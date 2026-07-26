@@ -1,0 +1,12 @@
+# @format
+
+packages:
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  bcrypt: true
+  electron: true
+  electron-winstaller: true
+  sharp: true
+  unrs-resolver: true
