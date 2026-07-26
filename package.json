@@ -5,6 +5,7 @@
 	"description": "App",
 	"version": "1.2.22",
 	"author": "Xernerx Studios",
+	"packageManager": "pnpm@11.17.0",
 	"scripts": {
 		"dev": "pnpm i && concurrently -n apps,tunnel -c blue,green \"pnpm --parallel --filter ./apps/* dev\" \"pnpm tunnel\"",
 		"build": "pnpm --filter ./apps/* build",
@@ -15,6 +16,7 @@
 		"minor": "git add . && git commit -m \"Minor submit source code of app\" && npm version minor && pnpm --filter ./apps/* run minor && git add . && git commit -m \"Minor version of app\" && git push && git push --tags"
 	},
 	"devDependencies": {
-		"concurrently": "^9.2.1"
+		"concurrently": "^9.2.1",
+		"shx": "^0.4.0"
 	}
 }
