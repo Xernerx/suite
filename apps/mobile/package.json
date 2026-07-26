@@ -1,7 +1,7 @@
 {
 	"name": "xernerx-mobile",
 	"main": "expo-router/entry",
-	"version": "1.2.21",
+	"version": "1.2.22",
 	"author": "Xernerx Studios",
 	"scripts": {
 		"start": "expo start",
