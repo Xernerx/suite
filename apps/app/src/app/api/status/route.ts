@@ -9,10 +9,10 @@ export async function GET() {
 	return NextResponse.json({ message: 'hi' });
 }
 
-export async function POST() {
-	const db = await database('status', 'status');
+// export async function POST() {
+// 	const db = await database('status', 'status');
 
-	console.log(db);
+// 	console.log(db);
 
-	return NextResponse.json({ message: 'hi' });
-}
+// 	return NextResponse.json({ message: 'hi' });
+// }

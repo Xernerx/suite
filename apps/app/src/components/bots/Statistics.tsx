@@ -190,7 +190,7 @@ export default function Statistics({ id }: Props) {
 
 						<YAxis domain={yDomain} />
 
-						<Tooltip labelFormatter={(value) => new Date(value).toLocaleString()} />
+						<Tooltip labelFormatter={(value) => new Date(Number(value)).toLocaleString()} />
 
 						{visible.guilds && <Line type='monotone' dataKey='guilds' stroke='#8884d8' strokeWidth={2} dot={false} />}
 

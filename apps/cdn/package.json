@@ -1,10 +1,11 @@
 {
-	"name": "b",
+	"name": "cdn",
 	"version": "0.2.21",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
-		"dev": "pnpm i && next dev -p 4002",
+		"initialize": "shx cp -r ../../packages/public/* ./public/",
+		"dev": "pnpm initialize && next dev -p 4003",
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint",
@@ -14,13 +15,16 @@
 	},
 	"dependencies": {
 		"@svgr/webpack": "^8",
-		"framer-motion": "^12",
-		"lucide-react": "^1",
-		"mongoose": "^9",
+		"next": "16.2.11",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"@xernerx/styles": "workspace:*",
+		"@xernerx/providers": "workspace:*",
+		"@xernerx/components": "workspace:*",
+		"@xernerx/lib": "workspace:*",
 		"next-auth": "^4",
-		"next": "^16",
-		"react": "^19",
-		"react-dom": "^19"
+		"framer-motion": "^12",
+		"lucide-react": "^1"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",
@@ -29,7 +33,7 @@
 		"@types/react-dom": "^19",
 		"babel-plugin-react-compiler": "1.0.0",
 		"eslint": "^9",
-		"eslint-config-next": "16.2.3",
+		"eslint-config-next": "16.2.11",
 		"tailwindcss": "^4",
 		"typescript": "^5"
 	}

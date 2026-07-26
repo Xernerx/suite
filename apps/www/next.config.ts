@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
 	images: {
 		unoptimized: true,
 	},
-	allowedDevOrigins: ['*.dev.dummi.me'],
+	allowedDevOrigins: ['*.dev.xernerx.com'],
 	turbopack: {
 		rules: {
 			'*.svg': {

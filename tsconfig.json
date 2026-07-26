@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"target": "ES2023",
+		"jsx": "react-jsx",
+		"strict": true,
+		"skipLibCheck": true,
+		"paths": {
+			"@xernerx/*": ["./packages/*"]
+		}
+	}
+}
