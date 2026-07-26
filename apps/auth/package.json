@@ -1,0 +1,40 @@
+{
+	"name": "auth",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"initialize": "shx cp -r ../../packages/public/* ./public/",
+		"dev": "pnpm initialize && next dev -p 4001",
+		"build": "next build",
+		"start": "next start",
+		"lint": "eslint",
+		"patch": "npm version patch",
+		"minor": "npm version minor",
+		"major": "npm version major"
+	},
+	"dependencies": {
+		"@svgr/webpack": "^8",
+		"next": "16.2.11",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"@xernerx/styles": "workspace:*",
+		"@xernerx/providers": "workspace:*",
+		"@xernerx/components": "workspace:*",
+		"@xernerx/ui": "workspace:*",
+		"@xernerx/lib": "workspace:*",
+		"next-auth": "^4",
+		"framer-motion": "^12",
+		"lucide-react": "^1"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"babel-plugin-react-compiler": "1.0.0",
+		"eslint": "^9",
+		"eslint-config-next": "16.2.11",
+		"tailwindcss": "^4",
+		"typescript": "^5"
+	}
+}
