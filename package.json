@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"description": "App",
-	"version": "1.2.24",
+	"version": "1.2.25",
 	"author": "Xernerx Studios",
 	"packageManager": "pnpm@11.17.0",
 	"engines": {
