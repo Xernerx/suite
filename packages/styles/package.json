@@ -1,0 +1,13 @@
+{
+	"name": "@xernerx/styles",
+	"version": "0.0.0",
+	"private": true,
+	"exports": {
+		".": "./index.ts",
+		"./globals.css": "./globals.css"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"tailwindcss": "^4"
+	}
+}

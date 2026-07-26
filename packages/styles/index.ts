@@ -1,0 +1,3 @@
+/** @format */
+
+import './globals.css';

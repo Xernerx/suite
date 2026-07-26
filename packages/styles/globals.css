@@ -1,0 +1,119 @@
+/** @format */
+
+@import 'tailwindcss';
+
+@source "../ui/src";
+@source "../components/src";
+@source "../providers/src";
+
+@theme {
+	--color-accent: #8b7cf6;
+	--color-accent-hover: #7a6be6;
+	--color-accent-active: #7e946f;
+
+	--color-bg-light: #fafafa;
+	--color-fg-light: #f4f4f5;
+
+	--color-bg-dark: #09090b;
+	--color-fg-dark: #18181b;
+}
+
+:root {
+	--accent: #8b7cf6;
+	--hover-accent: #7a6be6;
+	--active-accent: #7a6be6;
+
+	/* Base palette */
+	--background-light: #fafafa;
+	--foreground-light: #f4f4f5;
+	--border-light: #53535b;
+
+	--background-dark: #09090b;
+	--foreground-dark: #18181b;
+	--border-dark: #f4f4f5;
+
+	/* Active theme variables */
+	--background: var(--background-light);
+	--foreground: var(--foreground-light);
+	--border: var(--border-light);
+
+	--text: #09090b;
+	--text-muted: #52525b;
+
+	--ui-gap: 15px;
+}
+
+html.dark {
+	--background: var(--background-dark);
+	--foreground: var(--foreground-dark);
+	--border: var(--border-dark);
+
+	--text: #fafafa;
+	--text-muted: #a1a1aa;
+}
+
+html,
+body {
+	background: var(--background);
+	color: var(--text);
+	margin: 0;
+	overflow-y: auto;
+}
+
+.solar-slider {
+	appearance: none;
+	height: 10px;
+	border-radius: 999px;
+	background: rgb(39 39 42);
+	cursor: pointer;
+}
+
+.solar-slider::-webkit-slider-thumb {
+	appearance: none;
+	width: 22px;
+	height: 22px;
+	border-radius: 999px;
+	background: var(--accent);
+	border: 3px solid var(--border);
+	box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+}
+
+.solar-slider::-moz-range-thumb {
+	width: 22px;
+	height: 22px;
+	border-radius: 999px;
+	background: var(--accent);
+	border: 3px solid var(--border);
+}
+
+::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--accent);
+	border-radius: 999px;
+	border: 2px solid var(--background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--hover-accent);
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: var(--active-accent);
+}
+
+::-webkit-scrollbar-corner {
+	background: var(--background);
+}
+
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--accent) var(--background);
+}
