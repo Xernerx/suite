@@ -6,11 +6,14 @@
 	"version": "1.2.23",
 	"author": "Xernerx Studios",
 	"packageManager": "pnpm@11.17.0",
+	"engines": {
+		"node": ">=20"
+	},
 	"scripts": {
 		"dev": "pnpm i && concurrently -n apps,tunnel -c blue,green \"pnpm --parallel --filter ./apps/* dev\" \"pnpm tunnel\"",
 		"build": "pnpm --filter ./apps/* build",
 		"lint": "pnpm --recursive run lint",
-		"tunnel": "cloudflared tunnel run dev-local",
+		"tunnel": "cloudflared tunnel run",
 		"x": "cd cli && pnpm start",
 		"patch": "git add . && git commit -m \"Patch submit source code of app\" && npm version patch && pnpm --filter ./apps/* run patch && git add . && git commit -m \"Patch version of app\" && git push && git push --tags",
 		"minor": "git add . && git commit -m \"Minor submit source code of app\" && npm version minor && pnpm --filter ./apps/* run minor && git add . && git commit -m \"Minor version of app\" && git push && git push --tags"
