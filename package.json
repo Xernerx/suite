@@ -20,9 +20,7 @@
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1",
-		"shx": "^0.4.0"
-	},
-	"dependencies": {
+		"shx": "^0.4.0",
 		"next": "^16"
 	}
 }
