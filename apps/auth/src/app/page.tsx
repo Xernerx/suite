@@ -16,6 +16,7 @@ import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSidebar } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 
 // Mapped all your sidebar views to their respective imported component files
 const COMPONENT_MAP: Record<string, React.ReactNode> = {
@@ -66,27 +67,21 @@ export default function Home() {
 
 	if (!session && status !== 'loading') return redirect('/login');
 
-	if (status === 'loading') {
-		return (
-			<div className='flex h-full w-full items-center justify-center p-12'>
-				<div className='h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent' />
-			</div>
-		);
-	}
+	if (status === 'loading') return <Loading />;
 
 	const currentView = view || 'account';
 	// Fallback safely to Account if an unknown view param slips through
 	const ActiveComponent = COMPONENT_MAP[currentView] || <Account />;
 
 	return (
-		<AnimatePresence mode='wait'>
+		<AnimatePresence mode="wait">
 			<motion.div
 				key={currentView}
 				initial={{ opacity: 0, y: 8 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -8 }}
 				transition={{ duration: 0.2, ease: 'easeInOut' }}
-				className='flex flex-col w-full'>
+				className="flex flex-col w-full">
 				{ActiveComponent}
 			</motion.div>
 		</AnimatePresence>

@@ -7,6 +7,7 @@
 		".": "./index.ts"
 	},
 	"dependencies": {
+		"@xernerx/lib": "workspace:*",
 		"react": "^19",
 		"react-dom": "^19",
 		"next-auth": "^4",

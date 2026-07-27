@@ -31,7 +31,7 @@ type SidebarContextType = {
 const SidebarContext = createContext<SidebarContextType | null>(null);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-	const [state, setState] = useState<'open' | 'closed' | 'hidden'>('open');
+	const [state, setState] = useState<'open' | 'closed' | 'hidden'>('hidden');
 	const [prevState, setPrevState] = useState<'open' | 'closed'>('open');
 	const [isMobileOpen, setMobileOpen] = useState(false);
 

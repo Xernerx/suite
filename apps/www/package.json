@@ -14,11 +14,13 @@
 		"major": "npm version major"
 	},
 	"dependencies": {
+		"@xernerx/components": "workspace:*",
+		"@xernerx/providers": "workspace:*",
+		"@xernerx/lib": "workspace:*",
+		"@xernerx/feedback": "workspace:*",
 		"@svgr/webpack": "^8",
 		"framer-motion": "^12",
-		"lru-cache": "^6",
 		"lucide-react": "^1",
-		"mongoose": "^9",
 		"next": "^16",
 		"next-auth": "^4",
 		"react": "^19",

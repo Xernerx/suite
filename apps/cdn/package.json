@@ -22,6 +22,7 @@
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/components": "workspace:*",
 		"@xernerx/lib": "workspace:*",
+		"@xernerx/feedback": "workspace:*",
 		"next-auth": "^4",
 		"framer-motion": "^12",
 		"lucide-react": "^1"

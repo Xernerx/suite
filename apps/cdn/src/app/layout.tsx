@@ -10,21 +10,21 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: 'Xernerx CDN',
-	description: '',
+	description: 'Xernerx content delivery network and asset storage service.',
 
 	metadataBase: new URL('https://cdn.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Dashboard',
-		description: 'Access the Xernerx dashboard to manage applications, API tokens, and platform configuration.',
+		title: 'Xernerx CDN',
+		description: 'Xernerx content delivery network and asset storage service.',
 		url: 'https://cdn.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
 			{
-				url: '/banner.png', // ✅ now local works perfectly
+				url: '/banner.png',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx Dashboard',
+				alt: 'Xernerx CDN',
 			},
 		],
 		type: 'website',
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Dashboard',
-		description: 'Manage your Xernerx tools, tokens, and applications in one place.',
+		title: 'Xernerx CDN',
+		description: 'Xernerx content delivery network and asset storage service.',
 		images: ['/banner.png'],
 	},
 
@@ -54,7 +54,7 @@ export default async function RootLayout({
 	const session = await getServerSession(auth);
 
 	return (
-		<html lang='en' suppressHydrationWarning>
+		<html lang="en" suppressHydrationWarning>
 			<body>
 				<SessionProvider session={session}>
 					<AppLayout>{children}</AppLayout>

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { CookieProvider, PlatformProvider, SidebarProvider, SupportProvider, ThemeProvider, ToastProvider } from '@xernerx/providers';
+import { CookieProvider, EnvironmentProvider, PlatformProvider, SidebarProvider, SupportProvider, ThemeProvider, ToastProvider, ShortcutsProvider } from '@xernerx/providers';
 
 import { CookiePrompt } from './CookiePrompt';
 import { Page } from './Page';
@@ -10,21 +10,25 @@ import React from 'react';
 export function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<>
-			<PlatformProvider>
-				<ThemeProvider>
-					<ToastProvider>
-						<CookieProvider>
-							<SupportProvider>
-								<CookiePrompt />
+			<EnvironmentProvider>
+				<PlatformProvider>
+					<ThemeProvider>
+						<ShortcutsProvider>
+							<ToastProvider>
+								<CookieProvider>
+									<SupportProvider>
+										<CookiePrompt />
 
-								<SidebarProvider>
-									<Page>{children}</Page>
-								</SidebarProvider>
-							</SupportProvider>
-						</CookieProvider>
-					</ToastProvider>
-				</ThemeProvider>
-			</PlatformProvider>
+										<SidebarProvider>
+											<Page>{children}</Page>
+										</SidebarProvider>
+									</SupportProvider>
+								</CookieProvider>
+							</ToastProvider>
+						</ShortcutsProvider>
+					</ThemeProvider>
+				</PlatformProvider>
+			</EnvironmentProvider>
 		</>
 	);
 }

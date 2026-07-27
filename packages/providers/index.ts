@@ -7,3 +7,5 @@ export * from './src/PlatformProvider';
 export * from './src/CookieProvider';
 export * from './src/ToastProvider';
 export * from './src/SupportProvider';
+export * from './src/EnvironmentProvider';
+export * from './src/ShortcutsProvider';

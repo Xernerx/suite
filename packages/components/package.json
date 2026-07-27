@@ -15,8 +15,10 @@
 		"react": "^19",
 		"react-dom": "^19",
 		"@xernerx/providers": "workspace:*",
+		"@xernerx/lib": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"next-auth": "^4"
+		"next-auth": "^4",
+		"nextjs-toploader": "^3"
 	},
 	"devDependencies": {
 		"tailwindcss": "^4",

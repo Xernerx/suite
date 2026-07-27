@@ -3,11 +3,20 @@
 'use client';
 
 import { Boxes, ExternalLink, LayoutDashboard, Package } from 'lucide-react';
+import { useEnvironment, useSidebar } from '@xernerx/providers';
 
 import Banner from '@/../public/banner.svg';
 import Timeline from '@/components/Timeline';
+import { useEffect } from 'react';
 
 export default function Home() {
+	const { hide } = useSidebar();
+	const { getEnvUrl } = useEnvironment();
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
+
 	return (
 		<div className='flex flex-col'>
 			{/* HERO */}
@@ -16,59 +25,26 @@ export default function Home() {
 				style={{
 					gap: 'calc(var(--ui-gap) * 1.5)',
 				}}>
-				<div
-					className='absolute inset-0 -z-10'
-					style={{
-						background: 'radial-gradient(circle at center, rgba(var(--accent),0.15), transparent 70%)',
-					}}
-				/>
-
 				<div className='relative w-full flex justify-center py-24 overflow-hidden'>
-					{/* subtle accent glow */}
-					<div
-						className='absolute inset-0 -z-10'
-						style={{
-							background: 'radial-gradient(800px 400px at 50% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%)',
-						}}
-					/>
-
-					<Banner className='w-full max-w-6xl h-auto object-contain select-none pointer-events-none' />
+					<Banner className='w-full max-w-6xl h-auto object-contain select-none pointer-events-none text-(--accent)' />
 				</div>
 
-				<h1 className='text-5xl md:text-6xl font-semibold tracking-tight'>Building Reliable Infrastructure</h1>
+				<h1 className='text-5xl md:text-6xl font-semibold tracking-tight text-(--text)'>Building Reliable Infrastructure</h1>
 
-				<p className='max-w-2xl text-base opacity-70 leading-relaxed'>Xernerx develops scalable applications, frameworks, and automation tools focused on long-term maintainability and performance.</p>
+				<p className='max-w-2xl text-base text-(--text-muted) leading-relaxed'>
+					Xernerx develops scalable applications, frameworks, and automation tools focused on long-term maintainability and performance.
+				</p>
 			</section>
-
-			{/* DIVIDER */}
-			<div className='relative h-24'>
-				<div
-					className='absolute inset-0'
-					style={{
-						background: 'linear-gradient(to bottom, transparent, rgba(var(--accent),0.08), transparent)',
-					}}
-				/>
-			</div>
 
 			{/* ABOUT */}
 			<section className='max-w-5xl mx-auto text-center px-6' style={{ padding: 'calc(var(--ui-gap) * 3) 0' }}>
-				<h2 className='text-3xl font-semibold mb-6'>About Xernerx</h2>
+				<h2 className='text-3xl font-semibold mb-6 text-(--text)'>About Xernerx</h2>
 
-				<p className='text-base opacity-70 leading-relaxed'>
+				<p className='text-base text-(--text-muted) leading-relaxed'>
 					Founded in 2024, Xernerx evolved from a focused development initiative into a structured ecosystem of automation tools and infrastructure frameworks. Every system is built with scalability,
 					maintainability, and architectural clarity as first principles.
 				</p>
 			</section>
-
-			{/* DIVIDER */}
-			<div className='relative h-24'>
-				<div
-					className='absolute inset-0'
-					style={{
-						background: 'linear-gradient(to bottom, transparent, rgba(var(--accent),0.08), transparent)',
-					}}
-				/>
-			</div>
 
 			{/* SERVICES / PACKAGES / APPS */}
 			<section className='px-6' style={{ padding: 'calc(var(--ui-gap) * 4) 0' }}>
@@ -82,7 +58,7 @@ export default function Home() {
 									icon: <LayoutDashboard size={18} />,
 									title: 'Dashboard',
 									desc: 'Manage applications, configure deployments, and monitor system performance.',
-									link: 'https://app.xernerx.com',
+									link: getEnvUrl('https://app.xernerx.com'),
 								},
 							],
 						},
@@ -110,51 +86,44 @@ export default function Home() {
 									icon: <Boxes size={18} />,
 									title: 'To-Do List Bot',
 									desc: 'Structured productivity tooling.',
-									link: 'https://app.xernerx.com/bots/782105629572464652',
+									link: getEnvUrl('https://app.xernerx.com/bots/782105629572464652'),
 								},
 								{
 									icon: <Boxes size={18} />,
 									title: 'Zodiac',
 									desc: 'Astrology-based interaction tools.',
-									link: 'https://app.xernerx.com/bots/950251264095162418',
+									link: getEnvUrl('https://app.xernerx.com/bots/950251264095162418'),
 								},
 								{
 									icon: <Boxes size={18} />,
 									title: 'Metamorphosis',
 									desc: 'Advanced role transformation utilities.',
-									link: 'https://app.xernerx.com/bots/881678826906730547',
+									link: getEnvUrl('https://app.xernerx.com/bots/881678826906730547'),
 								},
 							],
 						},
 					].map((col) => (
 						<div key={col.title}>
-							<h2 className='text-xl font-semibold mb-6'>{col.title}</h2>
+							<h2 className='text-xl font-semibold mb-6 text-(--text)'>{col.title}</h2>
 
 							<div className='flex flex-col gap-6'>
 								{col.items.map((item) => (
-									<a
-										key={item.title}
-										href={item.link}
-										className='group rounded-xl p-5 transition relative overflow-hidden'
-										style={{
-											background: 'var(--container)',
-											border: '1px solid var(--border)',
-										}}>
+									<a key={item.title} href={item.link} className='group rounded-xl p-5 transition relative overflow-hidden bg-transparent border border-(--border)/10 hover:border-(--accent)/40'>
 										{/* hover glow */}
 										<div
 											className='absolute inset-0 opacity-0 group-hover:opacity-100 transition pointer-events-none'
 											style={{
-												background: 'radial-gradient(circle at top, rgba(var(--accent),0.1), transparent 70%)',
+												background: 'radial-gradient(circle at top, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%)',
 											}}
 										/>
 
 										<div className='relative flex items-center gap-3 mb-2'>
-											<div style={{ color: 'rgb(var(--accent))' }}>{item.icon}</div>
-											<h3 className='font-medium text-sm'>{item.title}</h3>
-											<ExternalLink className='ml-auto opacity-30 group-hover:opacity-100 transition' size={14} />
+											<div className='text-(--accent)'>{item.icon}</div>
+											<h3 className='font-medium text-sm text-(--text)'>{item.title}</h3>
+											<ExternalLink className='ml-auto text-(--text-muted) group-hover:text-(--text) transition' size={14} />
 										</div>
 
-										<p className='text-xs opacity-70 leading-relaxed'>{item.desc}</p>
+										<p className='text-xs text-(--text-muted) leading-relaxed'>{item.desc}</p>
 									</a>
 								))}
 							</div>
@@ -163,21 +132,11 @@ export default function Home() {
 				</div>
 			</section>
 
-			{/* DIVIDER */}
-			<div className='relative h-24'>
-				<div
-					className='absolute inset-0'
-					style={{
-						background: 'linear-gradient(to bottom, transparent, rgba(var(--accent),0.08), transparent)',
-					}}
-				/>
-			</div>
-
 			{/* HISTORY */}
 			<section style={{ paddingTop: 'calc(var(--ui-gap) * 4)' }}>
 				<div className='max-w-4xl mx-auto px-6 mb-16 text-center'>
-					<h2 className='text-3xl font-semibold mb-4'>Our History</h2>
-					<p className='text-sm opacity-70'>A structured progression from experimentation to stable infrastructure engineering.</p>
+					<h2 className='text-3xl font-semibold mb-4 text-(--text)'>Our History</h2>
+					<p className='text-sm text-(--text-muted)'>A structured progression from experimentation to stable infrastructure engineering.</p>
 				</div>
 
 				<Timeline />
