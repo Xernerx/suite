@@ -1,6 +1,6 @@
-# cdn
+# @xernerx/components
 
-## 0.2.27
+## 0.0.1
 
 ### Patch Changes
 
@@ -42,13 +42,5 @@
   - Completely rewritten all pages
 
 - Updated dependencies
-  - @xernerx/components@0.0.1
   - @xernerx/providers@0.0.1
-  - @xernerx/feedback@0.0.1
   - @xernerx/lib@0.0.1
-
-## 0.2.26
-
-### Patch Changes
-
-- 62b09e4: test

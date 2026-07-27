@@ -15,7 +15,8 @@
 		"lint": "pnpm --recursive run lint",
 		"tunnel": "cloudflared tunnel run",
 		"x": "cd cli && pnpm start",
-		"push": "pnpm changeset && pnpm changeset version && git add . && git commit -m \"chore: release\" && pnpm changeset tag && git push --follow-tags"
+		"commit": "changeset",
+		"push": "pnpm changeset version && git add . && git commit -m \"chore: release\" && pnpm changeset tag && git push --follow-tags"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.1",
