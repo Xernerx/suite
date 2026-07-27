@@ -1,5 +1,15 @@
 # cdn
 
+## 0.2.28
+
+### Patch Changes
+
+- <!-- @format -->
+
+  Added Changelog
+
+  - Fixed an issue where changelog was not properly loaded
+
 ## 0.2.27
 
 ### Patch Changes

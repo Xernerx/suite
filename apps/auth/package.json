@@ -1,6 +1,6 @@
 {
 	"name": "auth",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",

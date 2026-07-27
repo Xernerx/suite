@@ -1,5 +1,15 @@
 # auth
 
+## 0.1.8
+
+### Patch Changes
+
+- <!-- @format -->
+
+  Added Changelog
+
+  - Fixed an issue where changelog was not properly loaded
+
 ## 0.1.7
 
 ### Patch Changes
