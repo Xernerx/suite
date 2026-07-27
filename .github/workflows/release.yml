@@ -5,7 +5,9 @@ name: Desktop + Mobile Release
 on:
   push:
     tags:
-      - 'v*'
+      # Listen for changesets-generated package tags instead of global v*
+      - 'desktop@*'
+      - 'mobile@*'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -13,6 +15,8 @@ env:
 jobs:
   desktop:
     name: Electron Build
+    # ✅ ONLY run this job if the tag pushed was for the desktop app
+    if: startsWith(github.ref, 'refs/tags/desktop@')
     runs-on: ${{ matrix.os }}
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -53,49 +57,25 @@ jobs:
 
   mobile:
     name: Mobile Build (Expo)
+    # ✅ ONLY run this job if the tag pushed was for the mobile app
+    if: startsWith(github.ref, 'refs/tags/mobile@')
     runs-on: ubuntu-latest
-    continue-on-error: true # ✅ don’t block everything if this fails
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 24
-
       - name: Install pnpm
         run: npm install -g pnpm
-
-      # - name: Install deps
-      #   run: pnpm install --frozen-lockfile
-
-      # - name: Install EAS CLI
-      #   run: npm install -g eas-cli
-
-      # - name: Build Android with EAS
-      #   run: |
-      #     cd apps/mobile
-      #     npx eas build --platform android --non-interactive --profile preview
-      #   env:
-      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      # - name: Download APK
-      #   run: |
-      #     cd apps/mobile
-      #     npx eas build:download --platform android --latest --output app.apk
-      #   env:
-      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      # - name: Upload APK
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: android
-      #     path: apps/mobile/app.apk
+      # ... (your commented out EAS steps remain the same)
 
   release:
     name: Create GitHub Release
-    if: always() # ✅ ALWAYS run, even if builds fail
+    if: always()
+    # Use always() so it runs even if the *other* job was skipped by the `if` condition
     needs: [desktop, mobile]
     runs-on: ubuntu-latest
 

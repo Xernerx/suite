@@ -15,12 +15,16 @@
 		"lint": "pnpm --recursive run lint",
 		"tunnel": "cloudflared tunnel run",
 		"x": "cd cli && pnpm start",
+		"changeset": "changeset",
+		"version-packages": "changeset version",
+		"release": "changeset publish",
 		"patch": "git add . && git commit -m \"Patch submit source code of app\" && npm version patch && pnpm --filter ./apps/* run patch && git add . && git commit -m \"Patch version of app\" && git push && git push --tags",
 		"minor": "git add . && git commit -m \"Minor submit source code of app\" && npm version minor && pnpm --filter ./apps/* run minor && git add . && git commit -m \"Minor version of app\" && git push && git push --tags"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.31.1",
 		"concurrently": "^9.2.1",
-		"shx": "^0.4.0",
-		"next": "^16"
+		"next": "^16",
+		"shx": "^0.4.0"
 	}
 }
