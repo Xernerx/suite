@@ -1,5 +1,11 @@
 # cdn
 
+## 0.2.29
+
+### Patch Changes
+
+- Server port fix
+
 ## 0.2.28
 
 ### Patch Changes
