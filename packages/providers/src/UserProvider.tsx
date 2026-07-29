@@ -31,7 +31,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState(null);
 
 	useEffect(() => {
-		if (status === 'authenticated' && session?.error === 'RefreshAccessTokenError') {
+		// Safely check session error with type casting to prevent NextAuth TypeScript mismatch
+		const sessionWithError = session as { error?: string; accessToken?: string; user?: any };
+
+		if (status === 'authenticated' && sessionWithError?.error === 'RefreshAccessTokenError') {
 			const authLoginUrl = getEnvUrl('https://auth.xernerx.com/auth/login');
 
 			signOut({ callbackUrl: authLoginUrl });
@@ -39,13 +42,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		(async () => {
-			if (!session || !session.accessToken) return;
+			if (!sessionWithError || !sessionWithError.accessToken) return;
 
 			const res = await fetch('https://discord.com/api/v10/users/@me', {
-				headers: { Authorization: `Bearer ${session.accessToken}` },
+				headers: { Authorization: `Bearer ${sessionWithError.accessToken}` },
 			}).then((res) => res.json());
 
-			await setUser({ ...session.user, ...res });
+			await setUser({ ...sessionWithError.user, ...res });
 
 			// Check if syncFromDiscord is enabled (default to true if not explicitly set)
 			const storedSync = getPref('syncFromDiscord');

@@ -1,5 +1,13 @@
 # www
 
+## 0.2.30
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.1.1
+  - @xernerx/components@0.1.1
+
 ## 0.2.29
 
 ### Patch Changes

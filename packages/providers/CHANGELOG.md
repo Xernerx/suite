@@ -1,5 +1,15 @@
 # @xernerx/providers
 
+## 0.1.1
+
+### Patch Changes
+
+- <!-- @format -->
+
+  Type Error
+
+  Fixed an issue where the canary build failed
+
 ## 0.1.0
 
 ### Minor Changes
