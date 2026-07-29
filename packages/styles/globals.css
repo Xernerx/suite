@@ -8,8 +8,8 @@
 
 @theme {
 	--color-accent: #8b7cf6;
-	--color-accent-hover: #7a6be6;
-	--color-accent-active: #7e946f;
+	--color-accent-hover: rgb(from var(--color-accent) r g b / 10%);
+	--color-accent-active: color-mix(in srgb, var(--color-accent), black 15%);
 
 	--color-bg-light: #fafafa;
 	--color-fg-light: #f4f4f5;
@@ -20,8 +20,14 @@
 
 :root {
 	--accent: #8b7cf6;
-	--hover-accent: #7a6be6;
-	--active-accent: #7a6be6;
+	--hover-accent: rgb(from var(--accent) r g b / 10%);
+	--active-accent: color-mix(in srgb, var(--accent), black 15%);
+
+	--accent-green: #39ff14; /* Neon Lime Green (High-visibility pop) */
+	--accent-orange: #ff6600; /* Vibrant Neon Orange */
+	--accent-red: #ff3333; /* Bright Neon/Coral Red */
+	/* --accent-canary */
+	/* --accent-dev */
 
 	/* Base palette */
 	--background-light: #fafafa;

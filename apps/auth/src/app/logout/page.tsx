@@ -33,7 +33,7 @@ export default function SignOutPage() {
 					className='flex w-full max-w-sm flex-col items-center text-center gap-6 rounded-3xl border border-(--border)/10 bg-(--foreground) p-8 shadow-2xl'>
 					{/* LOGO */}
 					<div className='flex flex-col items-center'>
-						<Banner className='h-auto w-40 text-accent' />
+						<Banner className='h-auto w-40 text-(--accent)' />
 					</div>
 
 					{/* TEXT CONTENT */}

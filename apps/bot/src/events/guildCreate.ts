@@ -17,13 +17,12 @@ export default class GuildCreateEvent extends EventBuilder {
 	}
 
 	async updateGuild(guild: Guild) {
-		await fetch(`https://dev.dummi.me/api/v1/guilds/${guild.id}/profile`, {
+		await fetch(`https://dev.xernerx.com/api/v1/guilds/${guild.id}/profile`, {
 			method: 'PATCH',
 			body: JSON.stringify({
 				name: guild.name,
 				icon: guild.icon,
 				locale: guild.preferredLocale,
-
 				bot: true,
 			}),
 		})

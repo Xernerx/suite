@@ -56,7 +56,7 @@ export function CookiePrompt() {
 		<div className='fixed bottom-4 left-4 z-[100] w-[calc(100%-2rem)] max-w-md rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 shadow-2xl md:bottom-8 md:left-8'>
 			<div className='flex flex-col gap-4'>
 				<div>
-					<h3 className='text-lg font-semibold text-accent'>Cookie Preferences</h3>
+					<h3 className='text-lg font-semibold text-(--accent)'>Cookie Preferences</h3>
 					<p className='mt-2 text-sm text-(--text-muted)'>We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.</p>
 				</div>
 

@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 			{children}
 
 			{/* The Toast Portal / Container */}
-			<div className="fixed bottom-4 left-4 right-4 z-[9999] flex flex-col gap-3 sm:left-auto sm:right-4 md:bottom-8 md:right-8">
+			<div className='fixed bottom-4 left-4 right-4 z-[9999] flex flex-col gap-3 sm:left-auto sm:right-4 md:bottom-8 md:right-8'>
 				<AnimatePresence>
 					{toasts.map((t) => (
 						<ToastItem key={t.id} toast={t} onDismiss={() => dismiss(t.id)} />
@@ -71,17 +71,17 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 	}, [duration, onDismiss]);
 
 	const icons = {
-		success: <CheckCircle className="text-green-400" size={20} />,
-		error: <AlertCircle className="text-red-400" size={20} />,
+		success: <CheckCircle className='text-green-400' size={20} />,
+		error: <AlertCircle className='text-red-400' size={20} />,
 		// Updated to use your theme accent variable
-		info: <Info className="text-accent" size={20} />,
+		info: <Info className='text-(--accent)' size={20} />,
 	};
 
 	const progressColors = {
 		success: 'bg-green-400',
 		error: 'bg-red-400',
 		// Updated to use your theme accent variable
-		info: 'bg-accent',
+		info: 'bg-(--accent)',
 	};
 
 	const icon = icons[toast.type || 'info'];
@@ -95,16 +95,16 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 			exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
 			// Swapped hardcoded hexes for your global border and foreground variables
 
-			className="pointer-events-auto relative flex w-full sm:w-[350px] items-start gap-3 overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) p-4 shadow-xl backdrop-blur-md">
-			<div className="mt-0.5 shrink-0">{icon}</div>
-			<div className="min-w-0 flex-1 pb-1">
-				<h4 className="break-words text-sm font-medium text-(--text)">{toast.title}</h4>
-				{toast.description && <p className="mt-1 break-words text-sm text-(--text-muted)">{toast.description}</p>}
+			className='pointer-events-auto relative flex w-full sm:w-[350px] items-start gap-3 overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) p-4 shadow-xl backdrop-blur-md'>
+			<div className='mt-0.5 shrink-0'>{icon}</div>
+			<div className='min-w-0 flex-1 pb-1'>
+				<h4 className='break-words text-sm font-medium text-(--text)'>{toast.title}</h4>
+				{toast.description && <p className='mt-1 break-words text-sm text-(--text-muted)'>{toast.description}</p>}
 			</div>
 			<button
 				onClick={onDismiss}
 				// Swapped hover background to --background so it subtly contrasts the foreground toast
-				className="shrink-0 rounded-md p-1 text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)">
+				className='shrink-0 rounded-md p-1 text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)'>
 				<X size={16} />
 			</button>
 			{/* Animated Progress Bar */}

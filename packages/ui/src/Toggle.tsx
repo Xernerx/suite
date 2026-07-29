@@ -26,19 +26,19 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(({ className = '
 	return (
 		<label
 			className={`
-                    relative inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus-within:ring-2 focus-within:ring-accent focus-within:ring-offset-2 focus-within:ring-offset-(--background)
-                    ${activeSize.track}
-                    ${checked ? 'bg-accent' : 'bg-(--text-muted)'}
-                    ${disabled ? 'cursor-not-allowed opacity-60' : ''}
-                    ${className}
-                `}>
+                relative inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus-within:ring-2 focus-within:ring-(--accent) focus-within:ring-offset-2 focus-within:ring-offset-(--background)
+                ${activeSize.track}
+                ${checked ? 'bg-(--accent)' : 'bg-(--text-muted)'}
+                ${disabled ? 'cursor-not-allowed opacity-60' : ''}
+                ${className}
+            `}>
 			<input type='checkbox' ref={ref} className='sr-only' checked={checked} disabled={disabled} {...props} />
 			<span
 				className={`
-                        inline-block transform rounded-full bg-white transition duration-200 ease-in-out
-                        ${activeSize.thumb}
-                        ${activeSize.translate}
-                    `}
+                    inline-block transform rounded-full bg-white transition duration-200 ease-in-out
+                    ${activeSize.thumb}
+                    ${activeSize.translate}
+                `}
 			/>
 		</label>
 	);

@@ -1,6 +1,87 @@
 /** @format */
 'use client';
 
+import { AlertTriangle, LogOut, Trash2, User as UserIcon } from 'lucide-react';
+import { signOut, useSession } from 'next-auth/react';
+import { useEnvironment, useUser } from '@xernerx/providers';
+
+import Image from 'next/image';
+
 export default function Account() {
-	return <>Account</>;
+	const { data: session } = useSession();
+	const { user: discordUser } = useUser();
+	const { getEnvUrl } = useEnvironment();
+
+	const activeUser = discordUser || session?.user;
+	const avatarUrl = activeUser?.image || (activeUser?.id && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.png` : null);
+
+	const handleLogout = () => {
+		const authLoginUrl = getEnvUrl('https://auth.xernerx.com/auth/login');
+		signOut({ callbackUrl: authLoginUrl });
+	};
+
+	const handleDeleteAccount = () => {
+		// Placeholder for future logic
+		console.log('Delete account triggered');
+	};
+
+	return (
+		<div className='flex flex-col gap-8 max-w-4xl mx-auto p-6 md:p-12 w-full'>
+			{/* Welcome Header */}
+			<div>
+				<h1 className='text-3xl font-black tracking-tight text-(--text)'>Account Settings</h1>
+				<p className='text-sm text-(--text-muted) mt-1'>Manage your account session, data privacy, and global profile details.</p>
+			</div>
+
+			{/* Profile Summary Card */}
+			<div className='flex items-center gap-5 p-6 rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm'>
+				{avatarUrl ? (
+					<Image src={avatarUrl} alt='Profile Avatar' width={80} height={80} className='h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0' unoptimized draggable={false} />
+				) : (
+					<div className='flex h-20 w-20 items-center justify-center rounded-full bg-(--border)/10 shrink-0'>
+						<UserIcon size={36} className='text-(--text-muted)' />
+					</div>
+				)}
+				<div className='flex flex-col overflow-hidden'>
+					<h2 className='text-xl font-bold text-(--text) truncate'>{activeUser?.global_name || activeUser?.name || 'User'}</h2>
+					<p className='text-sm text-(--text-muted) truncate'>@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
+					{activeUser?.id && <span className='text-xs text-(--text-muted)/60 mt-1 font-mono'>ID: {activeUser.id}</span>}
+				</div>
+			</div>
+
+			{/* Settings Sections Grid / Stack */}
+			<div className='flex flex-col gap-6'>
+				{/* Session Section */}
+				<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm'>
+					<div className='flex flex-col max-w-xl'>
+						<h3 className='text-base font-semibold text-(--text)'>Active Session</h3>
+						<p className='text-xs text-(--text-muted) mt-0.5'>Sign out of your active account session on this device. You will need to re-authenticate to access your workspace.</p>
+					</div>
+					<button
+						onClick={handleLogout}
+						className='flex items-center justify-center gap-2 rounded-xl bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/20 shrink-0'>
+						<LogOut size={16} />
+						<span>Log out</span>
+					</button>
+				</div>
+
+				{/* Danger Zone: Data & Account Deletion */}
+				<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl border border-red-500/20 bg-red-500/5 shadow-sm'>
+					<div className='flex flex-col max-w-xl'>
+						<div className='flex items-center gap-2 text-red-500 font-semibold text-base'>
+							<AlertTriangle size={18} />
+							<h3>Delete User Data & Account</h3>
+						</div>
+						<p className='text-xs text-red-500/80 mt-0.5'>Permanently delete your profile data, stored preferences, and close your account across the ecosystem. This action cannot be undone.</p>
+					</div>
+					<button
+						onClick={handleDeleteAccount}
+						className='flex items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-600 shrink-0 shadow-sm'>
+						<Trash2 size={16} />
+						<span>Delete Account</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	);
 }

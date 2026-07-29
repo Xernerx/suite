@@ -40,7 +40,7 @@ export default function SignInPage() {
 					className='flex w-full flex-col items-center gap-6 text-center'>
 					{/* LOGO */}
 					<div className='m-4 flex flex-col items-center'>
-						<Banner className='h-auto w-48 text-accent md:w-56' />
+						<Banner className='h-auto w-48 text-(--accent) md:w-56' />
 					</div>
 
 					{/* LOGIN BUTTON */}
