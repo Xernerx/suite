@@ -1,5 +1,19 @@
 # @xernerx/providers
 
+## 0.1.2
+
+### Patch Changes
+
+- <!-- @format -->
+
+  Fixed UI issues on cookieheaders
+
+  ## @xernerx/providers
+  - Fixed an issue where cookie headers were incorrectly being read, making all domains return discord derived accent colors
+
+  ## auth
+  - Fixed an issue where cookie headers were incorrectly being set
+
 ## 0.1.1
 
 ### Patch Changes

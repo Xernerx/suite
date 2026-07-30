@@ -3,6 +3,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import Script from 'next/script';
 import tinycolor from 'tinycolor2';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -16,16 +17,17 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-const DEFAULT_ACCENT = '#a4b795';
+const DEFAULT_ACCENT = '#8b7cf6';
 
-/* ---------- STORAGE HELPERS (Cookie fallback to LocalStorage) ---------- */
+/* ---------- STORAGE HELPERS ---------- */
 
 function setPref(key: string, value: string) {
 	if (typeof window === 'undefined') return;
 
 	try {
-		document.cookie = `${key}=${value}; path=/; max-age=31536000; SameSite=Lax`;
-		if (document.cookie.includes(`${key}=${value}`)) return;
+		// Clear shadow cookies
+		document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+		document.cookie = `${key}=${value}; domain=.xernerx.com; path=/; max-age=31536000; SameSite=Lax`;
 	} catch (e) {}
 
 	try {
@@ -79,7 +81,6 @@ function applyAccent(color?: string | number | null) {
 	let colorStr = DEFAULT_ACCENT;
 
 	if (color !== null && color !== undefined) {
-		// If it's a number OR a string consisting purely of digits (like "2693401")
 		if (typeof color === 'number' || (typeof color === 'string' && /^\d+$/.test(color))) {
 			const num = typeof color === 'string' ? parseInt(color, 10) : color;
 			colorStr = '#' + num.toString(16).padStart(6, '0');
@@ -88,44 +89,13 @@ function applyAccent(color?: string | number | null) {
 		}
 	}
 
-	const storedAccent = getPref('accent');
+	setPref('accent', colorStr);
 
-	if (storedAccent !== colorStr) {
-		setPref('accent', colorStr);
-
-		const accent = tinycolor(colorStr);
-		document.documentElement.style.setProperty('--accent', accent.toHexString());
-		document.documentElement.style.setProperty('--hover-accent', accent.clone().darken(8).toHexString());
-		document.documentElement.style.setProperty('--active-accent', accent.clone().setAlpha(0.15).toRgbString());
-	}
+	const accent = tinycolor(colorStr);
+	document.documentElement.style.setProperty('--accent', accent.toHexString());
+	document.documentElement.style.setProperty('--hover-accent', accent.clone().darken(8).toHexString());
+	document.documentElement.style.setProperty('--active-accent', accent.clone().setAlpha(0.15).toRgbString());
 }
-
-/* ---------- BLOCKING SCRIPT (Fixes FOUC) ---------- */
-// This script runs synchronously before React hydration to prevent the purple flash
-const themeInitScript = `
-    (function() {
-        try {
-            function getPref(key) {
-                var match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
-                if (match) return match[2];
-                return localStorage.getItem(key);
-            }
-
-            var theme = getPref('theme') || 'system';
-            if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-
-            var accent = getPref('accent');
-            if (accent) {
-                document.documentElement.style.setProperty('--accent', accent);
-                // Note: hover & active variants will pop in microseconds later during React hydration
-            }
-        } catch (e) {}
-    })();
-`;
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>(() => {
@@ -136,11 +106,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
-	/* ---------- INITIALIZE ON MOUNT ---------- */
 	useEffect(() => {
 		const storedAccent = getPref('accent') || DEFAULT_ACCENT;
 
-		// This calculates and applies the missing --hover-accent and --active-accent variables
 		const accent = tinycolor(storedAccent);
 		document.documentElement.style.setProperty('--accent', accent.toHexString());
 		document.documentElement.style.setProperty('--hover-accent', accent.clone().darken(8).toHexString());
@@ -149,14 +117,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		setResolvedTheme(theme === 'system' ? getSystemTheme() : theme);
 	}, []);
 
-	/* ---------- APPLY THEME ---------- */
 	useEffect(() => {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;
 		setResolvedTheme(resolved);
 		applyTheme(theme);
 	}, [theme]);
 
-	/* ---------- THEME CHANGE HANDLER ---------- */
 	function updateTheme(next: Theme) {
 		if (theme !== next) {
 			setPref('theme', next);
@@ -164,7 +130,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		}
 	}
 
-	/* ---------- SYSTEM LISTENER ---------- */
 	useEffect(() => {
 		const media = window.matchMedia('(prefers-color-scheme: dark)');
 		const handler = () => {
@@ -186,7 +151,35 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				setTheme: updateTheme,
 				setAccent: applyAccent,
 			}}>
-			<script dangerouslySetInnerHTML={{ __html: themeInitScript }} suppressHydrationWarning />
+			<Script
+				id='theme-init'
+				strategy='beforeInteractive'
+				dangerouslySetInnerHTML={{
+					__html: `
+                        (function() {
+                            try {
+                                function getPref(key) {
+                                    var match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+                                    if (match) return match[2];
+                                    return localStorage.getItem(key);
+                                }
+
+                                var theme = getPref('theme') || 'system';
+                                if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                                    document.documentElement.classList.add('dark');
+                                } else {
+                                    document.documentElement.classList.remove('dark');
+                                }
+
+                                var accent = getPref('accent');
+                                if (accent) {
+                                    document.documentElement.style.setProperty('--accent', accent);
+                                }
+                            } catch (e) {}
+                        })();
+                    `,
+				}}
+			/>
 			{children}
 		</ThemeContext.Provider>
 	);

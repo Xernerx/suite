@@ -75,13 +75,13 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 		if (typeof document === 'undefined') return;
 		const date = new Date();
 		date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-		document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+		document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};domain=.xernerx.com;path=/;SameSite=Lax`;
 		setCookies(parseCookies());
 	}, []);
 
 	const removeCookie = useCallback((name: string) => {
 		if (typeof document === 'undefined') return;
-		document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+		document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;domain=.xernerx.com;path=/;SameSite=Lax`;
 		setCookies(parseCookies());
 	}, []);
 
