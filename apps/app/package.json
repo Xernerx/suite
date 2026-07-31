@@ -1,6 +1,6 @@
 {
 	"name": "app",
-	"version": "1.2.26",
+	"version": "1.2.27",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@svgr/webpack": "^8",
-		"@xernerx/websocket": "^0.4.9",
+		"@xernerx/websocket": "^1.2.1",
 		"discord-api-types": "^0",
 		"framer-motion": "^12",
 		"jose": "^6.2.3",

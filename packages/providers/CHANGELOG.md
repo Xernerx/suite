@@ -1,5 +1,13 @@
 # @xernerx/providers
 
+## 0.2.1
+
+### Patch Changes
+
+- Fixed an issue where gitignore ignored too much
+- Updated dependencies
+  - @xernerx/lib@0.1.1
+
 ## 0.2.0
 
 ### Minor Changes

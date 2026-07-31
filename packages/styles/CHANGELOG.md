@@ -1,5 +1,11 @@
 # @xernerx/styles
 
+## 0.1.1
+
+### Patch Changes
+
+- Fixed an issue where gitignore ignored too much
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # bot
 
+## 1.1.27
+
+### Patch Changes
+
+- Fixed an issue where gitignore ignored too much
+
 ## 1.1.26
 
 ### Patch Changes
