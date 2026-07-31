@@ -1,5 +1,13 @@
 # @xernerx/feedback
 
+## 0.0.4
+
+### Patch Changes
+
+- Fixed an issue where gitignore ignored too much
+- Updated dependencies
+  - @xernerx/ui@0.1.1
+
 ## 0.0.3
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # auth
 
+## 0.3.1
+
+### Patch Changes
+
+- Fixed an issue where gitignore ignored too much
+- Updated dependencies
+  - @xernerx/components@0.2.1
+  - @xernerx/providers@0.2.1
+  - @xernerx/feedback@0.0.4
+  - @xernerx/styles@0.1.1
+  - @xernerx/lib@0.1.1
+  - @xernerx/ui@0.1.1
+
 ## 0.3.0
 
 ### Minor Changes
