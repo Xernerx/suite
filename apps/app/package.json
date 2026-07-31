@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@svgr/webpack": "^8",
-		"@xernerx/websocket": "^1.2.1",
+		"@xernerx/websocket": "^1",
 		"discord-api-types": "^0",
 		"framer-motion": "^12",
 		"jose": "^6.2.3",
