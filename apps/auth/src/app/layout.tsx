@@ -2,11 +2,14 @@
 
 import './globals.css';
 
+import { Locale, dictionary } from '@xernerx/lib/server';
+
 import { AppLayout } from '@xernerx/components';
 import type { Metadata } from 'next';
 import { SessionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
+import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
 	title: 'Xernerx Account',
@@ -53,11 +56,16 @@ export default async function RootLayout({
 }>) {
 	const session = await getServerSession(auth);
 
+	const headersList = await headers();
+	const locale = headersList.get('x-locale') || 'en';
+
+	const dict = await dictionary(locale as Locale);
+
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang={locale} suppressHydrationWarning>
 			<body>
 				<SessionProvider session={session}>
-					<AppLayout>{children}</AppLayout>
+					<AppLayout dictionary={dict}>{children}</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

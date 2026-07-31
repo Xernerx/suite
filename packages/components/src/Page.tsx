@@ -1,26 +1,16 @@
 /** @format */
 'use client';
 
-import { usePlatform, useSidebar, useToast } from '@xernerx/providers';
+import { usePlatform, useSidebar } from '@xernerx/providers';
 
 import { Footer } from './Footer';
 import { Header } from './Header';
 import NextTopLoader from 'nextjs-toploader';
 import { Sidebar } from './Sidebar';
-import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 
 export function Page({ children }: { children: React.ReactNode }) {
 	const { device } = usePlatform();
-	const { data: session, status } = useSession();
 	const { state } = useSidebar();
-	const { toast } = useToast();
-
-	useEffect(() => {
-		if (session?.user) {
-			toast({ title: status, description: `Hello ${session.user.name}` });
-		}
-	}, [session, status, toast]);
 
 	// Footer only renders when the sidebar is hidden
 	const showFooter = state === 'hidden';

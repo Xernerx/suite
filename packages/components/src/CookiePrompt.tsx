@@ -1,16 +1,17 @@
 /** @format */
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { type CookiePreferences, useCookie } from '@xernerx/providers';
+import { useEffect, useState } from 'react';
+import { type CookiePreferences, useCookie, useDictionary } from '@xernerx/providers';
 import { Button, Toggle } from '@xernerx/ui';
 
 export function CookiePrompt() {
 	const { preferences, updatePreferences } = useCookie();
+	const { t } = useDictionary();
+
 	const [isMounted, setIsMounted] = useState(false);
 	const [showManage, setShowManage] = useState(false);
 
-	// Local state for the toggles before the user hits "Save"
 	const [localPrefs, setLocalPrefs] = useState<CookiePreferences>({
 		essential: true,
 		functional: true,
@@ -22,7 +23,6 @@ export function CookiePrompt() {
 		setIsMounted(true);
 	}, []);
 
-	// Hide the prompt if we haven't mounted or if the user already saved their choices
 	if (!isMounted || preferences !== null) return null;
 
 	const handleAcceptAll = () => {
@@ -48,7 +48,7 @@ export function CookiePrompt() {
 	};
 
 	const togglePref = (key: keyof CookiePreferences) => {
-		if (key === 'essential') return; // Cannot toggle essential
+		if (key === 'essential') return;
 		setLocalPrefs((prev) => ({ ...prev, [key]: !prev[key] }));
 	};
 
@@ -56,16 +56,34 @@ export function CookiePrompt() {
 		<div className='fixed bottom-4 left-4 z-[100] w-[calc(100%-2rem)] max-w-md rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 shadow-2xl md:bottom-8 md:left-8'>
 			<div className='flex flex-col gap-4'>
 				<div>
-					<h3 className='text-lg font-semibold text-(--accent)'>Cookie Preferences</h3>
-					<p className='mt-2 text-sm text-(--text-muted)'>We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.</p>
+					<h3 className='text-lg font-semibold text-(--accent)'>{t('common.cookiePrompt.title', {}, 'Cookie Preferences')}</h3>
+					<p className='mt-2 text-sm text-(--text-muted)'>
+						{t('common.cookiePrompt.description', {}, 'We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.')}
+					</p>
 				</div>
 
 				{/* Manage Preferences Dropdown */}
 				{showManage && (
 					<div className='flex flex-col gap-3 rounded-xl bg-(--background) p-4'>
-						<PreferenceToggle label='Essential' description='Required for sessions and security.' checked={true} disabled={true} onChange={() => {}} />
-						<PreferenceToggle label='Functional' description='Remembers your theme and layout state.' checked={localPrefs.functional} onChange={() => togglePref('functional')} />
-						<PreferenceToggle label='Analytics' description='Helps us track errors and traffic.' checked={localPrefs.analytics} onChange={() => togglePref('analytics')} />
+						<PreferenceToggle
+							label={t('common.cookiePrompt.manage.essential.label', {}, 'Essential')}
+							description={t('common.cookiePrompt.manage.essential.description', {}, 'Required for sessions and security.')}
+							checked={true}
+							disabled={true}
+							onChange={() => {}}
+						/>
+						<PreferenceToggle
+							label={t('common.cookiePrompt.manage.functional.label', {}, 'Functional')}
+							description={t('common.cookiePrompt.manage.functional.description', {}, 'Remembers your theme and layout state.')}
+							checked={localPrefs.functional}
+							onChange={() => togglePref('functional')}
+						/>
+						<PreferenceToggle
+							label={t('common.cookiePrompt.manage.analytics.label', {}, 'Analytics')}
+							description={t('common.cookiePrompt.manage.analytics.description', {}, 'Helps us track errors and traffic.')}
+							checked={localPrefs.analytics}
+							onChange={() => togglePref('analytics')}
+						/>
 					</div>
 				)}
 
@@ -73,19 +91,19 @@ export function CookiePrompt() {
 				<div className='mt-2 flex flex-col gap-2'>
 					{showManage ? (
 						<Button variant='primary' onClick={handleSavePreferences} className='w-full'>
-							Save My Preferences
+							{t('common.cookiePrompt.buttons.save', {}, 'Save My Preferences')}
 						</Button>
 					) : (
 						<>
 							<Button variant='primary' onClick={handleAcceptAll} className='w-full'>
-								Accept All
+								{t('common.cookiePrompt.buttons.acceptAll', {}, 'Accept All')}
 							</Button>
 							<div className='flex gap-2'>
 								<Button variant='secondary' onClick={handleEssentialOnly} className='flex-1'>
-									Essential Only
+									{t('common.cookiePrompt.buttons.essentialOnly', {}, 'Essential Only')}
 								</Button>
 								<Button variant='secondary' onClick={() => setShowManage(true)} className='flex-1'>
-									Manage
+									{t('common.cookiePrompt.buttons.manage', {}, 'Manage')}
 								</Button>
 							</div>
 						</>

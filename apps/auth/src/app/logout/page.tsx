@@ -2,21 +2,22 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useDictionary, useSidebar } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import Banner from '@/../public/banner.svg';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@xernerx/providers';
 
 export default function SignOutPage() {
 	const router = useRouter();
 	const [loading, setLoading] = useState(false);
 	const { hide } = useSidebar();
+	const { t } = useDictionary();
 
 	useEffect(() => {
 		hide();
-	}, []);
+	}, [hide]);
 
 	async function handleSignOut() {
 		setLoading(true);
@@ -38,8 +39,8 @@ export default function SignOutPage() {
 
 					{/* TEXT CONTENT */}
 					<div className='flex flex-col gap-2'>
-						<h2 className='text-xl font-semibold text-(--text)'>Sign Out</h2>
-						<p className='text-sm text-(--text-muted)'>Are you sure you want to log out? You will need to authenticate again to access your dashboard.</p>
+						<h2 className='text-xl font-semibold text-(--text)'>{t('auth.signout.title', {}, 'Sign Out')}</h2>
+						<p className='text-sm text-(--text-muted)'>{t('auth.signout.description', {}, 'Are you sure you want to log out? You will need to authenticate again to access your dashboard.')}</p>
 					</div>
 
 					{/* ACTION BUTTONS */}
@@ -49,9 +50,8 @@ export default function SignOutPage() {
 							disabled={loading}
 							whileHover={!loading ? { scale: 1.02, y: -1 } : undefined}
 							whileTap={!loading ? { scale: 0.985 } : undefined}
-							// Destructive red styling for the logout button
 							className='w-full rounded-xl border border-red-500/20 bg-red-500/10 px-6 py-3 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60'>
-							{loading ? 'Signing out…' : 'Yes, log me out'}
+							{loading ? t('auth.signout.signingOut', {}, 'Signing out…') : t('auth.signout.confirmButton', {}, 'Yes, log me out')}
 						</motion.button>
 
 						<motion.button
@@ -59,9 +59,8 @@ export default function SignOutPage() {
 							disabled={loading}
 							whileHover={!loading ? { scale: 1.02, y: -1 } : undefined}
 							whileTap={!loading ? { scale: 0.985 } : undefined}
-							// Secondary styling to match your theme
 							className='w-full rounded-xl border border-(--border)/10 bg-(--background) px-6 py-3 text-sm font-medium text-(--text) transition-colors hover:border-(--text-muted) disabled:cursor-not-allowed disabled:opacity-60'>
-							Cancel
+							{t('auth.signout.cancelButton', {}, 'Cancel')}
 						</motion.button>
 					</div>
 				</motion.div>

@@ -1,9 +1,8 @@
 /** @format */
-
 'use client';
 
 import { Boxes, ExternalLink, LayoutDashboard, Package } from 'lucide-react';
-import { useEnvironment, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 
 import Banner from '@/../public/banner.svg';
 import Timeline from '@/components/Timeline';
@@ -12,6 +11,7 @@ import { useEffect } from 'react';
 export default function Home() {
 	const { hide } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 
 	useEffect(() => {
 		hide();
@@ -29,21 +29,16 @@ export default function Home() {
 					<Banner className='w-full max-w-6xl h-auto object-contain select-none pointer-events-none text-(--accent)' />
 				</div>
 
-				<h1 className='text-5xl md:text-6xl font-semibold tracking-tight text-(--text)'>Building Reliable Infrastructure</h1>
+				<h1 className='text-5xl md:text-6xl font-semibold tracking-tight text-(--text)'>{t('www.hero.title')}</h1>
 
-				<p className='max-w-2xl text-base text-(--text-muted) leading-relaxed'>
-					Xernerx develops scalable applications, frameworks, and automation tools focused on long-term maintainability and performance.
-				</p>
+				<p className='max-w-2xl text-base text-(--text-muted) leading-relaxed'>{t('www.hero.description')}</p>
 			</section>
 
 			{/* ABOUT */}
 			<section className='max-w-5xl mx-auto text-center px-6' style={{ padding: 'calc(var(--ui-gap) * 3) 0' }}>
-				<h2 className='text-3xl font-semibold mb-6 text-(--text)'>About Xernerx</h2>
+				<h2 className='text-3xl font-semibold mb-6 text-(--text)'>{t('www.about.title')}</h2>
 
-				<p className='text-base text-(--text-muted) leading-relaxed'>
-					Founded in 2024, Xernerx evolved from a focused development initiative into a structured ecosystem of automation tools and infrastructure frameworks. Every system is built with scalability,
-					maintainability, and architectural clarity as first principles.
-				</p>
+				<p className='text-base text-(--text-muted) leading-relaxed'>{t('www.about.description')}</p>
 			</section>
 
 			{/* SERVICES / PACKAGES / APPS */}
@@ -52,52 +47,52 @@ export default function Home() {
 					{/* COLUMN */}
 					{[
 						{
-							title: 'Services',
+							title: t('www.sections.services.title'),
 							items: [
 								{
 									icon: <LayoutDashboard size={18} />,
-									title: 'Dashboard',
-									desc: 'Manage applications, configure deployments, and monitor system performance.',
+									title: t('www.services.dashboard.title'),
+									desc: t('www.services.dashboard.desc'),
 									link: getEnvUrl('https://app.xernerx.com'),
 								},
 							],
 						},
 						{
-							title: 'Packages',
+							title: t('www.sections.packages.title'),
 							items: [
 								{
 									icon: <Package size={18} />,
-									title: 'Xernerx Framework',
-									desc: 'A modular foundation for scalable Discord applications.',
+									title: t('www.packages.framework.title'),
+									desc: t('www.packages.framework.desc'),
 									link: 'https://www.npmjs.com/package/xernerx',
 								},
 								{
 									icon: <Boxes size={18} />,
-									title: 'Xernerx Stats',
-									desc: 'Analytics utilities for measuring performance.',
+									title: t('www.packages.stats.title'),
+									desc: t('www.packages.stats.desc'),
 									link: 'https://www.npmjs.com/package/xernerx-stats',
 								},
 							],
 						},
 						{
-							title: 'Applications',
+							title: t('www.sections.applications.title'),
 							items: [
 								{
 									icon: <Boxes size={18} />,
-									title: 'To-Do List Bot',
-									desc: 'Structured productivity tooling.',
+									title: t('www.applications.todo.title'),
+									desc: t('www.applications.todo.desc'),
 									link: getEnvUrl('https://app.xernerx.com/bots/782105629572464652'),
 								},
 								{
 									icon: <Boxes size={18} />,
-									title: 'Zodiac',
-									desc: 'Astrology-based interaction tools.',
+									title: t('www.applications.zodiac.title'),
+									desc: t('www.applications.zodiac.desc'),
 									link: getEnvUrl('https://app.xernerx.com/bots/950251264095162418'),
 								},
 								{
 									icon: <Boxes size={18} />,
-									title: 'Metamorphosis',
-									desc: 'Advanced role transformation utilities.',
+									title: t('www.applications.metamorphosis.title'),
+									desc: t('www.applications.metamorphosis.desc'),
 									link: getEnvUrl('https://app.xernerx.com/bots/881678826906730547'),
 								},
 							],
@@ -135,8 +130,8 @@ export default function Home() {
 			{/* HISTORY */}
 			<section style={{ paddingTop: 'calc(var(--ui-gap) * 4)' }}>
 				<div className='max-w-4xl mx-auto px-6 mb-16 text-center'>
-					<h2 className='text-3xl font-semibold mb-4 text-(--text)'>Our History</h2>
-					<p className='text-sm text-(--text-muted)'>A structured progression from experimentation to stable infrastructure engineering.</p>
+					<h2 className='text-3xl font-semibold mb-4 text-(--text)'>{t('www.history.title')}</h2>
+					<p className='text-sm text-(--text-muted)'>{t('www.history.description')}</p>
 				</div>
 
 				<Timeline />

@@ -1,5 +1,46 @@
 # @xernerx/components
 
+## 0.2.0
+
+### Minor Changes
+
+- <!-- @format -->
+
+  Added language support and changed some UI
+
+  ## @xernerx/components
+  - Updated all components with language support
+  - Added ThemeScript to prevent accent flashing due to loading times
+
+  ## @xernerx/lib
+  - Added server support for languages
+  - Added Languages en-US, en-GB, fr, es, nl
+  - Added proxy for language detection
+  - Added locales script to generate config file for languages
+
+  ## @xernerx/providers
+  - Added DictionaryProvider for language support
+  - Changed toast duration to 3000ms
+
+  ## @xernerx/ui
+  - Added Selector UI element
+
+  ## auth
+  - Updated the whole app to support localization
+
+  ## www
+  - Updated the whole app to support localization
+
+  ## cdn
+  - Updated the whole app to support localization
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.2.0
+  - @xernerx/lib@0.1.0
+  - @xernerx/ui@0.1.0
+
 ## 0.1.2
 
 ### Patch Changes

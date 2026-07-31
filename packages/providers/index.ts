@@ -10,3 +10,4 @@ export * from './src/SupportProvider';
 export * from './src/EnvironmentProvider';
 export * from './src/ShortcutsProvider';
 export * from './src/UserProvider';
+export * from './src/DictionaryProvider';

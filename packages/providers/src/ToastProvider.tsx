@@ -63,7 +63,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 // -----------------------------------------------------------------------------
 
 function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
-	const duration = toast.duration || 5000;
+	const duration = toast.duration || 3000;
 
 	useEffect(() => {
 		const timer = setTimeout(onDismiss, duration);
@@ -73,14 +73,12 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 	const icons = {
 		success: <CheckCircle className='text-green-400' size={20} />,
 		error: <AlertCircle className='text-red-400' size={20} />,
-		// Updated to use your theme accent variable
 		info: <Info className='text-(--accent)' size={20} />,
 	};
 
 	const progressColors = {
 		success: 'bg-green-400',
 		error: 'bg-red-400',
-		// Updated to use your theme accent variable
 		info: 'bg-(--accent)',
 	};
 
@@ -93,18 +91,13 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 			initial={{ opacity: 0, y: 50, scale: 0.9 }}
 			animate={{ opacity: 1, y: 0, scale: 1 }}
 			exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-			// Swapped hardcoded hexes for your global border and foreground variables
-
 			className='pointer-events-auto relative flex w-full sm:w-[350px] items-start gap-3 overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) p-4 shadow-xl backdrop-blur-md'>
 			<div className='mt-0.5 shrink-0'>{icon}</div>
 			<div className='min-w-0 flex-1 pb-1'>
 				<h4 className='break-words text-sm font-medium text-(--text)'>{toast.title}</h4>
 				{toast.description && <p className='mt-1 break-words text-sm text-(--text-muted)'>{toast.description}</p>}
 			</div>
-			<button
-				onClick={onDismiss}
-				// Swapped hover background to --background so it subtly contrasts the foreground toast
-				className='shrink-0 rounded-md p-1 text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)'>
+			<button onClick={onDismiss} className='shrink-0 rounded-md p-1 text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)'>
 				<X size={16} />
 			</button>
 			{/* Animated Progress Bar */}
