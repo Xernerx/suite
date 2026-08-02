@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.5
+
+### Patch Changes
+
+- Another attempt at fixing an issue with session race conditions
+
 ## 0.4.4
 
 ### Patch Changes

@@ -43,7 +43,7 @@ const COMPONENT_MAP: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
-	const { data: session, status } = useSession() || { status: 'loading' };
+	const { data: session, status } = useSession() || {};
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
 
@@ -130,7 +130,7 @@ export default function Home() {
 		if (!view) setView('account');
 	}, [session, status, hide, show, setNavItems, view, setView, t]);
 
-	if (!session && status !== 'loading') return redirect('/login');
+	if (!session && status !== 'loading' && status !== undefined) return redirect('/login');
 
 	if (status === 'loading') return <Loading />;
 
