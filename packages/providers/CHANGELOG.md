@@ -1,5 +1,11 @@
 # @xernerx/providers
 
+## 0.2.3
+
+### Patch Changes
+
+- Fixing a session error
+
 ## 0.2.2
 
 ### Patch Changes

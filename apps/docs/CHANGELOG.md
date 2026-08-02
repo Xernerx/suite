@@ -1,5 +1,13 @@
 # docs
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.2.3
+    - @xernerx/components@0.2.3
+
 ## 0.2.0
 
 ### Minor Changes
