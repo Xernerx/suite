@@ -1,32 +1,29 @@
 {
 	"name": "auth",
-	"version": "0.3.1",
+	"version": "0.4.0",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
-		"dev": "pnpm initialize && next dev -p 4001",
+		"dev": "pnpm initialize && next dev -p 4003",
 		"build": "next build",
 		"start": "next start",
-		"lint": "eslint",
-		"patch": "npm version patch",
-		"minor": "npm version minor",
-		"major": "npm version major"
+		"lint": "eslint"
 	},
 	"dependencies": {
 		"@svgr/webpack": "^8",
-		"next": "16.2.11",
-		"react": "19.2.4",
-		"react-dom": "19.2.4",
-		"@xernerx/styles": "workspace:*",
-		"@xernerx/providers": "workspace:*",
 		"@xernerx/components": "workspace:*",
-		"@xernerx/ui": "workspace:*",
-		"@xernerx/lib": "workspace:*",
 		"@xernerx/feedback": "workspace:*",
-		"next-auth": "^4",
+		"@xernerx/lib": "workspace:*",
+		"@xernerx/providers": "workspace:*",
+		"@xernerx/styles": "workspace:*",
+		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^12",
 		"lucide-react": "^1",
-		"react-circle-flags": "^0"
+		"next": "^16.2.12",
+		"next-auth": "^4",
+		"react": "^19",
+		"react-circle-flags": "^0",
+		"react-dom": "^19"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",
@@ -35,7 +32,7 @@
 		"@types/react-dom": "^19",
 		"babel-plugin-react-compiler": "1.0.0",
 		"eslint": "^9",
-		"eslint-config-next": "16.2.11",
+		"eslint-config-next": "^16",
 		"tailwindcss": "^4",
 		"typescript": "^5"
 	}

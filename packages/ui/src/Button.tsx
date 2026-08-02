@@ -14,7 +14,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className = 
 
 	const variants = {
 		primary: 'bg-(--accent) text-white hover:bg-(--accent-hover)',
-		// Using foreground for the resting state and border for the hover state
 		secondary: 'bg-(--foreground) text-(--text) hover:bg-(--border)',
 		outline: 'border border-(--border) bg-transparent text-(--text) hover:bg-(--foreground)',
 		ghost: 'bg-transparent text-(--text) hover:bg-(--foreground) hover:text-(--text)',
@@ -22,15 +21,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className = 
 	};
 
 	const sizes = {
-		sm: 'h-8 px-3 text-xs',
-		md: 'h-10 px-4 text-sm',
-		lg: 'h-12 px-6 text-base',
+		sm: 'h-8 px-3 text-xs gap-1.5',
+		md: 'h-10 px-4 text-sm gap-2',
+		lg: 'h-12 px-6 text-base gap-2.5',
 		icon: 'h-10 w-10 shrink-0',
 	};
 
 	return (
 		<button ref={ref} disabled={disabled || isLoading} className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
-			{isLoading && <span className='mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />}
+			{isLoading && <span className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent shrink-0' />}
 			{children}
 		</button>
 	);

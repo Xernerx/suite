@@ -7,9 +7,9 @@
 @source "../providers/src";
 
 @theme {
-	--color-accent: #8b7cf6;
-	--color-accent-hover: rgb(from var(--color-accent) r g b / 10%);
-	--color-accent-active: color-mix(in srgb, var(--color-accent), black 15%);
+	--color-accent: var(--accent);
+	--color-accent-hover: var(--hover-accent);
+	--color-accent-active: var(--active-accent);
 
 	--color-bg-light: #fafafa;
 	--color-fg-light: #f4f4f5;
@@ -20,14 +20,13 @@
 
 :root {
 	--accent: #8b7cf6;
-	--hover-accent: rgb(from var(--accent) r g b / 10%);
-	--active-accent: color-mix(in srgb, var(--accent), black 15%);
 
-	--accent-green: #39ff14; /* Neon Lime Green (High-visibility pop) */
-	--accent-orange: #ff6600; /* Vibrant Neon Orange */
-	--accent-red: #ff3333; /* Bright Neon/Coral Red */
-	/* --accent-canary */
-	/* --accent-dev */
+	--hover-accent: color-mix(in srgb, var(--accent) 85%, white 15%);
+	--active-accent: color-mix(in srgb, var(--accent) 85%, black 15%);
+
+	--accent-green: #39ff14;
+	--accent-orange: #ff6600;
+	--accent-red: #ff3333;
 
 	/* Base palette */
 	--background-light: #fafafa;
@@ -46,7 +45,10 @@
 	--text: #09090b;
 	--text-muted: #52525b;
 
+	/* Scalers & Spacing Defaults */
+	--text-scale: 14px;
 	--ui-gap: 15px;
+	--ui-scale: 100; /* Raw number format */
 }
 
 html.dark {
@@ -56,6 +58,11 @@ html.dark {
 
 	--text: #fafafa;
 	--text-muted: #a1a1aa;
+}
+
+html {
+	font-size: var(--text-scale);
+	zoom: calc(var(--ui-scale) * 1%); /* Converts raw 100 -> 100%, 110 -> 110% */
 }
 
 html,
@@ -122,4 +129,14 @@ body {
 * {
 	scrollbar-width: thin;
 	scrollbar-color: var(--accent) var(--background);
+}
+
+::selection {
+	background: var(--accent);
+	color: color-mix(in srgb, var(--accent) 15%, black);
+}
+
+::-moz-selection {
+	background: var(--accent);
+	color: #ffffff;
 }

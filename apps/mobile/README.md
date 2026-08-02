@@ -1,50 +1,42 @@
-# Welcome to your Expo app 👋
+<!-- @format -->
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<p align="center">
+  <img src="https://www.xernerx.com/banner.png" alt="Xernerx Mobile Banner" width="100%">
+</p>
 
-## Get started
+<p align="center">
+  <b>Cross-platform mobile application for the Xernerx Suite built with React Native and Expo.</b>
+</p>
 
-1. Install dependencies
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
+  <img src="https://img.shields.io/badge/service-mobile-blue?style=for-the-badge&logo=none" alt="Service">
+</p>
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## 🧭 Overview
 
-   ```bash
-   npx expo start
-   ```
+The **Mobile** service brings the core features and management capabilities of the Xernerx Suite to iOS and Android devices, built natively using React Native and Expo.
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## 🛠️ Core Features
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Cross-Platform Support:** Seamless native experiences across both iOS and Android platforms.
+- **On-the-Go Management:** Access dashboard metrics, notifications, and monitoring tools from mobile devices.
+- **Push Notifications:** Instant alerts for critical system events and status changes.
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## 🛠️ Tech Stack & Dependencies
 
-```bash
-npm run reset-project
-```
+- **Framework:** React Native / Expo
+- **Language:** TypeScript
+- **Styling:** NativeWind / Tailwind CSS
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 📄 License
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Exclusive property of **Xernerx Studios**. See the [LICENSE](../../LICENSE) file for details.

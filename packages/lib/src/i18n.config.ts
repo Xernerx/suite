@@ -11,7 +11,7 @@ export const localesConfig = {
         load: () => import('./dictionaries/en-US.json').then((module) => module.default),
     },
     'es': {
-        label: 'Spanish',
+        label: 'Español',
         load: () => import('./dictionaries/es.json').then((module) => module.default),
     },
     'fr': {

@@ -19,7 +19,7 @@
 		"@xernerx/terminal": "^1.0.7",
 		"dotenv": "^17",
 		"jose": "^6.2.3",
-		"mongoose": "^9",
+		"mongoose": "^9.9.1",
 		"ws": "^8"
 	},
 	"engines": {

@@ -126,8 +126,9 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className='relative w-full max-w-lg rounded-2xl bg-(--foreground) border border-(--border)/10 p-6 shadow-2xl z-10 max-h-[85vh] flex flex-col'>
-						<div className='flex items-center justify-between mb-6 pb-4 border-b border-(--border)/10 shrink-0'>
+						className='relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col'
+						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className='flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0'>
 							<div className='flex items-center gap-3'>
 								<div
 									className='flex h-10 w-10 items-center justify-center rounded-xl'
@@ -147,7 +148,7 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 							</button>
 						</div>
 
-						<div className='space-y-2 overflow-y-auto pr-1'>
+						<div className='flex flex-col overflow-y-auto pr-1' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 							{navigation && navigation.length > 0 ? (
 								navigation.map((item: any, idx: number) => {
 									const resolvedHref = getEnvUrl(item.href);
@@ -177,7 +178,7 @@ function FloatingNavigationShortcut() {
 	const { setNavOpen } = useShortcuts();
 
 	return (
-		<div className='fixed top-6 left-6 z-40'>
+		<div className='fixed z-40' style={{ top: 'var(--ui-gap)', left: 'var(--ui-gap)' }}>
 			<button
 				onClick={() => setNavOpen(true)}
 				className='flex h-11 items-center gap-2 px-3.5 rounded-xl bg-(--foreground) border border-(--border)/10 shadow-lg text-(--text) transition hover:border-(--accent)'
@@ -218,8 +219,9 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className='relative w-full max-w-2xl rounded-2xl bg-(--foreground) border border-(--border)/10 p-6 shadow-2xl z-10 max-h-[85vh] flex flex-col'>
-						<div className='flex items-center justify-between mb-6 pb-4 border-b border-(--border)/10 shrink-0'>
+						className='relative w-full max-w-2xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col'
+						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className='flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0'>
 							<div className='flex items-center gap-3'>
 								<div
 									className='flex h-10 w-10 items-center justify-center rounded-xl'
@@ -277,7 +279,9 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 							</div>
 						</div>
 
-						<div className='space-y-4 overflow-y-auto pr-2 flex-1 text-sm text-(--text-muted) font-mono whitespace-pre-wrap bg-(--background) p-4 rounded-xl border border-(--border)/10'>
+						<div
+							className='overflow-y-auto pr-2 flex-1 text-sm text-(--text-muted) font-mono whitespace-pre-wrap bg-(--background) rounded-2xl border border-(--border)/10'
+							style={{ padding: 'var(--ui-gap)' }}>
 							{changelogData ? changelogData.content : 'Loading changelog...'}
 						</div>
 					</motion.div>
@@ -325,8 +329,9 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 							animate={{ opacity: 1, scale: 1, y: 0 }}
 							exit={{ opacity: 0, scale: 0.95, y: 20 }}
 							transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-							className='relative w-full max-w-lg rounded-2xl bg-(--foreground) border border-(--border)/10 p-6 shadow-2xl z-10 max-h-[85vh] flex flex-col'>
-							<div className='flex items-center justify-between mb-6 pb-4 border-b border-(--border)/10 shrink-0'>
+							className='relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col'
+							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+							<div className='flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0'>
 								<div className='flex items-center gap-3'>
 									<div
 										className='flex h-10 w-10 items-center justify-center rounded-xl'
@@ -347,7 +352,7 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 								</button>
 							</div>
 
-							<div className='space-y-3 overflow-y-auto pr-1'>
+							<div className='flex flex-col overflow-y-auto pr-1' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 								{shortcuts.map((item, idx) => {
 									const IconComponent = item.icon || Command;
 									return (
@@ -363,7 +368,7 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 								})}
 							</div>
 
-							<div className='mt-6 pt-4 border-t border-(--border)/10 flex items-center justify-between text-xs text-(--text-muted) shrink-0 px-1'>
+							<div className='pt-3 border-t border-(--border)/10 flex items-center justify-between text-xs text-(--text-muted) shrink-0 px-1'>
 								<div className='flex items-center gap-2'>
 									<span>
 										Version:{' '}

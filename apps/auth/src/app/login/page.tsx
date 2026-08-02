@@ -32,15 +32,16 @@ export default function SignInPage() {
 	}, [session, status]);
 
 	return (
-		<div className='flex h-full min-h-screen items-center justify-center px-6'>
+		<div className='flex h-full min-h-screen items-center justify-center' style={{ padding: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			<AnimatePresence>
 				<motion.div
 					initial={{ opacity: 0, scale: 0.96, y: 12 }}
 					animate={{ opacity: 1, scale: 1, y: 0 }}
 					transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-					className='flex w-full flex-col items-center gap-6 text-center'>
+					className='flex w-full flex-col items-center text-center'
+					style={{ gap: 'var(--ui-gap)' }}>
 					{/* LOGO */}
-					<div className='m-4 flex flex-col items-center'>
+					<div className='flex flex-col items-center' style={{ margin: 'var(--ui-gap)' }}>
 						<Banner className='h-auto w-48 text-(--accent) md:w-56' />
 					</div>
 
@@ -50,7 +51,10 @@ export default function SignInPage() {
 					</Button>
 
 					{/* ABOUT TOGGLE */}
-					<button onClick={() => setAbout(!about)} className='flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-(--text-muted) transition-colors hover:text-(--text)'>
+					<button
+						onClick={() => setAbout(!about)}
+						className='flex items-center text-xs font-semibold uppercase tracking-wide text-(--text-muted) transition-colors hover:text-(--text)'
+						style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 						{t('auth.signin.aboutToggle', {}, 'About permissions')}
 						{about ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
 					</button>
@@ -64,40 +68,42 @@ export default function SignInPage() {
 								exit={{ opacity: 0, height: 0, y: -10 }}
 								transition={{ duration: 0.25, ease: 'easeInOut' }}
 								className='w-full max-w-md overflow-hidden'>
-								<div className='mt-2 rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 text-left shadow-xl'>
-									<div className='flex flex-col gap-4'>
-										<div className='flex flex-col gap-0.5'>
+								<div className='rounded-2xl border border-(--border)/10 bg-(--foreground) text-left shadow-xl' style={{ marginTop: 'calc(var(--ui-gap) * 0.5)', padding: 'var(--ui-gap)' }}>
+									<div className='flex flex-col' style={{ gap: 'var(--ui-gap)' }}>
+										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 											<h3 className='text-sm font-medium text-(--text)'>{t('auth.signin.permissions.profile.title')}</h3>
 											<p className='text-xs text-(--text-muted)'>{t('auth.signin.permissions.profile.description')}</p>
 										</div>
 
-										<div className='flex flex-col gap-0.5'>
+										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 											<h3 className='text-sm font-medium text-(--text)'>{t('auth.signin.permissions.email.title')}</h3>
 											<p className='text-xs text-(--text-muted)'>{t('auth.signin.permissions.email.description')}</p>
 										</div>
 
-										<div className='flex flex-col gap-0.5'>
+										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 											<h3 className='text-sm font-medium text-(--text)'>{t('auth.signin.permissions.connections.title')}</h3>
 											<p className='text-xs text-(--text-muted)'>{t('auth.signin.permissions.connections.description')}</p>
 										</div>
 
-										<div className='flex flex-col gap-0.5'>
+										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 											<h3 className='text-sm font-medium text-(--text)'>{t('auth.signin.permissions.joinServers.title')}</h3>
 											<p className='text-xs text-(--text-muted)'>{t('auth.signin.permissions.joinServers.description')}</p>
 										</div>
 
-										<div className='flex flex-col gap-0.5'>
+										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 											<h3 className='text-sm font-medium text-(--text)'>{t('auth.signin.permissions.servers.title')}</h3>
 											<p className='text-xs text-(--text-muted)'>{t('auth.signin.permissions.servers.description')}</p>
 										</div>
 
-										<div className='flex flex-col gap-0.5'>
+										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 											<h3 className='text-sm font-medium text-(--text)'>{t('auth.signin.permissions.memberInfo.title')}</h3>
 											<p className='text-xs text-(--text-muted)'>{t('auth.signin.permissions.memberInfo.description')}</p>
 										</div>
 
 										{/* DIVIDER */}
-										<div className='mt-2 border-t border-(--border)/10 pt-4 text-xs leading-relaxed text-(--text-muted)'>{t('auth.signin.permissions.footer')}</div>
+										<div className='border-t border-(--border)/10 text-xs leading-relaxed text-(--text-muted)' style={{ marginTop: 'calc(var(--ui-gap) * 0.5)', paddingTop: 'var(--ui-gap)' }}>
+											{t('auth.signin.permissions.footer')}
+										</div>
 									</div>
 								</div>
 							</motion.div>

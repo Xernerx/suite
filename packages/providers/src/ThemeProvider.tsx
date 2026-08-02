@@ -5,6 +5,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 
 import Script from 'next/script';
 import tinycolor from 'tinycolor2';
+import { useEnvironment } from '@xernerx/providers'; // Imported useEnvironment for API routing
+import { useSession } from 'next-auth/react';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -93,11 +95,14 @@ function applyAccent(color?: string | number | null) {
 
 	const accent = tinycolor(colorStr);
 	document.documentElement.style.setProperty('--accent', accent.toHexString());
-	document.documentElement.style.setProperty('--hover-accent', accent.clone().darken(8).toHexString());
-	document.documentElement.style.setProperty('--active-accent', accent.clone().setAlpha(0.15).toRgbString());
+	document.documentElement.style.setProperty('--accent-hover', accent.clone().darken(8).toHexString());
+	document.documentElement.style.setProperty('--accent-active', accent.clone().setAlpha(0.15).toRgbString());
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+	const { getEnvUrl } = useEnvironment();
+	const { data: session } = useSession();
+
 	const [theme, setThemeState] = useState<Theme>(() => {
 		if (typeof window === 'undefined') return 'system';
 		const stored = getPref('theme') as Theme | null;
@@ -106,16 +111,59 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 	const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
+	// -----------------------------------------------------------------------------
+	// Initial Load & Client Sync Request
+	// -----------------------------------------------------------------------------
 	useEffect(() => {
 		const storedAccent = getPref('accent') || DEFAULT_ACCENT;
 
 		const accent = tinycolor(storedAccent);
 		document.documentElement.style.setProperty('--accent', accent.toHexString());
-		document.documentElement.style.setProperty('--hover-accent', accent.clone().darken(8).toHexString());
-		document.documentElement.style.setProperty('--active-accent', accent.clone().setAlpha(0.15).toRgbString());
+		document.documentElement.style.setProperty('--accent-hover', accent.clone().darken(8).toHexString());
+		document.documentElement.style.setProperty('--accent-active', accent.clone().setAlpha(0.15).toRgbString());
 
 		setResolvedTheme(theme === 'system' ? getSystemTheme() : theme);
-	}, []);
+
+		// We can only fetch user preferences if we have a valid session ID
+		if (!session?.user || !(session.user as any).id) return;
+
+		const fetchRemoteSync = async () => {
+			try {
+				const userId = (session.user as any).id;
+				const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
+					credentials: 'include',
+				});
+				if (!res.ok) return;
+
+				const data = await res.json();
+				const appPrefs = data?.appearance;
+
+				if (appPrefs && appPrefs.clientSync) {
+					setPref('clientSync', 'true');
+					if (appPrefs.theme) setPref('theme', appPrefs.theme);
+					if (appPrefs.accent) setPref('accent', appPrefs.accent);
+					if (appPrefs.uiZoom) setPref('uiZoom', String(appPrefs.uiZoom));
+					if (appPrefs.uiGap) setPref('uiGap', String(appPrefs.uiGap));
+					if (appPrefs.textScale) setPref('textScale', String(appPrefs.textScale));
+					if (appPrefs.syncFromDiscord !== undefined) setPref('syncFromDiscord', String(appPrefs.syncFromDiscord));
+
+					if (appPrefs.theme) {
+						setThemeState(appPrefs.theme);
+						applyTheme(appPrefs.theme);
+					}
+					if (appPrefs.accent) applyAccent(appPrefs.accent);
+
+					if (appPrefs.uiZoom) document.documentElement.style.setProperty('--ui-zoom', String(appPrefs.uiZoom / 100));
+					if (appPrefs.uiGap) document.documentElement.style.setProperty('--ui-gap', `${appPrefs.uiGap}px`);
+					if (appPrefs.textScale) document.documentElement.style.setProperty('--text-scale', `${appPrefs.textScale}px`);
+				}
+			} catch (e) {
+				console.error('Failed to sync appearance from server', e);
+			}
+		};
+
+		fetchRemoteSync();
+	}, [getEnvUrl, theme, session]);
 
 	useEffect(() => {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;

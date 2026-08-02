@@ -1,4 +1,5 @@
 /** @format */
+
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -15,50 +16,62 @@ interface EnvironmentContextType {
 
 const EnvironmentContext = createContext<EnvironmentContextType | undefined>(undefined);
 
-export function EnvironmentProvider({ children }: { children: React.ReactNode }) {
-	const [environment, setEnvironment] = useState<Environment>('public');
+function getInitialEnvironment(): Environment {
+	if (typeof window !== 'undefined') {
+		const hostname = window.location.hostname;
+		if (hostname.includes('.dev.') || hostname === 'localhost') {
+			return 'dev';
+		}
+		if (hostname.includes('.canary.')) {
+			return 'canary';
+		}
+	}
+	return 'public';
+}
+
+export function EnvironmentProvider({ children, initialEnvironment }: { children: React.ReactNode; initialEnvironment?: Environment }) {
+	// Initialize with server-provided environment if available, preventing mismatch
+	const [environment, setEnvironment] = useState<Environment>(() => {
+		if (initialEnvironment) return initialEnvironment;
+		return getInitialEnvironment();
+	});
 
 	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			const hostname = window.location.hostname;
-
-			if (hostname.includes('.dev.') || hostname === 'localhost') {
-				setEnvironment('dev');
-			} else if (hostname.includes('.canary.')) {
-				setEnvironment('canary');
-			} else {
-				setEnvironment('public');
-			}
-		}
+		setEnvironment(getInitialEnvironment());
 	}, []);
 
 	const getEnvUrl = (baseUrl: string) => {
-		if (environment === 'public') return baseUrl;
+		let transformedUrl = baseUrl;
 
-		try {
-			const url = new URL(baseUrl);
-			let hostname = url.hostname;
+		if (environment !== 'public') {
+			try {
+				const url = new URL(baseUrl);
+				let hostname = url.hostname;
 
-			// 1. Strip any existing environment segments to ensure a clean slate
-			hostname = hostname.replace(/\.(dev|canary)\./g, '.');
+				hostname = hostname.replace(/\.(dev|canary)\./g, '.');
 
-			// 2. Ensure it starts with www if it's the root domain
-			if (hostname === 'xernerx.com') {
-				hostname = 'www.xernerx.com';
-			}
-
-			// 3. Inject the correct nested environment segment (e.g., www.xernerx.com -> www.dev.xernerx.com)
-			if (hostname.endsWith('xernerx.com')) {
-				const parts = hostname.split('.'); // ['www', 'xernerx', 'com']
-				if (parts.length === 3) {
-					url.hostname = `${parts[0]}.${environment}.${parts[1]}.${parts[2]}`;
+				if (hostname === 'xernerx.com') {
+					hostname = 'www.xernerx.com';
 				}
-			}
 
-			return url.toString();
-		} catch {
-			return baseUrl;
+				if (hostname.endsWith('xernerx.com')) {
+					const parts = hostname.split('.');
+					if (parts.length === 3) {
+						url.hostname = `${parts[0]}.${environment}.${parts[1]}.${parts[2]}`;
+					}
+				}
+
+				transformedUrl = url.toString();
+			} catch {
+				transformedUrl = baseUrl;
+			}
 		}
+
+		if (!baseUrl.endsWith('/') && transformedUrl.endsWith('/') && new URL(transformedUrl).pathname === '/') {
+			return transformedUrl.slice(0, -1);
+		}
+
+		return transformedUrl;
 	};
 
 	const value = {

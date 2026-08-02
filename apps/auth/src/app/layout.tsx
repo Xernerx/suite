@@ -2,7 +2,7 @@
 
 import './globals.css';
 
-import { Locale, dictionary } from '@xernerx/lib/server';
+import { Locale, dictionary, getThemeLayoutProps } from '@xernerx/lib/server';
 
 import { AppLayout } from '@xernerx/components';
 import type { Metadata } from 'next';
@@ -61,9 +61,11 @@ export default async function RootLayout({
 
 	const dict = await dictionary(locale as Locale);
 
+	const themeProps = await getThemeLayoutProps();
+
 	return (
 		<html lang={locale} suppressHydrationWarning>
-			<body>
+			<body {...themeProps}>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict}>{children}</AppLayout>
 				</SessionProvider>

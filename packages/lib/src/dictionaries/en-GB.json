@@ -66,6 +66,297 @@
 			}
 		}
 	},
+	"api": {
+		"title": "Xernerx API",
+		"description": "You have reached the core service and endpoint router for the Xernerx suite. No resource management, configuration changes, or interactive controls take place on this domain.",
+		"section": {
+			"title": "Looking for Access?",
+			"description": "To generate API tokens, view your active sessions, or manage developer keys, head over to your account."
+		},
+		"button": {
+			"account": "Your account",
+			"docs": "Read the docs"
+		},
+		"fact": "Useless Fact: ",
+		"facts": [
+			"This page consumes approximately 0.00004 kWh of server energy just to tell you that you need a token.",
+			"Virtue is currently judging your lack of an Authorization header.",
+			"Metamorphosis has transformed this request into disappointment because you forgot your bearer token.",
+			"Zodiac charts indicate that your current path lacks a valid API key.",
+			"Somewhere, a database index is crying because you queried without a token.",
+			"Error 418: I'm a teapot, but even a teapot needs a valid bearer token.",
+			"No token, no data. Those are the rules, I didn't make them up (yes I did)."
+		]
+	},
+	"auth": {
+		"account": {
+			"title": "Account Settings",
+			"description": "Manage your account session, data privacy, and global profile details.",
+			"fallbackName": "User",
+			"session": {
+				"title": "Active Session",
+				"description": "Sign out of your active account session on this device. You will need to re-authenticate to access your workspace.",
+				"button": "Log out"
+			},
+			"danger": {
+				"title": "Delete User Data & Account",
+				"description": "Permanently delete your profile data, stored preferences, and close your account across the ecosystem. This action cannot be undone.",
+				"button": "Delete Account",
+				"confirmTitle": "Confirm Account Deletion",
+				"confirmDescription": "You are about to trigger a permanent purge of your user data. Once completed, your credentials and profile cannot be recovered.",
+				"confirmButton": "Delete my account"
+			}
+		},
+		"profile": {
+			"title": "Edit Profile",
+			"description": "Manage your public profile details and personal preferences.",
+			"descriptionField": {
+				"label": "Description",
+				"placeholder": "Short bio..."
+			},
+			"infoField": {
+				"label": "Info (Long Description)",
+				"placeholder": "Tell us more about yourself..."
+			},
+			"birthday": {
+				"label": "Birthday"
+			},
+			"timezone": {
+				"label": "Timezone",
+				"placeholder": "e.g. Europe/Brussels"
+			},
+			"gender": {
+				"label": "Gender",
+				"male": "Male",
+				"female": "Female",
+				"other": "Other"
+			},
+			"pronouns": {
+				"label": "Pronouns",
+				"placeholder": "e.g. they/them"
+			},
+			"privacy": {
+				"label": "Privacy Level",
+				"public": "Public",
+				"limited": "Limited",
+				"private": "Private",
+				"tooltip": {
+					"title": "Privacy Options:",
+					"privateTitle": "Private:",
+					"privateDesc": "Completely private; no one but you can see your profile.",
+					"limitedTitle": "Limited:",
+					"limitedDesc": "Anyone with your account link can see your profile; you will just not be listed publicly.",
+					"publicTitle": "Public:",
+					"publicDesc": "Anyone can see your profile and it is not hidden from public spaces."
+				}
+			},
+			"save": "Save Changes",
+			"saving": "Saving...",
+			"toast": {
+				"success": "Profile updated successfully!",
+				"error": "Failed to save changes. Please try again."
+			}
+		},
+		"appearance": {
+			"title": "Appearance",
+			"description": "Customize how the interface looks and feels across your workspace.",
+			"theme": {
+				"title": "Theme",
+				"description": "Choose your preferred interface theme mode.",
+				"options": {
+					"dark": "Dark",
+					"light": "Light",
+					"system": "System"
+				}
+			},
+			"discordSync": {
+				"title": "Sync Accent from Discord",
+				"description": "Automatically adopt your Discord profile theme accent color as your workspace accent."
+			},
+			"clientSync": {
+				"title": "Sync Appearance Settings Across Clients",
+				"description": "Automatically load appearance settings on all your devices."
+			},
+			"accentColor": {
+				"title": "Accent Color",
+				"description": "Select a custom accent color for your workspace theme."
+			},
+			"colors": {
+				"purple": "Xernerx Purple",
+				"green": "Crea Green",
+				"neon": "Cyber Neon",
+				"blue": "Electric Blue",
+				"pink": "Vibrant Pink",
+				"orange": "Sunset Orange",
+				"yellow": "Golden Yellow",
+				"crimson": "Deep Crimson",
+				"mint": "Mint Breeze",
+				"indigo": "Royal Indigo",
+				"lime": "Acid Lime",
+				"charcoal": "Void Charcoal"
+			},
+			"zoom": {
+				"title": "UI Zoom Level",
+				"description": "Scale the interface zoom uniformly across the application."
+			},
+			"density": {
+				"title": "Layout Spacing",
+				"description": "Switch between compact, default, and spacious interface padding gaps.",
+				"compact": "Compact",
+				"default": "Default",
+				"spacious": "Spacious"
+			},
+			"textScale": {
+				"title": "Text Scale",
+				"description": "Configure base typography size for readability."
+			},
+			"toast": {
+				"clientSyncEnabled": {
+					"title": "Client Sync Enabled",
+					"description": "Your appearance settings are now syncing to your account."
+				},
+				"clientSyncDisabled": {
+					"title": "Client Sync Disabled",
+					"description": "Your appearance settings will stay local to this browser."
+				},
+				"accentColor": {
+					"title": "Updated accent color!",
+					"description": "Set accent color to {color}"
+				},
+				"theme": {
+					"title": "Updated theme!",
+					"description": "Set theme to {theme}"
+				},
+				"density": {
+					"title": "Updated layout density!"
+				}
+			}
+		},
+		"language": {
+			"headerTitle": "Language Preferences",
+			"headerDescription": "Choose your interface localization and view regional preferences.",
+			"title": "Language",
+			"description": "Select your preferred language for the interface.",
+			"contributeLabel": "+ Contribute a translation",
+			"coverage": {
+				"title": "Help us translate!",
+				"description": "Your selected language is currently {coverage}% translated. Have a few minutes to help us complete it?",
+				"button": "Contribute"
+			},
+			"discord": {
+				"title": "Discord Language",
+				"description": "Your current Discord account language setting (read-only indicator)."
+			}
+		},
+		"signin": {
+			"button": "Continue with Discord",
+			"redirecting": "Redirecting…",
+			"aboutToggle": "About permissions",
+			"permissions": {
+				"profile": {
+					"title": "Username & Profile",
+					"description": "Used to display your profile inside the app."
+				},
+				"email": {
+					"title": "Email Address",
+					"description": "Used for notifications and important account updates."
+				},
+				"connections": {
+					"title": "Connections",
+					"description": "Displayed on your profile for personalization."
+				},
+				"joinServers": {
+					"title": "Join Servers",
+					"description": "Used to join Xernerx Studios managed servers. Does not add you to any server without your input!"
+				},
+				"servers": {
+					"title": "Servers",
+					"description": "Used to power your dashboard experience."
+				},
+				"memberInfo": {
+					"title": "Server Member Info",
+					"description": "Used for roles, nicknames, and server-specific features."
+				},
+				"footer": "Xernerx does not sell your data. All data is either public via the Discord API or used internally for features."
+			}
+		},
+		"signout": {
+			"title": "Sign Out",
+			"description": "Are you sure you want to log out? You will need to authenticate again to access your dashboard.",
+			"confirmButton": "Yes, log me out",
+			"signingOut": "Signing out…",
+			"cancelButton": "Cancel"
+		},
+		"user": {
+			"createError": "Failed to initialize user profile.",
+			"fetchError": "Failed to load user profile data.",
+			"networkError": "Network error while connecting to user service.",
+			"created": "Welcome! User profile created successfully."
+		},
+		"notifications": {
+			"title": "Notifications",
+			"description": "Manage how you receive notifications and alerts across channels.",
+			"itemDescription": "Configure alerts for {item}.",
+			"categories": {
+				"general": "General",
+				"virtue": "Virtue"
+			},
+			"items": {
+				"birthday": "Birthday",
+				"levelup": "Level Up"
+			},
+			"channels": {
+				"discord": "Discord",
+				"mail": "Mail",
+				"inApp": "In-App"
+			},
+			"toast": {
+				"success": "Updated notification preferences",
+				"error": "Failed to save changes"
+			}
+		},
+		"tokens": {
+			"title": "API Tokens",
+			"description": "Manage your secure authentication keys",
+			"generateButton": "Generate Token",
+			"manageSettings": "Manage Settings",
+			"empty": {
+				"title": "No tokens found",
+				"description": "You don't have any active API tokens. Generate one to authenticate your services."
+			},
+			"toast": {
+				"loadError": "Error loading tokens, error: {error}"
+			},
+			"create": {
+				"modalTitle": "Generate New Token",
+				"nameLabel": "Token Name",
+				"namePlaceholder": "e.g., Production API Access",
+				"cancelButton": "Cancel",
+				"submitButton": "Create Token",
+				"success": "Token created successfully",
+				"errorTitle": "Creation failed",
+				"errorDesc": "Could not generate a new token. error: {error}"
+			},
+			"manage": {
+				"modalTitle": "Manage Token",
+				"revokeTitle": "Revoke Token",
+				"accessKeyLabel": "Access Key",
+				"securityWarning": "Treat this token like a password. Do not expose it in client-side code.",
+				"nameLabel": "Token Name",
+				"ownersLabel": "Owners (Discord IDs)",
+				"ownersPlaceholder": "Comma separated IDs",
+				"closeButton": "Close",
+				"saveButton": "Save Changes",
+				"loadError": "Failed to load token, error: {error}",
+				"copySuccess": "Token copied to clipboard",
+				"updateSuccess": "Token updated",
+				"updateError": "Update failed",
+				"deleteConfirm": "Are you sure you want to permanently delete this token?",
+				"deleteSuccess": "Token deleted",
+				"deleteError": "Deletion failed"
+			}
+		}
+	},
 	"www": {
 		"hero": {
 			"title": "Building Reliable Infrastructure",
@@ -188,7 +479,6 @@
 				}
 			}
 		},
-
 		"terms": {
 			"toc": "Contents",
 			"header": {
@@ -253,106 +543,6 @@
 					"prefix": "For legal inquiries contact"
 				}
 			}
-		}
-	},
-	"auth": {
-		"account": {
-			"title": "Account Settings",
-			"description": "Manage your account session, data privacy, and global profile details.",
-			"fallbackName": "User",
-			"session": {
-				"title": "Active Session",
-				"description": "Sign out of your active account session on this device. You will need to re-authenticate to access your workspace.",
-				"button": "Log out"
-			},
-			"danger": {
-				"title": "Delete User Data & Account",
-				"description": "Permanently delete your profile data, stored preferences, and close your account across the ecosystem. This action cannot be undone.",
-				"button": "Delete Account"
-			}
-		},
-		"appearance": {
-			"title": "Appearance",
-			"description": "Customize how the interface looks and feels across your workspace.",
-			"theme": {
-				"title": "Theme",
-				"description": "Choose your preferred interface theme mode.",
-				"options": {
-					"dark": "Dark",
-					"light": "Light",
-					"system": "System"
-				}
-			},
-			"discordSync": {
-				"title": "Sync Accent with Discord",
-				"description": "Automatically adopt your Discord profile theme accent color as your workspace accent."
-			},
-
-			"accentColor": {
-				"title": "Accent Color",
-				"description": "Select a custom accent color for your workspace theme."
-			},
-			"colors": {
-				"purple": "Xernerx Purple",
-				"green": "Crea Green",
-				"neon": "Cyber Neon",
-				"blue": "Electric Blue",
-				"pink": "Vibrant Pink",
-				"orange": "Sunset Orange",
-				"yellow": "Golden Yellow",
-				"crimson": "Deep Crimson",
-				"mint": "Mint Breeze",
-				"indigo": "Royal Indigo",
-				"lime": "Acid Lime",
-				"charcoal": "Void Charcoal"
-			}
-		},
-		"language": {
-			"title": "Language",
-			"description": "Select your preferred language for the interface.",
-			"coverage": {
-				"title": "Help us translate!",
-				"description": "Your selected language is currently {coverage}% translated. Have a few minutes to help us complete it?"
-			}
-		},
-		"signin": {
-			"button": "Continue with Discord",
-			"redirecting": "Redirecting…",
-			"aboutToggle": "About permissions",
-			"permissions": {
-				"profile": {
-					"title": "Username & Profile",
-					"description": "Used to display your profile inside the app."
-				},
-				"email": {
-					"title": "Email Address",
-					"description": "Used for notifications and important account updates."
-				},
-				"connections": {
-					"title": "Connections",
-					"description": "Displayed on your profile for personalization."
-				},
-				"joinServers": {
-					"title": "Join Servers",
-					"description": "Used to join Xernerx Studios managed servers. Does not add you to any server without your input!"
-				},
-				"servers": {
-					"title": "Servers",
-					"description": "Used to power your dashboard experience."
-				},
-				"memberInfo": {
-					"title": "Server Member Info",
-					"description": "Used for roles, nicknames, and server-specific features."
-				},
-				"footer": "Xernerx does not sell your data. All data is either public via the Discord API or used internally for features."
-			}
-		},
-		"signout": {
-			"title": "Sign Out",
-			"description": "Are you sure you want to log out? You will need to authenticate again to access your dashboard.",
-			"confirmButton": "Yes, log me out",
-			"signingOut": "Signing out…",
-			"cancelButton": "Cancel"
 		}
 	}
 }

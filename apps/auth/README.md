@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<!-- @format -->
 
-## Getting Started
+<p align="center">
+  <img src="https://www.xernerx.com/banner.png" alt="Xernerx Auth Banner" width="100%">
+</p>
 
-First, run the development server:
+<p align="center">
+  <b>User account hub and identity management service for the Xernerx Suite.</b>
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
+  <img src="https://img.shields.io/badge/service-auth-blue?style=for-the-badge&logo=none" alt="Service">
+</p>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧭 Overview
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The **Auth** service functions as the central user account hub for the Xernerx ecosystem. It manages all user-centric operations, identity verification, profile configurations, localization settings, and the complete token lifecycle.
 
-## Learn More
+### 🌐 Subdomain Routing
 
-To learn more about Next.js, take a look at the following resources:
+| Environment | URL Pattern                                                  | Description                                        |
+| :---------- | :----------------------------------------------------------- | :------------------------------------------------- |
+| **Public**  | [`auth.xernerx.com`](https://auth.xernerx.com)               | Production account and authentication hub          |
+| **Canary**  | [`auth.canary.xernerx.com`](https://canary.auth.xernerx.com) | Staging and pre-release authentication environment |
+| **Dev**     | [`auth.dev.xernerx.com`](https://dev.auth.xernerx.com)       | Local and active development environment           |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Core Features
 
-## Deploy on Vercel
+- **Account Management:** Centralized hub for user profile handling, preferences, and personal settings.
+- **Authentication & Tokens:** Secure login workflows and token lifecycle management via NextAuth.js.
+- **Localization:** Language preferences and regional configuration management.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Tech Stack & Dependencies
+
+- **Framework:** Next.js (App Router) / React
+- **Authentication:** NextAuth.js
+- **Styling & Components:** Tailwind CSS, `@xernerx/ui`, `@xernerx/styles`
+
+---
+
+## 📄 License
+
+Exclusive property of **Xernerx Studios**. See the [LICENSE](../../LICENSE) file for details.

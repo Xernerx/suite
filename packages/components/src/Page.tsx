@@ -36,7 +36,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 							'radial-gradient(circle at 50% 15%, color-mix(in srgb, var(--accent) 30%, var(--foreground)) 0%, var(--foreground) 75%), linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 0%, var(--foreground) 50%, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 100%)',
 					}}>
 					<div className={`relative z-10 flex flex-col ${showFooter ? 'min-h-full justify-between' : ''}`}>
-						<div className='p-5'>{children}</div>
+						<div style={{ padding: 'var(--ui-gap)' }}>{children}</div>
 
 						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}
 						{showFooter && <Footer />}

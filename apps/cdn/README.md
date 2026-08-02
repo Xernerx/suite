@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<!-- @format -->
 
-## Getting Started
+<p align="center">
+  <img src="https://www.xernerx.com/banner.png" alt="Xernerx CDN Banner" width="100%">
+</p>
 
-First, run the development server:
+<p align="center">
+  <b>Asset delivery network and media optimization service for the Xernerx Suite.</b>
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
+  <img src="https://img.shields.io/badge/service-cdn-blue?style=for-the-badge&logo=none" alt="Service">
+</p>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧭 Overview
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The **CDN** service manages asset distribution, media storage, and file optimization across the Xernerx ecosystem, ensuring fast and reliable delivery of static resources and user uploads.
 
-## Learn More
+### 🌐 Subdomain Routing
 
-To learn more about Next.js, take a look at the following resources:
+| Environment | URL Pattern                                                | Description                                          |
+| :---------- | :--------------------------------------------------------- | :--------------------------------------------------- |
+| **Public**  | [`cdn.xernerx.com`](https://cdn.xernerx.com)               | Production static asset and media gateway            |
+| **Canary**  | [`cdn.canary.xernerx.com`](https://canary.cdn.xernerx.com) | Staging and pre-release asset validation environment |
+| **Dev**     | [`cdn.dev.xernerx.com`](https://dev.cdn.xernerx.com)       | Local and active development environment             |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Core Features
 
-## Deploy on Vercel
+- **Asset Caching & Delivery:** High-performance distribution of static files, images, and brand assets.
+- **Media Optimization:** Automated processing and delivery for platform uploads.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Tech Stack & Dependencies
+
+- **Framework:** Next.js (App Router) / React
+- **Storage Integration:** Cloud storage providers and edge caching layers
+
+---
+
+## 📄 License
+
+Exclusive property of **Xernerx Studios**. See the [LICENSE](../../LICENSE) file for details.

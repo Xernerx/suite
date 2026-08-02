@@ -53,18 +53,25 @@ export function CookiePrompt() {
 	};
 
 	return (
-		<div className='fixed bottom-4 left-4 z-[100] w-[calc(100%-2rem)] max-w-md rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 shadow-2xl md:bottom-8 md:left-8'>
-			<div className='flex flex-col gap-4'>
-				<div>
+		<div
+			className='fixed z-[100] w-[calc(100%-2rem)] max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl'
+			style={{
+				bottom: 'var(--ui-gap)',
+				left: 'var(--ui-gap)',
+				padding: 'var(--ui-gap)',
+				fontSize: 'var(--text-scale, 14px)',
+			}}>
+			<div className='flex flex-col' style={{ gap: 'var(--ui-gap)' }}>
+				<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					<h3 className='text-lg font-semibold text-(--accent)'>{t('common.cookiePrompt.title', {}, 'Cookie Preferences')}</h3>
-					<p className='mt-2 text-sm text-(--text-muted)'>
+					<p className='text-sm text-(--text-muted)'>
 						{t('common.cookiePrompt.description', {}, 'We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.')}
 					</p>
 				</div>
 
 				{/* Manage Preferences Dropdown */}
 				{showManage && (
-					<div className='flex flex-col gap-3 rounded-xl bg-(--background) p-4'>
+					<div className='flex flex-col rounded-2xl bg-(--background) border border-(--border)/10' style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<PreferenceToggle
 							label={t('common.cookiePrompt.manage.essential.label', {}, 'Essential')}
 							description={t('common.cookiePrompt.manage.essential.description', {}, 'Required for sessions and security.')}
@@ -88,7 +95,7 @@ export function CookiePrompt() {
 				)}
 
 				{/* Action Buttons */}
-				<div className='mt-2 flex flex-col gap-2'>
+				<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{showManage ? (
 						<Button variant='primary' onClick={handleSavePreferences} className='w-full'>
 							{t('common.cookiePrompt.buttons.save', {}, 'Save My Preferences')}
@@ -98,7 +105,7 @@ export function CookiePrompt() {
 							<Button variant='primary' onClick={handleAcceptAll} className='w-full'>
 								{t('common.cookiePrompt.buttons.acceptAll', {}, 'Accept All')}
 							</Button>
-							<div className='flex gap-2'>
+							<div className='flex' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 								<Button variant='secondary' onClick={handleEssentialOnly} className='flex-1'>
 									{t('common.cookiePrompt.buttons.essentialOnly', {}, 'Essential Only')}
 								</Button>

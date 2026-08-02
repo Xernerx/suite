@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
-import { useEnvironment, useTheme } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useTheme, useToast } from '@xernerx/providers';
 
 type UserContextType = {
 	user: any;
+	mutate: () => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -27,26 +28,64 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	const { data: session, status } = useSession();
 	const { getEnvUrl } = useEnvironment();
 	const { setAccent } = useTheme();
+	const { toast } = useToast();
+	const { t } = useDictionary();
 
 	const [user, setUser] = useState(null);
 
-	useEffect(() => {
+	const fetchUser = useCallback(async () => {
 		const sessionWithError = session as { error?: string; accessToken?: string; user?: any };
 
 		if (status === 'authenticated' && sessionWithError?.error === 'RefreshAccessTokenError') {
-			const authLoginUrl = getEnvUrl('https://auth.xernerx.com/auth/login');
+			const authLoginUrl = getEnvUrl('https://auth.xernerx.com/login');
 			signOut({ callbackUrl: authLoginUrl });
 			return;
 		}
 
-		(async () => {
-			if (!sessionWithError || !sessionWithError.accessToken) return;
+		if (!sessionWithError || !sessionWithError.accessToken) return;
 
-			const res = await fetch('https://discord.com/api/v10/users/@me', {
+		try {
+			const discord = await fetch('https://discord.com/api/v10/users/@me', {
 				headers: { Authorization: `Bearer ${sessionWithError.accessToken}` },
 			}).then((res) => res.json());
 
-			await setUser({ ...sessionWithError.user, ...res });
+			const userId = (session?.user as any)?.id;
+			const baseUrl = getEnvUrl('https://api.xernerx.com/');
+			let xernerx = null;
+
+			const res = await fetch(`${baseUrl}secure/users/${userId}`);
+
+			if (res.status === 404) {
+				// User strictly does NOT exist, create them via POST
+				const postRes = await fetch(`${baseUrl}secure/users/${userId}`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(session?.user),
+				});
+
+				if (!postRes.ok) {
+					toast({
+						title: t('auth.user.createError'),
+						type: 'error',
+					});
+				} else {
+					xernerx = await postRes.json();
+					toast({
+						title: t('auth.user.created'),
+						type: 'info',
+					});
+				}
+			} else if (res.ok) {
+				xernerx = await res.json();
+			} else {
+				toast({
+					title: t('auth.user.fetchError'),
+					type: 'error',
+				});
+			}
+
+			const mergedUser = { ...sessionWithError.user, ...discord, ...xernerx };
+			setUser(mergedUser);
 
 			// Check preferences
 			const storedSync = getPref('syncFromDiscord');
@@ -54,12 +93,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 			// ONLY apply Discord's color if sync is explicitly enabled AND the user hasn't set a manual override
 			if (isSyncEnabled) {
-				setAccent(res?.accent_color);
+				setAccent(discord?.accent_color);
 			}
-		})();
-	}, [session, status]);
+		} catch (error) {
+			console.error('Critical error during user account synchronization:', error);
+			toast({
+				title: t('auth.user.networkError'),
+				type: 'error',
+			});
+		}
+	}, [session, status, getEnvUrl, setAccent, toast, t]);
 
-	return <UserContext.Provider value={{ user }}>{children}</UserContext.Provider>;
+	useEffect(() => {
+		fetchUser();
+	}, [fetchUser]);
+
+	return <UserContext.Provider value={{ user, mutate: fetchUser }}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {

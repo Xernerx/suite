@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, User } from 'lucide-react';
+import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Palette, ShieldCheck, User } from 'lucide-react';
 
 import Account from '@/components/Account';
 import Appearance from '@/components/Appearance';
@@ -52,33 +52,33 @@ export default function Home() {
 		show();
 
 		setNavItems([
-			{ category: t('common.nav.categories.account', {}, 'Account'), icon: User, label: t('common.nav.items.account', {}, 'Account'), view: 'account', onClick: () => setView('account') },
-			{ category: t('common.nav.categories.account', {}, 'Account'), icon: ShieldCheck, label: t('common.nav.items.profile', {}, 'Profile'), view: 'profile', onClick: () => setView('profile') },
+			{ category: t('common.nav.categories.account'), icon: User, label: t('common.nav.items.account'), view: 'account', onClick: () => setView('account') },
+			{ category: t('common.nav.categories.account'), icon: ShieldCheck, label: t('common.nav.items.profile'), view: 'profile', onClick: () => setView('profile') },
 			{
-				category: t('common.nav.categories.account', {}, 'Account'),
+				category: t('common.nav.categories.account'),
 				icon: Link,
-				label: t('common.nav.items.connections', {}, 'Connections'),
+				label: t('common.nav.items.connections'),
 				view: 'connections',
 				onClick: () => setView('connections'),
 			},
-			{ category: t('common.nav.categories.account', {}, 'Account'), icon: Computer, label: t('common.nav.items.devices', {}, 'Devices'), view: 'devices', onClick: () => setView('devices') },
+			{ category: t('common.nav.categories.account'), icon: Computer, label: t('common.nav.items.devices'), view: 'devices', onClick: () => setView('devices') },
 			{
-				category: t('common.nav.categories.preferences', {}, 'Preferences'),
-				icon: Paintbrush,
-				label: t('common.nav.items.appearance', {}, 'Appearance'),
+				category: t('common.nav.categories.preferences'),
+				icon: Palette,
+				label: t('common.nav.items.appearance'),
 				view: 'appearance',
 				onClick: () => setView('appearance'),
 			},
-			{ category: t('common.nav.categories.preferences', {}, 'Preferences'), icon: Globe, label: t('common.nav.items.language', {}, 'Language'), view: 'language', onClick: () => setView('language') },
+			{ category: t('common.nav.categories.preferences'), icon: Globe, label: t('common.nav.items.language'), view: 'language', onClick: () => setView('language') },
 			{
-				category: t('common.nav.categories.preferences', {}, 'Preferences'),
+				category: t('common.nav.categories.preferences'),
 				icon: Bell,
-				label: t('common.nav.items.notifications', {}, 'Notifications'),
+				label: t('common.nav.items.notifications'),
 				view: 'notifications',
 				onClick: () => setView('notifications'),
 			},
-			{ category: t('common.nav.categories.billing', {}, 'Billing'), icon: DollarSign, label: t('common.nav.items.billing', {}, 'Billing'), view: 'billing', onClick: () => setView('billing') },
-			{ category: t('common.nav.categories.developer', {}, 'Developer'), icon: KeyRound, label: t('common.nav.items.tokens', {}, 'Tokens'), view: 'tokens', onClick: () => setView('tokens') },
+			{ category: t('common.nav.categories.billing'), icon: DollarSign, label: t('common.nav.items.billing'), view: 'billing', onClick: () => setView('billing') },
+			{ category: t('common.nav.categories.developer'), icon: KeyRound, label: t('common.nav.items.tokens'), view: 'tokens', onClick: () => setView('tokens') },
 		]);
 
 		if (!view) setView('account');
@@ -99,7 +99,8 @@ export default function Home() {
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -8 }}
 				transition={{ duration: 0.2, ease: 'easeInOut' }}
-				className='flex flex-col w-full'>
+				className='flex flex-col w-full'
+				style={{ fontSize: 'var(--text-scale, 14px)', zoom: 'var(--ui-zoom, 1)' }}>
 				{ActiveComponent}
 			</motion.div>
 		</AnimatePresence>

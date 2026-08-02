@@ -1,4 +1,5 @@
 /** @format */
+'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, Copy, Globe, LogOut, Monitor, Pencil, Smartphone, Tablet, UserCircle, UserIcon, Zap } from 'lucide-react';
@@ -45,14 +46,15 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 			transition={{ duration: 0.15, ease: 'easeOut' }}
 			className={`bg-(--foreground) absolute bottom-full mb-3 z-50 flex flex-col rounded-[24px] shadow-2xl overflow-hidden text-left border border-white/5
                 ${isCollapsed ? 'left-1 w-56 origin-bottom-left' : 'left-0 right-0 origin-bottom'}
-            `}>
+            `}
+			style={{ fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Banner Area */}
 			<div className='h-[120px] w-full relative overflow-hidden bg-black/20'>
 				{bannerUrl && <Image src={bannerUrl} alt='User Banner' fill className='object-cover' unoptimized draggable={false} />}
 			</div>
 
 			{/* Profile Content */}
-			<div className='px-4 pb-4 relative'>
+			<div className='relative flex flex-col' style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 				{/* Avatar */}
 				<div className='flex justify-between items-start'>
 					<div className='bg-(--foreground) border-(--foreground) relative -mt-[42px] rounded-full border-[6px] shrink-0'>
@@ -74,16 +76,18 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 				</div>
 
 				{/* Names */}
-				<div className='mt-2 overflow-hidden'>
+				<div className='overflow-hidden' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					<div className='flex items-center gap-2'>
 						<h2 className='text-[20px] font-black text-white tracking-wide drop-shadow-sm truncate'>{activeUser?.global_name || activeUser?.name}</h2>
 					</div>
-					<p className='text-xs text-white/70 font-medium mt-0.5 truncate'>@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
+					<p className='text-xs text-white/70 font-medium truncate' style={{ marginTop: 'calc(var(--ui-gap) * 0.25)' }}>
+						@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}
+					</p>
 				</div>
 
 				{/* Dynamic Badges Row */}
 				{activeUser?.clan?.tag && (
-					<div className='flex gap-1.5 mt-3 items-center'>
+					<div className='flex items-center'>
 						<div className='bg-black/30 text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-1.5 border border-white/5'>
 							{clanBadgeUrl ? <Image src={clanBadgeUrl} alt='Clan Badge' width={12} height={12} unoptimized /> : <Zap size={10} className='text-yellow-500' fill='currentColor' />}
 							{activeUser.clan.tag}
@@ -91,18 +95,25 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 					</div>
 				)}
 
-				{/* Action Menu (Top) */}
-				<div className='mt-4 bg-black/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-white/80 border border-white/5'>
-					<Link href={getEnvUrl('https://auth.xernerx.com')} className='flex items-center gap-3 p-3 hover:bg-white/10 hover:text-white transition-colors'>
-						<Pencil size={16} className='shrink-0' /> <span className='truncate'>Edit Profile</span>
-					</Link>
-				</div>
+				{/* Action Menu (Top & Bottom Wrapper) */}
+				<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<div className='bg-black/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-white/80 border border-white/5'>
+						<Link
+							href={getEnvUrl('https://auth.xernerx.com')}
+							className='flex items-center transition-colors hover:bg-white/10 hover:text-white'
+							style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
+							<Pencil size={16} className='shrink-0' /> <span className='truncate'>Edit Profile</span>
+						</Link>
+					</div>
 
-				{/* Action Menu (Bottom) */}
-				<div className='mt-2 bg-black/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-white/80 border border-white/5'>
-					<button onClick={copyUserId} className='flex items-center gap-3 p-3 hover:bg-white/10 hover:text-white transition-colors'>
-						<Copy size={16} className='shrink-0' /> <span className='truncate'>Copy User ID</span>
-					</button>
+					<div className='bg-black/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-white/80 border border-white/5'>
+						<button
+							onClick={copyUserId}
+							className='flex items-center transition-colors hover:bg-white/10 hover:text-white text-left w-full'
+							style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
+							<Copy size={16} className='shrink-0' /> <span className='truncate'>Copy User ID</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</motion.div>

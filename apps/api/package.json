@@ -1,0 +1,35 @@
+{
+	"name": "api",
+	"version": "0.2.0",
+	"private": true,
+	"scripts": {
+		"initialize": "shx cp -r ../../packages/public/* ./public/",
+		"dev": "pnpm initialize && next dev -p 4001",
+		"build": "next build",
+		"start": "next start",
+		"lint": "eslint"
+	},
+	"dependencies": {
+		"@xernerx/components": "workspace:*",
+		"@xernerx/feedback": "workspace:*",
+		"@xernerx/lib": "workspace:*",
+		"@xernerx/providers": "workspace:*",
+		"@xernerx/ui": "workspace:*",
+		"mongoose": "^9.9.1",
+		"next": "^16.2.12",
+		"next-auth": "^4",
+		"react": "^19",
+		"react-dom": "^19"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"babel-plugin-react-compiler": "1.0.0",
+		"eslint": "^9",
+		"eslint-config-next": "^16",
+		"tailwindcss": "^4",
+		"typescript": "^5"
+	}
+}

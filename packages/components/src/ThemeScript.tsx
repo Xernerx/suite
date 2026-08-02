@@ -1,23 +1,46 @@
 /** @format */
 
+import Script from 'next/script';
+
 export function ThemeScript() {
 	const scriptCode = `
         try {
-            var match = document.cookie.match(/(^| )accent=([^;]+)/);
-            if (match) {
-                document.documentElement.style.setProperty('--accent', match[2]);
+            function getPref(key) {
+                var match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+                if (match) return match[2];
+                return localStorage.getItem(key);
             }
-            var themeMatch = document.cookie.match(/(^| )theme=([^;]+)/);
-            if (themeMatch) {
-                var theme = themeMatch[2];
+
+            var accent = getPref('accent');
+            if (accent) {
+                document.documentElement.style.setProperty('--accent', accent);
+            }
+            
+            var theme = getPref('theme');
+            if (theme) {
                 if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                 } else {
                     document.documentElement.classList.remove('dark');
                 }
             }
+
+            var zoom = getPref('uiZoom');
+            if (zoom) {
+                document.documentElement.style.setProperty('--ui-zoom', String(parseInt(zoom, 10) / 100));
+            }
+
+            var gap = getPref('uiGap');
+            if (gap) {
+                document.documentElement.style.setProperty('--ui-gap', gap + 'px');
+            }
+
+            var textScale = getPref('textScale');
+            if (textScale) {
+                document.documentElement.style.setProperty('--text-scale', textScale + 'px');
+            }
         } catch (e) {}
     `;
 
-	return <script dangerouslySetInnerHTML={{ __html: scriptCode }} suppressHydrationWarning />;
+	return <Script id='xernerx-theme-script' strategy='beforeInteractive' dangerouslySetInnerHTML={{ __html: scriptCode }} />;
 }

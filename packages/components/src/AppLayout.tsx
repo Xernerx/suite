@@ -19,18 +19,19 @@ import { Page } from './Page';
 import React from 'react';
 import { ThemeScript } from './ThemeScript';
 
-export function AppLayout({ dictionary, children }: { children: React.ReactNode; dictionary: any }) {
+export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {
 	return (
 		<>
 			<ThemeScript />
 
-			<DictionaryProvider dictionary={dictionary}>
-				<EnvironmentProvider>
-					<PlatformProvider>
-						<ThemeProvider>
-							<UserProvider>
-								<ShortcutsProvider>
-									<ToastProvider>
+			<ToastProvider>
+				<DictionaryProvider dictionary={dictionary}>
+					{/* Pass initialEnvironment here so SSR matches the client */}
+					<EnvironmentProvider initialEnvironment={initialEnvironment}>
+						<PlatformProvider>
+							<ThemeProvider>
+								<UserProvider>
+									<ShortcutsProvider>
 										<CookieProvider>
 											<SupportProvider>
 												<CookiePrompt />
@@ -39,13 +40,13 @@ export function AppLayout({ dictionary, children }: { children: React.ReactNode;
 												</SidebarProvider>
 											</SupportProvider>
 										</CookieProvider>
-									</ToastProvider>
-								</ShortcutsProvider>
-							</UserProvider>
-						</ThemeProvider>
-					</PlatformProvider>
-				</EnvironmentProvider>
-			</DictionaryProvider>
+									</ShortcutsProvider>
+								</UserProvider>
+							</ThemeProvider>
+						</PlatformProvider>
+					</EnvironmentProvider>
+				</DictionaryProvider>
+			</ToastProvider>
 		</>
 	);
 }

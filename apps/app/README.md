@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<!-- @format -->
 
-## Getting Started
+<p align="center">
+  <img src="https://www.xernerx.com/banner.png" alt="Xernerx App Banner" width="100%">
+</p>
 
-First, run the development server:
+<p align="center">
+  <b>Unified user dashboard and workspace control center for the Xernerx Suite.</b>
+</p>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<p align="center">
+  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
+  <img src="https://img.shields.io/badge/service-app-blue?style=for-the-badge&logo=none" alt="Service">
+</p>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧭 Overview
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The **App** service is the primary user-facing control center where users spend the majority of their time within the ecosystem. It provides comprehensive management tools for bots, servers, and organizations.
 
-## Learn More
+### 🌐 Subdomain Routing
 
-To learn more about Next.js, take a look at the following resources:
+| Environment | URL Pattern                                                | Description                                   |
+| :---------- | :--------------------------------------------------------- | :-------------------------------------------- |
+| **Public**  | [`app.xernerx.com`](https://app.xernerx.com)               | Production workspace control center           |
+| **Canary**  | [`app.canary.xernerx.com`](https://canary.app.xernerx.com) | Staging and pre-release workspace environment |
+| **Dev**     | [`app.dev.xernerx.com`](https://dev.app.xernerx.com)       | Local and active development environment      |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Core Features
 
-## Deploy on Vercel
+- **Server Explorer & Stats:** Comprehensive discovery and real-time performance tracking for connected servers.
+- **Bot Management:** Dedicated hosting controls, monitoring, and statistics for active bots.
+- **Bot Integration:** Seamless setup workflows for Xernerx Studios bots on user-owned servers.
+- **Organization Setup:** Centralized workspace and team management configuration.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Tech Stack & Dependencies
+
+- **Framework:** Next.js (App Router) / React
+- **Real-Time & State:** WebSockets, Framer Motion
+- **Database & Auth:** Mongoose / MongoDB, NextAuth.js
+- **UI & Visualization:** Tailwind CSS, Recharts, Lucide Icons
+
+---
+
+## 📄 License
+
+Exclusive property of **Xernerx Studios**. See the [LICENSE](../../LICENSE) file for details.

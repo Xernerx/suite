@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
+import { useDictionary, useUser } from '@xernerx/providers';
+
 import { CircleFlag } from 'react-circle-flags';
 import { Selector } from '@xernerx/ui';
-import { useDictionary } from '@xernerx/providers';
 import { useRouter } from 'next/navigation';
 
 const setLocaleCookie = (code: string) => {
@@ -16,8 +17,6 @@ const getFlagCode = (localeCode: string) => {
 			return 'uk';
 		case 'en-US':
 			return 'us';
-		case 'nl':
-			return 'nl';
 		default:
 			return localeCode;
 	}
@@ -25,66 +24,120 @@ const getFlagCode = (localeCode: string) => {
 
 export default function Language() {
 	const router = useRouter();
+	const { user } = useUser();
 	const { currentLocale, currentLanguage, locales, t } = useDictionary();
 
 	const handleLanguageChange = (code: string) => {
+		if (code === 'contribute') {
+			window.open('https://github.com/xernerx', '_blank', 'noopener,noreferrer');
+			return;
+		}
 		if (currentLocale === code) return;
 		setLocaleCookie(code);
 		router.refresh();
 	};
 
-	const languageOptions = locales.map((lang: { code: string; label: string; coverage: number }) => {
-		const countryCode = getFlagCode(lang.code);
+	const languageOptions = [
+		...locales.map((lang: { code: string; label: string; coverage: number }) => {
+			const countryCode = getFlagCode(lang.code);
 
-		return {
-			value: lang.code,
+			return {
+				value: lang.code,
+				label: (
+					<div className='flex items-center gap-2.5'>
+						<CircleFlag countryCode={countryCode} className='h-4 w-4 shrink-0' />
+						<span className='font-medium'>{lang.label}</span>
+					</div>
+				),
+				badge: (
+					<span className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${lang.coverage === 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
+						{lang.coverage}%
+					</span>
+				),
+			};
+		}),
+		{
+			value: 'contribute',
 			label: (
-				<div className='flex items-center gap-2.5'>
-					<CircleFlag countryCode={countryCode} className='h-4 w-4' />
-					<span className='font-medium'>{lang.label}</span>
+				<div className='flex items-center gap-2.5 text-yellow-600 dark:text-yellow-500'>
+					<span className='font-semibold'>{t('auth.language.contributeLabel', {}, '+ Contribute a translation')}</span>
 				</div>
 			),
-			badge: (
-				<span className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${lang.coverage === 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-					{lang.coverage}%
-				</span>
-			),
-		};
-	});
+		},
+	];
 
 	const coverageDescription = t('auth.language.coverage.description', { coverage: currentLanguage?.coverage ?? 0 });
 
-	return (
-		<div className='flex flex-col gap-4 w-full max-w-4xl mx-auto'>
-			{/* Main Selector */}
-			<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm'>
-				<div className='flex flex-col'>
-					<h3 className='text-base font-semibold text-(--text)'>{t('auth.language.title')}</h3>
-					<p className='text-xs text-(--text-muted) mt-0.5'>{t('auth.language.description')}</p>
-				</div>
+	const discordLocale = user?.locale || 'en-US';
+	const discordCountryCode = getFlagCode(discordLocale);
+	const discordLanguageLabel = locales.find((l: { code: string; label: string }) => l.code === discordLocale)?.label || discordLocale;
 
-				<div className='w-full sm:w-64'>
-					<Selector value={currentLocale} options={languageOptions} onChange={handleLanguageChange} />
-				</div>
+	return (
+		<div
+			className='flex flex-col max-w-4xl mx-auto w-full'
+			style={{
+				padding: 'var(--ui-gap)',
+				gap: 'var(--ui-gap)',
+				fontSize: 'var(--text-scale, 14px)',
+			}}>
+			{/* Page Header (Hero) */}
+			<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+				<h1 className='text-3xl font-black tracking-tight text-(--text)'>{t('auth.language.headerTitle', {}, 'Language Preferences')}</h1>
+				<p className='text-sm text-(--text-muted)'>{t('auth.language.headerDescription', {}, 'Choose your interface localization and view regional preferences.')}</p>
 			</div>
 
-			{/* Translation Invite Banner */}
-			{currentLanguage?.coverage < 100 && (
-				<div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl border border-yellow-500/20 bg-yellow-500/5 shadow-sm transition-all'>
-					<div className='flex flex-col'>
-						<h3 className='text-base font-semibold text-yellow-600 dark:text-yellow-500'>{t('auth.language.coverage.title')}</h3>
-						<p className='text-xs text-(--text-muted) mt-0.5 max-w-xl'>{coverageDescription}</p>
+			<div className='flex flex-col' style={{ gap: 'var(--ui-gap)' }}>
+				{/* Unified Main Card Wrapper */}
+				<div className='flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm'>
+					{/* Top Section: Main Selector */}
+					<div className='flex flex-col sm:flex-row sm:items-center justify-between' style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className='flex flex-col max-w-xl' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+							<h3 className='text-base font-semibold text-(--text)'>{t('auth.language.title', {}, 'Language')}</h3>
+							<p className='text-xs text-(--text-muted)'>{t('auth.language.description', {}, 'Select your preferred language for the interface.')}</p>
+						</div>
+
+						<div className='w-full sm:w-64'>
+							<Selector value={currentLocale} options={languageOptions} onChange={handleLanguageChange} />
+						</div>
 					</div>
 
-					<a
-						href='https://github.com/xernerx'
-						target='_blank'
-						rel='noopener noreferrer'
-						className='w-full sm:w-auto px-5 py-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-500/20 text-xs font-semibold rounded-2xl transition-colors text-center whitespace-nowrap'>
-						Contribute
-					</a>
+					{/* Bottom Section: Translation Invite Banner */}
+					{currentLanguage?.coverage < 100 && (
+						<div
+							className='flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/5 border-t border-yellow-500/10 transition-all rounded-b-[calc(1.5rem-1px)]'
+							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+							<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+								<h3 className='text-base font-semibold text-yellow-600 dark:text-yellow-500'>{t('auth.language.coverage.title', {}, 'Help us translate!')}</h3>
+								<p className='text-xs text-(--text-muted) max-w-xl'>{coverageDescription}</p>
+							</div>
+
+							<a
+								href='https://github.com/xernerx'
+								target='_blank'
+								rel='noopener noreferrer'
+								className='w-full sm:w-auto bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-500/20 text-xs font-semibold rounded-2xl transition-colors text-center whitespace-nowrap'
+								style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}>
+								{t('auth.language.coverage.button', {}, 'Contribute')}
+							</a>
+						</div>
+					)}
 				</div>
-			)}
+
+				{/* Discord Visual Language Section */}
+				<div
+					className='flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm'
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+					<div className='flex flex-col max-w-xl' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className='text-base font-semibold text-(--text)'>{t('auth.language.discord.title', {}, 'Discord Language')}</h3>
+						<p className='text-xs text-(--text-muted)'>{t('auth.language.discord.description', {}, 'Your current Discord account language setting (read-only indicator).')}</p>
+					</div>
+
+					<div className='w-full sm:w-64 flex items-center gap-2.5 rounded-2xl border border-(--border)/10 bg-(--background)' style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}>
+						<CircleFlag countryCode={discordCountryCode} className='h-4 w-4 shrink-0' />
+						<span className='text-sm font-medium text-(--text) truncate'>{discordLanguageLabel}</span>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

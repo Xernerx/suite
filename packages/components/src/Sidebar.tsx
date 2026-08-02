@@ -63,13 +63,18 @@ export function Sidebar() {
 				className={`
                     fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
                     w-full pt-[72px] pb-4
-                    md:w-64 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-72px)] md:pt-0 md:pb-0
+                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-72px)] md:pt-0 md:pb-0
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
                     md:translate-x-0 
                     ${isCollapsed ? 'md:w-[80px]' : ''}
-                `}>
+                `}
+				style={{
+					paddingLeft: 'var(--ui-gap)',
+					paddingRight: 'var(--ui-gap)',
+					fontSize: 'var(--text-scale, 14px)',
+				}}>
 				{/* Navigation Items */}
-				<div className='flex flex-1 flex-col gap-1 overflow-y-auto overflow-x-hidden pt-4 px-3'>
+				<div className='flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					{navItems.map((item, idx) => {
 						const Icon = item.icon;
 						const active = item.view && view === item.view;
@@ -96,10 +101,14 @@ export function Sidebar() {
 										if (item.onClick) item.onClick();
 										setMobileOpen(false);
 									}}
-									className={`group relative flex items-center rounded-xl py-3 transition-all duration-200 items-center 
+									className={`group relative flex items-center rounded-xl transition-all duration-200 
                                         ${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground) hover:text-(--text)'}
-                                        ${isCollapsed ? 'justify-center px-0' : 'px-4 gap-4'}
-                                    `}>
+                                        ${isCollapsed ? 'justify-center px-0' : ''}
+                                    `}
+									style={{
+										padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
+										gap: isCollapsed ? 0 : 'var(--ui-gap)',
+									}}>
 									{active && !isCollapsed && <div className='absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)' />}
 
 									{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
@@ -118,13 +127,14 @@ export function Sidebar() {
 				<Divider />
 				{/* Bottom Ecosystem & User Section */}
 
-				<div ref={menuRef} className={`relative flex flex-col gap-1 p-3 ${isCollapsed ? 'items-center' : ''}`}>
+				<div ref={menuRef} className={`relative flex flex-col ${isCollapsed ? 'items-center' : ''}`} style={{ paddingBottom: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{!activeUser ? (
 						<Link
 							href='/login'
-							className={`flex items-center justify-center gap-2 rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
-                                ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full py-2.5 px-4 font-medium text-sm'}
-                            `}>
+							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
+                                ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
+                            `}
+							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}>
 							<LogIn size={18} />
 							{!isCollapsed && <span>{t('common.sidebar.login', {}, 'Login')}</span>}
 						</Link>
@@ -138,11 +148,12 @@ export function Sidebar() {
 
 							{/* Combined Trigger Card Wrapper - Now hosts the Nameplate */}
 							<div
-								className={`group relative overflow-hidden flex w-full items-center rounded-xl p-2 transition-colors 
+								className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-colors 
                                 ${!nameplateUrl ? 'hover:bg-(--foreground)' : 'shadow-inner'}
                                 ${!nameplateUrl && (activeMenu === 'user' || activeMenu === 'suite') ? 'bg-(--foreground)' : ''}
-                                ${isCollapsed ? 'flex-col justify-center gap-3' : 'justify-between gap-3'}
-                            `}>
+                                ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
+                            `}
+								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}>
 								{/* Root Nameplate Video Background */}
 								{nameplateUrl && (
 									<>
@@ -153,7 +164,10 @@ export function Sidebar() {
 								)}
 
 								{/* User Info Trigger (Left Side) */}
-								<button onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')} className='relative z-10 flex flex-1 items-center gap-3 overflow-hidden text-left rounded-lg'>
+								<button
+									onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')}
+									className='relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg'
+									style={{ gap: 'var(--ui-gap)' }}>
 									{/* Avatar */}
 									<div className='relative shrink-0'>
 										{avatarUrl ? (
@@ -180,7 +194,9 @@ export function Sidebar() {
 									</div>
 
 									{/* Names */}
-									<div className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 opacity-100'}`}>
+									<div
+										className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 opacity-100'}`}
+										style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
 										<span className={`truncate text-sm font-bold tracking-wide ${nameplateUrl ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
 											{activeUser.global_name || activeUser.name}
 										</span>
@@ -193,10 +209,11 @@ export function Sidebar() {
 								{/* Compass Ecosystem Trigger (Right Side) */}
 								<button
 									onClick={() => setActiveMenu(activeMenu === 'suite' ? 'none' : 'suite')}
-									className={`relative z-10 shrink-0 flex items-center justify-center rounded-lg p-1.5 transition-colors 
+									className={`relative z-10 shrink-0 flex items-center justify-center rounded-xl transition-colors 
                                         ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) group-hover:text-(--text)'}
                                         ${activeMenu === 'suite' ? (nameplateUrl ? 'bg-black/40 text-white' : 'bg-(--background)') : ''}
-                                    `}>
+                                    `}
+									style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}>
 									<Compass size={isCollapsed ? 20 : 18} className={`transition-transform duration-200 ${activeMenu === 'suite' && !nameplateUrl ? 'text-(--accent)' : ''}`} />
 								</button>
 							</div>
