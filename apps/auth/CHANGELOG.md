@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.9
+
+### Patch Changes
+
+- Fixed imports
+
 ## 0.4.8
 
 ### Patch Changes

@@ -3,7 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, useSession } from '@xernerx/providers';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -11,7 +11,7 @@ import Banner from '@/../public/banner.svg';
 import { Button } from '@xernerx/ui';
 
 export default function SignInPage() {
-	const { data: session, status } = useSession() || {};
+	const { data: session, status } = useSession();
 	const { hide } = useSidebar();
 	const { t } = useDictionary();
 
@@ -32,20 +32,16 @@ export default function SignInPage() {
 	}, [session, status]);
 
 	return (
-		<div
-			className="flex h-full min-h-screen items-center justify-center"
-			style={{ padding: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
-		>
+		<div className="flex h-full min-h-screen items-center justify-center px-6">
 			<AnimatePresence>
 				<motion.div
 					initial={{ opacity: 0, scale: 0.96, y: 12 }}
 					animate={{ opacity: 1, scale: 1, y: 0 }}
 					transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-					className="flex w-full flex-col items-center text-center"
-					style={{ gap: 'var(--ui-gap)' }}
+					className="flex w-full flex-col items-center gap-6 text-center"
 				>
 					{/* LOGO */}
-					<div className="flex flex-col items-center" style={{ margin: 'var(--ui-gap)' }}>
+					<div className="m-4 flex flex-col items-center">
 						<Banner className="h-auto w-48 text-(--accent) md:w-56" />
 					</div>
 
@@ -65,8 +61,7 @@ export default function SignInPage() {
 					{/* ABOUT TOGGLE */}
 					<button
 						onClick={() => setAbout(!about)}
-						className="flex items-center text-xs font-semibold uppercase tracking-wide text-(--text-muted) transition-colors hover:text-(--text)"
-						style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
+						className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-(--text-muted) transition-colors hover:text-(--text)"
 					>
 						{t('auth.signin.aboutToggle', {}, 'About permissions')}
 						{about ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -82,18 +77,9 @@ export default function SignInPage() {
 								transition={{ duration: 0.25, ease: 'easeInOut' }}
 								className="w-full max-w-md overflow-hidden"
 							>
-								<div
-									className="rounded-2xl border border-(--border)/10 bg-(--foreground) text-left shadow-xl"
-									style={{
-										marginTop: 'calc(var(--ui-gap) * 0.5)',
-										padding: 'var(--ui-gap)',
-									}}
-								>
-									<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-										<div
-											className="flex flex-col"
-											style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-										>
+								<div className="mt-2 rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 text-left shadow-xl">
+									<div className="flex flex-col gap-4">
+										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">
 												{t('auth.signin.permissions.profile.title')}
 											</h3>
@@ -102,10 +88,7 @@ export default function SignInPage() {
 											</p>
 										</div>
 
-										<div
-											className="flex flex-col"
-											style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-										>
+										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">
 												{t('auth.signin.permissions.email.title')}
 											</h3>
@@ -114,10 +97,7 @@ export default function SignInPage() {
 											</p>
 										</div>
 
-										<div
-											className="flex flex-col"
-											style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-										>
+										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">
 												{t('auth.signin.permissions.connections.title')}
 											</h3>
@@ -128,10 +108,7 @@ export default function SignInPage() {
 											</p>
 										</div>
 
-										<div
-											className="flex flex-col"
-											style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-										>
+										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">
 												{t('auth.signin.permissions.joinServers.title')}
 											</h3>
@@ -142,10 +119,7 @@ export default function SignInPage() {
 											</p>
 										</div>
 
-										<div
-											className="flex flex-col"
-											style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-										>
+										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">
 												{t('auth.signin.permissions.servers.title')}
 											</h3>
@@ -154,10 +128,7 @@ export default function SignInPage() {
 											</p>
 										</div>
 
-										<div
-											className="flex flex-col"
-											style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-										>
+										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">
 												{t('auth.signin.permissions.memberInfo.title')}
 											</h3>
@@ -169,13 +140,7 @@ export default function SignInPage() {
 										</div>
 
 										{/* DIVIDER */}
-										<div
-											className="border-t border-(--border)/10 text-xs leading-relaxed text-(--text-muted)"
-											style={{
-												marginTop: 'calc(var(--ui-gap) * 0.5)',
-												paddingTop: 'var(--ui-gap)',
-											}}
-										>
+										<div className="mt-2 border-t border-(--border)/10 pt-4 text-xs leading-relaxed text-(--text-muted)">
 											{t('auth.signin.permissions.footer')}
 										</div>
 									</div>
