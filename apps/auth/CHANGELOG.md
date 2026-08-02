@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.8
+
+### Patch Changes
+
+- Reverted changes to see if it gets fixed
+
 ## 0.4.7
 
 ### Patch Changes
