@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.2
+
+### Patch Changes
+
+- Fixed a render issue
+
 ## 0.4.1
 
 ### Patch Changes

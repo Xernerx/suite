@@ -2,7 +2,17 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Palette, ShieldCheck, User } from 'lucide-react';
+import {
+	Bell,
+	Computer,
+	DollarSign,
+	Globe,
+	KeyRound,
+	Link,
+	Palette,
+	ShieldCheck,
+	User,
+} from 'lucide-react';
 
 import Account from '@/components/Account';
 import Appearance from '@/components/Appearance';
@@ -33,7 +43,7 @@ const COMPONENT_MAP: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
-	const { data: session, status } = useSession();
+	const { data: session, status } = useSession() || {};
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
 
@@ -52,8 +62,20 @@ export default function Home() {
 		show();
 
 		setNavItems([
-			{ category: t('common.nav.categories.account'), icon: User, label: t('common.nav.items.account'), view: 'account', onClick: () => setView('account') },
-			{ category: t('common.nav.categories.account'), icon: ShieldCheck, label: t('common.nav.items.profile'), view: 'profile', onClick: () => setView('profile') },
+			{
+				category: t('common.nav.categories.account'),
+				icon: User,
+				label: t('common.nav.items.account'),
+				view: 'account',
+				onClick: () => setView('account'),
+			},
+			{
+				category: t('common.nav.categories.account'),
+				icon: ShieldCheck,
+				label: t('common.nav.items.profile'),
+				view: 'profile',
+				onClick: () => setView('profile'),
+			},
 			{
 				category: t('common.nav.categories.account'),
 				icon: Link,
@@ -61,7 +83,13 @@ export default function Home() {
 				view: 'connections',
 				onClick: () => setView('connections'),
 			},
-			{ category: t('common.nav.categories.account'), icon: Computer, label: t('common.nav.items.devices'), view: 'devices', onClick: () => setView('devices') },
+			{
+				category: t('common.nav.categories.account'),
+				icon: Computer,
+				label: t('common.nav.items.devices'),
+				view: 'devices',
+				onClick: () => setView('devices'),
+			},
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Palette,
@@ -69,7 +97,13 @@ export default function Home() {
 				view: 'appearance',
 				onClick: () => setView('appearance'),
 			},
-			{ category: t('common.nav.categories.preferences'), icon: Globe, label: t('common.nav.items.language'), view: 'language', onClick: () => setView('language') },
+			{
+				category: t('common.nav.categories.preferences'),
+				icon: Globe,
+				label: t('common.nav.items.language'),
+				view: 'language',
+				onClick: () => setView('language'),
+			},
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Bell,
@@ -77,8 +111,20 @@ export default function Home() {
 				view: 'notifications',
 				onClick: () => setView('notifications'),
 			},
-			{ category: t('common.nav.categories.billing'), icon: DollarSign, label: t('common.nav.items.billing'), view: 'billing', onClick: () => setView('billing') },
-			{ category: t('common.nav.categories.developer'), icon: KeyRound, label: t('common.nav.items.tokens'), view: 'tokens', onClick: () => setView('tokens') },
+			{
+				category: t('common.nav.categories.billing'),
+				icon: DollarSign,
+				label: t('common.nav.items.billing'),
+				view: 'billing',
+				onClick: () => setView('billing'),
+			},
+			{
+				category: t('common.nav.categories.developer'),
+				icon: KeyRound,
+				label: t('common.nav.items.tokens'),
+				view: 'tokens',
+				onClick: () => setView('tokens'),
+			},
 		]);
 
 		if (!view) setView('account');
@@ -92,15 +138,16 @@ export default function Home() {
 	const ActiveComponent = COMPONENT_MAP[currentView] || <Account />;
 
 	return (
-		<AnimatePresence mode='wait'>
+		<AnimatePresence mode="wait">
 			<motion.div
 				key={currentView}
 				initial={{ opacity: 0, y: 8 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -8 }}
 				transition={{ duration: 0.2, ease: 'easeInOut' }}
-				className='flex flex-col w-full'
-				style={{ fontSize: 'var(--text-scale, 14px)', zoom: 'var(--ui-zoom, 1)' }}>
+				className="flex flex-col w-full"
+				style={{ fontSize: 'var(--text-scale, 14px)', zoom: 'var(--ui-zoom, 1)' }}
+			>
 				{ActiveComponent}
 			</motion.div>
 		</AnimatePresence>
