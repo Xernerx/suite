@@ -27,7 +27,7 @@ import Tokens from '@/components/Tokens';
 import { redirect } from 'next/navigation';
 import { useDictionary } from '@xernerx/providers';
 import { useEffect } from 'react';
-import { useSession } from '@xernerx/providers';
+import { useSession } from 'next-auth/react';
 import { useSidebar } from '@xernerx/providers';
 
 const COMPONENT_MAP: Record<string, React.ReactNode> = {

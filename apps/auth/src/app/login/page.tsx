@@ -3,7 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { signIn, useSession } from '@xernerx/providers';
+import { signIn, useSession } from 'next-auth/react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 

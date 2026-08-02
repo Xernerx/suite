@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.10
+
+### Patch Changes
+
+- Sticking to that what I know
+
 ## 0.4.9
 
 ### Patch Changes
