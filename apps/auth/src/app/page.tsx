@@ -52,7 +52,7 @@ export default function Home() {
 	}, [hide]);
 
 	useEffect(() => {
-		if (status === 'loading') return;
+		if (status === 'loading' || !status) return;
 
 		if (!session) {
 			hide();
@@ -128,7 +128,7 @@ export default function Home() {
 		]);
 
 		if (!view) setView('account');
-	}, [session, status, hide, show, setNavItems, view, setView, t]);
+	}, [session, status, hide, show, setNavItems]);
 
 	if (!session && status !== 'loading' && status !== undefined) return redirect('/login');
 

@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.7
+
+### Patch Changes
+
+- Attempt number: 1 more than the previous
+
 ## 0.4.6
 
 ### Patch Changes
