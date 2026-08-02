@@ -120,18 +120,19 @@ export default function Links({ id }: { id: string }) {
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className='flex flex-col gap-4'>
+		<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
 			{/* actions */}
-			<div className='flex justify-end gap-2'>
+			<div className="flex justify-end gap-2">
 				<motion.button
 					whileTap={{ scale: 0.98 }}
 					onClick={reset}
 					disabled={!hasChanges || saving}
-					className='rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
-					}}>
+					}}
+				>
 					Reset
 				</motion.button>
 
@@ -139,12 +140,13 @@ export default function Links({ id }: { id: string }) {
 					whileTap={{ scale: 0.98 }}
 					onClick={save}
 					disabled={!hasChanges || saving}
-					className='inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: hasChanges ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
 						background: hasChanges ? 'color-mix(in srgb, var(--accent) 16%, var(--bg-panel))' : 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
-					}}>
-					{saving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
+					}}
+				>
+					{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</motion.button>
 			</div>
@@ -155,13 +157,14 @@ export default function Links({ id }: { id: string }) {
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
-						className='rounded-2xl border px-4 py-3 text-sm'
+						className="rounded-2xl border px-4 py-3 text-sm"
 						style={{
 							borderColor: 'var(--border)',
 							background: 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
-						}}>
-						<div className='flex items-center gap-2'>
-							<Loader2 className='h-4 w-4 animate-spin' />
+						}}
+					>
+						<div className="flex items-center gap-2">
+							<Loader2 className="h-4 w-4 animate-spin" />
 							Loading links...
 						</div>
 					</motion.div>
@@ -172,20 +175,21 @@ export default function Links({ id }: { id: string }) {
 			<motion.section
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='rounded-3xl border p-5'
+				className="rounded-3xl border p-5"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-panel) 78%, transparent)',
-				}}>
-				<div className='mb-4 flex items-center gap-2'>
-					<LinkIcon className='h-4 w-4' />
-					<h4 className='text-sm font-semibold uppercase tracking-[0.18em]'>Links</h4>
+				}}
+			>
+				<div className="mb-4 flex items-center gap-2">
+					<LinkIcon className="h-4 w-4" />
+					<h4 className="text-sm font-semibold uppercase tracking-[0.18em]">Links</h4>
 				</div>
 
-				<div className='flex flex-col gap-4'>
-					<Input icon={<LinkIcon className='h-4 w-4' />} label='Invite Link' value={form.invite} onChange={(v) => update('invite', v)} placeholder='https://discord.gg/...' />
+				<div className="flex flex-col gap-4">
+					<Input icon={<LinkIcon className="h-4 w-4" />} label="Invite Link" value={form.invite} onChange={(v) => update('invite', v)} placeholder="https://discord.gg/..." />
 
-					<Input icon={<Globe className='h-4 w-4' />} label='Website' value={form.website} onChange={(v) => update('website', v)} placeholder='https://your-site.com' />
+					<Input icon={<Globe className="h-4 w-4" />} label="Website" value={form.website} onChange={(v) => update('website', v)} placeholder="https://your-site.com" />
 				</div>
 			</motion.section>
 		</motion.div>
@@ -194,18 +198,19 @@ export default function Links({ id }: { id: string }) {
 
 function Input({ icon, label, value, onChange, placeholder }: { icon: React.ReactNode; label: string; value: string; onChange: (v: string) => void; placeholder: string }) {
 	return (
-		<div className='flex flex-col gap-2'>
-			<label className='text-sm font-medium'>{label}</label>
+		<div className="flex flex-col gap-2">
+			<label className="text-sm font-medium">{label}</label>
 
 			<div
-				className='flex items-center gap-3 rounded-2xl border px-4 py-3'
+				className="flex items-center gap-3 rounded-2xl border px-4 py-3"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-main) 45%, var(--bg-panel))',
-				}}>
-				<span className='opacity-60'>{icon}</span>
+				}}
+			>
+				<span className="opacity-60">{icon}</span>
 
-				<input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className='w-full bg-transparent text-sm outline-none' />
+				<input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full bg-transparent text-sm outline-none" />
 			</div>
 		</div>
 	);

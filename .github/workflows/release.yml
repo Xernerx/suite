@@ -3,94 +3,94 @@
 name: Desktop + Mobile Release
 
 on:
-  push:
-    tags:
-      # Listen for changesets-generated package tags instead of global v*
-      - 'desktop@*'
-      - 'mobile@*'
+    push:
+        tags:
+            # Listen for changesets-generated package tags instead of global v*
+            - 'desktop@*'
+            - 'mobile@*'
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  desktop:
-    name: Electron Build
-    # ✅ ONLY run this job if the tag pushed was for the desktop app
-    if: startsWith(github.ref, 'refs/tags/desktop@')
-    runs-on: ${{ matrix.os }}
-    env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install deps
-        run: pnpm install --frozen-lockfile
-
-      - name: Build desktop
-        run: pnpm --filter ./apps/desktop build
-
-      - name: Package desktop
-        run: pnpm --filter ./apps/desktop dist -- --publish=never
-
-      - name: Upload desktop artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-${{ matrix.os }}
-          path: apps/desktop/release/**
-
-  mobile:
-    name: Mobile Build (Expo)
-    # ✅ ONLY run this job if the tag pushed was for the mobile app
-    if: startsWith(github.ref, 'refs/tags/mobile@')
-    runs-on: ubuntu-latest
-    continue-on-error: true
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-      - name: Install pnpm
-        run: npm install -g pnpm
-      # ... (your commented out EAS steps remain the same)
-
-  release:
-    name: Create GitHub Release
-    if: always()
-    # Use always() so it runs even if the *other* job was skipped by the `if` condition
-    needs: [desktop, mobile]
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/download-artifact@v4
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            **/*.exe
-            **/*.dmg
-            **/*.AppImage
-            **/*.apk
-            **/*.yml
-            **/*.blockmap
+    desktop:
+        name: Electron Build
+        # ✅ ONLY run this job if the tag pushed was for the desktop app
+        if: startsWith(github.ref, 'refs/tags/desktop@')
+        runs-on: ${{ matrix.os }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+
+        permissions:
+            contents: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+
+            - name: Install pnpm
+              run: npm install -g pnpm
+
+            - name: Install deps
+              run: pnpm install --frozen-lockfile
+
+            - name: Build desktop
+              run: pnpm --filter ./apps/desktop build
+
+            - name: Package desktop
+              run: pnpm --filter ./apps/desktop dist -- --publish=never
+
+            - name: Upload desktop artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: desktop-${{ matrix.os }}
+                  path: apps/desktop/release/**
+
+    mobile:
+        name: Mobile Build (Expo)
+        # ✅ ONLY run this job if the tag pushed was for the mobile app
+        if: startsWith(github.ref, 'refs/tags/mobile@')
+        runs-on: ubuntu-latest
+        continue-on-error: true
+
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+            - name: Install pnpm
+              run: npm install -g pnpm
+            # ... (your commented out EAS steps remain the same)
+
+    release:
+        name: Create GitHub Release
+        if: always()
+        # Use always() so it runs even if the *other* job was skipped by the `if` condition
+        needs: [desktop, mobile]
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/download-artifact@v4
+
+            - name: Create Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: |
+                      **/*.exe
+                      **/*.dmg
+                      **/*.AppImage
+                      **/*.apk
+                      **/*.yml
+                      **/*.blockmap
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

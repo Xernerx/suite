@@ -107,7 +107,8 @@ export default function Page({ params }: { params: Promise<{ type: string }> }) 
 				justifyContent: 'center',
 				alignItems: 'center',
 				padding: '2rem',
-			}}>
+			}}
+		>
 			<motion.div
 				initial={{ opacity: 0, scale: 0.95, y: 10 }}
 				animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -120,7 +121,8 @@ export default function Page({ params }: { params: Promise<{ type: string }> }) 
 					background: 'var(--container)',
 					padding: '1.5rem',
 					boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
-				}}>
+				}}
+			>
 				{/* HEADER */}
 				<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
 					<Sparkles size={18} />
@@ -142,7 +144,8 @@ export default function Page({ params }: { params: Promise<{ type: string }> }) 
 							color: '#ef4444',
 							fontSize: '0.9rem',
 							marginBottom: '1rem',
-						}}>
+						}}
+					>
 						<AlertCircle size={16} />
 						Couldn’t find an invite for "{type}"
 					</motion.div>
@@ -179,7 +182,8 @@ export default function Page({ params }: { params: Promise<{ type: string }> }) 
 													borderRadius: '0.5rem',
 													border: '1px solid var(--border)',
 													background: 'var(--bg-main)',
-												}}>
+												}}
+											>
 												<div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
 													{bot ? (
 														<img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.webp`} style={{ width: 24, height: 24, borderRadius: '50%' }} />
@@ -214,7 +218,8 @@ export default function Page({ params }: { params: Promise<{ type: string }> }) 
 													border: '1px solid var(--border)',
 													background: isCopied ? 'var(--accent)' : 'var(--bg-main)',
 													color: isCopied ? '#fff' : 'inherit',
-												}}>
+												}}
+											>
 												{isCopied ? <Check size={14} /> : <Copy size={14} />}
 											</motion.button>
 										</motion.div>

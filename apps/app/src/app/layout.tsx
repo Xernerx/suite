@@ -66,7 +66,7 @@ export default async function RootLayout({
 	const session = await getServerSession(authOptions);
 
 	return (
-		<html lang='en' className='h-full' suppressHydrationWarning>
+		<html lang="en" className="h-full" suppressHydrationWarning>
 			<head>
 				<Script
 					id={'1'}
@@ -99,7 +99,7 @@ try {
 				/>
 			</head>
 
-			<body className='h-full'>
+			<body className="h-full">
 				<SessionProvider session={session}>
 					<ToastProvider>
 						<UserProvider>
@@ -108,14 +108,14 @@ try {
 									<DebugProvider>
 										<SupportProvider>
 											<PlatformProvider>
-												<div id='app-root' className='h-full w-full overflow-hidden bg-(--bg-main)'>
+												<div id="app-root" className="h-full w-full overflow-hidden bg-(--bg-main)">
 													<SidebarProvider>
-														<div className='flex flex-col h-full'>
+														<div className="flex flex-col h-full">
 															{/* Header */}
 															<Header />
 
 															{/* Sidebar + Main */}
-															<div className='flex flex-1 overflow-hidden'>
+															<div className="flex flex-1 overflow-hidden">
 																<Sidebar />
 
 																<Main>{children}</Main>

@@ -1,5 +1,18 @@
 # auth
 
+## 0.4.14
+
+### Patch Changes
+
+- linted prettier
+- Updated dependencies
+    - @xernerx/components@0.2.5
+    - @xernerx/providers@0.2.5
+    - @xernerx/feedback@0.0.7
+    - @xernerx/styles@0.1.4
+    - @xernerx/lib@0.2.2
+    - @xernerx/ui@0.2.2
+
 ## 0.4.13
 
 ### Patch Changes

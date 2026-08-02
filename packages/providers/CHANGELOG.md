@@ -1,5 +1,13 @@
 # @xernerx/providers
 
+## 0.2.5
+
+### Patch Changes
+
+- linted prettier
+- Updated dependencies
+    - @xernerx/lib@0.2.2
+
 ## 0.2.4
 
 ### Patch Changes

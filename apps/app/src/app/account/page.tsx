@@ -34,29 +34,31 @@ export default function Page() {
 
 	return (
 		<div
-			className='flex flex-col w-full'
+			className="flex flex-col w-full"
 			style={{
 				padding: 'calc(var(--ui-gap) * 2)',
 				gap: 'calc(var(--ui-gap) * 2)',
-			}}>
+			}}
+		>
 			{/* HEADER */}
-			<div className='flex flex-col' style={{ gap: 4 }}>
-				<h1 className='text-xl font-semibold'>Account Settings</h1>
-				<p className='text-sm' style={{ color: 'var(--text-muted)' }}>
+			<div className="flex flex-col" style={{ gap: 4 }}>
+				<h1 className="text-xl font-semibold">Account Settings</h1>
+				<p className="text-sm" style={{ color: 'var(--text-muted)' }}>
 					Manage your account, profile, and preferences.
 				</p>
 			</div>
 
 			{/* CONTENT */}
-			<AnimatePresence mode='wait'>
+			<AnimatePresence mode="wait">
 				<motion.div
 					key={view}
 					initial={{ opacity: 0, y: 6 }}
 					animate={{ opacity: 1, y: 0 }}
 					exit={{ opacity: 0, y: -6 }}
 					transition={{ duration: 0.15 }}
-					className='flex flex-col w-full'
-					style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
+					className="flex flex-col w-full"
+					style={{ gap: 'calc(var(--ui-gap) * 2)' }}
+				>
 					{view === 'Account' && <Account />}
 					{view === 'Profile' && <Profile />}
 					{view === 'Devices' && <Devices />}

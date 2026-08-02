@@ -52,7 +52,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
 				view,
 				setView,
-			}}>
+			}}
+		>
 			{children}
 		</SidebarContext.Provider>
 	);

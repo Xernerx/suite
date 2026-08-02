@@ -27,27 +27,28 @@ export function Header() {
 	// Helper to dynamically render the correct SVG with its respective environment color
 	const renderBanner = () => {
 		if (effectiveIsDev) {
-			return <BannerDev className='h-10 text-(--accent) hover:text-orange-400 transition-colors' />;
+			return <BannerDev className="h-10 text-(--accent) hover:text-orange-400 transition-colors" />;
 		}
 		if (effectiveIsCanary) {
-			return <BannerCanary className='h-10 text-(--accent) hover:text-blue-400 transition-colors' />;
+			return <BannerCanary className="h-10 text-(--accent) hover:text-blue-400 transition-colors" />;
 		}
-		return <BannerPublic className='h-10 text-(--accent) hover:text-(--hover-accent) transition-colors' />;
+		return <BannerPublic className="h-10 text-(--accent) hover:text-(--hover-accent) transition-colors" />;
 	};
 
 	return (
 		<header
-			className='relative z-[60] flex h-[72px] shrink-0 items-center justify-between w-full bg-(--background)'
+			className="relative z-[60] flex h-[72px] shrink-0 items-center justify-between w-full bg-(--background)"
 			style={{
 				paddingLeft: 'var(--ui-gap)',
 				paddingRight: 'var(--ui-gap)',
 				fontSize: 'var(--text-scale, 14px)',
-			}}>
+			}}
+		>
 			{/* Ambient Environment Glow (Top Border) */}
-			{effectiveIsDev && <div className='absolute inset-x-0 top-0 h-[2px] bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]' />}
-			{effectiveIsCanary && <div className='absolute inset-x-0 top-0 h-[2px] bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]' />}
+			{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]" />}
+			{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]" />}
 
-			<div className='flex items-center'>
+			<div className="flex items-center">
 				{state !== 'hidden' && (
 					<button
 						onClick={() => {
@@ -57,20 +58,21 @@ export function Header() {
 								toggle();
 							}
 						}}
-						className='relative z-10 p-2 text-(--text-muted) transition-colors hover:text-(--text)'
-						style={{ marginRight: 'var(--ui-gap)' }}>
+						className="relative z-10 p-2 text-(--text-muted) transition-colors hover:text-(--text)"
+						style={{ marginRight: 'var(--ui-gap)' }}
+					>
 						{state == 'open' ? <SidebarOpen size={24} strokeWidth={2.5} /> : <SidebarClose size={24} strokeWidth={2.5} />}
 					</button>
 				)}
 
-				<Link href={'/'} className='absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:left-auto flex items-center'>
+				<Link href={'/'} className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:left-auto flex items-center">
 					{renderBanner()}
 				</Link>
 			</div>
 
 			{state === 'hidden' && (
-				<button onClick={() => setNavOpen(true)} title='Open Navigation (Ctrl + K)'>
-					<Compass size={18} className='text-(--text-muted) cursor-pointer hover:text-(--text)' />
+				<button onClick={() => setNavOpen(true)} title="Open Navigation (Ctrl + K)">
+					<Compass size={18} className="text-(--text-muted) cursor-pointer hover:text-(--text)" />
 				</button>
 			)}
 		</header>

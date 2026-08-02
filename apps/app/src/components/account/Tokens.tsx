@@ -161,37 +161,39 @@ export default function Tokens() {
 
 	if (loading) {
 		return (
-			<div className='flex items-center justify-center h-[60vh]' style={{ color: 'var(--text-muted)' }}>
+			<div className="flex items-center justify-center h-[60vh]" style={{ color: 'var(--text-muted)' }}>
 				Loading tokens...
 			</div>
 		);
 	}
 
 	return (
-		<div className='flex flex-col w-full' style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
+		<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
 			{/* HEADER */}
 			<div
-				className='flex items-center justify-between rounded-xl'
+				className="flex items-center justify-between rounded-xl"
 				style={{
 					background: 'var(--container)',
 					border: '1px solid var(--border)',
 					padding: 'calc(var(--ui-gap) * 1.5)',
-				}}>
-				<div className='flex flex-col'>
-					<span className='text-sm font-medium'>Tokens</span>
-					<span className='text-xs' style={{ color: 'var(--text-muted)' }}>
+				}}
+			>
+				<div className="flex flex-col">
+					<span className="text-sm font-medium">Tokens</span>
+					<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
 						Manage API access and ownership.
 					</span>
 				</div>
 
 				<button
 					onClick={() => setCreating(true)}
-					className='flex items-center gap-2 text-sm rounded-md'
+					className="flex items-center gap-2 text-sm rounded-md"
 					style={{
 						padding: '8px 12px',
 						background: 'var(--accent)',
 						color: '#fff',
-					}}>
+					}}
+				>
 					<Plus size={14} />
 					New
 				</button>
@@ -201,8 +203,8 @@ export default function Tokens() {
 			<input
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
-				placeholder='Search tokens...'
-				className='px-3 py-2 rounded-md text-sm outline-none'
+				placeholder="Search tokens..."
+				className="px-3 py-2 rounded-md text-sm outline-none"
 				style={{
 					background: 'var(--bg-main)',
 					border: '1px solid var(--border)',
@@ -216,13 +218,14 @@ export default function Tokens() {
 						initial={{ opacity: 0, y: -6 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0 }}
-						className='flex gap-2 rounded-xl'
+						className="flex gap-2 rounded-xl"
 						style={{
 							background: 'var(--container)',
 							border: '1px solid var(--border)',
 							padding: 'calc(var(--ui-gap) * 1)',
-						}}>
-						<input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder='Token name' className='flex-1 bg-transparent outline-none text-sm' />
+						}}
+					>
+						<input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Token name" className="flex-1 bg-transparent outline-none text-sm" />
 
 						<button onClick={createToken}>
 							<Check size={16} />
@@ -245,17 +248,18 @@ export default function Tokens() {
 						<motion.div
 							key={t.id}
 							layout
-							className='rounded-xl flex flex-col'
+							className="rounded-xl flex flex-col"
 							style={{
 								background: 'var(--container)',
 								border: '1px solid var(--border)',
 								padding: 'calc(var(--ui-gap) * 1.5)',
 								gap: 'calc(var(--ui-gap) * 1)',
-							}}>
+							}}
+						>
 							{/* HEADER */}
-							<div className='flex justify-between items-center'>
+							<div className="flex justify-between items-center">
 								{/* LEFT */}
-								<div className='flex items-center gap-2'>
+								<div className="flex items-center gap-2">
 									<div
 										style={{
 											width: 8,
@@ -265,24 +269,24 @@ export default function Tokens() {
 										}}
 									/>
 									{editing === t.id ? (
-										<input value={editName} onChange={(e) => setEditName(e.target.value)} className='bg-transparent outline-none text-sm' style={{ color: 'var(--text-main)' }} />
+										<input value={editName} onChange={(e) => setEditName(e.target.value)} className="bg-transparent outline-none text-sm" style={{ color: 'var(--text-main)' }} />
 									) : (
-										<span className='text-sm font-medium'>{t.name}</span>
+										<span className="text-sm font-medium">{t.name}</span>
 									)}
 								</div>
 
 								{/* RIGHT */}
-								<div className='flex items-center gap-1'>
+								<div className="flex items-center gap-1">
 									{/* ACTIONS (only when open) */}
 									{open === t.id && (
 										<>
 											{/* EDIT */}
 											{editing === t.id ? (
 												<>
-													<button onClick={() => saveEdit(t.id)} className='p-1 rounded hover:bg-white/5'>
+													<button onClick={() => saveEdit(t.id)} className="p-1 rounded hover:bg-white/5">
 														<Check size={14} />
 													</button>
-													<button onClick={() => setEditing(null)} className='p-1 rounded hover:bg-white/5'>
+													<button onClick={() => setEditing(null)} className="p-1 rounded hover:bg-white/5">
 														<X size={14} />
 													</button>
 												</>
@@ -296,7 +300,8 @@ export default function Tokens() {
 															[t.id]: [...(tokenDetails[t.id]?.owners || [])],
 														}));
 													}}
-													className='p-1 rounded hover:bg-white/5'>
+													className="p-1 rounded hover:bg-white/5"
+												>
 													<Pencil size={14} />
 												</button>
 											)}
@@ -304,15 +309,15 @@ export default function Tokens() {
 											{/* DELETE */}
 											{deleting === t.id ? (
 												<>
-													<button onClick={() => confirmDelete(t.id)} className='p-1 rounded text-red-400 hover:bg-red-500/10'>
+													<button onClick={() => confirmDelete(t.id)} className="p-1 rounded text-red-400 hover:bg-red-500/10">
 														<Check size={14} />
 													</button>
-													<button onClick={() => setDeleting(null)} className='p-1 rounded hover:bg-white/5'>
+													<button onClick={() => setDeleting(null)} className="p-1 rounded hover:bg-white/5">
 														<X size={14} />
 													</button>
 												</>
 											) : (
-												<button onClick={() => setDeleting(t.id)} className='p-1 rounded hover:bg-red-500/10 text-red-400'>
+												<button onClick={() => setDeleting(t.id)} className="p-1 rounded hover:bg-red-500/10 text-red-400">
 													<Trash2 size={14} />
 												</button>
 											)}
@@ -320,7 +325,7 @@ export default function Tokens() {
 									)}
 
 									{/* TOGGLE */}
-									<button onClick={() => handleTokenData(t.id)} className='p-1 rounded hover:bg-white/5'>
+									<button onClick={() => handleTokenData(t.id)} className="p-1 rounded hover:bg-white/5">
 										{open === t.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
 									</button>
 								</div>
@@ -330,41 +335,43 @@ export default function Tokens() {
 							<AnimatePresence>
 								{open === t.id && (
 									<motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-										<div className='flex flex-col gap-3 text-sm'>
+										<div className="flex flex-col gap-3 text-sm">
 											{/* TOKEN ID */}
 											<div
 												onClick={() => copyToClipboard(details?.id)}
-												className='flex justify-between items-center px-3 py-2 rounded-md cursor-pointer'
+												className="flex justify-between items-center px-3 py-2 rounded-md cursor-pointer"
 												style={{
 													background: 'var(--bg-main)',
 													border: '1px solid var(--border)',
-												}}>
-												<span className='font-mono text-xs opacity-70 truncate pr-2'>{details?.id}</span>
+												}}
+											>
+												<span className="font-mono text-xs opacity-70 truncate pr-2">{details?.id}</span>
 
 												{copied === details?.id ? <Check size={14} /> : <Copy size={14} />}
 											</div>
 
 											{/* STATUS */}
-											<div className='flex items-center gap-2 text-xs' style={{ color: 'var(--text-muted)' }}>
+											<div className="flex items-center gap-2 text-xs" style={{ color: 'var(--text-muted)' }}>
 												<span>{details?.status}</span>
 												<Info size={12} />
 											</div>
 
 											{/* BOT */}
 											{bots[t.id] && (
-												<div className='flex flex-col gap-1'>
-													<span className='text-[10px]' style={{ color: 'var(--text-muted)' }}>
+												<div className="flex flex-col gap-1">
+													<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
 														Linked Bot
 													</span>
 
 													<div
-														className='flex items-center gap-2 px-3 py-2 rounded-md'
+														className="flex items-center gap-2 px-3 py-2 rounded-md"
 														style={{
 															background: 'var(--bg-main)',
 															border: '1px solid var(--border)',
-														}}>
-														<img src={`https://cdn.discordapp.com/avatars/${bots[t.id].id}/${bots[t.id].avatar}.webp`} className='w-5 h-5 rounded-full' />
-														<span className='text-sm'>{bots[t.id].username}</span>
+														}}
+													>
+														<img src={`https://cdn.discordapp.com/avatars/${bots[t.id].id}/${bots[t.id].avatar}.webp`} className="w-5 h-5 rounded-full" />
+														<span className="text-sm">{bots[t.id].username}</span>
 													</div>
 												</div>
 											)}
@@ -372,26 +379,27 @@ export default function Tokens() {
 											{/* OWNERS */}
 											{/* OWNERS */}
 											{(owners[t.id] || editing === t.id) && (
-												<div className='flex flex-col gap-1'>
-													<span className='text-[10px]' style={{ color: 'var(--text-muted)' }}>
+												<div className="flex flex-col gap-1">
+													<span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
 														Owners
 													</span>
 
-													<div className='flex flex-col gap-2'>
+													<div className="flex flex-col gap-2">
 														{(editing === t.id ? editOwners[t.id] || [] : owners[t.id]?.map((o) => o.id))?.map((id) => {
 															const user = owners[t.id]?.find((o) => o.id === id);
 
 															return (
 																<div
 																	key={id}
-																	className='flex items-center gap-2 px-3 py-2 rounded-md'
+																	className="flex items-center gap-2 px-3 py-2 rounded-md"
 																	style={{
 																		background: 'var(--bg-main)',
 																		border: '1px solid var(--border)',
-																	}}>
-																	{user && <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp`} className='w-5 h-5 rounded-full' />}
+																	}}
+																>
+																	{user && <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp`} className="w-5 h-5 rounded-full" />}
 
-																	<span className='text-xs flex-1'>{user?.username || id}</span>
+																	<span className="text-xs flex-1">{user?.username || id}</span>
 
 																	{/* REMOVE (edit mode only) */}
 																	{editing === t.id && (
@@ -402,7 +410,8 @@ export default function Tokens() {
 																					[t.id]: prev[t.id].filter((o) => o !== id),
 																				}))
 																			}
-																			className='p-1 rounded hover:bg-red-500/10 text-red-400'>
+																			className="p-1 rounded hover:bg-red-500/10 text-red-400"
+																		>
 																			<X size={12} />
 																		</button>
 																	)}
@@ -413,9 +422,9 @@ export default function Tokens() {
 
 													{/* ADD OWNER */}
 													{editing === t.id && (
-														<div className='flex gap-2 mt-2'>
+														<div className="flex gap-2 mt-2">
 															<input
-																placeholder='User ID'
+																placeholder="User ID"
 																value={newOwnerId[t.id] || ''}
 																onChange={(e) =>
 																	setNewOwnerId((prev) => ({
@@ -423,7 +432,7 @@ export default function Tokens() {
 																		[t.id]: e.target.value,
 																	}))
 																}
-																className='flex-1 px-3 py-2 rounded-md text-sm outline-none'
+																className="flex-1 px-3 py-2 rounded-md text-sm outline-none"
 																style={{
 																	background: 'var(--bg-main)',
 																	border: '1px solid var(--border)',
@@ -463,7 +472,8 @@ export default function Tokens() {
 																		console.warn('Invalid user ID');
 																	}
 																}}
-																className='px-3 rounded-md hover:bg-white/5'>
+																className="px-3 rounded-md hover:bg-white/5"
+															>
 																<Plus size={14} />
 															</button>
 														</div>

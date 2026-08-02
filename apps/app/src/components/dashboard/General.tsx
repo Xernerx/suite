@@ -233,34 +233,36 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 	if (!id) return null;
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className='flex flex-col gap-4'>
-			<div className='flex flex-wrap items-center justify-end gap-2'>
+		<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex flex-col gap-4">
+			<div className="flex flex-wrap items-center justify-end gap-2">
 				<motion.button
 					whileTap={{ scale: 0.98 }}
-					type='button'
+					type="button"
 					onClick={resetForm}
 					disabled={!hasChanges || saving || deleting}
-					className='rounded-2xl border px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45'
+					className="rounded-2xl border px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
 						color: 'var(--text-main)',
-					}}>
+					}}
+				>
 					Reset
 				</motion.button>
 
 				<motion.button
 					whileTap={{ scale: 0.98 }}
-					type='button'
+					type="button"
 					onClick={handleSave}
 					disabled={!hasChanges || saving || deleting}
-					className='inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45'
+					className="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45"
 					style={{
 						borderColor: hasChanges ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
 						background: hasChanges ? 'color-mix(in srgb, var(--accent) 16%, var(--bg-panel))' : 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
 						color: 'var(--text-main)',
-					}}>
-					{saving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
+					}}
+				>
+					{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</motion.button>
 			</div>
@@ -271,62 +273,66 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 						initial={{ opacity: 0, y: 6 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -6 }}
-						className='rounded-2xl border px-4 py-3 text-sm'
+						className="rounded-2xl border px-4 py-3 text-sm"
 						style={{
 							borderColor: 'var(--border)',
 							background: 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
 							color: 'color-mix(in srgb, var(--text-main) 65%, transparent)',
-						}}>
-						<div className='flex items-center gap-2'>
-							<Loader2 className='h-4 w-4 animate-spin' />
+						}}
+					>
+						<div className="flex items-center gap-2">
+							<Loader2 className="h-4 w-4 animate-spin" />
 							Loading profile...
 						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
 
-			<div className='grid gap-4 xl:grid-cols-2'>
+			<div className="grid gap-4 xl:grid-cols-2">
 				<motion.section
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.03, duration: 0.2 }}
-					className='rounded-3xl border p-5'
+					className="rounded-3xl border p-5"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 78%, transparent)',
-					}}>
-					<div className='mb-4 flex items-center gap-2'>
-						<ShieldCheck className='h-4 w-4' style={{ color: 'color-mix(in srgb, var(--text-main) 70%, transparent)' }} />
-						<h4 className='text-sm font-semibold uppercase tracking-[0.18em]' style={{ color: 'color-mix(in srgb, var(--text-main) 64%, transparent)' }}>
+					}}
+				>
+					<div className="mb-4 flex items-center gap-2">
+						<ShieldCheck className="h-4 w-4" style={{ color: 'color-mix(in srgb, var(--text-main) 70%, transparent)' }} />
+						<h4 className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: 'color-mix(in srgb, var(--text-main) 64%, transparent)' }}>
 							Server
 						</h4>
 					</div>
 
-					<div className='flex flex-col gap-4'>
+					<div className="flex flex-col gap-4">
 						{!profile?.bot && (
 							<div
-								className='rounded-2xl border px-4 py-3 text-sm leading-6'
+								className="rounded-2xl border px-4 py-3 text-sm leading-6"
 								style={{
 									borderColor: 'color-mix(in srgb, var(--accent) 16%, var(--border))',
 									background: 'color-mix(in srgb, var(--accent) 8%, var(--bg-panel))',
 									color: 'color-mix(in srgb, var(--text-main) 82%, transparent)',
-								}}>
+								}}
+							>
 								This data is derived directly from your server. To sync and populate it, the{' '}
 								<a
-									href='/invite/xernerx'
-									className='font-medium underline underline-offset-4 transition'
+									href="/invite/xernerx"
+									className="font-medium underline underline-offset-4 transition"
 									style={{
 										color: 'var(--text-main)',
-									}}>
+									}}
+								>
 									Xernerx Bot
 								</a>{' '}
 								must be added to the server.
 							</div>
 						)}
 
-						<Field icon={<Bot className='h-4 w-4' />} label='Bot Connected' value={profile?.bot ? 'Yes' : 'No'} />
-						<Field icon={<ShieldCheck className='h-4 w-4' />} label='Verified' value={profile?.verified ? 'Yes' : 'No'} />
-						<Field icon={<Globe className='h-4 w-4' />} label='Locale' value={profile?.locale || '—'} />
+						<Field icon={<Bot className="h-4 w-4" />} label="Bot Connected" value={profile?.bot ? 'Yes' : 'No'} />
+						<Field icon={<ShieldCheck className="h-4 w-4" />} label="Verified" value={profile?.verified ? 'Yes' : 'No'} />
+						<Field icon={<Globe className="h-4 w-4" />} label="Locale" value={profile?.locale || '—'} />
 					</div>
 				</motion.section>
 
@@ -334,29 +340,30 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.06, duration: 0.2 }}
-					className='rounded-3xl border p-5'
+					className="rounded-3xl border p-5"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 78%, transparent)',
-					}}>
-					<div className='mb-4 flex items-center gap-2'>
-						<Globe className='h-4 w-4' style={{ color: 'color-mix(in srgb, var(--text-main) 70%, transparent)' }} />
-						<h4 className='text-sm font-semibold uppercase tracking-[0.18em]' style={{ color: 'color-mix(in srgb, var(--text-main) 64%, transparent)' }}>
+					}}
+				>
+					<div className="mb-4 flex items-center gap-2">
+						<Globe className="h-4 w-4" style={{ color: 'color-mix(in srgb, var(--text-main) 70%, transparent)' }} />
+						<h4 className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: 'color-mix(in srgb, var(--text-main) 64%, transparent)' }}>
 							Info
 						</h4>
 					</div>
 
-					<div className='flex flex-col gap-4'>
-						<div className='flex flex-col gap-2'>
-							<label className='text-sm font-medium' style={{ color: 'var(--text-main)' }}>
+					<div className="flex flex-col gap-4">
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-medium" style={{ color: 'var(--text-main)' }}>
 								Description
 							</label>
 
 							<input
 								value={form.description}
 								onChange={(e) => updateField('description', e.target.value)}
-								placeholder='Short guild description'
-								className='rounded-2xl border px-4 py-3 text-sm outline-none transition'
+								placeholder="Short guild description"
+								className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'color-mix(in srgb, var(--bg-main) 45%, var(--bg-panel))',
@@ -365,17 +372,17 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 							/>
 						</div>
 
-						<div className='flex flex-col gap-2'>
-							<label className='text-sm font-medium' style={{ color: 'var(--text-main)' }}>
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-medium" style={{ color: 'var(--text-main)' }}>
 								Long Description
 							</label>
 
 							<textarea
 								value={form.info}
 								onChange={(e) => updateField('info', e.target.value)}
-								placeholder='Longer guild information'
+								placeholder="Longer guild information"
 								rows={7}
-								className='resize-none rounded-2xl border px-4 py-3 text-sm outline-none transition'
+								className="resize-none rounded-2xl border px-4 py-3 text-sm outline-none transition"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'color-mix(in srgb, var(--bg-main) 45%, var(--bg-panel))',
@@ -384,21 +391,22 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 							/>
 						</div>
 
-						<div className='flex flex-col gap-2'>
-							<label className='text-sm font-medium' style={{ color: 'var(--text-main)' }}>
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-medium" style={{ color: 'var(--text-main)' }}>
 								Organization
 							</label>
 
 							<select
 								value={form.organization || 'personal'}
 								onChange={(e) => updateField('organization', e.target.value)}
-								className='rounded-2xl border px-4 py-3 text-sm outline-none transition'
+								className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'color-mix(in srgb, var(--bg-main) 45%, var(--bg-panel))',
 									color: 'var(--text-main)',
-								}}>
-								<option value='personal'>Personal</option>
+								}}
+							>
+								<option value="personal">Personal</option>
 
 								{orgs.map((org: any) => (
 									<option key={org._id} value={org._id}>
@@ -415,70 +423,74 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ delay: 0.09, duration: 0.2 }}
-				className='rounded-3xl border p-5'
+				className="rounded-3xl border p-5"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-panel) 78%, transparent)',
-				}}>
-				<div className='mb-4 flex items-center gap-2'>
-					<Lock className='h-4 w-4' style={{ color: 'color-mix(in srgb, var(--text-main) 70%, transparent)' }} />
-					<h4 className='text-sm font-semibold uppercase tracking-[0.18em]' style={{ color: 'color-mix(in srgb, var(--text-main) 64%, transparent)' }}>
+				}}
+			>
+				<div className="mb-4 flex items-center gap-2">
+					<Lock className="h-4 w-4" style={{ color: 'color-mix(in srgb, var(--text-main) 70%, transparent)' }} />
+					<h4 className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: 'color-mix(in srgb, var(--text-main) 64%, transparent)' }}>
 						Privacy & Data
 					</h4>
 				</div>
 
-				<div className='flex flex-col gap-4'>
-					<div className='grid gap-4 xl:grid-cols-[1fr_auto] xl:items-end'>
-						<div className='flex flex-col gap-2'>
-							<label className='text-sm font-medium' style={{ color: 'var(--text-main)' }}>
+				<div className="flex flex-col gap-4">
+					<div className="grid gap-4 xl:grid-cols-[1fr_auto] xl:items-end">
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-medium" style={{ color: 'var(--text-main)' }}>
 								Privacy
 							</label>
 
 							<select
 								value={form.privacy}
 								onChange={(e) => updateField('privacy', e.target.value as FormState['privacy'])}
-								className='rounded-2xl border px-4 py-3 text-sm outline-none transition'
+								className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'color-mix(in srgb, var(--bg-main) 45%, var(--bg-panel))',
 									color: 'var(--text-main)',
-								}}>
-								<option value='public'>Public</option>
-								<option value='private'>Private</option>
-								<option value='limited'>Limited</option>
+								}}
+							>
+								<option value="public">Public</option>
+								<option value="private">Private</option>
+								<option value="limited">Limited</option>
 							</select>
 						</div>
 					</div>
 
-					<div className='grid gap-4 xl:grid-cols-[1fr_auto] xl:items-end'>
-						<div className='flex flex-col gap-2'>
-							<label className='text-sm font-medium' style={{ color: 'var(--text-main)' }}>
+					<div className="grid gap-4 xl:grid-cols-[1fr_auto] xl:items-end">
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-medium" style={{ color: 'var(--text-main)' }}>
 								Delete Data
 							</label>
 
 							<div
-								className='rounded-2xl border px-4 py-3 text-sm'
+								className="rounded-2xl border px-4 py-3 text-sm"
 								style={{
 									borderColor: 'color-mix(in srgb, #ff4d67 18%, var(--border))',
 									background: 'color-mix(in srgb, #ff4d67 8%, transparent)',
 									color: 'color-mix(in srgb, var(--text-main) 78%, transparent)',
-								}}>
+								}}
+							>
 								Delete server data for this server. Will not remove our bots.
 							</div>
 						</div>
 
 						<motion.button
 							whileTap={{ scale: 0.98 }}
-							type='button'
+							type="button"
 							onClick={handleDelete}
 							disabled={saving || deleting}
-							className='inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45'
+							className="inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-45"
 							style={{
 								borderColor: 'color-mix(in srgb, #ff4d67 25%, var(--border))',
 								background: 'color-mix(in srgb, #ff4d67 12%, transparent)',
 								color: '#ffb2bf',
-							}}>
-							{deleting ? <Loader2 className='h-4 w-4 animate-spin' /> : <Trash2 className='h-4 w-4' />}
+							}}
+						>
+							{deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
 							{deleting ? 'Deleting...' : 'Delete guild data'}
 						</motion.button>
 					</div>
@@ -490,18 +502,19 @@ export default function General({ id, name }: { id?: string; name?: string }) {
 
 function Field({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
 	return (
-		<div className='flex flex-col gap-2'>
-			<label className='text-sm font-medium' style={{ color: 'var(--text-main)' }}>
+		<div className="flex flex-col gap-2">
+			<label className="text-sm font-medium" style={{ color: 'var(--text-main)' }}>
 				{label}
 			</label>
 
 			<div
-				className='flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm'
+				className="flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-main) 36%, var(--bg-panel))',
 					color: 'color-mix(in srgb, var(--text-main) 86%, transparent)',
-				}}>
+				}}
+			>
 				<span style={{ color: 'color-mix(in srgb, var(--text-main) 62%, transparent)' }}>{icon}</span>
 				<span>{value}</span>
 			</div>

@@ -31,7 +31,8 @@ export default function Main({ children }: { children: React.ReactNode }) {
 			className={`flex-1 overflow-y-auto bg-(--bg-panel) ${state == 'hidden' ? 'rounded-xl' : 'rounded-tl-xl'} p-8`}
 			style={{
 				background: `var(--bg-effect), var(--bg-panel)`,
-			}}>
+			}}
+		>
 			{children}
 		</main>
 	);

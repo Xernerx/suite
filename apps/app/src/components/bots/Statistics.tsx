@@ -118,7 +118,8 @@ export default function Statistics({ id }: Props) {
 							background: range === r ? 'var(--accent)' : 'var(--container)',
 							fontSize: '0.75rem',
 							cursor: 'pointer',
-						}}>
+						}}
+					>
 						{r}
 					</button>
 				))}
@@ -143,7 +144,8 @@ export default function Statistics({ id }: Props) {
 							fontSize: '0.7rem',
 							cursor: 'pointer',
 							opacity: val ? 1 : 0.6,
-						}}>
+						}}
+					>
 						{key}
 					</button>
 				))}
@@ -156,10 +158,11 @@ export default function Statistics({ id }: Props) {
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
 						gap: '0.75rem',
-					}}>
-					<Card label='Guilds Δ' value={summary.guilds} />
-					<Card label='Users Δ' value={summary.users} />
-					<Card label='Votes Δ' value={summary.votes} />
+					}}
+				>
+					<Card label="Guilds Δ" value={summary.guilds} />
+					<Card label="Users Δ" value={summary.users} />
+					<Card label="Votes Δ" value={summary.votes} />
 				</div>
 			)}
 
@@ -171,13 +174,14 @@ export default function Statistics({ id }: Props) {
 					borderRadius: '0.75rem',
 					padding: '1rem',
 					background: 'var(--container)',
-				}}>
-				<ResponsiveContainer width='100%' height='100%'>
+				}}
+			>
+				<ResponsiveContainer width="100%" height="100%">
 					<LineChart data={chartData}>
-						<CartesianGrid strokeDasharray='3 3' opacity={0.2} />
+						<CartesianGrid strokeDasharray="3 3" opacity={0.2} />
 
 						<XAxis
-							dataKey='timestamp'
+							dataKey="timestamp"
 							tickFormatter={(value) =>
 								range === '24h'
 									? new Date(value).toLocaleTimeString([], {
@@ -192,13 +196,13 @@ export default function Statistics({ id }: Props) {
 
 						<Tooltip labelFormatter={(value) => new Date(Number(value)).toLocaleString()} />
 
-						{visible.guilds && <Line type='monotone' dataKey='guilds' stroke='#8884d8' strokeWidth={2} dot={false} />}
+						{visible.guilds && <Line type="monotone" dataKey="guilds" stroke="#8884d8" strokeWidth={2} dot={false} />}
 
-						{visible.users && <Line type='monotone' dataKey='users' stroke='#82ca9d' strokeWidth={2} dot={false} />}
+						{visible.users && <Line type="monotone" dataKey="users" stroke="#82ca9d" strokeWidth={2} dot={false} />}
 
-						{visible.votes && <Line type='monotone' dataKey='votes' stroke='#facc15' strokeWidth={2} dot={false} />}
+						{visible.votes && <Line type="monotone" dataKey="votes" stroke="#facc15" strokeWidth={2} dot={false} />}
 
-						{visible.shards && <Line type='monotone' dataKey='shards' stroke='#60a5fa' strokeWidth={2} dot={false} />}
+						{visible.shards && <Line type="monotone" dataKey="shards" stroke="#60a5fa" strokeWidth={2} dot={false} />}
 					</LineChart>
 				</ResponsiveContainer>
 			</div>
@@ -216,7 +220,8 @@ function Card({ label, value }: { label: string; value: number }) {
 				borderRadius: '0.5rem',
 				border: '1px solid var(--border)',
 				background: 'var(--container)',
-			}}>
+			}}
+		>
 			<div style={{ fontSize: '0.7rem', opacity: 0.6 }}>{label}</div>
 			<div style={{ fontWeight: 600, fontSize: '1rem' }}>{value.toLocaleString()}</div>
 		</div>

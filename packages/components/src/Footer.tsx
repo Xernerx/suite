@@ -28,25 +28,26 @@ export function Footer() {
 		<motion.footer
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
-			className='relative w-full overflow-hidden bg-(--background) backdrop-blur-md'
-			style={{ fontSize: 'var(--text-scale, 14px)' }}>
+			className="relative w-full overflow-hidden bg-(--background) backdrop-blur-md"
+			style={{ fontSize: 'var(--text-scale, 14px)' }}
+		>
 			{/* Fading top border */}
-			<div className='pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50' />
+			<div className="pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />
 
-			<div className='mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr] md:px-12' style={{ gap: 'var(--ui-gap)' }}>
+			<div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
 				{/* ---------------------------------------------------------------- */}
 				{/* Brand */}
 				{/* ---------------------------------------------------------------- */}
-				<div className='flex flex-col justify-between text-center md:text-left' style={{ gap: 'var(--ui-gap)' }}>
-					<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-						<h2 className='text-lg font-semibold text-(--text)'>Xernerx Studios</h2>
+				<div className="flex flex-col justify-between text-center md:text-left" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+						<h2 className="text-lg font-semibold text-(--text)">Xernerx Studios</h2>
 
-						<p className='max-w-md leading-7 text-(--text-muted)'>
+						<p className="max-w-md leading-7 text-(--text-muted)">
 							{t('common.footer.tagline', {}, 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.')}
 						</p>
 					</div>
 
-					<div className='text-sm text-(--text-muted)'>© 2024 - {new Date().getFullYear()} Xernerx Studios</div>
+					<div className="text-sm text-(--text-muted)">© 2024 - {new Date().getFullYear()} Xernerx Studios</div>
 				</div>
 				{/* ---------------------------------------------------------------- */}
 				{/* Resources */}
@@ -60,10 +61,10 @@ export function Footer() {
 				{/* Developer */}
 				{/* ---------------------------------------------------------------- */}
 				<FooterSection title={t('common.footer.sections.developer', {}, 'Developer')}>
-					<FooterLink href='https://github.com/xernerx' icon={BsGithub} label={t('common.footer.links.github', {}, 'GitHub')} />
-					<FooterLink href='https://www.npmjs.com/package/xernerx' icon={Package} label={t('common.footer.links.npm', {}, 'npm')} />
+					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github', {}, 'GitHub')} />
+					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm', {}, 'npm')} />
 					<FooterLink href={resolveUrl('https://app.xernerx.com/docs')} icon={BookOpen} label={t('common.footer.links.documentation', {}, 'Documentation')} />
-					<FooterLink href='https://discord.gg/teNWyb69dq' icon={MessageCircle} label={t('common.footer.links.discord', {}, 'Discord')} />
+					<FooterLink href="https://discord.gg/teNWyb69dq" icon={MessageCircle} label={t('common.footer.links.discord', {}, 'Discord')} />
 				</FooterSection>
 			</div>
 		</motion.footer>
@@ -76,10 +77,10 @@ export function Footer() {
 
 function FooterSection({ title, children }: { title?: string; children: React.ReactNode }) {
 	return (
-		<div className='flex flex-col items-center md:items-start' style={{ gap: 'var(--ui-gap)' }}>
-			<h3 className='text-sm font-semibold uppercase tracking-[0.2em] text-(--text)'>{title}</h3>
+		<div className="flex flex-col items-center md:items-start" style={{ gap: 'var(--ui-gap)' }}>
+			<h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-(--text)">{title}</h3>
 
-			<div className='flex flex-col w-full' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+			<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 				{children}
 			</div>
 		</div>
@@ -101,14 +102,14 @@ function FooterLink({ href, icon: Icon, label, external = true }: { href: string
 
 	const content = (
 		<>
-			<Icon size={16} className='transition-colors group-hover:text-(--text) shrink-0' />
-			<span className='text-sm'>{label}</span>
+			<Icon size={16} className="transition-colors group-hover:text-(--text) shrink-0" />
+			<span className="text-sm">{label}</span>
 		</>
 	);
 
 	if (external) {
 		return (
-			<a href={href} target='_blank' rel='noopener noreferrer' className={className} style={linkStyle}>
+			<a href={href} target="_blank" rel="noopener noreferrer" className={className} style={linkStyle}>
 				{content}
 			</a>
 		);

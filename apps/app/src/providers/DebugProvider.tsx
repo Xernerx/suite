@@ -22,8 +22,8 @@ export function DebugProvider({ children }: { children: React.ReactNode }) {
 	return (
 		<DebugContext.Provider value={{ metadata }}>
 			{metadata?.debug ? (
-				<div className='rounded border-l-2 border-r-2 border-b-2 border-amber-300 w-full h-full'>
-					<div className='flex justify-center items-center bg-amber-300 text-black'>DEBUG MODE</div>
+				<div className="rounded border-l-2 border-r-2 border-b-2 border-amber-300 w-full h-full">
+					<div className="flex justify-center items-center bg-amber-300 text-black">DEBUG MODE</div>
 					{children}
 				</div>
 			) : (

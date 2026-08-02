@@ -124,33 +124,40 @@ export default function Page() {
 	/* UI */
 
 	return (
-		<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
+		<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
 			{/* HEADER */}
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='rounded-xl border'
+				className="rounded-xl border"
 				style={{
 					background: 'var(--container)',
 					borderColor: 'var(--border)',
 					padding: 'calc(var(--ui-gap) * 1.5)',
-				}}>
-				<div className='flex flex-wrap gap-3'>
+				}}
+			>
+				<div className="flex flex-wrap gap-3">
 					<select
 						value={selected ? `${selected.scope}/${selected.type}` : ''}
 						onChange={(e) => {
 							const [scope, type] = e.target.value.split('/');
 							setSelected({ scope, type });
 						}}
-						className='px-3 py-2 rounded-md text-sm'
-						style={{ background: 'var(--bg-main)', border: '1px solid var(--border)' }}>
+						className="px-3 py-2 rounded-md text-sm"
+						style={{ background: 'var(--bg-main)', border: '1px solid var(--border)' }}
+					>
 						{types.map((t) => {
 							const value = `${t.scope}/${t.type}`;
 							return <option key={value}>{value}</option>;
 						})}
 					</select>
 
-					<select value={version} onChange={(e) => setVersion(e.target.value)} className='px-3 py-2 rounded-md text-sm' style={{ background: 'var(--bg-main)', border: '1px solid var(--border)' }}>
+					<select
+						value={version}
+						onChange={(e) => setVersion(e.target.value)}
+						className="px-3 py-2 rounded-md text-sm"
+						style={{ background: 'var(--bg-main)', border: '1px solid var(--border)' }}
+					>
 						{versions.map((v) => (
 							<option key={v}>{v}</option>
 						))}
@@ -159,15 +166,15 @@ export default function Page() {
 					<input
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						placeholder='Search docs...'
-						className='flex-1 px-3 py-2 rounded-md text-sm'
+						placeholder="Search docs..."
+						className="flex-1 px-3 py-2 rounded-md text-sm"
 						style={{ background: 'var(--bg-main)', border: '1px solid var(--border)' }}
 					/>
 				</div>
 			</motion.div>
 
 			{/* CONTENT */}
-			<div className='flex flex-col gap-4'>
+			<div className="flex flex-col gap-4">
 				{activeCategory?.items
 					.flatMap((i: any) => i.children || [])
 					.filter((i: any) => i.name.toLowerCase().includes(search.toLowerCase()))
@@ -178,12 +185,13 @@ export default function Page() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: i * 0.02 }}
 							whileHover={{ y: -2 }}
-							className='rounded-xl border'
+							className="rounded-xl border"
 							style={{
 								background: 'var(--container)',
 								borderColor: 'var(--border)',
 								padding: 'calc(var(--ui-gap) * 1.5)',
-							}}>
+							}}
+						>
 							<DocRenderer item={item} />
 						</motion.div>
 					))}
@@ -233,19 +241,19 @@ function DocRenderer({ item }: { item: any }) {
 	/* ================= UI ================= */
 
 	return (
-		<div className='flex flex-col gap-5'>
+		<div className="flex flex-col gap-5">
 			{/* HEADER */}
 			<div>
-				<div className='text-lg font-semibold'>{item.name.replace(/^.*\//, '')}</div>
-				<div className='text-xs opacity-50'>{kindToLabel(item.kind)}</div>
+				<div className="text-lg font-semibold">{item.name.replace(/^.*\//, '')}</div>
+				<div className="text-xs opacity-50">{kindToLabel(item.kind)}</div>
 			</div>
 
 			{/* DESCRIPTION */}
-			{description && <div className='text-sm opacity-80 leading-6'>{description}</div>}
+			{description && <div className="text-sm opacity-80 leading-6">{description}</div>}
 
 			{/* ================= SIGNATURES (THIS IS WHAT YOU WERE MISSING) ================= */}
 			{sigs.length > 0 && (
-				<div className='flex flex-col gap-3'>
+				<div className="flex flex-col gap-3">
 					{sigs.map((sig: any, i: number) => {
 						const summary = sig.comment?.summary?.map((s: any) => s.text).join('') || '';
 
@@ -256,7 +264,7 @@ function DocRenderer({ item }: { item: any }) {
 								.join('') || null;
 
 						return (
-							<div className='flex flex-col gap-2'>
+							<div className="flex flex-col gap-2">
 								{sigs.map((sig: any, i: number) => {
 									const summary = sig.comment?.summary?.map((s: any) => s.text).join('') || '';
 
@@ -267,15 +275,15 @@ function DocRenderer({ item }: { item: any }) {
 											.join('') || null;
 
 									return (
-										<div key={i} className='flex flex-col gap-1 py-2'>
-											<div className='text-sm font-medium'>
-												{sig.name} <span className='opacity-50'>{sig.route}</span>
+										<div key={i} className="flex flex-col gap-1 py-2">
+											<div className="text-sm font-medium">
+												{sig.name} <span className="opacity-50">{sig.route}</span>
 											</div>
 
-											{summary && <div className='text-xs opacity-60'>{summary}</div>}
+											{summary && <div className="text-xs opacity-60">{summary}</div>}
 
 											{sig.parameters?.length > 0 && (
-												<div className='text-xs opacity-50'>
+												<div className="text-xs opacity-50">
 													{sig.parameters.map((p: any) => (
 														<div key={p.name}>
 															<b>{p.name}</b>: {renderType(p.type)}
@@ -285,12 +293,12 @@ function DocRenderer({ item }: { item: any }) {
 											)}
 
 											{sig.type && (
-												<div className='text-xs'>
-													<span className='opacity-50'>Returns:</span> {renderType(sig.type)}
+												<div className="text-xs">
+													<span className="opacity-50">Returns:</span> {renderType(sig.type)}
 												</div>
 											)}
 
-											{returns && <div className='text-xs opacity-50'>{returns}</div>}
+											{returns && <div className="text-xs opacity-50">{returns}</div>}
 										</div>
 									);
 								})}
@@ -303,17 +311,18 @@ function DocRenderer({ item }: { item: any }) {
 			{/* ================= GROUP GRID ================= */}
 			{groups.length > 0 && (
 				<div
-					className='grid gap-4'
+					className="grid gap-4"
 					style={{
 						gridTemplateColumns: `repeat(${groups.length}, minmax(0, 1fr))`,
-					}}>
+					}}
+				>
 					{groups.map((group) => (
-						<div key={group.label} className='flex flex-col gap-2'>
-							<div className='text-xs opacity-50'>{group.label}</div>
+						<div key={group.label} className="flex flex-col gap-2">
+							<div className="text-xs opacity-50">{group.label}</div>
 
-							<div className='flex gap-6'>
+							<div className="flex gap-6">
 								{/* LEFT COLUMN */}
-								<div className='flex flex-col gap-2 flex-1'>
+								<div className="flex flex-col gap-2 flex-1">
 									{group.items
 										.filter((_: any, i: number) => i % 2 === 0)
 										.map((child: any) => (
@@ -322,7 +331,7 @@ function DocRenderer({ item }: { item: any }) {
 								</div>
 
 								{/* RIGHT COLUMN */}
-								<div className='flex flex-col gap-2 flex-1'>
+								<div className="flex flex-col gap-2 flex-1">
 									{group.items
 										.filter((_: any, i: number) => i % 2 === 1)
 										.map((child: any) => (
@@ -337,7 +346,7 @@ function DocRenderer({ item }: { item: any }) {
 
 			{/* DETAIL */}
 			{activeChild && (
-				<div className='mt-4 pl-4 border-l' style={{ borderColor: 'var(--border)' }}>
+				<div className="mt-4 pl-4 border-l" style={{ borderColor: 'var(--border)' }}>
 					<DocRenderer item={activeChild} />
 				</div>
 			)}
@@ -362,20 +371,21 @@ function SubItem({ item, onClick, active }: { item: any; onClick: () => void; ac
 	return (
 		<div
 			onClick={onClick}
-			className='relative px-3 py-2 rounded-md cursor-pointer transition flex items-center gap-2'
+			className="relative px-3 py-2 rounded-md cursor-pointer transition flex items-center gap-2"
 			style={{
 				background: active ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-			}}>
+			}}
+		>
 			<div
-				className='absolute left-0 top-0 bottom-0 w-[2px] rounded'
+				className="absolute left-0 top-0 bottom-0 w-[2px] rounded"
 				style={{
 					background: active ? 'var(--accent)' : 'transparent',
 				}}
 			/>
 
-			<div className='flex flex-col'>
-				<span className='text-sm font-medium'>{item.name}</span>
-				<span className='text-xs opacity-50'>{renderType(sig?.type || item.type)}</span>
+			<div className="flex flex-col">
+				<span className="text-sm font-medium">{item.name}</span>
+				<span className="text-xs opacity-50">{renderType(sig?.type || item.type)}</span>
 			</div>
 		</div>
 	);

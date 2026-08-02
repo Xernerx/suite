@@ -2,17 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-	Bell,
-	Computer,
-	DollarSign,
-	Globe,
-	KeyRound,
-	Link,
-	Paintbrush,
-	ShieldCheck,
-	User,
-} from 'lucide-react';
+import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, User } from 'lucide-react';
 import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';

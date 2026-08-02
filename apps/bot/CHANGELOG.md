@@ -1,5 +1,11 @@
 # bot
 
+## 1.1.29
+
+### Patch Changes
+
+- linted prettier
+
 ## 1.1.28
 
 ### Patch Changes

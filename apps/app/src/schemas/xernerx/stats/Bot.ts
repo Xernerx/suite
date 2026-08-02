@@ -11,7 +11,9 @@ const schema = new Schema(
 		userCount: { type: Number, required: true },
 		shardCount: { type: Number, required: true },
 		voteCount: { type: Number, required: true },
-		shards: [{ shardId: { type: Number, required: true }, onlineSince: { type: Number, required: true }, guildCount: { type: Number, required: true }, userCount: { type: Number, required: true } }],
+		shards: [
+			{ shardId: { type: Number, required: true }, onlineSince: { type: Number, required: true }, guildCount: { type: Number, required: true }, userCount: { type: Number, required: true } },
+		],
 	},
 	{ timestamps: true }
 );

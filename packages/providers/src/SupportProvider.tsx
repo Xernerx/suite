@@ -61,16 +61,18 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					initial={{ scale: 0, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}
 					transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-					className='fixed z-[9999]'
-					style={{ bottom: 'var(--ui-gap)', right: 'var(--ui-gap)' }}>
+					className="fixed z-[9999]"
+					style={{ bottom: 'var(--ui-gap)', right: 'var(--ui-gap)' }}
+				>
 					<button
 						onClick={handleClick}
-						className='group flex h-14 w-14 hover:w-auto cursor-pointer items-center overflow-hidden rounded-full border-none bg-(--accent) text-white shadow-xl transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)'>
-						<div className='flex h-14 w-14 shrink-0 items-center justify-center'>
-							<MessageCircle size={24} className='transition-transform duration-500 ease-in-out group-hover:-rotate-360' />
+						className="group flex h-14 w-14 hover:w-auto cursor-pointer items-center overflow-hidden rounded-full border-none bg-(--accent) text-white shadow-xl transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-(--background)"
+					>
+						<div className="flex h-14 w-14 shrink-0 items-center justify-center">
+							<MessageCircle size={24} className="transition-transform duration-500 ease-in-out group-hover:-rotate-360" />
 						</div>
 
-						<div className='max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:max-w-[150px] group-hover:opacity-100 pr-6 text-sm font-medium'>
+						<div className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:max-w-[150px] group-hover:opacity-100 pr-6 text-sm font-medium">
 							Get Support
 						</div>
 					</button>

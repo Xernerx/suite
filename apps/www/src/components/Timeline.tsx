@@ -109,7 +109,8 @@ export default function Timeline() {
 					className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px]"
 					style={{
 						background: 'color-mix(in srgb, var(--accent) 20%, transparent)',
-					}}>
+					}}
+				>
 					<motion.div
 						className="absolute inset-0 origin-top"
 						style={{
@@ -171,7 +172,8 @@ function TimelineCard({ milestone }: { milestone: Milestone }) {
 			style={{
 				maxWidth: 420,
 				padding: 'calc(var(--ui-gap) * 2)',
-			}}>
+			}}
+		>
 			{/* HEADER */}
 			<div className="flex items-center gap-3 mb-3">
 				<div
@@ -181,7 +183,8 @@ function TimelineCard({ milestone }: { milestone: Milestone }) {
 						height: 36,
 						background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 						color: 'var(--accent)',
-					}}>
+					}}
+				>
 					{milestone.icon}
 				</div>
 

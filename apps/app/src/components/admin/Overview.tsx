@@ -33,8 +33,8 @@ function Sparkline({ data }: { data: number[] }) {
 		.join(' ');
 
 	return (
-		<svg viewBox='0 0 100 100' className='w-full h-10 opacity-70'>
-			<polyline fill='none' stroke='var(--accent)' strokeWidth='2' points={points} />
+		<svg viewBox="0 0 100 100" className="w-full h-10 opacity-70">
+			<polyline fill="none" stroke="var(--accent)" strokeWidth="2" points={points} />
 		</svg>
 	);
 }
@@ -125,7 +125,7 @@ export default function AdminOverview() {
 	}, []);
 
 	if (!status) {
-		return <div className='flex items-center justify-center h-[60vh] text-(--text-muted)'>Loading system data...</div>;
+		return <div className="flex items-center justify-center h-[60vh] text-(--text-muted)">Loading system data...</div>;
 	}
 
 	const tiles = [
@@ -162,34 +162,35 @@ export default function AdminOverview() {
 	];
 
 	return (
-		<div className='flex flex-col w-full' style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
+		<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
 			<div>
-				<h1 className='text-2xl font-semibold'>Admin Overview</h1>
-				<p className='text-sm text-(--text-muted)'>Live process & system metrics</p>
+				<h1 className="text-2xl font-semibold">Admin Overview</h1>
+				<p className="text-sm text-(--text-muted)">Live process & system metrics</p>
 			</div>
 
-			<div className='grid grid-cols-2 md:grid-cols-5 gap-4'>
+			<div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 				{tiles.map((tile, i) => (
 					<motion.div
 						key={i}
 						initial={{ opacity: 0, y: 6 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: i * 0.04 }}
-						className='rounded-xl p-4 flex flex-col justify-between'
+						className="rounded-xl p-4 flex flex-col justify-between"
 						style={{
 							background: 'var(--container)',
 							border: '1px solid var(--border)',
 							minHeight: 110,
-						}}>
-						<div className='flex items-center justify-between text-(--text-muted)'>
-							<span className='text-xs'>{tile.label}</span>
+						}}
+					>
+						<div className="flex items-center justify-between text-(--text-muted)">
+							<span className="text-xs">{tile.label}</span>
 							{tile.icon}
 						</div>
 
-						<div className='text-sm font-medium mt-1'>{tile.value}</div>
+						<div className="text-sm font-medium mt-1">{tile.value}</div>
 
 						{tile.history.length > 1 && (
-							<div className='mt-2'>
+							<div className="mt-2">
 								<Sparkline data={tile.history} />
 							</div>
 						)}

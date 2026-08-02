@@ -102,7 +102,8 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 				setCookie,
 				removeCookie,
 				updatePreferences,
-			}}>
+			}}
+		>
 			{children}
 		</CookieContext.Provider>
 	);

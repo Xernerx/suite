@@ -93,7 +93,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				user,
 				guilds,
 				updateUser,
-			}}>
+			}}
+		>
 			{children}
 		</UserContext.Provider>
 	);

@@ -54,7 +54,8 @@ export function DictionaryProvider({
 				locales: dictionary.locales,
 				currentLanguage,
 				t,
-			}}>
+			}}
+		>
 			{children}
 		</DictionaryContext.Provider>
 	);

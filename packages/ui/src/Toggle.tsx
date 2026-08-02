@@ -32,8 +32,9 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(({ className = '
                 ${checked ? 'bg-(--accent)' : 'bg-(--text-muted)'}
                 ${disabled ? 'cursor-not-allowed opacity-60' : ''}
                 ${className}
-            `}>
-			<input type='checkbox' ref={ref} className='sr-only' checked={checked} disabled={disabled} {...props} />
+            `}
+		>
+			<input type="checkbox" ref={ref} className="sr-only" checked={checked} disabled={disabled} {...props} />
 			<span
 				className={`
                     inline-block transform rounded-full bg-white transition duration-200 ease-in-out

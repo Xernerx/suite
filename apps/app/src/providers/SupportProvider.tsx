@@ -52,7 +52,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					onClick={handleClick}
 					initial={{ scale: 0, opacity: 0, width: 56 }}
 					animate={{ scale: 1, opacity: 1 }}
-					whileHover='hover'
+					whileHover="hover"
 					whileTap={{ scale: 0.95 }}
 					variants={{
 						hover: { width: 200 },
@@ -74,7 +74,8 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 						padding: 0,
 						boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
 						overflow: 'hidden',
-					}}>
+					}}
+				>
 					{/* ICON "WHEEL" */}
 					<motion.div
 						variants={{
@@ -93,7 +94,8 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-						}}>
+						}}
+					>
 						<MessageCircle size={24} />
 					</motion.div>
 
@@ -108,7 +110,8 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 							whiteSpace: 'nowrap',
 							fontSize: '14px',
 							fontWeight: 500,
-						}}>
+						}}
+					>
 						Get Support
 					</motion.div>
 				</motion.button>

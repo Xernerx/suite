@@ -1,5 +1,13 @@
 # app
 
+## 1.2.29
+
+### Patch Changes
+
+- linted prettier
+- Updated dependencies
+    - @xernerx/websocket@1.2.3
+
 ## 1.2.28
 
 ### Patch Changes

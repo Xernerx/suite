@@ -173,7 +173,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 					overflow: 'hidden',
 					border: '1px solid var(--border)',
 					background: 'var(--container)',
-				}}>
+				}}
+			>
 				{/* BANNER */}
 				<div style={{ height: '220px', position: 'relative', background: '#111' }}>
 					{banner && (
@@ -206,7 +207,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							display: 'flex',
 							gap: '0.5rem',
 							fontSize: '0.75rem',
-						}}>
+						}}
+					>
 						<span style={{ opacity: 0.7 }}>{bot.privacy}</span>
 					</div>
 
@@ -219,7 +221,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							display: 'flex',
 							alignItems: 'center',
 							gap: '0.75rem',
-						}}>
+						}}
+					>
 						{/* AVATAR */}
 						<div
 							style={{
@@ -229,7 +232,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 								overflow: 'hidden',
 								border: '3px solid rgba(255,255,255,0.15)',
 								background: '#222',
-							}}>
+							}}
+						>
 							{avatar && <img src={avatar} style={{ width: '100%', height: '100%' }} />}
 						</div>
 
@@ -248,7 +252,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 											background: 'rgba(34,197,94,0.15)',
 											color: '#22c55e',
 											border: '1px solid rgba(34,197,94,0.3)',
-										}}>
+										}}
+									>
 										Verified
 									</span>
 								)}
@@ -264,7 +269,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 									display: 'flex',
 									flexDirection: 'column',
 									gap: '0.25rem',
-								}}>
+								}}
+							>
 								{/* ORGANIZATION */}
 								{organization && (
 									<div
@@ -272,7 +278,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 											fontSize: '0.7rem',
 											opacity: 0.75,
 											fontWeight: 500,
-										}}>
+										}}
+									>
 										{organization.name}
 									</div>
 								)}
@@ -284,7 +291,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 											display: 'flex',
 											gap: '0.35rem',
 											flexWrap: 'wrap',
-										}}>
+										}}
+									>
 										{owners.slice(0, 3).map((owner) => {
 											const avatar = owner.avatar ? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png` : null;
 
@@ -300,7 +308,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 														background: 'rgba(255,255,255,0.06)',
 														fontSize: '0.65rem',
 														opacity: 0.85,
-													}}>
+													}}
+												>
 													<div
 														style={{
 															width: '14px',
@@ -308,7 +317,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 															borderRadius: '50%',
 															overflow: 'hidden',
 															background: '#222',
-														}}>
+														}}
+													>
 														{avatar && <img src={avatar} style={{ width: '100%', height: '100%' }} />}
 													</div>
 
@@ -324,7 +334,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 													opacity: 0.6,
 													display: 'flex',
 													alignItems: 'center',
-												}}>
+												}}
+											>
 												+{owners.length - 3}
 											</div>
 										)}
@@ -345,7 +356,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 								gap: '1rem',
 								fontSize: '0.75rem',
 								opacity: 0.85,
-							}}>
+							}}
+						>
 							<div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
 								<Globe size={14} style={{ opacity: 0.6 }} />
 								{stats.guildCount.toLocaleString()}
@@ -372,7 +384,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 			{/* CONTENT */}
 			<div style={{ marginTop: '1.5rem' }}>
-				<AnimatePresence mode='wait'>
+				<AnimatePresence mode="wait">
 					<motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
 						{view === 'about' && <About bot={bot} />}
 
@@ -391,7 +403,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 													borderRadius: '0.5rem',
 													background: 'var(--container)',
 													border: '1px solid var(--border)',
-												}}>
+												}}
+											>
 												<div style={{ fontWeight: 600 }}>{cmd.name}</div>
 												<div style={{ fontSize: '0.8rem', opacity: 0.7 }}>{cmd.description}</div>
 											</div>

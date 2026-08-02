@@ -9,10 +9,10 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 const views = [
-	{ id: 'general', label: 'General', icon: <Globe className='h-4 w-4' /> },
-	{ id: 'links', label: 'Links', icon: <Link2 className='h-4 w-4' /> },
-	{ id: 'webhooks', label: 'Webhooks', icon: <Webhook className='h-4 w-4' /> },
-	{ id: 'commands', label: 'Commands', icon: <Terminal className='h-4 w-4' /> },
+	{ id: 'general', label: 'General', icon: <Globe className="h-4 w-4" /> },
+	{ id: 'links', label: 'Links', icon: <Link2 className="h-4 w-4" /> },
+	{ id: 'webhooks', label: 'Webhooks', icon: <Webhook className="h-4 w-4" /> },
+	{ id: 'commands', label: 'Commands', icon: <Terminal className="h-4 w-4" /> },
 ];
 
 const inputStyle = {
@@ -107,35 +107,38 @@ export default function Bots() {
 
 	if (loading) {
 		return (
-			<div className='text-sm' style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
+			<div className="text-sm" style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
 				Loading bots...
 			</div>
 		);
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
+		<div className="flex flex-col gap-4">
 			{/* selector */}
-			<div className='flex gap-2 overflow-x-auto overflow-y-hidden'>
+			<div className="flex gap-2 overflow-x-auto overflow-y-hidden">
 				{bots.map((bot) => {
 					const isSelected = selectedBotId === bot.id;
 
-					const avatar = bot.user?.avatar ? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.user.avatar}.png?size=256` : `https://cdn.discordapp.com/embed/avatars/${Number(bot.id) % 5}.png`;
+					const avatar = bot.user?.avatar
+						? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.user.avatar}.png?size=256`
+						: `https://cdn.discordapp.com/embed/avatars/${Number(bot.id) % 5}.png`;
 
 					const name = bot.user?.global_name || bot.user?.username || 'Unknown Bot';
 
 					return (
 						<button
 							key={bot.id}
-							type='button'
+							type="button"
 							onClick={() => setSelectedBotId(bot.id)}
-							className='group shrink-0 rounded-3xl border p-1 transition hover:scale-[1.03]'
+							className="group shrink-0 rounded-3xl border p-1 transition hover:scale-[1.03]"
 							style={{
 								borderColor: isSelected ? 'color-mix(in srgb, var(--text-main) 18%, var(--border))' : 'transparent',
 								background: isSelected ? 'color-mix(in srgb, var(--text-main) 8%, transparent)' : 'transparent',
 							}}
-							title={name}>
-							<Image className='h-20 w-20 rounded-2xl object-cover transition' style={{ opacity: isSelected ? 1 : 0.82 }} src={avatar} alt={name} width={80} height={80} />
+							title={name}
+						>
+							<Image className="h-20 w-20 rounded-2xl object-cover transition" style={{ opacity: isSelected ? 1 : 0.82 }} src={avatar} alt={name} width={80} height={80} />
 						</button>
 					);
 				})}
@@ -143,11 +146,12 @@ export default function Bots() {
 			{/* selected bot info */}
 			{selectedBotId && (
 				<div
-					className='rounded-3xl border p-6'
+					className="rounded-3xl border p-6"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-					}}>
+					}}
+				>
 					{(() => {
 						const bot = bots.find((b) => b.id === selectedBotId);
 
@@ -159,14 +163,15 @@ export default function Bots() {
 								initial={{ opacity: 0, y: 10 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.2 }}
-								className='relative overflow-hidden rounded-3xl border'
+								className="relative overflow-hidden rounded-3xl border"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'var(--bg-panel)',
-								}}>
+								}}
+							>
 								{/* banner */}
 								<div
-									className='absolute inset-0 bg-cover bg-center'
+									className="absolute inset-0 bg-cover bg-center"
 									style={{
 										backgroundColor: 'var(--bg-panel)',
 										backgroundImage: bot.user?.banner
@@ -181,59 +186,66 @@ export default function Bots() {
 
 								{/* overlays */}
 								<div
-									className='absolute inset-0'
+									className="absolute inset-0"
 									style={{
 										background: 'linear-gradient(to bottom, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.18) 34%, rgba(0,0,0,0.56) 68%, rgba(0,0,0,0.9) 100%)',
 									}}
 								/>
 
 								<div
-									className='absolute inset-0'
+									className="absolute inset-0"
 									style={{
 										background: 'linear-gradient(to right, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 35%, rgba(0,0,0,0.2) 100%)',
 									}}
 								/>
 
 								<div
-									className='absolute inset-0'
+									className="absolute inset-0"
 									style={{
 										background: 'radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 12%, transparent), transparent 35%)',
 									}}
 								/>
 
 								{/* content */}
-								<div className='relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6'>
+								<div className="relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6">
 									<div
-										className='shrink-0 rounded-[1.4rem] border p-1 shadow-2xl backdrop-blur-md'
+										className="shrink-0 rounded-[1.4rem] border p-1 shadow-2xl backdrop-blur-md"
 										style={{
 											borderColor: 'var(--border)',
 											background: 'color-mix(in srgb, var(--bg-panel) 82%, transparent)',
-										}}>
+										}}
+									>
 										<Image
-											className='h-20 w-20 rounded-2xl object-cover'
-											src={bot.user?.avatar ? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.user.avatar}.png?size=256` : `https://cdn.discordapp.com/embed/avatars/${Number(bot.id) % 5}.png`}
-											alt='bot'
+											className="h-20 w-20 rounded-2xl object-cover"
+											src={
+												bot.user?.avatar
+													? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.user.avatar}.png?size=256`
+													: `https://cdn.discordapp.com/embed/avatars/${Number(bot.id) % 5}.png`
+											}
+											alt="bot"
 											width={80}
 											height={80}
 										/>
 									</div>
 
-									<div className='min-w-0 max-w-full'>
+									<div className="min-w-0 max-w-full">
 										<h2
-											className='truncate text-2xl font-semibold tracking-tight'
+											className="truncate text-2xl font-semibold tracking-tight"
 											style={{
 												color: '#ffffff',
 												textShadow: '0 2px 18px rgba(0,0,0,0.45)',
-											}}>
+											}}
+										>
 											{bot.user?.global_name || bot.user?.username || 'Unknown Bot'}
 										</h2>
 
 										<p
-											className='truncate text-sm'
+											className="truncate text-sm"
 											style={{
 												color: 'rgba(255,255,255,0.78)',
 												textShadow: '0 2px 18px rgba(0,0,0,0.45)',
-											}}>
+											}}
+										>
 											{bot.id}
 										</p>
 									</div>
@@ -243,7 +255,7 @@ export default function Bots() {
 					})()}
 				</div>
 			)}
-			<div className='flex gap-2 overflow-x-auto'>
+			<div className="flex gap-2 overflow-x-auto">
 				{views.map((v) => {
 					const active = view === v.id;
 
@@ -252,12 +264,13 @@ export default function Bots() {
 							key={v.id}
 							onClick={() => setView(v.id as any)}
 							whileTap={{ scale: 0.96 }}
-							className='relative flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-medium transition'>
+							className="relative flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm font-medium transition"
+						>
 							{/* active background */}
 							{active && (
 								<motion.div
-									layoutId='bot-view-active'
-									className='absolute inset-0 rounded-2xl'
+									layoutId="bot-view-active"
+									className="absolute inset-0 rounded-2xl"
 									style={{
 										background: 'color-mix(in srgb, var(--accent) 14%, var(--bg-panel))',
 										border: '1px solid color-mix(in srgb, var(--accent) 30%, var(--border))',
@@ -268,10 +281,11 @@ export default function Bots() {
 
 							{/* content */}
 							<span
-								className='relative flex items-center gap-2'
+								className="relative flex items-center gap-2"
 								style={{
 									color: active ? 'var(--text-main)' : 'color-mix(in srgb, var(--text-main) 65%, transparent)',
-								}}>
+								}}
+							>
 								{v.icon}
 								{v.label}
 							</span>
@@ -281,13 +295,14 @@ export default function Bots() {
 			</div>
 
 			<div
-				className='rounded-3xl border p-6'
+				className="rounded-3xl border p-6"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-				}}>
+				}}
+			>
 				{profileLoading ? (
-					<div className='flex items-center gap-2 text-sm opacity-60'>Loading...</div>
+					<div className="flex items-center gap-2 text-sm opacity-60">Loading...</div>
 				) : !profile ? null : (
 					<>
 						{view === 'general' && <GeneralView profile={profile} setProfile={setProfile} id={selectedBotId!} orgs={orgs} />}
@@ -371,19 +386,20 @@ function GeneralView({ profile, setProfile, id, orgs }: any) {
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className='flex flex-col gap-4'>
+		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
 			{/* ACTIONS */}
-			<div className='flex justify-end gap-2'>
+			<div className="flex justify-end gap-2">
 				<motion.button
 					whileTap={{ scale: 0.98 }}
 					onClick={resetForm}
 					disabled={!hasChanges || saving}
-					className='rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
+					}}
+				>
 					Reset
 				</motion.button>
 
@@ -391,46 +407,52 @@ function GeneralView({ profile, setProfile, id, orgs }: any) {
 					whileTap={{ scale: 0.98 }}
 					onClick={handleSave}
 					disabled={!hasChanges || saving}
-					className='inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: hasChanges ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
 						background: hasChanges ? 'color-mix(in srgb, var(--accent) 16%, var(--bg-panel))' : 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
-					{saving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
+					}}
+				>
+					{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</motion.button>
 			</div>
 
 			{/* TITLE */}
 			<div>
-				<h4 className='text-sm font-semibold uppercase tracking-[0.18em] opacity-70'>General</h4>
+				<h4 className="text-sm font-semibold uppercase tracking-[0.18em] opacity-70">General</h4>
 			</div>
 
 			{/* FORM */}
-			<div className='flex flex-col gap-4'>
-				<label htmlFor=''>Description</label>
+			<div className="flex flex-col gap-4">
+				<label htmlFor="">Description</label>
 				<input
 					value={form.description}
 					onChange={(e) => updateField('description', e.target.value)}
-					placeholder='Short description'
-					className='rounded-2xl border px-4 py-3 text-sm outline-none transition'
+					placeholder="Short description"
+					className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
 					style={inputStyle}
 				/>
 
-				<label htmlFor=''>Long Description</label>
+				<label htmlFor="">Long Description</label>
 				<textarea
 					value={form.info}
 					onChange={(e) => updateField('info', e.target.value)}
-					placeholder='Long description, supports Markdown'
+					placeholder="Long description, supports Markdown"
 					rows={6}
-					className='resize-none rounded-2xl border px-4 py-3 text-sm outline-none transition'
+					className="resize-none rounded-2xl border px-4 py-3 text-sm outline-none transition"
 					style={inputStyle}
 				/>
 
-				<label htmlFor=''>Organization</label>
-				<select value={form.organization} onChange={(e) => updateField('organization', e.target.value)} className='rounded-2xl border px-4 py-3 text-sm outline-none transition' style={inputStyle}>
-					<option value='personal'>Personal</option>
+				<label htmlFor="">Organization</label>
+				<select
+					value={form.organization}
+					onChange={(e) => updateField('organization', e.target.value)}
+					className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
+					style={inputStyle}
+				>
+					<option value="personal">Personal</option>
 					{orgs.map((org: any) => (
 						<option key={org._id} value={org._id}>
 							{org.name || 'Unnamed org'}
@@ -438,15 +460,16 @@ function GeneralView({ profile, setProfile, id, orgs }: any) {
 					))}
 				</select>
 
-				<label htmlFor=''>Privacy</label>
+				<label htmlFor="">Privacy</label>
 				<select
 					value={form.privacy}
 					onChange={(e) => updateField('privacy', e.target.value as FormState['privacy'])}
-					className='rounded-2xl border px-4 py-3 text-sm outline-none transition'
-					style={inputStyle}>
-					<option value='public'>Public</option>
-					<option value='private'>Private</option>
-					<option value='limited'>Limited</option>
+					className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
+					style={inputStyle}
+				>
+					<option value="public">Public</option>
+					<option value="private">Private</option>
+					<option value="limited">Limited</option>
 				</select>
 			</div>
 		</motion.div>
@@ -521,19 +544,20 @@ function LinksView({ profile, setProfile, id }: any) {
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className='flex flex-col gap-4'>
+		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
 			{/* ACTIONS */}
-			<div className='flex justify-end gap-2'>
+			<div className="flex justify-end gap-2">
 				<motion.button
 					whileTap={{ scale: 0.98 }}
 					onClick={resetForm}
 					disabled={!hasChanges || saving}
-					className='rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
+					}}
+				>
 					Reset
 				</motion.button>
 
@@ -541,22 +565,23 @@ function LinksView({ profile, setProfile, id }: any) {
 					whileTap={{ scale: 0.98 }}
 					onClick={handleSave}
 					disabled={!hasChanges || saving}
-					className='inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: hasChanges ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
 						background: hasChanges ? 'color-mix(in srgb, var(--accent) 16%, var(--bg-panel))' : 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
-					{saving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
+					}}
+				>
+					{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</motion.button>
 			</div>
 
 			{/* TITLE */}
-			<h4 className='text-sm font-semibold uppercase tracking-[0.18em] opacity-70'>Links</h4>
+			<h4 className="text-sm font-semibold uppercase tracking-[0.18em] opacity-70">Links</h4>
 
 			{/* FORM */}
-			<div className='grid gap-4'>
+			<div className="grid gap-4">
 				{KEYS.map((k) => (
 					<>
 						<label htmlFor={k}>{k}</label>
@@ -566,7 +591,7 @@ function LinksView({ profile, setProfile, id }: any) {
 							value={form[k]}
 							onChange={(e) => updateField(k, e.target.value)}
 							placeholder={k}
-							className='rounded-2xl border px-4 py-3 text-sm outline-none transition'
+							className="rounded-2xl border px-4 py-3 text-sm outline-none transition"
 							style={inputStyle}
 						/>
 					</>
@@ -655,19 +680,20 @@ function WebhooksView({ profile, setProfile, id }: any) {
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className='flex flex-col gap-4'>
+		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
 			{/* ACTIONS */}
-			<div className='flex justify-end gap-2'>
+			<div className="flex justify-end gap-2">
 				<motion.button
 					whileTap={{ scale: 0.98 }}
 					onClick={resetForm}
 					disabled={!hasChanges || saving}
-					className='rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
+					}}
+				>
 					Reset
 				</motion.button>
 
@@ -675,13 +701,14 @@ function WebhooksView({ profile, setProfile, id }: any) {
 					whileTap={{ scale: 0.98 }}
 					onClick={handleSave}
 					disabled={!hasChanges || saving}
-					className='inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: hasChanges ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
 						background: hasChanges ? 'color-mix(in srgb, var(--accent) 16%, var(--bg-panel))' : 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
-					{saving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
+					}}
+				>
+					{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</motion.button>
 			</div>
@@ -692,51 +719,59 @@ function WebhooksView({ profile, setProfile, id }: any) {
 					key={i}
 					initial={{ opacity: 0, y: 6 }}
 					animate={{ opacity: 1, y: 0 }}
-					className='rounded-3xl border p-5'
+					className="rounded-3xl border p-5"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 78%, transparent)',
-					}}>
-					<div className='mb-4 flex items-center justify-between'>
+					}}
+				>
+					<div className="mb-4 flex items-center justify-between">
 						<span
-							className='text-sm font-semibold uppercase tracking-[0.18em]'
+							className="text-sm font-semibold uppercase tracking-[0.18em]"
 							style={{
 								color: 'color-mix(in srgb, var(--text-main) 64%, transparent)',
-							}}>
+							}}
+						>
 							Webhook {i + 1}
 						</span>
 
-						<button onClick={() => removeHook(i)} className='text-xs opacity-60 hover:opacity-100 transition'>
+						<button onClick={() => removeHook(i)} className="text-xs opacity-60 hover:opacity-100 transition">
 							Remove
 						</button>
 					</div>
 
-					<div className='grid gap-3'>
+					<div className="grid gap-3">
 						<input
 							value={h.name}
 							onChange={(e) => updateField(i, 'name', e.target.value)}
-							placeholder='Webhook name'
-							className='rounded-2xl border px-4 py-3 text-sm outline-none'
+							placeholder="Webhook name"
+							className="rounded-2xl border px-4 py-3 text-sm outline-none"
 							style={inputStyle}
 						/>
 
-						<input value={h.url} onChange={(e) => updateField(i, 'url', e.target.value)} placeholder='Webhook URL' className='rounded-2xl border px-4 py-3 text-sm outline-none' style={inputStyle} />
+						<input
+							value={h.url}
+							onChange={(e) => updateField(i, 'url', e.target.value)}
+							placeholder="Webhook URL"
+							className="rounded-2xl border px-4 py-3 text-sm outline-none"
+							style={inputStyle}
+						/>
 
 						<textarea
 							value={h.description}
 							onChange={(e) => updateField(i, 'description', e.target.value)}
-							placeholder='Description'
+							placeholder="Description"
 							rows={2}
-							className='resize-none rounded-2xl border px-4 py-3 text-sm outline-none'
+							className="resize-none rounded-2xl border px-4 py-3 text-sm outline-none"
 							style={inputStyle}
 						/>
 
 						<textarea
 							value={h.data}
 							onChange={(e) => updateField(i, 'data', e.target.value)}
-							placeholder='Payload (placeholder)'
+							placeholder="Payload (placeholder)"
 							rows={3}
-							className='resize-none rounded-2xl border px-4 py-3 text-sm outline-none'
+							className="resize-none rounded-2xl border px-4 py-3 text-sm outline-none"
 							style={inputStyle}
 						/>
 					</div>
@@ -746,11 +781,12 @@ function WebhooksView({ profile, setProfile, id }: any) {
 			{/* ADD BUTTON */}
 			<button
 				onClick={addHook}
-				className='rounded-2xl border px-4 py-3 text-sm font-medium transition hover:scale-[1.02]'
+				className="rounded-2xl border px-4 py-3 text-sm font-medium transition hover:scale-[1.02]"
 				style={{
 					borderColor: 'color-mix(in srgb, var(--accent) 30%, var(--border))',
 					background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
-				}}>
+				}}
+			>
 				+ Create webhook
 			</button>
 		</motion.div>
@@ -834,19 +870,20 @@ function CommandsView({ profile, setProfile, id }: any) {
 	}
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className='flex flex-col gap-4'>
+		<motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
 			{/* ACTIONS */}
-			<div className='flex justify-end gap-2'>
+			<div className="flex justify-end gap-2">
 				<motion.button
 					whileTap={{ scale: 0.98 }}
 					onClick={resetForm}
 					disabled={!hasChanges || saving}
-					className='rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
+					}}
+				>
 					Reset
 				</motion.button>
 
@@ -854,13 +891,14 @@ function CommandsView({ profile, setProfile, id }: any) {
 					whileTap={{ scale: 0.98 }}
 					onClick={handleSave}
 					disabled={!hasChanges || saving}
-					className='inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40'
+					className="inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-sm disabled:opacity-40"
 					style={{
 						borderColor: hasChanges ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
 						background: hasChanges ? 'color-mix(in srgb, var(--accent) 16%, var(--bg-panel))' : 'var(--bg-panel)',
 						color: 'var(--text-main)',
-					}}>
-					{saving ? <Loader2 className='h-4 w-4 animate-spin' /> : <Save className='h-4 w-4' />}
+					}}
+				>
+					{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</motion.button>
 			</div>
@@ -869,27 +907,28 @@ function CommandsView({ profile, setProfile, id }: any) {
 			{form.map((c, i) => (
 				<div
 					key={c.id}
-					className='rounded-3xl border p-4'
+					className="rounded-3xl border p-4"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 78%, transparent)',
-					}}>
-					<div className='mb-3 flex justify-between items-center'>
-						<span className='text-xs opacity-60'>Command {i + 1}</span>
+					}}
+				>
+					<div className="mb-3 flex justify-between items-center">
+						<span className="text-xs opacity-60">Command {i + 1}</span>
 
-						<button onClick={() => removeCommand(i)} className='text-xs opacity-60 hover:opacity-100 transition'>
+						<button onClick={() => removeCommand(i)} className="text-xs opacity-60 hover:opacity-100 transition">
 							Remove
 						</button>
 					</div>
 
-					<div className='grid gap-3'>
-						<input value={c.name} onChange={(e) => updateField(i, 'name', e.target.value)} placeholder='Command name' className='rounded-2xl border px-4 py-3 text-sm' style={inputStyle} />
+					<div className="grid gap-3">
+						<input value={c.name} onChange={(e) => updateField(i, 'name', e.target.value)} placeholder="Command name" className="rounded-2xl border px-4 py-3 text-sm" style={inputStyle} />
 
 						<input
 							value={c.description}
 							onChange={(e) => updateField(i, 'description', e.target.value)}
-							placeholder='Description'
-							className='rounded-2xl border px-4 py-3 text-sm'
+							placeholder="Description"
+							className="rounded-2xl border px-4 py-3 text-sm"
 							style={inputStyle}
 						/>
 					</div>
@@ -899,11 +938,12 @@ function CommandsView({ profile, setProfile, id }: any) {
 			{/* ADD BUTTON */}
 			<button
 				onClick={addCommand}
-				className='rounded-2xl border px-4 py-3 text-sm font-medium transition hover:scale-[1.02]'
+				className="rounded-2xl border px-4 py-3 text-sm font-medium transition hover:scale-[1.02]"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
-				}}>
+				}}
+			>
 				Add command
 			</button>
 		</motion.div>

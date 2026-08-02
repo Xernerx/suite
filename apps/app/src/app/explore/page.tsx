@@ -87,7 +87,7 @@ export default function Page() {
 		<>
 			{/* SEARCH */}
 			<motion.input
-				type='search'
+				type="search"
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
 				placeholder={view === 'Servers' ? 'Search servers...' : 'Search bots...'}
@@ -105,7 +105,7 @@ export default function Page() {
 			/>
 
 			{/* VIEW SWITCH */}
-			<AnimatePresence mode='wait'>
+			<AnimatePresence mode="wait">
 				<motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
 					{/* ================= BOTS ================= */}
 					{view === 'Bots' && (
@@ -114,7 +114,8 @@ export default function Page() {
 								width: '100%',
 								display: 'flex',
 								justifyContent: 'center',
-							}}>
+							}}
+						>
 							<motion.div
 								layout
 								style={{
@@ -123,7 +124,8 @@ export default function Page() {
 									gap: '1.25rem',
 									width: '100%',
 									maxWidth: '1400px', // 👈 controls how wide it can get
-								}}>
+								}}
+							>
 								<AnimatePresence>
 									{filteredBots.map((bot) => (
 										<BotCard key={bot.id} bot={bot} profiles={profiles} setProfiles={setProfiles} />
@@ -140,7 +142,8 @@ export default function Page() {
 								width: '100%',
 								display: 'flex',
 								justifyContent: 'center',
-							}}>
+							}}
+						>
 							<motion.div
 								layout
 								style={{
@@ -149,7 +152,8 @@ export default function Page() {
 									gap: '1.25rem',
 									width: '100%',
 									maxWidth: '1400px',
-								}}>
+								}}
+							>
 								<AnimatePresence>
 									{filteredServers.map((server) => {
 										if (server.name) return <ServerCard key={server.id} server={server} />;
@@ -223,7 +227,8 @@ function BotCard({ bot, profiles, setProfiles }: { bot: Bot; profiles: ProfileMa
 						display: 'flex',
 						flexDirection: 'column',
 						height: '100%',
-					}}>
+					}}
+				>
 					{/* BANNER */}
 					<div style={{ height: '80px', position: 'relative', background: '#111' }}>
 						{banner && (
@@ -258,7 +263,8 @@ function BotCard({ bot, profiles, setProfiles }: { bot: Bot; profiles: ProfileMa
 							display: 'flex',
 							flexDirection: 'column',
 							flexGrow: 1,
-						}}>
+						}}
+					>
 						{/* AVATAR */}
 						<motion.div
 							initial={{ scale: 0.9, opacity: 0 }}
@@ -273,7 +279,8 @@ function BotCard({ bot, profiles, setProfiles }: { bot: Bot; profiles: ProfileMa
 								width: '40px',
 								height: '40px',
 								background: '#222',
-							}}>
+							}}
+						>
 							{avatar && <img src={avatar} style={{ width: '100%', height: '100%' }} />}
 						</motion.div>
 
@@ -294,7 +301,8 @@ function BotCard({ bot, profiles, setProfiles }: { bot: Bot; profiles: ProfileMa
 									alignItems: 'center',
 									fontSize: '0.68rem',
 									opacity: 0.6,
-								}}>
+								}}
+							>
 								<div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
 									<Globe size={12} style={{ opacity: 0.45 }} />
 									{bot.stats.guildCount.toLocaleString()}
@@ -326,7 +334,8 @@ function BotCard({ bot, profiles, setProfiles }: { bot: Bot; profiles: ProfileMa
 								WebkitLineClamp: 2,
 								WebkitBoxOrient: 'vertical',
 								overflow: 'hidden',
-							}}>
+							}}
+						>
 							{bot.description}
 						</div>
 
@@ -341,7 +350,8 @@ function BotCard({ bot, profiles, setProfiles }: { bot: Bot; profiles: ProfileMa
 										marginTop: '0.4rem',
 										fontSize: '0.7rem',
 										opacity: 0.5,
-									}}>
+									}}
+								>
 									Loading profile...
 								</motion.div>
 							)}
@@ -375,14 +385,16 @@ function ServerCard({ server }: { server: any }) {
 						display: 'flex',
 						flexDirection: 'column',
 						height: '100%',
-					}}>
+					}}
+				>
 					{/* BANNER */}
 					<div
 						style={{
 							height: '80px',
 							position: 'relative',
 							background: banner ? '#111' : 'linear-gradient(135deg, #1f1f24, #111114)',
-						}}>
+						}}
+					>
 						{banner && (
 							<motion.img
 								src={banner}
@@ -415,7 +427,8 @@ function ServerCard({ server }: { server: any }) {
 							display: 'flex',
 							flexDirection: 'column',
 							flexGrow: 1,
-						}}>
+						}}
+					>
 						{/* ICON */}
 						<motion.div
 							initial={{ scale: 0.9, opacity: 0 }}
@@ -431,7 +444,8 @@ function ServerCard({ server }: { server: any }) {
 								height: '56px',
 								background: '#222',
 								boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
-							}}>
+							}}
+						>
 							{icon ? (
 								<img
 									src={icon}
@@ -452,7 +466,8 @@ function ServerCard({ server }: { server: any }) {
 										fontSize: '1.2rem',
 										fontWeight: 700,
 										opacity: 0.5,
-									}}>
+									}}
+								>
 									{server.name?.[0] || '?'}
 								</div>
 							)}
@@ -466,7 +481,8 @@ function ServerCard({ server }: { server: any }) {
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
 								whiteSpace: 'nowrap',
-							}}>
+							}}
+						>
 							{server.name}
 						</div>
 
@@ -477,7 +493,8 @@ function ServerCard({ server }: { server: any }) {
 								overflow: 'hidden',
 								textOverflow: 'ellipsis',
 								whiteSpace: 'nowrap',
-							}}>
+							}}
+						>
 							{server.id}
 						</div>
 
@@ -494,7 +511,8 @@ function ServerCard({ server }: { server: any }) {
 									alignItems: 'center',
 									fontSize: '0.68rem',
 									opacity: 0.65,
-								}}>
+								}}
+							>
 								<div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
 									<Users size={12} style={{ opacity: 0.45 }} />
 									{server.stats.userCount?.toLocaleString?.() || '0'}
@@ -526,7 +544,8 @@ function ServerCard({ server }: { server: any }) {
 								WebkitLineClamp: 2,
 								WebkitBoxOrient: 'vertical',
 								overflow: 'hidden',
-							}}>
+							}}
+						>
 							{server.description}
 						</div>
 					</div>

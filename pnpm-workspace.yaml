@@ -1,13 +1,13 @@
 # @format
 
 packages:
-  - apps/*
-  - packages/*
+    - apps/*
+    - packages/*
 
 allowBuilds:
-  bcrypt: true
-  electron: true
-  electron-winstaller: true
-  esbuild: true
-  sharp: true
-  unrs-resolver: true
+    bcrypt: true
+    electron: true
+    electron-winstaller: true
+    esbuild: true
+    sharp: true
+    unrs-resolver: true

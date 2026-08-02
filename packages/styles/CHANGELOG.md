@@ -1,5 +1,11 @@
 # @xernerx/styles
 
+## 0.1.4
+
+### Patch Changes
+
+- linted prettier
+
 ## 0.1.3
 
 ### Patch Changes

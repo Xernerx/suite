@@ -1,5 +1,11 @@
 # @xernerx/websocket
 
+## 1.2.3
+
+### Patch Changes
+
+- linted prettier
+
 ## 1.2.2
 
 ### Patch Changes

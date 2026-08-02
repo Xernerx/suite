@@ -10,20 +10,7 @@ import { useUser } from '@/providers/UserProvider';
 type ThemeMode = 'light' | 'dark' | 'system';
 
 type BackgroundStyle =
-	| 'nebula'
-	| 'none'
-	| 'gradient-v'
-	| 'gradient-h'
-	| 'gradient-diag-l'
-	| 'gradient-diag-r'
-	| 'aurora'
-	| 'spotlight'
-	| 'halo'
-	| 'edge-glow'
-	| 'top-fade'
-	| 'corners'
-	| 'mesh'
-	| 'ring';
+	'nebula' | 'none' | 'gradient-v' | 'gradient-h' | 'gradient-diag-l' | 'gradient-diag-r' | 'aurora' | 'spotlight' | 'halo' | 'edge-glow' | 'top-fade' | 'corners' | 'mesh' | 'ring';
 
 type UISettings = {
 	uiSpacing: 'compact' | 'default' | 'spacious';
@@ -83,20 +70,20 @@ function applyTheme(state: ThemeState) {
 	root.style.setProperty('--accent-hover', accentHover);
 
 	const map: Record<BackgroundStyle, string> = {
-		'nebula': 'var(--bg-nebula)',
-		'none': '',
+		nebula: 'var(--bg-nebula)',
+		none: '',
 		'gradient-v': 'var(--bg-gradient-v)',
 		'gradient-h': 'var(--bg-gradient-h)',
 		'gradient-diag-l': 'var(--bg-gradient-diag-l)',
 		'gradient-diag-r': 'var(--bg-gradient-diag-r)',
-		'aurora': 'var(--bg-aurora)',
-		'spotlight': 'var(--bg-spotlight)',
-		'halo': 'var(--bg-halo)',
+		aurora: 'var(--bg-aurora)',
+		spotlight: 'var(--bg-spotlight)',
+		halo: 'var(--bg-halo)',
 		'edge-glow': 'var(--bg-edge-glow)',
 		'top-fade': 'var(--bg-edge-glow)',
-		'corners': 'var(--bg-edge-glow)',
-		'mesh': 'var(--bg-edge-glow)',
-		'ring': 'var(--bg-edge-glow)',
+		corners: 'var(--bg-edge-glow)',
+		mesh: 'var(--bg-edge-glow)',
+		ring: 'var(--bg-edge-glow)',
 	};
 
 	root.style.setProperty('--bg-effect', map[state.background]);

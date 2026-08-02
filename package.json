@@ -17,7 +17,7 @@
 		"build": "pnpm --filter ./apps/* build",
 		"lint": "pnpm --recursive run lint",
 		"tunnel": "cloudflared tunnel run",
-		"commit": "changeset",
+		"commit": "pnpx prettier --write . && changeset",
 		"push": "pnpm changeset version && git add . && git commit -m \"chore: release\" && pnpm changeset tag && git push --follow-tags"
 	},
 	"devDependencies": {

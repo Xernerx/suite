@@ -29,43 +29,45 @@ export default function Account() {
 	};
 
 	return (
-		<div className='flex flex-col w-full' style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
+		<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
 			{/* USER INFO */}
 			<motion.div
 				initial={{ opacity: 0, y: 6 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.15 }}
-				className='rounded-xl flex flex-col'
+				className="rounded-xl flex flex-col"
 				style={{
 					background: 'var(--container)',
 					border: '1px solid var(--border)',
 					padding: 'calc(var(--ui-gap) * 1.5)',
 					gap: 'calc(var(--ui-gap) * 1.2)',
-				}}>
-				<div className='flex items-center gap-3'>
+				}}
+			>
+				<div className="flex items-center gap-3">
 					<div
-						className='p-2 rounded-md'
+						className="p-2 rounded-md"
 						style={{
 							background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 							color: 'rgb(var(--accent))',
-						}}>
+						}}
+					>
 						<User size={16} />
 					</div>
 
-					<div className='flex flex-col'>
-						<span className='text-sm font-medium'>User Information</span>
-						<span className='text-xs' style={{ color: 'var(--text-muted)' }}>
+					<div className="flex flex-col">
+						<span className="text-sm font-medium">User Information</span>
+						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
 							Account details for your Xernerx profile.
 						</span>
 					</div>
 				</div>
 
-				<div className='flex flex-col text-sm' style={{ gap: 2 }}>
+				<div className="flex flex-col text-sm" style={{ gap: 2 }}>
 					<p>
-						Signed in as <span className='font-medium'>@{user?.username}</span>
+						Signed in as <span className="font-medium">@{user?.username}</span>
 					</p>
 					<p>
-						Using <span className='font-medium'>{user?.email}</span>
+						Using <span className="font-medium">{user?.email}</span>
 					</p>
 				</div>
 			</motion.div>
@@ -75,26 +77,28 @@ export default function Account() {
 				initial={{ opacity: 0, y: 6 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.15, delay: 0.05 }}
-				className='rounded-xl flex flex-col'
+				className="rounded-xl flex flex-col"
 				style={{
 					background: 'var(--container)',
 					border: '1px solid var(--border)',
 					padding: 'calc(var(--ui-gap) * 1.5)',
 					gap: 'calc(var(--ui-gap) * 1.2)',
-				}}>
-				<div className='flex items-center gap-3'>
+				}}
+			>
+				<div className="flex items-center gap-3">
 					<div
-						className='p-2 rounded-md'
+						className="p-2 rounded-md"
 						style={{
 							background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 							color: 'rgb(var(--accent))',
-						}}>
+						}}
+					>
 						<LogOut size={16} />
 					</div>
 
-					<div className='flex flex-col'>
-						<span className='text-sm font-medium'>Log Out</span>
-						<span className='text-xs' style={{ color: 'var(--text-muted)' }}>
+					<div className="flex flex-col">
+						<span className="text-sm font-medium">Log Out</span>
+						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
 							End your current session.
 						</span>
 					</div>
@@ -102,12 +106,13 @@ export default function Account() {
 
 				<button
 					onClick={handleSignOut}
-					className='flex items-center justify-center gap-2 text-sm rounded-md transition'
+					className="flex items-center justify-center gap-2 text-sm rounded-md transition"
 					style={{
 						padding: '8px 12px',
 						background: 'var(--accent)',
 						color: '#fff',
-					}}>
+					}}
+				>
 					<LogOut size={14} />
 					Log Out
 				</button>
@@ -118,26 +123,28 @@ export default function Account() {
 				initial={{ opacity: 0, y: 6 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.15, delay: 0.1 }}
-				className='rounded-xl flex flex-col'
+				className="rounded-xl flex flex-col"
 				style={{
 					background: 'var(--container)',
 					border: '1px solid color-mix(in srgb, red 30%, var(--border))',
 					padding: 'calc(var(--ui-gap) * 1.5)',
 					gap: 'calc(var(--ui-gap) * 1.2)',
-				}}>
-				<div className='flex items-center gap-3'>
+				}}
+			>
+				<div className="flex items-center gap-3">
 					<div
-						className='p-2 rounded-md'
+						className="p-2 rounded-md"
 						style={{
 							background: 'color-mix(in srgb, red 12%, transparent)',
 							color: '#f87171',
-						}}>
+						}}
+					>
 						<Trash2 size={16} />
 					</div>
 
-					<div className='flex flex-col'>
-						<span className='text-sm font-medium'>User Data</span>
-						<span className='text-xs' style={{ color: 'var(--text-muted)' }}>
+					<div className="flex flex-col">
+						<span className="text-sm font-medium">User Data</span>
+						<span className="text-xs" style={{ color: 'var(--text-muted)' }}>
 							Permanently delete your stored user data.
 						</span>
 					</div>
@@ -145,7 +152,7 @@ export default function Account() {
 
 				<button
 					onClick={handleDeleteData}
-					className='flex items-center justify-center gap-2 text-sm rounded-md transition'
+					className="flex items-center justify-center gap-2 text-sm rounded-md transition"
 					style={{
 						padding: '8px 12px',
 						color: '#f87171',
@@ -157,7 +164,8 @@ export default function Account() {
 					}}
 					onMouseLeave={(e) => {
 						e.currentTarget.style.background = 'transparent';
-					}}>
+					}}
+				>
 					<Trash2 size={14} />
 					Delete User Data
 				</button>

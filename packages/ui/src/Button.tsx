@@ -29,7 +29,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className = 
 
 	return (
 		<button ref={ref} disabled={disabled || isLoading} className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`} {...props}>
-			{isLoading && <span className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent shrink-0' />}
+			{isLoading && <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent shrink-0" />}
 			{children}
 		</button>
 	);

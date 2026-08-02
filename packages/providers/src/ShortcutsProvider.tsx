@@ -118,37 +118,39 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 	return (
 		<AnimatePresence>
 			{isOpen && (
-				<div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
-					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className='absolute inset-0 bg-black/60 backdrop-blur-sm' />
+				<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
 					<motion.div
 						initial={{ opacity: 0, scale: 0.95, y: 20 }}
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className='relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col'
-						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-						<div className='flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0'>
-							<div className='flex items-center gap-3'>
+						className="relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+					>
+						<div className="flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0">
+							<div className="flex items-center gap-3">
 								<div
-									className='flex h-10 w-10 items-center justify-center rounded-xl'
+									className="flex h-10 w-10 items-center justify-center rounded-xl"
 									style={{
 										background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 										color: 'var(--accent)',
-									}}>
+									}}
+								>
 									<Compass size={20} />
 								</div>
 								<div>
-									<h2 className='text-lg font-semibold text-(--text)'>Navigation</h2>
+									<h2 className="text-lg font-semibold text-(--text)">Navigation</h2>
 								</div>
 							</div>
 
-							<button onClick={onClose} className='rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition'>
+							<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
 								<X size={18} />
 							</button>
 						</div>
 
-						<div className='flex flex-col overflow-y-auto pr-1' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+						<div className="flex flex-col overflow-y-auto pr-1" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 							{navigation && navigation.length > 0 ? (
 								navigation.map((item: any, idx: number) => {
 									const resolvedHref = getEnvUrl(item.href);
@@ -157,14 +159,15 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 											key={idx}
 											href={resolvedHref}
 											onClick={onClose}
-											className='flex items-center justify-between rounded-xl px-4 py-3 bg-(--background) border border-(--border)/10 transition hover:border-(--accent)'>
-											<span className='text-sm font-medium text-(--text)'>{item.label}</span>
-											<span className='text-xs text-(--text-muted) font-mono'>{resolvedHref}</span>
+											className="flex items-center justify-between rounded-xl px-4 py-3 bg-(--background) border border-(--border)/10 transition hover:border-(--accent)"
+										>
+											<span className="text-sm font-medium text-(--text)">{item.label}</span>
+											<span className="text-xs text-(--text-muted) font-mono">{resolvedHref}</span>
 										</a>
 									);
 								})
 							) : (
-								<p className='text-sm text-(--text-muted) text-center py-4'>No navigation links available.</p>
+								<p className="text-sm text-(--text-muted) text-center py-4">No navigation links available.</p>
 							)}
 						</div>
 					</motion.div>
@@ -178,13 +181,14 @@ function FloatingNavigationShortcut() {
 	const { setNavOpen } = useShortcuts();
 
 	return (
-		<div className='fixed z-40' style={{ top: 'var(--ui-gap)', left: 'var(--ui-gap)' }}>
+		<div className="fixed z-40" style={{ top: 'var(--ui-gap)', left: 'var(--ui-gap)' }}>
 			<button
 				onClick={() => setNavOpen(true)}
-				className='flex h-11 items-center gap-2 px-3.5 rounded-xl bg-(--foreground) border border-(--border)/10 shadow-lg text-(--text) transition hover:border-(--accent)'
-				title='Open Navigation (Ctrl + K)'>
-				<Compass size={18} className='text-(--accent)' />
-				<span className='text-xs font-medium'>Navigation</span>
+				className="flex h-11 items-center gap-2 px-3.5 rounded-xl bg-(--foreground) border border-(--border)/10 shadow-lg text-(--text) transition hover:border-(--accent)"
+				title="Open Navigation (Ctrl + K)"
+			>
+				<Compass size={18} className="text-(--accent)" />
+				<span className="text-xs font-medium">Navigation</span>
 			</button>
 		</div>
 	);
@@ -211,40 +215,43 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 	return (
 		<AnimatePresence>
 			{isOpen && (
-				<div className='fixed inset-0 z-[60] flex items-center justify-center p-4'>
-					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className='absolute inset-0 bg-black/60 backdrop-blur-sm' />
+				<div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
 					<motion.div
 						initial={{ opacity: 0, scale: 0.95, y: 20 }}
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className='relative w-full max-w-2xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col'
-						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-						<div className='flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0'>
-							<div className='flex items-center gap-3'>
+						className="relative w-full max-w-2xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+					>
+						<div className="flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0">
+							<div className="flex items-center gap-3">
 								<div
-									className='flex h-10 w-10 items-center justify-center rounded-xl'
+									className="flex h-10 w-10 items-center justify-center rounded-xl"
 									style={{
 										background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 										color: 'var(--accent)',
-									}}>
+									}}
+								>
 									<FileText size={20} />
 								</div>
 								<div>
-									<h2 className='text-lg font-semibold text-(--text)'>Changelog</h2>
-									<p className='text-xs text-(--text-muted)'>Recent application updates and releases</p>
+									<h2 className="text-lg font-semibold text-(--text)">Changelog</h2>
+									<p className="text-xs text-(--text-muted)">Recent application updates and releases</p>
 								</div>
 							</div>
 
-							<div className='flex items-center gap-3'>
+							<div className="flex items-center gap-3">
 								{changelogData?.versions && changelogData.versions.length > 0 && (
-									<div className='relative'>
+									<div className="relative">
 										<button
 											onClick={() => setDropdownOpen((prev) => !prev)}
-											className='flex items-center gap-2 px-3 py-1.5 rounded-xl bg-(--background) border border-(--border)/10 text-xs font-mono text-(--text) hover:border-(--accent) transition'>
+											className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-(--background) border border-(--border)/10 text-xs font-mono text-(--text) hover:border-(--accent) transition"
+										>
 											<span>{changelogData.selectedVersion || 'Select Version'}</span>
-											<ChevronDown size={14} className='text-(--text-muted)' />
+											<ChevronDown size={14} className="text-(--text-muted)" />
 										</button>
 
 										<AnimatePresence>
@@ -253,7 +260,8 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 													initial={{ opacity: 0, y: 4 }}
 													animate={{ opacity: 1, y: 0 }}
 													exit={{ opacity: 0, y: 4 }}
-													className='absolute right-0 mt-2 w-40 rounded-xl bg-(--background) border border-(--border)/10 shadow-xl p-1 z-20 max-h-48 overflow-y-auto'>
+													className="absolute right-0 mt-2 w-40 rounded-xl bg-(--background) border border-(--border)/10 shadow-xl p-1 z-20 max-h-48 overflow-y-auto"
+												>
 													{changelogData.versions.map((ver) => (
 														<button
 															key={ver}
@@ -263,7 +271,8 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 															}}
 															className={`w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition ${
 																changelogData.selectedVersion === ver ? 'bg-(--accent)/10 text-(--accent) font-semibold' : 'text-(--text) hover:bg-(--foreground)'
-															}`}>
+															}`}
+														>
 															{ver}
 														</button>
 													))}
@@ -273,15 +282,16 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 									</div>
 								)}
 
-								<button onClick={onClose} className='rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition'>
+								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
 									<X size={18} />
 								</button>
 							</div>
 						</div>
 
 						<div
-							className='overflow-y-auto pr-2 flex-1 text-sm text-(--text-muted) font-mono whitespace-pre-wrap bg-(--background) rounded-2xl border border-(--border)/10'
-							style={{ padding: 'var(--ui-gap)' }}>
+							className="overflow-y-auto pr-2 flex-1 text-sm text-(--text-muted) font-mono whitespace-pre-wrap bg-(--background) rounded-2xl border border-(--border)/10"
+							style={{ padding: 'var(--ui-gap)' }}
+						>
 							{changelogData ? changelogData.content : 'Loading changelog...'}
 						</div>
 					</motion.div>
@@ -321,58 +331,64 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 		<>
 			<AnimatePresence>
 				{isOpen && (
-					<div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
-						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className='absolute inset-0 bg-black/60 backdrop-blur-sm' />
+					<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
 						<motion.div
 							initial={{ opacity: 0, scale: 0.95, y: 20 }}
 							animate={{ opacity: 1, scale: 1, y: 0 }}
 							exit={{ opacity: 0, scale: 0.95, y: 20 }}
 							transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-							className='relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col'
-							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-							<div className='flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0'>
-								<div className='flex items-center gap-3'>
+							className="relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+						>
+							<div className="flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0">
+								<div className="flex items-center gap-3">
 									<div
-										className='flex h-10 w-10 items-center justify-center rounded-xl'
+										className="flex h-10 w-10 items-center justify-center rounded-xl"
 										style={{
 											background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 											color: 'var(--accent)',
-										}}>
+										}}
+									>
 										<Command size={20} />
 									</div>
 									<div>
-										<h2 className='text-lg font-semibold text-(--text)'>Keyboard Shortcuts</h2>
-										<p className='text-xs text-(--text-muted)'>Quick commands to navigate efficiently</p>
+										<h2 className="text-lg font-semibold text-(--text)">Keyboard Shortcuts</h2>
+										<p className="text-xs text-(--text-muted)">Quick commands to navigate efficiently</p>
 									</div>
 								</div>
 
-								<button onClick={onClose} className='rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition'>
+								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
 									<X size={18} />
 								</button>
 							</div>
 
-							<div className='flex flex-col overflow-y-auto pr-1' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+							<div className="flex flex-col overflow-y-auto pr-1" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 								{shortcuts.map((item, idx) => {
 									const IconComponent = item.icon || Command;
 									return (
-										<div key={idx} className='flex items-center justify-between rounded-xl px-4 py-3 bg-(--background) border border-(--border)/10'>
-											<div className='flex items-center gap-3 text-sm text-(--text)'>
-												<IconComponent size={16} className='text-(--accent)' />
+										<div key={idx} className="flex items-center justify-between rounded-xl px-4 py-3 bg-(--background) border border-(--border)/10">
+											<div className="flex items-center gap-3 text-sm text-(--text)">
+												<IconComponent size={16} className="text-(--accent)" />
 												<span>{item.description}</span>
 											</div>
 
-											<kbd className='rounded-md px-2.5 py-1 text-xs font-mono font-medium bg-(--foreground) text-(--text) border border-(--border)/10 shadow-sm'>{item.key}</kbd>
+											<kbd className="rounded-md px-2.5 py-1 text-xs font-mono font-medium bg-(--foreground) text-(--text) border border-(--border)/10 shadow-sm">{item.key}</kbd>
 										</div>
 									);
 								})}
 							</div>
 
-							<div className='pt-3 border-t border-(--border)/10 flex items-center justify-between text-xs text-(--text-muted) shrink-0 px-1'>
-								<div className='flex items-center gap-2'>
+							<div className="pt-3 border-t border-(--border)/10 flex items-center justify-between text-xs text-(--text-muted) shrink-0 px-1">
+								<div className="flex items-center gap-2">
 									<span>
 										Version:{' '}
-										<button onClick={() => setChangelogOpen(true)} className='text-(--text) font-mono underline hover:text-(--accent) transition cursor-pointer' title='View Changelog'>
+										<button
+											onClick={() => setChangelogOpen(true)}
+											className="text-(--text) font-mono underline hover:text-(--accent) transition cursor-pointer"
+											title="View Changelog"
+										>
 											{appVersion}
 										</button>
 									</span>
@@ -380,13 +396,13 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 										<>
 											<span>•</span>
 											<span>
-												Electron: <strong className='text-(--text) font-mono'>{electronVersion}</strong>
+												Electron: <strong className="text-(--text) font-mono">{electronVersion}</strong>
 											</span>
 										</>
 									)}
 								</div>
 								<span>
-									Press <kbd className='font-mono text-(--text)'>Esc</kbd> to close
+									Press <kbd className="font-mono text-(--text)">Esc</kbd> to close
 								</span>
 							</div>
 						</motion.div>

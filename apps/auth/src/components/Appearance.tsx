@@ -111,8 +111,7 @@ export default function Appearance() {
 	const saveToDb = async (overrides: any) => {
 		if (!session?.user || !(session.user as any).id) return;
 
-		const isSyncEnabled =
-			overrides.clientSync !== undefined ? overrides.clientSync : clientSync;
+		const isSyncEnabled = overrides.clientSync !== undefined ? overrides.clientSync : clientSync;
 		if (!isSyncEnabled) return;
 
 		const payload = {
@@ -150,31 +149,15 @@ export default function Appearance() {
 			saveToDb({ clientSync: true });
 			toast({
 				type: 'success',
-				title: t(
-					'auth.appearance.toast.clientSyncEnabled.title',
-					{},
-					'Client Sync Enabled'
-				),
-				description: t(
-					'auth.appearance.toast.clientSyncEnabled.description',
-					{},
-					'Your appearance settings are now syncing to your account.'
-				),
+				title: t('auth.appearance.toast.clientSyncEnabled.title', {}, 'Client Sync Enabled'),
+				description: t('auth.appearance.toast.clientSyncEnabled.description', {}, 'Your appearance settings are now syncing to your account.'),
 			});
 		} else {
 			saveToDb({ clientSync: false });
 			toast({
 				type: 'info',
-				title: t(
-					'auth.appearance.toast.clientSyncDisabled.title',
-					{},
-					'Client Sync Disabled'
-				),
-				description: t(
-					'auth.appearance.toast.clientSyncDisabled.description',
-					{},
-					'Your appearance settings will stay local to this browser.'
-				),
+				title: t('auth.appearance.toast.clientSyncDisabled.title', {}, 'Client Sync Disabled'),
+				description: t('auth.appearance.toast.clientSyncDisabled.description', {}, 'Your appearance settings will stay local to this browser.'),
 			});
 		}
 	};
@@ -214,11 +197,7 @@ export default function Appearance() {
 		toast({
 			type: 'success',
 			title: t('auth.appearance.toast.theme.title', {}, 'Updated theme!'),
-			description: t(
-				'auth.appearance.toast.theme.description',
-				{ theme: themeMode },
-				`Set theme to ${themeMode}`
-			),
+			description: t('auth.appearance.toast.theme.description', { theme: themeMode }, `Set theme to ${themeMode}`),
 		});
 	};
 
@@ -253,9 +232,7 @@ export default function Appearance() {
 			label: (
 				<div className="flex items-center gap-2.5">
 					<Moon size={16} />
-					<span className="font-medium">
-						{t('auth.appearance.theme.options.dark', {}, 'Dark')}
-					</span>
+					<span className="font-medium">{t('auth.appearance.theme.options.dark', {}, 'Dark')}</span>
 				</div>
 			),
 		},
@@ -264,9 +241,7 @@ export default function Appearance() {
 			label: (
 				<div className="flex items-center gap-2.5">
 					<Sun size={16} />
-					<span className="font-medium">
-						{t('auth.appearance.theme.options.light', {}, 'Light')}
-					</span>
+					<span className="font-medium">{t('auth.appearance.theme.options.light', {}, 'Light')}</span>
 				</div>
 			),
 		},
@@ -275,9 +250,7 @@ export default function Appearance() {
 			label: (
 				<div className="flex items-center gap-2.5">
 					<Laptop size={16} />
-					<span className="font-medium">
-						{t('auth.appearance.theme.options.system', {}, 'System')}
-					</span>
+					<span className="font-medium">{t('auth.appearance.theme.options.system', {}, 'System')}</span>
 				</div>
 			),
 		},
@@ -289,9 +262,7 @@ export default function Appearance() {
 			label: (
 				<div className="flex items-center gap-2.5">
 					<Columns3 size={16} />
-					<span className="font-medium">
-						{t('auth.appearance.density.compact', {}, 'Compact')}
-					</span>
+					<span className="font-medium">{t('auth.appearance.density.compact', {}, 'Compact')}</span>
 				</div>
 			),
 		},
@@ -300,9 +271,7 @@ export default function Appearance() {
 			label: (
 				<div className="flex items-center gap-2.5">
 					<Columns3 size={16} />
-					<span className="font-medium">
-						{t('auth.appearance.density.default', {}, 'Default')}
-					</span>
+					<span className="font-medium">{t('auth.appearance.density.default', {}, 'Default')}</span>
 				</div>
 			),
 		},
@@ -311,9 +280,7 @@ export default function Appearance() {
 			label: (
 				<div className="flex items-center gap-2.5">
 					<Columns3 size={16} />
-					<span className="font-medium">
-						{t('auth.appearance.density.spacious', {}, 'Spacious')}
-					</span>
+					<span className="font-medium">{t('auth.appearance.density.spacious', {}, 'Spacious')}</span>
 				</div>
 			),
 		},
@@ -329,16 +296,8 @@ export default function Appearance() {
 			}}
 		>
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-3xl font-black tracking-tight text-(--text)">
-					{t('auth.appearance.title', {}, 'Appearance')}
-				</h1>
-				<p className="text-sm text-(--text-muted)">
-					{t(
-						'auth.appearance.description',
-						{},
-						'Customize how the interface looks and feels across your workspace.'
-					)}
-				</p>
+				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.appearance.title', {}, 'Appearance')}</h1>
+				<p className="text-sm text-(--text-muted)">{t('auth.appearance.description', {}, 'Customize how the interface looks and feels across your workspace.')}</p>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -347,27 +306,12 @@ export default function Appearance() {
 					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-					>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t('auth.appearance.theme.title', {}, 'Theme')}
-						</h3>
-						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.theme.description',
-								{},
-								'Choose your preferred interface theme mode.'
-							)}
-						</p>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.theme.title', {}, 'Theme')}</h3>
+						<p className="text-xs text-(--text-muted)">{t('auth.appearance.theme.description', {}, 'Choose your preferred interface theme mode.')}</p>
 					</div>
 					<div className="w-full sm:w-56">
-						<Selector
-							value={selectedTheme}
-							options={themeOptions}
-							onChange={handleThemeChange}
-						/>
+						<Selector value={selectedTheme} options={themeOptions} onChange={handleThemeChange} />
 					</div>
 				</div>
 
@@ -376,30 +320,11 @@ export default function Appearance() {
 					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-					>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t(
-								'auth.appearance.clientSync.title',
-								{},
-								'Sync Appearance Settings Across Clients'
-							)}
-						</h3>
-						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.clientSync.description',
-								{},
-								'Automatically load appearance settings on all your devices.'
-							)}
-						</p>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.clientSync.title', {}, 'Sync Appearance Settings Across Clients')}</h3>
+						<p className="text-xs text-(--text-muted)">{t('auth.appearance.clientSync.description', {}, 'Automatically load appearance settings on all your devices.')}</p>
 					</div>
-					<Toggle
-						checked={clientSync}
-						onChange={handleToggleClientSync}
-						suppressHydrationWarning
-					/>
+					<Toggle checked={clientSync} onChange={handleToggleClientSync} suppressHydrationWarning />
 				</div>
 
 				{/* Sync Accent with Discord */}
@@ -407,26 +332,13 @@ export default function Appearance() {
 					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-					>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t('auth.appearance.discordSync.title', {}, 'Sync Accent from Discord')}
-						</h3>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.discordSync.title', {}, 'Sync Accent from Discord')}</h3>
 						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.discordSync.description',
-								{},
-								'Automatically adopt your Discord profile theme accent color as your workspace accent.'
-							)}
+							{t('auth.appearance.discordSync.description', {}, 'Automatically adopt your Discord profile theme accent color as your workspace accent.')}
 						</p>
 					</div>
-					<Toggle
-						checked={syncFromDiscord}
-						onChange={handleToggleSync}
-						suppressHydrationWarning
-					/>
+					<Toggle checked={syncFromDiscord} onChange={handleToggleSync} suppressHydrationWarning />
 				</div>
 
 				{/* Accent Color Picker */}
@@ -435,25 +347,13 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t('auth.appearance.accentColor.title', {}, 'Accent Color')}
-						</h3>
-						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.accentColor.description',
-								{},
-								'Select a custom accent color for your workspace theme.'
-							)}
-						</p>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.accentColor.title', {}, 'Accent Color')}</h3>
+						<p className="text-xs text-(--text-muted)">{t('auth.appearance.accentColor.description', {}, 'Select a custom accent color for your workspace theme.')}</p>
 					</div>
 
-					<div
-						className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-2"
-						style={{ gap: 'var(--ui-gap)' }}
-					>
+					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-2" style={{ gap: 'var(--ui-gap)' }}>
 						{PRESET_COLORS.map((color) => {
-							const isSelected =
-								selectedColor.toLowerCase() === color.value.toLowerCase();
+							const isSelected = selectedColor.toLowerCase() === color.value.toLowerCase();
 							const label = t(`auth.appearance.colors.${color.key}`, {}, color.key);
 
 							return (
@@ -461,22 +361,15 @@ export default function Appearance() {
 									key={color.value}
 									onClick={() => handleSelectColor(color.value)}
 									className={`flex items-center rounded-2xl border transition-all text-left ${
-										isSelected
-											? 'border-(--accent) bg-(--active-accent)/20 shadow-xs'
-											: 'border-(--border)/10 hover:border-(--border)/40'
+										isSelected ? 'border-(--accent) bg-(--active-accent)/20 shadow-xs' : 'border-(--border)/10 hover:border-(--border)/40'
 									}`}
 									style={{
 										padding: 'calc(var(--ui-gap) * 0.75)',
 										gap: 'calc(var(--ui-gap) * 0.5)',
 									}}
 								>
-									<div
-										className="h-8 w-8 rounded-full shadow-inner shrink-0 border border-white/10"
-										style={{ backgroundColor: color.value }}
-									/>
-									<span className="text-xs font-medium text-(--text) truncate">
-										{label}
-									</span>
+									<div className="h-8 w-8 rounded-full shadow-inner shrink-0 border border-white/10" style={{ backgroundColor: color.value }} />
+									<span className="text-xs font-medium text-(--text) truncate">{label}</span>
 								</button>
 							);
 						})}
@@ -484,34 +377,13 @@ export default function Appearance() {
 				</div>
 
 				{/* UI Zoom Level */}
-				<div
-					className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-					>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t('auth.appearance.zoom.title', {}, 'UI Zoom Level')}
-						</h3>
-						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.zoom.description',
-								{},
-								'Scale the interface zoom uniformly across the application.'
-							)}
-						</p>
+				<div className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.zoom.title', {}, 'UI Zoom Level')}</h3>
+						<p className="text-xs text-(--text-muted)">{t('auth.appearance.zoom.description', {}, 'Scale the interface zoom uniformly across the application.')}</p>
 					</div>
 					<div className="w-full pt-2">
-						<Slider
-							value={uiZoom}
-							onChange={handleUiZoomChange}
-							min={80}
-							max={125}
-							step={5}
-							unit="%"
-						/>
+						<Slider value={uiZoom} onChange={handleUiZoomChange} min={80} max={125} step={5} unit="%" />
 					</div>
 				</div>
 
@@ -520,59 +392,23 @@ export default function Appearance() {
 					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-					>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t('auth.appearance.density.title', {}, 'Layout Spacing')}
-						</h3>
-						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.density.description',
-								{},
-								'Switch between compact, default, and spacious interface padding gaps.'
-							)}
-						</p>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.density.title', {}, 'Layout Spacing')}</h3>
+						<p className="text-xs text-(--text-muted)">{t('auth.appearance.density.description', {}, 'Switch between compact, default, and spacious interface padding gaps.')}</p>
 					</div>
 					<div className="w-full sm:w-56">
-						<Selector
-							value={uiGap}
-							options={densityOptions}
-							onChange={handleUiGapChange}
-						/>
+						<Selector value={uiGap} options={densityOptions} onChange={handleUiGapChange} />
 					</div>
 				</div>
 
 				{/* Text Scale Slider */}
-				<div
-					className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
-					>
-						<h3 className="text-base font-semibold text-(--text)">
-							{t('auth.appearance.textScale.title', {}, 'Text Scale')}
-						</h3>
-						<p className="text-xs text-(--text-muted)">
-							{t(
-								'auth.appearance.textScale.description',
-								{},
-								'Configure base typography size for readability.'
-							)}
-						</p>
+				<div className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.textScale.title', {}, 'Text Scale')}</h3>
+						<p className="text-xs text-(--text-muted)">{t('auth.appearance.textScale.description', {}, 'Configure base typography size for readability.')}</p>
 					</div>
 					<div className="w-full pt-2">
-						<Slider
-							value={textScale}
-							onChange={handleTextScaleChange}
-							min={10}
-							max={20}
-							step={1}
-							unit="px"
-						/>
+						<Slider value={textScale} onChange={handleTextScaleChange} min={10} max={20} step={1} unit="px" />
 					</div>
 				</div>
 			</div>

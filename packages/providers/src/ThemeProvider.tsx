@@ -198,10 +198,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				resolvedTheme,
 				setTheme: updateTheme,
 				setAccent: applyAccent,
-			}}>
+			}}
+		>
 			<Script
-				id='theme-init'
-				strategy='beforeInteractive'
+				id="theme-init"
+				strategy="beforeInteractive"
 				dangerouslySetInnerHTML={{
 					__html: `
                         (function() {

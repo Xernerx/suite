@@ -68,25 +68,27 @@ export default function Notifications() {
 	};
 
 	return (
-		<div className='flex flex-col mx-auto w-full max-w-9xl gap-6 px-4 py-6 sm:p-6'>
+		<div className="flex flex-col mx-auto w-full max-w-9xl gap-6 px-4 py-6 sm:p-6">
 			{/* HEADER */}
-			<div className='flex items-center gap-3'>
+			<div className="flex items-center gap-3">
 				<div
-					className='p-2 rounded-xl'
+					className="p-2 rounded-xl"
 					style={{
 						background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
-					}}>
+					}}
+				>
 					<BellDot size={18} />
 				</div>
 
-				<div className='flex flex-col'>
-					<h1 className='text-2xl font-semibold'>Notifications</h1>
+				<div className="flex flex-col">
+					<h1 className="text-2xl font-semibold">Notifications</h1>
 
 					<span
-						className='text-sm'
+						className="text-sm"
 						style={{
 							color: 'var(--text-muted)',
-						}}>
+						}}
+					>
 						Manage how you receive notifications
 					</span>
 				</div>
@@ -98,44 +100,47 @@ export default function Notifications() {
 					key={category}
 					layout
 					whileHover={{ y: -2 }}
-					className='rounded-xl relative overflow-hidden'
+					className="rounded-xl relative overflow-hidden"
 					style={{
 						background: 'var(--container)',
 						border: '1px solid var(--border)',
 						padding: 'calc(var(--ui-gap) * 1.5)',
-					}}>
+					}}
+				>
 					{/* glow */}
 					<div
-						className='absolute inset-0 opacity-0 hover:opacity-100 transition pointer-events-none'
+						className="absolute inset-0 opacity-0 hover:opacity-100 transition pointer-events-none"
 						style={{
 							background: 'radial-gradient(circle at top, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%)',
 						}}
 					/>
 
 					{/* title */}
-					<div className='flex items-center justify-between mb-5'>
-						<div className='flex flex-col'>
-							<h2 className='text-lg font-semibold capitalize'>{category}</h2>
+					<div className="flex items-center justify-between mb-5">
+						<div className="flex flex-col">
+							<h2 className="text-lg font-semibold capitalize">{category}</h2>
 						</div>
 					</div>
 
 					{/* table */}
 					<div
-						className='overflow-hidden rounded-xl'
+						className="overflow-hidden rounded-xl"
 						style={{
 							border: '1px solid var(--border)',
 							background: 'var(--bg-main)',
-						}}>
-						<table className='w-full border-collapse table-fixed'>
+						}}
+					>
+						<table className="w-full border-collapse table-fixed">
 							<thead>
 								<tr
 									style={{
 										borderBottom: '1px solid var(--border)',
-									}}>
-									<th className='text-left px-4 py-3 text-xs font-medium uppercase tracking-wide'>Notification</th>
+									}}
+								>
+									<th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wide">Notification</th>
 
 									{allToggleHeaders.map((toggle) => (
-										<th key={toggle} className='w-32 px-4 py-3 text-center text-xs font-medium uppercase tracking-wide'>
+										<th key={toggle} className="w-32 px-4 py-3 text-center text-xs font-medium uppercase tracking-wide">
 											{toggle}
 										</th>
 									))}
@@ -149,16 +154,18 @@ export default function Notifications() {
 										style={{
 											borderBottom: '1px solid var(--border)',
 										}}
-										className='last:border-none'>
-										<td className='px-4 py-4'>
-											<div className='flex flex-col'>
-												<span className='text-sm font-medium capitalize'>{key}</span>
+										className="last:border-none"
+									>
+										<td className="px-4 py-4">
+											<div className="flex flex-col">
+												<span className="text-sm font-medium capitalize">{key}</span>
 
 												<span
-													className='text-xs'
+													className="text-xs"
 													style={{
 														color: 'var(--text-muted)',
-													}}>
+													}}
+												>
 													{notification.description}
 												</span>
 											</div>
@@ -170,15 +177,16 @@ export default function Notifications() {
 											const active = Boolean(notificationState?.[category]?.[key]?.[toggle]);
 
 											return (
-												<td key={toggle} className='w-32 px-4 py-4 text-center align-middle'>
+												<td key={toggle} className="w-32 px-4 py-4 text-center align-middle">
 													{hasToggle ? (
 														<button
-															type='button'
+															type="button"
 															onClick={() => updateNotification(category, key, toggle, !active)}
-															className='relative w-11 h-6 rounded-full transition'
+															className="relative w-11 h-6 rounded-full transition"
 															style={{
 																background: active ? 'var(--accent)' : 'color-mix(in srgb, var(--border) 70%, transparent)',
-															}}>
+															}}
+														>
 															<motion.div
 																layout
 																transition={{
@@ -186,7 +194,7 @@ export default function Notifications() {
 																	stiffness: 500,
 																	damping: 30,
 																}}
-																className='absolute top-0.5 w-5 h-5 rounded-full bg-white'
+																className="absolute top-0.5 w-5 h-5 rounded-full bg-white"
 																style={{
 																	left: active ? 'calc(100% - 22px)' : '2px',
 																}}
@@ -194,10 +202,11 @@ export default function Notifications() {
 														</button>
 													) : (
 														<span
-															className='text-xs opacity-30'
+															className="text-xs opacity-30"
 															style={{
 																color: 'var(--text-muted)',
-															}}>
+															}}
+														>
 															—
 														</span>
 													)}

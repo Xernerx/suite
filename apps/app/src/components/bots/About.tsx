@@ -28,7 +28,8 @@ export default function About({ bot }: { bot: Bot }) {
 				flexDirection: 'column',
 				gap: '1.25rem',
 				marginTop: '1.5rem',
-			}}>
+			}}
+		>
 			{/* ================= LINKS CONTAINER ================= */}
 			{entries.length > 0 && (
 				<div
@@ -40,12 +41,13 @@ export default function About({ bot }: { bot: Bot }) {
 						display: 'flex',
 						gap: '0.5rem',
 						flexWrap: 'wrap',
-					}}>
+					}}
+				>
 					{entries.map(([key, value]) => (
 						<a
 							key={key}
 							href={value}
-							target='_blank'
+							target="_blank"
 							style={{
 								padding: '0.35rem 0.65rem',
 								fontSize: '0.75rem',
@@ -53,7 +55,8 @@ export default function About({ bot }: { bot: Bot }) {
 								border: '1px solid var(--border)',
 								background: 'rgba(255,255,255,0.04)',
 								opacity: 0.9,
-							}}>
+							}}
+						>
 							{key}
 						</a>
 					))}
@@ -68,14 +71,16 @@ export default function About({ bot }: { bot: Bot }) {
 						borderRadius: '0.75rem',
 						background: 'var(--container)',
 						padding: '1.25rem',
-					}}>
+					}}
+				>
 					<div
 						style={{
 							fontWeight: 600,
 							marginBottom: '0.75rem',
 							fontSize: '0.95rem',
 							opacity: 0.9,
-						}}>
+						}}
+					>
 						About
 					</div>
 
@@ -84,7 +89,8 @@ export default function About({ bot }: { bot: Bot }) {
 							opacity: 0.85,
 							lineHeight: 1.6,
 							fontSize: '0.95rem',
-						}}>
+						}}
+					>
 						<ReactMarkdown
 							remarkPlugins={[remarkGfm]}
 							rehypePlugins={[rehypeSanitize]}
@@ -95,11 +101,12 @@ export default function About({ bot }: { bot: Bot }) {
 								a: ({ href, children }) => (
 									<a
 										href={href}
-										target='_blank'
+										target="_blank"
 										style={{
 											color: 'var(--accent)',
 											textDecoration: 'underline',
-										}}>
+										}}
+									>
 										{children}
 									</a>
 								),
@@ -110,12 +117,14 @@ export default function About({ bot }: { bot: Bot }) {
 											padding: '0.15rem 0.3rem',
 											borderRadius: '0.3rem',
 											fontSize: '0.85rem',
-										}}>
+										}}
+									>
 										{children}
 									</code>
 								),
 								ul: ({ children }) => <ul style={{ paddingLeft: '1.2rem' }}>{children}</ul>,
-							}}>
+							}}
+						>
 							{bot.info || bot.description}
 						</ReactMarkdown>
 					</div>

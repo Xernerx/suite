@@ -46,10 +46,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 		<ToastContext.Provider value={value}>
 			{children}
 
-			<div className='pointer-events-none fixed inset-x-0 bottom-6 z-[9999] flex justify-center px-4'>
-				<div className='flex w-full max-w-md flex-col items-center gap-2'>
+			<div className="pointer-events-none fixed inset-x-0 bottom-6 z-[9999] flex justify-center px-4">
+				<div className="flex w-full max-w-md flex-col items-center gap-2">
 					{/* AnimatePresence enables exit animations for items removed from the array */}
-					<AnimatePresence mode='popLayout'>
+					<AnimatePresence mode="popLayout">
 						{toasts.map((item) => (
 							<Toast key={item.id} id={item.id} message={item.message} type={item.type} onClose={removeToast} />
 						))}
@@ -87,7 +87,8 @@ function Toast({ id, message, type, onClose }: { id: number; message: string; ty
 			animate={{ opacity: 1, y: 0, scale: 1 }}
 			exit={{ opacity: 0, y: 15, scale: 0.95, transition: { duration: 0.2 } }}
 			transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-			className={`pointer-events-auto relative w-full overflow-hidden rounded-2xl border px-4 pb-3 pt-4 shadow-2xl backdrop-blur-md ${styles[type].card}`}>
+			className={`pointer-events-auto relative w-full overflow-hidden rounded-2xl border px-4 pb-3 pt-4 shadow-2xl backdrop-blur-md ${styles[type].card}`}
+		>
 			{/* Progress Bar Animation */}
 			<motion.div
 				initial={{ scaleX: 1 }}
@@ -96,14 +97,14 @@ function Toast({ id, message, type, onClose }: { id: number; message: string; ty
 				className={`absolute left-0 top-0 h-1 w-full origin-left ${styles[type].bar}`}
 			/>
 
-			<div className='flex items-center justify-between gap-3'>
-				<div className='flex min-w-0 flex-col'>
-					<span className='text-xs font-medium uppercase tracking-[0.16em] opacity-60'>{type}</span>
-					<p className='truncate text-sm font-medium'>{message}</p>
+			<div className="flex items-center justify-between gap-3">
+				<div className="flex min-w-0 flex-col">
+					<span className="text-xs font-medium uppercase tracking-[0.16em] opacity-60">{type}</span>
+					<p className="truncate text-sm font-medium">{message}</p>
 				</div>
 
-				<button type='button' onClick={() => onClose(id)} className='group cursor-pointer rounded-lg p-1 transition hover:bg-white/10' aria-label='Close notification'>
-					<X className='h-4 w-4 opacity-60 transition group-hover:opacity-100' />
+				<button type="button" onClick={() => onClose(id)} className="group cursor-pointer rounded-lg p-1 transition hover:bg-white/10" aria-label="Close notification">
+					<X className="h-4 w-4 opacity-60 transition group-hover:opacity-100" />
 				</button>
 			</div>
 		</motion.div>

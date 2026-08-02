@@ -80,10 +80,10 @@ export default function Appearance() {
 	}
 
 	return (
-		<div className='flex flex-col w-full' style={{ gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
 			{/* THEME */}
-			<SettingsCard icon={<Monitor size={18} />} title='Theme' desc='Choose how Xernerx looks.'>
-				<div className='flex gap-3'>
+			<SettingsCard icon={<Monitor size={18} />} title="Theme" desc="Choose how Xernerx looks.">
+				<div className="flex gap-3">
 					{['light', 'dark', 'system'].map((m) => (
 						<button key={m} onClick={() => setMode(m as any)} className={button(mode === m)} style={mode === m ? { background: 'rgb(var(--accent))' } : {}}>
 							{m.charAt(0).toUpperCase() + m.slice(1)}
@@ -93,17 +93,17 @@ export default function Appearance() {
 			</SettingsCard>
 
 			{/* ACCENT */}
-			<SettingsCard icon={<Palette size={18} />} title='Accent Color' desc='Choose your interface accent.'>
-				<div className='flex flex-col gap-3'>
+			<SettingsCard icon={<Palette size={18} />} title="Accent Color" desc="Choose your interface accent.">
+				<div className="flex flex-col gap-3">
 					{/* PRIMARY (recommended) */}
-					<div className='flex flex-wrap gap-3'>
+					<div className="flex flex-wrap gap-3">
 						{primary.map((c) => (
 							<ColorDot key={c} color={c} active={accentColor === c} onClick={() => setAccentColor(c)} />
 						))}
 					</div>
 
 					{/* SECONDARY */}
-					<div className='flex flex-wrap gap-3 opacity-70' style={{ filter: 'saturate(0.9)' }}>
+					<div className="flex flex-wrap gap-3 opacity-70" style={{ filter: 'saturate(0.9)' }}>
 						{secondary.map((c) => (
 							<ColorDot key={c} color={c} active={accentColor === c} onClick={() => setAccentColor(c)} />
 						))}
@@ -112,12 +112,12 @@ export default function Appearance() {
 			</SettingsCard>
 
 			{/* BACKGROUND */}
-			<SettingsCard icon={<Sparkles size={18} />} title='Background' desc='Visual effect behind the UI.'>
-				<div className='flex flex-wrap gap-3'>
+			<SettingsCard icon={<Sparkles size={18} />} title="Background" desc="Visual effect behind the UI.">
+				<div className="flex flex-wrap gap-3">
 					{BACKGROUNDS.map((b) => (
 						<button key={b} onClick={() => setBackground(b as any)} className={`w-8 h-8 rounded border transition ${background === b ? 'border-white scale-110' : 'border-white/20'}`}>
 							<div
-								className='w-full h-full'
+								className="w-full h-full"
 								style={{
 									background: b === 'none' ? 'var(--bg-panel)' : `var(--bg-${b}), var(--bg-panel)`,
 								}}
@@ -128,8 +128,8 @@ export default function Appearance() {
 			</SettingsCard>
 
 			{/* SPACING */}
-			<SettingsCard icon={<LayoutGrid size={18} />} title='Spacing' desc='Distance between elements.'>
-				<div className='flex gap-3'>
+			<SettingsCard icon={<LayoutGrid size={18} />} title="Spacing" desc="Distance between elements.">
+				<div className="flex gap-3">
 					{['compact', 'default', 'spacious'].map((s) => (
 						<button key={s} onClick={() => setUISpacing(s as any)} className={button(uiSpacing === s)} style={uiSpacing === s ? { background: 'rgb(var(--accent))' } : {}}>
 							{s}
@@ -139,9 +139,9 @@ export default function Appearance() {
 			</SettingsCard>
 
 			{/* ZOOM */}
-			<SettingsCard icon={<ZoomIn size={18} />} title='Zoom' desc='Scale the interface.'>
+			<SettingsCard icon={<ZoomIn size={18} />} title="Zoom" desc="Scale the interface.">
 				<input
-					type='range'
+					type="range"
 					min={75}
 					max={150}
 					step={5}
@@ -151,10 +151,10 @@ export default function Appearance() {
 						setZoomPreview(val);
 						setZoom(val);
 					}}
-					className='slider w-full'
+					className="slider w-full"
 				/>
 
-				<div className='flex justify-between text-xs text-(--text-muted)'>
+				<div className="flex justify-between text-xs text-(--text-muted)">
 					<span>75%</span>
 					<span style={{ color: 'rgb(var(--accent))' }}>{zoomPreview}%</span>
 					<span>150%</span>
@@ -164,8 +164,8 @@ export default function Appearance() {
 			{/* SYNC */}
 			<SettingsCard
 				icon={<RefreshCw size={18} />}
-				title='Sync'
-				desc='Share theme across clients.'
+				title="Sync"
+				desc="Share theme across clients."
 				isRow={true} // Render side-by-side layout for switches
 			>
 				<Switch checked={syncAcrossClients} onChange={setSyncAcrossClients} />
@@ -185,7 +185,7 @@ function SettingsCard({ icon, title, desc, children, isRow = false }: any) {
 		<motion.div
 			initial={{ opacity: 0, y: 6 }}
 			animate={{ opacity: 1, y: 0 }}
-			className='rounded-xl border'
+			className="rounded-xl border"
 			style={{
 				background: 'var(--container)',
 				borderColor: 'var(--border)',
@@ -195,12 +195,13 @@ function SettingsCard({ icon, title, desc, children, isRow = false }: any) {
 				justifyContent: isRow ? 'space-between' : 'flex-start',
 				alignItems: isRow ? 'center' : 'stretch',
 				gap: 'calc(var(--ui-gap) * 1)',
-			}}>
-			<div className='flex items-center gap-3'>
+			}}
+		>
+			<div className="flex items-center gap-3">
 				<div style={{ color: 'rgb(var(--accent))' }}>{icon}</div>
 				<div>
-					<div className='text-sm font-medium'>{title}</div>
-					<div className='text-xs' style={{ color: 'var(--text-muted)' }}>
+					<div className="text-sm font-medium">{title}</div>
+					<div className="text-xs" style={{ color: 'var(--text-muted)' }}>
 						{desc}
 					</div>
 				</div>

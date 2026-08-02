@@ -54,24 +54,25 @@ export function CookiePrompt() {
 
 	return (
 		<div
-			className='fixed z-[100] w-[calc(100%-2rem)] max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl'
+			className="fixed z-[100] w-[calc(100%-2rem)] max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl"
 			style={{
 				bottom: 'var(--ui-gap)',
 				left: 'var(--ui-gap)',
 				padding: 'var(--ui-gap)',
 				fontSize: 'var(--text-scale, 14px)',
-			}}>
-			<div className='flex flex-col' style={{ gap: 'var(--ui-gap)' }}>
-				<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h3 className='text-lg font-semibold text-(--accent)'>{t('common.cookiePrompt.title', {}, 'Cookie Preferences')}</h3>
-					<p className='text-sm text-(--text-muted)'>
+			}}
+		>
+			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+					<h3 className="text-lg font-semibold text-(--accent)">{t('common.cookiePrompt.title', {}, 'Cookie Preferences')}</h3>
+					<p className="text-sm text-(--text-muted)">
 						{t('common.cookiePrompt.description', {}, 'We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.')}
 					</p>
 				</div>
 
 				{/* Manage Preferences Dropdown */}
 				{showManage && (
-					<div className='flex flex-col rounded-2xl bg-(--background) border border-(--border)/10' style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+					<div className="flex flex-col rounded-2xl bg-(--background) border border-(--border)/10" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<PreferenceToggle
 							label={t('common.cookiePrompt.manage.essential.label', {}, 'Essential')}
 							description={t('common.cookiePrompt.manage.essential.description', {}, 'Required for sessions and security.')}
@@ -95,21 +96,21 @@ export function CookiePrompt() {
 				)}
 
 				{/* Action Buttons */}
-				<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{showManage ? (
-						<Button variant='primary' onClick={handleSavePreferences} className='w-full'>
+						<Button variant="primary" onClick={handleSavePreferences} className="w-full">
 							{t('common.cookiePrompt.buttons.save', {}, 'Save My Preferences')}
 						</Button>
 					) : (
 						<>
-							<Button variant='primary' onClick={handleAcceptAll} className='w-full'>
+							<Button variant="primary" onClick={handleAcceptAll} className="w-full">
 								{t('common.cookiePrompt.buttons.acceptAll', {}, 'Accept All')}
 							</Button>
-							<div className='flex' style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-								<Button variant='secondary' onClick={handleEssentialOnly} className='flex-1'>
+							<div className="flex" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+								<Button variant="secondary" onClick={handleEssentialOnly} className="flex-1">
 									{t('common.cookiePrompt.buttons.essentialOnly', {}, 'Essential Only')}
 								</Button>
-								<Button variant='secondary' onClick={() => setShowManage(true)} className='flex-1'>
+								<Button variant="secondary" onClick={() => setShowManage(true)} className="flex-1">
 									{t('common.cookiePrompt.buttons.manage', {}, 'Manage')}
 								</Button>
 							</div>
@@ -125,9 +126,9 @@ export function CookiePrompt() {
 function PreferenceToggle({ label, description, checked, disabled = false, onChange }: { label: string; description: string; checked: boolean; disabled?: boolean; onChange: () => void }) {
 	return (
 		<label className={`flex cursor-pointer items-start justify-between gap-4 ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}>
-			<div className='flex flex-col'>
-				<span className='text-sm font-medium text-(--text)'>{label}</span>
-				<span className='text-xs text-(--text-muted)'>{description}</span>
+			<div className="flex flex-col">
+				<span className="text-sm font-medium text-(--text)">{label}</span>
+				<span className="text-xs text-(--text-muted)">{description}</span>
 			</div>
 			<Toggle checked={checked} disabled={disabled} onChange={onChange} />
 		</label>

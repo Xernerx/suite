@@ -106,12 +106,12 @@ export default function Invites() {
 	}
 
 	return (
-		<div className='flex flex-col mx-auto w-full max-w-9xl gap-6 px-4 py-6 sm:p-6'>
+		<div className="flex flex-col mx-auto w-full max-w-9xl gap-6 px-4 py-6 sm:p-6">
 			{/* HEADER */}
-			<div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3'>
-				<h1 className='text-2xl font-semibold'>Invites</h1>
+			<div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+				<h1 className="text-2xl font-semibold">Invites</h1>
 
-				<button onClick={() => setCreating(true)} className='flex items-center gap-2 px-4 py-2 rounded-md text-sm' style={{ background: 'var(--accent)', color: '#fff' }}>
+				<button onClick={() => setCreating(true)} className="flex items-center gap-2 px-4 py-2 rounded-md text-sm" style={{ background: 'var(--accent)', color: '#fff' }}>
 					<Plus size={16} /> New
 				</button>
 			</div>
@@ -120,8 +120,8 @@ export default function Invites() {
 			<input
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
-				placeholder='Search...'
-				className='px-3 py-2 rounded-md text-sm outline-none w-full'
+				placeholder="Search..."
+				className="px-3 py-2 rounded-md text-sm outline-none w-full"
 				style={{
 					background: 'var(--bg-main)',
 					border: '1px solid var(--border)',
@@ -131,38 +131,44 @@ export default function Invites() {
 			{/* CREATE */}
 			<AnimatePresence>
 				{creating && (
-					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='p-4 rounded-xl flex gap-2 flex-col sm:flex-row' style={{ background: 'var(--container)' }}>
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="p-4 rounded-xl flex gap-2 flex-col sm:flex-row"
+						style={{ background: 'var(--container)' }}
+					>
 						<input
-							className='px-3 py-2 rounded-md text-sm outline-none w-full'
+							className="px-3 py-2 rounded-md text-sm outline-none w-full"
 							style={{
 								background: 'var(--bg-main)',
 								border: '1px solid var(--border)',
 							}}
-							placeholder='Bot ID'
+							placeholder="Bot ID"
 							value={newInvite.id}
 							onChange={(e) => setNewInvite({ ...newInvite, id: e.target.value })}
 						/>
 						<input
-							className='px-3 py-2 rounded-md text-sm outline-none w-full'
+							className="px-3 py-2 rounded-md text-sm outline-none w-full"
 							style={{
 								background: 'var(--bg-main)',
 								border: '1px solid var(--border)',
 							}}
-							placeholder='Name'
+							placeholder="Name"
 							value={newInvite.name}
 							onChange={(e) => setNewInvite({ ...newInvite, name: e.target.value })}
 						/>
 						<input
-							className='px-3 py-2 rounded-md text-sm outline-none w-full'
+							className="px-3 py-2 rounded-md text-sm outline-none w-full"
 							style={{
 								background: 'var(--bg-main)',
 								border: '1px solid var(--border)',
 							}}
-							placeholder='Short name'
+							placeholder="Short name"
 							value={newInvite.shortName}
 							onChange={(e) => setNewInvite({ ...newInvite, shortName: e.target.value })}
 						/>
-						<div className='flex flex-row gap-3'>
+						<div className="flex flex-row gap-3">
 							<button onClick={create}>
 								<Check size={16} />
 							</button>
@@ -187,15 +193,16 @@ export default function Invites() {
 							key={invite.id}
 							layout
 							whileHover={{ y: -2 }}
-							className='rounded-xl relative overflow-hidden'
+							className="rounded-xl relative overflow-hidden"
 							style={{
 								background: 'var(--container)',
 								border: '1px solid var(--border)',
 								padding: 'calc(var(--ui-gap) * 1.5)',
-							}}>
+							}}
+						>
 							{/* subtle hover glow */}
 							<div
-								className='absolute inset-0 opacity-0 hover:opacity-100 transition pointer-events-none'
+								className="absolute inset-0 opacity-0 hover:opacity-100 transition pointer-events-none"
 								style={{
 									background: 'radial-gradient(circle at top, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%)',
 								}}
@@ -212,40 +219,40 @@ export default function Invites() {
 												[invite.id]: { ...data, name: e.target.value },
 											}))
 										}
-										className='bg-transparent outline-none font-medium text-sm'
+										className="bg-transparent outline-none font-medium text-sm"
 									/>
 								) : (
-									<div className='flex flex-col'>
-										<span className='font-medium'>{invite.name}</span>
-										{invite.shortName && <span className='text-xs text-(--text-muted)'>{invite.shortName}</span>}
+									<div className="flex flex-col">
+										<span className="font-medium">{invite.name}</span>
+										{invite.shortName && <span className="text-xs text-(--text-muted)">{invite.shortName}</span>}
 									</div>
 								)}
 
-								<div className='flex items-center gap-2'>
+								<div className="flex items-center gap-2">
 									{isOpen && (
 										<>
 											{isEditing ? (
 												<>
-													<button onClick={() => save(invite.id)} className='p-1 rounded-md hover:bg-white/10'>
+													<button onClick={() => save(invite.id)} className="p-1 rounded-md hover:bg-white/10">
 														<Check size={16} />
 													</button>
-													<button onClick={() => setEditing(null)} className='p-1 rounded-md hover:bg-white/10'>
+													<button onClick={() => setEditing(null)} className="p-1 rounded-md hover:bg-white/10">
 														<X size={16} />
 													</button>
 												</>
 											) : (
-												<button onClick={() => startEdit(invite)} className='p-1 rounded-md hover:bg-white/10'>
+												<button onClick={() => startEdit(invite)} className="p-1 rounded-md hover:bg-white/10">
 													<Pencil size={16} />
 												</button>
 											)}
 
-											<button onClick={() => remove(invite.id)} className='p-1 rounded-md hover:bg-red-500/20'>
+											<button onClick={() => remove(invite.id)} className="p-1 rounded-md hover:bg-red-500/20">
 												<Trash2 size={16} />
 											</button>
 										</>
 									)}
 
-									<button onClick={() => toggleOpen(invite.id)} className='p-1 rounded-md hover:bg-white/10'>
+									<button onClick={() => toggleOpen(invite.id)} className="p-1 rounded-md hover:bg-white/10">
 										{isOpen ? <ChevronUp /> : <ChevronDown />}
 									</button>
 								</div>
@@ -254,18 +261,19 @@ export default function Invites() {
 							{/* DETAILS */}
 							<AnimatePresence>
 								{isOpen && (
-									<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className='overflow-hidden'>
-										<div className='flex flex-col' style={{ gap: 'calc(var(--ui-gap) * 0.8)', marginTop: '1rem' }}>
+									<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.8)', marginTop: '1rem' }}>
 											{/* ID COPY BOX */}
 											<div
-												className='flex  justify-between items-center gap-3 px-3 py-2 rounded-md text-xs font-mono'
+												className="flex  justify-between items-center gap-3 px-3 py-2 rounded-md text-xs font-mono"
 												style={{
 													background: 'var(--bg-main)',
 													border: '1px solid var(--border)',
-												}}>
-												<span className='opacity-70 truncate break-all'>{invite.id}</span>
+												}}
+											>
+												<span className="opacity-70 truncate break-all">{invite.id}</span>
 
-												<button onClick={() => navigator.clipboard.writeText(invite.id)} className='p-1 rounded hover:bg-white/10'>
+												<button onClick={() => navigator.clipboard.writeText(invite.id)} className="p-1 rounded hover:bg-white/10">
 													<Copy size={14} />
 												</button>
 											</div>
@@ -283,8 +291,8 @@ export default function Invites() {
 															},
 														}))
 													}
-													placeholder='Short name'
-													className='px-3 py-2 rounded-md text-xs outline-none'
+													placeholder="Short name"
+													className="px-3 py-2 rounded-md text-xs outline-none"
 													style={{
 														background: 'var(--bg-main)',
 														border: '1px solid var(--border)',
@@ -294,43 +302,47 @@ export default function Invites() {
 
 											{/* PERMISSIONS */}
 											<div
-												className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 text-xs rounded-md p-3 overflow-auto'
+												className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 text-xs rounded-md p-3 overflow-auto"
 												style={{
 													background: 'var(--bg-main)',
 													border: '1px solid var(--border)',
-												}}>
+												}}
+											>
 												{ALL_PERMISSIONS.map(([key, value]) => {
 													const active = (selectedPerms[invite.id] || []).includes(value);
 
 													return (
 														<label
 															key={key}
-															className='flex items-center justify-between gap-2 px-3 py-2.5 rounded-md transition'
+															className="flex items-center justify-between gap-2 px-3 py-2.5 rounded-md transition"
 															style={{
 																background: active ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent',
-															}}>
+															}}
+														>
 															<span
-																className='text-xs transition truncate'
+																className="text-xs transition truncate"
 																style={{
 																	color: active ? 'var(--text-main)' : 'var(--text-muted)',
-																}}>
+																}}
+															>
 																{key}
 															</span>
 
 															{/* toggle */}
 															<button
-																type='button'
+																type="button"
 																onClick={() => isEditing && togglePerm(invite.id, value)}
 																disabled={!isEditing}
-																className='relative w-9 h-5 rounded-full transition'
+																className="relative w-9 h-5 rounded-full transition"
 																style={{
 																	background: active ? 'var(--accent)' : 'color-mix(in srgb, var(--border) 70%, transparent)',
 																	opacity: isEditing ? 1 : 0.5,
-																}}>
+																}}
+															>
 																<motion.div
 																	layout
 																	transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-																	className='absolute top-0.5 w-4 h-4 rounded-full bg-white'
+																	className="absolute top-0.5 w-4 h-4 rounded-full bg-white"
 																	style={{
 																		left: active ? 'calc(100% - 18px)' : '2px',
 																	}}
@@ -343,12 +355,13 @@ export default function Invites() {
 
 											{/* INVITE URL */}
 											<div
-												className='text-xs break-all px-2 py-1 rounded-md'
+												className="text-xs break-all px-2 py-1 rounded-md"
 												style={{
 													background: 'var(--bg-main)',
 													border: '1px solid var(--border)',
 													color: 'var(--text-muted)',
-												}}>
+												}}
+											>
 												https://discord.com/oauth2/authorize?client_id=
 												{invite.id}&permissions={computePerms(invite.id)}&scope=bot+applications.commands
 											</div>

@@ -83,16 +83,16 @@ export default function Organizations() {
 
 	if (loading) {
 		return (
-			<div className='text-sm' style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
+			<div className="text-sm" style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
 				Loading organizations...
 			</div>
 		);
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
+		<div className="flex flex-col gap-4">
 			{/* selector */}
-			<div className='flex gap-2 overflow-x-auto overflow-y-hidden'>
+			<div className="flex gap-2 overflow-x-auto overflow-y-hidden">
 				{orgs?.map((org) => {
 					const isSelected = selectedOrgId === org._id;
 
@@ -100,12 +100,13 @@ export default function Organizations() {
 						<button
 							key={org._id}
 							onClick={() => setSelectedOrgId(org._id)}
-							className='group shrink-0 rounded-3xl border p-1 transition hover:scale-[1.03]'
+							className="group shrink-0 rounded-3xl border p-1 transition hover:scale-[1.03]"
 							style={{
 								borderColor: isSelected ? 'color-mix(in srgb, var(--text-main) 18%, var(--border))' : 'transparent',
 								background: isSelected ? 'color-mix(in srgb, var(--text-main) 8%, transparent)' : 'transparent',
-							}}>
-							<div className='flex h-20 w-20 items-center justify-center rounded-2xl text-sm font-semibold'>
+							}}
+						>
+							<div className="flex h-20 w-20 items-center justify-center rounded-2xl text-sm font-semibold">
 								{org?.name
 									?.split(' ')
 									.map((s) => s[0])
@@ -118,47 +119,51 @@ export default function Organizations() {
 				{/* create button */}
 				<button
 					onClick={createOrg}
-					className='flex h-22 w-22 shrink-0 items-center justify-center rounded-3xl border transition hover:scale-[1.05]'
+					className="flex h-22 w-22 shrink-0 items-center justify-center rounded-3xl border transition hover:scale-[1.05]"
 					style={{
 						borderColor: 'color-mix(in srgb, var(--accent) 30%, var(--border))',
 						background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
-					}}>
-					<Plus className='h-6 w-6' />
+					}}
+				>
+					<Plus className="h-6 w-6" />
 				</button>
 			</div>
 
 			{/* banner */}
 			{selectedOrgId && (
 				<div
-					className='rounded-3xl border p-6'
+					className="rounded-3xl border p-6"
 					style={{
 						borderColor: 'var(--border)',
 						background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-					}}>
+					}}
+				>
 					<motion.div
 						key={selectedOrgId}
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
-						className='relative overflow-hidden rounded-3xl border'
+						className="relative overflow-hidden rounded-3xl border"
 						style={{
 							borderColor: 'var(--border)',
 							background: 'var(--bg-panel)',
-						}}>
+						}}
+					>
 						<div
-							className='absolute inset-0'
+							className="absolute inset-0"
 							style={{
 								background: 'radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 12%, transparent), transparent 35%)',
 							}}
 						/>
 
-						<div className='relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6'>
+						<div className="relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6">
 							<div
-								className='shrink-0 rounded-[1.4rem] border p-1 shadow-2xl backdrop-blur-md'
+								className="shrink-0 rounded-[1.4rem] border p-1 shadow-2xl backdrop-blur-md"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'color-mix(in srgb, var(--bg-panel) 82%, transparent)',
-								}}>
-								<div className='flex h-20 w-20 items-center justify-center rounded-2xl text-xl font-semibold'>
+								}}
+							>
+								<div className="flex h-20 w-20 items-center justify-center rounded-2xl text-xl font-semibold">
 									{profile?.name
 										?.split(' ')
 										.map((s) => s[0])
@@ -167,15 +172,16 @@ export default function Organizations() {
 							</div>
 
 							<div>
-								<h2 className='text-2xl font-semibold' style={{ color: 'var(--text-main)' }}>
+								<h2 className="text-2xl font-semibold" style={{ color: 'var(--text-main)' }}>
 									{profile?.name ?? 'Organization'}
 								</h2>
 
 								<p
-									className='text-sm'
+									className="text-sm"
 									style={{
 										color: 'color-mix(in srgb, var(--text-main) 65%, transparent)',
-									}}>
+									}}
+								>
 									{selectedOrgId}
 								</p>
 							</div>
@@ -186,12 +192,13 @@ export default function Organizations() {
 
 			{/* content */}
 			<div
-				className='rounded-3xl border p-6'
+				className="rounded-3xl border p-6"
 				style={{
 					borderColor: 'var(--border)',
 					background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-				}}>
-				{profileLoading ? <div className='text-sm opacity-60'>Loading...</div> : profile ? <OrgGeneral profile={profile} setProfile={setProfile} id={selectedOrgId!} /> : null}
+				}}
+			>
+				{profileLoading ? <div className="text-sm opacity-60">Loading...</div> : profile ? <OrgGeneral profile={profile} setProfile={setProfile} id={selectedOrgId!} /> : null}
 			</div>
 		</div>
 	);
@@ -248,20 +255,20 @@ function OrgGeneral({ profile, setProfile, id }: any) {
 	}
 
 	return (
-		<div className='flex flex-col gap-4'>
-			<div className='flex justify-end gap-2'>
-				<button onClick={handleReset} disabled={!hasChanges} className='rounded-2xl border px-4 py-2 text-sm opacity-70'>
+		<div className="flex flex-col gap-4">
+			<div className="flex justify-end gap-2">
+				<button onClick={handleReset} disabled={!hasChanges} className="rounded-2xl border px-4 py-2 text-sm opacity-70">
 					Reset
 				</button>
 
-				<button onClick={handleSave} disabled={!hasChanges || saving} className='rounded-2xl border px-4 py-2 text-sm font-medium'>
+				<button onClick={handleSave} disabled={!hasChanges || saving} className="rounded-2xl border px-4 py-2 text-sm font-medium">
 					{saving ? 'Saving...' : hasChanges ? 'Save changes' : 'Saved'}
 				</button>
 			</div>
 
-			<input value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder='Organization name' className='rounded-2xl border px-4 py-3 text-sm' />
+			<input value={form.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Organization name" className="rounded-2xl border px-4 py-3 text-sm" />
 
-			<textarea value={form.description} onChange={(e) => updateField('description', e.target.value)} placeholder='Description' rows={4} className='rounded-2xl border px-4 py-3 text-sm' />
+			<textarea value={form.description} onChange={(e) => updateField('description', e.target.value)} placeholder="Description" rows={4} className="rounded-2xl border px-4 py-3 text-sm" />
 		</div>
 	);
 }

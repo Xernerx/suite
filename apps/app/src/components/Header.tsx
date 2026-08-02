@@ -135,7 +135,8 @@ export default function Header() {
 					flexDirection: 'column',
 					justifyContent: 'center',
 				} as React.CSSProperties
-			}>
+			}
+		>
 			{/* TOP BAR */}
 			<div
 				style={{
@@ -143,9 +144,10 @@ export default function Header() {
 					alignItems: 'center',
 					padding: '0 20px',
 					height: 60,
-				}}>
+				}}
+			>
 				{/* LEFT */}
-				<div className='flex items-center gap-8'>
+				<div className="flex items-center gap-8">
 					{state !== 'hidden' && (
 						<button
 							onClick={toggle}
@@ -155,32 +157,33 @@ export default function Header() {
 								cursor: 'pointer',
 								color: 'var(--text-main)',
 							}}
-							className='p-2 rounded-md transition hover:bg-white/5'>
+							className="p-2 rounded-md transition hover:bg-white/5"
+						>
 							<Menu size={20} />
 						</button>
 					)}
 
-					<Link href='/'>
-						<div className='h-8 flex items-center'>
-							<Banner className='h-full w-auto' style={{ color: 'var(--accent)' }} />
+					<Link href="/">
+						<div className="h-8 flex items-center">
+							<Banner className="h-full w-auto" style={{ color: 'var(--accent)' }} />
 						</div>
 					</Link>
 				</div>
 
-				<div style={{ flex: 1, WebkitAppRegion: 'drag' } as React.CSSProperties} className='w-full h-full' />
+				<div style={{ flex: 1, WebkitAppRegion: 'drag' } as React.CSSProperties} className="w-full h-full" />
 
 				{/* WINDOW CONTROLS */}
 				{type === 'application' && (
-					<div className='flex items-center'>
-						<button className='w-11 h-9 flex items-center justify-center hover:bg-white/5' onClick={() => window.electron?.minimize()}>
+					<div className="flex items-center">
+						<button className="w-11 h-9 flex items-center justify-center hover:bg-white/5" onClick={() => window.electron?.minimize()}>
 							<Minus size={16} />
 						</button>
 
-						<button className='w-11 h-9 flex items-center justify-center hover:bg-white/5' onClick={toggleMaximize}>
+						<button className="w-11 h-9 flex items-center justify-center hover:bg-white/5" onClick={toggleMaximize}>
 							{maximized ? <Copy size={14} /> : <Square size={14} />}
 						</button>
 
-						<button className='w-11 h-9 flex items-center justify-center hover:bg-red-500/20' onClick={() => window.electron?.close()}>
+						<button className="w-11 h-9 flex items-center justify-center hover:bg-red-500/20" onClick={() => window.electron?.close()}>
 							<X size={16} />
 						</button>
 					</div>
@@ -200,19 +203,20 @@ export default function Header() {
 							alignItems: 'center',
 							gap: 8,
 							padding: '0 20px 10px',
-						}}>
-						<button onClick={() => router.push('/')} className='p-2 hover:bg-white/5 rounded-md'>
+						}}
+					>
+						<button onClick={() => router.push('/')} className="p-2 hover:bg-white/5 rounded-md">
 							<Home size={18} />
 						</button>
-						<button onClick={router.back} className='p-2 hover:bg-white/5 rounded-md'>
+						<button onClick={router.back} className="p-2 hover:bg-white/5 rounded-md">
 							<ChevronLeft size={18} />
 						</button>
 
-						<button onClick={router.forward} className='p-2 hover:bg-white/5 rounded-md'>
+						<button onClick={router.forward} className="p-2 hover:bg-white/5 rounded-md">
 							<ChevronRight size={18} />
 						</button>
 
-						<button onClick={router.refresh} className='p-2 hover:bg-white/5 rounded-md'>
+						<button onClick={router.refresh} className="p-2 hover:bg-white/5 rounded-md">
 							<RefreshCw size={18} />
 						</button>
 
@@ -227,19 +231,21 @@ export default function Header() {
 								background: 'color-mix(in srgb, var(--bg-main) 70%, black)',
 								padding: '0 12px',
 								color: 'var(--text-main)',
-							}}>
+							}}
+						>
 							<span
 								style={{
 									color: 'var(--text-muted)',
 									userSelect: 'none',
 
 									whiteSpace: 'nowrap',
-								}}>
+								}}
+							>
 								{window.location.origin}
 							</span>
 
 							<input
-								type='text'
+								type="text"
 								value={path}
 								onChange={(e) => setPath(e.target.value)}
 								onKeyDown={(e) => {
@@ -281,7 +287,8 @@ export default function Header() {
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-						}}>
+						}}
+					>
 						<motion.div
 							initial={{ scale: 0.95, opacity: 0 }}
 							animate={{ scale: 1, opacity: 1 }}
@@ -297,7 +304,8 @@ export default function Header() {
 								background: 'var(--bg-panel)',
 								border: '1px solid var(--border)',
 								boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-							}}>
+							}}
+						>
 							<h2 style={{ marginBottom: 20, fontSize: 18 }}>Keyboard Shortcuts</h2>
 							<div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 								{Object.entries(grouped).map(([category, items]) => (
@@ -309,7 +317,8 @@ export default function Header() {
 												color: 'var(--text-muted)',
 												textTransform: 'uppercase',
 												letterSpacing: 1,
-											}}>
+											}}
+										>
 											{category}
 										</div>
 
@@ -325,7 +334,8 @@ export default function Header() {
 														borderRadius: 10,
 														background: 'color-mix(in srgb, var(--bg-main) 60%, black)',
 														border: '1px solid var(--border)',
-													}}>
+													}}
+												>
 													<span>{s.description}</span>
 
 													<div style={{ display: 'flex', gap: 6 }}>
@@ -339,7 +349,8 @@ export default function Header() {
 																	fontFamily: 'monospace',
 																	background: 'color-mix(in srgb, var(--bg-main) 80%, black)',
 																	border: '1px solid var(--border)',
-																}}>
+																}}
+															>
 																{key}
 															</span>
 														))}
@@ -351,7 +362,7 @@ export default function Header() {
 								))}
 							</div>
 							<div
-								className='--text-(--muted) flex gap-2'
+								className="--text-(--muted) flex gap-2"
 								style={{
 									marginTop: 10,
 									marginBottom: 10,
@@ -359,7 +370,8 @@ export default function Header() {
 									color: 'var(--text-muted)',
 									textTransform: 'uppercase',
 									letterSpacing: 1,
-								}}>
+								}}
+							>
 								{window?.electron?.version && <p>App {window.electron?.version} - </p>}
 								<p>Next {version}</p>
 							</div>

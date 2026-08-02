@@ -57,21 +57,22 @@ export default function Supporters() {
 	if (!supporters.length) return null;
 
 	return (
-		<div className='space-y-4'>
-			<h1 className='text-xl font-semibold'>Our Supporting Members</h1>
+		<div className="space-y-4">
+			<h1 className="text-xl font-semibold">Our Supporting Members</h1>
 
-			<div className='flex flex-wrap gap-3 overflow-y-visible overflow-x-hidden'>
+			<div className="flex flex-wrap gap-3 overflow-y-visible overflow-x-hidden">
 				{supporters.map((s, i) => {
 					const isMe = s.id === me;
 
 					return (
 						<div
 							key={s.id}
-							className='group relative flex-shrink-0'
+							className="group relative flex-shrink-0"
 							style={{
 								paddingRight: 140,
 								marginRight: -140,
-							}}>
+							}}
+						>
 							<motion.div
 								initial={{ opacity: 0, y: 10 }}
 								animate={{
@@ -84,18 +85,19 @@ export default function Supporters() {
 									type: isMe ? 'spring' : 'tween',
 									stiffness: 300,
 								}}
-								className='flex items-center rounded-xl border cursor-pointer relative'
+								className="flex items-center rounded-xl border cursor-pointer relative"
 								style={{
 									borderColor: isMe ? 'var(--accent)' : 'var(--border)',
 									background: 'var(--bg-main)',
 									padding: '6px 8px',
 									boxShadow: isMe ? '0 0 0 2px var(--accent-hover)' : 'none',
-								}}>
+								}}
+							>
 								{/* avatar */}
-								<div className='relative flex-shrink-0'>
-									<Image src={s.avatar_url} alt={s.username} width={36} height={36} className='h-10 w-10 rounded-full object-cover' />
+								<div className="relative flex-shrink-0">
+									<Image src={s.avatar_url} alt={s.username} width={36} height={36} className="h-10 w-10 rounded-full object-cover" />
 									<span
-										className='absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2'
+										className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2"
 										style={{
 											borderColor: 'var(--bg-main)',
 											background: s.status === 'online' ? 'rgb(34,197,94)' : s.status === 'idle' ? 'rgb(234,179,8)' : s.status === 'dnd' ? 'rgb(239,68,68)' : 'rgb(148,163,184)',
@@ -104,14 +106,15 @@ export default function Supporters() {
 								</div>
 
 								{/* username */}
-								<div className='overflow-hidden max-w-0 group-hover:max-w-35 transition-all duration-300'>
+								<div className="overflow-hidden max-w-0 group-hover:max-w-35 transition-all duration-300">
 									<span
-										className='text-sm whitespace-nowrap'
+										className="text-sm whitespace-nowrap"
 										style={{
 											color: 'var(--text-main)',
 											paddingLeft: 8,
 											paddingRight: 8,
-										}}>
+										}}
+									>
 										{s.username}
 									</span>
 								</div>
@@ -123,11 +126,12 @@ export default function Supporters() {
 											initial={{ opacity: 0, y: -10, scale: 0.8 }}
 											animate={{ opacity: 1, y: -20, scale: 1 }}
 											exit={{ opacity: 0 }}
-											className='absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs px-2 py-1 rounded-md shadow'
+											className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs px-2 py-1 rounded-md shadow"
 											style={{
 												background: 'var(--bg-main)',
 												border: '1px solid var(--border)',
-											}}>
+											}}
+										>
 											Hey! It’s you!
 										</motion.div>
 									)}

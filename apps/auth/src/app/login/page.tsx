@@ -45,16 +45,8 @@ export default function SignInPage() {
 					</div>
 
 					{/* LOGIN BUTTON */}
-					<Button
-						variant="primary"
-						size="lg"
-						onClick={handleLogin}
-						isLoading={loading}
-						className="w-full max-w-65 shadow-[0_10px_30px_var(--color-accent-hover)]"
-					>
-						{loading
-							? t('auth.signin.redirecting', {}, 'Redirecting…')
-							: t('auth.signin.button', {}, 'Continue with Discord')}
+					<Button variant="primary" size="lg" onClick={handleLogin} isLoading={loading} className="w-full max-w-65 shadow-[0_10px_30px_var(--color-accent-hover)]">
+						{loading ? t('auth.signin.redirecting', {}, 'Redirecting…') : t('auth.signin.button', {}, 'Continue with Discord')}
 					</Button>
 
 					{/* ABOUT TOGGLE */}
@@ -79,69 +71,37 @@ export default function SignInPage() {
 								<div className="mt-2 rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 text-left shadow-xl">
 									<div className="flex flex-col gap-4">
 										<div className="flex flex-col gap-0.5">
-											<h3 className="text-sm font-medium text-(--text)">
-												{t('auth.signin.permissions.profile.title')}
-											</h3>
-											<p className="text-xs text-(--text-muted)">
-												{t('auth.signin.permissions.profile.description')}
-											</p>
+											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.profile.title')}</h3>
+											<p className="text-xs text-(--text-muted)">{t('auth.signin.permissions.profile.description')}</p>
 										</div>
 
 										<div className="flex flex-col gap-0.5">
-											<h3 className="text-sm font-medium text-(--text)">
-												{t('auth.signin.permissions.email.title')}
-											</h3>
-											<p className="text-xs text-(--text-muted)">
-												{t('auth.signin.permissions.email.description')}
-											</p>
+											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.email.title')}</h3>
+											<p className="text-xs text-(--text-muted)">{t('auth.signin.permissions.email.description')}</p>
 										</div>
 
 										<div className="flex flex-col gap-0.5">
-											<h3 className="text-sm font-medium text-(--text)">
-												{t('auth.signin.permissions.connections.title')}
-											</h3>
-											<p className="text-xs text-(--text-muted)">
-												{t(
-													'auth.signin.permissions.connections.description'
-												)}
-											</p>
+											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.connections.title')}</h3>
+											<p className="text-xs text-(--text-muted)">{t('auth.signin.permissions.connections.description')}</p>
 										</div>
 
 										<div className="flex flex-col gap-0.5">
-											<h3 className="text-sm font-medium text-(--text)">
-												{t('auth.signin.permissions.joinServers.title')}
-											</h3>
-											<p className="text-xs text-(--text-muted)">
-												{t(
-													'auth.signin.permissions.joinServers.description'
-												)}
-											</p>
+											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.joinServers.title')}</h3>
+											<p className="text-xs text-(--text-muted)">{t('auth.signin.permissions.joinServers.description')}</p>
 										</div>
 
 										<div className="flex flex-col gap-0.5">
-											<h3 className="text-sm font-medium text-(--text)">
-												{t('auth.signin.permissions.servers.title')}
-											</h3>
-											<p className="text-xs text-(--text-muted)">
-												{t('auth.signin.permissions.servers.description')}
-											</p>
+											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.servers.title')}</h3>
+											<p className="text-xs text-(--text-muted)">{t('auth.signin.permissions.servers.description')}</p>
 										</div>
 
 										<div className="flex flex-col gap-0.5">
-											<h3 className="text-sm font-medium text-(--text)">
-												{t('auth.signin.permissions.memberInfo.title')}
-											</h3>
-											<p className="text-xs text-(--text-muted)">
-												{t(
-													'auth.signin.permissions.memberInfo.description'
-												)}
-											</p>
+											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.memberInfo.title')}</h3>
+											<p className="text-xs text-(--text-muted)">{t('auth.signin.permissions.memberInfo.description')}</p>
 										</div>
 
 										{/* DIVIDER */}
-										<div className="mt-2 border-t border-(--border)/10 pt-4 text-xs leading-relaxed text-(--text-muted)">
-											{t('auth.signin.permissions.footer')}
-										</div>
+										<div className="mt-2 border-t border-(--border)/10 pt-4 text-xs leading-relaxed text-(--text-muted)">{t('auth.signin.permissions.footer')}</div>
 									</div>
 								</div>
 							</motion.div>

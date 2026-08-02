@@ -59,9 +59,9 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 				onClick: () => setView('metamorphosis'),
 				icon: (
 					<Image
-						className='h-6 w-auto rounded-full'
-						src='https://cdn.discordapp.com/avatars/881678826906730547/25511e2ef0b8c1b29b487116a9461739.webp?size=4096'
-						alt='Metamorphosis'
+						className="h-6 w-auto rounded-full"
+						src="https://cdn.discordapp.com/avatars/881678826906730547/25511e2ef0b8c1b29b487116a9461739.webp?size=4096"
+						alt="Metamorphosis"
 						width={80}
 						height={80}
 					/>
@@ -72,7 +72,13 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 				label: 'Virtue',
 				onClick: () => setView('virtue'),
 				icon: (
-					<Image className='h-6 w-auto rounded-full' src='https://cdn.discordapp.com/avatars/1484880634844287138/bb9495686b0bab5efa38119c8e2f0bb3.webp?size=4096' alt='Virtue' width={80} height={80} />
+					<Image
+						className="h-6 w-auto rounded-full"
+						src="https://cdn.discordapp.com/avatars/1484880634844287138/bb9495686b0bab5efa38119c8e2f0bb3.webp?size=4096"
+						alt="Virtue"
+						width={80}
+						height={80}
+					/>
 				),
 				view: 'virtue',
 			},
@@ -80,7 +86,13 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 				label: 'Zodiac',
 				onClick: () => setView('zodiac'),
 				icon: (
-					<Image className='h-6 w-auto rounded-full' src='https://cdn.discordapp.com/avatars/950251264095162418/07a9e067135a204bb0fdc796b44bda63.webp?size=4096' alt='Zodiac' width={80} height={80} />
+					<Image
+						className="h-6 w-auto rounded-full"
+						src="https://cdn.discordapp.com/avatars/950251264095162418/07a9e067135a204bb0fdc796b44bda63.webp?size=4096"
+						alt="Zodiac"
+						width={80}
+						height={80}
+					/>
 				),
 				view: 'zodiac',
 			},
@@ -226,21 +238,29 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 	const bannerTextShadow = bannerTextMode === 'dark' ? '0 1px 10px rgba(255,255,255,0.08)' : '0 2px 18px rgba(0,0,0,0.45)';
 
 	return (
-		<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }} className='flex min-h-full flex-col gap-4'>
-			<AnimatePresence mode='wait'>
+		<motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }} className="flex min-h-full flex-col gap-4">
+			<AnimatePresence mode="wait">
 				{loading ? (
-					<motion.div key='guild-loading' initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className='flex flex-col gap-4'>
-						<div className='flex gap-2 overflow-x-hidden'>
+					<motion.div
+						key="guild-loading"
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2 }}
+						className="flex flex-col gap-4"
+					>
+						<div className="flex gap-2 overflow-x-hidden">
 							{Array.from({ length: 6 }).map((_, index) => (
 								<div
 									key={index}
-									className='shrink-0 rounded-3xl border p-1'
+									className="shrink-0 rounded-3xl border p-1"
 									style={{
 										borderColor: 'var(--border)',
 										background: 'color-mix(in srgb, var(--bg-panel) 62%, transparent)',
-									}}>
+									}}
+								>
 									<div
-										className='h-20 w-20 animate-pulse rounded-2xl'
+										className="h-20 w-20 animate-pulse rounded-2xl"
 										style={{
 											background: 'color-mix(in srgb, var(--text-main) 8%, transparent)',
 										}}
@@ -250,56 +270,59 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 						</div>
 
 						<div
-							className='rounded-3xl border p-6'
+							className="rounded-3xl border p-6"
 							style={{
 								borderColor: 'var(--border)',
 								background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-							}}>
+							}}
+						>
 							<div
-								className='relative overflow-hidden rounded-3xl border'
+								className="relative overflow-hidden rounded-3xl border"
 								style={{
 									borderColor: 'var(--border)',
 									background: 'var(--bg-panel)',
-								}}>
+								}}
+							>
 								<div
-									className='absolute inset-0'
+									className="absolute inset-0"
 									style={{
 										background:
 											'radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 10%, transparent), transparent 38%), linear-gradient(180deg, color-mix(in srgb, var(--text-main) 4%, transparent), transparent 58%)',
 									}}
 								/>
 
-								<div className='relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6'>
+								<div className="relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6">
 									<div
-										className='shrink-0 rounded-[1.4rem] border p-1'
+										className="shrink-0 rounded-[1.4rem] border p-1"
 										style={{
 											borderColor: 'var(--border)',
 											background: 'color-mix(in srgb, var(--bg-panel) 82%, transparent)',
-										}}>
+										}}
+									>
 										<div
-											className='h-20 w-20 animate-pulse rounded-2xl'
+											className="h-20 w-20 animate-pulse rounded-2xl"
 											style={{
 												background: 'color-mix(in srgb, var(--text-main) 8%, transparent)',
 											}}
 										/>
 									</div>
 
-									<div className='min-w-0 max-w-full flex-1'>
+									<div className="min-w-0 max-w-full flex-1">
 										<div
-											className='h-7 w-52 animate-pulse rounded-xl'
+											className="h-7 w-52 animate-pulse rounded-xl"
 											style={{
 												background: 'color-mix(in srgb, var(--text-main) 8%, transparent)',
 											}}
 										/>
 										<div
-											className='mt-3 h-4 w-36 animate-pulse rounded-lg'
+											className="mt-3 h-4 w-36 animate-pulse rounded-lg"
 											style={{
 												background: 'color-mix(in srgb, var(--text-main) 6%, transparent)',
 											}}
 										/>
 
-										<div className='mt-4 flex items-center gap-2 text-sm' style={{ color: 'rgba(255,255,255,0.78)' }}>
-											<Loader2 className='h-4 w-4 animate-spin' />
+										<div className="mt-4 flex items-center gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.78)' }}>
+											<Loader2 className="h-4 w-4 animate-spin" />
 											Loading guilds...
 										</div>
 									</div>
@@ -308,8 +331,15 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 						</div>
 					</motion.div>
 				) : (
-					<motion.div key='guild-content' initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className='flex flex-col gap-4'>
-						<div className='flex gap-2 overflow-x-auto overflow-y-hidden'>
+					<motion.div
+						key="guild-content"
+						initial={{ opacity: 0, y: 10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2 }}
+						className="flex flex-col gap-4"
+					>
+						<div className="flex gap-2 overflow-x-auto overflow-y-hidden">
 							{guilds.length > 0 ? (
 								guilds.map((g, index) => {
 									const isSelected = selectedGuildId === g.id;
@@ -317,7 +347,7 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 									return (
 										<motion.button
 											key={g.id}
-											type='button'
+											type="button"
 											onClick={() => setSelectedGuildId(g.id)}
 											initial={{ opacity: 0, y: 10 }}
 											animate={{ opacity: 1, y: 0 }}
@@ -329,7 +359,8 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 												background: isSelected ? 'var(--accent)' : 'transparent',
 											}}
 											aria-pressed={isSelected}
-											title={g.name}>
+											title={g.name}
+										>
 											<Image
 												className={`${isSelected ? 'rounded-2xl' : 'rounded-full'} h-20 w-20 object-cover transition`}
 												style={{
@@ -344,31 +375,33 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 									);
 								})
 							) : (
-								<div className='text-sm' style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
+								<div className="text-sm" style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
 									No guilds found.
 								</div>
 							)}
 						</div>
 
 						<div
-							className='rounded-3xl border p-6'
+							className="rounded-3xl border p-6"
 							style={{
 								borderColor: 'var(--border)',
 								background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-							}}>
+							}}
+						>
 							{selectedGuild ? (
 								<motion.div
 									key={selectedGuild.id}
 									initial={{ opacity: 0, y: 10 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.2 }}
-									className='relative overflow-hidden rounded-3xl border'
+									className="relative overflow-hidden rounded-3xl border"
 									style={{
 										borderColor: 'var(--border)',
 										background: 'var(--bg-panel)',
-									}}>
+									}}
+								>
 									<div
-										className='absolute inset-0 bg-cover bg-center'
+										className="absolute inset-0 bg-cover bg-center"
 										style={{
 											backgroundColor: 'var(--bg-panel)',
 											backgroundImage: selectedGuild.banner ? `url(https://cdn.discordapp.com/banners/${selectedGuild.id}/${selectedGuild.banner}.png?size=1024)` : undefined,
@@ -376,62 +409,69 @@ export default function Page({ searchParams }: { searchParams: Promise<any> }) {
 										}}
 									/>
 									<div
-										className='absolute inset-0'
+										className="absolute inset-0"
 										style={{
 											background: 'linear-gradient(to bottom, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.18) 34%, rgba(0,0,0,0.56) 68%, rgba(0,0,0,0.9) 100%)',
 										}}
 									/>
 									<div
-										className='absolute inset-0'
+										className="absolute inset-0"
 										style={{
 											background: 'linear-gradient(to right, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.05) 35%, rgba(0,0,0,0.2) 100%)',
 										}}
 									/>
 									<div
-										className='absolute inset-0'
+										className="absolute inset-0"
 										style={{
 											background: 'radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 12%, transparent), transparent 35%)',
 										}}
 									/>
-									<div className='relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6'>
+									<div className="relative flex min-h-65 items-end gap-4 px-6 pb-7 pt-6">
 										<div
-											className='shrink-0 rounded-[1.4rem] border p-1 shadow-2xl backdrop-blur-md'
+											className="shrink-0 rounded-[1.4rem] border p-1 shadow-2xl backdrop-blur-md"
 											style={{
 												borderColor: 'var(--border)',
 												background: 'color-mix(in srgb, var(--bg-panel) 82%, transparent)',
-											}}>
+											}}
+										>
 											<Image
-												className='h-20 w-20 rounded-2xl object-cover'
-												src={selectedGuild.icon ? `https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png?size=256` : 'https://cdn.discordapp.com/embed/avatars/0.png'}
+												className="h-20 w-20 rounded-2xl object-cover"
+												src={
+													selectedGuild.icon
+														? `https://cdn.discordapp.com/icons/${selectedGuild.id}/${selectedGuild.icon}.png?size=256`
+														: 'https://cdn.discordapp.com/embed/avatars/0.png'
+												}
 												alt={selectedGuild.name}
 												width={80}
 												height={80}
 											/>
 										</div>
 
-										<div className='min-w-0 max-w-full'>
+										<div className="min-w-0 max-w-full">
 											<h2
-												className='truncate text-2xl font-semibold tracking-tight'
+												className="truncate text-2xl font-semibold tracking-tight"
 												style={{
 													color: bannerTextColor,
 													textShadow: bannerTextShadow,
-												}}>
+												}}
+											>
 												{selectedGuild.name}
 											</h2>
 
 											<p
-												className='truncate text-sm'
+												className="truncate text-sm"
 												style={{
 													color: bannerMutedTextColor,
 													textShadow: bannerTextShadow,
-												}}>
+												}}
+											>
 												{selectedGuild.id}
 											</p>
 										</div>
 									</div>
 								</motion.div>
 							) : (
-								<div className='text-sm' style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
+								<div className="text-sm" style={{ color: 'color-mix(in srgb, var(--text-main) 60%, transparent)' }}>
 									No guild selected.
 								</div>
 							)}

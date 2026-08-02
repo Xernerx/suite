@@ -42,5 +42,5 @@ export function ThemeScript() {
         } catch (e) {}
     `;
 
-	return <Script id='xernerx-theme-script' strategy='beforeInteractive' dangerouslySetInnerHTML={{ __html: scriptCode }} />;
+	return <Script id="xernerx-theme-script" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: scriptCode }} />;
 }

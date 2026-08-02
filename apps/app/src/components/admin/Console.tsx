@@ -99,33 +99,35 @@ export default function ConsolePanel({ permissions }: { permissions: string[] })
 	}
 
 	return (
-		<div className='h-full w-full flex flex-col'>
+		<div className="h-full w-full flex flex-col">
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='flex-1 flex flex-col rounded-xl border border-white/10 overflow-hidden'
-				style={{ background: 'var(--bg-panel)' }}>
+				className="flex-1 flex flex-col rounded-xl border border-white/10 overflow-hidden"
+				style={{ background: 'var(--bg-panel)' }}
+			>
 				{/* header */}
-				<div className='flex items-center px-3 py-2 border-b border-white/10 bg-black/20'>
-					<span className='text-xs text-white/50 font-medium tracking-wide'>Console</span>
+				<div className="flex items-center px-3 py-2 border-b border-white/10 bg-black/20">
+					<span className="text-xs text-white/50 font-medium tracking-wide">Console</span>
 
 					<input
-						type='search'
-						placeholder='Filter logs...'
+						type="search"
+						placeholder="Filter logs..."
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className='ml-3 flex-1 bg-transparent outline-none text-xs placeholder:text-white/30'
+						className="ml-3 flex-1 bg-transparent outline-none text-xs placeholder:text-white/30"
 					/>
 
 					<button
 						onClick={() => setLive((v) => !v)}
-						className={`ml-2 px-2 py-1 text-[10px] rounded border transition ${live ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-white/10 text-white/40 hover:bg-white/5'}`}>
+						className={`ml-2 px-2 py-1 text-[10px] rounded border transition ${live ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10' : 'border-white/10 text-white/40 hover:bg-white/5'}`}
+					>
 						{live ? 'LIVE' : 'PAUSED'}
 					</button>
 				</div>
 
 				{/* body */}
-				<div ref={containerRef} className='flex-1 overflow-auto font-mono text-xs px-2 py-2'>
+				<div ref={containerRef} className="flex-1 overflow-auto font-mono text-xs px-2 py-2">
 					{logs
 						.filter(({ log }) => log.toLowerCase().includes(search.toLowerCase()))
 						.map(({ time, log, type }, i) => {
@@ -137,15 +139,16 @@ export default function ConsolePanel({ permissions }: { permissions: string[] })
 									initial={{ opacity: 0, y: 4 }}
 									animate={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.12 }}
-									className='flex items-start gap-2 px-2 py-[2px] rounded hover:bg-white/5 group'>
+									className="flex items-start gap-2 px-2 py-[2px] rounded hover:bg-white/5 group"
+								>
 									{/* left indicator */}
-									<div className='w-[2px] h-4 mt-[2px] rounded' style={{ background: color, opacity: 0.7 }} />
+									<div className="w-[2px] h-4 mt-[2px] rounded" style={{ background: color, opacity: 0.7 }} />
 
 									{/* time */}
-									<span className='text-[10px] text-white/30 whitespace-nowrap'>{new Date(time).toLocaleTimeString()}</span>
+									<span className="text-[10px] text-white/30 whitespace-nowrap">{new Date(time).toLocaleTimeString()}</span>
 
 									{/* log */}
-									<span className='break-all flex-1' style={{ color }}>
+									<span className="break-all flex-1" style={{ color }}>
 										{log}
 									</span>
 
@@ -157,7 +160,8 @@ export default function ConsolePanel({ permissions }: { permissions: string[] })
 											setTimeout(() => setCopied(null), 800);
 											toast(`Copied log`, 'info');
 										}}
-										className='opacity-0 group-hover:opacity-100 transition'>
+										className="opacity-0 group-hover:opacity-100 transition"
+									>
 										{copied === i ? <CopyCheck size={12} /> : <Copy size={12} />}
 									</button>
 								</motion.div>

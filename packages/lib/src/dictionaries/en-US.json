@@ -443,7 +443,12 @@
 				},
 				"usage": {
 					"title": "4. How We Use Information",
-					"items": ["To provide and maintain services.", "To improve reliability and performance.", "To provide support and communicate updates.", "To ensure compliance with legal obligations."]
+					"items": [
+						"To provide and maintain services.",
+						"To improve reliability and performance.",
+						"To provide support and communicate updates.",
+						"To ensure compliance with legal obligations."
+					]
 				},
 				"sharing": {
 					"title": "5. Data Sharing",
@@ -496,7 +501,12 @@
 				},
 				"acceptableUse": {
 					"title": "3. Acceptable Use",
-					"items": ["Engage in unlawful activities.", "Access data without explicit authorization.", "Attempt to disrupt service infrastructure.", "Reverse-engineer or exploit vulnerabilities."]
+					"items": [
+						"Engage in unlawful activities.",
+						"Access data without explicit authorization.",
+						"Attempt to disrupt service infrastructure.",
+						"Reverse-engineer or exploit vulnerabilities."
+					]
 				},
 				"accounts": {
 					"title": "4. User Accounts",

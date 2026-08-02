@@ -57,13 +57,14 @@ export default function ContactPage() {
 					className="font-bold tracking-tight text-(--text)"
 					style={{
 						fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-					}}>
+					}}
+				>
 					Contact Us
 				</h1>
 
 				<p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-(--text-muted)">
-					Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we{"'"}re happy to help. Using the correct contact address helps your
-					message reach the right person faster.
+					Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we{"'"}re happy to help. Using the correct contact address helps
+					your message reach the right person faster.
 				</p>
 			</motion.div>
 
@@ -71,7 +72,8 @@ export default function ContactPage() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ delay: 0.3 }}
-				className="mx-auto mt-24 max-w-4xl rounded-2xl p-10 text-center bg-(--foreground) border border-(--border)/10">
+				className="mx-auto mt-24 max-w-4xl rounded-2xl p-10 text-center bg-(--foreground) border border-(--border)/10"
+			>
 				<h2 className="text-2xl font-semibold text-(--text)">Looking for documentation?</h2>
 
 				<p className="mx-auto mt-4 max-w-2xl leading-7 text-(--text-muted)">
@@ -87,7 +89,8 @@ export default function ContactPage() {
 						href="https://github.com/xernerx"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="rounded-xl px-5 py-3 font-medium transition-all duration-200 border border-(--border)/10 bg-(--foreground) text-(--text) hover:border-(--accent)">
+						className="rounded-xl px-5 py-3 font-medium transition-all duration-200 border border-(--border)/10 bg-(--foreground) text-(--text) hover:border-(--accent)"
+					>
 						GitHub
 					</Link>
 				</div>
@@ -100,7 +103,8 @@ export default function ContactPage() {
 						initial={{ opacity: 0, y: 15 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: index * 0.05 }}
-						className="group relative overflow-hidden rounded-2xl bg-(--foreground) border border-(--border)/10">
+						className="group relative overflow-hidden rounded-2xl bg-(--foreground) border border-(--border)/10"
+					>
 						<div
 							className="absolute inset-x-0 top-0 h-px"
 							style={{
@@ -114,7 +118,8 @@ export default function ContactPage() {
 								style={{
 									background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 									color: 'var(--accent)',
-								}}>
+								}}
+							>
 								<contact.icon size={24} />
 							</div>
 
@@ -128,7 +133,8 @@ export default function ContactPage() {
 								style={{
 									background: 'color-mix(in srgb, var(--accent) 8%, transparent)',
 									border: '1px solid color-mix(in srgb, var(--accent) 18%, transparent)',
-								}}>
+								}}
+							>
 								<span className="font-medium text-(--text)">{contact.email}</span>
 
 								<ArrowUpRight size={18} className="text-(--accent)" />

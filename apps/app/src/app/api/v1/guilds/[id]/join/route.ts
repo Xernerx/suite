@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 		const response = await fetch(`https://discord.com/api/v10/guilds/${id}/members/${userId}`, {
 			method: 'PUT',
 			headers: {
-				'Authorization': `Bot ${botToken}`,
+				Authorization: `Bot ${botToken}`,
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({ access_token: accessToken }),

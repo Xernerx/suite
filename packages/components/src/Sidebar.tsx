@@ -35,7 +35,9 @@ export function Sidebar() {
 	const activeUser = discordUser || session?.user;
 
 	// Resolve Discord CDN URLs for Avatar, Decoration, and Nameplate
-	const avatarUrl = activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128` : activeUser?.image;
+	const avatarUrl = activeUser?.avatar
+		? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
+		: activeUser?.image;
 	const decorationUrl = activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
 	const nameplateUrl = activeUser?.collectibles?.nameplate?.asset ? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm` : null;
 
@@ -57,7 +59,7 @@ export function Sidebar() {
 	return (
 		<>
 			{/* Mobile Backdrop */}
-			{isMobileOpen && <div className='fixed inset-0 top-[72px] z-40 bg-black/50 backdrop-blur-sm md:hidden' onClick={() => setMobileOpen(false)} />}
+			{isMobileOpen && <div className="fixed inset-0 top-[72px] z-40 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />}
 
 			<aside
 				className={`
@@ -72,9 +74,10 @@ export function Sidebar() {
 					paddingLeft: 'var(--ui-gap)',
 					paddingRight: 'var(--ui-gap)',
 					fontSize: 'var(--text-scale, 14px)',
-				}}>
+				}}
+			>
 				{/* Navigation Items */}
-				<div className='flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4' style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+				<div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					{navItems.map((item, idx) => {
 						const Icon = item.icon;
 						const active = item.view && view === item.view;
@@ -87,9 +90,9 @@ export function Sidebar() {
 								{showCategory && (
 									<div className={`mt-4 mb-1 transition-all duration-300 ${isCollapsed ? 'flex justify-center' : 'px-4'}`}>
 										{isCollapsed ? (
-											<div className='h-[1px] w-8 bg-gradient-to-r from-transparent via-(--border) to-transparent' />
+											<div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-(--border) to-transparent" />
 										) : (
-											<span className='text-[11px] font-bold uppercase tracking-wider text-(--text-muted)'>{item.category}</span>
+											<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{item.category}</span>
 										)}
 									</div>
 								)}
@@ -108,14 +111,16 @@ export function Sidebar() {
 									style={{
 										padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
 										gap: isCollapsed ? 0 : 'var(--ui-gap)',
-									}}>
-									{active && !isCollapsed && <div className='absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)' />}
+									}}
+								>
+									{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
 
 									{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 
 									<span
 										className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
-                                        ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}>
+                                        ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+									>
 										{item.label}
 									</span>
 								</Link>
@@ -130,16 +135,17 @@ export function Sidebar() {
 				<div ref={menuRef} className={`relative flex flex-col ${isCollapsed ? 'items-center' : ''}`} style={{ paddingBottom: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{!activeUser ? (
 						<Link
-							href='/login'
+							href="/login"
 							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
                                 ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
                             `}
-							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}>
+							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
+						>
 							<LogIn size={18} />
 							{!isCollapsed && <span>{t('common.sidebar.login', {}, 'Login')}</span>}
 						</Link>
 					) : (
-						<div className='relative w-full mt-1'>
+						<div className="relative w-full mt-1">
 							{/* Suite Menu Dropdown */}
 							<AnimatePresence>{activeMenu === 'suite' && <SidebarSuite isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 
@@ -153,40 +159,50 @@ export function Sidebar() {
                                 ${!nameplateUrl && (activeMenu === 'user' || activeMenu === 'suite') ? 'bg-(--foreground)' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                             `}
-								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}>
+								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
+							>
 								{/* Root Nameplate Video Background */}
 								{nameplateUrl && (
 									<>
-										<video src={nameplateUrl} autoPlay loop muted playsInline className='absolute inset-0 w-full h-full object-fill z-0 pointer-events-none opacity-90' />
+										<video src={nameplateUrl} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none opacity-90" />
 										{/* Optional slight dark overlay for text readability across all themes */}
-										<div className='absolute inset-0 bg-black/10 z-0 pointer-events-none' />
+										<div className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
 									</>
 								)}
 
 								{/* User Info Trigger (Left Side) */}
 								<button
 									onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')}
-									className='relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg'
-									style={{ gap: 'var(--ui-gap)' }}>
+									className="relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg"
+									style={{ gap: 'var(--ui-gap)' }}
+								>
 									{/* Avatar */}
-									<div className='relative shrink-0'>
+									<div className="relative shrink-0">
 										{avatarUrl ? (
-											<div className='relative h-9 w-9'>
-												<Image src={avatarUrl} alt='User Avatar' fill className='rounded-full border border-(--border) object-cover' unoptimized draggable={false} loading='eager' />
+											<div className="relative h-9 w-9">
+												<Image
+													src={avatarUrl}
+													alt="User Avatar"
+													fill
+													className="rounded-full border border-(--border) object-cover"
+													unoptimized
+													draggable={false}
+													loading="eager"
+												/>
 												{decorationUrl && (
 													<Image
 														src={decorationUrl}
-														alt='Avatar Decoration'
+														alt="Avatar Decoration"
 														fill
-														className='absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none'
+														className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
 														unoptimized
 														draggable={false}
 													/>
 												)}
 											</div>
 										) : (
-											<div className='flex h-9 w-9 items-center justify-center rounded-full bg-(--border)'>
-												<UserIcon size={16} className='text-(--text-muted)' />
+											<div className="flex h-9 w-9 items-center justify-center rounded-full bg-(--border)">
+												<UserIcon size={16} className="text-(--text-muted)" />
 											</div>
 										)}
 										{/* Status Indicator */}
@@ -196,7 +212,8 @@ export function Sidebar() {
 									{/* Names */}
 									<div
 										className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 opacity-100'}`}
-										style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+										style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}
+									>
 										<span className={`truncate text-sm font-bold tracking-wide ${nameplateUrl ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
 											{activeUser.global_name || activeUser.name}
 										</span>
@@ -213,7 +230,8 @@ export function Sidebar() {
                                         ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) group-hover:text-(--text)'}
                                         ${activeMenu === 'suite' ? (nameplateUrl ? 'bg-black/40 text-white' : 'bg-(--background)') : ''}
                                     `}
-									style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}>
+									style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
+								>
 									<Compass size={isCollapsed ? 20 : 18} className={`transition-transform duration-200 ${activeMenu === 'suite' && !nameplateUrl ? 'text-(--accent)' : ''}`} />
 								</button>
 							</div>
