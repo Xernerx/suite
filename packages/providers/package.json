@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/providers",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"private": true,
 	"main": "./index.ts",
 	"exports": {
@@ -8,18 +8,18 @@
 	},
 	"dependencies": {
 		"@xernerx/lib": "workspace:*",
+		"framer-motion": "^12",
+		"lucide-react": "^1",
+		"next-auth": "^4.24.15",
 		"react": "^19",
 		"react-dom": "^19",
-		"next-auth": "^4",
-		"tinycolor2": "^1",
-		"framer-motion": "^12",
-		"lucide-react": "^1"
+		"tinycolor2": "^1"
 	},
 	"devDependencies": {
-		"tailwindcss": "^4",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
-		"@types/tinycolor2": "^1"
+		"@types/tinycolor2": "^1",
+		"tailwindcss": "^4"
 	}
 }

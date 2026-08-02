@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.2.1
+
+### Patch Changes
+
+- deps update
+
 ## 0.2.0
 
 ### Minor Changes

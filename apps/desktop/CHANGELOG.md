@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 1.3.2
+
+### Patch Changes
+
+- deps update
+
 ## 1.3.1
 
 ### Patch Changes

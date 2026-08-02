@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/components",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"private": true,
 	"main": "./index.ts",
 	"exports": {
@@ -14,7 +14,7 @@
 		"framer-motion": "^12",
 		"lucide-react": "^1",
 		"next": "^16.2.12",
-		"next-auth": "^4",
+		"next-auth": "^4.24.15",
 		"nextjs-toploader": "^3",
 		"react": "^19",
 		"react-dom": "^19",

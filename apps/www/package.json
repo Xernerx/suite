@@ -1,6 +1,6 @@
 {
 	"name": "www",
-	"version": "0.4.1",
+	"version": "0.4.2",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -19,7 +19,7 @@
 		"framer-motion": "^12",
 		"lucide-react": "^1",
 		"next": "^16.2.12",
-		"next-auth": "^4",
+		"next-auth": "^4.24.15",
 		"react": "^19",
 		"react-dom": "^19",
 		"react-icons": "^5"

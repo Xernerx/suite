@@ -1,5 +1,13 @@
 # @xernerx/feedback
 
+## 0.0.6
+
+### Patch Changes
+
+- deps update
+- Updated dependencies
+    - @xernerx/ui@0.2.1
+
 ## 0.0.5
 
 ### Patch Changes

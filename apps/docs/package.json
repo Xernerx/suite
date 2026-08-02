@@ -1,6 +1,6 @@
 {
 	"name": "docs",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
@@ -15,7 +15,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"next": "^16.2.12",
-		"next-auth": "^4",
+		"next-auth": "^4.24.15",
 		"react": "^19",
 		"react-dom": "^19"
 	},

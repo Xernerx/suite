@@ -1,5 +1,16 @@
 # www
 
+## 0.4.2
+
+### Patch Changes
+
+- deps update
+- Updated dependencies
+    - @xernerx/components@0.2.4
+    - @xernerx/providers@0.2.4
+    - @xernerx/feedback@0.0.6
+    - @xernerx/lib@0.2.1
+
 ## 0.4.1
 
 ### Patch Changes

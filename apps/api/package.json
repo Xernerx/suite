@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
@@ -17,7 +17,7 @@
 		"@xernerx/ui": "workspace:*",
 		"mongoose": "^9.9.1",
 		"next": "^16.2.12",
-		"next-auth": "^4",
+		"next-auth": "^4.24.15",
 		"react": "^19",
 		"react-dom": "^19"
 	},
