@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.3
+
+### Patch Changes
+
+- Fixed an issue where useSession on login would not resolve in time
+
 ## 0.4.2
 
 ### Patch Changes
