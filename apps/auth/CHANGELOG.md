@@ -1,5 +1,17 @@
 # auth
 
+## 0.4.4
+
+### Patch Changes
+
+- Fixed multiple issues
+
+    ## auth
+    - Fixed an issue where session took too long to resolve and redirected to login because of it
+
+    ## docs
+    - Updated metadata
+
 ## 0.4.3
 
 ### Patch Changes

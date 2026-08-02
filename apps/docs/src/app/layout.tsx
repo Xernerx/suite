@@ -12,22 +12,22 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx CDN',
-	description: 'Xernerx content delivery network and asset storage service.',
+	title: 'Xernerx Docs',
+	description: 'Official documentation, guides, and API references for the Xernerx Suite.',
 
-	metadataBase: new URL('https://cdn.xernerx.com'),
+	metadataBase: new URL('https://docs.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx CDN',
-		description: 'Xernerx content delivery network and asset storage service.',
-		url: 'https://cdn.xernerx.com',
+		title: 'Xernerx Docs',
+		description: 'Official documentation, guides, and API references for the Xernerx Suite.',
+		url: 'https://docs.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
 			{
 				url: '/banner.png',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx CDN',
+				alt: 'Xernerx Docs',
 			},
 		],
 		type: 'website',
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx CDN',
-		description: 'Xernerx content delivery network and asset storage service.',
+		title: 'Xernerx Docs',
+		description: 'Official documentation, guides, and API references for the Xernerx Suite.',
 		images: ['/banner.png'],
 	},
 
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 	},
 
 	alternates: {
-		canonical: 'https://cdn.xernerx.com',
+		canonical: 'https://docs.xernerx.com',
 	},
 };
 

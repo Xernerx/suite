@@ -43,7 +43,7 @@ const COMPONENT_MAP: Record<string, React.ReactNode> = {
 };
 
 export default function Home() {
-	const { data: session, status } = useSession() || {};
+	const { data: session, status } = useSession() || { status: 'loading' };
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
 
