@@ -132,7 +132,7 @@ export default function Home() {
 
 	if (!session && status !== 'loading' && status !== undefined) return redirect('/login');
 
-	if (status === 'loading') return <Loading />;
+	if (status === 'loading' || !status) return <Loading />;
 
 	const currentView = view || 'account';
 	const ActiveComponent = COMPONENT_MAP[currentView] || <Account />;

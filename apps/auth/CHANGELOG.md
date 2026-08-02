@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.6
+
+### Patch Changes
+
+- Attempt number: I lost count
+
 ## 0.4.5
 
 ### Patch Changes
