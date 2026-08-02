@@ -3,8 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { signIn, useSession } from 'next-auth/react';
-import { useDictionary, useSidebar } from '@xernerx/providers';
+import { signIn, useDictionary, useSession, useSidebar } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import Banner from '@/../public/banner.svg';

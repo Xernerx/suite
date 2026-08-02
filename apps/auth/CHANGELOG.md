@@ -1,5 +1,11 @@
 # auth
 
+## 0.4.12
+
+### Patch Changes
+
+- I've lost hope
+
 ## 0.4.11
 
 ### Patch Changes

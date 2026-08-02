@@ -13,6 +13,7 @@ import {
 	ShieldCheck,
 	User,
 } from 'lucide-react';
+import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';
 import Appearance from '@/components/Appearance';
@@ -25,10 +26,7 @@ import Notifications from '@/components/Notifications';
 import Profile from '@/components/Profile';
 import Tokens from '@/components/Tokens';
 import { redirect } from 'next/navigation';
-import { useDictionary } from '@xernerx/providers';
 import { useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useSidebar } from '@xernerx/providers';
 
 const COMPONENT_MAP: Record<string, React.ReactNode> = {
 	account: <Account />,
