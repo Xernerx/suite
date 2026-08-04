@@ -62,7 +62,8 @@
 				"language": "Language",
 				"notifications": "Notifications",
 				"billing": "Billing",
-				"tokens": "Tokens"
+				"tokens": "Tokens",
+				"store": "Store"
 			}
 		}
 	},

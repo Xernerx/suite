@@ -2,6 +2,17 @@
 
 import { Schema } from 'mongoose';
 
+// Define the subscription sub-schema to handle multiple active tiers/products
+const subscriptionSchema = new Schema(
+	{
+		stripeSubscriptionId: { type: String, required: true }, // The ID of the subscription in Stripe
+		priceId: { type: String, required: true }, // The specific price/tier they bought
+		status: { type: String, required: true }, // e.g., 'active', 'past_due', 'canceled'
+		currentPeriodEnd: { type: Date, required: true }, // When this specific subscription expires
+	},
+	{ _id: false } // Prevents Mongoose from generating a unique _id for every single subscription object
+);
+
 const schema = new Schema(
 	{
 		id: { type: String, unique: true, required: true }, // User ID
@@ -46,6 +57,10 @@ const schema = new Schema(
 		},
 
 		hooks: { type: [{ name: String, description: String, url: String, data: String }] }, // List of user webhooks
+
+		// --- STRIPE BILLING & SUBSCRIPTIONS ---
+		stripeCustomerId: { type: String, default: null }, // Links this user to a Stripe Customer
+		subscriptions: { type: [subscriptionSchema], default: [] }, // Array holding all active/past subscriptions
 	},
 	{ timestamps: true }
 );

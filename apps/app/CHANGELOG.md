@@ -1,5 +1,11 @@
 # app
 
+## 1.3.0
+
+### Minor Changes
+
+- Stripe addition
+
 ## 1.2.29
 
 ### Patch Changes

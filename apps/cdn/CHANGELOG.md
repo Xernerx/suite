@@ -1,5 +1,14 @@
 # cdn
 
+## 0.4.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.0
+    - @xernerx/components@0.2.6
+    - @xernerx/providers@0.2.6
+
 ## 0.4.3
 
 ### Patch Changes

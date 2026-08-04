@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"version": "0.2.3",
+	"version": "0.3.0",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
@@ -19,7 +19,8 @@
 		"next": "^16.2.12",
 		"next-auth": "^4.24.15",
 		"react": "^19",
-		"react-dom": "^19"
+		"react-dom": "^19",
+		"stripe": "^22"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",

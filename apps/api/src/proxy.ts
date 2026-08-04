@@ -16,8 +16,10 @@ export async function proxy(req: NextRequest) {
 	const isAllowed = isAuthorizedOrigin || isAuthorizedHost || isLocalDev;
 
 	// 1. Intercept and secure only the /secure/ routes
+	// 1. Intercept and secure only the /secure/ routes (Excluding Stripe Webhooks)
 	if (req.nextUrl.pathname.startsWith('/secure')) {
-		if (!isAllowed) {
+		// Allow Stripe to POST here without an internal origin header
+		if (!req.nextUrl.pathname.startsWith('/secure/webhooks/stripe') && !isAllowed) {
 			return new NextResponse(JSON.stringify({ error: 'Forbidden: Unauthorized Origin' }), {
 				status: 403,
 				headers: { 'Content-Type': 'application/json' },

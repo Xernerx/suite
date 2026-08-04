@@ -1,5 +1,18 @@
 # auth
 
+## 0.5.0
+
+### Minor Changes
+
+- Stripe addition
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.0
+    - @xernerx/components@0.2.6
+    - @xernerx/providers@0.2.6
+
 ## 0.4.14
 
 ### Patch Changes
