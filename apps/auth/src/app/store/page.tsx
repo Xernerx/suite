@@ -4,11 +4,11 @@
 
 import { AlertCircle, Bot, Check, Code, Server, Sparkles, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useSidebar, useUser } from '@xernerx/providers';
 
 import { motion } from 'framer-motion';
 import { products } from '@xernerx/lib';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@xernerx/providers';
 
 interface UserSubscription {
 	stripeSubscriptionId: string;
@@ -39,10 +39,13 @@ export default function StorePage() {
 	const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
 	const [loadingPrices, setLoadingPrices] = useState(true);
 
+	const { hide } = useSidebar();
 	const { user, loading: userLoading } = useUser() as { user: any; loading?: boolean };
 	const subscriptions: UserSubscription[] = user?.subscriptions || [];
 
 	useEffect(() => {
+		hide();
+
 		async function fetchAllProducts() {
 			setLoadingPrices(true);
 			try {

@@ -1,5 +1,11 @@
 # auth
 
+## 0.5.1
+
+### Patch Changes
+
+- Fixed a UI issue
+
 ## 0.5.0
 
 ### Minor Changes
