@@ -1,5 +1,20 @@
 # api
 
+## 0.4.0
+
+### Minor Changes
+
+- Updated dependencies
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.3.0
+    - @xernerx/components@0.2.7
+    - @xernerx/feedback@0.0.8
+    - @xernerx/lib@0.3.1
+    - @xernerx/ui@0.2.3
+
 ## 0.3.0
 
 ### Minor Changes

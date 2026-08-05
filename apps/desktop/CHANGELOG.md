@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 1.4.0
+
+### Minor Changes
+
+- Updated dependencies
+
 ## 1.3.3
 
 ### Patch Changes

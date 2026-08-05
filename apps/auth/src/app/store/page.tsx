@@ -199,12 +199,7 @@ export default function StorePage() {
 							</div>
 
 							<ul className="flex-1 space-y-4 mb-8">
-								{[
-									'Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)',
-									'All server-level utility subscriptions',
-									'Priority support channel access',
-									'Automatic updates for new bot releases',
-								].map((feature) => (
+								{['Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)', 'All server-level utility subscriptions', 'Priority support channel access'].map((feature) => (
 									<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 										<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 										<span>{feature}</span>
@@ -353,7 +348,7 @@ export default function StorePage() {
 							</div>
 
 							<ul className="flex-1 space-y-4 mb-8">
-								{['Standard API access', 'Community support', 'Basic metrics', '1 Active project'].map((feature) => (
+								{['Standard API access', '1 Project'].map((feature) => (
 									<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 										<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 										<span>{feature}</span>
@@ -389,7 +384,7 @@ export default function StorePage() {
 									</div>
 
 									<ul className="flex-1 space-y-4 mb-8">
-										{['Advanced API access', 'Priority email support', 'Extended rate limits', 'Custom domains'].map((feature) => (
+										{['Advanced API access', 'Extended rate limits', 'Unlimited Projects'].map((feature) => (
 											<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 												<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 												<span>{feature}</span>

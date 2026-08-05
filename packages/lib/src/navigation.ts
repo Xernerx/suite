@@ -7,4 +7,5 @@ export const navigation = [
 	{ label: 'cdn', href: 'https://cdn.xernerx.com' },
 	{ label: 'docs', href: 'https://docs.xernerx.com' },
 	{ label: 'api', href: 'https://api.xernerx.com' },
+	{ label: 'Admin', href: 'https://admin.xernerx.com' },
 ];

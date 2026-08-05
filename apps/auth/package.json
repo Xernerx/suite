@@ -1,6 +1,6 @@
 {
 	"name": "auth",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
@@ -17,9 +17,9 @@
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^12",
-		"lucide-react": "^1",
-		"next": "^16.2.12",
+		"framer-motion": "^13.0.0",
+		"lucide-react": "^1.26.0",
+		"next": "^16.3.0",
 		"next-auth": "^4.24.15",
 		"react": "^19",
 		"react-circle-flags": "^0",

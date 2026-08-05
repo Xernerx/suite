@@ -1,13 +1,13 @@
 {
 	"name": "@xernerx/feedback",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"private": true,
 	"main": "./index.ts",
 	"dependencies": {
-		"framer-motion": "^12",
-		"lucide-react": "^1",
-		"react": "^19",
-		"@xernerx/ui": "workspace:*"
+		"@xernerx/ui": "workspace:*",
+		"framer-motion": "^13.0.0",
+		"lucide-react": "^1.26.0",
+		"react": "^19"
 	},
 	"devDependencies": {
 		"@types/react": "^19"

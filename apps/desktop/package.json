@@ -1,16 +1,13 @@
 {
 	"name": "@xernerx/desktop",
-	"version": "1.3.3",
+	"version": "1.4.0",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"build": "npm i && tsc",
+		"build": "pnpm i && tsc",
 		"dist": "pnpm build && electron-builder",
-		"dev": "npm i && tsc && electron .",
-		"patch": "npm version patch",
-		"minor": "npm version minor",
-		"major": "npm version major"
+		"dev": "pnpm i && tsc && electron ."
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",

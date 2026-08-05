@@ -1,5 +1,15 @@
 # @xernerx/components
 
+## 0.2.7
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/providers@0.3.0
+    - @xernerx/lib@0.3.1
+    - @xernerx/ui@0.2.3
+
 ## 0.2.6
 
 ### Patch Changes

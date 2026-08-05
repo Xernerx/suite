@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/providers",
-	"version": "0.2.6",
+	"version": "0.3.0",
 	"private": true,
 	"main": "./index.ts",
 	"exports": {
@@ -8,8 +8,8 @@
 	},
 	"dependencies": {
 		"@xernerx/lib": "workspace:*",
-		"framer-motion": "^12",
-		"lucide-react": "^1",
+		"framer-motion": "^13.0.0",
+		"lucide-react": "^1.26.0",
 		"next-auth": "^4.24.15",
 		"react": "^19",
 		"react-dom": "^19",

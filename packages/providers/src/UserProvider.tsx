@@ -8,6 +8,7 @@ import { useDictionary, useEnvironment, useTheme, useToast } from '@xernerx/prov
 type UserContextType = {
 	user: any;
 	mutate: () => Promise<void>;
+	loading: boolean;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -32,6 +33,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	const { t } = useDictionary();
 
 	const [user, setUser] = useState(null);
+	const [loading, setLoading] = useState(true);
 
 	const fetchUser = useCallback(async () => {
 		const sessionWithError = session as { error?: string; accessToken?: string; user?: any };
@@ -101,6 +103,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				title: t('auth.user.networkError'),
 				type: 'error',
 			});
+		} finally {
+			setLoading(false);
 		}
 	}, [session, status, getEnvUrl, setAccent, toast, t]);
 
@@ -108,7 +112,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 		fetchUser();
 	}, [fetchUser]);
 
-	return <UserContext.Provider value={{ user, mutate: fetchUser }}>{children}</UserContext.Provider>;
+	return <UserContext.Provider value={{ user, mutate: fetchUser, loading }}>{children}</UserContext.Provider>;
 }
 
 export function useUser() {

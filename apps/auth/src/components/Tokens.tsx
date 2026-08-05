@@ -3,16 +3,15 @@
 
 import { AlertTriangle, Check, Copy, Eye, EyeOff, Key, Loader2, Plus, Save, Settings2, Trash2 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Button, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
-
-import { Button } from '@xernerx/ui';
 
 // -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
 
-type TokenStatus = 'active' | 'suspended' | 'pending';
+type TokenStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 
 interface TokenListInfo {
 	_id: string;
@@ -70,6 +69,7 @@ export default function Tokens() {
 
 	const statusColors = {
 		active: 'text-(--accent-green) bg-(--accent-green)/10 border-(--accent-green)/20',
+		inactive: 'text-(--text-muted) bg-(--border)/10 border-(--border)/20',
 		suspended: 'text-(--accent-red) bg-(--accent-red)/10 border-(--accent-red)/20',
 		pending: 'text-(--accent-orange) bg-(--accent-orange)/10 border-(--accent-orange)/20',
 	};
@@ -268,6 +268,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 
 	const [name, setName] = useState('');
 	const [ownersStr, setOwnersStr] = useState('');
+	const [status, setStatus] = useState<TokenStatus>('active');
 	const [isTokenVisible, setIsTokenVisible] = useState(false);
 	const [copied, setCopied] = useState(false);
 
@@ -290,6 +291,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 				setToken(data);
 				setName(data.name);
 				setOwnersStr(data.owners.join(', '));
+				setStatus(data.status);
 			} catch (error) {
 				toast({
 					title: t('auth.tokens.manage.loadError', { error: (error as Error).message }),
@@ -304,6 +306,9 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 		fetchFullToken();
 	}, [tokenId, onClose, toast, getEnvUrl, t]);
 
+	// Derived dirty state check
+	const isDirty = token ? name !== token.name || ownersStr !== token.owners.join(', ') || status !== token.status : false;
+
 	const handleCopy = () => {
 		if (!token) return;
 		navigator.clipboard.writeText(token.id);
@@ -316,6 +321,12 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 		e.preventDefault();
 		if (!token) return;
 
+		// If nothing changed, act as a close button
+		if (!isDirty) {
+			onClose();
+			return;
+		}
+
 		setIsSaving(true);
 		const ownersArray = ownersStr
 			.split(',')
@@ -327,7 +338,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({ name, owners: ownersArray }),
+				body: JSON.stringify({ name, owners: ownersArray, status }),
 			});
 
 			if (!res.ok) throw new Error('Update failed');
@@ -401,12 +412,13 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 											</code>
 										</div>
 										<button
+											type="button"
 											onClick={() => setIsTokenVisible(!isTokenVisible)}
 											className="p-2.5 rounded-xl bg-(--foreground) border border-(--border)/20 text-(--text-muted) hover:text-(--text) hover:border-(--accent) transition"
 										>
 											{isTokenVisible ? <EyeOff size={16} /> : <Eye size={16} />}
 										</button>
-										<button onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) transition">
+										<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) transition">
 											{copied ? <Check size={16} /> : <Copy size={16} />}
 										</button>
 									</div>
@@ -436,13 +448,28 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 										/>
 									</div>
 
+									{token.status !== 'pending' && token.status !== 'suspended' && (
+										<div className="flex items-center justify-between rounded-xl border border-(--border)/20 bg-(--background) px-4 py-3">
+											<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+												<span className="text-sm font-medium text-(--text)">Active Status</span>
+												<span className="text-xs text-(--text-muted)">
+													{status === 'active' ? 'Token is active and can make API requests' : 'Token is temporarily disabled'}
+												</span>
+											</div>
+											<Toggle checked={status === 'active'} onChange={() => setStatus(status === 'active' ? 'inactive' : 'active')} />
+										</div>
+									)}
+
 									<div className="flex justify-end gap-3 mt-2">
-										<Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
-											{t('auth.tokens.manage.closeButton')}
-										</Button>
+										{/* Only show secondary cancel/close if the form is dirty */}
+										{isDirty && (
+											<Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
+												Cancel
+											</Button>
+										)}
 										<Button type="submit" className="bg-(--accent) text-white hover:bg-(--accent-hover) gap-2" disabled={isSaving}>
-											{isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-											{t('auth.tokens.manage.saveButton')}
+											{isSaving ? <Loader2 size={16} className="animate-spin" /> : isDirty ? <Save size={16} /> : <Check size={16} />}
+											{isDirty ? t('auth.tokens.manage.saveButton') : t('auth.tokens.manage.closeButton')}
 										</Button>
 									</div>
 								</form>
