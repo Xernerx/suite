@@ -66,12 +66,15 @@ export default async function RootLayout({
 	let isAuthorized = false;
 
 	if (session?.user) {
-		const db = (await database('xernerx')).models.profiles.users as any;
-		const userDoc = await db.findOne({ id: (session.user as any)?.id });
-		const allowedRoles = ['owner', 'administrator', 'moderator'];
+		const db = await database('xernerx');
+		const userDoc = await db.models.profiles.users.findOne({ id: (session.user as any)?.id });
 
-		if (userDoc && allowedRoles.includes(userDoc.role)) {
-			isAuthorized = true;
+		if (userDoc?.role) {
+			const roleDoc = await db.models.profiles.roles.findOne({ id: userDoc.role });
+
+			if (roleDoc && roleDoc.permissions?.access === true) {
+				isAuthorized = true;
+			}
 		}
 	}
 

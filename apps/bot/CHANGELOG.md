@@ -1,5 +1,11 @@
 # bot
 
+## 1.1.31
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+
 ## 1.1.30
 
 ### Patch Changes

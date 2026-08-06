@@ -1,5 +1,13 @@
 # @xernerx/providers
 
+## 0.3.1
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+- Updated dependencies
+    - @xernerx/lib@0.3.2
+
 ## 0.3.0
 
 ### Minor Changes

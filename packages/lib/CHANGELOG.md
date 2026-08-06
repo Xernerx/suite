@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.3.2
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+
 ## 0.3.1
 
 ### Patch Changes

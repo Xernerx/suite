@@ -1,5 +1,13 @@
 # app
 
+## 1.3.2
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+- Updated dependencies
+    - @xernerx/websocket@1.2.4
+
 ## 1.3.1
 
 ### Patch Changes

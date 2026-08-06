@@ -1,5 +1,17 @@
 # api
 
+## 0.4.1
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+- Updated dependencies
+    - @xernerx/components@0.2.8
+    - @xernerx/providers@0.3.1
+    - @xernerx/feedback@0.0.9
+    - @xernerx/lib@0.3.2
+    - @xernerx/ui@0.2.4
+
 ## 0.4.0
 
 ### Minor Changes

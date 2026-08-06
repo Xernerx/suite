@@ -38,6 +38,7 @@ export function Selector({ value, options, onChange, placeholder = 'Select...' }
 	return (
 		<div className="relative w-full" ref={ref}>
 			<button
+				type="button"
 				onClick={() => setIsOpen(!isOpen)}
 				className="flex w-full items-center justify-between rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) shadow-sm transition-all hover:border-(--border)/40 focus:border-(--accent) focus:outline-none"
 				style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
@@ -53,13 +54,14 @@ export function Selector({ value, options, onChange, placeholder = 'Select...' }
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -4 }}
 						transition={{ duration: 0.15, ease: 'easeOut' }}
-						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-lg"
+						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-y-auto max-h-60 rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-lg"
 						style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
 					>
 						{options.map((option) => {
 							const isSelected = option.value === value;
 							return (
 								<button
+									type="button"
 									key={option.value}
 									onClick={() => {
 										onChange(option.value);

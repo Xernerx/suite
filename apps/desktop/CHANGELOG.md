@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 1.4.1
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+
 ## 1.4.0
 
 ### Minor Changes

@@ -1,15 +1,30 @@
 /** @format */
+
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpDown, ChevronDown, Search, Trash2, User as UserIcon } from 'lucide-react';
-import { Button, Divider, Selector } from '@xernerx/ui';
+import { ArrowUpDown, ChevronDown, Plus, Search, Shield, Trash2, User as UserIcon } from 'lucide-react';
+import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useEffect, useMemo, useState } from 'react';
 
-import { Confirm } from '@xernerx/ui';
 import Image from 'next/image';
 import { Loading } from '@xernerx/feedback';
 import { useEnvironment } from '@xernerx/providers';
+
+interface Role {
+	id: string; // Random UUID
+	name?: string;
+	role?: string; // Discord Role ID
+	sync?: boolean; // Whether to sync name from Discord
+	permissions?: any;
+}
+
+interface DiscordRole {
+	id: string;
+	name: string;
+	color: number;
+	position: number;
+}
 
 interface DiscordProfile {
 	username: string;
@@ -47,11 +62,13 @@ interface UserSummary {
 
 function UserCard({
 	user,
+	roles,
 	getEnvUrl,
 	onUserDeleted,
 	onUserUpdated,
 }: {
 	user: UserSummary;
+	roles: Role[];
 	getEnvUrl: (url: string) => string;
 	onUserDeleted: (id: string) => void;
 	onUserUpdated: (updated: FullUser) => void;
@@ -66,7 +83,7 @@ function UserCard({
 
 	// Editable form states
 	const [name, setName] = useState(user.name || '');
-	const [role, setRole] = useState(user.role || 'user');
+	const [roleId, setRoleId] = useState(user.role || '');
 	const [description, setDescription] = useState('');
 	const [privacy, setPrivacy] = useState('private');
 
@@ -93,7 +110,7 @@ function UserCard({
 					const data: FullUser = await res.json();
 					setFullUser(data);
 					setName(data.name || '');
-					setRole(data.role || 'user');
+					setRoleId(data.role || '');
 					setDescription(data.description || '');
 					setPrivacy(data.privacy || 'private');
 				}
@@ -112,7 +129,7 @@ function UserCard({
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, role, description, privacy }),
+				body: JSON.stringify({ name, role: roleId, description, privacy }),
 			});
 			if (res.ok) {
 				const updated = await res.json();
@@ -146,6 +163,16 @@ function UserCard({
 		discord?.avatarUrl || (discord?.avatar && user.id ? `https://cdn.discordapp.com/avatars/${user.id}/${discord.avatar}.${discord.avatar.startsWith('a_') ? 'gif' : 'png'}` : null) || user.icon;
 
 	const displayName = discord?.globalName || discord?.username || user.name || 'Unnamed User';
+
+	const assignedRole = roles.find((r) => r.id === user.role);
+
+	const roleOptions = [
+		{ value: '', label: 'None' },
+		...roles.map((r) => ({
+			value: r.id,
+			label: r.name || 'Unnamed Role',
+		})),
+	];
 
 	return (
 		<>
@@ -181,7 +208,7 @@ function UserCard({
 						<div className="flex flex-col overflow-hidden">
 							<h2 className="font-bold text-base text-(--text) truncate">{displayName}</h2>
 							<div className="flex items-center gap-2 mt-0.5">
-								<span className="text-xs px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) font-medium capitalize">{user.role || 'user'}</span>
+								<span className="text-xs px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) font-medium truncate">{assignedRole?.name || user.role || 'No Role'}</span>
 								{discord?.username && <span className="text-xs text-(--text-muted) truncate">@{discord.username}</span>}
 							</div>
 							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">ID: {user.id}</span>
@@ -221,16 +248,7 @@ function UserCard({
 
 										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 											<label className="block text-xs font-medium text-(--text)">Role</label>
-											<Selector
-												value={role}
-												onChange={(val: string) => setRole(val)}
-												options={[
-													{ label: 'Owner', value: 'owner' },
-													{ label: 'Administrator', value: 'administrator' },
-													{ label: 'Moderator', value: 'moderator' },
-													{ label: 'User', value: 'user' },
-												]}
-											/>
+											<Selector value={roleId} onChange={(val: string) => setRoleId(val)} options={roleOptions} placeholder="Select role..." />
 										</div>
 
 										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
@@ -263,9 +281,7 @@ function UserCard({
 											</p>
 										)}
 
-										<Divider />
-
-										<div className="flex items-center justify-between">
+										<div className="flex items-center justify-between pt-2">
 											<button
 												type="button"
 												onClick={() => setConfirmDeleteOpen(true)}
@@ -303,6 +319,7 @@ function UserCard({
 export default function Users() {
 	const { getEnvUrl } = useEnvironment();
 	const [users, setUsers] = useState<UserSummary[]>([]);
+	const [roles, setRoles] = useState<Role[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -310,19 +327,24 @@ export default function Users() {
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
 	useEffect(() => {
-		fetch(getEnvUrl(`https://api.xernerx.com/secure/users`))
-			.then((res) => {
-				if (!res.ok) throw new Error('Failed to fetch users');
-				return res.json();
-			})
-			.then((data) => {
-				setUsers(data);
+		const fetchData = async () => {
+			setLoading(true);
+			try {
+				const [usersRes, rolesRes] = await Promise.all([fetch(getEnvUrl(`https://api.xernerx.com/secure/users`)), fetch(getEnvUrl(`https://api.xernerx.com/secure/roles`))]);
+
+				if (!usersRes.ok) throw new Error('Failed to fetch users');
+				if (!rolesRes.ok) throw new Error('Failed to fetch roles');
+
+				setUsers(await usersRes.json());
+				setRoles(await rolesRes.json());
+			} catch (err: any) {
+				setError(err.message || 'Failed to load data');
+			} finally {
 				setLoading(false);
-			})
-			.catch((err) => {
-				setError(err.message);
-				setLoading(false);
-			});
+			}
+		};
+
+		fetchData();
 	}, [getEnvUrl]);
 
 	const handleUserDeleted = (deletedId: string) => {
@@ -404,7 +426,7 @@ export default function Users() {
 				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 					<AnimatePresence>
 						{filteredAndSortedUsers.map((user) => (
-							<UserCard key={user.id} user={user} getEnvUrl={getEnvUrl} onUserDeleted={handleUserDeleted} onUserUpdated={handleUserUpdated} />
+							<UserCard key={user.id} user={user} roles={roles} getEnvUrl={getEnvUrl} onUserDeleted={handleUserDeleted} onUserUpdated={handleUserUpdated} />
 						))}
 					</AnimatePresence>
 				</motion.div>

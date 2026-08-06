@@ -1,5 +1,13 @@
 # @xernerx/feedback
 
+## 0.0.9
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+- Updated dependencies
+    - @xernerx/ui@0.2.4
+
 ## 0.0.8
 
 ### Patch Changes

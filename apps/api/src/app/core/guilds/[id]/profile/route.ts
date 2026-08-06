@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
 
 export function GET() {
-	return NextResponse.json('you got through');
+	return NextResponse.json('profile');
 }

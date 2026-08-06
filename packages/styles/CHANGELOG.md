@@ -1,5 +1,11 @@
 # @xernerx/styles
 
+## 0.1.5
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+
 ## 0.1.4
 
 ### Patch Changes

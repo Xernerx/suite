@@ -1,5 +1,11 @@
 # @xernerx/ui
 
+## 0.2.4
+
+### Patch Changes
+
+- Added permissions to admin and master control to all required items
+
 ## 0.2.3
 
 ### Patch Changes

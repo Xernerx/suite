@@ -6,3 +6,4 @@ export * from './src/Divider';
 export * from './src/Selector';
 export * from './src/Confirm';
 export * from './src/Slider';
+export * from './src/Modal';
