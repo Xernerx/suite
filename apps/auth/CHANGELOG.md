@@ -1,5 +1,11 @@
 # auth
 
+## 0.5.4
+
+### Patch Changes
+
+- Fixed some UI elements
+
 ## 0.5.3
 
 ### Patch Changes

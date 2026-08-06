@@ -52,52 +52,45 @@ export default function Home() {
 		setNavItems([
 			{
 				category: t('common.nav.categories.account'),
-				icon: User,
-				label: t('common.nav.items.account'),
-				view: 'account',
-				onClick: () => setView('account'),
-			},
-			{
-				category: t('common.nav.categories.account'),
 				icon: ShieldCheck,
 				label: t('common.nav.items.profile'),
 				view: 'profile',
-				onClick: () => setView('profile'),
 			},
 			{
 				category: t('common.nav.categories.account'),
-				icon: Link,
-				label: t('common.nav.items.connections'),
-				view: 'connections',
-				onClick: () => setView('connections'),
+				icon: User,
+				label: t('common.nav.items.account'),
+				view: 'account',
 			},
-			{
-				category: t('common.nav.categories.account'),
-				icon: Computer,
-				label: t('common.nav.items.devices'),
-				view: 'devices',
-				onClick: () => setView('devices'),
-			},
+			// { // todo
+			// 	category: t('common.nav.categories.account'),
+			// 	icon: Link,
+			// 	label: t('common.nav.items.connections'),
+			// 	view: 'connections',
+			// },
+			// { // todo
+			// 	category: t('common.nav.categories.account'),
+			// 	icon: Computer,
+			// 	label: t('common.nav.items.devices'),
+			// 	view: 'devices',
+			// },
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Paintbrush,
 				label: t('common.nav.items.appearance'),
 				view: 'appearance',
-				onClick: () => setView('appearance'),
 			},
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Globe,
 				label: t('common.nav.items.language'),
 				view: 'language',
-				onClick: () => setView('language'),
 			},
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Bell,
 				label: t('common.nav.items.notifications'),
 				view: 'notifications',
-				onClick: () => setView('notifications'),
 			},
 			{
 				category: t('common.nav.categories.billing'),
@@ -106,31 +99,29 @@ export default function Home() {
 				view: 'store',
 				href: '/store',
 			},
-			{
-				category: t('common.nav.categories.billing'),
-				icon: DollarSign,
-				label: t('common.nav.items.billing'),
-				view: 'billing',
-				onClick: () => setView('billing'),
-			},
+			// { // todo
+			// 	category: t('common.nav.categories.billing'),
+			// 	icon: DollarSign,
+			// 	label: t('common.nav.items.billing'),
+			// 	view: 'billing',
+			// },
 			{
 				category: t('common.nav.categories.developer'),
 				icon: KeyRound,
 				label: t('common.nav.items.tokens'),
 				view: 'tokens',
-				onClick: () => setView('tokens'),
 			},
 		]);
 
-		if (!view) setView('account');
+		if (!view) setView('profile');
 	}, [session, status, hide, show, setNavItems, view, setView, t]);
 
 	if (!session && status !== 'loading') return redirect('/login');
 
 	if (status === 'loading') return <Loading />;
 
-	const currentView = view || 'account';
-	const ActiveComponent = COMPONENT_MAP[currentView] || <Account />;
+	const currentView = view || 'profile';
+	const ActiveComponent = COMPONENT_MAP[currentView] || null;
 
 	return (
 		<AnimatePresence mode="wait">

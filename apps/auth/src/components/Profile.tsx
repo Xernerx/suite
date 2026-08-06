@@ -7,6 +7,7 @@ import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@x
 import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
+import { timezones } from '@xernerx/lib';
 
 export default function Profile() {
 	const { data: session } = useSession();
@@ -73,6 +74,7 @@ export default function Profile() {
 			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
 				body: JSON.stringify(formData),
 			});
 
@@ -81,18 +83,35 @@ export default function Profile() {
 			if (mutate) mutate();
 			setInitialData(formData);
 			toast({
-				title: t('auth.profile.toast.success', {}, 'Profile updated successfully!'),
+				title: t('auth.profile.toast.success'),
 				type: 'success',
 			});
 		} catch (error) {
 			toast({
-				title: t('auth.profile.toast.error', {}, 'Failed to save changes. Please try again.'),
+				title: t('auth.profile.toast.error'),
 				type: 'error',
 			});
 		} finally {
 			setIsSaving(false);
 		}
 	};
+
+	const tzList = Array.isArray(timezones)
+		? timezones
+		: [
+				{ value: 'UTC', label: 'UTC', offset: '+00:00', region: 'UTC' },
+				{ value: 'Europe/Brussels', label: 'Brussels', offset: '+02:00', region: 'Europe' },
+			];
+
+	const timezoneOptions = tzList.map((tz: any) => ({
+		value: tz.value,
+		label: (
+			<div className="flex items-center justify-between w-full">
+				<span>{tz.label}</span>
+				<span className="text-xs text-(--text-muted) font-mono">{tz.offset}</span>
+			</div>
+		),
+	}));
 
 	return (
 		<div
@@ -105,8 +124,8 @@ export default function Profile() {
 		>
 			{/* Header */}
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.profile.title', {}, 'Edit Profile')}</h1>
-				<p className="text-sm text-(--text-muted)">{t('auth.profile.description', {}, 'Manage your public profile details and personal preferences.')}</p>
+				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.profile.title')}</h1>
+				<p className="text-sm text-(--text-muted)">{t('auth.profile.description')}</p>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -128,7 +147,7 @@ export default function Profile() {
 						</div>
 					)}
 					<div className="flex flex-col overflow-hidden" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('auth.account.fallbackName', {}, 'User')}</h2>
+						<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('auth.account.fallbackName')}</h2>
 						<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
 						{userId && <span className="text-xs text-(--text-muted)/60 font-mono">ID: {userId}</span>}
 					</div>
@@ -138,12 +157,12 @@ export default function Profile() {
 				<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 					{/* Description */}
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-sm font-medium text-(--text)">{t('auth.profile.descriptionField.label', {}, 'Description')}</label>
+						<label className="block text-sm font-medium text-(--text)">{t('auth.profile.descriptionField.label')}</label>
 						<input
 							type="text"
 							value={formData.description}
 							onChange={(e) => handleChange('description', e.target.value)}
-							placeholder={t('auth.profile.descriptionField.placeholder', {}, 'Short bio...')}
+							placeholder={t('auth.profile.descriptionField.placeholder')}
 							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
 						/>
@@ -151,12 +170,12 @@ export default function Profile() {
 
 					{/* Info (Long Description) */}
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-sm font-medium text-(--text)">{t('auth.profile.infoField.label', {}, 'Info (Long Description)')}</label>
+						<label className="block text-sm font-medium text-(--text)">{t('auth.profile.infoField.label')}</label>
 						<textarea
 							rows={4}
 							value={formData.info}
 							onChange={(e) => handleChange('info', e.target.value)}
-							placeholder={t('auth.profile.infoField.placeholder', {}, 'Tell us more about yourself...')}
+							placeholder={t('auth.profile.infoField.placeholder')}
 							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
 						/>
@@ -165,7 +184,7 @@ export default function Profile() {
 					{/* Group 1: Birthday & Timezone */}
 					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.birthday.label', {}, 'Birthday')}</label>
+							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.birthday.label')}</label>
 							<input
 								type="date"
 								value={formData.birthday}
@@ -175,14 +194,12 @@ export default function Profile() {
 							/>
 						</div>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.timezone.label', {}, 'Timezone')}</label>
-							<input
-								type="text"
+							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.timezone.label')}</label>
+							<Selector
 								value={formData.timezone}
-								onChange={(e) => handleChange('timezone', e.target.value)}
-								placeholder={t('auth.profile.timezone.placeholder', {}, 'e.g. Europe/Brussels')}
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-								style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
+								options={timezoneOptions}
+								onChange={(val: string) => handleChange('timezone', val)}
+								placeholder={t('auth.profile.timezone.placeholder')}
 							/>
 						</div>
 					</div>
@@ -190,33 +207,33 @@ export default function Profile() {
 					{/* Group 2: Gender & Pronouns */}
 					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.gender.label', {}, 'Gender')}</label>
+							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.gender.label')}</label>
 							<Selector
 								value={formData.gender}
 								onChange={(val: string) => handleChange('gender', val)}
 								options={[
 									{
-										label: t('auth.profile.gender.male', {}, 'Male'),
+										label: t('auth.profile.gender.male'),
 										value: 'male',
 									},
 									{
-										label: t('auth.profile.gender.female', {}, 'Female'),
+										label: t('auth.profile.gender.female'),
 										value: 'female',
 									},
 									{
-										label: t('auth.profile.gender.other', {}, 'Other'),
+										label: t('auth.profile.gender.other'),
 										value: 'other',
 									},
 								]}
 							/>
 						</div>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.pronouns.label', {}, 'Pronouns')}</label>
+							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.pronouns.label')}</label>
 							<input
 								type="text"
 								value={formData.pronouns}
 								onChange={(e) => handleChange('pronouns', e.target.value)}
-								placeholder={t('auth.profile.pronouns.placeholder', {}, 'e.g. they/them')}
+								placeholder={t('auth.profile.pronouns.placeholder')}
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 								style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
 							/>
@@ -226,26 +243,23 @@ export default function Profile() {
 					{/* Privacy Level with Info Tooltip */}
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 						<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.privacy.label', {}, 'Privacy Level')}</label>
+							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.privacy.label')}</label>
 							<div className="group relative flex items-center">
 								<Info size={16} className="text-(--text-muted) cursor-pointer hover:text-(--text)" />
 								<div
 									className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-72 rounded-2xl border border-(--border)/10 bg-(--background) text-xs text-(--text-muted) shadow-2xl z-55 pointer-events-none"
 									style={{ padding: 'var(--ui-gap)' }}
 								>
-									<p className="font-semibold text-(--text) mb-1.5">{t('auth.profile.privacy.tooltip.title', {}, 'Privacy Options:')}</p>
+									<p className="font-semibold text-(--text) mb-1.5">{t('auth.profile.privacy.tooltip.title')}</p>
 									<ul className="space-y-1.5">
 										<li>
-											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.privateTitle', {}, 'Private:')}</span>{' '}
-											{t('auth.profile.privacy.tooltip.privateDesc', {}, 'Completely private; no one but you can see your profile.')}
+											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.privateTitle')}</span> {t('auth.profile.privacy.tooltip.privateDesc')}
 										</li>
 										<li>
-											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.limitedTitle', {}, 'Limited:')}</span>{' '}
-											{t('auth.profile.privacy.tooltip.limitedDesc', {}, 'Anyone with your account link can see your profile; you will just not be listed publicly.')}
+											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.limitedTitle')}</span> {t('auth.profile.privacy.tooltip.limitedDesc')}
 										</li>
 										<li>
-											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.publicTitle', {}, 'Public:')}</span>{' '}
-											{t('auth.profile.privacy.tooltip.publicDesc', {}, 'Anyone can see your profile and it is not hidden from public spaces.')}
+											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.publicTitle')}</span> {t('auth.profile.privacy.tooltip.publicDesc')}
 										</li>
 									</ul>
 								</div>
@@ -256,15 +270,15 @@ export default function Profile() {
 							onChange={(val: string) => handleChange('privacy', val)}
 							options={[
 								{
-									label: t('auth.profile.privacy.public', {}, 'Public'),
+									label: t('auth.profile.privacy.public'),
 									value: 'public',
 								},
 								{
-									label: t('auth.profile.privacy.limited', {}, 'Limited'),
+									label: t('auth.profile.privacy.limited'),
 									value: 'limited',
 								},
 								{
-									label: t('auth.profile.privacy.private', {}, 'Private'),
+									label: t('auth.profile.privacy.private'),
 									value: 'private',
 								},
 							]}
@@ -276,7 +290,7 @@ export default function Profile() {
 					{/* Save Action */}
 					<div className="flex justify-end">
 						<Button onClick={handleSave} disabled={!isDirty || isSaving}>
-							{isSaving ? t('auth.profile.saving', {}, 'Saving...') : t('auth.profile.save', {}, 'Save Changes')}
+							{isSaving ? t('auth.profile.saving') : t('auth.profile.save')}
 						</Button>
 					</div>
 				</div>

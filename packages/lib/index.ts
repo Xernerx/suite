@@ -6,3 +6,4 @@ export { proxy } from './src/proxy';
 export * from './src/env';
 export * from './src/products';
 export * from './src/permissions';
+export * from './src/timezones';
