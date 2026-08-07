@@ -52,7 +52,8 @@
                 "preferences": "Voorkeuren",
                 "billing": "Facturering",
                 "developer": "Ontwikkelaar",
-                "moderator": "Moderator"
+                "moderator": "Moderator",
+                "administrator": "ads"
             },
             "items": {
                 "account": "Account",
