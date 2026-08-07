@@ -1,5 +1,11 @@
 # admin
 
+## 0.1.5
+
+### Patch Changes
+
+- Users submitting translations now post with their username and id
+
 ## 0.1.4
 
 ### Patch Changes
