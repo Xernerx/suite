@@ -4,6 +4,8 @@
 import { dictionary, locales } from '@xernerx/lib/server';
 
 import { NextResponse } from 'next/server';
+import { auth } from '@xernerx/lib';
+import { getServerSession } from 'next-auth';
 
 type Locale = (typeof locales)[number];
 
@@ -30,6 +32,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ language
 
 export async function POST(req: Request, { params }: { params: Promise<{ language: string }> }) {
 	const { language } = await params;
+
+	// 1. Await the session to resolve the promise
+	const session = await getServerSession(auth);
+
+	// 2. Extract the actual variables from the session (with fallbacks if undefined)
+	const userName = session?.user?.name || 'Unknown User';
+	const userId = (session?.user as any)?.id || 'Unknown ID';
 
 	if (!language) {
 		return NextResponse.json({ error: 'Language parameter is required' }, { status: 400 });
@@ -71,6 +80,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ languag
 		const fileContent = JSON.stringify(updatedDictionary, null, 4) + '\n';
 		const encodedContent = Buffer.from(fileContent).toString('base64');
 
+		// Build a detailed commit message using the live session data
+		const commitTitle = `chore(i18n): update translations for ${validLanguage}`;
+		const commitDescription = `Updated by: ${userName} (ID: ${userId})`;
+		const fullCommitMessage = `${commitTitle}\n\n${commitDescription}`;
+
 		// 3. Push commit via GitHub Contents API
 		const updateRes = await fetch(url, {
 			method: 'PUT',
@@ -80,7 +94,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ languag
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				message: `chore(i18n): update translations for ${validLanguage}`,
+				message: fullCommitMessage,
 				content: encodedContent,
 				sha: fileSha,
 				branch: branch,
