@@ -3,8 +3,8 @@
 'use client';
 
 import { AlertCircle, Bot, Check, Code, Server, Sparkles, Zap } from 'lucide-react';
+import { useDictionary, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
-import { useSidebar, useUser } from '@xernerx/providers';
 
 import { motion } from 'framer-motion';
 import { products } from '@xernerx/lib';
@@ -33,6 +33,7 @@ interface ProductData {
 
 export default function StorePage() {
 	const router = useRouter();
+	const { t } = useDictionary();
 	const [actionLoading, setActionLoading] = useState<string | null>(null);
 	const [productCache, setProductCache] = useState<Record<string, ProductData>>({});
 	const [activeTab, setActiveTab] = useState<'consumers' | 'developers'>('consumers');
@@ -71,7 +72,7 @@ export default function StorePage() {
 			}
 		}
 		fetchAllProducts();
-	}, []);
+	}, [hide]);
 
 	const handleSubscribe = async (priceId: string | null) => {
 		if (!priceId) return;
@@ -106,8 +107,6 @@ export default function StorePage() {
 		return subscriptions.find((sub) => sub.priceId === priceId && (sub.status === 'active' || sub.status === 'trialing'));
 	};
 
-	const hasAnyActivePaidPlan = subscriptions.some((sub) => sub.status === 'active' || sub.status === 'trialing');
-
 	const ultraProductId = products.users[products.users.length - 1];
 	const individualBotProductIds = products.users.slice(0, -1);
 	const serverProductIds = products.servers;
@@ -121,10 +120,8 @@ export default function StorePage() {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen p-8 transition-colors duration-200">
 			<div className="max-w-4xl w-full flex flex-col items-center space-y-4 mb-8">
-				<h1 className="text-4xl md:text-5xl font-bold tracking-tight">Xernerx Store</h1>
-				<p className="text-(--text-muted) text-lg text-center max-w-2xl">
-					Choose your ecosystem. Access individual bot passes and the all-in-one Ultra bundle, or manage your developer API tools.
-				</p>
+				<h1 className="text-4xl md:text-5xl font-bold tracking-tight">{t('auth.store.title')}</h1>
+				<p className="text-(--text-muted) text-lg text-center max-w-2xl">{t('auth.store.description')}</p>
 
 				{/* Ecosystem Tab Switcher */}
 				<div className="flex items-center gap-2 p-1.5 rounded-full border border-(--border)/10 bg-(--foreground) mt-2">
@@ -134,7 +131,7 @@ export default function StorePage() {
 							activeTab === 'consumers' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
 					>
-						<Bot size={16} /> Bots, Servers & Ultra
+						<Bot size={16} /> {t('auth.store.tabs.consumers')}
 					</button>
 					<button
 						onClick={() => setActiveTab('developers')}
@@ -142,7 +139,7 @@ export default function StorePage() {
 							activeTab === 'developers' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
 					>
-						<Code size={16} /> Developer API
+						<Code size={16} /> {t('auth.store.tabs.developers')}
 					</button>
 				</div>
 
@@ -154,7 +151,7 @@ export default function StorePage() {
 							billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
 					>
-						Monthly
+						{t('auth.store.billing.monthly')}
 					</button>
 					<button
 						onClick={() => setBillingInterval('year')}
@@ -162,7 +159,7 @@ export default function StorePage() {
 							billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
 					>
-						Annually (Save 20%)
+						{t('auth.store.billing.annually')}
 					</button>
 				</div>
 			</div>
@@ -180,26 +177,26 @@ export default function StorePage() {
 						>
 							<div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-(--accent) text-white text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm">
 								<Sparkles size={12} />
-								Ultimate Ecosystem Bundle
+								{t('auth.store.ultra.badge')}
 							</div>
 
 							<div className="flex items-center gap-2 mb-4" style={{ color: 'var(--accent)' }}>
 								<Zap size={22} />
-								<span className="text-xs font-semibold uppercase tracking-wider">All-in-One Access</span>
+								<span className="text-xs font-semibold uppercase tracking-wider">{t('auth.store.ultra.subtitle')}</span>
 							</div>
 
 							<div className="mb-6">
-								<h3 className="text-2xl font-semibold mb-2">{ultraProduct?.name || 'Ultra'}</h3>
-								<p className="text-sm text-(--text-muted)">{ultraProduct?.description || 'Includes all user and server subscriptions of our bots in a single master pass.'}</p>
+								<h3 className="text-2xl font-semibold mb-2">{ultraProduct?.name || t('auth.store.ultra.fallbackName')}</h3>
+								<p className="text-sm text-(--text-muted)">{ultraProduct?.description || t('auth.store.ultra.fallbackDesc')}</p>
 							</div>
 
 							<div className="mb-6 flex items-baseline gap-1">
 								<span className="text-5xl font-bold">{loadingPrices ? '...' : currentUltraPrice ? `€${(currentUltraPrice.unitAmount / 100).toFixed(0)}` : '—'}</span>
-								<span className="text-(--text-muted) font-medium">{billingInterval === 'month' ? '/mo' : '/yr'}</span>
+								<span className="text-(--text-muted) font-medium">{billingInterval === 'month' ? t('auth.store.pricing.monthlySuffix') : t('auth.store.pricing.yearlySuffix')}</span>
 							</div>
 
 							<ul className="flex-1 space-y-4 mb-8">
-								{['Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)', 'All server-level utility subscriptions', 'Priority support channel access'].map((feature) => (
+								{[t('auth.store.ultra.features.bots'), t('auth.store.ultra.features.servers'), t('auth.store.ultra.features.support')].map((feature) => (
 									<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 										<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 										<span>{feature}</span>
@@ -208,7 +205,7 @@ export default function StorePage() {
 							</ul>
 
 							{userLoading || loadingPrices ? (
-								<div className="w-full py-3 px-4 rounded-xl bg-(--background) text-(--text-muted) text-center text-sm animate-pulse">Loading plan...</div>
+								<div className="w-full py-3 px-4 rounded-xl bg-(--background) text-(--text-muted) text-center text-sm animate-pulse">{t('auth.store.buttons.loading')}</div>
 							) : getActiveSubscription(currentUltraPrice?.id || null) ? (
 								<div className="space-y-2">
 									<button
@@ -216,10 +213,10 @@ export default function StorePage() {
 										className="w-full py-3 px-4 rounded-xl font-medium bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
 									>
 										<AlertCircle size={16} />
-										Cancel Ultra Bundle
+										{t('auth.store.buttons.cancelUltra')}
 									</button>
 									<p className="text-xs text-center text-(--text-muted)">
-										Active until {new Date(getActiveSubscription(currentUltraPrice?.id || null)!.currentPeriodEnd).toLocaleDateString()}
+										{t('auth.store.buttons.activeUntil', { date: new Date(getActiveSubscription(currentUltraPrice?.id || null)!.currentPeriodEnd).toLocaleDateString() })}
 									</p>
 								</div>
 							) : (
@@ -229,7 +226,7 @@ export default function StorePage() {
 									className="w-full py-3 px-4 rounded-xl font-medium bg-(--accent) hover:bg-(--hover-accent) text-white transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-md"
 								>
 									<Zap size={16} />
-									{actionLoading === currentUltraPrice?.id ? 'Redirecting...' : 'Get Ultra Bundle'}
+									{actionLoading === currentUltraPrice?.id ? t('auth.store.buttons.redirecting') : t('auth.store.buttons.getUltra')}
 								</button>
 							)}
 						</motion.div>
@@ -239,7 +236,7 @@ export default function StorePage() {
 					{individualBotProductIds.length > 0 && (
 						<div>
 							<h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-								<Bot style={{ color: 'var(--accent)' }} /> Individual Bot Passes
+								<Bot style={{ color: 'var(--accent)' }} /> {t('auth.store.sections.bots')}
 							</h2>
 							<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 								{individualBotProductIds.map((botProdId) => {
@@ -249,11 +246,13 @@ export default function StorePage() {
 									return (
 										<div key={botProdId} className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground) flex flex-col justify-between shadow-xs">
 											<div>
-												<h4 className="text-lg font-semibold mb-1">{botData?.name || 'Loading...'}</h4>
-												<p className="text-xs text-(--text-muted) mb-6 min-h-7.5">{botData?.description || 'Individual bot license pass'}</p>
+												<h4 className="text-lg font-semibold mb-1">{botData?.name || t('auth.store.buttons.loading')}</h4>
+												<p className="text-xs text-(--text-muted) mb-6 min-h-7.5">{botData?.description || t('auth.store.cards.botFallback')}</p>
 												<div className="text-3xl font-bold mb-6">
 													{loadingPrices ? '...' : activePrice ? `€${(activePrice.unitAmount / 100).toFixed(0)}` : '—'}
-													<span className="text-xs text-(--text-muted) font-normal">/{billingInterval === 'month' ? 'mo' : 'yr'}</span>
+													<span className="text-xs text-(--text-muted) font-normal">
+														/{billingInterval === 'month' ? t('auth.store.pricing.monthShort') : t('auth.store.pricing.yearShort')}
+													</span>
 												</div>
 											</div>
 
@@ -262,7 +261,7 @@ export default function StorePage() {
 													onClick={() => handleCancelClick(getActiveSubscription(activePrice?.id || null)!.stripeSubscriptionId)}
 													className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20 cursor-pointer"
 												>
-													Cancel Pass
+													{t('auth.store.buttons.cancelPass')}
 												</button>
 											) : (
 												<button
@@ -270,7 +269,7 @@ export default function StorePage() {
 													disabled={!activePrice || actionLoading === activePrice?.id}
 													className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-(--background) hover:bg-[var(--border)/10] border border-(--border)/10 transition-colors disabled:opacity-50 cursor-pointer"
 												>
-													{actionLoading === activePrice?.id ? 'Redirecting...' : 'Get Pass'}
+													{actionLoading === activePrice?.id ? t('auth.store.buttons.redirecting') : t('auth.store.buttons.getPass')}
 												</button>
 											)}
 										</div>
@@ -284,7 +283,7 @@ export default function StorePage() {
 					{serverProductIds.length > 0 && (
 						<div>
 							<h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-								<Server style={{ color: 'var(--accent)' }} /> Server Infrastructure Passes
+								<Server style={{ color: 'var(--accent)' }} /> {t('auth.store.sections.servers')}
 							</h2>
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 								{serverProductIds.map((serverProdId) => {
@@ -294,11 +293,13 @@ export default function StorePage() {
 									return (
 										<div key={serverProdId} className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground) flex flex-col justify-between shadow-xs">
 											<div>
-												<h4 className="text-lg font-semibold mb-1">{serverData?.name || 'Loading...'}</h4>
-												<p className="text-xs text-(--text-muted) mb-6 min-h-7.5">{serverData?.description || 'Server infrastructure pass'}</p>
+												<h4 className="text-lg font-semibold mb-1">{serverData?.name || t('auth.store.buttons.loading')}</h4>
+												<p className="text-xs text-(--text-muted) mb-6 min-h-7.5">{serverData?.description || t('auth.store.cards.serverFallback')}</p>
 												<div className="text-3xl font-bold mb-6">
 													{loadingPrices ? '...' : activePrice ? `€${(activePrice.unitAmount / 100).toFixed(0)}` : '—'}
-													<span className="text-xs text-(--text-muted) font-normal">/{billingInterval === 'month' ? 'mo' : 'yr'}</span>
+													<span className="text-xs text-(--text-muted) font-normal">
+														/{billingInterval === 'month' ? t('auth.store.pricing.monthShort') : t('auth.store.pricing.yearShort')}
+													</span>
 												</div>
 											</div>
 
@@ -307,7 +308,7 @@ export default function StorePage() {
 													onClick={() => handleCancelClick(getActiveSubscription(activePrice?.id || null)!.stripeSubscriptionId)}
 													className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20 cursor-pointer"
 												>
-													Cancel Pass
+													{t('auth.store.buttons.cancelPass')}
 												</button>
 											) : (
 												<button
@@ -315,7 +316,7 @@ export default function StorePage() {
 													disabled={!activePrice || actionLoading === activePrice?.id}
 													className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-(--background) hover:bg-[var(--border)/10] border border-(--border)/10 transition-colors disabled:opacity-50 cursor-pointer"
 												>
-													{actionLoading === activePrice?.id ? 'Redirecting...' : 'Get Pass'}
+													{actionLoading === activePrice?.id ? t('auth.store.buttons.redirecting') : t('auth.store.buttons.getPass')}
 												</button>
 											)}
 										</div>
@@ -335,20 +336,20 @@ export default function StorePage() {
 						<div className="relative flex flex-col p-6 rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-xs">
 							<div className="flex items-center gap-2 mb-4" style={{ color: 'var(--accent)' }}>
 								<Code size={20} />
-								<span className="text-xs font-semibold uppercase tracking-wider">API Access</span>
+								<span className="text-xs font-semibold uppercase tracking-wider">{t('auth.store.developer.free.badge')}</span>
 							</div>
 
 							<div className="mb-6">
-								<h3 className="text-xl font-semibold mb-2">Developer Free</h3>
-								<p className="text-sm text-(--text-muted) min-h-10">Perfect for individual developers testing local environments and personal projects.</p>
+								<h3 className="text-xl font-semibold mb-2">{t('auth.store.developer.free.title')}</h3>
+								<p className="text-sm text-(--text-muted) min-h-10">{t('auth.store.developer.free.desc')}</p>
 							</div>
 
 							<div className="mb-6 flex items-baseline gap-1">
-								<span className="text-4xl font-bold">Free</span>
+								<span className="text-4xl font-bold">{t('auth.store.developer.free.price')}</span>
 							</div>
 
 							<ul className="flex-1 space-y-4 mb-8">
-								{['Standard API access', '1 Project'].map((feature) => (
+								{[t('auth.store.developer.free.features.standardApi'), t('auth.store.developer.free.features.projects')].map((feature) => (
 									<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 										<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 										<span>{feature}</span>
@@ -357,7 +358,7 @@ export default function StorePage() {
 							</ul>
 
 							<button disabled className="w-full py-3 px-4 rounded-xl font-medium bg-(--background) text-(--text-muted) border border-(--border)/10 cursor-default">
-								Current Plan
+								{t('auth.store.buttons.currentPlan')}
 							</button>
 						</div>
 
@@ -370,21 +371,27 @@ export default function StorePage() {
 								<div key={devProdId} className="relative flex flex-col p-6 rounded-2xl border border-(--accent) bg-(--foreground) shadow-md">
 									<div className="flex items-center gap-2 mb-4" style={{ color: 'var(--accent)' }}>
 										<Code size={20} />
-										<span className="text-xs font-semibold uppercase tracking-wider">Developer Pro</span>
+										<span className="text-xs font-semibold uppercase tracking-wider">{t('auth.store.developer.pro.badge')}</span>
 									</div>
 
 									<div className="mb-6">
-										<h3 className="text-xl font-semibold mb-2">{devData?.name || 'API Suite'}</h3>
-										<p className="text-sm text-(--text-muted) min-h-10">{devData?.description || 'Advanced API rate limits and custom domains.'}</p>
+										<h3 className="text-xl font-semibold mb-2">{devData?.name || t('auth.store.developer.pro.fallbackName')}</h3>
+										<p className="text-sm text-(--text-muted) min-h-10">{devData?.description || t('auth.store.developer.pro.fallbackDesc')}</p>
 									</div>
 
 									<div className="mb-6 flex items-baseline gap-1">
 										<span className="text-4xl font-bold">{loadingPrices ? '...' : activePrice ? `€${(activePrice.unitAmount / 100).toFixed(0)}` : '—'}</span>
-										<span className="text-(--text-muted) font-medium">/{billingInterval === 'month' ? 'mo' : 'yr'}</span>
+										<span className="text-(--text-muted) font-medium">
+											/{billingInterval === 'month' ? t('auth.store.pricing.monthlySuffix') : t('auth.store.pricing.yearlySuffix')}
+										</span>
 									</div>
 
 									<ul className="flex-1 space-y-4 mb-8">
-										{['Advanced API access', 'Extended rate limits', 'Unlimited Projects'].map((feature) => (
+										{[
+											t('auth.store.developer.pro.features.advancedApi'),
+											t('auth.store.developer.pro.features.rateLimits'),
+											t('auth.store.developer.pro.features.unlimitedProjects'),
+										].map((feature) => (
 											<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 												<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 												<span>{feature}</span>
@@ -397,7 +404,7 @@ export default function StorePage() {
 											onClick={() => handleCancelClick(getActiveSubscription(activePrice?.id || null)!.stripeSubscriptionId)}
 											className="w-full py-3 px-4 rounded-xl font-medium bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 cursor-pointer"
 										>
-											Cancel API Plan
+											{t('auth.store.buttons.cancelApi')}
 										</button>
 									) : (
 										<button
@@ -405,7 +412,7 @@ export default function StorePage() {
 											disabled={!activePrice || actionLoading === activePrice?.id}
 											className="w-full py-3 px-4 rounded-xl font-medium bg-(--accent) hover:bg-(--hover-accent) text-white transition-all cursor-pointer disabled:opacity-50 shadow-sm"
 										>
-											{actionLoading === activePrice?.id ? 'Redirecting...' : 'Upgrade API'}
+											{actionLoading === activePrice?.id ? t('auth.store.buttons.redirecting') : t('auth.store.buttons.upgradeApi')}
 										</button>
 									)}
 								</div>

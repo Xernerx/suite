@@ -1,15 +1,14 @@
 /** @format */
-
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
 import { ChevronDown, Plus, Search, Shield, Trash2 } from 'lucide-react';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Loading } from '@xernerx/feedback';
 import { permissions } from '@xernerx/lib';
-import { useEnvironment } from '@xernerx/providers';
 
 interface Role {
 	id: string; // Random UUID
@@ -39,6 +38,7 @@ function RoleCard({
 	onRoleDeleted: (id: string) => void;
 	onRoleUpdated: (updated: Role) => void;
 }) {
+	const { t } = useDictionary();
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -114,7 +114,7 @@ function RoleCard({
 	};
 
 	const discordRoleOptions = [
-		{ value: '', label: 'None (Unlinked)' },
+		{ value: '', label: t('admin.roles.noneUnlinked') },
 		...discordRoles.map((dRole) => ({
 			value: dRole.id,
 			label: <span style={{ color: dRole.color ? `#${dRole.color.toString(16)}` : 'inherit' }}>{dRole.name}</span>,
@@ -143,7 +143,7 @@ function RoleCard({
 							<Shield size={24} />
 						</div>
 						<div className="flex flex-col overflow-hidden">
-							<h2 className="font-bold text-base text-(--text) truncate">{role.name || 'Unnamed Role'}</h2>
+							<h2 className="font-bold text-base text-(--text) truncate">{role.name || t('admin.roles.unnamedRole')}</h2>
 							<div className="flex items-center gap-2 mt-0.5">
 								{linkedDiscordRole ? (
 									<span
@@ -153,11 +153,13 @@ function RoleCard({
 										{linkedDiscordRole.name}
 									</span>
 								) : (
-									<span className="text-xs text-(--text-muted)">Unlinked</span>
+									<span className="text-xs text-(--text-muted)">{t('admin.roles.unlinked')}</span>
 								)}
-								{role.sync && <span className="text-[10px] px-1.5 py-0.5 rounded bg-(--accent)/20 text-(--accent) font-semibold uppercase">Synced</span>}
+								{role.sync && <span className="text-[10px] px-1.5 py-0.5 rounded bg-(--accent)/20 text-(--accent) font-semibold uppercase">{t('admin.roles.synced')}</span>}
 							</div>
-							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">UUID: {role.id}</span>
+							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">
+								{t('admin.roles.uuid')} {role.id}
+							</span>
 						</div>
 					</div>
 
@@ -174,10 +176,10 @@ function RoleCard({
 						<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }}>
 							<div className="border-t border-(--border)/10 bg-(--background)/50 flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 								<form onSubmit={handleUpdate} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-									<h3 className="text-sm font-bold text-(--text)">Manage Role Configuration</h3>
+									<h3 className="text-sm font-bold text-(--text)">{t('admin.roles.manageConfig')}</h3>
 
 									<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-										<label className="block text-xs font-medium text-(--text)">Role Name</label>
+										<label className="block text-xs font-medium text-(--text)">{t('admin.roles.roleNameLabel')}</label>
 										<input
 											type="text"
 											value={name}
@@ -192,7 +194,7 @@ function RoleCard({
 									</div>
 
 									<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-										<label className="block text-xs font-medium text-(--text)">Link Discord Role</label>
+										<label className="block text-xs font-medium text-(--text)">{t('admin.roles.linkDiscordRoleLabel')}</label>
 										<Selector
 											value={discordRoleId}
 											options={discordRoleOptions}
@@ -203,12 +205,12 @@ function RoleCard({
 													if (matched) setName(matched.name);
 												}
 											}}
-											placeholder="Select Discord role..."
+											placeholder={t('admin.roles.selectDiscordRolePlaceholder')}
 										/>
 									</div>
 
 									<div className="flex items-center justify-between pt-1">
-										<span className="text-xs font-medium text-(--text)">Sync name with Discord</span>
+										<span className="text-xs font-medium text-(--text)">{t('admin.roles.syncNameWithDiscord')}</span>
 										<Toggle
 											checked={sync}
 											onChange={(e) => {
@@ -225,7 +227,7 @@ function RoleCard({
 
 									{/* Permission Matrix */}
 									<div className="flex flex-col pt-2" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										<h4 className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">Permissions</h4>
+										<h4 className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">{t('admin.roles.permissionsHeader')}</h4>
 										<div
 											className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background) overflow-hidden"
 											style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
@@ -259,10 +261,10 @@ function RoleCard({
 											className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
 										>
 											<Trash2 size={14} />
-											Delete Role
+											{t('admin.roles.deleteRole')}
 										</button>
 										<Button type="submit" disabled={saving}>
-											{saving ? 'Saving...' : 'Save Changes'}
+											{saving ? t('admin.roles.saving') : t('admin.roles.saveChanges')}
 										</Button>
 									</div>
 								</form>
@@ -275,10 +277,10 @@ function RoleCard({
 			<Confirm
 				open={confirmDeleteOpen}
 				onOpenChange={setConfirmDeleteOpen}
-				title="Delete Role"
-				description={`Are you sure you want to delete role "${role.name || 'Unnamed'}"? This action cannot be undone.`}
-				confirmText="Delete"
-				cancelText="Cancel"
+				title={t('admin.roles.deleteRole')}
+				description={t('admin.roles.deleteConfirmDescription', { name: role.name || t('admin.roles.unnamedRole') })}
+				confirmText={t('admin.roles.confirmDelete')}
+				cancelText={t('admin.roles.cancel')}
 				onConfirm={handleDelete}
 				loading={deleting}
 			/>
@@ -288,6 +290,7 @@ function RoleCard({
 
 export default function Roles() {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 
 	const [roles, setRoles] = useState<Role[]>([]);
 	const [discordRoles, setDiscordRoles] = useState<DiscordRole[]>([]);
@@ -326,14 +329,14 @@ export default function Roles() {
 				if (guildRes.ok) setGuild(await guildRes.json());
 				if (discordRolesRes.ok) setDiscordRoles(await discordRolesRes.json());
 			} catch (err: any) {
-				setError(err.message || 'Failed to load roles data.');
+				setError(err.message || t('admin.roles.loadError'));
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchData();
-	}, [getEnvUrl]);
+	}, [getEnvUrl, t]);
 
 	const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -398,7 +401,7 @@ export default function Roles() {
 	}, [roles, search]);
 
 	const discordRoleOptions = [
-		{ value: '', label: 'None (Unlinked)' },
+		{ value: '', label: t('admin.roles.noneUnlinked') },
 		...discordRoles.map((dRole) => ({
 			value: dRole.id,
 			label: <span style={{ color: dRole.color ? `#${dRole.color.toString(16)}` : 'inherit' }}>{dRole.name}</span>,
@@ -406,7 +409,12 @@ export default function Roles() {
 	];
 
 	if (loading) return <Loading />;
-	if (error) return <div className="p-6 text-red-500">Error: {error}</div>;
+	if (error)
+		return (
+			<div className="p-6 text-red-500">
+				{t('admin.roles.errorPrefix')} {error}
+			</div>
+		);
 
 	return (
 		<div
@@ -424,7 +432,7 @@ export default function Roles() {
 					<div className="flex flex-col">
 						<h1 className="text-xl font-bold text-(--text)">{guild.name}</h1>
 						<p className="text-xs text-(--text-muted)">
-							Server ID: {guild.id} | Members: {guild.approximate_member_count || 'N/A'}
+							{t('admin.roles.serverId')} {guild.id} | {t('admin.roles.members')} {guild.approximate_member_count || 'N/A'}
 						</p>
 					</div>
 				</div>
@@ -433,8 +441,8 @@ export default function Roles() {
 			{/* Header & New Role Button */}
 			<div className="flex flex-col sm:flex-row items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col">
-					<h1 className="text-3xl font-black tracking-tight text-(--text)">Role Management</h1>
-					<p className="text-sm text-(--text-muted)">Configure custom system roles and map them directly to Discord server roles.</p>
+					<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('admin.roles.title')}</h1>
+					<p className="text-sm text-(--text-muted)">{t('admin.roles.description')}</p>
 				</div>
 				<Button
 					variant="primary"
@@ -452,7 +460,7 @@ export default function Roles() {
 					style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
 				>
 					<Plus size={16} />
-					<span>New Role</span>
+					<span>{t('admin.roles.newRoleButton')}</span>
 				</Button>
 			</div>
 
@@ -461,7 +469,7 @@ export default function Roles() {
 				<Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)" />
 				<input
 					type="text"
-					placeholder="Search by role name, UUID, or Discord ID..."
+					placeholder={t('admin.roles.searchPlaceholder')}
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 					className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
@@ -472,7 +480,7 @@ export default function Roles() {
 			{/* Roles Grid (3 Columns) */}
 			{filteredRoles.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
-					<p className="text-sm text-(--text-muted)">No roles found matching your search.</p>
+					<p className="text-sm text-(--text-muted)">{t('admin.roles.noRolesFound')}</p>
 				</div>
 			) : (
 				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
@@ -485,22 +493,22 @@ export default function Roles() {
 			)}
 
 			{/* Create Modal */}
-			<Modal open={isCreateOpen} onOpenChange={setIsCreateOpen} title="Create New Role" description="Add a new custom role and optionally link it to a Discord role.">
+			<Modal open={isCreateOpen} onOpenChange={setIsCreateOpen} title={t('admin.roles.createModalTitle')} description={t('admin.roles.createModalDesc')}>
 				<form onSubmit={handleCreate} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Role Name</label>
+						<label className="block text-xs font-medium text-(--text)">{t('admin.roles.roleNameLabel')}</label>
 						<input
 							type="text"
-							placeholder="e.g., Administrator"
+							placeholder={t('admin.roles.roleNamePlaceholder')}
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 							required
 						/>
 					</div>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Link Discord Role</label>
+						<label className="block text-xs font-medium text-(--text)">{t('admin.roles.linkDiscordRoleLabel')}</label>
 						<Selector
 							value={newDiscordRoleId}
 							options={discordRoleOptions}
@@ -511,11 +519,11 @@ export default function Roles() {
 									if (matched) setNewName(matched.name);
 								}
 							}}
-							placeholder="Select Discord role..."
+							placeholder={t('admin.roles.selectDiscordRolePlaceholder')}
 						/>
 					</div>
 					<div className="flex items-center justify-between pt-1">
-						<span className="text-xs font-medium text-(--text)">Sync name with Discord</span>
+						<span className="text-xs font-medium text-(--text)">{t('admin.roles.syncNameWithDiscord')}</span>
 						<Toggle
 							checked={newSync}
 							onChange={(e) => {
@@ -532,8 +540,8 @@ export default function Roles() {
 
 					{/* Create Permission Matrix */}
 					<div className="flex flex-col pt-2" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-						<h4 className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">Permissions</h4>
-						<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background) overflow-hidden" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<h4 className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">{t('admin.roles.permissionsHeader')}</h4>
+						<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--foreground) overflow-hidden" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 							{permissions.map((perm) => (
 								<div key={perm.key} className="flex items-center justify-between">
 									<div className="flex flex-col">
@@ -558,10 +566,10 @@ export default function Roles() {
 
 					<div className="flex justify-end gap-3 pt-2">
 						<Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
-							Cancel
+							{t('admin.roles.cancel')}
 						</Button>
 						<Button type="submit" variant="primary" disabled={creating}>
-							{creating ? 'Creating...' : 'Create Role'}
+							{creating ? t('admin.roles.creating') : t('admin.roles.createButton')}
 						</Button>
 					</div>
 				</form>

@@ -1,14 +1,13 @@
 /** @format */
-
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
 import { ChevronDown, Key, Plus, Search, Trash2, User as UserIcon, X } from 'lucide-react';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loading } from '@xernerx/feedback';
-import { useEnvironment } from '@xernerx/providers';
 
 interface Token {
 	_id: string;
@@ -37,17 +36,8 @@ interface UserOption {
  * Fetches users from `secure/users`, missing Discord profiles from `core/users/[id]/discord`,
  * filters in JS, and outputs an array of selected user IDs.
  */
-function AsyncUserMultiSelector({
-	values,
-	onChange,
-	getEnvUrl,
-	placeholder = 'Add owner...',
-}: {
-	values: string[];
-	onChange: (vals: string[]) => void;
-	getEnvUrl: (url: string) => string;
-	placeholder?: string;
-}) {
+function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { values: string[]; onChange: (vals: string[]) => void; getEnvUrl: (url: string) => string; placeholder?: string }) {
+	const { t } = useDictionary();
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [users, setUsers] = useState<UserOption[]>([]);
@@ -216,7 +206,7 @@ function AsyncUserMultiSelector({
 					className="flex w-full items-center justify-between rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) shadow-sm transition-all hover:border-(--border)/40 focus:border-(--accent) focus:outline-none"
 					style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
 				>
-					<span className="text-(--text-muted) font-medium">{placeholder}</span>
+					<span className="text-(--text-muted) font-medium">{placeholder || t('admin.tokens.ownersPlaceholder')}</span>
 					<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
 				</button>
 
@@ -236,7 +226,7 @@ function AsyncUserMultiSelector({
 								<input
 									ref={inputRef}
 									type="text"
-									placeholder="Search by name or Discord ID..."
+									placeholder={t('admin.tokens.ownersPlaceholder')}
 									value={query}
 									onChange={(e) => setQuery(e.target.value)}
 									className="w-full rounded-xl border border-(--border)/10 bg-(--background) text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
@@ -252,7 +242,7 @@ function AsyncUserMultiSelector({
 										<Loading />
 									</div>
 								) : filteredUsers.length === 0 ? (
-									<div className="py-4 text-center text-xs text-(--text-muted)">No matching users found</div>
+									<div className="py-4 text-center text-xs text-(--text-muted)">{t('admin.tokens.empty.title')}</div>
 								) : (
 									filteredUsers.map((u) => (
 										<button
@@ -293,6 +283,7 @@ function TokenCard({
 	onTokenDeleted: (id: string) => void;
 	onTokenUpdated: (updated: Token) => void;
 }) {
+	const { t } = useDictionary();
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [loadingDetails, setLoadingDetails] = useState(false);
 	const [fullToken, setFullToken] = useState<Token | null>(null);
@@ -415,7 +406,7 @@ function TokenCard({
 							<Key size={24} />
 						</div>
 						<div className="flex flex-col overflow-hidden">
-							<h2 className="font-bold text-base text-(--text) truncate">{token.name || 'Unnamed Token'}</h2>
+							<h2 className="font-bold text-base text-(--text) truncate">{token.name || t('admin.tokens.empty.title')}</h2>
 							<div className="flex items-center gap-2 mt-0.5">
 								<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>{token.status}</span>
 							</div>
@@ -441,10 +432,10 @@ function TokenCard({
 									</div>
 								) : (
 									<form onSubmit={handleUpdate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
-										<h3 className="text-sm font-bold text-(--text)">Manage Token Configuration</h3>
+										<h3 className="text-sm font-bold text-(--text)">{t('admin.tokens.manage.modalTitle')}</h3>
 
 										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">Token Name</label>
+											<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.nameLabel')}</label>
 											<input
 												type="text"
 												value={name}
@@ -482,7 +473,7 @@ function TokenCard({
 										</div>
 
 										<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">Owners</label>
+											<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
 											<AsyncUserMultiSelector values={selectedOwners} onChange={setSelectedOwners} getEnvUrl={getEnvUrl} />
 										</div>
 
@@ -501,10 +492,10 @@ function TokenCard({
 												className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
 											>
 												<Trash2 size={14} />
-												Delete Token
+												{t('admin.tokens.manage.revokeTitle')}
 											</button>
 											<Button type="submit" disabled={saving}>
-												{saving ? 'Saving...' : 'Save Changes'}
+												{saving ? t('admin.roles.saving') : t('admin.tokens.manage.saveButton')}
 											</Button>
 										</div>
 									</form>
@@ -518,10 +509,10 @@ function TokenCard({
 			<Confirm
 				open={confirmDeleteOpen}
 				onOpenChange={setConfirmDeleteOpen}
-				title="Delete Token"
-				description={`Are you sure you want to delete token "${token.name || 'Unnamed'}"? This action cannot be undone.`}
-				confirmText="Delete"
-				cancelText="Cancel"
+				title={t('admin.tokens.manage.revokeTitle')}
+				description={t('admin.tokens.manage.deleteConfirm')}
+				confirmText={t('admin.roles.confirmDelete')}
+				cancelText={t('admin.roles.cancel')}
 				onConfirm={handleDelete}
 				loading={deleting}
 			/>
@@ -531,6 +522,7 @@ function TokenCard({
 
 export default function Tokens() {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 
 	const [tokens, setTokens] = useState<Token[]>([]);
 	const [search, setSearch] = useState('');
@@ -555,14 +547,14 @@ export default function Tokens() {
 				const data = await res.json();
 				setTokens(data);
 			} catch (err: any) {
-				setError(err.message || 'Failed to load tokens data.');
+				setError(err.message || t('admin.tokens.toast.loadError', { error: err.message }));
 			} finally {
 				setLoading(false);
 			}
 		};
 
 		fetchTokens();
-	}, [getEnvUrl]);
+	}, [getEnvUrl, t]);
 
 	const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -633,8 +625,8 @@ export default function Tokens() {
 			{/* Header & New Token Button */}
 			<div className="flex flex-col sm:flex-row items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col">
-					<h1 className="text-3xl font-black tracking-tight text-(--text)">API Token Management</h1>
-					<p className="text-sm text-(--text-muted)">Manage organization access tokens, bot identifiers, and secure endpoint permissions.</p>
+					<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('admin.tokens.title')}</h1>
+					<p className="text-sm text-(--text-muted)">{t('admin.tokens.description')}</p>
 				</div>
 				<Button
 					variant="primary"
@@ -649,7 +641,7 @@ export default function Tokens() {
 					style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
 				>
 					<Plus size={16} />
-					<span>New Token</span>
+					<span>{t('admin.tokens.generateButton')}</span>
 				</Button>
 			</div>
 
@@ -658,7 +650,7 @@ export default function Tokens() {
 				<Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)" />
 				<input
 					type="text"
-					placeholder="Search by token name or UUID..."
+					placeholder={t('admin.tokens.empty.description')}
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 					className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
@@ -669,7 +661,7 @@ export default function Tokens() {
 			{/* Tokens Grid (3 Columns) */}
 			{filteredTokens.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
-					<p className="text-sm text-(--text-muted)">No tokens found matching your search.</p>
+					<p className="text-sm text-(--text-muted)">{t('admin.tokens.empty.title')}</p>
 				</div>
 			) : (
 				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
@@ -682,16 +674,16 @@ export default function Tokens() {
 			)}
 
 			{/* Create Modal */}
-			<Modal open={isCreateOpen} onOpenChange={setIsCreateOpen} title="Create New Token" description="Add a new API token with associated permissions and configuration.">
+			<Modal open={isCreateOpen} onOpenChange={setIsCreateOpen} title={t('admin.tokens.create.modalTitle')} description={t('admin.tokens.description')}>
 				<form onSubmit={handleCreate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Token Name</label>
+						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.create.nameLabel')}</label>
 						<input
 							type="text"
-							placeholder="e.g., Production Bot Token"
+							placeholder={t('admin.tokens.create.namePlaceholder')}
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 							required
 						/>
@@ -716,12 +708,12 @@ export default function Tokens() {
 							placeholder="Optional Bot ID..."
 							value={newBotId}
 							onChange={(e) => setNewBotId(e.target.value)}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 						/>
 					</div>
 					<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Owners</label>
+						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
 						<AsyncUserMultiSelector values={newSelectedOwners} onChange={setNewSelectedOwners} getEnvUrl={getEnvUrl} />
 					</div>
 					<div className="flex items-center justify-between pt-1">
@@ -733,10 +725,10 @@ export default function Tokens() {
 					</div>
 					<div className="flex justify-end gap-3 pt-2">
 						<Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
-							Cancel
+							{t('admin.tokens.create.cancelButton')}
 						</Button>
 						<Button type="submit" variant="primary" disabled={creating}>
-							{creating ? 'Creating...' : 'Create Token'}
+							{creating ? t('admin.roles.creating') : t('admin.tokens.create.submitButton')}
 						</Button>
 					</div>
 				</form>

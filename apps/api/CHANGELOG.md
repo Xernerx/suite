@@ -1,5 +1,11 @@
 # api
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies and added Translation page
+
 ## 0.4.1
 
 ### Patch Changes

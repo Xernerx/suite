@@ -45,17 +45,8 @@ interface UserOption {
  * Instead of fetching a bulk user database, it strictly fetches the specified
  * Discord ID from `core/users/[id]/discord` when entered.
  */
-function AsyncUserMultiSelector({
-	values,
-	onChange,
-	getEnvUrl,
-	placeholder = 'Add owner by Discord ID...',
-}: {
-	values: string[];
-	onChange: (vals: string[]) => void;
-	getEnvUrl: (url: string) => string;
-	placeholder?: string;
-}) {
+function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { values: string[]; onChange: (vals: string[]) => void; getEnvUrl: (url: string) => string; placeholder?: string }) {
+	const { t } = useDictionary();
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [users, setUsers] = useState<UserOption[]>([]);
@@ -183,7 +174,7 @@ function AsyncUserMultiSelector({
 					onClick={() => setIsOpen(!isOpen)}
 					className="flex w-full items-center justify-between rounded-xl border border-(--border)/20 bg-(--background) px-4 py-2.5 text-sm font-medium text-(--text) outline-none transition focus:border-(--accent)"
 				>
-					<span className="text-(--text-muted) font-medium">{placeholder}</span>
+					<span className="text-(--text-muted) font-medium">{placeholder || t('auth.tokens.manage.ownersPlaceholder')}</span>
 					<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
 				</button>
 
@@ -203,7 +194,7 @@ function AsyncUserMultiSelector({
 								<input
 									ref={inputRef}
 									type="text"
-									placeholder="Enter Discord ID..."
+									placeholder={t('auth.tokens.manage.ownersPlaceholder')}
 									value={query}
 									onChange={(e) => setQuery(e.target.value)}
 									className="w-full rounded-xl border border-(--border)/10 bg-(--background) text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
@@ -215,7 +206,7 @@ function AsyncUserMultiSelector({
 							{/* Options List */}
 							<div className="overflow-y-auto max-h-52 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 								{!isValidId ? (
-									<div className="py-4 text-center text-xs text-(--text-muted)">Enter a valid 17-20 digit Discord ID</div>
+									<div className="py-4 text-center text-xs text-(--text-muted)">{t('auth.tokens.manage.invalidIdPrompt', {}, 'Enter a valid 17-20 digit Discord ID')}</div>
 								) : loading ? (
 									<div className="py-6 flex justify-center">
 										<Loading />
@@ -241,9 +232,9 @@ function AsyncUserMultiSelector({
 										</div>
 									</button>
 								) : searchedUser && values.includes(searchedUser.id) ? (
-									<div className="py-4 text-center text-xs text-(--text-muted)">User already added</div>
+									<div className="py-4 text-center text-xs text-(--text-muted)">{t('auth.tokens.manage.userAlreadyAdded', {}, 'User already added')}</div>
 								) : (
-									<div className="py-4 text-center text-xs text-(--text-muted)">User not found</div>
+									<div className="py-4 text-center text-xs text-(--text-muted)">{t('auth.tokens.manage.userNotFound', {}, 'User not found')}</div>
 								)}
 							</div>
 						</motion.div>
@@ -476,7 +467,7 @@ function CreateTokenModal({ isOpen, onClose, onSuccess, userId }: { isOpen: bool
 							</div>
 
 							<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-								<label className="text-sm font-medium text-(--text)">{t('auth.tokens.manage.ownersLabel', {}, 'Owners')}</label>
+								<label className="text-sm font-medium text-(--text)">{t('auth.tokens.manage.ownersLabel')}</label>
 								<AsyncUserMultiSelector values={owners} onChange={setOwners} getEnvUrl={getEnvUrl} />
 							</div>
 
@@ -548,7 +539,6 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 		fetchFullToken();
 	}, [tokenId, onClose, toast, getEnvUrl, t]);
 
-	// Derived dirty state check (sort arrays to ensure order doesn't cause false positives)
 	const isDirty = token ? name !== token.name || [...owners].sort().join(',') !== [...token.owners].sort().join(',') || status !== token.status : false;
 
 	const handleCopy = () => {
@@ -563,7 +553,6 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 		e.preventDefault();
 		if (!token) return;
 
-		// If nothing changed, act as a close button
 		if (!isDirty) {
 			onClose();
 			return;
@@ -633,7 +622,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 									<h3 className="text-xl font-bold text-(--text)">{t('auth.tokens.manage.modalTitle')}</h3>
 									<button
 										onClick={handleDelete}
-										className="p-2 text-(--accent-red) hover:bg-(--accent-red)/10 rounded-xl transition-colors"
+										className="p-2 text-(--accent-red) hover:bg-(--accent-red)/10 rounded-xl transition-colors cursor-pointer"
 										title={t('auth.tokens.manage.revokeTitle')}
 									>
 										<Trash2 size={18} />
@@ -651,11 +640,11 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 										<button
 											type="button"
 											onClick={() => setIsTokenVisible(!isTokenVisible)}
-											className="p-2.5 rounded-xl bg-(--foreground) border border-(--border)/20 text-(--text-muted) hover:text-(--text) hover:border-(--accent) transition"
+											className="p-2.5 rounded-xl bg-(--foreground) border border-(--border)/20 text-(--text-muted) hover:text-(--text) hover:border-(--accent) transition cursor-pointer"
 										>
 											{isTokenVisible ? <EyeOff size={16} /> : <Eye size={16} />}
 										</button>
-										<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) transition">
+										<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) transition cursor-pointer">
 											{copied ? <Check size={16} /> : <Copy size={16} />}
 										</button>
 									</div>
@@ -675,16 +664,18 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 									</div>
 
 									<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										<label className="text-sm font-medium text-(--text)">{t('auth.tokens.manage.ownersLabel', {}, 'Owners')}</label>
+										<label className="text-sm font-medium text-(--text)">{t('auth.tokens.manage.ownersLabel')}</label>
 										<AsyncUserMultiSelector values={owners} onChange={setOwners} getEnvUrl={getEnvUrl} />
 									</div>
 
 									{token.status !== 'pending' && token.status !== 'suspended' && (
 										<div className="flex items-center justify-between rounded-xl border border-(--border)/20 bg-(--background) px-4 py-3">
 											<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-												<span className="text-sm font-medium text-(--text)">Active Status</span>
+												<span className="text-sm font-medium text-(--text)">{t('auth.tokens.manage.statusTitle', {}, 'Active Status')}</span>
 												<span className="text-xs text-(--text-muted)">
-													{status === 'active' ? 'Token is active and can make API requests' : 'Token is temporarily disabled'}
+													{status === 'active'
+														? t('auth.tokens.manage.statusActive', {}, 'Token is active and can make API requests')
+														: t('auth.tokens.manage.statusInactive', {}, 'Token is temporarily disabled')}
 												</span>
 											</div>
 											<Toggle checked={status === 'active'} onChange={() => setStatus(status === 'active' ? 'inactive' : 'active')} />
@@ -692,10 +683,9 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 									)}
 
 									<div className="flex justify-end gap-3 mt-2">
-										{/* Only show secondary cancel/close if the form is dirty */}
 										{isDirty && (
 											<Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
-												Cancel
+												{t('auth.tokens.manage.closeButton', {}, 'Cancel')}
 											</Button>
 										)}
 										<Button type="submit" className="bg-(--accent) text-white hover:bg-(--accent-hover) gap-2" disabled={isSaving}>

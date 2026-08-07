@@ -51,7 +51,10 @@
 				"account": "Account",
 				"preferences": "Preferences",
 				"billing": "Billing",
-				"developer": "Developer"
+				"developer": "Developer",
+				"moderator": "Moderator",
+				"administrator": "Administrator",
+				"translator": "Translator"
 			},
 			"items": {
 				"account": "Account",
@@ -63,7 +66,10 @@
 				"notifications": "Notifications",
 				"billing": "Billing",
 				"tokens": "Tokens",
-				"store": "Store"
+				"store": "Store",
+				"users": "Users",
+				"roles": "Roles",
+				"translations": "Translations"
 			}
 		}
 	},
@@ -89,7 +95,177 @@
 			"No token, no data. Those are the rules, I didn't make them up (yes I did)."
 		]
 	},
+	"admin": {
+		"roles": {
+			"title": "Role Management",
+			"description": "Configure custom system roles and map them directly to Discord server roles.",
+			"serverId": "Server ID",
+			"members": "Members",
+			"newRoleButton": "New Role",
+			"searchPlaceholder": "Search by role name, UUID, or Discord ID...",
+			"noRolesFound": "No roles found matching your search.",
+			"unnamedRole": "Unnamed Role",
+			"unlinked": "Unlinked",
+			"synced": "Synced",
+			"uuid": "UUID:",
+			"noneUnlinked": "None (Unlinked)",
+			"manageConfig": "Manage Role Configuration",
+			"roleNameLabel": "Role Name",
+			"roleNamePlaceholder": "e.g., Administrator",
+			"linkDiscordRoleLabel": "Link Discord Role",
+			"selectDiscordRolePlaceholder": "Select Discord role...",
+			"syncNameWithDiscord": "Sync name with Discord",
+			"permissionsHeader": "Permissions",
+			"deleteRole": "Delete Role",
+			"saveChanges": "Save Changes",
+			"saving": "Saving...",
+			"deleteConfirmDescription": "Are you sure you want to delete role \"{name}\"? This action cannot be undone.",
+			"confirmDelete": "Delete",
+			"cancel": "Cancel",
+			"createModalTitle": "Create New Role",
+			"createModalDesc": "Add a new custom role and optionally link it to a Discord role.",
+			"createButton": "Create Role",
+			"creating": "Creating...",
+			"loadError": "Failed to load roles data.",
+			"errorPrefix": "Error:"
+		},
+		"users": {
+			"title": "User Management",
+			"description": "Manage platform users, view Discord integrations, and adjust roles or permissions.",
+			"searchPlaceholder": "Search by name, id, or discord username...",
+			"sortLabel": "Sort:",
+			"noUsersFound": "No users found matching your search.",
+			"noRoles": "No Roles",
+			"manageUser": "Manage Xernerx User",
+			"displayNameLabel": "Display Name",
+			"rolesLabel": "Roles",
+			"addRolePlaceholder": "Add role...",
+			"searchRolesPlaceholder": "Search roles...",
+			"noMatchingRoles": "No matching roles found",
+			"stripeCustomerIdLabel": "Stripe Customer ID",
+			"stripeCustomerPlaceholder": "e.g., cus_...",
+			"descriptionLabel": "Description",
+			"privacyLevelLabel": "Privacy Level",
+			"staffSubTitle": "Staff Subscriptions",
+			"staffSubDesc": "Grants user an active infinite subscription for all services until toggled off.",
+			"emailLabel": "Email:",
+			"deleteButton": "Delete User",
+			"deleteUserTitle": "Delete User",
+			"deleteUserConfirmDesc": "Are you sure you want to delete user {name} ({id})? This action cannot be undone.",
+			"toast": {
+				"staffApplied": "Staff subscription applied",
+				"staffCanceled": "Staff subscription canceled",
+				"staffError": "Error updating staff subscription",
+				"updateSuccess": "User updated successfully",
+				"updateError": "Failed to update user",
+				"deleteSuccess": "User deleted successfully",
+				"deleteError": "Failed to delete user"
+			}
+		},
+		"tokens": {
+			"title": "API Token Management",
+			"description": "Manage organization access tokens, bot identifiers, and secure endpoint permissions.",
+			"generateButton": "New Token",
+			"ownersPlaceholder": "482513687417061376",
+			"empty": {
+				"title": "No tokens found matching your search.",
+				"description": "Search by token name or UUID..."
+			},
+			"toast": {
+				"loadError": "Error loading tokens, error: {error}"
+			},
+			"create": {
+				"modalTitle": "Create New Token",
+				"nameLabel": "Token Name",
+				"namePlaceholder": "e.g., Production Bot Token",
+				"cancelButton": "Cancel",
+				"submitButton": "Create Token"
+			},
+			"manage": {
+				"modalTitle": "Manage Token Configuration",
+				"revokeTitle": "Delete Token",
+				"nameLabel": "Token Name",
+				"ownersLabel": "Owners",
+				"ownersPlaceholder": "Add owner...",
+				"saveButton": "Save Changes",
+				"deleteConfirm": "Are you sure you want to delete this token? This action cannot be undone."
+			}
+		},
+		"translations": {
+			"title": "Translation Studio",
+			"description": "Select your target language and manage translation keys against English source.",
+			"pushToReview": "Push to review",
+			"tabs": {
+				"introduction": "Introduction",
+				"newEntries": "New Entries ({count})",
+				"reviewExisting": "Review Existing ({count})"
+			},
+			"welcome": {
+				"title": "Welcome to the Translation Studio",
+				"descStart": "Help us localize the Xernerx platform directly within the app! You are translating from our source of truth, ",
+				"english": "English (UK) (en-GB)",
+				"descMiddle": ", into ",
+				"newEntriesTitle": "Step-by-Step New Entries",
+				"newEntriesDesc": "Tackle missing keys one by one through a distraction-free card interface. Go at your own pace without feeling overwhelmed.",
+				"startTranslating": "Start Translating New ({count} left)",
+				"reviewTitle": "Review Existing Keys",
+				"reviewDesc": "Need to fix a typo or refine a translation reported by users? Browse and update all existing translations in a full list.",
+				"browseAll": "Browse All Translations",
+				"footerPart1": "Once you are finished translating, click ",
+				"footerBold": "Push to review",
+				"footerPart2": " at the top right to submit your work to the review branch! Any untranslated or empty entries will be omitted automatically.",
+				"guide": {
+					"title": "Before you start",
+					"step1": "If possible you may require a basic understanding of the English (UK) language",
+					"step2": "You can choose to either review new entries or modify existing ones",
+					"step3": "There is no deadline or haste upon these translations, take your time.",
+					"step4": "When you are changing keys the push to review button will become available, only press this once ready.",
+					"step5": "While editing try to not close or refresh the page, it may lose unsaved progression.",
+					"step6": "After submitting you will see your translated keys untranslated again, this is normal. The live environment cannot update manually, you have to wait for an admin to merge this updated dictionary with the live environment. You can speed up this progress by asking an admin directly to merge these changes"
+				}
+			},
+			"new": {
+				"allCaughtUp": "All caught up!",
+				"noMissingKeys": "There are no missing translation keys for {locale}.",
+				"reviewExistingButton": "Review Existing Translations",
+				"cardCounter": "Card {current} of {total}",
+				"translateInstruction": "Translate this sentence from English (UK) to {locale}:",
+				"yourTranslation": "Your Translation",
+				"typePlaceholder": "Type translation here...",
+				"previous": "Previous",
+				"next": "Next",
+				"finish": "Finish & Review"
+			},
+			"review": {
+				"searchPlaceholder": "Search translation keys or content...",
+				"noKeysFound": "No matching translation keys found.",
+				"missingKey": "Missing Key",
+				"translateInto": "Translate into {locale}..."
+			},
+			"success": {
+				"pushed": "Pull request successfully pushed to review branch!"
+			},
+			"errors": {
+				"fetchFailed": "Failed to fetch dictionary files",
+				"loadFailed": "Error loading dictionaries",
+				"noChanges": "No changes detected to push.",
+				"pushFailed": "Failed to push review branch",
+				"pushError": "Error pushing to review"
+			},
+			"unsaved": {
+				"title": "Unsaved Translations",
+				"description": "You have unsaved translations. If you leave now, all your current progress will be lost.",
+				"leave": "Discard Changes",
+				"stay": "Keep Editing"
+			}
+		}
+	},
 	"auth": {
+		"unauthorized": {
+			"title": "Unauthorized Access",
+			"description": "You do not have the required permissions or role to access the Xernerx administrative dashboard.",
+			"button": "Return Back"
+		},
 		"account": {
 			"title": "Account Settings",
 			"description": "Manage your account session, data privacy, and global profile details.",
@@ -345,7 +521,7 @@
 				"securityWarning": "Treat this token like a password. Do not expose it in client-side code.",
 				"nameLabel": "Token Name",
 				"ownersLabel": "Owners (Discord IDs)",
-				"ownersPlaceholder": "Comma separated IDs",
+				"ownersPlaceholder": "Add owner by Discord ID...",
 				"closeButton": "Close",
 				"saveButton": "Save Changes",
 				"loadError": "Failed to load token, error: {error}",
@@ -354,7 +530,93 @@
 				"updateError": "Update failed",
 				"deleteConfirm": "Are you sure you want to permanently delete this token?",
 				"deleteSuccess": "Token deleted",
-				"deleteError": "Deletion failed"
+				"deleteError": "Deletion failed",
+				"invalidIdPrompt": "Enter a valid 17-20 digit Discord ID",
+				"userAlreadyAdded": "User already added",
+				"userNotFound": "User not found",
+				"statusTitle": "Active Status",
+				"statusActive": "Token is active and can make API requests",
+				"statusInactive": "Token is temporarily disabled"
+			}
+		},
+		"store": {
+			"title": "Xernerx Store",
+			"description": "Choose your ecosystem. Access individual bot passes and the all-in-one Ultra bundle, or manage your developer API tools.",
+			"tabs": {
+				"consumers": "Bots, Servers & Ultra",
+				"developers": "Developer API"
+			},
+			"billing": {
+				"monthly": "Monthly",
+				"annually": "Annually (Save 20%)"
+			},
+			"ultra": {
+				"badge": "Ultimate Ecosystem Bundle",
+				"subtitle": "All-in-One Access",
+				"fallbackName": "Ultra",
+				"fallbackDesc": "Includes all user and server subscriptions of our bots in a single master pass.",
+				"features": {
+					"bots": "Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)",
+					"servers": "All server-level utility subscriptions",
+					"support": "Priority support channel access"
+				}
+			},
+			"sections": {
+				"bots": "Individual Bot Passes",
+				"servers": "Server Infrastructure Passes"
+			},
+			"cards": {
+				"botFallback": "Individual bot license pass",
+				"serverFallback": "Server infrastructure pass"
+			},
+			"developer": {
+				"free": {
+					"badge": "API Access",
+					"title": "Developer Free",
+					"desc": "Perfect for individual developers testing local environments and personal projects.",
+					"price": "Free",
+					"features": {
+						"standardApi": "Standard API access",
+						"projects": "1 Project"
+					}
+				},
+				"pro": {
+					"badge": "Developer Pro",
+					"fallbackName": "API Suite",
+					"fallbackDesc": "Advanced API rate limits and custom domains.",
+					"features": {
+						"advancedApi": "Advanced API access",
+						"rateLimits": "Extended rate limits",
+						"unlimitedProjects": "Unlimited Projects"
+					}
+				}
+			},
+			"pricing": {
+				"monthlySuffix": "/mo",
+				"yearlySuffix": "/yr",
+				"monthShort": "mo",
+				"yearShort": "yr"
+			},
+			"buttons": {
+				"loading": "Loading plan...",
+				"cancelUltra": "Cancel Ultra Bundle",
+				"activeUntil": "Active until {date}",
+				"getUltra": "Get Ultra Bundle",
+				"cancelPass": "Cancel Pass",
+				"getPass": "Get Pass",
+				"currentPlan": "Current Plan",
+				"cancelApi": "Cancel API Plan",
+				"upgradeApi": "Upgrade API",
+				"redirecting": "Redirecting..."
+			},
+			"cancel": {
+				"title": "Cancel Subscription",
+				"successMessage": "Subscription successfully scheduled for cancellation at the end of your billing period. Redirecting...",
+				"description": "Are you sure you want to cancel your subscription? You will retain full access to your premium features until the end of your current billing cycle.",
+				"canceling": "Canceling...",
+				"confirmButton": "Confirm Cancellation",
+				"keepButton": "Keep Subscription",
+				"errorDefault": "Failed to cancel subscription"
 			}
 		}
 	},

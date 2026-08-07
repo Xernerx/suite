@@ -1,5 +1,11 @@
 # admin
 
+## 0.1.4
+
+### Patch Changes
+
+- Updated dependencies and added Translation page
+
 ## 0.1.3
 
 ### Patch Changes

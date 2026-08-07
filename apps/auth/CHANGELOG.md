@@ -1,5 +1,11 @@
 # auth
 
+## 0.5.6
+
+### Patch Changes
+
+- Updated dependencies and added Translation page
+
 ## 0.5.5
 
 ### Patch Changes

@@ -1,19 +1,24 @@
 /** @format */
 'use client';
 
+import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
+
 import { Button } from '@xernerx/ui';
+import Link from 'next/link';
+import { Session } from 'next-auth';
 import { ShieldAlert } from 'lucide-react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSidebar } from '@xernerx/providers';
 
-export default function ReturnPage() {
+export default function ReturnPage({ session }: { session: Session | null }) {
 	const router = useRouter();
 	const { hide } = useSidebar();
+	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 
 	useEffect(() => {
 		hide();
-	}, []);
+	}, [hide]);
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
@@ -25,10 +30,16 @@ export default function ReturnPage() {
 					<ShieldAlert size={32} />
 				</div>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h1 className="text-xl font-bold text-(--text)">Unauthorized Access</h1>
-					<p className="text-sm text-(--text-muted)">You do not have the required permissions or role to access the Xernerx administrative dashboard.</p>
+					<h1 className="text-xl font-bold text-(--text)">{t('auth.unauthorized.title')}</h1>
+					<p className="text-sm text-(--text-muted)">{t('auth.unauthorized.description')}</p>
 				</div>
-				<Button onClick={() => router.back()}>Return Back</Button>
+				{session ? (
+					<Button onClick={() => router.back()}>{t('auth.unauthorized.button')}</Button>
+				) : (
+					<Button>
+						<Link href={getEnvUrl('https://auth.xernerx.com')}>{t('common.sidebar.login')}</Link>
+					</Button>
+				)}
 			</div>
 		</div>
 	);
