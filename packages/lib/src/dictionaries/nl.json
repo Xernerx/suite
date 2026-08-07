@@ -53,7 +53,8 @@
                 "billing": "Facturering",
                 "developer": "Ontwikkelaar",
                 "moderator": "Moderator",
-                "administrator": "Administrator"
+                "administrator": "Administrator",
+                "translator": "Vertaler"
             },
             "items": {
                 "account": "Account",
@@ -64,7 +65,11 @@
                 "language": "Taal",
                 "notifications": "Meldingen",
                 "billing": "Facturering",
-                "tokens": "Tokens"
+                "tokens": "Tokens",
+                "store": "Winkel",
+                "users": "Gebruikers",
+                "roles": "Rollen",
+                "translations": "Vertalingen"
             }
         }
     },
@@ -537,6 +542,11 @@
                     "prefix": "Voor juridische vragen kun je contact opnemen met"
                 }
             }
+        }
+    },
+    "admin": {
+        "roles": {
+            "title": "Rollen Beheer"
         }
     }
 }
