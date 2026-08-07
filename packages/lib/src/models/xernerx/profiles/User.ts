@@ -61,6 +61,7 @@ const schema = new Schema(
 		// --- STRIPE BILLING & SUBSCRIPTIONS ---
 		stripeCustomerId: { type: String, default: null }, // Links this user to a Stripe Customer
 		subscriptions: { type: [subscriptionSchema], default: [] }, // Array holding all active/past subscriptions
+		staffSubscription: { type: Boolean, default: false },
 	},
 	{ timestamps: true }
 );

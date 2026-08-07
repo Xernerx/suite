@@ -1,15 +1,18 @@
 /** @format */
-
 'use client';
 
+import { AlertTriangle, ArrowUpDown, Check, ChevronDown, Copy, Eye, EyeOff, Key, Loader2, Plus, Save, Search, Settings2, Trash2, User as UserIcon, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpDown, ChevronDown, Plus, Search, Shield, Trash2, User as UserIcon } from 'lucide-react';
-import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
-import { useEffect, useMemo, useState } from 'react';
+import { Button, Confirm, Selector, Toggle } from '@xernerx/ui';
+import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Image from 'next/image';
 import { Loading } from '@xernerx/feedback';
-import { useEnvironment } from '@xernerx/providers';
+
+// -----------------------------------------------------------------------------
+// Types
+// -----------------------------------------------------------------------------
 
 interface Role {
 	id: string; // Random UUID
@@ -17,13 +20,6 @@ interface Role {
 	role?: string; // Discord Role ID
 	sync?: boolean; // Whether to sync name from Discord
 	permissions?: any;
-}
-
-interface DiscordRole {
-	id: string;
-	name: string;
-	color: number;
-	position: number;
 }
 
 interface DiscordProfile {
@@ -50,6 +46,7 @@ interface FullUser {
 	privacy?: string;
 	verified?: boolean;
 	locale?: string;
+	staffSubscription?: boolean;
 }
 
 interface UserSummary {
@@ -59,6 +56,10 @@ interface UserSummary {
 	icon: string;
 	discord?: DiscordProfile | null;
 }
+
+// -----------------------------------------------------------------------------
+// UserCard Component
+// -----------------------------------------------------------------------------
 
 function UserCard({
 	user,
@@ -73,6 +74,7 @@ function UserCard({
 	onUserDeleted: (id: string) => void;
 	onUserUpdated: (updated: FullUser) => void;
 }) {
+	const { toast } = useToast();
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [discord, setDiscord] = useState<DiscordProfile | null>(user.discord || null);
 	const [fullUser, setFullUser] = useState<FullUser | null>(null);
@@ -86,6 +88,8 @@ function UserCard({
 	const [roleId, setRoleId] = useState(user.role || '');
 	const [description, setDescription] = useState('');
 	const [privacy, setPrivacy] = useState('private');
+	const [staffSubscription, setStaffSubscription] = useState(false);
+	const [subLoading, setSubLoading] = useState(false);
 
 	// Fetch Discord profile if missing
 	useEffect(() => {
@@ -105,7 +109,9 @@ function UserCard({
 		if (nextState && !fullUser) {
 			setLoadingDetails(true);
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`));
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
+					credentials: 'include',
+				});
 				if (res.ok) {
 					const data: FullUser = await res.json();
 					setFullUser(data);
@@ -113,12 +119,42 @@ function UserCard({
 					setRoleId(data.role || '');
 					setDescription(data.description || '');
 					setPrivacy(data.privacy || 'private');
+					setStaffSubscription(!!data.staffSubscription);
 				}
 			} catch (err) {
 				console.error('Failed to fetch user details:', err);
 			} finally {
 				setLoadingDetails(false);
 			}
+		}
+	};
+
+	const handleStaffSubscriptionToggle = async (checked: boolean) => {
+		setSubLoading(true);
+		try {
+			const endpoint = checked ? `secure/store/${user.id}/product` : `secure/store/${user.id}/cancel`;
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/${endpoint}`), {
+				method: 'POST',
+				credentials: 'include',
+			});
+
+			if (res.ok) {
+				setStaffSubscription(checked);
+				toast({
+					title: checked ? 'Staff subscription applied' : 'Staff subscription canceled',
+					type: 'success',
+				});
+			} else {
+				throw new Error('Failed to update subscription status');
+			}
+		} catch (err) {
+			console.error(err);
+			toast({
+				title: 'Error updating staff subscription',
+				type: 'error',
+			});
+		} finally {
+			setSubLoading(false);
 		}
 	};
 
@@ -129,14 +165,23 @@ function UserCard({
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, role: roleId, description, privacy }),
+				credentials: 'include',
+				body: JSON.stringify({
+					name,
+					role: roleId,
+					description,
+					privacy,
+					staffSubscription,
+				}),
 			});
 			if (res.ok) {
 				const updated = await res.json();
 				onUserUpdated(updated);
+				toast({ title: 'User updated successfully', type: 'success' });
 			}
 		} catch (err) {
 			console.error(err);
+			toast({ title: 'Failed to update user', type: 'error' });
 		} finally {
 			setSaving(false);
 		}
@@ -147,12 +192,15 @@ function UserCard({
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
 				method: 'DELETE',
+				credentials: 'include',
 			});
 			if (res.ok) {
 				onUserDeleted(user.id);
+				toast({ title: 'User deleted successfully', type: 'success' });
 			}
 		} catch (err) {
 			console.error(err);
+			toast({ title: 'Failed to delete user', type: 'error' });
 		} finally {
 			setDeleting(false);
 			setConfirmDeleteOpen(false);
@@ -181,7 +229,7 @@ function UserCard({
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, scale: 0.95 }}
-				className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-hidden transition-all duration-200"
+				className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-visible transition-all duration-200"
 			>
 				{/* Main Header / Summary Card */}
 				<div
@@ -226,13 +274,13 @@ function UserCard({
 				<AnimatePresence>
 					{isExpanded && (
 						<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }}>
-							<div className="border-t border-(--border)/10 bg-(--background)/50 flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+							<div className="border-t border-(--border)/10 bg-(--background)/50 flex flex-col overflow-visible" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 								{loadingDetails ? (
 									<div className="flex justify-center py-6">
 										<Loading />
 									</div>
 								) : (
-									<form onSubmit={handleUpdate} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+									<form onSubmit={handleUpdate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 										<h3 className="text-sm font-bold text-(--text)">Manage Xernerx User</h3>
 
 										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
@@ -246,7 +294,7 @@ function UserCard({
 											/>
 										</div>
 
-										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+										<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 											<label className="block text-xs font-medium text-(--text)">Role</label>
 											<Selector value={roleId} onChange={(val: string) => setRoleId(val)} options={roleOptions} placeholder="Select role..." />
 										</div>
@@ -262,7 +310,7 @@ function UserCard({
 											/>
 										</div>
 
-										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+										<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 											<label className="block text-xs font-medium text-(--text)">Privacy Level</label>
 											<Selector
 												value={privacy}
@@ -273,6 +321,20 @@ function UserCard({
 													{ label: 'Private', value: 'private' },
 												]}
 											/>
+										</div>
+
+										{/* Staff Subscription Toggle */}
+										<div
+											className={`flex items-center justify-between rounded-xl border border-(--accent)/20 bg-(--accent)/5 px-4 py-3 ${subLoading ? 'opacity-50 pointer-events-none' : ''}`}
+										>
+											<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+												<span className="text-sm font-semibold text-(--accent)">Staff Subscriptions</span>
+												<span className="text-xs text-(--text-muted) max-w-[200px]">Grants user an active infinite subscription for all services until toggled off.</span>
+											</div>
+											<div className="flex items-center gap-2">
+												{subLoading && <Loader2 size={14} className="animate-spin text-(--accent)" />}
+												<Toggle checked={staffSubscription} onChange={(e) => handleStaffSubscriptionToggle(e.target.checked)} />
+											</div>
 										</div>
 
 										{fullUser?.email && (
@@ -316,6 +378,10 @@ function UserCard({
 	);
 }
 
+// -----------------------------------------------------------------------------
+// Main Component
+// -----------------------------------------------------------------------------
+
 export default function Users() {
 	const { getEnvUrl } = useEnvironment();
 	const [users, setUsers] = useState<UserSummary[]>([]);
@@ -330,7 +396,10 @@ export default function Users() {
 		const fetchData = async () => {
 			setLoading(true);
 			try {
-				const [usersRes, rolesRes] = await Promise.all([fetch(getEnvUrl(`https://api.xernerx.com/secure/users`)), fetch(getEnvUrl(`https://api.xernerx.com/secure/roles`))]);
+				const [usersRes, rolesRes] = await Promise.all([
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/users`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/roles`), { credentials: 'include' }),
+				]);
 
 				if (!usersRes.ok) throw new Error('Failed to fetch users');
 				if (!rolesRes.ok) throw new Error('Failed to fetch roles');
@@ -423,7 +492,7 @@ export default function Users() {
 					<p className="text-sm text-(--text-muted)">No users found matching your search.</p>
 				</div>
 			) : (
-				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
+				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					<AnimatePresence>
 						{filteredAndSortedUsers.map((user) => (
 							<UserCard key={user.id} user={user} roles={roles} getEnvUrl={getEnvUrl} onUserDeleted={handleUserDeleted} onUserUpdated={handleUserUpdated} />

@@ -123,7 +123,7 @@ export async function proxy(req: NextRequest) {
 					return errorResponse(`Forbidden: Token is ${tokenData.status}`, 403);
 				}
 
-				if (!tokenData.permissions?.isXernerx) {
+				if (!tokenData.permissions?.secure) {
 					return errorResponse('Forbidden: this path is reserved', 403);
 				}
 

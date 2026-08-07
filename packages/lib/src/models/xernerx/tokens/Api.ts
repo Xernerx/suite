@@ -9,7 +9,7 @@ const schema = new Schema(
 		owners: { type: [String] },
 		status: { type: String, required: true, default: 'active', enum: ['active', 'inactive', 'suspended', 'pending'] },
 		permissions: {
-			isXernerx: Boolean, // can fetch data from /secure
+			secure: Boolean, // can fetch data from /secure
 		},
 		botId: { type: String },
 	},

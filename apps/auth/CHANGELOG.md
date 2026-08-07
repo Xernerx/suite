@@ -1,5 +1,11 @@
 # auth
 
+## 0.5.5
+
+### Patch Changes
+
+- Added user selector in Tokens
+
 ## 0.5.4
 
 ### Patch Changes

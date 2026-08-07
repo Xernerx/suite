@@ -4,23 +4,282 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
-import { ChevronDown, Key, Plus, Search, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { ChevronDown, Key, Plus, Search, Trash2, User as UserIcon, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loading } from '@xernerx/feedback';
 import { useEnvironment } from '@xernerx/providers';
 
 interface Token {
+	_id: string;
 	id: string;
 	name: string;
 	owners?: string[];
 	status: 'active' | 'inactive' | 'suspended' | 'pending';
 	permissions?: {
-		isXernerx?: boolean;
+		secure?: boolean;
 	};
 	botId?: string;
 	createdAt?: string;
 	updatedAt?: string;
+}
+
+interface UserOption {
+	id: string;
+	name?: string;
+	global_name?: string;
+	username?: string;
+	avatar?: string;
+}
+
+/**
+ * Custom Searchable Multi-User Selector component.
+ * Fetches users from `secure/users`, missing Discord profiles from `core/users/[id]/discord`,
+ * filters in JS, and outputs an array of selected user IDs.
+ */
+function AsyncUserMultiSelector({
+	values,
+	onChange,
+	getEnvUrl,
+	placeholder = 'Add owner...',
+}: {
+	values: string[];
+	onChange: (vals: string[]) => void;
+	getEnvUrl: (url: string) => string;
+	placeholder?: string;
+}) {
+	const [isOpen, setIsOpen] = useState(false);
+	const [query, setQuery] = useState('');
+	const [users, setUsers] = useState<UserOption[]>([]);
+	const [loading, setLoading] = useState(false);
+	const ref = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const fetchedIds = useRef(new Set<string>());
+
+	// Fetch all known secure users ONCE
+	useEffect(() => {
+		let isMounted = true;
+		const fetchUsers = async () => {
+			setLoading(true);
+			try {
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/users'), {
+					credentials: 'include',
+				});
+				if (res.ok) {
+					const data = await res.json();
+					if (isMounted) {
+						setUsers((prev) => {
+							const map = new Map(prev.map((u) => [u.id, u]));
+							data.forEach((u: UserOption) => {
+								if (!map.has(u.id)) map.set(u.id, u);
+							});
+							return Array.from(map.values());
+						});
+					}
+				}
+			} catch (err) {
+				console.error('Failed to fetch users:', err);
+			} finally {
+				if (isMounted) setLoading(false);
+			}
+		};
+
+		fetchUsers();
+		return () => {
+			isMounted = false;
+		};
+	}, [getEnvUrl]);
+
+	// Fetch full Discord profile for selected values if missing
+	useEffect(() => {
+		values.forEach((val) => {
+			if (val && !users.find((u) => u.id === val) && !fetchedIds.current.has(val)) {
+				fetchedIds.current.add(val);
+				fetch(getEnvUrl(`https://api.xernerx.com/core/users/${val}/discord`), {
+					credentials: 'include',
+				})
+					.then((res) => (res.ok ? res.json() : null))
+					.then((data) => {
+						if (data && data.id) {
+							setUsers((prev) => {
+								if (prev.some((u) => u.id === data.id)) {
+									return prev.map((u) => (u.id === data.id ? { ...u, ...data } : u));
+								}
+								return [...prev, data];
+							});
+						}
+					})
+					.catch(() => {});
+			}
+		});
+	}, [values, users, getEnvUrl]);
+
+	// Fetch full Discord profile dynamically if the user types a valid Discord ID
+	useEffect(() => {
+		if (/^\d{17,20}$/.test(query) && !fetchedIds.current.has(query)) {
+			fetchedIds.current.add(query);
+			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${query}/discord`), {
+				credentials: 'include',
+			})
+				.then((res) => (res.ok ? res.json() : null))
+				.then((data) => {
+					if (data && data.id) {
+						setUsers((prev) => {
+							if (prev.some((u) => u.id === data.id)) {
+								return prev.map((u) => (u.id === data.id ? { ...u, ...data } : u));
+							}
+							return [...prev, data];
+						});
+					}
+				})
+				.catch(() => {});
+		}
+	}, [query, getEnvUrl]);
+
+	// Close on click outside
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (ref.current && !ref.current.contains(event.target as Node)) {
+				setIsOpen(false);
+				setQuery('');
+			}
+		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
+
+	// Focus input when opened
+	useEffect(() => {
+		if (isOpen) {
+			setTimeout(() => inputRef.current?.focus(), 50);
+		} else {
+			setQuery('');
+		}
+	}, [isOpen]);
+
+	// Filter, exclude already selected, and limit to 30
+	const filteredUsers = useMemo(() => {
+		const q = query.toLowerCase();
+		return users
+			.filter(
+				(u) =>
+					!values.includes(u.id) &&
+					(u.id?.toLowerCase().includes(q) || u.name?.toLowerCase().includes(q) || u.global_name?.toLowerCase().includes(q) || u.username?.toLowerCase().includes(q))
+			)
+			.slice(0, 30);
+	}, [users, query, values]);
+
+	const handleRemove = (idToRemove: string) => {
+		onChange(values.filter((id) => id !== idToRemove));
+	};
+
+	const handleSelect = (idToAdd: string) => {
+		if (!values.includes(idToAdd)) {
+			onChange([...values, idToAdd]);
+		}
+		setIsOpen(false);
+		setQuery('');
+	};
+
+	return (
+		<div className="flex flex-col gap-2 w-full" ref={ref}>
+			{/* Selected Pills */}
+			{values.length > 0 && (
+				<div className="flex flex-wrap gap-2">
+					{values.map((id) => {
+						const u = users.find((u) => u.id === id);
+						return (
+							<div key={id} className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background) pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
+								{u?.avatar ? (
+									<img src={`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`} alt="" className="h-4 w-4 rounded-full object-cover shrink-0" />
+								) : (
+									<UserIcon size={12} className="text-(--text-muted) shrink-0" />
+								)}
+								<span className="font-medium truncate max-w-[120px]">{u ? u.global_name || u.name || u.username || u.id : id}</span>
+								<button
+									type="button"
+									onClick={() => handleRemove(id)}
+									className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-red-500/10 text-(--text-muted) hover:text-red-500 transition-colors"
+								>
+									<X size={10} />
+								</button>
+							</div>
+						);
+					})}
+				</div>
+			)}
+
+			<div className="relative w-full">
+				<button
+					type="button"
+					onClick={() => setIsOpen(!isOpen)}
+					className="flex w-full items-center justify-between rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) shadow-sm transition-all hover:border-(--border)/40 focus:border-(--accent) focus:outline-none"
+					style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
+				>
+					<span className="text-(--text-muted) font-medium">{placeholder}</span>
+					<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+				</button>
+
+				<AnimatePresence>
+					{isOpen && (
+						<motion.div
+							initial={{ opacity: 0, y: -4 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -4 }}
+							transition={{ duration: 0.15, ease: 'easeOut' }}
+							className="absolute left-0 top-[calc(100%+8px)] z-999 w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-2xl"
+							style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
+						>
+							{/* Search Filter Input */}
+							<div className="relative w-full" style={{ padding: 'calc(var(--ui-gap) * 0.25)' }}>
+								<Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)" />
+								<input
+									ref={inputRef}
+									type="text"
+									placeholder="Search by name or Discord ID..."
+									value={query}
+									onChange={(e) => setQuery(e.target.value)}
+									className="w-full rounded-xl border border-(--border)/10 bg-(--background) text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+									style={{ padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)' }}
+									onClick={(e) => e.stopPropagation()}
+								/>
+							</div>
+
+							{/* Options List */}
+							<div className="overflow-y-auto max-h-52 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+								{loading && users.length === 0 ? (
+									<div className="py-6 flex justify-center">
+										<Loading />
+									</div>
+								) : filteredUsers.length === 0 ? (
+									<div className="py-4 text-center text-xs text-(--text-muted)">No matching users found</div>
+								) : (
+									filteredUsers.map((u) => (
+										<button
+											type="button"
+											key={u.id}
+											onClick={() => handleSelect(u.id)}
+											className="flex w-full items-center justify-between rounded-xl text-sm transition-colors text-(--text) hover:bg-(--border)/5"
+											style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
+										>
+											<div className="flex items-center gap-2 truncate">
+												{u.avatar ? (
+													<img src={`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`} alt="" className="w-5 h-5 rounded-full object-cover shrink-0" />
+												) : (
+													<UserIcon size={16} className="text-(--text-muted) shrink-0" />
+												)}
+												<span className="font-medium truncate">{u.global_name || u.name || u.username || u.id}</span>
+											</div>
+										</button>
+									))
+								)}
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
+		</div>
+	);
 }
 
 function TokenCard({
@@ -45,8 +304,8 @@ function TokenCard({
 	const [name, setName] = useState(token.name || '');
 	const [status, setStatus] = useState<Token['status']>(token.status || 'active');
 	const [botId, setBotId] = useState('');
-	const [ownersInput, setOwnersInput] = useState('');
-	const [isXernerx, setIsXernerx] = useState(false);
+	const [selectedOwners, setSelectedOwners] = useState<string[]>(token.owners || []);
+	const [secure, setSecure] = useState(false);
 
 	const handleToggleExpand = async () => {
 		const nextState = !isExpanded;
@@ -55,7 +314,7 @@ function TokenCard({
 		if (nextState && !fullToken) {
 			setLoadingDetails(true);
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
 					credentials: 'include',
 				});
 				if (res.ok) {
@@ -64,8 +323,8 @@ function TokenCard({
 					setName(data.name || '');
 					setStatus(data.status || 'active');
 					setBotId(data.botId || '');
-					setOwnersInput((data.owners || []).join(', '));
-					setIsXernerx(!!data.permissions?.isXernerx);
+					setSelectedOwners(data.owners || []);
+					setSecure(!!data.permissions?.secure);
 				}
 			} catch (err) {
 				console.error('Failed to fetch token details:', err);
@@ -82,22 +341,17 @@ function TokenCard({
 		setSaving(true);
 
 		try {
-			const owners = ownersInput
-				.split(',')
-				.map((o) => o.trim())
-				.filter(Boolean);
-
 			const payload = {
 				name,
 				status,
 				botId: botId || undefined,
-				owners,
+				owners: selectedOwners,
 				permissions: {
-					isXernerx,
+					secure,
 				},
 			};
 
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
@@ -118,13 +372,13 @@ function TokenCard({
 	const handleDelete = async () => {
 		setDeleting(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
 				method: 'DELETE',
 				credentials: 'include',
 			});
 
 			if (res.ok) {
-				onTokenDeleted(token.id);
+				onTokenDeleted(token._id);
 			}
 		} catch (err) {
 			console.error('Failed to delete token:', err);
@@ -148,7 +402,7 @@ function TokenCard({
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, scale: 0.95 }}
-				className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-hidden transition-all duration-200"
+				className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-visible transition-all duration-200"
 			>
 				{/* Main Header / Summary Card */}
 				<div
@@ -165,7 +419,7 @@ function TokenCard({
 							<div className="flex items-center gap-2 mt-0.5">
 								<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>{token.status}</span>
 							</div>
-							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">ID: {token.id}</span>
+							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">ID: {token._id}</span>
 						</div>
 					</div>
 
@@ -180,13 +434,13 @@ function TokenCard({
 				<AnimatePresence>
 					{isExpanded && (
 						<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }}>
-							<div className="border-t border-(--border)/10 bg-(--background)/50 flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+							<div className="border-t border-(--border)/10 bg-(--background)/50 flex flex-col overflow-visible" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 								{loadingDetails ? (
 									<div className="flex justify-center py-6">
 										<Loading />
 									</div>
 								) : (
-									<form onSubmit={handleUpdate} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+									<form onSubmit={handleUpdate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 										<h3 className="text-sm font-bold text-(--text)">Manage Token Configuration</h3>
 
 										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
@@ -227,24 +481,17 @@ function TokenCard({
 											/>
 										</div>
 
-										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">Owners (comma-separated)</label>
-											<input
-												type="text"
-												value={ownersInput}
-												onChange={(e) => setOwnersInput(e.target.value)}
-												placeholder="owner1_id, owner2_id"
-												className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-												style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
-											/>
+										<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+											<label className="block text-xs font-medium text-(--text)">Owners</label>
+											<AsyncUserMultiSelector values={selectedOwners} onChange={setSelectedOwners} getEnvUrl={getEnvUrl} />
 										</div>
 
 										<div className="flex items-center justify-between pt-1">
 											<div className="flex flex-col">
-												<span className="text-xs font-medium text-(--text)">Is Xernerx</span>
+												<span className="text-xs font-medium text-(--text)">Secure</span>
 												<span className="text-[11px] text-(--text-muted)">Allow fetching data from /secure</span>
 											</div>
-											<Toggle checked={isXernerx} onChange={(e) => setIsXernerx(e.target.checked)} size="sm" />
+											<Toggle checked={secure} onChange={(e) => setSecure(e.target.checked)} size="sm" />
 										</div>
 
 										<div className="flex items-center justify-between pt-2">
@@ -295,22 +542,20 @@ export default function Tokens() {
 	const [newName, setNewName] = useState('');
 	const [newStatus, setNewStatus] = useState<Token['status']>('active');
 	const [newBotId, setNewBotId] = useState('');
-	const [newOwnersInput, setNewOwnersInput] = useState('');
-	const [newIsXernerx, setNewIsXernerx] = useState(false);
+	const [newSelectedOwners, setNewSelectedOwners] = useState<string[]>([]);
+	const [newSecure, setNewSecure] = useState(false);
 	const [creating, setCreating] = useState(false);
 
 	useEffect(() => {
 		const fetchTokens = async () => {
 			setLoading(true);
 			try {
-				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/tokens'), {
-					credentials: 'include',
-				});
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/tokens?admin=true'), { credentials: 'include' });
 				if (!res.ok) throw new Error('Failed to fetch tokens');
 				const data = await res.json();
 				setTokens(data);
 			} catch (err: any) {
-				setError(err.message || 'Failed to load tokens.');
+				setError(err.message || 'Failed to load tokens data.');
 			} finally {
 				setLoading(false);
 			}
@@ -329,11 +574,6 @@ export default function Tokens() {
 		const newId = crypto.randomUUID();
 
 		try {
-			const owners = newOwnersInput
-				.split(',')
-				.map((o) => o.trim())
-				.filter(Boolean);
-
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${newId}`), {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -342,9 +582,9 @@ export default function Tokens() {
 					name: newName,
 					status: newStatus,
 					botId: newBotId || undefined,
-					owners,
+					owners: newSelectedOwners,
 					permissions: {
-						isXernerx: newIsXernerx,
+						secure: newSecure,
 					},
 				}),
 			});
@@ -356,8 +596,8 @@ export default function Tokens() {
 				setNewName('');
 				setNewStatus('active');
 				setNewBotId('');
-				setNewOwnersInput('');
-				setNewIsXernerx(false);
+				setNewSelectedOwners([]);
+				setNewSecure(false);
 			}
 		} catch (err) {
 			console.error('Failed to create token:', err);
@@ -367,11 +607,11 @@ export default function Tokens() {
 	};
 
 	const handleTokenDeleted = (deletedId: string) => {
-		setTokens((prev) => prev.filter((t) => t.id !== deletedId));
+		setTokens((prev) => prev.filter((t) => t._id !== deletedId));
 	};
 
 	const handleTokenUpdated = (updatedToken: Token) => {
-		setTokens((prev) => prev.map((t) => (t.id === updatedToken.id ? updatedToken : t)));
+		setTokens((prev) => prev.map((t) => (t._id === updatedToken._id ? updatedToken : t)));
 	};
 
 	const filteredTokens = useMemo(() => {
@@ -402,8 +642,8 @@ export default function Tokens() {
 						setNewName('');
 						setNewStatus('active');
 						setNewBotId('');
-						setNewOwnersInput('');
-						setNewIsXernerx(false);
+						setNewSelectedOwners([]);
+						setNewSecure(false);
 						setIsCreateOpen(true);
 					}}
 					style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
@@ -432,10 +672,10 @@ export default function Tokens() {
 					<p className="text-sm text-(--text-muted)">No tokens found matching your search.</p>
 				</div>
 			) : (
-				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
+				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					<AnimatePresence>
 						{filteredTokens.map((token) => (
-							<TokenCard key={token.id} token={token} getEnvUrl={getEnvUrl} onTokenDeleted={handleTokenDeleted} onTokenUpdated={handleTokenUpdated} />
+							<TokenCard key={token._id} token={token} getEnvUrl={getEnvUrl} onTokenDeleted={handleTokenDeleted} onTokenUpdated={handleTokenUpdated} />
 						))}
 					</AnimatePresence>
 				</motion.div>
@@ -443,7 +683,7 @@ export default function Tokens() {
 
 			{/* Create Modal */}
 			<Modal open={isCreateOpen} onOpenChange={setIsCreateOpen} title="Create New Token" description="Add a new API token with associated permissions and configuration.">
-				<form onSubmit={handleCreate} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+				<form onSubmit={handleCreate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 						<label className="block text-xs font-medium text-(--text)">Token Name</label>
 						<input
@@ -480,23 +720,16 @@ export default function Tokens() {
 							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 						/>
 					</div>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Owners (comma-separated)</label>
-						<input
-							type="text"
-							placeholder="owner1_id, owner2_id"
-							value={newOwnersInput}
-							onChange={(e) => setNewOwnersInput(e.target.value)}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
-						/>
+					<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+						<label className="block text-xs font-medium text-(--text)">Owners</label>
+						<AsyncUserMultiSelector values={newSelectedOwners} onChange={setNewSelectedOwners} getEnvUrl={getEnvUrl} />
 					</div>
 					<div className="flex items-center justify-between pt-1">
 						<div className="flex flex-col">
 							<span className="text-xs font-medium text-(--text)">Is Xernerx</span>
 							<span className="text-[11px] text-(--text-muted)">Allow fetching data from /secure</span>
 						</div>
-						<Toggle checked={newIsXernerx} onChange={(e) => setNewIsXernerx(e.target.checked)} size="sm" />
+						<Toggle checked={newSecure} onChange={(e) => setNewSecure(e.target.checked)} size="sm" />
 					</div>
 					<div className="flex justify-end gap-3 pt-2">
 						<Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>

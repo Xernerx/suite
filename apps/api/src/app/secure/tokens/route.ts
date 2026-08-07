@@ -4,25 +4,24 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
-import { getServerSession } from 'next-auth'; // Or `import { auth } from '@/auth'` if you're on NextAuth v5
+import { getServerSession } from 'next-auth';
 
-export async function GET(_: NextRequest) {
+export async function GET(request: NextRequest) {
 	try {
-		// Retrieve the current user's session
-		// Note: You may need to pass your authOptions here (e.g., `getServerSession(authOptions)`)
-		// depending on your NextAuth configuration.
+		const admin = !!new URL(request.url).searchParams.get('admin');
+
 		const session = await getServerSession(auth);
 
-		// Ensure the user is authenticated and their ID is available
-		if (!session?.user || !(session.user as any)?.id) {
-			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-		}
+		if (!session?.user || !(session.user as any)?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
 		const userId = (session.user as any).id;
 		const db = await database('xernerx');
 
-		// Find all tokens where the current user's ID is in the 'owners' array
-		const tokens = await db.models.tokens.apis.find({ owners: userId }).select(['_id', 'status', 'name']);
+		const filter: Record<string, string> = {};
+
+		if (!admin) filter.owners = userId;
+
+		const tokens = await db.models.tokens.apis.find(filter).select(['_id', 'status', 'name']);
 
 		return NextResponse.json(tokens, { status: 200 });
 	} catch (error) {

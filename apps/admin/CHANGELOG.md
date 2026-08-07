@@ -1,5 +1,11 @@
 # admin
 
+## 0.1.3
+
+### Patch Changes
+
+- Added user selector in Tokens
+
 ## 0.1.2
 
 ### Patch Changes
