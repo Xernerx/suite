@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useDictionary, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useUser } from '@xernerx/providers';
 
 import { CircleFlag } from 'react-circle-flags';
 import { Selector } from '@xernerx/ui';
@@ -25,15 +25,42 @@ const getFlagCode = (localeCode: string) => {
 export default function Language() {
 	const router = useRouter();
 	const { user } = useUser();
+	const { getEnvUrl } = useEnvironment();
 	const { currentLocale, currentLanguage, locales, t } = useDictionary();
 
-	const handleLanguageChange = (code: string) => {
+	// Default to the user's saved preference first, then fallback to the cookie/context locale
+	const activeLocale = user?.preferences?.locale || currentLocale;
+
+	const handleLanguageChange = async (code: string) => {
 		if (code === 'contribute') {
 			window.open('https://github.com/xernerx', '_blank', 'noopener,noreferrer');
 			return;
 		}
-		if (currentLocale === code) return;
+
+		if (activeLocale === code) return;
+
+		// Set the cookie for the middleware/next-intl context
 		setLocaleCookie(code);
+
+		// Save the preference to the database so it persists across devices/cleared cookies
+		if (user?.id) {
+			try {
+				await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({
+						preferences: {
+							...(user.preferences || {}),
+							locale: code,
+						},
+					}),
+				});
+			} catch (err) {
+				console.error('Failed to sync language preference to user profile:', err);
+			}
+		}
+
 		router.refresh();
 	};
 
@@ -70,6 +97,7 @@ export default function Language() {
 
 	const coverageDescription = t('auth.language.coverage.description', { coverage: currentLanguage?.coverage ?? 0 });
 
+	// Discord read-only locale indicator (uncoupled from the app's internal locale)
 	const discordLocale = user?.locale || 'en-US';
 	const discordCountryCode = getFlagCode(discordLocale);
 	const discordLanguageLabel = locales.find((l: { code: string; label: string }) => l.code === discordLocale)?.label || discordLocale;
@@ -100,7 +128,8 @@ export default function Language() {
 						</div>
 
 						<div className="w-full sm:w-64">
-							<Selector value={currentLocale} options={languageOptions} onChange={handleLanguageChange} />
+							{/* Uses the correctly defaulted activeLocale */}
+							<Selector value={activeLocale} options={languageOptions} onChange={handleLanguageChange} />
 						</div>
 					</div>
 

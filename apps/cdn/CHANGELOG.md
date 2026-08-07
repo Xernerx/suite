@@ -1,5 +1,11 @@
 # cdn
 
+## 0.4.7
+
+### Patch Changes
+
+- Updated dependencies and added Translation page
+
 ## 0.4.6
 
 ### Patch Changes

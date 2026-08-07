@@ -58,11 +58,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 			const res = await fetch(`${baseUrl}secure/users/${userId}`);
 
 			if (res.status === 404) {
-				// User strictly does NOT exist, create them via POST
+				// User strictly does NOT exist, create them via POST with 1000 initial credits
 				const postRes = await fetch(`${baseUrl}secure/users/${userId}`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(session?.user),
+					body: JSON.stringify({
+						...(session?.user || {}),
+						credits: 1000,
+					}),
 				});
 
 				if (!postRes.ok) {

@@ -18,6 +18,19 @@ export interface SelectorProps {
 	placeholder?: string;
 }
 
+// Helper to extract plain text string from any ReactNode (handles strings, elements, arrays)
+function getLabelString(label: React.ReactNode): string {
+	if (typeof label === 'string') return label;
+	if (typeof label === 'number') return String(label);
+	if (React.isValidElement(label)) {
+		return getLabelString((label.props as { children?: React.ReactNode })?.children);
+	}
+	if (Array.isArray(label)) {
+		return label.map(getLabelString).join('');
+	}
+	return '';
+}
+
 export function Selector({ value, options, onChange, placeholder = 'Select...' }: SelectorProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -51,8 +64,11 @@ export function Selector({ value, options, onChange, placeholder = 'Select...' }
 
 	const filteredOptions = options.filter((option) => {
 		const q = query.toLowerCase();
+
 		const valueMatch = option.value.toLowerCase().includes(q);
-		const labelMatch = typeof option.label === 'string' ? option.label.toLowerCase().includes(q) : false;
+		const labelString = getLabelString(option.label);
+		const labelMatch = labelString.toLowerCase().includes(q);
+
 		return valueMatch || labelMatch;
 	});
 

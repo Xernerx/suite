@@ -25,10 +25,12 @@ const schema = new Schema(
 		pronouns: { type: String }, // User's pronouns (optional)
 		timezone: { type: String }, // User's timezone (optional)
 		email: { type: String }, // User's email (optional)
-		role: { type: String }, // User's role (e.g., admin, moderator, user)
+		role: { type: String }, // todo remove once phased out!
+		roles: { type: Array, default: [] }, // User's roles (e.g., admin, moderator, user)
 		permissions: { type: Schema.Types.Mixed }, // User's permissions (optional)
 		notifications: { type: Schema.Types.Mixed }, // User's notifications settings (optional)
 		seen: { type: Date }, // User's notifications seen settings (optional)
+		credits: { balance: { type: Number, default: 0, min: 0 }, streak: { type: Number, default: 0, min: 0 }, giftIn: { type: Date, default: new Date() } },
 
 		// FIXED: Array of objects with an explicit ObjectId type
 		organizations: [
@@ -40,7 +42,7 @@ const schema = new Schema(
 
 		verified: { type: Boolean, default: false }, // Whether the user has been verified
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the user
-		locale: { type: String }, // User locale (e.g., en-US, es-ES, fr-FR)
+		preferences: { locale: { type: String } }, // User locale (e.g., en-US, es-ES, fr-FR)
 
 		// FIXED: Explicitly defined as a mixed map/object
 		links: { type: Schema.Types.Mixed, default: {} },

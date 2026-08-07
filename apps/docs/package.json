@@ -1,6 +1,6 @@
 {
 	"name": "docs",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
@@ -16,13 +16,13 @@
 		"@xernerx/providers": "workspace:*",
 		"next": "^16.3.0",
 		"next-auth": "^4.24.15",
-		"react": "^19",
+		"react": "^19.2.8",
 		"react-dom": "^19"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20",
-		"@types/react": "^19",
+		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19",
 		"babel-plugin-react-compiler": "1.0.0",
 		"eslint": "^9",

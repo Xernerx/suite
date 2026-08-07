@@ -15,6 +15,8 @@ const countKeys = (obj: any): number => {
 	return count;
 };
 
+export const locales = supportedLocales;
+
 export { Locale };
 
 export const dictionary = async (locale: Locale) => {
@@ -43,7 +45,7 @@ export const dictionary = async (locale: Locale) => {
 
 	return {
 		dictionary: activeDict,
-		fallbackDictionary: defaultDict, // <-- Include the default/fallback dictionary here
+		fallbackDictionary: defaultDict,
 		locales,
 		currentLocale: locale,
 	};

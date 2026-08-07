@@ -1,5 +1,11 @@
 # docs
 
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies and added Translation page
+
 ## 0.2.8
 
 ### Patch Changes

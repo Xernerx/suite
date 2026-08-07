@@ -32,4 +32,10 @@ export const permissions: PermissionDefinition[] = [
 		description: 'Permission to generate, view, and revoke API tokens.',
 		defaultValue: false,
 	},
+	{
+		key: 'translations',
+		label: 'Manage Translations',
+		description: 'Permission to add and modify translations.',
+		defaultValue: false,
+	},
 ];

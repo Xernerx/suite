@@ -7,7 +7,7 @@ export async function GET() {
 	try {
 		const db = (await database('xernerx')).models.profiles.users;
 
-		const users = await db.find({}).lean().select(['id', 'name', 'icon', 'role']);
+		const users = await db.find({}).lean().select(['id', 'name', 'icon', 'roles']);
 
 		return NextResponse.json(users, { status: 200 });
 	} catch (error) {
