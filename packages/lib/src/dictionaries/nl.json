@@ -549,7 +549,37 @@
             "title": "Rollen Beheer",
             "serverId": "Server ID",
             "members": "Leden",
-            "newRoleButton": "Nieuwe Rol"
+            "newRoleButton": "Nieuwe Rol",
+            "searchPlaceholder": "Zoek aan de hand van de rol naam, UUID of de Discord ID...",
+            "noRolesFound": "Geen rollen gevonden aan de hand van de zoekopdracht.",
+            "unnamedRole": "Naamloze Rol",
+            "unlinked": "Geen Link",
+            "description": "Configureer aangepaste systeem rollen en link ze direct met Discord server rollen.",
+            "synced": "Gesynchroniseerd",
+            "uuid": "UUID:",
+            "noneUnlinked": "Geen (Geen Link)",
+            "manageConfig": "Beheer Rol Configuratie",
+            "roleNameLabel": "Rol Naam",
+            "roleNamePlaceholder": "bv, Administrator",
+            "linkDiscordRoleLabel": "Link Discord Rol",
+            "selectDiscordRolePlaceholder": "Selecteer Discord Rol...",
+            "syncNameWithDiscord": "Synchroniseer naam van Discord",
+            "permissionsHeader": "Machtigingen",
+            "deleteRole": "Verwijder Rol",
+            "saveChanges": "Sla aanpassingen Op",
+            "saving": "Opslaan...",
+            "deleteConfirmDescription": "Weet u zeker dat u de rol \"{name}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+            "confirmDelete": "Verwijderen",
+            "cancel": "Annuleren",
+            "createModalTitle": "Nieuwe Rol Maken",
+            "createModalDesc": "Voeg een aangepaste rol en link deze optioneel met een Discord rol.",
+            "createButton": "Rol Maken",
+            "creating": "Creëren",
+            "loadError": "Rollen data laden mislukt.",
+            "errorPrefix": "Error:"
+        },
+        "users": {
+            "title": "Gebruikers Beheer"
         }
     }
 }
