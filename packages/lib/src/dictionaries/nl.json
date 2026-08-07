@@ -546,7 +546,10 @@
     },
     "admin": {
         "roles": {
-            "title": "Rollen Beheer"
+            "title": "Rollen Beheer",
+            "serverId": "Server ID",
+            "members": "Leden",
+            "newRoleButton": "Nieuwe Rol"
         }
     }
 }
