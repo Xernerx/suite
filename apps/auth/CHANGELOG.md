@@ -1,5 +1,11 @@
 # auth
 
+## 0.6.0
+
+### Minor Changes
+
+- Added Notifications to the sidebar, added Request for Translator, added FaQ page
+
 ## 0.5.6
 
 ### Patch Changes

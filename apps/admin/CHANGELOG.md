@@ -1,5 +1,11 @@
 # admin
 
+## 0.2.0
+
+### Minor Changes
+
+- Added Notifications to the sidebar, added Request for Translator, added FaQ page
+
 ## 0.1.5
 
 ### Patch Changes

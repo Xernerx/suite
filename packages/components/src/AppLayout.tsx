@@ -5,6 +5,7 @@ import {
 	CookieProvider,
 	DictionaryProvider,
 	EnvironmentProvider,
+	NotificationProvider,
 	PlatformProvider,
 	ShortcutsProvider,
 	SidebarProvider,
@@ -13,15 +14,16 @@ import {
 	ToastProvider,
 	UserProvider,
 } from '@xernerx/providers';
+import React, { Suspense } from 'react';
 
 import { CookiePrompt } from './CookiePrompt';
+import { Loading } from '@xernerx/feedback';
 import { Page } from './Page';
-import React from 'react';
 import { ThemeScript } from './ThemeScript';
 
 export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {
 	return (
-		<>
+		<Suspense fallback={<Loading />}>
 			<ThemeScript />
 
 			<ToastProvider>
@@ -31,22 +33,24 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 						<PlatformProvider>
 							<ThemeProvider>
 								<UserProvider>
-									<ShortcutsProvider>
-										<CookieProvider>
-											<SupportProvider>
-												<CookiePrompt />
-												<SidebarProvider>
-													<Page>{children}</Page>
-												</SidebarProvider>
-											</SupportProvider>
-										</CookieProvider>
-									</ShortcutsProvider>
+									<NotificationProvider>
+										<ShortcutsProvider>
+											<CookieProvider>
+												<SupportProvider>
+													<CookiePrompt />
+													<SidebarProvider>
+														<Page>{children}</Page>
+													</SidebarProvider>
+												</SupportProvider>
+											</CookieProvider>
+										</ShortcutsProvider>
+									</NotificationProvider>
 								</UserProvider>
 							</ThemeProvider>
 						</PlatformProvider>
 					</EnvironmentProvider>
 				</DictionaryProvider>
 			</ToastProvider>
-		</>
+		</Suspense>
 	);
 }

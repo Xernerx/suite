@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Info, Loader2 } from 'lucide-react';
 
 interface ConfirmProps {
 	open: boolean;
@@ -12,10 +12,26 @@ interface ConfirmProps {
 	cancelText?: string;
 	onConfirm: () => void | Promise<void>;
 	loading?: boolean;
+	variant?: 'danger' | 'primary';
 }
 
-export function Confirm({ open, onOpenChange, title, description, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, loading = false }: ConfirmProps) {
+const variantStyles = {
+	danger: {
+		icon: AlertTriangle,
+		iconWrapper: 'bg-(--accent-red)/10 text-(--accent-red)',
+		button: 'bg-(--accent-red) text-white hover:bg-red-600',
+	},
+	primary: {
+		icon: Info,
+		iconWrapper: 'bg-(--accent)/10 text-(--accent)',
+		button: 'bg-(--accent) text-white hover:bg-blue-600',
+	},
+};
+
+export function Confirm({ open, onOpenChange, title, description, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, loading = false, variant = 'danger' }: ConfirmProps) {
 	if (!open) return null;
+
+	const { icon: Icon, iconWrapper, button } = variantStyles[variant];
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
@@ -24,8 +40,8 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex items-start" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-500/10 text-red-500">
-						<AlertTriangle size={24} />
+					<div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${iconWrapper}`}>
+						<Icon size={24} />
 					</div>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 						<h2 className="text-lg font-bold text-(--text)">{title}</h2>
@@ -47,7 +63,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 						type="button"
 						disabled={loading}
 						onClick={onConfirm}
-						className="flex items-center justify-center rounded-xl text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50 shadow-sm"
+						className={`flex items-center justify-center rounded-xl text-sm font-medium transition-colors disabled:opacity-50 shadow-sm ${button}`}
 						style={{ padding: 'calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 1.25)', gap: 'calc(var(--ui-gap) * 0.5)' }}
 					>
 						{loading && <Loader2 size={16} className="animate-spin" />}

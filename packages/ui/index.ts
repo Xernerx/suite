@@ -8,3 +8,4 @@ export * from './src/Confirm';
 export * from './src/Slider';
 export * from './src/Modal';
 export * from './src/PreventLossConfirmation';
+export * from './src/CollapsibleCard';

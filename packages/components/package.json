@@ -11,6 +11,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/ui": "workspace:*",
+		"@xernerx/feedback": "workspace:*",
 		"canvas-confetti": "^1",
 		"framer-motion": "^13.0.0",
 		"lucide-react": "^1.30.0",

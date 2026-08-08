@@ -11,3 +11,4 @@ export * from './src/EnvironmentProvider';
 export * from './src/ShortcutsProvider';
 export * from './src/UserProvider';
 export * from './src/DictionaryProvider';
+export * from './src/NotificationProvider';

@@ -2,10 +2,11 @@
 
 'use client';
 
-import { Key, Languages, Shield, Users as UsersIcon } from 'lucide-react';
+import { Key, Languages, Shield, Ticket, Users as UsersIcon } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
+import Applications from '@/components/Applications';
 import { Loading } from '@xernerx/feedback';
 import Roles from '@/components/Roles';
 import Tokens from '@/components/Tokens';
@@ -72,6 +73,7 @@ export default function Home() {
 
 		const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
 		const canUsers = userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true;
+		const canApplications = userRolePermissions.applications ?? permissions.find((p) => p.key === 'applications')?.defaultValue ?? false;
 		const canRoles = userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false;
 		const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
 
@@ -92,6 +94,16 @@ export default function Home() {
 				icon: UsersIcon,
 			});
 		}
+
+		if (canApplications) {
+			items.push({
+				category: t('common.nav.categories.administrator'),
+				label: t('common.nav.items.applications'),
+				view: 'applications',
+				icon: Ticket,
+			});
+		}
+
 		if (canRoles) {
 			items.push({
 				category: t('common.nav.categories.administrator'),
@@ -100,6 +112,7 @@ export default function Home() {
 				icon: Shield,
 			});
 		}
+
 		if (canTokens) {
 			items.push({
 				category: t('common.nav.categories.administrator'),
@@ -126,13 +139,15 @@ export default function Home() {
 	const allowedViews = [];
 	const canUsers = userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true;
 	const canRoles = userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false;
+	const canApplications = userRolePermissions.applications ?? permissions.find((p) => p.key === 'applications')?.defaultValue ?? false;
 	const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
 	const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
 
+	if (canTranslations) allowedViews.push('translations');
 	if (canUsers) allowedViews.push('users');
+	if (canApplications) allowedViews.push('applications');
 	if (canRoles) allowedViews.push('roles');
 	if (canTokens) allowedViews.push('tokens');
-	if (canTranslations) allowedViews.push('translations');
 
 	const activeView = allowedViews.includes(view!) ? view : allowedViews[0];
 
@@ -145,10 +160,11 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
+			{activeView === 'translations' && <Translations />}
 			{activeView === 'users' && <Users />}
+			{activeView === 'applications' && <Applications />}
 			{activeView === 'roles' && <Roles />}
 			{activeView === 'tokens' && <Tokens />}
-			{activeView === 'translations' && <Translations />}
 		</div>
 	);
 }
