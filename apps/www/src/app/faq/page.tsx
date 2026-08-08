@@ -36,7 +36,7 @@ export default function Page() {
 		}
 
 		show();
-	}, [setView, show, view, t]);
+	}, [setView, show, view, t, setNavItems]);
 
 	return (
 		<>

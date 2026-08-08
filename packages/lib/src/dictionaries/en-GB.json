@@ -872,6 +872,10 @@
 			"card3": {
 				"title": "I translated but it didn't update?",
 				"description": "Translations cannot be automatically applied, the web page needs to be rebuild. Whenever you submit a review we get a notification asking to apply the newly added translations, we will allow this once reviewed."
+			},
+			"card4": {
+				"title": "My language is not included in the list, how can I add it?",
+				"description": "For now you are required to request the language in our support channels, a language base will be created and then you can start translating for us!"
 			}
 		}
 	}

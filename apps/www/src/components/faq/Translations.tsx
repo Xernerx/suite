@@ -25,6 +25,8 @@ export default function Translations() {
 				<CollapsibleCard message={t('faq.translations.card2.title')} description={t('faq.translations.card2.description')} />
 
 				<CollapsibleCard message={t('faq.translations.card3.title')} description={t('faq.translations.card3.description')} />
+
+				<CollapsibleCard message={t('faq.translations.card4.title')} description={t('faq.translations.card4.description')} />
 			</div>
 		</div>
 	);
