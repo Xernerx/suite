@@ -10,7 +10,7 @@ jobs:
     build:
         uses: ./.github/workflows/build.yml
 
-    # 2. Build and package on each OS independently, then upload only installers
+    # 2. Build and package on each OS independently
     canary-desktop:
         name: Canary Desktop (${{ matrix.os }})
         needs: [build]
@@ -56,9 +56,9 @@ jobs:
                       apps/desktop/release/*.blockmap
                   if-no-files-found: error
 
-    # 3. Collect all installers and publish them as a unique versioned pre-release
+    # 3. Force-update the rolling canary tag and publish/overwrite the release
     publish-canary:
-        name: Publish Canary Release
+        name: Publish Rolling Canary Preview
         needs: [canary-desktop]
         runs-on: ubuntu-latest
         permissions:
@@ -73,34 +73,31 @@ jobs:
               with:
                   path: all-artifacts
 
-            - name: Create Unique Version Tag
-              id: tag
+            - name: Force Update Rolling Canary Tag
               run: |
-                  cd apps/desktop
-                  VERSION=$(node -p "require('./package.json').version")
-                  COMMIT=$(git rev-parse --short HEAD)
-                  TAG="v${VERSION}-canary.${COMMIT}"
-
-                  echo "tag_name=${TAG}" >> $GITHUB_OUTPUT
-                  echo "release_name=Xernerx App ${TAG}" >> $GITHUB_OUTPUT
-
-                  # Create and push the unique tag to the repo
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-                  git tag "${TAG}"
-                  git push origin "${TAG}"
 
-            - name: Publish to GitHub Releases
+                  # Delete local and remote canary tags cleanly without branch conflicts
+                  git tag -d canary || true
+                  git push origin --delete tag canary || true
+
+                  # Re-create tag at current HEAD and push
+                  git tag canary
+                  git push origin canary --force
+
+            - name: Publish Rolling Canary Release
               uses: softprops/action-gh-release@v2
               with:
                   files: |
                       all-artifacts/desktop-release-ubuntu-latest/*
                       all-artifacts/desktop-release-windows-latest/*
                       all-artifacts/desktop-release-macos-latest/*
-                  tag_name: ${{ steps.tag.outputs.tag_name }}
-                  name: ${{ steps.tag.outputs.release_name }}
-                  body: 'Automated bleeding-edge pre-release build from the canary branch.'
+                  tag_name: canary
+                  name: 'Xernerx Canary (Latest Preview)'
+                  body: 'Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit.'
                   prerelease: true
+                  draft: false
                   make_latest: false
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
