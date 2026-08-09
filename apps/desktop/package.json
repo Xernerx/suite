@@ -1,5 +1,5 @@
 {
-	"name": "@xernerx/desktop",
+	"name": "desktop",
 	"productName": "Xernerx App",
 	"version": "2.0.1",
 	"description": "Xernerx App",
@@ -7,7 +7,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "pnpm i && tsc",
-		"dist": "pnpm build && electron-builder",
+		"dist": "pnpm build && electron-builder --publish never",
 		"dev": "pnpm i && tsc && electron ."
 	},
 	"author": "Xernerx Studios",
