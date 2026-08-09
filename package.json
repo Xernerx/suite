@@ -14,7 +14,7 @@
 		"predev": "pnpm i && pnpm generate:locales",
 		"dev": "pnpm predev && concurrently -n apps,tunnel -c blue,green \"pnpm --parallel --filter ./apps/* dev\" \"pnpm tunnel\"",
 		"prebuild": "pnpm generate:locales",
-		"build": "pnpm --filter ./apps/* build",
+		"build": "pnpm -r build",
 		"lint": "pnpm --recursive run lint",
 		"tunnel": "cloudflared tunnel run",
 		"commit": "pnpm build && pnpx prettier --write . && changeset",
