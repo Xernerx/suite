@@ -8,10 +8,10 @@
 	},
 	"dependencies": {
 		"@svgr/webpack": "^8.1.0",
+		"@xernerx/feedback": "workspace:*",
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"@xernerx/feedback": "workspace:*",
 		"canvas-confetti": "^1",
 		"framer-motion": "^13.0.0",
 		"lucide-react": "^1.30.0",
@@ -23,10 +23,10 @@
 		"react-icons": "^5"
 	},
 	"devDependencies": {
-		"@types/canvas-confetti": "^1",
-		"@types/node": "^20",
+		"@types/canvas-confetti": "^1.9.0",
+		"@types/node": "^20.19.43",
 		"@types/react": "^19.2.18",
-		"@types/react-dom": "^19",
-		"tailwindcss": "^4"
+		"@types/react-dom": "^19.2.4",
+		"tailwindcss": "^4.3.3"
 	}
 }

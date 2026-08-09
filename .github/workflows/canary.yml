@@ -52,11 +52,9 @@ jobs:
                       apps/desktop/release/*.exe
                       apps/desktop/release/*.dmg
                       apps/desktop/release/*.AppImage
-                      apps/desktop/release/*.yml
-                      apps/desktop/release/*.blockmap
                   if-no-files-found: error
 
-    # 3. Cleanly wipe the old canary release/tag and create a fresh one with assets
+    # 3. Force-update the rolling canary tag and publish only the three main installers
     publish-canary:
         name: Publish Rolling Canary Preview
         needs: [canary-desktop]
@@ -77,28 +75,23 @@ jobs:
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-                  # Delete the release and remote tag using GitHub CLI
                   gh release delete canary --yes --cleanup-tag || true
-
-                  # Ensure local/remote tags are fully cleaned up
                   git tag -d canary || true
                   git push origin --delete refs/tags/canary || true
 
             - name: Create Fresh Rolling Canary Release
               run: |
-                  # Create a fresh local tag at current HEAD and push it
                   git tag canary
                   git push origin refs/tags/canary:refs/tags/canary --force
 
-                  # Create the release and upload all artifacts in one clean command
+                  # Create the release and upload ONLY the AppImage, DMG, and EXE installers
                   gh release create canary \
                       --title "Xernerx Canary (Latest Preview)" \
                       --notes "Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit." \
                       --prerelease \
                       --repo ${{ github.repository }} \
-                      all-artifacts/desktop-release-ubuntu-latest/* \
-                      all-artifacts/desktop-release-windows-latest/* \
-                      all-artifacts/desktop-release-macos-latest/*
+                      all-artifacts/desktop-release-ubuntu-latest/*.AppImage \
+                      all-artifacts/desktop-release-windows-latest/*.exe \
+                      all-artifacts/desktop-release-macos-latest/*.dmg
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
