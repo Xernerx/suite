@@ -1,5 +1,17 @@
 # www
 
+## 0.5.1
+
+### Patch Changes
+
+- Added a 4th question
+
+## 0.5.0
+
+### Minor Changes
+
+- Added Notifications to the sidebar, added Request for Translator, added FaQ page
+
 ## 0.4.7
 
 ### Patch Changes

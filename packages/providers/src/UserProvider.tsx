@@ -64,7 +64,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						...(session?.user || {}),
-						credits: 1000,
+						credits: { balance: 1000 },
+						roles: ['1b333119-d818-4fb1-a5dc-12621fd14198'],
 					}),
 				});
 
@@ -75,6 +76,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 					});
 				} else {
 					xernerx = await postRes.json();
+
 					toast({
 						title: t('auth.user.created'),
 						type: 'info',

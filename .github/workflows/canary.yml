@@ -1,0 +1,112 @@
+name: Canary
+
+on:
+    push:
+        branches:
+            - canary
+
+jobs:
+    # 1. Call the shared build workflow
+    build:
+        uses: ./.github/workflows/build.yml
+
+    # 2. Build and package on each OS independently
+    canary-desktop:
+        name: Canary Desktop (${{ matrix.os }})
+        needs: [build]
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+
+            - name: Install pnpm
+              run: npm install -g pnpm
+
+            - name: Install deps
+              run: pnpm install
+
+            - name: Build and Package Desktop
+              run: |
+                  cd apps/desktop
+                  npm pkg set version="$(node -p "require('./package.json').version")-canary.$(git rev-parse --short HEAD)"
+                  cd ../..
+
+                  pnpm --filter ./apps/desktop build
+                  pnpm --filter ./apps/desktop dist --publish never
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Upload Desktop Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: desktop-release-${{ matrix.os }}
+                  path: |
+                      apps/desktop/release/*.exe
+                      apps/desktop/release/*.dmg
+                      apps/desktop/release/*.AppImage
+                  if-no-files-found: error
+
+    # 3. Cleanly wipe the old rolling canary release/tag, push a unique historical tag, and create the fresh rolling release
+    publish-canary:
+        name: Publish Rolling Canary Preview
+        needs: [canary-desktop]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Download All Artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  path: all-artifacts
+
+            - name: Delete Old Rolling Canary Release & Tag
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  gh release delete canary --yes --cleanup-tag || true
+                  git tag -d canary || true
+                  git push origin --delete refs/tags/canary || true
+
+            - name: Create Version Tag & Rolling Canary Release
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+                  # Extract version and commit hash
+                  VERSION=$(node -p "require('./apps/desktop/package.json').version")
+                  COMMIT=$(git rev-parse --short HEAD)
+                  VERSIONED_TAG="v${VERSION}-canary.${COMMIT}"
+                  TITLE="v${VERSION}-canary"
+
+                  # 1. Create and push a unique permanent historical version tag (e.g. v2.0.1-canary.7c210b8)
+                  git tag "${VERSIONED_TAG}"
+                  git push origin "${VERSIONED_TAG}"
+
+                  # 2. Create and push the rolling 'canary' tag
+                  git tag canary
+                  git push origin refs/tags/canary:refs/tags/canary --force
+
+                  # 3. Create the release on the 'canary' tag with the dynamic version title
+                  gh release create canary \
+                      --title "${TITLE}" \
+                      --notes "Automated rolling bleeding-edge preview build from the canary branch (Commit: ${COMMIT}). Always points to the most recent commit." \
+                      --prerelease \
+                      --draft=false \
+                      --repo ${{ github.repository }} \
+                      all-artifacts/desktop-release-ubuntu-latest/*.AppImage \
+                      all-artifacts/desktop-release-windows-latest/*.exe \
+                      all-artifacts/desktop-release-macos-latest/*.dmg
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

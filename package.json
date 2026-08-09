@@ -5,7 +5,7 @@
 	"description": "Xernerx Suite",
 	"version": "1.2.26",
 	"author": "Xernerx Studios",
-	"packageManager": "pnpm@11.17.0",
+	"packageManager": "pnpm@11.20.0",
 	"engines": {
 		"node": ">=20"
 	},
@@ -14,7 +14,7 @@
 		"predev": "pnpm i && pnpm generate:locales",
 		"dev": "pnpm predev && concurrently -n apps,tunnel -c blue,green \"pnpm --parallel --filter ./apps/* dev\" \"pnpm tunnel\"",
 		"prebuild": "pnpm generate:locales",
-		"build": "pnpm --filter ./apps/* build",
+		"build": "pnpm -r build",
 		"lint": "pnpm --recursive run lint",
 		"tunnel": "cloudflared tunnel run",
 		"commit": "pnpm build && pnpx prettier --write . && changeset",
@@ -22,10 +22,10 @@
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.1",
-		"concurrently": "^9.2.1",
+		"concurrently": "^9.2.4",
 		"next": "^16.3.0",
 		"prettier": "^3.9.6",
 		"shx": "^0.4.0",
-		"tsx": "^4.19.0"
+		"tsx": "^4.23.11"
 	}
 }

@@ -38,4 +38,10 @@ export const permissions: PermissionDefinition[] = [
 		description: 'Permission to add and modify translations.',
 		defaultValue: false,
 	},
+	{
+		key: 'applications',
+		label: 'Manage Applications',
+		description: 'Permission review applications by users.',
+		defaultValue: false,
+	},
 ];

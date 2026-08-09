@@ -1,6 +1,6 @@
 {
 	"name": "auth",
-	"version": "0.5.6",
+	"version": "0.6.0",
 	"private": true,
 	"scripts": {
 		"initialize": "shx cp -r ../../packages/public/* ./public/",
@@ -27,14 +27,14 @@
 		"stripe": "^22"
 	},
 	"devDependencies": {
-		"@tailwindcss/postcss": "^4",
-		"@types/node": "^20",
+		"@tailwindcss/postcss": "^4.3.3",
+		"@types/node": "^20.19.43",
 		"@types/react": "^19.2.18",
-		"@types/react-dom": "^19",
+		"@types/react-dom": "^19.2.4",
 		"babel-plugin-react-compiler": "1.0.0",
-		"eslint": "^9",
-		"eslint-config-next": "^16",
-		"tailwindcss": "^4",
-		"typescript": "^5"
+		"eslint": "^9.39.5",
+		"eslint-config-next": "^16.3.0",
+		"tailwindcss": "^4.3.3",
+		"typescript": "^7.0.2"
 	}
 }

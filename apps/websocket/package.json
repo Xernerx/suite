@@ -1,5 +1,5 @@
 {
-	"name": "@xernerx/websocket",
+	"name": "websocket",
 	"version": "1.2.4",
 	"description": "Xernerx Websocket",
 	"main": "dist/main.js",
@@ -7,10 +7,7 @@
 	"scripts": {
 		"start": "node .",
 		"build": "tsc",
-		"dev": "pnpm i && tsc-watch --onSuccess \"node .\"",
-		"patch": "npm version patch",
-		"minor": "npm version minor",
-		"major": "npm version major"
+		"dev": "pnpm i && tsc-watch --onSuccess \"node .\""
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",
@@ -26,9 +23,9 @@
 		"node": ">=20"
 	},
 	"devDependencies": {
-		"@types/node": "^20.19.37",
+		"@types/node": "^20.19.43",
 		"@types/ws": "^8.18.1",
-		"tsc-watch": "7.2.0",
-		"typescript": "^6"
+		"tsc-watch": "7.2.1",
+		"typescript": "^7.0.2"
 	}
 }

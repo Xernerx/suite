@@ -6,8 +6,8 @@ import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 import { products } from '@xernerx/lib';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-	apiVersion: '2026-07-29.dahlia' as any,
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
+	apiVersion: '2026-07-29.dahlia',
 });
 
 const STAFF_COUPON_ID = process.env.STRIPE_COUPON_ID;

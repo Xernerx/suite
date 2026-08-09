@@ -2,11 +2,12 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Command, Compass, FileText, HelpCircle, Search, SidebarIcon, X } from 'lucide-react';
+import { ChevronDown, Command, Compass, FileText, HelpCircle, LayoutGrid, Search, SidebarIcon, X } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useDictionary, useEnvironment, useUser } from '@xernerx/providers';
 
 import { navigation } from '@xernerx/lib';
-import { useEnvironment } from '@xernerx/providers';
+import { useSession } from 'next-auth/react';
 
 type ShortcutItem = {
 	key: string;
@@ -98,8 +99,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 		<ShortcutsContext.Provider value={value}>
 			{children}
 			<HelpModal isOpen={isHelpOpen} onClose={() => setHelpOpen(false)} shortcuts={shortcuts} />
-			<NavigationModal isOpen={isNavOpen} onClose={() => setNavOpen(false)} />
-			<FloatingNavigationShortcut />
+			<NavigationModal isOpen={isNavOpen} onClose={() => setNavOpen(false)} navigation={navigation} />
 		</ShortcutsContext.Provider>
 	);
 }
@@ -112,8 +112,35 @@ export function useShortcuts() {
 	return context;
 }
 
-function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: boolean; onClose: () => void; navigation?: any[] }) {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
+	const { data: session } = useSession();
+	const { user: discordUser } = useUser();
+	const [roles, setRoles] = useState<any[]>([]);
+
+	useEffect(() => {
+		if (!isOpen) return;
+		fetch(getEnvUrl('https://api.xernerx.com/secure/roles'), { credentials: 'include' })
+			.then((res) => (res.ok ? res.json() : []))
+			.then((data) => setRoles(data))
+			.catch(() => {});
+	}, [getEnvUrl, isOpen]);
+
+	const activeUser = discordUser || session?.user;
+	const userRoleIds = Array.isArray(activeUser?.roles) ? activeUser.roles : [];
+	const activeRoles = roles.filter((r) => userRoleIds.includes(r.id));
+	const hasAdminAccess = activeRoles.some((r) => r.permissions?.access === true);
+
+	const visibleNavigation = navigation.filter((item) => !item.adminOnly || hasAdminAccess);
+	const hasCategories = visibleNavigation.some((item) => item.category);
+
+	const groupedNavigation = visibleNavigation.reduce((acc: Record<string, any[]>, item: any) => {
+		const category = item.category || 'Other';
+		if (!acc[category]) acc[category] = [];
+		acc[category].push(item);
+		return acc;
+	}, {});
 
 	return (
 		<AnimatePresence>
@@ -126,7 +153,7 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className="relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+						className="relative w-full max-w-3xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
 						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 					>
 						<div className="flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0">
@@ -138,10 +165,11 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 										color: 'var(--accent)',
 									}}
 								>
-									<Compass size={20} />
+									<LayoutGrid size={20} />
 								</div>
 								<div>
-									<h2 className="text-lg font-semibold text-(--text)">Navigation</h2>
+									<h2 className="text-lg font-semibold text-(--text)">{t('common.shortcuts.modal.navigation.title')}</h2>
+									<p className="text-xs text-(--text-muted)">{t('common.shortcuts.modal.navigation.description')}</p>
 								</div>
 							</div>
 
@@ -150,47 +178,54 @@ function NavigationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 							</button>
 						</div>
 
-						<div className="flex flex-col overflow-y-auto pr-1" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-							{navigation && navigation.length > 0 ? (
-								navigation.map((item: any, idx: number) => {
-									const resolvedHref = getEnvUrl(item.href);
-									return (
-										<a
-											key={idx}
-											href={resolvedHref}
-											onClick={onClose}
-											className="flex items-center justify-between rounded-xl px-4 py-3 bg-(--background) border border-(--border)/10 transition hover:border-(--accent)"
-										>
-											<span className="text-sm font-medium text-(--text)">{item.label}</span>
-											<span className="text-xs text-(--text-muted) font-mono">{resolvedHref}</span>
-										</a>
-									);
-								})
+						<div className="overflow-y-auto pr-1 flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+							{visibleNavigation.length > 0 ? (
+								hasCategories ? (
+									Object.entries(groupedNavigation).map(([category, items]) => (
+										<div key={category} className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+											<h3 className="text-xs font-bold uppercase tracking-wider text-(--text-muted) px-1">{category}</h3>
+											<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 sm:gap-6">
+												{items.map((item: any, idx: number) => {
+													const resolvedHref = getEnvUrl(item.href);
+													const AppIcon = item.icon || Compass;
+
+													return (
+														<a key={idx} href={resolvedHref} onClick={onClose} className="group flex flex-col items-center gap-3 cursor-pointer">
+															<div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-[22px] bg-(--background) border border-(--border)/10 shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md group-hover:border-(--accent)/50">
+																<AppIcon size={18} className="text-(--text-muted) group-hover:text-(--accent) transition-colors" />
+															</div>
+															<span className="text-xs sm:text-sm font-medium text-(--text) text-center line-clamp-1 w-full px-1">{item.label}</span>
+														</a>
+													);
+												})}
+											</div>
+										</div>
+									))
+								) : (
+									<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 sm:gap-6 py-2">
+										{visibleNavigation.map((item: any, idx: number) => {
+											const resolvedHref = getEnvUrl(item.href);
+											const AppIcon = item.icon || Compass;
+
+											return (
+												<a key={idx} href={resolvedHref} onClick={onClose} className="group flex flex-col items-center gap-3 cursor-pointer">
+													<div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-[22px] bg-(--background) border border-(--border)/10 shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md group-hover:border-(--accent)/50">
+														<AppIcon size={28} className="text-(--text-muted) group-hover:text-(--accent) transition-colors" />
+													</div>
+													<span className="text-xs sm:text-sm font-medium text-(--text) text-center line-clamp-1 w-full px-1">{item.label}</span>
+												</a>
+											);
+										})}
+									</div>
+								)
 							) : (
-								<p className="text-sm text-(--text-muted) text-center py-4">No navigation links available.</p>
+								<p className="text-sm text-(--text-muted) text-center py-10">{t('common.shortcuts.modal.navigation.empty')}</p>
 							)}
 						</div>
 					</motion.div>
 				</div>
 			)}
 		</AnimatePresence>
-	);
-}
-
-function FloatingNavigationShortcut() {
-	const { setNavOpen } = useShortcuts();
-
-	return (
-		<div className="fixed z-40" style={{ top: 'var(--ui-gap)', left: 'var(--ui-gap)' }}>
-			<button
-				onClick={() => setNavOpen(true)}
-				className="flex h-11 items-center gap-2 px-3.5 rounded-xl bg-(--foreground) border border-(--border)/10 shadow-lg text-(--text) transition hover:border-(--accent)"
-				title="Open Navigation (Ctrl + K)"
-			>
-				<Compass size={18} className="text-(--accent)" />
-				<span className="text-xs font-medium">Navigation</span>
-			</button>
-		</div>
 	);
 }
 
@@ -302,6 +337,8 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 }
 
 function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: () => void; shortcuts: ShortcutItem[] }) {
+	const { environment } = useEnvironment();
+
 	const [electronVersion, setElectronVersion] = useState<string | null>(null);
 	const [appVersion, setAppVersion] = useState<string>('1.0.0');
 	const [isChangelogOpen, setChangelogOpen] = useState(false);
@@ -310,21 +347,15 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 		const win = window as any;
 		if (win.electron) {
 			if (win.electron.version) {
-				setAppVersion(win.electron.version);
+				setElectronVersion(win.electron.version);
 			}
-			if (win.electron.metadata?.electronVersion) {
-				setElectronVersion(win.electron.metadata.electronVersion);
-			} else {
-				setElectronVersion('Loaded');
-			}
-		} else {
-			fetch('/api/version')
-				.then((res) => res.json())
-				.then((data) => {
-					if (data.version) setAppVersion(data.version);
-				})
-				.catch(() => {});
 		}
+		fetch('/api/version')
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.version) setAppVersion(data.version);
+			})
+			.catch(() => {});
 	}, []);
 
 	return (
@@ -383,20 +414,20 @@ function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onClose: (
 							<div className="pt-3 border-t border-(--border)/10 flex items-center justify-between text-xs text-(--text-muted) shrink-0 px-1">
 								<div className="flex items-center gap-2">
 									<span>
-										Version:{' '}
+										{environment}:{' '}
 										<button
 											onClick={() => setChangelogOpen(true)}
 											className="text-(--text) font-mono underline hover:text-(--accent) transition cursor-pointer"
 											title="View Changelog"
 										>
-											{appVersion}
+											<strong>{appVersion}</strong>
 										</button>
 									</span>
 									{electronVersion && (
 										<>
 											<span>•</span>
 											<span>
-												Electron: <strong className="text-(--text) font-mono">{electronVersion}</strong>
+												App: <strong className="text-(--text) font-mono">{electronVersion}</strong>
 											</span>
 										</>
 									)}

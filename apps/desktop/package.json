@@ -1,13 +1,14 @@
 {
-	"name": "@xernerx/desktop",
-	"version": "1.4.1",
+	"name": "desktop",
+	"productName": "Xernerx App",
+	"version": "2.0.1",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"build": "pnpm i && tsc",
-		"dist": "pnpm build && electron-builder",
-		"dev": "pnpm i && tsc && electron ."
+		"build": "tsc",
+		"dist": "pnpm build && electron-builder --publish never",
+		"dev": "tsc && electron ."
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",
@@ -18,8 +19,8 @@
 	},
 	"devDependencies": {
 		"electron": "41.5.0",
-		"electron-builder": "^26.8.1",
-		"typescript": "^6.0.3"
+		"electron-builder": "^26.15.3",
+		"typescript": "^7.0.2"
 	},
 	"build": {
 		"nodeGypRebuild": false,
@@ -67,7 +68,8 @@
 		},
 		"linux": {
 			"target": "AppImage",
-			"artifactName": "${productName}-${version}-setup.${ext}"
+			"artifactName": "${productName}-${version}-setup.${ext}",
+			"executableName": "xernerx-app"
 		},
 		"nsis": {
 			"oneClick": false,

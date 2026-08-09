@@ -27,6 +27,11 @@
 				"save": "Save My Preferences"
 			}
 		},
+		"buttons": {
+			"cancel": "Cancel",
+			"confirm": "Confirm",
+			"proceed": "Proceed"
+		},
 		"footer": {
 			"tagline": "Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.",
 			"sections": {
@@ -37,6 +42,7 @@
 				"privacy": "Privacy",
 				"terms": "Terms",
 				"contact": "Contact",
+				"faq": "Frequently Asked Questions",
 				"github": "GitHub",
 				"npm": "npm",
 				"documentation": "Documentation",
@@ -54,7 +60,8 @@
 				"developer": "Developer",
 				"moderator": "Moderator",
 				"administrator": "Administrator",
-				"translator": "Translator"
+				"translator": "Translator",
+				"xernerxSuite": "Xernerx Suite"
 			},
 			"items": {
 				"account": "Account",
@@ -69,7 +76,18 @@
 				"store": "Store",
 				"users": "Users",
 				"roles": "Roles",
-				"translations": "Translations"
+				"translations": "Translations",
+				"applications": "Applications",
+				"environments": "Environments"
+			}
+		},
+		"shortcuts": {
+			"modal": {
+				"navigation": {
+					"title": "App Drawer",
+					"description": "Quickly launch and switch between applications",
+					"empty": "No applications available."
+				}
 			}
 		}
 	},
@@ -418,7 +436,10 @@
 			"coverage": {
 				"title": "Help us translate!",
 				"description": "Your selected language is currently {coverage}% translated. Have a few minutes to help us complete it?",
-				"button": "Contribute"
+				"button": "Contribute",
+				"confirmTitle": "Request Translator",
+				"confirmPrompt": "You are requesting to become a translator, do you want to proceed?",
+				"adminButton": "Go to Translations"
 			},
 			"discord": {
 				"title": "Discord Language",
@@ -815,6 +836,56 @@
 					"title": "14. Contact",
 					"prefix": "For legal inquiries contact"
 				}
+			}
+		}
+	},
+	"faq": {
+		"category": {
+			"suite": "Xernerx Suite"
+		},
+		"environments": {
+			"title": "Environments",
+			"card": {
+				"title": "What are environments?",
+				"description": "Within Xernerx Studios we speak of 3 environments: release (production), canary (beta) and dev (development). Here is what each of them mean:"
+			},
+			"table": {
+				"header": {
+					"environment": "Environment",
+					"description": "Description"
+				},
+				"release": {
+					"label": "Release",
+					"description": "The stable production environment used for general release."
+				},
+				"canary": {
+					"label": "Canary",
+					"description": "The beta environment used for pre-release testing of new features."
+				},
+				"dev": {
+					"label": "Dev",
+					"description": "The development environment used for active building and testing."
+				}
+			}
+		},
+		"translations": {
+			"title": "Translations",
+			"card1": {
+				"title": "How do I become a translator?",
+				"p1": "You can apply directly from the Language preferences page if a language has less than 100% coverage.",
+				"p2": "Make sure you are logged in and on the account page."
+			},
+			"card2": {
+				"title": "How long does it take for an application to be reviewed?",
+				"description": "Whenever an admin has time to review your submission and merge the translations with the live environment"
+			},
+			"card3": {
+				"title": "I translated but it didn't update?",
+				"description": "Translations cannot be automatically applied, the web page needs to be rebuild. Whenever you submit a review we get a notification asking to apply the newly added translations, we will allow this once reviewed."
+			},
+			"card4": {
+				"title": "My language is not included in the list, how can I add it?",
+				"description": "For now you are required to request the language in our support channels, a language base will be created and then you can start translating for us!"
 			}
 		}
 	}

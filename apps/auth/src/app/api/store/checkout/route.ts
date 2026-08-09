@@ -4,7 +4,7 @@ import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 
 // Initialize Stripe with your Secret Key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
 	apiVersion: '2026-07-29.dahlia', // Use the latest API version
 });
 

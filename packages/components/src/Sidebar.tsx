@@ -1,16 +1,15 @@
 /** @format */
 'use client';
 
-import { Compass, LogIn, User as UserIcon } from 'lucide-react';
+import { Bell, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { Monitor, Smartphone, Tablet } from 'lucide-react';
-import { useDictionary, usePlatform, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 
 import { AnimatePresence } from 'framer-motion';
 import { Divider } from '@xernerx/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import SidebarSuite from './cards/SidebarSuite';
+import SidebarNotifications from './cards/SidebarNotifications';
 import SidebarUserCard from './cards/SidebarUser';
 import { useSession } from 'next-auth/react';
 
@@ -26,9 +25,11 @@ export function Sidebar() {
 	const { user: discordUser } = useUser();
 	const { device } = usePlatform();
 	const { t } = useDictionary();
+	const { unreadCount } = useNotifications();
+	const { setNavOpen } = useShortcuts();
 
-	// Manage which dropdown is active instead of a single boolean
-	const [activeMenu, setActiveMenu] = useState<'none' | 'suite' | 'user'>('none');
+	// Manage which dropdown is active
+	const [activeMenu, setActiveMenu] = useState<'none' | 'user' | 'notifications'>('none');
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	const isCollapsed = state === 'closed' && !isMobileOpen;
@@ -65,7 +66,7 @@ export function Sidebar() {
 				className={`
                     fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
                     w-full pt-[72px] pb-4
-                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-72px)] md:pt-0 md:pb-0
+                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-50px)] md:pt-0 md:pb-0
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
                     md:translate-x-0 
                     ${isCollapsed ? 'md:w-[80px]' : ''}
@@ -142,21 +143,19 @@ export function Sidebar() {
 							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
 						>
 							<LogIn size={18} />
-							{!isCollapsed && <span>{t('common.sidebar.login', {}, 'Login')}</span>}
+							{!isCollapsed && <span>{t('common.sidebar.login')}</span>}
 						</Link>
 					) : (
 						<div className="relative w-full mt-1">
-							{/* Suite Menu Dropdown */}
-							<AnimatePresence>{activeMenu === 'suite' && <SidebarSuite isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
-
-							{/* User Menu Dropdown (Rich Discord Profile) */}
+							{/* Menus */}
 							<AnimatePresence>{activeMenu === 'user' && <SidebarUserCard activeUser={activeUser} isCollapsed={isCollapsed} />}</AnimatePresence>
+							<AnimatePresence>{activeMenu === 'notifications' && <SidebarNotifications isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 
-							{/* Combined Trigger Card Wrapper - Now hosts the Nameplate */}
+							{/* Combined Trigger Card Wrapper */}
 							<div
 								className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-colors 
                                 ${!nameplateUrl ? 'hover:bg-(--foreground)' : 'shadow-inner'}
-                                ${!nameplateUrl && (activeMenu === 'user' || activeMenu === 'suite') ? 'bg-(--foreground)' : ''}
+                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                             `}
 								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
@@ -165,7 +164,6 @@ export function Sidebar() {
 								{nameplateUrl && (
 									<>
 										<video src={nameplateUrl} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none opacity-90" />
-										{/* Optional slight dark overlay for text readability across all themes */}
 										<div className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
 									</>
 								)}
@@ -223,17 +221,40 @@ export function Sidebar() {
 									</div>
 								</button>
 
-								{/* Compass Ecosystem Trigger (Right Side) */}
-								<button
-									onClick={() => setActiveMenu(activeMenu === 'suite' ? 'none' : 'suite')}
-									className={`relative z-10 shrink-0 flex items-center justify-center rounded-xl transition-colors 
-                                        ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) group-hover:text-(--text)'}
-                                        ${activeMenu === 'suite' ? (nameplateUrl ? 'bg-black/40 text-white' : 'bg-(--background)') : ''}
-                                    `}
-									style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
-								>
-									<Compass size={isCollapsed ? 20 : 18} className={`transition-transform duration-200 ${activeMenu === 'suite' && !nameplateUrl ? 'text-(--accent)' : ''}`} />
-								</button>
+								{/* Action Buttons (Right Side) */}
+								<div className={`relative z-10 flex ${isCollapsed ? 'flex-col' : 'items-center'} gap-1`}>
+									{/* Notifications Trigger */}
+									<button
+										onClick={() => setActiveMenu(activeMenu === 'notifications' ? 'none' : 'notifications')}
+										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
+                                            ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+                                            ${activeMenu === 'notifications' ? (nameplateUrl ? 'bg-black/40 text-white' : 'bg-(--background) text-(--text)') : ''}
+                                        `}
+										style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
+									>
+										<div className="relative">
+											<Bell
+												size={isCollapsed ? 20 : 18}
+												className={`transition-transform duration-200 ${activeMenu === 'notifications' && !nameplateUrl ? 'text-(--accent)' : ''}`}
+											/>
+											{unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-(--foreground)" />}
+										</div>
+									</button>
+
+									{/* App Drawer Trigger (Replaces Suite) */}
+									<button
+										onClick={() => {
+											setActiveMenu('none');
+											setNavOpen(true);
+										}}
+										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
+                                            ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+                                        `}
+										style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
+									>
+										<LayoutGrid size={isCollapsed ? 20 : 18} className="transition-transform duration-200" />
+									</button>
+								</div>
 							</div>
 						</div>
 					)}

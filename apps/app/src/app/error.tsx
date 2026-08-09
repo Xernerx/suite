@@ -1,16 +1,8 @@
 /** @format */
-
 'use client';
 
-export default function GlobalError({ error, reset }: { error: Error; reset: () => void }) {
-	return (
-		<html>
-			<body style={{ padding: 40 }}>
-				<h1>Something broke</h1>
-				<p>{error.message}</p>
+import { Error } from '@xernerx/feedback';
 
-				<button onClick={() => reset()}>Try again</button>
-			</body>
-		</html>
-	);
+export default function RouteError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+	return <Error error={error} reset={reset} />;
 }
