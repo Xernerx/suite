@@ -7,10 +7,7 @@
 	"scripts": {
 		"start": "node .",
 		"build": "tsc",
-		"dev": "pnpm i && tsc-watch --onSuccess \"node .\"",
-		"patch": "npm version patch",
-		"minor": "npm version minor",
-		"major": "npm version major"
+		"dev": "pnpm i && tsc-watch --onSuccess \"node .\""
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",

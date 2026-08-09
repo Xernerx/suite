@@ -10,7 +10,7 @@ jobs:
     build:
         uses: ./.github/workflows/build.yml
 
-    # 2. Build and package on each OS independently, then upload artifacts
+    # 2. Build and package on each OS independently, then upload only installers
     canary-desktop:
         name: Canary Desktop (${{ matrix.os }})
         needs: [build]
@@ -48,10 +48,15 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: desktop-release-${{ matrix.os }}
-                  path: apps/desktop/release/**/*
+                  path: |
+                      apps/desktop/release/*.exe
+                      apps/desktop/release/*.dmg
+                      apps/desktop/release/*.AppImage
+                      apps/desktop/release/*.yml
+                      apps/desktop/release/*.blockmap
                   if-no-files-found: error
 
-    # 3. Collect all artifacts and publish them in a single safe operation
+    # 3. Collect all installers and publish them in a single clean release
     publish-canary:
         name: Publish Canary Release
         needs: [canary-desktop]
@@ -68,9 +73,9 @@ jobs:
               uses: softprops/action-gh-release@v2
               with:
                   files: |
-                      all-artifacts/desktop-release-ubuntu-latest/**/*
-                      all-artifacts/desktop-release-windows-latest/**/*
-                      all-artifacts/desktop-release-macos-latest/**/*
+                      all-artifacts/desktop-release-ubuntu-latest/*
+                      all-artifacts/desktop-release-windows-latest/*
+                      all-artifacts/desktop-release-macos-latest/*
                   tag_name: canary
                   name: 'Xernerx Canary (Rolling)'
                   body: 'Automated bleeding-edge build from the canary branch.'
