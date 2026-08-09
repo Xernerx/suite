@@ -9,8 +9,29 @@ env:
     FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+    build-test:
+        name: Workspace Build Test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+
+            - name: Install pnpm
+              run: npm install -g pnpm
+
+            - name: Install deps
+              run: pnpm install
+
+            - name: Run Workspace Build
+              run: pnpm build
+
     canary-desktop:
         name: Canary Desktop
+        needs: [build-test]
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
@@ -34,7 +55,6 @@ jobs:
 
             - name: Build and Package Canary Desktop
               run: |
-                  # Append commit hash to desktop package version for unique canary tracking
                   cd apps/desktop
                   npm pkg set version="$(node -p "require('./package.json').version")-canary.$(git rev-parse --short HEAD)"
                   cd ../..
@@ -61,6 +81,7 @@ jobs:
 
     canary-mobile:
         name: Canary Mobile
+        needs: [build-test]
         runs-on: ubuntu-latest
         permissions:
             contents: write
@@ -76,9 +97,7 @@ jobs:
               run: npm install -g pnpm
 
             - name: Install deps
-              run: pnpm install --frozen-lockfile
-
-            # Add your Expo / Mobile canary build steps here
+              run: pnpm install
 
             - name: Publish Mobile Canary
               uses: softprops/action-gh-release@v2
