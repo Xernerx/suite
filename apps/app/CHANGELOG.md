@@ -1,5 +1,11 @@
 # app
 
+## 2.0.1
+
+### Patch Changes
+
+- Fixed downloads page added Canary channel when viewing on dev or canary branch
+
 ## 2.0.0
 
 ### Major Changes

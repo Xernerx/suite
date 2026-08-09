@@ -2,25 +2,28 @@
 
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request) {
 	try {
-		// Fetch the latest release from the GitHub repository
-		const response = await fetch('https://api.github.com/repos/Xernerx/suite/releases/latest', {
+		const { searchParams } = new URL(request.url);
+		const channel = searchParams.get('channel');
+
+		// Use the canary tag release if requested, otherwise default to latest stable
+		const githubUrl = channel === 'canary' ? 'https://api.github.com/repos/Xernerx/suite/releases/tags/canary' : 'https://api.github.com/repos/Xernerx/suite/releases/latest';
+
+		// Fetch the release from the GitHub repository
+		const response = await fetch(githubUrl, {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
-				// Optional: If you hit GitHub rate limits, add a GITHUB_TOKEN to your environment variables
 				...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
 			},
-			next: { revalidate: 3600 }, // Cache the release data for 1 hour to prevent hitting GitHub rate limits
+			next: { revalidate: 60 }, // Cache release data
 		});
 
 		if (!response.ok) {
-			return NextResponse.json({ error: 'Failed to fetch latest release from GitHub' }, { status: response.status });
+			return NextResponse.json({ error: 'Failed to fetch release from GitHub' }, { status: response.status });
 		}
 
 		const release = await response.json();
-
-		console.log(release);
 
 		const assets = release.assets || [];
 
