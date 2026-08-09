@@ -56,7 +56,7 @@ jobs:
                       apps/desktop/release/*.blockmap
                   if-no-files-found: error
 
-    # 3. Collect all installers and publish them in a single clean release
+    # 3. Collect all installers and publish them as a unique versioned pre-release
     publish-canary:
         name: Publish Canary Release
         needs: [canary-desktop]
@@ -73,27 +73,33 @@ jobs:
               with:
                   path: all-artifacts
 
-            - name: Force Update Canary Tag
+            - name: Create Unique Version Tag
+              id: tag
               run: |
+                  cd apps/desktop
+                  VERSION=$(node -p "require('./package.json').version")
+                  COMMIT=$(git rev-parse --short HEAD)
+                  TAG="v${VERSION}-canary.${COMMIT}"
+
+                  echo "tag_name=${TAG}" >> $GITHUB_OUTPUT
+                  echo "release_name=Xernerx App ${TAG}" >> $GITHUB_OUTPUT
+
+                  # Create and push the unique tag to the repo
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-                  # Delete local and remote canary tag if it exists
-                  git tag -d canary || true
-                  git push origin :refs/tags/canary || true
-                  # Create a fresh canary tag at HEAD and push it
-                  git tag canary
-                  git push origin canary --force
+                  git tag "${TAG}"
+                  git push origin "${TAG}"
 
-            - name: Publish to Rolling Canary Release
+            - name: Publish to GitHub Releases
               uses: softprops/action-gh-release@v2
               with:
                   files: |
                       all-artifacts/desktop-release-ubuntu-latest/*
                       all-artifacts/desktop-release-windows-latest/*
                       all-artifacts/desktop-release-macos-latest/*
-                  tag_name: canary
-                  name: 'Xernerx Canary (Rolling)'
-                  body: 'Automated bleeding-edge build from the canary branch.'
+                  tag_name: ${{ steps.tag.outputs.tag_name }}
+                  name: ${{ steps.tag.outputs.release_name }}
+                  body: 'Automated bleeding-edge pre-release build from the canary branch.'
                   prerelease: true
                   make_latest: false
               env:
