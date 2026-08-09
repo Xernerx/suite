@@ -78,13 +78,15 @@ jobs:
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-                  # Delete local and remote canary tags cleanly without branch conflicts
+                  # Delete local canary tag if it exists
                   git tag -d canary || true
-                  git push origin --delete tag canary || true
 
-                  # Re-create tag at current HEAD and push
+                  # Unambiguously delete the remote tag using the full ref path
+                  git push origin --delete refs/tags/canary || true
+
+                  # Create a fresh local canary tag at HEAD and push it using explicit refspecs
                   git tag canary
-                  git push origin canary --force
+                  git push origin refs/tags/canary:refs/tags/canary --force
 
             - name: Publish Rolling Canary Release
               uses: softprops/action-gh-release@v2
