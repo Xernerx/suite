@@ -1,5 +1,5 @@
 {
-	"name": "@xernerx/websocket",
+	"name": "websocket",
 	"version": "1.2.4",
 	"description": "Xernerx Websocket",
 	"main": "dist/main.js",

@@ -10,17 +10,15 @@ jobs:
     build:
         uses: ./.github/workflows/build.yml
 
-    # 2. Wait for it to pass before packaging desktop apps
+    # 2. Build and package on each OS independently, then upload artifacts
     canary-desktop:
-        name: Canary Desktop
+        name: Canary Desktop (${{ matrix.os }})
         needs: [build]
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, windows-latest, macos-latest]
-        permissions:
-            contents: write
         steps:
             - uses: actions/checkout@v4
 
@@ -35,7 +33,7 @@ jobs:
             - name: Install deps
               run: pnpm install
 
-            - name: Build and Package Canary Desktop
+            - name: Build and Package Desktop
               run: |
                   cd apps/desktop
                   npm pkg set version="$(node -p "require('./package.json').version")-canary.$(git rev-parse --short HEAD)"
@@ -46,15 +44,33 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+            - name: Upload Desktop Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: desktop-release-${{ matrix.os }}
+                  path: apps/desktop/release/**/*
+                  if-no-files-found: error
+
+    # 3. Collect all artifacts and publish them in a single safe operation
+    publish-canary:
+        name: Publish Canary Release
+        needs: [canary-desktop]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Download All Artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  path: all-artifacts
+
             - name: Publish to Rolling Canary Release
               uses: softprops/action-gh-release@v2
               with:
                   files: |
-                      apps/desktop/release/**/*.exe
-                      apps/desktop/release/**/*.dmg
-                      apps/desktop/release/**/*.AppImage
-                      apps/desktop/release/**/*.yml
-                      apps/desktop/release/**/*.blockmap
+                      all-artifacts/desktop-release-ubuntu-latest/**/*
+                      all-artifacts/desktop-release-windows-latest/**/*
+                      all-artifacts/desktop-release-macos-latest/**/*
                   tag_name: canary
                   name: 'Xernerx Canary (Rolling)'
                   body: 'Automated bleeding-edge build from the canary branch.'

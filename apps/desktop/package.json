@@ -6,9 +6,9 @@
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"build": "pnpm i && tsc",
+		"build": "tsc",
 		"dist": "pnpm build && electron-builder --publish never",
-		"dev": "pnpm i && tsc && electron ."
+		"dev": "tsc && electron ."
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",

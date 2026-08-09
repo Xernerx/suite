@@ -2,7 +2,6 @@ name: Shared Build Test
 
 on:
     workflow_call:
-    push:
     pull_request:
 
 env:
