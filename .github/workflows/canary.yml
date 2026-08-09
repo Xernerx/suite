@@ -64,10 +64,25 @@ jobs:
         permissions:
             contents: write
         steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
             - name: Download All Artifacts
               uses: actions/download-artifact@v4
               with:
                   path: all-artifacts
+
+            - name: Force Update Canary Tag
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  # Delete local and remote canary tag if it exists
+                  git tag -d canary || true
+                  git push origin :refs/tags/canary || true
+                  # Create a fresh canary tag at HEAD and push it
+                  git tag canary
+                  git push origin canary --force
 
             - name: Publish to Rolling Canary Release
               uses: softprops/action-gh-release@v2
