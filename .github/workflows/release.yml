@@ -10,29 +10,12 @@ env:
     FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-    build-test:
-        name: Workspace Build Test
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24
-
-            - name: Install pnpm
-              run: npm install -g pnpm
-
-            - name: Install deps
-              run: pnpm install
-
-            - name: Run Workspace Build
-              run: pnpm build
+    build:
+        uses: ./.github/workflows/build.yml
 
     release-desktop:
         name: Release Desktop
-        needs: [build-test]
+        needs: [build]
         if: startsWith(github.ref, 'refs/tags/desktop@')
         runs-on: ${{ matrix.os }}
         strategy:
@@ -77,7 +60,7 @@ jobs:
 
     release-mobile:
         name: Release Mobile
-        needs: [build-test]
+        needs: [build]
         if: startsWith(github.ref, 'refs/tags/mobile@')
         runs-on: ubuntu-latest
         permissions:

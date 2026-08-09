@@ -1,6 +1,7 @@
-name: Build Check
+name: Shared Build Test
 
 on:
+    workflow_call:
     push:
     pull_request:
 

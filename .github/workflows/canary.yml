@@ -5,33 +5,15 @@ on:
         branches:
             - canary
 
-env:
-    FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
-    build-test:
-        name: Workspace Build Test
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+    # 1. Call the shared build workflow
+    build:
+        uses: ./.github/workflows/build.yml
 
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24
-
-            - name: Install pnpm
-              run: npm install -g pnpm
-
-            - name: Install deps
-              run: pnpm install
-
-            - name: Run Workspace Build
-              run: pnpm build
-
+    # 2. Wait for it to pass before packaging desktop apps
     canary-desktop:
         name: Canary Desktop
-        needs: [build-test]
+        needs: [build]
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
@@ -60,7 +42,9 @@ jobs:
                   cd ../..
 
                   pnpm --filter ./apps/desktop build
-                  pnpm --filter ./apps/desktop dist -- --publish=never
+                  pnpm --filter ./apps/desktop dist --publish never
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Publish to Rolling Canary Release
               uses: softprops/action-gh-release@v2
@@ -76,36 +60,5 @@ jobs:
                   body: 'Automated bleeding-edge build from the canary branch.'
                   prerelease: true
                   make_latest: false
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    canary-mobile:
-        name: Canary Mobile
-        needs: [build-test]
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24
-
-            - name: Install pnpm
-              run: npm install -g pnpm
-
-            - name: Install deps
-              run: pnpm install
-
-            - name: Publish Mobile Canary
-              uses: softprops/action-gh-release@v2
-              with:
-                  files: |
-                      # apps/mobile/release/**/*.apk
-                  tag_name: canary-mobile
-                  name: 'Xernerx Mobile Canary'
-                  prerelease: true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
