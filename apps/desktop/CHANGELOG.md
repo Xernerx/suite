@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.0.0
+
+### Major Changes
+
+- Updated app
+
 ## 1.4.1
 
 ### Patch Changes

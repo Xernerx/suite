@@ -1,5 +1,11 @@
 # app
 
+## 2.0.0
+
+### Major Changes
+
+- Updated app
+
 ## 1.3.2
 
 ### Patch Changes

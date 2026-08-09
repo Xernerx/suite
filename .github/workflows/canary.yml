@@ -1,18 +1,16 @@
-name: Release
+name: Canary
 
 on:
     push:
-        tags:
-            - 'desktop@*'
-            - 'mobile@*'
+        branches:
+            - canary
 
 env:
     FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-    release-desktop:
-        name: Release Desktop
-        if: startsWith(github.ref, 'refs/tags/desktop@')
+    canary-desktop:
+        name: Canary Desktop
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
@@ -34,13 +32,17 @@ jobs:
             - name: Install deps
               run: pnpm install --frozen-lockfile
 
-            - name: Build desktop
-              run: pnpm --filter ./apps/desktop build
+            - name: Build and Package Canary Desktop
+              run: |
+                  # Append commit hash to desktop package version for unique canary tracking
+                  cd apps/desktop
+                  npm pkg set version="$(node -p "require('./package.json').version")-canary.$(git rev-parse --short HEAD)"
+                  cd ../..
 
-            - name: Package desktop
-              run: pnpm --filter ./apps/desktop dist -- --publish=never
+                  pnpm --filter ./apps/desktop build
+                  pnpm --filter ./apps/desktop dist -- --publish=never
 
-            - name: Publish Desktop Release
+            - name: Publish to Rolling Canary Release
               uses: softprops/action-gh-release@v2
               with:
                   files: |
@@ -49,14 +51,16 @@ jobs:
                       apps/desktop/release/**/*.AppImage
                       apps/desktop/release/**/*.yml
                       apps/desktop/release/**/*.blockmap
-                  tag_name: ${{ github.ref_name }}
-                  name: Desktop ${{ github.ref_name }}
+                  tag_name: canary
+                  name: 'Xernerx Canary (Rolling)'
+                  body: 'Automated bleeding-edge build from the canary branch.'
+                  prerelease: true
+                  make_latest: false
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    release-mobile:
-        name: Release Mobile
-        if: startsWith(github.ref, 'refs/tags/mobile@')
+    canary-mobile:
+        name: Canary Mobile
         runs-on: ubuntu-latest
         permissions:
             contents: write
@@ -74,16 +78,15 @@ jobs:
             - name: Install deps
               run: pnpm install --frozen-lockfile
 
-            # Add your Expo / Mobile build steps here
-            # - name: Build and publish mobile
-            #   run: ...
+            # Add your Expo / Mobile canary build steps here
 
-            - name: Publish Mobile Release
+            - name: Publish Mobile Canary
               uses: softprops/action-gh-release@v2
               with:
                   files: |
                       # apps/mobile/release/**/*.apk
-                  tag_name: ${{ github.ref_name }}
-                  name: Mobile ${{ github.ref_name }}
+                  tag_name: canary-mobile
+                  name: 'Xernerx Mobile Canary'
+                  prerelease: true
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

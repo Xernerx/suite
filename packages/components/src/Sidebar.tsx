@@ -1,16 +1,15 @@
 /** @format */
 'use client';
 
-import { Bell, Compass, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
+import { Bell, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { useDictionary, useNotifications, usePlatform, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 
 import { AnimatePresence } from 'framer-motion';
 import { Divider } from '@xernerx/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import SidebarNotifications from './cards/SidebarNotifications';
-import SidebarSuite from './cards/SidebarSuite';
 import SidebarUserCard from './cards/SidebarUser';
 import { useSession } from 'next-auth/react';
 
@@ -27,9 +26,10 @@ export function Sidebar() {
 	const { device } = usePlatform();
 	const { t } = useDictionary();
 	const { unreadCount } = useNotifications();
+	const { setNavOpen } = useShortcuts();
 
 	// Manage which dropdown is active
-	const [activeMenu, setActiveMenu] = useState<'none' | 'suite' | 'user' | 'notifications'>('none');
+	const [activeMenu, setActiveMenu] = useState<'none' | 'user' | 'notifications'>('none');
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	const isCollapsed = state === 'closed' && !isMobileOpen;
@@ -66,7 +66,7 @@ export function Sidebar() {
 				className={`
                     fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
                     w-full pt-[72px] pb-4
-                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-72px)] md:pt-0 md:pb-0
+                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-50px)] md:pt-0 md:pb-0
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
                     md:translate-x-0 
                     ${isCollapsed ? 'md:w-[80px]' : ''}
@@ -143,12 +143,11 @@ export function Sidebar() {
 							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
 						>
 							<LogIn size={18} />
-							{!isCollapsed && <span>{t('common.sidebar.login', {}, 'Login')}</span>}
+							{!isCollapsed && <span>{t('common.sidebar.login')}</span>}
 						</Link>
 					) : (
 						<div className="relative w-full mt-1">
 							{/* Menus */}
-							<AnimatePresence>{activeMenu === 'suite' && <SidebarSuite isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 							<AnimatePresence>{activeMenu === 'user' && <SidebarUserCard activeUser={activeUser} isCollapsed={isCollapsed} />}</AnimatePresence>
 							<AnimatePresence>{activeMenu === 'notifications' && <SidebarNotifications isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 
@@ -242,16 +241,18 @@ export function Sidebar() {
 										</div>
 									</button>
 
-									{/* Compass Ecosystem Trigger */}
+									{/* App Drawer Trigger (Replaces Suite) */}
 									<button
-										onClick={() => setActiveMenu(activeMenu === 'suite' ? 'none' : 'suite')}
+										onClick={() => {
+											setActiveMenu('none');
+											setNavOpen(true);
+										}}
 										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
                                             ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
-                                            ${activeMenu === 'suite' ? (nameplateUrl ? 'bg-black/40 text-white' : 'bg-(--background) text-(--text)') : ''}
                                         `}
 										style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
 									>
-										<Compass size={isCollapsed ? 20 : 18} className={`transition-transform duration-200 ${activeMenu === 'suite' && !nameplateUrl ? 'text-(--accent)' : ''}`} />
+										<LayoutGrid size={isCollapsed ? 20 : 18} className="transition-transform duration-200" />
 									</button>
 								</div>
 							</div>

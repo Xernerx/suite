@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"mongoose": "^9.9.1",
-		"next-auth": "^4.24.15"
+		"next-auth": "^4.24.15",
+		"lucide-react": "^1.30.0"
 	}
 }

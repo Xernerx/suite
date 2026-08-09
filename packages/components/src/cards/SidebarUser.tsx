@@ -135,7 +135,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
 		>
 			{/* Banner Area */}
-			<div className="h-[120px] w-full relative overflow-hidden bg-(--foreground)/20">
+			<div className="h-[120px] w-full relative overflow-hidden" style={{ backgroundColor: activeUser?.banner_color || 'var(--foreground)' }}>
 				{bannerUrl && <Image src={bannerUrl} alt="User Banner" fill className="object-cover" unoptimized draggable={false} />}
 			</div>
 

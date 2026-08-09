@@ -42,6 +42,7 @@
 				"privacy": "Privacy",
 				"terms": "Terms",
 				"contact": "Contact",
+				"faq": "Frequently Asked Questions",
 				"github": "GitHub",
 				"npm": "npm",
 				"documentation": "Documentation",
@@ -78,6 +79,15 @@
 				"translations": "Translations",
 				"applications": "Applications",
 				"environments": "Environments"
+			}
+		},
+		"shortcuts": {
+			"modal": {
+				"navigation": {
+					"title": "App Drawer",
+					"description": "Quickly launch and switch between applications",
+					"empty": "No applications available."
+				}
 			}
 		}
 	},

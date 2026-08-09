@@ -36,6 +36,7 @@ const nextConfig: NextConfig = {
 			},
 		},
 	},
+	transpilePackages: ['@xernerx/styles', '@xernerx/components', '@xernerx/ui', '@xernerx/providers'],
 };
 
 export default nextConfig;

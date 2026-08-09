@@ -67,10 +67,21 @@ html {
 
 html,
 body {
+	font-family:
+		var(--font-fredoka),
+		system-ui,
+		-apple-system,
+		sans-serif;
 	background: var(--background);
 	color: var(--text);
 	margin: 0;
 	overflow-y: auto;
+}
+
+code,
+pre,
+kbd {
+	font-family: var(--font-cascadia), ui-monospace, monospace;
 }
 
 .solar-slider {

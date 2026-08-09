@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { BookOpen, FileText, Mail, MessageCircle, Package, Shield } from 'lucide-react';
+import { BookOpen, CircleQuestionMark, FileText, Mail, MessageCircle, Package, Shield } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -52,19 +52,20 @@ export function Footer() {
 				{/* ---------------------------------------------------------------- */}
 				{/* Resources */}
 				{/* ---------------------------------------------------------------- */}
-				<FooterSection title={t('common.footer.sections.resources', {}, 'Resources')}>
-					<FooterLink href={resolveUrl('https://xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy', {}, 'Privacy')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms', {}, 'Terms')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact', {}, 'Contact')} external={false} />
+				<FooterSection title={t('common.footer.sections.resources')}>
+					<FooterLink href={resolveUrl('https://xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Developer */}
 				{/* ---------------------------------------------------------------- */}
-				<FooterSection title={t('common.footer.sections.developer', {}, 'Developer')}>
-					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github', {}, 'GitHub')} />
-					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm', {}, 'npm')} />
-					<FooterLink href={resolveUrl('https://app.xernerx.com/docs')} icon={BookOpen} label={t('common.footer.links.documentation', {}, 'Documentation')} />
-					<FooterLink href="https://discord.gg/teNWyb69dq" icon={MessageCircle} label={t('common.footer.links.discord', {}, 'Discord')} />
+				<FooterSection title={t('common.footer.sections.developer')}>
+					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
+					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
+					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} />
+					<FooterLink href="https://discord.gg/teNWyb69dq" icon={MessageCircle} label={t('common.footer.links.discord')} />
 				</FooterSection>
 			</div>
 		</motion.footer>
