@@ -1,5 +1,6 @@
 {
 	"name": "@xernerx/desktop",
+	"productName": "Xernerx App",
 	"version": "2.0.1",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
@@ -67,7 +68,8 @@
 		},
 		"linux": {
 			"target": "AppImage",
-			"artifactName": "${productName}-${version}-setup.${ext}"
+			"artifactName": "${productName}-${version}-setup.${ext}",
+			"executableName": "xernerx-app"
 		},
 		"nsis": {
 			"oneClick": false,
