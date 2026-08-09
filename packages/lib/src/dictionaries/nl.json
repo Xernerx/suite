@@ -40,7 +40,8 @@
                 "github": "GitHub",
                 "npm": "npm",
                 "documentation": "Documentatie",
-                "discord": "Discord"
+                "discord": "Discord",
+                "faq": "Veel Gestelde Vragen"
             }
         },
         "sidebar": {
@@ -54,7 +55,8 @@
                 "developer": "Ontwikkelaar",
                 "moderator": "Moderator",
                 "administrator": "Administrator",
-                "translator": "Vertaler"
+                "translator": "Vertaler",
+                "xernerxSuite": "Xernerx Suite"
             },
             "items": {
                 "account": "Account",
@@ -69,7 +71,23 @@
                 "store": "Winkel",
                 "users": "Gebruikers",
                 "roles": "Rollen",
-                "translations": "Vertalingen"
+                "translations": "Vertalingen",
+                "applications": "Aanmeldingen",
+                "environments": "Omgevingen"
+            }
+        },
+        "buttons": {
+            "cancel": "Annuleren",
+            "confirm": "Bevestigen",
+            "proceed": "Doorgaan"
+        },
+        "shortcuts": {
+            "modal": {
+                "navigation": {
+                    "title": "App Drawer",
+                    "description": "Navigeer snel en makkelijk tussen applicaties",
+                    "empty": "Geen applicaties beschikbaar."
+                }
             }
         }
     },
@@ -132,7 +150,7 @@
             },
             "pronouns": {
                 "label": "Voornaamwoorden",
-                "placeholder": "bijv. diens/die"
+                "placeholder": "bijv. zij/haar"
             },
             "privacy": {
                 "label": "Privacyniveau",
@@ -550,7 +568,9 @@
             "serverId": "Server ID",
             "members": "Leden",
             "newRoleButton": "Nieuwe Rol",
-            "unnamedRole": "Naamloze Rol"
+            "unnamedRole": "Naamloze Rol",
+            "description": "Beheer aangepaste systeem rollen en link ze direct met rollen van de Discord server.",
+            "searchPlaceholder": "Zoek naar rol naam, UUID of Discord ID..."
         }
     }
 }
