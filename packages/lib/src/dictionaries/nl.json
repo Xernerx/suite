@@ -1293,7 +1293,33 @@
     },
     "common": {
         "cookiePrompt": {
-            "title": "Cookie Voorkeuren"
+            "title": "Cookie Voorkeuren",
+            "description": "We gebruiken cookies om ervoor te zorgen dat je sessie veilig blijft, je thema te onthouden en ons te helpen de app te verbeteren.",
+            "manage": {
+                "essential": {
+                    "label": "Essentieel",
+                    "description": "Vereist voor sessies en beveiliging."
+                },
+                "functional": {
+                    "label": "Functioneel",
+                    "description": "Onthoudt de status van je thema en lay-out."
+                },
+                "analytics": {
+                    "label": "Statistieken",
+                    "description": "Helpt ons fouten en verkeer bij te houden."
+                }
+            },
+            "buttons": {
+                "acceptAll": "Allemaal Accepteren",
+                "essentialOnly": "Enkel Essentieel",
+                "manage": "Beheren",
+                "save": "Mijn Voorkeuren Opslaan"
+            }
+        },
+        "buttons": {
+            "cancel": "Annuleren",
+            "confirm": "Bevestigen",
+            "proceed": "Doorgaan"
         }
     }
 }
