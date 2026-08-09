@@ -56,7 +56,7 @@ jobs:
                       apps/desktop/release/*.blockmap
                   if-no-files-found: error
 
-    # 3. Force-update the rolling canary tag and publish/overwrite the release
+    # 3. Force-update the rolling canary tag and publish/overwrite the release cleanly
     publish-canary:
         name: Publish Rolling Canary Preview
         needs: [canary-desktop]
@@ -88,18 +88,27 @@ jobs:
                   git tag canary
                   git push origin refs/tags/canary:refs/tags/canary --force
 
-            - name: Publish Rolling Canary Release
-              uses: softprops/action-gh-release@v2
-              with:
-                  files: |
-                      all-artifacts/desktop-release-ubuntu-latest/*
-                      all-artifacts/desktop-release-windows-latest/*
-                      all-artifacts/desktop-release-macos-latest/*
-                  tag_name: canary
-                  name: 'Xernerx Canary (Latest Preview)'
-                  body: 'Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit.'
-                  prerelease: true
-                  draft: false
-                  make_latest: false
+            - name: Publish Rolling Canary Release via GitHub CLI
+              run: |
+                  # Create the release if it doesn't exist, or update metadata if it does
+                  gh release view canary --repo ${{ github.repository }} && \
+                  gh release edit canary \
+                      --title "Xernerx Canary (Latest Preview)" \
+                      --notes "Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit." \
+                      --prerelease \
+                      --repo ${{ github.repository }} || \
+                  gh release create canary \
+                      --title "Xernerx Canary (Latest Preview)" \
+                      --notes "Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit." \
+                      --prerelease \
+                      --repo ${{ github.repository }}
+
+                  # Upload new assets, safely overwriting existing files with --clobber
+                  gh release upload canary \
+                      all-artifacts/desktop-release-ubuntu-latest/* \
+                      all-artifacts/desktop-release-windows-latest/* \
+                      all-artifacts/desktop-release-macos-latest/* \
+                      --clobber \
+                      --repo ${{ github.repository }}
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
