@@ -54,7 +54,7 @@ jobs:
                       apps/desktop/release/*.AppImage
                   if-no-files-found: error
 
-    # 3. Force-update the rolling canary tag and publish only the three main installers
+    # 3. Cleanly wipe the old canary release/tag and create a fresh one with all installers
     publish-canary:
         name: Publish Rolling Canary Preview
         needs: [canary-desktop]
@@ -71,6 +71,13 @@ jobs:
               with:
                   path: all-artifacts
 
+            - name: Gather All Installers
+              run: |
+                  mkdir -p finalized-release
+                  # Find all installers recursively regardless of folder nesting and copy them to one folder
+                  find all-artifacts -type f \( -name "*.AppImage" -o -name "*.exe" -o -name "*.dmg" \) -exec cp {} finalized-release/ \;
+                  ls -la finalized-release
+
             - name: Delete Old Canary Release & Tag
               run: |
                   git config --global user.name "github-actions[bot]"
@@ -84,14 +91,13 @@ jobs:
                   git tag canary
                   git push origin refs/tags/canary:refs/tags/canary --force
 
-                  # Create the release and upload ONLY the AppImage, DMG, and EXE installers
+                  # Create the release and upload every installer found in the folder
                   gh release create canary \
                       --title "Xernerx Canary (Latest Preview)" \
                       --notes "Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit." \
                       --prerelease \
+                      --draft=false \
                       --repo ${{ github.repository }} \
-                      all-artifacts/desktop-release-ubuntu-latest/*.AppImage \
-                      all-artifacts/desktop-release-windows-latest/*.exe \
-                      all-artifacts/desktop-release-macos-latest/*.dmg
+                      finalized-release/*
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
