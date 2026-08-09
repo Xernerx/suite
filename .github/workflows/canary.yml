@@ -56,7 +56,7 @@ jobs:
                       apps/desktop/release/*.blockmap
                   if-no-files-found: error
 
-    # 3. Force-update the rolling canary tag and publish/overwrite the release cleanly
+    # 3. Cleanly wipe the old canary release/tag and create a fresh one with assets
     publish-canary:
         name: Publish Rolling Canary Preview
         needs: [canary-desktop]
@@ -73,42 +73,32 @@ jobs:
               with:
                   path: all-artifacts
 
-            - name: Force Update Rolling Canary Tag
+            - name: Delete Old Canary Release & Tag
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-                  # Delete local canary tag if it exists
-                  git tag -d canary || true
+                  # Delete the release and remote tag using GitHub CLI
+                  gh release delete canary --yes --cleanup-tag || true
 
-                  # Unambiguously delete the remote tag using the full ref path
+                  # Ensure local/remote tags are fully cleaned up
+                  git tag -d canary || true
                   git push origin --delete refs/tags/canary || true
 
-                  # Create a fresh local canary tag at HEAD and push it using explicit refspecs
+            - name: Create Fresh Rolling Canary Release
+              run: |
+                  # Create a fresh local tag at current HEAD and push it
                   git tag canary
                   git push origin refs/tags/canary:refs/tags/canary --force
 
-            - name: Publish Rolling Canary Release via GitHub CLI
-              run: |
-                  # Create the release if it doesn't exist, or update metadata if it does
-                  gh release view canary --repo ${{ github.repository }} && \
-                  gh release edit canary \
-                      --title "Xernerx Canary (Latest Preview)" \
-                      --notes "Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit." \
-                      --prerelease \
-                      --repo ${{ github.repository }} || \
+                  # Create the release and upload all artifacts in one clean command
                   gh release create canary \
                       --title "Xernerx Canary (Latest Preview)" \
                       --notes "Automated rolling bleeding-edge preview build from the canary branch. Always points to the most recent commit." \
                       --prerelease \
-                      --repo ${{ github.repository }}
-
-                  # Upload new assets, safely overwriting existing files with --clobber
-                  gh release upload canary \
+                      --repo ${{ github.repository }} \
                       all-artifacts/desktop-release-ubuntu-latest/* \
                       all-artifacts/desktop-release-windows-latest/* \
-                      all-artifacts/desktop-release-macos-latest/* \
-                      --clobber \
-                      --repo ${{ github.repository }}
+                      all-artifacts/desktop-release-macos-latest/*
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
