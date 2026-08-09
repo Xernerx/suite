@@ -32,7 +32,7 @@ jobs:
               run: npm install -g pnpm
 
             - name: Install deps
-              run: pnpm install --frozen-lockfile
+              run: pnpm install
 
             - name: Build desktop
               run: pnpm --filter ./apps/desktop build

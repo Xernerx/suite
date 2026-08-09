@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.0.1
+
+### Patch Changes
+
+- actions test
+
 ## 2.0.0
 
 ### Major Changes
