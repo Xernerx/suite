@@ -30,6 +30,7 @@ const fredoka = Fredoka({
 const cascadiaCode = Cascadia_Code({
 	subsets: ['latin'],
 	variable: '--font-cascadia',
+	adjustFontFallback: false,
 });
 
 export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {

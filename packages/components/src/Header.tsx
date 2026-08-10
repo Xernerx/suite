@@ -93,6 +93,7 @@ export function Header() {
 						className="hidden sm:flex items-center overflow-hidden"
 					>
 						<Link
+							suppressHydrationWarning
 							href={getEnvUrl('https://www.xernerx.com/download')}
 							className="flex items-center gap-2 text-(--text) cursor-pointer hover:text-(--accent) transition-colors whitespace-nowrap"
 						>

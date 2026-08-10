@@ -42,7 +42,13 @@ export async function proxy(req: NextRequest) {
 
 	// Explicitly identify trusted frontends (browsers send Origin)
 	const isLocalDevOrigin = process.env.ENVIRONMENT?.toLowerCase() === 'development' && (originHostname === 'localhost' || originHostname === '127.0.0.1');
-	const isTrustedFrontend = isAuthorizedOrigin || isLocalDevOrigin;
+
+	// Browsers don't send Origin headers on same-origin GET requests.
+	// If origin is missing, but they sent Next-Auth session cookies and the host is trusted, it's a browser.
+	const hasSessionCookie = req.cookies.has('next-auth.session-token') || req.cookies.has('__Secure-next-auth.session-token');
+	const isSameOriginBrowser = !origin && isAuthorizedHost && hasSessionCookie;
+
+	const isTrustedFrontend = isAuthorizedOrigin || isLocalDevOrigin || isSameOriginBrowser;
 
 	// --- REUSABLE CORS HEADERS ---
 	const corsHeaders: Record<string, string> = {

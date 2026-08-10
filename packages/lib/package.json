@@ -8,8 +8,8 @@
 		"./server": "./server.ts"
 	},
 	"dependencies": {
+		"lucide-react": "^1.31.0",
 		"mongoose": "^9.9.1",
-		"next-auth": "^4.24.15",
-		"lucide-react": "^1.30.0"
+		"next-auth": "^4.24.15"
 	}
 }

@@ -1,5 +1,19 @@
 # @xernerx/components
 
+## 0.2.10
+
+### Patch Changes
+
+-   - Restyled the `api` app landing page to feature the premium glassmorphism aesthetic.
+    - Fixed hydration mismatch issues involving `next/link` and translated dictionaries.
+    - Resolved Discord API `Failed to fetch` error that broke the User account synchronization by splitting try/catch blocks and gracefully bypassing Discord CORS failures.
+    - Ensured session cookies traverse successfully between client subdomains and the API route by adding `credentials: 'include'` to `UserProvider` fetches.
+    - Fixed a bug where same-origin browser API calls lacked `Origin` headers, preventing them from bypassing the `proxy.ts` middleware authentication block.
+- Updated dependencies
+    - @xernerx/providers@0.3.3
+    - @xernerx/ui@0.2.6
+    - @xernerx/feedback@0.0.11
+
 ## 0.2.9
 
 ### Patch Changes
