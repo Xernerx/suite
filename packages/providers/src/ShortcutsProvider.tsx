@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Command, Compass, FileText, HelpCircle, LayoutGrid, Search, SidebarIcon, X } from 'lucide-react';
+import { ChevronDown, Command, Compass, FileText, HelpCircle, LayoutGrid, Search, SidebarIcon, X, RefreshCw } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useUser } from '@xernerx/providers';
 
@@ -35,6 +35,7 @@ const defaultShortcuts: ShortcutItem[] = [
 	{ key: 'Ctrl + /', description: 'Open global search across app', icon: Search },
 	{ key: 'Ctrl + K', description: 'Open navigation modal', icon: Compass },
 	{ key: 'Ctrl + ~', description: 'Toggle application sidebar visibility', icon: SidebarIcon },
+	{ key: 'Ctrl + R', description: 'Reload the application state', icon: RefreshCw },
 	{ key: 'Esc', description: 'Close active overlays or modals', icon: X },
 ];
 

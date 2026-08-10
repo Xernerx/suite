@@ -9,3 +9,4 @@ export * from './src/Slider';
 export * from './src/Modal';
 export * from './src/PreventLossConfirmation';
 export * from './src/CollapsibleCard';
+export * from './src/Input';

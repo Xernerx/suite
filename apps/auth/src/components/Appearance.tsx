@@ -296,14 +296,16 @@ export default function Appearance() {
 			}}
 		>
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.appearance.title', {}, 'Appearance')}</h1>
+				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('auth.appearance.title', {}, 'Appearance')}
+				</h1>
 				<p className="text-sm text-(--text-muted)">{t('auth.appearance.description', {}, 'Customize how the interface looks and feels across your workspace.')}</p>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{/* Theme Selector Card */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -317,7 +319,7 @@ export default function Appearance() {
 
 				{/* Sync Accent with Clients */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -329,7 +331,7 @@ export default function Appearance() {
 
 				{/* Sync Accent with Discord */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -343,7 +345,7 @@ export default function Appearance() {
 
 				{/* Accent Color Picker */}
 				<div
-					className={`flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm transition-opacity ${syncFromDiscord ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+					className={`flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-opacity ${syncFromDiscord ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -377,7 +379,10 @@ export default function Appearance() {
 				</div>
 
 				{/* UI Zoom Level */}
-				<div className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div
+					className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.zoom.title', {}, 'UI Zoom Level')}</h3>
 						<p className="text-xs text-(--text-muted)">{t('auth.appearance.zoom.description', {}, 'Scale the interface zoom uniformly across the application.')}</p>
@@ -389,7 +394,7 @@ export default function Appearance() {
 
 				{/* Layout Density Selector */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -402,7 +407,10 @@ export default function Appearance() {
 				</div>
 
 				{/* Text Scale Slider */}
-				<div className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div
+					className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 						<h3 className="text-base font-semibold text-(--text)">{t('auth.appearance.textScale.title', {}, 'Text Scale')}</h3>
 						<p className="text-xs text-(--text-muted)">{t('auth.appearance.textScale.description', {}, 'Configure base typography size for readability.')}</p>

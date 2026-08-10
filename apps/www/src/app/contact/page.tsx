@@ -54,9 +54,10 @@ export default function ContactPage() {
 		<div className="mx-auto w-full max-w-7xl px-6 py-20">
 			<motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl text-center">
 				<h1
-					className="font-bold tracking-tight text-(--text)"
+					className="font-extrabold tracking-tight text-(--text) drop-shadow-sm"
 					style={{
-						fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+						fontSize: 'clamp(3rem, 6vw, 5rem)',
+						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
 					Contact Us
@@ -72,9 +73,11 @@ export default function ContactPage() {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ delay: 0.3 }}
-				className="mx-auto mt-24 max-w-4xl rounded-2xl p-10 text-center bg-(--foreground) border border-(--border)/10"
+				className="mx-auto mt-24 max-w-4xl rounded-3xl p-10 text-center bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md shadow-sm"
 			>
-				<h2 className="text-2xl font-semibold text-(--text)">Looking for documentation?</h2>
+				<h2 className="text-3xl font-extrabold text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					Looking for documentation?
+				</h2>
 
 				<p className="mx-auto mt-4 max-w-2xl leading-7 text-(--text-muted)">
 					Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.
@@ -103,7 +106,7 @@ export default function ContactPage() {
 						initial={{ opacity: 0, y: 15 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: index * 0.05 }}
-						className="group relative overflow-hidden rounded-2xl bg-(--foreground) border border-(--border)/10"
+						className="group relative overflow-hidden rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md hover:border-(--accent)/50 hover:bg-(--foreground)/50 shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all"
 					>
 						<div
 							className="absolute inset-x-0 top-0 h-px"
@@ -123,7 +126,9 @@ export default function ContactPage() {
 								<contact.icon size={24} />
 							</div>
 
-							<h2 className="text-xl font-semibold text-(--text)">{contact.title}</h2>
+							<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{contact.title}
+							</h2>
 
 							<p className="mt-3 flex-1 leading-7 text-(--text-muted)">{contact.description}</p>
 

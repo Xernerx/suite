@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Button, Divider, Selector } from '@xernerx/ui';
+import { Button, Divider, Input, Selector } from '@xernerx/ui';
 import { Info, User as UserIcon } from 'lucide-react';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
@@ -124,13 +124,15 @@ export default function Profile() {
 		>
 			{/* Header */}
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.profile.title')}</h1>
+				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('auth.profile.title')}
+				</h1>
 				<p className="text-sm text-(--text-muted)">{t('auth.profile.description')}</p>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{/* Profile Summary Card */}
-				<div className="flex items-center rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div className="flex items-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 					{avatarUrl ? (
 						<Image
 							src={avatarUrl}
@@ -154,44 +156,24 @@ export default function Profile() {
 				</div>
 
 				{/* Form Inputs Card */}
-				<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 					{/* Description */}
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 						<label className="block text-sm font-medium text-(--text)">{t('auth.profile.descriptionField.label')}</label>
-						<input
-							type="text"
-							value={formData.description}
-							onChange={(e) => handleChange('description', e.target.value)}
-							placeholder={t('auth.profile.descriptionField.placeholder')}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
-						/>
+						<Input type="text" value={formData.description} onChange={(e) => handleChange('description', e.target.value)} placeholder={t('auth.profile.descriptionField.placeholder')} />
 					</div>
 
 					{/* Info (Long Description) */}
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 						<label className="block text-sm font-medium text-(--text)">{t('auth.profile.infoField.label')}</label>
-						<textarea
-							rows={4}
-							value={formData.info}
-							onChange={(e) => handleChange('info', e.target.value)}
-							placeholder={t('auth.profile.infoField.placeholder')}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
-						/>
+						<Input variant="textarea" rows={4} value={formData.info} onChange={(e) => handleChange('info', e.target.value)} placeholder={t('auth.profile.infoField.placeholder')} />
 					</div>
 
 					{/* Group 1: Birthday & Timezone */}
 					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.birthday.label')}</label>
-							<input
-								type="date"
-								value={formData.birthday}
-								onChange={(e) => handleChange('birthday', e.target.value)}
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-								style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
-							/>
+							<Input variant="date" value={formData.birthday} onChange={(e) => handleChange('birthday', e.target.value)} />
 						</div>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.timezone.label')}</label>
@@ -229,14 +211,7 @@ export default function Profile() {
 						</div>
 						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.pronouns.label')}</label>
-							<input
-								type="text"
-								value={formData.pronouns}
-								onChange={(e) => handleChange('pronouns', e.target.value)}
-								placeholder={t('auth.profile.pronouns.placeholder')}
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-								style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
-							/>
+							<Input type="text" value={formData.pronouns} onChange={(e) => handleChange('pronouns', e.target.value)} placeholder={t('auth.profile.pronouns.placeholder')} />
 						</div>
 					</div>
 

@@ -110,7 +110,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 	};
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
-	const iconStyles = 'text-(--accent-green) absolute bottom-0 right-0 h-[22px] w-[22px] border-(--foreground) border-[4px] rounded-full bg-(--foreground)';
+	const iconStyles = 'text-(--accent-green) absolute bottom-0 right-0 h-[22px] w-[22px] border-(--foreground) border-[4px] rounded-full bg-(--foreground)/30 backdrop-blur-md';
 
 	const hasActiveSub = activeUser?.staffSubscription || (Array.isArray(activeUser?.subscriptions) && activeUser.subscriptions.some((s: any) => s.status === 'active'));
 	const userRoleIds = Array.isArray(activeUser?.roles) ? activeUser.roles : [];
@@ -129,7 +129,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 8 }}
 			transition={{ duration: 0.15, ease: 'easeOut' }}
-			className={`bg-(--foreground) absolute bottom-full mb-3 z-50 flex flex-col rounded-[24px] shadow-2xl overflow-hidden text-left border border-(--border)/5
+			className={`bg-(--foreground)/30 backdrop-blur-md absolute bottom-full mb-3 z-50 flex flex-col rounded-[24px] shadow-2xl overflow-hidden text-left border border-(--border)/5
                 ${isCollapsed ? 'left-1 w-56 origin-bottom-left' : 'left-0 right-0 origin-bottom'}
             `}
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
@@ -143,7 +143,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 			<div className="relative flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 				{/* Avatar */}
 				<div className="flex justify-between items-start">
-					<div className="bg-(--foreground) border-(--foreground) relative -mt-[42px] rounded-full border-[6px] shrink-0">
+					<div className="bg-(--foreground)/30 backdrop-blur-md border-(--foreground) relative -mt-[42px] rounded-full border-[6px] shrink-0">
 						{avatarUrl ? (
 							<div className="relative h-[80px] w-[80px]">
 								<Image src={avatarUrl} alt="User Profile" fill className="rounded-full object-cover" unoptimized draggable={false} />
@@ -159,7 +159,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 								)}
 							</div>
 						) : (
-							<div className="flex h-[80px] w-[80px] items-center justify-center rounded-full bg-(--foreground)/40">
+							<div className="flex h-[80px] w-[80px] items-center justify-center rounded-full bg-(--foreground)/30 backdrop-blur-md/40">
 								<UserIcon size={40} className="text-(--text)" />
 							</div>
 						)}
@@ -186,7 +186,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 				{(activeUser?.clan?.tag || clanBadgeUrl || currentStreak > 0) && (
 					<div className="flex flex-wrap items-center gap-1.5">
 						{activeUser?.clan?.tag && (
-							<div className="bg-(--foreground)/30 text-(--text) text-[10px] font-extrabold px-2 py-1 rounded-lg flex items-center gap-1.5 border border-(--border)/5">
+							<div className="bg-(--foreground)/30 backdrop-blur-md/30 text-(--text) text-[10px] font-extrabold px-2 py-1 rounded-lg flex items-center gap-1.5 border border-(--border)/5">
 								{clanBadgeUrl ? <Image src={clanBadgeUrl} alt="Clan Badge" width={12} height={12} unoptimized /> : <Zap size={10} className="text-yellow-500" fill="currentColor" />}
 								{activeUser.clan.tag}
 							</div>
@@ -212,7 +212,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 				)}
 
 				{/* Credits Balance Display */}
-				<div className="flex items-center justify-between bg-(--foreground)/30 px-3 py-2 rounded-xl border border-(--border)/5">
+				<div className="flex items-center justify-between bg-(--foreground)/30 backdrop-blur-md/30 px-3 py-2 rounded-xl border border-(--border)/5">
 					<span className="text-xs text-(--text-muted) font-medium">Credits Balance</span>
 					<div className="flex items-center gap-1.5 text-emerald-400 text-xs font-extrabold">
 						<Coins size={14} />
@@ -233,7 +233,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 							<span>{claiming ? 'Opening Present...' : 'Claim Daily Present!'}</span>
 						</button>
 					) : (
-						<div className="w-full flex items-center justify-between bg-(--foreground)/20 text-(--text-muted) text-xs px-3 py-2 rounded-xl border border-(--border)/5">
+						<div className="w-full flex items-center justify-between bg-(--foreground)/30 backdrop-blur-md/20 text-(--text-muted) text-xs px-3 py-2 rounded-xl border border-(--border)/5">
 							<span className="flex items-center gap-1.5 font-medium">
 								<Gift size={14} className="opacity-50" /> Next Gift In
 							</span>
@@ -244,7 +244,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 
 				{/* Action Menu */}
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-					<div className="bg-(--foreground)/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
+					<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
 						<Button>
 							<Link href={getEnvUrl('https://auth.xernerx.com')} className="flex" style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 								<Pencil size={16} className="shrink-0" /> <span className="truncate">Edit Profile</span>
@@ -254,7 +254,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 
 					{/* Conditional Admin Panel Button */}
 					{hasAdminAccess && (
-						<div className="bg-(--foreground)/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
+						<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
 							<Button>
 								<Link href={getEnvUrl('https://admin.xernerx.com')} className="flex" style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 									<ShieldAlert size={16} className="shrink-0" /> <span className="truncate">Admin Panel</span>
@@ -263,7 +263,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 						</div>
 					)}
 
-					<div className="bg-(--foreground)/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
+					<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
 						<Button onClick={copyUserId} className="flex">
 							<Copy size={16} className="shrink-0" /> <span className="truncate">Copy User ID</span>
 						</Button>

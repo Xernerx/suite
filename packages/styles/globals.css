@@ -151,3 +151,18 @@ kbd {
 	background: var(--accent);
 	color: #ffffff;
 }
+
+/* Number Input spin buttons */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	opacity: 1;
+	cursor: pointer;
+	border-radius: 4px;
+	margin-left: 8px;
+}
+html:not(.dark) input[type='number']::-webkit-inner-spin-button {
+	filter: invert(0.2);
+}
+html.dark input[type='number']::-webkit-inner-spin-button {
+	filter: invert(0.8) hue-rotate(180deg);
+}

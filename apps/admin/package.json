@@ -1,6 +1,6 @@
 {
 	"name": "admin",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -23,7 +23,7 @@
 		"next-auth": "^4.24.15",
 		"react": "^19.2.8",
 		"react-circle-flags": "^0",
-		"react-dom": "^19",
+		"react-dom": "^19.2.8",
 		"react-icons": "^5"
 	},
 	"devDependencies": {

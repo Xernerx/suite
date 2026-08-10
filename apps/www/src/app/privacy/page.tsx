@@ -199,20 +199,26 @@ export default function Page() {
 					</aside>
 
 					{/* MAIN */}
-					<main className="space-y-20">
-						<header className="text-center mb-16">
-							<h1 className="text-4xl font-semibold mb-4 text-(--text)">{t('www.privacy.header.title', {}, 'Privacy Policy')}</h1>
-							<p className="text-sm text-(--text-muted)">
+					<main className="space-y-16">
+						<header className="text-center mb-16 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm">
+							<h1 className="text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{t('www.privacy.header.title', {}, 'Privacy Policy')}
+							</h1>
+							<p className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">
 								{t('www.privacy.header.effectiveDate', {}, 'Effective Date:')} {new Date().toDateString()}
 							</p>
 						</header>
 
-						{sections.map((section) => (
-							<section key={section.id} id={section.id} className="scroll-mt-32 pl-6 border-l-2 border-[color-mix(in_srgb,var(--accent)_20%,transparent)]">
-								<h2 className="text-2xl font-semibold mb-4 text-(--text)">{section.title}</h2>
-								<div className="text-(--text-muted) leading-relaxed">{section.content}</div>
-							</section>
-						))}
+						<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm space-y-16">
+							{sections.map((section) => (
+								<section key={section.id} id={section.id} className="scroll-mt-32 pl-6 border-l-2 border-(--accent)">
+									<h2 className="text-2xl font-bold mb-4 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+										{section.title}
+									</h2>
+									<div className="text-(--text-muted) leading-relaxed">{section.content}</div>
+								</section>
+							))}
+						</div>
 					</main>
 				</div>
 			</div>

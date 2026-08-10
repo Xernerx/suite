@@ -30,14 +30,18 @@ export default function Home() {
 					<Banner className="w-full max-w-6xl h-auto object-contain select-none pointer-events-none text-(--accent)" />
 				</div>
 
-				<h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-(--text)">{t('www.hero.title')}</h1>
+				<h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('www.hero.title')}
+				</h1>
 
 				<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">{t('www.hero.description')}</p>
 			</section>
 
 			{/* ABOUT */}
 			<section className="max-w-5xl mx-auto text-center px-6" style={{ padding: 'calc(var(--ui-gap) * 3) 0' }}>
-				<h2 className="text-3xl font-semibold mb-6 text-(--text)">{t('www.about.title')}</h2>
+				<h2 className="text-4xl font-extrabold mb-6 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('www.about.title')}
+				</h2>
 
 				<p className="text-base text-(--text-muted) leading-relaxed">{t('www.about.description')}</p>
 			</section>
@@ -100,14 +104,16 @@ export default function Home() {
 						},
 					].map((col) => (
 						<div key={col.title}>
-							<h2 className="text-xl font-semibold mb-6 text-(--text)">{col.title}</h2>
+							<h2 className="text-2xl font-bold mb-6 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{col.title}
+							</h2>
 
 							<div className="flex flex-col gap-6">
 								{col.items.map((item) => (
 									<a
 										key={item.title}
 										href={item.link}
-										className="group rounded-xl p-5 transition relative overflow-hidden bg-transparent border border-(--border)/10 hover:border-(--accent)/40"
+										className="group rounded-3xl p-6 transition-all relative overflow-hidden bg-(--foreground)/30 border border-(--border)/10 hover:border-(--accent)/50 hover:bg-(--foreground)/50 shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] backdrop-blur-md"
 									>
 										{/* hover glow */}
 										<div
@@ -135,7 +141,9 @@ export default function Home() {
 			{/* HISTORY */}
 			<section style={{ paddingTop: 'calc(var(--ui-gap) * 4)' }}>
 				<div className="max-w-4xl mx-auto px-6 mb-16 text-center">
-					<h2 className="text-3xl font-semibold mb-4 text-(--text)">{t('www.history.title')}</h2>
+					<h2 className="text-4xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.history.title')}
+					</h2>
 					<p className="text-sm text-(--text-muted)">{t('www.history.description')}</p>
 				</div>
 

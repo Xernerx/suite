@@ -40,39 +40,42 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 		setEnvironment(getInitialEnvironment());
 	}, []);
 
-	const getEnvUrl = (baseUrl: string) => {
-		let transformedUrl = baseUrl;
+	const getEnvUrl = React.useCallback(
+		(baseUrl: string) => {
+			let transformedUrl = baseUrl;
 
-		if (environment !== 'public') {
-			try {
-				const url = new URL(baseUrl);
-				let hostname = url.hostname;
+			if (environment !== 'public') {
+				try {
+					const url = new URL(baseUrl);
+					let hostname = url.hostname;
 
-				hostname = hostname.replace(/\.(dev|canary)\./g, '.');
+					hostname = hostname.replace(/\.(dev|canary)\./g, '.');
 
-				if (hostname === 'xernerx.com') {
-					hostname = 'www.xernerx.com';
-				}
-
-				if (hostname.endsWith('xernerx.com')) {
-					const parts = hostname.split('.');
-					if (parts.length === 3) {
-						url.hostname = `${parts[0]}.${environment}.${parts[1]}.${parts[2]}`;
+					if (hostname === 'xernerx.com') {
+						hostname = 'www.xernerx.com';
 					}
+
+					if (hostname.endsWith('xernerx.com')) {
+						const parts = hostname.split('.');
+						if (parts.length === 3) {
+							url.hostname = `${parts[0]}.${environment}.${parts[1]}.${parts[2]}`;
+						}
+					}
+
+					transformedUrl = url.toString();
+				} catch {
+					transformedUrl = baseUrl;
 				}
-
-				transformedUrl = url.toString();
-			} catch {
-				transformedUrl = baseUrl;
 			}
-		}
 
-		if (!baseUrl.endsWith('/') && transformedUrl.endsWith('/') && new URL(transformedUrl).pathname === '/') {
-			return transformedUrl.slice(0, -1);
-		}
+			if (!baseUrl.endsWith('/') && transformedUrl.endsWith('/') && new URL(transformedUrl).pathname === '/') {
+				return transformedUrl.slice(0, -1);
+			}
 
-		return transformedUrl;
-	};
+			return transformedUrl;
+		},
+		[environment]
+	);
 
 	const value = {
 		environment,

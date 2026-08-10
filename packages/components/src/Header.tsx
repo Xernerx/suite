@@ -90,7 +90,7 @@ export function Header() {
 						animate={{ width: isExpanded ? 'auto' : '20px' }}
 						onHoverStart={() => setIsExpanded(true)}
 						onHoverEnd={() => setIsExpanded(false)}
-						className="flex items-center overflow-hidden"
+						className="hidden sm:flex items-center overflow-hidden"
 					>
 						<Link
 							href={getEnvUrl('https://www.xernerx.com/download')}

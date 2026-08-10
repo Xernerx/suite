@@ -248,7 +248,7 @@ export default function Translations() {
 			/>
 
 			<div
-				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+				className="relative z-20 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -273,11 +273,60 @@ export default function Translations() {
 				</div>
 			</div>
 
-			<div className="flex items-center rounded-2xl border border-(--border)/10 bg-(--foreground) p-1.5 shadow-sm" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+			{/* Mobile Tab Selector */}
+			<div className="relative z-10 sm:hidden w-full">
+				<Selector
+					items={true}
+					value={activeTab}
+					onChange={(val) => {
+						if (val === 'new' && missingKeys.length === 0) return;
+						setActiveTab(val as any);
+					}}
+					options={[
+						{
+							value: 'welcome',
+							label: (
+								<div className="flex items-center gap-2">
+									<BookOpen size={16} />
+									{t('admin.translations.tabs.introduction')}
+								</div>
+							),
+						},
+						{
+							value: 'new',
+							label: (
+								<div className={`flex items-center gap-2 ${missingKeys.length === 0 ? 'opacity-50' : ''}`}>
+									<Sparkles size={16} />
+									{typeof t('admin.translations.tabs.newEntries') === 'string'
+										? t('admin.translations.tabs.newEntries').replace(/\s*\(\{count\}\)/g, '')
+										: t('admin.translations.tabs.newEntries')}
+								</div>
+							),
+						},
+						{
+							value: 'review',
+							label: (
+								<div className="flex items-center gap-2">
+									<ListOrdered size={16} />
+									{typeof t('admin.translations.tabs.reviewExisting') === 'string'
+										? t('admin.translations.tabs.reviewExisting').replace(/\s*\(\{count\}\)/g, '')
+										: t('admin.translations.tabs.reviewExisting')}
+								</div>
+							),
+						},
+					]}
+				/>
+			</div>
+
+			{/* Desktop Tab Buttons */}
+			<div
+				className="hidden sm:flex items-center overflow-x-auto hide-scrollbar rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-1.5 shadow-sm"
+				style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
+			>
 				<button
 					type="button"
 					onClick={() => setActiveTab('welcome')}
-					className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
+					className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
 						activeTab === 'welcome' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'
 					}`}
 				>
@@ -287,33 +336,39 @@ export default function Translations() {
 				<button
 					type="button"
 					onClick={() => setActiveTab('new')}
-					className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
-						activeTab === 'new' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'
-					}`}
+					disabled={missingKeys.length === 0}
+					className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+						missingKeys.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+					} ${activeTab === 'new' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'}`}
 				>
 					<Sparkles size={16} />
-					{t('admin.translations.tabs.newEntries', { count: missingKeys.length })}
+					{typeof t('admin.translations.tabs.newEntries') === 'string' ? t('admin.translations.tabs.newEntries').replace(/\s*\(\{count\}\)/g, '') : t('admin.translations.tabs.newEntries')}
 				</button>
 				<button
 					type="button"
 					onClick={() => setActiveTab('review')}
-					className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
+					className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${
 						activeTab === 'review' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'
 					}`}
 				>
 					<ListOrdered size={16} />
-					{t('admin.translations.tabs.reviewExisting', { count: allKeys.length })}
+					{typeof t('admin.translations.tabs.reviewExisting') === 'string'
+						? t('admin.translations.tabs.reviewExisting').replace(/\s*\(\{count\}\)/g, '')
+						: t('admin.translations.tabs.reviewExisting')}
 				</button>
 			</div>
 
 			{loading ? (
-				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm">
+				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 					<Loading />
 				</div>
 			) : (
 				<>
 					{activeTab === 'welcome' && (
-						<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm" style={{ padding: 'calc(var(--ui-gap) * 1.5)', gap: 'var(--ui-gap)' }}>
+						<div
+							className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+							style={{ padding: 'calc(var(--ui-gap) * 1.5)', gap: 'var(--ui-gap)' }}
+						>
 							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 								<h2 className="text-2xl font-black tracking-tight text-(--text)">{t('admin.translations.welcome.title')}</h2>
 								<p className="text-sm text-(--text-muted) leading-relaxed">
@@ -325,7 +380,7 @@ export default function Translations() {
 							</div>
 
 							{/* New Guide Section */}
-							<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background) p-5" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+							<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md p-5" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 								<h3 className="text-sm font-bold text-(--text)">{t('admin.translations.welcome.guide.title', {}, 'Before you start')}</h3>
 								<ul className="flex flex-col text-xs text-(--text-muted) list-disc list-outside ml-4" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 									<li>{t('admin.translations.welcome.guide.step1', {}, 'If possible you may require a basic understanding of the English (UK) language')}</li>
@@ -346,7 +401,7 @@ export default function Translations() {
 							</div>
 
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-								<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background) p-5" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+								<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md p-5" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 									<div className="flex items-center gap-2 text-(--accent) font-bold text-sm">
 										<Sparkles size={18} />
 										{t('admin.translations.welcome.newEntriesTitle')}
@@ -362,7 +417,7 @@ export default function Translations() {
 									</button>
 								</div>
 
-								<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background) p-5" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+								<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md p-5" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 									<div className="flex items-center gap-2 text-(--accent) font-bold text-sm">
 										<ListOrdered size={18} />
 										{t('admin.translations.welcome.reviewTitle')}
@@ -416,7 +471,7 @@ export default function Translations() {
 
 									return (
 										<div
-											className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+											className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 											style={{ padding: 'calc(var(--ui-gap) * 1.5)', gap: 'var(--ui-gap)' }}
 										>
 											<div className="flex items-center justify-between">
@@ -432,7 +487,7 @@ export default function Translations() {
 												<label className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
 													{t('admin.translations.new.translateInstruction', { locale: currentLocaleObj?.label || selectedLocale })}
 												</label>
-												<p className="text-base font-medium text-(--text) bg-(--background) p-4 rounded-2xl border border-(--border)/10">{sourceText}</p>
+												<p className="text-base font-medium text-(--text) bg-(--background)/50 backdrop-blur-md p-4 rounded-2xl border border-(--border)/10">{sourceText}</p>
 											</div>
 
 											<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
@@ -448,7 +503,7 @@ export default function Translations() {
 													}}
 													autoFocus
 													placeholder={t('admin.translations.new.typePlaceholder')}
-													className="w-full rounded-2xl border border-(--border)/10 bg-(--background) px-4 py-3 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)"
+													className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md px-4 py-3 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)"
 												/>
 											</div>
 
@@ -492,7 +547,7 @@ export default function Translations() {
 									placeholder={t('admin.translations.review.searchPlaceholder')}
 									value={reviewSearch}
 									onChange={(e) => setReviewSearch(e.target.value)}
-									className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+									className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 									style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap) calc(var(--ui-gap) * 0.6) calc(var(--ui-gap) * 2.5)' }}
 								/>
 							</div>
@@ -510,7 +565,7 @@ export default function Translations() {
 										return (
 											<div
 												key={key}
-												className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+												className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 												style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}
 											>
 												<div className="flex items-center justify-between">
@@ -521,13 +576,13 @@ export default function Translations() {
 														</span>
 													)}
 												</div>
-												<p className="text-sm font-medium text-(--text) bg-(--background) p-3.5 rounded-2xl border border-(--border)/10">{sourceText}</p>
+												<p className="text-sm font-medium text-(--text) bg-(--background)/50 backdrop-blur-md p-3.5 rounded-2xl border border-(--border)/10">{sourceText}</p>
 												<input
 													type="text"
 													value={targetText}
 													onChange={(e) => handleInputChange(key, e.target.value)}
 													placeholder={t('admin.translations.review.translateInto', { locale: selectedLocale })}
-													className="w-full rounded-2xl border border-(--border)/10 bg-(--background) px-4 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)"
+													className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md px-4 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)"
 												/>
 											</div>
 										);

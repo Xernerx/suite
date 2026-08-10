@@ -2,14 +2,18 @@
 'use client';
 
 import Banner from '../../public/banner.svg';
+import Logo from '../../public/logo.svg';
 import { motion } from 'framer-motion';
 
-export function Loading({ message }: { message?: string }) {
+export function Loading({ message, variant = 'default' }: { message?: string; variant?: 'default' | 'small' }) {
+	const Component = variant === 'default' ? Banner : Logo;
+	const maxWidth = variant === 'default' ? 'max-w-[420px]' : 'max-w-[48px]';
+
 	return (
-		<div className="flex h-full w-full flex-col items-center justify-center" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-			<div className="relative block w-full max-w-[420px] shrink-0 pointer-events-none select-none">
-				{/* 1. Base Layer: Dimmed out background version of the logo */}
-				<Banner
+		<div className="flex h-full w-full flex-col items-center justify-center" style={{ padding: variant === 'default' ? 'var(--ui-gap)' : 0, gap: 'var(--ui-gap)' }}>
+			<div className={`relative block w-full ${maxWidth} shrink-0 pointer-events-none select-none`}>
+				{/* 1. Base Layer: Dimmed out background version of the logo/banner */}
+				<Component
 					className="h-auto w-full text-(--text-muted) opacity-20 fill-current"
 					style={{
 						imageRendering: '-webkit-optimize-contrast',
@@ -39,7 +43,7 @@ export function Loading({ message }: { message?: string }) {
 						repeatDelay: 0.2,
 					}}
 				>
-					<Banner
+					<Component
 						className="h-auto w-full text-(--accent) fill-current"
 						style={{
 							imageRendering: '-webkit-optimize-contrast',
@@ -49,7 +53,7 @@ export function Loading({ message }: { message?: string }) {
 				</motion.div>
 			</div>
 
-			{message && <div className="font-medium text-(--accent)">{message}</div>}
+			{message && <div className="font-medium text-(--accent) text-sm">{message}</div>}
 		</div>
 	);
 }

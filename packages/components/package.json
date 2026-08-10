@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/components",
-	"version": "0.2.8",
+	"version": "0.2.9",
 	"private": true,
 	"main": "./index.ts",
 	"exports": {
@@ -19,7 +19,7 @@
 		"next-auth": "^4.24.15",
 		"nextjs-toploader": "^3",
 		"react": "^19.2.8",
-		"react-dom": "^19",
+		"react-dom": "^19.2.8",
 		"react-icons": "^5"
 	},
 	"devDependencies": {

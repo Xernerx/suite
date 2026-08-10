@@ -17,7 +17,7 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: 8 }}
 			transition={{ duration: 0.15, ease: 'easeOut' }}
-			className={`absolute bottom-full mb-2 z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl backdrop-blur-md
+			className={`absolute bottom-full mb-2 z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl
                 ${isCollapsed ? 'left-1 w-56 origin-bottom-left' : 'left-0 right-0 origin-bottom'}
             `}
 			style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)', fontSize: 'var(--text-scale, 14px)' }}

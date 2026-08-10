@@ -12,22 +12,22 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Dashboard',
-	description: 'Manage your Xernerx applications, tokens, and settings. Access platform tools and infrastructure from a unified dashboard.',
+	title: 'Xernerx Studios | Explore',
+	description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home on Xernerx.',
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Dashboard',
-		description: 'Access the Xernerx dashboard to manage applications, API tokens, and platform configuration.',
+		title: 'Xernerx Studios | Explore',
+		description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
 			{
-				url: '/banner.png', // ✅ now local works perfectly
+				url: '/banner.png',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx Dashboard',
+				alt: 'Explore Xernerx',
 			},
 		],
 		type: 'website',
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Dashboard',
-		description: 'Manage your Xernerx tools, tokens, and applications in one place.',
+		title: 'Xernerx Studios | Explore',
+		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx.',
 		images: ['/banner.png'],
 	},
 
@@ -63,8 +63,8 @@ export default async function RootLayout({
 	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang={locale} suppressHydrationWarning>
-			<body {...themeProps}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+			<body style={themeProps.style}>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict}>{children}</AppLayout>
 				</SessionProvider>

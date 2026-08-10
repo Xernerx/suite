@@ -81,8 +81,8 @@ export default async function RootLayout({
 	}
 
 	return (
-		<html lang={locale} suppressHydrationWarning>
-			<body {...themeProps}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+			<body style={themeProps.style}>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict}>{isAuthorized && session ? children : <ReturnPage session={session} />}</AppLayout>
 				</SessionProvider>

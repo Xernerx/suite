@@ -17,7 +17,10 @@ export function CollapsibleCard({ message, description, defaultOpen = false, cla
 	const [isOpen, setIsOpen] = useState(defaultOpen);
 
 	return (
-		<div className={`flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-hidden transition-colors ${className}`} style={{ padding: 'var(--ui-gap)' }}>
+		<div
+			className={`group flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all hover:border-(--accent)/50 hover:bg-(--foreground)/50 hover:shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_20%,transparent)] ${className}`}
+			style={{ padding: 'var(--ui-gap)' }}
+		>
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
@@ -25,7 +28,7 @@ export function CollapsibleCard({ message, description, defaultOpen = false, cla
 				style={{ gap: 'var(--ui-gap)' }}
 			>
 				<span className="font-semibold text-(--text) text-base">{message}</span>
-				<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-(--border)/5 text-(--text-muted) group-hover:bg-(--border)/10 transition-colors">
+				<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-(--border)/5 text-(--text-muted) group-hover:bg-color-mix(in_srgb,var(--accent)_15%,transparent) group-hover:text-(--accent) transition-colors">
 					<motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
 						<ChevronDown size={16} />
 					</motion.div>

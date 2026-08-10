@@ -48,7 +48,7 @@ export default function CancelSubscriptionPage() {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<div
-				className="flex flex-col items-center text-center max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+				className="flex flex-col items-center text-center max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_10%,transparent)]"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 			>
 				<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-500">
@@ -56,7 +56,9 @@ export default function CancelSubscriptionPage() {
 				</div>
 
 				<div className="flex flex-col items-center text-center" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h1 className="text-xl font-bold text-(--text)">{t('auth.store.cancel.title')}</h1>
+					<h1 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('auth.store.cancel.title')}
+					</h1>
 					{success ? (
 						<p className="text-sm text-emerald-500 font-medium">{t('auth.store.cancel.successMessage')}</p>
 					) : (

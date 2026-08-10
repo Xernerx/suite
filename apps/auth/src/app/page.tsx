@@ -99,12 +99,12 @@ export default function Home() {
 				view: 'store',
 				href: '/store',
 			},
-			// { // todo
-			// 	category: t('common.nav.categories.billing'),
-			// 	icon: DollarSign,
-			// 	label: t('common.nav.items.billing'),
-			// 	view: 'billing',
-			// },
+			{
+				category: t('common.nav.categories.billing'),
+				icon: DollarSign,
+				label: t('common.nav.items.billing'),
+				view: 'billing',
+			},
 			{
 				category: t('common.nav.categories.developer'),
 				icon: KeyRound,

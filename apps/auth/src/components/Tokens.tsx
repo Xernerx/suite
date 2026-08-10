@@ -37,6 +37,83 @@ interface UserOption {
 }
 
 // -----------------------------------------------------------------------------
+// Read-Only Bot Profile Preview
+// -----------------------------------------------------------------------------
+
+function BotProfilePreview({ botId, getEnvUrl }: { botId: string; getEnvUrl: (url: string) => string }) {
+	const [profile, setProfile] = useState<any>(null);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		if (!botId || botId.length < 15) {
+			setProfile(null);
+			return;
+		}
+
+		let isMounted = true;
+		setLoading(true);
+
+		fetch(getEnvUrl(`https://api.xernerx.com/core/users/${botId}/discord`))
+			.then((res) => (res.ok ? res.json() : null))
+			.then((data) => {
+				if (isMounted) {
+					if (data && data.id) {
+						setProfile(data);
+					} else {
+						setProfile(null);
+					}
+					setLoading(false);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setProfile(null);
+					setLoading(false);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [botId, getEnvUrl]);
+
+	if (!botId || botId.length < 15) return null;
+
+	if (loading) {
+		return (
+			<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-2 py-1 text-xs text-(--text) shadow-sm w-max">
+				<Loading variant="small" />
+				<span className="font-medium truncate max-w-[120px]">Loading...</span>
+			</div>
+		);
+	}
+
+	if (!profile) {
+		return (
+			<div className="flex items-center gap-1.5 rounded-xl border border-red-500/10 bg-red-500/5 backdrop-blur-md pl-2 pr-2 py-1 text-xs text-red-500 shadow-sm w-max">
+				<span className="font-medium truncate max-w-[120px]">Invalid Bot ID</span>
+			</div>
+		);
+	}
+
+	const avatarUrl = profile.avatarUrl || (profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=64` : null);
+	const name = profile.global_name || profile.username || 'Unknown Bot';
+
+	return (
+		<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-2 py-1 text-xs text-(--text) shadow-sm w-max">
+			{avatarUrl ? (
+				<img src={avatarUrl} alt={name} className="h-4 w-4 rounded-full object-cover shrink-0" />
+			) : (
+				<div className="flex h-4 w-4 items-center justify-center rounded-full bg-(--foreground) shrink-0">
+					<span className="text-[8px] font-bold text-(--text-muted)">{name.charAt(0)}</span>
+				</div>
+			)}
+			<span className="font-medium truncate max-w-[120px]">{name}</span>
+		</div>
+	);
+}
+
+// -----------------------------------------------------------------------------
 // Multi-User Selector Component
 // -----------------------------------------------------------------------------
 
@@ -147,7 +224,7 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 						return (
 							<div
 								key={id}
-								className="flex items-center gap-1.5 rounded-xl border border-(--border)/20 bg-(--foreground) pl-2 pr-1.5 py-1.5 text-xs text-(--text) shadow-sm transition hover:border-(--accent)/50"
+								className="flex items-center gap-1.5 rounded-xl border border-(--border)/20 bg-(--foreground)/30 backdrop-blur-md pl-2 pr-1.5 py-1.5 text-xs text-(--text) shadow-sm transition hover:border-(--accent)/50"
 							>
 								{u?.avatar ? (
 									<img src={`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`} alt="" className="h-4 w-4 rounded-full object-cover shrink-0" />
@@ -185,7 +262,7 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -4 }}
 							transition={{ duration: 0.15, ease: 'easeOut' }}
-							className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-2xl"
+							className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl"
 							style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
 						>
 							{/* Search Filter Input */}
@@ -304,7 +381,7 @@ export default function Tokens() {
 		>
 			{/* Header */}
 			<div
-				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
@@ -318,7 +395,9 @@ export default function Tokens() {
 						<Key size={24} />
 					</div>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.tokens.title')}</h1>
+						<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('auth.tokens.title')}
+						</h1>
 						<p className="text-sm text-(--text-muted)">{t('auth.tokens.description')}</p>
 					</div>
 				</div>
@@ -331,12 +410,12 @@ export default function Tokens() {
 
 			{/* List */}
 			{isLoading ? (
-				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm">
+				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 					<Loader2 className="animate-spin text-(--accent)" size={24} />
 				</div>
 			) : tokens.length === 0 ? (
 				<div
-					className="flex flex-col h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm text-center px-4"
+					className="flex flex-col h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm text-center px-4"
 					style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
 				>
 					<AlertTriangle size={32} className="text-(--text-muted)" />
@@ -353,7 +432,7 @@ export default function Tokens() {
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: i * 0.05 }}
 								onClick={() => setSelectedTokenId(token._id)}
-								className="group relative flex cursor-pointer flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm transition-all hover:border-(--accent)/50 hover:shadow-md"
+								className="group relative flex cursor-pointer flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all hover:border-(--accent)/50 hover:shadow-md"
 								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 							>
 								<div className="flex items-start justify-between">
@@ -447,7 +526,7 @@ function CreateTokenModal({ isOpen, onClose, onSuccess, userId }: { isOpen: bool
 						initial={{ opacity: 0, scale: 0.95, y: 20 }}
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
-						className="relative w-full max-w-md flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl z-10"
+						className="relative w-full max-w-md flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl z-10"
 						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 					>
 						<h3 className="text-lg font-bold text-(--text)">{t('auth.tokens.create.modalTitle')}</h3>
@@ -609,7 +688,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 						initial={{ opacity: 0, scale: 0.95, y: 20 }}
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
-						className="relative w-full max-w-lg flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl z-10"
+						className="relative w-full max-w-lg flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl z-10"
 						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 					>
 						{isLoading || !token ? (
@@ -632,7 +711,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 								<div className="flex flex-col rounded-2xl bg-(--background) border border-(--border)/10 p-4" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 									<label className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">{t('auth.tokens.manage.accessKeyLabel')}</label>
 									<div className="flex items-center gap-2">
-										<div className="flex-1 flex items-center rounded-xl bg-(--foreground) border border-(--border)/20 px-3 py-2 overflow-hidden relative">
+										<div className="flex-1 flex items-center rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 px-3 py-2 overflow-hidden relative">
 											<code className={`text-sm font-mono truncate transition-all duration-300 ${isTokenVisible ? 'text-(--text)' : 'text-(--text-muted) blur-sm select-none'}`}>
 												{token.id}
 											</code>
@@ -640,7 +719,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 										<button
 											type="button"
 											onClick={() => setIsTokenVisible(!isTokenVisible)}
-											className="p-2.5 rounded-xl bg-(--foreground) border border-(--border)/20 text-(--text-muted) hover:text-(--text) hover:border-(--accent) transition cursor-pointer"
+											className="p-2.5 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 text-(--text-muted) hover:text-(--text) hover:border-(--accent) transition cursor-pointer"
 										>
 											{isTokenVisible ? <EyeOff size={16} /> : <Eye size={16} />}
 										</button>
@@ -662,6 +741,13 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 											required
 										/>
 									</div>
+
+									{token.botId && (
+										<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+											<label className="text-sm font-medium text-(--text)">Linked Bot</label>
+											<BotProfilePreview botId={token.botId} getEnvUrl={getEnvUrl} />
+										</div>
+									)}
 
 									<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 										<label className="text-sm font-medium text-(--text)">{t('auth.tokens.manage.ownersLabel')}</label>

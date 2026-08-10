@@ -53,12 +53,12 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 										<NotificationProvider>
 											<ShortcutsProvider>
 												<CookieProvider>
-													<SupportProvider>
-														<CookiePrompt />
-														<SidebarProvider>
+													<CookiePrompt />
+													<SidebarProvider>
+														<SupportProvider>
 															<Page>{children}</Page>
-														</SidebarProvider>
-													</SupportProvider>
+														</SupportProvider>
+													</SidebarProvider>
 												</CookieProvider>
 											</ShortcutsProvider>
 										</NotificationProvider>

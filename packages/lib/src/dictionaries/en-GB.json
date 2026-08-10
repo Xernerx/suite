@@ -215,8 +215,8 @@
 			"pushToReview": "Push to review",
 			"tabs": {
 				"introduction": "Introduction",
-				"newEntries": "New Entries ({count})",
-				"reviewExisting": "Review Existing ({count})"
+				"newEntries": "New Entries",
+				"reviewExisting": "Review Existing"
 			},
 			"welcome": {
 				"title": "Welcome to the Translation Studio",

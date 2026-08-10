@@ -105,7 +105,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				exit={{ opacity: 0, y: 10, scale: 0.95 }}
 				transition={{ duration: 0.2, ease: 'easeOut' }}
-				className={`absolute bottom-full mb-3 z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-xl
+				className={`absolute bottom-full mb-3 z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl
                     ${isCollapsed ? 'left-0 w-64' : 'left-0 right-0 w-full'}
                 `}
 				style={{
@@ -173,7 +173,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 				createPortal(
 					<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200">
 						<div
-							className="flex flex-col w-full max-w-2xl max-h-[90vh] rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl animate-in zoom-in-95 duration-200"
+							className="flex flex-col w-full max-w-2xl max-h-[90vh] rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl animate-in zoom-in-95 duration-200"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 						>
 							{/* Modal Header (Fixed) */}

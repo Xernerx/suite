@@ -83,13 +83,15 @@ export default function Notifications() {
 			}}
 		>
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.notifications.title', {}, 'Notifications')}</h1>
+				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('auth.notifications.title', {}, 'Notifications')}
+				</h1>
 				<p className="text-sm text-(--text-muted)">{t('auth.notifications.description', {}, 'Manage how you receive notifications and alerts across channels.')}</p>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{Object.entries(notifications).map(([category, items]) => (
-					<div key={category} className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-hidden">
+					<div key={category} className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden">
 						<div
 							className="bg-(--background)/50 border-b border-(--border)/10 font-semibold uppercase tracking-wider text-xs text-(--text-muted)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}

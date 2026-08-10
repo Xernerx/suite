@@ -208,13 +208,15 @@ export default function Language() {
 
 			{/* Page Header (Hero) */}
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('auth.language.headerTitle')}</h1>
+				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('auth.language.headerTitle')}
+				</h1>
 				<p className="text-sm text-(--text-muted)">{t('auth.language.headerDescription')}</p>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{/* Unified Main Card Wrapper */}
-				<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm">
+				<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 					{/* Top Section: Main Selector */}
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -264,7 +266,7 @@ export default function Language() {
 
 				{/* Discord Visual Language Section */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -272,7 +274,7 @@ export default function Language() {
 						<p className="text-xs text-(--text-muted)">{t('auth.language.discord.description')}</p>
 					</div>
 
-					<div className="w-full sm:w-64 flex items-center gap-2.5 rounded-2xl border border-(--border)/10 bg-(--background)" style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}>
+					<div className="w-full sm:w-64 flex items-center gap-2.5 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm p-3">
 						<CircleFlag countryCode={discordCountryCode} className="h-4 w-4 shrink-0" />
 						<span className="text-sm font-medium text-(--text) truncate">{discordLanguageLabel}</span>
 					</div>

@@ -2,9 +2,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
-import { ChevronDown, Key, Plus, Search, Trash2, User as UserIcon, X } from 'lucide-react';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
+import { ChevronDown, Copy, Key, Plus, Search, Settings2, Trash2, User as UserIcon, X } from 'lucide-react';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loading } from '@xernerx/feedback';
@@ -21,6 +21,96 @@ interface Token {
 	botId?: string;
 	createdAt?: string;
 	updatedAt?: string;
+}
+
+function BotProfilePreview({ botId, getEnvUrl, onClear }: { botId: string; getEnvUrl: (url: string) => string; onClear: () => void }) {
+	const [profile, setProfile] = useState<any>(null);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		if (!botId || botId.length < 15) {
+			setProfile(null);
+			return;
+		}
+
+		let isMounted = true;
+		setLoading(true);
+
+		fetch(getEnvUrl(`https://api.xernerx.com/core/users/${botId}/discord`))
+			.then((res) => (res.ok ? res.json() : null))
+			.then((data) => {
+				if (isMounted) {
+					if (data && data.id) {
+						setProfile(data);
+					} else {
+						setProfile(null);
+					}
+					setLoading(false);
+				}
+			})
+			.catch(() => {
+				if (isMounted) {
+					setProfile(null);
+					setLoading(false);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [botId, getEnvUrl]);
+
+	if (!botId || botId.length < 15) return null;
+
+	if (loading) {
+		return (
+			<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
+				<Loading variant="small" />
+				<span className="font-medium truncate max-w-[120px]">Loading...</span>
+				<button
+					type="button"
+					onClick={onClear}
+					className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-red-500/10 text-(--text-muted) hover:text-red-500 transition-colors"
+				>
+					<X size={10} />
+				</button>
+			</div>
+		);
+	}
+
+	if (!profile) {
+		return (
+			<div className="flex items-center gap-1.5 rounded-xl border border-red-500/10 bg-red-500/5 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-red-500 shadow-sm">
+				<span className="font-medium truncate max-w-[120px]">Invalid Bot ID</span>
+				<button type="button" onClick={onClear} className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-red-500/10 text-red-500 hover:text-red-500 transition-colors">
+					<X size={10} />
+				</button>
+			</div>
+		);
+	}
+
+	const avatarUrl = profile.avatarUrl || (profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=64` : null);
+	const name = profile.global_name || profile.username || 'Unknown Bot';
+
+	return (
+		<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
+			{avatarUrl ? (
+				<img src={avatarUrl} alt={name} className="h-4 w-4 rounded-full object-cover shrink-0" />
+			) : (
+				<div className="flex h-4 w-4 items-center justify-center rounded-full bg-(--foreground) shrink-0">
+					<span className="text-[8px] font-bold text-(--text-muted)">{name.charAt(0)}</span>
+				</div>
+			)}
+			<span className="font-medium truncate max-w-[120px]">{name}</span>
+			<button
+				type="button"
+				onClick={onClear}
+				className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-red-500/10 text-(--text-muted) hover:text-red-500 transition-colors"
+			>
+				<X size={10} />
+			</button>
+		</div>
+	);
 }
 
 interface UserOption {
@@ -179,7 +269,10 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 					{values.map((id) => {
 						const u = users.find((u) => u.id === id);
 						return (
-							<div key={id} className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background) pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
+							<div
+								key={id}
+								className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm"
+							>
 								{u?.avatar ? (
 									<img src={`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`} alt="" className="h-4 w-4 rounded-full object-cover shrink-0" />
 								) : (
@@ -203,7 +296,7 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 				<button
 					type="button"
 					onClick={() => setIsOpen(!isOpen)}
-					className="flex w-full items-center justify-between rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) shadow-sm transition-all hover:border-(--border)/40 focus:border-(--accent) focus:outline-none"
+					className="flex w-full items-center justify-between rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 focus:border-(--accent) focus:outline-none"
 					style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
 				>
 					<span className="text-(--text-muted) font-medium">{placeholder || t('admin.tokens.ownersPlaceholder')}</span>
@@ -217,7 +310,7 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -4 }}
 							transition={{ duration: 0.15, ease: 'easeOut' }}
-							className="absolute left-0 top-[calc(100%+8px)] z-999 w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-2xl"
+							className="absolute left-0 top-[calc(100%+8px)] z-999 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl"
 							style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
 						>
 							{/* Search Filter Input */}
@@ -229,7 +322,7 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 									placeholder={t('admin.tokens.ownersPlaceholder')}
 									value={query}
 									onChange={(e) => setQuery(e.target.value)}
-									className="w-full rounded-xl border border-(--border)/10 bg-(--background) text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+									className="w-full rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
 									style={{ padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)' }}
 									onClick={(e) => e.stopPropagation()}
 								/>
@@ -284,7 +377,8 @@ function TokenCard({
 	onTokenUpdated: (updated: Token) => void;
 }) {
 	const { t } = useDictionary();
-	const [isExpanded, setIsExpanded] = useState(false);
+	const { toast } = useToast();
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [loadingDetails, setLoadingDetails] = useState(false);
 	const [fullToken, setFullToken] = useState<Token | null>(null);
 	const [saving, setSaving] = useState(false);
@@ -298,11 +392,20 @@ function TokenCard({
 	const [selectedOwners, setSelectedOwners] = useState<string[]>(token.owners || []);
 	const [secure, setSecure] = useState(false);
 
-	const handleToggleExpand = async () => {
-		const nextState = !isExpanded;
-		setIsExpanded(nextState);
+	const isDirty = useMemo(() => {
+		if (!fullToken) return false;
 
-		if (nextState && !fullToken) {
+		const sortedSelectedOwners = [...selectedOwners].sort();
+		const sortedOriginalOwners = [...(fullToken.owners || [])].sort();
+		const ownersChanged = JSON.stringify(sortedSelectedOwners) !== JSON.stringify(sortedOriginalOwners);
+
+		return name !== (fullToken.name || '') || status !== (fullToken.status || 'active') || botId !== (fullToken.botId || '') || ownersChanged || secure !== !!fullToken.permissions?.secure;
+	}, [fullToken, name, status, botId, selectedOwners, secure]);
+
+	const handleToggleExpand = async () => {
+		setIsModalOpen(true);
+
+		if (!fullToken && !loadingDetails) {
 			setLoadingDetails(true);
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
@@ -351,7 +454,18 @@ function TokenCard({
 
 			if (res.ok) {
 				const updated = await res.json();
-				onTokenUpdated(updated);
+				const manuallyUpdatedToken: Token = {
+					...(fullToken as Token),
+					...updated,
+					name,
+					status,
+					botId: botId || undefined,
+					owners: selectedOwners,
+					permissions: { secure },
+				};
+				setFullToken(manuallyUpdatedToken);
+				onTokenUpdated(manuallyUpdatedToken);
+				toast({ title: 'Token updated', type: 'success' });
 			}
 		} catch (err) {
 			console.error('Failed to update token:', err);
@@ -393,118 +507,138 @@ function TokenCard({
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, scale: 0.95 }}
-				className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-visible transition-all duration-200"
+				onClick={handleToggleExpand}
+				className="flex items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:border-(--accent)/30 group relative"
+				style={{ padding: 'calc(var(--ui-gap) * 0.75)' }}
 			>
-				{/* Main Header / Summary Card */}
-				<div
-					onClick={handleToggleExpand}
-					className="flex items-center justify-between cursor-pointer hover:bg-(--border)/5 transition-colors"
-					style={{ padding: 'calc(var(--ui-gap) * 0.75)' }}
-				>
-					<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
-						<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/10 shrink-0 text-(--accent)">
-							<Key size={24} />
-						</div>
-						<div className="flex flex-col overflow-hidden">
-							<h2 className="font-bold text-base text-(--text) truncate">{token.name || t('admin.tokens.empty.title')}</h2>
-							<div className="flex items-center gap-2 mt-0.5">
-								<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>{token.status}</span>
-							</div>
-							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">ID: {token._id}</span>
-						</div>
-					</div>
+				<div className="absolute inset-0 bg-gradient-to-br from-transparent to-(--border)/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-					<div className="flex items-center gap-2">
-						<motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-							<ChevronDown size={18} className="text-(--text-muted)" />
-						</motion.div>
+				<div className="flex items-center relative z-10" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/10 shrink-0 text-(--accent) shadow-inner transition-colors duration-300 group-hover:bg-(--accent)/20">
+						<Key size={24} />
+					</div>
+					<div className="flex flex-col overflow-hidden">
+						<h2 className="font-bold text-base text-(--text) truncate group-hover:text-(--accent) transition-colors">{token.name || t('admin.tokens.empty.title')}</h2>
+						<div className="flex items-center gap-2 mt-0.5">
+							<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>{token.status}</span>
+						</div>
+						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">ID: {token._id}</span>
 					</div>
 				</div>
 
-				{/* Expanded Content: Token Management Form */}
-				<AnimatePresence>
-					{isExpanded && (
-						<motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }}>
-							<div className="border-t border-(--border)/10 bg-(--background)/50 flex flex-col overflow-visible" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-								{loadingDetails ? (
-									<div className="flex justify-center py-6">
-										<Loading />
-									</div>
-								) : (
-									<form onSubmit={handleUpdate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
-										<h3 className="text-sm font-bold text-(--text)">{t('admin.tokens.manage.modalTitle')}</h3>
+				<div className="flex items-center justify-center w-8 h-8 rounded-full bg-(--border)/10 opacity-0 group-hover:opacity-100 transition-all text-(--text) relative z-10 shrink-0 mr-2">
+					<Settings2 size={16} />
+				</div>
+			</motion.div>
 
-										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.nameLabel')}</label>
-											<input
-												type="text"
-												value={name}
-												onChange={(e) => setName(e.target.value)}
-												className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-												style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
-												required
-											/>
-										</div>
+			<Modal
+				open={isModalOpen}
+				onOpenChange={setIsModalOpen}
+				title={t('admin.tokens.manage.modalTitle')}
+				description={`Manage settings for ${token.name || t('admin.tokens.empty.title')}`}
+				maxWidth="max-w-2xl"
+			>
+				<div className="flex flex-col overflow-visible" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+					{loadingDetails ? (
+						<div className="flex justify-center py-6">
+							<Loading />
+						</div>
+					) : (
+						<form onSubmit={handleUpdate} className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
+							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.nameLabel')}</label>
+									<input
+										type="text"
+										value={name}
+										onChange={(e) => setName(e.target.value)}
+										className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+										style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+										required
+									/>
+								</div>
 
-										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">Status</label>
-											<Selector
-												value={status}
-												options={[
-													{ label: 'Active', value: 'active' },
-													{ label: 'Inactive', value: 'inactive' },
-													{ label: 'Suspended', value: 'suspended' },
-													{ label: 'Pending', value: 'pending' },
-												]}
-												onChange={(val: string) => setStatus(val as Token['status'])}
-											/>
-										</div>
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="block text-xs font-medium text-(--text)">Status</label>
+									<Selector
+										value={status}
+										options={[
+											{ label: 'Active', value: 'active' },
+											{ label: 'Inactive', value: 'inactive' },
+											{ label: 'Suspended', value: 'suspended' },
+											{ label: 'Pending', value: 'pending' },
+										]}
+										onChange={(val: string) => setStatus(val as Token['status'])}
+									/>
+								</div>
+							</div>
 
-										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">Bot ID</label>
+							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="block text-xs font-medium text-(--text)">Bot ID</label>
+									<div className="flex flex-col gap-2 w-full">
+										{botId && botId.length >= 15 && (
+											<div className="flex flex-wrap gap-2">
+												<BotProfilePreview botId={botId} getEnvUrl={getEnvUrl} onClear={() => setBotId('')} />
+											</div>
+										)}
+										<div className="relative w-full">
 											<input
 												type="text"
 												value={botId}
 												onChange={(e) => setBotId(e.target.value)}
 												placeholder="Optional Bot ID..."
-												className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+												className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 												style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 											/>
 										</div>
+									</div>
+								</div>
 
-										<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-											<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
-											<AsyncUserMultiSelector values={selectedOwners} onChange={setSelectedOwners} getEnvUrl={getEnvUrl} />
-										</div>
-
-										<div className="flex items-center justify-between pt-1">
-											<div className="flex flex-col">
-												<span className="text-xs font-medium text-(--text)">Secure</span>
-												<span className="text-[11px] text-(--text-muted)">Allow fetching data from /secure</span>
-											</div>
-											<Toggle checked={secure} onChange={(e) => setSecure(e.target.checked)} size="sm" />
-										</div>
-
-										<div className="flex items-center justify-between pt-2">
-											<button
-												type="button"
-												onClick={() => setConfirmDeleteOpen(true)}
-												className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
-											>
-												<Trash2 size={14} />
-												{t('admin.tokens.manage.revokeTitle')}
-											</button>
-											<Button type="submit" disabled={saving}>
-												{saving ? t('admin.roles.saving') : t('admin.tokens.manage.saveButton')}
-											</Button>
-										</div>
-									</form>
-								)}
+								<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
+									<AsyncUserMultiSelector values={selectedOwners} onChange={setSelectedOwners} getEnvUrl={getEnvUrl} />
+								</div>
 							</div>
-						</motion.div>
+
+							<div className="flex items-center justify-between p-3 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md shadow-sm">
+								<div className="flex flex-col">
+									<span className="text-xs font-medium text-(--text)">Secure</span>
+									<span className="text-[11px] text-(--text-muted)">Allow fetching data from /secure</span>
+								</div>
+								<Toggle checked={secure} onChange={(e) => setSecure(e.target.checked)} size="sm" />
+							</div>
+
+							<div className="flex items-center justify-between pt-4 border-t border-(--border)/10 mt-auto">
+								<div className="flex items-center gap-2">
+									<button
+										type="button"
+										onClick={() => setConfirmDeleteOpen(true)}
+										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
+									>
+										<Trash2 size={14} />
+										{t('admin.tokens.manage.revokeTitle')}
+									</button>
+									<button
+										type="button"
+										onClick={() => {
+											navigator.clipboard.writeText(token._id);
+											toast({ title: 'Token ID copied', type: 'success' });
+										}}
+										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-(--background)/50 hover:bg-(--border)/10 text-(--text-muted) text-xs font-mono font-medium transition-colors"
+									>
+										<Copy size={12} />
+										{token._id.substring(0, 8)}...
+									</button>
+								</div>
+								<Button type="submit" disabled={saving || !isDirty}>
+									{saving ? t('admin.roles.saving') : t('admin.tokens.manage.saveButton')}
+								</Button>
+							</div>
+						</form>
 					)}
-				</AnimatePresence>
-			</motion.div>
+				</div>
+			</Modal>
 
 			<Confirm
 				open={confirmDeleteOpen}
@@ -625,7 +759,9 @@ export default function Tokens() {
 			{/* Header & New Token Button */}
 			<div className="flex flex-col sm:flex-row items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col">
-					<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('admin.tokens.title')}</h1>
+					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: `var(--font-fredoka)` }}>
+						{t('admin.tokens.title')}
+					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.tokens.description')}</p>
 				</div>
 				<Button
@@ -647,15 +783,7 @@ export default function Tokens() {
 
 			{/* Controls Bar: Search */}
 			<div className="relative w-full">
-				<Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)" />
-				<input
-					type="text"
-					placeholder={t('admin.tokens.empty.description')}
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-					className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-					style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap) calc(var(--ui-gap) * 0.6) calc(var(--ui-gap) * 2.5)' }}
-				/>
+				<Input variant="search" shortcut={true} placeholder={t('admin.tokens.empty.description')} value={search} onChange={(e) => setSearch(e.target.value)} />
 			</div>
 
 			{/* Tokens Grid (3 Columns) */}
@@ -683,7 +811,7 @@ export default function Tokens() {
 							placeholder={t('admin.tokens.create.namePlaceholder')}
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 							required
 						/>
@@ -703,14 +831,23 @@ export default function Tokens() {
 					</div>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 						<label className="block text-xs font-medium text-(--text)">Bot ID</label>
-						<input
-							type="text"
-							placeholder="Optional Bot ID..."
-							value={newBotId}
-							onChange={(e) => setNewBotId(e.target.value)}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
-						/>
+						<div className="flex flex-col gap-2 w-full">
+							{newBotId && newBotId.length >= 15 && (
+								<div className="flex flex-wrap gap-2">
+									<BotProfilePreview botId={newBotId} getEnvUrl={getEnvUrl} onClear={() => setNewBotId('')} />
+								</div>
+							)}
+							<div className="relative w-full">
+								<input
+									type="text"
+									placeholder="Optional Bot ID..."
+									value={newBotId}
+									onChange={(e) => setNewBotId(e.target.value)}
+									className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
+									style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+								/>
+							</div>
+						</div>
 					</div>
 					<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>

@@ -6,11 +6,13 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
+import { useSidebar } from './SidebarProvider';
 
 const SupportContext = createContext(null);
 
 export function SupportProvider({ children }: { children: React.ReactNode }) {
 	const { data: session } = useSession();
+	const { isMobileOpen } = useSidebar();
 
 	const [support, setSupport] = useState(false);
 
@@ -56,7 +58,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 		<SupportContext.Provider value={null}>
 			{children}
 
-			{support && (
+			{support && !isMobileOpen && (
 				<motion.div
 					initial={{ scale: 0, opacity: 0 }}
 					animate={{ scale: 1, opacity: 1 }}

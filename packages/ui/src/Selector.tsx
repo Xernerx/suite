@@ -16,6 +16,7 @@ export interface SelectorProps {
 	options: SelectorOption[];
 	onChange: (value: string) => void;
 	placeholder?: string;
+	items?: boolean;
 }
 
 // Helper to extract plain text string from any ReactNode (handles strings, elements, arrays)
@@ -31,7 +32,7 @@ function getLabelString(label: React.ReactNode): string {
 	return '';
 }
 
-export function Selector({ value, options, onChange, placeholder = 'Select...' }: SelectorProps) {
+export function Selector({ value, options, onChange, placeholder = 'Select...', items }: SelectorProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const ref = useRef<HTMLDivElement>(null);
@@ -77,8 +78,8 @@ export function Selector({ value, options, onChange, placeholder = 'Select...' }
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex w-full items-center justify-between rounded-2xl border border-(--border)/10 bg-(--foreground) text-sm text-(--text) shadow-sm transition-all hover:border-(--border)/40 focus:border-(--accent) focus:outline-none"
-				style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
+				className="flex w-full items-center justify-between rounded-xl p-3 border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground)/50 focus:border-(--accent) focus:outline-none"
+				style={{ gap: 'var(--ui-gap)' }}
 			>
 				<span className="font-medium">{selectedOption ? selectedOption.label : placeholder}</span>
 				<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -91,23 +92,25 @@ export function Selector({ value, options, onChange, placeholder = 'Select...' }
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -4 }}
 						transition={{ duration: 0.15, ease: 'easeOut' }}
-						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-lg"
+						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-lg"
 						style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
 					>
 						{/* Search Filter Input */}
-						<div className="relative w-full" style={{ padding: 'calc(var(--ui-gap) * 0.25)' }}>
-							<Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)" />
-							<input
-								ref={inputRef}
-								type="text"
-								placeholder="Search..."
-								value={query}
-								onChange={(e) => setQuery(e.target.value)}
-								className="w-full rounded-xl border border-(--border)/10 bg-(--background) text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
-								style={{ padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)' }}
-								onClick={(e) => e.stopPropagation()}
-							/>
-						</div>
+						{!items && (
+							<div className="relative w-full" style={{ padding: 'calc(var(--ui-gap) * 0.25)' }}>
+								<Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)" />
+								<input
+									ref={inputRef}
+									type="text"
+									placeholder="Search..."
+									value={query}
+									onChange={(e) => setQuery(e.target.value)}
+									className="w-full rounded-xl border border-(--border)/10 bg-(--background) text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
+									style={{ padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)' }}
+									onClick={(e) => e.stopPropagation()}
+								/>
+							</div>
+						)}
 
 						{/* Options List */}
 						<div className="overflow-y-auto max-h-52 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>

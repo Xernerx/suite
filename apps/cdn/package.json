@@ -1,6 +1,6 @@
 {
 	"name": "cdn",
-	"version": "0.4.7",
+	"version": "0.4.8",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -22,7 +22,7 @@
 		"next": "^16.3.0",
 		"next-auth": "^4.24.15",
 		"react": "^19.2.8",
-		"react-dom": "^19"
+		"react-dom": "^19.2.8"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.3",

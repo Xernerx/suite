@@ -45,7 +45,13 @@ export default function SignInPage() {
 					</div>
 
 					{/* LOGIN BUTTON */}
-					<Button variant="primary" size="lg" onClick={handleLogin} isLoading={loading} className="w-full max-w-65 shadow-[0_10px_30px_var(--color-accent-hover)]">
+					<Button
+						variant="primary"
+						size="lg"
+						onClick={handleLogin}
+						isLoading={loading}
+						className="w-full max-w-65 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_30%,transparent)] hover:shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_50%,transparent)] transition-all"
+					>
 						{loading ? t('auth.signin.redirecting', {}, 'Redirecting…') : t('auth.signin.button', {}, 'Continue with Discord')}
 					</Button>
 
@@ -68,7 +74,7 @@ export default function SignInPage() {
 								transition={{ duration: 0.25, ease: 'easeInOut' }}
 								className="w-full max-w-md overflow-hidden"
 							>
-								<div className="mt-2 rounded-2xl border border-(--border)/10 bg-(--foreground) p-6 text-left shadow-xl">
+								<div className="mt-2 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-6 text-left shadow-xl">
 									<div className="flex flex-col gap-4">
 										<div className="flex flex-col gap-0.5">
 											<h3 className="text-sm font-medium text-(--text)">{t('auth.signin.permissions.profile.title')}</h3>

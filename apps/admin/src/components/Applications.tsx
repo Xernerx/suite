@@ -158,7 +158,9 @@ export default function Applications() {
 			{/* Header */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h1 className="text-3xl font-black tracking-tight text-(--text)">Applications</h1>
+					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: `var(--font-fredoka)` }}>
+						Applications
+					</h1>
 					<p className="text-sm text-(--text-muted)">Review and manage user requests.</p>
 				</div>
 
@@ -173,7 +175,7 @@ export default function Applications() {
 			</div>
 
 			{/* List */}
-			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-sm overflow-hidden">
+			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden">
 				{isLoading && applications.length === 0 ? (
 					<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
 						<Loader2 size={32} className="animate-spin mb-4 opacity-50" />
@@ -228,9 +230,9 @@ export default function Applications() {
 			{/* Review Modal */}
 			{selectedApp && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-					<div className="flex flex-col w-full max-w-lg rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-xl animate-in zoom-in-95 duration-200 overflow-hidden">
+					<div className="flex flex-col w-full max-w-lg rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl animate-in zoom-in-95 duration-200 overflow-hidden">
 						{/* Modal Header */}
-						<div className="flex items-center justify-between border-b border-(--border)/10 bg-(--background)" style={{ padding: 'var(--ui-gap)' }}>
+						<div className="flex items-center justify-between border-b border-(--border)/10 bg-(--background)/50 backdrop-blur-md" style={{ padding: 'var(--ui-gap)' }}>
 							<h2 className="text-lg font-bold text-(--text) capitalize">{selectedApp.type.replace('_', ' ')} Application</h2>
 							{getStatusBadge(selectedApp.status)}
 						</div>
@@ -238,7 +240,7 @@ export default function Applications() {
 						{/* Modal Body */}
 						<div className="flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 							{/* Info Grid */}
-							<div className="grid grid-cols-2 gap-4 rounded-2xl border border-(--border)/10 bg-(--background) p-4">
+							<div className="grid grid-cols-2 gap-4 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md p-4">
 								<div className="flex flex-col gap-1">
 									<span className="text-[10px] uppercase font-bold tracking-wider text-(--text-muted)">Applicant</span>
 									<div className="text-sm font-medium text-(--text) truncate flex items-center gap-2">
@@ -274,14 +276,16 @@ export default function Applications() {
 									placeholder="Explain why this was approved or denied (visible to user)..."
 									disabled={selectedApp.status !== 'pending' || isProcessing}
 									rows={3}
-									className="w-full rounded-2xl border border-(--border)/10 bg-(--background) text-sm text-(--text) placeholder:text-(--text-muted)/50 focus:border-(--text)/30 focus:outline-none focus:ring-0 disabled:opacity-50 resize-none"
-									style={{ padding: 'calc(var(--ui-gap) * 0.75)' }}
+									className="w-full rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) placeholder:text-(--text-muted)/50 focus:border-(--accent) focus:outline-none focus:ring-2 focus:ring-(--accent) disabled:opacity-50 resize-none p-3"
 								/>
 							</div>
 						</div>
 
 						{/* Modal Footer Actions */}
-						<div className="flex items-center justify-end bg-(--background) border-t border-(--border)/10" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
+						<div
+							className="flex items-center justify-end bg-(--background)/50 backdrop-blur-md border-t border-(--border)/10"
+							style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}
+						>
 							<button
 								type="button"
 								disabled={isProcessing}

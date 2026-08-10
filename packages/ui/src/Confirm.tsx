@@ -36,7 +36,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
 			<div
-				className="flex flex-col w-full max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-xl animate-in zoom-in-95 duration-200"
+				className="flex flex-col w-full max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex items-start" style={{ gap: 'var(--ui-gap)' }}>
@@ -44,7 +44,9 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 						<Icon size={24} />
 					</div>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-lg font-bold text-(--text)">{title}</h2>
+						<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{title}
+						</h2>
 						<p className="text-xs text-(--text-muted) leading-relaxed">{description}</p>
 					</div>
 				</div>

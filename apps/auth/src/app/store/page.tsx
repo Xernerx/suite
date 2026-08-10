@@ -120,7 +120,9 @@ export default function StorePage() {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen p-8 transition-colors duration-200">
 			<div className="max-w-4xl w-full flex flex-col items-center space-y-4 mb-8">
-				<h1 className="text-4xl md:text-5xl font-bold tracking-tight">{t('auth.store.title')}</h1>
+				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('auth.store.title')}
+				</h1>
 				<p className="text-(--text-muted) text-lg text-center max-w-2xl">{t('auth.store.description')}</p>
 
 				{/* Ecosystem Tab Switcher */}
@@ -173,7 +175,7 @@ export default function StorePage() {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.3 }}
-							className="relative flex flex-col p-8 rounded-2xl border-2 border-(--accent) bg-(--foreground) shadow-xl"
+							className="relative flex flex-col p-8 rounded-3xl border-2 border-(--accent) bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
 						>
 							<div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-(--accent) text-white text-xs font-semibold rounded-full flex items-center gap-1 shadow-sm">
 								<Sparkles size={12} />
@@ -186,7 +188,9 @@ export default function StorePage() {
 							</div>
 
 							<div className="mb-6">
-								<h3 className="text-2xl font-semibold mb-2">{ultraProduct?.name || t('auth.store.ultra.fallbackName')}</h3>
+								<h3 className="text-3xl font-extrabold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{ultraProduct?.name || t('auth.store.ultra.fallbackName')}
+								</h3>
 								<p className="text-sm text-(--text-muted)">{ultraProduct?.description || t('auth.store.ultra.fallbackDesc')}</p>
 							</div>
 
@@ -244,9 +248,14 @@ export default function StorePage() {
 									const activePrice = botData?.prices.find((p) => p.interval === billingInterval);
 
 									return (
-										<div key={botProdId} className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground) flex flex-col justify-between shadow-xs">
+										<div
+											key={botProdId}
+											className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md flex flex-col justify-between shadow-sm hover:border-(--accent)/50 hover:bg-(--foreground)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all"
+										>
 											<div>
-												<h4 className="text-lg font-semibold mb-1">{botData?.name || t('auth.store.buttons.loading')}</h4>
+												<h4 className="text-xl font-bold mb-1 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+													{botData?.name || t('auth.store.buttons.loading')}
+												</h4>
 												<p className="text-xs text-(--text-muted) mb-6 min-h-7.5">{botData?.description || t('auth.store.cards.botFallback')}</p>
 												<div className="text-3xl font-bold mb-6">
 													{loadingPrices ? '...' : activePrice ? `€${(activePrice.unitAmount / 100).toFixed(0)}` : '—'}
@@ -291,9 +300,14 @@ export default function StorePage() {
 									const activePrice = serverData?.prices.find((p) => p.interval === billingInterval);
 
 									return (
-										<div key={serverProdId} className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground) flex flex-col justify-between shadow-xs">
+										<div
+											key={serverProdId}
+											className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md flex flex-col justify-between shadow-sm hover:border-(--accent)/50 hover:bg-(--foreground)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all"
+										>
 											<div>
-												<h4 className="text-lg font-semibold mb-1">{serverData?.name || t('auth.store.buttons.loading')}</h4>
+												<h4 className="text-xl font-bold mb-1 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+													{serverData?.name || t('auth.store.buttons.loading')}
+												</h4>
 												<p className="text-xs text-(--text-muted) mb-6 min-h-7.5">{serverData?.description || t('auth.store.cards.serverFallback')}</p>
 												<div className="text-3xl font-bold mb-6">
 													{loadingPrices ? '...' : activePrice ? `€${(activePrice.unitAmount / 100).toFixed(0)}` : '—'}
@@ -333,14 +347,16 @@ export default function StorePage() {
 				<div className="w-full max-w-4xl">
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						{/* Free Developer Tier */}
-						<div className="relative flex flex-col p-6 rounded-2xl border border-(--border)/10 bg-(--foreground) shadow-xs">
+						<div className="relative flex flex-col p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 							<div className="flex items-center gap-2 mb-4" style={{ color: 'var(--accent)' }}>
 								<Code size={20} />
 								<span className="text-xs font-semibold uppercase tracking-wider">{t('auth.store.developer.free.badge')}</span>
 							</div>
 
 							<div className="mb-6">
-								<h3 className="text-xl font-semibold mb-2">{t('auth.store.developer.free.title')}</h3>
+								<h3 className="text-2xl font-bold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{t('auth.store.developer.free.title')}
+								</h3>
 								<p className="text-sm text-(--text-muted) min-h-10">{t('auth.store.developer.free.desc')}</p>
 							</div>
 
@@ -368,14 +384,19 @@ export default function StorePage() {
 							const activePrice = devData?.prices.find((p) => p.interval === billingInterval);
 
 							return (
-								<div key={devProdId} className="relative flex flex-col p-6 rounded-2xl border border-(--accent) bg-(--foreground) shadow-md">
+								<div
+									key={devProdId}
+									className="relative flex flex-col p-6 rounded-3xl border border-(--accent) bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all"
+								>
 									<div className="flex items-center gap-2 mb-4" style={{ color: 'var(--accent)' }}>
 										<Code size={20} />
 										<span className="text-xs font-semibold uppercase tracking-wider">{t('auth.store.developer.pro.badge')}</span>
 									</div>
 
 									<div className="mb-6">
-										<h3 className="text-xl font-semibold mb-2">{devData?.name || t('auth.store.developer.pro.fallbackName')}</h3>
+										<h3 className="text-2xl font-bold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+											{devData?.name || t('auth.store.developer.pro.fallbackName')}
+										</h3>
 										<p className="text-sm text-(--text-muted) min-h-10">{devData?.description || t('auth.store.developer.pro.fallbackDesc')}</p>
 									</div>
 

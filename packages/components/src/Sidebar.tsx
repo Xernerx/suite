@@ -43,7 +43,7 @@ export function Sidebar() {
 	const nameplateUrl = activeUser?.collectibles?.nameplate?.asset ? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm` : null;
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
-	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground) z-20';
+	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -106,7 +106,7 @@ export function Sidebar() {
 										setMobileOpen(false);
 									}}
 									className={`group relative flex items-center rounded-xl transition-all duration-200 
-                                        ${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground) hover:text-(--text)'}
+                                        ${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
                                         ${isCollapsed ? 'justify-center px-0' : ''}
                                     `}
 									style={{
@@ -154,8 +154,8 @@ export function Sidebar() {
 							{/* Combined Trigger Card Wrapper */}
 							<div
 								className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-colors 
-                                ${!nameplateUrl ? 'hover:bg-(--foreground)' : 'shadow-inner'}
-                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)' : ''}
+                                ${!nameplateUrl ? 'hover:bg-(--foreground)/30 backdrop-blur-md' : 'shadow-inner'}
+                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/30 backdrop-blur-md' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                             `}
 								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}

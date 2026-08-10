@@ -13,7 +13,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const iconPath = path.join(__dirname, '../public/icon.ico');
-const WEB_URL = app.isPackaged ? 'https://app.xernerx.com' : 'https://app.dev.xernerx.com';
+const isCanary = app.getVersion().includes('canary');
+const WEB_URL = app.isPackaged ? (isCanary ? 'https://app.canary.xernerx.com' : 'https://app.xernerx.com') : 'https://app.dev.xernerx.com';
 
 let win: BrowserWindow;
 let splash: BrowserWindow | null = null;
