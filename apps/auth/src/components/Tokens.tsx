@@ -411,7 +411,7 @@ export default function Tokens() {
 			{/* List */}
 			{isLoading ? (
 				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
-					<Loader2 className="animate-spin text-(--accent)" size={24} />
+					<Loading />
 				</div>
 			) : tokens.length === 0 ? (
 				<div
@@ -693,7 +693,7 @@ function ManageTokenModal({ tokenId, onClose, onSuccess }: { tokenId: string | n
 					>
 						{isLoading || !token ? (
 							<div className="flex h-64 items-center justify-center">
-								<Loader2 className="animate-spin text-(--accent)" size={32} />
+								<Loading />
 							</div>
 						) : (
 							<>

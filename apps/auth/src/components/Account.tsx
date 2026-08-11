@@ -2,7 +2,7 @@
 'use client';
 
 import { AlertTriangle, LogOut, Trash2, User as UserIcon } from 'lucide-react';
-import { signOut, useDictionary, useEnvironment, useSession, useUser } from '@xernerx/providers';
+import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
 
 import { Confirm } from '@xernerx/ui';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ export default function Account() {
 	const { user: discordUser } = useUser();
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
+	const { toast } = useToast();
 
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -43,8 +44,9 @@ export default function Account() {
 
 			const authLoginUrl = getEnvUrl('https://auth.xernerx.com/login');
 			await signOut({ callbackUrl: authLoginUrl });
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Error deleting account:', error);
+			toast({ type: 'error', title: 'Failed to delete account', description: error.message });
 			setIsDeleting(false);
 			setIsConfirmOpen(false);
 		}

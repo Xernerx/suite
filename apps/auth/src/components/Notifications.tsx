@@ -12,7 +12,24 @@ export default function Notifications() {
 	const { toast } = useToast();
 	const { t } = useDictionary();
 
+	const hasSubscription = user?.staffSubscription || user?.subscriptions?.some((sub: any) => sub.status === 'active' || sub.status === 'trialing');
+
 	const [notifications, setNotifications] = useState<Record<string, Record<string, Record<string, boolean>>>>({
+		api: {
+			rateLimitWarning: { discord: false, mail: false, inApp: true },
+			tokenCreated: { discord: false, mail: false, inApp: true },
+			tokenRevoked: { discord: false, mail: false, inApp: true },
+			downtime: { discord: false, mail: false, inApp: true },
+		},
+		billing: {
+			invoicePaid: { discord: false, mail: false, inApp: true },
+			subscriptionExpiring: { discord: false, mail: false, inApp: true },
+			paymentFailed: { discord: false, mail: false, inApp: true },
+		},
+		apps: {
+			botApproved: { discord: false, mail: false, inApp: true },
+			botRejected: { discord: false, mail: false, inApp: true },
+		},
 		general: {
 			birthday: { discord: false, mail: false, inApp: true },
 		},
@@ -110,18 +127,28 @@ export default function Notifications() {
 										<p className="text-xs text-(--text-muted)">{t('auth.notifications.itemDescription', { item: itemKey }, `Configure alerts for ${itemKey}.`)}</p>
 									</div>
 									<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
-										{Object.entries(channels).map(([channelKey, enabled]) => (
-											<div key={channelKey} className="flex flex-col items-center" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-												<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">
-													{t(`auth.notifications.channels.${channelKey}`, {}, channelKey)}
-												</span>
-												<Toggle
-													checked={enabled}
-													onChange={(val) => handleToggle(category, itemKey, channelKey, typeof val === 'boolean' ? val : val.target.checked)}
-													suppressHydrationWarning
-												/>
-											</div>
-										))}
+										{Object.entries(channels).map(([channelKey, enabled]) => {
+											const isMailChannel = channelKey === 'mail';
+											const isDisabled = isMailChannel && !hasSubscription;
+
+											return (
+												<div
+													key={channelKey}
+													className={`flex flex-col items-center ${isDisabled ? 'opacity-50 grayscale' : ''}`}
+													style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
+												>
+													<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">
+														{t(`auth.notifications.channels.${channelKey}`, {}, channelKey)}
+													</span>
+													<Toggle
+														checked={enabled && !isDisabled}
+														onChange={(val) => handleToggle(category, itemKey, channelKey, typeof val === 'boolean' ? val : val.target.checked)}
+														disabled={isDisabled}
+														suppressHydrationWarning
+													/>
+												</div>
+											);
+										})}
 									</div>
 								</div>
 							))}

@@ -69,7 +69,7 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', ..
 				<input
 					ref={inputRef as React.RefObject<HTMLInputElement>}
 					type="text"
-					className={`${baseClasses} block w-full p-4 pl-6 pr-32 text-base rounded-full shadow-lg`}
+					className={`${baseClasses} block w-full h-[56px] py-0 pl-6 pr-32 text-base rounded-full shadow-lg`}
 					onKeyDown={handleKeyDown}
 					{...(props as React.InputHTMLAttributes<HTMLInputElement>)}
 				/>

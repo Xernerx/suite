@@ -1,5 +1,15 @@
 # @xernerx/providers
 
+## 0.3.4
+
+### Patch Changes
+
+-   - Added debounced infinite scroll to Users table to prevent rapid continuous fetching
+    - Fixed alphabetical sorting to always push users with empty names to the bottom of the list
+    - Fixed z-index stacking context so Confirm dialogs appear over standard edit Modals
+    - Fixed `useToast` import missing from Roles and Tokens causing Turbopack build failures
+    - Fixed hydration environment mismatch that caused immediate CORS failures when fetching in dev
+
 ## 0.3.3
 
 ### Patch Changes

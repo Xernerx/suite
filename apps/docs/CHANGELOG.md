@@ -1,5 +1,14 @@
 # docs
 
+## 0.2.12
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.3.4
+    - @xernerx/components@0.2.11
+    - @xernerx/feedback@0.0.12
+
 ## 0.2.11
 
 ### Patch Changes

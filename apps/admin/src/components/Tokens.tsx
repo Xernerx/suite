@@ -466,9 +466,12 @@ function TokenCard({
 				setFullToken(manuallyUpdatedToken);
 				onTokenUpdated(manuallyUpdatedToken);
 				toast({ title: 'Token updated', type: 'success' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Unknown error');
 			}
-		} catch (err) {
-			console.error('Failed to update token:', err);
+		} catch (err: any) {
+			toast({ type: 'error', title: 'Failed to update token', description: err.message });
 		} finally {
 			setSaving(false);
 		}
@@ -484,9 +487,13 @@ function TokenCard({
 
 			if (res.ok) {
 				onTokenDeleted(token._id);
+				toast({ type: 'success', title: 'Token deleted successfully' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Unknown error');
 			}
-		} catch (err) {
-			console.error('Failed to delete token:', err);
+		} catch (err: any) {
+			toast({ type: 'error', title: 'Failed to delete token', description: err.message });
 		} finally {
 			setDeleting(false);
 			setConfirmDeleteOpen(false);
@@ -656,6 +663,7 @@ function TokenCard({
 
 export default function Tokens() {
 	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
 	const { t } = useDictionary();
 
 	const [tokens, setTokens] = useState<Token[]>([]);
@@ -724,9 +732,14 @@ export default function Tokens() {
 				setNewBotId('');
 				setNewSelectedOwners([]);
 				setNewSecure(false);
+				toast({ type: 'success', title: 'Token created successfully' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Unknown error');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Failed to create token:', err);
+			toast({ type: 'error', title: 'Failed to create token', description: err.message });
 		} finally {
 			setCreating(false);
 		}

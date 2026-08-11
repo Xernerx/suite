@@ -12,6 +12,7 @@ interface EnvironmentContextType {
 	isCanary: boolean;
 	isPublic: boolean;
 	getEnvUrl: (baseUrl: string) => string;
+	isReady: boolean;
 }
 
 const EnvironmentContext = createContext<EnvironmentContextType | undefined>(undefined);
@@ -33,11 +34,13 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 	// Initialize with server-provided environment if available, preventing mismatch
 	const [environment, setEnvironment] = useState<Environment>(() => {
 		if (initialEnvironment) return initialEnvironment;
-		return getInitialEnvironment();
+		return 'public'; // Force 'public' for initial SSR/hydration to avoid mismatch
 	});
+	const [isReady, setIsReady] = useState(false);
 
 	useEffect(() => {
 		setEnvironment(getInitialEnvironment());
+		setIsReady(true);
 	}, []);
 
 	const getEnvUrl = React.useCallback(
@@ -83,6 +86,7 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 		isCanary: environment === 'canary',
 		isPublic: environment === 'public',
 		getEnvUrl,
+		isReady,
 	};
 
 	return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;

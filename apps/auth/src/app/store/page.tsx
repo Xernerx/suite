@@ -3,7 +3,7 @@
 'use client';
 
 import { AlertCircle, Bot, Check, Code, Server, Sparkles, Zap } from 'lucide-react';
-import { useDictionary, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import { motion } from 'framer-motion';
@@ -41,8 +41,9 @@ export default function StorePage() {
 	const [loadingPrices, setLoadingPrices] = useState(true);
 
 	const { hide } = useSidebar();
-	const { user, loading: userLoading } = useUser() as { user: any; loading?: boolean };
+	const { user, loading: userLoading } = useUser() as { user: any; loading: boolean };
 	const subscriptions: UserSubscription[] = user?.subscriptions || [];
+	const { toast } = useToast();
 
 	useEffect(() => {
 		hide();
@@ -92,8 +93,9 @@ export default function StorePage() {
 			if (data.url) {
 				window.location.assign(data.url);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Failed to create checkout session:', error);
+			toast({ type: 'error', title: 'Failed to create checkout session', description: error.message });
 			setActionLoading(null);
 		}
 	};

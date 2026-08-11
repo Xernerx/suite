@@ -125,9 +125,10 @@ export default function Home() {
 	const { type } = usePlatform();
 	const router = useRouter();
 
-	// Redirect to dashboard immediately if running within the desktop application wrapper
+	// Redirect to dashboard only on app start if running within the desktop application wrapper
 	useEffect(() => {
-		if (type === 'application') {
+		if (type === 'application' && !sessionStorage.getItem('hasRedirectedToDashboard')) {
+			sessionStorage.setItem('hasRedirectedToDashboard', 'true');
 			router.replace('/dashboard');
 		}
 	}, [type, router]);

@@ -3,9 +3,9 @@
 
 import { AlertTriangle, ArrowUpDown, Check, ChevronDown, Copy, Eye, EyeOff, Key, Loader2, Plus, Save, Search, Settings2, Trash2, User as UserIcon, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Confirm, Modal, Selector, Toggle, Input } from '@xernerx/ui';
+import { Button, Confirm, Modal, Selector, Toggle, Input, MultiSelector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 import Image from 'next/image';
 import { Loading } from '@xernerx/feedback';
@@ -73,144 +73,6 @@ function getNormalizedRoles(obj: { roles?: string[] } | null | undefined): strin
 }
 
 // -----------------------------------------------------------------------------
-// Custom Multi-Role Selector Component
-// -----------------------------------------------------------------------------
-
-function RoleMultiSelector({ values, onChange, roles, placeholder }: { values: string[]; onChange: (vals: string[]) => void; roles: Role[]; placeholder?: string }) {
-	const { t } = useDictionary();
-	const [isOpen, setIsOpen] = useState(false);
-	const [query, setQuery] = useState('');
-	const ref = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
-
-	// Close on click outside
-	useEffect(() => {
-		function handleClickOutside(event: MouseEvent) {
-			if (ref.current && !ref.current.contains(event.target as Node)) {
-				setIsOpen(false);
-				setQuery('');
-			}
-		}
-		document.addEventListener('mousedown', handleClickOutside);
-		return () => document.removeEventListener('mousedown', handleClickOutside);
-	}, []);
-
-	// Focus input when opened
-	useEffect(() => {
-		if (isOpen) {
-			setTimeout(() => inputRef.current?.focus(), 50);
-		} else {
-			setQuery('');
-		}
-	}, [isOpen]);
-
-	// Filter, exclude already selected, and limit to 30
-	const filteredRoles = useMemo(() => {
-		const q = query.toLowerCase();
-		return roles.filter((r) => !values.includes(r.id) && (r.name?.toLowerCase().includes(q) || r.role?.toLowerCase().includes(q))).slice(0, 30);
-	}, [roles, query, values]);
-
-	const handleRemove = (idToRemove: string) => {
-		onChange(values.filter((id) => id !== idToRemove));
-	};
-
-	const handleSelect = (idToAdd: string) => {
-		if (!values.includes(idToAdd)) {
-			onChange([...values, idToAdd]);
-		}
-		setIsOpen(false);
-		setQuery('');
-	};
-
-	return (
-		<div className="flex flex-col gap-2 w-full" ref={ref}>
-			{/* Selected Pills */}
-			{values.length > 0 && (
-				<div className="flex flex-wrap gap-2">
-					{values.map((id) => {
-						const r = roles.find((role) => role.id === id);
-						return (
-							<div
-								key={id}
-								className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2.5 pr-1.5 py-1 text-xs text-(--text) shadow-sm"
-							>
-								<span className="font-medium truncate max-w-[150px]">{r ? r.name || t('admin.roles.unnamedRole') : id}</span>
-								<button
-									type="button"
-									onClick={() => handleRemove(id)}
-									className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-red-500/10 text-(--text-muted) hover:text-red-500 transition-colors"
-								>
-									<X size={10} />
-								</button>
-							</div>
-						);
-					})}
-				</div>
-			)}
-
-			<div className="relative w-full">
-				<button
-					type="button"
-					onClick={() => setIsOpen(!isOpen)}
-					className="flex w-full items-center justify-between rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 focus:border-(--accent) focus:outline-none"
-					style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
-				>
-					<span className="text-(--text-muted) font-medium">{placeholder || t('admin.users.addRolePlaceholder')}</span>
-					<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
-				</button>
-
-				<AnimatePresence>
-					{isOpen && (
-						<motion.div
-							initial={{ opacity: 0, y: -4 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -4 }}
-							transition={{ duration: 0.15, ease: 'easeOut' }}
-							className="absolute left-0 top-[calc(100%+8px)] z-999 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl"
-							style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
-						>
-							{/* Search Filter Input */}
-							<div className="relative w-full" style={{ padding: 'calc(var(--ui-gap) * 0.25)' }}>
-								<Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)" />
-								<input
-									ref={inputRef}
-									type="text"
-									placeholder={t('admin.users.searchRolesPlaceholder')}
-									value={query}
-									onChange={(e) => setQuery(e.target.value)}
-									className="w-full rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
-									style={{ padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)' }}
-									onClick={(e) => e.stopPropagation()}
-								/>
-							</div>
-
-							{/* Options List */}
-							<div className="overflow-y-auto max-h-52 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-								{filteredRoles.length === 0 ? (
-									<div className="py-4 text-center text-xs text-(--text-muted)">{t('admin.users.noMatchingRoles')}</div>
-								) : (
-									filteredRoles.map((r) => (
-										<button
-											type="button"
-											key={r.id}
-											onClick={() => handleSelect(r.id)}
-											className="flex w-full items-center justify-between rounded-xl text-sm transition-colors text-(--text) hover:bg-(--border)/5 text-left"
-											style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
-										>
-											<span className="font-medium truncate">{r.name || t('admin.roles.unnamedRole')}</span>
-										</button>
-									))
-								)}
-							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
-			</div>
-		</div>
-	);
-}
-
-// -----------------------------------------------------------------------------
 // UserCard Component
 // -----------------------------------------------------------------------------
 
@@ -220,12 +82,14 @@ function UserCard({
 	getEnvUrl,
 	onUserDeleted,
 	onUserUpdated,
+	onDiscordFetched,
 }: {
 	user: UserSummary;
 	roles: Role[];
 	getEnvUrl: (url: string) => string;
 	onUserDeleted: (id: string) => void;
 	onUserUpdated: (updated: FullUser) => void;
+	onDiscordFetched: (id: string, discord: DiscordProfile) => void;
 }) {
 	const { toast } = useToast();
 	const { t } = useDictionary();
@@ -274,10 +138,13 @@ function UserCard({
 		fetch(getEnvUrl(`https://api.xernerx.com/core/users/${user.id}/discord`))
 			.then((res) => (res.ok ? res.json() : null))
 			.then((data) => {
-				if (data) setDiscord(data);
+				if (data) {
+					setDiscord(data);
+					onDiscordFetched(user.id, data);
+				}
 			})
 			.catch(() => {});
-	}, [user.id, user.discord, getEnvUrl]);
+	}, [user.id, user.discord, getEnvUrl, onDiscordFetched]);
 
 	const handleOpenModal = async () => {
 		setIsModalOpen(true);
@@ -382,14 +249,20 @@ function UserCard({
 						headers: { 'Content-Type': 'application/json' },
 						credentials: 'include',
 						body: JSON.stringify({ roleId: discordRoleId }),
-					}).catch((err) => console.error('Failed to assign Discord role:', err));
+					}).catch((err) => {
+						console.error('Failed to assign Discord role:', err);
+						toast({ type: 'error', title: 'Failed to assign Discord role', description: err.message });
+					});
 				} else {
 					await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}/discord/roles`), {
 						method: 'DELETE',
 						headers: { 'Content-Type': 'application/json' },
 						credentials: 'include',
 						body: JSON.stringify({ roleId: discordRoleId }),
-					}).catch((err) => console.error('Failed to remove Discord role:', err));
+					}).catch((err) => {
+						console.error('Failed to remove Discord role:', err);
+						toast({ type: 'error', title: 'Failed to remove Discord role', description: err.message });
+					});
 				}
 			}
 
@@ -595,7 +468,12 @@ function UserCard({
 
 								<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 									<label className="block text-xs font-medium text-(--text)">{t('admin.users.rolesLabel')}</label>
-									<RoleMultiSelector values={selectedRoleIds} onChange={setSelectedRoleIds} roles={roles} placeholder={t('admin.users.addRolePlaceholder')} />
+									<MultiSelector
+										value={selectedRoleIds}
+										onChange={setSelectedRoleIds}
+										options={roles.map((r) => ({ value: r.id, label: r.name || t('admin.roles.unnamedRole'), color: r.permissions?.color || undefined }))}
+										placeholder={t('admin.users.addRolePlaceholder')}
+									/>
 								</div>
 
 								<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
@@ -711,6 +589,33 @@ export default function Users() {
 
 	const [search, setSearch] = useState('');
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [filterRoleIds, setFilterRoleIds] = useState<string[]>([]);
+	const [limit, setLimit] = useState(30);
+
+	// Reset limit when filters change
+	useEffect(() => {
+		setLimit(30);
+	}, [search, sortOrder, filterRoleIds]);
+
+	const observer = useRef<IntersectionObserver | null>(null);
+	const lastIncrementTime = useRef(0);
+	const loadMoreRef = useCallback(
+		(node: HTMLDivElement | null) => {
+			if (loading) return;
+			if (observer.current) observer.current.disconnect();
+			observer.current = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting) {
+					const now = Date.now();
+					if (now - lastIncrementTime.current > 500) {
+						setLimit((prev) => prev + 30);
+						lastIncrementTime.current = now;
+					}
+				}
+			});
+			if (node) observer.current.observe(node);
+		},
+		[loading]
+	);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -746,26 +651,46 @@ export default function Users() {
 		);
 	};
 
-	const filteredAndSortedUsers = useMemo(() => {
+	const handleDiscordFetched = useCallback((id: string, discord: DiscordProfile) => {
+		setUsers((prev) => {
+			// Prevent unnecessary updates if already set
+			const exists = prev.find((u) => u.id === id);
+			if (exists && exists.discord) return prev;
+			return prev.map((u) => (u.id === id ? { ...u, discord } : u));
+		});
+	}, []);
+
+	const filteredUsers = useMemo(() => {
 		return users
 			.filter((user) => {
 				const query = search.toLowerCase();
 				const nameMatch = user.name?.toLowerCase().includes(query) ?? false;
 				const idMatch = user.id?.toLowerCase().includes(query) ?? false;
 				const discordMatch = user.discord?.username?.toLowerCase().includes(query) ?? false;
-				return nameMatch || idMatch || discordMatch;
+				const matchesSearch = nameMatch || idMatch || discordMatch;
+
+				const userRoleIds = getNormalizedRoles(user);
+				const matchesRoles = filterRoleIds.length === 0 || filterRoleIds.some((roleId) => userRoleIds.includes(roleId));
+
+				return matchesSearch && matchesRoles;
 			})
 			.sort((a, b) => {
 				const nameA = (a.name || a.discord?.username || '').toLowerCase();
 				const nameB = (b.name || b.discord?.username || '').toLowerCase();
+
+				// Always push empty names to the very bottom
+				if (!nameA && nameB) return 1;
+				if (nameA && !nameB) return -1;
+
 				if (sortOrder === 'asc') {
 					return nameA.localeCompare(nameB);
 				} else {
 					return nameB.localeCompare(nameA);
 				}
-			})
-			.slice(0, 30);
-	}, [users, search, sortOrder]);
+			});
+	}, [users, search, sortOrder, filterRoleIds]);
+
+	const renderedUsers = filteredUsers.slice(0, limit);
 
 	if (loading) return <Loading />;
 	if (error) return <div className="p-6 text-red-500">Error: {error}</div>;
@@ -792,6 +717,16 @@ export default function Users() {
 				<div className="relative flex-1 w-full">
 					<Input variant="search" shortcut={true} placeholder={t('admin.users.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 				</div>
+				<div className="relative w-full sm:max-w-xs z-50">
+					<MultiSelector
+						value={filterRoleIds}
+						onChange={setFilterRoleIds}
+						options={roles.map((r) => ({ value: r.id, label: r.name || t('admin.roles.unnamedRole'), color: r.permissions?.color || undefined }))}
+						placeholder={t('admin.users.rolesLabel', {}, 'Filter by roles...')}
+						searchPlaceholder={t('admin.users.searchRolesPlaceholder', {}, 'Search roles...')}
+						toggleClassName="h-[56px] !rounded-full !text-base shadow-sm"
+					/>
+				</div>
 				<button
 					onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
 					className="flex items-center justify-center gap-2 rounded-full border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm font-medium text-(--text) hover:bg-(--foreground)/50 transition-colors shrink-0 w-full sm:w-auto h-[56px] px-6 shadow-sm"
@@ -804,18 +739,33 @@ export default function Users() {
 			</div>
 
 			{/* User Grid (3 Columns) */}
-			{filteredAndSortedUsers.length === 0 ? (
+			{renderedUsers.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
 					<p className="text-sm text-(--text-muted)">{t('admin.users.noUsersFound')}</p>
 				</div>
 			) : (
-				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
-					<AnimatePresence>
-						{filteredAndSortedUsers.map((user) => (
-							<UserCard key={user.id} user={user} roles={roles} getEnvUrl={getEnvUrl} onUserDeleted={handleUserDeleted} onUserUpdated={handleUserUpdated} />
-						))}
-					</AnimatePresence>
-				</motion.div>
+				<>
+					<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
+						<AnimatePresence>
+							{renderedUsers.map((user) => (
+								<UserCard
+									key={user.id}
+									user={user}
+									roles={roles}
+									getEnvUrl={getEnvUrl}
+									onUserDeleted={handleUserDeleted}
+									onUserUpdated={handleUserUpdated}
+									onDiscordFetched={handleDiscordFetched}
+								/>
+							))}
+						</AnimatePresence>
+					</motion.div>
+					{filteredUsers.length > limit && (
+						<div ref={loadMoreRef} className="h-14 w-full flex items-center justify-center my-6">
+							<Loading />
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);

@@ -147,8 +147,9 @@ export default function Language() {
 						},
 					}),
 				});
-			} catch (err) {
+			} catch (err: any) {
 				console.error('Failed to sync language preference to user profile:', err);
+				toast({ type: 'error', title: 'Failed to sync language', description: err.message });
 			}
 		}
 
@@ -216,7 +217,7 @@ export default function Language() {
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{/* Unified Main Card Wrapper */}
-				<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
+				<div className="relative z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 					{/* Top Section: Main Selector */}
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>

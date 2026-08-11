@@ -93,9 +93,14 @@ function RoleCard({
 			if (res.ok) {
 				const updated = await res.json();
 				onRoleUpdated(updated);
+				toast({ type: 'success', title: 'Role updated successfully' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Unknown error');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Failed to update role:', err);
+			toast({ type: 'error', title: 'Failed to update role', description: err.message });
 		} finally {
 			setSaving(false);
 		}
@@ -110,9 +115,14 @@ function RoleCard({
 
 			if (res.ok) {
 				onRoleDeleted(role.id);
+				toast({ type: 'success', title: 'Role deleted successfully' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Unknown error');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Failed to delete role:', err);
+			toast({ type: 'error', title: 'Failed to delete role', description: err.message });
 		} finally {
 			setDeleting(false);
 			setConfirmDeleteOpen(false);
@@ -344,6 +354,7 @@ function RoleCard({
 
 export default function Roles() {
 	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
 	const { t } = useDictionary();
 
 	const [roles, setRoles] = useState<Role[]>([]);
@@ -423,8 +434,8 @@ export default function Roles() {
 			});
 
 			if (res.ok) {
-				const created = await res.json();
-				setRoles((prev) => [...prev, created]);
+				const newRole = await res.json();
+				setRoles((prev) => [...prev, newRole]);
 				setIsCreateOpen(false);
 				setNewName('');
 				setNewDiscordRoleId('');
@@ -434,9 +445,14 @@ export default function Roles() {
 					resetPerms[p.key] = p.defaultValue;
 				});
 				setNewPermissions(resetPerms);
+				toast({ type: 'success', title: 'Role created successfully' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Unknown error');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Failed to create role:', err);
+			toast({ type: 'error', title: 'Failed to create role', description: err.message });
 		} finally {
 			setCreating(false);
 		}

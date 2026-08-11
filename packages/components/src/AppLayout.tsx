@@ -14,6 +14,7 @@ import {
 	ThemeProvider,
 	ToastProvider,
 	UserProvider,
+	DispatchProvider,
 } from '@xernerx/providers';
 import React, { Suspense } from 'react';
 
@@ -52,16 +53,18 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 								<ThemeProvider>
 									<UserProvider>
 										<NotificationProvider>
-											<ShortcutsProvider>
-												<CookieProvider>
-													<CookiePrompt />
-													<SidebarProvider>
-														<SupportProvider>
-															<Page>{children}</Page>
-														</SupportProvider>
-													</SidebarProvider>
-												</CookieProvider>
-											</ShortcutsProvider>
+											<DispatchProvider>
+												<ShortcutsProvider>
+													<CookieProvider>
+														<CookiePrompt />
+														<SidebarProvider>
+															<SupportProvider>
+																<Page>{children}</Page>
+															</SupportProvider>
+														</SidebarProvider>
+													</CookieProvider>
+												</ShortcutsProvider>
+											</DispatchProvider>
 										</NotificationProvider>
 									</UserProvider>
 								</ThemeProvider>

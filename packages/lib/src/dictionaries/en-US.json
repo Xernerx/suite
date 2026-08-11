@@ -292,11 +292,23 @@
 			"itemDescription": "Configure alerts for {item}.",
 			"categories": {
 				"general": "General",
-				"virtue": "Virtue"
+				"virtue": "Virtue",
+				"api": "API & Developer",
+				"billing": "Billing & Subscriptions",
+				"apps": "Bots & Applications"
 			},
 			"items": {
 				"birthday": "Birthday",
-				"levelup": "Level Up"
+				"levelup": "Level Up",
+				"rateLimitWarning": "Rate Limit Warning",
+				"tokenCreated": "Token Created",
+				"tokenRevoked": "Token Revoked",
+				"downtime": "Service Downtime",
+				"invoicePaid": "Invoice Paid",
+				"subscriptionExpiring": "Subscription Expiring",
+				"paymentFailed": "Payment Failed",
+				"botApproved": "Bot Approved",
+				"botRejected": "Bot Rejected"
 			},
 			"channels": {
 				"discord": "Discord",
@@ -305,7 +317,7 @@
 			},
 			"toast": {
 				"success": "Updated notification preferences",
-				"error": "Failed to save changes"
+				"error": "Failed to save notification preferences."
 			}
 		},
 		"tokens": {

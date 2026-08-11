@@ -34,7 +34,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 	const { icon: Icon, iconWrapper, button } = variantStyles[variant];
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+		<div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
 			<div
 				className="flex flex-col w-full max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}

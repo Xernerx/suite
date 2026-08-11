@@ -3,7 +3,7 @@
 
 import { Coins, Copy, Flame, Gift, Monitor, Pencil, ShieldAlert, ShieldCheck, Smartphone, Tablet, UserIcon, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useEnvironment, usePlatform, useUser } from '@xernerx/providers';
+import { useEnvironment, usePlatform, useUser, useToast } from '@xernerx/providers';
 
 import { Button } from '@xernerx/ui';
 import Image from 'next/image';
@@ -28,6 +28,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 	const { getEnvUrl } = useEnvironment();
 	const { device } = usePlatform();
 	const { mutate } = useUser();
+	const { toast } = useToast();
 	const [roles, setRoles] = useState<Role[]>([]);
 	const [claiming, setClaiming] = useState(false);
 	const [timeLeft, setTimeLeft] = useState<string>('');
@@ -101,9 +102,14 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 					origin: { x: 0.5, y: 0 },
 				});
 				await mutate();
+				toast({ type: 'success', title: 'Daily reward claimed!' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Failed to claim daily reward');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Failed to claim daily reward:', err);
+			toast({ type: 'error', title: 'Failed to claim daily reward', description: err.message });
 		} finally {
 			setClaiming(false);
 		}

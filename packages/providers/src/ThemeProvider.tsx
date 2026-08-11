@@ -100,7 +100,7 @@ function applyAccent(color?: string | number | null) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { data: session } = useSession();
 
 	const [theme, setThemeState] = useState<Theme>(() => {
@@ -114,7 +114,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	// -----------------------------------------------------------------------------
 	// Initial Load & Client Sync Request
 	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
 	useEffect(() => {
+		if (!isReady) return;
 		const storedAccent = getPref('accent') || DEFAULT_ACCENT;
 
 		const accent = tinycolor(storedAccent);

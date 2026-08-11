@@ -14,7 +14,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({ className = 
 
 	const variants = {
 		primary: 'bg-(--accent) text-white shadow-sm hover:shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_40%,transparent)]',
-		secondary: 'bg-(--foreground)/30 backdrop-blur-md text-(--text) shadow-sm hover:bg-(--foreground)/50 hover:border-(--accent)/50',
+		secondary: 'border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-(--text) shadow-sm hover:bg-(--foreground)/50 hover:border-(--accent)/50',
 		outline: 'border border-(--border)/10 bg-transparent text-(--text) hover:bg-(--foreground)/30 hover:backdrop-blur-md',
 		ghost: 'bg-transparent text-(--text) hover:bg-(--foreground)/30 hover:backdrop-blur-md hover:text-(--text)',
 		danger: 'bg-red-500/10 text-red-500 hover:bg-red-500/20 shadow-sm',

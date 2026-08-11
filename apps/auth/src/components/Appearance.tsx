@@ -129,14 +129,19 @@ export default function Appearance() {
 
 		try {
 			const userId = (session.user as any).id;
-			await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
+			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
 				body: JSON.stringify(payload),
 			});
-		} catch (e) {
+			if (!res.ok) {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Failed to sync appearance');
+			}
+		} catch (e: any) {
 			console.error('Failed to sync appearance to server', e);
+			toast({ type: 'error', title: 'Sync Failed', description: e.message || 'Failed to sync appearance' });
 		}
 	};
 
@@ -305,7 +310,7 @@ export default function Appearance() {
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{/* Theme Selector Card */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					className="relative z-50 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -394,7 +399,7 @@ export default function Appearance() {
 
 				{/* Layout Density Selector */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					className="relative z-40 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>

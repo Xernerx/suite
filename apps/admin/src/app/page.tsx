@@ -3,7 +3,7 @@
 'use client';
 
 import { Key, Languages, Shield, Ticket, Users as UsersIcon } from 'lucide-react';
-import { useDictionary, useEnvironment, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import Applications from '@/components/Applications';
@@ -19,6 +19,7 @@ export default function Home() {
 	const { user, loading: userLoading } = useUser() as { user: any; loading: boolean };
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
+	const { toast } = useToast();
 
 	const [roleLoading, setRoleLoading] = useState(true);
 	const [userRolePermissions, setUserRolePermissions] = useState<Record<string, boolean>>({});
@@ -54,8 +55,9 @@ export default function Home() {
 				);
 
 				setUserRolePermissions(mergedPermissions);
-			} catch (err) {
+			} catch (err: any) {
 				console.error('Failed to fetch role permissions:', err);
+				toast({ type: 'error', title: 'Failed to fetch permissions', description: err.message });
 			} finally {
 				setRoleLoading(false);
 			}

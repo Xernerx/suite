@@ -298,11 +298,23 @@
 			"itemDescription": "Configureer waarschuwingen voor {item}.",
 			"categories": {
 				"general": "Algemeen",
-				"virtue": "Virtue"
+				"virtue": "Virtue",
+				"api": "API & Ontwikkelaar",
+				"billing": "Facturering & Abonnementen",
+				"apps": "Bots & Applicaties"
 			},
 			"items": {
 				"birthday": "Verjaardag",
-				"levelup": "Level Up"
+				"levelup": "Niveau Omhoog",
+				"rateLimitWarning": "Limiet Waarschuwing",
+				"tokenCreated": "Token Aangemaakt",
+				"tokenRevoked": "Token Ingetrokken",
+				"downtime": "Service Storing",
+				"invoicePaid": "Factuur Betaald",
+				"subscriptionExpiring": "Abonnement Verloopt",
+				"paymentFailed": "Betaling Mislukt",
+				"botApproved": "Bot Goedgekeurd",
+				"botRejected": "Bot Afgewezen"
 			},
 			"channels": {
 				"discord": "Discord",

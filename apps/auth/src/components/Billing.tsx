@@ -5,7 +5,7 @@ import { AlertTriangle, CreditCard, ExternalLink, Loader2, RefreshCw, ShieldChec
 import { useEffect, useState } from 'react';
 
 import { Button } from '@xernerx/ui';
-import { useEnvironment, useUser } from '@xernerx/providers';
+import { useEnvironment, useUser, useToast } from '@xernerx/providers';
 import { products } from '@xernerx/lib';
 
 interface UserSubscription {
@@ -25,6 +25,7 @@ const allProductIds = [...products.users, ...products.developers, ...(products.s
 export default function Billing() {
 	const { user, loading: userLoading } = useUser() as { user: any; loading?: boolean };
 	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
 
 	const [enriched, setEnriched] = useState<EnrichedSubscription[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -81,9 +82,14 @@ export default function Billing() {
 			});
 			if (res.ok) {
 				setEnriched((prev) => prev.filter((s) => s.stripeSubscriptionId !== stripeSubscriptionId));
+				toast({ type: 'success', title: 'Subscription cancelled successfully' });
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Failed to cancel subscription');
 			}
-		} catch (err) {
+		} catch (err: any) {
 			console.error('Failed to cancel subscription', err);
+			toast({ type: 'error', title: 'Failed to cancel subscription', description: err.message });
 		} finally {
 			setCancellingId(null);
 			setCancelConfirm(null);

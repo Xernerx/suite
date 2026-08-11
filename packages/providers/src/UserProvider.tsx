@@ -27,7 +27,7 @@ function getPref(key: string): string | null {
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
 	const { data: session, status } = useSession();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { setAccent } = useTheme();
 	const { toast } = useToast();
 	const { t } = useDictionary();
@@ -123,8 +123,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	}, [session, status, getEnvUrl, setAccent, toast, t]);
 
 	useEffect(() => {
-		fetchUser();
-	}, [fetchUser]);
+		if (isReady) {
+			fetchUser();
+		}
+	}, [fetchUser, isReady]);
 
 	return <UserContext.Provider value={{ user, mutate: fetchUser, loading }}>{children}</UserContext.Provider>;
 }
