@@ -29,14 +29,32 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const { models } = await database('xernerx');
 		const Application = models.content.applications;
 
-		// Find by custom 'id', apply updates, and return the new document
-		const updatedApplication = await Application.findOneAndUpdate({ id }, body, {
-			after: true,
-			select: '-_id',
-		});
+		const updatedApplication = await Application.findOneAndUpdate(
+			{ id },
+			{ $set: body },
+			{
+				new: true,
+				select: '-_id',
+			}
+		);
 
 		if (!updatedApplication) {
 			return NextResponse.json({ error: 'Application not found' }, { status: 404 });
+		}
+
+		// Handle side-effects for specific application types
+		if (updatedApplication.type === 'organization_invite' && updatedApplication.status === 'approved') {
+			const Organization = models.profiles.organizations;
+			const orgId = updatedApplication.metadata?.organizationId || (updatedApplication.metadata as any)?.get?.('organizationId');
+
+			if (orgId) {
+				const updatedOrg = await Organization.findByIdAndUpdate(orgId, { $addToSet: { members: updatedApplication.userId } });
+				if (!updatedOrg) {
+					throw new Error(`Org not found: ${orgId}`);
+				}
+			} else {
+				throw new Error('Organization ID is missing from invite metadata.');
+			}
 		}
 
 		return NextResponse.json(updatedApplication);

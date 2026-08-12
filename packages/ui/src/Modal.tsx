@@ -39,7 +39,7 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 
 				<div
 					ref={ref}
-					className={`flex flex-col w-full shrink-0 ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative`}
+					className={`flex flex-col w-full shrink-0 ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--foreground)/90 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
 					style={{ padding: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>

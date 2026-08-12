@@ -3,6 +3,7 @@
 
 import { AlertTriangle, Bell, Check, CheckCircle2, ExternalLink, Info, Loader2, Mail, RefreshCw, Trash2, X } from 'lucide-react';
 import { Notification, useEnvironment, useNotifications, useToast } from '@xernerx/providers';
+import { Button } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
 
 import { createPortal } from 'react-dom';
@@ -58,6 +59,29 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 
 			await refresh();
 			setSelectedNotification(null);
+		} catch (err: any) {
+			toast({ title: err.message, type: 'error' });
+		} finally {
+			setIsProcessing(false);
+		}
+	};
+
+	const handleManageInvite = async (newStatus: 'approved' | 'denied') => {
+		if (!selectedNotification) return;
+		setIsProcessing(true);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/applications/${selectedNotification.id}`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ status: newStatus }),
+			});
+			if (!res.ok) throw new Error('Failed to update invite');
+
+			toast({ title: `Invite ${newStatus}!`, type: 'success' });
+			await refresh();
+			setSelectedNotification(null);
+			if (newStatus === 'approved') window.location.reload();
 		} catch (err: any) {
 			toast({ title: err.message, type: 'error' });
 		} finally {
@@ -207,24 +231,37 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 							{/* Modal Footer (Fixed) */}
 							<div className="flex items-center justify-between pt-2 shrink-0 border-t border-(--border)/10 mt-1" style={{ paddingTop: 'calc(var(--ui-gap) * 0.75)' }}>
 								{/* Left Side Actions (Delete & Unread) */}
-								<div className="flex items-center gap-2">
-									<button
-										onClick={handleDelete}
-										disabled={isProcessing}
-										title="Delete Notification"
-										className="flex items-center justify-center h-10 w-10 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-									>
-										{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-									</button>
-									<button
-										onClick={handleMarkUnread}
-										disabled={isProcessing}
-										title="Mark as Unread"
-										className="flex items-center justify-center h-10 w-10 rounded-xl text-(--text-muted) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
-									>
-										{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
-									</button>
-								</div>
+								{selectedNotification.isInvite ? (
+									<div className="flex items-center gap-2">
+										<Button variant="danger" onClick={() => handleManageInvite('denied')} disabled={isProcessing} loading={isProcessing}>
+											{!isProcessing && <X size={16} className="mr-2" />}
+											Decline
+										</Button>
+										<Button variant="primary" onClick={() => handleManageInvite('approved')} disabled={isProcessing} loading={isProcessing}>
+											{!isProcessing && <Check size={16} className="mr-2" />}
+											Accept
+										</Button>
+									</div>
+								) : (
+									<div className="flex items-center gap-2">
+										<button
+											onClick={handleDelete}
+											disabled={isProcessing}
+											title="Delete Notification"
+											className="flex items-center justify-center h-10 w-10 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+										>
+											{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+										</button>
+										<button
+											onClick={handleMarkUnread}
+											disabled={isProcessing}
+											title="Mark as Unread"
+											className="flex items-center justify-center h-10 w-10 rounded-xl text-(--text-muted) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
+										>
+											{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
+										</button>
+									</div>
+								)}
 
 								{/* Right Side Actions (Link & Close) */}
 								<div className="flex items-center gap-2">

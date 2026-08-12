@@ -1,5 +1,11 @@
 # api
 
+## 0.5.3
+
+### Patch Changes
+
+- Fixed organization invite acceptance logic, removed duplicate timezone fields, and updated Next.js 15 header async calls.
+
 ## 0.5.2
 
 ### Patch Changes

@@ -48,8 +48,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const body = await req.json();
 		const { models } = await database('xernerx');
 
-		// findOneAndUpdate with { new: true } returns the updated document rather than the old one
-		const updatedUser = await models.profiles.users.findOneAndUpdate({ id }, { $set: body }, { after: true, runValidators: true });
+		// findOneAndUpdate with { returnDocument: 'after' } returns the updated document rather than the old one
+		const updatedUser = await models.profiles.users.findOneAndUpdate({ id }, { $set: body }, { returnDocument: 'after', runValidators: true });
 
 		if (!updatedUser) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });

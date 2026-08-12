@@ -54,7 +54,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 		const query = isValidObjectId(id) ? { _id: id } : { id };
 
-		const token = await db.models.tokens.apis.findOneAndUpdate(query, { $set: body }, { after: true, runValidators: true });
+		const token = await db.models.tokens.apis.findOneAndUpdate(query, { $set: body }, { returnDocument: 'after', runValidators: true });
 
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });

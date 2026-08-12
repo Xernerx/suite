@@ -6,11 +6,26 @@ import { database } from '@xernerx/lib/server';
 
 export async function GET(req: Request) {
 	try {
+		const { searchParams } = new URL(req.url);
+		const userId = searchParams.get('userId');
+		const organizationId = searchParams.get('organizationId');
+
 		const { models } = await database('xernerx');
 		const Application = models.content.applications;
 
-		// Fetch all, but simplify the response to exclude Mongoose's internal _id and heavy metadata
-		const applications = await Application.find({}, '-_id id userId type status createdAt').sort({ createdAt: -1 });
+		let query: any = {};
+		if (userId) {
+			query.userId = userId;
+		} else if (organizationId) {
+			query['metadata.organizationId'] = organizationId;
+			query.type = 'organization_invite';
+		} else {
+			// For admins (no userId provided), exclude user-level applications like org invites
+			query.type = { $ne: 'organization_invite' };
+		}
+
+		// Fetch all matching, simplifying the response to exclude Mongoose's internal _id and heavy metadata
+		const applications = await Application.find(query, '-_id id userId type status createdAt metadata').sort({ createdAt: -1 });
 
 		return NextResponse.json(applications);
 	} catch (err: any) {

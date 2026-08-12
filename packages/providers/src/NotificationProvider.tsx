@@ -15,6 +15,7 @@ export interface Notification {
 	read: boolean;
 	link: string | null;
 	createdAt: string;
+	isInvite?: boolean;
 }
 
 interface NotificationContextType {
@@ -45,14 +46,37 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 		setIsLoading(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications?userId=${user.id}`), {
-				credentials: 'include',
-			});
+			const [res, appsRes] = await Promise.all([
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications?userId=${user.id}`), { credentials: 'include' }),
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/content/applications?userId=${user.id}`), { credentials: 'include' }),
+			]);
+
+			let combined: Notification[] = [];
 
 			if (res.ok) {
-				const data = await res.json();
-				setNotifications(data);
+				combined = await res.json();
 			}
+
+			if (appsRes.ok) {
+				const appsData = await appsRes.json();
+				const invites = appsData
+					.filter((app: any) => app.type === 'organization_invite' && app.status === 'pending')
+					.map((app: any) => ({
+						id: app.id,
+						userId: app.userId,
+						title: 'Organization Invitation',
+						message: `You have been invited to join ${app.metadata?.organizationName || 'an organization'}.`,
+						type: 'info',
+						read: false,
+						link: null,
+						createdAt: app.createdAt,
+						isInvite: true,
+					}));
+
+				combined = [...combined, ...invites];
+			}
+
+			setNotifications(combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
 		} catch (err) {
 			console.error('Failed to fetch notifications:', err);
 		} finally {

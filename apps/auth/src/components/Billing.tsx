@@ -113,16 +113,12 @@ export default function Billing() {
 
 	const daysUntil = (dateStr: string) => Math.max(0, Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
 
-	// Group by stripeSubscriptionId for multi-item subscriptions (e.g. staff bundles)
-	const grouped = enriched.reduce<Record<string, EnrichedSubscription[]>>((acc, sub) => {
-		(acc[sub.stripeSubscriptionId] ??= []).push(sub);
-		return acc;
-	}, {});
+	// No longer grouping by stripeSubscriptionId, as we want to render each price_id separately
 
 	const isLoading = userLoading || loading;
 
 	return (
-		<div className="flex flex-col max-w-4xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
+		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Header */}
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -167,8 +163,9 @@ export default function Billing() {
 
 				{/* Subscription cards */}
 				{!isLoading &&
-					Object.entries(grouped).map(([subId, items]) => {
-						const renewalDate = items[0]?.currentPeriodEnd;
+					enriched.map((item, index) => {
+						const subId = item.stripeSubscriptionId;
+						const renewalDate = item.currentPeriodEnd;
 						const days = renewalDate ? daysUntil(renewalDate) : null;
 						const isExpiringSoon = days !== null && days <= 7;
 						const isCancelling = cancellingId === subId;
@@ -176,7 +173,7 @@ export default function Billing() {
 
 						return (
 							<div
-								key={subId}
+								key={`${subId}-${item.priceId}-${index}`}
 								className={`flex flex-col rounded-3xl border bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all ${isExpiringSoon ? 'border-yellow-500/30' : 'border-(--border)/10'}`}
 							>
 								{/* Card header */}
@@ -186,27 +183,12 @@ export default function Billing() {
 											<Sparkles size={18} className="text-(--accent)" />
 										</div>
 										<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.15)' }}>
-											<span className="text-base font-bold text-(--text)">{items.length === 1 ? items[0].productName : `${items.length} products`}</span>
-											{items.length === 1 && items[0].productDescription && <span className="text-xs text-(--text-muted) truncate max-w-xs">{items[0].productDescription}</span>}
+											<span className="text-base font-bold text-(--text)">{item.productName}</span>
+											{item.productDescription && <span className="text-xs text-(--text-muted) truncate max-w-xs">{item.productDescription}</span>}
 										</div>
 									</div>
-									<span className={`shrink-0 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${getStatusColor(items[0].status)}`}>{items[0].status}</span>
+									<span className={`shrink-0 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${getStatusColor(item.status)}`}>{item.status}</span>
 								</div>
-
-								{/* Multi-item product list */}
-								{items.length > 1 && (
-									<div className="flex flex-col border-t border-(--border)/10" style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										{items.map((item, i) => (
-											<div key={i} className="flex items-start gap-3">
-												<ShieldCheck size={14} className="text-(--accent) shrink-0 mt-0.5" />
-												<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.1)' }}>
-													<span className="text-sm font-medium text-(--text)">{item.productName}</span>
-													{item.productDescription && <span className="text-xs text-(--text-muted)">{item.productDescription}</span>}
-												</div>
-											</div>
-										))}
-									</div>
-								)}
 
 								{/* Footer: renewal + cancel */}
 								<div

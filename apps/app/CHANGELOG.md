@@ -1,5 +1,11 @@
 # app
 
+## 2.1.3
+
+### Patch Changes
+
+- Fixed organization invite acceptance logic, removed duplicate timezone fields, and updated Next.js 15 header async calls.
+
 ## 2.1.2
 
 ### Patch Changes

@@ -28,6 +28,21 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-	return children;
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+
+export default async function Layout({ children }: { children: React.ReactNode }) {
+	const session = await getServerSession(auth);
+
+	if (!session) {
+		const host = (await headers()).get('host') || '';
+		let url = 'https://auth.xernerx.com/login';
+		if (host.includes('localhost') || host.includes('.dev.')) url = 'https://auth.dev.xernerx.com/login';
+		else if (host.includes('.canary.')) url = 'https://auth.canary.xernerx.com/login';
+		redirect(url);
+	}
+
+	return <>{children}</>;
 }

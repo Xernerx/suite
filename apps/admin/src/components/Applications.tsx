@@ -154,7 +154,7 @@ export default function Applications() {
 	};
 
 	return (
-		<div className="flex flex-col max-w-5xl mx-auto w-full relative" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
+		<div className="flex flex-col max-w-7xl mx-auto w-full relative" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Header */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>

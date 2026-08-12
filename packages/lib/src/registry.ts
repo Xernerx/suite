@@ -12,6 +12,7 @@ import NotificationSchema from './models/xernerx/content/Notification';
 import RoleSchema from './models/xernerx/profiles/Role';
 import UserSchema from './models/xernerx/profiles/User';
 import GuildSchema from './models/xernerx/profiles/Guild';
+import OrganizationSchema from './models/xernerx/profiles/Organization';
 
 export const xernerxModels = {
 	content: {
@@ -46,6 +47,11 @@ export const xernerxModels = {
 			schema: GuildSchema,
 			modelName: 'Guild',
 			collection: 'guilds',
+		},
+		organizations: {
+			schema: OrganizationSchema,
+			modelName: 'Organization',
+			collection: 'organizations',
 		},
 	},
 	stats: {

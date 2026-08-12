@@ -78,7 +78,7 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex w-full items-center justify-between rounded-xl p-3 border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground)/50 focus:border-(--accent) focus:outline-none"
+				className="flex w-full items-center justify-between rounded-xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none"
 				style={{ gap: 'var(--ui-gap)' }}
 			>
 				<span className="font-medium">{selectedOption ? selectedOption.label : placeholder}</span>
@@ -92,7 +92,7 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -4 }}
 						transition={{ duration: 0.15, ease: 'easeOut' }}
-						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-lg"
+						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md shadow-lg"
 						style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
 					>
 						{/* Search Filter Input */}

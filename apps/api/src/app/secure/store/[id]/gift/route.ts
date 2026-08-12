@@ -60,7 +60,7 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 					'credits.giftIn': nextGiftIn,
 				},
 			},
-			{ after: true }
+			{ returnDocument: 'after' }
 		);
 
 		return NextResponse.json({

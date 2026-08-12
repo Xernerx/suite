@@ -27,7 +27,6 @@ export default function Profile() {
 		gender: 'other',
 		pronouns: '',
 		timezone: '',
-		privacy: 'private',
 	});
 
 	const [initialData, setInitialData] = useState({
@@ -37,7 +36,6 @@ export default function Profile() {
 		gender: 'other',
 		pronouns: '',
 		timezone: '',
-		privacy: 'private',
 	});
 
 	const [isSaving, setIsSaving] = useState(false);
@@ -52,7 +50,6 @@ export default function Profile() {
 					gender: user.gender || 'other',
 					pronouns: user.pronouns || '',
 					timezone: user.timezone || '',
-					privacy: user.privacy || 'private',
 				};
 				setFormData(loadedData);
 				setInitialData(loadedData);
@@ -115,7 +112,7 @@ export default function Profile() {
 
 	return (
 		<div
-			className="flex flex-col max-w-4xl mx-auto w-full"
+			className="flex flex-col max-w-7xl mx-auto w-full"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',
@@ -213,51 +210,6 @@ export default function Profile() {
 							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.pronouns.label')}</label>
 							<Input type="text" value={formData.pronouns} onChange={(e) => handleChange('pronouns', e.target.value)} placeholder={t('auth.profile.pronouns.placeholder')} />
 						</div>
-					</div>
-
-					{/* Privacy Level with Info Tooltip */}
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-							<label className="block text-sm font-medium text-(--text)">{t('auth.profile.privacy.label')}</label>
-							<div className="group relative flex items-center">
-								<Info size={16} className="text-(--text-muted) cursor-pointer hover:text-(--text)" />
-								<div
-									className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-72 rounded-2xl border border-(--border)/10 bg-(--background) text-xs text-(--text-muted) shadow-2xl z-55 pointer-events-none"
-									style={{ padding: 'var(--ui-gap)' }}
-								>
-									<p className="font-semibold text-(--text) mb-1.5">{t('auth.profile.privacy.tooltip.title')}</p>
-									<ul className="space-y-1.5">
-										<li>
-											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.privateTitle')}</span> {t('auth.profile.privacy.tooltip.privateDesc')}
-										</li>
-										<li>
-											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.limitedTitle')}</span> {t('auth.profile.privacy.tooltip.limitedDesc')}
-										</li>
-										<li>
-											<span className="font-medium text-(--text)">{t('auth.profile.privacy.tooltip.publicTitle')}</span> {t('auth.profile.privacy.tooltip.publicDesc')}
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-						<Selector
-							value={formData.privacy}
-							onChange={(val: string) => handleChange('privacy', val)}
-							options={[
-								{
-									label: t('auth.profile.privacy.public'),
-									value: 'public',
-								},
-								{
-									label: t('auth.profile.privacy.limited'),
-									value: 'limited',
-								},
-								{
-									label: t('auth.profile.privacy.private'),
-									value: 'private',
-								},
-							]}
-						/>
 					</div>
 
 					<Divider />

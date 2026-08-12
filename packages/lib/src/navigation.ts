@@ -1,6 +1,6 @@
 /** @format */
 
-import { BookOpen, Cloud, Globe, LayoutDashboard, ShieldAlert, Terminal, UserCircle } from 'lucide-react';
+import { BookOpen, Cloud, Globe, LayoutDashboard, ShieldAlert, Terminal, UserCircle, Compass, Building2 } from 'lucide-react';
 
 export type NavigationItem = {
 	label: string;
@@ -11,14 +11,16 @@ export type NavigationItem = {
 };
 
 export const navigation: NavigationItem[] = [
-	// Core Suite
-	{ label: 'Dashboard', href: 'https://app.xernerx.com', icon: LayoutDashboard, category: 'Suite' },
-	{ label: 'Account', href: 'https://auth.xernerx.com', icon: UserCircle, category: 'Suite' },
+	// User
+	{ label: 'Explore', href: 'https://app.xernerx.com', icon: Compass, category: 'User' },
+	{ label: 'Dashboard', href: 'https://app.xernerx.com/dashboard', icon: LayoutDashboard, category: 'User' },
+	{ label: 'Account', href: 'https://auth.xernerx.com', icon: UserCircle, category: 'User' },
 
-	// Developer Tools
-	{ label: 'API', href: 'https://api.xernerx.com', icon: Terminal, category: 'Developers' },
-	{ label: 'Docs', href: 'https://docs.xernerx.com', icon: BookOpen, category: 'Developers' },
-	{ label: 'CDN', href: 'https://cdn.xernerx.com', icon: Cloud, category: 'Developers' },
+	// Developer
+	{ label: 'Portal', href: 'https://app.xernerx.com/portal', icon: Building2, category: 'Developer' },
+	{ label: 'API', href: 'https://api.xernerx.com', icon: Terminal, category: 'Developer' },
+	{ label: 'Docs', href: 'https://docs.xernerx.com', icon: BookOpen, category: 'Developer' },
+	{ label: 'CDN', href: 'https://cdn.xernerx.com', icon: Cloud, category: 'Developer' },
 
 	// External
 	{ label: 'Website', href: 'https://www.xernerx.com', icon: Globe, category: 'Public' },

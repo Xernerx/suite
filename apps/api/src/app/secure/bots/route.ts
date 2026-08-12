@@ -3,6 +3,8 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
 	try {
 		const db = await database('xernerx');
@@ -16,15 +18,19 @@ export async function GET(request: Request) {
 
 		let bots = [];
 
-		if (category === 'promoted') {
+		const owner = url.searchParams.get('owner');
+
+		if (owner) {
+			bots = await BotModel.find({ owners: owner }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).lean();
+		} else if (category === 'promoted') {
 			bots = await BotModel.find({ promotedUntil: { $gt: now } })
-				.select(['id', 'name', 'avatar', 'description', 'voteCount'])
+				.select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization'])
 				.limit(limit)
 				.lean();
 		} else if (category === 'newcomers') {
-			bots = await BotModel.find({}).sort({ createdAt: -1 }).select(['id', 'name', 'avatar', 'description', 'voteCount']).limit(limit).lean();
+			bots = await BotModel.find({}).sort({ createdAt: -1 }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).limit(limit).lean();
 		} else if (category === 'top_voted') {
-			bots = await BotModel.find({}).sort({ voteCount: -1 }).select(['id', 'name', 'avatar', 'description', 'voteCount']).limit(limit).lean();
+			bots = await BotModel.find({}).sort({ voteCount: -1 }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).limit(limit).lean();
 		} else if (category === 'biggest') {
 			const biggestStats = await StatModel.aggregate([
 				{ $sort: { timestamp: -1 } },
@@ -35,7 +41,7 @@ export async function GET(request: Request) {
 
 			const biggestBotIds = biggestStats.map((stat: any) => stat._id);
 			const rawBiggestProfiles = await BotModel.find({ id: { $in: biggestBotIds } })
-				.select(['id', 'name', 'avatar', 'description', 'voteCount'])
+				.select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization'])
 				.lean();
 
 			bots = biggestStats.map((stat: any) => rawBiggestProfiles.find((p: any) => p.id === stat._id)).filter(Boolean);
@@ -44,16 +50,16 @@ export async function GET(request: Request) {
 			bots = await BotModel.find({
 				$or: [{ id: { $regex: query, $options: 'i' } }, { name: { $regex: query, $options: 'i' } }, { tags: { $regex: query, $options: 'i' } }],
 			})
-				.select(['id', 'name', 'avatar', 'description', 'voteCount'])
+				.select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization'])
 				.limit(limit)
 				.lean();
 		} else if (url.searchParams.get('tag')) {
 			// Fetch bots by a specific tag
 			const tag = url.searchParams.get('tag');
-			bots = await BotModel.find({ tags: tag }).select(['id', 'name', 'avatar', 'description', 'voteCount']).limit(limit).lean();
+			bots = await BotModel.find({ tags: tag }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).limit(limit).lean();
 		} else {
 			// Default list behavior
-			bots = await BotModel.find({}).lean().select(['id', 'name', 'avatar', 'description', 'voteCount']);
+			bots = await BotModel.find({}).lean().select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']);
 		}
 
 		return NextResponse.json(bots, { status: 200 });

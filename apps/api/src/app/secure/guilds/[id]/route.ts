@@ -37,11 +37,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const body = await req.json();
 		const db = (await database('xernerx')).models.profiles.guilds as any;
 
-		const updatedGuild = await db.findOneAndUpdate({ id }, { $set: body }, { after: true, upsert: true });
+		const updatedGuild = await db.findOneAndUpdate({ id }, { $set: body }, { returnDocument: 'after', upsert: true });
 
 		return NextResponse.json(updatedGuild, { status: 200 });
 	} catch (error) {
 		console.error('Failed to update guild:', error);
+		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+	}
+}
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		const db = (await database('xernerx')).models.profiles.guilds as any;
+
+		const deletedGuild = await db.findOneAndDelete({ id });
+
+		if (!deletedGuild) {
+			return NextResponse.json({ error: 'Guild not found' }, { status: 404 });
+		}
+
+		return NextResponse.json({ success: true }, { status: 200 });
+	} catch (error) {
+		console.error('Failed to delete guild:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}
 }

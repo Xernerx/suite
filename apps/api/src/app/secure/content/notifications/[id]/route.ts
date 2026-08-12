@@ -30,7 +30,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 		// Find by custom 'id', apply updates (like marking as read), and return the new document
 		const updatedNotification = await Notification.findOneAndUpdate({ id }, body, {
-			after: true,
+			returnDocument: 'after',
 			select: '-_id',
 		});
 

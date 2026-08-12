@@ -121,7 +121,7 @@ function BotCard({ bot }: { bot: BotProfile }) {
 
 export default function Home() {
 	const { hide } = useSidebar();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { type } = usePlatform();
 	const router = useRouter();
 
@@ -167,6 +167,7 @@ export default function Home() {
 
 	// Fetch Bots from Secure Route
 	useEffect(() => {
+		if (!isReady) return;
 		if (context === 'bots') {
 			const fetchBots = async () => {
 				setLoading(true);
@@ -194,7 +195,7 @@ export default function Home() {
 			};
 			fetchBots();
 		}
-	}, [getEnvUrl, context]);
+	}, [getEnvUrl, context, isReady]);
 
 	// Helper to render a category grid
 	const renderCategoryGrid = (title: string, icon: React.ReactNode, botsArray: BotProfile[], categoryId: string) => (
