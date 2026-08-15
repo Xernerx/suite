@@ -1,5 +1,11 @@
 # auth
 
+## 0.6.6
+
+### Patch Changes
+
+- Fix package.json name to resolve vercel build errors
+
 ## 0.6.5
 
 ### Patch Changes

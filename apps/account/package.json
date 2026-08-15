@@ -1,6 +1,6 @@
 {
-	"name": "auth",
-	"version": "0.6.5",
+	"name": "account",
+	"version": "0.6.6",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
