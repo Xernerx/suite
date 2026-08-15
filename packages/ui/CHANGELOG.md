@@ -1,5 +1,11 @@
 # @xernerx/ui
 
+## 0.2.8
+
+### Patch Changes
+
+- @xernerx/providers@0.3.5
+
 ## 0.2.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.3.4
+
+### Patch Changes
+
+- Fix MongoDB connection URI concatenation when base URI has query parameters
+
 ## 0.3.3
 
 ### Patch Changes

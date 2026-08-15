@@ -55,7 +55,14 @@ export async function database(projectId: keyof typeof uris) {
 	// Loop 1: uriSuffix is 'profiles', 'stats', 'tokens'
 	for (const [uriSuffix, collectionsMap] of Object.entries(registry)) {
 		// Connects to mongodb+srv://.../profiles
-		const connectionUri = `${baseUri.replace(/\/$/, '')}/${uriSuffix}`;
+		let connectionUri = '';
+		try {
+			const parsed = new URL(baseUri);
+			parsed.pathname = parsed.pathname === '/' ? `/${uriSuffix}` : `${parsed.pathname.replace(/\/$/, '')}/${uriSuffix}`;
+			connectionUri = parsed.toString();
+		} catch (e) {
+			connectionUri = `${baseUri.replace(/\/$/, '')}/${uriSuffix}`;
+		}
 
 		let conn: Connection | undefined = activeConnections[projectId][uriSuffix];
 
