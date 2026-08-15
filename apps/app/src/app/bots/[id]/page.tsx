@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, use, useRef } from 'react';
-import { useEnvironment, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import { User, Activity, Terminal, ArrowLeft, ExternalLink, ShieldCheck, Server, Users, Hash, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp } from 'lucide-react';
@@ -31,8 +31,9 @@ interface BotProfile {
 
 export default function BotPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params);
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { view, setNavItems, show, hide } = useSidebar();
+	const { t } = useDictionary();
 
 	const [bot, setBot] = useState<BotProfile | null>(null);
 	const [stats, setStats] = useState<any[]>([]);
@@ -89,6 +90,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	useEffect(() => {
 		show();
 		setNavItems([
+			{ label: 'Back to Bots', href: '/bots', icon: ArrowLeft, category: 'Navigation' },
 			{ label: 'Profile', view: 'profile', icon: User, category: 'Bot Details' },
 			{ label: 'Statistics', view: 'stats', icon: Activity, category: 'Bot Details' },
 			{ label: 'Commands', view: 'commands', icon: Terminal, category: 'Bot Details' },
@@ -96,8 +98,18 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 		return () => hide();
 	}, [setNavItems, show, hide]);
 
+	// 1.5. Reset State on ID Change
+	useEffect(() => {
+		setBot(null);
+		setStats([]);
+		statsCache.current = {};
+		setLoading(true);
+		setStatsLoading(true);
+	}, [id]);
+
 	// 2. Fetch Bot Profile
 	useEffect(() => {
+		if (!isReady) return;
 		const fetchBot = async () => {
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${id}/profile`));
@@ -111,10 +123,11 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 			}
 		};
 		fetchBot();
-	}, [id, getEnvUrl]);
+	}, [id, getEnvUrl, isReady]);
 
 	// 3. Fetch Bot Stats (Dynamic by timeframe)
 	useEffect(() => {
+		if (!isReady) return;
 		const fetchStats = async () => {
 			if (statsCache.current[timeframe]) {
 				setStats(statsCache.current[timeframe]);
@@ -143,9 +156,22 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 				const res = await fetch(getEnvUrl(url));
 				if (res.ok) {
 					const data = await res.json();
-					const reversed = data.reverse(); // Reverse to chronological order for charts
-					statsCache.current[timeframe] = reversed;
-					setStats(reversed);
+					const normalized = data.map((s: any) => {
+						let dateObj;
+						if (s.timestamp) dateObj = new Date(s.timestamp);
+						else if (s.createdAt) dateObj = new Date(s.createdAt);
+						let sc = s.shardCount ?? s.shards ?? 0;
+						if (Array.isArray(sc)) sc = sc.length;
+						return {
+							...s,
+							guildCount: s.guildCount ?? s.servers ?? 0,
+							userCount: s.userCount ?? s.users ?? 0,
+							shardCount: typeof sc === 'object' ? 0 : sc,
+							voteCount: s.voteCount ?? s.votes ?? 0,
+						};
+					});
+					statsCache.current[timeframe] = normalized;
+					setStats(normalized);
 				}
 			} catch (error) {
 				console.error('Failed to fetch bot stats', error);
@@ -154,10 +180,11 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 			}
 		};
 		fetchStats();
-	}, [id, getEnvUrl, timeframe]);
+	}, [id, getEnvUrl, timeframe, isReady]);
 
 	// 4. Fetch Vote Status
 	useEffect(() => {
+		if (!isReady) return;
 		const fetchVoteStatus = async () => {
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${id}/vote`), { credentials: 'include' });
@@ -171,7 +198,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 			}
 		};
 		fetchVoteStatus();
-	}, [id, getEnvUrl]);
+	}, [id, getEnvUrl, isReady]);
 
 	const handleVote = async () => {
 		setVoting(true);
@@ -203,11 +230,11 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
 				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					Bot Not Found
+					{t('app.bots.id.text1')}
 				</h2>
-				<p className="text-(--text-muted) mb-8">This bot might have been deleted or is currently private.</p>
+				<p className="text-(--text-muted) mb-8">{t('app.bots.id.text2')}</p>
 				<Link href="/bots">
-					<Button variant="primary">Return to Bots</Button>
+					<Button variant="primary">{t('app.bots.id.text3')}</Button>
 				</Link>
 			</div>
 		);
@@ -232,7 +259,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 					/>
 				)}
 				{avatarUrl ? (
-					<Image src={avatarUrl} alt={bot.name} width={128} height={128} className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10" />
+					<Image src={avatarUrl} alt={bot.discord?.global_name || bot.discord?.username || bot.name || 'Bot Avatar'} width={128} height={128} className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10" />
 				) : (
 					<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg relative z-10">
 						<User className="w-12 h-12" />
@@ -241,10 +268,10 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 				<div className="flex-1 relative z-10">
 					<div className="flex items-center gap-3 mb-2">
 						<h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{bot.discord?.global_name || bot.discord?.username || bot.name}
+							{bot.discord?.global_name || bot.discord?.username || bot.name || 'Unknown Bot'}
 						</h1>
 						{bot.verified && <ShieldCheck className="w-6 h-6 text-green-500" />}
-						{bot.discord?.bot && <span className="px-2 py-0.5 bg-[#5865F2] text-white text-[10px] font-bold rounded-sm uppercase tracking-wider">Bot</span>}
+						{bot.discord?.bot && <span className="px-2 py-0.5 bg-[#5865F2] text-white text-[10px] font-bold rounded-sm uppercase tracking-wider">{t('app.bots.id.text4')}</span>}
 					</div>
 					<p className="text-lg text-(--text-muted) mb-4 max-w-2xl">{bot.description || 'No description provided.'}</p>
 					<div className="flex flex-wrap gap-2">
@@ -261,7 +288,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 						<div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
 							{bot.links?.invite && (
 								<Button onClick={() => window.open(bot.links!.invite, '_blank')} className="w-full sm:w-auto px-8 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
-									Invite Bot
+									{t('app.bots.id.text5')}
 								</Button>
 							)}
 							<Button
@@ -304,7 +331,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 
 					{bot.ownersData && bot.ownersData.length > 0 && (
 						<div className="flex flex-col items-start md:items-end gap-2">
-							<span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-wider">Developed By</span>
+							<span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-wider">{t('app.bots.id.text6')}</span>
 							<div className="flex flex-wrap gap-2 justify-end">
 								{bot.ownersData.map((owner: any) => (
 									<Link
@@ -318,11 +345,12 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 													? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
 													: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator) % 5}.png`
 											}
-											alt={owner.global_name || owner.username}
+											alt={owner.global_name || owner.username || 'Owner Avatar'}
 											width={16}
 											height={16}
 											className="rounded-full"
 										/>
+
 										<span className="text-xs font-bold text-(--text)">{owner.global_name || owner.username}</span>
 									</Link>
 								))}
@@ -337,7 +365,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	// Contextual: Profile View
 	const renderProfile = () => (
 		<div className="prose prose-invert max-w-none prose-headings:font-fredoka prose-a:text-(--accent) bg-(--foreground)/30 p-8 rounded-3xl border border-(--border)/10">
-			{bot.info ? <ReactMarkdown>{bot.info}</ReactMarkdown> : <div className="text-center text-(--text-muted) py-12">No additional information provided by the developer.</div>}
+			{bot.info ? <ReactMarkdown>{bot.info}</ReactMarkdown> : <div className="text-center text-(--text-muted) py-12">{t('app.bots.id.text7')}</div>}
 		</div>
 	);
 
@@ -349,7 +377,8 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 					<Loading variant="small" />
 				</div>
 			);
-		if (stats.length === 0) return <div className="text-center text-(--text-muted) py-12 border border-(--border)/10 rounded-3xl">No historical statistics available.</div>;
+
+		if (stats.length === 0) return <div className="text-center text-(--text-muted) py-12 border border-(--border)/10 rounded-3xl">{t('app.bots.id.text8')}</div>;
 
 		const currentStats = stats[stats.length - 1];
 
@@ -430,7 +459,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 						<div className={`text-3xl font-bold ${activeMetric === 'uptime' ? 'text-white' : 'text-green-400'}`} style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{calculateUptime()}
 						</div>
-						<div className={`text-sm font-semibold uppercase tracking-wider ${activeMetric === 'uptime' ? 'text-(--accent)' : 'text-(--text-muted)'}`}>Uptime</div>
+						<div className={`text-sm font-semibold uppercase tracking-wider ${activeMetric === 'uptime' ? 'text-(--accent)' : 'text-(--text-muted)'}`}>{t('app.bots.id.text9')}</div>
 					</button>
 				</div>
 
@@ -439,15 +468,18 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 					<div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6">
 						<div>
 							<h3 className="text-2xl font-bold mb-1 capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{activeMetric.replace('Count', '')} Growth
+								{activeMetric.replace('Count', '')}
+								{t('app.bots.id.text10')}
 							</h3>
 							<div className="flex flex-wrap items-center gap-4 text-sm font-medium">
 								<span className={`${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'} flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded-md`}>
 									{gainLoss > 0 ? '+' : ''}
-									{activeMetric === 'uptime' ? gainLoss.toFixed(1) : gainLoss.toLocaleString()} ({gainPercentage}%)
+									{activeMetric === 'uptime' ? gainLoss.toFixed(1) : gainLoss.toLocaleString()} ({gainPercentage}
+									{t('app.bots.id.text11')}
 								</span>
 								<span className="text-(--text-muted) bg-(--background) px-2 py-1 rounded-md border border-(--border)/10">
-									Highest: {activeMetric === 'uptime' ? `${highestValue.toFixed(1)}h` : highestValue.toLocaleString()}
+									{t('app.bots.id.text12')}
+									{activeMetric === 'uptime' ? `${highestValue.toFixed(1)}h` : highestValue.toLocaleString()}
 								</span>
 							</div>
 						</div>
@@ -500,6 +532,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 										dy={10}
 										minTickGap={30}
 									/>
+
 									<YAxis
 										stroke="var(--text-muted)"
 										fontSize={12}
@@ -512,6 +545,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 											return val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val;
 										}}
 									/>
+
 									<Tooltip
 										contentStyle={{
 											backgroundColor: 'var(--foreground)',
@@ -522,13 +556,14 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 										itemStyle={{ color: 'var(--text)', fontWeight: 'bold' }}
 										labelFormatter={(label) => new Date(label as string | number).toLocaleString()}
 									/>
+
 									<Line
 										type="monotone"
 										dataKey={activeMetric}
 										name={activeMetric.replace('Count', '')}
 										stroke="var(--accent)"
 										strokeWidth={4}
-										dot={false}
+										dot={chartData.length <= 1 ? { r: 6, fill: 'var(--accent)', strokeWidth: 0 } : false}
 										activeDot={{ r: 8, fill: 'var(--accent)', strokeWidth: 0, stroke: 'var(--background)', strokeOpacity: 0.5 }}
 									/>
 								</LineChart>
@@ -555,13 +590,13 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 						{/* Render Discord Options if present */}
 						{cmd.options && cmd.options.length > 0 && (
 							<div className="bg-(--background) rounded-2xl p-4 border border-(--border)/10">
-								<h4 className="text-xs font-bold text-(--text-muted) uppercase tracking-wider mb-3">Parameters</h4>
+								<h4 className="text-xs font-bold text-(--text-muted) uppercase tracking-wider mb-3">{t('app.bots.id.text13')}</h4>
 								<div className="flex flex-col gap-2">
 									{cmd.options.map((opt: any, j: number) => (
 										<div key={j} className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-(--border)/10 last:border-0 gap-2">
 											<div className="flex items-center gap-2">
 												<span className="font-mono text-sm font-semibold">{opt.name}</span>
-												{opt.required && <span className="text-[10px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full font-bold">Required</span>}
+												{opt.required && <span className="text-[10px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full font-bold">{t('app.bots.id.text14')}</span>}
 											</div>
 											<span className="text-sm text-(--text-muted)">{opt.description}</span>
 										</div>
@@ -572,22 +607,13 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 					</div>
 				))
 			) : (
-				<div className="text-center text-(--text-muted) py-12 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">This bot has not exposed any commands yet.</div>
+				<div className="text-center text-(--text-muted) py-12 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">{t('app.bots.id.text15')}</div>
 			)}
 		</div>
 	);
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pb-24">
-			<div className="flex items-center gap-4 mt-8">
-				<Link
-					href="/bots"
-					className="p-3 rounded-full bg-(--foreground) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 transition-colors shadow-sm"
-				>
-					<ArrowLeft className="w-5 h-5" />
-				</Link>
-				<span className="text-lg font-bold text-(--text-muted)">Back to Bots</span>
-			</div>
 
 			{renderHeader()}
 

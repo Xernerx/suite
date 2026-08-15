@@ -8,59 +8,76 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
 	try {
 		const db = await database('xernerx');
-		const BotModel = db.models.profiles.bots;
-		const StatModel = db.models.stats.bots;
+		const BotModel = (db.models.bots as any).Bot;
 
 		const url = new URL(request.url);
 		const category = url.searchParams.get('category');
-		const limit = parseInt(url.searchParams.get('limit') || '3');
+		const owner = url.searchParams.get('owner');
+		const limit = parseInt(url.searchParams.get('limit') || (owner ? '100' : '3'));
 		const now = new Date();
 
-		let bots = [];
-
-		const owner = url.searchParams.get('owner');
+		let matchStage: any = {};
 
 		if (owner) {
-			bots = await BotModel.find({ owners: owner }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).lean();
-		} else if (category === 'promoted') {
-			bots = await BotModel.find({ promotedUntil: { $gt: now } })
-				.select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization'])
-				.limit(limit)
-				.lean();
-		} else if (category === 'newcomers') {
-			bots = await BotModel.find({}).sort({ createdAt: -1 }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).limit(limit).lean();
-		} else if (category === 'top_voted') {
-			bots = await BotModel.find({}).sort({ voteCount: -1 }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).limit(limit).lean();
-		} else if (category === 'biggest') {
-			const biggestStats = await StatModel.aggregate([
-				{ $sort: { timestamp: -1 } },
-				{ $group: { _id: '$id', guildCount: { $first: '$guildCount' } } },
-				{ $sort: { guildCount: -1 } },
-				{ $limit: limit },
-			]);
-
-			const biggestBotIds = biggestStats.map((stat: any) => stat._id);
-			const rawBiggestProfiles = await BotModel.find({ id: { $in: biggestBotIds } })
-				.select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization'])
-				.lean();
-
-			bots = biggestStats.map((stat: any) => rawBiggestProfiles.find((p: any) => p.id === stat._id)).filter(Boolean);
-		} else if (url.searchParams.get('search')) {
-			const query = url.searchParams.get('search');
-			bots = await BotModel.find({
-				$or: [{ id: { $regex: query, $options: 'i' } }, { name: { $regex: query, $options: 'i' } }, { tags: { $regex: query, $options: 'i' } }],
-			})
-				.select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization'])
-				.limit(limit)
-				.lean();
-		} else if (url.searchParams.get('tag')) {
-			// Fetch bots by a specific tag
-			const tag = url.searchParams.get('tag');
-			bots = await BotModel.find({ tags: tag }).select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']).limit(limit).lean();
+			matchStage = { owners: owner };
 		} else {
-			// Default list behavior
-			bots = await BotModel.find({}).lean().select(['id', 'name', 'avatar', 'description', 'voteCount', 'organization']);
+			matchStage.privacy = 'public';
+			if (category === 'promoted') {
+				matchStage.promotedUntil = { $gt: now };
+			} else if (url.searchParams.get('search')) {
+				const query = url.searchParams.get('search');
+				matchStage.$or = [{ id: { $regex: query, $options: 'i' } }, { 'name': { $regex: query, $options: 'i' } }, { 'tags': { $regex: query, $options: 'i' } }];
+			} else if (url.searchParams.get('tag')) {
+				matchStage.tags = url.searchParams.get('tag');
+			}
 		}
+
+		let sortStage: any = { createdAt: -1 };
+		if (category === 'top_voted') {
+			sortStage = { 'statsData.votes': -1 };
+		} else if (category === 'biggest') {
+			sortStage = { 'statsData.servers': -1 };
+		}
+
+		const bots = await BotModel.aggregate([
+			{ $match: matchStage },
+			{
+				$lookup: {
+					from: 'stats',
+					let: { botId: '$id' },
+					pipeline: [
+						{ $match: { $expr: { $eq: ['$id', '$$botId'] } } },
+						{ $sort: { timestamp: -1 } },
+						{ $limit: 1 }
+					],
+					as: 'statsData'
+				}
+			},
+			{ $unwind: { path: '$statsData', preserveNullAndEmptyArrays: true } },
+			{ $sort: sortStage },
+			{ $limit: limit },
+			{
+				$project: {
+					id: 1,
+					'name': 1,
+					'avatar': 1,
+					'description': 1,
+					organization: 1,
+					stats: {
+						$cond: {
+							if: { $not: ["$statsData"] },
+							then: null,
+							else: {
+								guildCount: { $ifNull: ['$statsData.guildCount', '$statsData.servers'] },
+								userCount: { $ifNull: ['$statsData.userCount', '$statsData.users'] },
+								shardCount: { $ifNull: ['$statsData.shardCount', '$statsData.shards'] },
+								voteCount: { $ifNull: ['$statsData.voteCount', '$statsData.votes'] },
+							}
+						}
+					}
+				}
+			}
+		]);
 
 		return NextResponse.json(bots, { status: 200 });
 	} catch (error) {

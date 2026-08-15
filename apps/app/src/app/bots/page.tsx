@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useEnvironment, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Button, Input } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import Link from 'next/link';
@@ -113,7 +113,8 @@ function BotCard({ bot }: { bot: BotProfile }) {
 }
 
 export default function BotsList() {
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
+	const { t } = useDictionary();
 	const { view, setNavItems, show, hide } = useSidebar();
 	const searchParams = useSearchParams();
 	const router = useRouter();
@@ -125,6 +126,7 @@ export default function BotsList() {
 		show();
 
 		const baseNavItems = [
+			{ label: 'Back to Explore', href: '/', icon: ArrowLeft, category: 'Navigation' },
 			{ label: 'All Bots', view: 'all', icon: Server, category: 'Algorithms' },
 			{ label: 'Top Voted', view: 'top_voted', icon: ChevronUp, category: 'Algorithms' },
 			{ label: 'Biggest on Platform', view: 'biggest', icon: Trophy, category: 'Algorithms' },
@@ -137,6 +139,7 @@ export default function BotsList() {
 
 		// Fetch tags to populate the 'Categories' section
 		const fetchTags = async () => {
+			if (!isReady) return;
 			try {
 				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/bots/tags'), { next: { revalidate: 300 } });
 				if (res.ok) {
@@ -156,10 +159,11 @@ export default function BotsList() {
 		fetchTags();
 
 		return () => hide();
-	}, [setNavItems, show, hide, getEnvUrl]);
+	}, [setNavItems, show, hide, getEnvUrl, isReady]);
 
 	// Fetch Bots based on Sidebar View or Search Query
 	useEffect(() => {
+		if (!isReady) return;
 		const fetchBots = async () => {
 			const searchQuery = searchParams.get('search');
 			let query = '';
@@ -191,16 +195,13 @@ export default function BotsList() {
 			}
 		};
 		fetchBots();
-	}, [view, getEnvUrl, searchParams]);
+	}, [view, getEnvUrl, searchParams, isReady]);
 
 	return (
 		<div className="flex flex-col w-full min-h-screen">
 			{/* Header Navigation */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
 				<div className="flex items-center gap-4">
-					<Link href="/" className="p-3 rounded-full bg-(--foreground) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 transition-colors">
-						<ArrowLeft className="w-5 h-5" />
-					</Link>
 					<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{searchParams.get('search')
 							? `Search: ${searchParams.get('search')}`
@@ -222,7 +223,7 @@ export default function BotsList() {
 					<Input
 						variant="search"
 						shortcut="/"
-						placeholder="Search for a specific bot..."
+						placeholder={t('app.bots.placeholder1')}
 						defaultValue={searchParams.get('search') || ''}
 						onSearch={(val) => {
 							if (val.trim()) {
@@ -248,8 +249,8 @@ export default function BotsList() {
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center py-40 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">
-					<h4 className="text-2xl font-bold text-(--text-muted) mb-2">No bots found</h4>
-					<p className="text-(--text-muted)/70">There are currently no bots available in this category.</p>
+					<h4 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.bots.text1')}</h4>
+					<p className="text-(--text-muted)/70">{t('app.bots.text2')}</p>
 				</div>
 			)}
 		</div>

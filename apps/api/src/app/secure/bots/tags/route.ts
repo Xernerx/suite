@@ -6,9 +6,9 @@ import { database } from '@xernerx/lib/server';
 export async function GET() {
 	try {
 		const db = await database('xernerx');
-		const BotModel = db.models.profiles.bots;
+		const BotModel = (db.models.bots as any).Bot;
 
-		const tags = await BotModel.distinct('tags');
+		const tags = await BotModel.distinct('profile.tags');
 
 		const validTags = tags.filter((tag: any) => typeof tag === 'string' && tag.trim() !== '').sort((a: string, b: string) => a.localeCompare(b));
 
