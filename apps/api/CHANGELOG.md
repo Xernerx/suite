@@ -1,5 +1,11 @@
 # api
 
+## 0.5.6
+
+### Patch Changes
+
+- Removed a bunch of files
+
 ## 0.5.5
 
 ### Patch Changes
