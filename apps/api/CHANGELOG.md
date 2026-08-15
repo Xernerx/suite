@@ -1,5 +1,11 @@
 # api
 
+## 0.5.5
+
+### Patch Changes
+
+- Fix /secure/validate/token endpoint to use the correct users.Token model path
+
 ## 0.5.4
 
 ### Patch Changes
