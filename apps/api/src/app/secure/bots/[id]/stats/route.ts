@@ -18,21 +18,26 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const query: any = { id };
 		if (afterParam) {
 			const afterNumber = parseInt(afterParam, 10);
-			query.$or = [
-				{ timestamp: { $gte: afterNumber } },
-				{ timestamp: { $gte: new Date(afterNumber) } }
-			];
+			query.$or = [{ timestamp: { $gte: afterNumber } }, { timestamp: { $gte: new Date(afterNumber) } }];
 		}
 
-		// Fetch historical stats, sort descending to get newest first, then limit, then reverse to chronological order
-		// Only select necessary fields to avoid hitting Vercel's 4.5MB payload limit
-		const rawStats = await StatModel.find(query)
-			.select('timestamp createdAt guildCount servers userCount users shardCount voteCount votes onlineSince')
-			.sort({ timestamp: -1 })
-			.limit(limit)
-			.lean();
-		const stats = rawStats.reverse();
-		
+		let rawStatsQuery = StatModel.find(query).select('timestamp createdAt guildCount servers userCount users shardCount voteCount votes onlineSince').sort({ timestamp: -1 });
+
+		if (limitParam !== null) {
+			rawStatsQuery = rawStatsQuery.limit(limit);
+		}
+
+		const rawStats = await rawStatsQuery.lean();
+
+		// Downsample to max 'limit' items to avoid payload size limits and frontend lag
+		const downsampled = [];
+		const step = Math.max(1, Math.ceil(rawStats.length / limit));
+		for (let i = 0; i < rawStats.length; i += step) {
+			downsampled.push(rawStats[i]);
+		}
+
+		const stats = downsampled.reverse();
+
 		return NextResponse.json(stats, { status: 200 });
 	} catch (error) {
 		console.error('Failed to fetch bot stats:', error);

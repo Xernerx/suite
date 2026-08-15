@@ -39,7 +39,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 		const sessionWithError = session as { error?: string; accessToken?: string; user?: any };
 
 		if (status === 'authenticated' && sessionWithError?.error === 'RefreshAccessTokenError') {
-			const authLoginUrl = getEnvUrl('https://auth.xernerx.com/login');
+			const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
 			signOut({ callbackUrl: authLoginUrl });
 			return;
 		}
@@ -52,7 +52,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				headers: { Authorization: `Bearer ${sessionWithError.accessToken}` },
 			}).then((res) => res.json());
 		} catch (error) {
-			console.error('Critical error fetching from Discord:', error);
+			console.warn('Critical error fetching from Discord:', error);
 			// We can proceed without discord data if we have to, or return
 		}
 
@@ -63,6 +63,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 			const res = await fetch(`${baseUrl}secure/users/${userId}`, {
 				credentials: 'include',
+				cache: 'no-store',
 			});
 
 			if (res.status === 404) {
@@ -80,14 +81,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 				if (!postRes.ok) {
 					toast({
-						title: t('auth.user.createError'),
+						title: t('account.user.createError'),
 						type: 'error',
 					});
 				} else {
 					xernerx = await postRes.json();
 
 					toast({
-						title: t('auth.user.created'),
+						title: t('account.user.created'),
 						type: 'info',
 					});
 				}
@@ -95,7 +96,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				xernerx = await res.json();
 			} else {
 				toast({
-					title: t('auth.user.fetchError'),
+					title: t('account.user.fetchError'),
 					type: 'error',
 				});
 			}
@@ -112,9 +113,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				setAccent(discord?.accent_color);
 			}
 		} catch (error) {
-			console.error('Critical error fetching from Xernerx API:', error);
+			console.warn('Critical error fetching from Xernerx API:', error);
 			toast({
-				title: t('auth.user.networkError'),
+				title: t('account.user.networkError'),
 				type: 'error',
 			});
 		} finally {

@@ -3,12 +3,11 @@
 'use client';
 
 import { ArrowUpRight, Briefcase, FileText, Headphones, Mail, Shield } from 'lucide-react';
-
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useSidebar, useEnvironment } from '@xernerx/providers';
 import { useEffect } from 'react';
-
+import { useDictionary } from '@xernerx/providers';
 const contacts = [
 	{
 		title: 'General',
@@ -41,18 +40,26 @@ const contacts = [
 		icon: Briefcase,
 	},
 ];
-
 export default function ContactPage() {
+	const { t } = useDictionary();
 	const { hide } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
-
 	useEffect(() => {
 		hide();
 	}, [hide]);
-
 	return (
 		<div className="mx-auto w-full max-w-7xl px-6 py-20">
-			<motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-3xl text-center">
+			<motion.div
+				initial={{
+					opacity: 0,
+					y: 15,
+				}}
+				animate={{
+					opacity: 1,
+					y: 0,
+				}}
+				className="mx-auto max-w-3xl text-center"
+			>
 				<h1
 					className="font-extrabold tracking-tight text-(--text) drop-shadow-sm"
 					style={{
@@ -60,32 +67,42 @@ export default function ContactPage() {
 						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
-					Contact Us
+					{t('www.contact.title')}
 				</h1>
 
 				<p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-(--text-muted)">
-					Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we{"'"}re happy to help. Using the correct contact address helps
-					your message reach the right person faster.
+					{t('www.contact.description')}
+					{"'"}
+					{t('www.contact.description2')}
 				</p>
 			</motion.div>
 
 			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: 0.3 }}
+				initial={{
+					opacity: 0,
+				}}
+				animate={{
+					opacity: 1,
+				}}
+				transition={{
+					delay: 0.3,
+				}}
 				className="mx-auto mt-24 max-w-4xl rounded-3xl p-10 text-center bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md shadow-sm"
 			>
-				<h2 className="text-3xl font-extrabold text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					Looking for documentation?
+				<h2
+					className="text-3xl font-extrabold text-(--text) drop-shadow-sm"
+					style={{
+						fontFamily: 'var(--font-fredoka)',
+					}}
+				>
+					{t('www.contact.title2')}
 				</h2>
 
-				<p className="mx-auto mt-4 max-w-2xl leading-7 text-(--text-muted)">
-					Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.
-				</p>
+				<p className="mx-auto mt-4 max-w-2xl leading-7 text-(--text-muted)">{t('www.contact.description3')}</p>
 
 				<div className="mt-8 flex flex-wrap justify-center gap-4">
 					<Link href={getEnvUrl('https://app.xernerx.com/docs')} className="rounded-xl px-5 py-3 font-medium transition-all duration-200 bg-(--accent) text-(--background) hover:opacity-90">
-						Documentation
+						{t('www.contact.button')}
 					</Link>
 
 					<Link
@@ -94,7 +111,7 @@ export default function ContactPage() {
 						rel="noopener noreferrer"
 						className="rounded-xl px-5 py-3 font-medium transition-all duration-200 border border-(--border)/10 bg-(--foreground) text-(--text) hover:border-(--accent)"
 					>
-						GitHub
+						{t('www.contact.button2')}
 					</Link>
 				</div>
 			</motion.div>
@@ -103,9 +120,17 @@ export default function ContactPage() {
 				{contacts.map((contact, index) => (
 					<motion.div
 						key={contact.email}
-						initial={{ opacity: 0, y: 15 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.05 }}
+						initial={{
+							opacity: 0,
+							y: 15,
+						}}
+						animate={{
+							opacity: 1,
+							y: 0,
+						}}
+						transition={{
+							delay: index * 0.05,
+						}}
 						className="group relative overflow-hidden rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md hover:border-(--accent)/50 hover:bg-(--foreground)/50 shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all"
 					>
 						<div
@@ -126,7 +151,12 @@ export default function ContactPage() {
 								<contact.icon size={24} />
 							</div>
 
-							<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							<h2
+								className="text-2xl font-bold text-(--text)"
+								style={{
+									fontFamily: 'var(--font-fredoka)',
+								}}
+							>
 								{contact.title}
 							</h2>
 

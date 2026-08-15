@@ -260,7 +260,7 @@
 			}
 		}
 	},
-	"auth": {
+	"account": {
 		"account": {
 			"title": "Configuración de la cuenta",
 			"description": "Administra la sesión de tu cuenta, la privacidad de los datos y los detalles globales del perfil.",

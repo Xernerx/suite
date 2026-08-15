@@ -46,39 +46,45 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 		setIsLoading(true);
 		try {
-			const [res, appsRes] = await Promise.all([
-				fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications?userId=${user.id}`), { credentials: 'include' }),
-				fetch(getEnvUrl(`https://api.xernerx.com/secure/content/applications?userId=${user.id}`), { credentials: 'include' }),
-			]);
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch?targetId=${user.id}`), { credentials: 'include' });
 
 			let combined: Notification[] = [];
 
 			if (res.ok) {
-				combined = await res.json();
-			}
+				const dispatchData = await res.json();
 
-			if (appsRes.ok) {
-				const appsData = await appsRes.json();
-				const invites = appsData
-					.filter((app: any) => app.type === 'organization_invite' && app.status === 'pending')
-					.map((app: any) => ({
-						id: app.id,
-						userId: app.userId,
-						title: 'Organization Invitation',
-						message: `You have been invited to join ${app.metadata?.organizationName || 'an organization'}.`,
-						type: 'info',
-						read: false,
-						link: null,
-						createdAt: app.createdAt,
-						isInvite: true,
-					}));
-
-				combined = [...combined, ...invites];
+				combined = dispatchData.map((d: any) => {
+					if (d.category === 'invite' && d.status === 'pending') {
+						return {
+							id: d.id,
+							userId: d.targetId,
+							title: 'Organization Invitation',
+							message: `You have been invited to join ${d.data?.organizationName || 'an organization'}.`,
+							type: 'info',
+							read: false,
+							link: null,
+							createdAt: d.createdAt,
+							isInvite: true,
+						};
+					} else {
+						return {
+							id: d.id,
+							userId: d.targetId,
+							title: d.data?.title || 'Notification',
+							message: d.data?.message || '',
+							type: d.data?.type || 'info',
+							read: d.status === 'read',
+							link: d.data?.link || null,
+							createdAt: d.createdAt,
+							isInvite: false,
+						};
+					}
+				});
 			}
 
 			setNotifications(combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
 		} catch (err) {
-			console.error('Failed to fetch notifications:', err);
+			console.warn('Failed to fetch notifications:', err);
 		} finally {
 			setIsLoading(false);
 		}
@@ -102,14 +108,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 		// 2. Database Update
 		try {
-			await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications/${id}`), {
+			await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${id}`), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({ read: true }),
+				body: JSON.stringify({ status: 'read' }),
 			});
 		} catch (err) {
-			console.error('Failed to mark notification as read:', err);
+			console.warn('Failed to mark notification as read:', err);
 			// Optionally, revert the optimistic update here if the request fails
 			setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: false } : n)));
 		}
@@ -125,20 +131,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 		// 2. Database Update (Firing Promises in parallel)
 		// Note: If users get thousands of notifications, you might want to create a dedicated
-		// PATCH /secure/content/notifications route to mass-update them in one DB query.
+		// PATCH /secure/dispatch route to mass-update them in one DB query.
 		try {
 			await Promise.all(
 				unreadIds.map((id) =>
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications/${id}`), {
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${id}`), {
 						method: 'PATCH',
 						headers: { 'Content-Type': 'application/json' },
 						credentials: 'include',
-						body: JSON.stringify({ read: true }),
+						body: JSON.stringify({ status: 'read' }),
 					})
 				)
 			);
 		} catch (err) {
-			console.error('Failed to mark all notifications as read:', err);
+			console.warn('Failed to mark all notifications as read:', err);
 		}
 	};
 

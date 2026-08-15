@@ -35,6 +35,12 @@ const cascadiaCode = Cascadia_Code({
 });
 
 export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {
+	React.useEffect(() => {
+		if (typeof document !== 'undefined') {
+			document.body.classList.add(fredoka.variable, cascadiaCode.variable);
+		}
+	}, []);
+
 	return (
 		<Suspense fallback={<Loading />}>
 			<div
@@ -46,8 +52,8 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 			>
 				<ThemeScript />
 
-				<ToastProvider>
-					<DictionaryProvider dictionary={dictionary}>
+				<DictionaryProvider dictionary={dictionary}>
+					<ToastProvider>
 						<EnvironmentProvider initialEnvironment={initialEnvironment}>
 							<PlatformProvider>
 								<ThemeProvider>
@@ -70,8 +76,8 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 								</ThemeProvider>
 							</PlatformProvider>
 						</EnvironmentProvider>
-					</DictionaryProvider>
-				</ToastProvider>
+					</ToastProvider>
+				</DictionaryProvider>
 			</div>
 		</Suspense>
 	);

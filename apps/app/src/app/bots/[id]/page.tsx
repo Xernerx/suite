@@ -164,6 +164,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 						if (Array.isArray(sc)) sc = sc.length;
 						return {
 							...s,
+							timestamp: dateObj ? dateObj.getTime() : 0,
 							guildCount: s.guildCount ?? s.servers ?? 0,
 							userCount: s.userCount ?? s.users ?? 0,
 							shardCount: typeof sc === 'object' ? 0 : sc,
@@ -210,6 +211,13 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 			if (res.ok) {
 				setCanVote(false);
 				setNextVoteAt(new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString());
+				setBot((prev: any) => (prev ? { ...prev, voteCount: (prev.voteCount || 0) + 1 } : prev));
+				setStats((prev: any) => {
+					if (!prev || !prev.length) return prev;
+					const last = prev[prev.length - 1];
+					return [...prev, { ...last, voteCount: (last.voteCount || 0) + 1, timestamp: Date.now() }];
+				});
+				statsCache.current = {};
 			}
 		} catch (error) {
 			console.error('Failed to vote', error);
@@ -259,7 +267,13 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 					/>
 				)}
 				{avatarUrl ? (
-					<Image src={avatarUrl} alt={bot.discord?.global_name || bot.discord?.username || bot.name || 'Bot Avatar'} width={128} height={128} className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10" />
+					<Image
+						src={avatarUrl}
+						alt={bot.discord?.global_name || bot.discord?.username || bot.name || 'Bot Avatar'}
+						width={128}
+						height={128}
+						className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10"
+					/>
 				) : (
 					<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg relative z-10">
 						<User className="w-12 h-12" />
@@ -435,7 +449,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 						{ id: 'guildCount', label: 'Servers', value: currentStats.guildCount, icon: Server },
 						{ id: 'userCount', label: 'Users', value: currentStats.userCount, icon: Users },
 						{ id: 'shardCount', label: 'Shards', value: currentStats.shardCount, icon: Activity },
-						{ id: 'voteCount', label: 'Votes', value: currentStats.voteCount, icon: ShieldCheck },
+						{ id: 'voteCount', label: 'Votes', value: (bot as any).voteCount || currentStats.voteCount || 0, icon: ShieldCheck },
 					].map((metric) => (
 						<button
 							key={metric.label}
@@ -555,12 +569,24 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 										}}
 										itemStyle={{ color: 'var(--text)', fontWeight: 'bold' }}
 										labelFormatter={(label) => new Date(label as string | number).toLocaleString()}
+										separator=" "
+										formatter={(value: any) => value.toLocaleString()}
 									/>
 
 									<Line
 										type="monotone"
 										dataKey={activeMetric}
-										name={activeMetric.replace('Count', '')}
+										name={
+											activeMetric === 'guildCount'
+												? 'Servers'
+												: activeMetric === 'userCount'
+													? 'Users'
+													: activeMetric === 'shardCount'
+														? 'Shards'
+														: activeMetric === 'voteCount'
+															? 'Votes'
+															: 'Uptime'
+										}
 										stroke="var(--accent)"
 										strokeWidth={4}
 										dot={chartData.length <= 1 ? { r: 6, fill: 'var(--accent)', strokeWidth: 0 } : false}
@@ -614,7 +640,6 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pb-24">
-
 			{renderHeader()}
 
 			<div className="mt-4">

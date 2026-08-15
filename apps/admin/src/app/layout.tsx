@@ -67,12 +67,12 @@ export default async function RootLayout({
 
 	if (session?.user) {
 		const db = await database('xernerx');
-		const userDoc = await db.models.profiles.users.findOne({ id: (session.user as any)?.id });
+		const userDoc = await (db.models.users as any).User.findOne({ id: (session.user as any)?.id });
 
 		const userRoles = Array.isArray(userDoc?.roles) ? userDoc.roles : [];
 
 		if (userRoles.length > 0) {
-			const roleDocs = await db.models.profiles.roles.find({ id: { $in: userRoles } });
+			const roleDocs = await (db.models.core as any).Role.find({ id: { $in: userRoles } }).lean();
 
 			if (roleDocs.some((roleDoc: any) => roleDoc.permissions?.access === true)) {
 				isAuthorized = true;
@@ -82,7 +82,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
-			<body style={themeProps.style}>
+			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict}>{isAuthorized && session ? children : <ReturnPage session={session} />}</AppLayout>
 				</SessionProvider>

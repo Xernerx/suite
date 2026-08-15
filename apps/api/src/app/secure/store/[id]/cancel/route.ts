@@ -15,7 +15,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		if (!userId) return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
 
-		const user = await (await database('xernerx')).models.profiles.users.findOne({ id: userId });
+		const user = await (await database('xernerx')).models.users.User.findOne({ id: userId });
 		if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
 		if (user.stripeCustomerId) {

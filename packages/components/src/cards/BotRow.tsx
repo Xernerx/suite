@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import Link from 'next/link';
 import { Server, Users, ChevronUp, Bot } from 'lucide-react';
@@ -22,6 +22,7 @@ interface DiscordProfile {
 
 export function BotRow({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPrefix?: string }) {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 	const [discord, setDiscord] = useState<DiscordProfile | null>(null);
 	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -83,13 +84,13 @@ export function BotRow({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPre
 				<div className="hidden sm:flex items-center gap-4">
 					<div className="flex flex-col items-end">
 						<span className="text-xs font-semibold text-(--text)">{stats.guildCount >= 1000 ? `${(stats.guildCount / 1000).toFixed(1)}k` : stats.guildCount}</span>
-						<span className="text-[10px] text-(--text-muted) uppercase tracking-widest">Servers</span>
+						<span className="text-[10px] text-(--text-muted) uppercase tracking-widest">{t('components.cards.botrow.text1')}</span>
 					</div>
 					<div className="flex flex-col items-end">
 						<span className="text-xs font-semibold text-(--text)">
 							{stats.userCount >= 1000000 ? `${(stats.userCount / 1000000).toFixed(1)}M` : stats.userCount >= 1000 ? `${(stats.userCount / 1000).toFixed(1)}k` : stats.userCount}
 						</span>
-						<span className="text-[10px] text-(--text-muted) uppercase tracking-widest">Users</span>
+						<span className="text-[10px] text-(--text-muted) uppercase tracking-widest">{t('components.cards.botrow.text2')}</span>
 					</div>
 				</div>
 			)}

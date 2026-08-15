@@ -31,15 +31,15 @@ export default function ReturnPage({ session }: { session: Session | null }) {
 				</div>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					<h1 className="text-xl font-bold text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{t('auth.unauthorized.title')}
+						{t('account.unauthorized.title')}
 					</h1>
-					<p className="text-sm text-(--text-muted)">{t('auth.unauthorized.description')}</p>
+					<p className="text-sm text-(--text-muted)">{t('account.unauthorized.description')}</p>
 				</div>
 				{session ? (
-					<Button onClick={() => router.back()}>{t('auth.unauthorized.button')}</Button>
+					<Button onClick={() => router.back()}>{t('account.unauthorized.button')}</Button>
 				) : (
 					<Button>
-						<Link href={getEnvUrl('https://auth.xernerx.com')}>{t('common.sidebar.login')}</Link>
+						<Link href={getEnvUrl('https://account.xernerx.com')}>{t('common.sidebar.login')}</Link>
 					</Button>
 				)}
 			</div>

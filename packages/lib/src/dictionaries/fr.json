@@ -264,7 +264,7 @@
 			}
 		}
 	},
-	"auth": {
+	"account": {
 		"account": {
 			"title": "Paramètres du compte",
 			"description": "Gérez votre session de compte, la confidentialité de vos données et les informations générales de votre profil.",

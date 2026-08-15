@@ -1,5 +1,11 @@
 # app
 
+## 2.1.4
+
+### Patch Changes
+
+- Resolve token modal issues, fix auth user IDs, apply custom ui, and trigger vercel builds.
+
 ## 2.1.3
 
 ### Patch Changes

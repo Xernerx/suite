@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
-	allowedDevOrigins: ['*.dev.xernerx.com'],
+	allowedDevOrigins: process.env.DOMAIN ? ['*.dev.xernerx.com', 'localhost', process.env.DOMAIN] : ['*.dev.xernerx.com', 'localhost'],
 	turbopack: {
 		rules: {
 			'*.svg': {

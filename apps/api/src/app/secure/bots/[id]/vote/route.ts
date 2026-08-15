@@ -18,17 +18,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		const userId = session.user.id;
 
 		const db = await database('xernerx');
-		const BotModel = (db.models.bots as any).Bot;
+		const VoteModel = (db.models.bots as any).Vote;
 
-		const bot = await BotModel.findOne({ id }).select('votes').lean();
-		const userVotes = bot?.votes?.filter((v: any) => v.userId === userId) || [];
-		const lastVote = userVotes.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+		const lastVote = await VoteModel.findOne({ botId: id, userId }).sort({ createdAt: -1 }).lean();
 
 		if (!lastVote) {
 			return NextResponse.json({ canVote: true, nextVoteAt: null }, { status: 200 });
 		}
 
-		const nextVoteAt = new Date(new Date(lastVote.timestamp).getTime() + COOLDOWN_HOURS * 60 * 60 * 1000);
+		const nextVoteAt = new Date(new Date(lastVote.createdAt).getTime() + COOLDOWN_HOURS * 60 * 60 * 1000);
 		const canVote = new Date() >= nextVoteAt;
 
 		return NextResponse.json({ canVote, nextVoteAt: nextVoteAt.toISOString() }, { status: 200 });
@@ -49,33 +47,38 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 		const userId = session.user.id;
 
 		const db = await database('xernerx');
-		const BotModel = (db.models.bots as any).Bot;
-		const StatModel = (db.models.bots as any).Stat;
-		const UserModel = (db.models.users as any).User;
+		const VoteModel = (db.models.bots as any).Vote;
 
 		// 1. Check cooldown
-		const bot = await BotModel.findOne({ id }).select('votes').lean();
-		const userVotes = bot?.votes?.filter((v: any) => v.userId === userId) || [];
-		const lastVote = userVotes.sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+		const lastVote = await VoteModel.findOne({ botId: id, userId }).sort({ createdAt: -1 }).lean();
 
 		if (lastVote) {
-			const nextVoteAt = new Date(new Date(lastVote.timestamp).getTime() + COOLDOWN_HOURS * 60 * 60 * 1000);
+			const nextVoteAt = new Date(new Date(lastVote.createdAt).getTime() + COOLDOWN_HOURS * 60 * 60 * 1000);
 			if (new Date() < nextVoteAt) {
 				return NextResponse.json({ error: 'Cooldown active', nextVoteAt: nextVoteAt.toISOString() }, { status: 429 });
 			}
 		}
 
-		// 2 & 3. Log the vote and increment cache
-		await BotModel.updateOne(
-			{ id },
-			{
-				$push: { votes: { userId, timestamp: new Date() } },
-				$inc: { voteCount: 1 }
-			}
-		);
+		// 2. Log the vote in the distinct collection
+		await VoteModel.create({ botId: id, userId });
 
-		// 4. Reward the user with 100 credits
-		await UserModel.updateOne({ id: userId }, { $inc: { 'billing.credits.balance': 100 } });
+		// 2.5 Immediately push a new stat to the historical log so the graph updates instantly
+		const totalVotes = await VoteModel.countDocuments({ botId: id });
+		const StatModel = (db.models.bots as any).Stat;
+		const latestStat = await StatModel.findOne({ id }).sort({ timestamp: -1 }).lean();
+
+		await StatModel.create({
+			id,
+			guildCount: latestStat?.guildCount ?? 0,
+			shardCount: latestStat?.shardCount ?? 0,
+			userCount: latestStat?.userCount ?? 0,
+			voteCount: totalVotes,
+			timestamp: new Date(),
+		});
+
+		// 3. Reward the user with 100 credits
+		const CreditModel = (db.models.users as any).Credit;
+		await CreditModel.updateOne({ ownerId: userId }, { $inc: { balance: 100 } }, { upsert: true });
 
 		return NextResponse.json({ success: true, message: 'Vote cast successfully and 100 credits awarded' }, { status: 201 });
 	} catch (error) {

@@ -1,5 +1,5 @@
 /** @format */
-import 'server-only';
+
 import { ServerClient } from 'postmark';
 import { render } from '@react-email/render';
 
@@ -48,6 +48,8 @@ export async function sendWebhook(payload: WebhookPayload) {
 			body: JSON.stringify({
 				content: payload.content,
 				embeds: payload.embeds,
+				username: 'Xernerx App',
+				avatar_url: 'https://xernerx.com/logo.png',
 			}),
 		});
 

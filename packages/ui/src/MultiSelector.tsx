@@ -5,13 +5,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Search } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from './Button';
-
+import { useDictionary } from '@xernerx/providers';
 export interface MultiSelectorOption {
 	label: string;
 	value: string;
 	color?: string;
 }
-
 export interface MultiSelectorProps {
 	label?: string;
 	value: string[];
@@ -23,13 +22,12 @@ export interface MultiSelectorProps {
 	searchable?: boolean;
 	searchPlaceholder?: string;
 }
-
 export function MultiSelector({ value, options, onChange, placeholder = 'Select', className, toggleClassName, label, searchable = true, searchPlaceholder = 'Search...' }: MultiSelectorProps) {
+	const { t } = useDictionary();
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const ref = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
-
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
 			if (!ref.current?.contains(event.target as Node)) {
@@ -37,11 +35,9 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 				setQuery('');
 			}
 		}
-
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
-
 	useEffect(() => {
 		if (open && searchable) {
 			setTimeout(() => inputRef.current?.focus(), 50);
@@ -49,35 +45,27 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 			setQuery('');
 		}
 	}, [open, searchable]);
-
 	function toggle(option: string) {
 		if (value.includes(option)) {
 			onChange(value.filter((x) => x !== option));
 			return;
 		}
-
 		onChange([...value, option]);
 	}
-
 	function displayValue() {
 		if (!value.length) return placeholder;
-
 		if (value.length === 1) {
 			return options.find((x) => x.value === value[0])?.label ?? placeholder;
 		}
-
 		if (value.length === 2) {
 			return value
 				.map((v) => options.find((x) => x.value === v)?.label)
 				.filter(Boolean)
 				.join(', ');
 		}
-
 		return `${value.length} selected`;
 	}
-
 	const filteredOptions = options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()));
-
 	return (
 		<div ref={ref} className={`relative w-full ${className ?? ''}`}>
 			{label && <label className="mb-2 block text-sm font-medium text-(--text)">{label}</label>}
@@ -93,7 +81,6 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 						<div className="flex -space-x-1.5">
 							{value.slice(0, 3).map((selectedValue) => {
 								const option = options.find((x) => x.value === selectedValue);
-
 								return (
 									<div
 										key={selectedValue}
@@ -116,10 +103,22 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 			<AnimatePresence>
 				{open && (
 					<motion.div
-						initial={{ opacity: 0, y: -4 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -4 }}
-						transition={{ duration: 0.15, ease: 'easeOut' }}
+						initial={{
+							opacity: 0,
+							y: -4,
+						}}
+						animate={{
+							opacity: 1,
+							y: 0,
+						}}
+						exit={{
+							opacity: 0,
+							y: -4,
+						}}
+						transition={{
+							duration: 0.15,
+							ease: 'easeOut',
+						}}
 						className="absolute left-0 top-[calc(100%+8px)] z-[100] w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl p-2"
 					>
 						<div className="flex flex-col gap-1">
@@ -140,7 +139,6 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 							<div className="max-h-72 overflow-y-auto pr-1 flex flex-col gap-1">
 								{filteredOptions.map((option) => {
 									const selected = value.includes(option.value);
-
 									return (
 										<Button
 											key={option.value}
@@ -162,7 +160,7 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 									);
 								})}
 
-								{!filteredOptions.length && <div className="py-4 text-center text-sm text-(--text-muted)">No options</div>}
+								{!filteredOptions.length && <div className="py-4 text-center text-sm text-(--text-muted)">{t('common.multiselector.description')}</div>}
 							</div>
 						</div>
 					</motion.div>

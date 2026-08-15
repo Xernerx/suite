@@ -40,14 +40,18 @@ export function Footer() {
 				{/* ---------------------------------------------------------------- */}
 				<div className="flex flex-col justify-between text-center md:text-left" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-						<h2 className="text-lg font-semibold text-(--text)">Xernerx Studios</h2>
+						<h2 className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</h2>
 
 						<p className="max-w-md leading-7 text-(--text-muted)">
 							{t('common.footer.tagline', {}, 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.')}
 						</p>
 					</div>
 
-					<div className="text-sm text-(--text-muted)">© 2024 - {new Date().getFullYear()} Xernerx Studios</div>
+					<div className="text-sm text-(--text-muted)">
+						{t('components.footer.text2')}
+						{new Date().getFullYear()}
+						{t('components.footer.text3')}
+					</div>
 				</div>
 				{/* ---------------------------------------------------------------- */}
 				{/* Resources */}

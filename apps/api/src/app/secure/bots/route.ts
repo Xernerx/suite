@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 				matchStage.promotedUntil = { $gt: now };
 			} else if (url.searchParams.get('search')) {
 				const query = url.searchParams.get('search');
-				matchStage.$or = [{ id: { $regex: query, $options: 'i' } }, { 'name': { $regex: query, $options: 'i' } }, { 'tags': { $regex: query, $options: 'i' } }];
+				matchStage.$or = [{ id: { $regex: query, $options: 'i' } }, { name: { $regex: query, $options: 'i' } }, { tags: { $regex: query, $options: 'i' } }];
 			} else if (url.searchParams.get('tag')) {
 				matchStage.tags = url.searchParams.get('tag');
 			}
@@ -34,9 +34,9 @@ export async function GET(request: Request) {
 
 		let sortStage: any = { createdAt: -1 };
 		if (category === 'top_voted') {
-			sortStage = { 'statsData.votes': -1 };
+			sortStage = { 'statsData.voteCount': -1 };
 		} else if (category === 'biggest') {
-			sortStage = { 'statsData.servers': -1 };
+			sortStage = { 'statsData.guildCount': -1 };
 		}
 
 		const bots = await BotModel.aggregate([
@@ -45,13 +45,9 @@ export async function GET(request: Request) {
 				$lookup: {
 					from: 'stats',
 					let: { botId: '$id' },
-					pipeline: [
-						{ $match: { $expr: { $eq: ['$id', '$$botId'] } } },
-						{ $sort: { timestamp: -1 } },
-						{ $limit: 1 }
-					],
-					as: 'statsData'
-				}
+					pipeline: [{ $match: { $expr: { $eq: ['$id', '$$botId'] } } }, { $sort: { timestamp: -1 } }, { $limit: 1 }],
+					as: 'statsData',
+				},
 			},
 			{ $unwind: { path: '$statsData', preserveNullAndEmptyArrays: true } },
 			{ $sort: sortStage },
@@ -59,24 +55,25 @@ export async function GET(request: Request) {
 			{
 				$project: {
 					id: 1,
-					'name': 1,
-					'avatar': 1,
-					'description': 1,
+					name: 1,
+					avatar: 1,
+					description: 1,
 					organization: 1,
+					voteCount: { $ifNull: ['$statsData.voteCount', '$statsData.votes', 0] },
 					stats: {
 						$cond: {
-							if: { $not: ["$statsData"] },
+							if: { $not: ['$statsData'] },
 							then: null,
 							else: {
 								guildCount: { $ifNull: ['$statsData.guildCount', '$statsData.servers'] },
 								userCount: { $ifNull: ['$statsData.userCount', '$statsData.users'] },
 								shardCount: { $ifNull: ['$statsData.shardCount', '$statsData.shards'] },
 								voteCount: { $ifNull: ['$statsData.voteCount', '$statsData.votes'] },
-							}
-						}
-					}
-				}
-			}
+							},
+						},
+					},
+				},
+			},
 		]);
 
 		return NextResponse.json(bots, { status: 200 });

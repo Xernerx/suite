@@ -1,5 +1,5 @@
 /** @format */
-import React from 'react';
+
 import { Html, Head, Body, Container, Text, Section, Link, Heading } from '@react-email/components';
 
 export interface BasicTemplateProps {

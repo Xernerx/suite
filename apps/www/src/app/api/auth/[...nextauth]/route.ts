@@ -28,8 +28,8 @@ const handler = NextAuth({
 			return {
 				...session,
 				user: {
-					id: token.sub,
 					...session.user,
+					id: token.sub as string,
 				},
 				accessToken: token.accessToken,
 			};

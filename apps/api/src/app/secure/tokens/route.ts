@@ -16,14 +16,20 @@ export async function GET(request: NextRequest) {
 
 		const userId = (session.user as any).id;
 		const db = await database('xernerx');
+		const TokenModel = (db.models.users as any).Token;
 
-		const filter: Record<string, string> = {};
+		let tokens: any[] = [];
 
-		if (!admin) filter.owners = userId;
+		if (admin) {
+			tokens = await TokenModel.find({}).lean();
+		} else {
+			tokens = await TokenModel.find({ owners: userId }).lean();
+		}
 
-		const tokens = await db.models.tokens.apis.find(filter).select(['_id', 'status', 'name']);
+		// Clean up for standard view format
+		const formattedTokens = tokens.map((t) => ({ id: t.id, status: t.status, name: t.name }));
 
-		return NextResponse.json(tokens, { status: 200 });
+		return NextResponse.json(formattedTokens, { status: 200 });
 	} catch (error) {
 		console.error('GET Secure Tokens Error:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

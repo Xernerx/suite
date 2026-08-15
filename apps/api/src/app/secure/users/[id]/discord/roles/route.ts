@@ -19,13 +19,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		}
 
 		const { models } = await database('xernerx');
-		const user = await models.profiles.users.findOne({ id: userId });
+		const user = await models.users.User.findOne({ id: userId });
 
 		if (!user) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
-		const guildId = process.env.DISCORD_GUILD_ID;
+		const adminServerSetting = await models.core.Setting.findOne({ id: 'admin_server_id' }).lean();
+		const guildId = adminServerSetting?.value;
 		const botToken = process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!guildId || !botToken) {
@@ -63,13 +64,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 		}
 
 		const { models } = await database('xernerx');
-		const user = await models.profiles.users.findOne({ id: userId });
+		const user = await models.users.User.findOne({ id: userId });
 
 		if (!user) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
-		const guildId = process.env.DISCORD_GUILD_ID;
+		const adminServerSetting = await models.core.Setting.findOne({ id: 'admin_server_id' }).lean();
+		const guildId = adminServerSetting?.value;
 		const botToken = process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!guildId || !botToken) {

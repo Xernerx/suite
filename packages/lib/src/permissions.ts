@@ -39,9 +39,21 @@ export const permissions: PermissionDefinition[] = [
 		defaultValue: false,
 	},
 	{
-		key: 'applications',
+		key: 'applications_review',
+		label: 'Review Applications',
+		description: 'Permission to review and process user applications.',
+		defaultValue: false,
+	},
+	{
+		key: 'applications_manage',
 		label: 'Manage Applications',
-		description: 'Permission review applications by users.',
+		description: 'Permission to create, edit, and delete application templates and configurations.',
+		defaultValue: false,
+	},
+	{
+		key: 'settings',
+		label: 'System Settings',
+		description: 'Permission to manage global system configurations and core settings.',
 		defaultValue: false,
 	},
 ];

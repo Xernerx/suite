@@ -6,9 +6,7 @@ import { Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { ChevronDown, Copy, Key, Plus, Search, Settings2, Trash2, User as UserIcon, X } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useMemo, useRef, useState } from 'react';
-
 import { Loading } from '@xernerx/feedback';
-
 interface Token {
 	_id: string;
 	id: string;
@@ -22,20 +20,17 @@ interface Token {
 	createdAt?: string;
 	updatedAt?: string;
 }
-
 function BotProfilePreview({ botId, getEnvUrl, onClear }: { botId: string; getEnvUrl: (url: string) => string; onClear: () => void }) {
 	const [profile, setProfile] = useState<any>(null);
 	const [loading, setLoading] = useState(false);
-
+	const { t } = useDictionary();
 	useEffect(() => {
 		if (!botId || botId.length < 15) {
 			setProfile(null);
 			return;
 		}
-
 		let isMounted = true;
 		setLoading(true);
-
 		fetch(getEnvUrl(`https://api.xernerx.com/core/users/${botId}/discord`))
 			.then((res) => (res.ok ? res.json() : null))
 			.then((data) => {
@@ -54,19 +49,16 @@ function BotProfilePreview({ botId, getEnvUrl, onClear }: { botId: string; getEn
 					setLoading(false);
 				}
 			});
-
 		return () => {
 			isMounted = false;
 		};
 	}, [botId, getEnvUrl]);
-
 	if (!botId || botId.length < 15) return null;
-
 	if (loading) {
 		return (
 			<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
 				<Loading variant="small" />
-				<span className="font-medium truncate max-w-[120px]">Loading...</span>
+				<span className="font-medium truncate max-w-[120px]">{t('admin.tokens.card.botApplication')}</span>
 				<button
 					type="button"
 					onClick={onClear}
@@ -77,21 +69,18 @@ function BotProfilePreview({ botId, getEnvUrl, onClear }: { botId: string; getEn
 			</div>
 		);
 	}
-
 	if (!profile) {
 		return (
 			<div className="flex items-center gap-1.5 rounded-xl border border-red-500/10 bg-red-500/5 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-red-500 shadow-sm">
-				<span className="font-medium truncate max-w-[120px]">Invalid Bot ID</span>
+				<span className="font-medium truncate max-w-[120px]">{t('admin.tokens.card.apiConnection')}</span>
 				<button type="button" onClick={onClear} className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-red-500/10 text-red-500 hover:text-red-500 transition-colors">
 					<X size={10} />
 				</button>
 			</div>
 		);
 	}
-
 	const avatarUrl = profile.avatarUrl || (profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=64` : null);
 	const name = profile.global_name || profile.username || 'Unknown Bot';
-
 	return (
 		<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
 			{avatarUrl ? (
@@ -112,7 +101,6 @@ function BotProfilePreview({ botId, getEnvUrl, onClear }: { botId: string; getEn
 		</div>
 	);
 }
-
 interface UserOption {
 	id: string;
 	name?: string;
@@ -127,11 +115,11 @@ interface UserOption {
  * filters in JS, and outputs an array of selected user IDs.
  */
 function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { values: string[]; onChange: (vals: string[]) => void; getEnvUrl: (url: string) => string; placeholder?: string }) {
-	const { t } = useDictionary();
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const [users, setUsers] = useState<UserOption[]>([]);
 	const [loading, setLoading] = useState(false);
+	const { t } = useDictionary();
 	const ref = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const fetchedIds = useRef(new Set<string>());
@@ -163,7 +151,6 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 				if (isMounted) setLoading(false);
 			}
 		};
-
 		fetchUsers();
 		return () => {
 			isMounted = false;
@@ -183,7 +170,14 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 						if (data && data.id) {
 							setUsers((prev) => {
 								if (prev.some((u) => u.id === data.id)) {
-									return prev.map((u) => (u.id === data.id ? { ...u, ...data } : u));
+									return prev.map((u) =>
+										u.id === data.id
+											? {
+													...u,
+													...data,
+												}
+											: u
+									);
 								}
 								return [...prev, data];
 							});
@@ -206,7 +200,14 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 					if (data && data.id) {
 						setUsers((prev) => {
 							if (prev.some((u) => u.id === data.id)) {
-								return prev.map((u) => (u.id === data.id ? { ...u, ...data } : u));
+								return prev.map((u) =>
+									u.id === data.id
+										? {
+												...u,
+												...data,
+											}
+										: u
+								);
 							}
 							return [...prev, data];
 						});
@@ -248,11 +249,9 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 			)
 			.slice(0, 30);
 	}, [users, query, values]);
-
 	const handleRemove = (idToRemove: string) => {
 		onChange(values.filter((id) => id !== idToRemove));
 	};
-
 	const handleSelect = (idToAdd: string) => {
 		if (!values.includes(idToAdd)) {
 			onChange([...values, idToAdd]);
@@ -260,7 +259,6 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 		setIsOpen(false);
 		setQuery('');
 	};
-
 	return (
 		<div className="flex flex-col gap-2 w-full" ref={ref}>
 			{/* Selected Pills */}
@@ -297,7 +295,10 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 					type="button"
 					onClick={() => setIsOpen(!isOpen)}
 					className="flex w-full items-center justify-between rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 focus:border-(--accent) focus:outline-none"
-					style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
+					style={{
+						padding: 'calc(var(--ui-gap) * 0.75)',
+						gap: 'var(--ui-gap)',
+					}}
 				>
 					<span className="text-(--text-muted) font-medium">{placeholder || t('admin.tokens.ownersPlaceholder')}</span>
 					<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
@@ -306,15 +307,37 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 				<AnimatePresence>
 					{isOpen && (
 						<motion.div
-							initial={{ opacity: 0, y: -4 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -4 }}
-							transition={{ duration: 0.15, ease: 'easeOut' }}
+							initial={{
+								opacity: 0,
+								y: -4,
+							}}
+							animate={{
+								opacity: 1,
+								y: 0,
+							}}
+							exit={{
+								opacity: 0,
+								y: -4,
+							}}
+							transition={{
+								duration: 0.15,
+								ease: 'easeOut',
+							}}
 							className="absolute left-0 top-[calc(100%+8px)] z-999 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl"
-							style={{ padding: 'calc(var(--ui-gap) * 0.25)', display: 'flex', flexDirection: 'column', gap: 'calc(var(--ui-gap) * 0.25)' }}
+							style={{
+								padding: 'calc(var(--ui-gap) * 0.25)',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 'calc(var(--ui-gap) * 0.25)',
+							}}
 						>
 							{/* Search Filter Input */}
-							<div className="relative w-full" style={{ padding: 'calc(var(--ui-gap) * 0.25)' }}>
+							<div
+								className="relative w-full"
+								style={{
+									padding: 'calc(var(--ui-gap) * 0.25)',
+								}}
+							>
 								<Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)" />
 								<input
 									ref={inputRef}
@@ -323,13 +346,20 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 									value={query}
 									onChange={(e) => setQuery(e.target.value)}
 									className="w-full rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-xs text-(--text) focus:outline-none focus:ring-1 focus:ring-(--accent)"
-									style={{ padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)' }}
+									style={{
+										padding: 'calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.4) calc(var(--ui-gap) * 2)',
+									}}
 									onClick={(e) => e.stopPropagation()}
 								/>
 							</div>
 
 							{/* Options List */}
-							<div className="overflow-y-auto max-h-52 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+							<div
+								className="overflow-y-auto max-h-52 flex flex-col"
+								style={{
+									gap: 'calc(var(--ui-gap) * 0.25)',
+								}}
+							>
 								{loading && users.length === 0 ? (
 									<div className="py-6 flex justify-center">
 										<Loading />
@@ -343,7 +373,9 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 											key={u.id}
 											onClick={() => handleSelect(u.id)}
 											className="flex w-full items-center justify-between rounded-xl text-sm transition-colors text-(--text) hover:bg-(--border)/5"
-											style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)' }}
+											style={{
+												padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)',
+											}}
 										>
 											<div className="flex items-center gap-2 truncate">
 												{u.avatar ? (
@@ -364,7 +396,6 @@ function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholder }: { 
 		</div>
 	);
 }
-
 function TokenCard({
 	token,
 	getEnvUrl,
@@ -391,24 +422,19 @@ function TokenCard({
 	const [botId, setBotId] = useState('');
 	const [selectedOwners, setSelectedOwners] = useState<string[]>(token.owners || []);
 	const [secure, setSecure] = useState(false);
-
 	const isDirty = useMemo(() => {
 		if (!fullToken) return false;
-
 		const sortedSelectedOwners = [...selectedOwners].sort();
 		const sortedOriginalOwners = [...(fullToken.owners || [])].sort();
 		const ownersChanged = JSON.stringify(sortedSelectedOwners) !== JSON.stringify(sortedOriginalOwners);
-
 		return name !== (fullToken.name || '') || status !== (fullToken.status || 'active') || botId !== (fullToken.botId || '') || ownersChanged || secure !== !!fullToken.permissions?.secure;
 	}, [fullToken, name, status, botId, selectedOwners, secure]);
-
 	const handleToggleExpand = async () => {
 		setIsModalOpen(true);
-
 		if (!fullToken && !loadingDetails) {
 			setLoadingDetails(true);
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
 					credentials: 'include',
 				});
 				if (res.ok) {
@@ -427,13 +453,11 @@ function TokenCard({
 			}
 		}
 	};
-
 	const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const submitter = (e.nativeEvent as SubmitEvent).submitter;
 		if (submitter && submitter.getAttribute('type') !== 'submit') return;
 		setSaving(true);
-
 		try {
 			const payload = {
 				name,
@@ -444,14 +468,14 @@ function TokenCard({
 					secure,
 				},
 			};
-
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
 				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				credentials: 'include',
 				body: JSON.stringify(payload),
 			});
-
 			if (res.ok) {
 				const updated = await res.json();
 				const manuallyUpdatedToken: Token = {
@@ -461,66 +485,96 @@ function TokenCard({
 					status,
 					botId: botId || undefined,
 					owners: selectedOwners,
-					permissions: { secure },
+					permissions: {
+						secure,
+					},
 				};
 				setFullToken(manuallyUpdatedToken);
 				onTokenUpdated(manuallyUpdatedToken);
-				toast({ title: 'Token updated', type: 'success' });
+				toast({
+					title: 'Token updated',
+					type: 'success',
+				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
 				throw new Error(errData.error || 'Unknown error');
 			}
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Failed to update token', description: err.message });
+			toast({
+				type: 'error',
+				title: 'Failed to update token',
+				description: err.message,
+			});
 		} finally {
 			setSaving(false);
 		}
 	};
-
 	const handleDelete = async () => {
 		setDeleting(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token._id}`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
 				method: 'DELETE',
 				credentials: 'include',
 			});
-
 			if (res.ok) {
-				onTokenDeleted(token._id);
-				toast({ type: 'success', title: 'Token deleted successfully' });
+				onTokenDeleted(token.id);
+				setIsModalOpen(false);
+				toast({
+					type: 'success',
+					title: 'Token deleted successfully',
+				});
+				window.location.reload();
 			} else {
 				const errData = await res.json().catch(() => ({}));
 				throw new Error(errData.error || 'Unknown error');
 			}
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Failed to delete token', description: err.message });
+			toast({
+				type: 'error',
+				title: 'Failed to delete token',
+				description: err.message,
+			});
 		} finally {
 			setDeleting(false);
 			setConfirmDeleteOpen(false);
 		}
 	};
-
 	const statusColors = {
 		active: 'bg-emerald-500/10 text-emerald-500',
 		inactive: 'bg-zinc-500/10 text-zinc-400',
 		suspended: 'bg-red-500/10 text-red-500',
 		pending: 'bg-amber-500/10 text-amber-500',
 	};
-
 	return (
 		<>
 			<motion.div
 				layout
-				initial={{ opacity: 0, y: 10 }}
-				animate={{ opacity: 1, y: 0 }}
-				exit={{ opacity: 0, scale: 0.95 }}
+				initial={{
+					opacity: 0,
+					y: 10,
+				}}
+				animate={{
+					opacity: 1,
+					y: 0,
+				}}
+				exit={{
+					opacity: 0,
+					scale: 0.95,
+				}}
 				onClick={handleToggleExpand}
 				className="flex items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:border-(--accent)/30 group relative"
-				style={{ padding: 'calc(var(--ui-gap) * 0.75)' }}
+				style={{
+					padding: 'calc(var(--ui-gap) * 0.75)',
+				}}
 			>
 				<div className="absolute inset-0 bg-gradient-to-br from-transparent to-(--border)/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-				<div className="flex items-center relative z-10" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+				<div
+					className="flex items-center relative z-10"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.75)',
+					}}
+				>
 					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/10 shrink-0 text-(--accent) shadow-inner transition-colors duration-300 group-hover:bg-(--accent)/20">
 						<Key size={24} />
 					</div>
@@ -529,7 +583,10 @@ function TokenCard({
 						<div className="flex items-center gap-2 mt-0.5">
 							<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>{token.status}</span>
 						</div>
-						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">ID: {token._id}</span>
+						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">
+							{t('admin.tokens.card.idPrefix')}
+							{token.id}
+						</span>
 					</div>
 				</div>
 
@@ -545,44 +602,95 @@ function TokenCard({
 				description={`Manage settings for ${token.name || t('admin.tokens.empty.title')}`}
 				maxWidth="max-w-2xl"
 			>
-				<div className="flex flex-col overflow-visible" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div
+					className="flex flex-col overflow-visible"
+					style={{
+						padding: 'var(--ui-gap)',
+						gap: 'var(--ui-gap)',
+					}}
+				>
 					{loadingDetails ? (
 						<div className="flex justify-center py-6">
 							<Loading />
 						</div>
 					) : (
-						<form onSubmit={handleUpdate} className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
-							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+						<form
+							onSubmit={handleUpdate}
+							className="flex flex-col overflow-visible"
+							style={{
+								gap: 'calc(var(--ui-gap) * 1.5)',
+							}}
+						>
+							<div
+								className="grid grid-cols-1 md:grid-cols-2"
+								style={{
+									gap: 'var(--ui-gap)',
+								}}
+							>
+								<div
+									className="flex flex-col"
+									style={{
+										gap: 'calc(var(--ui-gap) * 0.4)',
+									}}
+								>
 									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.nameLabel')}</label>
 									<input
 										type="text"
 										value={name}
 										onChange={(e) => setName(e.target.value)}
 										className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-										style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+										style={{
+											padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+										}}
 										required
 									/>
 								</div>
 
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-									<label className="block text-xs font-medium text-(--text)">Status</label>
+								<div
+									className="flex flex-col"
+									style={{
+										gap: 'calc(var(--ui-gap) * 0.4)',
+									}}
+								>
+									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.edit.status')}</label>
 									<Selector
 										value={status}
 										options={[
-											{ label: 'Active', value: 'active' },
-											{ label: 'Inactive', value: 'inactive' },
-											{ label: 'Suspended', value: 'suspended' },
-											{ label: 'Pending', value: 'pending' },
+											{
+												label: 'Active',
+												value: 'active',
+											},
+											{
+												label: 'Inactive',
+												value: 'inactive',
+											},
+											{
+												label: 'Suspended',
+												value: 'suspended',
+											},
+											{
+												label: 'Pending',
+												value: 'pending',
+											},
 										]}
 										onChange={(val: string) => setStatus(val as Token['status'])}
 									/>
 								</div>
 							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-									<label className="block text-xs font-medium text-(--text)">Bot ID</label>
+							<div
+								className="grid grid-cols-1 md:grid-cols-2"
+								style={{
+									gap: 'var(--ui-gap)',
+								}}
+							>
+								<div
+									className="flex flex-col"
+									style={{
+										gap: 'calc(var(--ui-gap) * 0.4)',
+									}}
+								>
+									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.edit.botId')}</label>
 									<div className="flex flex-col gap-2 w-full">
 										{botId && botId.length >= 15 && (
 											<div className="flex flex-wrap gap-2">
@@ -594,15 +702,22 @@ function TokenCard({
 												type="text"
 												value={botId}
 												onChange={(e) => setBotId(e.target.value)}
-												placeholder="Optional Bot ID..."
+												placeholder={t('admin.tokens.edit.botIdPlaceholder')}
 												className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-												style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+												style={{
+													padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+												}}
 											/>
 										</div>
 									</div>
 								</div>
 
-								<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+								<div
+									className="flex flex-col overflow-visible"
+									style={{
+										gap: 'calc(var(--ui-gap) * 0.4)',
+									}}
+								>
 									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
 									<AsyncUserMultiSelector values={selectedOwners} onChange={setSelectedOwners} getEnvUrl={getEnvUrl} />
 								</div>
@@ -610,8 +725,8 @@ function TokenCard({
 
 							<div className="flex items-center justify-between p-3 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md shadow-sm">
 								<div className="flex flex-col">
-									<span className="text-xs font-medium text-(--text)">Secure</span>
-									<span className="text-[11px] text-(--text-muted)">Allow fetching data from /secure</span>
+									<span className="text-xs font-medium text-(--text)">{t('admin.tokens.edit.isXernerx')}</span>
+									<span className="text-[11px] text-(--text-muted)">{t('admin.tokens.edit.allowFetching')}</span>
 								</div>
 								<Toggle checked={secure} onChange={(e) => setSecure(e.target.checked)} size="sm" />
 							</div>
@@ -629,13 +744,16 @@ function TokenCard({
 									<button
 										type="button"
 										onClick={() => {
-											navigator.clipboard.writeText(token._id);
-											toast({ title: 'Token ID copied', type: 'success' });
+											navigator.clipboard.writeText(token.id);
+											toast({
+												title: 'Token ID copied',
+												type: 'success',
+											});
 										}}
 										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-(--background)/50 hover:bg-(--border)/10 text-(--text-muted) text-xs font-mono font-medium transition-colors"
 									>
 										<Copy size={12} />
-										{token._id.substring(0, 8)}...
+										{(token.id || '').substring(0, 8)}...
 									</button>
 								</div>
 								<Button type="submit" disabled={saving || !isDirty}>
@@ -660,12 +778,10 @@ function TokenCard({
 		</>
 	);
 }
-
 export default function Tokens() {
+	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
-	const { t } = useDictionary();
-
 	const [tokens, setTokens] = useState<Token[]>([]);
 	const [search, setSearch] = useState('');
 	const [loading, setLoading] = useState(true);
@@ -679,40 +795,45 @@ export default function Tokens() {
 	const [newSelectedOwners, setNewSelectedOwners] = useState<string[]>([]);
 	const [newSecure, setNewSecure] = useState(false);
 	const [creating, setCreating] = useState(false);
-
 	useEffect(() => {
 		const fetchTokens = async () => {
 			setLoading(true);
 			try {
-				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/tokens?admin=true'), { credentials: 'include' });
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/tokens?admin=true'), {
+					credentials: 'include',
+				});
 				if (!res.ok) throw new Error('Failed to fetch tokens');
 				const data = await res.json();
 				setTokens(data);
 			} catch (err: any) {
-				setError(err.message || t('admin.tokens.toast.loadError', { error: err.message }));
+				setError(
+					err.message ||
+						t('admin.tokens.toast.loadError', {
+							error: err.message,
+						})
+				);
 			} finally {
 				setLoading(false);
 			}
 		};
-
 		fetchTokens();
 	}, [getEnvUrl, t]);
-
 	const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const submitter = (e.nativeEvent as SubmitEvent).submitter;
 		if (submitter && submitter.getAttribute('type') !== 'submit') return;
 		if (!newName) return;
-
 		setCreating(true);
 		const newId = crypto.randomUUID();
-
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${newId}`), {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				credentials: 'include',
 				body: JSON.stringify({
+					userId: newSelectedOwners[0] || 'admin',
 					name: newName,
 					status: newStatus,
 					botId: newBotId || undefined,
@@ -722,7 +843,6 @@ export default function Tokens() {
 					},
 				}),
 			});
-
 			if (res.ok) {
 				const created = await res.json();
 				setTokens((prev) => [...prev, created]);
@@ -732,34 +852,43 @@ export default function Tokens() {
 				setNewBotId('');
 				setNewSelectedOwners([]);
 				setNewSecure(false);
-				toast({ type: 'success', title: 'Token created successfully' });
+				toast({
+					type: 'success',
+					title: 'Token created successfully',
+				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
 				throw new Error(errData.error || 'Unknown error');
 			}
 		} catch (err: any) {
 			console.error('Failed to create token:', err);
-			toast({ type: 'error', title: 'Failed to create token', description: err.message });
+			toast({
+				type: 'error',
+				title: 'Failed to create token',
+				description: err.message,
+			});
 		} finally {
 			setCreating(false);
 		}
 	};
-
 	const handleTokenDeleted = (deletedId: string) => {
 		setTokens((prev) => prev.filter((t) => t._id !== deletedId));
 	};
-
 	const handleTokenUpdated = (updatedToken: Token) => {
 		setTokens((prev) => prev.map((t) => (t._id === updatedToken._id ? updatedToken : t)));
 	};
-
 	const filteredTokens = useMemo(() => {
 		return tokens.filter((t) => t.name?.toLowerCase().includes(search.toLowerCase()) || t.id?.toLowerCase().includes(search.toLowerCase()));
 	}, [tokens, search]);
-
 	if (loading) return <Loading />;
-	if (error) return <div className="p-6 text-red-500">Error: {error}</div>;
-
+	if (error)
+		return (
+			<div className="p-6 text-red-500">
+				{t('admin.tokens.edit.failedToFetchToken', {
+					error,
+				})}
+			</div>
+		);
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full"
@@ -770,9 +899,19 @@ export default function Tokens() {
 			}}
 		>
 			{/* Header & New Token Button */}
-			<div className="flex flex-col sm:flex-row items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+			<div
+				className="flex flex-col sm:flex-row items-center justify-between"
+				style={{
+					gap: 'var(--ui-gap)',
+				}}
+			>
 				<div className="flex flex-col">
-					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: `var(--font-fredoka)` }}>
+					<h1
+						className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
+						style={{
+							fontFamily: `var(--font-fredoka)`,
+						}}
+					>
 						{t('admin.tokens.title')}
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.tokens.description')}</p>
@@ -787,7 +926,9 @@ export default function Tokens() {
 						setNewSecure(false);
 						setIsCreateOpen(true);
 					}}
-					style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
 				>
 					<Plus size={16} />
 					<span>{t('admin.tokens.generateButton')}</span>
@@ -805,10 +946,16 @@ export default function Tokens() {
 					<p className="text-sm text-(--text-muted)">{t('admin.tokens.empty.title')}</p>
 				</div>
 			) : (
-				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
+				<motion.div
+					layout
+					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible"
+					style={{
+						gap: 'var(--ui-gap)',
+					}}
+				>
 					<AnimatePresence>
 						{filteredTokens.map((token) => (
-							<TokenCard key={token._id} token={token} getEnvUrl={getEnvUrl} onTokenDeleted={handleTokenDeleted} onTokenUpdated={handleTokenUpdated} />
+							<TokenCard key={token.id} token={token} getEnvUrl={getEnvUrl} onTokenDeleted={handleTokenDeleted} onTokenUpdated={handleTokenUpdated} />
 						))}
 					</AnimatePresence>
 				</motion.div>
@@ -816,8 +963,19 @@ export default function Tokens() {
 
 			{/* Create Modal */}
 			<Modal open={isCreateOpen} onOpenChange={setIsCreateOpen} title={t('admin.tokens.create.modalTitle')} description={t('admin.tokens.description')}>
-				<form onSubmit={handleCreate} className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+				<form
+					onSubmit={handleCreate}
+					className="flex flex-col overflow-visible"
+					style={{
+						gap: 'var(--ui-gap)',
+					}}
+				>
+					<div
+						className="flex flex-col"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.4)',
+						}}
+					>
 						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.create.nameLabel')}</label>
 						<input
 							type="text"
@@ -825,25 +983,49 @@ export default function Tokens() {
 							value={newName}
 							onChange={(e) => setNewName(e.target.value)}
 							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+							style={{
+								padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+							}}
 							required
 						/>
 					</div>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Status</label>
+					<div
+						className="flex flex-col"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.4)',
+						}}
+					>
+						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.edit.status')}</label>
 						<Selector
 							value={newStatus}
 							options={[
-								{ label: 'Active', value: 'active' },
-								{ label: 'Inactive', value: 'inactive' },
-								{ label: 'Suspended', value: 'suspended' },
-								{ label: 'Pending', value: 'pending' },
+								{
+									label: 'Active',
+									value: 'active',
+								},
+								{
+									label: 'Inactive',
+									value: 'inactive',
+								},
+								{
+									label: 'Suspended',
+									value: 'suspended',
+								},
+								{
+									label: 'Pending',
+									value: 'pending',
+								},
 							]}
 							onChange={(val: string) => setNewStatus(val as Token['status'])}
 						/>
 					</div>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-						<label className="block text-xs font-medium text-(--text)">Bot ID</label>
+					<div
+						className="flex flex-col"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.4)',
+						}}
+					>
+						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.edit.botId')}</label>
 						<div className="flex flex-col gap-2 w-full">
 							{newBotId && newBotId.length >= 15 && (
 								<div className="flex flex-wrap gap-2">
@@ -853,23 +1035,30 @@ export default function Tokens() {
 							<div className="relative w-full">
 								<input
 									type="text"
-									placeholder="Optional Bot ID..."
+									placeholder={t('admin.tokens.edit.botIdPlaceholder')}
 									value={newBotId}
 									onChange={(e) => setNewBotId(e.target.value)}
 									className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-									style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+									style={{
+										padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+									}}
 								/>
 							</div>
 						</div>
 					</div>
-					<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<div
+						className="flex flex-col overflow-visible"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.4)',
+						}}
+					>
 						<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
 						<AsyncUserMultiSelector values={newSelectedOwners} onChange={setNewSelectedOwners} getEnvUrl={getEnvUrl} />
 					</div>
 					<div className="flex items-center justify-between pt-1">
 						<div className="flex flex-col">
-							<span className="text-xs font-medium text-(--text)">Is Xernerx</span>
-							<span className="text-[11px] text-(--text-muted)">Allow fetching data from /secure</span>
+							<span className="text-xs font-medium text-(--text)">{t('admin.tokens.edit.isXernerx')}</span>
+							<span className="text-[11px] text-(--text-muted)">{t('admin.tokens.edit.allowFetching')}</span>
 						</div>
 						<Toggle checked={newSecure} onChange={(e) => setNewSecure(e.target.checked)} size="sm" />
 					</div>

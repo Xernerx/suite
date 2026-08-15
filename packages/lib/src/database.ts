@@ -1,7 +1,5 @@
 /** @format */
 
-import 'server-only';
-
 import mongoose, { Connection, Model, Schema } from 'mongoose';
 
 import { xernerxModels } from './registry';

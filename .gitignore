@@ -13,7 +13,6 @@ build/
 .env*.local
 
 # Editor & OS Files
-.vscode/
 *.log
 .DS_Store
 
@@ -61,4 +60,4 @@ yarn-error.log*
 next-env.d.ts
 
 pnpm-lock.yaml
-package-lock.json
+.xernerx/database

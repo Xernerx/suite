@@ -44,7 +44,7 @@ export default function Home() {
 					<div className="flex flex-wrap items-center justify-center gap-4 pt-2">
 						<a
 							suppressHydrationWarning
-							href={getEnvUrl('https://auth.xernerx.com')}
+							href={getEnvUrl('https://account.xernerx.com')}
 							className="inline-flex items-center justify-center px-6 py-3 text-sm font-bold rounded-xl text-(--background) bg-(--text) transition-transform hover:scale-105 shadow-md hover:shadow-lg"
 						>
 							{t('api.button.account')}

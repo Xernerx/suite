@@ -3,7 +3,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import Script from 'next/script';
 import tinycolor from 'tinycolor2';
 import { useEnvironment } from '@xernerx/providers'; // Imported useEnvironment for API routing
 import { useSession } from 'next-auth/react';
@@ -138,7 +137,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				if (!res.ok) return;
 
 				const data = await res.json();
-				const appPrefs = data?.appearance;
+				const appPrefs = data?.settings?.appearance;
 
 				if (appPrefs && appPrefs.clientSync) {
 					setPref('clientSync', 'true');
@@ -160,12 +159,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 					if (appPrefs.textScale) document.documentElement.style.setProperty('--text-scale', `${appPrefs.textScale}px`);
 				}
 			} catch (e) {
-				console.error('Failed to sync appearance from server', e);
+				console.warn('Failed to sync appearance from server', e);
 			}
 		};
 
 		fetchRemoteSync();
-	}, [getEnvUrl, theme, session]);
+	}, [getEnvUrl, session]);
 
 	useEffect(() => {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;
@@ -202,9 +201,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				setAccent: applyAccent,
 			}}
 		>
-			<Script
+			<script
 				id="theme-init"
-				strategy="beforeInteractive"
+				suppressHydrationWarning
 				dangerouslySetInnerHTML={{
 					__html: `
                         (function() {

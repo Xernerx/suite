@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Bot, Building2, ChevronRight, Compass, Globe, LayoutDashboard, LogIn, Server, Settings, Trash2 } from 'lucide-react';
+import { AlertTriangle, Bot, Building2, ChevronRight, Compass, Globe, LayoutDashboard, LogIn, Server, Settings, Trash2, Users, MessageSquare, ShieldCheck, Activity } from 'lucide-react';
 import { Button, Input, Selector } from '@xernerx/ui';
 import { Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
@@ -11,6 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
 import { useRouter } from 'next/navigation';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 type Guild = {
 	id: string;
@@ -41,6 +42,19 @@ export default function DashboardPage() {
 	const [rateLimited, setRateLimited] = useState(false);
 	const [activeTab, setActiveTab] = useState('info');
 	const { remind } = useToast();
+
+	const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '3m' | '6m' | '1y' | 'all'>('24h');
+	const [activeMetric, setActiveMetric] = useState<'members' | 'messages' | 'bots' | 'boosts'>('members');
+	const [isUndrawing, setIsUndrawing] = useState(false);
+
+	const handleMetricSwitch = (metricId: any) => {
+		if (metricId === activeMetric || isUndrawing) return;
+		setIsUndrawing(true);
+		setTimeout(() => {
+			setActiveMetric(metricId);
+			setIsUndrawing(false);
+		}, 400); // 400ms duration for undraw animation
+	};
 
 	useEffect(() => {
 		if (!isReady || status === 'unauthenticated' || status === 'loading') return;
@@ -166,7 +180,8 @@ export default function DashboardPage() {
 				},
 				body: JSON.stringify({
 					name: selectedGuild.name,
-					icon: selectedGuild.iconUrl,
+					icon: selectedGuild.icon,
+					banner: selectedGuild.banner,
 					description: guildConfig.description,
 					info: guildConfig.info,
 					organization: guildConfig.organization,
@@ -261,7 +276,10 @@ export default function DashboardPage() {
 									<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 										{selectedGuild.name}
 									</span>
-									<span className="text-sm font-medium text-(--text-muted)">ID: {selectedGuild.id}</span>
+									<span className="text-sm font-medium text-(--text-muted)">
+										{t('app.dashboard.text1')}
+										{selectedGuild.id}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -285,41 +303,51 @@ export default function DashboardPage() {
 								{activeTab === 'info' && (
 									<>
 										{/* Server Sync Data Card */}
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl h-min">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Server className="w-4 h-4" />
+										{guildConfig.bot ? (
+											<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl h-min">
+												<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
+													<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
+														<Server className="w-4 h-4" />
+													</div>
+													{t('app.dashboard.text2')}
 												</div>
-												Server Sync Data
-											</div>
-											<p className="text-xs text-(--text-muted) mb-8 p-4 bg-(--accent)/5 rounded-2xl border border-(--accent)/10 text-(--accent)">
-												This data is derived directly from your server. To sync and populate it, the Xernerx Bot must be added to the server.
-											</p>
+												<p className="text-xs text-(--text-muted) mb-8 p-4 bg-(--accent)/5 rounded-2xl border border-(--accent)/10 text-(--accent)">
+													{t('app.dashboard.text3')}
+												</p>
 
-											<div className="flex flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text) ml-1">Bot Connected</label>
-													<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
-														<Settings className="w-5 h-5 opacity-50" />
-														{guildConfig.bot ? 'Yes' : 'No'}
+												<div className="flex flex-col gap-6">
+													<div className="flex flex-col gap-2">
+														<label className="text-sm font-bold text-(--text) ml-1">{t('app.dashboard.text4')}</label>
+														<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
+															<Settings className="w-5 h-5 opacity-50" />
+															{guildConfig.bot ? 'Yes' : 'No'}
+														</div>
 													</div>
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text) ml-1">Verified</label>
-													<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
-														<Settings className="w-5 h-5 opacity-50" />
-														{guildConfig.verified ? 'Yes' : 'No'}
+													<div className="flex flex-col gap-2">
+														<label className="text-sm font-bold text-(--text) ml-1">{t('app.dashboard.text5')}</label>
+														<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
+															<Settings className="w-5 h-5 opacity-50" />
+															{guildConfig.verified ? 'Yes' : 'No'}
+														</div>
 													</div>
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text) ml-1">Locale</label>
-													<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
-														<Settings className="w-5 h-5 opacity-50" />
-														{guildConfig.locale || 'en-US'}
+													<div className="flex flex-col gap-2">
+														<label className="text-sm font-bold text-(--text) ml-1">{t('app.dashboard.text6')}</label>
+														<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
+															<Settings className="w-5 h-5 opacity-50" />
+															{guildConfig.locale || 'en-US'}
+														</div>
 													</div>
 												</div>
 											</div>
-										</div>
+										) : (
+											<div className="flex flex-col items-center text-center justify-center bg-(--accent)/5 border border-(--accent)/20 rounded-[2rem] p-10 shadow-xl h-min animate-in fade-in zoom-in-95 duration-300">
+												<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
+													<Server className="w-8 h-8" />
+												</div>
+												<h3 className="text-xl font-extrabold text-(--text) mb-2">Bot Not Connected</h3>
+												<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.text3')}</p>
+											</div>
+										)}
 
 										{/* Server Info Card */}
 										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
@@ -327,24 +355,24 @@ export default function DashboardPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Settings className="w-4 h-4" />
 												</div>
-												Server Info
+												{t('app.dashboard.text7')}
 											</div>
 
 											<div className="flex flex-col gap-6">
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Description</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.dashboard.text8')}</label>
 													<Input
 														value={guildConfig.description || ''}
 														onChange={(e) => setGuildConfig({ ...guildConfig, description: e.target.value })}
-														placeholder="Short description..."
+														placeholder={t('app.dashboard.placeholder1')}
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Info</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.dashboard.text9')}</label>
 													<textarea
 														value={guildConfig.info || ''}
 														onChange={(e) => setGuildConfig({ ...guildConfig, info: e.target.value })}
-														placeholder="Detailed server info..."
+														placeholder={t('app.dashboard.placeholder2')}
 														rows={4}
 														className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none"
 														style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}
@@ -357,20 +385,195 @@ export default function DashboardPage() {
 
 								{activeTab === 'stats' && (
 									<>
-										{/* Server Stats Placeholder */}
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Server className="w-4 h-4" />
+										{/* Server Stats Card */}
+										{guildConfig.bot ? (
+											(() => {
+												let chartData = (guildConfig.stats || []).map((s: any) => ({
+													...s,
+													timestamp: new Date(s.timestamp).getTime(),
+												}));
+
+												if (timeframe !== 'all') {
+													const now = Date.now();
+													const day = 24 * 60 * 60 * 1000;
+													const limits = {
+														'24h': now - day,
+														'7d': now - 7 * day,
+														'30d': now - 30 * day,
+														'3m': now - 90 * day,
+														'6m': now - 180 * day,
+														'1y': now - 365 * day,
+													};
+													chartData = chartData.filter((s: any) => s.timestamp >= limits[timeframe]);
+												}
+
+												// Calculate gain/loss and highest ever for the active metric
+												const highestValue = Math.max(0, ...chartData.map((s: any) => s[activeMetric] || 0));
+												const firstPoint = chartData[0]?.[activeMetric] || 0;
+												const lastPoint = chartData[chartData.length - 1]?.[activeMetric] || 0;
+												const gainLoss = lastPoint - firstPoint;
+												const gainPercentage = firstPoint > 0 ? ((gainLoss / firstPoint) * 100).toFixed(1) : '0';
+
+												const currentStats = guildConfig.stats?.[guildConfig.stats.length - 1] || { members: 0, messages: 0, bots: 0, boosts: 0 };
+
+												return (
+													<div className="flex flex-col gap-6">
+														<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+															{[
+																{ id: 'members', label: 'Members', value: currentStats.members, icon: Users },
+																{ id: 'messages', label: 'Messages', value: currentStats.messages, icon: MessageSquare },
+																{ id: 'bots', label: 'Bots', value: currentStats.bots, icon: Bot },
+																{ id: 'boosts', label: 'Boosts', value: currentStats.boosts, icon: Activity },
+															].map((metric) => (
+																<button
+																	key={metric.label}
+																	onClick={() => handleMetricSwitch(metric.id)}
+																	className={`bg-(--foreground)/50 border p-6 rounded-3xl flex flex-col items-center justify-center gap-3 backdrop-blur-md transition-all ${activeMetric === metric.id ? 'border-(--accent) shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_20%,transparent)] scale-105 z-10' : 'border-(--border)/10 hover:border-(--accent)/50'}`}
+																>
+																	<metric.icon className={`w-8 h-8 ${activeMetric === metric.id ? 'text-(--accent)' : 'text-(--text-muted)'}`} />
+																	<div className="text-3xl font-bold" style={{ fontFamily: 'var(--font-fredoka)' }}>
+																		{metric.value?.toLocaleString() || '0'}
+																	</div>
+																	<div
+																		className={`text-sm font-semibold uppercase tracking-wider ${activeMetric === metric.id ? 'text-(--accent)' : 'text-(--text-muted)'}`}
+																	>
+																		{metric.label}
+																	</div>
+																</button>
+															))}
+														</div>
+
+														<div className="bg-(--foreground)/50 border border-(--border)/10 p-6 md:p-8 rounded-3xl backdrop-blur-md">
+															<div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6">
+																<div>
+																	<h3 className="text-2xl font-bold mb-1 capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
+																		{activeMetric}
+																		{t('app.bots.id.text10')}
+																	</h3>
+																	<div className="flex flex-wrap items-center gap-4 text-sm font-medium">
+																		<span
+																			className={`${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'} flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded-md`}
+																		>
+																			{gainLoss > 0 ? '+' : ''}
+																			{gainLoss.toLocaleString()} ({gainPercentage}%)
+																		</span>
+																		<span className="text-(--text-muted) bg-(--background) px-2 py-1 rounded-md border border-(--border)/10">
+																			Highest: {highestValue.toLocaleString()}
+																		</span>
+																	</div>
+																</div>
+
+																<div className="flex bg-(--background) p-2 rounded-xl border border-(--border)/10 gap-1 w-full md:w-auto overflow-x-auto shadow-inner hide-scrollbar">
+																	{(['24h', '7d', '30d', '3m', '6m', '1y', 'all'] as const).map((tf) => (
+																		<button
+																			key={tf}
+																			onClick={() => setTimeframe(tf)}
+																			className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex-none ${
+																				timeframe === tf
+																					? 'bg-(--accent) text-white shadow-md'
+																					: 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)'
+																			}`}
+																		>
+																			{tf === '24h'
+																				? '24h'
+																				: tf === '7d'
+																					? '7d'
+																					: tf === '30d'
+																						? '1m'
+																						: tf === '3m'
+																							? '3m'
+																							: tf === '6m'
+																								? '6m'
+																								: tf === '1y'
+																									? '1y'
+																									: 'All'}
+																		</button>
+																	))}
+																</div>
+															</div>
+
+															<div
+																className="h-[400px] w-full mt-4"
+																style={{
+																	clipPath: isUndrawing ? 'inset(0 100% 0 0)' : 'inset(0 0 0 0)',
+																	transition: 'clip-path 400ms ease-in-out',
+																}}
+															>
+																{!guildConfig.stats || guildConfig.stats.length === 0 ? (
+																	<div className="flex flex-col items-center justify-center py-10 opacity-70 h-full">
+																		<Server className="w-10 h-10 mb-4 text-(--text-muted)" />
+																		<p className="text-(--text) font-bold text-lg mb-2">{t('app.dashboard.text11')}</p>
+																		<p className="text-(--text-muted) text-sm text-center max-w-sm">{t('app.dashboard.text12')}</p>
+																	</div>
+																) : (
+																	<ResponsiveContainer width="100%" height="100%">
+																		<LineChart key={activeMetric} data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+																			<CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.1} vertical={false} />
+																			<XAxis
+																				dataKey="timestamp"
+																				type="number"
+																				domain={['dataMin', 'dataMax']}
+																				tickFormatter={(time) => {
+																					const date = new Date(time);
+																					if (timeframe === '24h') return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+																					if (timeframe === 'all' || timeframe === '1y')
+																						return date.toLocaleDateString([], { month: 'short', year: 'numeric' });
+																					return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+																				}}
+																				stroke="var(--text-muted)"
+																				fontSize={12}
+																				tickLine={false}
+																				axisLine={false}
+																				dy={10}
+																				minTickGap={30}
+																			/>
+																			<YAxis
+																				stroke="var(--text-muted)"
+																				fontSize={12}
+																				tickLine={false}
+																				axisLine={false}
+																				dx={-10}
+																				domain={['auto', 'auto']}
+																				tickFormatter={(val) => {
+																					return val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val;
+																				}}
+																			/>
+																			<RechartsTooltip
+																				contentStyle={{
+																					backgroundColor: 'var(--foreground)',
+																					border: '1px solid color-mix(in srgb, var(--border) 10%, transparent)',
+																					borderRadius: '1rem',
+																					boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+																				}}
+																				itemStyle={{ color: 'var(--text)', fontWeight: 'bold' }}
+																				labelFormatter={(label) => new Date(label as string | number).toLocaleString()}
+																			/>
+																			<Line
+																				type="monotone"
+																				dataKey={activeMetric}
+																				name={activeMetric}
+																				stroke="var(--accent)"
+																				strokeWidth={4}
+																				dot={chartData.length <= 1 ? { r: 6, fill: 'var(--accent)', strokeWidth: 0 } : false}
+																				activeDot={{ r: 8, fill: 'var(--accent)', strokeWidth: 0, stroke: 'var(--background)', strokeOpacity: 0.5 }}
+																			/>
+																		</LineChart>
+																	</ResponsiveContainer>
+																)}
+															</div>
+														</div>
+													</div>
+												);
+											})()
+										) : (
+											<div className="flex flex-col items-center text-center justify-center bg-(--accent)/5 border border-(--accent)/20 rounded-[2rem] p-10 shadow-xl h-min animate-in fade-in zoom-in-95 duration-300">
+												<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
+													<Server className="w-8 h-8" />
 												</div>
-												Server Stats
+												<h3 className="text-xl font-extrabold text-(--text) mb-2">Bot Not Connected</h3>
+												<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.text3')}</p>
 											</div>
-											<div className="flex flex-col items-center justify-center py-10 opacity-70">
-												<Server className="w-10 h-10 mb-4 text-(--text-muted)" />
-												<p className="text-(--text) font-bold text-lg mb-2">Metrics Coming Soon</p>
-												<p className="text-(--text-muted) text-sm text-center max-w-sm">We're working on bringing detailed server analytics and statistics here.</p>
-											</div>
-										</div>
+										)}
 									</>
 								)}
 
@@ -384,9 +587,9 @@ export default function DashboardPage() {
 											<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 												<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 													<Settings size={18} />
-													<h3>Privacy Setting</h3>
+													<h3>{t('app.dashboard.text13')}</h3>
 												</div>
-												<div className="flex items-center gap-1 text-xs text-(--text-muted)">Choose who can see this server's profile on Xernerx.</div>
+												<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.dashboard.text14')}</div>
 											</div>
 											<div className="w-full sm:w-48 shrink-0">
 												<Selector
@@ -409,9 +612,9 @@ export default function DashboardPage() {
 											<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 												<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 													<AlertTriangle size={18} />
-													<h3>Reset Data</h3>
+													<h3>{t('app.dashboard.text15')}</h3>
 												</div>
-												<p className="text-xs text-(--accent-orange)/80">Reset all server settings and configurations back to default.</p>
+												<p className="text-xs text-(--accent-orange)/80">{t('app.dashboard.text16')}</p>
 											</div>
 											<button
 												onClick={() => setGuildConfig({ ...guildConfig, description: '', info: '', locale: '', links: {} })}
@@ -422,7 +625,7 @@ export default function DashboardPage() {
 												}}
 											>
 												<Trash2 size={16} />
-												<span>Reset Data</span>
+												<span>{t('app.dashboard.text17')}</span>
 											</button>
 										</div>
 
@@ -434,9 +637,9 @@ export default function DashboardPage() {
 											<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 												<div className="flex items-center text-(--accent-red) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 													<AlertTriangle size={18} />
-													<h3>Delete Server Data</h3>
+													<h3>{t('app.dashboard.text18')}</h3>
 												</div>
-												<p className="text-xs text-(--accent-red)/80">Permanently delete all data associated with this server from Xernerx.</p>
+												<p className="text-xs text-(--accent-red)/80">{t('app.dashboard.text19')}</p>
 											</div>
 											<button
 												onClick={handleDeleteGuild}
@@ -447,7 +650,7 @@ export default function DashboardPage() {
 												}}
 											>
 												<Trash2 size={16} />
-												<span>Delete Server</span>
+												<span>{t('app.dashboard.text20')}</span>
 											</button>
 										</div>
 									</>
@@ -462,9 +665,9 @@ export default function DashboardPage() {
 						<Server className="w-10 h-10 text-(--accent)" />
 					</div>
 					<h1 className="text-3xl font-extrabold tracking-tight text-(--text) drop-shadow-sm mb-4" style={{ fontFamily: `var(--font-fredoka)` }}>
-						Too Many Requests
+						{t('app.dashboard.text21')}
 					</h1>
-					<p className="text-sm text-(--text-muted) max-w-md">We are hitting Discord's rate limits for fetching your servers. Please wait a moment and try refreshing the page!</p>
+					<p className="text-sm text-(--text-muted) max-w-md">{t('app.dashboard.text22')}</p>
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center text-center">
@@ -472,18 +675,16 @@ export default function DashboardPage() {
 						<Server className="w-10 h-10 text-(--accent)" />
 					</div>
 					<h1 className="text-3xl font-extrabold tracking-tight text-(--text) drop-shadow-sm mb-4" style={{ fontFamily: `var(--font-fredoka)` }}>
-						No Eligible Servers
+						{t('app.dashboard.text23')}
 					</h1>
-					<p className="text-sm text-(--text-muted) max-w-md">
-						You don't seem to have Manage Server or Administrator permissions in any connected servers. Please become authorized in a server or create a new Discord server to get started!
-					</p>
+					<p className="text-sm text-(--text-muted) max-w-md">{t('app.dashboard.text24')}</p>
 					<a
 						href="https://discord.com/new"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="mt-6 px-6 py-3 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white font-medium transition-colors shadow-sm"
 					>
-						Create Discord Server
+						{t('app.dashboard.text25')}
 					</a>
 				</div>
 			)}

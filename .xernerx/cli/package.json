@@ -1,0 +1,19 @@
+{
+	"name": "@xernerx/cli",
+	"version": "1.0.0",
+	"type": "module",
+	"description": "Internal CLI for Xernerx Suite",
+	"private": true,
+	"bin": {
+		"suite": "bin.js"
+	},
+	"dependencies": {
+		"@changesets/cli": "^2.31.1",
+		"@inquirer/prompts": "^8.5.2",
+		"commander": "^15.0.0",
+		"mongodb-memory-server": "^11.2.0",
+		"shx": "^0.4.0",
+		"tsx": "^4.23.11",
+		"typescript": "^7.0.2"
+	}
+}

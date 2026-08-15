@@ -2,7 +2,7 @@
 'use client';
 
 import { AlertTriangle, Bell, Check, CheckCircle2, ExternalLink, Info, Loader2, Mail, RefreshCw, Trash2, X } from 'lucide-react';
-import { Notification, useEnvironment, useNotifications, useToast } from '@xernerx/providers';
+import { Notification, useDictionary, useEnvironment, useNotifications, useToast } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +16,7 @@ interface SidebarNotificationsProps {
 
 export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNotificationsProps) {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 	const { toast } = useToast();
 	const { notifications, unreadCount, markAsRead, markAllAsRead, refresh } = useNotifications();
 
@@ -141,7 +142,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 				<div className="flex items-center justify-between px-2 pt-1 pb-2 border-b border-(--border)/10">
 					<div className="flex items-center gap-2">
 						<Bell size={14} className="text-(--text-muted)" />
-						<span className="text-sm font-semibold text-(--text)">Notifications</span>
+						<span className="text-sm font-semibold text-(--text)">{t('components.cards.sidebarnotifications.text1')}</span>
 						{unreadCount > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">{unreadCount}</span>}
 					</div>
 					<div className="flex items-center gap-3">
@@ -151,12 +152,12 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 							className="text-[10px] font-medium text-(--text-muted) hover:text-(--text) transition-colors flex items-center gap-1 disabled:opacity-50"
 						>
 							<RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-							Refresh
+							{t('components.cards.sidebarnotifications.text2')}
 						</button>
 						{unreadCount > 0 && (
 							<button onClick={markAllAsRead} className="text-[10px] font-medium text-(--text-muted) hover:text-(--text) transition-colors flex items-center gap-1">
 								<Check size={12} />
-								Mark all read
+								{t('components.cards.sidebarnotifications.text3')}
 							</button>
 						)}
 					</div>
@@ -167,7 +168,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 					{notifications.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-8 text-(--text-muted)">
 							<Bell size={24} className="opacity-20 mb-2" />
-							<span className="text-xs">No notifications yet</span>
+							<span className="text-xs">{t('components.cards.sidebarnotifications.text4')}</span>
 						</div>
 					) : (
 						notifications.slice(0, 10).map((notification) => (
@@ -235,11 +236,11 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 									<div className="flex items-center gap-2">
 										<Button variant="danger" onClick={() => handleManageInvite('denied')} disabled={isProcessing} loading={isProcessing}>
 											{!isProcessing && <X size={16} className="mr-2" />}
-											Decline
+											{t('components.cards.sidebarnotifications.text5')}
 										</Button>
 										<Button variant="primary" onClick={() => handleManageInvite('approved')} disabled={isProcessing} loading={isProcessing}>
 											{!isProcessing && <Check size={16} className="mr-2" />}
-											Accept
+											{t('components.cards.sidebarnotifications.text6')}
 										</Button>
 									</div>
 								) : (
@@ -247,7 +248,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 										<button
 											onClick={handleDelete}
 											disabled={isProcessing}
-											title="Delete Notification"
+											title={t('components.cards.sidebarnotifications.title1')}
 											className="flex items-center justify-center h-10 w-10 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
 										>
 											{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
@@ -255,7 +256,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 										<button
 											onClick={handleMarkUnread}
 											disabled={isProcessing}
-											title="Mark as Unread"
+											title={t('components.cards.sidebarnotifications.title2')}
 											className="flex items-center justify-center h-10 w-10 rounded-xl text-(--text-muted) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
 										>
 											{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
@@ -273,7 +274,9 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 											className="flex items-center gap-2 rounded-xl text-sm font-medium bg-(--accent)/10 text-(--accent) hover:bg-(--accent)/20 transition-colors"
 											style={{ padding: 'calc(var(--ui-gap) * 0.65) calc(var(--ui-gap) * 1.5)' }}
 										>
-											Open Link <ExternalLink size={14} />
+											{t('components.cards.sidebarnotifications.text7')}
+
+											<ExternalLink size={14} />
 										</a>
 									)}
 									<button
@@ -282,7 +285,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 										className="rounded-xl text-sm font-medium bg-(--border)/10 hover:bg-(--border)/20 text-(--text) transition-colors disabled:opacity-50"
 										style={{ padding: 'calc(var(--ui-gap) * 0.65) calc(var(--ui-gap) * 1.5)' }}
 									>
-										Close
+										{t('components.cards.sidebarnotifications.text8')}
 									</button>
 								</div>
 							</div>

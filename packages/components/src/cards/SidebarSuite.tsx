@@ -6,10 +6,11 @@ import { Divider } from '@xernerx/ui';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { navigation } from '@xernerx/lib';
-import { useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 
 export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: boolean; onClose: () => void }) {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 
 	return (
 		<motion.div
@@ -33,7 +34,7 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 				}}
 			>
 				<Compass size={14} className="text-(--accent)" />
-				<span className="text-[11px] uppercase font-bold tracking-wider">Suite</span>
+				<span className="text-[11px] uppercase font-bold tracking-wider">{t('components.cards.sidebarsuite.text1')}</span>
 			</div>
 
 			<Divider />

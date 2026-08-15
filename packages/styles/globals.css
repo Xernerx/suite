@@ -166,3 +166,14 @@ html:not(.dark) input[type='number']::-webkit-inner-spin-button {
 html.dark input[type='number']::-webkit-inner-spin-button {
 	filter: invert(0.8) hue-rotate(180deg);
 }
+
+/* Global Application Inputs */
+@layer base {
+	textarea {
+		@apply w-full rounded-2xl border border-(--border)/20 bg-(--foreground) p-4 text-sm text-(--text) placeholder-(--text-muted) outline-none focus:border-(--accent) focus:ring-1 focus:ring-(--accent) min-h-[120px] resize-y transition-all;
+	}
+
+	input[type='radio'] {
+		@apply w-4 h-4 text-(--accent) bg-(--background) border-(--border) focus:ring-(--accent);
+	}
+}

@@ -1,0 +1,36 @@
+{
+	"name": "bot",
+	"version": "1.1.31",
+	"description": "",
+	"main": "dist/main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "pnpm i && tsc-watch --onSuccess \"npx tsx src/main.ts\"",
+		"build": "tsc",
+		"start": "npx tsx src/main.ts"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"keywords": [],
+	"author": "Xernerx Studios",
+	"license": "MIT",
+	"packageManager": "pnpm@11.20.0",
+	"devDependencies": {
+		"prettier": "^3.9.6",
+		"tsc-watch": "^7.2.1",
+		"tsx": "^4.7.1",
+		"typescript": "^7.0.2"
+	},
+	"dependencies": {
+		"@types/react": "^19.2.18",
+		"@xernerx/framework": "^1",
+		"@xernerx/lib": "workspace:*",
+		"@xernerx/stats": "^1.0.9",
+		"discord.js": "^14.22.1",
+		"mongoose": "^9.9.1",
+		"next": "^16.3.1",
+		"server-only": "^0.0.1",
+		"tslib": "^2.6.2"
+	}
+}

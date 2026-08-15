@@ -13,16 +13,17 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 		}
 
 		const db = await database('xernerx');
-		const User = db.models.profiles.users;
+		const Credit = (db.models.users as any).Credit;
 
-		const user = await User.findOne({ id: userId });
+		let creditRecord = await Credit.findOne({ ownerId: userId });
 
-		if (!user) {
-			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		if (!creditRecord) {
+			creditRecord = new Credit({ ownerId: userId });
+			await creditRecord.save();
 		}
 
 		const now = new Date();
-		const giftIn = user.credits?.giftIn ? new Date(user.credits.giftIn) : new Date(0);
+		const giftIn = creditRecord.giftIn ? new Date(creditRecord.giftIn) : new Date(0);
 
 		// Check if cooldown has passed
 		if (now < giftIn) {
@@ -36,9 +37,9 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 		const timeSinceUnlock = now.getTime() - giftIn.getTime();
 
 		let newStreak = 1;
-		if (user.credits?.giftIn) {
+		if (creditRecord.giftIn) {
 			if (timeSinceUnlock <= gracePeriodMs) {
-				newStreak = (user.credits?.streak || 0) + 1;
+				newStreak = (creditRecord.streak || 0) + 1;
 			} else {
 				newStreak = 1; // Reset streak if the 48-hour window was missed
 			}
@@ -51,13 +52,13 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 		// Next gift available 24 hours from now
 		const nextGiftIn = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-		const updatedUser = await User.findOneAndUpdate(
-			{ id: userId },
+		const updatedCredit = await Credit.findOneAndUpdate(
+			{ ownerId: userId },
 			{
-				$inc: { 'credits.balance': rewardCredits },
+				$inc: { balance: rewardCredits },
 				$set: {
-					'credits.streak': newStreak,
-					'credits.giftIn': nextGiftIn,
+					streak: newStreak,
+					giftIn: nextGiftIn,
 				},
 			},
 			{ returnDocument: 'after' }
@@ -66,7 +67,7 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 		return NextResponse.json({
 			success: true,
 			reward: rewardCredits,
-			credits: updatedUser.credits,
+			credits: updatedCredit,
 		});
 	} catch (error: any) {
 		console.error('Failed to process daily gift:', error);

@@ -196,7 +196,7 @@ export default function PortalPage() {
 
 					let pendingUsers: any[] = [];
 					try {
-						const appsRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/applications?organizationId=${selectedOrg._id}`), { credentials: 'include' });
+						const appsRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/applications?organizationId=${selectedOrg._id}`), { credentials: 'include' });
 						if (appsRes.ok) {
 							const appsData = await appsRes.json();
 							pendingUsers = appsData.filter((app: any) => app.type === 'organization_invite' && app.status === 'pending');
@@ -323,7 +323,7 @@ export default function PortalPage() {
 		if (!selectedOrg || selectedOrg === 'personal' || !inviteUserObj) return;
 		setInvitingMember(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/applications`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/applications`), {
 				method: 'POST',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
@@ -412,10 +412,13 @@ export default function PortalPage() {
 									Personal Bots
 								</div>
 								<div className="flex flex-col items-center justify-center w-full">
-									{bots.filter((b) => !b.organization || !organizations.some((org) => org._id === b.organization)).length > 0 ? (
+									{bots.filter((b) => !b.organization || b.organization === 'null' || b.organization === 'undefined' || !organizations.some((org) => org._id === b.organization))
+										.length > 0 ? (
 										<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm">
 											{bots
-												.filter((b) => !b.organization || !organizations.some((org) => org._id === b.organization))
+												.filter(
+													(b) => !b.organization || b.organization === 'null' || b.organization === 'undefined' || !organizations.some((org) => org._id === b.organization)
+												)
 												.map((bot) => (
 													<BotRow key={bot.id} bot={bot} hrefPrefix="/portal/bots" />
 												))}
@@ -806,7 +809,7 @@ export default function PortalPage() {
 									{activeTab === 'settings' && (
 										<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 											<div
-												className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+												className="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 												style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 											>
 												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -830,7 +833,7 @@ export default function PortalPage() {
 											</div>
 											{/* Reset Data Card */}
 											<div
-												className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
+												className="relative z-20 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
 												style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 											>
 												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -857,7 +860,7 @@ export default function PortalPage() {
 
 											{/* Delete Organization Card */}
 											<div
-												className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
+												className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
 												style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 											>
 												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>

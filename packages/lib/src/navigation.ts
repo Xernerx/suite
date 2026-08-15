@@ -14,7 +14,7 @@ export const navigation: NavigationItem[] = [
 	// User
 	{ label: 'Explore', href: 'https://app.xernerx.com', icon: Compass, category: 'User' },
 	{ label: 'Dashboard', href: 'https://app.xernerx.com/dashboard', icon: LayoutDashboard, category: 'User' },
-	{ label: 'Account', href: 'https://auth.xernerx.com', icon: UserCircle, category: 'User' },
+	{ label: 'Account', href: 'https://account.xernerx.com', icon: UserCircle, category: 'User' },
 
 	// Developer
 	{ label: 'Portal', href: 'https://app.xernerx.com/portal', icon: Building2, category: 'Developer' },

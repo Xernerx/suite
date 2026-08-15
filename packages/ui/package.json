@@ -9,9 +9,9 @@
 	"dependencies": {
 		"@svgr/webpack": "^8.1.0",
 		"@xernerx/providers": "workspace:*",
-		"framer-motion": "^13.0.0",
+		"framer-motion": "^13.1.0",
 		"lucide-react": "^1.31.0",
-		"next": "^16.3.0",
+		"next": "^16.3.1",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"react-icons": "^5"

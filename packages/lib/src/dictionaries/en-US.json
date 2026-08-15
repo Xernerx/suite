@@ -81,7 +81,7 @@
 		"fact": "Useless Fact: ",
 		"facts": "This page consumes approximately 0.00004 kWh of server energy just to tell you that you need a token.,Virtue is currently judging your lack of an Authorization header.,Metamorphosis has transformed this request into disappointment because you forgot your bearer token.,Zodiac charts indicate that your current path lacks a valid API key.,Somewhere, a database index is crying because you queried without a token.,Error 418: I'm a teapot, but even a teapot needs a valid bearer token.,No token, no data. Those are the rules, I didn't make them up (yes I did)."
 	},
-	"auth": {
+	"account": {
 		"account": {
 			"title": "Account Settings",
 			"description": "Manage your account session, data privacy, and global profile details.",

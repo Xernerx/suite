@@ -87,7 +87,7 @@
 		"fact": "Nutteloos feit: ",
 		"facts": "Deze pagina verbruikt ongeveer 0,00004 kWh aan serverenergie om je te vertellen dat je een token nodig hebt.,Virtue beoordeelt momenteel het ontbreken van een Authorization-header.,Metamorphosis heeft dit verzoek omgezet in teleurstelling omdat je je bearer-token bent vergeten.,Zodiakale grafieken geven aan dat je huidige pad geen geldige API-sleutel heeft.,Ergens huilt er een database-index omdat je hebt opgevraagd zonder token.,Fout 418: Ik ben een theepot, maar zelfs een theepot heeft een geldig bearer-token nodig.,Geen token, geen data. Dat zijn de regels, ik heb ze niet bedacht (ja, dat heb ik wel)."
 	},
-	"auth": {
+	"account": {
 		"account": {
 			"title": "Accountinstellingen",
 			"description": "Beheer je accountsessie, gegevensprivacy en algemene profielgegevens.",

@@ -1,5 +1,11 @@
 # api
 
+## 0.5.4
+
+### Patch Changes
+
+- Resolve token modal issues, fix auth user IDs, apply custom ui, and trigger vercel builds.
+
 ## 0.5.3
 
 ### Patch Changes
