@@ -1,5 +1,16 @@
 # @xernerx/feedback
 
+## 0.0.14
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/providers@0.3.6
+    - @xernerx/ui@0.2.9
+
 ## 0.0.13
 
 ### Patch Changes

@@ -1,5 +1,15 @@
 # @xernerx/providers
 
+## 0.3.6
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/lib@0.3.5
+
 ## 0.3.5
 
 ### Patch Changes

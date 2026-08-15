@@ -1,5 +1,15 @@
 # bot
 
+## 1.1.33
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/lib@0.3.5
+
 ## 1.1.32
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # app
 
+## 2.1.6
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.2.13
+    - @xernerx/providers@0.3.6
+    - @xernerx/feedback@0.0.14
+    - @xernerx/styles@0.1.6
+    - @xernerx/lib@0.3.5
+    - @xernerx/ui@0.2.9
+
 ## 2.1.5
 
 ### Patch Changes

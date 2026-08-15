@@ -1,5 +1,18 @@
 # docs
 
+## 0.2.15
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.2.13
+    - @xernerx/providers@0.3.6
+    - @xernerx/feedback@0.0.14
+    - @xernerx/lib@0.3.5
+
 ## 0.2.14
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @xernerx/websocket
 
+## 1.2.5
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+
 ## 1.2.4
 
 ### Patch Changes

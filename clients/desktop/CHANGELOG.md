@@ -1,5 +1,12 @@
 # @xernerx/desktop
 
+## 2.1.1
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+
 ## 2.1.0
 
 ### Minor Changes
