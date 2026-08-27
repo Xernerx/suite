@@ -138,6 +138,8 @@ export default function DashboardPage() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session, getEnvUrl]);
 
+	const [organizations, setOrganizations] = useState<any[]>([]);
+
 	useEffect(() => {
 		if (!selectedGuild) {
 			setGuildConfig(null);
@@ -148,13 +150,19 @@ export default function DashboardPage() {
 		const fetchConfig = async () => {
 			setConfigLoading(true);
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), {
-					credentials: 'include',
-				});
-				if (res.ok) {
-					const data = await res.json();
+				const [guildRes, orgsRes] = await Promise.all([
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?user=${(session as any).user.id}`), { credentials: 'include' }),
+				]);
+
+				if (guildRes.ok) {
+					const data = await guildRes.json();
 					setGuildConfig(data);
 					setOriginalGuildConfig(data);
+				}
+
+				if (orgsRes.ok) {
+					setOrganizations(await orgsRes.json());
 				}
 			} catch (error) {
 				console.error('Failed to fetch guild config', error);
@@ -599,6 +607,33 @@ export default function DashboardPage() {
 														{ label: 'Public', value: 'public' },
 														{ label: 'Limited', value: 'limited' },
 														{ label: 'Private', value: 'private' },
+													]}
+												/>
+											</div>
+										</div>
+
+										{/* Transfer Organization Card */}
+										<div
+											className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
+											style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+										>
+											<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+												<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+													<Building2 size={18} />
+													<h3>Transfer Organization</h3>
+												</div>
+												<p className="text-xs text-(--accent-orange)/80">Move this server to a different organization you manage.</p>
+											</div>
+											<div className="w-full sm:w-64 shrink-0">
+												<Selector
+													value={guildConfig.organization || ''}
+													onChange={(val: string) => setGuildConfig({ ...guildConfig, organization: val })}
+													options={[
+														{ label: 'Personal (No Organization)', value: '' },
+														...organizations.map((org) => ({
+															label: org.name,
+															value: org._id,
+														})),
 													]}
 												/>
 											</div>

@@ -13,6 +13,7 @@ export async function GET(req: Request) {
 		const category = url.searchParams.get('category');
 		const search = url.searchParams.get('search');
 		const idsParam = url.searchParams.get('ids');
+		const organization = url.searchParams.get('organization');
 
 		const db = await database('xernerx');
 		const GuildModel = db.models.guilds.Guild as any;
@@ -22,6 +23,8 @@ export async function GET(req: Request) {
 		if (idsParam) {
 			const ids = idsParam.split(',').map((id) => id.trim());
 			query = { id: { $in: ids } }; // If querying by explicit IDs, bypass privacy check
+		} else if (organization) {
+			query = { organization }; // If querying by organization, bypass privacy check
 		} else if (search) {
 			query.name = { $regex: search, $options: 'i' };
 		}

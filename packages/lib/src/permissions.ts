@@ -56,4 +56,10 @@ export const permissions: PermissionDefinition[] = [
 		description: 'Permission to manage global system configurations and core settings.',
 		defaultValue: false,
 	},
+	{
+		key: 'invites',
+		label: 'Manage Invites',
+		description: 'Permission to configure public Discord bot invite URLs.',
+		defaultValue: false,
+	},
 ];

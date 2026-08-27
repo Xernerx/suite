@@ -3,8 +3,7 @@
 
 import { Save, Server, Loader2, RefreshCw, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { useEnvironment, useToast } from '@xernerx/providers';
+import { useEnvironment, useToast, useSession } from '@xernerx/providers';
 import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import { useDictionary } from '@xernerx/providers';

@@ -48,6 +48,7 @@ export default function PortalPage() {
 	const [organizations, setOrganizations] = useState<Organization[]>([]);
 	const [bots, setBots] = useState<any[]>([]);
 	const [guilds, setGuilds] = useState<any[]>([]);
+	const [orgGuilds, setOrgGuilds] = useState<any[]>([]);
 
 	const [selectedOrg, setSelectedOrg] = useState<Organization | 'personal' | null>(null);
 	const [orgConfig, setOrgConfig] = useState<any>(null);
@@ -195,14 +196,22 @@ export default function PortalPage() {
 					setOriginalOrgConfig(data);
 
 					let pendingUsers: any[] = [];
+					let fetchedOrgGuilds: any[] = [];
 					try {
-						const appsRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/applications?organizationId=${selectedOrg._id}`), { credentials: 'include' });
+						const [appsRes, guildsRes] = await Promise.all([
+							fetch(getEnvUrl(`https://api.xernerx.com/secure/applications?organizationId=${selectedOrg._id}`), { credentials: 'include' }),
+							fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?organization=${selectedOrg._id}`), { credentials: 'include' }),
+						]);
 						if (appsRes.ok) {
 							const appsData = await appsRes.json();
 							pendingUsers = appsData.filter((app: any) => app.type === 'organization_invite' && app.status === 'pending');
 						}
+						if (guildsRes.ok) {
+							fetchedOrgGuilds = await guildsRes.json();
+						}
 					} catch (e) {}
 					setPendingInvites(pendingUsers);
+					setOrgGuilds(fetchedOrgGuilds);
 
 					const allMembers = [selectedOrg.owner, ...(data.members || []), ...pendingUsers.map((app) => app.userId)];
 					const profiles: Record<string, any> = {};
@@ -702,18 +711,18 @@ export default function PortalPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Server className="w-4 h-4" />
 												</div>
-												Organization Server
+												Organization Servers
 											</div>
 											<div className="flex flex-col gap-6">
-												<p className="text-sm text-(--text-muted)">Select a Discord server to link with this organization.</p>
+												<p className="text-sm text-(--text-muted)">Select a main Discord server to feature for this organization.</p>
 												<div className="flex flex-col gap-2">
-													{guilds.length > 0 ? (
+													{orgGuilds.length > 0 ? (
 														<Selector
 															value={orgConfig?.guild || ''}
 															onChange={(val) => setOrgConfig({ ...orgConfig, guild: val })}
 															options={[
 																{ label: 'None', value: '' },
-																...guilds.map((guild) => ({
+																...orgGuilds.map((guild) => ({
 																	value: guild.id,
 																	label: (
 																		<div className="flex items-center gap-3">
@@ -737,7 +746,47 @@ export default function PortalPage() {
 													) : (
 														<div className="flex flex-col items-center justify-center py-10 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed">
 															<Server className="w-8 h-8 mb-4 opacity-30" />
-															<p className="text-sm">No managed Discord servers found.</p>
+															<p className="text-sm">No linked servers available.</p>
+															<p className="text-xs mt-1">Transfer a server to this organization first via the Server Dashboard.</p>
+														</div>
+													)}
+												</div>
+
+												<div className="flex flex-col gap-2 mt-4 pt-4 border-t border-(--border)/10">
+													<label className="text-sm font-bold text-(--text)">Linked Servers</label>
+													<span className="text-xs text-(--text-muted)">Servers transferred to this organization.</span>
+													{orgGuilds.length > 0 ? (
+														<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm mt-2">
+															{orgGuilds.map((g: any) => (
+																<Link
+																	href={`/dashboard`}
+																	key={g.id}
+																	className="flex items-center justify-between gap-4 p-4 hover:bg-(--foreground)/50 border-b border-(--border)/10 last:border-0 transition-colors"
+																>
+																	<div className="flex items-center gap-4">
+																		{g.icon ? (
+																			<img
+																				src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`}
+																				alt={g.name}
+																				className="w-10 h-10 rounded-full shadow-sm object-cover"
+																			/>
+																		) : (
+																			<div className="w-10 h-10 bg-(--background) rounded-full flex items-center justify-center font-bold shadow-sm">
+																				{g.name?.charAt(0) || 'S'}
+																			</div>
+																		)}
+																		<div className="flex flex-col">
+																			<span className="font-bold text-(--text)">{g.name}</span>
+																			<span className="text-xs text-(--text-muted)">{g.id}</span>
+																		</div>
+																	</div>
+																	<LayoutDashboard className="w-5 h-5 text-(--text-muted) opacity-50 group-hover:opacity-100 transition-opacity" />
+																</Link>
+															))}
+														</div>
+													) : (
+														<div className="flex flex-col items-center justify-center py-6 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed mt-2">
+															<p className="text-sm">No servers transferred to this organization yet.</p>
 														</div>
 													)}
 												</div>
@@ -763,14 +812,6 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Discord Invite URL</label>
-													<Input
-														value={orgConfig.links?.invite || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, invite: e.target.value } })}
-														placeholder="https://discord.gg/..."
-													/>
-												</div>
-												<div className="flex flex-col gap-2">
 													<label className="text-sm font-bold text-(--text)">Support Server URL</label>
 													<Input
 														value={orgConfig.links?.support || ''}
@@ -779,7 +820,7 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">GitHub Repository</label>
+													<label className="text-sm font-bold text-(--text)">GitHub URL</label>
 													<Input
 														value={orgConfig.links?.github || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, github: e.target.value } })}

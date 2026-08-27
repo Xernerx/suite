@@ -1,5 +1,34 @@
 # api
 
+## 0.6.0
+
+### Minor Changes
+
+- ## New Features & Enhancements
+    - **Invites Matrix System Added**: Added a comprehensive `/invites` matrix system allowing admins to manage official Discord bot invites across the Xernerx network.
+    - **Dynamic Discord Profiles (API & Frontend)**: The public Invites listing page (`www`) and Admin dashboard cards now dynamically fetch and display live Discord `global_name`/`username` and `avatarUrl` metadata directly from the Discord API. This ensures that bot branding is always up-to-date.
+    - **Admin Dashboard UI Upgrades**:
+        - The Invites view is fully integrated into the Admin sidebar layout under the `Administrator` category.
+        - The Invites management modal now utilizes the sleek `@xernerx/ui` `Toggle` component for the 53-item Discord Permission matrix.
+        - Modals were scaled up to support robust scrolling configurations (`maxWidth="max-w-4xl"`).
+    - **Public Timeline Overhaul**: Upgraded the Xernerx landing page timeline to a 2035 "editorial" layout featuring sticky typography headers on the left and seamlessly scrolling bento glass cards on the right.
+
+    ## Bug Fixes
+    - Fixed `database` import errors by correctly awaiting the server connection and passing the appropriate `xernerx` project configuration payload across API routes.
+    - Resolved build-time dependency leakage by properly scoping `discord-api-types` exclusively to the `admin` app.
+    - Corrected React context collisions in the Admin `Settings` page by ensuring `useSession` is imported directly from `@xernerx/providers` rather than raw `next-auth/react`.
+    - Next.js 15+ Compatibility: Implemented Promise resolutions for dynamic routing parameters `await params` in OAuth2 routing paths.
+    - Prevented cross-environment failures by switching hardcoded API paths in Server Components to properly evaluate `ENV.ENVIRONMENT` domains for local proxying versus production calls.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.6
+    - @xernerx/components@0.2.14
+    - @xernerx/providers@0.3.7
+    - @xernerx/feedback@0.0.15
+    - @xernerx/ui@0.2.10
+
 ## 0.5.8
 
 ### Patch Changes

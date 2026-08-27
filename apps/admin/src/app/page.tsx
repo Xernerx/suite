@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Key, Languages, Shield, Ticket, Users as UsersIcon } from 'lucide-react';
+import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +14,7 @@ import Tokens from '@/components/Tokens';
 import Translations from '@/components/Translations';
 import Users from '@/components/Users';
 import Settings from '@/components/Settings';
+import Invites from '@/components/Invites';
 import { permissions } from '@xernerx/lib';
 import { Server } from 'lucide-react';
 
@@ -104,6 +105,7 @@ export default function Home() {
 		const canRoles = userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false;
 		const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
 		const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
+		const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
 
 		const isServerSet = !!adminServerId;
 
@@ -152,6 +154,15 @@ export default function Home() {
 			});
 		}
 
+		if (canInvites) {
+			items.push({
+				category: t('common.nav.categories.administrator'),
+				label: 'Invites',
+				view: 'invites',
+				icon: Link,
+			});
+		}
+
 		if (canRoles && isServerSet) {
 			items.push({
 				category: t('common.nav.categories.system'),
@@ -192,6 +203,7 @@ export default function Home() {
 	const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
 	const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
 	const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
+	const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
 
 	const isServerSet = !!adminServerId;
 
@@ -202,6 +214,7 @@ export default function Home() {
 	if (canRoles && isServerSet) allowedViews.push('roles');
 	if (canTokens && isServerSet) allowedViews.push('tokens');
 	if (canSettings) allowedViews.push('settings');
+	if (canInvites) allowedViews.push('invites');
 
 	const activeView = allowedViews.includes(view!) ? view : allowedViews[0];
 
@@ -221,6 +234,7 @@ export default function Home() {
 			{activeView === 'roles' && <Roles />}
 			{activeView === 'tokens' && <Tokens />}
 			{activeView === 'settings' && <Settings />}
+			{activeView === 'invites' && <Invites />}
 		</div>
 	);
 }

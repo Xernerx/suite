@@ -6,6 +6,7 @@ import BotVoteSchema from './models/xernerx/bots/Vote';
 
 import CoreSettingSchema from './models/xernerx/core/Setting';
 import CoreInviteSchema from './models/xernerx/core/Invite';
+import CoreAppInviteSchema from './models/xernerx/core/AppInvite';
 import CoreRoleSchema from './models/xernerx/core/Role';
 
 import DispatchApplicationSchema from './models/xernerx/dispatch/Application';
@@ -38,6 +39,7 @@ export const xernerxModels = {
 	core: {
 		Setting: { schema: CoreSettingSchema, modelName: 'Setting' },
 		Invite: { schema: CoreInviteSchema, modelName: 'Invite' },
+		AppInvite: { schema: CoreAppInviteSchema, modelName: 'AppInvite' },
 		Role: { schema: CoreRoleSchema, modelName: 'Role' },
 	},
 	dispatch: {

@@ -28,6 +28,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 
 				{/* Scrollable Content Area with a prominent, symmetrical radial and linear accent gradient */}
 				<div
+					id="main-scroll-container"
 					className={`relative h-full flex-1 overflow-y-auto shadow-inner
                         ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : 'rounded-tl-xl'} 
                     `}
