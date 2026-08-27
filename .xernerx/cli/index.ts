@@ -20,7 +20,7 @@ async function main() {
 
 	const isCI = process.env.CI === 'true' || process.env.CI === '1';
 	const skipInitCommands = ['build', 'lint', 'clean', 'commit', 'push', 'initialize'];
-	const isSkippedCommand = process.argv.some(arg => skipInitCommands.includes(arg));
+	const isSkippedCommand = process.argv.some((arg) => skipInitCommands.includes(arg));
 
 	if (!fs.existsSync(rootEnvPath) && !isCI && !isSkippedCommand) {
 		console.log('\n[CLI] No .env file found. Running interactive initialization...');

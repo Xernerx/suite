@@ -1,5 +1,11 @@
 # @xernerx/styles
 
+## 0.1.7
+
+### Patch Changes
+
+- fix build
+
 ## 0.1.6
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.3.7
+
+### Patch Changes
+
+- fix build
+
 ## 0.3.6
 
 ### Patch Changes

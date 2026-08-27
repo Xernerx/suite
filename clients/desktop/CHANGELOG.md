@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.1.2
+
+### Patch Changes
+
+- fix build
+
 ## 2.1.1
 
 ### Patch Changes

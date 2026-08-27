@@ -1,5 +1,11 @@
 # @xernerx/websocket
 
+## 1.2.6
+
+### Patch Changes
+
+- fix build
+
 ## 1.2.5
 
 ### Patch Changes

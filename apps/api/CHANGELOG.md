@@ -1,5 +1,17 @@
 # api
 
+## 0.6.1
+
+### Patch Changes
+
+- fix build
+- Updated dependencies
+    - @xernerx/components@0.2.15
+    - @xernerx/providers@0.3.8
+    - @xernerx/feedback@0.0.16
+    - @xernerx/lib@0.3.7
+    - @xernerx/ui@0.2.11
+
 ## 0.6.0
 
 ### Minor Changes

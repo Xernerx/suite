@@ -1,5 +1,16 @@
 # docs
 
+## 0.2.17
+
+### Patch Changes
+
+- fix build
+- Updated dependencies
+    - @xernerx/components@0.2.15
+    - @xernerx/providers@0.3.8
+    - @xernerx/feedback@0.0.16
+    - @xernerx/lib@0.3.7
+
 ## 0.2.16
 
 ### Patch Changes

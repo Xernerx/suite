@@ -1,7 +1,7 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
