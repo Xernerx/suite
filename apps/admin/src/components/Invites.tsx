@@ -37,7 +37,7 @@ export default function Invites() {
 	const [newClientId, setNewClientId] = useState('');
 	const [newName, setNewName] = useState('');
 	const [newScopes, setNewScopes] = useState('bot, applications.commands');
-	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(0n);
+	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -64,7 +64,7 @@ export default function Invites() {
 		setNewClientId('');
 		setNewName('');
 		setNewScopes('bot, applications.commands');
-		setSelectedPermissions(0n);
+		setSelectedPermissions(BigInt(0));
 		setIsCreateOpen(true);
 	};
 

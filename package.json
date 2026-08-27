@@ -10,7 +10,8 @@
 	},
 	"scripts": {
 		"suite": "suite",
-		"dev": "suite dev"
+		"dev": "suite dev",
+		"build": "suite build"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.1",
