@@ -18,7 +18,11 @@ async function main() {
 	const rootEnvPath = path.join(process.cwd(), '.env');
 	let envInitialized = false;
 
-	if (!fs.existsSync(rootEnvPath)) {
+	const isCI = process.env.CI === 'true' || process.env.CI === '1';
+	const skipInitCommands = ['build', 'lint', 'clean', 'commit', 'push', 'initialize'];
+	const isSkippedCommand = process.argv.some(arg => skipInitCommands.includes(arg));
+
+	if (!fs.existsSync(rootEnvPath) && !isCI && !isSkippedCommand) {
 		console.log('\n[CLI] No .env file found. Running interactive initialization...');
 		await initCommand();
 		envInitialized = true;
@@ -41,7 +45,7 @@ async function main() {
 	registerClean(program);
 
 	program.action(async () => {
-		if (!fs.existsSync(rootEnvPath) && !envInitialized) {
+		if (!fs.existsSync(rootEnvPath) && !envInitialized && !isCI && !isSkippedCommand) {
 			await initCommand();
 			console.log('[CLI] Linking the `suite` command globally so you can use it natively...');
 			runCommand('npm', ['link']);
