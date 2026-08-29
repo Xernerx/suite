@@ -117,7 +117,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			await BotModel.updateOne({ id }, { $set: updateFields });
 		}
 
-		return NextResponse.json({ message: 'Stats updated successfully' }, { status: 201 });
+		return NextResponse.json(
+			{
+				message: 'Stats updated successfully',
+				warning: 'DEPRECATED: This endpoint will be removed in the next major version. Please update your integrations to use https://api.xernerx.com/v1/bots/[id]/stats instead.',
+			},
+			{
+				status: 201,
+				headers: {
+					Warning: '299 - "Deprecated API: This endpoint will be removed in the next major version. Please use https://api.xernerx.com/v1/bots/[id]/stats instead."',
+				},
+			}
+		);
 	} catch (error: any) {
 		console.error('Failed to process bot stats POST:', error);
 		return NextResponse.json({ error: 'Internal Server Error', message: error.message, stack: error.stack }, { status: 500 });

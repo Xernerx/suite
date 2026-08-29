@@ -1,5 +1,11 @@
 # app
 
+## 2.1.9
+
+### Patch Changes
+
+- Added deprecation warning to api endpoint
+
 ## 2.1.8
 
 ### Patch Changes
