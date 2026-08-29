@@ -1,5 +1,11 @@
 # auth
 
+## 0.6.12
+
+### Patch Changes
+
+- Another fix for stripe version
+
 ## 0.6.11
 
 ### Patch Changes

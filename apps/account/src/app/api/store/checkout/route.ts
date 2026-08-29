@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 
 // Initialize Stripe with your Secret Key
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-08-26.dahlia', // Use the latest API version
+	apiVersion: '2026-07-29.dahlia', // Use the latest API version
 });
 
 export async function POST(req: Request) {
