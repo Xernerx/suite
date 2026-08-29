@@ -1,5 +1,11 @@
 # api
 
+## 0.6.2
+
+### Patch Changes
+
+- Fixed stripe version
+
 ## 0.6.1
 
 ### Patch Changes
