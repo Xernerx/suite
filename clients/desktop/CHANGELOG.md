@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.1.3
+
+### Patch Changes
+
+- Fixed app builder
+
 ## 2.1.2
 
 ### Patch Changes

@@ -35,12 +35,12 @@ jobs:
 
             - name: Build and Package Desktop
               run: |
-                  cd apps/desktop
+                  cd clients/desktop
                   npm pkg set version="$(node -p "require('./package.json').version")-canary.$(git rev-parse --short HEAD)"
                   cd ../..
 
-                  pnpm --filter ./apps/desktop build
-                  pnpm --filter ./apps/desktop dist --publish never
+                  pnpm --filter ./clients/desktop build
+                  pnpm --filter ./clients/desktop dist --publish never
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -49,9 +49,9 @@ jobs:
               with:
                   name: desktop-release-${{ matrix.os }}
                   path: |
-                      apps/desktop/release/*.exe
-                      apps/desktop/release/*.dmg
-                      apps/desktop/release/*.AppImage
+                      clients/desktop/release/*.exe
+                      clients/desktop/release/*.dmg
+                      clients/desktop/release/*.AppImage
                   if-no-files-found: error
 
     # 3. Cleanly wipe the old rolling canary release/tag, push a unique historical tag, and create the fresh rolling release
@@ -85,7 +85,7 @@ jobs:
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
                   # Extract version and commit hash
-                  VERSION=$(node -p "require('./apps/desktop/package.json').version")
+                  VERSION=$(node -p "require('./clients/desktop/package.json').version")
                   COMMIT=$(git rev-parse --short HEAD)
                   VERSIONED_TAG="v${VERSION}-canary.${COMMIT}"
                   TITLE="v${VERSION}-canary"

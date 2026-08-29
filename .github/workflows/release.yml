@@ -39,20 +39,20 @@ jobs:
               run: pnpm install
 
             - name: Build desktop
-              run: pnpm --filter ./apps/desktop build
+              run: pnpm --filter ./clients/desktop build
 
             - name: Package desktop
-              run: pnpm --filter ./apps/desktop dist -- --publish=never
+              run: pnpm --filter ./clients/desktop dist -- --publish=never
 
             - name: Publish Desktop Release
               uses: softprops/action-gh-release@v2
               with:
                   files: |
-                      apps/desktop/release/**/*.exe
-                      apps/desktop/release/**/*.dmg
-                      apps/desktop/release/**/*.AppImage
-                      apps/desktop/release/**/*.yml
-                      apps/desktop/release/**/*.blockmap
+                      clients/desktop/release/**/*.exe
+                      clients/desktop/release/**/*.dmg
+                      clients/desktop/release/**/*.AppImage
+                      clients/desktop/release/**/*.yml
+                      clients/desktop/release/**/*.blockmap
                   tag_name: ${{ github.ref_name }}
                   name: Desktop ${{ github.ref_name }}
               env:
