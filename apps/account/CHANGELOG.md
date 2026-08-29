@@ -1,5 +1,11 @@
 # auth
 
+## 0.6.14
+
+### Patch Changes
+
+- Fixed an issue where urls were constructed with production in the url
+
 ## 0.6.13
 
 ### Patch Changes
