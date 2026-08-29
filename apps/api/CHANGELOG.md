@@ -1,5 +1,11 @@
 # api
 
+## 0.6.5
+
+### Patch Changes
+
+- Added announcements and update privacy policy and terms of service
+
 ## 0.6.4
 
 ### Patch Changes

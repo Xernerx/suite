@@ -21,6 +21,8 @@ const schema = new Schema(
 		seen: { type: Date }, // User's notifications seen settings (optional)
 
 		verified: { type: Boolean, default: false }, // Whether the user has been verified
+		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service
+		agreedPrivacy: { type: Date, default: null }, // Timestamp of when the user agreed to the Privacy Policy
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the user
 		preferences: { locale: { type: String } }, // User locale (e.g., en-US, es-ES, fr-FR)
 

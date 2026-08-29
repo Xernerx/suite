@@ -1,5 +1,11 @@
 # admin
 
+## 0.4.0
+
+### Minor Changes
+
+- Added announcements and update privacy policy and terms of service
+
 ## 0.3.1
 
 ### Patch Changes

@@ -51,7 +51,18 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 			let combined: Notification[] = [];
 
 			if (res.ok) {
-				const dispatchData = await res.json();
+				let dispatchData = await res.json();
+
+				// Use localStorage to track read states for global announcements so one user reading it doesn't hide it for everyone
+				let readGlobals: string[] = [];
+				let deletedGlobals: string[] = [];
+				if (typeof window !== 'undefined') {
+					readGlobals = JSON.parse(localStorage.getItem('xernerx-read-globals') || '[]');
+					deletedGlobals = JSON.parse(localStorage.getItem('xernerx-deleted-globals') || '[]');
+				}
+
+				// Filter out globally deleted announcements
+				dispatchData = dispatchData.filter((d: any) => !(d.targetId === 'global' && deletedGlobals.includes(d.id)));
 
 				combined = dispatchData.map((d: any) => {
 					if (d.category === 'invite' && d.status === 'pending') {
@@ -67,13 +78,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 							isInvite: true,
 						};
 					} else {
+						const isGlobal = d.targetId === 'global';
 						return {
 							id: d.id,
 							userId: d.targetId,
 							title: d.data?.title || 'Notification',
 							message: d.data?.message || '',
 							type: d.data?.type || 'info',
-							read: d.status === 'read',
+							read: isGlobal ? readGlobals.includes(d.id) : d.status === 'read',
 							link: d.data?.link || null,
 							createdAt: d.createdAt,
 							isInvite: false,
@@ -106,6 +118,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 		// 1. Optimistic UI Update (instant feedback)
 		setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
 
+		if (notification.userId === 'global') {
+			if (typeof window !== 'undefined') {
+				const readGlobals = JSON.parse(localStorage.getItem('xernerx-read-globals') || '[]');
+				if (!readGlobals.includes(id)) {
+					localStorage.setItem('xernerx-read-globals', JSON.stringify([...readGlobals, id]));
+				}
+			}
+			return;
+		}
+
 		// 2. Database Update
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${id}`), {
@@ -123,15 +145,23 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 	// Optimistically mark all notifications as read
 	const markAllAsRead = async () => {
-		const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
-		if (unreadIds.length === 0) return;
+		const unreadNotifications = notifications.filter((n) => !n.read);
+		if (unreadNotifications.length === 0) return;
 
 		// 1. Optimistic UI Update
 		setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 
+		// Globals
+		const unreadGlobals = unreadNotifications.filter((n) => n.userId === 'global');
+		if (unreadGlobals.length > 0 && typeof window !== 'undefined') {
+			const readGlobals = JSON.parse(localStorage.getItem('xernerx-read-globals') || '[]');
+			localStorage.setItem('xernerx-read-globals', JSON.stringify([...readGlobals, ...unreadGlobals.map((n) => n.id)]));
+		}
+
+		const unreadIds = unreadNotifications.filter((n) => n.userId !== 'global').map((n) => n.id);
+		if (unreadIds.length === 0) return;
+
 		// 2. Database Update (Firing Promises in parallel)
-		// Note: If users get thousands of notifications, you might want to create a dedicated
-		// PATCH /secure/dispatch route to mass-update them in one DB query.
 		try {
 			await Promise.all(
 				unreadIds.map((id) =>

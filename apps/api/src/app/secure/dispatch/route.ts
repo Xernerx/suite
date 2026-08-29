@@ -17,7 +17,9 @@ export async function GET(req: Request) {
 		const Dispatch = models.dispatch.Invite as any;
 
 		let query: any = {};
-		if (targetId) query.targetId = targetId;
+		if (targetId) {
+			query.$or = [{ targetId: targetId }, { targetId: 'global' }];
+		}
 		if (senderId) query.senderId = senderId;
 		if (category) query.category = category;
 		if (type) query.type = type;

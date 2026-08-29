@@ -5,16 +5,16 @@ import mongoose, { Connection, Model, Schema } from 'mongoose';
 import { xernerxModels } from './registry';
 
 const globalWithMongoose = global as typeof global & {
-	__connections?: Record<string, Record<string, Connection>>;
-	__models?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__connections_v2?: Record<string, Record<string, Connection>>;
+	__models_v4?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
-const activeConnections = globalWithMongoose.__connections || {};
-const cachedModels = globalWithMongoose.__models || {};
+const activeConnections = globalWithMongoose.__connections_v2 || {};
+const cachedModels = globalWithMongoose.__models_v4 || {};
 
 if (process.env.NODE_ENV !== 'production') {
-	globalWithMongoose.__connections = activeConnections;
-	globalWithMongoose.__models = cachedModels;
+	globalWithMongoose.__connections_v2 = activeConnections;
+	globalWithMongoose.__models_v4 = cachedModels;
 }
 
 const uris = {

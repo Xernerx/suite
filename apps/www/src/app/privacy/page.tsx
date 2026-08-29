@@ -25,9 +25,15 @@ export default function Page() {
 			id: 'data-collected',
 			title: t('www.privacy.sections.dataCollected.title'),
 			content: (
-				<ul className="list-disc pl-6 space-y-2">
+				<ul className="list-disc pl-6 space-y-4">
 					<li>
 						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.account.title')}</strong> {t('www.privacy.sections.dataCollected.account.desc')}
+					</li>
+					<li>
+						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.developers.title')}</strong> {t('www.privacy.sections.dataCollected.developers.desc')}
+					</li>
+					<li>
+						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.botUsers.title')}</strong> {t('www.privacy.sections.dataCollected.botUsers.desc')}
 					</li>
 					<li>
 						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.usage.title')}</strong> {t('www.privacy.sections.dataCollected.usage.desc')}
@@ -63,6 +69,7 @@ export default function Page() {
 					<li>{t('www.privacy.sections.sharing.items.0')}</li>
 					<li>{t('www.privacy.sections.sharing.items.1')}</li>
 					<li>{t('www.privacy.sections.sharing.items.2')}</li>
+					<li>{t('www.privacy.sections.sharing.items.3')}</li>
 				</ul>
 			),
 		},
@@ -79,14 +86,7 @@ export default function Page() {
 		{
 			id: 'rights',
 			title: t('www.privacy.sections.rights.title'),
-			content: (
-				<ul className="list-disc pl-6 space-y-2">
-					<li>{t('www.privacy.sections.rights.items.0')}</li>
-					<li>{t('www.privacy.sections.rights.items.1')}</li>
-					<li>{t('www.privacy.sections.rights.items.2')}</li>
-					<li>{t('www.privacy.sections.rights.items.3')}</li>
-				</ul>
-			),
+			content: <p>{t('www.privacy.sections.rights.content')}</p>,
 		},
 		{
 			id: 'cookies',
@@ -97,6 +97,11 @@ export default function Page() {
 			id: 'international',
 			title: t('www.privacy.sections.international.title'),
 			content: <p>{t('www.privacy.sections.international.content')}</p>,
+		},
+		{
+			id: 'childrens-privacy',
+			title: t('www.privacy.sections.childrensPrivacy.title'),
+			content: <p>{t('www.privacy.sections.childrensPrivacy.content')}</p>,
 		},
 		{
 			id: 'changes',

@@ -19,6 +19,7 @@ import {
 import React, { Suspense } from 'react';
 
 import { CookiePrompt } from './CookiePrompt';
+import { TermsPrompt } from './TermsPrompt';
 import { Loading } from '@xernerx/feedback';
 import { Page } from './Page';
 import { ThemeScript } from './ThemeScript';
@@ -63,6 +64,7 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 												<ShortcutsProvider>
 													<CookieProvider>
 														<CookiePrompt />
+														<TermsPrompt />
 														<SidebarProvider>
 															<SupportProvider>
 																<Page>{children}</Page>

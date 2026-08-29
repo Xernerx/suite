@@ -1,7 +1,7 @@
 <!-- @format -->
 
 <p align="center">
-  <img src="https://www.xernerx.com/banner.png" alt="Xernerx Auth Banner" width="100%">
+  <img src="https://www.xernerx.com/banner.png" alt="Xernerx Account Banner" width="100%">
 </p>
 
 <p align="center">
@@ -10,22 +10,22 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
-  <img src="https://img.shields.io/badge/service-auth-blue?style=for-the-badge&logo=none" alt="Service">
+  <img src="https://img.shields.io/badge/service-account-blue?style=for-the-badge&logo=none" alt="Service">
 </p>
 
 ---
 
 ## 🧭 Overview
 
-The **Auth** service functions as the central user account hub for the Xernerx ecosystem. It manages all user-centric operations, identity verification, profile configurations, localization settings, and the complete token lifecycle.
+The **Account** service functions as the central user account hub for the Xernerx ecosystem. It manages all user-centric operations, identity verification, profile configurations, localization settings, and the complete token lifecycle.
 
 ### 🌐 Subdomain Routing
 
-| Environment | URL Pattern                                                  | Description                                        |
-| :---------- | :----------------------------------------------------------- | :------------------------------------------------- |
-| **Public**  | [`auth.xernerx.com`](https://auth.xernerx.com)               | Production account and authentication hub          |
-| **Canary**  | [`auth.canary.xernerx.com`](https://canary.auth.xernerx.com) | Staging and pre-release authentication environment |
-| **Dev**     | [`auth.dev.xernerx.com`](https://dev.auth.xernerx.com)       | Local and active development environment           |
+| Environment | URL Pattern                                                        | Description                                        |
+| :---------- | :----------------------------------------------------------------- | :------------------------------------------------- |
+| **Public**  | [`account.xernerx.com`](https://account.xernerx.com)               | Production account and authentication hub          |
+| **Canary**  | [`account.canary.xernerx.com`](https://canary.account.xernerx.com) | Staging and pre-release authentication environment |
+| **Dev**     | [`account.dev.xernerx.com`](https://dev.account.xernerx.com)       | Local and active development environment           |
 
 ---
 

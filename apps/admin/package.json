@@ -1,6 +1,6 @@
 {
 	"name": "admin",
-	"version": "0.3.1",
+	"version": "0.4.0",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -20,7 +20,7 @@
 		"discord-api-types": "^0.38.53",
 		"framer-motion": "^13.1.0",
 		"lucide-react": "^1.31.0",
-		"next": "^16.3.1",
+		"next": "^16.3.3",
 		"next-auth": "^4.24.15",
 		"react": "^19.2.8",
 		"react-circle-flags": "^0",
