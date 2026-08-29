@@ -5,9 +5,9 @@ function runSync(cmd: string, args: string[]) {
 	spawnSync(cmd, args, { stdio: 'inherit', shell: true });
 }
 
-export default function registerPush(program: Command) {
+export default function registerShip(program: Command) {
 	program
-		.command('push')
+		.command('ship')
 		.description('Version, commit, tag, and push release')
 		.action(() => {
 			runSync('npx', ['@changesets/cli', 'version']);
