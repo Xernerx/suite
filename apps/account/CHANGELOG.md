@@ -1,5 +1,11 @@
 # auth
 
+## 0.6.13
+
+### Patch Changes
+
+- fix stripe
+
 ## 0.6.12
 
 ### Patch Changes
