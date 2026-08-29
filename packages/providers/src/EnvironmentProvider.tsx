@@ -29,7 +29,8 @@ function getInitialEnvironment(): Environment {
 			return 'canary';
 		}
 	}
-	return (process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase() as Environment) || 'public';
+	const env = process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase();
+	return (env === 'production' || !env ? 'public' : env) as Environment;
 }
 
 export function EnvironmentProvider({ children, initialEnvironment }: { children: React.ReactNode; initialEnvironment?: Environment }) {
