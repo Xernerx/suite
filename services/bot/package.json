@@ -29,7 +29,7 @@
 		"@xernerx/stats": "^1.0.9",
 		"discord.js": "^14.22.1",
 		"mongoose": "^9.9.1",
-		"next": "^16.3.1",
+		"next": "^16.3.3",
 		"server-only": "^0.0.1",
 		"tslib": "^2.6.2"
 	}

@@ -928,16 +928,24 @@
 				"dataCollected": {
 					"title": "2. Information We Collect",
 					"account": {
-						"title": "Account Information:",
-						"desc": "Email, username, and profile identifiers."
+						"title": "General Account Information:",
+						"desc": "Email, username, and profile identifiers when you register."
 					},
 					"usage": {
 						"title": "Usage Data:",
-						"desc": "Logs, system interactions, and configuration settings."
+						"desc": "Error logs and system interactions to maintain platform stability."
 					},
 					"integration": {
 						"title": "Integration Data:",
-						"desc": "Data provided through third-party platforms such as Discord."
+						"desc": "Data provided through third-party platforms such as Discord, and payment processing details via Stripe."
+					},
+					"developers": {
+						"title": "For API & Bot Developers:",
+						"desc": "API tokens, webhook URLs, application metadata, and configuration settings used to operate your integrations on our infrastructure."
+					},
+					"botUsers": {
+						"title": "For Bot End Users:",
+						"desc": "When you interact with a bot powered by Xernerx (e.g. Zodiac, To-Do list), we process your Discord ID, server IDs, and command inputs to execute the requested actions. We do not store raw message logs unless explicitly required by an opt-in bot feature."
 					}
 				},
 				"legalBasis": {
@@ -949,13 +957,18 @@
 					"items": [
 						"To provide and maintain services.",
 						"To improve reliability and performance.",
-						"To provide support and communicate updates.",
+						"To provide support, communicate platform updates, and send important service-related emails (e.g., billing, security alerts). You may manage your notification preferences or opt-out of non-essential emails at any time.",
 						"To ensure compliance with legal obligations."
 					]
 				},
 				"sharing": {
 					"title": "5. Data Sharing",
-					"items": ["Hosting and infrastructure providers.", "Authorized third-party integrations.", "Legal authorities when required by law."]
+					"items": [
+						"Hosting and infrastructure providers.",
+						"Payment processors (e.g. Stripe) for billing and subscription management.",
+						"Authorized third-party integrations.",
+						"Legal authorities when required by law."
+					]
 				},
 				"retention": {
 					"title": "6. Data Retention",
@@ -971,7 +984,7 @@
 				},
 				"cookies": {
 					"title": "9. Cookies & Tracking",
-					"content": "We may use cookies or similar technologies to improve service performance and analytics."
+					"content": "We use cookies or similar technologies to improve service performance, store interface preferences, and serve advertisements. This includes third-party services like Google AdSense, which may use cookies to serve personalized ads based on your prior visits to our platform or other websites."
 				},
 				"international": {
 					"title": "10. International Transfers",
@@ -1012,48 +1025,58 @@
 						"Reverse-engineer or exploit vulnerabilities."
 					]
 				},
+				"apiUsage": {
+					"title": "4. API & Developer Terms",
+					"content": "Developers using our API or bot infrastructure must not use these services to distribute malware, bypass rate limits, or facilitate unauthorized data scraping. We reserve the right to revoke API tokens or suspend bot applications that violate these guidelines or degrade platform performance."
+				},
+				"botUsage": {
+					"title": "5. Bot End User Terms",
+					"content": "Users interacting with Xernerx-powered bots agree not to exploit command inputs to execute malicious payloads or harass other users. Server administrators are responsible for ensuring bots are used in compliance with both these terms and Discord's Terms of Service."
+				},
 				"accounts": {
-					"title": "4. User Accounts",
+					"title": "6. User Accounts",
 					"content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. We are not liable for losses arising from unauthorized access."
 				},
 				"data": {
-					"title": "5. User Data",
-					"content": "By using our services, you agree to our data handling practices as described in our Privacy Policy. Data may include account information, usage metrics, and integration-based data where applicable."
+					"title": "7. User Data",
+					"contentPrefix": "By using our services, you agree to our data handling practices as described in our ",
+					"contentLink": "Privacy Policy",
+					"contentSuffix": ". Data may include account information, usage metrics, and integration-based data where applicable."
 				},
 				"availability": {
-					"title": "6. Service Availability",
+					"title": "8. Service Availability",
 					"content": "We strive for reliable uptime but do not guarantee uninterrupted service. Services may be modified, suspended, or discontinued at any time."
 				},
 				"thirdParty": {
-					"title": "7. Third-Party Services",
-					"content": "Our services may integrate with third-party platforms such as Discord. We are not responsible for third-party policies, availability, or data practices."
+					"title": "9. Third-Party Services",
+					"content": "Our services integrate with third-party platforms such as Discord, Stripe, and Google (for translation and advertising services). We are not responsible for third-party policies, service availability, or independent data practices."
 				},
 				"intellectualProperty": {
-					"title": "8. Intellectual Property",
+					"title": "10. Intellectual Property",
 					"content": "All software, code, branding, and materials remain the exclusive property of Xernerx Studios or its licensors. Unauthorized reproduction or distribution is prohibited."
 				},
 				"warranty": {
-					"title": "9. Disclaimer of Warranties",
+					"title": "11. Disclaimer of Warranties",
 					"content": "Services are provided “as is” without warranties of any kind, whether express or implied."
 				},
 				"liability": {
-					"title": "10. Limitation of Liability",
+					"title": "12. Limitation of Liability",
 					"content": "To the fullest extent permitted by law, Xernerx Studios shall not be liable for indirect, incidental, or consequential damages arising from use of our services."
 				},
 				"indemnification": {
-					"title": "11. Indemnification",
+					"title": "13. Indemnification",
 					"content": "You agree to indemnify and hold harmless Xernerx Studios from claims or liabilities arising from misuse of our services or violation of these Terms."
 				},
 				"governingLaw": {
-					"title": "12. Governing Law",
+					"title": "14. Governing Law",
 					"content": "These Terms shall be governed in accordance with applicable laws within your jurisdiction."
 				},
 				"changes": {
-					"title": "13. Changes to Terms",
+					"title": "15. Changes to Terms",
 					"content": "We may update these Terms from time to time. Continued use of our services after updates constitutes acceptance."
 				},
 				"contact": {
-					"title": "14. Contact",
+					"title": "16. Contact",
 					"prefix": "For legal inquiries contact"
 				}
 			},

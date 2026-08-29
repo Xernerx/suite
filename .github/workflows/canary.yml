@@ -10,10 +10,34 @@ jobs:
     build:
         uses: ./.github/workflows/build.yml
 
-    # 2. Build and package on each OS independently
+    # 2. Check if desktop version bumped
+    check-version:
+        name: Check Desktop Version Bump
+        runs-on: ubuntu-latest
+        outputs:
+            changed: ${{ steps.check.outputs.changed }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: Check version change
+              id: check
+              run: |
+                  OLD_VERSION=$(git show ${{ github.event.before }}:clients/desktop/package.json 2>/dev/null | jq -r .version || echo "none")
+                  NEW_VERSION=$(jq -r .version clients/desktop/package.json)
+                  echo "Old version: $OLD_VERSION"
+                  echo "New version: $NEW_VERSION"
+                  if [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ "$NEW_VERSION" != "null" ]; then
+                    echo "changed=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "changed=false" >> $GITHUB_OUTPUT
+                  fi
+
+    # 3. Build and package on each OS independently
     canary-desktop:
         name: Canary Desktop (${{ matrix.os }})
-        needs: [build]
+        needs: [build, check-version]
+        if: needs.check-version.outputs.changed == 'true'
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
@@ -54,7 +78,7 @@ jobs:
                       clients/desktop/release/*.AppImage
                   if-no-files-found: error
 
-    # 3. Cleanly wipe the old rolling canary release/tag, push a unique historical tag, and create the fresh rolling release
+    # 4. Cleanly wipe the old rolling canary release/tag, push a unique historical tag, and create the fresh rolling release
     publish-canary:
         name: Publish Rolling Canary Preview
         needs: [canary-desktop]

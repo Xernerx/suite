@@ -6,6 +6,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import tinycolor from 'tinycolor2';
 import { useEnvironment } from '@xernerx/providers'; // Imported useEnvironment for API routing
 import { useSession } from 'next-auth/react';
+import Script from 'next/script';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -201,9 +202,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				setAccent: applyAccent,
 			}}
 		>
-			<script
+			<Script
 				id="theme-init"
-				suppressHydrationWarning
+				strategy="beforeInteractive"
 				dangerouslySetInnerHTML={{
 					__html: `
                         (function() {

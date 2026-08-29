@@ -50,13 +50,19 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 		if (!selectedNotification) return;
 		setIsProcessing(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications/${selectedNotification.id}`), {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({ read: false }),
-			});
-			if (!res.ok) throw new Error('Failed to mark as unread');
+			if (selectedNotification.userId === 'global') {
+				const readGlobals = JSON.parse(localStorage.getItem('xernerx-read-globals') || '[]');
+				const newReadGlobals = readGlobals.filter((id: string) => id !== selectedNotification.id);
+				localStorage.setItem('xernerx-read-globals', JSON.stringify(newReadGlobals));
+			} else {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${selectedNotification.id}`), {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ status: 'unread' }),
+				});
+				if (!res.ok) throw new Error('Failed to mark as unread');
+			}
 
 			await refresh();
 			setSelectedNotification(null);
@@ -71,7 +77,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 		if (!selectedNotification) return;
 		setIsProcessing(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/applications/${selectedNotification.id}`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${selectedNotification.id}`), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
@@ -94,11 +100,18 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 		if (!selectedNotification) return;
 		setIsProcessing(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/content/notifications/${selectedNotification.id}`), {
-				method: 'DELETE',
-				credentials: 'include',
-			});
-			if (!res.ok) throw new Error('Failed to delete notification');
+			if (selectedNotification.userId === 'global') {
+				const deletedGlobals = JSON.parse(localStorage.getItem('xernerx-deleted-globals') || '[]');
+				if (!deletedGlobals.includes(selectedNotification.id)) {
+					localStorage.setItem('xernerx-deleted-globals', JSON.stringify([...deletedGlobals, selectedNotification.id]));
+				}
+			} else {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${selectedNotification.id}`), {
+					method: 'DELETE',
+					credentials: 'include',
+				});
+				if (!res.ok) throw new Error('Failed to delete notification');
+			}
 
 			await refresh();
 			setSelectedNotification(null);
@@ -145,19 +158,22 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 						<span className="text-sm font-semibold text-(--text)">{t('components.cards.sidebarnotifications.text1')}</span>
 						{unreadCount > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">{unreadCount}</span>}
 					</div>
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2">
 						<button
 							onClick={handleRefresh}
 							disabled={isRefreshing}
-							className="text-[10px] font-medium text-(--text-muted) hover:text-(--text) transition-colors flex items-center gap-1 disabled:opacity-50"
+							title={t('components.cards.sidebarnotifications.text2')}
+							className="h-6 w-6 flex items-center justify-center rounded-md text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
 						>
 							<RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-							{t('components.cards.sidebarnotifications.text2')}
 						</button>
 						{unreadCount > 0 && (
-							<button onClick={markAllAsRead} className="text-[10px] font-medium text-(--text-muted) hover:text-(--text) transition-colors flex items-center gap-1">
+							<button
+								onClick={markAllAsRead}
+								title={t('components.cards.sidebarnotifications.text3')}
+								className="h-6 w-6 flex items-center justify-center rounded-md text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors"
+							>
 								<Check size={12} />
-								{t('components.cards.sidebarnotifications.text3')}
 							</button>
 						)}
 					</div>

@@ -1,5 +1,11 @@
 # www
 
+## 0.6.2
+
+### Patch Changes
+
+- Added announcements and update privacy policy and terms of service
+
 ## 0.6.1
 
 ### Patch Changes

@@ -39,6 +39,16 @@ export default function Page() {
 			),
 		},
 		{
+			id: 'api-usage',
+			title: t('www.terms.sections.apiUsage.title'),
+			content: <p>{t('www.terms.sections.apiUsage.content')}</p>,
+		},
+		{
+			id: 'bot-usage',
+			title: t('www.terms.sections.botUsage.title'),
+			content: <p>{t('www.terms.sections.botUsage.content')}</p>,
+		},
+		{
 			id: 'accounts',
 			title: t('www.terms.sections.accounts.title'),
 			content: <p>{t('www.terms.sections.accounts.content')}</p>,
@@ -46,7 +56,15 @@ export default function Page() {
 		{
 			id: 'data',
 			title: t('www.terms.sections.data.title'),
-			content: <p>{t('www.terms.sections.data.content')}</p>,
+			content: (
+				<p>
+					{t('www.terms.sections.data.contentPrefix')}
+					<a href="/privacy" target="_blank" rel="noreferrer" className="text-(--accent) hover:underline font-medium">
+						{t('www.terms.sections.data.contentLink')}
+					</a>
+					{t('www.terms.sections.data.contentSuffix')}
+				</p>
+			),
 		},
 		{
 			id: 'availability',

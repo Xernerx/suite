@@ -1,5 +1,11 @@
 # app
 
+## 2.2.0
+
+### Minor Changes
+
+- Added announcements and update privacy policy and terms of service
+
 ## 2.1.9
 
 ### Patch Changes

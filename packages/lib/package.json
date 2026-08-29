@@ -15,7 +15,7 @@
 		"@types/react": "^19.2.18",
 		"lucide-react": "^1.31.0",
 		"mongoose": "^9.9.1",
-		"next": "^16.3.1",
+		"next": "^16.3.3",
 		"next-auth": "^4.24.15",
 		"postmark": "^5.1.0",
 		"react": "^19.2.8",

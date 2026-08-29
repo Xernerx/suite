@@ -66,7 +66,12 @@ async function run() {
 				if (batch.length === 0) return;
 				try {
 					const bulkOps = batch.map((doc) => {
-						const filter = doc.id ? { id: doc.id } : { _id: doc._id };
+						let filter;
+						if (legacyDbName === 'stats') {
+							filter = { _id: doc._id };
+						} else {
+							filter = doc.id ? { id: doc.id } : { _id: doc._id };
+						}
 						return {
 							updateOne: {
 								filter,

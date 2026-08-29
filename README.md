@@ -20,15 +20,15 @@
 
 ### 🌐 Core Applications & Subdomains
 
-| Service                              | Public                                           | Canary                                       | Dev                                    | Description                                                           |
-| :----------------------------------- | :----------------------------------------------- | :------------------------------------------- | :------------------------------------- | :-------------------------------------------------------------------- |
-| **[Admin](./apps/admin/README.md)**  | [`admin.xernerx.com`](https://admin.xernerx.com) | [`canary`](https://canary.admin.xernerx.com) | [`dev`](https://dev.admin.xernerx.com) | Internal administrative portal and ecosystem management console       |
-| **[API](./apps/api/README.md)**      | [`api.xernerx.com`](https://api.xernerx.com)     | [`canary`](https://api.canary.xernerx.com)   | [`dev`](https://api.dev.xernerx.com)   | Core routing, security enforcement, and token validation engine       |
-| **[App](./apps/app/README.md)**      | [`app.xernerx.com`](https://app.xernerx.com)     | [`canary`](https://app.canary.xernerx.com)   | [`dev`](https://app.dev.xernerx.com)   | Unified user dashboard and workspace control center                   |
-| **[Auth](./apps/account/README.md)** | [`auth.xernerx.com`](https://auth.xernerx.com)   | [`canary`](https://auth.canary.xernerx.com)  | [`dev`](https://auth.dev.xernerx.com)  | Authentication, settings, profiles, localization, and token lifecycle |
-| **[CDN](./apps/cdn/README.md)**      | [`cdn.xernerx.com`](https://cdn.xernerx.com)     | [`canary`](https://cdn.canary.xernerx.com)   | [`dev`](https://cdn.dev.xernerx.com)   | Asset delivery and media pipeline infrastructure                      |
-| **[Docs](./apps/docs/README.md)**    | [`docs.xernerx.com`](https://docs.xernerx.com)   | [`canary`](https://docs.canary.xernerx.com)  | [`dev`](https://docs.dev.xernerx.com)  | Developer documentation, guides, and architectural specs              |
-| **[Www](./apps/www/README.md)**      | [`xernerx.com`](https://www.xernerx.com)         | [`canary`](https://canary.xernerx.com)       | [`dev`](https://dev.xernerx.com)       | Institutional landing pages, history, legal terms, and privacy policy |
+| Service                                 | Public                                               | Canary                                         | Dev                                      | Description                                                           |
+| :-------------------------------------- | :--------------------------------------------------- | :--------------------------------------------- | :--------------------------------------- | :-------------------------------------------------------------------- |
+| **[Admin](./apps/admin/README.md)**     | [`admin.xernerx.com`](https://admin.xernerx.com)     | [`canary`](https://canary.admin.xernerx.com)   | [`dev`](https://dev.admin.xernerx.com)   | Internal administrative portal and ecosystem management console       |
+| **[API](./apps/api/README.md)**         | [`api.xernerx.com`](https://api.xernerx.com)         | [`canary`](https://api.canary.xernerx.com)     | [`dev`](https://api.dev.xernerx.com)     | Core routing, security enforcement, and token validation engine       |
+| **[App](./apps/app/README.md)**         | [`app.xernerx.com`](https://app.xernerx.com)         | [`canary`](https://app.canary.xernerx.com)     | [`dev`](https://app.dev.xernerx.com)     | Unified user dashboard and workspace control center                   |
+| **[Account](./apps/account/README.md)** | [`account.xernerx.com`](https://account.xernerx.com) | [`canary`](https://account.canary.xernerx.com) | [`dev`](https://account.dev.xernerx.com) | Authentication, settings, profiles, localization, and token lifecycle |
+| **[CDN](./apps/cdn/README.md)**         | [`cdn.xernerx.com`](https://cdn.xernerx.com)         | [`canary`](https://cdn.canary.xernerx.com)     | [`dev`](https://cdn.dev.xernerx.com)     | Asset delivery and media pipeline infrastructure                      |
+| **[Docs](./apps/docs/README.md)**       | [`docs.xernerx.com`](https://docs.xernerx.com)       | [`canary`](https://docs.canary.xernerx.com)    | [`dev`](https://docs.dev.xernerx.com)    | Developer documentation, guides, and architectural specs              |
+| **[Www](./apps/www/README.md)**         | [`xernerx.com`](https://www.xernerx.com)             | [`canary`](https://canary.xernerx.com)         | [`dev`](https://dev.xernerx.com)         | Institutional landing pages, history, legal terms, and privacy policy |
 
 ### ⚡ Infrastructure & Services
 
