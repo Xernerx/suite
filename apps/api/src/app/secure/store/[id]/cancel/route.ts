@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-07-29.dahlia',
+	apiVersion: '2026-08-26.dahlia',
 });
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
