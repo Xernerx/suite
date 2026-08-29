@@ -7,9 +7,9 @@
 @source "../providers/src";
 
 @theme {
-	--color-accent: #8b7cf6;
-	--color-accent-hover: #7a6be6;
-	--color-accent-active: #7e946f;
+	--color-accent: var(--accent);
+	--color-accent-hover: var(--hover-accent);
+	--color-accent-active: var(--active-accent);
 
 	--color-bg-light: #fafafa;
 	--color-fg-light: #f4f4f5;
@@ -20,8 +20,13 @@
 
 :root {
 	--accent: #8b7cf6;
-	--hover-accent: #7a6be6;
-	--active-accent: #7a6be6;
+
+	--hover-accent: color-mix(in srgb, var(--accent) 85%, white 15%);
+	--active-accent: color-mix(in srgb, var(--accent) 85%, black 15%);
+
+	--accent-green: #39ff14;
+	--accent-orange: #ff6600;
+	--accent-red: #ff3333;
 
 	/* Base palette */
 	--background-light: #fafafa;
@@ -40,7 +45,10 @@
 	--text: #09090b;
 	--text-muted: #52525b;
 
+	/* Scalers & Spacing Defaults */
+	--text-scale: 14px;
 	--ui-gap: 15px;
+	--ui-scale: 100; /* Raw number format */
 }
 
 html.dark {
@@ -52,12 +60,28 @@ html.dark {
 	--text-muted: #a1a1aa;
 }
 
+html {
+	font-size: var(--text-scale);
+	zoom: calc(var(--ui-scale) * 1%); /* Converts raw 100 -> 100%, 110 -> 110% */
+}
+
 html,
 body {
+	font-family:
+		var(--font-fredoka),
+		system-ui,
+		-apple-system,
+		sans-serif;
 	background: var(--background);
 	color: var(--text);
 	margin: 0;
 	overflow-y: auto;
+}
+
+code,
+pre,
+kbd {
+	font-family: var(--font-cascadia), ui-monospace, monospace;
 }
 
 .solar-slider {
@@ -116,4 +140,40 @@ body {
 * {
 	scrollbar-width: thin;
 	scrollbar-color: var(--accent) var(--background);
+}
+
+::selection {
+	background: var(--accent);
+	color: color-mix(in srgb, var(--accent) 15%, black);
+}
+
+::-moz-selection {
+	background: var(--accent);
+	color: #ffffff;
+}
+
+/* Number Input spin buttons */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+	opacity: 1;
+	cursor: pointer;
+	border-radius: 4px;
+	margin-left: 8px;
+}
+html:not(.dark) input[type='number']::-webkit-inner-spin-button {
+	filter: invert(0.2);
+}
+html.dark input[type='number']::-webkit-inner-spin-button {
+	filter: invert(0.8) hue-rotate(180deg);
+}
+
+/* Global Application Inputs */
+@layer base {
+	textarea {
+		@apply w-full rounded-2xl border border-(--border)/20 bg-(--foreground) p-4 text-sm text-(--text) placeholder-(--text-muted) outline-none focus:border-(--accent) focus:ring-1 focus:ring-(--accent) min-h-[120px] resize-y transition-all;
+	}
+
+	input[type='radio'] {
+		@apply w-4 h-4 text-(--accent) bg-(--background) border-(--border) focus:ring-(--accent);
+	}
 }

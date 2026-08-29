@@ -3,15 +3,17 @@
 'use client';
 
 import { ArrowUpRight, Bot, Building2, Calendar, Globe, LogOut, RefreshCw, ShieldCheck, Star, UserPlus } from 'lucide-react';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useEnvironment } from '@xernerx/providers';
 
 type Milestone = {
 	date: string;
 	title: string;
 	description: string;
 	icon: React.ReactNode;
+	link?: string;
 };
 
 const milestones: Milestone[] = [
@@ -38,6 +40,7 @@ const milestones: Milestone[] = [
 		title: 'To-Do List Bot Launched',
 		description: 'Clari began development of To-Do List Bot, introducing structured productivity features.',
 		icon: <UserPlus />,
+		link: 'https://app.xernerx.com/bots/782105629572464652',
 	},
 	{
 		date: 'August 2021',
@@ -56,6 +59,7 @@ const milestones: Milestone[] = [
 		title: 'Metamorphosis Rewrite',
 		description: 'Discord-Translate was rebuilt and relaunched as Metamorphosis with improved infrastructure.',
 		icon: <Star />,
+		link: 'https://app.xernerx.com/bots/881678826906730547',
 	},
 	{
 		date: 'February 2022',
@@ -68,6 +72,7 @@ const milestones: Milestone[] = [
 		title: 'Zodiac Development',
 		description: 'Max began development of Zodiac, expanding into astrology and personality tooling.',
 		icon: <ShieldCheck />,
+		link: 'https://app.xernerx.com/bots/950251264095162418',
 	},
 	{
 		date: 'February 2026',
@@ -84,64 +89,38 @@ const milestones: Milestone[] = [
 ];
 
 export default function Timeline() {
-	const containerRef = useRef<HTMLDivElement>(null);
-
-	const { scrollYProgress } = useScroll({
-		target: containerRef,
-		offset: ['start 10%', 'end 90%'],
-	});
-
-	const smoothProgress = useSpring(scrollYProgress, {
-		stiffness: 120,
-		damping: 30,
-	});
-
 	return (
-		<section ref={containerRef} className='relative py-32'>
-			<div className='relative max-w-6xl mx-auto'>
-				{/* CENTER LINE */}
-				<div
-					className='absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[2px]'
-					style={{
-						background: 'color-mix(in srgb, var(--accent) 20%, transparent)',
-					}}>
-					<motion.div
-						className='absolute inset-0 origin-top'
-						style={{
-							background: 'rgb(var(--accent))',
-							scaleY: smoothProgress,
-						}}
-					/>
+		<section className="relative py-32 mb-32 max-w-7xl mx-auto px-6">
+			<div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
+				{/* STICKY LEFT (Editorial Hero) */}
+				<div className="lg:col-span-5 relative">
+					<div className="lg:sticky lg:top-40 flex flex-col gap-8 relative z-10">
+						<div>
+							<h2 className="text-6xl lg:text-[5.5rem] font-black text-(--text) leading-[0.9] tracking-tighter mb-6" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								The
+								<br />
+								<span className="text-transparent bg-clip-text bg-gradient-to-br from-(--accent) to-purple-500">Journey</span>
+								<br />
+								So Far.
+							</h2>
+							<p className="text-lg text-(--text-muted) leading-relaxed max-w-md font-medium">
+								From early experimentation with bots to stable infrastructure engineering, see how Xernerx evolved over the years.
+							</p>
+						</div>
+						<div className="hidden lg:block w-32 h-1.5 bg-gradient-to-r from-(--accent) to-transparent rounded-full shadow-[0_0_20px_var(--accent)]" />
+					</div>
 				</div>
 
-				{/* ITEMS */}
-				<div className='flex flex-col gap-32'>
-					{milestones.map((m, i) => {
-						const isLeft = i % 2 === 0;
+				{/* SCROLLING RIGHT (Timeline Cards) */}
+				<div className="lg:col-span-7 relative">
+					{/* Ambient Glowing Wire */}
+					<div className="absolute left-8 lg:left-12 top-12 bottom-12 w-[2px] bg-gradient-to-b from-transparent via-(--accent) to-transparent opacity-40" />
 
-						return (
-							<div key={i} className='grid grid-cols-[1fr_auto_1fr] items-center'>
-								{/* LEFT */}
-								<div className={isLeft ? 'flex justify-end pr-12' : ''}>{isLeft && <TimelineCard milestone={m} />}</div>
-
-								{/* DOT */}
-								<div className='flex justify-center'>
-									<div
-										style={{
-											width: 10,
-											height: 10,
-											borderRadius: '999px',
-											background: 'rgb(var(--accent))',
-											boxShadow: '0 0 0 4px color-mix(in srgb, var(--accent) 15%, transparent)',
-										}}
-									/>
-								</div>
-
-								{/* RIGHT */}
-								<div className={!isLeft ? 'flex justify-start pl-12' : ''}>{!isLeft && <TimelineCard milestone={m} />}</div>
-							</div>
-						);
-					})}
+					<div className="flex flex-col gap-12 lg:gap-20">
+						{milestones.map((m, i) => (
+							<TimelineCard key={i} milestone={m} />
+						))}
+					</div>
 				</div>
 			</div>
 		</section>
@@ -149,45 +128,61 @@ export default function Timeline() {
 }
 
 function TimelineCard({ milestone }: { milestone: Milestone }) {
+	const { getEnvUrl } = useEnvironment();
+	const finalLink = milestone.link ? getEnvUrl(milestone.link) : undefined;
+
+	const Component = finalLink ? motion.a : motion.div;
+	const componentProps = finalLink ? { href: finalLink } : {};
+
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			whileInView={{ opacity: 1, y: 0 }}
-			viewport={{ once: true, amount: 0.4 }}
-			transition={{ duration: 0.35 }}
-			className='rounded-xl'
-			style={{
-				maxWidth: 420,
-				background: 'var(--container)',
-				border: '1px solid var(--border)',
-				padding: 'calc(var(--ui-gap) * 2)',
-			}}>
-			{/* HEADER */}
-			<div className='flex items-center gap-3 mb-3'>
-				<div
-					className='flex items-center justify-center rounded-md'
-					style={{
-						width: 36,
-						height: 36,
-						background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
-						color: 'rgb(var(--accent))',
-					}}>
-					{milestone.icon}
-				</div>
-
-				<div className='flex flex-col'>
-					<span className='text-[10px] uppercase tracking-wide' style={{ color: 'var(--text-muted)' }}>
-						{milestone.date}
-					</span>
-
-					<span className='text-sm font-medium'>{milestone.title}</span>
-				</div>
+		<div className="relative flex items-center gap-6 lg:gap-12 pl-4 lg:pl-6 group/item">
+			{/* GLOWING NODE */}
+			<div className="absolute left-4 lg:left-6 w-8 h-8 -translate-x-1/2 flex items-center justify-center z-10 transition-transform duration-500 group-hover/item:scale-125">
+				<div className="absolute inset-0 bg-(--accent) rounded-full opacity-20 blur-md group-hover/item:opacity-60 transition-opacity" />
+				<div className="w-3 h-3 bg-(--accent) rounded-full shadow-[0_0_15px_var(--accent)]" />
 			</div>
 
-			{/* DESCRIPTION */}
-			<p className='text-sm leading-relaxed' style={{ color: 'var(--text-muted)' }}>
-				{milestone.description}
-			</p>
-		</motion.div>
+			{/* CARD */}
+			<Component
+				{...componentProps}
+				initial={{ opacity: 0, x: 50, scale: 0.95 }}
+				whileInView={{ opacity: 1, x: 0, scale: 1 }}
+				viewport={{ once: true, margin: '-100px' }}
+				transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+				className={`block w-full rounded-[2rem] transition-all duration-500 bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 p-8 lg:p-10 shadow-2xl relative overflow-hidden group ${finalLink ? 'hover:border-(--accent)/50 hover:shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_40%,transparent)] hover:-translate-y-2' : ''}`}
+			>
+				{/* Frosted glow on hover */}
+				{finalLink && <div className="absolute -top-20 -right-20 w-64 h-64 bg-(--accent)/20 rounded-full blur-[80px] group-hover:bg-(--accent)/30 transition-colors duration-700" />}
+
+				{/* HEADER */}
+				<div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6 mb-6 relative z-10">
+					<div
+						className="flex items-center justify-center rounded-2xl shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+						style={{
+							width: 56,
+							height: 56,
+							background: 'color-mix(in srgb, var(--accent) 15%, transparent)',
+							color: 'var(--accent)',
+						}}
+					>
+						{milestone.icon}
+					</div>
+
+					<div className="flex flex-col flex-1 min-w-0">
+						<span className="text-xs uppercase tracking-widest text-(--accent) font-black mb-1">{milestone.date}</span>
+
+						<span className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
+							{milestone.title}
+							{finalLink && (
+								<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+							)}
+						</span>
+					</div>
+				</div>
+
+				{/* DESCRIPTION */}
+				<p className="text-base leading-relaxed text-(--text-muted) relative z-10 font-medium">{milestone.description}</p>
+			</Component>
+		</div>
 	);
 }

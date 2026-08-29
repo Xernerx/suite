@@ -1,0 +1,1411 @@
+{
+	"metadata": {
+		"label": "English (UK)"
+	},
+	"common": {
+		"cookiePrompt": {
+			"title": "Cookie Preferences",
+			"description": "We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.",
+			"manage": {
+				"essential": {
+					"label": "Essential",
+					"description": "Required for sessions and security."
+				},
+				"functional": {
+					"label": "Functional",
+					"description": "Remembers your theme and layout state."
+				},
+				"analytics": {
+					"label": "Analytics",
+					"description": "Helps us track errors and traffic."
+				}
+			},
+			"buttons": {
+				"acceptAll": "Accept All",
+				"essentialOnly": "Essential Only",
+				"manage": "Manage",
+				"save": "Save My Preferences"
+			}
+		},
+		"buttons": {
+			"cancel": "Cancel",
+			"confirm": "Confirm",
+			"proceed": "Proceed"
+		},
+		"footer": {
+			"tagline": "Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.",
+			"sections": {
+				"resources": "Resources",
+				"developer": "Developer"
+			},
+			"links": {
+				"privacy": "Privacy",
+				"terms": "Terms",
+				"contact": "Contact",
+				"faq": "Frequently Asked Questions",
+				"github": "GitHub",
+				"npm": "npm",
+				"documentation": "Documentation",
+				"discord": "Discord"
+			},
+			"title": "Xernerx Studios",
+			"description": "© 2024 -",
+			"description2": "Xernerx Studios"
+		},
+		"sidebar": {
+			"login": "Login",
+			"alt": "User Avatar",
+			"alt2": "Avatar Decoration"
+		},
+		"nav": {
+			"categories": {
+				"account": "Account",
+				"preferences": "Preferences",
+				"billing": "Billing",
+				"developer": "Developer",
+				"moderator": "Moderator",
+				"administrator": "Administrator",
+				"translator": "Translator",
+				"xernerxSuite": "Xernerx Suite",
+				"system": "System"
+			},
+			"items": {
+				"account": "Account",
+				"profile": "Profile",
+				"connections": "Connections",
+				"devices": "Devices",
+				"appearance": "Appearance",
+				"language": "Language",
+				"notifications": "Notifications",
+				"billing": "Billing",
+				"tokens": "Tokens",
+				"store": "Store",
+				"users": "Users",
+				"roles": "Roles",
+				"translations": "Translations",
+				"applications": "Applications",
+				"applications_review": "Review Applications",
+				"applications_manage": "Manage Applications",
+				"settings": "Settings",
+				"environments": "Environments"
+			}
+		},
+		"shortcuts": {
+			"modal": {
+				"navigation": {
+					"title": "App Drawer",
+					"description": "Quickly launch and switch between applications",
+					"empty": "No applications available."
+				}
+			}
+		},
+		"botrow": {
+			"description": "Servers",
+			"description2": "Users"
+		},
+		"sidebarnotifications": {
+			"description": "Notifications",
+			"button": "Refresh",
+			"button2": "Mark all read",
+			"description2": "No notifications yet",
+			"button3": "Decline",
+			"button4": "Accept",
+			"tooltip": "Delete Notification",
+			"tooltip2": "Mark as Unread",
+			"button5": "Open Link",
+			"button6": "Close"
+		},
+		"sidebarsuite": {
+			"description": "Suite"
+		},
+		"sidebaruser": {
+			"alt": "User Banner",
+			"alt2": "User Profile",
+			"alt3": "Avatar Decoration",
+			"alt4": "Clan Badge",
+			"description": "Credits Balance",
+			"description2": "Next Gift In",
+			"description3": "Edit Profile",
+			"description4": "Admin Panel",
+			"description5": "Copy User ID"
+		},
+		"header": {
+			"description": "Download the app!",
+			"tooltip": "Open App Drawer (Ctrl + K)"
+		},
+		"error": {
+			"title": "Something went wrong!",
+			"description": "We encountered a problem loading this section.",
+			"button": "Try again"
+		},
+		"globalerror": {
+			"title": "Fatal Application Error",
+			"description": "The core layout failed to load.",
+			"button": "Restart Application"
+		},
+		"notfound": {
+			"description": "Error 404",
+			"title": "Signal Lost.",
+			"description2": "The resource you requested cannot be located in the current routing manifest.",
+			"button": "Go Back",
+			"button2": "Return Home"
+		},
+		"shortcutsprovider": {
+			"title": "Changelog",
+			"description": "Recent application updates and releases",
+			"title2": "Keyboard Shortcuts",
+			"description2": "Quick commands to navigate efficiently",
+			"tooltip": "View Changelog",
+			"description3": "App:",
+			"description4": "Press",
+			"description5": "to close",
+			"text": "Esc"
+		},
+		"supportprovider": {
+			"description": "Get Support"
+		},
+		"toastprovider": {
+			"description": "Careful — you have unsaved changes!",
+			"button": "Reset",
+			"button2": "Save Changes"
+		},
+		"multiselector": {
+			"description": "No options"
+		},
+		"selector": {
+			"placeholder": "Search...",
+			"description": "No options found"
+		}
+	},
+	"api": {
+		"title": "Xernerx API",
+		"description": "You have reached the core service and endpoint router for the Xernerx suite. No resource management, configuration changes, or interactive controls take place on this domain.",
+		"section": {
+			"title": "Looking for Access?",
+			"description": "To generate API tokens, view your active sessions, or manage developer keys, head over to your account."
+		},
+		"button": {
+			"account": "Your account",
+			"docs": "Read the docs"
+		},
+		"fact": "Useless Fact: ",
+		"facts": [
+			"This page consumes approximately 0.00004 kWh of server energy just to tell you that you need a token.",
+			"Virtue is currently judging your lack of an Authorization header.",
+			"Metamorphosis has transformed this request into disappointment because you forgot your bearer token.",
+			"Zodiac charts indicate that your current path lacks a valid API key.",
+			"Somewhere, a database index is crying because you queried without a token.",
+			"Error 418: I'm a teapot, but even a teapot needs a valid bearer token.",
+			"No token, no data. Those are the rules, I didn't make them up (yes I did)."
+		]
+	},
+	"admin": {
+		"roles": {
+			"title": "Role Management",
+			"description": "Configure custom system roles and map them directly to Discord server roles.",
+			"serverId": "Server ID",
+			"members": "Members",
+			"newRoleButton": "New Role",
+			"searchPlaceholder": "Search by role name, UUID, or Discord ID...",
+			"noRolesFound": "No roles found matching your search.",
+			"unnamedRole": "Unnamed Role",
+			"unlinked": "Unlinked",
+			"synced": "Synced",
+			"uuid": "UUID:",
+			"noneUnlinked": "None (Unlinked)",
+			"manageConfig": "Manage Role Configuration",
+			"roleNameLabel": "Role Name",
+			"roleNamePlaceholder": "e.g., Administrator",
+			"linkDiscordRoleLabel": "Link Discord Role",
+			"selectDiscordRolePlaceholder": "Select Discord role...",
+			"syncNameWithDiscord": "Sync name with Discord",
+			"permissionsHeader": "Permissions",
+			"deleteRole": "Delete Role",
+			"saveChanges": "Save Changes",
+			"saving": "Saving...",
+			"deleteConfirmDescription": "Are you sure you want to delete role \"{name}\"? This action cannot be undone.",
+			"confirmDelete": "Delete",
+			"cancel": "Cancel",
+			"createModalTitle": "Create New Role",
+			"createModalDesc": "Add a new custom role and optionally link it to a Discord role.",
+			"createButton": "Create Role",
+			"creating": "Creating...",
+			"loadError": "Failed to load roles data.",
+			"errorPrefix": "Error:",
+			"card": {
+				"idPrefix": "ID: {id}",
+				"discordIdPrefix": "ID: {discordRoleId}"
+			}
+		},
+		"users": {
+			"title": "User Management",
+			"description": "Manage platform users, view Discord integrations, and adjust roles or permissions.",
+			"searchPlaceholder": "Search by name, id, or discord username...",
+			"sortLabel": "Sort:",
+			"noUsersFound": "No users found matching your search.",
+			"noRoles": "No Roles",
+			"manageUser": "Manage Xernerx User",
+			"displayNameLabel": "Display Name",
+			"rolesLabel": "Roles",
+			"addRolePlaceholder": "Add role...",
+			"searchRolesPlaceholder": "Search roles...",
+			"noMatchingRoles": "No matching roles found",
+			"stripeCustomerIdLabel": "Stripe Customer ID",
+			"stripeCustomerPlaceholder": "e.g., cus_...",
+			"descriptionLabel": "Description",
+			"privacyLevelLabel": "Privacy Level",
+			"staffSubTitle": "Staff Subscriptions",
+			"staffSubDesc": "Grants user an active infinite subscription for all services until toggled off.",
+			"emailLabel": "Email:",
+			"deleteButton": "Delete User",
+			"deleteUserTitle": "Delete User",
+			"deleteUserConfirmDesc": "Are you sure you want to delete user {name} ({id})? This action cannot be undone.",
+			"toast": {
+				"staffApplied": "Staff subscription applied",
+				"staffCanceled": "Staff subscription canceled",
+				"staffError": "Error updating staff subscription",
+				"updateSuccess": "User updated successfully",
+				"updateError": "Failed to update user",
+				"deleteSuccess": "User deleted successfully",
+				"deleteError": "Failed to delete user"
+			},
+			"card": {
+				"idPrefix": "ID: {id}",
+				"creditsLabel": "Credits",
+				"dailyStreakLabel": "Daily Streak",
+				"fetchError": "Error: {error}"
+			}
+		},
+		"tokens": {
+			"title": "API Token Management",
+			"description": "Manage organization access tokens, bot identifiers, and secure endpoint permissions.",
+			"generateButton": "New Token",
+			"ownersPlaceholder": "482513687417061376",
+			"empty": {
+				"title": "No tokens found matching your search.",
+				"description": "Search by token name or UUID..."
+			},
+			"toast": {
+				"loadError": "Error loading tokens, error: {error}"
+			},
+			"create": {
+				"modalTitle": "Create New Token",
+				"nameLabel": "Token Name",
+				"namePlaceholder": "e.g., Production Bot Token",
+				"cancelButton": "Cancel",
+				"submitButton": "Create Token"
+			},
+			"manage": {
+				"modalTitle": "Manage Token Configuration",
+				"revokeTitle": "Delete Token",
+				"nameLabel": "Token Name",
+				"ownersLabel": "Owners",
+				"ownersPlaceholder": "Add owner...",
+				"saveButton": "Save Changes",
+				"deleteConfirm": "Are you sure you want to delete this token? This action cannot be undone."
+			},
+			"card": {
+				"botApplication": "Bot Application",
+				"apiConnection": "API Connection",
+				"idPrefix": "ID: "
+			},
+			"edit": {
+				"status": "Status",
+				"botId": "Bot ID",
+				"botIdPlaceholder": "Optional Bot ID...",
+				"isXernerx": "Is Xernerx",
+				"allowFetching": "Allow fetching data from /secure",
+				"failedToFetchToken": "Failed to fetch token config: "
+			}
+		},
+		"translations": {
+			"title": "Translation Studio",
+			"description": "Select your target language and manage translation keys against English source.",
+			"pushToReview": "Push to review",
+			"tabs": {
+				"introduction": "Introduction",
+				"newEntries": "New Entries",
+				"reviewExisting": "Review Existing"
+			},
+			"welcome": {
+				"title": "Welcome to the Translation Studio",
+				"descStart": "Help us localize the Xernerx platform directly within the app! You are translating from our source of truth, ",
+				"english": "English (UK) (en-GB)",
+				"descMiddle": ", into ",
+				"newEntriesTitle": "Step-by-Step New Entries",
+				"newEntriesDesc": "Tackle missing keys one by one through a distraction-free card interface. Go at your own pace without feeling overwhelmed.",
+				"startTranslating": "Start Translating New ({count} left)",
+				"reviewTitle": "Review Existing Keys",
+				"reviewDesc": "Need to fix a typo or refine a translation reported by users? Browse and update all existing translations in a full list.",
+				"browseAll": "Browse All Translations",
+				"footerPart1": "Once you are finished translating, click ",
+				"footerBold": "Push to review",
+				"footerPart2": " at the top right to submit your work to the review branch! Any untranslated or empty entries will be omitted automatically.",
+				"guide": {
+					"title": "Before you start",
+					"step1": "If possible you may require a basic understanding of the English (UK) language",
+					"step2": "You can choose to either review new entries or modify existing ones",
+					"step3": "There is no deadline or haste upon these translations, take your time.",
+					"step4": "When you are changing keys the push to review button will become available, only press this once ready.",
+					"step5": "While editing try to not close or refresh the page, it may lose unsaved progression.",
+					"step6": "After submitting you will see your translated keys untranslated again, this is normal. The live environment cannot update manually, you have to wait for an admin to merge this updated dictionary with the live environment. You can speed up this progress by asking an admin directly to merge these changes"
+				}
+			},
+			"new": {
+				"allCaughtUp": "All caught up!",
+				"noMissingKeys": "There are no missing translation keys for {locale}.",
+				"reviewExistingButton": "Review Existing Translations",
+				"cardCounter": "Card {current} of {total}",
+				"translateInstruction": "Translate this sentence from English (UK) to {locale}:",
+				"yourTranslation": "Your Translation",
+				"typePlaceholder": "Type translation here...",
+				"previous": "Previous",
+				"next": "Next",
+				"finish": "Finish & Review"
+			},
+			"review": {
+				"searchPlaceholder": "Search translation keys or content...",
+				"noKeysFound": "No matching translation keys found.",
+				"missingKey": "Missing Key",
+				"translateInto": "Translate into {locale}..."
+			},
+			"success": {
+				"pushed": "Pull request successfully pushed to review branch!"
+			},
+			"errors": {
+				"fetchFailed": "Failed to fetch dictionary files",
+				"loadFailed": "Error loading dictionaries",
+				"noChanges": "No changes detected to push.",
+				"pushFailed": "Failed to push review branch",
+				"pushError": "Error pushing to review"
+			},
+			"unsaved": {
+				"title": "Unsaved Translations",
+				"description": "You have unsaved translations. If you leave now, all your current progress will be lost.",
+				"leave": "Discard Changes",
+				"stay": "Keep Editing"
+			},
+			"mapping": {
+				"title": "Translator Application Config",
+				"description": "Select the application configuration ID that will be used to approve new translators. Applications of this type will appear here in the dashboard.",
+				"saveConfig": "Save Config"
+			}
+		},
+		"common": {
+			"title": "Application Configs",
+			"description": "Manage application templates and rewards.",
+			"button": "New Application",
+			"description2": "Loading configs...",
+			"description3": "No application configs found.",
+			"description4": "ID: {id}",
+			"description5": "Reward Role:",
+			"description6": "Config ID",
+			"description7": "Display Name",
+			"placeholder": "e.g. Beta Tester Application",
+			"description8": "Description",
+			"placeholder2": "Optional description of this application template",
+			"description9": "Reward Role",
+			"placeholder3": "Select a Xernerx role to reward upon approval",
+			"description10": "Status",
+			"description11": "Visibility",
+			"button2": "Cancel",
+			"tooltip": "Delete Config",
+			"title2": "Application",
+			"alt": "Avatar",
+			"description12": "Allow fetching data from /secure"
+		},
+		"configs": {
+			"title": "Application Configs",
+			"description": "Manage application templates and rewards.",
+			"newConfig": "New Application",
+			"loading": "Loading configs...",
+			"empty": "No application configs found.",
+			"idBadge": "ID: {id}",
+			"rewardRoleBadge": "Reward Role: ",
+			"edit": {
+				"configId": "Config ID",
+				"displayName": "Display Name",
+				"displayNamePlaceholder": "e.g. Beta Tester Application",
+				"description": "Description",
+				"descriptionPlaceholder": "Optional description of this application template",
+				"rewardRole": "Reward Role",
+				"rewardRolePlaceholder": "Select a Xernerx role to reward upon approval",
+				"status": "Status",
+				"visibility": "Visibility",
+				"cancel": "Cancel",
+				"deleteTooltip": "Delete Config"
+			}
+		},
+		"reviews": {
+			"title": "Application Reviews",
+			"description": "Review and manage user role applications.",
+			"loading": "Loading applications...",
+			"empty": "No pending applications to review.",
+			"status": {
+				"approved": "Approved",
+				"denied": "Denied",
+				"pending": "Pending"
+			},
+			"modal": {
+				"titleSuffix": " Application",
+				"applicant": "Applicant",
+				"submitted": "Submitted",
+				"locale": "Locale",
+				"reviewNote": "Review Note (Visible to User)",
+				"reviewNotePlaceholder": "Optional note explaining the decision...",
+				"approve": "Approve"
+			}
+		},
+		"settings": {
+			"loading": "Loading settings...",
+			"title": "Platform Settings",
+			"description": "Configure global application settings and platform integrations.",
+			"coreConfig": "Core Configuration",
+			"adminServerId": "Admin Server ID",
+			"adminServerIdDesc": "The main Discord server for administrative alerts and logging.",
+			"adminServerIdPlaceholder": "e.g. 123456789012345678",
+			"appWebhookUrl": "App Webhook URL",
+			"appWebhookUrlDesc": "Webhook for sending important application events.",
+			"appWebhookUrlPlaceholder": "https://discord.com/api/webhooks/...",
+			"supportRole": "Support Role",
+			"supportRoleDesc": "Role required to manage support tickets and feedback.",
+			"supportRolePlaceholder": "Select a role...",
+			"saveButton": "Save Settings"
+		}
+	},
+	"account": {
+		"unauthorized": {
+			"title": "Unauthorized Access",
+			"description": "You do not have the required permissions or role to access the Xernerx administrative dashboard.",
+			"button": "Return Back"
+		},
+		"account": {
+			"title": "Account Settings",
+			"description": "Manage your account session, data privacy, and global profile details.",
+			"fallbackName": "User",
+			"session": {
+				"title": "Active Session",
+				"description": "Sign out of your active account session on this device. You will need to re-authenticate to access your workspace.",
+				"button": "Log out"
+			},
+			"danger": {
+				"title": "Delete User Data & Account",
+				"description": "Permanently delete your profile data, stored preferences, and close your account across the ecosystem. This action cannot be undone.",
+				"button": "Delete Account",
+				"confirmTitle": "Confirm Account Deletion",
+				"confirmDescription": "You are about to trigger a permanent purge of your user data. Once completed, your credentials and profile cannot be recovered.",
+				"confirmButton": "Delete my account"
+			}
+		},
+		"profile": {
+			"title": "Edit Profile",
+			"description": "Manage your public profile details and personal preferences.",
+			"descriptionField": {
+				"label": "Description",
+				"placeholder": "Short bio..."
+			},
+			"infoField": {
+				"label": "Info (Long Description)",
+				"placeholder": "Tell us more about yourself..."
+			},
+			"birthday": {
+				"label": "Birthday"
+			},
+			"timezone": {
+				"label": "Timezone",
+				"placeholder": "e.g. Europe/Brussels"
+			},
+			"gender": {
+				"label": "Gender",
+				"male": "Male",
+				"female": "Female",
+				"other": "Other"
+			},
+			"pronouns": {
+				"label": "Pronouns",
+				"placeholder": "e.g. they/them"
+			},
+			"privacy": {
+				"label": "Privacy Level",
+				"public": "Public",
+				"limited": "Limited",
+				"private": "Private",
+				"tooltip": {
+					"title": "Privacy Options:",
+					"privateTitle": "Private:",
+					"privateDesc": "Completely private; no one but you can see your profile.",
+					"limitedTitle": "Limited:",
+					"limitedDesc": "Anyone with your account link can see your profile; you will just not be listed publicly.",
+					"publicTitle": "Public:",
+					"publicDesc": "Anyone can see your profile and it is not hidden from public spaces."
+				}
+			},
+			"save": "Save Changes",
+			"saving": "Saving...",
+			"toast": {
+				"success": "Profile updated successfully!",
+				"error": "Failed to save changes. Please try again."
+			}
+		},
+		"appearance": {
+			"title": "Appearance",
+			"description": "Customize how the interface looks and feels across your workspace.",
+			"theme": {
+				"title": "Theme",
+				"description": "Choose your preferred interface theme mode.",
+				"options": {
+					"dark": "Dark",
+					"light": "Light",
+					"system": "System"
+				}
+			},
+			"discordSync": {
+				"title": "Sync Accent from Discord",
+				"description": "Automatically adopt your Discord profile theme accent color as your workspace accent."
+			},
+			"clientSync": {
+				"title": "Sync Appearance Settings Across Clients",
+				"description": "Automatically load appearance settings on all your devices."
+			},
+			"accentColor": {
+				"title": "Accent Color",
+				"description": "Select a custom accent color for your workspace theme."
+			},
+			"colors": {
+				"purple": "Xerple",
+				"green": "Crean",
+				"neon": "Cyber Neon",
+				"blue": "Electric Blue",
+				"pink": "Vibrant Pink",
+				"orange": "Sunset Orange",
+				"yellow": "Golden Yellow",
+				"crimson": "Deep Crimson",
+				"mint": "Mint Breeze",
+				"indigo": "Royal Indigo",
+				"lime": "Acid Lime",
+				"charcoal": "Void Charcoal"
+			},
+			"zoom": {
+				"title": "UI Zoom Level",
+				"description": "Scale the interface zoom uniformly across the application."
+			},
+			"density": {
+				"title": "Layout Spacing",
+				"description": "Switch between compact, default, and spacious interface padding gaps.",
+				"compact": "Compact",
+				"default": "Default",
+				"spacious": "Spacious"
+			},
+			"textScale": {
+				"title": "Text Scale",
+				"description": "Configure base typography size for readability."
+			},
+			"toast": {
+				"clientSyncEnabled": {
+					"title": "Client Sync Enabled",
+					"description": "Your appearance settings are now syncing to your account."
+				},
+				"clientSyncDisabled": {
+					"title": "Client Sync Disabled",
+					"description": "Your appearance settings will stay local to this browser."
+				},
+				"accentColor": {
+					"title": "Updated accent color!",
+					"description": "Set accent color to {color}"
+				},
+				"theme": {
+					"title": "Updated theme!",
+					"description": "Set theme to {theme}"
+				},
+				"density": {
+					"title": "Updated layout density!"
+				}
+			}
+		},
+		"language": {
+			"headerTitle": "Language Preferences",
+			"headerDescription": "Choose your interface localization and view regional preferences.",
+			"title": "Language",
+			"description": "Select your preferred language for the interface.",
+			"contributeLabel": "+ Contribute a translation",
+			"coverage": {
+				"title": "Help us translate!",
+				"description": "Your selected language is currently {coverage}% translated. Have a few minutes to help us complete it?",
+				"button": "Contribute",
+				"confirmTitle": "Request Translator",
+				"confirmPrompt": "You are requesting to become a translator, do you want to proceed?",
+				"adminButton": "Go to Translations",
+				"requestFailed": "Failed to submit translator application",
+				"requestSuccess": "Translator application submitted successfully!",
+				"notLoggedIn": "You must be logged in to apply"
+			},
+			"discord": {
+				"title": "Discord Language",
+				"description": "Your current Discord account language setting (read-only indicator)."
+			}
+		},
+		"signin": {
+			"button": "Continue with Discord",
+			"redirecting": "Redirecting…",
+			"aboutToggle": "About permissions",
+			"permissions": {
+				"profile": {
+					"title": "Username & Profile",
+					"description": "Used to display your profile inside the app."
+				},
+				"email": {
+					"title": "Email Address",
+					"description": "Used for notifications and important account updates."
+				},
+				"connections": {
+					"title": "Connections",
+					"description": "Displayed on your profile for personalization."
+				},
+				"joinServers": {
+					"title": "Join Servers",
+					"description": "Used to join Xernerx Studios managed servers. Does not add you to any server without your input!"
+				},
+				"servers": {
+					"title": "Servers",
+					"description": "Used to power your dashboard experience."
+				},
+				"memberInfo": {
+					"title": "Server Member Info",
+					"description": "Used for roles, nicknames, and server-specific features."
+				},
+				"footer": "Xernerx does not sell your data. All data is either public via the Discord API or used internally for features."
+			}
+		},
+		"signout": {
+			"title": "Sign Out",
+			"description": "Are you sure you want to log out? You will need to authenticate again to access your dashboard.",
+			"confirmButton": "Yes, log me out",
+			"signingOut": "Signing out…",
+			"cancelButton": "Cancel"
+		},
+		"user": {
+			"createError": "Failed to initialize user profile.",
+			"fetchError": "Failed to load user profile data.",
+			"networkError": "Network error while connecting to user service.",
+			"created": "Welcome! User profile created successfully."
+		},
+		"notifications": {
+			"title": "Notifications",
+			"description": "Manage how you receive notifications and alerts across channels.",
+			"itemDescription": "Configure alerts for {item}.",
+			"categories": {
+				"general": "General",
+				"virtue": "Virtue"
+			},
+			"items": {
+				"birthday": "Birthday",
+				"levelup": "Level Up"
+			},
+			"channels": {
+				"discord": "Discord",
+				"mail": "Mail",
+				"inApp": "In-App"
+			},
+			"toast": {
+				"success": "Updated notification preferences",
+				"error": "Failed to save changes"
+			}
+		},
+		"tokens": {
+			"title": "API Tokens",
+			"description": "Manage your secure authentication keys",
+			"generateButton": "Generate Token",
+			"manageSettings": "Manage Settings",
+			"empty": {
+				"title": "No tokens found",
+				"description": "You don't have any active API tokens. Generate one to authenticate your services."
+			},
+			"toast": {
+				"loadError": "Error loading tokens, error: {error}"
+			},
+			"create": {
+				"modalTitle": "Generate New Token",
+				"nameLabel": "Token Name",
+				"namePlaceholder": "e.g., Production API Access",
+				"cancelButton": "Cancel",
+				"submitButton": "Create Token",
+				"success": "Token created successfully",
+				"errorTitle": "Creation failed",
+				"errorDesc": "Could not generate a new token. error: {error}"
+			},
+			"manage": {
+				"modalTitle": "Manage Token",
+				"revokeTitle": "Revoke Token",
+				"accessKeyLabel": "Access Key",
+				"securityWarning": "Treat this token like a password. Do not expose it in client-side code.",
+				"nameLabel": "Token Name",
+				"ownersLabel": "Owners (Discord IDs)",
+				"ownersPlaceholder": "Add owner by Discord ID...",
+				"closeButton": "Close",
+				"saveButton": "Save Changes",
+				"loadError": "Failed to load token, error: {error}",
+				"copySuccess": "Token copied to clipboard",
+				"updateSuccess": "Token updated",
+				"updateError": "Update failed",
+				"deleteConfirm": "Are you sure you want to permanently delete this token?",
+				"deleteSuccess": "Token deleted",
+				"deleteError": "Deletion failed",
+				"invalidIdPrompt": "Enter a valid 17-20 digit Discord ID",
+				"userAlreadyAdded": "User already added",
+				"userNotFound": "User not found",
+				"statusTitle": "Active Status",
+				"statusActive": "Token is active and can make API requests",
+				"statusInactive": "Token is temporarily disabled"
+			}
+		},
+		"store": {
+			"title": "Xernerx Store",
+			"description": "Choose your ecosystem. Access individual bot passes and the all-in-one Ultra bundle, or manage your developer API tools.",
+			"tabs": {
+				"consumers": "Bots, Servers & Ultra",
+				"developers": "Developer API"
+			},
+			"billing": {
+				"monthly": "Monthly",
+				"annually": "Annually (Save 20%)"
+			},
+			"ultra": {
+				"badge": "Ultimate Ecosystem Bundle",
+				"subtitle": "All-in-One Access",
+				"fallbackName": "Ultra",
+				"fallbackDesc": "Includes all user and server subscriptions of our bots in a single master pass.",
+				"features": {
+					"bots": "Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)",
+					"servers": "All server-level utility subscriptions",
+					"support": "Priority support channel access"
+				}
+			},
+			"sections": {
+				"bots": "Individual Bot Passes",
+				"servers": "Server Infrastructure Passes"
+			},
+			"cards": {
+				"botFallback": "Individual bot license pass",
+				"serverFallback": "Server infrastructure pass"
+			},
+			"developer": {
+				"free": {
+					"badge": "API Access",
+					"title": "Developer Free",
+					"desc": "Perfect for individual developers testing local environments and personal projects.",
+					"price": "Free",
+					"features": {
+						"standardApi": "Standard API access",
+						"projects": "1 Project"
+					}
+				},
+				"pro": {
+					"badge": "Developer Pro",
+					"fallbackName": "API Suite",
+					"fallbackDesc": "Advanced API rate limits and custom domains.",
+					"features": {
+						"advancedApi": "Advanced API access",
+						"rateLimits": "Extended rate limits",
+						"unlimitedProjects": "Unlimited Projects"
+					}
+				}
+			},
+			"pricing": {
+				"monthlySuffix": "/mo",
+				"yearlySuffix": "/yr",
+				"monthShort": "mo",
+				"yearShort": "yr"
+			},
+			"buttons": {
+				"loading": "Loading plan...",
+				"cancelUltra": "Cancel Ultra Bundle",
+				"activeUntil": "Active until {date}",
+				"getUltra": "Get Ultra Bundle",
+				"cancelPass": "Cancel Pass",
+				"getPass": "Get Pass",
+				"currentPlan": "Current Plan",
+				"cancelApi": "Cancel API Plan",
+				"upgradeApi": "Upgrade API",
+				"redirecting": "Redirecting..."
+			},
+			"cancel": {
+				"title": "Cancel Subscription",
+				"successMessage": "Subscription successfully scheduled for cancellation at the end of your billing period. Redirecting...",
+				"description": "Are you sure you want to cancel your subscription? You will retain full access to your premium features until the end of your current billing cycle.",
+				"canceling": "Canceling...",
+				"confirmButton": "Confirm Cancellation",
+				"keepButton": "Keep Subscription",
+				"errorDefault": "Failed to cancel subscription"
+			}
+		},
+		"login": {
+			"description": "Loading..."
+		},
+		"common": {
+			"alt": "Profile Avatar",
+			"description": "ID: {userId}",
+			"title": "Privacy Setting",
+			"description2": "Choose who can see your profile.",
+			"title2": "Delete Data",
+			"description3": "Reset all your profile information back to default without deleting your account.",
+			"description4": "Delete Data",
+			"description5": "Delete Account",
+			"tooltip": "Delete Data",
+			"button": "Browse Store",
+			"button2": "Cancel subscription",
+			"description6": "Are you sure?",
+			"button3": "No",
+			"button4": "Yes, cancel",
+			"description7": "Staff Access",
+			"description8": "You have a complimentary all-access staff subscription applied to your account."
+		}
+	},
+	"www": {
+		"hero": {
+			"title": "Empowering Developers. Connecting Communities.",
+			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
+		},
+		"about": {
+			"title": "About Xernerx",
+			"description": "Founded in 2024, Xernerx evolved from a focused development initiative into a structured ecosystem of automation tools and infrastructure frameworks. Every system is built with scalability, maintainability, and architectural clarity as first principles."
+		},
+		"sections": {
+			"services": {
+				"title": "Services"
+			},
+			"packages": {
+				"title": "Packages"
+			},
+			"applications": {
+				"title": "Applications"
+			}
+		},
+		"services": {
+			"dashboard": {
+				"title": "Dashboard",
+				"desc": "Manage applications, configure deployments, and monitor system performance."
+			}
+		},
+		"packages": {
+			"framework": {
+				"title": "Xernerx Framework",
+				"desc": "A modular foundation for scalable Discord applications."
+			},
+			"stats": {
+				"title": "Xernerx Stats",
+				"desc": "Analytics utilities for measuring performance."
+			}
+		},
+		"applications": {
+			"todo": {
+				"title": "To-Do List Bot",
+				"desc": "Structured productivity tooling."
+			},
+			"zodiac": {
+				"title": "Zodiac",
+				"desc": "Astrology-based interaction tools."
+			},
+			"metamorphosis": {
+				"title": "Metamorphosis",
+				"desc": "Advanced role transformation utilities."
+			}
+		},
+		"history": {
+			"title": "Our History",
+			"description": "A structured progression from experimentation to stable infrastructure engineering."
+		},
+		"privacy": {
+			"toc": "Contents",
+			"header": {
+				"title": "Privacy Policy",
+				"effectiveDate": "Effective Date:"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Introduction",
+					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our services."
+				},
+				"dataCollected": {
+					"title": "2. Information We Collect",
+					"account": {
+						"title": "Account Information:",
+						"desc": "Email, username, and profile identifiers."
+					},
+					"usage": {
+						"title": "Usage Data:",
+						"desc": "Logs, system interactions, and configuration settings."
+					},
+					"integration": {
+						"title": "Integration Data:",
+						"desc": "Data provided through third-party platforms such as Discord."
+					}
+				},
+				"legalBasis": {
+					"title": "3. Legal Basis for Processing",
+					"content": "We process personal data based on contractual necessity, legitimate interests, legal obligations, or user consent where applicable."
+				},
+				"usage": {
+					"title": "4. How We Use Information",
+					"items": [
+						"To provide and maintain services.",
+						"To improve reliability and performance.",
+						"To provide support and communicate updates.",
+						"To ensure compliance with legal obligations."
+					]
+				},
+				"sharing": {
+					"title": "5. Data Sharing",
+					"items": ["Hosting and infrastructure providers.", "Authorized third-party integrations.", "Legal authorities when required by law."]
+				},
+				"retention": {
+					"title": "6. Data Retention",
+					"content": "We retain data only as long as necessary to fulfill the purposes outlined in this Policy, unless longer retention is required by law."
+				},
+				"security": {
+					"title": "7. Data Security",
+					"content": "We implement technical and organizational security measures to protect data. However, no system is absolutely secure."
+				},
+				"rights": {
+					"title": "8. Your Rights",
+					"items": ["Right to access your data.", "Right to correction or deletion.", "Right to restrict or object to processing.", "Right to data portability."]
+				},
+				"cookies": {
+					"title": "9. Cookies & Tracking",
+					"content": "We may use cookies or similar technologies to improve service performance and analytics."
+				},
+				"international": {
+					"title": "10. International Transfers",
+					"content": "If data is transferred outside your jurisdiction, appropriate safeguards are implemented to ensure legal compliance."
+				},
+				"changes": {
+					"title": "11. Changes to This Policy",
+					"content": "We may update this Privacy Policy periodically. Continued use of services indicates acceptance of the revised version."
+				},
+				"contact": {
+					"title": "12. Contact",
+					"prefix": "For privacy-related inquiries contact"
+				}
+			},
+			"description": "legal@xernerx.com"
+		},
+		"terms": {
+			"toc": "Contents",
+			"header": {
+				"title": "Terms of Service",
+				"effectiveDate": "Effective Date:"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Introduction",
+					"content": "These Terms of Service (\"Terms\") govern your access to and use of services provided by Xernerx Studios (\"we\", \"our\", or \"us\"). By accessing or using our services, you agree to be legally bound by these Terms."
+				},
+				"eligibility": {
+					"title": "2. Eligibility",
+					"content": "You must meet the minimum legal age in your jurisdiction to use our services. By using our services, you represent that you satisfy this requirement."
+				},
+				"acceptableUse": {
+					"title": "3. Acceptable Use",
+					"items": [
+						"Engage in unlawful activities.",
+						"Access data without explicit authorization.",
+						"Attempt to disrupt service infrastructure.",
+						"Reverse-engineer or exploit vulnerabilities."
+					]
+				},
+				"accounts": {
+					"title": "4. User Accounts",
+					"content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. We are not liable for losses arising from unauthorized access."
+				},
+				"data": {
+					"title": "5. User Data",
+					"content": "By using our services, you agree to our data handling practices as described in our Privacy Policy. Data may include account information, usage metrics, and integration-based data where applicable."
+				},
+				"availability": {
+					"title": "6. Service Availability",
+					"content": "We strive for reliable uptime but do not guarantee uninterrupted service. Services may be modified, suspended, or discontinued at any time."
+				},
+				"thirdParty": {
+					"title": "7. Third-Party Services",
+					"content": "Our services may integrate with third-party platforms such as Discord. We are not responsible for third-party policies, availability, or data practices."
+				},
+				"intellectualProperty": {
+					"title": "8. Intellectual Property",
+					"content": "All software, code, branding, and materials remain the exclusive property of Xernerx Studios or its licensors. Unauthorized reproduction or distribution is prohibited."
+				},
+				"warranty": {
+					"title": "9. Disclaimer of Warranties",
+					"content": "Services are provided “as is” without warranties of any kind, whether express or implied."
+				},
+				"liability": {
+					"title": "10. Limitation of Liability",
+					"content": "To the fullest extent permitted by law, Xernerx Studios shall not be liable for indirect, incidental, or consequential damages arising from use of our services."
+				},
+				"indemnification": {
+					"title": "11. Indemnification",
+					"content": "You agree to indemnify and hold harmless Xernerx Studios from claims or liabilities arising from misuse of our services or violation of these Terms."
+				},
+				"governingLaw": {
+					"title": "12. Governing Law",
+					"content": "These Terms shall be governed in accordance with applicable laws within your jurisdiction."
+				},
+				"changes": {
+					"title": "13. Changes to Terms",
+					"content": "We may update these Terms from time to time. Continued use of our services after updates constitutes acceptance."
+				},
+				"contact": {
+					"title": "14. Contact",
+					"prefix": "For legal inquiries contact"
+				}
+			},
+			"description": "legal@xernerx.com"
+		},
+		"contact": {
+			"title": "Contact Us",
+			"description": "Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we",
+			"description2": "re happy to help. Using the correct contact address helps your message reach the right person faster.",
+			"title2": "Looking for documentation?",
+			"description3": "Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.",
+			"button": "Documentation",
+			"button2": "GitHub"
+		},
+		"download": {
+			"title": "Download Xernerx App",
+			"description": "Optimized for your system. One click and you are in.",
+			"button": "Stable",
+			"button2": "Canary",
+			"button3": "Download for",
+			"button4": "Other platforms"
+		}
+	},
+	"faq": {
+		"category": {
+			"suite": "Xernerx Suite"
+		},
+		"environments": {
+			"title": "Environments",
+			"card": {
+				"title": "What are environments?",
+				"description": "Within Xernerx Studios we speak of 3 environments: release (production), canary (beta) and dev (development). Here is what each of them mean:"
+			},
+			"table": {
+				"header": {
+					"environment": "Environment",
+					"description": "Description"
+				},
+				"release": {
+					"label": "Release",
+					"description": "The stable production environment used for general release."
+				},
+				"canary": {
+					"label": "Canary",
+					"description": "The beta environment used for pre-release testing of new features."
+				},
+				"dev": {
+					"label": "Dev",
+					"description": "The development environment used for active building and testing."
+				}
+			}
+		},
+		"translations": {
+			"title": "Translations",
+			"card1": {
+				"title": "How do I become a translator?",
+				"p1": "You can apply directly from the Language preferences page if a language has less than 100% coverage.",
+				"p2": "Make sure you are logged in and on the account page."
+			},
+			"card2": {
+				"title": "How long does it take for an application to be reviewed?",
+				"description": "Whenever an admin has time to review your submission and merge the translations with the live environment"
+			},
+			"card3": {
+				"title": "I translated but it didn't update?",
+				"description": "Translations cannot be automatically applied, the web page needs to be rebuild. Whenever you submit a review we get a notification asking to apply the newly added translations, we will allow this once reviewed."
+			},
+			"card4": {
+				"title": "My language is not included in the list, how can I add it?",
+				"description": "For now you are required to request the language in our support channels, a language base will be created and then you can start translating for us!"
+			}
+		}
+	},
+	"app": {
+		"src": {
+			"placeholder": "Search for a specific bot...",
+			"title": "No bots found",
+			"description": "There are currently no bots available in this category.",
+			"button": "Return to Bots",
+			"description2": "Bot",
+			"button2": "Invite Bot",
+			"description3": "Developed By",
+			"description4": "No additional information provided by the developer.",
+			"description5": "No historical statistics available.",
+			"description6": "Uptime",
+			"title2": "Growth",
+			"description7": "Highest:",
+			"title3": "Parameters",
+			"description8": "Required",
+			"description9": "This bot has not exposed any commands yet.",
+			"description10": "Back to Bots",
+			"placeholder2": "Detailed server info...",
+			"description11": "Members",
+			"description12": "Bots",
+			"description13": "Messages (30m)",
+			"description14": "Boosts",
+			"description15": "No Stats Available Yet",
+			"description16": "The bot is currently gathering analytics. Check back shortly!",
+			"description17": "Choose who can see this server's profile on Xernerx.",
+			"description18": "Reset all server settings and configurations back to default.",
+			"description19": "Reset Data",
+			"description20": "Permanently delete all data associated with this server from Xernerx.",
+			"description21": "Delete Server",
+			"title4": "Too Many Requests",
+			"description22": "We are hitting Discord's rate limits for fetching your servers. Please wait a moment and try refreshing the page!",
+			"title5": "No Eligible Servers",
+			"description23": "You don't seem to have Manage Server or Administrator permissions in any connected servers. Please become authorized in a server or create a new Discord server to get started!",
+			"button3": "Browse Servers",
+			"alt": "Avatar",
+			"placeholder3": "Detailed markdown description about this organization...",
+			"alt2": "Avatar",
+			"alt3": "Avatar",
+			"tooltip": "Kick Member",
+			"placeholder4": "Discord User ID (e.g. 1234567890)",
+			"description24": "No managed Discord servers found.",
+			"description25": "Organization Links",
+			"description26": "Website URL",
+			"placeholder5": "https://...",
+			"description27": "Discord Invite URL",
+			"placeholder6": "https://discord.gg/...",
+			"description28": "Support Server URL",
+			"placeholder7": "https://discord.gg/...",
+			"description29": "GitHub Repository",
+			"placeholder8": "https://github.com/...",
+			"description30": "Privacy Policy URL",
+			"placeholder9": "https://...",
+			"description31": "Terms of Service URL",
+			"placeholder10": "https://...",
+			"description32": "Determines who can discover and interact with this organization.",
+			"description33": "Reset all organization settings and configurations back to default without deleting the organization itself.",
+			"description34": "Reset Data",
+			"description35": "Permanently delete this organization and all of its associated data from Xernerx.",
+			"description36": "Delete Organization",
+			"description37": "Leave this organization and remove your access. This action cannot be undone.",
+			"description38": "Leave Organization",
+			"tooltip2": "Create Organization",
+			"description39": "Organization Name",
+			"placeholder11": "e.g. Acme Corp",
+			"description40": "Description (Optional)",
+			"placeholder12": "What is this organization for?",
+			"tooltip3": "Confirm Invite",
+			"alt4": "Avatar",
+			"button4": "Cancel",
+			"button5": "Confirm Invite",
+			"tooltip4": "Delete Organization"
+		},
+		"bots": {
+			"placeholder1": "Search for a specific bot...",
+			"text1": "No bots found",
+			"text2": "There are currently no bots available in this category.",
+			"id": {
+				"text1": "Bot Not Found",
+				"text2": "This bot might have been deleted or is currently private.",
+				"text3": "Return to Bots",
+				"text4": "Bot",
+				"text5": "Invite Bot",
+				"text6": "Developed By",
+				"text7": "No additional information provided by the developer.",
+				"text8": "No historical statistics available.",
+				"text9": "Uptime",
+				"text10": "Growth",
+				"text11": "%)",
+				"text12": "Highest:",
+				"text13": "Parameters",
+				"text14": "Required",
+				"text15": "This bot has not exposed any commands yet.",
+				"text16": "Back to Bots"
+			}
+		},
+		"dashboard": {
+			"layout": {},
+			"text1": "ID:",
+			"text2": "Server Sync Data",
+			"text3": "This data is derived directly from your server. To sync and populate it, the Xernerx Bot must be added to the server.",
+			"text4": "Bot Connected",
+			"text5": "Verified",
+			"text6": "Locale",
+			"text7": "Server Info",
+			"text8": "Description",
+			"placeholder1": "Short description...",
+			"text9": "Info",
+			"placeholder2": "Detailed server info...",
+			"text10": "Server Stats",
+			"text11": "Not Enough Data",
+			"text12": "The bot needs a little more time to gather statistics for this server.",
+			"text13": "Privacy Setting",
+			"text14": "Choose who can see this server's profile on Xernerx.",
+			"text15": "Reset Data",
+			"text16": "Reset all server settings and configurations back to default.",
+			"text17": "Reset Data",
+			"text18": "Delete Server Data",
+			"text19": "Permanently delete all data associated with this server from Xernerx.",
+			"text20": "Delete Server",
+			"text21": "Too Many Requests",
+			"text22": "We are hitting Discord's rate limits for fetching your servers. Please wait a moment and try refreshing the page!",
+			"text23": "No Eligible Servers",
+			"text24": "You don't seem to have Manage Server or Administrator permissions in any connected servers. Please become authorized in a server or create a new Discord server to get started!",
+			"text25": "Create Discord Server"
+		},
+		"layout": {},
+		"loading": {},
+		"home": {
+			"text1": "View All",
+			"text2": "No bots currently in this category.",
+			"text3": "Discover the Best",
+			"text4": "Discord",
+			"text5": "Explore thousands of unique bots and vibrant communities. Power up your server or find your next home.",
+			"text6": "Dashboard",
+			"text7": "Portal",
+			"text8": "Browse Bots",
+			"text9": "Browse Servers",
+			"text10": "Servers coming soon",
+			"text11": "We are currently building out the server discovery platform.",
+			"text12": "Failed to load bots",
+			"text13": "Please check your network connection and try again."
+		},
+		"portal": {
+			"layout": {},
+			"alt1": "Avatar",
+			"text1": "My Workspace",
+			"text2": "Personal Bots",
+			"text3": "No personal bots registered yet.",
+			"text4": "Bots are automatically registered when they interact with the API.",
+			"text5": "ID:",
+			"text6": "Organization Profile",
+			"text7": "Name",
+			"placeholder2": "Organization Name",
+			"text8": "Description",
+			"placeholder3": "Short description...",
+			"text9": "Extended Info",
+			"placeholder4": "Detailed markdown description about this organization...",
+			"text10": "Locale",
+			"text11": "Organization Members",
+			"text12": "Current Members",
+			"alt5": "Avatar",
+			"text13": "Owner",
+			"alt6": "Avatar",
+			"text14": "No other members yet.",
+			"text15": "Pending Invitations",
+			"text16": "Pending",
+			"text17": "Invite Member",
+			"placeholder7": "Discord User ID (e.g. 1234567890)",
+			"text18": "Invite",
+			"text19": "They will receive an invitation to join this organization.",
+			"text20": "Organization Bots",
+			"text21": "No bots registered to this organization.",
+			"text22": "Organization Server",
+			"text23": "Select a Discord server to link with this organization.",
+			"text24": "No managed Discord servers found.",
+			"text25": "Organization Links",
+			"text26": "Website URL",
+			"placeholder8": "https://...",
+			"text27": "Discord Invite URL",
+			"placeholder9": "https://discord.gg/...",
+			"text28": "Support Server URL",
+			"placeholder10": "https://discord.gg/...",
+			"text29": "GitHub Repository",
+			"placeholder11": "https://github.com/...",
+			"text30": "Privacy Policy URL",
+			"placeholder12": "https://...",
+			"text31": "Terms of Service URL",
+			"placeholder13": "https://...",
+			"text32": "Privacy Setting",
+			"text33": "Determines who can discover and interact with this organization.",
+			"text34": "Reset Data",
+			"text35": "Reset all organization settings and configurations back to default without deleting the organization itself.",
+			"text36": "Reset Data",
+			"text37": "Delete Organization",
+			"text38": "Permanently delete this organization and all of its associated data from Xernerx.",
+			"text39": "Delete Organization",
+			"title14": "Create Organization",
+			"description15": "Set up a new organization to group your bots, members, and settings.",
+			"text40": "Organization Name",
+			"placeholder16": "e.g. Acme Corp",
+			"text41": "Description (Optional)",
+			"placeholder17": "What is this organization for?",
+			"text42": "Cancel",
+			"text43": "Create Organization",
+			"title18": "Confirm Invite",
+			"description19": "Is this the person you want to invite?",
+			"alt20": "Avatar",
+			"text44": "Cancel",
+			"text45": "Confirm Invite",
+			"title21": "Delete Organization",
+			"description22": "Are you absolutely sure you want to delete this organization and all its data? This action cannot be undone."
+		}
+	},
+	"cdn": {
+		"common": {
+			"description": "test"
+		}
+	},
+	"docs": {
+		"common": {
+			"description": "Official Documentation",
+			"title": "How can we help you",
+			"description2": "build",
+			"description3": "Explore guides, comprehensive API references, and tutorials to help you integrate with the Xernerx Suite seamlessly.",
+			"placeholder": "Search documentation, guides, and API endpoints...",
+			"title2": "Explore Categories"
+		}
+	},
+	"components": {
+		"applayout": {},
+		"cards": {
+			"botcard": {},
+			"botrow": {
+				"text1": "Servers",
+				"text2": "Users"
+			},
+			"sidebarnotifications": {
+				"text1": "Notifications",
+				"text2": "Refresh",
+				"text3": "Mark all read",
+				"text4": "No notifications yet",
+				"text5": "Decline",
+				"text6": "Accept",
+				"title1": "Delete Notification",
+				"title2": "Mark as Unread",
+				"text7": "Open Link",
+				"text8": "Close"
+			},
+			"sidebarsuite": {
+				"text1": "Suite"
+			},
+			"sidebaruser": {
+				"alt1": "User Banner",
+				"alt2": "User Profile",
+				"alt3": "Avatar Decoration",
+				"alt4": "Clan Badge",
+				"text1": "Credits Balance",
+				"text2": "Next Gift In",
+				"text3": "Edit Profile",
+				"text4": "Admin Panel",
+				"text5": "Copy User ID"
+			}
+		},
+		"cookieprompt": {},
+		"footer": {
+			"text1": "Xernerx Studios",
+			"text2": "© 2024 -",
+			"text3": "Xernerx Studios"
+		},
+		"header": {
+			"text1": "Download the app!",
+			"title1": "Open App Drawer (Ctrl + K)"
+		},
+		"page": {},
+		"sidebar": {
+			"alt1": "User Avatar",
+			"alt2": "Avatar Decoration"
+		},
+		"themescript": {}
+	}
+}

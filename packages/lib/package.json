@@ -1,12 +1,25 @@
 {
 	"name": "@xernerx/lib",
-	"version": "0.0.0",
+	"version": "0.3.7",
 	"private": true,
 	"main": "./index.ts",
+	"type": "module",
 	"exports": {
-		".": "./index.ts"
+		".": "./index.ts",
+		"./server": "./server.ts",
+		"./core": "./core.ts"
 	},
 	"dependencies": {
-		"next-auth": "^4"
+		"@react-email/components": "^1.0.12",
+		"@react-email/render": "^2.1.0",
+		"@types/react": "^19.2.18",
+		"lucide-react": "^1.31.0",
+		"mongoose": "^9.9.1",
+		"next": "^16.3.1",
+		"next-auth": "^4.24.15",
+		"postmark": "^5.1.0",
+		"react": "^19.2.8",
+		"server-only": "^0.0.1",
+		"tslib": "^2.6.2"
 	}
 }

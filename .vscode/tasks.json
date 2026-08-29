@@ -1,0 +1,64 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Dev: Prepare",
+			"type": "shell",
+			"command": "pnpm suite dev --prepare-only",
+			"presentation": {
+				"reveal": "never"
+			}
+		},
+		{
+			"label": "Dev: Apps",
+			"type": "shell",
+			"command": "pnpm suite dev --only apps",
+			"dependsOn": "Dev: Prepare",
+			"isBackground": true,
+			"presentation": {
+				"panel": "new",
+				"clear": true
+			}
+		},
+		{
+			"label": "Dev: Services",
+			"type": "shell",
+			"command": "pnpm suite dev --only services",
+			"dependsOn": "Dev: Prepare",
+			"isBackground": true,
+			"presentation": {
+				"panel": "new"
+			}
+		},
+		{
+			"label": "Dev: Clients",
+			"type": "shell",
+			"command": "pnpm suite dev --only clients",
+			"dependsOn": "Dev: Prepare",
+			"isBackground": true,
+			"presentation": {
+				"panel": "new"
+			}
+		},
+		{
+			"label": "Dev: Tunnel",
+			"type": "shell",
+			"command": "pnpm suite dev --only tunnel",
+			"dependsOn": "Dev: Prepare",
+			"isBackground": true,
+			"presentation": {
+				"panel": "new"
+			}
+		},
+		{
+			"label": "Dev: Split Terminal",
+			"dependsOn": ["Dev: Apps", "Dev: Services", "Dev: Clients", "Dev: Tunnel"],
+			"dependsOrder": "parallel",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		}
+	]
+}

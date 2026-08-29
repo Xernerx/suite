@@ -6,8 +6,8 @@ on:
             - main
 
 jobs:
-    check-source:
-        name: Check Source Branch
+    validate-main-target:
+        name: validate-main-target
         runs-on: ubuntu-latest
         steps:
             - name: Verify source is canary

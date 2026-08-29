@@ -54,6 +54,8 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 
 		// Try to load existing preferences
 		const savedConsent = initialCookies['xernerx-cookie-consent'];
+		const isElectron = typeof window !== 'undefined' && window.navigator && window.navigator.userAgent.toLowerCase().includes('electron');
+
 		if (savedConsent) {
 			try {
 				setPreferences(JSON.parse(savedConsent));
@@ -61,6 +63,14 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 				// Fallback if the cookie data got corrupted
 				setPreferences(defaultPreferences);
 			}
+		} else if (isElectron) {
+			const allAccepted = { essential: true, functional: true, analytics: true, marketing: true };
+			setPreferences(allAccepted);
+
+			// Silently set the cookie so it doesn't ask again
+			const date = new Date();
+			date.setTime(date.getTime() + 365 * 24 * 60 * 60 * 1000);
+			document.cookie = `xernerx-cookie-consent=${encodeURIComponent(JSON.stringify(allAccepted))};expires=${date.toUTCString()};domain=.xernerx.com;path=/;SameSite=Lax`;
 		}
 	}, []);
 
@@ -75,13 +85,13 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 		if (typeof document === 'undefined') return;
 		const date = new Date();
 		date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-		document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/`;
+		document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};domain=.xernerx.com;path=/;SameSite=Lax`;
 		setCookies(parseCookies());
 	}, []);
 
 	const removeCookie = useCallback((name: string) => {
 		if (typeof document === 'undefined') return;
-		document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+		document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;domain=.xernerx.com;path=/;SameSite=Lax`;
 		setCookies(parseCookies());
 	}, []);
 
@@ -102,7 +112,8 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 				setCookie,
 				removeCookie,
 				updatePreferences,
-			}}>
+			}}
+		>
 			{children}
 		</CookieContext.Provider>
 	);

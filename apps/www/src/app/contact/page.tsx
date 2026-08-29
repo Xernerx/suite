@@ -1,11 +1,13 @@
 /** @format */
+
 'use client';
 
 import { ArrowUpRight, Briefcase, FileText, Headphones, Mail, Shield } from 'lucide-react';
-
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-
+import { useSidebar, useEnvironment } from '@xernerx/providers';
+import { useEffect } from 'react';
+import { useDictionary } from '@xernerx/providers';
 const contacts = [
 	{
 		title: 'General',
@@ -38,135 +40,139 @@ const contacts = [
 		icon: Briefcase,
 	},
 ];
-
 export default function ContactPage() {
+	const { t } = useDictionary();
+	const { hide } = useSidebar();
+	const { getEnvUrl } = useEnvironment();
+	useEffect(() => {
+		hide();
+	}, [hide]);
 	return (
-		<div className='mx-auto w-full max-w-7xl px-6 py-20'>
-			<motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className='mx-auto max-w-3xl text-center'>
+		<div className="mx-auto w-full max-w-7xl px-6 py-20">
+			<motion.div
+				initial={{
+					opacity: 0,
+					y: 15,
+				}}
+				animate={{
+					opacity: 1,
+					y: 0,
+				}}
+				className="mx-auto max-w-3xl text-center"
+			>
 				<h1
-					className='font-bold tracking-tight'
+					className="font-extrabold tracking-tight text-(--text) drop-shadow-sm"
 					style={{
-						fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-					}}>
-					Contact Xernerx Studios
+						fontSize: 'clamp(3rem, 6vw, 5rem)',
+						fontFamily: 'var(--font-fredoka)',
+					}}
+				>
+					{t('www.contact.title')}
 				</h1>
 
-				<p
-					className='mx-auto mt-6 max-w-2xl text-lg leading-8'
-					style={{
-						color: 'var(--text-muted)',
-					}}>
-					Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we{"'"}re happy to help. Using the correct contact address helps your
-					message reach the right person faster.
+				<p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-(--text-muted)">
+					{t('www.contact.description')}
+					{"'"}
+					{t('www.contact.description2')}
 				</p>
 			</motion.div>
 
 			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ delay: 0.3 }}
-				className='mx-auto mt-24 max-w-4xl rounded-2xl p-10 text-center'
-				style={{
-					background: 'var(--container)',
-					border: '1px solid var(--border)',
-				}}>
-				<h2 className='text-2xl font-semibold'>Looking for documentation?</h2>
-
-				<p
-					className='mx-auto mt-4 max-w-2xl leading-7'
+				initial={{
+					opacity: 0,
+				}}
+				animate={{
+					opacity: 1,
+				}}
+				transition={{
+					delay: 0.3,
+				}}
+				className="mx-auto mt-24 max-w-4xl rounded-3xl p-10 text-center bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md shadow-sm"
+			>
+				<h2
+					className="text-3xl font-extrabold text-(--text) drop-shadow-sm"
 					style={{
-						color: 'var(--text-muted)',
-					}}>
-					Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.
-				</p>
+						fontFamily: 'var(--font-fredoka)',
+					}}
+				>
+					{t('www.contact.title2')}
+				</h2>
 
-				<div className='mt-8 flex flex-wrap justify-center gap-4'>
-					<Link
-						href='https://app.xernerx.com/docs'
-						className='rounded-xl px-5 py-3 font-medium transition-all duration-200'
-						style={{
-							background: 'var(--accent)',
-							color: 'var(--accent-foreground)',
-						}}>
-						Documentation
+				<p className="mx-auto mt-4 max-w-2xl leading-7 text-(--text-muted)">{t('www.contact.description3')}</p>
+
+				<div className="mt-8 flex flex-wrap justify-center gap-4">
+					<Link href={getEnvUrl('https://app.xernerx.com/docs')} className="rounded-xl px-5 py-3 font-medium transition-all duration-200 bg-(--accent) text-(--background) hover:opacity-90">
+						{t('www.contact.button')}
 					</Link>
 
 					<Link
-						href='https://github.com/xernerx'
-						target='_blank'
-						className='rounded-xl px-5 py-3 font-medium transition-all duration-200'
-						style={{
-							border: '1px solid var(--border)',
-							background: 'var(--container)',
-						}}>
-						GitHub
+						href="https://github.com/xernerx"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="rounded-xl px-5 py-3 font-medium transition-all duration-200 border border-(--border)/10 bg-(--foreground) text-(--text) hover:border-(--accent)"
+					>
+						{t('www.contact.button2')}
 					</Link>
 				</div>
 			</motion.div>
 
-			<div className='mt-20 grid gap-8 md:grid-cols-2 xl:grid-cols-3'>
+			<div className="mt-20 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
 				{contacts.map((contact, index) => (
 					<motion.div
 						key={contact.email}
-						initial={{ opacity: 0, y: 15 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: index * 0.05 }}
-						className='group relative overflow-hidden rounded-2xl'
-						style={{
-							background: 'var(--container)',
-							border: '1px solid var(--border)',
-						}}>
+						initial={{
+							opacity: 0,
+							y: 15,
+						}}
+						animate={{
+							opacity: 1,
+							y: 0,
+						}}
+						transition={{
+							delay: index * 0.05,
+						}}
+						className="group relative overflow-hidden rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md hover:border-(--accent)/50 hover:bg-(--foreground)/50 shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all"
+					>
 						<div
-							className='absolute inset-x-0 top-0 h-px'
+							className="absolute inset-x-0 top-0 h-px"
 							style={{
 								background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--accent) 35%, transparent), transparent)',
 							}}
 						/>
 
-						<div className='flex h-full flex-col p-8'>
+						<div className="flex h-full flex-col p-8">
 							<div
-								className='mb-6 flex h-14 w-14 items-center justify-center rounded-xl transition-all'
+								className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl transition-all"
 								style={{
 									background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
 									color: 'var(--accent)',
-								}}>
+								}}
+							>
 								<contact.icon size={24} />
 							</div>
 
-							<h2 className='text-xl font-semibold'>{contact.title}</h2>
-
-							<p
-								className='mt-3 flex-1 leading-7'
+							<h2
+								className="text-2xl font-bold text-(--text)"
 								style={{
-									color: 'var(--text-muted)',
-								}}>
-								{contact.description}
-							</p>
+									fontFamily: 'var(--font-fredoka)',
+								}}
+							>
+								{contact.title}
+							</h2>
+
+							<p className="mt-3 flex-1 leading-7 text-(--text-muted)">{contact.description}</p>
 
 							<Link
 								href={`mailto:${contact.email}`}
-								className='mt-8 inline-flex items-center justify-between rounded-xl px-4 py-3 transition-all duration-200'
+								className="mt-8 inline-flex items-center justify-between rounded-xl px-4 py-3 transition-all duration-200 hover:-translate-y-0.5"
 								style={{
 									background: 'color-mix(in srgb, var(--accent) 8%, transparent)',
 									border: '1px solid color-mix(in srgb, var(--accent) 18%, transparent)',
 								}}
-								onMouseEnter={(e) => {
-									e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 15%, transparent)';
-									e.currentTarget.style.transform = 'translateY(-2px)';
-								}}
-								onMouseLeave={(e) => {
-									e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
-									e.currentTarget.style.transform = 'translateY(0px)';
-								}}>
-								<span
-									className='font-medium'
-									style={{
-										color: 'var(--text-main)',
-									}}>
-									{contact.email}
-								</span>
+							>
+								<span className="font-medium text-(--text)">{contact.email}</span>
 
-								<ArrowUpRight size={18} />
+								<ArrowUpRight size={18} className="text-(--accent)" />
 							</Link>
 						</div>
 					</motion.div>

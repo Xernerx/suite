@@ -1,0 +1,366 @@
+{
+	"metadata": {
+		"label": "Français"
+	},
+	"common": {
+		"cookiePrompt": {
+			"title": "Préférences de cookies",
+			"description": "Nous utilisons des cookies pour garantir la sécurité de votre session, mémoriser votre thème et nous aider à améliorer l'application.",
+			"manage": {
+				"essential": {
+					"label": "Essentiel",
+					"description": "Requis pour les sessions et la sécurité."
+				},
+				"functional": {
+					"label": "Fonctionnel",
+					"description": "Mémorise votre thème et l'état de la mise en page."
+				},
+				"analytics": {
+					"label": "Analytique",
+					"description": "Nous aide à suivre les erreurs et le trafic."
+				}
+			},
+			"buttons": {
+				"acceptAll": "Tout accepter",
+				"essentialOnly": "Essentiel uniquement",
+				"manage": "Gérer",
+				"save": "Enregistrer mes préférences"
+			}
+		},
+		"footer": {
+			"tagline": "Création de logiciels, d'infrastructures et d'outils de développement modernes axés sur la performance, la simplicité et la maintenabilité à long terme.",
+			"sections": {
+				"resources": "Ressources",
+				"developer": "Développeur"
+			},
+			"links": {
+				"privacy": "Confidentialité",
+				"terms": "Conditions",
+				"contact": "Contact",
+				"github": "GitHub",
+				"npm": "npm",
+				"documentation": "Documentation",
+				"discord": "Discord"
+			}
+		},
+		"sidebar": {
+			"login": "Connexion"
+		},
+		"nav": {
+			"categories": {
+				"account": "Compte",
+				"preferences": "Préférences",
+				"billing": "Facturation",
+				"developer": "Développeur"
+			},
+			"items": {
+				"account": "Compte",
+				"profile": "Profil",
+				"connections": "Connexions",
+				"devices": "Appareils",
+				"appearance": "Apparence",
+				"language": "Langue",
+				"notifications": "Notifications",
+				"billing": "Facturation",
+				"tokens": "Jetons"
+			}
+		}
+	},
+	"www": {
+		"hero": {
+			"title": "Empowering Developers. Connecting Communities.",
+			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
+		},
+		"about": {
+			"title": "À propos de Xernerx",
+			"description": "Fondé en 2024, Xernerx a évolué d'une initiative de développement ciblée vers un écosystème structuré d'outils d'automatisation et de frameworks d'infrastructure. Chaque système est conçu avec l'évolutivité, la maintenabilité et la clarté architecturale comme principes premiers."
+		},
+		"sections": {
+			"services": {
+				"title": "Services"
+			},
+			"packages": {
+				"title": "Paquets"
+			},
+			"applications": {
+				"title": "Applications"
+			}
+		},
+		"services": {
+			"dashboard": {
+				"title": "Tableau de bord",
+				"desc": "Gérez les applications, configurez les déploiements et surveillez les performances du système."
+			}
+		},
+		"packages": {
+			"framework": {
+				"title": "Framework Xernerx",
+				"desc": "Une base modulaire pour les applications Discord évolutives."
+			},
+			"stats": {
+				"title": "Statistiques Xernerx",
+				"desc": "Utilitaires d'analyse pour mesurer les performances."
+			}
+		},
+		"applications": {
+			"todo": {
+				"title": "Bot de liste de tâches",
+				"desc": "Outils de productivité structurés."
+			},
+			"zodiac": {
+				"title": "Zodiaque",
+				"desc": "Outils d'interaction basés sur l'astrologie."
+			},
+			"metamorphosis": {
+				"title": "Métamorphose",
+				"desc": "Utilitaires avancés de transformation de rôle."
+			}
+		},
+		"history": {
+			"title": "Notre histoire",
+			"description": "Une progression structurée de l'expérimentation vers l'ingénierie d'infrastructure stable."
+		},
+		"privacy": {
+			"toc": "Sommaire",
+			"header": {
+				"title": "Politique de confidentialité",
+				"effectiveDate": "Date d'effet :"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Introduction",
+					"content": "Cette Politique de confidentialité explique comment Xernerx Studios (« nous », « notre ») collecte, utilise et protège vos données personnelles lorsque vous utilisez nos services."
+				},
+				"dataCollected": {
+					"title": "2. Informations que nous collectons",
+					"account": {
+						"title": "Informations du compte :",
+						"desc": "E-mail, nom d'utilisateur et identifiants de profil."
+					},
+					"usage": {
+						"title": "Données d'utilisation :",
+						"desc": "Journaux, interactions système et paramètres de configuration."
+					},
+					"integration": {
+						"title": "Données d'intégration :",
+						"desc": "Données fournies via des plateformes tierces telles que Discord."
+					}
+				},
+				"legalBasis": {
+					"title": "3. Base juridique du traitement",
+					"content": "Nous traitons les données personnelles sur la base de la nécessité contractuelle, des intérêts légitimes, des obligations légales ou du consentement de l'utilisateur le cas échéant."
+				},
+				"usage": {
+					"title": "4. Comment nous utilisons les informations",
+					"items": [
+						"Fournir et maintenir les services.",
+						"Améliorer la fiabilité et les performances.",
+						"Fournir du support et communiquer des mises à jour.",
+						"Garantir le respect des obligations légales."
+					]
+				},
+				"sharing": {
+					"title": "5. Partage des données",
+					"items": ["Fournisseurs d'hébergement et d'infrastructure.", "Intégrations tierces autorisées.", "Autorités légales lorsque la loi l'exige."]
+				},
+				"retention": {
+					"title": "6. Conservation des données",
+					"content": "Nous conservons les données uniquement aussi longtemps que nécessaire pour remplir les objectifs décrits dans cette politique, sauf si une conservation plus longue est requise par la loi."
+				},
+				"security": {
+					"title": "7. Sécurité des données",
+					"content": "Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles pour protéger les données. Cependant, aucun système n'est absolument sécurisé."
+				},
+				"rights": {
+					"title": "8. Vos droits",
+					"items": ["Droit d'accès à vos données.", "Droit de rectification ou de suppression.", "Droit de restreindre ou de s'opposer au traitement.", "Droit à la portabilité des données."]
+				},
+				"cookies": {
+					"title": "9. Cookies et suivi",
+					"content": "Nous pouvons utiliser des cookies ou des technologies similaires pour améliorer les performances du service et les analyses."
+				},
+				"international": {
+					"title": "10. Transferts internationaux",
+					"content": "Si des données sont transférées en dehors de votre juridiction, des garanties appropriées sont mises en œuvre pour assurer la conformité légale."
+				},
+				"changes": {
+					"title": "11. Modifications de cette politique",
+					"content": "Nous pouvons mettre à jour cette Politique de confidentialité périodiquement. L'utilisation continue des services indique l'acceptation de la version révisée."
+				},
+				"contact": {
+					"title": "12. Contact",
+					"prefix": "Pour toute question relative à la confidentialité, contactez"
+				}
+			}
+		},
+		"terms": {
+			"toc": "Sommaire",
+			"header": {
+				"title": "Conditions d'utilisation",
+				"effectiveDate": "Date d'effet :"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Introduction",
+					"content": "Ces Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation des services fournis par Xernerx Studios (« nous », « notre »). En accédant à nos services, vous acceptez d'être lié par ces Conditions."
+				},
+				"eligibility": {
+					"title": "2. Éligibilité",
+					"content": "Vous devez avoir l'âge légal minimum dans votre juridiction pour utiliser nos services. En utilisant nos services, vous déclarez satisfaire à cette exigence."
+				},
+				"acceptableUse": {
+					"title": "3. Utilisation acceptable",
+					"items": [
+						"Se livrer à des activités illégales.",
+						"Accéder aux données sans autorisation explicite.",
+						"Tenter de perturber l'infrastructure du service.",
+						"Effectuer de l'ingénierie inverse ou exploiter des vulnérabilités."
+					]
+				},
+				"accounts": {
+					"title": "4. Comptes utilisateurs",
+					"content": "Vous êtes responsable du maintien de la confidentialité de vos identifiants de compte et de toutes les activités effectuées sous votre compte. Nous ne sommes pas responsables des pertes résultant d'un accès non autorisé."
+				},
+				"data": {
+					"title": "5. Données utilisateur",
+					"content": "En utilisant nos services, vous acceptez nos pratiques de traitement des données décrites dans notre Politique de confidentialité. Les données peuvent inclure des informations de compte, des mesures d'utilisation et des données d'intégration."
+				},
+				"availability": {
+					"title": "6. Disponibilité du service",
+					"content": "Nous nous efforçons d'assurer une disponibilité fiable mais ne garantissons pas un service ininterrompu. Les services peuvent être modifiés, suspendus ou interrompus à tout moment."
+				},
+				"thirdParty": {
+					"title": "7. Services tiers",
+					"content": "Nos services peuvent s'intégrer à des plateformes tierces telles que Discord. Nous ne sommes pas responsables des politiques, de la disponibilité ou des pratiques de données des tiers."
+				},
+				"intellectualProperty": {
+					"title": "8. Propriété intellectuelle",
+					"content": "Tous les logiciels, codes, marques et matériaux restent la propriété exclusive de Xernerx Studios ou de ses concédants de licence. Toute reproduction ou distribution non autorisée est interdite."
+				},
+				"warranty": {
+					"title": "9. Exclusion de garanties",
+					"content": "Les services sont fournis « en l'état » sans aucune garantie d'aucune sorte, expresse ou implicite."
+				},
+				"liability": {
+					"title": "10. Limitation de responsabilité",
+					"content": "Dans toute la mesure permise par la loi, Xernerx Studios ne sera pas responsable des dommages indirects, accessoires ou consécutifs découlant de l'utilisation de nos services."
+				},
+				"indemnification": {
+					"title": "11. Indemnisation",
+					"content": "Vous acceptez d'indemniser et de dégager de toute responsabilité Xernerx Studios contre toute réclamation ou responsabilité découlant d'une mauvaise utilisation de nos services ou d'une violation de ces Conditions."
+				},
+				"governingLaw": {
+					"title": "12. Loi applicable",
+					"content": "Ces Conditions sont régies conformément aux lois applicables dans votre juridiction."
+				},
+				"changes": {
+					"title": "13. Modifications des conditions",
+					"content": "Nous pouvons mettre à jour ces Conditions de temps à autre. L'utilisation continue de nos services après les mises à jour constitue une acceptation."
+				},
+				"contact": {
+					"title": "14. Contact",
+					"prefix": "Pour toute demande d'ordre juridique, contactez"
+				}
+			}
+		}
+	},
+	"account": {
+		"account": {
+			"title": "Paramètres du compte",
+			"description": "Gérez votre session de compte, la confidentialité de vos données et les informations générales de votre profil.",
+			"fallbackName": "Utilisateur",
+			"session": {
+				"title": "Session Active",
+				"description": "Déconnectez-vous de la session active sur cet appareil. Vous devrez vous réauthentifier pour accéder à votre espace de travail.",
+				"button": "Se déconnecter"
+			},
+			"danger": {
+				"title": "Supprimer les données utilisateur et le compte",
+				"description": "Supprimez définitivement les données de votre profil et vos préférences enregistrées, et fermez votre compte dans l'ensemble de l'écosystème. Cette action est irréversible.",
+				"button": "Supprimer le compte"
+			}
+		},
+		"appearance": {
+			"title": "Apparence",
+			"description": "Personnalisez l'apparence et la convivialité de l'interface dans votre espace de travail.",
+			"theme": {
+				"title": "Thème",
+				"description": "Choisissez votre mode de thème d'interface préféré.",
+				"options": {
+					"dark": "Sombre",
+					"light": "Clair",
+					"system": "Système"
+				}
+			},
+			"discordSync": {
+				"title": "Synchroniser l'accent avec Discord",
+				"description": "Adoptez automatiquement la couleur d'accentuation du thème de votre profil Discord comme accent de votre espace de travail."
+			},
+			"accentColor": {
+				"title": "Couleur d'accentuation",
+				"description": "Sélectionnez une couleur d'accentuation personnalisée pour le thème de votre espace de travail."
+			},
+			"colors": {
+				"purple": "Xerple",
+				"green": "Crean",
+				"neon": "Néon Cyber",
+				"blue": "Bleu Électrique",
+				"pink": "Rose Vif",
+				"orange": "Orange Coucher de soleil",
+				"yellow": "Jaune Or",
+				"crimson": "Cramoisi Profond",
+				"mint": "Brise Menthe",
+				"indigo": "Indigo Royal",
+				"lime": "Lime Acide",
+				"charcoal": "Charbon Vide"
+			}
+		},
+		"language": {
+			"title": "Langue",
+			"description": "Sélectionnez votre langue préférée pour l'interface.",
+			"coverage": {
+				"title": "Aidez-nous à traduire !",
+				"description": "Votre langue sélectionnée est actuellement traduite à {coverage}%. Avez-vous quelques minutes pour nous aider à la compléter ?"
+			}
+		},
+		"signin": {
+			"button": "Continuer avec Discord",
+			"redirecting": "Redirection…",
+			"aboutToggle": "À propos des autorisations",
+			"permissions": {
+				"profile": {
+					"title": "Nom d'utilisateur et profil",
+					"description": "Utilisé pour afficher votre profil dans l'application."
+				},
+				"email": {
+					"title": "Adresse e-mail",
+					"description": "Utilisé pour les notifications et les mises à jour importantes du compte."
+				},
+				"connections": {
+					"title": "Connexions",
+					"description": "Affiché sur votre profil pour la personnalisation."
+				},
+				"joinServers": {
+					"title": "Rejoindre des serveurs",
+					"description": "Utilisé pour rejoindre les serveurs gérés par Xernerx Studios. Ne vous ajoute à aucun serveur sans votre accord !"
+				},
+				"servers": {
+					"title": "Serveurs",
+					"description": "Utilisé pour alimenter votre expérience de tableau de bord."
+				},
+				"memberInfo": {
+					"title": "Informations de membre du serveur",
+					"description": "Utilisé pour les rôles, les surnoms et les fonctionnalités spécifiques au serveur."
+				},
+				"footer": "Xernerx ne vend pas vos données. Toutes les données sont soit publiques via l'API Discord, soit utilisées en interne pour les fonctionnalités."
+			}
+		},
+		"signout": {
+			"title": "Se déconnecter",
+			"description": "Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous authentifier à nouveau pour accéder à votre tableau de bord.",
+			"confirmButton": "Oui, déconnectez-moi",
+			"signingOut": "Déconnexion en cours…",
+			"cancelButton": "Annuler"
+		}
+	}
+}

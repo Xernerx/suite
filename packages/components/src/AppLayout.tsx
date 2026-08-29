@@ -1,30 +1,84 @@
 /** @format */
 'use client';
 
-import { CookieProvider, PlatformProvider, SidebarProvider, SupportProvider, ThemeProvider, ToastProvider } from '@xernerx/providers';
+import { Cascadia_Code, Fredoka } from 'next/font/google';
+import {
+	CookieProvider,
+	DictionaryProvider,
+	EnvironmentProvider,
+	NotificationProvider,
+	PlatformProvider,
+	ShortcutsProvider,
+	SidebarProvider,
+	SupportProvider,
+	ThemeProvider,
+	ToastProvider,
+	UserProvider,
+	DispatchProvider,
+} from '@xernerx/providers';
+import React, { Suspense } from 'react';
 
 import { CookiePrompt } from './CookiePrompt';
+import { Loading } from '@xernerx/feedback';
 import { Page } from './Page';
-import React from 'react';
+import { ThemeScript } from './ThemeScript';
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
+const fredoka = Fredoka({
+	subsets: ['latin'],
+	variable: '--font-fredoka',
+});
+
+const cascadiaCode = Cascadia_Code({
+	subsets: ['latin'],
+	variable: '--font-cascadia',
+	adjustFontFallback: false,
+});
+
+export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {
+	React.useEffect(() => {
+		if (typeof document !== 'undefined') {
+			document.body.classList.add(fredoka.variable, cascadiaCode.variable);
+		}
+	}, []);
+
 	return (
-		<>
-			<PlatformProvider>
-				<ThemeProvider>
-					<ToastProvider>
-						<CookieProvider>
-							<SupportProvider>
-								<CookiePrompt />
+		<Suspense fallback={<Loading />}>
+			<div
+				className={`${fredoka.variable} ${cascadiaCode.variable}`}
+				style={{
+					fontFamily: 'var(--font-fredoka), system-ui, -apple-system, sans-serif',
+					display: 'contents',
+				}}
+			>
+				<ThemeScript />
 
-								<SidebarProvider>
-									<Page>{children}</Page>
-								</SidebarProvider>
-							</SupportProvider>
-						</CookieProvider>
+				<DictionaryProvider dictionary={dictionary}>
+					<ToastProvider>
+						<EnvironmentProvider initialEnvironment={initialEnvironment}>
+							<PlatformProvider>
+								<ThemeProvider>
+									<UserProvider>
+										<NotificationProvider>
+											<DispatchProvider>
+												<ShortcutsProvider>
+													<CookieProvider>
+														<CookiePrompt />
+														<SidebarProvider>
+															<SupportProvider>
+																<Page>{children}</Page>
+															</SupportProvider>
+														</SidebarProvider>
+													</CookieProvider>
+												</ShortcutsProvider>
+											</DispatchProvider>
+										</NotificationProvider>
+									</UserProvider>
+								</ThemeProvider>
+							</PlatformProvider>
+						</EnvironmentProvider>
 					</ToastProvider>
-				</ThemeProvider>
-			</PlatformProvider>
-		</>
+				</DictionaryProvider>
+			</div>
+		</Suspense>
 	);
 }

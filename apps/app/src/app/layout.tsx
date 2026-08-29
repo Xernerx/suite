@@ -1,42 +1,33 @@
 /** @format */
 
 import './globals.css';
-import '@/lib/console';
 
-import { CookieProvider } from '@/providers/CookieProvider';
-import { DebugProvider } from '@/providers/DebugProvider';
-import Header from '@/components/Header';
-import Main from '@/components/Main';
+import { Locale, dictionary, getThemeLayoutProps } from '@xernerx/lib/server';
+
+import { AppLayout } from '@xernerx/components';
 import type { Metadata } from 'next';
-import { PlatformProvider } from '@/providers/PlatformProvider';
-import Script from 'next/script';
-import { SessionProvider } from '@/providers/SessionProvider';
-import Sidebar from '@/components/Sidebar';
-import { SidebarProvider } from '@/providers/SidebarProvider';
-import { SupportProvider } from '@/providers/SupportProvider';
-import { ThemeProvider } from '@/providers/ThemeProvider';
-import { ToastProvider } from '@/providers/ToastProvider';
-import { UserProvider } from '@/providers/UserProvider';
-import { authOptions } from '@/lib/schema/auth';
+import { SessionProvider } from '@xernerx/providers';
+import { auth } from '@xernerx/lib';
+import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Dashboard',
-	description: 'Manage your Xernerx applications, tokens, and settings. Access platform tools and infrastructure from a unified dashboard.',
+	title: 'Xernerx Studios | Explore',
+	description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home on Xernerx.',
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Dashboard',
-		description: 'Access the Xernerx dashboard to manage applications, API tokens, and platform configuration.',
+		title: 'Xernerx Studios | Explore',
+		description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
 			{
-				url: '/banner.png', // ✅ now local works perfectly
+				url: '/banner.png',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx Dashboard',
+				alt: 'Explore Xernerx',
 			},
 		],
 		type: 'website',
@@ -44,8 +35,8 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Dashboard',
-		description: 'Manage your Xernerx tools, tokens, and applications in one place.',
+		title: 'Xernerx Studios | Explore',
+		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx.',
 		images: ['/banner.png'],
 	},
 
@@ -63,73 +54,19 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getServerSession(authOptions);
+	const session = await getServerSession(auth);
+
+	const cookieStore = await cookies();
+	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
+	const dict = await dictionary(locale as Locale);
+
+	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang='en' className='h-full' suppressHydrationWarning>
-			<head>
-				<Script
-					id={'1'}
-					dangerouslySetInnerHTML={{
-						__html: `
-try {
-	const theme = JSON.parse(localStorage.getItem('xernerx-theme'));
-
-	if (theme?.accentColor) {
-		document.documentElement.style.setProperty('--accent', theme.accentColor);
-	}
-
-	if (theme?.mode) {
-		document.documentElement.dataset.theme =
-			theme.mode === 'system'
-				? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-				: theme.mode;
-	}
-
-	if (theme?.ui?.uiSpacing) {
-		document.documentElement.dataset.spacing = theme.ui.uiSpacing;
-	}
-
-	if (theme?.ui?.zoom) {
-		document.documentElement.style.setProperty('--ui-zoom-scale', theme.ui.zoom / 100);
-	}
-} catch {}
-`,
-					}}
-				/>
-			</head>
-
-			<body className='h-full'>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<ToastProvider>
-						<UserProvider>
-							<ThemeProvider>
-								<CookieProvider>
-									<DebugProvider>
-										<SupportProvider>
-											<PlatformProvider>
-												<div id='app-root' className='h-full w-full overflow-hidden bg-(--bg-main)'>
-													<SidebarProvider>
-														<div className='flex flex-col h-full'>
-															{/* Header */}
-															<Header />
-
-															{/* Sidebar + Main */}
-															<div className='flex flex-1 overflow-hidden'>
-																<Sidebar />
-
-																<Main>{children}</Main>
-															</div>
-														</div>
-													</SidebarProvider>
-												</div>
-											</PlatformProvider>
-										</SupportProvider>
-									</DebugProvider>
-								</CookieProvider>
-							</ThemeProvider>
-						</UserProvider>
-					</ToastProvider>
+					<AppLayout dictionary={dict}>{children}</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

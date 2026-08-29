@@ -1,241 +1,136 @@
 /** @format */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { database } from '@xernerx/lib/server';
 
-import { authOptions } from '@/lib/schema/auth';
-import check from '@/lib/functions/check';
-import database from '@/lib/database';
-import { getServerSession } from 'next-auth';
-import getToken from '@/lib/functions/getToken';
-import validate from '@/lib/functions/validate';
-import { z } from 'zod';
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		const authHeader = req.headers.get('Authorization');
 
-type Params = { params: Promise<{ id: string }> };
-
-/* ========================= SCHEMA ========================= */
-
-const shardSchema = z.object({
-	shardId: z.number(),
-	onlineSince: z.number(),
-	guildCount: z.number(),
-	userCount: z.number(),
-});
-
-const statsSchema = z.object({
-	timestamp: z.number().optional(),
-	onlineSince: z.number(),
-	guildCount: z.number(),
-	userCount: z.number(),
-	shardCount: z.number(),
-	voteCount: z.number(),
-	shards: z.array(shardSchema).optional(),
-});
-
-/* ========================= HELPERS ========================= */
-
-async function getAuth(req: NextRequest) {
-	const token = await getToken(req);
-	const session: any = await getServerSession(authOptions);
-	return { token, session };
-}
-
-async function guardRead(req: NextRequest) {
-	const { token, session } = await getAuth(req);
-
-	// only validate token if present
-	if (token) {
-		const c = await check({ token });
-		if (c) return c;
-	}
-
-	// no auth required for reading
-	return { token, session };
-}
-
-async function guardWrite(req: NextRequest, id: string) {
-	const { token, session } = await getAuth(req);
-
-	if (session) return { token, session };
-
-	const c = await check({ token, write: true, botId: id });
-	if (c) return c;
-
-	return { token, session: null };
-}
-
-async function ensureBotExists(profilesDb: any, id: string) {
-	const bot = await profilesDb.bot.findOne({ id }).lean();
-
-	if (!bot) {
-		return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
-	}
-
-	return null;
-}
-
-/* ========================= GET ========================= */
-
-export async function GET(req: NextRequest, { params }: Params) {
-	const guard = await guardRead(req);
-	if (guard instanceof NextResponse) return guard;
-
-	const id = (await params).id;
-
-	const profilesDb = await database('xernerx', 'profiles');
-	const statsDb = await database('xernerx', 'stats');
-
-	const botCheck = await ensureBotExists(profilesDb, id);
-	if (botCheck) return botCheck;
-
-	const stats = await statsDb.bot.find({ id }).sort({ timestamp: -1 }).limit(100).lean();
-
-	return NextResponse.json(stats, { status: 200 });
-}
-
-/* ========================= POST ========================= */
-
-export async function POST(req: NextRequest, { params }: Params) {
-	const id = (await params).id;
-
-	const { token, session } = await getAuth(req);
-
-	const profilesDb = await database('xernerx', 'profiles');
-	const statsDb = await database('xernerx', 'stats');
-	const tokenDb = await database('xernerx', 'tokens');
-
-	// ================= TOKEN / SESSION HANDLING =================
-
-	let t: any = null;
-
-	if (!session) {
-		// no session → must use token
-		if (!token) {
-			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		if (!authHeader) {
+			return NextResponse.json({ error: 'Missing Authorization header' }, { status: 401 });
 		}
 
-		t = await tokenDb.api.findOne({ id: token });
+		// Extract token (support "Bearer <token>" or just "<token>")
+		const tokenValue = authHeader.replace(/^Bearer\s+/i, '').trim();
 
-		if (!t) {
-			return NextResponse.json({ error: 'Invalid token' }, { status: 403 });
+		const db = await database('xernerx');
+		const TokenModel = (db.models.users as any).Token; // Note: Token is usually in users collection (models.users.Token)
+		const BotModel = (db.models.bots as any).Bot;
+		const StatModel = (db.models.bots as any).Stat;
+
+		if (!TokenModel || !BotModel || !StatModel) {
+			return NextResponse.json({ error: 'Database models not found' }, { status: 500 });
 		}
 
-		// ❌ token linked to another bot → block
-		if (t.botId && t.botId !== id) {
-			return NextResponse.json({ error: 'Token already linked to another bot' }, { status: 403 });
+		// 1. Fetch Token
+		const tokenDoc = await TokenModel.findOne({ id: tokenValue });
+		if (!tokenDoc) {
+			return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
 		}
 
-		// run normal validation (no write restriction)
-		const c = await check({ token });
-		if (c) return c;
-	} else {
-		// session path → normal write rules
-		const c = await check({ token, write: true, botId: id });
-		if (c) return c;
-	}
+		if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') {
+			return NextResponse.json({ error: 'Token is inactive or suspended' }, { status: 403 });
+		}
 
-	// ================= VALIDATION =================
+		// 2. Parse Body Stats
+		const body = await req.json().catch(() => ({}));
 
-	const result = await validate(req, statsSchema);
-	if ('response' in result) return result.response;
+		// 3. Token Assignment Logic
+		if (!tokenDoc.botId) {
+			// First time: claim the bot ID
+			const existingBot = await BotModel.findOne({ id });
+			if (existingBot) {
+				const tokenOwners = tokenDoc.owners || [];
+				const botOwners = existingBot.owners || [];
 
-	// ================= BOT CREATION =================
+				const hasAccess = tokenOwners.some((owner: string) => botOwners.includes(owner));
+				if (!hasAccess) {
+					return NextResponse.json({ error: 'Bot ID is already assigned to another profile' }, { status: 403 });
+				}
 
-	let bot = await profilesDb.bot.findOne({ id });
+				// If they own it, link it directly without creating a new profile
+				await TokenModel.updateOne({ id: tokenValue }, { $set: { botId: id, status: 'active' } });
+			} else {
+				// Fetch bot info from Discord
+				let botName = 'Unknown Bot';
+				let botAvatar = null;
+				try {
+					const discordToken = process.env.DISCORD_CLIENT_TOKEN;
+					if (discordToken) {
+						const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
+							headers: { Authorization: `Bot ${discordToken}` },
+						});
+						if (discordRes.ok) {
+							const discordUser = await discordRes.json();
+							botName = discordUser.username;
+							botAvatar = discordUser.avatar;
+						}
+					}
+				} catch (e) {
+					console.error('Failed to fetch Discord user for bot profile:', e);
+				}
 
-	if (!bot) {
-		await profilesDb.bot.create({
+				// Create Bot profile
+				await BotModel.create({
+					id,
+					name: botName,
+					avatar: botAvatar,
+					owners: tokenDoc.owners || [],
+				});
+
+				// Update Token
+				await TokenModel.updateOne({ id: tokenValue }, { $set: { botId: id, status: 'active' } });
+			}
+		} else {
+			// Recurring: ensure botId matches
+			if (tokenDoc.botId !== id) {
+				return NextResponse.json({ error: 'Token is not assigned to this bot ID' }, { status: 403 });
+			}
+		}
+
+		// 4. Update Stats
+		const serverCount = typeof body.serverCount === 'number' ? body.serverCount : typeof body.guildCount === 'number' ? body.guildCount : 0;
+		const shardCount = typeof body.shardCount === 'number' ? body.shardCount : 0;
+		const userCount = typeof body.userCount === 'number' ? body.userCount : 0;
+
+		const VoteModel = (db.models.bots as any).Vote;
+		const currentVoteCount = await VoteModel.countDocuments({ botId: id });
+
+		await StatModel.create({
 			id,
-			owners: t?.owners ?? [], // 👈 THIS LINE
-			verified: false,
-			privacy: 'private',
+			guildCount: serverCount,
+			shardCount: shardCount,
+			userCount: userCount,
+			voteCount: currentVoteCount,
+			timestamp: new Date(),
 		});
-	}
 
-	// ================= TOKEN LINKING =================
+		// Fast cache update on BotModel
+		const updateFields: any = {};
+		if (typeof body.voteCount === 'number') {
+			updateFields.voteCount = body.voteCount;
+		}
 
-	if (t && !t.botId) {
-		await tokenDb.api.updateOne(
-			{ id: token },
+		if (Object.keys(updateFields).length > 0) {
+			await BotModel.updateOne({ id }, { $set: updateFields });
+		}
+
+		return NextResponse.json(
 			{
-				$set: {
-					botId: id,
-					status: 'active',
+				message: 'Stats updated successfully',
+				warning: 'DEPRECATED: This endpoint will be removed in the next major version. Please update your integrations to use https://api.xernerx.com/v1/bots/[id]/stats instead.',
+			},
+			{
+				status: 201,
+				headers: {
+					Warning: '299 - "Deprecated API: This endpoint will be removed in the next major version. Please use https://api.xernerx.com/v1/bots/[id]/stats instead."',
 				},
 			}
 		);
+	} catch (error: any) {
+		console.error('Failed to process bot stats POST:', error);
+		return NextResponse.json({ error: 'Internal Server Error', message: error.message, stack: error.stack }, { status: 500 });
 	}
-
-	// ================= CREATE STATS =================
-
-	const created = await statsDb.bot.create({
-		id,
-		...result.data,
-		timestamp: result.data.timestamp ?? Date.now(),
-	});
-
-	return NextResponse.json(created, { status: 201 });
-}
-
-/* ========================= PATCH ========================= */
-
-export async function PATCH(req: NextRequest, { params }: Params) {
-	const id = (await params).id;
-
-	const guard = await guardWrite(req, id);
-	if (guard instanceof NextResponse) return guard;
-
-	const result = await validate(req, statsSchema.partial());
-	if ('response' in result) return result.response;
-
-	if (!result.data.timestamp) {
-		return NextResponse.json({ error: 'timestamp required for update' }, { status: 400 });
-	}
-
-	const profilesDb = await database('xernerx', 'profiles');
-	const statsDb = await database('xernerx', 'stats');
-
-	const botCheck = await ensureBotExists(profilesDb, id);
-	if (botCheck) return botCheck;
-
-	const updated = await statsDb.bot.findOneAndUpdate({ id, timestamp: result.data.timestamp }, { $set: result.data }, { returnDocument: 'after' }).lean();
-
-	if (!updated) {
-		return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
-	}
-
-	return NextResponse.json(updated, { status: 200 });
-}
-
-/* ========================= DELETE ========================= */
-
-export async function DELETE(req: NextRequest, { params }: Params) {
-	const id = (await params).id;
-
-	const guard = await guardWrite(req, id);
-	if (guard instanceof NextResponse) return guard;
-
-	const result = await validate(
-		req,
-		z.object({
-			timestamp: z.number(),
-		})
-	);
-	if ('response' in result) return result.response;
-
-	const profilesDb = await database('xernerx', 'profiles');
-	const statsDb = await database('xernerx', 'stats');
-
-	const botCheck = await ensureBotExists(profilesDb, id);
-	if (botCheck) return botCheck;
-
-	const deletion = await statsDb.bot.deleteOne({
-		id,
-		timestamp: result.data.timestamp,
-	});
-
-	if (deletion.deletedCount === 0) {
-		return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
-	}
-
-	return NextResponse.json({ success: true }, { status: 200 });
 }

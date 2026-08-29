@@ -1,36 +1,54 @@
 /** @format */
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronUp, Globe, LayoutDashboard, LogIn, LogOut, Server, User } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { Bell, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { useDictionary, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 
+import { AnimatePresence } from 'framer-motion';
+import { Divider } from '@xernerx/ui';
 import Image from 'next/image';
 import Link from 'next/link';
+import SidebarNotifications from './cards/SidebarNotifications';
+import SidebarUserCard from './cards/SidebarUser';
 import { useSession } from 'next-auth/react';
-import { useSidebar } from '@xernerx/providers';
 
-// Define your cross-domain ecosystem services here
-const SERVICES = [
-	{ label: 'Website', href: 'https://www.xernerx.com', icon: Globe },
-	{ label: 'Dashboard', href: 'https://app.xernerx.com', icon: LayoutDashboard },
-	{ label: 'CDN', href: 'https://cdn.xernerx.com', icon: Server },
-	{ label: 'Account', href: 'https://auth.xernerx.com', icon: User },
-];
+const deviceIcons = {
+	desktop: Monitor,
+	mobile: Smartphone,
+	tablet: Tablet,
+} as const;
 
 export function Sidebar() {
 	const { data: session } = useSession();
 	const { state, isMobileOpen, setMobileOpen, navItems, view, setView } = useSidebar();
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const { user: discordUser } = useUser();
+	const { device } = usePlatform();
+	const { t } = useDictionary();
+	const { unreadCount } = useNotifications();
+	const { setNavOpen } = useShortcuts();
+
+	// Manage which dropdown is active
+	const [activeMenu, setActiveMenu] = useState<'none' | 'user' | 'notifications'>('none');
 	const menuRef = useRef<HTMLDivElement>(null);
 
-	const isCollapsed = state === 'closed';
+	const isCollapsed = state === 'closed' && !isMobileOpen;
+	const activeUser = discordUser || session?.user;
 
-	// Close menu when clicking outside
+	// Resolve Discord CDN URLs for Avatar, Decoration, and Nameplate
+	const avatarUrl = activeUser?.avatar
+		? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
+		: activeUser?.image;
+	const decorationUrl = activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
+	const nameplateUrl = activeUser?.collectibles?.nameplate?.asset ? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm` : null;
+
+	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
+	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
+
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
 			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-				setIsMenuOpen(false);
+				setActiveMenu('none');
 			}
 		}
 		document.addEventListener('mousedown', handleClickOutside);
@@ -42,136 +60,229 @@ export function Sidebar() {
 	return (
 		<>
 			{/* Mobile Backdrop */}
-			{isMobileOpen && <div className='fixed inset-0 top-[72px] z-40 bg-black/50 backdrop-blur-sm md:hidden' onClick={() => setMobileOpen(false)} />}
+			{isMobileOpen && <div className="fixed inset-0 top-[72px] z-40 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />}
 
 			<aside
 				className={`
-                    fixed bottom-0 left-0 z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
-                    md:sticky md:top-[72px] md:h-[calc(100vh-72px)]
+                    fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
+                    w-full pt-[72px] pb-4
+                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-50px)] md:pt-0 md:pb-0
                     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
                     md:translate-x-0 
-                    ${isCollapsed ? 'md:w-[80px]' : 'md:w-64'}
-                `}>
+                    ${isCollapsed ? 'md:w-[80px]' : ''}
+                `}
+				style={{
+					paddingLeft: 'var(--ui-gap)',
+					paddingRight: 'var(--ui-gap)',
+					fontSize: 'var(--text-scale, 14px)',
+				}}
+			>
 				{/* Navigation Items */}
-				<div className='flex flex-1 flex-col gap-2 overflow-y-auto overflow-x-hidden pt-6 px-3'>
+				<div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					{navItems.map((item, idx) => {
 						const Icon = item.icon;
 						const active = item.view && view === item.view;
 
-						return (
-							<Link
-								key={idx}
-								href={item.href || '#'}
-								onClick={() => {
-									if (item.view) setView(item.view);
-									if (item.onClick) item.onClick();
-									setMobileOpen(false);
-								}}
-								className={`group relative flex items-center rounded-xl py-3 transition-all duration-200 
-                                    ${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground) hover:text-(--text)'}
-                                    ${isCollapsed ? 'justify-center px-0' : 'px-4 gap-4'}
-                                `}>
-								{active && !isCollapsed && <div className='absolute left-0 h-5 w-1 rounded-r-full bg-accent' />}
+						const prevItem = idx > 0 ? navItems[idx - 1] : null;
+						const showCategory = item.category && item.category !== prevItem?.category;
 
-								{Icon && <Icon size={22} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-accent' : ''}`} />}
-								<span
-									className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium 
-                                    ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}>
-									{item.label}
-								</span>
-							</Link>
+						return (
+							<Fragment key={idx}>
+								{showCategory && (
+									<div className={`mt-4 mb-1 transition-all duration-300 ${isCollapsed ? 'flex justify-center' : 'px-4'}`}>
+										{isCollapsed ? (
+											<div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-(--border) to-transparent" />
+										) : (
+											<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{item.category}</span>
+										)}
+									</div>
+								)}
+
+								{!item.href || item.href === '#' ? (
+									<button
+										onClick={() => {
+											if (item.view) setView(item.view);
+											if (item.onClick) item.onClick();
+											setMobileOpen(false);
+										}}
+										className={`w-full group relative flex items-center text-left rounded-xl transition-all duration-200 
+											${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
+											${isCollapsed ? 'justify-center px-0' : 'justify-start'}
+										`}
+										style={{
+											padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
+											gap: isCollapsed ? 0 : 'var(--ui-gap)',
+										}}
+									>
+										{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
+										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
+										<span
+											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
+											${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+										>
+											{item.label}
+										</span>
+									</button>
+								) : (
+									<Link
+										href={item.href}
+										onClick={() => {
+											if (item.view) setView(item.view);
+											if (item.onClick) item.onClick();
+											setMobileOpen(false);
+										}}
+										className={`group relative flex items-center text-left rounded-xl transition-all duration-200 
+											${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
+											${isCollapsed ? 'justify-center px-0' : 'justify-start'}
+										`}
+										style={{
+											padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
+											gap: isCollapsed ? 0 : 'var(--ui-gap)',
+										}}
+									>
+										{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
+										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
+										<span
+											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
+											${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+										>
+											{item.label}
+										</span>
+									</Link>
+								)}
+							</Fragment>
 						);
 					})}
 				</div>
 
-				{/* User Section / Ecosystem Menu Dropdown (Bottom) */}
-				<div
-					ref={menuRef}
-					className={`relative p-3 before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-accent before:to-transparent ${isCollapsed ? 'flex justify-center' : ''}`}>
-					{!session?.user ? (
+				<Divider />
+				{/* Bottom Ecosystem & User Section */}
+
+				<div ref={menuRef} className={`relative flex flex-col ${isCollapsed ? 'items-center' : ''}`} style={{ paddingBottom: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					{!activeUser ? (
 						<Link
-							href='/login'
-							className={`flex items-center justify-center gap-2 rounded-xl bg-accent text-white transition-colors hover:bg-accent-hover 
-                                ${isCollapsed ? 'h-11 w-11 p-0' : 'w-full py-2.5 px-4 font-medium text-sm'}
-                            `}>
+							href="/login"
+							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
+                                ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
+                            `}
+							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
+						>
 							<LogIn size={18} />
-							{!isCollapsed && <span>Login</span>}
+							{!isCollapsed && <span>{t('common.sidebar.login')}</span>}
 						</Link>
 					) : (
-						<div className='relative'>
-							{/* Ecosystem Popup Menu - Popping out to the side to avoid overflow clipping */}
-							<AnimatePresence>
-								{isMenuOpen && (
-									<motion.div
-										initial={{ opacity: 0, scale: 0.95, x: -8 }}
-										animate={{ opacity: 1, scale: 1, x: 0 }}
-										exit={{ opacity: 0, scale: 0.95, x: -8 }}
-										transition={{ duration: 0.15, ease: 'easeOut' }}
-										className='absolute bottom-0 left-full ml-3 z-50 flex w-64 flex-col gap-1 rounded-2xl border border-(--border)/10 bg-(--foreground) p-2 shadow-2xl backdrop-blur-md'>
-										<span className='text-[11px] text-(--text-muted) uppercase px-3 py-2'>Suite</span>
-										<div className='relative px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-(--text-muted) mb-2 before:absolute before:inset-x-0 before:bottom-0 before:h-[1px] before:bg-gradient-to-r before:from-transparent before:via-accent before:to-transparent' />
+						<div className="relative w-full mt-1">
+							{/* Menus */}
+							<AnimatePresence>{activeMenu === 'user' && <SidebarUserCard activeUser={activeUser} isCollapsed={isCollapsed} />}</AnimatePresence>
+							<AnimatePresence>{activeMenu === 'notifications' && <SidebarNotifications isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 
-										{SERVICES.map((service, sIdx) => {
-											const ServiceIcon = service.icon;
-											return (
-												<Link
-													key={sIdx}
-													href={service.href}
-													className='flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)'>
-													<ServiceIcon size={18} className='text-(--accent)' />
-													<span>{service.label}</span>
-												</Link>
-											);
-										})}
-
-										<div className='my-1 h-[1px] bg-(--border)/10' />
-
-										<Link
-											href='/logout'
-											className='flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10'
-											onClick={() => setIsMenuOpen(false)}>
-											<LogOut size={18} />
-											<span>Log out</span>
-										</Link>
-									</motion.div>
+							{/* Combined Trigger Card Wrapper */}
+							<div
+								className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-colors 
+                                ${!nameplateUrl ? 'hover:bg-(--foreground)/30 backdrop-blur-md' : 'shadow-inner'}
+                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/30 backdrop-blur-md' : ''}
+                                ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
+                            `}
+								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
+							>
+								{/* Root Nameplate Video Background */}
+								{nameplateUrl && (
+									<>
+										<video src={nameplateUrl} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none opacity-90" />
+										<div className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
+									</>
 								)}
-							</AnimatePresence>
 
-							{/* Clickable Profile Trigger Card */}
-							<button
-								onClick={() => setIsMenuOpen(!isMenuOpen)}
-								className={`group flex w-full items-center rounded-xl p-2 transition-colors hover:bg-(--foreground) text-left 
-                                    ${isCollapsed ? 'justify-center' : 'justify-between gap-3'}
-                                `}>
-								<div className='flex items-center gap-3 overflow-hidden'>
+								{/* User Info Trigger (Left Side) */}
+								<button
+									onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')}
+									className="relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg"
+									style={{ gap: 'var(--ui-gap)' }}
+								>
 									{/* Avatar */}
-									{session.user.image ? (
-										<Image
-											src={session.user.image}
-											alt='User Avatar'
-											height={100}
-											width={100}
-											className='h-10 w-10 shrink-0 rounded-full border border-(--border) object-cover'
-											unoptimized
-											draggable={false}
-											loading='eager'
-										/>
-									) : (
-										<div className='h-10 w-10 shrink-0 rounded-full bg-(--border)' />
-									)}
+									<div className="relative shrink-0">
+										{avatarUrl ? (
+											<div className="relative h-9 w-9">
+												<Image
+													src={avatarUrl}
+													alt={t('components.sidebar.alt1')}
+													fill
+													className="rounded-full border border-(--border) object-cover"
+													unoptimized
+													draggable={false}
+													loading="eager"
+												/>
 
-									{/* User Info (Hidden when collapsed) */}
-									<div
-										className={`flex flex-col overflow-hidden transition-all duration-300 
-                                        ${isCollapsed ? 'w-0 opacity-0' : 'flex-1 opacity-100'}`}>
-										<span className='truncate text-sm font-semibold text-(--text)'>{session.user.name}</span>
-										<span className='truncate text-xs text-(--text-muted)'>@{session.user.name?.toLowerCase().replace(/\s/g, '')}</span>
+												{decorationUrl && (
+													<Image
+														src={decorationUrl}
+														alt={t('components.sidebar.alt2')}
+														fill
+														className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
+														unoptimized
+														draggable={false}
+													/>
+												)}
+											</div>
+										) : (
+											<div className="flex h-9 w-9 items-center justify-center rounded-full bg-(--border)">
+												<UserIcon size={16} className="text-(--text-muted)" />
+											</div>
+										)}
+										{/* Status Indicator */}
+										{DeviceIcon ? <DeviceIcon className={iconStyles} /> : <div className={`${iconStyles} rounded-full`} />}
 									</div>
-								</div>
 
-								{/* Menu Toggle Chevron Icon (Hidden when collapsed) */}
-								{!isCollapsed && <ChevronUp size={18} className={`shrink-0 text-(--text-muted) transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />}
-							</button>
+									{/* Names */}
+									<div
+										className={`flex flex-col overflow-hidden transition-all duration-300 relative ${isCollapsed ? 'w-0 opacity-0 hidden' : 'flex-1 opacity-100'}`}
+										style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}
+									>
+										<span className={`truncate text-sm font-bold tracking-wide ${nameplateUrl ? 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]' : 'text-(--text)'}`}>
+											{activeUser.global_name || activeUser.name}
+										</span>
+										<span className={`truncate text-xs ${nameplateUrl ? 'text-white/80 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]' : 'text-(--text-muted)'}`}>
+											@{activeUser.username || activeUser.name?.toLowerCase().replace(/\s/g, '')}
+										</span>
+									</div>
+								</button>
+
+								{/* Action Buttons (Right Side) */}
+								<div className={`relative z-10 flex ${isCollapsed ? 'flex-col' : 'items-center'} gap-1`}>
+									{/* Notifications Trigger */}
+									<button
+										onClick={() => setActiveMenu(activeMenu === 'notifications' ? 'none' : 'notifications')}
+										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
+                                            ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+                                            ${activeMenu === 'notifications' ? (nameplateUrl ? 'bg-black/40 text-white' : 'bg-(--background) text-(--text)') : ''}
+                                        `}
+										style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
+									>
+										<div className="relative">
+											<Bell
+												size={isCollapsed ? 20 : 18}
+												className={`transition-transform duration-200 ${activeMenu === 'notifications' && !nameplateUrl ? 'text-(--accent)' : ''}`}
+											/>
+
+											{unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-(--foreground)" />}
+										</div>
+									</button>
+
+									{/* App Drawer Trigger (Replaces Suite) */}
+									<button
+										onClick={() => {
+											setActiveMenu('none');
+											setNavOpen(true);
+										}}
+										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
+                                            ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+                                        `}
+										style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
+									>
+										<LayoutGrid size={isCollapsed ? 20 : 18} className="transition-transform duration-200" />
+									</button>
+								</div>
+							</div>
 						</div>
 					)}
 				</div>
