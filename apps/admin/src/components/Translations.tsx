@@ -191,8 +191,12 @@ export default function Translations() {
 				if (!sourceRes.ok || !targetRes.ok) {
 					throw new Error(t('admin.translations.errors.fetchFailed'));
 				}
-				const sourceJson = await sourceRes.json();
-				const targetJson = await targetRes.json();
+				const sourceData = await sourceRes.json();
+				const targetData = await targetRes.json();
+
+				const sourceJson = sourceData.dictionary || sourceData;
+				const targetJson = targetData.dictionary || targetData;
+
 				const flatSource = flattenObject(sourceJson);
 				const flatTarget = flattenObject(targetJson);
 				setSourceDict(flatSource);

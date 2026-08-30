@@ -1,5 +1,11 @@
 # @xernerx/cli
 
+## 2.0.1
+
+### Patch Changes
+
+- Automated all processes
+
 ## 2.0.0
 
 ### Major Changes

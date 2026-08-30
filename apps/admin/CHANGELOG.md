@@ -1,5 +1,11 @@
 # admin
 
+## 0.4.2
+
+### Patch Changes
+
+- Automated all processes
+
 ## 0.4.1
 
 ### Patch Changes
