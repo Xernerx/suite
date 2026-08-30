@@ -19,6 +19,18 @@ const nextConfig: NextConfig = {
 	reactCompiler: true,
 	images: {
 		unoptimized: true,
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: '**.xernerx.com',
+				pathname: '/**',
+			},
+			{
+				protocol: 'http',
+				hostname: 'localhost',
+				pathname: '/**',
+			},
+		],
 	},
 	allowedDevOrigins: process.env.DOMAIN ? ['*.dev.xernerx.com', 'localhost', process.env.DOMAIN] : ['*.dev.xernerx.com', 'localhost'],
 	turbopack: {

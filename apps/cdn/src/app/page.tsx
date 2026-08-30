@@ -1,8 +1,133 @@
 /** @format */
 'use client';
 
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePermissions } from '@xernerx/providers';
+import { Button } from '@xernerx/ui';
+import { useState } from 'react';
+import { Upload } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+import Banner from '@/../public/banner.svg';
+
 export default function Home() {
+	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
-	return <div className="">{t('cdn.common.description')}</div>;
+	const { permissions } = usePermissions();
+	const [uploading, setUploading] = useState(false);
+	const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+
+	const canManage = permissions.manageMedia;
+
+	const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!e.target.files || e.target.files.length === 0) return;
+
+		setUploading(true);
+		try {
+			const formData = new FormData();
+			formData.append('file', e.target.files[0]);
+
+			const res = await fetch('/upload', {
+				method: 'POST',
+				body: formData,
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				setUploadedUrl(data.url);
+			} else {
+				alert('Upload failed. Ensure you are logged in and have permission.');
+			}
+		} catch (err) {
+			console.error(err);
+			alert('Failed to upload file');
+		} finally {
+			setUploading(false);
+			e.target.value = '';
+		}
+	};
+
+	return (
+		<div className="flex flex-col selection:bg-(--accent) selection:text-white">
+			<section className="min-h-[90vh] flex items-center justify-center px-6 py-16 relative">
+				<div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
+					{/* LEFT: TEXT */}
+					<motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
+						<h1
+							className="text-6xl lg:text-7xl xl:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
+							style={{ fontFamily: 'var(--font-fredoka)' }}
+						>
+							Xernerx CDN
+						</h1>
+
+						<p className="max-w-xl text-lg text-(--text-muted) leading-relaxed mb-10 border-l-2 border-(--border)/20 pl-6">
+							{t('cdn.common.description', 'Xernerx content delivery network and asset storage service.')}
+							<br />
+							<br />
+							This service securely routes, accelerates, and caches content for the entire ecosystem.
+						</p>
+
+						<div className="flex flex-wrap items-center gap-4 mb-8">
+							<a
+								suppressHydrationWarning
+								href={getEnvUrl('https://account.xernerx.com')}
+								className="px-8 py-4 rounded-2xl bg-(--accent) text-white font-bold text-sm hover:opacity-90 transition-all shadow-[0_0_40px_-10px_var(--accent)] hover:shadow-[0_0_60px_-15px_var(--accent)] hover:-translate-y-1"
+							>
+								Manage Media
+							</a>
+							<a
+								suppressHydrationWarning
+								href={getEnvUrl('https://docs.xernerx.com/cdn')}
+								className="px-8 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md hover:-translate-y-1"
+							>
+								Documentation
+							</a>
+						</div>
+
+						{canManage && (
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ delay: 0.5 }}
+								className="max-w-md bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-6 rounded-2xl"
+							>
+								<h4 className="font-bold text-sm text-(--text) uppercase tracking-wider mb-4">Direct Upload</h4>
+								<div className="flex flex-col items-start gap-4">
+									<input type="file" id="cdn-upload" className="hidden" onChange={handleUpload} disabled={uploading} />
+									<label htmlFor="cdn-upload">
+										<Button variant="primary" loading={uploading} style={{ pointerEvents: 'none' }}>
+											<Upload size={16} /> Upload Media
+										</Button>
+									</label>
+
+									{uploadedUrl && (
+										<div className="mt-2 p-3 bg-(--accent)/10 border border-(--accent)/20 text-(--accent) rounded-lg w-full text-sm break-all text-left">
+											<a href={uploadedUrl} target="_blank" rel="noopener noreferrer" className="hover:underline font-medium">
+												{uploadedUrl}
+											</a>
+										</div>
+									)}
+								</div>
+							</motion.div>
+						)}
+					</motion.div>
+
+					{/* RIGHT: BANNER VISUAL */}
+					<motion.div
+						initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+						animate={{ opacity: 1, scale: 1, rotate: 0 }}
+						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+						className="relative flex justify-center items-center w-full"
+					>
+						<motion.div
+							animate={{ y: [-15, 15, -15] }}
+							transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+							className="w-full relative z-10 scale-[1.25] lg:scale-[1.4] origin-center pl-8 lg:pl-16"
+						>
+							<Banner className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-2xl text-(--text)" />
+						</motion.div>
+					</motion.div>
+				</div>
+			</section>
+		</div>
+	);
 }

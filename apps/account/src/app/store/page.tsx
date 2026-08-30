@@ -119,6 +119,23 @@ export default function StorePage() {
 	const yearlyUltra = ultraProduct?.prices.find((p) => p.interval === 'year' && p.intervalCount === 1);
 	const currentUltraPrice = billingInterval === 'month' ? monthlyUltra : yearlyUltra;
 
+	const devProductId = developerProductIds[0];
+	const devProduct = productCache[devProductId];
+	const monthlyDev = devProduct?.prices.find((p) => p.interval === 'month' && p.intervalCount === 1);
+	const yearlyDev = devProduct?.prices.find((p) => p.interval === 'year' && p.intervalCount === 1);
+
+	const calculateDiscount = (monthly: StripePrice | undefined, yearly: StripePrice | undefined) => {
+		if (!monthly || !yearly) return 0;
+		const monthlyCostForYear = monthly.unitAmount * 12;
+		const yearlyCost = yearly.unitAmount;
+		if (yearlyCost >= monthlyCostForYear) return 0;
+		return Math.round(((monthlyCostForYear - yearlyCost) / monthlyCostForYear) * 100);
+	};
+	const ultraDiscount = calculateDiscount(monthlyUltra, yearlyUltra);
+	const devDiscount = calculateDiscount(monthlyDev, yearlyDev);
+
+	const currentTabDiscount = activeTab === 'consumers' ? ultraDiscount : devDiscount;
+
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen p-8 transition-colors duration-200">
 			<div className="max-w-4xl w-full flex flex-col items-center space-y-4 mb-8">
@@ -155,15 +172,16 @@ export default function StorePage() {
 							billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
 					>
-						{t('account.store.billing.monthly')}
+						Monthly
 					</button>
 					<button
 						onClick={() => setBillingInterval('year')}
-						className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+						className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
 							billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
 					>
-						{t('account.store.billing.annually')}
+						Annually
+						{currentTabDiscount > 0 && <span className="bg-green-500/10 text-green-500 px-1.5 py-0.5 rounded-md text-[10px] font-bold">-{currentTabDiscount}%</span>}
 					</button>
 				</div>
 			</div>
@@ -172,7 +190,59 @@ export default function StorePage() {
 			{activeTab === 'consumers' && (
 				<div className="w-full max-w-6xl space-y-16">
 					{/* Ultra Featured Bundle */}
-					<div className="grid grid-cols-1 md:grid-cols-1 gap-8 w-full max-w-xl mx-auto">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto">
+						{/* Free Plan */}
+						<motion.div
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3 }}
+							className="relative flex flex-col p-8 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md"
+						>
+							<div className="flex items-center gap-2 mb-4 text-(--text-muted)">
+								<Bot size={22} />
+								<span className="text-xs font-semibold uppercase tracking-wider">Basic</span>
+							</div>
+
+							<div className="mb-6">
+								<h3 className="text-3xl font-extrabold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									Free
+								</h3>
+								<p className="text-sm text-(--text-muted)">Essential access to the platform.</p>
+							</div>
+
+							<div className="mb-6 flex items-baseline gap-1">
+								<span className="text-5xl font-bold">€0</span>
+								<span className="text-(--text-muted) font-medium">
+									{billingInterval === 'month' ? t('account.store.pricing.monthlySuffix') : t('account.store.pricing.yearlySuffix')}
+								</span>
+							</div>
+
+							<ul className="flex-1 space-y-4 mb-8">
+								{['Access to all Consumer Bots', '10 Media Uploads (CDN)'].map((feature) => (
+									<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
+										<Check className="w-5 h-5 shrink-0 text-(--text-muted)" />
+										<span>{feature}</span>
+									</li>
+								))}
+							</ul>
+
+							{!getActiveSubscription(currentUltraPrice?.id || null) ? (
+								<button
+									disabled
+									className="w-full py-3 px-4 rounded-xl font-medium bg-(--background) text-(--text) border border-(--border)/10 flex items-center justify-center gap-2 cursor-default shadow-xs"
+								>
+									<Check size={16} className="text-green-500" /> Current Plan
+								</button>
+							) : (
+								<button
+									disabled
+									className="w-full py-3 px-4 rounded-xl font-medium bg-transparent text-(--text-muted) border border-(--border)/5 flex items-center justify-center gap-2 cursor-default"
+								>
+									Included Free
+								</button>
+							)}
+						</motion.div>
+
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
@@ -204,7 +274,7 @@ export default function StorePage() {
 							</div>
 
 							<ul className="flex-1 space-y-4 mb-8">
-								{[t('account.store.ultra.features.bots'), t('account.store.ultra.features.servers'), t('account.store.ultra.features.support')].map((feature) => (
+								{['Premium Access to all Consumer Bots', 'All server-level utility subscriptions', '1,000 Media Uploads (CDN)'].map((feature) => (
 									<li key={feature} className="flex items-start gap-3 text-sm text-(--text-muted)">
 										<Check className="w-5 h-5 shrink-0" style={{ color: 'var(--accent)' }} />
 										<span>{feature}</span>
@@ -407,7 +477,7 @@ export default function StorePage() {
 									<div className="mb-6 flex items-baseline gap-1">
 										<span className="text-4xl font-bold">{loadingPrices ? '...' : activePrice ? `€${(activePrice.unitAmount / 100).toFixed(0)}` : '—'}</span>
 										<span className="text-(--text-muted) font-medium">
-											/{billingInterval === 'month' ? t('account.store.pricing.monthlySuffix') : t('account.store.pricing.yearlySuffix')}
+											{billingInterval === 'month' ? t('account.store.pricing.monthlySuffix') : t('account.store.pricing.yearlySuffix')}
 										</span>
 									</div>
 
@@ -446,6 +516,8 @@ export default function StorePage() {
 					</div>
 				</div>
 			)}
+
+			<p className="mt-12 text-center text-xs text-(--text-muted) opacity-70">Locale prices and applicable taxes are calculated securely at checkout.</p>
 		</div>
 	);
 }

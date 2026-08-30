@@ -348,7 +348,9 @@
 					"step3": "There is no deadline or haste upon these translations, take your time.",
 					"step4": "When you are changing keys the push to review button will become available, only press this once ready.",
 					"step5": "While editing try to not close or refresh the page, it may lose unsaved progression.",
-					"step6": "After submitting you will see your translated keys untranslated again, this is normal. The live environment cannot update manually, you have to wait for an admin to merge this updated dictionary with the live environment. You can speed up this progress by asking an admin directly to merge these changes"
+					"step6Part1": "After submitting you will see your translated keys untranslated again, this is normal. Your changes are automatically merged into the ",
+					"step6Link": "canary branch",
+					"step6Part2": " for testing and review, and will go live with the next deployment."
 				}
 			},
 			"new": {
@@ -1376,7 +1378,7 @@
 	},
 	"cdn": {
 		"common": {
-			"description": "test"
+			"description": "Xernerx content delivery network and asset storage service."
 		}
 	},
 	"docs": {

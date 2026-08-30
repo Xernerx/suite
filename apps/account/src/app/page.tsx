@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, Store, User } from 'lucide-react';
+import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, Store, User, Image } from 'lucide-react';
 import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';
@@ -15,6 +15,7 @@ import { Loading } from '@xernerx/feedback';
 import Notifications from '@/components/Notifications';
 import Profile from '@/components/Profile';
 import Tokens from '@/components/Tokens';
+import Media from '@/components/Media';
 import { redirect } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -28,6 +29,7 @@ const COMPONENT_MAP: Record<string, React.ReactNode> = {
 	notifications: <Notifications />,
 	profile: <Profile />,
 	tokens: <Tokens />,
+	media: <Media />,
 };
 
 export default function Home() {
@@ -110,6 +112,12 @@ export default function Home() {
 				icon: KeyRound,
 				label: t('common.nav.items.tokens'),
 				view: 'tokens',
+			},
+			{
+				category: t('common.nav.categories.developer'),
+				icon: Image,
+				label: 'Media Library',
+				view: 'media',
 			},
 		]);
 

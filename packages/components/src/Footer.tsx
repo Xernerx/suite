@@ -69,7 +69,7 @@ export function Footer() {
 					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
 					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
 					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} />
-					<FooterLink href="https://discord.gg/teNWyb69dq" icon={MessageCircle} label={t('common.footer.links.discord')} />
+					<FooterLink href="https://discord.gg/yrm8gqTuXa" icon={MessageCircle} label={t('common.footer.links.discord')} />
 				</FooterSection>
 			</div>
 		</motion.footer>

@@ -3,9 +3,10 @@
 
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
-import { Divider } from '@xernerx/ui';
 import { Sparkles } from 'lucide-react';
+import Banner from '@/../public/banner.svg';
 
 export default function Home() {
 	const { getEnvUrl } = useEnvironment();
@@ -22,56 +23,77 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-[80vh] px-4 text-center">
-			<div className="max-w-2xl w-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-[2rem] p-10 md:p-14 shadow-2xl space-y-8 relative overflow-hidden">
-				{/* Decorative subtle glow */}
-				<div className="absolute -top-32 -left-32 w-64 h-64 bg-(--accent) opacity-10 rounded-full blur-3xl pointer-events-none" />
-				<div className="absolute -bottom-32 -right-32 w-64 h-64 bg-(--accent) opacity-10 rounded-full blur-3xl pointer-events-none" />
-
-				<div className="relative z-10 space-y-2">
-					<h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-(--text)">{t('api.title')}</h1>
-					<p className="text-lg text-(--text-muted) max-w-lg mx-auto">{t('api.description')}</p>
-				</div>
-
-				<Divider />
-
-				<div className="p-8 rounded-2xl bg-(--background)/40 border border-(--border)/5 transition-all space-y-6 shadow-inner relative z-10">
-					<div>
-						<h3 className="text-xl font-bold text-(--text)">{t('api.section.title')}</h3>
-						<p className="text-sm text-(--text-muted) mt-1">{t('api.section.description')}</p>
-					</div>
-
-					<div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-						<a
-							suppressHydrationWarning
-							href={getEnvUrl('https://account.xernerx.com')}
-							className="inline-flex items-center justify-center px-6 py-3 text-sm font-bold rounded-xl text-(--background) bg-(--text) transition-transform hover:scale-105 shadow-md hover:shadow-lg"
+		<div className="flex flex-col selection:bg-(--accent) selection:text-white">
+			<section className="min-h-[90vh] flex items-center justify-center px-6 py-16 relative">
+				<div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
+					{/* LEFT: TEXT */}
+					<motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
+						<h1
+							className="text-6xl lg:text-7xl xl:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
+							style={{ fontFamily: 'var(--font-fredoka)' }}
 						>
-							{t('api.button.account')}
-						</a>
+							{t('api.title')}
+						</h1>
 
-						<a
-							suppressHydrationWarning
-							href={getEnvUrl('https://docs.xernerx.com')}
-							className="inline-flex items-center justify-center px-6 py-3 text-sm font-bold rounded-xl text-(--text) bg-(--foreground)/50 border border-(--border)/10 transition-transform hover:scale-105 hover:bg-(--foreground)/70 shadow-sm"
-						>
-							{t('api.button.docs')}
-						</a>
-					</div>
-				</div>
-
-				<div className="text-sm pt-4 relative z-10">
-					{fact && (
-						<p className="text-(--text-muted) italic bg-(--foreground)/20 py-4 px-6 rounded-xl block border border-(--border)/5 break-words">
-							<span className="font-bold text-(--text) flex items-center not-italic mb-1">
-								<Sparkles className="w-4 h-4 mr-2" />
-								{t('api.fact')}
-							</span>
-							{fact}
+						<p className="max-w-xl text-lg text-(--text-muted) leading-relaxed mb-10 border-l-2 border-(--border)/20 pl-6">
+							{t('api.description')}
+							<br />
+							<br />
+							{t('api.section.description')}
 						</p>
-					)}
+
+						<div className="flex flex-wrap items-center gap-4 mb-8">
+							<a
+								suppressHydrationWarning
+								href={getEnvUrl('https://account.xernerx.com')}
+								className="px-8 py-4 rounded-2xl bg-(--accent) text-white font-bold text-sm hover:opacity-90 transition-all shadow-[0_0_40px_-10px_var(--accent)] hover:shadow-[0_0_60px_-15px_var(--accent)] hover:-translate-y-1"
+							>
+								{t('api.button.account')}
+							</a>
+							<a
+								suppressHydrationWarning
+								href={getEnvUrl('https://docs.xernerx.com/api')}
+								className="px-8 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md hover:-translate-y-1"
+							>
+								{t('api.button.docs')}
+							</a>
+						</div>
+
+						{fact && (
+							<motion.div
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ delay: 0.5 }}
+								className="max-w-md bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-5 rounded-2xl"
+							>
+								<p className="text-sm text-(--text-muted) leading-relaxed">
+									<span className="font-bold text-(--text) flex items-center mb-2">
+										<Sparkles className="w-4 h-4 mr-2 text-(--accent)" />
+										{t('api.fact')}
+									</span>
+									{fact}
+								</p>
+							</motion.div>
+						)}
+					</motion.div>
+
+					{/* RIGHT: BANNER VISUAL */}
+					<motion.div
+						initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+						animate={{ opacity: 1, scale: 1, rotate: 0 }}
+						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+						className="relative flex justify-center items-center w-full"
+					>
+						<motion.div
+							animate={{ y: [-15, 15, -15] }}
+							transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+							className="w-full relative z-10 scale-[1.25] lg:scale-[1.4] origin-center pl-8 lg:pl-16"
+						>
+							<Banner className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-2xl text-(--text)" />
+						</motion.div>
+					</motion.div>
 				</div>
-			</div>
+			</section>
 		</div>
 	);
 }

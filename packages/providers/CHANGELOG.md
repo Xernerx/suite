@@ -1,5 +1,12 @@
 # @xernerx/providers
 
+## 0.3.9
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.4.0
+
 ## 0.3.8
 
 ### Patch Changes

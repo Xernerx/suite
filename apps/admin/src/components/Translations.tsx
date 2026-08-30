@@ -4,6 +4,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, Languages, ListOrdered, Loader2, Search, Send, Sparkles } from 'lucide-react';
 import { Button, PreventLossConfirmation, Selector } from '@xernerx/ui';
+import Link from 'next/link';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { CircleFlag } from 'react-circle-flags';
@@ -510,7 +511,13 @@ export default function Translations() {
 									<li>{t('admin.translations.welcome.guide.step3')}</li>
 									<li>{t('admin.translations.welcome.guide.step4')}</li>
 									<li>{t('admin.translations.welcome.guide.step5')}</li>
-									<li className="leading-relaxed">{t('admin.translations.welcome.guide.step6')}</li>
+									<li className="leading-relaxed">
+										{t('admin.translations.welcome.guide.step6Part1')}
+										<Link href="https://admin.canary.xernerx.com?view=translations" className="text-(--accent) font-medium hover:underline">
+											{t('admin.translations.welcome.guide.step6Link')}
+										</Link>
+										{t('admin.translations.welcome.guide.step6Part2')}
+									</li>
 								</ul>
 							</div>
 
