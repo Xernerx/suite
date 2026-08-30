@@ -236,7 +236,12 @@
 			"card": {
 				"idPrefix": "ID: {id}",
 				"discordIdPrefix": "ID: {discordRoleId}"
-			}
+			},
+			"roleIdCopied": "Role ID copied",
+			"discordIdCopied": "Discord ID copied",
+			"roleUpdated": "Role updated successfully",
+			"roleDeleted": "Role deleted successfully",
+			"roleCreated": "Role created successfully"
 		},
 		"users": {
 			"title": "User Management",
@@ -275,7 +280,12 @@
 				"creditsLabel": "Credits",
 				"dailyStreakLabel": "Daily Streak",
 				"fetchError": "Error: {error}"
-			}
+			},
+			"idCopied": "ID copied to clipboard",
+			"emailCopied": "Email copied to clipboard",
+			"updateFailed": "Failed to update user profile",
+			"assignRoleFailed": "Failed to assign Discord role",
+			"removeRoleFailed": "Failed to remove Discord role"
 		},
 		"tokens": {
 			"title": "API Token Management",
@@ -317,6 +327,16 @@
 				"isXernerx": "Is Xernerx",
 				"allowFetching": "Allow fetching data from /secure",
 				"failedToFetchToken": "Failed to fetch token config: "
+			},
+			"unknownBot": "Unknown Bot",
+			"tokenUpdated": "Token updated",
+			"tokenDeleted": "Token deleted successfully",
+			"tokenIdCopied": "Token ID copied",
+			"statusOptions": {
+				"active": "Active",
+				"inactive": "Inactive",
+				"suspended": "Suspended",
+				"pending": "Pending"
 			}
 		},
 		"translations": {
@@ -474,6 +494,245 @@
 			"supportRoleDesc": "Role required to manage support tickets and feedback.",
 			"supportRolePlaceholder": "Select a role...",
 			"saveButton": "Save Settings"
+		},
+		"dashboard": {
+			"nav": {
+				"media": "Media",
+				"mediaLibrary": "Media Library",
+				"invites": "Invites",
+				"announcements": "Announcements"
+			},
+			"media": {
+				"title": "Media Library",
+				"subtitle": "Manage and view your uploaded media.",
+				"uploadButton": "Upload Media",
+				"noMedia": "No media found.",
+				"editMetadata": "Edit Media Metadata",
+				"editingMetadata": "Editing metadata for ",
+				"privacyLevel": "Privacy Level",
+				"public": "Public",
+				"limited": "Limited",
+				"private": "Private",
+				"sharedUsers": "Shared Users",
+				"addSharedUsersDesc": "Add Discord User IDs who can view this private file.",
+				"add": "Add",
+				"unknownUser": "Unknown User",
+				"cancel": "Cancel",
+				"saveChanges": "Save Changes",
+				"shared": "Shared",
+				"toasts": {
+					"userNotFound": "Discord User Not Found",
+					"fetchUserFailed": "Failed to fetch user",
+					"fetchMediaFailed": "Error fetching media",
+					"uploadSuccess": "Uploaded successfully!",
+					"uploadFailed": "Failed to upload media",
+					"deleteConfirm": "Are you sure you want to delete this media?",
+					"deleteSuccess": "Deleted media",
+					"deleteFailed": "Failed to delete media",
+					"updateSuccess": "Media updated!",
+					"updateFailed": "Failed to update media metadata"
+				}
+			},
+			"invites": {
+				"title": "Application Invites",
+				"subtitle": "Manage public Discord bot invite URLs and their permission matrices.",
+				"createButton": "Create Invite",
+				"searchPlaceholder": "Search invites...",
+				"noInvites": "No invites found.",
+				"perms": "Perms:",
+				"editModalTitle": "Edit Invite",
+				"createModalTitle": "Create Invite",
+				"modalDesc": "Configure the Discord OAuth2 parameters for this application.",
+				"urlSlug": "URL Slug (ID)",
+				"appName": "Application Name",
+				"clientId": "Client ID",
+				"scopes": "Scopes (comma separated)",
+				"permMatrix": "Permission Matrix",
+				"cancel": "Cancel",
+				"saveButton": "Save Invite",
+				"saving": "Saving...",
+				"toasts": {
+					"deleteConfirm": "Are you sure you want to delete this invite link?",
+					"deleteSuccess": "Invite deleted",
+					"deleteFailed": "Failed to delete invite",
+					"updateSuccess": "Invite updated",
+					"createSuccess": "Invite created"
+				}
+			},
+			"announcements": {
+				"title": "Announcements",
+				"subtitle": "Manage global announcements and Discord webhooks.",
+				"createButton": "Create Announcement",
+				"sentOn": "Sent on ",
+				"scheduled": "Scheduled: ",
+				"draft": "Draft",
+				"channel": "Channel: ",
+				"editModalTitle": "Edit Announcement",
+				"createModalTitle": "New Announcement",
+				"modalDesc": "Configure Discord embed & scheduling",
+				"loadTos": "Load TOS Template",
+				"loadPrivacy": "Load Privacy Template",
+				"internalTitle": "Internal Title",
+				"scheduledFor": "Scheduled For (Leave empty to send immediately)",
+				"discordChannel": "Discord Channel (Optional)",
+				"selectChannel": "Select a channel...",
+				"webhookUrl": "Webhook URL",
+				"messageContent": "Message Content",
+				"builderTitle": "Discord Message Builder",
+				"changeColor": "Change Embed Color",
+				"authorName": "Author Name...",
+				"embedTitle": "Embed Title...",
+				"embedDesc": "Embed Description...",
+				"fieldName": "Field Name",
+				"fieldValue": "Field Value",
+				"inline": "INLINE",
+				"addField": "+ Add Field",
+				"footerText": "Footer Text...",
+				"addEmbed": "Add Embed",
+				"label": "Label",
+				"buttonStyle": "Button Style",
+				"stylePrimary": "Primary (Blurple)",
+				"styleSecondary": "Secondary (Grey)",
+				"styleSuccess": "Success (Green)",
+				"styleDanger": "Danger (Red)",
+				"styleLink": "Link (URL)",
+				"url": "URL",
+				"customId": "Custom ID",
+				"removeButton": "Remove Button",
+				"addActionRow": "Add Action Row",
+				"cancel": "Cancel",
+				"savePublish": "Save & Publish",
+				"saving": "Saving...",
+				"deleteConfirm": "Are you sure?",
+				"toasts": {
+					"webhookLinked": "Webhook linked!",
+					"createWebhookFailed": "Failed to create webhook",
+					"updateSuccess": "Updated!",
+					"createSuccess": "Created!",
+					"saveFailed": "Failed to save"
+				}
+			},
+			"applicationReviews": {
+				"refreshing": "Refreshing...",
+				"refreshList": "Refresh List",
+				"anonymousUser": "Anonymous User",
+				"unknownUser": "Unknown User",
+				"application": "Application",
+				"unknownForm": "Unknown Form",
+				"needsReview": "Needs Review",
+				"reviewed": "Reviewed",
+				"noApplicationsFound": "No Applications Found",
+				"noApplicationsWaiting": "There are no applications waiting for review.",
+				"unknownApplication": "Unknown Application",
+				"formResponses": "Form Responses",
+				"errorConfigNotFound": "Error: Original application form configuration not found.",
+				"noOptionsSelected": "No options selected",
+				"noAnswerProvided": "No answer provided",
+				"reviewerNotes": "Reviewer Notes (Optional)",
+				"addNotePlaceholder": "Add a note to be sent to the applicant...",
+				"currentStatus": "Current Status:",
+				"deny": "Deny",
+				"approveAssignRole": "Approve & Assign Role"
+			},
+			"applicationConfigs": {
+				"requiresUserLogin": "Requires User Login",
+				"benefits": "Benefits",
+				"addBenefit": "Add Benefit",
+				"noBenefits": "No benefits added.",
+				"benefitPlaceholder": "e.g. Free Discord Nitro",
+				"requirements": "Requirements",
+				"addRequirement": "Add Requirement",
+				"noRequirements": "No requirements added.",
+				"requirementPlaceholder": "e.g. Must be 18+ years old",
+				"applicationQuestions": "Application Questions",
+				"addQuestion": "Add Question",
+				"noQuestionsAdded": "No questions added. Users will only see benefits and requirements.",
+				"questionPlaceholder": "e.g. Why do you want to join?",
+				"shortText": "Short Text",
+				"longText": "Long Text",
+				"dropdown": "Dropdown",
+				"radio": "Radio",
+				"checkboxes": "Checkboxes",
+				"requiredField": "Required Field",
+				"options": "Options",
+				"addOption": "+ Add Option",
+				"optionText": "Option text",
+				"saving": "Saving...",
+				"saveConfig": "Save Config",
+				"deleteConfirmDesc": "Are you sure you want to delete this application configuration? This action cannot be undone.",
+				"delete": "Delete",
+				"unlisted": "Unlisted",
+				"public": "Public",
+				"dynamicForm": "Dynamic Form",
+				"open": "Open",
+				"closed": "Closed"
+			},
+			"settings": {
+				"joinRolesHumans": "Join Roles (Humans)",
+				"joinRolesHumansDesc": "Roles automatically assigned to human users upon joining.",
+				"selectHumanJoinRoles": "Select human join roles...",
+				"joinRolesBots": "Join Roles (Bots)",
+				"joinRolesBotsDesc": "Roles automatically assigned to bots upon joining.",
+				"selectBotJoinRoles": "Select bot join roles...",
+				"sisterServers": "Sister Servers",
+				"sisterServersDesc": "List of sister server Guild IDs.",
+				"add": "+ Add",
+				"selectServer": "Select a server...",
+				"selectDiscordGuild": "Select Discord Guild"
+			},
+			"translations": {
+				"defaultTranslator": "Default (translator)"
+			}
+		},
+		"permissions": {
+			"access": {
+				"label": "Dashboard Access",
+				"description": "Allow or deny access to the Xernerx admin panel."
+			},
+			"users": {
+				"label": "Manage Users",
+				"description": "Permission to view, update, and delete platform users."
+			},
+			"roles": {
+				"label": "Manage Roles",
+				"description": "Permission to create, edit, and delete system roles."
+			},
+			"tokens": {
+				"label": "Manage Tokens",
+				"description": "Permission to generate, view, and revoke API tokens."
+			},
+			"translations": {
+				"label": "Manage Translations",
+				"description": "Permission to add and modify translations."
+			},
+			"applications_review": {
+				"label": "Review Applications",
+				"description": "Permission to review and process user applications."
+			},
+			"applications_manage": {
+				"label": "Manage Applications",
+				"description": "Permission to create, edit, and delete application templates and configurations."
+			},
+			"settings": {
+				"label": "System Settings",
+				"description": "Permission to manage global system configurations and core settings."
+			},
+			"invites": {
+				"label": "Manage Invites",
+				"description": "Permission to configure public Discord bot invite URLs."
+			},
+			"announcements": {
+				"label": "Manage Announcements",
+				"description": "Permission to create, edit, and publish platform announcements."
+			},
+			"manageMedia": {
+				"label": "Manage Media",
+				"description": "Permission to view, edit, and delete all media files on the CDN."
+			},
+			"uploadMedia": {
+				"label": "Upload Media",
+				"description": "Permission to upload media and manage own media files on the CDN."
+			}
 		}
 	},
 	"account": {
@@ -698,11 +957,23 @@
 			"itemDescription": "Configure alerts for {item}.",
 			"categories": {
 				"general": "General",
-				"virtue": "Virtue"
+				"virtue": "Virtue",
+				"api": "API",
+				"billing": "Billing",
+				"apps": "Apps"
 			},
 			"items": {
 				"birthday": "Birthday",
-				"levelup": "Level Up"
+				"levelup": "Level Up",
+				"rateLimitWarning": "Rate Limit Warning",
+				"tokenCreated": "Token Created",
+				"tokenRevoked": "Token Revoked",
+				"downtime": "Downtime",
+				"invoicePaid": "Invoice Paid",
+				"subscriptionExpiring": "Subscription Expiring",
+				"paymentFailed": "Payment Failed",
+				"botApproved": "Bot Approved",
+				"botRejected": "Bot Rejected"
 			},
 			"channels": {
 				"discord": "Discord",
@@ -861,12 +1132,93 @@
 			"button4": "Yes, cancel",
 			"description7": "Staff Access",
 			"description8": "You have a complimentary all-access staff subscription applied to your account."
+		},
+		"media": {
+			"title": "Media Library",
+			"description": "Manage and view your uploaded media.",
+			"switchToAdmin": "Switch to Admin"
 		}
 	},
 	"www": {
+		"applications": {
+			"errorLoad": "Failed to load open applications.",
+			"title": "Open Applications",
+			"subtitle": "Join the team! Browse our currently open roles and positions below. If you think you're a good fit, we'd love to hear from you.",
+			"noRoles": "No Open Roles",
+			"noRolesDesc": "Check back later for new opportunities! We're always looking for great talent.",
+			"noDesc": "No description provided.",
+			"requirements": "Requirements",
+			"more": "+{count} more",
+			"benefits": "Benefits",
+			"loginApply": "Log in to Apply",
+			"applyNow": "Apply Now",
+			"errorLoadApp": "Failed to load application",
+			"mustLogin": "You must be logged in to apply.",
+			"submissionFailed": "Submission failed",
+			"submitSuccess": "Application submitted successfully!",
+			"errorLoading": "Error Loading Application",
+			"notFound": "Application not found",
+			"goBack": "Go Back",
+			"appSent": "Application Sent!",
+			"appSentDesc": "Your application for {name} has been successfully submitted. We will review it shortly!",
+			"returnToApps": "Return to Applications",
+			"backToApps": "Back to applications",
+			"noQuestions": "This application doesn't have any specific questions.",
+			"hitSubmit": "Just hit submit to apply directly!",
+			"selectOption": "Select an option",
+			"submit": "Submit Application",
+			"yourAnswer": "Your answer...",
+			"todo": {
+				"title": "To-Do List Bot",
+				"desc": "Structured productivity tooling."
+			},
+			"zodiac": {
+				"title": "Zodiac",
+				"desc": "Astrology-based interaction tools."
+			},
+			"metamorphosis": {
+				"title": "Metamorphosis",
+				"desc": "Advanced role transformation utilities."
+			}
+		},
+		"contact": {
+			"cards": {
+				"general": {
+					"title": "General",
+					"description": "General enquiries, partnerships and anything that does not fit elsewhere."
+				},
+				"support": {
+					"title": "Support",
+					"description": "Technical support, bug reports and product assistance."
+				},
+				"invoices": {
+					"title": "Invoices",
+					"description": "Supplier invoices, accounting and payment related enquiries."
+				},
+				"security": {
+					"title": "Security",
+					"description": "Security reports, responsible disclosure and vulnerability reports."
+				},
+				"legal": {
+					"title": "Legal",
+					"description": "Contracts, legal requests and official correspondence."
+				}
+			},
+			"title": "Contact Us",
+			"description": "Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we",
+			"description2": "re happy to help. Using the correct contact address helps your message reach the right person faster.",
+			"title2": "Looking for documentation?",
+			"description3": "Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.",
+			"button": "Documentation",
+			"button2": "GitHub"
+		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
-			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
+			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers.",
+			"buttons": {
+				"explore": "Explore Services",
+				"software": "View Software"
+			}
 		},
 		"about": {
 			"title": "About Xernerx",
@@ -881,6 +1233,14 @@
 			},
 			"applications": {
 				"title": "Applications"
+			},
+			"consumer": {
+				"title": "Consumer Services",
+				"description": "Powerful, user-friendly applications and platforms designed to bring communities together and streamline digital experiences."
+			},
+			"developer": {
+				"title": "Developer Software",
+				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools."
 			}
 		},
 		"services": {
@@ -897,20 +1257,6 @@
 			"stats": {
 				"title": "Xernerx Stats",
 				"desc": "Analytics utilities for measuring performance."
-			}
-		},
-		"applications": {
-			"todo": {
-				"title": "To-Do List Bot",
-				"desc": "Structured productivity tooling."
-			},
-			"zodiac": {
-				"title": "Zodiac",
-				"desc": "Astrology-based interaction tools."
-			},
-			"metamorphosis": {
-				"title": "Metamorphosis",
-				"desc": "Advanced role transformation utilities."
 			}
 		},
 		"history": {
@@ -1095,15 +1441,6 @@
 			},
 			"description": "legal@xernerx.com"
 		},
-		"contact": {
-			"title": "Contact Us",
-			"description": "Whether you have a technical question, found a bug, want to discuss a partnership or simply need to get in touch, we",
-			"description2": "re happy to help. Using the correct contact address helps your message reach the right person faster.",
-			"title2": "Looking for documentation?",
-			"description3": "Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.",
-			"button": "Documentation",
-			"button2": "GitHub"
-		},
 		"download": {
 			"title": "Download Xernerx App",
 			"description": "Optimized for your system. One click and you are in.",
@@ -1111,6 +1448,89 @@
 			"button2": "Canary",
 			"button3": "Download for",
 			"button4": "Other platforms"
+		},
+		"features": {
+			"scale": {
+				"title": "Built for Scale",
+				"description": "Our infrastructure and tools are designed from the ground up to handle massive communities and workloads effortlessly."
+			},
+			"opensource": {
+				"title": "Open Source Heart",
+				"description": "We believe in transparent development. Our software tools are freely available to push the ecosystem forward."
+			},
+			"design": {
+				"title": "User-Centric Design",
+				"description": "Whether it's a CLI tool or a web dashboard, we prioritize intuitive interfaces and seamless developer experiences."
+			}
+		},
+		"tags": {
+			"platform": "Platform",
+			"discordBot": "Discord Bot"
+		},
+		"timeline": {
+			"title": {
+				"line1": "The",
+				"line2": "Journey",
+				"line3": "So Far."
+			},
+			"description": "From early experimentation with bots to stable infrastructure engineering, see how Xernerx evolved over the years.",
+			"events": {
+				"0": {
+					"date": "March 2020",
+					"title": "Amethyst Development Founded",
+					"description": "Thomas, Johannes, and Asher established Amethyst Development with a focus on scalable Discord tooling."
+				},
+				"1": {
+					"date": "June 2020",
+					"title": "Rebranded to Portal Development",
+					"description": "Following structural changes, the company was reintroduced under the name Portal Development."
+				},
+				"2": {
+					"date": "June 2020",
+					"title": "First Bot Acquisition",
+					"description": "Roblox Utilities joined the portfolio, expanding into multi-server utility tooling."
+				},
+				"3": {
+					"date": "November 2020",
+					"title": "To-Do List Bot Launched",
+					"description": "Clari began development of To-Do List Bot, introducing structured productivity features."
+				},
+				"4": {
+					"date": "August 2021",
+					"title": "Discord-Translate Begins",
+					"description": "Thomas initiated development of Discord-Translate, focused on multilingual communities."
+				},
+				"5": {
+					"date": "December 2021",
+					"title": "Acquired DragDev Studios",
+					"description": "DragDev Studios and YourApps joined the company, along with three new developers."
+				},
+				"6": {
+					"date": "January 2022",
+					"title": "Metamorphosis Rewrite",
+					"description": "Discord-Translate was rebuilt and relaunched as Metamorphosis with improved infrastructure."
+				},
+				"7": {
+					"date": "February 2022",
+					"title": "Leadership Transition",
+					"description": "Johannes stepped down. Infrastructure responsibilities were restructured internally."
+				},
+				"8": {
+					"date": "March 2022",
+					"title": "Zodiac Development",
+					"description": "Max began development of Zodiac, expanding into astrology and personality tooling."
+				},
+				"9": {
+					"date": "February 2026",
+					"title": "Xernerx Studios Rebrand",
+					"description": "The company rebranded to Xernerx Studios, reflecting a shift in focus and identity."
+				},
+				"10": {
+					"date": "DYNAMIC_DATE",
+					"title": "Today",
+					"description": "You're all caught up!"
+				}
+			}
 		}
 	},
 	"faq": {
@@ -1287,7 +1707,21 @@
 			"text22": "We are hitting Discord's rate limits for fetching your servers. Please wait a moment and try refreshing the page!",
 			"text23": "No Eligible Servers",
 			"text24": "You don't seem to have Manage Server or Administrator permissions in any connected servers. Please become authorized in a server or create a new Discord server to get started!",
-			"text25": "Create Discord Server"
+			"text25": "Create Discord Server",
+			"nav": {
+				"explore": "Explore",
+				"portal": "Portal"
+			},
+			"categories": {
+				"navigation": "Navigation",
+				"servers": "Servers"
+			},
+			"tabs": {
+				"info": "Info",
+				"stats": "Stats",
+				"settings": "Settings"
+			},
+			"botNotConnected": "Bot Not Connected"
 		},
 		"layout": {},
 		"loading": {},
@@ -1304,7 +1738,11 @@
 			"text10": "Servers coming soon",
 			"text11": "We are currently building out the server discovery platform.",
 			"text12": "Failed to load bots",
-			"text13": "Please check your network connection and try again."
+			"text13": "Please check your network connection and try again.",
+			"searchBots": "Search for bots...",
+			"searchServers": "Search for servers...",
+			"heroBots": "Bots",
+			"heroServers": "Servers"
 		},
 		"portal": {
 			"layout": {},
@@ -1374,15 +1812,234 @@
 			"text44": "Cancel",
 			"text45": "Confirm Invite",
 			"title21": "Delete Organization",
-			"description22": "Are you absolutely sure you want to delete this organization and all its data? This action cannot be undone."
+			"description22": "Are you absolutely sure you want to delete this organization and all its data? This action cannot be undone.",
+			"nav": {
+				"explore": "Explore",
+				"dashboard": "Dashboard",
+				"personal": "Personal",
+				"newOrganization": "New Organization"
+			},
+			"categories": {
+				"navigation": "Navigation",
+				"organizations": "Organizations"
+			},
+			"myWorkspace": "My Workspace",
+			"personalBots": "Personal Bots",
+			"noBots": "No personal bots registered yet.",
+			"botsAutoRegister": "Bots are automatically registered when they interact with the API.",
+			"tabs": {
+				"info": "Info",
+				"members": "Members",
+				"bots": "Bots",
+				"servers": "Servers",
+				"links": "Links",
+				"settings": "Settings"
+			},
+			"orgProfile": "Organization Profile",
+			"labels": {
+				"name": "Name",
+				"description": "Description",
+				"extendedInfo": "Extended Info",
+				"locale": "Locale"
+			},
+			"placeholders": {
+				"orgName": "Organization Name",
+				"shortDesc": "Short description...",
+				"extendedInfo": "Detailed markdown description about this organization..."
+			},
+			"options": {
+				"default": "Default"
+			},
+			"members": {
+				"header": "Organization Members",
+				"currentMembers": "Current Members",
+				"owner": "Owner",
+				"unknownUser": "Unknown User",
+				"noMembers": "No other members yet.",
+				"pendingInvitations": "Pending Invitations",
+				"pending": "Pending",
+				"inviteMember": "Invite Member",
+				"invitePlaceholder": "Discord User ID (e.g. 1234567890)",
+				"inviteButton": "Invite",
+				"inviteHelp": "They will receive an invitation to join this organization."
+			},
+			"bots": {
+				"header": "Organization Bots",
+				"noBots": "No bots registered to this organization."
+			},
+			"servers": {
+				"header": "Organization Servers",
+				"desc": "Select a main Discord server to feature for this organization.",
+				"none": "None",
+				"noLinked": "No linked servers available.",
+				"transferFirst": "Transfer a server to this organization first via the Server Dashboard.",
+				"linkedServers": "Linked Servers",
+				"transferred": "Servers transferred to this organization.",
+				"noServers": "No servers transferred to this organization yet."
+			},
+			"links": {
+				"header": "Organization Links",
+				"website": "Website URL",
+				"support": "Support Server URL",
+				"github": "GitHub URL",
+				"privacy": "Privacy Policy URL",
+				"terms": "Terms of Service URL"
+			},
+			"settings": {
+				"privacySetting": "Privacy Setting",
+				"privacyDesc": "Determines who can discover and interact with this organization.",
+				"public": "Public",
+				"limited": "Limited",
+				"private": "Private",
+				"resetData": "Reset Data",
+				"resetDesc": "Reset all organization settings and configurations back to default without deleting the organization itself.",
+				"deleteOrg": "Delete Organization",
+				"deleteDesc": "Permanently delete this organization and all of its associated data from Xernerx."
+			},
+			"modals": {
+				"create": {
+					"title": "Create Organization",
+					"desc": "Set up a new organization to group your bots, members, and settings.",
+					"nameLabel": "Organization Name",
+					"namePlaceholder": "e.g. Acme Corp",
+					"descLabel": "Description (Optional)",
+					"descPlaceholder": "What is this organization for?",
+					"cancel": "Cancel",
+					"confirm": "Create Organization"
+				},
+				"invite": {
+					"title": "Confirm Invite",
+					"desc": "Is this the person you want to invite?",
+					"cancel": "Cancel",
+					"confirm": "Confirm Invite"
+				},
+				"delete": {
+					"title": "Delete Organization",
+					"desc": "Are you absolutely sure you want to delete this organization and all its data? This action cannot be undone.",
+					"confirm": "Delete Organization",
+					"cancel": "Cancel"
+				}
+			},
+			"bot": {
+				"nav": {
+					"back": "Back to Portal"
+				},
+				"categories": {
+					"orgBots": "Organization Bots",
+					"personalBots": "Personal Bots"
+				},
+				"tabs": {
+					"general": "General",
+					"links": "Links",
+					"settings": "Settings"
+				},
+				"general": {
+					"header": "General Settings",
+					"shortDesc": "Short Description",
+					"shortDescPlaceholder": "A brief tagline for your app",
+					"longDesc": "Long Information (Markdown)",
+					"longDescPlaceholder": "Detailed description supporting markdown formatting..."
+				},
+				"links": {
+					"header": "External Links",
+					"invite": "Invite URL",
+					"website": "Website",
+					"support": "Support Server",
+					"github": "GitHub Repository",
+					"privacy": "Privacy Policy",
+					"terms": "Terms of Service"
+				},
+				"settings": {
+					"privacyHeader": "Privacy Setting",
+					"privacyDesc": "Control who can view this profile publicly.",
+					"public": "Public",
+					"private": "Private",
+					"limited": "Limited",
+					"transferHeader": "Transfer Organization",
+					"transferDesc": "Move this application to a different organization you manage.",
+					"noOrg": "Personal (No Organization)",
+					"resetHeader": "Reset Data",
+					"resetDesc": "Clear all profile descriptions and external links. This action cannot be undone.",
+					"resetBtn": "Reset",
+					"deleteHeader": "Delete Application",
+					"deleteDesc": "Permanently delete this application profile and all associated data. This action cannot be undone.",
+					"deleteBtn": "Delete"
+				},
+				"modals": {
+					"delete": {
+						"title": "Delete Application",
+						"desc": "Are you absolutely sure you want to delete this application? This action cannot be undone and all data will be permanently removed."
+					}
+				}
+			}
+		},
+		"categories": {
+			"topVoted": "Top Voted",
+			"newlyAdded": "Newly Added",
+			"staffPicks": "Staff Picks",
+			"promoted": "Promoted",
+			"biggestServers": "Biggest Communities",
+			"biggestBots": "Biggest on Platform",
+			"newcomers": "Newcomers"
 		}
 	},
 	"cdn": {
 		"common": {
 			"description": "Xernerx content delivery network and asset storage service."
+		},
+		"home": {
+			"description2": "This service securely routes, accelerates, and caches content for the entire ecosystem.",
+			"manage": "Manage Media",
+			"docs": "Documentation",
+			"directUpload": "Direct Upload",
+			"uploadMedia": "Upload Media",
+			"errors": {
+				"uploadFailed": "Upload failed. Ensure you are logged in and have permission.",
+				"generic": "Failed to upload file"
+			}
 		}
 	},
 	"docs": {
+		"packages": {
+			"details": {
+				"packageNotFound": "Package Not Found",
+				"couldNotLoadDocsFor": "Could not load documentation for",
+				"returnToPackages": "Return to Packages",
+				"classes": "Classes",
+				"interfaces": "Interfaces",
+				"functions": "Functions",
+				"constructor": "Constructor",
+				"properties": "Properties",
+				"methods": "Methods",
+				"property": "Property",
+				"type": "Type",
+				"description": "Description",
+				"noDescription": "No description",
+				"backToPackages": "Back to Packages",
+				"navigation": "Navigation",
+				"selectVersion": "Select version..."
+			},
+			"page": {
+				"title": "Xernerx Developer Software",
+				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools on top of the Xernerx Ecosystem.",
+				"overview": {
+					"title": "Available Packages",
+					"description": "Select a package below to view its comprehensive API documentation and types.",
+					"versionsAvailable": "{count} versions available",
+					"latest": "Latest:",
+					"viewDocs": "View Docs",
+					"noPackages": "No packages found or GitHub API rate limited."
+				}
+			},
+			"sidebar": {
+				"backToCategories": "Back to Categories",
+				"availablePackages": "Available Packages"
+			},
+			"search": {
+				"placeholder": "Search classes, interfaces, and functions across all latest packages...",
+				"noResults": "No results found for \"{query}\"."
+			}
+		},
 		"common": {
 			"description": "Official Documentation",
 			"title": "How can we help you",
@@ -1390,6 +2047,255 @@
 			"description3": "Explore guides, comprehensive API references, and tutorials to help you integrate with the Xernerx Suite seamlessly.",
 			"placeholder": "Search documentation, guides, and API endpoints...",
 			"title2": "Explore Categories"
+		},
+		"home": {
+			"badge": "Official Documentation",
+			"title": "Suite Docs",
+			"description": "Explore guides, API references, and tutorials to help you integrate with the Xernerx Ecosystem seamlessly.",
+			"searchPlaceholder": "Search documentation, guides, and references...",
+			"categories": {
+				"api": {
+					"title": "REST API",
+					"description": "Comprehensive documentation for the Xernerx HTTP API. Learn how to authenticate, interact with databases, and utilize core microservices securely."
+				},
+				"cdn": {
+					"title": "CDN Services",
+					"description": "Documentation for the Xernerx Content Delivery Network. Discover how to programmatically upload, retrieve, and manage distributed media assets."
+				},
+				"npm": {
+					"title": "NPM Packages",
+					"description": "Guides and references for the open-source Xernerx Developer Software suite, including frameworks, libraries, and utilities."
+				}
+			}
+		},
+		"api": {
+			"common": {
+				"title": "REST API",
+				"selectVersion": "Select Version",
+				"description": "The Xernerx {version} API allows developers to programmatically interface with the ecosystem, manage bot statistics, and automate organization workflows.",
+				"baseUrl": "Base URL",
+				"prodEndpoint": "Production Endpoint",
+				"canaryEndpoint": "Canary Endpoint",
+				"devEndpoint": "Development Endpoint",
+				"auth": "Authentication",
+				"authDesc1": "All programmatic API requests across the platform must be authenticated using an API Token generated from your developer dashboard.",
+				"authDesc2": " Internal web requests may also utilize standard NextAuth session cookies.",
+				"authDesc3": "Pass your token in the Authorization HTTP header as a Bearer token.",
+				"securePassage": "Secure Passage",
+				"secureDesc": "The /secure API routes manage sensitive administrative components (roles, users, etc.). While utilized internally by the dashboard, they can also be accessed by third-party applications if an administrator has explicitly granted the API token the secure passage flag.",
+				"nav": {
+					"back": "Back to Categories",
+					"overview": "Overview",
+					"endpoints": "Endpoints",
+					"users": "Users",
+					"guilds": "Guilds"
+				}
+			},
+			"v1": {
+				"endpoints": {
+					"fetchBotProfile": {
+						"title": "Fetch Bot Profile",
+						"description": "Retrieve public or private profile metadata for a specific Discord bot.",
+						"privacyScope": "Privacy & Ownership Scope",
+						"privacyDesc": "If the requested bot profile is set to <code>private</code>, this endpoint will return a 403 Forbidden error unless the authenticated token belongs to an owner of the bot. If the token is owned by the bot developer, the response will additionally include sensitive properties such as configured{' '}<code>hooks</code> and full arrays of user votes."
+					},
+					"updateBotProfile": {
+						"title": "Update Bot Profile",
+						"description": "Update specific fields of your bot's profile programmatically.",
+						"descField": "A short summary of what the bot does (usually used in cards).",
+						"infoField": "A detailed markdown description for the bot's full profile page.",
+						"privacyField": "Visibility scope. Allowed values: <code>public</code>, <code>private</code>, <code>limited</code>.",
+						"tagsField": "An array of string categories that apply to the bot.",
+						"linksField": "An object containing URLs like <code>invite</code>, <code>support</code>, or <code>website</code>."
+					},
+					"deleteBotProfile": {
+						"title": "Delete Bot Profile",
+						"description": "Permanently delete your bot's profile from the platform ecosystem."
+					},
+					"fetchBotStats": {
+						"title": "Fetch Bot Stats",
+						"description": "Retrieve the statistical history of a specific Discord bot."
+					},
+					"postBotStats": {
+						"title": "Post Bot Stats",
+						"description": "Log a new statistical snapshot for a Discord bot.",
+						"nodePackage": "Node.js Package Available",
+						"nodePackageDesc": "If you are using Node.js, you can easily automate your statistics posting using the official <code>@xernerx/stats</code> package without needing to write manual fetch requests."
+					},
+					"updateBotStats": {
+						"title": "Update Bot Stats",
+						"description": "Update a previously logged statistical snapshot."
+					},
+					"deleteBotStats": {
+						"title": "Delete Bot Stats",
+						"description": "Delete all statistical snapshots for a Discord bot."
+					},
+					"fetchBotCommands": {
+						"title": "Fetch Bot Commands",
+						"description": "Retrieve your synced Discord application slash commands."
+					},
+					"syncBotCommands": {
+						"title": "Sync Bot Commands",
+						"description": "Bulk synchronize your Discord application slash commands.",
+						"bulkSync": "Bulk Synchronization",
+						"bulkSyncDesc": "The <code>PUT</code> endpoint expects a full array of your Discord application commands. It performs a complete sync by wiping your previously stored commands and bulk-inserting the new array. This is best called during your bot's startup sequence."
+					},
+					"deleteBotCommands": {
+						"title": "Delete Bot Commands",
+						"description": "Wipe all synchronized commands for a Discord bot."
+					}
+				},
+				"common": {
+					"fetchExamples": "Fetch Examples",
+					"jsonBodyParameters": "JSON Body Parameters",
+					"field": "Field",
+					"type": "Type",
+					"description": "Description",
+					"serverCountDesc": "The number of servers the bot is in (alias for guildCount).",
+					"shardCountDesc": "The number of active shards.",
+					"userCountDesc": "The estimated total number of users across all guilds."
+				}
+			},
+			"core": {
+				"fetchDiscordProfile": {
+					"title": "Fetch Discord Profile",
+					"description": "Fetch a user's Discord profile metadata directly from the Xernerx core caching layer."
+				},
+				"fetchDiscordGuilds": {
+					"title": "Fetch Discord Guilds",
+					"description": "Retrieve a list of Discord guilds that a user is currently a member of."
+				},
+				"fetchDiscordGuild": {
+					"title": "Fetch Discord Guild",
+					"description": "Fetch a specific Discord guild's metadata directly from the Xernerx core caching layer."
+				},
+				"fetchDiscordRoles": {
+					"title": "Fetch Discord Roles",
+					"description": "Retrieve all available Discord roles within a specific guild."
+				}
+			},
+			"secure": {
+				"manageUsers": {
+					"title": "Manage Users",
+					"description": "Manage users on the platform."
+				},
+				"manageTokens": {
+					"title": "Manage Tokens",
+					"description": "List, create, update, or delete API tokens."
+				},
+				"manageRoles": {
+					"title": "Manage Roles",
+					"description": "Create, edit, and delete system roles and permissions."
+				},
+				"manageInvites": {
+					"title": "Manage Invites",
+					"description": "Configure public Discord bot invite URLs."
+				},
+				"manageAnnouncements": {
+					"title": "Manage Announcements",
+					"description": "Create, edit, and publish platform announcements."
+				},
+				"manageTranslations": {
+					"title": "Manage Translations",
+					"description": "Add and modify system-wide translations."
+				},
+				"manageApplications": {
+					"title": "Manage Applications",
+					"description": "Create, edit, and review user applications."
+				},
+				"systemSettings": {
+					"title": "System Settings",
+					"description": "Manage global system configurations and core settings."
+				}
+			}
+		},
+		"cdn": {
+			"nav": {
+				"backToCategories": "Back to Categories",
+				"overview": "Overview",
+				"uploadMedia": "Upload Media",
+				"listMedia": "List Media",
+				"manageMedia": "Manage Media",
+				"secureProxy": "Secure Proxy",
+				"category": {
+					"navigation": "Navigation",
+					"cdnApi": "CDN API",
+					"endpoints": "Endpoints"
+				}
+			},
+			"title": "Xernerx CDN Services",
+			"description": "The Xernerx Content Delivery Network securely routes, caches, and accelerates media assets across the entire ecosystem. This documentation covers the internal HTTP API used for programmatically managing uploads and media retrieval.",
+			"notice": {
+				"title": "Internal API Usage Notice",
+				"description": "The CDN is primarily designed as an internal microservice for Xernerx ecosystem applications (like the Account and Admin dashboards). While these endpoints are documented for transparency and advanced developer integrations, they are tightly coupled to the internal authentication flow and are not intended for general public consumption like a standalone SaaS product."
+			},
+			"overview": {
+				"title": "Base URL & Authentication",
+				"productionEndpoint": "Production Endpoint",
+				"canaryEndpoint": "Canary Endpoint",
+				"developmentEndpoint": "Development Endpoint",
+				"authLabel": "Authentication:",
+				"authDesc1": "All restricted endpoints rely on standard NextAuth session cookies. API requests must be made with credentials included, and the authenticated user must possess the appropriate roles (e.g., ",
+				"authDesc2": " or ",
+				"authDesc3": ") in the database."
+			},
+			"upload": {
+				"title": "Upload Media",
+				"description": "Upload a new file to the private Vercel Blob store and create a MongoDB metadata record.",
+				"contentType": "Content-Type",
+				"formFields": "Form Fields",
+				"fields": {
+					"fileDesc": "The raw file binary to upload.",
+					"privacyDesc1": "Either ",
+					"privacyDesc2": ", ",
+					"privacyDesc3": ", or ",
+					"privacyDesc4": " (default).",
+					"sharedDesc": "Stringified array of User IDs granted access to the file."
+				}
+			},
+			"table": {
+				"field": "Field",
+				"type": "Type",
+				"required": "Required",
+				"description": "Description",
+				"parameter": "Parameter",
+				"yes": "Yes",
+				"no": "No"
+			},
+			"successResponse": "Success Response (200 OK)",
+			"list": {
+				"title": "List Media",
+				"description": "Retrieve a list of media records that the authenticated user owns or has shared access to.",
+				"queryParams": "Query Parameters",
+				"params": {
+					"adminDesc1": "If set to ",
+					"adminDesc2": " and the user has ",
+					"adminDesc3": " permissions, returns all media globally."
+				}
+			},
+			"manage": {
+				"title": "Manage Media",
+				"description": "Update metadata properties of an existing media record or permanently delete it.",
+				"jsonBodyParams": "JSON Body Parameters",
+				"fields": {
+					"privacyDesc1": "Either ",
+					"privacyDesc2": ", ",
+					"privacyDesc3": ", or ",
+					"privacyDesc4": ".",
+					"sharedDesc": "Array of User IDs to grant access to."
+				},
+				"deleteDesc1": "Permanently deletes the file from the Vercel Blob store and removes the metadata record from the database. Requires ownership or the ",
+				"deleteDesc2": " permission."
+			},
+			"proxy": {
+				"title": "Secure Media Proxy",
+				"description": "Since underlying Vercel Blobs are securely restricted, media must be streamed via the secure proxy endpoint which verifies access permissions dynamically.",
+				"details1": "Provides a direct byte-stream of the requested file with appropriate ",
+				"details2": " headers. If the media is private, the proxy verifies that the requester's session ID matches the ",
+				"details3": ", exists in the ",
+				"details4": " array, or has global ",
+				"details5": " permissions before streaming the file."
+			}
 		}
 	},
 	"components": {
@@ -1424,7 +2330,11 @@
 				"text2": "Next Gift In",
 				"text3": "Edit Profile",
 				"text4": "Admin Panel",
-				"text5": "Copy User ID"
+				"text5": "Copy User ID",
+				"claimGift": "Claim Daily Present!",
+				"openingGift": "Opening Present...",
+				"giftClaimedTitle": "Daily reward claimed!",
+				"giftFailedTitle": "Failed to claim daily reward"
 			}
 		},
 		"cookieprompt": {},
@@ -1443,5 +2353,36 @@
 			"alt2": "Avatar Decoration"
 		},
 		"themescript": {}
+	},
+	"lib": {
+		"navigation": {
+			"categories": {
+				"user": "User",
+				"developer": "Developer",
+				"public": "Public",
+				"management": "Management"
+			},
+			"items": {
+				"explore": "Explore",
+				"dashboard": "Dashboard",
+				"account": "Account",
+				"portal": "Portal",
+				"api": "API",
+				"docs": "Docs",
+				"cdn": "CDN",
+				"website": "Website",
+				"admin": "Admin"
+			}
+		}
+	},
+	"feedback": {
+		"error": {
+			"title": "Something went wrong!",
+			"description": "An unexpected error occurred while loading this page. Please try again or contact support if the issue persists.",
+			"details": "Error Details:",
+			"unknown": "Unknown Error",
+			"digest": "Digest: ",
+			"retry": "Try again"
+		}
 	}
 }

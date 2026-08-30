@@ -8,24 +8,24 @@ import { useDictionary, useSidebar } from '@xernerx/providers';
 
 const categories = [
 	{
-		title: 'REST API',
-		description: 'Comprehensive documentation for the Xernerx HTTP API. Learn how to authenticate, interact with databases, and utilize core microservices securely.',
+		titleKey: 'docs.home.categories.api.title',
+		descKey: 'docs.home.categories.api.description',
 		icon: Globe,
 		href: '/api',
 		color: 'text-blue-500',
 		bg: 'bg-blue-500/10',
 	},
 	{
-		title: 'CDN Services',
-		description: 'Documentation for the Xernerx Content Delivery Network. Discover how to programmatically upload, retrieve, and manage distributed media assets.',
+		titleKey: 'docs.home.categories.cdn.title',
+		descKey: 'docs.home.categories.cdn.description',
 		icon: Rocket,
 		href: '/cdn',
 		color: 'text-purple-500',
 		bg: 'bg-purple-500/10',
 	},
 	{
-		title: 'NPM Packages',
-		description: 'Guides and references for the open-source Xernerx Developer Software suite, including frameworks, libraries, and utilities.',
+		titleKey: 'docs.home.categories.npm.title',
+		descKey: 'docs.home.categories.npm.description',
 		icon: Package,
 		href: '/packages',
 		color: 'text-emerald-500',
@@ -71,7 +71,7 @@ export default function DocsHome() {
 			>
 				<div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-(--accent)/20 bg-(--accent)/5 text-(--accent) text-xs font-bold uppercase tracking-wider mb-2 shadow-sm">
 					<Book size={14} />
-					<span>Official Documentation</span>
+					<span>{t('docs.home.badge')}</span>
 				</div>
 				<h1
 					className="text-5xl md:text-6xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
@@ -79,11 +79,9 @@ export default function DocsHome() {
 						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
-					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-purple-500">Suite Docs</span>
+					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-purple-500">{t('docs.home.title')}</span>
 				</h1>
-				<p className="text-base text-(--text-muted) max-w-xl leading-relaxed mt-2">
-					Explore guides, API references, and tutorials to help you integrate with the Xernerx Ecosystem seamlessly.
-				</p>
+				<p className="text-base text-(--text-muted) max-w-xl leading-relaxed mt-2">{t('docs.home.description')}</p>
 
 				{/* Search Bar */}
 				<div className="w-full max-w-2xl mt-8 relative group">
@@ -94,7 +92,7 @@ export default function DocsHome() {
 							type="text"
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							placeholder="Search documentation, guides, and references..."
+							placeholder={t('docs.home.searchPlaceholder')}
 							className="w-full bg-transparent border-none text-(--text) placeholder:text-(--text-muted) focus:outline-none focus:ring-0 text-base"
 							style={{
 								padding: 'calc(var(--ui-gap) * 1.5) calc(var(--ui-gap) * 1.5) calc(var(--ui-gap) * 1.5) 4rem',
@@ -166,10 +164,10 @@ export default function DocsHome() {
 										fontFamily: 'var(--font-fredoka)',
 									}}
 								>
-									{category.title}
+									{t(category.titleKey)}
 								</h3>
 							</div>
-							<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{category.description}</p>
+							<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{t(category.descKey)}</p>
 						</motion.a>
 					))}
 				</motion.div>

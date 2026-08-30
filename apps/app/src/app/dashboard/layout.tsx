@@ -3,10 +3,16 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Studios | Dashboard',
+	title: {
+		default: 'Xernerx Studios | Dashboard',
+		template: 'Xernerx Studios | Dashboard | %s',
+	},
 	description: 'Manage your Xernerx applications, tokens, and settings. Access platform tools and infrastructure from a unified dashboard.',
 	openGraph: {
-		title: 'Xernerx Studios | Dashboard',
+		title: {
+			default: 'Xernerx Studios | Dashboard',
+			template: 'Xernerx Studios | Dashboard | %s',
+		},
 		description: 'Access the Xernerx dashboard to manage applications, API tokens, and platform configuration.',
 		url: 'https://app.xernerx.com/dashboard',
 		siteName: 'Xernerx',
@@ -22,7 +28,10 @@ export const metadata: Metadata = {
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Studios | Dashboard',
+		title: {
+			default: 'Xernerx Studios | Dashboard',
+			template: 'Xernerx Studios | Dashboard | %s',
+		},
 		description: 'Manage your Xernerx tools, tokens, and applications in one place.',
 		images: ['/banner.png'],
 	},

@@ -12,13 +12,19 @@ import { getServerSession } from 'next-auth';
 import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Account',
+	title: {
+		default: 'Xernerx Account',
+		template: 'Xernerx Account | %s',
+	},
 	description: 'Manage your Xernerx account, API tokens, and platform configuration.',
 
 	metadataBase: new URL('https://account.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Account',
+		title: {
+			default: 'Xernerx Account',
+			template: 'Xernerx Account | %s',
+		},
 		description: 'Manage your Xernerx account, API tokens, and platform configuration.',
 		url: 'https://account.xernerx.com',
 		siteName: 'Xernerx',
@@ -35,7 +41,10 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Account',
+		title: {
+			default: 'Xernerx Account',
+			template: 'Xernerx Account | %s',
+		},
 		description: 'Manage your Xernerx account, API tokens, and platform configuration.',
 		images: ['/banner.png'],
 	},

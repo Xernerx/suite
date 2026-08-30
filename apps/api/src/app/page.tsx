@@ -13,7 +13,8 @@ export default function Home() {
 	const { t } = useDictionary();
 	const [fact, setFact] = useState<string>();
 
-	const uselessFacts = t('api.facts').split(',');
+	const rawFacts = t('api.facts') as any;
+	const uselessFacts = Array.isArray(rawFacts) ? rawFacts : (rawFacts || '').split(',');
 
 	useEffect(() => {
 		(() => {

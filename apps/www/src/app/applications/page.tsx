@@ -1,10 +1,11 @@
 /** @format */
+// Force recompile
 'use client';
 
 import { ArrowRight, Briefcase, Loader2, LogIn } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useEnvironment, useSidebar, useUser } from '@xernerx/providers';
+import { useEnvironment, useSidebar, useUser, useDictionary } from '@xernerx/providers';
 import Link from 'next/link';
 
 interface ApplicationConfig {
@@ -22,6 +23,7 @@ export default function ApplicationsPage() {
 	const { hide } = useSidebar();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { user } = useUser();
+	const { t } = useDictionary();
 
 	const [applications, setApplications] = useState<ApplicationConfig[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ export default function ApplicationsPage() {
 				}
 			} catch (err) {
 				console.warn(err);
-				setError('Failed to load open applications.');
+				setError(t('www.applications.errorLoad'));
 			} finally {
 				setLoading(false);
 			}
@@ -63,9 +65,9 @@ export default function ApplicationsPage() {
 		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-7xl mx-auto w-full">
 			<div className="mb-12">
 				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					Open Applications
+					{t('www.applications.title')}
 				</h1>
-				<p className="text-lg text-(--text-muted) max-w-2xl">Join the team! Browse our currently open roles and positions below. If you think you're a good fit, we'd love to hear from you.</p>
+				<p className="text-lg text-(--text-muted) max-w-2xl">{t('www.applications.subtitle')}</p>
 			</div>
 
 			{loading ? (
@@ -83,8 +85,8 @@ export default function ApplicationsPage() {
 					className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-neutral-500/20 rounded-3xl bg-neutral-500/5 backdrop-blur-xl"
 				>
 					<Briefcase className="w-12 h-12 text-(--text-muted) mb-4 opacity-50" />
-					<h3 className="text-2xl font-bold mb-2">No Open Roles</h3>
-					<p className="text-(--text-muted) max-w-sm">Check back later for new opportunities! We're always looking for great talent.</p>
+					<h3 className="text-2xl font-bold mb-2">{t('www.applications.noRoles')}</h3>
+					<p className="text-(--text-muted) max-w-sm">{t('www.applications.noRolesDesc')}</p>
 				</motion.div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -102,12 +104,12 @@ export default function ApplicationsPage() {
 								</div>
 							</div>
 							<h3 className="text-2xl font-bold mb-3 group-hover:text-(--accent) transition-colors">{app.name}</h3>
-							<p className="text-(--text-muted) mb-6 line-clamp-2 leading-relaxed">{app.description || 'No description provided.'}</p>
+							<p className="text-(--text-muted) mb-6 line-clamp-2 leading-relaxed">{app.description || t('www.applications.noDesc')}</p>
 
 							<div className="flex flex-col gap-5 mb-8 flex-grow">
 								{app.requirements && app.requirements.length > 0 && (
 									<div className="flex flex-col gap-2">
-										<span className="text-xs font-bold uppercase tracking-wider text-(--text)">Requirements</span>
+										<span className="text-xs font-bold uppercase tracking-wider text-(--text)">{t('www.applications.requirements')}</span>
 										<ul className="text-sm text-(--text-muted) flex flex-col gap-1.5">
 											{app.requirements.slice(0, 3).map((req, idx) => (
 												<li key={idx} className="flex items-start gap-2">
@@ -115,13 +117,15 @@ export default function ApplicationsPage() {
 													<span className="leading-snug line-clamp-2">{req}</span>
 												</li>
 											))}
-											{app.requirements.length > 3 && <li className="text-xs text-(--text-muted)/60 italic ml-4">+{app.requirements.length - 3} more</li>}
+											{app.requirements.length > 3 && (
+												<li className="text-xs text-(--text-muted)/60 italic ml-4">{t('www.applications.more', { count: app.requirements.length - 3 })}</li>
+											)}
 										</ul>
 									</div>
 								)}
 								{app.benefits && app.benefits.length > 0 && (
 									<div className="flex flex-col gap-2">
-										<span className="text-xs font-bold uppercase tracking-wider text-(--text)">Benefits</span>
+										<span className="text-xs font-bold uppercase tracking-wider text-(--text)">{t('www.applications.benefits')}</span>
 										<ul className="text-sm text-(--text-muted) flex flex-col gap-1.5">
 											{app.benefits.slice(0, 3).map((ben, idx) => (
 												<li key={idx} className="flex items-start gap-2">
@@ -129,7 +133,9 @@ export default function ApplicationsPage() {
 													<span className="leading-snug line-clamp-2">{ben}</span>
 												</li>
 											))}
-											{app.benefits.length > 3 && <li className="text-xs text-(--text-muted)/60 italic ml-4">+{app.benefits.length - 3} more</li>}
+											{app.benefits.length > 3 && (
+												<li className="text-xs text-(--text-muted)/60 italic ml-4">{t('www.applications.more', { count: app.benefits.length - 3 })}</li>
+											)}
 										</ul>
 									</div>
 								)}
@@ -140,7 +146,7 @@ export default function ApplicationsPage() {
 									href={`${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + `/applications/${app.id}` : '')}`}
 									className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-500/20 hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/30 transition-all active:scale-[0.98] group"
 								>
-									Log in to Apply
+									{t('www.applications.loginApply')}
 									<LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
 								</Link>
 							) : (
@@ -148,7 +154,7 @@ export default function ApplicationsPage() {
 									href={`/applications/${app.id}`}
 									className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-(--accent) text-white font-semibold shadow-md shadow-(--accent)/20 hover:opacity-90 hover:shadow-lg hover:shadow-(--accent)/30 transition-all active:scale-[0.98] group"
 								>
-									Apply Now
+									{t('www.applications.applyNow')}
 									<ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
 								</Link>
 							)}

@@ -1,11 +1,12 @@
 /** @format */
+// Force recompile
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, ArrowLeft, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEnvironment, useUser, useToast, useSidebar } from '@xernerx/providers';
+import { useEnvironment, useUser, useToast, useSidebar, useDictionary } from '@xernerx/providers';
 import { Button, Input, Selector, Toggle } from '@xernerx/ui';
 import Link from 'next/link';
 
@@ -36,6 +37,7 @@ export default function ApplicationFormPage() {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { user } = useUser();
 	const { toast } = useToast();
+	const { t } = useDictionary();
 
 	const [config, setConfig] = useState<ApplicationConfig | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -60,7 +62,7 @@ export default function ApplicationFormPage() {
 				});
 				const json = await response.json();
 
-				if (!response.ok || !json.success) throw new Error(json.error || 'Failed to load application');
+				if (!response.ok || !json.success) throw new Error(json.error || t('www.applications.errorLoadApp'));
 				setConfig(json.data);
 
 				// Initialize answers state with empty strings/arrays based on type
@@ -99,7 +101,7 @@ export default function ApplicationFormPage() {
 		e.preventDefault();
 
 		if (config?.requireLogin !== false && !user) {
-			toast({ title: 'You must be logged in to apply.', type: 'error' });
+			toast({ title: t('www.applications.mustLogin'), type: 'error' });
 			return;
 		}
 
@@ -117,10 +119,10 @@ export default function ApplicationFormPage() {
 
 			const json = await res.json();
 			if (!res.ok || !json.success) {
-				throw new Error(json.error || 'Submission failed');
+				throw new Error(json.error || t('www.applications.submissionFailed'));
 			}
 
-			toast({ title: 'Application submitted successfully!', type: 'success' });
+			toast({ title: t('www.applications.submitSuccess'), type: 'success' });
 			setSubmitted(true);
 		} catch (err: any) {
 			toast({ title: err.message, type: 'error' });
@@ -141,10 +143,10 @@ export default function ApplicationFormPage() {
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
 				<div className="bg-red-500/10 border border-red-500/20 text-red-400 p-8 rounded-3xl backdrop-blur-md max-w-lg">
-					<h2 className="text-xl font-bold mb-2">Error Loading Application</h2>
-					<p>{error || 'Application not found'}</p>
+					<h2 className="text-xl font-bold mb-2">{t('www.applications.errorLoading')}</h2>
+					<p>{error || t('www.applications.notFound')}</p>
 					<Link href="/applications" className="inline-block mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
-						Go Back
+						{t('www.applications.goBack')}
 					</Link>
 				</div>
 			</div>
@@ -159,13 +161,11 @@ export default function ApplicationFormPage() {
 						<Send className="w-10 h-10" />
 					</div>
 					<h2 className="text-4xl font-extrabold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						Application Sent!
+						{t('www.applications.appSent')}
 					</h2>
-					<p className="text-emerald-400/80 mb-8">
-						Your application for <strong>{config.name}</strong> has been successfully submitted. We will review it shortly!
-					</p>
+					<p className="text-emerald-400/80 mb-8" dangerouslySetInnerHTML={{ __html: t('www.applications.appSentDesc', { name: `<strong>${config.name}</strong>` }) }} />
 					<Link href="/applications" className="inline-block px-8 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:opacity-90 transition-opacity">
-						Return to Applications
+						{t('www.applications.returnToApps')}
 					</Link>
 				</div>
 			</motion.div>
@@ -175,7 +175,7 @@ export default function ApplicationFormPage() {
 	return (
 		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-4xl mx-auto w-full pb-24">
 			<Link href="/applications" className="flex items-center gap-2 text-(--text-muted) hover:text-(--text) mb-8 transition-colors w-fit group">
-				<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to applications
+				<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> {t('www.applications.backToApps')}
 			</Link>
 
 			<div className="mb-12">
@@ -189,8 +189,8 @@ export default function ApplicationFormPage() {
 				<div className="flex flex-col gap-8 p-6 sm:p-10 rounded-[2.5rem] border border-neutral-500/10 bg-neutral-500/5 backdrop-blur-2xl shadow-xl shadow-black/5">
 					{!config.questions || config.questions.length === 0 ? (
 						<div className="text-center py-12 text-(--text-muted)">
-							<p className="mb-2">This application doesn't have any specific questions.</p>
-							<p>Just hit submit to apply directly!</p>
+							<p className="mb-2">{t('www.applications.noQuestions')}</p>
+							<p>{t('www.applications.hitSubmit')}</p>
 						</div>
 					) : (
 						config.questions.map((q, idx) => (
@@ -203,18 +203,28 @@ export default function ApplicationFormPage() {
 
 								<div className="pl-8">
 									{q.type === 'text' && (
-										<Input value={answers[q.id] || ''} onChange={(e) => handleAnswerChange(q.id, e.target.value)} required={q.required} placeholder="Your answer..." />
+										<Input
+											value={answers[q.id] || ''}
+											onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+											required={q.required}
+											placeholder={t('www.applications.yourAnswer')}
+										/>
 									)}
 
 									{q.type === 'textarea' && (
-										<textarea value={answers[q.id] || ''} onChange={(e) => handleAnswerChange(q.id, e.target.value)} required={q.required} placeholder="Your answer..." />
+										<textarea
+											value={answers[q.id] || ''}
+											onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+											required={q.required}
+											placeholder={t('www.applications.yourAnswer')}
+										/>
 									)}
 
 									{q.type === 'select' && (
 										<Selector
 											value={answers[q.id] || ''}
 											onChange={(val: string) => handleAnswerChange(q.id, val)}
-											options={[{ value: '', label: 'Select an option' }, ...(q.options || []).map((o) => ({ value: o, label: o }))]}
+											options={[{ value: '', label: t('www.applications.selectOption') }, ...(q.options || []).map((o) => ({ value: o, label: o }))]}
 										/>
 									)}
 
@@ -258,7 +268,7 @@ export default function ApplicationFormPage() {
 						disabled={submitting}
 						className="flex items-center justify-center gap-2 px-10 py-4 rounded-2xl bg-(--accent) text-white font-bold text-lg shadow-lg shadow-(--accent)/30 hover:shadow-xl hover:shadow-(--accent)/40 hover:-translate-y-0.5 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
 					>
-						{submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Submit Application'}
+						{submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : t('www.applications.submit')}
 						{!submitting && <Send className="w-5 h-5" />}
 					</button>
 				</div>

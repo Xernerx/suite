@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Search, FileCode2, Package, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useDictionary } from '@xernerx/providers';
 
 export type SearchIndexItem = {
 	name: string;
@@ -15,6 +16,7 @@ export type SearchIndexItem = {
 
 export function PackagesSearch({ index }: { index: SearchIndexItem[] }) {
 	const [query, setQuery] = useState('');
+	const { t } = useDictionary();
 
 	const results = query.length > 2 ? index.filter((item) => item.name.toLowerCase().includes(query.toLowerCase())).slice(0, 10) : [];
 
@@ -27,7 +29,7 @@ export function PackagesSearch({ index }: { index: SearchIndexItem[] }) {
 				<input
 					type="text"
 					className="block w-full pl-11 pr-4 py-4 bg-(--foreground)/30 border border-(--border)/20 rounded-2xl text-(--text) placeholder-(--text-muted) focus:outline-none focus:ring-2 focus:ring-(--accent)/50 transition-all shadow-sm"
-					placeholder="Search classes, interfaces, and functions across all latest packages..."
+					placeholder={t('docs.packages.search.placeholder')}
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
 				/>
@@ -60,7 +62,7 @@ export function PackagesSearch({ index }: { index: SearchIndexItem[] }) {
 							))}
 						</div>
 					) : (
-						<div className="p-8 text-center text-(--text-muted)">No results found for "{query}".</div>
+						<div className="p-8 text-center text-(--text-muted)">{t('docs.packages.search.noResults').replace('{query}', query)}</div>
 					)}
 				</div>
 			)}

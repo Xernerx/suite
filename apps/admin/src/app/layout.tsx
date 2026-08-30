@@ -13,13 +13,19 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Admin',
+	title: {
+		default: 'Xernerx Admin',
+		template: 'Xernerx Admin | %s',
+	},
 	description: 'Xernerx administrative dashboard, user management, and control center.',
 
 	metadataBase: new URL('https://admin.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Admin',
+		title: {
+			default: 'Xernerx Admin',
+			template: 'Xernerx Admin | %s',
+		},
 		description: 'Xernerx administrative dashboard, user management, and control center.',
 		url: 'https://admin.xernerx.com',
 		siteName: 'Xernerx',
@@ -36,7 +42,10 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Admin',
+		title: {
+			default: 'Xernerx Admin',
+			template: 'Xernerx Admin | %s',
+		},
 		description: 'Xernerx administrative dashboard, user management, and control center.',
 		images: ['/banner.png'],
 	},

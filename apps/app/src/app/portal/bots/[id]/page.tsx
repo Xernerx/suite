@@ -90,9 +90,9 @@ export default function PortalBotPage() {
 					);
 
 					const staticItems = [
-						{ label: 'Explore', href: '/', icon: Compass as any, category: 'Navigation' },
-						{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard as any, category: 'Navigation' },
-						{ label: 'Back to Portal', href: '/portal', icon: ArrowLeft as any, category: 'Navigation' },
+						{ label: t('app.portal.nav.explore'), href: '/', icon: Compass as any, category: t('app.portal.categories.navigation') },
+						{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard as any, category: t('app.portal.categories.navigation') },
+						{ label: t('app.portal.bot.nav.back'), href: '/portal', icon: ArrowLeft as any, category: t('app.portal.categories.navigation') },
 					];
 
 					setNavItems([
@@ -100,7 +100,10 @@ export default function PortalBotPage() {
 						...botsWithDiscord.map((b: any) => ({
 							label: b.discord?.global_name || b.discord?.username || b.name,
 							onClick: () => router.push(`/portal/bots/${b.id}`, { scroll: false }),
-							category: currentBotData.organization && currentBotData.organization !== 'null' && currentBotData.organization !== 'undefined' ? 'Organization Bots' : 'Personal Bots',
+							category:
+								currentBotData.organization && currentBotData.organization !== 'null' && currentBotData.organization !== 'undefined'
+									? t('app.portal.bot.categories.orgBots')
+									: t('app.portal.bot.categories.personalBots'),
 							icon: b.discord?.avatar
 								? () => <img src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png`} alt={b.name} className="w-5 h-5 rounded-md object-cover" />
 								: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{(b.name || 'B').charAt(0)}</div>,
@@ -226,9 +229,9 @@ export default function PortalBotPage() {
 						activeTab={activeTab}
 						onChange={setActiveTab}
 						tabs={[
-							{ id: 'general', label: 'General' },
-							{ id: 'links', label: 'Links' },
-							{ id: 'settings', label: 'Settings' },
+							{ id: 'general', label: t('app.portal.bot.tabs.general') },
+							{ id: 'links', label: t('app.portal.bot.tabs.links') },
+							{ id: 'settings', label: t('app.portal.bot.tabs.settings') },
 						]}
 					/>
 
@@ -238,23 +241,23 @@ export default function PortalBotPage() {
 								<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 									<Settings className="w-4 h-4" />
 								</div>
-								General Settings
+								{t('app.portal.bot.general.header')}
 							</div>
 							<div className="flex flex-col gap-5">
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Short Description</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.shortDesc')}</label>
 									<Input
 										value={botConfig.description || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, description: e.target.value })}
-										placeholder="A brief tagline for your app"
+										placeholder={t('app.portal.bot.general.shortDescPlaceholder')}
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Long Information (Markdown)</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.longDesc')}</label>
 									<textarea
 										value={botConfig.info || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, info: e.target.value })}
-										placeholder="Detailed description supporting markdown formatting..."
+										placeholder={t('app.portal.bot.general.longDescPlaceholder')}
 										className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
 									/>
 								</div>
@@ -268,11 +271,11 @@ export default function PortalBotPage() {
 								<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 									<Link2 className="w-4 h-4" />
 								</div>
-								External Links
+								{t('app.portal.bot.links.header')}
 							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Invite URL</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.invite')}</label>
 									<Input
 										value={botConfig.links?.invite || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, invite: e.target.value } })}
@@ -280,7 +283,7 @@ export default function PortalBotPage() {
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Website</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.website')}</label>
 									<Input
 										value={botConfig.links?.website || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, website: e.target.value } })}
@@ -288,7 +291,7 @@ export default function PortalBotPage() {
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Support Server</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.support')}</label>
 									<Input
 										value={botConfig.links?.support || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, support: e.target.value } })}
@@ -296,7 +299,7 @@ export default function PortalBotPage() {
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">GitHub Repository</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.github')}</label>
 									<Input
 										value={botConfig.links?.github || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, github: e.target.value } })}
@@ -304,7 +307,7 @@ export default function PortalBotPage() {
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Privacy Policy</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.privacy')}</label>
 									<Input
 										value={botConfig.links?.privacy || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, privacy: e.target.value } })}
@@ -312,7 +315,7 @@ export default function PortalBotPage() {
 									/>
 								</div>
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Terms of Service</label>
+									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.terms')}</label>
 									<Input
 										value={botConfig.links?.terms || ''}
 										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, terms: e.target.value } })}
@@ -333,18 +336,18 @@ export default function PortalBotPage() {
 								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 									<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 										<Shield size={18} />
-										<h3>Privacy Setting</h3>
+										<h3>{t('app.portal.bot.settings.privacyHeader')}</h3>
 									</div>
-									<div className="flex items-center gap-1 text-xs text-(--text-muted)">Control who can view this profile publicly.</div>
+									<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.portal.bot.settings.privacyDesc')}</div>
 								</div>
 								<div className="w-full sm:w-48 shrink-0">
 									<Selector
 										value={botConfig.privacy || 'private'}
 										onChange={(val) => setBotConfig({ ...botConfig, privacy: val })}
 										options={[
-											{ label: 'Public', value: 'public' },
-											{ label: 'Private', value: 'private' },
-											{ label: 'Limited', value: 'limited' },
+											{ label: t('app.portal.bot.settings.public'), value: 'public' },
+											{ label: t('app.portal.bot.settings.private'), value: 'private' },
+											{ label: t('app.portal.bot.settings.limited'), value: 'limited' },
 										]}
 									/>
 								</div>
@@ -358,16 +361,16 @@ export default function PortalBotPage() {
 								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 									<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 										<Building2 size={18} />
-										<h3>Transfer Organization</h3>
+										<h3>{t('app.portal.bot.settings.transferHeader')}</h3>
 									</div>
-									<p className="text-xs text-(--accent-orange)/80">Move this application to a different organization you manage.</p>
+									<p className="text-xs text-(--accent-orange)/80">{t('app.portal.bot.settings.transferDesc')}</p>
 								</div>
 								<div className="w-full sm:w-64 shrink-0">
 									<Selector
 										value={botConfig.organization || ''}
 										onChange={(val) => setBotConfig({ ...botConfig, organization: val })}
 										options={[
-											{ label: 'Personal (No Organization)', value: '' },
+											{ label: t('app.portal.bot.settings.noOrg'), value: '' },
 											...organizations.map((org) => ({
 												label: org.name,
 												value: org._id,
@@ -385,9 +388,9 @@ export default function PortalBotPage() {
 								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 									<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 										<AlertTriangle size={18} />
-										<h3>Reset Data</h3>
+										<h3>{t('app.portal.bot.settings.resetHeader')}</h3>
 									</div>
-									<p className="text-xs text-(--accent-orange)/80">Clear all profile descriptions and external links. This action cannot be undone.</p>
+									<p className="text-xs text-(--accent-orange)/80">{t('app.portal.bot.settings.resetDesc')}</p>
 								</div>
 								<button
 									onClick={() => setBotConfig({ ...botConfig, description: '', info: '', links: {} })}
@@ -398,7 +401,7 @@ export default function PortalBotPage() {
 									}}
 								>
 									<Trash2 size={16} />
-									<span>Reset</span>
+									<span>{t('app.portal.bot.settings.resetBtn')}</span>
 								</button>
 							</div>
 
@@ -410,9 +413,9 @@ export default function PortalBotPage() {
 								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 									<div className="flex items-center text-(--accent-red) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 										<AlertTriangle size={18} />
-										<h3>Delete Application</h3>
+										<h3>{t('app.portal.bot.settings.deleteHeader')}</h3>
 									</div>
-									<p className="text-xs text-(--accent-red)/80">Permanently delete this application profile and all associated data. This action cannot be undone.</p>
+									<p className="text-xs text-(--accent-red)/80">{t('app.portal.bot.settings.deleteDesc')}</p>
 								</div>
 								<button
 									onClick={() => setIsConfirmDeleteOpen(true)}
@@ -423,7 +426,7 @@ export default function PortalBotPage() {
 									}}
 								>
 									<Trash2 size={16} />
-									<span>Delete</span>
+									<span>{t('app.portal.bot.settings.deleteBtn')}</span>
 								</button>
 							</div>
 						</div>
@@ -435,8 +438,8 @@ export default function PortalBotPage() {
 				open={isConfirmDeleteOpen}
 				onOpenChange={setIsConfirmDeleteOpen}
 				onConfirm={handleDelete}
-				title="Delete Application"
-				description="Are you absolutely sure you want to delete this application? This action cannot be undone and all data will be permanently removed."
+				title={t('app.portal.bot.modals.delete.title')}
+				description={t('app.portal.bot.modals.delete.desc')}
 				loading={deleting}
 			/>
 		</div>

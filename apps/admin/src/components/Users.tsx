@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -227,7 +228,7 @@ function UserCard({
 			});
 			if (!res.ok) {
 				const errJson = await res.json().catch(() => ({}));
-				throw new Error(errJson.error || 'Failed to update user profile');
+				throw new Error(errJson.error || t('admin.users.updateFailed'));
 			}
 			const updated = await res.json();
 
@@ -252,7 +253,7 @@ function UserCard({
 						console.error('Failed to assign Discord role:', err);
 						toast({
 							type: 'error',
-							title: 'Failed to assign Discord role',
+							title: t('admin.users.assignRoleFailed'),
 							description: err.message,
 						});
 					});
@@ -270,7 +271,7 @@ function UserCard({
 						console.error('Failed to remove Discord role:', err);
 						toast({
 							type: 'error',
-							title: 'Failed to remove Discord role',
+							title: t('admin.users.removeRoleFailed'),
 							description: err.message,
 						});
 					});
@@ -470,7 +471,7 @@ function UserCard({
 											onClick={() => {
 												navigator.clipboard.writeText(user.id);
 												toast({
-													title: 'ID copied to clipboard',
+													title: t('admin.users.idCopied'),
 													type: 'success',
 												});
 											}}
@@ -489,7 +490,7 @@ function UserCard({
 												onClick={() => {
 													navigator.clipboard.writeText(fullUser.email!);
 													toast({
-														title: 'Email copied to clipboard',
+														title: t('admin.users.emailCopied'),
 														type: 'success',
 													});
 												}}

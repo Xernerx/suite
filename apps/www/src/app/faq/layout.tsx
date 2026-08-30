@@ -3,7 +3,10 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Studios | FaQ',
+	title: {
+		default: 'Xernerx Studios | FaQ',
+		template: 'Xernerx Studios | FaQ | %s',
+	},
 	description: 'Get answers on frequently asked questions',
 };
 

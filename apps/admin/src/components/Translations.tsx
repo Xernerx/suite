@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -332,7 +333,7 @@ export default function Translations() {
 								options={[
 									{
 										value: '',
-										label: 'Default (translator)',
+										label: t('admin.dashboard.translations.defaultTranslator'),
 									},
 									...appConfigs.map((a) => ({
 										value: a.id,

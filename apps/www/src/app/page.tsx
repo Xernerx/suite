@@ -126,13 +126,13 @@ export default function Home() {
 								href="#services"
 								className="px-8 py-4 rounded-2xl bg-(--accent) text-white font-bold text-sm hover:opacity-90 transition-all shadow-[0_0_40px_-10px_var(--accent)] hover:shadow-[0_0_60px_-15px_var(--accent)] hover:-translate-y-1"
 							>
-								Explore Services
+								{t('www.hero.buttons.explore')}
 							</a>
 							<a
 								href="#software"
 								className="px-8 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
 							>
-								View Software
+								{t('www.hero.buttons.software')}
 							</a>
 						</div>
 					</motion.div>
@@ -161,8 +161,8 @@ export default function Home() {
 				<div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
 					{[
 						{
-							title: 'Built for Scale',
-							desc: 'Our infrastructure and tools are designed from the ground up to handle massive communities and workloads effortlessly.',
+							title: t('www.features.scale.title'),
+							desc: t('www.features.scale.description'),
 							icon: (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -180,8 +180,8 @@ export default function Home() {
 							),
 						},
 						{
-							title: 'Open Source Heart',
-							desc: 'We believe in transparent development. Our software tools are freely available to push the ecosystem forward.',
+							title: t('www.features.opensource.title'),
+							desc: t('www.features.opensource.description'),
 							icon: (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -199,8 +199,8 @@ export default function Home() {
 							),
 						},
 						{
-							title: 'User-Centric Design',
-							desc: "Whether it's a CLI tool or a web dashboard, we prioritize intuitive interfaces and seamless developer experiences.",
+							title: t('www.features.design.title'),
+							desc: t('www.features.design.description'),
 							icon: (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -252,11 +252,9 @@ export default function Home() {
 				<div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
 					<div className="w-full max-w-7xl mx-auto text-left mb-16 relative z-10 px-6 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							Consumer Services
+							{t('www.sections.consumer.title')}
 						</h2>
-						<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">
-							Powerful, user-friendly applications and platforms designed to bring communities together and streamline digital experiences.
-						</p>
+						<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">{t('www.sections.consumer.description')}</p>
 					</div>
 
 					<div className="relative z-10 w-full overflow-hidden flex items-center h-[350px]">
@@ -267,28 +265,28 @@ export default function Home() {
 									title: t('www.services.dashboard.title'),
 									desc: t('www.services.dashboard.desc'),
 									link: getEnvUrl('https://app.xernerx.com'),
-									tag: 'Platform',
+									tag: t('www.tags.platform'),
 								},
 								{
 									icon: <Boxes size={24} />,
 									title: t('www.applications.todo.title'),
 									desc: t('www.applications.todo.desc'),
 									link: getEnvUrl('https://app.xernerx.com/bots/782105629572464652'),
-									tag: 'Discord Bot',
+									tag: t('www.tags.discordBot'),
 								},
 								{
 									icon: <Boxes size={24} />,
 									title: t('www.applications.zodiac.title'),
 									desc: t('www.applications.zodiac.desc'),
 									link: getEnvUrl('https://app.xernerx.com/bots/950251264095162418'),
-									tag: 'Discord Bot',
+									tag: t('www.tags.discordBot'),
 								},
 								{
 									icon: <Boxes size={24} />,
 									title: t('www.applications.metamorphosis.title'),
 									desc: t('www.applications.metamorphosis.desc'),
 									link: getEnvUrl('https://app.xernerx.com/bots/881678826906730547'),
-									tag: 'Discord Bot',
+									tag: t('www.tags.discordBot'),
 								},
 							].map((item) => (
 								<a
@@ -317,11 +315,9 @@ export default function Home() {
 				<div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
 					<div className="w-full max-w-7xl mx-auto text-right mb-16 relative z-10 px-6 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							Developer Software
+							{t('www.sections.developer.title')}
 						</h2>
-						<p className="max-w-2xl ml-auto text-base text-(--text-muted) leading-relaxed">
-							Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools.
-						</p>
+						<p className="max-w-2xl ml-auto text-base text-(--text-muted) leading-relaxed">{t('www.sections.developer.description')}</p>
 					</div>
 
 					<div className="relative z-10 w-full overflow-hidden flex items-center h-[350px]">

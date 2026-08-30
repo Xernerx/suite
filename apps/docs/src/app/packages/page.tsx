@@ -1,9 +1,7 @@
 /** @format */
-
-import { Box, Package, Terminal, GitBranch, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
-import { PackagesSearch, SearchIndexItem } from './PackagesSearch';
-import { PackagesSidebar } from './PackagesSidebar';
+// Force recompile
+import { PackagesPageClient } from './PackagesPageClient';
+import { SearchIndexItem } from './PackagesSearch';
 
 // Recursively extract all items of a specific kind (reusing logic from package renderer)
 const extractItems = (node: any, targetKind: number): any[] => {
@@ -121,53 +119,5 @@ async function getPackages() {
 
 export default async function PackagesPage() {
 	const { packages, index } = await getPackages();
-
-	return (
-		<div className="max-w-7xl mx-auto py-12 px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white relative">
-			<PackagesSidebar />
-
-			<div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-				<h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-(--text) mb-4 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					Xernerx Developer Software
-				</h1>
-				<p className="text-lg text-(--text-muted) leading-relaxed mb-8">
-					Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools on top of the Xernerx Ecosystem.
-				</p>
-			</div>
-
-			<PackagesSearch index={index} />
-
-			<div className="space-y-16">
-				{/* OVERVIEW SECTION */}
-				<section id="overview" className="space-y-6 scroll-mt-24">
-					<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2 border-b border-(--border)/10 pb-4">
-						<Box className="text-(--accent)" size={24} /> Available Packages
-					</h2>
-					<p className="text-(--text-muted) mb-6">Select a package below to view its comprehensive API documentation and types.</p>
-
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-						{packages.map((pkg) => (
-							<div key={pkg.name} className="flex flex-col bg-(--foreground)/30 border border-(--border)/10 rounded-2xl p-6 hover:border-(--accent)/50 transition-colors">
-								<h3 className="text-xl font-bold text-(--text) mb-2 font-mono text-(--accent)">{pkg.name}</h3>
-								<p className="text-sm text-(--text-muted) mb-4">{pkg.description}</p>
-								<div className="flex items-center gap-2 text-sm text-(--text-muted) mb-6">
-									<GitBranch size={14} />
-									<span>{pkg.versions.length} versions available</span>
-								</div>
-								<div className="mt-auto flex items-center justify-between">
-									<span className="text-xs bg-(--background) px-2 py-1 rounded text-(--text-muted) border border-(--border)/10">Latest: {pkg.versions[0]}</span>
-									<Link href={`/packages/${pkg.name}/${pkg.versions[0]}`} className="text-sm font-bold text-(--accent) hover:text-(--accent)/80 flex items-center gap-1">
-										View Docs <ChevronRight size={16} />
-									</Link>
-								</div>
-							</div>
-						))}
-						{packages.length === 0 && (
-							<div className="col-span-full p-8 text-center text-(--text-muted) border border-(--border)/10 border-dashed rounded-2xl">No packages found or GitHub API rate limited.</div>
-						)}
-					</div>
-				</section>
-			</div>
-		</div>
-	);
+	return <PackagesPageClient packages={packages} index={index} />;
 }

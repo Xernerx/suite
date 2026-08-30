@@ -1,5 +1,6 @@
 /** @format */
 
+// Force recompile
 'use client';
 
 import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image } from 'lucide-react';
@@ -117,8 +118,8 @@ export default function Home() {
 
 		if (canMedia) {
 			items.push({
-				category: 'Media',
-				label: 'Media Library',
+				category: t('admin.dashboard.nav.media'),
+				label: t('admin.dashboard.nav.mediaLibrary'),
 				view: 'media',
 				icon: Image,
 			});
@@ -172,7 +173,7 @@ export default function Home() {
 		if (canInvites) {
 			items.push({
 				category: t('common.nav.categories.administrator'),
-				label: 'Invites',
+				label: t('admin.dashboard.nav.invites'),
 				view: 'invites',
 				icon: Link,
 			});
@@ -181,7 +182,7 @@ export default function Home() {
 		if (canAnnouncements) {
 			items.push({
 				category: t('common.nav.categories.administrator'),
-				label: 'Announcements',
+				label: t('admin.dashboard.nav.announcements'),
 				view: 'announcements',
 				icon: Megaphone,
 			});

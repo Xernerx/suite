@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -171,11 +172,11 @@ export default function ApplicationReviews() {
 	const getStatusBadge = (status: string) => {
 		switch (status) {
 			case 'approved':
-				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 uppercase">Approved</span>;
+				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 uppercase">{t('admin.reviews.status.approved')}</span>;
 			case 'denied':
-				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 uppercase">Denied</span>;
+				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 uppercase">{t('admin.reviews.status.denied')}</span>;
 			default:
-				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 uppercase">Pending</span>;
+				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 uppercase">{t('admin.reviews.status.pending')}</span>;
 		}
 	};
 
@@ -203,7 +204,7 @@ export default function ApplicationReviews() {
 					style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 				>
 					<Loader2 className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-					{isLoading ? 'Refreshing...' : 'Refresh List'}
+					{isLoading ? t('admin.dashboard.applicationReviews.refreshing') : t('admin.dashboard.applicationReviews.refreshList')}
 				</button>
 			</div>
 
@@ -234,17 +235,21 @@ export default function ApplicationReviews() {
 										)}
 									</div>
 									<div className="flex flex-col">
-										<span className="font-bold text-(--text) line-clamp-1">{app.ownerId === 'anonymous' ? 'Anonymous User' : applicant?.name || 'Unknown User'}</span>
+										<span className="font-bold text-(--text) line-clamp-1">
+											{app.ownerId === 'anonymous'
+												? t('admin.dashboard.applicationReviews.anonymousUser')
+												: applicant?.name || t('admin.dashboard.applicationReviews.unknownUser')}
+										</span>
 										<span className="text-xs text-(--text-muted)">{new Date(app.createdAt).toLocaleDateString()}</span>
 									</div>
 								</div>
 							</div>
 
 							<div className="flex flex-col gap-2 mb-6">
-								<span className="text-xs font-semibold text-(--text-muted) uppercase tracking-wider">Application</span>
+								<span className="text-xs font-semibold text-(--text-muted) uppercase tracking-wider">{t('admin.dashboard.applicationReviews.application')}</span>
 								<div className="flex items-center gap-2">
 									<FileText className="w-4 h-4 text-(--accent)" />
-									<span className="font-medium text-(--text)">{config?.name || 'Unknown Form'}</span>
+									<span className="font-medium text-(--text)">{config?.name || t('admin.dashboard.applicationReviews.unknownForm')}</span>
 								</div>
 							</div>
 
@@ -252,11 +257,11 @@ export default function ApplicationReviews() {
 								{getStatusBadge(app.status)}
 								{app.status === 'pending' ? (
 									<span className="flex items-center gap-1.5 text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
-										<Clock className="w-3 h-3" /> Needs Review
+										<Clock className="w-3 h-3" /> {t('admin.dashboard.applicationReviews.needsReview')}
 									</span>
 								) : (
 									<span className="flex items-center gap-1 text-xs text-(--text-muted)">
-										<Check className="w-3 h-3 text-emerald-500" /> Reviewed
+										<Check className="w-3 h-3 text-emerald-500" /> {t('admin.dashboard.applicationReviews.reviewed')}
 									</span>
 								)}
 							</div>
@@ -267,8 +272,8 @@ export default function ApplicationReviews() {
 				{!isLoading && applications.length === 0 && (
 					<div className="col-span-full py-20 flex flex-col items-center justify-center text-(--text-muted) border-2 border-dashed border-(--border)/20 rounded-[3rem]">
 						<ShieldAlert className="w-12 h-12 mb-4 opacity-20" />
-						<h3 className="text-lg font-semibold">No Applications Found</h3>
-						<p className="text-sm opacity-80">There are no applications waiting for review.</p>
+						<h3 className="text-lg font-semibold">{t('admin.dashboard.applicationReviews.noApplicationsFound')}</h3>
+						<p className="text-sm opacity-80">{t('admin.dashboard.applicationReviews.noApplicationsWaiting')}</p>
 					</div>
 				)}
 			</div>
@@ -297,9 +302,13 @@ export default function ApplicationReviews() {
 									</div>
 									<div className="flex flex-col">
 										<span className="text-xl font-bold text-(--text)">
-											{selectedApp.ownerId === 'anonymous' ? 'Anonymous User' : appUsers[selectedApp.ownerId]?.name || 'Unknown User'}
+											{selectedApp.ownerId === 'anonymous'
+												? t('admin.dashboard.applicationReviews.anonymousUser')
+												: appUsers[selectedApp.ownerId]?.name || t('admin.dashboard.applicationReviews.unknownUser')}
 										</span>
-										<span className="text-sm text-(--accent) font-medium">{appConfigs[selectedApp.targetId]?.name || 'Unknown Application'}</span>
+										<span className="text-sm text-(--accent) font-medium">
+											{appConfigs[selectedApp.targetId]?.name || t('admin.dashboard.applicationReviews.unknownApplication')}
+										</span>
 									</div>
 								</div>
 								<button onClick={closeModal} className="p-2 rounded-full hover:bg-(--border)/10 text-(--text-muted) hover:text-(--text) transition-colors">
@@ -309,10 +318,12 @@ export default function ApplicationReviews() {
 
 							<div className="flex-1 overflow-y-auto px-8 py-8 flex flex-col gap-8 custom-scrollbar">
 								<div className="flex flex-col gap-6">
-									<h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-widest border-b border-(--border)/10 pb-2">Form Responses</h3>
+									<h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-widest border-b border-(--border)/10 pb-2">
+										{t('admin.dashboard.applicationReviews.formResponses')}
+									</h3>
 
 									{!appConfigs[selectedApp.targetId] ? (
-										<p className="text-sm text-red-400 italic">Error: Original application form configuration not found.</p>
+										<p className="text-sm text-red-400 italic">{t('admin.dashboard.applicationReviews.errorConfigNotFound')}</p>
 									) : (
 										appConfigs[selectedApp.targetId].questions?.map((q, idx) => (
 											<div key={q.id} className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
@@ -328,10 +339,12 @@ export default function ApplicationReviews() {
 																))}
 															</ul>
 														) : (
-															<span className="italic opacity-50">No options selected</span>
+															<span className="italic opacity-50">{t('admin.dashboard.applicationReviews.noOptionsSelected')}</span>
 														)
 													) : (
-														<span className="whitespace-pre-wrap">{selectedApp.data[q.id] || <span className="italic opacity-50">No answer provided</span>}</span>
+														<span className="whitespace-pre-wrap">
+															{selectedApp.data[q.id] || <span className="italic opacity-50">{t('admin.dashboard.applicationReviews.noAnswerProvided')}</span>}
+														</span>
 													)}
 												</div>
 											</div>
@@ -340,11 +353,11 @@ export default function ApplicationReviews() {
 								</div>
 
 								<div className="flex flex-col gap-3 pt-6 border-t border-(--border)/10">
-									<label className="text-sm font-bold text-(--text-muted) uppercase tracking-widest">Reviewer Notes (Optional)</label>
+									<label className="text-sm font-bold text-(--text-muted) uppercase tracking-widest">{t('admin.dashboard.applicationReviews.reviewerNotes')}</label>
 									<textarea
 										value={reviewNote}
 										onChange={(e) => setReviewNote(e.target.value)}
-										placeholder="Add a note to be sent to the applicant..."
+										placeholder={t('admin.dashboard.applicationReviews.addNotePlaceholder')}
 										className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 p-4 text-sm text-(--text) placeholder-(--text-muted) outline-none focus:border-(--accent) focus:ring-1 focus:ring-(--accent) min-h-[100px] resize-y transition-all"
 										disabled={isProcessing || selectedApp.status !== 'pending'}
 									/>
@@ -353,7 +366,7 @@ export default function ApplicationReviews() {
 
 							<div className="flex items-center justify-between px-8 py-6 border-t border-(--border)/10 bg-transparent">
 								<div className="flex items-center gap-3">
-									<span className="text-sm text-(--text-muted)">Current Status:</span>
+									<span className="text-sm text-(--text-muted)">{t('admin.dashboard.applicationReviews.currentStatus')}</span>
 									{getStatusBadge(selectedApp.status)}
 								</div>
 
@@ -364,7 +377,7 @@ export default function ApplicationReviews() {
 											disabled={isProcessing}
 											className="px-6 py-2.5 rounded-xl text-sm font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-colors disabled:opacity-50"
 										>
-											Deny
+											{t('admin.dashboard.applicationReviews.deny')}
 										</button>
 										<button
 											onClick={() => handleAction('approved')}
@@ -372,7 +385,7 @@ export default function ApplicationReviews() {
 											className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-(--accent) hover:opacity-90 shadow-lg shadow-(--accent)/20 transition-all disabled:opacity-50"
 										>
 											{isProcessing && <Loader2 className="w-4 h-4 animate-spin" />}
-											Approve & Assign Role
+											{t('admin.dashboard.applicationReviews.approveAssignRole')}
 										</button>
 									</div>
 								)}

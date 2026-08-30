@@ -316,7 +316,7 @@ export default function Home() {
 				</h3>
 				{bots.length > 0 && (
 					<Link href={`/bots?category=${category}`} className="text-sm font-bold text-(--accent) hover:text-(--accent)/80 transition-colors flex items-center gap-1 group">
-						View All <ChevronUp className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
+						{t('app.home.text1')} <ChevronUp className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
 					</Link>
 				)}
 			</div>
@@ -343,7 +343,7 @@ export default function Home() {
 				</h3>
 				{servers.length > 0 && (
 					<Link href={`/servers?category=${category}`} className="text-sm font-bold text-(--accent) hover:text-(--accent)/80 transition-colors flex items-center gap-1 group">
-						View All <ChevronUp className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
+						{t('app.home.text1')} <ChevronUp className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
 					</Link>
 				)}
 			</div>
@@ -369,7 +369,7 @@ export default function Home() {
 					{t('app.home.text3')}
 					<br />
 					<span className="text-(--accent) drop-shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_30%,transparent)]">
-						{t('app.home.text4')} {context === 'bots' ? 'Bots' : 'Servers'}
+						{t('app.home.text4')} {context === 'bots' ? t('app.home.heroBots') : t('app.home.heroServers')}
 					</span>
 				</h2>
 				<p className="max-w-2xl text-xl text-(--text-muted) font-medium transition-all duration-500">{t('app.home.text5')}</p>
@@ -405,7 +405,7 @@ export default function Home() {
 						<Input
 							variant="search"
 							shortcut="/"
-							placeholder={`Search for ${context}...`}
+							placeholder={context === 'bots' ? t('app.home.searchBots') : t('app.home.searchServers')}
 							onSearch={(val) => {
 								if (val.trim()) router.push(`/${context}?search=${encodeURIComponent(val.trim())}`);
 							}}
@@ -444,16 +444,17 @@ export default function Home() {
 					categorizedServers ? (
 						<div className="flex flex-col">
 							{/* Promoted Section (Only renders if there are promoted servers) */}
-							{categorizedServers.promoted?.length > 0 && renderServerCategoryGrid('Promoted', <Flame className="w-8 h-8 text-(--accent)" />, categorizedServers.promoted, 'promoted')}
+							{categorizedServers.promoted?.length > 0 &&
+								renderServerCategoryGrid(t('app.categories.promoted'), <Flame className="w-8 h-8 text-(--accent)" />, categorizedServers.promoted, 'promoted')}
 
 							{/* Top Voted Section */}
-							{renderServerCategoryGrid('Top Voted', <ChevronUp className="w-8 h-8 text-(--accent)" />, categorizedServers.topVoted || [], 'top_voted')}
+							{renderServerCategoryGrid(t('app.categories.topVoted'), <ChevronUp className="w-8 h-8 text-(--accent)" />, categorizedServers.topVoted || [], 'top_voted')}
 
 							{/* Biggest Servers Section */}
-							{renderServerCategoryGrid('Biggest Communities', <Users className="w-8 h-8 text-(--accent)" />, categorizedServers.biggest || [], 'biggest')}
+							{renderServerCategoryGrid(t('app.categories.biggestServers'), <Users className="w-8 h-8 text-(--accent)" />, categorizedServers.biggest || [], 'biggest')}
 
 							{/* Newcomers Section */}
-							{renderServerCategoryGrid('Newcomers', <Sparkles className="w-8 h-8 text-(--accent)" />, categorizedServers.newcomers || [], 'newcomers')}
+							{renderServerCategoryGrid(t('app.categories.newcomers'), <Sparkles className="w-8 h-8 text-(--accent)" />, categorizedServers.newcomers || [], 'newcomers')}
 						</div>
 					) : (
 						<div className="flex flex-col items-center justify-center py-32 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/50">
@@ -464,16 +465,17 @@ export default function Home() {
 				) : categorizedBots ? (
 					<div className="flex flex-col">
 						{/* Promoted Section (Only renders if there are promoted bots) */}
-						{categorizedBots.promoted?.length > 0 && renderBotCategoryGrid('Promoted', <Flame className="w-8 h-8 text-(--accent)" />, categorizedBots.promoted, 'promoted')}
+						{categorizedBots.promoted?.length > 0 &&
+							renderBotCategoryGrid(t('app.categories.promoted'), <Flame className="w-8 h-8 text-(--accent)" />, categorizedBots.promoted, 'promoted')}
 
 						{/* Top Voted Section */}
-						{renderBotCategoryGrid('Top Voted', <ChevronUp className="w-8 h-8 text-(--accent)" />, categorizedBots.topVoted || [], 'top_voted')}
+						{renderBotCategoryGrid(t('app.categories.topVoted'), <ChevronUp className="w-8 h-8 text-(--accent)" />, categorizedBots.topVoted || [], 'top_voted')}
 
 						{/* Biggest Bots Section */}
-						{renderBotCategoryGrid('Biggest on Platform', <Trophy className="w-8 h-8 text-(--accent)" />, categorizedBots.biggest || [], 'biggest')}
+						{renderBotCategoryGrid(t('app.categories.biggestBots'), <Trophy className="w-8 h-8 text-(--accent)" />, categorizedBots.biggest || [], 'biggest')}
 
 						{/* Newcomers Section */}
-						{renderBotCategoryGrid('Newcomers', <Sparkles className="w-8 h-8 text-(--accent)" />, categorizedBots.newcomers || [], 'newcomers')}
+						{renderBotCategoryGrid(t('app.categories.newcomers'), <Sparkles className="w-8 h-8 text-(--accent)" />, categorizedBots.newcomers || [], 'newcomers')}
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-32 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/50">

@@ -8,6 +8,7 @@ import {
 	EnvironmentProvider,
 	NotificationProvider,
 	PlatformProvider,
+	PermissionProvider,
 	ShortcutsProvider,
 	SidebarProvider,
 	SupportProvider,
@@ -59,21 +60,23 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 							<PlatformProvider>
 								<ThemeProvider>
 									<UserProvider>
-										<NotificationProvider>
-											<DispatchProvider>
-												<ShortcutsProvider>
-													<CookieProvider>
-														<CookiePrompt />
-														<TermsPrompt />
-														<SidebarProvider>
-															<SupportProvider>
-																<Page>{children}</Page>
-															</SupportProvider>
-														</SidebarProvider>
-													</CookieProvider>
-												</ShortcutsProvider>
-											</DispatchProvider>
-										</NotificationProvider>
+										<PermissionProvider>
+											<NotificationProvider>
+												<DispatchProvider>
+													<ShortcutsProvider>
+														<CookieProvider>
+															<CookiePrompt />
+															<TermsPrompt />
+															<SidebarProvider>
+																<SupportProvider>
+																	<Page>{children}</Page>
+																</SupportProvider>
+															</SidebarProvider>
+														</CookieProvider>
+													</ShortcutsProvider>
+												</DispatchProvider>
+											</NotificationProvider>
+										</PermissionProvider>
 									</UserProvider>
 								</ThemeProvider>
 							</PlatformProvider>

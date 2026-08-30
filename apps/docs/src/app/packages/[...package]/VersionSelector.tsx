@@ -1,12 +1,15 @@
 /** @format */
+// Force recompile
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { Selector } from '@xernerx/ui';
 import { Box } from 'lucide-react';
+import { useDictionary } from '@xernerx/providers';
 
 export function VersionSelector({ versions, currentVersion, pkgName }: { versions: string[]; currentVersion: string; pkgName: string }) {
 	const router = useRouter();
+	const { t } = useDictionary();
 
 	const options = versions.map((v) => ({
 		value: v,
@@ -18,7 +21,7 @@ export function VersionSelector({ versions, currentVersion, pkgName }: { version
 			<div className="p-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-500 shadow-sm shrink-0">
 				<Box size={20} />
 			</div>
-			<Selector value={currentVersion} options={options} onChange={(value) => router.push(`/packages/${pkgName}/${value}`)} placeholder="Select version..." />
+			<Selector value={currentVersion} options={options} onChange={(value) => router.push(`/packages/${pkgName}/${value}`)} placeholder={t('docs.packages.details.selectVersion')} />
 		</div>
 	);
 }

@@ -62,8 +62,8 @@ export default function DashboardPage() {
 		show();
 
 		const staticItems = [
-			{ label: 'Explore', href: '/', icon: Compass as any, category: 'Navigation' },
-			{ label: 'Portal', href: '/portal', icon: Building2 as any, category: 'Navigation' },
+			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass as any, category: t('app.dashboard.categories.navigation') },
+			{ label: t('app.dashboard.nav.portal'), href: '/portal', icon: Building2 as any, category: t('app.dashboard.categories.navigation') },
 		];
 
 		// Populate static items immediately so they aren't blocked by the fetch or StrictMode
@@ -110,7 +110,7 @@ export default function DashboardPage() {
 					...managedGuilds.map((g) => ({
 						label: g.name,
 						onClick: () => setSelectedGuild(g),
-						category: 'Servers',
+						category: t('app.dashboard.categories.servers'),
 						icon: g.iconUrl
 							? () => <img src={g.iconUrl!} alt={g.name} className="w-5 h-5 rounded-full object-cover" />
 							: () => <div className="w-5 h-5 rounded-full bg-(--foreground) flex items-center justify-center text-[10px]">{g.name.charAt(0)}</div>,
@@ -302,9 +302,9 @@ export default function DashboardPage() {
 									activeTab={activeTab}
 									onChange={setActiveTab}
 									tabs={[
-										{ id: 'info', label: 'Info' },
-										{ id: 'stats', label: 'Stats' },
-										{ id: 'settings', label: 'Settings' },
+										{ id: 'info', label: t('app.dashboard.tabs.info') },
+										{ id: 'stats', label: t('app.dashboard.tabs.stats') },
+										{ id: 'settings', label: t('app.dashboard.tabs.settings') },
 									]}
 								/>
 
@@ -352,7 +352,7 @@ export default function DashboardPage() {
 												<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
 													<Server className="w-8 h-8" />
 												</div>
-												<h3 className="text-xl font-extrabold text-(--text) mb-2">Bot Not Connected</h3>
+												<h3 className="text-xl font-extrabold text-(--text) mb-2">{t('app.dashboard.botNotConnected')}</h3>
 												<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.text3')}</p>
 											</div>
 										)}
@@ -578,7 +578,7 @@ export default function DashboardPage() {
 												<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
 													<Server className="w-8 h-8" />
 												</div>
-												<h3 className="text-xl font-extrabold text-(--text) mb-2">Bot Not Connected</h3>
+												<h3 className="text-xl font-extrabold text-(--text) mb-2">{t('app.dashboard.botNotConnected')}</h3>
 												<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.text3')}</p>
 											</div>
 										)}

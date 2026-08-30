@@ -1,7 +1,8 @@
 /** @format */
+// Force recompile
 'use client';
 
-import { useEnvironment, useToast, usePermissions } from '@xernerx/providers';
+import { useEnvironment, useToast, usePermissions, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Modal, Input, Selector } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
@@ -9,6 +10,7 @@ import { Trash, Upload, ExternalLink, Settings, Plus, X, User as UserIcon, Users
 
 export default function Media() {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 	const { toast } = useToast();
 	const { hasPermission } = usePermissions();
 	const canManage = hasPermission('manageMedia');
@@ -58,10 +60,10 @@ export default function Media() {
 				setEditMedia({ ...editMedia, shared: newShared });
 				setSharedInput('');
 			} else {
-				toast({ type: 'error', title: 'Discord User Not Found' });
+				toast({ type: 'error', title: t('admin.dashboard.media.toasts.userNotFound') });
 			}
 		} catch {
-			toast({ type: 'error', title: 'Failed to fetch user' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.fetchUserFailed') });
 		} finally {
 			setLoadingProfile(false);
 		}
@@ -82,7 +84,7 @@ export default function Media() {
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Error fetching media' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.fetchMediaFailed') });
 		} finally {
 			setLoading(false);
 		}
@@ -109,14 +111,14 @@ export default function Media() {
 			});
 
 			if (res.ok) {
-				toast({ type: 'success', title: 'Uploaded successfully!' });
+				toast({ type: 'success', title: t('admin.dashboard.media.toasts.uploadSuccess') });
 				fetchMedia();
 			} else {
 				throw new Error('Upload failed');
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Failed to upload media' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.uploadFailed') });
 		} finally {
 			setUploading(false);
 			e.target.value = '';
@@ -124,7 +126,7 @@ export default function Media() {
 	};
 
 	const handleDelete = async (id: string) => {
-		if (!confirm('Are you sure you want to delete this media?')) return;
+		if (!confirm(t('admin.dashboard.media.toasts.deleteConfirm'))) return;
 
 		try {
 			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/media/${id}`), {
@@ -132,14 +134,14 @@ export default function Media() {
 				credentials: 'include',
 			});
 			if (res.ok) {
-				toast({ type: 'success', title: 'Deleted media' });
+				toast({ type: 'success', title: t('admin.dashboard.media.toasts.deleteSuccess') });
 				setMedia(media.filter((m) => m._id !== id));
 			} else {
 				throw new Error('Delete failed');
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Failed to delete media' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.deleteFailed') });
 		}
 	};
 
@@ -159,7 +161,7 @@ export default function Media() {
 
 			if (res.ok) {
 				const data = await res.json();
-				toast({ type: 'success', title: 'Media updated!' });
+				toast({ type: 'success', title: t('admin.dashboard.media.toasts.updateSuccess') });
 				setMedia(media.map((m) => (m._id === editMedia._id ? data.media : m)));
 				setEditMedia(null);
 			} else {
@@ -167,7 +169,7 @@ export default function Media() {
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Failed to update media metadata' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.updateFailed') });
 		} finally {
 			setSaving(false);
 		}
@@ -179,8 +181,8 @@ export default function Media() {
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-2xl font-bold">Media Library</h1>
-					<p className="text-(--text-muted) text-sm mt-1">Manage and view your uploaded media.</p>
+					<h1 className="text-2xl font-bold">{t('admin.dashboard.media.title')}</h1>
+					<p className="text-(--text-muted) text-sm mt-1">{t('admin.dashboard.media.subtitle')}</p>
 				</div>
 				<div className="flex items-center gap-3">
 					{(canUpload || canManage) && (
@@ -188,7 +190,7 @@ export default function Media() {
 							<input type="file" id="media-upload" className="hidden" onChange={handleUpload} disabled={uploading} />
 							<label htmlFor="media-upload">
 								<Button variant="primary" loading={uploading} style={{ pointerEvents: 'none' }}>
-									<Upload size={16} /> Upload Media
+									<Upload size={16} /> {t('admin.dashboard.media.uploadButton')}
 								</Button>
 							</label>
 						</div>
@@ -241,7 +243,7 @@ export default function Media() {
 						</div>
 					</div>
 				))}
-				{media.length === 0 && <div className="col-span-full py-12 text-center text-(--text-muted)">No media found.</div>}
+				{media.length === 0 && <div className="col-span-full py-12 text-center text-(--text-muted)">{t('admin.dashboard.media.noMedia')}</div>}
 			</div>
 
 			{editMedia && (
@@ -250,19 +252,19 @@ export default function Media() {
 					onOpenChange={(open) => {
 						if (!open) setEditMedia(null);
 					}}
-					title="Edit Media Metadata"
-					description={`Editing metadata for ${editMedia.filename}`}
+					title={t('admin.dashboard.media.editMetadata')}
+					description={`${t('admin.dashboard.media.editingMetadata')}${editMedia.filename}`}
 				>
 					<div className="space-y-4">
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm font-medium text-(--text)">Privacy Level</label>
+							<label className="text-sm font-medium text-(--text)">{t('admin.dashboard.media.privacyLevel')}</label>
 							<Selector
 								value={editMedia.privacy}
 								onChange={(v: string) => setEditMedia({ ...editMedia, privacy: v })}
 								options={[
-									{ label: 'Public', value: 'public' },
-									{ label: 'Limited', value: 'limited' },
-									{ label: 'Private', value: 'private' },
+									{ label: t('admin.dashboard.media.public'), value: 'public' },
+									{ label: t('admin.dashboard.media.limited'), value: 'limited' },
+									{ label: t('admin.dashboard.media.private'), value: 'private' },
 								]}
 							/>
 						</div>
@@ -270,12 +272,12 @@ export default function Media() {
 						{editMedia.privacy === 'private' && (
 							<div className="flex flex-col gap-3 border border-(--border)/10 rounded-2xl p-4 bg-(--foreground)/30">
 								<div>
-									<h4 className="text-sm font-semibold text-(--text)">Shared Users</h4>
-									<p className="text-xs text-(--text-muted) mt-1">Add Discord User IDs who can view this private file.</p>
+									<h4 className="text-sm font-semibold text-(--text)">{t('admin.dashboard.media.sharedUsers')}</h4>
+									<p className="text-xs text-(--text-muted) mt-1">{t('admin.dashboard.media.addSharedUsersDesc')}</p>
 								</div>
 								<div className="flex gap-2 items-center">
 									<Input
-										placeholder="e.g. 123456789012345678"
+										placeholder={t('admin.dashboard.media.placeholder') || 'e.g. 123456789012345678'}
 										value={sharedInput}
 										onChange={(e) => setSharedInput(e.target.value)}
 										onKeyDown={(e) => {
@@ -305,7 +307,9 @@ export default function Media() {
 															</div>
 														)}
 														<div className="flex flex-col overflow-hidden">
-															<span className="text-sm font-medium text-(--text) truncate">{profile?.global_name || profile?.username || 'Unknown User'}</span>
+															<span className="text-sm font-medium text-(--text) truncate">
+																{profile?.global_name || profile?.username || t('admin.dashboard.media.unknownUser')}
+															</span>
 															<span className="text-[10px] font-mono text-(--text-muted) truncate">{id}</span>
 														</div>
 													</div>

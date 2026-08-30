@@ -35,11 +35,11 @@ export default function Home() {
 				const data = await res.json();
 				setUploadedUrl(data.url);
 			} else {
-				alert('Upload failed. Ensure you are logged in and have permission.');
+				alert(t('cdn.home.errors.uploadFailed'));
 			}
 		} catch (err) {
 			console.error(err);
-			alert('Failed to upload file');
+			alert(t('cdn.home.errors.generic'));
 		} finally {
 			setUploading(false);
 			e.target.value = '';
@@ -63,7 +63,7 @@ export default function Home() {
 							{t('cdn.common.description', 'Xernerx content delivery network and asset storage service.')}
 							<br />
 							<br />
-							This service securely routes, accelerates, and caches content for the entire ecosystem.
+							{t('cdn.home.description2')}
 						</p>
 
 						<div className="flex flex-wrap items-center gap-4 mb-8">
@@ -72,14 +72,14 @@ export default function Home() {
 								href={getEnvUrl('https://account.xernerx.com')}
 								className="px-8 py-4 rounded-2xl bg-(--accent) text-white font-bold text-sm hover:opacity-90 transition-all shadow-[0_0_40px_-10px_var(--accent)] hover:shadow-[0_0_60px_-15px_var(--accent)] hover:-translate-y-1"
 							>
-								Manage Media
+								{t('cdn.home.manage')}
 							</a>
 							<a
 								suppressHydrationWarning
 								href={getEnvUrl('https://docs.xernerx.com/cdn')}
 								className="px-8 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md hover:-translate-y-1"
 							>
-								Documentation
+								{t('cdn.home.docs')}
 							</a>
 						</div>
 
@@ -90,12 +90,12 @@ export default function Home() {
 								transition={{ delay: 0.5 }}
 								className="max-w-md bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-6 rounded-2xl"
 							>
-								<h4 className="font-bold text-sm text-(--text) uppercase tracking-wider mb-4">Direct Upload</h4>
+								<h4 className="font-bold text-sm text-(--text) uppercase tracking-wider mb-4">{t('cdn.home.directUpload')}</h4>
 								<div className="flex flex-col items-start gap-4">
 									<input type="file" id="cdn-upload" className="hidden" onChange={handleUpload} disabled={uploading} />
 									<label htmlFor="cdn-upload">
 										<Button variant="primary" loading={uploading} style={{ pointerEvents: 'none' }}>
-											<Upload size={16} /> Upload Media
+											<Upload size={16} /> {t('cdn.home.uploadMedia')}
 										</Button>
 									</label>
 
