@@ -18,7 +18,7 @@ export const permissions: PermissionDefinition[] = [
 		key: 'users',
 		label: 'Manage Users',
 		description: 'Permission to view, update, and delete platform users.',
-		defaultValue: true,
+		defaultValue: false,
 	},
 	{
 		key: 'roles',
@@ -60,6 +60,24 @@ export const permissions: PermissionDefinition[] = [
 		key: 'invites',
 		label: 'Manage Invites',
 		description: 'Permission to configure public Discord bot invite URLs.',
+		defaultValue: false,
+	},
+	{
+		key: 'announcements',
+		label: 'Manage Announcements',
+		description: 'Permission to create, edit, and publish platform announcements.',
+		defaultValue: false,
+	},
+	{
+		key: 'manageMedia',
+		label: 'Manage Media',
+		description: 'Permission to view, edit, and delete all media files on the CDN.',
+		defaultValue: false,
+	},
+	{
+		key: 'uploadMedia',
+		label: 'Upload Media',
+		description: 'Permission to upload media and manage own media files on the CDN.',
 		defaultValue: false,
 	},
 ];

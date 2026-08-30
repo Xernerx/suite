@@ -12,3 +12,4 @@ export * from './src/CollapsibleCard';
 export * from './src/Input';
 export * from './src/MultiSelector';
 export * from './src/Tabs';
+export * from './src/CodeBlock';

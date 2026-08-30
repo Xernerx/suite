@@ -40,11 +40,17 @@
 				"github": "GitHub",
 				"npm": "npm",
 				"documentation": "Documentatie",
-				"discord": "Discord"
-			}
+				"discord": "Discord",
+				"faq": "Veel Gestelde Vragen"
+			},
+			"title": "Xernerx Studios",
+			"description": "© 2024 -",
+			"description2": "Xernerx Studios"
 		},
 		"sidebar": {
-			"login": "Inloggen"
+			"login": "Inloggen",
+			"alt": "Gebruiker Avatar",
+			"alt2": "Avatar Decoratie"
 		},
 		"nav": {
 			"categories": {
@@ -54,7 +60,9 @@
 				"developer": "Ontwikkelaar",
 				"moderator": "Moderator",
 				"administrator": "Administrator",
-				"translator": "Vertaler"
+				"translator": "Vertaler",
+				"xernerxSuite": "Xernerx Suite",
+				"system": "Systeem"
 			},
 			"items": {
 				"account": "Account",
@@ -69,8 +77,41 @@
 				"store": "Winkel",
 				"users": "Gebruikers",
 				"roles": "Rollen",
-				"translations": "Vertalingen"
+				"translations": "Vertalingen",
+				"applications": "Applicaties",
+				"settings": "Instellingen",
+				"environments": "Omgevingen"
 			}
+		},
+		"buttons": {
+			"cancel": "Annuleren",
+			"confirm": "Bevestigen",
+			"proceed": "Doorgaan"
+		},
+		"shortcuts": {
+			"modal": {
+				"navigation": {
+					"empty": "Geen applicaties beschikbaar."
+				}
+			}
+		},
+		"botrow": {
+			"description": "Servers",
+			"description2": "Gebruikers"
+		},
+		"sidebarnotifications": {
+			"description": "Notificaties",
+			"button2": "Alles gelezen",
+			"description2": "Nog geen notificaties",
+			"button3": "Afwijzen",
+			"button4": "Accepteren",
+			"tooltip": "Notificatie Verwijderen",
+			"tooltip2": "Alles Markeren als Ongelezen",
+			"button5": "Link Openen",
+			"button6": "Sluiten"
+		},
+		"sidebarsuite": {
+			"description": "Suite"
 		}
 	},
 	"api": {

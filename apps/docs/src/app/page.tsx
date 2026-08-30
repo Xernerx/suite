@@ -1,75 +1,55 @@
 /** @format */
 'use client';
 
-import { Book, Code, CreditCard, Key, Rocket, Search, Shield, Webhook } from 'lucide-react';
+import { Book, Code, Globe, Package, Rocket, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { useDictionary } from '@xernerx/providers';
+import { useEffect, useState } from 'react';
+import { useDictionary, useSidebar } from '@xernerx/providers';
+
 const categories = [
 	{
-		title: 'Getting Started',
-		description: 'Learn the basics, setup your environment, and make your first API request.',
-		icon: Rocket,
-		href: '/docs/getting-started',
+		title: 'REST API',
+		description: 'Comprehensive documentation for the Xernerx HTTP API. Learn how to authenticate, interact with databases, and utilize core microservices securely.',
+		icon: Globe,
+		href: '/api',
 		color: 'text-blue-500',
 		bg: 'bg-blue-500/10',
 	},
 	{
-		title: 'Core API',
-		description: 'Comprehensive references for all Core API endpoints and data models.',
-		icon: Code,
-		href: '/docs/core-api',
-		color: 'text-emerald-500',
-		bg: 'bg-emerald-500/10',
-	},
-	{
-		title: 'Authentication',
-		description: 'Manage users, OAuth2 flows, and secure your applications.',
-		icon: Key,
-		href: '/docs/authentication',
-		color: 'text-amber-500',
-		bg: 'bg-amber-500/10',
-	},
-	{
-		title: 'Billing & Subscriptions',
-		description: 'Integrate Stripe, manage products, and handle user subscriptions.',
-		icon: CreditCard,
-		href: '/docs/billing',
+		title: 'CDN Services',
+		description: 'Documentation for the Xernerx Content Delivery Network. Discover how to programmatically upload, retrieve, and manage distributed media assets.',
+		icon: Rocket,
+		href: '/cdn',
 		color: 'text-purple-500',
 		bg: 'bg-purple-500/10',
 	},
 	{
-		title: 'Admin & Roles',
-		description: 'Configure RBAC, synchronize Discord roles, and manage permissions.',
-		icon: Shield,
-		href: '/docs/admin',
-		color: 'text-rose-500',
-		bg: 'bg-rose-500/10',
-	},
-	{
-		title: 'Webhooks',
-		description: 'Listen to real-time events and automate workflows across your apps.',
-		icon: Webhook,
-		href: '/docs/webhooks',
-		color: 'text-cyan-500',
-		bg: 'bg-cyan-500/10',
+		title: 'NPM Packages',
+		description: 'Guides and references for the open-source Xernerx Developer Software suite, including frameworks, libraries, and utilities.',
+		icon: Package,
+		href: '/packages',
+		color: 'text-emerald-500',
+		bg: 'bg-emerald-500/10',
 	},
 ];
+
 export default function DocsHome() {
 	const { t } = useDictionary();
+	const { hide } = useSidebar();
 	const [searchQuery, setSearchQuery] = useState('');
+
+	useEffect(() => {
+		hide();
+	}, [hide]);
+
 	return (
 		<div
-			className="flex flex-col min-h-screen w-full relative overflow-hidden"
+			className="flex flex-col min-h-[85vh] w-full relative overflow-hidden"
 			style={{
 				padding: 'calc(var(--ui-gap) * 2)',
 				gap: 'calc(var(--ui-gap) * 3)',
 			}}
 		>
-			{/* Background Glows */}
-			<div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-(--accent) rounded-full blur-[150px] opacity-10 pointer-events-none" />
-			<div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-purple-500 rounded-full blur-[150px] opacity-10 pointer-events-none" />
-
 			{/* Hero Section */}
 			<motion.div
 				initial={{
@@ -84,14 +64,14 @@ export default function DocsHome() {
 					duration: 0.5,
 					ease: 'easeOut',
 				}}
-				className="flex flex-col items-center text-center max-w-3xl mx-auto mt-10 z-10"
+				className="flex flex-col items-center text-center max-w-3xl mx-auto mt-16 z-10"
 				style={{
 					gap: 'var(--ui-gap)',
 				}}
 			>
 				<div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-(--accent)/20 bg-(--accent)/5 text-(--accent) text-xs font-bold uppercase tracking-wider mb-2 shadow-sm">
 					<Book size={14} />
-					<span>{t('docs.common.description')}</span>
+					<span>Official Documentation</span>
 				</div>
 				<h1
 					className="text-5xl md:text-6xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
@@ -99,13 +79,14 @@ export default function DocsHome() {
 						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
-					{t('docs.common.title')}
-					<span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-purple-500">{t('docs.common.description2')}</span>?
+					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-purple-500">Suite Docs</span>
 				</h1>
-				<p className="text-base text-(--text-muted) max-w-xl leading-relaxed mt-2">{t('docs.common.description3')}</p>
+				<p className="text-base text-(--text-muted) max-w-xl leading-relaxed mt-2">
+					Explore guides, API references, and tutorials to help you integrate with the Xernerx Ecosystem seamlessly.
+				</p>
 
 				{/* Search Bar */}
-				<div className="w-full max-w-2xl mt-6 relative group">
+				<div className="w-full max-w-2xl mt-8 relative group">
 					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-purple-500 rounded-3xl blur-md opacity-20 group-hover:opacity-40 transition duration-500" />
 					<div className="relative flex items-center w-full rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl transition-all duration-300 focus-within:border-(--accent)/50 focus-within:bg-(--foreground)/50">
 						<Search size={22} className="absolute left-6 text-(--text-muted) group-focus-within:text-(--accent) transition-colors" />
@@ -113,7 +94,7 @@ export default function DocsHome() {
 							type="text"
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							placeholder={t('docs.common.placeholder')}
+							placeholder="Search documentation, guides, and references..."
 							className="w-full bg-transparent border-none text-(--text) placeholder:text-(--text-muted) focus:outline-none focus:ring-0 text-base"
 							style={{
 								padding: 'calc(var(--ui-gap) * 1.5) calc(var(--ui-gap) * 1.5) calc(var(--ui-gap) * 1.5) 4rem',
@@ -125,33 +106,11 @@ export default function DocsHome() {
 
 			{/* Categories Grid */}
 			<div
-				className="max-w-6xl mx-auto w-full z-10 flex flex-col"
+				className="max-w-5xl mx-auto w-full z-10 flex flex-col mt-8"
 				style={{
 					gap: 'calc(var(--ui-gap) * 1.5)',
 				}}
 			>
-				<motion.h2
-					initial={{
-						opacity: 0,
-						x: -20,
-					}}
-					animate={{
-						opacity: 1,
-						x: 0,
-					}}
-					transition={{
-						duration: 0.5,
-						delay: 0.2,
-						ease: 'easeOut',
-					}}
-					className="text-2xl font-bold text-(--text)"
-					style={{
-						fontFamily: 'var(--font-fredoka)',
-					}}
-				>
-					{t('docs.common.title2')}
-				</motion.h2>
-
 				<motion.div
 					initial="hidden"
 					animate="visible"
@@ -167,9 +126,9 @@ export default function DocsHome() {
 							},
 						},
 					}}
-					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full"
+					className="grid grid-cols-1 md:grid-cols-3 w-full"
 					style={{
-						gap: 'var(--ui-gap)',
+						gap: 'calc(var(--ui-gap) * 1.5)',
 					}}
 				>
 					{categories.map((category, idx) => (
@@ -188,21 +147,21 @@ export default function DocsHome() {
 							}}
 							className="group flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer overflow-hidden relative"
 							style={{
-								padding: 'calc(var(--ui-gap) * 1.5)',
+								padding: 'calc(var(--ui-gap) * 2)',
 								gap: 'var(--ui-gap)',
 							}}
 						>
 							{/* Subtle background gradient on hover */}
 							<div className="absolute inset-0 bg-gradient-to-br from-transparent to-(--border)/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-							<div className="flex items-center gap-4 relative z-10">
+							<div className="flex flex-col gap-4 relative z-10">
 								<div
-									className={`flex h-14 w-14 items-center justify-center rounded-2xl ${category.bg} ${category.color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-inner`}
+									className={`flex h-16 w-16 items-center justify-center rounded-2xl ${category.bg} ${category.color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-inner`}
 								>
-									<category.icon size={28} />
+									<category.icon size={32} />
 								</div>
 								<h3
-									className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors"
+									className="text-2xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mt-2"
 									style={{
 										fontFamily: 'var(--font-fredoka)',
 									}}
@@ -210,7 +169,7 @@ export default function DocsHome() {
 									{category.title}
 								</h3>
 							</div>
-							<p className="text-sm text-(--text-muted) leading-relaxed relative z-10">{category.description}</p>
+							<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{category.description}</p>
 						</motion.a>
 					))}
 				</motion.div>

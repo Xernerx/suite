@@ -1,5 +1,39 @@
 # docs
 
+## 1.0.1
+
+### Patch Changes
+
+- Fixed type errors
+
+## 1.0.0
+
+### Major Changes
+
+- ## Feature Updates & UI Polish
+    - **Store Overhaul**: Redesigned the Consumer tab ecosystem in the Account Store to feature a side-by-side comparison of the new `Free` plan and the `Ultra` plan.
+    - **Dynamic Store Discounts**: The store's annual billing toggle now dynamically calculates exact savings margins based directly on live Stripe prices. The discount percentage natively responds to whichever ecosystem tab (Consumers vs Developers) is active.
+    - **Checkout Subtext**: Added a global disclaimer on the store page clarifying that locale prices and taxes are securely calculated at checkout.
+
+    ## Core Backend & Authorization
+    - **CDN Storage Quota Engine**: The `/upload` endpoint now strictly enforces dynamic storage quotas. Free tier users are hard-capped at 10 media uploads, while users with active subscriptions via Stripe bypass this constraint (up to 1,000).
+    - **Media Dashboard Isolation**: Heavily scoped the media query logic. The personal library view now completely filters out global public media, only returning media explicitly uploaded by or shared directly with the current user.
+
+    ## Bug Fixes
+    - **Upload Permissions Patch**: Changed the fallback default value of `uploadMedia` to `false` inside the permissions library, fixing a dangerous bug where zero-role accounts were mistakenly granted UI access to the upload buttons.
+    - **Typo Fixes**: Resolved an interpolation issue in the store rendering that caused `/mo` and `/yr` suffixes to double-slash in the Developer API tab.
+    - **CDN Crashing Fix**: Resolved a critical Turbopack compilation crash caused by variable redeclaration in the upload route that brought down the entire CDN server.
+    - **Unauthorized State**: Polished the 404 unauthorized fallback inside the CDN file viewer to intelligently handle login/redirect loops vs simple permission denials.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.4.0
+    - @xernerx/ui@0.3.0
+    - @xernerx/components@0.2.16
+    - @xernerx/providers@0.3.9
+    - @xernerx/feedback@0.0.17
+
 ## 0.2.17
 
 ### Patch Changes

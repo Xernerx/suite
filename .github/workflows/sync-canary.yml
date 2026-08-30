@@ -1,0 +1,38 @@
+name: Sync Canary Branch
+
+on:
+    push:
+        branches:
+            - dictionary
+
+jobs:
+    sync-branch:
+        name: Merge Dictionary to Canary
+        # Prevent infinite loops by skipping if the commit was made by the auto-sync bot
+        if: "!contains(github.event.head_commit.message, 'auto-sync canary into dictionary')"
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout Canary Branch
+              uses: actions/checkout@v4
+              with:
+                  ref: canary
+                  fetch-depth: 0
+
+            - name: Setup Git Identity
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Merge Dictionary into Canary
+              run: |
+                  # Fetch the latest dictionary branch
+                  git fetch origin dictionary
+
+                  # Merge dictionary into canary.
+                  # -X theirs ensures that if there's a conflict (e.g. translation data), the dictionary's changes win.
+                  git merge origin/dictionary -X theirs --allow-unrelated-histories -m "chore: auto-sync dictionary into canary"
+
+                  # Push back to canary
+                  git push origin HEAD:refs/heads/canary

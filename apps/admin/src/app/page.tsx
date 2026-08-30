@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone } from 'lucide-react';
+import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +16,7 @@ import Users from '@/components/Users';
 import Settings from '@/components/Settings';
 import Invites from '@/components/Invites';
 import Announcements from '@/components/Announcements';
+import Media from '@/components/Media';
 import { permissions } from '@xernerx/lib';
 import { Server } from 'lucide-react';
 
@@ -107,9 +108,21 @@ export default function Home() {
 		const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
 		const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
 		const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
-		const canAnnouncements = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
+		const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
+		const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
+		const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
+		const canMedia = canManageMedia || canUploadMedia;
 
 		const isServerSet = !!adminServerId;
+
+		if (canMedia) {
+			items.push({
+				category: 'Media',
+				label: 'Media Library',
+				view: 'media',
+				icon: Image,
+			});
+		}
 
 		if (canTranslations && isServerSet) {
 			items.push({
@@ -215,10 +228,14 @@ export default function Home() {
 	const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
 	const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
 	const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
-	const canAnnouncements = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
+	const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
+	const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
+	const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
+	const canMedia = canManageMedia || canUploadMedia;
 
 	const isServerSet = !!adminServerId;
 
+	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
 	if (canUsers && isServerSet) allowedViews.push('users');
 	if (canApplicationsReview && isServerSet) allowedViews.push('applications_review');
@@ -240,6 +257,7 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
+			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations />}
 			{activeView === 'users' && <Users />}
 			{activeView === 'applications_review' && <ApplicationReviews />}

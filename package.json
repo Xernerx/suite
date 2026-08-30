@@ -4,12 +4,12 @@
 	"type": "module",
 	"description": "Xernerx Suite",
 	"author": "Xernerx Studios",
-	"packageManager": "pnpm@11.20.0",
+	"packageManager": "pnpm@11.24.0",
 	"engines": {
 		"node": ">=20"
 	},
 	"scripts": {
-		"suite": "suite",
+		"suite": "npm link --prefix .xernerx/cli --silent && suite",
 		"dev": "suite dev",
 		"build": "suite build"
 	},

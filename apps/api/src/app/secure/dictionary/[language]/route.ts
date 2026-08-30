@@ -52,7 +52,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ languag
 
 	try {
 		const body = await req.json();
-		const updatedDictionary = body.dictionary || body;
+		const updatedDictionary = body;
 
 		const owner = process.env.GITHUB_REPO_OWNER; // e.g. your GitHub username or org
 		const repo = process.env.GITHUB_REPO_NAME; // e.g. your repository name

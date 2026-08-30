@@ -19,6 +19,77 @@ export default function Home() {
 	const containerRef = useRef<HTMLElement | null>(null);
 	const [ready, setReady] = useState(false);
 
+	const [dynamicPackages, setDynamicPackages] = useState<any[]>([
+		{
+			icon: <Package size={24} />,
+			title: 'REST API',
+			desc: 'Official documentation and endpoints for interacting with the Xernerx Suite via HTTP.',
+			link: 'https://docs.dev.xernerx.com/api',
+			tag: 'API',
+		},
+	]);
+
+	useEffect(() => {
+		fetch('https://api.github.com/repos/Xernerx/docs/git/trees/main?recursive=1')
+			.then((r) => r.json())
+			.then(async (data) => {
+				if (!data.tree) return;
+				const docsPaths = data.tree.filter((item: any) => item.path.startsWith('packages/') && item.path.endsWith('/docs.json'));
+				const packagesMap = new Set<string>();
+				for (const item of docsPaths) {
+					const pathParts = item.path.replace('packages/', '').replace('/docs.json', '').split('/');
+					pathParts.pop(); // remove version
+					packagesMap.add(pathParts.join('/'));
+				}
+				const pkgs = await Promise.all(
+					Array.from(packagesMap).map(async (name) => {
+						let desc = `Official documentation and references for the ${name} NPM package.`;
+
+						try {
+							const npmRes = await fetch(`https://registry.npmjs.org/${name}`);
+							if (npmRes.ok) {
+								const npmData = await npmRes.json();
+								let parsedDesc = npmData.description;
+
+								if (npmData.readme) {
+									const lines = npmData.readme.split('\n').map((l: string) => l.trim());
+									const aboutIndex = lines.findIndex((l: string) => l.toLowerCase() === '# about');
+									const searchLines = aboutIndex !== -1 ? lines.slice(aboutIndex + 1) : lines;
+
+									const firstRealLine = searchLines.find(
+										(l: string) =>
+											l.length > 0 && !l.startsWith('#') && !l.startsWith('<') && !l.startsWith('!') && !l.startsWith('[') && !l.startsWith('>') && !l.startsWith('<!--')
+									);
+
+									if (firstRealLine) {
+										parsedDesc = firstRealLine.replace(/\*|\_|\`/g, '');
+									}
+								}
+
+								if (parsedDesc && !parsedDesc.includes('<!-- @format -->')) {
+									desc = parsedDesc;
+								}
+							}
+						} catch (e) {
+							// ignore
+						}
+
+						return {
+							icon: <Boxes size={24} />,
+							title: name,
+							desc,
+							link: `https://docs.dev.xernerx.com/packages/${name}`,
+							tag: 'NPM Package',
+						};
+					})
+				);
+
+				// Keep the static API card and append dynamic packages
+				setDynamicPackages((prev) => [prev[0], ...pkgs]);
+			})
+			.catch(console.error);
+	}, []);
+
 	useEffect(() => {
 		containerRef.current = document.getElementById('main-scroll-container');
 		setReady(true);
@@ -28,7 +99,7 @@ export default function Home() {
 	const servicesX = useTransform(servicesProgress, [0, 1], ['0%', '-60%']);
 
 	const { scrollYProgress: softwareProgress } = useScroll(ready ? { target: softwareRef, container: containerRef } : {});
-	const softwareX = useTransform(softwareProgress, [0, 1], ['0%', '20%']); // Pans right
+	const softwareX = useTransform(softwareProgress, [0, 1], ['0%', '70%']); // Pans right much further to account for dynamic packages
 
 	useEffect(() => {
 		hide();
@@ -255,38 +326,19 @@ export default function Home() {
 
 					<div className="relative z-10 w-full overflow-hidden flex items-center h-[350px]">
 						<motion.div style={{ x: softwareX }} className="flex gap-8 px-6 md:px-12 xl:px-[15vw] absolute right-0 w-max">
-							{[
-								{
-									icon: <Package size={24} />,
-									title: t('www.packages.framework.title'),
-									desc: t('www.packages.framework.desc'),
-									link: 'https://www.npmjs.com/package/xernerx',
-									tag: 'Framework',
-								},
-								{
-									icon: <Boxes size={24} />,
-									title: t('www.packages.stats.title'),
-									desc: t('www.packages.stats.desc'),
-									link: 'https://www.npmjs.com/package/xernerx-stats',
-									tag: 'Library',
-								},
-							].map((item) => (
+							{dynamicPackages.map((item) => (
 								<a
 									key={item.title}
-									href={item.link}
-									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--background)/50 backdrop-blur-md border border-(--border)/10 hover:border-(--text)/30 shadow-xl hover:bg-(--foreground)/30"
+									href={getEnvUrl(item.link.replace('docs.dev.xernerx.com', 'docs.xernerx.com'))}
+									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
 								>
 									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
 										<ExternalLink className="text-(--text)" size={20} />
 									</div>
-									<div className="w-14 h-14 rounded-2xl bg-(--foreground) flex items-center justify-center text-(--text) border border-(--border)/10 mb-6 group-hover:scale-110 transition-transform duration-300">
-										{item.icon}
-									</div>
+									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
 									<div className="flex items-center gap-3 mb-3">
 										<h3 className="font-bold text-xl text-(--text) font-mono">{item.title}</h3>
-										<span className="text-[10px] font-bold uppercase tracking-widest text-(--text-muted) bg-(--foreground) px-2.5 py-1 rounded-full border border-(--border)/10">
-											{item.tag}
-										</span>
+										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
 									</div>
 									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
 								</a>

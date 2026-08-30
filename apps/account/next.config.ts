@@ -25,6 +25,16 @@ const nextConfig: NextConfig = {
 				hostname: 'cdn.discordapp.com',
 				pathname: '/**',
 			},
+			{
+				protocol: 'https',
+				hostname: '**.xernerx.com',
+				pathname: '/**',
+			},
+			{
+				protocol: 'http',
+				hostname: 'localhost',
+				pathname: '/**',
+			},
 		],
 	},
 	allowedDevOrigins: process.env.DOMAIN ? ['*.dev.xernerx.com', 'localhost', process.env.DOMAIN] : ['*.dev.xernerx.com', 'localhost'],

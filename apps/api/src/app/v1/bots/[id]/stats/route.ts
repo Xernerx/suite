@@ -123,3 +123,104 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		return NextResponse.json({ error: 'Internal Server Error', message: error.message, stack: error.stack }, { status: 500 });
 	}
 }
+
+async function authStats(req: NextRequest, botId: string) {
+	const authHeader = req.headers.get('Authorization');
+	if (!authHeader) return { error: 'Missing Authorization header', status: 401 };
+
+	const tokenValue = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+	const db = await database('xernerx');
+	const TokenModel = (db.models.users as any).Token;
+	const BotModel = (db.models.bots as any).Profile || (db.models.bots as any).Bot;
+	const StatModel = (db.models.bots as any).Stat;
+
+	if (!TokenModel || !BotModel || !StatModel) return { error: 'Database models not found', status: 500 };
+
+	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
+	if (!tokenDoc) return { error: 'Invalid token', status: 401 };
+	if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') return { error: 'Token is inactive or suspended', status: 403 };
+
+	const bot = await BotModel.findOne({ id: botId });
+	if (!bot) return { error: 'Bot not found', status: 404 };
+
+	const tokenOwners = tokenDoc.owners || [];
+	const botOwners = bot.owners || [];
+	const hasFullAccess = tokenDoc.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
+
+	return { hasFullAccess, StatModel };
+}
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		const db = await database('xernerx');
+		const StatModel = (db.models.bots as any).Stat;
+
+		if (!StatModel) return NextResponse.json({ error: 'Database model not found' }, { status: 500 });
+
+		const stats = await StatModel.find({ id }).sort({ _id: -1 }).limit(100);
+		return NextResponse.json(stats);
+	} catch (error: any) {
+		console.error('Failed to GET bot stats:', error);
+		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+	}
+}
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		const authResult = await authStats(req, id);
+		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+
+		const { hasFullAccess, StatModel } = authResult;
+		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+		const statId = req.nextUrl.searchParams.get('statId');
+		const body = await req.json().catch(() => ({}));
+
+		delete body._id;
+		delete body.id;
+		delete body.timestamp;
+
+		if (statId) {
+			await StatModel.updateOne({ _id: statId, id }, { $set: body });
+		} else {
+			const latest = await StatModel.findOne({ id }).sort({ _id: -1 });
+			if (latest) {
+				await StatModel.updateOne({ _id: latest._id }, { $set: body });
+			} else {
+				return NextResponse.json({ error: 'No stats found to update' }, { status: 404 });
+			}
+		}
+
+		return NextResponse.json({ message: 'Stats updated successfully' });
+	} catch (error: any) {
+		console.error('Failed to PATCH bot stats:', error);
+		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+	}
+}
+
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const { id } = await params;
+		const authResult = await authStats(req, id);
+		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+
+		const { hasFullAccess, StatModel } = authResult;
+		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+		const statId = req.nextUrl.searchParams.get('statId');
+
+		if (statId) {
+			await StatModel.deleteOne({ _id: statId, id });
+		} else {
+			await StatModel.deleteMany({ id });
+		}
+
+		return NextResponse.json({ message: 'Stats deleted successfully' });
+	} catch (error: any) {
+		console.error('Failed to DELETE bot stats:', error);
+		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+	}
+}

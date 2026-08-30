@@ -6,7 +6,7 @@ import { Locale, dictionary, getThemeLayoutProps } from '@xernerx/lib/server';
 
 import { AppLayout } from '@xernerx/components';
 import type { Metadata } from 'next';
-import { SessionProvider } from '@xernerx/providers';
+import { SessionProvider, PermissionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { headers } from 'next/headers';
@@ -67,7 +67,9 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>{children}</AppLayout>
+					<AppLayout dictionary={dict}>
+						<PermissionProvider>{children}</PermissionProvider>
+					</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

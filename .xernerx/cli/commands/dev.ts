@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
+import { confirm } from '@inquirer/prompts';
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
 import { generateLocalesCommand } from './generateLocales';
@@ -14,6 +16,32 @@ export default function registerDev(program: Command) {
 		.option('--prepare-only', 'Run only the environment preparation step and exit')
 		.action(async (options) => {
 			const rootEnvPath = path.join(process.cwd(), '.env');
+
+			try {
+				const currentBranch = execSync('git branch --show-current').toString().trim();
+				if (currentBranch === 'canary') {
+					console.log('[CLI] Checking for updates on canary branch...');
+					execSync('git fetch origin refs/heads/canary', { stdio: 'ignore' });
+					const behindCount = parseInt(execSync('git rev-list --count HEAD..origin/canary').toString().trim());
+
+					if (behindCount > 0) {
+						const pull = await confirm({
+							message: `There are ${behindCount} new commit(s) on the canary branch. Do you want to safely pull them now?`,
+							default: true,
+						});
+						if (pull) {
+							console.log('[CLI] Discarding local dictionary changes to favor remote...');
+							try {
+								execSync('git checkout HEAD -- packages/lib/src/dictionaries', { stdio: 'ignore' });
+							} catch (e) {}
+							console.log('[CLI] Pulling with autostash to preserve your other local work...');
+							execSync('git pull origin refs/heads/canary --autostash', { stdio: 'inherit' });
+						}
+					}
+				}
+			} catch (e: any) {
+				console.log('\x1b[31m[CLI] Git operation failed:\x1b[0m', e.message || e.toString());
+			}
 
 			console.log('[CLI] Pre-flight: Generating locales...');
 			generateLocalesCommand();

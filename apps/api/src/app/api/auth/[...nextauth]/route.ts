@@ -1,6 +1,7 @@
 /** @format */
 
-import NextAuth, { AuthOptions } from 'next-auth';
+import NextAuth from 'next-auth/next';
+import { AuthOptions } from 'next-auth';
 
 import { auth } from '@xernerx/lib';
 

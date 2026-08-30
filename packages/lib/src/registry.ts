@@ -9,6 +9,7 @@ import CoreInviteSchema from './models/xernerx/core/Invite';
 import CoreAppInviteSchema from './models/xernerx/core/AppInvite';
 import CoreRoleSchema from './models/xernerx/core/Role';
 import CoreAnnouncementSchema from './models/xernerx/core/Announcement';
+import CoreMediaSchema from './models/xernerx/core/Media';
 
 import DispatchApplicationSchema from './models/xernerx/dispatch/Application';
 import DispatchApplicationConfigSchema from './models/xernerx/dispatch/ApplicationConfig';
@@ -43,6 +44,7 @@ export const xernerxModels = {
 		AppInvite: { schema: CoreAppInviteSchema, modelName: 'AppInvite' },
 		Role: { schema: CoreRoleSchema, modelName: 'Role' },
 		Announcement: { schema: CoreAnnouncementSchema, modelName: 'Announcement' },
+		Media: { schema: CoreMediaSchema, modelName: 'Media' },
 	},
 	dispatch: {
 		Application: { schema: DispatchApplicationSchema, modelName: 'Application' },

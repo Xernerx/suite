@@ -348,7 +348,9 @@
 					"step3": "There is no deadline or haste upon these translations, take your time.",
 					"step4": "When you are changing keys the push to review button will become available, only press this once ready.",
 					"step5": "While editing try to not close or refresh the page, it may lose unsaved progression.",
-					"step6": "After submitting you will see your translated keys untranslated again, this is normal. The live environment cannot update manually, you have to wait for an admin to merge this updated dictionary with the live environment. You can speed up this progress by asking an admin directly to merge these changes"
+					"step6Part1": "After submitting you will see your translated keys untranslated again, this is normal. Your changes are automatically merged into the ",
+					"step6Link": "canary branch",
+					"step6Part2": " for testing and review, and will go live with the next deployment."
 				}
 			},
 			"new": {
@@ -997,6 +999,10 @@
 				"contact": {
 					"title": "12. Contact",
 					"prefix": "For privacy-related inquiries contact"
+				},
+				"apiData": {
+					"title": "API Data Collection & Developer Obligations",
+					"content": "When developers use our REST API to synchronize bot statistics or fetch metadata, we collect and store this data to render bot pages and provide analytics. Developers are strictly prohibited from transmitting personally identifiable information (PII) of their users to our API unless explicitly requested by an endpoint. We do not sell or share API data with third-party advertisers."
 				}
 			},
 			"description": "legal@xernerx.com"
@@ -1027,7 +1033,13 @@
 				},
 				"apiUsage": {
 					"title": "4. API & Developer Terms",
-					"content": "Developers using our API or bot infrastructure must not use these services to distribute malware, bypass rate limits, or facilitate unauthorized data scraping. We reserve the right to revoke API tokens or suspend bot applications that violate these guidelines or degrade platform performance."
+					"content": "Developers using our API or bot infrastructure must adhere to the following rules:",
+					"items": [
+						"Respect rate limits and do not spam or reverse-engineer the API.",
+						"You are solely responsible for securing your API keys; we are not liable for leaked tokens.",
+						"Data submitted to the platform (such as server stats) must be accurate and not artificially inflated.",
+						"We reserve the right to instantly revoke API tokens or suspend bot applications for any abuse or degraded platform performance."
+					]
 				},
 				"botUsage": {
 					"title": "5. Bot End User Terms",
@@ -1366,7 +1378,7 @@
 	},
 	"cdn": {
 		"common": {
-			"description": "test"
+			"description": "Xernerx content delivery network and asset storage service."
 		}
 	},
 	"docs": {
