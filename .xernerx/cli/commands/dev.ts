@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { execSync } from 'child_process';
+import { confirm } from '@inquirer/prompts';
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
 import { generateLocalesCommand } from './generateLocales';
@@ -14,6 +16,27 @@ export default function registerDev(program: Command) {
 		.option('--prepare-only', 'Run only the environment preparation step and exit')
 		.action(async (options) => {
 			const rootEnvPath = path.join(process.cwd(), '.env');
+
+			try {
+				const currentBranch = execSync('git branch --show-current').toString().trim();
+				if (currentBranch === 'canary') {
+					console.log('[CLI] Checking for updates on canary branch...');
+					execSync('git fetch origin canary', { stdio: 'ignore' });
+					const behindCount = parseInt(execSync('git rev-list --count HEAD..origin/canary').toString().trim());
+
+					if (behindCount > 0) {
+						const pull = await confirm({
+							message: `There are ${behindCount} new commit(s) on the canary branch. Do you want to pull them now?`,
+							default: true,
+						});
+						if (pull) {
+							execSync('git pull origin canary', { stdio: 'inherit' });
+						}
+					}
+				}
+			} catch (e) {
+				console.log('[CLI] Failed to check for git updates.');
+			}
 
 			console.log('[CLI] Pre-flight: Generating locales...');
 			generateLocalesCommand();

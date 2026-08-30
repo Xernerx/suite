@@ -1,5 +1,11 @@
 # @xernerx/cli
 
+## 2.0.2
+
+### Patch Changes
+
+- Fixed an issue where workflow was failing due to multiple refs
+
 ## 2.0.1
 
 ### Patch Changes

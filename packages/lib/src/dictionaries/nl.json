@@ -1,568 +1,568 @@
 {
-    "metadata": {
-        "label": "Nederlands"
-    },
-    "common": {
-        "cookiePrompt": {
-            "title": "Cookievoorkeuren",
-            "description": "We gebruiken cookies om ervoor te zorgen dat je sessie veilig blijft, je thema te onthouden en ons te helpen de app te verbeteren.",
-            "manage": {
-                "essential": {
-                    "label": "Essentieel",
-                    "description": "Vereist voor sessies en beveiliging."
-                },
-                "functional": {
-                    "label": "Functioneel",
-                    "description": "Onthoudt je thema en lay-outstatus."
-                },
-                "analytics": {
-                    "label": "Analytisch",
-                    "description": "Helpt ons fouten en verkeer te analyseren."
-                }
-            },
-            "buttons": {
-                "acceptAll": "Alles accepteren",
-                "essentialOnly": "Alleen essentieel",
-                "manage": "Beheren",
-                "save": "Mijn voorkeuren opslaan"
-            }
-        },
-        "footer": {
-            "tagline": "Het bouwen van moderne software, infrastructuur en ontwikkelingstools met een focus op prestaties, eenvoud en lange termijn onderhoudbaarheid.",
-            "sections": {
-                "resources": "Bronnen",
-                "developer": "Ontwikkelaar"
-            },
-            "links": {
-                "privacy": "Privacy",
-                "terms": "Voorwaarden",
-                "contact": "Contact",
-                "github": "GitHub",
-                "npm": "npm",
-                "documentation": "Documentatie",
-                "discord": "Discord"
-            }
-        },
-        "sidebar": {
-            "login": "Inloggen"
-        },
-        "nav": {
-            "categories": {
-                "account": "Account",
-                "preferences": "Voorkeuren",
-                "billing": "Facturering",
-                "developer": "Ontwikkelaar",
-                "moderator": "Moderator",
-                "administrator": "Administrator",
-                "translator": "Vertaler"
-            },
-            "items": {
-                "account": "Account",
-                "profile": "Profiel",
-                "connections": "Verbindingen",
-                "devices": "Apparaten",
-                "appearance": "Weergave",
-                "language": "Taal",
-                "notifications": "Meldingen",
-                "billing": "Facturering",
-                "tokens": "Tokens",
-                "store": "Winkel",
-                "users": "Gebruikers",
-                "roles": "Rollen",
-                "translations": "Vertalingen"
-            }
-        },
-        "buttons": {
-            "cancel": "Annuleren",
-            "confirm": "Bevestigen"
-        }
-    },
-    "api": {
-        "title": "Xernerx API",
-        "description": "Je hebt de kernservice en endpoint-router voor de Xernerx-suite bereikt. Op dit domein vinden geen bronbeheer, configuratiewijzigingen of interactieve besturing plaats.",
-        "section": {
-            "title": "Op zoek naar toegang?",
-            "description": "Ga naar je account om API-tokens te genereren, je actieve sessies te bekijken of ontwikkelaarsleutels te beheren."
-        },
-        "button": {
-            "account": "Jouw account",
-            "docs": "Lees de documentatie"
-        },
-        "fact": "Nutteloos feit: ",
-        "facts": "Deze pagina verbruikt ongeveer 0,00004 kWh aan serverenergie om je te vertellen dat je een token nodig hebt.,Virtue beoordeelt momenteel het ontbreken van een Authorization-header.,Metamorphosis heeft dit verzoek omgezet in teleurstelling omdat je je bearer-token bent vergeten.,Zodiakale grafieken geven aan dat je huidige pad geen geldige API-sleutel heeft.,Ergens huilt er een database-index omdat je hebt opgevraagd zonder token.,Fout 418: Ik ben een theepot, maar zelfs een theepot heeft een geldig bearer-token nodig.,Geen token, geen data. Dat zijn de regels, ik heb ze niet bedacht (ja, dat heb ik wel)."
-    },
-    "account": {
-        "account": {
-            "title": "Accountinstellingen",
-            "description": "Beheer je accountsessie, gegevensprivacy en algemene profielgegevens.",
-            "fallbackName": "Gebruiker",
-            "session": {
-                "title": "Actieve sessie",
-                "description": "Meld je af bij je actieve accountsessie op dit apparaat. Je moet opnieuw authenticeren om toegang te krijgen tot je werkruimte.",
-                "button": "Uitloggen"
-            },
-            "danger": {
-                "title": "Gebruikersgegevens en account verwijderen",
-                "description": "Verwijder permanent je profielgegevens, opgeslagen voorkeuren en sluit je account in het hele ecosysteem. Deze actie kan niet ongedaan worden gemaakt.",
-                "button": "Account verwijderen",
-                "confirmTitle": "Bevestig accountverwijdering",
-                "confirmDescription": "Je staat op het punt een permanente verwijdering van je gebruikersgegevens te starten. Zodra dit is voltooid, kunnen je inloggegevens en profiel niet meer worden hersteld.",
-                "confirmButton": "Verwijder mijn account"
-            }
-        },
-        "profile": {
-            "title": "Profiel bewerken",
-            "description": "Beheer je openbare profielgegevens en persoonlijke voorkeuren.",
-            "descriptionField": {
-                "label": "Beschrijving",
-                "placeholder": "Korte bio..."
-            },
-            "infoField": {
-                "label": "Info (Lange beschrijving)",
-                "placeholder": "Vertel ons meer over jezelf..."
-            },
-            "birthday": {
-                "label": "Geboortedatum"
-            },
-            "timezone": {
-                "label": "Tijdzone",
-                "placeholder": "bijv. Europe/Brussels"
-            },
-            "gender": {
-                "label": "Geslacht",
-                "male": "Man",
-                "female": "Vrouw",
-                "other": "Anders"
-            },
-            "pronouns": {
-                "label": "Voornaamwoorden",
-                "placeholder": "bijv. diens/die"
-            },
-            "privacy": {
-                "label": "Privacyniveau",
-                "public": "Openbaar",
-                "limited": "Beperkt",
-                "private": "Privé",
-                "tooltip": {
-                    "title": "Privacyopties:",
-                    "privateTitle": "Privé:",
-                    "privateDesc": "Volledig privé; niemand behalve jij kan je profiel zien.",
-                    "limitedTitle": "Beperkt:",
-                    "limitedDesc": "Iedereen met je accountlink kan je profiel zien; je wordt alleen niet openbaar vermeld.",
-                    "publicTitle": "Openbaar:",
-                    "publicDesc": "Iedereen kan je profiel zien en het wordt niet verborgen in openbare ruimtes."
-                }
-            },
-            "save": "Wijzigingen opslaan",
-            "saving": "Opslaan...",
-            "toast": {
-                "success": "Profiel succesvol bijgewerkt!",
-                "error": "Opslaan mislukt. Probeer het opnieuw."
-            }
-        },
-        "appearance": {
-            "title": "Weergave",
-            "description": "Pas aan hoe de interface eruitziet en aanvoelt in je werkruimte.",
-            "theme": {
-                "title": "Thema",
-                "description": "Kies je bevorzugde interface-themamodus.",
-                "options": {
-                    "dark": "Donker",
-                    "light": "Licht",
-                    "system": "Systeem"
-                }
-            },
-            "discordSync": {
-                "title": "Accent synchroniseren vanuit Discord",
-                "description": "Neem automatisch de accentkleur van je Discord-profielthema over als je werkruimte-accent."
-            },
-            "clientSync": {
-                "title": "Weergaveinstellingen synchroniseren tussen clients",
-                "description": "Laad weergaveinstellingen automatisch in op al je apparaten."
-            },
-            "accentColor": {
-                "title": "Accentkleur",
-                "description": "Selecteer een aangepaste accentkleur voor je werkruimtethema."
-            },
-            "colors": {
-                "purple": "Xerple",
-                "green": "Crean",
-                "neon": "Cyber Neon",
-                "blue": "Elektrisch Blauw",
-                "pink": "Levendig Roze",
-                "orange": "Zonsondergang Oranje",
-                "yellow": "Goudgeel",
-                "crimson": "Diep Karmozijn",
-                "mint": "Mint Bries",
-                "indigo": "Koninklijk Indigo",
-                "lime": "Zuur Limoen",
-                "charcoal": "Leegte Houtskool"
-            },
-            "zoom": {
-                "title": "UI-zoomniveau",
-                "description": "Schaal de interfacezoom gelijkmatig over de toepassing."
-            },
-            "density": {
-                "title": "Lay-out Spacing",
-                "description": "Schakel tussen compacte, standaard en ruime interface-opvulmarges.",
-                "compact": "Compact",
-                "default": "Standaard",
-                "spacious": "Ruim"
-            },
-            "textScale": {
-                "title": "Tekstschaal",
-                "description": "Configureer de basistypografiegrootte voor leesbaarheid."
-            },
-            "toast": {
-                "clientSyncEnabled": {
-                    "title": "Client-synchronisatie ingeschakeld",
-                    "description": "Je weergaveinstellingen worden nu gesynchroniseerd met je account."
-                },
-                "clientSyncDisabled": {
-                    "title": "Client-synchronisatie uitgeschakeld",
-                    "description": "Je weergaveinstellingen blijven lokaal op deze browser."
-                },
-                "accentColor": {
-                    "title": "Accentkleur bijgewerkt!",
-                    "description": "Accentkleur ingesteld op {color}"
-                },
-                "theme": {
-                    "title": "Thema bijgewerkt!",
-                    "description": "Thema ingesteld op {theme}"
-                },
-                "density": {
-                    "title": "Lay-outdichtheid bijgewerkt!"
-                }
-            }
-        },
-        "language": {
-            "headerTitle": "Taalvoorkeuren",
-            "headerDescription": "Kies je interfacelokalisatie en bekijk regionale voorkeuren.",
-            "title": "Taal",
-            "description": "Selecteer je voorkeurstaal voor de interface.",
-            "contributeLabel": "+ Draag een vertaling bij",
-            "coverage": {
-                "title": "Help ons vertalen!",
-                "description": "Je geselecteerde taal is momenteel voor {coverage}% vertaald. Heb je een paar minuten om ons te helpen het af te maken?",
-                "button": "Bijdragen"
-            },
-            "discord": {
-                "title": "Discord-taal",
-                "description": "Je huidige Discord-accounttaalinstelling (alleen-lezen indicator)."
-            }
-        },
-        "signin": {
-            "button": "Doorgaan met Discord",
-            "redirecting": "Doorverwijzen…",
-            "aboutToggle": "Over machtigingen",
-            "permissions": {
-                "profile": {
-                    "title": "Gebruikersnaam & Profiel",
-                    "description": "Wordt gebruikt om je profiel binnen de app weer te geven."
-                },
-                "email": {
-                    "title": "E-mailadres",
-                    "description": "Wordt gebruikt voor meldingen en belangrijke account-updates."
-                },
-                "connections": {
-                    "title": "Verbindingen",
-                    "description": "Wordt weergegeven op je profiel voor personalisatie."
-                },
-                "joinServers": {
-                    "title": "Servers deelnemen",
-                    "description": "Wordt gebruikt om toe te treden tot door Xernerx Studios beheerde servers. Voegt je niet toe aan een server zonder jouw invoer!"
-                },
-                "servers": {
-                    "title": "Servers",
-                    "description": "Wordt gebruikt om je dashboardervaring mogelijk te maken."
-                },
-                "memberInfo": {
-                    "title": "Serverlid-informatie",
-                    "description": "Wordt gebruikt voor rollen, bijnamen en serverspecifieke functies."
-                },
-                "footer": "Xernerx verkoopt je gegevens niet. Alle gegevens zijn openbaar via de Discord-API of worden intern gebruikt voor functies."
-            }
-        },
-        "signout": {
-            "title": "Uitloggen",
-            "description": "Weet je zeker dat je wilt uitloggen? Je moet opnieuw authenticeren om toegang te krijgen tot je dashboard.",
-            "confirmButton": "Ja, log me uit",
-            "signingOut": "Uitloggen…",
-            "cancelButton": "Annuleren"
-        },
-        "user": {
-            "createError": "Kan gebruikersprofiel niet initialiseren.",
-            "fetchError": "Kan gebruikersprofielgegevens niet laden.",
-            "networkError": "Netwerkfout bij het verbinden met de gebruikersservice.",
-            "created": "Welkom! Gebruikersprofiel succesvol aangemaakt."
-        },
-        "notifications": {
-            "title": "Meldingen",
-            "description": "Beheer hoe je meldingen en waarschuwingen via verschillende kanalen ontvangt.",
-            "itemDescription": "Configureer waarschuwingen voor {item}.",
-            "categories": {
-                "general": "Algemeen",
-                "virtue": "Virtue",
-                "api": "API & Ontwikkelaar",
-                "billing": "Facturering & Abonnementen",
-                "apps": "Bots & Applicaties"
-            },
-            "items": {
-                "birthday": "Verjaardag",
-                "levelup": "Niveau Omhoog",
-                "rateLimitWarning": "Limiet Waarschuwing",
-                "tokenCreated": "Token Aangemaakt",
-                "tokenRevoked": "Token Ingetrokken",
-                "downtime": "Service Storing",
-                "invoicePaid": "Factuur Betaald",
-                "subscriptionExpiring": "Abonnement Verloopt",
-                "paymentFailed": "Betaling Mislukt",
-                "botApproved": "Bot Goedgekeurd",
-                "botRejected": "Bot Afgewezen"
-            },
-            "channels": {
-                "discord": "Discord",
-                "mail": "E-mail",
-                "inApp": "In-App"
-            },
-            "toast": {
-                "success": "Meldingsvoorkeuren bijgewerkt",
-                "error": "Opslaan van wijzigingen mislukt"
-            }
-        },
-        "tokens": {
-            "title": "API-tokens",
-            "description": "Beheer je veilige authenticatiesleutels",
-            "generateButton": "Token genereren",
-            "manageSettings": "Instellingen beheren",
-            "empty": {
-                "title": "Geen tokens gevonden",
-                "description": "Je hebt geen actieve API-tokens. Genereer er een om je services te authenticeren."
-            },
-            "toast": {
-                "loadError": "Fout bij laden van tokens, fout: {error}"
-            },
-            "create": {
-                "modalTitle": "Nieuw token genereren",
-                "nameLabel": "Tokennaam",
-                "namePlaceholder": "bijv. Productie API-toegang",
-                "cancelButton": "Annuleren",
-                "submitButton": "Token aanmaken",
-                "success": "Token succesvol aangemaakt",
-                "errorTitle": "Aanmaken mislukt",
-                "errorDesc": "Kon geen nieuw token genereren. Fout: {error}"
-            },
-            "manage": {
-                "modalTitle": "Token beheren",
-                "revokeTitle": "Token intrekken",
-                "accessKeyLabel": "Toegangssleutel",
-                "securityWarning": "Behandel dit token als een wachtwoord. Stel het niet bloot in client-side code.",
-                "nameLabel": "Tokennaam",
-                "ownersLabel": "Eigenaren (Discord-ID's)",
-                "ownersPlaceholder": "Kommagescheiden ID's",
-                "closeButton": "Sluiten",
-                "saveButton": "Wijzigingen opslaan",
-                "loadError": "Kan token niet laden, fout: {error}",
-                "copySuccess": "Token gekopieerd naar klembord",
-                "updateSuccess": "Token bijgewerkt",
-                "updateError": "Bijwerken mislukt",
-                "deleteConfirm": "Weet je zeker dat je dit token permanent wilt verwijderen?",
-                "deleteSuccess": "Token verwijderd",
-                "deleteError": "Verwijderen mislukt"
-            }
-        }
-    },
-    "www": {
-        "hero": {
-            "title": "Empowering Developers. Connecting Communities.",
-            "description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
-        },
-        "about": {
-            "title": "Over Xernerx",
-            "description": "Opgericht in 2024, is Xernerx geëvolueerd van een gericht ontwikkelingsinitiatief tot een gestructureerd ecosysteem van automatiseringstools en infrastructuurframeworks. Elk systeem is gebouwd met schaalbaarheid, onderhoudbaarheid en architectonische helderheid als uitgangspunten."
-        },
-        "sections": {
-            "services": {
-                "title": "Diensten"
-            },
-            "packages": {
-                "title": "Pakketten"
-            },
-            "applications": {
-                "title": "Applicaties"
-            }
-        },
-        "services": {
-            "dashboard": {
-                "title": "Dashboard",
-                "desc": "Beheer applicaties, configureer implementaties en monitor systeemprestaties."
-            }
-        },
-        "packages": {
-            "framework": {
-                "title": "Xernerx Framework",
-                "desc": "Een modulair fundament voor schaalbare Discord-applicaties."
-            },
-            "stats": {
-                "title": "Xernerx Stats",
-                "desc": "Analytische hulpmiddelen voor het meten van prestaties."
-            }
-        },
-        "applications": {
-            "todo": {
-                "title": "Takenlijst-bot",
-                "desc": "Gestructureerde productiviteitstools."
-            },
-            "zodiac": {
-                "title": "Zodiac",
-                "desc": "Op astrologie gebaseerde interactietools."
-            },
-            "metamorphosis": {
-                "title": "Metamorphosis",
-                "desc": "Geavanceerde hulpmiddelen voor rolomzetting."
-            }
-        },
-        "history": {
-            "title": "Onze geschiedenis",
-            "description": "Een gestructureerde voortgang van experimentatie naar stabiele infrastructuurtechniek."
-        },
-        "privacy": {
-            "toc": "Inhoud",
-            "header": {
-                "title": "Privacybeleid",
-                "effectiveDate": "Ingangsdatum:"
-            },
-            "sections": {
-                "introduction": {
-                    "title": "1. Inleiding",
-                    "content": "Dit privacybeleid legt uit hoe Xernerx Studios (\"wij\", \"ons\", \"onze\") je persoonsgegevens verzamelt, gebruikt en beschermt wanneer je onze diensten gebruikt."
-                },
-                "dataCollected": {
-                    "title": "2. Informatie die we verzamelen",
-                    "account": {
-                        "title": "Accountinformatie:",
-                        "desc": "E-mail, gebruikersnaam en profielidentificatoren."
-                    },
-                    "usage": {
-                        "title": "Gebruiksgegevens:",
-                        "desc": "Logboeken, systeeminteracties en configuratie-instellingen."
-                    },
-                    "integration": {
-                        "title": "Integratiegegevens:",
-                        "desc": "Gegevens verstrekt via platforms van derden, zoals Discord."
-                    }
-                },
-                "legalBasis": {
-                    "title": "3. Juridische grondslag voor verwerking",
-                    "content": "Wij verwerken persoonsgegevens op basis van contractuele noodzakelijkheid, gerechtvaardigde belangen, wettelijke verplichtingen of toestemming van de gebruiker waar van toepassing."
-                },
-                "usage": {
-                    "title": "4. Hoe we informatie gebruiken",
-                    "items": "Om diensten aan te bieden en te onderhouden.,Om de betrouwbaarheid en prestaties te verbeteren.,Om ondersteuning te bieden en updates te communiceren.,Om naleving van wettelijke verplichtingen te waarborgen."
-                },
-                "sharing": {
-                    "title": "5. Gegevens delen",
-                    "items": "Hosting- en infrastructuurproviders.,Geautoriseerde integraties van derden.,Juridische autoriteiten wanneer wettelijk vereist."
-                },
-                "retention": {
-                    "title": "6. Bewaartermijn van gegevens",
-                    "content": "Wij bewaren gegevens niet langer dan noodzakelijk is om de doeleinden te bereiken die in dit beleid zijn uiteengezet, tenzij een langere bewaartermijn wettelijk verplicht is."
-                },
-                "security": {
-                    "title": "7. Gegevensbeveiliging",
-                    "content": "We implementeren technische en organisatorische beveiligingsmaatregelen om gegevens te beschermen. Geen enkel systeem is echter absoluut veilig."
-                },
-                "rights": {
-                    "title": "8. Jouw rechten",
-                    "items": "Recht op toegang tot je gegevens.,Recht op correctie of verwijdering.,Recht om de verwerking te beperken of er bezwaar tegen te maken.,Recht op gegevensoverdraagbaarheid."
-                },
-                "cookies": {
-                    "title": "9. Cookies & Tracking",
-                    "content": "We kunnen cookies of vergelijkbare technologieën gebruiken om de prestaties en analyse van de service te verbeteren."
-                },
-                "international": {
-                    "title": "10. Internationale overdrachten",
-                    "content": "Als gegevens worden overgedragen buiten je jurisdictie, worden passende waarborgen geïmplementeerd om naleving van de wet te waarborgen."
-                },
-                "changes": {
-                    "title": "11. Wijzigingen in dit beleid",
-                    "content": "We kunnen dit privacybeleid periodiek bijwerken. Voortgezet gebruik van de diensten betekent acceptatie van de herziene versie."
-                },
-                "contact": {
-                    "title": "12. Contact",
-                    "prefix": "Voor privacygerelateerde vragen kun je contact opnemen met"
-                }
-            }
-        },
-        "terms": {
-            "toc": "Inhoud",
-            "header": {
-                "title": "Servicevoorwaarden",
-                "effectiveDate": "Ingangsdatum:"
-            },
-            "sections": {
-                "introduction": {
-                    "title": "1. Inleiding",
-                    "content": "Deze servicevoorwaarden (\"Voorwaarden\") regelen je toegang tot en gebruik van diensten aangeboden door Xernerx Studios (\"wij\", \"ons\" of \"onze\"). Door toegang te krijgen tot of gebruik te maken van onze diensten, ga je akkoord met deze Voorwaarden."
-                },
-                "eligibility": {
-                    "title": "2. Geschiktheid",
-                    "content": "Je moet voldoen aan de minimumleeftijd in je jurisdictie om onze diensten te gebruiken. Door onze diensten te gebruiken, verklaar je dat je aan deze eis voldoet."
-                },
-                "acceptableUse": {
-                    "title": "3. Acceptabel gebruik",
-                    "items": "Deelnemen aan onwettige activiteiten.,Toegang tot gegevens zonder expliciete toestemming.,Pogingen om de service-infrastructuur te verstoren.,Het reverse-engineeren of exploiteren van kwetsbaarheden."
-                },
-                "accounts": {
-                    "title": "4. Gebruikersaccounts",
-                    "content": "Je bent verantwoordelijk voor het handhaven van de vertrouwelijkheid van je accountgegevens en voor alle activiteiten onder je account. Wij zijn niet aansprakelijk voor verliezen als gevolg van onbevoegde toegang."
-                },
-                "data": {
-                    "title": "5. Gebruikersgegevens",
-                    "content": "Door onze diensten te gebruiken, ga je akkoord met onze gegevensverwerkingspraktijken zoals beschreven in ons privacybeleid. Gegevens kunnen accountinformatie, gebruiksmetriek en op integratie gebaseerde gegevens omvatten indien van toepassing."
-                },
-                "availability": {
-                    "title": "6. Beschikbaarheid van de service",
-                    "content": "We streven naar een betrouwbare uptime maar garanderen geen ononderbroken service. Diensten kunnen op elk moment worden gewijzigd, opgeschort of stopgezet."
-                },
-                "thirdParty": {
-                    "title": "7. Diensten van derden",
-                    "content": "Onze diensten kunnen integreren met platforms van derden zoals Discord. Wij zijn niet verantwoordelijk voor het beleid, de beschikbaarheid of de gegevenspraktijken van derden."
-                },
-                "intellectualProperty": {
-                    "title": "8. Intellectueel eigendom",
-                    "content": "Alle software, code, branding en materialen blijven het uitsluitend eigendom van Xernerx Studios of haar licentiegevers. Ongeautoriseerde reproductie of distributie is verboden."
-                },
-                "warranty": {
-                    "title": "9. Disclaimer van garanties",
-                    "content": "Diensten worden geleverd \"zoals ze zijn\" zonder enige garantie, expliciet of impliciet."
-                },
-                "liability": {
-                    "title": "10. Beperking van aansprakelijkheid",
-                    "content": "Voor zover toegestaan door de wet, is Xernerx Studios niet aansprakelijk voor indirecte, incidentele of gevolgschade die voortvloeit uit het gebruik van onze diensten."
-                },
-                "indemnification": {
-                    "title": "11. Vrijwaring",
-                    "content": "Je gaat ermee akkoord Xernerx Studios te vrijwaren en schadeloos te stellen voor claims of verplichtingen die voortvloeien uit misbruik van onze diensten of schending van deze Voorwaarden."
-                },
-                "governingLaw": {
-                    "title": "12. Toepasselijk recht",
-                    "content": "Deze Voorwaarden worden beheerst in overeenstemming met de toepasselijke wetgeving binnen jouw jurisdictie."
-                },
-                "changes": {
-                    "title": "13. Wijzigingen in de voorwaarden",
-                    "content": "We kunnen deze Voorwaarden van tijd tot tijd bijwerken. Voortgezet gebruik van onze diensten na updates houdt acceptatie in."
-                },
-                "contact": {
-                    "title": "14. Contact",
-                    "prefix": "Voor juridische vragen kun je contact opnemen met"
-                }
-            }
-        }
-    },
-    "admin": {
-        "roles": {
-            "title": "Rollen Beheer"
-        }
-    }
+	"metadata": {
+		"label": "Nederlands"
+	},
+	"common": {
+		"cookiePrompt": {
+			"title": "Cookievoorkeuren",
+			"description": "We gebruiken cookies om ervoor te zorgen dat je sessie veilig blijft, je thema te onthouden en ons te helpen de app te verbeteren.",
+			"manage": {
+				"essential": {
+					"label": "Essentieel",
+					"description": "Vereist voor sessies en beveiliging."
+				},
+				"functional": {
+					"label": "Functioneel",
+					"description": "Onthoudt je thema en lay-outstatus."
+				},
+				"analytics": {
+					"label": "Analytisch",
+					"description": "Helpt ons fouten en verkeer te analyseren."
+				}
+			},
+			"buttons": {
+				"acceptAll": "Alles accepteren",
+				"essentialOnly": "Alleen essentieel",
+				"manage": "Beheren",
+				"save": "Mijn voorkeuren opslaan"
+			}
+		},
+		"footer": {
+			"tagline": "Het bouwen van moderne software, infrastructuur en ontwikkelingstools met een focus op prestaties, eenvoud en lange termijn onderhoudbaarheid.",
+			"sections": {
+				"resources": "Bronnen",
+				"developer": "Ontwikkelaar"
+			},
+			"links": {
+				"privacy": "Privacy",
+				"terms": "Voorwaarden",
+				"contact": "Contact",
+				"github": "GitHub",
+				"npm": "npm",
+				"documentation": "Documentatie",
+				"discord": "Discord"
+			}
+		},
+		"sidebar": {
+			"login": "Inloggen"
+		},
+		"nav": {
+			"categories": {
+				"account": "Account",
+				"preferences": "Voorkeuren",
+				"billing": "Facturering",
+				"developer": "Ontwikkelaar",
+				"moderator": "Moderator",
+				"administrator": "Administrator",
+				"translator": "Vertaler"
+			},
+			"items": {
+				"account": "Account",
+				"profile": "Profiel",
+				"connections": "Verbindingen",
+				"devices": "Apparaten",
+				"appearance": "Weergave",
+				"language": "Taal",
+				"notifications": "Meldingen",
+				"billing": "Facturering",
+				"tokens": "Tokens",
+				"store": "Winkel",
+				"users": "Gebruikers",
+				"roles": "Rollen",
+				"translations": "Vertalingen"
+			}
+		},
+		"buttons": {
+			"cancel": "Annuleren",
+			"confirm": "Bevestigen"
+		}
+	},
+	"api": {
+		"title": "Xernerx API",
+		"description": "Je hebt de kernservice en endpoint-router voor de Xernerx-suite bereikt. Op dit domein vinden geen bronbeheer, configuratiewijzigingen of interactieve besturing plaats.",
+		"section": {
+			"title": "Op zoek naar toegang?",
+			"description": "Ga naar je account om API-tokens te genereren, je actieve sessies te bekijken of ontwikkelaarsleutels te beheren."
+		},
+		"button": {
+			"account": "Jouw account",
+			"docs": "Lees de documentatie"
+		},
+		"fact": "Nutteloos feit: ",
+		"facts": "Deze pagina verbruikt ongeveer 0,00004 kWh aan serverenergie om je te vertellen dat je een token nodig hebt.,Virtue beoordeelt momenteel het ontbreken van een Authorization-header.,Metamorphosis heeft dit verzoek omgezet in teleurstelling omdat je je bearer-token bent vergeten.,Zodiakale grafieken geven aan dat je huidige pad geen geldige API-sleutel heeft.,Ergens huilt er een database-index omdat je hebt opgevraagd zonder token.,Fout 418: Ik ben een theepot, maar zelfs een theepot heeft een geldig bearer-token nodig.,Geen token, geen data. Dat zijn de regels, ik heb ze niet bedacht (ja, dat heb ik wel)."
+	},
+	"account": {
+		"account": {
+			"title": "Accountinstellingen",
+			"description": "Beheer je accountsessie, gegevensprivacy en algemene profielgegevens.",
+			"fallbackName": "Gebruiker",
+			"session": {
+				"title": "Actieve sessie",
+				"description": "Meld je af bij je actieve accountsessie op dit apparaat. Je moet opnieuw authenticeren om toegang te krijgen tot je werkruimte.",
+				"button": "Uitloggen"
+			},
+			"danger": {
+				"title": "Gebruikersgegevens en account verwijderen",
+				"description": "Verwijder permanent je profielgegevens, opgeslagen voorkeuren en sluit je account in het hele ecosysteem. Deze actie kan niet ongedaan worden gemaakt.",
+				"button": "Account verwijderen",
+				"confirmTitle": "Bevestig accountverwijdering",
+				"confirmDescription": "Je staat op het punt een permanente verwijdering van je gebruikersgegevens te starten. Zodra dit is voltooid, kunnen je inloggegevens en profiel niet meer worden hersteld.",
+				"confirmButton": "Verwijder mijn account"
+			}
+		},
+		"profile": {
+			"title": "Profiel bewerken",
+			"description": "Beheer je openbare profielgegevens en persoonlijke voorkeuren.",
+			"descriptionField": {
+				"label": "Beschrijving",
+				"placeholder": "Korte bio..."
+			},
+			"infoField": {
+				"label": "Info (Lange beschrijving)",
+				"placeholder": "Vertel ons meer over jezelf..."
+			},
+			"birthday": {
+				"label": "Geboortedatum"
+			},
+			"timezone": {
+				"label": "Tijdzone",
+				"placeholder": "bijv. Europe/Brussels"
+			},
+			"gender": {
+				"label": "Geslacht",
+				"male": "Man",
+				"female": "Vrouw",
+				"other": "Anders"
+			},
+			"pronouns": {
+				"label": "Voornaamwoorden",
+				"placeholder": "bijv. diens/die"
+			},
+			"privacy": {
+				"label": "Privacyniveau",
+				"public": "Openbaar",
+				"limited": "Beperkt",
+				"private": "Privé",
+				"tooltip": {
+					"title": "Privacyopties:",
+					"privateTitle": "Privé:",
+					"privateDesc": "Volledig privé; niemand behalve jij kan je profiel zien.",
+					"limitedTitle": "Beperkt:",
+					"limitedDesc": "Iedereen met je accountlink kan je profiel zien; je wordt alleen niet openbaar vermeld.",
+					"publicTitle": "Openbaar:",
+					"publicDesc": "Iedereen kan je profiel zien en het wordt niet verborgen in openbare ruimtes."
+				}
+			},
+			"save": "Wijzigingen opslaan",
+			"saving": "Opslaan...",
+			"toast": {
+				"success": "Profiel succesvol bijgewerkt!",
+				"error": "Opslaan mislukt. Probeer het opnieuw."
+			}
+		},
+		"appearance": {
+			"title": "Weergave",
+			"description": "Pas aan hoe de interface eruitziet en aanvoelt in je werkruimte.",
+			"theme": {
+				"title": "Thema",
+				"description": "Kies je bevorzugde interface-themamodus.",
+				"options": {
+					"dark": "Donker",
+					"light": "Licht",
+					"system": "Systeem"
+				}
+			},
+			"discordSync": {
+				"title": "Accent synchroniseren vanuit Discord",
+				"description": "Neem automatisch de accentkleur van je Discord-profielthema over als je werkruimte-accent."
+			},
+			"clientSync": {
+				"title": "Weergaveinstellingen synchroniseren tussen clients",
+				"description": "Laad weergaveinstellingen automatisch in op al je apparaten."
+			},
+			"accentColor": {
+				"title": "Accentkleur",
+				"description": "Selecteer een aangepaste accentkleur voor je werkruimtethema."
+			},
+			"colors": {
+				"purple": "Xerple",
+				"green": "Crean",
+				"neon": "Cyber Neon",
+				"blue": "Elektrisch Blauw",
+				"pink": "Levendig Roze",
+				"orange": "Zonsondergang Oranje",
+				"yellow": "Goudgeel",
+				"crimson": "Diep Karmozijn",
+				"mint": "Mint Bries",
+				"indigo": "Koninklijk Indigo",
+				"lime": "Zuur Limoen",
+				"charcoal": "Leegte Houtskool"
+			},
+			"zoom": {
+				"title": "UI-zoomniveau",
+				"description": "Schaal de interfacezoom gelijkmatig over de toepassing."
+			},
+			"density": {
+				"title": "Lay-out Spacing",
+				"description": "Schakel tussen compacte, standaard en ruime interface-opvulmarges.",
+				"compact": "Compact",
+				"default": "Standaard",
+				"spacious": "Ruim"
+			},
+			"textScale": {
+				"title": "Tekstschaal",
+				"description": "Configureer de basistypografiegrootte voor leesbaarheid."
+			},
+			"toast": {
+				"clientSyncEnabled": {
+					"title": "Client-synchronisatie ingeschakeld",
+					"description": "Je weergaveinstellingen worden nu gesynchroniseerd met je account."
+				},
+				"clientSyncDisabled": {
+					"title": "Client-synchronisatie uitgeschakeld",
+					"description": "Je weergaveinstellingen blijven lokaal op deze browser."
+				},
+				"accentColor": {
+					"title": "Accentkleur bijgewerkt!",
+					"description": "Accentkleur ingesteld op {color}"
+				},
+				"theme": {
+					"title": "Thema bijgewerkt!",
+					"description": "Thema ingesteld op {theme}"
+				},
+				"density": {
+					"title": "Lay-outdichtheid bijgewerkt!"
+				}
+			}
+		},
+		"language": {
+			"headerTitle": "Taalvoorkeuren",
+			"headerDescription": "Kies je interfacelokalisatie en bekijk regionale voorkeuren.",
+			"title": "Taal",
+			"description": "Selecteer je voorkeurstaal voor de interface.",
+			"contributeLabel": "+ Draag een vertaling bij",
+			"coverage": {
+				"title": "Help ons vertalen!",
+				"description": "Je geselecteerde taal is momenteel voor {coverage}% vertaald. Heb je een paar minuten om ons te helpen het af te maken?",
+				"button": "Bijdragen"
+			},
+			"discord": {
+				"title": "Discord-taal",
+				"description": "Je huidige Discord-accounttaalinstelling (alleen-lezen indicator)."
+			}
+		},
+		"signin": {
+			"button": "Doorgaan met Discord",
+			"redirecting": "Doorverwijzen…",
+			"aboutToggle": "Over machtigingen",
+			"permissions": {
+				"profile": {
+					"title": "Gebruikersnaam & Profiel",
+					"description": "Wordt gebruikt om je profiel binnen de app weer te geven."
+				},
+				"email": {
+					"title": "E-mailadres",
+					"description": "Wordt gebruikt voor meldingen en belangrijke account-updates."
+				},
+				"connections": {
+					"title": "Verbindingen",
+					"description": "Wordt weergegeven op je profiel voor personalisatie."
+				},
+				"joinServers": {
+					"title": "Servers deelnemen",
+					"description": "Wordt gebruikt om toe te treden tot door Xernerx Studios beheerde servers. Voegt je niet toe aan een server zonder jouw invoer!"
+				},
+				"servers": {
+					"title": "Servers",
+					"description": "Wordt gebruikt om je dashboardervaring mogelijk te maken."
+				},
+				"memberInfo": {
+					"title": "Serverlid-informatie",
+					"description": "Wordt gebruikt voor rollen, bijnamen en serverspecifieke functies."
+				},
+				"footer": "Xernerx verkoopt je gegevens niet. Alle gegevens zijn openbaar via de Discord-API of worden intern gebruikt voor functies."
+			}
+		},
+		"signout": {
+			"title": "Uitloggen",
+			"description": "Weet je zeker dat je wilt uitloggen? Je moet opnieuw authenticeren om toegang te krijgen tot je dashboard.",
+			"confirmButton": "Ja, log me uit",
+			"signingOut": "Uitloggen…",
+			"cancelButton": "Annuleren"
+		},
+		"user": {
+			"createError": "Kan gebruikersprofiel niet initialiseren.",
+			"fetchError": "Kan gebruikersprofielgegevens niet laden.",
+			"networkError": "Netwerkfout bij het verbinden met de gebruikersservice.",
+			"created": "Welkom! Gebruikersprofiel succesvol aangemaakt."
+		},
+		"notifications": {
+			"title": "Meldingen",
+			"description": "Beheer hoe je meldingen en waarschuwingen via verschillende kanalen ontvangt.",
+			"itemDescription": "Configureer waarschuwingen voor {item}.",
+			"categories": {
+				"general": "Algemeen",
+				"virtue": "Virtue",
+				"api": "API & Ontwikkelaar",
+				"billing": "Facturering & Abonnementen",
+				"apps": "Bots & Applicaties"
+			},
+			"items": {
+				"birthday": "Verjaardag",
+				"levelup": "Niveau Omhoog",
+				"rateLimitWarning": "Limiet Waarschuwing",
+				"tokenCreated": "Token Aangemaakt",
+				"tokenRevoked": "Token Ingetrokken",
+				"downtime": "Service Storing",
+				"invoicePaid": "Factuur Betaald",
+				"subscriptionExpiring": "Abonnement Verloopt",
+				"paymentFailed": "Betaling Mislukt",
+				"botApproved": "Bot Goedgekeurd",
+				"botRejected": "Bot Afgewezen"
+			},
+			"channels": {
+				"discord": "Discord",
+				"mail": "E-mail",
+				"inApp": "In-App"
+			},
+			"toast": {
+				"success": "Meldingsvoorkeuren bijgewerkt",
+				"error": "Opslaan van wijzigingen mislukt"
+			}
+		},
+		"tokens": {
+			"title": "API-tokens",
+			"description": "Beheer je veilige authenticatiesleutels",
+			"generateButton": "Token genereren",
+			"manageSettings": "Instellingen beheren",
+			"empty": {
+				"title": "Geen tokens gevonden",
+				"description": "Je hebt geen actieve API-tokens. Genereer er een om je services te authenticeren."
+			},
+			"toast": {
+				"loadError": "Fout bij laden van tokens, fout: {error}"
+			},
+			"create": {
+				"modalTitle": "Nieuw token genereren",
+				"nameLabel": "Tokennaam",
+				"namePlaceholder": "bijv. Productie API-toegang",
+				"cancelButton": "Annuleren",
+				"submitButton": "Token aanmaken",
+				"success": "Token succesvol aangemaakt",
+				"errorTitle": "Aanmaken mislukt",
+				"errorDesc": "Kon geen nieuw token genereren. Fout: {error}"
+			},
+			"manage": {
+				"modalTitle": "Token beheren",
+				"revokeTitle": "Token intrekken",
+				"accessKeyLabel": "Toegangssleutel",
+				"securityWarning": "Behandel dit token als een wachtwoord. Stel het niet bloot in client-side code.",
+				"nameLabel": "Tokennaam",
+				"ownersLabel": "Eigenaren (Discord-ID's)",
+				"ownersPlaceholder": "Kommagescheiden ID's",
+				"closeButton": "Sluiten",
+				"saveButton": "Wijzigingen opslaan",
+				"loadError": "Kan token niet laden, fout: {error}",
+				"copySuccess": "Token gekopieerd naar klembord",
+				"updateSuccess": "Token bijgewerkt",
+				"updateError": "Bijwerken mislukt",
+				"deleteConfirm": "Weet je zeker dat je dit token permanent wilt verwijderen?",
+				"deleteSuccess": "Token verwijderd",
+				"deleteError": "Verwijderen mislukt"
+			}
+		}
+	},
+	"www": {
+		"hero": {
+			"title": "Empowering Developers. Connecting Communities.",
+			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
+		},
+		"about": {
+			"title": "Over Xernerx",
+			"description": "Opgericht in 2024, is Xernerx geëvolueerd van een gericht ontwikkelingsinitiatief tot een gestructureerd ecosysteem van automatiseringstools en infrastructuurframeworks. Elk systeem is gebouwd met schaalbaarheid, onderhoudbaarheid en architectonische helderheid als uitgangspunten."
+		},
+		"sections": {
+			"services": {
+				"title": "Diensten"
+			},
+			"packages": {
+				"title": "Pakketten"
+			},
+			"applications": {
+				"title": "Applicaties"
+			}
+		},
+		"services": {
+			"dashboard": {
+				"title": "Dashboard",
+				"desc": "Beheer applicaties, configureer implementaties en monitor systeemprestaties."
+			}
+		},
+		"packages": {
+			"framework": {
+				"title": "Xernerx Framework",
+				"desc": "Een modulair fundament voor schaalbare Discord-applicaties."
+			},
+			"stats": {
+				"title": "Xernerx Stats",
+				"desc": "Analytische hulpmiddelen voor het meten van prestaties."
+			}
+		},
+		"applications": {
+			"todo": {
+				"title": "Takenlijst-bot",
+				"desc": "Gestructureerde productiviteitstools."
+			},
+			"zodiac": {
+				"title": "Zodiac",
+				"desc": "Op astrologie gebaseerde interactietools."
+			},
+			"metamorphosis": {
+				"title": "Metamorphosis",
+				"desc": "Geavanceerde hulpmiddelen voor rolomzetting."
+			}
+		},
+		"history": {
+			"title": "Onze geschiedenis",
+			"description": "Een gestructureerde voortgang van experimentatie naar stabiele infrastructuurtechniek."
+		},
+		"privacy": {
+			"toc": "Inhoud",
+			"header": {
+				"title": "Privacybeleid",
+				"effectiveDate": "Ingangsdatum:"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Inleiding",
+					"content": "Dit privacybeleid legt uit hoe Xernerx Studios (\"wij\", \"ons\", \"onze\") je persoonsgegevens verzamelt, gebruikt en beschermt wanneer je onze diensten gebruikt."
+				},
+				"dataCollected": {
+					"title": "2. Informatie die we verzamelen",
+					"account": {
+						"title": "Accountinformatie:",
+						"desc": "E-mail, gebruikersnaam en profielidentificatoren."
+					},
+					"usage": {
+						"title": "Gebruiksgegevens:",
+						"desc": "Logboeken, systeeminteracties en configuratie-instellingen."
+					},
+					"integration": {
+						"title": "Integratiegegevens:",
+						"desc": "Gegevens verstrekt via platforms van derden, zoals Discord."
+					}
+				},
+				"legalBasis": {
+					"title": "3. Juridische grondslag voor verwerking",
+					"content": "Wij verwerken persoonsgegevens op basis van contractuele noodzakelijkheid, gerechtvaardigde belangen, wettelijke verplichtingen of toestemming van de gebruiker waar van toepassing."
+				},
+				"usage": {
+					"title": "4. Hoe we informatie gebruiken",
+					"items": "Om diensten aan te bieden en te onderhouden.,Om de betrouwbaarheid en prestaties te verbeteren.,Om ondersteuning te bieden en updates te communiceren.,Om naleving van wettelijke verplichtingen te waarborgen."
+				},
+				"sharing": {
+					"title": "5. Gegevens delen",
+					"items": "Hosting- en infrastructuurproviders.,Geautoriseerde integraties van derden.,Juridische autoriteiten wanneer wettelijk vereist."
+				},
+				"retention": {
+					"title": "6. Bewaartermijn van gegevens",
+					"content": "Wij bewaren gegevens niet langer dan noodzakelijk is om de doeleinden te bereiken die in dit beleid zijn uiteengezet, tenzij een langere bewaartermijn wettelijk verplicht is."
+				},
+				"security": {
+					"title": "7. Gegevensbeveiliging",
+					"content": "We implementeren technische en organisatorische beveiligingsmaatregelen om gegevens te beschermen. Geen enkel systeem is echter absoluut veilig."
+				},
+				"rights": {
+					"title": "8. Jouw rechten",
+					"items": "Recht op toegang tot je gegevens.,Recht op correctie of verwijdering.,Recht om de verwerking te beperken of er bezwaar tegen te maken.,Recht op gegevensoverdraagbaarheid."
+				},
+				"cookies": {
+					"title": "9. Cookies & Tracking",
+					"content": "We kunnen cookies of vergelijkbare technologieën gebruiken om de prestaties en analyse van de service te verbeteren."
+				},
+				"international": {
+					"title": "10. Internationale overdrachten",
+					"content": "Als gegevens worden overgedragen buiten je jurisdictie, worden passende waarborgen geïmplementeerd om naleving van de wet te waarborgen."
+				},
+				"changes": {
+					"title": "11. Wijzigingen in dit beleid",
+					"content": "We kunnen dit privacybeleid periodiek bijwerken. Voortgezet gebruik van de diensten betekent acceptatie van de herziene versie."
+				},
+				"contact": {
+					"title": "12. Contact",
+					"prefix": "Voor privacygerelateerde vragen kun je contact opnemen met"
+				}
+			}
+		},
+		"terms": {
+			"toc": "Inhoud",
+			"header": {
+				"title": "Servicevoorwaarden",
+				"effectiveDate": "Ingangsdatum:"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Inleiding",
+					"content": "Deze servicevoorwaarden (\"Voorwaarden\") regelen je toegang tot en gebruik van diensten aangeboden door Xernerx Studios (\"wij\", \"ons\" of \"onze\"). Door toegang te krijgen tot of gebruik te maken van onze diensten, ga je akkoord met deze Voorwaarden."
+				},
+				"eligibility": {
+					"title": "2. Geschiktheid",
+					"content": "Je moet voldoen aan de minimumleeftijd in je jurisdictie om onze diensten te gebruiken. Door onze diensten te gebruiken, verklaar je dat je aan deze eis voldoet."
+				},
+				"acceptableUse": {
+					"title": "3. Acceptabel gebruik",
+					"items": "Deelnemen aan onwettige activiteiten.,Toegang tot gegevens zonder expliciete toestemming.,Pogingen om de service-infrastructuur te verstoren.,Het reverse-engineeren of exploiteren van kwetsbaarheden."
+				},
+				"accounts": {
+					"title": "4. Gebruikersaccounts",
+					"content": "Je bent verantwoordelijk voor het handhaven van de vertrouwelijkheid van je accountgegevens en voor alle activiteiten onder je account. Wij zijn niet aansprakelijk voor verliezen als gevolg van onbevoegde toegang."
+				},
+				"data": {
+					"title": "5. Gebruikersgegevens",
+					"content": "Door onze diensten te gebruiken, ga je akkoord met onze gegevensverwerkingspraktijken zoals beschreven in ons privacybeleid. Gegevens kunnen accountinformatie, gebruiksmetriek en op integratie gebaseerde gegevens omvatten indien van toepassing."
+				},
+				"availability": {
+					"title": "6. Beschikbaarheid van de service",
+					"content": "We streven naar een betrouwbare uptime maar garanderen geen ononderbroken service. Diensten kunnen op elk moment worden gewijzigd, opgeschort of stopgezet."
+				},
+				"thirdParty": {
+					"title": "7. Diensten van derden",
+					"content": "Onze diensten kunnen integreren met platforms van derden zoals Discord. Wij zijn niet verantwoordelijk voor het beleid, de beschikbaarheid of de gegevenspraktijken van derden."
+				},
+				"intellectualProperty": {
+					"title": "8. Intellectueel eigendom",
+					"content": "Alle software, code, branding en materialen blijven het uitsluitend eigendom van Xernerx Studios of haar licentiegevers. Ongeautoriseerde reproductie of distributie is verboden."
+				},
+				"warranty": {
+					"title": "9. Disclaimer van garanties",
+					"content": "Diensten worden geleverd \"zoals ze zijn\" zonder enige garantie, expliciet of impliciet."
+				},
+				"liability": {
+					"title": "10. Beperking van aansprakelijkheid",
+					"content": "Voor zover toegestaan door de wet, is Xernerx Studios niet aansprakelijk voor indirecte, incidentele of gevolgschade die voortvloeit uit het gebruik van onze diensten."
+				},
+				"indemnification": {
+					"title": "11. Vrijwaring",
+					"content": "Je gaat ermee akkoord Xernerx Studios te vrijwaren en schadeloos te stellen voor claims of verplichtingen die voortvloeien uit misbruik van onze diensten of schending van deze Voorwaarden."
+				},
+				"governingLaw": {
+					"title": "12. Toepasselijk recht",
+					"content": "Deze Voorwaarden worden beheerst in overeenstemming met de toepasselijke wetgeving binnen jouw jurisdictie."
+				},
+				"changes": {
+					"title": "13. Wijzigingen in de voorwaarden",
+					"content": "We kunnen deze Voorwaarden van tijd tot tijd bijwerken. Voortgezet gebruik van onze diensten na updates houdt acceptatie in."
+				},
+				"contact": {
+					"title": "14. Contact",
+					"prefix": "Voor juridische vragen kun je contact opnemen met"
+				}
+			}
+		}
+	},
+	"admin": {
+		"roles": {
+			"title": "Rollen Beheer"
+		}
+	}
 }

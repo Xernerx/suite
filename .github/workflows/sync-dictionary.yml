@@ -35,4 +35,4 @@ jobs:
                   git merge origin/canary -X theirs --allow-unrelated-histories -m "chore: auto-sync canary into dictionary"
 
                   # Push the result back to origin
-                  git push origin dictionary
+                  git push origin HEAD:refs/heads/dictionary
