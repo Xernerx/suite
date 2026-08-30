@@ -1,5 +1,17 @@
 # app
 
+## 2.2.2
+
+### Patch Changes
+
+- Added footer link to careers, and 2 languages
+- Updated dependencies
+    - @xernerx/lib@0.5.0
+    - @xernerx/components@0.2.17
+    - @xernerx/providers@0.3.10
+    - @xernerx/feedback@0.0.18
+    - @xernerx/ui@0.3.1
+
 ## 2.2.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.5.0
+
+### Minor Changes
+
+- Added footer link to careers, and 2 languages
+
 ## 0.4.0
 
 ### Minor Changes

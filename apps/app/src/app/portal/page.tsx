@@ -1,13 +1,13 @@
 /** @format */
 'use client';
 
-import { Bot, Building2, Check, Compass, LayoutDashboard, Plus, Save, Settings, User, Users, Server, Link2, Shield, AlertTriangle, Trash2 } from 'lucide-react';
-import { Button, Input, Modal, Selector, Tabs, Confirm } from '@xernerx/ui';
-import { BotRow } from '@xernerx/components';
+import { AlertTriangle, Bot, Building2, Check, Compass, LayoutDashboard, Link2, Plus, Save, Server, Settings, Shield, Trash2, User, Users } from 'lucide-react';
+import { Button, Confirm, Input, Modal, Selector, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
-import { CircleFlag } from 'react-circle-flags';
 
+import { BotRow } from '@xernerx/components';
+import { CircleFlag } from 'react-circle-flags';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';

@@ -4,11 +4,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, Languages, ListOrdered, Loader2, Search, Send, Sparkles } from 'lucide-react';
 import { Button, PreventLossConfirmation, Selector } from '@xernerx/ui';
-import Link from 'next/link';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
+
 import { CircleFlag } from 'react-circle-flags';
+import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
+
 const getFlagCode = (localeCode: string) => {
 	switch (localeCode) {
 		case 'en-GB':
