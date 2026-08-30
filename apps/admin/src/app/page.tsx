@@ -257,7 +257,7 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			{activeView === 'media' && <Media canManage={canManageMedia} canUpload={canUploadMedia} />}
+			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations />}
 			{activeView === 'users' && <Users />}
 			{activeView === 'applications_review' && <ApplicationReviews />}

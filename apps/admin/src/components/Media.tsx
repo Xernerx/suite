@@ -254,16 +254,18 @@ export default function Media() {
 					description={`Editing metadata for ${editMedia.filename}`}
 				>
 					<div className="space-y-4">
-						<Selector
-							label="Privacy Level"
-							value={editMedia.privacy}
-							onChange={(v: string) => setEditMedia({ ...editMedia, privacy: v })}
-							options={[
-								{ label: 'Public', value: 'public' },
-								{ label: 'Limited', value: 'limited' },
-								{ label: 'Private', value: 'private' },
-							]}
-						/>
+						<div className="flex flex-col gap-1.5">
+							<label className="text-sm font-medium text-(--text)">Privacy Level</label>
+							<Selector
+								value={editMedia.privacy}
+								onChange={(v: string) => setEditMedia({ ...editMedia, privacy: v })}
+								options={[
+									{ label: 'Public', value: 'public' },
+									{ label: 'Limited', value: 'limited' },
+									{ label: 'Private', value: 'private' },
+								]}
+							/>
+						</div>
 
 						{editMedia.privacy === 'private' && (
 							<div className="flex flex-col gap-3 border border-(--border)/10 rounded-2xl p-4 bg-(--foreground)/30">

@@ -1,5 +1,11 @@
 # auth
 
+## 0.7.1
+
+### Patch Changes
+
+- Fixed type errors
+
 ## 0.7.0
 
 ### Minor Changes

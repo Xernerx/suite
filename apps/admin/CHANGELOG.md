@@ -1,5 +1,11 @@
 # admin
 
+## 0.5.1
+
+### Patch Changes
+
+- Fixed type errors
+
 ## 0.5.0
 
 ### Minor Changes

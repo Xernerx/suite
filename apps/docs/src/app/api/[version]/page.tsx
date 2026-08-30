@@ -823,7 +823,7 @@ print(response.json())`,
 								description: 'Retrieve all available Discord roles within a specific guild.',
 								routes: [{ method: 'GET', path: '/core/guilds/[id]/discord/roles', color: 'blue' }],
 							},
-						].map((section) => {
+						].map((section: any) => {
 							const Icon = section.icon;
 							return (
 								<motion.section
@@ -840,7 +840,7 @@ print(response.json())`,
 									<p className="text-(--text-muted)">{section.description}</p>
 
 									<div className="bg-(--foreground)/30 border border-(--border)/10 rounded-2xl overflow-hidden mb-6">
-										{section.routes.map((route, i) => (
+										{section.routes.map((route: any, i: number) => (
 											<div
 												key={i}
 												className={`flex items-center gap-3 p-4 bg-(--background)/50 ${i !== section.routes.length - 1 || section.extra ? 'border-b border-(--border)/5' : ''}`}
@@ -962,7 +962,7 @@ print(response.json())`,
 									{ method: 'DELETE', path: '/secure/core/settings/[id]', color: 'red' },
 								],
 							},
-						].map((section) => {
+						].map((section: any) => {
 							const Icon = section.icon;
 							return (
 								<motion.section
@@ -979,7 +979,7 @@ print(response.json())`,
 									<p className="text-(--text-muted)">{section.description}</p>
 
 									<div className="bg-(--foreground)/30 border border-(--border)/10 rounded-2xl overflow-hidden mb-6">
-										{section.routes.map((route, i) => (
+										{section.routes.map((route: any, i: number) => (
 											<div
 												key={i}
 												className={`flex items-center gap-3 p-4 bg-(--background)/50 ${i !== section.routes.length - 1 || section.extra ? 'border-b border-(--border)/5' : ''}`}
