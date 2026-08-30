@@ -40,11 +40,17 @@
                 "github": "GitHub",
                 "npm": "npm",
                 "documentation": "Documentatie",
-                "discord": "Discord"
-            }
+                "discord": "Discord",
+                "faq": "Veel Gestelde Vragen"
+            },
+            "title": "Xernerx Studios",
+            "description": "© 2024 -",
+            "description2": "Xernerx Studios"
         },
         "sidebar": {
-            "login": "Inloggen"
+            "login": "Inloggen",
+            "alt": "Gebruiker Avatar",
+            "alt2": "Avatar Decoratie"
         },
         "nav": {
             "categories": {
@@ -54,7 +60,9 @@
                 "developer": "Ontwikkelaar",
                 "moderator": "Moderator",
                 "administrator": "Administrator",
-                "translator": "Vertaler"
+                "translator": "Vertaler",
+                "xernerxSuite": "Xernerx Suite",
+                "system": "System"
             },
             "items": {
                 "account": "Account",
@@ -69,12 +77,14 @@
                 "store": "Winkel",
                 "users": "Gebruikers",
                 "roles": "Rollen",
-                "translations": "Vertalingen"
+                "translations": "Vertalingen",
+                "applications": "Applicaties"
             }
         },
         "buttons": {
             "cancel": "Annuleren",
-            "confirm": "Bevestigen"
+            "confirm": "Bevestigen",
+            "proceed": "Doorgaan"
         }
     },
     "api": {
