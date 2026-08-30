@@ -19,6 +19,9 @@ declare global {
 
 declare module 'next-auth' {
 	interface Session extends DefaultSession {
+		user: {
+			id: string;
+		} & DefaultSession['user'];
 		[index: string]: any;
 	}
 }

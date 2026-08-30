@@ -41,8 +41,15 @@ export async function proxy(req: NextRequest) {
 	const isAuthorizedHost = hostNameOnly.endsWith('.xernerx.com') || hostNameOnly === 'xernerx.com';
 
 	// Explicitly identify trusted frontends (browsers send Origin)
-	const isLocalDevOrigin = process.env.ENVIRONMENT?.toLowerCase() === 'development' && (originHostname === 'localhost' || originHostname === '127.0.0.1');
-	const isTrustedFrontend = isAuthorizedOrigin || isLocalDevOrigin;
+	const isLocalDevOrigin =
+		process.env.ENVIRONMENT?.toLowerCase() === 'development' && (originHostname === 'localhost' || originHostname === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(originHostname));
+
+	// Browsers don't send Origin headers on same-origin GET requests.
+	// If origin is missing, but they sent Next-Auth session cookies and the host is trusted, it's a browser.
+	const hasSessionCookie = req.cookies.has('next-auth.session-token') || req.cookies.has('__Secure-next-auth.session-token');
+	const isSameOriginBrowser = !origin && isAuthorizedHost && hasSessionCookie;
+
+	const isTrustedFrontend = isAuthorizedOrigin || isLocalDevOrigin || isSameOriginBrowser;
 
 	// --- REUSABLE CORS HEADERS ---
 	const corsHeaders: Record<string, string> = {
@@ -51,9 +58,13 @@ export async function proxy(req: NextRequest) {
 	};
 
 	const errorResponse = (message: string, status: number) => {
+		const headers: Record<string, string> = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin || '*' };
+		if (origin) {
+			headers['Access-Control-Allow-Credentials'] = 'true';
+		}
 		return new NextResponse(JSON.stringify({ error: message }), {
 			status,
-			headers: { 'Content-Type': 'application/json', ...corsHeaders },
+			headers,
 		});
 	};
 
@@ -81,7 +92,11 @@ export async function proxy(req: NextRequest) {
 
 	// 1. MUST HANDLE CORS PREFLIGHT FIRST
 	if (req.method === 'OPTIONS') {
-		const preflightHeaders = new Headers(corsHeaders);
+		const preflightHeaders = new Headers();
+		preflightHeaders.set('Access-Control-Allow-Origin', origin || '*');
+		if (origin) {
+			preflightHeaders.set('Access-Control-Allow-Credentials', 'true');
+		}
 		preflightHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 		preflightHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
 		return new NextResponse(null, { headers: preflightHeaders, status: 200 });
@@ -145,9 +160,11 @@ export async function proxy(req: NextRequest) {
 	const response = await i18nProxyHandler(req as never);
 
 	// 4. Attach the required CORS headers to the final success response
-	if (response instanceof Response) {
+	if (response && response.headers) {
 		response.headers.set('Access-Control-Allow-Origin', origin || '*');
-		response.headers.set('Access-Control-Allow-Credentials', 'true');
+		if (origin) {
+			response.headers.set('Access-Control-Allow-Credentials', 'true');
+		}
 	}
 
 	return response;

@@ -27,7 +27,7 @@ function getPref(key: string): string | null {
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
 	const { data: session, status } = useSession();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { setAccent } = useTheme();
 	const { toast } = useToast();
 	const { t } = useDictionary();
@@ -39,28 +39,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 		const sessionWithError = session as { error?: string; accessToken?: string; user?: any };
 
 		if (status === 'authenticated' && sessionWithError?.error === 'RefreshAccessTokenError') {
-			const authLoginUrl = getEnvUrl('https://auth.xernerx.com/login');
+			const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
 			signOut({ callbackUrl: authLoginUrl });
 			return;
 		}
 
 		if (!sessionWithError || !sessionWithError.accessToken) return;
 
+		let discord = null;
 		try {
-			const discord = await fetch('https://discord.com/api/v10/users/@me', {
+			discord = await fetch('https://discord.com/api/v10/users/@me', {
 				headers: { Authorization: `Bearer ${sessionWithError.accessToken}` },
 			}).then((res) => res.json());
+		} catch (error) {
+			console.warn('Critical error fetching from Discord:', error);
+			// We can proceed without discord data if we have to, or return
+		}
 
+		let xernerx = null;
+		try {
 			const userId = (session?.user as any)?.id;
 			const baseUrl = getEnvUrl('https://api.xernerx.com/');
-			let xernerx = null;
 
-			const res = await fetch(`${baseUrl}secure/users/${userId}`);
+			const res = await fetch(`${baseUrl}secure/users/${userId}`, {
+				credentials: 'include',
+				cache: 'no-store',
+			});
 
 			if (res.status === 404) {
 				// User strictly does NOT exist, create them via POST with 1000 initial credits
 				const postRes = await fetch(`${baseUrl}secure/users/${userId}`, {
 					method: 'POST',
+					credentials: 'include',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						...(session?.user || {}),
@@ -71,14 +81,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 				if (!postRes.ok) {
 					toast({
-						title: t('auth.user.createError'),
+						title: t('account.user.createError'),
 						type: 'error',
 					});
 				} else {
 					xernerx = await postRes.json();
 
 					toast({
-						title: t('auth.user.created'),
+						title: t('account.user.created'),
 						type: 'info',
 					});
 				}
@@ -86,12 +96,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				xernerx = await res.json();
 			} else {
 				toast({
-					title: t('auth.user.fetchError'),
+					title: t('account.user.fetchError'),
 					type: 'error',
 				});
 			}
 
-			const mergedUser = { ...sessionWithError.user, ...discord, ...xernerx };
+			const mergedUser = { ...sessionWithError.user, ...(discord || {}), ...(xernerx || {}) };
 			setUser(mergedUser);
 
 			// Check preferences
@@ -103,9 +113,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				setAccent(discord?.accent_color);
 			}
 		} catch (error) {
-			console.error('Critical error during user account synchronization:', error);
+			console.warn('Critical error fetching from Xernerx API:', error);
 			toast({
-				title: t('auth.user.networkError'),
+				title: t('account.user.networkError'),
 				type: 'error',
 			});
 		} finally {
@@ -114,8 +124,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	}, [session, status, getEnvUrl, setAccent, toast, t]);
 
 	useEffect(() => {
-		fetchUser();
-	}, [fetchUser]);
+		if (isReady) {
+			fetchUser();
+		}
+	}, [fetchUser, isReady]);
 
 	return <UserContext.Provider value={{ user, mutate: fetchUser, loading }}>{children}</UserContext.Provider>;
 }

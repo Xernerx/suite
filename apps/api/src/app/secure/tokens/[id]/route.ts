@@ -2,18 +2,15 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-
 import { database } from '@xernerx/lib/server';
-import { isValidObjectId } from 'mongoose';
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
 		const db = await database('xernerx');
+		const TokenModel = (db.models.users as any).Token;
 
-		// Smart query: If it's a valid 24-char hex, search by `_id`, otherwise search by your custom token `id`
-		const query = isValidObjectId(id) ? { _id: id } : { id };
-		const token = await db.models.tokens.apis.findOne(query);
+		const token = await TokenModel.findOne({ id }).lean();
 
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
@@ -31,15 +28,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const { id } = await params;
 		const body = await req.json();
 		const db = await database('xernerx');
+		const TokenModel = (db.models.users as any).Token;
 
-		const existingToken = await db.models.tokens.apis.findOne({ id });
+		// The user ID should be provided in the body when creating a token
+		const userId = body.userId;
+		if (!userId) return NextResponse.json({ error: 'userId required to create a token' }, { status: 400 });
+
+		const existingToken = await TokenModel.findOne({ id });
 		if (existingToken) {
 			return NextResponse.json({ error: 'Token already exists' }, { status: 409 });
 		}
 
-		const token = await db.models.tokens.apis.create({ ...body, id });
+		const newToken = await TokenModel.create({
+			...body,
+			owners: body.owners || [userId],
+			id,
+		});
 
-		return NextResponse.json(token, { status: 201 });
+		return NextResponse.json(newToken, { status: 201 });
 	} catch (error) {
 		console.error('POST Token Error:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -51,11 +57,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const { id } = await params;
 		const body = await req.json();
 		const db = await database('xernerx');
+		const TokenModel = (db.models.users as any).Token;
 
-		const query = isValidObjectId(id) ? { _id: id } : { id };
-
-		const token = await db.models.tokens.apis.findOneAndUpdate(query, { $set: body }, { after: true, runValidators: true });
-
+		const token = await TokenModel.findOneAndUpdate({ id }, body, { new: true });
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
 		}
@@ -71,11 +75,11 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
 	try {
 		const { id } = await params;
 		const db = await database('xernerx');
+		const TokenModel = (db.models.users as any).Token;
 
-		const query = isValidObjectId(id) ? { _id: id } : { id };
-		const deletedToken = await db.models.tokens.apis.findOneAndDelete(query);
+		const token = await TokenModel.findOneAndDelete({ id });
 
-		if (!deletedToken) {
+		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
 		}
 

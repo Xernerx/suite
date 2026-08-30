@@ -9,7 +9,9 @@ export default function Environments() {
 
 	return (
 		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-			<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('faq.environments.title')}</h1>
+			<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				{t('faq.environments.title')}
+			</h1>
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				<CollapsibleCard

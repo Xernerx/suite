@@ -43,7 +43,7 @@ export function Sidebar() {
 	const nameplateUrl = activeUser?.collectibles?.nameplate?.asset ? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm` : null;
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
-	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground) z-20';
+	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -98,33 +98,58 @@ export function Sidebar() {
 									</div>
 								)}
 
-								<Link
-									href={item.href || '#'}
-									onClick={() => {
-										if (item.view) setView(item.view);
-										if (item.onClick) item.onClick();
-										setMobileOpen(false);
-									}}
-									className={`group relative flex items-center rounded-xl transition-all duration-200 
-                                        ${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground) hover:text-(--text)'}
-                                        ${isCollapsed ? 'justify-center px-0' : ''}
-                                    `}
-									style={{
-										padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
-										gap: isCollapsed ? 0 : 'var(--ui-gap)',
-									}}
-								>
-									{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
-
-									{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
-
-									<span
-										className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
-                                        ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+								{!item.href || item.href === '#' ? (
+									<button
+										onClick={() => {
+											if (item.view) setView(item.view);
+											if (item.onClick) item.onClick();
+											setMobileOpen(false);
+										}}
+										className={`w-full group relative flex items-center text-left rounded-xl transition-all duration-200 
+											${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
+											${isCollapsed ? 'justify-center px-0' : 'justify-start'}
+										`}
+										style={{
+											padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
+											gap: isCollapsed ? 0 : 'var(--ui-gap)',
+										}}
 									>
-										{item.label}
-									</span>
-								</Link>
+										{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
+										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
+										<span
+											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
+											${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+										>
+											{item.label}
+										</span>
+									</button>
+								) : (
+									<Link
+										href={item.href}
+										onClick={() => {
+											if (item.view) setView(item.view);
+											if (item.onClick) item.onClick();
+											setMobileOpen(false);
+										}}
+										className={`group relative flex items-center text-left rounded-xl transition-all duration-200 
+											${active ? 'bg-(--active-accent)/50 text-(--text) font-semibold shadow-xs' : 'text-(--text-muted) hover:bg-(--foreground)/30 backdrop-blur-md hover:text-(--text)'}
+											${isCollapsed ? 'justify-center px-0' : 'justify-start'}
+										`}
+										style={{
+											padding: isCollapsed ? 'calc(var(--ui-gap) * 0.75) 0' : 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
+											gap: isCollapsed ? 0 : 'var(--ui-gap)',
+										}}
+									>
+										{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
+										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
+										<span
+											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
+											${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+										>
+											{item.label}
+										</span>
+									</Link>
+								)}
 							</Fragment>
 						);
 					})}
@@ -154,8 +179,8 @@ export function Sidebar() {
 							{/* Combined Trigger Card Wrapper */}
 							<div
 								className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-colors 
-                                ${!nameplateUrl ? 'hover:bg-(--foreground)' : 'shadow-inner'}
-                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)' : ''}
+                                ${!nameplateUrl ? 'hover:bg-(--foreground)/30 backdrop-blur-md' : 'shadow-inner'}
+                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/30 backdrop-blur-md' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                             `}
 								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
@@ -180,17 +205,18 @@ export function Sidebar() {
 											<div className="relative h-9 w-9">
 												<Image
 													src={avatarUrl}
-													alt="User Avatar"
+													alt={t('components.sidebar.alt1')}
 													fill
 													className="rounded-full border border-(--border) object-cover"
 													unoptimized
 													draggable={false}
 													loading="eager"
 												/>
+
 												{decorationUrl && (
 													<Image
 														src={decorationUrl}
-														alt="Avatar Decoration"
+														alt={t('components.sidebar.alt2')}
 														fill
 														className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
 														unoptimized
@@ -237,6 +263,7 @@ export function Sidebar() {
 												size={isCollapsed ? 20 : 18}
 												className={`transition-transform duration-200 ${activeMenu === 'notifications' && !nameplateUrl ? 'text-(--accent)' : ''}`}
 											/>
+
 											{unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-(--foreground)" />}
 										</div>
 									</button>

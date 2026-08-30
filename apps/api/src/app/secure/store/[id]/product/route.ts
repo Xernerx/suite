@@ -6,8 +6,8 @@ import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 import { products } from '@xernerx/lib';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
-	apiVersion: '2026-07-29.dahlia',
+const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
+	apiVersion: '2026-08-26.dahlia',
 });
 
 const STAFF_COUPON_ID = process.env.STRIPE_COUPON_ID;
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		if (!userId) return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
 
-		const user = await (await database('xernerx')).models.profiles.users.findOne({ id: userId });
+		const user = await (await database('xernerx')).models.users.User.findOne({ id: userId });
 		if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
 		// 1. Ensure the user has a Stripe Customer ID

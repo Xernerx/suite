@@ -14,10 +14,12 @@ import {
 	ThemeProvider,
 	ToastProvider,
 	UserProvider,
+	DispatchProvider,
 } from '@xernerx/providers';
 import React, { Suspense } from 'react';
 
 import { CookiePrompt } from './CookiePrompt';
+import { TermsPrompt } from './TermsPrompt';
 import { Loading } from '@xernerx/feedback';
 import { Page } from './Page';
 import { ThemeScript } from './ThemeScript';
@@ -30,9 +32,16 @@ const fredoka = Fredoka({
 const cascadiaCode = Cascadia_Code({
 	subsets: ['latin'],
 	variable: '--font-cascadia',
+	adjustFontFallback: false,
 });
 
 export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {
+	React.useEffect(() => {
+		if (typeof document !== 'undefined') {
+			document.body.classList.add(fredoka.variable, cascadiaCode.variable);
+		}
+	}, []);
+
 	return (
 		<Suspense fallback={<Loading />}>
 			<div
@@ -44,30 +53,33 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 			>
 				<ThemeScript />
 
-				<ToastProvider>
-					<DictionaryProvider dictionary={dictionary}>
+				<DictionaryProvider dictionary={dictionary}>
+					<ToastProvider>
 						<EnvironmentProvider initialEnvironment={initialEnvironment}>
 							<PlatformProvider>
 								<ThemeProvider>
 									<UserProvider>
 										<NotificationProvider>
-											<ShortcutsProvider>
-												<CookieProvider>
-													<SupportProvider>
+											<DispatchProvider>
+												<ShortcutsProvider>
+													<CookieProvider>
 														<CookiePrompt />
+														<TermsPrompt />
 														<SidebarProvider>
-															<Page>{children}</Page>
+															<SupportProvider>
+																<Page>{children}</Page>
+															</SupportProvider>
 														</SidebarProvider>
-													</SupportProvider>
-												</CookieProvider>
-											</ShortcutsProvider>
+													</CookieProvider>
+												</ShortcutsProvider>
+											</DispatchProvider>
 										</NotificationProvider>
 									</UserProvider>
 								</ThemeProvider>
 							</PlatformProvider>
 						</EnvironmentProvider>
-					</DictionaryProvider>
-				</ToastProvider>
+					</ToastProvider>
+				</DictionaryProvider>
 			</div>
 		</Suspense>
 	);

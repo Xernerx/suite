@@ -1,6 +1,8 @@
 /** @format */
 'use client';
 
+import { useDictionary } from '@xernerx/providers';
 export default function Home() {
-	return <div className="">test</div>;
+	const { t } = useDictionary();
+	return <div className="">{t('cdn.common.description')}</div>;
 }

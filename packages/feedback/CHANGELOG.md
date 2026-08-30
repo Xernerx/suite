@@ -1,5 +1,59 @@
 # @xernerx/feedback
 
+## 0.0.16
+
+### Patch Changes
+
+- fix build
+- Updated dependencies
+    - @xernerx/providers@0.3.8
+    - @xernerx/ui@0.2.11
+
+## 0.0.15
+
+### Patch Changes
+
+- @xernerx/providers@0.3.7
+- @xernerx/ui@0.2.10
+
+## 0.0.14
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/providers@0.3.6
+    - @xernerx/ui@0.2.9
+
+## 0.0.13
+
+### Patch Changes
+
+- @xernerx/providers@0.3.5
+- @xernerx/ui@0.2.8
+
+## 0.0.12
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/ui@0.2.7
+
+## 0.0.11
+
+### Patch Changes
+
+- @xernerx/ui@0.2.6
+
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/ui@0.2.5
+
 ## 0.0.9
 
 ### Patch Changes

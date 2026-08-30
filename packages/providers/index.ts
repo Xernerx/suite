@@ -9,6 +9,9 @@ export * from './src/ToastProvider';
 export * from './src/SupportProvider';
 export * from './src/EnvironmentProvider';
 export * from './src/ShortcutsProvider';
+export * from './src/DispatchProvider';
 export * from './src/UserProvider';
 export * from './src/DictionaryProvider';
 export * from './src/NotificationProvider';
+export * from './src/PermissionProvider';
+// cache bust

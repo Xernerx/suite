@@ -11,7 +11,7 @@ export async function getThemeLayoutProps() {
 	const uiGap = cookieStore.get('uiGap')?.value;
 	const textScale = cookieStore.get('textScale')?.value;
 
-	const isDark = theme === 'dark';
+	const isLight = theme === 'light';
 
 	const initialStyles: Record<string, string> = {
 		'--accent': accent,
@@ -22,7 +22,7 @@ export async function getThemeLayoutProps() {
 	if (textScale) initialStyles['--text-scale'] = `${textScale}px`;
 
 	return {
-		className: isDark ? 'dark' : '',
+		className: !isLight ? 'dark' : '',
 		style: initialStyles as React.CSSProperties,
 	};
 }

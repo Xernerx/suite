@@ -1,5 +1,120 @@
 # www
 
+## 0.6.3
+
+### Patch Changes
+
+- Updated ToS and Privacy Policy to better include developer terms, and fixed permissions in admin panel
+
+## 0.6.2
+
+### Patch Changes
+
+- Added announcements and update privacy policy and terms of service
+
+## 0.6.1
+
+### Patch Changes
+
+- fix build
+- Updated dependencies
+    - @xernerx/components@0.2.15
+    - @xernerx/providers@0.3.8
+    - @xernerx/feedback@0.0.16
+    - @xernerx/lib@0.3.7
+    - @xernerx/ui@0.2.11
+
+## 0.6.0
+
+### Minor Changes
+
+- ## New Features & Enhancements
+    - **Invites Matrix System Added**: Added a comprehensive `/invites` matrix system allowing admins to manage official Discord bot invites across the Xernerx network.
+    - **Dynamic Discord Profiles (API & Frontend)**: The public Invites listing page (`www`) and Admin dashboard cards now dynamically fetch and display live Discord `global_name`/`username` and `avatarUrl` metadata directly from the Discord API. This ensures that bot branding is always up-to-date.
+    - **Admin Dashboard UI Upgrades**:
+        - The Invites view is fully integrated into the Admin sidebar layout under the `Administrator` category.
+        - The Invites management modal now utilizes the sleek `@xernerx/ui` `Toggle` component for the 53-item Discord Permission matrix.
+        - Modals were scaled up to support robust scrolling configurations (`maxWidth="max-w-4xl"`).
+    - **Public Timeline Overhaul**: Upgraded the Xernerx landing page timeline to a 2035 "editorial" layout featuring sticky typography headers on the left and seamlessly scrolling bento glass cards on the right.
+
+    ## Bug Fixes
+    - Fixed `database` import errors by correctly awaiting the server connection and passing the appropriate `xernerx` project configuration payload across API routes.
+    - Resolved build-time dependency leakage by properly scoping `discord-api-types` exclusively to the `admin` app.
+    - Corrected React context collisions in the Admin `Settings` page by ensuring `useSession` is imported directly from `@xernerx/providers` rather than raw `next-auth/react`.
+    - Next.js 15+ Compatibility: Implemented Promise resolutions for dynamic routing parameters `await params` in OAuth2 routing paths.
+    - Prevented cross-environment failures by switching hardcoded API paths in Server Components to properly evaluate `ENV.ENVIRONMENT` domains for local proxying versus production calls.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.6
+    - @xernerx/components@0.2.14
+    - @xernerx/providers@0.3.7
+    - @xernerx/feedback@0.0.15
+    - @xernerx/ui@0.2.10
+
+## 0.5.7
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.2.13
+    - @xernerx/providers@0.3.6
+    - @xernerx/feedback@0.0.14
+    - @xernerx/lib@0.3.5
+    - @xernerx/ui@0.2.9
+
+## 0.5.6
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.4
+    - @xernerx/components@0.2.12
+    - @xernerx/providers@0.3.5
+    - @xernerx/feedback@0.0.13
+    - @xernerx/ui@0.2.8
+
+## 0.5.5
+
+### Patch Changes
+
+- Resolve token modal issues, fix auth user IDs, apply custom ui, and trigger vercel builds.
+
+## 0.5.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/ui@0.2.7
+    - @xernerx/providers@0.3.4
+    - @xernerx/components@0.2.11
+    - @xernerx/feedback@0.0.12
+
+## 0.5.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.2.10
+    - @xernerx/providers@0.3.3
+    - @xernerx/ui@0.2.6
+    - @xernerx/feedback@0.0.11
+
+## 0.5.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/ui@0.2.5
+    - @xernerx/providers@0.3.2
+    - @xernerx/lib@0.3.3
+    - @xernerx/components@0.2.9
+    - @xernerx/feedback@0.0.10
+
 ## 0.5.1
 
 ### Patch Changes

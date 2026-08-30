@@ -3,10 +3,10 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
-import Script from 'next/script';
 import tinycolor from 'tinycolor2';
 import { useEnvironment } from '@xernerx/providers'; // Imported useEnvironment for API routing
 import { useSession } from 'next-auth/react';
+import Script from 'next/script';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -100,7 +100,7 @@ function applyAccent(color?: string | number | null) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { data: session } = useSession();
 
 	const [theme, setThemeState] = useState<Theme>(() => {
@@ -114,7 +114,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	// -----------------------------------------------------------------------------
 	// Initial Load & Client Sync Request
 	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
 	useEffect(() => {
+		if (!isReady) return;
 		const storedAccent = getPref('accent') || DEFAULT_ACCENT;
 
 		const accent = tinycolor(storedAccent);
@@ -136,7 +138,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				if (!res.ok) return;
 
 				const data = await res.json();
-				const appPrefs = data?.appearance;
+				const appPrefs = data?.settings?.appearance;
 
 				if (appPrefs && appPrefs.clientSync) {
 					setPref('clientSync', 'true');
@@ -158,12 +160,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 					if (appPrefs.textScale) document.documentElement.style.setProperty('--text-scale', `${appPrefs.textScale}px`);
 				}
 			} catch (e) {
-				console.error('Failed to sync appearance from server', e);
+				console.warn('Failed to sync appearance from server', e);
 			}
 		};
 
 		fetchRemoteSync();
-	}, [getEnvUrl, theme, session]);
+	}, [getEnvUrl, session]);
 
 	useEffect(() => {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;

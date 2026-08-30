@@ -1,5 +1,82 @@
 # @xernerx/components
 
+## 0.2.15
+
+### Patch Changes
+
+- fix build
+- Updated dependencies
+    - @xernerx/providers@0.3.8
+    - @xernerx/feedback@0.0.16
+    - @xernerx/lib@0.3.7
+    - @xernerx/ui@0.2.11
+
+## 0.2.14
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.6
+    - @xernerx/providers@0.3.7
+    - @xernerx/feedback@0.0.15
+    - @xernerx/ui@0.2.10
+
+## 0.2.13
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/providers@0.3.6
+    - @xernerx/feedback@0.0.14
+    - @xernerx/lib@0.3.5
+    - @xernerx/ui@0.2.9
+
+## 0.2.12
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.4
+    - @xernerx/providers@0.3.5
+    - @xernerx/feedback@0.0.13
+    - @xernerx/ui@0.2.8
+
+## 0.2.11
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/ui@0.2.7
+    - @xernerx/providers@0.3.4
+    - @xernerx/feedback@0.0.12
+
+## 0.2.10
+
+### Patch Changes
+
+-   - Restyled the `api` app landing page to feature the premium glassmorphism aesthetic.
+    - Fixed hydration mismatch issues involving `next/link` and translated dictionaries.
+    - Resolved Discord API `Failed to fetch` error that broke the User account synchronization by splitting try/catch blocks and gracefully bypassing Discord CORS failures.
+    - Ensured session cookies traverse successfully between client subdomains and the API route by adding `credentials: 'include'` to `UserProvider` fetches.
+    - Fixed a bug where same-origin browser API calls lacked `Origin` headers, preventing them from bypassing the `proxy.ts` middleware authentication block.
+- Updated dependencies
+    - @xernerx/providers@0.3.3
+    - @xernerx/ui@0.2.6
+    - @xernerx/feedback@0.0.11
+
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/ui@0.2.5
+    - @xernerx/providers@0.3.2
+    - @xernerx/lib@0.3.3
+    - @xernerx/feedback@0.0.10
+
 ## 0.2.8
 
 ### Patch Changes

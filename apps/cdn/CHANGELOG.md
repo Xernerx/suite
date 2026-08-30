@@ -1,5 +1,85 @@
 # cdn
 
+## 0.4.15
+
+### Patch Changes
+
+- fix build
+- Updated dependencies
+    - @xernerx/components@0.2.15
+    - @xernerx/providers@0.3.8
+    - @xernerx/feedback@0.0.16
+    - @xernerx/styles@0.1.7
+    - @xernerx/lib@0.3.7
+
+## 0.4.14
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.6
+    - @xernerx/components@0.2.14
+    - @xernerx/providers@0.3.7
+    - @xernerx/feedback@0.0.15
+
+## 0.4.13
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.2.13
+    - @xernerx/providers@0.3.6
+    - @xernerx/feedback@0.0.14
+    - @xernerx/styles@0.1.6
+    - @xernerx/lib@0.3.5
+
+## 0.4.12
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.3.4
+    - @xernerx/components@0.2.12
+    - @xernerx/providers@0.3.5
+    - @xernerx/feedback@0.0.13
+
+## 0.4.11
+
+### Patch Changes
+
+- Resolve token modal issues, fix auth user IDs, apply custom ui, and trigger vercel builds.
+
+## 0.4.10
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.3.4
+    - @xernerx/components@0.2.11
+    - @xernerx/feedback@0.0.12
+
+## 0.4.9
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.2.10
+    - @xernerx/providers@0.3.3
+    - @xernerx/feedback@0.0.11
+
+## 0.4.8
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.3.2
+    - @xernerx/lib@0.3.3
+    - @xernerx/components@0.2.9
+    - @xernerx/feedback@0.0.10
+
 ## 0.4.7
 
 ### Patch Changes

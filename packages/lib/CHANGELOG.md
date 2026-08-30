@@ -1,5 +1,69 @@
 # @xernerx/lib
 
+## 0.3.7
+
+### Patch Changes
+
+- fix build
+
+## 0.3.6
+
+### Patch Changes
+
+- ## New Features & Enhancements
+    - **Invites Matrix System Added**: Added a comprehensive `/invites` matrix system allowing admins to manage official Discord bot invites across the Xernerx network.
+    - **Dynamic Discord Profiles (API & Frontend)**: The public Invites listing page (`www`) and Admin dashboard cards now dynamically fetch and display live Discord `global_name`/`username` and `avatarUrl` metadata directly from the Discord API. This ensures that bot branding is always up-to-date.
+    - **Admin Dashboard UI Upgrades**:
+        - The Invites view is fully integrated into the Admin sidebar layout under the `Administrator` category.
+        - The Invites management modal now utilizes the sleek `@xernerx/ui` `Toggle` component for the 53-item Discord Permission matrix.
+        - Modals were scaled up to support robust scrolling configurations (`maxWidth="max-w-4xl"`).
+    - **Public Timeline Overhaul**: Upgraded the Xernerx landing page timeline to a 2035 "editorial" layout featuring sticky typography headers on the left and seamlessly scrolling bento glass cards on the right.
+
+    ## Bug Fixes
+    - Fixed `database` import errors by correctly awaiting the server connection and passing the appropriate `xernerx` project configuration payload across API routes.
+    - Resolved build-time dependency leakage by properly scoping `discord-api-types` exclusively to the `admin` app.
+    - Corrected React context collisions in the Admin `Settings` page by ensuring `useSession` is imported directly from `@xernerx/providers` rather than raw `next-auth/react`.
+    - Next.js 15+ Compatibility: Implemented Promise resolutions for dynamic routing parameters `await params` in OAuth2 routing paths.
+    - Prevented cross-environment failures by switching hardcoded API paths in Server Components to properly evaluate `ENV.ENVIRONMENT` domains for local proxying versus production calls.
+
+## 0.3.5
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+
+## 0.3.4
+
+### Patch Changes
+
+- Fix MongoDB connection URI concatenation when base URI has query parameters
+
+## 0.3.3
+
+### Patch Changes
+
+- ### Dashboard (apps/app)
+    - Restyled the dashboard configuration interface into a responsive, full-width SPA layout without arbitrary height restrictions, allowing native body scrolling.
+    - Implemented premium glassmorphism aesthetics (`bg-(--foreground)/30`, `backdrop-blur-md`, `rounded-[2rem]`) and grid-based cards (Server Sync Data, Server Info, Privacy & Data).
+    - Rendered Discord guild banners natively within the layout.
+    - Replaced native HTML `<select>` elements with the custom `@xernerx/ui` `<Selector>` component (`items={true}`).
+    - Fixed build errors regarding the `<Loading />` component variant and Recharts tooltip label formatting.
+
+    ### API & Middleware (apps/api)
+    - Updated `core/users/[id]/discord/guilds` to successfully map and return `bannerUrl` for Discord guilds.
+    - Created `secure/guilds/[id]` endpoint for profile persistence.
+    - Resolved token invalidation loop (`proxy.ts`) by removing unnecessary `Authorization` headers on internal DB requests, instead relying on Next-Auth session cookies.
+    - Resolved TypeScript errors in bot voting endpoints (`secure/bots/[id]/vote`).
+
+    ### Desktop App (apps/desktop)
+    - Configured dynamic routing in `main.ts` so canary builds automatically point `WEB_URL` to `https://app.canary.xernerx.com` by sniffing the version string for `canary`.
+
+    ### Packages & Providers
+    - **@xernerx/ui**: Expanded `InputProps` to include the `rows` property to support `variant="textarea"`, fixing upstream compilation errors in `apps/auth`.
+    - **@xernerx/providers**: Wrapped `getEnvUrl` in a `useCallback` hook inside `EnvironmentProvider` to prevent infinite re-render fetch loops against the Discord API.
+    - **@xernerx/lib**: Exported `GuildSchema` to the central registry.
+
 ## 0.3.2
 
 ### Patch Changes

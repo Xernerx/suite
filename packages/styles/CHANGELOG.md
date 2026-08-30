@@ -1,5 +1,18 @@
 # @xernerx/styles
 
+## 0.1.7
+
+### Patch Changes
+
+- fix build
+
+## 0.1.6
+
+### Patch Changes
+
+- Xerple and Crean
+- Xerple and Crean
+
 ## 0.1.5
 
 ### Patch Changes

@@ -1,22 +1,20 @@
 /** @format */
 
-import 'server-only';
-
 import mongoose, { Connection, Model, Schema } from 'mongoose';
 
 import { xernerxModels } from './registry';
 
 const globalWithMongoose = global as typeof global & {
-	__connections?: Record<string, Record<string, Connection>>;
-	__models?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__connections_v2?: Record<string, Record<string, Connection>>;
+	__models_v4?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
-const activeConnections = globalWithMongoose.__connections || {};
-const cachedModels = globalWithMongoose.__models || {};
+const activeConnections = globalWithMongoose.__connections_v2 || {};
+const cachedModels = globalWithMongoose.__models_v4 || {};
 
 if (process.env.NODE_ENV !== 'production') {
-	globalWithMongoose.__connections = activeConnections;
-	globalWithMongoose.__models = cachedModels;
+	globalWithMongoose.__connections_v2 = activeConnections;
+	globalWithMongoose.__models_v4 = cachedModels;
 }
 
 const uris = {
@@ -57,7 +55,14 @@ export async function database(projectId: keyof typeof uris) {
 	// Loop 1: uriSuffix is 'profiles', 'stats', 'tokens'
 	for (const [uriSuffix, collectionsMap] of Object.entries(registry)) {
 		// Connects to mongodb+srv://.../profiles
-		const connectionUri = `${baseUri.replace(/\/$/, '')}/${uriSuffix}`;
+		let connectionUri = '';
+		try {
+			const parsed = new URL(baseUri);
+			parsed.pathname = parsed.pathname === '/' ? `/${uriSuffix}` : `${parsed.pathname.replace(/\/$/, '')}/${uriSuffix}`;
+			connectionUri = parsed.toString();
+		} catch (e) {
+			connectionUri = `${baseUri.replace(/\/$/, '')}/${uriSuffix}`;
+		}
 
 		let conn: Connection | undefined = activeConnections[projectId][uriSuffix];
 

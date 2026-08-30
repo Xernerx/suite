@@ -27,8 +27,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		return NextResponse.json(
 			{
 				...data,
-				avatarUrl: data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}` : null,
-				bannerUrl: data.banner ? `https://cdn.discordapp.com/banners/${id}/${data.banner}.${data.banner.startsWith('a_') ? 'gif' : 'png'}` : null,
+				avatarUrl: data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null,
+				bannerUrl: data.banner ? `https://cdn.discordapp.com/banners/${id}/${data.banner}.${data.banner.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null,
 			},
 			{ status: 200 }
 		);

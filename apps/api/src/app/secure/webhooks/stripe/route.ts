@@ -8,7 +8,7 @@ import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-07-29.dahlia',
+	apiVersion: '2026-08-26.dahlia',
 });
 
 export async function POST(req: NextRequest) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 		const db = await database('xernerx');
 		const models = db?.models;
 
-		if (!models?.profiles?.users) {
+		if (!models?.users) {
 			console.error('Webhook Error: Database models or users model not found on connection');
 			return NextResponse.json({ error: 'Database model initialization failed' }, { status: 500 });
 		}
@@ -54,12 +54,12 @@ export async function POST(req: NextRequest) {
 				const currentPeriodEnd = new Date(subscription.items.data[0].current_period_end * 1000);
 				const status = subscription.status;
 
-				await models.profiles.users.findOneAndUpdate(
+				await models.users.User.findOneAndUpdate(
 					{ id: userId },
 					{
-						$set: { stripeCustomerId: customerId },
+						$set: { 'billing.stripeCustomerId': customerId },
 						$push: {
-							subscriptions: {
+							'billing.subscriptions': {
 								stripeSubscriptionId: subscriptionId,
 								priceId: priceId,
 								status: status,
@@ -80,12 +80,12 @@ export async function POST(req: NextRequest) {
 			const status = subscription.status;
 			const currentPeriodEnd = new Date(subscription.items.data[0].current_period_end * 1000);
 
-			await models.profiles.users.findOneAndUpdate(
-				{ 'subscriptions.stripeSubscriptionId': subscriptionId },
+			await models.users.User.findOneAndUpdate(
+				{ 'billing.subscriptions.stripeSubscriptionId': subscriptionId },
 				{
 					$set: {
-						'subscriptions.$.currentPeriodEnd': currentPeriodEnd,
-						'subscriptions.$.status': status,
+						'billing.subscriptions.$.currentPeriodEnd': currentPeriodEnd,
+						'billing.subscriptions.$.status': status,
 					},
 				}
 			);
@@ -96,10 +96,10 @@ export async function POST(req: NextRequest) {
 			const subscription = event.data.object as Stripe.Subscription;
 			const subscriptionId = subscription.id;
 
-			await models.profiles.users.findOneAndUpdate(
-				{ 'subscriptions.stripeSubscriptionId': subscriptionId },
+			await models.users.User.findOneAndUpdate(
+				{ 'billing.subscriptions.stripeSubscriptionId': subscriptionId },
 				{
-					$set: { 'subscriptions.$.status': 'canceled' },
+					$set: { 'billing.subscriptions.$.status': 'canceled' },
 				}
 			);
 		}

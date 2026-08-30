@@ -1,6 +1,5 @@
 /** @format */
 
-import 'server-only';
 import { type Locale, localesConfig, supportedLocales, defaultLocale } from './i18n.config';
 
 const countKeys = (obj: any): number => {

@@ -3,29 +3,22 @@
 	"private": true,
 	"type": "module",
 	"description": "Xernerx Suite",
-	"version": "1.2.26",
 	"author": "Xernerx Studios",
-	"packageManager": "pnpm@11.20.0",
+	"packageManager": "pnpm@11.24.0",
 	"engines": {
 		"node": ">=20"
 	},
 	"scripts": {
-		"generate:locales": "tsx packages/lib/src/scripts/generate-locales.ts",
-		"predev": "pnpm i && pnpm generate:locales",
-		"dev": "pnpm predev && concurrently -n apps,tunnel -c blue,green \"pnpm --parallel --filter ./apps/* dev\" \"pnpm tunnel\"",
-		"prebuild": "pnpm generate:locales",
-		"build": "pnpm -r build",
-		"lint": "pnpm --recursive run lint",
-		"tunnel": "cloudflared tunnel run",
-		"commit": "pnpm build && pnpx prettier --write . && changeset",
-		"push": "pnpm changeset version && git add . && git commit -m \"chore: release\" && pnpm changeset tag && git push --follow-tags"
+		"suite": "npm link --prefix .xernerx/cli --silent && suite",
+		"dev": "suite dev",
+		"build": "suite build"
 	},
 	"devDependencies": {
 		"@changesets/cli": "^2.31.1",
-		"concurrently": "^9.2.4",
-		"next": "^16.3.0",
+		"@xernerx/cli": "workspace:*",
+		"concurrently": "^10.0.4",
+		"next": "^16.3.3",
 		"prettier": "^3.9.6",
-		"shx": "^0.4.0",
-		"tsx": "^4.23.11"
+		"typescript": "^7.0.2"
 	}
 }

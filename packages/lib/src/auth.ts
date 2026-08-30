@@ -1,7 +1,16 @@
 /** @format */
 
 import DiscordProvider from 'next-auth/providers/discord';
-import { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions, DefaultSession } from 'next-auth';
+
+declare module 'next-auth' {
+	interface Session extends DefaultSession {
+		user: {
+			id: string;
+		} & DefaultSession['user'];
+		[index: string]: any;
+	}
+}
 
 async function refreshAccessToken(token: any) {
 	try {
@@ -38,9 +47,9 @@ async function refreshAccessToken(token: any) {
 
 export const auth: NextAuthOptions = {
 	pages: {
-		signIn: '/auth/login',
-		error: '/auth/login',
-		signOut: '/auth/logout',
+		signIn: '/login',
+		error: '/login',
+		signOut: '/logout',
 	},
 	providers: [
 		DiscordProvider({
@@ -56,6 +65,7 @@ export const auth: NextAuthOptions = {
 	session: {
 		strategy: 'jwt',
 	},
+	useSecureCookies: true,
 	cookies: {
 		sessionToken: {
 			name: '__Secure-next-auth.session-token',
@@ -99,6 +109,18 @@ export const auth: NextAuthOptions = {
 		},
 	},
 	callbacks: {
+		async redirect({ url, baseUrl }) {
+			if (url.startsWith('/')) return `${baseUrl}${url}`;
+			try {
+				const parsedUrl = new URL(url);
+				if (parsedUrl.hostname.endsWith('xernerx.com') || parsedUrl.hostname === 'localhost') {
+					return url;
+				}
+			} catch (e) {
+				// ignore
+			}
+			return baseUrl;
+		},
 		async signIn({ user }) {
 			return true;
 		},
@@ -127,8 +149,8 @@ export const auth: NextAuthOptions = {
 			return {
 				...session,
 				user: {
-					id: token.sub,
 					...session.user,
+					id: token.sub as string,
 				},
 				accessToken: token.accessToken,
 				error: token.error,

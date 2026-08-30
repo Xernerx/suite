@@ -42,7 +42,7 @@ The **App** service is the primary user-facing control center where users spend 
 
 - **Framework:** Next.js (App Router) / React
 - **Real-Time & State:** WebSockets, Framer Motion
-- **Database & Auth:** Mongoose / MongoDB, NextAuth.js
+- **Database & Authentication:** Mongoose / MongoDB, NextAuth.js
 - **UI & Visualization:** Tailwind CSS, Recharts, Lucide Icons
 
 ---

@@ -33,7 +33,7 @@ The **WWW** service serves as the public-facing gateway and marketing portal for
 
 - **Public Showcase:** Highlights suite offerings, service statuses, and platform capabilities.
 - **Optimized Performance:** Built for lightning-fast load times and seamless cross-device browsing.
-- **Ecosystem Entry Point:** Routes users directly into the App, Docs, and Auth services.
+- **Ecosystem Entry Point:** Routes users directly into the App, Docs, and Account services.
 
 ---
 

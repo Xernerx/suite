@@ -1,6 +1,7 @@
 /** @format */
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Info, Loader2 } from 'lucide-react';
 
 interface ConfirmProps {
@@ -29,14 +30,20 @@ const variantStyles = {
 };
 
 export function Confirm({ open, onOpenChange, title, description, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, loading = false, variant = 'danger' }: ConfirmProps) {
-	if (!open) return null;
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	if (!open || !mounted) return null;
 
 	const { icon: Icon, iconWrapper, button } = variantStyles[variant];
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+	const confirmContent = (
+		<div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200 font-sans antialiased text-(--text)">
 			<div
-				className="flex flex-col w-full max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-xl animate-in zoom-in-95 duration-200"
+				className="flex flex-col w-full max-w-md rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex items-start" style={{ gap: 'var(--ui-gap)' }}>
@@ -44,7 +51,9 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 						<Icon size={24} />
 					</div>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-lg font-bold text-(--text)">{title}</h2>
+						<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{title}
+						</h2>
 						<p className="text-xs text-(--text-muted) leading-relaxed">{description}</p>
 					</div>
 				</div>
@@ -73,4 +82,10 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 			</div>
 		</div>
 	);
+
+	if (typeof document !== 'undefined') {
+		const { createPortal } = require('react-dom');
+		return createPortal(confirmContent, document.body);
+	}
+	return null;
 }

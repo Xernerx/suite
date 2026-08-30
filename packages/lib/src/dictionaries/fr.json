@@ -68,8 +68,8 @@
 	},
 	"www": {
 		"hero": {
-			"title": "Construction d'une infrastructure fiable",
-			"description": "Xernerx développe des applications, des frameworks et des outils d'automatisation évolutifs axés sur la maintenabilité à long terme et les performances."
+			"title": "Empowering Developers. Connecting Communities.",
+			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
 		},
 		"about": {
 			"title": "À propos de Xernerx",
@@ -264,7 +264,7 @@
 			}
 		}
 	},
-	"auth": {
+	"account": {
 		"account": {
 			"title": "Paramètres du compte",
 			"description": "Gérez votre session de compte, la confidentialité de vos données et les informations générales de votre profil.",
@@ -301,8 +301,8 @@
 				"description": "Sélectionnez une couleur d'accentuation personnalisée pour le thème de votre espace de travail."
 			},
 			"colors": {
-				"purple": "Violet Xernerx",
-				"green": "Vert Crea",
+				"purple": "Xerple",
+				"green": "Crean",
 				"neon": "Néon Cyber",
 				"blue": "Bleu Électrique",
 				"pink": "Rose Vif",
