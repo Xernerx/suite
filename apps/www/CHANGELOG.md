@@ -1,5 +1,11 @@
 # www
 
+## 0.6.3
+
+### Patch Changes
+
+- Updated ToS and Privacy Policy to better include developer terms, and fixed permissions in admin panel
+
 ## 0.6.2
 
 ### Patch Changes

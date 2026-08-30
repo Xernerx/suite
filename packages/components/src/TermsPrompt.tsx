@@ -13,8 +13,8 @@ export function TermsPrompt() {
 	const [submitting, setSubmitting] = useState(false);
 
 	// These dates are automatically bumped by the `suite commit` script
-	const TERMS_VERSION = new Date('2026-08-29T00:00:00Z').getTime();
-	const PRIVACY_VERSION = new Date('2026-08-29T00:00:00Z').getTime();
+	const TERMS_VERSION = new Date('2026-08-30T00:00:00Z').getTime();
+	const PRIVACY_VERSION = new Date('2026-08-30T00:00:00Z').getTime();
 
 	useEffect(() => {
 		console.log('[TermsPrompt] Evaluating state:', { loading, user });

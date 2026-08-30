@@ -1,5 +1,11 @@
 # admin
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated ToS and Privacy Policy to better include developer terms, and fixed permissions in admin panel
+
 ## 0.4.0
 
 ### Minor Changes

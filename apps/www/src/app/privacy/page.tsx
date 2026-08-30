@@ -45,6 +45,11 @@ export default function Page() {
 			),
 		},
 		{
+			id: 'api-data',
+			title: t('www.privacy.sections.apiData.title'),
+			content: <p>{t('www.privacy.sections.apiData.content')}</p>,
+		},
+		{
 			id: 'legal-basis',
 			title: t('www.privacy.sections.legalBasis.title'),
 			content: <p>{t('www.privacy.sections.legalBasis.content')}</p>,

@@ -41,7 +41,17 @@ export default function Page() {
 		{
 			id: 'api-usage',
 			title: t('www.terms.sections.apiUsage.title'),
-			content: <p>{t('www.terms.sections.apiUsage.content')}</p>,
+			content: (
+				<div className="space-y-4">
+					<p>{t('www.terms.sections.apiUsage.content')}</p>
+					<ul className="list-disc pl-6 space-y-2">
+						<li>{t('www.terms.sections.apiUsage.items.0')}</li>
+						<li>{t('www.terms.sections.apiUsage.items.1')}</li>
+						<li>{t('www.terms.sections.apiUsage.items.2')}</li>
+						<li>{t('www.terms.sections.apiUsage.items.3')}</li>
+					</ul>
+				</div>
+			),
 		},
 		{
 			id: 'bot-usage',

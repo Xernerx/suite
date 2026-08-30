@@ -107,7 +107,7 @@ export default function Home() {
 		const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
 		const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
 		const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
-		const canAnnouncements = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
+		const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
 
 		const isServerSet = !!adminServerId;
 
@@ -215,7 +215,7 @@ export default function Home() {
 	const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
 	const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
 	const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
-	const canAnnouncements = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
+	const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
 
 	const isServerSet = !!adminServerId;
 

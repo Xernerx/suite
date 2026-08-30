@@ -503,6 +503,10 @@
 				"contact": {
 					"title": "13. Contact",
 					"prefix": "For privacy-related inquiries contact"
+				},
+				"apiData": {
+					"title": "API Data Collection & Developer Obligations",
+					"content": "When developers use our REST API to synchronize bot statistics or fetch metadata, we collect and store this data to render bot pages and provide analytics. Developers are strictly prohibited from transmitting personally identifiable information (PII) of their users to our API unless explicitly requested by an endpoint. We do not sell or share API data with third-party advertisers."
 				}
 			}
 		},
@@ -532,7 +536,13 @@
 				},
 				"apiUsage": {
 					"title": "4. API & Developer Terms",
-					"content": "Developers using our API or bot infrastructure must not use these services to distribute malware, bypass rate limits, or facilitate unauthorized data scraping. We reserve the right to revoke API tokens or suspend bot applications that violate these guidelines or degrade platform performance."
+					"content": "Developers using our API or bot infrastructure must adhere to the following rules:",
+					"items": [
+						"Respect rate limits and do not spam or reverse-engineer the API.",
+						"You are solely responsible for securing your API keys; we are not liable for leaked tokens.",
+						"Data submitted to the platform (such as server stats) must be accurate and not artificially inflated.",
+						"We reserve the right to instantly revoke API tokens or suspend bot applications for any abuse or degraded platform performance."
+					]
 				},
 				"botUsage": {
 					"title": "5. Bot End User Terms",
