@@ -1,5 +1,4 @@
 /** @format */
-'use server';
 
 import { dictionary, locales } from '@xernerx/lib/server';
 

@@ -1,5 +1,4 @@
 /** @format */
-'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { sendWebhook } from '@xernerx/lib/server';

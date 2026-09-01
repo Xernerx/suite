@@ -18,6 +18,7 @@ import {
 	DispatchProvider,
 } from '@xernerx/providers';
 import React, { Suspense } from 'react';
+import Script from 'next/script';
 
 import { CookiePrompt } from './CookiePrompt';
 import { TermsPrompt } from './TermsPrompt';
@@ -53,6 +54,14 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 				}}
 			>
 				<ThemeScript />
+				{process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+					<Script
+						async
+						src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+						crossOrigin="anonymous"
+						strategy="afterInteractive"
+					/>
+				)}
 
 				<DictionaryProvider dictionary={dictionary}>
 					<ToastProvider>
