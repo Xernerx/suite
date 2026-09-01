@@ -1,5 +1,11 @@
 # app
 
+## 2.2.5
+
+### Patch Changes
+
+- Testing Ads 2
+
 ## 2.2.4
 
 ### Patch Changes
