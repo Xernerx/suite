@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -89,7 +90,7 @@ function RoleCard({
 				setIsModalOpen(false);
 				toast({
 					type: 'success',
-					title: 'Role updated successfully',
+					title: t('admin.roles.roleUpdated'),
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
@@ -116,7 +117,7 @@ function RoleCard({
 				onRoleDeleted(role.id);
 				toast({
 					type: 'success',
-					title: 'Role deleted successfully',
+					title: t('admin.roles.roleDeleted'),
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
@@ -260,7 +261,7 @@ function RoleCard({
 									onClick={() => {
 										navigator.clipboard.writeText(role.id);
 										toast({
-											title: 'Role ID copied',
+											title: t('admin.roles.roleIdCopied'),
 											type: 'success',
 										});
 									}}
@@ -279,7 +280,7 @@ function RoleCard({
 										onClick={() => {
 											navigator.clipboard.writeText(discordRoleId);
 											toast({
-												title: 'Discord ID copied',
+												title: t('admin.roles.discordIdCopied'),
 												type: 'success',
 											});
 										}}
@@ -387,8 +388,8 @@ function RoleCard({
 								{permissions.map((perm) => (
 									<div key={perm.key} className="flex items-center justify-between">
 										<div className="flex flex-col">
-											<span className="text-xs font-semibold text-(--text)">{perm.label}</span>
-											<span className="text-[11px] text-(--text-muted)">{perm.description}</span>
+											<span className="text-xs font-semibold text-(--text)">{t(`admin.permissions.${perm.key}.label`) || perm.label}</span>
+											<span className="text-[11px] text-(--text-muted)">{t(`admin.permissions.${perm.key}.description`) || perm.description}</span>
 										</div>
 										<Toggle
 											checked={localPermissions[perm.key] ?? perm.defaultValue}
@@ -541,7 +542,7 @@ export default function Roles() {
 				setNewPermissions(resetPerms);
 				toast({
 					type: 'success',
-					title: 'Role created successfully',
+					title: t('admin.roles.roleCreated'),
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
@@ -791,8 +792,8 @@ export default function Roles() {
 							{permissions.map((perm) => (
 								<div key={perm.key} className="flex items-center justify-between">
 									<div className="flex flex-col">
-										<span className="text-xs font-semibold text-(--text)">{perm.label}</span>
-										<span className="text-[11px] text-(--text-muted)">{perm.description}</span>
+										<span className="text-xs font-semibold text-(--text)">{t(`admin.permissions.${perm.key}.label`) || perm.label}</span>
+										<span className="text-[11px] text-(--text-muted)">{t(`admin.permissions.${perm.key}.description`) || perm.description}</span>
 									</div>
 									<Toggle
 										checked={newPermissions[perm.key] ?? perm.defaultValue}

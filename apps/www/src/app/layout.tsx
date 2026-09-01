@@ -12,13 +12,19 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Studios',
+	title: {
+		default: 'Xernerx Studios',
+		template: 'Xernerx Studios | %s',
+	},
 	description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
 
 	metadataBase: new URL('https://xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Studios',
+		title: {
+			default: 'Xernerx Studios',
+			template: 'Xernerx Studios | %s',
+		},
 		description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
 		url: 'https://xernerx.com',
 		siteName: 'Xernerx',
@@ -35,7 +41,10 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Studios',
+		title: {
+			default: 'Xernerx Studios',
+			template: 'Xernerx Studios | %s',
+		},
 		description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
 		images: ['/banner.png'],
 	},

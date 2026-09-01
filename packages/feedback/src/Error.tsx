@@ -13,6 +13,7 @@ export function Error({
 	};
 	reset: () => void;
 }) {
+	const { t } = useDictionary();
 	useEffect(() => {
 		console.error('Route Error:', error);
 	}, [error]);
@@ -33,12 +34,17 @@ export function Error({
 					gap: 'calc(var(--ui-gap) * 0.25)',
 				}}
 			>
-				<h2 className="text-xl font-bold text-(--text)">Something went wrong!</h2>
-				<p className="max-w-md text-sm text-(--text-muted)">An unexpected error occurred while loading this page. Please try again or contact support if the issue persists.</p>
+				<h2 className="text-xl font-bold text-(--text)">{t('feedback.error.title')}</h2>
+				<p className="max-w-md text-sm text-(--text-muted)">{t('feedback.error.description')}</p>
 				<div className="mt-4 p-4 bg-(--background) rounded-xl border border-(--border)/10 text-left w-full max-w-lg overflow-auto">
-					<p className="text-xs font-mono text-red-400 font-bold mb-1">Error Details:</p>
-					<p className="text-xs font-mono text-(--text-muted) break-words">{error.message || 'Unknown Error'}</p>
-					{error.digest && <p className="text-xs font-mono text-(--text-muted) mt-2">Digest: {error.digest}</p>}
+					<p className="text-xs font-mono text-red-400 font-bold mb-1">{t('feedback.error.details')}</p>
+					<p className="text-xs font-mono text-(--text-muted) break-words">{error.message || t('feedback.error.unknown')}</p>
+					{error.digest && (
+						<p className="text-xs font-mono text-(--text-muted) mt-2">
+							{t('feedback.error.digest')}
+							{error.digest}
+						</p>
+					)}
 				</div>
 			</div>
 			<button
@@ -49,7 +55,7 @@ export function Error({
 					marginTop: 'calc(var(--ui-gap) * 0.5)',
 				}}
 			>
-				Try again
+				{t('feedback.error.retry')}
 			</button>
 		</div>
 	);

@@ -12,13 +12,19 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Docs',
+	title: {
+		default: 'Xernerx Docs',
+		template: 'Xernerx Docs | %s',
+	},
 	description: 'Official documentation, guides, and API references for the Xernerx Suite.',
 
 	metadataBase: new URL('https://docs.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Docs',
+		title: {
+			default: 'Xernerx Docs',
+			template: 'Xernerx Docs | %s',
+		},
 		description: 'Official documentation, guides, and API references for the Xernerx Suite.',
 		url: 'https://docs.xernerx.com',
 		siteName: 'Xernerx',
@@ -35,7 +41,10 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Docs',
+		title: {
+			default: 'Xernerx Docs',
+			template: 'Xernerx Docs | %s',
+		},
 		description: 'Official documentation, guides, and API references for the Xernerx Suite.',
 		images: ['/banner.png'],
 	},

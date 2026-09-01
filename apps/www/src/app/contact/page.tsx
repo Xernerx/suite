@@ -1,4 +1,5 @@
 /** @format */
+// Force recompile
 
 'use client';
 
@@ -8,40 +9,41 @@ import { motion } from 'framer-motion';
 import { useSidebar, useEnvironment } from '@xernerx/providers';
 import { useEffect } from 'react';
 import { useDictionary } from '@xernerx/providers';
-const contacts = [
-	{
-		title: 'General',
-		description: 'General enquiries, partnerships and anything that does not fit elsewhere.',
-		email: 'info@xernerx.com',
-		icon: Mail,
-	},
-	{
-		title: 'Support',
-		description: 'Technical support, bug reports and product assistance.',
-		email: 'support@xernerx.com',
-		icon: Headphones,
-	},
-	{
-		title: 'Invoices',
-		description: 'Supplier invoices, accounting and payment related enquiries.',
-		email: 'invoice@xernerx.com',
-		icon: FileText,
-	},
-	{
-		title: 'Security',
-		description: 'Security reports, responsible disclosure and vulnerability reports.',
-		email: 'security@xernerx.com',
-		icon: Shield,
-	},
-	{
-		title: 'Legal',
-		description: 'Contracts, legal requests and official correspondence.',
-		email: 'legal@xernerx.com',
-		icon: Briefcase,
-	},
-];
 export default function ContactPage() {
 	const { t } = useDictionary();
+
+	const contacts = [
+		{
+			title: t('www.contact.cards.general.title'),
+			description: t('www.contact.cards.general.description'),
+			email: 'info@xernerx.com',
+			icon: Mail,
+		},
+		{
+			title: t('www.contact.cards.support.title'),
+			description: t('www.contact.cards.support.description'),
+			email: 'support@xernerx.com',
+			icon: Headphones,
+		},
+		{
+			title: t('www.contact.cards.invoices.title'),
+			description: t('www.contact.cards.invoices.description'),
+			email: 'invoice@xernerx.com',
+			icon: FileText,
+		},
+		{
+			title: t('www.contact.cards.security.title'),
+			description: t('www.contact.cards.security.description'),
+			email: 'security@xernerx.com',
+			icon: Shield,
+		},
+		{
+			title: t('www.contact.cards.legal.title'),
+			description: t('www.contact.cards.legal.description'),
+			email: 'legal@xernerx.com',
+			icon: Briefcase,
+		},
+	];
 	const { hide } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
 	useEffect(() => {

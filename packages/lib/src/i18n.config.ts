@@ -22,6 +22,14 @@ export const localesConfig = {
 		label: 'Nederlands',
 		load: () => import('./dictionaries/nl.json').then((module) => module.default),
 	},
+	ru: {
+		label: 'Русский',
+		load: () => import('./dictionaries/ru.json').then((module) => module.default),
+	},
+	se: {
+		label: 'Svenska',
+		load: () => import('./dictionaries/se.json').then((module) => module.default),
+	},
 } as const;
 
 export type Locale = keyof typeof localesConfig;

@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -267,7 +268,7 @@ export default function Settings() {
 					<Selector
 						value={adminServerId}
 						onChange={(val: string) => setAdminServerId(val)}
-						options={[{ value: '', label: 'Select a server...' }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
+						options={[{ value: '', label: t('admin.dashboard.settings.selectServer') }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
 						placeholder={t('admin.settings.adminServerIdPlaceholder') || 'Select Admin Server'}
 					/>
 				</div>
@@ -289,8 +290,8 @@ export default function Settings() {
 						gap: 'calc(var(--ui-gap) * 0.5)',
 					}}
 				>
-					<label className="text-xs font-semibold text-(--text)">Join Roles (Humans)</label>
-					<p className="text-xs text-(--text-muted) mb-1">Roles automatically assigned to human users upon joining.</p>
+					<label className="text-xs font-semibold text-(--text)">{t('admin.dashboard.settings.joinRolesHumans')}</label>
+					<p className="text-xs text-(--text-muted) mb-1">{t('admin.dashboard.settings.joinRolesHumansDesc')}</p>
 					<MultiSelector
 						value={joinRoles}
 						onChange={(val) => setJoinRoles(val)}
@@ -298,7 +299,7 @@ export default function Settings() {
 							value: r.id,
 							label: r.name,
 						}))}
-						placeholder="Select human join roles..."
+						placeholder={t('admin.dashboard.settings.selectHumanJoinRoles')}
 					/>
 				</div>
 
@@ -308,8 +309,8 @@ export default function Settings() {
 						gap: 'calc(var(--ui-gap) * 0.5)',
 					}}
 				>
-					<label className="text-xs font-semibold text-(--text)">Join Roles (Bots)</label>
-					<p className="text-xs text-(--text-muted) mb-1">Roles automatically assigned to bots upon joining.</p>
+					<label className="text-xs font-semibold text-(--text)">{t('admin.dashboard.settings.joinRolesBots')}</label>
+					<p className="text-xs text-(--text-muted) mb-1">{t('admin.dashboard.settings.joinRolesBotsDesc')}</p>
 					<MultiSelector
 						value={botJoinRoles}
 						onChange={(val) => setBotJoinRoles(val)}
@@ -317,7 +318,7 @@ export default function Settings() {
 							value: r.id,
 							label: r.name,
 						}))}
-						placeholder="Select bot join roles..."
+						placeholder={t('admin.dashboard.settings.selectBotJoinRoles')}
 					/>
 				</div>
 
@@ -329,11 +330,12 @@ export default function Settings() {
 				>
 					<div className="flex justify-between items-center">
 						<div>
-							<label className="text-xs font-semibold text-(--text)">Sister Servers</label>
-							<p className="text-xs text-(--text-muted) mb-1">List of sister server Guild IDs.</p>
+							<label className="text-xs font-semibold text-(--text)">{t('admin.dashboard.settings.sisterServers')}</label>
+							<p className="text-xs text-(--text-muted) mb-1">{t('admin.dashboard.settings.sisterServersDesc')}</p>
 						</div>
 						<Button type="button" variant="ghost" size="sm" onClick={() => setSisterServers([...sisterServers, { id: '' }])}>
-							+ Add
+							{' '}
+							{t('admin.dashboard.settings.add')}{' '}
 						</Button>
 					</div>
 					{sisterServers.map((server, idx) => (
@@ -346,8 +348,8 @@ export default function Settings() {
 										newServers[idx].id = val;
 										setSisterServers(newServers);
 									}}
-									options={[{ value: '', label: 'Select a server...' }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
-									placeholder="Select Discord Guild"
+									options={[{ value: '', label: t('admin.dashboard.settings.selectServer') }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
+									placeholder={t('admin.dashboard.settings.selectDiscordGuild')}
 								/>
 							</div>
 							<Button

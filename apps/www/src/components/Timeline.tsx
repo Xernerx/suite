@@ -6,7 +6,7 @@ import { ArrowUpRight, Bot, Building2, Calendar, Globe, LogOut, RefreshCw, Shiel
 import { motion, useScroll, useSpring } from 'framer-motion';
 
 import { useEffect, useRef, useState } from 'react';
-import { useEnvironment } from '@xernerx/providers';
+import { useEnvironment, useDictionary } from '@xernerx/providers';
 
 type Milestone = {
 	date: string;
@@ -89,6 +89,8 @@ const milestones: Milestone[] = [
 ];
 
 export default function Timeline() {
+	const { t } = useDictionary();
+
 	return (
 		<section className="relative py-32 mb-32 max-w-7xl mx-auto px-6">
 			<div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
@@ -97,15 +99,13 @@ export default function Timeline() {
 					<div className="lg:sticky lg:top-40 flex flex-col gap-8 relative z-10">
 						<div>
 							<h2 className="text-6xl lg:text-[5.5rem] font-black text-(--text) leading-[0.9] tracking-tighter mb-6" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								The
+								{t('www.timeline.title.line1')}
 								<br />
-								<span className="text-transparent bg-clip-text bg-gradient-to-br from-(--accent) to-purple-500">Journey</span>
+								<span className="text-transparent bg-clip-text bg-gradient-to-br from-(--accent) to-purple-500">{t('www.timeline.title.line2')}</span>
 								<br />
-								So Far.
+								{t('www.timeline.title.line3')}
 							</h2>
-							<p className="text-lg text-(--text-muted) leading-relaxed max-w-md font-medium">
-								From early experimentation with bots to stable infrastructure engineering, see how Xernerx evolved over the years.
-							</p>
+							<p className="text-lg text-(--text-muted) leading-relaxed max-w-md font-medium">{t('www.timeline.description')}</p>
 						</div>
 						<div className="hidden lg:block w-32 h-1.5 bg-gradient-to-r from-(--accent) to-transparent rounded-full shadow-[0_0_20px_var(--accent)]" />
 					</div>
@@ -118,7 +118,7 @@ export default function Timeline() {
 
 					<div className="flex flex-col gap-12 lg:gap-20">
 						{milestones.map((m, i) => (
-							<TimelineCard key={i} milestone={m} />
+							<TimelineCard key={i} milestone={m} index={i} />
 						))}
 					</div>
 				</div>
@@ -127,8 +127,9 @@ export default function Timeline() {
 	);
 }
 
-function TimelineCard({ milestone }: { milestone: Milestone }) {
+function TimelineCard({ milestone, index }: { milestone: Milestone; index: number }) {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 	const finalLink = milestone.link ? getEnvUrl(milestone.link) : undefined;
 
 	const Component = finalLink ? motion.a : motion.div;
@@ -169,10 +170,14 @@ function TimelineCard({ milestone }: { milestone: Milestone }) {
 					</div>
 
 					<div className="flex flex-col flex-1 min-w-0">
-						<span className="text-xs uppercase tracking-widest text-(--accent) font-black mb-1">{milestone.date}</span>
+						<span className="text-xs uppercase tracking-widest text-(--accent) font-black mb-1">
+							{t(`www.timeline.events.${index}.date`, {}, milestone.date) === 'DYNAMIC_DATE'
+								? `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][new Date().getMonth()]} ${new Date().getFullYear()}`
+								: t(`www.timeline.events.${index}.date`, {}, milestone.date)}
+						</span>
 
 						<span className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
-							{milestone.title}
+							{t(`www.timeline.events.${index}.title`, {}, milestone.title)}
 							{finalLink && (
 								<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
 							)}
@@ -181,7 +186,7 @@ function TimelineCard({ milestone }: { milestone: Milestone }) {
 				</div>
 
 				{/* DESCRIPTION */}
-				<p className="text-base leading-relaxed text-(--text-muted) relative z-10 font-medium">{milestone.description}</p>
+				<p className="text-base leading-relaxed text-(--text-muted) relative z-10 font-medium">{t(`www.timeline.events.${index}.description`, {}, milestone.description)}</p>
 			</Component>
 		</div>
 	);

@@ -1,5 +1,4 @@
 /** @format */
-'use server';
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';

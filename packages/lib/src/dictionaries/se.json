@@ -1,0 +1,111 @@
+{
+	"metadata": {
+		"label": "Svenska"
+	},
+	"common": {
+		"cookiePrompt": {
+			"title": "Inställningar för cookies",
+			"description": "Vi använder cookies för att säkerställa att din session förblir säker, komma ihåg ditt tema och hjälpa oss att förbättra appen.",
+			"manage": {
+				"essential": {
+					"label": "Grundläggande",
+					"description": "Krävs för sessioner och säkerhet."
+				},
+				"functional": {
+					"label": " Funktionell",
+					"description": " Kommer ihåg ditt tema och din layoutstatus."
+				},
+				"analytics": {
+					"label": "Analys",
+					"description": "Hjälper oss att spåra fel och trafik."
+				}
+			},
+			"buttons": {
+				"acceptAll": "Acceptera alla",
+				"essentialOnly": "Endast det nödvändiga",
+				"manage": " Hantera",
+				"save": "Spara mina inställningar"
+			}
+		},
+		"buttons": {
+			"cancel": "Avboka",
+			"confirm": " Bekräfta",
+			"proceed": " Fortsätta"
+		},
+		"footer": {
+			"tagline": "Utveckling av modern mjukvara, infrastruktur och utvecklarverktyg med fokus på prestanda, enkelhet och långsiktigt underhåll.",
+			"sections": {
+				"resources": "Resurser",
+				"developer": "Framkallare"
+			},
+			"links": {
+				"privacy": "Privatliv",
+				"terms": "Villkor",
+				"contact": "Kontakta",
+				"faq": "Vanliga frågor",
+				"careers": "Karriär",
+				"github": "Github",
+				"npm": "npm",
+				"documentation": " Dokumentation",
+				"discord": "Discord"
+			},
+			"title": "Xernerx Studios",
+			"description": "© 2024 -",
+			"description2": "Xernerx Studios"
+		},
+		"sidebar": {
+			"login": "Inloggning",
+			"alt": "Användaravatar",
+			"alt2": "Avatar-dekoration"
+		},
+		"nav": {
+			"categories": {
+				"account": "Konto",
+				"preferences": "Inställningar",
+				"billing": "Fakturering",
+				"developer": "Framkallare",
+				"moderator": "Moderator",
+				"administrator": "Administratör",
+				"translator": "Översättare",
+				"xernerxSuite": "Xernerx Suite",
+				"system": "System"
+			},
+			"items": {
+				"account": "Konto",
+				"profile": "Profil",
+				"connections": "Kopplingar",
+				"devices": "Enheter",
+				"appearance": "Utseende",
+				"language": "Språk",
+				"notifications": "Aviseringar",
+				"billing": "Fakturering",
+				"tokens": "Polletter",
+				"store": " Lagra",
+				"users": "Användare",
+				"roles": "Roller",
+				"translations": "Översättningar",
+				"applications": "Användningsområden",
+				"applications_review": "Granska ansökningar",
+				"applications_manage": "Hantera applikationer",
+				"settings": "Inställningar",
+				"environments": "Miljöer"
+			}
+		},
+		"shortcuts": {
+			"modal": {
+				"navigation": {
+					"title": "App-låda",
+					"description": "Starta och växla snabbt mellan program",
+					"empty": "Inga program tillgängliga."
+				}
+			}
+		},
+		"botrow": {
+			"description": " Servrar",
+			"description2": "Användare"
+		},
+		"sidebarnotifications": {
+			"description": "Aviseringar"
+		}
+	}
+}

@@ -1,3 +1,4 @@
+// Force recompile
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -80,7 +81,7 @@ export default function Announcements() {
 			const data = await res.json();
 			if (res.ok) {
 				setWebhookUrl(data.url);
-				toast({ type: 'success', title: 'Webhook linked!' });
+				toast({ type: 'success', title: t('admin.dashboard.announcements.toasts.webhookLinked') });
 			} else {
 				throw new Error(data.error || 'Failed');
 			}
@@ -175,7 +176,7 @@ export default function Announcements() {
 			});
 
 			if (res.ok) {
-				toast({ type: 'success', title: editingId ? 'Updated!' : 'Created!' });
+				toast({ type: 'success', title: editingId ? t('admin.dashboard.announcements.toasts.updateSuccess') : t('admin.dashboard.announcements.toasts.createSuccess') });
 				setIsOpen(false);
 				fetchAnnouncements();
 			} else {
@@ -189,7 +190,7 @@ export default function Announcements() {
 	};
 
 	const deleteAnnouncement = async (id: string) => {
-		if (!confirm('Are you sure?')) return;
+		if (!confirm(t('admin.dashboard.announcements.deleteConfirm'))) return;
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements/${id}`), {
 				method: 'DELETE',
@@ -268,8 +269,8 @@ export default function Announcements() {
 		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<div className="flex flex-col sm:flex-row items-center justify-between">
 				<div className="flex flex-col">
-					<h1 className="text-4xl font-extrabold tracking-tight text-(--text)">Announcements</h1>
-					<p className="text-sm text-(--text-muted)">Manage global announcements and Discord webhooks.</p>
+					<h1 className="text-4xl font-extrabold tracking-tight text-(--text)">{t('admin.dashboard.announcements.title')}</h1>
+					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.announcements.subtitle')}</p>
 				</div>
 				<Button
 					variant="primary"
@@ -328,44 +329,57 @@ export default function Announcements() {
 						<div className="flex flex-col gap-1 text-sm text-(--text-muted)">
 							{a.sentAt ? (
 								<div className="flex items-center gap-2 text-green-500">
-									<Send size={14} /> Sent on {new Date(a.sentAt).toLocaleDateString()}
+									<Send size={14} /> {t('admin.dashboard.announcements.sentOn')}
+									{new Date(a.sentAt).toLocaleDateString()}
 								</div>
 							) : (
 								<div className="flex items-center gap-2 text-orange-500">
-									<CalendarClock size={14} /> {a.scheduledFor ? `Scheduled: ${new Date(a.scheduledFor).toLocaleString()}` : 'Draft'}
+									<CalendarClock size={14} />{' '}
+									{a.scheduledFor ? `{t('admin.dashboard.announcements.scheduled')}${new Date(a.scheduledFor).toLocaleString()}` : t('admin.dashboard.announcements.draft')}
 								</div>
 							)}
-							{a.channelId && <div className="text-xs">Channel: {a.channelId}</div>}
+							{a.channelId && (
+								<div className="text-xs">
+									{t('admin.dashboard.announcements.channel')}
+									{a.channelId}
+								</div>
+							)}
 						</div>
 					</div>
 				))}
 			</div>
 
-			<Modal open={isOpen} onOpenChange={setIsOpen} title={editingId ? 'Edit Announcement' : 'New Announcement'} description="Configure Discord embed & scheduling" maxWidth="max-w-4xl">
+			<Modal
+				open={isOpen}
+				onOpenChange={setIsOpen}
+				title={editingId ? t('admin.dashboard.announcements.editModalTitle') : t('admin.dashboard.announcements.createModalTitle')}
+				description={t('admin.dashboard.announcements.modalDesc')}
+				maxWidth="max-w-4xl"
+			>
 				<form onSubmit={saveAnnouncement} className="flex flex-col gap-6 max-h-[75vh] overflow-y-auto pr-2">
 					<div className="flex gap-2">
 						<Button type="button" variant="ghost" onClick={() => fillBoilerplate('tos')}>
-							Load TOS Template
+							{t('admin.dashboard.announcements.loadTos')}
 						</Button>
 						<Button type="button" variant="ghost" onClick={() => fillBoilerplate('privacy')}>
-							Load Privacy Template
+							{t('admin.dashboard.announcements.loadPrivacy')}
 						</Button>
 					</div>
 
 					<div className="grid grid-cols-2 gap-4 border-b border-(--border)/10 pb-4">
 						<div className="flex flex-col gap-1 w-full">
-							<label className="text-xs font-medium text-(--text)">Internal Title</label>
+							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.announcements.internalTitle')}</label>
 							<Input value={title} onChange={(e) => setTitle(e.target.value)} required />
 						</div>
 						<div className="flex flex-col gap-1 w-full">
-							<label className="text-xs font-medium text-(--text)">Scheduled For (Leave empty to send immediately)</label>
+							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.announcements.scheduledFor')}</label>
 							<Input type="datetime-local" value={scheduledFor} onChange={(e) => setScheduledFor(e.target.value)} />
 						</div>
 						<div className="flex flex-col gap-1 w-full col-span-2">
-							<label className="text-xs font-medium text-(--text)">Discord Channel (Optional)</label>
+							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.announcements.discordChannel')}</label>
 							<Selector
 								value={channelId}
-								options={[{ label: 'Select a channel...', value: '' }, ...channels]}
+								options={[{ label: t('admin.dashboard.announcements.selectChannel'), value: '' }, ...channels]}
 								onChange={(val: string) => {
 									setChannelId(val);
 									if (val) generateWebhook(val);
@@ -373,19 +387,19 @@ export default function Announcements() {
 							/>
 						</div>
 						<div className="col-span-2 flex flex-col gap-1 w-full">
-							<label className="text-xs font-medium text-(--text)">Webhook URL</label>
+							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.announcements.webhookUrl')}</label>
 							<Input value={webhookUrl} onChange={(e) => setWebhookUrl(e.target.value)} required />
 						</div>
 					</div>
 
 					<div className="flex flex-col gap-1 w-full">
-						<label className="text-xs font-medium text-(--text)">Message Content</label>
+						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.announcements.messageContent')}</label>
 						<Input value={content} onChange={(e) => setContent(e.target.value)} />
 					</div>
 
 					{/* WYSIWYG DISCORD BUILDER */}
 					<div className="flex flex-col gap-2 mt-4">
-						<h3 className="font-semibold text-(--text) text-sm mb-2">Discord Message Builder</h3>
+						<h3 className="font-semibold text-(--text) text-sm mb-2">{t('admin.dashboard.announcements.builderTitle')}</h3>
 
 						{embeds.map((emb, eIdx) => (
 							<div key={eIdx} className="relative flex group max-w-xl">
@@ -399,7 +413,7 @@ export default function Announcements() {
 										className="absolute inset-0 opacity-0 cursor-pointer w-[200%] h-full -ml-2"
 										value={emb.color || '#000000'}
 										onChange={(e) => updateEmbed(eIdx, 'color', e.target.value)}
-										title="Change Embed Color"
+										title={t('admin.dashboard.announcements.changeColor')}
 									/>
 								</div>
 
@@ -412,24 +426,20 @@ export default function Announcements() {
 									{/* Author */}
 									<div className="flex items-center gap-2 text-xs font-semibold mb-1">
 										<input
-											placeholder="Author Name..."
+											placeholder={t('admin.dashboard.announcements.authorName')}
 											value={emb.author?.name || ''}
 											onChange={(e) => updateEmbed(eIdx, 'author', { ...emb.author, name: e.target.value })}
-											className="bg-transparent outline-none w-full placeholder:text-(--text-muted) text-(--text) font-medium"
+											className="bg-transparent outline-none w-full placeholder:text-(--text-muted) text-(--text) font-bold"
 										/>
 									</div>
-
-									{/* Title */}
 									<input
-										placeholder="Embed Title..."
+										placeholder={t('admin.dashboard.announcements.embedTitle')}
 										value={emb.title || ''}
 										onChange={(e) => updateEmbed(eIdx, 'title', e.target.value)}
-										className="bg-transparent outline-none w-full font-bold text-(--text) placeholder:text-(--text-muted)"
+										className="text-base font-bold text-blue-400 bg-transparent outline-none w-full mb-1 placeholder:text-(--text-muted)"
 									/>
-
-									{/* Description */}
 									<textarea
-										placeholder="Embed Description..."
+										placeholder={t('admin.dashboard.announcements.embedDesc')}
 										value={emb.description || ''}
 										onChange={(e) => updateEmbed(eIdx, 'description', e.target.value)}
 										className="bg-transparent outline-none w-full text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[40px]"
@@ -441,13 +451,13 @@ export default function Announcements() {
 											{emb.fields.map((f: any, fIdx: number) => (
 												<div key={fIdx} className={`flex flex-col relative group/field ${f.inline ? 'w-[30%]' : 'w-full'}`}>
 													<input
-														placeholder="Field Name"
+														placeholder={t('admin.dashboard.announcements.fieldName')}
 														value={f.name}
 														onChange={(e) => updateField(eIdx, fIdx, 'name', e.target.value)}
 														className="bg-transparent outline-none font-semibold text-sm text-(--text) placeholder:text-(--text-muted)"
 													/>
 													<textarea
-														placeholder="Field Value"
+														placeholder={t('admin.dashboard.announcements.fieldValue')}
 														value={f.value}
 														onChange={(e) => updateField(eIdx, fIdx, 'value', e.target.value)}
 														className="bg-transparent outline-none text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[30px]"
@@ -478,7 +488,7 @@ export default function Announcements() {
 										{emb.footer?.icon_url && <img src={emb.footer.icon_url} alt="Footer Icon" className="w-5 h-5 rounded-full object-cover" />}
 										<div className="flex flex-1 items-center gap-1.5 min-w-0 justify-start">
 											<input
-												placeholder="Footer Text..."
+												placeholder={t('admin.dashboard.announcements.footerText')}
 												value={emb.footer?.text || ''}
 												onChange={(e) => updateEmbed(eIdx, 'footer', { ...emb.footer, text: e.target.value })}
 												className="bg-transparent outline-none text-(--text-muted) placeholder:text-(--text-muted)/50 text-[11px]"
@@ -521,7 +531,7 @@ export default function Announcements() {
 												className={`relative flex items-center ${styleColors[btn.style] || styleColors[2]} text-white px-3 py-1.5 rounded font-medium text-sm transition-colors group/btn`}
 											>
 												<input
-													placeholder="Label"
+													placeholder={t('admin.dashboard.announcements.label')}
 													value={btn.label || ''}
 													onChange={(e) => updateButton(rIdx, bIdx, 'label', e.target.value)}
 													className="bg-transparent outline-none w-full text-center placeholder:text-white/50 w-20"
@@ -529,19 +539,21 @@ export default function Announcements() {
 
 												{/* Editor Popout */}
 												<div className="absolute bottom-10 left-0 bg-(--foreground) border border-(--border)/10 p-3 rounded-lg hidden group-hover/btn:flex flex-col gap-2 z-20 w-48 shadow-xl">
-													<label className="text-[10px] uppercase font-bold text-(--text-muted)">Button Style</label>
+													<label className="text-[10px] uppercase font-bold text-(--text-muted)">{t('admin.dashboard.announcements.buttonStyle')}</label>
 													<select
 														value={btn.style}
 														onChange={(e) => updateButton(rIdx, bIdx, 'style', parseInt(e.target.value))}
 														className="bg-(--background) text-xs outline-none p-1 rounded text-(--text)"
 													>
-														<option value={1}>Primary (Blurple)</option>
-														<option value={2}>Secondary (Grey)</option>
-														<option value={3}>Success (Green)</option>
-														<option value={4}>Danger (Red)</option>
-														<option value={5}>Link (URL)</option>
+														<option value={1}>{t('admin.dashboard.announcements.stylePrimary')}</option>
+														<option value={2}>{t('admin.dashboard.announcements.styleSecondary')}</option>
+														<option value={3}>{t('admin.dashboard.announcements.styleSuccess')}</option>
+														<option value={4}>{t('admin.dashboard.announcements.styleDanger')}</option>
+														<option value={5}>{t('admin.dashboard.announcements.styleLink')}</option>
 													</select>
-													<label className="text-[10px] uppercase font-bold text-(--text-muted) mt-1">{btn.style === 5 ? 'URL' : 'Custom ID'}</label>
+													<label className="text-[10px] uppercase font-bold text-(--text-muted) mt-1">
+														{btn.style === 5 ? t('admin.dashboard.announcements.url') : t('admin.dashboard.announcements.customId')}
+													</label>
 													{btn.style === 5 ? (
 														<input
 															placeholder="https://..."
@@ -594,7 +606,7 @@ export default function Announcements() {
 							Cancel
 						</Button>
 						<Button type="submit" variant="primary" disabled={saving}>
-							{saving ? 'Saving...' : 'Save & Publish'}
+							{saving ? t('admin.dashboard.announcements.saving') : t('admin.dashboard.announcements.savePublish')}
 						</Button>
 					</div>
 				</form>

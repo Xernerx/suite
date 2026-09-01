@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -80,7 +81,7 @@ function BotProfilePreview({ botId, getEnvUrl, onClear }: { botId: string; getEn
 		);
 	}
 	const avatarUrl = profile.avatarUrl || (profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png?size=64` : null);
-	const name = profile.global_name || profile.username || 'Unknown Bot';
+	const name = profile.global_name || profile.username || t('admin.tokens.unknownBot');
 	return (
 		<div className="flex items-center gap-1.5 rounded-xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm">
 			{avatarUrl ? (
@@ -492,7 +493,7 @@ function TokenCard({
 				setFullToken(manuallyUpdatedToken);
 				onTokenUpdated(manuallyUpdatedToken);
 				toast({
-					title: 'Token updated',
+					title: t('admin.tokens.tokenUpdated'),
 					type: 'success',
 				});
 			} else {
@@ -521,7 +522,7 @@ function TokenCard({
 				setIsModalOpen(false);
 				toast({
 					type: 'success',
-					title: 'Token deleted successfully',
+					title: t('admin.tokens.tokenDeleted'),
 				});
 				window.location.reload();
 			} else {
@@ -581,7 +582,9 @@ function TokenCard({
 					<div className="flex flex-col overflow-hidden">
 						<h2 className="font-bold text-base text-(--text) truncate group-hover:text-(--accent) transition-colors">{token.name || t('admin.tokens.empty.title')}</h2>
 						<div className="flex items-center gap-2 mt-0.5">
-							<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>{token.status}</span>
+							<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>
+								{t(`admin.tokens.statusOptions.${token.status}`) || token.status}
+							</span>
 						</div>
 						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">
 							{t('admin.tokens.card.idPrefix')}
@@ -657,19 +660,19 @@ function TokenCard({
 										value={status}
 										options={[
 											{
-												label: 'Active',
+												label: t('admin.tokens.statusOptions.active'),
 												value: 'active',
 											},
 											{
-												label: 'Inactive',
+												label: t('admin.tokens.statusOptions.inactive'),
 												value: 'inactive',
 											},
 											{
-												label: 'Suspended',
+												label: t('admin.tokens.statusOptions.suspended'),
 												value: 'suspended',
 											},
 											{
-												label: 'Pending',
+												label: t('admin.tokens.statusOptions.pending'),
 												value: 'pending',
 											},
 										]}
@@ -746,7 +749,7 @@ function TokenCard({
 										onClick={() => {
 											navigator.clipboard.writeText(token.id);
 											toast({
-												title: 'Token ID copied',
+												title: t('admin.tokens.tokenIdCopied'),
 												type: 'success',
 											});
 										}}
@@ -1000,19 +1003,19 @@ export default function Tokens() {
 							value={newStatus}
 							options={[
 								{
-									label: 'Active',
+									label: t('admin.tokens.statusOptions.active'),
 									value: 'active',
 								},
 								{
-									label: 'Inactive',
+									label: t('admin.tokens.statusOptions.inactive'),
 									value: 'inactive',
 								},
 								{
-									label: 'Suspended',
+									label: t('admin.tokens.statusOptions.suspended'),
 									value: 'suspended',
 								},
 								{
-									label: 'Pending',
+									label: t('admin.tokens.statusOptions.pending'),
 									value: 'pending',
 								},
 							]}

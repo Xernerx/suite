@@ -1,3 +1,4 @@
+// Force recompile
 /** @format */
 'use client';
 
@@ -200,7 +201,7 @@ export default function ApplicationConfigs() {
 			},
 			...roles.map((r) => ({
 				value: r.id,
-				label: r.name || 'Unnamed Role',
+				label: r.name || t('admin.roles.unnamedRole'),
 			})),
 		];
 	}, [roles]);
@@ -331,15 +332,17 @@ export default function ApplicationConfigs() {
 												<span
 													className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.status === 'open' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}
 												>
-													{config.status || 'open'}
+													{config.status === 'closed' ? t('admin.dashboard.applicationConfigs.closed') || 'CLOSED' : t('admin.dashboard.applicationConfigs.open') || 'OPEN'}
 												</span>
 												<span
 													className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.public !== false ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}
 												>
-													{config.public !== false ? 'Public' : 'Unlisted'}
+													{config.public !== false ? t('admin.dashboard.applicationConfigs.public') : t('admin.dashboard.applicationConfigs.unlisted')}
 												</span>
 												{config.questions && config.questions.length > 0 && (
-													<span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">Dynamic Form</span>
+													<span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">
+														{t('admin.dashboard.applicationConfigs.dynamicForm')}
+													</span>
 												)}
 											</div>
 											{matchedRole ? (
@@ -455,11 +458,11 @@ export default function ApplicationConfigs() {
 									options={[
 										{
 											value: 'open',
-											label: 'Open',
+											label: t('admin.dashboard.applicationConfigs.open'),
 										},
 										{
 											value: 'closed',
-											label: 'Closed',
+											label: t('admin.dashboard.applicationConfigs.closed'),
 										},
 									]}
 									onChange={(val: string) =>
@@ -483,11 +486,11 @@ export default function ApplicationConfigs() {
 									options={[
 										{
 											value: 'true',
-											label: 'Public (Listed)',
+											label: t('admin.dashboard.applicationConfigs.public'),
 										},
 										{
 											value: 'false',
-											label: 'Unlisted (Hidden)',
+											label: t('admin.dashboard.applicationConfigs.unlisted'),
 										},
 									]}
 									onChange={(val: string) =>
@@ -503,7 +506,7 @@ export default function ApplicationConfigs() {
 						<div className="flex items-center gap-2 mt-2">
 							<label className="flex items-center gap-2 text-sm text-(--text-muted) cursor-pointer select-none">
 								<Toggle size="md" checked={formData.requireLogin !== false} onChange={(e) => setFormData({ ...formData, requireLogin: e.target.checked })} />
-								Requires User Login
+								{t('admin.dashboard.applicationConfigs.requiresUserLogin')}
 							</label>
 						</div>
 					</div>
@@ -513,18 +516,18 @@ export default function ApplicationConfigs() {
 						{/* Benefits */}
 						<div className="flex flex-col gap-3">
 							<div className="flex items-center justify-between">
-								<label className="text-xs font-bold text-(--text) uppercase tracking-wider">Benefits</label>
+								<label className="text-xs font-bold text-(--text) uppercase tracking-wider">{t('admin.dashboard.applicationConfigs.benefits')}</label>
 								<Button
 									type="button"
 									variant="secondary"
 									onClick={() => setFormData({ ...formData, benefits: [...formData.benefits, ''] })}
 									style={{ padding: '4px 8px', height: 'auto', fontSize: '12px' }}
 								>
-									<Plus size={12} /> Add Benefit
+									<Plus size={12} /> {t('admin.dashboard.applicationConfigs.addBenefit')}
 								</Button>
 							</div>
 							{formData.benefits.length === 0 ? (
-								<p className="text-xs text-(--text-muted) italic">No benefits added.</p>
+								<p className="text-xs text-(--text-muted) italic">{t('admin.dashboard.applicationConfigs.noBenefits')}</p>
 							) : (
 								<div className="flex flex-col gap-2">
 									{formData.benefits.map((b, i) => (
@@ -536,7 +539,7 @@ export default function ApplicationConfigs() {
 													arr[i] = e.target.value;
 													setFormData({ ...formData, benefits: arr });
 												}}
-												placeholder="e.g. Free Discord Nitro"
+												placeholder={t('admin.dashboard.applicationConfigs.benefitPlaceholder')}
 											/>
 											<button
 												type="button"
@@ -554,18 +557,18 @@ export default function ApplicationConfigs() {
 						{/* Requirements */}
 						<div className="flex flex-col gap-3">
 							<div className="flex items-center justify-between">
-								<label className="text-xs font-bold text-(--text) uppercase tracking-wider">Requirements</label>
+								<label className="text-xs font-bold text-(--text) uppercase tracking-wider">{t('admin.dashboard.applicationConfigs.requirements')}</label>
 								<Button
 									type="button"
 									variant="secondary"
 									onClick={() => setFormData({ ...formData, requirements: [...formData.requirements, ''] })}
 									style={{ padding: '4px 8px', height: 'auto', fontSize: '12px' }}
 								>
-									<Plus size={12} /> Add Requirement
+									<Plus size={12} /> {t('admin.dashboard.applicationConfigs.addRequirement')}
 								</Button>
 							</div>
 							{formData.requirements.length === 0 ? (
-								<p className="text-xs text-(--text-muted) italic">No requirements added.</p>
+								<p className="text-xs text-(--text-muted) italic">{t('admin.dashboard.applicationConfigs.noRequirements')}</p>
 							) : (
 								<div className="flex flex-col gap-2">
 									{formData.requirements.map((r, i) => (
@@ -577,7 +580,7 @@ export default function ApplicationConfigs() {
 													arr[i] = e.target.value;
 													setFormData({ ...formData, requirements: arr });
 												}}
-												placeholder="e.g. Must be 18+ years old"
+												placeholder={t('admin.dashboard.applicationConfigs.requirementPlaceholder')}
 											/>
 											<button
 												type="button"
@@ -595,7 +598,7 @@ export default function ApplicationConfigs() {
 						{/* Questions Form Builder */}
 						<div className="flex flex-col gap-3">
 							<div className="flex items-center justify-between">
-								<label className="text-xs font-bold text-(--text) uppercase tracking-wider">Application Questions</label>
+								<label className="text-xs font-bold text-(--text) uppercase tracking-wider">{t('admin.dashboard.applicationConfigs.applicationQuestions')}</label>
 								<Button
 									type="button"
 									variant="secondary"
@@ -607,11 +610,11 @@ export default function ApplicationConfigs() {
 									}
 									style={{ padding: '4px 8px', height: 'auto', fontSize: '12px' }}
 								>
-									<Plus size={12} /> Add Question
+									<Plus size={12} /> {t('admin.dashboard.applicationConfigs.addQuestion')}
 								</Button>
 							</div>
 							{formData.questions.length === 0 ? (
-								<p className="text-xs text-(--text-muted) italic">No questions added. Users will only see benefits and requirements.</p>
+								<p className="text-xs text-(--text-muted) italic">{t('admin.dashboard.applicationConfigs.noQuestionsAdded')}</p>
 							) : (
 								<div className="flex flex-col gap-4">
 									{formData.questions.map((q, i) => (
@@ -632,16 +635,16 @@ export default function ApplicationConfigs() {
 														arr[i].question = e.target.value;
 														setFormData({ ...formData, questions: arr });
 													}}
-													placeholder="e.g. Why do you want to join?"
+													placeholder={t('admin.dashboard.applicationConfigs.questionPlaceholder')}
 												/>
 												<Selector
 													value={q.type}
 													options={[
-														{ value: 'text', label: 'Short Text' },
-														{ value: 'textarea', label: 'Long Text' },
-														{ value: 'select', label: 'Dropdown' },
-														{ value: 'radio', label: 'Radio' },
-														{ value: 'checkbox', label: 'Checkboxes' },
+														{ value: 'text', label: t('admin.dashboard.applicationConfigs.shortText') },
+														{ value: 'textarea', label: t('admin.dashboard.applicationConfigs.longText') },
+														{ value: 'select', label: t('admin.dashboard.applicationConfigs.dropdown') },
+														{ value: 'radio', label: t('admin.dashboard.applicationConfigs.radio') },
+														{ value: 'checkbox', label: t('admin.dashboard.applicationConfigs.checkboxes') },
 													]}
 													onChange={(val: string) => {
 														const arr = [...formData.questions];
@@ -662,14 +665,14 @@ export default function ApplicationConfigs() {
 															setFormData({ ...formData, questions: arr });
 														}}
 													/>
-													Required Field
+													{t('admin.dashboard.applicationConfigs.requiredField')}
 												</label>
 											</div>
 
 											{(q.type === 'select' || q.type === 'radio' || q.type === 'checkbox') && (
 												<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/5">
 													<div className="flex items-center justify-between">
-														<span className="text-[10px] text-(--text-muted) uppercase">Options</span>
+														<span className="text-[10px] text-(--text-muted) uppercase">{t('admin.dashboard.applicationConfigs.options')}</span>
 														<button
 															type="button"
 															onClick={() => {
@@ -679,7 +682,8 @@ export default function ApplicationConfigs() {
 															}}
 															className="text-[10px] text-(--accent) hover:underline"
 														>
-															+ Add Option
+															{' '}
+															{t('admin.dashboard.applicationConfigs.addOption')}
 														</button>
 													</div>
 													{q.options?.map((opt, optIdx) => (
@@ -692,7 +696,7 @@ export default function ApplicationConfigs() {
 																	arr[i].options[optIdx] = e.target.value;
 																	setFormData({ ...formData, questions: arr });
 																}}
-																placeholder="Option text"
+																placeholder={t('admin.dashboard.applicationConfigs.optionText')}
 																className="h-7 text-xs"
 															/>
 															<button
@@ -722,7 +726,7 @@ export default function ApplicationConfigs() {
 							{t('admin.configs.edit.cancel')}
 						</Button>
 						<Button type="submit" variant="primary" disabled={isProcessing}>
-							{isProcessing ? 'Saving...' : 'Save Config'}
+							{isProcessing ? t('admin.dashboard.applicationConfigs.saving') : t('admin.dashboard.applicationConfigs.saveConfig')}
 						</Button>
 					</div>
 				</form>
@@ -732,9 +736,9 @@ export default function ApplicationConfigs() {
 				open={confirmDeleteOpen}
 				onOpenChange={setConfirmDeleteOpen}
 				title={t('admin.configs.edit.deleteTooltip')}
-				description="Are you sure you want to delete this application configuration? This action cannot be undone."
-				confirmText="Delete"
-				cancelText="Cancel"
+				description={t('admin.dashboard.applicationConfigs.deleteConfirmDesc')}
+				confirmText={t('admin.dashboard.applicationConfigs.delete')}
+				cancelText={t('admin.configs.edit.cancel')}
 				onConfirm={handleDelete}
 				loading={isProcessing}
 			/>

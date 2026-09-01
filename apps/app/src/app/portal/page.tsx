@@ -1,13 +1,13 @@
 /** @format */
 'use client';
 
-import { Bot, Building2, Check, Compass, LayoutDashboard, Plus, Save, Settings, User, Users, Server, Link2, Shield, AlertTriangle, Trash2 } from 'lucide-react';
-import { Button, Input, Modal, Selector, Tabs, Confirm } from '@xernerx/ui';
-import { BotRow } from '@xernerx/components';
+import { AlertTriangle, Bot, Building2, Check, Compass, LayoutDashboard, Link2, Plus, Save, Server, Settings, Shield, Trash2, User, Users } from 'lucide-react';
+import { Button, Confirm, Input, Modal, Selector, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
-import { CircleFlag } from 'react-circle-flags';
 
+import { BotRow } from '@xernerx/components';
+import { CircleFlag } from 'react-circle-flags';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
@@ -79,8 +79,8 @@ export default function PortalPage() {
 		show();
 
 		const staticItems = [
-			{ label: 'Explore', href: '/', icon: Compass as any, category: 'Navigation' },
-			{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard as any, category: 'Navigation' },
+			{ label: t('app.portal.nav.explore'), href: '/', icon: Compass as any, category: t('app.portal.categories.navigation') },
+			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard as any, category: t('app.portal.categories.navigation') },
 		];
 
 		setNavItems(staticItems);
@@ -102,12 +102,12 @@ export default function PortalPage() {
 					setNavItems([
 						...staticItems,
 						{
-							label: 'Personal',
+							label: t('app.portal.nav.personal'),
 							onClick: () => {
 								setSelectedOrg('personal');
 								setView('org-personal');
 							},
-							category: 'Organizations',
+							category: t('app.portal.categories.organizations'),
 							icon: User as any,
 							view: 'org-personal',
 						},
@@ -117,16 +117,16 @@ export default function PortalPage() {
 								setSelectedOrg(org);
 								setView(`org-${org._id}`);
 							},
-							category: 'Organizations',
+							category: t('app.portal.categories.organizations'),
 							icon: org.iconUrl
 								? () => <img src={org.iconUrl} alt={org.name} className="w-5 h-5 rounded-md object-cover" />
-								: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{(org.name || 'O').charAt(0)}</div>,
+								: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
 							view: `org-${org._id}`,
 						})),
 						{
-							label: 'New Organization',
+							label: t('app.portal.nav.newOrganization'),
 							onClick: () => setCreateModalOpen(true),
-							category: 'Organizations',
+							category: t('app.portal.categories.organizations'),
 							icon: Plus as any,
 							view: 'org-new',
 						},
@@ -406,9 +406,9 @@ export default function PortalPage() {
 									)}
 									<div className="flex flex-col gap-1">
 										<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-											{session?.user?.name || 'Personal'}
+											{session?.user?.name || t('app.portal.nav.personal')}
 										</span>
-										<span className="text-sm font-medium text-(--text-muted)">My Workspace</span>
+										<span className="text-sm font-medium text-(--text-muted)">{t('app.portal.myWorkspace')}</span>
 									</div>
 								</div>
 							</div>
@@ -418,7 +418,7 @@ export default function PortalPage() {
 									<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 										<Bot className="w-4 h-4" />
 									</div>
-									Personal Bots
+									{t('app.portal.personalBots')}
 								</div>
 								<div className="flex flex-col items-center justify-center w-full">
 									{bots.filter((b) => !b.organization || b.organization === 'null' || b.organization === 'undefined' || !organizations.some((org) => org._id === b.organization))
@@ -429,16 +429,14 @@ export default function PortalPage() {
 													(b) => !b.organization || b.organization === 'null' || b.organization === 'undefined' || !organizations.some((org) => org._id === b.organization)
 												)
 												.map((bot) => (
-													<BotRow key={bot.id} bot={bot} hrefPrefix="/portal/bots" />
+													<BotRow key={bot._id} bot={bot} hrefPrefix="/portal/bots" />
 												))}
 										</div>
 									) : (
 										<div className="flex flex-col items-center justify-center p-8 bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed w-full">
 											<Bot className="w-8 h-8 text-(--text-muted) opacity-50 mb-3" />
-											<p className="text-sm text-(--text-muted) mb-4">No personal bots registered yet.</p>
-											<div className="text-xs text-(--text-muted) bg-(--background) border border-(--border)/20 px-4 py-2 rounded-lg">
-												Bots are automatically registered when they interact with the API.
-											</div>
+											<p className="text-sm text-(--text-muted) mb-4">{t('app.portal.noBots')}</p>
+											<div className="text-xs text-(--text-muted) bg-(--background) border border-(--border)/20 px-4 py-2 rounded-lg">{t('app.portal.botsAutoRegister')}</div>
 										</div>
 									)}
 								</div>
@@ -482,12 +480,12 @@ export default function PortalPage() {
 										activeTab={activeTab}
 										onChange={setActiveTab}
 										tabs={[
-											{ id: 'info', label: 'Info' },
-											{ id: 'members', label: 'Members' },
-											{ id: 'bots', label: 'Bots' },
-											{ id: 'servers', label: 'Servers' },
-											{ id: 'links', label: 'Links' },
-											{ id: 'settings', label: 'Settings' },
+											{ id: 'info', label: t('app.portal.tabs.info') },
+											{ id: 'members', label: t('app.portal.tabs.members') },
+											{ id: 'bots', label: t('app.portal.tabs.bots') },
+											{ id: 'servers', label: t('app.portal.tabs.servers') },
+											{ id: 'links', label: t('app.portal.tabs.links') },
+											{ id: 'settings', label: t('app.portal.tabs.settings') },
 										]}
 									/>
 
@@ -497,37 +495,41 @@ export default function PortalPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Building2 className="w-4 h-4" />
 												</div>
-												Organization Profile
+												{t('app.portal.orgProfile')}
 											</div>
 											<div className="flex flex-col gap-5">
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Name</label>
-													<Input value={orgConfig.name || ''} onChange={(e) => setOrgConfig({ ...orgConfig, name: e.target.value })} placeholder="Organization Name" />
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Description</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.name')}</label>
 													<Input
-														value={orgConfig.description || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, description: e.target.value })}
-														placeholder="Short description..."
+														value={orgConfig.name || ''}
+														onChange={(e) => setOrgConfig({ ...orgConfig, name: e.target.value })}
+														placeholder={t('app.portal.placeholders.orgName')}
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Extended Info</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.description')}</label>
+													<Input
+														value={orgConfig.description || ''}
+														onChange={(e) => setOrgConfig({ ...orgConfig, description: e.target.value })}
+														placeholder={t('app.portal.placeholders.shortDesc')}
+													/>
+												</div>
+												<div className="flex flex-col gap-2">
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
 													<textarea
 														value={orgConfig.info || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, info: e.target.value })}
-														placeholder="Detailed markdown description about this organization..."
+														placeholder={t('app.portal.placeholders.extendedInfo')}
 														className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Locale</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.locale')}</label>
 													<Selector
 														value={orgConfig.locale || ''}
 														onChange={(val) => setOrgConfig({ ...orgConfig, locale: val })}
 														options={[
-															{ label: 'Default', value: '' },
+															{ label: t('app.portal.options.default'), value: '' },
 															...(locales?.map((lang: any) => {
 																const countryCode = getFlagCode(lang.code);
 																return {
@@ -562,11 +564,11 @@ export default function PortalPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Users className="w-4 h-4" />
 												</div>
-												Organization Members
+												{t('app.portal.members.header')}
 											</div>
 											<div className="flex flex-col gap-6">
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Current Members</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.members.currentMembers')}</label>
 													<div className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 														<div className="flex items-center justify-between text-sm">
 															<div className="flex items-center gap-2">
@@ -582,12 +584,14 @@ export default function PortalPage() {
 																	</div>
 																)}
 																<span className="text-(--text) font-medium flex items-center gap-2">
-																	{memberProfiles[selectedOrg.owner]?.global_name || memberProfiles[selectedOrg.owner]?.username || 'Unknown User'}
+																	{memberProfiles[selectedOrg.owner]?.global_name ||
+																		memberProfiles[selectedOrg.owner]?.username ||
+																		t('app.portal.members.unknownUser')}
 																	<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
 																		{selectedOrg.owner}
 																	</span>
 																	<span className="text-(--accent) text-[10px] font-bold uppercase tracking-widest bg-(--accent)/10 px-2 py-0.5 rounded-full ml-1 border border-(--accent)/20">
-																		Owner
+																		{t('app.portal.members.owner')}
 																	</span>
 																</span>
 															</div>
@@ -608,7 +612,7 @@ export default function PortalPage() {
 																			</div>
 																		)}
 																		<span className="text-(--text) font-medium flex items-center gap-2">
-																			{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || 'Unknown User'}
+																			{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
 																			<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
 																				{memberId}
 																			</span>
@@ -617,13 +621,13 @@ export default function PortalPage() {
 																</div>
 															))
 														) : (
-															<span className="text-xs text-(--text-muted) mt-2 pt-2 border-t border-(--border)/5">No other members yet.</span>
+															<span className="text-xs text-(--text-muted) mt-2 pt-2 border-t border-(--border)/5">{t('app.portal.members.noMembers')}</span>
 														)}
 													</div>
 												</div>
 												{pendingInvites.length > 0 && (
 													<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
-														<label className="text-sm font-bold text-(--text)">Pending Invitations</label>
+														<label className="text-sm font-bold text-(--text)">{t('app.portal.members.pendingInvitations')}</label>
 														<div className="flex flex-col gap-2 p-4 bg-(--background)/50 rounded-2xl border border-(--border)/10">
 															{pendingInvites.map((app) => {
 																const profile = memberProfiles[app.userId];
@@ -644,14 +648,14 @@ export default function PortalPage() {
 																				</div>
 																			)}
 																			<span className="text-(--text) font-medium flex items-center gap-2">
-																				{profile?.global_name || profile?.username || 'Unknown User'}
+																				{profile?.global_name || profile?.username || t('app.portal.members.unknownUser')}
 																				<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
 																					{app.userId}
 																				</span>
 																			</span>
 																		</div>
 																		<div className="text-[10px] font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20 uppercase tracking-widest shadow-sm">
-																			Pending
+																			{t('app.portal.members.pending')}
 																		</div>
 																	</div>
 																);
@@ -660,19 +664,19 @@ export default function PortalPage() {
 													</div>
 												)}
 												<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
-													<label className="text-sm font-bold text-(--text)">Invite Member</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.members.inviteMember')}</label>
 													<div className="flex items-center gap-2">
 														<Input
 															value={inviteUserId}
 															onChange={(e) => setInviteUserId(e.target.value)}
-															placeholder="Discord User ID (e.g. 1234567890)"
+															placeholder={t('app.portal.members.invitePlaceholder')}
 															className="flex-1 bg-(--background)/50 border-(--border)/10"
 														/>
 														<Button variant="primary" onClick={handlePreviewUser} loading={fetchingUser} disabled={!inviteUserId.trim()}>
-															Invite
+															{t('app.portal.members.inviteButton')}
 														</Button>
 													</div>
-													<span className="text-xs text-(--text-muted) mt-1">They will receive an invitation to join this organization.</span>
+													<span className="text-xs text-(--text-muted) mt-1">{t('app.portal.members.inviteHelp')}</span>
 												</div>
 											</div>
 										</div>
@@ -684,7 +688,7 @@ export default function PortalPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Bot className="w-4 h-4" />
 												</div>
-												Organization Bots
+												{t('app.portal.bots.header')}
 											</div>
 											<div className="flex flex-col items-center justify-center w-full">
 												{bots.filter((b) => b.organization === selectedOrg._id).length > 0 ? (
@@ -698,7 +702,7 @@ export default function PortalPage() {
 												) : (
 													<div className="flex flex-col items-center justify-center p-8 bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed w-full">
 														<Bot className="w-8 h-8 text-(--text-muted) opacity-50 mb-3" />
-														<p className="text-sm text-(--text-muted) mb-4">No bots registered to this organization.</p>
+														<p className="text-sm text-(--text-muted) mb-4">{t('app.portal.bots.noBots')}</p>
 													</div>
 												)}
 											</div>
@@ -711,17 +715,17 @@ export default function PortalPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Server className="w-4 h-4" />
 												</div>
-												Organization Servers
+												{t('app.portal.servers.header')}
 											</div>
 											<div className="flex flex-col gap-6">
-												<p className="text-sm text-(--text-muted)">Select a main Discord server to feature for this organization.</p>
+												<p className="text-sm text-(--text-muted)">{t('app.portal.servers.desc')}</p>
 												<div className="flex flex-col gap-2">
 													{orgGuilds.length > 0 ? (
 														<Selector
 															value={orgConfig?.guild || ''}
 															onChange={(val) => setOrgConfig({ ...orgConfig, guild: val })}
 															options={[
-																{ label: 'None', value: '' },
+																{ label: t('app.portal.servers.none'), value: '' },
 																...orgGuilds.map((guild) => ({
 																	value: guild.id,
 																	label: (
@@ -746,15 +750,15 @@ export default function PortalPage() {
 													) : (
 														<div className="flex flex-col items-center justify-center py-10 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed">
 															<Server className="w-8 h-8 mb-4 opacity-30" />
-															<p className="text-sm">No linked servers available.</p>
-															<p className="text-xs mt-1">Transfer a server to this organization first via the Server Dashboard.</p>
+															<p className="text-sm">{t('app.portal.servers.noLinked')}</p>
+															<p className="text-xs mt-1">{t('app.portal.servers.transferFirst')}</p>
 														</div>
 													)}
 												</div>
 
 												<div className="flex flex-col gap-2 mt-4 pt-4 border-t border-(--border)/10">
-													<label className="text-sm font-bold text-(--text)">Linked Servers</label>
-													<span className="text-xs text-(--text-muted)">Servers transferred to this organization.</span>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.servers.linkedServers')}</label>
+													<span className="text-xs text-(--text-muted)">{t('app.portal.servers.transferred')}</span>
 													{orgGuilds.length > 0 ? (
 														<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm mt-2">
 															{orgGuilds.map((g: any) => (
@@ -786,7 +790,7 @@ export default function PortalPage() {
 														</div>
 													) : (
 														<div className="flex flex-col items-center justify-center py-6 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed mt-2">
-															<p className="text-sm">No servers transferred to this organization yet.</p>
+															<p className="text-sm">{t('app.portal.servers.noServers')}</p>
 														</div>
 													)}
 												</div>
@@ -800,11 +804,11 @@ export default function PortalPage() {
 												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 													<Link2 className="w-4 h-4" />
 												</div>
-												Organization Links
+												{t('app.portal.links.header')}
 											</div>
 											<div className="flex flex-col gap-5">
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Website URL</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.website')}</label>
 													<Input
 														value={orgConfig.links?.website || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, website: e.target.value } })}
@@ -812,7 +816,7 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Support Server URL</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.support')}</label>
 													<Input
 														value={orgConfig.links?.support || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, support: e.target.value } })}
@@ -820,7 +824,7 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">GitHub URL</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.github')}</label>
 													<Input
 														value={orgConfig.links?.github || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, github: e.target.value } })}
@@ -828,7 +832,7 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Privacy Policy URL</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.privacy')}</label>
 													<Input
 														value={orgConfig.links?.privacy || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, privacy: e.target.value } })}
@@ -836,7 +840,7 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">Terms of Service URL</label>
+													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.terms')}</label>
 													<Input
 														value={orgConfig.links?.terms || ''}
 														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, terms: e.target.value } })}
@@ -856,18 +860,18 @@ export default function PortalPage() {
 												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 													<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 														<Shield size={18} />
-														<h3>Privacy Setting</h3>
+														<h3>{t('app.portal.settings.privacySetting')}</h3>
 													</div>
-													<div className="flex items-center gap-1 text-xs text-(--text-muted)">Determines who can discover and interact with this organization.</div>
+													<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.portal.settings.privacyDesc')}</div>
 												</div>
 												<div className="w-full sm:w-48 shrink-0">
 													<Selector
 														value={orgConfig.privacy || 'private'}
 														onChange={(val) => setOrgConfig({ ...orgConfig, privacy: val })}
 														options={[
-															{ label: 'Public', value: 'public' },
-															{ label: 'Limited', value: 'limited' },
-															{ label: 'Private', value: 'private' },
+															{ label: t('app.portal.settings.public'), value: 'public' },
+															{ label: t('app.portal.settings.limited'), value: 'limited' },
+															{ label: t('app.portal.settings.private'), value: 'private' },
 														]}
 													/>
 												</div>
@@ -880,11 +884,9 @@ export default function PortalPage() {
 												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 													<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 														<AlertTriangle size={18} />
-														<h3>Reset Data</h3>
+														<h3>{t('app.portal.settings.resetData')}</h3>
 													</div>
-													<p className="text-xs text-(--accent-orange)/80">
-														Reset all organization settings and configurations back to default without deleting the organization itself.
-													</p>
+													<p className="text-xs text-(--accent-orange)/80">{t('app.portal.settings.resetDesc')}</p>
 												</div>
 												<button
 													onClick={() => setOrgConfig({ ...orgConfig, description: '', info: '', locale: '', links: {} })}
@@ -895,7 +897,7 @@ export default function PortalPage() {
 													}}
 												>
 													<Trash2 size={16} />
-													<span>Reset Data</span>
+													<span>{t('app.portal.settings.resetData')}</span>
 												</button>
 											</div>
 
@@ -907,9 +909,9 @@ export default function PortalPage() {
 												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 													<div className="flex items-center text-(--accent-red) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 														<AlertTriangle size={18} />
-														<h3>Delete Organization</h3>
+														<h3>{t('app.portal.settings.deleteOrg')}</h3>
 													</div>
-													<p className="text-xs text-(--accent-red)/80">Permanently delete this organization and all of its associated data from Xernerx.</p>
+													<p className="text-xs text-(--accent-red)/80">{t('app.portal.settings.deleteDesc')}</p>
 												</div>
 												<button
 													onClick={() => setIsConfirmDeleteOpen(true)}
@@ -920,7 +922,7 @@ export default function PortalPage() {
 													}}
 												>
 													<Trash2 size={16} />
-													<span>Delete Organization</span>
+													<span>{t('app.portal.settings.deleteOrg')}</span>
 												</button>
 											</div>
 										</div>
@@ -932,28 +934,28 @@ export default function PortalPage() {
 				) : null}
 			</div>
 
-			<Modal open={createModalOpen} onOpenChange={setCreateModalOpen} title="Create Organization" description="Set up a new organization to group your bots, members, and settings.">
+			<Modal open={createModalOpen} onOpenChange={setCreateModalOpen} title={t('app.portal.modals.create.title')} description={t('app.portal.modals.create.desc')}>
 				<div className="flex flex-col gap-4 py-4">
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">Organization Name</label>
-						<Input value={newOrgName} onChange={(e) => setNewOrgName(e.target.value)} placeholder="e.g. Acme Corp" autoFocus />
+						<label className="text-sm font-bold text-(--text)">{t('app.portal.modals.create.nameLabel')}</label>
+						<Input value={newOrgName} onChange={(e) => setNewOrgName(e.target.value)} placeholder={t('app.portal.modals.create.namePlaceholder')} autoFocus />
 					</div>
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">Description (Optional)</label>
-						<Input value={newOrgDescription} onChange={(e) => setNewOrgDescription(e.target.value)} placeholder="What is this organization for?" />
+						<label className="text-sm font-bold text-(--text)">{t('app.portal.modals.create.descLabel')}</label>
+						<Input value={newOrgDescription} onChange={(e) => setNewOrgDescription(e.target.value)} placeholder={t('app.portal.modals.create.descPlaceholder')} />
 					</div>
 				</div>
 				<div className="flex justify-end gap-2">
 					<Button variant="ghost" onClick={() => setCreateModalOpen(false)}>
-						Cancel
+						{t('app.portal.modals.create.cancel')}
 					</Button>
 					<Button variant="primary" onClick={handleCreateOrg} loading={creatingOrg} disabled={!newOrgName.trim() || creatingOrg}>
-						Create Organization
+						{t('app.portal.modals.create.confirm')}
 					</Button>
 				</div>
 			</Modal>
 
-			<Modal open={inviteModalOpen} onOpenChange={setInviteModalOpen} title="Confirm Invite" description="Is this the person you want to invite?">
+			<Modal open={inviteModalOpen} onOpenChange={setInviteModalOpen} title={t('app.portal.modals.invite.title')} description={t('app.portal.modals.invite.desc')}>
 				{inviteUserObj && (
 					<div className="flex flex-col items-center justify-center gap-4 bg-(--background)/50 p-6 rounded-3xl border border-(--border)/10">
 						<div className="flex flex-col gap-2 p-4 bg-(--background)/50 rounded-2xl border border-(--border)/10">
@@ -988,10 +990,10 @@ export default function PortalPage() {
 				)}
 				<div className="flex justify-end gap-2 mt-4 pt-4 border-t border-(--border)/10">
 					<Button variant="ghost" onClick={() => setInviteModalOpen(false)} disabled={invitingMember}>
-						Cancel
+						{t('app.portal.modals.invite.cancel')}
 					</Button>
 					<Button variant="primary" onClick={confirmInviteMember} loading={invitingMember}>
-						Confirm Invite
+						{t('app.portal.modals.invite.confirm')}
 					</Button>
 				</div>
 			</Modal>
@@ -999,9 +1001,10 @@ export default function PortalPage() {
 			<Confirm
 				open={isConfirmDeleteOpen}
 				onOpenChange={setIsConfirmDeleteOpen}
-				title="Delete Organization"
-				description="Are you absolutely sure you want to delete this organization and all its data? This action cannot be undone."
-				confirmText="Delete Organization"
+				title={t('app.portal.modals.delete.title')}
+				description={t('app.portal.modals.delete.desc')}
+				confirmText={t('app.portal.modals.delete.confirm')}
+				cancelText={t('app.portal.modals.delete.cancel')}
 				onConfirm={handleDeleteOrg}
 				loading={deleting}
 			/>

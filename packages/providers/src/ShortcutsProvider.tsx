@@ -241,7 +241,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 												gap: 'calc(var(--ui-gap) * 0.5)',
 											}}
 										>
-											<h3 className="text-xs font-bold uppercase tracking-wider text-(--text-muted) px-1">{category}</h3>
+											<h3 className="text-xs font-bold uppercase tracking-wider text-(--text-muted) px-1">{t(category)}</h3>
 											<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 sm:gap-6">
 												{items.map((item: any, idx: number) => {
 													const resolvedHref = getEnvUrl(item.href);
@@ -251,7 +251,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 															<div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-[22px] bg-(--background) border border-(--border)/10 shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md group-hover:border-(--accent)/50">
 																<AppIcon size={18} className="text-(--text-muted) group-hover:text-(--accent) transition-colors" />
 															</div>
-															<span className="text-xs sm:text-sm font-medium text-(--text) text-center line-clamp-1 w-full px-1">{item.label}</span>
+															<span className="text-xs sm:text-sm font-medium text-(--text) text-center line-clamp-1 w-full px-1">{t(item.label)}</span>
 														</a>
 													);
 												})}

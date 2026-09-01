@@ -1,3 +1,4 @@
+// Force recompile
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -107,10 +108,10 @@ export default function Invites() {
 				const saved = await res.json();
 				if (editId) {
 					setInvites((prev) => prev.map((i) => (i.id === editId ? saved : i)));
-					toast({ type: 'success', title: 'Invite updated' });
+					toast({ type: 'success', title: t('admin.dashboard.invites.toasts.updateSuccess') });
 				} else {
 					setInvites((prev) => [saved, ...prev]);
-					toast({ type: 'success', title: 'Invite created' });
+					toast({ type: 'success', title: t('admin.dashboard.invites.toasts.createSuccess') });
 				}
 				setIsCreateOpen(false);
 			} else {
@@ -124,7 +125,7 @@ export default function Invites() {
 	};
 
 	const handleDelete = async (id: string) => {
-		if (!confirm('Are you sure you want to delete this invite link?')) return;
+		if (!confirm(t('admin.dashboard.invites.toasts.deleteConfirm'))) return;
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/invites/${id}`), {
 				method: 'DELETE',
@@ -132,10 +133,10 @@ export default function Invites() {
 			});
 			if (res.ok) {
 				setInvites((prev) => prev.filter((i) => i.id !== id));
-				toast({ type: 'success', title: 'Invite deleted' });
+				toast({ type: 'success', title: t('admin.dashboard.invites.toasts.deleteSuccess') });
 			}
 		} catch (error) {
-			toast({ type: 'error', title: 'Failed to delete invite' });
+			toast({ type: 'error', title: t('admin.dashboard.invites.toasts.deleteFailed') });
 		}
 	};
 
@@ -156,7 +157,7 @@ export default function Invites() {
 					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						Application Invites
 					</h1>
-					<p className="text-sm text-(--text-muted)">Manage public Discord bot invite URLs and their permission matrices.</p>
+					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.invites.subtitle')}</p>
 				</div>
 				<Button variant="primary" onClick={openCreateModal} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					<Plus size={16} />
@@ -164,11 +165,11 @@ export default function Invites() {
 				</Button>
 			</div>
 
-			<Input variant="search" placeholder="Search invites..." value={search} onChange={(e) => setSearch(e.target.value)} />
+			<Input variant="search" placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 
 			{filteredInvites.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
-					<p className="text-sm text-(--text-muted)">No invites found.</p>
+					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.invites.noInvites')}</p>
 				</div>
 			) : (
 				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
@@ -207,7 +208,9 @@ export default function Invites() {
 									</div>
 								</div>
 
-								<div className="bg-(--background) rounded-xl p-3 border border-(--border)/5 text-xs font-mono text-(--text-muted) truncate">Perms: {invite.permissions}</div>
+								<div className="bg-(--background) rounded-xl p-3 border border-(--border)/5 text-xs font-mono text-(--text-muted) truncate">
+									{t('admin.dashboard.invites.perms')} {invite.permissions}
+								</div>
 							</motion.div>
 						))}
 					</AnimatePresence>
@@ -217,50 +220,50 @@ export default function Invites() {
 			<Modal
 				open={isCreateOpen}
 				onOpenChange={setIsCreateOpen}
-				title={editId ? 'Edit Invite' : 'Create Invite'}
-				description="Configure the Discord OAuth2 parameters for this application."
+				title={editId ? t('admin.dashboard.invites.editModalTitle') : t('admin.dashboard.invites.createModalTitle')}
+				description={t('admin.dashboard.invites.modalDesc')}
 				maxWidth="max-w-4xl"
 			>
 				<form onSubmit={handleSave} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="grid grid-cols-2 gap-4">
 						<div className="flex flex-col gap-2">
-							<label className="text-xs font-medium text-(--text)">URL Slug (ID)</label>
+							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.urlSlug')}</label>
 							<input
 								type="text"
 								value={newId}
 								onChange={(e) => setNewId(e.target.value)}
 								required
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder="e.g. todo"
+								placeholder={t('admin.dashboard.invites.placeholderTodo') || 'e.g. todo'}
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
-							<label className="text-xs font-medium text-(--text)">Application Name</label>
+							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.appName')}</label>
 							<input
 								type="text"
 								value={newName}
 								onChange={(e) => setNewName(e.target.value)}
 								required
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder="e.g. To-Do List Bot"
+								placeholder={t('admin.dashboard.invites.placeholderAppName') || 'e.g. To-Do List Bot'}
 							/>
 						</div>
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<label className="text-xs font-medium text-(--text)">Client ID</label>
+						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.clientId')}</label>
 						<input
 							type="text"
 							value={newClientId}
 							onChange={(e) => setNewClientId(e.target.value)}
 							required
 							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-							placeholder="Discord Client ID"
+							placeholder={t('admin.dashboard.invites.placeholderClientId') || 'Discord Client ID'}
 						/>
 					</div>
 
 					<div className="flex flex-col gap-2">
-						<label className="text-xs font-medium text-(--text)">Scopes (comma separated)</label>
+						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.scopes')}</label>
 						<input
 							type="text"
 							value={newScopes}
@@ -271,7 +274,7 @@ export default function Invites() {
 					</div>
 
 					<div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-2 rounded-xl bg-(--foreground)/10 border border-(--border)/10 p-4">
-						<label className="text-xs font-medium text-(--text) sticky top-0 py-1 z-10 mb-2 border-b border-(--border)/10 pb-2">Permission Matrix</label>
+						<label className="text-xs font-medium text-(--text) sticky top-0 py-1 z-10 mb-2 border-b border-(--border)/10 pb-2">{t('admin.dashboard.invites.permMatrix')}</label>
 						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
 							{Object.entries(PermissionFlagsBits).map(([key, bit]) => {
 								const b = BigInt(bit as bigint);
@@ -290,10 +293,10 @@ export default function Invites() {
 
 					<div className="flex justify-end gap-3 pt-4 border-t border-(--border)/10 mt-2">
 						<Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
-							Cancel
+							{t('admin.dashboard.invites.cancel')}
 						</Button>
 						<Button type="submit" variant="primary" disabled={creating}>
-							{creating ? 'Saving...' : 'Save Invite'}
+							{creating ? t('admin.dashboard.invites.saving') : t('admin.dashboard.invites.saveButton')}
 						</Button>
 					</div>
 				</form>

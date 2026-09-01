@@ -12,13 +12,19 @@ import { cookies } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Studios | Explore',
+	title: {
+		default: 'Xernerx Studios | Explore',
+		template: 'Xernerx Studios | Explore | %s',
+	},
 	description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home on Xernerx.',
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
 	openGraph: {
-		title: 'Xernerx Studios | Explore',
+		title: {
+			default: 'Xernerx Studios | Explore',
+			template: 'Xernerx Studios | Explore | %s',
+		},
 		description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
@@ -35,7 +41,10 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Xernerx Studios | Explore',
+		title: {
+			default: 'Xernerx Studios | Explore',
+			template: 'Xernerx Studios | Explore | %s',
+		},
 		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx.',
 		images: ['/banner.png'],
 	},

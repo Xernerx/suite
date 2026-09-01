@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { BookOpen, CircleQuestionMark, FileText, Mail, MessageCircle, Package, Shield } from 'lucide-react';
+import { BookOpen, CircleQuestionMark, FileText, Mail, MessageCircle, Package, Shield, Briefcase } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -61,6 +61,7 @@ export function Footer() {
 					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers', 'Careers')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Developer */}

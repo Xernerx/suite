@@ -103,14 +103,14 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 					origin: { x: 0.5, y: 0 },
 				});
 				await mutate();
-				toast({ type: 'success', title: 'Daily reward claimed!' });
+				toast({ type: 'success', title: t('components.cards.sidebaruser.giftClaimedTitle') });
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Failed to claim daily reward');
+				throw new Error(errData.error || t('components.cards.sidebaruser.giftFailedTitle'));
 			}
 		} catch (err: any) {
 			console.error('Failed to claim daily reward:', err);
-			toast({ type: 'error', title: 'Failed to claim daily reward', description: err.message });
+			toast({ type: 'error', title: t('components.cards.sidebaruser.giftFailedTitle'), description: err.message });
 		} finally {
 			setClaiming(false);
 		}
@@ -241,7 +241,7 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 							className="w-full flex items-center justify-center gap-2 bg-(--accent) text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow-md hover:opacity-90 transition-all animate-pulse"
 						>
 							<Gift size={16} />
-							<span>{claiming ? 'Opening Present...' : 'Claim Daily Present!'}</span>
+							<span>{claiming ? t('components.cards.sidebaruser.openingGift') : t('components.cards.sidebaruser.claimGift')}</span>
 						</button>
 					) : (
 						<div className="w-full flex items-center justify-between bg-(--foreground)/30 backdrop-blur-md/20 text-(--text-muted) text-xs px-3 py-2 rounded-xl border border-(--border)/5">

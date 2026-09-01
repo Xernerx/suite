@@ -1,13 +1,14 @@
 /** @format */
 'use client';
 
-import { useEnvironment, useToast, usePermissions } from '@xernerx/providers';
+import { useEnvironment, useToast, usePermissions, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Modal, Input, Selector } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
 import { Trash, Upload, ExternalLink, ShieldAlert, Settings, Plus, X, User as UserIcon, Users } from 'lucide-react';
 
 export default function Media() {
+	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { hasPermission } = usePermissions();
@@ -58,10 +59,10 @@ export default function Media() {
 				setEditMedia({ ...editMedia, shared: newShared });
 				setSharedInput('');
 			} else {
-				toast({ type: 'error', title: 'Discord User Not Found' });
+				toast({ type: 'error', title: t('admin.dashboard.media.toasts.userNotFound') });
 			}
 		} catch {
-			toast({ type: 'error', title: 'Failed to fetch user' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.fetchUserFailed') });
 		} finally {
 			setLoadingProfile(false);
 		}
@@ -81,7 +82,7 @@ export default function Media() {
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Error fetching media' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.fetchMediaFailed') });
 		} finally {
 			setLoading(false);
 		}
@@ -108,14 +109,14 @@ export default function Media() {
 			});
 
 			if (res.ok) {
-				toast({ type: 'success', title: 'Uploaded successfully!' });
+				toast({ type: 'success', title: t('admin.dashboard.media.toasts.uploadSuccess') });
 				fetchMedia();
 			} else {
-				throw new Error('Upload failed');
+				throw new Error(t('admin.dashboard.media.toasts.uploadFailed'));
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Failed to upload media' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.uploadFailed') });
 		} finally {
 			setUploading(false);
 			e.target.value = '';
@@ -131,14 +132,14 @@ export default function Media() {
 				credentials: 'include',
 			});
 			if (res.ok) {
-				toast({ type: 'success', title: 'Deleted media' });
+				toast({ type: 'success', title: t('admin.dashboard.media.toasts.deleteSuccess') });
 				setMedia(media.filter((m) => m._id !== id));
 			} else {
-				throw new Error('Delete failed');
+				throw new Error(t('admin.dashboard.media.toasts.deleteFailed'));
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Failed to delete media' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.deleteFailed') });
 		}
 	};
 
@@ -158,15 +159,15 @@ export default function Media() {
 
 			if (res.ok) {
 				const data = await res.json();
-				toast({ type: 'success', title: 'Media updated!' });
+				toast({ type: 'success', title: t('admin.dashboard.media.toasts.updateSuccess') });
 				setMedia(media.map((m) => (m._id === editMedia._id ? data.media : m)));
 				setEditMedia(null);
 			} else {
-				throw new Error('Failed to update media');
+				throw new Error(t('admin.dashboard.media.toasts.updateFailed'));
 			}
 		} catch (err) {
 			console.error(err);
-			toast({ type: 'error', title: 'Failed to update media metadata' });
+			toast({ type: 'error', title: t('admin.dashboard.media.toasts.updateFailed') });
 		} finally {
 			setSaving(false);
 		}
@@ -178,14 +179,14 @@ export default function Media() {
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center justify-between">
 				<div>
-					<h1 className="text-2xl font-bold">Media Library</h1>
-					<p className="text-(--text-muted) text-sm mt-1">Manage and view your uploaded media.</p>
+					<h1 className="text-2xl font-bold">{t('account.media.title')}</h1>
+					<p className="text-(--text-muted) text-sm mt-1">{t('account.media.description')}</p>
 				</div>
 				<div className="flex items-center gap-3">
 					{hasPermission('manageMedia') && (
-						<a href={getEnvUrl('https://admin.xernerx.com')}>
+						<a href={getEnvUrl('https://admin.xernerx.com/?view=media')}>
 							<Button variant="secondary">
-								<ShieldAlert size={16} className="text-amber-500" /> Switch to Admin
+								<ShieldAlert size={16} className="text-amber-500" /> {t('account.media.switchToAdmin') || 'Switch to Admin'}
 							</Button>
 						</a>
 					)}
@@ -194,7 +195,7 @@ export default function Media() {
 							<input type="file" id="media-upload" className="hidden" onChange={handleUpload} disabled={uploading} />
 							<label htmlFor="media-upload">
 								<Button variant="primary" loading={uploading} style={{ pointerEvents: 'none' }}>
-									<Upload size={16} /> Upload Media
+									<Upload size={16} /> {t('admin.dashboard.media.uploadButton')}
 								</Button>
 							</label>
 						</div>

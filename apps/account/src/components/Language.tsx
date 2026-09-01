@@ -156,7 +156,7 @@ export default function Language() {
 	const handleLanguageChange = async (code: string) => {
 		if (code === 'contribute') {
 			if (hasTranslationPermission) {
-				window.open(getEnvUrl('https://admin.xernerx.com'));
+				window.open(getEnvUrl('https://admin.xernerx.com/?view=translations'));
 				return;
 			}
 
@@ -285,7 +285,7 @@ export default function Language() {
 							<button
 								onClick={() => {
 									if (hasTranslationPermission) {
-										window.open(getEnvUrl('https://admin.xernerx.com'));
+										window.open(getEnvUrl('https://admin.xernerx.com/?view=translations'));
 										return;
 									}
 									if (!user?.id) {

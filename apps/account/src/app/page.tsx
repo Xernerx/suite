@@ -116,7 +116,7 @@ export default function Home() {
 			{
 				category: t('common.nav.categories.developer'),
 				icon: Image,
-				label: 'Media Library',
+				label: t('account.media.title') || 'Media Library',
 				view: 'media',
 			},
 		]);

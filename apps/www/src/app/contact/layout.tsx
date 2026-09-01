@@ -3,7 +3,10 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Xernerx Studios | Contact',
+	title: {
+		default: 'Xernerx Studios | Contact',
+		template: 'Xernerx Studios | Contact | %s',
+	},
 	description: 'Get in touch with Xernerx Studios for support, partnerships, security disclosures, legal enquiries and general questions.',
 };
 

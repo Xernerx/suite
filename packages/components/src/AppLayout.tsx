@@ -8,6 +8,7 @@ import {
 	EnvironmentProvider,
 	NotificationProvider,
 	PlatformProvider,
+	PermissionProvider,
 	ShortcutsProvider,
 	SidebarProvider,
 	SupportProvider,
@@ -17,6 +18,7 @@ import {
 	DispatchProvider,
 } from '@xernerx/providers';
 import React, { Suspense } from 'react';
+import Script from 'next/script';
 
 import { CookiePrompt } from './CookiePrompt';
 import { TermsPrompt } from './TermsPrompt';
@@ -52,6 +54,14 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 				}}
 			>
 				<ThemeScript />
+				{process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+					<Script
+						async
+						src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+						crossOrigin="anonymous"
+						strategy="afterInteractive"
+					/>
+				)}
 
 				<DictionaryProvider dictionary={dictionary}>
 					<ToastProvider>
@@ -59,21 +69,23 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 							<PlatformProvider>
 								<ThemeProvider>
 									<UserProvider>
-										<NotificationProvider>
-											<DispatchProvider>
-												<ShortcutsProvider>
-													<CookieProvider>
-														<CookiePrompt />
-														<TermsPrompt />
-														<SidebarProvider>
-															<SupportProvider>
-																<Page>{children}</Page>
-															</SupportProvider>
-														</SidebarProvider>
-													</CookieProvider>
-												</ShortcutsProvider>
-											</DispatchProvider>
-										</NotificationProvider>
+										<PermissionProvider>
+											<NotificationProvider>
+												<DispatchProvider>
+													<ShortcutsProvider>
+														<CookieProvider>
+															<CookiePrompt />
+															<TermsPrompt />
+															<SidebarProvider>
+																<SupportProvider>
+																	<Page>{children}</Page>
+																</SupportProvider>
+															</SidebarProvider>
+														</CookieProvider>
+													</ShortcutsProvider>
+												</DispatchProvider>
+											</NotificationProvider>
+										</PermissionProvider>
 									</UserProvider>
 								</ThemeProvider>
 							</PlatformProvider>

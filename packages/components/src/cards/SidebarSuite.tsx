@@ -50,7 +50,7 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 							className="flex items-center rounded-xl font-medium text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
 						>
-							<span>{service.label}</span>
+							<span>{t(service.label)}</span>
 						</Link>
 					);
 				})}
