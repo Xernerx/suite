@@ -14,9 +14,12 @@ export default class ClientReadyEvent extends EventBuilder {
 	}
 
 	override async run() {
-		this.updateGuilds();
 		this.updateStats();
 		this.updatePresence();
+
+		if (process.env.ENVIRONMENT !== 'PRODUCTION') return;
+
+		this.updateGuilds();
 	}
 
 	async updateGuilds() {

@@ -5,9 +5,8 @@
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"start": "node .",
-		"build": "tsc",
-		"dev": "pnpm i && tsc-watch --onSuccess \"node .\""
+		"start": "tsx src/main.ts",
+		"dev": "tsx watch src/main.ts"
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",
@@ -26,6 +25,7 @@
 		"@types/node": "^20.19.43",
 		"@types/ws": "^8.18.1",
 		"tsc-watch": "7.2.1",
+		"tsx": "^4.23.13",
 		"typescript": "^7.0.2"
 	}
 }

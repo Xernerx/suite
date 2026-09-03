@@ -1,5 +1,11 @@
 # bot
 
+## 1.1.39
+
+### Patch Changes
+
+- Fixed an issue where in canary build it would register it's own guilds
+
 ## 1.1.38
 
 ### Patch Changes

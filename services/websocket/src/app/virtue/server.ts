@@ -1,12 +1,20 @@
 /** @format */
 
-import mongoose from 'mongoose';
+import { database } from '@xernerx/lib/server';
 
-const models = {
-	guilds: () => mongoose.models.guilds,
-	users: () => mongoose.models.users,
-	members: () => mongoose.models.members,
-};
+async function getModel(action: string) {
+	const db = await database('xernerx');
+	switch (action) {
+		case 'guilds':
+			return db.models.guilds.Guild;
+		case 'users':
+			return db.models.users.User;
+		case 'members':
+			return db.models.guilds.Member;
+		default:
+			return null;
+	}
+}
 
 function getFilter(action: string, body: any) {
 	switch (action) {
@@ -28,13 +36,11 @@ function getFilter(action: string, body: any) {
 }
 
 export default async function Server(msg: any) {
-	const getModel = models[msg.action as keyof typeof models];
+	const model = await getModel(msg.action);
 
-	if (!getModel) {
+	if (!model) {
 		throw new Error('Unknown action');
 	}
-
-	const model = getModel();
 
 	switch (msg.method) {
 		case 'get':
