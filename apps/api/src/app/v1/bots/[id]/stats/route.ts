@@ -113,14 +113,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			updateFields.voteCount = body.voteCount;
 		}
 
-		let botName = 'your bot';
 		if (Object.keys(updateFields).length > 0) {
-			const updatedBot = await BotModel.findOneAndUpdate({ id }, { $set: updateFields });
-			if (updatedBot?.name) botName = updatedBot.name;
-		} else {
-			const existingBot = await BotModel.findOne({ id }).select('name').lean();
-			if (existingBot?.name) botName = existingBot.name;
+			await BotModel.findOneAndUpdate({ id }, { $set: updateFields });
 		}
+
+		const botMeta = await getBotMeta(BotModel, id);
 
 		const HookModel = (db.models.bots as any).Hook;
 		const hooks = await HookModel.find({ botId: id }).lean();
@@ -134,8 +131,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 						embeds: [
 							{
 								title: 'Bot Stats Posted',
-								description: `The stats for **${botName}** were just posted!\n\n**Servers:** ${serverCount}\n**Shards:** ${shardCount}`,
+								description: `The stats for **${botMeta.name}** were just posted!\n\n**Servers:** ${serverCount}\n**Shards:** ${shardCount}`,
 								color: 0x00ff00,
+								footer: {
+									text: botMeta.displayName,
+									...(botMeta.avatarUrl ? { icon_url: botMeta.avatarUrl } : {}),
+								},
 								timestamp: new Date().toISOString(),
 							},
 						],
@@ -151,6 +152,60 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		console.error('Failed to process bot stats POST:', error);
 		return NextResponse.json({ error: 'Internal Server Error', message: error.message, stack: error.stack }, { status: 500 });
 	}
+}
+
+async function getBotMeta(BotModel: any, id: string) {
+	let botDoc = await BotModel.findOne({ id }).select('name avatar').lean();
+	let name = botDoc?.name;
+	let avatar = botDoc?.avatar;
+
+	if ((!name || !avatar) && process.env.DISCORD_CLIENT_TOKEN) {
+		try {
+			const res = await fetch(`https://discord.com/api/v10/users/${id}`, {
+				headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+			});
+			if (res.ok) {
+				const user = await res.json();
+				if (!name && (user.global_name || user.username)) {
+					name = user.global_name || user.username;
+				}
+				if (!avatar && user.avatar) {
+					avatar = user.avatar;
+				}
+				if (name || avatar) {
+					await BotModel.updateOne(
+						{ id },
+						{
+							$set: {
+								...(name ? { name } : {}),
+								...(avatar ? { avatar } : {}),
+							},
+						}
+					);
+				}
+			}
+		} catch (e) {
+			console.error('Failed to fetch Discord user for bot meta:', e);
+		}
+	}
+
+	let avatarUrl: string | undefined = undefined;
+	if (avatar) {
+		avatarUrl = avatar.startsWith('http') ? avatar : `https://cdn.discordapp.com/avatars/${id}/${avatar}.${avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`;
+	} else {
+		try {
+			const defaultIndex = Number(BigInt(id) >> BigInt(22)) % 6;
+			avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+		} catch {
+			avatarUrl = undefined;
+		}
+	}
+
+	return {
+		name: name || 'your bot',
+		displayName: name || 'Unknown Bot',
+		avatarUrl,
+	};
 }
 
 async function authStats(req: NextRequest, botId: string) {
@@ -225,7 +280,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 		const db = await database('xernerx');
 		const HookModel = (db.models.bots as any).Hook;
-		const botDoc = await (db.models.bots as any).Bot.findOne({ id }).select('name').lean();
+		const BotModel = (db.models.bots as any).Bot || (db.models.bots as any).Profile;
+		const botMeta = await getBotMeta(BotModel, id);
 		const hooks = await HookModel.find({ botId: id }).lean();
 
 		if (hooks?.length) {
@@ -237,8 +293,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 						embeds: [
 							{
 								title: 'Bot Stats Updated',
-								description: `The stats for **${botDoc.name || 'your bot'}** were just updated!`,
+								description: `The stats for **${botMeta.name}** were just updated!`,
 								color: 0x00a0ff,
+								footer: {
+									text: botMeta.displayName,
+									...(botMeta.avatarUrl ? { icon_url: botMeta.avatarUrl } : {}),
+								},
 								timestamp: new Date().toISOString(),
 							},
 						],
@@ -275,7 +335,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
 		const db = await database('xernerx');
 		const HookModel = (db.models.bots as any).Hook;
-		const botDoc = await (db.models.bots as any).Bot.findOne({ id }).select('name').lean();
+		const BotModel = (db.models.bots as any).Bot || (db.models.bots as any).Profile;
+		const botMeta = await getBotMeta(BotModel, id);
 		const hooks = await HookModel.find({ botId: id }).lean();
 
 		if (hooks?.length) {
@@ -287,8 +348,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 						embeds: [
 							{
 								title: 'Bot Stats Deleted',
-								description: statId ? `A stat record was deleted for **${botDoc.name || 'your bot'}**.` : `All stat records were deleted for **${botDoc.name || 'your bot'}**.`,
+								description: statId ? `A stat record was deleted for **${botMeta.name}**.` : `All stat records were deleted for **${botMeta.name}**.`,
 								color: 0xff0000,
+								footer: {
+									text: botMeta.displayName,
+									...(botMeta.avatarUrl ? { icon_url: botMeta.avatarUrl } : {}),
+								},
 								timestamp: new Date().toISOString(),
 							},
 						],

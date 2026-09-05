@@ -1,5 +1,11 @@
 # api
 
+## 0.7.1
+
+### Patch Changes
+
+- Fixed an issue where embeds were send incorrectly
+
 ## 0.7.0
 
 ### Minor Changes
