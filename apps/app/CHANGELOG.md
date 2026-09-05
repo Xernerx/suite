@@ -1,5 +1,11 @@
 # app
 
+## 2.3.0
+
+### Minor Changes
+
+- Added Webhooks, Webhook support and reviews for bots
+
 ## 2.2.5
 
 ### Patch Changes

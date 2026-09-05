@@ -14,6 +14,8 @@ export default class GuildUpdateEvent extends EventBuilder {
 	}
 
 	override async run(oldGuild: Guild, newGuild: Guild) {
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
+
 		if (oldGuild.name === newGuild.name && oldGuild.icon === newGuild.icon && oldGuild.preferredLocale === newGuild.preferredLocale) {
 			return; // No changes to track
 		}

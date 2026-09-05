@@ -14,6 +14,8 @@ export default class GuildCreateEvent extends EventBuilder {
 	}
 
 	override async run(guild: Guild) {
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
+
 		this.updateGuild(guild);
 	}
 

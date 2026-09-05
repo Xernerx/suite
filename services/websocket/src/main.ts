@@ -2,14 +2,11 @@
 
 import http from 'http';
 import { WebSocketServer, type WebSocket } from 'ws';
-import database from './lib/database.js';
 import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs/promises';
 import path from 'path';
 import { jwtVerify } from 'jose';
 import { Terminal } from '@xernerx/terminal';
-
-database();
 
 const terminal = new Terminal({ scope: 'WS', title: 'XERNERX', format: ['title', 'scope', 'datetime', 'memory'] });
 

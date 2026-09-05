@@ -1,5 +1,17 @@
 # bot
 
+## 1.1.40
+
+### Patch Changes
+
+- Fixed an issue where guilds on the production bot would be removed by the dev and canary bots
+
+## 1.1.39
+
+### Patch Changes
+
+- Fixed an issue where in canary build it would register it's own guilds
+
 ## 1.1.38
 
 ### Patch Changes
