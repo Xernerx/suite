@@ -25,7 +25,6 @@ const schema = new Schema(
 			privacy: { type: String }, // Privacy policy link
 			terms: { type: String }, // Terms of service link
 		},
-		hooks: { type: [{ name: String, description: String, url: String, data: String }] }, // List of bot webhooks
 		commands: { type: Array, default: [] }, // Discord JSON application commands
 		votes: { type: [{ userId: String, timestamp: Date }], default: [] }, // Array of user votes with timestamps
 		voteCount: { type: Number, default: 0 }, // Fast cache for total votes

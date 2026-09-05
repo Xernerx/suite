@@ -1,5 +1,11 @@
 # api
 
+## 0.7.0
+
+### Minor Changes
+
+- Added Webhooks, Webhook support and reviews for bots
+
 ## 0.6.8
 
 ### Patch Changes

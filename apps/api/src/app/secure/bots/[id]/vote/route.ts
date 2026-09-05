@@ -1,7 +1,7 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
-import { database } from '@xernerx/lib/server';
+import { database, sendWebhook } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 
@@ -79,6 +79,61 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 		// 3. Reward the user with 100 credits
 		const CreditModel = (db.models.users as any).Credit;
 		await CreditModel.updateOne({ ownerId: userId }, { $inc: { balance: 100 } }, { upsert: true });
+
+		// 4. Trigger bot webhooks
+		const BotModel = (db.models.bots as any).Bot;
+		const HookModel = (db.models.bots as any).Hook;
+		const hooks = await HookModel.find({ botId: id }).lean();
+
+		if (hooks?.length) {
+			let discordBot: any = null;
+			try {
+				const res = await fetch(`https://discord.com/api/v10/users/${id}`, {
+					headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+					next: { revalidate: 3600 },
+				});
+				if (res.ok) discordBot = await res.json();
+			} catch (e) {}
+
+			const bot = await BotModel.findOne({ id }).select('name avatar').lean();
+			const finalBotName = discordBot?.global_name || discordBot?.username || bot?.name || 'Unknown Bot';
+			const finalBotAvatar = discordBot?.avatar
+				? `https://cdn.discordapp.com/avatars/${id}/${discordBot.avatar}.png`
+				: bot?.avatar
+					? `https://cdn.discordapp.com/avatars/${id}/${bot.avatar}.png`
+					: undefined;
+
+			for (const hook of hooks) {
+				if (!hook.url || !hook.events?.includes('POST vote')) continue;
+				try {
+					const authorName = session?.user?.name || session?.user?.global_name || 'A user';
+					const authorIcon = session?.user?.image || undefined;
+
+					await sendWebhook({
+						url: hook.url,
+						embeds: [
+							{
+								author: {
+									name: authorName,
+									icon_url: authorIcon,
+								},
+								title: 'New Vote!',
+								url: `https://xernerx.com/bots/${id}`,
+								description: `This user just voted for your bot! Your bot now has **${totalVotes}** votes.`,
+								color: 0xff00a0,
+								footer: {
+									text: finalBotName,
+									icon_url: finalBotAvatar,
+								},
+								timestamp: new Date().toISOString(),
+							},
+						],
+					});
+				} catch (e) {
+					console.error('Failed to trigger bot webhook for vote', e);
+				}
+			}
+		}
 
 		return NextResponse.json({ success: true, message: 'Vote cast successfully and 100 credits awarded' }, { status: 201 });
 	} catch (error) {

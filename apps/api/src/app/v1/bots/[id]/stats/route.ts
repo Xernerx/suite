@@ -1,7 +1,7 @@
 /** @format */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { database } from '@xernerx/lib/server';
+import { database, sendWebhook } from '@xernerx/lib/server';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -113,8 +113,37 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			updateFields.voteCount = body.voteCount;
 		}
 
+		let botName = 'your bot';
 		if (Object.keys(updateFields).length > 0) {
-			await BotModel.updateOne({ id }, { $set: updateFields });
+			const updatedBot = await BotModel.findOneAndUpdate({ id }, { $set: updateFields });
+			if (updatedBot?.name) botName = updatedBot.name;
+		} else {
+			const existingBot = await BotModel.findOne({ id }).select('name').lean();
+			if (existingBot?.name) botName = existingBot.name;
+		}
+
+		const HookModel = (db.models.bots as any).Hook;
+		const hooks = await HookModel.find({ botId: id }).lean();
+
+		if (hooks?.length) {
+			for (const hook of hooks) {
+				if (!hook.url || !hook.events?.includes('POST stat')) continue;
+				try {
+					await sendWebhook({
+						url: hook.url,
+						embeds: [
+							{
+								title: 'Bot Stats Posted',
+								description: `The stats for **${botName}** were just posted!\n\n**Servers:** ${serverCount}\n**Shards:** ${shardCount}`,
+								color: 0x00ff00,
+								timestamp: new Date().toISOString(),
+							},
+						],
+					});
+				} catch (e) {
+					console.error('Failed to trigger bot webhook for stat post', e);
+				}
+			}
 		}
 
 		return NextResponse.json({ message: 'Stats updated successfully' }, { status: 201 });
@@ -194,6 +223,32 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			}
 		}
 
+		const db = await database('xernerx');
+		const HookModel = (db.models.bots as any).Hook;
+		const botDoc = await (db.models.bots as any).Bot.findOne({ id }).select('name').lean();
+		const hooks = await HookModel.find({ botId: id }).lean();
+
+		if (hooks?.length) {
+			for (const hook of hooks) {
+				if (!hook.url || !hook.events?.includes('PATCH stat')) continue;
+				try {
+					await sendWebhook({
+						url: hook.url,
+						embeds: [
+							{
+								title: 'Bot Stats Updated',
+								description: `The stats for **${botDoc.name || 'your bot'}** were just updated!`,
+								color: 0x00a0ff,
+								timestamp: new Date().toISOString(),
+							},
+						],
+					});
+				} catch (e) {
+					console.error('Failed to trigger bot webhook for stat update', e);
+				}
+			}
+		}
+
 		return NextResponse.json({ message: 'Stats updated successfully' });
 	} catch (error: any) {
 		console.error('Failed to PATCH bot stats:', error);
@@ -216,6 +271,32 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 			await StatModel.deleteOne({ _id: statId, id });
 		} else {
 			await StatModel.deleteMany({ id });
+		}
+
+		const db = await database('xernerx');
+		const HookModel = (db.models.bots as any).Hook;
+		const botDoc = await (db.models.bots as any).Bot.findOne({ id }).select('name').lean();
+		const hooks = await HookModel.find({ botId: id }).lean();
+
+		if (hooks?.length) {
+			for (const hook of hooks) {
+				if (!hook.url || !hook.events?.includes('DELETE stat')) continue;
+				try {
+					await sendWebhook({
+						url: hook.url,
+						embeds: [
+							{
+								title: 'Bot Stats Deleted',
+								description: statId ? `A stat record was deleted for **${botDoc.name || 'your bot'}**.` : `All stat records were deleted for **${botDoc.name || 'your bot'}**.`,
+								color: 0xff0000,
+								timestamp: new Date().toISOString(),
+							},
+						],
+					});
+				} catch (e) {
+					console.error('Failed to trigger bot webhook for stat deletion', e);
+				}
+			}
 		}
 
 		return NextResponse.json({ message: 'Stats deleted successfully' });
