@@ -15,6 +15,7 @@ export default class MessageCreateEvent extends EventBuilder {
 
 	override async run(message: Message) {
 		if (!message.inGuild() || message.author.bot) return;
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
 
 		this.recordMessageStat(message.guildId, message.channelId);
 	}

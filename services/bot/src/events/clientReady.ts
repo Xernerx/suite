@@ -14,15 +14,17 @@ export default class ClientReadyEvent extends EventBuilder {
 	}
 
 	override async run() {
-		this.updateStats();
 		this.updatePresence();
 
-		if (process.env.ENVIRONMENT !== 'PRODUCTION') return;
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
 
+		this.updateStats();
 		this.updateGuilds();
 	}
 
 	async updateGuilds() {
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
+
 		const stats = {
 			created: 0,
 			updated: 0,
@@ -109,6 +111,8 @@ export default class ClientReadyEvent extends EventBuilder {
 	}
 
 	async updateStats() {
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
+
 		try {
 			const db = await database('xernerx');
 			const GuildModel = db.models.guilds.Guild;

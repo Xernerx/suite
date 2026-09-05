@@ -14,6 +14,8 @@ export default class GuildDeleteEvent extends EventBuilder {
 	}
 
 	override async run(guild: Guild) {
+		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
+
 		try {
 			const db = await database('xernerx');
 			const GuildModel = db.models.guilds.Guild;
