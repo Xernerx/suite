@@ -523,7 +523,11 @@ export default function PortalPage() {
 								)}
 								<div className="relative z-10 flex items-center w-full gap-4">
 									{selectedOrg.iconUrl ? (
-										<img src={getEnvUrl(selectedOrg.iconUrl)} alt={selectedOrg.name} className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
+										<img
+											src={getEnvUrl(selectedOrg.iconUrl)}
+											alt={selectedOrg.name}
+											className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+										/>
 									) : (
 										<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
 											<Building2 className="w-8 h-8 text-(--text-muted)" />
@@ -569,13 +573,19 @@ export default function PortalPage() {
 												<div className="relative mb-14">
 													<div className="relative h-48 w-full rounded-[2rem] overflow-hidden border border-(--border)/10 shadow-sm bg-(--background)/50 group/banner">
 														{pendingUploads.bannerUrl || orgConfig.bannerUrl ? (
-															<img src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : getEnvUrl(orgConfig.bannerUrl as string)} alt="Banner" className="w-full h-full object-cover" />
+															<img
+																src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : getEnvUrl(orgConfig.bannerUrl as string)}
+																alt="Banner"
+																className="w-full h-full object-cover"
+															/>
 														) : (
 															<div className="w-full h-full bg-(--foreground)/30" />
 														)}
 														<label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover/banner:opacity-100 transition-opacity cursor-pointer">
 															{uploadingMedia === 'bannerUrl' ? <Loading variant="small" /> : <Upload className="w-6 h-6 text-white" />}
-															<span className="text-white font-medium text-sm">{(pendingUploads.bannerUrl || orgConfig.bannerUrl) ? 'Change Banner' : 'Upload Banner'}</span>
+															<span className="text-white font-medium text-sm">
+																{pendingUploads.bannerUrl || orgConfig.bannerUrl ? 'Change Banner' : 'Upload Banner'}
+															</span>
 															<input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'bannerUrl')} disabled={uploadingMedia !== null} />
 														</label>
 													</div>
@@ -583,7 +593,11 @@ export default function PortalPage() {
 													<div className="absolute left-8 -bottom-10 rounded-full border-4 border-(--background) shadow-lg bg-(--background) group/avatar z-10">
 														<div className="relative w-24 h-24 rounded-full overflow-hidden bg-(--background)">
 															{pendingUploads.iconUrl || orgConfig.iconUrl ? (
-																<img src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : getEnvUrl(orgConfig.iconUrl as string)} alt="Avatar" className="w-full h-full object-cover" />
+																<img
+																	src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : getEnvUrl(orgConfig.iconUrl as string)}
+																	alt="Avatar"
+																	className="w-full h-full object-cover"
+																/>
 															) : (
 																<div className="w-full h-full bg-(--foreground)/50 flex items-center justify-center">
 																	<Building2 className="w-10 h-10 text-(--text-muted)" />
@@ -592,7 +606,13 @@ export default function PortalPage() {
 															<label className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
 																{uploadingMedia === 'iconUrl' ? <Loading variant="small" /> : <Upload className="w-5 h-5 text-white" />}
 																<span className="text-white font-medium text-[10px]">Edit Avatar</span>
-																<input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'iconUrl')} disabled={uploadingMedia !== null} />
+																<input
+																	type="file"
+																	accept="image/*"
+																	className="hidden"
+																	onChange={(e) => handleUpload(e, 'iconUrl')}
+																	disabled={uploadingMedia !== null}
+																/>
 															</label>
 														</div>
 													</div>
@@ -617,13 +637,13 @@ export default function PortalPage() {
 													<div className="flex items-center justify-between">
 														<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
 														<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
-															<button 
+															<button
 																onClick={() => setMarkdownPreview(false)}
 																className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 															>
 																Write
 															</button>
-															<button 
+															<button
 																onClick={() => setMarkdownPreview(true)}
 																className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 															>
@@ -631,7 +651,7 @@ export default function PortalPage() {
 															</button>
 														</div>
 													</div>
-													
+
 													{markdownPreview ? (
 														<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
 															{orgConfig.info ? <ReactMarkdown>{orgConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">Nothing to preview</span>}

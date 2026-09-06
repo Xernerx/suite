@@ -19,6 +19,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		const VoteModel = (db.models.bots as any).Vote;
 		bot.voteCount = await VoteModel.countDocuments({ botId: id });
 
+		if (bot.organization) {
+			const OrganizationModel = (db.models.organizations as any).Organization;
+			const org = await OrganizationModel.findById(bot.organization).lean();
+			if (org) {
+				bot.organizationData = org;
+			}
+		}
+
 		// Fetch Discord Profile
 		try {
 			const token = process.env.DISCORD_CLIENT_TOKEN;
@@ -81,8 +89,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 		// Actually, let's just do the update. The user hasn't specified strict auth here yet other than `secure` route middleware which checks session?
 		// Wait, /secure routes in Next.js usually have middleware or check session!
 
-		const updatableFields = ['description', 'info', 'privacy', 'bot', 'organization'];
-		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms'];
+		const updatableFields = ['description', 'info', 'privacy', 'bot', 'organization', 'tags'];
+		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 
 		if (body.links) {
 			if (!bot.links) bot.links = {};

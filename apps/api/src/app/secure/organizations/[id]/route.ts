@@ -44,8 +44,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.name !== undefined) updateData['name'] = body.name;
 		if (body.description !== undefined) updateData['description'] = body.description;
 		if (body.icon !== undefined) updateData['icon'] = body.icon;
+		if (body.iconUrl !== undefined) updateData['iconUrl'] = body.iconUrl;
+		if (body.bannerUrl !== undefined) updateData['bannerUrl'] = body.bannerUrl;
+		if (body.info !== undefined) updateData['info'] = body.info;
+		if (body.locale !== undefined) updateData['locale'] = body.locale;
+		if (body.links !== undefined) updateData['links'] = body.links;
 		if (body.verified !== undefined) updateData['verified'] = body.verified;
-		if (body.privacy !== undefined) updateData['config.privacy'] = body.privacy;
+		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
 
 		if (body.action === 'remove_member' && body.targetId) {
 			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: id }, { $pull: { members: { userId: body.targetId } } }, { returnDocument: 'after', runValidators: true }).lean();

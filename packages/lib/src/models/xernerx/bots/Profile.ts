@@ -24,6 +24,7 @@ const schema = new Schema(
 			website: { type: String }, // Official website link
 			privacy: { type: String }, // Privacy policy link
 			terms: { type: String }, // Terms of service link
+			dashboard: { type: String }, // Bot dashboard link
 		},
 		commands: { type: Array, default: [] }, // Discord JSON application commands
 		votes: { type: [{ userId: String, timestamp: Date }], default: [] }, // Array of user votes with timestamps

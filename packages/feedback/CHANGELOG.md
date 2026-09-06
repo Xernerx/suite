@@ -1,5 +1,12 @@
 # @xernerx/feedback
 
+## 0.0.20
+
+### Patch Changes
+
+- @xernerx/providers@0.3.12
+- @xernerx/ui@0.3.3
+
 ## 0.0.19
 
 ### Patch Changes

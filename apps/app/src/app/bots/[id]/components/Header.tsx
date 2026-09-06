@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
-import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp } from 'lucide-react';
+import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -154,6 +154,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 									else if (key === 'community') Icon = MessageSquare;
 									else if (key === 'privacy') Icon = Shield;
 									else if (key === 'terms') Icon = FileText;
+									else if (key === 'dashboard') Icon = LayoutDashboard;
 
 									return (
 										<button
@@ -170,33 +171,65 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 					)}
 				</div>
 
-				{bot.ownersData && bot.ownersData.length > 0 && (
-					<div className="flex flex-col items-start md:items-end gap-2">
-						<span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-wider">{t('app.bots.id.text6')}</span>
-						<div className="flex flex-wrap gap-2 justify-end">
-							{bot.ownersData.map((owner: any) => (
-								<Link
-									href={`/users/${owner.id}`}
-									key={owner.id}
-									className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors"
-								>
-									<Image
-										src={
-											owner.avatar
-												? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
-												: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator) % 5}.png`
-										}
-										alt={owner.global_name || owner.username || 'Owner Avatar'}
-										width={16}
-										height={16}
-										className="rounded-full"
-									/>
-									<span className="text-xs font-bold text-(--text)">{owner.global_name || owner.username}</span>
-								</Link>
-							))}
+				<div className="flex flex-col sm:flex-row items-end justify-end gap-6">
+					{bot.organizationData && (
+						<div className="flex flex-col items-start md:items-end gap-2">
+							<span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-wider">Published by</span>
+							<div className="flex flex-wrap gap-2 justify-end">
+								{bot.organizationData.privacy === 'public' ? (
+									<Link
+										href={`/organizations/${bot.organizationData._id}`}
+										className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors"
+									>
+										{bot.organizationData.iconUrl ? (
+											<img src={bot.organizationData.iconUrl} alt={bot.organizationData.name} className="w-4 h-4 rounded-full object-cover" />
+										) : (
+											<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
+										)}
+										<span className="text-xs font-bold text-(--accent)">{bot.organizationData.name}</span>
+									</Link>
+								) : (
+									<span className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm">
+										{bot.organizationData.iconUrl ? (
+											<img src={bot.organizationData.iconUrl} alt={bot.organizationData.name} className="w-4 h-4 rounded-full object-cover" />
+										) : (
+											<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
+										)}
+										<span className="text-xs font-bold text-(--text-muted)">{bot.organizationData.name}</span>
+									</span>
+								)}
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+
+					{bot.ownersData && bot.ownersData.length > 0 && (
+						<div className="flex flex-col items-start md:items-end gap-2">
+							<span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-wider">{t('app.bots.id.text6')}</span>
+							<div className="flex flex-wrap gap-2 justify-end">
+								{bot.ownersData.map((owner: any) => (
+									<Link
+										href={`/users/${owner.id}`}
+										key={owner.id}
+										className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors"
+									>
+										<Image
+											src={
+												owner.avatar
+													? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
+													: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator) % 5}.png`
+											}
+											alt={owner.global_name || owner.username || 'Owner Avatar'}
+											width={16}
+											height={16}
+											className="rounded-full"
+										/>
+										<span className="text-xs font-bold text-(--text)">{owner.global_name || owner.username}</span>
+									</Link>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);

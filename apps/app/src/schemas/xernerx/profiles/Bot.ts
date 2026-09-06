@@ -19,7 +19,9 @@ const schema = new Schema(
 			website: { type: String }, // Official website link
 			privacy: { type: String }, // Privacy policy link
 			terms: { type: String }, // Terms of service link
+			dashboard: { type: String }, // Bot dashboard link
 		},
+		tags: { type: [String], default: [] }, // Array of tags
 		hooks: { type: [{ name: String, description: String, url: String, data: String }] }, // List of bot webhooks
 		commands: { type: [{ id: String, name: String, description: String }] }, // List of bot commands
 	},

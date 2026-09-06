@@ -17,6 +17,8 @@ const schema = new Schema(
 		guild: { type: String }, // Discord guild ID (optional, if tied to a server)
 		name: { type: String, required: true }, // Organization name
 		icon: { type: String }, // Organization icon URL (optional)
+		iconUrl: { type: String }, // New custom avatar CDN URL
+		bannerUrl: { type: String }, // Custom banner CDN URL
 		owner: { type: String, required: true }, // Discord user ID of the organization owner
 		description: { type: String }, // Short description of the organization
 		info: { type: String }, // Long description about the organization

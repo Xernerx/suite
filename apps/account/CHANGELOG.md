@@ -1,5 +1,17 @@
 # auth
 
+## 0.7.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/styles@0.1.9
+    - @xernerx/lib@0.5.2
+    - @xernerx/components@0.2.19
+    - @xernerx/providers@0.3.12
+    - @xernerx/feedback@0.0.20
+    - @xernerx/ui@0.3.3
+
 ## 0.7.3
 
 ### Patch Changes

@@ -68,7 +68,8 @@
 				"administrator": "Administrator",
 				"translator": "Translator",
 				"xernerxSuite": "Xernerx Suite",
-				"system": "System"
+				"system": "System",
+				"bots": "Bots"
 			},
 			"items": {
 				"account": "Account",
