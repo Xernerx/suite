@@ -63,23 +63,32 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			}
 		}
 
-		// Fetch the actual file from Vercel Blobs using the server token
-		const res = await fetch(media.url, {
-			headers: {
-				Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-			},
-		});
+		// Fetch the actual file from Vercel Blobs using the Vercel Blob SDK
+		// This automatically resolves VERCEL_OIDC_TOKEN in production!
+		const { get } = await import('@vercel/blob');
+		let stream;
+		try {
+			const res = await get(media.url, { access: 'private' });
+			if (!res) {
+				console.error(`DEBUG RAW - SDK get() returned null (blob not found):`, media.url);
+				return new Response('Failed to retrieve media from storage', { status: 404 });
+			}
+			stream = res.stream;
+		} catch (e: any) {
+			console.error(`DEBUG RAW - SDK get() failed:`, e);
+			return new Response('Failed to retrieve media from storage', { status: 502 });
+		}
 
-		if (!res.ok) {
+		if (!stream) {
 			return new Response('Failed to retrieve media from storage', { status: 502 });
 		}
 
 		// Stream the response directly to the client
 		const headers = new Headers(corsHeaders);
-		headers.set('Content-Type', media.mimeType || res.headers.get('content-type') || 'application/octet-stream');
+		headers.set('Content-Type', media.mimeType || 'application/octet-stream');
 		headers.set('Cache-Control', 'public, max-age=31536000, immutable'); // heavily cache since it's immutable
 
-		return new Response(res.body, {
+		return new Response(stream as any, {
 			status: 200,
 			headers,
 		});
