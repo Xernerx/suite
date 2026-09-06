@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Server, Users, Activity, ShieldCheck } from 'lucide-react';
+import { Server, Users, Activity, ShieldCheck, TrendingUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
 export default function Stats({ bot, id }: { bot: any; id: string }) {
@@ -13,7 +13,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 	const [stats, setStats] = useState<any[]>([]);
 	const [statsLoading, setStatsLoading] = useState(true);
 	const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '3m' | '6m' | '1y' | 'all'>('24h');
-	const [activeMetric, setActiveMetric] = useState<'guildCount' | 'userCount' | 'shardCount' | 'voteCount' | 'uptime'>('guildCount');
+	const [activeMetric, setActiveMetric] = useState<'guildCount' | 'userCount' | 'shardCount' | 'voteCount' | 'uptime' | 'valuation'>('guildCount');
 	const [isUndrawing, setIsUndrawing] = useState(false);
 	const statsCache = useRef<Record<string, any[]>>({});
 
@@ -94,7 +94,35 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 
 	const currentStats = stats[stats.length - 1];
 
-	let chartData = stats;
+	let mappedStats = stats.map((s) => {
+		const baseline = s.guildCount * 0.1 + s.userCount * 0.001;
+
+		const thirtyDaysPrior = s.timestamp - 30 * 24 * 60 * 60 * 1000;
+		let pastStat = stats[0];
+		for (let i = 0; i < stats.length; i++) {
+			if (stats[i].timestamp >= thirtyDaysPrior) {
+				pastStat = stats[i];
+				break;
+			}
+		}
+
+		const pastBaseline = pastStat ? pastStat.guildCount * 0.1 + pastStat.userCount * 0.001 : baseline;
+		let growthRate = 0;
+		if (pastBaseline > 0) {
+			growthRate = (baseline - pastBaseline) / pastBaseline;
+		}
+
+		const multiplier = Math.max(0.5, Math.min(3.0, 1 + growthRate));
+		const valuation = baseline * multiplier;
+
+		return {
+			...s,
+			uptime: s.onlineSince ? Math.max(0, (s.timestamp - s.onlineSince) / (1000 * 60 * 60)) : 0,
+			valuation: valuation,
+		};
+	});
+
+	let chartData = mappedStats;
 
 	if (timeframe !== 'all') {
 		const now = Date.now();
@@ -107,15 +135,10 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 			'6m': now - 180 * day,
 			'1y': now - 365 * day,
 		};
-		chartData = stats.filter((s) => s.timestamp >= limits[timeframe]);
+		chartData = mappedStats.filter((s) => s.timestamp >= limits[timeframe]);
 	}
 
-	chartData = chartData.map((s) => ({
-		...s,
-		uptime: s.onlineSince ? Math.max(0, (s.timestamp - s.onlineSince) / (1000 * 60 * 60)) : 0,
-	}));
-
-	const highestValue = Math.max(...stats.map((s) => s[activeMetric] || 0));
+	const highestValue = Math.max(...mappedStats.map((s) => s[activeMetric] || 0));
 	const firstPoint = chartData[0]?.[activeMetric] || 0;
 	const lastPoint = chartData[chartData.length - 1]?.[activeMetric] || 0;
 	const gainLoss = lastPoint - firstPoint;
@@ -137,12 +160,13 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 
 	return (
 		<div className="flex flex-col gap-6">
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+			<div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-6">
 				{[
 					{ id: 'guildCount', label: 'Servers', value: currentStats.guildCount, icon: Server },
 					{ id: 'userCount', label: 'Users', value: currentStats.userCount, icon: Users },
 					{ id: 'shardCount', label: 'Shards', value: currentStats.shardCount, icon: Activity },
 					{ id: 'voteCount', label: 'Votes', value: bot.voteCount || currentStats.voteCount || 0, icon: ShieldCheck },
+					{ id: 'valuation', label: 'Est. Value', value: `$${Math.round(mappedStats[mappedStats.length - 1]?.valuation || 0).toLocaleString()}`, icon: TrendingUp },
 				].map((metric) => (
 					<button
 						key={metric.label}
@@ -179,12 +203,17 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 						<div className="flex flex-wrap items-center gap-4 text-sm font-medium">
 							<span className={`${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'} flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded-md`}>
 								{gainLoss > 0 ? '+' : ''}
-								{activeMetric === 'uptime' ? gainLoss.toFixed(1) : gainLoss.toLocaleString()} ({gainPercentage}
+								{activeMetric === 'uptime' ? gainLoss.toFixed(1) : activeMetric === 'valuation' ? `$${Math.round(gainLoss).toLocaleString()}` : Math.round(gainLoss).toLocaleString()} (
+								{gainPercentage}
 								{t('app.bots.id.text11')}
 							</span>
 							<span className="text-(--text-muted) bg-(--background) px-2 py-1 rounded-md border border-(--border)/10">
 								{t('app.bots.id.text12')}
-								{activeMetric === 'uptime' ? `${highestValue.toFixed(1)}h` : highestValue.toLocaleString()}
+								{activeMetric === 'uptime'
+									? `${highestValue.toFixed(1)}h`
+									: activeMetric === 'valuation'
+										? `$${Math.round(highestValue).toLocaleString()}`
+										: Math.round(highestValue).toLocaleString()}
 							</span>
 						</div>
 					</div>
@@ -246,6 +275,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 									domain={['auto', 'auto']}
 									tickFormatter={(val) => {
 										if (activeMetric === 'uptime') return `${val.toFixed(0)}h`;
+										if (activeMetric === 'valuation') return val >= 1000 ? `$${(val / 1000).toFixed(1)}k` : `$${val.toFixed(0)}`;
 										return val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val;
 									}}
 								/>
@@ -260,7 +290,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 									itemStyle={{ color: 'var(--text)', fontWeight: 'bold' }}
 									labelFormatter={(label) => new Date(label as string | number).toLocaleString()}
 									separator=" "
-									formatter={(value: any) => value.toLocaleString()}
+									formatter={(value: any) => (activeMetric === 'valuation' ? `$${Math.round(value).toLocaleString()}` : Math.round(value).toLocaleString())}
 								/>
 
 								<Line
@@ -275,7 +305,9 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 													? 'Shards'
 													: activeMetric === 'voteCount'
 														? 'Votes'
-														: 'Uptime'
+														: activeMetric === 'valuation'
+															? 'Est. Value'
+															: 'Uptime'
 									}
 									stroke="var(--accent)"
 									strokeWidth={4}

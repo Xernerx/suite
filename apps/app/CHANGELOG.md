@@ -1,5 +1,11 @@
 # app
 
+## 2.5.0
+
+### Minor Changes
+
+- Added valuation and faq
+
 ## 2.4.0
 
 ### Minor Changes

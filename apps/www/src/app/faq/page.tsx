@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import { Languages, Server } from 'lucide-react';
+import { Languages, Server, TrendingUp } from 'lucide-react';
 import { SidebarNavItem, useDictionary, useSidebar } from '@xernerx/providers';
 
 import Environments from '@/components/faq/Environments';
 import Translations from '@/components/faq/Translations';
+import Bots from '@/components/faq/Bots';
 import { useEffect } from 'react';
 
 export default function Page() {
@@ -26,6 +27,12 @@ export default function Page() {
 				view: 'environments',
 				category: t('common.nav.categories.xernerxSuite'),
 			},
+			{
+				icon: TrendingUp,
+				label: t('faq.bots.title'),
+				view: 'bots',
+				category: t('common.nav.categories.xernerxSuite'),
+			},
 		];
 
 		setNavItems(items);
@@ -42,6 +49,7 @@ export default function Page() {
 		<>
 			{view === 'translations' && <Translations />}
 			{view === 'environments' && <Environments />}
+			{view === 'bots' && <Bots />}
 		</>
 	);
 }
