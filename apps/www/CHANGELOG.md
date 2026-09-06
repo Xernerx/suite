@@ -1,5 +1,22 @@
 # www
 
+## 0.6.8
+
+### Patch Changes
+
+- Added valuation and faq
+
+## 0.6.7
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.5.2
+    - @xernerx/components@0.2.19
+    - @xernerx/providers@0.3.12
+    - @xernerx/feedback@0.0.20
+    - @xernerx/ui@0.3.3
+
 ## 0.6.6
 
 ### Patch Changes

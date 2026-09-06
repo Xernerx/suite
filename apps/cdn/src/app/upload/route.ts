@@ -98,6 +98,7 @@ export async function POST(req: Request) {
 		const blob = await put(file.name, file, {
 			access: 'private', // User is using a private store, so we must proxy requests
 			multipart: true,
+			addRandomSuffix: true,
 		});
 
 		// 4. Save metadata to MongoDB
@@ -119,8 +120,8 @@ export async function POST(req: Request) {
 		return NextResponse.json(
 			{
 				success: true,
-				url: `${baseUrl}/view/${mediaDoc._id}`,
-				media: { ...mediaDoc.toObject(), url: `${baseUrl}/view/${mediaDoc._id}` },
+				url: `${baseUrl}/raw/${mediaDoc._id}`,
+				media: { ...mediaDoc.toObject(), url: `${baseUrl}/raw/${mediaDoc._id}` },
 			},
 			{ headers: corsHeaders }
 		);

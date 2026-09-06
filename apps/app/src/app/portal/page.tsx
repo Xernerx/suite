@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Bot, Building2, Check, Compass, LayoutDashboard, Link2, Plus, Save, Server, Settings, Shield, Trash2, User, Users } from 'lucide-react';
+import { AlertTriangle, Bot, Building2, Check, Compass, LayoutDashboard, Link2, Plus, Save, Server, Settings, Shield, Trash2, Upload, User, Users } from 'lucide-react';
 import { Button, Confirm, Input, Modal, Selector, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
@@ -11,6 +11,7 @@ import { CircleFlag } from 'react-circle-flags';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
+import ReactMarkdown from 'react-markdown';
 import { useRouter } from 'next/navigation';
 
 type Organization = {
@@ -69,21 +70,16 @@ export default function PortalPage() {
 	const [inviteUserId, setInviteUserId] = useState('');
 	const [invitingMember, setInvitingMember] = useState(false);
 	const [activeTab, setActiveTab] = useState('info');
+	const [markdownPreview, setMarkdownPreview] = useState(false);
 	const [inviteUserObj, setInviteUserObj] = useState<any>(null);
 	const [inviteModalOpen, setInviteModalOpen] = useState(false);
 	const [fetchingUser, setFetchingUser] = useState(false);
+	const [pendingUploads, setPendingUploads] = useState<Record<string, File>>({});
 
-	const isDirty = JSON.stringify(orgConfig) !== JSON.stringify(originalOrgConfig);
+	const isDirty = JSON.stringify(orgConfig) !== JSON.stringify(originalOrgConfig) || Object.keys(pendingUploads).length > 0;
 	useEffect(() => {
 		if (!envReady || !session) return;
 		show();
-
-		const staticItems = [
-			{ label: t('app.portal.nav.explore'), href: '/', icon: Compass as any, category: t('app.portal.categories.navigation') },
-			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard as any, category: t('app.portal.categories.navigation') },
-		];
-
-		setNavItems(staticItems);
 
 		const fetchOrganizations = async () => {
 			const sessionData = session as any;
@@ -99,38 +95,6 @@ export default function PortalPage() {
 				if (res.ok) {
 					const data = await res.json();
 					setOrganizations(data);
-					setNavItems([
-						...staticItems,
-						{
-							label: t('app.portal.nav.personal'),
-							onClick: () => {
-								setSelectedOrg('personal');
-								setView('org-personal');
-							},
-							category: t('app.portal.categories.organizations'),
-							icon: User as any,
-							view: 'org-personal',
-						},
-						...data.map((org: any) => ({
-							label: org.name,
-							onClick: () => {
-								setSelectedOrg(org);
-								setView(`org-${org._id}`);
-							},
-							category: t('app.portal.categories.organizations'),
-							icon: org.iconUrl
-								? () => <img src={org.iconUrl} alt={org.name} className="w-5 h-5 rounded-md object-cover" />
-								: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
-							view: `org-${org._id}`,
-						})),
-						{
-							label: t('app.portal.nav.newOrganization'),
-							onClick: () => setCreateModalOpen(true),
-							category: t('app.portal.categories.organizations'),
-							icon: Plus as any,
-							view: 'org-new',
-						},
-					]);
 					setSelectedOrg('personal');
 					setView('org-personal');
 				}
@@ -146,7 +110,23 @@ export default function PortalPage() {
 			if (!sessionData?.user?.id) return;
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${sessionData.user.id}`), { credentials: 'include' });
-				if (res.ok) setBots(await res.json());
+				if (res.ok) {
+					const fetchedBots = await res.json();
+					const populatedBots = await Promise.all(
+						fetchedBots.map(async (bot: any) => {
+							try {
+								const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
+								if (discordRes.ok) {
+									bot.discord = await discordRes.json();
+								}
+							} catch (e) {
+								console.error(`Failed to fetch discord user for bot ${bot.id}`, e);
+							}
+							return bot;
+						})
+					);
+					setBots(populatedBots);
+				}
 			} catch (error) {
 				console.error('Failed to fetch bots:', error);
 			}
@@ -178,6 +158,64 @@ export default function PortalPage() {
 
 		return () => clearNavItems();
 	}, [session, getEnvUrl, envReady]);
+
+	useEffect(() => {
+		if (!envReady || !session) return;
+
+		const staticItems = [
+			{ label: t('app.portal.nav.explore'), href: '/', icon: Compass as any, category: t('app.portal.categories.navigation') },
+			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard as any, category: t('app.portal.categories.navigation') },
+		];
+
+		const dynamicItems: any[] = [
+			{
+				label: t('app.portal.nav.personal'),
+				onClick: () => {
+					setSelectedOrg('personal');
+					setView('org-personal');
+				},
+				category: t('app.portal.categories.organizations'),
+				icon: User as any,
+				view: 'org-personal',
+			},
+			...organizations.map((org: any) => ({
+				label: org.name,
+				onClick: () => {
+					setSelectedOrg(org);
+					setView(`org-${org._id}`);
+				},
+				category: t('app.portal.categories.organizations'),
+				icon: org.iconUrl
+					? () => <img src={getEnvUrl(org.iconUrl as string)} alt={org.name} className="w-5 h-5 rounded-md object-cover" />
+					: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
+				view: `org-${org._id}`,
+			})),
+			{
+				label: t('app.portal.nav.newOrganization'),
+				onClick: () => setCreateModalOpen(true),
+				category: t('app.portal.categories.organizations'),
+				icon: Plus as any,
+				view: 'org-new',
+			},
+		];
+
+		if (bots.length > 0) {
+			bots.forEach((bot) => {
+				dynamicItems.push({
+					label: bot.discord?.username || bot.name || bot.id,
+					href: `/portal/bots/${bot.id}`,
+					category: t('common.nav.categories.bots'),
+					icon: bot.discord?.avatar
+						? () => <img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=64`} alt={bot.name || bot.id} className="w-5 h-5 rounded-md object-cover" />
+						: bot.avatar
+							? () => <img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64`} alt={bot.name || bot.id} className="w-5 h-5 rounded-md object-cover" />
+							: (Bot as any),
+				});
+			});
+		}
+
+		setNavItems([...staticItems, ...dynamicItems]);
+	}, [envReady, session, organizations, bots, t]);
 
 	useEffect(() => {
 		if (!selectedOrg || selectedOrg === 'personal') {
@@ -239,14 +277,34 @@ export default function PortalPage() {
 			const handleSave = async () => {
 				setSaving(true);
 				try {
+					let finalConfig = { ...orgConfig };
+					for (const field of ['iconUrl', 'bannerUrl'] as const) {
+						if (pendingUploads[field]) {
+							const formData = new FormData();
+							formData.append('file', pendingUploads[field]);
+							formData.append('privacy', 'public');
+							const uploadRes = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
+								method: 'POST',
+								body: formData,
+								credentials: 'include',
+							});
+							const uploadData = await uploadRes.json();
+							if (uploadData.url) {
+								finalConfig[field] = uploadData.url;
+							}
+						}
+					}
+
 					const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${(selectedOrg as any)._id}`), {
 						method: 'PATCH',
 						credentials: 'include',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(orgConfig),
+						body: JSON.stringify(finalConfig),
 					});
 					if (res.ok) {
-						setOriginalOrgConfig(orgConfig);
+						setOrgConfig(finalConfig);
+						setOriginalOrgConfig(finalConfig);
+						setPendingUploads({});
 						toast({ title: 'Saved successfully!', type: 'success' });
 						remind(false);
 					} else toast({ title: 'Failed to save', type: 'error' });
@@ -259,6 +317,7 @@ export default function PortalPage() {
 
 			const handleReset = () => {
 				setOrgConfig(originalOrgConfig);
+				setPendingUploads({});
 			};
 
 			remind(true, handleSave, handleReset, saving);
@@ -374,6 +433,15 @@ export default function PortalPage() {
 		}
 	};
 
+	const [uploadingMedia, setUploadingMedia] = useState<string | null>(null);
+
+	const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'iconUrl' | 'bannerUrl') => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		setPendingUploads((prev) => ({ ...prev, [field]: file }));
+	};
+
 	if (loading) {
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center py-20 text-(--text-muted)">
@@ -455,7 +523,11 @@ export default function PortalPage() {
 								)}
 								<div className="relative z-10 flex items-center w-full gap-4">
 									{selectedOrg.iconUrl ? (
-										<img src={selectedOrg.iconUrl} alt={selectedOrg.name} className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
+										<img
+											src={getEnvUrl(selectedOrg.iconUrl)}
+											alt={selectedOrg.name}
+											className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+										/>
 									) : (
 										<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
 											<Building2 className="w-8 h-8 text-(--text-muted)" />
@@ -498,6 +570,53 @@ export default function PortalPage() {
 												{t('app.portal.orgProfile')}
 											</div>
 											<div className="flex flex-col gap-5">
+												<div className="relative mb-14">
+													<div className="relative h-48 w-full rounded-[2rem] overflow-hidden border border-(--border)/10 shadow-sm bg-(--background)/50 group/banner">
+														{pendingUploads.bannerUrl || orgConfig.bannerUrl ? (
+															<img
+																src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : getEnvUrl(orgConfig.bannerUrl as string)}
+																alt="Banner"
+																className="w-full h-full object-cover"
+															/>
+														) : (
+															<div className="w-full h-full bg-(--foreground)/30" />
+														)}
+														<label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover/banner:opacity-100 transition-opacity cursor-pointer">
+															{uploadingMedia === 'bannerUrl' ? <Loading variant="small" /> : <Upload className="w-6 h-6 text-white" />}
+															<span className="text-white font-medium text-sm">
+																{pendingUploads.bannerUrl || orgConfig.bannerUrl ? 'Change Banner' : 'Upload Banner'}
+															</span>
+															<input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'bannerUrl')} disabled={uploadingMedia !== null} />
+														</label>
+													</div>
+
+													<div className="absolute left-8 -bottom-10 rounded-full border-4 border-(--background) shadow-lg bg-(--background) group/avatar z-10">
+														<div className="relative w-24 h-24 rounded-full overflow-hidden bg-(--background)">
+															{pendingUploads.iconUrl || orgConfig.iconUrl ? (
+																<img
+																	src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : getEnvUrl(orgConfig.iconUrl as string)}
+																	alt="Avatar"
+																	className="w-full h-full object-cover"
+																/>
+															) : (
+																<div className="w-full h-full bg-(--foreground)/50 flex items-center justify-center">
+																	<Building2 className="w-10 h-10 text-(--text-muted)" />
+																</div>
+															)}
+															<label className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
+																{uploadingMedia === 'iconUrl' ? <Loading variant="small" /> : <Upload className="w-5 h-5 text-white" />}
+																<span className="text-white font-medium text-[10px]">Edit Avatar</span>
+																<input
+																	type="file"
+																	accept="image/*"
+																	className="hidden"
+																	onChange={(e) => handleUpload(e, 'iconUrl')}
+																	disabled={uploadingMedia !== null}
+																/>
+															</label>
+														</div>
+													</div>
+												</div>
 												<div className="flex flex-col gap-2">
 													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.name')}</label>
 													<Input
@@ -515,13 +634,36 @@ export default function PortalPage() {
 													/>
 												</div>
 												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
-													<textarea
-														value={orgConfig.info || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, info: e.target.value })}
-														placeholder={t('app.portal.placeholders.extendedInfo')}
-														className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
-													/>
+													<div className="flex items-center justify-between">
+														<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
+														<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
+															<button
+																onClick={() => setMarkdownPreview(false)}
+																className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+															>
+																Write
+															</button>
+															<button
+																onClick={() => setMarkdownPreview(true)}
+																className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+															>
+																Preview
+															</button>
+														</div>
+													</div>
+
+													{markdownPreview ? (
+														<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
+															{orgConfig.info ? <ReactMarkdown>{orgConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">Nothing to preview</span>}
+														</div>
+													) : (
+														<textarea
+															value={orgConfig.info || ''}
+															onChange={(e) => setOrgConfig({ ...orgConfig, info: e.target.value })}
+															placeholder={t('app.portal.placeholders.extendedInfo')}
+															className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
+														/>
+													)}
 												</div>
 												<div className="flex flex-col gap-2">
 													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.locale')}</label>
