@@ -64,6 +64,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 				// Filter out globally deleted announcements
 				dispatchData = dispatchData.filter((d: any) => !(d.targetId === 'global' && deletedGlobals.includes(d.id)));
 
+				let readInvites: string[] = [];
+				if (typeof window !== 'undefined') {
+					readInvites = JSON.parse(localStorage.getItem('xernerx-read-invites') || '[]');
+				}
+
 				combined = dispatchData.map((d: any) => {
 					if (d.category === 'invite' && d.status === 'pending') {
 						return {
@@ -72,8 +77,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 							title: 'Organization Invitation',
 							message: `You have been invited to join ${d.data?.organizationName || 'an organization'}.`,
 							type: 'info',
-							read: false,
-							link: null,
+							read: readInvites.includes(d.id),
+							link: '/portal',
 							createdAt: d.createdAt,
 							isInvite: true,
 						};
@@ -128,6 +133,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 			return;
 		}
 
+		if (notification.isInvite) {
+			if (typeof window !== 'undefined') {
+				const readInvites = JSON.parse(localStorage.getItem('xernerx-read-invites') || '[]');
+				if (!readInvites.includes(id)) {
+					localStorage.setItem('xernerx-read-invites', JSON.stringify([...readInvites, id]));
+				}
+			}
+			return;
+		}
+
 		// 2. Database Update
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${id}`), {
@@ -158,7 +173,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 			localStorage.setItem('xernerx-read-globals', JSON.stringify([...readGlobals, ...unreadGlobals.map((n) => n.id)]));
 		}
 
-		const unreadIds = unreadNotifications.filter((n) => n.userId !== 'global').map((n) => n.id);
+		// Invites
+		const unreadInvites = unreadNotifications.filter((n) => n.isInvite);
+		if (unreadInvites.length > 0 && typeof window !== 'undefined') {
+			const readInvites = JSON.parse(localStorage.getItem('xernerx-read-invites') || '[]');
+			localStorage.setItem('xernerx-read-invites', JSON.stringify([...readInvites, ...unreadInvites.map((n) => n.id)]));
+		}
+
+		const unreadIds = unreadNotifications.filter((n) => n.userId !== 'global' && !n.isInvite).map((n) => n.id);
 		if (unreadIds.length === 0) return;
 
 		// 2. Database Update (Firing Promises in parallel)

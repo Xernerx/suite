@@ -13,13 +13,16 @@ export async function GET(request: Request) {
 		const url = new URL(request.url);
 		const category = url.searchParams.get('category');
 		const owner = url.searchParams.get('owner');
-		const limit = parseInt(url.searchParams.get('limit') || (owner ? '100' : '3'));
+		const organization = url.searchParams.get('organization');
+		const limit = parseInt(url.searchParams.get('limit') || (owner || organization ? '100' : '3'));
 		const now = new Date();
 
 		let matchStage: any = {};
 
 		if (owner) {
 			matchStage = { owners: owner };
+		} else if (organization) {
+			matchStage = { organization };
 		} else {
 			matchStage.privacy = 'public';
 			if (category === 'promoted') {

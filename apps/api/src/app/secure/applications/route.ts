@@ -6,13 +6,17 @@ export async function GET(req: Request) {
 	try {
 		const url = new URL(req.url);
 		const organizationId = url.searchParams.get('organizationId');
+		const userId = url.searchParams.get('userId');
 
 		const { models } = await database('xernerx');
 		const Application = models.dispatch.Application as any;
 
 		let query: any = {};
 		if (organizationId) {
-			query = { 'data.metadata.organizationId': organizationId };
+			query['data.metadata.organizationId'] = organizationId;
+		}
+		if (userId) {
+			query['data.userId'] = userId;
 		}
 
 		const applications = await Application.find(query).sort({ createdAt: -1 }).lean();

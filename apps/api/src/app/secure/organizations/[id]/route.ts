@@ -49,6 +49,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.info !== undefined) updateData['info'] = body.info;
 		if (body.locale !== undefined) updateData['locale'] = body.locale;
 		if (body.links !== undefined) updateData['links'] = body.links;
+		if (body.roles !== undefined) updateData['roles'] = body.roles;
 		if (body.verified !== undefined) updateData['verified'] = body.verified;
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
 

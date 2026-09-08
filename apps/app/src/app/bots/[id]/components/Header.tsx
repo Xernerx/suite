@@ -178,7 +178,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 							<div className="flex flex-wrap gap-2 justify-end">
 								{bot.organizationData.privacy === 'public' ? (
 									<Link
-										href={`/organizations/${bot.organizationData._id}`}
+										href={`/organization/${bot.organizationData._id}`}
 										className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors"
 									>
 										{bot.organizationData.iconUrl ? (

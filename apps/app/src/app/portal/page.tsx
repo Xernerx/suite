@@ -56,6 +56,7 @@ export default function PortalPage() {
 	const [originalOrgConfig, setOriginalOrgConfig] = useState<any>(null);
 	const [memberProfiles, setMemberProfiles] = useState<Record<string, any>>({});
 	const [pendingInvites, setPendingInvites] = useState<any[]>([]);
+	const [orgMembers, setOrgMembers] = useState<any[]>([]);
 	const [configLoading, setConfigLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
@@ -95,6 +96,19 @@ export default function PortalPage() {
 				if (res.ok) {
 					const data = await res.json();
 					setOrganizations(data);
+
+					const params = new URLSearchParams(window.location.search);
+					const orgParam = params.get('org');
+
+					if (orgParam) {
+						const targetOrg = data.find((o: any) => o._id === orgParam);
+						if (targetOrg) {
+							setSelectedOrg(targetOrg);
+							setView(`org-${targetOrg._id}`);
+							return;
+						}
+					}
+
 					setSelectedOrg('personal');
 					setView('org-personal');
 				}
@@ -231,25 +245,31 @@ export default function PortalPage() {
 				if (res.ok) {
 					const data = await res.json();
 					setOrgConfig(data);
-					setOriginalOrgConfig(data);
+					setOriginalOrgConfig(JSON.parse(JSON.stringify(data)));
 
 					let pendingUsers: any[] = [];
 					let fetchedOrgGuilds: any[] = [];
+					let fetchedMembers: any[] = [];
 					try {
-						const [appsRes, guildsRes] = await Promise.all([
-							fetch(getEnvUrl(`https://api.xernerx.com/secure/applications?organizationId=${selectedOrg._id}`), { credentials: 'include' }),
+						const [appsRes, guildsRes, membersRes] = await Promise.all([
+							fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch?senderId=${selectedOrg._id}&category=invite&type=organization_invite&status=pending`), { credentials: 'include' }),
 							fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?organization=${selectedOrg._id}`), { credentials: 'include' }),
+							fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${selectedOrg._id}/members`), { credentials: 'include' }),
 						]);
 						if (appsRes.ok) {
 							const appsData = await appsRes.json();
-							pendingUsers = appsData.filter((app: any) => app.type === 'organization_invite' && app.status === 'pending');
+							pendingUsers = appsData.map((app: any) => ({ ...app, userId: app.targetId }));
 						}
 						if (guildsRes.ok) {
 							fetchedOrgGuilds = await guildsRes.json();
 						}
+						if (membersRes.ok) {
+							fetchedMembers = await membersRes.json();
+						}
 					} catch (e) {}
 					setPendingInvites(pendingUsers);
 					setOrgGuilds(fetchedOrgGuilds);
+					setOrgMembers(fetchedMembers);
 
 					const allMembers = [selectedOrg.owner, ...(data.members || []), ...pendingUsers.map((app) => app.userId)];
 					const profiles: Record<string, any> = {};
@@ -303,7 +323,7 @@ export default function PortalPage() {
 					});
 					if (res.ok) {
 						setOrgConfig(finalConfig);
-						setOriginalOrgConfig(finalConfig);
+						setOriginalOrgConfig(JSON.parse(JSON.stringify(finalConfig)));
 						setPendingUploads({});
 						toast({ title: 'Saved successfully!', type: 'success' });
 						remind(false);
@@ -391,14 +411,20 @@ export default function PortalPage() {
 		if (!selectedOrg || selectedOrg === 'personal' || !inviteUserObj) return;
 		setInvitingMember(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/applications`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch`), {
 				method: 'POST',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					userId: inviteUserObj.id,
+					targetId: inviteUserObj.id,
+					senderId: selectedOrg._id,
+					category: 'invite',
 					type: 'organization_invite',
-					metadata: { organizationId: selectedOrg._id, organizationName: selectedOrg.name },
+					status: 'pending',
+					data: {
+						organizationId: selectedOrg._id,
+						organizationName: selectedOrg.name,
+					},
 				}),
 			});
 			if (res.ok) {
@@ -413,6 +439,59 @@ export default function PortalPage() {
 			toast({ title: 'An error occurred while sending the invite.', type: 'error' });
 		} finally {
 			setInvitingMember(false);
+		}
+	};
+
+	const handleUpdateMemberRoles = async (userId: string, roles: string[]) => {
+		if (!selectedOrg || selectedOrg === 'personal') return;
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${selectedOrg._id}/members`), {
+				method: 'PATCH',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ userId, roles }),
+			});
+			if (res.ok) {
+				const updatedMember = await res.json();
+				setOrgMembers((prev) => {
+					const existing = prev.find((m) => m.userId === userId);
+					if (existing) {
+						return prev.map((m) => (m.userId === userId ? updatedMember : m));
+					}
+					return [...prev, updatedMember];
+				});
+				toast({ title: 'Roles updated', type: 'success' });
+			} else {
+				toast({ title: 'Failed to update roles', type: 'error' });
+			}
+		} catch (error) {
+			toast({ title: 'An error occurred while updating roles', type: 'error' });
+		}
+	};
+
+	const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
+
+	const handleRemoveMember = async () => {
+		if (!memberToRemove || !selectedOrg || selectedOrg === 'personal') return;
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${selectedOrg._id}`), {
+				method: 'PATCH',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action: 'remove_member', targetId: memberToRemove }),
+			});
+			if (res.ok) {
+				const updatedOrg = await res.json();
+				setOrgConfig(updatedOrg);
+				setOriginalOrgConfig(updatedOrg);
+				toast({ title: 'Member removed', type: 'success' });
+			} else {
+				toast({ title: 'Failed to remove member', type: 'error' });
+			}
+		} catch (error) {
+			toast({ title: 'An error occurred while removing member', type: 'error' });
+		} finally {
+			setMemberToRemove(null);
 		}
 	};
 
@@ -431,6 +510,35 @@ export default function PortalPage() {
 		} finally {
 			setDeleting(false);
 		}
+	};
+
+	const renderMemberActions = (userId: string) => {
+		const isOwner = (session?.user as any)?.id === selectedOrg?.owner;
+		if (!isOwner) return null;
+
+		const memberObj = orgMembers.find((m) => m.userId === userId);
+		const userRole = memberObj?.roles?.[0] || '';
+
+		const roleOptions = [{ value: '', label: 'No Role' }, ...(orgConfig?.roles || []).map((r: any) => ({ value: r.id, label: r.name }))];
+
+		return (
+			<div className="flex flex-wrap items-center justify-end gap-2 shrink-0 ml-4">
+				<div className="w-40">
+					<Selector
+						value={userRole}
+						onChange={(val) => {
+							handleUpdateMemberRoles(userId, val ? [val] : []);
+						}}
+						options={roleOptions}
+					/>
+				</div>
+				{userId !== selectedOrg?.owner && (
+					<Button variant="danger" size="icon" onClick={() => setMemberToRemove(userId)}>
+						<Trash2 size={16} />
+					</Button>
+				)}
+			</div>
+		);
 	};
 
 	const [uploadingMedia, setUploadingMedia] = useState<string | null>(null);
@@ -554,6 +662,7 @@ export default function PortalPage() {
 										tabs={[
 											{ id: 'info', label: t('app.portal.tabs.info') },
 											{ id: 'members', label: t('app.portal.tabs.members') },
+											{ id: 'roles', label: 'Roles' },
 											{ id: 'bots', label: t('app.portal.tabs.bots') },
 											{ id: 'servers', label: t('app.portal.tabs.servers') },
 											{ id: 'links', label: t('app.portal.tabs.links') },
@@ -725,7 +834,7 @@ export default function PortalPage() {
 																		<User className="w-3 h-3 text-(--accent)" />
 																	</div>
 																)}
-																<span className="text-(--text) font-medium flex items-center gap-2">
+																<span className="text-(--text) font-medium flex items-center gap-2 flex-wrap">
 																	{memberProfiles[selectedOrg.owner]?.global_name ||
 																		memberProfiles[selectedOrg.owner]?.username ||
 																		t('app.portal.members.unknownUser')}
@@ -737,6 +846,7 @@ export default function PortalPage() {
 																	</span>
 																</span>
 															</div>
+															{renderMemberActions(selectedOrg.owner)}
 														</div>
 														{orgConfig?.members?.length > 0 ? (
 															orgConfig.members.map((memberId: string) => (
@@ -753,13 +863,14 @@ export default function PortalPage() {
 																				<User className="w-3 h-3 text-(--text-muted)" />
 																			</div>
 																		)}
-																		<span className="text-(--text) font-medium flex items-center gap-2">
+																		<span className="text-(--text) font-medium flex items-center gap-2 flex-wrap">
 																			{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
 																			<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
 																				{memberId}
 																			</span>
 																		</span>
 																	</div>
+																	{renderMemberActions(memberId)}
 																</div>
 															))
 														) : (
@@ -820,6 +931,62 @@ export default function PortalPage() {
 													</div>
 													<span className="text-xs text-(--text-muted) mt-1">{t('app.portal.members.inviteHelp')}</span>
 												</div>
+											</div>
+										</div>
+									)}
+
+									{activeTab === 'roles' && (
+										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
+											<div className="flex items-center justify-between mb-6">
+												<div className="flex items-center gap-3 text-(--text) font-extrabold text-sm tracking-widest uppercase">
+													<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
+														<Shield className="w-4 h-4" />
+													</div>
+													Roles
+												</div>
+												<Button
+													variant="primary"
+													onClick={() => {
+														const newRole = { id: `role-${Date.now()}`, name: 'New Role', permissions: '0' };
+														setOrgConfig({ ...orgConfig, roles: [...(orgConfig.roles || []), newRole] });
+													}}
+													className="shadow-sm text-xs py-1.5 h-auto"
+												>
+													<Plus className="w-4 h-4 mr-1" />
+													Add Role
+												</Button>
+											</div>
+											<p className="text-sm text-(--text-muted) mb-6">Define custom roles for your organization. Currently, these act as titles for your team members.</p>
+
+											<div className="flex flex-col gap-4">
+												{!orgConfig.roles || orgConfig.roles.length === 0 ? (
+													<div className="text-center py-10 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10">No roles defined yet.</div>
+												) : (
+													orgConfig.roles.map((role: any, index: number) => (
+														<div key={role.id} className="flex items-center gap-4 bg-(--background)/50 border border-(--border)/10 p-4 rounded-2xl">
+															<div className="flex flex-col flex-1 gap-1">
+																<Input
+																	value={role.name}
+																	onChange={(e) => {
+																		const newRoles = orgConfig.roles.map((r: any, i: number) => (i === index ? { ...r, name: e.target.value } : r));
+																		setOrgConfig({ ...orgConfig, roles: newRoles });
+																	}}
+																	placeholder="Role Name (e.g. Developer)"
+																	className="w-full sm:w-64"
+																/>
+															</div>
+															<button
+																onClick={() => {
+																	const newRoles = orgConfig.roles.filter((r: any) => r.id !== role.id);
+																	setOrgConfig({ ...orgConfig, roles: newRoles });
+																}}
+																className="p-2 rounded-xl text-red-400 hover:bg-red-400/10 transition-colors"
+															>
+																<Trash2 className="w-5 h-5" />
+															</button>
+														</div>
+													))
+												)}
 											</div>
 										</div>
 									)}
@@ -957,14 +1124,7 @@ export default function PortalPage() {
 														placeholder="https://..."
 													/>
 												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.support')}</label>
-													<Input
-														value={orgConfig.links?.support || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, support: e.target.value } })}
-														placeholder="https://discord.gg/..."
-													/>
-												</div>
+
 												<div className="flex flex-col gap-2">
 													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.github')}</label>
 													<Input

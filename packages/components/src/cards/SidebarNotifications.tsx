@@ -1,4 +1,5 @@
 /** @format */
+// Force recompile 2
 'use client';
 
 import { AlertTriangle, Bell, Check, CheckCircle2, ExternalLink, Info, Loader2, Mail, RefreshCw, Trash2, X } from 'lucide-react';
@@ -212,7 +213,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 			{mounted &&
 				selectedNotification &&
 				createPortal(
-					<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200">
+					<div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200" style={{ zIndex: 2147483640 }}>
 						<div
 							className="flex flex-col w-full max-w-2xl max-h-[90vh] rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl animate-in zoom-in-95 duration-200"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}

@@ -77,6 +77,7 @@ export async function GET(req: Request) {
 					description: 1,
 					voteCount: '$computedVoteCount',
 					memberCount: { $ifNull: ['$statsData.members', 0] },
+					links: 1,
 				},
 			},
 		]);
