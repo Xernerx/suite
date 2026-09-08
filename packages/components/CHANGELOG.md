@@ -1,5 +1,27 @@
 # @xernerx/components
 
+## 0.2.20
+
+### Patch Changes
+
+- Added a new public page for organizations and completely overhauled the organization member management and invite system.
+
+    ### Features
+    - **Organization Pages**: Added `organization/[id]` route to display public profiles for organizations, aggregating their bots and servers.
+    - **Team Roles**: Team members are now dynamically categorized and grouped by custom roles on the public organization page.
+    - **Member Management**: Organization owners can now assign roles to members using a dropdown selector and kick members via the Developer Portal.
+    - **Role Creation**: Added the ability to define custom roles/titles within the portal, which are safely passed through the API whitelist and stored in the database.
+
+    ### Bug Fixes
+    - **Invite Routing**: Fixed a critical bug where organization invites were bypassing the notification engine. Invites are now properly routed through the `dispatch` collection rather than `applications`.
+    - **Notification Overlap**: Resolved a z-index stacking context issue where the `SidebarNotifications` modal backdrop was rendering behind the sticky desktop sidebar by forcing it to the maximum allowable z-index.
+    - **Dirty State Tracking**: Fixed a React shallow-copy mutation bug in the portal that prevented the "Save" button from appearing after modifying nested role objects.
+
+- Updated dependencies
+    - @xernerx/providers@0.3.13
+    - @xernerx/feedback@0.0.21
+    - @xernerx/ui@0.3.4
+
 ## 0.2.19
 
 ### Patch Changes

@@ -41,7 +41,8 @@
 				"npm": "npm",
 				"documentation": "Documentatie",
 				"discord": "Discord",
-				"faq": "Veel Gestelde Vragen"
+				"faq": "Veel Gestelde Vragen",
+				"careers": "Vacatures"
 			},
 			"title": "Xernerx Studios",
 			"description": "© 2024 -",
@@ -62,7 +63,8 @@
 				"administrator": "Administrator",
 				"translator": "Vertaler",
 				"xernerxSuite": "Xernerx Suite",
-				"system": "Systeem"
+				"system": "Systeem",
+				"bots": "Bots"
 			},
 			"items": {
 				"account": "Account",
@@ -80,7 +82,9 @@
 				"translations": "Vertalingen",
 				"applications": "Applicaties",
 				"settings": "Instellingen",
-				"environments": "Omgevingen"
+				"environments": "Omgevingen",
+				"applications_review": "Aanvragen beoordelen",
+				"applications_manage": "Beheer Aanvragen"
 			}
 		},
 		"buttons": {
@@ -91,7 +95,9 @@
 		"shortcuts": {
 			"modal": {
 				"navigation": {
-					"empty": "Geen applicaties beschikbaar."
+					"empty": "Geen applicaties beschikbaar.",
+					"title": "App-overzicht",
+					"description": "Schakel snel en makkelijk tussen applicaties"
 				}
 			}
 		},

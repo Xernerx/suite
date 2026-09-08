@@ -34,6 +34,16 @@ const schema = new Schema(
 			terms: { type: String }, // Terms of service URL (optional)
 			github: { type: String }, // GitHub repository link
 		},
+		roles: {
+			type: [
+				{
+					id: { type: String, required: true },
+					name: { type: String, required: true },
+					permissions: { type: String, default: '0' },
+				},
+			],
+			default: [],
+		},
 		hooks: { type: [hookSchema], default: [] }, // List of webhooks
 	},
 	{ timestamps: true }

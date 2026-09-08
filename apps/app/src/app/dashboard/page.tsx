@@ -304,6 +304,7 @@ export default function DashboardPage() {
 									tabs={[
 										{ id: 'info', label: t('app.dashboard.tabs.info') },
 										{ id: 'stats', label: t('app.dashboard.tabs.stats') },
+										{ id: 'links', label: 'Links' },
 										{ id: 'settings', label: t('app.dashboard.tabs.settings') },
 									]}
 								/>
@@ -582,6 +583,40 @@ export default function DashboardPage() {
 												<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.text3')}</p>
 											</div>
 										)}
+									</>
+								)}
+
+								{activeTab === 'links' && (
+									<>
+										{/* Server Links Card */}
+										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
+											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
+												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
+													<Globe className="w-4 h-4" />
+												</div>
+												Server Links
+											</div>
+											<p className="text-sm text-(--text-muted) mb-6">Add links to your server's resources. These will be displayed on your server's public profile page.</p>
+
+											<div className="flex flex-col gap-6">
+												<div className="flex flex-col gap-2">
+													<label className="text-sm font-bold text-(--text)">Discord Invite URL</label>
+													<Input
+														value={guildConfig.links?.invite || ''}
+														onChange={(e) => setGuildConfig({ ...guildConfig, links: { ...guildConfig.links, invite: e.target.value } })}
+														placeholder="https://discord.gg/..."
+													/>
+												</div>
+												<div className="flex flex-col gap-2">
+													<label className="text-sm font-bold text-(--text)">Website</label>
+													<Input
+														value={guildConfig.links?.website || ''}
+														onChange={(e) => setGuildConfig({ ...guildConfig, links: { ...guildConfig.links, website: e.target.value } })}
+														placeholder="https://your-website.com"
+													/>
+												</div>
+											</div>
+										</div>
 									</>
 								)}
 
