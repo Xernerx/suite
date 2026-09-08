@@ -513,7 +513,10 @@ export default function PortalPage() {
 	};
 
 	const renderMemberActions = (userId: string) => {
-		const isOwner = (session?.user as any)?.id === selectedOrg?.owner;
+		if (!selectedOrg || selectedOrg === 'personal') return null;
+
+		const currentOrg = selectedOrg as Organization;
+		const isOwner = (session?.user as any)?.id === currentOrg.owner;
 		if (!isOwner) return null;
 
 		const memberObj = orgMembers.find((m) => m.userId === userId);
@@ -532,7 +535,7 @@ export default function PortalPage() {
 						options={roleOptions}
 					/>
 				</div>
-				{userId !== selectedOrg?.owner && (
+				{userId !== currentOrg.owner && (
 					<Button variant="danger" size="icon" onClick={() => setMemberToRemove(userId)}>
 						<Trash2 size={16} />
 					</Button>
