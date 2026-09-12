@@ -1,5 +1,13 @@
 # bot
 
+## 1.1.42
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+- Updated dependencies
+    - @xernerx/lib@0.5.3
+
 ## 1.1.41
 
 ### Patch Changes

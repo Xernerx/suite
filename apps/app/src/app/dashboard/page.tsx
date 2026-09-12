@@ -57,7 +57,12 @@ export default function DashboardPage() {
 	};
 
 	useEffect(() => {
-		if (!isReady || status === 'unauthenticated' || status === 'loading') return;
+		if (!isReady || status === 'loading') return;
+
+		if (status === 'unauthenticated') {
+			window.location.href = getEnvUrl('https://account.xernerx.com/login');
+			return;
+		}
 
 		show();
 

@@ -1,5 +1,13 @@
 # @xernerx/providers
 
+## 0.3.14
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+- Updated dependencies
+    - @xernerx/lib@0.5.3
+
 ## 0.3.13
 
 ### Patch Changes

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
-import { confirm } from '@inquirer/prompts';
+import { confirm, isCancel } from '@clack/prompts';
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
 import { generateLocalesCommand } from './generateLocales';
@@ -27,9 +27,9 @@ export default function registerDev(program: Command) {
 					if (behindCount > 0) {
 						const pull = await confirm({
 							message: `There are ${behindCount} new commit(s) on the canary branch. Do you want to safely pull them now?`,
-							default: true,
+							initialValue: true,
 						});
-						if (pull) {
+						if (!isCancel(pull) && pull) {
 							console.log('[CLI] Discarding local dictionary changes to favor remote...');
 							try {
 								execSync('git checkout HEAD -- packages/lib/src/dictionaries', { stdio: 'ignore' });

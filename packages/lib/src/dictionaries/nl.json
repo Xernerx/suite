@@ -114,10 +114,29 @@
 			"tooltip": "Notificatie Verwijderen",
 			"tooltip2": "Alles Markeren als Ongelezen",
 			"button5": "Link Openen",
-			"button6": "Sluiten"
+			"button6": "Sluiten",
+			"button": "Herladen"
 		},
 		"sidebarsuite": {
 			"description": "Suite"
+		},
+		"sidebaruser": {
+			"alt": "Gebruikersbanner",
+			"alt2": "Gebruikersprofiel",
+			"alt3": "Avatar Decoratie",
+			"alt4": "Clan Badge",
+			"description": "Credits Balans",
+			"description2": "Volgende Cadeau Over",
+			"description3": "Profiel Bewerken",
+			"description4": "Admin Paneel",
+			"description5": "Kopieer Gebruiker ID"
+		},
+		"header": {
+			"description": "Download de app!",
+			"tooltip": "Open App Overzicht (Ctrl + K)"
+		},
+		"error": {
+			"title": "Er ging iets mis!"
 		}
 	},
 	"api": {

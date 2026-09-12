@@ -1,5 +1,13 @@
 # @xernerx/ui
 
+## 0.3.5
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+- Updated dependencies
+    - @xernerx/providers@0.3.14
+
 ## 0.3.4
 
 ### Patch Changes
