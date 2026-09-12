@@ -1,5 +1,11 @@
 # @xernerx/styles
 
+## 0.1.11
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+
 ## 0.1.10
 
 ### Patch Changes

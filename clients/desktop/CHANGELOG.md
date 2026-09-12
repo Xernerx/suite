@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.1.6
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+
 ## 2.1.5
 
 ### Patch Changes

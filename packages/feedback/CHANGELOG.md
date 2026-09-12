@@ -1,5 +1,14 @@
 # @xernerx/feedback
 
+## 0.0.23
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+- Updated dependencies
+    - @xernerx/providers@0.3.15
+    - @xernerx/ui@0.3.6
+
 ## 0.0.22
 
 ### Patch Changes

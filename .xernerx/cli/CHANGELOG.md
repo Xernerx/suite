@@ -1,5 +1,11 @@
 # @xernerx/cli
 
+## 2.0.5
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+
 ## 2.0.4
 
 ### Patch Changes

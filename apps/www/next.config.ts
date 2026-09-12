@@ -20,6 +20,9 @@ const nextConfig: NextConfig = {
 	images: {
 		unoptimized: true,
 	},
+	outputFileTracingIncludes: {
+		'/changelog': ['../../apps/*/CHANGELOG.md'],
+	},
 	allowedDevOrigins: process.env.DOMAIN ? ['*.dev.xernerx.com', 'localhost', process.env.DOMAIN] : ['*.dev.xernerx.com', 'localhost'],
 	turbopack: {
 		rules: {

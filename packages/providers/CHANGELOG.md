@@ -1,5 +1,13 @@
 # @xernerx/providers
 
+## 0.3.15
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+- Updated dependencies
+    - @xernerx/lib@0.5.4
+
 ## 0.3.14
 
 ### Patch Changes
