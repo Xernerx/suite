@@ -3,8 +3,17 @@ import path from 'path';
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
 import crypto from 'crypto';
-import { input } from '@inquirer/prompts';
+import { text, isCancel } from '@clack/prompts';
 import { getLocalIp } from '../utils/ip';
+
+async function ask(message: string, placeholder = ''): Promise<string> {
+	const res = await text({ message, placeholder });
+	if (isCancel(res)) {
+		console.log('\n[CLI] Setup cancelled.');
+		process.exit(0);
+	}
+	return (res as string) || '';
+}
 
 export async function initCommand() {
 	const rootEnv = path.join(process.cwd(), '.env');
@@ -13,17 +22,17 @@ export async function initCommand() {
 	console.log('   Xernerx Suite - Environment Setup   ');
 	console.log('=======================================\n');
 
-	let domain = await input({ message: 'What is the primary domain for this project? (Leave blank for local pure dev)' });
+	let domain = await ask('What is the primary domain for this project? (Leave blank for local pure dev)');
 	if (!domain || domain.trim() === '') {
 		domain = getLocalIp();
 		console.log(`[CLI] No domain provided. Defaulting to local IP: ${domain}`);
 	}
-	const discordClientId = await input({ message: 'Discord Client ID (Optional):' });
-	const discordClientSecret = await input({ message: 'Discord Client Secret (Optional):' });
-	const discordClientToken = await input({ message: 'Discord Bot Token (Optional):' });
-	const discordGuildId = await input({ message: 'Discord Guild ID (Optional):' });
-	const mongoXernerx = await input({ message: 'MongoDB URI (Leave blank for local 127.0.0.1 fallback):' });
-	const githubPat = await input({ message: 'Github Personal Access Token (PAT):' });
+	const discordClientId = await ask('Discord Client ID (Optional):');
+	const discordClientSecret = await ask('Discord Client Secret (Optional):');
+	const discordClientToken = await ask('Discord Bot Token (Optional):');
+	const discordGuildId = await ask('Discord Guild ID (Optional):');
+	const mongoXernerx = await ask('MongoDB URI (Leave blank for local 127.0.0.1 fallback):');
+	const githubPat = await ask('Github Personal Access Token (PAT):');
 
 	const randomToken = crypto.randomBytes(32).toString('hex');
 

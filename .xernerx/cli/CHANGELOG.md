@@ -1,5 +1,11 @@
 # @xernerx/cli
 
+## 2.0.4
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+
 ## 2.0.3
 
 ### Patch Changes

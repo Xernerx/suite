@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.5.3
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+
 ## 0.5.2
 
 ### Patch Changes

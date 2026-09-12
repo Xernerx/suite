@@ -39,7 +39,7 @@ const getFlagCode = (localeCode: string) => {
 };
 
 export default function PortalPage() {
-	const { data: session } = useSession();
+	const { data: session, status } = useSession();
 	const { getEnvUrl, isReady: envReady } = useEnvironment();
 	const { t, locales } = useDictionary();
 	const { setNavItems, clearNavItems, show, setView } = useSidebar();
@@ -79,7 +79,13 @@ export default function PortalPage() {
 
 	const isDirty = JSON.stringify(orgConfig) !== JSON.stringify(originalOrgConfig) || Object.keys(pendingUploads).length > 0;
 	useEffect(() => {
-		if (!envReady || !session) return;
+		if (!envReady || status === 'loading') return;
+
+		if (status === 'unauthenticated') {
+			window.location.href = getEnvUrl('https://account.xernerx.com/login');
+			return;
+		}
+
 		show();
 
 		const fetchOrganizations = async () => {

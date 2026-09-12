@@ -1,5 +1,16 @@
 # @xernerx/components
 
+## 0.2.21
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+- Updated dependencies
+    - @xernerx/feedback@0.0.22
+    - @xernerx/lib@0.5.3
+    - @xernerx/providers@0.3.14
+    - @xernerx/ui@0.3.5
+
 ## 0.2.20
 
 ### Patch Changes

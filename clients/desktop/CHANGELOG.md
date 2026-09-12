@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.1.5
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+
 ## 2.1.4
 
 ### Patch Changes

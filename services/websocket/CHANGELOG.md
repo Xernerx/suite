@@ -1,5 +1,11 @@
 # @xernerx/websocket
 
+## 1.2.8
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+
 ## 1.2.7
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # auth
 
+## 0.7.6
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+- Updated dependencies
+    - @xernerx/components@0.2.21
+    - @xernerx/feedback@0.0.22
+    - @xernerx/lib@0.5.3
+    - @xernerx/providers@0.3.14
+    - @xernerx/styles@0.1.10
+    - @xernerx/ui@0.3.5
+
 ## 0.7.5
 
 ### Patch Changes

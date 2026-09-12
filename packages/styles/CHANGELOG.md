@@ -1,5 +1,11 @@
 # @xernerx/styles
 
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies and fixed a loading state issue on app
+
 ## 0.1.9
 
 ### Patch Changes

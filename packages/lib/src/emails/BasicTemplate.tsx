@@ -1,6 +1,6 @@
 /** @format */
 
-import { Html, Head, Body, Container, Text, Section, Link, Heading } from '@react-email/components';
+import { Html, Head, Body, Container, Text, Section, Link, Heading } from 'react-email';
 
 export interface BasicTemplateProps {
 	title: string;
