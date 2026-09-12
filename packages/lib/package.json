@@ -11,9 +11,9 @@
 	},
 	"dependencies": {
 		"@react-email/render": "^2.1.0",
-		"lucide-react": "^1.44.0",
+		"lucide-react": "^1.45.0",
 		"mongoose": "^9.10.0",
-		"next": "^16.3.4",
+		"next": "^16.3.5",
 		"next-auth": "^4.24.15",
 		"postmark": "^5.1.0",
 		"react": "^19.3.0",

@@ -1,16 +1,16 @@
 /** @format */
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, RotateCw, Search, SidebarClose, SidebarOpen, Square, X } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
 import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar } from '@xernerx/providers';
+import { useEffect, useRef, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 import BannerCanary from '../../public/banner-canary.svg';
 import BannerDev from '../../public/banner-dev.svg';
 import BannerPublic from '../../public/banner.svg';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname, useSearchParams } from 'next/navigation';
 
 export function SubSelector({ name, options, defaultValue }: { name: string; options: string[]; defaultValue: string }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -208,7 +208,7 @@ export function Header() {
 						animate={{ height: 44, opacity: 1, transitionEnd: { overflow: 'visible' } }}
 						exit={{ height: 0, opacity: 0, overflow: 'hidden' }}
 						transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-						className="flex items-center w-full shrink-0 bg-(--background) border-b border-white/10 px-4 gap-3 relative z-[999]"
+						className="flex items-center w-full shrink-0 bg-(--background) px-4 gap-3 relative z-[999]"
 					>
 						<div className="flex items-center gap-1">
 							<button onClick={() => window.history.back()} className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all">
