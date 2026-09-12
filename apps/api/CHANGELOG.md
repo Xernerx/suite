@@ -1,5 +1,17 @@
 # api
 
+## 0.7.5
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+- Updated dependencies
+    - @xernerx/components@0.2.22
+    - @xernerx/feedback@0.0.23
+    - @xernerx/lib@0.5.4
+    - @xernerx/providers@0.3.15
+    - @xernerx/ui@0.3.6
+
 ## 0.7.4
 
 ### Patch Changes

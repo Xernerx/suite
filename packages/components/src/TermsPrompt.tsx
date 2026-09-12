@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useUser, useEnvironment } from '@xernerx/providers';
-import { Modal, Button } from '@xernerx/ui';
+import { Button, Modal } from '@xernerx/ui';
+import React, { useEffect, useState } from 'react';
+import { useEnvironment, useUser } from '@xernerx/providers';
+
 import { signOut } from 'next-auth/react';
 
 export function TermsPrompt() {
@@ -17,8 +18,6 @@ export function TermsPrompt() {
 	const PRIVACY_VERSION = new Date('2026-08-30T00:00:00Z').getTime();
 
 	useEffect(() => {
-		console.log('[TermsPrompt] Evaluating state:', { loading, user });
-
 		// Don't block the screen if they are currently trying to read the policies!
 		if (typeof window !== 'undefined' && (window.location.pathname === '/privacy' || window.location.pathname === '/terms')) {
 			setIsOpen(false);
@@ -30,7 +29,6 @@ export function TermsPrompt() {
 			const userPrivacyTime = user.agreedPrivacy ? new Date(user.agreedPrivacy).getTime() : 0;
 
 			if (userTermsTime < TERMS_VERSION || userPrivacyTime < PRIVACY_VERSION) {
-				console.log('[TermsPrompt] User needs to agree. Opening modal.');
 				setIsOpen(true);
 			} else {
 				setIsOpen(false);

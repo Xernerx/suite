@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.5.4
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+
 ## 0.5.3
 
 ### Patch Changes

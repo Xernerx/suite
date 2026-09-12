@@ -1,5 +1,11 @@
 # @xernerx/websocket
 
+## 1.2.9
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+
 ## 1.2.8
 
 ### Patch Changes

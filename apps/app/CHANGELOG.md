@@ -1,5 +1,18 @@
 # app
 
+## 2.6.3
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+- Updated dependencies
+    - @xernerx/components@0.2.22
+    - @xernerx/feedback@0.0.23
+    - @xernerx/lib@0.5.4
+    - @xernerx/providers@0.3.15
+    - @xernerx/styles@0.1.11
+    - @xernerx/ui@0.3.6
+
 ## 2.6.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # bot
 
+## 1.1.43
+
+### Patch Changes
+
+- Fixed an issue where changelogs were not being pushed as entries
+- Updated dependencies
+    - @xernerx/lib@0.5.4
+
 ## 1.1.42
 
 ### Patch Changes
