@@ -25,6 +25,7 @@ import { TermsPrompt } from './TermsPrompt';
 import { Loading } from '@xernerx/feedback';
 import { Page } from './Page';
 import { ThemeScript } from './ThemeScript';
+import { VersionTracker } from './VersionTracker';
 
 const fredoka = Fredoka({
 	subsets: ['latin'],
@@ -76,6 +77,7 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 														<CookieProvider>
 															<CookiePrompt />
 															<TermsPrompt />
+															<VersionTracker />
 															<SidebarProvider>
 																<SupportProvider>
 																	<Page>{children}</Page>

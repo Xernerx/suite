@@ -3,11 +3,13 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Suspense, useEffect, useState } from 'react';
 import { signIn, useDictionary, useSession, useSidebar } from '@xernerx/providers';
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+
 import Banner from '@/../public/banner.svg';
 import { Button } from '@xernerx/ui';
+import { useSearchParams } from 'next/navigation';
+
 function SignInContent() {
 	const { t } = useDictionary();
 	const { data: session, status } = useSession();
@@ -142,6 +144,7 @@ function SignInContent() {
 		</div>
 	);
 }
+
 export default function SignInPage() {
 	const { t } = useDictionary();
 	return (

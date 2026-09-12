@@ -17,6 +17,10 @@ export interface Toast {
 	description?: string;
 	type?: ToastType;
 	duration?: number;
+	action?: {
+		label: string;
+		onClick: () => void;
+	};
 }
 interface ToastContextType {
 	toast: (toast: Omit<Toast, 'id'>) => void;
@@ -223,6 +227,17 @@ function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
 			<div className="min-w-0 flex-1 pb-1">
 				<h4 className="break-words text-sm font-medium text-(--text)">{toast.title}</h4>
 				{toast.description && <p className="mt-1 break-words text-sm text-(--text-muted)">{toast.description}</p>}
+				{toast.action && (
+					<button
+						onClick={() => {
+							toast.action?.onClick();
+							onDismiss();
+						}}
+						className="mt-3 text-sm font-medium bg-(--foreground) hover:bg-(--border)/10 text-(--text) px-4 py-2 rounded-lg transition-colors"
+					>
+						{toast.action.label}
+					</button>
+				)}
 			</div>
 			<button onClick={onDismiss} className="shrink-0 rounded-lg p-1 text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)">
 				<X size={16} />

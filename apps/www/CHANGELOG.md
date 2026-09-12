@@ -1,5 +1,11 @@
 # www
 
+## 0.7.0
+
+### Minor Changes
+
+- Added a new page for changelogs
+
 ## 0.6.10
 
 ### Patch Changes

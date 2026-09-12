@@ -19,6 +19,7 @@ const schema = new Schema(
 		permissions: { type: [String], default: [] }, // User's permissions (optional)
 		notifications: { type: Schema.Types.Mixed, default: {} },
 		seen: { type: Date }, // User's notifications seen settings (optional)
+		lastSeenVersions: { type: Map, of: String, default: {} }, // User's last seen app versions
 
 		verified: { type: Boolean, default: false }, // Whether the user has been verified
 		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service
