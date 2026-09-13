@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Book, Code, Globe, Package, Rocket, Search } from 'lucide-react';
+import { Book, Code, Globe, Package, Rocket, Search, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
@@ -30,6 +30,14 @@ const categories = [
 		href: '/packages',
 		color: 'text-emerald-500',
 		bg: 'bg-emerald-500/10',
+	},
+	{
+		titleKey: 'docs.home.categories.websocket.title',
+		descKey: 'docs.home.categories.websocket.description',
+		icon: Zap,
+		href: '/websocket',
+		color: 'text-orange-500',
+		bg: 'bg-orange-500/10',
 	},
 ];
 
@@ -69,10 +77,6 @@ export default function DocsHome() {
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				<div className="flex items-center gap-3 px-4 py-1.5 rounded-full border border-(--accent)/20 bg-(--accent)/5 text-(--accent) text-xs font-bold uppercase tracking-wider mb-2 shadow-sm">
-					<Book size={14} />
-					<span>{t('docs.home.badge')}</span>
-				</div>
 				<h1
 					className="text-5xl md:text-6xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
 					style={{
@@ -124,12 +128,17 @@ export default function DocsHome() {
 							},
 						},
 					}}
-					className="grid grid-cols-1 md:grid-cols-3 w-full"
+					className="grid grid-cols-1 md:grid-cols-2 w-full"
 					style={{
 						gap: 'calc(var(--ui-gap) * 1.5)',
 					}}
 				>
-					{categories.map((category, idx) => (
+					{categories
+						.filter((category) => {
+							const q = searchQuery.toLowerCase();
+							return t(category.titleKey).toLowerCase().includes(q) || t(category.descKey).toLowerCase().includes(q);
+						})
+						.map((category, idx) => (
 						<motion.a
 							href={category.href}
 							key={idx}

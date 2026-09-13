@@ -5,16 +5,34 @@ import { WebSocketServer, type WebSocket } from 'ws';
 import { fileURLToPath, pathToFileURL } from 'url';
 import fs from 'fs/promises';
 import path from 'path';
-import { jwtVerify } from 'jose';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load .env configuration
+for (const envPath of [
+	path.resolve(__dirname, '../.env'),
+	path.resolve(__dirname, '../../.env'),
+	path.resolve(process.cwd(), '.env'),
+]) {
+	try {
+		process.loadEnvFile(envPath);
+	} catch {}
+}
+
 import { Terminal } from '@xernerx/terminal';
+import { verifyWebsocketToken, checkTokenWebsocketAccess } from './lib/auth';
 
 const terminal = new Terminal({ scope: 'WS', title: 'XERNERX', format: ['title', 'scope', 'datetime', 'memory'] });
 
-const secret = new TextEncoder().encode(process.env.WS_TOKEN!);
 /* ================= TYPES ================= */
 
 type AuthedWebSocket = WebSocket & {
 	authed: boolean;
+	authError?: string;
+	tokenId?: string;
+	userId?: string;
+	tokenDoc?: any;
 };
 
 type ServiceFn = (
@@ -28,7 +46,6 @@ type ServiceFn = (
 
 /* ================= PATH ================= */
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.join(__dirname, './app');
 
 /* ================= REGISTRY ================= */
@@ -48,14 +65,19 @@ async function loadServices() {
 	const folders = await fs.readdir(appDir);
 
 	for (const folder of folders) {
-		const servicePath = path.join(appDir, folder, 'server.js');
+		let servicePath = path.join(appDir, folder, 'server.ts');
+		try {
+			await fs.access(servicePath);
+		} catch {
+			servicePath = path.join(appDir, folder, 'server.js');
+		}
 
 		try {
 			const mod = await import(pathToFileURL(servicePath).href);
 			services[folder] = mod.default;
-			console.log(`Loaded service: ${folder}`);
+			terminal.log(`Loaded service: ${folder}`);
 		} catch (e) {
-			console.warn(`Skipped ${folder} (no server.js) ${(e as Error).message}`);
+			terminal.warn(`Skipped ${folder}: ${(e as Error).message}`);
 		}
 	}
 }
@@ -113,24 +135,60 @@ async function start() {
 	const port = Number(process.env.PORT) || 5000;
 
 	const server = http.createServer((req, res) => {
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+		res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+		if (req.method === 'OPTIONS') {
+			res.writeHead(204);
+			res.end();
+			return;
+		}
+
 		if (req.url === '/health') {
-			res.writeHead(200);
+			res.writeHead(200, { 'Content-Type': 'text/plain' });
 			res.end('ok');
 			return;
 		}
 
-		res.writeHead(200);
+		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.end('alive');
 	});
 
 	const wss = new WebSocketServer({ server });
 
-	wss.on('connection', (ws: AuthedWebSocket, req) => {
+	wss.on('connection', async (ws: AuthedWebSocket, req) => {
 		ws.authed = false;
 
 		const ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress;
 
 		terminal.log(`Connection established from ${ip}`);
+
+		// Check for pre-authentication via URL query parameter (?token=...) or Authorization header
+		try {
+			const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+			const queryToken = url.searchParams.get('token');
+			const authHeader = req.headers['authorization'];
+			const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+			const initialToken = queryToken || bearerToken;
+
+			if (initialToken) {
+				const res = await verifyWebsocketToken(initialToken);
+				if (res.valid) {
+					ws.authed = true;
+					ws.authError = undefined;
+					ws.tokenId = res.tokenId;
+					ws.userId = res.userId;
+					ws.tokenDoc = res.tokenDoc;
+					terminal.log(`Connection pre-authenticated from ${ip} (token: ${res.tokenId || 'jwt'})`);
+				} else {
+					ws.authError = res.message;
+					terminal.warn(`Pre-auth failed from ${ip}: ${res.message}`);
+				}
+			}
+		} catch (e) {
+			terminal.warn(`Pre-auth parse error from ${ip}: ${(e as Error).message}`);
+		}
 
 		ws.on('message', async (data) => {
 			try {
@@ -144,27 +202,38 @@ async function start() {
 					const { token } = msg.body ?? {};
 
 					if (!token || typeof token !== 'string') {
-						return ws.send(JSON.stringify({ id: msg.id, message: 'Missing token' }));
+						return ws.send(JSON.stringify({ id: msg.id, success: false, message: 'Missing token' }));
 					}
 
-					try {
-						const { payload } = await jwtVerify(token, secret).catch(() => ({ payload: null }));
+					const res = await verifyWebsocketToken(token);
 
-						if (!payload && token !== process.env.WS_TOKEN) throw new Error('Invalid Token');
-
-						ws.authed = true;
-
-						// optional but useful
-						(ws as any).userId = payload?.userId;
-
-						return ws.send(JSON.stringify({ id: msg.id, success: true }));
-					} catch (e) {
-						return ws.send(JSON.stringify({ id: msg.id, message: 'Invalid token' }));
+					if (!res.valid) {
+						ws.authed = false;
+						ws.authError = res.message;
+						return ws.send(JSON.stringify({ id: msg.id, success: false, message: res.message || 'Invalid token' }));
 					}
+
+					ws.authed = true;
+					ws.authError = undefined;
+					ws.tokenId = res.tokenId;
+					ws.userId = res.userId;
+					ws.tokenDoc = res.tokenDoc;
+
+					terminal.log(`Client authenticated from ${ip} (token: ${res.tokenId || 'jwt'})`);
+					return ws.send(JSON.stringify({ id: msg.id, success: true }));
 				}
 
 				if (!ws.authed) {
-					return ws.send(JSON.stringify({ id: msg.id, message: 'unauthorized' }));
+					return ws.send(JSON.stringify({ id: msg.id, message: ws.authError || 'unauthorized' }));
+				}
+
+				// Extra safety check: ensure the token state hasn't been revoked
+				if (ws.tokenId) {
+					const hasAccess = await checkTokenWebsocketAccess(ws.tokenId);
+					if (!hasAccess) {
+						ws.authed = false;
+						return ws.send(JSON.stringify({ id: msg.id, message: 'Forbidden: websocket permission revoked' }));
+					}
 				}
 
 				await handleMessage(ws, msg);
@@ -179,7 +248,9 @@ async function start() {
 	});
 
 	server.listen(port, '0.0.0.0', () => {
-		console.log(`Server running on port ${port}`);
+		terminal.log(`Server running on port ${port}`);
+		terminal.log(`Local gateway: ws://localhost:${port}`);
+		terminal.log(`Cloudflare tunnel: wss://ws.dev.xernerx.com`);
 	});
 }
 

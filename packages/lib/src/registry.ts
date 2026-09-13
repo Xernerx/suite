@@ -76,3 +76,15 @@ export const xernerxModels = {
 		Token: { schema: UserTokenSchema, modelName: 'Token' },
 	},
 };
+
+import VirtueGuildSchema from './models/virtue/profiles/Guild';
+import VirtueTextLevelSchema from './models/virtue/levels/Text';
+import VirtueVoiceLevelSchema from './models/virtue/levels/Voice';
+
+export const virtueModels = {
+	profiles: {
+		Guild: { schema: VirtueGuildSchema, modelName: 'Guild', collection: 'guilds' },
+		Text: { schema: VirtueTextLevelSchema, modelName: 'Text', collection: 'text' },
+		Voice: { schema: VirtueVoiceLevelSchema, modelName: 'Voice', collection: 'voice' },
+	},
+};

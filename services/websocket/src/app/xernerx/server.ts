@@ -4,24 +4,22 @@ import { database } from '@xernerx/lib/core';
 
 async function getModel(action: string) {
 	switch (action) {
-		// ================= VIRTUE SELF-SAVED ITEMS (virtue DB) =================
-		case 'guilds':
-		case 'settings': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.Guild;
+		case 'globalLevel':
+		case 'levels': {
+			const db = await database('xernerx');
+			return (db.models.users as any)?.Level;
 		}
 
-		case 'text':
-		case 'textLevels':
-		case 'members': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.Text;
+		case 'user':
+		case 'users':
+		case 'globalUser': {
+			const db = await database('xernerx');
+			return (db.models.users as any)?.User;
 		}
 
-		case 'voice':
-		case 'voiceLevels': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.Voice;
+		case 'globalGuild': {
+			const db = await database('xernerx');
+			return (db.models.guilds as any)?.Guild;
 		}
 
 		default:
@@ -31,18 +29,16 @@ async function getModel(action: string) {
 
 function getFilter(action: string, body: any) {
 	switch (action) {
-		case 'text':
-		case 'textLevels':
-		case 'voice':
-		case 'voiceLevels':
-		case 'members':
+		case 'globalLevel':
+		case 'levels':
 			return {
-				id: body.id,
-				guild: body.guild,
+				ownerId: body.ownerId || body.id,
 			};
 
-		case 'guilds':
-		case 'settings':
+		case 'user':
+		case 'users':
+		case 'globalUser':
+		case 'globalGuild':
 			return {
 				id: body.id,
 			};

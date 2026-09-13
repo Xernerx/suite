@@ -5,13 +5,14 @@
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"start": "tsx src/main.ts",
-		"dev": "tsx watch src/main.ts"
+		"start": "tsx --env-file=.env src/main.ts",
+		"dev": "tsx watch --env-file=.env src/main.ts"
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",
 	"packageManager": "pnpm@10.32.0",
 	"dependencies": {
+		"@xernerx/lib": "workspace:*",
 		"@xernerx/terminal": "^1.1.11",
 		"jose": "^6.2.12",
 		"mongoose": "^9.10.0",

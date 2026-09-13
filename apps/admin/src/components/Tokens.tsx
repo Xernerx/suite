@@ -16,6 +16,7 @@ interface Token {
 	status: 'active' | 'inactive' | 'suspended' | 'pending';
 	permissions?: {
 		secure?: boolean;
+		websocket?: boolean;
 	};
 	botId?: string;
 	createdAt?: string;
@@ -423,13 +424,14 @@ function TokenCard({
 	const [botId, setBotId] = useState('');
 	const [selectedOwners, setSelectedOwners] = useState<string[]>(token.owners || []);
 	const [secure, setSecure] = useState(false);
+	const [websocket, setWebsocket] = useState(false);
 	const isDirty = useMemo(() => {
 		if (!fullToken) return false;
 		const sortedSelectedOwners = [...selectedOwners].sort();
 		const sortedOriginalOwners = [...(fullToken.owners || [])].sort();
 		const ownersChanged = JSON.stringify(sortedSelectedOwners) !== JSON.stringify(sortedOriginalOwners);
-		return name !== (fullToken.name || '') || status !== (fullToken.status || 'active') || botId !== (fullToken.botId || '') || ownersChanged || secure !== !!fullToken.permissions?.secure;
-	}, [fullToken, name, status, botId, selectedOwners, secure]);
+		return name !== (fullToken.name || '') || status !== (fullToken.status || 'active') || botId !== (fullToken.botId || '') || ownersChanged || secure !== !!fullToken.permissions?.secure || websocket !== !!fullToken.permissions?.websocket;
+	}, [fullToken, name, status, botId, selectedOwners, secure, websocket]);
 	const handleToggleExpand = async () => {
 		setIsModalOpen(true);
 		if (!fullToken && !loadingDetails) {
@@ -446,6 +448,7 @@ function TokenCard({
 					setBotId(data.botId || '');
 					setSelectedOwners(data.owners || []);
 					setSecure(!!data.permissions?.secure);
+					setWebsocket(!!data.permissions?.websocket);
 				}
 			} catch (err) {
 				console.error('Failed to fetch token details:', err);
@@ -467,6 +470,7 @@ function TokenCard({
 				owners: selectedOwners,
 				permissions: {
 					secure,
+					websocket,
 				},
 			};
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/tokens/${token.id}`), {
@@ -488,6 +492,7 @@ function TokenCard({
 					owners: selectedOwners,
 					permissions: {
 						secure,
+						websocket,
 					},
 				};
 				setFullToken(manuallyUpdatedToken);
@@ -728,10 +733,18 @@ function TokenCard({
 
 							<div className="flex items-center justify-between p-3 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md shadow-sm">
 								<div className="flex flex-col">
-									<span className="text-xs font-medium text-(--text)">{t('admin.tokens.edit.isXernerx')}</span>
+									<span className="text-xs font-medium text-(--text)">Secure</span>
 									<span className="text-[11px] text-(--text-muted)">{t('admin.tokens.edit.allowFetching')}</span>
 								</div>
 								<Toggle checked={secure} onChange={(e) => setSecure(e.target.checked)} size="sm" />
+							</div>
+
+							<div className="flex items-center justify-between p-3 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md shadow-sm">
+								<div className="flex flex-col">
+									<span className="text-xs font-medium text-(--text)">Websocket Access</span>
+									<span className="text-[11px] text-(--text-muted)">Requires increased elevation to use the unfiltered direct connection.</span>
+								</div>
+								<Toggle checked={websocket} onChange={(e) => setWebsocket(e.target.checked)} size="sm" />
 							</div>
 
 							<div className="flex items-center justify-between pt-4 border-t border-(--border)/10 mt-auto">
@@ -797,6 +810,7 @@ export default function Tokens() {
 	const [newBotId, setNewBotId] = useState('');
 	const [newSelectedOwners, setNewSelectedOwners] = useState<string[]>([]);
 	const [newSecure, setNewSecure] = useState(false);
+	const [newWebsocket, setNewWebsocket] = useState(false);
 	const [creating, setCreating] = useState(false);
 	useEffect(() => {
 		const fetchTokens = async () => {
@@ -843,6 +857,7 @@ export default function Tokens() {
 					owners: newSelectedOwners,
 					permissions: {
 						secure: newSecure,
+						websocket: newWebsocket,
 					},
 				}),
 			});
@@ -855,6 +870,7 @@ export default function Tokens() {
 				setNewBotId('');
 				setNewSelectedOwners([]);
 				setNewSecure(false);
+				setNewWebsocket(false);
 				toast({
 					type: 'success',
 					title: 'Token created successfully',
@@ -927,6 +943,7 @@ export default function Tokens() {
 						setNewBotId('');
 						setNewSelectedOwners([]);
 						setNewSecure(false);
+						setNewWebsocket(false);
 						setIsCreateOpen(true);
 					}}
 					style={{
@@ -1060,10 +1077,17 @@ export default function Tokens() {
 					</div>
 					<div className="flex items-center justify-between pt-1">
 						<div className="flex flex-col">
-							<span className="text-xs font-medium text-(--text)">{t('admin.tokens.edit.isXernerx')}</span>
+							<span className="text-xs font-medium text-(--text)">Secure</span>
 							<span className="text-[11px] text-(--text-muted)">{t('admin.tokens.edit.allowFetching')}</span>
 						</div>
 						<Toggle checked={newSecure} onChange={(e) => setNewSecure(e.target.checked)} size="sm" />
+					</div>
+					<div className="flex items-center justify-between p-3 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md shadow-sm mt-3">
+						<div className="flex flex-col">
+							<span className="text-xs font-medium text-(--text)">Websocket Access</span>
+							<span className="text-[11px] text-(--text-muted)">Requires increased elevation to use the unfiltered direct connection.</span>
+						</div>
+						<Toggle checked={newWebsocket} onChange={(e) => setNewWebsocket(e.target.checked)} size="sm" />
 					</div>
 					<div className="flex justify-end gap-3 pt-2">
 						<Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>

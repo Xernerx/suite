@@ -2,7 +2,7 @@
 
 import mongoose, { Connection, Model, Schema } from 'mongoose';
 
-import { xernerxModels } from './registry';
+import { xernerxModels, virtueModels } from './registry';
 
 const globalWithMongoose = global as typeof global & {
 	__connections_v2?: Record<string, Record<string, Connection>>;
@@ -17,10 +17,10 @@ if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__models_v4 = cachedModels;
 }
 
-const uris = {
+const getUris = (): Record<string, string> => ({
 	xernerx: process.env.MONGO_XERNERX || '',
 	virtue: process.env.MONGO_VIRTUE || '',
-};
+});
 
 interface ModelDefinition {
 	schema: Schema;
@@ -30,9 +30,10 @@ interface ModelDefinition {
 
 const registries: Record<string, any> = {
 	xernerx: xernerxModels,
+	virtue: virtueModels,
 };
 
-export async function database(projectId: keyof typeof uris) {
+export async function database(projectId: 'xernerx' | 'virtue') {
 	// Ensure cache objects exist for this specific project identifier (e.g., 'xernerx')
 	if (!activeConnections[projectId]) activeConnections[projectId] = {};
 	if (!cachedModels[projectId]) cachedModels[projectId] = {};
@@ -44,7 +45,7 @@ export async function database(projectId: keyof typeof uris) {
 		};
 	}
 
-	const baseUri = uris[projectId];
+	const baseUri = getUris()[projectId];
 	if (!baseUri) throw new Error(`Database URI for ${projectId} is not defined.`);
 
 	const registry = registries[projectId];
@@ -54,14 +55,14 @@ export async function database(projectId: keyof typeof uris) {
 
 	// Loop 1: uriSuffix is 'profiles', 'stats', 'tokens'
 	for (const [uriSuffix, collectionsMap] of Object.entries(registry)) {
-		// Connects to mongodb+srv://.../profiles
+		const cleanDbName = uriSuffix.replace(/^\/+/, '').replace(/\/+$/, '');
 		let connectionUri = '';
 		try {
-			const parsed = new URL(baseUri);
-			parsed.pathname = parsed.pathname === '/' ? `/${uriSuffix}` : `${parsed.pathname.replace(/\/$/, '')}/${uriSuffix}`;
+			const parsed = new URL(baseUri.replace(/\/+$/, ''));
+			parsed.pathname = `/${cleanDbName}`;
 			connectionUri = parsed.toString();
 		} catch (e) {
-			connectionUri = `${baseUri.replace(/\/$/, '')}/${uriSuffix}`;
+			connectionUri = `${baseUri.replace(/\/+$/, '')}/${cleanDbName}`;
 		}
 
 		let conn: Connection | undefined = activeConnections[projectId][uriSuffix];
@@ -74,7 +75,9 @@ export async function database(projectId: keyof typeof uris) {
 		}
 
 		if (!conn) {
-			conn = mongoose.createConnection(connectionUri);
+			conn = mongoose.createConnection(connectionUri, {
+				dbName: cleanDbName,
+			});
 			activeConnections[projectId][uriSuffix] = conn;
 		}
 

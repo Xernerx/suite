@@ -10,6 +10,7 @@ const schema = new Schema(
 		status: { type: String, required: true, default: 'active', enum: ['active', 'inactive', 'suspended', 'pending'] },
 		permissions: {
 			secure: Boolean, // can fetch data from /secure
+			websocket: Boolean, // can connect to the websocket gateway directly
 		},
 		botId: { type: String },
 	},
