@@ -1,5 +1,11 @@
 # cdn
 
+## 1.0.7
+
+### Patch Changes
+
+- Fixed opengraph rendering of the viewer, also added quicklink to the viewer routes.
+
 ## 1.0.6
 
 ### Patch Changes
