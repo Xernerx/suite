@@ -1,5 +1,11 @@
 # app
 
+## 2.6.5
+
+### Patch Changes
+
+- Fixed opengraph embed for bot specific pages
+
 ## 2.6.4
 
 ### Patch Changes
