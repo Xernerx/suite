@@ -5,6 +5,7 @@
 ### Patch Changes
 
 - Fixed an issue where only public environments would show version changes, also added a quicklink to the changelog page to quickly reference versions
+- Fixed opengraph rendering of the viewer, also added quicklink to the viewer routes.
 
 ## 1.0.6
 

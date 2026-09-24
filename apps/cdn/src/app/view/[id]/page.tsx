@@ -1,9 +1,57 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { Download, ShieldAlert } from 'lucide-react';
 import { Button } from '@xernerx/ui';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+	const { id } = await params;
+	const { models } = await database('xernerx');
+	const MediaModel = models.core.Media;
+
+	const media = await MediaModel.findById(id);
+
+	if (!media || media.privacy === 'private') {
+		return {
+			title: 'File Not Found or Private',
+		};
+	}
+
+	const domain = process.env.DOMAIN || 'xernerx.com';
+	const isDev = process.env.ENVIRONMENT === 'DEVELOPMENT';
+	const baseUrl = isDev ? `https://cdn.dev.${domain}` : `https://cdn.${domain}`;
+	const rawUrl = `${baseUrl}/raw/${id}`;
+
+	if (media.mimeType?.startsWith('image/')) {
+		return {
+			title: media.filename || 'Image',
+			openGraph: {
+				images: [rawUrl],
+			},
+			twitter: {
+				card: 'summary_large_image',
+				images: [rawUrl],
+			},
+		};
+	}
+
+	if (media.mimeType?.startsWith('video/')) {
+		return {
+			title: media.filename || 'Video',
+			openGraph: {
+				videos: [{ url: rawUrl }],
+			},
+		};
+	}
+
+	return {
+		title: media.filename || 'File',
+	};
+}
+
+import { MediaActions } from '@/components/MediaActions';
 
 export default async function MediaViewPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -67,7 +115,8 @@ export default async function MediaViewPage({ params }: { params: Promise<{ id: 
 	const rawUrl = `${baseUrl}/raw/${id}`;
 
 	return (
-		<div className="fixed inset-0 z-[9999] bg-(--background) flex flex-col items-center justify-center overflow-hidden">
+		<div className="fixed inset-0 z-[9999] bg-(--background) flex flex-col items-center justify-center overflow-hidden group">
+			<MediaActions rawUrl={rawUrl} />
 			{media.mimeType?.startsWith('image/') ? (
 				// eslint-disable-next-line @next/next/no-img-element
 				<img src={rawUrl} alt={media.filename} className="object-contain w-full h-full" />
