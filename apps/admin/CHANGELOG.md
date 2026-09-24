@@ -1,5 +1,11 @@
 # admin
 
+## 0.5.8
+
+### Patch Changes
+
+- Fixed an issue where only public environments would show version changes, also added a quicklink to the changelog page to quickly reference versions
+
 ## 0.5.7
 
 ### Patch Changes

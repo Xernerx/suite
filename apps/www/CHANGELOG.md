@@ -1,5 +1,11 @@
 # www
 
+## 0.7.2
+
+### Patch Changes
+
+- Fixed an issue where only public environments would show version changes, also added a quicklink to the changelog page to quickly reference versions
+
 ## 0.7.1
 
 ### Patch Changes

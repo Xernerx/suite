@@ -1,5 +1,11 @@
 # app
 
+## 2.6.4
+
+### Patch Changes
+
+- Fixed an issue where only public environments would show version changes, also added a quicklink to the changelog page to quickly reference versions
+
 ## 2.6.3
 
 ### Patch Changes

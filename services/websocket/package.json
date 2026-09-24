@@ -15,7 +15,7 @@
 		"@xernerx/terminal": "^1.1.11",
 		"jose": "^6.2.12",
 		"mongoose": "^9.10.0",
-		"next": "^16.3.4",
+		"next": "^16.3.5",
 		"ws": "^8.21.3"
 	},
 	"engines": {

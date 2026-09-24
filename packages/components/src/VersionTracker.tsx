@@ -6,13 +6,13 @@ import { useEnvironment, useSession, useToast } from '@xernerx/providers';
 
 export function VersionTracker() {
 	const { data: session } = useSession();
-	const { isDev, isCanary, getEnvUrl, isReady } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
 	const hasChecked = useRef(false);
 
 	useEffect(() => {
-		// Only check once per session mount, and only if we are in production
-		if (!isReady || !session?.user || isDev || isCanary || hasChecked.current) return;
+		// Only check once per session mount
+		if (!isReady || !session?.user || hasChecked.current) return;
 		hasChecked.current = true;
 
 		const checkVersion = async () => {
@@ -21,8 +21,8 @@ export function VersionTracker() {
 				const hostname = window.location.hostname;
 				let appName = hostname.split('.')[0];
 
-				// Handle root domains or www
-				if (appName === 'www' || appName === 'xernerx' || hostname === 'localhost' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname)) {
+				// Handle root domains, IP addresses, or environment prefixes acting as www
+				if (appName === 'dev' || appName === 'canary' || appName === 'www' || appName === 'xernerx' || hostname === 'localhost' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname)) {
 					appName = 'www'; // Fallback to 'www' for marketing site
 				}
 
@@ -77,7 +77,7 @@ export function VersionTracker() {
 		};
 
 		checkVersion();
-	}, [isReady, session, isDev, isCanary, getEnvUrl, toast]);
+	}, [isReady, session, getEnvUrl, toast]);
 
 	return null; // Invisible component
 }
