@@ -4,16 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');
-		const setting = await models.core.Setting.findOne({ id: 'roadmap_products' }).lean();
 
-		let products = ['Dashboard', 'API', 'CDN', 'Bots']; // defaults
-		if (setting && setting.value) {
-			try {
-				products = JSON.parse(setting.value);
-			} catch (e) {}
-		}
+		// Fetch unique product IDs from both Issues and RoadmapItems
+		const roadmapProducts = await models.core.RoadmapItem.distinct('productId');
+		const issueProducts = await models.core.Issue.distinct('productId');
 
-		return NextResponse.json({ data: products });
+		const uniqueProducts = [...new Set([...roadmapProducts, ...issueProducts])].filter(Boolean);
+
+		return NextResponse.json({ data: uniqueProducts });
 	} catch (err) {
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}

@@ -63,6 +63,11 @@ export async function POST(req: NextRequest) {
 		}
 
 		const body = await req.json();
+
+		if (!body.title?.trim() || !body.description?.trim() || !body.productId) {
+			return NextResponse.json({ error: 'Title, description, and product are required' }, { status: 400 });
+		}
+
 		const { models } = await database('xernerx');
 
 		// Prevent duplicates

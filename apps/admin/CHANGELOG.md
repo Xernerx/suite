@@ -1,5 +1,11 @@
 # admin
 
+## 0.6.1
+
+### Patch Changes
+
+- Fixed interaction issues and product listing
+
 ## 0.6.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # www
 
+## 0.8.2
+
+### Patch Changes
+
+- Fixed interaction issues and product listing
+
 ## 0.8.1
 
 ### Patch Changes

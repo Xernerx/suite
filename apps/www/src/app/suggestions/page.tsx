@@ -29,6 +29,7 @@ export default function SuggestionsPage() {
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
 	const [search, setSearch] = useState('');
+	const [showForm, setShowForm] = useState(false);
 
 	const fetchSuggestions = () => {
 		fetch(getEnvUrl('https://api.xernerx.com/core/suggestions'))
@@ -104,22 +105,29 @@ export default function SuggestionsPage() {
 				<p className="text-gray-500">Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.</p>
 			</div>
 
-			<div className={`grid grid-cols-1 ${user ? 'md:grid-cols-3' : 'md:grid-cols-1'} gap-8`}>
+			<div className={`grid grid-cols-1 ${user && showForm ? 'md:grid-cols-3' : 'md:grid-cols-1'} gap-8`}>
 				{/* Form (Only show to logged-in users) */}
-				{user && (
+				{user && showForm && (
 					<div className="col-span-1 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-xl flex flex-col gap-4 h-fit">
 						<h2 className="text-xl font-bold">New Suggestion</h2>
 						<form onSubmit={submitSuggestion} className="flex flex-col gap-4">
 							<Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
 							<Input variant="textarea" rows={4} placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
 							<Selector value={product} options={products.map((p) => ({ value: p, label: p }))} onChange={setProduct} placeholder="Select Product" />
-							<Button type="submit">Submit Idea</Button>
+							<div className="flex gap-2 w-full">
+								<Button type="submit" className="flex-1">
+									Submit
+								</Button>
+								<Button variant="danger" type="button" onClick={() => setShowForm(false)}>
+									Cancel
+								</Button>
+							</div>
 						</form>
 					</div>
 				)}
 
 				{/* List & Search */}
-				<div className={`flex flex-col gap-4 ${user ? 'col-span-2' : 'col-span-1 max-w-3xl mx-auto w-full'}`}>
+				<div className={`flex flex-col gap-4 ${user && showForm ? 'col-span-2' : 'col-span-1 max-w-3xl mx-auto w-full'}`}>
 					<Input variant="search" placeholder="Search suggestions (e.g. 'discord bot')..." value={search} onChange={(e) => setSearch(e.target.value)} />
 
 					{filteredSuggestions.map((s: any) => {
@@ -166,7 +174,7 @@ export default function SuggestionsPage() {
 						);
 					})}
 
-					{filteredSuggestions.length === 0 && search && (
+					{filteredSuggestions.length === 0 && search.trim() && (
 						<div className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-4 text-gray-500">
 							<div>No suggestions match "{search}".</div>
 							{user ? (
@@ -174,6 +182,7 @@ export default function SuggestionsPage() {
 									onClick={() => {
 										setTitle(search);
 										setSearch('');
+										setShowForm(true);
 										// Optionally focus description here
 									}}
 								>

@@ -298,34 +298,6 @@ export default function Settings() {
 						gap: 'calc(var(--ui-gap) * 0.5)',
 					}}
 				>
-					<label className="text-xs font-semibold text-(--text)">Roadmap Products</label>
-					<p className="text-xs text-(--text-muted) mb-1">Manage the list of product tags that users can select when submitting ideas or creating roadmap items.</p>
-					<div className="flex flex-col gap-2">
-						{roadmapProducts.map((prod, i) => (
-							<div key={i} className="flex gap-2">
-								<Input
-									value={prod}
-									onChange={(e) => {
-										const copy = [...roadmapProducts];
-										copy[i] = e.target.value;
-										setRoadmapProducts(copy);
-									}}
-								/>
-								<Button variant="danger" onClick={() => setRoadmapProducts(roadmapProducts.filter((_, idx) => idx !== i))}>
-									<Trash2 className="w-4 h-4" />
-								</Button>
-							</div>
-						))}
-						<Button onClick={() => setRoadmapProducts([...roadmapProducts, 'New Product'])}>Add Product</Button>
-					</div>
-				</div>
-
-				<div
-					className="flex flex-col max-w-md"
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
 					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.appWebhookUrl')}</label>
 					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.appWebhookUrlDesc')}</p>
 					<Input value={appWebhookUrl} onChange={(e) => setAppWebhookUrl(e.target.value)} placeholder={t('admin.settings.appWebhookUrlPlaceholder')} />
