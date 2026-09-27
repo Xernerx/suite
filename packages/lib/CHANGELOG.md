@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 0.6.0
+
+### Minor Changes
+
+- Added a new /support route to all domains that allows direct access to the support server.
+
 ## 0.5.4
 
 ### Patch Changes
