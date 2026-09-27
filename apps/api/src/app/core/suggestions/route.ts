@@ -7,7 +7,49 @@ export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');
 		const suggestions = await models.core.Suggestion.find({ status: 'pending' }).sort({ createdAt: -1 }).lean();
-		return NextResponse.json({ data: suggestions });
+
+		const authorIds = [...new Set(suggestions.map((s) => s.authorId))];
+		const users = await models.users.User.find({ id: { $in: authorIds } }).lean();
+		const userMap: Record<string, any> = {};
+
+		await Promise.all(
+			authorIds.map(async (id) => {
+				try {
+					if (process.env.DISCORD_CLIENT_TOKEN) {
+						const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
+							headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+							next: { revalidate: 3600 },
+						});
+
+						if (discordRes.ok) {
+							const data = await discordRes.json();
+							userMap[id] = {
+								name: data.global_name || data.username,
+								icon: data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null,
+							};
+							return; // successfully fetched from discord
+						}
+					}
+				} catch (e) {
+					console.error('Failed to fetch Discord user for suggestion:', e);
+				}
+
+				// Fallback to database
+				const dbUser = users.find((u) => u.id === id);
+				if (dbUser) {
+					userMap[id] = { name: dbUser.name, icon: dbUser.icon };
+				} else {
+					userMap[id] = { name: 'Unknown User', icon: null };
+				}
+			})
+		);
+
+		const data = suggestions.map((s) => ({
+			...s,
+			author: userMap[s.authorId] || null,
+		}));
+
+		return NextResponse.json({ data });
 	} catch (err) {
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}

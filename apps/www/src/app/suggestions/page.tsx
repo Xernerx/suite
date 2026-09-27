@@ -127,8 +127,8 @@ export default function SuggestionsPage() {
 						const hasDownvoted = user && s.downvotes?.includes(user.id);
 						const netVotes = (s.upvotes?.length || 0) - (s.downvotes?.length || 0);
 						return (
-							<motion.div key={s.id} layout className="flex gap-4 p-4 rounded-xl border border-(--border) bg-(--background)">
-								<div className="flex flex-col items-center gap-1 justify-center">
+							<motion.div key={s.id} layout className="flex gap-4 p-4 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
+								<div className="flex flex-col items-center gap-1 justify-center shrink-0">
 									<button
 										onClick={() => vote(s.id, 'upvote')}
 										className={`p-2 rounded ${hasUpvoted ? 'bg-(--accent) text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
@@ -143,10 +143,24 @@ export default function SuggestionsPage() {
 										▼
 									</button>
 								</div>
-								<div className="flex flex-col justify-center">
-									<div className="font-bold text-lg">{s.title}</div>
-									<div className="text-gray-500 text-sm mb-2">{s.description}</div>
-									<span className="text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded w-fit">{s.productId}</span>
+								<div className="flex flex-col justify-center w-full min-w-0">
+									<div className="flex justify-between items-start gap-4">
+										<div className="font-bold text-lg">{s.title}</div>
+										{s.author && (
+											<div className="flex items-center gap-2 shrink-0 bg-(--foreground)/50 border border-(--border)/10 rounded-full pr-3 pl-1 py-1">
+												{s.author.icon ? (
+													<img src={s.author.icon} alt={s.author.name} className="w-6 h-6 rounded-full" />
+												) : (
+													<div className="w-6 h-6 rounded-full bg-(--accent) flex items-center justify-center text-[10px] text-white font-bold">
+														{s.author.name?.charAt(0) || '?'}
+													</div>
+												)}
+												<span className="text-xs text-(--text-muted) font-medium truncate max-w-[100px]">{s.author.name}</span>
+											</div>
+										)}
+									</div>
+									<div className="text-gray-500 text-sm mb-2 mt-1">{s.description}</div>
+									<span className="text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">{s.productId}</span>
 								</div>
 							</motion.div>
 						);
