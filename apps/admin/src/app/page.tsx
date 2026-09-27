@@ -3,7 +3,7 @@
 // Force recompile
 'use client';
 
-import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image } from 'lucide-react';
+import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -17,6 +17,9 @@ import Users from '@/components/Users';
 import Settings from '@/components/Settings';
 import Invites from '@/components/Invites';
 import Announcements from '@/components/Announcements';
+import Suggestions from '@/components/Suggestions';
+import Roadmap from '@/components/Roadmap';
+import Issues from '@/components/Issues';
 import Media from '@/components/Media';
 import { permissions } from '@xernerx/lib';
 import { Server } from 'lucide-react';
@@ -112,6 +115,9 @@ export default function Home() {
 		const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
 		const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
 		const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
+		const canManageRoadmap = userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false;
+		const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
+		const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
 		const canMedia = canManageMedia || canUploadMedia;
 
 		const isServerSet = !!adminServerId;
@@ -206,6 +212,31 @@ export default function Home() {
 			});
 		}
 
+		if (canManageRoadmap) {
+			items.push({
+				category: 'Product',
+				label: 'Roadmap',
+				view: 'roadmap',
+				icon: Map,
+			});
+		}
+		if (canManageSuggestions) {
+			items.push({
+				category: 'Product',
+				label: 'Suggestions',
+				view: 'suggestions',
+				icon: Inbox,
+			});
+		}
+		if (canManageIssues) {
+			items.push({
+				category: 'Product',
+				label: 'Issues',
+				view: 'issues',
+				icon: Bug,
+			});
+		}
+
 		setNavItems(items);
 
 		if (items.length > 0) {
@@ -233,6 +264,9 @@ export default function Home() {
 	const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
 	const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
 	const canMedia = canManageMedia || canUploadMedia;
+	const canManageRoadmap = userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false;
+	const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
+	const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
 
 	const isServerSet = !!adminServerId;
 
@@ -246,6 +280,9 @@ export default function Home() {
 	if (canSettings) allowedViews.push('settings');
 	if (canInvites) allowedViews.push('invites');
 	if (canAnnouncements) allowedViews.push('announcements');
+	if (canManageRoadmap) allowedViews.push('roadmap');
+	if (canManageSuggestions) allowedViews.push('suggestions');
+	if (canManageIssues) allowedViews.push('issues');
 
 	const activeView = allowedViews.includes(view!) ? view : allowedViews[0];
 
@@ -268,6 +305,9 @@ export default function Home() {
 			{activeView === 'settings' && <Settings />}
 			{activeView === 'invites' && <Invites />}
 			{activeView === 'announcements' && <Announcements />}
+			{activeView === 'roadmap' && <Roadmap />}
+			{activeView === 'suggestions' && <Suggestions />}
+			{activeView === 'issues' && <Issues />}
 		</div>
 	);
 }

@@ -80,4 +80,22 @@ export const permissions: PermissionDefinition[] = [
 		description: 'Permission to upload media and manage own media files on the CDN.',
 		defaultValue: false,
 	},
+	{
+		key: 'manageRoadmap',
+		label: 'Manage Roadmap',
+		description: 'Permission to create, update, and publish roadmap items.',
+		defaultValue: false,
+	},
+	{
+		key: 'manageSuggestions',
+		label: 'Manage Suggestions',
+		description: 'Permission to triage, accept, and decline community suggestions.',
+		defaultValue: false,
+	},
+	{
+		key: 'manageIssues',
+		label: 'Manage Issues',
+		description: 'Permission to log bugs and mark them as resolved for health metrics.',
+		defaultValue: false,
+	},
 ];

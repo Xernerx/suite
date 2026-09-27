@@ -1,5 +1,11 @@
 # api
 
+## 0.8.0
+
+### Minor Changes
+
+- Added a new roadmap and suggestions feature
+
 ## 0.7.8
 
 ### Patch Changes

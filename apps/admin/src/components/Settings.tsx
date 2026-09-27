@@ -20,6 +20,7 @@ export default function Settings() {
 	const [joinRoles, setJoinRoles] = useState<string[]>([]);
 	const [botJoinRoles, setBotJoinRoles] = useState<string[]>([]);
 	const [sisterServers, setSisterServers] = useState<{ id: string }[]>([]);
+	const [roadmapProducts, setRoadmapProducts] = useState<string[]>(['Dashboard', 'API', 'CDN', 'Bots']);
 	const [availableRoles, setAvailableRoles] = useState<
 		{
 			id: string;
@@ -54,7 +55,7 @@ export default function Settings() {
 	const fetchSettings = async () => {
 		setIsLoading(true);
 		try {
-			const [adminRes, webhookRes, joinRes, botJoinRes, sisterRes, rolesRes] = await Promise.all([
+			const [adminRes, webhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
 					credentials: 'include',
 				}),
@@ -66,6 +67,15 @@ export default function Settings() {
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/bot_join_roles'), {
 					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ value: JSON.stringify(roadmapProducts.filter(Boolean)), valueType: 'json' }),
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), {
 					credentials: 'include',
@@ -89,6 +99,15 @@ export default function Settings() {
 					setJoinRoles(Array.isArray(parsed) ? parsed : []);
 				} catch {
 					setJoinRoles([]);
+				}
+			}
+			if (roadmapRes.ok) {
+				const data = await roadmapRes.json();
+				try {
+					const parsed = JSON.parse(data.value || '[]');
+					setRoadmapProducts(parsed.length ? parsed : ['Dashboard', 'API', 'CDN', 'Bots']);
+				} catch {
+					setRoadmapProducts(['Dashboard', 'API', 'CDN', 'Bots']);
 				}
 			}
 			if (botJoinRes.ok) {
@@ -271,6 +290,34 @@ export default function Settings() {
 						options={[{ value: '', label: t('admin.dashboard.settings.selectServer') }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
 						placeholder={t('admin.settings.adminServerIdPlaceholder') || 'Select Admin Server'}
 					/>
+				</div>
+
+				<div
+					className="flex flex-col max-w-md"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<label className="text-xs font-semibold text-(--text)">Roadmap Products</label>
+					<p className="text-xs text-(--text-muted) mb-1">Manage the list of product tags that users can select when submitting ideas or creating roadmap items.</p>
+					<div className="flex flex-col gap-2">
+						{roadmapProducts.map((prod, i) => (
+							<div key={i} className="flex gap-2">
+								<Input
+									value={prod}
+									onChange={(e) => {
+										const copy = [...roadmapProducts];
+										copy[i] = e.target.value;
+										setRoadmapProducts(copy);
+									}}
+								/>
+								<Button variant="danger" onClick={() => setRoadmapProducts(roadmapProducts.filter((_, idx) => idx !== i))}>
+									<Trash2 className="w-4 h-4" />
+								</Button>
+							</div>
+						))}
+						<Button onClick={() => setRoadmapProducts([...roadmapProducts, 'New Product'])}>Add Product</Button>
+					</div>
 				</div>
 
 				<div

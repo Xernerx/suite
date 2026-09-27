@@ -1,5 +1,11 @@
 # www
 
+## 0.8.0
+
+### Minor Changes
+
+- Added a new roadmap and suggestions feature
+
 ## 0.7.4
 
 ### Patch Changes

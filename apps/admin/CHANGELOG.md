@@ -1,5 +1,11 @@
 # admin
 
+## 0.6.0
+
+### Minor Changes
+
+- Added a new roadmap and suggestions feature
+
 ## 0.5.10
 
 ### Patch Changes

@@ -1,0 +1,12 @@
+import { database } from '@xernerx/lib/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(req: NextRequest) {
+	try {
+		const { models } = await database('xernerx');
+		const items = await models.core.RoadmapItem.find().sort({ targetQuarter: 1, createdAt: -1 }).lean();
+		return NextResponse.json({ data: items });
+	} catch (err) {
+		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+	}
+}
