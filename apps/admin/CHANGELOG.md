@@ -1,5 +1,11 @@
 # admin
 
+## 0.6.2
+
+### Patch Changes
+
+- Fixed some UI issues and make the roadmap look cleaner
+
 ## 0.6.1
 
 ### Patch Changes

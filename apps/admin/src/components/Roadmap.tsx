@@ -10,6 +10,7 @@ export default function Roadmap() {
 	const [loading, setLoading] = useState(true);
 
 	const [modalOpen, setModalOpen] = useState(false);
+	const [editId, setEditId] = useState<string | null>(null);
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
@@ -35,22 +36,37 @@ export default function Roadmap() {
 		fetchData();
 	}, [getEnvUrl]);
 
-	const createItem = async () => {
+	const openCreate = () => {
+		setEditId(null);
+		setTitle('');
+		setDescription('');
+		setProduct('');
+		setStatus('idea');
+		setTargetQuarter('');
+		setModalOpen(true);
+	};
+
+	const openEdit = (item: any) => {
+		setEditId(item.id);
+		setTitle(item.title || '');
+		setDescription(item.description || '');
+		setProduct(item.productId || '');
+		setStatus(item.status || 'idea');
+		setTargetQuarter(item.targetQuarter || '');
+		setModalOpen(true);
+	};
+
+	const saveItem = async () => {
 		if (!title || !description || !product || !status) return toast({ type: 'error', title: 'Error', description: 'Fill required fields' });
 		try {
-			await fetch(getEnvUrl('https://api.xernerx.com/secure/core/roadmap'), {
-				method: 'POST',
+			await fetch(getEnvUrl(editId ? `https://api.xernerx.com/secure/core/roadmap/${editId}` : 'https://api.xernerx.com/secure/core/roadmap'), {
+				method: editId ? 'PUT' : 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
 				body: JSON.stringify({ title, description, productId: product, status, targetQuarter }),
 			});
-			toast({ type: 'success', title: 'Created', description: 'Roadmap item added.' });
+			toast({ type: 'success', title: editId ? 'Updated' : 'Created', description: `Roadmap item ${editId ? 'updated' : 'added'}.` });
 			setModalOpen(false);
-			setTitle('');
-			setDescription('');
-			setProduct('');
-			setStatus('idea');
-			setTargetQuarter('');
 			fetchData();
 		} catch (err: any) {
 			toast({ type: 'error', title: 'Error', description: err.message });
@@ -90,10 +106,10 @@ export default function Roadmap() {
 		<div className="flex flex-col gap-4">
 			<div className="flex justify-between items-center">
 				<h2 className="text-2xl font-bold">Roadmap Management</h2>
-				<Button onClick={() => setModalOpen(true)}>Create Item</Button>
+				<Button onClick={openCreate}>Create Item</Button>
 			</div>
 
-			<Modal open={modalOpen} onOpenChange={setModalOpen} title="New Roadmap Item">
+			<Modal open={modalOpen} onOpenChange={setModalOpen} title={editId ? 'Edit Roadmap Item' : 'New Roadmap Item'}>
 				<div className="flex flex-col gap-4 pt-4">
 					<Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
 					<Input variant="textarea" rows={3} placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
@@ -112,7 +128,7 @@ export default function Roadmap() {
 					<Input placeholder="Target Quarter (e.g. Q4 2026)" value={targetQuarter} onChange={(e) => setTargetQuarter(e.target.value)} />
 
 					<div className="flex justify-end mt-4">
-						<Button onClick={createItem}>Create</Button>
+						<Button onClick={saveItem}>{editId ? 'Save Changes' : 'Create'}</Button>
 					</div>
 				</div>
 			</Modal>
@@ -136,7 +152,14 @@ export default function Roadmap() {
 											options={['idea', 'planned', 'active', 'released'].map((s) => ({ value: s, label: `Move to ${s}` }))}
 											onChange={(val) => updateStatus(item.id, val)}
 										/>
-										<Button onClick={() => deleteItem(item.id)}>Delete</Button>
+										<div className="flex gap-2 w-full">
+											<Button className="flex-1" onClick={() => openEdit(item)}>
+												Edit
+											</Button>
+											<Button variant="danger" className="flex-1" onClick={() => deleteItem(item.id)}>
+												Delete
+											</Button>
+										</div>
 									</div>
 								</div>
 							))}

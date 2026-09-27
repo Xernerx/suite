@@ -1,5 +1,11 @@
 # www
 
+## 0.8.3
+
+### Patch Changes
+
+- Fixed some UI issues and make the roadmap look cleaner
+
 ## 0.8.2
 
 ### Patch Changes
