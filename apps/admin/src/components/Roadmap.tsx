@@ -25,6 +25,10 @@ export default function Roadmap() {
 			.then((d) => {
 				setData(d.data || []);
 				setLoading(false);
+			})
+			.catch((err) => {
+				console.error(err);
+				setLoading(false);
 			});
 
 		fetch(getEnvUrl('https://api.xernerx.com/core/roadmap/products'))

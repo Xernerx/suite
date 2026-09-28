@@ -1,5 +1,11 @@
 # www
 
+## 0.8.4
+
+### Patch Changes
+
+- Fixed UI elements on the roadmap page
+
 ## 0.8.3
 
 ### Patch Changes
