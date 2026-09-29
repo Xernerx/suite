@@ -62,6 +62,13 @@ export default function RoadmapPage() {
 		return qA.localeCompare(qB);
 	});
 
+	const allProducts = Array.from(new Set(roadmap.map((i: any) => i.productId)));
+	const productColors = ['#3b82f6', '#ec4899', '#10b981', '#f97316', '#8b5cf6', '#06b6d4', '#ef4444', '#eab308'];
+	const getProductColor = (prod: string) => {
+		const idx = allProducts.indexOf(prod);
+		return productColors[Math.max(0, idx) % productColors.length];
+	};
+
 	const statusColors: any = {
 		idea: 'bg-gray-500',
 		planned: 'bg-blue-500',
@@ -106,53 +113,108 @@ export default function RoadmapPage() {
 									<h2 className="text-2xl font-black tracking-wider uppercase text-(--text)">{quarter}</h2>
 								</div>
 
-								{/* Branched Items Stack */}
-								<div className="flex flex-col relative pl-6 md:pl-8 ml-[11px] border-l-2 border-(--border)/20 mt-2">
-									{Array.from(new Set(qItems.map((i: any) => i.productId))).map((prod: string, pIdx) => {
-										const pItems = qItems.filter((i: any) => i.productId === prod);
+								{/* Git-Style Parallel Branch Lines */}
+								<div className="flex flex-col relative w-full mt-4 min-h-[200px]">
+									{(() => {
+										const uniqueProducts = Array.from(new Set(qItems.map((i: any) => i.productId)));
+										const trunkX = 11;
+										const startY = 0;
+										const paddingTop = startY + (uniqueProducts.length > 0 ? (uniqueProducts.length - 1) * 36 + 32 : 0);
+										const cardLeftPadding = trunkX + (uniqueProducts.length > 0 ? (uniqueProducts.length - 1) * 24 : 0) + 24;
+
 										return (
-											<div key={prod} className="flex flex-col relative mb-8">
-												{/* Branch connector */}
-												<div className="absolute top-4 -left-6 md:-left-8 w-6 md:w-8 h-[2px] bg-(--border)/20"></div>
-												{/* Branch dot */}
-												<div className="absolute top-[14px] -left-[5px] w-[10px] h-[10px] rounded-full bg-(--accent) shadow-[0_0_8px_var(--accent)]"></div>
+											<>
+												{/* The SVG Tracks */}
+												<svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+													{uniqueProducts.map((prod: string, i: number) => {
+														const color = getProductColor(prod);
 
-												<span className="text-xs font-black uppercase text-(--accent) bg-(--accent)/10 px-3 py-1.5 rounded-lg tracking-wider border border-(--accent)/20 w-fit mb-4">
-													{prod}
-												</span>
+														if (i === 0) {
+															return <line key={prod} x1={trunkX} y1={startY} x2={trunkX} y2="100%" stroke={color} strokeWidth="2" opacity="0.6" />;
+														}
 
-												<div className="flex flex-col gap-4">
-													{pItems.map((item: any) => (
-														<motion.div
-															key={item.id}
-															layout
-															className="flex flex-col p-6 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg transition-all hover:border-(--accent)/50 hover:bg-(--foreground)/50 gap-3 relative overflow-hidden group"
-														>
-															<div className="absolute top-0 left-0 w-1 h-full bg-(--border)/10 group-hover:bg-(--accent)/50 transition-colors"></div>
+														const trackX = trunkX + i * 24;
+														const hDiff = trackX - trunkX;
+														const curveHeight = hDiff;
+														const branchY = startY + i * 16;
+														const curveEndY = branchY + curveHeight;
 
-															<div className="flex justify-between items-start gap-4">
-																<div className="flex items-center gap-2">
-																	<span className={`w-2 h-2 rounded-full ${statusColors[item.status] || 'bg-gray-500'}`}></span>
-																	<span className="text-xs uppercase font-bold text-(--text-muted)">{item.status}</span>
-																</div>
+														const pathD = `M ${trunkX} ${startY} L ${trunkX} ${branchY} C ${trunkX} ${branchY + curveHeight / 2}, ${trackX} ${branchY + curveHeight / 2}, ${trackX} ${curveEndY} L ${trackX} 100%`;
+
+														return <path key={prod} d={pathD} fill="none" stroke={color} strokeWidth="2" opacity="0.6" />;
+													})}
+												</svg>
+
+												{/* The Cards in DOM Flow */}
+												<div className="flex flex-col w-full relative z-10" style={{ paddingTop: `${paddingTop}px` }}>
+													{uniqueProducts.map((prod: string, i: number) => {
+														const pItems = qItems.filter((item: any) => item.productId === prod);
+														const color = getProductColor(prod);
+														const trackX = trunkX + i * 24;
+
+														return (
+															<div key={prod} className="flex flex-col w-full mb-8">
+																{pItems.map((item: any) => (
+																	<div key={item.id} className="relative flex items-center mb-6 w-full group/item">
+																		{/* Commit Dot */}
+																		<div
+																			className="absolute rounded-full border-2 border-(--background) z-20 transition-transform duration-300 group-hover/item:scale-[1.7]"
+																			style={{
+																				left: `${trackX - 5}px`,
+																				width: '12px',
+																				height: '12px',
+																				backgroundColor: color,
+																				boxShadow: `0 0 12px ${color}`,
+																			}}
+																		></div>
+
+																		{/* Card */}
+																		<div className="w-full" style={{ paddingLeft: `${cardLeftPadding}px` }}>
+																			<motion.div
+																				layout
+																				className="flex flex-col p-5 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg hover:bg-(--foreground)/50 transition-all hover:shadow-xl hover:-translate-y-0.5 relative overflow-hidden group/card"
+																			>
+																				<div
+																					className="absolute top-0 left-0 w-1 h-full opacity-50 group-hover/card:opacity-100 transition-opacity"
+																					style={{ backgroundColor: color }}
+																				></div>
+
+																				<div className="flex justify-between items-start gap-4 mb-3">
+																					<span
+																						className="text-[10px] font-black uppercase px-2 py-1 rounded-md tracking-wider border"
+																						style={{ color: color, backgroundColor: `${color}1A`, borderColor: `${color}33` }}
+																					>
+																						{prod}
+																					</span>
+																					<div className="flex items-center gap-2">
+																						<span className={`w-2 h-2 rounded-full ${statusColors[item.status] || 'bg-gray-500'}`}></span>
+																						<span className="text-[10px] uppercase font-bold text-(--text-muted)">{item.status}</span>
+																					</div>
+																				</div>
+
+																				<h3 className="font-bold text-lg leading-tight group-hover/card:text-white transition-colors">{item.title}</h3>
+																				<p className="text-sm text-(--text-muted) mt-2 leading-relaxed">{item.description}</p>
+
+																				{item.status === 'released' && item.changelogUrl && (
+																					<a
+																						href={item.changelogUrl}
+																						className="mt-4 text-xs font-bold hover:underline flex items-center gap-1 w-fit"
+																						style={{ color: color }}
+																					>
+																						Read Changelog +-
+																					</a>
+																				)}
+																			</motion.div>
+																		</div>
+																	</div>
+																))}
 															</div>
-
-															<div className="flex flex-col mt-1">
-																<h3 className="font-bold text-xl">{item.title}</h3>
-																<p className="text-sm text-(--text-muted) mt-2 leading-relaxed">{item.description}</p>
-															</div>
-
-															{item.status === 'released' && item.changelogUrl && (
-																<a href={item.changelogUrl} className="mt-4 text-sm font-semibold text-(--accent) hover:underline flex items-center gap-1 w-fit">
-																	Read Changelog ↗
-																</a>
-															)}
-														</motion.div>
-													))}
+														);
+													})}
 												</div>
-											</div>
+											</>
 										);
-									})}
+									})()}
 								</div>
 							</div>
 						);
