@@ -47,9 +47,7 @@ export default function InfoHomePage() {
 				<div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-(--accent)/20 border border-(--accent)/30 mb-2">
 					<Compass className="w-8 h-8 text-(--accent)" />
 				</div>
-				<h1 className="text-5xl md:text-6xl font-black tracking-tight">
-					Feedback & <span className="text-(--accent)">Support</span>
-				</h1>
+				<h1 className="text-5xl md:text-6xl font-black tracking-tight">Support</h1>
 				<p className="text-xl text-(--text-muted) leading-relaxed">
 					Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.
 				</p>

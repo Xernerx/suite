@@ -1,5 +1,11 @@
 # info
 
+## 1.0.1
+
+### Patch Changes
+
+- Fixed metadata and footer content
+
 ## 1.0.0
 
 ### Major Changes

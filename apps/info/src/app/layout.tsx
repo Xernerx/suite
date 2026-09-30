@@ -13,48 +13,39 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Studios',
-		template: 'Xernerx Studios | %s',
+		default: 'Xernerx Support',
+		template: 'Xernerx Support | %s',
 	},
-	description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
+	description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report bugs.',
 
-	metadataBase: new URL('https://xernerx.com'),
+	metadataBase: new URL('https://info.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Studios',
-			template: 'Xernerx Studios | %s',
+			default: 'Xernerx Support',
+			template: 'Xernerx Support | %s',
 		},
-		description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
-		url: 'https://xernerx.com',
-		siteName: 'Xernerx',
+		description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report bugs.',
+		url: 'https://info.xernerx.com',
+		siteName: 'Xernerx Support',
 		images: [
 			{
-				url: '/banner.png',
+				url: 'https://www.xernerx.com/banner.png',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx Studios',
 			},
 		],
+		locale: 'en-US',
 		type: 'website',
 	},
 
 	twitter: {
-		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Studios',
-			template: 'Xernerx Studios | %s',
+			default: 'Xernerx Support',
+			template: 'Xernerx Support | %s',
 		},
-		description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
-		images: ['/banner.png'],
-	},
-
-	icons: {
-		icon: '/logo.png',
-	},
-
-	alternates: {
-		canonical: 'https://xernerx.com',
+		description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report bugs.',
+		card: 'summary_large_image',
 	},
 };
 
