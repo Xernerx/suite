@@ -18,19 +18,19 @@
 	"packageManager": "pnpm@11.20.0",
 	"devDependencies": {
 		"@types/react": "^19.3.0",
-		"prettier": "^3.9.6",
+		"prettier": "^3.9.9",
 		"tsc-watch": "^7.2.1",
-		"tsx": "^4.23.13",
+		"tsx": "^4.23.15",
 		"typescript": "^7.0.2"
 	},
 	"dependencies": {
-		"@xernerx/framework": "^1",
+		"@xernerx/framework": "^1.0.2",
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/stats": "^1.0.10",
-		"discord.js": "^14.22.1",
-		"mongoose": "^9.10.0",
-		"next": "^16.3.5",
+		"discord.js": "^14.27.0",
+		"mongoose": "^9.10.3",
+		"next": "^16.3.7",
 		"server-only": "^0.0.1",
-		"tslib": "^2.6.2"
+		"tslib": "^2.8.1"
 	}
 }

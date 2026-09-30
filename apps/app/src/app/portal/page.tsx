@@ -309,7 +309,7 @@ export default function PortalPage() {
 							const formData = new FormData();
 							formData.append('file', pendingUploads[field]);
 							formData.append('privacy', 'public');
-							const uploadRes = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
+							const uploadRes = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${(session?.user as any)?.id}`), {
 								method: 'POST',
 								body: formData,
 								credentials: 'include',

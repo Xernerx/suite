@@ -8,12 +8,12 @@
 		"suite": "bin.js"
 	},
 	"dependencies": {
-		"@changesets/cli": "^3.0.2",
-		"@clack/prompts": "^1.8.0",
+		"@changesets/cli": "^3.0.3",
+		"@clack/prompts": "^1.8.1",
 		"commander": "^15.0.0",
-		"mongodb-memory-server": "^11.2.0",
+		"mongodb-memory-server": "^11.3.0",
 		"shx": "^0.4.0",
-		"tsx": "^4.23.13",
+		"tsx": "^4.23.15",
 		"typescript": "^7.0.2"
 	}
 }

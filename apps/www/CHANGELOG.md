@@ -1,5 +1,11 @@
 # www
 
+## 0.9.0
+
+### Minor Changes
+
+- Added a new subdomain for info and moved roadmap, suggestions, bug reports as well as faq to info.xernerx.com
+
 ## 0.8.5
 
 ### Patch Changes
