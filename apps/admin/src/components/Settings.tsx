@@ -20,6 +20,7 @@ export default function Settings() {
 	const [joinRoles, setJoinRoles] = useState<string[]>([]);
 	const [botJoinRoles, setBotJoinRoles] = useState<string[]>([]);
 	const [sisterServers, setSisterServers] = useState<{ id: string }[]>([]);
+	const [roadmapProducts, setRoadmapProducts] = useState<string[]>(['Dashboard', 'API', 'CDN', 'Bots']);
 	const [availableRoles, setAvailableRoles] = useState<
 		{
 			id: string;
@@ -54,7 +55,7 @@ export default function Settings() {
 	const fetchSettings = async () => {
 		setIsLoading(true);
 		try {
-			const [adminRes, webhookRes, joinRes, botJoinRes, sisterRes, rolesRes] = await Promise.all([
+			const [adminRes, webhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
 					credentials: 'include',
 				}),
@@ -66,6 +67,15 @@ export default function Settings() {
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/bot_join_roles'), {
 					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ value: JSON.stringify(roadmapProducts.filter(Boolean)), valueType: 'json' }),
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), {
 					credentials: 'include',
@@ -89,6 +99,15 @@ export default function Settings() {
 					setJoinRoles(Array.isArray(parsed) ? parsed : []);
 				} catch {
 					setJoinRoles([]);
+				}
+			}
+			if (roadmapRes.ok) {
+				const data = await roadmapRes.json();
+				try {
+					const parsed = JSON.parse(data.value || '[]');
+					setRoadmapProducts(parsed.length ? parsed : ['Dashboard', 'API', 'CDN', 'Bots']);
+				} catch {
+					setRoadmapProducts(['Dashboard', 'API', 'CDN', 'Bots']);
 				}
 			}
 			if (botJoinRes.ok) {

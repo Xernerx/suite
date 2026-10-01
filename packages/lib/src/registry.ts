@@ -12,6 +12,9 @@ import CoreAppInviteSchema from './models/xernerx/core/AppInvite';
 import CoreRoleSchema from './models/xernerx/core/Role';
 import CoreAnnouncementSchema from './models/xernerx/core/Announcement';
 import CoreMediaSchema from './models/xernerx/core/Media';
+import CoreSuggestionSchema from './models/xernerx/core/Suggestion';
+import CoreRoadmapItemSchema from './models/xernerx/core/RoadmapItem';
+import CoreIssueSchema from './models/xernerx/core/Issue';
 
 import DispatchApplicationSchema from './models/xernerx/dispatch/Application';
 import DispatchApplicationConfigSchema from './models/xernerx/dispatch/ApplicationConfig';
@@ -49,6 +52,9 @@ export const xernerxModels = {
 		Role: { schema: CoreRoleSchema, modelName: 'Role' },
 		Announcement: { schema: CoreAnnouncementSchema, modelName: 'Announcement' },
 		Media: { schema: CoreMediaSchema, modelName: 'Media' },
+		Suggestion: { schema: CoreSuggestionSchema, modelName: 'Suggestion' },
+		RoadmapItem: { schema: CoreRoadmapItemSchema, modelName: 'RoadmapItem' },
+		Issue: { schema: CoreIssueSchema, modelName: 'Issue' },
 	},
 	dispatch: {
 		Application: { schema: DispatchApplicationSchema, modelName: 'Application' },

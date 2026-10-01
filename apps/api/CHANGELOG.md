@@ -1,5 +1,32 @@
 # api
 
+## 0.8.0
+
+### Minor Changes
+
+- Added a new roadmap and suggestions feature
+
+## 0.7.8
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.4.0
+    - @xernerx/components@0.2.24
+    - @xernerx/feedback@0.0.25
+    - @xernerx/ui@0.3.8
+
+## 0.7.7
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.6.0
+    - @xernerx/components@0.2.23
+    - @xernerx/providers@0.3.16
+    - @xernerx/feedback@0.0.24
+    - @xernerx/ui@0.3.7
+
 ## 0.7.6
 
 ### Patch Changes

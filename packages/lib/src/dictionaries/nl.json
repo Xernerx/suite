@@ -136,7 +136,46 @@
 			"tooltip": "Open App Overzicht (Ctrl + K)"
 		},
 		"error": {
-			"title": "Er ging iets mis!"
+			"title": "Er ging iets mis!",
+			"description": "Er is een probleem met het laden van dit onderdeel.",
+			"button": "Opnieuw proberen"
+		},
+		"globalerror": {
+			"title": "Fatale Applicatie Fout",
+			"button": "Applicatie Herstarten"
+		},
+		"notfound": {
+			"description": "Error 404",
+			"title": "Signaal Verloren.",
+			"description2": "De resource die je hebt aangevraagd kan niet worden gevonden in het huidige routingmanifest.",
+			"button": "Ga Terug",
+			"button2": "Naar Hoofdpagina"
+		},
+		"shortcutsprovider": {
+			"title": "Wijzigingsregister",
+			"description": "Recente applicatie aanpassingen en uitgaven.",
+			"title2": "Keyboard Snelkoppelingen",
+			"description2": "Snelle commando's om efficient te navigeren",
+			"tooltip": "Bekijk Wijzigingsregister",
+			"description3": "App:",
+			"description4": "Druk",
+			"description5": "sluiten",
+			"text": "Esc"
+		},
+		"supportprovider": {
+			"description": "Krijg Ondersteuning"
+		},
+		"toastprovider": {
+			"description": "Opgepast — je hebt onopgeslagen aanpassingen!",
+			"button": "Reset",
+			"button2": "Opslaan"
+		},
+		"multiselector": {
+			"description": "Geen opties"
+		},
+		"selector": {
+			"placeholder": "Zoek...",
+			"description": "Geen opties gevonden"
 		}
 	},
 	"api": {
@@ -624,7 +663,36 @@
 	},
 	"admin": {
 		"roles": {
-			"title": "Rollen Beheer"
+			"title": "Rollen Beheer",
+			"serverId": "Server ID",
+			"members": "Leden",
+			"newRoleButton": "Nieuwe Rol",
+			"searchPlaceholder": "Zoek op rol naam, UUID of Discord ID",
+			"noRolesFound": "Geen rol gevonden met jouw zoekopdracht.",
+			"unnamedRole": "Naamloze Rol",
+			"unlinked": "Geen Link",
+			"synced": "Gesynchroniseerd",
+			"uuid": "UUID:",
+			"noneUnlinked": "Geen (Geen link)",
+			"manageConfig": "Beheer Rol Configuratie",
+			"roleNameLabel": "Rol Naam",
+			"roleNamePlaceholder": "b.v. Administrator",
+			"linkDiscordRoleLabel": "Link Discord Rol",
+			"selectDiscordRolePlaceholder": "Selecteer Discord Rol",
+			"syncNameWithDiscord": "Synchroniseer naam met Discord",
+			"permissionsHeader": "Rechten",
+			"deleteRole": "Rol Verwijderen",
+			"saveChanges": "Aanpassingen Opslaan",
+			"saving": "Opslaan...",
+			"confirmDelete": "Verwijder",
+			"cancel": "Annuleer",
+			"createModalTitle": "Nieuwe Rol Maken",
+			"createButton": "Rol Maken",
+			"creating": "Maken...",
+			"errorPrefix": "Error:",
+			"card": {
+				"idPrefix": "Id: {id}"
+			}
 		}
 	}
 }

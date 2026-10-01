@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useEnvironment, useToast, usePermissions, useDictionary } from '@xernerx/providers';
+import { useEnvironment, useToast, usePermissions, useDictionary, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Modal, Input, Selector } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { Trash, Upload, ExternalLink, ShieldAlert, Settings, Plus, X, User as Us
 export default function Media() {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const { user } = useUser();
 	const { toast } = useToast();
 	const { hasPermission } = usePermissions();
 	const canManage = hasPermission('manageMedia');
@@ -102,7 +103,7 @@ export default function Media() {
 			formData.append('file', file);
 			formData.append('privacy', 'public');
 
-			const res = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
+			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${user?.id}`), {
 				method: 'POST',
 				body: formData,
 				credentials: 'include',

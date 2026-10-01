@@ -78,6 +78,9 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 						case 'admin.xernerx.com':
 							url.port = '4006';
 							break;
+						case 'info.xernerx.com':
+							url.port = '4007';
+							break;
 						case 'xernerx.com':
 						case 'www.xernerx.com':
 							url.port = '4000';

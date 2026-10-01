@@ -1,5 +1,44 @@
 # admin
 
+## 0.6.2
+
+### Patch Changes
+
+- Fixed some UI issues and make the roadmap look cleaner
+
+## 0.6.1
+
+### Patch Changes
+
+- Fixed interaction issues and product listing
+
+## 0.6.0
+
+### Minor Changes
+
+- Added a new roadmap and suggestions feature
+
+## 0.5.10
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.4.0
+    - @xernerx/components@0.2.24
+    - @xernerx/feedback@0.0.25
+    - @xernerx/ui@0.3.8
+
+## 0.5.9
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.6.0
+    - @xernerx/components@0.2.23
+    - @xernerx/providers@0.3.16
+    - @xernerx/feedback@0.0.24
+    - @xernerx/ui@0.3.7
+
 ## 0.5.8
 
 ### Patch Changes

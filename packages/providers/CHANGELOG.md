@@ -1,5 +1,18 @@
 # @xernerx/providers
 
+## 0.4.0
+
+### Minor Changes
+
+- Added a new support icon when users are not part of the support server
+
+## 0.3.16
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.6.0
+
 ## 0.3.15
 
 ### Patch Changes

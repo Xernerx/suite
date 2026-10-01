@@ -1,10 +1,31 @@
 # cdn
 
+## 1.0.9
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.4.0
+    - @xernerx/components@0.2.24
+    - @xernerx/feedback@0.0.25
+    - @xernerx/ui@0.3.8
+
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@0.6.0
+    - @xernerx/components@0.2.23
+    - @xernerx/providers@0.3.16
+    - @xernerx/feedback@0.0.24
+    - @xernerx/ui@0.3.7
+
 ## 1.0.7
 
 ### Patch Changes
 
-- Fixed an issue where only public environments would show version changes, also added a quicklink to the changelog page to quickly reference versions
+- Fixed opengraph rendering of the viewer, also added quicklink to the viewer routes.
 
 ## 1.0.6
 
