@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Coins, Copy, Flame, Gift, Monitor, Pencil, ShieldAlert, ShieldCheck, Smartphone, Tablet, UserIcon, Zap } from 'lucide-react';
+import { Coins, Copy, Flame, Gift, Monitor, Pencil, ShieldAlert, ShieldCheck, Smartphone, Sparkles, Tablet, UserIcon, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, usePlatform, useUser, useToast } from '@xernerx/providers';
 
@@ -129,6 +129,11 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 	const now = Date.now();
 	const isReadyToClaim = now >= giftInTime;
 	const currentStreak = activeUser?.credits?.streak ?? 0;
+	const currentLevel = activeUser?.level?.level ?? activeUser?.levels?.[0]?.level ?? 1;
+	const totalXp = activeUser?.level?.xp ?? activeUser?.levels?.[0]?.xp ?? 0;
+	const xpRequired = currentLevel * 100;
+	const currentLevelXp = totalXp % xpRequired;
+	const levelProgress = Math.min(100, Math.max(totalXp > 0 ? 3 : 0, Math.round((currentLevelXp / xpRequired) * 100)));
 
 	return (
 		<motion.div
@@ -221,6 +226,24 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 						))}
 					</div>
 				)}
+
+				{/* Level Progress Bar Display */}
+				<div className="flex flex-col gap-1.5 bg-(--foreground)/30 backdrop-blur-md/30 px-3 py-2 rounded-xl border border-(--border)/5">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-1.5 text-xs font-extrabold text-(--accent)">
+							<Sparkles size={13} className="text-(--accent)" />
+							<span>
+								{t('components.cards.sidebaruser.level') || 'Level'} {currentLevel}
+							</span>
+						</div>
+						<span className="text-[10px] text-(--text-muted) font-mono font-medium">
+							{currentLevelXp.toLocaleString()} / {xpRequired.toLocaleString()} XP
+						</span>
+					</div>
+					<div className="w-full h-1.5 bg-(--border)/10 rounded-full overflow-hidden">
+						<div className="h-full bg-(--accent) rounded-full transition-all duration-500 shadow-[0_0_8px_var(--accent)]" style={{ width: `${levelProgress}%` }} />
+					</div>
+				</div>
 
 				{/* Credits Balance Display */}
 				<div className="flex items-center justify-between bg-(--foreground)/30 backdrop-blur-md/30 px-3 py-2 rounded-xl border border-(--border)/5">

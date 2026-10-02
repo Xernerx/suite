@@ -4,11 +4,12 @@ import DiscordProvider from 'next-auth/providers/discord';
 import { NextAuthOptions, DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
-	interface Session extends DefaultSession {
+	interface Session {
 		user: {
 			id: string;
 		} & DefaultSession['user'];
-		[index: string]: any;
+		accessToken?: string;
+		error?: string;
 	}
 }
 
@@ -40,6 +41,7 @@ async function refreshAccessToken(token: any) {
 		console.error('Error refreshing Discord access token', error);
 		return {
 			...token,
+			accessToken: undefined,
 			error: 'RefreshAccessTokenError',
 		};
 	}

@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 		const { models } = await database('xernerx');
 		const item = await models.core.Issue.create({
 			id: crypto.randomUUID(),
+			acknowledged: true,
 			...body,
 		});
 		return NextResponse.json({ data: item });

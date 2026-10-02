@@ -15,10 +15,10 @@ const handler = NextAuth({
 		sessionToken: {
 			name: '__Secure-next-auth.session-token',
 			options: {
-				domain: '.dummi.me',
+				domain: '.xernerx.com',
 				path: '/',
 				httpOnly: true,
-				sameSite: 'lax',
+				sameSite: 'none',
 				secure: true,
 			},
 		},
@@ -32,6 +32,7 @@ const handler = NextAuth({
 					id: token.sub as string,
 				},
 				accessToken: token.accessToken,
+				error: token.error,
 			};
 		},
 	},

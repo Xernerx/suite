@@ -53,7 +53,8 @@
 				"billing": "Facturación",
 				"developer": "Desarrollador",
 				"administrator": "Admnistrador",
-				"translator": "Traductor"
+				"translator": "Traductor",
+				"product": "Product"
 			},
 			"items": {
 				"account": "Cuenta",
@@ -68,7 +69,10 @@
 				"store": "Tienda",
 				"users": "Usarios",
 				"roles": "Roles",
-				"translations": "Traducciones"
+				"translations": "Traducciones",
+				"roadmap": "Roadmap",
+				"suggestions": "Suggestions",
+				"issues": "Issues"
 			}
 		}
 	},
@@ -364,6 +368,167 @@
 		"description": "Has localizado el servicio central y router de endpoints para Xernerx. En este sitio no se hace gestión de recursos, cambios de configuración, o controles interactivos.",
 		"section": {
 			"title": "Buscas acceso?"
+		}
+	},
+	"info": {
+		"home": {
+			"title": "Support",
+			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
+			"portals": {
+				"roadmap": {
+					"title": "Roadmap",
+					"description": "See what we are building right now, what is coming next, and track our progress on long-term goals."
+				},
+				"suggestions": {
+					"title": "Suggestions",
+					"description": "Have a great idea? Submit it to our community sandbox where others can vote it up to our roadmap!"
+				},
+				"bugs": {
+					"title": "Bug Tracker",
+					"description": "Found a glitch? Report it here so our engineers can squash it and move it to the known issues list."
+				},
+				"faq": {
+					"title": "FAQ",
+					"description": "Frequently asked questions, billing inquiries, and general help with your Xernerx account."
+				}
+			}
+		},
+		"roadmap": {
+			"title": "Platform Roadmap",
+			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
+			"metrics": {
+				"avgResolutionTime": "Avg Bug Resolution Time",
+				"recentResolutions": "Issues Resolved Recently",
+				"hours": "{count} hours",
+				"na": "N/A"
+			},
+			"timeline": {
+				"today": "Today",
+				"backlog": "Backlog",
+				"readChangelog": "Read Changelog",
+				"status": {
+					"idea": "Idea",
+					"planned": "Planned",
+					"active": "In Progress",
+					"released": "Released"
+				}
+			},
+			"knownIssues": {
+				"title": "Known Issues Tracker",
+				"description": "A transparent log of active bugs and recently resolved problems across our ecosystem.",
+				"openIssues": "Open Issues",
+				"noOpenIssues": "No active issues known! Everything is running smoothly.",
+				"recentlyResolved": "Recently Resolved",
+				"noResolvedIssues": "No recently resolved issues.",
+				"fixedOn": "Fixed {date}"
+			}
+		},
+		"suggestions": {
+			"title": "Feature Sandbox",
+			"description": "Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.",
+			"newSuggestion": "New Suggestion",
+			"titlePlaceholder": "Title",
+			"descriptionPlaceholder": "Description",
+			"selectProduct": "Select Product",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"searchPlaceholder": "Search suggestions (e.g. 'discord bot')...",
+			"noMatch": "No suggestions match \"{query}\".",
+			"addAsNew": "Add as a New Suggestion",
+			"loginToSubmit": "Log in to submit this as a new idea!",
+			"toasts": {
+				"notAuthenticated": "Not Authenticated",
+				"mustBeLoggedIn": "You must be logged in to post.",
+				"mustBeLoggedInVote": "You must be logged in to vote.",
+				"duplicateTitle": "A suggestion with this exact title already exists!",
+				"duplicate": "Duplicate",
+				"submitted": "Suggestion submitted!",
+				"success": "Success",
+				"failedToPost": "Failed to post",
+				"failedToVote": "Failed to vote",
+				"error": "Error"
+			}
+		},
+		"bugs": {
+			"title": "Bug Tracker",
+			"description": "Report bugs or issues you encounter. Bugs are reviewed by our team and moved to the known issues list once verified.",
+			"newBug": "New Bug",
+			"titlePlaceholder": "Title",
+			"descriptionPlaceholder": "Description",
+			"selectProduct": "Select Product",
+			"attachFile": "Attach Screenshot/Log (Optional)",
+			"uploading": "Uploading...",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"searchPlaceholder": "Search bugs (e.g. 'login error')...",
+			"noMatch": "No bugs match \"{query}\".",
+			"reportAsNew": "Report as a New Bug",
+			"status": {
+				"resolved": "Resolved",
+				"verified": "Verified",
+				"pendingReview": "Pending Review",
+				"submitted": "Enviado"
+			},
+			"toasts": {
+				"notAuthenticated": "Not Authenticated",
+				"mustBeLoggedIn": "You must be logged in to post.",
+				"duplicate": "Duplicate",
+				"duplicateTitle": "A bug with this exact title already exists!",
+				"submitted": "Bug submitted!",
+				"success": "Success",
+				"uploadFailed": "Upload Failed",
+				"failedToUpload": "Failed to upload attachment",
+				"failedToPost": "Failed to post",
+				"error": "Error"
+			},
+			"tooltips": {
+				"verified": "Este problema ha sido reconocido por los desarrolladores y se solucionará en el futuro.",
+				"submitted": "Este problema ha sido enviado por la comunidad y aún no ha sido reconocido.",
+				"resolved": "Este problema ha sido solucionado."
+			}
+		}
+	},
+	"admin": {
+		"dashboard": {
+			"issues": {
+				"title": "Issue Tracker",
+				"logBug": "Log Bug",
+				"status": "Status",
+				"resolved": "Resolved",
+				"verified": "Verified",
+				"pending": "Pending Review",
+				"modalTitle": "Log New Issue",
+				"titlePlaceholder": "Title",
+				"descPlaceholder": "Description",
+				"productPlaceholder": "Select Product",
+				"save": "Save",
+				"cancel": "Cancel",
+				"submitted": "Enviado",
+				"verify": "Verificar"
+			},
+			"roadmap": {
+				"title": "Roadmap Management",
+				"addItem": "Add Item",
+				"modalTitle": "Add Roadmap Item",
+				"titlePlaceholder": "Title",
+				"descPlaceholder": "Description",
+				"productPlaceholder": "Select Product",
+				"quarterPlaceholder": "Target Quarter (e.g. Q1 2026)",
+				"statusPlaceholder": "Select Status",
+				"changelogPlaceholder": "Changelog URL (Optional)",
+				"save": "Save",
+				"cancel": "Cancel"
+			},
+			"suggestions": {
+				"title": "Community Suggestions",
+				"status": "Status",
+				"open": "Open",
+				"approved": "Approved",
+				"rejected": "Rejected",
+				"implemented": "Implemented",
+				"moveToRoadmap": "Move to Roadmap",
+				"votes": "Votes"
+			}
 		}
 	}
 }

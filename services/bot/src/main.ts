@@ -1,4 +1,10 @@
-/** @format */
+import path from 'path';
+
+for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')]) {
+	try {
+		process.loadEnvFile(envPath);
+	} catch {}
+}
 
 import { XernerxClient } from '@xernerx/framework';
 import { XernerxStats } from '@xernerx/stats';

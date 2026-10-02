@@ -1,5 +1,11 @@
 # info
 
+## 1.0.2
+
+### Patch Changes
+
+- Fixed issues on the api routes and pages to do with UI and loading
+
 ## 1.0.1
 
 ### Patch Changes

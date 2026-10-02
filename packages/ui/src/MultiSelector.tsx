@@ -38,9 +38,23 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
+	const [openUpwards, setOpenUpwards] = useState(false);
+
 	useEffect(() => {
-		if (open && searchable) {
-			setTimeout(() => inputRef.current?.focus(), 50);
+		if (open) {
+			if (ref.current) {
+				const rect = ref.current.getBoundingClientRect();
+				const spaceBelow = window.innerHeight - rect.bottom;
+				const spaceAbove = rect.top;
+				if (spaceBelow < 260 && spaceAbove > spaceBelow) {
+					setOpenUpwards(true);
+				} else {
+					setOpenUpwards(false);
+				}
+			}
+			if (searchable) {
+				setTimeout(() => inputRef.current?.focus(), 50);
+			}
 		} else {
 			setQuery('');
 		}
@@ -105,7 +119,7 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 					<motion.div
 						initial={{
 							opacity: 0,
-							y: -4,
+							y: openUpwards ? 4 : -4,
 						}}
 						animate={{
 							opacity: 1,
@@ -113,13 +127,13 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 						}}
 						exit={{
 							opacity: 0,
-							y: -4,
+							y: openUpwards ? 4 : -4,
 						}}
 						transition={{
 							duration: 0.15,
 							ease: 'easeOut',
 						}}
-						className="absolute left-0 top-[calc(100%+8px)] z-[100] w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl p-2"
+						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl p-2`}
 					>
 						<div className="flex flex-col gap-1">
 							{searchable && (

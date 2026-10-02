@@ -61,34 +61,37 @@ export default async function Server(msg: any) {
 
 	switch (msg.method) {
 		case 'get':
-			return model.findOne(getFilter(msg.action, msg.body));
+			return model.findOne(getFilter(msg.action, msg.body)).lean();
 
 		case 'create':
 			try {
-				return await model.create(msg.body);
+				const res = await model.create(msg.body);
+				return res?.toObject ? res.toObject() : res;
 			} catch (error: any) {
 				if (error?.code === 11000) {
-					return model.findOne(getFilter(msg.action, msg.body));
+					return model.findOne(getFilter(msg.action, msg.body)).lean();
 				}
 
 				throw error;
 			}
 
 		case 'update':
-			return model.findOneAndUpdate(
-				getFilter(msg.action, msg.body),
-				{
-					$set: msg.body,
-				},
-				{
-					returnDocument: 'after',
-					runValidators: true,
-					upsert: false,
-				}
-			);
+			return model
+				.findOneAndUpdate(
+					getFilter(msg.action, msg.body),
+					{
+						$set: msg.body,
+					},
+					{
+						returnDocument: 'after',
+						runValidators: true,
+						upsert: true,
+					}
+				)
+				.lean();
 
 		case 'delete':
-			return model.findOneAndDelete(getFilter(msg.action, msg.body));
+			return model.findOneAndDelete(getFilter(msg.action, msg.body)).lean();
 
 		default:
 			throw new Error('Unknown method');

@@ -139,46 +139,46 @@ export default function DocsHome() {
 							return t(category.titleKey).toLowerCase().includes(q) || t(category.descKey).toLowerCase().includes(q);
 						})
 						.map((category, idx) => (
-						<motion.a
-							href={category.href}
-							key={idx}
-							variants={{
-								hidden: {
-									opacity: 0,
-									y: 20,
-								},
-								visible: {
-									opacity: 1,
-									y: 0,
-								},
-							}}
-							className="group flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer overflow-hidden relative"
-							style={{
-								padding: 'calc(var(--ui-gap) * 2)',
-								gap: 'var(--ui-gap)',
-							}}
-						>
-							{/* Subtle background gradient on hover */}
-							<div className="absolute inset-0 bg-gradient-to-br from-transparent to-(--border)/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+							<motion.a
+								href={category.href}
+								key={idx}
+								variants={{
+									hidden: {
+										opacity: 0,
+										y: 20,
+									},
+									visible: {
+										opacity: 1,
+										y: 0,
+									},
+								}}
+								className="group flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer overflow-hidden relative"
+								style={{
+									padding: 'calc(var(--ui-gap) * 2)',
+									gap: 'var(--ui-gap)',
+								}}
+							>
+								{/* Subtle background gradient on hover */}
+								<div className="absolute inset-0 bg-gradient-to-br from-transparent to-(--border)/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-							<div className="flex flex-col gap-4 relative z-10">
-								<div
-									className={`flex h-16 w-16 items-center justify-center rounded-2xl ${category.bg} ${category.color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-inner`}
-								>
-									<category.icon size={32} />
+								<div className="flex flex-col gap-4 relative z-10">
+									<div
+										className={`flex h-16 w-16 items-center justify-center rounded-2xl ${category.bg} ${category.color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-inner`}
+									>
+										<category.icon size={32} />
+									</div>
+									<h3
+										className="text-2xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mt-2"
+										style={{
+											fontFamily: 'var(--font-fredoka)',
+										}}
+									>
+										{t(category.titleKey)}
+									</h3>
 								</div>
-								<h3
-									className="text-2xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mt-2"
-									style={{
-										fontFamily: 'var(--font-fredoka)',
-									}}
-								>
-									{t(category.titleKey)}
-								</h3>
-							</div>
-							<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{t(category.descKey)}</p>
-						</motion.a>
-					))}
+								<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{t(category.descKey)}</p>
+							</motion.a>
+						))}
 				</motion.div>
 			</div>
 		</div>

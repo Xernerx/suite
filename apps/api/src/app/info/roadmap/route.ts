@@ -1,6 +1,8 @@
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');

@@ -1,492 +1,298 @@
-// /** @format */
-
-// 'use client';
-
-// import { Info, Loader2, Sparkles } from 'lucide-react';
-// import { useEffect, useRef, useState } from 'react';
-
-// import { XernerxWebsocket } from '@xernerx/websocket';
-// import { motion } from 'framer-motion';
-
-// const inputStyle = {
-// 	borderColor: 'var(--border)',
-// 	background: 'color-mix(in srgb, var(--bg-main) 45%, var(--bg-panel))',
-// 	color: 'var(--text-main)',
-// };
-
-// // export default function Virtue({ id }: { id?: string }) {
-// 	const clientRef = useRef<XernerxWebsocket | null>(null);
-
-// 	const [profile, setProfile] = useState<any | null>(null);
-// 	const [loading, setLoading] = useState(false);
-
-// 	const [state, setState] = useState({
-// 		mode: 'balanced',
-// 		cycles: {
-// 			daily: false,
-// 			weekly: false,
-// 			monthly: false,
-// 		},
-// 		roles: {
-// 			ignored: [] as string[],
-// 			tracked: [] as string[],
-// 		},
-
-// 		levelUp: true,
-// 		levelMessage: '[@mention] reached level [@level] :tada:!',
-// 		levelChannel: '' as string | null,
-
-// 		saving: false,
-// 		autoDelete: 0,
-// 	});
-
-// 	/* ================= INIT WS CLIENT ================= */
-
-// 	useEffect(() => {
-// 		let cancelled = false;
-
-// 		(async () => {
-// 			try {
-// 				const res = await fetch('/api/ws/token');
-// 				const { token } = await res.json();
-
-// 				if (cancelled) return;
-
-// 				clientRef.current = new XernerxWebsocket({ token });
-
-// 				await clientRef.current.connect();
-// 			} catch (err) {
-// 				console.error('WS init failed:', err);
-// 			}
-// 		})();
-
-// 		return () => {
-// 			cancelled = true;
-// 			clientRef.current?.disconnect();
-// 			clientRef.current = null;
-// 		};
-// 	}, []);
-
-// 	/* ================= FETCH PROFILE ================= */
-
-// 	useEffect(() => {
-// 		if (!id) return;
-
-// 		let cancelled = false;
-
-// 		const run = async () => {
-// 			if (!clientRef.current) {
-// 				// wait until WS is ready
-// 				await new Promise((resolve) => {
-// 					const interval = setInterval(() => {
-// 						if (clientRef.current) {
-// 							clearInterval(interval);
-// 							resolve(true);
-// 						}
-// 					}, 50);
-// 				});
-// 			}
-
-// 			try {
-// 				setLoading(true);
-// 				setProfile(null);
-
-// 				const data = await clientRef.current!.get('virtue', 'guilds', {
-// 					id: id,
-// 				});
-
-// 				if (!cancelled) {
-// 					setProfile(data?._doc);
-// 				}
-// 			} catch (err) {
-// 				console.error('Virtue fetch failed:', err);
-
-// 				if (!cancelled) {
-// 					setProfile(null);
-// 				}
-// 			} finally {
-// 				if (!cancelled) setLoading(false);
-// 			}
-// 		};
-
-// 		run();
-
-// 		return () => {
-// 			cancelled = true;
-// 		};
-// 	}, [id]);
-
-// 	/* ================= SYNC STATE ================= */
-
-// 	useEffect(() => {
-// 		if (!profile) return;
-
-// 		setState((prev) => ({
-// 			...prev,
-// 			mode: profile.mode ?? 'balanced',
-
-// 			cycles: {
-// 				daily: profile.cycles?.daily ?? false,
-// 				weekly: profile.cycles?.weekly ?? false,
-// 				monthly: profile.cycles?.monthly ?? false,
-// 			},
-
-// 			roles: {
-// 				ignored: profile.roles?.ignored ?? [],
-// 				tracked: profile.roles?.tracked ?? [],
-// 			},
-
-// 			levelUp: profile.levelUp ?? true,
-// 			levelMessage: profile.levelMessage ?? '[@mention] reached level [@level] :tada:!',
-// 			levelChannel: profile.levelChannel ?? '',
-
-// 			autoDelete: profile.autoDelete ?? 0,
-// 		}));
-// 	}, [profile]);
-
-// 	async function ensureFreshConnection() {
-// 		const res = await fetch('/api/ws/token');
-// 		const { token } = await res.json();
-
-// 		clientRef.current?.disconnect();
-
-// 		const client = new XernerxWebsocket({
-// 			token,
-// 		});
-
-// 		await client.connect();
-// 		clientRef.current = client;
-// 	}
-
-// 	if (!id) return null;
-
-// 	/* ================= LOADING ================= */
-
-// 	if (loading) {
-// 		return (
-// 			<div className="flex items-center justify-center py-20">
-// 				<div className="flex items-center gap-2 text-sm opacity-60">
-// 					<Loader2 className="h-4 w-4 animate-spin" />
-// 					Loading Virtue...
-// 				</div>
-// 			</div>
-// 		);
-// 	}
-
-// 	/* ================= NO PROFILE ================= */
-
-// 	if (!profile) {
-// 		return (
-// 			<div className="w-full py-16">
-// 				<motion.div
-// 					initial={{ opacity: 0, y: 12 }}
-// 					animate={{ opacity: 1, y: 0 }}
-// 					className="relative w-full rounded-3xl border p-8"
-// 					style={{
-// 						borderColor: 'var(--border)',
-// 						background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-// 					}}
-// 				>
-// 					<div
-// 						className="pointer-events-none absolute inset-0 rounded-3xl"
-// 						style={{
-// 							background: 'radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%)',
-// 						}}
-// 					/>
-
-// 					<div className="relative flex flex-col items-center justify-center gap-5 text-center">
-// 						<div
-// 							className="flex h-16 w-16 items-center justify-center rounded-2xl border"
-// 							style={{
-// 								borderColor: 'color-mix(in srgb, var(--accent) 30%, var(--border))',
-// 								background: 'color-mix(in srgb, var(--accent) 12%, transparent)',
-// 							}}
-// 						>
-// 							<Sparkles className="h-7 w-7" />
-// 						</div>
-
-// 						<div className="max-w-xl">
-// 							<h2 className="text-xl font-semibold">Virtue isn’t part of this server yet</h2>
-
-// 							<p
-// 								className="pt-4 pb-4 text-sm leading-relaxed"
-// 								style={{
-// 									color: 'color-mix(in srgb, var(--text-main) 70%, transparent)',
-// 								}}
-// 							>
-// 								Virtue is a Discord bot focused on community engagement through leveling systems. Track progress globally or per server, and configure resets for monthly, weekly, or
-// 								daily cycles.
-// 							</p>
-// 						</div>
-
-// 						<a
-// 							href="/invite/virtue"
-// 							className="inline-flex items-center justify-center rounded-2xl border px-6 py-3 text-sm font-medium transition hover:scale-[1.04]"
-// 							style={{
-// 								borderColor: 'color-mix(in srgb, var(--accent) 35%, var(--border))',
-// 								background: 'color-mix(in srgb, var(--accent) 16%, transparent)',
-// 								color: 'var(--text-main)',
-// 							}}
-// 						>
-// 							Invite Virtue
-// 						</a>
-// 					</div>
-// 				</motion.div>
-// 			</div>
-// 		);
-// 	}
-
-// 	/* ================= SAVE ================= */
-
-// 	async function save() {
-// 		if (!clientRef.current) return;
-
-// 		setState((s) => ({ ...s, saving: true }));
-
-// 		await ensureFreshConnection();
-
-// 		try {
-// 			await clientRef.current.update('virtue', 'guilds', {
-// 				id: id,
-// 				mode: state.mode,
-// 				cycles: state.cycles,
-// 				roles: state.roles,
-
-// 				levelUp: state.levelUp,
-// 				levelMessage: state.levelMessage,
-// 				levelChannel: state.levelChannel || null,
-
-// 				autoDelete: state.autoDelete,
-// 			});
-// 		} catch (err) {
-// 			console.error('Save failed:', err);
-// 		} finally {
-// 			setState((s) => ({ ...s, saving: false }));
-// 		}
-// 	}
-
-// 	/* ================= UI ================= */
-
-// 	return (
-// 		<div
-// 			className="rounded-3xl border p-6"
-// 			style={{
-// 				borderColor: 'var(--border)',
-// 				background: 'color-mix(in srgb, var(--bg-panel) 88%, transparent)',
-// 			}}
-// 		>
-// 			<div className="flex flex-col gap-6">
-// 				<div>
-// 					<h2 className="text-lg font-semibold">Virtue Settings</h2>
-// 					<p
-// 						className="text-sm mt-1"
-// 						style={{
-// 							color: 'color-mix(in srgb, var(--text-main) 65%, transparent)',
-// 						}}
-// 					>
-// 						Configure leveling behavior and tracking rules.
-// 					</p>
-// 				</div>
-
-// 				<div className="flex flex-col gap-2">
-// 					<label className="text-sm font-medium">Level Mode</label>
-
-// 					<select value={state.mode} onChange={(e) => setState((s) => ({ ...s, mode: e.target.value }))} className="rounded-2xl border px-4 py-3 text-sm outline-none" style={inputStyle}>
-// 						{['easy', 'casual', 'balanced', 'hard', 'extreme'].map((m) => (
-// 							<option key={m} value={m}>
-// 								{m.charAt(0).toUpperCase() + m.slice(1)}
-// 							</option>
-// 						))}
-// 					</select>
-// 				</div>
-
-// 				{/* <div className='flex flex-col gap-3'>
-// 					<label className='text-sm font-medium'>Reset Cycles</label>
-
-// 					<div className='grid grid-cols-3 gap-2'>
-// 						{(['daily', 'weekly', 'monthly'] as const).map((key) => {
-// 							const active = state.cycles[key];
-
-// 							return (
-// 								<button
-// 									key={key}
-// 									onClick={() =>
-// 										setState((s) => ({
-// 											...s,
-// 											cycles: {
-// 												...s.cycles,
-// 												[key]: !active,
-// 											},
-// 										}))
-// 									}
-// 									className='rounded-2xl border px-4 py-2 text-sm'
-// 									style={{
-// 										borderColor: active ? 'color-mix(in srgb, var(--accent) 35%, var(--border))' : 'var(--border)',
-// 										background: active ? 'color-mix(in srgb, var(--accent) 14%, transparent)' : 'color-mix(in srgb, var(--bg-panel) 76%, transparent)',
-// 									}}>
-// 									{key}
-// 								</button>
-// 							);
-// 						})}
-// 					</div>
-// 				</div> */}
-
-// 				<div className="flex flex-col gap-4">
-// 					<div className="flex items-center justify-between">
-// 						<label className="text-sm font-medium">Level Up Messages</label>
-
-// 						<button
-// 							type="button"
-// 							onClick={() => setState((s) => ({ ...s, levelUp: !s.levelUp }))}
-// 							className="relative w-9 h-5 rounded-full transition"
-// 							style={{
-// 								background: state.levelUp ? 'var(--accent)' : 'color-mix(in srgb, var(--border) 70%, transparent)',
-// 							}}
-// 						>
-// 							<motion.div
-// 								layout
-// 								transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-// 								className="absolute top-0.5 w-4 h-4 rounded-full bg-white"
-// 								style={{
-// 									left: state.levelUp ? 'calc(100% - 18px)' : '2px',
-// 								}}
-// 							/>
-// 						</button>
-// 					</div>
-
-// 					<div className="flex flex-col gap-2">
-// 						<div className="flex items-center justify-between gap-3 pt-1">
-// 							<div className="flex items-center gap-1.5 text-sm">
-// 								<span
-// 									style={{
-// 										color: `color-mix(in srgb, var(${state.levelChannel ? '--text-muted' : '--text-main'}) 80%, transparent)`,
-// 									}}
-// 								>
-// 									Auto delete after
-// 								</span>
-
-// 								<div title="0 disables auto delete • max 60 seconds" className="opacity-60 hover:opacity-100 transition cursor-help">
-// 									<Info size={14} />
-// 								</div>
-// 							</div>
-
-// 							<div className="flex items-center gap-2">
-// 								<input
-// 									type="number"
-// 									min={0}
-// 									max={60}
-// 									disabled={!!state.levelChannel}
-// 									value={!state.levelChannel ? state.autoDelete || 0 : 0}
-// 									onChange={(e) =>
-// 										setState((s) => ({
-// 											...s,
-// 											autoDelete: Number(e.target.value),
-// 										}))
-// 									}
-// 									style={inputStyle}
-// 									className="w-16 rounded-xl border px-2 py-1 text-sm outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-// 								/>
-
-// 								<span
-// 									style={{
-// 										color: `color-mix(in srgb, var(${state.levelChannel ? '--text-muted' : '--text-main'}) 80%, transparent)`,
-// 									}}
-// 								>
-// 									sec
-// 								</span>
-// 							</div>
-// 						</div>
-
-// 						<label htmlFor="">Message</label>
-// 						<textarea
-// 							value={state.levelMessage}
-// 							onChange={(e) =>
-// 								setState((s) => ({
-// 									...s,
-// 									levelMessage: e.target.value,
-// 								}))
-// 							}
-// 							disabled={!state.levelUp}
-// 							rows={3}
-// 							placeholder="Level-up message (use [@username])"
-// 							className="rounded-2xl border px-4 py-3 text-sm outline-none resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-// 							style={inputStyle}
-// 						/>
-
-// 						<label htmlFor="">Channel</label>
-
-// 						<input
-// 							value={state.levelChannel ?? ''}
-// 							onChange={(e) =>
-// 								setState((s) => ({
-// 									...s,
-// 									levelChannel: e.target.value,
-// 								}))
-// 							}
-// 							disabled={!state.levelUp}
-// 							placeholder="Channel ID (optional)"
-// 							className="rounded-2xl border px-4 py-3 text-sm outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-// 							style={inputStyle}
-// 						/>
-// 					</div>
-// 				</div>
-
-// 				<div className="flex flex-col gap-3">
-// 					<label className="text-sm font-medium">Roles</label>
-
-// 					<input
-// 						value={state.roles?.ignored?.join(',') || ''}
-// 						onChange={(e) =>
-// 							setState((s) => ({
-// 								...s,
-// 								roles: {
-// 									...s.roles,
-// 									ignored: e.target.value
-// 										.split(',')
-// 										.map((r) => r.trim())
-// 										.filter(Boolean),
-// 								},
-// 							}))
-// 						}
-// 						placeholder="Ignored roles (comma separated)"
-// 						className="rounded-2xl border px-4 py-3 text-sm outline-none"
-// 						style={inputStyle}
-// 					/>
-
-// 					<input
-// 						value={state.roles?.tracked?.join(',') || ''}
-// 						onChange={(e) =>
-// 							setState((s) => ({
-// 								...s,
-// 								roles: {
-// 									...s.roles,
-// 									tracked: e.target.value
-// 										.split(',')
-// 										.map((r) => r.trim())
-// 										.filter(Boolean),
-// 								},
-// 							}))
-// 						}
-// 						placeholder="Tracked roles (comma separated)"
-// 						className="rounded-2xl border px-4 py-3 text-sm outline-none"
-// 						style={inputStyle}
-// 					/>
-// 				</div>
-
-// 				<div className="flex justify-end">
-// 					<button
-// 						onClick={save}
-// 						disabled={state.saving}
-// 						className="rounded-2xl border px-5 py-2.5 text-sm font-medium"
-// 						style={{
-// 							borderColor: 'color-mix(in srgb, var(--accent) 35%, var(--border))',
-// 							background: 'color-mix(in srgb, var(--accent) 14%, transparent)',
-// 						}}
-// 					>
-// 						{state.saving ? 'Saving...' : 'Save changes'}
-// 					</button>
-// 				</div>
-// 			</div>
-// 		</div>
-// 	);
-// }
+/** @format */
+
+'use client';
+
+import { AlertCircle, Check, Info, Loader2, Save, Sparkles, Trophy } from 'lucide-react';
+import { Button, Input, Selector, Toggle } from '@xernerx/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useEnvironment, useToast } from '@xernerx/providers';
+
+interface VirtueProfile {
+	id: string;
+	mode: 'easy' | 'casual' | 'balanced' | 'hard' | 'extreme';
+	cycles: {
+		daily: boolean;
+		weekly: boolean;
+		monthly: boolean;
+	};
+	roles: {
+		ignored: string[];
+		tracked: string[];
+	};
+	levelUp: boolean;
+	levelMessage: string;
+	levelChannel: string | null;
+	autoDelete: number;
+}
+
+export default function VirtueGeneral({ id }: { id?: string }) {
+	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
+
+	const [profile, setProfile] = useState<VirtueProfile | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [saving, setSaving] = useState(false);
+
+	const [mode, setMode] = useState<'easy' | 'casual' | 'balanced' | 'hard' | 'extreme'>('balanced');
+	const [cycles, setCycles] = useState({ daily: false, weekly: false, monthly: false });
+	const [ignoredRoles, setIgnoredRoles] = useState('');
+	const [trackedRoles, setTrackedRoles] = useState('');
+	const [levelUp, setLevelUp] = useState(true);
+	const [levelMessage, setLevelMessage] = useState('[@mention] reached level [@level] :tada:!');
+	const [levelChannel, setLevelChannel] = useState('');
+	const [autoDelete, setAutoDelete] = useState(0);
+
+	const fetchProfile = useCallback(async () => {
+		if (!id) return;
+		setLoading(true);
+
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/virtue`), {
+				credentials: 'include',
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				setProfile(data);
+				setMode(data.mode || 'balanced');
+				setCycles(data.cycles || { daily: false, weekly: false, monthly: false });
+				setIgnoredRoles(Array.isArray(data.roles?.ignored) ? data.roles.ignored.join(', ') : '');
+				setTrackedRoles(Array.isArray(data.roles?.tracked) ? data.roles.tracked.join(', ') : '');
+				setLevelUp(data.levelUp ?? true);
+				setLevelMessage(data.levelMessage || '[@mention] reached level [@level] :tada:!');
+				setLevelChannel(data.levelChannel || '');
+				setAutoDelete(data.autoDelete || 0);
+			} else {
+				setProfile(null);
+			}
+		} catch (err) {
+			console.error('Failed to fetch Virtue profile:', err);
+			setProfile(null);
+		} finally {
+			setLoading(false);
+		}
+	}, [id, getEnvUrl]);
+
+	useEffect(() => {
+		fetchProfile();
+	}, [fetchProfile]);
+
+	const handleSave = async () => {
+		if (!id) return;
+		setSaving(true);
+
+		const payload = {
+			mode,
+			cycles,
+			roles: {
+				ignored: ignoredRoles
+					.split(',')
+					.map((r) => r.trim())
+					.filter(Boolean),
+				tracked: trackedRoles
+					.split(',')
+					.map((r) => r.trim())
+					.filter(Boolean),
+			},
+			levelUp,
+			levelMessage,
+			levelChannel: levelChannel.trim() || null,
+			autoDelete: Number(autoDelete) || 0,
+		};
+
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/virtue`), {
+				method: 'PATCH',
+				credentials: 'include',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+
+			if (res.ok) {
+				const updated = await res.json();
+				setProfile(updated);
+				toast({
+					title: 'Virtue settings saved successfully',
+					type: 'success',
+				});
+			} else {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Failed to update Virtue settings');
+			}
+		} catch (err: any) {
+			console.error('Failed to save Virtue settings:', err);
+			toast({
+				title: 'Error saving Virtue settings',
+				description: err.message,
+				type: 'error',
+			});
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	if (loading) {
+		return (
+			<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
+				<Loader2 className="w-8 h-8 animate-spin text-(--accent) mb-3" />
+				<span className="text-sm font-medium">Loading Virtue configuration...</span>
+			</div>
+		);
+	}
+
+	if (!profile) {
+		return (
+			<div className="flex flex-col items-center text-center justify-center bg-(--accent)/5 border border-(--accent)/20 rounded-[2rem] p-10 shadow-xl animate-in fade-in zoom-in-95 duration-300">
+				<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
+					<Sparkles className="w-8 h-8" />
+				</div>
+				<h3 className="text-xl font-extrabold text-(--text) mb-2">Virtue is not added to this server</h3>
+				<p className="text-sm text-(--text-muted) mb-6 max-w-md">
+					This server requires Virtue to be added in order to configure leveling systems, custom leveling messages, cycle resets, and role tracking.
+				</p>
+				<a
+					href={getEnvUrl('https://xernerx.com/invites/virtue')}
+					target="_blank"
+					rel="noopener noreferrer"
+					className="inline-flex items-center justify-center gap-2 rounded-2xl bg-(--accent) text-white font-bold text-sm px-6 py-3 shadow-lg shadow-(--accent)/20 hover:opacity-90 transition-all hover:scale-[1.02]"
+				>
+					<Sparkles size={16} />
+					<span>Invite Virtue to Server</span>
+				</a>
+			</div>
+		);
+	}
+
+	return (
+		<div className="flex flex-col gap-8">
+			{/* Virtue Leveling Configuration Card */}
+			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
+				<div className="flex items-center justify-between mb-6">
+					<div className="flex items-center gap-3 text-(--text) font-extrabold text-sm tracking-widest uppercase">
+						<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
+							<Trophy className="w-4 h-4" />
+						</div>
+						Virtue Leveling System
+					</div>
+					<Button
+						onClick={handleSave}
+						disabled={saving}
+						className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold shadow-md hover:opacity-90 transition-all"
+					>
+						{saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+						<span>{saving ? 'Saving...' : 'Save Changes'}</span>
+					</Button>
+				</div>
+
+				<div className="flex flex-col gap-6">
+					{/* Level Mode Selector */}
+					<div className="flex flex-col gap-2">
+						<label className="text-sm font-bold text-(--text)">Leveling Difficulty Mode</label>
+						<Selector
+							value={mode}
+							onChange={(val: any) => setMode(val)}
+							options={[
+								{ label: 'Easy (Quick progression)', value: 'easy' },
+								{ label: 'Casual (Relaxed rate)', value: 'casual' },
+								{ label: 'Balanced (Standard progression)', value: 'balanced' },
+								{ label: 'Hard (Demanding milestones)', value: 'hard' },
+								{ label: 'Extreme (Maximum grinding)', value: 'extreme' },
+							]}
+						/>
+					</div>
+
+					{/* Reset Cycles */}
+					<div className="flex flex-col gap-2">
+						<label className="text-sm font-bold text-(--text)">Leaderboard Reset Cycles</label>
+						<p className="text-xs text-(--text-muted)">Toggle scheduled recurring experience resets for competition seasons.</p>
+						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
+							{(['daily', 'weekly', 'monthly'] as const).map((cycleKey) => {
+								const active = cycles[cycleKey];
+								return (
+									<button
+										key={cycleKey}
+										type="button"
+										onClick={() => setCycles((prev) => ({ ...prev, [cycleKey]: !active }))}
+										className={`flex items-center justify-between px-4 py-3 rounded-2xl border transition-all ${
+											active
+												? 'border-(--accent) bg-(--accent)/10 text-(--text) font-bold shadow-sm'
+												: 'border-(--border)/10 bg-(--background)/50 text-(--text-muted) hover:border-(--border)/20'
+										}`}
+									>
+										<span className="capitalize text-sm">{cycleKey} Cycle</span>
+										{active && <Check size={16} className="text-(--accent)" />}
+									</button>
+								);
+							})}
+						</div>
+					</div>
+
+					{/* Level Up Announcement Toggle */}
+					<div className="flex items-center justify-between p-4 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md">
+						<div className="flex flex-col">
+							<span className="text-sm font-bold text-(--text)">Announce Level Ups</span>
+							<span className="text-xs text-(--text-muted)">Post an announcement message when a member reaches a new level.</span>
+						</div>
+						<Toggle checked={levelUp} onChange={(e) => setLevelUp(e.target.checked)} size="sm" />
+					</div>
+
+					{/* Conditional Message Settings */}
+					{levelUp && (
+						<div className="flex flex-col gap-4 p-5 rounded-2xl border border-(--border)/10 bg-(--background)/30">
+							<div className="flex flex-col gap-2">
+								<label className="text-sm font-bold text-(--text)">Level-up Message Template</label>
+								<textarea
+									value={levelMessage}
+									onChange={(e) => setLevelMessage(e.target.value)}
+									placeholder="[@mention] reached level [@level] :tada:!"
+									rows={3}
+									className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none p-3.5"
+								/>
+								<span className="text-[11px] text-(--text-muted)">
+									Variables: <code>[@mention]</code>, <code>[@level]</code>, <code>[@username]</code>
+								</span>
+							</div>
+
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div className="flex flex-col gap-2">
+									<label className="text-sm font-bold text-(--text)">Announcement Channel ID (Optional)</label>
+									<Input value={levelChannel} onChange={(e) => setLevelChannel(e.target.value)} placeholder="Leave empty to send in current channel" />
+								</div>
+
+								<div className="flex flex-col gap-2">
+									<div className="flex items-center justify-between">
+										<label className="text-sm font-bold text-(--text)">Auto-delete Message</label>
+										<span className="text-xs text-(--text-muted)">{autoDelete > 0 ? `${autoDelete}s` : 'Disabled'}</span>
+									</div>
+									<Input
+										type="number"
+										min={0}
+										max={60}
+										value={autoDelete.toString()}
+										onChange={(e) => setAutoDelete(Number(e.target.value) || 0)}
+										placeholder="0 disables auto-delete (max 60s)"
+									/>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{/* Role Rules */}
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-bold text-(--text)">Ignored Roles (IDs)</label>
+							<Input value={ignoredRoles} onChange={(e) => setIgnoredRoles(e.target.value)} placeholder="Comma-separated Role IDs" />
+							<span className="text-[11px] text-(--text-muted)">Members with these roles will not gain experience.</span>
+						</div>
+
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-bold text-(--text)">Tracked Roles (IDs)</label>
+							<Input value={trackedRoles} onChange={(e) => setTrackedRoles(e.target.value)} placeholder="Comma-separated Role IDs" />
+							<span className="text-[11px] text-(--text-muted)">If specified, only members with these roles gain experience.</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}

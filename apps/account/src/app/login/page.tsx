@@ -28,7 +28,9 @@ function SignInContent() {
 		hide();
 	}, [hide]);
 	useEffect(() => {
-		if (status === 'authenticated' && session) window.location.replace(redirectUrl);
+		if (status === 'authenticated' && session && !(session as any)?.error) {
+			window.location.replace(redirectUrl);
+		}
 	}, [session, status, redirectUrl]);
 	return (
 		<div className="flex h-full min-h-screen items-center justify-center px-6">

@@ -214,24 +214,24 @@ export default function Home() {
 
 		if (canManageRoadmap) {
 			items.push({
-				category: 'Product',
-				label: 'Roadmap',
+				category: t('common.nav.categories.product'),
+				label: t('common.nav.items.roadmap'),
 				view: 'roadmap',
 				icon: Map,
 			});
 		}
 		if (canManageSuggestions) {
 			items.push({
-				category: 'Product',
-				label: 'Suggestions',
+				category: t('common.nav.categories.product'),
+				label: t('common.nav.items.suggestions'),
 				view: 'suggestions',
 				icon: Inbox,
 			});
 		}
 		if (canManageIssues) {
 			items.push({
-				category: 'Product',
-				label: 'Issues',
+				category: t('common.nav.categories.product'),
+				label: t('common.nav.items.issues'),
 				view: 'issues',
 				icon: Bug,
 			});

@@ -288,7 +288,7 @@ export default function Settings() {
 						value={adminServerId}
 						onChange={(val: string) => setAdminServerId(val)}
 						options={[{ value: '', label: t('admin.dashboard.settings.selectServer') }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
-						placeholder={t('admin.settings.adminServerIdPlaceholder') || 'Select Admin Server'}
+						placeholder={t('admin.settings.adminServerIdPlaceholder')}
 					/>
 				</div>
 

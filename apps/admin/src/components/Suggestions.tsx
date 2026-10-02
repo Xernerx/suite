@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useEnvironment, useToast } from '@xernerx/providers';
+import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 
 export default function Suggestions() {
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
+	const { t } = useDictionary();
 	const [data, setData] = useState([]);
 	const [loading, setLoading] = useState(true);
 
@@ -71,7 +72,7 @@ export default function Suggestions() {
 
 	return (
 		<div className="flex flex-col gap-4">
-			<h2 className="text-2xl font-bold">Suggestions Triage</h2>
+			<h2 className="text-2xl font-bold">{t('admin.dashboard.suggestions.title')}</h2>
 			<div className="flex flex-col gap-2">
 				{data.map((item: any) => {
 					const netVotes = (item.upvotes?.length || 0) - (item.downvotes?.length || 0);
@@ -79,16 +80,18 @@ export default function Suggestions() {
 						<div key={item.id} className="p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex justify-between items-start">
 							<div>
 								<div className="font-bold flex gap-2 items-center">
-									<span className="bg-(--foreground)/50 px-2 py-1 rounded text-xs border border-(--border)/10 font-mono">Votes: {netVotes}</span>
+									<span className="bg-(--foreground)/50 px-2 py-1 rounded text-xs border border-(--border)/10 font-mono">
+										{t('admin.dashboard.suggestions.votes')}: {netVotes}
+									</span>
 									{item.title}
 								</div>
 								<div className="text-sm text-(--text-muted) mb-2 mt-2">{item.description}</div>
 								<div className="text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded border border-(--accent)/20 mt-2">{item.productId}</div>
 							</div>
 							<div className="flex gap-2 shrink-0">
-								<Button onClick={() => acceptSuggestion(item)}>Accept</Button>
+								<Button onClick={() => acceptSuggestion(item)}>{t('admin.dashboard.suggestions.moveToRoadmap')}</Button>
 								<Button variant="danger" onClick={() => declineSuggestion(item.id)}>
-									Decline
+									{t('admin.dashboard.suggestions.rejected')}
 								</Button>
 							</div>
 						</div>

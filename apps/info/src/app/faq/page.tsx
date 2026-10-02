@@ -9,6 +9,8 @@ import Translations from '@/components/faq/Translations';
 import Bots from '@/components/faq/Bots';
 import { useEffect } from 'react';
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 export default function Page() {
 	const { show, setNavItems, setView, view } = useSidebar();
 	const { t } = useDictionary();
@@ -46,10 +48,12 @@ export default function Page() {
 	}, [setView, show, view, t, setNavItems]);
 
 	return (
-		<>
-			{view === 'translations' && <Translations />}
-			{view === 'environments' && <Environments />}
-			{view === 'bots' && <Bots />}
-		</>
+		<AnimatePresence mode="wait">
+			<motion.div key={view} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
+				{view === 'translations' && <Translations />}
+				{view === 'environments' && <Environments />}
+				{view === 'bots' && <Bots />}
+			</motion.div>
+		</AnimatePresence>
 	);
 }

@@ -64,7 +64,8 @@
 				"translator": "Vertaler",
 				"xernerxSuite": "Xernerx Suite",
 				"system": "Systeem",
-				"bots": "Bots"
+				"bots": "Bots",
+				"product": "Product"
 			},
 			"items": {
 				"account": "Account",
@@ -84,7 +85,10 @@
 				"settings": "Instellingen",
 				"environments": "Omgevingen",
 				"applications_review": "Aanvragen beoordelen",
-				"applications_manage": "Beheer Aanvragen"
+				"applications_manage": "Beheer Aanvragen",
+				"roadmap": "Roadmap",
+				"suggestions": "Suggesties",
+				"issues": "Problemen"
 			}
 		},
 		"buttons": {
@@ -692,6 +696,165 @@
 			"errorPrefix": "Error:",
 			"card": {
 				"idPrefix": "Id: {id}"
+			}
+		},
+		"dashboard": {
+			"issues": {
+				"title": "Probleembeheer",
+				"logBug": "Bug Vastleggen",
+				"status": "Status",
+				"resolved": "Opgelost",
+				"verified": "Geverifieerd",
+				"pending": "In Afwachting",
+				"modalTitle": "Nieuw Probleem Vastleggen",
+				"titlePlaceholder": "Titel",
+				"descPlaceholder": "Beschrijving",
+				"productPlaceholder": "Selecteer Product",
+				"save": "Opslaan",
+				"cancel": "Annuleren",
+				"submitted": "Ingediend",
+				"verify": "Verifieer"
+			},
+			"roadmap": {
+				"title": "Roadmap Beheer",
+				"addItem": "Item Toevoegen",
+				"modalTitle": "Roadmap Item Toevoegen",
+				"titlePlaceholder": "Titel",
+				"descPlaceholder": "Beschrijving",
+				"productPlaceholder": "Selecteer Product",
+				"quarterPlaceholder": "Doelkwartaal (bijv. Q1 2026)",
+				"statusPlaceholder": "Selecteer Status",
+				"changelogPlaceholder": "Changelog URL (Optioneel)",
+				"save": "Opslaan",
+				"cancel": "Annuleren"
+			},
+			"suggestions": {
+				"title": "Community Suggesties",
+				"status": "Status",
+				"open": "Open",
+				"approved": "Goedgekeurd",
+				"rejected": "Afgewezen",
+				"implemented": "Geïmplementeerd",
+				"moveToRoadmap": "Naar Roadmap Verplaatsen",
+				"votes": "Stemmen"
+			}
+		}
+	},
+	"info": {
+		"home": {
+			"title": "Ondersteuning",
+			"description": "Welkom bij de kennisbank. Verken onze transparante roadmap, dien nieuwe ideeën in, meld problemen en vind antwoorden op al je vragen.",
+			"portals": {
+				"roadmap": {
+					"title": "Roadmap",
+					"description": "Bekijk waar we nu aan bouwen, wat er binnenkort aankomt en volg onze voortgang op langetermijndoelen."
+				},
+				"suggestions": {
+					"title": "Suggesties",
+					"description": "Heb je een geweldig idee? Dien het in bij onze community-sandbox waar anderen erop kunnen stemmen voor de roadmap!"
+				},
+				"bugs": {
+					"title": "Bugtracker",
+					"description": "Een bug gevonden? Meld hem hier zodat onze technici hem kunnen oplossen en naar de bekende problemen kunnen verplaatsen."
+				},
+				"faq": {
+					"title": "Veelgestelde Vragen",
+					"description": "Veelgestelde vragen, facturatie en algemene hulp met je Xernerx-account."
+				}
+			}
+		},
+		"roadmap": {
+			"title": "Platform Roadmap",
+			"description": "Onze chronologische reis van functies, optimalisaties en releases. Zie precies wat er aankomt en wanneer.",
+			"metrics": {
+				"avgResolutionTime": "Gemiddelde oplostijd van bugs",
+				"recentResolutions": "Recent opgeloste problemen",
+				"hours": "{count} uur",
+				"na": "N.v.t."
+			},
+			"timeline": {
+				"today": "Vandaag",
+				"backlog": "Backlog",
+				"readChangelog": "Changelog Lezen",
+				"status": {
+					"idea": "Idee",
+					"planned": "Gepland",
+					"active": "In Uitvoering",
+					"released": "Uitgebracht"
+				}
+			},
+			"knownIssues": {
+				"title": "Bekende Problemen Tracker",
+				"description": "Een transparant logboek van actieve bugs en recent opgeloste problemen binnen ons ecosysteem.",
+				"openIssues": "Openstaande Problemen",
+				"noOpenIssues": "Geen actieve problemen bekend! Alles werkt soepel.",
+				"recentlyResolved": "Recent Opgelost",
+				"noResolvedIssues": "Geen recent opgeloste problemen.",
+				"fixedOn": "Opgelost op {date}"
+			}
+		},
+		"suggestions": {
+			"title": "Functie Sandbox",
+			"description": "Stem op ideeën of dien je eigen idee in. Populaire suggesties worden beoordeeld door ons team en toegevoegd aan de roadmap.",
+			"newSuggestion": "Nieuwe Suggestie",
+			"titlePlaceholder": "Titel",
+			"descriptionPlaceholder": "Beschrijving",
+			"selectProduct": "Selecteer Product",
+			"submit": "Indienen",
+			"cancel": "Annuleren",
+			"searchPlaceholder": "Zoek suggesties (bijv. 'discord bot')...",
+			"noMatch": "Geen suggesties komen overeen met \"{query}\".",
+			"addAsNew": "Als nieuwe suggestie toevoegen",
+			"loginToSubmit": "Log in om dit als een nieuw idee in te dienen!",
+			"toasts": {
+				"notAuthenticated": "Niet Geauthenticeerd",
+				"mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
+				"mustBeLoggedInVote": "Je moet ingelogd zijn om te stemmen.",
+				"duplicateTitle": "Er bestaat al een suggestie met deze exacte titel!",
+				"duplicate": "Duplicaat",
+				"submitted": "Suggestie ingediend!",
+				"success": "Succes",
+				"failedToPost": "Plaatsen mislukt",
+				"failedToVote": "Stemmen mislukt",
+				"error": "Fout"
+			}
+		},
+		"bugs": {
+			"title": "Bugtracker",
+			"description": "Meld bugs of problemen die je tegenkomt. Bugs worden beoordeeld door ons team en geverifieerd.",
+			"newBug": "Nieuwe Bug",
+			"titlePlaceholder": "Titel",
+			"descriptionPlaceholder": "Beschrijving",
+			"selectProduct": "Selecteer Product",
+			"attachFile": "Bijlage Screenshot/Log (Optioneel)",
+			"uploading": "Uploaden...",
+			"submit": "Indienen",
+			"cancel": "Annuleren",
+			"searchPlaceholder": "Zoek bugs (bijv. 'inlogfout')...",
+			"noMatch": "Geen bugs komen overeen met \"{query}\".",
+			"reportAsNew": "Als nieuwe bug melden",
+			"status": {
+				"resolved": "Opgelost",
+				"verified": "Geverifieerd",
+				"pendingReview": "In Afwachting",
+				"submitted": "Ingediend"
+			},
+			"toasts": {
+				"notAuthenticated": "Niet Geauthenticeerd",
+				"mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
+				"duplicate": "Duplicaat",
+				"duplicateTitle": "Er bestaat al een bug met deze exacte titel!",
+				"submitted": "Bug ingediend!",
+				"success": "Succes",
+				"uploadFailed": "Upload Mislukt",
+				"failedToUpload": "Uploaden van bijlage mislukt",
+				"failedToPost": "Plaatsen mislukt",
+				"error": "Fout"
+			},
+			"tooltips": {
+				"verified": "Dit probleem is erkend door de ontwikkelaars en zal op termijn worden opgelost.",
+				"submitted": "Dit probleem is ingediend door de community en is nog niet beoordeeld of erkend door de ontwikkelaars.",
+				"resolved": "Dit probleem is opgelost."
 			}
 		}
 	}

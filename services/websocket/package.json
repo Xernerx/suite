@@ -5,8 +5,8 @@
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"start": "tsx --env-file=.env src/main.ts",
-		"dev": "tsx watch --env-file=.env src/main.ts"
+		"start": "tsx src/main.ts",
+		"dev": "tsx watch src/main.ts"
 	},
 	"author": "Xernerx Studios",
 	"license": "MIT",

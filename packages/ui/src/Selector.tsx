@@ -39,6 +39,7 @@ function getLabelString(label: React.ReactNode): string {
 export function Selector({ value, options, onChange, placeholder = 'Select...', items }: SelectorProps) {
 	const { t } = useDictionary();
 	const [isOpen, setIsOpen] = useState(false);
+	const [openUpwards, setOpenUpwards] = useState(false);
 	const [query, setQuery] = useState('');
 	const ref = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -55,9 +56,19 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
-	// Focus input when opened
+	// Focus input and determine placement when opened
 	useEffect(() => {
 		if (isOpen) {
+			if (ref.current) {
+				const rect = ref.current.getBoundingClientRect();
+				const spaceBelow = window.innerHeight - rect.bottom;
+				const spaceAbove = rect.top;
+				if (spaceBelow < 260 && spaceAbove > spaceBelow) {
+					setOpenUpwards(true);
+				} else {
+					setOpenUpwards(false);
+				}
+			}
 			setTimeout(() => {
 				inputRef.current?.focus();
 			}, 50);
@@ -92,7 +103,7 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 					<motion.div
 						initial={{
 							opacity: 0,
-							y: -4,
+							y: openUpwards ? 4 : -4,
 						}}
 						animate={{
 							opacity: 1,
@@ -100,13 +111,13 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 						}}
 						exit={{
 							opacity: 0,
-							y: -4,
+							y: openUpwards ? 4 : -4,
 						}}
 						transition={{
 							duration: 0.15,
 							ease: 'easeOut',
 						}}
-						className="absolute left-0 top-[calc(100%+8px)] z-50 w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md shadow-lg"
+						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl`}
 						style={{
 							padding: 'calc(var(--ui-gap) * 0.25)',
 							display: 'flex',

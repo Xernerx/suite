@@ -18,6 +18,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 		// Fetch separated domain models
 		const appearance = await models.users.Appearance.findOne({ ownerId: id }).lean();
 		const credits = await models.users.Credit.findOne({ ownerId: id }).lean();
+		const level = await models.users.Level.findOne({ ownerId: id }).lean();
 		const levels = await models.users.Level.find({ ownerId: id }).lean();
 		const subscriptions = await models.users.Subscription.find({ ownerId: id }).lean();
 
@@ -28,6 +29,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 			...user,
 			appearance: appearance || {},
 			credits: credits || { balance: 0, streak: 0 },
+			level: level || (levels && levels[0]) || { level: 1, xp: 0 },
 			levels: levels || [],
 			subscriptions: subscriptions || [],
 			organizations: organizations || [],
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const existingUser = await models.users.User.findOne({ id });
 		if (existingUser) return NextResponse.json({ error: 'User already exists' }, { status: 409 });
 
-		const { appearance, credits, ...userBody } = body;
+		const { appearance, credits, level, ...userBody } = body;
 
 		// Fetch default join roles
 		const joinRolesSetting = await models.core.Setting.findOne({ id: 'join_roles' }).lean();
@@ -84,6 +86,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		if (credits) {
 			await models.users.Credit.create({ ...credits, ownerId: id, id: require('crypto').randomUUID() });
 		}
+		if (level) {
+			await models.users.Level.create({ ...level, ownerId: id, id: require('crypto').randomUUID() });
+		}
 
 		return NextResponse.json(newUser, { status: 201 });
 	} catch (error: unknown) {
@@ -97,7 +102,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const body = await req.json();
 		const { models } = await database('xernerx');
 
-		const { appearance, credits, ...userBody } = body;
+		const { appearance, credits, level, ...userBody } = body;
 
 		let oldUser = null;
 		if (userBody.roles) {
@@ -158,10 +163,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			await models.users.Credit.findOneAndUpdate({ ownerId: id }, { $set: credits }, { upsert: true, runValidators: true });
 		}
 
+		if (level) {
+			await models.users.Level.findOneAndUpdate({ ownerId: id }, { $set: level }, { upsert: true, runValidators: true });
+		}
+
 		return NextResponse.json({
 			...updatedUser,
 			appearance: appearance || {},
 			credits: credits || {},
+			level: level || {},
 		});
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });

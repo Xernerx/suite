@@ -3,24 +3,34 @@ import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');
 
-		// If query has 'all=true' and the user is an admin, return all issues including unacknowledged
 		const url = new URL(req.url);
-		const fetchAll = url.searchParams.get('all') === 'true';
+		const acknowledged = url.searchParams.get('acknowledged');
+		const status = url.searchParams.get('status');
 
-		let filter: any = { acknowledged: true };
+		let filter: any = {};
+		if (acknowledged === 'true') {
+			filter.acknowledged = true;
+		} else if (acknowledged === 'false') {
+			filter.acknowledged = false;
+		}
 
-		if (fetchAll) {
-			// Check admin auth
-			const session = (await getServerSession(auth)) as any;
-			if (session?.user?.id) {
-				const user = await models.users.User.findOne({ id: session.user.id });
-				if (user && user.roles?.includes('admin')) {
-					filter = {}; // Return all issues to admins
-				}
+		if (status) {
+			if (status === 'open') {
+				filter.status = { $ne: 'resolved' };
+			} else if (status === 'submitted') {
+				filter.status = { $ne: 'resolved' };
+				filter.acknowledged = false;
+			} else if (status === 'verified') {
+				filter.status = { $ne: 'resolved' };
+				filter.acknowledged = true;
+			} else {
+				filter.status = status;
 			}
 		}
 

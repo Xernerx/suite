@@ -36,15 +36,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 	const [loading, setLoading] = useState(true);
 
 	const fetchUser = useCallback(async () => {
-		const sessionWithError = session as { error?: string; accessToken?: string; user?: any };
+		const sessionWithError = session as { error?: any; accessToken?: string; user?: any };
 
-		if (status === 'authenticated' && sessionWithError?.error === 'RefreshAccessTokenError') {
+		if (
+			status === 'authenticated' &&
+			(sessionWithError?.error === 'RefreshAccessTokenError' ||
+				sessionWithError?.error === 'invalid_grant' ||
+				sessionWithError?.error?.error === 'invalid_grant' ||
+				Boolean(sessionWithError?.error))
+		) {
 			const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
 			signOut({ callbackUrl: authLoginUrl });
 			return;
 		}
 
-		if (!sessionWithError || !sessionWithError.accessToken) return;
+		if (!sessionWithError || !sessionWithError.accessToken || sessionWithError.error) return;
 
 		let discord = null;
 		try {
@@ -75,6 +81,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 					body: JSON.stringify({
 						...(session?.user || {}),
 						credits: { balance: 1000 },
+						level: { level: 1, xp: 0 },
 						roles: ['1b333119-d818-4fb1-a5dc-12621fd14198'],
 					}),
 				});

@@ -430,7 +430,14 @@ function TokenCard({
 		const sortedSelectedOwners = [...selectedOwners].sort();
 		const sortedOriginalOwners = [...(fullToken.owners || [])].sort();
 		const ownersChanged = JSON.stringify(sortedSelectedOwners) !== JSON.stringify(sortedOriginalOwners);
-		return name !== (fullToken.name || '') || status !== (fullToken.status || 'active') || botId !== (fullToken.botId || '') || ownersChanged || secure !== !!fullToken.permissions?.secure || websocket !== !!fullToken.permissions?.websocket;
+		return (
+			name !== (fullToken.name || '') ||
+			status !== (fullToken.status || 'active') ||
+			botId !== (fullToken.botId || '') ||
+			ownersChanged ||
+			secure !== !!fullToken.permissions?.secure ||
+			websocket !== !!fullToken.permissions?.websocket
+		);
 	}, [fullToken, name, status, botId, selectedOwners, secure, websocket]);
 	const handleToggleExpand = async () => {
 		setIsModalOpen(true);
@@ -588,7 +595,7 @@ function TokenCard({
 						<h2 className="font-bold text-base text-(--text) truncate group-hover:text-(--accent) transition-colors">{token.name || t('admin.tokens.empty.title')}</h2>
 						<div className="flex items-center gap-2 mt-0.5">
 							<span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[token.status] || statusColors.active}`}>
-								{t(`admin.tokens.statusOptions.${token.status}`) || token.status}
+								{t(`admin.tokens.statusOptions.${token.status}`)}
 							</span>
 						</div>
 						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">

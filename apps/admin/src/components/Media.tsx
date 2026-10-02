@@ -278,7 +278,7 @@ export default function Media() {
 								</div>
 								<div className="flex gap-2 items-center">
 									<Input
-										placeholder={t('admin.dashboard.media.placeholder') || 'e.g. 123456789012345678'}
+										placeholder={t('admin.dashboard.media.placeholder')}
 										value={sharedInput}
 										onChange={(e) => setSharedInput(e.target.value)}
 										onKeyDown={(e) => {
@@ -289,7 +289,7 @@ export default function Media() {
 										}}
 									/>
 									<Button variant="secondary" onClick={addSharedUser} loading={loadingProfile} disabled={!sharedInput.trim()} className="shrink-0 h-10">
-										<Plus size={16} /> Add
+										<Plus size={16} /> {t('admin.dashboard.media.add')}
 									</Button>
 								</div>
 

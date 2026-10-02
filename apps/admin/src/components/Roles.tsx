@@ -388,8 +388,8 @@ function RoleCard({
 								{permissions.map((perm) => (
 									<div key={perm.key} className="flex items-center justify-between">
 										<div className="flex flex-col">
-											<span className="text-xs font-semibold text-(--text)">{t(`admin.permissions.${perm.key}.label`) || perm.label}</span>
-											<span className="text-[11px] text-(--text-muted)">{t(`admin.permissions.${perm.key}.description`) || perm.description}</span>
+											<span className="text-xs font-semibold text-(--text)">{t(`admin.permissions.${perm.key}.label`)}</span>
+											<span className="text-[11px] text-(--text-muted)">{t(`admin.permissions.${perm.key}.description`)}</span>
 										</div>
 										<Toggle
 											checked={localPermissions[perm.key] ?? perm.defaultValue}
@@ -792,8 +792,8 @@ export default function Roles() {
 							{permissions.map((perm) => (
 								<div key={perm.key} className="flex items-center justify-between">
 									<div className="flex flex-col">
-										<span className="text-xs font-semibold text-(--text)">{t(`admin.permissions.${perm.key}.label`) || perm.label}</span>
-										<span className="text-[11px] text-(--text-muted)">{t(`admin.permissions.${perm.key}.description`) || perm.description}</span>
+										<span className="text-xs font-semibold text-(--text)">{t(`admin.permissions.${perm.key}.label`)}</span>
+										<span className="text-[11px] text-(--text-muted)">{t(`admin.permissions.${perm.key}.description`)}</span>
 									</div>
 									<Toggle
 										checked={newPermissions[perm.key] ?? perm.defaultValue}

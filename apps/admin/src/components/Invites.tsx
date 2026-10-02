@@ -234,7 +234,7 @@ export default function Invites() {
 								onChange={(e) => setNewId(e.target.value)}
 								required
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderTodo') || 'e.g. todo'}
+								placeholder={t('admin.dashboard.invites.placeholderTodo')}
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
@@ -245,7 +245,7 @@ export default function Invites() {
 								onChange={(e) => setNewName(e.target.value)}
 								required
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderAppName') || 'e.g. To-Do List Bot'}
+								placeholder={t('admin.dashboard.invites.placeholderAppName')}
 							/>
 						</div>
 					</div>
@@ -258,7 +258,7 @@ export default function Invites() {
 							onChange={(e) => setNewClientId(e.target.value)}
 							required
 							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-							placeholder={t('admin.dashboard.invites.placeholderClientId') || 'Discord Client ID'}
+							placeholder={t('admin.dashboard.invites.placeholderClientId')}
 						/>
 					</div>
 

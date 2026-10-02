@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
 import { useRouter } from 'next/navigation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import VirtueGeneral from '@/components/dashboard/virtue/General';
 
 type Guild = {
 	id: string;
@@ -310,6 +311,7 @@ export default function DashboardPage() {
 										{ id: 'info', label: t('app.dashboard.tabs.info') },
 										{ id: 'stats', label: t('app.dashboard.tabs.stats') },
 										{ id: 'links', label: 'Links' },
+										{ id: 'virtue', label: 'Virtue' },
 										{ id: 'settings', label: t('app.dashboard.tabs.settings') },
 									]}
 								/>
@@ -624,6 +626,8 @@ export default function DashboardPage() {
 										</div>
 									</>
 								)}
+
+								{activeTab === 'virtue' && selectedGuild && <VirtueGeneral id={selectedGuild.id} />}
 
 								{activeTab === 'settings' && (
 									<>

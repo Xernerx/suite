@@ -28,7 +28,7 @@ export function Footer() {
 		<motion.footer
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="relative w-full overflow-hidden bg-(--background) backdrop-blur-md"
+			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
 		>
 			{/* Fading top border */}

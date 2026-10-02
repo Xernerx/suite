@@ -10,11 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load .env configuration
-for (const envPath of [
-	path.resolve(__dirname, '../.env'),
-	path.resolve(__dirname, '../../.env'),
-	path.resolve(process.cwd(), '.env'),
-]) {
+for (const envPath of [path.resolve(__dirname, '../.env'), path.resolve(__dirname, '../../.env'), path.resolve(process.cwd(), '.env')]) {
 	try {
 		process.loadEnvFile(envPath);
 	} catch {}
@@ -23,7 +19,15 @@ for (const envPath of [
 import { Terminal } from '@xernerx/terminal';
 import { verifyWebsocketToken, checkTokenWebsocketAccess } from './lib/auth';
 
-const terminal = new Terminal({ scope: 'WS', title: 'XERNERX', format: ['title', 'scope', 'datetime', 'memory'] });
+const terminal = new Terminal({ scope: 'WS', title: 'XERNERX', format: ['title', 'scope', 'datetime', 'memory'], spin: false });
+
+process.on('uncaughtException', (err) => {
+	terminal.error(`Uncaught exception: ${err?.stack || err?.message || err}`);
+});
+
+process.on('unhandledRejection', (reason) => {
+	terminal.error(`Unhandled rejection: ${reason}`);
+});
 
 /* ================= TYPES ================= */
 
@@ -84,27 +88,39 @@ async function loadServices() {
 
 /* ================= ROUTER ================= */
 
+function send(ws: WebSocket, data: any) {
+	if (ws && ws.readyState === 1) {
+		try {
+			ws.send(typeof data === 'string' ? data : JSON.stringify(data));
+		} catch (e) {
+			terminal.warn(`Failed to send WebSocket message: ${(e as Error).message}`);
+		}
+	}
+}
+
 async function handleMessage(ws: AuthedWebSocket, msg: any) {
 	const { id } = msg;
 
 	if (!id) {
-		return ws.send(JSON.stringify({ message: 'Missing request id' }));
+		return send(ws, { message: 'Missing request id' });
 	}
 
 	const service = services[msg.service];
 	const method = methods[msg.method as keyof typeof methods];
 
 	if (!service) {
-		return ws.send(JSON.stringify({ id, message: 'Unknown service' }));
+		return send(ws, { id, message: 'Unknown service' });
 	}
 
 	if (!method) {
-		return ws.send(JSON.stringify({ id, message: 'Unknown method' }));
+		return send(ws, { id, message: 'Unknown method' });
 	}
 
 	if (!msg.body || typeof msg.body !== 'object') {
-		return ws.send(JSON.stringify({ id, message: 'Invalid body' }));
+		return send(ws, { id, message: 'Invalid body' });
 	}
+
+	terminal.log(`${msg.method?.toUpperCase()} ${msg.service}${msg.action ? '/' + msg.action : ''} (id: ${id})`);
 
 	try {
 		const data = await service(
@@ -116,14 +132,18 @@ async function handleMessage(ws: AuthedWebSocket, msg: any) {
 			ws
 		);
 
-		ws.send(JSON.stringify({ id, ...(data ?? {}) }));
+		let responseData = data ?? {};
+		if (typeof (responseData as any).toJSON === 'function') {
+			responseData = (responseData as any).toJSON();
+		}
+
+		send(ws, { ...responseData, id });
 	} catch (err: unknown) {
-		ws.send(
-			JSON.stringify({
-				id,
-				message: (err as Error)?.message || 'Server error',
-			})
-		);
+		terminal.error(`Error handling ${msg.service}/${msg.action}: ${(err as Error)?.message || err}`);
+		send(ws, {
+			id,
+			message: (err as Error)?.message || 'Server error',
+		});
 	}
 }
 
@@ -156,6 +176,9 @@ async function start() {
 	});
 
 	const wss = new WebSocketServer({ server });
+	wss.on('error', (err) => {
+		terminal.error(`WebSocketServer error: ${err.message}`);
+	});
 
 	wss.on('connection', async (ws: AuthedWebSocket, req) => {
 		ws.authed = false;
@@ -163,6 +186,10 @@ async function start() {
 		const ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress;
 
 		terminal.log(`Connection established from ${ip}`);
+
+		ws.on('error', (err) => {
+			terminal.warn(`Socket error from ${ip}: ${err.message}`);
+		});
 
 		// Check for pre-authentication via URL query parameter (?token=...) or Authorization header
 		try {
@@ -195,14 +222,14 @@ async function start() {
 				const msg = JSON.parse(data.toString());
 
 				if (!msg.service) {
-					return ws.send(JSON.stringify({ message: 'Invalid message format' }));
+					return send(ws, { message: 'Invalid message format' });
 				}
 
 				if (msg.service === 'auth') {
 					const { token } = msg.body ?? {};
 
 					if (!token || typeof token !== 'string') {
-						return ws.send(JSON.stringify({ id: msg.id, success: false, message: 'Missing token' }));
+						return send(ws, { id: msg.id, success: false, message: 'Missing token' });
 					}
 
 					const res = await verifyWebsocketToken(token);
@@ -210,7 +237,7 @@ async function start() {
 					if (!res.valid) {
 						ws.authed = false;
 						ws.authError = res.message;
-						return ws.send(JSON.stringify({ id: msg.id, success: false, message: res.message || 'Invalid token' }));
+						return send(ws, { id: msg.id, success: false, message: res.message || 'Invalid token' });
 					}
 
 					ws.authed = true;
@@ -220,11 +247,11 @@ async function start() {
 					ws.tokenDoc = res.tokenDoc;
 
 					terminal.log(`Client authenticated from ${ip} (token: ${res.tokenId || 'jwt'})`);
-					return ws.send(JSON.stringify({ id: msg.id, success: true }));
+					return send(ws, { id: msg.id, success: true });
 				}
 
 				if (!ws.authed) {
-					return ws.send(JSON.stringify({ id: msg.id, message: ws.authError || 'unauthorized' }));
+					return send(ws, { id: msg.id, message: ws.authError || 'unauthorized' });
 				}
 
 				// Extra safety check: ensure the token state hasn't been revoked
@@ -232,13 +259,13 @@ async function start() {
 					const hasAccess = await checkTokenWebsocketAccess(ws.tokenId);
 					if (!hasAccess) {
 						ws.authed = false;
-						return ws.send(JSON.stringify({ id: msg.id, message: 'Forbidden: websocket permission revoked' }));
+						return send(ws, { id: msg.id, message: 'Forbidden: websocket permission revoked' });
 					}
 				}
 
 				await handleMessage(ws, msg);
 			} catch {
-				ws.send(JSON.stringify({ message: 'Invalid JSON' }));
+				send(ws, { message: 'Invalid JSON' });
 			}
 		});
 
@@ -247,10 +274,11 @@ async function start() {
 		});
 	});
 
-	server.listen(port, '0.0.0.0', () => {
+	server.listen(port, () => {
 		terminal.log(`Server running on port ${port}`);
 		terminal.log(`Local gateway: ws://localhost:${port}`);
 		terminal.log(`Cloudflare tunnel: wss://ws.dev.xernerx.com`);
+		terminal.log(`Websocket is ready`);
 	});
 }
 

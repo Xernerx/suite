@@ -71,9 +71,9 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
 					}
 					if (!dbToken.permissions?.websocket) {
 						return {
-						valid: false,
-						message: 'Forbidden: Token needs websocket allowance',
-					};
+							valid: false,
+							message: 'Forbidden: Token needs websocket allowance',
+						};
 					}
 					return {
 						valid: true,

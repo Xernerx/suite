@@ -38,7 +38,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 					}}
 				>
 					<div className={`relative z-10 flex flex-col ${showFooter ? 'min-h-full justify-between' : ''}`}>
-						<div style={{ padding: 'var(--ui-gap)' }}>{children}</div>
+						<div className="relative z-10" style={{ padding: 'var(--ui-gap)' }}>
+							{children}
+						</div>
 
 						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}
 						{showFooter && <Footer />}

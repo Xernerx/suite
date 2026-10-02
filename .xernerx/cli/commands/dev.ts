@@ -176,8 +176,8 @@ export default function registerDev(program: Command) {
 				} else if (type === 'clients') {
 					runCommand('pnpm', ['--parallel', '--filter', './clients/*', 'dev']);
 				} else if (type === 'tunnel') {
-					process.env.TUNNEL_LOGLEVEL = 'error';
-					runCommand('cloudflared', ['tunnel', '--protocol', 'http2', 'run']);
+					process.env.TUNNEL_LOGLEVEL = 'info';
+					runCommand('cloudflared', ['tunnel', 'run']);
 				} else {
 					console.log(`\x1b[31m[ERROR]\x1b[0m Unknown --only type: ${type}`);
 				}
@@ -185,7 +185,7 @@ export default function registerDev(program: Command) {
 				if (hasCustomDomain) {
 					console.log('[CLI] Custom domain detected. Starting apps and Cloudflare Tunnel...');
 					printEndpointsBox(currentDomain, hasCustomDomain);
-					process.env.TUNNEL_LOGLEVEL = 'error';
+					process.env.TUNNEL_LOGLEVEL = 'info';
 					process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
 					runCommand('npx', [
 						'concurrently',
@@ -194,7 +194,7 @@ export default function registerDev(program: Command) {
 						'-c',
 						'blue,green',
 						'"pnpm --parallel --filter ./apps/* --filter ./services/* --filter ./clients/* dev"',
-						'"cloudflared tunnel --protocol http2 run"',
+						'"cloudflared tunnel run"',
 					]);
 				} else {
 					console.log('[CLI] Local IP mode detected. Starting apps without tunnel...');
@@ -216,6 +216,7 @@ function printEndpointsBox(domain: string, isCustomDomain: boolean) {
 			{ name: 'App', port: 4004 },
 			{ name: 'Docs', port: 4005 },
 			{ name: 'Admin', port: 4006 },
+			{ name: 'Info', port: 4007 },
 		];
 
 		const boxWidth = 56;

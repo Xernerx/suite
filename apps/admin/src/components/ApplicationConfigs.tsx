@@ -332,7 +332,7 @@ export default function ApplicationConfigs() {
 												<span
 													className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.status === 'open' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}
 												>
-													{config.status === 'closed' ? t('admin.dashboard.applicationConfigs.closed') || 'CLOSED' : t('admin.dashboard.applicationConfigs.open') || 'OPEN'}
+													{config.status === 'closed' ? t('admin.dashboard.applicationConfigs.closed') : t('admin.dashboard.applicationConfigs.open')}
 												</span>
 												<span
 													className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.public !== false ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}

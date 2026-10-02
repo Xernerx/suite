@@ -78,6 +78,7 @@ export async function database(projectId: 'xernerx' | 'virtue') {
 			conn = mongoose.createConnection(connectionUri, {
 				dbName: cleanDbName,
 			});
+			conn.on('error', (err) => console.error(`Mongoose connection error for ${projectId}:`, err));
 			activeConnections[projectId][uriSuffix] = conn;
 		}
 
