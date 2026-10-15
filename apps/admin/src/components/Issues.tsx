@@ -110,13 +110,7 @@ export default function Issues() {
 			<Modal open={modalOpen} onOpenChange={setModalOpen} title={t('admin.dashboard.issues.modalTitle')}>
 				<div className="flex flex-col gap-4 pt-4">
 					<Input placeholder={t('admin.dashboard.issues.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} />
-					<Input
-						variant="textarea"
-						rows={4}
-						placeholder={t('admin.dashboard.issues.descPlaceholder')}
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-					/>
+					<Input variant="textarea" rows={4} placeholder={t('admin.dashboard.issues.descPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} />
 					<Input placeholder={t('admin.dashboard.issues.productPlaceholder')} list="product-tags" value={product} onChange={(e) => setProduct(e.target.value)} />
 					<datalist id="product-tags">
 						{products.map((p) => (
@@ -141,9 +135,7 @@ export default function Issues() {
 							<div className="flex items-center gap-2 mt-2">
 								<div className="text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded border border-(--accent)/20">{item.productId}</div>
 								{item.acknowledged === false && (
-									<span className="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20 font-medium">
-										{t('admin.dashboard.issues.submitted')}
-									</span>
+									<span className="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20 font-medium">{t('admin.dashboard.issues.submitted')}</span>
 								)}
 							</div>
 						</div>

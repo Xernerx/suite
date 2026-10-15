@@ -155,20 +155,8 @@ export default function BugsPage() {
 							<h2 className="text-xl font-bold text-(--text)">{t('info.bugs.newBug')}</h2>
 							<form onSubmit={submitBug} className="flex flex-col gap-4">
 								<Input placeholder={t('info.bugs.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} required />
-								<Input
-									variant="textarea"
-									rows={4}
-									placeholder={t('info.bugs.descriptionPlaceholder')}
-									value={description}
-									onChange={(e) => setDescription(e.target.value)}
-									required
-								/>
-								<Selector
-									value={product}
-									options={products.map((p) => ({ value: p, label: p }))}
-									onChange={setProduct}
-									placeholder={t('info.bugs.selectProduct')}
-								/>
+								<Input variant="textarea" rows={4} placeholder={t('info.bugs.descriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} required />
+								<Selector value={product} options={products.map((p) => ({ value: p, label: p }))} onChange={setProduct} placeholder={t('info.bugs.selectProduct')} />
 								<div className="flex flex-col gap-2">
 									<label className="text-xs font-bold text-(--text-muted) uppercase">{t('info.bugs.attachFile')}</label>
 									<input
@@ -216,21 +204,13 @@ export default function BugsPage() {
 										<div className="flex items-center gap-2 mt-2">
 											<Tooltip
 												content={
-													s.status === 'resolved'
-														? t('info.bugs.tooltips.resolved')
-														: s.acknowledged
-															? t('info.bugs.tooltips.verified')
-															: t('info.bugs.tooltips.submitted')
+													s.status === 'resolved' ? t('info.bugs.tooltips.resolved') : s.acknowledged ? t('info.bugs.tooltips.verified') : t('info.bugs.tooltips.submitted')
 												}
 											>
 												<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
 													<span className={`w-2 h-2 rounded-full ${s.status === 'resolved' ? 'bg-green-500' : s.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}></span>
 													<span className="text-xs uppercase font-bold text-(--text-muted)">
-														{s.status === 'resolved'
-															? t('info.bugs.status.resolved')
-															: s.acknowledged
-																? t('info.bugs.status.verified')
-																: t('info.bugs.status.submitted')}
+														{s.status === 'resolved' ? t('info.bugs.status.resolved') : s.acknowledged ? t('info.bugs.status.verified') : t('info.bugs.status.submitted')}
 													</span>
 												</div>
 											</Tooltip>

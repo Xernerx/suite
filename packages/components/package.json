@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/components",
-	"version": "0.2.24",
+	"version": "0.2.25",
 	"private": true,
 	"main": "./index.ts",
 	"exports": {

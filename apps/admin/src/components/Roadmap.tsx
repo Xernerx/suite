@@ -115,29 +115,14 @@ export default function Roadmap() {
 				<Button onClick={openCreate}>{t('admin.dashboard.roadmap.addItem')}</Button>
 			</div>
 
-			<Modal
-				open={modalOpen}
-				onOpenChange={setModalOpen}
-				title={editId ? t('admin.dashboard.roadmap.modalTitle') : t('admin.dashboard.roadmap.modalTitle')}
-			>
+			<Modal open={modalOpen} onOpenChange={setModalOpen} title={editId ? t('admin.dashboard.roadmap.modalTitle') : t('admin.dashboard.roadmap.modalTitle')}>
 				<div className="flex flex-col gap-4 pt-4">
 					<Input placeholder={t('admin.dashboard.roadmap.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} />
-					<Input
-						variant="textarea"
-						rows={3}
-						placeholder={t('admin.dashboard.roadmap.descPlaceholder')}
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-					/>
+					<Input variant="textarea" rows={3} placeholder={t('admin.dashboard.roadmap.descPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} />
 
 					<div className="flex gap-4">
 						<div className="w-full">
-							<Input
-								placeholder={t('admin.dashboard.roadmap.productPlaceholder')}
-								list="product-tags"
-								value={product}
-								onChange={(e) => setProduct(e.target.value)}
-							/>
+							<Input placeholder={t('admin.dashboard.roadmap.productPlaceholder')} list="product-tags" value={product} onChange={(e) => setProduct(e.target.value)} />
 							<datalist id="product-tags">
 								{products.map((p) => (
 									<option key={p} value={p} />

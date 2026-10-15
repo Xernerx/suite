@@ -307,9 +307,7 @@ export default function RoadmapPage() {
 														<div className="flex justify-between items-start mb-2">
 															<div className="flex items-center gap-2">
 																<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-gray-500'}`}></span>
-																<span className="text-xs uppercase font-bold text-(--text-muted)">
-																	{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}
-																</span>
+																<span className="text-xs uppercase font-bold text-(--text-muted)">{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}</span>
 															</div>
 														</div>
 														<h3 className="font-bold text-lg text-(--text)">{item.title}</h3>
@@ -372,14 +370,7 @@ export default function RoadmapPage() {
 														<span className="text-xs font-black uppercase text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-red-500/20">
 															{issue.productId}
 														</span>
-														<Tooltip
-															position="bottom"
-															content={
-																issue.acknowledged
-																	? t('info.bugs.tooltips.verified')
-																	: t('info.bugs.tooltips.submitted')
-															}
-														>
+														<Tooltip position="bottom" content={issue.acknowledged ? t('info.bugs.tooltips.verified') : t('info.bugs.tooltips.submitted')}>
 															<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
 																<span className={`w-2 h-2 rounded-full ${issue.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}></span>
 																<span className="text-[10px] uppercase font-bold text-(--text-muted)">

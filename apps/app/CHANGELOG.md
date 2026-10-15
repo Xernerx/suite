@@ -1,5 +1,16 @@
 # app
 
+## 2.6.8
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.0.0
+    - @xernerx/components@0.2.25
+    - @xernerx/providers@0.4.1
+    - @xernerx/feedback@0.0.26
+    - @xernerx/ui@0.3.9
+
 ## 2.6.7
 
 ### Patch Changes

@@ -57,6 +57,7 @@ export const auth: NextAuthOptions = {
 		DiscordProvider({
 			clientId: process.env.DISCORD_CLIENT_ID!,
 			clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+			issuer: 'https://discord.com',
 			authorization: {
 				params: {
 					scope: 'identify guilds guilds.join email connections guilds.members.read',

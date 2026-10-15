@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 1.0.0
+
+### Major Changes
+
+- Fixed a breaking issue causing users to be unable to sign in due to new regulations for session providers (RFC 9207 (OAuth 2.0 Authorization Server Issuer Identification))
+
 ## 0.6.0
 
 ### Minor Changes

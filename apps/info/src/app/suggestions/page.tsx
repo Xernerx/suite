@@ -149,12 +149,7 @@ export default function SuggestionsPage() {
 									onChange={(e) => setDescription(e.target.value)}
 									required
 								/>
-								<Selector
-									value={product}
-									options={products.map((p) => ({ value: p, label: p }))}
-									onChange={setProduct}
-									placeholder={t('info.suggestions.selectProduct')}
-								/>
+								<Selector value={product} options={products.map((p) => ({ value: p, label: p }))} onChange={setProduct} placeholder={t('info.suggestions.selectProduct')} />
 								<div className="flex gap-2 w-full">
 									<Button type="submit" className="flex-1">
 										{t('info.suggestions.submit')}
@@ -170,12 +165,7 @@ export default function SuggestionsPage() {
 
 				{/* List & Search */}
 				<div className={`flex flex-col gap-4 ${user && showForm ? 'col-span-2' : 'col-span-1 max-w-3xl mx-auto w-full'}`}>
-					<Input
-						variant="search"
-						placeholder={t('info.suggestions.searchPlaceholder')}
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-					/>
+					<Input variant="search" placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 
 					<AnimatePresence mode="popLayout">
 						{filteredSuggestions.map((s: any) => {
