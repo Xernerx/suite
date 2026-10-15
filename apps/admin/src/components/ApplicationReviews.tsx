@@ -1,4 +1,3 @@
-// Force recompile
 /** @format */
 'use client';
 
@@ -153,7 +152,10 @@ export default function ApplicationReviews() {
 				}).catch((err) => console.error('Failed to send notification', err));
 			}
 
-			toast({ title: `Application ${newStatus} successfully.`, type: 'success' });
+			toast({
+				title: newStatus === 'approved' ? t('admin.dashboard.applicationReviews.toasts.approvedSuccess') : t('admin.dashboard.applicationReviews.toasts.deniedSuccess'),
+				type: 'success',
+			});
 
 			setApplications((prev) => prev.map((app) => (app.id === selectedApp.id ? { ...app, status: newStatus, reviewNote: reviewNote.trim() || undefined } : app)));
 			closeModal();

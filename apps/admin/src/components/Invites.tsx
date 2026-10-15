@@ -1,4 +1,4 @@
-// Force recompile
+/** @format */
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -40,11 +40,6 @@ export default function Invites() {
 	const [newScopes, setNewScopes] = useState('bot, applications.commands');
 	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
 
-	useEffect(() => {
-		if (!isReady) return;
-		fetchInvites();
-	}, [isReady]);
-
 	const fetchInvites = async () => {
 		setLoading(true);
 		try {
@@ -58,6 +53,11 @@ export default function Invites() {
 			setLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		if (!isReady) return;
+		fetchInvites();
+	}, [isReady]);
 
 	const openCreateModal = () => {
 		setEditId(null);
@@ -118,7 +118,7 @@ export default function Invites() {
 				throw new Error('Failed to save');
 			}
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.invites.toasts.saveFailed'), description: err.message });
 		} finally {
 			setCreating(false);
 		}
@@ -155,13 +155,13 @@ export default function Invites() {
 			<div className="flex flex-col sm:flex-row items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col">
 					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						Application Invites
+						{t('admin.dashboard.invites.title')}
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.invites.subtitle')}</p>
 				</div>
 				<Button variant="primary" onClick={openCreateModal} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					<Plus size={16} />
-					<span>Create Invite</span>
+					<span>{t('admin.dashboard.invites.createButton')}</span>
 				</Button>
 			</div>
 

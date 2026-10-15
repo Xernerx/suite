@@ -1,9 +1,7 @@
 /** @format */
-
-// Force recompile
 'use client';
 
-import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug } from 'lucide-react';
+import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -21,6 +19,7 @@ import Suggestions from '@/components/Suggestions';
 import Roadmap from '@/components/Roadmap';
 import Issues from '@/components/Issues';
 import Media from '@/components/Media';
+import StoreManagement from '@/components/StoreManagement';
 import { permissions } from '@xernerx/lib';
 import { Server } from 'lucide-react';
 
@@ -88,7 +87,7 @@ export default function Home() {
 				setUserRolePermissions(mergedPermissions);
 			} catch (err: any) {
 				console.error('Failed to fetch role permissions:', err);
-				toast({ type: 'error', title: 'Failed to fetch permissions', description: err.message });
+				toast({ type: 'error', title: t('admin.dashboard.toasts.fetchPermissionsError'), description: err.message });
 			} finally {
 				setRoleLoading(false);
 			}
@@ -118,6 +117,7 @@ export default function Home() {
 		const canManageRoadmap = userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false;
 		const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
 		const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
+		const canManageStore = userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false;
 		const canMedia = canManageMedia || canUploadMedia;
 
 		const isServerSet = !!adminServerId;
@@ -236,6 +236,14 @@ export default function Home() {
 				icon: Bug,
 			});
 		}
+		if (canManageStore) {
+			items.push({
+				category: t('common.nav.categories.product'),
+				label: t('admin.dashboard.nav.store'),
+				view: 'store',
+				icon: ShoppingBag,
+			});
+		}
 
 		setNavItems(items);
 
@@ -267,6 +275,7 @@ export default function Home() {
 	const canManageRoadmap = userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false;
 	const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
 	const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
+	const canManageStore = userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false;
 
 	const isServerSet = !!adminServerId;
 
@@ -283,6 +292,7 @@ export default function Home() {
 	if (canManageRoadmap) allowedViews.push('roadmap');
 	if (canManageSuggestions) allowedViews.push('suggestions');
 	if (canManageIssues) allowedViews.push('issues');
+	if (canManageStore) allowedViews.push('store');
 
 	const activeView = allowedViews.includes(view!) ? view : allowedViews[0];
 
@@ -308,6 +318,7 @@ export default function Home() {
 			{activeView === 'roadmap' && <Roadmap />}
 			{activeView === 'suggestions' && <Suggestions />}
 			{activeView === 'issues' && <Issues />}
+			{activeView === 'store' && <StoreManagement />}
 		</div>
 	);
 }

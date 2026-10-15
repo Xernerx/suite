@@ -1,4 +1,5 @@
 /** @format */
+// Force recompile
 
 import BotProfileSchema from './models/xernerx/bots/Profile';
 import BotStatSchema from './models/xernerx/bots/Stat';
@@ -15,6 +16,9 @@ import CoreMediaSchema from './models/xernerx/core/Media';
 import CoreSuggestionSchema from './models/xernerx/core/Suggestion';
 import CoreRoadmapItemSchema from './models/xernerx/core/RoadmapItem';
 import CoreIssueSchema from './models/xernerx/core/Issue';
+
+import StoreCategorySchema from './models/xernerx/store/Category';
+import StoreItemSchema from './models/xernerx/store/Item';
 
 import DispatchApplicationSchema from './models/xernerx/dispatch/Application';
 import DispatchApplicationConfigSchema from './models/xernerx/dispatch/ApplicationConfig';
@@ -55,6 +59,10 @@ export const xernerxModels = {
 		Suggestion: { schema: CoreSuggestionSchema, modelName: 'Suggestion' },
 		RoadmapItem: { schema: CoreRoadmapItemSchema, modelName: 'RoadmapItem' },
 		Issue: { schema: CoreIssueSchema, modelName: 'Issue' },
+	},
+	store: {
+		Category: { schema: StoreCategorySchema, modelName: 'Category', collection: 'categories' },
+		Item: { schema: StoreItemSchema, modelName: 'Item', collection: 'items' },
 	},
 	dispatch: {
 		Application: { schema: DispatchApplicationSchema, modelName: 'Application' },

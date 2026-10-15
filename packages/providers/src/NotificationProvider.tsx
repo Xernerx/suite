@@ -31,15 +31,15 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
 	const { user } = useUser();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 
 	// Fetch notifications based on the current user
 	const fetchNotifications = useCallback(async () => {
-		if (!user?.id) {
-			setNotifications([]);
+		if (!isReady || !user?.id) {
+			if (!user?.id) setNotifications([]);
 			setIsLoading(false);
 			return;
 		}
@@ -105,7 +105,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [user?.id, getEnvUrl]);
+	}, [user?.id, getEnvUrl, isReady]);
 
 	// Automatically fetch when the user ID changes (e.g., logging in/out)
 	useEffect(() => {

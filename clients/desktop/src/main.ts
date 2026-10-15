@@ -197,7 +197,7 @@ async function waitForServer() {
 		attempt++;
 
 		try {
-			const res = await fetch(`${WEB_URL}/api/status`);
+			const res = await fetch(`${WEB_URL}/api/version`);
 
 			if (res.ok) {
 				sendStatus('Ready');

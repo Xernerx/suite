@@ -1,3 +1,5 @@
+/** @format */
+
 import { auth, permissions } from '@xernerx/lib';
 
 import { NextResponse } from 'next/server';

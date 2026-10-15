@@ -22,7 +22,8 @@ interface GuildProfile {
 }
 
 function ServerCard({ server }: { server: GuildProfile }) {
-	const name = server.name || 'Unknown Server';
+	const { t } = useDictionary();
+	const name = server.name || t('common.unknownServer');
 	const avatar = server.icon ? `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png` : null;
 	const banner = server.banner ? `https://cdn.discordapp.com/banners/${server.id}/${server.banner}.png?size=1024` : null;
 
@@ -66,7 +67,7 @@ function ServerCard({ server }: { server: GuildProfile }) {
 
 				<div className="mt-4 flex flex-col flex-1">
 					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{name}</h4>
-					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{server.description || 'No description provided.'}</p>
+					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{server.description || t('common.noDescription')}</p>
 				</div>
 			</div>
 		</Link>
@@ -87,17 +88,17 @@ export default function ServersList() {
 		show();
 
 		const baseNavItems = [
-			{ label: 'Back to Explore', href: '/', icon: ArrowLeft, category: 'Navigation' },
-			{ label: 'All Servers', view: 'all', icon: Server, category: 'Algorithms' },
-			{ label: 'Top Voted', view: 'top_voted', icon: ChevronUp, category: 'Algorithms' },
-			{ label: 'Biggest Communities', view: 'biggest', icon: Trophy, category: 'Algorithms' },
-			{ label: 'Newcomers', view: 'newcomers', icon: Sparkles, category: 'Algorithms' },
+			{ label: t('app.servers.nav.backToExplore'), href: '/', icon: ArrowLeft, category: t('app.bots.nav.categoryNavigation') },
+			{ label: t('app.servers.nav.allServers'), view: 'all', icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.topVoted'), view: 'top_voted', icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.biggestServers'), view: 'biggest', icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.newcomers'), view: 'newcomers', icon: Sparkles, category: t('app.bots.nav.categoryAlgorithms') },
 		];
 
 		setNavItems(baseNavItems);
 
 		return () => hide();
-	}, [setNavItems, show, hide]);
+	}, [setNavItems, show, hide, t]);
 
 	// Fetch Servers based on Sidebar View or Search Query
 	useEffect(() => {
@@ -137,14 +138,14 @@ export default function ServersList() {
 				<div className="flex items-center gap-4">
 					<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{searchParams.get('search')
-							? `Search: ${searchParams.get('search')}`
+							? `${t('common.search')}: ${searchParams.get('search')}`
 							: view === 'all'
-								? 'All Servers'
+								? t('app.servers.nav.allServers')
 								: view === 'top_voted'
-									? 'Top Voted'
+									? t('app.categories.topVoted')
 									: view === 'newcomers'
-										? 'Newcomers'
-										: 'Biggest Communities'}
+										? t('app.categories.newcomers')
+										: t('app.categories.biggestServers')}
 					</h1>
 				</div>
 
@@ -152,7 +153,7 @@ export default function ServersList() {
 					<Input
 						variant="search"
 						shortcut="/"
-						placeholder="Search for a server..."
+						placeholder={t('app.servers.placeholder')}
 						defaultValue={searchParams.get('search') || ''}
 						onSearch={(val) => {
 							if (val.trim()) {
@@ -181,8 +182,8 @@ export default function ServersList() {
 					<div className="w-20 h-20 bg-(--foreground) border border-(--border)/10 rounded-3xl flex items-center justify-center mb-6 shadow-sm">
 						<Server className="w-10 h-10 text-(--text-muted)/50" />
 					</div>
-					<h2 className="text-2xl font-bold text-(--text) mb-2">No servers found</h2>
-					<p className="text-(--text-muted) max-w-md">Try adjusting your search or check back later.</p>
+					<h2 className="text-2xl font-bold text-(--text) mb-2">{t('app.servers.noServersFound')}</h2>
+					<p className="text-(--text-muted) max-w-md">{t('app.servers.noServersDesc')}</p>
 				</div>
 			)}
 		</div>

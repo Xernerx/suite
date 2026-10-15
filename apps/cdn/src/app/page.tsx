@@ -60,7 +60,7 @@ export default function Home() {
 						</h1>
 
 						<p className="max-w-xl text-lg text-(--text-muted) leading-relaxed mb-10 border-l-2 border-(--border)/20 pl-6">
-							{t('cdn.common.description', 'Xernerx content delivery network and asset storage service.')}
+							{t('cdn.common.description')}
 							<br />
 							<br />
 							{t('cdn.home.description2')}

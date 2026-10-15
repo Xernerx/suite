@@ -1,6 +1,7 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
@@ -53,7 +54,6 @@ export async function POST(req: Request) {
 		// But for now, we just create the Organization document
 		const newOrg = await OrganizationModel.create(body);
 
-		const crypto = require('crypto');
 		await RoleModel.create([
 			{
 				id: crypto.randomUUID(),

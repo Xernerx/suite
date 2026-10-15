@@ -527,5 +527,28 @@
 				"votes": "Votes"
 			}
 		}
+	},
+	"lib": {
+		"navigation": {
+			"categories": {
+				"user": "Utilisateur",
+				"developer": "Développeur",
+				"public": "Public",
+				"management": "Gestion"
+			},
+			"items": {
+				"explore": "Explorer",
+				"dashboard": "Tableau de bord",
+				"account": "Compte",
+				"store": "Boutique",
+				"portal": "Portail",
+				"api": "API",
+				"docs": "Documentation",
+				"cdn": "CDN",
+				"website": "Site web",
+				"admin": "Admin",
+				"help": "Aide"
+			}
+		}
 	}
 }

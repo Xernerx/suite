@@ -1,3 +1,5 @@
+/** @format */
+
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
@@ -13,7 +15,7 @@ export async function GET(req: NextRequest) {
 		const acknowledged = url.searchParams.get('acknowledged');
 		const status = url.searchParams.get('status');
 
-		let filter: any = {};
+		const filter: any = {};
 		if (acknowledged === 'true') {
 			filter.acknowledged = true;
 		} else if (acknowledged === 'false') {

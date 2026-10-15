@@ -504,7 +504,8 @@
 				"media": "Медиа",
 				"mediaLibrary": "Медиатека",
 				"invites": "Приглашения",
-				"announcements": "Объявления"
+				"announcements": "Объявления",
+				"store": "Магазин"
 			},
 			"media": {
 				"title": "Медиатека",
@@ -779,6 +780,83 @@
 			"uploadMedia": {
 				"label": "Загрузка медиа",
 				"description": "Разрешение на загрузку медиа и управление собственными медиафайлами в CDN."
+			}
+		},
+		"store": {
+			"title": "Управление магазином",
+			"description": "Настройка динамических категорий, товаров, Stripe SKU ID и промо-скидок без перезагрузки сервера.",
+			"tabs": {
+				"items": "Товары и SKU ID",
+				"categories": "Категории"
+			},
+			"stats": {
+				"totalItems": "Всего товаров",
+				"activeItems": "Активных товаров",
+				"categories": "Категории",
+				"discounted": "Со скидкой"
+			},
+			"buttons": {
+				"newItem": "Новый товар",
+				"newCategory": "Новая категория",
+				"save": "Сохранить изменения",
+				"cancel": "Отмена",
+				"delete": "Удалить",
+				"saving": "Сохранение...",
+				"deleting": "Удаление...",
+				"edit": "Редактировать"
+			},
+			"table": {
+				"name": "Название товара",
+				"category": "Категория",
+				"skuId": "SKU ID (Stripe)",
+				"discount": "Скидка",
+				"status": "Статус",
+				"actions": "Действия",
+				"order": "Порядок",
+				"itemCount": "Товары",
+				"noItems": "Товары магазина не найдены.",
+				"noCategories": "Категории магазина не найдены.",
+				"searchPlaceholder": "Поиск товаров по названию или SKU...",
+				"allCategories": "Все категории"
+			},
+			"itemModal": {
+				"createTitle": "Создать товар",
+				"editTitle": "Редактировать товар",
+				"name": "Название товара",
+				"namePlaceholder": "например, Ultra Ecosystem",
+				"skuId": "Stripe Product ID (SKU)",
+				"skuIdPlaceholder": "например, prod_V0pD5uXoTQkrYS",
+				"category": "Категория",
+				"description": "Описание",
+				"descriptionPlaceholder": "Краткое описание товара...",
+				"badge": "Бейдж (необязательно)",
+				"badgePlaceholder": "например, Популярный, Эко",
+				"discount": "Процент скидки (%)",
+				"features": "Особенности (по одной в строке)",
+				"featuresPlaceholder": "Функция 1\nФункция 2\nФункция 3",
+				"order": "Порядок сортировки",
+				"featured": "Главная карточка (выделенный вид)",
+				"enabled": "Активен в магазине"
+			},
+			"categoryModal": {
+				"createTitle": "Создать категорию",
+				"editTitle": "Редактировать категорию",
+				"name": "Название категории",
+				"namePlaceholder": "например, Боты и Ультра",
+				"id": "Идентификатор категории",
+				"idPlaceholder": "например, consumers, developers",
+				"icon": "Имя иконки (Lucide)",
+				"order": "Порядок сортировки",
+				"enabled": "Активна в магазине"
+			},
+			"alerts": {
+				"itemSaved": "Товар успешно сохранен.",
+				"itemDeleted": "Товар успешно удален.",
+				"categorySaved": "Категория успешно сохранена.",
+				"categoryDeleted": "Категория успешно удалена.",
+				"skuCopied": "SKU ID скопирован в буфер обмена.",
+				"deleteItemConfirm": "Вы уверены, что хотите удалить товар «{name}»?",
+				"deleteCategoryConfirm": "Вы уверены, что хотите удалить категорию «{name}»? Все товары этой категории также будут удалены."
 			}
 		}
 	},
@@ -1088,7 +1166,8 @@
 			},
 			"billing": {
 				"monthly": "Ежемесячно",
-				"annually": "Ежегодно (скидка 20%)"
+				"annually": "Ежегодно",
+				"annuallyDiscount": "Ежегодно (скидка 20%)"
 			},
 			"ultra": {
 				"badge": "Ultimate Ecosystem Bundle",
@@ -1098,7 +1177,8 @@
 				"features": {
 					"bots": "Доступ ко всем потребительским ботам (Zodiac, Virtue, To-Do, Metamorphosis)",
 					"servers": "Все подписки на утилиты уровня сервера",
-					"support": "Приоритетный доступ к каналу поддержки"
+					"support": "Приоритетный доступ к каналу поддержки",
+					"media": "1 000 загрузок медиа (CDN)"
 				}
 			},
 			"sections": {
@@ -1157,6 +1237,17 @@
 				"confirmButton": "Подтвердить отмену",
 				"keepButton": "Сохранить подписку",
 				"errorDefault": "Не удалось отменить подписку"
+			},
+			"taxNotice": "Цены и применимые налоги рассчитываются безопасно при оформлении заказа.",
+			"free": {
+				"badge": "Базовый",
+				"title": "Бесплатно",
+				"desc": "Базовый доступ к платформе.",
+				"features": {
+					"consumerBots": "Доступ ко всем потребительским ботам",
+					"mediaUploads": "10 загрузок медиа (CDN)"
+				},
+				"includedFree": "Включено бесплатно"
 			}
 		},
 		"login": {
@@ -2429,6 +2520,7 @@
 				"explore": "Обзор",
 				"dashboard": "Панель управления",
 				"account": "Аккаунт",
+				"store": "Магазин",
 				"portal": "Портал",
 				"api": "API",
 				"docs": "Документация",

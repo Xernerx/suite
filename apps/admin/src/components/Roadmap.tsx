@@ -1,3 +1,4 @@
+/** @format */
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
@@ -63,7 +64,8 @@ export default function Roadmap() {
 	};
 
 	const saveItem = async () => {
-		if (!title || !description || !product || !status) return toast({ type: 'error', title: 'Error', description: 'Fill required fields' });
+		if (!title || !description || !product || !status)
+			return toast({ type: 'error', title: t('admin.dashboard.roadmap.toasts.error'), description: t('admin.dashboard.roadmap.toasts.fillRequired') });
 		try {
 			await fetch(getEnvUrl(editId ? `https://api.xernerx.com/secure/core/roadmap/${editId}` : 'https://api.xernerx.com/secure/core/roadmap'), {
 				method: editId ? 'PUT' : 'POST',
@@ -71,11 +73,15 @@ export default function Roadmap() {
 				credentials: 'include',
 				body: JSON.stringify({ title, description, productId: product, status, targetQuarter }),
 			});
-			toast({ type: 'success', title: editId ? 'Updated' : 'Created', description: `Roadmap item ${editId ? 'updated' : 'added'}.` });
+			toast({
+				type: 'success',
+				title: editId ? t('admin.dashboard.roadmap.toasts.updated') : t('admin.dashboard.roadmap.toasts.created'),
+				description: editId ? t('admin.dashboard.roadmap.toasts.updatedDesc') : t('admin.dashboard.roadmap.toasts.createdDesc'),
+			});
 			setModalOpen(false);
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.roadmap.toasts.error'), description: err.message });
 		}
 	};
 
@@ -89,7 +95,7 @@ export default function Roadmap() {
 			});
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.roadmap.toasts.error'), description: err.message });
 		}
 	};
 
@@ -99,10 +105,10 @@ export default function Roadmap() {
 				method: 'DELETE',
 				credentials: 'include',
 			});
-			toast({ type: 'success', title: 'Deleted', description: 'Item removed.' });
+			toast({ type: 'success', title: t('admin.dashboard.roadmap.toasts.deleted'), description: t('admin.dashboard.roadmap.toasts.deletedDesc') });
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.roadmap.toasts.error'), description: err.message });
 		}
 	};
 
@@ -160,7 +166,10 @@ export default function Roadmap() {
 									<div className="flex flex-col gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
 										<Selector
 											value={item.status}
-											options={['idea', 'planned', 'active', 'released'].map((s) => ({ value: s, label: `Move to ${s}` }))}
+											options={['idea', 'planned', 'active', 'released'].map((s) => ({
+												value: s,
+												label: t('admin.dashboard.roadmap.moveTo', { status: t(`info.roadmap.timeline.status.${s}`) }),
+											}))}
 											onChange={(val) => updateStatus(item.id, val)}
 										/>
 										<div className="flex gap-2 w-full">

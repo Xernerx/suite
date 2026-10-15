@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { syncSisterServers } from '../sync';
+import { syncSisterServers } from '@/lib/sync/settings';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {

@@ -1,6 +1,6 @@
 /** @format */
 
-import { BookOpen, Cloud, Globe, LayoutDashboard, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy } from 'lucide-react';
+import { BookOpen, Cloud, Globe, LayoutDashboard, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
 
 export type NavigationItem = {
 	label: string;
@@ -15,6 +15,7 @@ export const navigation: NavigationItem[] = [
 	{ label: 'lib.navigation.items.explore', href: 'https://app.xernerx.com', icon: Compass, category: 'lib.navigation.categories.user' },
 	{ label: 'lib.navigation.items.dashboard', href: 'https://app.xernerx.com/dashboard', icon: LayoutDashboard, category: 'lib.navigation.categories.user' },
 	{ label: 'lib.navigation.items.account', href: 'https://account.xernerx.com', icon: UserCircle, category: 'lib.navigation.categories.user' },
+	{ label: 'lib.navigation.items.store', href: 'https://store.xernerx.com', icon: Store, category: 'lib.navigation.categories.user' },
 
 	// Developer
 	{ label: 'lib.navigation.items.portal', href: 'https://app.xernerx.com/portal', icon: Building2, category: 'lib.navigation.categories.developer' },

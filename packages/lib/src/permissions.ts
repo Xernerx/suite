@@ -98,4 +98,10 @@ export const permissions: PermissionDefinition[] = [
 		description: 'Permission to log bugs and mark them as resolved for health metrics.',
 		defaultValue: false,
 	},
+	{
+		key: 'manageStore',
+		label: 'Manage Store',
+		description: 'Permission to configure store categories, items, pricing, and discounts.',
+		defaultValue: false,
+	},
 ];

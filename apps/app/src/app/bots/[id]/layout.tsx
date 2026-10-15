@@ -1,3 +1,5 @@
+/** @format */
+
 import type { Metadata } from 'next';
 import { database } from '@xernerx/lib/server';
 

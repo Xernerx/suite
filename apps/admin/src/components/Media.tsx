@@ -235,7 +235,7 @@ export default function Media() {
 								<div className="flex items-center gap-1.5">
 									{item.shared?.length > 0 && (
 										<span className="flex items-center gap-1 text-[9px] bg-blue-500/10 text-blue-500 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-wider">
-											<Users size={10} /> Shared
+											<Users size={10} /> {t('admin.dashboard.media.shared')}
 										</span>
 									)}
 									<span className="uppercase">{item.privacy}</span>
@@ -331,10 +331,10 @@ export default function Media() {
 
 						<div className="flex justify-end gap-3 mt-6">
 							<Button variant="secondary" onClick={() => setEditMedia(null)} disabled={saving}>
-								Cancel
+								{t('admin.dashboard.media.cancel')}
 							</Button>
 							<Button variant="primary" onClick={handleSaveEdit} loading={saving}>
-								Save Changes
+								{t('admin.dashboard.media.saveChanges')}
 							</Button>
 						</div>
 					</div>

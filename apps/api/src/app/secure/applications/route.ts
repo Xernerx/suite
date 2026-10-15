@@ -1,3 +1,5 @@
+/** @format */
+
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import crypto from 'crypto';
@@ -11,7 +13,7 @@ export async function GET(req: Request) {
 		const { models } = await database('xernerx');
 		const Application = models.dispatch.Application as any;
 
-		let query: any = {};
+		const query: any = {};
 		if (organizationId) {
 			query['data.metadata.organizationId'] = organizationId;
 		}

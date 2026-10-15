@@ -1,3 +1,4 @@
+/** @format */
 import { useState, useEffect } from 'react';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
@@ -18,7 +19,7 @@ export default function Suggestions() {
 				setLoading(false);
 			})
 			.catch((err) => {
-				toast({ type: 'error', title: 'Error', description: err.message });
+				toast({ type: 'error', title: t('admin.dashboard.suggestions.toasts.error'), description: err.message });
 				setLoading(false);
 			});
 	};
@@ -33,10 +34,10 @@ export default function Suggestions() {
 				method: 'DELETE',
 				credentials: 'include',
 			});
-			toast({ type: 'success', title: 'Declined', description: 'Suggestion deleted.' });
+			toast({ type: 'success', title: t('admin.dashboard.suggestions.toasts.declined'), description: t('admin.dashboard.suggestions.toasts.declinedDesc') });
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.suggestions.toasts.error'), description: err.message });
 		}
 	};
 
@@ -61,10 +62,10 @@ export default function Suggestions() {
 				credentials: 'include',
 			});
 
-			toast({ type: 'success', title: 'Accepted', description: 'Promoted to Roadmap Ideas.' });
+			toast({ type: 'success', title: t('admin.dashboard.suggestions.toasts.accepted'), description: t('admin.dashboard.suggestions.toasts.acceptedDesc') });
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.suggestions.toasts.error'), description: err.message });
 		}
 	};
 
@@ -97,7 +98,7 @@ export default function Suggestions() {
 						</div>
 					);
 				})}
-				{data.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">No pending suggestions.</div>}
+				{data.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">{t('admin.dashboard.suggestions.noSuggestions')}</div>}
 			</div>
 		</div>
 	);

@@ -171,13 +171,13 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 
 					<div className="flex flex-col flex-1 min-w-0">
 						<span className="text-xs uppercase tracking-widest text-(--accent) font-black mb-1">
-							{t(`www.timeline.events.${index}.date`, {}, milestone.date) === 'DYNAMIC_DATE'
+							{t(`www.timeline.events.${index}.date`) === 'DYNAMIC_DATE'
 								? `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][new Date().getMonth()]} ${new Date().getFullYear()}`
-								: t(`www.timeline.events.${index}.date`, {}, milestone.date)}
+								: t(`www.timeline.events.${index}.date`)}
 						</span>
 
 						<span className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
-							{t(`www.timeline.events.${index}.title`, {}, milestone.title)}
+							{t(`www.timeline.events.${index}.title`)}
 							{finalLink && (
 								<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
 							)}
@@ -186,7 +186,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 				</div>
 
 				{/* DESCRIPTION */}
-				<p className="text-base leading-relaxed text-(--text-muted) relative z-10 font-medium">{t(`www.timeline.events.${index}.description`, {}, milestone.description)}</p>
+				<p className="text-base leading-relaxed text-(--text-muted) relative z-10 font-medium">{t(`www.timeline.events.${index}.description`)}</p>
 			</Component>
 		</div>
 	);

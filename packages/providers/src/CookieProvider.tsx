@@ -8,7 +8,11 @@ export type CookiePreferences = {
 	functional: boolean;
 	analytics: boolean;
 	marketing: boolean;
+	agreedAt?: string;
 };
+
+// This date is automatically bumped by the `suite commit` script
+const COOKIES_VERSION = new Date('2026-10-15T00:00:00Z').getTime();
 
 const defaultPreferences: CookiePreferences = {
 	essential: true, // Always required
@@ -21,6 +25,9 @@ type CookieContextType = {
 	cookies: Record<string, string>;
 	// null means the user hasn't made a choice yet
 	preferences: CookiePreferences | null;
+	isPromptOpen: boolean;
+	openPrompt: () => void;
+	closePrompt: () => void;
 	getCookie: (name: string) => string | undefined;
 	setCookie: (name: string, value: string, days?: number) => void;
 	removeCookie: (name: string) => void;
@@ -47,6 +54,7 @@ const parseCookies = (): Record<string, string> => {
 export function CookieProvider({ children }: { children: React.ReactNode }) {
 	const [cookies, setCookies] = useState<Record<string, string>>({});
 	const [preferences, setPreferences] = useState<CookiePreferences | null>(null);
+	const [isPromptOpen, setIsPromptOpen] = useState(false);
 
 	useEffect(() => {
 		const initialCookies = parseCookies();
@@ -58,13 +66,27 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 
 		if (savedConsent) {
 			try {
-				setPreferences(JSON.parse(savedConsent));
+				const parsed: CookiePreferences = JSON.parse(savedConsent);
+				const agreedTime = parsed.agreedAt ? new Date(parsed.agreedAt).getTime() : 0;
+
+				if (agreedTime < COOKIES_VERSION && !isElectron) {
+					// Outdated cookie agreement — prompt user again
+					setPreferences(null);
+				} else {
+					setPreferences(parsed);
+				}
 			} catch (e) {
 				// Fallback if the cookie data got corrupted
 				setPreferences(defaultPreferences);
 			}
 		} else if (isElectron) {
-			const allAccepted = { essential: true, functional: true, analytics: true, marketing: true };
+			const allAccepted: CookiePreferences = {
+				essential: true,
+				functional: true,
+				analytics: true,
+				marketing: true,
+				agreedAt: new Date().toISOString(),
+			};
 			setPreferences(allAccepted);
 
 			// Silently set the cookie so it doesn't ask again
@@ -97,17 +119,33 @@ export function CookieProvider({ children }: { children: React.ReactNode }) {
 
 	const updatePreferences = useCallback(
 		(prefs: CookiePreferences) => {
-			setPreferences(prefs);
-			setCookie('xernerx-cookie-consent', JSON.stringify(prefs), 365);
+			const updatedPrefs: CookiePreferences = {
+				...prefs,
+				agreedAt: new Date().toISOString(),
+			};
+			setPreferences(updatedPrefs);
+			setCookie('xernerx-cookie-consent', JSON.stringify(updatedPrefs), 365);
+			setIsPromptOpen(false);
 		},
 		[setCookie]
 	);
+
+	const openPrompt = useCallback(() => {
+		setIsPromptOpen(true);
+	}, []);
+
+	const closePrompt = useCallback(() => {
+		setIsPromptOpen(false);
+	}, []);
 
 	return (
 		<CookieContext.Provider
 			value={{
 				cookies,
 				preferences,
+				isPromptOpen,
+				openPrompt,
+				closePrompt,
 				getCookie,
 				setCookie,
 				removeCookie,

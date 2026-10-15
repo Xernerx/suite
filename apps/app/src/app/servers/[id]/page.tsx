@@ -84,12 +84,12 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	useEffect(() => {
 		show();
 		setNavItems([
-			{ label: 'Back to Servers', href: '/servers', icon: ArrowLeft, category: 'Navigation' },
-			{ label: 'Profile', view: 'profile', icon: Server, category: 'Server Details' },
-			{ label: 'Statistics', view: 'statistics', icon: Activity, category: 'Server Details' },
+			{ label: t('app.servers.nav.backToServers'), href: '/servers', icon: ArrowLeft, category: t('app.portal.categories.navigation') },
+			{ label: t('app.organization.nav.profile'), view: 'profile', icon: Server, category: t('app.servers.nav.serverDetails') },
+			{ label: t('app.bots.tabs.statistics'), view: 'statistics', icon: Activity, category: t('app.servers.nav.serverDetails') },
 		]);
 		return () => hide();
-	}, [setNavItems, show, hide]);
+	}, [setNavItems, show, hide, t]);
 
 	// Fetch Server Profile
 	useEffect(() => {
@@ -156,11 +156,11 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
 				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					Server Not Found
+					{t('app.servers.notFoundTitle')}
 				</h2>
-				<p className="text-(--text-muted) mb-8">This server either doesn't exist or is private.</p>
+				<p className="text-(--text-muted) mb-8">{t('app.servers.notFoundDesc')}</p>
 				<Link href="/servers">
-					<Button variant="primary">Back to Explore</Button>
+					<Button variant="primary">{t('app.servers.backToExplore')}</Button>
 				</Link>
 			</div>
 		);
@@ -189,14 +189,14 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 						</h1>
 						{server.verified && <Shield className="w-6 h-6 text-green-500" />}
 					</div>
-					<p className="text-lg text-(--text-muted) mb-4 max-w-2xl">{server.description || 'No description provided.'}</p>
+					<p className="text-lg text-(--text-muted) mb-4 max-w-2xl">{server.description || t('common.noDescription')}</p>
 
 					<div className="flex flex-wrap items-center gap-4">
 						{(server as any).bot !== false && (
 							<div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-(--background)/80 border border-(--border)/10 shadow-sm backdrop-blur-md">
 								<Users className="w-4 h-4 text-(--accent)" />
 								<span className="text-sm font-semibold text-(--text)">
-									{server.stats && server.stats.length > 0 ? server.stats[server.stats.length - 1].members.toLocaleString() : 'N/A'} Members
+									{server.stats && server.stats.length > 0 ? server.stats[server.stats.length - 1].members.toLocaleString() : 'N/A'} {t('app.dashboard.stats.members')}
 								</span>
 							</div>
 						)}
@@ -205,7 +205,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 
 				<div className="flex flex-col gap-3 min-w-[200px] relative z-10 w-full md:w-auto mt-6 md:mt-0">
 					<Button variant="primary" className="w-full justify-center shadow-lg hover:shadow-xl transition-shadow" onClick={() => window.open(server.links?.website || '#', '_blank')}>
-						Join Server
+						{t('app.servers.joinServer')}
 					</Button>
 					<Button
 						variant={canVote ? 'secondary' : 'ghost'}
@@ -214,7 +214,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 						disabled={!canVote || voting}
 						loading={voting}
 					>
-						{canVote ? `Vote for Server (${server.voteCount || 0})` : `Vote available in ${timeLeft}`}
+						{canVote ? t('app.servers.voteForServer', { count: server.voteCount || 0 }) : t('app.servers.voteAvailableIn', { time: timeLeft })}
 					</Button>
 				</div>
 			</div>
@@ -228,10 +228,10 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 				{/* About Section */}
 				<div className="p-8 rounded-3xl bg-(--foreground)/30 border border-(--border)/10 shadow-sm flex flex-col h-full">
 					<h3 className="text-2xl font-bold mb-6 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						About {server.name}
+						{t('app.servers.about', { name: server.name })}
 					</h3>
 					<div className="prose prose-invert max-w-none text-(--text-muted) flex-1 prose-headings:font-fredoka prose-a:text-(--accent) hover:prose-a:text-(--accent)/80">
-						{server.info ? <ReactMarkdown>{server.info}</ReactMarkdown> : 'This server has not provided a detailed description yet.'}
+						{server.info ? <ReactMarkdown>{server.info}</ReactMarkdown> : t('app.servers.noDetailedDesc')}
 					</div>
 				</div>
 			</div>
@@ -240,12 +240,12 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 				{/* Information Card */}
 				<div className="p-6 rounded-3xl bg-(--foreground)/30 border border-(--border)/10 shadow-sm">
 					<h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-						<Server className="w-5 h-5 text-(--text-muted)" /> Information
+						<Server className="w-5 h-5 text-(--text-muted)" /> {t('app.servers.information')}
 					</h4>
 					<div className="flex flex-col gap-4">
 						{server.links?.website && (
 							<div className="flex flex-col gap-1">
-								<span className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">Website</span>
+								<span className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">{t('app.portal.links.website')}</span>
 								<a
 									href={server.links.website}
 									target="_blank"
@@ -269,7 +269,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 			timestamp: new Date(s.timestamp).getTime(),
 		}));
 
-		if (stats.length === 0) return <div className="text-center text-(--text-muted) py-12 border border-(--border)/10 rounded-3xl">No statistics have been recorded for this server yet.</div>;
+		if (stats.length === 0) return <div className="text-center text-(--text-muted) py-12 border border-(--border)/10 rounded-3xl">{t('app.servers.noStatsRecorded')}</div>;
 
 		const currentStats = stats[stats.length - 1];
 
@@ -302,12 +302,12 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 				{/* Metrics Row */}
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 					{[
-						{ id: 'members', label: 'Members', value: currentStats.members, icon: Users },
-						{ id: 'messages', label: 'Messages', value: currentStats.messages, icon: MessageSquare },
-						{ id: 'voteCount', label: 'Votes', value: currentStats.voteCount || server.voteCount, icon: ShieldCheck },
+						{ id: 'members', label: t('app.dashboard.stats.members'), value: currentStats.members, icon: Users },
+						{ id: 'messages', label: t('app.dashboard.stats.messages'), value: currentStats.messages, icon: MessageSquare },
+						{ id: 'voteCount', label: t('app.bots.stats.votes'), value: currentStats.voteCount || server.voteCount, icon: ShieldCheck },
 					].map((metric) => (
 						<button
-							key={metric.label}
+							key={metric.id}
 							onClick={() => handleMetricSwitch(metric.id)}
 							className={`bg-(--foreground)/50 border p-6 rounded-3xl flex flex-col items-center justify-center gap-3 backdrop-blur-md transition-all ${activeMetric === metric.id ? 'border-(--accent) shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_20%,transparent)] scale-105 z-10' : 'border-(--border)/10 hover:border-(--accent)/50'}`}
 						>
@@ -325,14 +325,17 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 					<div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-6">
 						<div>
 							<h3 className="text-2xl font-bold mb-1 capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{activeMetric === 'voteCount' ? 'Votes' : activeMetric} over time
+								{activeMetric === 'voteCount' ? t('app.bots.stats.votes') : activeMetric === 'members' ? t('app.dashboard.stats.members') : t('app.dashboard.stats.messages')}{' '}
+								{t('app.servers.overTime')}
 							</h3>
 							<div className="flex flex-wrap items-center gap-4 text-sm font-medium">
 								<span className={`${gainLoss >= 0 ? 'text-green-500' : 'text-red-500'} flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded-md`}>
 									{gainLoss > 0 ? '+' : ''}
 									{gainLoss.toLocaleString()} ({gainPercentage}%)
 								</span>
-								<span className="text-(--text-muted) bg-(--background) px-2 py-1 rounded-md border border-(--border)/10">Highest: {highestValue.toLocaleString()}</span>
+								<span className="text-(--text-muted) bg-(--background) px-2 py-1 rounded-md border border-(--border)/10">
+									{t('app.bots.id.text12')} {highestValue.toLocaleString()}
+								</span>
 							</div>
 						</div>
 
@@ -346,7 +349,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 										timeframe === tf ? 'bg-(--accent) text-white shadow-md' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)'
 									}`}
 								>
-									{tf === '24h' ? '24h' : tf === '7d' ? '7d' : tf === '30d' ? '1m' : tf === '3m' ? '3m' : tf === '6m' ? '6m' : tf === '1y' ? '1y' : 'All'}
+									{tf === '24h' ? '24h' : tf === '7d' ? '7d' : tf === '30d' ? '1m' : tf === '3m' ? '3m' : tf === '6m' ? '6m' : tf === '1y' ? '1y' : t('app.bots.stats.all')}
 								</button>
 							))}
 						</div>
@@ -406,7 +409,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 								<Line
 									type="monotone"
 									dataKey={activeMetric}
-									name={activeMetric === 'voteCount' ? 'Votes' : activeMetric}
+									name={activeMetric === 'voteCount' ? t('app.bots.stats.votes') : activeMetric === 'members' ? t('app.dashboard.stats.members') : t('app.dashboard.stats.messages')}
 									stroke="var(--accent)"
 									strokeWidth={4}
 									dot={chartData.length <= 1 ? { r: 6, fill: 'var(--accent)', strokeWidth: 0 } : false}

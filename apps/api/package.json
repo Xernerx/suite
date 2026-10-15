@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"version": "0.8.1",
+	"version": "0.10.0",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
@@ -15,24 +15,24 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^13.4.6",
-		"lucide-react": "^1.48.0",
-		"mongoose": "^9.10.3",
-		"next": "^16.3.7",
+		"framer-motion": "^14.2.0",
+		"lucide-react": "^1.57.0",
+		"mongoose": "^9.11.2",
+		"next": "^16.4.1",
 		"next-auth": "^4.24.15",
-		"react": "^19.3.0",
-		"react-dom": "^19.3.0",
-		"stripe": "^22.6.2"
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1",
+		"stripe": "^23.0.0"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.3",
-		"@types/node": "^22.20.4",
+		"@types/node": "^26.6.5",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"babel-plugin-react-compiler": "1.0.0",
-		"eslint": "^10.11.0",
-		"eslint-config-next": "^16.3.4",
+		"eslint": "^10.12.0",
+		"eslint-config-next": "^16.4.1",
 		"tailwindcss": "^4.3.3",
-		"typescript": "^7.0.2"
+		"typescript": "^6.0.3"
 	}
 }

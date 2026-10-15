@@ -35,7 +35,7 @@ export default function Account() {
 				method: 'DELETE',
 			});
 			if (!res.ok) {
-				throw new Error('Failed to delete user data from database.');
+				throw new Error(t('account.account.danger.toasts.deleteUserError'));
 			}
 			const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
 			await signOut({
@@ -45,7 +45,7 @@ export default function Account() {
 			console.error('Error deleting account:', error);
 			toast({
 				type: 'error',
-				title: 'Failed to delete account',
+				title: t('account.account.danger.toasts.deleteAccountFailed'),
 				description: error.message,
 			});
 			setIsDeletingAccount(false);
@@ -73,12 +73,12 @@ export default function Account() {
 				}),
 			});
 			if (!res.ok) {
-				throw new Error('Failed to delete user data.');
+				throw new Error(t('account.account.danger.toasts.deleteDataFailed'));
 			}
 			toast({
 				type: 'success',
-				title: 'Data Deleted',
-				description: 'Your profile data has been successfully reset.',
+				title: t('account.account.danger.toasts.dataDeletedTitle'),
+				description: t('account.account.danger.toasts.dataDeletedDesc'),
 			});
 			setIsConfirmDataOpen(false);
 
@@ -90,7 +90,7 @@ export default function Account() {
 			console.error('Error deleting data:', error);
 			toast({
 				type: 'error',
-				title: 'Failed to delete data',
+				title: t('account.account.danger.toasts.deleteDataFailed'),
 				description: error.message,
 			});
 		} finally {
@@ -111,16 +111,16 @@ export default function Account() {
 					privacy: val,
 				}),
 			});
-			if (!res.ok) throw new Error('Failed to update privacy');
+			if (!res.ok) throw new Error(t('account.profile.privacy.toast.error'));
 			toast({
 				type: 'success',
-				title: 'Privacy Updated',
-				description: 'Your privacy settings have been updated.',
+				title: t('account.profile.privacy.toast.title'),
+				description: t('account.profile.privacy.toast.description'),
 			});
 		} catch (error: any) {
 			toast({
 				type: 'error',
-				title: 'Error',
+				title: t('account.profile.privacy.toast.error'),
 				description: error.message,
 			});
 		}
@@ -388,8 +388,8 @@ export default function Account() {
 				open={isConfirmDataOpen}
 				onOpenChange={setIsConfirmDataOpen}
 				title={t('account.common.tooltip')}
-				description="Are you sure you want to reset all your profile data? Your account will remain active."
-				confirmText="Delete Data"
+				description={t('account.account.resetDataConfirmDesc')}
+				confirmText={t('account.account.resetDataConfirmButton')}
 				onConfirm={handleDeleteData}
 				loading={isDeletingData}
 			/>

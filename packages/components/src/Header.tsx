@@ -2,15 +2,18 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, RotateCw, Search, SidebarClose, SidebarOpen, Square, X } from 'lucide-react';
-import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar } from '@xernerx/providers';
+import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, Monitor, RotateCw, Search, SidebarClose, SidebarOpen, Smartphone, Square, Tablet, User as UserIcon, X } from 'lucide-react';
+import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 import BannerCanary from '../../public/banner-canary.svg';
 import BannerDev from '../../public/banner-dev.svg';
 import BannerPublic from '../../public/banner.svg';
+import Image from 'next/image';
 import Link from 'next/link';
+import SidebarUserCard from './cards/SidebarUser';
 
 export function SubSelector({ name, options, defaultValue }: { name: string; options: string[]; defaultValue: string }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -64,12 +67,25 @@ export function SubSelector({ name, options, defaultValue }: { name: string; opt
 	);
 }
 
+const deviceIcons = {
+	desktop: Monitor,
+	mobile: Smartphone,
+	tablet: Tablet,
+} as const;
+
 export function Header() {
 	const { state, toggle, setMobileOpen, isMobileOpen } = useSidebar();
 	const { t } = useDictionary();
-	const { type } = usePlatform();
+	const { type, device } = usePlatform();
 	const { getEnvUrl } = useEnvironment();
 	const [maximized, setMaximized] = useState(false);
+
+	const { data: session } = useSession();
+	const { user: discordUser } = useUser();
+	const activeUser = discordUser || session?.user;
+
+	const [userMenuOpen, setUserMenuOpen] = useState(false);
+	const userMenuRef = useRef<HTMLDivElement>(null);
 
 	const [isExpanded, setIsExpanded] = useState(true);
 
@@ -90,6 +106,28 @@ export function Header() {
 		const timer = setTimeout(() => setIsExpanded(false), 2000);
 		return () => clearTimeout(timer);
 	}, []);
+
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+				setUserMenuOpen(false);
+			}
+		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
+
+	useEffect(() => {
+		setUserMenuOpen(false);
+	}, [pathname]);
+
+	const avatarUrl = activeUser?.avatar
+		? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
+		: activeUser?.image;
+	const decorationUrl = activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
+
+	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
+	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[12px] w-[12px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
 
 	const effectiveIsDev = isMounted ? isDev : false;
 	const effectiveIsCanary = isMounted ? isCanary : false;
@@ -182,6 +220,50 @@ export function Header() {
 						<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => setNavOpen(true)} title={t('components.header.title1')}>
 							<LayoutGrid size={20} />
 						</button>
+					)}
+
+					{isMounted && state === 'hidden' && activeUser && (
+						<div ref={userMenuRef} className="relative flex items-center">
+							<button
+								onClick={() => setUserMenuOpen((prev) => !prev)}
+								className="relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden"
+								title={activeUser?.global_name || activeUser?.name || 'User Profile'}
+							>
+								<div className="relative shrink-0">
+									{avatarUrl ? (
+										<div className="relative h-8 w-8">
+											<Image
+												src={avatarUrl}
+												alt={t('components.sidebar.alt')}
+												fill
+												className="rounded-full border border-(--border)/20 object-cover"
+												unoptimized
+												draggable={false}
+												loading="eager"
+											/>
+
+											{decorationUrl && (
+												<Image
+													src={decorationUrl}
+													alt={t('components.sidebar.alt2')}
+													fill
+													className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
+													unoptimized
+													draggable={false}
+												/>
+											)}
+										</div>
+									) : (
+										<div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--foreground)/30 border border-(--border)/20">
+											<UserIcon size={16} className="text-(--text-muted)" />
+										</div>
+									)}
+									{DeviceIcon ? <DeviceIcon className={iconStyles} /> : <div className={`${iconStyles} rounded-full`} />}
+								</div>
+							</button>
+
+							<AnimatePresence>{userMenuOpen && <SidebarUserCard activeUser={activeUser} placement="top" onClose={() => setUserMenuOpen(false)} />}</AnimatePresence>
+						</div>
 					)}
 
 					{type === 'application' && (

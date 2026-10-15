@@ -6,16 +6,37 @@ import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-08-26.dahlia',
+	apiVersion: '2026-09-30.endive',
 });
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const userId = (await params).id;
+		const targetId = (await params).id;
 
-		if (!userId) return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+		if (!targetId) return NextResponse.json({ error: 'Target ID is required' }, { status: 400 });
 
-		const user = await (await database('xernerx')).models.users.User.findOne({ id: userId });
+		// 1. User-initiated cancellation by Stripe subscription ID
+		if (targetId.startsWith('sub_')) {
+			const canceledSubscription = await stripe.subscriptions.update(targetId, {
+				cancel_at_period_end: true,
+			});
+
+			const { models } = await database('xernerx');
+			await models.users.User.findOneAndUpdate(
+				{ 'billing.subscriptions.stripeSubscriptionId': targetId },
+				{
+					$set: {
+						'billing.subscriptions.$.status': canceledSubscription.status,
+						'billing.subscriptions.$.cancelAtPeriodEnd': true,
+					},
+				}
+			);
+
+			return NextResponse.json({ success: true, status: canceledSubscription.status });
+		}
+
+		// 2. Admin staff override cancellation by user ID
+		const user = await (await database('xernerx')).models.users.User.findOne({ id: targetId });
 		if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
 		if (user.stripeCustomerId) {

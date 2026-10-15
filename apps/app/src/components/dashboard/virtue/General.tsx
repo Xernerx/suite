@@ -5,7 +5,7 @@
 import { AlertCircle, Check, Info, Loader2, Save, Sparkles, Trophy } from 'lucide-react';
 import { Button, Input, Selector, Toggle } from '@xernerx/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { useEnvironment, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 
 interface VirtueProfile {
 	id: string;
@@ -26,6 +26,7 @@ interface VirtueProfile {
 }
 
 export default function VirtueGeneral({ id }: { id?: string }) {
+	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
@@ -112,7 +113,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 				const updated = await res.json();
 				setProfile(updated);
 				toast({
-					title: 'Virtue settings saved successfully',
+					title: t('app.dashboard.virtue.toast.savedSuccess'),
 					type: 'success',
 				});
 			} else {
@@ -122,7 +123,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 		} catch (err: any) {
 			console.error('Failed to save Virtue settings:', err);
 			toast({
-				title: 'Error saving Virtue settings',
+				title: t('app.dashboard.virtue.toast.saveError'),
 				description: err.message,
 				type: 'error',
 			});
@@ -135,7 +136,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
 				<Loader2 className="w-8 h-8 animate-spin text-(--accent) mb-3" />
-				<span className="text-sm font-medium">Loading Virtue configuration...</span>
+				<span className="text-sm font-medium">{t('app.dashboard.virtue.loading')}</span>
 			</div>
 		);
 	}
@@ -146,10 +147,8 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 				<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
 					<Sparkles className="w-8 h-8" />
 				</div>
-				<h3 className="text-xl font-extrabold text-(--text) mb-2">Virtue is not added to this server</h3>
-				<p className="text-sm text-(--text-muted) mb-6 max-w-md">
-					This server requires Virtue to be added in order to configure leveling systems, custom leveling messages, cycle resets, and role tracking.
-				</p>
+				<h3 className="text-xl font-extrabold text-(--text) mb-2">{t('app.dashboard.virtue.notAdded')}</h3>
+				<p className="text-sm text-(--text-muted) mb-6 max-w-md">{t('app.dashboard.virtue.notAddedDesc')}</p>
 				<a
 					href={getEnvUrl('https://xernerx.com/invites/virtue')}
 					target="_blank"
@@ -157,7 +156,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 					className="inline-flex items-center justify-center gap-2 rounded-2xl bg-(--accent) text-white font-bold text-sm px-6 py-3 shadow-lg shadow-(--accent)/20 hover:opacity-90 transition-all hover:scale-[1.02]"
 				>
 					<Sparkles size={16} />
-					<span>Invite Virtue to Server</span>
+					<span>{t('app.dashboard.virtue.inviteBtn')}</span>
 				</a>
 			</div>
 		);
@@ -172,7 +171,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 						<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 							<Trophy className="w-4 h-4" />
 						</div>
-						Virtue Leveling System
+						{t('app.dashboard.virtue.title')}
 					</div>
 					<Button
 						onClick={handleSave}
@@ -180,31 +179,31 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 						className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-(--accent) text-white text-xs font-bold shadow-md hover:opacity-90 transition-all"
 					>
 						{saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-						<span>{saving ? 'Saving...' : 'Save Changes'}</span>
+						<span>{saving ? t('app.dashboard.virtue.saving') : t('app.dashboard.virtue.saveChanges')}</span>
 					</Button>
 				</div>
 
 				<div className="flex flex-col gap-6">
 					{/* Level Mode Selector */}
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">Leveling Difficulty Mode</label>
+						<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.difficultyMode')}</label>
 						<Selector
 							value={mode}
 							onChange={(val: any) => setMode(val)}
 							options={[
-								{ label: 'Easy (Quick progression)', value: 'easy' },
-								{ label: 'Casual (Relaxed rate)', value: 'casual' },
-								{ label: 'Balanced (Standard progression)', value: 'balanced' },
-								{ label: 'Hard (Demanding milestones)', value: 'hard' },
-								{ label: 'Extreme (Maximum grinding)', value: 'extreme' },
+								{ label: t('app.dashboard.virtue.modes.easy'), value: 'easy' },
+								{ label: t('app.dashboard.virtue.modes.casual'), value: 'casual' },
+								{ label: t('app.dashboard.virtue.modes.balanced'), value: 'balanced' },
+								{ label: t('app.dashboard.virtue.modes.hard'), value: 'hard' },
+								{ label: t('app.dashboard.virtue.modes.extreme'), value: 'extreme' },
 							]}
 						/>
 					</div>
 
 					{/* Reset Cycles */}
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">Leaderboard Reset Cycles</label>
-						<p className="text-xs text-(--text-muted)">Toggle scheduled recurring experience resets for competition seasons.</p>
+						<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.resetCycles')}</label>
+						<p className="text-xs text-(--text-muted)">{t('app.dashboard.virtue.resetCyclesDesc')}</p>
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
 							{(['daily', 'weekly', 'monthly'] as const).map((cycleKey) => {
 								const active = cycles[cycleKey];
@@ -219,7 +218,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 												: 'border-(--border)/10 bg-(--background)/50 text-(--text-muted) hover:border-(--border)/20'
 										}`}
 									>
-										<span className="capitalize text-sm">{cycleKey} Cycle</span>
+										<span className="capitalize text-sm">{t(`app.dashboard.virtue.cycles.${cycleKey}`)}</span>
 										{active && <Check size={16} className="text-(--accent)" />}
 									</button>
 								);
@@ -230,8 +229,8 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 					{/* Level Up Announcement Toggle */}
 					<div className="flex items-center justify-between p-4 rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md">
 						<div className="flex flex-col">
-							<span className="text-sm font-bold text-(--text)">Announce Level Ups</span>
-							<span className="text-xs text-(--text-muted)">Post an announcement message when a member reaches a new level.</span>
+							<span className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.announceLevelUps')}</span>
+							<span className="text-xs text-(--text-muted)">{t('app.dashboard.virtue.announceLevelUpsDesc')}</span>
 						</div>
 						<Toggle checked={levelUp} onChange={(e) => setLevelUp(e.target.checked)} size="sm" />
 					</div>
@@ -240,7 +239,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 					{levelUp && (
 						<div className="flex flex-col gap-4 p-5 rounded-2xl border border-(--border)/10 bg-(--background)/30">
 							<div className="flex flex-col gap-2">
-								<label className="text-sm font-bold text-(--text)">Level-up Message Template</label>
+								<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.messageTemplate')}</label>
 								<textarea
 									value={levelMessage}
 									onChange={(e) => setLevelMessage(e.target.value)}
@@ -249,20 +248,20 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 									className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none p-3.5"
 								/>
 								<span className="text-[11px] text-(--text-muted)">
-									Variables: <code>[@mention]</code>, <code>[@level]</code>, <code>[@username]</code>
+									{t('app.dashboard.virtue.variables')} <code>[@mention]</code>, <code>[@level]</code>, <code>[@username]</code>
 								</span>
 							</div>
 
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Announcement Channel ID (Optional)</label>
-									<Input value={levelChannel} onChange={(e) => setLevelChannel(e.target.value)} placeholder="Leave empty to send in current channel" />
+									<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.channelId')}</label>
+									<Input value={levelChannel} onChange={(e) => setLevelChannel(e.target.value)} placeholder={t('app.dashboard.virtue.channelPlaceholder')} />
 								</div>
 
 								<div className="flex flex-col gap-2">
 									<div className="flex items-center justify-between">
-										<label className="text-sm font-bold text-(--text)">Auto-delete Message</label>
-										<span className="text-xs text-(--text-muted)">{autoDelete > 0 ? `${autoDelete}s` : 'Disabled'}</span>
+										<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.autoDelete')}</label>
+										<span className="text-xs text-(--text-muted)">{autoDelete > 0 ? `${autoDelete}s` : t('app.dashboard.virtue.disabled')}</span>
 									</div>
 									<Input
 										type="number"
@@ -270,7 +269,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 										max={60}
 										value={autoDelete.toString()}
 										onChange={(e) => setAutoDelete(Number(e.target.value) || 0)}
-										placeholder="0 disables auto-delete (max 60s)"
+										placeholder={t('app.dashboard.virtue.autoDeletePlaceholder')}
 									/>
 								</div>
 							</div>
@@ -280,15 +279,15 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 					{/* Role Rules */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<div className="flex flex-col gap-2">
-							<label className="text-sm font-bold text-(--text)">Ignored Roles (IDs)</label>
-							<Input value={ignoredRoles} onChange={(e) => setIgnoredRoles(e.target.value)} placeholder="Comma-separated Role IDs" />
-							<span className="text-[11px] text-(--text-muted)">Members with these roles will not gain experience.</span>
+							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.ignoredRoles')}</label>
+							<Input value={ignoredRoles} onChange={(e) => setIgnoredRoles(e.target.value)} placeholder={t('app.dashboard.virtue.rolesPlaceholder')} />
+							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.virtue.ignoredRolesDesc')}</span>
 						</div>
 
 						<div className="flex flex-col gap-2">
-							<label className="text-sm font-bold text-(--text)">Tracked Roles (IDs)</label>
-							<Input value={trackedRoles} onChange={(e) => setTrackedRoles(e.target.value)} placeholder="Comma-separated Role IDs" />
-							<span className="text-[11px] text-(--text-muted)">If specified, only members with these roles gain experience.</span>
+							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.trackedRoles')}</label>
+							<Input value={trackedRoles} onChange={(e) => setTrackedRoles(e.target.value)} placeholder={t('app.dashboard.virtue.rolesPlaceholder')} />
+							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.virtue.trackedRolesDesc')}</span>
 						</div>
 					</div>
 				</div>

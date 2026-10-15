@@ -29,6 +29,7 @@
 | **[CDN](./apps/cdn/README.md)**         | [`cdn.xernerx.com`](https://cdn.xernerx.com)         | [`canary`](https://cdn.canary.xernerx.com)     | [`dev`](https://cdn.dev.xernerx.com)     | Asset delivery and media pipeline infrastructure                      |
 | **[Docs](./apps/docs/README.md)**       | [`docs.xernerx.com`](https://docs.xernerx.com)       | [`canary`](https://docs.canary.xernerx.com)    | [`dev`](https://docs.dev.xernerx.com)    | Developer documentation, guides, and architectural specs              |
 | **[Info](./apps/info/README.md)**       | [`info.xernerx.com`](https://info.xernerx.com)       | [`canary`](https://info.canary.xernerx.com)    | [`dev`](https://info.dev.xernerx.com)    | Feedback & Support hub for bug tracking, roadmap, and suggestions     |
+| **[Store](./apps/store/README.md)**     | [`store.xernerx.com`](https://store.xernerx.com)     | [`canary`](https://store.canary.xernerx.com)   | [`dev`](https://store.dev.xernerx.com)   | Store portal, subscriptions, add-ons, credits, and checkout           |
 | **[Www](./apps/www/README.md)**         | [`xernerx.com`](https://www.xernerx.com)             | [`canary`](https://canary.xernerx.com)         | [`dev`](https://dev.xernerx.com)         | Institutional landing pages, history, legal terms, and privacy policy |
 
 ### ⚡ Infrastructure & Services

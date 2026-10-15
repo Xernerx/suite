@@ -1,15 +1,17 @@
+/** @format */
 'use client';
 
-import { Bot, Save, Settings, Link2, Shield, AlertTriangle, Trash2, Building2, Compass, LayoutDashboard, ArrowLeft } from 'lucide-react';
-import { Button, Input, Modal, Selector, Tabs, Confirm, Toggle } from '@xernerx/ui';
+import { Bot, Compass, LayoutDashboard, ArrowLeft } from 'lucide-react';
+import { Tabs, Confirm } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
-
-import Image from 'next/image';
-import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useParams } from 'next/navigation';
-import ReactMarkdown from 'react-markdown';
+
+import GeneralTab from '@/components/portal/bot/GeneralTab';
+import LinksTab from '@/components/portal/bot/LinksTab';
+import WebhooksTab from '@/components/portal/bot/WebhooksTab';
+import SettingsTab from '@/components/portal/bot/SettingsTab';
 
 export default function PortalBotPage() {
 	const params = useParams();
@@ -31,7 +33,6 @@ export default function PortalBotPage() {
 	const [deleting, setDeleting] = useState(false);
 	const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 	const [activeTab, setActiveTab] = useState('general');
-	const [markdownPreview, setMarkdownPreview] = useState(false);
 
 	const isDirty = JSON.stringify(botConfig) !== JSON.stringify(originalBotConfig);
 
@@ -137,7 +138,7 @@ export default function PortalBotPage() {
 		fetchConfig();
 
 		return () => clearNavItems();
-	}, [botId, session, getEnvUrl, envReady, router, show, setView, setNavItems, clearNavItems]);
+	}, [botId, session, getEnvUrl, envReady, router, show, setView, setNavItems, clearNavItems, t]);
 
 	useEffect(() => {
 		if (isDirty) {
@@ -163,7 +164,7 @@ export default function PortalBotPage() {
 					]);
 
 					if (res.ok && hooksRes.ok) {
-						toast({ title: 'Saved successfully!', type: 'success' });
+						toast({ title: t('common.toast.savedSuccess'), type: 'success' });
 						remind(false);
 
 						if (botConfig.organization !== originalBotConfig.organization) {
@@ -172,7 +173,7 @@ export default function PortalBotPage() {
 							setOriginalBotConfig(JSON.parse(JSON.stringify(botConfig)));
 						}
 					} else {
-						let errorMessage = 'Failed to save';
+						let errorMessage = t('common.toast.saveFailed');
 						if (!hooksRes.ok) {
 							const hookErr = await hooksRes.json().catch(() => ({}));
 							if (hookErr.error) errorMessage = hookErr.error;
@@ -183,7 +184,7 @@ export default function PortalBotPage() {
 						toast({ title: errorMessage, type: 'error' });
 					}
 				} catch (e: any) {
-					toast({ title: e.message || 'Error saving', type: 'error' });
+					toast({ title: e.message || t('common.toast.saveError'), type: 'error' });
 				} finally {
 					setSaving(false);
 				}
@@ -197,7 +198,7 @@ export default function PortalBotPage() {
 		} else {
 			remind(false);
 		}
-	}, [isDirty, saving, botConfig, originalBotConfig, botId, getEnvUrl, remind, toast]);
+	}, [isDirty, saving, botConfig, originalBotConfig, botId, getEnvUrl, remind, toast, t]);
 
 	const handleDelete = async () => {
 		setDeleting(true);
@@ -207,15 +208,15 @@ export default function PortalBotPage() {
 				credentials: 'include',
 			});
 			if (res.ok) {
-				toast({ title: 'Bot deleted', type: 'success' });
+				toast({ title: t('app.portal.bot.toast.deleted'), type: 'success' });
 				router.push('/portal');
 			} else {
-				toast({ title: 'Failed to delete bot', type: 'error' });
+				toast({ title: t('app.portal.bot.toast.deleteFailed'), type: 'error' });
 				setDeleting(false);
 				setIsConfirmDeleteOpen(false);
 			}
 		} catch (error) {
-			toast({ title: 'Error deleting bot', type: 'error' });
+			toast({ title: t('app.portal.bot.toast.deleteError'), type: 'error' });
 			setDeleting(false);
 			setIsConfirmDeleteOpen(false);
 		}
@@ -270,351 +271,18 @@ export default function PortalBotPage() {
 						tabs={[
 							{ id: 'general', label: t('app.portal.bot.tabs.general') },
 							{ id: 'links', label: t('app.portal.bot.tabs.links') },
-							{ id: 'webhooks', label: 'Webhooks' },
+							{ id: 'webhooks', label: t('app.portal.bot.tabs.webhooks') },
 							{ id: 'settings', label: t('app.portal.bot.tabs.settings') },
 						]}
 					/>
 
-					{activeTab === 'general' && (
-						<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-							<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-								<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-									<Settings className="w-4 h-4" />
-								</div>
-								{t('app.portal.bot.general.header')}
-							</div>
-							<div className="flex flex-col gap-5">
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.shortDesc')}</label>
-									<Input
-										value={botConfig.description || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, description: e.target.value })}
-										placeholder={t('app.portal.bot.general.shortDescPlaceholder')}
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<div className="flex items-center justify-between">
-										<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.longDesc')}</label>
-										<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
-											<button
-												onClick={() => setMarkdownPreview(false)}
-												className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-											>
-												Write
-											</button>
-											<button
-												onClick={() => setMarkdownPreview(true)}
-												className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-											>
-												Preview
-											</button>
-										</div>
-									</div>
+					{activeTab === 'general' && <GeneralTab botConfig={botConfig} setBotConfig={setBotConfig} availableTags={availableTags} />}
 
-									{markdownPreview ? (
-										<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
-											{botConfig.info ? <ReactMarkdown>{botConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">Nothing to preview</span>}
-										</div>
-									) : (
-										<textarea
-											value={botConfig.info || ''}
-											onChange={(e) => setBotConfig({ ...botConfig, info: e.target.value })}
-											placeholder={t('app.portal.bot.general.longDescPlaceholder')}
-											className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
-										/>
-									)}
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Tags</label>
-									<div className="flex flex-wrap gap-2 mb-1">
-										{botConfig.tags?.map((tag: string, i: number) => (
-											<span
-												key={i}
-												className="px-2 py-1 bg-(--accent)/10 text-(--accent) text-xs font-semibold rounded-md flex items-center gap-1 border border-(--accent)/20 shadow-sm"
-											>
-												{tag}
-												<button
-													onClick={() => setBotConfig({ ...botConfig, tags: botConfig.tags.filter((_: any, idx: number) => idx !== i) })}
-													className="hover:text-red-500 transition-colors ml-1"
-												>
-													×
-												</button>
-											</span>
-										))}
-									</div>
-									<Input
-										placeholder="Type a tag and press Enter (e.g. moderation, anime, economy)"
-										list="available-tags"
-										onKeyDown={(e) => {
-											if (e.key === 'Enter') {
-												e.preventDefault();
-												const val = e.currentTarget.value.trim();
-												if (val && !(botConfig.tags || []).includes(val)) {
-													setBotConfig({ ...botConfig, tags: [...(botConfig.tags || []), val] });
-													e.currentTarget.value = '';
-												}
-											}
-										}}
-									/>
-									<datalist id="available-tags">
-										{availableTags
-											.filter((t) => !(botConfig.tags || []).includes(t))
-											.map((tag) => (
-												<option key={tag} value={tag} />
-											))}
-									</datalist>
-								</div>
-							</div>
-						</div>
-					)}
+					{activeTab === 'links' && <LinksTab botConfig={botConfig} setBotConfig={setBotConfig} />}
 
-					{activeTab === 'links' && (
-						<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-							<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-								<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-									<Link2 className="w-4 h-4" />
-								</div>
-								{t('app.portal.bot.links.header')}
-							</div>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.invite')}</label>
-									<Input
-										value={botConfig.links?.invite || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, invite: e.target.value } })}
-										placeholder="https://discord.com/oauth2/authorize..."
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.website')}</label>
-									<Input
-										value={botConfig.links?.website || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, website: e.target.value } })}
-										placeholder="https://yourwebsite.com"
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.support')}</label>
-									<Input
-										value={botConfig.links?.support || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, support: e.target.value } })}
-										placeholder="https://discord.gg/..."
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.github')}</label>
-									<Input
-										value={botConfig.links?.github || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, github: e.target.value } })}
-										placeholder="https://github.com/..."
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.privacy')}</label>
-									<Input
-										value={botConfig.links?.privacy || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, privacy: e.target.value } })}
-										placeholder="https://..."
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.links.terms')}</label>
-									<Input
-										value={botConfig.links?.terms || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, terms: e.target.value } })}
-										placeholder="https://..."
-									/>
-								</div>
-								<div className="flex flex-col gap-2">
-									<label className="text-sm font-bold text-(--text)">Dashboard</label>
-									<Input
-										value={botConfig.links?.dashboard || ''}
-										onChange={(e) => setBotConfig({ ...botConfig, links: { ...botConfig.links, dashboard: e.target.value } })}
-										placeholder="https://..."
-									/>
-								</div>
-							</div>
-						</div>
-					)}
+					{activeTab === 'webhooks' && <WebhooksTab botConfig={botConfig} setBotConfig={setBotConfig} />}
 
-					{activeTab === 'webhooks' && (
-						<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-							<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-								<Link2 className="w-5 h-5 text-(--accent)" />
-								<h2>Webhooks</h2>
-							</div>
-
-							<div className="flex flex-col gap-6">
-								{(botConfig.hooks || []).map((hook: any, index: number) => (
-									<div key={index} className="flex flex-col gap-4 p-4 border border-(--border)/20 rounded-xl bg-(--foreground)/50">
-										<div className="flex justify-between items-center">
-											<h3 className="font-bold">Webhook {index + 1}</h3>
-											<button
-												onClick={() => {
-													const newHooks = [...botConfig.hooks];
-													newHooks.splice(index, 1);
-													setBotConfig({ ...botConfig, hooks: newHooks });
-												}}
-												className="p-2 text-red-500/70 hover:text-red-500 transition-colors"
-											>
-												<Trash2 size={16} />
-											</button>
-										</div>
-										<div className="flex flex-col gap-1">
-											<label className="text-sm font-semibold text-(--text-muted)">Webhook URL</label>
-											<Input
-												value={hook.url || ''}
-												onChange={(e) => {
-													const newHooks = [...botConfig.hooks];
-													newHooks[index].url = e.target.value;
-													setBotConfig({ ...botConfig, hooks: newHooks });
-												}}
-												placeholder="https://discord.com/api/webhooks/..."
-											/>
-										</div>
-										<div className="flex flex-col gap-2">
-											<span className="text-sm font-semibold text-(--text-muted)">Triggers</span>
-											<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-												{['POST vote', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review'].map((event) => (
-													<label key={event} className="flex items-center gap-2 cursor-pointer">
-														<Toggle
-															checked={hook.events?.includes(event) || false}
-															onChange={() => {
-																const newHooks = [...botConfig.hooks];
-																const events = newHooks[index].events || [];
-																if (events.includes(event)) {
-																	newHooks[index].events = events.filter((e: string) => e !== event);
-																} else {
-																	newHooks[index].events = [...events, event];
-																}
-																setBotConfig({ ...botConfig, hooks: newHooks });
-															}}
-														/>
-														<span className="text-sm text-(--text)">{event}</span>
-													</label>
-												))}
-											</div>
-										</div>
-									</div>
-								))}
-								<Button
-									variant="outline"
-									className="w-fit"
-									onClick={() => {
-										setBotConfig({ ...botConfig, hooks: [...(botConfig.hooks || []), { url: '', events: [] }] });
-									}}
-								>
-									Add Webhook
-								</Button>
-							</div>
-						</div>
-					)}
-
-					{activeTab === 'settings' && (
-						<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-							{/* Privacy Setting Card */}
-							<div
-								className="relative z-40 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-									<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										<Shield size={18} />
-										<h3>{t('app.portal.bot.settings.privacyHeader')}</h3>
-									</div>
-									<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.portal.bot.settings.privacyDesc')}</div>
-								</div>
-								<div className="w-full sm:w-48 shrink-0">
-									<Selector
-										value={botConfig.privacy || 'private'}
-										onChange={(val) => setBotConfig({ ...botConfig, privacy: val })}
-										options={[
-											{ label: t('app.portal.bot.settings.public'), value: 'public' },
-											{ label: t('app.portal.bot.settings.private'), value: 'private' },
-											{ label: t('app.portal.bot.settings.limited'), value: 'limited' },
-										]}
-									/>
-								</div>
-							</div>
-
-							{/* Transfer Organization Card */}
-							<div
-								className="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
-								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-									<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										<Building2 size={18} />
-										<h3>{t('app.portal.bot.settings.transferHeader')}</h3>
-									</div>
-									<p className="text-xs text-(--accent-orange)/80">{t('app.portal.bot.settings.transferDesc')}</p>
-								</div>
-								<div className="w-full sm:w-64 shrink-0">
-									<Selector
-										value={botConfig.organization || ''}
-										onChange={(val) => setBotConfig({ ...botConfig, organization: val })}
-										options={[
-											{ label: t('app.portal.bot.settings.noOrg'), value: '' },
-											...organizations.map((org) => ({
-												label: org.name,
-												value: org._id,
-											})),
-										]}
-									/>
-								</div>
-							</div>
-
-							{/* Reset Data Card */}
-							<div
-								className="relative z-20 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
-								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-									<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										<AlertTriangle size={18} />
-										<h3>{t('app.portal.bot.settings.resetHeader')}</h3>
-									</div>
-									<p className="text-xs text-(--accent-orange)/80">{t('app.portal.bot.settings.resetDesc')}</p>
-								</div>
-								<button
-									onClick={() => setBotConfig({ ...botConfig, description: '', info: '', links: {} })}
-									className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
-									style={{
-										padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-										gap: 'calc(var(--ui-gap) * 0.5)',
-									}}
-								>
-									<Trash2 size={16} />
-									<span>{t('app.portal.bot.settings.resetBtn')}</span>
-								</button>
-							</div>
-
-							{/* Delete Application Card */}
-							<div
-								className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
-								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-									<div className="flex items-center text-(--accent-red) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-										<AlertTriangle size={18} />
-										<h3>{t('app.portal.bot.settings.deleteHeader')}</h3>
-									</div>
-									<p className="text-xs text-(--accent-red)/80">{t('app.portal.bot.settings.deleteDesc')}</p>
-								</div>
-								<button
-									onClick={() => setIsConfirmDeleteOpen(true)}
-									className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm disabled:opacity-50 disabled:pointer-events-none"
-									style={{
-										padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-										gap: 'calc(var(--ui-gap) * 0.5)',
-									}}
-								>
-									<Trash2 size={16} />
-									<span>{t('app.portal.bot.settings.deleteBtn')}</span>
-								</button>
-							</div>
-						</div>
-					)}
+					{activeTab === 'settings' && <SettingsTab botConfig={botConfig} setBotConfig={setBotConfig} organizations={organizations} onDeleteClick={() => setIsConfirmDeleteOpen(true)} />}
 				</div>
 			</div>
 

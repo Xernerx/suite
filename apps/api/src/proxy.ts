@@ -78,7 +78,7 @@ export async function proxy(req: NextRequest) {
 
 	if (!isLoopback && !isXernerxDomain) {
 		const now = Date.now();
-		let clientRate = rateLimitMap.get(ip);
+		const clientRate = rateLimitMap.get(ip);
 
 		if (!clientRate || now > clientRate.resetTime) {
 			rateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_MS });
@@ -98,7 +98,9 @@ export async function proxy(req: NextRequest) {
 			preflightHeaders.set('Access-Control-Allow-Credentials', 'true');
 		}
 		preflightHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-		preflightHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Cookie');
+		const requestedHeaders = req.headers.get('access-control-request-headers');
+		preflightHeaders.set('Access-Control-Allow-Headers', requestedHeaders || 'Content-Type, Authorization, Cookie');
+		preflightHeaders.set('Vary', 'Origin');
 		return new NextResponse(null, { headers: preflightHeaders, status: 200 });
 	}
 

@@ -24,7 +24,17 @@ const deviceIcons = {
 	tablet: Tablet,
 } as const;
 
-export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUser: any; isCollapsed: boolean }) {
+export default function SidebarUserCard({
+	activeUser,
+	isCollapsed = false,
+	placement = 'bottom',
+	onClose,
+}: {
+	activeUser: any;
+	isCollapsed?: boolean;
+	placement?: 'top' | 'bottom';
+	onClose?: () => void;
+}) {
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
 	const { device } = usePlatform();
@@ -137,12 +147,16 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 8 }}
+			initial={{ opacity: 0, y: placement === 'top' ? -8 : 8 }}
 			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: 8 }}
+			exit={{ opacity: 0, y: placement === 'top' ? -8 : 8 }}
 			transition={{ duration: 0.15, ease: 'easeOut' }}
-			className={`bg-(--foreground)/30 backdrop-blur-md absolute bottom-full mb-3 z-50 flex flex-col rounded-[24px] shadow-2xl overflow-hidden text-left border border-(--border)/5
-                ${isCollapsed ? 'left-1 w-56 origin-bottom-left' : 'left-0 right-0 origin-bottom'}
+			className={`bg-(--foreground)/30 backdrop-blur-md z-50 flex flex-col rounded-[24px] shadow-2xl overflow-hidden text-left border border-(--border)/10
+                ${
+					placement === 'top'
+						? 'absolute top-full mt-2 right-0 w-80 max-w-[calc(100vw-2rem)] origin-top-right'
+						: `absolute bottom-full mb-3 ${isCollapsed ? 'left-1 w-56 origin-bottom-left' : 'left-0 right-0 origin-bottom'}`
+				}
             `}
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
 		>
@@ -281,7 +295,12 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
 						<Button>
-							<Link href={getEnvUrl('https://account.xernerx.com')} className="flex" style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
+							<Link
+								href={getEnvUrl('https://account.xernerx.com')}
+								onClick={onClose}
+								className="flex"
+								style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
+							>
 								<Pencil size={16} className="shrink-0" /> <span className="truncate">{t('components.cards.sidebaruser.text3')}</span>
 							</Link>
 						</Button>
@@ -291,7 +310,12 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 					{hasAdminAccess && (
 						<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
 							<Button>
-								<Link href={getEnvUrl('https://admin.xernerx.com')} className="flex" style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
+								<Link
+									href={getEnvUrl('https://admin.xernerx.com')}
+									onClick={onClose}
+									className="flex"
+									style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
+								>
 									<ShieldAlert size={16} className="shrink-0" /> <span className="truncate">{t('components.cards.sidebaruser.text4')}</span>
 								</Link>
 							</Button>
@@ -299,7 +323,13 @@ export default function SidebarUserCard({ activeUser, isCollapsed }: { activeUse
 					)}
 
 					<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
-						<Button onClick={copyUserId} className="flex">
+						<Button
+							onClick={() => {
+								copyUserId();
+								onClose?.();
+							}}
+							className="flex"
+						>
 							<Copy size={16} className="shrink-0" /> <span className="truncate">{t('components.cards.sidebaruser.text5')}</span>
 						</Button>
 					</div>

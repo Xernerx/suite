@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/styles",
-	"version": "0.1.11",
+	"version": "0.1.13",
 	"private": true,
 	"exports": {
 		".": "./index.ts",
@@ -12,6 +12,6 @@
 	},
 	"dependencies": {
 		"@tailwindcss/typography": "^0.5.20",
-		"next": "^16.3.7"
+		"next": "^16.4.1"
 	}
 }

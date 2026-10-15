@@ -272,5 +272,28 @@
 				"votes": "Votes"
 			}
 		}
+	},
+	"lib": {
+		"navigation": {
+			"categories": {
+				"user": "Användare",
+				"developer": "Utvecklare",
+				"public": "Offentlig",
+				"management": "Hantering"
+			},
+			"items": {
+				"explore": "Utforska",
+				"dashboard": "Översikt",
+				"account": "Konto",
+				"store": "Butik",
+				"portal": "Portal",
+				"api": "API",
+				"docs": "Dokumentation",
+				"cdn": "CDN",
+				"website": "Webbplats",
+				"admin": "Admin",
+				"help": "Support"
+			}
+		}
 	}
 }

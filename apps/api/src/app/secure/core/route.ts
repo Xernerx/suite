@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 		} catch (e) {}
 
 		const botToken = process.env.DISCORD_CLIENT_TOKEN;
-		let mappings: Record<string, string> = {};
+		const mappings: Record<string, string> = {};
 
 		// If a role name and bot token exist, create the role on sister servers
 		if (botToken && body.name && sisterServers.length > 0) {

@@ -6,7 +6,6 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import tinycolor from 'tinycolor2';
 import { useEnvironment } from '@xernerx/providers'; // Imported useEnvironment for API routing
 import { useSession } from 'next-auth/react';
-import Script from 'next/script';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -132,7 +131,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		const fetchRemoteSync = async () => {
 			try {
 				const userId = (session.user as any).id;
-				const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
 					credentials: 'include',
 				});
 				if (!res.ok) return;
@@ -202,35 +201,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				setAccent: applyAccent,
 			}}
 		>
-			<Script
-				id="theme-init"
-				strategy="beforeInteractive"
-				dangerouslySetInnerHTML={{
-					__html: `
-                        (function() {
-                            try {
-                                function getPref(key) {
-                                    var match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
-                                    if (match) return match[2];
-                                    return localStorage.getItem(key);
-                                }
-
-                                var theme = getPref('theme') || 'system';
-                                if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                                    document.documentElement.classList.add('dark');
-                                } else {
-                                    document.documentElement.classList.remove('dark');
-                                }
-
-                                var accent = getPref('accent');
-                                if (accent) {
-                                    document.documentElement.style.setProperty('--accent', accent);
-                                }
-                            } catch (e) {}
-                        })();
-                    `,
-				}}
-			/>
 			{children}
 		</ThemeContext.Provider>
 	);

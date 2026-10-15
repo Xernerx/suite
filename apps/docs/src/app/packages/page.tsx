@@ -1,7 +1,7 @@
 /** @format */
 // Force recompile
-import { PackagesPageClient } from './PackagesPageClient';
-import { SearchIndexItem } from './PackagesSearch';
+import { PackagesPageClient } from '@/components/packages/PackagesPageClient';
+import { SearchIndexItem } from '@/components/packages/PackagesSearch';
 
 // Recursively extract all items of a specific kind (reusing logic from package renderer)
 const extractItems = (node: any, targetKind: number): any[] => {

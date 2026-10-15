@@ -1,6 +1,9 @@
 /** @format */
 'use client';
 
+import { useDictionary } from '@xernerx/providers';
+
 export default function Connections() {
-	return <>Connections</>;
+	const { t } = useDictionary();
+	return <>{t('account.connections.title')}</>;
 }

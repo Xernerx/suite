@@ -857,5 +857,28 @@
 				"resolved": "Dit probleem is opgelost."
 			}
 		}
+	},
+	"lib": {
+		"navigation": {
+			"categories": {
+				"user": "Gebruiker",
+				"developer": "Ontwikkelaar",
+				"public": "Openbaar",
+				"management": "Beheer"
+			},
+			"items": {
+				"explore": "Ontdekken",
+				"dashboard": "Dashboard",
+				"account": "Account",
+				"store": "Winkel",
+				"portal": "Portaal",
+				"api": "API",
+				"docs": "Documentatie",
+				"cdn": "CDN",
+				"website": "Website",
+				"admin": "Beheerder",
+				"help": "Ondersteuning"
+			}
+		}
 	}
 }

@@ -7,10 +7,48 @@ import { database } from '@xernerx/lib/server';
 import { products } from '@xernerx/lib';
 
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-08-26.dahlia',
+	apiVersion: '2026-09-30.endive',
 });
 
 const STAFF_COUPON_ID = process.env.STRIPE_COUPON_ID;
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	try {
+		const productId = (await params).id;
+
+		if (!productId) {
+			return NextResponse.json({ error: 'Product ID is required' }, { status: 400 });
+		}
+
+		// 1. Fetch the product details to get its real name from Stripe
+		const product = await stripe.products.retrieve(productId);
+
+		// 2. Fetch all active prices for this product
+		const pricesList = await stripe.prices.list({
+			product: productId,
+			active: true,
+		});
+
+		const prices = pricesList.data.map((price) => ({
+			id: price.id,
+			unitAmount: price.unit_amount,
+			currency: price.currency,
+			interval: price.recurring?.interval,
+			intervalCount: price.recurring?.interval_count,
+		}));
+
+		return NextResponse.json(
+			{
+				name: product.name,
+				description: product.description,
+				prices,
+			},
+			{ status: 200 }
+		);
+	} catch (error: any) {
+		return NextResponse.json({ error: error.message }, { status: 500 });
+	}
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -34,8 +72,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			await user.save();
 		}
 
-		// 2. Collect all products defined in your library
-		const allProductIds = [...(products.users || []), ...(products.developers || []), ...(products.servers || [])];
+		// 2. Collect all products defined in database (or fallback to static library)
+		const { models } = await database('xernerx');
+		const Item = models.store.Item as any;
+		const dbItems = await Item.find({ enabled: true }).select('skuId').lean();
+		let allProductIds = Array.from(new Set(dbItems.map((i: any) => i.skuId).filter(Boolean))) as string[];
+		if (allProductIds.length === 0) {
+			allProductIds = [...(products.users || []), ...(products.developers || []), ...(products.servers || [])];
+		}
 
 		if (allProductIds.length === 0) {
 			return NextResponse.json({ error: 'No products configured to grant' }, { status: 400 });

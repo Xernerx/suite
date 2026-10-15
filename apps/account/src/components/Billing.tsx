@@ -4,7 +4,7 @@
 import { AlertTriangle, CreditCard, ExternalLink, Loader2, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@xernerx/ui';
-import { useEnvironment, useUser, useToast } from '@xernerx/providers';
+import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { products } from '@xernerx/lib';
 
 interface UserSubscription {
@@ -19,6 +19,7 @@ interface EnrichedSubscription extends UserSubscription {
 }
 const allProductIds = [...products.users, ...products.developers, ...(products.servers || [])];
 export default function Billing() {
+	const { t } = useDictionary();
 	const { user, loading: userLoading } = useUser() as {
 		user: any;
 		loading?: boolean;
@@ -45,7 +46,7 @@ export default function Billing() {
 			> = {};
 			for (const productId of allProductIds) {
 				try {
-					const res = await fetch(`/api/store/${productId}/product`);
+					const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/store/${productId}/product`));
 					if (!res.ok) continue;
 					const data = await res.json();
 					for (const price of data.prices || []) {
@@ -84,17 +85,17 @@ export default function Billing() {
 				setEnriched((prev) => prev.filter((s) => s.stripeSubscriptionId !== stripeSubscriptionId));
 				toast({
 					type: 'success',
-					title: 'Subscription cancelled successfully',
+					title: t('account.billing.toasts.cancelSuccess'),
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Failed to cancel subscription');
+				throw new Error(errData.error || t('account.billing.toasts.cancelError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to cancel subscription', err);
 			toast({
 				type: 'error',
-				title: 'Failed to cancel subscription',
+				title: t('account.billing.toasts.cancelError'),
 				description: err.message,
 			});
 		} finally {
@@ -147,9 +148,9 @@ export default function Billing() {
 						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
-					Billing & Subscriptions
+					{t('account.billing.title')}
 				</h1>
-				<p className="text-sm text-(--text-muted)">Manage your active subscriptions and billing history.</p>
+				<p className="text-sm text-(--text-muted)">{t('account.billing.description')}</p>
 			</div>
 
 			<div
@@ -168,7 +169,7 @@ export default function Billing() {
 						}}
 					>
 						<Loader2 size={28} className="animate-spin text-(--accent)" />
-						<p className="text-sm text-(--text-muted)">Loading your subscriptions...</p>
+						<p className="text-sm text-(--text-muted)">{t('account.billing.loading')}</p>
 					</div>
 				)}
 
@@ -196,13 +197,13 @@ export default function Billing() {
 									fontFamily: 'var(--font-fredoka)',
 								}}
 							>
-								No Active Subscriptions
+								{t('account.billing.empty.title')}
 							</h2>
-							<p className="text-sm text-(--text-muted) max-w-sm">You don't have any active subscriptions right now. Head over to the store to check out our plans!</p>
+							<p className="text-sm text-(--text-muted) max-w-sm">{t('account.billing.empty.description')}</p>
 						</div>
-						<Button variant="outline" onClick={() => (window.location.href = '/store')}>
+						<Button variant="outline" onClick={() => (window.location.href = getEnvUrl('https://store.xernerx.com'))}>
 							<ExternalLink size={14} />
-							Browse Store
+							{t('account.billing.empty.browseStore')}
 						</Button>
 					</div>
 				)}
@@ -248,7 +249,9 @@ export default function Billing() {
 											{item.productDescription && <span className="text-xs text-(--text-muted) truncate max-w-xs">{item.productDescription}</span>}
 										</div>
 									</div>
-									<span className={`shrink-0 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${getStatusColor(item.status)}`}>{item.status}</span>
+									<span className={`shrink-0 text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full ${getStatusColor(item.status)}`}>
+										{t(`account.billing.status.${item.status}`)}
+									</span>
 								</div>
 
 								{/* Footer: renewal + cancel */}
@@ -263,34 +266,35 @@ export default function Billing() {
 										<RefreshCw size={13} className={isExpiringSoon ? 'text-yellow-500' : 'text-(--text-muted)'} />
 										{renewalDate ? (
 											<span className={isExpiringSoon ? 'text-yellow-500 font-medium' : 'text-(--text-muted)'}>
-												Renews on {formatDate(renewalDate)}
-												{isExpiringSoon && ` · ${days}d left`}
+												{t('account.billing.renewsOn', { date: formatDate(renewalDate) })}
+												{isExpiringSoon && ` · ${t('account.billing.daysLeft', { days: days ?? 0 })}`}
 											</span>
 										) : (
-											<span className="text-(--text-muted)">Canceled</span>
+											<span className="text-(--text-muted)">{t('account.billing.canceled')}</span>
 										)}
 									</div>
 
 									<div className="flex items-center gap-2">
 										{!isConfirming ? (
 											<button onClick={() => setCancelConfirm(subId)} className="text-xs font-medium text-red-500 hover:underline transition-colors">
-												Cancel subscription
+												{t('account.billing.cancelSubscription')}
 											</button>
 										) : (
 											<div className="flex items-center gap-2">
 												<span className="text-xs text-(--text-muted) flex items-center gap-1">
 													<AlertTriangle size={12} className="text-yellow-500" />
-													Are you sure?
+													{t('account.billing.confirmPrompt')}
 												</span>
 												<button onClick={() => setCancelConfirm(null)} className="text-xs font-medium text-(--text-muted) hover:text-(--text) transition-colors">
-													No, keep it
+													{t('account.billing.keepSubscription')}
 												</button>
 												<button
 													onClick={() => handleCancel(subId)}
 													disabled={isCancelling}
 													className="flex items-center gap-1.5 text-xs font-semibold bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-1 rounded-lg transition-colors disabled:opacity-50"
 												>
-													{isCancelling && <Loader2 size={11} className="animate-spin" />}Yes, cancel
+													{isCancelling && <Loader2 size={11} className="animate-spin" />}
+													{t('account.billing.cancelButton')}
 												</button>
 											</div>
 										)}
@@ -318,8 +322,8 @@ export default function Billing() {
 								gap: 'calc(var(--ui-gap) * 0.15)',
 							}}
 						>
-							<span className="text-sm font-bold text-(--text)">Staff Access</span>
-							<span className="text-xs text-(--text-muted)">You have a complimentary all-access staff subscription applied to your account.</span>
+							<span className="text-sm font-bold text-(--text)">{t('account.billing.staff.title')}</span>
+							<span className="text-xs text-(--text-muted)">{t('account.billing.staff.description')}</span>
 						</div>
 					</div>
 				)}

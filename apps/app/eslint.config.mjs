@@ -17,9 +17,10 @@ const eslintConfig = defineConfig([
 		'next-env.d.ts',
 	]),
 	{
-		extends: ['next/core-web-vitals'],
 		rules: {
 			'@typescript-eslint/no-explicit-any': 'off',
+			'react-hooks/set-state-in-effect': 'off',
+			'react-hooks/purity': 'off',
 		},
 	},
 ]);

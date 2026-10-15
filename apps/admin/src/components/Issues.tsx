@@ -1,3 +1,4 @@
+/** @format */
 import { Button, Input, Modal } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
@@ -36,7 +37,7 @@ export default function Issues() {
 	}, [getEnvUrl]);
 
 	const logBug = async () => {
-		if (!title || !description || !product) return toast({ type: 'error', title: 'Error', description: 'Fill all fields' });
+		if (!title || !description || !product) return toast({ type: 'error', title: t('admin.dashboard.issues.toasts.error'), description: t('admin.dashboard.issues.toasts.fillAll') });
 		try {
 			await fetch(getEnvUrl('https://api.xernerx.com/secure/core/issues'), {
 				method: 'POST',
@@ -44,14 +45,14 @@ export default function Issues() {
 				credentials: 'include',
 				body: JSON.stringify({ title, description, productId: product, status: 'open' }),
 			});
-			toast({ type: 'success', title: 'Logged', description: 'Bug logged successfully.' });
+			toast({ type: 'success', title: t('admin.dashboard.issues.toasts.logged'), description: t('admin.dashboard.issues.toasts.loggedDesc') });
 			setModalOpen(false);
 			setTitle('');
 			setDescription('');
 			setProduct('');
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.issues.toasts.error'), description: err.message });
 		}
 	};
 
@@ -63,10 +64,10 @@ export default function Issues() {
 				credentials: 'include',
 				body: JSON.stringify({ status: 'resolved' }),
 			});
-			toast({ type: 'success', title: 'Resolved', description: 'Issue marked as resolved.' });
+			toast({ type: 'success', title: t('admin.dashboard.issues.toasts.resolved'), description: t('admin.dashboard.issues.toasts.resolvedDesc') });
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.issues.toasts.error'), description: err.message });
 		}
 	};
 
@@ -78,10 +79,10 @@ export default function Issues() {
 				credentials: 'include',
 				body: JSON.stringify({ acknowledged: true }),
 			});
-			toast({ type: 'success', title: t('admin.dashboard.issues.verified'), description: 'Issue verified.' });
+			toast({ type: 'success', title: t('admin.dashboard.issues.verified'), description: t('admin.dashboard.issues.toasts.verifiedDesc') });
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.issues.toasts.error'), description: err.message });
 		}
 	};
 
@@ -91,10 +92,10 @@ export default function Issues() {
 				method: 'DELETE',
 				credentials: 'include',
 			});
-			toast({ type: 'success', title: 'Deleted', description: 'Issue removed.' });
+			toast({ type: 'success', title: t('admin.dashboard.issues.toasts.deleted'), description: t('admin.dashboard.issues.toasts.deletedDesc') });
 			fetchData();
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.issues.toasts.error'), description: err.message });
 		}
 	};
 

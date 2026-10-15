@@ -1,6 +1,9 @@
+/** @format */
+
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { database, sendWebhook } from '@xernerx/lib/server';
+import fs from 'fs';
+import { database } from '@xernerx/lib/server';
 
 export async function GET(req: Request) {
 	try {
@@ -10,7 +13,7 @@ export async function GET(req: Request) {
 		const { models } = await database('xernerx');
 		const Announcement = models.core.Announcement as any;
 
-		let query: any = {};
+		const query: any = {};
 		if (channelId) query.channelId = channelId;
 
 		const announcements = await Announcement.find(query).sort({ createdAt: -1 }).lean();
@@ -69,7 +72,7 @@ export async function POST(req: Request) {
 				} else {
 					const errorText = await webhookRes.text();
 					console.error('Failed to send webhook', errorText);
-					require('fs').writeFileSync('discord-error.log', JSON.stringify({ error: errorText, payload }, null, 2));
+					fs.writeFileSync('discord-error.log', JSON.stringify({ error: errorText, payload }, null, 2));
 				}
 			} catch (err) {
 				console.error('Webhook execution failed:', err);

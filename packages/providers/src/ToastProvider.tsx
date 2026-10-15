@@ -85,14 +85,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 			isSaving,
 		});
 	}, []);
+	const contextValue = React.useMemo(
+		() => ({
+			toast,
+			dismiss,
+			remind,
+		}),
+		[toast, dismiss, remind]
+	);
+
 	return (
-		<ToastContext.Provider
-			value={{
-				toast,
-				dismiss,
-				remind,
-			}}
-		>
+		<ToastContext.Provider value={contextValue}>
 			{children}
 
 			{/* The Toast Portal / Container */}

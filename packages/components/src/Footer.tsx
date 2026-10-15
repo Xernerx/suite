@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import { BookOpen, CircleQuestionMark, FileText, Mail, MessageCircle, Package, Shield, Briefcase } from 'lucide-react';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { BookOpen, CircleQuestionMark, Cookie, FileText, Mail, MessageCircle, Package, Shield, Briefcase, SlidersHorizontal } from 'lucide-react';
+import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import { BsGithub } from 'react-icons/bs';
@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 
 export function Footer() {
 	const { getEnvUrl } = useEnvironment();
+	const { openPrompt } = useCookie();
 	const { t } = useDictionary();
 	const [isMounted, setIsMounted] = useState(false);
 
@@ -42,9 +43,7 @@ export function Footer() {
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 						<h2 className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</h2>
 
-						<p className="max-w-md leading-7 text-(--text-muted)">
-							{t('common.footer.tagline', {}, 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.')}
-						</p>
+						<p className="max-w-md leading-7 text-(--text-muted)">{t('common.footer.tagline')}</p>
 					</div>
 
 					<div className="text-sm text-(--text-muted)">
@@ -59,9 +58,11 @@ export function Footer() {
 				<FooterSection title={t('common.footer.sections.resources')}>
 					<FooterLink href={resolveUrl('https://xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
+					<FooterLink onClick={openPrompt} icon={SlidersHorizontal} label={t('common.footer.links.cookiePreferences')} />
 					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers', 'Careers')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Developer */}
@@ -97,9 +98,9 @@ function FooterSection({ title, children }: { title?: string; children: React.Re
 /* Link */
 /* -------------------------------------------------------------------------- */
 
-function FooterLink({ href, icon: Icon, label, external = true }: { href: string; icon: React.ElementType; label?: string; external?: boolean }) {
+function FooterLink({ href, onClick, icon: Icon, label, external = true }: { href?: string; onClick?: () => void; icon: React.ElementType; label?: string; external?: boolean }) {
 	const className =
-		'group inline-flex items-center rounded-lg text-(--text-muted) transition-all duration-200 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] hover:text-(--text)';
+		'group inline-flex items-center rounded-lg text-(--text-muted) transition-all duration-200 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] hover:text-(--text) cursor-pointer text-left';
 
 	const linkStyle = {
 		padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
@@ -113,7 +114,15 @@ function FooterLink({ href, icon: Icon, label, external = true }: { href: string
 		</>
 	);
 
-	if (external) {
+	if (onClick) {
+		return (
+			<button type="button" onClick={onClick} className={className} style={linkStyle}>
+				{content}
+			</button>
+		);
+	}
+
+	if (external && href) {
 		return (
 			<a href={href} target="_blank" rel="noopener noreferrer" className={className} style={linkStyle}>
 				{content}
@@ -122,7 +131,7 @@ function FooterLink({ href, icon: Icon, label, external = true }: { href: string
 	}
 
 	return (
-		<Link href={href} className={className} style={linkStyle}>
+		<Link href={href || '#'} className={className} style={linkStyle}>
 			{content}
 		</Link>
 	);

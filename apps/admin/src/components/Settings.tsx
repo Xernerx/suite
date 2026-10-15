@@ -1,4 +1,3 @@
-// Force recompile
 /** @format */
 'use client';
 
@@ -202,7 +201,7 @@ export default function Settings() {
 				}),
 			]);
 			toast({
-				title: 'System settings saved successfully.',
+				title: t('admin.settings.toasts.saveSuccess'),
 				type: 'success',
 			});
 		} catch (err: any) {
@@ -377,7 +376,7 @@ export default function Settings() {
 								size="icon"
 								disabled={!server.id}
 								onClick={async () => {
-									toast({ title: 'Initiating Force Sync...', type: 'info' });
+									toast({ title: t('admin.settings.toasts.syncInitiated'), type: 'info' });
 									try {
 										const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers/sync'), {
 											method: 'POST',
@@ -386,9 +385,9 @@ export default function Settings() {
 											body: JSON.stringify({ guildId: server.id }),
 										});
 										if (res.ok) {
-											toast({ title: `Force sync started for ${server.id}`, type: 'success' });
+											toast({ title: t('admin.settings.toasts.syncStarted', { id: server.id }), type: 'success' });
 										} else {
-											toast({ title: 'Failed to start force sync.', type: 'error' });
+											toast({ title: t('admin.settings.toasts.syncFailed'), type: 'error' });
 										}
 									} catch (err) {
 										console.error(err);
@@ -406,7 +405,7 @@ export default function Settings() {
 									const newServers = [...sisterServers];
 									newServers.splice(idx, 1);
 									setSisterServers(newServers);
-									toast({ title: 'Sister server removed (unsaved).', type: 'info' });
+									toast({ title: t('admin.settings.toasts.sisterServerRemoved'), type: 'info' });
 								}}
 							>
 								<Trash2 size={16} />
