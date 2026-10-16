@@ -62,10 +62,15 @@ export default function Roles() {
 				]);
 				if (rolesRes.ok) {
 					const fetchedRoles = await rolesRes.json();
-					setRoles(fetchedRoles.sort((a: Role, b: Role) => (a.position || 0) - (b.position || 0)));
+					if (Array.isArray(fetchedRoles)) {
+						setRoles(fetchedRoles.sort((a: Role, b: Role) => (a.position || 0) - (b.position || 0)));
+					}
 				}
 				if (guildRes.ok) setGuild(await guildRes.json());
-				if (discordRolesRes.ok) setDiscordRoles(await discordRolesRes.json());
+				if (discordRolesRes.ok) {
+					const fetchedDiscordRoles = await discordRolesRes.json();
+					setDiscordRoles(Array.isArray(fetchedDiscordRoles) ? fetchedDiscordRoles : []);
+				}
 			} catch (err: any) {
 				setError(err.message || t('admin.roles.loadError'));
 			} finally {

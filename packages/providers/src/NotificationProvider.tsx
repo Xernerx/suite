@@ -52,6 +52,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 			if (res.ok) {
 				let dispatchData = await res.json();
+				if (!Array.isArray(dispatchData)) dispatchData = [];
 
 				// Use localStorage to track read states for global announcements so one user reading it doesn't hide it for everyone
 				let readGlobals: string[] = [];

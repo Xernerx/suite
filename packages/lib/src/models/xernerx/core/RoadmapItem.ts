@@ -1,3 +1,5 @@
+/** @format */
+
 import { Schema } from 'mongoose';
 
 const schema = new Schema(
@@ -6,6 +8,7 @@ const schema = new Schema(
 		title: { type: String, required: true },
 		description: { type: String, required: true },
 		productId: { type: String, required: true }, // Open string for autocomplete
+		botId: { type: String, default: null }, // Optional Discord bot ID reference
 		status: { type: String, enum: ['idea', 'planned', 'active', 'released'], default: 'idea' },
 		targetQuarter: { type: String, default: null }, // e.g., 'Q4 2026'
 		suggestionId: { type: String, default: null }, // Links back to a Suggestion if it came from one

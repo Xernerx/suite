@@ -1,7 +1,8 @@
 /** @format */
+// Force recompile
 'use client';
 
-import { BookOpen, CircleQuestionMark, Cookie, FileText, Mail, MessageCircle, Package, Shield, Briefcase, SlidersHorizontal } from 'lucide-react';
+import { BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -35,7 +36,7 @@ export function Footer() {
 			{/* Fading top border */}
 			<div className="pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />
 
-			<div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
+			<div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
 				{/* ---------------------------------------------------------------- */}
 				{/* Brand */}
 				{/* ---------------------------------------------------------------- */}
@@ -60,9 +61,18 @@ export function Footer() {
 					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
 					<FooterLink onClick={openPrompt} icon={SlidersHorizontal} label={t('common.footer.links.cookiePreferences')} />
-					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
+				</FooterSection>
+				{/* ---------------------------------------------------------------- */}
+				{/* Support */}
+				{/* ---------------------------------------------------------------- */}
+				<FooterSection title={t('common.footer.sections.support')}>
+					<FooterLink href={resolveUrl('https://info.xernerx.com')} icon={LifeBuoy} label={t('common.footer.links.help')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/bugs')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Developer */}

@@ -31,12 +31,19 @@
 			"tagline": "Het bouwen van moderne software, infrastructuur en ontwikkelingstools met een focus op prestaties, eenvoud en lange termijn onderhoudbaarheid.",
 			"sections": {
 				"resources": "Bronnen",
+				"support": "Ondersteuning",
 				"developer": "Ontwikkelaar"
 			},
 			"links": {
 				"privacy": "Privacy",
 				"terms": "Voorwaarden",
+				"cookies": "Cookies",
+				"cookiePreferences": "Cookievoorkeuren",
 				"contact": "Contact",
+				"help": "Helpcentrum",
+				"issues": "Problemen",
+				"suggestions": "Suggesties",
+				"roadmap": "Roadmap",
 				"github": "GitHub",
 				"npm": "npm",
 				"documentation": "Documentatie",

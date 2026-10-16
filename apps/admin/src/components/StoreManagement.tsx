@@ -43,12 +43,12 @@ export default function StoreManagement() {
 
 			if (catsRes.ok) {
 				const catsData = await catsRes.json();
-				setCategories(catsData);
+				setCategories(Array.isArray(catsData) ? catsData : []);
 			}
 
 			if (itemsRes.ok) {
 				const itemsData = await itemsRes.json();
-				setItems(itemsData);
+				setItems(Array.isArray(itemsData) ? itemsData : []);
 			}
 		} catch (err: any) {
 			console.error('Failed to fetch store admin data:', err);

@@ -15,6 +15,8 @@ export default function Settings() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const [adminServerId, setAdminServerId] = useState('');
+	const [mainOrgId, setMainOrgId] = useState('');
+	const [organizations, setOrganizations] = useState<{ _id: string; name: string }[]>([]);
 	const [appWebhookUrl, setAppWebhookUrl] = useState('');
 	const [joinRoles, setJoinRoles] = useState<string[]>([]);
 	const [botJoinRoles, setBotJoinRoles] = useState<string[]>([]);
@@ -54,8 +56,14 @@ export default function Settings() {
 	const fetchSettings = async () => {
 		setIsLoading(true);
 		try {
-			const [adminRes, webhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
+			const [adminRes, mainOrgRes, orgsRes, webhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/main_org_id'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/organizations'), {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
@@ -70,12 +78,6 @@ export default function Settings() {
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
 					credentials: 'include',
 				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify({ value: JSON.stringify(roadmapProducts.filter(Boolean)), valueType: 'json' }),
-				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), {
 					credentials: 'include',
 				}),
@@ -86,6 +88,14 @@ export default function Settings() {
 			if (adminRes.ok) {
 				const data = await adminRes.json();
 				setAdminServerId(data.value || '');
+			}
+			if (mainOrgRes.ok) {
+				const data = await mainOrgRes.json();
+				setMainOrgId(data.value || '');
+			}
+			if (orgsRes.ok) {
+				const orgsData = await orgsRes.json();
+				setOrganizations(Array.isArray(orgsData) ? orgsData : []);
 			}
 			if (webhookRes.ok) {
 				const data = await webhookRes.json();
@@ -104,7 +114,7 @@ export default function Settings() {
 				const data = await roadmapRes.json();
 				try {
 					const parsed = JSON.parse(data.value || '[]');
-					setRoadmapProducts(parsed.length ? parsed : ['Dashboard', 'API', 'CDN', 'Bots']);
+					setRoadmapProducts(Array.isArray(parsed) && parsed.length ? parsed : ['Dashboard', 'API', 'CDN', 'Bots']);
 				} catch {
 					setRoadmapProducts(['Dashboard', 'API', 'CDN', 'Bots']);
 				}
@@ -128,7 +138,8 @@ export default function Settings() {
 				}
 			}
 			if (rolesRes.ok) {
-				setAvailableRoles(await rolesRes.json());
+				const rolesData = await rolesRes.json();
+				setAvailableRoles(Array.isArray(rolesData) ? rolesData : []);
 			}
 		} catch (err: any) {
 			console.error('Failed to fetch settings:', err);
@@ -152,6 +163,17 @@ export default function Settings() {
 					credentials: 'include',
 					body: JSON.stringify({
 						value: adminServerId,
+						valueType: 'string',
+					}),
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/main_org_id'), {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					credentials: 'include',
+					body: JSON.stringify({
+						value: mainOrgId,
 						valueType: 'string',
 					}),
 				}),
@@ -185,6 +207,17 @@ export default function Settings() {
 					credentials: 'include',
 					body: JSON.stringify({
 						value: JSON.stringify(botJoinRoles),
+						valueType: 'json',
+					}),
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					credentials: 'include',
+					body: JSON.stringify({
+						value: JSON.stringify(roadmapProducts.filter(Boolean)),
 						valueType: 'json',
 					}),
 				}),
@@ -288,6 +321,22 @@ export default function Settings() {
 						onChange={(val: string) => setAdminServerId(val)}
 						options={[{ value: '', label: t('admin.dashboard.settings.selectServer') }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
 						placeholder={t('admin.settings.adminServerIdPlaceholder')}
+					/>
+				</div>
+
+				<div
+					className="flex flex-col max-w-md"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.mainOrg')}</label>
+					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.mainOrgDesc')}</p>
+					<Selector
+						value={mainOrgId}
+						onChange={(val: string) => setMainOrgId(val)}
+						options={[{ value: '', label: t('admin.settings.selectMainOrg') }, ...organizations.map((org) => ({ value: org._id, label: org.name }))]}
+						placeholder={t('admin.settings.selectMainOrg')}
 					/>
 				</div>
 

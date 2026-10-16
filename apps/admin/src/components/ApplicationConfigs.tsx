@@ -51,8 +51,12 @@ export default function ApplicationConfigs() {
 				}),
 			]);
 			if (!configsRes.ok) throw new Error('Failed to fetch configs');
-			setConfigs(await configsRes.json());
-			if (rolesRes.ok) setRoles(await rolesRes.json());
+			const configsData = await configsRes.json();
+			setConfigs(Array.isArray(configsData) ? configsData : []);
+			if (rolesRes.ok) {
+				const rolesData = await rolesRes.json();
+				setRoles(Array.isArray(rolesData) ? rolesData : []);
+			}
 		} catch (err: any) {
 			toast({
 				title: err.message,

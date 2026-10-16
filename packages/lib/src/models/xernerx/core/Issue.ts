@@ -1,3 +1,5 @@
+/** @format */
+
 import { Schema } from 'mongoose';
 
 const schema = new Schema(
@@ -6,6 +8,7 @@ const schema = new Schema(
 		title: { type: String, required: true },
 		description: { type: String, required: true },
 		productId: { type: String, required: true }, // Open string for autocomplete
+		botId: { type: String, default: null }, // Optional Discord bot ID reference
 		status: { type: String, enum: ['open', 'resolved'], default: 'open' },
 		resolvedAt: { type: Date, default: null }, // Used to calculate Time-to-Resolution
 		acknowledged: { type: Boolean, default: false }, // If false, it stays in the admin review queue and does not appear on the roadmap Known Issues tracker

@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
 			title: body.title,
 			description: body.description,
 			productId: body.productId,
+			botId: body.botId || null,
 			status: 'open',
 			acknowledged: false, // Default to unacknowledged for admin review
 		});

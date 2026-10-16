@@ -1,3 +1,5 @@
+/** @format */
+
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -7,13 +9,56 @@ export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');
 
-		// Fetch unique product IDs from both Issues and RoadmapItems
-		const roadmapProducts = await models.core.RoadmapItem.distinct('productId');
-		const issueProducts = await models.core.Issue.distinct('productId');
+		const mainOrgSetting = await models.core.Setting.findOne({ id: 'main_org_id' }).lean();
+		const mainOrgId = mainOrgSetting?.value ? String(mainOrgSetting.value) : null;
 
-		const uniqueProducts = [...new Set([...roadmapProducts, ...issueProducts])].filter(Boolean);
+		const bots: { id: string; name: string; avatarUrl: string | null }[] = [];
 
-		return NextResponse.json({ data: uniqueProducts });
+		if (mainOrgId && models.bots?.Bot) {
+			const orgBots = await (models.bots as any).Bot.find({ organization: mainOrgId }).lean();
+			const token = process.env.DISCORD_CLIENT_TOKEN;
+
+			await Promise.all(
+				orgBots.map(async (bot: any) => {
+					let name = bot.name || bot.id;
+					let avatarUrl = bot.avatar || null;
+
+					if (token && bot.id) {
+						try {
+							const res = await fetch(`https://discord.com/api/v10/users/${bot.id}`, {
+								headers: { Authorization: `Bot ${token}` },
+								next: { revalidate: 3600 },
+							});
+							if (res.ok) {
+								const discordUser = await res.json();
+								name = discordUser.global_name || discordUser.username || name;
+								if (discordUser.avatar) {
+									avatarUrl = `https://cdn.discordapp.com/avatars/${bot.id}/${discordUser.avatar}.${discordUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=256`;
+								}
+							}
+						} catch {}
+					}
+
+					bots.push({
+						id: bot.id,
+						name,
+						avatarUrl,
+					});
+				})
+			);
+		}
+
+		// Fetch unique product IDs from RoadmapItems, Issues, and Suggestions
+		const [roadmapProducts, issueProducts, suggestionProducts] = await Promise.all([
+			models.core.RoadmapItem.distinct('productId'),
+			models.core.Issue.distinct('productId'),
+			models.core.Suggestion.distinct('productId'),
+		]);
+
+		const botNames = bots.map((b) => b.name).filter(Boolean);
+		const uniqueProducts = [...new Set([...botNames, ...roadmapProducts, ...issueProducts, ...suggestionProducts])].filter(Boolean);
+
+		return NextResponse.json({ data: uniqueProducts, bots, mainOrgId });
 	} catch (err) {
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}

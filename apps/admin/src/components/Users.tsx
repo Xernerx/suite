@@ -57,8 +57,10 @@ export default function Users() {
 				]);
 				if (!usersRes.ok) throw new Error('Failed to fetch users');
 				if (!rolesRes.ok) throw new Error('Failed to fetch roles');
-				setUsers(await usersRes.json());
-				setRoles(await rolesRes.json());
+				const usersData = await usersRes.json();
+				const rolesData = await rolesRes.json();
+				setUsers(Array.isArray(usersData) ? usersData : []);
+				setRoles(Array.isArray(rolesData) ? rolesData : []);
 			} catch (err: any) {
 				setError(err.message || t('admin.users.card.loadError'));
 			} finally {

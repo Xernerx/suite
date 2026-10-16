@@ -81,7 +81,10 @@ export default function Translations() {
 					fetch(getEnvUrl('https://api.xernerx.com/secure/dispatch/applications'), { credentials: 'include', cache: 'no-store' }),
 					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/translator_app_config'), { credentials: 'include', cache: 'no-store' }),
 				]);
-				if (appsRes.ok) setAppConfigs(await appsRes.json());
+				if (appsRes.ok) {
+					const appsData = await appsRes.json();
+					setAppConfigs(Array.isArray(appsData) ? appsData : []);
+				}
 				if (settingRes.ok) {
 					const data = await settingRes.json();
 					setTranslatorAppConfig(data?.value || '');

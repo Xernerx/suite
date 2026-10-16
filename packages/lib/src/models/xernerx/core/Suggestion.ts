@@ -1,3 +1,5 @@
+/** @format */
+
 import { Schema } from 'mongoose';
 
 const schema = new Schema(
@@ -7,6 +9,7 @@ const schema = new Schema(
 		title: { type: String, required: true },
 		description: { type: String, required: true },
 		productId: { type: String, required: true }, // Open string for autocomplete (e.g. 'bot', 'dashboard')
+		botId: { type: String, default: null }, // Optional Discord bot ID reference
 		upvotes: { type: [String], default: [] }, // Array of user IDs who upvoted
 		downvotes: { type: [String], default: [] }, // Array of user IDs who downvoted
 		status: { type: String, enum: ['pending', 'accepted', 'declined', 'implemented'], default: 'pending' },

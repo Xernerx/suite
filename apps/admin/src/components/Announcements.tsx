@@ -57,7 +57,10 @@ export default function Announcements() {
 	const fetchAnnouncements = async () => {
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/announcements'), { credentials: 'include' });
-			if (res.ok) setAnnouncements(await res.json());
+			if (res.ok) {
+				const data = await res.json();
+				setAnnouncements(Array.isArray(data) ? data : []);
+			}
 		} catch (err) {
 			console.error('Failed to fetch announcements:', err);
 		} finally {

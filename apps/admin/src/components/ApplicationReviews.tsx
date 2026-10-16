@@ -64,8 +64,10 @@ export default function ApplicationReviews() {
 			]);
 
 			if (!appsRes.ok) throw new Error('Failed to fetch applications');
-			const data: Application[] = await appsRes.json();
-			const configsData: ApplicationConfig[] = configsRes.ok ? await configsRes.json() : [];
+			const rawData = await appsRes.json();
+			const data: Application[] = Array.isArray(rawData) ? rawData : [];
+			const rawConfigs = configsRes.ok ? await configsRes.json() : [];
+			const configsData: ApplicationConfig[] = Array.isArray(rawConfigs) ? rawConfigs : [];
 
 			const configMap: Record<string, ApplicationConfig> = {};
 			configsData.forEach((c) => {

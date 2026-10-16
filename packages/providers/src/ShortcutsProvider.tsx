@@ -144,7 +144,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 			credentials: 'include',
 		})
 			.then((res) => (res.ok ? res.json() : []))
-			.then((data) => setRoles(data))
+			.then((data) => setRoles(Array.isArray(data) ? data : []))
 			.catch(() => {});
 	}, [getEnvUrl, isOpen]);
 	const activeUser = discordUser || session?.user;

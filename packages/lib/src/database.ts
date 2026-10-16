@@ -5,16 +5,43 @@ import mongoose, { Connection, Model, Schema } from 'mongoose';
 import { xernerxModels, virtueModels } from './registry';
 
 const globalWithMongoose = global as typeof global & {
+	__connections?: Record<string, Record<string, Connection>>;
 	__connections_v2?: Record<string, Record<string, Connection>>;
 	__models_v4?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__root_connections_v5?: Record<string, Connection>;
+	__db_connections_v5?: Record<string, Record<string, Connection>>;
+	__models_v5?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
-const activeConnections = globalWithMongoose.__connections_v2 || {};
-const cachedModels = globalWithMongoose.__models_v4 || {};
+// Close any legacy per-database connections left over from older HMR reloads
+if (globalWithMongoose.__connections_v2) {
+	for (const projectConns of Object.values(globalWithMongoose.__connections_v2)) {
+		for (const conn of Object.values(projectConns || {})) {
+			if (conn && typeof conn.close === 'function') {
+				conn.close().catch(() => {});
+			}
+		}
+	}
+	delete globalWithMongoose.__connections_v2;
+	delete globalWithMongoose.__models_v4;
+}
+
+const rootConnections = globalWithMongoose.__root_connections_v5 || {};
+const activeConnections = globalWithMongoose.__db_connections_v5 || {};
+const cachedModels = globalWithMongoose.__models_v5 || {};
+
+// Also close any orphaned top-level mongoose.connections not tracked in rootConnections
+const trackedRoots = new Set(Object.values(rootConnections));
+for (const conn of mongoose.connections) {
+	if (conn && conn !== mongoose.connection && !trackedRoots.has(conn) && conn.readyState !== 0) {
+		conn.close().catch(() => {});
+	}
+}
 
 if (process.env.NODE_ENV !== 'production') {
-	globalWithMongoose.__connections_v2 = activeConnections;
-	globalWithMongoose.__models_v4 = cachedModels;
+	globalWithMongoose.__root_connections_v5 = rootConnections;
+	globalWithMongoose.__db_connections_v5 = activeConnections;
+	globalWithMongoose.__models_v5 = cachedModels;
 }
 
 const getUris = (): Record<string, string> => ({
@@ -34,11 +61,18 @@ const registries: Record<string, any> = {
 };
 
 export async function database(projectId: 'xernerx' | 'virtue') {
-	// Ensure cache objects exist for this specific project identifier (e.g., 'xernerx')
 	if (!activeConnections[projectId]) activeConnections[projectId] = {};
 	if (!cachedModels[projectId]) cachedModels[projectId] = {};
 
-	if (Object.keys(cachedModels[projectId]).length > 0) {
+	let rootConn = rootConnections[projectId];
+	if (rootConn && (rootConn.readyState === 0 || typeof rootConn.useDb !== 'function')) {
+		delete rootConnections[projectId];
+		activeConnections[projectId] = {};
+		cachedModels[projectId] = {};
+		rootConn = undefined as any;
+	}
+
+	if (rootConn && Object.keys(cachedModels[projectId]).length > 0) {
 		return {
 			connections: activeConnections[projectId],
 			models: cachedModels[projectId],
@@ -51,47 +85,44 @@ export async function database(projectId: 'xernerx' | 'virtue') {
 	const registry = registries[projectId];
 	if (!registry) throw new Error(`No registry found for ${projectId}.`);
 
+	if (!rootConn) {
+		// Strip any trailing slash/db path so the root pool connects cleanly to the cluster
+		let clusterUri = baseUri;
+		try {
+			const parsed = new URL(baseUri);
+			parsed.pathname = '/';
+			clusterUri = parsed.toString();
+		} catch {}
+
+		rootConn = mongoose.createConnection(clusterUri, {
+			maxPoolSize: 3,
+			minPoolSize: 0,
+			maxIdleTimeMS: 15000,
+			serverSelectionTimeoutMS: 5000,
+			socketTimeoutMS: 30000,
+		});
+		rootConn.on('error', (err) => console.warn(`Mongoose connection error for ${projectId}:`, err?.message || err));
+		rootConnections[projectId] = rootConn;
+	}
+
 	const projectModels: Record<string, Record<string, Model<any>>> = {};
 
-	// Loop 1: uriSuffix is 'profiles', 'stats', 'tokens'
 	for (const [uriSuffix, collectionsMap] of Object.entries(registry)) {
 		const cleanDbName = uriSuffix.replace(/^\/+/, '').replace(/\/+$/, '');
-		let connectionUri = '';
-		try {
-			const parsed = new URL(baseUri.replace(/\/+$/, ''));
-			parsed.pathname = `/${cleanDbName}`;
-			connectionUri = parsed.toString();
-		} catch (e) {
-			connectionUri = `${baseUri.replace(/\/+$/, '')}/${cleanDbName}`;
-		}
 
 		let conn: Connection | undefined = activeConnections[projectId][uriSuffix];
-
-		// HMR cleanup / pending promise resolution
-		if (conn && typeof (conn as any).then === 'function') conn = await (conn as any);
-		if (conn && typeof conn.model !== 'function') {
-			delete activeConnections[projectId][uriSuffix];
-			conn = undefined;
-		}
-
-		if (!conn) {
-			conn = mongoose.createConnection(connectionUri, {
-				dbName: cleanDbName,
-			});
-			conn.on('error', (err) => console.error(`Mongoose connection error for ${projectId}:`, err));
+		if (!conn || typeof conn.model !== 'function') {
+			conn = rootConn.useDb(cleanDbName, { useCache: true });
 			activeConnections[projectId][uriSuffix] = conn;
 		}
 
 		projectModels[uriSuffix] = {};
 
-		// Loop 2: key is 'users', 'guilds', 'bots'
 		for (const [key, def] of Object.entries(collectionsMap as Record<string, ModelDefinition>)) {
 			try {
-				// conn.model('User', schema, 'users')
-				// This builds the EXACT structure from your screenshot.
-				projectModels[uriSuffix][key] = conn.model(def.modelName, def.schema, def.collection);
+				projectModels[uriSuffix][key] = conn.models[def.modelName] || conn.model(def.modelName, def.schema, def.collection);
 			} catch (err) {
-				console.error(`Failed to initialize ${def.modelName} in ${uriSuffix}:`, err);
+				console.warn(`Failed to initialize ${def.modelName} in ${uriSuffix}:`, err);
 			}
 		}
 	}

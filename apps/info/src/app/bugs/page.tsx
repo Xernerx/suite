@@ -1,3 +1,4 @@
+/** @format */
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
@@ -23,8 +24,10 @@ export default function BugsPage() {
 	const { user } = useUser();
 	const { toast } = useToast();
 	const { t } = useDictionary();
-	const [bugs, setBugs] = useState([]);
+	const [bugs, setBugs] = useState<any[]>([]);
 	const [products, setProducts] = useState<string[]>([]);
+	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
+	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
@@ -35,11 +38,21 @@ export default function BugsPage() {
 	const [uploading, setUploading] = useState(false);
 
 	const fetchBugs = async () => {
+		const botIds = new Set<string>();
+
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/issues?status=open'));
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json();
-			setBugs(d.data || []);
+			const list = d.data || [];
+			setBugs(list);
+			list.forEach((s: any) => {
+				if (s?.botId && /^\d{17,20}$/.test(String(s.botId).trim())) {
+					botIds.add(String(s.botId).trim());
+				} else if (s?.productId && /^\d{17,20}$/.test(String(s.productId).trim())) {
+					botIds.add(String(s.productId).trim());
+				}
+			});
 		} catch (err: any) {
 			toast({ type: 'error', title: t('info.bugs.toasts.error'), description: err.message });
 		}
@@ -49,8 +62,33 @@ export default function BugsPage() {
 			if (res.ok) {
 				const d = await res.json();
 				setProducts(d.data || []);
+				if (Array.isArray(d.bots)) {
+					setOrgBots(d.bots);
+					d.bots.forEach((b: any) => {
+						if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) {
+							botIds.add(String(b.id).trim());
+						}
+					});
+				}
 			}
 		} catch {}
+
+		botIds.forEach((id) => {
+			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`))
+				.then((res) => (res.ok ? res.json() : null))
+				.then((d) => {
+					if (!d) return;
+					setBotProfiles((prev) => ({
+						...prev,
+						[id]: {
+							name: d.global_name || d.username || id,
+							avatarUrl: d.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+						},
+					}));
+				})
+				.catch(() => {});
+		});
+
 		setLoading(false);
 	};
 
@@ -58,6 +96,22 @@ export default function BugsPage() {
 		if (!isReady) return;
 		fetchBugs();
 	}, [isReady, getEnvUrl]);
+
+	const resolveBot = (itemOrProd: any): { id: string; name: string; avatarUrl: string | null } | null => {
+		const isObj = itemOrProd && typeof itemOrProd === 'object';
+		const rawBotId = isObj ? itemOrProd.botId : null;
+		const rawProd = isObj ? itemOrProd.productId : itemOrProd;
+
+		const matchedOrgBot = orgBots.find((b) => b.id === rawBotId || b.id === rawProd || (rawProd && b.name.toLowerCase() === String(rawProd).toLowerCase()));
+
+		const targetId = rawBotId || matchedOrgBot?.id || (rawProd && /^\d{17,20}$/.test(String(rawProd).trim()) ? String(rawProd).trim() : null);
+
+		if (!targetId) return null;
+		const discordProfile = botProfiles[targetId];
+		if (discordProfile) return { id: targetId, ...discordProfile };
+		if (matchedOrgBot) return matchedOrgBot;
+		return null;
+	};
 
 	const submitBug = async (e: any) => {
 		e.preventDefault();
@@ -98,12 +152,19 @@ export default function BugsPage() {
 			return toast({ type: 'error', title: t('info.bugs.toasts.uploadFailed'), description: err.message });
 		}
 
+		const resolved = resolveBot(product);
+
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/issues'), {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({ title, description: finalDescription, productId: product }),
+				body: JSON.stringify({
+					title,
+					description: finalDescription,
+					productId: resolved?.name || product,
+					botId: resolved?.id || null,
+				}),
 			});
 			if (res.status === 409)
 				return toast({
@@ -129,8 +190,11 @@ export default function BugsPage() {
 	const filteredBugs = useMemo(() => {
 		const openBugs = bugs.filter((s: any) => s.status !== 'resolved');
 		if (!search) return openBugs;
-		return openBugs.filter((s: any) => fuzzySearch(search, s.title) || fuzzySearch(search, s.description));
-	}, [search, bugs]);
+		return openBugs.filter((s: any) => {
+			const botInfo = resolveBot(s);
+			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, botInfo?.name || s.productId || '');
+		});
+	}, [search, bugs, orgBots, botProfiles]);
 
 	if (loading) return <Loading />;
 
@@ -156,7 +220,25 @@ export default function BugsPage() {
 							<form onSubmit={submitBug} className="flex flex-col gap-4">
 								<Input placeholder={t('info.bugs.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} required />
 								<Input variant="textarea" rows={4} placeholder={t('info.bugs.descriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} required />
-								<Selector value={product} options={products.map((p) => ({ value: p, label: p }))} onChange={setProduct} placeholder={t('info.bugs.selectProduct')} />
+								<Selector
+									value={product}
+									options={products.map((p) => {
+										const botInfo = resolveBot(p);
+										return {
+											value: p,
+											label: botInfo ? (
+												<span className="inline-flex items-center gap-2">
+													{botInfo.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+													<span>{botInfo.name}</span>
+												</span>
+											) : (
+												p
+											),
+										};
+									})}
+									onChange={setProduct}
+									placeholder={t('info.bugs.selectProduct')}
+								/>
 								<div className="flex flex-col gap-2">
 									<label className="text-xs font-bold text-(--text-muted) uppercase">{t('info.bugs.attachFile')}</label>
 									<input
@@ -185,6 +267,7 @@ export default function BugsPage() {
 
 					<AnimatePresence mode="popLayout">
 						{filteredBugs.map((s: any) => {
+							const botInfo = resolveBot(s);
 							return (
 								<motion.div
 									key={s.id}
@@ -215,7 +298,10 @@ export default function BugsPage() {
 												</div>
 											</Tooltip>
 
-											<span className="text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">{s.productId}</span>
+											<span className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">
+												{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+												{botInfo ? botInfo.name : s.productId}
+											</span>
 										</div>
 									</div>
 								</motion.div>

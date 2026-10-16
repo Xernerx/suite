@@ -1,3 +1,4 @@
+/** @format */
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
@@ -23,8 +24,10 @@ export default function SuggestionsPage() {
 	const { user } = useUser();
 	const { toast } = useToast();
 	const { t } = useDictionary();
-	const [suggestions, setSuggestions] = useState([]);
+	const [suggestions, setSuggestions] = useState<any[]>([]);
 	const [products, setProducts] = useState<string[]>([]);
+	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
+	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
@@ -33,11 +36,21 @@ export default function SuggestionsPage() {
 	const [showForm, setShowForm] = useState(false);
 
 	const fetchSuggestions = async () => {
+		const botIds = new Set<string>();
+
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/suggestions'));
 			if (!res.ok) throw new Error(`HTTP ${res.status}`);
 			const d = await res.json();
-			setSuggestions(d.data || []);
+			const list = d.data || [];
+			setSuggestions(list);
+			list.forEach((s: any) => {
+				if (s?.botId && /^\d{17,20}$/.test(String(s.botId).trim())) {
+					botIds.add(String(s.botId).trim());
+				} else if (s?.productId && /^\d{17,20}$/.test(String(s.productId).trim())) {
+					botIds.add(String(s.productId).trim());
+				}
+			});
 		} catch (err: any) {
 			toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: err.message });
 		}
@@ -47,8 +60,33 @@ export default function SuggestionsPage() {
 			if (res.ok) {
 				const d = await res.json();
 				setProducts(d.data || []);
+				if (Array.isArray(d.bots)) {
+					setOrgBots(d.bots);
+					d.bots.forEach((b: any) => {
+						if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) {
+							botIds.add(String(b.id).trim());
+						}
+					});
+				}
 			}
 		} catch {}
+
+		botIds.forEach((id) => {
+			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`))
+				.then((res) => (res.ok ? res.json() : null))
+				.then((d) => {
+					if (!d) return;
+					setBotProfiles((prev) => ({
+						...prev,
+						[id]: {
+							name: d.global_name || d.username || id,
+							avatarUrl: d.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+						},
+					}));
+				})
+				.catch(() => {});
+		});
+
 		setLoading(false);
 	};
 
@@ -56,6 +94,22 @@ export default function SuggestionsPage() {
 		if (!isReady) return;
 		fetchSuggestions();
 	}, [isReady, getEnvUrl]);
+
+	const resolveBot = (itemOrProd: any): { id: string; name: string; avatarUrl: string | null } | null => {
+		const isObj = itemOrProd && typeof itemOrProd === 'object';
+		const rawBotId = isObj ? itemOrProd.botId : null;
+		const rawProd = isObj ? itemOrProd.productId : itemOrProd;
+
+		const matchedOrgBot = orgBots.find((b) => b.id === rawBotId || b.id === rawProd || (rawProd && b.name.toLowerCase() === String(rawProd).toLowerCase()));
+
+		const targetId = rawBotId || matchedOrgBot?.id || (rawProd && /^\d{17,20}$/.test(String(rawProd).trim()) ? String(rawProd).trim() : null);
+
+		if (!targetId) return null;
+		const discordProfile = botProfiles[targetId];
+		if (discordProfile) return { id: targetId, ...discordProfile };
+		if (matchedOrgBot) return matchedOrgBot;
+		return null;
+	};
 
 	const submitSuggestion = async (e: any) => {
 		e.preventDefault();
@@ -67,12 +121,19 @@ export default function SuggestionsPage() {
 			});
 		if (!title || !description || !product) return;
 
+		const resolved = resolveBot(product);
+
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/suggestions'), {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({ title, description, productId: product }),
+				body: JSON.stringify({
+					title,
+					description,
+					productId: resolved?.name || product,
+					botId: resolved?.id || null,
+				}),
 			});
 			if (res.status === 409)
 				return toast({
@@ -115,8 +176,11 @@ export default function SuggestionsPage() {
 
 	const filteredSuggestions = useMemo(() => {
 		if (!search) return suggestions;
-		return suggestions.filter((s: any) => fuzzySearch(search, s.title) || fuzzySearch(search, s.description));
-	}, [search, suggestions]);
+		return suggestions.filter((s: any) => {
+			const botInfo = resolveBot(s);
+			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, botInfo?.name || s.productId || '');
+		});
+	}, [search, suggestions, orgBots, botProfiles]);
 
 	if (loading) return <Loading />;
 
@@ -149,7 +213,25 @@ export default function SuggestionsPage() {
 									onChange={(e) => setDescription(e.target.value)}
 									required
 								/>
-								<Selector value={product} options={products.map((p) => ({ value: p, label: p }))} onChange={setProduct} placeholder={t('info.suggestions.selectProduct')} />
+								<Selector
+									value={product}
+									options={products.map((p) => {
+										const botInfo = resolveBot(p);
+										return {
+											value: p,
+											label: botInfo ? (
+												<span className="inline-flex items-center gap-2">
+													{botInfo.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+													<span>{botInfo.name}</span>
+												</span>
+											) : (
+												p
+											),
+										};
+									})}
+									onChange={setProduct}
+									placeholder={t('info.suggestions.selectProduct')}
+								/>
 								<div className="flex gap-2 w-full">
 									<Button type="submit" className="flex-1">
 										{t('info.suggestions.submit')}
@@ -172,6 +254,7 @@ export default function SuggestionsPage() {
 							const hasUpvoted = user && s.upvotes?.includes(user.id);
 							const hasDownvoted = user && s.downvotes?.includes(user.id);
 							const netVotes = (s.upvotes?.length || 0) - (s.downvotes?.length || 0);
+							const botInfo = resolveBot(s);
 							return (
 								<motion.div
 									key={s.id}
@@ -219,7 +302,10 @@ export default function SuggestionsPage() {
 											)}
 										</div>
 										<div className="text-(--text-muted) text-sm mb-2 mt-1">{s.description}</div>
-										<span className="text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">{s.productId}</span>
+										<span className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">
+											{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+											{botInfo ? botInfo.name : s.productId}
+										</span>
 									</div>
 								</motion.div>
 							);

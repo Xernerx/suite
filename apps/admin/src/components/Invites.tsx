@@ -45,7 +45,8 @@ export default function Invites() {
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), { credentials: 'include' });
 			if (res.ok) {
-				setInvites(await res.json());
+				const data = await res.json();
+				setInvites(Array.isArray(data) ? data : []);
 			}
 		} catch (error) {
 			console.error(error);

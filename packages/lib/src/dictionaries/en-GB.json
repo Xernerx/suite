@@ -37,6 +37,7 @@
 			"tagline": "Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.",
 			"sections": {
 				"resources": "Resources",
+				"support": "Support",
 				"developer": "Developer"
 			},
 			"links": {
@@ -45,6 +46,10 @@
 				"cookies": "Cookies",
 				"cookiePreferences": "Cookie Preferences",
 				"contact": "Contact",
+				"help": "Help Center",
+				"issues": "Issues",
+				"suggestions": "Suggestions",
+				"roadmap": "Roadmap",
 				"faq": "Frequently Asked Questions",
 				"careers": "Careers",
 				"github": "GitHub",
@@ -545,6 +550,9 @@
 			"adminServerId": "Admin Server ID",
 			"adminServerIdDesc": "The main Discord server for administrative alerts and logging.",
 			"adminServerIdPlaceholder": "e.g. 123456789012345678",
+			"mainOrg": "Main Organization",
+			"mainOrgDesc": "The primary organization whose bots and products populate roadmap and issue autocomplete.",
+			"selectMainOrg": "Select Main Organization...",
 			"appWebhookUrl": "App Webhook URL",
 			"appWebhookUrlDesc": "Webhook for sending important application events.",
 			"appWebhookUrlPlaceholder": "https://discord.com/api/webhooks/...",
@@ -805,6 +813,7 @@
 				"titlePlaceholder": "Title",
 				"descPlaceholder": "Description",
 				"productPlaceholder": "Select Product",
+				"botIdPlaceholder": "Bot ID (Optional — renders Discord name & avatar)",
 				"quarterPlaceholder": "Target Quarter (e.g. Q1 2026)",
 				"statusPlaceholder": "Select Status",
 				"changelogPlaceholder": "Changelog URL (Optional)",

@@ -39,7 +39,7 @@ export default function Tokens() {
 				});
 				if (!res.ok) throw new Error(t('admin.tokens.toast.fetchFailed'));
 				const data = await res.json();
-				setTokens(data);
+				setTokens(Array.isArray(data) ? data : []);
 			} catch (err: any) {
 				setError(
 					err.message ||

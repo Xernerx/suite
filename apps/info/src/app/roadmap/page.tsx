@@ -1,3 +1,4 @@
+/** @format */
 'use client';
 import { useState, useEffect } from 'react';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
@@ -10,8 +11,10 @@ export default function RoadmapPage() {
 	const { toast } = useToast();
 	const { t } = useDictionary();
 	const [roadmap, setRoadmap] = useState<any[]>([]);
-	const [issues, setIssues] = useState([]);
+	const [issues, setIssues] = useState<any[]>([]);
 	const [metrics, setMetrics] = useState<any>(null);
+	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
+	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
 	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
@@ -27,12 +30,50 @@ export default function RoadmapPage() {
 			fetch(getEnvUrl('https://api.xernerx.com/info/issues'))
 				.then((res) => (res.ok ? res.json() : { data: [] }))
 				.catch(() => ({ data: [] })),
+			fetch(getEnvUrl('https://api.xernerx.com/info/roadmap/products'))
+				.then((res) => (res.ok ? res.json() : { data: [], bots: [] }))
+				.catch(() => ({ data: [], bots: [] })),
 		])
-			.then(([roadmapData, metricsData, issuesData]) => {
-				setRoadmap(roadmapData?.data || []);
+			.then(([roadmapData, metricsData, issuesData, productsData]) => {
+				const rItems = roadmapData?.data || [];
+				const iItems = issuesData?.data || [];
+				const botsList = Array.isArray(productsData?.bots) ? productsData.bots : [];
+
+				setRoadmap(rItems);
 				setMetrics(metricsData?.data || null);
-				setIssues(issuesData?.data || []);
+				setIssues(iItems);
+				setOrgBots(botsList);
 				setLoading(false);
+
+				const botIds = new Set<string>();
+				botsList.forEach((b: any) => {
+					if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) {
+						botIds.add(String(b.id).trim());
+					}
+				});
+				[...rItems, ...iItems].forEach((item: any) => {
+					if (item?.botId && /^\d{17,20}$/.test(String(item.botId).trim())) {
+						botIds.add(String(item.botId).trim());
+					} else if (item?.productId && /^\d{17,20}$/.test(String(item.productId).trim())) {
+						botIds.add(String(item.productId).trim());
+					}
+				});
+
+				botIds.forEach((id) => {
+					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`))
+						.then((res) => (res.ok ? res.json() : null))
+						.then((d) => {
+							if (!d) return;
+							setBotProfiles((prev) => ({
+								...prev,
+								[id]: {
+									name: d.global_name || d.username || id,
+									avatarUrl: d.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
+								},
+							}));
+						})
+						.catch(() => {});
+				});
 			})
 			.catch((err) => {
 				setLoading(false);
@@ -41,6 +82,20 @@ export default function RoadmapPage() {
 				} catch {}
 			});
 	}, [isReady, getEnvUrl]);
+
+	const resolveBot = (itemOrProd: any): { name: string; avatarUrl: string | null } | null => {
+		const isObj = itemOrProd && typeof itemOrProd === 'object';
+		const rawBotId = isObj ? itemOrProd.botId : null;
+		const rawProd = isObj ? itemOrProd.productId : itemOrProd;
+
+		const itemWithBot = !rawBotId && rawProd ? roadmap.find((r: any) => r.productId === rawProd && r.botId) : null;
+		const matchedOrgBot = orgBots.find((b) => b.id === rawBotId || b.id === rawProd || (rawProd && b.name.toLowerCase() === String(rawProd).toLowerCase()));
+
+		const targetId = rawBotId || itemWithBot?.botId || matchedOrgBot?.id || (rawProd && /^\d{17,20}$/.test(String(rawProd).trim()) ? String(rawProd).trim() : null);
+
+		if (!targetId) return null;
+		return botProfiles[targetId] || (matchedOrgBot ? { name: matchedOrgBot.name, avatarUrl: matchedOrgBot.avatarUrl } : null);
+	};
 
 	if (loading) return <Loading />;
 
@@ -193,6 +248,7 @@ export default function RoadmapPage() {
 												const trackY = trackStartY + pIdx * trackSpacing;
 												const color = getProductColor(item.productId);
 												const distToTrack = cardsY - trackY;
+												const botInfo = resolveBot(item);
 
 												return (
 													<motion.div
@@ -224,10 +280,11 @@ export default function RoadmapPage() {
 														<div className="flex justify-between items-start mb-4 z-10">
 															<span
 																onClick={() => setSelectedProduct(selectedProduct === item.productId ? null : item.productId)}
-																className="text-[10px] font-black uppercase px-2 py-1 rounded-md tracking-wider border cursor-pointer hover:brightness-150 transition-all"
+																className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-md tracking-wider border cursor-pointer hover:brightness-150 transition-all"
 																style={{ color: color, backgroundColor: `${color}1A`, borderColor: `${color}33` }}
 															>
-																{item.productId}
+																{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+																{botInfo ? botInfo.name : item.productId}
 															</span>
 															<div className="flex items-center gap-2">
 																<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-gray-500'}`}></span>
@@ -286,16 +343,18 @@ export default function RoadmapPage() {
 										const pItems = qItems.filter((i: any) => i.productId === prod);
 										if (pItems.length === 0 || (selectedProduct && prod !== selectedProduct)) return null;
 										const color = getProductColor(prod);
+										const prodBotInfo = resolveBot(pItems[0] || prod);
 
 										return (
 											<div key={prod} className="flex flex-col gap-4 relative border-l-2 pl-6" style={{ borderColor: `${color}66` }}>
 												<div className="absolute top-0 -left-[3px] w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
 												<span
 													onClick={() => setSelectedProduct(selectedProduct === prod ? null : prod)}
-													className="text-[10px] font-black uppercase px-2 py-1 rounded-md w-fit cursor-pointer hover:brightness-150 transition-all"
+													className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-md w-fit cursor-pointer hover:brightness-150 transition-all"
 													style={{ color: color, backgroundColor: `${color}1A`, border: `1px solid ${color}33` }}
 												>
-													{prod}
+													{prodBotInfo?.avatarUrl && <img src={prodBotInfo.avatarUrl} alt={prodBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+													{prodBotInfo ? prodBotInfo.name : prod}
 												</span>
 												{pItems.map((item: any) => (
 													<motion.div
@@ -354,41 +413,45 @@ export default function RoadmapPage() {
 								<AnimatePresence mode="popLayout">
 									{issues
 										.filter((i: any) => i.status === 'open' && i.acknowledged)
-										.map((issue: any) => (
-											<motion.div
-												layout
-												initial={{ opacity: 0, y: 15 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, scale: 0.95 }}
-												transition={{ duration: 0.25, ease: 'easeOut' }}
-												key={issue.id}
-												className="flex flex-col p-6 bg-(--foreground)/40 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-xl transition-all duration-300 hover:border-red-500/60 hover:bg-(--foreground)/60 hover:shadow-[0_8px_24px_rgba(239,68,68,0.15)] hover:-translate-y-1 hover:z-20 gap-3 relative group/card"
-											>
-												<div className="absolute top-0 left-0 w-1.5 h-full bg-red-500/40 group-hover/card:bg-red-500 transition-colors duration-300 rounded-l-2xl"></div>
-												<div className="flex justify-between items-start mb-2">
-													<div className="flex items-center gap-2">
-														<span className="text-xs font-black uppercase text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-red-500/20">
-															{issue.productId}
+										.map((issue: any) => {
+											const issueBotInfo = resolveBot(issue);
+											return (
+												<motion.div
+													layout
+													initial={{ opacity: 0, y: 15 }}
+													animate={{ opacity: 1, y: 0 }}
+													exit={{ opacity: 0, scale: 0.95 }}
+													transition={{ duration: 0.25, ease: 'easeOut' }}
+													key={issue.id}
+													className="flex flex-col p-6 bg-(--foreground)/40 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-xl transition-all duration-300 hover:border-red-500/60 hover:bg-(--foreground)/60 hover:shadow-[0_8px_24px_rgba(239,68,68,0.15)] hover:-translate-y-1 hover:z-20 gap-3 relative group/card"
+												>
+													<div className="absolute top-0 left-0 w-1.5 h-full bg-red-500/40 group-hover/card:bg-red-500 transition-colors duration-300 rounded-l-2xl"></div>
+													<div className="flex justify-between items-start mb-2">
+														<div className="flex items-center gap-2">
+															<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-red-500/20">
+																{issueBotInfo?.avatarUrl && <img src={issueBotInfo.avatarUrl} alt={issueBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+																{issueBotInfo ? issueBotInfo.name : issue.productId}
+															</span>
+															<Tooltip position="bottom" content={issue.acknowledged ? t('info.bugs.tooltips.verified') : t('info.bugs.tooltips.submitted')}>
+																<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
+																	<span className={`w-2 h-2 rounded-full ${issue.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}></span>
+																	<span className="text-[10px] uppercase font-bold text-(--text-muted)">
+																		{issue.acknowledged ? t('info.bugs.status.verified') : t('info.bugs.status.submitted')}
+																	</span>
+																</div>
+															</Tooltip>
+														</div>
+														<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/50 px-2 py-1 rounded-md">
+															{new Date(issue.createdAt).toLocaleDateString()}
 														</span>
-														<Tooltip position="bottom" content={issue.acknowledged ? t('info.bugs.tooltips.verified') : t('info.bugs.tooltips.submitted')}>
-															<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
-																<span className={`w-2 h-2 rounded-full ${issue.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}></span>
-																<span className="text-[10px] uppercase font-bold text-(--text-muted)">
-																	{issue.acknowledged ? t('info.bugs.status.verified') : t('info.bugs.status.submitted')}
-																</span>
-															</div>
-														</Tooltip>
 													</div>
-													<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/50 px-2 py-1 rounded-md">
-														{new Date(issue.createdAt).toLocaleDateString()}
-													</span>
-												</div>
-												<div className="flex flex-col">
-													<div className="font-bold text-xl text-(--text) group-hover/card:text-(--accent) transition-colors">{issue.title}</div>
-													<div className="text-sm text-(--text-muted) mt-3 leading-relaxed">{issue.description}</div>
-												</div>
-											</motion.div>
-										))}
+													<div className="flex flex-col">
+														<div className="font-bold text-xl text-(--text) group-hover/card:text-(--accent) transition-colors">{issue.title}</div>
+														<div className="text-sm text-(--text-muted) mt-3 leading-relaxed">{issue.description}</div>
+													</div>
+												</motion.div>
+											);
+										})}
 								</AnimatePresence>
 							)}
 						</div>
@@ -407,32 +470,36 @@ export default function RoadmapPage() {
 								<AnimatePresence mode="popLayout">
 									{issues
 										.filter((i: any) => i.status === 'resolved')
-										.map((issue: any) => (
-											<motion.div
-												layout
-												initial={{ opacity: 0, y: 15 }}
-												animate={{ opacity: 1, y: 0 }}
-												exit={{ opacity: 0, scale: 0.95 }}
-												transition={{ duration: 0.25, ease: 'easeOut' }}
-												key={issue.id}
-												className="flex flex-col p-6 bg-(--foreground)/20 backdrop-blur-xl rounded-2xl border border-(--border)/5 shadow-lg transition-all duration-300 hover:border-green-500/40 hover:bg-(--foreground)/40 gap-3 relative overflow-hidden opacity-75 hover:opacity-100 group/card"
-											>
-												<div className="absolute top-0 left-0 w-1.5 h-full bg-green-500/30 group-hover/card:bg-green-500 transition-colors duration-300 rounded-l-2xl"></div>
-												<div className="flex justify-between items-start mb-2">
-													<span className="text-xs font-black uppercase text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-green-500/20">
-														{issue.productId}
-													</span>
-													<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/40 px-2 py-1 rounded-md">
-														{t('info.roadmap.knownIssues.fixedOn', {
-															date: new Date(issue.resolvedAt || issue.updatedAt).toLocaleDateString(),
-														})}
-													</span>
-												</div>
-												<div className="flex flex-col">
-													<div className="font-bold text-lg line-through text-(--text-muted) group-hover/card:text-(--text) transition-colors">{issue.title}</div>
-												</div>
-											</motion.div>
-										))}
+										.map((issue: any) => {
+											const issueBotInfo = resolveBot(issue);
+											return (
+												<motion.div
+													layout
+													initial={{ opacity: 0, y: 15 }}
+													animate={{ opacity: 1, y: 0 }}
+													exit={{ opacity: 0, scale: 0.95 }}
+													transition={{ duration: 0.25, ease: 'easeOut' }}
+													key={issue.id}
+													className="flex flex-col p-6 bg-(--foreground)/20 backdrop-blur-xl rounded-2xl border border-(--border)/5 shadow-lg transition-all duration-300 hover:border-green-500/40 hover:bg-(--foreground)/40 gap-3 relative overflow-hidden opacity-75 hover:opacity-100 group/card"
+												>
+													<div className="absolute top-0 left-0 w-1.5 h-full bg-green-500/30 group-hover/card:bg-green-500 transition-colors duration-300 rounded-l-2xl"></div>
+													<div className="flex justify-between items-start mb-2">
+														<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-green-500/20">
+															{issueBotInfo?.avatarUrl && <img src={issueBotInfo.avatarUrl} alt={issueBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+															{issueBotInfo ? issueBotInfo.name : issue.productId}
+														</span>
+														<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/40 px-2 py-1 rounded-md">
+															{t('info.roadmap.knownIssues.fixedOn', {
+																date: new Date(issue.resolvedAt || issue.updatedAt).toLocaleDateString(),
+															})}
+														</span>
+													</div>
+													<div className="flex flex-col">
+														<div className="font-bold text-lg line-through text-(--text-muted) group-hover/card:text-(--text) transition-colors">{issue.title}</div>
+													</div>
+												</motion.div>
+											);
+										})}
 								</AnimatePresence>
 							)}
 						</div>
