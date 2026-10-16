@@ -2,9 +2,11 @@
 'use client';
 
 import { usePlatform, useSidebar } from '@xernerx/providers';
+import { Suspense } from 'react';
 
 import { Footer } from './Footer';
 import { Header } from './Header';
+import { Loading } from '@xernerx/feedback';
 import NextTopLoader from 'nextjs-toploader';
 import { Sidebar } from './Sidebar';
 
@@ -39,7 +41,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 				>
 					<div className={`relative z-10 flex flex-col ${showFooter ? 'min-h-full justify-between' : ''}`}>
 						<div className="relative z-10" style={{ padding: 'var(--ui-gap)' }}>
-							{children}
+							<Suspense fallback={<Loading />}>{children}</Suspense>
 						</div>
 
 						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}

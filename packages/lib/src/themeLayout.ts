@@ -1,9 +1,13 @@
 /** @format */
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 export async function getThemeLayoutProps() {
 	const cookieStore = await cookies();
+	const headerStore = await headers();
+
+	const ua = headerStore.get('user-agent')?.toLowerCase() || '';
+	const isElectron = ua.includes('electron');
 
 	const accent = cookieStore.get('accent')?.value || '#8b7cf6';
 	const theme = cookieStore.get('theme')?.value || 'system';
@@ -21,8 +25,10 @@ export async function getThemeLayoutProps() {
 	if (uiGap) initialStyles['--ui-gap'] = `${uiGap}px`;
 	if (textScale) initialStyles['--text-scale'] = `${textScale}px`;
 
+	const classes = [!isLight ? 'dark' : '', isElectron ? 'is-electron' : ''].filter(Boolean).join(' ');
+
 	return {
-		className: !isLight ? 'dark' : '',
+		className: classes,
 		style: initialStyles as React.CSSProperties,
 	};
 }

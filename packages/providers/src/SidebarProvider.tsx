@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export type SidebarNavItem = {
 	label: string;
@@ -34,7 +34,6 @@ const SidebarContext = createContext<SidebarContextType | null>(null);
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const pathname = usePathname();
-	const searchParams = useSearchParams();
 
 	const [state, setState] = useState<'open' | 'closed' | 'hidden'>('hidden');
 	const [prevState, setPrevState] = useState<'open' | 'closed'>('open');
@@ -42,8 +41,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 
 	const [navItems, setNavItems] = useState<SidebarNavItem[]>([]);
 
-	const urlView = searchParams.get('view');
-	const [view, setViewState] = useState<string | null>(urlView || null);
+	const [view, setViewState] = useState<string | null>(null);
 	const [isMounted, setIsMounted] = useState(false);
 
 	useEffect(() => {
@@ -55,6 +53,8 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		setIsMounted(true);
 		const storageKey = `xernerx_sidebar_view_${pathname}`;
 		const storedView = localStorage.getItem(storageKey);
+		const params = new URLSearchParams(window.location.search);
+		const urlView = params.get('view');
 
 		if (urlView) {
 			localStorage.setItem(storageKey, urlView);
@@ -64,7 +64,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		} else {
 			setViewState(null);
 		}
-	}, [urlView, pathname]);
+	}, [pathname]);
 
 	// 2. Handle NavItems loading & fallback once items are registered by the page
 	useEffect(() => {
@@ -97,12 +97,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		// Clean the URL if they navigated via a shared link
-		if (searchParams.has('view')) {
-			const params = new URLSearchParams(searchParams.toString());
-			params.delete('view');
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			if (params.has('view')) {
+				params.delete('view');
 
-			const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-			router.replace(newUrl, { scroll: false });
+				const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+				router.replace(newUrl, { scroll: false });
+			}
 		}
 	};
 
@@ -120,7 +122,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 				setNavItems,
 				clearNavItems: () => setNavItems([]),
 
-				view: isMounted ? view : urlView || navItems.find((i) => i.view)?.view || null,
+				view: isMounted ? view : navItems.find((i) => i.view)?.view || null,
 				setView,
 			}}
 		>

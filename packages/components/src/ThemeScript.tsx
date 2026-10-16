@@ -6,6 +6,10 @@ import { useEffect } from 'react';
 export function ThemeScript() {
 	useEffect(() => {
 		try {
+			if (typeof (window as any).electron !== 'undefined' || navigator.userAgent.toLowerCase().includes('electron')) {
+				document.documentElement.classList.add('is-electron');
+			}
+
 			function getPref(key: string) {
 				const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
 				if (match) return match[2];

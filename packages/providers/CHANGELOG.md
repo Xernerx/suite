@@ -1,5 +1,11 @@
 # @xernerx/providers
 
+## 0.6.1
+
+### Patch Changes
+
+- Fixed an issue where in the app the minimize/maximize and close buttons wouldn't show.
+
 ## 0.6.0
 
 ### Minor Changes

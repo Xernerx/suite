@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, Monitor, RotateCw, Search, SidebarClose, SidebarOpen, Smartphone, Square, Tablet, User as UserIcon, X } from 'lucide-react';
 import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 import BannerCanary from '../../public/banner-canary.svg';
@@ -77,8 +77,9 @@ export function Header() {
 	const { state, toggle, setMobileOpen, isMobileOpen } = useSidebar();
 	const { t } = useDictionary();
 	const { type, device } = usePlatform();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isDev, isCanary } = useEnvironment();
 	const [maximized, setMaximized] = useState(false);
+	const [isElectron, setIsElectron] = useState(false);
 
 	const { data: session } = useSession();
 	const { user: discordUser } = useUser();
@@ -92,20 +93,28 @@ export function Header() {
 	async function toggleMaximize() {
 		const electron = (window as any).electron;
 		await electron?.maximize?.();
-		setMaximized((await electron?.isMaximized?.())!);
+		setMaximized(Boolean(await electron?.isMaximized?.()));
 	}
 
-	const { isDev, isCanary } = useEnvironment();
 	const { setNavOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
 	const pathname = usePathname();
-	const searchParams = useSearchParams();
 
 	const [isMounted, setIsMounted] = useState(false);
 	useEffect(() => {
 		setIsMounted(true);
+		const electronBridge = (window as any).electron;
+		const detectedElectron = Boolean(electronBridge) || navigator.userAgent.toLowerCase().includes('electron');
+		setIsElectron(detectedElectron);
+		if (detectedElectron) {
+			document.documentElement.classList.add('is-electron');
+		}
+		electronBridge?.isMaximized?.()?.then?.((val: boolean) => setMaximized(Boolean(val)));
+
 		const timer = setTimeout(() => setIsExpanded(false), 2000);
 		return () => clearTimeout(timer);
 	}, []);
+
+	const isApp = type === 'application' || isElectron;
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -148,12 +157,12 @@ export function Header() {
 		const env = host.includes('.dev.') || host === 'localhost' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 
 		let pre = 'app';
-		['www', 'api', 'docs', 'admin', 'account'].forEach((p) => {
+		['www', 'api', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => {
 			if (host.startsWith(`${p}.`)) pre = p;
 		});
 
-		const searchStr = searchParams.toString();
-		return { pre, env, path: pathname + (searchStr ? `?${searchStr}` : '') };
+		const searchStr = window.location.search;
+		return { pre, env, path: pathname + (searchStr || '') };
 	};
 
 	const urlState = getInitialUrlState();
@@ -171,7 +180,7 @@ export function Header() {
 				{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]" />}
 				{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]" />}
 
-				<div className="flex items-center">
+				<div className="flex items-center shrink-0" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
 					{state !== 'hidden' && (
 						<button
 							onClick={() => {
@@ -193,15 +202,15 @@ export function Header() {
 					</Link>
 				</div>
 
-				<div style={{ flex: 1, WebkitAppRegion: 'drag' } as React.CSSProperties} className="w-full h-full" />
+				<div style={{ flex: 1, WebkitAppRegion: 'drag' } as React.CSSProperties} className="h-full min-w-4" />
 
-				<div className="flex items-center gap-4">
-					{type !== 'application' && (
+				<div className="flex items-center gap-4 shrink-0 relative z-10" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+					{!isApp && (
 						<motion.div
 							animate={{ width: isExpanded ? 'auto' : '20px' }}
 							onHoverStart={() => setIsExpanded(true)}
 							onHoverEnd={() => setIsExpanded(false)}
-							className="hidden sm:flex items-center overflow-hidden"
+							className="hidden sm:flex [.is-electron_&]:!hidden items-center overflow-hidden"
 						>
 							<Link
 								suppressHydrationWarning
@@ -266,21 +275,19 @@ export function Header() {
 						</div>
 					)}
 
-					{type === 'application' && (
-						<>
-							<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => (window as any).electron?.minimize?.()}>
-								<Minus size={20} />
-							</button>
+					<div className={`${isApp ? 'flex' : 'hidden [.is-electron_&]:flex'} items-center gap-4`}>
+						<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => (window as any).electron?.minimize?.()}>
+							<Minus size={20} />
+						</button>
 
-							<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={toggleMaximize}>
-								{maximized ? <Copy size={20} /> : <Square size={14} />}
-							</button>
+						<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={toggleMaximize}>
+							{maximized ? <Copy size={20} /> : <Square size={14} />}
+						</button>
 
-							<button className="text-(--text) cursor-pointer hover:text-(--accent-red)" onClick={() => (window as any).electron?.close?.()}>
-								<X size={20} />
-							</button>
-						</>
-					)}
+						<button className="text-(--text) cursor-pointer hover:text-(--accent-red)" onClick={() => (window as any).electron?.close?.()}>
+							<X size={20} />
+						</button>
+					</div>
 				</div>
 			</header>
 			<AnimatePresence>
