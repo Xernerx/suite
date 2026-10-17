@@ -8,6 +8,7 @@ import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import Banner from '@/../public/banner.svg';
 import { useEffect, useRef, useState } from 'react';
 import Timeline from '@/components/Timeline';
+import { LandingCta, PlatformHighlights } from '@/components/PlatformHighlights';
 
 export type ShowcasePackage = {
 	name: string;
@@ -42,13 +43,6 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		},
 		{
 			icon: <Boxes size={24} />,
-			title: t('docs.home.categories.websocket.title'),
-			desc: t('docs.home.categories.websocket.description'),
-			link: 'https://docs.xernerx.com/websocket',
-			tag: t('www.software.apiTag'),
-		},
-		{
-			icon: <Boxes size={24} />,
 			title: t('docs.home.categories.cdn.title'),
 			desc: t('docs.home.categories.cdn.description'),
 			link: 'https://docs.xernerx.com/cdn',
@@ -56,17 +50,24 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		},
 	];
 
+	const publicPackages = initialPackages.filter((pkg) => !pkg.name.toLowerCase().includes('websocket'));
+
 	const softwareItems =
-		initialPackages.length > 0
+		publicPackages.length > 0
 			? [
 					staticSoftwareItems[0],
-					...initialPackages.map((pkg) => ({
-						icon: <Boxes size={24} />,
-						title: pkg.name,
-						desc: pkg.desc || t('www.software.packageDesc', { name: pkg.name }),
-						link: pkg.link,
-						tag: t('www.software.npmPackageTag'),
-					})),
+					...publicPackages.map((pkg) => {
+						const fallbackDesc = t('www.software.packageDesc', { name: pkg.name });
+						const cleanDesc = pkg.desc?.trim();
+						const finalDesc = !cleanDesc ? fallbackDesc : cleanDesc.length < 45 ? `${cleanDesc.endsWith('.') ? cleanDesc : `${cleanDesc}.`} ${fallbackDesc}` : cleanDesc;
+						return {
+							icon: <Boxes size={24} />,
+							title: pkg.name,
+							desc: finalDesc,
+							link: pkg.link,
+							tag: t('www.software.npmPackageTag'),
+						};
+					}),
 				]
 			: staticSoftwareItems;
 
@@ -269,21 +270,24 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 									tag: t('www.tags.discordBot'),
 								},
 							].map((item) => (
-								<a
+								<div
 									key={item.title}
-									href={item.link}
 									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
 								>
-									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
 										<ExternalLink className="text-(--text)" size={20} />
 									</div>
 									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
 									<div className="flex items-center gap-3 mb-3">
-										<h3 className="font-bold text-xl text-(--text)">{item.title}</h3>
+										<h3 className="font-bold text-xl text-(--text)">
+											<a href={item.link} className="after:absolute after:inset-0">
+												{item.title}
+											</a>
+										</h3>
 										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
 									</div>
 									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
-								</a>
+								</div>
 							))}
 						</motion.div>
 					</div>
@@ -303,21 +307,24 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					<div className="relative z-10 w-full overflow-hidden flex items-center h-[350px]">
 						<motion.div style={{ x: softwareX }} className="flex gap-8 px-6 md:px-12 xl:px-[15vw] absolute right-0 w-max">
 							{softwareItems.map((item) => (
-								<a
+								<div
 									key={item.title}
-									href={getEnvUrl(item.link)}
 									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
 								>
-									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
 										<ExternalLink className="text-(--text)" size={20} />
 									</div>
 									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
 									<div className="flex items-center gap-3 mb-3">
-										<h3 className="font-bold text-xl text-(--text) font-mono">{item.title}</h3>
+										<h3 className="font-bold text-xl text-(--text) font-mono">
+											<a href={getEnvUrl(item.link)} className="after:absolute after:inset-0">
+												{item.title}
+											</a>
+										</h3>
 										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
 									</div>
 									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
-								</a>
+								</div>
 							))}
 						</motion.div>
 					</div>
@@ -354,16 +361,57 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 						transition={{ duration: 0.8, delay: 0.2 }}
 						className="md:col-span-7 lg:col-span-8 relative"
 					>
-						<div className="bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 p-10 lg:p-14 rounded-[3rem] shadow-xl relative overflow-hidden group hover:border-(--accent)/30 transition-colors">
+						<div className="bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 p-10 lg:p-14 rounded-[3rem] shadow-xl relative overflow-hidden group hover:border-(--accent)/30 transition-colors flex flex-col gap-6">
 							<div className="absolute top-0 right-0 w-32 h-32 bg-(--accent)/10 rounded-full blur-3xl group-hover:bg-(--accent)/20 transition-colors" />
 							<p className="text-lg lg:text-xl text-(--text-muted) leading-relaxed relative z-10 font-medium">{t('www.about.description')}</p>
+							<p className="text-base lg:text-lg text-(--text-muted) leading-relaxed relative z-10">{t('www.about.description2')}</p>
 						</div>
 					</motion.div>
 				</div>
+
+				{/* ECOSYSTEM PILLARS */}
+				<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+					{(
+						[
+							{
+								title: t('www.about.pillars.communities.title'),
+								desc: t('www.about.pillars.communities.description'),
+							},
+							{
+								title: t('www.about.pillars.frameworks.title'),
+								desc: t('www.about.pillars.frameworks.description'),
+							},
+							{
+								title: t('www.about.pillars.infrastructure.title'),
+								desc: t('www.about.pillars.infrastructure.description'),
+							},
+							{
+								title: t('www.about.pillars.identity.title'),
+								desc: t('www.about.pillars.identity.description'),
+							},
+						] as const
+					).map((pillar) => (
+						<div
+							key={pillar.title}
+							className="bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/30 rounded-[2rem] p-8 shadow-xl transition-colors flex flex-col gap-3"
+						>
+							<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{pillar.title}
+							</h3>
+							<p className="text-sm text-(--text-muted) leading-relaxed">{pillar.desc}</p>
+						</div>
+					))}
+				</div>
 			</section>
+
+			{/* PLATFORM EXPERIENCE HIGHLIGHTS */}
+			<PlatformHighlights />
 
 			{/* HISTORY */}
 			<Timeline />
+
+			{/* CLOSING CALL TO ACTION */}
+			<LandingCta />
 		</div>
 	);
 }

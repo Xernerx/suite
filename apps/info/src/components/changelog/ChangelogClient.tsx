@@ -6,8 +6,6 @@ import { LayoutDashboard, Link2 } from 'lucide-react';
 import { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { useSearchParams, useRouter } from 'next/navigation';
-
 function extractText(children: any): string {
 	if (typeof children === 'string' || typeof children === 'number') return String(children);
 	if (Array.isArray(children)) return children.map(extractText).join('');
@@ -21,8 +19,6 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 	const { setNavItems, clearNavItems, show, setView, view } = useSidebar();
 	const { toast } = useToast();
 	const { t } = useDictionary();
-	const searchParams = useSearchParams();
-	const router = useRouter();
 
 	useEffect(() => {
 		show();
@@ -43,7 +39,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 		setNavItems(items);
 
 		if (!view && items.length > 0) {
-			const itemParam = searchParams?.get('item');
+			const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
 			if (itemParam) {
 				const match = items.find((i) => i.view === `changelog-${itemParam.toLowerCase()}`);
 				setView(match ? match.view : items[0].view);
@@ -53,7 +49,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 		}
 
 		return () => clearNavItems();
-	}, [changelogs, setNavItems, clearNavItems, show, setView, view, searchParams, router, t]);
+	}, [changelogs, setNavItems, clearNavItems, show, setView, view, t]);
 
 	const activeLog = changelogs.find((log) => `changelog-${log.appName.toLowerCase()}` === view) || changelogs[0];
 

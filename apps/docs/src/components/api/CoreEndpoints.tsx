@@ -37,6 +37,27 @@ export function CoreEndpoints() {
 			description: t('docs.api.core.fetchDiscordRoles.description'),
 			routes: [{ method: 'GET', path: '/core/guilds/[id]/discord/roles', color: 'blue' }],
 		},
+		{
+			id: 'fetch-bot-embed',
+			title: t('docs.api.core.fetchBotEmbed.title'),
+			icon: Server,
+			description: t('docs.api.core.fetchBotEmbed.description'),
+			routes: [{ method: 'GET', path: '/core/bots/[id]', color: 'blue' }],
+		},
+		{
+			id: 'fetch-organization-embed',
+			title: t('docs.api.core.fetchOrganizationEmbed.title'),
+			icon: Shield,
+			description: t('docs.api.core.fetchOrganizationEmbed.description'),
+			routes: [{ method: 'GET', path: '/core/organizations/[id]', color: 'blue' }],
+		},
+		{
+			id: 'fetch-guild-embed',
+			title: t('docs.api.core.fetchGuildEmbed.title'),
+			icon: Globe,
+			description: t('docs.api.core.fetchGuildEmbed.description'),
+			routes: [{ method: 'GET', path: '/core/guilds/[id]', color: 'blue' }],
+		},
 	];
 
 	return (

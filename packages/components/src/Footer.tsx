@@ -4,7 +4,6 @@
 
 import { BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, History, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
 
 import { BsGithub } from 'react-icons/bs';
 import Link from 'next/link';
@@ -14,17 +13,7 @@ export function Footer() {
 	const { getEnvUrl } = useEnvironment();
 	const { openPrompt } = useCookie();
 	const { t } = useDictionary();
-	const [isMounted, setIsMounted] = useState(false);
-
-	useEffect(() => {
-		setIsMounted(true);
-	}, []);
-
-	// Ensures server and initial client render match identically before applying environment subdomains
-	const resolveUrl = (url: string) => {
-		if (!isMounted) return url;
-		return getEnvUrl(url);
-	};
+	const resolveUrl = (url: string) => getEnvUrl(url);
 
 	return (
 		<motion.footer
@@ -134,14 +123,14 @@ function FooterLink({ href, onClick, icon: Icon, label, external = true }: { hre
 
 	if (external && href) {
 		return (
-			<a href={href} target="_blank" rel="noopener noreferrer" className={className} style={linkStyle}>
+			<a suppressHydrationWarning href={href} target="_blank" rel="noopener noreferrer" className={className} style={linkStyle}>
 				{content}
 			</a>
 		);
 	}
 
 	return (
-		<Link href={href || '#'} className={className} style={linkStyle}>
+		<Link suppressHydrationWarning href={href || '#'} className={className} style={linkStyle}>
 			{content}
 		</Link>
 	);

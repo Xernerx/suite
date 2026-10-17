@@ -206,6 +206,7 @@
 		"noDescription": "No description provided.",
 		"search": "Search",
 		"toast": {
+			"error": "An error occurred",
 			"saveError": "Error saving",
 			"saveFailed": "Failed to save",
 			"savedSuccess": "Saved successfully!"
@@ -572,11 +573,53 @@
 		},
 		"dashboard": {
 			"nav": {
+				"overview": "Overview & SEO",
 				"media": "Media",
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
 				"announcements": "Announcements",
 				"store": "Store"
+			},
+			"overview": {
+				"title": "Suite Overview & SEO",
+				"subtitle": "Monitor live versions, latency, issue health, and Seobility SEO scores across all 9 Xernerx Suite subdomains.",
+				"refresh": "Refresh Metrics",
+				"refreshing": "Refreshing...",
+				"envProduction": "Production URLs",
+				"envCanary": "Canary URLs",
+				"cards": {
+					"services": "Suite Services",
+					"synced": "{count} synced • {ahead} canary ahead",
+					"openIssues": "Open Issues",
+					"pendingReview": "{count} pending verification",
+					"resolvedIssues": "Resolved Issues",
+					"avgResolution": "Avg Resolution Time",
+					"hours": "{count}h"
+				},
+				"seoSectionTitle": "Subdomain SEO Scores & Live Telemetry",
+				"seoSectionSubtitle": "Click any Seobility badge to run or inspect a full on-page SEO check for that subdomain.",
+				"prodVersion": "Prod",
+				"canaryVersion": "Canary",
+				"devVersion": "Dev",
+				"localVersion": "Local",
+				"syncedBadge": "Synced",
+				"canaryAheadBadge": "Canary Ahead",
+				"seobilityCheck": "Seobility",
+				"lighthouseCheck": "Lighthouse",
+				"lighthouseScan": "Run Lighthouse",
+				"lighthouseScanning": "Auditing...",
+				"lighthouseRescan": "Re-run Chrome Lighthouse audit",
+				"lighthouseCategories": {
+					"seo": "SEO",
+					"perf": "Perf",
+					"a11y": "A11y",
+					"bp": "Best"
+				},
+				"ping": "{ms} ms",
+				"pinging": "Pinging...",
+				"pingOffline": "Offline",
+				"repingTooltip": "Click to ping site render time",
+				"openSite": "Open Site"
 			},
 			"media": {
 				"title": "Media Library",
@@ -1544,15 +1587,15 @@
 			"yourAnswer": "Your answer...",
 			"todo": {
 				"title": "To-Do List Bot",
-				"desc": "Structured productivity tooling."
+				"desc": "Structured productivity tooling for Discord communities. Organize personal checklists, collaborate on shared server tasks, and automate recurring team reminders directly inside your channels."
 			},
 			"zodiac": {
 				"title": "Zodiac",
-				"desc": "Astrology-based interaction tools."
+				"desc": "Interactive astrology and personality tooling for social servers. Generate daily horoscopes, explore detailed natal chart placements, and compare sign compatibility with your community."
 			},
 			"metamorphosis": {
 				"title": "Metamorphosis",
-				"desc": "Advanced role transformation utilities."
+				"desc": "Advanced multilingual translation and role transformation utilities. Bridge global Discord communities with real-time message localization and automated language routing."
 			}
 		},
 		"contact": {
@@ -1588,7 +1631,7 @@
 		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
-			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers.",
+			"description": "Empowering developers with open-source frameworks, modern software, and developer tools, while connecting communities through intuitive Discord bots and platforms. Xernerx Studios is a unified ecosystem built for developers and communities. We combine scalable cloud infrastructure with modular libraries and an open JSON REST API so teams can build and grow faster.",
 			"buttons": {
 				"explore": "Explore Services",
 				"software": "View Software"
@@ -1596,8 +1639,27 @@
 		},
 		"about": {
 			"title": "About Xernerx",
-			"description": "Founded in 2024, Xernerx evolved from a focused development initiative into a structured ecosystem of automation tools and infrastructure frameworks. Every system is built with scalability, maintainability, and architectural clarity as first principles.",
-			"watermark": "ABOUT US"
+			"description": "Founded in 2024, Xernerx Studios evolved from a focused development initiative into a modern software ecosystem of Discord bots, developer tools, and infrastructure frameworks. Every system is built with scalability, maintainability, and architectural clarity as first principles.",
+			"description2": "Our platform unifies consumer applications and developer tooling under a single cohesive network. From multipurpose server management with Virtue and upcoming integrations for Metamorphosis and Zodiac to open-source packages and a language-agnostic JSON REST API, we engineer reliable software that scales alongside your community.",
+			"watermark": "ABOUT US",
+			"pillars": {
+				"communities": {
+					"title": "Community Platforms & Bots",
+					"description": "Configure Virtue server modules, manage multi-server organizations, and explore our growing suite of Discord bots including Metamorphosis, Zodiac, and To-Do List Bot. Our tools help server owners automate moderation, boost member engagement, and track community growth in real time."
+				},
+				"frameworks": {
+					"title": "Open-Source Packages & Tooling",
+					"description": "Build applications faster with our modular NPM packages and developer libraries. Every package ships with clear class references, practical examples, and versioned documentation so developers can integrate with confidence."
+				},
+				"infrastructure": {
+					"title": "Open JSON REST API",
+					"description": "Connect any bot or application in any programming language using standard HTTP JSON requests and responses. As long as your scoped Bearer token grants access, you can synchronize bot telemetry, command registries, and public profile metadata from any stack."
+				},
+				"identity": {
+					"title": "One Account Everywhere",
+					"description": "Sign in once with Discord to unify your identity across every Xernerx web application, desktop client, and bot service. Your language preferences, custom themes, and account settings stay automatically synchronized wherever you interact with Xernerx."
+				}
+			}
 		},
 		"sections": {
 			"services": {
@@ -1611,17 +1673,17 @@
 			},
 			"consumer": {
 				"title": "Consumer Services",
-				"description": "Powerful, user-friendly applications and platforms designed to bring communities together and streamline digital experiences."
+				"description": "Powerful, user-friendly applications and platforms designed to bring communities together and streamline digital experiences. Explore our web dashboard and Discord bots built for server management, productivity, localization, and community engagement."
 			},
 			"developer": {
 				"title": "Developer Software",
-				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools."
+				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools. Integrate our public REST API and modular NPM packages into your workflow."
 			}
 		},
 		"services": {
 			"dashboard": {
 				"title": "Dashboard",
-				"desc": "Manage applications, configure deployments, and monitor system performance."
+				"desc": "Manage applications, configure Virtue server deployments, and monitor real-time bot telemetry from a unified web control center. Collaborate with organization members and customize server modules effortlessly."
 			}
 		},
 		"packages": {
@@ -1900,24 +1962,44 @@
 		},
 		"download": {
 			"title": "Download Xernerx App",
-			"description": "Optimized for your system. One click and you are in.",
+			"description": "Optimized for your system. One click and you are in. Experience the entire Xernerx Suite inside a fast, distraction-free native desktop client.",
 			"button": "Stable",
 			"button2": "Canary",
 			"button3": "Download for",
-			"button4": "Other platforms"
+			"button4": "Other platforms",
+			"highlights": {
+				"title": "Why Use the Desktop Client?",
+				"subtitle": "Built from the ground up to give server owners, community managers, and developers instant access to the Xernerx ecosystem without browser clutter.",
+				"workspace": {
+					"title": "Dedicated Native Workspace",
+					"description": "Manage Virtue server modules, review bot analytics, and configure developer integrations in a clean window. Your session and interface settings stay active so you never have to log in twice."
+				},
+				"channels": {
+					"title": "Stable & Canary Release Channels",
+					"description": "Run the Stable channel for rock-solid daily community administration, or switch to the Canary build to preview upcoming Xernerx features and experimental tools before general release."
+				},
+				"crossPlatform": {
+					"title": "Cross-Platform & Auto-Updating",
+					"description": "Available natively for Windows, macOS, and Linux. Automatic background updates ensure your client always runs the latest security patches and platform improvements."
+				},
+				"sync": {
+					"title": "Seamless Theme & Account Sync",
+					"description": "Your custom accent colors, dark or light mode preferences, UI scaling, and chosen language synchronize automatically between our web applications, bot services, and desktop app."
+				}
+			}
 		},
 		"features": {
 			"scale": {
 				"title": "Built for Scale",
-				"description": "Our infrastructure and tools are designed from the ground up to handle massive communities and workloads effortlessly."
+				"description": "Our infrastructure and tools are designed from the ground up to handle massive communities and workloads effortlessly. High-availability services and automated load balancing keep your applications responsive at any size."
 			},
 			"opensource": {
 				"title": "Open Source Heart",
-				"description": "We believe in transparent development. Our software tools are freely available to push the ecosystem forward."
+				"description": "We believe in transparent development. Our software tools, modular frameworks, and developer utilities are freely available so builders everywhere can inspect, extend, and push the ecosystem forward."
 			},
 			"design": {
 				"title": "User-Centric Design",
-				"description": "Whether it's a CLI tool or a web dashboard, we prioritize intuitive interfaces and seamless developer experiences."
+				"description": "Whether it is a CLI tool or a web dashboard, we prioritize intuitive interfaces and seamless developer experiences. Every workflow is crafted for clarity, speed, and accessibility across all devices."
 			}
 		},
 		"tags": {
@@ -1930,62 +2012,62 @@
 				"line2": "Journey",
 				"line3": "So Far."
 			},
-			"description": "From early experimentation with bots to stable infrastructure engineering, see how Xernerx evolved over the years.",
+			"description": "From early experimentation with bots to stable infrastructure engineering, see how Xernerx Studios evolved over the years into a unified platform for developers and communities.",
 			"events": {
 				"0": {
 					"date": "March 2020",
 					"title": "Amethyst Development Founded",
-					"description": "Thomas, Johannes, and Asher established Amethyst Development with a focus on scalable Discord tooling."
+					"description": "Thomas, Johannes, and Asher established Amethyst Development with a focus on scalable Discord tooling. The team set out to build reliable community utilities and modular bot foundations."
 				},
 				"1": {
 					"date": "June 2020",
 					"title": "Rebranded to Portal Development",
-					"description": "Following structural changes, the company was reintroduced under the name Portal Development."
+					"description": "Following structural changes, the company was reintroduced under the name Portal Development. This milestone unified our early Discord projects under a shared engineering roadmap."
 				},
 				"2": {
 					"date": "June 2020",
 					"title": "First Bot Acquisition",
-					"description": "Roblox Utilities joined the portfolio, expanding into multi-server utility tooling."
+					"description": "Roblox Utilities joined the portfolio, expanding our reach into multi-server utility tooling. The integration brought thousands of active community servers onto our core infrastructure."
 				},
 				"3": {
 					"date": "November 2020",
 					"title": "To-Do List Bot Launched",
-					"description": "Clari began development of To-Do List Bot, introducing structured productivity features."
+					"description": "Clari began development of To-Do List Bot, introducing structured productivity features for Discord servers. Communities gained personal task lists, shared channel boards, and automated reminders."
 				},
 				"4": {
 					"date": "August 2021",
 					"title": "Discord-Translate Begins",
-					"description": "Thomas initiated development of Discord-Translate, focused on multilingual communities."
+					"description": "Thomas initiated development of Discord-Translate, focused on connecting multilingual communities. The project enabled seamless cross-language conversations inside international Discord guilds."
 				},
 				"5": {
 					"date": "December 2021",
 					"title": "Acquired DragDev Studios",
-					"description": "DragDev Studios and YourApps joined the company, along with three new developers."
+					"description": "DragDev Studios and YourApps joined the company, along with three new developers. Their expertise accelerated our work on web dashboards and custom server application workflows."
 				},
 				"6": {
 					"date": "January 2022",
 					"title": "Metamorphosis Rewrite",
-					"description": "Discord-Translate was rebuilt and relaunched as Metamorphosis with improved infrastructure."
+					"description": "Discord-Translate was rebuilt from the ground up and relaunched as Metamorphosis with improved infrastructure. The rewrite introduced faster translation pipelines and automated role routing."
 				},
 				"7": {
 					"date": "February 2022",
 					"title": "Leadership Transition",
-					"description": "Johannes stepped down. Infrastructure responsibilities were restructured internally."
+					"description": "Johannes stepped down from daily operations. Infrastructure responsibilities and backend architecture were restructured internally to prepare for long-term platform scalability."
 				},
 				"8": {
 					"date": "March 2022",
 					"title": "Zodiac Development",
-					"description": "Max began development of Zodiac, expanding into astrology and personality tooling."
+					"description": "Max began development of Zodiac, expanding our catalog into astrology and personality tooling. Social communities quickly adopted Zodiac for daily horoscopes and interactive birth chart insights."
 				},
 				"9": {
 					"date": "February 2026",
 					"title": "Xernerx Studios Rebrand",
-					"description": "The company rebranded to Xernerx Studios, reflecting a shift in focus and identity."
+					"description": "The company rebranded to Xernerx Studios, reflecting a major evolution in focus and identity. We launched the unified Xernerx Suite monorepo, open JSON REST API, and open-source developer packages."
 				},
 				"10": {
 					"date": "DYNAMIC_DATE",
 					"title": "Today",
-					"description": "You're all caught up!"
+					"description": "You're all caught up! Today Xernerx Studios continues to ship modern software, Discord bots like Virtue, Metamorphosis, and Zodiac, and open-source developer tools for communities worldwide."
 				}
 			}
 		},
@@ -2003,10 +2085,33 @@
 			"linkCopiedDesc": "Copied direct link to version {version}"
 		},
 		"software": {
-			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite via HTTP.",
+			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite over HTTP. Send JSON requests and receive JSON responses from any language using your scoped Bearer token.",
 			"apiTag": "API",
 			"npmPackageTag": "NPM Package",
-			"packageDesc": "Official documentation and references for the {name} NPM package."
+			"packageDesc": "Official documentation, class references, and integration guides for the {name} NPM package."
+		},
+		"highlights": {
+			"title": "Designed Around Your Experience",
+			"description": "Every part of the Xernerx ecosystem is built to adapt to your preferences, protect your privacy, and evolve through direct community feedback.",
+			"personalization": {
+				"title": "Personalization & Global Localization",
+				"description": "Tailor every interface to match your style. Switch between dark, light, and system themes, pick custom accent colors, and adjust UI zoom and layout density. You can sync your appearance directly from Discord and browse in your preferred language through community-driven translations."
+			},
+			"roadmap": {
+				"title": "Community-Driven Roadmap & Feedback",
+				"description": "Our platform grows alongside the communities and developers who use it every day. Visit our support and feedback hub to submit feature suggestions, vote on new ideas, report issues, and track our transparent public roadmap from concept to release."
+			},
+			"privacy": {
+				"title": "Privacy & Complete Data Control",
+				"description": "We engineer our services with strict security boundaries and transparent data practices. Third-party integrations use scoped tokens, user data is never sold to advertisers, and your account settings give you one-click controls to manage profile visibility, reset data, or delete your account anytime."
+			}
+		},
+		"cta": {
+			"title": "Ready to Build and Connect?",
+			"description": "Join communities and developers using Xernerx Studios to manage Discord servers, automate workflows, and connect custom bots through our open JSON REST API. Sign in once with Discord to access our web dashboard, bot services, and developer tools.",
+			"dashboard": "Open Dashboard",
+			"download": "Get Desktop App",
+			"docs": "Read Documentation"
 		}
 	},
 	"faq": {
@@ -2742,6 +2847,24 @@
 		"supporters": {
 			"itsYou": "It's You!",
 			"title": "Supporters"
+		},
+		"widgets": {
+			"copied": "Copied",
+			"copy": "Copy",
+			"description": "Allow external websites and applications to embed a live status card for this profile.",
+			"disabledWarning": "Enable the widget toggle and save your changes for external embeds to render publicly.",
+			"embedButton": "Embed Code",
+			"formatDirectJson": "Direct JSON Endpoint",
+			"formatDirectSvg": "SVG Image",
+			"formatHtmlImg": "HTML Image",
+			"formatIframe": "HTML Iframe",
+			"formatMarkdown": "Markdown",
+			"formatPngImage": "Image",
+			"formatRawSvg": "Raw SVG",
+			"modalDescription": "Copy and paste any of the snippets below to embed this live widget.",
+			"modalTitle": "Embed Profile Widget",
+			"previewLabel": "Live Widget Preview",
+			"title": "Public Embed Widget"
 		}
 	},
 	"cdn": {
@@ -2957,6 +3080,18 @@
 				"fetchDiscordRoles": {
 					"title": "Fetch Discord Roles",
 					"description": "Retrieve all available Discord roles within a specific guild."
+				},
+				"fetchBotEmbed": {
+					"title": "Fetch Public Bot Widget",
+					"description": "Retrieve the public widget for a bot by ID (requires widgets enabled in Bot Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
+				},
+				"fetchOrganizationEmbed": {
+					"title": "Fetch Public Organization Widget",
+					"description": "Retrieve the public widget for an organization by ID (requires widgets enabled in Organization Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
+				},
+				"fetchGuildEmbed": {
+					"title": "Fetch Public Server Widget",
+					"description": "Retrieve the public widget for a server by ID (requires widgets enabled in Server Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
 				}
 			},
 			"secure": {
@@ -3261,7 +3396,9 @@
 		"header": {
 			"text1": "Download the app!",
 			"store": "Store",
-			"title1": "Open App Drawer (Ctrl + K)"
+			"title1": "Open App Drawer (Ctrl + K)",
+			"copyUrl": "Copy URL",
+			"urlCopied": "URL copied to clipboard"
 		},
 		"page": {},
 		"sidebar": {

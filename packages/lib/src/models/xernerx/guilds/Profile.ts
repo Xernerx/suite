@@ -32,6 +32,7 @@ const schema = new Schema(
 			enum: ['public', 'private', 'limited'],
 			default: 'private',
 		}, // Privacy level of the guild
+		widgets: { type: Boolean, default: false }, // Whether embeddable widgets are enabled
 		locale: { type: String }, // Guild locale (e.g., en-US, es-ES, fr-FR)
 		links: {
 			invite: { type: String }, // Discord guild invite link

@@ -4,6 +4,7 @@
 import { Shield, Building2, AlertTriangle, Trash2 } from 'lucide-react';
 import { Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
+import WidgetSettingsCard from '@/components/WidgetSettingsCard';
 
 interface SettingsTabProps {
 	botConfig: any;
@@ -41,6 +42,15 @@ export default function SettingsTab({ botConfig, setBotConfig, organizations, on
 					/>
 				</div>
 			</div>
+
+			{/* Public Embed Widget Card */}
+			<WidgetSettingsCard
+				entityType="bots"
+				entityId={botConfig.id}
+				entityName={botConfig.name}
+				enabled={Boolean(botConfig.widgets)}
+				onChange={(val) => setBotConfig({ ...botConfig, widgets: val })}
+			/>
 
 			{/* Transfer Organization Card */}
 			<div
@@ -82,7 +92,7 @@ export default function SettingsTab({ botConfig, setBotConfig, organizations, on
 					<p className="text-xs text-(--accent-orange)/80">{t('app.portal.bot.settings.resetDesc')}</p>
 				</div>
 				<button
-					onClick={() => setBotConfig({ ...botConfig, description: '', info: '', links: {} })}
+					onClick={() => setBotConfig({ ...botConfig, description: '', info: '', links: {}, widgets: false })}
 					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',

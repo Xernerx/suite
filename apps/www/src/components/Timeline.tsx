@@ -132,9 +132,6 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 	const { t } = useDictionary();
 	const finalLink = milestone.link ? getEnvUrl(milestone.link) : undefined;
 
-	const Component = finalLink ? motion.a : motion.div;
-	const componentProps = finalLink ? { href: finalLink } : {};
-
 	return (
 		<div className="relative flex items-center gap-6 lg:gap-12 pl-4 lg:pl-6 group/item">
 			{/* GLOWING NODE */}
@@ -144,8 +141,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 			</div>
 
 			{/* CARD */}
-			<Component
-				{...componentProps}
+			<motion.div
 				initial={{ opacity: 1, x: 0, scale: 1 }}
 				whileInView={{ opacity: 1, x: 0, scale: 1 }}
 				viewport={{ once: true, margin: '-100px' }}
@@ -176,18 +172,22 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 								: t(`www.timeline.events.${index}.date`)}
 						</span>
 
-						<span className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
-							{t(`www.timeline.events.${index}.title`)}
-							{finalLink && (
-								<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+						<h3 className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
+							{finalLink ? (
+								<a href={finalLink} className="after:absolute after:inset-0 flex items-center justify-between w-full">
+									<span>{t(`www.timeline.events.${index}.title`)}</span>
+									<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+								</a>
+							) : (
+								t(`www.timeline.events.${index}.title`)
 							)}
-						</span>
+						</h3>
 					</div>
 				</div>
 
 				{/* DESCRIPTION */}
 				<p className="text-base leading-relaxed text-(--text-muted) relative z-10 font-medium">{t(`www.timeline.events.${index}.description`)}</p>
-			</Component>
+			</motion.div>
 		</div>
 	);
 }

@@ -3,10 +3,14 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'NPM Packages | Xernerx Docs',
-	description: 'Guides and references for the open-source Xernerx Developer Software suite, including frameworks, libraries, and utilities.',
+	title: 'Open-Source NPM Packages & Frameworks',
+	description: 'Browse official Xernerx Studios TypeScript packages, Discord bot frameworks, and open-source developer libraries.',
+	openGraph: {
+		title: 'Xernerx Docs | Open-Source NPM Packages & Frameworks',
+		description: 'Browse official Xernerx Studios TypeScript packages, Discord bot frameworks, and open-source developer libraries.',
+	},
 };
 
 export default function PackagesLayout({ children }: { children: React.ReactNode }) {
-	return <>{children}</>;
+	return children;
 }

@@ -12,6 +12,7 @@ const globalWithMongoose = global as typeof global & {
 	__db_connections_v5?: Record<string, Record<string, Connection>>;
 	__models_v5?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v6?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__models_v7?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
 // Close any legacy per-database connections left over from older HMR reloads
@@ -30,10 +31,13 @@ if (globalWithMongoose.__connections_v2) {
 if (globalWithMongoose.__models_v5) {
 	delete globalWithMongoose.__models_v5;
 }
+if (globalWithMongoose.__models_v6) {
+	delete globalWithMongoose.__models_v6;
+}
 
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v6 || {};
+const cachedModels = globalWithMongoose.__models_v7 || {};
 
 // Also close any orphaned top-level mongoose.connections not tracked in rootConnections
 const trackedRoots = new Set(Object.values(rootConnections));
@@ -46,7 +50,7 @@ for (const conn of mongoose.connections) {
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
-	globalWithMongoose.__models_v6 = cachedModels;
+	globalWithMongoose.__models_v7 = cachedModels;
 }
 
 const getUris = (): Record<string, string> => ({

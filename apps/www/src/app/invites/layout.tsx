@@ -3,10 +3,10 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Official Bot & Server Invites',
+	title: 'Official Discord Bot & Server Invites',
 	description: 'Invite official Xernerx Studios Discord bots including To-Do List, Metamorphosis, and Zodiac, or join our official support community.',
 	openGraph: {
-		title: 'Xernerx Studios | Official Bot & Server Invites',
+		title: 'Xernerx Studios | Official Discord Bot & Server Invites',
 		description: 'Invite official Xernerx Studios Discord bots including To-Do List, Metamorphosis, and Zodiac, or join our official support community.',
 	},
 };

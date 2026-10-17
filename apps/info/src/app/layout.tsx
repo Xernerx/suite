@@ -9,12 +9,12 @@ import { AppLayout } from '@xernerx/components';
 import type { Metadata } from 'next';
 import { SessionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Support',
+		default: 'Xernerx Support | Roadmap, Changelog, Issues & FAQ Hub',
 		template: 'Xernerx Support | %s',
 	},
 	description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Support',
+			default: 'Xernerx Support | Roadmap, Changelog, Issues & FAQ Hub',
 			template: 'Xernerx Support | %s',
 		},
 		description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 	twitter: {
 		title: {
-			default: 'Xernerx Support',
+			default: 'Xernerx Support | Roadmap, Changelog, Issues & FAQ Hub',
 			template: 'Xernerx Support | %s',
 		},
 		description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
@@ -51,6 +51,7 @@ export const metadata: Metadata = {
 
 	icons: {
 		icon: '/logo.png',
+		apple: '/logo.png',
 	},
 
 	alternates: {
@@ -65,6 +66,11 @@ export default async function RootLayout({
 }>) {
 	const session = await getServerSession(auth);
 
+	const headersList = await headers();
+	const host = headersList.get('host') || '';
+	const initialEnv: 'dev' | 'canary' | 'public' =
+		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
+
 	const cookieStore = await cookies();
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
 	const dict = await dictionary(locale as Locale);
@@ -75,7 +81,7 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style}>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict} enableAds>
+					<AppLayout dictionary={dict} initialEnvironment={initialEnv} enableAds>
 						{children}
 					</AppLayout>
 				</SessionProvider>

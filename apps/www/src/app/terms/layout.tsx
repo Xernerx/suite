@@ -3,13 +3,14 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: {
-		default: 'Xernerx Studios | Terms of Service',
-		template: 'Xernerx Studios | Terms of Service | %s',
+	title: 'Terms of Service & Platform Rules',
+	description: 'Review the official Xernerx Studios Terms of Service governing the use of our web applications, Discord bots, APIs, and developer tools.',
+	openGraph: {
+		title: 'Xernerx Studios | Terms of Service & Platform Rules',
+		description: 'Review the official Xernerx Studios Terms of Service governing the use of our web applications, Discord bots, APIs, and developer tools.',
 	},
-	description: 'Review the Terms of Service for Xernerx Studios, including the conditions, responsibilities and policies that apply when using our websites, software, APIs and services.',
 };
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default function TermsLayout({ children }: { children: React.ReactNode }) {
 	return children;
 }

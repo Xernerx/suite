@@ -24,6 +24,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
 			icon: organization.icon,
 			verified: organization.verified,
 			privacy: organization.config?.privacy || organization.privacy,
+			widgets: Boolean(organization.widgets),
 		};
 
 		return NextResponse.json(flatOrg, { status: 200 });
@@ -53,6 +54,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.roles !== undefined) updateData['roles'] = body.roles;
 		if (body.verified !== undefined) updateData['verified'] = body.verified;
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
+		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 
 		if (body.action === 'remove_member' && body.targetId) {
 			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: id }, { $pull: { members: { userId: body.targetId } } }, { returnDocument: 'after', runValidators: true }).lean();
@@ -85,6 +87,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				icon: updatedOrg.icon,
 				verified: updatedOrg.verified,
 				privacy: updatedOrg.config?.privacy || updatedOrg.privacy,
+				widgets: Boolean(updatedOrg.widgets),
 			};
 			return NextResponse.json(flatOrg, { status: 200 });
 		}
@@ -105,6 +108,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			icon: updatedOrg.icon,
 			verified: updatedOrg.verified,
 			privacy: updatedOrg.config?.privacy || updatedOrg.privacy,
+			widgets: Boolean(updatedOrg.widgets),
 		};
 
 		return NextResponse.json(flatOrg, { status: 200 });

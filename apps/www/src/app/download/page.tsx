@@ -207,6 +207,49 @@ export default function Page() {
 					</AnimatePresence>
 				</div>
 			</motion.div>
+
+			{/* DESKTOP CLIENT HIGHLIGHTS */}
+			<section className="w-full max-w-5xl mt-12 pb-16">
+				<div className="text-center max-w-2xl mx-auto mb-10">
+					<h2 className="text-2xl md:text-3xl font-extrabold text-(--text) mb-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.download.highlights.title')}
+					</h2>
+					<p className="text-sm text-(--text-muted) leading-relaxed">{t('www.download.highlights.subtitle')}</p>
+				</div>
+
+				<div className="grid md:grid-cols-2 gap-6">
+					{(
+						[
+							{
+								title: t('www.download.highlights.workspace.title'),
+								desc: t('www.download.highlights.workspace.description'),
+							},
+							{
+								title: t('www.download.highlights.channels.title'),
+								desc: t('www.download.highlights.channels.description'),
+							},
+							{
+								title: t('www.download.highlights.crossPlatform.title'),
+								desc: t('www.download.highlights.crossPlatform.description'),
+							},
+							{
+								title: t('www.download.highlights.sync.title'),
+								desc: t('www.download.highlights.sync.description'),
+							},
+						] as const
+					).map((card) => (
+						<div
+							key={card.title}
+							className="rounded-3xl bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/30 p-8 shadow-xl transition-colors flex flex-col gap-3 text-left"
+						>
+							<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{card.title}
+							</h3>
+							<p className="text-sm text-(--text-muted) leading-relaxed">{card.desc}</p>
+						</div>
+					))}
+				</div>
+			</section>
 		</div>
 	);
 }

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Button, Input } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
@@ -74,7 +74,7 @@ function ServerCard({ server }: { server: GuildProfile }) {
 	);
 }
 
-export default function ServersList() {
+function ServersListContent() {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
 	const { view, setNavItems, show, hide } = useSidebar();
@@ -187,5 +187,30 @@ export default function ServersList() {
 				</div>
 			)}
 		</div>
+	);
+}
+
+export default function ServersList() {
+	const { t } = useDictionary();
+
+	return (
+		<Suspense
+			fallback={
+				<div className="flex flex-col w-full min-h-screen">
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
+						<div className="flex items-center gap-4">
+							<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{t('app.categories.biggestServers')}
+							</h1>
+						</div>
+					</div>
+					<div className="flex-1 flex items-center justify-center py-32">
+						<Loading />
+					</div>
+				</div>
+			}
+		>
+			<ServersListContent />
+		</Suspense>
 	);
 }

@@ -4,6 +4,7 @@
 import { Settings as SettingsIcon, Building2, AlertTriangle, Trash2 } from 'lucide-react';
 import { Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
+import WidgetSettingsCard from '@/components/WidgetSettingsCard';
 
 interface SettingsProps {
 	guildConfig: any;
@@ -41,6 +42,15 @@ export default function Settings({ guildConfig, setGuildConfig, organizations, h
 					/>
 				</div>
 			</div>
+
+			{/* Public Embed Widget Card */}
+			<WidgetSettingsCard
+				entityType="guilds"
+				entityId={guildConfig.id}
+				entityName={guildConfig.name}
+				enabled={Boolean(guildConfig.widgets)}
+				onChange={(val) => setGuildConfig({ ...guildConfig, widgets: val })}
+			/>
 
 			{/* Transfer Organization Card */}
 			<div
@@ -82,7 +92,7 @@ export default function Settings({ guildConfig, setGuildConfig, organizations, h
 					<p className="text-xs text-(--accent-orange)/80">{t('app.dashboard.text16')}</p>
 				</div>
 				<button
-					onClick={() => setGuildConfig({ ...guildConfig, description: '', info: '', locale: '', links: {} })}
+					onClick={() => setGuildConfig({ ...guildConfig, description: '', info: '', locale: '', links: {}, widgets: false })}
 					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',

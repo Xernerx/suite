@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server } from 'lucide-react';
+import { Activity, AlertTriangle, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -9,6 +9,7 @@ import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
+import Overview from '@/components/Overview';
 import Roles from '@/components/Roles';
 import Tokens from '@/components/Tokens';
 import Translations from '@/components/Translations';
@@ -138,6 +139,13 @@ export default function Home() {
 		const canMedia = canManageMedia || canUploadMedia;
 
 		const isServerSet = hasDbFallback || !!adminServerId;
+
+		items.push({
+			category: t('common.nav.categories.system'),
+			label: t('admin.dashboard.nav.overview'),
+			view: 'overview',
+			icon: Activity,
+		});
 
 		if (canMedia) {
 			items.push({
@@ -329,6 +337,7 @@ export default function Home() {
 
 	const isServerSet = !!adminServerId;
 
+	allowedViews.push('overview');
 	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
 	if (canUsers && isServerSet) allowedViews.push('users');
@@ -355,6 +364,7 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
+			{activeView === 'overview' && <Overview />}
 			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations />}
 			{activeView === 'users' && <Users />}

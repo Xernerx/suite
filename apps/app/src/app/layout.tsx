@@ -8,13 +8,13 @@ import { AppLayout } from '@xernerx/components';
 import type { Metadata } from 'next';
 import { SessionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Studios | Explore',
-		template: 'Xernerx Studios | Explore | %s',
+		default: 'Xernerx Studios | Explore Discord Bots & Communities',
+		template: 'Xernerx Studios | %s',
 	},
 	description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios. Power up your server, manage bot dashboards, or find your next home.',
 
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Studios | Explore',
-			template: 'Xernerx Studios | Explore | %s',
+			default: 'Xernerx Studios | Explore Discord Bots & Communities',
+			template: 'Xernerx Studios | %s',
 		},
 		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios. Power up your server, manage bot dashboards, or find your next home.',
 		url: 'https://app.xernerx.com',
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Studios | Explore',
-			template: 'Xernerx Studios | Explore | %s',
+			default: 'Xernerx Studios | Explore Discord Bots & Communities',
+			template: 'Xernerx Studios | %s',
 		},
 		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios.',
 		images: ['/banner.png'],
@@ -51,6 +51,7 @@ export const metadata: Metadata = {
 
 	icons: {
 		icon: '/logo.png',
+		apple: '/logo.png',
 	},
 
 	alternates: {
@@ -65,6 +66,11 @@ export default async function RootLayout({
 }>) {
 	const session = await getServerSession(auth);
 
+	const headersList = await headers();
+	const host = headersList.get('host') || '';
+	const initialEnv: 'dev' | 'canary' | 'public' =
+		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
+
 	const cookieStore = await cookies();
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
 	const dict = await dictionary(locale as Locale);
@@ -75,7 +81,7 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict} enableAds>
+					<AppLayout dictionary={dict} initialEnvironment={initialEnv} enableAds>
 						{children}
 					</AppLayout>
 				</SessionProvider>

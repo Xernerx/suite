@@ -89,7 +89,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 		// Actually, let's just do the update. The user hasn't specified strict auth here yet other than `secure` route middleware which checks session?
 		// Wait, /secure routes in Next.js usually have middleware or check session!
 
-		const updatableFields = ['description', 'info', 'privacy', 'bot', 'organization', 'tags'];
+		const updatableFields = ['description', 'info', 'privacy', 'widgets', 'bot', 'organization', 'tags'];
 		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 
 		if (body.links) {

@@ -15,6 +15,7 @@ const schema = new Schema(
 		promotedUntil: { type: Date }, // Timestamp until which the bot is promoted
 		verified: { type: Boolean, default: false }, // Whether the bot has been verified
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the bot
+		widgets: { type: Boolean, default: false }, // Whether embeddable widgets are enabled
 		tags: { type: Array, default: [] },
 		links: {
 			invite: { type: String }, // Discord bot invite link

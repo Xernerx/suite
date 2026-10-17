@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
 	ArrowLeft,
 	ArrowRight,
+	Check,
 	Copy,
 	Download,
 	Home,
@@ -22,7 +23,7 @@ import {
 	User as UserIcon,
 	X,
 } from 'lucide-react';
-import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -116,7 +117,10 @@ export function Header() {
 	}
 
 	const { setNavOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
+	const { toast } = useToast();
 	const pathname = usePathname();
+	const urlFormRef = useRef<HTMLFormElement>(null);
+	const [urlCopied, setUrlCopied] = useState(false);
 
 	const [isMounted, setIsMounted] = useState(false);
 	useEffect(() => {
@@ -176,7 +180,7 @@ export function Header() {
 		const env = host.includes('.dev.') || host === 'localhost' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 
 		let pre = 'app';
-		['www', 'api', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => {
+		['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => {
 			if (host.startsWith(`${p}.`)) pre = p;
 		});
 
@@ -343,6 +347,7 @@ export function Header() {
 						</div>
 
 						<form
+							ref={urlFormRef}
 							className="flex flex-1 items-center bg-(--foreground) rounded-full h-[30px] px-3 border border-white/10 ml-1 focus-within:ring-2 focus-within:ring-(--accent)/20 focus-within:border-(--accent) transition-all shadow-sm"
 							onSubmit={(e) => {
 								e.preventDefault();
@@ -361,7 +366,7 @@ export function Header() {
 							}}
 						>
 							<span className="text-(--text-muted) select-none text-sm font-medium pr-1">https://</span>
-							<SubSelector name="pre" options={['app', 'www', 'api', 'docs', 'admin', 'account', 'store', 'info']} defaultValue={urlState.pre} />
+							<SubSelector name="pre" options={['app', 'www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info']} defaultValue={urlState.pre} />
 							<span className="text-(--text-muted) select-none text-sm font-medium px-0.5">.</span>
 							<SubSelector name="env" options={['public', 'canary', 'dev']} defaultValue={urlState.env} />
 							<span className="text-(--text-muted) select-none text-sm font-medium pl-0.5 pr-2">.xernerx.com</span>
@@ -376,9 +381,38 @@ export function Header() {
 							/>
 						</form>
 
-						<button onClick={() => setUrlPlacerOpen(false)} className="text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-all">
-							<X size={16} strokeWidth={2.5} />
-						</button>
+						<div className="flex items-center gap-1">
+							<button
+								type="button"
+								title={t('components.header.copyUrl')}
+								onClick={() => {
+									const form = urlFormRef.current;
+									let targetUrl = typeof window !== 'undefined' ? window.location.href : '';
+									if (form) {
+										const pre = (form.elements.namedItem('pre') as HTMLInputElement)?.value || urlState.pre;
+										const env = (form.elements.namedItem('env') as HTMLInputElement)?.value || urlState.env;
+										const path = (form.elements.namedItem('path') as HTMLInputElement)?.value || '';
+										let fullPath = path.trim();
+										if (fullPath && !fullPath.startsWith('/')) {
+											fullPath = '/' + fullPath;
+										}
+										targetUrl = `https://${pre}.${env === 'public' ? '' : env + '.'}xernerx.com${fullPath}`;
+									}
+									navigator.clipboard.writeText(targetUrl).then(() => {
+										setUrlCopied(true);
+										toast({ type: 'success', title: t('components.header.urlCopied'), description: targetUrl });
+										setTimeout(() => setUrlCopied(false), 2000);
+									});
+								}}
+								className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all cursor-pointer"
+							>
+								{urlCopied ? <Check size={16} strokeWidth={2.5} className="text-green-400" /> : <Copy size={16} strokeWidth={2.5} />}
+							</button>
+
+							<button onClick={() => setUrlPlacerOpen(false)} className="text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-all cursor-pointer">
+								<X size={16} strokeWidth={2.5} />
+							</button>
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>

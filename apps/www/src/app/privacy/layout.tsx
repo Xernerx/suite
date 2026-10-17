@@ -3,13 +3,14 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: {
-		default: 'Xernerx Studios | Privacy Policy',
-		template: 'Xernerx Studios | Privacy Policy | %s',
+	title: 'Privacy Policy & Data Protection',
+	description: 'Read the Xernerx Studios Privacy Policy to learn how we collect, protect, and process account, Discord bot, and platform usage data.',
+	openGraph: {
+		title: 'Xernerx Studios | Privacy Policy & Data Protection',
+		description: 'Read the Xernerx Studios Privacy Policy to learn how we collect, protect, and process account, Discord bot, and platform usage data.',
 	},
-	description: 'Learn how Xernerx Studios collects, uses, stores and protects your personal information when you use our websites, applications, APIs and services.',
 };
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default function PrivacyLayout({ children }: { children: React.ReactNode }) {
 	return children;
 }
