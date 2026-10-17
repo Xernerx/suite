@@ -30,18 +30,26 @@
 		"buttons": {
 			"cancel": "Cancel",
 			"confirm": "Confirm",
-			"proceed": "Proceed"
+			"proceed": "Proceed",
+			"delete": "Delete"
 		},
 		"footer": {
 			"tagline": "Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.",
 			"sections": {
 				"resources": "Resources",
+				"support": "Support",
 				"developer": "Developer"
 			},
 			"links": {
 				"privacy": "Privacy",
 				"terms": "Terms",
+				"cookies": "Cookies",
+				"cookiePreferences": "Cookie Preferences",
 				"contact": "Contact",
+				"help": "Help Center",
+				"issues": "Issues",
+				"suggestions": "Suggestions",
+				"roadmap": "Roadmap",
 				"faq": "Frequently Asked Questions",
 				"careers": "Careers",
 				"github": "GitHub",
@@ -69,7 +77,8 @@
 				"translator": "Translator",
 				"xernerxSuite": "Xernerx Suite",
 				"system": "System",
-				"bots": "Bots"
+				"bots": "Bots",
+				"product": "Product"
 			},
 			"items": {
 				"account": "Account",
@@ -89,7 +98,10 @@
 				"applications_review": "Review Applications",
 				"applications_manage": "Manage Applications",
 				"settings": "Settings",
-				"environments": "Environments"
+				"environments": "Environments",
+				"roadmap": "Roadmap",
+				"suggestions": "Suggestions",
+				"issues": "Issues"
 			}
 		},
 		"shortcuts": {
@@ -177,7 +189,30 @@
 		"selector": {
 			"placeholder": "Search...",
 			"description": "No options found"
-		}
+		},
+		"edit": "Edit",
+		"actions": {
+			"remove": "Remove",
+			"reset": "Reset",
+			"saveChanges": "Save Changes",
+			"saved": "Saved!",
+			"saving": "Saving..."
+		},
+		"justNow": "Just now",
+		"loading": "Loading...",
+		"no": "No",
+		"noDescription": "No description provided.",
+		"search": "Search",
+		"toast": {
+			"saveError": "Error saving",
+			"saveFailed": "Failed to save",
+			"savedSuccess": "Saved successfully!"
+		},
+		"unknown": "Unknown",
+		"unknownBot": "Unknown Bot",
+		"unknownServer": "Unknown Server",
+		"unknownUser": "Unknown User",
+		"yes": "Yes"
 	},
 	"api": {
 		"title": "Xernerx API",
@@ -242,7 +277,13 @@
 			"discordIdCopied": "Discord ID copied",
 			"roleUpdated": "Role updated successfully",
 			"roleDeleted": "Role deleted successfully",
-			"roleCreated": "Role created successfully"
+			"roleCreated": "Role created successfully",
+			"createRoleError": "Failed to create role",
+			"deleteRoleError": "Failed to delete role",
+			"linkedPrefix": "Linked: @{name}",
+			"manageRoleDesc": "Manage settings for {name}",
+			"reorderRoleError": "Failed to reorder roles",
+			"updateRoleError": "Failed to update role"
 		},
 		"users": {
 			"title": "User Management",
@@ -280,13 +321,15 @@
 				"idPrefix": "ID: {id}",
 				"creditsLabel": "Credits",
 				"dailyStreakLabel": "Daily Streak",
-				"fetchError": "Error: {error}"
+				"fetchError": "Error: {error}",
+				"loadError": "Failed to load data"
 			},
 			"idCopied": "ID copied to clipboard",
 			"emailCopied": "Email copied to clipboard",
 			"updateFailed": "Failed to update user profile",
 			"assignRoleFailed": "Failed to assign Discord role",
-			"removeRoleFailed": "Failed to remove Discord role"
+			"removeRoleFailed": "Failed to remove Discord role",
+			"manageProfileDesc": "Manage profile for {name}"
 		},
 		"tokens": {
 			"title": "API Token Management",
@@ -298,7 +341,12 @@
 				"description": "Search by token name or UUID..."
 			},
 			"toast": {
-				"loadError": "Error loading tokens, error: {error}"
+				"loadError": "Error loading tokens, error: {error}",
+				"createError": "Failed to create token",
+				"createSuccess": "Token created successfully",
+				"deleteError": "Failed to delete token",
+				"fetchFailed": "Failed to fetch tokens",
+				"updateError": "Failed to update token"
 			},
 			"create": {
 				"modalTitle": "Create New Token",
@@ -314,7 +362,8 @@
 				"ownersLabel": "Owners",
 				"ownersPlaceholder": "Add owner...",
 				"saveButton": "Save Changes",
-				"deleteConfirm": "Are you sure you want to delete this token? This action cannot be undone."
+				"deleteConfirm": "Are you sure you want to delete this token? This action cannot be undone.",
+				"description": "Manage settings for {name}"
 			},
 			"card": {
 				"botApplication": "Bot Application",
@@ -327,7 +376,10 @@
 				"botIdPlaceholder": "Optional Bot ID...",
 				"isXernerx": "Is Xernerx",
 				"allowFetching": "Allow fetching data from /secure",
-				"failedToFetchToken": "Failed to fetch token config: "
+				"failedToFetchToken": "Failed to fetch token config: ",
+				"secure": "Secure",
+				"websocket": "Websocket Access",
+				"websocketDescription": "Requires increased elevation to use the unfiltered direct connection."
 			},
 			"unknownBot": "Unknown Bot",
 			"tokenUpdated": "Token updated",
@@ -412,7 +464,8 @@
 			"mapping": {
 				"title": "Translator Application Config",
 				"description": "Select the application configuration ID that will be used to approve new translators. Applications of this type will appear here in the dashboard.",
-				"saveConfig": "Save Config"
+				"saveConfig": "Save Config",
+				"successToast": "Application mapped successfully"
 			}
 		},
 		"common": {
@@ -457,7 +510,16 @@
 				"status": "Status",
 				"visibility": "Visibility",
 				"cancel": "Cancel",
-				"deleteTooltip": "Delete Config"
+				"deleteTooltip": "Delete Config",
+				"createDesc": "Create a new application template.",
+				"createTitle": "New Config",
+				"editDesc": "Update the application configuration.",
+				"editTitle": "Edit Config"
+			},
+			"toasts": {
+				"configCreated": "Application config created.",
+				"configDeleted": "Application config deleted.",
+				"configUpdated": "Application config updated."
 			}
 		},
 		"reviews": {
@@ -488,20 +550,31 @@
 			"adminServerId": "Admin Server ID",
 			"adminServerIdDesc": "The main Discord server for administrative alerts and logging.",
 			"adminServerIdPlaceholder": "e.g. 123456789012345678",
+			"mainOrg": "Main Organization",
+			"mainOrgDesc": "The primary organization whose bots and products populate roadmap and issue autocomplete.",
+			"selectMainOrg": "Select Main Organization...",
 			"appWebhookUrl": "App Webhook URL",
 			"appWebhookUrlDesc": "Webhook for sending important application events.",
 			"appWebhookUrlPlaceholder": "https://discord.com/api/webhooks/...",
 			"supportRole": "Support Role",
 			"supportRoleDesc": "Role required to manage support tickets and feedback.",
 			"supportRolePlaceholder": "Select a role...",
-			"saveButton": "Save Settings"
+			"saveButton": "Save Settings",
+			"toasts": {
+				"saveSuccess": "System settings saved successfully.",
+				"sisterServerRemoved": "Sister server removed (unsaved).",
+				"syncFailed": "Failed to start force sync.",
+				"syncInitiated": "Initiating Force Sync...",
+				"syncStarted": "Force sync started for {id}"
+			}
 		},
 		"dashboard": {
 			"nav": {
 				"media": "Media",
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
-				"announcements": "Announcements"
+				"announcements": "Announcements",
+				"store": "Store"
 			},
 			"media": {
 				"title": "Media Library",
@@ -517,6 +590,7 @@
 				"sharedUsers": "Shared Users",
 				"addSharedUsersDesc": "Add Discord User IDs who can view this private file.",
 				"add": "Add",
+				"placeholder": "e.g. 123456789012345678",
 				"unknownUser": "Unknown User",
 				"cancel": "Cancel",
 				"saveChanges": "Save Changes",
@@ -545,8 +619,11 @@
 				"createModalTitle": "Create Invite",
 				"modalDesc": "Configure the Discord OAuth2 parameters for this application.",
 				"urlSlug": "URL Slug (ID)",
+				"placeholderTodo": "e.g. todo",
 				"appName": "Application Name",
+				"placeholderAppName": "e.g. To-Do List Bot",
 				"clientId": "Client ID",
+				"placeholderClientId": "Discord Client ID",
 				"scopes": "Scopes (comma separated)",
 				"permMatrix": "Permission Matrix",
 				"cancel": "Cancel",
@@ -557,7 +634,8 @@
 					"deleteSuccess": "Invite deleted",
 					"deleteFailed": "Failed to delete invite",
 					"updateSuccess": "Invite updated",
-					"createSuccess": "Invite created"
+					"createSuccess": "Invite created",
+					"saveFailed": "Failed to save invite"
 				}
 			},
 			"announcements": {
@@ -611,6 +689,18 @@
 					"updateSuccess": "Updated!",
 					"createSuccess": "Created!",
 					"saveFailed": "Failed to save"
+				},
+				"footerIconAlt": "Footer Icon",
+				"newButton": "New Button",
+				"templates": {
+					"privacyButtonLabel": "Read Privacy Policy",
+					"privacyEmbedDesc": "We've recently updated our Privacy Policy to better serve our community and comply with the latest regulations. Please take a moment to review the changes.",
+					"privacyEmbedTitle": "Privacy Policy Updated",
+					"privacyTitle": "Privacy Update",
+					"tosButtonLabel": "Read Terms of Service",
+					"tosEmbedDesc": "We've recently updated our Terms of Service to better serve our community and comply with the latest regulations. Please take a moment to review the changes.",
+					"tosEmbedTitle": "Terms of Service Updated",
+					"tosTitle": "TOS Update"
 				}
 			},
 			"applicationReviews": {
@@ -633,7 +723,11 @@
 				"addNotePlaceholder": "Add a note to be sent to the applicant...",
 				"currentStatus": "Current Status:",
 				"deny": "Deny",
-				"approveAssignRole": "Approve & Assign Role"
+				"approveAssignRole": "Approve & Assign Role",
+				"toasts": {
+					"approvedSuccess": "Application approved successfully.",
+					"deniedSuccess": "Application denied successfully."
+				}
 			},
 			"applicationConfigs": {
 				"requiresUserLogin": "Requires User Login",
@@ -666,7 +760,8 @@
 				"public": "Public",
 				"dynamicForm": "Dynamic Form",
 				"open": "Open",
-				"closed": "Closed"
+				"closed": "Closed",
+				"none": "None"
 			},
 			"settings": {
 				"joinRolesHumans": "Join Roles (Humans)",
@@ -683,6 +778,93 @@
 			},
 			"translations": {
 				"defaultTranslator": "Default (translator)"
+			},
+			"issues": {
+				"title": "Issues",
+				"logBug": "Log Issue",
+				"status": "Status",
+				"resolved": "Resolved",
+				"verified": "Verified",
+				"pending": "Pending Review",
+				"modalTitle": "Log New Issue",
+				"titlePlaceholder": "Title",
+				"descPlaceholder": "Description",
+				"productPlaceholder": "Select Product",
+				"save": "Save",
+				"cancel": "Cancel",
+				"submitted": "Submitted",
+				"verify": "Verify",
+				"resolveModalTitle": "Resolve App Issue",
+				"resolveModalDesc": "Select the Suite service and update version that fixed this issue.",
+				"selectSubdomain": "Select Subdomain / Service",
+				"selectVersion": "Select Fixed Version",
+				"customVersionPlaceholder": "Or enter version manually (e.g. 2.6.13)",
+				"liveProd": "Production: v{version}",
+				"liveCanary": "Canary: v{version}",
+				"confirmResolve": "Mark Resolved",
+				"releaseStatus": {
+					"production": "Live (Canary & Prod)",
+					"canary": "Canary Only",
+					"pending": "Pending Release"
+				},
+				"toasts": {
+					"deleted": "Deleted",
+					"deletedDesc": "Issue removed.",
+					"error": "Error",
+					"fillAll": "Fill all fields",
+					"selectVersionError": "Please select both a service and version.",
+					"logged": "Logged",
+					"loggedDesc": "Issue logged successfully.",
+					"resolved": "Resolved",
+					"resolvedDesc": "Issue marked as resolved.",
+					"verifiedDesc": "Issue verified."
+				}
+			},
+			"roadmap": {
+				"title": "Roadmap Management",
+				"addItem": "Add Item",
+				"modalTitle": "Add Roadmap Item",
+				"titlePlaceholder": "Title",
+				"descPlaceholder": "Description",
+				"productPlaceholder": "Select Product",
+				"botIdPlaceholder": "Bot ID (Optional — renders Discord name & avatar)",
+				"quarterPlaceholder": "Target Quarter (e.g. Q1 2026)",
+				"statusPlaceholder": "Select Status",
+				"changelogPlaceholder": "Changelog URL (Optional)",
+				"save": "Save",
+				"cancel": "Cancel",
+				"moveTo": "Move to {status}",
+				"toasts": {
+					"created": "Created",
+					"createdDesc": "Roadmap item added.",
+					"deleted": "Deleted",
+					"deletedDesc": "Item removed.",
+					"error": "Error",
+					"fillRequired": "Fill required fields",
+					"updated": "Updated",
+					"updatedDesc": "Roadmap item updated."
+				}
+			},
+			"suggestions": {
+				"title": "Community Suggestions",
+				"status": "Status",
+				"open": "Open",
+				"approved": "Approved",
+				"rejected": "Rejected",
+				"implemented": "Implemented",
+				"moveToRoadmap": "Move to Roadmap",
+				"votes": "Votes",
+				"noSuggestions": "No pending suggestions.",
+				"toasts": {
+					"accepted": "Accepted",
+					"acceptedDesc": "Promoted to Roadmap Ideas.",
+					"declined": "Declined",
+					"declinedDesc": "Suggestion deleted.",
+					"error": "Error"
+				}
+			},
+			"toasts": {
+				"fetchPermissionsError": "Failed to fetch permissions"
 			}
 		},
 		"permissions": {
@@ -734,6 +916,99 @@
 				"label": "Upload Media",
 				"description": "Permission to upload media and manage own media files on the CDN."
 			}
+		},
+		"store": {
+			"title": "Store Management",
+			"description": "Configure dynamic store categories, products, Stripe SKU IDs, and promotional discounts without server resets.",
+			"tabs": {
+				"items": "Products & SKU IDs",
+				"categories": "Categories"
+			},
+			"stats": {
+				"totalItems": "Total Products",
+				"activeItems": "Active Products",
+				"categories": "Categories",
+				"discounted": "Discounted / On Sale"
+			},
+			"buttons": {
+				"newItem": "New Product",
+				"newCategory": "New Category",
+				"save": "Save Changes",
+				"cancel": "Cancel",
+				"delete": "Delete",
+				"saving": "Saving...",
+				"deleting": "Deleting...",
+				"edit": "Edit"
+			},
+			"table": {
+				"name": "Product Name",
+				"category": "Category",
+				"skuId": "SKU ID (Stripe)",
+				"discount": "Discount",
+				"status": "Status",
+				"actions": "Actions",
+				"order": "Order",
+				"itemCount": "Items",
+				"noItems": "No store products found.",
+				"noCategories": "No store categories found.",
+				"searchPlaceholder": "Search products by name or SKU...",
+				"allCategories": "All Categories",
+				"addDiscount": "+ Add Discount",
+				"featuredBadge": "Featured",
+				"featuresCount": "✓ {count} features configured",
+				"percentOff": "-{percent}% OFF"
+			},
+			"itemModal": {
+				"createTitle": "Create Store Product",
+				"editTitle": "Edit Store Product",
+				"name": "Product Name",
+				"namePlaceholder": "e.g. Ultra Ecosystem or Zodiac Pass",
+				"skuId": "Stripe Product ID (SKU)",
+				"skuIdPlaceholder": "e.g. prod_V0pD5uXoTQkrYS",
+				"category": "Category",
+				"description": "Description",
+				"descriptionPlaceholder": "Short product description...",
+				"badge": "Badge Label (Optional)",
+				"badgePlaceholder": "e.g. Ultimate Ecosystem, Popular",
+				"discount": "Discount Percentage (%)",
+				"features": "Features (One per line)",
+				"featuresPlaceholder": "Feature 1\nFeature 2\nFeature 3",
+				"order": "Sort Order",
+				"featured": "Featured Hero Card (highlighted display)",
+				"enabled": "Active in Store"
+			},
+			"categoryModal": {
+				"createTitle": "Create Category",
+				"editTitle": "Edit Category",
+				"name": "Category Name",
+				"namePlaceholder": "e.g. Bots & Ultra, Developer API",
+				"id": "Category ID / Slug",
+				"idPlaceholder": "e.g. consumers, developers",
+				"icon": "Icon Name (Lucide)",
+				"order": "Sort Order",
+				"enabled": "Active in Store",
+				"iconPlaceholder": "Bot, Code, Server, Zap..."
+			},
+			"alerts": {
+				"itemSaved": "Product saved successfully.",
+				"itemDeleted": "Product deleted successfully.",
+				"categorySaved": "Category saved successfully.",
+				"categoryDeleted": "Category deleted successfully.",
+				"skuCopied": "SKU ID copied to clipboard.",
+				"deleteItemConfirm": "Are you sure you want to delete product \"{name}\"?",
+				"deleteCategoryConfirm": "Are you sure you want to delete category \"{name}\"? All products in this category will also be removed.",
+				"deleteFailed": "Delete Failed",
+				"discountFailed": "Discount Update Failed",
+				"fetchFailed": "Fetch Error",
+				"saveFailed": "Save Failed",
+				"toggleFailed": "Toggle Failed"
+			},
+			"tooltips": {
+				"clickToDisable": "Click to Disable",
+				"clickToEnable": "Click to Enable",
+				"copySku": "Copy SKU ID",
+				"editDiscount": "Click to edit discount"
+			}
 		}
 	},
 	"account": {
@@ -757,8 +1032,17 @@
 				"button": "Delete Account",
 				"confirmTitle": "Confirm Account Deletion",
 				"confirmDescription": "You are about to trigger a permanent purge of your user data. Once completed, your credentials and profile cannot be recovered.",
-				"confirmButton": "Delete my account"
-			}
+				"confirmButton": "Delete my account",
+				"toasts": {
+					"deleteUserError": "Failed to delete user data from database.",
+					"deleteAccountFailed": "Failed to delete account",
+					"deleteDataFailed": "Failed to delete data",
+					"dataDeletedTitle": "Data Deleted",
+					"dataDeletedDesc": "Your profile data has been successfully reset."
+				}
+			},
+			"resetDataConfirmDesc": "Are you sure you want to reset all your profile data? Your account will remain active.",
+			"resetDataConfirmButton": "Delete Data"
 		},
 		"profile": {
 			"title": "Edit Profile",
@@ -801,6 +1085,11 @@
 					"limitedDesc": "Anyone with your account link can see your profile; you will just not be listed publicly.",
 					"publicTitle": "Public:",
 					"publicDesc": "Anyone can see your profile and it is not hidden from public spaces."
+				},
+				"toast": {
+					"title": "Privacy Updated",
+					"description": "Your privacy settings have been updated.",
+					"error": "Failed to update privacy"
 				}
 			},
 			"save": "Save Changes",
@@ -882,6 +1171,10 @@
 				},
 				"density": {
 					"title": "Updated layout density!"
+				},
+				"syncFailed": {
+					"title": "Sync Failed",
+					"description": "Failed to sync appearance"
 				}
 			}
 		},
@@ -905,6 +1198,9 @@
 			"discord": {
 				"title": "Discord Language",
 				"description": "Your current Discord account language setting (read-only indicator)."
+			},
+			"toast": {
+				"syncFailed": "Failed to sync language"
 			}
 		},
 		"signin": {
@@ -1031,6 +1327,9 @@
 				"statusTitle": "Active Status",
 				"statusActive": "Token is active and can make API requests",
 				"statusInactive": "Token is temporarily disabled"
+			},
+			"preview": {
+				"unknownBot": "Unknown Bot"
 			}
 		},
 		"store": {
@@ -1042,7 +1341,8 @@
 			},
 			"billing": {
 				"monthly": "Monthly",
-				"annually": "Annually (Save 20%)"
+				"annually": "Annually",
+				"annuallyDiscount": "Annually (Save 20%)"
 			},
 			"ultra": {
 				"badge": "Ultimate Ecosystem Bundle",
@@ -1052,7 +1352,8 @@
 				"features": {
 					"bots": "Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)",
 					"servers": "All server-level utility subscriptions",
-					"support": "Priority support channel access"
+					"support": "Priority support channel access",
+					"media": "1,000 Media Uploads (CDN)"
 				}
 			},
 			"sections": {
@@ -1111,7 +1412,21 @@
 				"confirmButton": "Confirm Cancellation",
 				"keepButton": "Keep Subscription",
 				"errorDefault": "Failed to cancel subscription"
-			}
+			},
+			"taxNotice": "Locale prices and applicable taxes are calculated securely at checkout.",
+			"free": {
+				"badge": "Basic",
+				"title": "Free",
+				"desc": "Essential access to the platform.",
+				"features": {
+					"consumerBots": "Access to all Consumer Bots",
+					"mediaUploads": "10 Media Uploads (CDN)"
+				},
+				"includedFree": "Included Free"
+			},
+			"checkoutFailed": "Checkout Failed",
+			"discountBadge": "-{percent}% OFF",
+			"noItems": "No store products found."
 		},
 		"login": {
 			"description": "Loading..."
@@ -1137,7 +1452,63 @@
 		"media": {
 			"title": "Media Library",
 			"description": "Manage and view your uploaded media.",
-			"switchToAdmin": "Switch to Admin"
+			"switchToAdmin": "Switch to Admin",
+			"deleteConfirm": "Are you sure you want to delete this media?",
+			"shared": "Shared",
+			"noMedia": "No media found.",
+			"modal": {
+				"title": "Edit Media Metadata",
+				"description": "Editing metadata for {filename}",
+				"privacyLevel": "Privacy Level",
+				"sharedUsers": "Shared Users",
+				"sharedUsersDesc": "Add Discord User IDs who can view this private file.",
+				"sharedUsersPlaceholder": "e.g. 123456789012345678",
+				"add": "Add",
+				"unknownUser": "Unknown User",
+				"cancel": "Cancel",
+				"saveChanges": "Save Changes"
+			},
+			"privacy": {
+				"public": "Public",
+				"limited": "Limited",
+				"private": "Private"
+			}
+		},
+		"connections": {
+			"title": "Connections"
+		},
+		"devices": {
+			"title": "Devices"
+		},
+		"billing": {
+			"title": "Billing & Subscriptions",
+			"description": "Manage your active subscriptions and billing history.",
+			"loading": "Loading your subscriptions...",
+			"empty": {
+				"title": "No Active Subscriptions",
+				"description": "You don't have any active subscriptions right now. Head over to the store to check out our plans!",
+				"browseStore": "Browse Store"
+			},
+			"status": {
+				"active": "active",
+				"past_due": "past due",
+				"canceled": "canceled"
+			},
+			"renewsOn": "Renews on {date}",
+			"daysLeft": "{days}d left",
+			"canceled": "Canceled",
+			"cancelSubscription": "Cancel subscription",
+			"confirmPrompt": "Are you sure?",
+			"keepSubscription": "No, keep it",
+			"cancelButton": "Yes, cancel",
+			"staff": {
+				"title": "Staff Access",
+				"description": "You have a complimentary all-access staff subscription applied to your account."
+			},
+			"toasts": {
+				"cancelSuccess": "Subscription cancelled successfully",
+				"cancelError": "Failed to cancel subscription"
+			}
 		}
 	},
 	"www": {
@@ -1223,7 +1594,8 @@
 		},
 		"about": {
 			"title": "About Xernerx",
-			"description": "Founded in 2024, Xernerx evolved from a focused development initiative into a structured ecosystem of automation tools and infrastructure frameworks. Every system is built with scalability, maintainability, and architectural clarity as first principles."
+			"description": "Founded in 2024, Xernerx evolved from a focused development initiative into a structured ecosystem of automation tools and infrastructure frameworks. Every system is built with scalability, maintainability, and architectural clarity as first principles.",
+			"watermark": "ABOUT US"
 		},
 		"sections": {
 			"services": {
@@ -1330,7 +1702,8 @@
 				},
 				"rights": {
 					"title": "8. Your Rights",
-					"items": ["Right to access your data.", "Right to correction or deletion.", "Right to restrict or object to processing.", "Right to data portability."]
+					"items": ["Right to access your data.", "Right to correction or deletion.", "Right to restrict or object to processing.", "Right to data portability."],
+					"content": "You have the right to access, update, or delete your personal data. You may also object to or restrict certain processing activities, or request data portability by contacting us."
 				},
 				"cookies": {
 					"title": "9. Cookies & Tracking",
@@ -1351,6 +1724,10 @@
 				"apiData": {
 					"title": "API Data Collection & Developer Obligations",
 					"content": "When developers use our REST API to synchronize bot statistics or fetch metadata, we collect and store this data to render bot pages and provide analytics. Developers are strictly prohibited from transmitting personally identifiable information (PII) of their users to our API unless explicitly requested by an endpoint. We do not sell or share API data with third-party advertisers."
+				},
+				"childrensPrivacy": {
+					"title": "11. Children's Privacy",
+					"content": "Our services are not directed to children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us."
 				}
 			},
 			"description": "legal@xernerx.com"
@@ -1438,6 +1815,83 @@
 				"contact": {
 					"title": "16. Contact",
 					"prefix": "For legal inquiries contact"
+				}
+			},
+			"description": "legal@xernerx.com"
+		},
+		"cookies": {
+			"toc": "Contents",
+			"header": {
+				"title": "Cookie Policy",
+				"effectiveDate": "Effective Date:"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Introduction",
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and similar technologies when you visit or interact with our websites, dashboards, APIs, and services."
+				},
+				"whatAreCookies": {
+					"title": "2. What Are Cookies?",
+					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow the platform to recognize your device, maintain your authenticated session across subdomains (such as *.xernerx.com), and remember your interface preferences."
+				},
+				"categories": {
+					"title": "3. Categories of Cookies We Use",
+					"essential": {
+						"title": "Essential Cookies:",
+						"desc": "Strictly necessary for the operation and security of our services. These include authentication sessions, CSRF protection, and OAuth state verification. Because the platform cannot function securely without them, they cannot be disabled."
+					},
+					"functional": {
+						"title": "Functional Cookies:",
+						"desc": "Used to remember your personal preferences, such as your selected language, interface theme (dark, light, or system), accent color, layout density, UI zoom, and typography scale."
+					},
+					"analytics": {
+						"title": "Analytics Cookies:",
+						"desc": "Help us understand how visitors interact with our websites, monitor platform performance, and diagnose technical errors so we can improve reliability."
+					},
+					"marketing": {
+						"title": "Marketing & Advertising Cookies:",
+						"desc": "Used by third-party advertising partners (such as Google AdSense) to deliver relevant advertisements and measure campaign effectiveness."
+					}
+				},
+				"cookiesUsed": {
+					"title": "4. Specific Cookies We Set",
+					"content": "Across the Xernerx ecosystem (.xernerx.com), we set and read the following first-party cookies:",
+					"auth": {
+						"title": "Authentication (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state):",
+						"desc": "Essential HTTP-only secure cookies managed by NextAuth to authenticate your Discord session, prevent cross-site request forgery, and handle login redirects."
+					},
+					"consent": {
+						"title": "Cookie Consent (xernerx-cookie-consent):",
+						"desc": "An essential cookie that stores your chosen privacy and cookie preferences for up to 1 year so you are not prompted on every visit."
+					},
+					"locale": {
+						"title": "Localization (NEXT_LOCALE):",
+						"desc": "A functional cookie that remembers your preferred interface language across all Xernerx subdomains for up to 1 year."
+					},
+					"appearance": {
+						"title": "Interface & Appearance (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord):",
+						"desc": "Functional cookies that preserve your visual customizations and allow the server to render your chosen theme and layout immediately without visual flickering."
+					}
+				},
+				"localStorage": {
+					"title": "5. Local Storage & Similar Technologies",
+					"content": "In addition to cookies, we utilize browser localStorage to cache non-sensitive interface settings (such as theme and layout preferences) locally on your device for instant application startup. If you use the Xernerx Desktop client (Electron), essential and functional preferences are automatically enabled to support the native application environment."
+				},
+				"thirdParty": {
+					"title": "6. Third-Party Cookies",
+					"content": "Some features and pages integrate with third-party services, including Discord (for OAuth2 authentication), Stripe (for secure checkout and billing), and Google AdSense (for displaying advertisements). These third parties may set their own cookies in accordance with their respective privacy policies."
+				},
+				"managing": {
+					"title": "7. Managing Your Preferences",
+					"content": "You can review or update your cookie consent choices at any time by clicking \"Cookie Preferences\" in the website footer. You may also configure your web browser to block or delete cookies, though blocking essential cookies will prevent you from signing in or using authenticated features."
+				},
+				"changes": {
+					"title": "8. Changes to This Policy",
+					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology, infrastructure, or legal requirements. Continued use of our services constitutes acceptance of the updated policy."
+				},
+				"contact": {
+					"title": "9. Contact",
+					"prefix": "For questions regarding our use of cookies, contact"
 				}
 			},
 			"description": "legal@xernerx.com"
@@ -1532,6 +1986,25 @@
 					"description": "You're all caught up!"
 				}
 			}
+		},
+		"invites": {
+			"title": "Application Invites",
+			"description": "Quickly add our verified applications and services to your Discord server. These official invites are pre-configured with the exact permissions each bot needs to function flawlessly.",
+			"empty": "No invites are currently available."
+		},
+		"changelog": {
+			"category": "Changelogs",
+			"noLogs": "No changelogs found.",
+			"title": "{name} Changelog",
+			"subtitle": "See the latest updates and release notes.",
+			"linkCopiedTitle": "Link copied!",
+			"linkCopiedDesc": "Copied direct link to version {version}"
+		},
+		"software": {
+			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite via HTTP.",
+			"apiTag": "API",
+			"npmPackageTag": "NPM Package",
+			"packageDesc": "Official documentation and references for the {name} NPM package."
 		}
 	},
 	"faq": {
@@ -1688,7 +2161,65 @@
 				"text13": "Parameters",
 				"text14": "Required",
 				"text15": "This bot has not exposed any commands yet.",
-				"text16": "Back to Bots"
+				"text16": "Back to Bots",
+				"publishedBy": "Published by",
+				"vote": "Vote",
+				"voteAgainIn": "Vote again in {time}",
+				"voted": "Voted!",
+				"voting": "Voting..."
+			},
+			"avatarAlt": "Bot Avatar",
+			"nav": {
+				"allBots": "All Bots",
+				"backToExplore": "Back to Explore",
+				"categoryAlgorithms": "Algorithms",
+				"categoryCategories": "Categories",
+				"categoryNavigation": "Navigation"
+			},
+			"reviews": {
+				"characters": "characters",
+				"deleteConfirmDesc": "Are you sure you want to delete your review? This action cannot be undone.",
+				"deleteReview": "Delete Review",
+				"developerResponse": "Developer Response",
+				"editReview": "Edit your Review",
+				"noReviews": "No reviews yet. Be the first to review!",
+				"placeholder": "What do you think about this bot? (Optional)",
+				"reply": "Reply",
+				"replyPlaceholder": "Write your response as the developer...",
+				"review": "Review",
+				"reviews": "Reviews",
+				"submitResponse": "Submit Response",
+				"submitReview": "Submit Review",
+				"toast": {
+					"deleteFailed": "Failed to delete review",
+					"deleted": "Review deleted",
+					"loginRequired": "You must be logged in",
+					"networkError": "Network error",
+					"responseAdded": "Response added",
+					"responseFailed": "Failed to add response",
+					"submitFailed": "Failed to submit review",
+					"submitted": "Review submitted!"
+				},
+				"updateReview": "Update Review",
+				"updateYourReview": "Update your Review",
+				"writeReview": "Write a Review"
+			},
+			"stats": {
+				"all": "All",
+				"estValue": "Est. Value",
+				"servers": "Servers",
+				"shards": "Shards",
+				"users": "Users",
+				"votes": "Votes"
+			},
+			"tabs": {
+				"categoryBotDetails": "Bot Details",
+				"categoryManagement": "Management",
+				"commands": "Commands",
+				"profile": "Profile",
+				"reviews": "Reviews",
+				"settings": "Settings",
+				"statistics": "Statistics"
 			}
 		},
 		"dashboard": {
@@ -1731,9 +2262,72 @@
 			"tabs": {
 				"info": "Info",
 				"stats": "Stats",
-				"settings": "Settings"
+				"settings": "Settings",
+				"links": "Links",
+				"virtue": "Virtue"
 			},
-			"botNotConnected": "Bot Not Connected"
+			"botNotConnected": "Bot Not Connected",
+			"deleteConfirmDesc": "Are you sure you want to completely delete this guild from the database? This action cannot be undone.",
+			"links": {
+				"description": "Customize links to your external websites and Discord communities.",
+				"invitePlaceholder": "https://discord.gg/your-invite",
+				"inviteUrl": "Invite URL",
+				"title": "External Links",
+				"website": "Website URL",
+				"websitePlaceholder": "https://yourwebsite.com"
+			},
+			"loadingServers": "We are fetching your Discord servers, just a moment...",
+			"settings": {
+				"limited": "Limited",
+				"personalOrg": "Personal (No Organization)",
+				"private": "Private",
+				"public": "Public",
+				"transferDescription": "Transfer this server to an organization you belong to or own.",
+				"transferTitle": "Transfer Organization"
+			},
+			"stats": {
+				"boosts": "Boosts",
+				"bots": "Bots",
+				"members": "Members",
+				"messages": "Messages"
+			},
+			"virtue": {
+				"announceLevelUps": "Announce Level-Ups",
+				"announceLevelUpsDesc": "Send an embed whenever a member ascends a virtue tier.",
+				"autoDelete": "Auto Delete (Seconds)",
+				"autoDeletePlaceholder": "0 = disabled",
+				"channelId": "Announcement Channel ID",
+				"channelPlaceholder": "Optional channel ID",
+				"difficultyMode": "Virtue Curve Mode",
+				"disabled": "Disabled",
+				"ignoredRoles": "Ignored Roles",
+				"ignoredRolesDesc": "Roles exempted from accumulating score.",
+				"inviteBtn": "Invite Virtue",
+				"loading": "Loading Virtue Configuration...",
+				"messageTemplate": "Message Template",
+				"modes": {
+					"balanced": "Balanced (Standard)",
+					"casual": "Casual (Fast leveling)",
+					"easy": "Easy (Very fast)",
+					"extreme": "Extreme (Prestige)",
+					"hard": "Hard (Slow curve)"
+				},
+				"notAdded": "Virtue Bot Not Added",
+				"notAddedDesc": "Virtue levels and ranks have not been initialized for this server yet. Add the Virtue bot to start tracking server engagement.",
+				"resetCycles": "Reset Cycles",
+				"resetCyclesDesc": "Automatically wipe rankings periodically.",
+				"rolesPlaceholder": "Select roles...",
+				"saveChanges": "Save Changes",
+				"saving": "Saving...",
+				"title": "Virtue Progression System",
+				"toast": {
+					"saveError": "Failed to save Virtue settings",
+					"savedSuccess": "Virtue settings saved successfully!"
+				},
+				"trackedRoles": "Tracked Level Roles",
+				"trackedRolesDesc": "Assign roles to unlock as members progress.",
+				"variables": "Variables: {user}, {level}, {role}"
+			}
 		},
 		"layout": {},
 		"loading": {},
@@ -1754,7 +2348,9 @@
 			"searchBots": "Search for bots...",
 			"searchServers": "Search for servers...",
 			"heroBots": "Bots",
-			"heroServers": "Servers"
+			"heroServers": "Servers",
+			"noBotsCategory": "No bots found for this category.",
+			"noServersCategory": "No servers found for this category."
 		},
 		"portal": {
 			"layout": {},
@@ -1845,7 +2441,8 @@
 				"bots": "Bots",
 				"servers": "Servers",
 				"links": "Links",
-				"settings": "Settings"
+				"settings": "Settings",
+				"roles": "Roles"
 			},
 			"orgProfile": "Organization Profile",
 			"labels": {
@@ -1873,11 +2470,63 @@
 				"inviteMember": "Invite Member",
 				"invitePlaceholder": "Discord User ID (e.g. 1234567890)",
 				"inviteButton": "Invite",
-				"inviteHelp": "They will receive an invitation to join this organization."
+				"inviteHelp": "They will receive an invitation to join this organization.",
+				"noRole": "No Role",
+				"removeModal": {
+					"cancel": "Cancel",
+					"confirm": "Remove Member",
+					"description": "Are you sure you want to remove this member from the organization? They will lose access to all shared resources immediately.",
+					"title": "Remove Member"
+				},
+				"toast": {
+					"invalidUser": "Invalid Discord User ID",
+					"inviteError": "Error sending invite",
+					"inviteFailed": "Failed to invite member",
+					"inviteSent": "Invitation sent!",
+					"memberRemoveError": "Error removing member",
+					"memberRemoveFailed": "Failed to remove member",
+					"memberRemoved": "Member removed",
+					"rolesUpdateError": "Error updating roles",
+					"rolesUpdateFailed": "Failed to update member roles",
+					"rolesUpdated": "Member roles updated"
+				}
 			},
 			"bots": {
 				"header": "Organization Bots",
-				"noBots": "No bots registered to this organization."
+				"noBots": "No bots registered to this organization.",
+				"commands": {
+					"addCommand": "Add Command",
+					"commandNumber": "Command #{number}",
+					"descPlaceholder": "Command description",
+					"namePlaceholder": "command-name",
+					"saveFailed": "Failed to save commands"
+				},
+				"general": {
+					"descriptionLabel": "Short Description",
+					"longDescLabel": "Extended Information (Markdown)",
+					"longDescPlaceholder": "Provide a rich description of what your application does...",
+					"organizationLabel": "Associated Organization",
+					"personal": "Personal (No Organization)",
+					"privacyLabel": "Privacy Setting",
+					"saveFailed": "Failed to save profile changes",
+					"shortDescPlaceholder": "A quick tagline for what your application does...",
+					"unnamedOrg": "Unnamed Organization"
+				},
+				"links": {
+					"saveFailed": "Failed to save links"
+				},
+				"loading": "Loading Applications...",
+				"loadingProfile": "Loading application profile...",
+				"webhooks": {
+					"createWebhook": "Create Webhook",
+					"dataPlaceholder": "Authorization Token / Secret",
+					"descPlaceholder": "Webhook Description",
+					"namePlaceholder": "Webhook Name",
+					"saveFailed": "Failed to save webhooks",
+					"title": "Incoming Webhooks",
+					"urlPlaceholder": "https://your-domain.com/api/webhook",
+					"webhookNumber": "Webhook #{number}"
+				}
 			},
 			"servers": {
 				"header": "Organization Servers",
@@ -1917,7 +2566,9 @@
 					"descLabel": "Description (Optional)",
 					"descPlaceholder": "What is this organization for?",
 					"cancel": "Cancel",
-					"confirm": "Create Organization"
+					"confirm": "Create Organization",
+					"error": "Error creating organization",
+					"failed": "Failed to create organization"
 				},
 				"invite": {
 					"title": "Confirm Invite",
@@ -1943,14 +2594,18 @@
 				"tabs": {
 					"general": "General",
 					"links": "Links",
-					"settings": "Settings"
+					"settings": "Settings",
+					"commands": "Commands",
+					"webhooks": "Webhooks"
 				},
 				"general": {
 					"header": "General Settings",
 					"shortDesc": "Short Description",
 					"shortDescPlaceholder": "A brief tagline for your app",
 					"longDesc": "Long Information (Markdown)",
-					"longDescPlaceholder": "Detailed description supporting markdown formatting..."
+					"longDescPlaceholder": "Detailed description supporting markdown formatting...",
+					"tags": "Tags",
+					"tagsPlaceholder": "Add tags..."
 				},
 				"links": {
 					"header": "External Links",
@@ -1959,7 +2614,8 @@
 					"support": "Support Server",
 					"github": "GitHub Repository",
 					"privacy": "Privacy Policy",
-					"terms": "Terms of Service"
+					"terms": "Terms of Service",
+					"dashboard": "Dashboard URL"
 				},
 				"settings": {
 					"privacyHeader": "Privacy Setting",
@@ -1982,7 +2638,42 @@
 						"title": "Delete Application",
 						"desc": "Are you absolutely sure you want to delete this application? This action cannot be undone and all data will be permanently removed."
 					}
+				},
+				"toast": {
+					"deleteError": "Error deleting bot",
+					"deleteFailed": "Failed to delete bot",
+					"deleted": "Bot deleted"
+				},
+				"webhooks": {
+					"addWebhook": "Add Webhook",
+					"header": "Webhooks",
+					"triggers": "Triggers",
+					"url": "Webhook URL",
+					"webhookNumber": "Webhook #{number}"
 				}
+			},
+			"info": {
+				"changeBanner": "Change Banner",
+				"editAvatar": "Edit Avatar",
+				"nothingToPreview": "Nothing to preview",
+				"preview": "Preview",
+				"uploadBanner": "Upload Banner",
+				"write": "Write"
+			},
+			"roles": {
+				"addRole": "Add Role",
+				"defaultRoleName": "New Role",
+				"description": "Assign custom roles to members within your organization.",
+				"header": "Organization Roles",
+				"noRoles": "No custom roles created yet.",
+				"placeholder": "Role Name"
+			},
+			"toast": {
+				"deleteError": "Error deleting organization",
+				"deleteFailed": "Failed to delete organization"
+			},
+			"workspace": {
+				"id": "ID: {id}"
 			}
 		},
 		"categories": {
@@ -1993,6 +2684,62 @@
 			"biggestServers": "Biggest Communities",
 			"biggestBots": "Biggest on Platform",
 			"newcomers": "Newcomers"
+		},
+		"organization": {
+			"header": {
+				"joinServer": "Join Server",
+				"unknownOrg": "Unknown Organization"
+			},
+			"nav": {
+				"goBack": "Go Back",
+				"management": "Management",
+				"officialServers": "Official Servers",
+				"orgDetails": "Organization Details",
+				"profile": "Profile",
+				"publishedBots": "Published Bots",
+				"settings": "Settings"
+			},
+			"notFoundDesc": "This organization does not exist or is private.",
+			"notFoundTitle": "Organization Not Found",
+			"profile": {
+				"estNetworkValue": "Est. Network Value",
+				"members": "Members",
+				"noDetails": "This organization has not provided a detailed description yet.",
+				"noMembers": "No member profiles available.",
+				"officialServers": "Official Servers",
+				"owner": "Owner",
+				"publishedBots": "Published Bots",
+				"theTeam": "The Team",
+				"totalServers": "Total Servers",
+				"totalUsers": "Total Users"
+			},
+			"returnHome": "Return Home"
+		},
+		"servers": {
+			"about": "About {name}",
+			"backToExplore": "Back to Explore",
+			"information": "Information",
+			"joinServer": "Join Server",
+			"nav": {
+				"allServers": "All Servers",
+				"backToExplore": "Back to Explore",
+				"backToServers": "Back to Servers",
+				"serverDetails": "Server Details"
+			},
+			"noDetailedDesc": "This server has not provided a detailed description yet.",
+			"noServersDesc": "Try adjusting your search or check back later.",
+			"noServersFound": "No servers found",
+			"noStatsRecorded": "No statistics have been recorded for this server yet.",
+			"notFoundDesc": "This server either doesn't exist or is private.",
+			"notFoundTitle": "Server Not Found",
+			"overTime": "over time",
+			"placeholder": "Search for a server...",
+			"voteAvailableIn": "Vote available in {time}",
+			"voteForServer": "Vote for Server ({count})"
+		},
+		"supporters": {
+			"itsYou": "It's You!",
+			"title": "Supporters"
 		}
 	},
 	"cdn": {
@@ -2009,6 +2756,22 @@
 				"uploadFailed": "Upload failed. Ensure you are logged in and have permission.",
 				"generic": "Failed to upload file"
 			}
+		},
+		"view": {
+			"actions": {
+				"copyDirectLink": "Copy Direct Link",
+				"openOriginal": "Open Original",
+				"download": "Download"
+			},
+			"unauthorized": {
+				"forbidden": "Forbidden",
+				"unauthorized": "Unauthorized",
+				"description": "This file is private. You do not have permission to view it.",
+				"returnToLibrary": "Return to Library",
+				"signIn": "Sign In"
+			},
+			"unknownFileType": "Unknown File Type",
+			"downloadFile": "Download File"
 		}
 	},
 	"docs": {
@@ -2045,7 +2808,9 @@
 			},
 			"sidebar": {
 				"backToCategories": "Back to Categories",
-				"availablePackages": "Available Packages"
+				"availablePackages": "Available Packages",
+				"categoryNavigation": "Navigation",
+				"categoryPackages": "Packages"
 			},
 			"search": {
 				"placeholder": "Search classes, interfaces, and functions across all latest packages...",
@@ -2077,6 +2842,10 @@
 				"npm": {
 					"title": "NPM Packages",
 					"description": "Guides and references for the open-source Xernerx Developer Software suite, including frameworks, libraries, and utilities."
+				},
+				"websocket": {
+					"title": "WebSocket",
+					"description": "Real-time event streaming and gateway connection details."
 				}
 			}
 		},
@@ -2100,7 +2869,9 @@
 					"overview": "Overview",
 					"endpoints": "Endpoints",
 					"users": "Users",
-					"guilds": "Guilds"
+					"guilds": "Guilds",
+					"categoryNavigation": "Navigation",
+					"categoryRestApi": "REST API"
 				}
 			},
 			"v1": {
@@ -2308,6 +3079,135 @@
 				"details4": " array, or has global ",
 				"details5": " permissions before streaming the file."
 			}
+		},
+		"websocket": {
+			"nav": {
+				"backToCategories": "Back to Categories",
+				"overview": "Overview",
+				"connecting": "Connecting",
+				"authentication": "Authentication",
+				"rpcProtocol": "RPC Protocol",
+				"servicesAndActions": "Services & Actions",
+				"clientExample": "Client Example",
+				"categoryNavigation": "Navigation",
+				"categoryWebsocket": "WebSocket"
+			},
+			"hero": {
+				"title": "WebSocket Gateway",
+				"description": "High-performance RPC-over-WebSocket daemon mediating real-time database operations and cross-service coordination for Xernerx bots and applications.",
+				"alertTitle": "WebSocket Allowance Required",
+				"alertDescription": "All WebSocket connections start in an unauthenticated state and must immediately authenticate with a valid token. In addition, the token needs websocket allowance. Tokens without this allowance will be rejected with a <code class=\"bg-orange-500/20 px-1.5 py-0.5 rounded text-xs font-mono\">Forbidden: Token needs websocket allowance</code> error."
+			},
+			"overview": {
+				"title": "Overview & Architecture",
+				"description1": "The Xernerx <strong>WebSocket Gateway</strong> operates as a private, authenticated RPC microservice daemon. Rather than exposing direct database ports or requiring external bot runtimes and dashboard instances to maintain direct MongoDB connection pools, client processes establish a persistent socket connection to execute structured queries and mutations.",
+				"description2": "The gateway uses a <strong>correlated Request-Response RPC pattern</strong> over JSON payloads. Every client message provides an arbitrary request identifier (<code>id</code>), which the gateway mirrors in its response payload to allow multiplexed asynchronous communication over a single connection.",
+				"cards": {
+					"socket": {
+						"title": "Persistent TCP Socket",
+						"desc": "Avoids connection establishment overhead and retains persistent channel telemetry with IP logging."
+					},
+					"auth": {
+						"title": "Token & JWT Auth",
+						"desc": "Secured via signed JWT tokens or shared system secrets evaluated with the <code>jose</code> library."
+					},
+					"proxy": {
+						"title": "Isolated Database Proxy",
+						"desc": "Mediates CRUD access to Mongoose models (Guilds, Users, Members) without leaking database credentials."
+					}
+				}
+			},
+			"connecting": {
+				"title": "Connecting & Endpoints",
+				"description": "Clients connect to the gateway using any standard WebSocket implementation (e.g., native browser <code>WebSocket</code>, Node.js <code>ws</code>).",
+				"productionEndpoint": "Production Gateway",
+				"developmentEndpoint": "Development Gateway",
+				"localRuntime": "Local Runtime",
+				"healthChecksTitle": "HTTP Health Checks",
+				"healthChecksDesc": "The WebSocket daemon also runs an embedded HTTP server on the same port for uptime monitoring and health checks:"
+			},
+			"auth": {
+				"title": "Authentication Handshake",
+				"description": "Immediately after establishing the connection, the client must authenticate. The server inspects the <code>auth</code> service message, validates the token against <code>WS_TOKEN</code>, and marks the socket session as authenticated.",
+				"requestPayloadTitle": "Auth Request Payload",
+				"requestPayloadDesc": "Pass your token in the <code>body.token</code> field. The token is checked against the database <code>Token</code> schema. To use the WebSocket, the token must be in an active state and have websocket allowance enabled.",
+				"responsePayloadsTitle": "Auth Response Payloads",
+				"successResponse": "Success Response",
+				"failureResponse": "Failure Response"
+			},
+			"protocol": {
+				"title": "RPC Protocol Specification",
+				"description": "All operational commands sent to the gateway must adhere to the standard RPC message schema.",
+				"schemaTitle": "Message Schema",
+				"table": {
+					"field": "Field",
+					"type": "Type",
+					"required": "Required",
+					"description": "Description",
+					"yes": "Yes",
+					"optional": "Optional"
+				},
+				"fields": {
+					"idDesc": "Arbitrary correlation ID. Mirrored directly in the response.",
+					"serviceDesc": "Target service module (e.g. <code>virtue</code>, <code>auth</code>).",
+					"methodDesc": "Action verb: <code>GET</code>, <code>POST</code>, <code>PATCH</code>, or <code>DELETE</code>.",
+					"actionDesc": "Sub-resource or model to target (e.g. <code>guilds</code>, <code>members</code>).",
+					"bodyDesc": "Query criteria, document filters, or payload for mutations."
+				},
+				"mappingTitle": "Method & Operation Mapping",
+				"methods": {
+					"getDesc": "Queries a single matching document.",
+					"postDesc": "Creates a new document; falls back to existing if duplicate key (11000).",
+					"patchDesc": "Performs atomic <code>$set</code> update and returns updated document.",
+					"deleteDesc": "Deletes the matched document."
+				}
+			},
+			"services": {
+				"title": "Available Services & Actions",
+				"description": "Services represent backend domains dynamically loaded from the server's app directory.",
+				"activeBadge": "Active",
+				"stubBadge": "Stub",
+				"table": {
+					"action": "Action",
+					"database": "Database",
+					"filterKeys": "Filter Keys",
+					"description": "Description"
+				},
+				"virtue": {
+					"description": "Manages leveling configurations and user activity tracking. Self-saved Virtue leveling data is stored in the isolated <code>virtue</code> database (separating text and voice levels per guild), while global user identity and combined platform levels are stored in the primary <code>xernerx</code> database.",
+					"guildsDesc": "Guild leveling mode (<code>easy</code>, <code>casual</code>, <code>balanced</code>, <code>hard</code>, <code>extreme</code>), cycles, level message, and ignored/tracked roles.",
+					"textDesc": "Guild member text level, text XP, and message count per server.",
+					"voiceDesc": "Guild member voice level, voice XP, and time spent in voice per server.",
+					"globalLevelDesc": "Global unified platform user level and XP (combined text & voice contribution).",
+					"globalUserDesc": "Global Xernerx user account profile and settings.",
+					"exampleTitle": "Example: Update Guild Leveling Configuration"
+				},
+				"xernerx": {
+					"description": "Primary platform service mediating global accounts, combined user leveling, economy credits, and ecosystem resources stored in the main <code>xernerx</code> database.",
+					"usersDesc": "Global user profile, appearance, preferences, and account metadata.",
+					"levelsDesc": "Unified platform user level and XP (aggregated across text and voice).",
+					"creditsDesc": "User balance, daily gift streak, and credit transaction status.",
+					"tokensDesc": "API and WebSocket developer tokens and permission states.",
+					"guildsDesc": "Platform-wide guild profiles and institutional registration.",
+					"botsDesc": "Registered bot metadata, reviews, votes, and verification state.",
+					"exampleTitle": "Example: Query Global User & Level"
+				},
+				"metamorphosis": {
+					"desc": "Metamorphosis bot profiles and integration hooks."
+				},
+				"zodiac": {
+					"desc": "Zodiac bot configurations and star sign telemetry."
+				}
+			},
+			"client": {
+				"title": "Client SDK & Implementation",
+				"p1Prefix": "To interact with the WebSocket Gateway, you can install the official public",
+				"p1Suffix": "npm package.",
+				"p2": "The package abstracts raw socket lifecycle events, establishes and recovers connections, manages the authentication handshake, and provides <strong>functionified RPC methods</strong> (<code>get</code>, <code>create</code>, <code>update</code>, <code>delete</code>).",
+				"step1Title": "1. Installation",
+				"step2Title": "2. Functionified Connection Example",
+				"step2Desc": "Provide your token (ensuring it has WebSocket allowance enabled) and call the built-in CRUD operations:"
+			}
 		}
 	},
 	"components": {
@@ -2346,7 +3246,8 @@
 				"claimGift": "Claim Daily Present!",
 				"openingGift": "Opening Present...",
 				"giftClaimedTitle": "Daily reward claimed!",
-				"giftFailedTitle": "Failed to claim daily reward"
+				"giftFailedTitle": "Failed to claim daily reward",
+				"level": "Level"
 			}
 		},
 		"cookieprompt": {},
@@ -2362,7 +3263,8 @@
 		"page": {},
 		"sidebar": {
 			"alt1": "User Avatar",
-			"alt2": "Avatar Decoration"
+			"alt2": "Avatar Decoration",
+			"alt": "User Avatar"
 		},
 		"themescript": {}
 	},
@@ -2378,12 +3280,14 @@
 				"explore": "Explore",
 				"dashboard": "Dashboard",
 				"account": "Account",
+				"store": "Store",
 				"portal": "Portal",
 				"api": "API",
 				"docs": "Docs",
 				"cdn": "CDN",
 				"website": "Website",
-				"admin": "Admin"
+				"admin": "Admin",
+				"help": "Support"
 			}
 		}
 	},
@@ -2395,6 +3299,138 @@
 			"unknown": "Unknown Error",
 			"digest": "Digest: ",
 			"retry": "Try again"
+		}
+	},
+	"info": {
+		"home": {
+			"title": "Support",
+			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
+			"portals": {
+				"roadmap": {
+					"title": "Roadmap",
+					"description": "See what we are building right now, what is coming next, and track our progress on long-term goals."
+				},
+				"suggestions": {
+					"title": "Suggestion Centre",
+					"description": "Have a great idea? Submit it to our community sandbox where others can vote it up to our roadmap!"
+				},
+				"bugs": {
+					"title": "Issues",
+					"description": "Found an issue? Report it here so our engineers can resolve it and move it to the known issues list."
+				},
+				"faq": {
+					"title": "FAQ",
+					"description": "Frequently asked questions, billing inquiries, and general help with your Xernerx account."
+				}
+			}
+		},
+		"roadmap": {
+			"title": "Platform Roadmap",
+			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
+			"metrics": {
+				"avgResolutionTime": "Avg Issue Resolution Time",
+				"recentResolutions": "Issues Resolved Recently",
+				"hours": "{count} hours",
+				"na": "N/A"
+			},
+			"timeline": {
+				"today": "Today",
+				"backlog": "Backlog",
+				"readChangelog": "Read Changelog",
+				"status": {
+					"idea": "Idea",
+					"planned": "Planned",
+					"active": "In Progress",
+					"released": "Released"
+				}
+			},
+			"knownIssues": {
+				"title": "Known Issues Tracker",
+				"description": "A transparent log of active issues and recently resolved problems across our ecosystem.",
+				"openIssues": "Open Issues",
+				"noOpenIssues": "No active issues known! Everything is running smoothly.",
+				"recentlyResolved": "Recently Resolved",
+				"noResolvedIssues": "No recently resolved issues.",
+				"fixedOn": "Fixed {date}"
+			}
+		},
+		"suggestions": {
+			"title": "Suggestion Centre",
+			"description": "Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.",
+			"newSuggestion": "New Suggestion",
+			"titlePlaceholder": "Title",
+			"descriptionPlaceholder": "Description",
+			"selectProduct": "Select Product",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"searchPlaceholder": "Search suggestions (e.g. 'discord bot')...",
+			"startTyping": "Start typing for a new suggestion",
+			"noMatch": "No suggestions match \"{query}\".",
+			"addAsNew": "Add as a New Suggestion",
+			"loginToSubmit": "Log in to submit this as a new idea!",
+			"toasts": {
+				"notAuthenticated": "Not Authenticated",
+				"mustBeLoggedIn": "You must be logged in to post.",
+				"mustBeLoggedInVote": "You must be logged in to vote.",
+				"productRequired": "Please select a product.",
+				"duplicateTitle": "A suggestion with this exact title already exists!",
+				"duplicate": "Duplicate",
+				"submitted": "Suggestion submitted!",
+				"success": "Success",
+				"failedToPost": "Failed to post",
+				"failedToVote": "Failed to vote",
+				"error": "Error"
+			}
+		},
+		"bugs": {
+			"title": "Issues",
+			"description": "Report issues you encounter. Issues are reviewed by our team and moved to the known issues list once verified.",
+			"newBug": "New Issue",
+			"titlePlaceholder": "Title",
+			"descriptionPlaceholder": "Description",
+			"selectProduct": "Select Product",
+			"attachFile": "Attach Screenshot/Log (Optional)",
+			"uploading": "Uploading...",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"searchPlaceholder": "Search issues (e.g. 'login error')...",
+			"startTyping": "Start typing for a new issue",
+			"noMatch": "No issues match \"{query}\".",
+			"reportAsNew": "Report as a New Issue",
+			"status": {
+				"resolved": "Resolved",
+				"verified": "Verified",
+				"pendingReview": "Pending Review",
+				"submitted": "Submitted"
+			},
+			"releaseStatus": {
+				"production": "Live (Prod & Canary) • {app} v{version}",
+				"canary": "Canary Only • {app} v{version}",
+				"pending": "Queued • {app} v{version}"
+			},
+			"releaseTooltips": {
+				"production": "This fix is live on both Canary and Production ({app} v{version}).",
+				"canary": "This fix is live on Canary ({app} v{version}) and awaiting Production rollout.",
+				"pending": "This fix is queued for release in {app} v{version}."
+			},
+			"toasts": {
+				"notAuthenticated": "Not Authenticated",
+				"mustBeLoggedIn": "You must be logged in to post.",
+				"productRequired": "Please select a product.",
+				"duplicate": "Duplicate",
+				"duplicateTitle": "An issue with this exact title already exists!",
+				"submitted": "Issue submitted!",
+				"success": "Success",
+				"uploadFailed": "Upload Failed",
+				"failedToUpload": "Failed to upload attachment",
+				"failedToPost": "Failed to post",
+				"error": "Error"
+			},
+			"tooltips": {
+				"verified": "This issue has been acknowledged by the developers and should see a fix at some point.",
+				"submitted": "This issue has been submitted by the community and has not yet been acknowledged.",
+				"resolved": "This issue has been resolved."
+			}
 		}
 	}
 }

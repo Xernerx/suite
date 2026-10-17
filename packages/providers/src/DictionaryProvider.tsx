@@ -61,10 +61,36 @@ export function DictionaryProvider({
 	);
 }
 
+const FALLBACK_DICTIONARY: Record<string, string> = {
+	'feedback.error.title': 'Something went wrong!',
+	'feedback.error.description': 'An unexpected error occurred while loading this page. Please try again or contact support if the issue persists.',
+	'feedback.error.details': 'Error Details:',
+	'feedback.error.unknown': 'Unknown error occurred.',
+	'feedback.error.digest': 'Error ID: ',
+	'feedback.error.retry': 'Try Again',
+	'feedback.notFound.title': 'Page Not Found',
+	'feedback.notFound.description': 'The page you are looking for does not exist or has been moved.',
+	'feedback.notFound.backHome': 'Back to Home',
+};
+
 export function useDictionary() {
 	const context = useContext(DictionaryContext);
 	if (!context) {
-		throw new Error('useDictionary must be used within a DictionaryProvider');
+		return {
+			dictionary: {},
+			currentLocale: 'en-GB' as Locale,
+			locales: [],
+			currentLanguage: undefined,
+			t: (path: string, variables?: Record<string, string | number>) => {
+				const value = FALLBACK_DICTIONARY[path] || path;
+				if (variables) {
+					return Object.entries(variables).reduce((str, [key, val]) => {
+						return str.replace(new RegExp(`\\{${key}\\}`, 'g'), String(val));
+					}, value);
+				}
+				return value;
+			},
+		};
 	}
 	return context;
 }

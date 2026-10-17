@@ -1,4 +1,4 @@
-// Force recompile
+/** @format */
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -40,17 +40,13 @@ export default function Invites() {
 	const [newScopes, setNewScopes] = useState('bot, applications.commands');
 	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
 
-	useEffect(() => {
-		if (!isReady) return;
-		fetchInvites();
-	}, [isReady]);
-
 	const fetchInvites = async () => {
 		setLoading(true);
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), { credentials: 'include' });
 			if (res.ok) {
-				setInvites(await res.json());
+				const data = await res.json();
+				setInvites(Array.isArray(data) ? data : []);
 			}
 		} catch (error) {
 			console.error(error);
@@ -58,6 +54,11 @@ export default function Invites() {
 			setLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		if (!isReady) return;
+		fetchInvites();
+	}, [isReady]);
 
 	const openCreateModal = () => {
 		setEditId(null);
@@ -118,7 +119,7 @@ export default function Invites() {
 				throw new Error('Failed to save');
 			}
 		} catch (err: any) {
-			toast({ type: 'error', title: 'Error', description: err.message });
+			toast({ type: 'error', title: t('admin.dashboard.invites.toasts.saveFailed'), description: err.message });
 		} finally {
 			setCreating(false);
 		}
@@ -155,13 +156,13 @@ export default function Invites() {
 			<div className="flex flex-col sm:flex-row items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col">
 					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						Application Invites
+						{t('admin.dashboard.invites.title')}
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.invites.subtitle')}</p>
 				</div>
 				<Button variant="primary" onClick={openCreateModal} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					<Plus size={16} />
-					<span>Create Invite</span>
+					<span>{t('admin.dashboard.invites.createButton')}</span>
 				</Button>
 			</div>
 
@@ -234,7 +235,7 @@ export default function Invites() {
 								onChange={(e) => setNewId(e.target.value)}
 								required
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderTodo') || 'e.g. todo'}
+								placeholder={t('admin.dashboard.invites.placeholderTodo')}
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
@@ -245,7 +246,7 @@ export default function Invites() {
 								onChange={(e) => setNewName(e.target.value)}
 								required
 								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderAppName') || 'e.g. To-Do List Bot'}
+								placeholder={t('admin.dashboard.invites.placeholderAppName')}
 							/>
 						</div>
 					</div>
@@ -258,7 +259,7 @@ export default function Invites() {
 							onChange={(e) => setNewClientId(e.target.value)}
 							required
 							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-							placeholder={t('admin.dashboard.invites.placeholderClientId') || 'Discord Client ID'}
+							placeholder={t('admin.dashboard.invites.placeholderClientId')}
 						/>
 					</div>
 

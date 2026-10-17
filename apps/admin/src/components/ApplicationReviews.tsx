@@ -1,4 +1,3 @@
-// Force recompile
 /** @format */
 'use client';
 
@@ -65,8 +64,10 @@ export default function ApplicationReviews() {
 			]);
 
 			if (!appsRes.ok) throw new Error('Failed to fetch applications');
-			const data: Application[] = await appsRes.json();
-			const configsData: ApplicationConfig[] = configsRes.ok ? await configsRes.json() : [];
+			const rawData = await appsRes.json();
+			const data: Application[] = Array.isArray(rawData) ? rawData : [];
+			const rawConfigs = configsRes.ok ? await configsRes.json() : [];
+			const configsData: ApplicationConfig[] = Array.isArray(rawConfigs) ? rawConfigs : [];
 
 			const configMap: Record<string, ApplicationConfig> = {};
 			configsData.forEach((c) => {
@@ -153,7 +154,10 @@ export default function ApplicationReviews() {
 				}).catch((err) => console.error('Failed to send notification', err));
 			}
 
-			toast({ title: `Application ${newStatus} successfully.`, type: 'success' });
+			toast({
+				title: newStatus === 'approved' ? t('admin.dashboard.applicationReviews.toasts.approvedSuccess') : t('admin.dashboard.applicationReviews.toasts.deniedSuccess'),
+				type: 'success',
+			});
 
 			setApplications((prev) => prev.map((app) => (app.id === selectedApp.id ? { ...app, status: newStatus, reviewNote: reviewNote.trim() || undefined } : app)));
 			closeModal();

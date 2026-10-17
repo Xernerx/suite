@@ -1,6 +1,7 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 
 export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
@@ -60,7 +61,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 			try {
 				const Dispatch = (await database('xernerx')).models.dispatch as any;
-				const crypto = require('crypto');
 				await Dispatch.create({
 					id: crypto.randomUUID(),
 					targetId: body.targetId,

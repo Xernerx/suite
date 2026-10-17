@@ -18,6 +18,11 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 	const [adminServerId, setAdminServerId] = useState('687429190165069838'); // Fallback
 
 	const handleClick = () => {
+		if (!support) {
+			window.open('/support', '_blank');
+			return;
+		}
+
 		const appUrl = `discord://-/channels/${adminServerId}/1136354838872068186`;
 		const webUrl = `https://discord.com/channels/${adminServerId}/1136354838872068186`;
 		const start = Date.now();
@@ -85,7 +90,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 		<SupportContext.Provider value={null}>
 			{children}
 
-			{support && !isMobileOpen && (
+			{!isMobileOpen && (
 				<motion.div
 					initial={{
 						scale: 0,
@@ -115,7 +120,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 						</div>
 
 						<div className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 ease-in-out group-hover:max-w-[150px] group-hover:opacity-100 pr-6 text-sm font-medium">
-							{t('common.supportprovider.description')}
+							{support ? 'Get Support' : 'Join Support Server'}
 						</div>
 					</button>
 				</motion.div>

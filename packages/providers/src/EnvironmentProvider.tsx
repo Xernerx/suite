@@ -30,16 +30,21 @@ function getInitialEnvironment(): Environment {
 		}
 	}
 	const env = process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase();
-	return (env === 'production' || !env ? 'public' : env) as Environment;
+	if (env === 'development' || env === 'dev') {
+		return 'dev';
+	}
+	if (env === 'canary') {
+		return 'canary';
+	}
+	return 'public';
 }
 
 export function EnvironmentProvider({ children, initialEnvironment }: { children: React.ReactNode; initialEnvironment?: Environment }) {
-	// Initialize with server-provided environment if available, preventing mismatch
 	const [environment, setEnvironment] = useState<Environment>(() => {
 		if (initialEnvironment) return initialEnvironment;
-		return 'public'; // Force 'public' for initial SSR/hydration to avoid mismatch
+		return getInitialEnvironment();
 	});
-	const [isReady, setIsReady] = useState(false);
+	const [isReady, setIsReady] = useState(() => typeof window !== 'undefined');
 
 	useEffect(() => {
 		setEnvironment(getInitialEnvironment());
@@ -54,7 +59,7 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 			const isLocalhost = domain === 'localhost' || domain === '127.0.0.1' || windowHostname === 'localhost' || windowHostname === '127.0.0.1';
 			let transformedUrl = baseUrl;
 
-			if (isIp || isLocalhost || (!domain && environment === 'dev')) {
+			if (isIp || isLocalhost) {
 				// Pure local development (IP or localhost) using port routing
 				try {
 					const url = new URL(baseUrl);
@@ -78,6 +83,12 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 						case 'admin.xernerx.com':
 							url.port = '4006';
 							break;
+						case 'info.xernerx.com':
+							url.port = '4007';
+							break;
+						case 'store.xernerx.com':
+							url.port = '4008';
+							break;
 						case 'xernerx.com':
 						case 'www.xernerx.com':
 							url.port = '4000';
@@ -86,8 +97,14 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 							url.port = '3000';
 							break;
 					}
-					// Use the configured domain or fallback to window hostname
-					url.hostname = domain || (typeof window !== 'undefined' ? window.location.hostname : 'localhost');
+					// In local port routing, use configured local domain/IP or window hostname (never public domain like xernerx.com)
+					const localHost =
+						domain === 'localhost' || domain === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(domain)
+							? domain
+							: typeof window !== 'undefined'
+								? window.location.hostname
+								: 'localhost';
+					url.hostname = localHost;
 					url.protocol = 'http:';
 					transformedUrl = url.toString();
 				} catch {

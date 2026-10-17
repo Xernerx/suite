@@ -15,7 +15,7 @@ export function Error({
 }) {
 	const { t } = useDictionary();
 	useEffect(() => {
-		console.error('Route Error:', error);
+		console.warn('Route Error:', error?.message || error);
 	}, [error]);
 	return (
 		<div

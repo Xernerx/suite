@@ -1,37 +1,11 @@
 /** @format */
-
+import { withXernerxConfig } from '@xernerx/lib/next.config';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-	async headers() {
-		return [
-			{
-				source: '/_next/:path*',
-				headers: [
-					{
-						key: 'Cache-Control',
-						value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
-					},
-				],
-			},
-		];
-	},
-	reactCompiler: true,
-	images: {
-		unoptimized: true,
-	},
 	outputFileTracingIncludes: {
 		'/changelog': ['../../apps/*/CHANGELOG.md'],
 	},
-	allowedDevOrigins: process.env.DOMAIN ? ['*.dev.xernerx.com', 'localhost', process.env.DOMAIN] : ['*.dev.xernerx.com', 'localhost'],
-	turbopack: {
-		rules: {
-			'*.svg': {
-				loaders: ['@svgr/webpack'],
-				as: '*.js',
-			},
-		},
-	},
 };
 
-export default nextConfig;
+export default withXernerxConfig(nextConfig);

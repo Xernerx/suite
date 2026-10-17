@@ -155,7 +155,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 async function getBotMeta(BotModel: any, id: string) {
-	let botDoc = await BotModel.findOne({ id }).select('name avatar').lean();
+	const botDoc = await BotModel.findOne({ id }).select('name avatar').lean();
 	let name = botDoc?.name;
 	let avatar = botDoc?.avatar;
 

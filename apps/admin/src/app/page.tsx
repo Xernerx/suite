@@ -1,15 +1,14 @@
 /** @format */
-
-// Force recompile
 'use client';
 
-import { Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image } from 'lucide-react';
+import { AlertTriangle, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
 import { Loading } from '@xernerx/feedback';
+import { Button } from '@xernerx/ui';
 import Roles from '@/components/Roles';
 import Tokens from '@/components/Tokens';
 import Translations from '@/components/Translations';
@@ -17,9 +16,12 @@ import Users from '@/components/Users';
 import Settings from '@/components/Settings';
 import Invites from '@/components/Invites';
 import Announcements from '@/components/Announcements';
+import Suggestions from '@/components/Suggestions';
+import Roadmap from '@/components/Roadmap';
+import Issues from '@/components/Issues';
 import Media from '@/components/Media';
+import StoreManagement from '@/components/StoreManagement';
 import { permissions } from '@xernerx/lib';
-import { Server } from 'lucide-react';
 
 export default function Home() {
 	const { show, setNavItems, view, setView } = useSidebar();
@@ -32,6 +34,16 @@ export default function Home() {
 	const [serverLoading, setServerLoading] = useState(true);
 	const [adminServerId, setAdminServerId] = useState<string | null>(null);
 	const [userRolePermissions, setUserRolePermissions] = useState<Record<string, boolean>>({});
+	const [dbError, setDbError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (typeof document !== 'undefined') {
+			const layoutDbError = document.querySelector('[data-db-error]')?.getAttribute('data-db-error');
+			if (layoutDbError) {
+				setDbError(layoutDbError);
+			}
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -41,9 +53,12 @@ export default function Home() {
 				if (res.ok) {
 					const data = await res.json();
 					setAdminServerId(data.value || null);
+				} else {
+					const errData = await res.json().catch(() => ({}));
+					if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
 				}
-			} catch (err) {
-				console.error('Failed to fetch admin server id', err);
+			} catch (err: any) {
+				console.warn('Failed to fetch admin server id', err);
 			} finally {
 				setServerLoading(false);
 			}
@@ -54,7 +69,7 @@ export default function Home() {
 	useEffect(() => {
 		if (!isReady) return;
 		async function fetchPermissions() {
-			const roleIds = user?.roles || (user?.role ? [user.role] : []);
+			const roleIds = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
 			if (roleIds.length === 0) {
 				setRoleLoading(false);
 				return;
@@ -66,6 +81,9 @@ export default function Home() {
 						if (res.ok) {
 							const roleDoc = await res.json();
 							return roleDoc.permissions || {};
+						} else {
+							const errData = await res.json().catch(() => ({}));
+							if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
 						}
 						return {};
 					})
@@ -84,8 +102,8 @@ export default function Home() {
 
 				setUserRolePermissions(mergedPermissions);
 			} catch (err: any) {
-				console.error('Failed to fetch role permissions:', err);
-				toast({ type: 'error', title: 'Failed to fetch permissions', description: err.message });
+				console.warn('Failed to fetch role permissions:', err);
+				toast({ type: 'error', title: t('admin.dashboard.toasts.fetchPermissionsError'), description: err.message });
 			} finally {
 				setRoleLoading(false);
 			}
@@ -97,24 +115,29 @@ export default function Home() {
 	}, [user, userLoading, getEnvUrl, isReady]);
 
 	useEffect(() => {
-		if (userLoading || roleLoading || serverLoading) return;
+		if ((userLoading || roleLoading || serverLoading) && !dbError) return;
 
 		const items = [];
+		const hasDbFallback = Boolean(dbError);
 
-		const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
-		const canUsers = userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true;
-		const canApplicationsReview = userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false;
-		const canApplicationsManage = userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false;
-		const canRoles = userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false;
-		const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
-		const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
-		const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
-		const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
-		const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
-		const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
+		const canTranslations = hasDbFallback || (userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false);
+		const canUsers = hasDbFallback || (userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true);
+		const canApplicationsReview = hasDbFallback || (userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false);
+		const canApplicationsManage = hasDbFallback || (userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false);
+		const canRoles = hasDbFallback || (userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false);
+		const canTokens = hasDbFallback || (userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false);
+		const canSettings = hasDbFallback || (userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false);
+		const canInvites = hasDbFallback || (userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false);
+		const canAnnouncements = hasDbFallback || (userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false);
+		const canManageMedia = hasDbFallback || (userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false);
+		const canUploadMedia = hasDbFallback || (userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true);
+		const canManageRoadmap = hasDbFallback || (userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false);
+		const canManageSuggestions = hasDbFallback || (userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false);
+		const canManageIssues = hasDbFallback || (userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false);
+		const canManageStore = hasDbFallback || (userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false);
 		const canMedia = canManageMedia || canUploadMedia;
 
-		const isServerSet = !!adminServerId;
+		const isServerSet = hasDbFallback || !!adminServerId;
 
 		if (canMedia) {
 			items.push({
@@ -206,6 +229,39 @@ export default function Home() {
 			});
 		}
 
+		if (canManageRoadmap) {
+			items.push({
+				category: t('common.nav.categories.product'),
+				label: t('common.nav.items.roadmap'),
+				view: 'roadmap',
+				icon: Map,
+			});
+		}
+		if (canManageSuggestions) {
+			items.push({
+				category: t('common.nav.categories.product'),
+				label: t('common.nav.items.suggestions'),
+				view: 'suggestions',
+				icon: Inbox,
+			});
+		}
+		if (canManageIssues) {
+			items.push({
+				category: t('common.nav.categories.product'),
+				label: t('common.nav.items.issues'),
+				view: 'issues',
+				icon: Bug,
+			});
+		}
+		if (canManageStore) {
+			items.push({
+				category: t('common.nav.categories.product'),
+				label: t('admin.dashboard.nav.store'),
+				view: 'store',
+				icon: ShoppingBag,
+			});
+		}
+
 		setNavItems(items);
 
 		if (items.length > 0) {
@@ -216,9 +272,42 @@ export default function Home() {
 		}
 
 		show();
-	}, [userLoading, roleLoading, serverLoading, adminServerId, userRolePermissions, view, setView, setNavItems, show, t]);
+	}, [userLoading, roleLoading, serverLoading, adminServerId, userRolePermissions, dbError, view, setView, setNavItems, show, t]);
 
-	if (userLoading || roleLoading || serverLoading) return <Loading />;
+	if ((userLoading || roleLoading || serverLoading) && !dbError) return <Loading />;
+
+	if (dbError) {
+		return (
+			<div
+				className="flex flex-col items-center justify-center min-h-[60vh] max-w-7xl mx-auto w-full"
+				style={{
+					padding: 'var(--ui-gap)',
+					gap: 'var(--ui-gap)',
+					fontSize: 'var(--text-scale, 14px)',
+				}}
+			>
+				<div
+					className="flex flex-col items-center text-center max-w-lg w-full rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+				>
+					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-500">
+						<AlertTriangle size={32} />
+					</div>
+					<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h1 className="text-xl font-bold text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							Database Error
+						</h1>
+						<p className="text-sm text-(--text-muted)">{t('feedback.error.description')}</p>
+						<div className="mt-4 p-4 bg-(--background) rounded-xl border border-(--border)/10 text-left w-full overflow-auto">
+							<p className="text-xs font-mono text-red-400 font-bold mb-1">{t('feedback.error.details')}</p>
+							<p className="text-xs font-mono text-(--text-muted) break-words">{dbError}</p>
+						</div>
+					</div>
+					<Button onClick={() => window.location.reload()}>{t('feedback.error.retry')}</Button>
+				</div>
+			</div>
+		);
+	}
 
 	const allowedViews = [];
 	const canUsers = userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true;
@@ -233,6 +322,10 @@ export default function Home() {
 	const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
 	const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
 	const canMedia = canManageMedia || canUploadMedia;
+	const canManageRoadmap = userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false;
+	const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
+	const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
+	const canManageStore = userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false;
 
 	const isServerSet = !!adminServerId;
 
@@ -246,6 +339,10 @@ export default function Home() {
 	if (canSettings) allowedViews.push('settings');
 	if (canInvites) allowedViews.push('invites');
 	if (canAnnouncements) allowedViews.push('announcements');
+	if (canManageRoadmap) allowedViews.push('roadmap');
+	if (canManageSuggestions) allowedViews.push('suggestions');
+	if (canManageIssues) allowedViews.push('issues');
+	if (canManageStore) allowedViews.push('store');
 
 	const activeView = allowedViews.includes(view!) ? view : allowedViews[0];
 
@@ -268,6 +365,10 @@ export default function Home() {
 			{activeView === 'settings' && <Settings />}
 			{activeView === 'invites' && <Invites />}
 			{activeView === 'announcements' && <Announcements />}
+			{activeView === 'roadmap' && <Roadmap />}
+			{activeView === 'suggestions' && <Suggestions />}
+			{activeView === 'issues' && <Issues />}
+			{activeView === 'store' && <StoreManagement />}
 		</div>
 	);
 }

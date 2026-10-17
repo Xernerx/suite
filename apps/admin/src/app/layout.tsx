@@ -73,19 +73,24 @@ export default async function RootLayout({
 	const themeProps = await getThemeLayoutProps();
 
 	let isAuthorized = false;
+	let dbError: string | null = null;
 
 	if (session?.user) {
-		const db = await database('xernerx');
-		const userDoc = await (db.models.users as any).User.findOne({ id: (session.user as any)?.id });
+		try {
+			const db = await database('xernerx');
+			const userDoc = await (db.models.users as any).User.findOne({ id: (session.user as any)?.id });
 
-		const userRoles = Array.isArray(userDoc?.roles) ? userDoc.roles : [];
+			const userRoles = Array.isArray(userDoc?.roles) ? userDoc.roles : [];
 
-		if (userRoles.length > 0) {
-			const roleDocs = await (db.models.core as any).Role.find({ id: { $in: userRoles } }).lean();
+			if (userRoles.length > 0) {
+				const roleDocs = await (db.models.core as any).Role.find({ id: { $in: userRoles } }).lean();
 
-			if (roleDocs.some((roleDoc: any) => roleDoc.permissions?.access === true)) {
-				isAuthorized = true;
+				if (roleDocs.some((roleDoc: any) => roleDoc.permissions?.access === true)) {
+					isAuthorized = true;
+				}
 			}
+		} catch (err: any) {
+			dbError = `${err?.name || 'DatabaseError'}: ${err?.message || 'Failed to connect to database'}`;
 		}
 	}
 
@@ -93,7 +98,15 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>{isAuthorized && session ? children : <ReturnPage session={session} />}</AppLayout>
+					<AppLayout dictionary={dict}>
+						{session && (isAuthorized || dbError) ? (
+							<div data-db-error={dbError || undefined} className="contents">
+								{children}
+							</div>
+						) : (
+							<ReturnPage session={session} />
+						)}
+					</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

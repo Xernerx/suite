@@ -6,7 +6,7 @@ import { type CookiePreferences, useCookie, useDictionary } from '@xernerx/provi
 import { Button, Toggle } from '@xernerx/ui';
 
 export function CookiePrompt() {
-	const { preferences, updatePreferences } = useCookie();
+	const { preferences, updatePreferences, isPromptOpen, closePrompt } = useCookie();
 	const { t } = useDictionary();
 
 	const [isMounted, setIsMounted] = useState(false);
@@ -23,7 +23,22 @@ export function CookiePrompt() {
 		setIsMounted(true);
 	}, []);
 
-	if (!isMounted || preferences !== null) return null;
+	useEffect(() => {
+		if (preferences) {
+			setLocalPrefs(preferences);
+		}
+	}, [preferences]);
+
+	useEffect(() => {
+		if (isPromptOpen) {
+			setShowManage(true);
+			if (preferences) {
+				setLocalPrefs(preferences);
+			}
+		}
+	}, [isPromptOpen, preferences]);
+
+	if (!isMounted || (preferences !== null && !isPromptOpen)) return null;
 
 	const handleAcceptAll = () => {
 		updatePreferences({
@@ -64,31 +79,29 @@ export function CookiePrompt() {
 		>
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h3 className="text-lg font-semibold text-(--accent)">{t('common.cookiePrompt.title', {}, 'Cookie Preferences')}</h3>
-					<p className="text-sm text-(--text-muted)">
-						{t('common.cookiePrompt.description', {}, 'We use cookies to ensure your session stays secure, remember your theme, and help us improve the app.')}
-					</p>
+					<h3 className="text-lg font-semibold text-(--accent)">{t('common.cookiePrompt.title')}</h3>
+					<p className="text-sm text-(--text-muted)">{t('common.cookiePrompt.description')}</p>
 				</div>
 
 				{/* Manage Preferences Dropdown */}
 				{showManage && (
 					<div className="flex flex-col rounded-2xl bg-(--background) border border-(--border)/10" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<PreferenceToggle
-							label={t('common.cookiePrompt.manage.essential.label', {}, 'Essential')}
-							description={t('common.cookiePrompt.manage.essential.description', {}, 'Required for sessions and security.')}
+							label={t('common.cookiePrompt.manage.essential.label')}
+							description={t('common.cookiePrompt.manage.essential.description')}
 							checked={true}
 							disabled={true}
 							onChange={() => {}}
 						/>
 						<PreferenceToggle
-							label={t('common.cookiePrompt.manage.functional.label', {}, 'Functional')}
-							description={t('common.cookiePrompt.manage.functional.description', {}, 'Remembers your theme and layout state.')}
+							label={t('common.cookiePrompt.manage.functional.label')}
+							description={t('common.cookiePrompt.manage.functional.description')}
 							checked={localPrefs.functional}
 							onChange={() => togglePref('functional')}
 						/>
 						<PreferenceToggle
-							label={t('common.cookiePrompt.manage.analytics.label', {}, 'Analytics')}
-							description={t('common.cookiePrompt.manage.analytics.description', {}, 'Helps us track errors and traffic.')}
+							label={t('common.cookiePrompt.manage.analytics.label')}
+							description={t('common.cookiePrompt.manage.analytics.description')}
 							checked={localPrefs.analytics}
 							onChange={() => togglePref('analytics')}
 						/>
@@ -98,20 +111,27 @@ export function CookiePrompt() {
 				{/* Action Buttons */}
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{showManage ? (
-						<Button variant="primary" onClick={handleSavePreferences} className="w-full">
-							{t('common.cookiePrompt.buttons.save', {}, 'Save My Preferences')}
-						</Button>
+						<div className="flex" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+							{preferences !== null && (
+								<Button variant="secondary" onClick={closePrompt} className="flex-1">
+									{t('common.buttons.cancel')}
+								</Button>
+							)}
+							<Button variant="primary" onClick={handleSavePreferences} className="flex-1">
+								{t('common.cookiePrompt.buttons.save')}
+							</Button>
+						</div>
 					) : (
 						<>
 							<Button variant="primary" onClick={handleAcceptAll} className="w-full">
-								{t('common.cookiePrompt.buttons.acceptAll', {}, 'Accept All')}
+								{t('common.cookiePrompt.buttons.acceptAll')}
 							</Button>
 							<div className="flex" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 								<Button variant="secondary" onClick={handleEssentialOnly} className="flex-1">
-									{t('common.cookiePrompt.buttons.essentialOnly', {}, 'Essential Only')}
+									{t('common.cookiePrompt.buttons.essentialOnly')}
 								</Button>
 								<Button variant="secondary" onClick={() => setShowManage(true)} className="flex-1">
-									{t('common.cookiePrompt.buttons.manage', {}, 'Manage')}
+									{t('common.cookiePrompt.buttons.manage')}
 								</Button>
 							</div>
 						</>

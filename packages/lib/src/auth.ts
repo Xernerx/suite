@@ -4,11 +4,12 @@ import DiscordProvider from 'next-auth/providers/discord';
 import { NextAuthOptions, DefaultSession } from 'next-auth';
 
 declare module 'next-auth' {
-	interface Session extends DefaultSession {
+	interface Session {
 		user: {
 			id: string;
 		} & DefaultSession['user'];
-		[index: string]: any;
+		accessToken?: string;
+		error?: string;
 	}
 }
 
@@ -40,6 +41,7 @@ async function refreshAccessToken(token: any) {
 		console.error('Error refreshing Discord access token', error);
 		return {
 			...token,
+			accessToken: undefined,
 			error: 'RefreshAccessTokenError',
 		};
 	}
@@ -55,6 +57,7 @@ export const auth: NextAuthOptions = {
 		DiscordProvider({
 			clientId: process.env.DISCORD_CLIENT_ID!,
 			clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+			issuer: 'https://discord.com',
 			authorization: {
 				params: {
 					scope: 'identify guilds guilds.join email connections guilds.members.read',
@@ -113,7 +116,8 @@ export const auth: NextAuthOptions = {
 			if (url.startsWith('/')) return `${baseUrl}${url}`;
 			try {
 				const parsedUrl = new URL(url);
-				if (parsedUrl.hostname.endsWith('xernerx.com') || parsedUrl.hostname === 'localhost') {
+				const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(parsedUrl.hostname);
+				if (parsedUrl.hostname.endsWith('xernerx.com') || parsedUrl.hostname === 'localhost' || isIp) {
 					return url;
 				}
 			} catch (e) {

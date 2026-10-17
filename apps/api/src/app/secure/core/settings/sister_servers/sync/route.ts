@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { syncSisterServers } from '../../sync';
+import { syncSisterServers } from '@/lib/sync/settings';
 
 export async function POST(req: Request) {
 	try {

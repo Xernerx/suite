@@ -25,6 +25,7 @@ interface DiscordProfile {
 
 // BotCard component extracted to keep it consistent
 function BotCard({ bot }: { bot: BotProfile }) {
+	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const [discord, setDiscord] = useState<DiscordProfile | null>(null);
 	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(null);
@@ -59,7 +60,7 @@ function BotCard({ bot }: { bot: BotProfile }) {
 		fetchData();
 	}, [bot.id, getEnvUrl]);
 
-	const name = discord?.global_name || discord?.username || 'Unknown Bot';
+	const name = discord?.global_name || discord?.username || t('common.unknownBot');
 	const avatar = discord?.avatarUrl;
 	const banner = discord?.bannerUrl;
 
@@ -104,8 +105,8 @@ function BotCard({ bot }: { bot: BotProfile }) {
 				</div>
 
 				<div className="mt-4 flex flex-col flex-1">
-					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{loading ? 'Loading...' : name}</h4>
-					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{bot.description || 'No description provided.'}</p>
+					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{loading ? t('common.loading') : name}</h4>
+					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{bot.description || t('common.noDescription')}</p>
 				</div>
 			</div>
 		</Link>
@@ -126,12 +127,12 @@ export default function BotsList() {
 		show();
 
 		const baseNavItems = [
-			{ label: 'Back to Explore', href: '/', icon: ArrowLeft, category: 'Navigation' },
-			{ label: 'All Bots', view: 'all', icon: Server, category: 'Algorithms' },
-			{ label: 'Top Voted', view: 'top_voted', icon: ChevronUp, category: 'Algorithms' },
-			{ label: 'Biggest on Platform', view: 'biggest', icon: Trophy, category: 'Algorithms' },
-			{ label: 'Promoted', view: 'promoted', icon: Flame, category: 'Algorithms' },
-			{ label: 'Newcomers', view: 'newcomers', icon: Sparkles, category: 'Algorithms' },
+			{ label: t('app.bots.nav.backToExplore'), href: '/', icon: ArrowLeft, category: t('app.bots.nav.categoryNavigation') },
+			{ label: t('app.bots.nav.allBots'), view: 'all', icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.topVoted'), view: 'top_voted', icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.biggestBots'), view: 'biggest', icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.promoted'), view: 'promoted', icon: Flame, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.newcomers'), view: 'newcomers', icon: Sparkles, category: t('app.bots.nav.categoryAlgorithms') },
 		];
 
 		// Set base items initially so the sidebar isn't empty while tags load
@@ -148,7 +149,7 @@ export default function BotsList() {
 						label: tag,
 						view: `tag-${tag}`,
 						icon: Hash,
-						category: 'Categories',
+						category: t('app.bots.nav.categoryCategories'),
 					}));
 					setNavItems([...baseNavItems, ...tagNavItems]);
 				}
@@ -159,7 +160,7 @@ export default function BotsList() {
 		fetchTags();
 
 		return () => hide();
-	}, [setNavItems, show, hide, getEnvUrl, isReady]);
+	}, [setNavItems, show, hide, getEnvUrl, isReady, t]);
 
 	// Fetch Bots based on Sidebar View or Search Query
 	useEffect(() => {
@@ -204,18 +205,18 @@ export default function BotsList() {
 				<div className="flex items-center gap-4">
 					<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{searchParams.get('search')
-							? `Search: ${searchParams.get('search')}`
+							? `${t('common.search')}: ${searchParams.get('search')}`
 							: view?.startsWith('tag-')
 								? `#${view.replace('tag-', '')}`
 								: view === 'all'
-									? 'All Bots'
+									? t('app.bots.nav.allBots')
 									: view === 'top_voted'
-										? 'Top Voted'
+										? t('app.categories.topVoted')
 										: view === 'newcomers'
-											? 'Newcomers'
+											? t('app.categories.newcomers')
 											: view === 'promoted'
-												? 'Promoted'
-												: 'Biggest on Platform'}
+												? t('app.categories.promoted')
+												: t('app.categories.biggestBots')}
 					</h1>
 				</div>
 

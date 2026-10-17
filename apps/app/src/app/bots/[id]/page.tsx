@@ -8,11 +8,11 @@ import { Button } from '@xernerx/ui';
 import { User, Activity, Terminal, ArrowLeft, Star, Settings } from 'lucide-react';
 import Link from 'next/link';
 
-import Header from './components/Header';
-import Profile from './components/Profile';
-import Stats from './components/Stats';
-import Commands from './components/Commands';
-import Reviews from './components/Reviews';
+import Header from '@/components/bots/Header';
+import Profile from '@/components/bots/Profile';
+import Stats from '@/components/bots/Stats';
+import Commands from '@/components/bots/Commands';
+import Reviews from '@/components/bots/Reviews';
 
 interface BotProfile {
 	id: string;
@@ -45,21 +45,21 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 		show();
 
 		const items: any[] = [
-			{ label: 'Back to Bots', href: '/bots', icon: ArrowLeft, category: 'Navigation' },
-			{ label: 'Profile', view: 'profile', icon: User, category: 'Bot Details' },
-			{ label: 'Statistics', view: 'stats', icon: Activity, category: 'Bot Details' },
-			{ label: 'Commands', view: 'commands', icon: Terminal, category: 'Bot Details' },
-			{ label: 'Reviews', view: 'reviews', icon: Star, category: 'Bot Details' },
+			{ label: t('app.bots.id.text16'), href: '/bots', icon: ArrowLeft, category: t('app.portal.categories.navigation') },
+			{ label: t('app.bots.tabs.profile'), view: 'profile', icon: User, category: t('app.bots.tabs.categoryBotDetails') },
+			{ label: t('app.bots.tabs.statistics'), view: 'stats', icon: Activity, category: t('app.bots.tabs.categoryBotDetails') },
+			{ label: t('app.bots.tabs.commands'), view: 'commands', icon: Terminal, category: t('app.bots.tabs.categoryBotDetails') },
+			{ label: t('app.bots.tabs.reviews'), view: 'reviews', icon: Star, category: t('app.bots.tabs.categoryBotDetails') },
 		];
 
 		const uid = (session as any)?.user?.id;
 		if (bot && uid && (bot.owners?.includes(uid) || bot.owners?.[0] === uid)) {
-			items.push({ label: 'Settings', href: `/portal/bots/${bot.id}`, icon: Settings, category: 'Management' });
+			items.push({ label: t('app.bots.tabs.settings'), href: `/portal/bots/${bot.id}`, icon: Settings, category: t('app.bots.tabs.categoryManagement') });
 		}
 
 		setNavItems(items);
 		return () => hide();
-	}, [setNavItems, show, hide, bot, session]);
+	}, [setNavItems, show, hide, bot, session, t]);
 
 	useEffect(() => {
 		setBot(null);

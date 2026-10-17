@@ -40,7 +40,7 @@ interface GuildProfile {
 }
 
 function BotCard({ bot }: { bot: BotProfile }) {
-	console.log('BotCard rendering:', bot?.id);
+	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const [discord, setDiscord] = useState<DiscordProfile | null>(null);
 	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(null);
@@ -75,7 +75,7 @@ function BotCard({ bot }: { bot: BotProfile }) {
 		fetchData();
 	}, [bot.id, getEnvUrl]);
 
-	const name = discord?.global_name || discord?.username || 'Unknown Bot';
+	const name = discord?.global_name || discord?.username || t('common.unknownBot');
 	const avatar = discord?.avatarUrl;
 	const banner = discord?.bannerUrl;
 
@@ -123,8 +123,8 @@ function BotCard({ bot }: { bot: BotProfile }) {
 				</div>
 
 				<div className="mt-4 flex flex-col flex-1">
-					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{loading ? 'Loading...' : name}</h4>
-					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{bot.description || 'No description provided.'}</p>
+					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{loading ? t('common.loading') : name}</h4>
+					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{bot.description || t('common.noDescription')}</p>
 				</div>
 			</div>
 		</Link>
@@ -132,7 +132,8 @@ function BotCard({ bot }: { bot: BotProfile }) {
 }
 
 function ServerCard({ server }: { server: GuildProfile }) {
-	const name = server.name || 'Unknown Server';
+	const { t } = useDictionary();
+	const name = server.name || t('common.unknownServer');
 	const avatar = server.icon ? `https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png` : null;
 	const banner = server.banner ? `https://cdn.discordapp.com/banners/${server.id}/${server.banner}.png?size=1024` : null;
 
@@ -176,7 +177,7 @@ function ServerCard({ server }: { server: GuildProfile }) {
 
 				<div className="mt-4 flex flex-col flex-1">
 					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{name}</h4>
-					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{server.description || 'No description provided.'}</p>
+					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{server.description || t('common.noDescription')}</p>
 				</div>
 			</div>
 		</Link>
@@ -328,7 +329,7 @@ export default function Home() {
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center py-20 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">
-					<p className="text-(--text-muted)/70">No bots found for this category.</p>
+					<p className="text-(--text-muted)/70">{t('app.home.noBotsCategory')}</p>
 				</div>
 			)}
 		</div>
@@ -355,7 +356,7 @@ export default function Home() {
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center py-20 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">
-					<p className="text-(--text-muted)/70">No servers found for this category.</p>
+					<p className="text-(--text-muted)/70">{t('app.home.noServersCategory')}</p>
 				</div>
 			)}
 		</div>

@@ -10,9 +10,9 @@ import { useSidebar, useUser, useEnvironment, useDictionary } from '@xernerx/pro
 import { Selector, CodeBlock } from '@xernerx/ui';
 
 import { useParams, useRouter } from 'next/navigation';
-import { V1Endpoints } from './V1Endpoints';
-import { CoreEndpoints } from './CoreEndpoints';
-import { SecureEndpoints } from './SecureEndpoints';
+import { V1Endpoints } from '@/components/api/V1Endpoints';
+import { CoreEndpoints } from '@/components/api/CoreEndpoints';
+import { SecureEndpoints } from '@/components/api/SecureEndpoints';
 
 export default function APIDocs() {
 	const { version } = useParams() as { version: string };
@@ -48,10 +48,10 @@ export default function APIDocs() {
 	useEffect(() => {
 		show();
 
-		let navItems = [
-			{ label: t('docs.api.common.nav.back'), href: '/', icon: ArrowLeft, category: 'Navigation' },
-			{ label: t('docs.api.common.nav.overview'), href: '#overview', icon: Globe, category: 'REST API' },
-			{ label: t('docs.api.common.auth'), href: '#authentication', icon: Key, category: 'REST API' },
+		const navItems = [
+			{ label: t('docs.api.common.nav.back'), href: '/', icon: ArrowLeft, category: t('docs.api.common.nav.categoryNavigation') },
+			{ label: t('docs.api.common.nav.overview'), href: '#overview', icon: Globe, category: t('docs.api.common.nav.categoryRestApi') },
+			{ label: t('docs.api.common.auth'), href: '#authentication', icon: Key, category: t('docs.api.common.nav.categoryRestApi') },
 		];
 
 		if (version === 'v1') {
@@ -116,7 +116,7 @@ export default function APIDocs() {
 						/>
 					</div>
 				</div>
-				<p className="text-lg text-(--text-muted) leading-relaxed mb-12">{t('docs.api.common.description').replace('{version}', version.toUpperCase())}</p>
+				<p className="text-lg text-(--text-muted) leading-relaxed mb-12">{t('docs.api.common.description', { version: version.toUpperCase() })}</p>
 			</motion.div>
 
 			<div className="space-y-16">

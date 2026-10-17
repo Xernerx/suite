@@ -9,8 +9,8 @@ import { User, ArrowLeft, Settings, Users, Bot, Server, LayoutDashboard, Buildin
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import Header from './components/Header';
-import Profile from './components/Profile';
+import Header from '@/components/organization/Header';
+import Profile from '@/components/organization/Profile';
 
 export default function OrganizationPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params);
@@ -29,22 +29,22 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 		show();
 
 		const items: any[] = [
-			{ label: t('app.dashboard.nav.explore') || 'Explore', href: '/', icon: Compass, category: 'Navigation' },
-			{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, category: 'Navigation' },
-			{ label: 'Developer Portal', href: '/portal', icon: Building2, category: 'Navigation' },
-			{ label: 'Go Back', onClick: () => router.back(), icon: ArrowLeft, category: 'Navigation' },
-			{ label: 'Profile', view: 'profile', icon: User, category: 'Organization Details' },
+			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass, category: t('app.portal.categories.navigation') },
+			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, category: t('app.portal.categories.navigation') },
+			{ label: t('app.home.text7'), href: '/portal', icon: Building2, category: t('app.portal.categories.navigation') },
+			{ label: t('app.organization.nav.goBack'), onClick: () => router.back(), icon: ArrowLeft, category: t('app.portal.categories.navigation') },
+			{ label: t('app.organization.nav.profile'), view: 'profile', icon: User, category: t('app.organization.nav.orgDetails') },
 		];
 
 		if (bots.length > 0) {
 			items.push(
 				...bots.map((b) => ({
-					label: b.discord?.global_name || b.discord?.username || b.name || 'Unknown Bot',
+					label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
 					href: `/bots/${b.id}`,
 					icon: b.discord?.avatar
 						? () => <img src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`} alt={b.name} className="w-5 h-5 rounded-full object-cover" />
 						: Bot,
-					category: 'Published Bots',
+					category: t('app.organization.nav.publishedBots'),
 				}))
 			);
 		}
@@ -59,19 +59,19 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 						: s.icon
 							? () => <img src={`https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64`} alt={s.name} className="w-5 h-5 rounded-full object-cover" />
 							: Server,
-					category: 'Official Servers',
+					category: t('app.organization.nav.officialServers'),
 				}))
 			);
 		}
 
 		const uid = (session as any)?.user?.id;
 		if (organization && uid && (organization.owner === uid || organization.members?.includes(uid))) {
-			items.push({ label: 'Settings', href: `/portal?tab=organizations&org=${organization._id}`, icon: Settings, category: 'Management' });
+			items.push({ label: t('app.organization.nav.settings'), href: `/portal?tab=organizations&org=${organization._id}`, icon: Settings, category: t('app.organization.nav.management') });
 		}
 
 		setNavItems(items);
 		return () => hide();
-	}, [setNavItems, show, hide, organization, session, bots, servers]);
+	}, [setNavItems, show, hide, organization, session, bots, servers, t]);
 
 	useEffect(() => {
 		setOrganization(null);
@@ -171,11 +171,11 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
 				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					Organization Not Found
+					{t('app.organization.notFoundTitle')}
 				</h2>
-				<p className="text-(--text-muted) mb-8">This organization does not exist or is private.</p>
+				<p className="text-(--text-muted) mb-8">{t('app.organization.notFoundDesc')}</p>
 				<Link href="/">
-					<Button variant="primary">Return Home</Button>
+					<Button variant="primary">{t('app.organization.returnHome')}</Button>
 				</Link>
 			</div>
 		);

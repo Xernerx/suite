@@ -3,8 +3,8 @@
 import fs from 'fs';
 import path from 'path';
 import { Metadata } from 'next';
-import ChangelogClient from './ChangelogClient';
-import SidebarTrigger from './SidebarTrigger';
+import ChangelogClient from '@/components/changelog/ChangelogClient';
+import SidebarTrigger from '@/components/changelog/SidebarTrigger';
 import { Suspense } from 'react';
 import { Loading } from '@xernerx/feedback';
 

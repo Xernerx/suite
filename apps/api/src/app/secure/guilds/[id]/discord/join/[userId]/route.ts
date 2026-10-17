@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { syncUserRoles } from '@/lib/sync/users';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string; userId: string }> }) {
 	try {
@@ -34,7 +35,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 		});
 
 		if (response.status === 204) {
-			const { syncUserRoles } = require('../../../../../core/users/sync');
 			setTimeout(async () => {
 				try {
 					const db = await database('xernerx');
@@ -47,7 +47,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 		}
 
 		const data = await response.json();
-		const { syncUserRoles } = require('../../../../../core/users/sync');
 		setTimeout(async () => {
 			try {
 				const db = await database('xernerx');

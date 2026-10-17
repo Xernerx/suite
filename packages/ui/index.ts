@@ -13,3 +13,4 @@ export * from './src/Input';
 export * from './src/MultiSelector';
 export * from './src/Tabs';
 export * from './src/CodeBlock';
+export * from './src/Tooltip';

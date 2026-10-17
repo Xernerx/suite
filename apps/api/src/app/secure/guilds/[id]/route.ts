@@ -9,8 +9,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const db = (await database('xernerx')).models.guilds.Guild as any;
 		const StatModel = (await database('xernerx')).models.guilds.Stat as any;
 
-		let guild = await db.findOne({ id }).lean();
-		let stats = await StatModel.find({ id }).sort({ timestamp: 1 }).lean();
+		const guild = await db.findOne({ id }).lean();
+		const stats = await StatModel.find({ id }).sort({ timestamp: 1 }).lean();
 
 		if (guild) {
 			const VoteModel = (await database('xernerx')).models.guilds.Vote as any;

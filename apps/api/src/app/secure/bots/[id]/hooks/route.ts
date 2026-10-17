@@ -37,7 +37,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 		const HookModel = (db.models.bots as any).Hook;
 
 		const bot = await BotProfileModel.findOne({ id }).lean();
-		if (!bot || (!bot.owners.includes(session.user.id) && bot.owners[0] !== session.user.id)) {
+		if (!bot) {
+			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
+		}
+
+		let isAuthorized = Array.isArray(bot.owners) && bot.owners.includes(session.user.id);
+		if (!isAuthorized && bot.organization) {
+			const OrganizationModel = (db.models.organizations as any).Organization;
+			const org = await OrganizationModel.findById(bot.organization).lean();
+			if (org && (org.owner === session.user.id || (Array.isArray(org.members) && org.members.includes(session.user.id)))) {
+				isAuthorized = true;
+			}
+		}
+
+		if (!isAuthorized) {
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 		}
 

@@ -23,9 +23,9 @@ export default function Home() {
 		{
 			icon: <Package size={24} />,
 			title: 'REST API',
-			desc: 'Official documentation and endpoints for interacting with the Xernerx Suite via HTTP.',
+			desc: t('www.software.apiDesc'),
 			link: 'https://docs.dev.xernerx.com/api',
-			tag: 'API',
+			tag: t('www.software.apiTag'),
 		},
 	]);
 
@@ -43,7 +43,7 @@ export default function Home() {
 				}
 				const pkgs = await Promise.all(
 					Array.from(packagesMap).map(async (name) => {
-						let desc = `Official documentation and references for the ${name} NPM package.`;
+						let desc = t('www.software.packageDesc', { name });
 
 						try {
 							const npmRes = await fetch(`https://registry.npmjs.org/${name}`);
@@ -79,7 +79,7 @@ export default function Home() {
 							title: name,
 							desc,
 							link: `https://docs.dev.xernerx.com/packages/${name}`,
-							tag: 'NPM Package',
+							tag: t('www.software.npmPackageTag'),
 						};
 					})
 				);
@@ -352,7 +352,7 @@ export default function Home() {
 						className="hidden lg:block absolute -left-20 top-1/2 -translate-y-1/2 text-[12rem] font-black text-(--foreground)/20 whitespace-nowrap pointer-events-none select-none -z-10"
 						style={{ fontFamily: 'var(--font-fredoka)' }}
 					>
-						ABOUT US
+						{t('www.about.watermark')}
 					</div>
 
 					<motion.div

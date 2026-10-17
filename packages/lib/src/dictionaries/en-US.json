@@ -36,6 +36,8 @@
 			"links": {
 				"privacy": "Privacy",
 				"terms": "Terms",
+				"cookies": "Cookies",
+				"cookiePreferences": "Cookie Preferences",
 				"contact": "Contact",
 				"github": "GitHub",
 				"npm": "npm",
@@ -52,7 +54,8 @@
 				"preferences": "Preferences",
 				"billing": "Billing",
 				"developer": "Developer",
-				"moderator": "Moderator"
+				"moderator": "Moderator",
+				"product": "Product"
 			},
 			"items": {
 				"account": "Account",
@@ -63,7 +66,10 @@
 				"language": "Language",
 				"notifications": "Notifications",
 				"billing": "Billing",
-				"tokens": "Tokens"
+				"tokens": "Tokens",
+				"roadmap": "Roadmap",
+				"suggestions": "Suggestions",
+				"issues": "Issues"
 			}
 		}
 	},
@@ -594,6 +600,268 @@
 					"title": "16. Contact",
 					"prefix": "For legal inquiries contact"
 				}
+			},
+			"description": "legal@xernerx.com"
+		},
+		"cookies": {
+			"toc": "Contents",
+			"header": {
+				"title": "Cookie Policy",
+				"effectiveDate": "Effective Date:"
+			},
+			"sections": {
+				"introduction": {
+					"title": "1. Introduction",
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and similar technologies when you visit or interact with our websites, dashboards, APIs, and services."
+				},
+				"whatAreCookies": {
+					"title": "2. What Are Cookies?",
+					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow the platform to recognize your device, maintain your authenticated session across subdomains (such as *.xernerx.com), and remember your interface preferences."
+				},
+				"categories": {
+					"title": "3. Categories of Cookies We Use",
+					"essential": {
+						"title": "Essential Cookies:",
+						"desc": "Strictly necessary for the operation and security of our services. These include authentication sessions, CSRF protection, and OAuth state verification. Because the platform cannot function securely without them, they cannot be disabled."
+					},
+					"functional": {
+						"title": "Functional Cookies:",
+						"desc": "Used to remember your personal preferences, such as your selected language, interface theme (dark, light, or system), accent color, layout density, UI zoom, and typography scale."
+					},
+					"analytics": {
+						"title": "Analytics Cookies:",
+						"desc": "Help us understand how visitors interact with our websites, monitor platform performance, and diagnose technical errors so we can improve reliability."
+					},
+					"marketing": {
+						"title": "Marketing & Advertising Cookies:",
+						"desc": "Used by third-party advertising partners (such as Google AdSense) to deliver relevant advertisements and measure campaign effectiveness."
+					}
+				},
+				"cookiesUsed": {
+					"title": "4. Specific Cookies We Set",
+					"content": "Across the Xernerx ecosystem (.xernerx.com), we set and read the following first-party cookies:",
+					"auth": {
+						"title": "Authentication (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state):",
+						"desc": "Essential HTTP-only secure cookies managed by NextAuth to authenticate your Discord session, prevent cross-site request forgery, and handle login redirects."
+					},
+					"consent": {
+						"title": "Cookie Consent (xernerx-cookie-consent):",
+						"desc": "An essential cookie that stores your chosen privacy and cookie preferences for up to 1 year so you are not prompted on every visit."
+					},
+					"locale": {
+						"title": "Localization (NEXT_LOCALE):",
+						"desc": "A functional cookie that remembers your preferred interface language across all Xernerx subdomains for up to 1 year."
+					},
+					"appearance": {
+						"title": "Interface & Appearance (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord):",
+						"desc": "Functional cookies that preserve your visual customizations and allow the server to render your chosen theme and layout immediately without visual flickering."
+					}
+				},
+				"localStorage": {
+					"title": "5. Local Storage & Similar Technologies",
+					"content": "In addition to cookies, we utilize browser localStorage to cache non-sensitive interface settings (such as theme and layout preferences) locally on your device for instant application startup. If you use the Xernerx Desktop client (Electron), essential and functional preferences are automatically enabled to support the native application environment."
+				},
+				"thirdParty": {
+					"title": "6. Third-Party Cookies",
+					"content": "Some features and pages integrate with third-party services, including Discord (for OAuth2 authentication), Stripe (for secure checkout and billing), and Google AdSense (for displaying advertisements). These third parties may set their own cookies in accordance with their respective privacy policies."
+				},
+				"managing": {
+					"title": "7. Managing Your Preferences",
+					"content": "You can review or update your cookie consent choices at any time by clicking \"Cookie Preferences\" in the website footer. You may also configure your web browser to block or delete cookies, though blocking essential cookies will prevent you from signing in or using authenticated features."
+				},
+				"changes": {
+					"title": "8. Changes to This Policy",
+					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology, infrastructure, or legal requirements. Continued use of our services constitutes acceptance of the updated policy."
+				},
+				"contact": {
+					"title": "9. Contact",
+					"prefix": "For questions regarding our use of cookies, contact"
+				}
+			},
+			"description": "legal@xernerx.com"
+		}
+	},
+	"info": {
+		"home": {
+			"title": "Support",
+			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
+			"portals": {
+				"roadmap": {
+					"title": "Roadmap",
+					"description": "See what we are building right now, what is coming next, and track our progress on long-term goals."
+				},
+				"suggestions": {
+					"title": "Suggestions",
+					"description": "Have a great idea? Submit it to our community sandbox where others can vote it up to our roadmap!"
+				},
+				"bugs": {
+					"title": "Bug Tracker",
+					"description": "Found a glitch? Report it here so our engineers can squash it and move it to the known issues list."
+				},
+				"faq": {
+					"title": "FAQ",
+					"description": "Frequently asked questions, billing inquiries, and general help with your Xernerx account."
+				}
+			}
+		},
+		"roadmap": {
+			"title": "Platform Roadmap",
+			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
+			"metrics": {
+				"avgResolutionTime": "Avg Bug Resolution Time",
+				"recentResolutions": "Issues Resolved Recently",
+				"hours": "{count} hours",
+				"na": "N/A"
+			},
+			"timeline": {
+				"today": "Today",
+				"backlog": "Backlog",
+				"readChangelog": "Read Changelog",
+				"status": {
+					"idea": "Idea",
+					"planned": "Planned",
+					"active": "In Progress",
+					"released": "Released"
+				}
+			},
+			"knownIssues": {
+				"title": "Known Issues Tracker",
+				"description": "A transparent log of active bugs and recently resolved problems across our ecosystem.",
+				"openIssues": "Open Issues",
+				"noOpenIssues": "No active issues known! Everything is running smoothly.",
+				"recentlyResolved": "Recently Resolved",
+				"noResolvedIssues": "No recently resolved issues.",
+				"fixedOn": "Fixed {date}"
+			}
+		},
+		"suggestions": {
+			"title": "Feature Sandbox",
+			"description": "Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.",
+			"newSuggestion": "New Suggestion",
+			"titlePlaceholder": "Title",
+			"descriptionPlaceholder": "Description",
+			"selectProduct": "Select Product",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"searchPlaceholder": "Search suggestions (e.g. 'discord bot')...",
+			"noMatch": "No suggestions match \"{query}\".",
+			"addAsNew": "Add as a New Suggestion",
+			"loginToSubmit": "Log in to submit this as a new idea!",
+			"toasts": {
+				"notAuthenticated": "Not Authenticated",
+				"mustBeLoggedIn": "You must be logged in to post.",
+				"mustBeLoggedInVote": "You must be logged in to vote.",
+				"duplicateTitle": "A suggestion with this exact title already exists!",
+				"duplicate": "Duplicate",
+				"submitted": "Suggestion submitted!",
+				"success": "Success",
+				"failedToPost": "Failed to post",
+				"failedToVote": "Failed to vote",
+				"error": "Error"
+			}
+		},
+		"bugs": {
+			"title": "Bug Tracker",
+			"description": "Report bugs or issues you encounter. Bugs are reviewed by our team and moved to the known issues list once verified.",
+			"newBug": "New Bug",
+			"titlePlaceholder": "Title",
+			"descriptionPlaceholder": "Description",
+			"selectProduct": "Select Product",
+			"attachFile": "Attach Screenshot/Log (Optional)",
+			"uploading": "Uploading...",
+			"submit": "Submit",
+			"cancel": "Cancel",
+			"searchPlaceholder": "Search bugs (e.g. 'login error')...",
+			"noMatch": "No bugs match \"{query}\".",
+			"reportAsNew": "Report as a New Bug",
+			"status": {
+				"resolved": "Resolved",
+				"verified": "Verified",
+				"pendingReview": "Pending Review",
+				"submitted": "Submitted"
+			},
+			"toasts": {
+				"notAuthenticated": "Not Authenticated",
+				"mustBeLoggedIn": "You must be logged in to post.",
+				"duplicate": "Duplicate",
+				"duplicateTitle": "A bug with this exact title already exists!",
+				"submitted": "Bug submitted!",
+				"success": "Success",
+				"uploadFailed": "Upload Failed",
+				"failedToUpload": "Failed to upload attachment",
+				"failedToPost": "Failed to post",
+				"error": "Error"
+			},
+			"tooltips": {
+				"verified": "This issue has been acknowledged by the developers and should see a fix at some point.",
+				"submitted": "This issue has been submitted by the community and has not yet been acknowledged.",
+				"resolved": "This issue has been resolved."
+			}
+		}
+	},
+	"admin": {
+		"dashboard": {
+			"issues": {
+				"title": "Issue Tracker",
+				"logBug": "Log Bug",
+				"status": "Status",
+				"resolved": "Resolved",
+				"verified": "Verified",
+				"pending": "Pending Review",
+				"modalTitle": "Log New Issue",
+				"titlePlaceholder": "Title",
+				"descPlaceholder": "Description",
+				"productPlaceholder": "Select Product",
+				"save": "Save",
+				"cancel": "Cancel",
+				"submitted": "Submitted",
+				"verify": "Verify"
+			},
+			"roadmap": {
+				"title": "Roadmap Management",
+				"addItem": "Add Item",
+				"modalTitle": "Add Roadmap Item",
+				"titlePlaceholder": "Title",
+				"descPlaceholder": "Description",
+				"productPlaceholder": "Select Product",
+				"quarterPlaceholder": "Target Quarter (e.g. Q1 2026)",
+				"statusPlaceholder": "Select Status",
+				"changelogPlaceholder": "Changelog URL (Optional)",
+				"save": "Save",
+				"cancel": "Cancel"
+			},
+			"suggestions": {
+				"title": "Community Suggestions",
+				"status": "Status",
+				"open": "Open",
+				"approved": "Approved",
+				"rejected": "Rejected",
+				"implemented": "Implemented",
+				"moveToRoadmap": "Move to Roadmap",
+				"votes": "Votes"
+			}
+		}
+	},
+	"lib": {
+		"navigation": {
+			"categories": {
+				"user": "User",
+				"developer": "Developer",
+				"public": "Public",
+				"management": "Management"
+			},
+			"items": {
+				"explore": "Explore",
+				"dashboard": "Dashboard",
+				"account": "Account",
+				"store": "Store",
+				"portal": "Portal",
+				"api": "API",
+				"docs": "Docs",
+				"cdn": "CDN",
+				"website": "Website",
+				"admin": "Admin",
+				"help": "Support"
 			}
 		}
 	}

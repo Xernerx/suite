@@ -20,13 +20,24 @@ export default async function Layout({ children }: { children: React.ReactNode }
 	if (!session) {
 		const host = (await headers()).get('host') || '';
 		const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}(:[0-9]+)?$/.test(host);
+		const domain = process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com';
 
 		let url = 'https://account.xernerx.com/login';
-		if (host.includes('localhost')) url = 'http://localhost:4003/login';
-		else if (isIp) url = `http://${host.split(':')[0]}:4003/login`;
-		else if (host.includes('.dev.')) url = `https://account.dev.${process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com'}/login`;
-		else if (host.includes('.canary.')) url = `https://account.canary.${process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com'}/login`;
-		redirect(url);
+		let returnTo = `https://app.${domain}/portal`;
+		if (host.includes('localhost')) {
+			url = 'http://localhost:4003/login';
+			returnTo = `http://${host}/portal`;
+		} else if (isIp) {
+			url = `http://${host.split(':')[0]}:4003/login`;
+			returnTo = `http://${host}/portal`;
+		} else if (host.includes('.dev.')) {
+			url = `https://account.dev.${domain}/login`;
+			returnTo = `https://app.dev.${domain}/portal`;
+		} else if (host.includes('.canary.')) {
+			url = `https://account.canary.${domain}/login`;
+			returnTo = `https://app.canary.${domain}/portal`;
+		}
+		redirect(`${url}?redirect=${encodeURIComponent(returnTo)}`);
 	}
 
 	return <>{children}</>;

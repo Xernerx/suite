@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useEnvironment, useToast, usePermissions, useDictionary } from '@xernerx/providers';
+import { useEnvironment, useToast, usePermissions, useDictionary, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Modal, Input, Selector } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { Trash, Upload, ExternalLink, ShieldAlert, Settings, Plus, X, User as Us
 export default function Media() {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const { user } = useUser();
 	const { toast } = useToast();
 	const { hasPermission } = usePermissions();
 	const canManage = hasPermission('manageMedia');
@@ -102,7 +103,7 @@ export default function Media() {
 			formData.append('file', file);
 			formData.append('privacy', 'public');
 
-			const res = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
+			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${user?.id}`), {
 				method: 'POST',
 				body: formData,
 				credentials: 'include',
@@ -124,7 +125,7 @@ export default function Media() {
 	};
 
 	const handleDelete = async (id: string) => {
-		if (!confirm('Are you sure you want to delete this media?')) return;
+		if (!confirm(t('account.media.deleteConfirm'))) return;
 
 		try {
 			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/media/${id}`), {
@@ -186,7 +187,7 @@ export default function Media() {
 					{hasPermission('manageMedia') && (
 						<a href={getEnvUrl('https://admin.xernerx.com/?view=media')}>
 							<Button variant="secondary">
-								<ShieldAlert size={16} className="text-amber-500" /> {t('account.media.switchToAdmin') || 'Switch to Admin'}
+								<ShieldAlert size={16} className="text-amber-500" /> {t('account.media.switchToAdmin')}
 							</Button>
 						</a>
 					)}
@@ -239,7 +240,7 @@ export default function Media() {
 								<div className="flex items-center gap-1.5">
 									{item.shared?.length > 0 && (
 										<span className="flex items-center gap-1 text-[9px] bg-blue-500/10 text-blue-500 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-wider">
-											<Users size={10} /> Shared
+											<Users size={10} /> {t('account.media.shared')}
 										</span>
 									)}
 									<span className="uppercase">{item.privacy}</span>
@@ -248,7 +249,7 @@ export default function Media() {
 						</div>
 					</div>
 				))}
-				{media.length === 0 && <div className="col-span-full py-12 text-center text-(--text-muted)">No media found.</div>}
+				{media.length === 0 && <div className="col-span-full py-12 text-center text-(--text-muted)">{t('account.media.noMedia')}</div>}
 			</div>
 
 			{editMedia && (
@@ -257,19 +258,19 @@ export default function Media() {
 					onOpenChange={(open) => {
 						if (!open) setEditMedia(null);
 					}}
-					title="Edit Media Metadata"
-					description={`Editing metadata for ${editMedia.filename}`}
+					title={t('account.media.modal.title')}
+					description={t('account.media.modal.description', { filename: editMedia.filename })}
 				>
 					<div className="space-y-4">
 						<div className="flex flex-col gap-1.5">
-							<label className="text-sm font-medium text-(--text)">Privacy Level</label>
+							<label className="text-sm font-medium text-(--text)">{t('account.media.modal.privacyLevel')}</label>
 							<Selector
 								value={editMedia.privacy}
 								onChange={(v: string) => setEditMedia({ ...editMedia, privacy: v })}
 								options={[
-									{ label: 'Public', value: 'public' },
-									{ label: 'Limited', value: 'limited' },
-									{ label: 'Private', value: 'private' },
+									{ label: t('account.media.privacy.public'), value: 'public' },
+									{ label: t('account.media.privacy.limited'), value: 'limited' },
+									{ label: t('account.media.privacy.private'), value: 'private' },
 								]}
 							/>
 						</div>
@@ -277,12 +278,12 @@ export default function Media() {
 						{editMedia.privacy === 'private' && (
 							<div className="flex flex-col gap-3 border border-(--border)/10 rounded-2xl p-4 bg-(--foreground)/30">
 								<div>
-									<h4 className="text-sm font-semibold text-(--text)">Shared Users</h4>
-									<p className="text-xs text-(--text-muted) mt-1">Add Discord User IDs who can view this private file.</p>
+									<h4 className="text-sm font-semibold text-(--text)">{t('account.media.modal.sharedUsers')}</h4>
+									<p className="text-xs text-(--text-muted) mt-1">{t('account.media.modal.sharedUsersDesc')}</p>
 								</div>
 								<div className="flex gap-2 items-center">
 									<Input
-										placeholder="e.g. 123456789012345678"
+										placeholder={t('account.media.modal.sharedUsersPlaceholder')}
 										value={sharedInput}
 										onChange={(e) => setSharedInput(e.target.value)}
 										onKeyDown={(e) => {
@@ -293,7 +294,7 @@ export default function Media() {
 										}}
 									/>
 									<Button variant="secondary" onClick={addSharedUser} loading={loadingProfile} disabled={!sharedInput.trim()} className="shrink-0 h-10">
-										<Plus size={16} /> Add
+										<Plus size={16} /> {t('account.media.modal.add')}
 									</Button>
 								</div>
 
@@ -312,7 +313,9 @@ export default function Media() {
 															</div>
 														)}
 														<div className="flex flex-col overflow-hidden">
-															<span className="text-sm font-medium text-(--text) truncate">{profile?.global_name || profile?.username || 'Unknown User'}</span>
+															<span className="text-sm font-medium text-(--text) truncate">
+																{profile?.global_name || profile?.username || t('account.media.modal.unknownUser')}
+															</span>
 															<span className="text-[10px] font-mono text-(--text-muted) truncate">{id}</span>
 														</div>
 													</div>
@@ -333,10 +336,10 @@ export default function Media() {
 
 						<div className="flex justify-end gap-3 mt-6">
 							<Button variant="secondary" onClick={() => setEditMedia(null)} disabled={saving}>
-								Cancel
+								{t('account.media.modal.cancel')}
 							</Button>
 							<Button variant="primary" onClick={handleSaveEdit} loading={saving}>
-								Save Changes
+								{t('account.media.modal.saveChanges')}
 							</Button>
 						</div>
 					</div>

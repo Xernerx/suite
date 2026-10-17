@@ -2,7 +2,7 @@
 // Force recompile
 'use client';
 
-import { useEnvironment, useToast, usePermissions, useDictionary } from '@xernerx/providers';
+import { useEnvironment, useToast, usePermissions, useDictionary, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Modal, Input, Selector } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { Trash, Upload, ExternalLink, Settings, Plus, X, User as UserIcon, Users
 
 export default function Media() {
 	const { getEnvUrl } = useEnvironment();
+	const { user } = useUser();
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const { hasPermission } = usePermissions();
@@ -104,7 +105,7 @@ export default function Media() {
 			formData.append('file', file);
 			formData.append('privacy', 'public');
 
-			const res = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
+			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${user?.id}`), {
 				method: 'POST',
 				body: formData,
 				credentials: 'include',
@@ -234,7 +235,7 @@ export default function Media() {
 								<div className="flex items-center gap-1.5">
 									{item.shared?.length > 0 && (
 										<span className="flex items-center gap-1 text-[9px] bg-blue-500/10 text-blue-500 px-1.5 py-0.5 rounded border border-blue-500/20 font-bold uppercase tracking-wider">
-											<Users size={10} /> Shared
+											<Users size={10} /> {t('admin.dashboard.media.shared')}
 										</span>
 									)}
 									<span className="uppercase">{item.privacy}</span>
@@ -277,7 +278,7 @@ export default function Media() {
 								</div>
 								<div className="flex gap-2 items-center">
 									<Input
-										placeholder={t('admin.dashboard.media.placeholder') || 'e.g. 123456789012345678'}
+										placeholder={t('admin.dashboard.media.placeholder')}
 										value={sharedInput}
 										onChange={(e) => setSharedInput(e.target.value)}
 										onKeyDown={(e) => {
@@ -288,7 +289,7 @@ export default function Media() {
 										}}
 									/>
 									<Button variant="secondary" onClick={addSharedUser} loading={loadingProfile} disabled={!sharedInput.trim()} className="shrink-0 h-10">
-										<Plus size={16} /> Add
+										<Plus size={16} /> {t('admin.dashboard.media.add')}
 									</Button>
 								</div>
 
@@ -330,10 +331,10 @@ export default function Media() {
 
 						<div className="flex justify-end gap-3 mt-6">
 							<Button variant="secondary" onClick={() => setEditMedia(null)} disabled={saving}>
-								Cancel
+								{t('admin.dashboard.media.cancel')}
 							</Button>
 							<Button variant="primary" onClick={handleSaveEdit} loading={saving}>
-								Save Changes
+								{t('admin.dashboard.media.saveChanges')}
 							</Button>
 						</div>
 					</div>

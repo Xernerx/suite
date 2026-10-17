@@ -23,7 +23,8 @@ export function PlatformProvider({ children }: { children: React.ReactNode }) {
 		const ua = navigator.userAgent.toLowerCase();
 
 		// 1. Determine Type
-		const type = ua.includes('electron') ? 'application' : 'browser';
+		const isElectron = ua.includes('electron') || typeof (window as any).electron !== 'undefined';
+		const type = isElectron ? 'application' : 'browser';
 
 		// 2. Determine Platform
 		let platform: PlatformContextType['platform'] = 'other';

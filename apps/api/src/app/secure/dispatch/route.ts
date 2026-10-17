@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 		const { models } = await database('xernerx');
 		const Dispatch = models.dispatch.Invite as any;
 
-		let query: any = {};
+		const query: any = {};
 		if (targetId) {
 			query.$or = [{ targetId: targetId }, { targetId: 'global' }];
 		}

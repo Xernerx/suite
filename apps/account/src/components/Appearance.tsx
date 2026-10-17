@@ -137,11 +137,11 @@ export default function Appearance() {
 			});
 			if (!res.ok) {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Failed to sync appearance');
+				throw new Error(errData.error || t('account.appearance.toast.syncFailed.title'));
 			}
 		} catch (e: any) {
 			console.error('Failed to sync appearance to server', e);
-			toast({ type: 'error', title: 'Sync Failed', description: e.message || 'Failed to sync appearance' });
+			toast({ type: 'error', title: t('account.appearance.toast.syncFailed.title'), description: e.message || t('account.appearance.toast.syncFailed.description') });
 		}
 	};
 

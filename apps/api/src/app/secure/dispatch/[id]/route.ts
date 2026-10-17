@@ -1,6 +1,7 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { database, sendWebhook } from '@xernerx/lib/server';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -37,7 +38,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (updatedItem.type === 'organization_invite' && updatedItem.status === 'approved') {
 			const Organization = models.organizations.Organization as any;
 			const OrgMember = models.organizations.Member as any;
-			const crypto = require('crypto');
 
 			// Add to Organization.members array (Array of Strings)
 			const orgResult = await Organization.updateOne({ _id: updatedItem.senderId }, { $addToSet: { members: updatedItem.targetId } });

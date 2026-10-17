@@ -189,7 +189,7 @@ export default function Language() {
 				});
 			} catch (err: any) {
 				console.error('Failed to sync language preference to user profile:', err);
-				toast({ type: 'error', title: 'Failed to sync language', description: err.message });
+				toast({ type: 'error', title: t('account.language.toast.syncFailed'), description: err.message });
 			}
 		}
 

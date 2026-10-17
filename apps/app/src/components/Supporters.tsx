@@ -5,6 +5,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
+import { useDictionary } from '@xernerx/providers';
 import Image from 'next/image';
 
 type Member = {
@@ -15,6 +16,7 @@ type Member = {
 };
 
 export default function Supporters() {
+	const { t } = useDictionary();
 	const [supporters, setSupporters] = useState<Member[]>([]);
 	const [me, setMe] = useState<string | null>(null);
 
@@ -58,7 +60,7 @@ export default function Supporters() {
 
 	return (
 		<div className="space-y-4">
-			<h1 className="text-xl font-semibold">Our Supporting Members</h1>
+			<h1 className="text-xl font-semibold">{t('app.supporters.title')}</h1>
 
 			<div className="flex flex-wrap gap-3 overflow-y-visible overflow-x-hidden">
 				{supporters.map((s, i) => {
@@ -132,7 +134,7 @@ export default function Supporters() {
 												border: '1px solid var(--border)',
 											}}
 										>
-											Hey! It’s you!
+											{t('app.supporters.itsYou')}
 										</motion.div>
 									)}
 								</AnimatePresence>

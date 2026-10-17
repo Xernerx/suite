@@ -197,7 +197,7 @@ async function waitForServer() {
 		attempt++;
 
 		try {
-			const res = await fetch(`${WEB_URL}/api/status`);
+			const res = await fetch(`${WEB_URL}/api/version`);
 
 			if (res.ok) {
 				sendStatus('Ready');
@@ -369,7 +369,9 @@ async function createWindow() {
 		// Create actual app only now
 		createMainWindow(bounds);
 
-		await win.loadURL(WEB_URL + '/dashboard');
+		await win.loadURL(WEB_URL + '/dashboard').catch((err) => {
+			if (err?.errno !== -3 && err?.code !== 'ERR_ABORTED') throw err;
+		});
 
 		if (!meta.startMinimized) {
 			win.show();

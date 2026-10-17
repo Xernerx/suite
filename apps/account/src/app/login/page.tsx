@@ -10,26 +10,90 @@ import Banner from '@/../public/banner.svg';
 import { Button } from '@xernerx/ui';
 import { useSearchParams } from 'next/navigation';
 
+function isSafeRedirect(url: string | null | undefined): url is string {
+	if (!url || url === '/') return false;
+	try {
+		if (url.startsWith('/')) {
+			return !url.startsWith('/login') && !url.startsWith('/logout');
+		}
+		const parsed = new URL(url);
+		const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(parsed.hostname);
+		const validHost = parsed.hostname.endsWith('xernerx.com') || parsed.hostname === 'localhost' || isIp;
+		const isAuthPath = parsed.pathname.startsWith('/login') || parsed.pathname.startsWith('/logout');
+		return validHost && !isAuthPath;
+	} catch {
+		return false;
+	}
+}
+
 function SignInContent() {
 	const { t } = useDictionary();
 	const { data: session, status } = useSession();
 	const { hide } = useSidebar();
 	const searchParams = useSearchParams();
-	const redirectUrl = searchParams.get('redirect') || '/';
+	const rawParam = searchParams.get('redirect') || searchParams.get('callbackUrl');
+	const [resolvedRedirect, setResolvedRedirect] = useState<string>(() => (isSafeRedirect(rawParam) ? rawParam : '/'));
 	const [loading, setLoading] = useState(false);
 	const [about, setAbout] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		if (isSafeRedirect(rawParam)) {
+			sessionStorage.setItem('xernerx_login_redirect', rawParam);
+			sessionStorage.setItem('xernerx_login_redirect_ts', String(Date.now()));
+			setResolvedRedirect(rawParam);
+			return;
+		}
+
+		const saved = sessionStorage.getItem('xernerx_login_redirect');
+		const savedTs = Number(sessionStorage.getItem('xernerx_login_redirect_ts') || '0');
+		if (isSafeRedirect(saved) && Date.now() - savedTs < 10 * 60 * 1000) {
+			setResolvedRedirect(saved);
+			return;
+		}
+
+		if (document.referrer && isSafeRedirect(document.referrer)) {
+			try {
+				const refUrl = new URL(document.referrer);
+				if (refUrl.origin !== window.location.origin) {
+					sessionStorage.setItem('xernerx_login_redirect', document.referrer);
+					sessionStorage.setItem('xernerx_login_redirect_ts', String(Date.now()));
+					setResolvedRedirect(document.referrer);
+				}
+			} catch {
+				// ignore
+			}
+		}
+	}, [rawParam]);
+
 	async function handleLogin() {
 		setLoading(true);
+		const target = isSafeRedirect(rawParam) ? rawParam : resolvedRedirect;
+		if (typeof window !== 'undefined' && isSafeRedirect(target)) {
+			sessionStorage.setItem('xernerx_login_redirect', target);
+			sessionStorage.setItem('xernerx_login_redirect_ts', String(Date.now()));
+		}
 		await signIn('discord', {
-			callbackUrl: redirectUrl,
+			callbackUrl: target || '/',
 		});
 	}
 	useEffect(() => {
 		hide();
 	}, [hide]);
 	useEffect(() => {
-		if (status === 'authenticated' && session) window.location.replace(redirectUrl);
-	}, [session, status, redirectUrl]);
+		if (status === 'authenticated' && session && !(session as any)?.error) {
+			let target = isSafeRedirect(rawParam) ? rawParam : resolvedRedirect;
+			if (!isSafeRedirect(target) && typeof window !== 'undefined') {
+				const saved = sessionStorage.getItem('xernerx_login_redirect');
+				if (isSafeRedirect(saved)) target = saved;
+			}
+			if (typeof window !== 'undefined') {
+				sessionStorage.removeItem('xernerx_login_redirect');
+				sessionStorage.removeItem('xernerx_login_redirect_ts');
+			}
+			window.location.replace(target || '/');
+		}
+	}, [session, status, rawParam, resolvedRedirect]);
 	return (
 		<div className="flex h-full min-h-screen items-center justify-center px-6">
 			<AnimatePresence>

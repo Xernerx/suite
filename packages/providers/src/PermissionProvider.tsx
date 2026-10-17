@@ -26,7 +26,7 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 	useEffect(() => {
 		if (!isReady || userLoading) return;
 		async function fetchPermissions() {
-			const roleIds = user?.roles || (user?.role ? [user.role] : []);
+			const roleIds = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
 			if (roleIds.length === 0) {
 				setLoading(false);
 				return;

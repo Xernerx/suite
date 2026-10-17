@@ -1,7 +1,7 @@
 /** @format */
 // Force recompile
 
-import { PackageDetailsClient } from './PackageDetailsClient';
+import { PackageDetailsClient } from '@/components/packages/PackageDetailsClient';
 
 async function getPackageData(pkgName: string, version: string) {
 	try {

@@ -1,0 +1,236 @@
+/** @format */
+
+'use client';
+
+import { useState } from 'react';
+import { Button, Input } from '@xernerx/ui';
+import { useDictionary, useToast } from '@xernerx/providers';
+import { Edit2, Trash2, Power, Copy, Check, Sparkles, Tag, PackageSearch } from 'lucide-react';
+import { StoreCategory, StoreItem } from './types';
+
+interface StoreItemsTabProps {
+	items: StoreItem[];
+	categories: StoreCategory[];
+	onEdit: (item: StoreItem) => void;
+	onToggleEnabled: (id: string, enabled: boolean) => Promise<void>;
+	onQuickDiscount: (id: string, discountPercent: number) => Promise<void>;
+	onDelete: (item: StoreItem) => Promise<void>;
+}
+
+export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQuickDiscount, onDelete }: StoreItemsTabProps) {
+	const { t } = useDictionary();
+	const { toast } = useToast();
+
+	const [search, setSearch] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState<string>('all');
+	const [copiedSku, setCopiedSku] = useState<string | null>(null);
+	const [editingDiscountId, setEditingDiscountId] = useState<string | null>(null);
+	const [tempDiscount, setTempDiscount] = useState<number>(0);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
+
+	const handleCopySku = (skuId: string) => {
+		navigator.clipboard.writeText(skuId);
+		setCopiedSku(skuId);
+		toast({ type: 'success', title: t('admin.store.alerts.skuCopied') });
+		setTimeout(() => setCopiedSku(null), 2000);
+	};
+
+	const handleDeleteClick = async (item: StoreItem) => {
+		const confirmMsg = t('admin.store.alerts.deleteItemConfirm', { name: item.name });
+		if (!window.confirm(confirmMsg)) return;
+
+		setDeletingId(item.id);
+		try {
+			await onDelete(item);
+		} catch (err: any) {
+			toast({ type: 'error', title: t('admin.store.alerts.deleteFailed'), description: err.message });
+		} finally {
+			setDeletingId(null);
+		}
+	};
+
+	const handleSaveDiscount = async (id: string) => {
+		await onQuickDiscount(id, tempDiscount);
+		setEditingDiscountId(null);
+	};
+
+	const filteredItems = items.filter((item) => {
+		const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.skuId.toLowerCase().includes(search.toLowerCase()) || item.id.toLowerCase().includes(search.toLowerCase());
+
+		const matchesCategory = selectedCategory === 'all' || item.categoryId === selectedCategory;
+
+		return matchesSearch && matchesCategory;
+	});
+
+	return (
+		<div className="flex flex-col gap-6">
+			{/* Filters */}
+			<div className="flex flex-col md:flex-row items-center gap-3 justify-between">
+				<div className="w-full md:max-w-md">
+					<Input value={search} onChange={(e: any) => setSearch(e.target.value)} placeholder={t('admin.store.table.searchPlaceholder')} />
+				</div>
+
+				<div className="flex items-center gap-2 w-full md:w-auto">
+					<select
+						value={selectedCategory}
+						onChange={(e) => setSelectedCategory(e.target.value)}
+						className="h-10 px-3 rounded-xl border border-(--border)/20 bg-(--foreground)/30 text-(--text) text-sm focus:outline-hidden focus:border-(--accent) cursor-pointer"
+					>
+						<option value="all" className="bg-(--background) text-(--text)">
+							{t('admin.store.table.allCategories')}
+						</option>
+						{categories.map((cat) => (
+							<option key={cat.id} value={cat.id} className="bg-(--background) text-(--text)">
+								{cat.name}
+							</option>
+						))}
+					</select>
+				</div>
+			</div>
+
+			{filteredItems.length === 0 ? (
+				<div className="flex flex-col items-center justify-center p-12 text-center border border-(--border)/10 rounded-2xl bg-(--foreground)/10">
+					<PackageSearch className="w-12 h-12 text-(--text-muted) mb-3 opacity-50" />
+					<p className="text-(--text-muted) text-sm">{t('admin.store.table.noItems')}</p>
+				</div>
+			) : (
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					{filteredItems.map((item) => (
+						<div
+							key={item.id}
+							className={`relative flex flex-col justify-between p-5 rounded-2xl border transition-all duration-200 ${
+								item.enabled
+									? item.isFeatured
+										? 'border-(--accent) bg-(--foreground)/25 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
+										: 'border-(--border)/15 bg-(--foreground)/20 shadow-xs'
+									: 'border-(--border)/5 bg-(--foreground)/5 opacity-60'
+							}`}
+						>
+							<div>
+								{/* Header & Badges */}
+								<div className="flex items-start justify-between gap-3 mb-2">
+									<div className="flex flex-wrap items-center gap-1.5">
+										<span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-(--foreground) text-(--text-muted) border border-(--border)/10">
+											{item.categoryName || item.categoryId}
+										</span>
+										{item.isFeatured && (
+											<span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) flex items-center gap-1">
+												<Sparkles size={11} /> {t('admin.store.table.featuredBadge')}
+											</span>
+										)}
+										{item.badge && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">{item.badge}</span>}
+									</div>
+
+									<button
+										onClick={() => onToggleEnabled(item.id, !item.enabled)}
+										className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
+											item.enabled
+												? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20'
+												: 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20'
+										}`}
+										title={item.enabled ? t('admin.store.tooltips.clickToDisable') : t('admin.store.tooltips.clickToEnable')}
+									>
+										<Power size={14} />
+									</button>
+								</div>
+
+								{/* Title & Description */}
+								<h3 className="font-bold text-(--text) text-lg mb-1" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{item.name}
+								</h3>
+								{item.description && <p className="text-xs text-(--text-muted) mb-3 line-clamp-2">{item.description}</p>}
+
+								{/* SKU ID info */}
+								<div className="flex items-center justify-between p-2 rounded-xl bg-(--background)/50 border border-(--border)/10 mb-3 text-xs">
+									<div className="flex items-center gap-1.5 text-(--text-muted) font-mono text-[11px] truncate">
+										<Tag size={12} className="shrink-0 text-(--accent)" />
+										<span className="truncate">{item.skuId}</span>
+									</div>
+									<button
+										onClick={() => handleCopySku(item.skuId)}
+										className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer shrink-0"
+										title={t('admin.store.tooltips.copySku')}
+									>
+										{copiedSku === item.skuId ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+									</button>
+								</div>
+
+								{/* Discount controller */}
+								<div className="flex items-center justify-between p-2.5 rounded-xl bg-(--foreground)/30 border border-(--border)/10 mb-4">
+									<span className="text-xs text-(--text-muted) font-medium">{t('admin.store.table.discount')}:</span>
+
+									{editingDiscountId === item.id ? (
+										<div className="flex items-center gap-1.5">
+											<input
+												type="number"
+												min="0"
+												max="100"
+												value={tempDiscount}
+												onChange={(e) => setTempDiscount(Number(e.target.value))}
+												className="w-14 h-7 text-xs px-1.5 rounded-lg border border-(--border)/20 bg-(--background) text-(--text) text-center"
+												autoFocus
+											/>
+											<span className="text-xs">%</span>
+											<button onClick={() => handleSaveDiscount(item.id)} className="px-2 py-1 text-[11px] rounded-lg bg-(--accent) text-white font-medium cursor-pointer">
+												{t('admin.store.buttons.save')}
+											</button>
+											<button onClick={() => setEditingDiscountId(null)} className="px-1.5 py-1 text-[11px] text-(--text-muted) hover:text-(--text) cursor-pointer">
+												✕
+											</button>
+										</div>
+									) : (
+										<div className="flex items-center gap-1.5">
+											{item.discountPercent > 0 ? (
+												<span
+													onClick={() => {
+														setEditingDiscountId(item.id);
+														setTempDiscount(item.discountPercent);
+													}}
+													className="px-2 py-0.5 rounded-lg text-xs font-bold bg-green-500/15 text-green-500 border border-green-500/20 cursor-pointer hover:opacity-80"
+													title={t('admin.store.tooltips.editDiscount')}
+												>
+													{t('admin.store.table.percentOff', { percent: item.discountPercent })}
+												</span>
+											) : (
+												<button
+													onClick={() => {
+														setEditingDiscountId(item.id);
+														setTempDiscount(0);
+													}}
+													className="text-xs text-(--text-muted) hover:text-(--accent) cursor-pointer underline underline-offset-2"
+												>
+													{t('admin.store.table.addDiscount')}
+												</button>
+											)}
+										</div>
+									)}
+								</div>
+
+								{/* Features list count */}
+								{item.features && item.features.length > 0 && (
+									<p className="text-[11px] text-(--text-muted) mb-3">{t('admin.store.table.featuresCount', { count: item.features.length })}</p>
+								)}
+							</div>
+
+							{/* Actions */}
+							<div className="flex items-center justify-between pt-3 border-t border-(--border)/10 text-xs text-(--text-muted)">
+								<span>
+									{t('admin.store.table.order')}: <strong className="text-(--text)">{item.order}</strong>
+								</span>
+
+								<div className="flex items-center gap-1.5">
+									<Button variant="secondary" onClick={() => onEdit(item)} className="!p-2 !h-8">
+										<Edit2 size={14} />
+									</Button>
+									<Button variant="danger" onClick={() => handleDeleteClick(item)} disabled={deletingId === item.id} className="!p-2 !h-8">
+										<Trash2 size={14} />
+									</Button>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			)}
+		</div>
+	);
+}

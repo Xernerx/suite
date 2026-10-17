@@ -14,12 +14,12 @@ export function TermsPrompt() {
 	const [submitting, setSubmitting] = useState(false);
 
 	// These dates are automatically bumped by the `suite commit` script
-	const TERMS_VERSION = new Date('2026-08-30T00:00:00Z').getTime();
-	const PRIVACY_VERSION = new Date('2026-08-30T00:00:00Z').getTime();
+	const TERMS_VERSION = new Date('2026-10-15T00:00:00Z').getTime();
+	const PRIVACY_VERSION = new Date('2026-10-15T00:00:00Z').getTime();
 
 	useEffect(() => {
 		// Don't block the screen if they are currently trying to read the policies!
-		if (typeof window !== 'undefined' && (window.location.pathname === '/privacy' || window.location.pathname === '/terms')) {
+		if (typeof window !== 'undefined' && (window.location.pathname === '/privacy' || window.location.pathname === '/terms' || window.location.pathname === '/cookies')) {
 			setIsOpen(false);
 			return;
 		}
@@ -42,9 +42,9 @@ export function TermsPrompt() {
 		if (!user?.id) return;
 		setSubmitting(true);
 		try {
-			const baseUrl = getEnvUrl('https://api.xernerx.com/');
+			const url = getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`);
 			const now = new Date().toISOString();
-			const res = await fetch(`${baseUrl}secure/users/${user.id}`, {
+			const res = await fetch(url, {
 				method: 'PATCH',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },

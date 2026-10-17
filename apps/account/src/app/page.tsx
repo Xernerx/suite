@@ -3,7 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, Store, User, Image } from 'lucide-react';
-import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';
 import Appearance from '@/components/Appearance';
@@ -36,6 +36,7 @@ export default function Home() {
 	const { data: session, status } = useSession();
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 
 	useEffect(() => {
 		hide();
@@ -47,6 +48,21 @@ export default function Home() {
 		if (!session) {
 			hide();
 			return;
+		}
+
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const redirectParam = params.get('redirect') || params.get('callbackUrl');
+			const saved = sessionStorage.getItem('xernerx_login_redirect');
+			const savedTs = Number(sessionStorage.getItem('xernerx_login_redirect_ts') || '0');
+			const target = redirectParam || (Date.now() - savedTs < 10 * 60 * 1000 ? saved : null);
+
+			if (target && target !== '/' && !target.includes('/login') && !target.includes('/logout')) {
+				sessionStorage.removeItem('xernerx_login_redirect');
+				sessionStorage.removeItem('xernerx_login_redirect_ts');
+				window.location.replace(target);
+				return;
+			}
 		}
 
 		show();
@@ -99,7 +115,7 @@ export default function Home() {
 				icon: Store,
 				label: t('common.nav.items.store'),
 				view: 'store',
-				href: '/store',
+				href: getEnvUrl('https://store.xernerx.com'),
 			},
 			{
 				category: t('common.nav.categories.billing'),
@@ -116,15 +132,18 @@ export default function Home() {
 			{
 				category: t('common.nav.categories.developer'),
 				icon: Image,
-				label: t('account.media.title') || 'Media Library',
+				label: t('account.media.title'),
 				view: 'media',
 			},
 		]);
 
 		if (!view) setView('profile');
-	}, [session, status, hide, show, setNavItems, view, setView, t]);
+	}, [session, status, hide, show, setNavItems, view, setView, t, getEnvUrl]);
 
-	if (!session && status !== 'loading') return redirect('/login');
+	if (!session && status !== 'loading') {
+		const search = typeof window !== 'undefined' ? window.location.search : '';
+		return redirect(`/login${search}`);
+	}
 
 	if (status === 'loading') return <Loading />;
 

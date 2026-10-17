@@ -1,8 +1,9 @@
 /** @format */
+// Force recompile
 'use client';
 
-import { BookOpen, CircleQuestionMark, FileText, Mail, MessageCircle, Package, Shield, Briefcase } from 'lucide-react';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
+import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import { BsGithub } from 'react-icons/bs';
@@ -11,6 +12,7 @@ import { motion } from 'framer-motion';
 
 export function Footer() {
 	const { getEnvUrl } = useEnvironment();
+	const { openPrompt } = useCookie();
 	const { t } = useDictionary();
 	const [isMounted, setIsMounted] = useState(false);
 
@@ -28,13 +30,13 @@ export function Footer() {
 		<motion.footer
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="relative w-full overflow-hidden bg-(--background) backdrop-blur-md"
+			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
 		>
 			{/* Fading top border */}
 			<div className="pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />
 
-			<div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
+			<div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
 				{/* ---------------------------------------------------------------- */}
 				{/* Brand */}
 				{/* ---------------------------------------------------------------- */}
@@ -42,15 +44,11 @@ export function Footer() {
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 						<h2 className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</h2>
 
-						<p className="max-w-md leading-7 text-(--text-muted)">
-							{t('common.footer.tagline', {}, 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.')}
-						</p>
+						<p className="max-w-md leading-7 text-(--text-muted)">{t('common.footer.tagline')}</p>
 					</div>
 
 					<div className="text-sm text-(--text-muted)">
-						{t('components.footer.text2')}
-						{new Date().getFullYear()}
-						{t('components.footer.text3')}
+						{t('components.footer.text2')} {new Date().getFullYear()} {t('components.footer.text3')}
 					</div>
 				</div>
 				{/* ---------------------------------------------------------------- */}
@@ -59,9 +57,20 @@ export function Footer() {
 				<FooterSection title={t('common.footer.sections.resources')}>
 					<FooterLink href={resolveUrl('https://xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
+					<FooterLink href={resolveUrl('https://xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
+					<FooterLink onClick={openPrompt} icon={SlidersHorizontal} label={t('common.footer.links.cookiePreferences')} />
+					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
+				</FooterSection>
+				{/* ---------------------------------------------------------------- */}
+				{/* Support */}
+				{/* ---------------------------------------------------------------- */}
+				<FooterSection title={t('common.footer.sections.support')}>
+					<FooterLink href={resolveUrl('https://info.xernerx.com')} icon={LifeBuoy} label={t('common.footer.links.help')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/issues')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
 					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers', 'Careers')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Developer */}
@@ -70,7 +79,7 @@ export function Footer() {
 					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
 					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
 					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} />
-					<FooterLink href="https://discord.gg/yrm8gqTuXa" icon={MessageCircle} label={t('common.footer.links.discord')} />
+					<FooterLink href="/support" icon={MessageCircle} label={t('common.footer.links.discord')} />
 				</FooterSection>
 			</div>
 		</motion.footer>
@@ -97,9 +106,9 @@ function FooterSection({ title, children }: { title?: string; children: React.Re
 /* Link */
 /* -------------------------------------------------------------------------- */
 
-function FooterLink({ href, icon: Icon, label, external = true }: { href: string; icon: React.ElementType; label?: string; external?: boolean }) {
+function FooterLink({ href, onClick, icon: Icon, label, external = true }: { href?: string; onClick?: () => void; icon: React.ElementType; label?: string; external?: boolean }) {
 	const className =
-		'group inline-flex items-center rounded-lg text-(--text-muted) transition-all duration-200 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] hover:text-(--text)';
+		'group inline-flex items-center rounded-lg text-(--text-muted) transition-all duration-200 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] hover:text-(--text) cursor-pointer text-left';
 
 	const linkStyle = {
 		padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
@@ -113,7 +122,15 @@ function FooterLink({ href, icon: Icon, label, external = true }: { href: string
 		</>
 	);
 
-	if (external) {
+	if (onClick) {
+		return (
+			<button type="button" onClick={onClick} className={className} style={linkStyle}>
+				{content}
+			</button>
+		);
+	}
+
+	if (external && href) {
 		return (
 			<a href={href} target="_blank" rel="noopener noreferrer" className={className} style={linkStyle}>
 				{content}
@@ -122,7 +139,7 @@ function FooterLink({ href, icon: Icon, label, external = true }: { href: string
 	}
 
 	return (
-		<Link href={href} className={className} style={linkStyle}>
+		<Link href={href || '#'} className={className} style={linkStyle}>
 			{content}
 		</Link>
 	);

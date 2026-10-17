@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { syncSisterServers } from '../sync';
+import { syncSisterServers } from '@/lib/sync/settings';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -17,9 +17,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		return NextResponse.json(setting, { status: 200 });
-	} catch (error) {
-		console.error('Failed to fetch setting:', error);
-		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+	} catch (error: any) {
+		console.warn('Failed to fetch setting:', error?.message || error);
+		return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
 	}
 }
 

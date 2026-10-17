@@ -2,15 +2,18 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, RotateCw, Search, SidebarClose, SidebarOpen, Square, X } from 'lucide-react';
-import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar } from '@xernerx/providers';
+import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, Monitor, RotateCw, Search, SidebarClose, SidebarOpen, Smartphone, Square, Tablet, User as UserIcon, X } from 'lucide-react';
+import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 import BannerCanary from '../../public/banner-canary.svg';
 import BannerDev from '../../public/banner-dev.svg';
 import BannerPublic from '../../public/banner.svg';
+import Image from 'next/image';
 import Link from 'next/link';
+import SidebarUserCard from './cards/SidebarUser';
 
 export function SubSelector({ name, options, defaultValue }: { name: string; options: string[]; defaultValue: string }) {
 	const [isOpen, setIsOpen] = useState(false);
@@ -64,32 +67,76 @@ export function SubSelector({ name, options, defaultValue }: { name: string; opt
 	);
 }
 
+const deviceIcons = {
+	desktop: Monitor,
+	mobile: Smartphone,
+	tablet: Tablet,
+} as const;
+
 export function Header() {
 	const { state, toggle, setMobileOpen, isMobileOpen } = useSidebar();
 	const { t } = useDictionary();
-	const { type } = usePlatform();
-	const { getEnvUrl } = useEnvironment();
+	const { type, device } = usePlatform();
+	const { getEnvUrl, isDev, isCanary } = useEnvironment();
 	const [maximized, setMaximized] = useState(false);
+	const [isElectron, setIsElectron] = useState(false);
+
+	const { data: session } = useSession();
+	const { user: discordUser } = useUser();
+	const activeUser = discordUser || session?.user;
+
+	const [userMenuOpen, setUserMenuOpen] = useState(false);
+	const userMenuRef = useRef<HTMLDivElement>(null);
 
 	const [isExpanded, setIsExpanded] = useState(true);
 
 	async function toggleMaximize() {
 		const electron = (window as any).electron;
 		await electron?.maximize?.();
-		setMaximized((await electron?.isMaximized?.())!);
+		setMaximized(Boolean(await electron?.isMaximized?.()));
 	}
 
-	const { isDev, isCanary } = useEnvironment();
 	const { setNavOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
 	const pathname = usePathname();
-	const searchParams = useSearchParams();
 
 	const [isMounted, setIsMounted] = useState(false);
 	useEffect(() => {
 		setIsMounted(true);
+		const electronBridge = (window as any).electron;
+		const detectedElectron = Boolean(electronBridge) || navigator.userAgent.toLowerCase().includes('electron');
+		setIsElectron(detectedElectron);
+		if (detectedElectron) {
+			document.documentElement.classList.add('is-electron');
+		}
+		electronBridge?.isMaximized?.()?.then?.((val: boolean) => setMaximized(Boolean(val)));
+
 		const timer = setTimeout(() => setIsExpanded(false), 2000);
 		return () => clearTimeout(timer);
 	}, []);
+
+	const isApp = type === 'application' || isElectron;
+
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+				setUserMenuOpen(false);
+			}
+		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
+
+	useEffect(() => {
+		setUserMenuOpen(false);
+	}, [pathname]);
+
+	const avatarUrl = activeUser?.avatar
+		? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
+		: activeUser?.image;
+	const decorationUrl = activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
+
+	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
+	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[12px] w-[12px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
 
 	const effectiveIsDev = isMounted ? isDev : false;
 	const effectiveIsCanary = isMounted ? isCanary : false;
@@ -110,12 +157,12 @@ export function Header() {
 		const env = host.includes('.dev.') || host === 'localhost' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 
 		let pre = 'app';
-		['www', 'api', 'docs', 'admin', 'account'].forEach((p) => {
+		['www', 'api', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => {
 			if (host.startsWith(`${p}.`)) pre = p;
 		});
 
-		const searchStr = searchParams.toString();
-		return { pre, env, path: pathname + (searchStr ? `?${searchStr}` : '') };
+		const searchStr = window.location.search;
+		return { pre, env, path: pathname + (searchStr || '') };
 	};
 
 	const urlState = getInitialUrlState();
@@ -133,7 +180,7 @@ export function Header() {
 				{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.8)]" />}
 				{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)]" />}
 
-				<div className="flex items-center">
+				<div className="flex items-center shrink-0" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
 					{state !== 'hidden' && (
 						<button
 							onClick={() => {
@@ -155,15 +202,15 @@ export function Header() {
 					</Link>
 				</div>
 
-				<div style={{ flex: 1, WebkitAppRegion: 'drag' } as React.CSSProperties} className="w-full h-full" />
+				<div style={{ flex: 1, WebkitAppRegion: 'drag' } as React.CSSProperties} className="h-full min-w-4" />
 
-				<div className="flex items-center gap-4">
-					{type !== 'application' && (
+				<div className="flex items-center gap-4 shrink-0 relative z-10" style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
+					{!isApp && (
 						<motion.div
 							animate={{ width: isExpanded ? 'auto' : '20px' }}
 							onHoverStart={() => setIsExpanded(true)}
 							onHoverEnd={() => setIsExpanded(false)}
-							className="hidden sm:flex items-center overflow-hidden"
+							className="hidden sm:flex [.is-electron_&]:!hidden items-center overflow-hidden"
 						>
 							<Link
 								suppressHydrationWarning
@@ -184,21 +231,63 @@ export function Header() {
 						</button>
 					)}
 
-					{type === 'application' && (
-						<>
-							<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => (window as any).electron?.minimize?.()}>
-								<Minus size={20} />
+					{isMounted && state === 'hidden' && activeUser && (
+						<div ref={userMenuRef} className="relative flex items-center">
+							<button
+								onClick={() => setUserMenuOpen((prev) => !prev)}
+								className="relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden"
+								title={activeUser?.global_name || activeUser?.name || 'User Profile'}
+							>
+								<div className="relative shrink-0">
+									{avatarUrl ? (
+										<div className="relative h-8 w-8">
+											<Image
+												src={avatarUrl}
+												alt={t('components.sidebar.alt')}
+												fill
+												className="rounded-full border border-(--border)/20 object-cover"
+												unoptimized
+												draggable={false}
+												loading="eager"
+											/>
+
+											{decorationUrl && (
+												<Image
+													src={decorationUrl}
+													alt={t('components.sidebar.alt2')}
+													fill
+													className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
+													unoptimized
+													draggable={false}
+												/>
+											)}
+										</div>
+									) : (
+										<div className="flex h-8 w-8 items-center justify-center rounded-full bg-(--foreground)/30 border border-(--border)/20">
+											<UserIcon size={16} className="text-(--text-muted)" />
+										</div>
+									)}
+									{DeviceIcon ? <DeviceIcon className={iconStyles} /> : <div className={`${iconStyles} rounded-full`} />}
+								</div>
 							</button>
 
-							<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={toggleMaximize}>
-								{maximized ? <Copy size={20} /> : <Square size={14} />}
-							</button>
-
-							<button className="text-(--text) cursor-pointer hover:text-(--accent-red)" onClick={() => (window as any).electron?.close?.()}>
-								<X size={20} />
-							</button>
-						</>
+							<AnimatePresence>{userMenuOpen && <SidebarUserCard activeUser={activeUser} placement="top" onClose={() => setUserMenuOpen(false)} />}</AnimatePresence>
+						</div>
 					)}
+
+					<div className={`${isApp ? 'flex' : 'hidden [.is-electron_&]:flex'} items-center gap-4`}>
+						<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => (window as any).electron?.minimize?.()}>
+							<Minus size={20} />
+						</button>
+
+						<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={toggleMaximize}>
+							{maximized ? <Copy size={20} /> : <Square size={14} />}
+						</button>
+
+						<button className="text-(--text) cursor-pointer hover:text-(--accent-red)" onClick={() => (window as any).electron?.close?.()}>
+							<X size={20} />
+						</button>
+					</div>
 				</div>
 			</header>
 			<AnimatePresence>

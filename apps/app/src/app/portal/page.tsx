@@ -1,18 +1,23 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Bot, Building2, Check, Compass, LayoutDashboard, Link2, Plus, Save, Server, Settings, Shield, Trash2, Upload, User, Users } from 'lucide-react';
-import { Button, Confirm, Input, Modal, Selector, Tabs } from '@xernerx/ui';
+import { Bot, Compass, LayoutDashboard, Plus, User } from 'lucide-react';
+import { Confirm, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
-
-import { BotRow } from '@xernerx/components';
-import { CircleFlag } from 'react-circle-flags';
-import Image from 'next/image';
-import Link from 'next/link';
 import { Loading } from '@xernerx/feedback';
-import ReactMarkdown from 'react-markdown';
 import { useRouter } from 'next/navigation';
+
+import PersonalWorkspace from '@/components/portal/PersonalWorkspace';
+import OrgWorkspaceHeader from '@/components/portal/OrgWorkspaceHeader';
+import OrgInfoTab from '@/components/portal/OrgInfoTab';
+import OrgMembersTab from '@/components/portal/OrgMembersTab';
+import OrgRolesTab from '@/components/portal/OrgRolesTab';
+import OrgBotsTab from '@/components/portal/OrgBotsTab';
+import OrgServersTab from '@/components/portal/OrgServersTab';
+import OrgLinksTab from '@/components/portal/OrgLinksTab';
+import OrgSettingsTab from '@/components/portal/OrgSettingsTab';
+import CreateOrgModal from '@/components/portal/CreateOrgModal';
 
 type Organization = {
 	_id: string;
@@ -27,21 +32,10 @@ type Organization = {
 	bannerUrl?: string | null;
 };
 
-const getFlagCode = (localeCode: string) => {
-	switch (localeCode) {
-		case 'en-GB':
-			return 'uk';
-		case 'en-US':
-			return 'us';
-		default:
-			return localeCode;
-	}
-};
-
 export default function PortalPage() {
 	const { data: session, status } = useSession();
 	const { getEnvUrl, isReady: envReady } = useEnvironment();
-	const { t, locales } = useDictionary();
+	const { t } = useDictionary();
 	const { setNavItems, clearNavItems, show, setView } = useSidebar();
 	const { toast, remind } = useToast();
 	const router = useRouter();
@@ -63,90 +57,110 @@ export default function PortalPage() {
 	const [loading, setLoading] = useState(true);
 
 	const [createModalOpen, setCreateModalOpen] = useState(false);
-	const [newOrgName, setNewOrgName] = useState('');
-	const [newOrgDescription, setNewOrgDescription] = useState('');
 	const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-	const [creatingOrg, setCreatingOrg] = useState(false);
-
-	const [inviteUserId, setInviteUserId] = useState('');
-	const [invitingMember, setInvitingMember] = useState(false);
 	const [activeTab, setActiveTab] = useState('info');
-	const [markdownPreview, setMarkdownPreview] = useState(false);
-	const [inviteUserObj, setInviteUserObj] = useState<any>(null);
-	const [inviteModalOpen, setInviteModalOpen] = useState(false);
-	const [fetchingUser, setFetchingUser] = useState(false);
 	const [pendingUploads, setPendingUploads] = useState<Record<string, File>>({});
+	const [uploadingMedia, setUploadingMedia] = useState<string | null>(null);
 
 	const isDirty = JSON.stringify(orgConfig) !== JSON.stringify(originalOrgConfig) || Object.keys(pendingUploads).length > 0;
+
 	useEffect(() => {
 		if (!envReady || status === 'loading') return;
 
 		if (status === 'unauthenticated') {
-			window.location.href = getEnvUrl('https://account.xernerx.com/login');
+			window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
 			return;
 		}
 
 		show();
 
-		const fetchOrganizations = async () => {
+		const populateDiscordBots = async (botList: any[]) => {
+			return Promise.all(
+				botList.map(async (bot: any) => {
+					if (bot.discord) return bot;
+					try {
+						const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
+						if (discordRes.ok) {
+							bot.discord = await discordRes.json();
+						}
+					} catch (e) {
+						console.error(`Failed to fetch discord user for bot ${bot.id}`, e);
+					}
+					return bot;
+				})
+			);
+		};
+
+		const fetchPortalData = async () => {
 			const sessionData = session as any;
 			if (!sessionData?.user?.id) {
 				setLoading(false);
 				return;
 			}
 
+			let userOrgs: Organization[] = [];
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?user=${sessionData.user.id}`), {
 					credentials: 'include',
 				});
 				if (res.ok) {
 					const data = await res.json();
-					setOrganizations(data);
+					userOrgs = Array.isArray(data) ? data : [];
+					setOrganizations(userOrgs);
 
 					const params = new URLSearchParams(window.location.search);
 					const orgParam = params.get('org');
 
+					let matched = false;
 					if (orgParam) {
-						const targetOrg = data.find((o: any) => o._id === orgParam);
+						const targetOrg = userOrgs.find((o: any) => o._id === orgParam);
 						if (targetOrg) {
 							setSelectedOrg(targetOrg);
 							setView(`org-${targetOrg._id}`);
-							return;
+							matched = true;
 						}
 					}
 
-					setSelectedOrg('personal');
-					setView('org-personal');
+					if (!matched) {
+						setSelectedOrg('personal');
+						setView('org-personal');
+					}
 				}
 			} catch (error) {
 				console.error('Failed to fetch organizations:', error);
 			} finally {
 				setLoading(false);
 			}
-		};
 
-		const fetchBots = async () => {
-			const sessionData = session as any;
-			if (!sessionData?.user?.id) return;
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${sessionData.user.id}`), { credentials: 'include' });
-				if (res.ok) {
-					const fetchedBots = await res.json();
-					const populatedBots = await Promise.all(
-						fetchedBots.map(async (bot: any) => {
-							try {
-								const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
-								if (discordRes.ok) {
-									bot.discord = await discordRes.json();
-								}
-							} catch (e) {
-								console.error(`Failed to fetch discord user for bot ${bot.id}`, e);
-							}
-							return bot;
-						})
-					);
-					setBots(populatedBots);
+				const [ownerRes, ...orgBotResponses] = await Promise.all([
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${sessionData.user.id}`), { credentials: 'include' }),
+					...userOrgs.map((org) => fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${org._id}`), { credentials: 'include' })),
+				]);
+
+				const botMap = new Map<string, any>();
+				if (ownerRes.ok) {
+					const ownerBots = await ownerRes.json();
+					if (Array.isArray(ownerBots)) {
+						ownerBots.forEach((b: any) => {
+							if (b?.id) botMap.set(b.id, b);
+						});
+					}
 				}
+
+				for (const orgBotRes of orgBotResponses) {
+					if (orgBotRes.ok) {
+						const orgBotsList = await orgBotRes.json();
+						if (Array.isArray(orgBotsList)) {
+							orgBotsList.forEach((b: any) => {
+								if (b?.id) botMap.set(b.id, b);
+							});
+						}
+					}
+				}
+
+				const populatedBots = await populateDiscordBots(Array.from(botMap.values()));
+				setBots(populatedBots);
 			} catch (error) {
 				console.error('Failed to fetch bots:', error);
 			}
@@ -172,8 +186,7 @@ export default function PortalPage() {
 			}
 		};
 
-		fetchOrganizations();
-		fetchBots();
+		fetchPortalData();
 		fetchGuilds();
 
 		return () => clearNavItems();
@@ -303,13 +316,13 @@ export default function PortalPage() {
 			const handleSave = async () => {
 				setSaving(true);
 				try {
-					let finalConfig = { ...orgConfig };
+					const finalConfig = { ...orgConfig };
 					for (const field of ['iconUrl', 'bannerUrl'] as const) {
 						if (pendingUploads[field]) {
 							const formData = new FormData();
 							formData.append('file', pendingUploads[field]);
 							formData.append('privacy', 'public');
-							const uploadRes = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
+							const uploadRes = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${(session?.user as any)?.id}`), {
 								method: 'POST',
 								body: formData,
 								credentials: 'include',
@@ -331,11 +344,11 @@ export default function PortalPage() {
 						setOrgConfig(finalConfig);
 						setOriginalOrgConfig(JSON.parse(JSON.stringify(finalConfig)));
 						setPendingUploads({});
-						toast({ title: 'Saved successfully!', type: 'success' });
+						toast({ title: t('common.toast.savedSuccess'), type: 'success' });
 						remind(false);
-					} else toast({ title: 'Failed to save', type: 'error' });
+					} else toast({ title: t('common.toast.saveFailed'), type: 'error' });
 				} catch (e) {
-					toast({ title: 'Error saving', type: 'error' });
+					toast({ title: t('common.toast.saveError'), type: 'error' });
 				} finally {
 					setSaving(false);
 				}
@@ -350,156 +363,7 @@ export default function PortalPage() {
 		} else {
 			remind(false);
 		}
-	}, [isDirty, saving, orgConfig, originalOrgConfig, selectedOrg, getEnvUrl, remind, toast]);
-
-	const handleCreateOrg = async () => {
-		if (!newOrgName.trim()) return;
-		setCreatingOrg(true);
-		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/organizations'), {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name: newOrgName.trim(), description: newOrgDescription.trim() || undefined }),
-				credentials: 'include',
-			});
-			if (res.ok) window.location.reload();
-			else toast({ title: 'Failed to create organization', type: 'error' });
-		} catch (error) {
-			toast({ title: 'Error creating organization', type: 'error' });
-		} finally {
-			setCreatingOrg(false);
-		}
-	};
-
-	const handlePreviewUser = async () => {
-		if (!inviteUserId.trim()) return;
-		setFetchingUser(true);
-		try {
-			const [discordRes, dbRes] = await Promise.all([
-				fetch(getEnvUrl(`https://api.xernerx.com/core/users/${inviteUserId.trim()}/discord`)),
-				fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${inviteUserId.trim()}`), { credentials: 'include' }).catch(() => null),
-			]);
-
-			if (discordRes.ok) {
-				const discordUser = await discordRes.json();
-				let dbUser: any = {};
-				let fullRoles: any[] = [];
-				if (dbRes && dbRes.ok) {
-					dbUser = await dbRes.json();
-
-					if (dbUser.roles && Array.isArray(dbUser.roles)) {
-						const rolePromises = dbUser.roles.map(async (roleItem: any) => {
-							const roleId = typeof roleItem === 'string' ? roleItem : roleItem.id;
-							if (!roleId) return null;
-							try {
-								const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/roles/${roleId}`), { credentials: 'include' });
-								if (res.ok) return await res.json();
-							} catch (e) {}
-							return null;
-						});
-						const fetched = await Promise.all(rolePromises);
-						fullRoles = fetched.filter(Boolean);
-					}
-				}
-				setInviteUserObj({ ...discordUser, dbData: dbUser, fullRoles });
-				setInviteModalOpen(true);
-			} else {
-				toast({ title: 'Not a valid user.', type: 'error' });
-			}
-		} catch (error) {
-			toast({ title: 'Not a valid user.', type: 'error' });
-		} finally {
-			setFetchingUser(false);
-		}
-	};
-
-	const confirmInviteMember = async () => {
-		if (!selectedOrg || selectedOrg === 'personal' || !inviteUserObj) return;
-		setInvitingMember(true);
-		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch`), {
-				method: 'POST',
-				credentials: 'include',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					targetId: inviteUserObj.id,
-					senderId: selectedOrg._id,
-					category: 'invite',
-					type: 'organization_invite',
-					status: 'pending',
-					data: {
-						organizationId: selectedOrg._id,
-						organizationName: selectedOrg.name,
-					},
-				}),
-			});
-			if (res.ok) {
-				setInviteUserId('');
-				setInviteModalOpen(false);
-				toast({ title: 'Invite sent successfully!', type: 'success' });
-			} else {
-				const data = await res.json();
-				toast({ title: data.error || 'Failed to send invite.', type: 'error' });
-			}
-		} catch (error) {
-			toast({ title: 'An error occurred while sending the invite.', type: 'error' });
-		} finally {
-			setInvitingMember(false);
-		}
-	};
-
-	const handleUpdateMemberRoles = async (userId: string, roles: string[]) => {
-		if (!selectedOrg || selectedOrg === 'personal') return;
-		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${selectedOrg._id}/members`), {
-				method: 'PATCH',
-				credentials: 'include',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ userId, roles }),
-			});
-			if (res.ok) {
-				const updatedMember = await res.json();
-				setOrgMembers((prev) => {
-					const existing = prev.find((m) => m.userId === userId);
-					if (existing) {
-						return prev.map((m) => (m.userId === userId ? updatedMember : m));
-					}
-					return [...prev, updatedMember];
-				});
-				toast({ title: 'Roles updated', type: 'success' });
-			} else {
-				toast({ title: 'Failed to update roles', type: 'error' });
-			}
-		} catch (error) {
-			toast({ title: 'An error occurred while updating roles', type: 'error' });
-		}
-	};
-
-	const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
-
-	const handleRemoveMember = async () => {
-		if (!memberToRemove || !selectedOrg || selectedOrg === 'personal') return;
-		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${selectedOrg._id}`), {
-				method: 'PATCH',
-				credentials: 'include',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ action: 'remove_member', targetId: memberToRemove }),
-			});
-			if (res.ok) {
-				const updatedOrg = await res.json();
-				setOrgConfig(updatedOrg);
-				setOriginalOrgConfig(updatedOrg);
-				toast({ title: 'Member removed', type: 'success' });
-			} else {
-				toast({ title: 'Failed to remove member', type: 'error' });
-			}
-		} catch (error) {
-			toast({ title: 'An error occurred while removing member', type: 'error' });
-		} finally {
-			setMemberToRemove(null);
-		}
-	};
+	}, [isDirty, saving, orgConfig, originalOrgConfig, selectedOrg, getEnvUrl, remind, toast, t]);
 
 	const handleDeleteOrg = async () => {
 		if (!selectedOrg || selectedOrg === 'personal') return;
@@ -510,47 +374,13 @@ export default function PortalPage() {
 				credentials: 'include',
 			});
 			if (res.ok) window.location.reload();
-			else toast({ title: 'Failed to delete organization', type: 'error' });
+			else toast({ title: t('app.portal.toast.deleteFailed'), type: 'error' });
 		} catch (error) {
-			toast({ title: 'Error deleting organization', type: 'error' });
+			toast({ title: t('app.portal.toast.deleteError'), type: 'error' });
 		} finally {
 			setDeleting(false);
 		}
 	};
-
-	const renderMemberActions = (userId: string) => {
-		if (!selectedOrg || selectedOrg === 'personal') return null;
-
-		const currentOrg = selectedOrg as Organization;
-		const isOwner = (session?.user as any)?.id === currentOrg.owner;
-		if (!isOwner) return null;
-
-		const memberObj = orgMembers.find((m) => m.userId === userId);
-		const userRole = memberObj?.roles?.[0] || '';
-
-		const roleOptions = [{ value: '', label: 'No Role' }, ...(orgConfig?.roles || []).map((r: any) => ({ value: r.id, label: r.name }))];
-
-		return (
-			<div className="flex flex-wrap items-center justify-end gap-2 shrink-0 ml-4">
-				<div className="w-40">
-					<Selector
-						value={userRole}
-						onChange={(val) => {
-							handleUpdateMemberRoles(userId, val ? [val] : []);
-						}}
-						options={roleOptions}
-					/>
-				</div>
-				{userId !== currentOrg.owner && (
-					<Button variant="danger" size="icon" onClick={() => setMemberToRemove(userId)}>
-						<Trash2 size={16} />
-					</Button>
-				)}
-			</div>
-		);
-	};
-
-	const [uploadingMedia, setUploadingMedia] = useState<string | null>(null);
 
 	const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'iconUrl' | 'bannerUrl') => {
 		const file = e.target.files?.[0];
@@ -578,736 +408,65 @@ export default function PortalPage() {
 				}}
 			>
 				{selectedOrg === 'personal' ? (
-					<>
-						<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-							<div className="relative flex items-center rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
-								<div className="relative z-10 flex items-center w-full gap-4">
-									{session?.user?.image ? (
-										<img src={session.user.image} alt="Avatar" className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
-									) : (
-										<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-											<User className="w-8 h-8 text-(--text-muted)" />
-										</div>
-									)}
-									<div className="flex flex-col gap-1">
-										<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-											{session?.user?.name || t('app.portal.nav.personal')}
-										</span>
-										<span className="text-sm font-medium text-(--text-muted)">{t('app.portal.myWorkspace')}</span>
-									</div>
-								</div>
-							</div>
-
-							<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-								<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-									<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-										<Bot className="w-4 h-4" />
-									</div>
-									{t('app.portal.personalBots')}
-								</div>
-								<div className="flex flex-col items-center justify-center w-full">
-									{bots.filter((b) => !b.organization || b.organization === 'null' || b.organization === 'undefined' || !organizations.some((org) => org._id === b.organization))
-										.length > 0 ? (
-										<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm">
-											{bots
-												.filter(
-													(b) => !b.organization || b.organization === 'null' || b.organization === 'undefined' || !organizations.some((org) => org._id === b.organization)
-												)
-												.map((bot) => (
-													<BotRow key={bot._id} bot={bot} hrefPrefix="/portal/bots" />
-												))}
-										</div>
-									) : (
-										<div className="flex flex-col items-center justify-center p-8 bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed w-full">
-											<Bot className="w-8 h-8 text-(--text-muted) opacity-50 mb-3" />
-											<p className="text-sm text-(--text-muted) mb-4">{t('app.portal.noBots')}</p>
-											<div className="text-xs text-(--text-muted) bg-(--background) border border-(--border)/20 px-4 py-2 rounded-lg">{t('app.portal.botsAutoRegister')}</div>
-										</div>
-									)}
-								</div>
-							</div>
-						</div>
-					</>
+					<PersonalWorkspace session={session} bots={bots} organizations={organizations} />
 				) : selectedOrg ? (
-					<>
-						<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-							<div className="relative flex items-center rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
-								{selectedOrg.bannerUrl && (
-									<div
-										className="absolute inset-0 z-0 opacity-20"
-										style={{ backgroundImage: `url(${selectedOrg.bannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+						<OrgWorkspaceHeader organization={selectedOrg} />
+
+						{configLoading ? (
+							<div className="flex flex-col w-full h-full text-center items-center justify-center py-20 text-(--text-muted)">
+								<Loading variant="default" />
+							</div>
+						) : orgConfig ? (
+							<div className="flex flex-col w-full gap-8 mt-4">
+								<Tabs
+									activeTab={activeTab}
+									onChange={setActiveTab}
+									tabs={[
+										{ id: 'info', label: t('app.portal.tabs.info') },
+										{ id: 'members', label: t('app.portal.tabs.members') },
+										{ id: 'roles', label: t('app.portal.tabs.roles') },
+										{ id: 'bots', label: t('app.portal.tabs.bots') },
+										{ id: 'servers', label: t('app.portal.tabs.servers') },
+										{ id: 'links', label: t('app.portal.tabs.links') },
+										{ id: 'settings', label: t('app.portal.tabs.settings') },
+									]}
+								/>
+
+								{activeTab === 'info' && (
+									<OrgInfoTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} pendingUploads={pendingUploads} handleUpload={handleUpload} uploadingMedia={uploadingMedia} />
+								)}
+
+								{activeTab === 'members' && (
+									<OrgMembersTab
+										session={session}
+										selectedOrg={selectedOrg}
+										orgConfig={orgConfig}
+										setOrgConfig={setOrgConfig}
+										setOriginalOrgConfig={setOriginalOrgConfig}
+										memberProfiles={memberProfiles}
+										pendingInvites={pendingInvites}
+										orgMembers={orgMembers}
+										setOrgMembers={setOrgMembers}
 									/>
 								)}
-								<div className="relative z-10 flex items-center w-full gap-4">
-									{selectedOrg.iconUrl ? (
-										<img
-											src={getEnvUrl(selectedOrg.iconUrl)}
-											alt={selectedOrg.name}
-											className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
-										/>
-									) : (
-										<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-											<Building2 className="w-8 h-8 text-(--text-muted)" />
-										</div>
-									)}
-									<div className="flex flex-col gap-1">
-										<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-											{selectedOrg.name}
-										</span>
-										<span className="text-sm font-medium text-(--text-muted)">ID: {selectedOrg._id}</span>
-									</div>
-								</div>
+
+								{activeTab === 'roles' && <OrgRolesTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} />}
+
+								{activeTab === 'bots' && <OrgBotsTab bots={bots} selectedOrg={selectedOrg} />}
+
+								{activeTab === 'servers' && <OrgServersTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} orgGuilds={orgGuilds} />}
+
+								{activeTab === 'links' && <OrgLinksTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} />}
+
+								{activeTab === 'settings' && <OrgSettingsTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} setIsConfirmDeleteOpen={setIsConfirmDeleteOpen} />}
 							</div>
-
-							{configLoading ? (
-								<div className="flex flex-col w-full h-full text-center items-center justify-center py-20 text-(--text-muted)">
-									<Loading variant="default" />
-								</div>
-							) : orgConfig ? (
-								<div className="flex flex-col w-full gap-8 mt-4">
-									<Tabs
-										activeTab={activeTab}
-										onChange={setActiveTab}
-										tabs={[
-											{ id: 'info', label: t('app.portal.tabs.info') },
-											{ id: 'members', label: t('app.portal.tabs.members') },
-											{ id: 'roles', label: 'Roles' },
-											{ id: 'bots', label: t('app.portal.tabs.bots') },
-											{ id: 'servers', label: t('app.portal.tabs.servers') },
-											{ id: 'links', label: t('app.portal.tabs.links') },
-											{ id: 'settings', label: t('app.portal.tabs.settings') },
-										]}
-									/>
-
-									{activeTab === 'info' && (
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Building2 className="w-4 h-4" />
-												</div>
-												{t('app.portal.orgProfile')}
-											</div>
-											<div className="flex flex-col gap-5">
-												<div className="relative mb-14">
-													<div className="relative h-48 w-full rounded-[2rem] overflow-hidden border border-(--border)/10 shadow-sm bg-(--background)/50 group/banner">
-														{pendingUploads.bannerUrl || orgConfig.bannerUrl ? (
-															<img
-																src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : getEnvUrl(orgConfig.bannerUrl as string)}
-																alt="Banner"
-																className="w-full h-full object-cover"
-															/>
-														) : (
-															<div className="w-full h-full bg-(--foreground)/30" />
-														)}
-														<label className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/50 opacity-0 group-hover/banner:opacity-100 transition-opacity cursor-pointer">
-															{uploadingMedia === 'bannerUrl' ? <Loading variant="small" /> : <Upload className="w-6 h-6 text-white" />}
-															<span className="text-white font-medium text-sm">
-																{pendingUploads.bannerUrl || orgConfig.bannerUrl ? 'Change Banner' : 'Upload Banner'}
-															</span>
-															<input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, 'bannerUrl')} disabled={uploadingMedia !== null} />
-														</label>
-													</div>
-
-													<div className="absolute left-8 -bottom-10 rounded-full border-4 border-(--background) shadow-lg bg-(--background) group/avatar z-10">
-														<div className="relative w-24 h-24 rounded-full overflow-hidden bg-(--background)">
-															{pendingUploads.iconUrl || orgConfig.iconUrl ? (
-																<img
-																	src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : getEnvUrl(orgConfig.iconUrl as string)}
-																	alt="Avatar"
-																	className="w-full h-full object-cover"
-																/>
-															) : (
-																<div className="w-full h-full bg-(--foreground)/50 flex items-center justify-center">
-																	<Building2 className="w-10 h-10 text-(--text-muted)" />
-																</div>
-															)}
-															<label className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity cursor-pointer">
-																{uploadingMedia === 'iconUrl' ? <Loading variant="small" /> : <Upload className="w-5 h-5 text-white" />}
-																<span className="text-white font-medium text-[10px]">Edit Avatar</span>
-																<input
-																	type="file"
-																	accept="image/*"
-																	className="hidden"
-																	onChange={(e) => handleUpload(e, 'iconUrl')}
-																	disabled={uploadingMedia !== null}
-																/>
-															</label>
-														</div>
-													</div>
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.name')}</label>
-													<Input
-														value={orgConfig.name || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, name: e.target.value })}
-														placeholder={t('app.portal.placeholders.orgName')}
-													/>
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.description')}</label>
-													<Input
-														value={orgConfig.description || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, description: e.target.value })}
-														placeholder={t('app.portal.placeholders.shortDesc')}
-													/>
-												</div>
-												<div className="flex flex-col gap-2">
-													<div className="flex items-center justify-between">
-														<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
-														<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
-															<button
-																onClick={() => setMarkdownPreview(false)}
-																className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-															>
-																Write
-															</button>
-															<button
-																onClick={() => setMarkdownPreview(true)}
-																className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-															>
-																Preview
-															</button>
-														</div>
-													</div>
-
-													{markdownPreview ? (
-														<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
-															{orgConfig.info ? <ReactMarkdown>{orgConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">Nothing to preview</span>}
-														</div>
-													) : (
-														<textarea
-															value={orgConfig.info || ''}
-															onChange={(e) => setOrgConfig({ ...orgConfig, info: e.target.value })}
-															placeholder={t('app.portal.placeholders.extendedInfo')}
-															className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
-														/>
-													)}
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.locale')}</label>
-													<Selector
-														value={orgConfig.locale || ''}
-														onChange={(val) => setOrgConfig({ ...orgConfig, locale: val })}
-														options={[
-															{ label: t('app.portal.options.default'), value: '' },
-															...(locales?.map((lang: any) => {
-																const countryCode = getFlagCode(lang.code);
-																return {
-																	value: lang.code,
-																	label: (
-																		<div className="flex items-center gap-2.5">
-																			<CircleFlag countryCode={countryCode} className="h-4 w-4 shrink-0" />
-																			<span className="font-medium">{lang.label}</span>
-																		</div>
-																	),
-																	badge: (
-																		<span
-																			className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${
-																				lang.coverage === 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-																			}`}
-																		>
-																			{lang.coverage}%
-																		</span>
-																	),
-																};
-															}) || []),
-														]}
-													/>
-												</div>
-											</div>
-										</div>
-									)}
-
-									{activeTab === 'members' && (
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Users className="w-4 h-4" />
-												</div>
-												{t('app.portal.members.header')}
-											</div>
-											<div className="flex flex-col gap-6">
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.members.currentMembers')}</label>
-													<div className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
-														<div className="flex items-center justify-between text-sm">
-															<div className="flex items-center gap-2">
-																{memberProfiles[selectedOrg.owner]?.avatar ? (
-																	<img
-																		src={`https://cdn.discordapp.com/avatars/${selectedOrg.owner}/${memberProfiles[selectedOrg.owner].avatar}.png`}
-																		alt="Avatar"
-																		className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-																	/>
-																) : (
-																	<div className="w-6 h-6 rounded-full bg-(--accent)/10 flex items-center justify-center border border-(--accent)/20 shadow-sm">
-																		<User className="w-3 h-3 text-(--accent)" />
-																	</div>
-																)}
-																<span className="text-(--text) font-medium flex items-center gap-2 flex-wrap">
-																	{memberProfiles[selectedOrg.owner]?.global_name ||
-																		memberProfiles[selectedOrg.owner]?.username ||
-																		t('app.portal.members.unknownUser')}
-																	<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
-																		{selectedOrg.owner}
-																	</span>
-																	<span className="text-(--accent) text-[10px] font-bold uppercase tracking-widest bg-(--accent)/10 px-2 py-0.5 rounded-full ml-1 border border-(--accent)/20">
-																		{t('app.portal.members.owner')}
-																	</span>
-																</span>
-															</div>
-															{renderMemberActions(selectedOrg.owner)}
-														</div>
-														{orgConfig?.members?.length > 0 ? (
-															orgConfig.members.map((memberId: string) => (
-																<div key={memberId} className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-(--border)/5">
-																	<div className="flex items-center gap-2">
-																		{memberProfiles[memberId]?.avatar ? (
-																			<img
-																				src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
-																				alt="Avatar"
-																				className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-																			/>
-																		) : (
-																			<div className="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm">
-																				<User className="w-3 h-3 text-(--text-muted)" />
-																			</div>
-																		)}
-																		<span className="text-(--text) font-medium flex items-center gap-2 flex-wrap">
-																			{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
-																			<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
-																				{memberId}
-																			</span>
-																		</span>
-																	</div>
-																	{renderMemberActions(memberId)}
-																</div>
-															))
-														) : (
-															<span className="text-xs text-(--text-muted) mt-2 pt-2 border-t border-(--border)/5">{t('app.portal.members.noMembers')}</span>
-														)}
-													</div>
-												</div>
-												{pendingInvites.length > 0 && (
-													<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
-														<label className="text-sm font-bold text-(--text)">{t('app.portal.members.pendingInvitations')}</label>
-														<div className="flex flex-col gap-2 p-4 bg-(--background)/50 rounded-2xl border border-(--border)/10">
-															{pendingInvites.map((app) => {
-																const profile = memberProfiles[app.userId];
-																return (
-																	<div
-																		key={app.id}
-																		className="flex items-center justify-between text-sm mt-2 first:mt-0 pt-2 first:pt-0 border-t first:border-t-0 border-(--border)/5"
-																	>
-																		<div className="flex items-center gap-2">
-																			{profile?.avatar ? (
-																				<img
-																					src={`https://cdn.discordapp.com/avatars/${app.userId}/${profile.avatar}.png`}
-																					className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-																				/>
-																			) : (
-																				<div className="w-6 h-6 rounded-full bg-(--foreground)/30 flex items-center justify-center border border-(--border)/10 shadow-sm text-(--text-muted)">
-																					<User className="w-3 h-3 text-(--text-muted)" />
-																				</div>
-																			)}
-																			<span className="text-(--text) font-medium flex items-center gap-2">
-																				{profile?.global_name || profile?.username || t('app.portal.members.unknownUser')}
-																				<span className="text-(--text-muted) text-[10px] font-mono bg-(--background)/50 px-1.5 py-0.5 rounded border border-(--border)/10">
-																					{app.userId}
-																				</span>
-																			</span>
-																		</div>
-																		<div className="text-[10px] font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20 uppercase tracking-widest shadow-sm">
-																			{t('app.portal.members.pending')}
-																		</div>
-																	</div>
-																);
-															})}
-														</div>
-													</div>
-												)}
-												<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.members.inviteMember')}</label>
-													<div className="flex items-center gap-2">
-														<Input
-															value={inviteUserId}
-															onChange={(e) => setInviteUserId(e.target.value)}
-															placeholder={t('app.portal.members.invitePlaceholder')}
-															className="flex-1 bg-(--background)/50 border-(--border)/10"
-														/>
-														<Button variant="primary" onClick={handlePreviewUser} loading={fetchingUser} disabled={!inviteUserId.trim()}>
-															{t('app.portal.members.inviteButton')}
-														</Button>
-													</div>
-													<span className="text-xs text-(--text-muted) mt-1">{t('app.portal.members.inviteHelp')}</span>
-												</div>
-											</div>
-										</div>
-									)}
-
-									{activeTab === 'roles' && (
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center justify-between mb-6">
-												<div className="flex items-center gap-3 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-													<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-														<Shield className="w-4 h-4" />
-													</div>
-													Roles
-												</div>
-												<Button
-													variant="primary"
-													onClick={() => {
-														const newRole = { id: `role-${Date.now()}`, name: 'New Role', permissions: '0' };
-														setOrgConfig({ ...orgConfig, roles: [...(orgConfig.roles || []), newRole] });
-													}}
-													className="shadow-sm text-xs py-1.5 h-auto"
-												>
-													<Plus className="w-4 h-4 mr-1" />
-													Add Role
-												</Button>
-											</div>
-											<p className="text-sm text-(--text-muted) mb-6">Define custom roles for your organization. Currently, these act as titles for your team members.</p>
-
-											<div className="flex flex-col gap-4">
-												{!orgConfig.roles || orgConfig.roles.length === 0 ? (
-													<div className="text-center py-10 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10">No roles defined yet.</div>
-												) : (
-													orgConfig.roles.map((role: any, index: number) => (
-														<div key={role.id} className="flex items-center gap-4 bg-(--background)/50 border border-(--border)/10 p-4 rounded-2xl">
-															<div className="flex flex-col flex-1 gap-1">
-																<Input
-																	value={role.name}
-																	onChange={(e) => {
-																		const newRoles = orgConfig.roles.map((r: any, i: number) => (i === index ? { ...r, name: e.target.value } : r));
-																		setOrgConfig({ ...orgConfig, roles: newRoles });
-																	}}
-																	placeholder="Role Name (e.g. Developer)"
-																	className="w-full sm:w-64"
-																/>
-															</div>
-															<button
-																onClick={() => {
-																	const newRoles = orgConfig.roles.filter((r: any) => r.id !== role.id);
-																	setOrgConfig({ ...orgConfig, roles: newRoles });
-																}}
-																className="p-2 rounded-xl text-red-400 hover:bg-red-400/10 transition-colors"
-															>
-																<Trash2 className="w-5 h-5" />
-															</button>
-														</div>
-													))
-												)}
-											</div>
-										</div>
-									)}
-
-									{activeTab === 'bots' && (
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Bot className="w-4 h-4" />
-												</div>
-												{t('app.portal.bots.header')}
-											</div>
-											<div className="flex flex-col items-center justify-center w-full">
-												{bots.filter((b) => b.organization === selectedOrg._id).length > 0 ? (
-													<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm">
-														{bots
-															.filter((b) => b.organization === selectedOrg._id)
-															.map((bot) => (
-																<BotRow key={bot.id} bot={bot} hrefPrefix="/portal/bots" />
-															))}
-													</div>
-												) : (
-													<div className="flex flex-col items-center justify-center p-8 bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed w-full">
-														<Bot className="w-8 h-8 text-(--text-muted) opacity-50 mb-3" />
-														<p className="text-sm text-(--text-muted) mb-4">{t('app.portal.bots.noBots')}</p>
-													</div>
-												)}
-											</div>
-										</div>
-									)}
-
-									{activeTab === 'servers' && (
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Server className="w-4 h-4" />
-												</div>
-												{t('app.portal.servers.header')}
-											</div>
-											<div className="flex flex-col gap-6">
-												<p className="text-sm text-(--text-muted)">{t('app.portal.servers.desc')}</p>
-												<div className="flex flex-col gap-2">
-													{orgGuilds.length > 0 ? (
-														<Selector
-															value={orgConfig?.guild || ''}
-															onChange={(val) => setOrgConfig({ ...orgConfig, guild: val })}
-															options={[
-																{ label: t('app.portal.servers.none'), value: '' },
-																...orgGuilds.map((guild) => ({
-																	value: guild.id,
-																	label: (
-																		<div className="flex items-center gap-3">
-																			{guild.icon ? (
-																				<img
-																					src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`}
-																					alt={guild.name}
-																					className="w-5 h-5 rounded-full object-cover shadow-sm border border-(--border)/10"
-																				/>
-																			) : (
-																				<div className="w-5 h-5 rounded-full bg-(--foreground)/50 flex items-center justify-center text-(--text-muted) font-bold text-[10px] shadow-sm border border-(--border)/10">
-																					{guild.name.charAt(0)}
-																				</div>
-																			)}
-																			<span className="font-medium">{guild.name}</span>
-																		</div>
-																	),
-																})),
-															]}
-														/>
-													) : (
-														<div className="flex flex-col items-center justify-center py-10 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed">
-															<Server className="w-8 h-8 mb-4 opacity-30" />
-															<p className="text-sm">{t('app.portal.servers.noLinked')}</p>
-															<p className="text-xs mt-1">{t('app.portal.servers.transferFirst')}</p>
-														</div>
-													)}
-												</div>
-
-												<div className="flex flex-col gap-2 mt-4 pt-4 border-t border-(--border)/10">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.servers.linkedServers')}</label>
-													<span className="text-xs text-(--text-muted)">{t('app.portal.servers.transferred')}</span>
-													{orgGuilds.length > 0 ? (
-														<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm mt-2">
-															{orgGuilds.map((g: any) => (
-																<Link
-																	href={`/dashboard`}
-																	key={g.id}
-																	className="flex items-center justify-between gap-4 p-4 hover:bg-(--foreground)/50 border-b border-(--border)/10 last:border-0 transition-colors"
-																>
-																	<div className="flex items-center gap-4">
-																		{g.icon ? (
-																			<img
-																				src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`}
-																				alt={g.name}
-																				className="w-10 h-10 rounded-full shadow-sm object-cover"
-																			/>
-																		) : (
-																			<div className="w-10 h-10 bg-(--background) rounded-full flex items-center justify-center font-bold shadow-sm">
-																				{g.name?.charAt(0) || 'S'}
-																			</div>
-																		)}
-																		<div className="flex flex-col">
-																			<span className="font-bold text-(--text)">{g.name}</span>
-																			<span className="text-xs text-(--text-muted)">{g.id}</span>
-																		</div>
-																	</div>
-																	<LayoutDashboard className="w-5 h-5 text-(--text-muted) opacity-50 group-hover:opacity-100 transition-opacity" />
-																</Link>
-															))}
-														</div>
-													) : (
-														<div className="flex flex-col items-center justify-center py-6 text-(--text-muted) bg-(--background)/50 rounded-2xl border border-(--border)/10 border-dashed mt-2">
-															<p className="text-sm">{t('app.portal.servers.noServers')}</p>
-														</div>
-													)}
-												</div>
-											</div>
-										</div>
-									)}
-
-									{activeTab === 'links' && (
-										<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-											<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-												<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-													<Link2 className="w-4 h-4" />
-												</div>
-												{t('app.portal.links.header')}
-											</div>
-											<div className="flex flex-col gap-5">
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.website')}</label>
-													<Input
-														value={orgConfig.links?.website || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, website: e.target.value } })}
-														placeholder="https://..."
-													/>
-												</div>
-
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.github')}</label>
-													<Input
-														value={orgConfig.links?.github || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, github: e.target.value } })}
-														placeholder="https://github.com/..."
-													/>
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.privacy')}</label>
-													<Input
-														value={orgConfig.links?.privacy || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, privacy: e.target.value } })}
-														placeholder="https://..."
-													/>
-												</div>
-												<div className="flex flex-col gap-2">
-													<label className="text-sm font-bold text-(--text)">{t('app.portal.links.terms')}</label>
-													<Input
-														value={orgConfig.links?.terms || ''}
-														onChange={(e) => setOrgConfig({ ...orgConfig, links: { ...orgConfig.links, terms: e.target.value } })}
-														placeholder="https://..."
-													/>
-												</div>
-											</div>
-										</div>
-									)}
-
-									{activeTab === 'settings' && (
-										<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-											<div
-												className="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-												style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-											>
-												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-													<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-														<Shield size={18} />
-														<h3>{t('app.portal.settings.privacySetting')}</h3>
-													</div>
-													<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.portal.settings.privacyDesc')}</div>
-												</div>
-												<div className="w-full sm:w-48 shrink-0">
-													<Selector
-														value={orgConfig.privacy || 'private'}
-														onChange={(val) => setOrgConfig({ ...orgConfig, privacy: val })}
-														options={[
-															{ label: t('app.portal.settings.public'), value: 'public' },
-															{ label: t('app.portal.settings.limited'), value: 'limited' },
-															{ label: t('app.portal.settings.private'), value: 'private' },
-														]}
-													/>
-												</div>
-											</div>
-											{/* Reset Data Card */}
-											<div
-												className="relative z-20 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
-												style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-											>
-												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-													<div className="flex items-center text-(--accent-orange) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-														<AlertTriangle size={18} />
-														<h3>{t('app.portal.settings.resetData')}</h3>
-													</div>
-													<p className="text-xs text-(--accent-orange)/80">{t('app.portal.settings.resetDesc')}</p>
-												</div>
-												<button
-													onClick={() => setOrgConfig({ ...orgConfig, description: '', info: '', locale: '', links: {} })}
-													className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
-													style={{
-														padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-														gap: 'calc(var(--ui-gap) * 0.5)',
-													}}
-												>
-													<Trash2 size={16} />
-													<span>{t('app.portal.settings.resetData')}</span>
-												</button>
-											</div>
-
-											{/* Delete Organization Card */}
-											<div
-												className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
-												style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-											>
-												<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-													<div className="flex items-center text-(--accent-red) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-														<AlertTriangle size={18} />
-														<h3>{t('app.portal.settings.deleteOrg')}</h3>
-													</div>
-													<p className="text-xs text-(--accent-red)/80">{t('app.portal.settings.deleteDesc')}</p>
-												</div>
-												<button
-													onClick={() => setIsConfirmDeleteOpen(true)}
-													className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm disabled:opacity-50 disabled:pointer-events-none"
-													style={{
-														padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-														gap: 'calc(var(--ui-gap) * 0.5)',
-													}}
-												>
-													<Trash2 size={16} />
-													<span>{t('app.portal.settings.deleteOrg')}</span>
-												</button>
-											</div>
-										</div>
-									)}
-								</div>
-							) : null}
-						</div>
-					</>
+						) : null}
+					</div>
 				) : null}
 			</div>
 
-			<Modal open={createModalOpen} onOpenChange={setCreateModalOpen} title={t('app.portal.modals.create.title')} description={t('app.portal.modals.create.desc')}>
-				<div className="flex flex-col gap-4 py-4">
-					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">{t('app.portal.modals.create.nameLabel')}</label>
-						<Input value={newOrgName} onChange={(e) => setNewOrgName(e.target.value)} placeholder={t('app.portal.modals.create.namePlaceholder')} autoFocus />
-					</div>
-					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">{t('app.portal.modals.create.descLabel')}</label>
-						<Input value={newOrgDescription} onChange={(e) => setNewOrgDescription(e.target.value)} placeholder={t('app.portal.modals.create.descPlaceholder')} />
-					</div>
-				</div>
-				<div className="flex justify-end gap-2">
-					<Button variant="ghost" onClick={() => setCreateModalOpen(false)}>
-						{t('app.portal.modals.create.cancel')}
-					</Button>
-					<Button variant="primary" onClick={handleCreateOrg} loading={creatingOrg} disabled={!newOrgName.trim() || creatingOrg}>
-						{t('app.portal.modals.create.confirm')}
-					</Button>
-				</div>
-			</Modal>
-
-			<Modal open={inviteModalOpen} onOpenChange={setInviteModalOpen} title={t('app.portal.modals.invite.title')} description={t('app.portal.modals.invite.desc')}>
-				{inviteUserObj && (
-					<div className="flex flex-col items-center justify-center gap-4 bg-(--background)/50 p-6 rounded-3xl border border-(--border)/10">
-						<div className="flex flex-col gap-2 p-4 bg-(--background)/50 rounded-2xl border border-(--border)/10">
-							<div className="flex items-center gap-4">
-								{inviteUserObj.avatarUrl ? (
-									<img src={inviteUserObj.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full shadow-sm" />
-								) : (
-									<div className="w-12 h-12 bg-(--border)/10 rounded-full flex items-center justify-center">
-										<User className="text-(--text-muted) w-6 h-6" />
-									</div>
-								)}
-								<div className="flex flex-col">
-									<span className="font-bold text-(--text) text-lg">{inviteUserObj.global_name || inviteUserObj.username}</span>
-									<span className="text-sm text-(--text-muted)">@{inviteUserObj.username}</span>
-								</div>
-							</div>
-
-							{inviteUserObj.fullRoles && inviteUserObj.fullRoles.length > 0 && (
-								<div className="flex flex-wrap gap-2 mt-2 pt-2 border-t border-(--border)/5">
-									{inviteUserObj.fullRoles.map((role: any) => (
-										<span
-											key={role._id || role.id}
-											className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) uppercase border border-(--accent)/20"
-										>
-											{role.name}
-										</span>
-									))}
-								</div>
-							)}
-						</div>
-					</div>
-				)}
-				<div className="flex justify-end gap-2 mt-4 pt-4 border-t border-(--border)/10">
-					<Button variant="ghost" onClick={() => setInviteModalOpen(false)} disabled={invitingMember}>
-						{t('app.portal.modals.invite.cancel')}
-					</Button>
-					<Button variant="primary" onClick={confirmInviteMember} loading={invitingMember}>
-						{t('app.portal.modals.invite.confirm')}
-					</Button>
-				</div>
-			</Modal>
+			<CreateOrgModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
 			<Confirm
 				open={isConfirmDeleteOpen}

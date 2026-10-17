@@ -1,0 +1,91 @@
+/** @format */
+// Force recompile
+
+import './globals.css';
+
+import { Locale, dictionary, getThemeLayoutProps } from '@xernerx/lib/server';
+
+import { AppLayout } from '@xernerx/components';
+import type { Metadata } from 'next';
+import { SessionProvider, PermissionProvider } from '@xernerx/providers';
+import { auth } from '@xernerx/lib';
+import { getServerSession } from 'next-auth';
+import { headers } from 'next/headers';
+
+export const metadata: Metadata = {
+	title: {
+		default: 'Xernerx Store',
+		template: 'Xernerx Store | %s',
+	},
+	description: 'Explore the Xernerx Studios store. Subscribe to individual bot passes, server infrastructure, developer API plans, or unlock everything with the Ultra bundle.',
+
+	metadataBase: new URL('https://store.xernerx.com'),
+
+	openGraph: {
+		title: {
+			default: 'Xernerx Store',
+			template: 'Xernerx Store | %s',
+		},
+		description: 'Explore the Xernerx Studios store. Subscribe to individual bot passes, server infrastructure, developer API plans, or unlock everything with the Ultra bundle.',
+		url: 'https://store.xernerx.com',
+		siteName: 'Xernerx Store',
+		images: [
+			{
+				url: '/banner.png',
+				width: 1200,
+				height: 630,
+				alt: 'Xernerx Store',
+			},
+		],
+		type: 'website',
+	},
+
+	twitter: {
+		card: 'summary_large_image',
+		title: {
+			default: 'Xernerx Store',
+			template: 'Xernerx Store | %s',
+		},
+		description: 'Explore the Xernerx Studios store. Subscribe to individual bot passes, server infrastructure, developer API plans, or unlock everything with the Ultra bundle.',
+		images: ['/banner.png'],
+	},
+
+	icons: {
+		icon: '/logo.png',
+	},
+
+	alternates: {
+		canonical: 'https://store.xernerx.com',
+	},
+};
+
+export default async function RootLayout({
+	children,
+}: Readonly<{
+	children: React.ReactNode;
+}>) {
+	const session = await getServerSession(auth);
+
+	const headersList = await headers();
+	const host = headersList.get('host') || '';
+	const initialEnv: 'dev' | 'canary' | 'public' =
+		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
+
+	const locale = headersList.get('x-locale') || 'en';
+
+	const dict = await dictionary(locale as Locale);
+
+	const themeProps = await getThemeLayoutProps();
+
+	return (
+		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+			<body style={themeProps.style} suppressHydrationWarning>
+				<SessionProvider session={session}>
+					<AppLayout dictionary={dict} initialEnvironment={initialEnv}>
+						<PermissionProvider>{children}</PermissionProvider>
+					</AppLayout>
+				</SessionProvider>
+			</body>
+		</html>
+	);
+}

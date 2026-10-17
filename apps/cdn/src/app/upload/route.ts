@@ -1,5 +1,3 @@
-/** @format */
-
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { database } from '@xernerx/lib/server';
@@ -14,8 +12,8 @@ function getCorsHeaders(origin: string | null) {
 
 	return {
 		'Access-Control-Allow-Origin': allowedOrigin || '*',
-		'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-upload-name',
+		'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 		'Access-Control-Allow-Credentials': 'true',
 	};
 }
@@ -35,82 +33,41 @@ export async function POST(req: Request) {
 		const session = await getServerSession(auth);
 		const userId = (session?.user as any)?.id;
 		if (!userId) {
-			console.log('Upload rejected: Unauthorized. Session object:', session);
-			return NextResponse.json({ error: 'Unauthorized', session: session }, { status: 401, headers: corsHeaders });
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
 		}
 
-		const { models } = await database('xernerx');
-		const UserModel = models.users.User;
-		const user = await UserModel.findOne({ id: userId }).lean();
-		const roleIds = user?.roles || [];
-
-		const RoleModel = models.core.Role;
-		const roles = await RoleModel.find({ id: { $in: roleIds } });
-
-		console.log('DEBUG UPLOAD - session user:', session?.user);
-		console.log('DEBUG UPLOAD - roleIds:', roleIds);
-		console.log('DEBUG UPLOAD - fetched roles:', roles);
-
-		const canUpload = roles.some((r) => r.permissions?.uploadMedia);
-		const canManage = roles.some((r) => r.permissions?.manageMedia);
-
-		console.log('DEBUG UPLOAD - canUpload:', canUpload, 'canManage:', canManage);
-
-		if (!canUpload && !canManage) {
-			return NextResponse.json({ error: `Forbidden. You do not have permission to upload media. roles: ${JSON.stringify(roles)}` }, { status: 403, headers: corsHeaders });
-		}
-
-		// 1.5. Storage Limits Check
-		const SubscriptionModel = models.users.Subscription;
-		const activeSubscriptions = await SubscriptionModel.find({
-			ownerId: userId,
-			status: { $in: ['active', 'trialing'] },
-		}).lean();
-
-		const MediaModel = models.core.Media;
-		const currentUploadCount = await MediaModel.countDocuments({ uploaderId: userId });
-
-		// If they have any active subscription (like the Ultra plan), they get 1000. Otherwise 10.
-		const maxUploads = activeSubscriptions.length > 0 ? 1000 : 10;
-
-		// Admins (canManage) bypass the quota limits entirely
-		if (currentUploadCount >= maxUploads && !canManage) {
-			return NextResponse.json(
-				{
-					error: `Storage limit reached. You have used ${currentUploadCount}/${maxUploads} uploads. Upgrade to Ultra to increase your limit!`,
-				},
-				{ status: 403, headers: corsHeaders }
-			);
-		}
-
-		// 2. Parse form data
+		// 1. Parse form data
 		const formData = await req.formData();
 		const file = formData.get('file') as File;
-		const privacy = (formData.get('privacy') as string) || 'private';
-		const rawShared = formData.get('shared') as string;
-		const shared = rawShared ? JSON.parse(rawShared) : [];
 
 		if (!file) {
 			return NextResponse.json({ error: 'No file provided' }, { status: 400, headers: corsHeaders });
 		}
 
-		// 3. Upload to Vercel Blob
-		const blob = await put(file.name, file, {
-			access: 'private', // User is using a private store, so we must proxy requests
+		// Limit file size to 10MB to prevent abuse
+		if (file.size > 10 * 1024 * 1024) {
+			return NextResponse.json({ error: 'File exceeds 10MB limit' }, { status: 400, headers: corsHeaders });
+		}
+
+		// 2. Upload to Vercel Blob
+		const blob = await put(`anonymous/${file.name}`, file, {
+			access: 'private',
 			multipart: true,
 			addRandomSuffix: true,
 		});
 
-		// 4. Save metadata to MongoDB
+		// 3. Save metadata to MongoDB as Anonymous System Upload
+		const { models } = await database('xernerx');
+		const MediaModel = models.core.Media;
 
 		const mediaDoc = await MediaModel.create({
 			url: blob.url,
 			filename: file.name,
 			mimeType: file.type,
 			size: file.size,
-			uploaderId: userId,
-			privacy: ['public', 'limited', 'private'].includes(privacy) ? privacy : 'private',
-			shared: Array.isArray(shared) ? shared : [],
+			uploaderId: 'system-anonymous', // DOES NOT tie to the user!
+			privacy: 'public', // Must be public so admins can view it when reading the bug report
+			shared: [],
 		});
 
 		const domain = process.env.DOMAIN || 'xernerx.com';
@@ -121,12 +78,11 @@ export async function POST(req: Request) {
 			{
 				success: true,
 				url: `${baseUrl}/raw/${mediaDoc._id}`,
-				media: { ...mediaDoc.toObject(), url: `${baseUrl}/raw/${mediaDoc._id}` },
 			},
 			{ headers: corsHeaders }
 		);
 	} catch (error: any) {
-		console.error('Upload error:', error);
+		console.error('Anonymous Upload error:', error);
 		return NextResponse.json({ error: error.message || 'Failed to upload file' }, { status: 500, headers: corsHeaders });
 	}
 }
