@@ -4,6 +4,12 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.3.7
+
+### Patch Changes
+
+- Fixed cors policy issues
+
 ## 0.3.6
 
 ### Patch Changes

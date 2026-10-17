@@ -1,10 +1,10 @@
 /** @format */
 
-import fs from 'fs';
-import path from 'path';
 import { Metadata } from 'next';
 import ChangelogClient from '@/components/changelog/ChangelogClient';
 import SidebarTrigger from '@/components/changelog/SidebarTrigger';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
 	title: 'Platform Changelog & Release Notes',
@@ -12,38 +12,63 @@ export const metadata: Metadata = {
 };
 
 const APPS = [
-	{ id: 'app', name: 'App' },
-	{ id: 'account', name: 'Account' },
-	{ id: 'admin', name: 'Admin' },
-	{ id: 'api', name: 'API' },
-	{ id: 'cdn', name: 'CDN' },
-	{ id: 'docs', name: 'Docs' },
-	{ id: 'info', name: 'Info' },
-	{ id: 'store', name: 'Store' },
-	{ id: 'www', name: 'Website' },
-];
+	{ id: 'app', name: 'App', devPort: 4004 },
+	{ id: 'account', name: 'Account', devPort: 4003 },
+	{ id: 'admin', name: 'Admin', devPort: 4006 },
+	{ id: 'api', name: 'API', devPort: 4001 },
+	{ id: 'cdn', name: 'CDN', devPort: 4002 },
+	{ id: 'docs', name: 'Docs', devPort: 4005 },
+	{ id: 'info', name: 'Info', devPort: 4007 },
+	{ id: 'store', name: 'Store', devPort: 4008 },
+	{ id: 'www', name: 'Website', devPort: 4000 },
+] as const;
+
+const FETCH_HEADERS: Record<string, string> = {
+	Accept: 'application/json',
+	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 XernerxSuite/1.0',
+};
+
+async function fetchChangelogFromUrl(url: string, timeoutMs = 4000): Promise<string | null> {
+	try {
+		const controller = new AbortController();
+		const timeout = setTimeout(() => controller.abort(), timeoutMs);
+		const res = await fetch(url, {
+			headers: FETCH_HEADERS,
+			signal: controller.signal,
+			cache: 'no-store',
+		});
+		clearTimeout(timeout);
+		if (!res.ok) return null;
+		const data = await res.json();
+		const content = data?.fullContent || data?.content;
+		return typeof content === 'string' && content.trim().length > 0 ? content : null;
+	} catch {
+		return null;
+	}
+}
 
 async function getChangelogs() {
-	const changelogs: { appName: string; content: string }[] = [];
+	const baseDomain = process.env.NEXT_PUBLIC_DOMAIN && !/^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(process.env.NEXT_PUBLIC_DOMAIN) ? process.env.NEXT_PUBLIC_DOMAIN : 'xernerx.com';
+	const isDevEnv = process.env.ENVIRONMENT?.toLowerCase() === 'development' || process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase() === 'development';
 
-	for (const app of APPS) {
-		try {
-			// Resolve the path to the CHANGELOG.md file in the respective app directory
-			// Handle both monorepo root (Vercel) and package root (local dev)
-			const cwd = process.cwd();
-			const basePath = cwd.endsWith('info') ? path.join(cwd, '..', '..') : cwd;
-			const filePath = path.join(basePath, 'apps', app.id, 'CHANGELOG.md');
-
-			if (fs.existsSync(filePath)) {
-				const content = fs.readFileSync(filePath, 'utf-8');
-				changelogs.push({ appName: app.name, content });
+	const results = await Promise.all(
+		APPS.map(async (app) => {
+			if (isDevEnv) {
+				const localContent = await fetchChangelogFromUrl(`http://127.0.0.1:${app.devPort}/api/changelog?version=all`, 2000);
+				if (localContent) return { appName: app.name, content: localContent };
 			}
-		} catch (error) {
-			console.error(`Failed to read CHANGELOG for ${app.name}:`, error);
-		}
-	}
+			const canaryContent = await fetchChangelogFromUrl(`https://${app.id}.canary.${baseDomain}/api/changelog?version=all`);
+			if (canaryContent) return { appName: app.name, content: canaryContent };
 
-	return changelogs;
+			const prodHost = app.id === 'www' ? `www.${baseDomain}` : `${app.id}.${baseDomain}`;
+			const prodContent = await fetchChangelogFromUrl(`https://${prodHost}/api/changelog?version=all`);
+			if (prodContent) return { appName: app.name, content: prodContent };
+
+			return null;
+		})
+	);
+
+	return results.filter((entry): entry is { appName: string; content: string } => entry !== null);
 }
 
 export default async function ChangelogPage() {

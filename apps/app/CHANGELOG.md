@@ -1,5 +1,11 @@
 # app
 
+## 2.7.1
+
+### Patch Changes
+
+- Fixed cors policy issues
+
 ## 2.7.0
 
 ### Minor Changes

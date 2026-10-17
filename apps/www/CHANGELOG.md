@@ -1,5 +1,11 @@
 # www
 
+## 0.13.1
+
+### Patch Changes
+
+- Fixed cors policy issues
+
 ## 0.13.0
 
 ### Minor Changes

@@ -2,7 +2,6 @@
 
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import fs from 'fs';
 import { database } from '@xernerx/lib/server';
 
 export async function GET(req: Request) {
@@ -72,7 +71,6 @@ export async function POST(req: Request) {
 				} else {
 					const errorText = await webhookRes.text();
 					console.error('Failed to send webhook', errorText);
-					fs.writeFileSync('discord-error.log', JSON.stringify({ error: errorText, payload }, null, 2));
 				}
 			} catch (err) {
 				console.error('Webhook execution failed:', err);

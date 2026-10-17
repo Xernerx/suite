@@ -1,5 +1,11 @@
 # docs
 
+## 1.0.20
+
+### Patch Changes
+
+- Fixed cors policy issues
+
 ## 1.0.19
 
 ### Patch Changes

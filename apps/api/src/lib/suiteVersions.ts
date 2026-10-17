@@ -1,8 +1,5 @@
 /** @format */
 
-import fs from 'fs';
-import path from 'path';
-
 export interface SuiteAppVersionInfo {
 	id: string;
 	name: string;
@@ -18,16 +15,21 @@ export interface SuiteAppVersionInfo {
 }
 
 export const SUITE_APPS = [
-	{ id: 'www', name: 'Website', domain: 'www.xernerx.com' },
-	{ id: 'app', name: 'App', domain: 'app.xernerx.com' },
-	{ id: 'account', name: 'Account', domain: 'account.xernerx.com' },
-	{ id: 'store', name: 'Store', domain: 'store.xernerx.com' },
-	{ id: 'info', name: 'Info & Support', domain: 'info.xernerx.com' },
-	{ id: 'docs', name: 'Docs', domain: 'docs.xernerx.com' },
-	{ id: 'admin', name: 'Admin', domain: 'admin.xernerx.com' },
-	{ id: 'api', name: 'API', domain: 'api.xernerx.com' },
-	{ id: 'cdn', name: 'CDN', domain: 'cdn.xernerx.com' },
+	{ id: 'www', name: 'Website', domain: 'www.xernerx.com', devPort: 4000 },
+	{ id: 'app', name: 'App', domain: 'app.xernerx.com', devPort: 4004 },
+	{ id: 'account', name: 'Account', domain: 'account.xernerx.com', devPort: 4003 },
+	{ id: 'store', name: 'Store', domain: 'store.xernerx.com', devPort: 4008 },
+	{ id: 'info', name: 'Info & Support', domain: 'info.xernerx.com', devPort: 4007 },
+	{ id: 'docs', name: 'Docs', domain: 'docs.xernerx.com', devPort: 4005 },
+	{ id: 'admin', name: 'Admin', domain: 'admin.xernerx.com', devPort: 4006 },
+	{ id: 'api', name: 'API', domain: 'api.xernerx.com', devPort: 4001 },
+	{ id: 'cdn', name: 'CDN', domain: 'cdn.xernerx.com', devPort: 4002 },
 ] as const;
+
+const FETCH_HEADERS: Record<string, string> = {
+	Accept: 'application/json',
+	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 XernerxSuite/1.0',
+};
 
 export function compareSemver(a?: string | null, b?: string | null): number {
 	if (!a || !b) return -1;
@@ -45,53 +47,13 @@ export function compareSemver(a?: string | null, b?: string | null): number {
 	return a3 - b3;
 }
 
-function resolveMonorepoRoot(): string {
-	const cwd = process.cwd();
-	if (fs.existsSync(path.join(cwd, 'apps'))) return cwd;
-	const twoUp = path.resolve(cwd, '..', '..');
-	if (fs.existsSync(path.join(twoUp, 'apps'))) return twoUp;
-	return cwd;
-}
-
-function readLocalAppVersions(appId: string): { localVersion: string | null; versions: string[] } {
-	const root = resolveMonorepoRoot();
-	const appDir = path.join(root, 'apps', appId);
-	const versionSet = new Set<string>();
-	let localVersion: string | null = null;
-
-	try {
-		const pkgPath = path.join(appDir, 'package.json');
-		if (fs.existsSync(pkgPath)) {
-			const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-			if (pkg?.version) {
-				localVersion = String(pkg.version).trim();
-				versionSet.add(localVersion);
-			}
-		}
-	} catch {}
-
-	try {
-		const changelogPath = path.join(appDir, 'CHANGELOG.md');
-		if (fs.existsSync(changelogPath)) {
-			const content = fs.readFileSync(changelogPath, 'utf8');
-			const versionRegex = /^#{1,3}\s+(?:\[?v?([\d]+\.[\d]+\.[\d]+[\w.-]*)\]?|([\d]+\.[\d]+\.[\d]+[\w.-]*))/gm;
-			for (const match of content.matchAll(versionRegex)) {
-				const ver = (match[1] || match[2] || '').trim();
-				if (ver) versionSet.add(ver);
-			}
-		}
-	} catch {}
-
-	const sorted = Array.from(versionSet).sort((a, b) => compareSemver(b, a));
-	return { localVersion, versions: sorted };
-}
-
-async function fetchRemoteVersion(url: string): Promise<{ version: string | null; latencyMs: number | null }> {
+async function fetchRemoteVersion(url: string, timeoutMs = 6000): Promise<{ version: string | null; latencyMs: number | null }> {
 	const start = Date.now();
 	try {
 		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 2500);
+		const timeout = setTimeout(() => controller.abort(), timeoutMs);
 		const res = await fetch(url, {
+			headers: FETCH_HEADERS,
 			signal: controller.signal,
 			cache: 'no-store',
 		});
@@ -108,6 +70,27 @@ async function fetchRemoteVersion(url: string): Promise<{ version: string | null
 	}
 }
 
+async function fetchRemoteChangelogVersions(url: string, timeoutMs = 5000): Promise<string[]> {
+	try {
+		const controller = new AbortController();
+		const timeout = setTimeout(() => controller.abort(), timeoutMs);
+		const res = await fetch(url, {
+			headers: FETCH_HEADERS,
+			signal: controller.signal,
+			cache: 'no-store',
+		});
+		clearTimeout(timeout);
+		if (!res.ok) return [];
+		const data = await res.json();
+		if (Array.isArray(data?.versions)) {
+			return data.versions.map((v: any) => String(v).trim()).filter(Boolean);
+		}
+		return [];
+	} catch {
+		return [];
+	}
+}
+
 let cachedApps: Record<string, SuiteAppVersionInfo> | null = null;
 let cachedAt = 0;
 const CACHE_TTL_MS = 60_000;
@@ -119,21 +102,36 @@ export async function getSuiteVersionsMap(forceRefresh = false): Promise<Record<
 	}
 
 	const baseDomain = process.env.NEXT_PUBLIC_DOMAIN && !/^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(process.env.NEXT_PUBLIC_DOMAIN) ? process.env.NEXT_PUBLIC_DOMAIN : 'xernerx.com';
+	const isDevEnv = process.env.ENVIRONMENT?.toLowerCase() === 'development' || process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase() === 'development';
 
 	const entries = await Promise.all(
 		SUITE_APPS.map(async (app) => {
-			const { localVersion, versions } = readLocalAppVersions(app.id);
-			const prodUrl = `https://${app.id}.${baseDomain}/api/version`;
-			const canaryUrl = `https://${app.id}.canary.${baseDomain}/api/version`;
-			const devUrl = `https://${app.id}.dev.${baseDomain}/api/version`;
+			const prodHost = app.id === 'www' ? `www.${baseDomain}` : `${app.id}.${baseDomain}`;
+			const canaryHost = `${app.id}.canary.${baseDomain}`;
 
-			const [remoteProd, remoteCanary, remoteDev] = await Promise.all([fetchRemoteVersion(prodUrl), fetchRemoteVersion(canaryUrl), fetchRemoteVersion(devUrl)]);
+			const prodUrl = `https://${prodHost}/api/version`;
+			const canaryUrl = `https://${canaryHost}/api/version`;
+			const changelogUrl = `https://${canaryHost}/api/changelog`;
+
+			const devPromise = isDevEnv
+				? fetchRemoteVersion(`http://127.0.0.1:${app.devPort}/api/version`, 2000).then((res) =>
+						res.version ? res : fetchRemoteVersion(`https://${app.id}.dev.${baseDomain}/api/version`, 2500)
+					)
+				: Promise.resolve({ version: null, latencyMs: null });
+
+			const [remoteProd, remoteCanary, remoteDev, changelogVersions] = await Promise.all([
+				fetchRemoteVersion(prodUrl),
+				fetchRemoteVersion(canaryUrl),
+				devPromise,
+				fetchRemoteChangelogVersions(changelogUrl),
+			]);
 
 			const prodVersion = remoteProd.version;
 			const canaryVersion = remoteCanary.version;
 			const devVersion = remoteDev.version;
+			const localVersion = devVersion || canaryVersion || prodVersion;
 
-			const combinedSet = new Set<string>(versions);
+			const combinedSet = new Set<string>(changelogVersions);
 			if (devVersion) combinedSet.add(devVersion);
 			if (canaryVersion) combinedSet.add(canaryVersion);
 			if (prodVersion) combinedSet.add(prodVersion);
@@ -156,9 +154,13 @@ export async function getSuiteVersionsMap(forceRefresh = false): Promise<Record<
 		})
 	);
 
-	cachedApps = Object.fromEntries(entries);
-	cachedAt = now;
-	return cachedApps;
+	const result = Object.fromEntries(entries);
+	const hasAnyLiveVersion = entries.some(([, info]) => Boolean(info.prodVersion || info.canaryVersion || info.devVersion));
+	if (hasAnyLiveVersion) {
+		cachedApps = result;
+		cachedAt = now;
+	}
+	return result;
 }
 
 export async function enrichIssuesWithVersionStatus<T extends Record<string, any>>(issues: T[]): Promise<T[]> {

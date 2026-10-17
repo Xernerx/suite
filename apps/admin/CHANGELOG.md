@@ -1,5 +1,11 @@
 # admin
 
+## 0.11.1
+
+### Patch Changes
+
+- Fixed cors policy issues
+
 ## 0.11.0
 
 ### Minor Changes
