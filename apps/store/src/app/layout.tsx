@@ -14,7 +14,7 @@ import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Store',
+		default: 'Xernerx Store | Bot Subscriptions, Add-Ons & Credits',
 		template: 'Xernerx Store | %s',
 	},
 	description: 'Explore the Xernerx Studios store. Subscribe to individual bot passes, server infrastructure, developer API plans, or unlock everything with the Ultra bundle.',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Store',
+			default: 'Xernerx Store | Bot Subscriptions, Add-Ons & Credits',
 			template: 'Xernerx Store | %s',
 		},
 		description: 'Explore the Xernerx Studios store. Subscribe to individual bot passes, server infrastructure, developer API plans, or unlock everything with the Ultra bundle.',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Store',
+			default: 'Xernerx Store | Bot Subscriptions, Add-Ons & Credits',
 			template: 'Xernerx Store | %s',
 		},
 		description: 'Explore the Xernerx Studios store. Subscribe to individual bot passes, server infrastructure, developer API plans, or unlock everything with the Ultra bundle.',
@@ -52,6 +52,7 @@ export const metadata: Metadata = {
 
 	icons: {
 		icon: '/logo.png',
+		apple: '/logo.png',
 	},
 
 	alternates: {

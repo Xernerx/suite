@@ -20,11 +20,10 @@ import {
 	signOut,
 	useEnvironment,
 } from '@xernerx/providers';
-import React, { Suspense } from 'react';
+import React from 'react';
 
 import { CookiePrompt } from './CookiePrompt';
 import { TermsPrompt } from './TermsPrompt';
-import { Loading } from '@xernerx/feedback';
 import { Page } from './Page';
 import { ThemeScript } from './ThemeScript';
 import { VersionTracker } from './VersionTracker';
@@ -87,51 +86,49 @@ export function AppLayout({
 	}, []);
 
 	return (
-		<Suspense fallback={<Loading />}>
-			<div
-				className={`${fredoka.variable} ${cascadiaCode.variable}`}
-				style={{
-					fontFamily: 'var(--font-fredoka), system-ui, -apple-system, sans-serif',
-					display: 'contents',
-				}}
-			>
-				<ThemeScript />
-				{enableAds && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
-					<script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`} crossOrigin="anonymous" />
-				)}
+		<div
+			className={`${fredoka.variable} ${cascadiaCode.variable}`}
+			style={{
+				fontFamily: 'var(--font-fredoka), system-ui, -apple-system, sans-serif',
+				display: 'contents',
+			}}
+		>
+			<ThemeScript />
+			{enableAds && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+				<script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`} crossOrigin="anonymous" />
+			)}
 
-				<DictionaryProvider dictionary={dictionary}>
-					<ToastProvider>
-						<EnvironmentProvider initialEnvironment={initialEnvironment}>
-							<AuthWatcher />
-							<PlatformProvider>
-								<ThemeProvider>
-									<UserProvider>
-										<PermissionProvider>
-											<NotificationProvider>
-												<DispatchProvider>
-													<ShortcutsProvider>
-														<CookieProvider>
-															<CookiePrompt />
-															<TermsPrompt />
-															<VersionTracker />
-															<SidebarProvider>
-																<SupportProvider>
-																	<Page>{children}</Page>
-																</SupportProvider>
-															</SidebarProvider>
-														</CookieProvider>
-													</ShortcutsProvider>
-												</DispatchProvider>
-											</NotificationProvider>
-										</PermissionProvider>
-									</UserProvider>
-								</ThemeProvider>
-							</PlatformProvider>
-						</EnvironmentProvider>
-					</ToastProvider>
-				</DictionaryProvider>
-			</div>
-		</Suspense>
+			<DictionaryProvider dictionary={dictionary}>
+				<ToastProvider>
+					<EnvironmentProvider initialEnvironment={initialEnvironment}>
+						<AuthWatcher />
+						<PlatformProvider>
+							<ThemeProvider>
+								<UserProvider>
+									<PermissionProvider>
+										<NotificationProvider>
+											<DispatchProvider>
+												<ShortcutsProvider>
+													<CookieProvider>
+														<CookiePrompt />
+														<TermsPrompt />
+														<VersionTracker />
+														<SidebarProvider>
+															<SupportProvider>
+																<Page>{children}</Page>
+															</SupportProvider>
+														</SidebarProvider>
+													</CookieProvider>
+												</ShortcutsProvider>
+											</DispatchProvider>
+										</NotificationProvider>
+									</PermissionProvider>
+								</UserProvider>
+							</ThemeProvider>
+						</PlatformProvider>
+					</EnvironmentProvider>
+				</ToastProvider>
+			</DictionaryProvider>
+		</div>
 	);
 }

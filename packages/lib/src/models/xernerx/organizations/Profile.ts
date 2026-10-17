@@ -24,6 +24,7 @@ const schema = new Schema(
 		info: { type: String }, // Long description about the organization
 		verified: { type: Boolean, default: false }, // Whether the organization has been verified
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level
+		widgets: { type: Boolean, default: false }, // Whether embeddable widgets are enabled
 		members: { type: [String], default: [] }, // Array of Discord user IDs
 		locale: { type: String }, // Locale (e.g., en-US)
 		links: {

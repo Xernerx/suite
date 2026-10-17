@@ -93,6 +93,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 					id,
 					name: 'Unknown Guild',
 					privacy: 'private',
+					widgets: false,
 					verified: false,
 					bot: botInServer,
 					channels: activeChannels,
@@ -104,6 +105,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		// Map stats into the raw guild document
 		const fullGuild = {
 			...guild,
+			widgets: Boolean(guild.widgets),
 			stats: stats || [],
 			channels: activeChannels,
 		};
@@ -132,6 +134,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.verified !== undefined) updateData['verified'] = body.verified;
 		if (body.bot !== undefined) updateData['bot'] = body.bot;
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
+		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 		if (body.links !== undefined) updateData['links'] = body.links;
 
 		const finalUpdate = Object.keys(updateData).length > 0 ? updateData : body;
@@ -151,6 +154,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			verified: updatedGuild.verified,
 			bot: updatedGuild.bot,
 			privacy: updatedGuild.privacy,
+			widgets: Boolean(updatedGuild.widgets),
 			links: updatedGuild.links || {},
 		};
 

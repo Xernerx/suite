@@ -13,7 +13,7 @@ import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Account',
+		default: 'Xernerx Account | Profile Settings, Tokens & Billing',
 		template: 'Xernerx Account | %s',
 	},
 	description: 'Manage your Xernerx account, API tokens, and platform configuration.',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Account',
+			default: 'Xernerx Account | Profile Settings, Tokens & Billing',
 			template: 'Xernerx Account | %s',
 		},
 		description: 'Manage your Xernerx account, API tokens, and platform configuration.',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Account',
+			default: 'Xernerx Account | Profile Settings, Tokens & Billing',
 			template: 'Xernerx Account | %s',
 		},
 		description: 'Manage your Xernerx account, API tokens, and platform configuration.',
@@ -51,6 +51,7 @@ export const metadata: Metadata = {
 
 	icons: {
 		icon: '/logo.png',
+		apple: '/logo.png',
 	},
 
 	alternates: {

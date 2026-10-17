@@ -4,6 +4,7 @@
 import { Shield, AlertTriangle, Trash2 } from 'lucide-react';
 import { Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
+import WidgetSettingsCard from '@/components/WidgetSettingsCard';
 
 interface OrgSettingsTabProps {
 	orgConfig: any;
@@ -17,7 +18,7 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDe
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 			<div
-				className="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+				className="relative z-40 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -39,6 +40,16 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDe
 					/>
 				</div>
 			</div>
+
+			{/* Public Embed Widget Card */}
+			<WidgetSettingsCard
+				entityType="organizations"
+				entityId={orgConfig._id}
+				entityName={orgConfig.name}
+				enabled={Boolean(orgConfig.widgets)}
+				onChange={(val) => setOrgConfig({ ...orgConfig, widgets: val })}
+			/>
+
 			{/* Reset Data Card */}
 			<div
 				className="relative z-20 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
@@ -52,7 +63,7 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDe
 					<p className="text-xs text-(--accent-orange)/80">{t('app.portal.settings.resetDesc')}</p>
 				</div>
 				<button
-					onClick={() => setOrgConfig({ ...orgConfig, description: '', info: '', locale: '', links: {} })}
+					onClick={() => setOrgConfig({ ...orgConfig, description: '', info: '', locale: '', links: {}, widgets: false })}
 					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',

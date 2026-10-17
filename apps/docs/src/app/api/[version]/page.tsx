@@ -72,7 +72,10 @@ export default function APIDocs() {
 				{ label: t('docs.api.core.fetchDiscordProfile.title'), href: '#fetch-discord-profile', icon: Server, category: t('docs.api.common.nav.users') },
 				{ label: t('docs.api.core.fetchDiscordGuilds.title'), href: '#fetch-discord-guilds', icon: Shield, category: t('docs.api.common.nav.users') },
 				{ label: t('docs.api.core.fetchDiscordGuild.title'), href: '#fetch-discord-guild', icon: Globe, category: t('docs.api.common.nav.guilds') },
-				{ label: t('docs.api.core.fetchDiscordRoles.title'), href: '#fetch-discord-roles', icon: Key, category: t('docs.api.common.nav.guilds') }
+				{ label: t('docs.api.core.fetchDiscordRoles.title'), href: '#fetch-discord-roles', icon: Key, category: t('docs.api.common.nav.guilds') },
+				{ label: t('docs.api.core.fetchBotEmbed.title'), href: '#fetch-bot-embed', icon: Server, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.core.fetchOrganizationEmbed.title'), href: '#fetch-organization-embed', icon: Shield, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.core.fetchGuildEmbed.title'), href: '#fetch-guild-embed', icon: Globe, category: t('docs.api.common.nav.endpoints') }
 			);
 		} else if (version === 'secure' && isAdmin) {
 			navItems.push(

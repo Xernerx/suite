@@ -89,7 +89,7 @@ export default function Issues() {
 				}
 			});
 
-		fetch(getEnvUrl('https://api.xernerx.com/info/versions'))
+		fetch(getEnvUrl('https://api.xernerx.com/secure/core/versions'), { credentials: 'include' })
 			.then((res) => (res.ok ? res.json() : { data: [] }))
 			.then((d) => {
 				if (Array.isArray(d.data)) {

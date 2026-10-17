@@ -7,8 +7,8 @@ import ChangelogClient from '@/components/changelog/ChangelogClient';
 import SidebarTrigger from '@/components/changelog/SidebarTrigger';
 
 export const metadata: Metadata = {
-	title: 'Changelog',
-	description: 'See the latest updates and release notes across the Xernerx ecosystem.',
+	title: 'Platform Changelog & Release Notes',
+	description: 'Explore the latest updates, version history, and release notes across the Xernerx Studios ecosystem.',
 };
 
 const APPS = [

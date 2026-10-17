@@ -200,6 +200,7 @@ export default function DashboardPage() {
 					info: guildConfig.info,
 					organization: guildConfig.organization,
 					privacy: guildConfig.privacy,
+					widgets: Boolean(guildConfig.widgets),
 					locale: guildConfig.locale,
 					links: guildConfig.links,
 				}),

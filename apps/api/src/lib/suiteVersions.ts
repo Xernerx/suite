@@ -8,14 +8,18 @@ export interface SuiteAppVersionInfo {
 	name: string;
 	domain: string;
 	localVersion: string | null;
+	devVersion: string | null;
 	canaryVersion: string | null;
 	prodVersion: string | null;
+	devLatencyMs: number | null;
+	canaryLatencyMs: number | null;
+	prodLatencyMs: number | null;
 	versions: string[];
 }
 
 export const SUITE_APPS = [
+	{ id: 'www', name: 'Website', domain: 'www.xernerx.com' },
 	{ id: 'app', name: 'App', domain: 'app.xernerx.com' },
-	{ id: 'www', name: 'Website', domain: 'xernerx.com' },
 	{ id: 'account', name: 'Account', domain: 'account.xernerx.com' },
 	{ id: 'store', name: 'Store', domain: 'store.xernerx.com' },
 	{ id: 'info', name: 'Info & Support', domain: 'info.xernerx.com' },
@@ -82,7 +86,8 @@ function readLocalAppVersions(appId: string): { localVersion: string | null; ver
 	return { localVersion, versions: sorted };
 }
 
-async function fetchRemoteVersion(url: string): Promise<string | null> {
+async function fetchRemoteVersion(url: string): Promise<{ version: string | null; latencyMs: number | null }> {
+	const start = Date.now();
 	try {
 		const controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), 2500);
@@ -91,11 +96,15 @@ async function fetchRemoteVersion(url: string): Promise<string | null> {
 			cache: 'no-store',
 		});
 		clearTimeout(timeout);
-		if (!res.ok) return null;
+		const latencyMs = Date.now() - start;
+		if (!res.ok) return { version: null, latencyMs: null };
 		const data = await res.json();
-		return data?.version ? String(data.version).trim() : null;
+		return {
+			version: data?.version ? String(data.version).trim() : null,
+			latencyMs,
+		};
 	} catch {
-		return null;
+		return { version: null, latencyMs: null };
 	}
 }
 
@@ -110,21 +119,22 @@ export async function getSuiteVersionsMap(forceRefresh = false): Promise<Record<
 	}
 
 	const baseDomain = process.env.NEXT_PUBLIC_DOMAIN && !/^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(process.env.NEXT_PUBLIC_DOMAIN) ? process.env.NEXT_PUBLIC_DOMAIN : 'xernerx.com';
-	const envMode = (process.env.NEXT_PUBLIC_ENVIRONMENT || '').toLowerCase();
-	const isLocalOrCanary = process.env.NODE_ENV !== 'production' || envMode === 'canary' || envMode === 'dev' || envMode === 'development';
 
 	const entries = await Promise.all(
 		SUITE_APPS.map(async (app) => {
 			const { localVersion, versions } = readLocalAppVersions(app.id);
 			const prodUrl = `https://${app.id}.${baseDomain}/api/version`;
 			const canaryUrl = `https://${app.id}.canary.${baseDomain}/api/version`;
+			const devUrl = `https://${app.id}.dev.${baseDomain}/api/version`;
 
-			const [remoteProd, remoteCanary] = await Promise.all([fetchRemoteVersion(prodUrl), fetchRemoteVersion(canaryUrl)]);
+			const [remoteProd, remoteCanary, remoteDev] = await Promise.all([fetchRemoteVersion(prodUrl), fetchRemoteVersion(canaryUrl), fetchRemoteVersion(devUrl)]);
 
-			const prodVersion = remoteProd || (!isLocalOrCanary ? localVersion : null);
-			const canaryVersion = remoteCanary || (isLocalOrCanary ? localVersion : prodVersion);
+			const prodVersion = remoteProd.version;
+			const canaryVersion = remoteCanary.version;
+			const devVersion = remoteDev.version;
 
 			const combinedSet = new Set<string>(versions);
+			if (devVersion) combinedSet.add(devVersion);
 			if (canaryVersion) combinedSet.add(canaryVersion);
 			if (prodVersion) combinedSet.add(prodVersion);
 			const allVersions = Array.from(combinedSet).sort((a, b) => compareSemver(b, a));
@@ -134,8 +144,12 @@ export async function getSuiteVersionsMap(forceRefresh = false): Promise<Record<
 				name: app.name,
 				domain: app.domain,
 				localVersion,
+				devVersion,
 				canaryVersion,
 				prodVersion,
+				devLatencyMs: remoteDev.latencyMs,
+				canaryLatencyMs: remoteCanary.latencyMs,
+				prodLatencyMs: remoteProd.latencyMs,
 				versions: allVersions,
 			};
 			return [app.id, info] as const;

@@ -706,6 +706,47 @@
 			}
 		},
 		"dashboard": {
+			"overview": {
+				"title": "Suite Overzicht & SEO",
+				"subtitle": "Monitor live versies, latentie, probleemstatus en Seobility SEO-scores over alle 9 Xernerx Suite subdomeinen.",
+				"refresh": "Statistieken Vernieuwen",
+				"refreshing": "Vernieuwen...",
+				"envProduction": "Productie URL's",
+				"envCanary": "Canary URL's",
+				"cards": {
+					"services": "Suite Services",
+					"synced": "{count} gesynchroniseerd • {ahead} canary voorop",
+					"openIssues": "Openstaande Problemen",
+					"pendingReview": "{count} wachtend op verificatie",
+					"resolvedIssues": "Opgeloste Problemen",
+					"avgResolution": "Gem. Oplostijd",
+					"hours": "{count}u"
+				},
+				"seoSectionTitle": "Subdomein SEO-scores & Live Telemetrie",
+				"seoSectionSubtitle": "Klik op een Seobility-badge om een volledige on-page SEO-controle uit te voeren of te bekijken.",
+				"prodVersion": "Prod",
+				"canaryVersion": "Canary",
+				"devVersion": "Dev",
+				"localVersion": "Lokaal",
+				"syncedBadge": "Gesynchroniseerd",
+				"canaryAheadBadge": "Canary Voorop",
+				"seobilityCheck": "Seobility",
+				"lighthouseCheck": "Lighthouse",
+				"lighthouseScan": "Lighthouse Starten",
+				"lighthouseScanning": "Controleren...",
+				"lighthouseRescan": "Chrome Lighthouse audit opnieuw uitvoeren",
+				"lighthouseCategories": {
+					"seo": "SEO",
+					"perf": "Perf",
+					"a11y": "A11y",
+					"bp": "Best"
+				},
+				"ping": "{ms} ms",
+				"pinging": "Pingen...",
+				"pingOffline": "Offline",
+				"repingTooltip": "Klik om de laadtijd te pingen",
+				"openSite": "Site Openen"
+			},
 			"issues": {
 				"title": "Problemen",
 				"logBug": "Probleem Vastleggen",

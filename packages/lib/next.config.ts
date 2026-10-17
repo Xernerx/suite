@@ -4,6 +4,7 @@ import type { NextConfig } from 'next';
 
 export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 	return {
+		poweredByHeader: false,
 		...appConfig,
 		experimental: {
 			turbopackFileSystemCacheForDev: false,
