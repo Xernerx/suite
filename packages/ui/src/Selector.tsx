@@ -16,6 +16,7 @@ export interface SelectorProps {
 	onChange: (value: string) => void;
 	placeholder?: string;
 	items?: boolean;
+	required?: boolean;
 }
 
 // Helper to extract plain text string from any ReactNode (handles strings, elements, arrays)
@@ -36,7 +37,7 @@ function getLabelString(label: React.ReactNode): string {
 	}
 	return '';
 }
-export function Selector({ value, options, onChange, placeholder = 'Select...', items }: SelectorProps) {
+export function Selector({ value, options, onChange, placeholder = 'Select...', items, required }: SelectorProps) {
 	const { t } = useDictionary();
 	const [isOpen, setIsOpen] = useState(false);
 	const [openUpwards, setOpenUpwards] = useState(false);
@@ -86,6 +87,9 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 	});
 	return (
 		<div className="relative w-full" ref={ref}>
+			{required && (
+				<input tabIndex={-1} autoComplete="off" value={value} onChange={() => {}} required className="pointer-events-none absolute bottom-0 left-1/2 h-px w-px -translate-x-1/2 opacity-0" />
+			)}
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}

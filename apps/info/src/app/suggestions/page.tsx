@@ -5,6 +5,7 @@ import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/provi
 import { Loading } from '@xernerx/feedback';
 import { Button, Selector, Input } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LogIn } from 'lucide-react';
 
 function fuzzySearch(query: string, text: string) {
 	if (!query) return true;
@@ -34,6 +35,16 @@ export default function SuggestionsPage() {
 	const [product, setProduct] = useState('');
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
+
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const savedDraft = sessionStorage.getItem('xernerx_suggestion_draft');
+			if (savedDraft) {
+				setSearch(savedDraft);
+				sessionStorage.removeItem('xernerx_suggestion_draft');
+			}
+		}
+	}, []);
 
 	const fetchSuggestions = async () => {
 		const botIds = new Set<string>();
@@ -119,7 +130,14 @@ export default function SuggestionsPage() {
 				title: t('info.suggestions.toasts.notAuthenticated'),
 				description: t('info.suggestions.toasts.mustBeLoggedIn'),
 			});
-		if (!title || !description || !product) return;
+		if (!product) {
+			return toast({
+				type: 'error',
+				title: t('info.suggestions.toasts.error'),
+				description: t('info.suggestions.toasts.productRequired'),
+			});
+		}
+		if (!title || !description) return;
 
 		const resolved = resolveBot(product);
 
@@ -147,6 +165,7 @@ export default function SuggestionsPage() {
 			setDescription('');
 			setProduct('');
 			setSearch('');
+			setShowForm(false);
 			fetchSuggestions();
 		} catch (err) {
 			toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: t('info.suggestions.toasts.failedToPost') });
@@ -191,16 +210,16 @@ export default function SuggestionsPage() {
 				<p className="text-(--text-muted)">{t('info.suggestions.description')}</p>
 			</motion.div>
 
-			<div className={`grid grid-cols-1 ${user && showForm ? 'md:grid-cols-3' : 'md:grid-cols-1'} gap-8`}>
-				{/* Form (Only show to logged-in users) */}
-				<AnimatePresence>
-					{user && showForm && (
+			<div className="max-w-3xl mx-auto w-full">
+				<AnimatePresence mode="wait">
+					{user && showForm ? (
 						<motion.div
-							initial={{ opacity: 0, scale: 0.95, y: -10 }}
+							key="create-form"
+							initial={{ opacity: 0, scale: 0.96, y: 10 }}
 							animate={{ opacity: 1, scale: 1, y: 0 }}
-							exit={{ opacity: 0, scale: 0.95, y: -10 }}
+							exit={{ opacity: 0, scale: 0.96, y: -10 }}
 							transition={{ duration: 0.25, ease: 'easeOut' }}
-							className="col-span-1 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-xl flex flex-col gap-4 h-fit"
+							className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-xl flex flex-col gap-4 w-full"
 						>
 							<h2 className="text-xl font-bold text-(--text)">{t('info.suggestions.newSuggestion')}</h2>
 							<form onSubmit={submitSuggestion} className="flex flex-col gap-4">
@@ -231,6 +250,7 @@ export default function SuggestionsPage() {
 									})}
 									onChange={setProduct}
 									placeholder={t('info.suggestions.selectProduct')}
+									required
 								/>
 								<div className="flex gap-2 w-full">
 									<Button type="submit" className="flex-1">
@@ -242,100 +262,133 @@ export default function SuggestionsPage() {
 								</div>
 							</form>
 						</motion.div>
-					)}
-				</AnimatePresence>
+					) : (
+						<motion.div
+							key="search-list"
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.2, ease: 'easeOut' }}
+							className="flex flex-col gap-4 w-full"
+						>
+							<div className="flex flex-col gap-1.5">
+								<Input variant="search" placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+								<p className="text-xs text-(--text-muted) px-1">{t('info.suggestions.startTyping')}</p>
+							</div>
 
-				{/* List & Search */}
-				<div className={`flex flex-col gap-4 ${user && showForm ? 'col-span-2' : 'col-span-1 max-w-3xl mx-auto w-full'}`}>
-					<Input variant="search" placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-
-					<AnimatePresence mode="popLayout">
-						{filteredSuggestions.map((s: any) => {
-							const hasUpvoted = user && s.upvotes?.includes(user.id);
-							const hasDownvoted = user && s.downvotes?.includes(user.id);
-							const netVotes = (s.upvotes?.length || 0) - (s.downvotes?.length || 0);
-							const botInfo = resolveBot(s);
-							return (
-								<motion.div
-									key={s.id}
-									layout
-									initial={{ opacity: 0, y: 15 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, scale: 0.95 }}
-									transition={{ duration: 0.25, ease: 'easeOut' }}
-									whileHover={{ y: -2 }}
-									className="flex gap-4 p-4 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
-								>
-									<div className="flex flex-col items-center gap-1 justify-center shrink-0">
-										<motion.button
-											whileHover={{ scale: 1.15 }}
-											whileTap={{ scale: 0.85 }}
-											onClick={() => vote(s.id, 'upvote')}
-											className={`p-2 rounded cursor-pointer ${hasUpvoted ? 'bg-(--accent) text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
+							<AnimatePresence mode="popLayout">
+								{filteredSuggestions.map((s: any) => {
+									const hasUpvoted = user && s.upvotes?.includes(user.id);
+									const hasDownvoted = user && s.downvotes?.includes(user.id);
+									const netVotes = (s.upvotes?.length || 0) - (s.downvotes?.length || 0);
+									const botInfo = resolveBot(s);
+									return (
+										<motion.div
+											key={s.id}
+											layout
+											initial={{ opacity: 0, y: 15 }}
+											animate={{ opacity: 1, y: 0 }}
+											exit={{ opacity: 0, scale: 0.95 }}
+											transition={{ duration: 0.25, ease: 'easeOut' }}
+											whileHover={{ y: -2 }}
+											className="flex gap-4 p-4 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
 										>
-											▲
-										</motion.button>
-										<span className="font-bold">{netVotes}</span>
-										<motion.button
-											whileHover={{ scale: 1.15 }}
-											whileTap={{ scale: 0.85 }}
-											onClick={() => vote(s.id, 'downvote')}
-											className={`p-2 rounded cursor-pointer ${hasDownvoted ? 'bg-red-500 text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
-										>
-											▼
-										</motion.button>
-									</div>
-									<div className="flex flex-col justify-center w-full min-w-0">
-										<div className="flex justify-between items-start gap-4">
-											<div className="font-bold text-lg text-(--text)">{s.title}</div>
-											{s.author && (
-												<div className="flex items-center gap-2 shrink-0 bg-(--foreground)/50 border border-(--border)/10 rounded-full pr-3 pl-1 py-1">
-													{s.author.icon ? (
-														<img src={s.author.icon} alt={s.author.name} className="w-6 h-6 rounded-full" />
-													) : (
-														<div className="w-6 h-6 rounded-full bg-(--accent) flex items-center justify-center text-[10px] text-white font-bold">
-															{s.author.name?.charAt(0) || '?'}
+											<div className="flex flex-col items-center gap-1 justify-center shrink-0">
+												<motion.button
+													whileHover={{ scale: 1.15 }}
+													whileTap={{ scale: 0.85 }}
+													onClick={() => vote(s.id, 'upvote')}
+													className={`p-2 rounded cursor-pointer ${hasUpvoted ? 'bg-(--accent) text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
+												>
+													▲
+												</motion.button>
+												<span className="font-bold">{netVotes}</span>
+												<motion.button
+													whileHover={{ scale: 1.15 }}
+													whileTap={{ scale: 0.85 }}
+													onClick={() => vote(s.id, 'downvote')}
+													className={`p-2 rounded cursor-pointer ${hasDownvoted ? 'bg-red-500 text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
+												>
+													▼
+												</motion.button>
+											</div>
+											<div className="flex flex-col justify-center w-full min-w-0">
+												<div className="flex justify-between items-start gap-4">
+													<div className="font-bold text-lg text-(--text)">{s.title}</div>
+													{s.author && (
+														<div className="flex items-center gap-2 shrink-0 bg-(--foreground)/50 border border-(--border)/10 rounded-full pr-3 pl-1 py-1">
+															{s.author.icon ? (
+																<img src={s.author.icon} alt={s.author.name} className="w-6 h-6 rounded-full" />
+															) : (
+																<div className="w-6 h-6 rounded-full bg-(--accent) flex items-center justify-center text-[10px] text-white font-bold">
+																	{s.author.name?.charAt(0) || '?'}
+																</div>
+															)}
+															<span className="text-xs text-(--text-muted) font-medium truncate max-w-[100px]">{s.author.name}</span>
 														</div>
 													)}
-													<span className="text-xs text-(--text-muted) font-medium truncate max-w-[100px]">{s.author.name}</span>
 												</div>
-											)}
-										</div>
-										<div className="text-(--text-muted) text-sm mb-2 mt-1">{s.description}</div>
-										<span className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">
-											{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-											{botInfo ? botInfo.name : s.productId}
-										</span>
-									</div>
-								</motion.div>
-							);
-						})}
-					</AnimatePresence>
+												<div className="text-(--text-muted) text-sm mb-2 mt-1">{s.description}</div>
+												<span className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">
+													{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+													{botInfo ? botInfo.name : s.productId}
+												</span>
+											</div>
+										</motion.div>
+									);
+								})}
+							</AnimatePresence>
 
-					{filteredSuggestions.length === 0 && search.trim() && (
-						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 0.25 }}
-							className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
-						>
-							<div>{t('info.suggestions.noMatch', { query: search })}</div>
-							{user ? (
-								<Button
-									onClick={() => {
-										setTitle(search);
-										setSearch('');
-										setShowForm(true);
-									}}
+							{filteredSuggestions.length === 0 && !search.trim() && (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
+									transition={{ duration: 0.25 }}
+									className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-2 text-(--text-muted)"
 								>
-									{t('info.suggestions.addAsNew')}
-								</Button>
-							) : (
-								<div>{t('info.suggestions.loginToSubmit')}</div>
+									<div>{t('admin.dashboard.suggestions.noSuggestions')}</div>
+								</motion.div>
+							)}
+
+							{filteredSuggestions.length === 0 && search.trim() && (
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									animate={{ opacity: 1, scale: 1 }}
+									transition={{ duration: 0.25 }}
+									className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
+								>
+									<div>{t('info.suggestions.noMatch', { query: search })}</div>
+									{user ? (
+										<Button
+											onClick={() => {
+												setTitle(search);
+												setSearch('');
+												setShowForm(true);
+											}}
+										>
+											{t('info.suggestions.addAsNew')}
+										</Button>
+									) : (
+										<div className="flex flex-col items-center gap-3">
+											<div>{t('info.suggestions.loginToSubmit')}</div>
+											<Button
+												onClick={() => {
+													if (typeof window !== 'undefined') {
+														sessionStorage.setItem('xernerx_suggestion_draft', search);
+														window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+													}
+												}}
+											>
+												<LogIn size={16} />
+												{t('common.sidebar.login')}
+											</Button>
+										</div>
+									)}
+								</motion.div>
 							)}
 						</motion.div>
 					)}
-				</div>
+				</AnimatePresence>
 			</div>
 		</div>
 	);

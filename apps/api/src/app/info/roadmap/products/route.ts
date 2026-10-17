@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
 		]);
 
 		const botNames = bots.map((b) => b.name).filter(Boolean);
-		const uniqueProducts = [...new Set([...botNames, ...roadmapProducts, ...issueProducts, ...suggestionProducts])].filter(Boolean);
+		const uniqueProducts = [...new Set(['App', ...botNames, ...roadmapProducts, ...issueProducts, ...suggestionProducts])].filter(Boolean);
 
 		return NextResponse.json({ data: uniqueProducts, bots, mainOrgId });
 	} catch (err) {

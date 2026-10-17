@@ -50,6 +50,21 @@ export default function Home() {
 			return;
 		}
 
+		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const redirectParam = params.get('redirect') || params.get('callbackUrl');
+			const saved = sessionStorage.getItem('xernerx_login_redirect');
+			const savedTs = Number(sessionStorage.getItem('xernerx_login_redirect_ts') || '0');
+			const target = redirectParam || (Date.now() - savedTs < 10 * 60 * 1000 ? saved : null);
+
+			if (target && target !== '/' && !target.includes('/login') && !target.includes('/logout')) {
+				sessionStorage.removeItem('xernerx_login_redirect');
+				sessionStorage.removeItem('xernerx_login_redirect_ts');
+				window.location.replace(target);
+				return;
+			}
+		}
+
 		show();
 
 		setNavItems([
@@ -125,7 +140,10 @@ export default function Home() {
 		if (!view) setView('profile');
 	}, [session, status, hide, show, setNavItems, view, setView, t, getEnvUrl]);
 
-	if (!session && status !== 'loading') return redirect('/login');
+	if (!session && status !== 'loading') {
+		const search = typeof window !== 'undefined' ? window.location.search : '';
+		return redirect(`/login${search}`);
+	}
 
 	if (status === 'loading') return <Loading />;
 

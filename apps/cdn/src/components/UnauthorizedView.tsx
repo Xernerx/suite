@@ -21,7 +21,7 @@ export function UnauthorizedView({ signedIn, accountUrl, currentUrl }: { signedI
 						<Button variant="primary">{t('cdn.view.unauthorized.returnToLibrary')}</Button>
 					</a>
 				) : (
-					<a href={`${accountUrl}/login?callbackUrl=${encodeURIComponent(currentUrl)}`} className="mt-4">
+					<a href={`${accountUrl}/login?redirect=${encodeURIComponent(currentUrl)}`} className="mt-4">
 						<Button variant="primary">{t('cdn.view.unauthorized.signIn')}</Button>
 					</a>
 				)}

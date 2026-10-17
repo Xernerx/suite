@@ -32,7 +32,7 @@ export default function InfoHomePage() {
 			title: t('info.home.portals.bugs.title'),
 			description: t('info.home.portals.bugs.description'),
 			icon: <Bug className="w-8 h-8 text-red-500" />,
-			href: '/bugs',
+			href: '/issues',
 			color: 'bg-red-500/10 border-red-500/20',
 		},
 		{

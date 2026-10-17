@@ -102,6 +102,9 @@ export default function ApplicationFormPage() {
 
 		if (config?.requireLogin !== false && !user) {
 			toast({ title: t('www.applications.mustLogin'), type: 'error' });
+			if (typeof window !== 'undefined') {
+				window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+			}
 			return;
 		}
 

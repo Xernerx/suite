@@ -780,8 +780,8 @@
 				"defaultTranslator": "Default (translator)"
 			},
 			"issues": {
-				"title": "Issue Tracker",
-				"logBug": "Log Bug",
+				"title": "Issues",
+				"logBug": "Log Issue",
 				"status": "Status",
 				"resolved": "Resolved",
 				"verified": "Verified",
@@ -794,13 +794,27 @@
 				"cancel": "Cancel",
 				"submitted": "Submitted",
 				"verify": "Verify",
+				"resolveModalTitle": "Resolve App Issue",
+				"resolveModalDesc": "Select the Suite service and update version that fixed this issue.",
+				"selectSubdomain": "Select Subdomain / Service",
+				"selectVersion": "Select Fixed Version",
+				"customVersionPlaceholder": "Or enter version manually (e.g. 2.6.13)",
+				"liveProd": "Production: v{version}",
+				"liveCanary": "Canary: v{version}",
+				"confirmResolve": "Mark Resolved",
+				"releaseStatus": {
+					"production": "Live (Canary & Prod)",
+					"canary": "Canary Only",
+					"pending": "Pending Release"
+				},
 				"toasts": {
 					"deleted": "Deleted",
 					"deletedDesc": "Issue removed.",
 					"error": "Error",
 					"fillAll": "Fill all fields",
+					"selectVersionError": "Please select both a service and version.",
 					"logged": "Logged",
-					"loggedDesc": "Bug logged successfully.",
+					"loggedDesc": "Issue logged successfully.",
 					"resolved": "Resolved",
 					"resolvedDesc": "Issue marked as resolved.",
 					"verifiedDesc": "Issue verified."
@@ -3301,8 +3315,8 @@
 					"description": "Have a great idea? Submit it to our community sandbox where others can vote it up to our roadmap!"
 				},
 				"bugs": {
-					"title": "Bug Centre",
-					"description": "Found a glitch? Report it here so our engineers can squash it and move it to the known issues list."
+					"title": "Issues",
+					"description": "Found an issue? Report it here so our engineers can resolve it and move it to the known issues list."
 				},
 				"faq": {
 					"title": "FAQ",
@@ -3314,7 +3328,7 @@
 			"title": "Platform Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
 			"metrics": {
-				"avgResolutionTime": "Avg Bug Resolution Time",
+				"avgResolutionTime": "Avg Issue Resolution Time",
 				"recentResolutions": "Issues Resolved Recently",
 				"hours": "{count} hours",
 				"na": "N/A"
@@ -3332,7 +3346,7 @@
 			},
 			"knownIssues": {
 				"title": "Known Issues Tracker",
-				"description": "A transparent log of active bugs and recently resolved problems across our ecosystem.",
+				"description": "A transparent log of active issues and recently resolved problems across our ecosystem.",
 				"openIssues": "Open Issues",
 				"noOpenIssues": "No active issues known! Everything is running smoothly.",
 				"recentlyResolved": "Recently Resolved",
@@ -3350,6 +3364,7 @@
 			"submit": "Submit",
 			"cancel": "Cancel",
 			"searchPlaceholder": "Search suggestions (e.g. 'discord bot')...",
+			"startTyping": "Start typing for a new suggestion",
 			"noMatch": "No suggestions match \"{query}\".",
 			"addAsNew": "Add as a New Suggestion",
 			"loginToSubmit": "Log in to submit this as a new idea!",
@@ -3357,6 +3372,7 @@
 				"notAuthenticated": "Not Authenticated",
 				"mustBeLoggedIn": "You must be logged in to post.",
 				"mustBeLoggedInVote": "You must be logged in to vote.",
+				"productRequired": "Please select a product.",
 				"duplicateTitle": "A suggestion with this exact title already exists!",
 				"duplicate": "Duplicate",
 				"submitted": "Suggestion submitted!",
@@ -3367,9 +3383,9 @@
 			}
 		},
 		"bugs": {
-			"title": "Bug Centre",
-			"description": "Report bugs or issues you encounter. Bugs are reviewed by our team and moved to the known issues list once verified.",
-			"newBug": "New Bug",
+			"title": "Issues",
+			"description": "Report issues you encounter. Issues are reviewed by our team and moved to the known issues list once verified.",
+			"newBug": "New Issue",
 			"titlePlaceholder": "Title",
 			"descriptionPlaceholder": "Description",
 			"selectProduct": "Select Product",
@@ -3377,21 +3393,33 @@
 			"uploading": "Uploading...",
 			"submit": "Submit",
 			"cancel": "Cancel",
-			"searchPlaceholder": "Search bugs (e.g. 'login error')...",
-			"noMatch": "No bugs match \"{query}\".",
-			"reportAsNew": "Report as a New Bug",
+			"searchPlaceholder": "Search issues (e.g. 'login error')...",
+			"startTyping": "Start typing for a new issue",
+			"noMatch": "No issues match \"{query}\".",
+			"reportAsNew": "Report as a New Issue",
 			"status": {
 				"resolved": "Resolved",
 				"verified": "Verified",
 				"pendingReview": "Pending Review",
 				"submitted": "Submitted"
 			},
+			"releaseStatus": {
+				"production": "Live (Prod & Canary) • {app} v{version}",
+				"canary": "Canary Only • {app} v{version}",
+				"pending": "Queued • {app} v{version}"
+			},
+			"releaseTooltips": {
+				"production": "This fix is live on both Canary and Production ({app} v{version}).",
+				"canary": "This fix is live on Canary ({app} v{version}) and awaiting Production rollout.",
+				"pending": "This fix is queued for release in {app} v{version}."
+			},
 			"toasts": {
 				"notAuthenticated": "Not Authenticated",
 				"mustBeLoggedIn": "You must be logged in to post.",
+				"productRequired": "Please select a product.",
 				"duplicate": "Duplicate",
-				"duplicateTitle": "A bug with this exact title already exists!",
-				"submitted": "Bug submitted!",
+				"duplicateTitle": "An issue with this exact title already exists!",
+				"submitted": "Issue submitted!",
 				"success": "Success",
 				"uploadFailed": "Upload Failed",
 				"failedToUpload": "Failed to upload attachment",

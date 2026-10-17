@@ -69,8 +69,14 @@ export default function ReturnPage({ session, dbError }: { session: Session | nu
 				{session ? (
 					<Button onClick={() => router.back()}>{t('account.unauthorized.button')}</Button>
 				) : (
-					<Button>
-						<Link href={getEnvUrl('https://account.xernerx.com')}>{t('common.sidebar.login')}</Link>
+					<Button
+						onClick={() => {
+							if (typeof window !== 'undefined') {
+								window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+							}
+						}}
+					>
+						{t('common.sidebar.login')}
 					</Button>
 				)}
 			</div>

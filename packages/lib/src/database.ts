@@ -11,6 +11,7 @@ const globalWithMongoose = global as typeof global & {
 	__root_connections_v5?: Record<string, Connection>;
 	__db_connections_v5?: Record<string, Record<string, Connection>>;
 	__models_v5?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__models_v6?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
 // Close any legacy per-database connections left over from older HMR reloads
@@ -26,9 +27,13 @@ if (globalWithMongoose.__connections_v2) {
 	delete globalWithMongoose.__models_v4;
 }
 
+if (globalWithMongoose.__models_v5) {
+	delete globalWithMongoose.__models_v5;
+}
+
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v5 || {};
+const cachedModels = globalWithMongoose.__models_v6 || {};
 
 // Also close any orphaned top-level mongoose.connections not tracked in rootConnections
 const trackedRoots = new Set(Object.values(rootConnections));
@@ -41,7 +46,7 @@ for (const conn of mongoose.connections) {
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
-	globalWithMongoose.__models_v5 = cachedModels;
+	globalWithMongoose.__models_v6 = cachedModels;
 }
 
 const getUris = (): Record<string, string> => ({
@@ -120,6 +125,9 @@ export async function database(projectId: 'xernerx' | 'virtue') {
 
 		for (const [key, def] of Object.entries(collectionsMap as Record<string, ModelDefinition>)) {
 			try {
+				if (process.env.NODE_ENV !== 'production' && conn.models[def.modelName]) {
+					delete (conn.models as any)[def.modelName];
+				}
 				projectModels[uriSuffix][key] = conn.models[def.modelName] || conn.model(def.modelName, def.schema, def.collection);
 			} catch (err) {
 				console.warn(`Failed to initialize ${def.modelName} in ${uriSuffix}:`, err);

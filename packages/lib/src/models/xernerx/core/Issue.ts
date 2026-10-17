@@ -11,6 +11,8 @@ const schema = new Schema(
 		botId: { type: String, default: null }, // Optional Discord bot ID reference
 		status: { type: String, enum: ['open', 'resolved'], default: 'open' },
 		resolvedAt: { type: Date, default: null }, // Used to calculate Time-to-Resolution
+		resolvedApp: { type: String, default: null }, // Suite app subdomain ID (e.g. 'app', 'info', 'api', 'www')
+		resolvedVersion: { type: String, default: null }, // Version that fixed the issue (e.g. '2.6.12')
 		acknowledged: { type: Boolean, default: false }, // If false, it stays in the admin review queue and does not appear on the roadmap Known Issues tracker
 	},
 	{ timestamps: true } // Provides createdAt automatically

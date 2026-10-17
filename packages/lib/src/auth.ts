@@ -116,7 +116,8 @@ export const auth: NextAuthOptions = {
 			if (url.startsWith('/')) return `${baseUrl}${url}`;
 			try {
 				const parsedUrl = new URL(url);
-				if (parsedUrl.hostname.endsWith('xernerx.com') || parsedUrl.hostname === 'localhost') {
+				const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(parsedUrl.hostname);
+				if (parsedUrl.hostname.endsWith('xernerx.com') || parsedUrl.hostname === 'localhost' || isIp) {
 					return url;
 				}
 			} catch (e) {

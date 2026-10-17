@@ -64,6 +64,12 @@ export default function StorePage() {
 
 	const handleSubscribe = async (priceId: string | null, discountPercent: number = 0) => {
 		if (!priceId) return;
+		if (!user) {
+			if (typeof window !== 'undefined') {
+				window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+			}
+			return;
+		}
 		setActionLoading(priceId);
 
 		try {

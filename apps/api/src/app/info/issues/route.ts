@@ -4,6 +4,7 @@ import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { enrichIssuesWithVersionStatus } from '@/lib/suiteVersions';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,10 +23,8 @@ export async function GET(req: NextRequest) {
 			filter.acknowledged = false;
 		}
 
-		if (status) {
-			if (status === 'open') {
-				filter.status = { $ne: 'resolved' };
-			} else if (status === 'submitted') {
+		if (status && status !== 'open') {
+			if (status === 'submitted') {
 				filter.status = { $ne: 'resolved' };
 				filter.acknowledged = false;
 			} else if (status === 'verified') {
@@ -36,7 +35,12 @@ export async function GET(req: NextRequest) {
 			}
 		}
 
-		const issues = await models.core.Issue.find(filter).sort({ createdAt: -1 }).lean();
+		const rawIssues = await models.core.Issue.find(filter).sort({ createdAt: -1 }).lean();
+		const enriched = await enrichIssuesWithVersionStatus(rawIssues);
+
+		const issues =
+			status === 'open' ? enriched.filter((issue: any) => issue.status !== 'resolved' || (issue.resolvedApp && issue.resolvedVersion && issue.releaseStatus !== 'production')) : enriched;
+
 		return NextResponse.json({ data: issues });
 	} catch (err) {
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

@@ -1,9 +1,10 @@
 /** @format */
+// Force recompile
 'use client';
 
 import { Bell, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { useDictionary, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 
 import { AnimatePresence } from 'framer-motion';
 import { Divider } from '@xernerx/ui';
@@ -11,6 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SidebarNotifications from './cards/SidebarNotifications';
 import SidebarUserCard from './cards/SidebarUser';
+import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 const deviceIcons = {
@@ -25,8 +27,11 @@ export function Sidebar() {
 	const { user: discordUser } = useUser();
 	const { device } = usePlatform();
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const { unreadCount } = useNotifications();
 	const { setNavOpen } = useShortcuts();
+	const pathname = usePathname();
+	const [isMounted, setIsMounted] = useState(false);
 
 	// Manage which dropdown is active
 	const [activeMenu, setActiveMenu] = useState<'none' | 'user' | 'notifications'>('none');
@@ -46,6 +51,7 @@ export function Sidebar() {
 	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
 
 	useEffect(() => {
+		setIsMounted(true);
 		function handleClickOutside(event: MouseEvent) {
 			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
 				setActiveMenu('none');
@@ -54,6 +60,13 @@ export function Sidebar() {
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
+
+	const loginHref = (() => {
+		if (!isMounted || typeof window === 'undefined') return '/login';
+		const base = getEnvUrl('https://account.xernerx.com/login');
+		const isAuthRoute = pathname?.startsWith('/login') || pathname?.startsWith('/logout');
+		return !isAuthRoute && window.location.href ? `${base}?redirect=${encodeURIComponent(window.location.href)}` : base;
+	})();
 
 	if (state === 'hidden') return null;
 
@@ -161,7 +174,7 @@ export function Sidebar() {
 				<div ref={menuRef} className={`relative flex flex-col ${isCollapsed ? 'items-center' : ''}`} style={{ paddingBottom: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{!activeUser ? (
 						<Link
-							href="/login"
+							href={loginHref}
 							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
                                 ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
                             `}

@@ -1,11 +1,15 @@
+/** @format */
+
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { enrichIssuesWithVersionStatus } from '@/lib/suiteVersions';
 
 export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');
 		const items = await models.core.Issue.find().sort({ createdAt: -1 }).lean();
-		return NextResponse.json({ data: items });
+		const enriched = await enrichIssuesWithVersionStatus(items);
+		return NextResponse.json({ data: enriched });
 	} catch (err) {
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}

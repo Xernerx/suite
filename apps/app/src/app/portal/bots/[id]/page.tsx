@@ -85,13 +85,26 @@ export default function PortalBotPage() {
 					setOrganizations(await orgsRes.json());
 				}
 
-				if (botsRes.ok && currentBotData) {
-					const allBots = await botsRes.json();
-					const relatedBots = allBots.filter((b: any) =>
-						currentBotData.organization && currentBotData.organization !== 'null' && currentBotData.organization !== 'undefined'
-							? b.organization === currentBotData.organization
-							: !b.organization || b.organization === 'null' || b.organization === 'undefined'
-					);
+				if (currentBotData) {
+					const isOrgBot = Boolean(currentBotData.organization && currentBotData.organization !== 'null' && currentBotData.organization !== 'undefined');
+					let relatedBots: any[] = [];
+
+					if (isOrgBot) {
+						try {
+							const orgBotsRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${currentBotData.organization}`), { credentials: 'include' });
+							if (orgBotsRes.ok) {
+								const orgBotsData = await orgBotsRes.json();
+								if (Array.isArray(orgBotsData)) relatedBots = orgBotsData;
+							}
+						} catch (e) {
+							console.error('Failed to fetch organization bots', e);
+						}
+					} else if (botsRes.ok) {
+						const allBots = await botsRes.json();
+						if (Array.isArray(allBots)) {
+							relatedBots = allBots.filter((b: any) => !b.organization || b.organization === 'null' || b.organization === 'undefined');
+						}
+					}
 
 					const botsWithDiscord = await Promise.all(
 						relatedBots.map(async (b: any) => {

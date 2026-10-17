@@ -48,9 +48,7 @@ export function Footer() {
 					</div>
 
 					<div className="text-sm text-(--text-muted)">
-						{t('components.footer.text2')}
-						{new Date().getFullYear()}
-						{t('components.footer.text3')}
+						{t('components.footer.text2')} {new Date().getFullYear()} {t('components.footer.text3')}
 					</div>
 				</div>
 				{/* ---------------------------------------------------------------- */}
@@ -68,7 +66,7 @@ export function Footer() {
 				{/* ---------------------------------------------------------------- */}
 				<FooterSection title={t('common.footer.sections.support')}>
 					<FooterLink href={resolveUrl('https://info.xernerx.com')} icon={LifeBuoy} label={t('common.footer.links.help')} external={false} />
-					<FooterLink href={resolveUrl('https://info.xernerx.com/bugs')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/issues')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
@@ -81,7 +79,7 @@ export function Footer() {
 					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
 					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
 					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} />
-					<FooterLink href="https://discord.gg/yrm8gqTuXa" icon={MessageCircle} label={t('common.footer.links.discord')} />
+					<FooterLink href="/support" icon={MessageCircle} label={t('common.footer.links.discord')} />
 				</FooterSection>
 			</div>
 		</motion.footer>

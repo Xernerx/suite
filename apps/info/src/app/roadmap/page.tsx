@@ -472,6 +472,14 @@ export default function RoadmapPage() {
 										.filter((i: any) => i.status === 'resolved')
 										.map((issue: any) => {
 											const issueBotInfo = resolveBot(issue);
+											const releaseStatus: 'production' | 'canary' | 'pending' | null = issue.resolvedApp && issue.resolvedVersion ? issue.releaseStatus || 'pending' : null;
+											const releaseBadgeColor =
+												releaseStatus === 'production'
+													? 'text-green-400 bg-green-500/10 border-green-500/20'
+													: releaseStatus === 'canary'
+														? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+														: 'text-purple-400 bg-purple-500/10 border-purple-500/20';
+											const releaseDotColor = releaseStatus === 'production' ? 'bg-green-500' : releaseStatus === 'canary' ? 'bg-amber-500' : 'bg-purple-500';
 											return (
 												<motion.div
 													layout
@@ -483,11 +491,34 @@ export default function RoadmapPage() {
 													className="flex flex-col p-6 bg-(--foreground)/20 backdrop-blur-xl rounded-2xl border border-(--border)/5 shadow-lg transition-all duration-300 hover:border-green-500/40 hover:bg-(--foreground)/40 gap-3 relative overflow-hidden opacity-75 hover:opacity-100 group/card"
 												>
 													<div className="absolute top-0 left-0 w-1.5 h-full bg-green-500/30 group-hover/card:bg-green-500 transition-colors duration-300 rounded-l-2xl"></div>
-													<div className="flex justify-between items-start mb-2">
-														<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-green-500/20">
-															{issueBotInfo?.avatarUrl && <img src={issueBotInfo.avatarUrl} alt={issueBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-															{issueBotInfo ? issueBotInfo.name : issue.productId}
-														</span>
+													<div className="flex flex-wrap justify-between items-start gap-2 mb-2">
+														<div className="flex flex-wrap items-center gap-2">
+															<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-green-500/20">
+																{issueBotInfo?.avatarUrl && <img src={issueBotInfo.avatarUrl} alt={issueBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+																{issueBotInfo ? issueBotInfo.name : issue.productId}
+															</span>
+															{releaseStatus && (
+																<Tooltip
+																	position="bottom"
+																	content={t(`info.bugs.releaseTooltips.${releaseStatus}`, {
+																		app: issue.resolvedApp,
+																		version: issue.resolvedVersion,
+																	})}
+																>
+																	<div
+																		className={`inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1.5 rounded-lg border cursor-help ${releaseBadgeColor}`}
+																	>
+																		<span className={`w-2 h-2 rounded-full ${releaseDotColor}`}></span>
+																		<span>
+																			{t(`info.bugs.releaseStatus.${releaseStatus}`, {
+																				app: issue.resolvedApp,
+																				version: issue.resolvedVersion,
+																			})}
+																		</span>
+																	</div>
+																</Tooltip>
+															)}
+														</div>
 														<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/40 px-2 py-1 rounded-md">
 															{t('info.roadmap.knownIssues.fixedOn', {
 																date: new Date(issue.resolvedAt || issue.updatedAt).toLocaleDateString(),

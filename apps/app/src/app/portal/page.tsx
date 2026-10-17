@@ -68,71 +68,99 @@ export default function PortalPage() {
 		if (!envReady || status === 'loading') return;
 
 		if (status === 'unauthenticated') {
-			window.location.href = getEnvUrl('https://account.xernerx.com/login');
+			window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
 			return;
 		}
 
 		show();
 
-		const fetchOrganizations = async () => {
+		const populateDiscordBots = async (botList: any[]) => {
+			return Promise.all(
+				botList.map(async (bot: any) => {
+					if (bot.discord) return bot;
+					try {
+						const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
+						if (discordRes.ok) {
+							bot.discord = await discordRes.json();
+						}
+					} catch (e) {
+						console.error(`Failed to fetch discord user for bot ${bot.id}`, e);
+					}
+					return bot;
+				})
+			);
+		};
+
+		const fetchPortalData = async () => {
 			const sessionData = session as any;
 			if (!sessionData?.user?.id) {
 				setLoading(false);
 				return;
 			}
 
+			let userOrgs: Organization[] = [];
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?user=${sessionData.user.id}`), {
 					credentials: 'include',
 				});
 				if (res.ok) {
 					const data = await res.json();
-					setOrganizations(data);
+					userOrgs = Array.isArray(data) ? data : [];
+					setOrganizations(userOrgs);
 
 					const params = new URLSearchParams(window.location.search);
 					const orgParam = params.get('org');
 
+					let matched = false;
 					if (orgParam) {
-						const targetOrg = data.find((o: any) => o._id === orgParam);
+						const targetOrg = userOrgs.find((o: any) => o._id === orgParam);
 						if (targetOrg) {
 							setSelectedOrg(targetOrg);
 							setView(`org-${targetOrg._id}`);
-							return;
+							matched = true;
 						}
 					}
 
-					setSelectedOrg('personal');
-					setView('org-personal');
+					if (!matched) {
+						setSelectedOrg('personal');
+						setView('org-personal');
+					}
 				}
 			} catch (error) {
 				console.error('Failed to fetch organizations:', error);
 			} finally {
 				setLoading(false);
 			}
-		};
 
-		const fetchBots = async () => {
-			const sessionData = session as any;
-			if (!sessionData?.user?.id) return;
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${sessionData.user.id}`), { credentials: 'include' });
-				if (res.ok) {
-					const fetchedBots = await res.json();
-					const populatedBots = await Promise.all(
-						fetchedBots.map(async (bot: any) => {
-							try {
-								const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
-								if (discordRes.ok) {
-									bot.discord = await discordRes.json();
-								}
-							} catch (e) {
-								console.error(`Failed to fetch discord user for bot ${bot.id}`, e);
-							}
-							return bot;
-						})
-					);
-					setBots(populatedBots);
+				const [ownerRes, ...orgBotResponses] = await Promise.all([
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${sessionData.user.id}`), { credentials: 'include' }),
+					...userOrgs.map((org) => fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${org._id}`), { credentials: 'include' })),
+				]);
+
+				const botMap = new Map<string, any>();
+				if (ownerRes.ok) {
+					const ownerBots = await ownerRes.json();
+					if (Array.isArray(ownerBots)) {
+						ownerBots.forEach((b: any) => {
+							if (b?.id) botMap.set(b.id, b);
+						});
+					}
 				}
+
+				for (const orgBotRes of orgBotResponses) {
+					if (orgBotRes.ok) {
+						const orgBotsList = await orgBotRes.json();
+						if (Array.isArray(orgBotsList)) {
+							orgBotsList.forEach((b: any) => {
+								if (b?.id) botMap.set(b.id, b);
+							});
+						}
+					}
+				}
+
+				const populatedBots = await populateDiscordBots(Array.from(botMap.values()));
+				setBots(populatedBots);
 			} catch (error) {
 				console.error('Failed to fetch bots:', error);
 			}
@@ -158,8 +186,7 @@ export default function PortalPage() {
 			}
 		};
 
-		fetchOrganizations();
-		fetchBots();
+		fetchPortalData();
 		fetchGuilds();
 
 		return () => clearNavItems();

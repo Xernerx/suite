@@ -707,8 +707,8 @@
 		},
 		"dashboard": {
 			"issues": {
-				"title": "Probleembeheer",
-				"logBug": "Bug Vastleggen",
+				"title": "Problemen",
+				"logBug": "Probleem Vastleggen",
 				"status": "Status",
 				"resolved": "Opgelost",
 				"verified": "Geverifieerd",
@@ -761,8 +761,8 @@
 					"description": "Heb je een geweldig idee? Dien het in bij onze community-sandbox waar anderen erop kunnen stemmen voor de roadmap!"
 				},
 				"bugs": {
-					"title": "Bugtracker",
-					"description": "Een bug gevonden? Meld hem hier zodat onze technici hem kunnen oplossen en naar de bekende problemen kunnen verplaatsen."
+					"title": "Problemen",
+					"description": "Een probleem gevonden? Meld het hier zodat onze technici het kunnen oplossen en naar de bekende problemen kunnen verplaatsen."
 				},
 				"faq": {
 					"title": "Veelgestelde Vragen",
@@ -774,7 +774,7 @@
 			"title": "Platform Roadmap",
 			"description": "Onze chronologische reis van functies, optimalisaties en releases. Zie precies wat er aankomt en wanneer.",
 			"metrics": {
-				"avgResolutionTime": "Gemiddelde oplostijd van bugs",
+				"avgResolutionTime": "Gemiddelde oplostijd van problemen",
 				"recentResolutions": "Recent opgeloste problemen",
 				"hours": "{count} uur",
 				"na": "N.v.t."
@@ -792,7 +792,7 @@
 			},
 			"knownIssues": {
 				"title": "Bekende Problemen Tracker",
-				"description": "Een transparant logboek van actieve bugs en recent opgeloste problemen binnen ons ecosysteem.",
+				"description": "Een transparant logboek van actieve problemen en recent opgeloste problemen binnen ons ecosysteem.",
 				"openIssues": "Openstaande Problemen",
 				"noOpenIssues": "Geen actieve problemen bekend! Alles werkt soepel.",
 				"recentlyResolved": "Recent Opgelost",
@@ -810,6 +810,7 @@
 			"submit": "Indienen",
 			"cancel": "Annuleren",
 			"searchPlaceholder": "Zoek suggesties (bijv. 'discord bot')...",
+			"startTyping": "Begin met typen voor een nieuwe suggestie",
 			"noMatch": "Geen suggesties komen overeen met \"{query}\".",
 			"addAsNew": "Als nieuwe suggestie toevoegen",
 			"loginToSubmit": "Log in om dit als een nieuw idee in te dienen!",
@@ -817,6 +818,7 @@
 				"notAuthenticated": "Niet Geauthenticeerd",
 				"mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
 				"mustBeLoggedInVote": "Je moet ingelogd zijn om te stemmen.",
+				"productRequired": "Selecteer een product.",
 				"duplicateTitle": "Er bestaat al een suggestie met deze exacte titel!",
 				"duplicate": "Duplicaat",
 				"submitted": "Suggestie ingediend!",
@@ -827,9 +829,9 @@
 			}
 		},
 		"bugs": {
-			"title": "Bugtracker",
-			"description": "Meld bugs of problemen die je tegenkomt. Bugs worden beoordeeld door ons team en geverifieerd.",
-			"newBug": "Nieuwe Bug",
+			"title": "Problemen",
+			"description": "Meld problemen die je tegenkomt. Problemen worden beoordeeld door ons team en geverifieerd.",
+			"newBug": "Nieuw Probleem",
 			"titlePlaceholder": "Titel",
 			"descriptionPlaceholder": "Beschrijving",
 			"selectProduct": "Selecteer Product",
@@ -837,21 +839,33 @@
 			"uploading": "Uploaden...",
 			"submit": "Indienen",
 			"cancel": "Annuleren",
-			"searchPlaceholder": "Zoek bugs (bijv. 'inlogfout')...",
-			"noMatch": "Geen bugs komen overeen met \"{query}\".",
-			"reportAsNew": "Als nieuwe bug melden",
+			"searchPlaceholder": "Zoek problemen (bijv. 'inlogfout')...",
+			"startTyping": "Begin met typen voor een nieuw probleem",
+			"noMatch": "Geen problemen komen overeen met \"{query}\".",
+			"reportAsNew": "Als nieuw probleem melden",
 			"status": {
 				"resolved": "Opgelost",
 				"verified": "Geverifieerd",
 				"pendingReview": "In Afwachting",
 				"submitted": "Ingediend"
 			},
+			"releaseStatus": {
+				"production": "Live (Prod & Canary) • {app} v{version}",
+				"canary": "Alleen Canary • {app} v{version}",
+				"pending": "In Wachtrij • {app} v{version}"
+			},
+			"releaseTooltips": {
+				"production": "Deze oplossing staat live op zowel Canary als Productie ({app} v{version}).",
+				"canary": "Deze oplossing staat momenteel live op Canary ({app} v{version}) en wacht op uitrol naar Productie.",
+				"pending": "Deze oplossing staat ingepland voor {app} v{version}."
+			},
 			"toasts": {
 				"notAuthenticated": "Niet Geauthenticeerd",
 				"mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
+				"productRequired": "Selecteer een product.",
 				"duplicate": "Duplicaat",
-				"duplicateTitle": "Er bestaat al een bug met deze exacte titel!",
-				"submitted": "Bug ingediend!",
+				"duplicateTitle": "Er bestaat al een probleem met deze exacte titel!",
+				"submitted": "Probleem ingediend!",
 				"success": "Succes",
 				"uploadFailed": "Upload Mislukt",
 				"failedToUpload": "Uploaden van bijlage mislukt",

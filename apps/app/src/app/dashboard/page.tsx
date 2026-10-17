@@ -61,7 +61,7 @@ export default function DashboardPage() {
 		if (!isReady || status === 'loading') return;
 
 		if (status === 'unauthenticated') {
-			window.location.href = getEnvUrl('https://account.xernerx.com/login');
+			window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
 			return;
 		}
 
