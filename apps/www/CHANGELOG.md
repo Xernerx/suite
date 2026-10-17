@@ -1,5 +1,12 @@
 # www
 
+## 0.12.1
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.6.1
+
 ## 0.12.0
 
 ### Minor Changes

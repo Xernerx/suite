@@ -1,5 +1,11 @@
 # @xernerx/components
 
+## 0.6.1
+
+### Patch Changes
+
+- Fixed metadata reading for SEO and GSC services
+
 ## 0.6.0
 
 ### Minor Changes

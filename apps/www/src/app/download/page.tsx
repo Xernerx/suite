@@ -47,8 +47,8 @@ export default function Page() {
 		>
 			<motion.div
 				initial={{
-					opacity: 0,
-					y: 10,
+					opacity: 1,
+					y: 0,
 				}}
 				animate={{
 					opacity: 1,

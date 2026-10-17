@@ -28,6 +28,7 @@ export function Footer() {
 
 	return (
 		<motion.footer
+			data-nosnippet
 			initial={{ opacity: 1, y: 0 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"

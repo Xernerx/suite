@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx Docs',
 		template: 'Xernerx Docs | %s',
 	},
-	description: 'Official documentation, guides, and API references for the Xernerx Suite.',
+	description: 'Official developer documentation, guides, NPM package references, and REST/WebSocket API specifications for Xernerx Studios.',
 
 	metadataBase: new URL('https://docs.xernerx.com'),
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Docs',
 			template: 'Xernerx Docs | %s',
 		},
-		description: 'Official documentation, guides, and API references for the Xernerx Suite.',
+		description: 'Official developer documentation, guides, NPM package references, and REST/WebSocket API specifications for Xernerx Studios.',
 		url: 'https://docs.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Docs',
 			template: 'Xernerx Docs | %s',
 		},
-		description: 'Official documentation, guides, and API references for the Xernerx Suite.',
+		description: 'Official developer documentation, guides, NPM package references, and REST/WebSocket API specifications for Xernerx Studios.',
 		images: ['/banner.png'],
 	},
 

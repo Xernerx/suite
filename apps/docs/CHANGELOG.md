@@ -1,5 +1,12 @@
 # docs
 
+## 1.0.18
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.6.1
+
 ## 1.0.17
 
 ### Patch Changes
