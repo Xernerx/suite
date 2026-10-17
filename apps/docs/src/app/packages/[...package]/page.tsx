@@ -19,6 +19,10 @@ async function getPackageData(pkgName: string, version: string) {
 async function getAvailableVersions(pkgName: string) {
 	try {
 		const res = await fetch('https://api.github.com/repos/Xernerx/docs/git/trees/main?recursive=1', {
+			headers: {
+				Accept: 'application/vnd.github.v3+json',
+				...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
+			},
 			next: { revalidate: 3600 },
 		});
 		const data = await res.json();

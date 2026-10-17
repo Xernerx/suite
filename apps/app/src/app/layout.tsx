@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx Studios | Explore',
 		template: 'Xernerx Studios | Explore | %s',
 	},
-	description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home on Xernerx.',
+	description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios. Power up your server, manage bot dashboards, or find your next home.',
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios | Explore',
 			template: 'Xernerx Studios | Explore | %s',
 		},
-		description: 'Discover thousands of unique Discord bots and vibrant communities. Power up your server or find your next home.',
+		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios. Power up your server, manage bot dashboards, or find your next home.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios | Explore',
 			template: 'Xernerx Studios | Explore | %s',
 		},
-		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx.',
+		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios.',
 		images: ['/banner.png'],
 	},
 

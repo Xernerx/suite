@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx Support',
 		template: 'Xernerx Support | %s',
 	},
-	description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report issues.',
+	description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
 
 	metadataBase: new URL('https://info.xernerx.com'),
 
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Support',
 			template: 'Xernerx Support | %s',
 		},
-		description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report issues.',
+		description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
 		url: 'https://info.xernerx.com',
 		siteName: 'Xernerx Support',
 		images: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Support',
 			template: 'Xernerx Support | %s',
 		},
-		description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report issues.',
+		description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
 		card: 'summary_large_image',
 	},
 
