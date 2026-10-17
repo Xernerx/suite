@@ -4,7 +4,7 @@
 
 ## 🧭 Overview
 
-`apps/info` (`info.xernerx.com`, dev port `4007`) is the public community feedback, roadmap, bug reporting, and knowledgebase support hub.
+`apps/info` (`info.xernerx.com`, dev port `4007`) is the public community feedback, roadmap, bug reporting, changelog, and knowledgebase support hub.
 
 ## 🏗️ Key Routes & Architecture
 
@@ -13,6 +13,7 @@
 - **`/suggestions`:** Community feature request board with upvoting and status filtering (`/secure/core/suggestions`).
 - **`/bugs`:** Bug reporting portal that uploads screenshot attachments to `cdn.xernerx.com/upload` before submitting issue payloads to `/secure/core/issues`.
 - **`/faq`:** Tabbed knowledgebase covering Bots, Environments, and Translations.
+- **`/changelog`:** Aggregated release notes across the monorepo.
 
 ## ⚠️ Important Rules & Gotchas
 

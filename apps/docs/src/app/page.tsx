@@ -61,8 +61,8 @@ export default function DocsHome() {
 			{/* Hero Section */}
 			<motion.div
 				initial={{
-					opacity: 0,
-					y: 20,
+					opacity: 1,
+					y: 0,
 				}}
 				animate={{
 					opacity: 1,
@@ -114,11 +114,11 @@ export default function DocsHome() {
 				}}
 			>
 				<motion.div
-					initial="hidden"
+					initial="visible"
 					animate="visible"
 					variants={{
 						hidden: {
-							opacity: 0,
+							opacity: 1,
 						},
 						visible: {
 							opacity: 1,
@@ -144,8 +144,8 @@ export default function DocsHome() {
 								key={idx}
 								variants={{
 									hidden: {
-										opacity: 0,
-										y: 20,
+										opacity: 1,
+										y: 0,
 									},
 									visible: {
 										opacity: 1,

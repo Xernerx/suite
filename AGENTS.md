@@ -10,14 +10,14 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 
 | Workspace Path        | Package / Service Name | Dev Port | Subdomain (Public / Canary / Dev) | Purpose                                                                          |
 | :-------------------- | :--------------------- | :------- | :-------------------------------- | :------------------------------------------------------------------------------- |
-| `apps/www`            | `www`                  | `4000`   | `xernerx.com`                     | Marketing showcase, legal (`terms`, `privacy`), changelog, applications          |
+| `apps/www`            | `www`                  | `4000`   | `xernerx.com`                     | Marketing showcase, legal (`terms`, `privacy`), applications, desktop download   |
 | `apps/api`            | `api`                  | `4001`   | `api.xernerx.com`                 | Core backend gateway, Bearer token validator, Discord & Stripe webhooks          |
 | `apps/cdn`            | `cdn`                  | `4002`   | `cdn.xernerx.com`                 | Media pipeline, `@vercel/blob` private storage, `/raw/[id]` streaming            |
 | `apps/account`        | `account`              | `4003`   | `account.xernerx.com`             | Identity hub, profile settings, localization, tokens, and billing history        |
 | `apps/app`            | `app`                  | `4004`   | `app.xernerx.com`                 | User dashboard, bot & server explorer, Virtue settings, dev `/portal`            |
 | `apps/docs`           | `docs`                 | `4005`   | `docs.xernerx.com`                | Developer documentation, interactive API specs, package docs reader              |
 | `apps/admin`          | `admin`                | `4006`   | `admin.xernerx.com`               | Internal staff portal, RBAC role management, moderation, system config           |
-| `apps/info`           | `info`                 | `4007`   | `info.xernerx.com`                | Feedback & support hub (`roadmap`, `suggestions`, `bugs`, `faq`)                 |
+| `apps/info`           | `info`                 | `4007`   | `info.xernerx.com`                | Feedback & support hub (`roadmap`, `suggestions`, `bugs`, `faq`, `changelog`)    |
 | `apps/store`          | `store`                | `4008`   | `store.xernerx.com`               | Store portal, Virtue subscriptions, add-ons, credits, and checkout               |
 | `packages/components` | `@xernerx/components`  | —        | —                                 | Shared application shell (`AppLayout`, `Header`, `Sidebar`, `Footer`)            |
 | `packages/feedback`   | `@xernerx/feedback`    | —        | —                                 | Route feedback & error boundaries (`Loading`, `Error`, `NotFound`)               |

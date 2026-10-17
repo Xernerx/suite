@@ -21,7 +21,6 @@ import {
 	useEnvironment,
 } from '@xernerx/providers';
 import React, { Suspense } from 'react';
-import Script from 'next/script';
 
 import { CookiePrompt } from './CookiePrompt';
 import { TermsPrompt } from './TermsPrompt';
@@ -70,7 +69,17 @@ function AuthWatcher() {
 	return null;
 }
 
-export function AppLayout({ dictionary, children, initialEnvironment }: { children: React.ReactNode; dictionary: any; initialEnvironment?: 'dev' | 'canary' | 'public' }) {
+export function AppLayout({
+	dictionary,
+	children,
+	initialEnvironment,
+	enableAds = false,
+}: {
+	children: React.ReactNode;
+	dictionary: any;
+	initialEnvironment?: 'dev' | 'canary' | 'public';
+	enableAds?: boolean;
+}) {
 	React.useEffect(() => {
 		if (typeof document !== 'undefined') {
 			document.body.classList.add(fredoka.variable, cascadiaCode.variable);
@@ -87,13 +96,8 @@ export function AppLayout({ dictionary, children, initialEnvironment }: { childr
 				}}
 			>
 				<ThemeScript />
-				{process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
-					<Script
-						async
-						src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-						crossOrigin="anonymous"
-						strategy="afterInteractive"
-					/>
+				{enableAds && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+					<script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`} crossOrigin="anonymous" />
 				)}
 
 				<DictionaryProvider dictionary={dictionary}>

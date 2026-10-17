@@ -48,6 +48,14 @@ export const metadata: Metadata = {
 		description: 'The official Feedback, Support, and Community Hub for the Xernerx Suite. Explore our roadmap, submit suggestions, and report issues.',
 		card: 'summary_large_image',
 	},
+
+	icons: {
+		icon: '/logo.png',
+	},
+
+	alternates: {
+		canonical: './',
+	},
 };
 
 export default async function RootLayout({
@@ -67,7 +75,9 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style}>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>{children}</AppLayout>
+					<AppLayout dictionary={dict} enableAds>
+						{children}
+					</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

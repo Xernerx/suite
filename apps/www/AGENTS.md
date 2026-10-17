@@ -4,14 +4,13 @@
 
 ## 🧭 Overview
 
-`apps/www` (`xernerx.com` / `www.xernerx.com`, dev port `4000`) is the primary public marketing website, legal compliance center, changelog viewer, staff application portal, and desktop client download hub.
+`apps/www` (`xernerx.com` / `www.xernerx.com`, dev port `4000`) is the primary public marketing website, legal compliance center, staff application portal, and desktop client download hub.
 
 ## 🏗️ Key Routes & Architecture
 
 - **`/`:** Marketing homepage showcasing the Xernerx ecosystem.
 - **`/terms` & `/privacy`:** Official Terms of Service and Privacy Policy pages with intersection-observer table of contents and scroll progress bars.
 - **`/applications` & `/applications/[id]`:** Public staff/role application forms dispatching submissions to `api.xernerx.com/secure/dispatch/applications`.
-- **`/changelog`:** Aggregated release notes across the monorepo.
 - **`/download`:** Native desktop client (`clients/desktop`) installer download page.
 - **`/contact`:** General inquiry and support contact page.
 - **`/invites` & `/invites/[id]`:** Vanity invite showcase and redirect handler.

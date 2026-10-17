@@ -24,7 +24,6 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
-	// Explicitly call show on mount as requested
 	useEffect(() => {
 		show();
 	}, [show]);
@@ -43,7 +42,6 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 
 		setNavItems(items);
 
-		// If no view is selected, default to the first one or the query parameter
 		if (!view && items.length > 0) {
 			const itemParam = searchParams?.get('item');
 			if (itemParam) {
@@ -55,17 +53,15 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 		}
 
 		return () => clearNavItems();
-	}, [changelogs, setNavItems, clearNavItems, show, setView, view, searchParams, router]);
+	}, [changelogs, setNavItems, clearNavItems, show, setView, view, searchParams, router, t]);
 
 	const activeLog = changelogs.find((log) => `changelog-${log.appName.toLowerCase()}` === view) || changelogs[0];
 
-	// Handle hash scrolling after render
 	useEffect(() => {
 		if (typeof window !== 'undefined' && window.location.hash) {
-			const hash = window.location.hash.substring(1); // remove '#'
+			const hash = window.location.hash.substring(1);
 			const element = document.getElementById(hash);
 			if (element) {
-				// Use setTimeout to ensure DOM has fully painted the new view
 				setTimeout(() => {
 					element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}, 100);
@@ -96,9 +92,8 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 					<div className="prose prose-invert max-w-none text-(--text) prose-headings:text-(--text) prose-strong:text-(--text) prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:text-(--text-muted) prose-a:text-blue-500 hover:prose-a:text-blue-400">
 						<ReactMarkdown
 							components={{
-								h2: ({ node, ...props }) => {
+								h2: ({ node: _node, ...props }) => {
 									const textContent = extractText(props.children);
-									// Strip brackets, spaces, and 'v' prefix to just get the raw version (e.g. 2.5.0)
 									const id = textContent.replace(/[^a-zA-Z0-9.-]/g, '').replace(/^v/i, '');
 
 									return (

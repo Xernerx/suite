@@ -2,7 +2,26 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Copy, Download, Home, LayoutGrid, Minus, Monitor, RotateCw, Search, SidebarClose, SidebarOpen, Smartphone, Square, Tablet, User as UserIcon, X } from 'lucide-react';
+import {
+	ArrowLeft,
+	ArrowRight,
+	Copy,
+	Download,
+	Home,
+	LayoutGrid,
+	Minus,
+	Monitor,
+	RotateCw,
+	Search,
+	SidebarClose,
+	SidebarOpen,
+	Smartphone,
+	Square,
+	Store,
+	Tablet,
+	User as UserIcon,
+	X,
+} from 'lucide-react';
 import { useDictionary, useEnvironment, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -225,6 +244,15 @@ export function Header() {
 						</motion.div>
 					)}
 
+					<Link
+						suppressHydrationWarning
+						href={getEnvUrl('https://store.xernerx.com')}
+						title={t('components.header.store')}
+						className="flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors"
+					>
+						<Store size={20} />
+					</Link>
+
 					{state === 'hidden' && (
 						<button className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => setNavOpen(true)} title={t('components.header.title1')}>
 							<LayoutGrid size={20} />
@@ -333,7 +361,7 @@ export function Header() {
 							}}
 						>
 							<span className="text-(--text-muted) select-none text-sm font-medium pr-1">https://</span>
-							<SubSelector name="pre" options={['app', 'www', 'api', 'docs', 'admin', 'account']} defaultValue={urlState.pre} />
+							<SubSelector name="pre" options={['app', 'www', 'api', 'docs', 'admin', 'account', 'store', 'info']} defaultValue={urlState.pre} />
 							<span className="text-(--text-muted) select-none text-sm font-medium px-0.5">.</span>
 							<SubSelector name="env" options={['public', 'canary', 'dev']} defaultValue={urlState.env} />
 							<span className="text-(--text-muted) select-none text-sm font-medium pl-0.5 pr-2">.xernerx.com</span>

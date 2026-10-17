@@ -24,7 +24,28 @@ export default function Home() {
 			icon: <Package size={24} />,
 			title: 'REST API',
 			desc: t('www.software.apiDesc'),
-			link: 'https://docs.dev.xernerx.com/api',
+			link: 'https://docs.xernerx.com/api',
+			tag: t('www.software.apiTag'),
+		},
+		{
+			icon: <Boxes size={24} />,
+			title: t('docs.home.categories.npm.title'),
+			desc: t('docs.home.categories.npm.description'),
+			link: 'https://docs.xernerx.com/packages',
+			tag: t('www.software.npmPackageTag'),
+		},
+		{
+			icon: <Boxes size={24} />,
+			title: t('docs.home.categories.websocket.title'),
+			desc: t('docs.home.categories.websocket.description'),
+			link: 'https://docs.xernerx.com/websocket',
+			tag: t('www.software.apiTag'),
+		},
+		{
+			icon: <Boxes size={24} />,
+			title: t('docs.home.categories.cdn.title'),
+			desc: t('docs.home.categories.cdn.description'),
+			link: 'https://docs.xernerx.com/cdn',
 			tag: t('www.software.apiTag'),
 		},
 	]);
@@ -78,14 +99,16 @@ export default function Home() {
 							icon: <Boxes size={24} />,
 							title: name,
 							desc,
-							link: `https://docs.dev.xernerx.com/packages/${name}`,
+							link: `https://docs.xernerx.com/packages/${name}`,
 							tag: t('www.software.npmPackageTag'),
 						};
 					})
 				);
 
 				// Keep the static API card and append dynamic packages
-				setDynamicPackages((prev) => [prev[0], ...pkgs]);
+				if (pkgs.length > 0) {
+					setDynamicPackages((prev) => [prev[0], ...pkgs]);
+				}
 			})
 			.catch(console.error);
 	}, []);
@@ -111,7 +134,7 @@ export default function Home() {
 			<section className="min-h-[90vh] flex items-center justify-center px-6 pt-20 pb-16 relative">
 				<div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
 					{/* LEFT: TEXT */}
-					<motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
+					<motion.div initial={{ opacity: 1, x: 0 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
 						<h1
 							className="text-6xl lg:text-7xl xl:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
 							style={{ fontFamily: 'var(--font-fredoka)' }}
@@ -139,7 +162,7 @@ export default function Home() {
 
 					{/* RIGHT: BANNER VISUAL */}
 					<motion.div
-						initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+						initial={{ opacity: 1, scale: 1, rotate: 0 }}
 						animate={{ opacity: 1, scale: 1, rotate: 0 }}
 						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
 						className="relative flex justify-center items-center w-full"
@@ -223,7 +246,7 @@ export default function Home() {
 					].map((point, i) => (
 						<motion.div
 							key={point.title}
-							initial={{ opacity: 0, y: 30 }}
+							initial={{ opacity: 1, y: 0 }}
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-50px' }}
 							transition={{ duration: 0.6, delay: i * 0.15, ease: 'easeOut' }}
@@ -325,7 +348,7 @@ export default function Home() {
 							{dynamicPackages.map((item) => (
 								<a
 									key={item.title}
-									href={getEnvUrl(item.link.replace('docs.dev.xernerx.com', 'docs.xernerx.com'))}
+									href={getEnvUrl(item.link)}
 									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
 								>
 									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
@@ -356,7 +379,7 @@ export default function Home() {
 					</div>
 
 					<motion.div
-						initial={{ opacity: 0, y: 40 }}
+						initial={{ opacity: 1, y: 0 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
 						transition={{ duration: 0.8 }}
@@ -368,7 +391,7 @@ export default function Home() {
 					</motion.div>
 
 					<motion.div
-						initial={{ opacity: 0, x: 40 }}
+						initial={{ opacity: 1, x: 0 }}
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
 						transition={{ duration: 0.8, delay: 0.2 }}
