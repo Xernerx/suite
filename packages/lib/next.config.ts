@@ -1,8 +1,14 @@
+/** @format */
+
 import type { NextConfig } from 'next';
 
 export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 	return {
 		...appConfig,
+		experimental: {
+			turbopackFileSystemCacheForDev: false,
+			...appConfig.experimental,
+		},
 		async headers() {
 			const appHeaders = appConfig.headers ? await appConfig.headers() : [];
 			return [

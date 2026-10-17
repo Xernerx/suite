@@ -2,7 +2,7 @@
 // Force recompile
 'use client';
 
-import { BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
+import { BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, History, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
@@ -28,7 +28,7 @@ export function Footer() {
 
 	return (
 		<motion.footer
-			initial={{ opacity: 0, y: 10 }}
+			initial={{ opacity: 1, y: 0 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
@@ -55,11 +55,11 @@ export function Footer() {
 				{/* Resources */}
 				{/* ---------------------------------------------------------------- */}
 				<FooterSection title={t('common.footer.sections.resources')}>
-					<FooterLink href={resolveUrl('https://xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
 					<FooterLink onClick={openPrompt} icon={SlidersHorizontal} label={t('common.footer.links.cookiePreferences')} />
-					<FooterLink href={resolveUrl('https://xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/applications')} icon={Briefcase} label={t('common.footer.links.careers')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Support */}
@@ -69,8 +69,9 @@ export function Footer() {
 					<FooterLink href={resolveUrl('https://info.xernerx.com/issues')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/changelog')} icon={History} label={t('common.footer.links.changelog')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/faq')} icon={CircleQuestionMark} label={t('common.footer.links.faq')} external={false} />
-					<FooterLink href={resolveUrl('https://xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/contact')} icon={Mail} label={t('common.footer.links.contact')} external={false} />
 				</FooterSection>
 				{/* ---------------------------------------------------------------- */}
 				{/* Developer */}
@@ -78,7 +79,7 @@ export function Footer() {
 				<FooterSection title={t('common.footer.sections.developer')}>
 					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
 					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
-					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} />
+					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} external={false} />
 					<FooterLink href="/support" icon={MessageCircle} label={t('common.footer.links.discord')} />
 				</FooterSection>
 			</div>

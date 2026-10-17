@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 	},
 
 	alternates: {
-		canonical: 'https://app.xernerx.com',
+		canonical: './',
 	},
 };
 
@@ -75,7 +75,9 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>{children}</AppLayout>
+					<AppLayout dictionary={dict} enableAds>
+						{children}
+					</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

@@ -47,12 +47,14 @@ export default function Page() {
 		show();
 	}, [setView, show, view, t, setNavItems]);
 
+	const activeView = view || 'translations';
+
 	return (
 		<AnimatePresence mode="wait">
-			<motion.div key={view} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
-				{view === 'translations' && <Translations />}
-				{view === 'environments' && <Environments />}
-				{view === 'bots' && <Bots />}
+			<motion.div key={activeView} initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
+				{activeView === 'translations' && <Translations />}
+				{activeView === 'environments' && <Environments />}
+				{activeView === 'bots' && <Bots />}
 			</motion.div>
 		</AnimatePresence>
 	);

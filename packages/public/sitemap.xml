@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<!-- ================================================================== -->
+	<!-- WWW (www.xernerx.com)                                              -->
+	<!-- ================================================================== -->
+	<url>
+		<loc>https://www.xernerx.com/</loc>
+		<changefreq>weekly</changefreq>
+		<priority>1.0</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/download</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/invites</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/applications</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.7</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/contact</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.6</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/terms</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/privacy</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.5</priority>
+	</url>
+	<url>
+		<loc>https://www.xernerx.com/cookies</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.5</priority>
+	</url>
+
+	<!-- ================================================================== -->
+	<!-- APP (app.xernerx.com)                                              -->
+	<!-- ================================================================== -->
+	<url>
+		<loc>https://app.xernerx.com/</loc>
+		<changefreq>daily</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://app.xernerx.com/bots</loc>
+		<changefreq>daily</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://app.xernerx.com/servers</loc>
+		<changefreq>daily</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://app.xernerx.com/bots/782105629572464652</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://app.xernerx.com/bots/950251264095162418</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://app.xernerx.com/bots/881678826906730547</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+
+	<!-- ================================================================== -->
+	<!-- STORE (store.xernerx.com)                                          -->
+	<!-- ================================================================== -->
+	<url>
+		<loc>https://store.xernerx.com/</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.9</priority>
+	</url>
+
+	<!-- ================================================================== -->
+	<!-- DOCS (docs.xernerx.com)                                            -->
+	<!-- ================================================================== -->
+	<url>
+		<loc>https://docs.xernerx.com/</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.9</priority>
+	</url>
+	<url>
+		<loc>https://docs.xernerx.com/api</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://docs.xernerx.com/api/v1</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://docs.xernerx.com/packages</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://docs.xernerx.com/cdn</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.7</priority>
+	</url>
+	<url>
+		<loc>https://docs.xernerx.com/websocket</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.7</priority>
+	</url>
+
+	<!-- ================================================================== -->
+	<!-- INFO (info.xernerx.com)                                            -->
+	<!-- ================================================================== -->
+	<url>
+		<loc>https://info.xernerx.com/</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://info.xernerx.com/roadmap</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://info.xernerx.com/suggestions</loc>
+		<changefreq>daily</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://info.xernerx.com/issues</loc>
+		<changefreq>daily</changefreq>
+		<priority>0.7</priority>
+	</url>
+	<url>
+		<loc>https://info.xernerx.com/changelog</loc>
+		<changefreq>daily</changefreq>
+		<priority>0.8</priority>
+	</url>
+	<url>
+		<loc>https://info.xernerx.com/faq</loc>
+		<changefreq>monthly</changefreq>
+		<priority>0.8</priority>
+	</url>
+</urlset>

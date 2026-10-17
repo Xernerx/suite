@@ -50,6 +50,7 @@
 				"issues": "Issues",
 				"suggestions": "Suggestions",
 				"roadmap": "Roadmap",
+				"changelog": "Changelog",
 				"faq": "Frequently Asked Questions",
 				"careers": "Careers",
 				"github": "GitHub",
@@ -145,6 +146,7 @@
 		},
 		"header": {
 			"description": "Download the app!",
+			"store": "Store",
 			"tooltip": "Open App Drawer (Ctrl + K)"
 		},
 		"error": {
@@ -3258,6 +3260,7 @@
 		},
 		"header": {
 			"text1": "Download the app!",
+			"store": "Store",
 			"title1": "Open App Drawer (Ctrl + K)"
 		},
 		"page": {},
@@ -3321,6 +3324,10 @@
 				"faq": {
 					"title": "FAQ",
 					"description": "Frequently asked questions, billing inquiries, and general help with your Xernerx account."
+				},
+				"changelog": {
+					"title": "Changelog",
+					"description": "See the latest updates, version history, and release notes across the Xernerx ecosystem."
 				}
 			}
 		},

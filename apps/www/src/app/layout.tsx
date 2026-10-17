@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 	},
 	description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
 
-	metadataBase: new URL('https://xernerx.com'),
+	metadataBase: new URL('https://www.xernerx.com'),
 
 	openGraph: {
 		title: {
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 			template: 'Xernerx Studios | %s',
 		},
 		description: 'Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.',
-		url: 'https://xernerx.com',
+		url: 'https://www.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
 			{
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 	},
 
 	alternates: {
-		canonical: 'https://xernerx.com',
+		canonical: './',
 	},
 };
 
@@ -75,7 +75,9 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
 			<body style={themeProps.style}>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>{children}</AppLayout>
+					<AppLayout dictionary={dict} enableAds>
+						{children}
+					</AppLayout>
 				</SessionProvider>
 			</body>
 		</html>

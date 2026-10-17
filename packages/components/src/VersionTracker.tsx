@@ -45,7 +45,7 @@ export function VersionTracker() {
 						action: {
 							label: 'View Changelog',
 							onClick: () => {
-								window.location.href = getEnvUrl('https://www.xernerx.com/changelog');
+								window.location.href = getEnvUrl('https://info.xernerx.com/changelog');
 							},
 						},
 						duration: 10000,

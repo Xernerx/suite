@@ -2,10 +2,6 @@
 import { withXernerxConfig } from '@xernerx/lib/next.config';
 import type { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {
-	outputFileTracingIncludes: {
-		'/changelog': ['../../apps/*/CHANGELOG.md'],
-	},
-};
+const nextConfig: NextConfig = {};
 
 export default withXernerxConfig(nextConfig);

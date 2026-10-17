@@ -54,8 +54,13 @@ export const metadata: Metadata = {
 		icon: '/logo.png',
 	},
 
+	robots: {
+		index: false,
+		follow: false,
+	},
+
 	alternates: {
-		canonical: 'https://admin.xernerx.com',
+		canonical: './',
 	},
 };
 

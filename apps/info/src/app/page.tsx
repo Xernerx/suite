@@ -1,8 +1,9 @@
+/** @format */
 'use client';
 import { useEffect } from 'react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { motion } from 'framer-motion';
-import { Bug, Compass, Map, MessageSquare, LifeBuoy } from 'lucide-react';
+import { Bug, Compass, History, Map, MessageSquare, LifeBuoy } from 'lucide-react';
 import Link from 'next/link';
 
 export default function InfoHomePage() {
@@ -36,6 +37,13 @@ export default function InfoHomePage() {
 			color: 'bg-red-500/10 border-red-500/20',
 		},
 		{
+			title: t('info.home.portals.changelog.title'),
+			description: t('info.home.portals.changelog.description'),
+			icon: <History className="w-8 h-8 text-amber-500" />,
+			href: '/changelog',
+			color: 'bg-amber-500/10 border-amber-500/20',
+		},
+		{
 			title: t('info.home.portals.faq.title'),
 			description: t('info.home.portals.faq.description'),
 			icon: <LifeBuoy className="w-8 h-8 text-green-500" />,
@@ -50,13 +58,13 @@ export default function InfoHomePage() {
 			<div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-(--accent)/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
 
 			<motion.div
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 1, y: 0 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5, ease: 'easeOut' }}
 				className="flex flex-col items-center text-center gap-6 max-w-3xl mx-auto"
 			>
 				<motion.div
-					initial={{ scale: 0.8, opacity: 0 }}
+					initial={{ scale: 1, opacity: 1 }}
 					animate={{ scale: 1, opacity: 1 }}
 					transition={{ duration: 0.4, delay: 0.1 }}
 					className="flex items-center justify-center w-16 h-16 rounded-2xl bg-(--accent)/20 border border-(--accent)/30 mb-2"
@@ -67,11 +75,11 @@ export default function InfoHomePage() {
 				<p className="text-xl text-(--text-muted) leading-relaxed">{t('info.home.description')}</p>
 			</motion.div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto w-full">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto w-full">
 				{portals.map((portal, i) => (
 					<Link href={portal.href} key={i}>
 						<motion.div
-							initial={{ opacity: 0, y: 25 }}
+							initial={{ opacity: 1, y: 0 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.45, delay: 0.15 + i * 0.08, ease: 'easeOut' }}
 							whileHover={{ y: -6, scale: 1.02 }}

@@ -53,8 +53,8 @@ export default function ContactPage() {
 		<div className="mx-auto w-full max-w-7xl px-6 py-20">
 			<motion.div
 				initial={{
-					opacity: 0,
-					y: 15,
+					opacity: 1,
+					y: 0,
 				}}
 				animate={{
 					opacity: 1,
@@ -81,7 +81,7 @@ export default function ContactPage() {
 
 			<motion.div
 				initial={{
-					opacity: 0,
+					opacity: 1,
 				}}
 				animate={{
 					opacity: 1,
@@ -103,7 +103,7 @@ export default function ContactPage() {
 				<p className="mx-auto mt-4 max-w-2xl leading-7 text-(--text-muted)">{t('www.contact.description3')}</p>
 
 				<div className="mt-8 flex flex-wrap justify-center gap-4">
-					<Link href={getEnvUrl('https://app.xernerx.com/docs')} className="rounded-xl px-5 py-3 font-medium transition-all duration-200 bg-(--accent) text-(--background) hover:opacity-90">
+					<Link href={getEnvUrl('https://docs.xernerx.com')} className="rounded-xl px-5 py-3 font-medium transition-all duration-200 bg-(--accent) text-(--background) hover:opacity-90">
 						{t('www.contact.button')}
 					</Link>
 

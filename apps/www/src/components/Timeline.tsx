@@ -146,7 +146,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 			{/* CARD */}
 			<Component
 				{...componentProps}
-				initial={{ opacity: 0, x: 50, scale: 0.95 }}
+				initial={{ opacity: 1, x: 0, scale: 1 }}
 				whileInView={{ opacity: 1, x: 0, scale: 1 }}
 				viewport={{ once: true, margin: '-100px' }}
 				transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}

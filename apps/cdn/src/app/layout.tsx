@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 	},
 
 	alternates: {
-		canonical: 'https://cdn.xernerx.com',
+		canonical: './',
 	},
 };
 
