@@ -36,6 +36,16 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 		setMounted(true);
 	}, []);
 
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === 'Escape' && open && !loading) {
+				onOpenChange(false);
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [open, loading, onOpenChange]);
+
 	if (!open || !mounted) return null;
 
 	const { icon: Icon, iconWrapper, button } = variantStyles[variant];

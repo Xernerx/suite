@@ -152,7 +152,7 @@ function ServersListContent() {
 				<div className="relative max-w-sm w-full">
 					<Input
 						variant="search"
-						shortcut="/"
+						shortcut="K"
 						placeholder={t('app.servers.placeholder')}
 						defaultValue={searchParams.get('search') || ''}
 						onSearch={(val) => {

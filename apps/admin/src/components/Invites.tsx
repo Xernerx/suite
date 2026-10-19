@@ -166,7 +166,7 @@ export default function Invites() {
 				</Button>
 			</div>
 
-			<Input variant="search" placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+			<Input variant="search" shortcut={true} placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 
 			{filteredInvites.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">

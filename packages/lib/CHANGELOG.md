@@ -1,5 +1,11 @@
 # @xernerx/lib
 
+## 1.5.1
+
+### Patch Changes
+
+- Streamlined shortcuts and added new shortcuts.
+
 ## 1.5.0
 
 ### Minor Changes

@@ -405,7 +405,7 @@ export default function Home() {
 					<div className="flex-1 w-full min-w-[200px]">
 						<Input
 							variant="search"
-							shortcut="/"
+							shortcut="K"
 							placeholder={context === 'bots' ? t('app.home.searchBots') : t('app.home.searchServers')}
 							onSearch={(val) => {
 								if (val.trim()) router.push(`/${context}?search=${encodeURIComponent(val.trim())}`);

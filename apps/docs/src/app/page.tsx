@@ -1,10 +1,11 @@
 /** @format */
 'use client';
 
-import { Book, Code, Globe, Package, Rocket, Search, Zap } from 'lucide-react';
+import { Book, Code, Globe, Package, Rocket, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
+import { Input } from '@xernerx/ui';
 
 const categories = [
 	{
@@ -89,20 +90,8 @@ export default function DocsHome() {
 
 				{/* Search Bar */}
 				<div className="w-full max-w-2xl mt-8 relative group">
-					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-purple-500 rounded-3xl blur-md opacity-20 group-hover:opacity-40 transition duration-500" />
-					<div className="relative flex items-center w-full rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl transition-all duration-300 focus-within:border-(--accent)/50 focus-within:bg-(--foreground)/50">
-						<Search size={22} className="absolute left-6 text-(--text-muted) group-focus-within:text-(--accent) transition-colors" />
-						<input
-							type="text"
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							placeholder={t('docs.home.searchPlaceholder')}
-							className="w-full bg-transparent border-none text-(--text) placeholder:text-(--text-muted) focus:outline-none focus:ring-0 text-base"
-							style={{
-								padding: 'calc(var(--ui-gap) * 1.5) calc(var(--ui-gap) * 1.5) calc(var(--ui-gap) * 1.5) 4rem',
-							}}
-						/>
-					</div>
+					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-purple-500 rounded-full blur-md opacity-20 group-hover:opacity-40 transition duration-500 pointer-events-none" />
+					<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('docs.home.searchPlaceholder')} />
 				</div>
 			</motion.div>
 

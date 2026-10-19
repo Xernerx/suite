@@ -89,6 +89,10 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 
 - **Reuse Shared UI First:** Before rendering custom UI elements, always check `@xernerx/ui` and `@xernerx/components` for existing primitives and components.
 - **Toggles Instead of Checkboxes (`Toggle.tsx`):** Never render raw native `<input type="checkbox">` elements. Always use `Toggle` from `@xernerx/ui` for boolean settings, switches, and binary state controls.
+- **Search Inputs & Global Shortcuts (`Input.tsx` & `ShortcutsProvider.tsx`):**
+    - Never build custom search input markup or bind conflicting keyboard shortcuts (such as `Ctrl + /`, which is reserved for the global Help modal, or `Ctrl + ~` which collides with browser shortcuts).
+    - Always use `<Input variant="search" shortcut={true} ... />` (or `shortcut="K"`) from `@xernerx/ui` for page-level search bars so they adhere to the global `Ctrl + K` search shortcut.
+    - Respect all global shortcuts (`Ctrl + /` Help, `Ctrl + K` Search, `Ctrl + Space` / `Alt + A` App Drawer Navigation, `Ctrl + B` Sidebar toggle, `Ctrl + .` URL Omnibar, `Ctrl + I` Notifications, `Ctrl + ,` Account Settings, `Ctrl + S` / `Ctrl + Enter` Save unsaved changes, `Alt + R` Reset unsaved changes, `Alt + 1..9` Switch sidebar views, `Ctrl + Shift + C` Copy URL, `Esc` Close modals/popovers) and register any custom view shortcuts via `useShortcuts().registerShortcut()`.
 - **500-Line Inline Code Cap:** Any `page.tsx` or component file exceeding 500 lines of inline UI/JSX code must be broken down into sub-components (a file >500 lines that mainly composes imported components is fine).
 - **Strict `src/components/` Placement:** All app-specific components must be housed in `apps/<app>/src/components/` (next to `src/app/`), **never** co-located inside `src/app/` route folders.
 - **Strict 3-Route Local `/api` Rule:** Frontend apps may only house `/api/auth/[...nextauth]`, `/api/changelog`, and `/api/version` locally. All other backend endpoints (including Stripe store routes) must live in `apps/api` (`api.xernerx.com/secure/*` or `/v1/*`).

@@ -1,5 +1,17 @@
 # info
 
+## 1.3.4
+
+### Patch Changes
+
+- Streamlined shortcuts and added new shortcuts.
+- Updated dependencies
+    - @xernerx/components@0.6.3
+    - @xernerx/lib@1.5.1
+    - @xernerx/providers@0.6.6
+    - @xernerx/feedback@0.0.34
+    - @xernerx/ui@0.4.1
+
 ## 1.3.3
 
 ### Patch Changes

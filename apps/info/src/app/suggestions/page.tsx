@@ -272,7 +272,7 @@ export default function SuggestionsPage() {
 							className="flex flex-col gap-4 w-full"
 						>
 							<div className="flex flex-col gap-1.5">
-								<Input variant="search" placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+								<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 								<p className="text-xs text-(--text-muted) px-1">{t('info.suggestions.startTyping')}</p>
 							</div>
 

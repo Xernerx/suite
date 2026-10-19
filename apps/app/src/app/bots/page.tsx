@@ -223,7 +223,7 @@ function BotsListContent() {
 				<div className="relative max-w-sm w-full">
 					<Input
 						variant="search"
-						shortcut="/"
+						shortcut="K"
 						placeholder={t('app.bots.placeholder1')}
 						defaultValue={searchParams.get('search') || ''}
 						onSearch={(val) => {

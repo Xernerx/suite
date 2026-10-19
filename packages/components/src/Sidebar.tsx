@@ -61,6 +61,22 @@ export function Sidebar() {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 
+	useEffect(() => {
+		if (!activeUser || state === 'hidden') return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement;
+			const isInput = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable;
+			if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 'i' || e.key === 'I') && !isInput) {
+				e.preventDefault();
+				setActiveMenu((prev) => (prev === 'notifications' ? 'none' : 'notifications'));
+			} else if (e.key === 'Escape') {
+				setActiveMenu('none');
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [activeUser, state]);
+
 	const loginHref = (() => {
 		if (!isMounted || typeof window === 'undefined') return '/login';
 		const base = getEnvUrl('https://account.xernerx.com/login');

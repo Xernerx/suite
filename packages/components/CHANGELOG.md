@@ -1,5 +1,16 @@
 # @xernerx/components
 
+## 0.6.3
+
+### Patch Changes
+
+- Streamlined shortcuts and added new shortcuts.
+- Updated dependencies
+    - @xernerx/lib@1.5.1
+    - @xernerx/providers@0.6.6
+    - @xernerx/feedback@0.0.34
+    - @xernerx/ui@0.4.1
+
 ## 0.6.2
 
 ### Patch Changes

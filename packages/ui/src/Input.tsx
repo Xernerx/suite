@@ -18,7 +18,7 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', ..
 	const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
 	const { platform } = usePlatform();
 
-	const activeShortcut = typeof shortcut === 'boolean' && shortcut ? '/' : typeof shortcut === 'string' ? shortcut : null;
+	const activeShortcut = typeof shortcut === 'boolean' && shortcut ? 'K' : typeof shortcut === 'string' ? shortcut : null;
 
 	// Handle global shortcut key listener
 	useEffect(() => {

@@ -67,7 +67,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 			{/* Filters */}
 			<div className="flex flex-col md:flex-row items-center gap-3 justify-between">
 				<div className="w-full md:max-w-md">
-					<Input value={search} onChange={(e: any) => setSearch(e.target.value)} placeholder={t('admin.store.table.searchPlaceholder')} />
+					<Input variant="search" shortcut={true} value={search} onChange={(e: any) => setSearch(e.target.value)} placeholder={t('admin.store.table.searchPlaceholder')} />
 				</div>
 
 				<div className="flex items-center gap-2 w-full md:w-auto">

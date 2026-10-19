@@ -1,5 +1,13 @@
 # @xernerx/providers
 
+## 0.6.6
+
+### Patch Changes
+
+- Streamlined shortcuts and added new shortcuts.
+- Updated dependencies
+    - @xernerx/lib@1.5.1
+
 ## 0.6.5
 
 ### Patch Changes

@@ -289,7 +289,7 @@ export default function IssuesPage() {
 							className="flex flex-col gap-4 w-full"
 						>
 							<div className="flex flex-col gap-1.5">
-								<Input variant="search" placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+								<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 								<p className="text-xs text-(--text-muted) px-1">{t('info.bugs.startTyping')}</p>
 							</div>
 

@@ -2,9 +2,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Command, Compass, FileText, HelpCircle, LayoutGrid, Search, SidebarIcon, X, RefreshCw } from 'lucide-react';
+import { Bell, ChevronDown, Command, Compass, Copy, FileText, Globe, HelpCircle, Layers, LayoutGrid, RefreshCw, Save, Search, Settings, SidebarIcon, X } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useDictionary, useEnvironment, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { navigation } from '@xernerx/lib';
 import { useSession } from 'next-auth/react';
 type ShortcutItem = {
@@ -34,19 +34,49 @@ const defaultShortcuts: ShortcutItem[] = [
 		icon: HelpCircle,
 	},
 	{
-		key: 'Ctrl + S',
-		description: 'Open global search across app',
+		key: 'Ctrl + K',
+		description: 'Focus page search bar',
 		icon: Search,
 	},
 	{
-		key: 'Ctrl + K',
+		key: 'Ctrl + Space',
 		description: 'Open navigation modal',
 		icon: Compass,
 	},
 	{
-		key: 'Ctrl + ~',
+		key: 'Ctrl + B',
 		description: 'Toggle application sidebar visibility',
 		icon: SidebarIcon,
+	},
+	{
+		key: 'Ctrl + .',
+		description: 'Toggle URL omnibar',
+		icon: Globe,
+	},
+	{
+		key: 'Ctrl + I',
+		description: 'Toggle notifications drawer',
+		icon: Bell,
+	},
+	{
+		key: 'Ctrl + ,',
+		description: 'Open account settings',
+		icon: Settings,
+	},
+	{
+		key: 'Ctrl + S / Enter',
+		description: 'Save unsaved changes',
+		icon: Save,
+	},
+	{
+		key: 'Alt + 1..9',
+		description: 'Switch sidebar views or tabs',
+		icon: Layers,
+	},
+	{
+		key: 'Ctrl + Shift + C',
+		description: 'Copy current suite URL',
+		icon: Copy,
 	},
 	{
 		key: 'Ctrl + R',
@@ -61,6 +91,8 @@ const defaultShortcuts: ShortcutItem[] = [
 ];
 export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
 	const [isHelpOpen, setHelpOpen] = useState(false);
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [isNavOpen, setNavOpen] = useState(false);
@@ -78,19 +110,28 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement;
 			const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-			if (e.ctrlKey && e.key === '.') {
+			if ((e.ctrlKey || e.metaKey) && e.key === '.') {
 				e.preventDefault();
 				setUrlPlacerOpen((prev) => !prev);
-			} else if (e.ctrlKey && e.key === '/') {
+			} else if ((e.ctrlKey || e.metaKey) && e.key === '/') {
 				e.preventDefault();
 				setHelpOpen((prev) => !prev);
-			} else if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+			} else if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
 				e.preventDefault();
 				setSearchOpen((prev) => !prev);
-			} else if (e.ctrlKey && (e.key === 'k' || e.key === 'K')) {
+			} else if (((e.ctrlKey || e.metaKey) && (e.key === ' ' || e.code === 'Space')) || (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'a' || e.key === 'A') && !isInput)) {
 				e.preventDefault();
 				setNavOpen((prev) => !prev);
-			} else if (e.ctrlKey && e.key === '`' && !isInput) {
+			} else if ((e.ctrlKey || e.metaKey) && e.key === ',' && !isInput) {
+				e.preventDefault();
+				window.location.href = getEnvUrl('https://account.xernerx.com');
+			} else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'c' || e.key === 'C') && !isInput) {
+				e.preventDefault();
+				const currentUrl = window.location.href;
+				navigator.clipboard.writeText(currentUrl).then(() => {
+					toast({ type: 'success', title: t('components.header.urlCopied'), description: currentUrl });
+				});
+			} else if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !isInput) {
 				e.preventDefault();
 				toggleSidebar();
 			} else if (e.key === 'Escape') {
@@ -102,7 +143,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 		};
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, []);
+	}, [getEnvUrl, toast, t]);
 	const value = {
 		isHelpOpen,
 		setHelpOpen,

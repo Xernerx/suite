@@ -1,5 +1,11 @@
 # @xernerx/desktop
 
+## 2.1.10
+
+### Patch Changes
+
+- Streamlined shortcuts and added new shortcuts.
+
 ## 2.1.9
 
 ### Patch Changes
