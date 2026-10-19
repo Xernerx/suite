@@ -2,18 +2,28 @@
 // Force recompile
 'use client';
 
-import { BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, History, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
+import { Activity, BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, History, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
+import { useEffect, useState } from 'react';
 
 import { BsGithub } from 'react-icons/bs';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
 export function Footer() {
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { openPrompt } = useCookie();
 	const { t } = useDictionary();
 	const resolveUrl = (url: string) => getEnvUrl(url);
+
+	const [systemOnline, setSystemOnline] = useState<boolean | null>(null);
+
+	useEffect(() => {
+		if (!isReady) return;
+		fetch('/api/version', { cache: 'no-store' })
+			.then((res) => setSystemOnline(res.ok))
+			.catch(() => setSystemOnline(false));
+	}, [isReady]);
 
 	return (
 		<motion.footer
@@ -31,10 +41,23 @@ export function Footer() {
 				{/* Brand */}
 				{/* ---------------------------------------------------------------- */}
 				<div className="flex flex-col justify-between text-center md:text-left" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<div className="flex flex-col items-center md:items-start" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 						<h2 className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</h2>
 
 						<p className="max-w-md leading-7 text-(--text-muted)">{t('common.footer.tagline')}</p>
+
+						<Link
+							suppressHydrationWarning
+							href={resolveUrl('https://info.xernerx.com/status')}
+							className="mt-1 inline-flex items-center gap-2 rounded-full border border-(--border)/15 bg-(--foreground)/40 px-3 py-1 text-xs font-medium text-(--text-muted) transition-colors hover:border-(--accent)/40 hover:text-(--text)"
+						>
+							<span
+								className={`h-2 w-2 rounded-full ${
+									systemOnline === null ? 'bg-(--text-muted) animate-pulse' : systemOnline ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-amber-400'
+								}`}
+							/>
+							<span>{systemOnline === false ? t('common.footer.links.statusDegraded') : t('common.footer.links.statusOperational')}</span>
+						</Link>
 					</div>
 
 					<div className="text-sm text-(--text-muted)">
@@ -56,6 +79,7 @@ export function Footer() {
 				{/* ---------------------------------------------------------------- */}
 				<FooterSection title={t('common.footer.sections.support')}>
 					<FooterLink href={resolveUrl('https://info.xernerx.com')} icon={LifeBuoy} label={t('common.footer.links.help')} external={false} />
+					<FooterLink href={resolveUrl('https://info.xernerx.com/status')} icon={Activity} label={t('common.footer.links.status')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/issues')} icon={Bug} label={t('common.footer.links.issues')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/suggestions')} icon={MessageSquare} label={t('common.footer.links.suggestions')} external={false} />
 					<FooterLink href={resolveUrl('https://info.xernerx.com/roadmap')} icon={Map} label={t('common.footer.links.roadmap')} external={false} />

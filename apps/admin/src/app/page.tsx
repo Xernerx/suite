@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { Activity, AlertTriangle, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server } from 'lucide-react';
+import { Activity, AlertTriangle, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server, ScrollText } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
+import AuditLogs from '@/components/AuditLogs';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import Overview from '@/components/Overview';
@@ -237,6 +238,13 @@ export default function Home() {
 			});
 		}
 
+		items.push({
+			category: t('common.nav.categories.system'),
+			label: t('admin.dashboard.nav.auditLogs'),
+			view: 'audit',
+			icon: ScrollText,
+		});
+
 		if (canManageRoadmap) {
 			items.push({
 				category: t('common.nav.categories.product'),
@@ -343,6 +351,7 @@ export default function Home() {
 	const isServerSet = !!adminServerId;
 
 	allowedViews.push('overview');
+	allowedViews.push('audit');
 	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
 	if (canUsers && isServerSet) allowedViews.push('users');
@@ -370,6 +379,7 @@ export default function Home() {
 			}}
 		>
 			{activeView === 'overview' && <Overview />}
+			{activeView === 'audit' && <AuditLogs />}
 			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations />}
 			{activeView === 'users' && <Users />}

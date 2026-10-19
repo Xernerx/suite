@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, CreditCard, ExternalLink, Loader2, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
+import { AlertTriangle, Coins, CreditCard, ExternalLink, Flame, Gift, Loader2, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@xernerx/ui';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
@@ -20,8 +20,13 @@ interface EnrichedSubscription extends UserSubscription {
 const allProductIds = [...products.users, ...products.developers, ...(products.servers || [])];
 export default function Billing() {
 	const { t } = useDictionary();
-	const { user, loading: userLoading } = useUser() as {
+	const {
+		user,
+		mutate,
+		loading: userLoading,
+	} = useUser() as {
 		user: any;
+		mutate?: () => Promise<void>;
 		loading?: boolean;
 	};
 	const { getEnvUrl } = useEnvironment();
@@ -30,6 +35,41 @@ export default function Billing() {
 	const [loading, setLoading] = useState(true);
 	const [cancellingId, setCancellingId] = useState<string | null>(null);
 	const [cancelConfirm, setCancelConfirm] = useState<string | null>(null);
+	const [claimingGift, setClaimingGift] = useState(false);
+
+	const creditBalance = user?.credits?.balance ?? 0;
+	const creditStreak = user?.credits?.streak ?? 0;
+	const nextGiftMs = user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : 0;
+	const canClaimGift = creditStreak === 0 || nextGiftMs <= Date.now();
+	const hoursUntilGift = !canClaimGift ? Math.max(1, Math.ceil((nextGiftMs - Date.now()) / (1000 * 60 * 60))) : 0;
+
+	const handleClaimDailyGift = async () => {
+		if (!user?.id || claimingGift) return;
+		setClaimingGift(true);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}/credits/claim`), {
+				method: 'POST',
+				credentials: 'include',
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || t('account.billing.credits.claimError'));
+			if (mutate) await mutate();
+			toast({
+				type: 'success',
+				title: t('account.billing.credits.claimSuccess', {
+					amount: data.rewardEarned || 50,
+					streak: data.streak || 1,
+				}),
+			});
+		} catch (err: any) {
+			toast({
+				type: 'error',
+				title: err.message || t('account.billing.credits.claimError'),
+			});
+		} finally {
+			setClaimingGift(false);
+		}
+	};
 	const rawSubs: UserSubscription[] = user?.billing?.subscriptions?.filter((s: UserSubscription) => s.status === 'active') || [];
 	useEffect(() => {
 		if (userLoading) return;
@@ -159,6 +199,37 @@ export default function Billing() {
 					gap: 'var(--ui-gap)',
 				}}
 			>
+				{/* Credits & Daily Streak Card */}
+				<div
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{
+						padding: 'var(--ui-gap)',
+						gap: 'var(--ui-gap)',
+					}}
+				>
+					<div className="flex items-center gap-4">
+						<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
+							<Coins size={26} />
+						</div>
+						<div>
+							<div className="flex flex-wrap items-center gap-2.5">
+								<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{creditBalance.toLocaleString()} {t('account.billing.credits.unit')}
+								</h2>
+								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-500/15 text-orange-400 border border-orange-500/25">
+									<Flame size={12} />
+									{t('account.billing.credits.streakDays', { count: creditStreak })}
+								</span>
+							</div>
+							<p className="text-xs text-(--text-muted) mt-1">{t('account.billing.credits.description')}</p>
+						</div>
+					</div>
+
+					<Button onClick={handleClaimDailyGift} disabled={!canClaimGift || claimingGift} className="flex items-center gap-2 shrink-0">
+						{claimingGift ? <Loader2 size={15} className="animate-spin" /> : <Gift size={15} />}
+						{canClaimGift ? t('account.billing.credits.claimButton') : t('account.billing.credits.nextClaimIn', { hours: hoursUntilGift })}
+					</Button>
+				</div>
 				{/* Loading */}
 				{isLoading && (
 					<div

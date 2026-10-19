@@ -49,7 +49,10 @@
 				"documentation": "Documentatie",
 				"discord": "Discord",
 				"faq": "Veel Gestelde Vragen",
-				"careers": "Vacatures"
+				"careers": "Vacatures",
+				"status": "Systeemstatus",
+				"statusOperational": "Alle systemen operationeel",
+				"statusDegraded": "Systeemstatus: Vertraagd"
 			},
 			"title": "Xernerx Studios",
 			"description": "© 2024 -",
@@ -417,7 +420,8 @@
 				"virtue": "Virtue",
 				"api": "API & Ontwikkelaar",
 				"billing": "Facturering & Abonnementen",
-				"apps": "Bots & Applicaties"
+				"apps": "Bots & Applicaties",
+				"community": "Community & Roadmap"
 			},
 			"items": {
 				"birthday": "Verjaardag",
@@ -430,7 +434,11 @@
 				"subscriptionExpiring": "Abonnement Verloopt",
 				"paymentFailed": "Betaling Mislukt",
 				"botApproved": "Bot Goedgekeurd",
-				"botRejected": "Bot Afgewezen"
+				"botRejected": "Bot Afgewezen",
+				"roadmapReleased": "Roadmap Mijlpaal Uitgebracht",
+				"issueStatusUpdate": "Bugmelding Statusupdate",
+				"suggestionStatusUpdate": "Suggestie Statusupdate",
+				"applicationReviewed": "Sollicitatie Beoordeeld"
 			},
 			"channels": {
 				"discord": "Discord",
@@ -481,6 +489,61 @@
 				"deleteConfirm": "Weet je zeker dat je dit token permanent wilt verwijderen?",
 				"deleteSuccess": "Token verwijderd",
 				"deleteError": "Verwijderen mislukt"
+			}
+		},
+		"activity": {
+			"navLabel": "Activiteit & Gegevens",
+			"title": "Mijn Activiteit & Accountgegevens",
+			"description": "Volg al je ingediende sollicitaties, bugrapporten en suggesties, of exporteer je volledige accountgegevens.",
+			"exportData": "Mijn gegevens exporteren (JSON)",
+			"exportSuccess": "Het exporteren van je accountgegevens is gestart",
+			"refresh": "Vernieuwen",
+			"fetchError": "Kan accountactiviteit niet laden",
+			"searchPlaceholder": "Zoek in inzendingen...",
+			"emptyTitle": "Nog geen inzendingen",
+			"emptyDescription": "Alle sollicitaties, bugrapporten of suggesties die je indient bij Xernerx verschijnen hier.",
+			"tabs": {
+				"all": "Alles",
+				"applications": "Sollicitaties",
+				"issues": "Bugrapporten",
+				"suggestions": "Suggesties"
+			}
+		},
+		"connections": {
+			"title": "Koppelingen",
+			"description": "Koppel externe accounts via OAuth om je profielen binnen het Xernerx-ecosysteem te verifiëren.",
+			"connected": "Gekoppeld",
+			"primaryIdentity": "Vereiste Login",
+			"availableTitle": "OAuth Koppelingen",
+			"availableDesc": "Optionele geverifieerde externe accounts. Deze kunnen niet worden gebruikt om in te loggen — Discord blijft je vereiste inlogidentiteit.",
+			"verifiedBadge": "Geverifieerd",
+			"notConnected": "Niet gekoppeld",
+			"connectButton": "Koppelen",
+			"disconnect": "Ontkoppelen",
+			"showOnProfile": "Toon op openbaar profiel",
+			"oauthSuccess": "{provider}-account succesvol gekoppeld!",
+			"oauthNotConfigured": "{provider} OAuth-inloggegevens zijn nog niet geconfigureerd.",
+			"oauthError": "Kon de OAuth-koppeling niet voltooien.",
+			"disconnectSuccess": "Koppeling verwijderd.",
+			"disconnectError": "Kon koppeling niet verwijderen.",
+			"saveError": "Kon koppelingsinstellingen niet bijwerken."
+		},
+		"devices": {
+			"title": "Actieve Apparaten & Sessies",
+			"description": "Bekijk recente browsers en apparaten die toegang hebben gehad tot je Xernerx-account.",
+			"currentSession": "Huidige Sessie",
+			"revokeOthers": "Andere Sessies Intrekken",
+			"revokeSuccess": "Andere apparaatsessies zijn ingetrokken."
+		},
+		"billing": {
+			"credits": {
+				"unit": "Credits",
+				"streakDays": "{count} Dagen Reeks",
+				"description": "Claim je dagelijkse creditcadeau om je reeks op te bouwen en tot +200 bonuscredits per dag te verdienen.",
+				"claimButton": "Claim Dagelijkse Beloning",
+				"nextClaimIn": "Volgende Beloning over {hours}u",
+				"claimSuccess": "+{amount} credits geclaimd! ({streak} dagen reeks)",
+				"claimError": "Kon dagelijkse beloning niet claimen"
 			}
 		}
 	},
@@ -670,6 +733,9 @@
 					"prefix": "Voor juridische vragen kun je contact opnemen met"
 				}
 			}
+		},
+		"changelog": {
+			"rssFeed": "RSS-feed"
 		}
 	},
 	"admin": {
@@ -745,7 +811,33 @@
 				"pinging": "Pingen...",
 				"pingOffline": "Offline",
 				"repingTooltip": "Klik om de laadtijd te pingen",
-				"openSite": "Site Openen"
+				"openSite": "Site Openen",
+				"auditAllProd": "Audit Prod",
+				"auditAllCanary": "Audit Canary",
+				"auditingProgress": "Controleren ({current}/{total})...",
+				"filterAll": "Alle ({count})",
+				"filterSynced": "Gesynchroniseerd ({count})",
+				"filterCanaryAhead": "Canary Voorop ({count})",
+				"envAll": "Alle Omg.",
+				"envProdOnly": "Alleen Prod",
+				"envCanaryOnly": "Alleen Canary",
+				"envDevOnly": "Alleen Dev",
+				"serviceGateway": "Service Gateway",
+				"gatewayOnline": "Gateway Online",
+				"gatewayOffline": "Gateway Onbereikbaar",
+				"gatewayDesc": "Backend-service zonder HTML (SEO-widgets overgeslagen)",
+				"viewChangelogTooltip": "Klik om wijzigingsregister te bekijken",
+				"changelogTitle": "{name} ({env}) Wijzigingsregister",
+				"changelogLoading": "Wijzigingsregister laden...",
+				"changelogEmpty": "Geen wijzigingsregister gevonden voor deze omgeving.",
+				"declareIncident": "Incident melden",
+				"incidentModalTitle": "Globale statusmelding uitzenden",
+				"incidentModalDesc": "Verstuurt direct een statusmelding over alle Xernerx-subdomeinen gekoppeld aan info.xernerx.com/status.",
+				"incidentSeverity": "Ernst van melding",
+				"incidentTitleLabel": "Titel van melding",
+				"incidentMessageLabel": "Statusbericht",
+				"incidentBroadcastSuccess": "Globale statusmelding verzonden",
+				"broadcastAlert": "Melding uitzenden"
 			},
 			"issues": {
 				"title": "Problemen",
@@ -785,6 +877,42 @@
 				"implemented": "Geïmplementeerd",
 				"moveToRoadmap": "Naar Roadmap Verplaatsen",
 				"votes": "Stemmen"
+			},
+			"nav": {
+				"auditLogs": "Auditlogs"
+			},
+			"audit": {
+				"title": "Auditlogs",
+				"description": "Onveranderlijk beveiligings- en beheerlogboek voor de hele Xernerx Suite.",
+				"refresh": "Vernieuwen",
+				"searchPlaceholder": "Zoek op beheerder, actie of doel...",
+				"fetchError": "Kan auditlogs niet laden",
+				"emptyTitle": "Geen auditgebeurtenissen gevonden",
+				"emptyDescription": "Beheerdersacties voor problemen, suggesties, sollicitaties en instellingen verschijnen hier.",
+				"categories": {
+					"all": "Alle",
+					"issue": "Problemen",
+					"suggestion": "Suggesties",
+					"application": "Sollicitaties",
+					"setting": "Instellingen",
+					"role": "Rollen",
+					"user": "Gebruikers",
+					"system": "Systeem"
+				},
+				"exportCsv": "Exporteer CSV",
+				"exportJson": "Exporteer JSON"
+			}
+		},
+		"settings": {
+			"auditWebhookUrl": "Admin Audit Discord Webhook URL",
+			"auditWebhookUrlDesc": "Stuurt beveiligings- en beheeracties in realtime door naar je staff Discord-kanaal.",
+			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/..."
+		},
+		"translations": {
+			"review": {
+				"completionProgress": "{translated} van {total} sleutels vertaald ({percent}%)",
+				"missingOnly": "Alleen Ontbrekend ({count})",
+				"copySource": "Kopieer Bron"
 			}
 		}
 	},
@@ -808,6 +936,10 @@
 				"faq": {
 					"title": "Veelgestelde Vragen",
 					"description": "Veelgestelde vragen, facturatie en algemene hulp met je Xernerx-account."
+				},
+				"status": {
+					"title": "Systeemstatus",
+					"description": "Live uptime, responstijd en operationele status van alle Xernerx-diensten."
 				}
 			}
 		},
@@ -839,6 +971,13 @@
 				"recentlyResolved": "Recent Opgelost",
 				"noResolvedIssues": "Geen recent opgeloste problemen.",
 				"fixedOn": "Opgelost op {date}"
+			},
+			"actions": {
+				"notifyMe": "Houd Mij Op De Hoogte",
+				"watching": "Volgend",
+				"loginRequired": "Log in om op roadmap-mijlpalen te stemmen of ze te volgen",
+				"watchAdded": "Je ontvangt een melding zodra deze mijlpaal wordt uitgebracht!",
+				"watchRemoved": "Meldingen voor deze mijlpaal uitgeschakeld."
 			}
 		},
 		"suggestions": {
@@ -918,6 +1057,37 @@
 				"submitted": "Dit probleem is ingediend door de community en is nog niet beoordeeld of erkend door de ontwikkelaars.",
 				"resolved": "Dit probleem is opgelost."
 			}
+		},
+		"status": {
+			"subtitle": "Live ecosysteem-telemetrie & gezondheidsmatrix",
+			"refresh": "Status vernieuwen",
+			"servicesHeading": "Ecosysteemdiensten",
+			"searchPlaceholder": "Diensten filteren...",
+			"activeIncidentsHeading": "Actieve geregistreerde problemen",
+			"viewAllIssues": "Bekijk Issue Tracker →",
+			"noActiveIncidents": "Geen actieve geverifieerde incidenten gemeld. Alle systemen werken naar behoren.",
+			"banner": {
+				"checking": "Ecosysteemstatus controleren...",
+				"allOperational": "Alle systemen operationeel",
+				"partialOutage": "{count} / {total} diensten operationeel"
+			},
+			"states": {
+				"operational": "Operationeel",
+				"degraded": "Vertraagd",
+				"down": "Storing",
+				"checking": "Controleren"
+			},
+			"services": {
+				"www": "Hoofdwebsite",
+				"app": "Gebruikersdashboard",
+				"account": "Accountportaal",
+				"api": "Core API Gateway",
+				"cdn": "Media CDN",
+				"docs": "Documentatie",
+				"info": "Support & Info Hub",
+				"store": "Winkel & Facturatie",
+				"admin": "Beheerdersportaal"
+			}
 		}
 	},
 	"lib": {
@@ -941,6 +1111,71 @@
 				"admin": "Beheerder",
 				"help": "Ondersteuning"
 			}
+		}
+	},
+	"docs": {
+		"api": {
+			"playground": {
+				"title": "Interactieve API Explorer",
+				"description": "Test live verzoeken tegen de Xernerx API-gateway direct vanuit je browser en bekijk realtime JSON-responsen.",
+				"presets": "Snelkeuzes",
+				"send": "Verzoek versturen",
+				"sending": "Versturen...",
+				"bearerToken": "Bearer Token (Optioneel)",
+				"jsonBody": "JSON Request Body"
+			}
+		}
+	},
+	"app": {
+		"users": {
+			"profile": {
+				"badges": {
+					"botDeveloper": "Bot Ontwikkelaar",
+					"bugHunter": "Bug Hunter",
+					"contributor": "Bijdrager"
+				}
+			}
+		},
+		"portal": {
+			"bot": {
+				"webhooks": {
+					"testButton": "Test Ping",
+					"urlRequired": "Voer eerst een webhook-URL in.",
+					"testSuccess": "Webhook antwoordde met {status} ({latency}ms)",
+					"testFailed": "Webhook-test mislukt: {error}"
+				}
+			}
+		},
+		"bots": {
+			"id": {
+				"embedBadges": "Badges Insluiten",
+				"embedBadgesDesc": "Kopieer live SVG-statusbadges voor je GitHub README of website.",
+				"snippetCopied": "{format} insluitcode gekopieerd!"
+			}
+		},
+		"leaderboard": {
+			"title": "Ranglijsten",
+			"description": "De meest gestemde bots, grootste servers en langste dagelijkse reeksen in het ecosysteem.",
+			"backToExplore": "Terug naar Ontdekken",
+			"privacyNotice": "Alleen openbare bots, servers en gebruikersprofielen worden hier vermeld.",
+			"empty": "Nog geen vermeldingen in deze categorie.",
+			"tabs": {
+				"bots": "Top Bots",
+				"servers": "Top Servers",
+				"streaks": "Dagelijkse Reeksen"
+			},
+			"metrics": {
+				"votes": "Stemmen",
+				"users": "Gebruikers",
+				"members": "Leden",
+				"streak": "Reeks",
+				"credits": "Credits",
+				"totalImpact": "Totaal",
+				"bugs": "Bugs",
+				"suggestions": "Ideeën"
+			},
+			"sortBy": "Sorteer op",
+			"searchPlaceholder": "Zoek op de ranglijst..."
 		}
 	}
 }

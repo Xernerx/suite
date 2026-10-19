@@ -13,6 +13,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { V1Endpoints } from '@/components/api/V1Endpoints';
 import { CoreEndpoints } from '@/components/api/CoreEndpoints';
 import { SecureEndpoints } from '@/components/api/SecureEndpoints';
+import { ApiPlayground } from '@/components/api/ApiPlayground';
 
 export default function APIDocs() {
 	const { version } = useParams() as { version: string };
@@ -52,6 +53,7 @@ export default function APIDocs() {
 			{ label: t('docs.api.common.nav.back'), href: '/', icon: ArrowLeft, category: t('docs.api.common.nav.categoryNavigation') },
 			{ label: t('docs.api.common.nav.overview'), href: '#overview', icon: Globe, category: t('docs.api.common.nav.categoryRestApi') },
 			{ label: t('docs.api.common.auth'), href: '#authentication', icon: Key, category: t('docs.api.common.nav.categoryRestApi') },
+			{ label: t('docs.api.playground.title'), href: '#playground', icon: Terminal, category: t('docs.api.common.nav.categoryRestApi') },
 		];
 
 		if (version === 'v1') {
@@ -206,6 +208,8 @@ export default function APIDocs() {
 						)}
 					</div>
 				</motion.section>
+
+				<ApiPlayground version={version} />
 
 				{version === 'v1' && <V1Endpoints />}
 				{version === 'core' && isAdmin && <CoreEndpoints />}

@@ -6,6 +6,7 @@ import { Loading } from '@xernerx/feedback';
 import { Input } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import KnownIssuesSection from '@/components/roadmap/KnownIssuesSection';
+import RoadmapActionBar from '@/components/roadmap/RoadmapActionBar';
 
 export default function RoadmapPage() {
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -412,6 +413,8 @@ export default function RoadmapPage() {
 																{t('info.roadmap.timeline.readChangelog')} →
 															</a>
 														)}
+
+														<RoadmapActionBar item={item} onUpdate={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))} />
 													</motion.div>
 												);
 											})}
@@ -426,7 +429,7 @@ export default function RoadmapPage() {
 				{/* MOBILE VERTICAL STACK (md:hidden) */}
 				<div className="flex md:hidden flex-col gap-12 w-full pt-4 pb-8 relative">
 					<div className="absolute top-8 bottom-0 left-[27px] w-[2px] bg-(--border)/20 z-0"></div>
-					{sortedQuarters.map((quarter, idx) => {
+					{sortedQuarters.map((quarter) => {
 						const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
 						const qItems = rawQItems.filter(matchesRoadmapFilters);
 						return (
@@ -481,6 +484,7 @@ export default function RoadmapPage() {
 														</div>
 														<h3 className="font-bold text-lg text-(--text)">{item.title}</h3>
 														<p className="text-sm text-(--text-muted) mt-2">{item.description}</p>
+														<RoadmapActionBar item={item} onUpdate={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))} />
 													</motion.div>
 												))}
 											</div>

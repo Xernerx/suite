@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
-import { Link2, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Link2, Loader2, Send, Trash2 } from 'lucide-react';
 import { Button, Input, Toggle } from '@xernerx/ui';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 
 interface WebhooksTabProps {
 	botConfig: any;
@@ -12,6 +13,43 @@ interface WebhooksTabProps {
 
 export default function WebhooksTab({ botConfig, setBotConfig }: WebhooksTabProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
+	const [testingIndex, setTestingIndex] = useState<number | null>(null);
+
+	const handleTestWebhook = async (hook: any, index: number) => {
+		if (!hook.url || !hook.url.trim()) {
+			toast({ type: 'error', title: t('app.portal.bot.webhooks.urlRequired') });
+			return;
+		}
+		setTestingIndex(index);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${botConfig.id}/hooks/test`), {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ url: hook.url, events: hook.events }),
+			});
+			const data = await res.json();
+			if (!res.ok || !data.ok) {
+				throw new Error(data.error || `HTTP ${data.status || res.status}`);
+			}
+			toast({
+				type: 'success',
+				title: t('app.portal.bot.webhooks.testSuccess', {
+					status: data.status,
+					latency: data.latencyMs,
+				}),
+			});
+		} catch (err: any) {
+			toast({
+				type: 'error',
+				title: t('app.portal.bot.webhooks.testFailed', { error: err.message }),
+			});
+		} finally {
+			setTestingIndex(null);
+		}
+	};
 
 	return (
 		<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
@@ -23,18 +61,30 @@ export default function WebhooksTab({ botConfig, setBotConfig }: WebhooksTabProp
 			<div className="flex flex-col gap-6">
 				{(botConfig.hooks || []).map((hook: any, index: number) => (
 					<div key={index} className="flex flex-col gap-4 p-4 border border-(--border)/20 rounded-xl bg-(--foreground)/50">
-						<div className="flex justify-between items-center">
+						<div className="flex justify-between items-center gap-2">
 							<h3 className="font-bold">{t('app.portal.bot.webhooks.webhookNumber', { number: index + 1 })}</h3>
-							<button
-								onClick={() => {
-									const newHooks = [...botConfig.hooks];
-									newHooks.splice(index, 1);
-									setBotConfig({ ...botConfig, hooks: newHooks });
-								}}
-								className="p-2 text-red-500/70 hover:text-red-500 transition-colors"
-							>
-								<Trash2 size={16} />
-							</button>
+							<div className="flex items-center gap-2">
+								<Button
+									variant="secondary"
+									onClick={() => handleTestWebhook(hook, index)}
+									disabled={testingIndex === index || !hook.url}
+									className="flex items-center gap-1.5 text-xs px-3 py-1.5"
+								>
+									{testingIndex === index ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
+									{t('app.portal.bot.webhooks.testButton')}
+								</Button>
+								<button
+									type="button"
+									onClick={() => {
+										const newHooks = [...botConfig.hooks];
+										newHooks.splice(index, 1);
+										setBotConfig({ ...botConfig, hooks: newHooks });
+									}}
+									className="p-2 text-red-500/70 hover:text-red-500 transition-colors cursor-pointer"
+								>
+									<Trash2 size={16} />
+								</button>
+							</div>
 						</div>
 						<div className="flex flex-col gap-1">
 							<label className="text-sm font-semibold text-(--text-muted)">{t('app.portal.bot.webhooks.url')}</label>

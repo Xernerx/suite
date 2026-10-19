@@ -70,9 +70,40 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 		if (!isReady) return;
 		const fetchBot = async () => {
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${id}/profile`));
+				const [res, discordRes] = await Promise.all([
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${id}/profile`)),
+					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`)).catch(() => null),
+				]);
 				if (res.ok) {
-					setBot(await res.json());
+					const botData = await res.json();
+					const uid = (session as any)?.user?.id;
+					const isOwner = Boolean(uid && Array.isArray(botData.owners) && botData.owners.includes(uid));
+
+					if (botData.privacy === 'private' && !isOwner) {
+						setBot(null);
+						return;
+					}
+
+					if (discordRes && discordRes.ok) {
+						botData.discord = await discordRes.json();
+					}
+
+					if (Array.isArray(botData.owners) && botData.owners.length > 0 && (!botData.ownersData || botData.ownersData.length === 0)) {
+						const ownersData = await Promise.all(
+							botData.owners.map(async (ownerId: string) => {
+								try {
+									const oRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${ownerId}/discord`));
+									if (oRes.ok) return await oRes.json();
+								} catch {
+									// Ignore individual owner lookup failure
+								}
+								return null;
+							})
+						);
+						botData.ownersData = ownersData.filter(Boolean);
+					}
+
+					setBot(botData);
 				}
 			} catch (error) {
 				console.error('Failed to fetch bot profile', error);
@@ -81,7 +112,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 			}
 		};
 		fetchBot();
-	}, [id, getEnvUrl, isReady]);
+	}, [id, getEnvUrl, isReady, session]);
 
 	if (loading) {
 		return (

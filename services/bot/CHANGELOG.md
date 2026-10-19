@@ -1,5 +1,12 @@
 # bot
 
+## 1.1.56
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.6.0
+
 ## 1.1.55
 
 ### Patch Changes

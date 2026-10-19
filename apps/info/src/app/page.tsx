@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Bug, Compass, History, LifeBuoy, Map, MessageSquare } from 'lucide-react';
+import { ArrowRight, Activity, Bug, Compass, History, LifeBuoy, Map, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -200,6 +200,13 @@ export default function InfoHomePage() {
 			color: 'bg-amber-500/10 border-amber-500/20',
 		},
 		{
+			title: t('info.home.portals.status.title'),
+			description: t('info.home.portals.status.description'),
+			icon: <Activity className="w-8 h-8 text-emerald-500" />,
+			href: '/status',
+			color: 'bg-emerald-500/10 border-emerald-500/20',
+		},
+		{
 			title: t('info.home.portals.faq.title'),
 			description: t('info.home.portals.faq.description'),
 			icon: <LifeBuoy className="w-8 h-8 text-green-500" />,
@@ -285,7 +292,7 @@ export default function InfoHomePage() {
 				</div>
 			</motion.div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto w-full">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
 				{portals.map((portal, i) => (
 					<Link href={portal.href} key={i}>
 						<motion.div

@@ -97,6 +97,24 @@ GITHUB_PAT="${githubPat}"
 
 POSTMARK_TOKEN=""
 
+#################################################
+## OAuth Connections (account.xernerx.com)      #
+#################################################
+
+# GITHUB_CLIENT_ID=""
+# GITHUB_CLIENT_SECRET=""
+# TWITCH_CLIENT_ID=""
+# TWITCH_CLIENT_SECRET=""
+# GOOGLE_CLIENT_ID=""
+# GOOGLE_CLIENT_SECRET=""
+# TWITTER_CLIENT_ID=""
+# TWITTER_CLIENT_SECRET=""
+# SPOTIFY_CLIENT_ID=""
+# SPOTIFY_CLIENT_SECRET=""
+# REDDIT_CLIENT_ID=""
+# REDDIT_CLIENT_SECRET=""
+# STEAM_API_KEY=""
+
 # this is to be kept for now
 
 WS_TOKEN=""

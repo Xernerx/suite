@@ -25,23 +25,35 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 
 	useEffect(() => {
 		if (!isReady || userLoading) return;
+		let cancelled = false;
+
 		async function fetchPermissions() {
-			const roleIds = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+			const rawRoles = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+			const roleIds = rawRoles.map((r: any) => (typeof r === 'string' ? r : r?.id)).filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0);
+
 			if (roleIds.length === 0) {
-				setLoading(false);
+				if (!cancelled) setLoading(false);
 				return;
 			}
 			try {
 				const roleDocs = await Promise.all(
 					roleIds.map(async (roleId: string) => {
-						const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`));
-						if (res.ok) {
-							const roleDoc = await res.json();
-							return roleDoc.permissions || {};
+						try {
+							const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${encodeURIComponent(roleId)}`), {
+								credentials: 'include',
+							});
+							if (res.ok) {
+								const roleDoc = await res.json();
+								return roleDoc?.permissions || {};
+							}
+						} catch {
+							// Ignore transient or aborted fetch errors during navigation/HMR
 						}
 						return {};
 					})
 				);
+
+				if (cancelled) return;
 
 				const mergedPermissions = roleDocs.reduce(
 					(acc, curr) => {
@@ -56,14 +68,18 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 
 				setRolePermissions(mergedPermissions);
 			} catch (err: any) {
-				console.error('Failed to fetch role permissions:', err);
-				toast({ type: 'error', title: 'Failed to fetch permissions', description: err.message });
+				if (!cancelled) {
+					toast({ type: 'error', title: 'Failed to fetch permissions', description: err?.message || 'Unknown error' });
+				}
 			} finally {
-				setLoading(false);
+				if (!cancelled) setLoading(false);
 			}
 		}
 
 		fetchPermissions();
+		return () => {
+			cancelled = true;
+		};
 	}, [getEnvUrl, isReady, user, userLoading, toast]);
 
 	const hasPermission = (key: string) => {

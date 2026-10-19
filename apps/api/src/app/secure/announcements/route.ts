@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request) {
 	try {
@@ -27,15 +28,50 @@ export async function POST(req: Request) {
 		const body = await req.json();
 		const { models } = await database('xernerx');
 		const Announcement = models.core.Announcement as any;
+		const Dispatch = models.dispatch.Invite as any;
+
+		// Quick in-app system incident/maintenance broadcast mode
+		if (body.broadcastOnly) {
+			const dispatchDoc = await Dispatch.create({
+				id: crypto.randomUUID(),
+				senderId: 'system',
+				targetId: 'global',
+				category: 'announcement',
+				type: body.severity || 'warning',
+				data: {
+					title: body.title || 'System Status Update',
+					message: body.content || 'Please check info.xernerx.com/status for live updates.',
+					type: body.severity || 'warning',
+					link: body.link || 'https://info.xernerx.com/status',
+				},
+				status: 'pending',
+			});
+
+			await recordAuditLog(req, {
+				action: 'system.incident_broadcast',
+				targetType: 'system',
+				targetId: dispatchDoc.id,
+				summary: `Broadcasted global status alert: "${body.title}"`,
+				metadata: { severity: body.severity || 'warning', link: body.link || 'https://info.xernerx.com/status' },
+			});
+
+			return NextResponse.json(dispatchDoc, { status: 201 });
+		}
 
 		const newAnnouncement = await Announcement.create({
 			id: crypto.randomUUID(),
 			...body,
 		});
 
+		await recordAuditLog(req, {
+			action: 'announcement.created',
+			targetType: 'system',
+			targetId: newAnnouncement.id,
+			summary: `Created announcement "${newAnnouncement.title || newAnnouncement.id}"`,
+		});
+
 		// If scheduledFor is not provided or is in the past, send it immediately
 		if (!newAnnouncement.scheduledFor || new Date(newAnnouncement.scheduledFor).getTime() <= Date.now()) {
-			// Trigger webhook send logic here
 			try {
 				const payload = newAnnouncement.message ? (newAnnouncement.message.toJSON ? newAnnouncement.message.toJSON() : JSON.parse(JSON.stringify(newAnnouncement.message))) : {};
 				if (payload.components && payload.components.length === 0) delete payload.components;
@@ -54,7 +90,6 @@ export async function POST(req: Request) {
 					await newAnnouncement.save();
 
 					// Dispatch global notification
-					const Dispatch = models.dispatch.Invite as any;
 					await Dispatch.create({
 						id: crypto.randomUUID(),
 						senderId: 'system',

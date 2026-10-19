@@ -4,8 +4,16 @@ import { ServerClient } from 'postmark';
 import { render } from '@react-email/render';
 
 let postmarkClient: ServerClient | null = null;
-if (process.env.POSTMARK_TOKEN) {
-	postmarkClient = new ServerClient(process.env.POSTMARK_TOKEN);
+let cachedPostmarkToken: string | undefined;
+
+function getPostmarkClient(): ServerClient | null {
+	const token = process.env.POSTMARK_TOKEN;
+	if (!token) return null;
+	if (!postmarkClient || cachedPostmarkToken !== token) {
+		postmarkClient = new ServerClient(token);
+		cachedPostmarkToken = token;
+	}
+	return postmarkClient;
 }
 
 export interface MailPayload {
@@ -15,15 +23,16 @@ export interface MailPayload {
 }
 
 export async function sendMail(payload: MailPayload) {
-	if (!postmarkClient) {
+	const client = getPostmarkClient();
+	if (!client) {
 		console.warn('POSTMARK_TOKEN is missing. Email dispatch skipped.', payload.subject);
 		return;
 	}
 
 	try {
 		const html = await render(payload.template);
-		await postmarkClient.sendEmail({
-			From: 'noreply@xernerx.com', // Update this to your verified Sender Signature in Postmark
+		await client.sendEmail({
+			From: process.env.POSTMARK_FROM_EMAIL || 'noreply@xernerx.com',
 			To: payload.to,
 			Subject: payload.subject,
 			HtmlBody: html,

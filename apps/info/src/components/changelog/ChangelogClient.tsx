@@ -1,9 +1,9 @@
 /** @format */
 'use client';
 
-import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
-import { Input } from '@xernerx/ui';
-import { LayoutDashboard, Link2, Tag } from 'lucide-react';
+import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
+import { Button, Input } from '@xernerx/ui';
+import { LayoutDashboard, Link2, Rss, Tag } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -22,6 +22,7 @@ function toVersionId(headingText: string): string {
 
 export default function ChangelogClient({ changelogs }: { changelogs: { appName: string; content: string }[] }) {
 	const { setNavItems, clearNavItems, show, setView, view } = useSidebar();
+	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
 
@@ -144,11 +145,17 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pt-24 px-4 sm:px-8 max-w-5xl mx-auto">
-			<div className="flex flex-col gap-2 mb-8">
-				<h1 className="text-4xl md:text-5xl font-black text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					{t('www.changelog.title', { name: activeLog.appName })}
-				</h1>
-				<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+				<div className="flex flex-col gap-2">
+					<h1 className="text-4xl md:text-5xl font-black text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.changelog.title', { name: activeLog.appName })}
+					</h1>
+					<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
+				</div>
+				<Button variant="secondary" onClick={() => window.open(getEnvUrl('https://api.xernerx.com/v1/changelog/rss.xml'), '_blank')} className="flex items-center gap-2 shrink-0">
+					<Rss size={15} className="text-amber-500" />
+					{t('www.changelog.rssFeed')}
+				</Button>
 			</div>
 
 			{/* Search Bar & Version Quick-Jump Pills */}

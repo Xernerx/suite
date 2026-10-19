@@ -203,7 +203,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 		);
 	}
 
-	if (!server || server.name === 'Unknown Guild') {
+	if (!server || server.name === 'Unknown Guild' || (server.privacy === 'private' && !canManageServer)) {
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
 				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>

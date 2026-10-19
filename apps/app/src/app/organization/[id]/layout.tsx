@@ -14,47 +14,57 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 	const domain = process.env.DOMAIN || 'xernerx.com';
 
 	const apiBase = isLocal ? 'http://localhost:4001' : isDev ? `https://api.dev.${domain}` : isCanary ? `https://api.canary.${domain}` : `https://api.${domain}`;
-
 	const appBase = isLocal ? 'http://localhost:4004' : isDev ? `https://app.dev.${domain}` : isCanary ? `https://app.canary.${domain}` : `https://app.${domain}`;
 
 	try {
-		const res = await fetch(`${apiBase}/core/organizations/${id}`, {
+		const res = await fetch(`${apiBase}/core/organizations/${id}?format=json`, {
 			next: { revalidate: 300 },
 		});
 
 		if (!res.ok) {
 			return {
 				title: 'Organization Not Found',
-				description: 'This organization does not exist or is private.',
+				description: 'This organization is private or does not exist on Xernerx Studios.',
 			};
 		}
 
 		const org = await res.json();
 
 		const parts: string[] = [];
-		if (org.memberCount) parts.push(`Members: ${Number(org.memberCount).toLocaleString()}`);
-		if (org.botCount) parts.push(`Bots: ${Number(org.botCount).toLocaleString()}`);
-		if (org.serverCount) parts.push(`Servers: ${Number(org.serverCount).toLocaleString()}`);
+		if (org.memberCount !== undefined) parts.push(`👥 Members: ${Number(org.memberCount).toLocaleString()}`);
+		if (org.botCount !== undefined) parts.push(`🤖 Bots: ${Number(org.botCount).toLocaleString()}`);
+		if (org.serverCount !== undefined) parts.push(`🌐 Servers: ${Number(org.serverCount).toLocaleString()}`);
 		const statsDescription = parts.join(' • ');
 
+		const title = `${org.name}${org.verified ? ' ✓' : ''}`;
 		const baseDescription = org.description || org.info || `Check out ${org.name} on Xernerx Studios!`;
-		const ogDescription = statsDescription ? `${baseDescription}\n\n📊 ${statsDescription}` : baseDescription;
+		const ogDescription = statsDescription ? `${baseDescription}\n\n${statsDescription}` : baseDescription;
 		const currentUrl = `${appBase}/organization/${id}`;
+		const cardImageUrl = `${apiBase}/core/organizations/${id}?type=png`;
 
 		return {
-			title: org.name,
+			title,
 			description: ogDescription,
 			openGraph: {
-				title: org.name,
+				siteName: 'Xernerx Studios',
+				type: 'website',
+				title,
 				description: ogDescription,
 				url: currentUrl,
-				images: org.iconUrl ? [{ url: org.iconUrl }] : [],
+				images: [
+					{
+						url: cardImageUrl,
+						width: 840,
+						height: 360,
+						alt: org.name,
+					},
+				],
 			},
 			twitter: {
-				card: 'summary',
-				title: org.name,
+				card: 'summary_large_image',
+				title,
 				description: ogDescription,
-				images: org.iconUrl ? [org.iconUrl] : [],
+				images: [cardImageUrl],
 			},
 		};
 	} catch {

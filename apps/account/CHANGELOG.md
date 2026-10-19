@@ -1,5 +1,61 @@
 # auth
 
+## 2.2.0
+
+### Minor Changes
+
+- <!-- @format -->
+
+    ### Ecosystem Leaderboards, Dynamic OpenGraph Embeds & Suite Enhancements
+
+    #### `app` (`minor`)
+    - **Ecosystem Leaderboards (`/leaderboard`)**: Added a dedicated leaderboard hub featuring Top Bots, Top Servers, and Daily Streaks with a stepped `2 - 1 - 3` Olympic podium showcase, live Discord profile resolution via `/core/users/[id]/discord`, a unified category switcher, `Ctrl + K` search bar, and `@xernerx/ui` metric `<Selector />`.
+    - **Rich OpenGraph & Discord Unfurl Cards**: Added `users/[id]/layout.tsx` and upgraded `bots/[id]/layout.tsx`, `servers/[id]/layout.tsx`, `organization/[id]/layout.tsx`, and `leaderboard/page.tsx` with `siteName: 'Xernerx Studios'` and high-DPI `840×360` dynamic OpenGraph card images.
+    - **Profile Privacy Enforcement**: Enforced `privacy === 'private'` guards on `/bots/[id]` and `/servers/[id]` for non-owners/non-managers and loaded live Discord data for bots and owners via `/core/users/[id]/discord`.
+    - **Embeddable SVG Badges & Webhook Testing**: Added an Embed Badges modal (`Markdown` & `HTML` snippets for votes, servers, users, and status badges) on Bot profiles and a "Send Test Ping" webhook button in the Developer Portal (`WebhooksTab.tsx`).
+    - **SEO & PWA Metadata**: Added `manifest.ts`, `opengraph-image.tsx`, `robots.ts`, and `sitemap.ts`.
+
+    #### `api` (`minor`)
+    - **Public Leaderboard Endpoint (`/v1/leaderboard`)**: Added aggregation pipelines for public bots, public guilds, and public user credit streaks, strictly enforcing `{ privacy: 'public' }`.
+    - **User OpenGraph & Widget Endpoint (`/core/users/[id]`) & `widgetRenderer.ts`**: Added `/core/users/[id]` and upgraded `renderWidgetPng` to render `840×360` retina cards with Discord/guild banner backgrounds, rounded avatars, `VERIFIED` pills, `@handle`, and stat boxes across `bot`, `guild`, `organization`, and `user` profiles.
+    - **Live SVG Badges (`/v1/bots/[id]/badge.svg` & `/v1/status/badge.svg`)**: Added dynamic Shields-style SVG badge endpoints for bot metrics and system status.
+    - **Daily Credit Claim (`/secure/users/[id]/credits/claim`) & Webhook Test Ping (`/secure/bots/[id]/hooks/test`)**: Added endpoints for 24-hour daily credit streak rewards and signed `ping.test` webhook verification.
+    - **Roadmap Interactions (`/info/roadmap/[id]/interact`) & Audit/Email Dispatch (`auditAndNotify.ts`)**: Added roadmap upvoting and release-watcher toggling with automatic Postmark email and in-app notification dispatch when watched roadmap items are released.
+    - **Unified Status, Changelog & Audit Endpoints**: Added `/v1/status`, `/v1/changelog`, `/secure/core/audit`, and `/secure/users/[id]/activity`.
+
+    #### `account` (`minor`)
+    - **OAuth2 / OpenID Connections (`/api/connections/[provider]`)**: Added dedicated OAuth2/OpenID linking routes (`github`, `twitch`, `twitter`, `youtube`, `steam`, `roblox`, `reddit`, `spotify`) and updated `Connections.tsx` with provider cards and profile visibility toggles.
+    - **Daily Credit Rewards & Activity Feed**: Added the Daily Reward & Streak claim card in `Billing.tsx`, `ActivityView.tsx` for account history, and granular notification toggles (including Roadmap Releases) in `Notifications.tsx`.
+    - **Navigation Cleanup & PWA Manifest**: Removed the redundant Store sidebar item from `account` and added `manifest.ts`.
+
+    #### `info` (`minor`)
+    - **Roadmap Upvoting & Release Watcher (`RoadmapActionBar.tsx`)**: Added interactive upvoting and "Notify on Release" watcher buttons to roadmap items.
+    - **Live System Status (`/status`)**: Added `StatusClient.tsx` and `/status` route plus SEO/PWA metadata (`manifest.ts`, `opengraph-image.tsx`, `robots.ts`, `sitemap.ts`).
+
+    #### `admin` (`minor`)
+    - **Staff Audit Logs & Live Subdomain Health**: Added `AuditLogs.tsx` and `OverviewSubdomainCard.tsx` for monitoring staff actions, service latency, and versions across the suite.
+
+    #### `docs` (`minor`)
+    - **Interactive API Playground (`ApiPlayground.tsx`)**: Added an interactive HTTP request tester in the API documentation viewer along with SEO/PWA metadata routes.
+
+    #### `@xernerx/lib` (`minor`)
+    - **Models, Postmark Dispatch & Localization**: Added `AuditLog` model, updated `RoadmapItem` (`upvotes`, `watchers`) and `User` (`connections`) schemas, added `dispatchUserNotification` with Postmark HTML email delivery in `dispatch.ts`, and expanded `en-GB.json` and `nl.json` dictionaries.
+
+    #### `@xernerx/providers` (`patch`)
+    - **`PermissionProvider` Stability & Command Palette**: Fixed `TypeError: Failed to fetch` in `PermissionProvider.tsx` by normalizing role IDs, including credentials, and gracefully handling aborted fetches during navigation/HMR; updated `CommandPaletteModal.tsx` shortcuts.
+
+    #### `@xernerx/components`, `@xernerx/cli`, `store`, `www` (`patch`)
+    - Updated ecosystem links in `Footer.tsx`, environment initialization in `@xernerx/cli`, and added `manifest.ts`, `opengraph-image.tsx`, `robots.ts`, and `sitemap.ts` to `store` and `www`.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.6.0
+    - @xernerx/components@0.7.1
+    - @xernerx/providers@0.9.1
+    - @xernerx/feedback@0.0.38
+    - @xernerx/ui@0.5.1
+
 ## 2.1.0
 
 ### Minor Changes

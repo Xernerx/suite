@@ -13,6 +13,8 @@ const schema = new Schema(
 		targetQuarter: { type: String, default: null }, // e.g., 'Q4 2026'
 		suggestionId: { type: String, default: null }, // Links back to a Suggestion if it came from one
 		changelogUrl: { type: String, default: null }, // Links to the changelog once released
+		upvotes: { type: [String], default: [] }, // User IDs who upvoted this milestone
+		watchers: { type: [String], default: [] }, // User IDs subscribed to release notifications
 	},
 	{ timestamps: true }
 );

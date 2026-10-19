@@ -388,17 +388,24 @@ export default function Home() {
 					<div className="hidden md:flex flex-row items-center gap-2 w-full md:w-auto shrink-0">
 						<Link
 							href="/dashboard"
-							className="flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
+							className="flex items-center justify-center gap-2 px-5 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
 						>
 							<LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							<span className="text-sm font-bold">{t('app.home.text6')}</span>
 						</Link>
 						<Link
 							href="/portal"
-							className="flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
+							className="flex items-center justify-center gap-2 px-5 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
 						>
 							<TerminalSquare className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							<span className="text-sm font-bold">{t('app.home.text7')}</span>
+						</Link>
+						<Link
+							href="/leaderboard"
+							className="flex items-center justify-center gap-2 px-5 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
+						>
+							<Trophy className="w-4 h-4 group-hover:scale-110 transition-transform" />
+							<span className="text-sm font-bold">{t('app.leaderboard.title')}</span>
 						</Link>
 					</div>
 

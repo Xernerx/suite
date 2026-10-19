@@ -4,8 +4,40 @@
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, ShieldCheck, Server, Users, Building2, Sparkles, Clock, Award, Flame } from 'lucide-react';
+import {
+	User,
+	ShieldCheck,
+	Server,
+	Users,
+	Building2,
+	Sparkles,
+	Clock,
+	Award,
+	Flame,
+	Globe,
+	Bug,
+	Lightbulb,
+	ExternalLink,
+	Code2,
+	AtSign,
+	Video,
+	Tv,
+	Music,
+	Gamepad2,
+	MessageCircle,
+	CheckCircle2,
+} from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
+
+const PROVIDER_META: Record<string, { label: string; icon: any }> = {
+	github: { label: 'GitHub', icon: Code2 },
+	twitch: { label: 'Twitch', icon: Tv },
+	youtube: { label: 'YouTube', icon: Video },
+	twitter: { label: 'X (Twitter)', icon: AtSign },
+	spotify: { label: 'Spotify', icon: Music },
+	steam: { label: 'Steam', icon: Gamepad2 },
+	reddit: { label: 'Reddit', icon: MessageCircle },
+};
 
 export default function Profile({ user, bots, organizations }: { user: any; bots: any[]; organizations: any[] }) {
 	const { t } = useDictionary();
@@ -14,7 +46,13 @@ export default function Profile({ user, bots, organizations }: { user: any; bots
 	const totalServers = bots.reduce((acc, bot) => acc + (bot.stats?.guildCount || 0), 0);
 	const totalUsers = bots.reduce((acc, bot) => acc + (bot.stats?.userCount || 0), 0);
 
-	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak);
+	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false);
+
+	const verifiedIssues = user?.communityStats?.verifiedIssuesCount || 0;
+	const approvedSuggestions = user?.communityStats?.approvedSuggestionsCount || 0;
+	const hasBadges = verifiedIssues > 0 || approvedSuggestions > 0 || bots.length > 0;
+
+	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak || publicConnections.length > 0 || hasBadges);
 
 	return (
 		<div className="flex flex-col gap-8">
@@ -24,7 +62,7 @@ export default function Profile({ user, bots, organizations }: { user: any; bots
 				</div>
 			)}
 
-			{!user?.info && bots.length === 0 && organizations.length === 0 && (
+			{!user?.info && bots.length === 0 && organizations.length === 0 && !hasDetails && (
 				<div className="bg-(--foreground)/30 p-8 rounded-3xl border border-(--border)/10 text-center text-(--text-muted) py-12">{t('app.users.profile.noDetails')}</div>
 			)}
 
@@ -157,13 +195,36 @@ export default function Profile({ user, bots, organizations }: { user: any; bots
 
 				{hasDetails && (
 					<div className="lg:col-span-1 flex flex-col gap-6">
-						<div className="bg-(--foreground)/30 p-6 rounded-3xl border border-(--border)/10 shadow-sm flex flex-col gap-4 sticky top-8">
-							<div className="flex items-center gap-2 mb-2">
+						<div className="bg-(--foreground)/30 p-6 rounded-3xl border border-(--border)/10 shadow-sm flex flex-col gap-5 sticky top-8">
+							<div className="flex items-center gap-2">
 								<Sparkles className="w-5 h-5 text-(--accent)" />
 								<h3 className="text-xl font-bold" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{t('app.users.profile.information')}
 								</h3>
 							</div>
+
+							{hasBadges && (
+								<div className="flex flex-wrap gap-2">
+									{bots.length > 0 && (
+										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+											<Server size={12} />
+											{t('app.users.profile.badges.botDeveloper')}
+										</span>
+									)}
+									{verifiedIssues > 0 && (
+										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/15 text-red-400 border border-red-500/25">
+											<Bug size={12} />
+											{t('app.users.profile.badges.bugHunter')} ({verifiedIssues})
+										</span>
+									)}
+									{approvedSuggestions > 0 && (
+										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/15 text-purple-400 border border-purple-500/25">
+											<Lightbulb size={12} />
+											{t('app.users.profile.badges.contributor')} ({approvedSuggestions})
+										</span>
+									)}
+								</div>
+							)}
 
 							<div className="flex flex-col gap-3">
 								{user?.pronouns && (
@@ -203,6 +264,36 @@ export default function Profile({ user, bots, organizations }: { user: any; bots
 									</div>
 								)}
 							</div>
+
+							{publicConnections.length > 0 && (
+								<div className="flex flex-col gap-2 pt-3 border-t border-(--border)/10">
+									<span className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">{t('account.connections.title')}</span>
+									<div className="flex flex-col gap-2">
+										{publicConnections.map((conn: any) => {
+											const meta = PROVIDER_META[conn.provider] || { label: conn.provider, icon: Globe };
+											const IconComp = meta.icon;
+											const href = conn.url || '#';
+											return (
+												<a
+													key={conn.provider}
+													href={href}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="flex items-center justify-between p-2.5 rounded-xl bg-(--background)/50 border border-(--border)/10 hover:border-(--accent)/40 text-xs font-medium text-(--text) transition-all"
+												>
+													<span className="flex items-center gap-2 truncate">
+														<IconComp size={14} className="text-(--accent) shrink-0" />
+														<span className="font-semibold">{meta.label}:</span>
+														<span className="truncate text-(--text-muted)">{conn.displayName || conn.username}</span>
+														<CheckCircle2 size={12} className="text-emerald-400 shrink-0" />
+													</span>
+													<ExternalLink size={12} className="text-(--text-muted) shrink-0" />
+												</a>
+											);
+										})}
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 				)}

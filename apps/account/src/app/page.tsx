@@ -2,10 +2,11 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, Store, User, Image } from 'lucide-react';
-import { useDictionary, useEnvironment, useSession, useSidebar } from '@xernerx/providers';
+import { Activity, Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, User, Image } from 'lucide-react';
+import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';
+import ActivityView from '@/components/ActivityView';
 import Appearance from '@/components/Appearance';
 import Billing from '@/components/Billing';
 import Connections from '@/components/Connections';
@@ -21,6 +22,7 @@ import { useEffect } from 'react';
 
 const COMPONENT_MAP: Record<string, React.ReactNode> = {
 	account: <Account />,
+	activity: <ActivityView />,
 	appearance: <Appearance />,
 	billing: <Billing />,
 	connections: <Connections />,
@@ -36,7 +38,6 @@ export default function Home() {
 	const { data: session, status } = useSession();
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
-	const { getEnvUrl } = useEnvironment();
 
 	useEffect(() => {
 		hide();
@@ -80,18 +81,24 @@ export default function Home() {
 				label: t('common.nav.items.account'),
 				view: 'account',
 			},
-			// { // todo
-			// 	category: t('common.nav.categories.account'),
-			// 	icon: Link,
-			// 	label: t('common.nav.items.connections'),
-			// 	view: 'connections',
-			// },
-			// { // todo
-			// 	category: t('common.nav.categories.account'),
-			// 	icon: Computer,
-			// 	label: t('common.nav.items.devices'),
-			// 	view: 'devices',
-			// },
+			{
+				category: t('common.nav.categories.account'),
+				icon: Activity,
+				label: t('account.activity.navLabel'),
+				view: 'activity',
+			},
+			{
+				category: t('common.nav.categories.account'),
+				icon: Link,
+				label: t('common.nav.items.connections'),
+				view: 'connections',
+			},
+			{
+				category: t('common.nav.categories.account'),
+				icon: Computer,
+				label: t('common.nav.items.devices'),
+				view: 'devices',
+			},
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Paintbrush,
@@ -109,13 +116,6 @@ export default function Home() {
 				icon: Bell,
 				label: t('common.nav.items.notifications'),
 				view: 'notifications',
-			},
-			{
-				category: t('common.nav.categories.billing'),
-				icon: Store,
-				label: t('common.nav.items.store'),
-				view: 'store',
-				href: getEnvUrl('https://store.xernerx.com'),
 			},
 			{
 				category: t('common.nav.categories.billing'),
@@ -141,7 +141,7 @@ export default function Home() {
 		const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
 		const targetView = urlView || view || storedView || 'profile';
 		if (view !== targetView) setView(targetView);
-	}, [session, status, hide, show, setNavItems, view, setView, t, getEnvUrl]);
+	}, [session, status, hide, show, setNavItems, view, setView, t]);
 
 	if (!session && status !== 'loading') {
 		const search = typeof window !== 'undefined' ? window.location.search : '';

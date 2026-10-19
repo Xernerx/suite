@@ -30,6 +30,12 @@ export default function Notifications() {
 			botApproved: { discord: false, mail: false, inApp: true },
 			botRejected: { discord: false, mail: false, inApp: true },
 		},
+		community: {
+			roadmapReleased: { discord: false, mail: false, inApp: true },
+			issueStatusUpdate: { discord: false, mail: false, inApp: true },
+			suggestionStatusUpdate: { discord: false, mail: false, inApp: true },
+			applicationReviewed: { discord: false, mail: false, inApp: true },
+		},
 		general: {
 			birthday: { discord: false, mail: false, inApp: true },
 		},
@@ -113,7 +119,7 @@ export default function Notifications() {
 							className="bg-(--background)/50 border-b border-(--border)/10 font-semibold uppercase tracking-wider text-xs text-(--text-muted)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}
 						>
-							{t(`account.notifications.categories.${category}`, {}, category)}
+							{t(`account.notifications.categories.${category}`)}
 						</div>
 						<div className="flex flex-col">
 							{Object.entries(items).map(([itemKey, channels]) => (
@@ -123,13 +129,13 @@ export default function Notifications() {
 									style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 								>
 									<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-										<h3 className="text-base font-semibold text-(--text) capitalize">{t(`account.notifications.items.${itemKey}`, {}, itemKey)}</h3>
-										<p className="text-xs text-(--text-muted)">{t('account.notifications.itemDescription', { item: itemKey })}</p>
+										<h3 className="text-base font-semibold text-(--text) capitalize">{t(`account.notifications.items.${itemKey}`)}</h3>
+										<p className="text-xs text-(--text-muted)">{t('account.notifications.itemDescription', { item: t(`account.notifications.items.${itemKey}`) })}</p>
 									</div>
 									<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
 										{Object.entries(channels).map(([channelKey, enabled]) => {
 											const isMailChannel = channelKey === 'mail';
-											const isDisabled = isMailChannel && !hasSubscription;
+											const isDisabled = isMailChannel && !hasSubscription && category !== 'community';
 
 											return (
 												<div
@@ -137,9 +143,7 @@ export default function Notifications() {
 													className={`flex flex-col items-center ${isDisabled ? 'opacity-50 grayscale' : ''}`}
 													style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
 												>
-													<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">
-														{t(`account.notifications.channels.${channelKey}`, {}, channelKey)}
-													</span>
+													<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">{t(`account.notifications.channels.${channelKey}`)}</span>
 													<Toggle
 														checked={enabled && !isDisabled}
 														onChange={(val) => handleToggle(category, itemKey, channelKey, typeof val === 'boolean' ? val : val.target.checked)}

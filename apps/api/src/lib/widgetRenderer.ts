@@ -9,8 +9,9 @@ export interface WidgetStat {
 }
 
 export interface WidgetRenderOptions {
-	type: 'bot' | 'organization' | 'guild';
+	type: 'bot' | 'organization' | 'guild' | 'user';
 	name: string;
+	handle?: string | null;
 	description: string;
 	avatarUrl: string | null;
 	bannerUrl: string | null;
@@ -58,12 +59,19 @@ async function fetchImageAsDataUri(url: string | null): Promise<string | null> {
 	}
 }
 
+function getTypeLabel(type: WidgetRenderOptions['type']): string {
+	if (type === 'bot') return 'DISCORD BOT';
+	if (type === 'organization') return 'ORGANIZATION';
+	if (type === 'user') return 'USER PROFILE';
+	return 'DISCORD SERVER';
+}
+
 export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageResponse> {
-	const avatarDataUri = await fetchImageAsDataUri(opts.avatarUrl);
-	const typeLabel = opts.type === 'bot' ? 'DISCORD BOT' : opts.type === 'organization' ? 'ORGANIZATION' : 'DISCORD SERVER';
-	const displayName = opts.name.length > 32 ? `${opts.name.slice(0, 30)}…` : opts.name;
+	const [avatarDataUri, bannerDataUri] = await Promise.all([fetchImageAsDataUri(opts.avatarUrl), fetchImageAsDataUri(opts.bannerUrl)]);
+	const typeLabel = getTypeLabel(opts.type);
+	const displayName = opts.name.length > 28 ? `${opts.name.slice(0, 26)}…` : opts.name;
 	const rawDesc = (opts.description || 'Explore this profile on the Xernerx ecosystem.').replace(/\s+/g, ' ').trim();
-	const displayDesc = rawDesc.length > 72 ? `${rawDesc.slice(0, 69)}…` : rawDesc;
+	const displayDesc = rawDesc.length > 90 ? `${rawDesc.slice(0, 87)}…` : rawDesc;
 	const initial = (opts.name || 'X').charAt(0).toUpperCase();
 
 	const h = React.createElement;
@@ -76,24 +84,43 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 					display: 'flex',
 					flexDirection: 'column',
 					justifyContent: 'space-between',
-					width: '420px',
-					height: '172px',
-					padding: '20px 24px',
-					borderRadius: '20px',
-					background: 'linear-gradient(135deg, #0b0e17 0%, #111625 100%)',
-					border: '2px solid rgba(99, 102, 241, 0.4)',
+					width: '840px',
+					height: '360px',
+					padding: '38px 44px',
+					borderRadius: '36px',
+					background: 'linear-gradient(135deg, #0b0e17 0%, #111625 60%, #161b2e 100%)',
+					border: '3px solid rgba(99, 102, 241, 0.45)',
 					color: '#f8fafc',
 					fontFamily: 'sans-serif',
+					position: 'relative',
+					overflow: 'hidden',
 				},
 			},
+			bannerDataUri
+				? h('img', {
+						src: bannerDataUri,
+						width: 840,
+						height: 360,
+						style: {
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							width: '840px',
+							height: '360px',
+							objectFit: 'cover',
+							opacity: 0.16,
+						},
+					})
+				: null,
 			h(
 				'div',
 				{
 					style: {
 						display: 'flex',
 						alignItems: 'center',
-						gap: '14px',
+						gap: '28px',
 						width: '100%',
+						position: 'relative',
 					},
 				},
 				avatarDataUri
@@ -104,22 +131,23 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									width: '56px',
-									height: '56px',
-									borderRadius: '16px',
+									width: '116px',
+									height: '116px',
+									borderRadius: '30px',
 									background: '#1e2436',
-									border: '1px solid rgba(255, 255, 255, 0.08)',
+									border: '3px solid rgba(129, 140, 248, 0.35)',
 									overflow: 'hidden',
+									boxShadow: '0 12px 30px rgba(0,0,0,0.45)',
 								},
 							},
 							h('img', {
 								src: avatarDataUri,
-								width: 56,
-								height: 56,
+								width: 116,
+								height: 116,
 								style: {
-									width: '56px',
-									height: '56px',
-									borderRadius: '16px',
+									width: '116px',
+									height: '116px',
+									borderRadius: '28px',
 									objectFit: 'cover',
 								},
 							})
@@ -131,13 +159,13 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									width: '56px',
-									height: '56px',
-									borderRadius: '16px',
+									width: '116px',
+									height: '116px',
+									borderRadius: '30px',
 									background: '#1e2436',
-									border: '1px solid rgba(255, 255, 255, 0.08)',
+									border: '3px solid rgba(129, 140, 248, 0.35)',
 									color: '#818cf8',
-									fontSize: '22px',
+									fontSize: '46px',
 									fontWeight: 800,
 								},
 							},
@@ -160,17 +188,17 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 								alignItems: 'center',
 								justifyContent: 'space-between',
 								width: '100%',
-								marginBottom: '2px',
+								marginBottom: '6px',
 							},
 						},
 						h(
 							'span',
 							{
 								style: {
-									fontSize: '10px',
+									fontSize: '18px',
 									fontWeight: 800,
 									color: '#818cf8',
-									letterSpacing: '1px',
+									letterSpacing: '2px',
 								},
 							},
 							typeLabel
@@ -179,12 +207,13 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 							'span',
 							{
 								style: {
-									fontSize: '10px',
-									fontWeight: 700,
+									fontSize: '18px',
+									fontWeight: 800,
 									color: '#64748b',
+									letterSpacing: '1.5px',
 								},
 							},
-							'XERNERX'
+							'XERNERX STUDIOS'
 						)
 					),
 					h(
@@ -193,20 +222,59 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 							style: {
 								display: 'flex',
 								alignItems: 'center',
-								fontSize: '18px',
-								fontWeight: 800,
-								color: '#f8fafc',
+								gap: '12px',
 							},
 						},
-						`${displayName}${opts.verified ? ' ✓' : ''}`
+						h(
+							'span',
+							{
+								style: {
+									fontSize: '38px',
+									fontWeight: 800,
+									color: '#f8fafc',
+								},
+							},
+							displayName
+						),
+						opts.verified
+							? h(
+									'span',
+									{
+										style: {
+											fontSize: '22px',
+											fontWeight: 800,
+											color: '#34d399',
+											background: 'rgba(16, 185, 129, 0.15)',
+											border: '1px solid rgba(52, 211, 153, 0.4)',
+											borderRadius: '999px',
+											padding: '2px 12px',
+										},
+									},
+									'VERIFIED'
+								)
+							: null,
+						opts.handle
+							? h(
+									'span',
+									{
+										style: {
+											fontSize: '20px',
+											fontWeight: 600,
+											color: '#64748b',
+										},
+									},
+									opts.handle
+								)
+							: null
 					),
 					h(
 						'div',
 						{
 							style: {
-								fontSize: '12px',
+								fontSize: '22px',
 								color: '#94a3b8',
-								marginTop: '2px',
+								marginTop: '8px',
+								lineHeight: 1.35,
 							},
 						},
 						displayDesc
@@ -220,10 +288,11 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
-						gap: '10px',
-						paddingTop: '12px',
-						borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+						gap: '18px',
+						paddingTop: '24px',
+						borderTop: '2px solid rgba(255, 255, 255, 0.08)',
 						width: '100%',
+						position: 'relative',
 					},
 				},
 				...opts.stats.slice(0, 3).map((stat, idx) =>
@@ -236,18 +305,18 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 								alignItems: 'center',
 								justifyContent: 'space-between',
 								flex: 1,
-								height: '36px',
-								padding: '0 12px',
-								borderRadius: '10px',
-								background: '#151924',
-								border: '1px solid rgba(255, 255, 255, 0.08)',
+								height: '74px',
+								padding: '0 24px',
+								borderRadius: '20px',
+								background: 'rgba(21, 25, 36, 0.9)',
+								border: '2px solid rgba(255, 255, 255, 0.08)',
 							},
 						},
 						h(
 							'span',
 							{
 								style: {
-									fontSize: '13px',
+									fontSize: '28px',
 									fontWeight: 800,
 									color: '#f8fafc',
 								},
@@ -258,10 +327,11 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 							'span',
 							{
 								style: {
-									fontSize: '9px',
-									fontWeight: 700,
-									color: '#94a3b8',
+									fontSize: '16px',
+									fontWeight: 800,
+									color: '#818cf8',
 									textTransform: 'uppercase',
+									letterSpacing: '1px',
 								},
 							},
 							stat.label.toUpperCase()
@@ -271,8 +341,8 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 			)
 		),
 		{
-			width: 420,
-			height: 172,
+			width: 840,
+			height: 360,
 			headers: {
 				'Cache-Control': 'public, max-age=300',
 			},
@@ -282,7 +352,7 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 
 export async function renderWidgetSvg(opts: WidgetRenderOptions): Promise<string> {
 	const avatarDataUri = await fetchImageAsDataUri(opts.avatarUrl);
-	const typeLabel = opts.type === 'bot' ? 'DISCORD BOT' : opts.type === 'organization' ? 'ORGANIZATION' : 'DISCORD SERVER';
+	const typeLabel = getTypeLabel(opts.type);
 	const safeName = escapeXml(opts.name.length > 32 ? `${opts.name.slice(0, 30)}…` : opts.name);
 	const rawDesc = (opts.description || 'Explore this profile on the Xernerx ecosystem.').replace(/\s+/g, ' ').trim();
 	const safeDesc = escapeXml(rawDesc.length > 78 ? `${rawDesc.slice(0, 75)}…` : rawDesc);
@@ -341,7 +411,7 @@ export async function renderWidgetSvg(opts: WidgetRenderOptions): Promise<string
 }
 
 export function renderWidgetHtml(opts: WidgetRenderOptions): string {
-	const typeLabel = opts.type === 'bot' ? 'Discord Bot' : opts.type === 'organization' ? 'Organization' : 'Discord Server';
+	const typeLabel = opts.type === 'bot' ? 'Discord Bot' : opts.type === 'organization' ? 'Organization' : opts.type === 'user' ? 'User Profile' : 'Discord Server';
 	const safeName = escapeXml(opts.name);
 	const rawDesc = (opts.description || 'Explore this profile on the Xernerx ecosystem.').replace(/\s+/g, ' ').trim();
 	const safeDesc = escapeXml(rawDesc);

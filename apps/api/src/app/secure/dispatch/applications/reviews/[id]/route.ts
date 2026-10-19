@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -35,10 +36,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			return NextResponse.json({ error: 'Application not found' }, { status: 404 });
 		}
 
+		const config = await ApplicationConfig.findOne({ id: updatedApplication.targetId }).lean();
+
 		// 2. If approved, assign the reward role to the Xernerx user profile
 		if (status === 'approved' && updatedApplication.ownerId !== 'anonymous') {
-			const config = await ApplicationConfig.findOne({ id: updatedApplication.targetId }).lean();
-
 			if (config && config.rewardRole) {
 				const User = models.users.User as any;
 				const Role = models.core.Role as any;
@@ -71,6 +72,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 					}
 				}
 			}
+		}
+
+		await recordAuditLog(req, {
+			action: `application.${status}`,
+			category: 'application',
+			targetId: id,
+			targetLabel: config?.title || updatedApplication.targetId || id,
+			details: {
+				status,
+				reviewedBy,
+				reviewNote,
+				applicantId: updatedApplication.ownerId,
+			},
+		});
+
+		if (updatedApplication.ownerId && updatedApplication.ownerId !== 'anonymous' && (status === 'approved' || status === 'denied')) {
+			await sendUserNotification({
+				targetId: updatedApplication.ownerId,
+				title: `Application ${status === 'approved' ? 'Approved' : 'Reviewed'}`,
+				message: `Your application for "${config?.title || updatedApplication.targetId}" has been ${status}.${reviewNote ? ` Note: ${reviewNote}` : ''}`,
+				type: status === 'approved' ? 'success' : 'warning',
+				link: 'https://xernerx.com/applications',
+			});
 		}
 
 		return NextResponse.json(updatedApplication);

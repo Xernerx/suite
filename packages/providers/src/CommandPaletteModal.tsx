@@ -3,6 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+	Activity,
 	ArrowRight,
 	BarChart3,
 	Bell,
@@ -26,6 +27,7 @@ import {
 	Megaphone,
 	Moon,
 	Paintbrush,
+	ScrollText,
 	Search,
 	Settings,
 	Shield,
@@ -240,6 +242,9 @@ export function CommandPaletteModal({
 		// 4. Account & Developer Settings Deep-Links
 		const accountTabs = [
 			{ view: 'profile', labelKey: 'common.nav.items.profile', catKey: 'common.nav.categories.account', icon: ShieldCheck },
+			{ view: 'activity', labelKey: 'account.activity.navLabel', catKey: 'common.nav.categories.account', icon: Activity },
+			{ view: 'connections', labelKey: 'common.nav.items.connections', catKey: 'common.nav.categories.account', icon: Globe },
+			{ view: 'devices', labelKey: 'common.nav.items.devices', catKey: 'common.nav.categories.account', icon: Shield },
 			{ view: 'appearance', labelKey: 'common.nav.items.appearance', catKey: 'common.nav.categories.preferences', icon: Paintbrush },
 			{ view: 'language', labelKey: 'common.nav.items.language', catKey: 'common.nav.categories.preferences', icon: Globe },
 			{ view: 'notifications', labelKey: 'common.nav.items.notifications', catKey: 'common.nav.categories.preferences', icon: Bell },
@@ -272,6 +277,7 @@ export function CommandPaletteModal({
 
 		// 5. Support Hub Portals
 		const supportPortals = [
+			{ path: '/status', labelKey: 'info.home.portals.status.title', icon: Activity },
 			{ path: '/roadmap', labelKey: 'info.home.portals.roadmap.title', icon: Map },
 			{ path: '/suggestions', labelKey: 'info.home.portals.suggestions.title', icon: Lightbulb },
 			{ path: '/issues', labelKey: 'info.home.portals.issues.title', icon: Bug },
@@ -297,6 +303,7 @@ export function CommandPaletteModal({
 		if (hasAdminAccess) {
 			const adminTabs = [
 				{ view: 'overview', labelKey: 'admin.dashboard.nav.overview', catKey: 'common.nav.categories.system', icon: BarChart3 },
+				{ view: 'audit', labelKey: 'admin.dashboard.nav.auditLogs', catKey: 'common.nav.categories.system', icon: ScrollText },
 				{ view: 'users', labelKey: 'common.nav.items.users', catKey: 'common.nav.categories.moderator', icon: Users },
 				{ view: 'roles', labelKey: 'common.nav.items.roles', catKey: 'common.nav.categories.system', icon: Shield },
 				{ view: 'store', labelKey: 'admin.dashboard.nav.store', catKey: 'common.nav.categories.product', icon: Store },

@@ -60,7 +60,10 @@
 				"github": "GitHub",
 				"npm": "npm",
 				"documentation": "Documentation",
-				"discord": "Discord"
+				"discord": "Discord",
+				"status": "System Status",
+				"statusOperational": "All Systems Operational",
+				"statusDegraded": "System Status: Degraded"
 			},
 			"title": "Xernerx Studios",
 			"description": "© 2024 -",
@@ -518,7 +521,10 @@
 				"searchPlaceholder": "Search translation keys or content...",
 				"noKeysFound": "No matching translation keys found.",
 				"missingKey": "Missing Key",
-				"translateInto": "Translate into {locale}..."
+				"translateInto": "Translate into {locale}...",
+				"completionProgress": "Translated {translated} of {total} keys ({percent}%)",
+				"missingOnly": "Missing Only ({count})",
+				"copySource": "Copy Source"
 			},
 			"success": {
 				"pushed": "Pull request successfully pushed to review branch!"
@@ -641,7 +647,10 @@
 				"syncFailed": "Failed to start force sync.",
 				"syncInitiated": "Initiating Force Sync...",
 				"syncStarted": "Force sync started for {id}"
-			}
+			},
+			"auditWebhookUrl": "Admin Audit Discord Webhook URL",
+			"auditWebhookUrlDesc": "Forwards security audit logs and administrative actions to your staff Discord channel in real time.",
+			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/..."
 		},
 		"dashboard": {
 			"nav": {
@@ -650,7 +659,8 @@
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
 				"announcements": "Announcements",
-				"store": "Store"
+				"store": "Store",
+				"auditLogs": "Audit Logs"
 			},
 			"overview": {
 				"title": "Suite Overview & SEO",
@@ -691,7 +701,33 @@
 				"pinging": "Pinging...",
 				"pingOffline": "Offline",
 				"repingTooltip": "Click to ping site render time",
-				"openSite": "Open Site"
+				"openSite": "Open Site",
+				"auditAllProd": "Audit Prod",
+				"auditAllCanary": "Audit Canary",
+				"auditingProgress": "Auditing ({current}/{total})...",
+				"filterAll": "All ({count})",
+				"filterSynced": "Synced ({count})",
+				"filterCanaryAhead": "Canary Ahead ({count})",
+				"envAll": "All Envs",
+				"envProdOnly": "Prod Only",
+				"envCanaryOnly": "Canary Only",
+				"envDevOnly": "Dev Only",
+				"serviceGateway": "Service Gateway",
+				"gatewayOnline": "Gateway Online",
+				"gatewayOffline": "Gateway Unreachable",
+				"gatewayDesc": "Non-HTML backend service (SEO widgets skipped)",
+				"viewChangelogTooltip": "Click to view release changelog",
+				"changelogTitle": "{name} ({env}) Changelog",
+				"changelogLoading": "Loading changelog...",
+				"changelogEmpty": "No changelog entries found for this deployment.",
+				"declareIncident": "Declare Incident",
+				"incidentModalTitle": "Broadcast Global Status Alert",
+				"incidentModalDesc": "Broadcasts an immediate status notification across all Xernerx subdomains linked to info.xernerx.com/status.",
+				"incidentSeverity": "Alert Severity",
+				"incidentTitleLabel": "Alert Title",
+				"incidentMessageLabel": "Status Message",
+				"incidentBroadcastSuccess": "Global status alert broadcasted",
+				"broadcastAlert": "Broadcast Alert"
 			},
 			"media": {
 				"title": "Media Library",
@@ -990,6 +1026,27 @@
 			},
 			"toasts": {
 				"fetchPermissionsError": "Failed to fetch permissions"
+			},
+			"audit": {
+				"title": "Audit Logs",
+				"description": "Immutable security and administrative event trail across the Xernerx Suite.",
+				"refresh": "Refresh",
+				"searchPlaceholder": "Search actor, action, or target...",
+				"fetchError": "Failed to load audit logs",
+				"emptyTitle": "No Audit Events Found",
+				"emptyDescription": "Administrative actions across issues, suggestions, applications, and settings will appear here.",
+				"categories": {
+					"all": "All",
+					"issue": "Issues",
+					"suggestion": "Suggestions",
+					"application": "Applications",
+					"setting": "Settings",
+					"role": "Roles",
+					"user": "Users",
+					"system": "System"
+				},
+				"exportCsv": "Export CSV",
+				"exportJson": "Export JSON"
 			}
 		},
 		"permissions": {
@@ -1387,7 +1444,8 @@
 				"virtue": "Virtue",
 				"api": "API",
 				"billing": "Billing",
-				"apps": "Apps"
+				"apps": "Apps",
+				"community": "Community & Roadmap"
 			},
 			"items": {
 				"birthday": "Birthday",
@@ -1400,7 +1458,11 @@
 				"subscriptionExpiring": "Subscription Expiring",
 				"paymentFailed": "Payment Failed",
 				"botApproved": "Bot Approved",
-				"botRejected": "Bot Rejected"
+				"botRejected": "Bot Rejected",
+				"roadmapReleased": "Roadmap Milestone Released",
+				"issueStatusUpdate": "Bug Report Status Update",
+				"suggestionStatusUpdate": "Suggestion Status Update",
+				"applicationReviewed": "Staff Application Reviewed"
 			},
 			"channels": {
 				"discord": "Discord",
@@ -1617,10 +1679,30 @@
 			}
 		},
 		"connections": {
-			"title": "Connections"
+			"title": "Connections",
+			"description": "Link third-party accounts via OAuth to verify your external profiles across the Xernerx ecosystem.",
+			"connected": "Connected",
+			"primaryIdentity": "Required Login",
+			"availableTitle": "OAuth Connections",
+			"availableDesc": "Optional verified external accounts. These cannot be used to sign in — Discord remains your required login identity.",
+			"verifiedBadge": "Verified",
+			"notConnected": "Not connected",
+			"connectButton": "Connect",
+			"disconnect": "Disconnect",
+			"showOnProfile": "Display on public profile",
+			"oauthSuccess": "{provider} account linked successfully!",
+			"oauthNotConfigured": "{provider} OAuth credentials are not configured yet.",
+			"oauthError": "Could not complete OAuth connection flow.",
+			"disconnectSuccess": "Connection removed.",
+			"disconnectError": "Failed to remove connection.",
+			"saveError": "Failed to update connection settings."
 		},
 		"devices": {
-			"title": "Devices"
+			"title": "Active Devices & Sessions",
+			"description": "Review recent browsers and devices that have accessed your Xernerx account.",
+			"currentSession": "Current Session",
+			"revokeOthers": "Revoke Other Sessions",
+			"revokeSuccess": "Other device sessions have been revoked."
 		},
 		"billing": {
 			"title": "Billing & Subscriptions",
@@ -1650,6 +1732,33 @@
 			"toasts": {
 				"cancelSuccess": "Subscription cancelled successfully",
 				"cancelError": "Failed to cancel subscription"
+			},
+			"credits": {
+				"unit": "Credits",
+				"streakDays": "{count} Day Streak",
+				"description": "Claim your daily credit gift to build your streak and earn up to +200 bonus credits per day.",
+				"claimButton": "Claim Daily Reward",
+				"nextClaimIn": "Next Reward in {hours}h",
+				"claimSuccess": "Claimed +{amount} credits! ({streak} day streak)",
+				"claimError": "Could not claim daily reward"
+			}
+		},
+		"activity": {
+			"navLabel": "Activity & Data",
+			"title": "My Activity & Account Data",
+			"description": "Track all your submitted applications, bug reports, and feature suggestions, or export your full account data.",
+			"exportData": "Export My Data (JSON)",
+			"exportSuccess": "Your account data export has started",
+			"refresh": "Refresh",
+			"fetchError": "Failed to load account activity",
+			"searchPlaceholder": "Search submissions...",
+			"emptyTitle": "No Submissions Yet",
+			"emptyDescription": "Any staff applications, bug reports, or feature suggestions you submit across Xernerx will appear here.",
+			"tabs": {
+				"all": "All",
+				"applications": "Applications",
+				"issues": "Bug Reports",
+				"suggestions": "Suggestions"
 			}
 		}
 	},
@@ -2186,7 +2295,8 @@
 			"linkCopiedDesc": "Copied direct link to version {version}",
 			"searchPlaceholder": "Search release notes or version (e.g. '1.3.4')...",
 			"jumpToVersion": "Releases:",
-			"noMatchingVersions": "No release notes match \"{query}\"."
+			"noMatchingVersions": "No release notes match \"{query}\".",
+			"rssFeed": "RSS Feed"
 		},
 		"software": {
 			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite over HTTP. Send JSON requests and receive JSON responses from any language using your scoped Bearer token.",
@@ -2388,7 +2498,10 @@
 				"copyCommand": "Copy /{name}",
 				"commandCopied": "Copied /{name} to clipboard",
 				"noCommandsMatch": "No commands match \"{query}\".",
-				"commandsCount": "{count} Commands"
+				"commandsCount": "{count} Commands",
+				"embedBadges": "Embed Badges",
+				"embedBadgesDesc": "Copy live SVG status shields for your GitHub README or website.",
+				"snippetCopied": "Copied {format} embed snippet!"
 			},
 			"avatarAlt": "Bot Avatar",
 			"nav": {
@@ -2893,7 +3006,11 @@
 					"header": "Webhooks",
 					"triggers": "Triggers",
 					"url": "Webhook URL",
-					"webhookNumber": "Webhook #{number}"
+					"webhookNumber": "Webhook #{number}",
+					"testButton": "Test Ping",
+					"urlRequired": "Please enter a webhook URL first.",
+					"testSuccess": "Webhook responded with {status} ({latency}ms)",
+					"testFailed": "Webhook test failed: {error}"
 				}
 			},
 			"info": {
@@ -2994,7 +3111,12 @@
 				"streak": "Daily Streak",
 				"days": "{count} days",
 				"totalServers": "Bot Servers",
-				"totalUsers": "Bot Users"
+				"totalUsers": "Bot Users",
+				"badges": {
+					"botDeveloper": "Bot Developer",
+					"bugHunter": "Bug Hunter",
+					"contributor": "Contributor"
+				}
 			}
 		},
 		"servers": {
@@ -3045,6 +3167,30 @@
 			"modalTitle": "Embed Profile Widget",
 			"previewLabel": "Live Widget Preview",
 			"title": "Public Embed Widget"
+		},
+		"leaderboard": {
+			"title": "Leaderboards",
+			"description": "The highest-voted bots, top communities, and longest daily streaks across the ecosystem.",
+			"backToExplore": "Back to Explore",
+			"privacyNotice": "Only public bots, servers, and user profiles are listed here.",
+			"empty": "No entries ranked in this category yet.",
+			"tabs": {
+				"bots": "Top Bots",
+				"servers": "Top Servers",
+				"streaks": "Daily Streaks"
+			},
+			"metrics": {
+				"votes": "Votes",
+				"users": "Users",
+				"members": "Members",
+				"streak": "Streak",
+				"credits": "Credits",
+				"totalImpact": "Total",
+				"bugs": "Bugs",
+				"suggestions": "Ideas"
+			},
+			"sortBy": "Sort by",
+			"searchPlaceholder": "Search leaderboard..."
 		}
 	},
 	"cdn": {
@@ -3311,6 +3457,15 @@
 					"title": "System Settings",
 					"description": "Manage global system configurations and core settings."
 				}
+			},
+			"playground": {
+				"title": "Interactive API Explorer",
+				"description": "Test live requests against the Xernerx API gateway directly from your browser and inspect real-time JSON responses.",
+				"presets": "Quick Presets",
+				"send": "Send Request",
+				"sending": "Sending...",
+				"bearerToken": "Bearer Token (Optional)",
+				"jsonBody": "JSON Request Body"
 			}
 		},
 		"cdn": {
@@ -3671,6 +3826,10 @@
 				"changelog": {
 					"title": "Changelog",
 					"description": "See the latest updates, version history, and release notes across the Xernerx ecosystem."
+				},
+				"status": {
+					"title": "System Status",
+					"description": "Live uptime, response latency, and operational health across all Xernerx services."
 				}
 			}
 		},
@@ -3706,6 +3865,13 @@
 				"recentlyResolved": "Recently Resolved",
 				"noResolvedIssues": "No recently resolved issues.",
 				"fixedOn": "Fixed {date}"
+			},
+			"actions": {
+				"notifyMe": "Notify Me",
+				"watching": "Watching",
+				"loginRequired": "Sign in to upvote or watch roadmap milestones",
+				"watchAdded": "You will be notified when this milestone is released!",
+				"watchRemoved": "Release notifications disabled for this milestone."
 			}
 		},
 		"suggestions": {
@@ -3802,6 +3968,37 @@
 				"verified": "This issue has been acknowledged by the developers and should see a fix at some point.",
 				"submitted": "This issue has been submitted by the community and has not yet been acknowledged.",
 				"resolved": "This issue has been resolved."
+			}
+		},
+		"status": {
+			"subtitle": "Live ecosystem telemetry & health matrix",
+			"refresh": "Refresh Status",
+			"servicesHeading": "Ecosystem Services",
+			"searchPlaceholder": "Filter services...",
+			"activeIncidentsHeading": "Active Tracked Issues",
+			"viewAllIssues": "View Issue Tracker →",
+			"noActiveIncidents": "No active verified incidents reported. All systems are running smoothly.",
+			"banner": {
+				"checking": "Checking Ecosystem Status...",
+				"allOperational": "All Systems Operational",
+				"partialOutage": "{count} / {total} Services Operational"
+			},
+			"states": {
+				"operational": "Operational",
+				"degraded": "Degraded",
+				"down": "Outage",
+				"checking": "Checking"
+			},
+			"services": {
+				"www": "Main Website",
+				"app": "User Dashboard",
+				"account": "Identity & Account Hub",
+				"api": "Core API Gateway",
+				"cdn": "Media CDN",
+				"docs": "Developer Documentation",
+				"info": "Support & Info Hub",
+				"store": "Store & Billing",
+				"admin": "Staff Portal"
 			}
 		}
 	}

@@ -23,9 +23,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const organization = await OrganizationModel.findOne({ _id: id }).lean();
 		const privacy = organization?.config?.privacy || organization?.privacy;
+		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
 
-		if (!organization || privacy === 'private' || !organization.widgets) {
-			return NextResponse.json({ error: 'Organization widget not found or disabled' }, { status: 404 });
+		if (!organization || privacy === 'private' || (isExternalWidget && !organization.widgets)) {
+			return NextResponse.json({ error: 'Organization profile not found or private' }, { status: 404 });
 		}
 
 		const [botCount, serverCount] = await Promise.all([

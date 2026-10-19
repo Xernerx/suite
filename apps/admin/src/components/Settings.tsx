@@ -18,6 +18,7 @@ export default function Settings() {
 	const [mainOrgId, setMainOrgId] = useState('');
 	const [organizations, setOrganizations] = useState<{ _id: string; name: string }[]>([]);
 	const [appWebhookUrl, setAppWebhookUrl] = useState('');
+	const [auditWebhookUrl, setAuditWebhookUrl] = useState('');
 	const [joinRoles, setJoinRoles] = useState<string[]>([]);
 	const [botJoinRoles, setBotJoinRoles] = useState<string[]>([]);
 	const [sisterServers, setSisterServers] = useState<{ id: string }[]>([]);
@@ -56,7 +57,7 @@ export default function Settings() {
 	const fetchSettings = async () => {
 		setIsLoading(true);
 		try {
-			const [adminRes, mainOrgRes, orgsRes, webhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
+			const [adminRes, mainOrgRes, orgsRes, webhookRes, auditWebhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
 					credentials: 'include',
 				}),
@@ -67,6 +68,9 @@ export default function Settings() {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_audit_webhook_url'), {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/join_roles'), {
@@ -100,6 +104,10 @@ export default function Settings() {
 			if (webhookRes.ok) {
 				const data = await webhookRes.json();
 				setAppWebhookUrl(data.value || '');
+			}
+			if (auditWebhookRes.ok) {
+				const data = await auditWebhookRes.json();
+				setAuditWebhookUrl(data.value || '');
 			}
 			if (joinRes.ok) {
 				const data = await joinRes.json();
@@ -185,6 +193,17 @@ export default function Settings() {
 					credentials: 'include',
 					body: JSON.stringify({
 						value: appWebhookUrl,
+						valueType: 'string',
+					}),
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_audit_webhook_url'), {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					credentials: 'include',
+					body: JSON.stringify({
+						value: auditWebhookUrl,
 						valueType: 'string',
 					}),
 				}),
@@ -349,6 +368,17 @@ export default function Settings() {
 					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.appWebhookUrl')}</label>
 					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.appWebhookUrlDesc')}</p>
 					<Input value={appWebhookUrl} onChange={(e) => setAppWebhookUrl(e.target.value)} placeholder={t('admin.settings.appWebhookUrlPlaceholder')} />
+				</div>
+
+				<div
+					className="flex flex-col max-w-md"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.auditWebhookUrl')}</label>
+					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.auditWebhookUrlDesc')}</p>
+					<Input value={auditWebhookUrl} onChange={(e) => setAuditWebhookUrl(e.target.value)} placeholder={t('admin.settings.auditWebhookUrlPlaceholder')} />
 				</div>
 
 				<div

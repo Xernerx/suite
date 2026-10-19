@@ -3,9 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
-import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard, Copy, Share2, Check } from 'lucide-react';
-import { FaGithub } from 'react-icons/fa';
+import { Button, Modal } from '@xernerx/ui';
+import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard, Copy, Share2, Check, Code2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -21,6 +20,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 	const [timeLeft, setTimeLeft] = useState<string>('');
 	const [copiedId, setCopiedId] = useState(false);
 	const [copiedShare, setCopiedShare] = useState(false);
+	const [embedModalOpen, setEmbedModalOpen] = useState(false);
 
 	const handleCopyId = () => {
 		navigator.clipboard.writeText(bot.id).then(() => {
@@ -179,6 +179,14 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 						>
 							{copiedShare ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
 						</Button>
+						<Button
+							onClick={() => setEmbedModalOpen(true)}
+							variant="outline"
+							title={t('app.bots.id.embedBadges')}
+							className="w-full sm:w-auto px-4 border border-(--border)/10 hover:border-(--accent)/50 hover:bg-(--accent)/10 text-(--text-muted) hover:text-(--text)"
+						>
+							<Code2 className="w-4 h-4" />
+						</Button>
 					</div>
 					{bot.links && Object.entries(bot.links).filter(([key, val]) => key !== 'invite' && val).length > 0 && (
 						<div className="flex flex-wrap gap-2 justify-end w-full">
@@ -186,7 +194,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 								.filter(([key, val]) => key !== 'invite' && val)
 								.map(([key, val]) => {
 									let Icon: any = ExternalLink;
-									if (key === 'github') Icon = FaGithub;
+									if (key === 'github') Icon = Code2;
 									else if (key === 'website') Icon = Globe;
 									else if (key === 'support') Icon = LifeBuoy;
 									else if (key === 'community') Icon = MessageSquare;
@@ -269,6 +277,51 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 					)}
 				</div>
 			</div>
+
+			<Modal isOpen={embedModalOpen} onClose={() => setEmbedModalOpen(false)} title={t('app.bots.id.embedBadges')}>
+				<div className="flex flex-col gap-4">
+					<p className="text-xs text-(--text-muted)">{t('app.bots.id.embedBadgesDesc')}</p>
+					{(['votes', 'servers', 'users', 'status'] as const).map((badgeType) => {
+						const badgeUrl = getEnvUrl(`https://api.xernerx.com/v1/bots/${id}/badge.svg?type=${badgeType}`);
+						const botPageUrl = `${getEnvUrl('https://app.xernerx.com')}/bots/${id}`;
+						const mdSnippet = `[![Xernerx ${badgeType}](${badgeUrl})](${botPageUrl})`;
+						const htmlSnippet = `<a href="${botPageUrl}"><img src="${badgeUrl}" alt="Xernerx ${badgeType}" /></a>`;
+
+						return (
+							<div key={badgeType} className="flex flex-col gap-2.5 p-4 rounded-2xl border border-(--border)/10 bg-(--background)/50">
+								<div className="flex items-center justify-between gap-3">
+									<img src={badgeUrl} alt={badgeType} className="h-6" />
+									<div className="flex items-center gap-2">
+										<Button
+											variant="secondary"
+											onClick={() => {
+												navigator.clipboard.writeText(mdSnippet);
+												toast({ type: 'success', title: t('app.bots.id.snippetCopied', { format: 'Markdown' }) });
+											}}
+											className="text-xs px-3 py-1"
+										>
+											Markdown
+										</Button>
+										<Button
+											variant="secondary"
+											onClick={() => {
+												navigator.clipboard.writeText(htmlSnippet);
+												toast({ type: 'success', title: t('app.bots.id.snippetCopied', { format: 'HTML' }) });
+											}}
+											className="text-xs px-3 py-1"
+										>
+											HTML
+										</Button>
+									</div>
+								</div>
+								<code className="text-[11px] font-mono text-(--text-muted) bg-(--foreground)/50 p-2 rounded-xl border border-(--border)/10 overflow-x-auto whitespace-nowrap">
+									{mdSnippet}
+								</code>
+							</div>
+						);
+					})}
+				</div>
+			</Modal>
 		</div>
 	);
 }

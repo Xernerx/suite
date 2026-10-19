@@ -16,6 +16,7 @@ import CoreMediaSchema from './models/xernerx/core/Media';
 import CoreSuggestionSchema from './models/xernerx/core/Suggestion';
 import CoreRoadmapItemSchema from './models/xernerx/core/RoadmapItem';
 import CoreIssueSchema from './models/xernerx/core/Issue';
+import CoreAuditLogSchema from './models/xernerx/core/AuditLog';
 
 import StoreCategorySchema from './models/xernerx/store/Category';
 import StoreItemSchema from './models/xernerx/store/Item';
@@ -59,6 +60,7 @@ export const xernerxModels = {
 		Suggestion: { schema: CoreSuggestionSchema, modelName: 'Suggestion' },
 		RoadmapItem: { schema: CoreRoadmapItemSchema, modelName: 'RoadmapItem' },
 		Issue: { schema: CoreIssueSchema, modelName: 'Issue' },
+		AuditLog: { schema: CoreAuditLogSchema, modelName: 'AuditLog', collection: 'audit_logs' },
 	},
 	store: {
 		Category: { schema: StoreCategorySchema, modelName: 'Category', collection: 'categories' },

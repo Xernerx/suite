@@ -23,6 +23,10 @@ export interface LighthouseScoreData {
 	perf: number;
 	a11y: number;
 	bp: number;
+	prevSeo?: number;
+	prevPerf?: number;
+	prevA11y?: number;
+	prevBp?: number;
 	updatedAt: number;
 }
 
