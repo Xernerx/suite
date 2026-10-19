@@ -2,9 +2,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
-import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard } from 'lucide-react';
+import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard, Copy, Share2, Check } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,12 +12,32 @@ import Link from 'next/link';
 export default function Header({ bot, id, setBot }: { bot: any; id: string; setBot: any }) {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
+	const { toast } = useToast();
 
 	// Vote State
 	const [canVote, setCanVote] = useState(false);
 	const [nextVoteAt, setNextVoteAt] = useState<string | null>(null);
 	const [voting, setVoting] = useState(false);
 	const [timeLeft, setTimeLeft] = useState<string>('');
+	const [copiedId, setCopiedId] = useState(false);
+	const [copiedShare, setCopiedShare] = useState(false);
+
+	const handleCopyId = () => {
+		navigator.clipboard.writeText(bot.id).then(() => {
+			setCopiedId(true);
+			toast({ type: 'success', title: t('app.bots.id.idCopied'), description: bot.id });
+			setTimeout(() => setCopiedId(false), 2000);
+		});
+	};
+
+	const handleShareProfile = () => {
+		const url = window.location.href;
+		navigator.clipboard.writeText(url).then(() => {
+			setCopiedShare(true);
+			toast({ type: 'success', title: t('app.bots.id.profileLinkCopied'), description: url });
+			setTimeout(() => setCopiedShare(false), 2000);
+		});
+	};
 
 	useEffect(() => {
 		if (!nextVoteAt || canVote) return;
@@ -108,12 +128,21 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 				</div>
 			)}
 			<div className="flex-1 relative z-10">
-				<div className="flex items-center gap-3 mb-2">
+				<div className="flex flex-wrap items-center gap-3 mb-2">
 					<h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{bot.discord?.global_name || bot.discord?.username || bot.name || t('common.unknownBot')}
 					</h1>
 					{bot.verified && <ShieldCheck className="w-6 h-6 text-green-500" />}
 					{bot.discord?.bot && <span className="px-2 py-0.5 bg-[#5865F2] text-white text-[10px] font-bold rounded-sm uppercase tracking-wider">{t('app.bots.id.text4')}</span>}
+					<button
+						type="button"
+						onClick={handleCopyId}
+						title={t('app.bots.id.copyId')}
+						className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-(--background)/80 hover:bg-(--background) border border-(--border)/10 hover:border-(--accent)/40 text-xs font-mono text-(--text-muted) hover:text-(--text) transition-all cursor-pointer"
+					>
+						{copiedId ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+						<span>{bot.id}</span>
+					</button>
 				</div>
 				<p className="text-lg text-(--text-muted) mb-4 max-w-2xl">{bot.description || t('common.noDescription')}</p>
 				<div className="flex flex-wrap gap-2">
@@ -141,6 +170,14 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 						>
 							<ChevronUp className="w-4 h-4 mr-2" />
 							{voting ? t('app.bots.id.voting') : canVote ? t('app.bots.id.vote') : nextVoteAt ? t('app.bots.id.voteAgainIn', { time: timeLeft || '...' }) : t('app.bots.id.voted')}
+						</Button>
+						<Button
+							onClick={handleShareProfile}
+							variant="outline"
+							title={t('app.bots.id.shareProfile')}
+							className="w-full sm:w-auto px-4 border border-(--border)/10 hover:border-(--accent)/50 hover:bg-(--accent)/10 text-(--text-muted) hover:text-(--text)"
+						>
+							{copiedShare ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
 						</Button>
 					</div>
 					{bot.links && Object.entries(bot.links).filter(([key, val]) => key !== 'invite' && val).length > 0 && (

@@ -1,8 +1,9 @@
 /** @format */
 'use client';
 
+import { useState } from 'react';
 import { Settings as SettingsIcon, Building2, AlertTriangle, Trash2 } from 'lucide-react';
-import { Selector } from '@xernerx/ui';
+import { Confirm, Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import WidgetSettingsCard from '@/components/WidgetSettingsCard';
 
@@ -15,6 +16,7 @@ interface SettingsProps {
 
 export default function Settings({ guildConfig, setGuildConfig, organizations, handleDeleteGuild }: SettingsProps) {
 	const { t } = useDictionary();
+	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
 	return (
 		<>
@@ -92,7 +94,8 @@ export default function Settings({ guildConfig, setGuildConfig, organizations, h
 					<p className="text-xs text-(--accent-orange)/80">{t('app.dashboard.text16')}</p>
 				</div>
 				<button
-					onClick={() => setGuildConfig({ ...guildConfig, description: '', info: '', locale: '', links: {}, widgets: false })}
+					type="button"
+					onClick={() => setIsResetConfirmOpen(true)}
 					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
@@ -117,6 +120,7 @@ export default function Settings({ guildConfig, setGuildConfig, organizations, h
 					<p className="text-xs text-(--accent-red)/80">{t('app.dashboard.text19')}</p>
 				</div>
 				<button
+					type="button"
 					onClick={handleDeleteGuild}
 					className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm"
 					style={{
@@ -128,6 +132,21 @@ export default function Settings({ guildConfig, setGuildConfig, organizations, h
 					<span>{t('app.dashboard.text20')}</span>
 				</button>
 			</div>
+
+			<Confirm
+				open={isResetConfirmOpen}
+				onOpenChange={setIsResetConfirmOpen}
+				title={t('app.dashboard.settings.resetConfirmTitle')}
+				description={t('app.dashboard.settings.resetConfirmDesc')}
+				confirmText={t('app.dashboard.text17')}
+				cancelText={t('common.buttons.cancel')}
+				variant="warning"
+				confirmKeyword="RESET"
+				onConfirm={() => {
+					setGuildConfig({ ...guildConfig, description: '', info: '', locale: '', links: {}, widgets: false });
+					setIsResetConfirmOpen(false);
+				}}
+			/>
 		</>
 	);
 }

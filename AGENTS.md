@@ -91,6 +91,9 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 - **Form Controls (`Input.tsx`, `Selector.tsx`, `MultiSelector.tsx`, `Toggle.tsx`):**
     - Never render raw native `<input type="text">`, `<input type="number">`, `<textarea>`, `<select>`, or `<input type="checkbox">` elements for standard form controls.
     - Always use `<Input />`, `<Input variant="textarea" />`, `<Selector />`, `<MultiSelector />`, and `<Toggle />` from `@xernerx/ui`.
+- **No Native Browser Dialogs (`prompt()`, `confirm()`, `alert()`):**
+    - **NEVER EVER use `window.prompt()` / `prompt()`, `window.confirm()` / `confirm()`, or `window.alert()` / `alert()` for anything.**
+    - Always use `<Modal />` + `<Input />` from `@xernerx/ui` instead of `prompt()`, `<Confirm />` from `@xernerx/ui` instead of `confirm()`, and `useToast().toast()` from `@xernerx/providers` instead of `alert()`.
 - **Search Inputs, Command Palette & Global Shortcuts (`Input.tsx` & `ShortcutsProvider.tsx`):**
     - Never build custom search input markup or bind conflicting keyboard shortcuts (such as `Ctrl + /`, which is reserved for the global Help modal, or `Ctrl + ~` which collides with browser shortcuts).
     - Always use `<Input variant="search" shortcut={true} ... />` (or `shortcut="K"`) from `@xernerx/ui` for page-level search bars so they adhere to the global `Ctrl + K` search shortcut. When no page-level search bar is mounted (or when pressing `Ctrl + Shift + K`), `Ctrl + K` opens the global Command Palette (`CommandPaletteModal.tsx`).

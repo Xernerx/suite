@@ -1,20 +1,24 @@
 /** @format */
 'use client';
 
-import { Bot, Compass, LayoutDashboard, ArrowLeft } from 'lucide-react';
-import { Tabs, Confirm } from '@xernerx/ui';
+import { Bot, Compass, LayoutDashboard, ArrowLeft, ExternalLink, Copy, Check } from 'lucide-react';
+import { Tabs, Confirm, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 import GeneralTab from '@/components/portal/bot/GeneralTab';
 import LinksTab from '@/components/portal/bot/LinksTab';
 import WebhooksTab from '@/components/portal/bot/WebhooksTab';
 import SettingsTab from '@/components/portal/bot/SettingsTab';
 
+const VALID_TABS = ['general', 'links', 'webhooks', 'settings'];
+
 export default function PortalBotPage() {
 	const params = useParams();
+	const searchParams = useSearchParams();
 	const botId = params.id as string;
 
 	const { data: session } = useSession();
@@ -32,7 +36,30 @@ export default function PortalBotPage() {
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 	const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-	const [activeTab, setActiveTab] = useState('general');
+	const [copiedId, setCopiedId] = useState(false);
+
+	const initialTab = searchParams.get('tab');
+	const [activeTab, setActiveTab] = useState(initialTab && VALID_TABS.includes(initialTab) ? initialTab : 'general');
+
+	useEffect(() => {
+		const tabParam = searchParams.get('tab');
+		if (tabParam && VALID_TABS.includes(tabParam) && tabParam !== activeTab) {
+			setActiveTab(tabParam);
+		}
+	}, [searchParams]);
+
+	const handleTabChange = (nextTab: string) => {
+		setActiveTab(nextTab);
+		router.replace(`/portal/bots/${botId}?tab=${nextTab}`, { scroll: false });
+	};
+
+	const handleCopyId = () => {
+		if (!botConfig?.id) return;
+		navigator.clipboard.writeText(botConfig.id);
+		setCopiedId(true);
+		toast({ title: t('app.portal.workspace.idCopied'), type: 'success' });
+		setTimeout(() => setCopiedId(false), 2000);
+	};
 
 	const isDirty = JSON.stringify(botConfig) !== JSON.stringify(originalBotConfig);
 
@@ -255,8 +282,8 @@ export default function PortalBotPage() {
 			}}
 		>
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-				<div className="relative flex items-center rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
-					<div className="relative z-10 flex items-center w-full gap-4">
+				<div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
+					<div className="relative z-10 flex items-center gap-4">
 						{botConfig.discord?.avatar ? (
 							<img
 								src={`https://cdn.discordapp.com/avatars/${botConfig.id}/${botConfig.discord.avatar}.png`}
@@ -268,19 +295,34 @@ export default function PortalBotPage() {
 								<Bot className="w-8 h-8 text-(--text-muted)" />
 							</div>
 						)}
-						<div className="flex flex-col gap-1">
+						<div className="flex flex-col gap-1.5">
 							<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{botConfig.discord?.username || botConfig.name}
+								{botConfig.discord?.global_name || botConfig.discord?.username || botConfig.name}
 							</span>
-							<span className="text-sm font-medium text-(--text-muted)">ID: {botConfig.id}</span>
+							<button
+								type="button"
+								onClick={handleCopyId}
+								className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-colors cursor-pointer"
+							>
+								<span>{t('app.portal.workspace.id', { id: botConfig.id })}</span>
+								{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+							</button>
 						</div>
+					</div>
+					<div className="relative z-10 flex items-center gap-2 shrink-0">
+						<Link href={`/bots/${botConfig.id}`}>
+							<Button variant="secondary" className="gap-2">
+								<ExternalLink className="w-4 h-4" />
+								{t('app.portal.workspace.viewPublicProfile')}
+							</Button>
+						</Link>
 					</div>
 				</div>
 
 				<div className="flex flex-col w-full gap-8 mt-4">
 					<Tabs
 						activeTab={activeTab}
-						onChange={setActiveTab}
+						onChange={handleTabChange}
 						tabs={[
 							{ id: 'general', label: t('app.portal.bot.tabs.general') },
 							{ id: 'links', label: t('app.portal.bot.tabs.links') },
@@ -305,6 +347,7 @@ export default function PortalBotPage() {
 				onConfirm={handleDelete}
 				title={t('app.portal.bot.modals.delete.title')}
 				description={t('app.portal.bot.modals.delete.desc')}
+				confirmKeyword={botConfig?.discord?.username || botConfig?.name || 'DELETE'}
 				loading={deleting}
 			/>
 		</div>

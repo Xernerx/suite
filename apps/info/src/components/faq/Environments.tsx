@@ -4,8 +4,25 @@
 import { CollapsibleCard } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
-export default function Environments() {
+export default function Environments({ searchQuery = '' }: { searchQuery?: string }) {
 	const { t } = useDictionary();
+	const q = searchQuery.trim().toLowerCase();
+
+	const searchableText = [
+		t('faq.environments.title'),
+		t('faq.environments.card.title'),
+		t('faq.environments.card.description'),
+		t('faq.environments.table.release.label'),
+		t('faq.environments.table.release.description'),
+		t('faq.environments.table.canary.label'),
+		t('faq.environments.table.canary.description'),
+		t('faq.environments.table.dev.label'),
+		t('faq.environments.table.dev.description'),
+	]
+		.join(' ')
+		.toLowerCase();
+
+	if (q && !searchableText.includes(q)) return null;
 
 	return (
 		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>

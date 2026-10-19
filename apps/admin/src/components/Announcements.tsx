@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
+import { Button, Confirm } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import type { AnnouncementItem, ChannelOption, ComponentRow, EmbedData } from './announcements/types';
 import { AnnouncementCard } from './announcements/AnnouncementCard';
@@ -22,6 +22,7 @@ export default function Announcements() {
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [title, setTitle] = useState('');
@@ -194,8 +195,14 @@ export default function Announcements() {
 		}
 	};
 
-	const deleteAnnouncement = async (id: string) => {
-		if (!confirm(t('admin.dashboard.announcements.deleteConfirm'))) return;
+	const deleteAnnouncement = (id: string) => {
+		setConfirmDeleteId(id);
+	};
+
+	const confirmDeleteAnnouncement = async () => {
+		if (!confirmDeleteId) return;
+		const id = confirmDeleteId;
+		setConfirmDeleteId(null);
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements/${id}`), {
 				method: 'DELETE',
@@ -281,6 +288,15 @@ export default function Announcements() {
 				fillBoilerplate={fillBoilerplate}
 				onSubmit={saveAnnouncement}
 				saving={saving}
+			/>
+
+			<Confirm
+				open={!!confirmDeleteId}
+				onOpenChange={(open) => !open && setConfirmDeleteId(null)}
+				title={t('admin.dashboard.announcements.title')}
+				description={t('admin.dashboard.announcements.deleteConfirm')}
+				variant="danger"
+				onConfirm={confirmDeleteAnnouncement}
 			/>
 		</div>
 	);

@@ -2,7 +2,41 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Moon, Search, Settings, SidebarIcon, Sun, X } from 'lucide-react';
+import {
+	ArrowRight,
+	BarChart3,
+	Bell,
+	BookOpen,
+	Bug,
+	Compass,
+	Copy,
+	DollarSign,
+	FileCheck,
+	FileCog,
+	Globe,
+	HelpCircle,
+	History,
+	Image as ImageIcon,
+	KeyRound,
+	Languages,
+	Layers,
+	LayoutGrid,
+	Lightbulb,
+	Map,
+	Megaphone,
+	Moon,
+	Paintbrush,
+	Search,
+	Settings,
+	Shield,
+	ShieldCheck,
+	SidebarIcon,
+	Store,
+	Sun,
+	Ticket,
+	Users,
+	X,
+} from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -15,7 +49,7 @@ import { useUser } from './UserProvider';
 
 type PaletteActionItem = {
 	id: string;
-	section: 'views' | 'actions' | 'apps';
+	section: 'views' | 'actions' | 'apps' | 'settings' | 'support' | 'admin';
 	label: string;
 	subtitle?: string;
 	shortcut?: string;
@@ -152,7 +186,11 @@ export function CommandPaletteModal({
 				shortcut: 'Ctrl + Shift + C',
 				icon: Copy,
 				onSelect: () => {
-					const currentUrl = window.location.href;
+					const urlObj = new URL(window.location.href);
+					if (sidebar.state !== 'hidden' && sidebar.view && !urlObj.searchParams.has('view')) {
+						urlObj.searchParams.set('view', sidebar.view);
+					}
+					const currentUrl = urlObj.toString();
 					navigator.clipboard.writeText(currentUrl).then(() => {
 						toast({ type: 'success', title: t('components.header.urlCopied'), description: currentUrl });
 					});
@@ -199,8 +237,107 @@ export function CommandPaletteModal({
 			});
 		});
 
+		// 4. Account & Developer Settings Deep-Links
+		const accountTabs = [
+			{ view: 'profile', labelKey: 'common.nav.items.profile', catKey: 'common.nav.categories.account', icon: ShieldCheck },
+			{ view: 'appearance', labelKey: 'common.nav.items.appearance', catKey: 'common.nav.categories.preferences', icon: Paintbrush },
+			{ view: 'language', labelKey: 'common.nav.items.language', catKey: 'common.nav.categories.preferences', icon: Globe },
+			{ view: 'notifications', labelKey: 'common.nav.items.notifications', catKey: 'common.nav.categories.preferences', icon: Bell },
+			{ view: 'billing', labelKey: 'common.nav.items.billing', catKey: 'common.nav.categories.billing', icon: DollarSign },
+			{ view: 'tokens', labelKey: 'common.nav.items.tokens', catKey: 'common.nav.categories.developer', icon: KeyRound },
+			{ view: 'media', labelKey: 'account.media.title', catKey: 'common.nav.categories.developer', icon: ImageIcon },
+		];
+
+		accountTabs.forEach((tab) => {
+			list.push({
+				id: `settings-account-${tab.view}`,
+				section: 'settings',
+				label: t(tab.labelKey),
+				subtitle: t(tab.catKey),
+				icon: tab.icon,
+				onSelect: () => {
+					const accountBase = getEnvUrl('https://account.xernerx.com');
+					try {
+						if (window.location.origin === new URL(accountBase).origin && window.location.pathname === '/') {
+							sidebar.setView(tab.view);
+							onClose();
+							return;
+						}
+					} catch {}
+					window.location.href = `${accountBase}/?view=${tab.view}`;
+					onClose();
+				},
+			});
+		});
+
+		// 5. Support Hub Portals
+		const supportPortals = [
+			{ path: '/roadmap', labelKey: 'info.home.portals.roadmap.title', icon: Map },
+			{ path: '/suggestions', labelKey: 'info.home.portals.suggestions.title', icon: Lightbulb },
+			{ path: '/issues', labelKey: 'info.home.portals.issues.title', icon: Bug },
+			{ path: '/faq', labelKey: 'info.home.portals.faq.title', icon: BookOpen },
+			{ path: '/changelog', labelKey: 'info.home.portals.changelog.title', icon: History },
+		];
+
+		supportPortals.forEach((portal) => {
+			list.push({
+				id: `support-${portal.path}`,
+				section: 'support',
+				label: t(portal.labelKey),
+				subtitle: t('common.footer.sections.support'),
+				icon: portal.icon,
+				onSelect: () => {
+					window.location.href = `${getEnvUrl('https://info.xernerx.com')}${portal.path}`;
+					onClose();
+				},
+			});
+		});
+
+		// 6. Admin Panel Deep-Links (for Staff)
+		if (hasAdminAccess) {
+			const adminTabs = [
+				{ view: 'overview', labelKey: 'admin.dashboard.nav.overview', catKey: 'common.nav.categories.system', icon: BarChart3 },
+				{ view: 'users', labelKey: 'common.nav.items.users', catKey: 'common.nav.categories.moderator', icon: Users },
+				{ view: 'roles', labelKey: 'common.nav.items.roles', catKey: 'common.nav.categories.system', icon: Shield },
+				{ view: 'store', labelKey: 'admin.dashboard.nav.store', catKey: 'common.nav.categories.product', icon: Store },
+				{ view: 'media', labelKey: 'admin.dashboard.nav.mediaLibrary', catKey: 'admin.dashboard.nav.media', icon: ImageIcon },
+				{ view: 'invites', labelKey: 'admin.dashboard.nav.invites', catKey: 'common.nav.categories.administrator', icon: Ticket },
+				{ view: 'announcements', labelKey: 'admin.dashboard.nav.announcements', catKey: 'common.nav.categories.administrator', icon: Megaphone },
+				{ view: 'roadmap', labelKey: 'common.nav.items.roadmap', catKey: 'common.nav.categories.product', icon: Map },
+				{ view: 'suggestions', labelKey: 'common.nav.items.suggestions', catKey: 'common.nav.categories.product', icon: Lightbulb },
+				{ view: 'issues', labelKey: 'common.nav.items.issues', catKey: 'common.nav.categories.product', icon: Bug },
+				{ view: 'translations', labelKey: 'common.nav.items.translations', catKey: 'common.nav.categories.translator', icon: Languages },
+				{ view: 'applications_review', labelKey: 'common.nav.items.applications_review', catKey: 'common.nav.categories.moderator', icon: FileCheck },
+				{ view: 'applications_manage', labelKey: 'common.nav.items.applications_manage', catKey: 'common.nav.categories.administrator', icon: FileCog },
+				{ view: 'tokens', labelKey: 'common.nav.items.tokens', catKey: 'common.nav.categories.administrator', icon: KeyRound },
+				{ view: 'settings', labelKey: 'common.nav.items.settings', catKey: 'common.nav.categories.system', icon: Settings },
+			];
+
+			adminTabs.forEach((tab) => {
+				list.push({
+					id: `admin-${tab.view}`,
+					section: 'admin',
+					label: t(tab.labelKey),
+					subtitle: t(tab.catKey),
+					icon: tab.icon,
+					onSelect: () => {
+						const adminBase = getEnvUrl('https://admin.xernerx.com');
+						try {
+							if (window.location.origin === new URL(adminBase).origin && window.location.pathname === '/') {
+								sidebar.setView(tab.view);
+								onClose();
+								return;
+							}
+						} catch {}
+						window.location.href = `${adminBase}/?view=${tab.view}`;
+						onClose();
+					},
+				});
+			});
+		}
+
 		return list;
-	}, [sidebar, resolvedTheme, setTheme, t, visibleNavigation, getEnvUrl, router, onClose, onOpenAppDrawer, onOpenHelp, onOpenOmnibar, toast]);
+	}, [sidebar, resolvedTheme, setTheme, t, visibleNavigation, hasAdminAccess, getEnvUrl, router, onClose, onOpenAppDrawer, onOpenHelp, onOpenOmnibar, toast]);
 
 	const filteredItems = useMemo(() => {
 		const trimmed = query.trim().toLowerCase();
@@ -229,10 +366,13 @@ export function CommandPaletteModal({
 		}
 	};
 
-	const sections: Array<{ key: 'views' | 'actions' | 'apps'; title: string }> = [
+	const sections: Array<{ key: 'views' | 'actions' | 'apps' | 'settings' | 'support' | 'admin'; title: string }> = [
 		{ key: 'views', title: t('common.shortcuts.modal.palette.sections.views') },
 		{ key: 'actions', title: t('common.shortcuts.modal.palette.sections.actions') },
 		{ key: 'apps', title: t('common.shortcuts.modal.palette.sections.apps') },
+		{ key: 'settings', title: t('common.shortcuts.modal.palette.sections.settings') },
+		{ key: 'support', title: t('common.shortcuts.modal.palette.sections.support') },
+		{ key: 'admin', title: t('common.shortcuts.modal.palette.sections.admin') },
 	];
 
 	return (

@@ -2,10 +2,10 @@
 'use client';
 
 import { useEffect, useState, use } from 'react';
-import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar, useSession, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { ArrowLeft, Server, Users, Shield, Link as LinkIcon, Image as ImageIcon, Activity, MessageSquare, ShieldCheck, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Server, Users, Shield, Link as LinkIcon, Image as ImageIcon, Activity, MessageSquare, ShieldCheck, Settings, Copy, Share2, Check } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
@@ -31,9 +31,14 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	const { getEnvUrl } = useEnvironment();
 	const { view, setNavItems, show, hide } = useSidebar();
 	const { t } = useDictionary();
+	const { data: session } = useSession();
+	const { toast } = useToast();
 
 	const [server, setServer] = useState<GuildProfile | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [canManageServer, setCanManageServer] = useState(false);
+	const [copiedId, setCopiedId] = useState(false);
+	const [copiedShare, setCopiedShare] = useState(false);
 
 	// Chart State
 	const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '3m' | '6m' | '1y' | 'all'>('24h');
@@ -47,6 +52,24 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 			setActiveMetric(metricId);
 			setIsUndrawing(false);
 		}, 400);
+	};
+
+	const handleCopyId = () => {
+		if (!server) return;
+		navigator.clipboard.writeText(server.id).then(() => {
+			setCopiedId(true);
+			toast({ type: 'success', title: t('app.servers.idCopied'), description: server.id });
+			setTimeout(() => setCopiedId(false), 2000);
+		});
+	};
+
+	const handleShareProfile = () => {
+		const url = window.location.href;
+		navigator.clipboard.writeText(url).then(() => {
+			setCopiedShare(true);
+			toast({ type: 'success', title: t('app.servers.profileLinkCopied'), description: url });
+			setTimeout(() => setCopiedShare(false), 2000);
+		});
 	};
 
 	// Vote State
@@ -82,14 +105,42 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	}, [nextVoteAt, canVote]);
 
 	useEffect(() => {
+		const sessionData = session as any;
+		const uid = sessionData?.user?.id;
+		if (!uid) {
+			setCanManageServer(false);
+			return;
+		}
+		fetch(getEnvUrl(`https://api.xernerx.com/core/users/${uid}/discord/guilds`))
+			.then((res) => (res.ok ? res.json() : []))
+			.then((guilds: any[]) => {
+				if (!Array.isArray(guilds)) return;
+				const match = guilds.find((g) => g.id === id);
+				if (match) {
+					const perms = BigInt(match.permissions || 0);
+					const hasAdmin = (perms & BigInt(0x8)) === BigInt(0x8);
+					const hasManage = (perms & BigInt(0x20)) === BigInt(0x20);
+					setCanManageServer(hasAdmin || hasManage);
+				} else {
+					setCanManageServer(false);
+				}
+			})
+			.catch(() => setCanManageServer(false));
+	}, [session, id, getEnvUrl]);
+
+	useEffect(() => {
 		show();
-		setNavItems([
+		const items: any[] = [
 			{ label: t('app.servers.nav.backToServers'), href: '/servers', icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.organization.nav.profile'), view: 'profile', icon: Server, category: t('app.servers.nav.serverDetails') },
 			{ label: t('app.bots.tabs.statistics'), view: 'statistics', icon: Activity, category: t('app.servers.nav.serverDetails') },
-		]);
+		];
+		if (canManageServer) {
+			items.push({ label: t('app.servers.manageServer'), href: `/dashboard?guild=${id}`, icon: Settings, category: t('app.bots.tabs.categoryManagement') });
+		}
+		setNavItems(items);
 		return () => hide();
-	}, [setNavItems, show, hide, t]);
+	}, [setNavItems, show, hide, t, canManageServer, id]);
 
 	// Fetch Server Profile
 	useEffect(() => {
@@ -183,11 +234,20 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 					</div>
 				)}
 				<div className="flex-1 relative z-10">
-					<div className="flex items-center gap-3 mb-2">
+					<div className="flex flex-wrap items-center gap-3 mb-2">
 						<h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{server.name}
 						</h1>
 						{server.verified && <Shield className="w-6 h-6 text-green-500" />}
+						<button
+							type="button"
+							onClick={handleCopyId}
+							title={t('app.servers.copyId')}
+							className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-(--background)/80 hover:bg-(--background) border border-(--border)/10 hover:border-(--accent)/40 text-xs font-mono text-(--text-muted) hover:text-(--text) transition-all cursor-pointer"
+						>
+							{copiedId ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+							<span>{server.id}</span>
+						</button>
 					</div>
 					<p className="text-lg text-(--text-muted) mb-4 max-w-2xl">{server.description || t('common.noDescription')}</p>
 
@@ -204,9 +264,23 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 				</div>
 
 				<div className="flex flex-col gap-3 min-w-[200px] relative z-10 w-full md:w-auto mt-6 md:mt-0">
-					<Button variant="primary" className="w-full justify-center shadow-lg hover:shadow-xl transition-shadow" onClick={() => window.open(server.links?.website || '#', '_blank')}>
-						{t('app.servers.joinServer')}
-					</Button>
+					<div className="flex gap-2">
+						<Button
+							variant="primary"
+							className="flex-1 justify-center shadow-lg hover:shadow-xl transition-shadow"
+							onClick={() => window.open(server.links?.invite || server.links?.website || '#', '_blank')}
+						>
+							{t('app.servers.joinServer')}
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={handleShareProfile}
+							title={t('app.servers.shareProfile')}
+							className="px-3.5 justify-center border border-(--border)/10 hover:border-(--accent)/50"
+						>
+							{copiedShare ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
+						</Button>
+					</div>
 					<Button
 						variant={canVote ? 'secondary' : 'ghost'}
 						className={`w-full justify-center ${canVote ? 'hover:border-(--accent) hover:text-(--accent)' : 'opacity-70 cursor-not-allowed border-(--border)/5 bg-(--foreground)/30'}`}

@@ -3,8 +3,8 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Copy, User as UserIcon } from 'lucide-react';
-import { useDictionary, useToast } from '@xernerx/providers';
+import { Copy, ExternalLink, User as UserIcon } from 'lucide-react';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import type { DiscordProfile, FullUser, UserSummary } from './types';
 
 interface UserProfilePreviewProps {
@@ -18,6 +18,7 @@ interface UserProfilePreviewProps {
 
 export function UserProfilePreview({ user, discord, fullUser, displayName, avatarUrl, discordBanner }: UserProfilePreviewProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
 	return (
@@ -88,6 +89,16 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 								<span className="truncate">{fullUser.email}</span>
 							</div>
 							<Copy size={14} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
+						</button>
+					)}
+					{user.id && (
+						<button
+							type="button"
+							onClick={() => window.open(getEnvUrl(`https://app.xernerx.com/users/${user.id}`), '_blank')}
+							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 font-semibold text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/30 transition-all text-left group cursor-pointer"
+						>
+							<span className="truncate">{t('admin.users.viewPublicProfile')}</span>
+							<ExternalLink size={14} className="shrink-0 ml-2" />
 						</button>
 					)}
 				</div>

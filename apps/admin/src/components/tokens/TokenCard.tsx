@@ -214,10 +214,24 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 								{t(`admin.tokens.statusOptions.${token.status}`)}
 							</span>
 						</div>
-						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">
-							{t('admin.tokens.card.idPrefix')}
-							{token.id}
-						</span>
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								navigator.clipboard.writeText(token.id);
+								toast({
+									title: t('admin.tokens.tokenIdCopied'),
+									type: 'success',
+								});
+							}}
+							className="inline-flex items-center gap-1 w-fit text-[10px] text-(--text-muted)/60 hover:text-(--text) font-mono mt-1 truncate transition-colors cursor-pointer"
+						>
+							<span className="truncate">
+								{t('admin.tokens.card.idPrefix')}
+								{token.id}
+							</span>
+							<Copy size={10} className="shrink-0 opacity-70" />
+						</button>
 					</div>
 				</div>
 

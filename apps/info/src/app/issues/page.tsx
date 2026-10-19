@@ -1,11 +1,11 @@
 /** @format */
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Selector, Input, Tooltip } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogIn } from 'lucide-react';
+import { FileText, LogIn, Upload, X } from 'lucide-react';
 
 function fuzzySearch(query: string, text: string) {
 	if (!query) return true;
@@ -33,15 +33,34 @@ export default function IssuesPage() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
+	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+	const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'submitted' | 'release'>('all');
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
 	const [attachment, setAttachment] = useState<File | null>(null);
+	const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+	const [isDragging, setIsDragging] = useState(false);
 	const [uploading, setUploading] = useState(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (!attachment || !attachment.type.startsWith('image/')) {
+			setAttachmentPreview(null);
+			return;
+		}
+		const url = URL.createObjectURL(attachment);
+		setAttachmentPreview(url);
+		return () => URL.revokeObjectURL(url);
+	}, [attachment]);
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const qParam = params.get('q');
 			const savedDraft = sessionStorage.getItem('xernerx_issue_draft') || sessionStorage.getItem('xernerx_bug_draft');
-			if (savedDraft) {
+			if (qParam) {
+				setSearch(qParam);
+			} else if (savedDraft) {
 				setSearch(savedDraft);
 				sessionStorage.removeItem('xernerx_issue_draft');
 				sessionStorage.removeItem('xernerx_bug_draft');
@@ -207,14 +226,50 @@ export default function IssuesPage() {
 		}
 	};
 
+	const availableProducts = useMemo(() => {
+		const openIssues = issues.filter((s: any) => s.status !== 'resolved');
+		const set = new Set<string>(products);
+		openIssues.forEach((s: any) => {
+			if (s.productId) set.add(s.productId);
+		});
+		return Array.from(set).filter(Boolean);
+	}, [products, issues]);
+
 	const filteredIssues = useMemo(() => {
 		const openIssues = issues.filter((s: any) => s.status !== 'resolved');
-		if (!search) return openIssues;
 		return openIssues.filter((s: any) => {
+			if (statusFilter === 'verified' && !s.acknowledged) return false;
+			if (statusFilter === 'submitted' && s.acknowledged) return false;
+			if (statusFilter === 'release' && !(s.resolvedApp && s.resolvedVersion)) return false;
+
 			const botInfo = resolveBot(s);
-			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, botInfo?.name || s.productId || '');
+			const prodName = botInfo?.name || s.productId || '';
+			if (selectedProduct) {
+				const selectedBot = resolveBot(selectedProduct);
+				const selectedName = selectedBot?.name || selectedProduct;
+				if (prodName.toLowerCase() !== selectedName.toLowerCase() && s.productId !== selectedProduct) {
+					return false;
+				}
+			}
+			if (!search) return true;
+			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
 		});
-	}, [search, issues, orgBots, botProfiles]);
+	}, [search, selectedProduct, statusFilter, issues, orgBots, botProfiles]);
+
+	const handlePaste = (e: React.ClipboardEvent) => {
+		const items = e.clipboardData?.items;
+		if (!items) return;
+		for (let i = 0; i < items.length; i++) {
+			const item = items[i];
+			if (item.kind === 'file') {
+				const file = item.getAsFile();
+				if (file) {
+					setAttachment(file);
+					break;
+				}
+			}
+		}
+	};
 
 	if (loading) return <Loading />;
 
@@ -237,7 +292,7 @@ export default function IssuesPage() {
 							className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-xl flex flex-col gap-4 w-full"
 						>
 							<h2 className="text-xl font-bold text-(--text)">{t('info.bugs.newBug')}</h2>
-							<form onSubmit={submitIssue} className="flex flex-col gap-4">
+							<form onSubmit={submitIssue} onPaste={handlePaste} className="flex flex-col gap-4">
 								<Input placeholder={t('info.bugs.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} required />
 								<Input variant="textarea" rows={4} placeholder={t('info.bugs.descriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} required />
 								<Selector
@@ -262,12 +317,57 @@ export default function IssuesPage() {
 								/>
 								<div className="flex flex-col gap-2">
 									<label className="text-xs font-bold text-(--text-muted) uppercase">{t('info.bugs.attachFile')}</label>
-									<input
-										type="file"
-										onChange={(e) => setAttachment(e.target.files?.[0] || null)}
-										className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-(--accent) file:text-(--background) hover:file:opacity-90"
-										accept="image/*,.txt,.log,.json"
-									/>
+									<input ref={fileInputRef} type="file" onChange={(e) => setAttachment(e.target.files?.[0] || null)} className="hidden" accept="image/*,.txt,.log,.json" />
+									{attachment ? (
+										<div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-(--accent)/30 bg-(--background)/50">
+											<div className="flex items-center gap-3 min-w-0">
+												{attachmentPreview ? (
+													<img src={attachmentPreview} alt={attachment.name} className="w-12 h-12 rounded-lg object-cover border border-(--border)/10 shrink-0" />
+												) : (
+													<div className="w-12 h-12 rounded-lg bg-(--accent)/10 text-(--accent) flex items-center justify-center shrink-0">
+														<FileText size={20} />
+													</div>
+												)}
+												<div className="flex flex-col min-w-0">
+													<span className="text-sm font-semibold text-(--text) truncate">{attachment.name}</span>
+													<span className="text-xs text-(--text-muted)">{(attachment.size / 1024).toFixed(1)} KB</span>
+												</div>
+											</div>
+											<button
+												type="button"
+												title={t('info.bugs.dropzone.remove')}
+												onClick={() => {
+													setAttachment(null);
+													if (fileInputRef.current) fileInputRef.current.value = '';
+												}}
+												className="p-2 rounded-lg text-(--text-muted) hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
+											>
+												<X size={16} />
+											</button>
+										</div>
+									) : (
+										<div
+											onClick={() => fileInputRef.current?.click()}
+											onDragOver={(e) => {
+												e.preventDefault();
+												setIsDragging(true);
+											}}
+											onDragLeave={() => setIsDragging(false)}
+											onDrop={(e) => {
+												e.preventDefault();
+												setIsDragging(false);
+												const dropped = e.dataTransfer.files?.[0];
+												if (dropped) setAttachment(dropped);
+											}}
+											className={`flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center ${
+												isDragging ? 'border-(--accent) bg-(--accent)/10' : 'border-(--border)/15 bg-(--background)/30 hover:border-(--accent)/40 hover:bg-(--background)/50'
+											}`}
+										>
+											<Upload size={20} className="text-(--accent)" />
+											<span className="text-xs font-semibold text-(--text)">{t('info.bugs.dropzone.prompt')}</span>
+											<span className="text-[11px] text-(--text-muted)">{t('info.bugs.dropzone.formats')}</span>
+										</div>
+									)}
 								</div>
 								<div className="flex gap-2 w-full">
 									<Button type="submit" className="flex-1" disabled={uploading}>
@@ -288,9 +388,67 @@ export default function IssuesPage() {
 							transition={{ duration: 0.2, ease: 'easeOut' }}
 							className="flex flex-col gap-4 w-full"
 						>
-							<div className="flex flex-col gap-1.5">
+							<div className="flex flex-col gap-2.5">
 								<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-								<p className="text-xs text-(--text-muted) px-1">{t('info.bugs.startTyping')}</p>
+								<div className="flex flex-wrap items-center justify-between gap-2 px-1">
+									<p className="text-xs text-(--text-muted)">{t('info.bugs.startTyping')}</p>
+									<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10">
+										{(
+											[
+												{ id: 'all', label: t('info.bugs.filters.all') },
+												{ id: 'verified', label: t('info.bugs.filters.verified') },
+												{ id: 'submitted', label: t('info.bugs.filters.submitted') },
+												{ id: 'release', label: t('info.bugs.filters.release') },
+											] as Array<{ id: 'all' | 'verified' | 'submitted' | 'release'; label: string }>
+										).map((opt) => (
+											<button
+												key={opt.id}
+												type="button"
+												onClick={() => setStatusFilter(opt.id)}
+												className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+													statusFilter === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+												}`}
+											>
+												{opt.label}
+											</button>
+										))}
+									</div>
+								</div>
+
+								{availableProducts.length > 0 && (
+									<div className="flex flex-wrap items-center gap-1.5 pt-1">
+										<button
+											type="button"
+											onClick={() => setSelectedProduct(null)}
+											className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+												selectedProduct === null
+													? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+													: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+											}`}
+										>
+											{t('info.bugs.allProducts')}
+										</button>
+										{availableProducts.map((prod) => {
+											const botInfo = resolveBot(prod);
+											const isSelected = selectedProduct === prod;
+											return (
+												<button
+													key={prod}
+													type="button"
+													onClick={() => setSelectedProduct(isSelected ? null : prod)}
+													className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+														isSelected
+															? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+															: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+													}`}
+												>
+													{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+													<span>{botInfo ? botInfo.name : prod}</span>
+												</button>
+											);
+										})}
+									</div>
+								)}
 							</div>
 
 							<AnimatePresence mode="popLayout">
@@ -362,10 +520,14 @@ export default function IssuesPage() {
 														</Tooltip>
 													)}
 
-													<span className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">
+													<button
+														type="button"
+														onClick={() => setSelectedProduct(selectedProduct === s.productId ? null : s.productId)}
+														className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
+													>
 														{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
 														{botInfo ? botInfo.name : s.productId}
-													</span>
+													</button>
 												</div>
 											</div>
 										</motion.div>

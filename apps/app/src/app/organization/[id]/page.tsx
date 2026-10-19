@@ -66,7 +66,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 		const uid = (session as any)?.user?.id;
 		if (organization && uid && (organization.owner === uid || organization.members?.includes(uid))) {
-			items.push({ label: t('app.organization.nav.settings'), href: `/portal?tab=organizations&org=${organization._id}`, icon: Settings, category: t('app.organization.nav.management') });
+			items.push({ label: t('app.organization.nav.settings'), href: `/portal?org=${organization._id}&tab=settings`, icon: Settings, category: t('app.organization.nav.management') });
 		}
 
 		setNavItems(items);

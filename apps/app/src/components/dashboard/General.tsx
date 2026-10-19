@@ -1,6 +1,8 @@
 /** @format */
 'use client';
 
+import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Settings, Server } from 'lucide-react';
 import { Input } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
@@ -12,6 +14,7 @@ interface GeneralProps {
 
 export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 	const { t } = useDictionary();
+	const [markdownPreview, setMarkdownPreview] = useState(false);
 
 	return (
 		<>
@@ -75,15 +78,40 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 						<Input value={guildConfig.description || ''} onChange={(e) => setGuildConfig({ ...guildConfig, description: e.target.value })} placeholder={t('app.dashboard.placeholder1')} />
 					</div>
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">{t('app.dashboard.text9')}</label>
-						<Input
-							variant="textarea"
-							value={guildConfig.info || ''}
-							onChange={(e) => setGuildConfig({ ...guildConfig, info: e.target.value })}
-							placeholder={t('app.dashboard.placeholder2')}
-							rows={4}
-							className="resize-none"
-						/>
+						<div className="flex items-center justify-between">
+							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.text9')}</label>
+							<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
+								<button
+									type="button"
+									onClick={() => setMarkdownPreview(false)}
+									className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								>
+									{t('app.portal.info.write')}
+								</button>
+								<button
+									type="button"
+									onClick={() => setMarkdownPreview(true)}
+									className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								>
+									{t('app.portal.info.preview')}
+								</button>
+							</div>
+						</div>
+
+						{markdownPreview ? (
+							<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
+								{guildConfig.info ? <ReactMarkdown>{guildConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">{t('app.portal.info.nothingToPreview')}</span>}
+							</div>
+						) : (
+							<Input
+								variant="textarea"
+								value={guildConfig.info || ''}
+								onChange={(e) => setGuildConfig({ ...guildConfig, info: e.target.value })}
+								placeholder={t('app.dashboard.placeholder2')}
+								rows={4}
+								className="resize-none min-h-[120px]"
+							/>
+						)}
 					</div>
 				</div>
 			</div>

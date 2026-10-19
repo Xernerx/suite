@@ -10,6 +10,7 @@ import { Button, Input } from '@xernerx/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ExploreSearchBar } from '@/components/ExploreSearchBar';
 
 interface BotProfile {
 	id: string;
@@ -402,16 +403,7 @@ export default function Home() {
 					</div>
 
 					{/* Searchbar */}
-					<div className="flex-1 w-full min-w-[200px]">
-						<Input
-							variant="search"
-							shortcut="K"
-							placeholder={context === 'bots' ? t('app.home.searchBots') : t('app.home.searchServers')}
-							onSearch={(val) => {
-								if (val.trim()) router.push(`/${context}?search=${encodeURIComponent(val.trim())}`);
-							}}
-						/>
-					</div>
+					<ExploreSearchBar context={context} />
 
 					{/* Context Switcher */}
 					<div className="flex items-center p-1 bg-(--background) rounded-xl border border-(--border)/10 h-12 w-full md:w-auto shrink-0 shadow-inner">

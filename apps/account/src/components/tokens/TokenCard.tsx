@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings2 } from 'lucide-react';
-import { useDictionary } from '@xernerx/providers';
+import { Settings2, Copy, Check } from 'lucide-react';
+import { useDictionary, useToast } from '@xernerx/providers';
 import { TokenListInfo } from './types';
 
 interface TokenCardProps {
@@ -21,6 +22,19 @@ const statusColors = {
 
 export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 	const { t } = useDictionary();
+	const { toast } = useToast();
+	const [copiedId, setCopiedId] = useState(false);
+
+	const tokenId = token.id || token._id;
+
+	const handleCopyId = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		if (!tokenId) return;
+		navigator.clipboard.writeText(tokenId);
+		setCopiedId(true);
+		toast({ title: t('account.tokens.idCopied'), type: 'success' });
+		setTimeout(() => setCopiedId(false), 2000);
+	};
 
 	return (
 		<motion.div
@@ -35,7 +49,7 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 			transition={{
 				delay: index * 0.05,
 			}}
-			onClick={() => onSelect(token.id || token._id)}
+			onClick={() => onSelect(tokenId)}
 			className="group relative flex cursor-pointer flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all hover:border-(--accent)/50 hover:shadow-md"
 			style={{
 				padding: 'var(--ui-gap)',
@@ -50,7 +64,15 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 					}}
 				>
 					<h3 className="text-base font-semibold text-(--text) truncate max-w-[180px]">{token.name}</h3>
-					<p className="text-xs font-mono text-(--text-muted)">...{token.id?.slice(-6)}</p>
+					<button
+						type="button"
+						onClick={handleCopyId}
+						title={t('account.tokens.copyId')}
+						className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-md border border-(--border)/10 transition-colors cursor-pointer"
+					>
+						<span>...{tokenId?.slice(-6)}</span>
+						{copiedId ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+					</button>
 				</div>
 				<span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${statusColors[token.status]}`}>{token.status}</span>
 			</div>

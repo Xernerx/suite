@@ -2,7 +2,7 @@
 'use client';
 
 import { Button, Divider, Input, Selector } from '@xernerx/ui';
-import { Info, User as UserIcon } from 'lucide-react';
+import { Info, User as UserIcon, ExternalLink, Copy, Check } from 'lucide-react';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -13,9 +13,20 @@ export default function Profile() {
 	const { user, mutate } = useUser();
 	const { getEnvUrl } = useEnvironment();
 	const { toast, remind } = useToast();
+	const [copiedId, setCopiedId] = useState(false);
+	const [markdownPreview, setMarkdownPreview] = useState(false);
 	const activeUser = user || session?.user;
 	const userId = activeUser?.id;
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
+
+	const handleCopyId = () => {
+		if (!userId) return;
+		navigator.clipboard.writeText(userId);
+		setCopiedId(true);
+		toast({ title: t('account.profile.idCopied'), type: 'success' });
+		setTimeout(() => setCopiedId(false), 2000);
+	};
+
 	const [formData, setFormData] = useState({
 		description: '',
 		info: '',
@@ -163,43 +174,65 @@ export default function Profile() {
 			>
 				{/* Profile Summary Card */}
 				<div
-					className="flex items-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{
 						padding: 'var(--ui-gap)',
 						gap: 'var(--ui-gap)',
 					}}
 				>
-					{avatarUrl ? (
-						<Image
-							src={avatarUrl}
-							alt={t('account.common.alt')}
-							width={80}
-							height={80}
-							className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0"
-							unoptimized
-							draggable={false}
-						/>
-					) : (
-						<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--border)/10 shrink-0">
-							<UserIcon size={36} className="text-(--text-muted)" />
-						</div>
-					)}
 					<div
-						className="flex flex-col overflow-hidden"
+						className="flex items-center"
 						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
+							gap: 'var(--ui-gap)',
 						}}
 					>
-						<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('account.account.fallbackName')}</h2>
-						<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
-						{userId && (
-							<span className="text-xs text-(--text-muted)/60 font-mono">
-								{t('account.common.description', {
-									userId,
-								})}
-							</span>
+						{avatarUrl ? (
+							<Image
+								src={avatarUrl}
+								alt={t('account.common.alt')}
+								width={80}
+								height={80}
+								className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0"
+								unoptimized
+								draggable={false}
+							/>
+						) : (
+							<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--border)/10 shrink-0">
+								<UserIcon size={36} className="text-(--text-muted)" />
+							</div>
 						)}
+						<div
+							className="flex flex-col overflow-hidden"
+							style={{
+								gap: 'calc(var(--ui-gap) * 0.25)',
+							}}
+						>
+							<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('account.account.fallbackName')}</h2>
+							<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
+							{userId && (
+								<button
+									type="button"
+									onClick={handleCopyId}
+									className="inline-flex items-center gap-1.5 w-fit text-xs text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-md border border-(--border)/10 font-mono transition-colors cursor-pointer"
+								>
+									<span>
+										{t('account.common.description', {
+											userId,
+										})}
+									</span>
+									{copiedId ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+								</button>
+							)}
+						</div>
 					</div>
+					{userId && (
+						<div className="flex items-center shrink-0">
+							<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com/')}users/${userId}`, '_blank')} className="gap-2">
+								<ExternalLink size={16} />
+								{t('account.profile.viewPublicProfile')}
+							</Button>
+						</div>
+					)}
 				</div>
 
 				{/* Form Inputs Card */}
@@ -228,8 +261,33 @@ export default function Profile() {
 							gap: 'calc(var(--ui-gap) * 0.4)',
 						}}
 					>
-						<label className="block text-sm font-medium text-(--text)">{t('account.profile.infoField.label')}</label>
-						<Input variant="textarea" rows={4} value={formData.info} onChange={(e) => handleChange('info', e.target.value)} placeholder={t('account.profile.infoField.placeholder')} />
+						<div className="flex items-center justify-between">
+							<label className="block text-sm font-medium text-(--text)">{t('account.profile.infoField.label')}</label>
+							<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
+								<button
+									type="button"
+									onClick={() => setMarkdownPreview(false)}
+									className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								>
+									{t('account.profile.infoField.write')}
+								</button>
+								<button
+									type="button"
+									onClick={() => setMarkdownPreview(true)}
+									className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								>
+									{t('account.profile.infoField.preview')}
+								</button>
+							</div>
+						</div>
+
+						{markdownPreview ? (
+							<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka whitespace-pre-wrap text-(--text)">
+								{formData.info ? formData.info : <span className="text-(--text-muted) italic">{t('account.profile.infoField.nothingToPreview')}</span>}
+							</div>
+						) : (
+							<Input variant="textarea" rows={4} value={formData.info} onChange={(e) => handleChange('info', e.target.value)} placeholder={t('account.profile.infoField.placeholder')} />
+						)}
 					</div>
 
 					{/* Group 1: Birthday & Timezone */}

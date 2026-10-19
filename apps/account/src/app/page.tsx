@@ -137,7 +137,10 @@ export default function Home() {
 			},
 		]);
 
-		if (!view) setView('profile');
+		const urlView = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('view') : null;
+		const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
+		const targetView = urlView || view || storedView || 'profile';
+		if (view !== targetView) setView(targetView);
 	}, [session, status, hide, show, setNavItems, view, setView, t, getEnvUrl]);
 
 	if (!session && status !== 'loading') {

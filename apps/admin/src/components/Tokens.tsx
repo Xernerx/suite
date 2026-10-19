@@ -17,6 +17,7 @@ export default function Tokens() {
 	const { toast } = useToast();
 	const [tokens, setTokens] = useState<Token[]>([]);
 	const [search, setSearch] = useState('');
+	const [statusFilter, setStatusFilter] = useState<'all' | Token['status']>('all');
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -119,8 +120,13 @@ export default function Tokens() {
 	};
 
 	const filteredTokens = useMemo(() => {
-		return tokens.filter((t) => t.name?.toLowerCase().includes(search.toLowerCase()) || t.id?.toLowerCase().includes(search.toLowerCase()));
-	}, [tokens, search]);
+		return tokens.filter((t) => {
+			if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+			if (!search.trim()) return true;
+			const q = search.toLowerCase();
+			return t.name?.toLowerCase().includes(q) || t.id?.toLowerCase().includes(q) || t.botId?.toLowerCase().includes(q);
+		});
+	}, [tokens, search, statusFilter]);
 
 	if (loading) return <Loading />;
 	if (error)
@@ -179,9 +185,25 @@ export default function Tokens() {
 				</Button>
 			</div>
 
-			{/* Controls Bar: Search */}
-			<div className="relative w-full">
-				<Input variant="search" shortcut={true} placeholder={t('admin.tokens.empty.description')} value={search} onChange={(e) => setSearch(e.target.value)} />
+			{/* Controls Bar: Search & Status Filters */}
+			<div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+				<div className="relative flex-1">
+					<Input variant="search" shortcut={true} placeholder={t('admin.tokens.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+				</div>
+				<div className="flex items-center gap-1.5 flex-wrap bg-(--foreground)/30 border border-(--border)/10 p-1.5 rounded-2xl shrink-0">
+					{(['all', 'active', 'inactive', 'suspended', 'pending'] as const).map((st) => (
+						<button
+							key={st}
+							type="button"
+							onClick={() => setStatusFilter(st)}
+							className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all cursor-pointer ${
+								statusFilter === st ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--background)/50'
+							}`}
+						>
+							{st === 'all' ? t('admin.tokens.filterAll') : t(`admin.tokens.statusOptions.${st}`)}
+						</button>
+					))}
+				</div>
 			</div>
 
 			{/* Tokens Grid (3 Columns) */}

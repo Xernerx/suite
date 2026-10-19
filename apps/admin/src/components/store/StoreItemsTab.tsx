@@ -3,7 +3,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Input, Selector } from '@xernerx/ui';
+import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Edit2, Trash2, Power, Copy, Check, Sparkles, Tag, PackageSearch } from 'lucide-react';
 import { StoreCategory, StoreItem } from './types';
@@ -27,6 +27,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 	const [editingDiscountId, setEditingDiscountId] = useState<string | null>(null);
 	const [tempDiscount, setTempDiscount] = useState<number>(0);
 	const [deletingId, setDeletingId] = useState<string | null>(null);
+	const [confirmDeleteItem, setConfirmDeleteItem] = useState<StoreItem | null>(null);
 
 	const handleCopySku = (skuId: string) => {
 		navigator.clipboard.writeText(skuId);
@@ -35,10 +36,14 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 		setTimeout(() => setCopiedSku(null), 2000);
 	};
 
-	const handleDeleteClick = async (item: StoreItem) => {
-		const confirmMsg = t('admin.store.alerts.deleteItemConfirm', { name: item.name });
-		if (!window.confirm(confirmMsg)) return;
+	const handleDeleteClick = (item: StoreItem) => {
+		setConfirmDeleteItem(item);
+	};
 
+	const confirmDelete = async () => {
+		if (!confirmDeleteItem) return;
+		const item = confirmDeleteItem;
+		setConfirmDeleteItem(null);
 		setDeletingId(item.id);
 		try {
 			await onDelete(item);
@@ -222,6 +227,15 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 					))}
 				</div>
 			)}
+
+			<Confirm
+				open={!!confirmDeleteItem}
+				onOpenChange={(open) => !open && setConfirmDeleteItem(null)}
+				title={confirmDeleteItem?.name || ''}
+				description={t('admin.store.alerts.deleteItemConfirm', { name: confirmDeleteItem?.name || '' })}
+				variant="danger"
+				onConfirm={confirmDelete}
+			/>
 		</div>
 	);
 }

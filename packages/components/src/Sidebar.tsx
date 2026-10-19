@@ -2,7 +2,7 @@
 // Force recompile
 'use client';
 
-import { Bell, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
+import { Bell, Gift, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 
@@ -39,6 +39,8 @@ export function Sidebar() {
 
 	const isCollapsed = state === 'closed' && !isMobileOpen;
 	const activeUser = discordUser || session?.user;
+	const giftInTime = activeUser?.credits?.giftIn ? new Date(activeUser.credits.giftIn).getTime() : 0;
+	const isGiftReady = isMounted && Boolean(activeUser) && Date.now() >= giftInTime;
 
 	// Resolve Discord CDN URLs for Avatar, Decoration, and Nameplate
 	const avatarUrl = activeUser?.avatar
@@ -111,6 +113,8 @@ export function Sidebar() {
 					{navItems.map((item, idx) => {
 						const Icon = item.icon;
 						const active = item.view && view === item.view;
+						const shortcutLabel = idx < 9 ? `Alt + ${idx + 1}` : undefined;
+						const itemTitle = shortcutLabel ? `${item.label} (${shortcutLabel})` : item.label;
 
 						const prevItem = idx > 0 ? navItems[idx - 1] : null;
 						const showCategory = item.category && item.category !== prevItem?.category;
@@ -129,6 +133,7 @@ export function Sidebar() {
 
 								{!item.href || item.href === '#' ? (
 									<button
+										title={itemTitle}
 										onClick={() => {
 											if (item.view) setView(item.view);
 											if (item.onClick) item.onClick();
@@ -151,10 +156,16 @@ export function Sidebar() {
 										>
 											{item.label}
 										</span>
+										{!isCollapsed && shortcutLabel && (
+											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded border border-(--border)/10 shrink-0">
+												{shortcutLabel}
+											</kbd>
+										)}
 									</button>
 								) : (
 									<Link
 										href={item.href}
+										title={itemTitle}
 										onClick={() => {
 											if (item.view) setView(item.view);
 											if (item.onClick) item.onClick();
@@ -177,6 +188,11 @@ export function Sidebar() {
 										>
 											{item.label}
 										</span>
+										{!isCollapsed && shortcutLabel && (
+											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded border border-(--border)/10 shrink-0">
+												{shortcutLabel}
+											</kbd>
+										)}
 									</Link>
 								)}
 							</Fragment>
@@ -191,6 +207,7 @@ export function Sidebar() {
 					{!activeUser ? (
 						<Link
 							href={loginHref}
+							title={t('common.sidebar.login')}
 							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
                                 ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
                             `}
@@ -202,7 +219,7 @@ export function Sidebar() {
 					) : (
 						<div className="relative w-full mt-1">
 							{/* Menus */}
-							<AnimatePresence>{activeMenu === 'user' && <SidebarUserCard activeUser={activeUser} isCollapsed={isCollapsed} />}</AnimatePresence>
+							<AnimatePresence>{activeMenu === 'user' && <SidebarUserCard activeUser={activeUser} isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 							<AnimatePresence>{activeMenu === 'notifications' && <SidebarNotifications isCollapsed={isCollapsed} onClose={() => setActiveMenu('none')} />}</AnimatePresence>
 
 							{/* Combined Trigger Card Wrapper */}
@@ -224,6 +241,7 @@ export function Sidebar() {
 
 								{/* User Info Trigger (Left Side) */}
 								<button
+									title={isGiftReady ? t('components.cards.sidebaruser.giftReadyTooltip') : activeUser.global_name || activeUser.name}
 									onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')}
 									className="relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg"
 									style={{ gap: 'var(--ui-gap)' }}
@@ -258,6 +276,15 @@ export function Sidebar() {
 												<UserIcon size={16} className="text-(--text-muted)" />
 											</div>
 										)}
+										{/* Daily Gift Ready Indicator */}
+										{isGiftReady && (
+											<span
+												title={t('components.cards.sidebaruser.giftReadyTooltip')}
+												className="absolute -top-1 -left-1 z-30 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm animate-bounce"
+											>
+												<Gift size={10} />
+											</span>
+										)}
 										{/* Status Indicator */}
 										{DeviceIcon ? <DeviceIcon className={iconStyles} /> : <div className={`${iconStyles} rounded-full`} />}
 									</div>
@@ -280,6 +307,7 @@ export function Sidebar() {
 								<div className={`relative z-10 flex ${isCollapsed ? 'flex-col' : 'items-center'} gap-1`}>
 									{/* Notifications Trigger */}
 									<button
+										title={t('components.header.notifications')}
 										onClick={() => setActiveMenu(activeMenu === 'notifications' ? 'none' : 'notifications')}
 										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
                                             ${nameplateUrl ? 'hover:bg-black/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
@@ -299,6 +327,7 @@ export function Sidebar() {
 
 									{/* App Drawer Trigger (Replaces Suite) */}
 									<button
+										title={t('components.header.title1')}
 										onClick={() => {
 											setActiveMenu('none');
 											setNavOpen(true);

@@ -102,7 +102,7 @@ export default function InfoHomePage() {
 			category: 'issues',
 			title: item.title || '',
 			description: item.description || '',
-			href: '/issues',
+			href: item.title ? `/issues?q=${encodeURIComponent(item.title)}` : '/issues',
 		}));
 
 		const suggestions: SearchResultItem[] = suggestionItems.map((item, idx) => ({
@@ -110,7 +110,7 @@ export default function InfoHomePage() {
 			category: 'suggestions',
 			title: item.title || '',
 			description: item.description || '',
-			href: '/suggestions',
+			href: item.title ? `/suggestions?q=${encodeURIComponent(item.title)}` : '/suggestions',
 		}));
 
 		const roadmap: SearchResultItem[] = roadmapItems.map((item, idx) => ({

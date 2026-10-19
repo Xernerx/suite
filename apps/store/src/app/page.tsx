@@ -35,6 +35,24 @@ export default function StorePage() {
 
 	const subscriptions: UserSubscription[] = user?.billing?.subscriptions || [];
 
+	const updateStoreUrlParams = useCallback((nextCategory?: string, nextInterval?: 'month' | 'year') => {
+		if (typeof window === 'undefined') return;
+		const params = new URLSearchParams(window.location.search);
+		if (nextCategory) params.set('category', nextCategory);
+		if (nextInterval) params.set('interval', nextInterval);
+		const qs = params.toString();
+		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+	}, []);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const params = new URLSearchParams(window.location.search);
+		const urlInterval = params.get('interval');
+		if (urlInterval === 'year' || urlInterval === 'month') {
+			setBillingInterval(urlInterval);
+		}
+	}, []);
+
 	const fetchCatalog = useCallback(async () => {
 		if (!isReady) return;
 		setLoading(true);
@@ -47,7 +65,10 @@ export default function StorePage() {
 			const cats: CatalogCategory[] = data.categories || [];
 			setCategories(cats);
 			setItems(data.items || []);
-			if (cats.length > 0 && (!activeCategory || !cats.some((c) => c.id === activeCategory))) {
+			const urlCat = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') : null;
+			if (urlCat && cats.some((c) => c.id === urlCat)) {
+				setActiveCategory(urlCat);
+			} else if (cats.length > 0 && (!activeCategory || !cats.some((c) => c.id === activeCategory))) {
 				setActiveCategory(cats[0].id);
 			}
 		} catch (err: any) {
@@ -126,7 +147,10 @@ export default function StorePage() {
 							return (
 								<button
 									key={cat.id}
-									onClick={() => setActiveCategory(cat.id)}
+									onClick={() => {
+										setActiveCategory(cat.id);
+										updateStoreUrlParams(cat.id, billingInterval);
+									}}
 									className={`px-5 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
 										isActive ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
 									}`}
@@ -141,7 +165,10 @@ export default function StorePage() {
 				{/* Global Billing Interval Toggle */}
 				<div className="flex items-center gap-2 p-1 rounded-full border border-(--border)/10 bg-(--foreground) mt-2">
 					<button
-						onClick={() => setBillingInterval('month')}
+						onClick={() => {
+							setBillingInterval('month');
+							updateStoreUrlParams(currentCategory?.id, 'month');
+						}}
 						className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
 							billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 						}`}
@@ -149,7 +176,10 @@ export default function StorePage() {
 						{t('account.store.billing.monthly')}
 					</button>
 					<button
-						onClick={() => setBillingInterval('year')}
+						onClick={() => {
+							setBillingInterval('year');
+							updateStoreUrlParams(currentCategory?.id, 'year');
+						}}
 						className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
 							billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 						}`}

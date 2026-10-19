@@ -1,18 +1,21 @@
 /** @format */
 'use client';
 
-import { Building2, Compass, Server } from 'lucide-react';
-import { Tabs } from '@xernerx/ui';
+import { Building2, Compass, Server, ExternalLink, Copy, Check } from 'lucide-react';
+import { Confirm, Tabs, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState, useMemo } from 'react';
 import { Loading } from '@xernerx/feedback';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 import General from '@/components/dashboard/General';
 import Statistics from '@/components/dashboard/Statistics';
 import Links from '@/components/dashboard/Links';
 import VirtueGeneral from '@/components/dashboard/virtue/General';
 import Settings from '@/components/dashboard/Settings';
+
+const VALID_DASHBOARD_TABS = ['info', 'stats', 'links', 'virtue', 'settings'];
 
 type Guild = {
 	id: string;
@@ -29,8 +32,9 @@ export default function DashboardPage() {
 	const { data: session, status } = useSession();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
-	const { setNavItems, clearNavItems, show, setView } = useSidebar();
+	const { view, setNavItems, clearNavItems, show, setView } = useSidebar();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const [guilds, setGuilds] = useState<Guild[]>([]);
 	const [selectedGuild, setSelectedGuild] = useState<Guild | null>(null);
@@ -39,10 +43,35 @@ export default function DashboardPage() {
 	const [configLoading, setConfigLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
+	const [deleteGuildConfirmOpen, setDeleteGuildConfirmOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [rateLimited, setRateLimited] = useState(false);
-	const [activeTab, setActiveTab] = useState('info');
-	const { remind } = useToast();
+	const [copiedId, setCopiedId] = useState(false);
+	const initialTab = searchParams.get('tab');
+	const [activeTab, setActiveTab] = useState(initialTab && VALID_DASHBOARD_TABS.includes(initialTab) ? initialTab : 'info');
+	const { remind, toast } = useToast();
+
+	useEffect(() => {
+		const tabParam = searchParams.get('tab');
+		if (tabParam && VALID_DASHBOARD_TABS.includes(tabParam) && tabParam !== activeTab) {
+			setActiveTab(tabParam);
+		}
+	}, [searchParams]);
+
+	const handleTabChange = (nextTab: string) => {
+		setActiveTab(nextTab);
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('tab', nextTab);
+		router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+	};
+
+	const handleCopyGuildId = () => {
+		if (!selectedGuild?.id) return;
+		navigator.clipboard.writeText(selectedGuild.id);
+		setCopiedId(true);
+		toast({ title: t('app.servers.idCopied'), type: 'success' });
+		setTimeout(() => setCopiedId(false), 2000);
+	};
 
 	const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '3m' | '6m' | '1y' | 'all'>('24h');
 	const [activeMetric, setActiveMetric] = useState<'members' | 'messages' | 'bots' | 'boosts'>('members');
@@ -124,10 +153,14 @@ export default function DashboardPage() {
 					})),
 				]);
 
-				// Auto-select the first server contextually
+				// Auto-select requested ?guild= / ?view=server-<id> or first server contextually
 				if (managedGuilds.length > 0) {
-					setSelectedGuild(managedGuilds[0]);
-					setView(`server-${managedGuilds[0].id}`);
+					const params = new URLSearchParams(window.location.search);
+					const requestedGuildId = params.get('guild') || (params.get('view')?.startsWith('server-') ? params.get('view')!.replace('server-', '') : null);
+					const matchedGuild = requestedGuildId ? managedGuilds.find((g) => g.id === requestedGuildId) : null;
+					const initialGuild = matchedGuild || managedGuilds[0];
+					setSelectedGuild(initialGuild);
+					setView(`server-${initialGuild.id}`);
 				}
 			} catch (error) {
 				console.error('Failed to fetch guilds:', error);
@@ -143,6 +176,15 @@ export default function DashboardPage() {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [session, getEnvUrl]);
+
+	useEffect(() => {
+		if (!view || !view.startsWith('server-') || guilds.length === 0) return;
+		const guildId = view.replace('server-', '');
+		if (selectedGuild?.id !== guildId) {
+			const matched = guilds.find((g) => g.id === guildId);
+			if (matched) setSelectedGuild(matched);
+		}
+	}, [view, guilds, selectedGuild?.id]);
 
 	const [organizations, setOrganizations] = useState<any[]>([]);
 
@@ -227,10 +269,14 @@ export default function DashboardPage() {
 		return () => remind(false);
 	}, [isDirty, saving, originalGuildConfig, remind, guildConfig, selectedGuild]);
 
-	const handleDeleteGuild = async () => {
+	const handleDeleteGuild = () => {
 		if (!selectedGuild) return;
-		if (!confirm(t('app.dashboard.deleteConfirmDesc'))) return;
+		setDeleteGuildConfirmOpen(true);
+	};
 
+	const confirmDeleteGuild = async () => {
+		if (!selectedGuild) return;
+		setDeleteGuildConfirmOpen(false);
 		setDeleting(true);
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), {
@@ -265,7 +311,7 @@ export default function DashboardPage() {
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 						{/* Guild Summary Card (Page Header) */}
 						<div
-							className="relative flex items-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden"
+							className="relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 						>
 							{/* Optional Banner Background */}
@@ -279,7 +325,7 @@ export default function DashboardPage() {
 									}}
 								/>
 							)}
-							<div className="relative z-10 flex items-center w-full" style={{ gap: 'var(--ui-gap)' }}>
+							<div className="relative z-10 flex items-center" style={{ gap: 'var(--ui-gap)' }}>
 								{selectedGuild.iconUrl ? (
 									<img src={selectedGuild.iconUrl} alt={selectedGuild.name} className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
 								) : (
@@ -287,15 +333,30 @@ export default function DashboardPage() {
 										<Server className="w-8 h-8 text-(--text-muted)" />
 									</div>
 								)}
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.15)' }}>
+								<div className="flex flex-col gap-1.5">
 									<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 										{selectedGuild.name}
 									</span>
-									<span className="text-sm font-medium text-(--text-muted)">
-										{t('app.dashboard.text1')}
-										{selectedGuild.id}
-									</span>
+									<button
+										type="button"
+										onClick={handleCopyGuildId}
+										className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-colors cursor-pointer"
+									>
+										<span>
+											{t('app.dashboard.text1')}
+											{selectedGuild.id}
+										</span>
+										{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+									</button>
 								</div>
+							</div>
+							<div className="relative z-10 flex items-center gap-2 shrink-0">
+								<Link href={`/servers/${selectedGuild.id}`}>
+									<Button variant="secondary" className="gap-2">
+										<ExternalLink className="w-4 h-4" />
+										{t('app.portal.workspace.viewPublicProfile')}
+									</Button>
+								</Link>
 							</div>
 						</div>
 
@@ -307,7 +368,7 @@ export default function DashboardPage() {
 							<div className="flex flex-col w-full gap-8 mt-4">
 								<Tabs
 									activeTab={activeTab}
-									onChange={setActiveTab}
+									onChange={handleTabChange}
 									tabs={[
 										{ id: 'info', label: t('app.dashboard.tabs.info') },
 										{ id: 'stats', label: t('app.dashboard.tabs.stats') },
@@ -368,6 +429,16 @@ export default function DashboardPage() {
 					</a>
 				</div>
 			)}
+
+			<Confirm
+				open={deleteGuildConfirmOpen}
+				onOpenChange={setDeleteGuildConfirmOpen}
+				title={selectedGuild?.name || ''}
+				description={t('app.dashboard.deleteConfirmDesc')}
+				variant="danger"
+				confirmKeyword={selectedGuild?.name || 'DELETE'}
+				onConfirm={confirmDeleteGuild}
+			/>
 		</div>
 	);
 }

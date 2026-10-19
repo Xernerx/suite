@@ -4,7 +4,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Bell, ChevronDown, Command, Compass, Copy, FileText, Globe, HelpCircle, Layers, LayoutGrid, RefreshCw, Save, Search, Settings, SidebarIcon, X } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { navigation } from '@xernerx/lib';
 import { useSession } from 'next-auth/react';
 import { CommandPaletteModal } from './CommandPaletteModal';
@@ -95,6 +95,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
+	const sidebar = useSidebar();
 	const [isHelpOpen, setHelpOpen] = useState(false);
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [isNavOpen, setNavOpen] = useState(false);
@@ -132,7 +133,11 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 				window.location.href = getEnvUrl('https://account.xernerx.com');
 			} else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'c' || e.key === 'C') && !isInput) {
 				e.preventDefault();
-				const currentUrl = window.location.href;
+				const urlObj = new URL(window.location.href);
+				if (sidebar.state !== 'hidden' && sidebar.view && !urlObj.searchParams.has('view')) {
+					urlObj.searchParams.set('view', sidebar.view);
+				}
+				const currentUrl = urlObj.toString();
 				navigator.clipboard.writeText(currentUrl).then(() => {
 					toast({ type: 'success', title: t('components.header.urlCopied'), description: currentUrl });
 				});
@@ -148,7 +153,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 		};
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [getEnvUrl, toast, t, isSearchOpen]);
+	}, [getEnvUrl, toast, t, isSearchOpen, sidebar.state, sidebar.view]);
 	const value = {
 		isHelpOpen,
 		setHelpOpen,
@@ -442,6 +447,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 }
 function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const [changelogData, setChangelogData] = useState<{
 		versions: string[];
 		selectedVersion: string;
@@ -460,6 +466,51 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 			fetchChangelog();
 		}
 	}, [isOpen]);
+
+	const renderFormattedChangelog = (raw: string) => {
+		const lines = raw.split('\n');
+		return (
+			<div className="flex flex-col gap-2.5 text-sm">
+				{lines.map((line, i) => {
+					const trimmed = line.trim();
+					if (!trimmed) return null;
+					if (trimmed.startsWith('## ')) {
+						return (
+							<h3 key={i} className="text-base font-bold text-(--text) border-b border-(--border)/10 pb-1.5 mt-1">
+								v{trimmed.replace(/^##\s*/, '')}
+							</h3>
+						);
+					}
+					if (trimmed.startsWith('### ')) {
+						const sectionName = trimmed.replace(/^###\s*/, '');
+						return (
+							<span
+								key={i}
+								className="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-2"
+							>
+								{sectionName}
+							</span>
+						);
+					}
+					if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+						const itemText = trimmed.replace(/^[-*]\s*/, '');
+						return (
+							<div key={i} className="flex items-start gap-2.5 pl-2 text-(--text-muted) leading-relaxed">
+								<span className="h-1.5 w-1.5 rounded-full bg-(--accent) mt-2 shrink-0" />
+								<span>{itemText}</span>
+							</div>
+						);
+					}
+					return (
+						<p key={i} className="text-(--text-muted) leading-relaxed">
+							{trimmed}
+						</p>
+					);
+				})}
+			</div>
+		);
+	};
+
 	return (
 		<AnimatePresence>
 			{isOpen && (
@@ -526,9 +577,9 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 									<div className="relative">
 										<button
 											onClick={() => setDropdownOpen((prev) => !prev)}
-											className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-(--background) border border-(--border)/10 text-xs font-mono text-(--text) hover:border-(--accent) transition"
+											className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-(--background) border border-(--border)/10 text-xs font-mono text-(--text) hover:border-(--accent) transition cursor-pointer"
 										>
-											<span>{changelogData.selectedVersion || 'Select Version'}</span>
+											<span>{changelogData.selectedVersion ? `v${changelogData.selectedVersion}` : t('common.shortcutsprovider.selectVersion')}</span>
 											<ChevronDown size={14} className="text-(--text-muted)" />
 										</button>
 
@@ -556,9 +607,9 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 																setDropdownOpen(false);
 																fetchChangelog(ver);
 															}}
-															className={`w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition ${changelogData.selectedVersion === ver ? 'bg-(--accent)/10 text-(--accent) font-semibold' : 'text-(--text) hover:bg-(--foreground)'}`}
+															className={`w-full text-left px-3 py-2 rounded-lg text-xs font-mono transition cursor-pointer ${changelogData.selectedVersion === ver ? 'bg-(--accent)/10 text-(--accent) font-semibold' : 'text-(--text) hover:bg-(--foreground)'}`}
 														>
-															{ver}
+															v{ver}
 														</button>
 													))}
 												</motion.div>
@@ -567,19 +618,29 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 									</div>
 								)}
 
-								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
+								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition cursor-pointer">
 									<X size={18} />
 								</button>
 							</div>
 						</div>
 
 						<div
-							className="overflow-y-auto pr-2 flex-1 text-sm text-(--text-muted) font-mono whitespace-pre-wrap bg-(--background) rounded-2xl border border-(--border)/10"
+							className="overflow-y-auto pr-2 flex-1 bg-(--background) rounded-2xl border border-(--border)/10"
 							style={{
 								padding: 'var(--ui-gap)',
 							}}
 						>
-							{changelogData ? changelogData.content : 'Loading changelog...'}
+							{changelogData ? renderFormattedChangelog(changelogData.content) : <span className="text-sm text-(--text-muted)">{t('common.shortcutsprovider.loadingChangelog')}</span>}
+						</div>
+
+						<div className="pt-2 border-t border-(--border)/10 flex items-center justify-between text-xs text-(--text-muted) shrink-0 px-1">
+							<a href={getEnvUrl('https://info.xernerx.com/changelog')} className="text-(--accent) hover:underline font-semibold">
+								{t('common.shortcutsprovider.viewFullChangelog')} →
+							</a>
+							<span>
+								{t('common.shortcutsprovider.description4')} <kbd className="font-mono text-(--text)">{t('common.shortcutsprovider.text')}</kbd>{' '}
+								{t('common.shortcutsprovider.description5')}
+							</span>
 						</div>
 					</motion.div>
 				</div>

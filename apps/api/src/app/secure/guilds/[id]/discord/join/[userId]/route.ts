@@ -13,11 +13,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 			return NextResponse.json({ error: 'Discord token missing' }, { status: 500 });
 		}
 
+		const body = await req.json().catch(() => ({}));
 		const { models } = await database('xernerx');
 		const user = await models.users.User.findOne({ id: userId }).lean();
 
-		// Assuming the user schema stores OAuth access token in accounts.discord or similar
-		const accessToken = user?.accounts?.discord?.access_token || user?.token;
+		// Use OAuth access token from request body (NextAuth JWT session) or stored user profile
+		const accessToken = body?.accessToken || user?.accounts?.discord?.access_token || user?.token;
 
 		if (!accessToken) {
 			return NextResponse.json({ error: 'User does not have an active Discord access token' }, { status: 400 });

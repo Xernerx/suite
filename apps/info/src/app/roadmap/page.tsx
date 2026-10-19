@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
+import { Input } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import KnownIssuesSection from '@/components/roadmap/KnownIssuesSection';
 
@@ -17,6 +18,15 @@ export default function RoadmapPage() {
 	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
 	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+	const [statusFilter, setStatusFilter] = useState<'all' | 'idea' | 'planned' | 'active' | 'released'>('all');
+	const [searchQuery, setSearchQuery] = useState('');
+
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const q = new URLSearchParams(window.location.search).get('q');
+			if (q) setSearchQuery(q);
+		}
+	}, []);
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -139,6 +149,44 @@ export default function RoadmapPage() {
 		released: 'bg-green-500',
 	};
 
+	const normalizedQuery = searchQuery.trim().toLowerCase();
+	const matchesRoadmapFilters = (item: any) => {
+		if (selectedProduct && item.productId !== selectedProduct) return false;
+		if (statusFilter !== 'all' && (item.status || 'idea') !== statusFilter) return false;
+		if (normalizedQuery) {
+			const botInfo = resolveBot(item);
+			const prodLabel = (botInfo?.name || item.productId || '').toLowerCase();
+			return (
+				String(item.title || '')
+					.toLowerCase()
+					.includes(normalizedQuery) ||
+				String(item.description || '')
+					.toLowerCase()
+					.includes(normalizedQuery) ||
+				prodLabel.includes(normalizedQuery)
+			);
+		}
+		return true;
+	};
+
+	const filteredIssues = issues.filter((issue: any) => {
+		if (selectedProduct && issue.productId !== selectedProduct) return false;
+		if (normalizedQuery) {
+			const botInfo = resolveBot(issue);
+			const prodLabel = (botInfo?.name || issue.productId || '').toLowerCase();
+			return (
+				String(issue.title || '')
+					.toLowerCase()
+					.includes(normalizedQuery) ||
+				String(issue.description || '')
+					.toLowerCase()
+					.includes(normalizedQuery) ||
+				prodLabel.includes(normalizedQuery)
+			);
+		}
+		return true;
+	});
+
 	return (
 		<div className="flex flex-col w-full min-h-screen overflow-hidden">
 			{/* Header & Metrics */}
@@ -172,6 +220,68 @@ export default function RoadmapPage() {
 						<span className="text-3xl font-bold text-(--accent)">{metrics?.recentResolutions?.length || 0}</span>
 						<span className="text-sm text-(--text-muted) uppercase tracking-widest mt-1">{t('info.roadmap.metrics.recentResolutions')}</span>
 					</motion.div>
+				</div>
+
+				{/* Search Bar & Interactive Product / Status Filters */}
+				<div className="flex flex-col items-center gap-4 w-full max-w-4xl mt-10">
+					<div className="w-full max-w-xl">
+						<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('info.roadmap.searchPlaceholder')} />
+					</div>
+
+					{allProducts.length > 0 && (
+						<div className="flex flex-wrap items-center justify-center gap-2">
+							<button
+								type="button"
+								onClick={() => setSelectedProduct(null)}
+								className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+									selectedProduct === null
+										? 'bg-(--accent) text-white border-(--accent) shadow-md'
+										: 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--border)/30'
+								}`}
+							>
+								{t('info.roadmap.allProducts')}
+							</button>
+							{allProducts.map((prod: string) => {
+								const color = getProductColor(prod);
+								const isSelected = selectedProduct === prod;
+								const botInfo = resolveBot(prod);
+								return (
+									<button
+										key={prod}
+										type="button"
+										onClick={() => setSelectedProduct(isSelected ? null : prod)}
+										className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+											isSelected ? 'shadow-md scale-105' : 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:text-(--text)'
+										}`}
+										style={isSelected ? { backgroundColor: `${color}26`, borderColor: color, color: color } : undefined}
+									>
+										<span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
+										{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+										<span>{botInfo ? botInfo.name : prod}</span>
+									</button>
+								);
+							})}
+						</div>
+					)}
+
+					<div className="flex flex-wrap items-center justify-center gap-2">
+						{(['all', 'idea', 'planned', 'active', 'released'] as const).map((statusKey) => {
+							const active = statusFilter === statusKey;
+							return (
+								<button
+									key={statusKey}
+									type="button"
+									onClick={() => setStatusFilter(statusKey)}
+									className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+										active ? 'bg-(--foreground) text-(--text) border-(--accent)/50 shadow-sm' : 'bg-transparent text-(--text-muted) border-(--border)/10 hover:text-(--text)'
+									}`}
+								>
+									{statusKey !== 'all' && <span className={`w-2 h-2 rounded-full ${statusColors[statusKey]}`} />}
+									<span>{statusKey === 'all' ? t('info.roadmap.allStatuses') : t(`info.roadmap.timeline.status.${statusKey}`)}</span>
+								</button>
+							);
+						})}
+					</div>
 				</div>
 			</motion.div>
 
@@ -214,7 +324,7 @@ export default function RoadmapPage() {
 							{/* QUARTER COLUMNS */}
 							{sortedQuarters.map((quarter, qIdx) => {
 								const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
-								const qItems = selectedProduct ? rawQItems.filter((i: any) => i.productId === selectedProduct) : rawQItems;
+								const qItems = rawQItems.filter(matchesRoadmapFilters);
 
 								return (
 									<div key={quarter} className="flex flex-col relative shrink-0">
@@ -318,7 +428,7 @@ export default function RoadmapPage() {
 					<div className="absolute top-8 bottom-0 left-[27px] w-[2px] bg-(--border)/20 z-0"></div>
 					{sortedQuarters.map((quarter, idx) => {
 						const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
-						const qItems = selectedProduct ? rawQItems.filter((i: any) => i.productId === selectedProduct) : rawQItems;
+						const qItems = rawQItems.filter(matchesRoadmapFilters);
 						return (
 							<div key={quarter} className="flex flex-col w-full relative z-10">
 								<div className="flex items-center gap-4 mb-8">
@@ -384,7 +494,7 @@ export default function RoadmapPage() {
 			</div>
 
 			{/* Known Issues Section */}
-			<KnownIssuesSection issues={issues} resolveBot={resolveBot} />
+			<KnownIssuesSection issues={filteredIssues} resolveBot={resolveBot} />
 		</div>
 	);
 }
