@@ -68,7 +68,7 @@ async function getChangelogs() {
 		})
 	);
 
-	return results.filter((entry): entry is { appName: string; content: string } => entry !== null);
+	return results.filter((entry): entry is NonNullable<typeof entry> => entry !== null);
 }
 
 export default async function ChangelogPage() {
