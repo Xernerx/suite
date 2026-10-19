@@ -273,8 +273,13 @@ export default function Home() {
 		setNavItems(items);
 
 		if (items.length > 0) {
-			const isCurrentViewAllowed = items.some((item) => item.view === view);
-			if (!isCurrentViewAllowed) {
+			const urlView = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('view') : null;
+			const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
+			const targetView = urlView || view || storedView;
+			const isTargetAllowed = Boolean(targetView && items.some((item) => item.view === targetView));
+			if (isTargetAllowed && targetView) {
+				if (view !== targetView) setView(targetView);
+			} else {
 				setView(items[0].view);
 			}
 		}

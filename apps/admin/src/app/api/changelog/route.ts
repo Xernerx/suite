@@ -4,6 +4,12 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+const CORS_HEADERS = {
+	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Methods': 'GET, OPTIONS',
+	'Cache-Control': 'no-store, max-age=0',
+};
+
 export async function GET(request: Request) {
 	try {
 		const url = new URL(request.url);
@@ -31,32 +37,44 @@ export async function GET(request: Request) {
 			parsedSections.push({ version, content: sectionContent });
 		}
 
-		if (parsedSections.length === 0) {
-			return NextResponse.json({
-				versions: ['latest'],
-				selectedVersion: 'latest',
-				content: content.trim(),
-			});
+		if (parsedSections.length === 0 || requestedVersion === 'all') {
+			return NextResponse.json(
+				{
+					versions: versions.length > 0 ? versions : ['latest'],
+					selectedVersion: requestedVersion === 'all' ? 'all' : 'latest',
+					content: content.trim(),
+					fullContent: content.trim(),
+				},
+				{ headers: CORS_HEADERS }
+			);
 		}
 
 		if (requestedVersion) {
 			const found = parsedSections.find((s) => s.version === requestedVersion);
 			if (found) {
-				return NextResponse.json({
-					versions,
-					selectedVersion: found.version,
-					content: found.content,
-				});
+				return NextResponse.json(
+					{
+						versions,
+						selectedVersion: found.version,
+						content: found.content,
+						fullContent: content.trim(),
+					},
+					{ headers: CORS_HEADERS }
+				);
 			}
 		}
 
 		// Default to the latest version
-		return NextResponse.json({
-			versions,
-			selectedVersion: parsedSections[0].version,
-			content: parsedSections[0].content,
-		});
+		return NextResponse.json(
+			{
+				versions,
+				selectedVersion: parsedSections[0].version,
+				content: parsedSections[0].content,
+				fullContent: content.trim(),
+			},
+			{ headers: CORS_HEADERS }
+		);
 	} catch {
-		return NextResponse.json({ error: 'Changelog not found' }, { status: 404 });
+		return NextResponse.json({ error: 'Changelog not found' }, { status: 404, headers: CORS_HEADERS });
 	}
 }

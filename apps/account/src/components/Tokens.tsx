@@ -3,9 +3,9 @@
 
 import { AlertTriangle, Key, Plus } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
-import { Button } from '@xernerx/ui';
+import { Button, Input } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { TokenListInfo } from './tokens/types';
 import TokenCard from './tokens/TokenCard';
@@ -21,6 +21,8 @@ export default function Tokens() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
 	const fetchTokens = async () => {
 		try {
@@ -46,6 +48,15 @@ export default function Tokens() {
 	useEffect(() => {
 		fetchTokens();
 	}, []);
+
+	const filteredTokens = useMemo(() => {
+		return tokens.filter((token) => {
+			if (statusFilter !== 'all' && token.status !== statusFilter) return false;
+			if (!searchQuery.trim()) return true;
+			const q = searchQuery.toLowerCase();
+			return token.name?.toLowerCase().includes(q) || (token.id || token._id)?.toLowerCase().includes(q);
+		});
+	}, [tokens, searchQuery, statusFilter]);
 
 	return (
 		<div
@@ -103,6 +114,31 @@ export default function Tokens() {
 				</Button>
 			</div>
 
+			{/* Search & Status Filters */}
+			{!isLoading && tokens.length > 0 && (
+				<div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+					<div className="w-full sm:max-w-sm">
+						<Input variant="search" shortcut={true} placeholder={t('account.tokens.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+					</div>
+					<div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+						{(['all', 'active', 'inactive'] as const).map((status) => (
+							<button
+								key={status}
+								type="button"
+								onClick={() => setStatusFilter(status)}
+								className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border shrink-0 cursor-pointer ${
+									statusFilter === status
+										? 'bg-(--accent) text-white border-(--accent) shadow-sm'
+										: 'bg-(--foreground)/30 text-(--text-muted) hover:text-(--text) border-(--border)/10'
+								}`}
+							>
+								{status === 'all' ? t('account.tokens.filterAll') : status === 'active' ? t('account.tokens.filterActive') : t('account.tokens.filterInactive')}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
+
 			{/* List */}
 			{isLoading ? (
 				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
@@ -119,6 +155,10 @@ export default function Tokens() {
 					<p className="text-sm font-medium text-(--text)">{t('account.tokens.empty.title')}</p>
 					<p className="text-xs text-(--text-muted) max-w-sm">{t('account.tokens.empty.description')}</p>
 				</div>
+			) : filteredTokens.length === 0 ? (
+				<div className="flex flex-col h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm text-center px-4">
+					<p className="text-sm font-medium text-(--text-muted)">{t('account.tokens.noMatchingTokens')}</p>
+				</div>
 			) : (
 				<div
 					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
@@ -127,7 +167,7 @@ export default function Tokens() {
 					}}
 				>
 					<AnimatePresence>
-						{tokens.map((token, i) => (
+						{filteredTokens.map((token, i) => (
 							<TokenCard key={token.id || token._id} token={token} index={i} onSelect={setSelectedTokenId} />
 						))}
 					</AnimatePresence>

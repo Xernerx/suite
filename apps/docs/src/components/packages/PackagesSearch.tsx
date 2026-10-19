@@ -2,9 +2,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, FileCode2, Package, ChevronRight } from 'lucide-react';
+import { FileCode2, Package, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useDictionary } from '@xernerx/providers';
+import { Input } from '@xernerx/ui';
 
 export type SearchIndexItem = {
 	name: string;
@@ -23,16 +24,7 @@ export function PackagesSearch({ index }: { index: SearchIndexItem[] }) {
 	return (
 		<div className="mb-12 relative z-50">
 			<div className="relative">
-				<div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-					<Search className="h-5 w-5 text-(--text-muted)" />
-				</div>
-				<input
-					type="text"
-					className="block w-full pl-11 pr-4 py-4 bg-(--foreground)/30 border border-(--border)/20 rounded-2xl text-(--text) placeholder-(--text-muted) focus:outline-none focus:ring-2 focus:ring-(--accent)/50 transition-all shadow-sm"
-					placeholder={t('docs.packages.search.placeholder')}
-					value={query}
-					onChange={(e) => setQuery(e.target.value)}
-				/>
+				<Input variant="search" shortcut={true} placeholder={t('docs.packages.search.placeholder')} value={query} onChange={(e) => setQuery(e.target.value)} />
 			</div>
 
 			{query.length > 2 && (

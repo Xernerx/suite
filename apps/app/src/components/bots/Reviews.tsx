@@ -1,11 +1,11 @@
 /** @format */
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useUser, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Confirm } from '@xernerx/ui';
-import { Star, Trash2, ShieldCheck, ThumbsUp, ThumbsDown, MessageSquareReply } from 'lucide-react';
+import { Button, Confirm, Input } from '@xernerx/ui';
+import { Star, Trash2, ShieldCheck, ThumbsUp, ThumbsDown, MessageSquareReply, X } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Reviews({ bot, id }: { bot: any; id: string }) {
@@ -24,9 +24,11 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 	const [deletingReview, setDeletingReview] = useState(false);
 	const [showReviewForm, setShowReviewForm] = useState(false);
 	const [reviewsLoading, setReviewsLoading] = useState(true);
+	const [selectedStarFilter, setSelectedStarFilter] = useState<number | null>(null);
+	const [sortBy, setSortBy] = useState<'helpful' | 'newest' | 'highest' | 'lowest'>('helpful');
 
 	const fetchReviews = async () => {
-		if (!isReady || !user) {
+		if (!isReady) {
 			setReviewsLoading(false);
 			return;
 		}
@@ -56,6 +58,22 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 			}
 		}
 	}, [reviews, user]);
+
+	const displayedReviews = useMemo(() => {
+		const filtered = selectedStarFilter ? reviews.filter((r) => r.rating === selectedStarFilter) : [...reviews];
+		return filtered.sort((a, b) => {
+			if (sortBy === 'helpful') {
+				const scoreA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+				const scoreB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+				if (scoreB !== scoreA) return scoreB - scoreA;
+			} else if (sortBy === 'highest') {
+				if (b.rating !== a.rating) return b.rating - a.rating;
+			} else if (sortBy === 'lowest') {
+				if (a.rating !== b.rating) return a.rating - b.rating;
+			}
+			return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+		});
+	}, [reviews, selectedStarFilter, sortBy]);
 
 	const submitReview = async () => {
 		if (!user) return;
@@ -159,39 +177,85 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 
 	return (
 		<div className="flex flex-col gap-6">
-			<div className="flex items-center gap-6 p-8 bg-(--foreground)/50 border border-(--border)/10 rounded-3xl backdrop-blur-md">
-				<div className="flex flex-col items-center justify-center">
-					<div className="text-5xl font-extrabold text-(--accent)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{averageRating}
+			<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-(--foreground)/50 border border-(--border)/10 rounded-3xl backdrop-blur-md">
+				<div className="flex items-center gap-6 flex-1">
+					<div className="flex flex-col items-center justify-center">
+						<div className="text-5xl font-extrabold text-(--accent)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{averageRating}
+						</div>
+						<div className="text-sm font-semibold text-(--text-muted) uppercase tracking-wider mt-1">
+							{reviews.length} {reviews.length === 1 ? t('app.bots.reviews.review') : t('app.bots.reviews.reviews')}
+						</div>
 					</div>
-					<div className="text-sm font-semibold text-(--text-muted) uppercase tracking-wider mt-1">
-						{reviews.length} {reviews.length === 1 ? t('app.bots.reviews.review') : t('app.bots.reviews.reviews')}
+					<div className="flex flex-col gap-1.5 flex-1 max-w-xs">
+						{[5, 4, 3, 2, 1].map((star) => {
+							const count = reviews.filter((r) => r.rating === star).length;
+							const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+							const isSelected = selectedStarFilter === star;
+							return (
+								<button
+									key={star}
+									type="button"
+									onClick={() => setSelectedStarFilter((prev) => (prev === star ? null : star))}
+									className={`flex items-center gap-3 text-sm px-2 py-0.5 rounded-lg transition-colors cursor-pointer ${
+										isSelected ? 'bg-(--accent)/15 ring-1 ring-(--accent)/40' : 'hover:bg-(--background)/60'
+									}`}
+								>
+									<div className={`flex items-center gap-1 w-8 font-semibold ${isSelected ? 'text-(--accent)' : 'text-(--text-muted)'}`}>
+										{star} <Star className="w-3 h-3 fill-current" />
+									</div>
+									<div className="flex-1 h-2 bg-(--background) rounded-full overflow-hidden">
+										<div className="h-full bg-(--accent) transition-all duration-300" style={{ width: `${percentage}%` }} />
+									</div>
+									<div className={`w-8 text-right text-xs font-mono ${isSelected ? 'text-(--accent) font-bold' : 'text-(--text-muted)'}`}>{count}</div>
+								</button>
+							);
+						})}
 					</div>
 				</div>
-				<div className="flex flex-col gap-1 flex-1 max-w-xs">
-					{[5, 4, 3, 2, 1].map((star) => {
-						const count = reviews.filter((r) => r.rating === star).length;
-						const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-						return (
-							<div key={star} className="flex items-center gap-3 text-sm">
-								<div className="flex items-center gap-1 w-8 text-(--text-muted) font-semibold">
-									{star} <Star className="w-3 h-3" />
-								</div>
-								<div className="flex-1 h-2 bg-(--background) rounded-full overflow-hidden">
-									<div className="h-full bg-(--accent)" style={{ width: `${percentage}%` }} />
-								</div>
-								<div className="w-8 text-right text-(--text-muted) text-xs">{count}</div>
-							</div>
-						);
-					})}
+
+				<div className="flex flex-col sm:flex-row md:flex-col items-start sm:items-center md:items-end justify-between gap-3">
+					{user && !showReviewForm && (
+						<Button variant="primary" onClick={() => setShowReviewForm(true)}>
+							{userReview ? t('app.bots.reviews.editReview') : t('app.bots.reviews.writeReview')}
+						</Button>
+					)}
+					{reviews.length > 0 && (
+						<div className="flex flex-wrap items-center gap-1.5 bg-(--background)/60 p-1.5 rounded-xl border border-(--border)/10">
+							{(
+								[
+									{ key: 'helpful', label: t('app.bots.reviews.sortMostHelpful') },
+									{ key: 'newest', label: t('app.bots.reviews.sortNewest') },
+									{ key: 'highest', label: t('app.bots.reviews.sortHighest') },
+									{ key: 'lowest', label: t('app.bots.reviews.sortLowest') },
+								] as const
+							).map((s) => (
+								<button
+									key={s.key}
+									type="button"
+									onClick={() => setSortBy(s.key)}
+									className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+										sortBy === s.key ? 'bg-(--accent) text-white' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{s.label}
+								</button>
+							))}
+						</div>
+					)}
 				</div>
 			</div>
 
-			{user && !showReviewForm && (
-				<div className="flex justify-end">
-					<Button variant="primary" onClick={() => setShowReviewForm(true)}>
-						{userReview ? t('app.bots.reviews.editReview') : t('app.bots.reviews.writeReview')}
-					</Button>
+			{selectedStarFilter !== null && (
+				<div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-(--accent)/10 border border-(--accent)/20 text-xs font-semibold text-(--accent)">
+					<span className="flex items-center gap-1.5">
+						<Star className="w-3.5 h-3.5 fill-current" />
+						{t('app.bots.reviews.showingStarFilter', { star: selectedStarFilter })} ({displayedReviews.length})
+					</span>
+					<button type="button" onClick={() => setSelectedStarFilter(null)} className="inline-flex items-center gap-1 hover:underline cursor-pointer">
+						<X className="w-3.5 h-3.5" />
+						{t('app.bots.reviews.clearFilter')}
+					</button>
 				</div>
 			)}
 
@@ -232,11 +296,12 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 							</button>
 						))}
 					</div>
-					<textarea
+					<Input
+						variant="textarea"
 						value={reviewContent}
 						onChange={(e) => setReviewContent(e.target.value)}
 						placeholder={t('app.bots.reviews.placeholder')}
-						className="w-full bg-(--background) border border-(--border)/10 rounded-xl p-4 text-sm resize-none focus:outline-none focus:border-(--accent) transition-colors h-32"
+						className="resize-none h-32"
 						maxLength={2000}
 					/>
 					<div className="flex justify-between items-center">
@@ -256,7 +321,7 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 			)}
 
 			<div className="flex flex-col gap-4">
-				{reviews.map((review) => (
+				{displayedReviews.map((review) => (
 					<div key={review._id} className="p-6 bg-(--foreground)/50 border border-(--border)/10 rounded-3xl flex flex-col gap-3">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-3">
@@ -325,11 +390,12 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 
 						{replyingToReview === review._id && (
 							<div className="mt-2 flex flex-col gap-2">
-								<textarea
+								<Input
+									variant="textarea"
 									value={devResponseContent}
 									onChange={(e) => setDevResponseContent(e.target.value)}
 									placeholder={t('app.bots.reviews.replyPlaceholder')}
-									className="w-full bg-(--background) border border-(--border)/10 rounded-xl p-3 text-sm resize-none focus:outline-none focus:border-(--accent) transition-colors h-24"
+									className="resize-none h-24"
 									maxLength={2000}
 								/>
 								<div className="flex justify-end gap-2">
@@ -344,9 +410,13 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 						)}
 					</div>
 				))}
-				{reviews.length === 0 && (
+				{reviews.length === 0 ? (
 					<div className="text-center text-(--text-muted) py-12 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">{t('app.bots.reviews.noReviews')}</div>
-				)}
+				) : displayedReviews.length === 0 && selectedStarFilter !== null ? (
+					<div className="text-center text-(--text-muted) py-12 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">
+						{t('app.bots.reviews.noFilteredReviews', { star: selectedStarFilter })}
+					</div>
+				) : null}
 			</div>
 		</div>
 	);

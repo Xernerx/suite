@@ -1,8 +1,9 @@
 /** @format */
 'use client';
 
+import { useState } from 'react';
 import { Shield, Building2, AlertTriangle, Trash2 } from 'lucide-react';
-import { Selector } from '@xernerx/ui';
+import { Confirm, Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import WidgetSettingsCard from '@/components/WidgetSettingsCard';
 
@@ -15,6 +16,7 @@ interface SettingsTabProps {
 
 export default function SettingsTab({ botConfig, setBotConfig, organizations, onDeleteClick }: SettingsTabProps) {
 	const { t } = useDictionary();
+	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -92,7 +94,8 @@ export default function SettingsTab({ botConfig, setBotConfig, organizations, on
 					<p className="text-xs text-(--accent-orange)/80">{t('app.portal.bot.settings.resetDesc')}</p>
 				</div>
 				<button
-					onClick={() => setBotConfig({ ...botConfig, description: '', info: '', links: {}, widgets: false })}
+					type="button"
+					onClick={() => setIsResetConfirmOpen(true)}
 					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
@@ -117,6 +120,7 @@ export default function SettingsTab({ botConfig, setBotConfig, organizations, on
 					<p className="text-xs text-(--accent-red)/80">{t('app.portal.bot.settings.deleteDesc')}</p>
 				</div>
 				<button
+					type="button"
 					onClick={onDeleteClick}
 					className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm disabled:opacity-50 disabled:pointer-events-none"
 					style={{
@@ -128,6 +132,21 @@ export default function SettingsTab({ botConfig, setBotConfig, organizations, on
 					<span>{t('app.portal.bot.settings.deleteBtn')}</span>
 				</button>
 			</div>
+
+			<Confirm
+				open={isResetConfirmOpen}
+				onOpenChange={setIsResetConfirmOpen}
+				title={t('app.portal.bot.modals.reset.title')}
+				description={t('app.portal.bot.modals.reset.desc')}
+				confirmText={t('app.portal.bot.modals.reset.confirm')}
+				cancelText={t('app.portal.bot.modals.reset.cancel')}
+				variant="warning"
+				confirmKeyword="RESET"
+				onConfirm={() => {
+					setBotConfig({ ...botConfig, description: '', info: '', links: {}, widgets: false });
+					setIsResetConfirmOpen(false);
+				}}
+			/>
 		</div>
 	);
 }

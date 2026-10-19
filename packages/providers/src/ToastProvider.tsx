@@ -64,6 +64,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 		document.addEventListener('click', handleNavigationAttempt, true);
 		return () => document.removeEventListener('click', handleNavigationAttempt, true);
 	}, [reminder.dirty]);
+	useEffect(() => {
+		if (!reminder.dirty || reminder.isSaving) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.ctrlKey || e.metaKey) && (e.key === 'Enter' || e.key === 's' || e.key === 'S')) {
+				e.preventDefault();
+				reminder.onSave?.();
+			} else if (e.altKey && (e.key === 'r' || e.key === 'R')) {
+				e.preventDefault();
+				reminder.onReset?.();
+			}
+		};
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [reminder]);
 	const toast = useCallback((newToast: Omit<Toast, 'id'>) => {
 		const id = Math.random().toString(36).substring(2, 9);
 		setToasts((prev) => [

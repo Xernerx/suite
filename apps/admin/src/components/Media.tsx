@@ -4,9 +4,9 @@
 
 import { useEnvironment, useToast, usePermissions, useDictionary, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Modal, Input, Selector } from '@xernerx/ui';
-import { useEffect, useState } from 'react';
-import { Trash, Upload, ExternalLink, Settings, Plus, X, User as UserIcon, Users } from 'lucide-react';
+import { Button, Confirm, Modal, Input, Selector } from '@xernerx/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Trash, Upload, ExternalLink, Settings, Plus, X, User as UserIcon, Users, Copy, Check } from 'lucide-react';
 
 export default function Media() {
 	const { getEnvUrl } = useEnvironment();
@@ -22,6 +22,12 @@ export default function Media() {
 	const [uploading, setUploading] = useState(false);
 	const [editMedia, setEditMedia] = useState<any | null>(null);
 	const [saving, setSaving] = useState(false);
+	const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+	const [searchQuery, setSearchQuery] = useState('');
+	const [privacyFilter, setPrivacyFilter] = useState<'all' | 'public' | 'limited' | 'private' | 'shared'>('all');
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+	const [isDragging, setIsDragging] = useState(false);
 
 	const [sharedInput, setSharedInput] = useState('');
 	const [sharedProfiles, setSharedProfiles] = useState<Record<string, any>>({});
@@ -75,7 +81,7 @@ export default function Media() {
 		setEditMedia({ ...editMedia, shared: newShared });
 	};
 
-	const fetchMedia = async () => {
+	const fetchMedia = useCallback(async () => {
 		try {
 			const url = canManage ? 'https://cdn.xernerx.com/media?admin=true' : 'https://cdn.xernerx.com/media';
 			const res = await fetch(getEnvUrl(url), { credentials: 'include' });
@@ -89,45 +95,103 @@ export default function Media() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [canManage, getEnvUrl, toast, t]);
 
 	useEffect(() => {
 		fetchMedia();
-	}, []);
+	}, [fetchMedia]);
+
+	const uploadFile = useCallback(
+		async (file: File) => {
+			if (!user?.id || (!canUpload && !canManage)) return;
+			setUploading(true);
+			try {
+				const formData = new FormData();
+				formData.append('file', file);
+				formData.append('privacy', 'public');
+
+				const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${user.id}`), {
+					method: 'POST',
+					body: formData,
+					credentials: 'include',
+				});
+
+				if (res.ok) {
+					toast({ type: 'success', title: t('admin.dashboard.media.toasts.uploadSuccess') });
+					fetchMedia();
+				} else {
+					throw new Error('Upload failed');
+				}
+			} catch (err) {
+				console.error(err);
+				toast({ type: 'error', title: t('admin.dashboard.media.toasts.uploadFailed') });
+			} finally {
+				setUploading(false);
+			}
+		},
+		[user?.id, canUpload, canManage, getEnvUrl, toast, t, fetchMedia]
+	);
 
 	const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files || e.target.files.length === 0) return;
 		const file = e.target.files[0];
-
-		setUploading(true);
-		try {
-			const formData = new FormData();
-			formData.append('file', file);
-			formData.append('privacy', 'public');
-
-			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${user?.id}`), {
-				method: 'POST',
-				body: formData,
-				credentials: 'include',
-			});
-
-			if (res.ok) {
-				toast({ type: 'success', title: t('admin.dashboard.media.toasts.uploadSuccess') });
-				fetchMedia();
-			} else {
-				throw new Error('Upload failed');
-			}
-		} catch (err) {
-			console.error(err);
-			toast({ type: 'error', title: t('admin.dashboard.media.toasts.uploadFailed') });
-		} finally {
-			setUploading(false);
-			e.target.value = '';
-		}
+		await uploadFile(file);
+		e.target.value = '';
 	};
 
-	const handleDelete = async (id: string) => {
-		if (!confirm(t('admin.dashboard.media.toasts.deleteConfirm'))) return;
+	useEffect(() => {
+		if (!canUpload && !canManage) return;
+		const handlePaste = (e: ClipboardEvent) => {
+			if (uploading || editMedia) return;
+			const target = e.target as HTMLElement;
+			if (target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable) return;
+			const items = e.clipboardData?.items;
+			if (!items) return;
+			for (let i = 0; i < items.length; i++) {
+				if (items[i].kind === 'file') {
+					const file = items[i].getAsFile();
+					if (file) {
+						e.preventDefault();
+						uploadFile(file);
+						break;
+					}
+				}
+			}
+		};
+		window.addEventListener('paste', handlePaste);
+		return () => window.removeEventListener('paste', handlePaste);
+	}, [canUpload, canManage, uploading, editMedia, uploadFile]);
+
+	const handleCopyRawUrl = (id: string) => {
+		const rawUrl = getEnvUrl(`https://cdn.xernerx.com/raw/${id}`);
+		navigator.clipboard.writeText(rawUrl).then(() => {
+			setCopiedId(id);
+			toast({ type: 'success', title: t('admin.dashboard.media.urlCopied'), description: rawUrl });
+			setTimeout(() => setCopiedId((prev) => (prev === id ? null : prev)), 2000);
+		});
+	};
+
+	const filteredMedia = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
+		return media.filter((item) => {
+			if (privacyFilter === 'shared') {
+				if (!Array.isArray(item.shared) || item.shared.length === 0) return false;
+			} else if (privacyFilter !== 'all' && item.privacy !== privacyFilter) {
+				return false;
+			}
+			if (!q) return true;
+			return item.filename?.toLowerCase().includes(q) || item.mimeType?.toLowerCase().includes(q) || item._id?.toLowerCase().includes(q);
+		});
+	}, [media, searchQuery, privacyFilter]);
+
+	const handleDelete = (id: string) => {
+		setDeleteConfirmId(id);
+	};
+
+	const confirmDelete = async () => {
+		if (!deleteConfirmId) return;
+		const id = deleteConfirmId;
+		setDeleteConfirmId(null);
 
 		try {
 			const res = await fetch(getEnvUrl(`https://cdn.xernerx.com/media/${id}`), {
@@ -179,8 +243,23 @@ export default function Media() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="flex flex-col gap-6">
-			<div className="flex items-center justify-between">
+		<div
+			className={`flex flex-col gap-6 rounded-3xl transition-all ${isDragging ? 'ring-2 ring-(--accent) bg-(--accent)/5 p-4' : ''}`}
+			onDragOver={(e) => {
+				if (!canUpload && !canManage) return;
+				e.preventDefault();
+				setIsDragging(true);
+			}}
+			onDragLeave={() => setIsDragging(false)}
+			onDrop={(e) => {
+				if (!canUpload && !canManage) return;
+				e.preventDefault();
+				setIsDragging(false);
+				const file = e.dataTransfer?.files?.[0];
+				if (file) uploadFile(file);
+			}}
+		>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div>
 					<h1 className="text-2xl font-bold">{t('admin.dashboard.media.title')}</h1>
 					<p className="text-(--text-muted) text-sm mt-1">{t('admin.dashboard.media.subtitle')}</p>
@@ -199,8 +278,45 @@ export default function Media() {
 				</div>
 			</div>
 
+			<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-(--foreground)/40 border border-(--border)/10 p-4 rounded-2xl">
+				<div className="flex-1 max-w-md">
+					<Input
+						variant="search"
+						shortcut={true}
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+						placeholder={t('admin.dashboard.media.searchPlaceholder')}
+						className="w-full"
+					/>
+				</div>
+				<div className="flex flex-wrap items-center gap-1.5">
+					{(
+						[
+							{ key: 'all', label: t('admin.dashboard.media.filterAll') },
+							{ key: 'public', label: t('admin.dashboard.media.public') },
+							{ key: 'limited', label: t('admin.dashboard.media.limited') },
+							{ key: 'private', label: t('admin.dashboard.media.private') },
+							{ key: 'shared', label: t('admin.dashboard.media.shared') },
+						] as const
+					).map((f) => (
+						<button
+							key={f.key}
+							type="button"
+							onClick={() => setPrivacyFilter(f.key)}
+							className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+								privacyFilter === f.key ? 'bg-(--accent) text-white border-(--accent)' : 'bg-(--background) text-(--text-muted) hover:text-(--text) border-(--border)/10'
+							}`}
+						>
+							{f.label}
+						</button>
+					))}
+				</div>
+			</div>
+
+			{(canUpload || canManage) && <p className="text-xs text-(--text-muted) -mt-2 px-1">{t('admin.dashboard.media.dropzoneHint')}</p>}
+
 			<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-				{media.map((item) => (
+				{filteredMedia.map((item) => (
 					<div
 						key={item._id}
 						className="relative group bg-(--foreground) border border-(--border)/10 rounded-xl overflow-hidden shadow-sm hover:border-(--border)/30 transition-all flex flex-col"
@@ -213,6 +329,9 @@ export default function Media() {
 							)}
 
 							<div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+								<Button variant="secondary" size="icon" title={t('admin.dashboard.media.copyUrl')} onClick={() => handleCopyRawUrl(item._id)}>
+									{copiedId === item._id ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+								</Button>
 								<a href={getEnvUrl(`https://cdn.xernerx.com/view/${item._id}`)} target="_blank" rel="noopener noreferrer">
 									<Button variant="secondary" size="icon">
 										<ExternalLink size={16} />
@@ -244,7 +363,7 @@ export default function Media() {
 						</div>
 					</div>
 				))}
-				{media.length === 0 && <div className="col-span-full py-12 text-center text-(--text-muted)">{t('admin.dashboard.media.noMedia')}</div>}
+				{filteredMedia.length === 0 && <div className="col-span-full py-12 text-center text-(--text-muted)">{t('admin.dashboard.media.noMedia')}</div>}
 			</div>
 
 			{editMedia && (
@@ -340,6 +459,17 @@ export default function Media() {
 					</div>
 				</Modal>
 			)}
+
+			<Confirm
+				open={Boolean(deleteConfirmId)}
+				onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+				title={t('common.buttons.delete')}
+				description={t('admin.dashboard.media.toasts.deleteConfirm')}
+				confirmText={t('common.buttons.delete')}
+				cancelText={t('common.buttons.cancel')}
+				onConfirm={confirmDelete}
+				variant="danger"
+			/>
 		</div>
 	);
 }

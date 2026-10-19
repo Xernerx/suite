@@ -4,6 +4,56 @@
 import { AlertCircle, CheckCircle2, Clock, Server } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
+export interface SuiteAppVersionInfo {
+	id: string;
+	name: string;
+	domain: string;
+	localVersion: string | null;
+	devVersion: string | null;
+	canaryVersion: string | null;
+	prodVersion: string | null;
+	devLatencyMs: number | null;
+	canaryLatencyMs: number | null;
+	prodLatencyMs: number | null;
+	versions: string[];
+}
+
+export interface LighthouseScoreData {
+	seo: number;
+	perf: number;
+	a11y: number;
+	bp: number;
+	updatedAt: number;
+}
+
+export const LIGHTHOUSE_STORAGE_KEY = 'xernerx_lighthouse_scores_v1';
+
+const SUITE_APP_DEFS = [
+	['www', 'Website', 'www.xernerx.com'],
+	['app', 'App', 'app.xernerx.com'],
+	['account', 'Account', 'account.xernerx.com'],
+	['store', 'Store', 'store.xernerx.com'],
+	['info', 'Info & Support', 'info.xernerx.com'],
+	['docs', 'Docs', 'docs.xernerx.com'],
+	['admin', 'Admin', 'admin.xernerx.com'],
+	['api', 'API', 'api.xernerx.com'],
+	['cdn', 'CDN', 'cdn.xernerx.com'],
+] as const;
+
+export const FALLBACK_APPS: SuiteAppVersionInfo[] = SUITE_APP_DEFS.map(([id, name, domain]) => ({
+	id,
+	name,
+	domain,
+	localVersion: null,
+	devVersion: null,
+	canaryVersion: null,
+	prodVersion: null,
+	devLatencyMs: null,
+	canaryLatencyMs: null,
+	prodLatencyMs: null,
+	versions: [],
+}));
+
 interface OverviewSummaryCardsProps {
 	appsCount: number;
 	syncedCount: number;

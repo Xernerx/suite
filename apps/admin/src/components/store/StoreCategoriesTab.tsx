@@ -3,7 +3,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@xernerx/ui';
+import { Button, Confirm } from '@xernerx/ui';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Edit2, Trash2, Folder, Power } from 'lucide-react';
 import { StoreCategory } from './types';
@@ -19,11 +19,16 @@ export function StoreCategoriesTab({ categories, onEdit, onToggleEnabled, onDele
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [deletingId, setDeletingId] = useState<string | null>(null);
+	const [confirmDeleteCategory, setConfirmDeleteCategory] = useState<StoreCategory | null>(null);
 
-	const handleDeleteClick = async (category: StoreCategory) => {
-		const confirmMsg = t('admin.store.alerts.deleteCategoryConfirm', { name: category.name });
-		if (!window.confirm(confirmMsg)) return;
+	const handleDeleteClick = (category: StoreCategory) => {
+		setConfirmDeleteCategory(category);
+	};
 
+	const confirmDelete = async () => {
+		if (!confirmDeleteCategory) return;
+		const category = confirmDeleteCategory;
+		setConfirmDeleteCategory(null);
 		setDeletingId(category.id);
 		try {
 			await onDelete(category);
@@ -99,6 +104,15 @@ export function StoreCategoriesTab({ categories, onEdit, onToggleEnabled, onDele
 					</div>
 				</div>
 			))}
+
+			<Confirm
+				open={!!confirmDeleteCategory}
+				onOpenChange={(open) => !open && setConfirmDeleteCategory(null)}
+				title={confirmDeleteCategory?.name || ''}
+				description={t('admin.store.alerts.deleteCategoryConfirm', { name: confirmDeleteCategory?.name || '' })}
+				variant="danger"
+				onConfirm={confirmDelete}
+			/>
 		</div>
 	);
 }

@@ -3,7 +3,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
+import { Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { Copy, Key, Settings2, Trash2 } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
@@ -214,10 +214,24 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 								{t(`admin.tokens.statusOptions.${token.status}`)}
 							</span>
 						</div>
-						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">
-							{t('admin.tokens.card.idPrefix')}
-							{token.id}
-						</span>
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								navigator.clipboard.writeText(token.id);
+								toast({
+									title: t('admin.tokens.tokenIdCopied'),
+									type: 'success',
+								});
+							}}
+							className="inline-flex items-center gap-1 w-fit text-[10px] text-(--text-muted)/60 hover:text-(--text) font-mono mt-1 truncate transition-colors cursor-pointer"
+						>
+							<span className="truncate">
+								{t('admin.tokens.card.idPrefix')}
+								{token.id}
+							</span>
+							<Copy size={10} className="shrink-0 opacity-70" />
+						</button>
 					</div>
 				</div>
 
@@ -265,16 +279,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 									}}
 								>
 									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.nameLabel')}</label>
-									<input
-										type="text"
-										value={name}
-										onChange={(e) => setName(e.target.value)}
-										className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-										style={{
-											padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-										}}
-										required
-									/>
+									<Input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
 								</div>
 
 								<div
@@ -329,16 +334,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 											</div>
 										)}
 										<div className="relative w-full">
-											<input
-												type="text"
-												value={botId}
-												onChange={(e) => setBotId(e.target.value)}
-												placeholder={t('admin.tokens.edit.botIdPlaceholder')}
-												className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-												style={{
-													padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-												}}
-											/>
+											<Input type="text" value={botId} onChange={(e) => setBotId(e.target.value)} placeholder={t('admin.tokens.edit.botIdPlaceholder')} />
 										</div>
 									</div>
 								</div>

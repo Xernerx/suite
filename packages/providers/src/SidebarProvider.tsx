@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 export type SidebarNavItem = {
@@ -48,6 +48,82 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		if (state !== 'hidden') setPrevState(state);
 	}, [state]);
 
+	const setView = useCallback(
+		(newView: string | null) => {
+			setViewState(newView);
+			const storageKey = `xernerx_sidebar_view_${pathname}`;
+
+			if (newView) {
+				localStorage.setItem(storageKey, newView);
+			} else {
+				localStorage.removeItem(storageKey);
+			}
+
+			// Clean the URL if they navigated via a shared link
+			if (typeof window !== 'undefined') {
+				const params = new URLSearchParams(window.location.search);
+				if (params.has('view')) {
+					params.delete('view');
+
+					const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+					router.replace(newUrl, { scroll: false });
+				}
+			}
+		},
+		[pathname, router]
+	);
+
+	const toggle = useCallback(() => {
+		setState((s) => (s === 'open' ? 'closed' : 'open'));
+	}, []);
+
+	const hide = useCallback(() => {
+		setState('hidden');
+	}, []);
+
+	const show = useCallback(() => {
+		setState((s) => (s === 'hidden' ? prevState : s));
+	}, [prevState]);
+
+	const clearNavItems = useCallback(() => {
+		setNavItems([]);
+	}, []);
+
+	// 0. Global keyboard shortcuts for sidebar toggle (Ctrl + B) and view switching (Alt + 1..9)
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			const target = e.target as HTMLElement;
+			const isInput = target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable;
+
+			if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !isInput) {
+				if (state !== 'hidden') {
+					e.preventDefault();
+					setState((s) => (s === 'open' ? 'closed' : 'open'));
+				}
+			} else if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && /^[1-9]$/.test(e.key) && !isInput) {
+				if (state !== 'hidden' && navItems.length > 0) {
+					const idx = parseInt(e.key, 10) - 1;
+					const targetItem = navItems[idx];
+					if (targetItem) {
+						e.preventDefault();
+						if (targetItem.view) {
+							setView(targetItem.view);
+						}
+						if (targetItem.onClick) {
+							targetItem.onClick();
+						}
+						if (targetItem.href && targetItem.href !== '#') {
+							router.push(targetItem.href);
+						}
+					}
+				}
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [state, navItems, setView, router]);
+
 	// 1. Handle URL or Path changes
 	useEffect(() => {
 		setIsMounted(true);
@@ -86,41 +162,19 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, [navItems, pathname, view]);
 
-	const setView = (newView: string | null) => {
-		setViewState(newView);
-		const storageKey = `xernerx_sidebar_view_${pathname}`;
-
-		if (newView) {
-			localStorage.setItem(storageKey, newView);
-		} else {
-			localStorage.removeItem(storageKey);
-		}
-
-		// Clean the URL if they navigated via a shared link
-		if (typeof window !== 'undefined') {
-			const params = new URLSearchParams(window.location.search);
-			if (params.has('view')) {
-				params.delete('view');
-
-				const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-				router.replace(newUrl, { scroll: false });
-			}
-		}
-	};
-
 	return (
 		<SidebarContext.Provider
 			value={{
 				state,
 				isMobileOpen,
-				toggle: () => setState((s) => (s === 'open' ? 'closed' : 'open')),
+				toggle,
 				setMobileOpen,
-				hide: () => setState('hidden'),
-				show: () => setState(state === 'hidden' ? prevState : state),
+				hide,
+				show,
 
 				navItems,
 				setNavItems,
-				clearNavItems: () => setNavItems([]),
+				clearNavItems,
 
 				view: isMounted ? view : navItems.find((i) => i.view)?.view || null,
 				setView,

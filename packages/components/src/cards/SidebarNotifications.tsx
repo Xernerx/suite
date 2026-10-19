@@ -12,10 +12,11 @@ import { motion } from 'framer-motion';
 
 interface SidebarNotificationsProps {
 	isCollapsed: boolean;
+	placement?: 'top' | 'bottom';
 	onClose: () => void;
 }
 
-export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNotificationsProps) {
+export default function SidebarNotifications({ isCollapsed, placement = 'bottom', onClose }: SidebarNotificationsProps) {
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
 	const { toast } = useToast();
@@ -62,7 +63,7 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 					credentials: 'include',
 					body: JSON.stringify({ status: 'unread' }),
 				});
-				if (!res.ok) throw new Error('Failed to mark as unread');
+				if (!res.ok) throw new Error(t('components.cards.sidebarnotifications.failedMarkUnread'));
 			}
 
 			await refresh();
@@ -84,9 +85,12 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 				credentials: 'include',
 				body: JSON.stringify({ status: newStatus }),
 			});
-			if (!res.ok) throw new Error('Failed to update invite');
+			if (!res.ok) throw new Error(t('components.cards.sidebarnotifications.failedUpdateInvite'));
 
-			toast({ title: `Invite ${newStatus}!`, type: 'success' });
+			toast({
+				title: newStatus === 'approved' ? t('components.cards.sidebarnotifications.inviteApproved') : t('components.cards.sidebarnotifications.inviteDenied'),
+				type: 'success',
+			});
 			await refresh();
 			setSelectedNotification(null);
 			if (newStatus === 'approved') window.location.reload();
@@ -111,12 +115,12 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 					method: 'DELETE',
 					credentials: 'include',
 				});
-				if (!res.ok) throw new Error('Failed to delete notification');
+				if (!res.ok) throw new Error(t('components.cards.sidebarnotifications.failedDelete'));
 			}
 
 			await refresh();
 			setSelectedNotification(null);
-			toast({ title: 'Notification deleted', type: 'success' });
+			toast({ title: t('components.cards.sidebarnotifications.notificationDeleted'), type: 'success' });
 		} catch (err: any) {
 			toast({ title: err.message, type: 'error' });
 		} finally {
@@ -140,12 +144,16 @@ export default function SidebarNotifications({ isCollapsed, onClose }: SidebarNo
 	return (
 		<>
 			<motion.div
-				initial={{ opacity: 0, y: 10, scale: 0.95 }}
+				initial={{ opacity: 0, y: placement === 'top' ? -10 : 10, scale: 0.95 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
-				exit={{ opacity: 0, y: 10, scale: 0.95 }}
+				exit={{ opacity: 0, y: placement === 'top' ? -10 : 10, scale: 0.95 }}
 				transition={{ duration: 0.2, ease: 'easeOut' }}
-				className={`absolute bottom-full mb-3 z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl
-                    ${isCollapsed ? 'left-0 w-64' : 'left-0 right-0 w-full'}
+				className={`z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl
+                    ${
+						placement === 'top'
+							? 'absolute top-full mt-2 right-0 w-80 max-w-[calc(100vw-2rem)] origin-top-right'
+							: `absolute bottom-full mb-3 ${isCollapsed ? 'left-0 w-64' : 'left-0 right-0 w-full'}`
+					}
                 `}
 				style={{
 					padding: 'calc(var(--ui-gap) * 0.5)',

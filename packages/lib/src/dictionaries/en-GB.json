@@ -33,6 +33,10 @@
 			"proceed": "Proceed",
 			"delete": "Delete"
 		},
+		"confirm": {
+			"typeToConfirmBefore": "Please type",
+			"typeToConfirmAfter": "to confirm:"
+		},
 		"footer": {
 			"tagline": "Building modern software, infrastructure and developer tools with a focus on performance, simplicity and long-term maintainability.",
 			"sections": {
@@ -106,11 +110,55 @@
 			}
 		},
 		"shortcuts": {
+			"items": {
+				"toggleHelp": "Toggle help menu",
+				"searchOrPalette": "Focus page search or open command palette",
+				"openAppDrawer": "Open App Drawer",
+				"toggleSidebar": "Toggle application sidebar visibility",
+				"toggleOmnibar": "Toggle URL omnibar",
+				"toggleNotifications": "Toggle notifications drawer",
+				"openAccountSettings": "Open account settings",
+				"saveChanges": "Save unsaved changes",
+				"switchSidebarViews": "Switch sidebar views or tabs",
+				"copyUrl": "Copy current suite URL",
+				"reloadApp": "Reload the application state",
+				"closeModals": "Close active overlays or modals"
+			},
 			"modal": {
 				"navigation": {
 					"title": "App Drawer",
 					"description": "Quickly launch and switch between applications",
+					"searchPlaceholder": "Filter applications...",
+					"navigateHint": "Use arrow keys to select, Enter to open",
 					"empty": "No applications available."
+				},
+				"palette": {
+					"title": "Command Palette",
+					"placeholder": "Search views, quick actions, or suite applications...",
+					"empty": "No matching commands or pages found.",
+					"sections": {
+						"views": "Current Page Views",
+						"actions": "Quick Actions",
+						"apps": "Suite Applications",
+						"settings": "Account & Developer Settings",
+						"support": "Support & Feedback Hub",
+						"admin": "Admin Panel (Staff)"
+					},
+					"actions": {
+						"switchThemeLight": "Switch to Light Theme",
+						"switchThemeDark": "Switch to Dark Theme",
+						"toggleSidebar": "Toggle Sidebar",
+						"openAppDrawer": "Open App Drawer",
+						"toggleOmnibar": "Toggle URL Omnibar",
+						"copyUrl": "Copy Current Suite URL",
+						"openShortcuts": "View Keyboard Shortcuts",
+						"openAccount": "Open Account Settings"
+					},
+					"footer": {
+						"navigate": "to navigate",
+						"select": "to select",
+						"close": "to close"
+					}
 				}
 			}
 		},
@@ -147,7 +195,7 @@
 		"header": {
 			"description": "Download the app!",
 			"store": "Store",
-			"tooltip": "Open App Drawer (Ctrl + K)"
+			"tooltip": "Open App Drawer (Ctrl + Space)"
 		},
 		"error": {
 			"title": "Something went wrong!",
@@ -175,10 +223,31 @@
 			"description3": "App:",
 			"description4": "Press",
 			"description5": "to close",
-			"text": "Esc"
+			"text": "Esc",
+			"selectVersion": "Select Version",
+			"loadingChangelog": "Loading changelog...",
+			"viewFullChangelog": "View Full Changelog"
 		},
 		"supportprovider": {
-			"description": "Get Support"
+			"description": "Get Support",
+			"joinButton": "Join Support Server",
+			"popoverTitle": "Need Help?",
+			"popoverSubtitle": "Quick links & live community support",
+			"links": {
+				"hub": "Support Hub",
+				"reportIssue": "Report an Issue",
+				"suggestFeature": "Suggest a Feature",
+				"faq": "Frequently Asked Questions"
+			},
+			"joinModal": {
+				"title": "Join the Support Server",
+				"description": "You are not currently in the official Xernerx Support Discord server. Would you like us to automatically add your Discord account to the server and open the support channel?",
+				"confirm": "Join & Open Support",
+				"joining": "Joining Server...",
+				"successTitle": "Joined Support Server!",
+				"successDescription": "You have been added to the Xernerx Support Discord server.",
+				"errorTitle": "Could not join server"
+			}
 		},
 		"toastprovider": {
 			"description": "Careful — you have unsaved changes!",
@@ -329,6 +398,7 @@
 			},
 			"idCopied": "ID copied to clipboard",
 			"emailCopied": "Email copied to clipboard",
+			"viewPublicProfile": "View Public Profile",
 			"updateFailed": "Failed to update user profile",
 			"assignRoleFailed": "Failed to assign Discord role",
 			"removeRoleFailed": "Failed to remove Discord role",
@@ -338,6 +408,8 @@
 			"title": "API Token Management",
 			"description": "Manage organization access tokens, bot identifiers, and secure endpoint permissions.",
 			"generateButton": "New Token",
+			"searchPlaceholder": "Search tokens by name, ID, or Bot ID...",
+			"filterAll": "All",
 			"ownersPlaceholder": "482513687417061376",
 			"empty": {
 				"title": "No tokens found matching your search.",
@@ -640,6 +712,11 @@
 				"cancel": "Cancel",
 				"saveChanges": "Save Changes",
 				"shared": "Shared",
+				"searchPlaceholder": "Search media by filename...",
+				"filterAll": "All",
+				"copyUrl": "Copy Direct URL",
+				"urlCopied": "Direct URL copied to clipboard",
+				"dropzoneHint": "Drag & drop files here or press Ctrl + V to paste & upload",
 				"toasts": {
 					"userNotFound": "Discord User Not Found",
 					"fetchUserFailed": "Failed to fetch user",
@@ -674,6 +751,9 @@
 				"cancel": "Cancel",
 				"saveButton": "Save Invite",
 				"saving": "Saving...",
+				"copyInviteUrl": "Copy Invite Link",
+				"inviteUrlCopied": "Invite link copied to clipboard",
+				"openInvite": "Open Invite",
 				"toasts": {
 					"deleteConfirm": "Are you sure you want to delete this invite link?",
 					"deleteSuccess": "Invite deleted",
@@ -1098,7 +1178,10 @@
 			},
 			"infoField": {
 				"label": "Info (Long Description)",
-				"placeholder": "Tell us more about yourself..."
+				"placeholder": "Tell us more about yourself...",
+				"write": "Write",
+				"preview": "Preview",
+				"nothingToPreview": "Nothing to preview"
 			},
 			"birthday": {
 				"label": "Birthday"
@@ -1139,6 +1222,8 @@
 			},
 			"save": "Save Changes",
 			"saving": "Saving...",
+			"viewPublicProfile": "View Public Profile",
+			"idCopied": "User ID copied to clipboard",
 			"toast": {
 				"success": "Profile updated successfully!",
 				"error": "Failed to save changes. Please try again."
@@ -1332,6 +1417,13 @@
 			"description": "Manage your secure authentication keys",
 			"generateButton": "Generate Token",
 			"manageSettings": "Manage Settings",
+			"searchPlaceholder": "Search tokens by name or ID...",
+			"filterAll": "All",
+			"filterActive": "Active",
+			"filterInactive": "Inactive",
+			"copyId": "Copy Token ID",
+			"idCopied": "Token ID copied to clipboard",
+			"noMatchingTokens": "No tokens match your filter.",
 			"empty": {
 				"title": "No tokens found",
 				"description": "You don't have any active API tokens. Generate one to authenticate your services."
@@ -1501,6 +1593,11 @@
 			"deleteConfirm": "Are you sure you want to delete this media?",
 			"shared": "Shared",
 			"noMedia": "No media found.",
+			"searchPlaceholder": "Search media by filename...",
+			"filterAll": "All",
+			"copyUrl": "Copy Direct URL",
+			"urlCopied": "Direct URL copied to clipboard",
+			"dropzoneHint": "Drag & drop files here or press Ctrl + V to paste & upload",
 			"modal": {
 				"title": "Edit Media Metadata",
 				"description": "Editing metadata for {filename}",
@@ -2074,7 +2171,11 @@
 		"invites": {
 			"title": "Application Invites",
 			"description": "Quickly add our verified applications and services to your Discord server. These official invites are pre-configured with the exact permissions each bot needs to function flawlessly.",
-			"empty": "No invites are currently available."
+			"empty": "No invites are currently available.",
+			"searchPlaceholder": "Search application invites...",
+			"copyInviteUrl": "Copy Invite Link",
+			"inviteUrlCopied": "Invite link copied to clipboard",
+			"noMatchingInvites": "No invites match \"{query}\"."
 		},
 		"changelog": {
 			"category": "Changelogs",
@@ -2082,7 +2183,10 @@
 			"title": "{name} Changelog",
 			"subtitle": "See the latest updates and release notes.",
 			"linkCopiedTitle": "Link copied!",
-			"linkCopiedDesc": "Copied direct link to version {version}"
+			"linkCopiedDesc": "Copied direct link to version {version}",
+			"searchPlaceholder": "Search release notes or version (e.g. '1.3.4')...",
+			"jumpToVersion": "Releases:",
+			"noMatchingVersions": "No release notes match \"{query}\"."
 		},
 		"software": {
 			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite over HTTP. Send JSON requests and receive JSON responses from any language using your scoped Bearer token.",
@@ -2115,6 +2219,8 @@
 		}
 	},
 	"faq": {
+		"searchPlaceholder": "Search frequently asked questions...",
+		"noResults": "No questions found matching \"{query}\".",
 		"category": {
 			"suite": "Xernerx Suite"
 		},
@@ -2273,7 +2379,16 @@
 				"vote": "Vote",
 				"voteAgainIn": "Vote again in {time}",
 				"voted": "Voted!",
-				"voting": "Voting..."
+				"voting": "Voting...",
+				"copyId": "Copy ID",
+				"idCopied": "Bot ID copied to clipboard",
+				"shareProfile": "Share",
+				"profileLinkCopied": "Profile link copied to clipboard",
+				"searchCommandsPlaceholder": "Search slash commands or parameters...",
+				"copyCommand": "Copy /{name}",
+				"commandCopied": "Copied /{name} to clipboard",
+				"noCommandsMatch": "No commands match \"{query}\".",
+				"commandsCount": "{count} Commands"
 			},
 			"avatarAlt": "Bot Avatar",
 			"nav": {
@@ -2309,7 +2424,15 @@
 				},
 				"updateReview": "Update Review",
 				"updateYourReview": "Update your Review",
-				"writeReview": "Write a Review"
+				"writeReview": "Write a Review",
+				"filterAllStars": "All Ratings",
+				"showingStarFilter": "Showing {star}-star reviews",
+				"clearFilter": "Clear filter",
+				"sortMostHelpful": "Most Helpful",
+				"sortNewest": "Newest",
+				"sortHighest": "Highest Rated",
+				"sortLowest": "Lowest Rated",
+				"noFilteredReviews": "No {star}-star reviews yet."
 			},
 			"stats": {
 				"all": "All",
@@ -2390,7 +2513,9 @@
 				"private": "Private",
 				"public": "Public",
 				"transferDescription": "Transfer this server to an organization you belong to or own.",
-				"transferTitle": "Transfer Organization"
+				"transferTitle": "Transfer Organization",
+				"resetConfirmTitle": "Reset Server Data",
+				"resetConfirmDesc": "Are you sure you want to reset all server descriptions, links, and widgets back to default?"
 			},
 			"stats": {
 				"boosts": "Boosts",
@@ -2457,7 +2582,9 @@
 			"heroBots": "Bots",
 			"heroServers": "Servers",
 			"noBotsCategory": "No bots found for this category.",
-			"noServersCategory": "No servers found for this category."
+			"noServersCategory": "No servers found for this category.",
+			"searchViewAll": "View all results for \"{query}\"",
+			"searchNoResults": "No matching results found for \"{query}\"."
 		},
 		"portal": {
 			"layout": {},
@@ -2688,6 +2815,12 @@
 					"desc": "Are you absolutely sure you want to delete this organization and all its data? This action cannot be undone.",
 					"confirm": "Delete Organization",
 					"cancel": "Cancel"
+				},
+				"reset": {
+					"title": "Reset Organization Data",
+					"desc": "Are you sure you want to reset all organization descriptions, links, and widgets back to default?",
+					"confirm": "Reset Data",
+					"cancel": "Cancel"
 				}
 			},
 			"bot": {
@@ -2744,6 +2877,10 @@
 					"delete": {
 						"title": "Delete Application",
 						"desc": "Are you absolutely sure you want to delete this application? This action cannot be undone and all data will be permanently removed."
+					},
+					"reset": {
+						"title": "Reset Application Data",
+						"desc": "Are you sure you want to clear all profile descriptions, links, and widgets back to default?"
 					}
 				},
 				"toast": {
@@ -2780,7 +2917,9 @@
 				"deleteFailed": "Failed to delete organization"
 			},
 			"workspace": {
-				"id": "ID: {id}"
+				"id": "ID: {id}",
+				"viewPublicProfile": "View Public Profile",
+				"idCopied": "ID copied to clipboard"
 			}
 		},
 		"categories": {
@@ -2795,7 +2934,11 @@
 		"organization": {
 			"header": {
 				"joinServer": "Join Server",
-				"unknownOrg": "Unknown Organization"
+				"unknownOrg": "Unknown Organization",
+				"copyId": "Copy ID",
+				"idCopied": "Organization ID copied to clipboard",
+				"shareProfile": "Share",
+				"profileLinkCopied": "Organization link copied to clipboard"
 			},
 			"nav": {
 				"goBack": "Go Back",
@@ -2822,6 +2965,38 @@
 			},
 			"returnHome": "Return Home"
 		},
+		"users": {
+			"notFoundTitle": "User Not Found",
+			"notFoundDesc": "This user profile does not exist or is set to private.",
+			"returnHome": "Return Home",
+			"unknownUser": "Unknown User",
+			"copyId": "Copy ID",
+			"idCopied": "User ID copied to clipboard",
+			"shareProfile": "Share",
+			"profileLinkCopied": "User profile link copied to clipboard",
+			"editProfile": "Edit Profile",
+			"nav": {
+				"goBack": "Go Back",
+				"userDetails": "User Profile",
+				"profile": "Profile",
+				"publishedBots": "Published Bots",
+				"organizations": "Organizations",
+				"management": "Management"
+			},
+			"profile": {
+				"noDetails": "This user has not added a detailed bio yet.",
+				"publishedBots": "Published Bots",
+				"organizations": "Organizations",
+				"information": "Information",
+				"pronouns": "Pronouns",
+				"timezone": "Timezone",
+				"level": "Level",
+				"streak": "Daily Streak",
+				"days": "{count} days",
+				"totalServers": "Bot Servers",
+				"totalUsers": "Bot Users"
+			}
+		},
 		"servers": {
 			"about": "About {name}",
 			"backToExplore": "Back to Explore",
@@ -2842,7 +3017,12 @@
 			"overTime": "over time",
 			"placeholder": "Search for a server...",
 			"voteAvailableIn": "Vote available in {time}",
-			"voteForServer": "Vote for Server ({count})"
+			"voteForServer": "Vote for Server ({count})",
+			"copyId": "Copy ID",
+			"idCopied": "Server ID copied to clipboard",
+			"shareProfile": "Share",
+			"profileLinkCopied": "Server link copied to clipboard",
+			"manageServer": "Manage Server"
 		},
 		"supporters": {
 			"itsYou": "It's You!",
@@ -2877,6 +3057,9 @@
 			"docs": "Documentation",
 			"directUpload": "Direct Upload",
 			"uploadMedia": "Upload Media",
+			"dropzoneHint": "Drop a file here, paste from clipboard (Ctrl + V), or click to upload",
+			"uploadedSuccess": "File uploaded to CDN!",
+			"urlCopied": "CDN link copied to clipboard",
 			"errors": {
 				"uploadFailed": "Upload failed. Ensure you are logged in and have permission.",
 				"generic": "Failed to upload file"
@@ -2955,6 +3138,7 @@
 			"title": "Suite Docs",
 			"description": "Explore guides, API references, and tutorials to help you integrate with the Xernerx Ecosystem seamlessly.",
 			"searchPlaceholder": "Search documentation, guides, and references...",
+			"searchEmpty": "No documentation topics found matching \"{query}\".",
 			"categories": {
 				"api": {
 					"title": "REST API",
@@ -3365,7 +3549,13 @@
 				"title1": "Delete Notification",
 				"title2": "Mark as Unread",
 				"text7": "Open Link",
-				"text8": "Close"
+				"text8": "Close",
+				"failedMarkUnread": "Failed to mark as unread",
+				"failedUpdateInvite": "Failed to update invite",
+				"inviteApproved": "Invite approved!",
+				"inviteDenied": "Invite declined!",
+				"failedDelete": "Failed to delete notification",
+				"notificationDeleted": "Notification deleted"
 			},
 			"sidebarsuite": {
 				"text1": "Suite"
@@ -3384,7 +3574,13 @@
 				"openingGift": "Opening Present...",
 				"giftClaimedTitle": "Daily reward claimed!",
 				"giftFailedTitle": "Failed to claim daily reward",
-				"level": "Level"
+				"level": "Level",
+				"staffBadge": "Staff",
+				"proBadge": "Pro",
+				"unnamedRole": "Unnamed Role",
+				"userIdCopied": "User ID copied to clipboard",
+				"giftReadyTooltip": "Daily reward ready to claim!",
+				"viewPublicProfile": "View Public Profile"
 			}
 		},
 		"cookieprompt": {},
@@ -3396,7 +3592,9 @@
 		"header": {
 			"text1": "Download the app!",
 			"store": "Store",
-			"title1": "Open App Drawer (Ctrl + K)",
+			"title1": "Open App Drawer (Ctrl + Space)",
+			"notifications": "Notifications (Ctrl + I)",
+			"commandPalette": "Open Command Palette (Ctrl + K)",
 			"copyUrl": "Copy URL",
 			"urlCopied": "URL copied to clipboard"
 		},
@@ -3445,6 +3643,14 @@
 		"home": {
 			"title": "Support",
 			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
+			"searchPlaceholder": "Search FAQ, known issues, suggestions, and roadmap...",
+			"searchEmpty": "No results found matching \"{query}\".",
+			"searchCategories": {
+				"faq": "FAQ",
+				"issues": "Issues",
+				"suggestions": "Suggestions",
+				"roadmap": "Roadmap"
+			},
 			"portals": {
 				"roadmap": {
 					"title": "Roadmap",
@@ -3471,6 +3677,10 @@
 		"roadmap": {
 			"title": "Platform Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
+			"searchPlaceholder": "Search roadmap milestones and known issues...",
+			"allProducts": "All Products",
+			"allStatuses": "All Statuses",
+			"noMatchingItems": "No roadmap milestones match your current filters.",
 			"metrics": {
 				"avgResolutionTime": "Avg Issue Resolution Time",
 				"recentResolutions": "Issues Resolved Recently",
@@ -3501,6 +3711,12 @@
 		"suggestions": {
 			"title": "Suggestion Centre",
 			"description": "Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.",
+			"allProducts": "All Products",
+			"sort": {
+				"top": "Most Upvoted",
+				"newest": "Newest",
+				"mine": "Upvoted by Me"
+			},
 			"newSuggestion": "New Suggestion",
 			"titlePlaceholder": "Title",
 			"descriptionPlaceholder": "Description",
@@ -3529,6 +3745,18 @@
 		"bugs": {
 			"title": "Issues",
 			"description": "Report issues you encounter. Issues are reviewed by our team and moved to the known issues list once verified.",
+			"allProducts": "All Products",
+			"filters": {
+				"all": "All Open",
+				"verified": "Verified",
+				"submitted": "Unverified",
+				"release": "Pending Release"
+			},
+			"dropzone": {
+				"prompt": "Drop a screenshot or log file here, paste from clipboard (Ctrl + V), or click to browse",
+				"formats": "Supports PNG, JPG, GIF, WEBP, TXT, LOG, JSON",
+				"remove": "Remove attachment"
+			},
 			"newBug": "New Issue",
 			"titlePlaceholder": "Title",
 			"descriptionPlaceholder": "Description",

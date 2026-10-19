@@ -4,8 +4,23 @@
 import { CollapsibleCard } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
-export default function Bots() {
+export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 	const { t } = useDictionary();
+	const q = searchQuery.trim().toLowerCase();
+
+	const searchableText = [
+		t('faq.bots.title'),
+		t('faq.bots.card.title'),
+		t('faq.bots.card.description1'),
+		t('faq.bots.card.disclaimer'),
+		t('faq.bots.card.description2'),
+		t('faq.bots.card.baseline'),
+		t('faq.bots.card.multiplier'),
+	]
+		.join(' ')
+		.toLowerCase();
+
+	if (q && !searchableText.includes(q)) return null;
 
 	return (
 		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, LogOut, Settings, Info, Trash2, User as UserIcon } from 'lucide-react';
+import { AlertTriangle, LogOut, Settings, Info, Trash2, User as UserIcon, ExternalLink, Copy, Check } from 'lucide-react';
 import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
 import { Button, Confirm, Selector } from '@xernerx/ui';
 import Image from 'next/image';
@@ -16,10 +16,20 @@ export default function Account() {
 	const [isConfirmAccountOpen, setIsConfirmAccountOpen] = useState(false);
 	const [isDeletingData, setIsDeletingData] = useState(false);
 	const [isConfirmDataOpen, setIsConfirmDataOpen] = useState(false);
+	const [copiedId, setCopiedId] = useState(false);
 	const activeUser = discordUser || session?.user;
 	const userId = activeUser?.id;
 	const [privacy, setPrivacy] = useState(activeUser?.privacy || 'private');
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
+
+	const handleCopyId = () => {
+		if (!userId) return;
+		navigator.clipboard.writeText(userId);
+		setCopiedId(true);
+		toast({ title: t('account.profile.idCopied'), type: 'success' });
+		setTimeout(() => setCopiedId(false), 2000);
+	};
+
 	const handleLogout = () => {
 		const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
 		signOut({
@@ -152,43 +162,65 @@ export default function Account() {
 			</div>
 
 			<div
-				className="flex items-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 				style={{
 					padding: 'var(--ui-gap)',
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				{avatarUrl ? (
-					<Image
-						src={avatarUrl}
-						alt={t('account.common.alt')}
-						width={80}
-						height={80}
-						className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0"
-						unoptimized
-						draggable={false}
-					/>
-				) : (
-					<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--border)/10 shrink-0">
-						<UserIcon size={36} className="text-(--text-muted)" />
-					</div>
-				)}
 				<div
-					className="flex flex-col overflow-hidden"
+					className="flex items-center"
 					style={{
-						gap: 'calc(var(--ui-gap) * 0.25)',
+						gap: 'var(--ui-gap)',
 					}}
 				>
-					<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('account.account.fallbackName')}</h2>
-					<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
-					{userId && (
-						<span className="text-xs text-(--text-muted)/60 font-mono">
-							{t('account.common.description', {
-								userId,
-							})}
-						</span>
+					{avatarUrl ? (
+						<Image
+							src={avatarUrl}
+							alt={t('account.common.alt')}
+							width={80}
+							height={80}
+							className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0"
+							unoptimized
+							draggable={false}
+						/>
+					) : (
+						<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--border)/10 shrink-0">
+							<UserIcon size={36} className="text-(--text-muted)" />
+						</div>
 					)}
+					<div
+						className="flex flex-col overflow-hidden"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.25)',
+						}}
+					>
+						<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('account.account.fallbackName')}</h2>
+						<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
+						{userId && (
+							<button
+								type="button"
+								onClick={handleCopyId}
+								className="inline-flex items-center gap-1.5 w-fit text-xs text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-md border border-(--border)/10 font-mono transition-colors cursor-pointer"
+							>
+								<span>
+									{t('account.common.description', {
+										userId,
+									})}
+								</span>
+								{copiedId ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+							</button>
+						)}
+					</div>
 				</div>
+				{userId && (
+					<div className="flex items-center shrink-0">
+						<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com/')}users/${userId}`, '_blank')} className="gap-2">
+							<ExternalLink size={16} />
+							{t('account.profile.viewPublicProfile')}
+						</Button>
+					</div>
+				)}
 			</div>
 
 			<div
@@ -380,6 +412,7 @@ export default function Account() {
 				title={t('account.account.danger.confirmTitle')}
 				description={t('account.account.danger.confirmDescription')}
 				confirmText={t('account.account.danger.confirmButton')}
+				confirmKeyword={activeUser?.username || activeUser?.name || 'DELETE'}
 				onConfirm={handleDeleteAccount}
 				loading={isDeletingAccount}
 			/>
@@ -390,6 +423,8 @@ export default function Account() {
 				title={t('account.common.tooltip')}
 				description={t('account.account.resetDataConfirmDesc')}
 				confirmText={t('account.account.resetDataConfirmButton')}
+				variant="warning"
+				confirmKeyword="RESET"
 				onConfirm={handleDeleteData}
 				loading={isDeletingData}
 			/>

@@ -4,8 +4,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useEnvironment, useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Modal, Button, Input, Toggle } from '@xernerx/ui';
-import { Link, Plus, Trash2, Edit2 } from 'lucide-react';
+import { Modal, Button, Confirm, Input, Toggle } from '@xernerx/ui';
+import { Link, Plus, Trash2, Edit2, Copy, Check, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 
@@ -29,9 +29,11 @@ export default function Invites() {
 	const [invites, setInvites] = useState<AppInvite[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [search, setSearch] = useState('');
+	const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
 
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [creating, setCreating] = useState(false);
+	const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
 	const [editId, setEditId] = useState<string | null>(null);
 	const [newId, setNewId] = useState('');
@@ -125,8 +127,14 @@ export default function Invites() {
 		}
 	};
 
-	const handleDelete = async (id: string) => {
-		if (!confirm(t('admin.dashboard.invites.toasts.deleteConfirm'))) return;
+	const handleDelete = (id: string) => {
+		setDeleteConfirmId(id);
+	};
+
+	const confirmDelete = async () => {
+		if (!deleteConfirmId) return;
+		const id = deleteConfirmId;
+		setDeleteConfirmId(null);
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/invites/${id}`), {
 				method: 'DELETE',
@@ -166,7 +174,7 @@ export default function Invites() {
 				</Button>
 			</div>
 
-			<Input variant="search" placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+			<Input variant="search" shortcut={true} placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 
 			{filteredInvites.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
@@ -199,11 +207,42 @@ export default function Invites() {
 											<span className="text-xs text-(--text-muted)">/invites/{invite.id}</span>
 										</div>
 									</div>
-									<div className="flex gap-2">
-										<button onClick={() => openEditModal(invite)} className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors">
+									<div className="flex items-center gap-1">
+										<button
+											type="button"
+											onClick={() => {
+												const url = `${getEnvUrl('https://xernerx.com')}/invites/${invite.id}`;
+												navigator.clipboard.writeText(url);
+												setCopiedSlug(invite.id);
+												toast({ type: 'success', title: t('admin.dashboard.invites.inviteUrlCopied') });
+												setTimeout(() => setCopiedSlug((prev) => (prev === invite.id ? null : prev)), 2000);
+											}}
+											title={t('admin.dashboard.invites.copyInviteUrl')}
+											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
+										>
+											{copiedSlug === invite.id ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+										</button>
+										<a
+											href={`${getEnvUrl('https://xernerx.com')}/invites/${invite.id}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											title={t('admin.dashboard.invites.openInvite')}
+											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
+										>
+											<ExternalLink size={16} />
+										</a>
+										<button
+											type="button"
+											onClick={() => openEditModal(invite)}
+											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
+										>
 											<Edit2 size={16} />
 										</button>
-										<button onClick={() => handleDelete(invite.id)} className="p-2 rounded-xl text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 transition-colors">
+										<button
+											type="button"
+											onClick={() => handleDelete(invite.id)}
+											className="p-2 rounded-xl text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 transition-colors"
+										>
 											<Trash2 size={16} />
 										</button>
 									</div>
@@ -229,49 +268,22 @@ export default function Invites() {
 					<div className="grid grid-cols-2 gap-4">
 						<div className="flex flex-col gap-2">
 							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.urlSlug')}</label>
-							<input
-								type="text"
-								value={newId}
-								onChange={(e) => setNewId(e.target.value)}
-								required
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderTodo')}
-							/>
+							<Input type="text" value={newId} onChange={(e) => setNewId(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderTodo')} />
 						</div>
 						<div className="flex flex-col gap-2">
 							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.appName')}</label>
-							<input
-								type="text"
-								value={newName}
-								onChange={(e) => setNewName(e.target.value)}
-								required
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderAppName')}
-							/>
+							<Input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderAppName')} />
 						</div>
 					</div>
 
 					<div className="flex flex-col gap-2">
 						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.clientId')}</label>
-						<input
-							type="text"
-							value={newClientId}
-							onChange={(e) => setNewClientId(e.target.value)}
-							required
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-							placeholder={t('admin.dashboard.invites.placeholderClientId')}
-						/>
+						<Input type="text" value={newClientId} onChange={(e) => setNewClientId(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderClientId')} />
 					</div>
 
 					<div className="flex flex-col gap-2">
 						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.scopes')}</label>
-						<input
-							type="text"
-							value={newScopes}
-							onChange={(e) => setNewScopes(e.target.value)}
-							required
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-						/>
+						<Input type="text" value={newScopes} onChange={(e) => setNewScopes(e.target.value)} required />
 					</div>
 
 					<div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-2 rounded-xl bg-(--foreground)/10 border border-(--border)/10 p-4">
@@ -302,6 +314,17 @@ export default function Invites() {
 					</div>
 				</form>
 			</Modal>
+
+			<Confirm
+				open={Boolean(deleteConfirmId)}
+				onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+				title={t('common.buttons.delete')}
+				description={t('admin.dashboard.invites.toasts.deleteConfirm')}
+				confirmText={t('common.buttons.delete')}
+				cancelText={t('common.buttons.cancel')}
+				onConfirm={confirmDelete}
+				variant="danger"
+			/>
 		</div>
 	);
 }

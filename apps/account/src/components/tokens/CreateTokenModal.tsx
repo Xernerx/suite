@@ -2,7 +2,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
-import { Button, Modal } from '@xernerx/ui';
+import { Button, Input, Modal } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import AsyncUserMultiSelector from './AsyncUserMultiSelector';
@@ -94,15 +94,7 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 					}}
 				>
 					<label className="text-sm font-medium text-(--text)">{t('account.tokens.create.nameLabel')}</label>
-					<input
-						type="text"
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						placeholder={t('account.tokens.create.namePlaceholder')}
-						className="w-full rounded-xl border border-(--border)/20 bg-(--background) px-4 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-1 focus:ring-(--accent)"
-						required
-						autoFocus
-					/>
+					<Input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('account.tokens.create.namePlaceholder')} required autoFocus />
 				</div>
 
 				<div

@@ -33,13 +33,19 @@ export default function SuggestionsPage() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
+	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+	const [sortBy, setSortBy] = useState<'top' | 'newest' | 'mine'>('top');
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
+			const params = new URLSearchParams(window.location.search);
+			const qParam = params.get('q');
 			const savedDraft = sessionStorage.getItem('xernerx_suggestion_draft');
-			if (savedDraft) {
+			if (qParam) {
+				setSearch(qParam);
+			} else if (savedDraft) {
 				setSearch(savedDraft);
 				sessionStorage.removeItem('xernerx_suggestion_draft');
 			}
@@ -193,13 +199,43 @@ export default function SuggestionsPage() {
 		}
 	};
 
-	const filteredSuggestions = useMemo(() => {
-		if (!search) return suggestions;
-		return suggestions.filter((s: any) => {
-			const botInfo = resolveBot(s);
-			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, botInfo?.name || s.productId || '');
+	const availableProducts = useMemo(() => {
+		const set = new Set<string>(products);
+		suggestions.forEach((s: any) => {
+			if (s.productId) set.add(s.productId);
 		});
-	}, [search, suggestions, orgBots, botProfiles]);
+		return Array.from(set).filter(Boolean);
+	}, [products, suggestions]);
+
+	const filteredSuggestions = useMemo(() => {
+		const filtered = suggestions.filter((s: any) => {
+			if (sortBy === 'mine' && !(user && s.upvotes?.includes(user.id))) {
+				return false;
+			}
+			const botInfo = resolveBot(s);
+			const prodName = botInfo?.name || s.productId || '';
+			if (selectedProduct) {
+				const selectedBot = resolveBot(selectedProduct);
+				const selectedName = selectedBot?.name || selectedProduct;
+				if (prodName.toLowerCase() !== selectedName.toLowerCase() && s.productId !== selectedProduct) {
+					return false;
+				}
+			}
+			if (!search) return true;
+			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
+		});
+
+		return [...filtered].sort((a, b) => {
+			if (sortBy === 'newest') {
+				const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+				const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+				return timeB - timeA;
+			}
+			const votesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+			const votesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+			return votesB - votesA;
+		});
+	}, [search, selectedProduct, sortBy, user, suggestions, orgBots, botProfiles]);
 
 	if (loading) return <Loading />;
 
@@ -271,9 +307,66 @@ export default function SuggestionsPage() {
 							transition={{ duration: 0.2, ease: 'easeOut' }}
 							className="flex flex-col gap-4 w-full"
 						>
-							<div className="flex flex-col gap-1.5">
-								<Input variant="search" placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-								<p className="text-xs text-(--text-muted) px-1">{t('info.suggestions.startTyping')}</p>
+							<div className="flex flex-col gap-2.5">
+								<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+								<div className="flex flex-wrap items-center justify-between gap-2 px-1">
+									<p className="text-xs text-(--text-muted)">{t('info.suggestions.startTyping')}</p>
+									<div className="flex items-center gap-1 p-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10">
+										{(
+											[
+												{ id: 'top', label: t('info.suggestions.sort.top') },
+												{ id: 'newest', label: t('info.suggestions.sort.newest') },
+												...(user ? [{ id: 'mine', label: t('info.suggestions.sort.mine') }] : []),
+											] as Array<{ id: 'top' | 'newest' | 'mine'; label: string }>
+										).map((opt) => (
+											<button
+												key={opt.id}
+												type="button"
+												onClick={() => setSortBy(opt.id)}
+												className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+													sortBy === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+												}`}
+											>
+												{opt.label}
+											</button>
+										))}
+									</div>
+								</div>
+
+								{availableProducts.length > 0 && (
+									<div className="flex flex-wrap items-center gap-1.5 pt-1">
+										<button
+											type="button"
+											onClick={() => setSelectedProduct(null)}
+											className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+												selectedProduct === null
+													? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+													: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+											}`}
+										>
+											{t('info.suggestions.allProducts')}
+										</button>
+										{availableProducts.map((prod) => {
+											const botInfo = resolveBot(prod);
+											const isSelected = selectedProduct === prod;
+											return (
+												<button
+													key={prod}
+													type="button"
+													onClick={() => setSelectedProduct(isSelected ? null : prod)}
+													className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+														isSelected
+															? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+															: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+													}`}
+												>
+													{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+													<span>{botInfo ? botInfo.name : prod}</span>
+												</button>
+											);
+										})}
+									</div>
+								)}
 							</div>
 
 							<AnimatePresence mode="popLayout">
@@ -329,10 +422,14 @@ export default function SuggestionsPage() {
 													)}
 												</div>
 												<div className="text-(--text-muted) text-sm mb-2 mt-1">{s.description}</div>
-												<span className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit">
+												<button
+													type="button"
+													onClick={() => setSelectedProduct(selectedProduct === s.productId ? null : s.productId)}
+													className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
+												>
 													{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
 													{botInfo ? botInfo.name : s.productId}
-												</span>
+												</button>
 											</div>
 										</motion.div>
 									);

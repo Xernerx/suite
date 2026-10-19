@@ -271,13 +271,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 								<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 									<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 										<label className="block text-xs font-medium text-(--text)">{t('admin.users.displayNameLabel')}</label>
-										<input
-											type="text"
-											value={name}
-											onChange={(e) => setName(e.target.value)}
-											className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-											style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
-										/>
+										<Input type="text" value={name} onChange={(e) => setName(e.target.value)} />
 									</div>
 
 									<div
@@ -287,16 +281,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 										}}
 									>
 										<label className="block text-xs font-medium text-(--text)">{t('admin.users.stripeCustomerIdLabel')}</label>
-										<input
-											type="text"
-											value={stripeCustomerId}
-											onChange={(e) => setStripeCustomerId(e.target.value)}
-											placeholder={t('admin.users.stripeCustomerPlaceholder')}
-											className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-											style={{
-												padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-											}}
-										/>
+										<Input type="text" value={stripeCustomerId} onChange={(e) => setStripeCustomerId(e.target.value)} placeholder={t('admin.users.stripeCustomerPlaceholder')} />
 									</div>
 								</div>
 
@@ -369,15 +354,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									}}
 								>
 									<label className="block text-xs font-medium text-(--text)">{t('admin.users.descriptionLabel')}</label>
-									<textarea
-										value={description}
-										onChange={(e) => setDescription(e.target.value)}
-										rows={3}
-										className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none"
-										style={{
-											padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
-										}}
-									/>
+									<Input variant="textarea" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="resize-none" />
 								</div>
 
 								<div

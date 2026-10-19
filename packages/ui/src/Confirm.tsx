@@ -3,6 +3,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Info, Loader2 } from 'lucide-react';
+import { useDictionary } from '@xernerx/providers';
+import { Input } from './Input';
 
 interface ConfirmProps {
 	open: boolean;
@@ -13,7 +15,8 @@ interface ConfirmProps {
 	cancelText?: string;
 	onConfirm: () => void | Promise<void>;
 	loading?: boolean;
-	variant?: 'danger' | 'primary';
+	variant?: 'danger' | 'warning' | 'primary';
+	confirmKeyword?: string;
 }
 
 const variantStyles = {
@@ -22,6 +25,11 @@ const variantStyles = {
 		iconWrapper: 'bg-(--accent-red)/10 text-(--accent-red)',
 		button: 'bg-(--accent-red) text-white hover:bg-red-600',
 	},
+	warning: {
+		icon: AlertTriangle,
+		iconWrapper: 'bg-(--accent-orange)/10 text-(--accent-orange)',
+		button: 'bg-(--accent-orange) text-white hover:bg-(--accent-orange)/80',
+	},
 	primary: {
 		icon: Info,
 		iconWrapper: 'bg-(--accent)/10 text-(--accent)',
@@ -29,16 +37,35 @@ const variantStyles = {
 	},
 };
 
-export function Confirm({ open, onOpenChange, title, description, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, loading = false, variant = 'danger' }: ConfirmProps) {
+export function Confirm({ open, onOpenChange, title, description, confirmText = 'Confirm', cancelText = 'Cancel', onConfirm, loading = false, variant = 'danger', confirmKeyword }: ConfirmProps) {
+	const { t } = useDictionary();
 	const [mounted, setMounted] = useState(false);
+	const [typedValue, setTypedValue] = useState('');
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
 
+	useEffect(() => {
+		if (!open) {
+			setTypedValue('');
+		}
+	}, [open]);
+
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if (e.key === 'Escape' && open && !loading) {
+				onOpenChange(false);
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, [open, loading, onOpenChange]);
+
 	if (!open || !mounted) return null;
 
 	const { icon: Icon, iconWrapper, button } = variantStyles[variant];
+	const isKeywordMatched = !confirmKeyword || typedValue === confirmKeyword;
 
 	const confirmContent = (
 		<div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200 font-sans antialiased text-(--text)">
@@ -58,6 +85,29 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 					</div>
 				</div>
 
+				{confirmKeyword && (
+					<div className="flex flex-col gap-2 pt-1">
+						<label className="text-xs text-(--text-muted) flex items-center gap-1.5 flex-wrap">
+							<span>{t('common.confirm.typeToConfirmBefore')}</span>
+							<code className="px-1.5 py-0.5 rounded-md bg-(--foreground) border border-(--border)/15 font-mono font-bold text-(--text) select-all">{confirmKeyword}</code>
+							<span>{t('common.confirm.typeToConfirmAfter')}</span>
+						</label>
+						<Input
+							type="text"
+							value={typedValue}
+							onChange={(e) => setTypedValue(e.target.value)}
+							placeholder={confirmKeyword}
+							autoFocus
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' && isKeywordMatched && !loading) {
+									e.preventDefault();
+									onConfirm();
+								}
+							}}
+						/>
+					</div>
+				)}
+
 				<div className="flex items-center justify-end" style={{ gap: 'calc(var(--ui-gap) * 0.5)', paddingTop: 'calc(var(--ui-gap) * 0.5)' }}>
 					<button
 						type="button"
@@ -70,9 +120,9 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 					</button>
 					<button
 						type="button"
-						disabled={loading}
+						disabled={loading || !isKeywordMatched}
 						onClick={onConfirm}
-						className={`flex items-center justify-center rounded-xl text-sm font-medium transition-colors disabled:opacity-50 shadow-sm ${button}`}
+						className={`flex items-center justify-center rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none shadow-sm ${button}`}
 						style={{ padding: 'calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 1.25)', gap: 'calc(var(--ui-gap) * 0.5)' }}
 					>
 						{loading && <Loader2 size={16} className="animate-spin" />}

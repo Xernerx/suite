@@ -1,8 +1,9 @@
 /** @format */
 'use client';
 
+import { useState } from 'react';
 import { Shield, AlertTriangle, Trash2 } from 'lucide-react';
-import { Selector } from '@xernerx/ui';
+import { Confirm, Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import WidgetSettingsCard from '@/components/WidgetSettingsCard';
 
@@ -14,6 +15,7 @@ interface OrgSettingsTabProps {
 
 export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDeleteOpen }: OrgSettingsTabProps) {
 	const { t } = useDictionary();
+	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -63,7 +65,8 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDe
 					<p className="text-xs text-(--accent-orange)/80">{t('app.portal.settings.resetDesc')}</p>
 				</div>
 				<button
-					onClick={() => setOrgConfig({ ...orgConfig, description: '', info: '', locale: '', links: {}, widgets: false })}
+					type="button"
+					onClick={() => setIsResetConfirmOpen(true)}
 					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
@@ -88,6 +91,7 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDe
 					<p className="text-xs text-(--accent-red)/80">{t('app.portal.settings.deleteDesc')}</p>
 				</div>
 				<button
+					type="button"
 					onClick={() => setIsConfirmDeleteOpen(true)}
 					className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm disabled:opacity-50 disabled:pointer-events-none"
 					style={{
@@ -99,6 +103,21 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, setIsConfirmDe
 					<span>{t('app.portal.settings.deleteOrg')}</span>
 				</button>
 			</div>
+
+			<Confirm
+				open={isResetConfirmOpen}
+				onOpenChange={setIsResetConfirmOpen}
+				title={t('app.portal.modals.reset.title')}
+				description={t('app.portal.modals.reset.desc')}
+				confirmText={t('app.portal.modals.reset.confirm')}
+				cancelText={t('app.portal.modals.reset.cancel')}
+				variant="warning"
+				confirmKeyword="RESET"
+				onConfirm={() => {
+					setOrgConfig({ ...orgConfig, description: '', info: '', locale: '', links: {}, widgets: false });
+					setIsResetConfirmOpen(false);
+				}}
+			/>
 		</div>
 	);
 }

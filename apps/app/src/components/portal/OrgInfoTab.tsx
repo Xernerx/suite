@@ -115,11 +115,12 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 							{orgConfig.info ? <ReactMarkdown>{orgConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">{t('app.portal.info.nothingToPreview')}</span>}
 						</div>
 					) : (
-						<textarea
+						<Input
+							variant="textarea"
 							value={orgConfig.info || ''}
 							onChange={(e) => setOrgConfig({ ...orgConfig, info: e.target.value })}
 							placeholder={t('app.portal.placeholders.extendedInfo')}
-							className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
+							className="min-h-[120px]"
 						/>
 					)}
 				</div>

@@ -2,7 +2,7 @@
 'use client';
 
 import { Check, Copy, Eye, EyeOff, Loader2, Save, Trash2 } from 'lucide-react';
-import { Button, Confirm, Modal, Toggle } from '@xernerx/ui';
+import { Button, Confirm, Input, Modal, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
@@ -196,13 +196,7 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 								}}
 							>
 								<label className="text-sm font-medium text-(--text)">{t('account.tokens.manage.nameLabel')}</label>
-								<input
-									type="text"
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-									className="w-full rounded-xl border border-(--border)/20 bg-(--background) px-4 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--accent)"
-									required
-								/>
+								<Input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
 							</div>
 
 							{token.botId && (

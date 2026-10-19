@@ -6,151 +6,7 @@ import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Activity, ExternalLink, Gauge, Globe, RefreshCw, Search } from 'lucide-react';
-import OverviewSummaryCards from './OverviewSummaryCards';
-
-interface SuiteAppVersionInfo {
-	id: string;
-	name: string;
-	domain: string;
-	localVersion: string | null;
-	devVersion: string | null;
-	canaryVersion: string | null;
-	prodVersion: string | null;
-	devLatencyMs: number | null;
-	canaryLatencyMs: number | null;
-	prodLatencyMs: number | null;
-	versions: string[];
-}
-
-interface LighthouseScoreData {
-	seo: number;
-	perf: number;
-	a11y: number;
-	bp: number;
-	updatedAt: number;
-}
-
-const LIGHTHOUSE_STORAGE_KEY = 'xernerx_lighthouse_scores_v1';
-
-const FALLBACK_APPS: SuiteAppVersionInfo[] = [
-	{
-		id: 'www',
-		name: 'Website',
-		domain: 'www.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'app',
-		name: 'App',
-		domain: 'app.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'account',
-		name: 'Account',
-		domain: 'account.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'store',
-		name: 'Store',
-		domain: 'store.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'info',
-		name: 'Info & Support',
-		domain: 'info.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'docs',
-		name: 'Docs',
-		domain: 'docs.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'admin',
-		name: 'Admin',
-		domain: 'admin.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'api',
-		name: 'API',
-		domain: 'api.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-	{
-		id: 'cdn',
-		name: 'CDN',
-		domain: 'cdn.xernerx.com',
-		localVersion: null,
-		devVersion: null,
-		canaryVersion: null,
-		prodVersion: null,
-		devLatencyMs: null,
-		canaryLatencyMs: null,
-		prodLatencyMs: null,
-		versions: [],
-	},
-];
+import OverviewSummaryCards, { FALLBACK_APPS, LIGHTHOUSE_STORAGE_KEY, type LighthouseScoreData, type SuiteAppVersionInfo } from './OverviewSummaryCards';
 
 export default function Overview() {
 	const { getEnvUrl, isDev } = useEnvironment();
@@ -165,7 +21,7 @@ export default function Overview() {
 
 	const [pings, setPings] = useState<Record<string, number | null>>({});
 	const [pingingKeys, setPingingKeys] = useState<Record<string, boolean>>({});
-	const [devLiveVersions, setDevLiveVersions] = useState<Record<string, string | null>>({});
+	const [liveVersions, setLiveVersions] = useState<Record<string, string | null>>({});
 
 	const [lighthouseScores, setLighthouseScores] = useState<Record<string, LighthouseScoreData>>({});
 	const [lighthouseLoading, setLighthouseLoading] = useState<Record<string, boolean>>({});
@@ -210,28 +66,42 @@ export default function Overview() {
 		[getEnvUrl, toast, t]
 	);
 
-	const measureSitePing = useCallback(async (key: string, versionEndpointUrl: string, appId?: string, isDevTarget?: boolean) => {
+	const measureSitePing = useCallback(async (key: string, versionEndpointUrl: string) => {
 		setPingingKeys((prev) => ({ ...prev, [key]: true }));
 		const start = Date.now();
 		try {
 			const controller = new AbortController();
 			const timeout = setTimeout(() => controller.abort(), 5000);
 			const res = await fetch(versionEndpointUrl, {
-				mode: isDevTarget ? 'cors' : 'no-cors',
+				mode: 'cors',
 				cache: 'no-store',
 				signal: controller.signal,
 			});
 			clearTimeout(timeout);
 			const elapsed = Date.now() - start;
 			setPings((prev) => ({ ...prev, [key]: elapsed }));
-			if (isDevTarget && appId && res.ok) {
+			if (res.ok) {
 				const data = await res.json().catch(() => null);
 				if (data?.version) {
-					setDevLiveVersions((prev) => ({ ...prev, [appId]: String(data.version).trim() }));
+					setLiveVersions((prev) => ({ ...prev, [key]: String(data.version).trim() }));
 				}
 			}
 		} catch {
-			setPings((prev) => ({ ...prev, [key]: null }));
+			const fallbackStart = Date.now();
+			try {
+				const fallbackController = new AbortController();
+				const fallbackTimeout = setTimeout(() => fallbackController.abort(), 5000);
+				await fetch(versionEndpointUrl, {
+					mode: 'no-cors',
+					cache: 'no-store',
+					signal: fallbackController.signal,
+				});
+				clearTimeout(fallbackTimeout);
+				const elapsed = Date.now() - fallbackStart;
+				setPings((prev) => ({ ...prev, [key]: elapsed }));
+			} catch {
+				setPings((prev) => ({ ...prev, [key]: null }));
+			}
 		} finally {
 			setPingingKeys((prev) => ({ ...prev, [key]: false }));
 		}
@@ -239,14 +109,18 @@ export default function Overview() {
 
 	const measureAllPings = useCallback(
 		async (appList: SuiteAppVersionInfo[]) => {
-			if (!isDev) return;
-			await Promise.all(
-				appList.map((app) => {
-					const prodHost = app.id === 'www' ? 'www.xernerx.com' : `${app.id}.xernerx.com`;
+			const tasks: Promise<void>[] = [];
+			for (const app of appList) {
+				const prodHost = app.id === 'www' ? 'www.xernerx.com' : `${app.id}.xernerx.com`;
+				const canaryHost = `${app.id}.canary.xernerx.com`;
+				tasks.push(measureSitePing(`${app.id}-prod`, `https://${prodHost}/api/version`));
+				tasks.push(measureSitePing(`${app.id}-canary`, `https://${canaryHost}/api/version`));
+				if (isDev) {
 					const devVersionUrl = getEnvUrl(`https://${prodHost}/api/version`);
-					return measureSitePing(`${app.id}-dev`, devVersionUrl, app.id, true);
-				})
-			);
+					tasks.push(measureSitePing(`${app.id}-dev`, devVersionUrl));
+				}
+			}
+			await Promise.all(tasks);
 		},
 		[measureSitePing, getEnvUrl, isDev]
 	);
@@ -255,7 +129,7 @@ export default function Overview() {
 		if (forceRefresh) setRefreshing(true);
 		try {
 			const [versionsRes, issuesRes, metricsRes] = await Promise.all([
-				fetch(getEnvUrl(`https://api.xernerx.com/secure/core/versions${forceRefresh ? '?refresh=true' : ''}`), { credentials: 'include' })
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/core/versions${forceRefresh ? '?refresh=true' : ''}`), { credentials: 'include', cache: 'no-store' })
 					.then((r) => (r.ok ? r.json() : null))
 					.catch(() => null),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/issues'), { credentials: 'include' })
@@ -297,9 +171,15 @@ export default function Overview() {
 	const avgHours = metrics?.avgResolutionTime ? (metrics.avgResolutionTime / (1000 * 60 * 60)).toFixed(1) : null;
 
 	const syncedCount = apps.filter((a) => {
-		return a.prodVersion && a.canaryVersion && a.prodVersion === a.canaryVersion;
+		const pVer = liveVersions[`${a.id}-prod`] || a.prodVersion;
+		const cVer = liveVersions[`${a.id}-canary`] || a.canaryVersion;
+		return pVer && cVer && pVer === cVer;
 	}).length;
-	const canaryAheadCount = apps.filter((a) => a.canaryVersion && (!a.prodVersion || a.canaryVersion !== a.prodVersion)).length;
+	const canaryAheadCount = apps.filter((a) => {
+		const pVer = liveVersions[`${a.id}-prod`] || a.prodVersion;
+		const cVer = liveVersions[`${a.id}-canary`] || a.canaryVersion;
+		return cVer && (!pVer || cVer !== pVer);
+	}).length;
 
 	const getPingColor = (ms: number | null) => {
 		if (ms === null) return 'text-(--text-muted)';
@@ -360,8 +240,10 @@ export default function Overview() {
 						const devUrl = `https://${devHost}/`;
 						const devReachableUrl = getEnvUrl(prodUrl);
 
-						const resolvedDevVer = app.devVersion || devLiveVersions[app.id] || null;
-						const isSynced = Boolean(app.prodVersion && app.canaryVersion && app.prodVersion === app.canaryVersion);
+						const resolvedProdVer = liveVersions[`${app.id}-prod`] || app.prodVersion || null;
+						const resolvedCanaryVer = liveVersions[`${app.id}-canary`] || app.canaryVersion || null;
+						const resolvedDevVer = liveVersions[`${app.id}-dev`] || app.devVersion || null;
+						const isSynced = Boolean(resolvedProdVer && resolvedCanaryVer && resolvedProdVer === resolvedCanaryVer);
 
 						const envBoxes = [
 							{
@@ -373,9 +255,8 @@ export default function Overview() {
 								publicUrl: prodUrl,
 								siteHref: prodUrl,
 								versionEndpoint: `${prodUrl}api/version`,
-								displayVersion: app.prodVersion ? `v${app.prodVersion}` : '—',
+								displayVersion: resolvedProdVer ? `v${resolvedProdVer}` : '—',
 								pingMs: pings[`${app.id}-prod`] ?? app.prodLatencyMs ?? null,
-								isDevTarget: false,
 							},
 							{
 								key: `${app.id}-canary`,
@@ -386,9 +267,8 @@ export default function Overview() {
 								publicUrl: canaryUrl,
 								siteHref: canaryUrl,
 								versionEndpoint: `${canaryUrl}api/version`,
-								displayVersion: app.canaryVersion ? `v${app.canaryVersion}` : '—',
+								displayVersion: resolvedCanaryVer ? `v${resolvedCanaryVer}` : '—',
 								pingMs: pings[`${app.id}-canary`] ?? app.canaryLatencyMs ?? null,
-								isDevTarget: false,
 							},
 							...(isDev
 								? [
@@ -403,7 +283,6 @@ export default function Overview() {
 											versionEndpoint: `${devReachableUrl.replace(/\/$/, '')}/api/version`,
 											displayVersion: resolvedDevVer ? `v${resolvedDevVer}` : '—',
 											pingMs: pings[`${app.id}-dev`] ?? app.devLatencyMs ?? null,
-											isDevTarget: true,
 										},
 									]
 								: []),
@@ -543,7 +422,7 @@ export default function Overview() {
 												<div className="w-full flex items-center justify-between gap-2 text-[11px] text-(--text-muted) pt-1 border-t border-(--border)/10">
 													<button
 														type="button"
-														onClick={() => measureSitePing(env.key, env.versionEndpoint, app.id, env.isDevTarget)}
+														onClick={() => measureSitePing(env.key, env.versionEndpoint)}
 														title={t('admin.dashboard.overview.repingTooltip')}
 														className={`inline-flex items-center gap-1 font-mono cursor-pointer hover:opacity-80 transition-opacity ${getPingColor(env.pingMs)}`}
 													>

@@ -116,11 +116,32 @@ function BotCard({ bot }: { bot: BotProfile }) {
 function BotsListContent() {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
-	const { view, setNavItems, show, hide } = useSidebar();
+	const { view, setView, setNavItems, show, hide } = useSidebar();
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const [bots, setBots] = useState<BotProfile[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+	const [prevView, setPrevView] = useState<string | null>(view);
+
+	// Sync ?category= query param into active sidebar view
+	useEffect(() => {
+		const categoryParam = searchParams.get('category');
+		if (categoryParam) {
+			setView(categoryParam);
+		}
+	}, [searchParams, setView]);
+
+	// Clear ?search= query when user clicks a sidebar category
+	useEffect(() => {
+		if (view && view !== prevView) {
+			setPrevView(view);
+			if (searchParams.get('search')) {
+				setSearchInput('');
+				router.replace('/bots', { scroll: false });
+			}
+		}
+	}, [view, prevView, searchParams, router]);
 
 	// Setup Sidebar Navigation
 	useEffect(() => {
@@ -165,14 +186,14 @@ function BotsListContent() {
 	// Fetch Bots based on Sidebar View or Search Query
 	useEffect(() => {
 		if (!isReady) return;
-		const fetchBots = async () => {
-			const searchQuery = searchParams.get('search');
+		const timer = setTimeout(async () => {
+			const activeSearch = searchInput.trim() || searchParams.get('search') || '';
 			let query = '';
 
-			if (searchQuery) {
-				query = `?search=${encodeURIComponent(searchQuery)}&limit=50`;
+			if (activeSearch) {
+				query = `?search=${encodeURIComponent(activeSearch)}&limit=50`;
 			} else {
-				const currentCategory = view || 'biggest';
+				const currentCategory = searchParams.get('category') || view || 'biggest';
 
 				if (currentCategory.startsWith('tag-')) {
 					const tag = currentCategory.replace('tag-', '');
@@ -194,9 +215,13 @@ function BotsListContent() {
 			} finally {
 				setLoading(false);
 			}
-		};
-		fetchBots();
-	}, [view, getEnvUrl, searchParams, isReady]);
+		}, 180);
+
+		return () => clearTimeout(timer);
+	}, [view, getEnvUrl, searchParams, searchInput, isReady]);
+
+	const activeSearchLabel = searchInput.trim() || searchParams.get('search');
+	const effectiveView = searchParams.get('category') || view;
 
 	return (
 		<div className="flex flex-col w-full min-h-screen">
@@ -204,17 +229,17 @@ function BotsListContent() {
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
 				<div className="flex items-center gap-4">
 					<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{searchParams.get('search')
-							? `${t('common.search')}: ${searchParams.get('search')}`
-							: view?.startsWith('tag-')
-								? `#${view.replace('tag-', '')}`
-								: view === 'all'
+						{activeSearchLabel
+							? `${t('common.search')}: ${activeSearchLabel}`
+							: effectiveView?.startsWith('tag-')
+								? `#${effectiveView.replace('tag-', '')}`
+								: effectiveView === 'all'
 									? t('app.bots.nav.allBots')
-									: view === 'top_voted'
+									: effectiveView === 'top_voted'
 										? t('app.categories.topVoted')
-										: view === 'newcomers'
+										: effectiveView === 'newcomers'
 											? t('app.categories.newcomers')
-											: view === 'promoted'
+											: effectiveView === 'promoted'
 												? t('app.categories.promoted')
 												: t('app.categories.biggestBots')}
 					</h1>
@@ -223,14 +248,15 @@ function BotsListContent() {
 				<div className="relative max-w-sm w-full">
 					<Input
 						variant="search"
-						shortcut="/"
+						shortcut="K"
 						placeholder={t('app.bots.placeholder1')}
-						defaultValue={searchParams.get('search') || ''}
+						value={searchInput}
+						onChange={(e) => setSearchInput(e.target.value)}
 						onSearch={(val) => {
 							if (val.trim()) {
 								router.push(`/bots?search=${encodeURIComponent(val.trim())}`);
 							} else {
-								router.push(`/bots?view=${view || 'biggest'}`);
+								router.push(`/bots?view=${effectiveView || 'biggest'}`);
 							}
 						}}
 					/>

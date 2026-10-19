@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Modal, Selector, Toggle } from '@xernerx/ui';
+import { Button, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import type { Token } from './types';
 import { BotProfilePreview } from './BotProfilePreview';
@@ -65,17 +65,7 @@ export function CreateTokenModal({
 					}}
 				>
 					<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.create.nameLabel')}</label>
-					<input
-						type="text"
-						placeholder={t('admin.tokens.create.namePlaceholder')}
-						value={newName}
-						onChange={(e) => setNewName(e.target.value)}
-						className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-						style={{
-							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-						}}
-						required
-					/>
+					<Input type="text" placeholder={t('admin.tokens.create.namePlaceholder')} value={newName} onChange={(e) => setNewName(e.target.value)} required />
 				</div>
 				<div
 					className="flex flex-col"
@@ -121,16 +111,7 @@ export function CreateTokenModal({
 							</div>
 						)}
 						<div className="relative w-full">
-							<input
-								type="text"
-								placeholder={t('admin.tokens.edit.botIdPlaceholder')}
-								value={newBotId}
-								onChange={(e) => setNewBotId(e.target.value)}
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-								style={{
-									padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-								}}
-							/>
+							<Input type="text" placeholder={t('admin.tokens.edit.botIdPlaceholder')} value={newBotId} onChange={(e) => setNewBotId(e.target.value)} />
 						</div>
 					</div>
 				</div>

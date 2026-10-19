@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Coins, Copy, Flame, Gift, Monitor, Pencil, ShieldAlert, ShieldCheck, Smartphone, Sparkles, Tablet, UserIcon, Zap } from 'lucide-react';
+import { Coins, Copy, ExternalLink, Flame, Gift, Monitor, Pencil, ShieldAlert, ShieldCheck, Smartphone, Sparkles, Tablet, UserIcon, Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, usePlatform, useUser, useToast } from '@xernerx/providers';
 
@@ -95,6 +95,7 @@ export default function SidebarUserCard({
 	const copyUserId = () => {
 		if (activeUser?.id) {
 			navigator.clipboard.writeText(activeUser.id);
+			toast({ type: 'success', title: t('components.cards.sidebaruser.userIdCopied'), description: String(activeUser.id) });
 		}
 	};
 
@@ -195,7 +196,7 @@ export default function SidebarUserCard({
 					{hasActiveSub && (
 						<div className="flex items-center gap-1 bg-(--accent)/10 text-(--accent) text-[10px] font-bold px-2.5 py-1 rounded-full border border-(--accent)/20 mt-1">
 							<ShieldCheck size={12} />
-							<span>{activeUser?.staffSubscription ? 'Staff' : 'Pro'}</span>
+							<span>{activeUser?.staffSubscription ? t('components.cards.sidebaruser.staffBadge') : t('components.cards.sidebaruser.proBadge')}</span>
 						</div>
 					)}
 				</div>
@@ -235,7 +236,7 @@ export default function SidebarUserCard({
 					<div className="flex flex-wrap items-center gap-1">
 						{activeRoles.map((r) => (
 							<span key={r.id} className="text-[10px] px-2 py-0.5 rounded-md bg-(--accent)/10 text-(--accent) font-semibold truncate">
-								{r.name || 'Unnamed Role'}
+								{r.name || t('components.cards.sidebaruser.unnamedRole')}
 							</span>
 						))}
 					</div>
@@ -247,7 +248,7 @@ export default function SidebarUserCard({
 						<div className="flex items-center gap-1.5 text-xs font-extrabold text-(--accent)">
 							<Sparkles size={13} className="text-(--accent)" />
 							<span>
-								{t('components.cards.sidebaruser.level') || 'Level'} {currentLevel}
+								{t('components.cards.sidebaruser.level')} {currentLevel}
 							</span>
 						</div>
 						<span className="text-[10px] text-(--text-muted) font-mono font-medium">
@@ -293,6 +294,21 @@ export default function SidebarUserCard({
 
 				{/* Action Menu */}
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					{activeUser?.id && (
+						<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
+							<Button>
+								<Link
+									href={getEnvUrl(`https://app.xernerx.com/users/${activeUser.id}`)}
+									onClick={onClose}
+									className="flex"
+									style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
+								>
+									<ExternalLink size={16} className="shrink-0" /> <span className="truncate">{t('components.cards.sidebaruser.viewPublicProfile')}</span>
+								</Link>
+							</Button>
+						</div>
+					)}
+
 					<div className="bg-(--foreground)/30 backdrop-blur-md/20 rounded-xl flex flex-col overflow-hidden text-sm font-semibold text-(--text-muted) border border-(--border)/5">
 						<Button>
 							<Link

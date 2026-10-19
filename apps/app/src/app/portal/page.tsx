@@ -110,9 +110,14 @@ export default function PortalPage() {
 
 					const params = new URLSearchParams(window.location.search);
 					const orgParam = params.get('org');
+					const tabParam = params.get('tab');
+					const validTabs = ['info', 'members', 'roles', 'bots', 'servers', 'links', 'settings'];
+					if (tabParam && validTabs.includes(tabParam)) {
+						setActiveTab(tabParam);
+					}
 
 					let matched = false;
-					if (orgParam) {
+					if (orgParam && orgParam !== 'personal') {
 						const targetOrg = userOrgs.find((o: any) => o._id === orgParam);
 						if (targetOrg) {
 							setSelectedOrg(targetOrg);
@@ -206,6 +211,7 @@ export default function PortalPage() {
 				onClick: () => {
 					setSelectedOrg('personal');
 					setView('org-personal');
+					router.replace('/portal?org=personal', { scroll: false });
 				},
 				category: t('app.portal.categories.organizations'),
 				icon: User as any,
@@ -216,6 +222,7 @@ export default function PortalPage() {
 				onClick: () => {
 					setSelectedOrg(org);
 					setView(`org-${org._id}`);
+					router.replace(`/portal?org=${org._id}&tab=${activeTab}`, { scroll: false });
 				},
 				category: t('app.portal.categories.organizations'),
 				icon: org.iconUrl
@@ -421,7 +428,10 @@ export default function PortalPage() {
 							<div className="flex flex-col w-full gap-8 mt-4">
 								<Tabs
 									activeTab={activeTab}
-									onChange={setActiveTab}
+									onChange={(tab) => {
+										setActiveTab(tab);
+										router.replace(`/portal?org=${selectedOrg._id}&tab=${tab}`, { scroll: false });
+									}}
 									tabs={[
 										{ id: 'info', label: t('app.portal.tabs.info') },
 										{ id: 'members', label: t('app.portal.tabs.members') },
@@ -475,6 +485,7 @@ export default function PortalPage() {
 				description={t('app.portal.modals.delete.desc')}
 				confirmText={t('app.portal.modals.delete.confirm')}
 				cancelText={t('app.portal.modals.delete.cancel')}
+				confirmKeyword={selectedOrg && selectedOrg !== 'personal' ? selectedOrg.name : 'DELETE'}
 				onConfirm={handleDeleteOrg}
 				loading={deleting}
 			/>
