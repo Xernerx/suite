@@ -1,5 +1,27 @@
 # @xernerx/providers
 
+## 0.8.0
+
+### Minor Changes
+
+- Streamlined UI
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.5.3
+
+## 0.7.0
+
+### Minor Changes
+
+- Streamlined UI
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.5.2
+
 ## 0.6.6
 
 ### Patch Changes

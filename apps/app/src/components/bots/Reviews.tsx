@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useUser, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Confirm } from '@xernerx/ui';
+import { Button, Confirm, Input } from '@xernerx/ui';
 import { Star, Trash2, ShieldCheck, ThumbsUp, ThumbsDown, MessageSquareReply } from 'lucide-react';
 import Image from 'next/image';
 
@@ -232,11 +232,12 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 							</button>
 						))}
 					</div>
-					<textarea
+					<Input
+						variant="textarea"
 						value={reviewContent}
 						onChange={(e) => setReviewContent(e.target.value)}
 						placeholder={t('app.bots.reviews.placeholder')}
-						className="w-full bg-(--background) border border-(--border)/10 rounded-xl p-4 text-sm resize-none focus:outline-none focus:border-(--accent) transition-colors h-32"
+						className="resize-none h-32"
 						maxLength={2000}
 					/>
 					<div className="flex justify-between items-center">
@@ -325,11 +326,12 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 
 						{replyingToReview === review._id && (
 							<div className="mt-2 flex flex-col gap-2">
-								<textarea
+								<Input
+									variant="textarea"
 									value={devResponseContent}
 									onChange={(e) => setDevResponseContent(e.target.value)}
 									placeholder={t('app.bots.reviews.replyPlaceholder')}
-									className="w-full bg-(--background) border border-(--border)/10 rounded-xl p-3 text-sm resize-none focus:outline-none focus:border-(--accent) transition-colors h-24"
+									className="resize-none h-24"
 									maxLength={2000}
 								/>
 								<div className="flex justify-end gap-2">

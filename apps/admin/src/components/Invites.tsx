@@ -229,49 +229,22 @@ export default function Invites() {
 					<div className="grid grid-cols-2 gap-4">
 						<div className="flex flex-col gap-2">
 							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.urlSlug')}</label>
-							<input
-								type="text"
-								value={newId}
-								onChange={(e) => setNewId(e.target.value)}
-								required
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderTodo')}
-							/>
+							<Input type="text" value={newId} onChange={(e) => setNewId(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderTodo')} />
 						</div>
 						<div className="flex flex-col gap-2">
 							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.appName')}</label>
-							<input
-								type="text"
-								value={newName}
-								onChange={(e) => setNewName(e.target.value)}
-								required
-								className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-								placeholder={t('admin.dashboard.invites.placeholderAppName')}
-							/>
+							<Input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderAppName')} />
 						</div>
 					</div>
 
 					<div className="flex flex-col gap-2">
 						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.clientId')}</label>
-						<input
-							type="text"
-							value={newClientId}
-							onChange={(e) => setNewClientId(e.target.value)}
-							required
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-							placeholder={t('admin.dashboard.invites.placeholderClientId')}
-						/>
+						<Input type="text" value={newClientId} onChange={(e) => setNewClientId(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderClientId')} />
 					</div>
 
 					<div className="flex flex-col gap-2">
 						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.scopes')}</label>
-						<input
-							type="text"
-							value={newScopes}
-							onChange={(e) => setNewScopes(e.target.value)}
-							required
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 p-3 text-sm focus:ring-2 focus:ring-(--accent)"
-						/>
+						<Input type="text" value={newScopes} onChange={(e) => setNewScopes(e.target.value)} required />
 					</div>
 
 					<div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-2 rounded-xl bg-(--foreground)/10 border border-(--border)/10 p-4">

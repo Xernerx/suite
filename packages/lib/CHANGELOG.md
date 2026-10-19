@@ -1,5 +1,17 @@
 # @xernerx/lib
 
+## 1.5.3
+
+### Patch Changes
+
+- Streamlined UI
+
+## 1.5.2
+
+### Patch Changes
+
+- Streamlined UI
+
 ## 1.5.1
 
 ### Patch Changes

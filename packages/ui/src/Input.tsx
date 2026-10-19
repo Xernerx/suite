@@ -69,6 +69,7 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', ..
 				<input
 					ref={inputRef as React.RefObject<HTMLInputElement>}
 					type="text"
+					data-search-shortcut={activeShortcut ? activeShortcut.toLowerCase() : undefined}
 					className={`${baseClasses} block w-full h-[56px] py-0 pl-6 pr-32 text-base rounded-full shadow-lg`}
 					onKeyDown={handleKeyDown}
 					{...(props as React.InputHTMLAttributes<HTMLInputElement>)}
@@ -99,6 +100,7 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', ..
 		<input
 			ref={inputRef as React.RefObject<HTMLInputElement>}
 			type={variant}
+			data-search-shortcut={activeShortcut ? activeShortcut.toLowerCase() : undefined}
 			className={`${baseClasses} rounded-xl p-3 w-full ${className}`}
 			{...(props as React.InputHTMLAttributes<HTMLInputElement>)}
 		/>

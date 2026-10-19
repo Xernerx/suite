@@ -106,11 +106,52 @@
 			}
 		},
 		"shortcuts": {
+			"items": {
+				"toggleHelp": "Toggle help menu",
+				"searchOrPalette": "Focus page search or open command palette",
+				"openAppDrawer": "Open App Drawer",
+				"toggleSidebar": "Toggle application sidebar visibility",
+				"toggleOmnibar": "Toggle URL omnibar",
+				"toggleNotifications": "Toggle notifications drawer",
+				"openAccountSettings": "Open account settings",
+				"saveChanges": "Save unsaved changes",
+				"switchSidebarViews": "Switch sidebar views or tabs",
+				"copyUrl": "Copy current suite URL",
+				"reloadApp": "Reload the application state",
+				"closeModals": "Close active overlays or modals"
+			},
 			"modal": {
 				"navigation": {
 					"title": "App Drawer",
 					"description": "Quickly launch and switch between applications",
+					"searchPlaceholder": "Filter applications...",
+					"navigateHint": "Use arrow keys to select, Enter to open",
 					"empty": "No applications available."
+				},
+				"palette": {
+					"title": "Command Palette",
+					"placeholder": "Search views, quick actions, or suite applications...",
+					"empty": "No matching commands or pages found.",
+					"sections": {
+						"views": "Current Page Views",
+						"actions": "Quick Actions",
+						"apps": "Suite Applications"
+					},
+					"actions": {
+						"switchThemeLight": "Switch to Light Theme",
+						"switchThemeDark": "Switch to Dark Theme",
+						"toggleSidebar": "Toggle Sidebar",
+						"openAppDrawer": "Open App Drawer",
+						"toggleOmnibar": "Toggle URL Omnibar",
+						"copyUrl": "Copy Current Suite URL",
+						"openShortcuts": "View Keyboard Shortcuts",
+						"openAccount": "Open Account Settings"
+					},
+					"footer": {
+						"navigate": "to navigate",
+						"select": "to select",
+						"close": "to close"
+					}
 				}
 			}
 		},
@@ -3445,6 +3486,14 @@
 		"home": {
 			"title": "Support",
 			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
+			"searchPlaceholder": "Search FAQ, known issues, suggestions, and roadmap...",
+			"searchEmpty": "No results found matching \"{query}\".",
+			"searchCategories": {
+				"faq": "FAQ",
+				"issues": "Issues",
+				"suggestions": "Suggestions",
+				"roadmap": "Roadmap"
+			},
 			"portals": {
 				"roadmap": {
 					"title": "Roadmap",

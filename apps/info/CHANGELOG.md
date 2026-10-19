@@ -1,5 +1,29 @@
 # info
 
+## 1.3.7
+
+### Patch Changes
+
+- Streamlined UI
+- Updated dependencies
+    - @xernerx/providers@0.8.0
+    - @xernerx/components@0.6.5
+    - @xernerx/lib@1.5.3
+    - @xernerx/ui@0.4.3
+    - @xernerx/feedback@0.0.36
+
+## 1.3.6
+
+### Patch Changes
+
+- Streamlined UI
+- Updated dependencies
+    - @xernerx/providers@0.7.0
+    - @xernerx/components@0.6.4
+    - @xernerx/lib@1.5.2
+    - @xernerx/ui@0.4.2
+    - @xernerx/feedback@0.0.35
+
 ## 1.3.5
 
 ### Patch Changes

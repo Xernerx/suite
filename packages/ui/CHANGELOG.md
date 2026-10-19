@@ -1,5 +1,21 @@
 # @xernerx/ui
 
+## 0.4.3
+
+### Patch Changes
+
+- Streamlined UI
+- Updated dependencies
+    - @xernerx/providers@0.8.0
+
+## 0.4.2
+
+### Patch Changes
+
+- Streamlined UI
+- Updated dependencies
+    - @xernerx/providers@0.7.0
+
 ## 0.4.1
 
 ### Patch Changes

@@ -5,6 +5,7 @@ import { Check, Clock, FileText, Loader2, ShieldAlert, User, X } from 'lucide-re
 import { useEffect, useState } from 'react';
 import { useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { useDictionary } from '@xernerx/providers';
+import { Input } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Application {
@@ -358,11 +359,12 @@ export default function ApplicationReviews() {
 
 								<div className="flex flex-col gap-3 pt-6 border-t border-(--border)/10">
 									<label className="text-sm font-bold text-(--text-muted) uppercase tracking-widest">{t('admin.dashboard.applicationReviews.reviewerNotes')}</label>
-									<textarea
+									<Input
+										variant="textarea"
 										value={reviewNote}
 										onChange={(e) => setReviewNote(e.target.value)}
 										placeholder={t('admin.dashboard.applicationReviews.addNotePlaceholder')}
-										className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 p-4 text-sm text-(--text) placeholder-(--text-muted) outline-none focus:border-(--accent) focus:ring-1 focus:ring-(--accent) min-h-[100px] resize-y transition-all"
+										className="min-h-[100px] resize-y"
 										disabled={isProcessing || selectedApp.status !== 'pending'}
 									/>
 								</div>

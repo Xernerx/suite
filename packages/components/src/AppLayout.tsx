@@ -108,18 +108,18 @@ export function AppLayout({
 									<PermissionProvider>
 										<NotificationProvider>
 											<DispatchProvider>
-												<ShortcutsProvider>
-													<CookieProvider>
-														<CookiePrompt />
-														<TermsPrompt />
-														<VersionTracker />
-														<SidebarProvider>
+												<SidebarProvider>
+													<ShortcutsProvider>
+														<CookieProvider>
+															<CookiePrompt />
+															<TermsPrompt />
+															<VersionTracker />
 															<SupportProvider>
 																<Page>{children}</Page>
 															</SupportProvider>
-														</SidebarProvider>
-													</CookieProvider>
-												</ShortcutsProvider>
+														</CookieProvider>
+													</ShortcutsProvider>
+												</SidebarProvider>
 											</DispatchProvider>
 										</NotificationProvider>
 									</PermissionProvider>

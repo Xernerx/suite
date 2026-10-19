@@ -58,11 +58,12 @@ export default function GeneralTab({ botConfig, setBotConfig, availableTags }: G
 							{botConfig.info ? <ReactMarkdown>{botConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">{t('app.portal.info.nothingToPreview')}</span>}
 						</div>
 					) : (
-						<textarea
+						<Input
+							variant="textarea"
 							value={botConfig.info || ''}
 							onChange={(e) => setBotConfig({ ...botConfig, info: e.target.value })}
 							placeholder={t('app.portal.bot.general.longDescPlaceholder')}
-							className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--foreground)/30 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-(--accent)"
+							className="min-h-[120px]"
 						/>
 					)}
 				</div>

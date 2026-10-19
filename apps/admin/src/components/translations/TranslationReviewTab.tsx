@@ -62,14 +62,13 @@ export function TranslationReviewTab({ reviewSearch, setReviewSearch, filteredRe
 									)}
 								</div>
 								<p className="text-sm font-medium text-(--text) bg-(--background)/50 backdrop-blur-md p-3.5 rounded-2xl border border-(--border)/10">{sourceText}</p>
-								<input
+								<Input
 									type="text"
 									value={targetText}
 									onChange={(e) => onInputChange(key, e.target.value)}
 									placeholder={t('admin.translations.review.translateInto', {
 										locale: selectedLocale,
 									})}
-									className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md px-4 py-2.5 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)"
 								/>
 							</div>
 						);

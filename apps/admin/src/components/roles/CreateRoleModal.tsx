@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Modal, Selector, Toggle } from '@xernerx/ui';
+import { Button, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import type { DiscordRole } from './types';
 import { PermissionMatrix } from './PermissionMatrix';
@@ -75,17 +75,7 @@ export function CreateRoleModal({
 					}}
 				>
 					<label className="block text-xs font-medium text-(--text)">{t('admin.roles.roleNameLabel')}</label>
-					<input
-						type="text"
-						placeholder={t('admin.roles.roleNamePlaceholder')}
-						value={newName}
-						onChange={(e) => setNewName(e.target.value)}
-						className="w-full rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent)"
-						style={{
-							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-						}}
-						required
-					/>
+					<Input type="text" placeholder={t('admin.roles.roleNamePlaceholder')} value={newName} onChange={(e) => setNewName(e.target.value)} required />
 				</div>
 				<div
 					className="flex flex-col"

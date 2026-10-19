@@ -240,12 +240,13 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 						<div className="flex flex-col gap-4 p-5 rounded-2xl border border-(--border)/10 bg-(--background)/30">
 							<div className="flex flex-col gap-2">
 								<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.messageTemplate')}</label>
-								<textarea
+								<Input
+									variant="textarea"
 									value={levelMessage}
 									onChange={(e) => setLevelMessage(e.target.value)}
 									placeholder="[@mention] reached level [@level] :tada:!"
 									rows={3}
-									className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none p-3.5"
+									className="resize-none"
 								/>
 								<span className="text-[11px] text-(--text-muted)">
 									{t('app.dashboard.virtue.variables')} <code>[@mention]</code>, <code>[@level]</code>, <code>[@username]</code>

@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { Button } from '@xernerx/ui';
+import { Button, Input } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
 interface TranslationNewTabProps {
@@ -93,7 +93,7 @@ export function TranslationNewTab({ missingKeys, newIndex, setNewIndex, sourceDi
 				}}
 			>
 				<label className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">{t('admin.translations.new.yourTranslation')}</label>
-				<input
+				<Input
 					type="text"
 					value={currentVal}
 					onChange={(e) => onInputChange(currentKey, e.target.value)}
@@ -104,7 +104,6 @@ export function TranslationNewTab({ missingKeys, newIndex, setNewIndex, sourceDi
 					}}
 					autoFocus
 					placeholder={t('admin.translations.new.typePlaceholder')}
-					className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md px-4 py-3 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)"
 				/>
 			</div>
 

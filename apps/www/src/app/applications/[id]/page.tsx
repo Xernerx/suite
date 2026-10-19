@@ -215,11 +215,13 @@ export default function ApplicationFormPage() {
 									)}
 
 									{q.type === 'textarea' && (
-										<textarea
+										<Input
+											variant="textarea"
 											value={answers[q.id] || ''}
 											onChange={(e) => handleAnswerChange(q.id, e.target.value)}
 											required={q.required}
 											placeholder={t('www.applications.yourAnswer')}
+											rows={4}
 										/>
 									)}
 

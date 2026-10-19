@@ -3,7 +3,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Reorder } from 'framer-motion';
-import { Button, Confirm, Modal, Selector, Toggle } from '@xernerx/ui';
+import { Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { Copy, GripVertical, Settings2, Shield, Trash2 } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { permissions } from '@xernerx/lib';
@@ -312,17 +312,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 								}}
 							>
 								<label className="block text-xs font-medium text-(--text)">{t('admin.roles.roleNameLabel')}</label>
-								<input
-									type="text"
-									value={name}
-									disabled={sync}
-									onChange={(e) => setName(e.target.value)}
-									className={`w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) ${sync ? 'opacity-60 cursor-not-allowed' : ''}`}
-									style={{
-										padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-									}}
-									required
-								/>
+								<Input type="text" value={name} disabled={sync} onChange={(e) => setName(e.target.value)} className={sync ? 'opacity-60 cursor-not-allowed' : ''} required />
 							</div>
 
 							<div

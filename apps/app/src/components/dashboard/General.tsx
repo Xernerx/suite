@@ -76,13 +76,13 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 					</div>
 					<div className="flex flex-col gap-2">
 						<label className="text-sm font-bold text-(--text)">{t('app.dashboard.text9')}</label>
-						<textarea
+						<Input
+							variant="textarea"
 							value={guildConfig.info || ''}
 							onChange={(e) => setGuildConfig({ ...guildConfig, info: e.target.value })}
 							placeholder={t('app.dashboard.placeholder2')}
 							rows={4}
-							className="w-full rounded-2xl border border-(--border)/10 bg-(--background)/50 backdrop-blur-md text-sm text-(--text) focus:outline-none focus:ring-2 focus:ring-(--accent) resize-none"
-							style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}
+							className="resize-none"
 						/>
 					</div>
 				</div>

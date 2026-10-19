@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button, Input, Modal, Toggle } from '@xernerx/ui';
+import { Button, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import { StoreCategory, StoreItem } from './types';
 
@@ -112,18 +112,15 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div className="flex flex-col gap-1.5">
 						<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.category')}</label>
-						<select
+						<Selector
 							value={categoryId}
-							onChange={(e) => setCategoryId(e.target.value)}
-							className="h-10 px-3 rounded-xl border border-(--border)/20 bg-(--foreground)/30 text-(--text) text-sm focus:outline-hidden focus:border-(--accent) cursor-pointer"
+							onChange={(val) => setCategoryId(val)}
+							options={categories.map((cat) => ({
+								value: cat.id,
+								label: `${cat.name} (${cat.id})`,
+							}))}
 							required
-						>
-							{categories.map((cat) => (
-								<option key={cat.id} value={cat.id} className="bg-(--background) text-(--text)">
-									{cat.name} ({cat.id})
-								</option>
-							))}
-						</select>
+						/>
 					</div>
 
 					<div className="flex flex-col gap-1.5">
@@ -151,13 +148,7 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 
 				<div className="flex flex-col gap-1.5">
 					<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.features')}</label>
-					<textarea
-						value={featuresText}
-						onChange={(e) => setFeaturesText(e.target.value)}
-						placeholder={t('admin.store.itemModal.featuresPlaceholder')}
-						rows={4}
-						className="w-full p-3 rounded-xl border border-(--border)/20 bg-(--foreground)/30 text-(--text) text-sm focus:outline-hidden focus:border-(--accent) resize-y"
-					/>
+					<Input variant="textarea" value={featuresText} onChange={(e: any) => setFeaturesText(e.target.value)} placeholder={t('admin.store.itemModal.featuresPlaceholder')} rows={4} />
 				</div>
 
 				<div className="grid grid-cols-2 gap-4 pt-2">

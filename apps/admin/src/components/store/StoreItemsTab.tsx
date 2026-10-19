@@ -3,7 +3,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Input } from '@xernerx/ui';
+import { Button, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Edit2, Trash2, Power, Copy, Check, Sparkles, Tag, PackageSearch } from 'lucide-react';
 import { StoreCategory, StoreItem } from './types';
@@ -70,21 +70,12 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 					<Input variant="search" shortcut={true} value={search} onChange={(e: any) => setSearch(e.target.value)} placeholder={t('admin.store.table.searchPlaceholder')} />
 				</div>
 
-				<div className="flex items-center gap-2 w-full md:w-auto">
-					<select
+				<div className="flex items-center gap-2 w-full md:w-56">
+					<Selector
 						value={selectedCategory}
-						onChange={(e) => setSelectedCategory(e.target.value)}
-						className="h-10 px-3 rounded-xl border border-(--border)/20 bg-(--foreground)/30 text-(--text) text-sm focus:outline-hidden focus:border-(--accent) cursor-pointer"
-					>
-						<option value="all" className="bg-(--background) text-(--text)">
-							{t('admin.store.table.allCategories')}
-						</option>
-						{categories.map((cat) => (
-							<option key={cat.id} value={cat.id} className="bg-(--background) text-(--text)">
-								{cat.name}
-							</option>
-						))}
-					</select>
+						onChange={(val) => setSelectedCategory(val)}
+						options={[{ value: 'all', label: t('admin.store.table.allCategories') }, ...categories.map((cat) => ({ value: cat.id, label: cat.name }))]}
+					/>
 				</div>
 			</div>
 
