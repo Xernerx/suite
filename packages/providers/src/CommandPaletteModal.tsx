@@ -2,43 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-	Activity,
-	ArrowRight,
-	BarChart3,
-	Bell,
-	BookOpen,
-	Bug,
-	Compass,
-	Copy,
-	DollarSign,
-	FileCheck,
-	FileCog,
-	Globe,
-	HelpCircle,
-	History,
-	Image as ImageIcon,
-	KeyRound,
-	Languages,
-	Layers,
-	LayoutGrid,
-	Lightbulb,
-	Map,
-	Megaphone,
-	Moon,
-	Paintbrush,
-	ScrollText,
-	Search,
-	Settings,
-	Shield,
-	ShieldCheck,
-	SidebarIcon,
-	Store,
-	Sun,
-	Ticket,
-	Users,
-	X,
-} from 'lucide-react';
+import { ArrowRight, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Moon, Search, Settings, SidebarIcon, Sun, Trophy, X } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -48,16 +12,7 @@ import { useSidebar } from './SidebarProvider';
 import { useTheme } from './ThemeProvider';
 import { useToast } from './ToastProvider';
 import { useUser } from './UserProvider';
-
-type PaletteActionItem = {
-	id: string;
-	section: 'views' | 'actions' | 'apps' | 'settings' | 'support' | 'admin';
-	label: string;
-	subtitle?: string;
-	shortcut?: string;
-	icon: React.ElementType;
-	onSelect: () => void;
-};
+import { ACCOUNT_TABS, ADMIN_TABS, type PaletteActionItem, SUPPORT_PORTALS } from './commandPaletteData';
 
 export function CommandPaletteModal({
 	isOpen,
@@ -239,21 +194,20 @@ export function CommandPaletteModal({
 			});
 		});
 
-		// 4. Account & Developer Settings Deep-Links
-		const accountTabs = [
-			{ view: 'profile', labelKey: 'common.nav.items.profile', catKey: 'common.nav.categories.account', icon: ShieldCheck },
-			{ view: 'activity', labelKey: 'account.activity.navLabel', catKey: 'common.nav.categories.account', icon: Activity },
-			{ view: 'connections', labelKey: 'common.nav.items.connections', catKey: 'common.nav.categories.account', icon: Globe },
-			{ view: 'devices', labelKey: 'common.nav.items.devices', catKey: 'common.nav.categories.account', icon: Shield },
-			{ view: 'appearance', labelKey: 'common.nav.items.appearance', catKey: 'common.nav.categories.preferences', icon: Paintbrush },
-			{ view: 'language', labelKey: 'common.nav.items.language', catKey: 'common.nav.categories.preferences', icon: Globe },
-			{ view: 'notifications', labelKey: 'common.nav.items.notifications', catKey: 'common.nav.categories.preferences', icon: Bell },
-			{ view: 'billing', labelKey: 'common.nav.items.billing', catKey: 'common.nav.categories.billing', icon: DollarSign },
-			{ view: 'tokens', labelKey: 'common.nav.items.tokens', catKey: 'common.nav.categories.developer', icon: KeyRound },
-			{ view: 'media', labelKey: 'account.media.title', catKey: 'common.nav.categories.developer', icon: ImageIcon },
-		];
+		list.push({
+			id: 'app-leaderboard',
+			section: 'apps',
+			label: t('app.leaderboard.title'),
+			subtitle: t('lib.navigation.items.explore'),
+			icon: Trophy,
+			onSelect: () => {
+				window.location.href = `${getEnvUrl('https://app.xernerx.com')}/leaderboard`;
+				onClose();
+			},
+		});
 
-		accountTabs.forEach((tab) => {
+		// 4. Account & Developer Settings Deep-Links
+		ACCOUNT_TABS.forEach((tab) => {
 			list.push({
 				id: `settings-account-${tab.view}`,
 				section: 'settings',
@@ -269,23 +223,14 @@ export function CommandPaletteModal({
 							return;
 						}
 					} catch {}
-					window.location.href = `${accountBase}/?view=${tab.view}`;
+					window.location.href = `${accountBase}/?tab=${tab.view}`;
 					onClose();
 				},
 			});
 		});
 
 		// 5. Support Hub Portals
-		const supportPortals = [
-			{ path: '/status', labelKey: 'info.home.portals.status.title', icon: Activity },
-			{ path: '/roadmap', labelKey: 'info.home.portals.roadmap.title', icon: Map },
-			{ path: '/suggestions', labelKey: 'info.home.portals.suggestions.title', icon: Lightbulb },
-			{ path: '/issues', labelKey: 'info.home.portals.issues.title', icon: Bug },
-			{ path: '/faq', labelKey: 'info.home.portals.faq.title', icon: BookOpen },
-			{ path: '/changelog', labelKey: 'info.home.portals.changelog.title', icon: History },
-		];
-
-		supportPortals.forEach((portal) => {
+		SUPPORT_PORTALS.forEach((portal) => {
 			list.push({
 				id: `support-${portal.path}`,
 				section: 'support',
@@ -301,26 +246,7 @@ export function CommandPaletteModal({
 
 		// 6. Admin Panel Deep-Links (for Staff)
 		if (hasAdminAccess) {
-			const adminTabs = [
-				{ view: 'overview', labelKey: 'admin.dashboard.nav.overview', catKey: 'common.nav.categories.system', icon: BarChart3 },
-				{ view: 'audit', labelKey: 'admin.dashboard.nav.auditLogs', catKey: 'common.nav.categories.system', icon: ScrollText },
-				{ view: 'users', labelKey: 'common.nav.items.users', catKey: 'common.nav.categories.moderator', icon: Users },
-				{ view: 'roles', labelKey: 'common.nav.items.roles', catKey: 'common.nav.categories.system', icon: Shield },
-				{ view: 'store', labelKey: 'admin.dashboard.nav.store', catKey: 'common.nav.categories.product', icon: Store },
-				{ view: 'media', labelKey: 'admin.dashboard.nav.mediaLibrary', catKey: 'admin.dashboard.nav.media', icon: ImageIcon },
-				{ view: 'invites', labelKey: 'admin.dashboard.nav.invites', catKey: 'common.nav.categories.administrator', icon: Ticket },
-				{ view: 'announcements', labelKey: 'admin.dashboard.nav.announcements', catKey: 'common.nav.categories.administrator', icon: Megaphone },
-				{ view: 'roadmap', labelKey: 'common.nav.items.roadmap', catKey: 'common.nav.categories.product', icon: Map },
-				{ view: 'suggestions', labelKey: 'common.nav.items.suggestions', catKey: 'common.nav.categories.product', icon: Lightbulb },
-				{ view: 'issues', labelKey: 'common.nav.items.issues', catKey: 'common.nav.categories.product', icon: Bug },
-				{ view: 'translations', labelKey: 'common.nav.items.translations', catKey: 'common.nav.categories.translator', icon: Languages },
-				{ view: 'applications_review', labelKey: 'common.nav.items.applications_review', catKey: 'common.nav.categories.moderator', icon: FileCheck },
-				{ view: 'applications_manage', labelKey: 'common.nav.items.applications_manage', catKey: 'common.nav.categories.administrator', icon: FileCog },
-				{ view: 'tokens', labelKey: 'common.nav.items.tokens', catKey: 'common.nav.categories.administrator', icon: KeyRound },
-				{ view: 'settings', labelKey: 'common.nav.items.settings', catKey: 'common.nav.categories.system', icon: Settings },
-			];
-
-			adminTabs.forEach((tab) => {
+			ADMIN_TABS.forEach((tab) => {
 				list.push({
 					id: `admin-${tab.view}`,
 					section: 'admin',
@@ -336,7 +262,7 @@ export function CommandPaletteModal({
 								return;
 							}
 						} catch {}
-						window.location.href = `${adminBase}/?view=${tab.view}`;
+						window.location.href = `${adminBase}/?tab=${tab.view}`;
 						onClose();
 					},
 				});

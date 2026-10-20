@@ -3,8 +3,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
-import { Button, Input } from '@xernerx/ui';
-import { Activity, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Clock, ExternalLink, Bug, Server, Globe } from 'lucide-react';
+import { Button, Input, Modal, CodeBlock } from '@xernerx/ui';
+import { Activity, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Clock, ExternalLink, Bug, Server, Globe, Code2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface ServiceStatus {
@@ -46,6 +46,7 @@ export default function StatusClient() {
 	const [refreshing, setRefreshing] = useState(false);
 	const [lastChecked, setLastChecked] = useState<Date | null>(null);
 	const [search, setSearch] = useState('');
+	const [badgeModalOpen, setBadgeModalOpen] = useState(false);
 
 	useEffect(() => {
 		hide();
@@ -202,10 +203,16 @@ export default function StatusClient() {
 					</div>
 				</div>
 
-				<Button variant="secondary" onClick={checkAllServices} disabled={refreshing} className="flex items-center gap-2 shrink-0">
-					<RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
-					{t('info.status.refresh')}
-				</Button>
+				<div className="flex flex-wrap items-center gap-2 shrink-0">
+					<Button variant="secondary" onClick={() => setBadgeModalOpen(true)} className="flex items-center gap-2 shrink-0">
+						<Code2 size={15} />
+						{t('info.status.badgeButton')}
+					</Button>
+					<Button variant="secondary" onClick={checkAllServices} disabled={refreshing} className="flex items-center gap-2 shrink-0">
+						<RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
+						{t('info.status.refresh')}
+					</Button>
+				</div>
 			</div>
 
 			{/* Search & Controls */}
@@ -311,6 +318,37 @@ export default function StatusClient() {
 					</div>
 				)}
 			</div>
+
+			<Modal open={badgeModalOpen} onOpenChange={setBadgeModalOpen} title={t('info.status.badgeModalTitle')} description={t('info.status.badgeModalDesc')} maxWidth="max-w-3xl">
+				<div className="flex flex-col gap-4">
+					<div className="flex items-center justify-between p-4 rounded-2xl border border-(--border)/10 bg-(--background)/50">
+						<span className="text-xs font-semibold text-(--text-muted)">{t('app.widgets.previewLabel')}</span>
+						<img src={getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')} alt="Xernerx System Status" className="h-6" />
+					</div>
+					<CodeBlock
+						tabs={[
+							{
+								id: 'markdown',
+								label: t('app.widgets.formatMarkdown'),
+								language: 'markdown',
+								code: `[![Xernerx Status](${getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')})](${getEnvUrl('https://info.xernerx.com/status')})`,
+							},
+							{
+								id: 'html',
+								label: t('app.widgets.formatHtmlImg'),
+								language: 'html',
+								code: `<a href="${getEnvUrl('https://info.xernerx.com/status')}" target="_blank" rel="noopener noreferrer">\n  <img src="${getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')}" alt="Xernerx Status" />\n</a>`,
+							},
+							{
+								id: 'svg',
+								label: t('app.widgets.formatDirectSvg'),
+								language: 'url',
+								code: getEnvUrl('https://api.xernerx.com/v1/status/badge.svg'),
+							},
+						]}
+					/>
+				</div>
+			</Modal>
 		</div>
 	);
 }

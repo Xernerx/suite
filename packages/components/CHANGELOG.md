@@ -1,5 +1,67 @@
 # @xernerx/components
 
+## 0.7.2
+
+### Patch Changes
+
+- <!-- @format -->
+
+    ### Workspace-Wide Architecture, Governance, Safeguards & UX Overhaul
+
+    #### `account` (`2.2.0` → `2.3.0` — `minor`)
+    - **Per-Device Session Revocation & Bulk Sign-Out**: Added individual session revocation (`DELETE /secure/account/sessions` with `sessionId`) alongside bulk sign-out (`revokeAllExceptCurrent`), guarded by `<Confirm variant="danger" />` modals and toast feedback in `Devices.tsx`.
+    - **High-Risk Destructive Safeguards (`confirmKeyword`)**: Enforced `confirmKeyword` verification on API token deletion (`ManageTokenModal.tsx`), CDN asset deletion (`Media.tsx`), OAuth account unlinking (`Connections.tsx`), and extracted `AccountDangerZone.tsx` for account disable/delete workflows.
+    - **Billing & Subscription Confirmation**: Replaced inline state toggles with a shared `<Confirm variant="danger" />` modal for subscription cancellation and saved payment method removal in `Billing.tsx`.
+    - **Notifications Search (`Ctrl + K`)**: Added page-level search (`<Input variant="search" shortcut={true} />`) with filter resetting and empty-state clearing in `Notifications.tsx`.
+    - **URL-Synced Sidebar Navigation**: Synchronized active views with `?tab=` query parameters via `SidebarProvider`.
+
+    #### `admin` (`0.13.0` → `0.14.0` — `minor`)
+    - **Destructive Action Safeguards Across All Modules**: Added `<Confirm variant="danger" />` modals (with `confirmKeyword` where appropriate) and `useToast().toast()` feedback across `Issues.tsx`, `Suggestions.tsx`, `Roadmap.tsx`, `Announcements.tsx`, `Media.tsx`, `Roles.tsx`, `Tokens.tsx`, `Invites.tsx`, `ApplicationConfigs.tsx`, `StoreCategoriesTab.tsx`, `StoreItemsTab.tsx`, and `UserModal.tsx`.
+    - **CSV / JSON Data Export & Manual Refresh**: Added filtered CSV/JSON export helpers and manual refresh buttons with loading spinners across `Users.tsx`, `AuditLogs.tsx`, `Tokens.tsx`, `Invites.tsx`, `Roles.tsx`, and `ApplicationConfigs.tsx`.
+    - **Localization Manager (`Translations.tsx`)**: Wired `useToast().remind` unsaved-changes bar (`Save` / `Reset`) for edited locale strings and added one-click JSON dictionary export.
+    - **Application Reviews (`ApplicationReviews.tsx`)**: Replaced custom backdrop markup with the shared `<Modal />` primitive from `@xernerx/ui`.
+    - **Modular Component Decomposition (<500-Line Rule)**: Extracted `HomeOverview.tsx`, `overview/*`, `settings/*`, and `issues/*` sub-components to keep all admin views modular and under 500 lines.
+
+    #### `api` (`0.14.0` → `0.15.0` — `minor`)
+    - **Public User Widget Endpoint (`/v1/users/[id]/widget`)**: Added SVG, PNG (`ImageResponse`), HTML iframe, and JSON embed widget rendering for user profiles (`widgetRenderer.ts`) and exposed `publicWidget` preferences in `GET/PATCH /core/users/[id]`.
+
+    #### `app` (`2.9.0` → `2.10.0` — `minor`)
+    - **Public Profile Embed Widgets (`PublicWidgetModalButton.tsx`)**: Added an interactive Embed Widget generator modal (Markdown, HTML, Image URL, Iframe, JSON) on Bot (`bots/Header.tsx`), Server (`ServerHeader.tsx`), Organization (`organization/Header.tsx`), and User (`users/Header.tsx`) public profiles.
+    - **Developer Portal Safeguards & Deep-Linking**: Added `confirmKeyword` + `variant="danger"` when removing organization members (`OrgMembersTab.tsx`), linked organization servers directly to `/dashboard?guild=${id}` (`OrgServersTab.tsx`), and added toast feedback for Guild Dashboard settings save/delete (`dashboard/page.tsx`).
+    - **Modularization & URL State**: Extracted `ExploreCards.tsx` (`BotCard`, `ServerCard`) from `app/page.tsx` and modularized `servers/[id]/page.tsx` into `src/components/servers/*`.
+
+    #### `docs` (`1.1.0` → `1.2.0` — `minor`)
+    - **API Playground Request History & Copy as cURL**: Added persistent recent request history (`localStorage`) with one-click replay and a `Copy as cURL` generator in `ApiPlayground.tsx`.
+    - **Interactive Endpoint Jump-Links**: Linked endpoint cards in `CoreEndpoints.tsx` directly to prefill the live API Playground and extracted `docsHomeData.ts` for modular architecture compliance.
+
+    #### `info` (`1.5.0` → `1.6.0` — `minor`)
+    - **URL-Synced Filtering & Pagination**: Synchronized search, status, category, and sort filters with URL query parameters across `issues/page.tsx`, `suggestions/page.tsx`, `roadmap/page.tsx`, and `ChangelogClient.tsx`.
+    - **Status Uptime Range Toggle**: Added `30d` / `60d` / `90d` historical uptime range selector and manual refresh in `StatusClient.tsx`.
+    - **Modularization**: Extracted `issues/*`, `suggestions/*`, and `MobileRoadmapTimeline.tsx` into `src/components/`.
+
+    #### `@xernerx/lib` (`1.6.0` → `1.7.0` — `minor`)
+    - **User Profile Schema**: Added `settings.privacy.publicWidget` (`boolean`, default `true`) to `UserProfileSchema` (`Profile.ts`).
+    - **Localization (`en-GB.json` & `i18n.config.ts`)**: Added comprehensive localization keys for all new modals, confirmations, exports, widgets, and actions across the monorepo.
+
+    #### `@xernerx/providers` (`0.9.1` → `0.10.0` — `minor`)
+    - **URL-Synced `SidebarProvider`**: Added optional `?tab=` URL query parameter synchronization (`history.replaceState` + `popstate` listener) when switching sidebar views.
+    - **Modularized Providers (<500-Line Rule)**: Extracted `commandPaletteData.ts` from `CommandPaletteModal.tsx` and `ShortcutHelpModal.tsx` from `ShortcutsProvider.tsx`.
+
+    #### `@xernerx/components` (`0.7.1` → `0.7.2` — `patch`)
+    - **Header Omnibar Decomposition**: Extracted `HeaderOmnibar.tsx` from `Header.tsx` to keep `Header.tsx` well under the 500-line threshold.
+
+    #### `store` (`0.3.12` → `0.3.13` — `patch`)
+    - **Localization Cleanup**: Replaced remaining hardcoded fallback strings in `apps/store/src/app/page.tsx` with `useDictionary()` keys.
+
+    #### `@xernerx/cli` (`2.2.1` → `2.2.2` — `patch`)
+    - **Suite Architecture Linter (`lint.ts`)**: Allowed Next.js App Router `manifest.ts` metadata files and `apps/account` secondary OAuth connection routes (`/api/connections/[provider]`) per `AGENTS.md` Rule 6.
+
+- Updated dependencies
+    - @xernerx/lib@1.7.0
+    - @xernerx/providers@0.10.0
+    - @xernerx/feedback@0.0.39
+    - @xernerx/ui@0.5.2
+
 ## 0.7.1
 
 ### Patch Changes

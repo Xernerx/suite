@@ -278,7 +278,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 				</div>
 			</div>
 
-			<Modal isOpen={embedModalOpen} onClose={() => setEmbedModalOpen(false)} title={t('app.bots.id.embedBadges')}>
+			<Modal open={embedModalOpen} onOpenChange={setEmbedModalOpen} title={t('app.bots.id.embedBadges')}>
 				<div className="flex flex-col gap-4">
 					<p className="text-xs text-(--text-muted)">{t('app.bots.id.embedBadgesDesc')}</p>
 					{(['votes', 'servers', 'users', 'status'] as const).map((badgeType) => {

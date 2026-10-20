@@ -6,6 +6,7 @@ import { Loading } from '@xernerx/feedback';
 import { Input } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import KnownIssuesSection from '@/components/roadmap/KnownIssuesSection';
+import MobileRoadmapTimeline from '@/components/roadmap/MobileRoadmapTimeline';
 import RoadmapActionBar from '@/components/roadmap/RoadmapActionBar';
 
 export default function RoadmapPage() {
@@ -24,10 +25,30 @@ export default function RoadmapPage() {
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			const q = new URLSearchParams(window.location.search).get('q');
+			const params = new URLSearchParams(window.location.search);
+			const q = params.get('q');
+			const prod = params.get('product');
+			const status = params.get('status') as any;
 			if (q) setSearchQuery(q);
+			if (prod) setSelectedProduct(prod);
+			if (status && ['all', 'idea', 'planned', 'active', 'released'].includes(status)) {
+				setStatusFilter(status);
+			}
 		}
 	}, []);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || loading) return;
+		const params = new URLSearchParams(window.location.search);
+		if (selectedProduct) params.set('product', selectedProduct);
+		else params.delete('product');
+		if (statusFilter !== 'all') params.set('status', statusFilter);
+		else params.delete('status');
+		if (searchQuery.trim()) params.set('q', searchQuery.trim());
+		else params.delete('q');
+		const qs = params.toString();
+		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+	}, [selectedProduct, statusFilter, searchQuery, loading]);
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -427,74 +448,19 @@ export default function RoadmapPage() {
 				})()}
 
 				{/* MOBILE VERTICAL STACK (md:hidden) */}
-				<div className="flex md:hidden flex-col gap-12 w-full pt-4 pb-8 relative">
-					<div className="absolute top-8 bottom-0 left-[27px] w-[2px] bg-(--border)/20 z-0"></div>
-					{sortedQuarters.map((quarter) => {
-						const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
-						const qItems = rawQItems.filter(matchesRoadmapFilters);
-						return (
-							<div key={quarter} className="flex flex-col w-full relative z-10">
-								<div className="flex items-center gap-4 mb-8">
-									<div
-										className={`w-6 h-6 rounded-full border-4 border-(--background) shadow-[0_0_15px_var(--accent)] z-20 relative ${quarter === 'Backlog' ? 'opacity-0' : quarter === currentQuarterStr ? 'bg-(--accent) shadow-[0_0_20px_var(--accent)] animate-pulse' : 'bg-(--accent)/40'}`}
-									>
-										{quarter === currentQuarterStr && (
-											<div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-												<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded shadow-lg">
-													{t('info.roadmap.timeline.today')}
-												</span>
-												<div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-(--accent) mt-0.5"></div>
-											</div>
-										)}
-									</div>
-									<h2 className={`text-2xl font-black tracking-wider uppercase ${quarter === currentQuarterStr ? 'text-(--accent)' : 'text-(--text)'}`}>
-										{quarter === 'Backlog' ? '' : quarter}
-									</h2>
-								</div>
-								<div className="flex flex-col gap-8 pl-[18px]">
-									{allProducts.map((prod) => {
-										const pItems = qItems.filter((i: any) => i.productId === prod);
-										if (pItems.length === 0 || (selectedProduct && prod !== selectedProduct)) return null;
-										const color = getProductColor(prod);
-										const prodBotInfo = resolveBot(pItems[0] || prod);
-
-										return (
-											<div key={prod} className="flex flex-col gap-4 relative border-l-2 pl-6" style={{ borderColor: `${color}66` }}>
-												<div className="absolute top-0 -left-[3px] w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
-												<span
-													onClick={() => setSelectedProduct(selectedProduct === prod ? null : prod)}
-													className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-md w-fit cursor-pointer hover:brightness-150 transition-all"
-													style={{ color: color, backgroundColor: `${color}1A`, border: `1px solid ${color}33` }}
-												>
-													{prodBotInfo?.avatarUrl && <img src={prodBotInfo.avatarUrl} alt={prodBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-													{prodBotInfo ? prodBotInfo.name : prod}
-												</span>
-												{pItems.map((item: any) => (
-													<motion.div
-														layout
-														key={item.id}
-														className="flex flex-col p-5 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg relative overflow-hidden"
-													>
-														<div className="absolute top-0 left-0 w-1 h-full opacity-60" style={{ backgroundColor: color }}></div>
-														<div className="flex justify-between items-start mb-2">
-															<div className="flex items-center gap-2">
-																<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-gray-500'}`}></span>
-																<span className="text-xs uppercase font-bold text-(--text-muted)">{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}</span>
-															</div>
-														</div>
-														<h3 className="font-bold text-lg text-(--text)">{item.title}</h3>
-														<p className="text-sm text-(--text-muted) mt-2">{item.description}</p>
-														<RoadmapActionBar item={item} onUpdate={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))} />
-													</motion.div>
-												))}
-											</div>
-										);
-									})}
-								</div>
-							</div>
-						);
-					})}
-				</div>
+				<MobileRoadmapTimeline
+					sortedQuarters={sortedQuarters}
+					currentQuarterStr={currentQuarterStr}
+					itemsWithQ={itemsWithQ}
+					matchesRoadmapFilters={matchesRoadmapFilters}
+					allProducts={allProducts}
+					selectedProduct={selectedProduct}
+					setSelectedProduct={setSelectedProduct}
+					getProductColor={getProductColor}
+					resolveBot={resolveBot}
+					statusColors={statusColors}
+					onUpdateItem={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))}
+				/>
 			</div>
 
 			{/* Known Issues Section */}

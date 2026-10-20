@@ -1,26 +1,26 @@
 /** @format */
-import { Button, Input, Modal, Selector } from '@xernerx/ui';
+import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Copy, Check, ExternalLink } from 'lucide-react';
 
 import { Loading } from '@xernerx/feedback';
+import { IssueModals, type SuiteAppVersionInfo } from './issues/IssueModals';
 
-interface SuiteAppVersionInfo {
-	id: string;
-	name: string;
-	domain: string;
-	localVersion: string | null;
-	canaryVersion: string | null;
-	prodVersion: string | null;
-	versions: string[];
-}
-
-export default function Issues() {
+export default function Issues({ initialSearch = '' }: { initialSearch?: string }) {
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
 	const [data, setData] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [search, setSearch] = useState(initialSearch);
+	const [statusFilter, setStatusFilter] = useState<'all' | 'unverified' | 'open' | 'resolved'>('all');
+	const [productFilter, setProductFilter] = useState('all');
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (initialSearch) setSearch(initialSearch);
+	}, [initialSearch]);
 
 	const [modalOpen, setModalOpen] = useState(false);
 	const [title, setTitle] = useState('');
@@ -32,6 +32,7 @@ export default function Issues() {
 	const [resolvingIssue, setResolvingIssue] = useState<any | null>(null);
 	const [selectedResolvedApp, setSelectedResolvedApp] = useState('app');
 	const [selectedResolvedVersion, setSelectedResolvedVersion] = useState('');
+	const [confirmDeleteItem, setConfirmDeleteItem] = useState<any | null>(null);
 
 	const [products, setProducts] = useState<string[]>([]);
 	const [suiteApps, setSuiteApps] = useState<SuiteAppVersionInfo[]>([]);
@@ -241,7 +242,10 @@ export default function Issues() {
 		}
 	};
 
-	const deleteIssue = async (id: string) => {
+	const deleteIssue = async () => {
+		if (!confirmDeleteItem) return;
+		const id = confirmDeleteItem.id;
+		setConfirmDeleteItem(null);
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/issues/${id}`), {
 				method: 'DELETE',
@@ -254,6 +258,40 @@ export default function Issues() {
 		}
 	};
 
+	const productFilterOptions = useMemo(() => {
+		const set = new Set<string>();
+		data.forEach((item) => {
+			const resolved = resolveItemBot(item);
+			const label = resolved?.name || item.productId;
+			if (label) set.add(String(label));
+		});
+		return [{ value: 'all', label: t('admin.dashboard.issues.allProducts') }, ...Array.from(set).map((p) => ({ value: p, label: p }))];
+	}, [data, orgBots, botProfiles, t]);
+
+	const filteredData = useMemo(() => {
+		const q = search.trim().toLowerCase();
+		return data.filter((item) => {
+			if (statusFilter === 'unverified' && (item.status !== 'open' || item.acknowledged !== false)) return false;
+			if (statusFilter === 'open' && item.status !== 'open') return false;
+			if (statusFilter === 'resolved' && item.status !== 'resolved') return false;
+			const resolved = resolveItemBot(item);
+			const prodLabel = String(resolved?.name || item.productId || '');
+			if (productFilter !== 'all' && prodLabel !== productFilter) return false;
+			if (!q) return true;
+			const authorId = String(item.authorId || item.author?.id || '');
+			return (
+				String(item.title || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(item.description || '')
+					.toLowerCase()
+					.includes(q) ||
+				prodLabel.toLowerCase().includes(q) ||
+				authorId.toLowerCase().includes(q)
+			);
+		});
+	}, [data, search, statusFilter, productFilter, orgBots, botProfiles]);
+
 	if (loading) return <Loading />;
 
 	const activePreviewBot = botId.trim() ? botProfiles[botId.trim()] || orgBots.find((b) => b.id === botId.trim()) : null;
@@ -261,103 +299,62 @@ export default function Issues() {
 
 	return (
 		<div className="flex flex-col gap-4">
-			<div className="flex justify-between items-center">
+			<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
 				<h2 className="text-2xl font-bold">{t('admin.dashboard.issues.title')}</h2>
-				<Button onClick={() => setModalOpen(true)}>{t('admin.dashboard.issues.logBug')}</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<div className="w-full sm:w-64">
+						<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('admin.dashboard.issues.searchPlaceholder')} />
+					</div>
+					<div className="w-full sm:w-40">
+						<Selector
+							value={statusFilter}
+							onChange={(val) => setStatusFilter(val as any)}
+							options={[
+								{ value: 'all', label: t('admin.dashboard.issues.filterAll') },
+								{ value: 'unverified', label: t('admin.dashboard.issues.filterUnverified') },
+								{ value: 'open', label: t('admin.dashboard.issues.filterOpen') },
+								{ value: 'resolved', label: t('admin.dashboard.issues.filterResolved') },
+							]}
+						/>
+					</div>
+					<div className="w-full sm:w-44">
+						<Selector value={productFilter} onChange={setProductFilter} options={productFilterOptions} />
+					</div>
+					<Button onClick={() => setModalOpen(true)}>{t('admin.dashboard.issues.logBug')}</Button>
+				</div>
 			</div>
 
-			<Modal open={modalOpen} onOpenChange={setModalOpen} title={t('admin.dashboard.issues.modalTitle')}>
-				<div className="flex flex-col gap-4 pt-4">
-					<Input placeholder={t('admin.dashboard.issues.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} />
-					<Input variant="textarea" rows={4} placeholder={t('admin.dashboard.issues.descPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} />
-					<Input placeholder={t('admin.dashboard.issues.productPlaceholder')} list="product-tags" value={product} onChange={(e) => handleProductChange(e.target.value)} />
-					<datalist id="product-tags">
-						{products.map((p) => (
-							<option key={p} value={p} />
-						))}
-					</datalist>
-
-					<div className="flex flex-col gap-2">
-						<Input placeholder={t('admin.dashboard.roadmap.botIdPlaceholder')} list="issue-bot-id-tags" value={botId} onChange={(e) => setBotId(e.target.value)} />
-						<datalist id="issue-bot-id-tags">
-							{orgBots.map((b) => (
-								<option key={b.id} value={b.id} label={b.name} />
-							))}
-						</datalist>
-						{activePreviewBot && (
-							<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-(--foreground)/40 border border-(--border)/10 w-fit text-xs">
-								{activePreviewBot.avatarUrl && <img src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} className="w-5 h-5 rounded-full object-cover" />}
-								<span className="font-semibold text-(--text)">{activePreviewBot.name}</span>
-								<span className="text-(--text-muted) font-mono">({botId.trim()})</span>
-							</div>
-						)}
-					</div>
-
-					<div className="flex justify-end mt-4">
-						<Button onClick={logBug}>{t('admin.dashboard.issues.save')}</Button>
-					</div>
-				</div>
-			</Modal>
-
-			<Modal open={resolveModalOpen} onOpenChange={setResolveModalOpen} title={t('admin.dashboard.issues.resolveModalTitle')}>
-				<div className="flex flex-col gap-4 pt-2">
-					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.issues.resolveModalDesc')}</p>
-					{resolvingIssue && (
-						<div className="p-3 rounded-lg bg-(--foreground)/40 border border-(--border)/10 text-sm">
-							<div className="font-bold text-(--text)">{resolvingIssue.title}</div>
-							<div className="text-xs text-(--text-muted) mt-0.5 line-clamp-2">{resolvingIssue.description}</div>
-						</div>
-					)}
-
-					<Selector
-						value={selectedResolvedApp}
-						onChange={handleSubdomainChange}
-						placeholder={t('admin.dashboard.issues.selectSubdomain')}
-						options={suiteApps.map((app) => ({
-							value: app.id,
-							label: `${app.name} (${app.domain})`,
-						}))}
-					/>
-
-					{currentSelectedAppInfo && (
-						<div className="flex flex-wrap items-center gap-2 text-xs">
-							{currentSelectedAppInfo.prodVersion && (
-								<span className="px-2.5 py-1 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 font-mono">
-									{t('admin.dashboard.issues.liveProd', { version: currentSelectedAppInfo.prodVersion })}
-								</span>
-							)}
-							{currentSelectedAppInfo.canaryVersion && (
-								<span className="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
-									{t('admin.dashboard.issues.liveCanary', { version: currentSelectedAppInfo.canaryVersion })}
-								</span>
-							)}
-						</div>
-					)}
-
-					<Selector
-						value={selectedResolvedVersion}
-						onChange={setSelectedResolvedVersion}
-						placeholder={t('admin.dashboard.issues.selectVersion')}
-						options={(currentSelectedAppInfo?.versions || []).map((ver, idx) => ({
-							value: ver,
-							label: idx === 0 ? `v${ver} (Latest)` : `v${ver}`,
-						}))}
-					/>
-
-					<Input placeholder={t('admin.dashboard.issues.customVersionPlaceholder')} value={selectedResolvedVersion} onChange={(e) => setSelectedResolvedVersion(e.target.value)} />
-
-					<div className="flex justify-end gap-2 mt-2">
-						<Button variant="secondary" onClick={() => setResolveModalOpen(false)}>
-							{t('admin.dashboard.issues.cancel')}
-						</Button>
-						<Button onClick={confirmAppResolve}>{t('admin.dashboard.issues.confirmResolve')}</Button>
-					</div>
-				</div>
-			</Modal>
+			<IssueModals
+				modalOpen={modalOpen}
+				setModalOpen={setModalOpen}
+				title={title}
+				setTitle={setTitle}
+				description={description}
+				setDescription={setDescription}
+				product={product}
+				handleProductChange={handleProductChange}
+				products={products}
+				botId={botId}
+				setBotId={setBotId}
+				orgBots={orgBots}
+				activePreviewBot={activePreviewBot}
+				logBug={logBug}
+				resolveModalOpen={resolveModalOpen}
+				setResolveModalOpen={setResolveModalOpen}
+				resolvingIssue={resolvingIssue}
+				selectedResolvedApp={selectedResolvedApp}
+				handleSubdomainChange={handleSubdomainChange}
+				suiteApps={suiteApps}
+				currentSelectedAppInfo={currentSelectedAppInfo}
+				selectedResolvedVersion={selectedResolvedVersion}
+				setSelectedResolvedVersion={setSelectedResolvedVersion}
+				confirmAppResolve={confirmAppResolve}
+			/>
 
 			<div className="flex flex-col gap-2">
-				{data.map((item: any) => {
+				{filteredData.map((item: any) => {
 					const resolvedBot = resolveItemBot(item);
+					const authorId = item.authorId || item.author?.id;
 					const releaseStatus: 'production' | 'canary' | 'pending' | null = item.resolvedApp && item.resolvedVersion ? item.releaseStatus || 'pending' : null;
 					const statusBadgeClass =
 						releaseStatus === 'production'
@@ -367,7 +364,10 @@ export default function Issues() {
 								: 'bg-purple-500/10 text-purple-400 border-purple-500/20';
 
 					return (
-						<div key={item.id} className="flex justify-between items-center p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm">
+						<div
+							key={item.id}
+							className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm"
+						>
 							<div>
 								<div className="font-bold flex items-center gap-2">
 									<span className={item.status === 'resolved' ? 'text-green-500' : 'text-red-500'}>●</span>
@@ -379,6 +379,31 @@ export default function Issues() {
 										{resolvedBot?.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
 										{resolvedBot ? resolvedBot.name : item.productId}
 									</div>
+									{authorId && /^\d{17,20}$/.test(String(authorId)) && (
+										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded border border-(--border)/10 font-mono">
+											<a
+												href={`${getEnvUrl('https://app.xernerx.com')}/users/${authorId}`}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="inline-flex items-center gap-1 hover:text-(--accent) transition-colors"
+											>
+												<span>{item.author?.username || authorId}</span>
+												<ExternalLink size={11} />
+											</a>
+											<button
+												type="button"
+												onClick={() => {
+													navigator.clipboard.writeText(String(authorId));
+													setCopiedId(item.id);
+													toast({ type: 'success', title: t('admin.users.idCopied') });
+													setTimeout(() => setCopiedId(null), 2000);
+												}}
+												className="hover:text-(--text) transition-colors cursor-pointer"
+											>
+												{copiedId === item.id ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+											</button>
+										</div>
+									)}
 									{releaseStatus && (
 										<button
 											type="button"
@@ -399,15 +424,29 @@ export default function Issues() {
 									)}
 								</div>
 							</div>
-							<div className="flex items-center gap-2">
+							<div className="flex items-center gap-2 shrink-0">
 								{item.acknowledged === false && <Button onClick={() => markAcknowledged(item.id)}>{t('admin.dashboard.issues.verify')}</Button>}
 								{item.status === 'open' && <Button onClick={() => handleResolveClick(item)}>{t('admin.dashboard.issues.resolved')}</Button>}
-								<Button onClick={() => deleteIssue(item.id)}>{t('common.buttons.delete')}</Button>
+								<Button variant="danger" onClick={() => setConfirmDeleteItem(item)}>
+									{t('common.buttons.delete')}
+								</Button>
 							</div>
 						</div>
 					);
 				})}
+				{filteredData.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">{t('admin.dashboard.issues.noMatchingIssues')}</div>}
 			</div>
+
+			<Confirm
+				open={Boolean(confirmDeleteItem)}
+				onOpenChange={(open) => !open && setConfirmDeleteItem(null)}
+				title={t('admin.dashboard.issues.deleteConfirmTitle')}
+				description={t('admin.dashboard.issues.deleteConfirmDesc')}
+				confirmText={t('common.buttons.delete')}
+				cancelText={t('common.buttons.cancel')}
+				variant="danger"
+				onConfirm={deleteIssue}
+			/>
 		</div>
 	);
 }

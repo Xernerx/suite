@@ -3,9 +3,9 @@
 
 import { AnimatePresence, Reorder } from 'framer-motion';
 import { Button, Input } from '@xernerx/ui';
-import { Plus } from 'lucide-react';
+import { Download, Plus, RefreshCw } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { permissions } from '@xernerx/lib';
 import type { DiscordRole, Role } from './roles/types';
@@ -21,6 +21,7 @@ export default function Roles() {
 	const [guild, setGuild] = useState<any>(null);
 	const [search, setSearch] = useState('');
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	// Modal state for creation
@@ -38,17 +39,21 @@ export default function Roles() {
 	const [creating, setCreating] = useState(false);
 	const [, setGuildId] = useState('687429190165069838');
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
+	const fetchData = useCallback(
+		async (isManual = false) => {
+			if (isManual) setRefreshing(true);
+			else setLoading(true);
 			try {
 				let resolvedGuildId = '687429190165069838';
 				try {
-					const settingRes = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'));
+					const settingRes = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
+						credentials: 'include',
+					});
 					if (settingRes.ok) {
 						const data = await settingRes.json();
-						if (data?.data?.value) {
-							resolvedGuildId = data.data.value;
+						const customGuildId = data?.value || data?.data?.value;
+						if (customGuildId) {
+							resolvedGuildId = customGuildId;
 							setGuildId(resolvedGuildId);
 						}
 					}
@@ -56,7 +61,7 @@ export default function Roles() {
 					console.error('Failed to fetch admin server setting:', err);
 				}
 				const [rolesRes, guildRes, discordRolesRes] = await Promise.all([
-					fetch(getEnvUrl('https://api.xernerx.com/secure/core')),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' }),
 					fetch(getEnvUrl(`https://api.xernerx.com/core/guilds/${resolvedGuildId}/discord`)),
 					fetch(getEnvUrl(`https://api.xernerx.com/core/guilds/${resolvedGuildId}/discord/roles`)),
 				]);
@@ -75,10 +80,15 @@ export default function Roles() {
 				setError(err.message || t('admin.roles.loadError'));
 			} finally {
 				setLoading(false);
+				setRefreshing(false);
 			}
-		};
+		},
+		[getEnvUrl, t]
+	);
+
+	useEffect(() => {
 		fetchData();
-	}, [getEnvUrl, t]);
+	}, [fetchData]);
 
 	const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -100,6 +110,7 @@ export default function Roles() {
 				headers: {
 					'Content-Type': 'application/json',
 				},
+				credentials: 'include',
 				body: JSON.stringify({
 					id: newId,
 					name: roleName,
@@ -157,6 +168,7 @@ export default function Roles() {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/roles/reorder'), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
 				body: JSON.stringify(updatedOrder.map((r) => ({ id: r.id, position: r.position }))),
 			});
 
@@ -172,6 +184,44 @@ export default function Roles() {
 	const filteredRoles = useMemo(() => {
 		return roles.filter((r) => r.name?.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()) || r.role?.toLowerCase().includes(search.toLowerCase()));
 	}, [roles, search]);
+
+	const exportRoles = (format: 'csv' | 'json') => {
+		if (filteredRoles.length === 0) return;
+		if (format === 'json') {
+			const blob = new Blob([JSON.stringify(filteredRoles, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `xernerx-roles-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			return;
+		}
+		const headers = ['id', 'name', 'discordRoleId', 'sync', 'position', 'permissions'];
+		const rows = filteredRoles.map((r) =>
+			[
+				r.id,
+				(r.name || '').replace(/"/g, '""'),
+				r.role || '',
+				String(Boolean(r.sync)),
+				String(r.position ?? 0),
+				Object.entries(r.permissions || {})
+					.filter(([, v]) => v)
+					.map(([k]) => k)
+					.join(';'),
+			]
+				.map((cell) => `"${cell}"`)
+				.join(',')
+		);
+		const csvContent = [headers.join(','), ...rows].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-roles-${new Date().toISOString().slice(0, 10)}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
 
 	if (loading) return <Loading />;
 	if (error)
@@ -226,26 +276,40 @@ export default function Roles() {
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.roles.description')}</p>
 				</div>
-				<Button
-					variant="primary"
-					onClick={() => {
-						setNewName('');
-						setNewDiscordRoleId('');
-						setNewSync(false);
-						const resetPerms: Record<string, boolean> = {};
-						permissions.forEach((p) => {
-							resetPerms[p.key] = p.defaultValue;
-						});
-						setNewPermissions(resetPerms);
-						setIsCreateOpen(true);
-					}}
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<Plus size={16} />
-					<span>{t('admin.roles.newRoleButton')}</span>
-				</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="secondary" size="sm" onClick={() => exportRoles('csv')} disabled={filteredRoles.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.roles.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => exportRoles('json')} disabled={filteredRoles.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.roles.exportJson')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => fetchData(true)} disabled={refreshing} className="flex items-center gap-1.5">
+						<RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+						{t('admin.roles.refresh')}
+					</Button>
+					<Button
+						variant="primary"
+						onClick={() => {
+							setNewName('');
+							setNewDiscordRoleId('');
+							setNewSync(false);
+							const resetPerms: Record<string, boolean> = {};
+							permissions.forEach((p) => {
+								resetPerms[p.key] = p.defaultValue;
+							});
+							setNewPermissions(resetPerms);
+							setIsCreateOpen(true);
+						}}
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.5)',
+						}}
+					>
+						<Plus size={16} />
+						<span>{t('admin.roles.newRoleButton')}</span>
+					</Button>
+				</div>
 			</div>
 
 			{/* Controls Bar: Search */}

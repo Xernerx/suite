@@ -67,6 +67,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 				headers: {
 					'Content-Type': 'application/json',
 				},
+				credentials: 'include',
 				body: JSON.stringify(updatePayload),
 			});
 			if (res.ok) {
@@ -98,6 +99,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${role.id}`), {
 				method: 'DELETE',
+				credentials: 'include',
 			});
 			if (res.ok) {
 				onRoleDeleted(role.id);
@@ -380,6 +382,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 				description={t('admin.roles.deleteConfirmDescription', {
 					name: role.name || t('admin.roles.unnamedRole'),
 				})}
+				confirmKeyword={role.name || role.id}
 				confirmText={t('admin.roles.confirmDelete')}
 				cancelText={t('admin.roles.cancel')}
 				onConfirm={handleDelete}

@@ -18,9 +18,10 @@ interface UserModalProps {
 	getEnvUrl: (url: string) => string;
 	onUserDeleted: (id: string) => void;
 	onUserUpdated: (updated: FullUser) => void;
+	onViewAuditLogs?: (userId: string) => void;
 }
 
-export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl, onUserDeleted, onUserUpdated }: UserModalProps) {
+export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl, onUserDeleted, onUserUpdated, onViewAuditLogs }: UserModalProps) {
 	const { toast } = useToast();
 	const { t } = useDictionary();
 
@@ -147,11 +148,14 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 			}
 			const updated = await res.json();
 
-			// 2. Direct Discord Role Sync: Loop through all available system roles.
+			// 2. Direct Discord Role Sync: Only sync roles that have a linked Discord Role ID and changed assignment.
+			const previousRoles = fullUser ? getNormalizedRoles(fullUser) : initialRoles;
 			for (const r of roles) {
-				const discordRoleId = r.role || r.id;
-				if (!discordRoleId) continue;
+				const discordRoleId = r.role;
+				if (!discordRoleId || !r.sync) continue;
+				const wasAssigned = previousRoles.includes(r.id);
 				const isAssigned = selectedRoleIds.includes(r.id);
+				if (wasAssigned === isAssigned) continue;
 				if (isAssigned) {
 					await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}/discord/roles`), {
 						method: 'POST',
@@ -264,7 +268,22 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-3 overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
-							<UserProfilePreview user={user} discord={discord} fullUser={fullUser} displayName={displayName} avatarUrl={avatarUrl} discordBanner={discordBanner} />
+							<UserProfilePreview
+								user={user}
+								discord={discord}
+								fullUser={fullUser}
+								displayName={displayName}
+								avatarUrl={avatarUrl}
+								discordBanner={discordBanner}
+								onViewAuditLogs={
+									onViewAuditLogs
+										? () => {
+												onOpenChange(false);
+												onViewAuditLogs(user.id);
+											}
+										: undefined
+								}
+							/>
 
 							{/* Edit Form */}
 							<form onSubmit={handleUpdate} className="col-span-1 md:col-span-2 flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
@@ -439,6 +458,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 					name: displayName,
 					id: user.id,
 				})}
+				confirmKeyword={user.id}
 				confirmText={t('admin.roles.confirmDelete')}
 				cancelText={t('admin.roles.cancel')}
 				onConfirm={handleDelete}

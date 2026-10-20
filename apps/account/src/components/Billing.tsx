@@ -1,9 +1,9 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Coins, CreditCard, ExternalLink, Flame, Gift, Loader2, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
+import { Coins, CreditCard, ExternalLink, Flame, Gift, Loader2, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@xernerx/ui';
+import { Button, Confirm } from '@xernerx/ui';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { products } from '@xernerx/lib';
 
@@ -34,7 +34,7 @@ export default function Billing() {
 	const [enriched, setEnriched] = useState<EnrichedSubscription[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [cancellingId, setCancellingId] = useState<string | null>(null);
-	const [cancelConfirm, setCancelConfirm] = useState<string | null>(null);
+	const [cancelConfirm, setCancelConfirm] = useState<EnrichedSubscription | null>(null);
 	const [claimingGift, setClaimingGift] = useState(false);
 
 	const creditBalance = user?.credits?.balance ?? 0;
@@ -287,7 +287,6 @@ export default function Billing() {
 						const days = renewalDate ? daysUntil(renewalDate) : null;
 						const isExpiringSoon = days !== null && days <= 7;
 						const isCancelling = cancellingId === subId;
-						const isConfirming = cancelConfirm === subId;
 						return (
 							<div
 								key={`${subId}-${item.priceId}-${index}`}
@@ -346,29 +345,9 @@ export default function Billing() {
 									</div>
 
 									<div className="flex items-center gap-2">
-										{!isConfirming ? (
-											<button onClick={() => setCancelConfirm(subId)} className="text-xs font-medium text-red-500 hover:underline transition-colors">
-												{t('account.billing.cancelSubscription')}
-											</button>
-										) : (
-											<div className="flex items-center gap-2">
-												<span className="text-xs text-(--text-muted) flex items-center gap-1">
-													<AlertTriangle size={12} className="text-yellow-500" />
-													{t('account.billing.confirmPrompt')}
-												</span>
-												<button onClick={() => setCancelConfirm(null)} className="text-xs font-medium text-(--text-muted) hover:text-(--text) transition-colors">
-													{t('account.billing.keepSubscription')}
-												</button>
-												<button
-													onClick={() => handleCancel(subId)}
-													disabled={isCancelling}
-													className="flex items-center gap-1.5 text-xs font-semibold bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-1 rounded-lg transition-colors disabled:opacity-50"
-												>
-													{isCancelling && <Loader2 size={11} className="animate-spin" />}
-													{t('account.billing.cancelButton')}
-												</button>
-											</div>
-										)}
+										<Button variant="danger" size="sm" onClick={() => setCancelConfirm(item)} disabled={isCancelling}>
+											{t('account.billing.cancelSubscription')}
+										</Button>
 									</div>
 								</div>
 							</div>
@@ -399,6 +378,21 @@ export default function Billing() {
 					</div>
 				)}
 			</div>
+
+			<Confirm
+				open={Boolean(cancelConfirm)}
+				onOpenChange={(open) => !open && setCancelConfirm(null)}
+				title={t('account.billing.cancelConfirmTitle')}
+				description={t('account.billing.cancelConfirmDesc', { product: cancelConfirm?.productName || '' })}
+				confirmKeyword={cancelConfirm?.productName || cancelConfirm?.stripeSubscriptionId || undefined}
+				confirmText={t('account.billing.cancelButton')}
+				cancelText={t('account.billing.keepSubscription')}
+				variant="danger"
+				loading={Boolean(cancellingId)}
+				onConfirm={() => {
+					if (cancelConfirm) handleCancel(cancelConfirm.stripeSubscriptionId);
+				}}
+			/>
 		</div>
 	);
 }

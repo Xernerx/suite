@@ -6,6 +6,7 @@ import { useDictionary, useEnvironment, useToast, useSession } from '@xernerx/pr
 import { Button } from '@xernerx/ui';
 import { User, Copy, Check, Share2, Settings } from 'lucide-react';
 import Image from 'next/image';
+import PublicWidgetModalButton from '@/components/PublicWidgetModalButton';
 
 export default function Header({ user, discordUser, id }: { user: any; discordUser: any; id: string }) {
 	const { t } = useDictionary();
@@ -73,7 +74,7 @@ export default function Header({ user, discordUser, id }: { user: any; discordUs
 
 			<div className="flex-shrink-0 w-full md:w-auto mt-4 md:mt-0 relative z-10 flex flex-wrap items-center gap-2">
 				{isOwnProfile && (
-					<Button variant="primary" onClick={() => window.open(`${getEnvUrl('https://account.xernerx.com/')}?view=profile`, '_blank')}>
+					<Button variant="primary" onClick={() => window.open(`${getEnvUrl('https://account.xernerx.com/')}?tab=profile`, '_blank')}>
 						<Settings className="w-4 h-4 mr-1.5" />
 						{t('app.users.editProfile')}
 					</Button>
@@ -82,6 +83,7 @@ export default function Header({ user, discordUser, id }: { user: any; discordUs
 					<Share2 className="w-4 h-4 mr-1.5" />
 					{t('app.users.shareProfile')}
 				</Button>
+				{user?.widgets && <PublicWidgetModalButton entityType="users" entityId={id} entityName={displayName} />}
 			</div>
 		</div>
 	);

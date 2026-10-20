@@ -149,6 +149,7 @@ function BotsListContent() {
 
 		const baseNavItems = [
 			{ label: t('app.bots.nav.backToExplore'), href: '/', icon: ArrowLeft, category: t('app.bots.nav.categoryNavigation') },
+			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy, category: t('app.bots.nav.categoryNavigation') },
 			{ label: t('app.bots.nav.allBots'), view: 'all', icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
 			{ label: t('app.categories.topVoted'), view: 'top_voted', icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
 			{ label: t('app.categories.biggestBots'), view: 'biggest', icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },

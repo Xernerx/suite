@@ -1,15 +1,16 @@
 /** @format */
 'use client';
 
-import { Activity, AlertTriangle, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server, ScrollText } from 'lucide-react';
+import { Activity, AlertTriangle, Gauge, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server, ScrollText } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
 import AuditLogs from '@/components/AuditLogs';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
+import HomeOverview from '@/components/HomeOverview';
 import Overview from '@/components/Overview';
 import Roles from '@/components/Roles';
 import Tokens from '@/components/Tokens';
@@ -37,6 +38,13 @@ export default function Home() {
 	const [adminServerId, setAdminServerId] = useState<string | null>(null);
 	const [userRolePermissions, setUserRolePermissions] = useState<Record<string, boolean>>({});
 	const [dbError, setDbError] = useState<string | null>(null);
+	const [triageQuery, setTriageQuery] = useState<string>('');
+	const hasInitializedView = useRef(false);
+
+	const handleNavigateFromOverview = (targetView: string, query?: string) => {
+		setTriageQuery(query || '');
+		setView(targetView);
+	};
 
 	useEffect(() => {
 		if (typeof document !== 'undefined') {
@@ -146,6 +154,13 @@ export default function Home() {
 			label: t('admin.dashboard.nav.overview'),
 			view: 'overview',
 			icon: Activity,
+		});
+
+		items.push({
+			category: t('common.nav.categories.system'),
+			label: t('admin.dashboard.nav.seo'),
+			view: 'seo',
+			icon: Gauge,
 		});
 
 		if (canMedia) {
@@ -281,19 +296,37 @@ export default function Home() {
 		setNavItems(items);
 
 		if (items.length > 0) {
-			const urlView = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('view') : null;
-			const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
-			const targetView = urlView || view || storedView;
-			const isTargetAllowed = Boolean(targetView && items.some((item) => item.view === targetView));
-			if (isTargetAllowed && targetView) {
-				if (view !== targetView) setView(targetView);
-			} else {
+			if (!hasInitializedView.current) {
+				hasInitializedView.current = true;
+				const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+				const urlQuery = searchParams ? searchParams.get('q') : null;
+				if (urlQuery) setTriageQuery(urlQuery);
+				const urlView = searchParams ? searchParams.get('tab') || searchParams.get('view') : null;
+				const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
+				const targetView = urlView || view || storedView;
+				const isTargetAllowed = Boolean(targetView && items.some((item) => item.view === targetView));
+				if (isTargetAllowed && targetView) {
+					if (view !== targetView) setView(targetView);
+				} else {
+					setView(items[0].view);
+				}
+			} else if (!view || !items.some((item) => item.view === view)) {
 				setView(items[0].view);
 			}
 		}
 
 		show();
 	}, [userLoading, roleLoading, serverLoading, adminServerId, userRolePermissions, dbError, view, setView, setNavItems, show, t]);
+
+	useEffect(() => {
+		if (!hasInitializedView.current || !view || typeof window === 'undefined') return;
+		const params = new URLSearchParams(window.location.search);
+		if (params.get('tab') !== view) {
+			params.set('tab', view);
+			params.delete('view');
+			window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+		}
+	}, [view]);
 
 	if ((userLoading || roleLoading || serverLoading) && !dbError) return <Loading />;
 
@@ -351,6 +384,7 @@ export default function Home() {
 	const isServerSet = !!adminServerId;
 
 	allowedViews.push('overview');
+	allowedViews.push('seo');
 	allowedViews.push('audit');
 	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
@@ -378,21 +412,44 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			{activeView === 'overview' && <Overview />}
-			{activeView === 'audit' && <AuditLogs />}
+			{activeView === 'overview' && (
+				<HomeOverview
+					permissions={{
+						canUsers,
+						canRoles,
+						canApplicationsReview,
+						canApplicationsManage,
+						canTokens,
+						canTranslations,
+						canSettings,
+						canInvites,
+						canAnnouncements,
+						canMedia,
+						canManageRoadmap,
+						canManageSuggestions,
+						canManageIssues,
+						canManageStore,
+						isServerSet,
+						adminServerId,
+					}}
+					onNavigate={handleNavigateFromOverview}
+				/>
+			)}
+			{activeView === 'seo' && <Overview />}
+			{activeView === 'audit' && <AuditLogs initialSearch={triageQuery} />}
 			{activeView === 'media' && <Media />}
-			{activeView === 'translations' && <Translations />}
-			{activeView === 'users' && <Users />}
-			{activeView === 'applications_review' && <ApplicationReviews />}
+			{activeView === 'translations' && <Translations initialLocale={triageQuery} />}
+			{activeView === 'users' && <Users initialSearch={triageQuery} onViewAuditLogs={(userId) => handleNavigateFromOverview('audit', userId)} />}
+			{activeView === 'applications_review' && <ApplicationReviews initialSearch={triageQuery} />}
 			{activeView === 'applications_manage' && <ApplicationConfigs />}
 			{activeView === 'roles' && <Roles />}
-			{activeView === 'tokens' && <Tokens />}
+			{activeView === 'tokens' && <Tokens initialSearch={triageQuery} onViewAuditLogs={(tokenId) => handleNavigateFromOverview('audit', tokenId)} />}
 			{activeView === 'settings' && <Settings />}
-			{activeView === 'invites' && <Invites />}
+			{activeView === 'invites' && <Invites initialSearch={triageQuery} />}
 			{activeView === 'announcements' && <Announcements />}
 			{activeView === 'roadmap' && <Roadmap />}
-			{activeView === 'suggestions' && <Suggestions />}
-			{activeView === 'issues' && <Issues />}
+			{activeView === 'suggestions' && <Suggestions initialSearch={triageQuery} />}
+			{activeView === 'issues' && <Issues initialSearch={triageQuery} />}
 			{activeView === 'store' && <StoreManagement />}
 		</div>
 	);

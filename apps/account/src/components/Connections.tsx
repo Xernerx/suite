@@ -300,7 +300,7 @@ export default function Connections() {
 								{connected && (
 									<div className="flex items-center justify-between pt-3 border-t border-(--border)/10">
 										<span className="text-xs text-(--text-muted)">{t('account.connections.showOnProfile')}</span>
-										<Toggle checked={connected.showOnProfile !== false} onChange={(val) => handleToggleVisibility(provider.id, val)} />
+										<Toggle checked={connected.showOnProfile !== false} onChange={(e) => handleToggleVisibility(provider.id, e.target.checked)} />
 									</div>
 								)}
 							</div>

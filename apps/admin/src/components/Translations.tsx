@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import { BookOpen, Languages, ListOrdered, Loader2, Send, Sparkles } from 'lucide-react';
+import { BookOpen, Download, Languages, ListOrdered, Loader2, Send, Sparkles } from 'lucide-react';
 import { Button, PreventLossConfirmation, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CircleFlag } from 'react-circle-flags';
 import { Loading } from '@xernerx/feedback';
 import { flattenObject, getFlagCode, unflattenObject } from './translations/utils';
@@ -13,9 +13,9 @@ import { TranslationWelcomeTab } from './translations/TranslationWelcomeTab';
 import { TranslationNewTab } from './translations/TranslationNewTab';
 import { TranslationReviewTab } from './translations/TranslationReviewTab';
 
-export default function Translations() {
+export default function Translations({ initialLocale = '' }: { initialLocale?: string }) {
 	const { getEnvUrl } = useEnvironment();
-	const { toast } = useToast();
+	const { toast, remind } = useToast();
 	const { user } = useUser();
 	const { locales: localesData, t } = useDictionary() as any;
 
@@ -28,12 +28,21 @@ export default function Translations() {
 	const targetLocales = localesList.filter((l) => l && typeof l === 'object' && l.code && l.code !== 'en-GB');
 
 	const [selectedLocale, setSelectedLocale] = useState<string>(() => {
+		if (initialLocale && targetLocales.some((l) => l.code === initialLocale)) {
+			return initialLocale;
+		}
 		const pref = user?.preferences?.locale;
 		if (pref && targetLocales.some((l) => l.code === pref)) {
 			return pref;
 		}
 		return targetLocales.length > 0 ? targetLocales[0].code : '';
 	});
+
+	useEffect(() => {
+		if (initialLocale && targetLocales.some((l) => l.code === initialLocale)) {
+			setSelectedLocale(initialLocale);
+		}
+	}, [initialLocale]);
 
 	const [sourceDict, setSourceDict] = useState<Record<string, string>>({});
 	const [targetDict, setTargetDict] = useState<Record<string, string>>({});
@@ -197,7 +206,7 @@ export default function Translations() {
 		}));
 	};
 
-	const handleSave = async () => {
+	const handleSave = useCallback(async () => {
 		if (!isDirty) {
 			toast({
 				title: t('admin.translations.errors.noChanges'),
@@ -233,6 +242,32 @@ export default function Translations() {
 		} finally {
 			setSaving(false);
 		}
+	}, [isDirty, targetDict, selectedLocale, getEnvUrl, toast, t]);
+
+	const handleReset = useCallback(() => {
+		setTargetDict(initialTargetDict);
+	}, [initialTargetDict]);
+
+	useEffect(() => {
+		if (isDirty) {
+			remind(true, handleSave, handleReset, saving);
+		} else {
+			remind(false);
+		}
+		return () => remind(false);
+	}, [isDirty, handleSave, handleReset, saving, remind]);
+
+	const handleExportJson = () => {
+		if (!selectedLocale) return;
+		const reconstructed = unflattenObject(targetDict);
+		const blob = new Blob([JSON.stringify(reconstructed, null, 2)], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${selectedLocale}.json`;
+		a.click();
+		URL.revokeObjectURL(url);
+		toast({ type: 'success', title: t('admin.translations.exportSuccess') });
 	};
 
 	const currentLocaleObj = targetLocales.find((l) => l.code === selectedLocale);
@@ -316,10 +351,15 @@ export default function Translations() {
 					<p className="text-xs text-(--text-muted)">{t('admin.translations.description')}</p>
 				</div>
 
-				<div className="flex items-center gap-3 w-full sm:w-auto">
+				<div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
 					<div className="w-full sm:w-64">
 						<Selector value={selectedLocale} options={languageOptions} onChange={(val) => setSelectedLocale(val)} />
 					</div>
+
+					<Button variant="secondary" onClick={handleExportJson} disabled={!selectedLocale || loading} className="gap-2 rounded-2xl px-4 py-2.5 shrink-0">
+						<Download size={16} />
+						{t('admin.translations.exportJson')}
+					</Button>
 
 					<Button onClick={handleSave} disabled={saving || !isDirty} className="gap-2 rounded-2xl px-5 py-2.5 shrink-0">
 						{saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}

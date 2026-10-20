@@ -4,7 +4,7 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
-import { Copy, Key, Settings2, Trash2 } from 'lucide-react';
+import { Copy, Key, ScrollText, Settings2, Trash2 } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import type { Token } from './types';
@@ -16,9 +16,10 @@ interface TokenCardProps {
 	getEnvUrl: (url: string) => string;
 	onTokenDeleted: (id: string) => void;
 	onTokenUpdated: (updated: Token) => void;
+	onViewAuditLogs?: (tokenId: string) => void;
 }
 
-export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: TokenCardProps) {
+export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, onViewAuditLogs }: TokenCardProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -150,7 +151,6 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 					type: 'success',
 					title: t('admin.tokens.tokenDeleted'),
 				});
-				window.location.reload();
 			} else {
 				const errData = await res.json().catch(() => ({}));
 				throw new Error(errData.error || 'Unknown error');
@@ -367,7 +367,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 							</div>
 
 							<div className="flex items-center justify-between pt-4 border-t border-(--border)/10 mt-auto">
-								<div className="flex items-center gap-2">
+								<div className="flex flex-wrap items-center gap-2">
 									<button
 										type="button"
 										onClick={() => setConfirmDeleteOpen(true)}
@@ -390,6 +390,19 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 										<Copy size={12} />
 										{(token.id || '').substring(0, 8)}...
 									</button>
+									{onViewAuditLogs && (
+										<button
+											type="button"
+											onClick={() => {
+												setIsModalOpen(false);
+												onViewAuditLogs(token.id);
+											}}
+											className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-(--background)/50 hover:bg-(--border)/10 text-(--text-muted) hover:text-(--accent) text-xs font-medium transition-colors"
+										>
+											<ScrollText size={13} />
+											{t('admin.users.viewAuditHistory')}
+										</button>
+									)}
 								</div>
 								<Button type="submit" disabled={saving || !isDirty}>
 									{saving ? t('admin.roles.saving') : t('admin.tokens.manage.saveButton')}
@@ -405,6 +418,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated }: 
 				onOpenChange={setConfirmDeleteOpen}
 				title={t('admin.tokens.manage.revokeTitle')}
 				description={t('admin.tokens.manage.deleteConfirm')}
+				confirmKeyword={token.name || token.id}
 				confirmText={t('admin.roles.confirmDelete')}
 				cancelText={t('admin.roles.cancel')}
 				onConfirm={handleDelete}

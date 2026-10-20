@@ -2,30 +2,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-	ArrowLeft,
-	ArrowRight,
-	Bell,
-	Check,
-	Copy,
-	Download,
-	Gift,
-	Home,
-	LayoutGrid,
-	Minus,
-	Monitor,
-	RotateCw,
-	Search,
-	SidebarClose,
-	SidebarOpen,
-	Smartphone,
-	Square,
-	Store,
-	Tablet,
-	User as UserIcon,
-	X,
-} from 'lucide-react';
-import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useToast, useUser } from '@xernerx/providers';
+import { Bell, Copy, Download, Gift, LayoutGrid, Minus, Monitor, Search, SidebarClose, SidebarOpen, Smartphone, Square, Store, Tablet, User as UserIcon, X } from 'lucide-react';
+import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -37,58 +15,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SidebarNotifications from './cards/SidebarNotifications';
 import SidebarUserCard from './cards/SidebarUser';
+import { HeaderOmnibar, SubSelector } from './HeaderOmnibar';
 
-export function SubSelector({ name, options, defaultValue }: { name: string; options: string[]; defaultValue: string }) {
-	const [isOpen, setIsOpen] = useState(false);
-	const [value, setValue] = useState(defaultValue);
-	const ref = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const handleClickOutside = (e: MouseEvent) => {
-			if (ref.current && !ref.current.contains(e.target as Node)) {
-				setIsOpen(false);
-			}
-		};
-		if (isOpen) {
-			window.addEventListener('click', handleClickOutside);
-		}
-		return () => window.removeEventListener('click', handleClickOutside);
-	}, [isOpen]);
-
-	return (
-		<div ref={ref} className="relative flex items-center">
-			<input type="hidden" name={name} value={value} />
-			<div className="text-sm font-medium text-(--text) cursor-pointer hover:text-(--accent) transition-colors flex items-center select-none" onClick={() => setIsOpen(!isOpen)}>
-				{value}
-			</div>
-
-			<AnimatePresence>
-				{isOpen && (
-					<motion.div
-						initial={{ opacity: 0, y: -5, scale: 0.95 }}
-						animate={{ opacity: 1, y: 0, scale: 1 }}
-						exit={{ opacity: 0, y: -5, scale: 0.95 }}
-						transition={{ duration: 0.15 }}
-						className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-(--background) border border-white/10 rounded-md shadow-xl overflow-hidden min-w-[120px] z-[9999] flex flex-col p-1"
-					>
-						{options.map((option) => (
-							<div
-								key={option}
-								className={`px-3 py-1.5 text-sm font-medium rounded-sm cursor-pointer transition-colors ${value === option ? 'bg-(--accent)/10 text-(--accent)' : 'text-(--text) hover:bg-(--foreground)'}`}
-								onClick={() => {
-									setValue(option);
-									setIsOpen(false);
-								}}
-							>
-								{option}
-							</div>
-						))}
-					</motion.div>
-				)}
-			</AnimatePresence>
-		</div>
-	);
-}
+export { SubSelector };
 
 const deviceIcons = {
 	desktop: Monitor,
@@ -126,10 +55,7 @@ export function Header() {
 	}
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
-	const { toast } = useToast();
 	const pathname = usePathname();
-	const urlFormRef = useRef<HTMLFormElement>(null);
-	const [urlCopied, setUrlCopied] = useState(false);
 
 	const resolveOmnibarUrl = (pre: string, env: string, rawPath: string) => {
 		let fullPath = rawPath.trim();
@@ -435,89 +361,7 @@ export function Header() {
 					</div>
 				</div>
 			</header>
-			<AnimatePresence>
-				{isUrlPlacerOpen && (
-					<motion.div
-						initial={{ height: 0, opacity: 0, overflow: 'hidden' }}
-						animate={{ height: 44, opacity: 1, transitionEnd: { overflow: 'visible' } }}
-						exit={{ height: 0, opacity: 0, overflow: 'hidden' }}
-						transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-						className="flex items-center w-full shrink-0 bg-(--background) px-4 gap-3 relative z-[999]"
-					>
-						<div className="flex items-center gap-1">
-							<button onClick={() => window.history.back()} className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all">
-								<ArrowLeft size={16} strokeWidth={2.5} />
-							</button>
-							<button onClick={() => window.history.forward()} className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all">
-								<ArrowRight size={16} strokeWidth={2.5} />
-							</button>
-							<button onClick={() => window.location.reload()} className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all">
-								<RotateCw size={16} strokeWidth={2.5} />
-							</button>
-							<button onClick={() => (window.location.href = '/')} className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all ml-1">
-								<Home size={16} strokeWidth={2.5} />
-							</button>
-						</div>
-
-						<form
-							ref={urlFormRef}
-							className="flex flex-1 items-center bg-(--foreground) rounded-full h-[30px] px-3 border border-white/10 ml-1 focus-within:ring-2 focus-within:ring-(--accent)/20 focus-within:border-(--accent) transition-all shadow-sm"
-							onSubmit={(e) => {
-								e.preventDefault();
-								const pre = (e.currentTarget.elements.namedItem('pre') as HTMLSelectElement).value;
-								const env = (e.currentTarget.elements.namedItem('env') as HTMLSelectElement).value;
-								const path = (e.currentTarget.elements.namedItem('path') as HTMLInputElement).value;
-
-								window.location.href = resolveOmnibarUrl(pre, env, path);
-							}}
-						>
-							<span className="text-(--text-muted) select-none text-sm font-medium pr-1">https://</span>
-							<SubSelector name="pre" options={['app', 'www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info']} defaultValue={urlState.pre} />
-							<span className="text-(--text-muted) select-none text-sm font-medium px-0.5">.</span>
-							<SubSelector name="env" options={['public', 'canary', 'dev']} defaultValue={urlState.env} />
-							<span className="text-(--text-muted) select-none text-sm font-medium pl-0.5 pr-2">.xernerx.com</span>
-							<input
-								key={urlState.path}
-								name="path"
-								type="text"
-								placeholder="/path"
-								className="bg-transparent border-none outline-none text-sm font-medium w-full text-(--text) placeholder:text-(--text-muted)/70"
-								autoFocus
-								defaultValue={urlState.path}
-							/>
-						</form>
-
-						<div className="flex items-center gap-1">
-							<button
-								type="button"
-								title={t('components.header.copyUrl')}
-								onClick={() => {
-									const form = urlFormRef.current;
-									let targetUrl = typeof window !== 'undefined' ? window.location.href : '';
-									if (form) {
-										const pre = (form.elements.namedItem('pre') as HTMLInputElement)?.value || urlState.pre;
-										const env = (form.elements.namedItem('env') as HTMLInputElement)?.value || urlState.env;
-										const path = (form.elements.namedItem('path') as HTMLInputElement)?.value || '';
-										targetUrl = resolveOmnibarUrl(pre, env, path);
-									}
-									navigator.clipboard.writeText(targetUrl).then(() => {
-										setUrlCopied(true);
-										toast({ type: 'success', title: t('components.header.urlCopied'), description: targetUrl });
-										setTimeout(() => setUrlCopied(false), 2000);
-									});
-								}}
-								className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-md transition-all cursor-pointer"
-							>
-								{urlCopied ? <Check size={16} strokeWidth={2.5} className="text-green-400" /> : <Copy size={16} strokeWidth={2.5} />}
-							</button>
-
-							<button onClick={() => setUrlPlacerOpen(false)} className="text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-md transition-all cursor-pointer">
-								<X size={16} strokeWidth={2.5} />
-							</button>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
+			<HeaderOmnibar isOpen={isUrlPlacerOpen} onClose={() => setUrlPlacerOpen(false)} urlState={urlState} resolveOmnibarUrl={resolveOmnibarUrl} />
 		</div>
 	);
 }

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Bot, Compass, LayoutDashboard, Plus, User } from 'lucide-react';
+import { Bot, Compass, LayoutDashboard, Plus, User, Trophy } from 'lucide-react';
 import { Confirm, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
@@ -202,6 +202,7 @@ export default function PortalPage() {
 
 		const staticItems = [
 			{ label: t('app.portal.nav.explore'), href: '/', icon: Compass as any, category: t('app.portal.categories.navigation') },
+			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy as any, category: t('app.portal.categories.navigation') },
 			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard as any, category: t('app.portal.categories.navigation') },
 		];
 

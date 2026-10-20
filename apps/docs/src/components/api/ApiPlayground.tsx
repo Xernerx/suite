@@ -7,8 +7,8 @@ import { Button, Input, Selector, CodeBlock } from '@xernerx/ui';
 import { Play, Terminal, Clock, Activity } from 'lucide-react';
 
 const PRESET_PATHS: Record<string, string[]> = {
-	v1: ['/api/version', '/v1/bots/1059956767103668244', '/v1/bots/1059956767103668244/stats', '/v1/bots/1059956767103668244/commands'],
-	core: ['/api/version', '/info/roadmap', '/info/issues', '/info/suggestions'],
+	v1: ['/api/version', '/v1/leaderboard', '/v1/status/badge.svg', '/v1/bots/1059956767103668244', '/v1/bots/1059956767103668244/stats', '/v1/bots/1059956767103668244/commands'],
+	core: ['/api/version', '/core/users/482513687417061376', '/info/roadmap', '/info/issues', '/info/suggestions'],
 	secure: ['/secure/core/versions', '/secure/core/audit?limit=10', '/secure/core'],
 };
 

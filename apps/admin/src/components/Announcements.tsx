@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
-import { Button, Confirm } from '@xernerx/ui';
+import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import type { AnnouncementItem, ChannelOption, ComponentRow, EmbedData } from './announcements/types';
 import { AnnouncementCard } from './announcements/AnnouncementCard';
@@ -19,6 +19,8 @@ export default function Announcements() {
 	const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [channels, setChannels] = useState<ChannelOption[]>([]);
+	const [search, setSearch] = useState('');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'scheduled' | 'sent'>('all');
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
@@ -204,13 +206,19 @@ export default function Announcements() {
 		const id = confirmDeleteId;
 		setConfirmDeleteId(null);
 		try {
-			await fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements/${id}`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements/${id}`), {
 				method: 'DELETE',
 				credentials: 'include',
 			});
-			fetchAnnouncements();
-		} catch (e) {
+			if (res.ok) {
+				toast({ type: 'success', title: t('admin.dashboard.announcements.toasts.deleteSuccess') });
+				fetchAnnouncements();
+			} else {
+				throw new Error('Delete failed');
+			}
+		} catch (e: any) {
 			console.error(e);
+			toast({ type: 'error', title: t('admin.dashboard.announcements.toasts.deleteFailed'), description: e.message });
 		}
 	};
 
@@ -245,13 +253,42 @@ export default function Announcements() {
 		setIsOpen(true);
 	};
 
+	const filteredAnnouncements = useMemo(() => {
+		const q = search.trim().toLowerCase();
+		return announcements.filter((a) => {
+			if (statusFilter === 'scheduled' && (Boolean(a.sentAt) || !a.scheduledFor)) return false;
+			if (statusFilter === 'sent' && !a.sentAt) return false;
+			if (!q) return true;
+			const embedMatch = (a.message?.embeds || []).some(
+				(e: any) =>
+					String(e.title || '')
+						.toLowerCase()
+						.includes(q) ||
+					String(e.description || '')
+						.toLowerCase()
+						.includes(q)
+			);
+			return (
+				String(a.title || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(a.message?.content || '')
+					.toLowerCase()
+					.includes(q) ||
+				embedMatch
+			);
+		});
+	}, [announcements, search, statusFilter]);
+
 	if (loading) return <Loading />;
 
 	return (
 		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-			<div className="flex flex-col sm:flex-row items-center justify-between">
+			<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 				<div className="flex flex-col">
-					<h1 className="text-4xl font-extrabold tracking-tight text-(--text)">{t('admin.dashboard.announcements.title')}</h1>
+					<h1 className="text-4xl font-extrabold tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('admin.dashboard.announcements.title')}
+					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.announcements.subtitle')}</p>
 				</div>
 				<Button variant="primary" onClick={handleCreateAnnouncement}>
@@ -259,11 +296,34 @@ export default function Announcements() {
 				</Button>
 			</div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-				{announcements.map((a) => (
-					<AnnouncementCard key={a.id} announcement={a} onEdit={handleEditAnnouncement} onDelete={deleteAnnouncement} />
-				))}
+			<div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+				<div className="relative flex-1">
+					<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('admin.dashboard.announcements.searchPlaceholder')} />
+				</div>
+				<div className="w-full sm:w-44">
+					<Selector
+						value={statusFilter}
+						onChange={(val) => setStatusFilter(val as any)}
+						options={[
+							{ value: 'all', label: t('admin.dashboard.announcements.filterAll') },
+							{ value: 'scheduled', label: t('admin.dashboard.announcements.filterScheduled') },
+							{ value: 'sent', label: t('admin.dashboard.announcements.filterSent') },
+						]}
+					/>
+				</div>
 			</div>
+
+			{filteredAnnouncements.length === 0 ? (
+				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
+					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.announcements.noAnnouncements')}</p>
+				</div>
+			) : (
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+					{filteredAnnouncements.map((a) => (
+						<AnnouncementCard key={a.id} announcement={a} onEdit={handleEditAnnouncement} onDelete={deleteAnnouncement} />
+					))}
+				</div>
+			)}
 
 			<AnnouncementModal
 				open={isOpen}
@@ -295,6 +355,7 @@ export default function Announcements() {
 				onOpenChange={(open) => !open && setConfirmDeleteId(null)}
 				title={t('admin.dashboard.announcements.title')}
 				description={t('admin.dashboard.announcements.deleteConfirm')}
+				confirmKeyword={announcements.find((a) => a.id === confirmDeleteId)?.title || confirmDeleteId || undefined}
 				variant="danger"
 				onConfirm={confirmDeleteAnnouncement}
 			/>

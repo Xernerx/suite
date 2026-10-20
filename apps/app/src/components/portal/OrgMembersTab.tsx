@@ -346,8 +346,10 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 				onOpenChange={(open) => !open && setMemberToRemove(null)}
 				title={t('app.portal.members.removeModal.title')}
 				description={t('app.portal.members.removeModal.description')}
+				confirmKeyword={memberToRemove ? memberProfiles[memberToRemove]?.global_name || memberProfiles[memberToRemove]?.username || memberToRemove : undefined}
 				confirmText={t('app.portal.members.removeModal.confirm')}
 				cancelText={t('app.portal.members.removeModal.cancel')}
+				variant="danger"
 				onConfirm={handleRemoveMember}
 			/>
 		</>

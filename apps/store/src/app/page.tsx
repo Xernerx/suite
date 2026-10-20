@@ -68,15 +68,15 @@ export default function StorePage() {
 			const urlCat = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') : null;
 			if (urlCat && cats.some((c) => c.id === urlCat)) {
 				setActiveCategory(urlCat);
-			} else if (cats.length > 0 && (!activeCategory || !cats.some((c) => c.id === activeCategory))) {
-				setActiveCategory(cats[0].id);
+			} else if (cats.length > 0) {
+				setActiveCategory((prev) => (prev && cats.some((c) => c.id === prev) ? prev : cats[0].id));
 			}
 		} catch (err: any) {
 			console.error('Failed to fetch store catalog:', err);
 		} finally {
 			setLoading(false);
 		}
-	}, [getEnvUrl, isReady, activeCategory]);
+	}, [getEnvUrl, isReady]);
 
 	useEffect(() => {
 		hide();

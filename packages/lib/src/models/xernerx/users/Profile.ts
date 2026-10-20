@@ -25,6 +25,7 @@ const schema = new Schema(
 		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service
 		agreedPrivacy: { type: Date, default: null }, // Timestamp of when the user agreed to the Privacy Policy
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the user
+		widgets: { type: Boolean, default: false }, // Whether public embed widgets are enabled
 		preferences: { locale: { type: String } }, // User locale (e.g., en-US, es-ES, fr-FR)
 
 		connections: {

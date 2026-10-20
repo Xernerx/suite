@@ -137,11 +137,22 @@ export default function Home() {
 			},
 		]);
 
-		const urlView = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('view') : null;
+		const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+		const urlView = searchParams ? searchParams.get('tab') || searchParams.get('view') : null;
 		const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
-		const targetView = urlView || view || storedView || 'profile';
+		const targetView = (urlView && urlView in COMPONENT_MAP ? urlView : null) || view || storedView || 'profile';
 		if (view !== targetView) setView(targetView);
 	}, [session, status, hide, show, setNavItems, view, setView, t]);
+
+	useEffect(() => {
+		if (!view || typeof window === 'undefined') return;
+		const url = new URL(window.location.href);
+		if (url.searchParams.get('tab') !== view) {
+			url.searchParams.delete('view');
+			url.searchParams.set('tab', view);
+			window.history.replaceState({}, '', url.toString());
+		}
+	}, [view]);
 
 	if (!session && status !== 'loading') {
 		const search = typeof window !== 'undefined' ? window.location.search : '';

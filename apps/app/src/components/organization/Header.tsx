@@ -7,6 +7,7 @@ import { Button } from '@xernerx/ui';
 import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, Copy, Check, Share2 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import Image from 'next/image';
+import PublicWidgetModalButton from '@/components/PublicWidgetModalButton';
 
 export default function Header({ organization, id, servers }: { organization: any; id: string; servers?: any[] }) {
 	const { t } = useDictionary();
@@ -87,6 +88,7 @@ export default function Header({ organization, id, servers }: { organization: an
 						<Share2 className="w-4 h-4 mr-1.5" />
 						{t('app.organization.header.shareProfile')}
 					</Button>
+					{(organization.widgets || organization.config?.widgets) && <PublicWidgetModalButton entityType="organizations" entityId={orgId} entityName={organization.name || 'Organization'} />}
 				</div>
 				<div className="flex flex-col items-start md:items-end gap-3 w-full">
 					{organization.links && Object.entries(organization.links).filter(([key, val]) => val).length > 0 && (

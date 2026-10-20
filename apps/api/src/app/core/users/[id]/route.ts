@@ -23,8 +23,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const OrganizationModel = (db.models.organizations as any).Organization;
 
 		const user = await UserModel.findOne({ id }).lean();
-		if (user?.privacy === 'private') {
-			return NextResponse.json({ error: 'User profile is private' }, { status: 404 });
+		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
+		if (user?.privacy === 'private' || (isExternalWidget && !user?.widgets)) {
+			return NextResponse.json({ error: 'User profile is private or widgets are disabled' }, { status: 404 });
 		}
 
 		let discordUser: any = null;

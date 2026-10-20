@@ -465,6 +465,7 @@ export default function Media() {
 				onOpenChange={(open) => !open && setDeleteConfirmId(null)}
 				title={t('common.buttons.delete')}
 				description={t('admin.dashboard.media.toasts.deleteConfirm')}
+				confirmKeyword={media.find((m) => m._id === deleteConfirmId)?.filename || deleteConfirmId || undefined}
 				confirmText={t('common.buttons.delete')}
 				cancelText={t('common.buttons.cancel')}
 				onConfirm={confirmDelete}

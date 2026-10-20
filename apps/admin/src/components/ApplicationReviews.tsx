@@ -1,12 +1,12 @@
 /** @format */
 'use client';
 
-import { Check, Clock, FileText, Loader2, ShieldAlert, User, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Check, Clock, Copy, ExternalLink, FileText, Loader2, ShieldAlert, User } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { useDictionary } from '@xernerx/providers';
-import { Input } from '@xernerx/ui';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Button, Input, Modal, Selector } from '@xernerx/ui';
+import { motion } from 'framer-motion';
 
 interface Application {
 	id: string;
@@ -40,7 +40,7 @@ interface AppUser {
 	icon?: string;
 }
 
-export default function ApplicationReviews() {
+export default function ApplicationReviews({ initialSearch = '' }: { initialSearch?: string }) {
 	const { t } = useDictionary();
 	const { user } = useUser();
 	const { getEnvUrl } = useEnvironment();
@@ -50,6 +50,12 @@ export default function ApplicationReviews() {
 	const [appConfigs, setAppConfigs] = useState<Record<string, ApplicationConfig>>({});
 	const [appUsers, setAppUsers] = useState<Record<string, AppUser>>({});
 	const [isLoading, setIsLoading] = useState(true);
+	const [search, setSearch] = useState(initialSearch);
+	const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'denied'>('all');
+
+	useEffect(() => {
+		if (initialSearch) setSearch(initialSearch);
+	}, [initialSearch]);
 
 	// Modal State
 	const [selectedApp, setSelectedApp] = useState<Application | null>(null);
@@ -134,8 +140,12 @@ export default function ApplicationReviews() {
 			// Fire a generic notification if the user isn't anonymous
 			if (selectedApp.ownerId !== 'anonymous') {
 				const config = appConfigs[selectedApp.targetId];
-				const appName = config?.name || 'Application';
-				const notificationMessage = `Your request for ${appName} has been ${newStatus}.${reviewNote.trim() ? `\n\nReviewer Note: ${reviewNote.trim()}` : ''}`;
+				const appName = config?.name || t('admin.dashboard.applicationReviews.application');
+				const baseMessage = t('admin.dashboard.applicationReviews.notificationMessage', {
+					appName,
+					status: t(`admin.reviews.status.${newStatus}`).toLowerCase(),
+				});
+				const notificationMessage = reviewNote.trim() ? `${baseMessage}\n\n${t('admin.dashboard.applicationReviews.notificationNotePrefix', { note: reviewNote.trim() })}` : baseMessage;
 
 				await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch`), {
 					method: 'POST',
@@ -147,7 +157,7 @@ export default function ApplicationReviews() {
 						category: 'notification',
 						type: 'system_notification',
 						data: {
-							title: `Application ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`,
+							title: newStatus === 'approved' ? t('admin.dashboard.applicationReviews.notificationApprovedTitle') : t('admin.dashboard.applicationReviews.notificationDeniedTitle'),
 							message: notificationMessage,
 							alertType: newStatus === 'approved' ? 'success' : 'error',
 						},
@@ -185,6 +195,30 @@ export default function ApplicationReviews() {
 		}
 	};
 
+	const filteredApplications = useMemo(() => {
+		const q = search.trim().toLowerCase();
+		return applications.filter((app) => {
+			if (statusFilter !== 'all' && app.status !== statusFilter) return false;
+			if (!q) return true;
+			const applicant = appUsers[app.ownerId];
+			const config = appConfigs[app.targetId];
+			return (
+				String(app.ownerId || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(applicant?.name || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(config?.name || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(app.id || '')
+					.toLowerCase()
+					.includes(q)
+			);
+		});
+	}, [applications, search, statusFilter, appUsers, appConfigs]);
+
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full relative"
@@ -194,7 +228,7 @@ export default function ApplicationReviews() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+			<div className="flex flex-col lg:flex-row lg:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: `var(--font-fredoka)` }}>
 						{t('admin.reviews.title')}
@@ -202,19 +236,36 @@ export default function ApplicationReviews() {
 					<p className="text-sm text-(--text-muted)">{t('admin.reviews.description')}</p>
 				</div>
 
-				<button
-					onClick={fetchApplications}
-					disabled={isLoading}
-					className="flex items-center justify-center gap-2 rounded-xl text-sm font-medium bg-(--border)/5 hover:bg-(--border)/10 text-(--text) transition-colors disabled:opacity-50"
-					style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
-				>
-					<Loader2 className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-					{isLoading ? t('admin.dashboard.applicationReviews.refreshing') : t('admin.dashboard.applicationReviews.refreshList')}
-				</button>
+				<div className="flex flex-wrap items-center gap-2">
+					<div className="w-full sm:w-64">
+						<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('admin.dashboard.applicationReviews.searchPlaceholder')} />
+					</div>
+					<div className="w-full sm:w-40">
+						<Selector
+							value={statusFilter}
+							onChange={(val) => setStatusFilter(val as any)}
+							options={[
+								{ value: 'all', label: t('admin.dashboard.applicationReviews.filterAll') },
+								{ value: 'pending', label: t('admin.dashboard.applicationReviews.filterPending') },
+								{ value: 'approved', label: t('admin.dashboard.applicationReviews.filterApproved') },
+								{ value: 'denied', label: t('admin.dashboard.applicationReviews.filterDenied') },
+							]}
+						/>
+					</div>
+					<button
+						onClick={fetchApplications}
+						disabled={isLoading}
+						className="flex items-center justify-center gap-2 rounded-xl text-sm font-medium bg-(--border)/5 hover:bg-(--border)/10 text-(--text) transition-colors disabled:opacity-50"
+						style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
+					>
+						<Loader2 className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+						{isLoading ? t('admin.dashboard.applicationReviews.refreshing') : t('admin.dashboard.applicationReviews.refreshList')}
+					</button>
+				</div>
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-4">
-				{applications.map((app) => {
+				{filteredApplications.map((app) => {
 					const applicant = appUsers[app.ownerId];
 					const config = appConfigs[app.targetId];
 
@@ -274,7 +325,7 @@ export default function ApplicationReviews() {
 					);
 				})}
 
-				{!isLoading && applications.length === 0 && (
+				{!isLoading && filteredApplications.length === 0 && (
 					<div className="col-span-full py-20 flex flex-col items-center justify-center text-(--text-muted) border-2 border-dashed border-(--border)/20 rounded-[3rem]">
 						<ShieldAlert className="w-12 h-12 mb-4 opacity-20" />
 						<h3 className="text-lg font-semibold">{t('admin.dashboard.applicationReviews.noApplicationsFound')}</h3>
@@ -283,123 +334,114 @@ export default function ApplicationReviews() {
 				)}
 			</div>
 
-			<AnimatePresence>
+			<Modal
+				open={Boolean(selectedApp)}
+				onOpenChange={(open) => {
+					if (!open) closeModal();
+				}}
+				title={
+					selectedApp
+						? selectedApp.ownerId === 'anonymous'
+							? t('admin.dashboard.applicationReviews.anonymousUser')
+							: appUsers[selectedApp.ownerId]?.name || t('admin.dashboard.applicationReviews.unknownUser')
+						: ''
+				}
+				description={selectedApp ? appConfigs[selectedApp.targetId]?.name || t('admin.dashboard.applicationReviews.unknownApplication') : ''}
+				maxWidth="max-w-3xl"
+			>
 				{selectedApp && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeModal} />
-
-						<motion.div
-							initial={{ opacity: 0, scale: 0.95, y: 20 }}
-							animate={{ opacity: 1, scale: 1, y: 0 }}
-							exit={{ opacity: 0, scale: 0.95, y: 20 }}
-							className="relative flex flex-col w-full max-w-3xl max-h-[85vh] bg-(--foreground)/90 backdrop-blur-md rounded-[2.5rem] border border-(--border)/10 shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] overflow-hidden"
-						>
-							<div className="flex items-center justify-between px-8 py-6 border-b border-(--border)/10 bg-transparent">
-								<div className="flex items-center gap-4">
-									<div className="w-12 h-12 rounded-full bg-(--border)/10 flex items-center justify-center overflow-hidden shrink-0 border border-(--border)/20">
-										{selectedApp.ownerId === 'anonymous' ? (
-											<User className="w-6 h-6 text-(--text-muted)" />
-										) : appUsers[selectedApp.ownerId]?.icon ? (
-											<img src={appUsers[selectedApp.ownerId].icon} alt="Avatar" className="w-full h-full object-cover" />
-										) : (
-											<User className="w-6 h-6 text-(--text-muted)" />
-										)}
-									</div>
-									<div className="flex flex-col">
-										<span className="text-xl font-bold text-(--text)">
-											{selectedApp.ownerId === 'anonymous'
-												? t('admin.dashboard.applicationReviews.anonymousUser')
-												: appUsers[selectedApp.ownerId]?.name || t('admin.dashboard.applicationReviews.unknownUser')}
-										</span>
-										<span className="text-sm text-(--accent) font-medium">
-											{appConfigs[selectedApp.targetId]?.name || t('admin.dashboard.applicationReviews.unknownApplication')}
-										</span>
-									</div>
-								</div>
-								<button onClick={closeModal} className="p-2 rounded-full hover:bg-(--border)/10 text-(--text-muted) hover:text-(--text) transition-colors">
-									<X className="w-5 h-5" />
+					<div className="flex flex-col gap-6 pt-2">
+						{selectedApp.ownerId && selectedApp.ownerId !== 'anonymous' && (
+							<div className="flex items-center gap-2">
+								<a
+									href={getEnvUrl(`https://app.xernerx.com/users/${selectedApp.ownerId}`)}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-xs font-mono text-(--text-muted) hover:text-(--accent) transition-colors flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-(--background)/60 border border-(--border)/10"
+								>
+									{selectedApp.ownerId}
+									<ExternalLink size={11} />
+								</a>
+								<button
+									type="button"
+									onClick={() => {
+										navigator.clipboard.writeText(selectedApp.ownerId);
+										toast({ title: t('admin.dashboard.suggestions.idCopied'), type: 'success' });
+									}}
+									className="p-1.5 rounded-md text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer"
+								>
+									<Copy size={12} />
 								</button>
 							</div>
+						)}
 
-							<div className="flex-1 overflow-y-auto px-8 py-8 flex flex-col gap-8 custom-scrollbar">
-								<div className="flex flex-col gap-6">
-									<h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-widest border-b border-(--border)/10 pb-2">
-										{t('admin.dashboard.applicationReviews.formResponses')}
-									</h3>
+						<div className="flex flex-col gap-4 max-h-[52vh] overflow-y-auto pr-1 custom-scrollbar">
+							<h3 className="text-xs font-bold text-(--text-muted) uppercase tracking-widest border-b border-(--border)/10 pb-2">
+								{t('admin.dashboard.applicationReviews.formResponses')}
+							</h3>
 
-									{!appConfigs[selectedApp.targetId] ? (
-										<p className="text-sm text-red-400 italic">{t('admin.dashboard.applicationReviews.errorConfigNotFound')}</p>
-									) : (
-										appConfigs[selectedApp.targetId].questions?.map((q, idx) => (
-											<div key={q.id} className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
-												<span className="text-sm font-semibold text-(--text) flex items-center gap-2">
-													<span className="text-(--accent)">{idx + 1}.</span> {q.question}
+							{!appConfigs[selectedApp.targetId] ? (
+								<p className="text-sm text-red-400 italic">{t('admin.dashboard.applicationReviews.errorConfigNotFound')}</p>
+							) : (
+								appConfigs[selectedApp.targetId].questions?.map((q, idx) => (
+									<div key={q.id} className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
+										<span className="text-sm font-semibold text-(--text) flex items-center gap-2">
+											<span className="text-(--accent)">{idx + 1}.</span> {q.question}
+										</span>
+										<div className="pl-6 pt-1 text-sm text-(--text-muted)">
+											{Array.isArray(selectedApp.data[q.id]) ? (
+												selectedApp.data[q.id].length > 0 ? (
+													<ul className="list-disc pl-4 flex flex-col gap-1">
+														{selectedApp.data[q.id].map((ans: string, i: number) => (
+															<li key={i}>{ans}</li>
+														))}
+													</ul>
+												) : (
+													<span className="italic opacity-50">{t('admin.dashboard.applicationReviews.noOptionsSelected')}</span>
+												)
+											) : (
+												<span className="whitespace-pre-wrap">
+													{selectedApp.data[q.id] || <span className="italic opacity-50">{t('admin.dashboard.applicationReviews.noAnswerProvided')}</span>}
 												</span>
-												<div className="pl-6 pt-1 text-sm text-(--text-muted)">
-													{Array.isArray(selectedApp.data[q.id]) ? (
-														selectedApp.data[q.id].length > 0 ? (
-															<ul className="list-disc pl-4 flex flex-col gap-1">
-																{selectedApp.data[q.id].map((ans: string, i: number) => (
-																	<li key={i}>{ans}</li>
-																))}
-															</ul>
-														) : (
-															<span className="italic opacity-50">{t('admin.dashboard.applicationReviews.noOptionsSelected')}</span>
-														)
-													) : (
-														<span className="whitespace-pre-wrap">
-															{selectedApp.data[q.id] || <span className="italic opacity-50">{t('admin.dashboard.applicationReviews.noAnswerProvided')}</span>}
-														</span>
-													)}
-												</div>
-											</div>
-										))
-									)}
-								</div>
-
-								<div className="flex flex-col gap-3 pt-6 border-t border-(--border)/10">
-									<label className="text-sm font-bold text-(--text-muted) uppercase tracking-widest">{t('admin.dashboard.applicationReviews.reviewerNotes')}</label>
-									<Input
-										variant="textarea"
-										value={reviewNote}
-										onChange={(e) => setReviewNote(e.target.value)}
-										placeholder={t('admin.dashboard.applicationReviews.addNotePlaceholder')}
-										className="min-h-[100px] resize-y"
-										disabled={isProcessing || selectedApp.status !== 'pending'}
-									/>
-								</div>
-							</div>
-
-							<div className="flex items-center justify-between px-8 py-6 border-t border-(--border)/10 bg-transparent">
-								<div className="flex items-center gap-3">
-									<span className="text-sm text-(--text-muted)">{t('admin.dashboard.applicationReviews.currentStatus')}</span>
-									{getStatusBadge(selectedApp.status)}
-								</div>
-
-								{selectedApp.status === 'pending' && (
-									<div className="flex items-center gap-3">
-										<button
-											onClick={() => handleAction('denied')}
-											disabled={isProcessing}
-											className="px-6 py-2.5 rounded-xl text-sm font-bold text-red-500 bg-red-500/10 hover:bg-red-500/20 transition-colors disabled:opacity-50"
-										>
-											{t('admin.dashboard.applicationReviews.deny')}
-										</button>
-										<button
-											onClick={() => handleAction('approved')}
-											disabled={isProcessing}
-											className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-(--accent) hover:opacity-90 shadow-lg shadow-(--accent)/20 transition-all disabled:opacity-50"
-										>
-											{isProcessing && <Loader2 className="w-4 h-4 animate-spin" />}
-											{t('admin.dashboard.applicationReviews.approveAssignRole')}
-										</button>
+											)}
+										</div>
 									</div>
-								)}
+								))
+							)}
+						</div>
+
+						<div className="flex flex-col gap-2 pt-4 border-t border-(--border)/10">
+							<label className="text-xs font-bold text-(--text-muted) uppercase tracking-widest">{t('admin.dashboard.applicationReviews.reviewerNotes')}</label>
+							<Input
+								variant="textarea"
+								value={reviewNote}
+								onChange={(e) => setReviewNote(e.target.value)}
+								placeholder={t('admin.dashboard.applicationReviews.addNotePlaceholder')}
+								rows={3}
+								disabled={isProcessing || selectedApp.status !== 'pending'}
+							/>
+						</div>
+
+						<div className="flex items-center justify-between pt-4 border-t border-(--border)/10">
+							<div className="flex items-center gap-3">
+								<span className="text-sm text-(--text-muted)">{t('admin.dashboard.applicationReviews.currentStatus')}</span>
+								{getStatusBadge(selectedApp.status)}
 							</div>
-						</motion.div>
+
+							{selectedApp.status === 'pending' && (
+								<div className="flex items-center gap-3">
+									<Button variant="danger" onClick={() => handleAction('denied')} disabled={isProcessing}>
+										{t('admin.dashboard.applicationReviews.deny')}
+									</Button>
+									<Button variant="primary" onClick={() => handleAction('approved')} loading={isProcessing} disabled={isProcessing}>
+										{t('admin.dashboard.applicationReviews.approveAssignRole')}
+									</Button>
+								</div>
+							)}
+						</div>
 					</div>
 				)}
-			</AnimatePresence>
+			</Modal>
 		</div>
 	);
 }

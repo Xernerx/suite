@@ -1,26 +1,31 @@
 /** @format */
 'use client';
 
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Download, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Input, MultiSelector } from '@xernerx/ui';
+import { Button, Input, MultiSelector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './users/types';
 import { UserCard } from './users/UserCard';
 
-export default function Users() {
+export default function Users({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (userId: string) => void }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const [users, setUsers] = useState<UserSummary[]>([]);
 	const [roles, setRoles] = useState<Role[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [search, setSearch] = useState('');
+	const [search, setSearch] = useState(initialSearch);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [filterRoleIds, setFilterRoleIds] = useState<string[]>([]);
 	const [limit, setLimit] = useState(30);
+
+	useEffect(() => {
+		if (initialSearch !== undefined) setSearch(initialSearch);
+	}, [initialSearch]);
 
 	// Reset limit when filters change
 	useEffect(() => {
@@ -47,9 +52,10 @@ export default function Users() {
 		[loading]
 	);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
+	const fetchData = useCallback(
+		async (isManual = false) => {
+			if (isManual) setRefreshing(true);
+			else setLoading(true);
 			try {
 				const [usersRes, rolesRes] = await Promise.all([
 					fetch(getEnvUrl(`https://api.xernerx.com/secure/users`), { credentials: 'include', cache: 'no-store' }),
@@ -65,10 +71,15 @@ export default function Users() {
 				setError(err.message || t('admin.users.card.loadError'));
 			} finally {
 				setLoading(false);
+				setRefreshing(false);
 			}
-		};
-		fetchData();
-	}, [getEnvUrl]);
+		},
+		[getEnvUrl, t]
+	);
+
+	useEffect(() => {
+		fetchData(false);
+	}, [fetchData]);
 
 	const handleUserDeleted = (deletedId: string) => {
 		setUsers((prev) => prev.filter((u) => u.id !== deletedId));
@@ -135,6 +146,47 @@ export default function Users() {
 
 	const renderedUsers = filteredUsers.slice(0, limit);
 
+	const exportUsers = (format: 'csv' | 'json') => {
+		if (filteredUsers.length === 0) return;
+		const roleMap = new Map(roles.map((r) => [r.id, r.name || r.id]));
+
+		if (format === 'json') {
+			const payload = filteredUsers.map((u) => ({
+				id: u.id,
+				name: u.name || u.discord?.globalName || u.discord?.username || '',
+				discordUsername: u.discord?.username || '',
+				roles: getNormalizedRoles(u).map((rid) => roleMap.get(rid) || rid),
+				stripeCustomerId: u.stripeCustomerId || '',
+			}));
+			const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `xernerx-users-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			return;
+		}
+
+		const headers = ['id', 'name', 'discordUsername', 'roles', 'stripeCustomerId'];
+		const rows = filteredUsers.map((u) => {
+			const roleNames = getNormalizedRoles(u)
+				.map((rid) => roleMap.get(rid) || rid)
+				.join('; ');
+			return [u.id, u.name || u.discord?.globalName || u.discord?.username || '', u.discord?.username || '', roleNames, u.stripeCustomerId || '']
+				.map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+				.join(',');
+		});
+		const csvContent = [headers.join(','), ...rows].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-users-${new Date().toISOString().slice(0, 10)}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
 	if (loading) return <Loading />;
 	if (error)
 		return (
@@ -155,21 +207,38 @@ export default function Users() {
 			}}
 		>
 			{/* Header */}
-			<div
-				className="flex flex-col"
-				style={{
-					gap: 'calc(var(--ui-gap) * 0.25)',
-				}}
-			>
-				<h1
-					className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
+			<div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+				<div
+					className="flex flex-col"
 					style={{
-						fontFamily: `var(--font-fredoka)`,
+						gap: 'calc(var(--ui-gap) * 0.25)',
 					}}
 				>
-					{t('admin.users.title')}
-				</h1>
-				<p className="text-sm text-(--text-muted)">{t('admin.users.description')}</p>
+					<h1
+						className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
+						style={{
+							fontFamily: `var(--font-fredoka)`,
+						}}
+					>
+						{t('admin.users.title')}
+					</h1>
+					<p className="text-sm text-(--text-muted)">{t('admin.users.description')}</p>
+				</div>
+
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="secondary" size="sm" onClick={() => exportUsers('csv')} disabled={filteredUsers.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.users.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => exportUsers('json')} disabled={filteredUsers.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.users.exportJson')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => fetchData(true)} disabled={refreshing} className="flex items-center gap-1.5">
+						<RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+						{t('admin.users.refresh')}
+					</Button>
+				</div>
 			</div>
 
 			{/* Controls Bar: Search & Sort */}
@@ -231,6 +300,7 @@ export default function Users() {
 									onUserDeleted={handleUserDeleted}
 									onUserUpdated={handleUserUpdated}
 									onDiscordFetched={handleDiscordFetched}
+									onViewAuditLogs={onViewAuditLogs}
 								/>
 							))}
 						</AnimatePresence>

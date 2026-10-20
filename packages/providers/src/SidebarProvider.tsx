@@ -59,12 +59,23 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 				localStorage.removeItem(storageKey);
 			}
 
-			// Clean the URL if they navigated via a shared link
+			// Clean or sync the URL if they navigated via a shared link
 			if (typeof window !== 'undefined') {
 				const params = new URLSearchParams(window.location.search);
+				let updated = false;
 				if (params.has('view')) {
 					params.delete('view');
-
+					updated = true;
+				}
+				if (params.has('tab')) {
+					if (newView) {
+						params.set('tab', newView);
+					} else {
+						params.delete('tab');
+					}
+					updated = true;
+				}
+				if (updated) {
 					const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
 					router.replace(newUrl, { scroll: false });
 				}
@@ -130,7 +141,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 		const storageKey = `xernerx_sidebar_view_${pathname}`;
 		const storedView = localStorage.getItem(storageKey);
 		const params = new URLSearchParams(window.location.search);
-		const urlView = params.get('view');
+		const urlView = params.get('view') || params.get('tab');
 
 		if (urlView) {
 			localStorage.setItem(storageKey, urlView);

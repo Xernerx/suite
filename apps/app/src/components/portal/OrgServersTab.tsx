@@ -69,7 +69,7 @@ export default function OrgServersTab({ orgConfig, setOrgConfig, orgGuilds }: Or
 						<div className="flex flex-col w-full bg-(--foreground)/30 border border-(--border)/10 rounded-3xl overflow-hidden shadow-sm mt-2">
 							{orgGuilds.map((g: any) => (
 								<Link
-									href={`/dashboard`}
+									href={`/dashboard?guild=${g.id}`}
 									key={g.id}
 									className="flex items-center justify-between gap-4 p-4 hover:bg-(--foreground)/50 border-b border-(--border)/10 last:border-0 transition-colors"
 								>

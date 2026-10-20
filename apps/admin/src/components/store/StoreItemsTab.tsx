@@ -23,6 +23,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 
 	const [search, setSearch] = useState('');
 	const [selectedCategory, setSelectedCategory] = useState<string>('all');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'enabled' | 'disabled' | 'discounted'>('all');
 	const [copiedSku, setCopiedSku] = useState<string | null>(null);
 	const [editingDiscountId, setEditingDiscountId] = useState<string | null>(null);
 	const [tempDiscount, setTempDiscount] = useState<number>(0);
@@ -64,6 +65,10 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 
 		const matchesCategory = selectedCategory === 'all' || item.categoryId === selectedCategory;
 
+		if (statusFilter === 'enabled' && !item.enabled) return false;
+		if (statusFilter === 'disabled' && item.enabled) return false;
+		if (statusFilter === 'discounted' && !(item.discountPercent > 0)) return false;
+
 		return matchesSearch && matchesCategory;
 	});
 
@@ -75,12 +80,26 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 					<Input variant="search" shortcut={true} value={search} onChange={(e: any) => setSearch(e.target.value)} placeholder={t('admin.store.table.searchPlaceholder')} />
 				</div>
 
-				<div className="flex items-center gap-2 w-full md:w-56">
-					<Selector
-						value={selectedCategory}
-						onChange={(val) => setSelectedCategory(val)}
-						options={[{ value: 'all', label: t('admin.store.table.allCategories') }, ...categories.map((cat) => ({ value: cat.id, label: cat.name }))]}
-					/>
+				<div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+					<div className="w-full sm:w-44">
+						<Selector
+							value={statusFilter}
+							onChange={(val) => setStatusFilter(val as any)}
+							options={[
+								{ value: 'all', label: t('admin.store.table.filterAll') },
+								{ value: 'enabled', label: t('admin.store.table.filterEnabled') },
+								{ value: 'disabled', label: t('admin.store.table.filterDisabled') },
+								{ value: 'discounted', label: t('admin.store.table.filterDiscounted') },
+							]}
+						/>
+					</div>
+					<div className="w-full sm:w-56">
+						<Selector
+							value={selectedCategory}
+							onChange={(val) => setSelectedCategory(val)}
+							options={[{ value: 'all', label: t('admin.store.table.allCategories') }, ...categories.map((cat) => ({ value: cat.id, label: cat.name }))]}
+						/>
+					</div>
 				</div>
 			</div>
 
@@ -157,15 +176,16 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 
 									{editingDiscountId === item.id ? (
 										<div className="flex items-center gap-1.5">
-											<input
-												type="number"
-												min="0"
-												max="100"
-												value={tempDiscount}
-												onChange={(e) => setTempDiscount(Number(e.target.value))}
-												className="w-14 h-7 text-xs px-1.5 rounded-lg border border-(--border)/20 bg-(--background) text-(--text) text-center"
-												autoFocus
-											/>
+											<div className="w-24">
+												<Input
+													variant="number"
+													min={0}
+													max={100}
+													value={tempDiscount}
+													onChange={(e) => setTempDiscount(Math.max(0, Math.min(100, Number(e.target.value) || 0)))}
+													className="!h-8 !text-xs"
+												/>
+											</div>
 											<span className="text-xs">%</span>
 											<button onClick={() => handleSaveDiscount(item.id)} className="px-2 py-1 text-[11px] rounded-lg bg-(--accent) text-white font-medium cursor-pointer">
 												{t('admin.store.buttons.save')}
@@ -233,6 +253,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 				onOpenChange={(open) => !open && setConfirmDeleteItem(null)}
 				title={confirmDeleteItem?.name || ''}
 				description={t('admin.store.alerts.deleteItemConfirm', { name: confirmDeleteItem?.name || '' })}
+				confirmKeyword={confirmDeleteItem?.name || confirmDeleteItem?.id}
 				variant="danger"
 				onConfirm={confirmDelete}
 			/>

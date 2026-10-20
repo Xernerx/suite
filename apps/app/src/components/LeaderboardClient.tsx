@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Trophy, Server, Users, Flame, Coins, ShieldCheck, ChevronUp, Lock, ArrowLeft, Bot, Crown, Medal, Award, ArrowUpDown } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
@@ -23,6 +24,7 @@ export default function LeaderboardClient() {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { hide } = useSidebar();
+	const router = useRouter();
 
 	const [activeTab, setActiveTab] = useState<LeaderboardTab>('bots');
 	const [sortBy, setSortBy] = useState<string>('votes');
@@ -43,12 +45,40 @@ export default function LeaderboardClient() {
 		hide();
 	}, [hide]);
 
-	// Reset default sort metric when switching tabs
+	// Initialize tab and sort metric from URL query parameters on mount
 	useEffect(() => {
-		if (activeTab === 'bots') setSortBy('votes');
-		else if (activeTab === 'servers') setSortBy('votes');
-		else if (activeTab === 'streaks') setSortBy('streak');
-	}, [activeTab]);
+		const params = new URLSearchParams(window.location.search);
+		const tabParam = params.get('tab') as LeaderboardTab | null;
+		const sortParam = params.get('sort');
+		if (tabParam && ['bots', 'servers', 'streaks'].includes(tabParam)) {
+			setActiveTab(tabParam);
+			if (sortParam) {
+				setSortBy(sortParam);
+			} else {
+				setSortBy(tabParam === 'streaks' ? 'streak' : 'votes');
+			}
+		} else if (sortParam) {
+			setSortBy(sortParam);
+		}
+	}, []);
+
+	const handleTabSwitch = (nextTab: LeaderboardTab) => {
+		const defaultSort = nextTab === 'streaks' ? 'streak' : 'votes';
+		setActiveTab(nextTab);
+		setSortBy(defaultSort);
+		const params = new URLSearchParams(window.location.search);
+		params.set('tab', nextTab);
+		params.set('sort', defaultSort);
+		router.replace(`/leaderboard?${params.toString()}`, { scroll: false });
+	};
+
+	const handleSortChange = (nextSort: string) => {
+		setSortBy(nextSort);
+		const params = new URLSearchParams(window.location.search);
+		params.set('tab', activeTab);
+		params.set('sort', nextSort);
+		router.replace(`/leaderboard?${params.toString()}`, { scroll: false });
+	};
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -265,7 +295,7 @@ export default function LeaderboardClient() {
 							<button
 								key={tab.id}
 								type="button"
-								onClick={() => setActiveTab(tab.id)}
+								onClick={() => handleTabSwitch(tab.id)}
 								className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-5 h-full rounded-lg text-sm font-bold transition-all cursor-pointer ${
 									isActive ? 'bg-(--accent) text-white shadow-md' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
 								}`}
@@ -285,7 +315,7 @@ export default function LeaderboardClient() {
 					<Selector
 						items={true}
 						value={sortBy}
-						onChange={setSortBy}
+						onChange={handleSortChange}
 						options={sortOptions.map((opt) => ({
 							value: opt.id,
 							label: `${t('app.leaderboard.sortBy')}: ${opt.label}`,

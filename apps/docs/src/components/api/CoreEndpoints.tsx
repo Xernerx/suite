@@ -58,6 +58,13 @@ export function CoreEndpoints() {
 			description: t('docs.api.core.fetchGuildEmbed.description'),
 			routes: [{ method: 'GET', path: '/core/guilds/[id]', color: 'blue' }],
 		},
+		{
+			id: 'fetch-user-embed',
+			title: t('docs.api.core.fetchUserEmbed.title'),
+			icon: Server,
+			description: t('docs.api.core.fetchUserEmbed.description'),
+			routes: [{ method: 'GET', path: '/core/users/[id]', color: 'blue' }],
+		},
 	];
 
 	return (

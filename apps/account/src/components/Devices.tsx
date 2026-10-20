@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
+import { Button, Confirm } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Computer, Smartphone, ShieldCheck, Trash2, Clock, CheckCircle2 } from 'lucide-react';
 
@@ -57,6 +57,8 @@ export default function Devices() {
 	const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
 	const [loading, setLoading] = useState(true);
 	const [revoking, setRevoking] = useState(false);
+	const [confirmRevokeOthers, setConfirmRevokeOthers] = useState(false);
+	const [revokeTarget, setRevokeTarget] = useState<DeviceSession | null>(null);
 
 	useEffect(() => {
 		if (!isReady || !userId) {
@@ -105,6 +107,30 @@ export default function Devices() {
 			toast({ type: 'error', title: err.message });
 		} finally {
 			setRevoking(false);
+			setConfirmRevokeOthers(false);
+		}
+	};
+
+	const handleRevokeSingle = async () => {
+		if (!userId || !revokeTarget) return;
+		setRevoking(true);
+		try {
+			const remaining = devices.filter((d) => d.id !== revokeTarget.id);
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ devices: remaining }),
+			});
+			if (res.ok) {
+				setDevices(remaining);
+				toast({ type: 'success', title: t('account.devices.revokeSingleSuccess') });
+			}
+		} catch (err: any) {
+			toast({ type: 'error', title: err.message });
+		} finally {
+			setRevoking(false);
+			setRevokeTarget(null);
 		}
 	};
 
@@ -122,7 +148,7 @@ export default function Devices() {
 				</div>
 
 				{devices.length > 1 && (
-					<Button variant="secondary" onClick={handleRevokeOthers} disabled={revoking} className="flex items-center gap-2 text-red-400">
+					<Button variant="danger" onClick={() => setConfirmRevokeOthers(true)} disabled={revoking} className="flex items-center gap-2">
 						<Trash2 size={15} />
 						{t('account.devices.revokeOthers')}
 					</Button>
@@ -160,14 +186,46 @@ export default function Devices() {
 								</div>
 							</div>
 
-							<div className="flex items-center gap-2 text-xs text-(--text-muted)">
-								<ShieldCheck size={15} className="text-emerald-400" />
-								<span>OAuth2 Verified</span>
+							<div className="flex items-center gap-3 text-xs text-(--text-muted)">
+								<div className="flex items-center gap-1.5">
+									<ShieldCheck size={15} className="text-emerald-400" />
+									<span>{t('account.devices.oauthVerified')}</span>
+								</div>
+								{!isCurrent && (
+									<Button variant="danger" size="sm" onClick={() => setRevokeTarget(device)} disabled={revoking} className="flex items-center gap-1.5">
+										<Trash2 size={13} />
+										{t('account.devices.revokeDevice')}
+									</Button>
+								)}
 							</div>
 						</div>
 					);
 				})}
 			</div>
+
+			<Confirm
+				open={confirmRevokeOthers}
+				onOpenChange={setConfirmRevokeOthers}
+				title={t('account.devices.revokeOthersConfirmTitle')}
+				description={t('account.devices.revokeOthersConfirmDesc')}
+				confirmText={t('account.devices.revokeOthers')}
+				cancelText={t('common.buttons.cancel')}
+				variant="danger"
+				loading={revoking}
+				onConfirm={handleRevokeOthers}
+			/>
+
+			<Confirm
+				open={Boolean(revokeTarget)}
+				onOpenChange={(open) => !open && setRevokeTarget(null)}
+				title={t('account.devices.revokeConfirmTitle')}
+				description={t('account.devices.revokeConfirmDesc', { device: revokeTarget ? `${revokeTarget.browser} • ${revokeTarget.os}` : '' })}
+				confirmText={t('account.devices.revokeDevice')}
+				cancelText={t('common.buttons.cancel')}
+				variant="danger"
+				loading={revoking}
+				onConfirm={handleRevokeSingle}
+			/>
 		</div>
 	);
 }

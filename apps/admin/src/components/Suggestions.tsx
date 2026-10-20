@@ -1,10 +1,11 @@
 /** @format */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button } from '@xernerx/ui';
+import { Button, Confirm, Input, Selector } from '@xernerx/ui';
+import { Copy, Check, ExternalLink } from 'lucide-react';
 
-export default function Suggestions() {
+export default function Suggestions({ initialSearch = '' }: { initialSearch?: string }) {
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
@@ -12,6 +13,15 @@ export default function Suggestions() {
 	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
 	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
+	const [search, setSearch] = useState(initialSearch);
+	const [productFilter, setProductFilter] = useState('all');
+	const [sortBy, setSortBy] = useState<'top' | 'newest'>('top');
+	const [copiedId, setCopiedId] = useState<string | null>(null);
+	const [confirmRejectItem, setConfirmRejectItem] = useState<any | null>(null);
+
+	useEffect(() => {
+		if (initialSearch) setSearch(initialSearch);
+	}, [initialSearch]);
 
 	const fetchBotDiscordProfile = async (id: string) => {
 		if (!id || !/^\d{17,20}$/.test(id.trim())) return null;
@@ -81,7 +91,10 @@ export default function Suggestions() {
 		return profile ? { id: targetBotId, ...profile } : null;
 	};
 
-	const declineSuggestion = async (id: string) => {
+	const declineSuggestion = async () => {
+		if (!confirmRejectItem) return;
+		const id = confirmRejectItem.id;
+		setConfirmRejectItem(null);
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/suggestions/${id}`), {
 				method: 'DELETE',
@@ -124,41 +137,145 @@ export default function Suggestions() {
 		}
 	};
 
+	const productOptions = useMemo(() => {
+		const set = new Set<string>();
+		data.forEach((item) => {
+			const resolved = resolveItemBot(item);
+			const label = resolved?.name || item.productId;
+			if (label) set.add(String(label));
+		});
+		return [{ value: 'all', label: t('admin.dashboard.suggestions.allProducts') }, ...Array.from(set).map((p) => ({ value: p, label: p }))];
+	}, [data, orgBots, botProfiles, t]);
+
+	const filteredData = useMemo(() => {
+		const q = search.trim().toLowerCase();
+		const list = data.filter((item) => {
+			const resolved = resolveItemBot(item);
+			const prodLabel = String(resolved?.name || item.productId || '');
+			if (productFilter !== 'all' && prodLabel !== productFilter) return false;
+			if (!q) return true;
+			const authorId = String(item.authorId || item.author?.id || '');
+			return (
+				String(item.title || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(item.description || '')
+					.toLowerCase()
+					.includes(q) ||
+				prodLabel.toLowerCase().includes(q) ||
+				authorId.toLowerCase().includes(q)
+			);
+		});
+
+		list.sort((a, b) => {
+			if (sortBy === 'newest') {
+				return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+			}
+			const votesA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+			const votesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+			return votesB - votesA;
+		});
+
+		return list;
+	}, [data, search, productFilter, sortBy, orgBots, botProfiles]);
+
 	if (loading) return <Loading />;
 
 	return (
 		<div className="flex flex-col gap-4">
-			<h2 className="text-2xl font-bold">{t('admin.dashboard.suggestions.title')}</h2>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+				<h2 className="text-2xl font-bold">{t('admin.dashboard.suggestions.title')}</h2>
+				<div className="flex flex-wrap items-center gap-2">
+					<div className="w-full sm:w-64">
+						<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('admin.dashboard.suggestions.searchPlaceholder')} />
+					</div>
+					<div className="w-full sm:w-44">
+						<Selector value={productFilter} onChange={setProductFilter} options={productOptions} />
+					</div>
+					<div className="w-full sm:w-40">
+						<Selector
+							value={sortBy}
+							onChange={(val) => setSortBy(val as 'top' | 'newest')}
+							options={[
+								{ value: 'top', label: t('admin.dashboard.suggestions.sortTop') },
+								{ value: 'newest', label: t('admin.dashboard.suggestions.sortNewest') },
+							]}
+						/>
+					</div>
+				</div>
+			</div>
 			<div className="flex flex-col gap-2">
-				{data.map((item: any) => {
+				{filteredData.map((item: any) => {
 					const netVotes = (item.upvotes?.length || 0) - (item.downvotes?.length || 0);
 					const resolvedBot = resolveItemBot(item);
+					const authorId = item.authorId || item.author?.id;
 					return (
-						<div key={item.id} className="p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex justify-between items-start">
+						<div
+							key={item.id}
+							className="p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col sm:flex-row justify-between items-start gap-4"
+						>
 							<div>
-								<div className="font-bold flex gap-2 items-center">
+								<div className="font-bold flex flex-wrap gap-2 items-center">
 									<span className="bg-(--foreground)/50 px-2 py-1 rounded text-xs border border-(--border)/10 font-mono">
 										{t('admin.dashboard.suggestions.votes')}: {netVotes}
 									</span>
 									{item.title}
 								</div>
 								<div className="text-sm text-(--text-muted) mb-2 mt-2">{item.description}</div>
-								<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded border border-(--accent)/20 mt-2">
-									{resolvedBot?.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
-									{resolvedBot ? resolvedBot.name : item.productId}
+								<div className="flex flex-wrap items-center gap-2 mt-2">
+									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded border border-(--accent)/20">
+										{resolvedBot?.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
+										{resolvedBot ? resolvedBot.name : item.productId}
+									</div>
+									{authorId && /^\d{17,20}$/.test(String(authorId)) && (
+										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded border border-(--border)/10 font-mono">
+											<a
+												href={`${getEnvUrl('https://app.xernerx.com')}/users/${authorId}`}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="inline-flex items-center gap-1 hover:text-(--accent) transition-colors"
+											>
+												<span>{item.author?.username || authorId}</span>
+												<ExternalLink size={11} />
+											</a>
+											<button
+												type="button"
+												onClick={() => {
+													navigator.clipboard.writeText(String(authorId));
+													setCopiedId(item.id);
+													toast({ type: 'success', title: t('admin.users.idCopied') });
+													setTimeout(() => setCopiedId(null), 2000);
+												}}
+												className="hover:text-(--text) transition-colors cursor-pointer"
+											>
+												{copiedId === item.id ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+											</button>
+										</div>
+									)}
 								</div>
 							</div>
 							<div className="flex gap-2 shrink-0">
 								<Button onClick={() => acceptSuggestion(item)}>{t('admin.dashboard.suggestions.moveToRoadmap')}</Button>
-								<Button variant="danger" onClick={() => declineSuggestion(item.id)}>
+								<Button variant="danger" onClick={() => setConfirmRejectItem(item)}>
 									{t('admin.dashboard.suggestions.rejected')}
 								</Button>
 							</div>
 						</div>
 					);
 				})}
-				{data.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">{t('admin.dashboard.suggestions.noSuggestions')}</div>}
+				{filteredData.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">{t('admin.dashboard.suggestions.noSuggestions')}</div>}
 			</div>
+
+			<Confirm
+				open={Boolean(confirmRejectItem)}
+				onOpenChange={(open) => !open && setConfirmRejectItem(null)}
+				title={t('admin.dashboard.suggestions.rejectConfirmTitle')}
+				description={t('admin.dashboard.suggestions.rejectConfirmDesc')}
+				confirmText={t('admin.dashboard.suggestions.rejected')}
+				cancelText={t('common.buttons.cancel')}
+				variant="danger"
+				onConfirm={declineSuggestion}
+			/>
 		</div>
 	);
 }

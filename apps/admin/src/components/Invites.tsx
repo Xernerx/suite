@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useEnvironment, useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Modal, Button, Confirm, Input, Toggle } from '@xernerx/ui';
-import { Link, Plus, Trash2, Edit2, Copy, Check, ExternalLink } from 'lucide-react';
+import { Link, Plus, Trash2, Edit2, Copy, Check, ExternalLink, Download, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
 
@@ -21,15 +21,20 @@ interface AppInvite {
 	updatedAt?: string;
 }
 
-export default function Invites() {
+export default function Invites({ initialSearch = '' }: { initialSearch?: string }) {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
 	const { toast } = useToast();
 
 	const [invites, setInvites] = useState<AppInvite[]>([]);
 	const [loading, setLoading] = useState(true);
-	const [search, setSearch] = useState('');
+	const [refreshing, setRefreshing] = useState(false);
+	const [search, setSearch] = useState(initialSearch);
 	const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (initialSearch !== undefined) setSearch(initialSearch);
+	}, [initialSearch]);
 
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [creating, setCreating] = useState(false);
@@ -42,8 +47,9 @@ export default function Invites() {
 	const [newScopes, setNewScopes] = useState('bot, applications.commands');
 	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
 
-	const fetchInvites = async () => {
-		setLoading(true);
+	const fetchInvites = async (isManual = false) => {
+		if (isManual) setRefreshing(true);
+		else setLoading(true);
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), { credentials: 'include' });
 			if (res.ok) {
@@ -54,6 +60,7 @@ export default function Invites() {
 			console.error(error);
 		} finally {
 			setLoading(false);
+			setRefreshing(false);
 		}
 	};
 
@@ -157,6 +164,32 @@ export default function Invites() {
 		return invites.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()) || i.id.toLowerCase().includes(search.toLowerCase()));
 	}, [invites, search]);
 
+	const exportInvites = (format: 'csv' | 'json') => {
+		if (filteredInvites.length === 0) return;
+		if (format === 'json') {
+			const blob = new Blob([JSON.stringify(filteredInvites, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `xernerx-invites-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			return;
+		}
+		const headers = ['id', 'name', 'clientId', 'permissions', 'scopes'];
+		const rows = filteredInvites.map((inv) =>
+			[inv.id, (inv.name || '').replace(/"/g, '""'), inv.clientId || '', inv.permissions || '', (inv.scopes || []).join(';')].map((cell) => `"${cell}"`).join(',')
+		);
+		const csvContent = [headers.join(','), ...rows].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-invites-${new Date().toISOString().slice(0, 10)}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
 	if (loading) return <Loading />;
 
 	return (
@@ -168,10 +201,24 @@ export default function Invites() {
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.invites.subtitle')}</p>
 				</div>
-				<Button variant="primary" onClick={openCreateModal} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-					<Plus size={16} />
-					<span>{t('admin.dashboard.invites.createButton')}</span>
-				</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="secondary" size="sm" onClick={() => exportInvites('csv')} disabled={filteredInvites.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.dashboard.invites.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => exportInvites('json')} disabled={filteredInvites.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.dashboard.invites.exportJson')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => fetchInvites(true)} disabled={refreshing} className="flex items-center gap-1.5">
+						<RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+						{t('admin.dashboard.invites.refresh')}
+					</Button>
+					<Button variant="primary" onClick={openCreateModal} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+						<Plus size={16} />
+						<span>{t('admin.dashboard.invites.createButton')}</span>
+					</Button>
+				</div>
 			</div>
 
 			<Input variant="search" shortcut={true} placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -320,6 +367,7 @@ export default function Invites() {
 				onOpenChange={(open) => !open && setDeleteConfirmId(null)}
 				title={t('common.buttons.delete')}
 				description={t('admin.dashboard.invites.toasts.deleteConfirm')}
+				confirmKeyword={deleteConfirmId || undefined}
 				confirmText={t('common.buttons.delete')}
 				cancelText={t('common.buttons.cancel')}
 				onConfirm={confirmDelete}

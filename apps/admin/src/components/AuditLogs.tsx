@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button, Input } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { ScrollText, RefreshCw, Shield, Bug, Inbox, Ticket, Server, User, Clock, Download } from 'lucide-react';
+import { ScrollText, RefreshCw, Shield, Bug, Inbox, Ticket, Server, User, Clock, Download, Copy, Check, ExternalLink } from 'lucide-react';
 
 interface AuditLogEntry {
 	id: string;
@@ -24,7 +24,7 @@ interface AuditLogEntry {
 
 const CATEGORIES = ['all', 'issue', 'suggestion', 'application', 'setting', 'role', 'user', 'system'] as const;
 
-export default function AuditLogs() {
+export default function AuditLogs({ initialSearch = '', initialCategory = 'all' }: { initialSearch?: string; initialCategory?: string }) {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
@@ -32,8 +32,17 @@ export default function AuditLogs() {
 	const [logs, setLogs] = useState<AuditLogEntry[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
-	const [category, setCategory] = useState<string>('all');
-	const [search, setSearch] = useState<string>('');
+	const [category, setCategory] = useState<string>(initialCategory || 'all');
+	const [search, setSearch] = useState<string>(initialSearch);
+	const [copiedTargetId, setCopiedTargetId] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (initialSearch !== undefined) setSearch(initialSearch);
+	}, [initialSearch]);
+
+	useEffect(() => {
+		if (initialCategory) setCategory(initialCategory);
+	}, [initialCategory]);
 
 	const fetchLogs = async (isManual = false) => {
 		if (!isReady) return;
@@ -213,7 +222,20 @@ export default function AuditLogs() {
 									<div className="p-2.5 rounded-xl bg-(--background)/70 border border-(--border)/10 shrink-0 mt-0.5">{getCategoryIcon(resolvedCat)}</div>
 									<div className="flex flex-col gap-1 min-w-0">
 										<div className="flex flex-wrap items-center gap-2">
-											<span className="font-bold text-sm text-(--text)">{log.actorName || log.actorId}</span>
+											{/^\d{17,20}$/.test(log.actorId || '') ? (
+												<a
+													href={`${getEnvUrl('https://app.xernerx.com')}/users/${log.actorId}`}
+													target="_blank"
+													rel="noopener noreferrer"
+													title={t('admin.dashboard.audit.viewActorProfile')}
+													className="inline-flex items-center gap-1 font-bold text-sm text-(--text) hover:text-(--accent) transition-colors"
+												>
+													<span>{log.actorName || log.actorId}</span>
+													<ExternalLink size={12} className="opacity-60" />
+												</a>
+											) : (
+												<span className="font-bold text-sm text-(--text)">{log.actorName || log.actorId}</span>
+											)}
 											<span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/20">
 												{log.action}
 											</span>
@@ -221,9 +243,24 @@ export default function AuditLogs() {
 												{resolvedCat}
 											</span>
 										</div>
-										<p className="text-xs text-(--text-muted) truncate">
-											<span className="font-semibold text-(--text)/80">{resolvedSummary}</span>
-											{log.targetId && resolvedSummary !== log.targetId && <span className="ml-1.5 font-mono opacity-60">({log.targetId})</span>}
+										<p className="text-xs text-(--text-muted) truncate flex items-center gap-1.5">
+											<span className="font-semibold text-(--text)/80 truncate">{resolvedSummary}</span>
+											{log.targetId && (
+												<button
+													type="button"
+													onClick={() => {
+														navigator.clipboard.writeText(log.targetId!);
+														setCopiedTargetId(log.id);
+														toast({ type: 'success', title: t('admin.dashboard.audit.idCopied'), description: log.targetId! });
+														setTimeout(() => setCopiedTargetId(null), 2000);
+													}}
+													title={t('admin.dashboard.audit.copyTargetId')}
+													className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-(--background)/60 hover:bg-(--background) border border-(--border)/10 font-mono text-[11px] text-(--text-muted) hover:text-(--text) transition-colors shrink-0 cursor-pointer"
+												>
+													<span>{log.targetId}</span>
+													{copiedTargetId === log.id ? <Check size={10} className="text-green-500" /> : <Copy size={10} />}
+												</button>
+											)}
 										</p>
 										{resolvedMeta && Object.keys(resolvedMeta).length > 0 && (
 											<div className="flex flex-wrap gap-2 mt-1">

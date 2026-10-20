@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, LogOut, Settings, Info, Trash2, User as UserIcon, ExternalLink, Copy, Check } from 'lucide-react';
+import { LogOut, Settings, Info, User as UserIcon, ExternalLink, Copy, Check, Code2 } from 'lucide-react';
 import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
-import { Button, Confirm, Selector } from '@xernerx/ui';
+import { Button, Selector, Toggle } from '@xernerx/ui';
 import Image from 'next/image';
 import { useState } from 'react';
+import { AccountDangerZone } from './AccountDangerZone';
 export default function Account() {
 	const { t } = useDictionary();
 	const { data: session } = useSession();
@@ -17,9 +18,11 @@ export default function Account() {
 	const [isDeletingData, setIsDeletingData] = useState(false);
 	const [isConfirmDataOpen, setIsConfirmDataOpen] = useState(false);
 	const [copiedId, setCopiedId] = useState(false);
+	const [isWidgetModalOpen, setIsWidgetModalOpen] = useState(false);
 	const activeUser = discordUser || session?.user;
 	const userId = activeUser?.id;
 	const [privacy, setPrivacy] = useState(activeUser?.privacy || 'private');
+	const [widgets, setWidgets] = useState(Boolean((activeUser as any)?.widgets));
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
 
 	const handleCopyId = () => {
@@ -80,6 +83,7 @@ export default function Account() {
 					pronouns: '',
 					timezone: '',
 					privacy: 'private',
+					widgets: false,
 				}),
 			});
 			if (!res.ok) {
@@ -135,6 +139,89 @@ export default function Account() {
 			});
 		}
 	};
+	const handleWidgetsChange = async (enabled: boolean) => {
+		if (!userId) return;
+		setWidgets(enabled);
+		try {
+			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+				body: JSON.stringify({
+					widgets: enabled,
+				}),
+			});
+			if (!res.ok) throw new Error(t('account.profile.privacy.toast.error'));
+			toast({
+				type: 'success',
+				title: t('account.profile.privacy.toast.title'),
+				description: t('account.profile.privacy.toast.widgetsSaved'),
+			});
+		} catch (error: any) {
+			toast({
+				type: 'error',
+				title: t('account.profile.privacy.toast.error'),
+				description: error.message,
+			});
+		}
+	};
+
+	const apiBase = getEnvUrl('https://api.xernerx.com');
+	const appBase = getEnvUrl('https://app.xernerx.com');
+	const baseEndpoint = `${apiBase}/core/users/${userId || ''}`;
+	const pngUrl = `${baseEndpoint}?type=png`;
+	const svgUrl = `${baseEndpoint}?type=svg`;
+	const iframeUrl = `${baseEndpoint}?type=iframe`;
+	const profileUrl = `${appBase}/users/${userId || ''}`;
+	const displayName = activeUser?.global_name || activeUser?.name || t('account.account.fallbackName');
+	const safeName = displayName.replace(/"/g, '&quot;');
+
+	const widgetTabs = [
+		{
+			id: 'iframe',
+			label: t('app.widgets.formatIframe'),
+			language: 'html',
+			code: `<iframe\n  src="${iframeUrl}"\n  width="420"\n  height="172"\n  style="border:0;border-radius:20px;overflow:hidden"\n  loading="lazy"\n  title="${safeName}"\n></iframe>`,
+		},
+		{
+			id: 'markdown',
+			label: t('app.widgets.formatMarkdown'),
+			language: 'markdown',
+			code: `[![${displayName}](${svgUrl})](${profileUrl})`,
+		},
+		{
+			id: 'html',
+			label: t('app.widgets.formatHtmlImg'),
+			language: 'html',
+			code: `<a href="${profileUrl}" target="_blank" rel="noopener noreferrer">\n  <img src="${svgUrl}" alt="${safeName}" width="420" height="172" />\n</a>`,
+		},
+		{
+			id: 'image',
+			label: t('app.widgets.formatPngImage'),
+			language: 'url',
+			code: pngUrl,
+		},
+		{
+			id: 'svg',
+			label: t('app.widgets.formatDirectSvg'),
+			language: 'url',
+			code: svgUrl,
+		},
+		{
+			id: 'raw-svg',
+			label: t('app.widgets.formatRawSvg'),
+			language: 'svg',
+			code: `<svg xmlns="http://www.w3.org/2000/svg" width="420" height="172" viewBox="0 0 420 172" fill="none" role="img" aria-label="${safeName}">\n  <a href="${profileUrl}" target="_blank" rel="noopener noreferrer">\n    <image href="${svgUrl}" width="420" height="172" />\n  </a>\n</svg>`,
+		},
+		{
+			id: 'json',
+			label: t('app.widgets.formatDirectJson'),
+			language: 'json',
+			code: baseEndpoint,
+		},
+	];
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full"
@@ -329,9 +416,9 @@ export default function Account() {
 					</div>
 				</div>
 
-				{/* Reset Data Card */}
+				{/* Public Embed Widget Card */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{
 						padding: 'var(--ui-gap)',
 						gap: 'var(--ui-gap)',
@@ -344,90 +431,54 @@ export default function Account() {
 						}}
 					>
 						<div
-							className="flex items-center text-(--accent-orange) font-semibold text-base"
+							className="flex items-center text-(--text) font-semibold text-base"
 							style={{
 								gap: 'calc(var(--ui-gap) * 0.5)',
 							}}
 						>
-							<AlertTriangle size={18} />
-							<h3>{t('account.common.title2')}</h3>
+							<Code2 size={18} />
+							<h3>{t('app.widgets.title')}</h3>
 						</div>
-						<p className="text-xs text-(--accent-orange)/80">{t('account.common.description3')}</p>
+						<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.widgets.description')}</div>
 					</div>
-					<button
-						onClick={() => setIsConfirmDataOpen(true)}
-						className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
+					<div
+						className="flex items-center shrink-0"
 						style={{
-							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-							gap: 'calc(var(--ui-gap) * 0.5)',
+							gap: 'calc(var(--ui-gap) * 0.75)',
 						}}
 					>
-						<Trash2 size={16} />
-						<span>{t('account.common.description4')}</span>
-					</button>
+						<button
+							type="button"
+							onClick={() => setIsWidgetModalOpen(true)}
+							className="flex items-center justify-center rounded-xl border border-(--border)/15 bg-(--background)/60 text-xs font-semibold text-(--text) transition-colors hover:border-(--accent)/40 hover:text-(--accent)"
+							style={{
+								padding: 'calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.75)',
+								gap: 'calc(var(--ui-gap) * 0.35)',
+							}}
+						>
+							<Code2 size={15} />
+							<span>{t('app.widgets.embedButton')}</span>
+						</button>
+						<Toggle checked={Boolean(widgets)} onChange={(e) => handleWidgetsChange(e.target.checked)} />
+					</div>
 				</div>
 
-				{/* Delete Account Card */}
-				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
-					style={{
-						padding: 'var(--ui-gap)',
-						gap: 'var(--ui-gap)',
-					}}
-				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
-						}}
-					>
-						<div
-							className="flex items-center text-(--accent-red) font-semibold text-base"
-							style={{
-								gap: 'calc(var(--ui-gap) * 0.5)',
-							}}
-						>
-							<AlertTriangle size={18} />
-							<h3>{t('account.account.danger.title')}</h3>
-						</div>
-						<p className="text-xs text-(--accent-red)/80">{t('account.account.danger.description')}</p>
-					</div>
-					<button
-						onClick={() => setIsConfirmAccountOpen(true)}
-						className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm"
-						style={{
-							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-							gap: 'calc(var(--ui-gap) * 0.5)',
-						}}
-					>
-						<Trash2 size={16} />
-						<span>{t('account.common.description5')}</span>
-					</button>
-				</div>
+				<AccountDangerZone
+					activeUser={activeUser}
+					widgets={Boolean(widgets)}
+					widgetTabs={widgetTabs}
+					isConfirmDataOpen={isConfirmDataOpen}
+					setIsConfirmDataOpen={setIsConfirmDataOpen}
+					isDeletingData={isDeletingData}
+					handleDeleteData={handleDeleteData}
+					isConfirmAccountOpen={isConfirmAccountOpen}
+					setIsConfirmAccountOpen={setIsConfirmAccountOpen}
+					isDeletingAccount={isDeletingAccount}
+					handleDeleteAccount={handleDeleteAccount}
+					isWidgetModalOpen={isWidgetModalOpen}
+					setIsWidgetModalOpen={setIsWidgetModalOpen}
+				/>
 			</div>
-
-			<Confirm
-				open={isConfirmAccountOpen}
-				onOpenChange={setIsConfirmAccountOpen}
-				title={t('account.account.danger.confirmTitle')}
-				description={t('account.account.danger.confirmDescription')}
-				confirmText={t('account.account.danger.confirmButton')}
-				confirmKeyword={activeUser?.username || activeUser?.name || 'DELETE'}
-				onConfirm={handleDeleteAccount}
-				loading={isDeletingAccount}
-			/>
-
-			<Confirm
-				open={isConfirmDataOpen}
-				onOpenChange={setIsConfirmDataOpen}
-				title={t('account.common.tooltip')}
-				description={t('account.account.resetDataConfirmDesc')}
-				confirmText={t('account.account.resetDataConfirmButton')}
-				variant="warning"
-				confirmKeyword="RESET"
-				onConfirm={handleDeleteData}
-				loading={isDeletingData}
-			/>
 		</div>
 	);
 }

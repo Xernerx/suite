@@ -261,9 +261,11 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 				onOpenChange={setConfirmDeleteOpen}
 				title={t('account.tokens.manage.revokeTitle')}
 				description={t('account.tokens.manage.deleteConfirm')}
+				confirmKeyword={token?.name || token?.id || undefined}
 				confirmText={t('account.tokens.manage.revokeTitle')}
 				cancelText={t('account.tokens.create.cancelButton')}
 				onConfirm={handleDelete}
+				variant="danger"
 				loading={isSaving}
 			/>
 		</>

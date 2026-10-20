@@ -371,7 +371,7 @@ export default function Overview() {
 			</div>
 
 			{/* Changelog Preview Modal */}
-			<Modal isOpen={changelogModal.open} onClose={() => setChangelogModal((prev) => ({ ...prev, open: false }))} title={changelogModal.title}>
+			<Modal open={changelogModal.open} onOpenChange={(open) => setChangelogModal((prev) => ({ ...prev, open }))} title={changelogModal.title}>
 				<div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
 					{changelogModal.loading ? (
 						<p className="text-sm text-(--text-muted) py-6 text-center">{t('admin.dashboard.overview.changelogLoading')}</p>
@@ -392,7 +392,7 @@ export default function Overview() {
 			</Modal>
 
 			{/* Quick Declare Incident / Maintenance Broadcast Modal */}
-			<Modal isOpen={incidentModal.open} onClose={() => setIncidentModal((prev) => ({ ...prev, open: false }))} title={t('admin.dashboard.overview.incidentModalTitle')}>
+			<Modal open={incidentModal.open} onOpenChange={(open) => setIncidentModal((prev) => ({ ...prev, open }))} title={t('admin.dashboard.overview.incidentModalTitle')}>
 				<div className="flex flex-col gap-4">
 					<p className="text-xs text-(--text-muted)">{t('admin.dashboard.overview.incidentModalDesc')}</p>
 					<div className="flex flex-col gap-1.5">

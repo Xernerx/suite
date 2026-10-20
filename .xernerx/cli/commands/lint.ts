@@ -19,6 +19,7 @@ const VALID_ROUTER_FILES = new Set([
 	'icon.tsx',
 	'robots.ts',
 	'sitemap.ts',
+	'manifest.ts',
 	'globals.css',
 ]);
 
@@ -92,6 +93,10 @@ export function runSuiteArchitectureLint(): boolean {
 				if (!['api', 'cdn', 'docs'].includes(appName) && file.startsWith(apiDir + path.sep)) {
 					const apiRel = path.relative(apiDir, file).replace(/\\/g, '/');
 					const allowedApiRoutes = new Set(['auth/[...nextauth]/route.ts', 'changelog/route.ts', 'version/route.ts']);
+					if (appName === 'account') {
+						allowedApiRoutes.add('connections/[provider]/route.ts');
+						allowedApiRoutes.add('connections/[provider]/callback/route.ts');
+					}
 					if (!allowedApiRoutes.has(apiRel)) {
 						errors.push(`[3-Route API Rule] ${relPath} is not allowed in frontend app '${appName}'. Move backend endpoints to apps/api.`);
 					}

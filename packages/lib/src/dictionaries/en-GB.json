@@ -266,6 +266,7 @@
 		},
 		"edit": "Edit",
 		"actions": {
+			"cancel": "Cancel",
 			"remove": "Remove",
 			"reset": "Reset",
 			"saveChanges": "Save Changes",
@@ -358,7 +359,10 @@
 			"linkedPrefix": "Linked: @{name}",
 			"manageRoleDesc": "Manage settings for {name}",
 			"reorderRoleError": "Failed to reorder roles",
-			"updateRoleError": "Failed to update role"
+			"updateRoleError": "Failed to update role",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh"
 		},
 		"users": {
 			"title": "User Management",
@@ -402,6 +406,10 @@
 			"idCopied": "ID copied to clipboard",
 			"emailCopied": "Email copied to clipboard",
 			"viewPublicProfile": "View Public Profile",
+			"viewAuditHistory": "View Audit Logs",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh",
 			"updateFailed": "Failed to update user profile",
 			"assignRoleFailed": "Failed to assign Discord role",
 			"removeRoleFailed": "Failed to remove Discord role",
@@ -463,6 +471,9 @@
 			"tokenUpdated": "Token updated",
 			"tokenDeleted": "Token deleted successfully",
 			"tokenIdCopied": "Token ID copied",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh",
 			"statusOptions": {
 				"active": "Active",
 				"inactive": "Inactive",
@@ -474,6 +485,8 @@
 			"title": "Translation Studio",
 			"description": "Select your target language and manage translation keys against English source.",
 			"pushToReview": "Push to review",
+			"exportJson": "Export JSON",
+			"exportSuccess": "Dictionary JSON exported",
 			"tabs": {
 				"introduction": "Introduction",
 				"newEntries": "New Entries",
@@ -576,6 +589,13 @@
 			"title": "Application Configs",
 			"description": "Manage application templates and rewards.",
 			"newConfig": "New Application",
+			"searchPlaceholder": "Search application templates by name, ID, or description...",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh",
+			"filterAll": "All Statuses",
+			"filterOpen": "Open",
+			"filterClosed": "Closed",
 			"loading": "Loading configs...",
 			"empty": "No application configs found.",
 			"idBadge": "ID: {id}",
@@ -654,7 +674,8 @@
 		},
 		"dashboard": {
 			"nav": {
-				"overview": "Overview & SEO",
+				"overview": "Overview",
+				"seo": "SEO",
 				"media": "Media",
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
@@ -662,8 +683,61 @@
 				"store": "Store",
 				"auditLogs": "Audit Logs"
 			},
+			"home": {
+				"title": "Admin Overview",
+				"subtitle": "Urgent triage queue, live service health, and permission-scoped workspace snapshots.",
+				"refresh": "Refresh Overview",
+				"refreshing": "Refreshing...",
+				"statusTitle": "Ecosystem Service Status",
+				"statusSubtitle": "{online} / {total} online • {synced} synced • {ahead} canary ahead",
+				"openSeo": "Open SEO & Telemetry",
+				"urgentTitle": "Urgent Action Queue",
+				"urgentSubtitle": "High-priority items requiring staff review or verification across your permitted modules.",
+				"allClearTitle": "All Caught Up!",
+				"allClearDesc": "There are no urgent items waiting for triage across your assigned permissions.",
+				"urgentBadge": "Urgent",
+				"needsAttention": "Needs Attention",
+				"modulesTitle": "Permitted Modules & Status",
+				"modulesSubtitle": "Real-time summaries populated dynamically from your role permissions.",
+				"openModule": "Manage",
+				"recentAuditTitle": "Recent Administrative Activity",
+				"viewAllAudit": "View Audit Logs",
+				"noAudit": "No recent audit events recorded.",
+				"cards": {
+					"issuesTitle": "Issues & Bug Reports",
+					"issuesUrgent": "{count} unverified issues awaiting triage",
+					"issuesMeta": "{open} open • {resolved} resolved",
+					"applicationsTitle": "Staff Applications",
+					"applicationsUrgent": "{count} pending applications awaiting review",
+					"applicationsMeta": "{pending} pending • {reviewed} reviewed",
+					"suggestionsTitle": "Community Suggestions",
+					"suggestionsUrgent": "{count} open suggestions awaiting triage",
+					"suggestionsMeta": "{open} open • {approved} approved",
+					"translationsTitle": "Localization & Translations",
+					"translationsUrgent": "{count} locales below 100% coverage",
+					"translationsMeta": "{avg}% average coverage across {total} locales",
+					"roadmapTitle": "Platform Roadmap",
+					"roadmapMeta": "{active} in progress • {planned} planned • {ideas} ideas",
+					"usersTitle": "Platform Users",
+					"usersMeta": "{total} registered • {verified} verified",
+					"rolesTitle": "Roles & RBAC",
+					"rolesMeta": "{total} system roles • {synced} Discord-linked",
+					"tokensTitle": "API & Bot Tokens",
+					"tokensMeta": "{active} active • {total} total tokens",
+					"storeTitle": "Store & Subscriptions",
+					"storeMeta": "{active} active products • {categories} categories • {discounted} on sale",
+					"invitesTitle": "Bot Invites",
+					"invitesMeta": "{total} configured OAuth2 invite slugs",
+					"announcementsTitle": "Announcements",
+					"announcementsMeta": "{total} announcements ({scheduled} scheduled)",
+					"mediaTitle": "CDN Media Library",
+					"mediaMeta": "{total} uploaded assets in storage",
+					"settingsTitle": "System Configuration",
+					"settingsMeta": "Admin Guild ID: {serverId}"
+				}
+			},
 			"overview": {
-				"title": "Suite Overview & SEO",
+				"title": "SEO & Subdomain Telemetry",
 				"subtitle": "Monitor live versions, latency, issue health, and Seobility SEO scores across all 9 Xernerx Suite subdomains.",
 				"refresh": "Refresh Metrics",
 				"refreshing": "Refreshing...",
@@ -790,6 +864,9 @@
 				"copyInviteUrl": "Copy Invite Link",
 				"inviteUrlCopied": "Invite link copied to clipboard",
 				"openInvite": "Open Invite",
+				"exportCsv": "Export CSV",
+				"exportJson": "Export JSON",
+				"refresh": "Refresh",
 				"toasts": {
 					"deleteConfirm": "Are you sure you want to delete this invite link?",
 					"deleteSuccess": "Invite deleted",
@@ -803,6 +880,11 @@
 				"title": "Announcements",
 				"subtitle": "Manage global announcements and Discord webhooks.",
 				"createButton": "Create Announcement",
+				"searchPlaceholder": "Search announcements by title or content...",
+				"filterAll": "All",
+				"filterScheduled": "Scheduled",
+				"filterSent": "Sent",
+				"noAnnouncements": "No announcements found.",
 				"sentOn": "Sent on ",
 				"scheduled": "Scheduled: ",
 				"draft": "Draft",
@@ -849,7 +931,9 @@
 					"createWebhookFailed": "Failed to create webhook",
 					"updateSuccess": "Updated!",
 					"createSuccess": "Created!",
-					"saveFailed": "Failed to save"
+					"saveFailed": "Failed to save",
+					"deleteSuccess": "Announcement deleted",
+					"deleteFailed": "Failed to delete announcement"
 				},
 				"footerIconAlt": "Footer Icon",
 				"newButton": "New Button",
@@ -867,6 +951,11 @@
 			"applicationReviews": {
 				"refreshing": "Refreshing...",
 				"refreshList": "Refresh List",
+				"searchPlaceholder": "Search by applicant, ID, or form...",
+				"filterAll": "All Statuses",
+				"filterPending": "Pending",
+				"filterApproved": "Approved",
+				"filterDenied": "Denied",
 				"anonymousUser": "Anonymous User",
 				"unknownUser": "Unknown User",
 				"application": "Application",
@@ -885,6 +974,10 @@
 				"currentStatus": "Current Status:",
 				"deny": "Deny",
 				"approveAssignRole": "Approve & Assign Role",
+				"notificationApprovedTitle": "Application Approved",
+				"notificationDeniedTitle": "Application Denied",
+				"notificationMessage": "Your request for {appName} has been {status}.",
+				"notificationNotePrefix": "Reviewer Note: {note}",
 				"toasts": {
 					"approvedSuccess": "Application approved successfully.",
 					"deniedSuccess": "Application denied successfully."
@@ -943,6 +1036,13 @@
 			"issues": {
 				"title": "Issues",
 				"logBug": "Log Issue",
+				"searchPlaceholder": "Search issues by title, description, or product...",
+				"filterAll": "All Statuses",
+				"filterUnverified": "Unverified",
+				"filterOpen": "Open",
+				"filterResolved": "Resolved",
+				"allProducts": "All Products",
+				"noMatchingIssues": "No issues match your current filters.",
 				"status": "Status",
 				"resolved": "Resolved",
 				"verified": "Verified",
@@ -963,6 +1063,8 @@
 				"liveProd": "Production: v{version}",
 				"liveCanary": "Canary: v{version}",
 				"confirmResolve": "Mark Resolved",
+				"deleteConfirmTitle": "Delete Issue",
+				"deleteConfirmDesc": "Are you sure you want to permanently delete this issue?",
 				"releaseStatus": {
 					"production": "Live (Canary & Prod)",
 					"canary": "Canary Only",
@@ -984,6 +1086,8 @@
 			"roadmap": {
 				"title": "Roadmap Management",
 				"addItem": "Add Item",
+				"searchPlaceholder": "Search roadmap milestones...",
+				"allProducts": "All Products",
 				"modalTitle": "Add Roadmap Item",
 				"titlePlaceholder": "Title",
 				"descPlaceholder": "Description",
@@ -995,6 +1099,8 @@
 				"save": "Save",
 				"cancel": "Cancel",
 				"moveTo": "Move to {status}",
+				"deleteConfirmTitle": "Delete Roadmap Item",
+				"deleteConfirmDesc": "Are you sure you want to permanently delete this roadmap milestone?",
 				"toasts": {
 					"created": "Created",
 					"createdDesc": "Roadmap item added.",
@@ -1008,6 +1114,10 @@
 			},
 			"suggestions": {
 				"title": "Community Suggestions",
+				"searchPlaceholder": "Search suggestions by title, description, or product...",
+				"allProducts": "All Products",
+				"sortTop": "Most Upvoted",
+				"sortNewest": "Newest",
 				"status": "Status",
 				"open": "Open",
 				"approved": "Approved",
@@ -1016,6 +1126,9 @@
 				"moveToRoadmap": "Move to Roadmap",
 				"votes": "Votes",
 				"noSuggestions": "No pending suggestions.",
+				"idCopied": "ID copied to clipboard",
+				"rejectConfirmTitle": "Reject Suggestion",
+				"rejectConfirmDesc": "Are you sure you want to reject and permanently delete this suggestion?",
 				"toasts": {
 					"accepted": "Accepted",
 					"acceptedDesc": "Promoted to Roadmap Ideas.",
@@ -1046,7 +1159,10 @@
 					"system": "System"
 				},
 				"exportCsv": "Export CSV",
-				"exportJson": "Export JSON"
+				"exportJson": "Export JSON",
+				"idCopied": "Target ID copied to clipboard",
+				"copyTargetId": "Copy Target ID",
+				"viewActorProfile": "View User Profile"
 			}
 		},
 		"permissions": {
@@ -1134,7 +1250,12 @@
 				"noItems": "No store products found.",
 				"noCategories": "No store categories found.",
 				"searchPlaceholder": "Search products by name or SKU...",
+				"searchCategoriesPlaceholder": "Search categories by name, ID, or description...",
 				"allCategories": "All Categories",
+				"filterAll": "All Statuses",
+				"filterEnabled": "Enabled",
+				"filterDisabled": "Disabled",
+				"filterDiscounted": "On Sale",
 				"addDiscount": "+ Add Discount",
 				"featuredBadge": "Featured",
 				"featuresCount": "✓ {count} features configured",
@@ -1274,7 +1395,8 @@
 				"toast": {
 					"title": "Privacy Updated",
 					"description": "Your privacy settings have been updated.",
-					"error": "Failed to update privacy"
+					"error": "Failed to update privacy",
+					"widgetsSaved": "Public embed widget preference updated"
 				}
 			},
 			"save": "Save Changes",
@@ -1438,6 +1560,8 @@
 		"notifications": {
 			"title": "Notifications",
 			"description": "Manage how you receive notifications and alerts across channels.",
+			"searchPlaceholder": "Search notification alerts or categories...",
+			"noMatchingAlerts": "No notification settings match your search.",
 			"itemDescription": "Configure alerts for {item}.",
 			"categories": {
 				"general": "General",
@@ -1701,7 +1825,14 @@
 			"title": "Active Devices & Sessions",
 			"description": "Review recent browsers and devices that have accessed your Xernerx account.",
 			"currentSession": "Current Session",
+			"oauthVerified": "OAuth2 Verified",
+			"revokeDevice": "Revoke",
 			"revokeOthers": "Revoke Other Sessions",
+			"revokeConfirmTitle": "Revoke Device Session",
+			"revokeConfirmDesc": "Are you sure you want to revoke the session on {device}?",
+			"revokeOthersConfirmTitle": "Revoke All Other Sessions",
+			"revokeOthersConfirmDesc": "Are you sure you want to revoke all other device sessions except your current browser?",
+			"revokeSingleSuccess": "Device session revoked.",
 			"revokeSuccess": "Other device sessions have been revoked."
 		},
 		"billing": {
@@ -1725,6 +1856,8 @@
 			"confirmPrompt": "Are you sure?",
 			"keepSubscription": "No, keep it",
 			"cancelButton": "Yes, cancel",
+			"cancelConfirmTitle": "Cancel Subscription",
+			"cancelConfirmDesc": "Are you sure you want to cancel your subscription for {product}? You will retain access until the end of your current billing period.",
 			"staff": {
 				"title": "Staff Access",
 				"description": "You have a complimentary all-access staff subscription applied to your account."
@@ -2611,6 +2744,8 @@
 			},
 			"botNotConnected": "Bot Not Connected",
 			"deleteConfirmDesc": "Are you sure you want to completely delete this guild from the database? This action cannot be undone.",
+			"deleteSuccess": "Server data deleted successfully",
+			"deleteFailed": "Failed to delete server data",
 			"links": {
 				"description": "Customize links to your external websites and Discord communities.",
 				"invitePlaceholder": "https://discord.gg/your-invite",
@@ -2993,7 +3128,9 @@
 					},
 					"reset": {
 						"title": "Reset Application Data",
-						"desc": "Are you sure you want to clear all profile descriptions, links, and widgets back to default?"
+						"desc": "Are you sure you want to clear all profile descriptions, links, and widgets back to default?",
+						"confirm": "Reset Data",
+						"cancel": "Cancel"
 					}
 				},
 				"toast": {
@@ -3144,7 +3281,8 @@
 			"idCopied": "Server ID copied to clipboard",
 			"shareProfile": "Share",
 			"profileLinkCopied": "Server link copied to clipboard",
-			"manageServer": "Manage Server"
+			"manageServer": "Manage Server",
+			"publishedBy": "Organization"
 		},
 		"supporters": {
 			"itsYou": "It's You!",
@@ -3422,6 +3560,10 @@
 				"fetchGuildEmbed": {
 					"title": "Fetch Public Server Widget",
 					"description": "Retrieve the public widget for a server by ID (requires widgets enabled in Server Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
+				},
+				"fetchUserEmbed": {
+					"title": "Fetch Public User Widget",
+					"description": "Retrieve the public widget for a user by ID (requires widgets enabled in Account Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
 				}
 			},
 			"secure": {
@@ -3973,6 +4115,9 @@
 		"status": {
 			"subtitle": "Live ecosystem telemetry & health matrix",
 			"refresh": "Refresh Status",
+			"badgeButton": "Status Badge",
+			"badgeModalTitle": "Embed Live Status Badge",
+			"badgeModalDesc": "Embed a real-time ecosystem health badge in your README, documentation, or website.",
 			"servicesHeading": "Ecosystem Services",
 			"searchPlaceholder": "Filter services...",
 			"activeIncidentsHeading": "Active Tracked Issues",

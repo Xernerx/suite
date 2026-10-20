@@ -4,7 +4,7 @@
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Button, Input } from '@xernerx/ui';
 import { LayoutDashboard, Link2, Rss, Tag } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 function extractText(children: any): string {
@@ -28,6 +28,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 
 	const [search, setSearch] = useState('');
 	const [activeVersionId, setActiveVersionId] = useState<string | null>(null);
+	const hasAppliedUrlParam = useRef(false);
 
 	useEffect(() => {
 		show();
@@ -49,12 +50,21 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 
 		setNavItems(items);
 
-		if (!view && items.length > 0) {
-			const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
-			if (itemParam) {
-				const match = items.find((i) => i.view === `changelog-${itemParam.toLowerCase()}`);
-				setView(match ? match.view : items[0].view);
-			} else {
+		if (items.length > 0) {
+			if (!hasAppliedUrlParam.current) {
+				hasAppliedUrlParam.current = true;
+				const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
+				if (itemParam) {
+					const match = items.find((i) => i.view === `changelog-${itemParam.toLowerCase()}`);
+					if (match && view !== match.view) {
+						setView(match.view);
+					} else if (!view) {
+						setView(items[0].view);
+					}
+				} else if (!view || !items.some((i) => i.view === view)) {
+					setView(items[0].view);
+				}
+			} else if (!view) {
 				setView(items[0].view);
 			}
 		}

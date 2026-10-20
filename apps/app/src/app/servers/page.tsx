@@ -110,6 +110,7 @@ function ServersListContent() {
 
 		const baseNavItems = [
 			{ label: t('app.servers.nav.backToExplore'), href: '/', icon: ArrowLeft, category: t('app.bots.nav.categoryNavigation') },
+			{ label: t('app.leaderboard.title'), href: '/leaderboard?tab=servers', icon: Trophy, category: t('app.bots.nav.categoryNavigation') },
 			{ label: t('app.servers.nav.allServers'), view: 'all', icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
 			{ label: t('app.categories.topVoted'), view: 'top_voted', icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
 			{ label: t('app.categories.biggestServers'), view: 'biggest', icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },

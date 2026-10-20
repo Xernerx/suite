@@ -437,39 +437,10 @@ export function renderWidgetHtml(opts: WidgetRenderOptions): string {
 <style>
 	* { box-sizing: border-box; margin: 0; padding: 0; }
 	html, body { width: 100%; height: 100%; background: transparent; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #f8fafc; overflow: hidden; }
-	.card {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		width: 100%;
-		height: 100%;
-		padding: 18px 20px;
-		border-radius: 20px;
-		background: linear-gradient(135deg, #0b0e17 0%, #111625 100%);
-		border: 1px solid rgba(99, 102, 241, 0.35);
-		text-decoration: none;
-		color: inherit;
-		position: relative;
-		overflow: hidden;
-		transition: border-color 0.2s ease, transform 0.2s ease;
-	}
+	.card { display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; padding: 18px 20px; border-radius: 20px; background: linear-gradient(135deg, #0b0e17 0%, #111625 100%); border: 1px solid rgba(99, 102, 241, 0.35); text-decoration: none; color: inherit; position: relative; overflow: hidden; transition: border-color 0.2s ease, transform 0.2s ease; }
 	.card:hover { border-color: rgba(129, 140, 248, 0.75); }
 	.top { display: flex; align-items: center; gap: 14px; }
-	.avatar {
-		width: 54px;
-		height: 54px;
-		border-radius: 15px;
-		object-fit: cover;
-		background: #1e2436;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 800;
-		font-size: 20px;
-		color: #818cf8;
-		flex-shrink: 0;
-		border: 1px solid rgba(255,255,255,0.08);
-	}
+	.avatar { width: 54px; height: 54px; border-radius: 15px; object-fit: cover; background: #1e2436; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: #818cf8; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.08); }
 	.meta { flex: 1; min-width: 0; }
 	.badges { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
 	.type { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #818cf8; }
@@ -477,15 +448,7 @@ export function renderWidgetHtml(opts: WidgetRenderOptions): string {
 	.name { font-size: 17px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #f8fafc; }
 	.desc { font-size: 12px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 	.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-	.stat {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		background: #151924;
-		border: 1px solid rgba(255,255,255,0.07);
-		border-radius: 10px;
-		padding: 7px 10px;
-	}
+	.stat { display: flex; align-items: center; justify-content: space-between; background: #151924; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 7px 10px; }
 	.stat-val { font-size: 13px; font-weight: 800; color: #f8fafc; }
 	.stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; }
 </style>
