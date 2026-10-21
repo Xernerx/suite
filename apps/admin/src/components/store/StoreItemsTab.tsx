@@ -133,15 +133,15 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 												<Sparkles size={11} /> {t('admin.store.table.featuredBadge')}
 											</span>
 										)}
-										{item.badge && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">{item.badge}</span>}
+										{item.badge && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent)">{item.badge}</span>}
 									</div>
 
 									<button
 										onClick={() => onToggleEnabled(item.id, !item.enabled)}
 										className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
 											item.enabled
-												? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20'
-												: 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20'
+												? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20 hover:bg-(--accent-green)/20'
+												: 'bg-(--accent-red)/10 text-(--accent-red) border-(--accent-red)/20 hover:bg-(--accent-red)/20'
 										}`}
 										title={item.enabled ? t('admin.store.tooltips.clickToDisable') : t('admin.store.tooltips.clickToEnable')}
 									>
@@ -166,7 +166,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 										className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer shrink-0"
 										title={t('admin.store.tooltips.copySku')}
 									>
-										{copiedSku === item.skuId ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
+										{copiedSku === item.skuId ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
 									</button>
 								</div>
 
@@ -202,7 +202,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 														setEditingDiscountId(item.id);
 														setTempDiscount(item.discountPercent);
 													}}
-													className="px-2 py-0.5 rounded-lg text-xs font-bold bg-green-500/15 text-green-500 border border-green-500/20 cursor-pointer hover:opacity-80"
+													className="px-2 py-0.5 rounded-lg text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/20 cursor-pointer hover:opacity-80"
 													title={t('admin.store.tooltips.editDiscount')}
 												>
 													{t('admin.store.table.percentOff', { percent: item.discountPercent })}

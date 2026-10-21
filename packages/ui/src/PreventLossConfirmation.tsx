@@ -2,8 +2,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-import { Confirm } from './Confirm'; // Adjust path if needed depending on your barrel file
+import { useDictionary } from '@xernerx/providers';
+import { Confirm } from './Confirm';
 import { useRouter } from 'next/navigation';
 
 export interface PreventLossConfirmationProps {
@@ -15,13 +15,8 @@ export interface PreventLossConfirmationProps {
 	cancelText?: string;
 }
 
-export function PreventLossConfirmation({
-	active,
-	title = 'Unsaved Changes',
-	description = 'You have unsaved changes. Are you sure you want to leave this page? Any unsaved work will be lost.',
-	confirmText = 'Leave Page',
-	cancelText = 'Stay',
-}: PreventLossConfirmationProps) {
+export function PreventLossConfirmation({ active, title, description, confirmText, cancelText }: PreventLossConfirmationProps) {
+	const { t } = useDictionary();
 	const router = useRouter();
 	const [showConfirm, setShowConfirm] = useState(false);
 	const [pendingUrl, setPendingUrl] = useState<string | null>(null);
@@ -114,5 +109,15 @@ export function PreventLossConfirmation({
 		}
 	};
 
-	return <Confirm open={showConfirm} onOpenChange={setShowConfirm} title={title} description={description} confirmText={confirmText} cancelText={cancelText} onConfirm={handleConfirmLeave} />;
+	return (
+		<Confirm
+			open={showConfirm}
+			onOpenChange={setShowConfirm}
+			title={title || t('common.preventLoss.title')}
+			description={description || t('common.preventLoss.description')}
+			confirmText={confirmText || t('common.preventLoss.confirmText')}
+			cancelText={cancelText || t('common.preventLoss.cancelText')}
+			onConfirm={handleConfirmLeave}
+		/>
+	);
 }

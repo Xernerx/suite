@@ -124,7 +124,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.tokens.toast.updateError'));
 			}
 		} catch (err: any) {
 			toast({
@@ -153,7 +153,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.tokens.toast.deleteError'));
 			}
 		} catch (err: any) {
 			toast({
@@ -168,10 +168,10 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 	};
 
 	const statusColors = {
-		active: 'bg-emerald-500/10 text-emerald-500',
-		inactive: 'bg-zinc-500/10 text-zinc-400',
-		suspended: 'bg-red-500/10 text-red-500',
-		pending: 'bg-amber-500/10 text-amber-500',
+		active: 'bg-(--accent-green)/10 text-(--accent-green)',
+		inactive: 'bg-(--text-muted)/10 text-(--text-muted)',
+		suspended: 'bg-(--accent-red)/10 text-(--accent-red)',
+		pending: 'bg-(--accent-orange)/10 text-(--accent-orange)',
 	};
 
 	return (
@@ -371,7 +371,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 									<button
 										type="button"
 										onClick={() => setConfirmDeleteOpen(true)}
-										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
+										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-(--accent-red)/10 hover:bg-(--accent-red)/20 text-(--accent-red) text-xs font-medium transition-colors"
 									>
 										<Trash2 size={14} />
 										{t('admin.tokens.manage.revokeTitle')}

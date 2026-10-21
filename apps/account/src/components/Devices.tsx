@@ -6,6 +6,7 @@ import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@x
 import { Button, Confirm } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Computer, Smartphone, ShieldCheck, Trash2, Clock, CheckCircle2 } from 'lucide-react';
+import { DevicePairingCard } from './DevicePairingCard';
 
 interface DeviceSession {
 	id: string;
@@ -155,6 +156,8 @@ export default function Devices() {
 				)}
 			</div>
 
+			<DevicePairingCard />
+
 			<div className="flex flex-col gap-3">
 				{devices.map((device) => {
 					const isCurrent = device.id === currentDeviceId;
@@ -169,11 +172,11 @@ export default function Devices() {
 								</div>
 								<div>
 									<div className="flex items-center gap-2">
-										<h3 className="font-bold text-base text-(--text)">
+										<h2 className="font-bold text-base text-(--text)">
 											{device.browser} • {device.os}
-										</h3>
+										</h2>
 										{isCurrent && (
-											<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+											<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
 												<CheckCircle2 size={12} />
 												{t('account.devices.currentSession')}
 											</span>
@@ -188,7 +191,7 @@ export default function Devices() {
 
 							<div className="flex items-center gap-3 text-xs text-(--text-muted)">
 								<div className="flex items-center gap-1.5">
-									<ShieldCheck size={15} className="text-emerald-400" />
+									<ShieldCheck size={15} className="text-(--accent-green)" />
 									<span>{t('account.devices.oauthVerified')}</span>
 								</div>
 								{!isCurrent && (

@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
+import { useWindowControlsStyle } from '../HeaderWindowControls';
 
 interface SidebarNotificationsProps {
 	isCollapsed: boolean;
@@ -21,11 +22,15 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const { notifications, unreadCount, markAsRead, markAllAsRead, refresh } = useNotifications();
+	const { isRightAligned } = useWindowControlsStyle();
 
 	const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
 	const [mounted, setMounted] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [filterMode, setFilterMode] = useState<'all' | 'unread'>('all');
+
+	const visibleNotifications = filterMode === 'unread' ? notifications.filter((n) => !n.read) : notifications;
 
 	// Ensure portal only renders on the client side to prevent hydration mismatches
 	useEffect(() => {
@@ -131,13 +136,13 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 	const getIcon = (type: string) => {
 		switch (type) {
 			case 'success':
-				return <CheckCircle2 size={16} className="text-green-500" />;
+				return <CheckCircle2 size={16} className="text-(--accent-green)" />;
 			case 'error':
-				return <AlertTriangle size={16} className="text-red-500" />;
+				return <AlertTriangle size={16} className="text-(--accent-red)" />;
 			case 'warning':
-				return <AlertTriangle size={16} className="text-yellow-500" />;
+				return <AlertTriangle size={16} className="text-(--accent-orange)" />;
 			default:
-				return <Info size={16} className="text-blue-500" />;
+				return <Info size={16} className="text-(--accent)" />;
 		}
 	};
 
@@ -151,8 +156,8 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 				className={`z-50 flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl
                     ${
 						placement === 'top'
-							? 'absolute top-full mt-2 right-0 w-80 max-w-[calc(100vw-2rem)] origin-top-right'
-							: `absolute bottom-full mb-3 ${isCollapsed ? 'left-0 w-64' : 'left-0 right-0 w-full'}`
+							? `absolute top-full mt-2 ${isRightAligned ? 'left-0 origin-top-left' : 'right-0 origin-top-right'} w-80 max-w-[calc(100vw-2rem)]`
+							: `absolute bottom-full mb-3 ${isCollapsed ? (isRightAligned ? 'right-0 w-64' : 'left-0 w-64') : 'left-0 right-0 w-full'}`
 					}
                 `}
 				style={{
@@ -161,42 +166,68 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 				}}
 			>
 				{/* Header */}
-				<div className="flex items-center justify-between px-2 pt-1 pb-2 border-b border-(--border)/10">
-					<div className="flex items-center gap-2">
-						<Bell size={14} className="text-(--text-muted)" />
-						<span className="text-sm font-semibold text-(--text)">{t('components.cards.sidebarnotifications.text1')}</span>
-						{unreadCount > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">{unreadCount}</span>}
-					</div>
-					<div className="flex items-center gap-2">
-						<button
-							onClick={handleRefresh}
-							disabled={isRefreshing}
-							title={t('components.cards.sidebarnotifications.text2')}
-							className="h-6 w-6 flex items-center justify-center rounded-md text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
-						>
-							<RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
-						</button>
-						{unreadCount > 0 && (
+				<div className="flex flex-col gap-2 px-2 pt-1 pb-2 border-b border-(--border)/10">
+					<div className="flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<Bell size={14} className="text-(--text-muted)" />
+							<span className="text-sm font-semibold text-(--text)">{t('components.cards.sidebarnotifications.text1')}</span>
+							{unreadCount > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-(--accent-red) text-[9px] font-bold text-white">{unreadCount}</span>}
+						</div>
+						<div className="flex items-center gap-2">
 							<button
-								onClick={markAllAsRead}
-								title={t('components.cards.sidebarnotifications.text3')}
-								className="h-6 w-6 flex items-center justify-center rounded-md text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors"
+								type="button"
+								onClick={handleRefresh}
+								disabled={isRefreshing}
+								title={t('components.cards.sidebarnotifications.text2')}
+								aria-label={t('components.cards.sidebarnotifications.text2')}
+								className="h-6 w-6 flex items-center justify-center rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
 							>
-								<Check size={12} />
+								<RefreshCw size={12} className={isRefreshing ? 'animate-spin' : ''} />
 							</button>
-						)}
+							{unreadCount > 0 && (
+								<button
+									type="button"
+									onClick={markAllAsRead}
+									title={t('components.cards.sidebarnotifications.text3')}
+									aria-label={t('components.cards.sidebarnotifications.text3')}
+									className="h-6 w-6 flex items-center justify-center rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors"
+								>
+									<Check size={12} />
+								</button>
+							)}
+						</div>
+					</div>
+					<div className="flex items-center gap-1 p-0.5 rounded-xl bg-(--background)/60 border border-(--border)/10">
+						<button
+							type="button"
+							onClick={() => setFilterMode('all')}
+							className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
+								filterMode === 'all' ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+							}`}
+						>
+							{t('components.cards.sidebarnotifications.filterAll')} ({notifications.length})
+						</button>
+						<button
+							type="button"
+							onClick={() => setFilterMode('unread')}
+							className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
+								filterMode === 'unread' ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+							}`}
+						>
+							{t('components.cards.sidebarnotifications.filterUnread')} ({unreadCount})
+						</button>
 					</div>
 				</div>
 
 				{/* Notification List */}
 				<div className="flex flex-col max-h-[300px] overflow-y-auto" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					{notifications.length === 0 ? (
+					{visibleNotifications.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-8 text-(--text-muted)">
 							<Bell size={24} className="opacity-20 mb-2" />
-							<span className="text-xs">{t('components.cards.sidebarnotifications.text4')}</span>
+							<span className="text-xs">{filterMode === 'unread' ? t('components.cards.sidebarnotifications.noUnread') : t('components.cards.sidebarnotifications.text4')}</span>
 						</div>
 					) : (
-						notifications.slice(0, 10).map((notification) => (
+						visibleNotifications.slice(0, 15).map((notification) => (
 							<button
 								key={notification.id}
 								onClick={() => handleNotificationClick(notification)}
@@ -210,7 +241,7 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 									<span className={`text-sm truncate ${!notification.read ? 'font-bold text-(--text)' : 'font-medium text-(--text-muted)'}`}>{notification.title}</span>
 									<span className="text-xs text-(--text-muted) truncate mt-0.5">{notification.message}</span>
 								</div>
-								{!notification.read && <div className="shrink-0 h-2 w-2 rounded-full bg-red-500 ml-2 mt-1.5" />}
+								{!notification.read && <div className="shrink-0 h-2 w-2 rounded-full bg-(--accent-red) ml-2 mt-1.5" />}
 							</button>
 						))
 					)}
@@ -274,7 +305,7 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 											onClick={handleDelete}
 											disabled={isProcessing}
 											title={t('components.cards.sidebarnotifications.title1')}
-											className="flex items-center justify-center h-10 w-10 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+											className="flex items-center justify-center h-10 w-10 rounded-xl text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors disabled:opacity-50"
 										>
 											{isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
 										</button>

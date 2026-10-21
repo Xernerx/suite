@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 		if (!res.ok) {
 			return {
-				title: 'User Profile',
-				description: 'This user profile is private or does not exist on Xernerx Studios.',
+				title: 'User Profile & Community Activity',
+				description: 'This user profile is private or does not exist on the Xernerx Studios platform. Explore public Discord bots, servers, and creators.',
+				alternates: { canonical: `/users/${id}` },
+				robots: { index: false, follow: false },
 			};
 		}
 
@@ -45,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		return {
 			title,
 			description: ogDescription,
+			alternates: { canonical: `/users/${id}` },
 			openGraph: {
 				siteName: 'Xernerx Studios',
 				type: 'profile',
@@ -69,8 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		};
 	} catch {
 		return {
-			title: 'User Profile',
-			description: 'View user profiles, published bots, and organizations on Xernerx Studios.',
+			title: 'User Profile & Community Activity',
+			description: 'View user profiles, daily voting streaks, published Discord bots, and affiliated organizations on the Xernerx Studios ecosystem.',
+			alternates: { canonical: `/users/${id}` },
 		};
 	}
 }

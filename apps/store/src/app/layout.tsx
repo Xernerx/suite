@@ -10,7 +10,7 @@ import type { Metadata } from 'next';
 import { SessionProvider, PermissionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 export const metadata: Metadata = {
 	title: {
@@ -72,14 +72,15 @@ export default async function RootLayout({
 	const initialEnv: 'dev' | 'canary' | 'public' =
 		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 
-	const locale = headersList.get('x-locale') || 'en';
+	const cookieStore = await cookies();
+	const locale = cookieStore.get('NEXT_LOCALE')?.value || headersList.get('x-locale') || 'en';
 
 	const dict = await dictionary(locale as Locale);
 
 	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict} initialEnvironment={initialEnv}>

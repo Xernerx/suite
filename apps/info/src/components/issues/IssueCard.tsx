@@ -2,6 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Tooltip } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
@@ -23,7 +24,7 @@ export default function IssueCard({ issue, botInfo, selectedProduct, onSelectPro
 			exit={{ opacity: 0, scale: 0.95 }}
 			transition={{ duration: 0.25, ease: 'easeOut' }}
 			whileHover={{ y: -2 }}
-			className="flex gap-4 p-4 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
+			className="flex gap-4 p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
 		>
 			<div className="flex flex-col justify-center w-full min-w-0">
 				<div className="flex justify-between items-start gap-4">
@@ -32,8 +33,8 @@ export default function IssueCard({ issue, botInfo, selectedProduct, onSelectPro
 				<div className="text-(--text-muted) text-sm mb-2 mt-1 whitespace-pre-wrap">{issue.description}</div>
 				<div className="flex flex-wrap items-center gap-2 mt-2">
 					<Tooltip content={issue.status === 'resolved' ? t('info.bugs.tooltips.resolved') : issue.acknowledged ? t('info.bugs.tooltips.verified') : t('info.bugs.tooltips.submitted')}>
-						<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
-							<span className={`w-2 h-2 rounded-full ${issue.status === 'resolved' ? 'bg-green-500' : issue.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}></span>
+						<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-xl border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
+							<span className={`w-2 h-2 rounded-full ${issue.status === 'resolved' ? 'bg-(--accent-green)' : issue.acknowledged ? 'bg-(--accent)' : 'bg-(--accent-orange)'}`}></span>
 							<span className="text-xs uppercase font-bold text-(--text-muted)">
 								{issue.status === 'resolved' ? t('info.bugs.status.resolved') : issue.acknowledged ? t('info.bugs.status.verified') : t('info.bugs.status.submitted')}
 							</span>
@@ -48,12 +49,12 @@ export default function IssueCard({ issue, botInfo, selectedProduct, onSelectPro
 							})}
 						>
 							<div
-								className={`inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded border cursor-help ${
+								className={`inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded-xl border cursor-help ${
 									issue.releaseStatus === 'production'
-										? 'bg-green-500/10 text-green-400 border-green-500/20'
+										? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20'
 										: issue.releaseStatus === 'canary'
-											? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-											: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+											? 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20'
+											: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20'
 								}`}
 							>
 								<span>
@@ -69,9 +70,9 @@ export default function IssueCard({ issue, botInfo, selectedProduct, onSelectPro
 					<button
 						type="button"
 						onClick={() => onSelectProduct(selectedProduct === issue.productId ? null : issue.productId)}
-						className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
+						className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded-xl border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
 					>
-						{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+						{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}
 						{botInfo ? botInfo.name : issue.productId}
 					</button>
 				</div>

@@ -16,7 +16,7 @@ export function flattenObject(obj: any, prefix = ''): Record<string, string> {
 	for (const k in obj) {
 		if (Object.prototype.hasOwnProperty.call(obj, k)) {
 			const pre = prefix.length ? prefix + '.' : '';
-			if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+			if (typeof obj[k] === 'object' && obj[k] !== null) {
 				Object.assign(flattened, flattenObject(obj[k], pre + k));
 			} else {
 				flattened[pre + k] = String(obj[k]);
@@ -38,8 +38,9 @@ export function unflattenObject(data: Record<string, string>) {
 			const arr = p.split('.');
 			for (let i = 0; i < arr.length; i++) {
 				const elem = arr[i];
-				if (!schema[elem]) {
-					schema[elem] = i === arr.length - 1 ? val : {};
+				if (schema[elem] === undefined) {
+					const nextElem = arr[i + 1];
+					schema[elem] = i === arr.length - 1 ? val : /^\d+$/.test(nextElem) ? [] : {};
 				}
 				schema = schema[elem];
 			}

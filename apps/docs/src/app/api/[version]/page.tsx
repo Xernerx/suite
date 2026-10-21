@@ -1,221 +1,280 @@
 /** @format */
-// Force recompile
 'use client';
 
-import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart2, Book, Code, Globe, Key, Lock, Rocket, Server, Shield, Terminal, Link as LinkIcon, Megaphone, Languages, FileText, Settings2, Info } from 'lucide-react';
-import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, ArrowLeft, Award, BarChart2, Bot, Code, Compass, Globe, HelpCircle, Key, Layers, Lock, Map, Settings2, Shield, ShoppingBag, Terminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useSidebar, useUser, useEnvironment, useDictionary } from '@xernerx/providers';
-import { Selector, CodeBlock } from '@xernerx/ui';
+import { SidebarNavItem, useSidebar, useDictionary } from '@xernerx/providers';
+import { Loading, NotPermitted } from '@xernerx/feedback';
+import { Input, Selector } from '@xernerx/ui';
 
 import { useParams, useRouter } from 'next/navigation';
 import { V1Endpoints } from '@/components/api/V1Endpoints';
 import { CoreEndpoints } from '@/components/api/CoreEndpoints';
 import { SecureEndpoints } from '@/components/api/SecureEndpoints';
 import { ApiPlayground } from '@/components/api/ApiPlayground';
+import { ApiOverviewAndAuth } from '@/components/api/ApiOverviewAndAuth';
+import { useDocsAccess } from '@/components/useDocsAccess';
+
+const HASH_TO_VIEW: Record<string, string> = {
+	overview: 'overview',
+	authentication: 'overview',
+	playground: 'playground',
+	'fetch-bot-profile': 'v1-profiles',
+	'update-bot-profile': 'v1-profiles',
+	'delete-bot-profile': 'v1-profiles',
+	'fetch-bot-badges': 'v1-badges',
+	'fetch-bot-stats': 'v1-stats',
+	'post-bot-stats': 'v1-stats',
+	'update-bot-stats': 'v1-stats',
+	'delete-bot-stats': 'v1-stats',
+	'fetch-bot-commands': 'v1-commands',
+	'sync-bot-commands': 'v1-commands',
+	'delete-bot-commands': 'v1-commands',
+	'fetch-leaderboard': 'v1-platform',
+	'fetch-changelog-rss': 'v1-platform',
+	'fetch-version-changelog': 'v1-platform',
+	'fetch-bot-embed': 'core-embeds',
+	'fetch-organization-embed': 'core-embeds',
+	'fetch-guild-embed': 'core-embeds',
+	'fetch-user-embed': 'core-embeds',
+	'core-faq': 'core-faq',
+	'info-roadmap': 'core-info',
+	'info-suggestions': 'core-info',
+	'info-issues': 'core-info',
+	'fetch-discord-profile': 'core-discord',
+	'fetch-discord-guilds': 'core-discord',
+	'fetch-discord-guild': 'core-discord',
+	'fetch-discord-roles': 'core-discord',
+};
+
+const HTTP_METHODS = ['ALL', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
 
 export default function APIDocs() {
 	const { version } = useParams() as { version: string };
 	const router = useRouter();
-	const { setNavItems, show, clearNavItems } = useSidebar();
-	const { user } = useUser() as any;
-	const { getEnvUrl } = useEnvironment();
-
-	const [isAdmin, setIsAdmin] = useState(false);
-
-	useEffect(() => {
-		const checkAdmin = async () => {
-			if (!user?.roles || !Array.isArray(user.roles) || user.roles.length === 0) return;
-			try {
-				const rolePromises = user.roles.map(async (roleItem: any) => {
-					const roleId = typeof roleItem === 'string' ? roleItem : roleItem.id;
-					if (!roleId) return null;
-					const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
-					if (!res.ok) return null;
-					return res.json();
-				});
-				const fetchedRoles = await Promise.all(rolePromises);
-				const hasPerm = fetchedRoles.some((role: any) => role?.permissions?.settings === true || role?.permissions?.tokens === true || role?.permissions?.access === true);
-				setIsAdmin(hasPerm);
-			} catch (err) {
-				console.error('Failed to verify role permissions:', err);
-			}
-		};
-		checkAdmin();
-	}, [user?.roles, getEnvUrl]);
-
+	const { setNavItems, show, hide, clearNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
+	const { isAdmin, loading } = useDocsAccess();
+
+	const [searchQuery, setSearchQuery] = useState('');
+	const [methodFilter, setMethodFilter] = useState<string>('ALL');
+	const [playgroundTarget, setPlaygroundTarget] = useState<{ method: string; path: string } | null>(null);
+
 	useEffect(() => {
+		if (version === 'secure' && !loading && !isAdmin) {
+			clearNavItems();
+			hide();
+			return;
+		}
+
 		show();
 
-		const navItems = [
+		const navItems: SidebarNavItem[] = [
 			{ label: t('docs.api.common.nav.back'), href: '/', icon: ArrowLeft, category: t('docs.api.common.nav.categoryNavigation') },
-			{ label: t('docs.api.common.nav.overview'), href: '#overview', icon: Globe, category: t('docs.api.common.nav.categoryRestApi') },
-			{ label: t('docs.api.common.auth'), href: '#authentication', icon: Key, category: t('docs.api.common.nav.categoryRestApi') },
-			{ label: t('docs.api.playground.title'), href: '#playground', icon: Terminal, category: t('docs.api.common.nav.categoryRestApi') },
+			{ label: t('docs.api.common.nav.overviewAndAuth'), view: 'overview', icon: Compass, category: t('docs.api.common.nav.categoryRestApi') },
+			{ label: t('docs.api.playground.title'), view: 'playground', icon: Terminal, category: t('docs.api.common.nav.categoryRestApi') },
+			{ label: t('docs.api.common.nav.allEndpoints'), view: 'all', icon: Layers, category: t('docs.api.common.nav.endpoints') },
 		];
 
 		if (version === 'v1') {
 			navItems.push(
-				{ label: t('docs.api.v1.endpoints.fetchBotProfile.title'), href: '#fetch-bot-profile', icon: Server, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.updateBotProfile.title'), href: '#update-bot-profile', icon: Code, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.deleteBotProfile.title'), href: '#delete-bot-profile', icon: Server, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.fetchBotStats.title'), href: '#fetch-bot-stats', icon: BarChart2, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.postBotStats.title'), href: '#post-bot-stats', icon: BarChart2, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.updateBotStats.title'), href: '#update-bot-stats', icon: BarChart2, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.deleteBotStats.title'), href: '#delete-bot-stats', icon: BarChart2, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.fetchBotCommands.title'), href: '#fetch-bot-commands', icon: Code, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.syncBotCommands.title'), href: '#sync-bot-commands', icon: Code, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.v1.endpoints.deleteBotCommands.title'), href: '#delete-bot-commands', icon: Code, category: t('docs.api.common.nav.endpoints') }
+				{ label: t('docs.api.common.groups.v1Profiles'), view: 'v1-profiles', icon: Bot, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.v1Stats'), view: 'v1-stats', icon: BarChart2, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.v1Commands'), view: 'v1-commands', icon: Code, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.v1Badges'), view: 'v1-badges', icon: Award, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.v1Platform'), view: 'v1-platform', icon: Activity, category: t('docs.api.common.nav.endpoints') }
 			);
-		} else if (version === 'core' && isAdmin) {
+		} else if (version === 'core') {
 			navItems.push(
-				{ label: t('docs.api.core.fetchDiscordProfile.title'), href: '#fetch-discord-profile', icon: Server, category: t('docs.api.common.nav.users') },
-				{ label: t('docs.api.core.fetchDiscordGuilds.title'), href: '#fetch-discord-guilds', icon: Shield, category: t('docs.api.common.nav.users') },
-				{ label: t('docs.api.core.fetchDiscordGuild.title'), href: '#fetch-discord-guild', icon: Globe, category: t('docs.api.common.nav.guilds') },
-				{ label: t('docs.api.core.fetchDiscordRoles.title'), href: '#fetch-discord-roles', icon: Key, category: t('docs.api.common.nav.guilds') },
-				{ label: t('docs.api.core.fetchBotEmbed.title'), href: '#fetch-bot-embed', icon: Server, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.core.fetchOrganizationEmbed.title'), href: '#fetch-organization-embed', icon: Shield, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.core.fetchGuildEmbed.title'), href: '#fetch-guild-embed', icon: Globe, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.core.fetchUserEmbed.title'), href: '#fetch-user-embed', icon: Server, category: t('docs.api.common.nav.endpoints') }
+				{ label: t('docs.api.common.groups.coreEmbeds'), view: 'core-embeds', icon: Globe, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.coreFaq'), view: 'core-faq', icon: HelpCircle, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.coreInfo'), view: 'core-info', icon: Map, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.coreDiscord'), view: 'core-discord', icon: Shield, category: t('docs.api.common.nav.endpoints') }
 			);
 		} else if (version === 'secure' && isAdmin) {
 			navItems.push(
-				{ label: t('docs.api.secure.manageUsers.title'), href: '#manage-users', icon: Server, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.manageTokens.title'), href: '#manage-tokens', icon: Key, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.manageRoles.title'), href: '#manage-roles', icon: Shield, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.manageInvites.title'), href: '#manage-invites', icon: LinkIcon, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.manageAnnouncements.title'), href: '#manage-announcements', icon: Megaphone, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.manageTranslations.title'), href: '#manage-translations', icon: Languages, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.manageApplications.title'), href: '#manage-applications', icon: FileText, category: t('docs.api.common.nav.endpoints') },
-				{ label: t('docs.api.secure.systemSettings.title'), href: '#system-settings', icon: Settings2, category: t('docs.api.common.nav.endpoints') }
+				{ label: t('docs.api.common.groups.secureEntities'), view: 'secure-entities', icon: Bot, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.secureCommerce'), view: 'secure-commerce', icon: ShoppingBag, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.secureModeration'), view: 'secure-moderation', icon: Shield, category: t('docs.api.common.nav.endpoints') },
+				{ label: t('docs.api.common.groups.secureSystem'), view: 'secure-system', icon: Settings2, category: t('docs.api.common.nav.endpoints') }
 			);
 		}
 
 		setNavItems(navItems);
 
+		const validViews = new Set(navItems.map((i) => i.view).filter(Boolean));
+		if (typeof window !== 'undefined' && window.location.hash) {
+			const rawHash = window.location.hash.replace('#', '');
+			const mappedView = HASH_TO_VIEW[rawHash];
+			if (mappedView && validViews.has(mappedView)) {
+				setView(mappedView);
+				return () => clearNavItems();
+			}
+		}
+
+		if (!view || !validViews.has(view)) {
+			setView('overview');
+		}
+
 		return () => clearNavItems();
-	}, [setNavItems, show, clearNavItems, version, isAdmin]);
+	}, [setNavItems, show, hide, clearNavItems, version, isAdmin, loading, t, view, setView]);
+
+	if (version === 'secure') {
+		if (loading) return <Loading />;
+		if (!isAdmin) return <NotPermitted view="/secure API" />;
+	}
+
+	const activeView = view || 'overview';
+	const isEndpointView = activeView !== 'overview' && activeView !== 'playground';
+	const isFiltering = isEndpointView && (searchQuery.trim().length > 0 || methodFilter !== 'ALL');
+
+	const handleTryRoute = (method: string, path: string) => {
+		setPlaygroundTarget({ method, path });
+		setSearchQuery('');
+		setMethodFilter('ALL');
+		setView('playground');
+		if (typeof window !== 'undefined') {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+	};
 
 	return (
-		<div className="max-w-7xl mx-auto py-12 px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white">
-			<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-					<h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						Xernerx {t('docs.api.common.title')} <span className="text-2xl text-(--accent)">{version}</span>
-					</h1>
-					<div className="w-full sm:w-48">
+		<div className="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
+			{/* Clean Page Header & Namespace Switcher */}
+			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-(--border)/10 pb-6">
+				<div className="space-y-2">
+					<div className="flex flex-wrap items-center gap-3">
+						<h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							Xernerx {t('docs.api.common.title')}
+						</h1>
+						<span className="px-3 py-1 rounded-full text-sm font-extrabold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/30">/{version}</span>
+					</div>
+					<p className="text-base text-(--text-muted) leading-relaxed max-w-2xl">{t('docs.api.common.description', { version: version.toUpperCase() })}</p>
+				</div>
+
+				{/* Namespace Switcher Pills + Mobile Selector */}
+				<div className="flex items-center gap-2 shrink-0">
+					<div className="hidden sm:flex items-center p-1 rounded-2xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 gap-1">
+						{(['v1', 'core', ...(isAdmin ? ['secure'] : [])] as const).map((ver) => (
+							<button
+								key={ver}
+								type="button"
+								onClick={() => router.push(`/api/${ver}`)}
+								className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+									version === ver ? 'bg-(--accent) text-white shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]' : 'text-(--text-muted) hover:text-(--text)'
+								}`}
+							>
+								{ver === 'secure' ? <Lock size={12} /> : ver === 'v1' ? <Key size={12} /> : <Globe size={12} />}
+								<span className="uppercase">{ver}</span>
+							</button>
+						))}
+					</div>
+
+					<div className="w-full sm:hidden">
 						<Selector
 							value={version}
 							onChange={(val: string) => router.push(`/api/${val}`)}
-							options={[
-								{ label: 'v1', value: 'v1' },
-								...(isAdmin
-									? [
-											{ label: 'core', value: 'core' },
-											{ label: 'secure', value: 'secure' },
-										]
-									: []),
-							]}
+							options={[{ label: 'v1', value: 'v1' }, { label: 'core', value: 'core' }, ...(isAdmin ? [{ label: 'secure', value: 'secure' }] : [])]}
 							placeholder={t('docs.api.common.selectVersion')}
 						/>
 					</div>
 				</div>
-				<p className="text-lg text-(--text-muted) leading-relaxed mb-12">{t('docs.api.common.description', { version: version.toUpperCase() })}</p>
-			</motion.div>
-
-			<div className="space-y-16">
-				{/* OVERVIEW SECTION */}
-				<motion.section id="overview" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-6 scroll-mt-24">
-					<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2 border-b border-(--border)/10 pb-4">
-						<Globe className="text-(--accent)" size={24} /> {t('docs.api.common.baseUrl')}
-					</h2>
-					<div className="bg-(--foreground)/30 border border-(--border)/10 rounded-2xl p-6">
-						<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
-							<div>
-								<h3 className="font-semibold text-(--text) mb-1">{t('docs.api.common.prodEndpoint')}</h3>
-								<code className="text-sm text-(--accent) bg-(--accent)/10 px-2 py-1 rounded">https://api.xernerx.com</code>
-							</div>
-							<div>
-								<h3 className="font-semibold text-(--text) mb-1">{t('docs.api.common.canaryEndpoint')}</h3>
-								<code className="text-sm text-orange-500 bg-orange-500/10 px-2 py-1 rounded">https://api.canary.xernerx.com</code>
-							</div>
-							<div>
-								<h3 className="font-semibold text-(--text) mb-1">{t('docs.api.common.devEndpoint')}</h3>
-								<code className="text-sm text-blue-500 bg-blue-500/10 px-2 py-1 rounded">https://api.dev.xernerx.com</code>
-							</div>
-						</div>
-					</div>
-				</motion.section>
-
-				<motion.section id="authentication" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="space-y-6 scroll-mt-24">
-					<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2 border-b border-(--border)/10 pb-4">
-						<Key className="text-(--accent)" size={24} /> {t('docs.api.common.auth')}
-					</h2>
-					<p className="text-(--text-muted)">
-						{t('docs.api.common.authDesc1')}
-						{version === 'secure' && t('docs.api.common.authDesc2')}
-					</p>
-
-					<div className="bg-(--foreground)/30 border border-(--border)/10 rounded-2xl p-6">
-						<p className="mb-4 text-sm text-(--text-muted)">
-							{t('docs.api.common.authDesc3').split('Authorization')[0]}
-							<code>Authorization</code>
-							{t('docs.api.common.authDesc3').split('Authorization')[1]}
-						</p>
-
-						<div className={version === 'secure' ? 'mb-4' : ''}>
-							<CodeBlock
-								tabs={[
-									{
-										label: 'TypeScript',
-										language: 'typescript',
-										code: `const headers: HeadersInit = {
-  'Authorization': 'Bearer xnx_live_abc123def456...'
-};`,
-									},
-									{
-										label: 'JavaScript',
-										language: 'javascript',
-										code: `const headers = {
-  'Authorization': 'Bearer xnx_live_abc123def456...'
-};`,
-									},
-									{
-										label: 'Python',
-										language: 'python',
-										code: `headers = {
-    "Authorization": "Bearer xnx_live_abc123def456..."
-}`,
-									},
-								]}
-							/>
-						</div>
-
-						{version === 'secure' && (
-							<div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl mt-4">
-								<h4 className="text-orange-500 font-bold mb-1 flex items-center gap-2">
-									<Lock size={16} /> {t('docs.api.common.securePassage')}
-								</h4>
-								<p className="text-sm text-(--text-muted)">
-									{t('docs.api.common.secureDesc').split('/secure')[0]}
-									<code>/secure</code>
-									{t('docs.api.common.secureDesc').split('/secure')[1].split('secure passage')[0]}
-									<code>secure</code>
-									{t('docs.api.common.secureDesc').split('/secure')[1].split('secure passage')[1]}
-								</p>
-							</div>
-						)}
-					</div>
-				</motion.section>
-
-				<ApiPlayground version={version} />
-
-				{version === 'v1' && <V1Endpoints />}
-				{version === 'core' && isAdmin && <CoreEndpoints />}
-				{version === 'secure' && isAdmin && <SecureEndpoints />}
 			</div>
+
+			{/* Endpoint Search Bar & HTTP Method Filter Pills (Only on Endpoint Views) */}
+			{isEndpointView && (
+				<div
+					className="flex flex-col lg:flex-row lg:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+				>
+					<div className="flex-1">
+						<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('docs.api.common.searchEndpointsPlaceholder')} />
+					</div>
+
+					<div className="flex flex-wrap items-center gap-1.5 shrink-0">
+						{HTTP_METHODS.map((m) => {
+							const isSelected = methodFilter === m;
+							return (
+								<button
+									key={m}
+									type="button"
+									onClick={() => setMethodFilter(m)}
+									className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
+										isSelected
+											? 'bg-(--accent) text-white border-(--accent) shadow-sm'
+											: 'bg-(--background)/60 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/30'
+									}`}
+								>
+									{m}
+								</button>
+							);
+						})}
+					</div>
+				</div>
+			)}
+
+			{/* Active View Content */}
+			{isFiltering ? (
+				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="flex items-center justify-between px-2">
+						<span className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">
+							{t('docs.api.common.filteringEndpoints')} ({version.toUpperCase()})
+						</span>
+						<button
+							type="button"
+							onClick={() => {
+								setSearchQuery('');
+								setMethodFilter('ALL');
+							}}
+							className="text-xs font-bold text-(--accent) hover:underline cursor-pointer"
+						>
+							{t('docs.api.common.clearFilters')}
+						</button>
+					</div>
+					{version === 'v1' && <V1Endpoints activeGroup="all" searchQuery={searchQuery} methodFilter={methodFilter} defaultExpanded={false} onTryRoute={handleTryRoute} />}
+					{version === 'core' && <CoreEndpoints activeGroup="all" searchQuery={searchQuery} methodFilter={methodFilter} defaultExpanded={false} onTryRoute={handleTryRoute} />}
+					{version === 'secure' && isAdmin && <SecureEndpoints activeGroup="all" searchQuery={searchQuery} methodFilter={methodFilter} defaultExpanded={false} onTryRoute={handleTryRoute} />}
+				</div>
+			) : (
+				<AnimatePresence mode="wait">
+					<motion.div
+						key={`${version}-${activeView}`}
+						initial={{ opacity: 1, y: 0 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2, ease: 'easeOut' }}
+						className="flex flex-col"
+						style={{ gap: 'calc(var(--ui-gap) * 1.25)' }}
+					>
+						{activeView === 'overview' && (
+							<ApiOverviewAndAuth version={version} isAdmin={isAdmin} onSwitchVersion={(ver) => router.push(`/api/${ver}`)} onOpenEndpoints={(targetView) => setView(targetView)} />
+						)}
+
+						{activeView === 'playground' && <ApiPlayground version={version} initialMethod={playgroundTarget?.method} initialPath={playgroundTarget?.path} />}
+
+						{isEndpointView && (
+							<>
+								{version === 'v1' && (
+									<V1Endpoints activeGroup={activeView} searchQuery={searchQuery} methodFilter={methodFilter} defaultExpanded={activeView !== 'all'} onTryRoute={handleTryRoute} />
+								)}
+								{version === 'core' && (
+									<CoreEndpoints activeGroup={activeView} searchQuery={searchQuery} methodFilter={methodFilter} defaultExpanded={activeView !== 'all'} onTryRoute={handleTryRoute} />
+								)}
+								{version === 'secure' && isAdmin && (
+									<SecureEndpoints
+										activeGroup={activeView}
+										searchQuery={searchQuery}
+										methodFilter={methodFilter}
+										defaultExpanded={activeView !== 'all'}
+										onTryRoute={handleTryRoute}
+									/>
+								)}
+							</>
+						)}
+					</motion.div>
+				</AnimatePresence>
+			)}
 		</div>
 	);
 }

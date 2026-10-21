@@ -1,25 +1,30 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Button, Input, Selector, CodeBlock } from '@xernerx/ui';
-import { Play, Terminal, Clock, Activity } from 'lucide-react';
+import { Play, Terminal, Activity } from 'lucide-react';
 
 const PRESET_PATHS: Record<string, string[]> = {
-	v1: ['/api/version', '/v1/leaderboard', '/v1/status/badge.svg', '/v1/bots/1059956767103668244', '/v1/bots/1059956767103668244/stats', '/v1/bots/1059956767103668244/commands'],
-	core: ['/api/version', '/core/users/482513687417061376', '/info/roadmap', '/info/issues', '/info/suggestions'],
-	secure: ['/secure/core/versions', '/secure/core/audit?limit=10', '/secure/core'],
+	v1: ['/api/version', '/v1/leaderboard', '/v1/status/badge.svg', '/v1/bots/1059956767103668244/profile', '/v1/bots/1059956767103668244/stats', '/v1/bots/1059956767103668244/commands'],
+	core: ['/core/faq/categories', '/core/faq/bots/registration', '/core/bots/1059956767103668244', '/core/users/482513687417061376', '/info/roadmap', '/info/issues', '/info/suggestions'],
+	secure: ['/secure/core/versions', '/secure/core/audit?limit=10', '/secure/core', '/secure/store/catalog'],
 };
 
-export function ApiPlayground({ version }: { version: string }) {
+export function ApiPlayground({ version, initialMethod, initialPath }: { version: string; initialMethod?: string; initialPath?: string }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 
 	const presets = PRESET_PATHS[version] || PRESET_PATHS.v1;
 
-	const [method, setMethod] = useState('GET');
-	const [path, setPath] = useState(presets[0]);
+	const [method, setMethod] = useState(initialMethod || 'GET');
+	const [path, setPath] = useState(initialPath || presets[0]);
+
+	useEffect(() => {
+		if (initialMethod) setMethod(initialMethod);
+		if (initialPath) setPath(initialPath);
+	}, [initialMethod, initialPath]);
 	const [token, setToken] = useState('');
 	const [body, setBody] = useState('{\n  \n}');
 	const [loading, setLoading] = useState(false);
@@ -81,12 +86,12 @@ export function ApiPlayground({ version }: { version: string }) {
 
 	return (
 		<section id="playground" className="space-y-6 scroll-mt-24">
-			<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2 border-b border-(--border)/10 pb-4">
+			<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2 border-b border-(--border)/10 pb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				<Terminal className="text-(--accent)" size={24} />
 				{t('docs.api.playground.title')}
 			</h2>
 
-			<div className="bg-(--foreground)/30 border border-(--border)/10 rounded-2xl p-6 flex flex-col gap-4">
+			<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl shadow-sm flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 				<p className="text-sm text-(--text-muted)">{t('docs.api.playground.description')}</p>
 
 				{/* Preset Quick Pills */}
@@ -100,8 +105,10 @@ export function ApiPlayground({ version }: { version: string }) {
 								setMethod('GET');
 								setPath(p);
 							}}
-							className={`px-2.5 py-1 rounded-lg text-xs font-mono border transition-colors cursor-pointer ${
-								path === p ? 'bg-(--accent)/15 text-(--accent) border-(--accent)/30' : 'bg-(--background)/60 text-(--text-muted) border-(--border)/10 hover:text-(--text)'
+							className={`px-3 py-1 rounded-full text-xs font-mono border transition-all cursor-pointer ${
+								path === p
+									? 'bg-(--accent)/15 text-(--accent) border-(--accent)/30 shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_20%,transparent)]'
+									: 'bg-(--background)/60 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/30'
 							}`}
 						>
 							{p}
@@ -134,7 +141,7 @@ export function ApiPlayground({ version }: { version: string }) {
 				</div>
 
 				{/* Optional Bearer Token & JSON Body */}
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col gap-1.5">
 						<label className="text-xs font-semibold text-(--text)">{t('docs.api.playground.bearerToken')}</label>
 						<Input value={token} onChange={(e) => setToken(e.target.value)} placeholder="xnx_live_... (optional)" />
@@ -151,15 +158,15 @@ export function ApiPlayground({ version }: { version: string }) {
 				{/* Response Viewer */}
 				{response && (
 					<div className="mt-2 flex flex-col gap-2">
-						<div className="flex items-center justify-between px-3 py-2 rounded-xl bg-(--background)/60 border border-(--border)/10 text-xs font-mono">
+						<div className="flex items-center justify-between px-3.5 py-2 rounded-2xl bg-(--background)/60 border border-(--border)/10 text-xs font-mono">
 							<div className="flex items-center gap-2">
 								<span
-									className={`px-2 py-0.5 rounded font-bold ${
+									className={`px-2.5 py-0.5 rounded-full font-bold border ${
 										response.status >= 200 && response.status < 300
-											? 'bg-emerald-500/15 text-emerald-400'
+											? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/25'
 											: response.status >= 400 || response.status === 0
-												? 'bg-red-500/15 text-red-400'
-												: 'bg-amber-500/15 text-amber-400'
+												? 'bg-(--accent-red)/15 text-(--accent-red) border-(--accent-red)/25'
+												: 'bg-(--accent-orange)/15 text-(--accent-orange) border-(--accent-orange)/25'
 									}`}
 								>
 									{response.status || 'ERR'} {response.statusText}

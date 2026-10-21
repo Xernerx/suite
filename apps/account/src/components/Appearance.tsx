@@ -1,25 +1,45 @@
 /** @format */
 'use client';
 
-import { Columns3, Laptop, Moon, Sun } from 'lucide-react';
-import { Selector, Slider, Toggle } from '@xernerx/ui';
+import { Columns3, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
+import { Button, Selector, Slider, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useTheme, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
 const PRESET_COLORS = [
 	{ key: 'purple', value: '#8b7cf6' },
+	{ key: 'violet', value: '#7c3aed' },
+	{ key: 'indigo', value: '#6366f1' },
+	{ key: 'cobalt', value: '#2563eb' },
+	{ key: 'blue', value: '#3b82f6' },
+	{ key: 'sky', value: '#38bdf8' },
+	{ key: 'cyan', value: '#06b6d4' },
+	{ key: 'mint', value: '#2dd4bf' },
+	{ key: 'emerald', value: '#10b981' },
 	{ key: 'green', value: '#a4b795' },
 	{ key: 'neon', value: '#39ff14' },
-	{ key: 'blue', value: '#3b82f6' },
-	{ key: 'pink', value: '#ec4899' },
-	{ key: 'orange', value: '#f97316' },
-	{ key: 'yellow', value: '#eab308' },
-	{ key: 'crimson', value: '#ef4444' },
-	{ key: 'mint', value: '#2dd4bf' },
-	{ key: 'indigo', value: '#6366f1' },
 	{ key: 'lime', value: '#acc813' },
+	{ key: 'yellow', value: '#eab308' },
+	{ key: 'gold', value: '#f59e0b' },
+	{ key: 'orange', value: '#f97316' },
+	{ key: 'peach', value: '#fdba74' },
+	{ key: 'coral', value: '#fb7185' },
+	{ key: 'crimson', value: '#ef4444' },
+	{ key: 'berry', value: '#e11d48' },
+	{ key: 'pink', value: '#ec4899' },
+	{ key: 'magenta', value: '#d946ef' },
+	{ key: 'lavender', value: '#c084fc' },
+	{ key: 'slate', value: '#64748b' },
 	{ key: 'charcoal', value: '#27272a' },
 ] as const;
+
+function setThemeVar(name: string, value: string) {
+	if (typeof document === 'undefined') return;
+	document.documentElement.style.setProperty(name, value);
+	if (document.body) {
+		document.body.style.setProperty(name, value);
+	}
+}
 
 function getPref(key: string): string | null {
 	if (typeof window === 'undefined') return null;
@@ -36,9 +56,13 @@ function getPref(key: string): string | null {
 function setPref(key: string, value: string) {
 	if (typeof window === 'undefined') return;
 	try {
-		document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 		const domain = process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com';
-		document.cookie = `${key}=${value}; domain=.${domain}; path=/; max-age=31536000; SameSite=Lax`;
+		if (window.location.hostname.endsWith(domain)) {
+			document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+			document.cookie = `${key}=${value}; domain=.${domain}; path=/; max-age=31536000; SameSite=Lax`;
+		} else {
+			document.cookie = `${key}=${value}; path=/; max-age=31536000; SameSite=Lax`;
+		}
 	} catch {}
 	try {
 		localStorage.setItem(key, value);
@@ -85,26 +109,28 @@ export default function Appearance() {
 			if (storedUiZoom) {
 				const val = parseInt(storedUiZoom, 10);
 				setUiZoom(val);
-				document.documentElement.style.setProperty('--ui-zoom', String(val / 100));
+				setThemeVar('--ui-zoom', String(val / 100));
+				setThemeVar('--ui-scale', String(val));
 			} else {
-				document.documentElement.style.setProperty('--ui-zoom', '1');
+				setThemeVar('--ui-zoom', '1');
+				setThemeVar('--ui-scale', '100');
 			}
 
 			const storedUiGap = getPref('uiGap');
 			if (storedUiGap) {
 				setUiGap(storedUiGap);
-				document.documentElement.style.setProperty('--ui-gap', `${storedUiGap}px`);
+				setThemeVar('--ui-gap', `${storedUiGap}px`);
 			} else {
-				document.documentElement.style.setProperty('--ui-gap', '16px');
+				setThemeVar('--ui-gap', '16px');
 			}
 
 			const storedTextScale = getPref('textScale');
 			if (storedTextScale) {
 				const val = parseInt(storedTextScale, 10);
 				setTextScale(val);
-				document.documentElement.style.setProperty('--text-scale', `${val}px`);
+				setThemeVar('--text-scale', `${val}px`);
 			} else {
-				document.documentElement.style.setProperty('--text-scale', '14px');
+				setThemeVar('--text-scale', '14px');
 			}
 		})();
 	}, []);
@@ -205,14 +231,15 @@ export default function Appearance() {
 	const handleUiZoomChange = (val: number) => {
 		setUiZoom(val);
 		setPref('uiZoom', String(val));
-		document.documentElement.style.setProperty('--ui-zoom', String(val / 100));
+		setThemeVar('--ui-zoom', String(val / 100));
+		setThemeVar('--ui-scale', String(val));
 		saveToDb({ uiZoom: val });
 	};
 
 	const handleUiGapChange = (val: string) => {
 		setUiGap(val);
 		setPref('uiGap', val);
-		document.documentElement.style.setProperty('--ui-gap', `${val}px`);
+		setThemeVar('--ui-gap', `${val}px`);
 		saveToDb({ uiGap: val });
 		toast({
 			type: 'success',
@@ -223,8 +250,43 @@ export default function Appearance() {
 	const handleTextScaleChange = (val: number) => {
 		setTextScale(val);
 		setPref('textScale', String(val));
-		document.documentElement.style.setProperty('--text-scale', `${val}px`);
+		setThemeVar('--text-scale', `${val}px`);
 		saveToDb({ textScale: val });
+	};
+
+	const handleResetDefaults = () => {
+		setSelectedTheme('system');
+		setTheme('system');
+		setPref('theme', 'system');
+
+		setSelectedColor('#8b7cf6');
+		setAccent('#8b7cf6');
+		setPref('accent', '#8b7cf6');
+
+		setUiZoom(100);
+		setPref('uiZoom', '100');
+		setThemeVar('--ui-zoom', '1');
+		setThemeVar('--ui-scale', '100');
+
+		setUiGap('16');
+		setPref('uiGap', '16');
+		setThemeVar('--ui-gap', '16px');
+
+		setTextScale(14);
+		setPref('textScale', '14');
+		setThemeVar('--text-scale', '14px');
+
+		saveToDb({
+			theme: 'system',
+			accent: '#8b7cf6',
+			uiZoom: 100,
+			uiGap: '16',
+			textScale: 14,
+		});
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.resetSuccess'),
+		});
 	};
 
 	const themeOptions = [
@@ -296,11 +358,18 @@ export default function Appearance() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					{t('account.appearance.title')}
-				</h1>
-				<p className="text-sm text-(--text-muted)">{t('account.appearance.description')}</p>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('account.appearance.title')}
+					</h1>
+					<p className="text-sm text-(--text-muted)">{t('account.appearance.description')}</p>
+				</div>
+
+				<Button variant="secondary" onClick={handleResetDefaults} className="flex items-center gap-2 shrink-0">
+					<RotateCcw size={15} />
+					{t('account.appearance.resetDefaults')}
+				</Button>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -310,7 +379,7 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.theme.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.theme.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.theme.description')}</p>
 					</div>
 					<div className="w-full sm:w-56">
@@ -324,7 +393,7 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.clientSync.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.clientSync.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.clientSync.description')}</p>
 					</div>
 					<Toggle checked={clientSync} onChange={handleToggleClientSync} suppressHydrationWarning />
@@ -336,7 +405,7 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.discordSync.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.discordSync.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.discordSync.description')}</p>
 					</div>
 					<Toggle checked={syncFromDiscord} onChange={handleToggleSync} suppressHydrationWarning />
@@ -348,14 +417,14 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.accentColor.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.accentColor.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.accentColor.description')}</p>
 					</div>
 
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-2" style={{ gap: 'var(--ui-gap)' }}>
 						{PRESET_COLORS.map((color) => {
 							const isSelected = selectedColor.toLowerCase() === color.value.toLowerCase();
-							const label = t(`account.appearance.colors.${color.key}`, {}, color.key);
+							const label = t(`account.appearance.colors.${color.key}`);
 
 							return (
 								<button
@@ -369,7 +438,7 @@ export default function Appearance() {
 										gap: 'calc(var(--ui-gap) * 0.5)',
 									}}
 								>
-									<div className="h-8 w-8 rounded-full shadow-inner shrink-0 border border-white/10" style={{ backgroundColor: color.value }} />
+									<div className="h-8 w-8 rounded-full shadow-inner shrink-0 border border-(--border)/10" style={{ backgroundColor: color.value }} />
 									<span className="text-xs font-medium text-(--text) truncate">{label}</span>
 								</button>
 							);
@@ -383,7 +452,7 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.zoom.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.zoom.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.zoom.description')}</p>
 					</div>
 					<div className="w-full pt-2">
@@ -397,7 +466,7 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.density.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.density.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.density.description')}</p>
 					</div>
 					<div className="w-full sm:w-56">
@@ -411,7 +480,7 @@ export default function Appearance() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.appearance.textScale.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.textScale.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.textScale.description')}</p>
 					</div>
 					<div className="w-full pt-2">

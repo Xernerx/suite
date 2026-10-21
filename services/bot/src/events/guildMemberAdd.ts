@@ -1,5 +1,6 @@
-import { database } from '@xernerx/lib/core';
 /** @format */
+
+import { database } from '@xernerx/lib/core';
 
 import { EventBuilder } from '@xernerx/framework';
 import { GuildMember } from 'discord.js';

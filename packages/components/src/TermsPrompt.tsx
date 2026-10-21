@@ -3,19 +3,20 @@
 
 import { Button, Modal } from '@xernerx/ui';
 import React, { useEffect, useState } from 'react';
-import { useEnvironment, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useUser } from '@xernerx/providers';
 
 import { signOut } from 'next-auth/react';
 
 export function TermsPrompt() {
+	const { t } = useDictionary();
 	const { user, mutate, loading } = useUser();
 	const { getEnvUrl } = useEnvironment();
 	const [isOpen, setIsOpen] = useState(false);
 	const [submitting, setSubmitting] = useState(false);
 
 	// These dates are automatically bumped by the `suite commit` script
-	const TERMS_VERSION = new Date('2026-10-15T00:00:00Z').getTime();
-	const PRIVACY_VERSION = new Date('2026-10-15T00:00:00Z').getTime();
+	const TERMS_VERSION = new Date('2026-10-21T00:00:00Z').getTime();
+	const PRIVACY_VERSION = new Date('2026-10-21T00:00:00Z').getTime();
 
 	useEffect(() => {
 		// Don't block the screen if they are currently trying to read the policies!
@@ -76,28 +77,28 @@ export function TermsPrompt() {
 	if (!isOpen) return null;
 
 	return (
-		<Modal open={isOpen} onOpenChange={() => {}} title="Terms & Privacy Agreement" maxWidth="max-w-lg">
+		<Modal open={isOpen} onOpenChange={() => {}} title={t('components.termsPrompt.title')} maxWidth="max-w-lg">
 			<div className="space-y-4">
-				<p className="text-(--text-muted)">We've updated our Terms of Service and Privacy Policy. To continue using Xernerx Studios services, you must review and agree to these documents.</p>
+				<p className="text-(--text-muted)">{t('components.termsPrompt.description')}</p>
 				<ul className="list-disc pl-5 text-(--text-muted) space-y-1">
 					<li>
-						<a href={getEnvUrl('https://www.xernerx.com/terms')} target="_blank" rel="noreferrer" className="text-(--accent) hover:underline">
-							Terms of Service
+						<a href={getEnvUrl('https://www.xernerx.com/terms')} target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline">
+							{t('components.termsPrompt.termsLink')}
 						</a>
 					</li>
 					<li>
-						<a href={getEnvUrl('https://www.xernerx.com/privacy')} target="_blank" rel="noreferrer" className="text-(--accent) hover:underline">
-							Privacy Policy
+						<a href={getEnvUrl('https://www.xernerx.com/privacy')} target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline">
+							{t('components.termsPrompt.privacyLink')}
 						</a>
 					</li>
 				</ul>
-				<p className="text-(--text-muted) text-sm">If you do not agree, you will be signed out and unable to access authenticated services.</p>
+				<p className="text-(--text-muted) text-sm">{t('components.termsPrompt.warning')}</p>
 				<div className="flex justify-end gap-3 mt-6">
 					<Button variant="secondary" onClick={handleDecline} disabled={submitting}>
-						Decline & Sign Out
+						{t('components.termsPrompt.decline')}
 					</Button>
 					<Button variant="primary" onClick={handleAgree} disabled={submitting}>
-						{submitting ? 'Saving...' : 'I Agree'}
+						{submitting ? t('components.termsPrompt.saving') : t('components.termsPrompt.agree')}
 					</Button>
 				</div>
 			</div>

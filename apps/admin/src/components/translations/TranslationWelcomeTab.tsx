@@ -116,7 +116,7 @@ export function TranslationWelcomeTab({ selectedLocale, currentLocaleObj, missin
 				</div>
 			</div>
 
-			<div className="flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-xs text-amber-600 dark:text-amber-400">
+			<div className="flex items-center gap-3 rounded-2xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 p-4 text-xs text-(--accent-orange) dark:text-(--accent-orange)">
 				<CheckCircle2 size={20} className="shrink-0" />
 				<span>
 					{t('admin.translations.welcome.footerPart1')}

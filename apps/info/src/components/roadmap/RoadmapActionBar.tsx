@@ -68,10 +68,10 @@ export default function RoadmapActionBar({ item, onUpdate }: RoadmapActionBarPro
 				type="button"
 				disabled={busy !== null}
 				onClick={() => handleInteract('upvote')}
-				className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+				className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
 					hasUpvoted
-						? 'bg-(--accent)/15 text-(--accent) border-(--accent)/30'
-						: 'bg-(--background)/50 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--border)/25'
+						? 'bg-(--accent)/15 text-(--accent) border-(--accent)/30 shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_20%,transparent)]'
+						: 'bg-(--background)/50 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/30'
 				}`}
 			>
 				<ThumbsUp size={13} />
@@ -83,10 +83,10 @@ export default function RoadmapActionBar({ item, onUpdate }: RoadmapActionBarPro
 					type="button"
 					disabled={busy !== null}
 					onClick={() => handleInteract('watch')}
-					className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
+					className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
 						isWatching
-							? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-							: 'bg-(--background)/50 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--border)/25'
+							? 'bg-(--accent)/15 text-(--accent) border-(--accent)/30 shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_20%,transparent)]'
+							: 'bg-(--background)/50 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/30'
 					}`}
 				>
 					{isWatching ? <BellRing size={13} /> : <Bell size={13} />}

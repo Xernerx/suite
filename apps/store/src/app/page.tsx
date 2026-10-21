@@ -130,8 +130,8 @@ export default function StorePage() {
 	const categoryMaxDiscount = currentItems.reduce((max, item) => Math.max(max, item.discountPercent || 0), 0);
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen p-8 transition-colors duration-200">
-			<div className="max-w-4xl w-full flex flex-col items-center space-y-4 mb-8">
+		<div className="flex flex-col items-center justify-center min-h-screen transition-colors duration-200" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+			<div className="max-w-4xl w-full flex flex-col items-center mb-4" style={{ gap: 'var(--ui-gap)' }}>
 				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('account.store.title')}
 				</h1>
@@ -185,7 +185,7 @@ export default function StorePage() {
 						}`}
 					>
 						{t('account.store.billing.annually')}
-						{categoryMaxDiscount > 0 && <span className="bg-green-500/10 text-green-500 px-1.5 py-0.5 rounded-md text-[10px] font-bold">-{categoryMaxDiscount}%</span>}
+						{categoryMaxDiscount > 0 && <span className="bg-(--accent-green)/10 text-(--accent-green) px-1.5 py-0.5 rounded-xl text-[10px] font-bold">-{categoryMaxDiscount}%</span>}
 					</button>
 				</div>
 			</div>

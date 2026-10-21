@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Trophy, Server, Users, Flame, Coins, ShieldCheck, ChevronUp, Lock, ArrowLeft, Bot, Crown, Medal, Award, ArrowUpDown } from 'lucide-react';
+import { Trophy, Server, Users, Flame, Coins, ShieldCheck, ChevronUp, Lock, ArrowLeft, Bot, Crown, Medal, Award } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Input, Selector } from '@xernerx/ui';
@@ -216,15 +216,15 @@ export default function LeaderboardClient() {
 		<div className="flex flex-wrap items-center gap-2">
 			{activeTab === 'bots' && (
 				<>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Server size={13} className="text-(--accent)" />
 						{(entry.guildCount || 0).toLocaleString()}
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Users size={13} className="text-(--accent)" />
 						{(entry.userCount || 0).toLocaleString()}
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-(--accent)/15 border border-(--accent)/30 text-xs font-bold text-(--accent)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-bold text-(--accent)">
 						<ChevronUp size={14} />
 						{(entry.voteCount || 0).toLocaleString()} {t('app.leaderboard.metrics.votes')}
 					</span>
@@ -233,11 +233,11 @@ export default function LeaderboardClient() {
 
 			{activeTab === 'servers' && (
 				<>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Users size={13} className="text-(--accent)" />
 						{(entry.memberCount || 0).toLocaleString()}
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-(--accent)/15 border border-(--accent)/30 text-xs font-bold text-(--accent)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-bold text-(--accent)">
 						<ChevronUp size={14} />
 						{(entry.voteCount || 0).toLocaleString()} {t('app.leaderboard.metrics.votes')}
 					</span>
@@ -246,11 +246,11 @@ export default function LeaderboardClient() {
 
 			{activeTab === 'streaks' && (
 				<>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-orange-500/15 border border-orange-500/30 text-xs font-bold text-orange-400">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-bold text-(--accent)">
 						<Flame size={13} />
 						{t('app.users.profile.days', { count: entry.streak || 0 })}
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Coins size={13} className="text-(--accent)" />
 						{(entry.balance || 0).toLocaleString()}
 					</span>
@@ -264,30 +264,30 @@ export default function LeaderboardClient() {
 	const listEntries = showPodium ? processedList.slice(3) : processedList;
 
 	return (
-		<div className="flex flex-col max-w-6xl mx-auto w-full py-10 px-4" style={{ gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-6xl mx-auto w-full py-10 px-4" style={{ gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Header */}
-			<div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+			<div className="flex flex-col md:flex-row md:items-end justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div>
 					<Link href="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-(--text-muted) hover:text-(--text) mb-3 transition-colors">
 						<ArrowLeft size={14} />
 						{t('app.leaderboard.backToExplore')}
 					</Link>
-					<h1 className="text-4xl font-extrabold text-(--text) flex items-center gap-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					<h1 className="text-4xl font-extrabold text-(--text) flex items-center gap-3 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						<Trophy className="text-(--accent)" size={34} />
 						{t('app.leaderboard.title')}
 					</h1>
 					<p className="text-sm text-(--text-muted) mt-1">{t('app.leaderboard.description')}</p>
 				</div>
 
-				<div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-(--foreground)/40 border border-(--border)/10 text-xs text-(--text-muted)">
+				<div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 text-xs text-(--text-muted)">
 					<Lock size={13} className="text-(--accent) shrink-0" />
 					<span>{t('app.leaderboard.privacyNotice')}</span>
 				</div>
 			</div>
 
 			{/* Unified Control Bar (Category Switcher + Search + Sort Selector) */}
-			<div className="w-full p-2 rounded-2xl border border-(--border)/10 bg-(--foreground)/40 backdrop-blur-md shadow-lg flex flex-col lg:flex-row items-center gap-2 relative z-30">
-				<div className="flex items-center p-1 bg-(--background) rounded-xl border border-(--border)/10 h-12 w-full lg:w-auto shrink-0 shadow-inner">
+			<div className="w-full p-2 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col lg:flex-row items-center gap-2 relative z-30">
+				<div className="flex items-center p-1 bg-(--background)/60 rounded-2xl border border-(--border)/10 h-12 w-full lg:w-auto shrink-0 shadow-inner">
 					{tabs.map((tab) => {
 						const IconComp = tab.icon;
 						const isActive = activeTab === tab.id;
@@ -296,8 +296,10 @@ export default function LeaderboardClient() {
 								key={tab.id}
 								type="button"
 								onClick={() => handleTabSwitch(tab.id)}
-								className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-5 h-full rounded-lg text-sm font-bold transition-all cursor-pointer ${
-									isActive ? 'bg-(--accent) text-white shadow-md' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
+								className={`flex-1 lg:flex-none flex items-center justify-center gap-2 px-5 h-full rounded-xl text-sm font-bold transition-all cursor-pointer ${
+									isActive
+										? 'bg-(--accent) text-white shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]'
+										: 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
 								}`}
 							>
 								<IconComp size={15} />
@@ -329,15 +331,15 @@ export default function LeaderboardClient() {
 					<Loading />
 				</div>
 			) : processedList.length === 0 ? (
-				<div className="flex flex-col items-center justify-center py-20 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 text-center">
+				<div className="flex flex-col items-center justify-center py-20 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-center">
 					<Trophy size={36} className="text-(--text-muted) mb-3 opacity-50" />
 					<p className="text-sm text-(--text-muted)">{t('app.leaderboard.empty')}</p>
 				</div>
 			) : (
-				<div className="flex flex-col gap-6">
+				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 					{/* Top 3 Podium Showcase (2 - 1 - 3 Olympic Podium Layout on Desktop) */}
 					{podiumEntries.length > 0 && (
-						<div className="grid grid-cols-1 md:grid-cols-3 items-end gap-5 pt-4 pb-2">
+						<div className="grid grid-cols-1 md:grid-cols-3 items-end pt-4 pb-2" style={{ gap: 'var(--ui-gap)' }}>
 							{podiumEntries.map((entry: any, index: number) => {
 								const { name, handle, avatarUrl, bannerUrl } = resolveEntryDisplay(entry);
 								const RankIcon = index === 0 ? Crown : index === 1 ? Medal : Award;
@@ -351,31 +353,33 @@ export default function LeaderboardClient() {
 										: 'order-3 md:order-3';
 
 								const borderAccent = isFirst
-									? 'border-amber-500/50 hover:border-amber-400 shadow-[0_10px_40px_rgba(245,158,11,0.18)] ring-1 ring-amber-500/20'
+									? 'border-(--accent)/50 hover:border-(--accent) shadow-[0_10px_40px_color-mix(in_srgb,var(--accent)_22%,transparent)] ring-1 ring-(--accent)/25'
 									: isSecond
-										? 'border-zinc-400/40 hover:border-zinc-300 shadow-[0_6px_25px_rgba(161,161,170,0.1)]'
-										: 'border-orange-600/40 hover:border-orange-400 shadow-[0_6px_25px_rgba(234,88,12,0.1)]';
+										? 'border-(--accent)/25 hover:border-(--accent)/50 shadow-[0_6px_25px_color-mix(in_srgb,var(--accent)_12%,transparent)]'
+										: 'border-(--border)/15 hover:border-(--accent)/40 shadow-sm';
 
-								const badgeTone = isFirst ? 'bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.5)]' : isSecond ? 'bg-zinc-300 text-black' : 'bg-orange-500 text-black';
+								const badgeTone = isFirst
+									? 'bg-(--accent) text-white shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_50%,transparent)]'
+									: 'bg-(--background)/85 text-(--accent) border border-(--accent)/30 backdrop-blur-md';
 
 								const pedestalTone = isFirst
-									? 'from-amber-500/25 via-amber-500/10 to-transparent border-t border-amber-500/30 text-amber-400'
+									? 'from-(--accent)/25 via-(--accent)/10 to-transparent border-t border-(--accent)/30 text-(--accent)'
 									: isSecond
-										? 'from-zinc-400/20 via-zinc-400/5 to-transparent border-t border-zinc-400/25 text-zinc-300'
-										: 'from-orange-500/20 via-orange-500/5 to-transparent border-t border-orange-500/25 text-orange-400';
+										? 'from-(--accent)/15 via-(--accent)/5 to-transparent border-t border-(--accent)/20 text-(--accent)'
+										: 'from-(--accent)/10 via-transparent to-transparent border-t border-(--border)/15 text-(--text-muted)';
 
 								return (
 									<Link
 										key={entry.id}
 										href={getHref(entry)}
-										className={`group relative flex flex-col rounded-3xl border bg-(--foreground)/40 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 ${orderAndElevation} ${borderAccent}`}
+										className={`group relative flex flex-col rounded-3xl border bg-(--foreground)/35 backdrop-blur-md overflow-hidden transition-all duration-300 hover:-translate-y-1.5 ${orderAndElevation} ${borderAccent}`}
 									>
 										{/* Banner */}
 										<div
-											className={`${isFirst ? 'h-36' : 'h-28'} w-full relative bg-gradient-to-br from-(--border)/60 via-(--foreground) to-(--background) overflow-hidden shrink-0`}
+											className={`${isFirst ? 'h-36' : 'h-28'} w-full relative bg-gradient-to-br from-(--accent)/20 via-(--foreground) to-(--background) overflow-hidden shrink-0`}
 										>
 											{bannerUrl && <Image src={bannerUrl} alt={name} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />}
-											<div className="absolute inset-0 bg-gradient-to-t from-(--foreground) via-transparent to-black/35" />
+											<div className="absolute inset-0 bg-gradient-to-t from-(--foreground) via-transparent to-black/25" />
 											<div className={`absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${badgeTone}`}>
 												<RankIcon size={14} />
 												<span>#{index + 1}</span>
@@ -386,7 +390,7 @@ export default function LeaderboardClient() {
 										<div className="flex flex-col items-center text-center px-6 pb-5 -mt-11 relative z-10 flex-1">
 											<div
 												className={`${
-													isFirst ? 'h-24 w-24 ring-2 ring-amber-500/40' : 'h-20 w-20'
+													isFirst ? 'h-24 w-24 ring-2 ring-(--accent)/40' : 'h-20 w-20'
 												} rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-xl flex items-center justify-center shrink-0`}
 											>
 												{avatarUrl ? (
@@ -398,8 +402,13 @@ export default function LeaderboardClient() {
 
 											<div className="mt-3 flex flex-col items-center flex-1 w-full">
 												<div className="flex items-center justify-center gap-1.5 max-w-full">
-													<h3 className={`${isFirst ? 'text-xl' : 'text-lg'} font-extrabold text-(--text) group-hover:text-(--accent) transition-colors truncate`}>{name}</h3>
-													{entry.verified && <ShieldCheck size={16} className="text-emerald-400 shrink-0" />}
+													<h2
+														className={`${isFirst ? 'text-xl' : 'text-lg'} font-extrabold text-(--text) group-hover:text-(--accent) transition-colors truncate`}
+														style={{ fontFamily: 'var(--font-fredoka)' }}
+													>
+														{name}
+													</h2>
+													{entry.verified && <ShieldCheck size={16} className="text-(--accent-green) shrink-0" />}
 												</div>
 												{handle && <span className="text-xs font-mono text-(--text-muted)">{handle}</span>}
 												<p className="text-xs text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{entry.description || t('common.noDescription')}</p>
@@ -424,7 +433,7 @@ export default function LeaderboardClient() {
 
 					{/* Ranked Rows (#4+ or Search Results) */}
 					{listEntries.length > 0 && (
-						<div className="flex flex-col gap-3">
+						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 							{listEntries.map((entry: any, idx: number) => {
 								const rank = showPodium ? idx + 4 : idx + 1;
 								const { name, handle, avatarUrl, bannerUrl } = resolveEntryDisplay(entry);
@@ -433,7 +442,8 @@ export default function LeaderboardClient() {
 									<Link
 										key={entry.id}
 										href={getHref(entry)}
-										className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 hover:border-(--accent)/40 hover:bg-(--foreground)/50 overflow-hidden transition-all"
+										className="group relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md hover:border-(--accent)/40 hover:bg-(--foreground)/50 overflow-hidden transition-all shadow-sm"
+										style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 									>
 										{bannerUrl && (
 											<div
@@ -442,7 +452,7 @@ export default function LeaderboardClient() {
 											/>
 										)}
 										<div className="flex items-center gap-4 min-w-0 relative z-10">
-											<div className="flex h-10 w-10 items-center justify-center rounded-xl border border-(--border)/15 bg-(--background)/80 text-sm font-black text-(--text-muted) shrink-0">
+											<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-(--border)/15 bg-(--background)/80 text-sm font-black text-(--text-muted) group-hover:text-(--accent) group-hover:border-(--accent)/30 transition-colors shrink-0">
 												#{rank}
 											</div>
 
@@ -463,9 +473,9 @@ export default function LeaderboardClient() {
 
 											<div className="min-w-0">
 												<div className="flex items-center gap-2">
-													<h3 className="text-base font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">{name}</h3>
+													<h2 className="text-base font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">{name}</h2>
 													{handle && <span className="text-xs font-mono text-(--text-muted) hidden sm:inline">{handle}</span>}
-													{entry.verified && <ShieldCheck size={15} className="text-emerald-400 shrink-0" />}
+													{entry.verified && <ShieldCheck size={15} className="text-(--accent-green) shrink-0" />}
 												</div>
 												{entry.description && <p className="text-xs text-(--text-muted) truncate max-w-lg mt-0.5">{entry.description}</p>}
 											</div>

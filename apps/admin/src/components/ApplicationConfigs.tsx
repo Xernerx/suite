@@ -97,7 +97,7 @@ export default function ApplicationConfigs() {
 			});
 			if (!res.ok) {
 				const errData = await res.json();
-				throw new Error(errData.error || 'Failed to save config');
+				throw new Error(errData.error || t('common.toast.error'));
 			}
 			toast({
 				title: isEditing ? t('admin.configs.toasts.configUpdated') : t('admin.configs.toasts.configCreated'),

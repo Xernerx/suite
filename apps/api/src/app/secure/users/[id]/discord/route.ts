@@ -1,1 +1,3 @@
+/** @format */
+
 export function GET() {}

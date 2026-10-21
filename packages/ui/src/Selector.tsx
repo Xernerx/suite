@@ -37,8 +37,9 @@ function getLabelString(label: React.ReactNode): string {
 	}
 	return '';
 }
-export function Selector({ value, options, onChange, placeholder = 'Select...', items, required }: SelectorProps) {
+export function Selector({ value, options, onChange, placeholder, items, required }: SelectorProps) {
 	const { t } = useDictionary();
+	const resolvedPlaceholder = placeholder ?? t('common.selector.defaultPlaceholder');
 	const [isOpen, setIsOpen] = useState(false);
 	const [openUpwards, setOpenUpwards] = useState(false);
 	const [query, setQuery] = useState('');
@@ -93,12 +94,12 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex w-full items-center justify-between rounded-xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none"
+				className="flex w-full items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none"
 				style={{
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				<span className="font-medium">{selectedOption ? selectedOption.label : placeholder}</span>
+				<span className="font-medium">{selectedOption ? selectedOption.label : resolvedPlaceholder}</span>
 				<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
 			</button>
 
@@ -121,7 +122,7 @@ export function Selector({ value, options, onChange, placeholder = 'Select...', 
 							duration: 0.15,
 							ease: 'easeOut',
 						}}
-						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl`}
+						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl`}
 						style={{
 							padding: 'calc(var(--ui-gap) * 0.25)',
 							display: 'flex',

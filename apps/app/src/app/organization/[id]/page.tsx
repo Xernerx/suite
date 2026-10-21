@@ -6,6 +6,7 @@ import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import { User, ArrowLeft, Settings, Users, Bot, Server, LayoutDashboard, Building2, Compass } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -42,7 +43,16 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
 					href: `/bots/${b.id}`,
 					icon: b.discord?.avatar
-						? () => <img src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`} alt={b.name} className="w-5 h-5 rounded-full object-cover" />
+						? () => (
+								<Image
+									src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`}
+									alt={b.name}
+									width={20}
+									height={20}
+									unoptimized
+									className="w-5 h-5 rounded-full object-cover"
+								/>
+							)
 						: Bot,
 					category: t('app.organization.nav.publishedBots'),
 				}))
@@ -55,9 +65,18 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					label: s.name,
 					href: `/servers/${s.id}`,
 					icon: s.iconUrl
-						? () => <img src={s.iconUrl} alt={s.name} className="w-5 h-5 rounded-full object-cover" />
+						? () => <Image src={s.iconUrl} alt={s.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
 						: s.icon
-							? () => <img src={`https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64`} alt={s.name} className="w-5 h-5 rounded-full object-cover" />
+							? () => (
+									<Image
+										src={`https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64`}
+										alt={s.name}
+										width={20}
+										height={20}
+										unoptimized
+										className="w-5 h-5 rounded-full object-cover"
+									/>
+								)
 							: Server,
 					category: t('app.organization.nav.officialServers'),
 				}))
@@ -162,6 +181,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 	if (loading) {
 		return (
 			<div className="flex-1 flex items-center justify-center min-h-screen">
+				<h1 className="sr-only">{t('app.organization.nav.profile')}</h1>
 				<Loading />
 			</div>
 		);
@@ -170,9 +190,9 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 	if (!organization) {
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
-				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('app.organization.notFoundTitle')}
-				</h2>
+				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.organization.notFoundDesc')}</p>
 				<Link href="/">
 					<Button variant="primary">{t('app.organization.returnHome')}</Button>

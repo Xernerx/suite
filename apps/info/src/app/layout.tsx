@@ -31,9 +31,10 @@ export const metadata: Metadata = {
 		siteName: 'Xernerx Support',
 		images: [
 			{
-				url: 'https://www.xernerx.com/banner.png',
+				url: '/banner.png',
 				width: 1200,
 				height: 630,
+				alt: 'Xernerx Support',
 			},
 		],
 		locale: 'en-US',
@@ -47,6 +48,7 @@ export const metadata: Metadata = {
 		},
 		description: 'The official Feedback, Support, and Community Hub for Xernerx Studios. Explore our roadmap, changelog, FAQ, submit suggestions, and report issues.',
 		card: 'summary_large_image',
+		images: ['/banner.png'],
 	},
 
 	icons: {
@@ -78,8 +80,8 @@ export default async function RootLayout({
 	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
-			<body style={themeProps.style}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
+			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict} initialEnvironment={initialEnv} enableAds>
 						{children}

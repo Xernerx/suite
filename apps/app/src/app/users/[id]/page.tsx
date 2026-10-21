@@ -5,7 +5,8 @@ import { useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { User, ArrowLeft, Settings, Bot, LayoutDashboard, Building2, Compass } from 'lucide-react';
+import { User, ArrowLeft, Settings, Bot, Server, LayoutDashboard, Building2, Compass } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -24,6 +25,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 	const [discordUser, setDiscordUser] = useState<any>(null);
 	const [bots, setBots] = useState<any[]>([]);
 	const [organizations, setOrganizations] = useState<any[]>([]);
+	const [servers, setServers] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [notFound, setNotFound] = useState(false);
 
@@ -44,7 +46,16 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
 					href: `/bots/${b.id}`,
 					icon: b.discord?.avatar
-						? () => <img src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`} alt={b.name} className="w-5 h-5 rounded-full object-cover" />
+						? () => (
+								<Image
+									src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`}
+									alt={b.name}
+									width={20}
+									height={20}
+									unoptimized
+									className="w-5 h-5 rounded-full object-cover"
+								/>
+							)
 						: Bot,
 					category: t('app.users.nav.publishedBots'),
 				}))
@@ -56,8 +67,32 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				...organizations.map((o) => ({
 					label: o.name,
 					href: `/organization/${o._id}`,
-					icon: o.iconUrl ? () => <img src={getEnvUrl(o.iconUrl)} alt={o.name} className="w-5 h-5 rounded-full object-cover" /> : Building2,
+					icon: o.iconUrl ? () => <Image src={getEnvUrl(o.iconUrl)} alt={o.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" /> : Building2,
 					category: t('app.users.nav.organizations'),
+				}))
+			);
+		}
+
+		if (servers.length > 0) {
+			items.push(
+				...servers.map((s) => ({
+					label: s.name,
+					href: `/servers/${s.id}`,
+					icon: s.iconUrl
+						? () => <Image src={s.iconUrl} alt={s.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
+						: s.icon
+							? () => (
+									<Image
+										src={`https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64`}
+										alt={s.name}
+										width={20}
+										height={20}
+										unoptimized
+										className="w-5 h-5 rounded-full object-cover"
+									/>
+								)
+							: Server,
+					category: t('app.users.nav.officialServers'),
 				}))
 			);
 		}
@@ -74,7 +109,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
 		setNavItems(items);
 		return () => hide();
-	}, [setNavItems, show, hide, id, session, bots, organizations, getEnvUrl, router, t]);
+	}, [setNavItems, show, hide, id, session, bots, organizations, servers, getEnvUrl, router, t]);
 
 	useEffect(() => {
 		setUser(null);
@@ -138,10 +173,25 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					setBots(botsWithDiscord);
 				}
 
+				let publicOrgs: any[] = [];
 				if (orgsRes.ok) {
 					const fetchedOrgs = await orgsRes.json();
-					const publicOrgs = Array.isArray(fetchedOrgs) ? fetchedOrgs.filter((o: any) => o.privacy !== 'private' || uid === id) : [];
+					publicOrgs = Array.isArray(fetchedOrgs) ? fetchedOrgs.filter((o: any) => o.privacy !== 'private' || uid === id) : [];
 					setOrganizations(publicOrgs);
+				}
+
+				const orgIdsParam = publicOrgs
+					.map((o) => o._id)
+					.filter(Boolean)
+					.join(',');
+				const guildsQueryUrl = orgIdsParam
+					? `https://api.xernerx.com/secure/guilds?owner=${id}&organizations=${encodeURIComponent(orgIdsParam)}`
+					: `https://api.xernerx.com/secure/guilds?owner=${id}`;
+				const guildsRes = await fetch(getEnvUrl(guildsQueryUrl));
+				if (guildsRes.ok) {
+					const fetchedGuilds = await guildsRes.json();
+					const publicGuilds = Array.isArray(fetchedGuilds) ? fetchedGuilds.filter((g: any) => g.privacy !== 'private' || uid === id) : [];
+					setServers(publicGuilds);
 				}
 			} catch (error) {
 				console.error('Failed to fetch user profile', error);
@@ -156,6 +206,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 	if (loading) {
 		return (
 			<div className="flex-1 flex items-center justify-center min-h-screen">
+				<h1 className="sr-only">{t('app.users.nav.profile')}</h1>
 				<Loading />
 			</div>
 		);
@@ -164,9 +215,9 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 	if (notFound || (!user && !discordUser)) {
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
-				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('app.users.notFoundTitle')}
-				</h2>
+				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.users.notFoundDesc')}</p>
 				<Link href="/">
 					<Button variant="primary">{t('app.users.returnHome')}</Button>
@@ -181,7 +232,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 		<div className="flex flex-col w-full min-h-screen pb-24">
 			<Header user={user} discordUser={discordUser} id={id} />
 
-			<div className="mt-4">{currentView === 'profile' && <Profile user={user} bots={bots} organizations={organizations} />}</div>
+			<div className="mt-4">{currentView === 'profile' && <Profile user={user} bots={bots} organizations={organizations} servers={servers} />}</div>
 		</div>
 	);
 }

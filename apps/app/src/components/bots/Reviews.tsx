@@ -262,14 +262,26 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 			{user && showReviewForm && (
 				<div className="p-6 bg-(--foreground)/30 border border-(--border)/10 rounded-3xl flex flex-col gap-4">
 					<div className="flex items-center justify-between">
-						<h3 className="text-xl font-bold font-fredoka">{userReview ? t('app.bots.reviews.updateYourReview') : t('app.bots.reviews.writeReview')}</h3>
+						<h2 className="text-xl font-bold font-fredoka">{userReview ? t('app.bots.reviews.updateYourReview') : t('app.bots.reviews.writeReview')}</h2>
 						<div className="flex items-center gap-2">
 							{userReview && (
-								<button onClick={() => setDeleteConfirmOpen(true)} className="text-red-500/70 hover:text-red-500 transition-colors p-1" title={t('app.bots.reviews.deleteReview')}>
+								<button
+									type="button"
+									onClick={() => setDeleteConfirmOpen(true)}
+									className="text-(--accent-red)/70 hover:text-(--accent-red) transition-colors p-1"
+									title={t('app.bots.reviews.deleteReview')}
+									aria-label={t('app.bots.reviews.deleteReview')}
+								>
 									<Trash2 className="w-5 h-5" />
 								</button>
 							)}
-							<button onClick={() => setShowReviewForm(false)} className="text-(--text-muted) hover:text-(--foreground) transition-colors p-1" title={t('common.buttons.cancel')}>
+							<button
+								type="button"
+								onClick={() => setShowReviewForm(false)}
+								className="text-(--text-muted) hover:text-(--foreground) transition-colors p-1"
+								title={t('common.buttons.cancel')}
+								aria-label={t('common.buttons.cancel')}
+							>
 								&times;
 							</button>
 						</div>
@@ -363,14 +375,14 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 							<div className="flex items-center gap-2">
 								<button
 									onClick={() => voteReview(review._id, 'upvote')}
-									className={`flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-md transition-colors ${review.upvotes?.includes(user?.id) ? 'bg-green-500/20 text-green-500' : 'text-(--text-muted) hover:bg-(--foreground)'}`}
+									className={`flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-xl transition-colors ${review.upvotes?.includes(user?.id) ? 'bg-(--accent-green)/20 text-(--accent-green)' : 'text-(--text-muted) hover:bg-(--foreground)'}`}
 								>
 									<ThumbsUp className="w-3.5 h-3.5" />
 									{review.upvotes?.length || 0}
 								</button>
 								<button
 									onClick={() => voteReview(review._id, 'downvote')}
-									className={`flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-md transition-colors ${review.downvotes?.includes(user?.id) ? 'bg-red-500/20 text-red-500' : 'text-(--text-muted) hover:bg-(--foreground)'}`}
+									className={`flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-xl transition-colors ${review.downvotes?.includes(user?.id) ? 'bg-(--accent-red)/20 text-(--accent-red)' : 'text-(--text-muted) hover:bg-(--foreground)'}`}
 								>
 									<ThumbsDown className="w-3.5 h-3.5" />
 									{review.downvotes?.length || 0}
@@ -380,7 +392,7 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 							{isOwner && !review.devResponse && (
 								<button
 									onClick={() => setReplyingToReview(replyingToReview === review._id ? null : review._id)}
-									className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-md text-(--text-muted) hover:bg-(--foreground) transition-colors ml-auto"
+									className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-xl text-(--text-muted) hover:bg-(--foreground) transition-colors ml-auto"
 								>
 									<MessageSquareReply className="w-3.5 h-3.5" />
 									{t('app.bots.reviews.reply')}

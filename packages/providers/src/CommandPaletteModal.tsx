@@ -2,8 +2,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Moon, Search, Settings, SidebarIcon, Sun, Trophy, X } from 'lucide-react';
+import { ArrowRight, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Loader2, Moon, Search, Settings, SidebarIcon, Sun, Trophy, X } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useDictionary } from './DictionaryProvider';
@@ -12,7 +13,7 @@ import { useSidebar } from './SidebarProvider';
 import { useTheme } from './ThemeProvider';
 import { useToast } from './ToastProvider';
 import { useUser } from './UserProvider';
-import { ACCOUNT_TABS, ADMIN_TABS, type PaletteActionItem, SUPPORT_PORTALS } from './commandPaletteData';
+import { ACCOUNT_TABS, ADMIN_TABS, buildDynamicPaletteItems, type PaletteActionItem, SUPPORT_PORTALS } from './commandPaletteData';
 
 export function CommandPaletteModal({
 	isOpen,
@@ -41,12 +42,18 @@ export function CommandPaletteModal({
 	const [query, setQuery] = useState('');
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [roles, setRoles] = useState<any[]>([]);
+	const [liveBots, setLiveBots] = useState<any[]>([]);
+	const [liveServers, setLiveServers] = useState<any[]>([]);
+	const [communityData, setCommunityData] = useState<{ issues: any[]; suggestions: any[]; roadmap: any[] }>({ issues: [], suggestions: [], roadmap: [] });
+	const [searchingLive, setSearchingLive] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (!isOpen) {
 			setQuery('');
 			setSelectedIndex(0);
+			setLiveBots([]);
+			setLiveServers([]);
 			return;
 		}
 		setTimeout(() => inputRef.current?.focus(), 20);
@@ -56,7 +63,52 @@ export function CommandPaletteModal({
 			.then((res) => (res.ok ? res.json() : []))
 			.then((data) => setRoles(Array.isArray(data) ? data : []))
 			.catch(() => {});
+
+		Promise.all([
+			fetch(getEnvUrl('https://api.xernerx.com/info/issues'))
+				.then((r) => (r.ok ? r.json() : { data: [] }))
+				.catch(() => ({ data: [] })),
+			fetch(getEnvUrl('https://api.xernerx.com/info/suggestions'))
+				.then((r) => (r.ok ? r.json() : { data: [] }))
+				.catch(() => ({ data: [] })),
+			fetch(getEnvUrl('https://api.xernerx.com/info/roadmap'))
+				.then((r) => (r.ok ? r.json() : { data: [] }))
+				.catch(() => ({ data: [] })),
+		]).then(([iRes, sRes, rRes]) => {
+			setCommunityData({
+				issues: Array.isArray(iRes?.data) ? iRes.data : [],
+				suggestions: Array.isArray(sRes?.data) ? sRes.data : [],
+				roadmap: Array.isArray(rRes?.data) ? rRes.data : [],
+			});
+		});
 	}, [isOpen, getEnvUrl]);
+
+	useEffect(() => {
+		const trimmed = query.trim();
+		if (!isOpen || trimmed.length < 2) {
+			setLiveBots([]);
+			setLiveServers([]);
+			setSearchingLive(false);
+			return;
+		}
+		setSearchingLive(true);
+		const timer = setTimeout(() => {
+			Promise.all([
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?search=${encodeURIComponent(trimmed)}&limit=4`))
+					.then((r) => (r.ok ? r.json() : []))
+					.catch(() => []),
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${encodeURIComponent(trimmed)}&limit=4`))
+					.then((r) => (r.ok ? r.json() : []))
+					.catch(() => []),
+			])
+				.then(([botsRes, guildsRes]) => {
+					setLiveBots(Array.isArray(botsRes) ? botsRes : []);
+					setLiveServers(Array.isArray(guildsRes) ? guildsRes : []);
+				})
+				.finally(() => setSearchingLive(false));
+		}, 180);
+		return () => clearTimeout(timer);
+	}, [query, isOpen, getEnvUrl]);
 
 	const activeUser = discordUser || session?.user;
 	const userRoleIds = Array.isArray((activeUser as any)?.roles) ? (activeUser as any).roles : [];
@@ -275,10 +327,19 @@ export function CommandPaletteModal({
 	const filteredItems = useMemo(() => {
 		const trimmed = query.trim().toLowerCase();
 		if (!trimmed) return allItems;
-		return allItems.filter(
+		const staticMatches = allItems.filter(
 			(item) => item.label.toLowerCase().includes(trimmed) || (item.subtitle && item.subtitle.toLowerCase().includes(trimmed)) || (item.shortcut && item.shortcut.toLowerCase().includes(trimmed))
 		);
-	}, [allItems, query]);
+		const dynamicItems = buildDynamicPaletteItems({
+			trimmedQuery: trimmed,
+			liveBots,
+			liveServers,
+			communityData,
+			getEnvUrl,
+			onClose,
+		});
+		return [...staticMatches, ...dynamicItems];
+	}, [allItems, query, liveBots, liveServers, communityData, getEnvUrl, onClose]);
 
 	useEffect(() => {
 		setSelectedIndex(0);
@@ -299,9 +360,12 @@ export function CommandPaletteModal({
 		}
 	};
 
-	const sections: Array<{ key: 'views' | 'actions' | 'apps' | 'settings' | 'support' | 'admin'; title: string }> = [
+	const sections: Array<{ key: 'views' | 'actions' | 'bots' | 'servers' | 'community' | 'apps' | 'settings' | 'support' | 'admin'; title: string }> = [
 		{ key: 'views', title: t('common.shortcuts.modal.palette.sections.views') },
 		{ key: 'actions', title: t('common.shortcuts.modal.palette.sections.actions') },
+		{ key: 'bots', title: t('common.shortcuts.modal.palette.sections.bots') },
+		{ key: 'servers', title: t('common.shortcuts.modal.palette.sections.servers') },
+		{ key: 'community', title: t('common.shortcuts.modal.palette.sections.community') },
 		{ key: 'apps', title: t('common.shortcuts.modal.palette.sections.apps') },
 		{ key: 'settings', title: t('common.shortcuts.modal.palette.sections.settings') },
 		{ key: 'support', title: t('common.shortcuts.modal.palette.sections.support') },
@@ -322,7 +386,7 @@ export function CommandPaletteModal({
 						className="relative w-full max-w-xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[75vh] flex flex-col overflow-hidden"
 					>
 						<div className="flex items-center gap-3 px-5 py-4 border-b border-(--border)/10 bg-(--background)/40 shrink-0">
-							<Search size={18} className="text-(--accent) shrink-0" />
+							{searchingLive ? <Loader2 size={18} className="text-(--accent) animate-spin shrink-0" /> : <Search size={18} className="text-(--accent) shrink-0" />}
 							<input
 								ref={inputRef}
 								type="text"
@@ -332,7 +396,7 @@ export function CommandPaletteModal({
 								placeholder={t('common.shortcuts.modal.palette.placeholder')}
 								className="w-full bg-transparent text-sm text-(--text) placeholder:text-(--text-muted) outline-none"
 							/>
-							<button onClick={onClose} className="rounded-lg p-1.5 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition shrink-0">
+							<button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1.5 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition shrink-0">
 								<X size={16} />
 							</button>
 						</div>
@@ -363,11 +427,15 @@ export function CommandPaletteModal({
 													>
 														<div className="flex items-center gap-3 min-w-0">
 															<div
-																className={`flex h-8 w-8 items-center justify-center rounded-lg border shrink-0 ${
+																className={`flex h-8 w-8 items-center justify-center rounded-lg border shrink-0 overflow-hidden ${
 																	isSelected ? 'bg-(--accent) text-white border-(--accent)' : 'bg-(--background) text-(--text-muted) border-(--border)/10'
 																}`}
 															>
-																<IconComponent size={15} />
+																{item.avatarUrl ? (
+																	<Image src={item.avatarUrl} alt={item.label} width={32} height={32} unoptimized className="w-full h-full object-cover" />
+																) : (
+																	<IconComponent size={15} />
+																)}
 															</div>
 															<div className="flex flex-col min-w-0">
 																<span className="text-sm font-medium truncate">{item.label}</span>
@@ -377,7 +445,7 @@ export function CommandPaletteModal({
 
 														<div className="flex items-center gap-2 shrink-0">
 															{item.shortcut && (
-																<kbd className="rounded-md px-2 py-0.5 text-[11px] font-mono bg-(--background) text-(--text-muted) border border-(--border)/10">
+																<kbd className="rounded-xl px-2 py-0.5 text-[11px] font-mono bg-(--background) text-(--text-muted) border border-(--border)/10">
 																	{item.shortcut}
 																</kbd>
 															)}

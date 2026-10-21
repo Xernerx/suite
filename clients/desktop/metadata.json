@@ -3,5 +3,11 @@
 	"hardwareAcceleration": true,
 	"startMinimized": false,
 	"startMaximized": false,
-	"startOnBoot": false
+	"startOnBoot": false,
+	"alwaysOnTop": false,
+	"minimizeOnClose": false,
+	"globalHotkey": true,
+	"openExternalInBrowser": true,
+	"discordRpc": true,
+	"windowControls": "system"
 }

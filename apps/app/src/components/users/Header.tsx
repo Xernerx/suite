@@ -1,19 +1,16 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
 import { useDictionary, useEnvironment, useToast, useSession } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
-import { User, Copy, Check, Share2, Settings } from 'lucide-react';
+import { Button, CopyButton } from '@xernerx/ui';
+import { User, Share2, Settings } from 'lucide-react';
 import Image from 'next/image';
-import PublicWidgetModalButton from '@/components/PublicWidgetModalButton';
 
 export default function Header({ user, discordUser, id }: { user: any; discordUser: any; id: string }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { data: session } = useSession();
-	const [copiedId, setCopiedId] = useState(false);
 
 	const isOwnProfile = (session as any)?.user?.id === id;
 
@@ -28,13 +25,6 @@ export default function Header({ user, discordUser, id }: { user: any; discordUs
 	const bannerUrl = discordUser?.bannerUrl || (discordUser?.banner ? `https://cdn.discordapp.com/banners/${id}/${discordUser.banner}.png?size=1024` : null);
 	const displayName = discordUser?.global_name || discordUser?.username || user?.username || t('app.users.unknownUser');
 	const username = discordUser?.username || user?.username;
-
-	const handleCopyId = () => {
-		navigator.clipboard.writeText(id);
-		setCopiedId(true);
-		toast({ title: t('app.users.idCopied'), type: 'success' });
-		setTimeout(() => setCopiedId(false), 2000);
-	};
 
 	const handleShareProfile = () => {
 		if (typeof window === 'undefined') return;
@@ -59,15 +49,7 @@ export default function Header({ user, discordUser, id }: { user: any; discordUs
 						{displayName}
 					</h1>
 					{username && <span className="text-sm font-semibold text-(--text-muted)">@{username}</span>}
-					<button
-						type="button"
-						onClick={handleCopyId}
-						title={t('app.users.copyId')}
-						className="flex items-center gap-1.5 text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-all cursor-pointer"
-					>
-						<span>{id}</span>
-						{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-					</button>
+					<CopyButton value={id} label={id} toastTitle={t('app.users.idCopied')} />
 				</div>
 				<p className="text-lg text-(--text-muted) max-w-2xl">{user?.description || t('common.noDescription')}</p>
 			</div>
@@ -83,7 +65,6 @@ export default function Header({ user, discordUser, id }: { user: any; discordUs
 					<Share2 className="w-4 h-4 mr-1.5" />
 					{t('app.users.shareProfile')}
 				</Button>
-				{user?.widgets && <PublicWidgetModalButton entityType="users" entityId={id} entityName={displayName} />}
 			</div>
 		</div>
 	);

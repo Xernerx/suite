@@ -148,6 +148,9 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 	if (!activeLog) {
 		return (
 			<div className="flex flex-col w-full min-h-screen pt-24 px-4 sm:px-8 max-w-5xl mx-auto">
+				<h1 className="text-4xl md:text-5xl font-black text-(--text) mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('www.changelog.title', { name: 'Xernerx' })}
+				</h1>
 				<p className="text-(--text-muted)">{t('www.changelog.noLogs')}</p>
 			</div>
 		);
@@ -163,7 +166,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 					<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
 				</div>
 				<Button variant="secondary" onClick={() => window.open(getEnvUrl('https://api.xernerx.com/v1/changelog/rss.xml'), '_blank')} className="flex items-center gap-2 shrink-0">
-					<Rss size={15} className="text-amber-500" />
+					<Rss size={15} className="text-(--accent-orange)" />
 					{t('www.changelog.rssFeed')}
 				</Button>
 			</div>
@@ -211,7 +214,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 						{/* Ambient Glowing Wire */}
 						<div className="absolute left-0 top-4 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-(--accent) to-transparent opacity-40" />
 
-						<div className="prose prose-invert max-w-none text-(--text) prose-headings:text-(--text) prose-strong:text-(--text) prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:text-(--text-muted) prose-a:text-blue-500 hover:prose-a:text-blue-400">
+						<div className="prose prose-invert max-w-none text-(--text) prose-headings:text-(--text) prose-strong:text-(--text) prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:text-(--text-muted) prose-a:text-(--accent) hover:prose-a:text-(--accent)">
 							<ReactMarkdown
 								components={{
 									h2: ({ node: _node, ...props }) => {

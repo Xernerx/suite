@@ -1,3 +1,5 @@
+/** @format */
+
 import { NextResponse } from 'next/server';
 import { put } from '@vercel/blob';
 import { database } from '@xernerx/lib/server';

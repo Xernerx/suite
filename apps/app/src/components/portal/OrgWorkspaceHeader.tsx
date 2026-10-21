@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Building2, ExternalLink, Copy, Check } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface OrgWorkspaceHeaderProps {
@@ -37,7 +38,14 @@ export default function OrgWorkspaceHeader({ organization }: OrgWorkspaceHeaderP
 			)}
 			<div className="relative z-10 flex items-center gap-4">
 				{organization.iconUrl ? (
-					<img src={getEnvUrl(organization.iconUrl)} alt={organization.name} className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
+					<Image
+						src={getEnvUrl(organization.iconUrl)}
+						alt={organization.name}
+						width={80}
+						height={80}
+						unoptimized
+						className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+					/>
 				) : (
 					<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
 						<Building2 className="w-8 h-8 text-(--text-muted)" />
@@ -53,7 +61,7 @@ export default function OrgWorkspaceHeader({ organization }: OrgWorkspaceHeaderP
 						className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-colors cursor-pointer"
 					>
 						<span>{t('app.portal.workspace.id', { id: organization._id })}</span>
-						{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+						{copiedId ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
 					</button>
 				</div>
 			</div>

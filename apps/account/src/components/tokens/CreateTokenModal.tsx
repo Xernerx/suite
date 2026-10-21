@@ -111,7 +111,7 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 					<Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
 						{t('account.tokens.create.cancelButton')}
 					</Button>
-					<Button type="submit" className="bg-(--accent) text-white hover:bg-(--accent-hover)" disabled={isSubmitting}>
+					<Button type="submit" className="bg-(--accent) text-white hover:bg-(--hover-accent)" disabled={isSubmitting}>
 						{isSubmitting ? <Loader2 size={16} className="animate-spin" /> : t('account.tokens.create.submitButton')}
 					</Button>
 				</div>

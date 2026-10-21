@@ -91,7 +91,7 @@ export default function Announcements() {
 				setWebhookUrl(data.url);
 				toast({ type: 'success', title: t('admin.dashboard.announcements.toasts.webhookLinked') });
 			} else {
-				throw new Error(data.error || 'Failed');
+				throw new Error(data.error || t('admin.dashboard.announcements.toasts.createWebhookFailed'));
 			}
 		} catch (e: any) {
 			toast({ type: 'error', title: t('admin.dashboard.announcements.toasts.createWebhookFailed'), description: e.message });

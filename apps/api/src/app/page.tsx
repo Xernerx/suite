@@ -28,7 +28,7 @@ export default function Home() {
 			<section className="min-h-[90vh] flex items-center justify-center px-6 py-16 relative">
 				<div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
 					{/* LEFT: TEXT */}
-					<motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
+					<motion.div initial={{ opacity: 1, x: 0 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
 						<h1
 							className="text-6xl lg:text-7xl xl:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
 							style={{ fontFamily: 'var(--font-fredoka)' }}
@@ -53,7 +53,7 @@ export default function Home() {
 							</a>
 							<a
 								suppressHydrationWarning
-								href={getEnvUrl('https://docs.xernerx.com/api')}
+								href={getEnvUrl('https://docs.xernerx.com/api/v1')}
 								className="px-8 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md hover:-translate-y-1"
 							>
 								{t('api.button.docs')}
@@ -80,7 +80,7 @@ export default function Home() {
 
 					{/* RIGHT: BANNER VISUAL */}
 					<motion.div
-						initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+						initial={{ opacity: 1, scale: 1, rotate: 0 }}
 						animate={{ opacity: 1, scale: 1, rotate: 0 }}
 						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
 						className="relative flex justify-center items-center w-full"

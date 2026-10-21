@@ -94,8 +94,8 @@ export function StoreCategoriesTab({ categories, onEdit, onToggleEnabled, onDele
 									onClick={() => onToggleEnabled(cat.id, !cat.enabled)}
 									className={`p-2 rounded-xl border transition-colors cursor-pointer ${
 										cat.enabled
-											? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 hover:bg-emerald-500/20'
-											: 'bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500/20'
+											? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20 hover:bg-(--accent-green)/20'
+											: 'bg-(--accent-red)/10 text-(--accent-red) border-(--accent-red)/20 hover:bg-(--accent-red)/20'
 									}`}
 									title={cat.enabled ? t('admin.store.tooltips.clickToDisable') : t('admin.store.tooltips.clickToEnable')}
 								>

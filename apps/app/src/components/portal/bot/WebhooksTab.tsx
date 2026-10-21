@@ -80,7 +80,7 @@ export default function WebhooksTab({ botConfig, setBotConfig }: WebhooksTabProp
 										newHooks.splice(index, 1);
 										setBotConfig({ ...botConfig, hooks: newHooks });
 									}}
-									className="p-2 text-red-500/70 hover:text-red-500 transition-colors cursor-pointer"
+									className="p-2 text-(--accent-red)/70 hover:text-(--accent-red) transition-colors cursor-pointer"
 								>
 									<Trash2 size={16} />
 								</button>

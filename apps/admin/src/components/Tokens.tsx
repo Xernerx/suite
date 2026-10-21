@@ -108,7 +108,7 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.tokens.toast.createError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to create token:', err);
@@ -178,7 +178,7 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 	if (loading) return <Loading />;
 	if (error)
 		return (
-			<div className="p-6 text-red-500">
+			<div className="p-6 text-(--accent-red)">
 				{t('admin.tokens.edit.failedToFetchToken', {
 					error,
 				})}

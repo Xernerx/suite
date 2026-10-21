@@ -302,7 +302,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 			<div className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col gap-4">
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+						<div className="p-2.5 rounded-2xl bg-(--accent-green)/10 border border-(--accent-green)/20 text-(--accent-green)">
 							<Activity size={20} />
 						</div>
 						<div>
@@ -339,11 +339,11 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 							>
 								<div className="flex items-center justify-between gap-1.5">
 									<span className="text-xs font-bold text-(--text) truncate uppercase">{app.id}</span>
-									<span className={`h-2 w-2 rounded-full shrink-0 ${!isUp ? 'bg-red-400' : ping && ping > 1200 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+									<span className={`h-2 w-2 rounded-full shrink-0 ${!isUp ? 'bg-(--accent-red)' : ping && ping > 1200 ? 'bg-(--accent-orange)' : 'bg-(--accent-green)'}`} />
 								</div>
 								<div className="flex flex-col gap-0.5">
 									<span className="text-[11px] font-mono text-(--text-muted)">{pVer ? `v${pVer}` : '—'}</span>
-									<span className={`text-[10px] font-semibold ${isSynced ? 'text-emerald-400' : 'text-amber-400'}`}>
+									<span className={`text-[10px] font-semibold ${isSynced ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}>
 										{ping !== undefined && ping !== null ? `${ping}ms` : isSynced ? t('admin.dashboard.overview.syncedBadge') : t('admin.dashboard.overview.canaryAheadBadge')}
 									</span>
 								</div>

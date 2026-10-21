@@ -132,17 +132,17 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 	const getCategoryIcon = (cat: string) => {
 		switch (cat) {
 			case 'issue':
-				return <Bug size={16} className="text-red-400" />;
+				return <Bug size={16} className="text-(--accent)" />;
 			case 'suggestion':
-				return <Inbox size={16} className="text-blue-400" />;
+				return <Inbox size={16} className="text-(--accent)" />;
 			case 'application':
-				return <Ticket size={16} className="text-purple-400" />;
+				return <Ticket size={16} className="text-(--accent)" />;
 			case 'setting':
-				return <Server size={16} className="text-amber-400" />;
+				return <Server size={16} className="text-(--accent)" />;
 			case 'role':
-				return <Shield size={16} className="text-emerald-400" />;
+				return <Shield size={16} className="text-(--accent)" />;
 			case 'user':
-				return <User size={16} className="text-cyan-400" />;
+				return <User size={16} className="text-(--accent)" />;
 			default:
 				return <ScrollText size={16} className="text-(--accent)" />;
 		}
@@ -152,13 +152,13 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 
 	return (
 		<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
-			<div className="flex flex-col md:flex-row md:items-center justify-between border-b border-(--border)/10 pb-6" style={{ gap: 'var(--ui-gap)' }}>
-				<div>
-					<h1 className="text-3xl font-bold text-(--text) tracking-tight flex items-center gap-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						<ScrollText className="text-(--accent)" size={28} />
+			<div className="flex flex-col md:flex-row md:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+					<h1 className="text-4xl font-extrabold text-(--text) tracking-tight drop-shadow-sm flex items-center gap-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						<ScrollText className="text-(--accent)" size={32} />
 						{t('admin.dashboard.audit.title')}
 					</h1>
-					<p className="text-(--text-muted) mt-1 text-sm">{t('admin.dashboard.audit.description')}</p>
+					<p className="text-(--text-muted) text-sm">{t('admin.dashboard.audit.description')}</p>
 				</div>
 
 				<div className="flex flex-wrap items-center gap-2">
@@ -177,15 +177,20 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 				</div>
 			</div>
 
-			<div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-				<div className="flex flex-wrap items-center gap-1.5 bg-(--foreground)/30 p-1.5 rounded-xl border border-(--border)/10">
+			<div
+				className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-2 shadow-sm"
+				style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
+			>
+				<div className="flex flex-wrap items-center gap-1.5 bg-(--background)/60 p-1 rounded-2xl border border-(--border)/10">
 					{CATEGORIES.map((cat) => (
 						<button
 							key={cat}
 							type="button"
 							onClick={() => setCategory(cat)}
-							className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-								category === cat ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--background)/50'
+							className={`px-3.5 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+								category === cat
+									? 'bg-(--accent) text-white shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_35%,transparent)]'
+									: 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
 							}`}
 						>
 							{t(`admin.dashboard.audit.categories.${cat}`)}
@@ -199,7 +204,7 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 			</div>
 
 			{filteredLogs.length === 0 ? (
-				<div className="flex flex-col items-center justify-center py-16 text-center rounded-2xl border border-(--border)/10 bg-(--foreground)/20">
+				<div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 					<ScrollText size={40} className="text-(--text-muted) opacity-40 mb-3" />
 					<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('admin.dashboard.audit.emptyTitle')}
@@ -207,7 +212,7 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 					<p className="text-sm text-(--text-muted) max-w-md mt-1">{t('admin.dashboard.audit.emptyDescription')}</p>
 				</div>
 			) : (
-				<div className="flex flex-col gap-3">
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 					{filteredLogs.map((log) => {
 						const resolvedCat = log.targetType || log.category || 'system';
 						const resolvedSummary = log.summary || log.targetLabel || log.targetId || log.action;
@@ -216,10 +221,11 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 						return (
 							<div
 								key={log.id}
-								className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 hover:border-(--border)/25 transition-all"
+								className="flex flex-col md:flex-row md:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm hover:border-(--accent)/35 transition-all"
+								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 							>
 								<div className="flex items-start gap-3.5 min-w-0">
-									<div className="p-2.5 rounded-xl bg-(--background)/70 border border-(--border)/10 shrink-0 mt-0.5">{getCategoryIcon(resolvedCat)}</div>
+									<div className="p-2.5 rounded-2xl bg-(--accent)/10 border border-(--accent)/20 shrink-0 mt-0.5">{getCategoryIcon(resolvedCat)}</div>
 									<div className="flex flex-col gap-1 min-w-0">
 										<div className="flex flex-wrap items-center gap-2">
 											{/^\d{17,20}$/.test(log.actorId || '') ? (
@@ -236,10 +242,10 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 											) : (
 												<span className="font-bold text-sm text-(--text)">{log.actorName || log.actorId}</span>
 											)}
-											<span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/20">
+											<span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
 												{log.action}
 											</span>
-											<span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-(--background)/80 text-(--text-muted) border border-(--border)/10">
+											<span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-(--background)/80 text-(--text-muted) border border-(--border)/10">
 												{resolvedCat}
 											</span>
 										</div>
@@ -255,10 +261,10 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 														setTimeout(() => setCopiedTargetId(null), 2000);
 													}}
 													title={t('admin.dashboard.audit.copyTargetId')}
-													className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-(--background)/60 hover:bg-(--background) border border-(--border)/10 font-mono text-[11px] text-(--text-muted) hover:text-(--text) transition-colors shrink-0 cursor-pointer"
+													className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-(--background)/60 hover:bg-(--background) border border-(--border)/10 font-mono text-[11px] text-(--text-muted) hover:text-(--text) transition-colors shrink-0 cursor-pointer"
 												>
 													<span>{log.targetId}</span>
-													{copiedTargetId === log.id ? <Check size={10} className="text-green-500" /> : <Copy size={10} />}
+													{copiedTargetId === log.id ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
 												</button>
 											)}
 										</p>
@@ -267,7 +273,7 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 												{Object.entries(resolvedMeta)
 													.filter(([, val]) => val !== undefined && val !== null && val !== '')
 													.map(([key, val]) => (
-														<span key={key} className="text-[11px] font-mono px-2 py-0.5 rounded bg-(--background)/60 border border-(--border)/10 text-(--text-muted)">
+														<span key={key} className="text-[11px] font-mono px-2.5 py-0.5 rounded-lg bg-(--background)/60 border border-(--border)/10 text-(--text-muted)">
 															<strong className="text-(--text)/80">{key}:</strong> {typeof val === 'object' ? JSON.stringify(val) : String(val)}
 														</span>
 													))}

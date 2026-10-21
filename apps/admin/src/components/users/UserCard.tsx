@@ -116,14 +116,14 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 								toast({ type: 'success', title: t('admin.users.idCopied') });
 								setTimeout(() => setCopiedId(false), 2000);
 							}}
-							className="inline-flex items-center gap-1 w-fit text-[10px] text-(--text-muted)/70 hover:text-(--text) font-mono mt-1 px-1.5 py-0.5 rounded bg-(--background)/40 hover:bg-(--background) border border-(--border)/10 transition-colors cursor-pointer"
+							className="inline-flex items-center gap-1 w-fit text-[10px] text-(--text-muted)/70 hover:text-(--text) font-mono mt-1 px-1.5 py-0.5 rounded-xl bg-(--background)/40 hover:bg-(--background) border border-(--border)/10 transition-colors cursor-pointer"
 						>
 							<span>
 								{t('admin.users.card.idPrefix', {
 									id: user.id,
 								})}
 							</span>
-							{copiedId ? <Check size={10} className="text-green-500" /> : <Copy size={10} />}
+							{copiedId ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
 						</button>
 					</div>
 				</div>

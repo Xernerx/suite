@@ -56,11 +56,11 @@ export function TranslationReviewTab({ reviewSearch, setReviewSearch, filteredRe
 							percent: completionPercent,
 						})}
 					</span>
-					<span className={`text-xs font-bold ${completionPercent === 100 ? 'text-emerald-500' : 'text-amber-500'}`}>{completionPercent}%</span>
+					<span className={`text-xs font-bold ${completionPercent === 100 ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}>{completionPercent}%</span>
 				</div>
 				<div className="h-2.5 w-full overflow-hidden rounded-full bg-(--background)/80 border border-(--border)/10">
 					<div
-						className={`h-full rounded-full transition-all duration-300 ${completionPercent === 100 ? 'bg-emerald-500' : 'bg-(--accent)'}`}
+						className={`h-full rounded-full transition-all duration-300 ${completionPercent === 100 ? 'bg-(--accent-green)' : 'bg-(--accent)'}`}
 						style={{ width: `${Math.min(100, Math.max(0, completionPercent))}%` }}
 					/>
 				</div>
@@ -104,7 +104,7 @@ export function TranslationReviewTab({ reviewSearch, setReviewSearch, filteredRe
 									<span className="text-xs font-mono text-(--accent)">{key}</span>
 									<div className="flex items-center gap-2">
 										{isMissing && (
-											<span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border text-amber-500 bg-amber-500/10 border-amber-500/20">
+											<span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border text-(--accent-orange) bg-(--accent-orange)/10 border-(--accent-orange)/20">
 												{t('admin.translations.review.missingKey')}
 											</span>
 										)}

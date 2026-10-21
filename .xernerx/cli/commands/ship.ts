@@ -1,3 +1,5 @@
+/** @format */
+
 import { Command } from 'commander';
 import { spawnSync } from 'child_process';
 

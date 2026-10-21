@@ -2,6 +2,7 @@
 import { Button, Confirm, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 
 import { Loading } from '@xernerx/feedback';
 
@@ -280,7 +281,9 @@ export default function Roadmap() {
 						</datalist>
 						{activePreviewBot && (
 							<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-(--foreground)/40 border border-(--border)/10 w-fit text-xs">
-								{activePreviewBot.avatarUrl && <img src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} className="w-5 h-5 rounded-full object-cover" />}
+								{activePreviewBot.avatarUrl && (
+									<Image src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
+								)}
 								<span className="font-semibold text-(--text)">{activePreviewBot.name}</span>
 								<span className="text-(--text-muted) font-mono">({botId.trim()})</span>
 							</div>
@@ -309,7 +312,9 @@ export default function Roadmap() {
 										<div className="text-(--text-muted) flex items-center gap-1.5 flex-wrap">
 											{resolvedBot ? (
 												<span className="inline-flex items-center gap-1.5 bg-(--foreground)/50 px-2 py-0.5 rounded-full border border-(--border)/10 text-(--text) text-xs font-medium">
-													{resolvedBot.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
+													{resolvedBot.avatarUrl && (
+														<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
+													)}
 													{resolvedBot.name}
 												</span>
 											) : (

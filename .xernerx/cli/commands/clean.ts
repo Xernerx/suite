@@ -1,3 +1,5 @@
+/** @format */
+
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
 import fs from 'fs';

@@ -4,6 +4,7 @@
 import { Server, LayoutDashboard } from 'lucide-react';
 import { Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface OrgServersTabProps {
@@ -37,9 +38,12 @@ export default function OrgServersTab({ orgConfig, setOrgConfig, orgGuilds }: Or
 									label: (
 										<div className="flex items-center gap-3">
 											{guild.icon ? (
-												<img
+												<Image
 													src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`}
 													alt={guild.name}
+													width={20}
+													height={20}
+													unoptimized
 													className="w-5 h-5 rounded-full object-cover shadow-sm border border-(--border)/10"
 												/>
 											) : (
@@ -75,7 +79,14 @@ export default function OrgServersTab({ orgConfig, setOrgConfig, orgGuilds }: Or
 								>
 									<div className="flex items-center gap-4">
 										{g.icon ? (
-											<img src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`} alt={g.name} className="w-10 h-10 rounded-full shadow-sm object-cover" />
+											<Image
+												src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`}
+												alt={g.name}
+												width={40}
+												height={40}
+												unoptimized
+												className="w-10 h-10 rounded-full shadow-sm object-cover"
+											/>
 										) : (
 											<div className="w-10 h-10 bg-(--background) rounded-full flex items-center justify-center font-bold shadow-sm">{g.name?.charAt(0) || 'S'}</div>
 										)}

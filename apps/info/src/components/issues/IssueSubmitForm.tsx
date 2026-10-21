@@ -2,6 +2,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FileText, Upload, X } from 'lucide-react';
 import { Button, Input, Selector } from '@xernerx/ui';
@@ -67,7 +68,7 @@ export function IssueSubmitForm({
 							value: p,
 							label: botInfo ? (
 								<span className="inline-flex items-center gap-2">
-									{botInfo.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+									{botInfo.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}
 									<span>{botInfo.name}</span>
 								</span>
 							) : (
@@ -86,7 +87,14 @@ export function IssueSubmitForm({
 						<div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-(--accent)/30 bg-(--background)/50">
 							<div className="flex items-center gap-3 min-w-0">
 								{attachmentPreview ? (
-									<img src={attachmentPreview} alt={attachment.name} className="w-12 h-12 rounded-lg object-cover border border-(--border)/10 shrink-0" />
+									<Image
+										src={attachmentPreview}
+										alt={attachment.name}
+										width={48}
+										height={48}
+										unoptimized
+										className="w-12 h-12 rounded-lg object-cover border border-(--border)/10 shrink-0"
+									/>
 								) : (
 									<div className="w-12 h-12 rounded-lg bg-(--accent)/10 text-(--accent) flex items-center justify-center shrink-0">
 										<FileText size={20} />
@@ -100,11 +108,12 @@ export function IssueSubmitForm({
 							<button
 								type="button"
 								title={t('info.bugs.dropzone.remove')}
+								aria-label={t('info.bugs.dropzone.remove')}
 								onClick={() => {
 									setAttachment(null);
 									if (fileInputRef.current) fileInputRef.current.value = '';
 								}}
-								className="p-2 rounded-lg text-(--text-muted) hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
+								className="p-2 rounded-lg text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors cursor-pointer shrink-0"
 							>
 								<X size={16} />
 							</button>

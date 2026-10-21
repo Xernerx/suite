@@ -190,7 +190,7 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 	if (loading) return <Loading />;
 	if (error)
 		return (
-			<div className="p-6 text-red-500">
+			<div className="p-6 text-(--accent-red)">
 				{t('admin.users.card.fetchError', {
 					error,
 				})}

@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 		}
 
 		// Clean up for standard view format
-		const formattedTokens = tokens.map((t) => ({ id: t.id, status: t.status, name: t.name }));
+		const formattedTokens = tokens.map((t) => ({ id: t.id, status: t.status, name: t.name, permissions: t.permissions }));
 
 		return NextResponse.json(formattedTokens, { status: 200 });
 	} catch (error) {

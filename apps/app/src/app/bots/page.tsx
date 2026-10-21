@@ -105,7 +105,7 @@ function BotCard({ bot }: { bot: BotProfile }) {
 				</div>
 
 				<div className="mt-4 flex flex-col flex-1">
-					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{loading ? t('common.loading') : name}</h4>
+					<h2 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{loading ? t('common.loading') : name}</h2>
 					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{bot.description || t('common.noDescription')}</p>
 				</div>
 			</div>
@@ -277,7 +277,7 @@ function BotsListContent() {
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center py-40 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">
-					<h4 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.bots.text1')}</h4>
+					<h2 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.bots.text1')}</h2>
 					<p className="text-(--text-muted)/70">{t('app.bots.text2')}</p>
 				</div>
 			)}

@@ -58,6 +58,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			bannerUrl: payload.bannerUrl,
 			verified: payload.verified,
 			profileUrl: `${resolveAppBaseUrl(req.url)}/organization/${payload.id}`,
+			theme: (url.searchParams.get('theme') === 'light' ? 'light' : 'dark') as 'dark' | 'light',
 			stats: [
 				{ label: 'Members', value: payload.memberCount },
 				{ label: 'Bots', value: payload.botCount },

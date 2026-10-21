@@ -5,42 +5,45 @@
 </p>
 
 <p align="center">
-  <b>High-performance static landing page and public marketing portal for the Xernerx Suite.</b>
+  <b>Public marketing showcase, institutional timeline, legal policies, staff applications, and desktop client download portal.</b>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
   <img src="https://img.shields.io/badge/service-www-blue?style=for-the-badge&logo=none" alt="Service">
+  <img src="https://img.shields.io/badge/port-4000-informational?style=for-the-badge&logo=none" alt="Port">
 </p>
 
 ---
 
 ## 🧭 Overview
 
-The **WWW** service serves as the public-facing gateway and marketing portal for Xernerx Studios. It showcases ecosystem features, company news, and directs visitors to core suite services.
+The **WWW** service (`xernerx.com` / `www.xernerx.com`, dev port `4000`) serves as the public landing page and institutional portal for Xernerx Studios.
 
 ### 🌐 Subdomain Routing
 
-| Environment | URL Pattern                                                                         | Description                                |
-| :---------- | :---------------------------------------------------------------------------------- | :----------------------------------------- |
-| **Public**  | [`xernerx.com`](https://xernerx.com) / [`www.xernerx.com`](https://www.xernerx.com) | Production marketing and landing portal    |
-| **Canary**  | [`canary.xernerx.com`](https://canary.xernerx.com)                                  | Staging and pre-release portal environment |
-| **Dev**     | [`dev.xernerx.com`](https://dev.xernerx.com)                                        | Local and active development environment   |
+| Environment | URL Pattern                                                                         | Description                                 |
+| :---------- | :---------------------------------------------------------------------------------- | :------------------------------------------ |
+| **Public**  | [`xernerx.com`](https://xernerx.com) / [`www.xernerx.com`](https://www.xernerx.com) | Production marketing and landing portal     |
+| **Canary**  | [`www.canary.xernerx.com`](https://www.canary.xernerx.com)                          | Staging and pre-release portal environment  |
+| **Dev**     | [`www.dev.xernerx.com`](https://www.dev.xernerx.com)                                | Local development portal (`localhost:4000`) |
 
 ---
 
-## 🛠️ Core Features
+## 🛠️ Core Routes & Features
 
-- **Public Showcase:** Highlights suite offerings, service statuses, and platform capabilities.
-- **Optimized Performance:** Built for lightning-fast load times and seamless cross-device browsing.
-- **Ecosystem Entry Point:** Routes users directly into the App, Docs, and Account services.
+- **`/` (Landing Showcase & Timeline):** Product showcase, ecosystem statistics, and interactive company history timeline.
+- **`/applications` & `/applications/[id]`:** Public career & staff application portal integrated with `api.xernerx.com/secure/applications/*`.
+- **`/download`:** Native desktop companion client installer download hub (`clients/desktop`).
+- **`/invites`:** Official Discord community and bot invite directory.
+- **`/terms`, `/privacy`, `/cookies`:** Versioned legal agreements and privacy disclosures.
 
 ---
 
 ## 🛠️ Tech Stack & Dependencies
 
 - **Framework:** Next.js (App Router) / React
-- **Styling & Assets:** Tailwind CSS, responsive media assets
+- **Styling & Components:** Tailwind CSS v4, `@xernerx/ui`, `@xernerx/components`, Framer Motion
 
 ---
 

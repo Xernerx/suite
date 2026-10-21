@@ -2,6 +2,7 @@
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 
 import { Loading } from '@xernerx/feedback';
@@ -358,10 +359,10 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 					const releaseStatus: 'production' | 'canary' | 'pending' | null = item.resolvedApp && item.resolvedVersion ? item.releaseStatus || 'pending' : null;
 					const statusBadgeClass =
 						releaseStatus === 'production'
-							? 'bg-green-500/10 text-green-400 border-green-500/20'
+							? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20'
 							: releaseStatus === 'canary'
-								? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-								: 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+								? 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20'
+								: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20';
 
 					return (
 						<div
@@ -370,17 +371,19 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 						>
 							<div>
 								<div className="font-bold flex items-center gap-2">
-									<span className={item.status === 'resolved' ? 'text-green-500' : 'text-red-500'}>●</span>
+									<span className={item.status === 'resolved' ? 'text-(--accent-green)' : 'text-(--accent-red)'}>●</span>
 									{item.title}
 								</div>
 								<div className="text-sm text-(--text-muted) mt-1">{item.description}</div>
 								<div className="flex flex-wrap items-center gap-2 mt-2">
-									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded border border-(--accent)/20">
-										{resolvedBot?.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
+									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded-xl border border-(--accent)/20">
+										{resolvedBot?.avatarUrl && (
+											<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
+										)}
 										{resolvedBot ? resolvedBot.name : item.productId}
 									</div>
 									{authorId && /^\d{17,20}$/.test(String(authorId)) && (
-										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded border border-(--border)/10 font-mono">
+										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded-xl border border-(--border)/10 font-mono">
 											<a
 												href={`${getEnvUrl('https://app.xernerx.com')}/users/${authorId}`}
 												target="_blank"
@@ -400,7 +403,7 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 												}}
 												className="hover:text-(--text) transition-colors cursor-pointer"
 											>
-												{copiedId === item.id ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+												{copiedId === item.id ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
 											</button>
 										</div>
 									)}
@@ -408,7 +411,7 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 										<button
 											type="button"
 											onClick={() => handleResolveClick(item)}
-											className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded border font-mono cursor-pointer transition-opacity hover:opacity-80 ${statusBadgeClass}`}
+											className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-xl border font-mono cursor-pointer transition-opacity hover:opacity-80 ${statusBadgeClass}`}
 										>
 											<span>{t(`admin.dashboard.issues.releaseStatus.${releaseStatus}`)}</span>
 											<span>•</span>
@@ -418,7 +421,7 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 										</button>
 									)}
 									{item.acknowledged === false && (
-										<span className="text-xs bg-yellow-500/10 text-yellow-500 px-2 py-1 rounded border border-yellow-500/20 font-medium">
+										<span className="text-xs bg-(--accent-orange)/10 text-(--accent-orange) px-2 py-1 rounded-xl border border-(--accent-orange)/20 font-medium">
 											{t('admin.dashboard.issues.submitted')}
 										</span>
 									)}

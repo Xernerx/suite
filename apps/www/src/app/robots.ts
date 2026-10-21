@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
 			allow: '/',
 			disallow: ['/api/'],
 		},
-		sitemap: 'https://xernerx.com/sitemap.xml',
+		sitemap: 'https://www.xernerx.com/sitemap.xml',
 	};
 }

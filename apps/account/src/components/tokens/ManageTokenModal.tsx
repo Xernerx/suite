@@ -175,7 +175,7 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 								>
 									{isTokenVisible ? <EyeOff size={16} /> : <Eye size={16} />}
 								</button>
-								<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--accent-hover) transition cursor-pointer">
+								<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--hover-accent) transition cursor-pointer">
 									{copied ? <Check size={16} /> : <Copy size={16} />}
 								</button>
 							</div>
@@ -246,7 +246,7 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 											{t('account.tokens.manage.closeButton')}
 										</Button>
 									)}
-									<Button type="submit" className="bg-(--accent) text-white hover:bg-(--accent-hover) gap-2" disabled={isSaving}>
+									<Button type="submit" className="bg-(--accent) text-white hover:bg-(--hover-accent) gap-2" disabled={isSaving}>
 										{isSaving ? <Loader2 size={16} className="animate-spin" /> : isDirty ? <Save size={16} /> : <Check size={16} />}
 										{isDirty ? t('account.tokens.manage.saveButton') : t('account.tokens.manage.closeButton')}
 									</Button>

@@ -4,16 +4,23 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Studios | Dashboard',
+		default: 'Server & Bot Management Dashboard',
 		template: 'Xernerx Studios | Dashboard | %s',
 	},
-	description: 'Manage your Xernerx applications, tokens, and settings. Access platform tools and infrastructure from a unified dashboard.',
+	description: 'Manage your Discord servers, Virtue bot modules, custom branding, and community analytics from the unified Xernerx Studios dashboard.',
+	robots: {
+		index: false,
+		follow: false,
+	},
+	alternates: {
+		canonical: '/dashboard',
+	},
 	openGraph: {
 		title: {
-			default: 'Xernerx Studios | Dashboard',
+			default: 'Xernerx Studios | Server & Bot Management Dashboard',
 			template: 'Xernerx Studios | Dashboard | %s',
 		},
-		description: 'Access the Xernerx dashboard to manage applications, API tokens, and platform configuration.',
+		description: 'Manage your Discord servers, Virtue bot modules, custom branding, and community analytics from the unified Xernerx Studios dashboard.',
 		url: 'https://app.xernerx.com/dashboard',
 		siteName: 'Xernerx',
 		images: [
@@ -29,10 +36,10 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Studios | Dashboard',
+			default: 'Xernerx Studios | Server & Bot Management Dashboard',
 			template: 'Xernerx Studios | Dashboard | %s',
 		},
-		description: 'Manage your Xernerx tools, tokens, and applications in one place.',
+		description: 'Manage your Discord servers, Virtue bot modules, custom branding, and community analytics from the unified Xernerx Studios dashboard.',
 		images: ['/banner.png'],
 	},
 };

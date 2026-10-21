@@ -256,7 +256,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 
 	const hasCategories = visibleNavigation.some((item) => item.category);
 	const groupedNavigation = visibleNavigation.reduce((acc: Record<string, any[]>, item: any) => {
-		const category = item.category || 'Other';
+		const category = item.category || 'common.shortcuts.modal.navigation.other';
 		if (!acc[category]) acc[category] = [];
 		acc[category].push(item);
 		return acc;
@@ -335,7 +335,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 										className="pl-8 pr-3 py-1.5 rounded-xl bg-(--background) border border-(--border)/10 text-xs text-(--text) placeholder:text-(--text-muted) outline-none focus:border-(--accent) w-48 transition"
 									/>
 								</div>
-								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
+								<button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
 									<X size={18} />
 								</button>
 							</div>

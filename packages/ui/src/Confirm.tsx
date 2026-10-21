@@ -23,7 +23,7 @@ const variantStyles = {
 	danger: {
 		icon: AlertTriangle,
 		iconWrapper: 'bg-(--accent-red)/10 text-(--accent-red)',
-		button: 'bg-(--accent-red) text-white hover:bg-red-600',
+		button: 'bg-(--accent-red) text-white hover:bg-(--accent-red)/85',
 	},
 	warning: {
 		icon: AlertTriangle,
@@ -33,7 +33,7 @@ const variantStyles = {
 	primary: {
 		icon: Info,
 		iconWrapper: 'bg-(--accent)/10 text-(--accent)',
-		button: 'bg-(--accent) text-white hover:bg-blue-600',
+		button: 'bg-(--accent) text-white hover:bg-(--hover-accent)',
 	},
 };
 
@@ -89,7 +89,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 					<div className="flex flex-col gap-2 pt-1">
 						<label className="text-xs text-(--text-muted) flex items-center gap-1.5 flex-wrap">
 							<span>{t('common.confirm.typeToConfirmBefore')}</span>
-							<code className="px-1.5 py-0.5 rounded-md bg-(--foreground) border border-(--border)/15 font-mono font-bold text-(--text) select-all">{confirmKeyword}</code>
+							<code className="px-2 py-0.5 rounded-xl bg-(--foreground) border border-(--border)/15 font-mono font-bold text-(--text) select-all">{confirmKeyword}</code>
 							<span>{t('common.confirm.typeToConfirmAfter')}</span>
 						</label>
 						<Input
@@ -113,7 +113,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 						type="button"
 						disabled={loading}
 						onClick={() => onOpenChange(false)}
-						className="rounded-xl text-sm font-medium text-(--text) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
+						className="rounded-2xl text-sm font-medium text-(--text) hover:bg-(--border)/10 transition-colors disabled:opacity-50"
 						style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 					>
 						{cancelText}
@@ -122,7 +122,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 						type="button"
 						disabled={loading || !isKeywordMatched}
 						onClick={onConfirm}
-						className={`flex items-center justify-center rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none shadow-sm ${button}`}
+						className={`flex items-center justify-center rounded-2xl text-sm font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none shadow-sm ${button}`}
 						style={{ padding: 'calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 1.25)', gap: 'calc(var(--ui-gap) * 0.5)' }}
 					>
 						{loading && <Loader2 size={16} className="animate-spin" />}

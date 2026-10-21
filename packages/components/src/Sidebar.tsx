@@ -4,7 +4,7 @@
 
 import { Bell, Gift, LayoutGrid, LogIn, Monitor, Smartphone, Tablet, User as UserIcon } from 'lucide-react';
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useTheme, useUser } from '@xernerx/providers';
 
 import { AnimatePresence } from 'framer-motion';
 import { Divider } from '@xernerx/ui';
@@ -12,6 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SidebarNotifications from './cards/SidebarNotifications';
 import SidebarUserCard from './cards/SidebarUser';
+import { useWindowControlsStyle } from './HeaderWindowControls';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
@@ -30,6 +31,8 @@ export function Sidebar() {
 	const { getEnvUrl } = useEnvironment();
 	const { unreadCount } = useNotifications();
 	const { setNavOpen } = useShortcuts();
+	const { preferences } = useTheme();
+	const { isRightAligned } = useWindowControlsStyle();
 	const pathname = usePathname();
 	const [isMounted, setIsMounted] = useState(false);
 
@@ -40,14 +43,18 @@ export function Sidebar() {
 	const isCollapsed = state === 'closed' && !isMobileOpen;
 	const activeUser = discordUser || session?.user;
 	const giftInTime = activeUser?.credits?.giftIn ? new Date(activeUser.credits.giftIn).getTime() : 0;
-	const isGiftReady = isMounted && Boolean(activeUser) && Date.now() >= giftInTime;
+	const isGiftReady = preferences.showGiftBadge && isMounted && Boolean(activeUser) && Date.now() >= giftInTime;
 
 	// Resolve Discord CDN URLs for Avatar, Decoration, and Nameplate
 	const avatarUrl = activeUser?.avatar
 		? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
 		: activeUser?.image;
-	const decorationUrl = activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
-	const nameplateUrl = activeUser?.collectibles?.nameplate?.asset ? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm` : null;
+	const decorationUrl =
+		preferences.showDiscordCollectibles && activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
+	const nameplateUrl =
+		preferences.showDiscordCollectibles && activeUser?.collectibles?.nameplate?.asset
+			? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm`
+			: null;
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
 	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
@@ -95,10 +102,10 @@ export function Sidebar() {
 
 			<aside
 				className={`
-                    fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
+                    fixed top-0 bottom-0 ${isRightAligned ? 'right-0' : 'left-0'} z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
                     w-full pt-[72px] pb-4
-                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-[calc(100vh-50px)] md:pt-0 md:pb-0
-                    ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} 
+                    md:w-80 md:top-0 md:bottom-auto md:sticky md:h-full md:pt-0 md:pb-0
+                    ${isMobileOpen ? 'translate-x-0' : isRightAligned ? 'translate-x-full' : '-translate-x-full'} 
                     md:translate-x-0 
                     ${isCollapsed ? 'md:w-[80px]' : ''}
                 `}
@@ -109,11 +116,11 @@ export function Sidebar() {
 				}}
 			>
 				{/* Navigation Items */}
-				<div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+				<nav aria-label={t('components.sidebar.title')} className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					{navItems.map((item, idx) => {
 						const Icon = item.icon;
 						const active = item.view && view === item.view;
-						const shortcutLabel = idx < 9 ? `Alt + ${idx + 1}` : undefined;
+						const shortcutLabel = preferences.showShortcutHints && idx < 9 ? `Alt + ${idx + 1}` : undefined;
 						const itemTitle = shortcutLabel ? `${item.label} (${shortcutLabel})` : item.label;
 
 						const prevItem = idx > 0 ? navItems[idx - 1] : null;
@@ -133,6 +140,8 @@ export function Sidebar() {
 
 								{!item.href || item.href === '#' ? (
 									<button
+										type="button"
+										aria-label={itemTitle}
 										title={itemTitle}
 										onClick={() => {
 											if (item.view) setView(item.view);
@@ -148,7 +157,7 @@ export function Sidebar() {
 											gap: isCollapsed ? 0 : 'var(--ui-gap)',
 										}}
 									>
-										{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
+										{active && !isCollapsed && <div className={`absolute ${isRightAligned ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} h-5 w-1 bg-(--accent)`} />}
 										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 										<span
 											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
@@ -157,7 +166,7 @@ export function Sidebar() {
 											{item.label}
 										</span>
 										{!isCollapsed && shortcutLabel && (
-											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded border border-(--border)/10 shrink-0">
+											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded-xl border border-(--border)/10 shrink-0">
 												{shortcutLabel}
 											</kbd>
 										)}
@@ -165,6 +174,7 @@ export function Sidebar() {
 								) : (
 									<Link
 										href={item.href}
+										aria-label={itemTitle}
 										title={itemTitle}
 										onClick={() => {
 											if (item.view) setView(item.view);
@@ -180,7 +190,7 @@ export function Sidebar() {
 											gap: isCollapsed ? 0 : 'var(--ui-gap)',
 										}}
 									>
-										{active && !isCollapsed && <div className="absolute left-0 h-5 w-1 rounded-r-full bg-(--accent)" />}
+										{active && !isCollapsed && <div className={`absolute ${isRightAligned ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} h-5 w-1 bg-(--accent)`} />}
 										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 										<span
 											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
@@ -189,7 +199,7 @@ export function Sidebar() {
 											{item.label}
 										</span>
 										{!isCollapsed && shortcutLabel && (
-											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded border border-(--border)/10 shrink-0">
+											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded-xl border border-(--border)/10 shrink-0">
 												{shortcutLabel}
 											</kbd>
 										)}
@@ -198,7 +208,7 @@ export function Sidebar() {
 							</Fragment>
 						);
 					})}
-				</div>
+				</nav>
 
 				<Divider />
 				{/* Bottom Ecosystem & User Section */}
@@ -208,7 +218,7 @@ export function Sidebar() {
 						<Link
 							href={loginHref}
 							title={t('common.sidebar.login')}
-							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--accent-hover) mt-1
+							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--hover-accent) mt-1
                                 ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
                             `}
 							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
@@ -241,6 +251,8 @@ export function Sidebar() {
 
 								{/* User Info Trigger (Left Side) */}
 								<button
+									type="button"
+									aria-label={isGiftReady ? t('components.cards.sidebaruser.giftReadyTooltip') : activeUser.global_name || activeUser.name}
 									title={isGiftReady ? t('components.cards.sidebaruser.giftReadyTooltip') : activeUser.global_name || activeUser.name}
 									onClick={() => setActiveMenu(activeMenu === 'user' ? 'none' : 'user')}
 									className="relative z-10 flex flex-1 items-center overflow-hidden text-left rounded-lg"
@@ -280,7 +292,7 @@ export function Sidebar() {
 										{isGiftReady && (
 											<span
 												title={t('components.cards.sidebaruser.giftReadyTooltip')}
-												className="absolute -top-1 -left-1 z-30 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-white shadow-sm animate-bounce"
+												className="absolute -top-1 -left-1 z-30 flex h-4 w-4 items-center justify-center rounded-full bg-(--accent-orange) text-white shadow-sm animate-bounce"
 											>
 												<Gift size={10} />
 											</span>
@@ -307,6 +319,8 @@ export function Sidebar() {
 								<div className={`relative z-10 flex ${isCollapsed ? 'flex-col' : 'items-center'} gap-1`}>
 									{/* Notifications Trigger */}
 									<button
+										type="button"
+										aria-label={t('components.header.notifications')}
 										title={t('components.header.notifications')}
 										onClick={() => setActiveMenu(activeMenu === 'notifications' ? 'none' : 'notifications')}
 										className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
@@ -321,12 +335,14 @@ export function Sidebar() {
 												className={`transition-transform duration-200 ${activeMenu === 'notifications' && !nameplateUrl ? 'text-(--accent)' : ''}`}
 											/>
 
-											{unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-(--foreground)" />}
+											{unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent-red) border-2 border-(--foreground)" />}
 										</div>
 									</button>
 
 									{/* App Drawer Trigger (Replaces Suite) */}
 									<button
+										type="button"
+										aria-label={t('components.header.title1')}
 										title={t('components.header.title1')}
 										onClick={() => {
 											setActiveMenu('none');

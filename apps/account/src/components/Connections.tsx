@@ -27,43 +27,36 @@ const OAUTH_PROVIDERS = [
 		id: 'github',
 		name: 'GitHub',
 		icon: Code2,
-		accentClass: 'bg-zinc-500/15 text-(--text) border-zinc-500/30',
 	},
 	{
 		id: 'twitch',
 		name: 'Twitch',
 		icon: Tv,
-		accentClass: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
 	},
 	{
 		id: 'youtube',
 		name: 'YouTube',
 		icon: Video,
-		accentClass: 'bg-red-500/15 text-red-400 border-red-500/30',
 	},
 	{
 		id: 'twitter',
 		name: 'X (Twitter)',
 		icon: AtSign,
-		accentClass: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
 	},
 	{
 		id: 'spotify',
 		name: 'Spotify',
 		icon: Music,
-		accentClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
 	},
 	{
 		id: 'steam',
 		name: 'Steam',
 		icon: Gamepad2,
-		accentClass: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
 	},
 	{
 		id: 'reddit',
 		name: 'Reddit',
 		icon: MessageCircle,
-		accentClass: 'bg-orange-500/15 text-orange-400 border-orange-500/30',
 	},
 ] as const;
 
@@ -125,7 +118,7 @@ export default function Connections() {
 
 	const handleConnect = (providerId: string) => {
 		setBusyProvider(providerId);
-		window.location.href = `/api/connections/${providerId}`;
+		window.location.assign(`/api/connections/${providerId}`);
 	};
 
 	const handleDisconnect = async (providerId: string) => {
@@ -166,29 +159,39 @@ export default function Connections() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="flex flex-col max-w-5xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-			<div>
-				<h1 className="text-3xl font-bold text-(--text) flex items-center gap-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					<LinkIcon className="text-(--accent)" size={28} />
+		<div
+			className="flex flex-col max-w-7xl mx-auto w-full"
+			style={{
+				padding: 'var(--ui-gap)',
+				gap: 'var(--ui-gap)',
+				fontSize: 'var(--text-scale, 14px)',
+			}}
+		>
+			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm flex items-center gap-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					<LinkIcon className="text-(--accent)" size={32} />
 					{t('account.connections.title')}
 				</h1>
-				<p className="text-sm text-(--text-muted) mt-1">{t('account.connections.description')}</p>
+				<p className="text-sm text-(--text-muted)">{t('account.connections.description')}</p>
 			</div>
 
 			{/* Primary Required Login: Discord OAuth2 */}
-			<div className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+			<div
+				className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col sm:flex-row sm:items-center justify-between"
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+			>
 				<div className="flex items-center gap-4">
-					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#5865F2]/15 text-[#5865F2] border border-[#5865F2]/30 shrink-0">
+					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
 						<Shield size={28} />
 					</div>
 					<div>
 						<div className="flex flex-wrap items-center gap-2">
-							<h3 className="text-lg font-bold text-(--text)">Discord</h3>
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+							<h2 className="text-lg font-bold text-(--text)">Discord</h2>
+							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
 								<CheckCircle2 size={12} />
 								{t('account.connections.connected')}
 							</span>
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#5865F2]/15 text-[#5865F2] border border-[#5865F2]/25">
+							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
 								<Lock size={11} />
 								{t('account.connections.primaryIdentity')}
 							</span>
@@ -208,15 +211,15 @@ export default function Connections() {
 			</div>
 
 			{/* Optional OAuth Connections Grid */}
-			<div className="flex flex-col gap-4">
-				<div>
+			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
 					<h2 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('account.connections.availableTitle')}
 					</h2>
-					<p className="text-xs text-(--text-muted) mt-0.5">{t('account.connections.availableDesc')}</p>
+					<p className="text-xs text-(--text-muted)">{t('account.connections.availableDesc')}</p>
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 					{OAUTH_PROVIDERS.map((provider) => {
 						const IconComponent = provider.icon;
 						const connected = connections.find((c) => c.provider === provider.id);
@@ -225,9 +228,10 @@ export default function Connections() {
 						return (
 							<div
 								key={provider.id}
-								className={`flex flex-col justify-between gap-4 p-5 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md transition-all ${
+								className={`flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all ${
 									!OAUTH_WORKFLOWS_ENABLED ? 'opacity-50 grayscale pointer-events-none select-none' : ''
 								}`}
+								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 							>
 								<div className="flex items-start justify-between gap-3">
 									<div className="flex items-center gap-3.5 min-w-0">
@@ -241,7 +245,7 @@ export default function Connections() {
 												className="h-12 w-12 rounded-2xl border border-(--border)/15 object-cover shrink-0"
 											/>
 										) : (
-											<div className={`flex h-12 w-12 items-center justify-center rounded-2xl border shrink-0 ${provider.accentClass}`}>
+											<div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-(--accent)/25 bg-(--accent)/15 text-(--accent) shrink-0">
 												<IconComponent size={22} />
 											</div>
 										)}
@@ -249,7 +253,7 @@ export default function Connections() {
 											<div className="flex items-center gap-2">
 												<h3 className="text-base font-bold text-(--text) truncate">{provider.name}</h3>
 												{connected && (
-													<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">
+													<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
 														<CheckCircle2 size={10} />
 														{t('account.connections.verifiedBadge')}
 													</span>
@@ -263,6 +267,7 @@ export default function Connections() {
 															href={connected.url}
 															target="_blank"
 															rel="noopener noreferrer"
+															aria-label={`${provider.name}: ${connected.displayName || connected.username}`}
 															className="text-(--accent) hover:underline inline-flex items-center gap-0.5 text-xs"
 														>
 															<ExternalLink size={11} />
@@ -280,7 +285,7 @@ export default function Connections() {
 											variant="secondary"
 											onClick={() => handleDisconnect(provider.id)}
 											disabled={!OAUTH_WORKFLOWS_ENABLED || isBusy}
-											className="flex items-center gap-1.5 text-red-400 shrink-0 text-xs px-3 py-1.5"
+											className="flex items-center gap-1.5 text-(--accent-red) shrink-0 text-xs px-3 py-1.5"
 										>
 											<Unplug size={13} />
 											{t('account.connections.disconnect')}

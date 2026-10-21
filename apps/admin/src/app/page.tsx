@@ -344,7 +344,7 @@ export default function Home() {
 					className="flex flex-col items-center text-center max-w-lg w-full rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
-					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-500">
+					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-(--accent-red)/10 text-(--accent-red)">
 						<AlertTriangle size={32} />
 					</div>
 					<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -353,7 +353,7 @@ export default function Home() {
 						</h1>
 						<p className="text-sm text-(--text-muted)">{t('feedback.error.description')}</p>
 						<div className="mt-4 p-4 bg-(--background) rounded-xl border border-(--border)/10 text-left w-full overflow-auto">
-							<p className="text-xs font-mono text-red-400 font-bold mb-1">{t('feedback.error.details')}</p>
+							<p className="text-xs font-mono text-(--accent-red) font-bold mb-1">{t('feedback.error.details')}</p>
 							<p className="text-xs font-mono text-(--text-muted) break-words">{dbError}</p>
 						</div>
 					</div>

@@ -1,14 +1,11 @@
 /** @format */
 'use client';
 
-import { AlertCircle, AlertTriangle, Trash2 } from 'lucide-react';
-import { CodeBlock, Confirm, Modal } from '@xernerx/ui';
+import { AlertTriangle, Trash2 } from 'lucide-react';
+import { Confirm } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
 interface AccountDangerZoneProps {
-	activeUser: any;
-	widgets: boolean;
-	widgetTabs: any[];
 	isConfirmDataOpen: boolean;
 	setIsConfirmDataOpen: (open: boolean) => void;
 	isDeletingData: boolean;
@@ -17,14 +14,9 @@ interface AccountDangerZoneProps {
 	setIsConfirmAccountOpen: (open: boolean) => void;
 	isDeletingAccount: boolean;
 	handleDeleteAccount: () => Promise<void>;
-	isWidgetModalOpen: boolean;
-	setIsWidgetModalOpen: (open: boolean) => void;
 }
 
 export function AccountDangerZone({
-	activeUser,
-	widgets,
-	widgetTabs,
 	isConfirmDataOpen,
 	setIsConfirmDataOpen,
 	isDeletingData,
@@ -33,8 +25,6 @@ export function AccountDangerZone({
 	setIsConfirmAccountOpen,
 	isDeletingAccount,
 	handleDeleteAccount,
-	isWidgetModalOpen,
-	setIsWidgetModalOpen,
 }: AccountDangerZoneProps) {
 	const { t } = useDictionary();
 
@@ -68,7 +58,7 @@ export function AccountDangerZone({
 				<button
 					type="button"
 					onClick={() => setIsConfirmDataOpen(true)}
-					className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
+					className="flex items-center justify-center rounded-2xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm cursor-pointer"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
 						gap: 'calc(var(--ui-gap) * 0.5)',
@@ -107,7 +97,7 @@ export function AccountDangerZone({
 				<button
 					type="button"
 					onClick={() => setIsConfirmAccountOpen(true)}
-					className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm"
+					className="flex items-center justify-center rounded-2xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm cursor-pointer"
 					style={{
 						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
 						gap: 'calc(var(--ui-gap) * 0.5)',
@@ -119,43 +109,26 @@ export function AccountDangerZone({
 			</div>
 
 			<Confirm
-				open={isConfirmAccountOpen}
-				onOpenChange={setIsConfirmAccountOpen}
-				title={t('account.account.danger.confirmTitle')}
-				description={t('account.account.danger.confirmDescription')}
-				confirmText={t('account.account.danger.confirmButton')}
-				confirmKeyword={activeUser?.username || activeUser?.name || 'DELETE'}
-				onConfirm={handleDeleteAccount}
-				loading={isDeletingAccount}
+				open={isConfirmDataOpen}
+				onOpenChange={setIsConfirmDataOpen}
+				title={t('account.common.title2')}
+				description={t('account.common.description3')}
+				confirmText={t('account.common.description4')}
+				variant="warning"
+				loading={isDeletingData}
+				onConfirm={handleDeleteData}
 			/>
 
 			<Confirm
-				open={isConfirmDataOpen}
-				onOpenChange={setIsConfirmDataOpen}
-				title={t('account.common.tooltip')}
-				description={t('account.account.resetDataConfirmDesc')}
-				confirmText={t('account.account.resetDataConfirmButton')}
-				variant="warning"
-				confirmKeyword="RESET"
-				onConfirm={handleDeleteData}
-				loading={isDeletingData}
+				open={isConfirmAccountOpen}
+				onOpenChange={setIsConfirmAccountOpen}
+				title={t('account.account.danger.title')}
+				description={t('account.account.danger.confirmDescription')}
+				confirmText={t('account.common.description5')}
+				variant="danger"
+				loading={isDeletingAccount}
+				onConfirm={handleDeleteAccount}
 			/>
-
-			<Modal open={isWidgetModalOpen} onOpenChange={setIsWidgetModalOpen} title={t('app.widgets.modalTitle')} description={t('app.widgets.modalDescription')} maxWidth="max-w-4xl">
-				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
-					{!widgets && (
-						<div
-							className="flex items-start rounded-2xl border border-(--accent-orange)/30 bg-(--accent-orange)/10 text-xs text-(--accent-orange)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.65)', gap: 'calc(var(--ui-gap) * 0.5)' }}
-						>
-							<AlertCircle size={16} className="shrink-0 mt-0.5" />
-							<span>{t('app.widgets.disabledWarning')}</span>
-						</div>
-					)}
-
-					<CodeBlock tabs={widgetTabs} />
-				</div>
-			</Modal>
 		</>
 	);
 }

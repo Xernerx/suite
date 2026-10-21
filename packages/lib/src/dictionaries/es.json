@@ -18,6 +18,10 @@
 				"analytics": {
 					"label": "Analítica",
 					"description": "Nos ayuda a rastrear errores y tráfico."
+				},
+				"marketing": {
+					"label": "Marketing",
+					"description": "Permite anuncios relevantes y medición de campañas."
 				}
 			},
 			"buttons": {
@@ -157,43 +161,60 @@
 					}
 				},
 				"legalBasis": {
-					"title": "3. Base legal para el procesamiento",
+					"title": "4. Base legal para el procesamiento",
 					"content": "Procesamos datos personales basándonos en la necesidad contractual, intereses legítimos, obligaciones legales o el consentimiento del usuario cuando corresponda."
 				},
 				"usage": {
-					"title": "4. Cómo utilizamos la información",
-					"items": "Proporcionar y mantener servicios.,Mejorar la fiabilidad y el rendimiento.,Brindar soporte y comunicar actualizaciones.,Garantizar el cumplimiento de obligaciones legales."
+					"title": "5. Cómo utilizamos la información",
+					"items": [
+						"Proporcionar y mantener servicios.",
+						"Mejorar la fiabilidad y el rendimiento.",
+						"Brindar soporte y comunicar actualizaciones.",
+						"Garantizar el cumplimiento de obligaciones legales."
+					]
 				},
 				"sharing": {
-					"title": "5. Compartir datos",
-					"items": "Proveedores de alojamiento e infraestructura.,Integraciones de terceros autorizadas.,Autoridades legales cuando lo requiera la ley."
+					"title": "6. Compartir datos",
+					"items": [
+						"Proveedores de alojamiento e infraestructura.",
+						"Procesadores de pagos (Stripe) para la gestión de facturación y suscripciones.",
+						"Integraciones de terceros autorizadas.",
+						"Autoridades legales cuando lo requiera la ley."
+					]
 				},
 				"retention": {
-					"title": "6. Retención de datos",
+					"title": "7. Retención de datos",
 					"content": "Conservamos los datos solo durante el tiempo necesario para cumplir con los fines descritos en esta Política, a menos que la ley exija una retención mayor."
 				},
 				"security": {
-					"title": "7. Seguridad de los datos",
+					"title": "8. Seguridad de los datos",
 					"content": "Implementamos medidas de seguridad técnicas y organizativas para proteger los datos. Sin embargo, ningún sistema es absolutamente seguro."
 				},
 				"rights": {
-					"title": "8. Tus derechos",
-					"items": "Derecho a acceder a tus datos.,Derecho de rectificación o supresión.,Derecho a restringir u oponerte al procesamiento.,Derecho a la portabilidad de los datos."
+					"title": "9. Tus derechos",
+					"items": [
+						"Derecho a acceder y exportar tus datos.",
+						"Derecho de rectificación o supresión.",
+						"Derecho a restringir u oponerte al procesamiento.",
+						"Derecho a la portabilidad de los datos."
+					]
 				},
 				"cookies": {
-					"title": "9. Cookies y seguimiento",
-					"content": "Podemos utilizar cookies o tecnologías similares para mejorar el rendimiento del servicio y el análisis."
+					"title": "10. Cookies y seguimiento",
+					"content": "Podemos utilizar cookies o tecnologías similares para mejorar el rendimiento del servicio y el análisis. Para más detalles, consulta nuestra ",
+					"linkText": "Política de Cookies",
+					"contentSuffix": "."
 				},
 				"international": {
-					"title": "10. Transferencias internacionales",
+					"title": "11. Transferencias internacionales",
 					"content": "Si los datos se transfieren fuera de tu jurisdicción, se implementan las salvaguardas adecuadas para garantizar el cumplimiento legal."
 				},
 				"changes": {
-					"title": "11. Cambios en esta política",
+					"title": "13. Cambios en esta política",
 					"content": "Podemos actualizar esta Política de Privacidad periódicamente. El uso continuado de los servicios indica la aceptación de la versión revisada."
 				},
 				"contact": {
-					"title": "12. Contacto",
+					"title": "14. Contacto",
 					"prefix": "Para consultas relacionadas con la privacidad, contacta a"
 				}
 			}
@@ -207,7 +228,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introducción",
-					"content": "Estos Términos de Servicio (\"Términos\") rigen tu acceso y uso de los servicios proporcionados por Xernerx Studios (\"nosotros\", \"nuestro\"). Al acceder o utilizar nuestros servicios, aceptas estar legalmente bound por estos Términos."
+					"content": "Estos Términos de Servicio (\"Términos\") rigen tu acceso y uso de los servicios proporcionados por Xernerx Studios (\"nosotros\", \"nuestro\"). Al acceder o utilizar nuestros servicios, aceptas estar legalmente vinculado por estos Términos."
 				},
 				"eligibility": {
 					"title": "2. Elegibilidad",
@@ -215,50 +236,59 @@
 				},
 				"acceptableUse": {
 					"title": "3. Uso aceptable",
-					"items": "Participar en actividades ilícitas.,Acceder a datos sin autorización explícita.,Intentar interrumpir la infraestructura del servicio.,Realizar ingeniería inversa o explotar vulnerabilidades."
+					"items": [
+						"Participar en actividades ilícitas.",
+						"Acceder a datos sin autorización explícita.",
+						"Intentar interrumpir la infraestructura del servicio.",
+						"Realizar ingeniería inversa o explotar vulnerabilidades."
+					]
 				},
 				"accounts": {
-					"title": "4. Cuentas de usuario",
+					"title": "6. Cuentas de usuario",
 					"content": "Eres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades realizadas bajo la misma. No somos responsables de las pérdidas derivadas de un acceso no autorizado."
 				},
 				"data": {
-					"title": "5. Datos de usuario",
-					"content": "Al utilizar nuestros servicios, aceptas nuestras prácticas de manejo de datos descritas en nuestra Política de Privacidad. Los datos pueden incluir información de la cuenta, métricas de uso y datos basados en integraciones."
+					"title": "9. Datos de usuario y cookies",
+					"contentPrefix": "Al utilizar nuestros servicios, aceptas nuestras prácticas de manejo de datos descritas en nuestra ",
+					"contentLink": "Política de Privacidad",
+					"contentMiddle": " y ",
+					"cookiesLink": "Política de Cookies",
+					"contentSuffix": ". Los datos pueden incluir información de la cuenta, métricas de uso y datos basados en integraciones."
 				},
 				"availability": {
-					"title": "6. Disponibilidad del servicio",
+					"title": "10. Disponibilidad del servicio",
 					"content": "Nos esforzamos por lograr un tiempo de actividad fiable, pero no garantizamos un servicio ininterrumpido. Los servicios pueden modificarse, suspenderse o discontinuarse en cualquier momento."
 				},
 				"thirdParty": {
-					"title": "7. Servicios de terceros",
-					"content": "Nuestros servicios pueden integrarse con plataformas de terceros como Discord. No somos responsables de las políticas, disponibilidad o prácticas de datos de terceros."
+					"title": "11. Servicios de terceros",
+					"content": "Nuestros servicios pueden integrarse con plataformas de terceros como Discord, Stripe y proveedores OAuth opcionales. No somos responsables de las políticas, disponibilidad o prácticas de datos de terceros."
 				},
 				"intellectualProperty": {
-					"title": "8. Propiedad intelectual",
+					"title": "12. Propiedad intelectual",
 					"content": "Todo el software, código, marca y materiales siguen siendo propiedad exclusiva de Xernerx Studios o sus licenciantes. Queda prohibida la reproducción o distribución no autorizada."
 				},
 				"warranty": {
-					"title": "9. Descargo de garantías",
+					"title": "13. Descargo de garantías",
 					"content": "Los servicios se proporcionan \"tal cual\" sin garantías de ningún tipo, ya sean expresas o implícitas."
 				},
 				"liability": {
-					"title": "10. Limitación de responsabilidad",
+					"title": "14. Limitación de responsabilidad",
 					"content": "Hasta el máximo permitido por la ley, Xernerx Studios no será responsable de daños indirectos, incidentales o consecuentes derivados del uso de nuestros servicios."
 				},
 				"indemnification": {
-					"title": "11. Indemnización",
+					"title": "15. Indemnización",
 					"content": "Acuerdas indemnizar y eximir de responsabilidad a Xernerx Studios de reclamaciones o responsabilidades derivadas del mal uso de nuestros servicios o violación de estos Términos."
 				},
 				"governingLaw": {
-					"title": "12. Ley aplicable",
+					"title": "16. Ley aplicable",
 					"content": "Estos Términos se regirán de acuerdo con las leyes aplicables dentro de tu jurisdicción."
 				},
 				"changes": {
-					"title": "13. Cambios en los Términos",
+					"title": "17. Cambios en los Términos",
 					"content": "Podemos actualizar estos Términos periódicamente. El uso continuado de nuestros servicios tras las actualizaciones constituye su aceptación."
 				},
 				"contact": {
-					"title": "14. Contacto",
+					"title": "18. Contacto",
 					"prefix": "Para consultas legales contacta a"
 				}
 			}

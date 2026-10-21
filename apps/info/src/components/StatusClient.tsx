@@ -5,7 +5,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Button, Input, Modal, CodeBlock } from '@xernerx/ui';
 import { Activity, CheckCircle2, AlertTriangle, XCircle, RefreshCw, Clock, ExternalLink, Bug, Server, Globe, Code2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { StatusBotsSection, type MainOrgBotStatus } from './StatusBotsSection';
+import { Status24hBar, type StatusBucketPoint } from './Status24hBar';
 
 interface ServiceStatus {
 	id: string;
@@ -42,6 +45,9 @@ export default function StatusClient() {
 			ping: null,
 		}))
 	);
+	const [bots, setBots] = useState<MainOrgBotStatus[]>([]);
+	const [serviceHistory, setServiceHistory] = useState<Record<string, StatusBucketPoint[]>>({});
+	const [botHistory, setBotHistory] = useState<Record<string, StatusBucketPoint[]>>({});
 	const [verifiedIssues, setVerifiedIssues] = useState<any[]>([]);
 	const [refreshing, setRefreshing] = useState(false);
 	const [lastChecked, setLastChecked] = useState<Date | null>(null);
@@ -57,16 +63,27 @@ export default function StatusClient() {
 		setRefreshing(true);
 
 		try {
-			const [versionsRes, issuesRes] = await Promise.all([
+			const [versionsRes, issuesRes, botsRes, historyRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/versions')).catch(() => null),
 				fetch(getEnvUrl('https://api.xernerx.com/info/issues')).catch(() => null),
+				fetch(getEnvUrl('https://api.xernerx.com/info/status/bots'), { cache: 'no-store' }).catch(() => null),
+				fetch(getEnvUrl('https://api.xernerx.com/info/status/history'), { cache: 'no-store' }).catch(() => null),
 			]);
 
 			const versionsData = versionsRes && versionsRes.ok ? await versionsRes.json().catch(() => null) : null;
 			const issuesData = issuesRes && issuesRes.ok ? await issuesRes.json().catch(() => null) : null;
+			const botsData = botsRes && botsRes.ok ? await botsRes.json().catch(() => null) : null;
+			const historyData = historyRes && historyRes.ok ? await historyRes.json().catch(() => null) : null;
+
+			if (historyData?.services) setServiceHistory(historyData.services);
+			if (historyData?.bots) setBotHistory(historyData.bots);
 
 			if (Array.isArray(issuesData?.data)) {
 				setVerifiedIssues(issuesData.data.filter((issue: any) => issue.status !== 'resolved' && issue.status !== 'closed').slice(0, 6));
+			}
+
+			if (Array.isArray(botsData?.bots)) {
+				setBots(botsData.bots);
 			}
 
 			const updated = await Promise.all(
@@ -114,6 +131,22 @@ export default function StatusClient() {
 
 			setServices(updated);
 			setLastChecked(new Date());
+
+			// Persist current check into the 24h status history bucket
+			fetch(getEnvUrl('https://api.xernerx.com/info/status/history'), {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					services: updated.map((s) => ({ id: s.id, status: s.status, ping: s.ping })),
+					bots: Array.isArray(botsData?.bots) ? botsData.bots.map((b: MainOrgBotStatus) => ({ id: b.id, status: b.status })) : [],
+				}),
+			})
+				.then((r) => (r.ok ? r.json() : null))
+				.then((recorded) => {
+					if (recorded?.services) setServiceHistory(recorded.services);
+					if (recorded?.bots) setBotHistory(recorded.bots);
+				})
+				.catch(() => null);
 		} finally {
 			setRefreshing(false);
 		}
@@ -125,14 +158,23 @@ export default function StatusClient() {
 		}
 	}, [isReady, checkAllServices]);
 
-	const operationalCount = services.filter((s) => s.status === 'operational').length;
-	const downCount = services.filter((s) => s.status === 'down').length;
+	const botsOnlineCount = bots.filter((b) => b.status !== 'offline').length;
+	const botsOfflineCount = bots.filter((b) => b.status === 'offline').length;
+	const totalMonitoredCount = services.length + bots.length;
+	const operationalCount = services.filter((s) => s.status === 'operational').length + botsOnlineCount;
+	const downCount = services.filter((s) => s.status === 'down').length + botsOfflineCount;
 	const isChecking = services.some((s) => s.status === 'checking');
 
 	const filteredServices = services.filter((s) => {
 		if (!search.trim()) return true;
 		const q = search.toLowerCase();
 		return t(s.labelKey).toLowerCase().includes(q) || s.host.toLowerCase().includes(q) || s.id.toLowerCase().includes(q);
+	});
+
+	const filteredBots = bots.filter((b) => {
+		if (!search.trim()) return true;
+		const q = search.toLowerCase();
+		return b.name.toLowerCase().includes(q) || b.id.toLowerCase().includes(q) || (b.activity || '').toLowerCase().includes(q) || b.status.toLowerCase().includes(q);
 	});
 
 	const avgPing = (() => {
@@ -142,18 +184,19 @@ export default function StatusClient() {
 	})();
 
 	return (
-		<div className="flex flex-col max-w-6xl mx-auto w-full p-6 md:p-10 gap-8">
+		<div className="flex flex-col max-w-6xl mx-auto w-full p-6 md:p-10" style={{ gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Hero Banner */}
 			<div
-				className={`flex flex-col md:flex-row md:items-center justify-between gap-6 p-6 md:p-8 rounded-3xl border backdrop-blur-md shadow-lg transition-all ${
+				className={`flex flex-col md:flex-row md:items-center justify-between rounded-3xl border backdrop-blur-md shadow-sm transition-all ${
 					isChecking
-						? 'bg-(--foreground)/40 border-(--border)/15'
+						? 'bg-(--foreground)/35 border-(--border)/15'
 						: downCount === 0
-							? 'bg-emerald-500/10 border-emerald-500/25'
-							: downCount < services.length / 2
-								? 'bg-amber-500/10 border-amber-500/25'
-								: 'bg-red-500/10 border-red-500/25'
+							? 'bg-(--accent-green)/10 border-(--accent-green)/25'
+							: downCount < totalMonitoredCount / 2
+								? 'bg-(--accent-orange)/10 border-(--accent-orange)/25'
+								: 'bg-(--accent-red)/10 border-(--accent-red)/25'
 				}`}
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex items-center gap-4">
 					<div
@@ -161,29 +204,29 @@ export default function StatusClient() {
 							isChecking
 								? 'bg-(--background)/60 border-(--border)/10 text-(--accent)'
 								: downCount === 0
-									? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-400'
-									: downCount < services.length / 2
-										? 'bg-amber-500/20 border-amber-500/30 text-amber-400'
-										: 'bg-red-500/20 border-red-500/30 text-red-400'
+									? 'bg-(--accent-green)/20 border-(--accent-green)/30 text-(--accent-green)'
+									: downCount < totalMonitoredCount / 2
+										? 'bg-(--accent-orange)/20 border-(--accent-orange)/30 text-(--accent-orange)'
+										: 'bg-(--accent-red)/20 border-(--accent-red)/30 text-(--accent-red)'
 						}`}
 					>
 						{isChecking ? (
 							<Activity size={28} className="animate-pulse" />
 						) : downCount === 0 ? (
 							<CheckCircle2 size={28} />
-						) : downCount < services.length / 2 ? (
+						) : downCount < totalMonitoredCount / 2 ? (
 							<AlertTriangle size={28} />
 						) : (
 							<XCircle size={28} />
 						)}
 					</div>
 					<div>
-						<h1 className="text-2xl md:text-3xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						<h1 className="text-2xl md:text-3xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{isChecking
 								? t('info.status.banner.checking')
 								: downCount === 0
 									? t('info.status.banner.allOperational')
-									: t('info.status.banner.partialOutage', { count: operationalCount, total: services.length })}
+									: t('info.status.banner.partialOutage', { count: operationalCount, total: totalMonitoredCount })}
 						</h1>
 						<p className="text-sm text-(--text-muted) mt-1 flex flex-wrap items-center gap-3">
 							<span>{t('info.status.subtitle')}</span>
@@ -194,7 +237,7 @@ export default function StatusClient() {
 								</span>
 							)}
 							{avgPing !== null && (
-								<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-mono bg-(--background)/60 border border-(--border)/10">
+								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono bg-(--background)/60 border border-(--border)/10">
 									<Activity size={11} className="text-(--accent)" />
 									{avgPing} ms avg
 								</span>
@@ -216,7 +259,7 @@ export default function StatusClient() {
 			</div>
 
 			{/* Search & Controls */}
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<h2 className="text-xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					<Server size={20} className="text-(--accent)" />
 					{t('info.status.servicesHeading')}
@@ -227,9 +270,13 @@ export default function StatusClient() {
 			</div>
 
 			{/* Services Grid */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 				{filteredServices.map((svc) => (
-					<div key={svc.id} className="flex flex-col justify-between gap-4 p-5 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 hover:border-(--border)/25 transition-all">
+					<div
+						key={svc.id}
+						className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm hover:border-(--accent)/35 transition-all"
+						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+					>
 						<div className="flex items-start justify-between gap-3">
 							<div className="min-w-0">
 								<a
@@ -250,28 +297,30 @@ export default function StatusClient() {
 							<span
 								className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border shrink-0 ${
 									svc.status === 'operational'
-										? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+										? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/25'
 										: svc.status === 'degraded'
-											? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+											? 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/25'
 											: svc.status === 'checking'
 												? 'bg-(--background)/60 text-(--text-muted) border-(--border)/10'
-												: 'bg-red-500/10 text-red-400 border-red-500/20'
+												: 'bg-(--accent-red)/10 text-(--accent-red) border-(--accent-red)/25'
 								}`}
 							>
 								<span
 									className={`h-2 w-2 rounded-full ${
 										svc.status === 'operational'
-											? 'bg-emerald-400'
+											? 'bg-(--accent-green)'
 											: svc.status === 'degraded'
-												? 'bg-amber-400'
+												? 'bg-(--accent-orange)'
 												: svc.status === 'checking'
 													? 'bg-(--text-muted) animate-pulse'
-													: 'bg-red-400'
+													: 'bg-(--accent-red)'
 									}`}
 								/>
 								{t(`info.status.states.${svc.status}`)}
 							</span>
 						</div>
+
+						<Status24hBar points={serviceHistory[svc.id]} currentStatus={svc.status} currentPing={svc.ping} />
 
 						<div className="flex items-center justify-between pt-3 border-t border-(--border)/10 text-xs font-mono text-(--text-muted)">
 							<span>{svc.version ? `v${svc.version}` : '—'}</span>
@@ -284,8 +333,11 @@ export default function StatusClient() {
 				))}
 			</div>
 
+			{/* Official Bots (Main Organization) Section */}
+			<StatusBotsSection bots={filteredBots} loading={refreshing && bots.length === 0} botHistory={botHistory} />
+
 			{/* Active Verified Issues Section */}
-			<div className="flex flex-col gap-4 mt-4">
+			<div className="flex flex-col mt-4" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex items-center justify-between">
 					<h2 className="text-xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						<Bug size={20} className="text-(--accent)" />
@@ -297,18 +349,21 @@ export default function StatusClient() {
 				</div>
 
 				{verifiedIssues.length === 0 ? (
-					<div className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground)/20 text-center text-sm text-(--text-muted)">{t('info.status.noActiveIncidents')}</div>
+					<div className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm text-center text-sm text-(--text-muted)">
+						{t('info.status.noActiveIncidents')}
+					</div>
 				) : (
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 						{verifiedIssues.map((issue: any) => (
 							<Link
 								key={issue.id || issue._id}
 								href={`/issues?q=${encodeURIComponent(issue.title || '')}`}
-								className="flex flex-col gap-1.5 p-4 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 hover:border-(--accent)/40 transition-all"
+								className="flex flex-col gap-1.5 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm hover:border-(--accent)/40 transition-all"
+								style={{ padding: 'var(--ui-gap)' }}
 							>
 								<div className="flex items-center justify-between gap-2">
 									<span className="font-bold text-sm text-(--text) truncate">{issue.title}</span>
-									<span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/20 shrink-0">
+									<span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
 										{issue.status || 'open'}
 									</span>
 								</div>
@@ -320,34 +375,29 @@ export default function StatusClient() {
 			</div>
 
 			<Modal open={badgeModalOpen} onOpenChange={setBadgeModalOpen} title={t('info.status.badgeModalTitle')} description={t('info.status.badgeModalDesc')} maxWidth="max-w-3xl">
-				<div className="flex flex-col gap-4">
-					<div className="flex items-center justify-between p-4 rounded-2xl border border-(--border)/10 bg-(--background)/50">
-						<span className="text-xs font-semibold text-(--text-muted)">{t('app.widgets.previewLabel')}</span>
-						<img src={getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')} alt="Xernerx System Status" className="h-6" />
-					</div>
-					<CodeBlock
-						tabs={[
-							{
-								id: 'markdown',
-								label: t('app.widgets.formatMarkdown'),
-								language: 'markdown',
-								code: `[![Xernerx Status](${getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')})](${getEnvUrl('https://info.xernerx.com/status')})`,
-							},
-							{
-								id: 'html',
-								label: t('app.widgets.formatHtmlImg'),
-								language: 'html',
-								code: `<a href="${getEnvUrl('https://info.xernerx.com/status')}" target="_blank" rel="noopener noreferrer">\n  <img src="${getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')}" alt="Xernerx Status" />\n</a>`,
-							},
-							{
-								id: 'svg',
-								label: t('app.widgets.formatDirectSvg'),
-								language: 'url',
-								code: getEnvUrl('https://api.xernerx.com/v1/status/badge.svg'),
-							},
-						]}
-					/>
-				</div>
+				<CodeBlock
+					preview={<Image src={getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')} alt="Xernerx System Status" width={160} height={24} unoptimized className="h-6 w-auto" />}
+					tabs={[
+						{
+							id: 'markdown',
+							label: t('app.widgets.formatMarkdown'),
+							language: 'markdown',
+							code: `[![Xernerx Status](${getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')})](${getEnvUrl('https://info.xernerx.com/status')})`,
+						},
+						{
+							id: 'html',
+							label: t('app.widgets.formatHtmlImg'),
+							language: 'html',
+							code: `<a href="${getEnvUrl('https://info.xernerx.com/status')}" target="_blank" rel="noopener noreferrer">\n  <img src="${getEnvUrl('https://api.xernerx.com/v1/status/badge.svg')}" alt="Xernerx Status" />\n</a>`,
+						},
+						{
+							id: 'svg',
+							label: t('app.widgets.formatDirectSvg'),
+							language: 'url',
+							code: getEnvUrl('https://api.xernerx.com/v1/status/badge.svg'),
+						},
+					]}
+				/>
 			</Modal>
 		</div>
 	);

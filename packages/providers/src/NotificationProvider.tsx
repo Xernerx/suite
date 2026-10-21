@@ -3,6 +3,7 @@
 
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
 
+import { useDictionary } from './DictionaryProvider';
 import { useEnvironment } from './EnvironmentProvider';
 import { useUser } from './UserProvider';
 
@@ -32,6 +33,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export function NotificationProvider({ children }: { children: ReactNode }) {
 	const { user } = useUser();
 	const { getEnvUrl, isReady } = useEnvironment();
+	const { t } = useDictionary();
 
 	const [notifications, setNotifications] = useState<Notification[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -75,8 +77,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 						return {
 							id: d.id,
 							userId: d.targetId,
-							title: 'Organization Invitation',
-							message: `You have been invited to join ${d.data?.organizationName || 'an organization'}.`,
+							title: t('common.notifications.orgInviteTitle'),
+							message: t('common.notifications.orgInviteMessage', { name: d.data?.organizationName || '' }),
 							type: 'info',
 							read: readInvites.includes(d.id),
 							link: '/portal',
@@ -88,7 +90,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 						return {
 							id: d.id,
 							userId: d.targetId,
-							title: d.data?.title || 'Notification',
+							title: d.data?.title || t('common.notifications.defaultTitle'),
 							message: d.data?.message || '',
 							type: d.data?.type || 'info',
 							read: isGlobal ? readGlobals.includes(d.id) : d.status === 'read',

@@ -1,3 +1,5 @@
+/** @format */
+
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';

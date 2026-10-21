@@ -36,7 +36,14 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 
 	const [state, setState] = useState<'open' | 'closed' | 'hidden'>('hidden');
-	const [prevState, setPrevState] = useState<'open' | 'closed'>('open');
+	const [prevState, setPrevState] = useState<'open' | 'closed'>(() => {
+		if (typeof window !== 'undefined') {
+			try {
+				if (localStorage.getItem('pref_defaultSidebarCollapsed') === 'true') return 'closed';
+			} catch {}
+		}
+		return 'open';
+	});
 	const [isMobileOpen, setMobileOpen] = useState(false);
 
 	const [navItems, setNavItems] = useState<SidebarNavItem[]>([]);
@@ -59,12 +66,15 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 				localStorage.removeItem(storageKey);
 			}
 
-			// Clean or sync the URL if they navigated via a shared link
+			// Clean or sync the URL synchronously if they navigated via a shared link
 			if (typeof window !== 'undefined') {
 				const params = new URLSearchParams(window.location.search);
 				let updated = false;
 				if (params.has('view')) {
 					params.delete('view');
+					if (newView) {
+						params.set('tab', newView);
+					}
 					updated = true;
 				}
 				if (params.has('tab')) {
@@ -77,11 +87,11 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 				}
 				if (updated) {
 					const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-					router.replace(newUrl, { scroll: false });
+					window.history.replaceState(null, '', newUrl);
 				}
 			}
 		},
-		[pathname, router]
+		[pathname]
 	);
 
 	const toggle = useCallback(() => {

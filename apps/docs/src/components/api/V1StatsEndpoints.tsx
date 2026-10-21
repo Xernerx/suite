@@ -6,8 +6,18 @@ import { useDictionary } from '@xernerx/providers';
 import { BarChart2, Code, Rocket } from 'lucide-react';
 import { EndpointSection } from './EndpointSection';
 
-export function V1StatsEndpoints() {
+interface V1SubProps {
+	activeGroup?: string;
+	searchQuery?: string;
+	methodFilter?: string;
+	defaultExpanded?: boolean;
+	onTryRoute?: (method: string, path: string) => void;
+}
+
+export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute }: V1SubProps) {
 	const { t } = useDictionary();
+
+	if (activeGroup !== 'all' && activeGroup !== 'v1-stats') return null;
 
 	const sections = [
 		{
@@ -15,12 +25,12 @@ export function V1StatsEndpoints() {
 			title: t('docs.api.v1.endpoints.fetchBotStats.title'),
 			icon: BarChart2,
 			description: t('docs.api.v1.endpoints.fetchBotStats.description'),
-			routes: [{ method: 'GET', path: '/v1/bots/[id]/stats', color: 'blue' }],
+			routes: [{ method: 'GET', path: '/v1/bots/[id]/stats', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
@@ -48,107 +58,67 @@ export function V1StatsEndpoints() {
 			title: t('docs.api.v1.endpoints.postBotStats.title'),
 			icon: BarChart2,
 			description: t('docs.api.v1.endpoints.postBotStats.description'),
-			routes: [{ method: 'POST', path: '/v1/bots/[id]/stats', color: 'green' }],
+			routes: [{ method: 'POST', path: '/v1/bots/[id]/stats', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
-					<h4 className="font-semibold text-(--text) mb-3 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-3 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.jsonBodyParameters')}
-					</h4>
-					<table className="w-full text-left text-sm border-collapse mb-2">
-						<thead>
-							<tr className="border-b border-(--border)/10 text-(--text-muted)">
-								<th className="pb-2 font-medium">{t('docs.api.v1.common.field')}</th>
-								<th className="pb-2 font-medium">{t('docs.api.v1.common.type')}</th>
-								<th className="pb-2 font-medium">{t('docs.api.v1.common.description')}</th>
-							</tr>
-						</thead>
-						<tbody className="text-(--text)">
-							<tr className="border-b border-(--border)/5">
-								<td className="py-3 font-mono text-(--accent)">serverCount</td>
-								<td className="py-3 font-mono">Number</td>
-								<td className="py-3">{t('docs.api.v1.common.serverCountDesc')}</td>
-							</tr>
-							<tr className="border-b border-(--border)/5">
-								<td className="py-3 font-mono text-(--accent)">shardCount</td>
-								<td className="py-3 font-mono">Number</td>
-								<td className="py-3">{t('docs.api.v1.common.shardCountDesc')}</td>
-							</tr>
-							<tr>
-								<td className="py-3 font-mono text-(--accent)">userCount</td>
-								<td className="py-3 font-mono">Number</td>
-								<td className="py-3">{t('docs.api.v1.common.userCountDesc')}</td>
-							</tr>
-						</tbody>
-					</table>
+					</h3>
+					<div className="overflow-x-auto rounded-2xl border border-(--border)/10 bg-(--background)/40 p-4 mb-6">
+						<table className="w-full text-left text-sm border-collapse">
+							<thead>
+								<tr className="border-b border-(--border)/10 text-(--text-muted)">
+									<th className="pb-2 font-medium">{t('docs.api.v1.common.field')}</th>
+									<th className="pb-2 font-medium">{t('docs.api.v1.common.type')}</th>
+									<th className="pb-2 font-medium">{t('docs.api.v1.common.description')}</th>
+								</tr>
+							</thead>
+							<tbody className="text-(--text)">
+								<tr className="border-b border-(--border)/5">
+									<td className="py-3 font-mono text-(--accent)">serverCount</td>
+									<td className="py-3 font-mono">Number</td>
+									<td className="py-3">{t('docs.api.v1.common.serverCountDesc')}</td>
+								</tr>
+								<tr className="border-b border-(--border)/5">
+									<td className="py-3 font-mono text-(--accent)">shardCount</td>
+									<td className="py-3 font-mono">Number</td>
+									<td className="py-3">{t('docs.api.v1.common.shardCountDesc')}</td>
+								</tr>
+								<tr>
+									<td className="py-3 font-mono text-(--accent)">userCount</td>
+									<td className="py-3 font-mono">Number</td>
+									<td className="py-3">{t('docs.api.v1.common.userCountDesc')}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 
-					<div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl mt-6 mb-6">
-						<h4 className="text-blue-500 font-bold mb-1 flex items-center gap-2">
+					<div className="bg-(--accent)/10 border border-(--accent)/20 p-4 rounded-2xl mb-6">
+						<h3 className="text-(--accent) font-bold mb-1 flex items-center gap-2">
 							<Rocket size={16} /> {t('docs.api.v1.endpoints.postBotStats.nodePackage')}
-						</h4>
+						</h3>
 						<p className="text-sm text-(--text-muted)" dangerouslySetInnerHTML={{ __html: t('docs.api.v1.endpoints.postBotStats.nodePackageDesc') }}></p>
 					</div>
 
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
 								label: 'TypeScript',
 								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {
-    method: 'POST',
-    headers: {
-        'Authorization': 'Bearer YOUR_API_TOKEN',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        serverCount: 1500,
-        shardCount: 2,
-        userCount: 450000
-    })
-});
-
-const data = await response.json();
-console.log(data);`,
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {\n    method: 'POST',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1500,\n        shardCount: 2,\n        userCount: 450000\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
 							},
 							{
 								label: 'JavaScript',
 								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {
-    method: 'POST',
-    headers: {
-        'Authorization': 'Bearer YOUR_API_TOKEN',
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        serverCount: 1500,
-        shardCount: 2,
-        userCount: 450000
-    })
-});
-
-const data = await response.json();
-console.log(data);`,
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {\n    method: 'POST',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1500,\n        shardCount: 2,\n        userCount: 450000\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests
-
-url = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats"
-headers = {
-    "Authorization": "Bearer YOUR_API_TOKEN",
-    "Content-Type": "application/json"
-}
-data = {
-    "serverCount": 1500,
-    "shardCount": 2,
-    "userCount": 450000
-}
-
-response = requests.post(url, json=data, headers=headers)
-print(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "serverCount": 1500,\n    "shardCount": 2,\n    "userCount": 450000\n}\n\nresponse = requests.post(url, json=data, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -160,41 +130,12 @@ print(response.json())`,
 			title: t('docs.api.v1.endpoints.updateBotStats.title'),
 			icon: BarChart2,
 			description: t('docs.api.v1.endpoints.updateBotStats.description'),
-			routes: [{ method: 'PATCH', path: '/v1/bots/[id]/stats', color: 'orange' }],
+			routes: [{ method: 'PATCH', path: '/v1/bots/[id]/stats?statId=...', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
-					<h4 className="font-semibold text-(--text) mb-3 flex items-center gap-2">
-						<Code size={16} /> {t('docs.api.v1.common.jsonBodyParameters')}
-					</h4>
-					<table className="w-full text-left text-sm border-collapse mb-6">
-						<thead>
-							<tr className="border-b border-(--border)/10 text-(--text-muted)">
-								<th className="pb-2 font-medium">{t('docs.api.v1.common.field')}</th>
-								<th className="pb-2 font-medium">{t('docs.api.v1.common.type')}</th>
-								<th className="pb-2 font-medium">{t('docs.api.v1.common.description')}</th>
-							</tr>
-						</thead>
-						<tbody className="text-(--text)">
-							<tr className="border-b border-(--border)/5">
-								<td className="py-3 font-mono text-(--accent)">serverCount</td>
-								<td className="py-3 font-mono">Number</td>
-								<td className="py-3">{t('docs.api.v1.common.serverCountDesc')}</td>
-							</tr>
-							<tr className="border-b border-(--border)/5">
-								<td className="py-3 font-mono text-(--accent)">shardCount</td>
-								<td className="py-3 font-mono">Number</td>
-								<td className="py-3">{t('docs.api.v1.common.shardCountDesc')}</td>
-							</tr>
-							<tr>
-								<td className="py-3 font-mono text-(--accent)">userCount</td>
-								<td className="py-3 font-mono">Number</td>
-								<td className="py-3">{t('docs.api.v1.common.userCountDesc')}</td>
-							</tr>
-						</tbody>
-					</table>
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
@@ -222,12 +163,12 @@ print(response.json())`,
 			title: t('docs.api.v1.endpoints.deleteBotStats.title'),
 			icon: BarChart2,
 			description: t('docs.api.v1.endpoints.deleteBotStats.description'),
-			routes: [{ method: 'DELETE', path: '/v1/bots/[id]/stats', color: 'red' }],
+			routes: [{ method: 'DELETE', path: '/v1/bots/[id]/stats?statId=...', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
@@ -255,7 +196,19 @@ print(response.json())`,
 	return (
 		<>
 			{sections.map((section) => (
-				<EndpointSection key={section.id} id={section.id} title={section.title} icon={section.icon} description={section.description} routes={section.routes} extra={section.extra} />
+				<EndpointSection
+					key={section.id}
+					id={section.id}
+					title={section.title}
+					icon={section.icon}
+					description={section.description}
+					routes={section.routes}
+					extra={section.extra}
+					defaultExpanded={defaultExpanded}
+					searchQuery={searchQuery}
+					methodFilter={methodFilter}
+					onTryRoute={onTryRoute}
+				/>
 			))}
 		</>
 	);

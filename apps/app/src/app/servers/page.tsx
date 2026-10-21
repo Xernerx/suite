@@ -66,7 +66,7 @@ function ServerCard({ server }: { server: GuildProfile }) {
 				</div>
 
 				<div className="mt-4 flex flex-col flex-1">
-					<h4 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{name}</h4>
+					<h2 className="text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors line-clamp-1">{name}</h2>
 					<p className="text-sm text-(--text-muted) mt-2 line-clamp-2 leading-relaxed flex-1">{server.description || t('common.noDescription')}</p>
 				</div>
 			</div>

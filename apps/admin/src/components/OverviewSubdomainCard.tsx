@@ -2,6 +2,7 @@
 'use client';
 
 import { useDictionary } from '@xernerx/providers';
+import Image from 'next/image';
 import { Activity, ExternalLink, FileText, Gauge, Globe, RefreshCw, Search, Server } from 'lucide-react';
 
 export interface SuiteAppVersionInfo {
@@ -80,15 +81,15 @@ export default function OverviewSubdomainCard({
 
 	const getPingColor = (ms: number | null) => {
 		if (ms === null) return 'text-(--text-muted)';
-		if (ms < 200) return 'text-green-400';
-		if (ms < 500) return 'text-amber-400';
-		return 'text-red-400';
+		if (ms < 200) return 'text-(--accent-green)';
+		if (ms < 500) return 'text-(--accent-orange)';
+		return 'text-(--accent-red)';
 	};
 
 	const getLighthouseScoreStyle = (score: number) => {
-		if (score >= 90) return 'border-green-500/50 bg-green-500/10 text-green-400';
-		if (score >= 50) return 'border-amber-500/50 bg-amber-500/10 text-amber-400';
-		return 'border-red-500/50 bg-red-500/10 text-red-400';
+		if (score >= 90) return 'border-(--accent-green)/50 bg-(--accent-green)/10 text-(--accent-green)';
+		if (score >= 50) return 'border-(--accent-orange)/50 bg-(--accent-orange)/10 text-(--accent-orange)';
+		return 'border-(--accent-red)/50 bg-(--accent-red)/10 text-(--accent-red)';
 	};
 
 	const allEnvBoxes = [
@@ -96,8 +97,8 @@ export default function OverviewSubdomainCard({
 			envType: 'prod' as const,
 			key: `${app.id}-prod`,
 			label: t('admin.dashboard.overview.prodVersion'),
-			textColor: 'text-green-400',
-			dotColor: 'bg-green-500',
+			textColor: 'text-(--accent-green)',
+			dotColor: 'bg-(--accent-green)',
 			host: prodHost,
 			publicUrl: prodUrl,
 			siteHref: prodUrl,
@@ -110,8 +111,8 @@ export default function OverviewSubdomainCard({
 			envType: 'canary' as const,
 			key: `${app.id}-canary`,
 			label: t('admin.dashboard.overview.canaryVersion'),
-			textColor: 'text-amber-400',
-			dotColor: 'bg-amber-500',
+			textColor: 'text-(--accent-orange)',
+			dotColor: 'bg-(--accent-orange)',
 			host: canaryHost,
 			publicUrl: canaryUrl,
 			siteHref: canaryUrl,
@@ -126,8 +127,8 @@ export default function OverviewSubdomainCard({
 						envType: 'dev' as const,
 						key: `${app.id}-dev`,
 						label: t('admin.dashboard.overview.devVersion'),
-						textColor: 'text-sky-400',
-						dotColor: 'bg-sky-500',
+						textColor: 'text-(--accent)',
+						dotColor: 'bg-(--accent)',
 						host: devHost,
 						publicUrl: devUrl,
 						siteHref: devReachableUrl,
@@ -157,9 +158,9 @@ export default function OverviewSubdomainCard({
 							<span>{app.name}</span>
 							<ExternalLink size={13} className="text-(--text-muted)" />
 						</a>
-						<span className="text-xs font-mono px-2 py-0.5 rounded bg-(--background)/60 text-(--text-muted) border border-(--border)/10">{app.id}</span>
+						<span className="text-xs font-mono px-2 py-0.5 rounded-xl bg-(--background)/60 text-(--text-muted) border border-(--border)/10">{app.id}</span>
 						{isGateway && (
-							<span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+							<span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 								{t('admin.dashboard.overview.serviceGateway')}
 							</span>
 						)}
@@ -171,8 +172,8 @@ export default function OverviewSubdomainCard({
 				</div>
 
 				<span
-					className={`text-[11px] font-bold uppercase px-2.5 py-1 rounded-md border ${
-						isSynced ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+					className={`text-[11px] font-bold uppercase px-2.5 py-1 rounded-xl border ${
+						isSynced ? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20' : 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20'
 					}`}
 				>
 					{isSynced ? t('admin.dashboard.overview.syncedBadge') : t('admin.dashboard.overview.canaryAheadBadge')}
@@ -217,9 +218,9 @@ export default function OverviewSubdomainCard({
 								/* Service Gateway Status Banner (API / CDN) */
 								<div className="w-full px-3 py-3 rounded-lg bg-(--foreground)/30 border border-(--border)/10 flex items-center justify-between gap-2">
 									<div className="flex items-center gap-2">
-										<Server size={15} className={env.hasVersion ? 'text-green-400' : 'text-(--text-muted)'} />
+										<Server size={15} className={env.hasVersion ? 'text-(--accent-green)' : 'text-(--text-muted)'} />
 										<div className="flex flex-col">
-											<span className={`text-xs font-bold ${env.hasVersion ? 'text-green-400' : 'text-(--text-muted)'}`}>
+											<span className={`text-xs font-bold ${env.hasVersion ? 'text-(--accent-green)' : 'text-(--text-muted)'}`}>
 												{env.hasVersion ? t('admin.dashboard.overview.gatewayOnline') : t('admin.dashboard.overview.gatewayOffline')}
 											</span>
 											<span className="text-[10px] text-(--text-muted)">{t('admin.dashboard.overview.gatewayDesc')}</span>
@@ -236,11 +237,13 @@ export default function OverviewSubdomainCard({
 										className="flex items-center justify-center p-2 rounded-lg bg-(--foreground)/40 hover:bg-(--foreground)/70 transition-colors w-full"
 										title={`${t('admin.dashboard.overview.seobilityCheck')} (${env.host})`}
 									>
-										<img
+										<Image
 											src={`https://app.seobility.net/widget/widget.png?url=${encodedUrl}`}
 											alt={`Seobility Score for ${env.host}`}
+											width={180}
+											height={64}
+											unoptimized
 											className="h-16 w-auto object-contain"
-											loading="lazy"
 										/>
 									</a>
 

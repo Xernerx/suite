@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { BookOpen, Download, Languages, ListOrdered, Loader2, Send, Sparkles } from 'lucide-react';
+import { Download, Languages, Loader2, Lock, Send } from 'lucide-react';
 import { Button, PreventLossConfirmation, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -12,6 +12,8 @@ import { TranslatorAppMapping } from './translations/TranslatorAppMapping';
 import { TranslationWelcomeTab } from './translations/TranslationWelcomeTab';
 import { TranslationNewTab } from './translations/TranslationNewTab';
 import { TranslationReviewTab } from './translations/TranslationReviewTab';
+import { TranslationSubmissionBanner, type TranslationSubmissionStatus } from './translations/TranslationSubmissionBanner';
+import { TranslationTabs } from './translations/TranslationTabs';
 
 export default function Translations({ initialLocale = '' }: { initialLocale?: string }) {
 	const { getEnvUrl } = useEnvironment();
@@ -53,6 +55,10 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 	const [activeTab, setActiveTab] = useState<'welcome' | 'new' | 'review'>('welcome');
 	const [newIndex, setNewIndex] = useState(0);
 	const [reviewSearch, setReviewSearch] = useState('');
+
+	// Submission version tracking & Canary build lock state
+	const [submissionStatus, setSubmissionStatus] = useState<TranslationSubmissionStatus | null>(null);
+	const [refreshingStatus, setRefreshingStatus] = useState(false);
 
 	// Translator Application Config Mapping State
 	const [appConfigs, setAppConfigs] = useState<any[]>([]);
@@ -157,6 +163,28 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 		}
 	}, [selectedLocale, targetLocales, user?.locale]);
 
+	const refreshSubmissionStatus = useCallback(
+		async (silent = false) => {
+			if (!selectedLocale) return;
+			if (!silent) setRefreshingStatus(true);
+			try {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dictionary/${selectedLocale}`), {
+					credentials: 'include',
+					cache: 'no-store',
+				});
+				if (res.ok) {
+					const data = await res.json();
+					setSubmissionStatus(data.submissionStatus || null);
+				}
+			} catch {
+				// Ignore transient network errors during background poll
+			} finally {
+				if (!silent) setRefreshingStatus(false);
+			}
+		},
+		[selectedLocale, getEnvUrl]
+	);
+
 	useEffect(() => {
 		if (!selectedLocale) return;
 		async function fetchDictionaries() {
@@ -165,9 +193,11 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 				const [sourceRes, targetRes] = await Promise.all([
 					fetch(getEnvUrl(`https://api.xernerx.com/secure/dictionary/en-GB`), {
 						credentials: 'include',
+						cache: 'no-store',
 					}),
 					fetch(getEnvUrl(`https://api.xernerx.com/secure/dictionary/${selectedLocale}`), {
 						credentials: 'include',
+						cache: 'no-store',
 					}),
 				]);
 				if (!sourceRes.ok || !targetRes.ok) {
@@ -178,6 +208,8 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 
 				const sourceJson = sourceData.dictionary || sourceData;
 				const targetJson = targetData.dictionary || targetData;
+
+				setSubmissionStatus(targetData.submissionStatus || null);
 
 				const flatSource = flattenObject(sourceJson);
 				const flatTarget = flattenObject(targetJson);
@@ -199,6 +231,14 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 		fetchDictionaries();
 	}, [selectedLocale, getEnvUrl, toast, t]);
 
+	useEffect(() => {
+		if (!submissionStatus?.isLocked || !selectedLocale) return;
+		const timer = setInterval(() => {
+			refreshSubmissionStatus(true);
+		}, 20000);
+		return () => clearInterval(timer);
+	}, [submissionStatus?.isLocked, selectedLocale, refreshSubmissionStatus]);
+
 	const handleInputChange = (key: string, value: string) => {
 		setTargetDict((prev) => ({
 			...prev,
@@ -206,7 +246,19 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 		}));
 	};
 
+	const isLocked = Boolean(submissionStatus?.isLocked);
+
 	const handleSave = useCallback(async () => {
+		if (isLocked) {
+			toast({
+				title: t('admin.translations.submissionLock.lockedTitle'),
+				description: t('admin.translations.submissionLock.phaseWaitingVersion', {
+					canaryVersion: submissionStatus?.canaryVersionAtSubmit || '',
+				}),
+				type: 'error',
+			});
+			return;
+		}
 		if (!isDirty) {
 			toast({
 				title: t('admin.translations.errors.noChanges'),
@@ -223,11 +275,16 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 					'Content-Type': 'application/json',
 				},
 				credentials: 'include',
-				body: JSON.stringify(reconstructed),
+				body: JSON.stringify({
+					dictionary: reconstructed,
+				}),
 			});
+			const resData = await res.json().catch(() => ({}));
+			if (resData?.submissionStatus) {
+				setSubmissionStatus(resData.submissionStatus);
+			}
 			if (!res.ok) {
-				const errData = await res.json();
-				throw new Error(errData.error || t('admin.translations.errors.pushFailed'));
+				throw new Error(resData.error || t('admin.translations.errors.pushFailed'));
 			}
 			setInitialTargetDict(targetDict);
 			toast({
@@ -242,7 +299,7 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 		} finally {
 			setSaving(false);
 		}
-	}, [isDirty, targetDict, selectedLocale, getEnvUrl, toast, t]);
+	}, [isLocked, isDirty, targetDict, selectedLocale, getEnvUrl, toast, t, submissionStatus?.canaryVersionAtSubmit]);
 
 	const handleReset = useCallback(() => {
 		setTargetDict(initialTargetDict);
@@ -250,12 +307,12 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 
 	useEffect(() => {
 		if (isDirty) {
-			remind(true, handleSave, handleReset, saving);
+			remind(true, handleSave, handleReset, saving || isLocked);
 		} else {
 			remind(false);
 		}
 		return () => remind(false);
-	}, [isDirty, handleSave, handleReset, saving, remind]);
+	}, [isDirty, handleSave, handleReset, saving, isLocked, remind]);
 
 	const handleExportJson = () => {
 		if (!selectedLocale) return;
@@ -270,9 +327,17 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 		toast({ type: 'success', title: t('admin.translations.exportSuccess') });
 	};
 
+	const liveSelectedCoverage = useMemo(() => {
+		const sourceKeys = Object.keys(sourceDict);
+		if (sourceKeys.length === 0) return null;
+		const translatedCount = sourceKeys.filter((k) => Boolean(targetDict[k] && targetDict[k].trim() !== '')).length;
+		return Math.round((translatedCount / sourceKeys.length) * 100);
+	}, [sourceDict, targetDict]);
+
 	const currentLocaleObj = targetLocales.find((l) => l.code === selectedLocale);
 	const languageOptions = targetLocales.map((lang) => {
 		const countryCode = getFlagCode(lang.code);
+		const coverageVal = lang.code === selectedLocale && liveSelectedCoverage !== null ? liveSelectedCoverage : lang.coverage;
 		return {
 			value: lang.code,
 			label: (
@@ -282,8 +347,12 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 				</div>
 			),
 			badge: (
-				<span className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${lang.coverage === 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-					{lang.coverage}%
+				<span
+					className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${
+						coverageVal === 100 ? 'bg-(--accent-green)/10 text-(--accent-green)' : 'bg-(--accent-orange)/10 text-(--accent-orange)'
+					}`}
+				>
+					{coverageVal}%
 				</span>
 			),
 		};
@@ -361,93 +430,16 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 						{t('admin.translations.exportJson')}
 					</Button>
 
-					<Button onClick={handleSave} disabled={saving || !isDirty} className="gap-2 rounded-2xl px-5 py-2.5 shrink-0">
-						{saving ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-						{t('admin.translations.pushToReview')}
+					<Button onClick={handleSave} disabled={saving || !isDirty || isLocked} className="gap-2 rounded-2xl px-5 py-2.5 shrink-0">
+						{saving ? <Loader2 size={16} className="animate-spin" /> : isLocked ? <Lock size={16} /> : <Send size={16} />}
+						{isLocked ? t('admin.translations.submissionLock.buttonLocked') : t('admin.translations.pushToReview')}
 					</Button>
 				</div>
 			</div>
 
-			{/* Mobile Tab Selector */}
-			<div className="relative z-10 sm:hidden w-full">
-				<Selector
-					items={true}
-					value={activeTab}
-					onChange={(val) => {
-						if (val === 'new' && missingKeys.length === 0) return;
-						setActiveTab(val as any);
-					}}
-					options={[
-						{
-							value: 'welcome',
-							label: (
-								<div className="flex items-center gap-2">
-									<BookOpen size={16} />
-									{t('admin.translations.tabs.introduction')}
-								</div>
-							),
-						},
-						{
-							value: 'new',
-							label: (
-								<div className={`flex items-center gap-2 ${missingKeys.length === 0 ? 'opacity-50' : ''}`}>
-									<Sparkles size={16} />
-									{typeof t('admin.translations.tabs.newEntries') === 'string'
-										? t('admin.translations.tabs.newEntries').replace(/\s*\(\{count\}\)/g, '')
-										: t('admin.translations.tabs.newEntries')}
-								</div>
-							),
-						},
-						{
-							value: 'review',
-							label: (
-								<div className="flex items-center gap-2">
-									<ListOrdered size={16} />
-									{typeof t('admin.translations.tabs.reviewExisting') === 'string'
-										? t('admin.translations.tabs.reviewExisting').replace(/\s*\(\{count\}\)/g, '')
-										: t('admin.translations.tabs.reviewExisting')}
-								</div>
-							),
-						},
-					]}
-				/>
-			</div>
+			<TranslationSubmissionBanner submissionStatus={submissionStatus} refreshingStatus={refreshingStatus} onRefresh={() => refreshSubmissionStatus(false)} />
 
-			{/* Desktop Tab Buttons */}
-			<div
-				className="hidden sm:flex items-center overflow-x-auto hide-scrollbar rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-1.5 shadow-sm"
-				style={{
-					gap: 'calc(var(--ui-gap) * 0.5)',
-				}}
-			>
-				<button
-					type="button"
-					onClick={() => setActiveTab('welcome')}
-					className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${activeTab === 'welcome' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'}`}
-				>
-					<BookOpen size={16} />
-					{t('admin.translations.tabs.introduction')}
-				</button>
-				<button
-					type="button"
-					onClick={() => setActiveTab('new')}
-					disabled={missingKeys.length === 0}
-					className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${missingKeys.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${activeTab === 'new' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'}`}
-				>
-					<Sparkles size={16} />
-					{typeof t('admin.translations.tabs.newEntries') === 'string' ? t('admin.translations.tabs.newEntries').replace(/\s*\(\{count\}\)/g, '') : t('admin.translations.tabs.newEntries')}
-				</button>
-				<button
-					type="button"
-					onClick={() => setActiveTab('review')}
-					className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all cursor-pointer ${activeTab === 'review' ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--border)/5'}`}
-				>
-					<ListOrdered size={16} />
-					{typeof t('admin.translations.tabs.reviewExisting') === 'string'
-						? t('admin.translations.tabs.reviewExisting').replace(/\s*\(\{count\}\)/g, '')
-						: t('admin.translations.tabs.reviewExisting')}
-				</button>
-			</div>
+			<TranslationTabs activeTab={activeTab} setActiveTab={setActiveTab} missingKeysCount={missingKeys.length} />
 
 			{loading ? (
 				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">

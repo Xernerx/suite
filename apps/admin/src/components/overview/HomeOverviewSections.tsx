@@ -40,15 +40,15 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 			<div className="flex flex-col gap-4">
 				<div>
 					<h2 className="text-xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						<AlertTriangle size={20} className="text-amber-400" />
+						<AlertTriangle size={20} className="text-(--accent-orange)" />
 						<span>{t('admin.dashboard.home.urgentTitle')}</span>
 					</h2>
 					<p className="text-xs text-(--text-muted) mt-0.5">{t('admin.dashboard.home.urgentSubtitle')}</p>
 				</div>
 
 				{urgentItems.length === 0 ? (
-					<div className="flex items-center gap-4 p-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
-						<div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-400 shrink-0">
+					<div className="flex items-center gap-4 p-6 rounded-3xl border border-(--accent-green)/20 bg-(--accent-green)/5">
+						<div className="p-3 rounded-2xl bg-(--accent-green)/15 text-(--accent-green) shrink-0">
 							<CheckCircle2 size={24} />
 						</div>
 						<div>
@@ -62,16 +62,16 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 							const IconComp = item.icon;
 							const toneClasses =
 								item.severity === 'critical'
-									? 'border-red-500/30 bg-red-500/5 hover:border-red-500/50'
+									? 'border-(--accent-red)/30 bg-(--accent-red)/5 hover:border-(--accent-red)/50'
 									: item.severity === 'warning'
-										? 'border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50'
+										? 'border-(--accent-orange)/30 bg-(--accent-orange)/5 hover:border-(--accent-orange)/50'
 										: 'border-(--accent)/30 bg-(--accent)/5 hover:border-(--accent)/50';
 
 							const badgeClasses =
 								item.severity === 'critical'
-									? 'bg-red-500/20 text-red-400 border-red-500/30'
+									? 'bg-(--accent-red)/20 text-(--accent-red) border-(--accent-red)/30'
 									: item.severity === 'warning'
-										? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+										? 'bg-(--accent-orange)/20 text-(--accent-orange) border-(--accent-orange)/30'
 										: 'bg-(--accent)/20 text-(--accent) border-(--accent)/30';
 
 							return (
@@ -105,7 +105,7 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 														e.stopPropagation();
 														onNavigate(item.view, hl.query);
 													}}
-													className="flex items-center justify-between text-xs text-(--text-muted) hover:text-(--text) truncate text-left py-0.5 rounded transition-colors cursor-pointer"
+													className="flex items-center justify-between text-xs text-(--text-muted) hover:text-(--text) truncate text-left py-0.5 rounded-xl transition-colors cursor-pointer"
 												>
 													<span className="truncate">• {hl.label}</span>
 													<ArrowRight size={12} className="shrink-0 opacity-60" />
@@ -153,9 +153,9 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 											<span
 												className={`px-2 py-0.5 rounded-full text-[11px] font-bold border shrink-0 ${
 													card.badge.tone === 'urgent'
-														? 'bg-red-500/15 text-red-400 border-red-500/30'
+														? 'bg-(--accent-red)/15 text-(--accent-red) border-(--accent-red)/30'
 														: card.badge.tone === 'ok'
-															? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+															? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30'
 															: 'bg-(--background)/80 text-(--text-muted) border-(--border)/15'
 												}`}
 											>
@@ -202,7 +202,7 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 							>
 								<div className="flex flex-wrap items-center gap-2 min-w-0">
 									<span className="font-bold text-xs text-(--text)">{log.actorName || log.actorId}</span>
-									<span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-(--accent)/15 text-(--accent) border border-(--accent)/20">{log.action}</span>
+									<span className="px-2 py-0.5 rounded-xl text-[10px] font-mono font-bold uppercase bg-(--accent)/15 text-(--accent) border border-(--accent)/20">{log.action}</span>
 									<span className="text-xs text-(--text-muted) truncate">{log.summary || log.targetLabel || log.targetId}</span>
 								</div>
 								<span className="inline-flex items-center gap-1 text-[11px] font-mono text-(--text-muted) shrink-0">

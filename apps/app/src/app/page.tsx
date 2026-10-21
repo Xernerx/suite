@@ -137,9 +137,9 @@ export default function Home() {
 	const renderBotCategoryGrid = (title: string, icon: React.ReactNode, bots: BotProfile[], category: string) => (
 		<div className="flex flex-col mb-16">
 			<div className="flex items-center justify-between mb-8">
-				<h3 className="text-3xl font-extrabold flex items-center gap-3 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h2 className="text-3xl font-extrabold flex items-center gap-3 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{icon} {title}
-				</h3>
+				</h2>
 				{bots.length > 0 && (
 					<Link href={`/bots?category=${category}`} className="text-sm font-bold text-(--accent) hover:text-(--accent)/80 transition-colors flex items-center gap-1 group">
 						{t('app.home.text1')} <ChevronUp className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
@@ -147,7 +147,7 @@ export default function Home() {
 				)}
 			</div>
 			{bots.length > 0 ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 					{bots.map((bot) => (
 						<BotCard key={bot.id} bot={bot} />
 					))}
@@ -164,9 +164,9 @@ export default function Home() {
 	const renderServerCategoryGrid = (title: string, icon: React.ReactNode, servers: GuildProfile[], category: string) => (
 		<div className="flex flex-col mb-16">
 			<div className="flex items-center justify-between mb-8">
-				<h3 className="text-3xl font-extrabold flex items-center gap-3 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h2 className="text-3xl font-extrabold flex items-center gap-3 drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{icon} {title}
-				</h3>
+				</h2>
 				{servers.length > 0 && (
 					<Link href={`/servers?category=${category}`} className="text-sm font-bold text-(--accent) hover:text-(--accent)/80 transition-colors flex items-center gap-1 group">
 						{t('app.home.text1')} <ChevronUp className="w-4 h-4 rotate-90 group-hover:translate-x-1 transition-transform" />
@@ -174,7 +174,7 @@ export default function Home() {
 				)}
 			</div>
 			{servers.length > 0 ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 					{servers.map((server) => (
 						<ServerCard key={server.id} server={server} />
 					))}
@@ -191,13 +191,13 @@ export default function Home() {
 		<div className="flex flex-col w-full h-full relative">
 			{/* Hero Section */}
 			<section className="flex flex-col items-center justify-center text-center mt-16 mb-8 relative z-10 w-full px-4 transition-all duration-500">
-				<h2 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 drop-shadow-sm transition-all duration-500" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 drop-shadow-sm transition-all duration-500" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('app.home.text3')}
 					<br />
 					<span className="text-(--accent) drop-shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_30%,transparent)]">
 						{t('app.home.text4')} {context === 'bots' ? t('app.home.heroBots') : t('app.home.heroServers')}
 					</span>
-				</h2>
+				</h1>
 				<p className="max-w-2xl text-xl text-(--text-muted) font-medium transition-all duration-500">{t('app.home.text5')}</p>
 			</section>
 
@@ -282,7 +282,7 @@ export default function Home() {
 						</div>
 					) : (
 						<div className="flex flex-col items-center justify-center py-32 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/50">
-							<h4 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.home.text12')}</h4>
+							<h2 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.home.text12')}</h2>
 							<p className="text-(--text-muted)/70">{t('app.home.text13')}</p>
 						</div>
 					)
@@ -303,7 +303,7 @@ export default function Home() {
 					</div>
 				) : (
 					<div className="flex flex-col items-center justify-center py-32 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/50">
-						<h4 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.home.text12')}</h4>
+						<h2 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.home.text12')}</h2>
 						<p className="text-(--text-muted)/70">{t('app.home.text13')}</p>
 					</div>
 				)}

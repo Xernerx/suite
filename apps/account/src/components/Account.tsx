@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
-import { LogOut, Settings, Info, User as UserIcon, ExternalLink, Copy, Check, Code2 } from 'lucide-react';
+import { LogOut, Settings, Info, User as UserIcon, ExternalLink } from 'lucide-react';
 import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
-import { Button, Selector, Toggle } from '@xernerx/ui';
+import { Button, CopyButton, Selector } from '@xernerx/ui';
+import { WidgetSettingsCard } from '@xernerx/components';
 import Image from 'next/image';
 import { useState } from 'react';
 import { AccountDangerZone } from './AccountDangerZone';
@@ -17,21 +18,11 @@ export default function Account() {
 	const [isConfirmAccountOpen, setIsConfirmAccountOpen] = useState(false);
 	const [isDeletingData, setIsDeletingData] = useState(false);
 	const [isConfirmDataOpen, setIsConfirmDataOpen] = useState(false);
-	const [copiedId, setCopiedId] = useState(false);
-	const [isWidgetModalOpen, setIsWidgetModalOpen] = useState(false);
 	const activeUser = discordUser || session?.user;
 	const userId = activeUser?.id;
 	const [privacy, setPrivacy] = useState(activeUser?.privacy || 'private');
 	const [widgets, setWidgets] = useState(Boolean((activeUser as any)?.widgets));
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
-
-	const handleCopyId = () => {
-		if (!userId) return;
-		navigator.clipboard.writeText(userId);
-		setCopiedId(true);
-		toast({ title: t('account.profile.idCopied'), type: 'success' });
-		setTimeout(() => setCopiedId(false), 2000);
-	};
 
 	const handleLogout = () => {
 		const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
@@ -168,60 +159,8 @@ export default function Account() {
 		}
 	};
 
-	const apiBase = getEnvUrl('https://api.xernerx.com');
-	const appBase = getEnvUrl('https://app.xernerx.com');
-	const baseEndpoint = `${apiBase}/core/users/${userId || ''}`;
-	const pngUrl = `${baseEndpoint}?type=png`;
-	const svgUrl = `${baseEndpoint}?type=svg`;
-	const iframeUrl = `${baseEndpoint}?type=iframe`;
-	const profileUrl = `${appBase}/users/${userId || ''}`;
 	const displayName = activeUser?.global_name || activeUser?.name || t('account.account.fallbackName');
-	const safeName = displayName.replace(/"/g, '&quot;');
 
-	const widgetTabs = [
-		{
-			id: 'iframe',
-			label: t('app.widgets.formatIframe'),
-			language: 'html',
-			code: `<iframe\n  src="${iframeUrl}"\n  width="420"\n  height="172"\n  style="border:0;border-radius:20px;overflow:hidden"\n  loading="lazy"\n  title="${safeName}"\n></iframe>`,
-		},
-		{
-			id: 'markdown',
-			label: t('app.widgets.formatMarkdown'),
-			language: 'markdown',
-			code: `[![${displayName}](${svgUrl})](${profileUrl})`,
-		},
-		{
-			id: 'html',
-			label: t('app.widgets.formatHtmlImg'),
-			language: 'html',
-			code: `<a href="${profileUrl}" target="_blank" rel="noopener noreferrer">\n  <img src="${svgUrl}" alt="${safeName}" width="420" height="172" />\n</a>`,
-		},
-		{
-			id: 'image',
-			label: t('app.widgets.formatPngImage'),
-			language: 'url',
-			code: pngUrl,
-		},
-		{
-			id: 'svg',
-			label: t('app.widgets.formatDirectSvg'),
-			language: 'url',
-			code: svgUrl,
-		},
-		{
-			id: 'raw-svg',
-			label: t('app.widgets.formatRawSvg'),
-			language: 'svg',
-			code: `<svg xmlns="http://www.w3.org/2000/svg" width="420" height="172" viewBox="0 0 420 172" fill="none" role="img" aria-label="${safeName}">\n  <a href="${profileUrl}" target="_blank" rel="noopener noreferrer">\n    <image href="${svgUrl}" width="420" height="172" />\n  </a>\n</svg>`,
-		},
-		{
-			id: 'json',
-			label: t('app.widgets.formatDirectJson'),
-			language: 'json',
-			code: baseEndpoint,
-		},
-	];
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full"
@@ -282,22 +221,9 @@ export default function Account() {
 							gap: 'calc(var(--ui-gap) * 0.25)',
 						}}
 					>
-						<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('account.account.fallbackName')}</h2>
+						<h2 className="text-xl font-bold text-(--text) truncate">{displayName}</h2>
 						<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
-						{userId && (
-							<button
-								type="button"
-								onClick={handleCopyId}
-								className="inline-flex items-center gap-1.5 w-fit text-xs text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-md border border-(--border)/10 font-mono transition-colors cursor-pointer"
-							>
-								<span>
-									{t('account.common.description', {
-										userId,
-									})}
-								</span>
-								{copiedId ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
-							</button>
-						)}
+						{userId && <CopyButton value={userId} label={t('account.common.description', { userId })} toastTitle={t('account.profile.idCopied')} className="w-fit" />}
 					</div>
 				</div>
 				{userId && (
@@ -334,7 +260,7 @@ export default function Account() {
 					</div>
 					<button
 						onClick={handleLogout}
-						className="flex items-center justify-center rounded-xl bg-red-500/15 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/20 shrink-0"
+						className="flex items-center justify-center rounded-2xl bg-(--accent-red)/15 text-sm font-medium text-(--accent-red) transition-colors hover:bg-(--accent-red)/20 shrink-0"
 						style={{
 							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
 							gap: 'calc(var(--ui-gap) * 0.5)',
@@ -365,7 +291,7 @@ export default function Account() {
 								gap: 'calc(var(--ui-gap) * 0.5)',
 							}}
 						>
-							<Settings size={18} />
+							<Settings size={18} className="text-(--accent)" />
 							<h3>{t('account.common.title')}</h3>
 						</div>
 						<div className="flex items-center gap-1 text-xs text-(--text-muted)">
@@ -416,57 +342,9 @@ export default function Account() {
 					</div>
 				</div>
 
-				{/* Public Embed Widget Card */}
-				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{
-						padding: 'var(--ui-gap)',
-						gap: 'var(--ui-gap)',
-					}}
-				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
-						}}
-					>
-						<div
-							className="flex items-center text-(--text) font-semibold text-base"
-							style={{
-								gap: 'calc(var(--ui-gap) * 0.5)',
-							}}
-						>
-							<Code2 size={18} />
-							<h3>{t('app.widgets.title')}</h3>
-						</div>
-						<div className="flex items-center gap-1 text-xs text-(--text-muted)">{t('app.widgets.description')}</div>
-					</div>
-					<div
-						className="flex items-center shrink-0"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.75)',
-						}}
-					>
-						<button
-							type="button"
-							onClick={() => setIsWidgetModalOpen(true)}
-							className="flex items-center justify-center rounded-xl border border-(--border)/15 bg-(--background)/60 text-xs font-semibold text-(--text) transition-colors hover:border-(--accent)/40 hover:text-(--accent)"
-							style={{
-								padding: 'calc(var(--ui-gap) * 0.5) calc(var(--ui-gap) * 0.75)',
-								gap: 'calc(var(--ui-gap) * 0.35)',
-							}}
-						>
-							<Code2 size={15} />
-							<span>{t('app.widgets.embedButton')}</span>
-						</button>
-						<Toggle checked={Boolean(widgets)} onChange={(e) => handleWidgetsChange(e.target.checked)} />
-					</div>
-				</div>
+				{userId && <WidgetSettingsCard entityType="users" entityId={userId} entityName={displayName} enabled={Boolean(widgets)} onChange={handleWidgetsChange} />}
 
 				<AccountDangerZone
-					activeUser={activeUser}
-					widgets={Boolean(widgets)}
-					widgetTabs={widgetTabs}
 					isConfirmDataOpen={isConfirmDataOpen}
 					setIsConfirmDataOpen={setIsConfirmDataOpen}
 					isDeletingData={isDeletingData}
@@ -475,8 +353,6 @@ export default function Account() {
 					setIsConfirmAccountOpen={setIsConfirmAccountOpen}
 					isDeletingAccount={isDeletingAccount}
 					handleDeleteAccount={handleDeleteAccount}
-					isWidgetModalOpen={isWidgetModalOpen}
-					setIsWidgetModalOpen={setIsWidgetModalOpen}
 				/>
 			</div>
 		</div>

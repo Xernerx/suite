@@ -2,6 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface SuggestionCardProps {
 	suggestion: any;
@@ -25,14 +26,14 @@ export function SuggestionCard({ suggestion: s, userId, botInfo, selectedProduct
 			exit={{ opacity: 0, scale: 0.95 }}
 			transition={{ duration: 0.25, ease: 'easeOut' }}
 			whileHover={{ y: -2 }}
-			className="flex gap-4 p-4 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
+			className="flex gap-4 p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
 		>
 			<div className="flex flex-col items-center gap-1 justify-center shrink-0">
 				<motion.button
 					whileHover={{ scale: 1.15 }}
 					whileTap={{ scale: 0.85 }}
 					onClick={() => onVote(s.id, 'upvote')}
-					className={`p-2 rounded cursor-pointer ${hasUpvoted ? 'bg-(--accent) text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
+					className={`p-2 rounded-xl cursor-pointer ${hasUpvoted ? 'bg-(--accent) text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
 				>
 					▲
 				</motion.button>
@@ -41,7 +42,7 @@ export function SuggestionCard({ suggestion: s, userId, botInfo, selectedProduct
 					whileHover={{ scale: 1.15 }}
 					whileTap={{ scale: 0.85 }}
 					onClick={() => onVote(s.id, 'downvote')}
-					className={`p-2 rounded cursor-pointer ${hasDownvoted ? 'bg-red-500 text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
+					className={`p-2 rounded-xl cursor-pointer ${hasDownvoted ? 'bg-(--accent-red) text-white' : 'bg-(--foreground)/50 border border-(--border)/10 hover:border-(--accent)/50 transition-colors'}`}
 				>
 					▼
 				</motion.button>
@@ -52,7 +53,7 @@ export function SuggestionCard({ suggestion: s, userId, botInfo, selectedProduct
 					{s.author && (
 						<div className="flex items-center gap-2 shrink-0 bg-(--foreground)/50 border border-(--border)/10 rounded-full pr-3 pl-1 py-1">
 							{s.author.icon ? (
-								<img src={s.author.icon} alt={s.author.name} className="w-6 h-6 rounded-full" />
+								<Image src={s.author.icon} alt={s.author.name} width={24} height={24} unoptimized className="w-6 h-6 rounded-full" />
 							) : (
 								<div className="w-6 h-6 rounded-full bg-(--accent) flex items-center justify-center text-[10px] text-white font-bold">{s.author.name?.charAt(0) || '?'}</div>
 							)}
@@ -64,9 +65,9 @@ export function SuggestionCard({ suggestion: s, userId, botInfo, selectedProduct
 				<button
 					type="button"
 					onClick={() => onSelectProduct(selectedProduct === s.productId ? null : s.productId)}
-					className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
+					className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded-xl border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
 				>
-					{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+					{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}
 					{botInfo ? botInfo.name : s.productId}
 				</button>
 			</div>

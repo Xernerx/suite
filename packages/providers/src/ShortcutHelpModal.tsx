@@ -152,7 +152,12 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 									</div>
 								)}
 
-								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition cursor-pointer">
+								<button
+									type="button"
+									onClick={onClose}
+									aria-label="Close"
+									className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition cursor-pointer"
+								>
 									<X size={18} />
 								</button>
 							</div>
@@ -238,7 +243,7 @@ export function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onC
 									</div>
 								</div>
 
-								<button onClick={onClose} className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
+								<button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
 									<X size={18} />
 								</button>
 							</div>
@@ -258,7 +263,7 @@ export function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onC
 												<span>{t(item.description)}</span>
 											</div>
 
-											<kbd className="rounded-md px-2.5 py-1 text-xs font-mono font-medium bg-(--foreground) text-(--text) border border-(--border)/10 shadow-sm">{item.key}</kbd>
+											<kbd className="rounded-xl px-2.5 py-1 text-xs font-mono font-medium bg-(--foreground) text-(--text) border border-(--border)/10 shadow-sm">{item.key}</kbd>
 										</div>
 									);
 								})}

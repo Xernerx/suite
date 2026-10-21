@@ -77,7 +77,7 @@ export default function Home() {
 			<section className="min-h-[90vh] flex items-center justify-center px-6 py-16 relative">
 				<div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
 					{/* LEFT: TEXT */}
-					<motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
+					<motion.div initial={{ opacity: 1, x: 0 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
 						<h1
 							className="text-6xl lg:text-7xl xl:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
 							style={{ fontFamily: 'var(--font-fredoka)' }}
@@ -130,7 +130,7 @@ export default function Home() {
 									isDragging ? 'border-(--accent) bg-(--accent)/10 scale-[1.01]' : 'border-(--border)/10'
 								}`}
 							>
-								<h4 className="font-bold text-sm text-(--text) uppercase tracking-wider mb-2">{t('cdn.home.directUpload')}</h4>
+								<h2 className="font-bold text-sm text-(--text) uppercase tracking-wider mb-2">{t('cdn.home.directUpload')}</h2>
 								<p className="text-xs text-(--text-muted) mb-4">{t('cdn.home.dropzoneHint')}</p>
 								<div className="flex flex-col items-start gap-4">
 									<input type="file" id="cdn-upload" className="hidden" onChange={handleUpload} disabled={uploading} />
@@ -157,8 +157,9 @@ export default function Home() {
 												}}
 												className="p-1.5 rounded-lg bg-(--background)/60 hover:bg-(--background) text-(--text) transition-colors shrink-0 cursor-pointer"
 												title={t('cdn.view.actions.copyDirectLink')}
+												aria-label={t('cdn.view.actions.copyDirectLink')}
 											>
-												{copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+												{copied ? <Check size={14} className="text-(--accent-green)" /> : <Copy size={14} />}
 											</button>
 										</div>
 									)}
@@ -169,7 +170,7 @@ export default function Home() {
 
 					{/* RIGHT: BANNER VISUAL */}
 					<motion.div
-						initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+						initial={{ opacity: 1, scale: 1, rotate: 0 }}
 						animate={{ opacity: 1, scale: 1, rotate: 0 }}
 						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
 						className="relative flex justify-center items-center w-full"

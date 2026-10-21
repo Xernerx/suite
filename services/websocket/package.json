@@ -1,6 +1,6 @@
 {
 	"name": "websocket",
-	"version": "1.2.22",
+	"version": "1.2.23",
 	"description": "Xernerx Websocket",
 	"main": "dist/main.js",
 	"type": "module",
@@ -16,7 +16,7 @@
 		"@xernerx/terminal": "^1.1.11",
 		"jose": "^6.2.12",
 		"mongoose": "^9.11.2",
-		"next": "^16.4.1",
+		"next": "^16.4.2",
 		"ws": "^8.22.0"
 	},
 	"engines": {

@@ -12,7 +12,7 @@ export type CookiePreferences = {
 };
 
 // This date is automatically bumped by the `suite commit` script
-const COOKIES_VERSION = new Date('2026-10-15T00:00:00Z').getTime();
+const COOKIES_VERSION = new Date('2026-10-21T00:00:00Z').getTime();
 
 const defaultPreferences: CookiePreferences = {
 	essential: true, // Always required

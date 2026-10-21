@@ -32,7 +32,7 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 					}}
 				/>
 			) : (
-				<div className="h-24 w-full bg-gradient-to-br from-(--accent)/40 to-purple-500/40 opacity-50" />
+				<div className="h-24 w-full bg-gradient-to-br from-(--accent)/40 to-(--accent)/40 opacity-50" />
 			)}
 
 			<div className="absolute top-12 left-4 rounded-full border-4 border-(--background) bg-(--background) overflow-hidden h-20 w-20 shadow-md">
@@ -86,7 +86,7 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/30 transition-all text-left group cursor-pointer"
 						>
 							<div className="flex items-center gap-1.5 truncate">
-								<div className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+								<div className="w-1.5 h-1.5 rounded-full bg-(--accent-green) shrink-0" />
 								<span className="truncate">{fullUser.email}</span>
 							</div>
 							<Copy size={14} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />

@@ -1,7 +1,7 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.1.10",
+	"version": "2.2.0",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
@@ -18,7 +18,7 @@
 		"electron-updater": "^6.8.9"
 	},
 	"devDependencies": {
-		"electron": "44.7.2",
+		"electron": "44.9.0",
 		"electron-builder": "^26.15.3",
 		"typescript": "^6.0.3"
 	},

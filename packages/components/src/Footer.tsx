@@ -46,18 +46,14 @@ export function Footer() {
 
 						<p className="max-w-md leading-7 text-(--text-muted)">{t('common.footer.tagline')}</p>
 
-						<Link
-							suppressHydrationWarning
-							href={resolveUrl('https://info.xernerx.com/status')}
-							className="mt-1 inline-flex items-center gap-2 rounded-full border border-(--border)/15 bg-(--foreground)/40 px-3 py-1 text-xs font-medium text-(--text-muted) transition-colors hover:border-(--accent)/40 hover:text-(--text)"
-						>
+						<div className="mt-1 inline-flex items-center gap-2 rounded-full border border-(--border)/15 bg-(--foreground)/40 px-3 py-1 text-xs font-medium text-(--text-muted)">
 							<span
 								className={`h-2 w-2 rounded-full ${
-									systemOnline === null ? 'bg-(--text-muted) animate-pulse' : systemOnline ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-amber-400'
+									systemOnline === null ? 'bg-(--text-muted) animate-pulse' : systemOnline ? 'bg-(--accent-green) shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-(--accent-orange)'
 								}`}
 							/>
 							<span>{systemOnline === false ? t('common.footer.links.statusDegraded') : t('common.footer.links.statusOperational')}</span>
-						</Link>
+						</div>
 					</div>
 
 					<div className="text-sm text-(--text-muted)">
@@ -94,7 +90,7 @@ export function Footer() {
 					<FooterLink href="https://github.com/xernerx" icon={BsGithub} label={t('common.footer.links.github')} />
 					<FooterLink href="https://www.npmjs.com/package/xernerx" icon={Package} label={t('common.footer.links.npm')} />
 					<FooterLink href={resolveUrl('https://docs.xernerx.com')} icon={BookOpen} label={t('common.footer.links.documentation')} external={false} />
-					<FooterLink href="/support" icon={MessageCircle} label={t('common.footer.links.discord')} />
+					<FooterLink href="https://discord.gg/yrm8gqTuXa" icon={MessageCircle} label={t('common.footer.links.discord')} />
 				</FooterSection>
 			</div>
 		</motion.footer>

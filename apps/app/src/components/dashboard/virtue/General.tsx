@@ -118,7 +118,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Failed to update Virtue settings');
+				throw new Error(errData.error || t('app.dashboard.virtue.toast.saveError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to save Virtue settings:', err);
@@ -150,7 +150,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 				<h3 className="text-xl font-extrabold text-(--text) mb-2">{t('app.dashboard.virtue.notAdded')}</h3>
 				<p className="text-sm text-(--text-muted) mb-6 max-w-md">{t('app.dashboard.virtue.notAddedDesc')}</p>
 				<a
-					href={getEnvUrl('https://xernerx.com/invites/virtue')}
+					href={getEnvUrl('https://www.xernerx.com/invites/virtue')}
 					target="_blank"
 					rel="noopener noreferrer"
 					className="inline-flex items-center justify-center gap-2 rounded-2xl bg-(--accent) text-white font-bold text-sm px-6 py-3 shadow-lg shadow-(--accent)/20 hover:opacity-90 transition-all hover:scale-[1.02]"

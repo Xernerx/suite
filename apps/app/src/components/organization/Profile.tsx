@@ -64,7 +64,7 @@ export default function Profile({ organization, bots, servers }: { organization:
 								<h2 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{t('app.organization.profile.publishedBots')}
 								</h2>
-								<span className="bg-(--accent)/10 text-(--accent) text-xs font-bold px-2 py-1 rounded-md">{bots.length}</span>
+								<span className="bg-(--accent)/10 text-(--accent) text-xs font-bold px-2 py-1 rounded-xl">{bots.length}</span>
 							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								{bots.map((bot) => {
@@ -99,7 +99,7 @@ export default function Profile({ organization, bots, servers }: { organization:
 														<h3 className="font-bold text-lg text-(--text) truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>
 															{bot.discord?.global_name || bot.discord?.username || bot.name || t('common.unknownBot')}
 														</h3>
-														{bot.verified && <ShieldCheck className="w-4 h-4 text-green-500 flex-shrink-0" />}
+														{bot.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) flex-shrink-0" />}
 													</div>
 													<div className="flex items-center gap-2 text-xs text-(--text-muted) mt-0.5">
 														<span className="flex items-center gap-1">
@@ -126,7 +126,7 @@ export default function Profile({ organization, bots, servers }: { organization:
 								<h2 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{t('app.organization.profile.officialServers')}
 								</h2>
-								<span className="bg-(--accent)/10 text-(--accent) text-xs font-bold px-2 py-1 rounded-md">{servers.length}</span>
+								<span className="bg-(--accent)/10 text-(--accent) text-xs font-bold px-2 py-1 rounded-xl">{servers.length}</span>
 							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								{servers.map((server) => {

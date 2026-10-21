@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
 		rules: {
 			userAgent: '*',
 			allow: '/',
-			disallow: ['/api/'],
+			disallow: ['/api/', '/bugs'],
 		},
 		sitemap: 'https://info.xernerx.com/sitemap.xml',
 	};

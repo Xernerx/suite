@@ -7,6 +7,20 @@ const nextConfig: NextConfig = {
 	outputFileTracingIncludes: {
 		'/changelog': ['../../apps/*/CHANGELOG.md'],
 	},
+	async redirects() {
+		return [
+			{
+				source: '/bugs',
+				destination: '/issues',
+				permanent: false,
+			},
+			{
+				source: '/help',
+				destination: '/faq',
+				permanent: false,
+			},
+		];
+	},
 };
 
 export default withXernerxConfig(nextConfig);

@@ -2,6 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useDictionary } from '@xernerx/providers';
 import RoadmapActionBar from './RoadmapActionBar';
 
@@ -50,7 +51,7 @@ export default function MobileRoadmapTimeline({
 							>
 								{quarter === currentQuarterStr && (
 									<div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-										<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded shadow-lg">
+										<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded-xl shadow-lg">
 											{t('info.roadmap.timeline.today')}
 										</span>
 										<div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-(--accent) mt-0.5"></div>
@@ -69,14 +70,20 @@ export default function MobileRoadmapTimeline({
 								const prodBotInfo = resolveBot(pItems[0] || prod);
 
 								return (
-									<div key={prod} className="flex flex-col gap-4 relative border-l-2 pl-6" style={{ borderColor: `${color}66` }}>
+									<div key={prod} className="flex flex-col gap-4 relative border-l-2 pl-6" style={{ borderColor: `color-mix(in srgb, ${color} 40%, transparent)` }}>
 										<div className="absolute top-0 -left-[3px] w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
 										<span
 											onClick={() => setSelectedProduct(selectedProduct === prod ? null : prod)}
-											className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-md w-fit cursor-pointer hover:brightness-150 transition-all"
-											style={{ color: color, backgroundColor: `${color}1A`, border: `1px solid ${color}33` }}
+											className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-xl w-fit cursor-pointer hover:brightness-150 transition-all"
+											style={{
+												color: color,
+												backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
+												border: `1px solid color-mix(in srgb, ${color} 20%, transparent)`,
+											}}
 										>
-											{prodBotInfo?.avatarUrl && <img src={prodBotInfo.avatarUrl} alt={prodBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+											{prodBotInfo?.avatarUrl && (
+												<Image src={prodBotInfo.avatarUrl} alt={prodBotInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
+											)}
 											{prodBotInfo ? prodBotInfo.name : prod}
 										</span>
 										{pItems.map((item: any) => (
@@ -88,7 +95,7 @@ export default function MobileRoadmapTimeline({
 												<div className="absolute top-0 left-0 w-1 h-full opacity-60" style={{ backgroundColor: color }}></div>
 												<div className="flex justify-between items-start mb-2">
 													<div className="flex items-center gap-2">
-														<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-gray-500'}`}></span>
+														<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-(--text-muted)'}`}></span>
 														<span className="text-xs uppercase font-bold text-(--text-muted)">{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}</span>
 													</div>
 												</div>

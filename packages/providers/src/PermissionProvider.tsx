@@ -2,6 +2,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useDictionary } from './DictionaryProvider';
 import { useEnvironment } from './EnvironmentProvider';
 import { useUser } from './UserProvider';
 import { useToast } from './ToastProvider';
@@ -19,6 +20,7 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 	const { user, loading: userLoading } = useUser() as { user: any; loading: boolean };
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
+	const { t } = useDictionary();
 
 	const [rolePermissions, setRolePermissions] = useState<Record<string, boolean>>({});
 	const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 				setRolePermissions(mergedPermissions);
 			} catch (err: any) {
 				if (!cancelled) {
-					toast({ type: 'error', title: 'Failed to fetch permissions', description: err?.message || 'Unknown error' });
+					toast({ type: 'error', title: t('common.permissionprovider.fetchFailed'), description: err?.message || t('common.toast.error') });
 				}
 			} finally {
 				if (!cancelled) setLoading(false);

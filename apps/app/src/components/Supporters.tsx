@@ -90,9 +90,9 @@ export default function Supporters() {
 								className="flex items-center rounded-xl border cursor-pointer relative"
 								style={{
 									borderColor: isMe ? 'var(--accent)' : 'var(--border)',
-									background: 'var(--bg-main)',
+									background: 'var(--foreground)',
 									padding: '6px 8px',
-									boxShadow: isMe ? '0 0 0 2px var(--accent-hover)' : 'none',
+									boxShadow: isMe ? '0 0 0 2px var(--hover-accent)' : 'none',
 								}}
 							>
 								{/* avatar */}
@@ -101,8 +101,15 @@ export default function Supporters() {
 									<span
 										className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2"
 										style={{
-											borderColor: 'var(--bg-main)',
-											background: s.status === 'online' ? 'rgb(34,197,94)' : s.status === 'idle' ? 'rgb(234,179,8)' : s.status === 'dnd' ? 'rgb(239,68,68)' : 'rgb(148,163,184)',
+											borderColor: 'var(--foreground)',
+											background:
+												s.status === 'online'
+													? 'var(--accent-green)'
+													: s.status === 'idle'
+														? 'var(--accent-orange)'
+														: s.status === 'dnd'
+															? 'var(--accent-red)'
+															: 'var(--text-muted)',
 										}}
 									/>
 								</div>
@@ -112,7 +119,7 @@ export default function Supporters() {
 									<span
 										className="text-sm whitespace-nowrap"
 										style={{
-											color: 'var(--text-main)',
+											color: 'var(--text)',
 											paddingLeft: 8,
 											paddingRight: 8,
 										}}
@@ -128,9 +135,9 @@ export default function Supporters() {
 											initial={{ opacity: 0, y: -10, scale: 0.8 }}
 											animate={{ opacity: 1, y: -20, scale: 1 }}
 											exit={{ opacity: 0 }}
-											className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs px-2 py-1 rounded-md shadow"
+											className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs px-2 py-1 rounded-xl shadow"
 											style={{
-												background: 'var(--bg-main)',
+												background: 'var(--foreground)',
 												border: '1px solid var(--border)',
 											}}
 										>

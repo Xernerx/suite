@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 		if (!res.ok) {
 			return {
-				title: 'Bot Not Found',
-				description: 'This bot is private or does not exist on Xernerx Studios.',
+				title: 'Discord Bot Not Found',
+				description: 'This Discord bot profile is private or does not exist on the Xernerx Studios ecosystem directory. Explore public bots and commands.',
+				alternates: { canonical: `/bots/${id}` },
+				robots: { index: false, follow: false },
 			};
 		}
 
@@ -45,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		return {
 			title,
 			description: ogDescription,
+			alternates: { canonical: `/bots/${id}` },
 			openGraph: {
 				siteName: 'Xernerx Studios',
 				type: 'website',
@@ -69,8 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		};
 	} catch {
 		return {
-			title: 'Discord Bot Profile',
-			description: 'View Discord bot statistics, commands, and reviews on Xernerx Studios.',
+			title: 'Discord Bot Profile & Commands',
+			description: 'View Discord bot statistics, slash commands, server count metrics, and community reviews on the Xernerx Studios bot directory.',
+			alternates: { canonical: `/bots/${id}` },
 		};
 	}
 }

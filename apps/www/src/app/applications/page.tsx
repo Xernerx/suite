@@ -48,7 +48,7 @@ export default function ApplicationsPage() {
 				if (json.success) {
 					setApplications(json.data);
 				} else {
-					throw new Error(json.error || 'Unknown error');
+					throw new Error(json.error || t('www.applications.errorLoad'));
 				}
 			} catch (err) {
 				console.warn(err);
@@ -75,17 +75,21 @@ export default function ApplicationsPage() {
 					<Loader2 className="w-8 h-8 animate-spin text-(--accent)" />
 				</div>
 			) : error ? (
-				<motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-500/10 border border-red-500/20 text-red-400 p-6 rounded-2xl backdrop-blur-md">
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					className="bg-(--accent-red)/10 border border-(--accent-red)/20 text-(--accent-red) p-6 rounded-2xl backdrop-blur-md"
+				>
 					{error}
 				</motion.div>
 			) : applications.length === 0 ? (
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
-					className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-neutral-500/20 rounded-3xl bg-neutral-500/5 backdrop-blur-xl"
+					className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-(--border)/20 rounded-3xl bg-(--text-muted)/5 backdrop-blur-xl"
 				>
 					<Briefcase className="w-12 h-12 text-(--text-muted) mb-4 opacity-50" />
-					<h3 className="text-2xl font-bold mb-2">{t('www.applications.noRoles')}</h3>
+					<h2 className="text-2xl font-bold mb-2">{t('www.applications.noRoles')}</h2>
 					<p className="text-(--text-muted) max-w-sm">{t('www.applications.noRolesDesc')}</p>
 				</motion.div>
 			) : (
@@ -96,14 +100,14 @@ export default function ApplicationsPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: i * 0.1, duration: 0.4 }}
 							key={app.id}
-							className="flex flex-col p-6 rounded-3xl border border-neutral-500/10 bg-neutral-500/5 backdrop-blur-2xl hover:bg-neutral-500/10 hover:border-(--accent)/50 transition-all duration-300 group shadow-lg shadow-black/5"
+							className="flex flex-col p-6 rounded-3xl border border-(--border)/10 bg-(--text-muted)/5 backdrop-blur-2xl hover:bg-(--text-muted)/10 hover:border-(--accent)/50 transition-all duration-300 group shadow-lg shadow-black/5"
 						>
 							<div className="flex items-start justify-between mb-4">
 								<div className="flex items-center justify-center w-12 h-12 rounded-full bg-(--accent)/20 text-(--accent)">
 									<Briefcase className="w-6 h-6" />
 								</div>
 							</div>
-							<h3 className="text-2xl font-bold mb-3 group-hover:text-(--accent) transition-colors">{app.name}</h3>
+							<h2 className="text-2xl font-bold mb-3 group-hover:text-(--accent) transition-colors">{app.name}</h2>
 							<p className="text-(--text-muted) mb-6 line-clamp-2 leading-relaxed">{app.description || t('www.applications.noDesc')}</p>
 
 							<div className="flex flex-col gap-5 mb-8 flex-grow">
@@ -129,7 +133,7 @@ export default function ApplicationsPage() {
 										<ul className="text-sm text-(--text-muted) flex flex-col gap-1.5">
 											{app.benefits.slice(0, 3).map((ben, idx) => (
 												<li key={idx} className="flex items-start gap-2">
-													<span className="text-emerald-400 mt-[2px] opacity-80">✓</span>
+													<span className="text-(--accent-green) mt-[2px] opacity-80">✓</span>
 													<span className="leading-snug line-clamp-2">{ben}</span>
 												</li>
 											))}
@@ -144,7 +148,7 @@ export default function ApplicationsPage() {
 							{app.requireLogin !== false && !user ? (
 								<Link
 									href={`${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + `/applications/${app.id}` : '')}`}
-									className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-indigo-500 text-white font-semibold shadow-md shadow-indigo-500/20 hover:opacity-90 hover:shadow-lg hover:shadow-indigo-500/30 transition-all active:scale-[0.98] group"
+									className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-(--accent) text-white font-semibold shadow-md shadow-(--accent)/20 hover:opacity-90 hover:shadow-lg hover:shadow-(--accent)/30 transition-all active:scale-[0.98] group"
 								>
 									{t('www.applications.loginApply')}
 									<LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

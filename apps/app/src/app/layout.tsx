@@ -78,7 +78,7 @@ export default async function RootLayout({
 	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict} initialEnvironment={initialEnv} enableAds>

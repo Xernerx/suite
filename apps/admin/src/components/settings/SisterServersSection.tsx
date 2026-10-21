@@ -75,7 +75,7 @@ export function SisterServersSection({ sisterServers, setSisterServers, userGuil
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="text-(--error)"
+						className="text-(--accent-red)"
 						onClick={() => {
 							const newServers = sisterServers.filter((_, i) => i !== idx);
 							setSisterServers(newServers);

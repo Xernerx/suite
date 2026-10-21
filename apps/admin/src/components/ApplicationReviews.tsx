@@ -2,6 +2,7 @@
 'use client';
 
 import { Check, Clock, Copy, ExternalLink, FileText, Loader2, ShieldAlert, User } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { useEnvironment, useToast, useUser } from '@xernerx/providers';
 import { useDictionary } from '@xernerx/providers';
@@ -134,7 +135,7 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 
 			if (!res.ok) {
 				const errData = await res.json();
-				throw new Error(errData.error || 'Failed to update application');
+				throw new Error(errData.error || t('common.toast.error'));
 			}
 
 			// Fire a generic notification if the user isn't anonymous
@@ -187,11 +188,19 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 	const getStatusBadge = (status: string) => {
 		switch (status) {
 			case 'approved':
-				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 uppercase">{t('admin.reviews.status.approved')}</span>;
+				return (
+					<span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-(--accent-green)/10 text-(--accent-green) uppercase">
+						{t('admin.reviews.status.approved')}
+					</span>
+				);
 			case 'denied':
-				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 uppercase">{t('admin.reviews.status.denied')}</span>;
+				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-(--accent-red)/10 text-(--accent-red) uppercase">{t('admin.reviews.status.denied')}</span>;
 			default:
-				return <span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 uppercase">{t('admin.reviews.status.pending')}</span>;
+				return (
+					<span className="text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full bg-(--accent-orange)/10 text-(--accent-orange) uppercase">
+						{t('admin.reviews.status.pending')}
+					</span>
+				);
 		}
 	};
 
@@ -285,7 +294,7 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 										{app.ownerId === 'anonymous' ? (
 											<User className="w-5 h-5 text-(--text-muted)" />
 										) : applicant?.icon ? (
-											<img src={applicant.icon} alt="Avatar" className="w-full h-full object-cover" />
+											<Image src={applicant.icon} alt="Avatar" width={40} height={40} unoptimized className="w-full h-full object-cover" />
 										) : (
 											<User className="w-5 h-5 text-(--text-muted)" />
 										)}
@@ -312,12 +321,12 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 							<div className="flex items-center justify-between mt-auto pt-4 border-t border-(--border)/10">
 								{getStatusBadge(app.status)}
 								{app.status === 'pending' ? (
-									<span className="flex items-center gap-1.5 text-xs font-medium text-amber-500 bg-amber-500/10 px-2 py-1 rounded-full">
+									<span className="flex items-center gap-1.5 text-xs font-medium text-(--accent-orange) bg-(--accent-orange)/10 px-2 py-1 rounded-full">
 										<Clock className="w-3 h-3" /> {t('admin.dashboard.applicationReviews.needsReview')}
 									</span>
 								) : (
 									<span className="flex items-center gap-1 text-xs text-(--text-muted)">
-										<Check className="w-3 h-3 text-emerald-500" /> {t('admin.dashboard.applicationReviews.reviewed')}
+										<Check className="w-3 h-3 text-(--accent-green)" /> {t('admin.dashboard.applicationReviews.reviewed')}
 									</span>
 								)}
 							</div>
@@ -368,7 +377,7 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 										navigator.clipboard.writeText(selectedApp.ownerId);
 										toast({ title: t('admin.dashboard.suggestions.idCopied'), type: 'success' });
 									}}
-									className="p-1.5 rounded-md text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer"
+									className="p-1.5 rounded-xl text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer"
 								>
 									<Copy size={12} />
 								</button>
@@ -381,7 +390,7 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 							</h3>
 
 							{!appConfigs[selectedApp.targetId] ? (
-								<p className="text-sm text-red-400 italic">{t('admin.dashboard.applicationReviews.errorConfigNotFound')}</p>
+								<p className="text-sm text-(--accent-red) italic">{t('admin.dashboard.applicationReviews.errorConfigNotFound')}</p>
 							) : (
 								appConfigs[selectedApp.targetId].questions?.map((q, idx) => (
 									<div key={q.id} className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">

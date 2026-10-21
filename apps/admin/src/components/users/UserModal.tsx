@@ -435,7 +435,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									<button
 										type="button"
 										onClick={() => setConfirmDeleteOpen(true)}
-										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
+										className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-(--accent-red)/10 hover:bg-(--accent-red)/20 text-(--accent-red) text-xs font-medium transition-colors"
 									>
 										<Trash2 size={14} />
 										{t('admin.users.deleteButton')}

@@ -7,6 +7,7 @@ import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from 
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import PersonalWorkspace from '@/components/portal/PersonalWorkspace';
 import OrgWorkspaceHeader from '@/components/portal/OrgWorkspaceHeader';
@@ -227,8 +228,8 @@ export default function PortalPage() {
 				},
 				category: t('app.portal.categories.organizations'),
 				icon: org.iconUrl
-					? () => <img src={getEnvUrl(org.iconUrl as string)} alt={org.name} className="w-5 h-5 rounded-md object-cover" />
-					: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
+					? () => <Image src={getEnvUrl(org.iconUrl as string)} alt={org.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-xl object-cover" />
+					: () => <div className="w-5 h-5 rounded-xl bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
 				view: `org-${org._id}`,
 			})),
 			{
@@ -247,9 +248,27 @@ export default function PortalPage() {
 					href: `/portal/bots/${bot.id}`,
 					category: t('common.nav.categories.bots'),
 					icon: bot.discord?.avatar
-						? () => <img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=64`} alt={bot.name || bot.id} className="w-5 h-5 rounded-md object-cover" />
+						? () => (
+								<Image
+									src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=64`}
+									alt={bot.name || bot.id}
+									width={20}
+									height={20}
+									unoptimized
+									className="w-5 h-5 rounded-xl object-cover"
+								/>
+							)
 						: bot.avatar
-							? () => <img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64`} alt={bot.name || bot.id} className="w-5 h-5 rounded-md object-cover" />
+							? () => (
+									<Image
+										src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64`}
+										alt={bot.name || bot.id}
+										width={20}
+										height={20}
+										unoptimized
+										className="w-5 h-5 rounded-xl object-cover"
+									/>
+								)
 							: (Bot as any),
 				});
 			});

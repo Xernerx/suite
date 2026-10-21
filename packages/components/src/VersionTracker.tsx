@@ -2,12 +2,13 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useEnvironment, useSession, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
 
 export function VersionTracker() {
 	const { data: session } = useSession();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
+	const { t } = useDictionary();
 	const hasChecked = useRef(false);
 
 	useEffect(() => {
@@ -40,10 +41,13 @@ export function VersionTracker() {
 				// Only prompt if there is a previously seen version AND it differs
 				if (lastSeenVersion && lastSeenVersion !== currentVersion) {
 					toast({
-						title: `App Updated!`,
-						description: `Xernerx ${appName.charAt(0).toUpperCase() + appName.slice(1)} has been updated to v${currentVersion}. Want to see what's new?`,
+						title: t('components.versionTracker.title'),
+						description: t('components.versionTracker.description', {
+							app: appName.charAt(0).toUpperCase() + appName.slice(1),
+							version: currentVersion,
+						}),
 						action: {
-							label: 'View Changelog',
+							label: t('components.versionTracker.viewChangelog'),
 							onClick: () => {
 								window.location.href = getEnvUrl('https://info.xernerx.com/changelog');
 							},

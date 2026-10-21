@@ -30,7 +30,7 @@ export function TranslationNewTab({ missingKeys, newIndex, setNewIndex, sourceDi
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				<div className="flex items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500 w-16 h-16">
+				<div className="flex items-center justify-center rounded-full bg-(--accent-green)/10 text-(--accent-green) w-16 h-16">
 					<Check size={32} />
 				</div>
 				<div className="flex flex-col gap-1">

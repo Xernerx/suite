@@ -56,7 +56,7 @@ export function BotRow({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPre
 		fetchData();
 	}, [bot.id, getEnvUrl]);
 
-	const name = discord?.global_name || discord?.username || 'Unknown Bot';
+	const name = discord?.global_name || discord?.username || t('components.cards.botcard.unknownBot');
 	const avatar = discord?.avatarUrl;
 
 	return (

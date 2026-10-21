@@ -40,13 +40,13 @@ export default function Overview() {
 		entries: { version: string; date?: string; content: string }[];
 	}>({ open: false, title: '', loading: false, entries: [] });
 
-	const [incidentModal, setIncidentModal] = useState({
+	const [incidentModal, setIncidentModal] = useState(() => ({
 		open: false,
-		title: 'Scheduled Maintenance / Service Incident',
-		content: 'We are currently investigating elevated latency on select services. Track live updates on the System Status page.',
+		title: t('admin.dashboard.overview.incidentDefaultTitle'),
+		content: t('admin.dashboard.overview.incidentDefaultContent'),
 		severity: 'warning',
 		submitting: false,
-	});
+	}));
 
 	useEffect(() => {
 		try {
@@ -63,7 +63,7 @@ export default function Overview() {
 				const res = await fetch(endpoint, { credentials: 'include', cache: 'no-store' });
 				const payload = await res.json().catch(() => null);
 				if (!res.ok || !payload?.data) {
-					throw new Error(payload?.error || 'Audit unavailable for this URL');
+					throw new Error(payload?.error || t('admin.dashboard.overview.auditUnavailable'));
 				}
 				const entry: LighthouseScoreData = payload.data;
 				setLighthouseScores((prev) => {
@@ -270,7 +270,7 @@ export default function Overview() {
 						<span>{t('admin.dashboard.overview.auditAllCanary')}</span>
 					</Button>
 					<Button variant="secondary" onClick={() => setIncidentModal((prev) => ({ ...prev, open: true }))} className="inline-flex items-center gap-2">
-						<Megaphone size={15} className="text-amber-400" />
+						<Megaphone size={15} className="text-(--accent-orange)" />
 						<span>{t('admin.dashboard.overview.declareIncident')}</span>
 					</Button>
 					<Button onClick={() => fetchOverviewData(true)} disabled={refreshing} className="inline-flex items-center gap-2">
@@ -401,10 +401,10 @@ export default function Overview() {
 							value={incidentModal.severity}
 							onChange={(val: string) => setIncidentModal((prev) => ({ ...prev, severity: val }))}
 							options={[
-								{ value: 'warning', label: 'Warning / Degraded Performance' },
-								{ value: 'error', label: 'Critical Outage' },
-								{ value: 'info', label: 'Scheduled Maintenance' },
-								{ value: 'success', label: 'Resolved / All Clear' },
+								{ value: 'warning', label: t('admin.dashboard.overview.severityWarning') },
+								{ value: 'error', label: t('admin.dashboard.overview.severityError') },
+								{ value: 'info', label: t('admin.dashboard.overview.severityInfo') },
+								{ value: 'success', label: t('admin.dashboard.overview.severitySuccess') },
 							]}
 						/>
 					</div>
@@ -441,7 +441,7 @@ export default function Overview() {
 										toast({ type: 'success', title: t('admin.dashboard.overview.incidentBroadcastSuccess') });
 										setIncidentModal((prev) => ({ ...prev, open: false, submitting: false }));
 									} else {
-										throw new Error('Failed to broadcast status alert');
+										throw new Error(t('admin.dashboard.overview.incidentBroadcastFailed'));
 									}
 								} catch (err: any) {
 									toast({ type: 'error', title: err.message });

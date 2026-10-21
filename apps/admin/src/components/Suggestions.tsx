@@ -1,5 +1,6 @@
 /** @format */
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
@@ -216,19 +217,21 @@ export default function Suggestions({ initialSearch = '' }: { initialSearch?: st
 						>
 							<div>
 								<div className="font-bold flex flex-wrap gap-2 items-center">
-									<span className="bg-(--foreground)/50 px-2 py-1 rounded text-xs border border-(--border)/10 font-mono">
+									<span className="bg-(--foreground)/50 px-2 py-1 rounded-xl text-xs border border-(--border)/10 font-mono">
 										{t('admin.dashboard.suggestions.votes')}: {netVotes}
 									</span>
 									{item.title}
 								</div>
 								<div className="text-sm text-(--text-muted) mb-2 mt-2">{item.description}</div>
 								<div className="flex flex-wrap items-center gap-2 mt-2">
-									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded border border-(--accent)/20">
-										{resolvedBot?.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
+									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded-xl border border-(--accent)/20">
+										{resolvedBot?.avatarUrl && (
+											<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
+										)}
 										{resolvedBot ? resolvedBot.name : item.productId}
 									</div>
 									{authorId && /^\d{17,20}$/.test(String(authorId)) && (
-										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded border border-(--border)/10 font-mono">
+										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded-xl border border-(--border)/10 font-mono">
 											<a
 												href={`${getEnvUrl('https://app.xernerx.com')}/users/${authorId}`}
 												target="_blank"
@@ -248,7 +251,7 @@ export default function Suggestions({ initialSearch = '' }: { initialSearch?: st
 												}}
 												className="hover:text-(--text) transition-colors cursor-pointer"
 											>
-												{copiedId === item.id ? <Check size={11} className="text-green-500" /> : <Copy size={11} />}
+												{copiedId === item.id ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
 											</button>
 										</div>
 									)}

@@ -52,7 +52,7 @@ export default function CancelSubscriptionPage() {
 				className="flex flex-col items-center text-center max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_10%,transparent)]"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 			>
-				<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-red-500">
+				<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-(--accent-red)/10 text-(--accent-red)">
 					<ShieldAlert size={32} />
 				</div>
 
@@ -61,13 +61,13 @@ export default function CancelSubscriptionPage() {
 						{t('account.store.cancel.title')}
 					</h1>
 					{success ? (
-						<p className="text-sm text-emerald-500 font-medium">{t('account.store.cancel.successMessage')}</p>
+						<p className="text-sm text-(--accent-green) font-medium">{t('account.store.cancel.successMessage')}</p>
 					) : (
 						<p className="text-sm text-(--text-muted)">{t('account.store.cancel.description')}</p>
 					)}
 				</div>
 
-				{error && <div className="w-full p-3 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-medium text-center">{error}</div>}
+				{error && <div className="w-full p-3 rounded-2xl bg-(--accent-red)/10 border border-(--accent-red)/20 text-(--accent-red) text-xs font-medium text-center">{error}</div>}
 
 				{!success && (
 					<div className="flex items-center justify-center gap-3 w-full pt-1">

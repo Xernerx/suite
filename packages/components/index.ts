@@ -11,3 +11,8 @@ export * from './src/cards/BotCard';
 export * from './src/cards/BotRow';
 export * from './src/AdBanner';
 export * from './src/VersionTracker';
+export * from './src/WidgetSettingsCard';
+export * from './src/MediaManager';
+export * from './src/tokens/types';
+export * from './src/tokens/BotProfilePreview';
+export * from './src/tokens/AsyncUserMultiSelector';

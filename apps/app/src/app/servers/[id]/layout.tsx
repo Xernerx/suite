@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 		if (!res.ok) {
 			return {
-				title: 'Server Not Found',
-				description: 'This Discord server is private or does not exist on Xernerx Studios.',
+				title: 'Discord Server Not Found',
+				description: 'This Discord server profile is private or does not exist on the Xernerx Studios community directory. Explore public Discord servers.',
+				alternates: { canonical: `/servers/${id}` },
+				robots: { index: false, follow: false },
 			};
 		}
 
@@ -45,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		return {
 			title,
 			description: ogDescription,
+			alternates: { canonical: `/servers/${id}` },
 			openGraph: {
 				siteName: 'Xernerx Studios',
 				type: 'website',
@@ -69,8 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		};
 	} catch {
 		return {
-			title: 'Discord Server Profile',
-			description: 'View Discord server statistics, community details, and invite links on Xernerx Studios.',
+			title: 'Discord Server Profile & Community',
+			description: 'View Discord server member statistics, activity metrics, community information, and invite links on the Xernerx Studios directory.',
+			alternates: { canonical: `/servers/${id}` },
 		};
 	}
 }

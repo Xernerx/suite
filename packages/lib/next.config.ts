@@ -39,6 +39,16 @@ export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 					destination: 'https://discord.gg/yrm8gqTuXa',
 					permanent: false,
 				},
+				{
+					source: '/github',
+					destination: 'https://github.com/xernerx',
+					permanent: false,
+				},
+				{
+					source: '/npm',
+					destination: 'https://www.npmjs.com/package/xernerx',
+					permanent: false,
+				},
 			];
 		},
 		reactCompiler: appConfig.reactCompiler ?? true,
@@ -75,6 +85,6 @@ export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 			},
 			...appConfig.turbopack,
 		},
-		transpilePackages: ['@xernerx/styles', '@xernerx/components', '@xernerx/ui', '@xernerx/providers', ...(appConfig.transpilePackages || [])],
+		transpilePackages: ['@xernerx/styles', '@xernerx/components', '@xernerx/ui', '@xernerx/providers', '@xernerx/lib', ...(appConfig.transpilePackages || [])],
 	};
 }

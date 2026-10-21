@@ -22,8 +22,10 @@ export interface MultiSelectorProps {
 	searchable?: boolean;
 	searchPlaceholder?: string;
 }
-export function MultiSelector({ value, options, onChange, placeholder = 'Select', className, toggleClassName, label, searchable = true, searchPlaceholder = 'Search...' }: MultiSelectorProps) {
+export function MultiSelector({ value, options, onChange, placeholder, className, toggleClassName, label, searchable = true, searchPlaceholder }: MultiSelectorProps) {
 	const { t } = useDictionary();
+	const resolvedPlaceholder = placeholder ?? t('common.multiselector.defaultPlaceholder');
+	const resolvedSearchPlaceholder = searchPlaceholder ?? t('common.multiselector.searchPlaceholder');
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
 	const ref = useRef<HTMLDivElement>(null);
@@ -67,9 +69,9 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 		onChange([...value, option]);
 	}
 	function displayValue() {
-		if (!value.length) return placeholder;
+		if (!value.length) return resolvedPlaceholder;
 		if (value.length === 1) {
-			return options.find((x) => x.value === value[0])?.label ?? placeholder;
+			return options.find((x) => x.value === value[0])?.label ?? resolvedPlaceholder;
 		}
 		if (value.length === 2) {
 			return value
@@ -77,7 +79,7 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 				.filter(Boolean)
 				.join(', ');
 		}
-		return `${value.length} selected`;
+		return t('common.multiselector.selectedCount', { count: value.length });
 	}
 	const filteredOptions = options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()));
 	return (
@@ -98,7 +100,7 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 								return (
 									<div
 										key={selectedValue}
-										className="size-3.5 rounded-full border border-white/20 shrink-0 shadow-sm"
+										className="size-3.5 rounded-full border border-(--border)/20 shrink-0 shadow-sm"
 										style={{
 											background: option?.color ?? 'var(--accent)',
 										}}
@@ -133,7 +135,7 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 							duration: 0.15,
 							ease: 'easeOut',
 						}}
-						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl p-2`}
+						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl p-2`}
 					>
 						<div className="flex flex-col gap-1">
 							{searchable && (
@@ -142,10 +144,10 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 									<input
 										ref={inputRef}
 										type="text"
-										placeholder={searchPlaceholder}
+										placeholder={resolvedSearchPlaceholder}
 										value={query}
 										onChange={(e) => setQuery(e.target.value)}
-										className="w-full rounded-lg bg-(--background)/50 px-8 py-2 text-sm text-(--text) placeholder:text-(--text-muted) border border-(--border)/5 focus:border-(--accent)/50 focus:outline-none transition-colors"
+										className="w-full rounded-xl bg-(--background)/50 px-8 py-2 text-sm text-(--text) placeholder:text-(--text-muted) border border-(--border)/5 focus:border-(--accent)/50 focus:outline-none transition-colors"
 									/>
 								</div>
 							)}
@@ -163,7 +165,7 @@ export function MultiSelector({ value, options, onChange, placeholder = 'Select'
 										>
 											<div className="flex items-center gap-3">
 												<div
-													className="size-2.5 rounded-full shadow-inner border border-white/20 shrink-0"
+													className="size-2.5 rounded-full shadow-inner border border-(--border)/20 shrink-0"
 													style={{
 														background: option.color ?? 'var(--accent)',
 													}}

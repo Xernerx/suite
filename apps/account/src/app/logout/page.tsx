@@ -28,7 +28,7 @@ export default function SignOutPage() {
 		<div className="flex h-full min-h-screen items-center justify-center" style={{ padding: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			<AnimatePresence>
 				<motion.div
-					initial={{ opacity: 0, scale: 0.96, y: 12 }}
+					initial={{ opacity: 1, scale: 1, y: 0 }}
 					animate={{ opacity: 1, scale: 1, y: 0 }}
 					transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
 					className="flex w-full max-w-sm flex-col items-center text-center rounded-3xl border border-(--border)/10 bg-(--foreground) shadow-2xl"
@@ -41,7 +41,7 @@ export default function SignOutPage() {
 
 					{/* TEXT CONTENT */}
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-xl font-semibold text-(--text)">{t('account.signout.title')}</h2>
+						<h1 className="text-xl font-semibold text-(--text)">{t('account.signout.title')}</h1>
 						<p className="text-sm text-(--text-muted)">{t('account.signout.description')}</p>
 					</div>
 
@@ -52,7 +52,7 @@ export default function SignOutPage() {
 							disabled={loading}
 							whileHover={!loading ? { scale: 1.02, y: -1 } : undefined}
 							whileTap={!loading ? { scale: 0.985 } : undefined}
-							className="w-full rounded-xl border border-red-500/20 bg-red-500/10 font-medium text-red-500 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+							className="w-full rounded-xl border border-(--accent-red)/20 bg-(--accent-red)/10 font-medium text-(--accent-red) transition-colors hover:bg-(--accent-red)/20 disabled:cursor-not-allowed disabled:opacity-60"
 							style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}
 						>
 							{loading ? t('account.signout.signingOut') : t('account.signout.confirmButton')}

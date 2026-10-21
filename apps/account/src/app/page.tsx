@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, User, Image } from 'lucide-react';
+import { Activity, Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, SlidersHorizontal, User, Image } from 'lucide-react';
 import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';
@@ -14,11 +14,12 @@ import Devices from '@/components/Devices';
 import Language from '@/components/Language';
 import { Loading } from '@xernerx/feedback';
 import Notifications from '@/components/Notifications';
+import Preferences from '@/components/Preferences';
 import Profile from '@/components/Profile';
 import Tokens from '@/components/Tokens';
 import Media from '@/components/Media';
-import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
+import SignInPage from './login/page';
+import { useEffect, useRef } from 'react';
 
 const COMPONENT_MAP: Record<string, React.ReactNode> = {
 	account: <Account />,
@@ -29,6 +30,7 @@ const COMPONENT_MAP: Record<string, React.ReactNode> = {
 	devices: <Devices />,
 	language: <Language />,
 	notifications: <Notifications />,
+	preferences: <Preferences />,
 	profile: <Profile />,
 	tokens: <Tokens />,
 	media: <Media />,
@@ -38,6 +40,7 @@ export default function Home() {
 	const { data: session, status } = useSession();
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
+	const hasInitializedView = useRef(false);
 
 	useEffect(() => {
 		hide();
@@ -107,6 +110,12 @@ export default function Home() {
 			},
 			{
 				category: t('common.nav.categories.preferences'),
+				icon: SlidersHorizontal,
+				label: t('common.nav.items.preferences'),
+				view: 'preferences',
+			},
+			{
+				category: t('common.nav.categories.preferences'),
 				icon: Globe,
 				label: t('common.nav.items.language'),
 				view: 'language',
@@ -137,26 +146,29 @@ export default function Home() {
 			},
 		]);
 
-		const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-		const urlView = searchParams ? searchParams.get('tab') || searchParams.get('view') : null;
-		const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
-		const targetView = (urlView && urlView in COMPONENT_MAP ? urlView : null) || view || storedView || 'profile';
-		if (view !== targetView) setView(targetView);
-	}, [session, status, hide, show, setNavItems, view, setView, t]);
+		if (!hasInitializedView.current) {
+			hasInitializedView.current = true;
+			const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+			const urlView = searchParams ? searchParams.get('tab') || searchParams.get('view') : null;
+			const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
+			const candidateView = (urlView && urlView in COMPONENT_MAP ? urlView : null) || view || storedView || 'profile';
+			const targetView = candidateView in COMPONENT_MAP ? candidateView : 'profile';
+			setView(targetView);
+		}
+	}, [session, status, hide, show, setNavItems, setView, t]);
 
 	useEffect(() => {
-		if (!view || typeof window === 'undefined') return;
+		if (!hasInitializedView.current || !view || typeof window === 'undefined') return;
 		const url = new URL(window.location.href);
-		if (url.searchParams.get('tab') !== view) {
+		if (url.searchParams.get('tab') !== view || url.searchParams.has('view')) {
 			url.searchParams.delete('view');
 			url.searchParams.set('tab', view);
-			window.history.replaceState({}, '', url.toString());
+			window.history.replaceState(null, '', url.toString());
 		}
 	}, [view]);
 
 	if (!session && status !== 'loading') {
-		const search = typeof window !== 'undefined' ? window.location.search : '';
-		return redirect(`/login${search}`);
+		return <SignInPage />;
 	}
 
 	if (status === 'loading') return <Loading />;

@@ -21,7 +21,13 @@ export async function getThemeLayoutProps() {
 		'--accent': accent,
 	};
 
-	if (uiZoom) initialStyles['--ui-zoom'] = String(parseInt(uiZoom, 10) / 100);
+	if (uiZoom) {
+		const parsedZoom = parseInt(uiZoom, 10);
+		if (!isNaN(parsedZoom)) {
+			initialStyles['--ui-zoom'] = String(parsedZoom / 100);
+			initialStyles['--ui-scale'] = String(parsedZoom);
+		}
+	}
 	if (uiGap) initialStyles['--ui-gap'] = `${uiGap}px`;
 	if (textScale) initialStyles['--text-scale'] = `${textScale}px`;
 

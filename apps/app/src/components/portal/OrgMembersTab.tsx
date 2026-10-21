@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Users, User, Trash2, Copy, Check } from 'lucide-react';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import Image from 'next/image';
 import Link from 'next/link';
 import InviteMemberModal from '@/components/portal/InviteMemberModal';
 
@@ -216,9 +217,12 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 								<div className="flex items-center gap-2 flex-wrap">
 									<Link href={`/users/${selectedOrg.owner}`} className="flex items-center gap-2 hover:text-(--accent) transition-colors">
 										{memberProfiles[selectedOrg.owner]?.avatar ? (
-											<img
+											<Image
 												src={`https://cdn.discordapp.com/avatars/${selectedOrg.owner}/${memberProfiles[selectedOrg.owner].avatar}.png`}
 												alt="Avatar"
+												width={24}
+												height={24}
+												unoptimized
 												className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
 											/>
 										) : (
@@ -233,10 +237,10 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 									<button
 										type="button"
 										onClick={() => handleCopyMemberId(selectedOrg.owner)}
-										className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded border border-(--border)/10 transition-colors cursor-pointer"
+										className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded-xl border border-(--border)/10 transition-colors cursor-pointer"
 									>
 										<span>{selectedOrg.owner}</span>
-										{copiedId === selectedOrg.owner ? <Check size={10} className="text-green-500" /> : <Copy size={10} />}
+										{copiedId === selectedOrg.owner ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
 									</button>
 									<span className="text-(--accent) text-[10px] font-bold uppercase tracking-widest bg-(--accent)/10 px-2 py-0.5 rounded-full border border-(--accent)/20">
 										{t('app.portal.members.owner')}
@@ -250,9 +254,12 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 										<div className="flex items-center gap-2 flex-wrap">
 											<Link href={`/users/${memberId}`} className="flex items-center gap-2 hover:text-(--accent) transition-colors">
 												{memberProfiles[memberId]?.avatar ? (
-													<img
+													<Image
 														src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
 														alt="Avatar"
+														width={24}
+														height={24}
+														unoptimized
 														className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
 													/>
 												) : (
@@ -267,10 +274,10 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 											<button
 												type="button"
 												onClick={() => handleCopyMemberId(memberId)}
-												className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded border border-(--border)/10 transition-colors cursor-pointer"
+												className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded-xl border border-(--border)/10 transition-colors cursor-pointer"
 											>
 												<span>{memberId}</span>
-												{copiedId === memberId ? <Check size={10} className="text-green-500" /> : <Copy size={10} />}
+												{copiedId === memberId ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
 											</button>
 										</div>
 										{renderMemberActions(memberId)}
@@ -292,8 +299,12 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 											<div className="flex items-center gap-2 flex-wrap">
 												<Link href={`/users/${app.userId}`} className="flex items-center gap-2 hover:text-(--accent) transition-colors">
 													{profile?.avatar ? (
-														<img
+														<Image
 															src={`https://cdn.discordapp.com/avatars/${app.userId}/${profile.avatar}.png`}
+															alt={profile?.global_name || profile?.username || ''}
+															width={24}
+															height={24}
+															unoptimized
 															className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
 														/>
 													) : (
@@ -306,13 +317,13 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 												<button
 													type="button"
 													onClick={() => handleCopyMemberId(app.userId)}
-													className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded border border-(--border)/10 transition-colors cursor-pointer"
+													className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded-xl border border-(--border)/10 transition-colors cursor-pointer"
 												>
 													<span>{app.userId}</span>
-													{copiedId === app.userId ? <Check size={10} className="text-green-500" /> : <Copy size={10} />}
+													{copiedId === app.userId ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
 												</button>
 											</div>
-											<div className="text-[10px] font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20 uppercase tracking-widest shadow-sm">
+											<div className="text-[10px] font-bold text-(--accent-orange) bg-(--accent-orange)/10 px-2 py-0.5 rounded-full border border-(--accent-orange)/20 uppercase tracking-widest shadow-sm">
 												{t('app.portal.members.pending')}
 											</div>
 										</div>

@@ -97,6 +97,43 @@ export default function Notifications() {
 		}
 	};
 
+	const handleBulkCategory = async (category: string, enable: boolean) => {
+		const catItems = notifications[category] || {};
+		const updatedCat: Record<string, Record<string, boolean>> = {};
+		for (const [itemKey, channels] of Object.entries(catItems)) {
+			updatedCat[itemKey] = {};
+			for (const channelKey of Object.keys(channels)) {
+				const isMailChannel = channelKey === 'mail';
+				const isDisabled = isMailChannel && !hasSubscription && category !== 'community';
+				updatedCat[itemKey][channelKey] = isDisabled ? false : enable;
+			}
+		}
+
+		const updated = {
+			...notifications,
+			[category]: updatedCat,
+		};
+
+		setNotifications(updated);
+
+		const userId = user?.id;
+		if (!userId) return;
+
+		try {
+			const apiUrl = getEnvUrl('https://api.xernerx.com/');
+			await fetch(`${apiUrl}secure/users/${userId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ notifications: updated }),
+			});
+			toast({ type: 'success', title: t('account.notifications.toast.success') });
+		} catch (e) {
+			console.error('Failed to update notifications', e);
+			toast({ type: 'error', title: t('account.notifications.toast.error') });
+		}
+	};
+
 	const filteredCategories = useMemo(() => {
 		const q = search.trim().toLowerCase();
 		if (!q) return Object.entries(notifications);
@@ -144,11 +181,24 @@ export default function Notifications() {
 				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 					{filteredCategories.map(([category, items]) => (
 						<div key={category} className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden">
-							<div
-								className="bg-(--background)/50 border-b border-(--border)/10 font-semibold uppercase tracking-wider text-xs text-(--text-muted)"
-								style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}
-							>
-								{t(`account.notifications.categories.${category}`)}
+							<div className="bg-(--background)/50 border-b border-(--border)/10 flex items-center justify-between" style={{ padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)' }}>
+								<h2 className="font-semibold uppercase tracking-wider text-xs text-(--text-muted)">{t(`account.notifications.categories.${category}`)}</h2>
+								<div className="flex items-center gap-2">
+									<button
+										type="button"
+										onClick={() => handleBulkCategory(category, true)}
+										className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-(--accent)/10 text-(--accent) hover:bg-(--accent) hover:text-white border border-(--accent)/20 transition-colors cursor-pointer"
+									>
+										{t('account.notifications.enableCategory')}
+									</button>
+									<button
+										type="button"
+										onClick={() => handleBulkCategory(category, false)}
+										className="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-(--foreground)/50 text-(--text-muted) hover:text-(--text) border border-(--border)/10 transition-colors cursor-pointer"
+									>
+										{t('account.notifications.muteCategory')}
+									</button>
+								</div>
 							</div>
 							<div className="flex flex-col">
 								{Object.entries(items).map(([itemKey, channels]) => (

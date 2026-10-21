@@ -9,32 +9,32 @@ import type { Metadata } from 'next';
 import ReturnPage from '@/components/ReturnPage';
 import { SessionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Admin',
+		default: 'Xernerx Admin | Staff Portal, Telemetry & RBAC Control',
 		template: 'Xernerx Admin | %s',
 	},
-	description: 'Xernerx administrative dashboard, user management, and control center.',
+	description: 'Official Xernerx Studios internal staff portal for ecosystem telemetry, RBAC role management, moderation, store catalog, and platform configuration.',
 
 	metadataBase: new URL('https://admin.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Admin',
+			default: 'Xernerx Admin | Staff Portal, Telemetry & RBAC Control',
 			template: 'Xernerx Admin | %s',
 		},
-		description: 'Xernerx administrative dashboard, user management, and control center.',
+		description: 'Official Xernerx Studios internal staff portal for ecosystem telemetry, RBAC role management, moderation, store catalog, and platform configuration.',
 		url: 'https://admin.xernerx.com',
-		siteName: 'Xernerx',
+		siteName: 'Xernerx Admin',
 		images: [
 			{
-				url: '/banner.png',
+				url: '/opengraph-image',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx Admin',
+				alt: 'Xernerx Admin — Staff Portal & Telemetry',
 			},
 		],
 		type: 'website',
@@ -43,21 +43,16 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Admin',
+			default: 'Xernerx Admin | Staff Portal, Telemetry & RBAC Control',
 			template: 'Xernerx Admin | %s',
 		},
-		description: 'Xernerx administrative dashboard, user management, and control center.',
-		images: ['/banner.png'],
+		description: 'Official Xernerx Studios internal staff portal for ecosystem telemetry, RBAC role management, moderation, store catalog, and platform configuration.',
+		images: ['/opengraph-image'],
 	},
 
 	icons: {
 		icon: '/logo.png',
 		apple: '/logo.png',
-	},
-
-	robots: {
-		index: false,
-		follow: false,
 	},
 
 	alternates: {
@@ -71,6 +66,11 @@ export default async function RootLayout({
 	children: React.ReactNode;
 }>) {
 	const session = await getServerSession(auth);
+
+	const headersList = await headers();
+	const host = headersList.get('host') || '';
+	const initialEnv: 'dev' | 'canary' | 'public' =
+		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 
 	const cookieStore = await cookies();
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
@@ -101,10 +101,10 @@ export default async function RootLayout({
 	}
 
 	return (
-		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>
+					<AppLayout dictionary={dict} initialEnvironment={initialEnv}>
 						{session && (isAuthorized || dbError) ? (
 							<div data-db-error={dbError || undefined} className="contents">
 								{children}

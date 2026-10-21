@@ -2,6 +2,7 @@
 'use client';
 
 import { useDictionary } from '@xernerx/providers';
+import Image from 'next/image';
 import { Tooltip } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -32,7 +33,7 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 			<div className="flex flex-col gap-10 relative z-10">
 				<div className="flex flex-col gap-4">
 					<h3 className="font-bold flex items-center gap-2 text-lg text-(--text)">
-						<span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)] animate-pulse"></span> {t('info.roadmap.knownIssues.openIssues')}
+						<span className="w-3 h-3 rounded-full bg-(--accent-red) shadow-[0_0_12px_rgba(239,68,68,0.8)] animate-pulse"></span> {t('info.roadmap.knownIssues.openIssues')}
 					</h3>
 					<div className="flex flex-col gap-4">
 						{issues.filter((i: any) => i.status === 'open' && i.acknowledged).length === 0 ? (
@@ -53,25 +54,34 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 												exit={{ opacity: 0, scale: 0.95 }}
 												transition={{ duration: 0.25, ease: 'easeOut' }}
 												key={issue.id}
-												className="flex flex-col p-6 bg-(--foreground)/40 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-xl transition-all duration-300 hover:border-red-500/60 hover:bg-(--foreground)/60 hover:shadow-[0_8px_24px_rgba(239,68,68,0.15)] hover:-translate-y-1 hover:z-20 gap-3 relative group/card"
+												className="flex flex-col p-6 bg-(--foreground)/40 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-xl transition-all duration-300 hover:border-(--accent-red)/60 hover:bg-(--foreground)/60 hover:shadow-[0_8px_24px_rgba(239,68,68,0.15)] hover:-translate-y-1 hover:z-20 gap-3 relative group/card"
 											>
-												<div className="absolute top-0 left-0 w-1.5 h-full bg-red-500/40 group-hover/card:bg-red-500 transition-colors duration-300 rounded-l-2xl"></div>
+												<div className="absolute top-0 left-0 w-1.5 h-full bg-(--accent-red)/40 group-hover/card:bg-(--accent-red) transition-colors duration-300 rounded-l-2xl"></div>
 												<div className="flex justify-between items-start mb-2">
 													<div className="flex items-center gap-2">
-														<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-red-500/20">
-															{issueBotInfo?.avatarUrl && <img src={issueBotInfo.avatarUrl} alt={issueBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+														<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-(--accent-red) bg-(--accent-red)/10 px-3 py-1.5 rounded-lg tracking-widest border border-(--accent-red)/20">
+															{issueBotInfo?.avatarUrl && (
+																<Image
+																	src={issueBotInfo.avatarUrl}
+																	alt={issueBotInfo.name}
+																	width={16}
+																	height={16}
+																	unoptimized
+																	className="w-4 h-4 rounded-full object-cover"
+																/>
+															)}
 															{issueBotInfo ? issueBotInfo.name : issue.productId}
 														</span>
 														<Tooltip position="bottom" content={issue.acknowledged ? t('info.bugs.tooltips.verified') : t('info.bugs.tooltips.submitted')}>
-															<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
-																<span className={`w-2 h-2 rounded-full ${issue.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}></span>
+															<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-xl border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
+																<span className={`w-2 h-2 rounded-full ${issue.acknowledged ? 'bg-(--accent)' : 'bg-(--accent-orange)'}`}></span>
 																<span className="text-[10px] uppercase font-bold text-(--text-muted)">
 																	{issue.acknowledged ? t('info.bugs.status.verified') : t('info.bugs.status.submitted')}
 																</span>
 															</div>
 														</Tooltip>
 													</div>
-													<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/50 px-2 py-1 rounded-md">
+													<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/50 px-2 py-1 rounded-xl">
 														{new Date(issue.createdAt).toLocaleDateString()}
 													</span>
 												</div>
@@ -89,7 +99,7 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 
 				<div className="flex flex-col gap-4">
 					<h3 className="font-bold flex items-center gap-2 text-lg text-(--text)">
-						<span className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]"></span> {t('info.roadmap.knownIssues.recentlyResolved')}
+						<span className="w-3 h-3 rounded-full bg-(--accent-green) shadow-[0_0_12px_rgba(34,197,94,0.6)]"></span> {t('info.roadmap.knownIssues.recentlyResolved')}
 					</h3>
 					<div className="flex flex-col gap-4">
 						{issues.filter((i: any) => i.status === 'resolved').length === 0 ? (
@@ -105,11 +115,11 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 										const releaseStatus: 'production' | 'canary' | 'pending' | null = issue.resolvedApp && issue.resolvedVersion ? issue.releaseStatus || 'pending' : null;
 										const releaseBadgeColor =
 											releaseStatus === 'production'
-												? 'text-green-400 bg-green-500/10 border-green-500/20'
+												? 'text-(--accent-green) bg-(--accent-green)/10 border-(--accent-green)/20'
 												: releaseStatus === 'canary'
-													? 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-													: 'text-purple-400 bg-purple-500/10 border-purple-500/20';
-										const releaseDotColor = releaseStatus === 'production' ? 'bg-green-500' : releaseStatus === 'canary' ? 'bg-amber-500' : 'bg-purple-500';
+													? 'text-(--accent-orange) bg-(--accent-orange)/10 border-(--accent-orange)/20'
+													: 'text-(--accent) bg-(--accent)/10 border-(--accent)/20';
+										const releaseDotColor = releaseStatus === 'production' ? 'bg-(--accent-green)' : releaseStatus === 'canary' ? 'bg-(--accent-orange)' : 'bg-(--accent)';
 										return (
 											<motion.div
 												layout
@@ -118,13 +128,22 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 												exit={{ opacity: 0, scale: 0.95 }}
 												transition={{ duration: 0.25, ease: 'easeOut' }}
 												key={issue.id}
-												className="flex flex-col p-6 bg-(--foreground)/20 backdrop-blur-xl rounded-2xl border border-(--border)/5 shadow-lg transition-all duration-300 hover:border-green-500/40 hover:bg-(--foreground)/40 gap-3 relative overflow-hidden opacity-75 hover:opacity-100 group/card"
+												className="flex flex-col p-6 bg-(--foreground)/20 backdrop-blur-xl rounded-2xl border border-(--border)/5 shadow-lg transition-all duration-300 hover:border-(--accent-green)/40 hover:bg-(--foreground)/40 gap-3 relative overflow-hidden opacity-75 hover:opacity-100 group/card"
 											>
-												<div className="absolute top-0 left-0 w-1.5 h-full bg-green-500/30 group-hover/card:bg-green-500 transition-colors duration-300 rounded-l-2xl"></div>
+												<div className="absolute top-0 left-0 w-1.5 h-full bg-(--accent-green)/30 group-hover/card:bg-(--accent-green) transition-colors duration-300 rounded-l-2xl"></div>
 												<div className="flex flex-wrap justify-between items-start gap-2 mb-2">
 													<div className="flex flex-wrap items-center gap-2">
-														<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg tracking-widest border border-green-500/20">
-															{issueBotInfo?.avatarUrl && <img src={issueBotInfo.avatarUrl} alt={issueBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+														<span className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-(--accent-green) bg-(--accent-green)/10 px-3 py-1.5 rounded-lg tracking-widest border border-(--accent-green)/20">
+															{issueBotInfo?.avatarUrl && (
+																<Image
+																	src={issueBotInfo.avatarUrl}
+																	alt={issueBotInfo.name}
+																	width={16}
+																	height={16}
+																	unoptimized
+																	className="w-4 h-4 rounded-full object-cover"
+																/>
+															)}
 															{issueBotInfo ? issueBotInfo.name : issue.productId}
 														</span>
 														{releaseStatus && (
@@ -147,7 +166,7 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 															</Tooltip>
 														)}
 													</div>
-													<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/40 px-2 py-1 rounded-md">
+													<span className="text-xs font-medium text-(--text-muted) bg-(--foreground)/40 px-2 py-1 rounded-xl">
 														{t('info.roadmap.knownIssues.fixedOn', {
 															date: new Date(issue.resolvedAt || issue.updatedAt).toLocaleDateString(),
 														})}

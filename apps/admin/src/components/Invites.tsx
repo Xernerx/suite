@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { useEnvironment, useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Modal, Button, Confirm, Input, Toggle } from '@xernerx/ui';
@@ -243,7 +244,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-4">
 										{invite.botAvatar ? (
-											<img src={invite.botAvatar} alt={invite.botName || invite.name} className="w-12 h-12 rounded-2xl shadow-sm" />
+											<Image src={invite.botAvatar} alt={invite.botName || invite.name} width={48} height={48} unoptimized className="w-12 h-12 rounded-2xl shadow-sm" />
 										) : (
 											<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/10 text-(--accent)">
 												<Link size={20} />
@@ -258,21 +259,23 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 										<button
 											type="button"
 											onClick={() => {
-												const url = `${getEnvUrl('https://xernerx.com')}/invites/${invite.id}`;
+												const url = `${getEnvUrl('https://www.xernerx.com')}/invites/${invite.id}`;
 												navigator.clipboard.writeText(url);
 												setCopiedSlug(invite.id);
 												toast({ type: 'success', title: t('admin.dashboard.invites.inviteUrlCopied') });
 												setTimeout(() => setCopiedSlug((prev) => (prev === invite.id ? null : prev)), 2000);
 											}}
 											title={t('admin.dashboard.invites.copyInviteUrl')}
+											aria-label={t('admin.dashboard.invites.copyInviteUrl')}
 											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
 										>
-											{copiedSlug === invite.id ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+											{copiedSlug === invite.id ? <Check size={16} className="text-(--accent-green)" /> : <Copy size={16} />}
 										</button>
 										<a
-											href={`${getEnvUrl('https://xernerx.com')}/invites/${invite.id}`}
+											href={`${getEnvUrl('https://www.xernerx.com')}/invites/${invite.id}`}
 											target="_blank"
 											rel="noopener noreferrer"
+											aria-label={t('admin.dashboard.invites.openInvite')}
 											title={t('admin.dashboard.invites.openInvite')}
 											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
 										>
@@ -281,6 +284,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 										<button
 											type="button"
 											onClick={() => openEditModal(invite)}
+											aria-label="Edit"
 											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
 										>
 											<Edit2 size={16} />
@@ -288,7 +292,8 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 										<button
 											type="button"
 											onClick={() => handleDelete(invite.id)}
-											className="p-2 rounded-xl text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 transition-colors"
+											aria-label="Delete"
+											className="p-2 rounded-xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors"
 										>
 											<Trash2 size={16} />
 										</button>

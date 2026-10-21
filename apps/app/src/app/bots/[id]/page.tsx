@@ -117,6 +117,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	if (loading) {
 		return (
 			<div className="flex-1 flex items-center justify-center min-h-screen">
+				<h1 className="sr-only">{t('app.bots.nav.botProfile')}</h1>
 				<Loading />
 			</div>
 		);
@@ -125,9 +126,9 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	if (!bot) {
 		return (
 			<div className="flex-1 flex flex-col items-center justify-center min-h-screen text-center">
-				<h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h1 className="text-4xl font-bold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('app.bots.id.text1')}
-				</h2>
+				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.bots.id.text2')}</p>
 				<Link href="/bots">
 					<Button variant="primary">{t('app.bots.id.text3')}</Button>

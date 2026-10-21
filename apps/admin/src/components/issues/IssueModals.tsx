@@ -2,6 +2,7 @@
 'use client';
 
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
+import Image from 'next/image';
 import { useDictionary } from '@xernerx/providers';
 
 export interface SuiteAppVersionInfo {
@@ -91,7 +92,9 @@ export function IssueModals({
 						</datalist>
 						{activePreviewBot && (
 							<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-(--foreground)/40 border border-(--border)/10 w-fit text-xs">
-								{activePreviewBot.avatarUrl && <img src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} className="w-5 h-5 rounded-full object-cover" />}
+								{activePreviewBot.avatarUrl && (
+									<Image src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
+								)}
 								<span className="font-semibold text-(--text)">{activePreviewBot.name}</span>
 								<span className="text-(--text-muted) font-mono">({botId.trim()})</span>
 							</div>
@@ -127,12 +130,12 @@ export function IssueModals({
 					{currentSelectedAppInfo && (
 						<div className="flex flex-wrap items-center gap-2 text-xs">
 							{currentSelectedAppInfo.prodVersion && (
-								<span className="px-2.5 py-1 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 font-mono">
+								<span className="px-2.5 py-1 rounded-xl bg-(--accent-green)/10 text-(--accent-green) border border-(--accent-green)/20 font-mono">
 									{t('admin.dashboard.issues.liveProd', { version: currentSelectedAppInfo.prodVersion })}
 								</span>
 							)}
 							{currentSelectedAppInfo.canaryVersion && (
-								<span className="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
+								<span className="px-2.5 py-1 rounded-xl bg-(--accent-orange)/10 text-(--accent-orange) border border-(--accent-orange)/20 font-mono">
 									{t('admin.dashboard.issues.liveCanary', { version: currentSelectedAppInfo.canaryVersion })}
 								</span>
 							)}

@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 		if (!res.ok) {
 			return {
-				title: 'Organization Not Found',
-				description: 'This organization is private or does not exist on Xernerx Studios.',
+				title: 'Organization Profile Not Found',
+				description: 'This organization profile is private or does not exist on the Xernerx Studios platform. Explore public organizations and teams.',
+				alternates: { canonical: `/organization/${id}` },
+				robots: { index: false, follow: false },
 			};
 		}
 
@@ -45,6 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		return {
 			title,
 			description: ogDescription,
+			alternates: { canonical: `/organization/${id}` },
 			openGraph: {
 				siteName: 'Xernerx Studios',
 				type: 'website',
@@ -69,8 +72,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 		};
 	} catch {
 		return {
-			title: 'Organization Profile',
-			description: 'View organization members, published bots, and official servers on Xernerx Studios.',
+			title: 'Organization Profile & Team Directory',
+			description: 'View organization team members, published Discord bots, and official community servers on the Xernerx Studios ecosystem directory.',
+			alternates: { canonical: `/organization/${id}` },
 		};
 	}
 }

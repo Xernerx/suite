@@ -48,8 +48,9 @@
 
 	/* Scalers & Spacing Defaults */
 	--text-scale: 14px;
-	--ui-gap: 15px;
+	--ui-gap: 16px;
 	--ui-scale: 100; /* Raw number format */
+	--ui-zoom: 1;
 }
 
 html.dark {
@@ -62,8 +63,8 @@ html.dark {
 }
 
 html {
-	font-size: var(--text-scale);
-	zoom: calc(var(--ui-scale) * 1%); /* Converts raw 100 -> 100%, 110 -> 110% */
+	font-size: var(--text-scale, 14px);
+	zoom: var(--ui-zoom, calc(var(--ui-scale, 100) * 1%));
 }
 
 html,
@@ -89,7 +90,7 @@ kbd {
 	appearance: none;
 	height: 10px;
 	border-radius: 999px;
-	background: rgb(39 39 42);
+	background: color-mix(in srgb, var(--border) 25%, var(--background));
 	cursor: pointer;
 }
 
@@ -166,6 +167,15 @@ html:not(.dark) input[type='number']::-webkit-inner-spin-button {
 }
 html.dark input[type='number']::-webkit-inner-spin-button {
 	filter: invert(0.8) hue-rotate(180deg);
+}
+
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+	animation-duration: 0.01ms !important;
+	animation-iteration-count: 1 !important;
+	transition-duration: 0.01ms !important;
+	scroll-behavior: auto !important;
 }
 
 /* Global Application Inputs */

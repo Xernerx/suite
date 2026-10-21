@@ -1,7 +1,38 @@
 /** @format */
 // Force recompile
 
+import type { Metadata } from 'next';
 import { PackageDetailsClient } from '@/components/packages/PackageDetailsClient';
+
+export async function generateMetadata({ params }: { params: Promise<{ package: string[] }> }): Promise<Metadata> {
+	const resolvedParams = await params;
+	const pkgParts = [...resolvedParams.package];
+	const version = pkgParts.pop() || 'latest';
+	const pkgName = decodeURIComponent(pkgParts.join('/'));
+	const canonicalPath = `/packages/${pkgParts.join('/')}/${version}`;
+	const title = `${pkgName} (${version}) — Package Reference`;
+	const description = `Official TypeScript API documentation, classes, methods, and usage examples for ${pkgName} version ${version} by Xernerx Studios.`;
+
+	return {
+		title,
+		description,
+		alternates: { canonical: canonicalPath },
+		openGraph: {
+			title: `Xernerx Docs | ${title}`,
+			description,
+			url: `https://docs.xernerx.com${canonicalPath}`,
+			siteName: 'Xernerx Docs',
+			images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: `${pkgName} Documentation` }],
+			type: 'website',
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: `Xernerx Docs | ${title}`,
+			description,
+			images: ['/opengraph-image'],
+		},
+	};
+}
 
 async function getPackageData(pkgName: string, version: string) {
 	try {

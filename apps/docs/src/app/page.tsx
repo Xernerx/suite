@@ -8,11 +8,13 @@ import { useRouter } from 'next/navigation';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 import { categories, searchTopics } from '@/components/docsHomeData';
+import { useDocsAccess } from '@/components/useDocsAccess';
 
 export default function DocsHome() {
 	const { t } = useDictionary();
 	const { hide } = useSidebar();
 	const router = useRouter();
+	const { hasWebsocket } = useDocsAccess();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -20,18 +22,21 @@ export default function DocsHome() {
 		hide();
 	}, [hide]);
 
+	const visibleCategories = useMemo(() => categories.filter((c) => (c.href === '/websocket' ? hasWebsocket : true)), [hasWebsocket]);
+
 	const filteredTopics = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
 		if (!q) return [];
 		return searchTopics
 			.filter((item) => {
+				if (item.href.startsWith('/websocket') && !hasWebsocket) return false;
 				const title = t(item.titleKey).toLowerCase();
 				const desc = t(item.descKey).toLowerCase();
 				const category = t(item.categoryKey).toLowerCase();
 				return title.includes(q) || desc.includes(q) || category.includes(q) || item.keywords.includes(q) || item.href.toLowerCase().includes(q);
 			})
 			.slice(0, 8);
-	}, [searchQuery, t]);
+	}, [searchQuery, t, hasWebsocket]);
 
 	useEffect(() => {
 		setSelectedIndex(0);
@@ -90,13 +95,13 @@ export default function DocsHome() {
 						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
-					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-purple-500">{t('docs.home.title')}</span>
+					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-(--accent)">{t('docs.home.title')}</span>
 				</h1>
 				<p className="text-base text-(--text-muted) max-w-xl leading-relaxed mt-2">{t('docs.home.description')}</p>
 
 				{/* Search Bar & Deep Search Dropdown */}
 				<div className="w-full max-w-2xl mt-8 relative group">
-					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-purple-500 rounded-full blur-md opacity-20 group-hover:opacity-40 transition duration-500 pointer-events-none" />
+					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-(--accent) rounded-full blur-md opacity-20 group-hover:opacity-40 transition duration-500 pointer-events-none" />
 					<Input
 						variant="search"
 						shortcut={true}
@@ -181,12 +186,12 @@ export default function DocsHome() {
 							},
 						},
 					}}
-					className="grid grid-cols-1 md:grid-cols-2 w-full"
+					className={`grid grid-cols-1 ${visibleCategories.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'} w-full`}
 					style={{
 						gap: 'calc(var(--ui-gap) * 1.5)',
 					}}
 				>
-					{categories.map((category, idx) => (
+					{visibleCategories.map((category, idx) => (
 						<motion.a
 							href={category.href}
 							key={idx}
@@ -215,14 +220,14 @@ export default function DocsHome() {
 								>
 									<category.icon size={32} />
 								</div>
-								<h3
+								<h2
 									className="text-2xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mt-2"
 									style={{
 										fontFamily: 'var(--font-fredoka)',
 									}}
 								>
 									{t(category.titleKey)}
-								</h3>
+								</h2>
 							</div>
 							<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{t(category.descKey)}</p>
 						</motion.a>

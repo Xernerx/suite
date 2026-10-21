@@ -6,6 +6,7 @@ import BotStatSchema from './models/xernerx/bots/Stat';
 import BotVoteSchema from './models/xernerx/bots/Vote';
 import BotReviewSchema from './models/xernerx/bots/Review';
 import BotHookSchema from './models/xernerx/bots/Hook';
+import BotCommandSchema from './models/xernerx/bots/Command';
 
 import CoreSettingSchema from './models/xernerx/core/Setting';
 import CoreInviteSchema from './models/xernerx/core/Invite';
@@ -49,6 +50,7 @@ export const xernerxModels = {
 		Vote: { schema: BotVoteSchema, modelName: 'Vote', collection: 'votes' },
 		Review: { schema: BotReviewSchema, modelName: 'Review', collection: 'reviews' },
 		Hook: { schema: BotHookSchema, modelName: 'Hook', collection: 'hooks' },
+		Command: { schema: BotCommandSchema, modelName: 'Command', collection: 'commands' },
 	},
 	core: {
 		Setting: { schema: CoreSettingSchema, modelName: 'Setting' },

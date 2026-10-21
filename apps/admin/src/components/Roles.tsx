@@ -6,6 +6,7 @@ import { Button, Input } from '@xernerx/ui';
 import { Download, Plus, RefreshCw } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import { Loading } from '@xernerx/feedback';
 import { permissions } from '@xernerx/lib';
 import type { DiscordRole, Role } from './roles/types';
@@ -137,7 +138,7 @@ export default function Roles() {
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.roles.createRoleError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to create role:', err);
@@ -226,7 +227,7 @@ export default function Roles() {
 	if (loading) return <Loading />;
 	if (error)
 		return (
-			<div className="p-6 text-red-500">
+			<div className="p-6 text-(--accent-red)">
 				{t('admin.roles.errorPrefix')} {error}
 			</div>
 		);
@@ -248,7 +249,9 @@ export default function Roles() {
 						padding: 'var(--ui-gap)',
 					}}
 				>
-					{guild.iconUrl && <img src={guild.iconUrl} alt={guild.name} className="w-14 h-14 rounded-full border border-(--border)/10 object-cover shrink-0" />}
+					{guild.iconUrl && (
+						<Image src={guild.iconUrl} alt={guild.name} width={56} height={56} unoptimized className="w-14 h-14 rounded-full border border-(--border)/10 object-cover shrink-0" />
+					)}
 					<div className="flex flex-col">
 						<h1 className="text-xl font-bold text-(--text)">{guild.name}</h1>
 						<p className="text-xs text-(--text-muted)">

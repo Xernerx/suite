@@ -1,31 +1,20 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
-import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, Copy, Check, Share2 } from 'lucide-react';
+import { Button, CopyButton } from '@xernerx/ui';
+import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, Share2 } from 'lucide-react';
 import { FaGithub } from 'react-icons/fa';
 import Image from 'next/image';
-import PublicWidgetModalButton from '@/components/PublicWidgetModalButton';
 
 export default function Header({ organization, id, servers }: { organization: any; id: string; servers?: any[] }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
-	const [copiedId, setCopiedId] = useState(false);
 
 	const orgId = organization._id || id;
 	const mainServer = servers?.find((s) => s.id === organization.guild) || servers?.[0];
 	const inviteUrl = mainServer?.links?.invite || organization.links?.invite;
-
-	const handleCopyId = () => {
-		if (!orgId) return;
-		navigator.clipboard.writeText(orgId);
-		setCopiedId(true);
-		toast({ title: t('app.organization.header.idCopied'), type: 'success' });
-		setTimeout(() => setCopiedId(false), 2000);
-	};
 
 	const handleShareProfile = () => {
 		if (typeof window === 'undefined') return;
@@ -44,7 +33,7 @@ export default function Header({ organization, id, servers }: { organization: an
 			{organization.iconUrl || organization.icon ? (
 				<Image
 					src={organization.iconUrl ? getEnvUrl(organization.iconUrl) : organization.icon}
-					alt={organization.name || 'Organization Avatar'}
+					alt={organization.name || t('app.organization.header.unknownOrg')}
 					width={128}
 					height={128}
 					className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10"
@@ -60,19 +49,9 @@ export default function Header({ organization, id, servers }: { organization: an
 						<h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{organization.name || t('app.organization.header.unknownOrg')}
 						</h1>
-						{organization.verified && <ShieldCheck className="w-6 h-6 text-green-500" />}
+						{organization.verified && <ShieldCheck className="w-6 h-6 text-(--accent-green)" />}
 					</div>
-					{orgId && (
-						<button
-							type="button"
-							onClick={handleCopyId}
-							title={t('app.organization.header.copyId')}
-							className="flex items-center gap-1.5 text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-all cursor-pointer"
-						>
-							<span>{orgId}</span>
-							{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
-						</button>
-					)}
+					{orgId && <CopyButton value={orgId} label={orgId} toastTitle={t('app.organization.header.idCopied')} />}
 				</div>
 				<p className="text-lg text-(--text-muted) max-w-2xl">{organization.description || t('common.noDescription')}</p>
 			</div>
@@ -80,7 +59,7 @@ export default function Header({ organization, id, servers }: { organization: an
 			<div className="flex-shrink-0 w-full md:w-auto mt-4 md:mt-0 relative z-10 flex flex-col items-start md:items-end gap-6">
 				<div className="flex flex-wrap items-center gap-2">
 					{inviteUrl && (
-						<Button variant="primary" onClick={() => window.open(inviteUrl, '_blank')} className="shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
+						<Button variant="primary" onClick={() => window.open(inviteUrl, '_blank')} className="shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
 							{t('app.organization.header.joinServer')}
 						</Button>
 					)}
@@ -88,7 +67,6 @@ export default function Header({ organization, id, servers }: { organization: an
 						<Share2 className="w-4 h-4 mr-1.5" />
 						{t('app.organization.header.shareProfile')}
 					</Button>
-					{(organization.widgets || organization.config?.widgets) && <PublicWidgetModalButton entityType="organizations" entityId={orgId} entityName={organization.name || 'Organization'} />}
 				</div>
 				<div className="flex flex-col items-start md:items-end gap-3 w-full">
 					{organization.links && Object.entries(organization.links).filter(([key, val]) => val).length > 0 && (
@@ -108,7 +86,7 @@ export default function Header({ organization, id, servers }: { organization: an
 										<button
 											key={key}
 											onClick={() => window.open(val as string, '_blank')}
-											className="flex items-center gap-1.5 text-xs font-bold text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-3 py-1.5 rounded-lg border border-(--border)/10 transition-all capitalize shadow-sm"
+											className="flex items-center gap-1.5 text-xs font-bold text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-3 py-1.5 rounded-xl border border-(--border)/10 transition-all capitalize shadow-sm"
 										>
 											<Icon className="w-3.5 h-3.5" />
 											{key}

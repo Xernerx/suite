@@ -25,18 +25,19 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
 			}
 		}
 
-		// Determine if streak is preserved (claimed within 24h after giftIn became available, i.e., within 48h of previous claim)
+		// Streak logic: 48-hour grace window from unlock time (unified with /secure/store/[id]/gift)
+		const gracePeriodMs = 48 * 60 * 60 * 1000;
 		let newStreak = 1;
 		if (existing?.giftIn && (existing.streak || 0) > 0) {
 			const msSinceAvailable = now - new Date(existing.giftIn).getTime();
-			if (msSinceAvailable <= 24 * 60 * 60 * 1000) {
+			if (msSinceAvailable <= gracePeriodMs) {
 				newStreak = (existing.streak || 0) + 1;
 			}
 		}
 
-		const baseReward = 50;
-		const streakBonus = Math.min(newStreak * 10, 150);
-		const rewardEarned = baseReward + streakBonus;
+		// Random base reward (50 to 150 credits) + bonus scaling with streak
+		const randomBase = Math.floor(Math.random() * 101) + 50;
+		const rewardEarned = randomBase + newStreak * 10;
 		const newBalance = (existing?.balance || 0) + rewardEarned;
 		const nextGiftIn = new Date(now + 24 * 60 * 60 * 1000);
 
@@ -58,7 +59,11 @@ export async function POST(_: NextRequest, { params }: { params: Promise<{ id: s
 
 		return NextResponse.json({
 			...updated,
+			success: true,
+			reward: rewardEarned,
 			rewardEarned,
+			streak: newStreak,
+			credits: updated,
 		});
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });

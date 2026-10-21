@@ -15,17 +15,27 @@ async function authenticateAndGetBot(req: NextRequest, botId: string) {
 
 	if (!TokenModel || !BotModel) return { error: 'Database models not found', status: 500 };
 
+	const isSystemToken = Boolean(process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN);
 	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
-	if (!tokenDoc) return { error: 'Invalid token', status: 401 };
-	if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') return { error: 'Token is inactive or suspended', status: 403 };
 
-	const bot = await BotModel.findOne({ id: botId });
-	if (!bot) return { error: 'Bot not found', status: 404 };
+	if (!tokenDoc && !isSystemToken) return { error: 'Invalid token', status: 401 };
+	if (tokenDoc && (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended')) return { error: 'Token is inactive or suspended', status: 403 };
 
-	// Check full access (Token assigned to bot OR Token owner owns the bot)
-	const tokenOwners = tokenDoc.owners || [];
-	const botOwners = bot.owners || [];
-	const hasFullAccess = tokenDoc.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
+	let bot = await BotModel.findOne({ id: botId });
+	if (!bot && isSystemToken) {
+		bot = await BotModel.create({
+			id: botId,
+			bot: true,
+			name: 'Xernerx App',
+			privacy: 'private',
+		}).catch(() => null);
+	}
+	if (!bot && !isSystemToken) return { error: 'Bot not found', status: 404 };
+
+	// Check full access (System token OR Token assigned to bot OR Token owner owns the bot)
+	const tokenOwners = tokenDoc?.owners || [];
+	const botOwners = bot?.owners || [];
+	const hasFullAccess = isSystemToken || tokenDoc?.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
 
 	return { bot, hasFullAccess, BotModel };
 }

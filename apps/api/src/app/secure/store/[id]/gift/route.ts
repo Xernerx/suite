@@ -67,6 +67,8 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 		return NextResponse.json({
 			success: true,
 			reward: rewardCredits,
+			rewardEarned: rewardCredits,
+			streak: newStreak,
 			credits: updatedCredit,
 		});
 	} catch (error: any) {

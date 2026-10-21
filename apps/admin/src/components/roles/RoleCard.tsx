@@ -80,7 +80,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.roles.updateRoleError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to update role:', err);
@@ -109,7 +109,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.roles.deleteRoleError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to delete role:', err);
@@ -190,7 +190,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 								) : (
 									<span className="text-xs px-2 py-0.5 rounded-full bg-(--border)/10 text-(--text-muted) font-medium truncate">{t('admin.roles.unlinked')}</span>
 								)}
-								{role.sync && <span className="text-[10px] px-1.5 py-0.5 rounded bg-(--accent)/20 text-(--accent) font-semibold uppercase">{t('admin.roles.synced')}</span>}
+								{role.sync && <span className="text-[10px] px-1.5 py-0.5 rounded-xl bg-(--accent)/20 text-(--accent) font-semibold uppercase">{t('admin.roles.synced')}</span>}
 							</div>
 							<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1 truncate">
 								{t('admin.roles.uuid')} {role.id}
@@ -362,7 +362,7 @@ export function RoleCard({ role, discordRoles, getEnvUrl, onRoleDeleted, onRoleU
 							<button
 								type="button"
 								onClick={() => setConfirmDeleteOpen(true)}
-								className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-medium transition-colors"
+								className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-(--accent-red)/10 hover:bg-(--accent-red)/20 text-(--accent-red) text-xs font-medium transition-colors"
 							>
 								<Trash2 size={14} />
 								{t('admin.roles.deleteRole')}

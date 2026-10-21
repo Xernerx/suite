@@ -17,6 +17,7 @@ const globalWithMongoose = global as typeof global & {
 	__models_v9?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v10?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v11?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__models_v12?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
 // Close any legacy per-database connections left over from older HMR reloads
@@ -50,10 +51,13 @@ if (globalWithMongoose.__models_v9) {
 if (globalWithMongoose.__models_v10) {
 	delete globalWithMongoose.__models_v10;
 }
+if (globalWithMongoose.__models_v11) {
+	delete globalWithMongoose.__models_v11;
+}
 
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v11 || {};
+const cachedModels = globalWithMongoose.__models_v12 || {};
 
 // Also close any orphaned top-level mongoose.connections not tracked in rootConnections
 const trackedRoots = new Set(Object.values(rootConnections));
@@ -66,7 +70,7 @@ for (const conn of mongoose.connections) {
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
-	globalWithMongoose.__models_v11 = cachedModels;
+	globalWithMongoose.__models_v12 = cachedModels;
 }
 
 const getUris = (): Record<string, string> => ({
@@ -98,10 +102,16 @@ export async function database(projectId: 'xernerx' | 'virtue') {
 	}
 
 	if (rootConn && Object.keys(cachedModels[projectId]).length > 0) {
-		return {
-			connections: activeConnections[projectId],
-			models: cachedModels[projectId],
-		};
+		const registry = registries[projectId];
+		const isFullyCached =
+			registry && Object.entries(registry).every(([cat, models]: [string, any]) => cachedModels[projectId][cat] && Object.keys(models).every((m) => cachedModels[projectId][cat][m]));
+
+		if (isFullyCached) {
+			return {
+				connections: activeConnections[projectId],
+				models: cachedModels[projectId],
+			};
+		}
 	}
 
 	const baseUri = getUris()[projectId];
