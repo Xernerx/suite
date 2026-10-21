@@ -213,14 +213,14 @@ export default function Profile() {
 								<button
 									type="button"
 									onClick={handleCopyId}
-									className="inline-flex items-center gap-1.5 w-fit text-xs text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-md border border-(--border)/10 font-mono transition-colors cursor-pointer"
+									className="inline-flex items-center gap-1.5 w-fit text-xs text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-xl border border-(--border)/10 font-mono transition-colors cursor-pointer"
 								>
 									<span>
 										{t('account.common.description', {
 											userId,
 										})}
 									</span>
-									{copiedId ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+									{copiedId ? <Check size={12} className="text-(--accent-green)" /> : <Copy size={12} />}
 								</button>
 							)}
 						</div>
@@ -267,14 +267,14 @@ export default function Profile() {
 								<button
 									type="button"
 									onClick={() => setMarkdownPreview(false)}
-									className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+									className={`px-3 py-1 rounded-xl transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 								>
 									{t('account.profile.infoField.write')}
 								</button>
 								<button
 									type="button"
 									onClick={() => setMarkdownPreview(true)}
-									className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+									className={`px-3 py-1 rounded-xl transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 								>
 									{t('account.profile.infoField.preview')}
 								</button>

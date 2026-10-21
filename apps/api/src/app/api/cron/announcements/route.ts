@@ -1,3 +1,5 @@
+/** @format */
+
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';

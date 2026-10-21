@@ -72,11 +72,11 @@ export function QuestionBuilder({ questions, onChange }: QuestionBuilderProps) {
 			) : (
 				<div className="flex flex-col gap-4">
 					{questions.map((q, i) => (
-						<div key={i} className="flex flex-col gap-3 p-4 border border-(--border)/10 bg-(--background-secondary)/30 rounded-xl relative group">
+						<div key={i} className="flex flex-col gap-3 p-4 border border-(--border)/10 bg-(--background)/50 rounded-2xl relative group">
 							<button
 								type="button"
 								onClick={() => removeQuestion(i)}
-								className="absolute top-2 right-2 p-1.5 text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+								className="absolute top-2 right-2 p-1.5 text-(--accent-red)/70 hover:text-(--accent-red) hover:bg-(--accent-red)/10 rounded-lg transition-colors"
 							>
 								<Trash2 size={14} />
 							</button>
@@ -120,7 +120,7 @@ export function QuestionBuilder({ questions, onChange }: QuestionBuilderProps) {
 												placeholder={t('admin.dashboard.applicationConfigs.optionText')}
 												className="h-7 text-xs"
 											/>
-											<button type="button" onClick={() => removeOption(i, optIdx)} className="text-red-500/50 hover:text-red-500">
+											<button type="button" onClick={() => removeOption(i, optIdx)} className="text-(--accent-red)/50 hover:text-(--accent-red)">
 												<Trash2 size={12} />
 											</button>
 										</div>

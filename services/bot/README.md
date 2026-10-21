@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <b>High-performance Discord bot serving as the data synchronization bridge for the Xernerx Suite.</b>
+  <b>High-performance Discord bot daemon serving as the data synchronization bridge for the Xernerx Suite.</b>
 </p>
 
 <p align="center">
@@ -17,24 +17,23 @@
 
 ## 🧭 Overview
 
-The **Bot** service is a dedicated Discord bot application that acts as the core bridge between users, user servers, and the Xernerx Suite, ensuring seamless data syncing and automation across the ecosystem.
+The **Bot** service (`services/bot`) is a dedicated Discord bot daemon that acts as the real-time bridge between Discord guilds, members, and the Xernerx Suite backend.
 
 ---
 
 ## 🛠️ Core Features
 
-- **Data Synchronization Bridge:** Continuously synchronizes state and data between user Discord servers and the Xernerx platform.
-- **Framework Integration:** Built using `@xernerx/framework` for robust command handling and operational extensions[cite: 4].
-- **Statistics Tracking:** Gathers and processes guild performance metrics via `@xernerx/stats`[cite: 4].
+- **Guild & Member Synchronization:** Continuously synchronizes guild metadata, roles, channels, and member states with the Xernerx platform.
+- **Framework Integration:** Built on `@xernerx/framework` for modular command handling, event listeners, and operational extensions.
+- **Telemetry & Statistics:** Publishes live guild, shard, and user metrics via `@xernerx/stats` and communicates with the WebSocket gateway via `@xernerx/websocket`.
 
 ---
 
 ## 🛠️ Tech Stack & Dependencies
 
-- **Runtime:** Node.js / TypeScript[cite: 4]
-- **Discord Integration:** Discord.js (`^14.22.1`)[cite: 4]
-- **Framework:** `@xernerx/framework`[cite: 4]
-- **Analytics:** `@xernerx/stats`[cite: 4]
+- **Runtime:** Node.js / TypeScript
+- **Discord Integration:** `discord.js` (`^14.22.1`)
+- **Framework & SDKs:** `@xernerx/framework`, `@xernerx/stats`, `@xernerx/websocket`
 
 ---
 

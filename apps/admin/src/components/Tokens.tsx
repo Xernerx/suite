@@ -3,23 +3,28 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Input } from '@xernerx/ui';
-import { Plus } from 'lucide-react';
+import { Download, Plus, RefreshCw } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import type { Token } from './tokens/types';
 import { TokenCard } from './tokens/TokenCard';
 import { CreateTokenModal } from './tokens/CreateTokenModal';
 
-export default function Tokens() {
+export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (tokenId: string) => void }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const [tokens, setTokens] = useState<Token[]>([]);
-	const [search, setSearch] = useState('');
+	const [search, setSearch] = useState(initialSearch);
 	const [statusFilter, setStatusFilter] = useState<'all' | Token['status']>('all');
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (initialSearch !== undefined) setSearch(initialSearch);
+	}, [initialSearch]);
 
 	// Modal state for creation
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -31,9 +36,10 @@ export default function Tokens() {
 	const [newWebsocket, setNewWebsocket] = useState(false);
 	const [creating, setCreating] = useState(false);
 
-	useEffect(() => {
-		const fetchTokens = async () => {
-			setLoading(true);
+	const fetchTokens = useCallback(
+		async (isManual = false) => {
+			if (isManual) setRefreshing(true);
+			else setLoading(true);
 			try {
 				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/tokens?admin=true'), {
 					credentials: 'include',
@@ -50,10 +56,15 @@ export default function Tokens() {
 				);
 			} finally {
 				setLoading(false);
+				setRefreshing(false);
 			}
-		};
+		},
+		[getEnvUrl, t]
+	);
+
+	useEffect(() => {
 		fetchTokens();
-	}, [getEnvUrl, t]);
+	}, [fetchTokens]);
 
 	const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -97,7 +108,7 @@ export default function Tokens() {
 				});
 			} else {
 				const errData = await res.json().catch(() => ({}));
-				throw new Error(errData.error || 'Unknown error');
+				throw new Error(errData.error || t('admin.tokens.toast.createError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to create token:', err);
@@ -112,11 +123,11 @@ export default function Tokens() {
 	};
 
 	const handleTokenDeleted = (deletedId: string) => {
-		setTokens((prev) => prev.filter((t) => t._id !== deletedId));
+		setTokens((prev) => prev.filter((t) => t.id !== deletedId && t._id !== deletedId));
 	};
 
 	const handleTokenUpdated = (updatedToken: Token) => {
-		setTokens((prev) => prev.map((t) => (t._id === updatedToken._id ? updatedToken : t)));
+		setTokens((prev) => prev.map((t) => ((t.id && t.id === updatedToken.id) || (t._id && t._id === updatedToken._id) ? updatedToken : t)));
 	};
 
 	const filteredTokens = useMemo(() => {
@@ -128,10 +139,46 @@ export default function Tokens() {
 		});
 	}, [tokens, search, statusFilter]);
 
+	const exportTokens = (format: 'csv' | 'json') => {
+		if (filteredTokens.length === 0) return;
+		if (format === 'json') {
+			const blob = new Blob([JSON.stringify(filteredTokens, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `xernerx-tokens-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			return;
+		}
+		const headers = ['id', 'name', 'status', 'botId', 'owners', 'secure', 'websocket'];
+		const rows = filteredTokens.map((tk) =>
+			[
+				tk.id || tk._id || '',
+				(tk.name || '').replace(/"/g, '""'),
+				tk.status || 'active',
+				tk.botId || '',
+				(tk.owners || []).join(';'),
+				String(Boolean(tk.permissions?.secure)),
+				String(Boolean(tk.permissions?.websocket)),
+			]
+				.map((cell) => `"${cell}"`)
+				.join(',')
+		);
+		const csvContent = [headers.join(','), ...rows].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-tokens-${new Date().toISOString().slice(0, 10)}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
 	if (loading) return <Loading />;
 	if (error)
 		return (
-			<div className="p-6 text-red-500">
+			<div className="p-6 text-(--accent-red)">
 				{t('admin.tokens.edit.failedToFetchToken', {
 					error,
 				})}
@@ -165,24 +212,38 @@ export default function Tokens() {
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.tokens.description')}</p>
 				</div>
-				<Button
-					variant="primary"
-					onClick={() => {
-						setNewName('');
-						setNewStatus('active');
-						setNewBotId('');
-						setNewSelectedOwners([]);
-						setNewSecure(false);
-						setNewWebsocket(false);
-						setIsCreateOpen(true);
-					}}
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<Plus size={16} />
-					<span>{t('admin.tokens.generateButton')}</span>
-				</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="secondary" size="sm" onClick={() => exportTokens('csv')} disabled={filteredTokens.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.tokens.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => exportTokens('json')} disabled={filteredTokens.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.tokens.exportJson')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => fetchTokens(true)} disabled={refreshing} className="flex items-center gap-1.5">
+						<RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+						{t('admin.tokens.refresh')}
+					</Button>
+					<Button
+						variant="primary"
+						onClick={() => {
+							setNewName('');
+							setNewStatus('active');
+							setNewBotId('');
+							setNewSelectedOwners([]);
+							setNewSecure(false);
+							setNewWebsocket(false);
+							setIsCreateOpen(true);
+						}}
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.5)',
+						}}
+					>
+						<Plus size={16} />
+						<span>{t('admin.tokens.generateButton')}</span>
+					</Button>
+				</div>
 			</div>
 
 			{/* Controls Bar: Search & Status Filters */}
@@ -221,7 +282,14 @@ export default function Tokens() {
 				>
 					<AnimatePresence>
 						{filteredTokens.map((token) => (
-							<TokenCard key={token.id} token={token} getEnvUrl={getEnvUrl} onTokenDeleted={handleTokenDeleted} onTokenUpdated={handleTokenUpdated} />
+							<TokenCard
+								key={token.id || token._id}
+								token={token}
+								getEnvUrl={getEnvUrl}
+								onTokenDeleted={handleTokenDeleted}
+								onTokenUpdated={handleTokenUpdated}
+								onViewAuditLogs={onViewAuditLogs}
+							/>
 						))}
 					</AnimatePresence>
 				</motion.div>

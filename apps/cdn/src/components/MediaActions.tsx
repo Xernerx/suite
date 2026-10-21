@@ -21,7 +21,7 @@ export function MediaActions({ rawUrl }: { rawUrl: string }) {
 	};
 
 	return (
-		<div className="absolute top-4 right-4 flex gap-2 z-[10000] opacity-0 hover:opacity-100 transition-opacity duration-200 group-hover:opacity-100 bg-black/50 p-2 rounded-lg backdrop-blur-sm">
+		<div className="absolute top-4 right-4 flex gap-2 z-[10000] opacity-0 hover:opacity-100 transition-opacity duration-200 group-hover:opacity-100 bg-(--foreground)/70 border border-(--border)/10 p-2 rounded-2xl backdrop-blur-md">
 			<Button variant="secondary" size="sm" onClick={handleCopy} title={t('cdn.view.actions.copyDirectLink')}>
 				{copied ? <Check size={16} /> : <Copy size={16} />}
 			</Button>

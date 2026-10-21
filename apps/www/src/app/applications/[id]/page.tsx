@@ -137,6 +137,7 @@ export default function ApplicationFormPage() {
 	if (loading) {
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen">
+				<h1 className="sr-only">{t('www.applications.title')}</h1>
 				<Loader2 className="w-10 h-10 animate-spin text-(--accent)" />
 			</div>
 		);
@@ -145,10 +146,13 @@ export default function ApplicationFormPage() {
 	if (error || !config) {
 		return (
 			<div className="flex flex-col items-center justify-center min-h-screen text-center px-4">
-				<div className="bg-red-500/10 border border-red-500/20 text-red-400 p-8 rounded-3xl backdrop-blur-md max-w-lg">
-					<h2 className="text-xl font-bold mb-2">{t('www.applications.errorLoading')}</h2>
+				<div className="bg-(--accent-red)/10 border border-(--accent-red)/20 text-(--accent-red) p-8 rounded-3xl backdrop-blur-md max-w-lg">
+					<h1 className="text-xl font-bold mb-2">{t('www.applications.errorLoading')}</h1>
 					<p>{error || t('www.applications.notFound')}</p>
-					<Link href="/applications" className="inline-block mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
+					<Link
+						href="/applications"
+						className="inline-block mt-6 px-6 py-2 bg-(--foreground)/40 hover:bg-(--foreground)/60 text-(--text) border border-(--border)/10 rounded-2xl transition-colors"
+					>
 						{t('www.applications.goBack')}
 					</Link>
 				</div>
@@ -159,15 +163,18 @@ export default function ApplicationFormPage() {
 	if (submitted) {
 		return (
 			<motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center min-h-screen text-center px-4">
-				<div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-12 rounded-[2.5rem] backdrop-blur-md max-w-xl w-full shadow-2xl shadow-emerald-500/5">
-					<div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+				<div className="bg-(--accent-green)/10 border border-(--accent-green)/20 text-(--accent-green) p-12 rounded-[2.5rem] backdrop-blur-md max-w-xl w-full shadow-2xl shadow-(--accent-green)/5">
+					<div className="w-20 h-20 bg-(--accent-green)/20 rounded-full flex items-center justify-center mx-auto mb-6">
 						<Send className="w-10 h-10" />
 					</div>
-					<h2 className="text-4xl font-extrabold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					<h1 className="text-4xl font-extrabold mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('www.applications.appSent')}
-					</h2>
-					<p className="text-emerald-400/80 mb-8" dangerouslySetInnerHTML={{ __html: t('www.applications.appSentDesc', { name: `<strong>${config.name}</strong>` }) }} />
-					<Link href="/applications" className="inline-block px-8 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:opacity-90 transition-opacity">
+					</h1>
+					<p className="text-(--accent-green)/80 mb-8" dangerouslySetInnerHTML={{ __html: t('www.applications.appSentDesc', { name: `<strong>${config.name}</strong>` }) }} />
+					<Link
+						href="/applications"
+						className="inline-block px-8 py-3 bg-(--accent-green) text-white font-bold rounded-xl shadow-lg shadow-(--accent-green)/30 hover:opacity-90 transition-opacity"
+					>
 						{t('www.applications.returnToApps')}
 					</Link>
 				</div>
@@ -189,7 +196,7 @@ export default function ApplicationFormPage() {
 			</div>
 
 			<form onSubmit={handleSubmit} noValidate className="flex flex-col gap-8">
-				<div className="flex flex-col gap-8 p-6 sm:p-10 rounded-[2.5rem] border border-neutral-500/10 bg-neutral-500/5 backdrop-blur-2xl shadow-xl shadow-black/5">
+				<div className="flex flex-col gap-8 p-6 sm:p-10 rounded-[2.5rem] border border-(--border)/10 bg-(--text-muted)/5 backdrop-blur-2xl shadow-xl shadow-black/5">
 					{!config.questions || config.questions.length === 0 ? (
 						<div className="text-center py-12 text-(--text-muted)">
 							<p className="mb-2">{t('www.applications.noQuestions')}</p>
@@ -201,7 +208,7 @@ export default function ApplicationFormPage() {
 								<label className="text-base font-semibold text-(--text) flex items-center gap-2">
 									<span className="bg-(--accent)/10 text-(--accent) w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold shrink-0">{idx + 1}</span>
 									{q.question}
-									{q.required && <span className="text-red-400 text-lg">*</span>}
+									{q.required && <span className="text-(--accent-red) text-lg">*</span>}
 								</label>
 
 								<div className="pl-8">
@@ -236,15 +243,11 @@ export default function ApplicationFormPage() {
 									{q.type === 'radio' && (
 										<div className="flex flex-col gap-2">
 											{q.options?.map((opt, oIdx) => (
-												<label key={oIdx} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-(--border)/10 hover:bg-(--border)/5 transition-colors">
-													<input
-														type="radio"
-														name={`radio-${q.id}`}
-														value={opt}
-														checked={answers[q.id] === opt}
-														onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-														required={q.required}
-													/>
+												<label
+													key={oIdx}
+													className="flex items-center gap-3 cursor-pointer p-3 rounded-2xl border border-(--border)/10 hover:bg-(--border)/5 transition-colors"
+												>
+													<Toggle size="sm" checked={answers[q.id] === opt} onChange={() => handleAnswerChange(q.id, opt)} />
 													<span className="text-sm">{opt}</span>
 												</label>
 											))}

@@ -8,7 +8,22 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
 	title: 'Platform Changelog & Release Notes',
-	description: 'Explore the latest updates, version history, and release notes across the Xernerx Studios ecosystem.',
+	description: 'Explore the latest feature updates, version history, security patches, and release notes across the entire Xernerx Studios suite ecosystem.',
+	alternates: { canonical: '/changelog' },
+	openGraph: {
+		title: 'Xernerx Support | Platform Changelog & Release Notes',
+		description: 'Explore the latest feature updates, version history, security patches, and release notes across the entire Xernerx Studios suite ecosystem.',
+		url: 'https://info.xernerx.com/changelog',
+		siteName: 'Xernerx Support & Info',
+		images: [{ url: '/opengraph-image', width: 1200, height: 630, alt: 'Xernerx Support — Changelog & Release Notes' }],
+		type: 'website',
+	},
+	twitter: {
+		card: 'summary_large_image',
+		title: 'Xernerx Support | Platform Changelog & Release Notes',
+		description: 'Explore the latest feature updates, version history, security patches, and release notes across the entire Xernerx Studios suite ecosystem.',
+		images: ['/opengraph-image'],
+	},
 };
 
 const APPS = [

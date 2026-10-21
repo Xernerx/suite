@@ -200,12 +200,12 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 
 										<div className="flex items-center gap-2 shrink-0">
 											{item.memberCount !== undefined && (
-												<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-(--foreground) border border-(--border)/10 text-[11px] font-semibold text-(--text-muted)">
+												<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-(--foreground) border border-(--border)/10 text-[11px] font-semibold text-(--text-muted)">
 													<Users size={11} className="text-(--accent)" />
 													{item.memberCount}
 												</span>
 											)}
-											<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-(--foreground) border border-(--border)/10 text-[11px] font-semibold text-(--text-muted)">
+											<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-(--foreground) border border-(--border)/10 text-[11px] font-semibold text-(--text-muted)">
 												<ChevronUp size={11} className="text-(--accent)" />
 												{item.voteCount || 0}
 											</span>

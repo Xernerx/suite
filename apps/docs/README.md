@@ -5,42 +5,48 @@
 </p>
 
 <p align="center">
-  <b>Comprehensive documentation portal for the Xernerx Suite and package ecosystem.</b>
+  <b>Comprehensive developer documentation portal, interactive API playground, and package reference for the Xernerx Suite.</b>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge&logo=none" alt="Status">
   <img src="https://img.shields.io/badge/service-docs-blue?style=for-the-badge&logo=none" alt="Service">
+  <img src="https://img.shields.io/badge/port-4005-informational?style=for-the-badge&logo=none" alt="Port">
 </p>
 
 ---
 
 ## 🧭 Overview
 
-The **Docs** service provides official guides, API references, and documentation for the entire Xernerx Suite as well as individual packages under the `@xernerx/*` namespace.
+The **Docs** service (`docs.xernerx.com`, dev port `4005`) provides official developer guides, interactive REST API specifications, CDN media pipeline documentation, WebSocket RPC protocol references, and automated TypeDoc/package documentation for `@xernerx/*` NPM packages.
 
 ### 🌐 Subdomain Routing
 
 | Environment | URL Pattern                                                  | Description                                       |
 | :---------- | :----------------------------------------------------------- | :------------------------------------------------ |
 | **Public**  | [`docs.xernerx.com`](https://docs.xernerx.com)               | Production documentation portal                   |
-| **Canary**  | [`docs.canary.xernerx.com`](https://canary.docs.xernerx.com) | Staging and pre-release documentation environment |
-| **Dev**     | [`docs.dev.xernerx.com`](https://dev.docs.xernerx.com)       | Local and active development environment          |
+| **Canary**  | [`docs.canary.xernerx.com`](https://docs.canary.xernerx.com) | Staging and pre-release documentation environment |
+| **Dev**     | [`docs.dev.xernerx.com`](https://docs.dev.xernerx.com)       | Local development portal (`localhost:4005`)       |
 
 ---
 
-## 🛠️ Core Features
+## 🛠️ Core Sections & Routes
 
-- **Suite Guides:** Comprehensive tutorials and architecture overviews for the Xernerx platform.
-- **Package API References:** Deep-dive documentation for `@xernerx/framework`, `@xernerx/stats`, and other ecosystem packages.
-- **Interactive Code Snippets:** Live examples and syntax highlighting for developers.
+- **`/` (Docs Hub & Deep Search):** Instant keyboard-navigable search (`Ctrl + K`) indexing all REST endpoints, CDN routes, WebSocket RPC services, and NPM packages.
+- **`/api/[version]` (`v1`, `core`, `secure`):**
+    - Interactive **API Playground** (`ApiPlayground.tsx`) with preset pills, custom Bearer token headers, JSON body editor, and live response/latency inspection.
+    - Multi-language code examples (`TypeScript`, `JavaScript`, `Python`, `HTML`, `Markdown`) and live SVG widget/badge previews.
+- **`/cdn` (Media & Storage Pipeline):** Reference for `POST /upload`, `POST /upload/[id]`, `GET /media`, `PATCH / DELETE /media/[id]`, `GET /raw/[id]`, and `GET /view/[id]`.
+- **`/websocket` (Real-Time Gateway):** Architecture overview, handshake authentication, JSON-RPC request/response envelopes, and `@xernerx/websocket` client examples.
+- **`/packages` & `/packages/[...package]`:** Live NPM registry and GitHub release reader for `@xernerx/framework`, `@xernerx/stats`, `@xernerx/websocket`, and ecosystem packages with version switching.
 
 ---
 
 ## 🛠️ Tech Stack & Dependencies
 
 - **Framework:** Next.js (App Router) / React
-- **Styling & Components:** Tailwind CSS, MDX rendering pipeline
+- **Styling & UI:** Tailwind CSS v4, `@xernerx/ui` (`CodeBlock`, `Selector`, `Input`), `@xernerx/components`, Framer Motion
+- **Localization:** `@xernerx/providers` (`useDictionary`)
 
 ---
 

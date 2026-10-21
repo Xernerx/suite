@@ -1,11 +1,13 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, LogOut, Settings, Info, Trash2, User as UserIcon, ExternalLink, Copy, Check } from 'lucide-react';
+import { LogOut, Settings, Info, User as UserIcon, ExternalLink } from 'lucide-react';
 import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
-import { Button, Confirm, Selector } from '@xernerx/ui';
+import { Button, CopyButton, Selector } from '@xernerx/ui';
+import { WidgetSettingsCard } from '@xernerx/components';
 import Image from 'next/image';
 import { useState } from 'react';
+import { AccountDangerZone } from './AccountDangerZone';
 export default function Account() {
 	const { t } = useDictionary();
 	const { data: session } = useSession();
@@ -16,19 +18,11 @@ export default function Account() {
 	const [isConfirmAccountOpen, setIsConfirmAccountOpen] = useState(false);
 	const [isDeletingData, setIsDeletingData] = useState(false);
 	const [isConfirmDataOpen, setIsConfirmDataOpen] = useState(false);
-	const [copiedId, setCopiedId] = useState(false);
 	const activeUser = discordUser || session?.user;
 	const userId = activeUser?.id;
 	const [privacy, setPrivacy] = useState(activeUser?.privacy || 'private');
+	const [widgets, setWidgets] = useState(Boolean((activeUser as any)?.widgets));
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
-
-	const handleCopyId = () => {
-		if (!userId) return;
-		navigator.clipboard.writeText(userId);
-		setCopiedId(true);
-		toast({ title: t('account.profile.idCopied'), type: 'success' });
-		setTimeout(() => setCopiedId(false), 2000);
-	};
 
 	const handleLogout = () => {
 		const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
@@ -80,6 +74,7 @@ export default function Account() {
 					pronouns: '',
 					timezone: '',
 					privacy: 'private',
+					widgets: false,
 				}),
 			});
 			if (!res.ok) {
@@ -135,6 +130,37 @@ export default function Account() {
 			});
 		}
 	};
+	const handleWidgetsChange = async (enabled: boolean) => {
+		if (!userId) return;
+		setWidgets(enabled);
+		try {
+			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+				body: JSON.stringify({
+					widgets: enabled,
+				}),
+			});
+			if (!res.ok) throw new Error(t('account.profile.privacy.toast.error'));
+			toast({
+				type: 'success',
+				title: t('account.profile.privacy.toast.title'),
+				description: t('account.profile.privacy.toast.widgetsSaved'),
+			});
+		} catch (error: any) {
+			toast({
+				type: 'error',
+				title: t('account.profile.privacy.toast.error'),
+				description: error.message,
+			});
+		}
+	};
+
+	const displayName = activeUser?.global_name || activeUser?.name || t('account.account.fallbackName');
+
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full"
@@ -195,22 +221,9 @@ export default function Account() {
 							gap: 'calc(var(--ui-gap) * 0.25)',
 						}}
 					>
-						<h2 className="text-xl font-bold text-(--text) truncate">{activeUser?.global_name || activeUser?.name || t('account.account.fallbackName')}</h2>
+						<h2 className="text-xl font-bold text-(--text) truncate">{displayName}</h2>
 						<p className="text-sm text-(--text-muted) truncate">@{activeUser?.username || activeUser?.name?.toLowerCase().replace(/\s/g, '')}</p>
-						{userId && (
-							<button
-								type="button"
-								onClick={handleCopyId}
-								className="inline-flex items-center gap-1.5 w-fit text-xs text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-2 py-0.5 rounded-md border border-(--border)/10 font-mono transition-colors cursor-pointer"
-							>
-								<span>
-									{t('account.common.description', {
-										userId,
-									})}
-								</span>
-								{copiedId ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
-							</button>
-						)}
+						{userId && <CopyButton value={userId} label={t('account.common.description', { userId })} toastTitle={t('account.profile.idCopied')} className="w-fit" />}
 					</div>
 				</div>
 				{userId && (
@@ -247,7 +260,7 @@ export default function Account() {
 					</div>
 					<button
 						onClick={handleLogout}
-						className="flex items-center justify-center rounded-xl bg-red-500/15 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/20 shrink-0"
+						className="flex items-center justify-center rounded-2xl bg-(--accent-red)/15 text-sm font-medium text-(--accent-red) transition-colors hover:bg-(--accent-red)/20 shrink-0"
 						style={{
 							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
 							gap: 'calc(var(--ui-gap) * 0.5)',
@@ -278,7 +291,7 @@ export default function Account() {
 								gap: 'calc(var(--ui-gap) * 0.5)',
 							}}
 						>
-							<Settings size={18} />
+							<Settings size={18} className="text-(--accent)" />
 							<h3>{t('account.common.title')}</h3>
 						</div>
 						<div className="flex items-center gap-1 text-xs text-(--text-muted)">
@@ -329,105 +342,19 @@ export default function Account() {
 					</div>
 				</div>
 
-				{/* Reset Data Card */}
-				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
-					style={{
-						padding: 'var(--ui-gap)',
-						gap: 'var(--ui-gap)',
-					}}
-				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
-						}}
-					>
-						<div
-							className="flex items-center text-(--accent-orange) font-semibold text-base"
-							style={{
-								gap: 'calc(var(--ui-gap) * 0.5)',
-							}}
-						>
-							<AlertTriangle size={18} />
-							<h3>{t('account.common.title2')}</h3>
-						</div>
-						<p className="text-xs text-(--accent-orange)/80">{t('account.common.description3')}</p>
-					</div>
-					<button
-						onClick={() => setIsConfirmDataOpen(true)}
-						className="flex items-center justify-center rounded-xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm"
-						style={{
-							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-							gap: 'calc(var(--ui-gap) * 0.5)',
-						}}
-					>
-						<Trash2 size={16} />
-						<span>{t('account.common.description4')}</span>
-					</button>
-				</div>
+				{userId && <WidgetSettingsCard entityType="users" entityId={userId} entityName={displayName} enabled={Boolean(widgets)} onChange={handleWidgetsChange} />}
 
-				{/* Delete Account Card */}
-				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
-					style={{
-						padding: 'var(--ui-gap)',
-						gap: 'var(--ui-gap)',
-					}}
-				>
-					<div
-						className="flex flex-col max-w-xl"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
-						}}
-					>
-						<div
-							className="flex items-center text-(--accent-red) font-semibold text-base"
-							style={{
-								gap: 'calc(var(--ui-gap) * 0.5)',
-							}}
-						>
-							<AlertTriangle size={18} />
-							<h3>{t('account.account.danger.title')}</h3>
-						</div>
-						<p className="text-xs text-(--accent-red)/80">{t('account.account.danger.description')}</p>
-					</div>
-					<button
-						onClick={() => setIsConfirmAccountOpen(true)}
-						className="flex items-center justify-center rounded-xl bg-(--accent-red) text-sm font-medium text-white transition-colors hover:bg-(--accent-red)/80 shrink-0 shadow-sm"
-						style={{
-							padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-							gap: 'calc(var(--ui-gap) * 0.5)',
-						}}
-					>
-						<Trash2 size={16} />
-						<span>{t('account.common.description5')}</span>
-					</button>
-				</div>
+				<AccountDangerZone
+					isConfirmDataOpen={isConfirmDataOpen}
+					setIsConfirmDataOpen={setIsConfirmDataOpen}
+					isDeletingData={isDeletingData}
+					handleDeleteData={handleDeleteData}
+					isConfirmAccountOpen={isConfirmAccountOpen}
+					setIsConfirmAccountOpen={setIsConfirmAccountOpen}
+					isDeletingAccount={isDeletingAccount}
+					handleDeleteAccount={handleDeleteAccount}
+				/>
 			</div>
-
-			<Confirm
-				open={isConfirmAccountOpen}
-				onOpenChange={setIsConfirmAccountOpen}
-				title={t('account.account.danger.confirmTitle')}
-				description={t('account.account.danger.confirmDescription')}
-				confirmText={t('account.account.danger.confirmButton')}
-				confirmKeyword={activeUser?.username || activeUser?.name || 'DELETE'}
-				onConfirm={handleDeleteAccount}
-				loading={isDeletingAccount}
-			/>
-
-			<Confirm
-				open={isConfirmDataOpen}
-				onOpenChange={setIsConfirmDataOpen}
-				title={t('account.common.tooltip')}
-				description={t('account.account.resetDataConfirmDesc')}
-				confirmText={t('account.account.resetDataConfirmButton')}
-				variant="warning"
-				confirmKeyword="RESET"
-				onConfirm={handleDeleteData}
-				loading={isDeletingData}
-			/>
 		</div>
 	);
 }

@@ -4,8 +4,8 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Settings2, User as UserIcon } from 'lucide-react';
-import { useDictionary } from '@xernerx/providers';
+import { Settings2, User as UserIcon, Copy, Check } from 'lucide-react';
+import { useDictionary, useToast } from '@xernerx/providers';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './types';
 import { UserModal } from './UserModal';
 
@@ -16,11 +16,14 @@ interface UserCardProps {
 	onUserDeleted: (id: string) => void;
 	onUserUpdated: (updated: FullUser) => void;
 	onDiscordFetched: (id: string, discord: DiscordProfile) => void;
+	onViewAuditLogs?: (userId: string) => void;
 }
 
-export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated, onDiscordFetched }: UserCardProps) {
+export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated, onDiscordFetched, onViewAuditLogs }: UserCardProps) {
 	const { t } = useDictionary();
+	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [copiedId, setCopiedId] = useState(false);
 	const [discord, setDiscord] = useState<DiscordProfile | null>(user.discord || null);
 
 	// Fetch Discord profile if missing
@@ -104,11 +107,24 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 							)}
 							{discord?.username && <span className="text-xs text-(--text-muted) truncate">@{discord.username}</span>}
 						</div>
-						<span className="text-[10px] text-(--text-muted)/60 font-mono mt-1">
-							{t('admin.users.card.idPrefix', {
-								id: user.id,
-							})}
-						</span>
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								navigator.clipboard.writeText(user.id);
+								setCopiedId(true);
+								toast({ type: 'success', title: t('admin.users.idCopied') });
+								setTimeout(() => setCopiedId(false), 2000);
+							}}
+							className="inline-flex items-center gap-1 w-fit text-[10px] text-(--text-muted)/70 hover:text-(--text) font-mono mt-1 px-1.5 py-0.5 rounded-xl bg-(--background)/40 hover:bg-(--background) border border-(--border)/10 transition-colors cursor-pointer"
+						>
+							<span>
+								{t('admin.users.card.idPrefix', {
+									id: user.id,
+								})}
+							</span>
+							{copiedId ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
+						</button>
 					</div>
 				</div>
 
@@ -117,7 +133,17 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 				</div>
 			</motion.div>
 
-			<UserModal open={isModalOpen} onOpenChange={setIsModalOpen} user={user} discord={discord} roles={roles} getEnvUrl={getEnvUrl} onUserDeleted={onUserDeleted} onUserUpdated={onUserUpdated} />
+			<UserModal
+				open={isModalOpen}
+				onOpenChange={setIsModalOpen}
+				user={user}
+				discord={discord}
+				roles={roles}
+				getEnvUrl={getEnvUrl}
+				onUserDeleted={onUserDeleted}
+				onUserUpdated={onUserUpdated}
+				onViewAuditLogs={onViewAuditLogs}
+			/>
 		</>
 	);
 }

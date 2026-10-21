@@ -25,14 +25,36 @@ const schema = new Schema(
 		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service
 		agreedPrivacy: { type: Date, default: null }, // Timestamp of when the user agreed to the Privacy Policy
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the user
+		widgets: { type: Boolean, default: false }, // Whether public embed widgets are enabled
 		preferences: { locale: { type: String } }, // User locale (e.g., en-US, es-ES, fr-FR)
 
-		links: {
-			website: { type: String },
-			github: { type: String },
-			twitter: { type: String },
-			youtube: { type: String },
-			twitch: { type: String },
+		connections: {
+			type: [
+				{
+					provider: { type: String, required: true },
+					id: { type: String, required: true },
+					username: { type: String, required: true },
+					displayName: { type: String },
+					avatar: { type: String },
+					url: { type: String },
+					showOnProfile: { type: Boolean, default: true },
+					connectedAt: { type: Date, default: Date.now },
+				},
+			],
+			default: [],
+		},
+
+		devices: {
+			type: [
+				{
+					id: { type: String },
+					browser: { type: String },
+					os: { type: String },
+					deviceType: { type: String },
+					lastActive: { type: Date },
+				},
+			],
+			default: [],
 		},
 
 		hooks: { type: [{ name: String, description: String, url: String, data: String }] }, // List of user webhooks

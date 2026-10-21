@@ -83,7 +83,7 @@ async function getPackages() {
 							description = parsedDesc;
 						}
 					}
-				} catch (e) {
+				} catch {
 					// ignore
 				}
 

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Bug, Compass, History, LifeBuoy, Map, MessageSquare } from 'lucide-react';
+import { ArrowRight, Activity, Bug, Compass, History, LifeBuoy, Map, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -53,48 +53,59 @@ export default function InfoHomePage() {
 
 	const searchableItems: SearchResultItem[] = useMemo(() => {
 		const faqEntries: SearchResultItem[] = [
-			{
-				id: 'faq-tr-1',
-				category: 'faq',
-				title: t('faq.translations.card1.title'),
-				description: t('faq.translations.card1.p1'),
-				href: '/faq?view=translations',
-			},
-			{
-				id: 'faq-tr-2',
-				category: 'faq',
-				title: t('faq.translations.card2.title'),
-				description: t('faq.translations.card2.description'),
-				href: '/faq?view=translations',
-			},
-			{
-				id: 'faq-tr-3',
-				category: 'faq',
-				title: t('faq.translations.card3.title'),
-				description: t('faq.translations.card3.description'),
-				href: '/faq?view=translations',
-			},
-			{
-				id: 'faq-tr-4',
-				category: 'faq',
-				title: t('faq.translations.card4.title'),
-				description: t('faq.translations.card4.description'),
-				href: '/faq?view=translations',
-			},
-			{
-				id: 'faq-env-1',
-				category: 'faq',
-				title: t('faq.environments.card.title'),
-				description: t('faq.environments.card.description'),
-				href: '/faq?view=environments',
-			},
-			{
-				id: 'faq-bots-1',
-				category: 'faq',
-				title: t('faq.bots.card.title'),
-				description: t('faq.bots.card.description2'),
-				href: '/faq?view=bots',
-			},
+			{ id: 'faq-ov-1', category: 'faq', title: t('faq.overview.card1.title'), description: t('faq.overview.card1.description'), href: '/faq?view=overview' },
+			{ id: 'faq-ov-2', category: 'faq', title: t('faq.overview.card2.title'), description: t('faq.overview.card2.description'), href: '/faq?view=overview' },
+			{ id: 'faq-ov-3', category: 'faq', title: t('faq.overview.card3.title'), description: t('faq.overview.card3.description'), href: '/faq?view=overview' },
+			{ id: 'faq-ov-4', category: 'faq', title: t('faq.overview.card4.title'), description: t('faq.overview.card4.description'), href: '/faq?view=overview' },
+			{ id: 'faq-ov-5', category: 'faq', title: t('faq.overview.card5.title'), description: t('faq.overview.card5.description'), href: '/faq?view=overview' },
+			{ id: 'faq-env-1', category: 'faq', title: t('faq.environments.card.title'), description: t('faq.environments.card.description'), href: '/faq?view=environments' },
+			{ id: 'faq-env-2', category: 'faq', title: t('faq.environments.card2.title'), description: t('faq.environments.card2.description'), href: '/faq?view=environments' },
+			{ id: 'faq-env-3', category: 'faq', title: t('faq.environments.card3.title'), description: t('faq.environments.card3.description'), href: '/faq?view=environments' },
+			{ id: 'faq-env-4', category: 'faq', title: t('faq.environments.card4.title'), description: t('faq.environments.card4.description'), href: '/faq?view=environments' },
+			{ id: 'faq-env-6', category: 'faq', title: t('faq.environments.card6.title'), description: t('faq.environments.card6.description'), href: '/faq?view=environments' },
+			{ id: 'faq-desk-1', category: 'faq', title: t('faq.desktop.card1.title'), description: t('faq.desktop.card1.description'), href: '/faq?view=desktop' },
+			{ id: 'faq-desk-2', category: 'faq', title: t('faq.desktop.card2.title'), description: t('faq.desktop.card2.description'), href: '/faq?view=desktop' },
+			{ id: 'faq-desk-3', category: 'faq', title: t('faq.desktop.card3.title'), description: t('faq.desktop.card3.description'), href: '/faq?view=desktop' },
+			{ id: 'faq-desk-4', category: 'faq', title: t('faq.desktop.card4.title'), description: t('faq.desktop.card4.description'), href: '/faq?view=desktop' },
+			{ id: 'faq-desk-5', category: 'faq', title: t('faq.desktop.card5.title'), description: t('faq.desktop.card5.description'), href: '/faq?view=desktop' },
+			{ id: 'faq-bots-8', category: 'faq', title: t('faq.bots.card8.title'), description: t('faq.bots.card8.description'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-2', category: 'faq', title: t('faq.bots.card2.title'), description: t('faq.bots.card2.description'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-9', category: 'faq', title: t('faq.bots.card9.title'), description: t('faq.bots.card9.description'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-10', category: 'faq', title: t('faq.bots.card10.title'), description: t('faq.bots.card10.description'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-1', category: 'faq', title: t('faq.bots.card.title'), description: t('faq.bots.card.description2'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-4', category: 'faq', title: t('faq.bots.card4.title'), description: t('faq.bots.card4.description'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-5', category: 'faq', title: t('faq.bots.card5.title'), description: t('faq.bots.card5.description'), href: '/faq?view=bots' },
+			{ id: 'faq-bots-3', category: 'faq', title: t('faq.bots.card3.title'), description: t('faq.bots.card3.description'), href: '/faq?view=bots' },
+			{ id: 'faq-srv-1', category: 'faq', title: t('faq.servers.card1.title'), description: t('faq.servers.card1.description'), href: '/faq?view=servers' },
+			{ id: 'faq-srv-2', category: 'faq', title: t('faq.servers.card2.title'), description: t('faq.servers.card2.description'), href: '/faq?view=servers' },
+			{ id: 'faq-srv-3', category: 'faq', title: t('faq.servers.card3.title'), description: t('faq.servers.card3.description'), href: '/faq?view=servers' },
+			{ id: 'faq-srv-4', category: 'faq', title: t('faq.servers.card4.title'), description: t('faq.servers.card4.description'), href: '/faq?view=servers' },
+			{ id: 'faq-srv-5', category: 'faq', title: t('faq.servers.card5.title'), description: t('faq.servers.card5.description'), href: '/faq?view=servers' },
+			{ id: 'faq-srv-6', category: 'faq', title: t('faq.servers.card6.title'), description: t('faq.servers.card6.description'), href: '/faq?view=servers' },
+			{ id: 'faq-acc-1', category: 'faq', title: t('faq.account.card1.title'), description: t('faq.account.card1.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-5', category: 'faq', title: t('faq.account.card5.title'), description: t('faq.account.card5.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-6', category: 'faq', title: t('faq.account.card6.title'), description: t('faq.account.card6.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-7', category: 'faq', title: t('faq.account.card7.title'), description: t('faq.account.card7.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-9', category: 'faq', title: t('faq.account.card9.title'), description: t('faq.account.card9.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-8', category: 'faq', title: t('faq.account.card8.title'), description: t('faq.account.card8.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-10', category: 'faq', title: t('faq.account.card10.title'), description: t('faq.account.card10.description'), href: '/faq?view=account' },
+			{ id: 'faq-acc-3', category: 'faq', title: t('faq.account.card3.title'), description: t('faq.account.card3.description'), href: '/faq?view=account' },
+			{ id: 'faq-bill-1', category: 'faq', title: t('faq.billing.card1.title'), description: t('faq.billing.card1.description'), href: '/faq?view=billing' },
+			{ id: 'faq-bill-2', category: 'faq', title: t('faq.billing.card2.title'), description: t('faq.billing.card2.description'), href: '/faq?view=billing' },
+			{ id: 'faq-bill-3', category: 'faq', title: t('faq.billing.card3.title'), description: t('faq.billing.card3.description'), href: '/faq?view=billing' },
+			{ id: 'faq-bill-4', category: 'faq', title: t('faq.billing.card4.title'), description: t('faq.billing.card4.description'), href: '/faq?view=billing' },
+			{ id: 'faq-bill-5', category: 'faq', title: t('faq.billing.card5.title'), description: t('faq.billing.card5.description'), href: '/faq?view=billing' },
+			{ id: 'faq-dev-1', category: 'faq', title: t('faq.developers.card1.title'), description: t('faq.developers.card1.description'), href: '/faq?view=developers' },
+			{ id: 'faq-dev-7', category: 'faq', title: t('faq.developers.card7.title'), description: t('faq.developers.card7.description'), href: '/faq?view=developers' },
+			{ id: 'faq-dev-3', category: 'faq', title: t('faq.developers.card3.title'), description: t('faq.developers.card3.description'), href: '/faq?view=developers' },
+			{ id: 'faq-dev-8', category: 'faq', title: t('faq.developers.card8.title'), description: t('faq.developers.card8.description'), href: '/faq?view=developers' },
+			{ id: 'faq-dev-4', category: 'faq', title: t('faq.developers.card4.title'), description: t('faq.developers.card4.description'), href: '/faq?view=developers' },
+			{ id: 'faq-dev-2', category: 'faq', title: t('faq.developers.card2.title'), description: t('faq.developers.card2.description'), href: '/faq?view=developers' },
+			{ id: 'faq-tr-1', category: 'faq', title: t('faq.translations.card1.title'), description: t('faq.translations.card1.p1'), href: '/faq?view=translations' },
+			{ id: 'faq-tr-2', category: 'faq', title: t('faq.translations.card2.title'), description: t('faq.translations.card2.description'), href: '/faq?view=translations' },
+			{ id: 'faq-tr-3', category: 'faq', title: t('faq.translations.card3.title'), description: t('faq.translations.card3.description'), href: '/faq?view=translations' },
+			{ id: 'faq-tr-4', category: 'faq', title: t('faq.translations.card4.title'), description: t('faq.translations.card4.description'), href: '/faq?view=translations' },
+			{ id: 'faq-tr-5', category: 'faq', title: t('faq.translations.card5.title'), description: t('faq.translations.card5.description'), href: '/faq?view=translations' },
 		];
 
 		const issues: SearchResultItem[] = issueItems.map((item, idx) => ({
@@ -156,14 +167,22 @@ export default function InfoHomePage() {
 	const categoryBadge = (category: SearchResultItem['category']) => {
 		switch (category) {
 			case 'faq':
-				return { label: t('info.home.searchCategories.faq'), icon: <LifeBuoy className="w-3.5 h-3.5 text-green-500" />, cls: 'bg-green-500/10 text-green-500 border-green-500/20' };
+				return {
+					label: t('info.home.searchCategories.faq'),
+					icon: <LifeBuoy className="w-3.5 h-3.5 text-(--accent-green)" />,
+					cls: 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20',
+				};
 			case 'issues':
-				return { label: t('info.home.searchCategories.issues'), icon: <Bug className="w-3.5 h-3.5 text-red-500" />, cls: 'bg-red-500/10 text-red-500 border-red-500/20' };
+				return {
+					label: t('info.home.searchCategories.issues'),
+					icon: <Bug className="w-3.5 h-3.5 text-(--accent-red)" />,
+					cls: 'bg-(--accent-red)/10 text-(--accent-red) border-(--accent-red)/20',
+				};
 			case 'suggestions':
 				return {
 					label: t('info.home.searchCategories.suggestions'),
-					icon: <MessageSquare className="w-3.5 h-3.5 text-purple-500" />,
-					cls: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
+					icon: <MessageSquare className="w-3.5 h-3.5 text-(--accent)" />,
+					cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20',
 				};
 			case 'roadmap':
 				return { label: t('info.home.searchCategories.roadmap'), icon: <Map className="w-3.5 h-3.5 text-(--accent)" />, cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20' };
@@ -176,35 +195,42 @@ export default function InfoHomePage() {
 			description: t('info.home.portals.roadmap.description'),
 			icon: <Map className="w-8 h-8 text-(--accent)" />,
 			href: '/roadmap',
-			color: 'bg-blue-500/10 border-blue-500/20',
+			color: 'bg-(--accent)/10 border-(--accent)/20',
 		},
 		{
 			title: t('info.home.portals.suggestions.title'),
 			description: t('info.home.portals.suggestions.description'),
-			icon: <MessageSquare className="w-8 h-8 text-purple-500" />,
+			icon: <MessageSquare className="w-8 h-8 text-(--accent)" />,
 			href: '/suggestions',
-			color: 'bg-purple-500/10 border-purple-500/20',
+			color: 'bg-(--accent)/10 border-(--accent)/20',
 		},
 		{
 			title: t('info.home.portals.bugs.title'),
 			description: t('info.home.portals.bugs.description'),
-			icon: <Bug className="w-8 h-8 text-red-500" />,
+			icon: <Bug className="w-8 h-8 text-(--accent-red)" />,
 			href: '/issues',
-			color: 'bg-red-500/10 border-red-500/20',
+			color: 'bg-(--accent-red)/10 border-(--accent-red)/20',
 		},
 		{
 			title: t('info.home.portals.changelog.title'),
 			description: t('info.home.portals.changelog.description'),
-			icon: <History className="w-8 h-8 text-amber-500" />,
+			icon: <History className="w-8 h-8 text-(--accent-orange)" />,
 			href: '/changelog',
-			color: 'bg-amber-500/10 border-amber-500/20',
+			color: 'bg-(--accent-orange)/10 border-(--accent-orange)/20',
+		},
+		{
+			title: t('info.home.portals.status.title'),
+			description: t('info.home.portals.status.description'),
+			icon: <Activity className="w-8 h-8 text-(--accent-green)" />,
+			href: '/status',
+			color: 'bg-(--accent-green)/10 border-(--accent-green)/20',
 		},
 		{
 			title: t('info.home.portals.faq.title'),
 			description: t('info.home.portals.faq.description'),
-			icon: <LifeBuoy className="w-8 h-8 text-green-500" />,
+			icon: <LifeBuoy className="w-8 h-8 text-(--accent-green)" />,
 			href: '/faq',
-			color: 'bg-green-500/10 border-green-500/20',
+			color: 'bg-(--accent-green)/10 border-(--accent-green)/20',
 		},
 	];
 
@@ -285,7 +311,7 @@ export default function InfoHomePage() {
 				</div>
 			</motion.div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto w-full">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
 				{portals.map((portal, i) => (
 					<Link href={portal.href} key={i}>
 						<motion.div
@@ -297,7 +323,7 @@ export default function InfoHomePage() {
 							className={`flex flex-col items-center text-center p-8 rounded-3xl border ${portal.color} bg-(--foreground)/30 backdrop-blur-md shadow-lg h-full transition-colors hover:bg-(--foreground)/50 hover:shadow-xl cursor-pointer gap-4`}
 						>
 							<div className="p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10 shadow-sm">{portal.icon}</div>
-							<h3 className="text-xl font-bold text-(--text)">{portal.title}</h3>
+							<h2 className="text-xl font-bold text-(--text)">{portal.title}</h2>
 							<p className="text-sm text-(--text-muted) leading-relaxed">{portal.description}</p>
 						</motion.div>
 					</Link>

@@ -5,23 +5,25 @@ import { usePlatform, useSidebar } from '@xernerx/providers';
 
 import { Footer } from './Footer';
 import { Header } from './Header';
+import { useWindowControlsStyle } from './HeaderWindowControls';
 import NextTopLoader from 'nextjs-toploader';
 import { Sidebar } from './Sidebar';
 
 export function Page({ children }: { children: React.ReactNode }) {
 	const { device } = usePlatform();
 	const { state } = useSidebar();
+	const { isRightAligned } = useWindowControlsStyle();
 
 	// Footer only renders when the sidebar is hidden
 	const showFooter = state === 'hidden';
 
 	return (
-		<main className="dark flex h-screen w-full flex-col overflow-hidden bg-(--background)">
+		<div className="flex h-screen w-full flex-col overflow-hidden bg-(--background)" style={{ height: 'calc(100vh / var(--ui-zoom, 1))' }}>
 			{/* Header stays completely fixed at the top */}
 			<Header />
 
 			{/* Middle layout container filling the screen */}
-			<div className="flex flex-1 overflow-hidden">
+			<div className={`flex flex-1 overflow-hidden ${isRightAligned ? 'flex-row-reverse' : ''}`}>
 				<NextTopLoader color="var(--accent)" showSpinner={false} shadow="none" height={3} />
 
 				<Sidebar />
@@ -30,7 +32,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 				<div
 					id="main-scroll-container"
 					className={`relative h-full flex-1 overflow-y-auto shadow-inner
-                        ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : 'rounded-tl-xl'} 
+                        ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'} 
                     `}
 					style={{
 						background:
@@ -38,15 +40,15 @@ export function Page({ children }: { children: React.ReactNode }) {
 					}}
 				>
 					<div className={`relative z-10 flex flex-col ${showFooter ? 'min-h-full justify-between' : ''}`}>
-						<div className="relative z-10" style={{ padding: 'var(--ui-gap)' }}>
+						<main className="relative z-10" style={{ padding: 'var(--ui-gap)' }}>
 							{children}
-						</div>
+						</main>
 
 						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}
 						{showFooter && <Footer />}
 					</div>
 				</div>
 			</div>
-		</main>
+		</div>
 	);
 }

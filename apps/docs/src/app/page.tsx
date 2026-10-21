@@ -1,299 +1,20 @@
 /** @format */
 'use client';
 
-import { ArrowRight, CornerDownLeft, Globe, Package, Rocket, Zap } from 'lucide-react';
+import { ArrowRight, CornerDownLeft } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
-
-const categories = [
-	{
-		titleKey: 'docs.home.categories.api.title',
-		descKey: 'docs.home.categories.api.description',
-		icon: Globe,
-		href: '/api',
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-	},
-	{
-		titleKey: 'docs.home.categories.cdn.title',
-		descKey: 'docs.home.categories.cdn.description',
-		icon: Rocket,
-		href: '/cdn',
-		color: 'text-purple-500',
-		bg: 'bg-purple-500/10',
-	},
-	{
-		titleKey: 'docs.home.categories.npm.title',
-		descKey: 'docs.home.categories.npm.description',
-		icon: Package,
-		href: '/packages',
-		color: 'text-emerald-500',
-		bg: 'bg-emerald-500/10',
-	},
-	{
-		titleKey: 'docs.home.categories.websocket.title',
-		descKey: 'docs.home.categories.websocket.description',
-		icon: Zap,
-		href: '/websocket',
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-	},
-];
-
-const searchTopics = [
-	// REST API v1
-	{
-		titleKey: 'docs.api.common.nav.overview',
-		descKey: 'docs.home.categories.api.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#overview',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'rest api base url endpoint v1 overview',
-	},
-	{
-		titleKey: 'docs.api.common.auth',
-		descKey: 'docs.api.common.authDesc1',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#authentication',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'authentication bearer token authorization header secure passage',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.fetchBotProfile.title',
-		descKey: 'docs.api.v1.endpoints.fetchBotProfile.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#fetch-bot-profile',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'get /v1/bots/:id bot profile metadata',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.updateBotProfile.title',
-		descKey: 'docs.api.v1.endpoints.updateBotProfile.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#update-bot-profile',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'patch /v1/bots/:id update bot profile description tags links privacy',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.deleteBotProfile.title',
-		descKey: 'docs.api.v1.endpoints.deleteBotProfile.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#delete-bot-profile',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'delete /v1/bots/:id remove bot profile',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.fetchBotStats.title',
-		descKey: 'docs.api.v1.endpoints.fetchBotStats.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#fetch-bot-stats',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'get /v1/bots/:id/stats statistics history',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.postBotStats.title',
-		descKey: 'docs.api.v1.endpoints.postBotStats.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#post-bot-stats',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'post /v1/bots/:id/stats @xernerx/stats guildCount serverCount shardCount userCount',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.updateBotStats.title',
-		descKey: 'docs.api.v1.endpoints.updateBotStats.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#update-bot-stats',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'patch /v1/bots/:id/stats update statistics snapshot',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.deleteBotStats.title',
-		descKey: 'docs.api.v1.endpoints.deleteBotStats.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#delete-bot-stats',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'delete /v1/bots/:id/stats wipe statistics',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.fetchBotCommands.title',
-		descKey: 'docs.api.v1.endpoints.fetchBotCommands.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#fetch-bot-commands',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'get /v1/bots/:id/commands slash commands',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.syncBotCommands.title',
-		descKey: 'docs.api.v1.endpoints.syncBotCommands.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#sync-bot-commands',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'put /v1/bots/:id/commands sync bulk slash commands',
-	},
-	{
-		titleKey: 'docs.api.v1.endpoints.deleteBotCommands.title',
-		descKey: 'docs.api.v1.endpoints.deleteBotCommands.description',
-		categoryKey: 'docs.home.categories.api.title',
-		href: '/api/v1#delete-bot-commands',
-		icon: Globe,
-		color: 'text-blue-500',
-		bg: 'bg-blue-500/10',
-		keywords: 'delete /v1/bots/:id/commands wipe commands',
-	},
-	// CDN
-	{
-		titleKey: 'docs.cdn.overview.title',
-		descKey: 'docs.cdn.description',
-		categoryKey: 'docs.home.categories.cdn.title',
-		href: '/cdn#overview',
-		icon: Rocket,
-		color: 'text-purple-500',
-		bg: 'bg-purple-500/10',
-		keywords: 'cdn base url authentication media storage blob',
-	},
-	{
-		titleKey: 'docs.cdn.upload.title',
-		descKey: 'docs.cdn.upload.description',
-		categoryKey: 'docs.home.categories.cdn.title',
-		href: '/cdn#upload',
-		icon: Rocket,
-		color: 'text-purple-500',
-		bg: 'bg-purple-500/10',
-		keywords: 'post /api/media upload file multipart form-data blob',
-	},
-	{
-		titleKey: 'docs.cdn.list.title',
-		descKey: 'docs.cdn.list.description',
-		categoryKey: 'docs.home.categories.cdn.title',
-		href: '/cdn#list',
-		icon: Rocket,
-		color: 'text-purple-500',
-		bg: 'bg-purple-500/10',
-		keywords: 'get /api/media list media records files',
-	},
-	{
-		titleKey: 'docs.cdn.manage.title',
-		descKey: 'docs.cdn.manage.description',
-		categoryKey: 'docs.home.categories.cdn.title',
-		href: '/cdn#manage',
-		icon: Rocket,
-		color: 'text-purple-500',
-		bg: 'bg-purple-500/10',
-		keywords: 'patch delete /api/media/:id manage privacy shared delete media',
-	},
-	{
-		titleKey: 'docs.cdn.proxy.title',
-		descKey: 'docs.cdn.proxy.description',
-		categoryKey: 'docs.home.categories.cdn.title',
-		href: '/cdn#proxy',
-		icon: Rocket,
-		color: 'text-purple-500',
-		bg: 'bg-purple-500/10',
-		keywords: 'get /raw/:id secure media proxy stream file',
-	},
-	// WebSocket
-	{
-		titleKey: 'docs.websocket.overview.title',
-		descKey: 'docs.websocket.hero.description',
-		categoryKey: 'docs.home.categories.websocket.title',
-		href: '/websocket#overview',
-		icon: Zap,
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-		keywords: 'websocket gateway rpc architecture overview socket',
-	},
-	{
-		titleKey: 'docs.websocket.nav.connecting',
-		descKey: 'docs.websocket.overview.cards.socket.desc',
-		categoryKey: 'docs.home.categories.websocket.title',
-		href: '/websocket#connecting',
-		icon: Zap,
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-		keywords: 'websocket connecting wss ws port 5000 connection',
-	},
-	{
-		titleKey: 'docs.websocket.nav.authentication',
-		descKey: 'docs.websocket.overview.cards.auth.desc',
-		categoryKey: 'docs.home.categories.websocket.title',
-		href: '/websocket#authentication',
-		icon: Zap,
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-		keywords: 'websocket authentication token jwt handshake allowance',
-	},
-	{
-		titleKey: 'docs.websocket.nav.rpcProtocol',
-		descKey: 'docs.websocket.overview.cards.proxy.desc',
-		categoryKey: 'docs.home.categories.websocket.title',
-		href: '/websocket#protocol',
-		icon: Zap,
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-		keywords: 'websocket rpc protocol request response payload id service action',
-	},
-	{
-		titleKey: 'docs.websocket.nav.servicesAndActions',
-		descKey: 'docs.websocket.hero.description',
-		categoryKey: 'docs.home.categories.websocket.title',
-		href: '/websocket#services',
-		icon: Zap,
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-		keywords: 'websocket services actions database guilds users members',
-	},
-	{
-		titleKey: 'docs.websocket.nav.clientExample',
-		descKey: 'docs.websocket.hero.description',
-		categoryKey: 'docs.home.categories.websocket.title',
-		href: '/websocket#client',
-		icon: Zap,
-		color: 'text-orange-500',
-		bg: 'bg-orange-500/10',
-		keywords: 'websocket client example @xernerx/websocket typescript node',
-	},
-	// NPM Packages
-	{
-		titleKey: 'docs.packages.page.title',
-		descKey: 'docs.packages.page.description',
-		categoryKey: 'docs.home.categories.npm.title',
-		href: '/packages',
-		icon: Package,
-		color: 'text-emerald-500',
-		bg: 'bg-emerald-500/10',
-		keywords: 'npm packages @xernerx/framework @xernerx/stats @xernerx/websocket classes interfaces functions',
-	},
-];
+import { categories, searchTopics } from '@/components/docsHomeData';
+import { useDocsAccess } from '@/components/useDocsAccess';
 
 export default function DocsHome() {
 	const { t } = useDictionary();
 	const { hide } = useSidebar();
 	const router = useRouter();
+	const { hasWebsocket } = useDocsAccess();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -301,18 +22,21 @@ export default function DocsHome() {
 		hide();
 	}, [hide]);
 
+	const visibleCategories = useMemo(() => categories.filter((c) => (c.href === '/websocket' ? hasWebsocket : true)), [hasWebsocket]);
+
 	const filteredTopics = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
 		if (!q) return [];
 		return searchTopics
 			.filter((item) => {
+				if (item.href.startsWith('/websocket') && !hasWebsocket) return false;
 				const title = t(item.titleKey).toLowerCase();
 				const desc = t(item.descKey).toLowerCase();
 				const category = t(item.categoryKey).toLowerCase();
 				return title.includes(q) || desc.includes(q) || category.includes(q) || item.keywords.includes(q) || item.href.toLowerCase().includes(q);
 			})
 			.slice(0, 8);
-	}, [searchQuery, t]);
+	}, [searchQuery, t, hasWebsocket]);
 
 	useEffect(() => {
 		setSelectedIndex(0);
@@ -371,13 +95,13 @@ export default function DocsHome() {
 						fontFamily: 'var(--font-fredoka)',
 					}}
 				>
-					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-purple-500">{t('docs.home.title')}</span>
+					Xernerx <span className="text-transparent bg-clip-text bg-gradient-to-r from-(--accent) to-(--accent)">{t('docs.home.title')}</span>
 				</h1>
 				<p className="text-base text-(--text-muted) max-w-xl leading-relaxed mt-2">{t('docs.home.description')}</p>
 
 				{/* Search Bar & Deep Search Dropdown */}
 				<div className="w-full max-w-2xl mt-8 relative group">
-					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-purple-500 rounded-full blur-md opacity-20 group-hover:opacity-40 transition duration-500 pointer-events-none" />
+					<div className="absolute inset-0 bg-gradient-to-r from-(--accent) to-(--accent) rounded-full blur-md opacity-20 group-hover:opacity-40 transition duration-500 pointer-events-none" />
 					<Input
 						variant="search"
 						shortcut={true}
@@ -462,12 +186,12 @@ export default function DocsHome() {
 							},
 						},
 					}}
-					className="grid grid-cols-1 md:grid-cols-2 w-full"
+					className={`grid grid-cols-1 ${visibleCategories.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'} w-full`}
 					style={{
 						gap: 'calc(var(--ui-gap) * 1.5)',
 					}}
 				>
-					{categories.map((category, idx) => (
+					{visibleCategories.map((category, idx) => (
 						<motion.a
 							href={category.href}
 							key={idx}
@@ -496,14 +220,14 @@ export default function DocsHome() {
 								>
 									<category.icon size={32} />
 								</div>
-								<h3
+								<h2
 									className="text-2xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mt-2"
 									style={{
 										fontFamily: 'var(--font-fredoka)',
 									}}
 								>
 									{t(category.titleKey)}
-								</h3>
+								</h2>
 							</div>
 							<p className="text-base text-(--text-muted) leading-relaxed relative z-10">{t(category.descKey)}</p>
 						</motion.a>

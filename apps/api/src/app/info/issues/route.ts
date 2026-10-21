@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
 
 		const issue = await models.core.Issue.create({
 			id: crypto.randomUUID(),
+			authorId: session.user.id,
 			title: body.title,
 			description: body.description,
 			productId: body.productId,

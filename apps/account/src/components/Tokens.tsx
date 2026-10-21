@@ -1,11 +1,11 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Key, Plus } from 'lucide-react';
+import { Key, Plus } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
-import { Button, Input } from '@xernerx/ui';
+import { Button, EmptyState, Input, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { TokenListInfo } from './tokens/types';
 import TokenCard from './tokens/TokenCard';
@@ -30,7 +30,7 @@ export default function Tokens() {
 			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/tokens`, {
 				credentials: 'include',
 			});
-			if (!res.ok) throw new Error('Failed to fetch tokens');
+			if (!res.ok) throw new Error(t('common.toast.error'));
 			const data = await res.json();
 			setTokens(data);
 		} catch (error) {
@@ -58,6 +58,12 @@ export default function Tokens() {
 		});
 	}, [tokens, searchQuery, statusFilter]);
 
+	const statusTabs = [
+		{ id: 'all', label: t('account.tokens.filterAll'), count: tokens.length },
+		{ id: 'active', label: t('account.tokens.filterActive') },
+		{ id: 'inactive', label: t('account.tokens.filterInactive') },
+	];
+
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full"
@@ -75,12 +81,7 @@ export default function Tokens() {
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				<div
-					className="flex items-center"
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.75)',
-					}}
-				>
+				<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 					<div
 						className="flex items-center justify-center rounded-2xl bg-(--accent)/10 text-(--accent) shrink-0"
 						style={{
@@ -90,25 +91,15 @@ export default function Tokens() {
 					>
 						<Key size={24} />
 					</div>
-					<div
-						className="flex flex-col"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
-						}}
-					>
-						<h1
-							className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
-							style={{
-								fontFamily: 'var(--font-fredoka)',
-							}}
-						>
+					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('account.tokens.title')}
 						</h1>
 						<p className="text-sm text-(--text-muted)">{t('account.tokens.description')}</p>
 					</div>
 				</div>
 
-				<Button onClick={() => setIsCreateOpen(true)} className="gap-2 bg-(--accent) text-white hover:bg-(--accent-hover) rounded-xl px-5 py-2.5">
+				<Button onClick={() => setIsCreateOpen(true)} className="gap-2 bg-(--accent) text-white hover:bg-(--hover-accent) rounded-2xl px-5 py-2.5">
 					<Plus size={16} />
 					{t('account.tokens.generateButton')}
 				</Button>
@@ -120,22 +111,7 @@ export default function Tokens() {
 					<div className="w-full sm:max-w-sm">
 						<Input variant="search" shortcut={true} placeholder={t('account.tokens.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
 					</div>
-					<div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-						{(['all', 'active', 'inactive'] as const).map((status) => (
-							<button
-								key={status}
-								type="button"
-								onClick={() => setStatusFilter(status)}
-								className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border shrink-0 cursor-pointer ${
-									statusFilter === status
-										? 'bg-(--accent) text-white border-(--accent) shadow-sm'
-										: 'bg-(--foreground)/30 text-(--text-muted) hover:text-(--text) border-(--border)/10'
-								}`}
-							>
-								{status === 'all' ? t('account.tokens.filterAll') : status === 'active' ? t('account.tokens.filterActive') : t('account.tokens.filterInactive')}
-							</button>
-						))}
-					</div>
+					<Tabs size="sm" fullWidth={false} tabs={statusTabs} activeTab={statusFilter} onChange={(id) => setStatusFilter(id as typeof statusFilter)} />
 				</div>
 			)}
 
@@ -145,27 +121,11 @@ export default function Tokens() {
 					<Loading />
 				</div>
 			) : tokens.length === 0 ? (
-				<div
-					className="flex flex-col h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm text-center px-4"
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<AlertTriangle size={32} className="text-(--text-muted)" />
-					<p className="text-sm font-medium text-(--text)">{t('account.tokens.empty.title')}</p>
-					<p className="text-xs text-(--text-muted) max-w-sm">{t('account.tokens.empty.description')}</p>
-				</div>
+				<EmptyState icon={<Key size={24} />} title={t('account.tokens.empty.title')} description={t('account.tokens.empty.description')} />
 			) : filteredTokens.length === 0 ? (
-				<div className="flex flex-col h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm text-center px-4">
-					<p className="text-sm font-medium text-(--text-muted)">{t('account.tokens.noMatchingTokens')}</p>
-				</div>
+				<EmptyState icon={<Key size={24} />} title={t('account.tokens.noMatchingTokens')} />
 			) : (
-				<div
-					className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-					style={{
-						gap: 'var(--ui-gap)',
-					}}
-				>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 					<AnimatePresence>
 						{filteredTokens.map((token, i) => (
 							<TokenCard key={token.id || token._id} token={token} index={i} onSelect={setSelectedTokenId} />
@@ -176,7 +136,6 @@ export default function Tokens() {
 
 			{/* Modals */}
 			<CreateTokenModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSuccess={fetchTokens} userId={(session?.user as any)?.id} />
-
 			<ManageTokenModal tokenId={selectedTokenId} onClose={() => setSelectedTokenId(null)} onSuccess={fetchTokens} />
 		</div>
 	);

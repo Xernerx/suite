@@ -20,6 +20,7 @@ const schema = new Schema(
 		banner: { type: String },
 		description: { type: String }, // Short description of the guild
 		info: { type: String }, // Long description about the guild
+		owner: { type: String }, // Owner Discord user ID of the guild
 		organization: { type: String }, // Organization or developer of the guild
 		verified: { type: Boolean, default: false }, // Whether the guild has been verified
 		bot: { type: Boolean, default: false }, // Whether the bot is in this server

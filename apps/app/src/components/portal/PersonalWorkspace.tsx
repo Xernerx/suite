@@ -6,6 +6,7 @@ import { Bot, User, ExternalLink, Copy, Check } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { BotRow } from '@xernerx/components';
 import { Button } from '@xernerx/ui';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface PersonalWorkspaceProps {
@@ -35,7 +36,14 @@ export default function PersonalWorkspace({ session, bots, organizations }: Pers
 			<div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
 				<div className="relative z-10 flex items-center gap-4">
 					{session?.user?.image ? (
-						<img src={session.user.image} alt="Avatar" className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
+						<Image
+							src={session.user.image}
+							alt="Avatar"
+							width={80}
+							height={80}
+							unoptimized
+							className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+						/>
 					) : (
 						<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
 							<User className="w-8 h-8 text-(--text-muted)" />
@@ -54,7 +62,7 @@ export default function PersonalWorkspace({ session, bots, organizations }: Pers
 									className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-0.5 rounded-lg border border-(--border)/10 transition-colors cursor-pointer"
 								>
 									<span>{t('app.portal.workspace.id', { id: userId })}</span>
-									{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+									{copiedId ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
 								</button>
 							)}
 						</div>

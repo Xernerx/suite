@@ -22,8 +22,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const VoteModel = (db.models.bots as any).Vote;
 
 		const bot = await BotModel.findOne({ id }).lean();
-		if (!bot || bot.privacy === 'private' || !bot.widgets) {
-			return NextResponse.json({ error: 'Bot widget not found or disabled' }, { status: 404 });
+		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
+		if (!bot || bot.privacy === 'private' || (isExternalWidget && !bot.widgets)) {
+			return NextResponse.json({ error: 'Bot profile not found or private' }, { status: 404 });
 		}
 
 		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ botId: id })]);
@@ -82,6 +83,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			bannerUrl: payload.bannerUrl,
 			verified: payload.verified,
 			profileUrl: `${resolveAppBaseUrl(req.url)}/bots/${payload.id}`,
+			theme: (url.searchParams.get('theme') === 'light' ? 'light' : 'dark') as 'dark' | 'light',
 			stats: [
 				{ label: 'Servers', value: payload.guildCount },
 				{ label: 'Users', value: payload.userCount },

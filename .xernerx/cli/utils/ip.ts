@@ -1,3 +1,5 @@
+/** @format */
+
 import os from 'os';
 
 export function getLocalIp(): string {

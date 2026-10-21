@@ -15,7 +15,7 @@ export default function Page() {
 	useEffect(() => {
 		hide();
 	}, [hide]);
-	const sections: Section[] = [
+	const rawSections: Section[] = [
 		{
 			id: 'introduction',
 			title: t('www.cookies.sections.introduction.title'),
@@ -99,6 +99,10 @@ export default function Page() {
 			),
 		},
 	];
+	const sections: Section[] = rawSections.map((section, idx) => ({
+		...section,
+		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
+	}));
 	const { scrollYProgress } = useScroll();
 	const scaleX = useSpring(scrollYProgress, {
 		stiffness: 100,
@@ -137,7 +141,7 @@ export default function Page() {
 				<div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					{/* TOC */}
 					<aside className="hidden lg:block sticky top-32 self-start">
-						<h3 className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.cookies.toc')}</h3>
+						<p className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.cookies.toc')}</p>
 
 						<nav className="space-y-4 text-sm">
 							{sections.map((section) => (
@@ -153,7 +157,7 @@ export default function Page() {
 					</aside>
 
 					{/* MAIN */}
-					<main className="space-y-16">
+					<div className="space-y-16">
 						<header className="text-center mb-16 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm">
 							<h1
 								className="text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm"
@@ -183,7 +187,7 @@ export default function Page() {
 								</section>
 							))}
 						</div>
-					</main>
+					</div>
 				</div>
 			</div>
 		</div>

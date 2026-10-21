@@ -63,7 +63,7 @@ export default function Commands({ bot }: { bot: any }) {
 							<div className="flex items-center justify-between gap-3 mb-2">
 								<div className="flex items-center gap-3 min-w-0">
 									<Terminal className="w-5 h-5 text-(--accent) shrink-0" />
-									<h3 className="text-xl font-bold font-mono truncate">/{cmd.name}</h3>
+									<h2 className="text-xl font-bold font-mono truncate">/{cmd.name}</h2>
 								</div>
 								<button
 									type="button"
@@ -71,7 +71,7 @@ export default function Commands({ bot }: { bot: any }) {
 									title={t('app.bots.id.copyCommand', { name: cmd.name })}
 									className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-(--background)/80 hover:bg-(--background) border border-(--border)/10 hover:border-(--accent)/40 text-xs font-mono text-(--text-muted) hover:text-(--text) transition-all cursor-pointer shrink-0"
 								>
-									{copiedCmd === cmd.name ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+									{copiedCmd === cmd.name ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
 									<span>/{cmd.name}</span>
 								</button>
 							</div>
@@ -79,13 +79,15 @@ export default function Commands({ bot }: { bot: any }) {
 
 							{cmd.options && cmd.options.length > 0 && (
 								<div className="bg-(--background) rounded-2xl p-4 border border-(--border)/10">
-									<h4 className="text-xs font-bold text-(--text-muted) uppercase tracking-wider mb-3">{t('app.bots.id.text13')}</h4>
+									<h3 className="text-xs font-bold text-(--text-muted) uppercase tracking-wider mb-3">{t('app.bots.id.text13')}</h3>
 									<div className="flex flex-col gap-2">
 										{cmd.options.map((opt: any, j: number) => (
 											<div key={j} className="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-(--border)/10 last:border-0 gap-2">
 												<div className="flex items-center gap-2">
 													<span className="font-mono text-sm font-semibold">{opt.name}</span>
-													{opt.required && <span className="text-[10px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded-full font-bold">{t('app.bots.id.text14')}</span>}
+													{opt.required && (
+														<span className="text-[10px] bg-(--accent-red)/10 text-(--accent-red) px-2 py-0.5 rounded-full font-bold">{t('app.bots.id.text14')}</span>
+													)}
 												</div>
 												<span className="text-sm text-(--text-muted)">{opt.description}</span>
 											</div>

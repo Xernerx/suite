@@ -29,7 +29,7 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 20 }}
+			initial={{ opacity: 1, y: 0 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.3 }}
 			className="relative flex flex-col p-8 rounded-3xl border-2 border-(--accent) bg-(--foreground)/30 backdrop-blur-md shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
@@ -46,16 +46,16 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 				</div>
 
 				{hasDiscount && (
-					<span className="px-2 py-0.5 rounded-full text-xs font-bold bg-green-500/15 text-green-500 border border-green-500/20">
+					<span className="px-2 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/20">
 						{t('account.store.discountBadge', { percent: item.discountPercent })}
 					</span>
 				)}
 			</div>
 
 			<div className="mb-6">
-				<h3 className="text-3xl font-extrabold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h2 className="text-3xl font-extrabold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{item.name || item.stripeName || t('account.store.ultra.fallbackName')}
-				</h3>
+				</h2>
 				<p className="text-sm text-(--text-muted)">{item.description || item.stripeDescription || t('account.store.ultra.fallbackDesc')}</p>
 			</div>
 
@@ -63,7 +63,7 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 				{activePrice ? (
 					<>
 						{hasDiscount && <span className="text-2xl line-through text-(--text-muted) opacity-60">€{originalAmount?.toFixed(0)}</span>}
-						<span className={`text-5xl font-bold ${hasDiscount ? 'text-green-500' : 'text-(--text)'}`}>€{discountedAmount?.toFixed(0)}</span>
+						<span className={`text-5xl font-bold ${hasDiscount ? 'text-(--accent-green)' : 'text-(--text)'}`}>€{discountedAmount?.toFixed(0)}</span>
 						<span className="text-(--text-muted) font-medium">{billingInterval === 'month' ? t('account.store.pricing.monthlySuffix') : t('account.store.pricing.yearlySuffix')}</span>
 					</>
 				) : (
@@ -88,7 +88,7 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 				<div className="space-y-2">
 					<button
 						onClick={() => handleCancelClick(currentSub.stripeSubscriptionId)}
-						className="w-full py-3 px-4 rounded-xl font-medium bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+						className="w-full py-3 px-4 rounded-xl font-medium bg-(--accent-red)/10 hover:bg-(--accent-red)/20 text-(--accent-red) border border-(--accent-red)/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
 					>
 						<AlertCircle size={16} />
 						{t('account.store.buttons.cancelUltra')}

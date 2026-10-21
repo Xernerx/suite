@@ -3,16 +3,19 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Laptop } from 'lucide-react';
+import { ChevronDown, Download, Laptop, Sparkles } from 'lucide-react';
 import { FaApple, FaLinux, FaQuestion, FaWindows } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
-import { useEnvironment, usePlatform, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePlatform, useSidebar, useToast } from '@xernerx/providers';
 import { redirect } from 'next/navigation';
-import { useDictionary } from '@xernerx/providers';
+import { DesktopPerksBento } from '@/components/DesktopPerksBento';
+import { DesktopInteractivePreview } from '@/components/DesktopInteractivePreview';
+
 export default function Page() {
 	const { t } = useDictionary();
 	const { platform, type } = usePlatform();
 	const { hide } = useSidebar();
+	const { toast } = useToast();
 	const { getEnvUrl, environment } = useEnvironment();
 	const [channel, setChannel] = useState<'stable' | 'canary'>('stable');
 	const [apps, setApps] = useState<Record<'windows' | 'macos' | 'linux', Record<string, string> | null>>({
@@ -22,234 +25,218 @@ export default function Page() {
 	});
 	const [app, setApp] = useState<Record<string, string> | null>(null);
 	const [show, setShow] = useState(false);
+	const [downloadsLoaded, setDownloadsLoaded] = useState(false);
 	const showChannelSelector = environment === 'canary' || environment === 'dev';
+
 	useEffect(() => {
 		hide();
 	}, []);
+
 	useEffect(() => {
+		let cancelled = false;
 		(async () => {
-			const endpoint = `https://api.xernerx.com/secure/downloads/app?channel=${channel}`;
-			const fetchedApps = await fetch(getEnvUrl(endpoint)).then((r) => r.json());
-			setApps(fetchedApps);
-			setApp(fetchedApps[platform]);
+			try {
+				const endpoint = `https://api.xernerx.com/secure/downloads/app?channel=${channel}`;
+				const fetchedApps = await fetch(getEnvUrl(endpoint)).then((r) => r.json());
+				if (!cancelled && fetchedApps && typeof fetchedApps === 'object') {
+					setApps(fetchedApps);
+					setApp(fetchedApps[platform] || null);
+				}
+			} catch {
+				// Keep fallback state if offline in dev
+			} finally {
+				if (!cancelled) setDownloadsLoaded(true);
+			}
 		})();
+		return () => {
+			cancelled = true;
+		};
 	}, [platform, channel]);
+
 	if (type === 'application') return redirect('/');
+
+	const activePlatform = platform || 'windows';
+
+	const handlePrimaryDownload = () => {
+		if (app?.browser_download_url) {
+			window.location.href = app.browser_download_url;
+		} else {
+			toast({
+				type: 'info',
+				title: t('www.download.badge'),
+				description: t('www.download.comingSoon', { platform: activePlatform }),
+			});
+		}
+	};
+
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full items-center justify-center"
+			className="flex flex-col max-w-[1400px] mx-auto w-full items-center justify-center"
 			style={{
-				padding: 'var(--ui-gap)',
-				gap: 'var(--ui-gap)',
+				padding: 'calc(var(--ui-gap) * 1.5)',
+				gap: 'calc(var(--ui-gap) * 2.25)',
 				fontSize: 'var(--text-scale, 14px)',
 				minHeight: '100%',
 			}}
 		>
-			<motion.div
-				initial={{
-					opacity: 1,
-					y: 0,
-				}}
-				animate={{
-					opacity: 1,
-					y: 0,
-				}}
-				transition={{
-					duration: 0.3,
-				}}
-				className="flex flex-col items-center text-center rounded-3xl w-full max-w-xl"
+			{/* ASYMMETRIC SPLIT HERO + INTERACTIVE LIVE DESKTOP PLAYGROUND */}
+			<div
+				className="relative overflow-hidden rounded-3xl w-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_16%,transparent)] grid grid-cols-1 lg:grid-cols-12 items-center"
 				style={{
 					padding: 'calc(var(--ui-gap) * 2)',
-					gap: 'calc(var(--ui-gap) * 1.75)',
+					gap: 'calc(var(--ui-gap) * 2)',
 				}}
 			>
-				{/* TITLE */}
-				<div className="flex flex-col items-center gap-3">
-					<div
-						className="flex h-16 w-16 items-center justify-center rounded-2xl"
-						style={{
-							background: 'color-mix(in srgb, var(--accent) 18%, transparent)',
-							color: 'var(--accent)',
-						}}
-					>
-						<Laptop size={26} />
+				{/* Left Column: End-User Pitch + Download CTA */}
+				<div className="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left" style={{ gap: 'calc(var(--ui-gap) * 1.15)' }}>
+					<div className="inline-flex items-center gap-2 rounded-full bg-(--accent)/15 border border-(--accent)/30 px-3.5 py-1 text-xs font-bold text-(--accent)">
+						<Laptop size={14} />
+						<span>{t('www.download.badge')}</span>
 					</div>
 
-					<h1 className="text-3xl font-black tracking-tight text-(--text)">{t('www.download.title')}</h1>
+					<h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-(--text) leading-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.download.title')}
+					</h1>
 
-					<p className="text-sm max-w-md text-(--text-muted)">{t('www.download.description')}</p>
-				</div>
+					<p className="text-sm md:text-base max-w-xl text-(--text-muted) leading-relaxed">{t('www.download.description')}</p>
 
-				{/* CHANNEL SELECTOR (Visible only on Canary & Dev environments) */}
-				{showChannelSelector && (
-					<div
-						className="flex items-center rounded-2xl border border-(--border)/10 bg-(--background) p-1"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.25)',
-						}}
-					>
-						<button
-							type="button"
-							onClick={() => setChannel('stable')}
-							className="rounded-xl px-5 py-2 text-xs font-medium transition-all hover:cursor-pointer"
-							style={{
-								background: channel === 'stable' ? 'var(--accent)' : 'transparent',
-								color: channel === 'stable' ? '#fff' : 'var(--text-muted)',
-							}}
-						>
-							{t('www.download.button')}
-						</button>
-						<button
-							type="button"
-							onClick={() => setChannel('canary')}
-							className="rounded-xl px-5 py-2 text-xs font-medium transition-all hover:cursor-pointer"
-							style={{
-								background: channel === 'canary' ? 'var(--accent)' : 'transparent',
-								color: channel === 'canary' ? '#fff' : 'var(--text-muted)',
-							}}
-						>
-							{t('www.download.button2')}
-						</button>
-					</div>
-				)}
+					{/* Primary Download CTA + Channel Selector Row (Rendered once platform & release data load) */}
+					<div className="flex flex-col items-center lg:items-start gap-3 pt-1 w-full min-h-[84px] justify-center">
+						{!downloadsLoaded ? (
+							<div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 w-full">
+								<div
+									className="rounded-2xl bg-(--background)/60 border border-(--border)/10 animate-pulse"
+									style={{
+										minWidth: 240,
+										height: 46,
+									}}
+								/>
+								<div className="h-9 w-28 rounded-2xl bg-(--background)/50 border border-(--border)/10 animate-pulse" />
+							</div>
+						) : (
+							<>
+								<motion.div
+									initial={{ opacity: 0, y: 4 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ duration: 0.2 }}
+									className="flex flex-wrap items-center justify-center lg:justify-start gap-3 w-full"
+								>
+									<motion.button
+										type="button"
+										whileHover={{ scale: 1.02, y: -1 }}
+										whileTap={{ scale: 0.98 }}
+										onClick={handlePrimaryDownload}
+										className="flex items-center justify-center gap-3 rounded-2xl bg-(--accent) hover:bg-(--hover-accent) text-(--text) font-extrabold transition hover:cursor-pointer shadow-[0_0_25px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+										style={{
+											minWidth: 240,
+											padding: 'calc(var(--ui-gap) * 0.85) calc(var(--ui-gap) * 1.5)',
+										}}
+									>
+										<Download size={18} />
+										<span>{t('www.download.button3')}</span>
+										{activePlatform === 'windows' ? <FaWindows /> : activePlatform === 'macos' ? <FaApple /> : activePlatform === 'linux' ? <FaLinux /> : <FaQuestion />}
+										<span className="capitalize">{activePlatform}</span>
+									</motion.button>
 
-				{/* PRIMARY DOWNLOAD */}
-				{app && (
-					<motion.button
-						initial={{
-							opacity: 0,
-							scale: 0.96,
-						}}
-						animate={{
-							opacity: 1,
-							scale: 1,
-						}}
-						whileHover={{
-							scale: 1.02,
-							y: -1,
-						}}
-						whileTap={{
-							scale: 0.98,
-						}}
-						onClick={() => (window.location.href = app.browser_download_url)}
-						className="flex items-center justify-center gap-3 rounded-2xl font-medium transition hover:cursor-pointer shadow-sm"
-						style={{
-							background: 'var(--accent)',
-							color: '#fff',
-							boxShadow: '0 20px 50px color-mix(in srgb, var(--accent) 25%, transparent)',
-							minWidth: 260,
-							padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)',
-						}}
-					>
-						{t('www.download.button3')}
-						{platform == 'windows' ? <FaWindows /> : platform == 'macos' ? <FaApple /> : platform == 'linux' ? <FaLinux /> : <FaQuestion />}
-						<span className="capitalize">{platform}</span>
-					</motion.button>
-				)}
-
-				{/* OTHER DOWNLOADS TOGGLE */}
-				<div className="flex flex-col items-center gap-2 w-full">
-					<button type="button" onClick={() => setShow((s) => !s)} className="flex items-center gap-2 text-sm text-(--text-muted) transition hover:text-(--text) hover:cursor-pointer">
-						{t('www.download.button4')}
-						<motion.span
-							animate={{
-								rotate: show ? 180 : 0,
-							}}
-							transition={{
-								duration: 0.2,
-							}}
-						>
-							<ChevronDown size={16} />
-						</motion.span>
-					</button>
-
-					<AnimatePresence>
-						{show && (
-							<motion.div
-								initial={{
-									opacity: 0,
-									y: -6,
-									height: 0,
-								}}
-								animate={{
-									opacity: 1,
-									y: 0,
-									height: 'auto',
-								}}
-								exit={{
-									opacity: 0,
-									y: -6,
-									height: 0,
-								}}
-								transition={{
-									duration: 0.2,
-								}}
-								className="flex flex-wrap justify-center gap-2 mt-2 w-full"
-							>
-								{Object.entries(apps)
-									.filter(([, value]) => value)
-									.map(([key, value]) => (
-										<button
-											type="button"
-											key={key}
-											onClick={() => (window.location.href = value!.browser_download_url)}
-											className="flex items-center gap-2 rounded-xl border border-(--border)/10 bg-(--background) text-sm text-(--text) transition hover:border-(--border)/40 hover:cursor-pointer"
+									{showChannelSelector && (
+										<div
+											className="flex items-center rounded-2xl border border-(--border)/10 bg-(--background)/60 p-1"
 											style={{
-												padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+												gap: 'calc(var(--ui-gap) * 0.25)',
 											}}
 										>
-											{key == 'windows' ? <FaWindows /> : key == 'macos' ? <FaApple /> : key == 'linux' ? <FaLinux /> : <FaQuestion />}
-											<span className="capitalize">{key}</span>
-										</button>
-									))}
-							</motion.div>
+											<button
+												type="button"
+												onClick={() => setChannel('stable')}
+												className={`rounded-2xl px-4 py-2 text-xs font-bold transition-all hover:cursor-pointer ${
+													channel === 'stable' ? 'bg-(--accent) text-(--text) shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
+												}`}
+											>
+												{t('www.download.button')}
+											</button>
+											<button
+												type="button"
+												onClick={() => setChannel('canary')}
+												className={`rounded-2xl px-4 py-2 text-xs font-bold transition-all hover:cursor-pointer ${
+													channel === 'canary' ? 'bg-(--accent) text-(--text) shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
+												}`}
+											>
+												{t('www.download.button2')}
+											</button>
+										</div>
+									)}
+								</motion.div>
+
+								{/* Other Platforms Rollout */}
+								<div className="flex flex-col items-center lg:items-start gap-2 w-full">
+									<button
+										type="button"
+										onClick={() => setShow((s) => !s)}
+										className="flex items-center gap-2 rounded-full bg-(--background)/50 border border-(--border)/10 px-3.5 py-1 text-xs font-semibold text-(--text-muted) transition hover:text-(--text) hover:border-(--accent)/30 hover:cursor-pointer"
+									>
+										{t('www.download.button4')}
+										<motion.span animate={{ rotate: show ? 180 : 0 }} transition={{ duration: 0.2 }}>
+											<ChevronDown size={14} />
+										</motion.span>
+									</button>
+
+									<AnimatePresence>
+										{show && (
+											<motion.div
+												initial={{ opacity: 0, y: -6, height: 0 }}
+												animate={{ opacity: 1, y: 0, height: 'auto' }}
+												exit={{ opacity: 0, y: -6, height: 0 }}
+												transition={{ duration: 0.2 }}
+												className="flex flex-wrap justify-center lg:justify-start gap-2 mt-1 w-full"
+											>
+												{(['windows', 'macos', 'linux'] as const).map((osKey) => {
+													const osApp = apps[osKey];
+													return (
+														<button
+															type="button"
+															key={osKey}
+															onClick={() => {
+																if (osApp?.browser_download_url) {
+																	window.location.href = osApp.browser_download_url;
+																} else {
+																	toast({
+																		type: 'info',
+																		title: t('www.download.badge'),
+																		description: t('www.download.comingSoon', { platform: osKey }),
+																	});
+																}
+															}}
+															className="flex items-center gap-2 rounded-2xl border border-(--border)/10 bg-(--background)/60 text-xs font-semibold text-(--text) transition hover:border-(--accent)/40 hover:bg-(--accent)/10 hover:cursor-pointer"
+															style={{
+																padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+															}}
+														>
+															{osKey === 'windows' ? <FaWindows /> : osKey === 'macos' ? <FaApple /> : <FaLinux />}
+															<span className="capitalize">{osKey}</span>
+														</button>
+													);
+												})}
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</div>
+							</>
 						)}
-					</AnimatePresence>
-				</div>
-			</motion.div>
-
-			{/* DESKTOP CLIENT HIGHLIGHTS */}
-			<section className="w-full max-w-5xl mt-12 pb-16">
-				<div className="text-center max-w-2xl mx-auto mb-10">
-					<h2 className="text-2xl md:text-3xl font-extrabold text-(--text) mb-3" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{t('www.download.highlights.title')}
-					</h2>
-					<p className="text-sm text-(--text-muted) leading-relaxed">{t('www.download.highlights.subtitle')}</p>
+					</div>
 				</div>
 
-				<div className="grid md:grid-cols-2 gap-6">
-					{(
-						[
-							{
-								title: t('www.download.highlights.workspace.title'),
-								desc: t('www.download.highlights.workspace.description'),
-							},
-							{
-								title: t('www.download.highlights.channels.title'),
-								desc: t('www.download.highlights.channels.description'),
-							},
-							{
-								title: t('www.download.highlights.crossPlatform.title'),
-								desc: t('www.download.highlights.crossPlatform.description'),
-							},
-							{
-								title: t('www.download.highlights.sync.title'),
-								desc: t('www.download.highlights.sync.description'),
-							},
-						] as const
-					).map((card) => (
-						<div
-							key={card.title}
-							className="rounded-3xl bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/30 p-8 shadow-xl transition-colors flex flex-col gap-3 text-left"
-						>
-							<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{card.title}
-							</h3>
-							<p className="text-sm text-(--text-muted) leading-relaxed">{card.desc}</p>
-						</div>
-					))}
+				{/* Right Column: Live Clickable Desktop App Window */}
+				<div className="lg:col-span-6 flex flex-col items-center gap-3 w-full">
+					<DesktopInteractivePreview />
+					<span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-(--text-muted)">
+						<Sparkles size={12} className="text-(--accent)" />
+						{t('www.download.tryInteractive')}
+					</span>
 				</div>
-			</section>
+			</div>
+
+			{/* ASYMMETRIC INTERACTIVE DESKTOP PERKS BENTO */}
+			<DesktopPerksBento />
 		</div>
 	);
 }

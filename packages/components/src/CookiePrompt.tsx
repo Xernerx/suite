@@ -79,7 +79,7 @@ export function CookiePrompt() {
 		>
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h3 className="text-lg font-semibold text-(--accent)">{t('common.cookiePrompt.title')}</h3>
+					<p className="text-lg font-semibold text-(--accent)">{t('common.cookiePrompt.title')}</p>
 					<p className="text-sm text-(--text-muted)">{t('common.cookiePrompt.description')}</p>
 				</div>
 
@@ -104,6 +104,12 @@ export function CookiePrompt() {
 							description={t('common.cookiePrompt.manage.analytics.description')}
 							checked={localPrefs.analytics}
 							onChange={() => togglePref('analytics')}
+						/>
+						<PreferenceToggle
+							label={t('common.cookiePrompt.manage.marketing.label')}
+							description={t('common.cookiePrompt.manage.marketing.description')}
+							checked={localPrefs.marketing}
+							onChange={() => togglePref('marketing')}
 						/>
 					</div>
 				)}

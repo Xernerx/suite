@@ -18,12 +18,19 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 		}
 
 		// Fetch separated domain models in parallel
-		const [appearance, credits, levels, subscriptions, organizations] = await Promise.all([
+		const [appearance, credits, levels, subscriptions, organizations, verifiedIssuesCount, approvedSuggestionsCount] = await Promise.all([
 			models.users.Appearance.findOne({ ownerId: id }).lean(),
 			models.users.Credit.findOne({ ownerId: id }).lean(),
 			models.users.Level.find({ ownerId: id }).lean(),
 			models.users.Subscription.find({ ownerId: id }).lean(),
 			models.organizations.Member.find({ userId: id }).lean(),
+			(models.core.Issue as any).countDocuments({ authorId: id, acknowledged: true }).catch(() => 0),
+			(models.core.Suggestion as any)
+				.countDocuments({
+					$or: [{ authorId: id }, { 'author.id': id }],
+					status: { $in: ['approved', 'implemented', 'completed'] },
+				})
+				.catch(() => 0),
 		]);
 
 		return NextResponse.json({
@@ -34,6 +41,10 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 			levels: levels || [],
 			subscriptions: subscriptions || [],
 			organizations: organizations || [],
+			communityStats: {
+				verifiedIssuesCount: verifiedIssuesCount || 0,
+				approvedSuggestionsCount: approvedSuggestionsCount || 0,
+			},
 		});
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });

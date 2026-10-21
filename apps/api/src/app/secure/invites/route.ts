@@ -1,5 +1,8 @@
+/** @format */
+
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function GET() {
 	try {
@@ -42,6 +45,13 @@ export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
 		const invite = await (await database('xernerx')).models.core.AppInvite.create(body);
+		await recordAuditLog(req, {
+			action: 'invite.created',
+			targetType: 'system',
+			targetId: invite.id,
+			summary: `Created bot invite "${invite.name || invite.id}"`,
+			metadata: { clientId: invite.clientId },
+		});
 		return NextResponse.json(invite);
 	} catch (error) {
 		console.error(error);

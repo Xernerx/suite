@@ -2,10 +2,11 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, Store, User, Image } from 'lucide-react';
-import { useDictionary, useEnvironment, useSession, useSidebar } from '@xernerx/providers';
+import { Activity, Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, SlidersHorizontal, User, Image } from 'lucide-react';
+import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
 
 import Account from '@/components/Account';
+import ActivityView from '@/components/ActivityView';
 import Appearance from '@/components/Appearance';
 import Billing from '@/components/Billing';
 import Connections from '@/components/Connections';
@@ -13,20 +14,23 @@ import Devices from '@/components/Devices';
 import Language from '@/components/Language';
 import { Loading } from '@xernerx/feedback';
 import Notifications from '@/components/Notifications';
+import Preferences from '@/components/Preferences';
 import Profile from '@/components/Profile';
 import Tokens from '@/components/Tokens';
 import Media from '@/components/Media';
-import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
+import SignInPage from './login/page';
+import { useEffect, useRef } from 'react';
 
 const COMPONENT_MAP: Record<string, React.ReactNode> = {
 	account: <Account />,
+	activity: <ActivityView />,
 	appearance: <Appearance />,
 	billing: <Billing />,
 	connections: <Connections />,
 	devices: <Devices />,
 	language: <Language />,
 	notifications: <Notifications />,
+	preferences: <Preferences />,
 	profile: <Profile />,
 	tokens: <Tokens />,
 	media: <Media />,
@@ -36,7 +40,7 @@ export default function Home() {
 	const { data: session, status } = useSession();
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
-	const { getEnvUrl } = useEnvironment();
+	const hasInitializedView = useRef(false);
 
 	useEffect(() => {
 		hide();
@@ -80,23 +84,35 @@ export default function Home() {
 				label: t('common.nav.items.account'),
 				view: 'account',
 			},
-			// { // todo
-			// 	category: t('common.nav.categories.account'),
-			// 	icon: Link,
-			// 	label: t('common.nav.items.connections'),
-			// 	view: 'connections',
-			// },
-			// { // todo
-			// 	category: t('common.nav.categories.account'),
-			// 	icon: Computer,
-			// 	label: t('common.nav.items.devices'),
-			// 	view: 'devices',
-			// },
+			{
+				category: t('common.nav.categories.account'),
+				icon: Activity,
+				label: t('account.activity.navLabel'),
+				view: 'activity',
+			},
+			{
+				category: t('common.nav.categories.account'),
+				icon: Link,
+				label: t('common.nav.items.connections'),
+				view: 'connections',
+			},
+			{
+				category: t('common.nav.categories.account'),
+				icon: Computer,
+				label: t('common.nav.items.devices'),
+				view: 'devices',
+			},
 			{
 				category: t('common.nav.categories.preferences'),
 				icon: Paintbrush,
 				label: t('common.nav.items.appearance'),
 				view: 'appearance',
+			},
+			{
+				category: t('common.nav.categories.preferences'),
+				icon: SlidersHorizontal,
+				label: t('common.nav.items.preferences'),
+				view: 'preferences',
 			},
 			{
 				category: t('common.nav.categories.preferences'),
@@ -109,13 +125,6 @@ export default function Home() {
 				icon: Bell,
 				label: t('common.nav.items.notifications'),
 				view: 'notifications',
-			},
-			{
-				category: t('common.nav.categories.billing'),
-				icon: Store,
-				label: t('common.nav.items.store'),
-				view: 'store',
-				href: getEnvUrl('https://store.xernerx.com'),
 			},
 			{
 				category: t('common.nav.categories.billing'),
@@ -137,15 +146,29 @@ export default function Home() {
 			},
 		]);
 
-		const urlView = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('view') : null;
-		const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
-		const targetView = urlView || view || storedView || 'profile';
-		if (view !== targetView) setView(targetView);
-	}, [session, status, hide, show, setNavItems, view, setView, t, getEnvUrl]);
+		if (!hasInitializedView.current) {
+			hasInitializedView.current = true;
+			const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+			const urlView = searchParams ? searchParams.get('tab') || searchParams.get('view') : null;
+			const storedView = typeof window !== 'undefined' ? localStorage.getItem('xernerx_sidebar_view_/') : null;
+			const candidateView = (urlView && urlView in COMPONENT_MAP ? urlView : null) || view || storedView || 'profile';
+			const targetView = candidateView in COMPONENT_MAP ? candidateView : 'profile';
+			setView(targetView);
+		}
+	}, [session, status, hide, show, setNavItems, setView, t]);
+
+	useEffect(() => {
+		if (!hasInitializedView.current || !view || typeof window === 'undefined') return;
+		const url = new URL(window.location.href);
+		if (url.searchParams.get('tab') !== view || url.searchParams.has('view')) {
+			url.searchParams.delete('view');
+			url.searchParams.set('tab', view);
+			window.history.replaceState(null, '', url.toString());
+		}
+	}, [view]);
 
 	if (!session && status !== 'loading') {
-		const search = typeof window !== 'undefined' ? window.location.search : '';
-		return redirect(`/login${search}`);
+		return <SignInPage />;
 	}
 
 	if (status === 'loading') return <Loading />;

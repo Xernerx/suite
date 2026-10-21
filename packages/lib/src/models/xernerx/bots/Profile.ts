@@ -30,6 +30,9 @@ const schema = new Schema(
 		commands: { type: Array, default: [] }, // Discord JSON application commands
 		votes: { type: [{ userId: String, timestamp: Date }], default: [] }, // Array of user votes with timestamps
 		voteCount: { type: Number, default: 0 }, // Fast cache for total votes
+		status: { type: String, enum: ['online', 'idle', 'dnd', 'offline'], default: 'offline' }, // Live presence status tracked by the Xernerx bot
+		statusUpdatedAt: { type: Date }, // Timestamp when status was last synced by the Xernerx bot
+		activity: { type: String }, // Current Discord activity label
 	},
 	{ timestamps: true }
 );

@@ -7,6 +7,7 @@ import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from 
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import GeneralTab from '@/components/portal/bot/GeneralTab';
@@ -163,8 +164,17 @@ export default function PortalBotPage() {
 									? t('app.portal.bot.categories.orgBots')
 									: t('app.portal.bot.categories.personalBots'),
 							icon: b.discord?.avatar
-								? () => <img src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png`} alt={b.name} className="w-5 h-5 rounded-md object-cover" />
-								: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{(b.name || 'B').charAt(0)}</div>,
+								? () => (
+										<Image
+											src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png`}
+											alt={b.name}
+											width={20}
+											height={20}
+											unoptimized
+											className="w-5 h-5 rounded-xl object-cover"
+										/>
+									)
+								: () => <div className="w-5 h-5 rounded-xl bg-(--foreground) flex items-center justify-center text-[10px]">{(b.name || 'B').charAt(0)}</div>,
 							view: `bot-${b.id}`,
 						})),
 					]);
@@ -285,9 +295,12 @@ export default function PortalBotPage() {
 				<div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[2rem] border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
 					<div className="relative z-10 flex items-center gap-4">
 						{botConfig.discord?.avatar ? (
-							<img
+							<Image
 								src={`https://cdn.discordapp.com/avatars/${botConfig.id}/${botConfig.discord.avatar}.png`}
 								alt={botConfig.name}
+								width={80}
+								height={80}
+								unoptimized
 								className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
 							/>
 						) : (
@@ -305,7 +318,7 @@ export default function PortalBotPage() {
 								className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-colors cursor-pointer"
 							>
 								<span>{t('app.portal.workspace.id', { id: botConfig.id })}</span>
-								{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+								{copiedId ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
 							</button>
 						</div>
 					</div>

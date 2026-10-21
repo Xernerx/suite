@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import Link from 'next/link';
 import { Server, Users, ChevronUp } from 'lucide-react';
@@ -23,6 +23,7 @@ interface DiscordProfile {
 
 export function BotCard({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPrefix?: string }) {
 	const { getEnvUrl } = useEnvironment();
+	const { t } = useDictionary();
 	const [discord, setDiscord] = useState<DiscordProfile | null>(null);
 	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -56,14 +57,14 @@ export function BotCard({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPr
 		fetchData();
 	}, [bot.id, getEnvUrl]);
 
-	const name = discord?.global_name || discord?.username || 'Unknown Bot';
+	const name = discord?.global_name || discord?.username || t('components.cards.botcard.unknownBot');
 	const avatar = discord?.avatarUrl;
 	const banner = discord?.bannerUrl;
 
 	return (
 		<Link
 			href={`${hrefPrefix}/${bot.id}`}
-			className="group relative flex flex-col bg-(--foreground) border border-(--border)/10 rounded-2xl overflow-hidden hover:border-(--accent) transition-colors shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
+			className="group relative flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl overflow-hidden hover:border-(--accent) transition-colors shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
 		>
 			<div className="h-24 w-full relative bg-gradient-to-br from-(--border) to-(--background) overflow-hidden shrink-0">
 				{banner && <Image src={banner} alt={`${name} banner`} fill className="object-cover" unoptimized />}
@@ -84,15 +85,15 @@ export function BotCard({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPr
 
 					{stats && (
 						<div className="flex items-center gap-2 mb-2">
-							<div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-(--background) border border-(--border)/10 text-xs font-semibold text-(--text-muted)">
+							<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-semibold text-(--text-muted)">
 								<Server className="w-3.5 h-3.5 text-(--accent)" />
 								{stats.guildCount >= 1000 ? `${(stats.guildCount / 1000).toFixed(1)}k` : stats.guildCount}
 							</div>
-							<div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-(--background) border border-(--border)/10 text-xs font-semibold text-(--text-muted)">
+							<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-semibold text-(--text-muted)">
 								<Users className="w-3.5 h-3.5 text-(--accent)" />
 								{stats.userCount >= 1000000 ? `${(stats.userCount / 1000000).toFixed(1)}M` : stats.userCount >= 1000 ? `${(stats.userCount / 1000).toFixed(1)}k` : stats.userCount}
 							</div>
-							<div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-(--background) border border-(--border)/10 text-xs font-semibold text-(--text-muted)">
+							<div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-semibold text-(--text-muted)">
 								<ChevronUp className="w-3.5 h-3.5 text-(--accent)" />
 								{bot.voteCount && bot.voteCount >= 1000 ? `${(bot.voteCount / 1000).toFixed(1)}k` : bot.voteCount || 0}
 							</div>
@@ -102,7 +103,7 @@ export function BotCard({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPr
 
 				<div className="mt-4">
 					<h3 className="font-extrabold text-xl mb-1 truncate text-(--text)">{name}</h3>
-					<p className="text-sm text-(--text-muted) line-clamp-2 leading-relaxed">{bot.description || 'No description provided.'}</p>
+					<p className="text-sm text-(--text-muted) line-clamp-2 leading-relaxed">{bot.description || t('components.cards.botcard.noDescription')}</p>
 				</div>
 			</div>
 		</Link>

@@ -14,3 +14,6 @@ export * from './src/MultiSelector';
 export * from './src/Tabs';
 export * from './src/CodeBlock';
 export * from './src/Tooltip';
+export * from './src/Badge';
+export * from './src/EmptyState';
+export * from './src/CopyButton';

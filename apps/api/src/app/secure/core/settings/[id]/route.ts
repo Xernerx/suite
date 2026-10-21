@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { syncSisterServers } from '@/lib/sync/settings';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -46,6 +47,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		}
 
 		const updatedSetting = await SettingModel.findOneAndUpdate({ id }, { $set: updateData }, { returnDocument: 'after', upsert: true }).lean();
+
+		await recordAuditLog(req, {
+			action: 'setting.updated',
+			category: 'setting',
+			targetId: id,
+			targetLabel: updateData.name || id,
+			details: { value: typeof updateData.value === 'string' && updateData.value.length > 120 ? `${updateData.value.slice(0, 120)}...` : updateData.value },
+		});
 
 		if (id === 'sister_servers') {
 			let newSisterServers: string[] = [];

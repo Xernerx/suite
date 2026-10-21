@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Building2, Upload } from 'lucide-react';
 import { Input, Selector } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
@@ -45,9 +46,11 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 				<div className="relative mb-14">
 					<div className="relative h-48 w-full rounded-[2rem] overflow-hidden border border-(--border)/10 shadow-sm bg-(--background)/50 group/banner">
 						{pendingUploads.bannerUrl || orgConfig.bannerUrl ? (
-							<img
+							<Image
 								src={pendingUploads.bannerUrl ? URL.createObjectURL(pendingUploads.bannerUrl) : getEnvUrl(orgConfig.bannerUrl as string)}
 								alt="Banner"
+								fill
+								unoptimized
 								className="w-full h-full object-cover"
 							/>
 						) : (
@@ -65,9 +68,11 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 					<div className="absolute left-8 -bottom-10 rounded-full border-4 border-(--background) shadow-lg bg-(--background) group/avatar z-10">
 						<div className="relative w-24 h-24 rounded-full overflow-hidden bg-(--background)">
 							{pendingUploads.iconUrl || orgConfig.iconUrl ? (
-								<img
+								<Image
 									src={pendingUploads.iconUrl ? URL.createObjectURL(pendingUploads.iconUrl) : getEnvUrl(orgConfig.iconUrl as string)}
 									alt="Avatar"
+									fill
+									unoptimized
 									className="w-full h-full object-cover"
 								/>
 							) : (
@@ -94,16 +99,16 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between">
 						<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
-						<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
+						<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-2xl p-1 text-xs">
 							<button
 								onClick={() => setMarkdownPreview(false)}
-								className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								className={`px-3 py-1 rounded-xl transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 							>
 								{t('app.portal.info.write')}
 							</button>
 							<button
 								onClick={() => setMarkdownPreview(true)}
-								className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								className={`px-3 py-1 rounded-xl transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 							>
 								{t('app.portal.info.preview')}
 							</button>
@@ -111,7 +116,7 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 					</div>
 
 					{markdownPreview ? (
-						<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
+						<div className="w-full min-h-[120px] rounded-2xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
 							{orgConfig.info ? <ReactMarkdown>{orgConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">{t('app.portal.info.nothingToPreview')}</span>}
 						</div>
 					) : (
@@ -144,7 +149,7 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 									badge: (
 										<span
 											className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${
-												lang.coverage === 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+												lang.coverage === 100 ? 'bg-(--accent-green)/10 text-(--accent-green)' : 'bg-(--accent-orange)/10 text-(--accent-orange)'
 											}`}
 										>
 											{lang.coverage}%

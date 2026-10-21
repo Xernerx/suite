@@ -1,7 +1,10 @@
 /** @format */
 
 import { database } from '@xernerx/lib/core';
+import { Terminal } from '@xernerx/terminal';
 import { jwtVerify } from 'jose';
+
+const terminal = new Terminal({ scope: 'WS:AUTH', title: 'XERNERX', format: ['title', 'scope', 'datetime', 'memory'], spin: false });
 
 function getSecret() {
 	return process.env.WS_TOKEN ? new TextEncoder().encode(process.env.WS_TOKEN) : null;
@@ -102,7 +105,7 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
 
 		return { valid: false, message: 'Invalid token' };
 	} catch (error) {
-		console.error('WebSocket token verification error:', error);
+		terminal.error(`WebSocket token verification error: ${error instanceof Error ? error.message : String(error)}`);
 		return { valid: false, message: 'Internal authentication error' };
 	}
 }
@@ -122,7 +125,7 @@ export async function checkTokenWebsocketAccess(tokenId: string): Promise<boolea
 
 		return Boolean(tokenDoc.permissions?.websocket);
 	} catch (e) {
-		console.error('Failed to check token websocket access:', e);
+		terminal.error(`Failed to check token websocket access: ${e instanceof Error ? e.message : String(e)}`);
 		return false;
 	}
 }

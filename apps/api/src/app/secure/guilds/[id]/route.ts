@@ -130,6 +130,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.description !== undefined) updateData['description'] = body.description;
 		if (body.info !== undefined) updateData['info'] = body.info;
 		if (body.locale !== undefined) updateData['locale'] = body.locale;
+		if (body.owner !== undefined) updateData['owner'] = body.owner;
 		if (body.organization !== undefined) updateData['organization'] = body.organization;
 		if (body.verified !== undefined) updateData['verified'] = body.verified;
 		if (body.bot !== undefined) updateData['bot'] = body.bot;

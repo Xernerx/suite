@@ -2,32 +2,48 @@
 'use client';
 
 import { CodeBlock } from '@xernerx/ui';
-import { useDictionary } from '@xernerx/providers';
-import { Server, Code, Lock } from 'lucide-react';
+import Image from 'next/image';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { Server, Code, Lock, Award } from 'lucide-react';
 import { EndpointSection } from './EndpointSection';
 
-export function V1ProfileEndpoints() {
+interface V1SubProps {
+	activeGroup?: string;
+	searchQuery?: string;
+	methodFilter?: string;
+	defaultExpanded?: boolean;
+	onTryRoute?: (method: string, path: string) => void;
+}
+
+export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute }: V1SubProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
+	const apiBase = getEnvUrl('https://api.xernerx.com');
+	const appBase = getEnvUrl('https://app.xernerx.com');
+
+	const sampleBadgeUrl = `${apiBase}/v1/bots/1059956767103668244/badge.svg?type=votes`;
+	const sampleBotUrl = `${appBase}/bots/1059956767103668244`;
 
 	const sections = [
 		{
 			id: 'fetch-bot-profile',
+			group: 'v1-profiles',
 			title: t('docs.api.v1.endpoints.fetchBotProfile.title'),
 			icon: Server,
 			description: t('docs.api.v1.endpoints.fetchBotProfile.description'),
-			routes: [{ method: 'GET', path: '/v1/bots/[id]/profile', color: 'blue' }],
+			routes: [{ method: 'GET', path: '/v1/bots/[id]/profile', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10 text-sm text-(--text-muted) space-y-4">
-					<div className="bg-orange-500/10 border border-orange-500/20 p-4 rounded-xl mb-6">
-						<h4 className="text-orange-500 font-bold mb-1 flex items-center gap-2">
+					<div className="bg-(--accent-orange)/10 border border-(--accent-orange)/20 p-4 rounded-2xl mb-6">
+						<h3 className="text-(--accent-orange) font-bold mb-1 flex items-center gap-2">
 							<Lock size={16} /> {t('docs.api.v1.endpoints.fetchBotProfile.privacyScope')}
-						</h4>
+						</h3>
 						<p className="text-sm text-(--text-muted)" dangerouslySetInnerHTML={{ __html: t('docs.api.v1.endpoints.fetchBotProfile.privacyDesc') }}></p>
 					</div>
 
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
@@ -52,16 +68,17 @@ export function V1ProfileEndpoints() {
 		},
 		{
 			id: 'update-bot-profile',
+			group: 'v1-profiles',
 			title: t('docs.api.v1.endpoints.updateBotProfile.title'),
 			icon: Code,
 			description: t('docs.api.v1.endpoints.updateBotProfile.description'),
-			routes: [{ method: 'PATCH', path: '/v1/bots/[id]/profile', color: 'orange' }],
+			routes: [{ method: 'PATCH', path: '/v1/bots/[id]/profile', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.jsonBodyParameters')}
-					</h4>
-					<div className="overflow-x-auto mb-8">
+					</h3>
+					<div className="overflow-x-auto mb-8 rounded-2xl border border-(--border)/10 bg-(--background)/40 p-4">
 						<table className="w-full text-left border-collapse text-sm">
 							<thead>
 								<tr className="border-b border-(--border)/10 text-(--text-muted)">
@@ -100,9 +117,9 @@ export function V1ProfileEndpoints() {
 						</table>
 					</div>
 
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
@@ -127,15 +144,16 @@ export function V1ProfileEndpoints() {
 		},
 		{
 			id: 'delete-bot-profile',
+			group: 'v1-profiles',
 			title: t('docs.api.v1.endpoints.deleteBotProfile.title'),
 			icon: Server,
 			description: t('docs.api.v1.endpoints.deleteBotProfile.description'),
-			routes: [{ method: 'DELETE', path: '/v1/bots/[id]/profile', color: 'red' }],
+			routes: [{ method: 'DELETE', path: '/v1/bots/[id]/profile', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
-					<h4 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
 						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
-					</h4>
+					</h3>
 					<CodeBlock
 						tabs={[
 							{
@@ -158,12 +176,72 @@ export function V1ProfileEndpoints() {
 				</div>
 			),
 		},
-	];
+		{
+			id: 'fetch-bot-badges',
+			group: 'v1-badges',
+			title: t('app.widgets.badgesTitle'),
+			icon: Award,
+			description: t('app.widgets.badgesDescription'),
+			routes: [
+				{ method: 'GET', path: '/v1/bots/[id]/badge.svg?type=votes|servers|users|status&theme=dark|light&style=rounded|pill|flat', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/guilds/[id]/badge.svg?type=votes|members|messages|status&theme=dark|light&style=rounded|pill|flat', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/organizations/[id]/badge.svg?type=members|bots|servers|status&theme=dark|light&style=rounded|pill|flat', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/users/[id]/badge.svg?type=streak|bots|orgs|status&theme=dark|light&style=rounded|pill|flat', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/status/badge.svg', auth: 'public' as const },
+			],
+			extra: (
+				<div className="p-6 border-t border-(--border)/10">
+					<CodeBlock
+						preview={
+							<div className="flex flex-wrap items-center gap-2">
+								<Image src={`${apiBase}/v1/bots/1059956767103668244/badge.svg?type=votes`} alt="Votes Badge" width={110} height={24} unoptimized className="h-6 w-auto" />
+								<Image src={`${apiBase}/v1/bots/1059956767103668244/badge.svg?type=servers`} alt="Servers Badge" width={120} height={24} unoptimized className="h-6 w-auto" />
+								<Image src={`${apiBase}/v1/bots/1059956767103668244/badge.svg?type=status`} alt="Status Badge" width={110} height={24} unoptimized className="h-6 w-auto" />
+								<Image src={`${apiBase}/v1/status/badge.svg`} alt="System Status Badge" width={130} height={24} unoptimized className="h-6 w-auto" />
+							</div>
+						}
+						tabs={[
+							{
+								id: 'markdown',
+								label: t('app.widgets.formatMarkdown'),
+								language: 'markdown',
+								code: `[![Xernerx Votes](${sampleBadgeUrl})](${sampleBotUrl})`,
+							},
+							{
+								id: 'html',
+								label: t('app.widgets.formatHtmlImg'),
+								language: 'html',
+								code: `<a href="${sampleBotUrl}" target="_blank" rel="noopener noreferrer">\n  <img src="${sampleBadgeUrl}" alt="Xernerx Votes" />\n</a>`,
+							},
+							{
+								id: 'svg',
+								label: t('app.widgets.formatDirectSvg'),
+								language: 'url',
+								code: sampleBadgeUrl,
+							},
+						]}
+					/>
+				</div>
+			),
+		},
+	].filter((s) => activeGroup === 'all' || s.group === activeGroup);
 
 	return (
 		<>
 			{sections.map((section) => (
-				<EndpointSection key={section.id} id={section.id} title={section.title} icon={section.icon} description={section.description} routes={section.routes} extra={section.extra} />
+				<EndpointSection
+					key={section.id}
+					id={section.id}
+					title={section.title}
+					icon={section.icon}
+					description={section.description}
+					routes={section.routes}
+					extra={section.extra}
+					defaultExpanded={defaultExpanded}
+					searchQuery={searchQuery}
+					methodFilter={methodFilter}
+					onTryRoute={onTryRoute}
+				/>
 			))}
 		</>
 	);

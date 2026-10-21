@@ -1,3 +1,7 @@
+/** @format */
+
+import { XernerxClient } from '@xernerx/framework';
+import { XernerxStats } from '@xernerx/stats';
 import path from 'path';
 
 for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')]) {
@@ -6,21 +10,28 @@ for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process
 	} catch {}
 }
 
-import { XernerxClient } from '@xernerx/framework';
-import { XernerxStats } from '@xernerx/stats';
-
 export class Client extends XernerxClient {
 	constructor() {
 		super({
-			intents: ['Guilds', 'GuildMessages', 'GuildMembers'],
+			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences'],
 			token: process.env.DISCORD_CLIENT_TOKEN as string,
+			guildId: '687429190165069838',
+			global: process.env.ENVIRONMENT === 'production',
 		});
 
-		this.modules.eventHandler.loadEvents({
+		this.init();
+	}
+
+	async init() {
+		await this.modules.commandHandler.loadSlashCommands({
+			directory: 'dist/commands/slash',
+		});
+
+		await this.modules.eventHandler.loadEvents({
 			directory: 'dist/events',
 		});
 
-		this.connect();
+		await this.connect();
 	}
 }
 

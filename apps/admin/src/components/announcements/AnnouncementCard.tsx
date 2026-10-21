@@ -32,11 +32,11 @@ export function AnnouncementCard({ announcement: a, onEdit, onDelete }: Announce
 
 			<div className="flex flex-col gap-1 text-sm text-(--text-muted)">
 				{a.sentAt ? (
-					<div className="flex items-center gap-2 text-green-500">
+					<div className="flex items-center gap-2 text-(--accent-green)">
 						<Send size={14} /> {t('admin.dashboard.announcements.sentOn')} {new Date(a.sentAt).toLocaleDateString()}
 					</div>
 				) : (
-					<div className="flex items-center gap-2 text-orange-500">
+					<div className="flex items-center gap-2 text-(--accent-orange)">
 						<CalendarClock size={14} />{' '}
 						{a.scheduledFor ? `${t('admin.dashboard.announcements.scheduled')} ${new Date(a.scheduledFor).toLocaleString()}` : t('admin.dashboard.announcements.draft')}
 					</div>

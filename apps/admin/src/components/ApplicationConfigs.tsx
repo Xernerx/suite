@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import { Loader2, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Download, Loader2, Plus, RefreshCw } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Button, Confirm } from '@xernerx/ui';
+import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ApplicationConfig, ApplicationFormData, Role } from './applications/types';
 import { ApplicationConfigCard } from './applications/ApplicationConfigCard';
@@ -17,7 +17,10 @@ export default function ApplicationConfigs() {
 	const [configs, setConfigs] = useState<ApplicationConfig[]>([]);
 	const [roles, setRoles] = useState<Role[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
+	const [search, setSearch] = useState('');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'closed'>('all');
 
 	// Form State
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,8 +42,9 @@ export default function ApplicationConfigs() {
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 	const [deletingId, setDeletingId] = useState<string | null>(null);
 
-	const fetchConfigsAndRoles = async () => {
-		setIsLoading(true);
+	const fetchConfigsAndRoles = async (isManual = false) => {
+		if (isManual) setRefreshing(true);
+		else setIsLoading(true);
 		try {
 			const [configsRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/dispatch/applications'), {
@@ -64,6 +68,7 @@ export default function ApplicationConfigs() {
 			});
 		} finally {
 			setIsLoading(false);
+			setRefreshing(false);
 		}
 	};
 
@@ -92,7 +97,7 @@ export default function ApplicationConfigs() {
 			});
 			if (!res.ok) {
 				const errData = await res.json();
-				throw new Error(errData.error || 'Failed to save config');
+				throw new Error(errData.error || t('common.toast.error'));
 			}
 			toast({
 				title: isEditing ? t('admin.configs.toasts.configUpdated') : t('admin.configs.toasts.configCreated'),
@@ -175,6 +180,62 @@ export default function ApplicationConfigs() {
 		setConfirmDeleteOpen(true);
 	};
 
+	const filteredConfigs = useMemo(() => {
+		const q = search.trim().toLowerCase();
+		return configs.filter((c) => {
+			const cStatus = c.status || 'open';
+			if (statusFilter !== 'all' && cStatus !== statusFilter) return false;
+			if (!q) return true;
+			return (
+				String(c.name || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(c.id || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(c.description || '')
+					.toLowerCase()
+					.includes(q)
+			);
+		});
+	}, [configs, search, statusFilter]);
+
+	const exportConfigs = (format: 'csv' | 'json') => {
+		if (filteredConfigs.length === 0) return;
+		if (format === 'json') {
+			const blob = new Blob([JSON.stringify(filteredConfigs, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `xernerx-application-configs-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			return;
+		}
+		const headers = ['id', 'name', 'status', 'public', 'requireLogin', 'rewardRole', 'questionsCount'];
+		const rows = filteredConfigs.map((cfg) =>
+			[
+				cfg.id,
+				(cfg.name || '').replace(/"/g, '""'),
+				cfg.status || 'open',
+				String(cfg.public !== false),
+				String(cfg.requireLogin !== false),
+				cfg.rewardRole || '',
+				String((cfg.questions || []).length),
+			]
+				.map((cell) => `"${cell}"`)
+				.join(',')
+		);
+		const csvContent = [headers.join(','), ...rows].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-application-configs-${new Date().toISOString().slice(0, 10)}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
+
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full relative"
@@ -206,16 +267,47 @@ export default function ApplicationConfigs() {
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('admin.configs.description')}</p>
 				</div>
-				<Button
-					variant="primary"
-					onClick={openCreateModal}
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<Plus size={16} />
-					{t('admin.configs.newConfig')}
-				</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="secondary" size="sm" onClick={() => exportConfigs('csv')} disabled={filteredConfigs.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.configs.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => exportConfigs('json')} disabled={filteredConfigs.length === 0} className="flex items-center gap-1.5">
+						<Download size={14} />
+						{t('admin.configs.exportJson')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => fetchConfigsAndRoles(true)} disabled={refreshing} className="flex items-center gap-1.5">
+						<RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+						{t('admin.configs.refresh')}
+					</Button>
+					<Button
+						variant="primary"
+						onClick={openCreateModal}
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.5)',
+						}}
+					>
+						<Plus size={16} />
+						{t('admin.configs.newConfig')}
+					</Button>
+				</div>
+			</div>
+
+			<div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+				<div className="relative flex-1">
+					<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('admin.configs.searchPlaceholder')} />
+				</div>
+				<div className="w-full sm:w-44">
+					<Selector
+						value={statusFilter}
+						onChange={(val) => setStatusFilter(val as any)}
+						options={[
+							{ value: 'all', label: t('admin.configs.filterAll') },
+							{ value: 'open', label: t('admin.configs.filterOpen') },
+							{ value: 'closed', label: t('admin.configs.filterClosed') },
+						]}
+					/>
+				</div>
 			</div>
 
 			{/* List */}
@@ -224,7 +316,7 @@ export default function ApplicationConfigs() {
 					<Loader2 size={32} className="animate-spin mb-4 opacity-50" />
 					<p>{t('admin.configs.loading')}</p>
 				</div>
-			) : configs.length === 0 ? (
+			) : filteredConfigs.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
 					<p className="text-sm text-(--text-muted)">{t('admin.configs.empty')}</p>
 				</div>
@@ -237,7 +329,7 @@ export default function ApplicationConfigs() {
 					}}
 				>
 					<AnimatePresence>
-						{configs.map((config) => (
+						{filteredConfigs.map((config) => (
 							<ApplicationConfigCard key={config.id} config={config} roles={roles} onEdit={openEditModal} onDelete={requestDelete} />
 						))}
 					</AnimatePresence>
@@ -260,6 +352,7 @@ export default function ApplicationConfigs() {
 				onOpenChange={setConfirmDeleteOpen}
 				title={t('admin.configs.edit.deleteTooltip')}
 				description={t('admin.dashboard.applicationConfigs.deleteConfirmDesc')}
+				confirmKeyword={configs.find((c) => c.id === deletingId)?.name || deletingId || undefined}
 				confirmText={t('admin.dashboard.applicationConfigs.delete')}
 				cancelText={t('admin.configs.edit.cancel')}
 				onConfirm={handleDelete}

@@ -210,7 +210,7 @@ export default function Language() {
 				),
 				badge: (
 					<span
-						className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${lang.coverage === 100 ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}
+						className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${lang.coverage === 100 ? 'bg-(--accent-green)/10 text-(--accent-green)' : 'bg-(--accent-orange)/10 text-(--accent-orange)'}`}
 					>
 						{lang.coverage}%
 					</span>
@@ -261,7 +261,7 @@ export default function Language() {
 					{/* Top Section: Main Selector */}
 					<div className="relative z-50 flex flex-col sm:flex-row sm:items-center justify-between" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-							<h3 className="text-base font-semibold text-(--text)">{t('account.language.title')}</h3>
+							<h2 className="text-base font-semibold text-(--text)">{t('account.language.title')}</h2>
 							<p className="text-xs text-(--text-muted)">{t('account.language.description')}</p>
 						</div>
 
@@ -274,11 +274,11 @@ export default function Language() {
 					{/* Bottom Section: Translation Invite Banner */}
 					{currentLanguage?.coverage < 100 && (
 						<div
-							className="flex flex-col sm:flex-row sm:items-center justify-between bg-yellow-500/5 border-t border-yellow-500/10 transition-all rounded-b-[calc(1.5rem-1px)]"
+							className="flex flex-col sm:flex-row sm:items-center justify-between bg-(--accent-orange)/5 border-t border-(--accent-orange)/10 transition-all rounded-b-[calc(1.5rem-1px)]"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 						>
 							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-								<h3 className="text-base font-semibold text-yellow-600 dark:text-yellow-500">{t('account.language.coverage.title')}</h3>
+								<h2 className="text-base font-semibold text-(--accent-orange) dark:text-(--accent-orange)">{t('account.language.coverage.title')}</h2>
 								<p className="text-xs text-(--text-muted) max-w-xl">{coverageDescription}</p>
 							</div>
 
@@ -295,7 +295,7 @@ export default function Language() {
 									setShowConfirm(true);
 								}}
 								disabled={(isRequesting || isCheckingRoles || isCheckingApplication || hasPendingApplication) && !hasTranslationPermission}
-								className="w-full sm:w-auto flex justify-center items-center gap-2 bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-500/20 text-xs font-semibold rounded-2xl transition-colors text-center whitespace-nowrap cursor-pointer disabled:opacity-50"
+								className="w-full sm:w-auto flex justify-center items-center gap-2 bg-(--accent-orange)/10 text-(--accent-orange) dark:text-(--accent-orange) hover:bg-(--accent-orange)/20 text-xs font-semibold rounded-2xl transition-colors text-center whitespace-nowrap cursor-pointer disabled:opacity-50"
 								style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 							>
 								{(isRequesting || isCheckingRoles || isCheckingApplication) && !hasTranslationPermission && <Loader2 size={14} className="animate-spin" />}
@@ -311,11 +311,11 @@ export default function Language() {
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h3 className="text-base font-semibold text-(--text)">{t('account.language.discord.title')}</h3>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.language.discord.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.language.discord.description')}</p>
 					</div>
 
-					<div className="w-full sm:w-64 flex items-center gap-2.5 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm p-3">
+					<div className="w-full sm:w-64 flex items-center gap-2.5 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm p-3">
 						<CircleFlag countryCode={discordCountryCode} className="h-4 w-4 shrink-0" />
 						<span className="text-sm font-medium text-(--text) truncate">{discordLanguageLabel}</span>
 					</div>

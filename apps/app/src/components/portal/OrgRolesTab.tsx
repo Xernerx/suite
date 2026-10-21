@@ -58,7 +58,7 @@ export default function OrgRolesTab({ orgConfig, setOrgConfig }: OrgRolesTabProp
 									const newRoles = orgConfig.roles.filter((r: any) => r.id !== role.id);
 									setOrgConfig({ ...orgConfig, roles: newRoles });
 								}}
-								className="p-2 rounded-xl text-red-400 hover:bg-red-400/10 transition-colors"
+								className="p-2 rounded-xl text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors"
 							>
 								<Trash2 className="w-5 h-5" />
 							</button>

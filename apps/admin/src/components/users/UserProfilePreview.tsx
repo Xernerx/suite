@@ -3,7 +3,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Copy, ExternalLink, User as UserIcon } from 'lucide-react';
+import { Copy, ExternalLink, ScrollText, User as UserIcon } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import type { DiscordProfile, FullUser, UserSummary } from './types';
 
@@ -14,9 +14,10 @@ interface UserProfilePreviewProps {
 	displayName: string;
 	avatarUrl: string | null;
 	discordBanner: string | null;
+	onViewAuditLogs?: () => void;
 }
 
-export function UserProfilePreview({ user, discord, fullUser, displayName, avatarUrl, discordBanner }: UserProfilePreviewProps) {
+export function UserProfilePreview({ user, discord, fullUser, displayName, avatarUrl, discordBanner, onViewAuditLogs }: UserProfilePreviewProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
@@ -31,7 +32,7 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 					}}
 				/>
 			) : (
-				<div className="h-24 w-full bg-gradient-to-br from-(--accent)/40 to-purple-500/40 opacity-50" />
+				<div className="h-24 w-full bg-gradient-to-br from-(--accent)/40 to-(--accent)/40 opacity-50" />
 			)}
 
 			<div className="absolute top-12 left-4 rounded-full border-4 border-(--background) bg-(--background) overflow-hidden h-20 w-20 shadow-md">
@@ -85,7 +86,7 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/30 transition-all text-left group cursor-pointer"
 						>
 							<div className="flex items-center gap-1.5 truncate">
-								<div className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
+								<div className="w-1.5 h-1.5 rounded-full bg-(--accent-green) shrink-0" />
 								<span className="truncate">{fullUser.email}</span>
 							</div>
 							<Copy size={14} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
@@ -99,6 +100,16 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 						>
 							<span className="truncate">{t('admin.users.viewPublicProfile')}</span>
 							<ExternalLink size={14} className="shrink-0 ml-2" />
+						</button>
+					)}
+					{user.id && onViewAuditLogs && (
+						<button
+							type="button"
+							onClick={onViewAuditLogs}
+							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 font-semibold text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/30 transition-all text-left group cursor-pointer"
+						>
+							<span className="truncate">{t('admin.users.viewAuditHistory')}</span>
+							<ScrollText size={14} className="shrink-0 ml-2" />
 						</button>
 					)}
 				</div>

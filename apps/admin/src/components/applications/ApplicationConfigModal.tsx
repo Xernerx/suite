@@ -213,7 +213,7 @@ export function ApplicationConfigModal({ open, onOpenChange, isEditing, formData
 										<button
 											type="button"
 											onClick={() => setFormData({ ...formData, benefits: formData.benefits.filter((_, idx) => idx !== i) })}
-											className="p-2 text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+											className="p-2 text-(--accent-red)/70 hover:text-(--accent-red) hover:bg-(--accent-red)/10 rounded-lg transition-colors"
 										>
 											<Trash2 size={16} />
 										</button>
@@ -254,7 +254,7 @@ export function ApplicationConfigModal({ open, onOpenChange, isEditing, formData
 										<button
 											type="button"
 											onClick={() => setFormData({ ...formData, requirements: formData.requirements.filter((_, idx) => idx !== i) })}
-											className="p-2 text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+											className="p-2 text-(--accent-red)/70 hover:text-(--accent-red) hover:bg-(--accent-red)/10 rounded-lg transition-colors"
 										>
 											<Trash2 size={16} />
 										</button>

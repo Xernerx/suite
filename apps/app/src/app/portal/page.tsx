@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { Bot, Compass, LayoutDashboard, Plus, User } from 'lucide-react';
+import { Bot, Compass, LayoutDashboard, Plus, User, Trophy } from 'lucide-react';
 import { Confirm, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 import PersonalWorkspace from '@/components/portal/PersonalWorkspace';
 import OrgWorkspaceHeader from '@/components/portal/OrgWorkspaceHeader';
@@ -202,6 +203,7 @@ export default function PortalPage() {
 
 		const staticItems = [
 			{ label: t('app.portal.nav.explore'), href: '/', icon: Compass as any, category: t('app.portal.categories.navigation') },
+			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy as any, category: t('app.portal.categories.navigation') },
 			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard as any, category: t('app.portal.categories.navigation') },
 		];
 
@@ -226,8 +228,8 @@ export default function PortalPage() {
 				},
 				category: t('app.portal.categories.organizations'),
 				icon: org.iconUrl
-					? () => <img src={getEnvUrl(org.iconUrl as string)} alt={org.name} className="w-5 h-5 rounded-md object-cover" />
-					: () => <div className="w-5 h-5 rounded-md bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
+					? () => <Image src={getEnvUrl(org.iconUrl as string)} alt={org.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-xl object-cover" />
+					: () => <div className="w-5 h-5 rounded-xl bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
 				view: `org-${org._id}`,
 			})),
 			{
@@ -246,9 +248,27 @@ export default function PortalPage() {
 					href: `/portal/bots/${bot.id}`,
 					category: t('common.nav.categories.bots'),
 					icon: bot.discord?.avatar
-						? () => <img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=64`} alt={bot.name || bot.id} className="w-5 h-5 rounded-md object-cover" />
+						? () => (
+								<Image
+									src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=64`}
+									alt={bot.name || bot.id}
+									width={20}
+									height={20}
+									unoptimized
+									className="w-5 h-5 rounded-xl object-cover"
+								/>
+							)
 						: bot.avatar
-							? () => <img src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64`} alt={bot.name || bot.id} className="w-5 h-5 rounded-md object-cover" />
+							? () => (
+									<Image
+										src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64`}
+										alt={bot.name || bot.id}
+										width={20}
+										height={20}
+										unoptimized
+										className="w-5 h-5 rounded-xl object-cover"
+									/>
+								)
 							: (Bot as any),
 				});
 			});

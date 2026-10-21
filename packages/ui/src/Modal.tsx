@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from 'react';
 
 import { Button } from './Button';
 import { X } from 'lucide-react';
+import { useDictionary } from '@xernerx/providers';
 
 export interface ModalProps {
 	open: boolean;
@@ -16,6 +17,7 @@ export interface ModalProps {
 }
 
 export function Modal({ open, onOpenChange, title, description, children, maxWidth = 'max-w-md' }: ModalProps) {
+	const { t } = useDictionary();
 	const ref = useRef<HTMLDivElement>(null);
 	const [mounted, setMounted] = React.useState(false);
 
@@ -58,7 +60,7 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 									)}
 									{description && <p className="text-xs text-(--text-muted) leading-relaxed">{description}</p>}
 								</div>
-								<Button type="button" variant="ghost" size="icon" onClick={() => onOpenChange(false)} aria-label="Close" className="shrink-0">
+								<Button type="button" variant="ghost" size="icon" onClick={() => onOpenChange(false)} aria-label={t('common.buttons.close')} className="shrink-0">
 									<X size={16} />
 								</Button>
 							</div>

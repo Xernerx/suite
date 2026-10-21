@@ -8,30 +8,30 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 
 ## 🧭 Workspace Directory & Port Map
 
-| Workspace Path        | Package / Service Name | Dev Port | Subdomain (Public / Canary / Dev) | Purpose                                                                          |
-| :-------------------- | :--------------------- | :------- | :-------------------------------- | :------------------------------------------------------------------------------- |
-| `apps/www`            | `www`                  | `4000`   | `xernerx.com`                     | Marketing showcase, legal (`terms`, `privacy`), applications, desktop download   |
-| `apps/api`            | `api`                  | `4001`   | `api.xernerx.com`                 | Core backend gateway, Bearer token validator, Discord & Stripe webhooks          |
-| `apps/cdn`            | `cdn`                  | `4002`   | `cdn.xernerx.com`                 | Media pipeline, `@vercel/blob` private storage, `/raw/[id]` streaming            |
-| `apps/account`        | `account`              | `4003`   | `account.xernerx.com`             | Identity hub, profile settings, localization, tokens, and billing history        |
-| `apps/app`            | `app`                  | `4004`   | `app.xernerx.com`                 | User dashboard, bot & server explorer, Virtue settings, dev `/portal`            |
-| `apps/docs`           | `docs`                 | `4005`   | `docs.xernerx.com`                | Developer documentation, interactive API specs, package docs reader              |
-| `apps/admin`          | `admin`                | `4006`   | `admin.xernerx.com`               | Internal staff portal, RBAC role management, moderation, system config           |
-| `apps/info`           | `info`                 | `4007`   | `info.xernerx.com`                | Feedback & support hub (`roadmap`, `suggestions`, `bugs`, `faq`, `changelog`)    |
-| `apps/store`          | `store`                | `4008`   | `store.xernerx.com`               | Store portal, Virtue subscriptions, add-ons, credits, and checkout               |
-| `packages/components` | `@xernerx/components`  | —        | —                                 | Shared application shell (`AppLayout`, `Header`, `Sidebar`, `Footer`)            |
-| `packages/feedback`   | `@xernerx/feedback`    | —        | —                                 | Route feedback & error boundaries (`Loading`, `Error`, `NotFound`)               |
-| `packages/lib`        | `@xernerx/lib`         | —        | —                                 | Mongoose models, NextAuth, i18n dictionaries, server utilities                   |
-| `packages/providers`  | `@xernerx/providers`   | —        | —                                 | Global React context providers & hooks (`useUser`, `useDictionary`)              |
-| `packages/public`     | —                      | —        | —                                 | Canonical static branding assets synced across web apps                          |
-| `packages/styles`     | `@xernerx/styles`      | —        | —                                 | Central Tailwind CSS v4 stylesheet & CSS variable design tokens                  |
-| `packages/ui`         | `@xernerx/ui`          | —        | —                                 | Primitive UI components (`Button`, `Modal`, `Input`, `Selector`, `Toggle`, etc.) |
-| `services/bot`        | `bot`                  | —        | —                                 | Discord bot daemon (`@xernerx/framework`) syncing guilds and members             |
-| `services/websocket`  | `websocket`            | `5000`   | —                                 | Real-time bidirectional WebSocket gateway & microservice router                  |
-| `clients/desktop`     | `desktop`              | —        | —                                 | Electron desktop companion client wrapping `app.xernerx.com`                     |
-| `clients/mobile`      | —                      | —        | —                                 | Placeholder workspace for future cross-platform mobile client                    |
-| `.xernerx/cli`        | `@xernerx/cli`         | —        | —                                 | Internal `suite` CLI orchestrating dev, locales, env sync, and builds            |
-| `.xernerx/database`   | —                      | `27017`  | —                                 | Local WiredTiger persistence directory for `mongodb-memory-server`               |
+| Workspace Path        | Package / Service Name | Dev Port | Subdomain (Public / Canary / Dev)                             | Purpose                                                                          |
+| :-------------------- | :--------------------- | :------- | :------------------------------------------------------------ | :------------------------------------------------------------------------------- |
+| `apps/www`            | `www`                  | `4000`   | `xernerx.com`                                                 | Marketing showcase, legal (`terms`, `privacy`), applications, desktop download   |
+| `apps/api`            | `api`                  | `4001`   | `api.xernerx.com`                                             | Core backend gateway, Bearer token validator, Discord & Stripe webhooks          |
+| `apps/cdn`            | `cdn`                  | `4002`   | `cdn.xernerx.com`                                             | Media pipeline, `@vercel/blob` private storage, `/raw/[id]` streaming            |
+| `apps/account`        | `account`              | `4003`   | `account.xernerx.com`                                         | Identity hub, profile settings, localization, tokens, and billing history        |
+| `apps/app`            | `app`                  | `4004`   | `app.xernerx.com`                                             | User dashboard, bot & server explorer, Virtue settings, dev `/portal`            |
+| `apps/docs`           | `docs`                 | `4005`   | `docs.xernerx.com`                                            | Developer documentation, interactive API specs, package docs reader              |
+| `apps/admin`          | `admin`                | `4006`   | `admin.xernerx.com`                                           | Internal staff portal, RBAC role management, moderation, system config           |
+| `apps/info`           | `info`                 | `4007`   | `info.xernerx.com`                                            | Feedback & support hub (`roadmap`, `suggestions`, `bugs`, `faq`, `changelog`)    |
+| `apps/store`          | `store`                | `4008`   | `store.xernerx.com`                                           | Store portal, Virtue subscriptions, add-ons, credits, and checkout               |
+| `packages/components` | `@xernerx/components`  | —        | —                                                             | Shared application shell (`AppLayout`, `Header`, `Sidebar`, `Footer`)            |
+| `packages/feedback`   | `@xernerx/feedback`    | —        | —                                                             | Route feedback & error boundaries (`Loading`, `Error`, `NotFound`)               |
+| `packages/lib`        | `@xernerx/lib`         | —        | —                                                             | Mongoose models, NextAuth, i18n dictionaries, server utilities                   |
+| `packages/providers`  | `@xernerx/providers`   | —        | —                                                             | Global React context providers & hooks (`useUser`, `useDictionary`)              |
+| `packages/public`     | —                      | —        | —                                                             | Canonical static branding assets synced across web apps                          |
+| `packages/styles`     | `@xernerx/styles`      | —        | —                                                             | Central Tailwind CSS v4 stylesheet & CSS variable design tokens                  |
+| `packages/ui`         | `@xernerx/ui`          | —        | —                                                             | Primitive UI components (`Button`, `Modal`, `Input`, `Selector`, `Toggle`, etc.) |
+| `services/bot`        | `bot`                  | —        | —                                                             | Discord bot daemon (`@xernerx/framework`) syncing guilds and members             |
+| `services/websocket`  | `websocket`            | `5000`   | —                                                             | Real-time bidirectional WebSocket gateway & microservice router                  |
+| `clients/desktop`     | `desktop`              | —        | —                                                             | Electron desktop companion client wrapping `app.xernerx.com`                     |
+| `clients/mobile`      | —                      | —        | Placeholder workspace for future cross-platform mobile client |
+| `.xernerx/cli`        | `@xernerx/cli`         | —        | —                                                             | Internal `suite` CLI orchestrating dev, locales, env sync, and builds            |
+| `.xernerx/database`   | —                      | `27017`  | —                                                             | Local WiredTiger persistence directory for `mongodb-memory-server`               |
 
 ---
 
@@ -55,15 +55,15 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
     - Semicolons required (`semi: true`).
     - Print width `200`, `es5` trailing commas.
 
-### 3. Styling & Tailwind CSS v4
+### 3. Styling, Design Language & Tailwind CSS v4 ("Modern Round Glassmorphism Pop")
 
 - The suite uses **Tailwind CSS v4** (`@tailwindcss/postcss`) configured centrally in `packages/styles/globals.css`. **Never create legacy `tailwind.config.js` or `tailwind.config.ts` files.**
-- Use CSS custom property tokens via Tailwind v4 syntax instead of hardcoded colors:
-    - Backgrounds & surfaces: `bg-(--background)`, `bg-(--foreground)`, `bg-(--foreground)/30`
-    - Text: `text-(--text)`, `text-(--text-muted)`
-    - Borders: `border-(--border)/10`, `border-(--accent)`
-    - Accents: `bg-(--accent)`, `hover:bg-(--hover-accent)`, `text-(--accent)`
-    - Spacing: `gap-(--ui-gap)`, `p-(--ui-gap)`
+- **Core Aesthetic — Modern Round Glassmorphism Pop:**
+    - **Rounded Geometry:** Use generous, tactile rounding everywhere—`rounded-3xl` for primary cards, panels, and modals; `rounded-2xl` for inner sub-cards, buttons, and form controls; `rounded-full` for pills, tags, and status badges. Never use sharp or boxy `rounded-sm` / `rounded-md` on cards or interactive controls.
+    - **Translucent Glass Surfaces:** Layer surfaces using `bg-(--foreground)/30` or `bg-(--foreground)/40` paired with `backdrop-blur-md`, `border border-(--border)/10`, and soft elevation (`shadow-sm` or subtle accent glow `shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]`). Inner recessed wells use `bg-(--background)/50` or `bg-(--background)/60` with `border border-(--border)/10`.
+    - **Favor `var(--accent)` at All Times:** The user's chosen `--accent` color is the primary visual identity across the entire suite. Always use `bg-(--accent)`, `text-(--accent)`, `border-(--accent)/30`, `bg-(--accent)/10`, and `hover:bg-(--hover-accent)` for active states, highlights, icons, pills, and interactive flourishes. **Never introduce off-palette rainbow Tailwind colors (`purple-500`, `blue-500`, `sky-500`, `amber-500`, `orange-500`, `#5865F2`, etc.) for decorative UI elements.** Reserve `--accent-green`, `--accent-orange`, and `--accent-red` strictly for semantic status, warning, and danger states.
+    - **Full Light & Dark Mode Compatibility:** Never hardcode dark-only or light-only surface colors (`bg-black`, `bg-zinc-900`, `text-white` on non-accent backgrounds, `border-white/10`). Always use theme-aware CSS custom properties (`--background`, `--foreground`, `--text`, `--text-muted`, `--border`) so every component adapts seamlessly between Light and Dark themes.
+    - **Custom UI & Text Scaling Support:** Respect user-configured scaling (`--ui-gap`, `--ui-scale`, `--text-scale`) across all views. Use `style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}` (or `gap-(--ui-gap)` / `p-(--ui-gap)` and `calc(var(--ui-gap) * ...)`) for layout spacing rather than rigid fixed pixel spacing.
 - Display headings use `style={{ fontFamily: 'var(--font-fredoka)' }}`.
 
 ### 4. Localization (`DictionaryProvider` & `useDictionary`)
@@ -100,4 +100,4 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
     - Respect all global shortcuts (`Ctrl + /` Help, `Ctrl + K` Search / Command Palette, `Ctrl + Space` / `Alt + A` App Drawer Navigation, `Ctrl + B` Sidebar toggle, `Ctrl + .` URL Omnibar, `Ctrl + I` Notifications, `Ctrl + ,` Account Settings, `Ctrl + S` / `Ctrl + Enter` Save unsaved changes, `Alt + R` Reset unsaved changes, `Alt + 1..9` Switch sidebar views, `Ctrl + Shift + C` Copy URL, `Esc` Close modals/popovers) and register any custom view shortcuts via `useShortcuts().registerShortcut()`.
 - **500-Line Inline Code Cap:** Any `page.tsx` or component file exceeding 500 lines of inline UI/JSX code must be broken down into sub-components (a file >500 lines that mainly composes imported components is fine).
 - **Strict `src/components/` Placement:** All app-specific components must be housed in `apps/<app>/src/components/` (next to `src/app/`), **never** co-located inside `src/app/` route folders.
-- **Strict 3-Route Local `/api` Rule:** Frontend apps may only house `/api/auth/[...nextauth]`, `/api/changelog`, and `/api/version` locally. All other backend endpoints (including Stripe store routes) must live in `apps/api` (`api.xernerx.com/secure/*` or `/v1/*`).
+- **Strict 3-Route Local `/api` Rule:** Frontend apps may only house `/api/auth/[...nextauth]`, `/api/changelog`, and `/api/version` locally (with the sole exception of `/api/connections/[provider]` and `/api/connections/[provider]/callback` on `apps/account` for linking secondary OAuth connections to an already-authenticated Discord account). All other backend endpoints (including Stripe store routes) must live in `apps/api` (`api.xernerx.com/secure/*` or `/v1/*`).

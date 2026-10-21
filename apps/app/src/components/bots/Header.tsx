@@ -3,9 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
-import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard, Copy, Share2, Check } from 'lucide-react';
-import { FaGithub } from 'react-icons/fa';
+import { Badge, Button, CopyButton } from '@xernerx/ui';
+import { User, ExternalLink, ShieldCheck, Globe, LifeBuoy, MessageSquare, FileText, Shield, ChevronUp, LayoutDashboard, Share2, Check, Code2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -19,16 +18,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 	const [nextVoteAt, setNextVoteAt] = useState<string | null>(null);
 	const [voting, setVoting] = useState(false);
 	const [timeLeft, setTimeLeft] = useState<string>('');
-	const [copiedId, setCopiedId] = useState(false);
 	const [copiedShare, setCopiedShare] = useState(false);
-
-	const handleCopyId = () => {
-		navigator.clipboard.writeText(bot.id).then(() => {
-			setCopiedId(true);
-			toast({ type: 'success', title: t('app.bots.id.idCopied'), description: bot.id });
-			setTimeout(() => setCopiedId(false), 2000);
-		});
-	};
 
 	const handleShareProfile = () => {
 		const url = window.location.href;
@@ -132,17 +122,9 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 					<h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{bot.discord?.global_name || bot.discord?.username || bot.name || t('common.unknownBot')}
 					</h1>
-					{bot.verified && <ShieldCheck className="w-6 h-6 text-green-500" />}
-					{bot.discord?.bot && <span className="px-2 py-0.5 bg-[#5865F2] text-white text-[10px] font-bold rounded-sm uppercase tracking-wider">{t('app.bots.id.text4')}</span>}
-					<button
-						type="button"
-						onClick={handleCopyId}
-						title={t('app.bots.id.copyId')}
-						className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-(--background)/80 hover:bg-(--background) border border-(--border)/10 hover:border-(--accent)/40 text-xs font-mono text-(--text-muted) hover:text-(--text) transition-all cursor-pointer"
-					>
-						{copiedId ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
-						<span>{bot.id}</span>
-					</button>
+					{bot.verified && <ShieldCheck className="w-6 h-6 text-(--accent-green)" />}
+					{bot.discord?.bot && <Badge variant="accent">{t('app.bots.id.text4')}</Badge>}
+					<CopyButton value={bot.id} label={bot.id} toastTitle={t('app.bots.id.idCopied')} toastDescription={bot.id} />
 				</div>
 				<p className="text-lg text-(--text-muted) mb-4 max-w-2xl">{bot.description || t('common.noDescription')}</p>
 				<div className="flex flex-wrap gap-2">
@@ -177,7 +159,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 							title={t('app.bots.id.shareProfile')}
 							className="w-full sm:w-auto px-4 border border-(--border)/10 hover:border-(--accent)/50 hover:bg-(--accent)/10 text-(--text-muted) hover:text-(--text)"
 						>
-							{copiedShare ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
+							{copiedShare ? <Check className="w-4 h-4 text-(--accent-green)" /> : <Share2 className="w-4 h-4" />}
 						</Button>
 					</div>
 					{bot.links && Object.entries(bot.links).filter(([key, val]) => key !== 'invite' && val).length > 0 && (
@@ -186,7 +168,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 								.filter(([key, val]) => key !== 'invite' && val)
 								.map(([key, val]) => {
 									let Icon: any = ExternalLink;
-									if (key === 'github') Icon = FaGithub;
+									if (key === 'github') Icon = Code2;
 									else if (key === 'website') Icon = Globe;
 									else if (key === 'support') Icon = LifeBuoy;
 									else if (key === 'community') Icon = MessageSquare;
@@ -198,7 +180,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 										<button
 											key={key}
 											onClick={() => window.open(val as string, '_blank')}
-											className="flex items-center gap-1.5 text-xs font-bold text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-3 py-1.5 rounded-lg border border-(--border)/10 transition-all capitalize shadow-sm"
+											className="flex items-center gap-1.5 text-xs font-bold text-(--text-muted) hover:text-(--text) bg-(--background)/50 hover:bg-(--background) px-3 py-1.5 rounded-xl border border-(--border)/10 transition-all capitalize shadow-sm"
 										>
 											<Icon className="w-3.5 h-3.5" />
 											{key}
@@ -220,7 +202,14 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 										className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors"
 									>
 										{bot.organizationData.iconUrl ? (
-											<img src={bot.organizationData.iconUrl} alt={bot.organizationData.name} className="w-4 h-4 rounded-full object-cover" />
+											<Image
+												src={bot.organizationData.iconUrl}
+												alt={bot.organizationData.name}
+												width={16}
+												height={16}
+												unoptimized
+												className="w-4 h-4 rounded-full object-cover"
+											/>
 										) : (
 											<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
 										)}
@@ -229,7 +218,14 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 								) : (
 									<span className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm">
 										{bot.organizationData.iconUrl ? (
-											<img src={bot.organizationData.iconUrl} alt={bot.organizationData.name} className="w-4 h-4 rounded-full object-cover" />
+											<Image
+												src={bot.organizationData.iconUrl}
+												alt={bot.organizationData.name}
+												width={16}
+												height={16}
+												unoptimized
+												className="w-4 h-4 rounded-full object-cover"
+											/>
 										) : (
 											<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
 										)}
@@ -256,7 +252,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 													? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
 													: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator) % 5}.png`
 											}
-											alt={owner.global_name || owner.username || 'Owner Avatar'}
+											alt={owner.global_name || owner.username || ''}
 											width={16}
 											height={16}
 											className="rounded-full"

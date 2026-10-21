@@ -99,11 +99,11 @@ export function AppLayout({
 			)}
 
 			<DictionaryProvider dictionary={dictionary}>
-				<ToastProvider>
-					<EnvironmentProvider initialEnvironment={initialEnvironment}>
-						<AuthWatcher />
-						<PlatformProvider>
-							<ThemeProvider>
+				<EnvironmentProvider initialEnvironment={initialEnvironment}>
+					<AuthWatcher />
+					<PlatformProvider>
+						<ThemeProvider>
+							<ToastProvider>
 								<UserProvider>
 									<PermissionProvider>
 										<NotificationProvider>
@@ -111,12 +111,12 @@ export function AppLayout({
 												<SidebarProvider>
 													<ShortcutsProvider>
 														<CookieProvider>
-															<CookiePrompt />
-															<TermsPrompt />
 															<VersionTracker />
 															<SupportProvider>
 																<Page>{children}</Page>
 															</SupportProvider>
+															<CookiePrompt />
+															<TermsPrompt />
 														</CookieProvider>
 													</ShortcutsProvider>
 												</SidebarProvider>
@@ -124,10 +124,10 @@ export function AppLayout({
 										</NotificationProvider>
 									</PermissionProvider>
 								</UserProvider>
-							</ThemeProvider>
-						</PlatformProvider>
-					</EnvironmentProvider>
-				</ToastProvider>
+							</ToastProvider>
+						</ThemeProvider>
+					</PlatformProvider>
+				</EnvironmentProvider>
 			</DictionaryProvider>
 		</div>
 	);

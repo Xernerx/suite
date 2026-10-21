@@ -30,17 +30,18 @@ export function DynamicCategoryView({ category, items, billingInterval, userLoad
 	const showFreeCard = category.id === 'consumers';
 
 	return (
-		<div className="w-full max-w-6xl space-y-16">
+		<div className="w-full max-w-6xl flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
 			{/* Featured section */}
 			{(featuredItems.length > 0 || showFreeCard) && (
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto">
+				<div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-4xl mx-auto" style={{ gap: 'var(--ui-gap)' }}>
 					{/* Free Tier Card */}
 					{showFreeCard && (
 						<motion.div
-							initial={{ opacity: 0, y: 20 }}
+							initial={{ opacity: 1, y: 0 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.3 }}
-							className="relative flex flex-col p-8 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md"
+							className="relative flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md"
+							style={{ padding: 'var(--ui-gap)' }}
 						>
 							<div className="flex items-center gap-2 mb-4 text-(--text-muted)">
 								<Bot size={22} />
@@ -48,9 +49,9 @@ export function DynamicCategoryView({ category, items, billingInterval, userLoad
 							</div>
 
 							<div className="mb-6">
-								<h3 className="text-3xl font-extrabold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								<h2 className="text-3xl font-extrabold mb-2 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{t('account.store.free.title')}
-								</h3>
+								</h2>
 								<p className="text-sm text-(--text-muted)">{t('account.store.free.desc')}</p>
 							</div>
 
@@ -74,7 +75,7 @@ export function DynamicCategoryView({ category, items, billingInterval, userLoad
 								disabled
 								className="w-full py-3 px-4 rounded-xl font-medium bg-(--background) text-(--text) border border-(--border)/10 flex items-center justify-center gap-2 cursor-default shadow-xs"
 							>
-								<Check size={16} className="text-green-500" /> {t('account.store.buttons.currentPlan')}
+								<Check size={16} className="text-(--accent-green)" /> {t('account.store.buttons.currentPlan')}
 							</button>
 						</motion.div>
 					)}
@@ -105,7 +106,7 @@ export function DynamicCategoryView({ category, items, billingInterval, userLoad
 						{category.description && <p className="text-xs text-(--text-muted) hidden md:block">{category.description}</p>}
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
 						{standardItems.map((item) => (
 							<DynamicItemCard
 								key={item.id}

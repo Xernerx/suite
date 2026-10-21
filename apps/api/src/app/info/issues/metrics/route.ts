@@ -1,3 +1,5 @@
+/** @format */
+
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 

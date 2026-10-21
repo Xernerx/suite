@@ -40,13 +40,13 @@ export default function GeneralTab({ botConfig, setBotConfig, availableTags }: G
 						<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
 							<button
 								onClick={() => setMarkdownPreview(false)}
-								className={`px-3 py-1 rounded-md transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								className={`px-3 py-1 rounded-xl transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 							>
 								{t('app.portal.info.write')}
 							</button>
 							<button
 								onClick={() => setMarkdownPreview(true)}
-								className={`px-3 py-1 rounded-md transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
+								className={`px-3 py-1 rounded-xl transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
 							>
 								{t('app.portal.info.preview')}
 							</button>
@@ -71,11 +71,11 @@ export default function GeneralTab({ botConfig, setBotConfig, availableTags }: G
 					<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.tags')}</label>
 					<div className="flex flex-wrap gap-2 mb-1">
 						{botConfig.tags?.map((tag: string, i: number) => (
-							<span key={i} className="px-2 py-1 bg-(--accent)/10 text-(--accent) text-xs font-semibold rounded-md flex items-center gap-1 border border-(--accent)/20 shadow-sm">
+							<span key={i} className="px-2 py-1 bg-(--accent)/10 text-(--accent) text-xs font-semibold rounded-xl flex items-center gap-1 border border-(--accent)/20 shadow-sm">
 								{tag}
 								<button
 									onClick={() => setBotConfig({ ...botConfig, tags: botConfig.tags.filter((_: any, idx: number) => idx !== i) })}
-									className="hover:text-red-500 transition-colors ml-1"
+									className="hover:text-(--accent-red) transition-colors ml-1"
 								>
 									×
 								</button>

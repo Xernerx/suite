@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { Building2, Compass, Server, ExternalLink, Copy, Check } from 'lucide-react';
+import { Building2, Compass, Server, ExternalLink, Copy, Check, Trophy } from 'lucide-react';
 import { Confirm, Tabs, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
 import { useEffect, useState, useMemo } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import General from '@/components/dashboard/General';
@@ -98,6 +99,7 @@ export default function DashboardPage() {
 
 		const staticItems = [
 			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass as any, category: t('app.dashboard.categories.navigation') },
+			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy as any, category: t('app.dashboard.categories.navigation') },
 			{ label: t('app.dashboard.nav.portal'), href: '/portal', icon: Building2 as any, category: t('app.dashboard.categories.navigation') },
 		];
 
@@ -147,7 +149,7 @@ export default function DashboardPage() {
 						onClick: () => setSelectedGuild(g),
 						category: t('app.dashboard.categories.servers'),
 						icon: g.iconUrl
-							? () => <img src={g.iconUrl!} alt={g.name} className="w-5 h-5 rounded-full object-cover" />
+							? () => <Image src={g.iconUrl!} alt={g.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
 							: () => <div className="w-5 h-5 rounded-full bg-(--foreground) flex items-center justify-center text-[10px]">{g.name.charAt(0)}</div>,
 						view: `server-${g.id}`,
 					})),
@@ -240,6 +242,7 @@ export default function DashboardPage() {
 					banner: selectedGuild.banner,
 					description: guildConfig.description,
 					info: guildConfig.info,
+					owner: sessionData?.user?.id,
 					organization: guildConfig.organization,
 					privacy: guildConfig.privacy,
 					widgets: Boolean(guildConfig.widgets),
@@ -251,9 +254,14 @@ export default function DashboardPage() {
 				const updated = await res.json();
 				setOriginalGuildConfig(updated);
 				setGuildConfig(updated);
+				toast({ title: t('common.toast.savedSuccess'), type: 'success' });
+				remind(false);
+			} else {
+				toast({ title: t('common.toast.saveFailed'), type: 'error' });
 			}
 		} catch (error) {
 			console.error('Failed to save config', error);
+			toast({ title: t('common.toast.saveError'), type: 'error' });
 		} finally {
 			setSaving(false);
 		}
@@ -287,9 +295,13 @@ export default function DashboardPage() {
 			if (res.ok) {
 				setSelectedGuild(null);
 				setGuildConfig(null);
+				toast({ title: t('app.dashboard.deleteSuccess'), type: 'success' });
+			} else {
+				toast({ title: t('app.dashboard.deleteFailed'), type: 'error' });
 			}
 		} catch (error) {
 			console.error('Failed to delete guild', error);
+			toast({ title: t('app.dashboard.deleteFailed'), type: 'error' });
 		} finally {
 			setDeleting(false);
 		}
@@ -327,7 +339,14 @@ export default function DashboardPage() {
 							)}
 							<div className="relative z-10 flex items-center" style={{ gap: 'var(--ui-gap)' }}>
 								{selectedGuild.iconUrl ? (
-									<img src={selectedGuild.iconUrl} alt={selectedGuild.name} className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg" />
+									<Image
+										src={selectedGuild.iconUrl}
+										alt={selectedGuild.name}
+										width={80}
+										height={80}
+										unoptimized
+										className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
+									/>
 								) : (
 									<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
 										<Server className="w-8 h-8 text-(--text-muted)" />
@@ -346,7 +365,7 @@ export default function DashboardPage() {
 											{t('app.dashboard.text1')}
 											{selectedGuild.id}
 										</span>
-										{copiedId ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+										{copiedId ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
 									</button>
 								</div>
 							</div>
@@ -365,7 +384,7 @@ export default function DashboardPage() {
 								<Loading variant="default" />
 							</div>
 						) : guildConfig ? (
-							<div className="flex flex-col w-full gap-8 mt-4">
+							<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
 								<Tabs
 									activeTab={activeTab}
 									onChange={handleTabChange}
@@ -423,7 +442,7 @@ export default function DashboardPage() {
 						href="https://discord.com/new"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="mt-6 px-6 py-3 rounded-xl bg-(--accent) hover:bg-(--accent-hover) text-white font-medium transition-colors shadow-sm"
+						className="mt-6 px-6 py-3 rounded-xl bg-(--accent) hover:bg-(--hover-accent) text-white font-medium transition-colors shadow-sm"
 					>
 						{t('app.dashboard.text25')}
 					</a>

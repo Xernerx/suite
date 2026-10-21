@@ -15,7 +15,7 @@ export default function Page() {
 	useEffect(() => {
 		hide();
 	}, [hide]);
-	const sections: Section[] = [
+	const rawSections: Section[] = [
 		{
 			id: 'introduction',
 			title: t('www.privacy.sections.introduction.title'),
@@ -30,10 +30,19 @@ export default function Page() {
 						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.account.title')}</strong> {t('www.privacy.sections.dataCollected.account.desc')}
 					</li>
 					<li>
+						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.connections.title')}</strong> {t('www.privacy.sections.dataCollected.connections.desc')}
+					</li>
+					<li>
 						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.developers.title')}</strong> {t('www.privacy.sections.dataCollected.developers.desc')}
 					</li>
 					<li>
 						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.botUsers.title')}</strong> {t('www.privacy.sections.dataCollected.botUsers.desc')}
+					</li>
+					<li>
+						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.cdnAndContent.title')}</strong> {t('www.privacy.sections.dataCollected.cdnAndContent.desc')}
+					</li>
+					<li>
+						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.desktop.title')}</strong> {t('www.privacy.sections.dataCollected.desktop.desc')}
 					</li>
 					<li>
 						<strong className="text-(--text)">{t('www.privacy.sections.dataCollected.usage.title')}</strong> {t('www.privacy.sections.dataCollected.usage.desc')}
@@ -91,12 +100,30 @@ export default function Page() {
 		{
 			id: 'rights',
 			title: t('www.privacy.sections.rights.title'),
-			content: <p>{t('www.privacy.sections.rights.content')}</p>,
+			content: (
+				<div className="space-y-4">
+					<p>{t('www.privacy.sections.rights.content')}</p>
+					<ul className="list-disc pl-6 space-y-2">
+						<li>{t('www.privacy.sections.rights.items.0')}</li>
+						<li>{t('www.privacy.sections.rights.items.1')}</li>
+						<li>{t('www.privacy.sections.rights.items.2')}</li>
+						<li>{t('www.privacy.sections.rights.items.3')}</li>
+					</ul>
+				</div>
+			),
 		},
 		{
 			id: 'cookies',
 			title: t('www.privacy.sections.cookies.title'),
-			content: <p>{t('www.privacy.sections.cookies.content')}</p>,
+			content: (
+				<p>
+					{t('www.privacy.sections.cookies.content')}
+					<a href="/cookies" target="_blank" rel="noreferrer" className="text-(--accent) hover:underline font-medium">
+						{t('www.privacy.sections.cookies.linkText')}
+					</a>
+					{t('www.privacy.sections.cookies.contentSuffix')}
+				</p>
+			),
 		},
 		{
 			id: 'international',
@@ -123,6 +150,10 @@ export default function Page() {
 			),
 		},
 	];
+	const sections: Section[] = rawSections.map((section, idx) => ({
+		...section,
+		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
+	}));
 	const { scrollYProgress } = useScroll();
 	const scaleX = useSpring(scrollYProgress, {
 		stiffness: 100,
@@ -161,7 +192,7 @@ export default function Page() {
 				<div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					{/* TOC */}
 					<aside className="hidden lg:block sticky top-32 self-start">
-						<h3 className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.privacy.toc')}</h3>
+						<p className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.privacy.toc')}</p>
 
 						<nav className="space-y-4 text-sm">
 							{sections.map((section) => (
@@ -177,7 +208,7 @@ export default function Page() {
 					</aside>
 
 					{/* MAIN */}
-					<main className="space-y-16">
+					<div className="space-y-16">
 						<header className="text-center mb-16 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm">
 							<h1
 								className="text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm"
@@ -207,7 +238,7 @@ export default function Page() {
 								</section>
 							))}
 						</div>
-					</main>
+					</div>
 				</div>
 			</div>
 		</div>

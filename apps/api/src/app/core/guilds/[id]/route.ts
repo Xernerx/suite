@@ -22,8 +22,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const VoteModel = (db.models.guilds as any).Vote;
 
 		const guild = await GuildModel.findOne({ id }).lean();
-		if (!guild || guild.privacy === 'private' || !guild.widgets) {
-			return NextResponse.json({ error: 'Guild widget not found or disabled' }, { status: 404 });
+		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
+		if (!guild || guild.privacy === 'private' || (isExternalWidget && !guild.widgets)) {
+			return NextResponse.json({ error: 'Guild profile not found or private' }, { status: 404 });
 		}
 
 		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ guildId: id })]);
@@ -62,6 +63,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			bannerUrl: payload.bannerUrl,
 			verified: payload.verified,
 			profileUrl: `${resolveAppBaseUrl(req.url)}/servers/${payload.id}`,
+			theme: (url.searchParams.get('theme') === 'light' ? 'light' : 'dark') as 'dark' | 'light',
 			stats: [
 				{ label: 'Members', value: payload.memberCount },
 				{ label: 'Messages', value: payload.messageCount },

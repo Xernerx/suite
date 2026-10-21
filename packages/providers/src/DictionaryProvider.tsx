@@ -3,12 +3,12 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 
-import { Locale } from '@xernerx/lib/server';
+import type { Locale } from '@xernerx/lib';
 
 const DictionaryContext = createContext<any | null>(null);
 
 function getNestedValue(obj: any, path: string) {
-	return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+	return path.split('.').reduce((acc, part) => (acc && typeof acc === 'object' ? acc[part] : undefined), obj);
 }
 
 export function DictionaryProvider({

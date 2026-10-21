@@ -23,6 +23,10 @@ export interface LighthouseScoreData {
 	perf: number;
 	a11y: number;
 	bp: number;
+	prevSeo?: number;
+	prevPerf?: number;
+	prevA11y?: number;
+	prevBp?: number;
 	updatedAt: number;
 }
 
@@ -81,16 +85,16 @@ export default function OverviewSummaryCards({ appsCount, syncedCount, canaryAhe
 			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.openIssues')}</span>
-					<AlertCircle size={18} className="text-red-400" />
+					<AlertCircle size={18} className="text-(--accent-red)" />
 				</div>
 				<div className="text-3xl font-black text-(--text)">{openIssuesCount}</div>
-				<div className="text-xs text-yellow-400">{t('admin.dashboard.overview.cards.pendingReview', { count: pendingReviewCount })}</div>
+				<div className="text-xs text-(--accent-orange)">{t('admin.dashboard.overview.cards.pendingReview', { count: pendingReviewCount })}</div>
 			</div>
 
 			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.resolvedIssues')}</span>
-					<CheckCircle2 size={18} className="text-green-400" />
+					<CheckCircle2 size={18} className="text-(--accent-green)" />
 				</div>
 				<div className="text-3xl font-black text-(--text)">{resolvedIssuesCount}</div>
 				<div className="text-xs text-(--text-muted)">{t('info.roadmap.metrics.recentResolutions')}</div>
@@ -99,7 +103,7 @@ export default function OverviewSummaryCards({ appsCount, syncedCount, canaryAhe
 			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.avgResolution')}</span>
-					<Clock size={18} className="text-blue-400" />
+					<Clock size={18} className="text-(--accent)" />
 				</div>
 				<div className="text-3xl font-black text-(--text)">{avgHours ? t('admin.dashboard.overview.cards.hours', { count: avgHours }) : t('info.roadmap.metrics.na')}</div>
 				<div className="text-xs text-(--text-muted)">{t('info.roadmap.metrics.avgResolutionTime')}</div>

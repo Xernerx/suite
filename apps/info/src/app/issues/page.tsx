@@ -1,11 +1,14 @@
 /** @format */
 'use client';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Selector, Input, Tooltip } from '@xernerx/ui';
+import { Button, Input } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, LogIn, Upload, X } from 'lucide-react';
+import { LogIn } from 'lucide-react';
+import IssueCard from '@/components/issues/IssueCard';
+import { IssueSubmitForm } from '@/components/issues/IssueSubmitForm';
 
 function fuzzySearch(query: string, text: string) {
 	if (!query) return true;
@@ -39,9 +42,7 @@ export default function IssuesPage() {
 	const [showForm, setShowForm] = useState(false);
 	const [attachment, setAttachment] = useState<File | null>(null);
 	const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
-	const [isDragging, setIsDragging] = useState(false);
 	const [uploading, setUploading] = useState(false);
-	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (!attachment || !attachment.type.startsWith('image/')) {
@@ -57,6 +58,8 @@ export default function IssuesPage() {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const qParam = params.get('q');
+			const prodParam = params.get('product');
+			const statusParam = params.get('status') as any;
 			const savedDraft = sessionStorage.getItem('xernerx_issue_draft') || sessionStorage.getItem('xernerx_bug_draft');
 			if (qParam) {
 				setSearch(qParam);
@@ -65,8 +68,23 @@ export default function IssuesPage() {
 				sessionStorage.removeItem('xernerx_issue_draft');
 				sessionStorage.removeItem('xernerx_bug_draft');
 			}
+			if (prodParam) setSelectedProduct(prodParam);
+			if (statusParam && ['all', 'verified', 'submitted', 'release'].includes(statusParam)) {
+				setStatusFilter(statusParam);
+			}
 		}
 	}, []);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || loading) return;
+		const params = new URLSearchParams(window.location.search);
+		if (selectedProduct) params.set('product', selectedProduct);
+		else params.delete('product');
+		if (statusFilter !== 'all') params.set('status', statusFilter);
+		else params.delete('status');
+		const qs = params.toString();
+		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+	}, [selectedProduct, statusFilter, loading]);
 
 	const fetchIssues = async () => {
 		const botIds = new Set<string>();
@@ -271,320 +289,169 @@ export default function IssuesPage() {
 		}
 	};
 
-	if (loading) return <Loading />;
-
 	return (
 		<div className="flex flex-col max-w-[1600px] mx-auto w-full p-8 md:p-12 pb-24 gap-12">
-			<motion.div initial={{ opacity: 0, y: -15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
+			<motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
 				<h1 className="text-4xl font-bold mb-4 text-(--text)">{t('info.bugs.title')}</h1>
 				<p className="text-(--text-muted)">{t('info.bugs.description')}</p>
 			</motion.div>
 
 			<div className="max-w-3xl mx-auto w-full">
-				<AnimatePresence mode="wait">
-					{user && showForm ? (
-						<motion.div
-							key="create-form"
-							initial={{ opacity: 0, scale: 0.96, y: 10 }}
-							animate={{ opacity: 1, scale: 1, y: 0 }}
-							exit={{ opacity: 0, scale: 0.96, y: -10 }}
-							transition={{ duration: 0.25, ease: 'easeOut' }}
-							className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-xl flex flex-col gap-4 w-full"
-						>
-							<h2 className="text-xl font-bold text-(--text)">{t('info.bugs.newBug')}</h2>
-							<form onSubmit={submitIssue} onPaste={handlePaste} className="flex flex-col gap-4">
-								<Input placeholder={t('info.bugs.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} required />
-								<Input variant="textarea" rows={4} placeholder={t('info.bugs.descriptionPlaceholder')} value={description} onChange={(e) => setDescription(e.target.value)} required />
-								<Selector
-									value={product}
-									options={products.map((p) => {
-										const botInfo = resolveBot(p);
-										return {
-											value: p,
-											label: botInfo ? (
-												<span className="inline-flex items-center gap-2">
-													{botInfo.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-													<span>{botInfo.name}</span>
-												</span>
-											) : (
-												p
-											),
-										};
-									})}
-									onChange={setProduct}
-									placeholder={t('info.bugs.selectProduct')}
-									required
-								/>
-								<div className="flex flex-col gap-2">
-									<label className="text-xs font-bold text-(--text-muted) uppercase">{t('info.bugs.attachFile')}</label>
-									<input ref={fileInputRef} type="file" onChange={(e) => setAttachment(e.target.files?.[0] || null)} className="hidden" accept="image/*,.txt,.log,.json" />
-									{attachment ? (
-										<div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-(--accent)/30 bg-(--background)/50">
-											<div className="flex items-center gap-3 min-w-0">
-												{attachmentPreview ? (
-													<img src={attachmentPreview} alt={attachment.name} className="w-12 h-12 rounded-lg object-cover border border-(--border)/10 shrink-0" />
-												) : (
-													<div className="w-12 h-12 rounded-lg bg-(--accent)/10 text-(--accent) flex items-center justify-center shrink-0">
-														<FileText size={20} />
-													</div>
-												)}
-												<div className="flex flex-col min-w-0">
-													<span className="text-sm font-semibold text-(--text) truncate">{attachment.name}</span>
-													<span className="text-xs text-(--text-muted)">{(attachment.size / 1024).toFixed(1)} KB</span>
-												</div>
-											</div>
-											<button
-												type="button"
-												title={t('info.bugs.dropzone.remove')}
-												onClick={() => {
-													setAttachment(null);
-													if (fileInputRef.current) fileInputRef.current.value = '';
-												}}
-												className="p-2 rounded-lg text-(--text-muted) hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
-											>
-												<X size={16} />
-											</button>
-										</div>
-									) : (
-										<div
-											onClick={() => fileInputRef.current?.click()}
-											onDragOver={(e) => {
-												e.preventDefault();
-												setIsDragging(true);
-											}}
-											onDragLeave={() => setIsDragging(false)}
-											onDrop={(e) => {
-												e.preventDefault();
-												setIsDragging(false);
-												const dropped = e.dataTransfer.files?.[0];
-												if (dropped) setAttachment(dropped);
-											}}
-											className={`flex flex-col items-center justify-center gap-1.5 p-5 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center ${
-												isDragging ? 'border-(--accent) bg-(--accent)/10' : 'border-(--border)/15 bg-(--background)/30 hover:border-(--accent)/40 hover:bg-(--background)/50'
-											}`}
-										>
-											<Upload size={20} className="text-(--accent)" />
-											<span className="text-xs font-semibold text-(--text)">{t('info.bugs.dropzone.prompt')}</span>
-											<span className="text-[11px] text-(--text-muted)">{t('info.bugs.dropzone.formats')}</span>
-										</div>
-									)}
-								</div>
-								<div className="flex gap-2 w-full">
-									<Button type="submit" className="flex-1" disabled={uploading}>
-										{uploading ? t('info.bugs.uploading') : t('info.bugs.submit')}
-									</Button>
-									<Button variant="danger" type="button" onClick={() => setShowForm(false)}>
-										{t('info.bugs.cancel')}
-									</Button>
-								</div>
-							</form>
-						</motion.div>
-					) : (
-						<motion.div
-							key="search-list"
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -10 }}
-							transition={{ duration: 0.2, ease: 'easeOut' }}
-							className="flex flex-col gap-4 w-full"
-						>
-							<div className="flex flex-col gap-2.5">
-								<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-								<div className="flex flex-wrap items-center justify-between gap-2 px-1">
-									<p className="text-xs text-(--text-muted)">{t('info.bugs.startTyping')}</p>
-									<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10">
-										{(
-											[
-												{ id: 'all', label: t('info.bugs.filters.all') },
-												{ id: 'verified', label: t('info.bugs.filters.verified') },
-												{ id: 'submitted', label: t('info.bugs.filters.submitted') },
-												{ id: 'release', label: t('info.bugs.filters.release') },
-											] as Array<{ id: 'all' | 'verified' | 'submitted' | 'release'; label: string }>
-										).map((opt) => (
-											<button
-												key={opt.id}
-												type="button"
-												onClick={() => setStatusFilter(opt.id)}
-												className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-													statusFilter === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-												}`}
-											>
-												{opt.label}
-											</button>
-										))}
-									</div>
-								</div>
-
-								{availableProducts.length > 0 && (
-									<div className="flex flex-wrap items-center gap-1.5 pt-1">
-										<button
-											type="button"
-											onClick={() => setSelectedProduct(null)}
-											className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-												selectedProduct === null
-													? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-													: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
-											}`}
-										>
-											{t('info.bugs.allProducts')}
-										</button>
-										{availableProducts.map((prod) => {
-											const botInfo = resolveBot(prod);
-											const isSelected = selectedProduct === prod;
-											return (
+				{loading ? (
+					<div className="flex items-center justify-center py-24">
+						<Loading />
+					</div>
+				) : (
+					<AnimatePresence mode="wait">
+						{user && showForm ? (
+							<IssueSubmitForm
+								title={title}
+								setTitle={setTitle}
+								description={description}
+								setDescription={setDescription}
+								product={product}
+								setProduct={setProduct}
+								products={products}
+								resolveBot={resolveBot}
+								attachment={attachment}
+								setAttachment={setAttachment}
+								attachmentPreview={attachmentPreview}
+								uploading={uploading}
+								submitIssue={submitIssue}
+								handlePaste={handlePaste}
+								onCancel={() => setShowForm(false)}
+							/>
+						) : (
+							<motion.div
+								key="search-list"
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								transition={{ duration: 0.2, ease: 'easeOut' }}
+								className="flex flex-col gap-4 w-full"
+							>
+								<div className="flex flex-col gap-2.5">
+									<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
+										<p className="text-xs text-(--text-muted)">{t('info.bugs.startTyping')}</p>
+										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10">
+											{(
+												[
+													{ id: 'all', label: t('info.bugs.filters.all') },
+													{ id: 'verified', label: t('info.bugs.filters.verified') },
+													{ id: 'submitted', label: t('info.bugs.filters.submitted') },
+													{ id: 'release', label: t('info.bugs.filters.release') },
+												] as Array<{ id: 'all' | 'verified' | 'submitted' | 'release'; label: string }>
+											).map((opt) => (
 												<button
-													key={prod}
+													key={opt.id}
 													type="button"
-													onClick={() => setSelectedProduct(isSelected ? null : prod)}
-													className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-														isSelected
-															? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-															: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+													onClick={() => setStatusFilter(opt.id)}
+													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+														statusFilter === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 													}`}
 												>
-													{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-													<span>{botInfo ? botInfo.name : prod}</span>
+													{opt.label}
 												</button>
-											);
-										})}
+											))}
+										</div>
 									</div>
-								)}
-							</div>
 
-							<AnimatePresence mode="popLayout">
-								{filteredIssues.map((s: any) => {
-									const botInfo = resolveBot(s);
-									return (
-										<motion.div
-											key={s.id}
-											layout
-											initial={{ opacity: 0, y: 15 }}
-											animate={{ opacity: 1, y: 0 }}
-											exit={{ opacity: 0, scale: 0.95 }}
-											transition={{ duration: 0.25, ease: 'easeOut' }}
-											whileHover={{ y: -2 }}
-											className="flex gap-4 p-4 rounded-xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
-										>
-											<div className="flex flex-col justify-center w-full min-w-0">
-												<div className="flex justify-between items-start gap-4">
-													<div className="font-bold text-lg text-(--text)">{s.title}</div>
-												</div>
-												<div className="text-(--text-muted) text-sm mb-2 mt-1 whitespace-pre-wrap">{s.description}</div>
-												<div className="flex flex-wrap items-center gap-2 mt-2">
-													<Tooltip
-														content={
-															s.status === 'resolved'
-																? t('info.bugs.tooltips.resolved')
-																: s.acknowledged
-																	? t('info.bugs.tooltips.verified')
-																	: t('info.bugs.tooltips.submitted')
-														}
-													>
-														<div className="flex items-center gap-1.5 bg-(--background)/50 px-2 py-1 rounded-md border border-(--border)/10 cursor-help transition-colors hover:border-(--border)/30">
-															<span
-																className={`w-2 h-2 rounded-full ${s.status === 'resolved' ? 'bg-green-500' : s.acknowledged ? 'bg-blue-500' : 'bg-yellow-500'}`}
-															></span>
-															<span className="text-xs uppercase font-bold text-(--text-muted)">
-																{s.status === 'resolved'
-																	? t('info.bugs.status.resolved')
-																	: s.acknowledged
-																		? t('info.bugs.status.verified')
-																		: t('info.bugs.status.submitted')}
-															</span>
-														</div>
-													</Tooltip>
-
-													{s.resolvedApp && s.resolvedVersion && (
-														<Tooltip
-															content={t(`info.bugs.releaseTooltips.${s.releaseStatus || 'pending'}`, {
-																app: s.resolvedApp,
-																version: s.resolvedVersion,
-															})}
-														>
-															<div
-																className={`inline-flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded border cursor-help ${
-																	s.releaseStatus === 'production'
-																		? 'bg-green-500/10 text-green-400 border-green-500/20'
-																		: s.releaseStatus === 'canary'
-																			? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-																			: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-																}`}
-															>
-																<span>
-																	{t(`info.bugs.releaseStatus.${s.releaseStatus || 'pending'}`, {
-																		app: s.resolvedApp,
-																		version: s.resolvedVersion,
-																	})}
-																</span>
-															</div>
-														</Tooltip>
-													)}
-
-													<button
-														type="button"
-														onClick={() => setSelectedProduct(selectedProduct === s.productId ? null : s.productId)}
-														className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 text-(--accent) px-2 py-1 rounded border border-(--accent)/20 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
-													>
-														{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-														{botInfo ? botInfo.name : s.productId}
-													</button>
-												</div>
-											</div>
-										</motion.div>
-									);
-								})}
-							</AnimatePresence>
-
-							{filteredIssues.length === 0 && !search.trim() && (
-								<motion.div
-									initial={{ opacity: 0, scale: 0.95 }}
-									animate={{ opacity: 1, scale: 1 }}
-									transition={{ duration: 0.25 }}
-									className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-2 text-(--text-muted)"
-								>
-									<div>{t('info.roadmap.knownIssues.noOpenIssues')}</div>
-								</motion.div>
-							)}
-
-							{filteredIssues.length === 0 && search.trim() && (
-								<motion.div
-									initial={{ opacity: 0, scale: 0.95 }}
-									animate={{ opacity: 1, scale: 1 }}
-									transition={{ duration: 0.25 }}
-									className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
-								>
-									<div>{t('info.bugs.noMatch', { query: search })}</div>
-									{user ? (
-										<Button
-											onClick={() => {
-												setTitle(search);
-												setSearch('');
-												setShowForm(true);
-											}}
-										>
-											{t('info.bugs.reportAsNew')}
-										</Button>
-									) : (
-										<div className="flex flex-col items-center gap-3">
-											<div>{t('info.suggestions.loginToSubmit')}</div>
-											<Button
-												onClick={() => {
-													if (typeof window !== 'undefined') {
-														sessionStorage.setItem('xernerx_issue_draft', search);
-														window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
-													}
-												}}
+									{availableProducts.length > 0 && (
+										<div className="flex flex-wrap items-center gap-1.5 pt-1">
+											<button
+												type="button"
+												onClick={() => setSelectedProduct(null)}
+												className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+													selectedProduct === null
+														? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+														: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+												}`}
 											>
-												<LogIn size={16} />
-												{t('common.sidebar.login')}
-											</Button>
+												{t('info.bugs.allProducts')}
+											</button>
+											{availableProducts.map((prod) => {
+												const botInfo = resolveBot(prod);
+												const isSelected = selectedProduct === prod;
+												return (
+													<button
+														key={prod}
+														type="button"
+														onClick={() => setSelectedProduct(isSelected ? null : prod)}
+														className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+															isSelected
+																? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+																: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+														}`}
+													>
+														{botInfo?.avatarUrl && (
+															<Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
+														)}
+														<span>{botInfo ? botInfo.name : prod}</span>
+													</button>
+												);
+											})}
 										</div>
 									)}
-								</motion.div>
-							)}
-						</motion.div>
-					)}
-				</AnimatePresence>
+								</div>
+
+								<AnimatePresence mode="popLayout">
+									{filteredIssues.map((s: any) => (
+										<IssueCard key={s.id} issue={s} botInfo={resolveBot(s)} selectedProduct={selectedProduct} onSelectProduct={setSelectedProduct} />
+									))}
+								</AnimatePresence>
+
+								{filteredIssues.length === 0 && !search.trim() && (
+									<motion.div
+										initial={{ opacity: 0, scale: 0.95 }}
+										animate={{ opacity: 1, scale: 1 }}
+										transition={{ duration: 0.25 }}
+										className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-2 text-(--text-muted)"
+									>
+										<div>{t('info.roadmap.knownIssues.noOpenIssues')}</div>
+									</motion.div>
+								)}
+
+								{filteredIssues.length === 0 && search.trim() && (
+									<motion.div
+										initial={{ opacity: 0, scale: 0.95 }}
+										animate={{ opacity: 1, scale: 1 }}
+										transition={{ duration: 0.25 }}
+										className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
+									>
+										<div>{t('info.bugs.noMatch', { query: search })}</div>
+										{user ? (
+											<Button
+												onClick={() => {
+													setTitle(search);
+													setSearch('');
+													setShowForm(true);
+												}}
+											>
+												{t('info.bugs.reportAsNew')}
+											</Button>
+										) : (
+											<div className="flex flex-col items-center gap-3">
+												<div>{t('info.suggestions.loginToSubmit')}</div>
+												<Button
+													onClick={() => {
+														if (typeof window !== 'undefined') {
+															sessionStorage.setItem('xernerx_issue_draft', search);
+															window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+														}
+													}}
+												>
+													<LogIn size={16} />
+													{t('common.sidebar.login')}
+												</Button>
+											</div>
+										)}
+									</motion.div>
+								)}
+							</motion.div>
+						)}
+					</AnimatePresence>
+				)}
 			</div>
 		</div>
 	);

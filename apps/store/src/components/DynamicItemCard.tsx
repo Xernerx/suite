@@ -38,12 +38,14 @@ export function DynamicItemCard({ item, billingInterval, actionLoading, getActiv
 						<div />
 					)}
 
-					{hasDiscount && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-500/15 text-green-500 border border-green-500/20">-{item.discountPercent}%</span>}
+					{hasDiscount && (
+						<span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/20">-{item.discountPercent}%</span>
+					)}
 				</div>
 
-				<h4 className="text-xl font-bold mb-1 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+				<h3 className="text-xl font-bold mb-1 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{item.name || item.stripeName || t('account.store.buttons.loading')}
-				</h4>
+				</h3>
 
 				<p className="text-xs text-(--text-muted) mb-4 min-h-7.5">{item.description || item.stripeDescription || t('account.store.cards.botFallback')}</p>
 
@@ -52,7 +54,7 @@ export function DynamicItemCard({ item, billingInterval, actionLoading, getActiv
 					{activePrice ? (
 						<>
 							{hasDiscount && <span className="text-lg line-through text-(--text-muted) opacity-60">€{originalAmount?.toFixed(0)}</span>}
-							<span className={`text-3xl font-bold ${hasDiscount ? 'text-green-500' : 'text-(--text)'}`}>€{discountedAmount?.toFixed(0)}</span>
+							<span className={`text-3xl font-bold ${hasDiscount ? 'text-(--accent-green)' : 'text-(--text)'}`}>€{discountedAmount?.toFixed(0)}</span>
 							<span className="text-xs text-(--text-muted) font-normal">
 								/{billingInterval === 'month' ? t('account.store.pricing.monthShort') : t('account.store.pricing.yearShort')}
 							</span>
@@ -80,7 +82,7 @@ export function DynamicItemCard({ item, billingInterval, actionLoading, getActiv
 				{currentSub ? (
 					<button
 						onClick={() => handleCancelClick(currentSub.stripeSubscriptionId)}
-						className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 transition-colors cursor-pointer"
+						className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-(--accent-red)/10 text-(--accent-red) border border-(--accent-red)/20 hover:bg-(--accent-red)/20 transition-colors cursor-pointer"
 					>
 						{t('account.store.buttons.cancelPass')}
 					</button>

@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
-import { Input } from '@xernerx/ui';
-import { LayoutDashboard, Link2, Tag } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
+import { Button, Input } from '@xernerx/ui';
+import { LayoutDashboard, Link2, Rss, Tag } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 function extractText(children: any): string {
@@ -22,11 +22,13 @@ function toVersionId(headingText: string): string {
 
 export default function ChangelogClient({ changelogs }: { changelogs: { appName: string; content: string }[] }) {
 	const { setNavItems, clearNavItems, show, setView, view } = useSidebar();
+	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
 
 	const [search, setSearch] = useState('');
 	const [activeVersionId, setActiveVersionId] = useState<string | null>(null);
+	const hasAppliedUrlParam = useRef(false);
 
 	useEffect(() => {
 		show();
@@ -48,12 +50,21 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 
 		setNavItems(items);
 
-		if (!view && items.length > 0) {
-			const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
-			if (itemParam) {
-				const match = items.find((i) => i.view === `changelog-${itemParam.toLowerCase()}`);
-				setView(match ? match.view : items[0].view);
-			} else {
+		if (items.length > 0) {
+			if (!hasAppliedUrlParam.current) {
+				hasAppliedUrlParam.current = true;
+				const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
+				if (itemParam) {
+					const match = items.find((i) => i.view === `changelog-${itemParam.toLowerCase()}`);
+					if (match && view !== match.view) {
+						setView(match.view);
+					} else if (!view) {
+						setView(items[0].view);
+					}
+				} else if (!view || !items.some((i) => i.view === view)) {
+					setView(items[0].view);
+				}
+			} else if (!view) {
 				setView(items[0].view);
 			}
 		}
@@ -137,6 +148,9 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 	if (!activeLog) {
 		return (
 			<div className="flex flex-col w-full min-h-screen pt-24 px-4 sm:px-8 max-w-5xl mx-auto">
+				<h1 className="text-4xl md:text-5xl font-black text-(--text) mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('www.changelog.title', { name: 'Xernerx' })}
+				</h1>
 				<p className="text-(--text-muted)">{t('www.changelog.noLogs')}</p>
 			</div>
 		);
@@ -144,11 +158,17 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pt-24 px-4 sm:px-8 max-w-5xl mx-auto">
-			<div className="flex flex-col gap-2 mb-8">
-				<h1 className="text-4xl md:text-5xl font-black text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					{t('www.changelog.title', { name: activeLog.appName })}
-				</h1>
-				<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+				<div className="flex flex-col gap-2">
+					<h1 className="text-4xl md:text-5xl font-black text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.changelog.title', { name: activeLog.appName })}
+					</h1>
+					<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
+				</div>
+				<Button variant="secondary" onClick={() => window.open(getEnvUrl('https://api.xernerx.com/v1/changelog/rss.xml'), '_blank')} className="flex items-center gap-2 shrink-0">
+					<Rss size={15} className="text-(--accent-orange)" />
+					{t('www.changelog.rssFeed')}
+				</Button>
 			</div>
 
 			{/* Search Bar & Version Quick-Jump Pills */}
@@ -194,7 +214,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: { appName:
 						{/* Ambient Glowing Wire */}
 						<div className="absolute left-0 top-4 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-(--accent) to-transparent opacity-40" />
 
-						<div className="prose prose-invert max-w-none text-(--text) prose-headings:text-(--text) prose-strong:text-(--text) prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:text-(--text-muted) prose-a:text-blue-500 hover:prose-a:text-blue-400">
+						<div className="prose prose-invert max-w-none text-(--text) prose-headings:text-(--text) prose-strong:text-(--text) prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-4 prose-h3:text-xl prose-h3:text-(--text-muted) prose-a:text-(--accent) hover:prose-a:text-(--accent)">
 							<ReactMarkdown
 								components={{
 									h2: ({ node: _node, ...props }) => {

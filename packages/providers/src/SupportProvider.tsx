@@ -9,6 +9,7 @@ import { useSidebar } from './SidebarProvider';
 import { useEnvironment } from './EnvironmentProvider';
 import { useDictionary } from './DictionaryProvider';
 import { useToast } from './ToastProvider';
+import { useEffectiveAlignment } from './ThemeProvider';
 
 const SupportContext = createContext(null);
 
@@ -18,6 +19,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 	const { isMobileOpen } = useSidebar();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
+	const { isRightAligned } = useEffectiveAlignment();
 
 	const [support, setSupport] = useState(false);
 	const [adminServerId, setAdminServerId] = useState('687429190165069838');
@@ -176,19 +178,19 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 			label: t('common.supportprovider.links.reportIssue'),
 			href: getEnvUrl('https://info.xernerx.com/issues'),
 			icon: Bug,
-			color: 'text-red-500',
+			color: 'text-(--accent-red)',
 		},
 		{
 			label: t('common.supportprovider.links.suggestFeature'),
 			href: getEnvUrl('https://info.xernerx.com/suggestions'),
 			icon: MessageSquare,
-			color: 'text-purple-500',
+			color: 'text-(--accent)',
 		},
 		{
 			label: t('common.supportprovider.links.faq'),
 			href: getEnvUrl('https://info.xernerx.com/faq'),
 			icon: LifeBuoy,
-			color: 'text-green-500',
+			color: 'text-(--accent-green)',
 		},
 	];
 
@@ -202,7 +204,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					className="fixed z-[9999]"
 					style={{
 						bottom: 'var(--ui-gap)',
-						right: 'var(--ui-gap)',
+						...(isRightAligned ? { left: 'var(--ui-gap)' } : { right: 'var(--ui-gap)' }),
 					}}
 				>
 					<AnimatePresence>
@@ -212,7 +214,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								exit={{ opacity: 0, y: 10, scale: 0.95 }}
 								transition={{ duration: 0.16, ease: 'easeOut' }}
-								className="absolute bottom-[calc(100%+12px)] right-0 w-72 rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl p-4 flex flex-col gap-3"
+								className={`absolute bottom-[calc(100%+12px)] ${isRightAligned ? 'left-0' : 'right-0'} w-72 rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl p-4 flex flex-col gap-3`}
 							>
 								<div className="flex items-center justify-between pb-2.5 border-b border-(--border)/10">
 									<div className="flex items-center gap-2.5">

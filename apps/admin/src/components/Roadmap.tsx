@@ -1,7 +1,8 @@
 /** @format */
-import { Button, Input, Modal, Selector } from '@xernerx/ui';
+import { Button, Confirm, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 
 import { Loading } from '@xernerx/feedback';
 
@@ -11,6 +12,8 @@ export default function Roadmap() {
 	const { t } = useDictionary();
 	const [data, setData] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [search, setSearch] = useState('');
+	const [productFilter, setProductFilter] = useState('all');
 
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editId, setEditId] = useState<string | null>(null);
@@ -20,6 +23,7 @@ export default function Roadmap() {
 	const [botId, setBotId] = useState('');
 	const [status, setStatus] = useState('idea');
 	const [targetQuarter, setTargetQuarter] = useState('');
+	const [confirmDeleteItem, setConfirmDeleteItem] = useState<any | null>(null);
 
 	const [products, setProducts] = useState<string[]>([]);
 	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
@@ -172,7 +176,10 @@ export default function Roadmap() {
 		}
 	};
 
-	const deleteItem = async (id: string) => {
+	const deleteItem = async () => {
+		if (!confirmDeleteItem) return;
+		const id = confirmDeleteItem.id;
+		setConfirmDeleteItem(null);
 		try {
 			await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/roadmap/${id}`), {
 				method: 'DELETE',
@@ -192,15 +199,55 @@ export default function Roadmap() {
 		return botProfiles[targetBotId] || (matchedOrgBot ? { name: matchedOrgBot.name, avatarUrl: matchedOrgBot.avatarUrl } : null);
 	};
 
+	const productFilterOptions = useMemo(() => {
+		const set = new Set<string>();
+		data.forEach((item) => {
+			const resolved = resolveItemBot(item);
+			const label = resolved?.name || item.productId;
+			if (label) set.add(String(label));
+		});
+		return [{ value: 'all', label: t('admin.dashboard.roadmap.allProducts') }, ...Array.from(set).map((p) => ({ value: p, label: p }))];
+	}, [data, orgBots, botProfiles, t]);
+
+	const filteredData = useMemo(() => {
+		const q = search.trim().toLowerCase();
+		return data.filter((item) => {
+			const resolved = resolveItemBot(item);
+			const prodLabel = String(resolved?.name || item.productId || '');
+			if (productFilter !== 'all' && prodLabel !== productFilter) return false;
+			if (!q) return true;
+			return (
+				String(item.title || '')
+					.toLowerCase()
+					.includes(q) ||
+				String(item.description || '')
+					.toLowerCase()
+					.includes(q) ||
+				prodLabel.toLowerCase().includes(q) ||
+				String(item.targetQuarter || '')
+					.toLowerCase()
+					.includes(q)
+			);
+		});
+	}, [data, search, productFilter, orgBots, botProfiles]);
+
 	if (loading) return <Loading />;
 
 	const activePreviewBot = botId.trim() ? botProfiles[botId.trim()] || orgBots.find((b) => b.id === botId.trim()) : null;
 
 	return (
 		<div className="flex flex-col gap-4">
-			<div className="flex justify-between items-center">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<h2 className="text-2xl font-bold">{t('admin.dashboard.roadmap.title')}</h2>
-				<Button onClick={openCreate}>{t('admin.dashboard.roadmap.addItem')}</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					<div className="w-full sm:w-64">
+						<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('admin.dashboard.roadmap.searchPlaceholder')} />
+					</div>
+					<div className="w-full sm:w-44">
+						<Selector value={productFilter} onChange={setProductFilter} options={productFilterOptions} />
+					</div>
+					<Button onClick={openCreate}>{t('admin.dashboard.roadmap.addItem')}</Button>
+				</div>
 			</div>
 
 			<Modal open={modalOpen} onOpenChange={setModalOpen} title={editId ? t('admin.dashboard.roadmap.modalTitle') : t('admin.dashboard.roadmap.modalTitle')}>
@@ -234,7 +281,9 @@ export default function Roadmap() {
 						</datalist>
 						{activePreviewBot && (
 							<div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-(--foreground)/40 border border-(--border)/10 w-fit text-xs">
-								{activePreviewBot.avatarUrl && <img src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} className="w-5 h-5 rounded-full object-cover" />}
+								{activePreviewBot.avatarUrl && (
+									<Image src={activePreviewBot.avatarUrl} alt={activePreviewBot.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
+								)}
 								<span className="font-semibold text-(--text)">{activePreviewBot.name}</span>
 								<span className="text-(--text-muted) font-mono">({botId.trim()})</span>
 							</div>
@@ -253,7 +302,7 @@ export default function Roadmap() {
 				{['idea', 'planned', 'active', 'released'].map((colStatus) => (
 					<div key={colStatus} className="flex flex-col gap-2 p-2 bg-(--foreground)/10 rounded-2xl">
 						<h3 className="font-bold capitalize px-2">{t(`info.roadmap.timeline.status.${colStatus}`)}</h3>
-						{data
+						{filteredData
 							.filter((i: any) => i.status === colStatus)
 							.map((item: any) => {
 								const resolvedBot = resolveItemBot(item);
@@ -263,7 +312,9 @@ export default function Roadmap() {
 										<div className="text-(--text-muted) flex items-center gap-1.5 flex-wrap">
 											{resolvedBot ? (
 												<span className="inline-flex items-center gap-1.5 bg-(--foreground)/50 px-2 py-0.5 rounded-full border border-(--border)/10 text-(--text) text-xs font-medium">
-													{resolvedBot.avatarUrl && <img src={resolvedBot.avatarUrl} alt={resolvedBot.name} className="w-4 h-4 rounded-full object-cover" />}
+													{resolvedBot.avatarUrl && (
+														<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
+													)}
 													{resolvedBot.name}
 												</span>
 											) : (
@@ -285,7 +336,7 @@ export default function Roadmap() {
 												<Button className="flex-1" onClick={() => openEdit(item)}>
 													{t('common.edit')}
 												</Button>
-												<Button variant="danger" className="flex-1" onClick={() => deleteItem(item.id)}>
+												<Button variant="danger" className="flex-1" onClick={() => setConfirmDeleteItem(item)}>
 													{t('common.buttons.delete')}
 												</Button>
 											</div>
@@ -296,6 +347,17 @@ export default function Roadmap() {
 					</div>
 				))}
 			</div>
+
+			<Confirm
+				open={Boolean(confirmDeleteItem)}
+				onOpenChange={(open) => !open && setConfirmDeleteItem(null)}
+				title={t('admin.dashboard.roadmap.deleteConfirmTitle')}
+				description={t('admin.dashboard.roadmap.deleteConfirmDesc')}
+				confirmText={t('common.buttons.delete')}
+				cancelText={t('common.buttons.cancel')}
+				variant="danger"
+				onConfirm={deleteItem}
+			/>
 		</div>
 	);
 }

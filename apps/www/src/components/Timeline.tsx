@@ -9,81 +9,45 @@ import { useEffect, useRef, useState } from 'react';
 import { useEnvironment, useDictionary } from '@xernerx/providers';
 
 type Milestone = {
-	date: string;
-	title: string;
-	description: string;
 	icon: React.ReactNode;
 	link?: string;
 };
 
 const milestones: Milestone[] = [
 	{
-		date: 'March 2020',
-		title: 'Amethyst Development Founded',
-		description: 'Thomas, Johannes, and Asher established Amethyst Development with a focus on scalable Discord tooling.',
 		icon: <Building2 />,
 	},
 	{
-		date: 'June 2020',
-		title: 'Rebranded to Portal Development',
-		description: 'Following structural changes, the company was reintroduced under the name Portal Development.',
 		icon: <RefreshCw />,
 	},
 	{
-		date: 'June 2020',
-		title: 'First Bot Acquisition',
-		description: 'Roblox Utilities joined the portfolio, expanding into multi-server utility tooling.',
 		icon: <Bot />,
 	},
 	{
-		date: 'November 2020',
-		title: 'To-Do List Bot Launched',
-		description: 'Clari began development of To-Do List Bot, introducing structured productivity features.',
 		icon: <UserPlus />,
 		link: 'https://app.xernerx.com/bots/782105629572464652',
 	},
 	{
-		date: 'August 2021',
-		title: 'Discord-Translate Begins',
-		description: 'Thomas initiated development of Discord-Translate, focused on multilingual communities.',
 		icon: <Globe />,
 	},
 	{
-		date: 'December 2021',
-		title: 'Acquired DragDev Studios',
-		description: 'DragDev Studios and YourApps joined the company, along with three new developers.',
 		icon: <ArrowUpRight />,
 	},
 	{
-		date: 'January 2022',
-		title: 'Metamorphosis Rewrite',
-		description: 'Discord-Translate was rebuilt and relaunched as Metamorphosis with improved infrastructure.',
 		icon: <Star />,
 		link: 'https://app.xernerx.com/bots/881678826906730547',
 	},
 	{
-		date: 'February 2022',
-		title: 'Leadership Transition',
-		description: 'Johannes stepped down. Infrastructure responsibilities were restructured internally.',
 		icon: <LogOut />,
 	},
 	{
-		date: 'March 2022',
-		title: 'Zodiac Development',
-		description: 'Max began development of Zodiac, expanding into astrology and personality tooling.',
 		icon: <ShieldCheck />,
 		link: 'https://app.xernerx.com/bots/950251264095162418',
 	},
 	{
-		date: 'February 2026',
-		title: 'Xernerx Studios Rebrand',
-		description: 'The company rebranded to Xernerx Studios, reflecting a shift in focus and identity.',
 		icon: <RefreshCw />,
 	},
 	{
-		date: `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][new Date().getMonth()]} ${new Date().getFullYear()}`,
-		title: 'Today',
-		description: "You're all caught up!",
 		icon: <Calendar />,
 	},
 ];
@@ -101,7 +65,7 @@ export default function Timeline() {
 							<h2 className="text-6xl lg:text-[5.5rem] font-black text-(--text) leading-[0.9] tracking-tighter mb-6" style={{ fontFamily: 'var(--font-fredoka)' }}>
 								{t('www.timeline.title.line1')}
 								<br />
-								<span className="text-transparent bg-clip-text bg-gradient-to-br from-(--accent) to-purple-500">{t('www.timeline.title.line2')}</span>
+								<span className="text-transparent bg-clip-text bg-gradient-to-br from-(--accent) to-(--accent)">{t('www.timeline.title.line2')}</span>
 								<br />
 								{t('www.timeline.title.line3')}
 							</h2>
@@ -168,7 +132,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 					<div className="flex flex-col flex-1 min-w-0">
 						<span className="text-xs uppercase tracking-widest text-(--accent) font-black mb-1">
 							{t(`www.timeline.events.${index}.date`) === 'DYNAMIC_DATE'
-								? `${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][new Date().getMonth()]} ${new Date().getFullYear()}`
+								? new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
 								: t(`www.timeline.events.${index}.date`)}
 						</span>
 

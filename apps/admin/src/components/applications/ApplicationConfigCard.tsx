@@ -55,7 +55,7 @@ export function ApplicationConfigCard({ config, roles, onEdit, onDelete }: Appli
 						<button onClick={() => onEdit(config)} className="p-1.5 rounded-lg hover:bg-(--border)/10 text-(--text-muted) hover:text-(--text) transition-colors">
 							<Edit size={14} />
 						</button>
-						<button onClick={() => onDelete(config.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-(--text-muted) hover:text-red-500 transition-colors">
+						<button onClick={() => onDelete(config.id)} className="p-1.5 rounded-lg hover:bg-(--accent-red)/10 text-(--text-muted) hover:text-(--accent-red) transition-colors">
 							<Trash2 size={14} />
 						</button>
 					</div>
@@ -69,24 +69,24 @@ export function ApplicationConfigCard({ config, roles, onEdit, onDelete }: Appli
 				>
 					<div className="flex items-center flex-wrap gap-2 mb-1">
 						<span
-							className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.status === 'open' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}
+							className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.status === 'open' ? 'bg-(--accent-green)/10 text-(--accent-green)' : 'bg-(--accent-red)/10 text-(--accent-red)'}`}
 						>
 							{config.status === 'closed' ? t('admin.dashboard.applicationConfigs.closed') : t('admin.dashboard.applicationConfigs.open')}
 						</span>
 						<span
-							className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.public !== false ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}
+							className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full ${config.public !== false ? 'bg-(--accent)/10 text-(--accent)' : 'bg-(--accent-orange)/10 text-(--accent-orange)'}`}
 						>
 							{config.public !== false ? t('admin.dashboard.applicationConfigs.public') : t('admin.dashboard.applicationConfigs.unlisted')}
 						</span>
 						{config.questions && config.questions.length > 0 && (
-							<span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400">
+							<span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent)">
 								{t('admin.dashboard.applicationConfigs.dynamicForm')}
 							</span>
 						)}
 					</div>
 					{matchedRole ? (
 						<div className="flex items-center gap-1.5 mt-1">
-							<div className="w-2 h-2 rounded-full bg-blue-400/80 shadow-[0_0_8px_rgba(96,165,250,0.5)]" />
+							<div className="w-2 h-2 rounded-full bg-(--accent)/80 shadow-[0_0_8px_rgba(96,165,250,0.5)]" />
 							<span className="text-xs font-semibold text-(--text-muted)">{matchedRole.name}</span>
 						</div>
 					) : config.rewardRole ? (

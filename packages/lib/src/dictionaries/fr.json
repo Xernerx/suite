@@ -18,6 +18,10 @@
 				"analytics": {
 					"label": "Analytique",
 					"description": "Nous aide à suivre les erreurs et le trafic."
+				},
+				"marketing": {
+					"label": "Marketing",
+					"description": "Permet des publicités pertinentes et la mesure des campagnes."
 				}
 			},
 			"buttons": {
@@ -164,35 +168,42 @@
 					]
 				},
 				"sharing": {
-					"title": "5. Partage des données",
-					"items": ["Fournisseurs d'hébergement et d'infrastructure.", "Intégrations tierces autorisées.", "Autorités légales lorsque la loi l'exige."]
+					"title": "6. Partage des données",
+					"items": [
+						"Fournisseurs d'hébergement et d'infrastructure.",
+						"Prestataires de paiement (Stripe) pour la facturation et la gestion des abonnements.",
+						"Intégrations tierces autorisées.",
+						"Autorités légales lorsque la loi l'exige."
+					]
 				},
 				"retention": {
-					"title": "6. Conservation des données",
+					"title": "7. Conservation des données",
 					"content": "Nous conservons les données uniquement aussi longtemps que nécessaire pour remplir les objectifs décrits dans cette politique, sauf si une conservation plus longue est requise par la loi."
 				},
 				"security": {
-					"title": "7. Sécurité des données",
+					"title": "8. Sécurité des données",
 					"content": "Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles pour protéger les données. Cependant, aucun système n'est absolument sécurisé."
 				},
 				"rights": {
-					"title": "8. Vos droits",
+					"title": "9. Vos droits",
 					"items": ["Droit d'accès à vos données.", "Droit de rectification ou de suppression.", "Droit de restreindre ou de s'opposer au traitement.", "Droit à la portabilité des données."]
 				},
 				"cookies": {
-					"title": "9. Cookies et suivi",
-					"content": "Nous pouvons utiliser des cookies ou des technologies similaires pour améliorer les performances du service et les analyses."
+					"title": "10. Cookies et suivi",
+					"content": "Nous pouvons utiliser des cookies ou des technologies similaires pour améliorer les performances du service et les analyses. Pour plus de détails, consultez notre ",
+					"linkText": "Politique relative aux cookies",
+					"contentSuffix": "."
 				},
 				"international": {
-					"title": "10. Transferts internationaux",
+					"title": "11. Transferts internationaux",
 					"content": "Si des données sont transférées en dehors de votre juridiction, des garanties appropriées sont mises en œuvre pour assurer la conformité légale."
 				},
 				"changes": {
-					"title": "11. Modifications de cette politique",
+					"title": "13. Modifications de cette politique",
 					"content": "Nous pouvons mettre à jour cette Politique de confidentialité périodiquement. L'utilisation continue des services indique l'acceptation de la version révisée."
 				},
 				"contact": {
-					"title": "12. Contact",
+					"title": "14. Contact",
 					"prefix": "Pour toute question relative à la confidentialité, contactez"
 				}
 			}
@@ -222,12 +233,16 @@
 					]
 				},
 				"accounts": {
-					"title": "4. Comptes utilisateurs",
+					"title": "6. Comptes utilisateurs",
 					"content": "Vous êtes responsable du maintien de la confidentialité de vos identifiants de compte et de toutes les activités effectuées sous votre compte. Nous ne sommes pas responsables des pertes résultant d'un accès non autorisé."
 				},
 				"data": {
-					"title": "5. Données utilisateur",
-					"content": "En utilisant nos services, vous acceptez nos pratiques de traitement des données décrites dans notre Politique de confidentialité. Les données peuvent inclure des informations de compte, des mesures d'utilisation et des données d'intégration."
+					"title": "9. Données utilisateur et cookies",
+					"contentPrefix": "En utilisant nos services, vous acceptez nos pratiques de traitement des données décrites dans notre ",
+					"contentLink": "Politique de confidentialité",
+					"contentMiddle": " et notre ",
+					"cookiesLink": "Politique relative aux cookies",
+					"contentSuffix": ". Les données peuvent inclure des informations de compte, des mesures d'utilisation et des données d'intégration."
 				},
 				"availability": {
 					"title": "6. Disponibilité du service",

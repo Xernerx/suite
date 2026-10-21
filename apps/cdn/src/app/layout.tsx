@@ -13,27 +13,27 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx CDN',
+		default: 'Xernerx CDN | Global Media Pipeline & Asset Storage',
 		template: 'Xernerx CDN | %s',
 	},
-	description: 'Xernerx content delivery network and asset storage service.',
+	description: 'Official Xernerx Studios content delivery network, high-speed media pipeline, private blob storage, and raw asset streaming service.',
 
 	metadataBase: new URL('https://cdn.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx CDN',
+			default: 'Xernerx CDN | Global Media Pipeline & Asset Storage',
 			template: 'Xernerx CDN | %s',
 		},
-		description: 'Xernerx content delivery network and asset storage service.',
+		description: 'Official Xernerx Studios content delivery network, high-speed media pipeline, private blob storage, and raw asset streaming service.',
 		url: 'https://cdn.xernerx.com',
-		siteName: 'Xernerx',
+		siteName: 'Xernerx CDN',
 		images: [
 			{
-				url: '/banner.png',
+				url: '/opengraph-image',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx CDN',
+				alt: 'Xernerx CDN — Global Media Pipeline',
 			},
 		],
 		type: 'website',
@@ -42,11 +42,11 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx CDN',
+			default: 'Xernerx CDN | Global Media Pipeline & Asset Storage',
 			template: 'Xernerx CDN | %s',
 		},
-		description: 'Xernerx content delivery network and asset storage service.',
-		images: ['/banner.png'],
+		description: 'Official Xernerx Studios content delivery network, high-speed media pipeline, private blob storage, and raw asset streaming service.',
+		images: ['/opengraph-image'],
 	},
 
 	icons: {
@@ -73,8 +73,8 @@ export default async function RootLayout({
 	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
-			<body style={themeProps.style}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
+			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict}>
 						<PermissionProvider>{children}</PermissionProvider>

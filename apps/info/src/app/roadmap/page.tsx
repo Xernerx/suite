@@ -1,11 +1,14 @@
 /** @format */
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Input } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import KnownIssuesSection from '@/components/roadmap/KnownIssuesSection';
+import MobileRoadmapTimeline from '@/components/roadmap/MobileRoadmapTimeline';
+import RoadmapActionBar from '@/components/roadmap/RoadmapActionBar';
 
 export default function RoadmapPage() {
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -23,10 +26,30 @@ export default function RoadmapPage() {
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			const q = new URLSearchParams(window.location.search).get('q');
+			const params = new URLSearchParams(window.location.search);
+			const q = params.get('q');
+			const prod = params.get('product');
+			const status = params.get('status') as any;
 			if (q) setSearchQuery(q);
+			if (prod) setSelectedProduct(prod);
+			if (status && ['all', 'idea', 'planned', 'active', 'released'].includes(status)) {
+				setStatusFilter(status);
+			}
 		}
 	}, []);
+
+	useEffect(() => {
+		if (typeof window === 'undefined' || loading) return;
+		const params = new URLSearchParams(window.location.search);
+		if (selectedProduct) params.set('product', selectedProduct);
+		else params.delete('product');
+		if (statusFilter !== 'all') params.set('status', statusFilter);
+		else params.delete('status');
+		if (searchQuery.trim()) params.set('q', searchQuery.trim());
+		else params.delete('q');
+		const qs = params.toString();
+		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+	}, [selectedProduct, statusFilter, searchQuery, loading]);
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -88,7 +111,7 @@ export default function RoadmapPage() {
 			.catch((err) => {
 				setLoading(false);
 				try {
-					toast({ type: 'error', title: 'Error', description: err.message });
+					toast({ type: 'error', title: t('common.toast.error'), description: err.message });
 				} catch {}
 			});
 	}, [isReady, getEnvUrl]);
@@ -106,8 +129,6 @@ export default function RoadmapPage() {
 		if (!targetId) return null;
 		return botProfiles[targetId] || (matchedOrgBot ? { name: matchedOrgBot.name, avatarUrl: matchedOrgBot.avatarUrl } : null);
 	};
-
-	if (loading) return <Loading />;
 
 	const formatTime = (ms: number) => {
 		if (!ms) return t('info.roadmap.metrics.na');
@@ -136,17 +157,13 @@ export default function RoadmapPage() {
 	});
 
 	const allProducts = Array.from(new Set(roadmap.map((i: any) => i.productId)));
-	const productColors = ['#3b82f6', '#ec4899', '#10b981', '#f97316', '#8b5cf6', '#06b6d4', '#ef4444', '#eab308'];
-	const getProductColor = (prod: string) => {
-		const idx = allProducts.indexOf(prod);
-		return productColors[Math.max(0, idx) % productColors.length];
-	};
+	const getProductColor = (_prod: string) => 'var(--accent)';
 
 	const statusColors: any = {
-		idea: 'bg-gray-500',
-		planned: 'bg-blue-500',
-		active: 'bg-yellow-500',
-		released: 'bg-green-500',
+		idea: 'bg-(--text-muted)',
+		planned: 'bg-(--accent)',
+		active: 'bg-(--accent-orange)',
+		released: 'bg-(--accent-green)',
 	};
 
 	const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -191,7 +208,7 @@ export default function RoadmapPage() {
 		<div className="flex flex-col w-full min-h-screen overflow-hidden">
 			{/* Header & Metrics */}
 			<motion.div
-				initial={{ opacity: 0, y: -20 }}
+				initial={{ opacity: 1, y: 0 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5, ease: 'easeOut' }}
 				className="flex flex-col items-center justify-center p-12 bg-transparent border-b border-(--border)/10 backdrop-blur-sm relative z-10"
@@ -253,10 +270,10 @@ export default function RoadmapPage() {
 										className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
 											isSelected ? 'shadow-md scale-105' : 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:text-(--text)'
 										}`}
-										style={isSelected ? { backgroundColor: `${color}26`, borderColor: color, color: color } : undefined}
+										style={isSelected ? { backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`, borderColor: color, color: color } : undefined}
 									>
 										<span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
-										{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
+										{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}
 										<span>{botInfo ? botInfo.name : prod}</span>
 									</button>
 								);
@@ -286,215 +303,188 @@ export default function RoadmapPage() {
 			</motion.div>
 
 			{/* Beautiful Horizontal Timeline (Hanging Wire Harness) */}
-			<div className="w-full relative py-12 px-4 md:px-8 overflow-x-auto custom-scrollbar flex-1">
-				{/* DESKTOP HANGING PENDANT LAYOUT (md:flex) */}
-				{(() => {
-					const trunkY = 32;
-					const trackSpacing = 20;
-					const trackStartY = trunkY + 48;
-					const bundleBottom = trackStartY + (allProducts.length > 0 ? (allProducts.length - 1) * trackSpacing : 0);
-					const cardsY = bundleBottom + 64;
+			{loading ? (
+				<div className="flex items-center justify-center py-24 flex-1">
+					<Loading />
+				</div>
+			) : (
+				<>
+					<div className="w-full relative py-12 px-4 md:px-8 overflow-x-auto custom-scrollbar flex-1">
+						{/* DESKTOP HANGING PENDANT LAYOUT (md:flex) */}
+						{(() => {
+							const trunkY = 32;
+							const trackSpacing = 20;
+							const trackStartY = trunkY + 48;
+							const bundleBottom = trackStartY + (allProducts.length > 0 ? (allProducts.length - 1) * trackSpacing : 0);
+							const cardsY = bundleBottom + 64;
 
-					return (
-						<div className="hidden md:flex flex-row min-w-max gap-16 relative z-10 pb-16">
-							{/* GLOBAL BACKGROUND TRACKS */}
-							<div className="absolute left-0 right-0 top-0 bottom-0 min-w-max z-0">
-								{/* Main Trunk Line */}
-								<div className="absolute left-0 right-0 h-[2px] bg-(--border)/20" style={{ top: `${trunkY}px` }}></div>
+							return (
+								<div className="hidden md:flex flex-row min-w-max gap-16 relative z-10 pb-16">
+									{/* GLOBAL BACKGROUND TRACKS */}
+									<div className="absolute left-0 right-0 top-0 bottom-0 min-w-max z-0">
+										{/* Main Trunk Line */}
+										<div className="absolute left-0 right-0 h-[2px] bg-(--border)/20" style={{ top: `${trunkY}px` }}></div>
 
-								{/* Parallel Product Tracks */}
-								{allProducts.map((prod: string, i: number) => {
-									const trackY = trackStartY + i * trackSpacing;
-									const color = getProductColor(prod);
-									const isSelected = selectedProduct === prod;
-									const isFaded = selectedProduct && !isSelected;
-									return (
-										<div
-											key={prod}
-											onClick={() => setSelectedProduct(isSelected ? null : prod)}
-											className={`absolute left-0 right-0 cursor-pointer transition-all duration-300 hover:h-[4px] hover:opacity-100 z-10 ${isFaded ? 'opacity-10 h-[2px]' : isSelected ? 'opacity-100 h-[3px] shadow-[0_0_10px_currentColor]' : 'opacity-30 h-[2px]'}`}
-											style={{ top: `${trackY}px`, backgroundColor: color, color: color }}
-										>
-											<div className="absolute -top-2 -bottom-2 left-0 right-0 bg-transparent"></div> {/* Larger click area */}
-										</div>
-									);
-								})}
-							</div>
-
-							{/* QUARTER COLUMNS */}
-							{sortedQuarters.map((quarter, qIdx) => {
-								const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
-								const qItems = rawQItems.filter(matchesRoadmapFilters);
-
-								return (
-									<div key={quarter} className="flex flex-col relative shrink-0">
-										{/* Quarter Node on the Trunk */}
-										<div className="absolute left-0 flex items-center gap-4" style={{ top: '20px' }}>
-											<div
-												className={`w-6 h-6 rounded-full border-4 border-(--background) z-20 relative ${quarter === 'Backlog' ? 'opacity-0' : quarter === currentQuarterStr ? 'bg-(--accent) shadow-[0_0_20px_var(--accent)] animate-pulse' : 'bg-(--accent)/40 shadow-[0_0_15px_var(--accent)]'}`}
-											>
-												{quarter === currentQuarterStr && (
-													<div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-														<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded shadow-lg">
-															{t('info.roadmap.timeline.today')}
-														</span>
-														<div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-(--accent) mt-0.5"></div>
-													</div>
-												)}
-											</div>
-											<h2 className={`text-2xl font-black uppercase tracking-widest ${quarter === currentQuarterStr ? 'text-(--accent)' : 'text-(--text)'}`}>
-												{quarter === 'Backlog' ? '' : quarter}
-											</h2>
-										</div>
-
-										{/* Horizontal Cards Container for this Quarter */}
-										<div className="flex flex-row gap-6 items-start z-10 pl-16" style={{ marginTop: `${cardsY}px` }}>
-											{qItems.length === 0 && (
-												<div className="w-[300px] h-1 opacity-0"></div> // Spacer for empty quarters
-											)}
-
-											{qItems.map((item: any) => {
-												const pIdx = allProducts.indexOf(item.productId);
-												const trackY = trackStartY + pIdx * trackSpacing;
-												const color = getProductColor(item.productId);
-												const distToTrack = cardsY - trackY;
-												const botInfo = resolveBot(item);
-
-												return (
-													<motion.div
-														layout
-														initial={{ opacity: 0, y: 15 }}
-														animate={{ opacity: 1, y: 0 }}
-														transition={{ duration: 0.3, ease: 'easeOut' }}
-														key={item.id}
-														className="relative flex flex-col w-[340px] shrink-0 p-6 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg hover:-translate-y-1 hover:shadow-2xl hover:bg-(--foreground)/50 transition-all duration-300 group/card"
-													>
-														{/* Vertical Wire connecting card up to its horizontal track */}
-														<div
-															className="absolute w-[2px] opacity-40 group-hover/card:opacity-100 transition-all duration-300 z-10"
-															style={{ left: '32px', top: `-${distToTrack}px`, height: `${distToTrack}px`, backgroundColor: color }}
-														></div>
-
-														{/* The Node dot exactly on the horizontal track */}
-														<div
-															className="absolute w-3 h-3 rounded-full border-2 border-(--background) z-20 transition-transform duration-300 group-hover/card:scale-[1.7]"
-															style={{ left: '27px', top: `-${distToTrack + 5}px`, backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
-														></div>
-
-														{/* Card Hover Accent */}
-														<div
-															className="absolute top-0 left-0 w-1 h-full opacity-40 group-hover/card:opacity-100 transition-opacity rounded-l-2xl"
-															style={{ backgroundColor: color }}
-														></div>
-
-														<div className="flex justify-between items-start mb-4 z-10">
-															<span
-																onClick={() => setSelectedProduct(selectedProduct === item.productId ? null : item.productId)}
-																className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-md tracking-wider border cursor-pointer hover:brightness-150 transition-all"
-																style={{ color: color, backgroundColor: `${color}1A`, borderColor: `${color}33` }}
-															>
-																{botInfo?.avatarUrl && <img src={botInfo.avatarUrl} alt={botInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-																{botInfo ? botInfo.name : item.productId}
-															</span>
-															<div className="flex items-center gap-2">
-																<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-gray-500'}`}></span>
-																<span className="text-[10px] uppercase font-bold text-(--text-muted)">
-																	{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}
-																</span>
-															</div>
-														</div>
-
-														<h3 className="font-bold text-lg leading-tight text-(--text) group-hover/card:text-(--accent) transition-colors z-10">{item.title}</h3>
-														<p className="text-sm text-(--text-muted) mt-3 line-clamp-3 leading-relaxed z-10">{item.description}</p>
-
-														{item.status === 'released' && item.changelogUrl && (
-															<a href={item.changelogUrl} className="mt-4 text-xs font-bold hover:underline flex items-center gap-1 w-fit z-10" style={{ color: color }}>
-																{t('info.roadmap.timeline.readChangelog')} →
-															</a>
-														)}
-													</motion.div>
-												);
-											})}
-										</div>
+										{/* Parallel Product Tracks */}
+										{allProducts.map((prod: string, i: number) => {
+											const trackY = trackStartY + i * trackSpacing;
+											const color = getProductColor(prod);
+											const isSelected = selectedProduct === prod;
+											const isFaded = selectedProduct && !isSelected;
+											return (
+												<div
+													key={prod}
+													onClick={() => setSelectedProduct(isSelected ? null : prod)}
+													className={`absolute left-0 right-0 cursor-pointer transition-all duration-300 hover:h-[4px] hover:opacity-100 z-10 ${isFaded ? 'opacity-10 h-[2px]' : isSelected ? 'opacity-100 h-[3px] shadow-[0_0_10px_currentColor]' : 'opacity-30 h-[2px]'}`}
+													style={{ top: `${trackY}px`, backgroundColor: color, color: color }}
+												>
+													<div className="absolute -top-2 -bottom-2 left-0 right-0 bg-transparent"></div> {/* Larger click area */}
+												</div>
+											);
+										})}
 									</div>
-								);
-							})}
-						</div>
-					);
-				})()}
 
-				{/* MOBILE VERTICAL STACK (md:hidden) */}
-				<div className="flex md:hidden flex-col gap-12 w-full pt-4 pb-8 relative">
-					<div className="absolute top-8 bottom-0 left-[27px] w-[2px] bg-(--border)/20 z-0"></div>
-					{sortedQuarters.map((quarter, idx) => {
-						const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
-						const qItems = rawQItems.filter(matchesRoadmapFilters);
-						return (
-							<div key={quarter} className="flex flex-col w-full relative z-10">
-								<div className="flex items-center gap-4 mb-8">
-									<div
-										className={`w-6 h-6 rounded-full border-4 border-(--background) shadow-[0_0_15px_var(--accent)] z-20 relative ${quarter === 'Backlog' ? 'opacity-0' : quarter === currentQuarterStr ? 'bg-(--accent) shadow-[0_0_20px_var(--accent)] animate-pulse' : 'bg-(--accent)/40'}`}
-									>
-										{quarter === currentQuarterStr && (
-											<div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-												<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded shadow-lg">
-													{t('info.roadmap.timeline.today')}
-												</span>
-												<div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-(--accent) mt-0.5"></div>
-											</div>
-										)}
-									</div>
-									<h2 className={`text-2xl font-black tracking-wider uppercase ${quarter === currentQuarterStr ? 'text-(--accent)' : 'text-(--text)'}`}>
-										{quarter === 'Backlog' ? '' : quarter}
-									</h2>
-								</div>
-								<div className="flex flex-col gap-8 pl-[18px]">
-									{allProducts.map((prod) => {
-										const pItems = qItems.filter((i: any) => i.productId === prod);
-										if (pItems.length === 0 || (selectedProduct && prod !== selectedProduct)) return null;
-										const color = getProductColor(prod);
-										const prodBotInfo = resolveBot(pItems[0] || prod);
+									{/* QUARTER COLUMNS */}
+									{sortedQuarters.map((quarter, qIdx) => {
+										const rawQItems = itemsWithQ.filter((i: any) => i.targetQuarter === quarter);
+										const qItems = rawQItems.filter(matchesRoadmapFilters);
 
 										return (
-											<div key={prod} className="flex flex-col gap-4 relative border-l-2 pl-6" style={{ borderColor: `${color}66` }}>
-												<div className="absolute top-0 -left-[3px] w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
-												<span
-													onClick={() => setSelectedProduct(selectedProduct === prod ? null : prod)}
-													className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-md w-fit cursor-pointer hover:brightness-150 transition-all"
-													style={{ color: color, backgroundColor: `${color}1A`, border: `1px solid ${color}33` }}
-												>
-													{prodBotInfo?.avatarUrl && <img src={prodBotInfo.avatarUrl} alt={prodBotInfo.name} className="w-4 h-4 rounded-full object-cover" />}
-													{prodBotInfo ? prodBotInfo.name : prod}
-												</span>
-												{pItems.map((item: any) => (
-													<motion.div
-														layout
-														key={item.id}
-														className="flex flex-col p-5 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg relative overflow-hidden"
+											<div key={quarter} className="flex flex-col relative shrink-0">
+												{/* Quarter Node on the Trunk */}
+												<div className="absolute left-0 flex items-center gap-4" style={{ top: '20px' }}>
+													<div
+														className={`w-6 h-6 rounded-full border-4 border-(--background) z-20 relative ${quarter === 'Backlog' ? 'opacity-0' : quarter === currentQuarterStr ? 'bg-(--accent) shadow-[0_0_20px_var(--accent)] animate-pulse' : 'bg-(--accent)/40 shadow-[0_0_15px_var(--accent)]'}`}
 													>
-														<div className="absolute top-0 left-0 w-1 h-full opacity-60" style={{ backgroundColor: color }}></div>
-														<div className="flex justify-between items-start mb-2">
-															<div className="flex items-center gap-2">
-																<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-gray-500'}`}></span>
-																<span className="text-xs uppercase font-bold text-(--text-muted)">{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}</span>
+														{quarter === currentQuarterStr && (
+															<div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
+																<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded-xl shadow-lg">
+																	{t('info.roadmap.timeline.today')}
+																</span>
+																<div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-(--accent) mt-0.5"></div>
 															</div>
-														</div>
-														<h3 className="font-bold text-lg text-(--text)">{item.title}</h3>
-														<p className="text-sm text-(--text-muted) mt-2">{item.description}</p>
-													</motion.div>
-												))}
+														)}
+													</div>
+													<h2 className={`text-2xl font-black uppercase tracking-widest ${quarter === currentQuarterStr ? 'text-(--accent)' : 'text-(--text)'}`}>
+														{quarter === 'Backlog' ? '' : quarter}
+													</h2>
+												</div>
+
+												{/* Horizontal Cards Container for this Quarter */}
+												<div className="flex flex-row gap-6 items-start z-10 pl-16" style={{ marginTop: `${cardsY}px` }}>
+													{qItems.length === 0 && (
+														<div className="w-[300px] h-1 opacity-0"></div> // Spacer for empty quarters
+													)}
+
+													{qItems.map((item: any) => {
+														const pIdx = allProducts.indexOf(item.productId);
+														const trackY = trackStartY + pIdx * trackSpacing;
+														const color = getProductColor(item.productId);
+														const distToTrack = cardsY - trackY;
+														const botInfo = resolveBot(item);
+
+														return (
+															<motion.div
+																layout
+																initial={{ opacity: 0, y: 15 }}
+																animate={{ opacity: 1, y: 0 }}
+																transition={{ duration: 0.3, ease: 'easeOut' }}
+																key={item.id}
+																className="relative flex flex-col w-[340px] shrink-0 p-6 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg hover:-translate-y-1 hover:shadow-2xl hover:bg-(--foreground)/50 transition-all duration-300 group/card"
+															>
+																{/* Vertical Wire connecting card up to its horizontal track */}
+																<div
+																	className="absolute w-[2px] opacity-40 group-hover/card:opacity-100 transition-all duration-300 z-10"
+																	style={{ left: '32px', top: `-${distToTrack}px`, height: `${distToTrack}px`, backgroundColor: color }}
+																></div>
+
+																{/* The Node dot exactly on the horizontal track */}
+																<div
+																	className="absolute w-3 h-3 rounded-full border-2 border-(--background) z-20 transition-transform duration-300 group-hover/card:scale-[1.7]"
+																	style={{ left: '27px', top: `-${distToTrack + 5}px`, backgroundColor: color, boxShadow: `0 0 10px ${color}` }}
+																></div>
+
+																{/* Card Hover Accent */}
+																<div
+																	className="absolute top-0 left-0 w-1 h-full opacity-40 group-hover/card:opacity-100 transition-opacity rounded-l-2xl"
+																	style={{ backgroundColor: color }}
+																></div>
+
+																<div className="flex justify-between items-start mb-4 z-10">
+																	<span
+																		onClick={() => setSelectedProduct(selectedProduct === item.productId ? null : item.productId)}
+																		className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-xl tracking-wider border cursor-pointer hover:brightness-150 transition-all"
+																		style={{
+																			color: color,
+																			backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
+																			borderColor: `color-mix(in srgb, ${color} 20%, transparent)`,
+																		}}
+																	>
+																		{botInfo?.avatarUrl && (
+																			<Image
+																				src={botInfo.avatarUrl}
+																				alt={botInfo.name}
+																				width={16}
+																				height={16}
+																				unoptimized
+																				className="w-4 h-4 rounded-full object-cover"
+																			/>
+																		)}
+																		{botInfo ? botInfo.name : item.productId}
+																	</span>
+																	<div className="flex items-center gap-2">
+																		<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-(--text-muted)'}`}></span>
+																		<span className="text-[10px] uppercase font-bold text-(--text-muted)">
+																			{t(`info.roadmap.timeline.status.${item.status || 'idea'}`)}
+																		</span>
+																	</div>
+																</div>
+
+																<h3 className="font-bold text-lg leading-tight text-(--text) group-hover/card:text-(--accent) transition-colors z-10">{item.title}</h3>
+																<p className="text-sm text-(--text-muted) mt-3 line-clamp-3 leading-relaxed z-10">{item.description}</p>
+
+																{item.status === 'released' && item.changelogUrl && (
+																	<a
+																		href={item.changelogUrl}
+																		className="mt-4 text-xs font-bold hover:underline flex items-center gap-1 w-fit z-10"
+																		style={{ color: color }}
+																	>
+																		{t('info.roadmap.timeline.readChangelog')} →
+																	</a>
+																)}
+
+																<RoadmapActionBar item={item} onUpdate={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))} />
+															</motion.div>
+														);
+													})}
+												</div>
 											</div>
 										);
 									})}
 								</div>
-							</div>
-						);
-					})}
-				</div>
-			</div>
+							);
+						})()}
 
-			{/* Known Issues Section */}
-			<KnownIssuesSection issues={filteredIssues} resolveBot={resolveBot} />
+						{/* MOBILE VERTICAL STACK (md:hidden) */}
+						<MobileRoadmapTimeline
+							sortedQuarters={sortedQuarters}
+							currentQuarterStr={currentQuarterStr}
+							itemsWithQ={itemsWithQ}
+							matchesRoadmapFilters={matchesRoadmapFilters}
+							allProducts={allProducts}
+							selectedProduct={selectedProduct}
+							setSelectedProduct={setSelectedProduct}
+							getProductColor={getProductColor}
+							resolveBot={resolveBot}
+							statusColors={statusColors}
+							onUpdateItem={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))}
+						/>
+					</div>
+
+					{/* Known Issues Section */}
+					<KnownIssuesSection issues={filteredIssues} resolveBot={resolveBot} />
+				</>
+			)}
 		</div>
 	);
 }

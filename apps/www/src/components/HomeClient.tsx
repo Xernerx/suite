@@ -218,9 +218,9 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 							<div className="relative z-10 flex flex-col items-start gap-4">
 								<div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">{point.icon}</div>
-								<h3 className="text-xl font-bold mt-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								<h2 className="text-xl font-bold mt-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{point.title}
-								</h3>
+								</h2>
 								<p className="text-white/90 text-sm leading-relaxed">{point.desc}</p>
 							</div>
 						</motion.div>

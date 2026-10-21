@@ -14,6 +14,8 @@ export async function GET(req: Request) {
 		const search = url.searchParams.get('search');
 		const idsParam = url.searchParams.get('ids');
 		const organization = url.searchParams.get('organization');
+		const organizationsParam = url.searchParams.get('organizations');
+		const owner = url.searchParams.get('owner');
 
 		const db = await database('xernerx');
 		const GuildModel = db.models.guilds.Guild as any;
@@ -25,6 +27,17 @@ export async function GET(req: Request) {
 			query = { id: { $in: ids } }; // If querying by explicit IDs, bypass privacy check
 		} else if (organization) {
 			query = { organization }; // If querying by organization, bypass privacy check
+		} else if (owner || organizationsParam) {
+			const orgList = organizationsParam
+				? organizationsParam
+						.split(',')
+						.map((o) => o.trim())
+						.filter(Boolean)
+				: [];
+			const orClauses: any[] = [];
+			if (owner) orClauses.push({ owner }, { organization: owner });
+			if (orgList.length > 0) orClauses.push({ organization: { $in: orgList } });
+			query = orClauses.length > 0 ? { $or: orClauses } : { privacy };
 		} else if (search) {
 			query.name = { $regex: search, $options: 'i' };
 		}
@@ -75,6 +88,10 @@ export async function GET(req: Request) {
 					icon: 1,
 					banner: 1,
 					description: 1,
+					privacy: 1,
+					verified: 1,
+					owner: 1,
+					organization: 1,
 					voteCount: '$computedVoteCount',
 					memberCount: { $ifNull: ['$statsData.members', 0] },
 					links: 1,

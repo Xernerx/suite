@@ -16,9 +16,16 @@ export function ThemeScript() {
 				return localStorage.getItem(key);
 			}
 
+			function setThemeVar(name: string, value: string) {
+				document.documentElement.style.setProperty(name, value);
+				if (document.body) {
+					document.body.style.setProperty(name, value);
+				}
+			}
+
 			const accent = getPref('accent');
 			if (accent) {
-				document.documentElement.style.setProperty('--accent', accent);
+				setThemeVar('--accent', accent);
 			}
 
 			const theme = getPref('theme');
@@ -32,17 +39,21 @@ export function ThemeScript() {
 
 			const zoom = getPref('uiZoom');
 			if (zoom) {
-				document.documentElement.style.setProperty('--ui-zoom', String(parseInt(zoom, 10) / 100));
+				const parsedZoom = parseInt(zoom, 10);
+				if (!isNaN(parsedZoom)) {
+					setThemeVar('--ui-zoom', String(parsedZoom / 100));
+					setThemeVar('--ui-scale', String(parsedZoom));
+				}
 			}
 
 			const gap = getPref('uiGap');
 			if (gap) {
-				document.documentElement.style.setProperty('--ui-gap', gap + 'px');
+				setThemeVar('--ui-gap', gap + 'px');
 			}
 
 			const textScale = getPref('textScale');
 			if (textScale) {
-				document.documentElement.style.setProperty('--text-scale', textScale + 'px');
+				setThemeVar('--text-scale', textScale + 'px');
 			}
 		} catch (e) {}
 	}, []);

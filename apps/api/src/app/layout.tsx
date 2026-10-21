@@ -13,27 +13,27 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx API',
+		default: 'Xernerx API | Core Backend Gateway & REST Endpoints',
 		template: 'Xernerx API | %s',
 	},
-	description: 'Xernerx core API service, documentation, and endpoints.',
+	description: 'Official Xernerx Studios backend API gateway providing RESTful endpoints, Bearer token authentication, Discord synchronization, and webhook routing.',
 
 	metadataBase: new URL('https://api.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx API',
+			default: 'Xernerx API | Core Backend Gateway & REST Endpoints',
 			template: 'Xernerx API | %s',
 		},
-		description: 'Xernerx core API service, documentation, and endpoints.',
+		description: 'Official Xernerx Studios backend API gateway providing RESTful endpoints, Bearer token authentication, Discord synchronization, and webhook routing.',
 		url: 'https://api.xernerx.com',
-		siteName: 'Xernerx',
+		siteName: 'Xernerx API',
 		images: [
 			{
-				url: '/banner.png',
+				url: '/opengraph-image',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx API',
+				alt: 'Xernerx API — Core Backend Gateway',
 			},
 		],
 		type: 'website',
@@ -42,11 +42,11 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx API',
+			default: 'Xernerx API | Core Backend Gateway & REST Endpoints',
 			template: 'Xernerx API | %s',
 		},
-		description: 'Xernerx core API service, documentation, and endpoints.',
-		images: ['/banner.png'],
+		description: 'Official Xernerx Studios backend API gateway providing RESTful endpoints, Bearer token authentication, Discord synchronization, and webhook routing.',
+		images: ['/opengraph-image'],
 	},
 
 	icons: {
@@ -73,8 +73,8 @@ export default async function RootLayout({
 	const themeProps = await getThemeLayoutProps();
 
 	return (
-		<html lang={locale} suppressHydrationWarning className={themeProps.className}>
-			<body style={themeProps.style}>
+		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
+			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
 					<AppLayout dictionary={dict}>{children}</AppLayout>
 				</SessionProvider>

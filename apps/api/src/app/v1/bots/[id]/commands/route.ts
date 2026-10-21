@@ -16,18 +16,28 @@ async function authCommands(req: NextRequest, botId: string) {
 
 	if (!TokenModel || !BotModel || !CommandModel) return { error: 'Database models not found', status: 500 };
 
+	const isSystemToken = Boolean(process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN);
 	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
-	if (!tokenDoc) return { error: 'Invalid token', status: 401 };
-	if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') return { error: 'Token is inactive or suspended', status: 403 };
 
-	const bot = await BotModel.findOne({ id: botId });
-	if (!bot) return { error: 'Bot not found', status: 404 };
+	if (!tokenDoc && !isSystemToken) return { error: 'Invalid token', status: 401 };
+	if (tokenDoc && (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended')) return { error: 'Token is inactive or suspended', status: 403 };
 
-	const tokenOwners = tokenDoc.owners || [];
-	const botOwners = bot.owners || [];
-	const hasFullAccess = tokenDoc.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
+	let bot = await BotModel.findOne({ id: botId });
+	if (!bot && isSystemToken) {
+		bot = await BotModel.create({
+			id: botId,
+			bot: true,
+			name: 'Xernerx App',
+			privacy: 'private',
+		}).catch(() => null);
+	}
+	if (!bot && !isSystemToken) return { error: 'Bot not found', status: 404 };
 
-	return { hasFullAccess, CommandModel };
+	const tokenOwners = tokenDoc?.owners || [];
+	const botOwners = bot?.owners || [];
+	const hasFullAccess = isSystemToken || tokenDoc?.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
+
+	return { hasFullAccess, CommandModel, BotModel };
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -52,7 +62,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 		const authResult = await authCommands(req, id);
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { hasFullAccess, CommandModel } = authResult;
+		const { hasFullAccess, CommandModel, BotModel } = authResult;
 		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
 		const body = await req.json().catch(() => null);
@@ -77,6 +87,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 		if (insertPayload.length > 0) {
 			await CommandModel.insertMany(insertPayload);
 		}
+
+		await BotModel.updateOne({ id }, { $set: { commands: body } }).catch(() => {});
 
 		return NextResponse.json({ message: 'Commands synced successfully', count: insertPayload.length }, { status: 201 });
 	} catch (error: any) {

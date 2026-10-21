@@ -18,6 +18,10 @@
 				"analytics": {
 					"label": "Analytics",
 					"description": "Helps us track errors and traffic."
+				},
+				"marketing": {
+					"label": "Marketing",
+					"description": "Allows relevant advertisements and campaign measurement."
 				}
 			},
 			"buttons": {
@@ -31,7 +35,8 @@
 			"cancel": "Cancel",
 			"confirm": "Confirm",
 			"proceed": "Proceed",
-			"delete": "Delete"
+			"delete": "Delete",
+			"close": "Close"
 		},
 		"confirm": {
 			"typeToConfirmBefore": "Please type",
@@ -60,7 +65,10 @@
 				"github": "GitHub",
 				"npm": "npm",
 				"documentation": "Documentation",
-				"discord": "Discord"
+				"discord": "Discord",
+				"status": "System Status",
+				"statusOperational": "All Systems Operational",
+				"statusDegraded": "System Status: Degraded"
 			},
 			"title": "Xernerx Studios",
 			"description": "© 2024 -",
@@ -106,7 +114,8 @@
 				"environments": "Environments",
 				"roadmap": "Roadmap",
 				"suggestions": "Suggestions",
-				"issues": "Issues"
+				"issues": "Issues",
+				"preferences": "Preferences"
 			}
 		},
 		"shortcuts": {
@@ -130,7 +139,8 @@
 					"description": "Quickly launch and switch between applications",
 					"searchPlaceholder": "Filter applications...",
 					"navigateHint": "Use arrow keys to select, Enter to open",
-					"empty": "No applications available."
+					"empty": "No applications available.",
+					"other": "Other"
 				},
 				"palette": {
 					"title": "Command Palette",
@@ -142,7 +152,10 @@
 						"apps": "Suite Applications",
 						"settings": "Account & Developer Settings",
 						"support": "Support & Feedback Hub",
-						"admin": "Admin Panel (Staff)"
+						"admin": "Admin Panel (Staff)",
+						"bots": "Public Bots",
+						"servers": "Public Servers",
+						"community": "Issues, Suggestions & Roadmap"
 					},
 					"actions": {
 						"switchThemeLight": "Switch to Light Theme",
@@ -158,7 +171,8 @@
 						"navigate": "to navigate",
 						"select": "to select",
 						"close": "to close"
-					}
+					},
+					"searching": "Searching ecosystem..."
 				}
 			}
 		},
@@ -252,17 +266,33 @@
 		"toastprovider": {
 			"description": "Careful — you have unsaved changes!",
 			"button": "Reset",
-			"button2": "Save Changes"
+			"button2": "Save Changes",
+			"copyError": "Copy Error",
+			"copiedError": "Copied!",
+			"viewFullError": "View Full Error",
+			"clearAll": "Clear All ({count})",
+			"moreToasts": "+{count} more",
+			"errorModalTitle": "Error Details",
+			"errorModalSubtitle": "Full diagnostic error output",
+			"copyFullError": "Copy Full Error",
+			"closeModal": "Close",
+			"routeLabel": "Location",
+			"timestampLabel": "Timestamp"
 		},
 		"multiselector": {
-			"description": "No options"
+			"description": "No options",
+			"defaultPlaceholder": "Select",
+			"searchPlaceholder": "Search...",
+			"selectedCount": "{count} selected"
 		},
 		"selector": {
 			"placeholder": "Search...",
-			"description": "No options found"
+			"description": "No options found",
+			"defaultPlaceholder": "Select..."
 		},
 		"edit": "Edit",
 		"actions": {
+			"cancel": "Cancel",
 			"remove": "Remove",
 			"reset": "Reset",
 			"saveChanges": "Save Changes",
@@ -284,7 +314,21 @@
 		"unknownBot": "Unknown Bot",
 		"unknownServer": "Unknown Server",
 		"unknownUser": "Unknown User",
-		"yes": "Yes"
+		"yes": "Yes",
+		"preventLoss": {
+			"title": "Unsaved Changes",
+			"description": "You have unsaved changes. Are you sure you want to leave this page? Any unsaved work will be lost.",
+			"confirmText": "Leave Page",
+			"cancelText": "Stay"
+		},
+		"notifications": {
+			"orgInviteTitle": "Organization Invitation",
+			"orgInviteMessage": "You have been invited to join {name}.",
+			"defaultTitle": "Notification"
+		},
+		"permissionprovider": {
+			"fetchFailed": "Failed to fetch permissions"
+		}
 	},
 	"api": {
 		"title": "Xernerx API",
@@ -355,7 +399,10 @@
 			"linkedPrefix": "Linked: @{name}",
 			"manageRoleDesc": "Manage settings for {name}",
 			"reorderRoleError": "Failed to reorder roles",
-			"updateRoleError": "Failed to update role"
+			"updateRoleError": "Failed to update role",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh"
 		},
 		"users": {
 			"title": "User Management",
@@ -399,6 +446,10 @@
 			"idCopied": "ID copied to clipboard",
 			"emailCopied": "Email copied to clipboard",
 			"viewPublicProfile": "View Public Profile",
+			"viewAuditHistory": "View Audit Logs",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh",
 			"updateFailed": "Failed to update user profile",
 			"assignRoleFailed": "Failed to assign Discord role",
 			"removeRoleFailed": "Failed to remove Discord role",
@@ -460,6 +511,9 @@
 			"tokenUpdated": "Token updated",
 			"tokenDeleted": "Token deleted successfully",
 			"tokenIdCopied": "Token ID copied",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh",
 			"statusOptions": {
 				"active": "Active",
 				"inactive": "Inactive",
@@ -471,6 +525,8 @@
 			"title": "Translation Studio",
 			"description": "Select your target language and manage translation keys against English source.",
 			"pushToReview": "Push to review",
+			"exportJson": "Export JSON",
+			"exportSuccess": "Dictionary JSON exported",
 			"tabs": {
 				"introduction": "Introduction",
 				"newEntries": "New Entries",
@@ -518,7 +574,10 @@
 				"searchPlaceholder": "Search translation keys or content...",
 				"noKeysFound": "No matching translation keys found.",
 				"missingKey": "Missing Key",
-				"translateInto": "Translate into {locale}..."
+				"translateInto": "Translate into {locale}...",
+				"completionProgress": "Translated {translated} of {total} keys ({percent}%)",
+				"missingOnly": "Missing Only ({count})",
+				"copySource": "Copy Source"
 			},
 			"success": {
 				"pushed": "Pull request successfully pushed to review branch!"
@@ -541,6 +600,27 @@
 				"description": "Select the application configuration ID that will be used to approve new translators. Applications of this type will appear here in the dashboard.",
 				"saveConfig": "Save Config",
 				"successToast": "Application mapped successfully"
+			},
+			"submissionLock": {
+				"buttonLocked": "Locked (Awaiting Canary)",
+				"lockedTitle": "Submission Locked — Awaiting Canary Build",
+				"unlockedTitle": "Canary Build Passed — Ready for Submissions",
+				"unlockedDesc": "Last submitted against Canary v{atSubmit}. Canary is now live on v{canaryVersion} and ready for new translation updates.",
+				"phaseSyncing": "Merging the dictionary branch into Canary (v{canaryVersion}). Submissions remain locked until Canary updates and the build passes.",
+				"phaseWaitingVersion": "Your translations are queued for the next Canary release (currently on v{canaryVersion}). The submit button will unlock automatically once Canary version updates and its build finishes and passes.",
+				"phaseBuilding": "Canary v{targetVersion} is currently building and deploying. Submissions will unlock as soon as the Canary build finishes and passes.",
+				"phaseFailed": "The latest Canary v{targetVersion} build did not pass. Submissions remain locked until a passing Canary build completes.",
+				"badgeSyncing": "Syncing to Canary...",
+				"badgeWaitingVersion": "Awaiting Canary Version Bump",
+				"badgeBuilding": "Canary Build Running...",
+				"badgeFailed": "Canary Build Failed",
+				"submittedFromLabel": "Submitted from {env} v{version}",
+				"canaryVersionLabel": "Submitted on Canary v{atSubmit} • Current Canary v{current}",
+				"submittedByLabel": "By {user}",
+				"checkStatus": "Check Build Status",
+				"envCanary": "Canary",
+				"envProd": "Prod",
+				"envDev": "Dev"
 			}
 		},
 		"common": {
@@ -570,6 +650,13 @@
 			"title": "Application Configs",
 			"description": "Manage application templates and rewards.",
 			"newConfig": "New Application",
+			"searchPlaceholder": "Search application templates by name, ID, or description...",
+			"exportCsv": "Export CSV",
+			"exportJson": "Export JSON",
+			"refresh": "Refresh",
+			"filterAll": "All Statuses",
+			"filterOpen": "Open",
+			"filterClosed": "Closed",
 			"loading": "Loading configs...",
 			"empty": "No application configs found.",
 			"idBadge": "ID: {id}",
@@ -641,19 +728,77 @@
 				"syncFailed": "Failed to start force sync.",
 				"syncInitiated": "Initiating Force Sync...",
 				"syncStarted": "Force sync started for {id}"
-			}
+			},
+			"auditWebhookUrl": "Admin Audit Discord Webhook URL",
+			"auditWebhookUrlDesc": "Forwards security audit logs and administrative actions to your staff Discord channel in real time.",
+			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/..."
 		},
 		"dashboard": {
 			"nav": {
-				"overview": "Overview & SEO",
+				"overview": "Overview",
+				"seo": "SEO",
 				"media": "Media",
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
 				"announcements": "Announcements",
-				"store": "Store"
+				"store": "Store",
+				"auditLogs": "Audit Logs"
+			},
+			"home": {
+				"title": "Admin Overview",
+				"subtitle": "Urgent triage queue, live service health, and permission-scoped workspace snapshots.",
+				"refresh": "Refresh Overview",
+				"refreshing": "Refreshing...",
+				"statusTitle": "Ecosystem Service Status",
+				"statusSubtitle": "{online} / {total} online • {synced} synced • {ahead} canary ahead",
+				"openSeo": "Open SEO & Telemetry",
+				"urgentTitle": "Urgent Action Queue",
+				"urgentSubtitle": "High-priority items requiring staff review or verification across your permitted modules.",
+				"allClearTitle": "All Caught Up!",
+				"allClearDesc": "There are no urgent items waiting for triage across your assigned permissions.",
+				"urgentBadge": "Urgent",
+				"needsAttention": "Needs Attention",
+				"modulesTitle": "Permitted Modules & Status",
+				"modulesSubtitle": "Real-time summaries populated dynamically from your role permissions.",
+				"openModule": "Manage",
+				"recentAuditTitle": "Recent Administrative Activity",
+				"viewAllAudit": "View Audit Logs",
+				"noAudit": "No recent audit events recorded.",
+				"cards": {
+					"issuesTitle": "Issues & Bug Reports",
+					"issuesUrgent": "{count} unverified issues awaiting triage",
+					"issuesMeta": "{open} open • {resolved} resolved",
+					"applicationsTitle": "Staff Applications",
+					"applicationsUrgent": "{count} pending applications awaiting review",
+					"applicationsMeta": "{pending} pending • {reviewed} reviewed",
+					"suggestionsTitle": "Community Suggestions",
+					"suggestionsUrgent": "{count} open suggestions awaiting triage",
+					"suggestionsMeta": "{open} open • {approved} approved",
+					"translationsTitle": "Localization & Translations",
+					"translationsUrgent": "{count} locales below 100% coverage",
+					"translationsMeta": "{avg}% average coverage across {total} locales",
+					"roadmapTitle": "Platform Roadmap",
+					"roadmapMeta": "{active} in progress • {planned} planned • {ideas} ideas",
+					"usersTitle": "Platform Users",
+					"usersMeta": "{total} registered • {verified} verified",
+					"rolesTitle": "Roles & RBAC",
+					"rolesMeta": "{total} system roles • {synced} Discord-linked",
+					"tokensTitle": "API & Bot Tokens",
+					"tokensMeta": "{active} active • {total} total tokens",
+					"storeTitle": "Store & Subscriptions",
+					"storeMeta": "{active} active products • {categories} categories • {discounted} on sale",
+					"invitesTitle": "Bot Invites",
+					"invitesMeta": "{total} configured OAuth2 invite slugs",
+					"announcementsTitle": "Announcements",
+					"announcementsMeta": "{total} announcements ({scheduled} scheduled)",
+					"mediaTitle": "CDN Media Library",
+					"mediaMeta": "{total} uploaded assets in storage",
+					"settingsTitle": "System Configuration",
+					"settingsMeta": "Admin Guild ID: {serverId}"
+				}
 			},
 			"overview": {
-				"title": "Suite Overview & SEO",
+				"title": "SEO & Subdomain Telemetry",
 				"subtitle": "Monitor live versions, latency, issue health, and Seobility SEO scores across all 9 Xernerx Suite subdomains.",
 				"refresh": "Refresh Metrics",
 				"refreshing": "Refreshing...",
@@ -691,7 +836,41 @@
 				"pinging": "Pinging...",
 				"pingOffline": "Offline",
 				"repingTooltip": "Click to ping site render time",
-				"openSite": "Open Site"
+				"openSite": "Open Site",
+				"auditAllProd": "Audit Prod",
+				"auditAllCanary": "Audit Canary",
+				"auditingProgress": "Auditing ({current}/{total})...",
+				"filterAll": "All ({count})",
+				"filterSynced": "Synced ({count})",
+				"filterCanaryAhead": "Canary Ahead ({count})",
+				"envAll": "All Envs",
+				"envProdOnly": "Prod Only",
+				"envCanaryOnly": "Canary Only",
+				"envDevOnly": "Dev Only",
+				"serviceGateway": "Service Gateway",
+				"gatewayOnline": "Gateway Online",
+				"gatewayOffline": "Gateway Unreachable",
+				"gatewayDesc": "Non-HTML backend service (SEO widgets skipped)",
+				"viewChangelogTooltip": "Click to view release changelog",
+				"changelogTitle": "{name} ({env}) Changelog",
+				"changelogLoading": "Loading changelog...",
+				"changelogEmpty": "No changelog entries found for this deployment.",
+				"declareIncident": "Declare Incident",
+				"incidentModalTitle": "Broadcast Global Status Alert",
+				"incidentModalDesc": "Broadcasts an immediate status notification across all Xernerx subdomains linked to info.xernerx.com/status.",
+				"incidentSeverity": "Alert Severity",
+				"incidentTitleLabel": "Alert Title",
+				"incidentMessageLabel": "Status Message",
+				"incidentBroadcastSuccess": "Global status alert broadcasted",
+				"broadcastAlert": "Broadcast Alert",
+				"incidentDefaultTitle": "Scheduled Maintenance / Service Incident",
+				"incidentDefaultContent": "We are currently investigating elevated latency on select services. Track live updates on the System Status page.",
+				"severityWarning": "Warning / Degraded Performance",
+				"severityError": "Critical Outage",
+				"severityInfo": "Scheduled Maintenance",
+				"severitySuccess": "Resolved / All Clear",
+				"auditUnavailable": "Audit unavailable for this URL",
+				"incidentBroadcastFailed": "Failed to broadcast status alert"
 			},
 			"media": {
 				"title": "Media Library",
@@ -754,6 +933,9 @@
 				"copyInviteUrl": "Copy Invite Link",
 				"inviteUrlCopied": "Invite link copied to clipboard",
 				"openInvite": "Open Invite",
+				"exportCsv": "Export CSV",
+				"exportJson": "Export JSON",
+				"refresh": "Refresh",
 				"toasts": {
 					"deleteConfirm": "Are you sure you want to delete this invite link?",
 					"deleteSuccess": "Invite deleted",
@@ -767,6 +949,11 @@
 				"title": "Announcements",
 				"subtitle": "Manage global announcements and Discord webhooks.",
 				"createButton": "Create Announcement",
+				"searchPlaceholder": "Search announcements by title or content...",
+				"filterAll": "All",
+				"filterScheduled": "Scheduled",
+				"filterSent": "Sent",
+				"noAnnouncements": "No announcements found.",
 				"sentOn": "Sent on ",
 				"scheduled": "Scheduled: ",
 				"draft": "Draft",
@@ -813,7 +1000,9 @@
 					"createWebhookFailed": "Failed to create webhook",
 					"updateSuccess": "Updated!",
 					"createSuccess": "Created!",
-					"saveFailed": "Failed to save"
+					"saveFailed": "Failed to save",
+					"deleteSuccess": "Announcement deleted",
+					"deleteFailed": "Failed to delete announcement"
 				},
 				"footerIconAlt": "Footer Icon",
 				"newButton": "New Button",
@@ -831,6 +1020,11 @@
 			"applicationReviews": {
 				"refreshing": "Refreshing...",
 				"refreshList": "Refresh List",
+				"searchPlaceholder": "Search by applicant, ID, or form...",
+				"filterAll": "All Statuses",
+				"filterPending": "Pending",
+				"filterApproved": "Approved",
+				"filterDenied": "Denied",
 				"anonymousUser": "Anonymous User",
 				"unknownUser": "Unknown User",
 				"application": "Application",
@@ -849,6 +1043,10 @@
 				"currentStatus": "Current Status:",
 				"deny": "Deny",
 				"approveAssignRole": "Approve & Assign Role",
+				"notificationApprovedTitle": "Application Approved",
+				"notificationDeniedTitle": "Application Denied",
+				"notificationMessage": "Your request for {appName} has been {status}.",
+				"notificationNotePrefix": "Reviewer Note: {note}",
 				"toasts": {
 					"approvedSuccess": "Application approved successfully.",
 					"deniedSuccess": "Application denied successfully."
@@ -907,6 +1105,13 @@
 			"issues": {
 				"title": "Issues",
 				"logBug": "Log Issue",
+				"searchPlaceholder": "Search issues by title, description, or product...",
+				"filterAll": "All Statuses",
+				"filterUnverified": "Unverified",
+				"filterOpen": "Open",
+				"filterResolved": "Resolved",
+				"allProducts": "All Products",
+				"noMatchingIssues": "No issues match your current filters.",
 				"status": "Status",
 				"resolved": "Resolved",
 				"verified": "Verified",
@@ -927,6 +1132,8 @@
 				"liveProd": "Production: v{version}",
 				"liveCanary": "Canary: v{version}",
 				"confirmResolve": "Mark Resolved",
+				"deleteConfirmTitle": "Delete Issue",
+				"deleteConfirmDesc": "Are you sure you want to permanently delete this issue?",
 				"releaseStatus": {
 					"production": "Live (Canary & Prod)",
 					"canary": "Canary Only",
@@ -948,6 +1155,8 @@
 			"roadmap": {
 				"title": "Roadmap Management",
 				"addItem": "Add Item",
+				"searchPlaceholder": "Search roadmap milestones...",
+				"allProducts": "All Products",
 				"modalTitle": "Add Roadmap Item",
 				"titlePlaceholder": "Title",
 				"descPlaceholder": "Description",
@@ -959,6 +1168,8 @@
 				"save": "Save",
 				"cancel": "Cancel",
 				"moveTo": "Move to {status}",
+				"deleteConfirmTitle": "Delete Roadmap Item",
+				"deleteConfirmDesc": "Are you sure you want to permanently delete this roadmap milestone?",
 				"toasts": {
 					"created": "Created",
 					"createdDesc": "Roadmap item added.",
@@ -972,6 +1183,10 @@
 			},
 			"suggestions": {
 				"title": "Community Suggestions",
+				"searchPlaceholder": "Search suggestions by title, description, or product...",
+				"allProducts": "All Products",
+				"sortTop": "Most Upvoted",
+				"sortNewest": "Newest",
 				"status": "Status",
 				"open": "Open",
 				"approved": "Approved",
@@ -980,6 +1195,9 @@
 				"moveToRoadmap": "Move to Roadmap",
 				"votes": "Votes",
 				"noSuggestions": "No pending suggestions.",
+				"idCopied": "ID copied to clipboard",
+				"rejectConfirmTitle": "Reject Suggestion",
+				"rejectConfirmDesc": "Are you sure you want to reject and permanently delete this suggestion?",
 				"toasts": {
 					"accepted": "Accepted",
 					"acceptedDesc": "Promoted to Roadmap Ideas.",
@@ -990,6 +1208,30 @@
 			},
 			"toasts": {
 				"fetchPermissionsError": "Failed to fetch permissions"
+			},
+			"audit": {
+				"title": "Audit Logs",
+				"description": "Immutable security and administrative event trail across the Xernerx Suite.",
+				"refresh": "Refresh",
+				"searchPlaceholder": "Search actor, action, or target...",
+				"fetchError": "Failed to load audit logs",
+				"emptyTitle": "No Audit Events Found",
+				"emptyDescription": "Administrative actions across issues, suggestions, applications, and settings will appear here.",
+				"categories": {
+					"all": "All",
+					"issue": "Issues",
+					"suggestion": "Suggestions",
+					"application": "Applications",
+					"setting": "Settings",
+					"role": "Roles",
+					"user": "Users",
+					"system": "System"
+				},
+				"exportCsv": "Export CSV",
+				"exportJson": "Export JSON",
+				"idCopied": "Target ID copied to clipboard",
+				"copyTargetId": "Copy Target ID",
+				"viewActorProfile": "View User Profile"
 			}
 		},
 		"permissions": {
@@ -1077,7 +1319,12 @@
 				"noItems": "No store products found.",
 				"noCategories": "No store categories found.",
 				"searchPlaceholder": "Search products by name or SKU...",
+				"searchCategoriesPlaceholder": "Search categories by name, ID, or description...",
 				"allCategories": "All Categories",
+				"filterAll": "All Statuses",
+				"filterEnabled": "Enabled",
+				"filterDisabled": "Disabled",
+				"filterDiscounted": "On Sale",
 				"addDiscount": "+ Add Discount",
 				"featuredBadge": "Featured",
 				"featuresCount": "✓ {count} features configured",
@@ -1217,7 +1464,8 @@
 				"toast": {
 					"title": "Privacy Updated",
 					"description": "Your privacy settings have been updated.",
-					"error": "Failed to update privacy"
+					"error": "Failed to update privacy",
+					"widgetsSaved": "Public embed widget preference updated"
 				}
 			},
 			"save": "Save Changes",
@@ -1265,7 +1513,19 @@
 				"mint": "Mint Breeze",
 				"indigo": "Royal Indigo",
 				"lime": "Acid Lime",
-				"charcoal": "Void Charcoal"
+				"charcoal": "Void Charcoal",
+				"cyan": "Arctic Cyan",
+				"coral": "Coral Rose",
+				"emerald": "Lush Emerald",
+				"lavender": "Soft Lavender",
+				"peach": "Warm Peach",
+				"sky": "Glacier Sky",
+				"magenta": "Hyper Magenta",
+				"gold": "Amber Gold",
+				"berry": "Wild Berry",
+				"cobalt": "Deep Cobalt",
+				"violet": "Cosmic Violet",
+				"slate": "Frosted Slate"
 			},
 			"zoom": {
 				"title": "UI Zoom Level",
@@ -1305,8 +1565,10 @@
 				"syncFailed": {
 					"title": "Sync Failed",
 					"description": "Failed to sync appearance"
-				}
-			}
+				},
+				"resetSuccess": "Appearance reset to defaults"
+			},
+			"resetDefaults": "Reset to Defaults"
 		},
 		"language": {
 			"headerTitle": "Language Preferences",
@@ -1363,7 +1625,41 @@
 					"description": "Used for roles, nicknames, and server-specific features."
 				},
 				"footer": "Xernerx does not sell your data. All data is either public via the Discord API or used internally for features."
-			}
+			},
+			"orDivider": "OR SIGN IN INSTANTLY",
+			"qrTitle": "Scan or Approve to Sign In",
+			"qrDescription": "Scan this QR code with a signed-in phone, or approve using the pairing code from any logged-in browser.",
+			"qrBrowserButton": "Approve in Default Browser",
+			"qrRefresh": "Refresh QR Code",
+			"qrExpired": "QR Code Expired",
+			"qrApprovedRedirecting": "Approved! Signing you in...",
+			"pairCodeLabel": "Pairing Code",
+			"haveCodePrompt": "Already signed in on this device?",
+			"openApprovePage": "Approve Another Device",
+			"approveTitle": "Approve Device Sign-In",
+			"approveSubtitle": "Enter the 6-character pairing code or confirm the scanned QR request to sign in another device using your Discord session.",
+			"approveCodePlaceholder": "Enter 6-character code (e.g. A7K9P2)",
+			"approveLookupButton": "Find Device",
+			"approveConfirmTitle": "Confirm Sign-In Request",
+			"approveConfirmDesc": "You are about to sign in the following device as @{username}:",
+			"approveDeviceLabel": "Requesting Device",
+			"approveCodeMatch": "Matched Code",
+			"approveButton": "Approve Sign-In",
+			"approveCancelButton": "Cancel",
+			"approveSuccessTitle": "Device Approved!",
+			"approveSuccessDesc": "The other device is now signed in. You can safely close this tab.",
+			"approveInvalidCode": "Invalid or expired pairing code. Please refresh the QR code on the other device.",
+			"approveNotSignedIn": "Sign in with Discord first to approve this device.",
+			"approvePendingDevicesTitle": "Waiting Devices Detected",
+			"approveSelectDevice": "Select",
+			"approveWhereToFindTitle": "Where do I find the 6-character code?",
+			"approveWhereStep1": "1. Open Account → Devices on any signed-in device (or /login on a signed-out device).",
+			"approveWhereStep2": "2. Copy the 6-character Pairing Code (e.g. A7K-9P2) shown beneath the QR code.",
+			"approveWhereStep3": "3. Enter that code here — or click any detected Waiting Device above.",
+			"enterDeviceCodePlaceholder": "Enter 6-char code from Account → Devices",
+			"signInWithCodeButton": "Sign In with Code",
+			"authErrorTitle": "Sign-in could not be completed",
+			"authErrorDesc": "Your sign-in session expired or was cancelled ({error}). Please click Continue with Discord below to try again."
 		},
 		"signout": {
 			"title": "Sign Out",
@@ -1381,13 +1677,16 @@
 		"notifications": {
 			"title": "Notifications",
 			"description": "Manage how you receive notifications and alerts across channels.",
+			"searchPlaceholder": "Search notification alerts or categories...",
+			"noMatchingAlerts": "No notification settings match your search.",
 			"itemDescription": "Configure alerts for {item}.",
 			"categories": {
 				"general": "General",
 				"virtue": "Virtue",
 				"api": "API",
 				"billing": "Billing",
-				"apps": "Apps"
+				"apps": "Apps",
+				"community": "Community & Roadmap"
 			},
 			"items": {
 				"birthday": "Birthday",
@@ -1400,7 +1699,11 @@
 				"subscriptionExpiring": "Subscription Expiring",
 				"paymentFailed": "Payment Failed",
 				"botApproved": "Bot Approved",
-				"botRejected": "Bot Rejected"
+				"botRejected": "Bot Rejected",
+				"roadmapReleased": "Roadmap Milestone Released",
+				"issueStatusUpdate": "Bug Report Status Update",
+				"suggestionStatusUpdate": "Suggestion Status Update",
+				"applicationReviewed": "Staff Application Reviewed"
 			},
 			"channels": {
 				"discord": "Discord",
@@ -1410,7 +1713,9 @@
 			"toast": {
 				"success": "Updated notification preferences",
 				"error": "Failed to save changes"
-			}
+			},
+			"enableCategory": "Enable All",
+			"muteCategory": "Mute All"
 		},
 		"tokens": {
 			"title": "API Tokens",
@@ -1566,7 +1871,8 @@
 			"noItems": "No store products found."
 		},
 		"login": {
-			"description": "Loading..."
+			"description": "Loading...",
+			"title": "Sign in to Xernerx"
 		},
 		"common": {
 			"alt": "Profile Avatar",
@@ -1617,10 +1923,44 @@
 			}
 		},
 		"connections": {
-			"title": "Connections"
+			"title": "Connections",
+			"description": "Link third-party accounts via OAuth to verify your external profiles across the Xernerx ecosystem.",
+			"connected": "Connected",
+			"primaryIdentity": "Required Login",
+			"availableTitle": "OAuth Connections",
+			"availableDesc": "Optional verified external accounts. These cannot be used to sign in — Discord remains your required login identity.",
+			"verifiedBadge": "Verified",
+			"notConnected": "Not connected",
+			"connectButton": "Connect",
+			"disconnect": "Disconnect",
+			"showOnProfile": "Display on public profile",
+			"oauthSuccess": "{provider} account linked successfully!",
+			"oauthNotConfigured": "{provider} OAuth credentials are not configured yet.",
+			"oauthError": "Could not complete OAuth connection flow.",
+			"disconnectSuccess": "Connection removed.",
+			"disconnectError": "Failed to remove connection.",
+			"saveError": "Failed to update connection settings."
 		},
 		"devices": {
-			"title": "Devices"
+			"title": "Active Devices & Sessions",
+			"description": "Review recent browsers and devices that have accessed your Xernerx account.",
+			"currentSession": "Current Session",
+			"oauthVerified": "OAuth2 Verified",
+			"revokeDevice": "Revoke",
+			"revokeOthers": "Revoke Other Sessions",
+			"revokeConfirmTitle": "Revoke Device Session",
+			"revokeConfirmDesc": "Are you sure you want to revoke the session on {device}?",
+			"revokeOthersConfirmTitle": "Revoke All Other Sessions",
+			"revokeOthersConfirmDesc": "Are you sure you want to revoke all other device sessions except your current browser?",
+			"revokeSingleSuccess": "Device session revoked.",
+			"revokeSuccess": "Other device sessions have been revoked.",
+			"pairTitle": "Pair or Approve Another Device",
+			"pairDescription": "Scan this QR code or enter this 6-character code on another device's login screen to sign it in instantly — or approve a waiting device below.",
+			"shareQrTitle": "Your Instant Sign-In Code",
+			"shareQrDesc": "Scan with your phone or enter this 6-character code on any signed-out Xernerx login page.",
+			"codeCopied": "6-character code copied!",
+			"deviceLinked": "Device signed in!",
+			"generateNewCode": "New Code"
 		},
 		"billing": {
 			"title": "Billing & Subscriptions",
@@ -1634,7 +1974,8 @@
 			"status": {
 				"active": "active",
 				"past_due": "past due",
-				"canceled": "canceled"
+				"canceled": "canceled",
+				"trialing": "trialing"
 			},
 			"renewsOn": "Renews on {date}",
 			"daysLeft": "{days}d left",
@@ -1643,6 +1984,8 @@
 			"confirmPrompt": "Are you sure?",
 			"keepSubscription": "No, keep it",
 			"cancelButton": "Yes, cancel",
+			"cancelConfirmTitle": "Cancel Subscription",
+			"cancelConfirmDesc": "Are you sure you want to cancel your subscription for {product}? You will retain access until the end of your current billing period.",
 			"staff": {
 				"title": "Staff Access",
 				"description": "You have a complimentary all-access staff subscription applied to your account."
@@ -1650,6 +1993,202 @@
 			"toasts": {
 				"cancelSuccess": "Subscription cancelled successfully",
 				"cancelError": "Failed to cancel subscription"
+			},
+			"credits": {
+				"unit": "Credits",
+				"streakDays": "{count} Day Streak",
+				"description": "Claim your daily credit gift to build your streak and earn up to +200 bonus credits per day.",
+				"claimButton": "Claim Daily Reward",
+				"nextClaimIn": "Next Reward in {hours}h",
+				"claimSuccess": "Claimed +{amount} credits! ({streak} day streak)",
+				"claimError": "Could not claim daily reward",
+				"nextClaimTimer": "Next Reward in {time}"
+			},
+			"tabs": {
+				"all": "All ({count})",
+				"active": "Active ({count})",
+				"history": "Past & Canceled ({count})"
+			},
+			"browseStore": "Browse Store",
+			"billingCycle": {
+				"month": "{price} / month",
+				"year": "{price} / year"
+			}
+		},
+		"activity": {
+			"navLabel": "Activity & Data",
+			"title": "My Activity & Account Data",
+			"description": "Track all your submitted applications, bug reports, and feature suggestions, or export your full account data.",
+			"exportData": "Export My Data (JSON)",
+			"exportSuccess": "Your account data export has started",
+			"refresh": "Refresh",
+			"fetchError": "Failed to load account activity",
+			"searchPlaceholder": "Search submissions...",
+			"emptyTitle": "No Submissions Yet",
+			"emptyDescription": "Any staff applications, bug reports, or feature suggestions you submit across Xernerx will appear here.",
+			"tabs": {
+				"all": "All",
+				"applications": "Applications",
+				"issues": "Bug Reports",
+				"suggestions": "Suggestions"
+			},
+			"notePrefix": "Note: {note}"
+		},
+		"preferences": {
+			"title": "Preferences",
+			"description": "Customize interface elements, workspace behavior, and native desktop client flags.",
+			"resetDefaults": "Reset Preferences",
+			"toast": {
+				"updated": "Preference updated",
+				"reset": "Preferences reset to defaults"
+			},
+			"sections": {
+				"header": "Header & Navigation Bar",
+				"headerDesc": "Choose which quick-access tools and links appear in the top navigation bar across all apps.",
+				"workspace": "Workspace, Profile & Motion",
+				"workspaceDesc": "Fine-tune keyboard hints, Discord collectibles, and motion behavior across the suite.",
+				"desktop": "Desktop Client",
+				"desktopDesc": "Configure native window behavior, system tray integration, global hotkeys, and startup flags for the Xernerx Desktop application."
+			},
+			"desktop": {
+				"badge": "Desktop Client",
+				"webNotice": "These native startup flags are stored in metadata.json and apply when running inside the Xernerx Desktop app.",
+				"restartBannerTitle": "Restart Required",
+				"restartBannerDesc": "You modified native desktop startup settings in metadata.json. Restart the app for changes to take effect.",
+				"restartNow": "Restart App Now",
+				"restartLater": "Later",
+				"restartModalTitle": "Restart Xernerx Desktop?",
+				"restartModalDesc": "Changes to native desktop flags (such as Hardware Acceleration or Debug Mode) are bound at preload/startup and require an application restart to take effect.",
+				"editJson": "Edit as JSON",
+				"visualEditor": "Visual Editor",
+				"formatJson": "Format JSON",
+				"saveJson": "Save JSON",
+				"invalidJson": "Invalid JSON syntax. Please check your formatting before saving.",
+				"jsonSaved": "Desktop configuration saved.",
+				"clearCache": "Clear App Cache",
+				"cacheCleared": "Desktop cache cleared.",
+				"openLogs": "Open Debug Logs",
+				"launchOverlay": "Live Overlay",
+				"accountsTitle": "Desktop Account Switcher",
+				"accountsDesc": "Switch between isolated Discord sessions instantly without logging out.",
+				"addAccountSlot": "Add / Switch Account Slot",
+				"activeAccountBadge": "Active",
+				"switchAccountButton": "Switch",
+				"removeSlotButton": "Remove",
+				"unlinkedSlot": "Available Account Slot",
+				"logsModalTitle": "Desktop Debug Logs",
+				"logsModalSubtitle": "Runtime diagnostics and desktop client log output",
+				"copyLogs": "Copy Logs",
+				"logsCopied": "Logs copied to clipboard!",
+				"openLogFile": "Open Log File in OS",
+				"refreshLogs": "Refresh Logs"
+			},
+			"items": {
+				"showHeaderStore": {
+					"title": "Show Store Button in Header",
+					"description": "Display the quick-access Store icon in the top navigation bar."
+				},
+				"showHeaderCommandPalette": {
+					"title": "Show Command Palette Pill in Header",
+					"description": "Display the Ctrl + K search button in the top bar (the Ctrl + K shortcut remains active when hidden)."
+				},
+				"showHeaderNotifications": {
+					"title": "Show Notifications Bell in Header",
+					"description": "Display the notifications bell icon in the top header when the sidebar is hidden."
+				},
+				"showHeaderDownload": {
+					"title": "Show Desktop App Download Link",
+					"description": "Display the Download App button in the header when browsing on the web."
+				},
+				"showHeaderAppDrawer": {
+					"title": "Show App Drawer Button in Header",
+					"description": "Display the App Drawer launcher icon in the header when the sidebar is hidden."
+				},
+				"showShortcutHints": {
+					"title": "Show Keyboard Shortcut Hints",
+					"description": "Display kbd shortcut badges (such as Ctrl + K and Alt + 1..9) on buttons and sidebar items."
+				},
+				"showDiscordCollectibles": {
+					"title": "Show Discord Avatar Decorations & Nameplates",
+					"description": "Render animated Discord profile nameplates, avatar decorations, and clan badges."
+				},
+				"showGiftBadge": {
+					"title": "Show Daily Reward Reminder Badge",
+					"description": "Display the animated gift indicator on your avatar when your daily credit reward is ready to claim."
+				},
+				"reducedMotion": {
+					"title": "Reduced Motion & Effects",
+					"description": "Minimize interface transitions, decorative animations, and confetti bursts across the suite."
+				},
+				"defaultSidebarCollapsed": {
+					"title": "Start with Sidebar Collapsed",
+					"description": "Default the navigation sidebar to its compact icon-only mode when opening pages."
+				},
+				"developerMode": {
+					"title": "Developer Mode",
+					"description": "Display advanced developer controls such as the Live Overlay Monitor launcher in your profile card and preferences."
+				},
+				"alignment": {
+					"title": "Workspace & Sidebar Alignment",
+					"description": "Choose which side of the screen the navigation sidebar and header controls live on (System defaults to Right on macOS / Traffic Lights and Left on Windows).",
+					"options": {
+						"system": "System Detected (Auto)",
+						"left": "Left (Standard)",
+						"right": "Right (Mirrored / macOS)"
+					}
+				}
+			},
+			"desktopItems": {
+				"hardwareAcceleration": {
+					"title": "Hardware Acceleration (GPU)",
+					"description": "Use your GPU to accelerate glassmorphism blur, animations, and rendering (enabled by default)."
+				},
+				"debug": {
+					"title": "Developer Debug Mode",
+					"description": "Enable detached DevTools on launch, F12 / Ctrl+Shift+I inspector shortcuts, context menu, and xernerx-debug.log output."
+				},
+				"startOnBoot": {
+					"title": "Launch on System Startup",
+					"description": "Automatically start Xernerx Desktop when you sign into Windows."
+				},
+				"startMaximized": {
+					"title": "Always Launch Maximized",
+					"description": "Open the main application window maximized to full screen on startup."
+				},
+				"startMinimized": {
+					"title": "Start Minimized (Quiet Launch)",
+					"description": "Launch the desktop client minimized in the background without stealing window focus."
+				},
+				"alwaysOnTop": {
+					"title": "Keep Window Always on Top",
+					"description": "Pin the Xernerx Desktop window above other desktop applications."
+				},
+				"minimizeOnClose": {
+					"title": "Close to System Tray",
+					"description": "Keep Xernerx running in the system tray when clicking the window close button instead of quitting."
+				},
+				"globalHotkey": {
+					"title": "Global Summon Hotkey (Ctrl + Shift + X)",
+					"description": "Summon or minimize the Xernerx Desktop window from anywhere in your operating system."
+				},
+				"openExternalInBrowser": {
+					"title": "Open External Links in Default Browser",
+					"description": "Open third-party links in your default system web browser while keeping Xernerx links inside the app."
+				},
+				"discordRpc": {
+					"title": "Discord Rich Presence",
+					"description": "Display your current Xernerx workspace activity and quick links on your Discord profile status."
+				},
+				"windowControls": {
+					"title": "Window Control Buttons Style",
+					"description": "Choose the titlebar button style for minimize, maximize, and close (defaults to system OS detection, overridden by metadata.json).",
+					"options": {
+						"system": "System Detected (Auto)",
+						"windows": "Windows Classic",
+						"macos": "Traffic Lights (macOS)",
+						"xernerx": "Xernerx Glass Pills"
+					}
+				}
 			}
 		}
 	},
@@ -1806,89 +2345,108 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our services."
+					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our websites, dashboards, Discord bots, APIs, CDN, and desktop applications."
 				},
 				"dataCollected": {
 					"title": "2. Information We Collect",
 					"account": {
-						"title": "General Account Information:",
-						"desc": "Email, username, and profile identifiers when you register."
+						"title": "Account & Device Session Information:",
+						"desc": "When you sign in via Discord OAuth2 or our QR Code / 6-character Pairing Code Device Sign-In flow, we collect your Discord ID, username, avatar, email address, custom profile settings (display name, bio, pronouns, banner), and recent device session metadata (browser, operating system, device type, and last-active timestamp for up to 10 devices) so you can review and manage active sessions."
 					},
-					"usage": {
-						"title": "Usage Data:",
-						"desc": "Error logs and system interactions to maintain platform stability."
-					},
-					"integration": {
-						"title": "Integration Data:",
-						"desc": "Data provided through third-party platforms such as Discord, and payment processing details via Stripe."
+					"connections": {
+						"title": "Connected Third-Party Accounts:",
+						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity."
 					},
 					"developers": {
 						"title": "For API & Bot Developers:",
-						"desc": "API tokens, webhook URLs, application metadata, and configuration settings used to operate your integrations on our infrastructure."
+						"desc": "Scoped Bearer API tokens, webhook URLs, application and organization metadata, real-time WebSocket gateway telemetry, and configuration settings used to operate your integrations on our infrastructure."
 					},
 					"botUsers": {
-						"title": "For Bot End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (e.g. Zodiac, To-Do list), we process your Discord ID, server IDs, and command inputs to execute the requested actions. We do not store raw message logs unless explicitly required by an opt-in bot feature."
+						"title": "For Bot & Community End Users:",
+						"desc": "When you interact with a bot powered by Xernerx (such as Virtue, Zodiac, Metamorphosis, or To-Do List Bot), we process your Discord ID, guild IDs, command inputs, and opt-in community engagement metrics (such as text and voice XP/leveling statistics). We do not store raw message logs unless explicitly required by an opt-in server feature."
+					},
+					"cdnAndContent": {
+						"title": "CDN Media & Community Submissions:",
+						"desc": "Files and images uploaded to cdn.xernerx.com or attached to bug reports and feature suggestions are stored in private cloud blob storage and served according to your configured visibility setting (public, limited to specific users, or private)."
+					},
+					"desktop": {
+						"title": "Xernerx Desktop Client:",
+						"desc": "When using the Xernerx Desktop App, window state, update channel preferences (Stable/Canary), hotkey bindings, and isolated multi-account session slots are stored locally on your machine. If enabled, the app communicates locally with your Discord client for Rich Presence (RPC) and writes diagnostic logs locally only when Debug Logging is turned on."
+					},
+					"usage": {
+						"title": "Usage & Diagnostic Data:",
+						"desc": "Error logs, security audit trails, and system interactions collected to maintain platform stability, enforce rate limits, and prevent abuse."
+					},
+					"integration": {
+						"title": "Billing, Store & Rewards Data:",
+						"desc": "Subscription status, billing history, and regional checkout details processed securely via Stripe (we never store raw payment card numbers), along with platform Virtual Credit balances and daily mystery gift streak timestamps."
 					}
 				},
+				"apiData": {
+					"title": "3. API Data Collection & Developer Obligations",
+					"content": "When developers use our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket gateway to synchronize bot statistics or fetch metadata, we collect and store this data to render public pages and provide analytics. Developers are strictly prohibited from transmitting unrequested personally identifiable information (PII) of their end users to our API. We do not sell or share API data with third-party advertisers."
+				},
 				"legalBasis": {
-					"title": "3. Legal Basis for Processing",
-					"content": "We process personal data based on contractual necessity, legitimate interests, legal obligations, or user consent where applicable."
+					"title": "4. Legal Basis for Processing",
+					"content": "We process personal data based on contractual necessity (to deliver the services and subscriptions you request), legitimate interests (security, fraud prevention, and service improvement), compliance with legal obligations, or your explicit consent where applicable."
 				},
 				"usage": {
-					"title": "4. How We Use Information",
+					"title": "5. How We Use Information",
 					"items": [
-						"To provide and maintain services.",
-						"To improve reliability and performance.",
-						"To provide support, communicate platform updates, and send important service-related emails (e.g., billing, security alerts). You may manage your notification preferences or opt-out of non-essential emails at any time.",
-						"To ensure compliance with legal obligations."
+						"To provide, authenticate, and synchronize your account across all Xernerx web applications, bots, and desktop clients.",
+						"To process Store subscriptions, allocate Virtual Credits, enforce CDN storage quotas, and improve platform reliability.",
+						"To provide customer support, communicate platform updates, and send important service-related emails (e.g., billing receipts, security alerts, and organization invitations). You may manage your notification preferences at any time.",
+						"To detect abuse, enforce our Terms of Service, and comply with applicable legal obligations."
 					]
 				},
 				"sharing": {
-					"title": "5. Data Sharing",
+					"title": "6. Data Sharing",
 					"items": [
-						"Hosting and infrastructure providers.",
-						"Payment processors (e.g. Stripe) for billing and subscription management.",
-						"Authorized third-party integrations.",
-						"Legal authorities when required by law."
+						"Cloud hosting, database, and private blob storage infrastructure providers.",
+						"Payment processors (Stripe) for subscription checkout, Adaptive Pricing localization, and billing management.",
+						"Authorized third-party integrations and connected accounts that you explicitly link or enable as public profile widgets.",
+						"Law enforcement or regulatory authorities when strictly required by applicable law."
 					]
 				},
 				"retention": {
-					"title": "6. Data Retention",
-					"content": "We retain data only as long as necessary to fulfill the purposes outlined in this Policy, unless longer retention is required by law."
+					"title": "7. Data Retention",
+					"content": "We retain personal data only as long as necessary to provide our services and fulfill the purposes outlined in this Policy, unless longer retention is required by law (such as tax and accounting records). Ephemeral QR/pairing sign-in tickets automatically expire after 3 minutes."
 				},
 				"security": {
-					"title": "7. Data Security",
-					"content": "We implement technical and organizational security measures to protect data. However, no system is absolutely secure."
+					"title": "8. Data Security",
+					"content": "We implement robust technical and organizational security measures, including AES-256-GCM encryption for cross-device sign-in tokens, HTTP-only session cookies, scoped Bearer token authentication, and strict role-based access controls. However, no internet transmission or storage system is 100% secure."
 				},
 				"rights": {
-					"title": "8. Your Rights",
-					"items": ["Right to access your data.", "Right to correction or deletion.", "Right to restrict or object to processing.", "Right to data portability."],
-					"content": "You have the right to access, update, or delete your personal data. You may also object to or restrict certain processing activities, or request data portability by contacting us."
+					"title": "9. Your Rights (GDPR & CCPA)",
+					"items": [
+						"Right to access and export your personal data (available any time via the self-service \"Export Data (JSON)\" tool in Account -> Activity).",
+						"Right to rectification, profile reset, or permanent account deletion (available directly in Account -> Settings).",
+						"Right to restrict or object to certain data processing activities and to unlink connected third-party accounts at any time.",
+						"Right to withdraw consent for non-essential cookies and marketing communications."
+					],
+					"content": "Under data protection frameworks including the GDPR, UK GDPR, and CCPA, you have comprehensive rights over your personal data. You can exercise most of these rights instantly through your Account Dashboard or by contacting our legal team."
 				},
 				"cookies": {
-					"title": "9. Cookies & Tracking",
-					"content": "We use cookies or similar technologies to improve service performance, store interface preferences, and serve advertisements. This includes third-party services like Google AdSense, which may use cookies to serve personalized ads based on your prior visits to our platform or other websites."
+					"title": "10. Cookies & Tracking",
+					"content": "We use cookies and local storage to keep your session secure across *.xernerx.com subdomains, remember your theme and workspace preferences, and measure site performance. Third-party services such as Google AdSense may also use cookies to serve relevant advertisements based on your consent. For a complete breakdown of every cookie we set and how to manage your preferences, please read our ",
+					"linkText": "Cookie Policy",
+					"contentSuffix": "."
 				},
 				"international": {
-					"title": "10. International Transfers",
-					"content": "If data is transferred outside your jurisdiction, appropriate safeguards are implemented to ensure legal compliance."
-				},
-				"changes": {
-					"title": "11. Changes to This Policy",
-					"content": "We may update this Privacy Policy periodically. Continued use of services indicates acceptance of the revised version."
-				},
-				"contact": {
-					"title": "12. Contact",
-					"prefix": "For privacy-related inquiries contact"
-				},
-				"apiData": {
-					"title": "API Data Collection & Developer Obligations",
-					"content": "When developers use our REST API to synchronize bot statistics or fetch metadata, we collect and store this data to render bot pages and provide analytics. Developers are strictly prohibited from transmitting personally identifiable information (PII) of their users to our API unless explicitly requested by an endpoint. We do not sell or share API data with third-party advertisers."
+					"title": "11. International Transfers",
+					"content": "If personal data is transferred outside your jurisdiction (including outside the European Economic Area or the United Kingdom), we implement appropriate legal and technical safeguards to ensure your data remains protected."
 				},
 				"childrensPrivacy": {
-					"title": "11. Children's Privacy",
-					"content": "Our services are not directed to children under the age of 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us."
+					"title": "12. Children's Privacy",
+					"content": "Our services are not directed to children under the age of 13 (or the minimum digital consent age in your jurisdiction). We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us so we can promptly delete it."
+				},
+				"changes": {
+					"title": "13. Changes to This Policy",
+					"content": "We may update this Privacy Policy periodically. When material changes occur, we update the policy version timestamp and prompt authenticated users to review and accept the revised policy."
+				},
+				"contact": {
+					"title": "14. Contact",
+					"prefix": "For privacy-related inquiries or data requests, contact"
 				}
 			},
 			"description": "legal@xernerx.com"
@@ -1902,79 +2460,94 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "These Terms of Service (\"Terms\") govern your access to and use of services provided by Xernerx Studios (\"we\", \"our\", or \"us\"). By accessing or using our services, you agree to be legally bound by these Terms."
+					"content": "These Terms of Service (\"Terms\") govern your access to and use of all websites, dashboards, Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios (\"we\", \"our\", or \"us\"). By accessing or using our services, you agree to be legally bound by these Terms."
 				},
 				"eligibility": {
 					"title": "2. Eligibility",
-					"content": "You must meet the minimum legal age in your jurisdiction to use our services. By using our services, you represent that you satisfy this requirement."
+					"content": "You must be at least 13 years of age (or the minimum age of digital consent in your jurisdiction) to use our services. By using our services, you represent and warrant that you satisfy this requirement and comply with Discord's Terms of Service."
 				},
 				"acceptableUse": {
 					"title": "3. Acceptable Use",
 					"items": [
-						"Engage in unlawful activities.",
-						"Access data without explicit authorization.",
-						"Attempt to disrupt service infrastructure.",
-						"Reverse-engineer or exploit vulnerabilities."
+						"Engage in unlawful, fraudulent, defamatory, or abusive activities, or upload illegal content to our CDN or community portals.",
+						"Attempt to access accounts, private CDN blobs, API endpoints, or administrative tools without explicit authorization.",
+						"Disrupt, overload, or bypass platform rate limits, WebSocket gateways, or security mechanisms.",
+						"Reverse-engineer, scrape, or exploit vulnerabilities in any Xernerx service, bot, or client application."
 					]
 				},
 				"apiUsage": {
-					"title": "4. API & Developer Terms",
-					"content": "Developers using our API or bot infrastructure must adhere to the following rules:",
+					"title": "4. API, Widgets & WebSocket Gateway Terms",
+					"content": "Developers using our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket RPC gateway must adhere to the following rules:",
 					"items": [
-						"Respect rate limits and do not spam or reverse-engineer the API.",
-						"You are solely responsible for securing your API keys; we are not liable for leaked tokens.",
-						"Data submitted to the platform (such as server stats) must be accurate and not artificially inflated.",
-						"We reserve the right to instantly revoke API tokens or suspend bot applications for any abuse or degraded platform performance."
+						"Respect all rate limits and plan quotas; do not spam, scrape, or abuse API endpoints or WebSocket connections.",
+						"You are solely responsible for securing your Bearer API tokens; we are not liable for unauthorized actions caused by leaked keys.",
+						"Telemetry, command registries, and statistics submitted to the platform must be accurate and never artificially inflated.",
+						"We reserve the right to immediately revoke API tokens, disable public widgets, or suspend applications that degrade platform stability or violate these Terms."
 					]
 				},
 				"botUsage": {
 					"title": "5. Bot End User Terms",
-					"content": "Users interacting with Xernerx-powered bots agree not to exploit command inputs to execute malicious payloads or harass other users. Server administrators are responsible for ensuring bots are used in compliance with both these terms and Discord's Terms of Service."
+					"content": "Users interacting with Xernerx-powered Discord bots (including Virtue, Metamorphosis, Zodiac, and To-Do List Bot) agree not to exploit command inputs, automate abusive requests, or harass other community members. Server owners and administrators are responsible for configuring bot modules in compliance with both these Terms and Discord's Terms of Service."
 				},
 				"accounts": {
-					"title": "6. User Accounts",
-					"content": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. We are not liable for losses arising from unauthorized access."
+					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
+					"content": "You authenticate via Discord OAuth2 or our encrypted QR Code / Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not initiate yourself. You may also optionally link third-party accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) to display on your public profile. You are responsible for all activity occurring under your account and can revoke active device sessions or unlink connected accounts at any time in Account Settings."
+				},
+				"storeAndBilling": {
+					"title": "7. Store, Subscriptions & Virtual Credits",
+					"content": "Paid subscriptions (including the Xernerx Ultra bundle, Individual Bot Passes, Server Infrastructure Passes, and Developer API Pro) and add-ons are billed in advance on a recurring monthly or annual cycle via Stripe, which may display localized currencies through Stripe Adaptive Pricing:",
+					"items": [
+						"You may cancel a recurring subscription at any time via the Billing Portal; your plan benefits remain active until the end of the current paid billing period.",
+						"Virtual Credits, Daily Mystery Gifts, and login streak rewards are non-monetary digital platform features with no real-world cash value. They cannot be exchanged for cash, transferred between users, or refunded outside mandatory statutory consumer rights.",
+						"If a subscription downgrades or expires, features and CDN storage quotas revert to standard tier limits; existing files are not immediately deleted without notice, but new uploads may be restricted if you exceed your active quota."
+					]
+				},
+				"desktopClient": {
+					"title": "8. Xernerx Desktop Client",
+					"content": "We grant you a limited, non-exclusive, revocable license to download and use the Xernerx Desktop application for personal or internal community management use. The Desktop client may automatically download and install updates (across Stable or Canary release channels), register optional global keyboard shortcuts, display a floating mini overlay, maintain isolated multi-account sessions, and communicate locally with Discord for Rich Presence."
 				},
 				"data": {
-					"title": "7. User Data",
-					"contentPrefix": "By using our services, you agree to our data handling practices as described in our ",
+					"title": "9. User Data & Cookies",
+					"contentPrefix": "By using our services, you agree to our data handling and cookie practices as described in our ",
 					"contentLink": "Privacy Policy",
-					"contentSuffix": ". Data may include account information, usage metrics, and integration-based data where applicable."
+					"contentMiddle": " and ",
+					"cookiesLink": "Cookie Policy",
+					"contentSuffix": ". You may export your account data or delete your account at any time through your Account Dashboard."
 				},
 				"availability": {
-					"title": "8. Service Availability",
-					"content": "We strive for reliable uptime but do not guarantee uninterrupted service. Services may be modified, suspended, or discontinued at any time."
+					"title": "10. Service Availability",
+					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted or error-free operation. Features, bot modules, APIs, or experimental Canary builds may be modified, suspended, or discontinued at any time."
 				},
 				"thirdParty": {
-					"title": "9. Third-Party Services",
-					"content": "Our services integrate with third-party platforms such as Discord, Stripe, and Google (for translation and advertising services). We are not responsible for third-party policies, service availability, or independent data practices."
+					"title": "11. Third-Party Services",
+					"content": "Our ecosystem integrates with third-party platforms including Discord, Stripe, Google (for translation and advertising services), and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit). We are not responsible for the availability, policies, or independent practices of third-party services."
 				},
 				"intellectualProperty": {
-					"title": "10. Intellectual Property",
-					"content": "All software, code, branding, and materials remain the exclusive property of Xernerx Studios or its licensors. Unauthorized reproduction or distribution is prohibited."
+					"title": "12. Intellectual Property & User Content",
+					"content": "All Xernerx software, source code (excluding open-source packages licensed under their respective repository licenses), branding, and visual assets remain the exclusive property of Xernerx Studios. You retain ownership of media and content you upload to cdn.xernerx.com or submit to our platform, and grant Xernerx Studios a worldwide, non-exclusive, royalty-free license to host, cache, and deliver that content solely according to the visibility permissions (public, limited, or private) you configure."
 				},
 				"warranty": {
-					"title": "11. Disclaimer of Warranties",
-					"content": "Services are provided “as is” without warranties of any kind, whether express or implied."
+					"title": "13. Disclaimer of Warranties",
+					"content": "Services are provided “as is” and “as available” without warranties of any kind, whether express, implied, or statutory, including implied warranties of merchantability, fitness for a particular purpose, or non-infringement."
 				},
 				"liability": {
-					"title": "12. Limitation of Liability",
-					"content": "To the fullest extent permitted by law, Xernerx Studios shall not be liable for indirect, incidental, or consequential damages arising from use of our services."
+					"title": "14. Limitation of Liability",
+					"content": "To the fullest extent permitted by applicable law, Xernerx Studios shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of data, revenue, or profits arising from your use of our services."
 				},
 				"indemnification": {
-					"title": "13. Indemnification",
-					"content": "You agree to indemnify and hold harmless Xernerx Studios from claims or liabilities arising from misuse of our services or violation of these Terms."
+					"title": "15. Indemnification",
+					"content": "You agree to indemnify and hold harmless Xernerx Studios and its team members from any claims, damages, or liabilities arising out of your misuse of our services, your uploaded content, your developer applications, or your violation of these Terms."
 				},
 				"governingLaw": {
-					"title": "14. Governing Law",
-					"content": "These Terms shall be governed in accordance with applicable laws within your jurisdiction."
+					"title": "16. Governing Law",
+					"content": "These Terms shall be governed and construed in accordance with applicable laws, without regard to conflict of law principles, while respecting mandatory consumer protection laws in your country of residence."
 				},
 				"changes": {
-					"title": "15. Changes to Terms",
-					"content": "We may update these Terms from time to time. Continued use of our services after updates constitutes acceptance."
+					"title": "17. Changes to Terms",
+					"content": "We may update these Terms from time to time. When material updates are published, we update the effective timestamp and prompt authenticated users to review and accept the revised Terms before continuing to use the platform."
 				},
 				"contact": {
-					"title": "16. Contact",
+					"title": "18. Contact",
 					"prefix": "For legal inquiries contact"
 				}
 			},
@@ -1989,21 +2562,21 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and similar technologies when you visit or interact with our websites, dashboards, APIs, and services."
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, session partitions, and similar technologies when you visit or interact with our websites, dashboards, APIs, and desktop applications."
 				},
 				"whatAreCookies": {
 					"title": "2. What Are Cookies?",
-					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow the platform to recognize your device, maintain your authenticated session across subdomains (such as *.xernerx.com), and remember your interface preferences."
+					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow the platform to recognize your device, maintain your authenticated session seamlessly across all Xernerx subdomains (*.xernerx.com), and remember your customized interface preferences."
 				},
 				"categories": {
 					"title": "3. Categories of Cookies We Use",
 					"essential": {
 						"title": "Essential Cookies:",
-						"desc": "Strictly necessary for the operation and security of our services. These include authentication sessions, CSRF protection, and OAuth state verification. Because the platform cannot function securely without them, they cannot be disabled."
+						"desc": "Strictly necessary for the core operation and security of our services. These include Discord OAuth2 authentication sessions, CSRF protection, secondary account-linking state verification, and your saved cookie consent state. Because the platform cannot function securely without them, they cannot be disabled."
 					},
 					"functional": {
 						"title": "Functional Cookies:",
-						"desc": "Used to remember your personal preferences, such as your selected language, interface theme (dark, light, or system), accent color, layout density, UI zoom, and typography scale."
+						"desc": "Used to remember your personal preferences across subdomains, including your selected language, interface theme (dark, light, or system), accent color, layout density, UI zoom, typography scale, and header/sidebar workspace toggles."
 					},
 					"analytics": {
 						"title": "Analytics Cookies:",
@@ -2018,37 +2591,37 @@
 					"title": "4. Specific Cookies We Set",
 					"content": "Across the Xernerx ecosystem (.xernerx.com), we set and read the following first-party cookies:",
 					"auth": {
-						"title": "Authentication (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state):",
-						"desc": "Essential HTTP-only secure cookies managed by NextAuth to authenticate your Discord session, prevent cross-site request forgery, and handle login redirects."
+						"title": "Authentication & OAuth State (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state, __xernerx_conn_oauth):",
+						"desc": "Essential HTTP-only secure cookies managed by NextAuth to authenticate your session across subdomains, prevent cross-site request forgery, and verify short-lived (10-minute) PKCE/OAuth state when linking third-party accounts on account.xernerx.com."
 					},
 					"consent": {
 						"title": "Cookie Consent (xernerx-cookie-consent):",
-						"desc": "An essential cookie that stores your chosen privacy and cookie preferences for up to 1 year so you are not prompted on every visit."
+						"desc": "An essential cookie that stores your chosen cookie category preferences (essential, functional, analytics, marketing) and an agreedAt timestamp for up to 1 year. If we publish a material update to this Cookie Policy, the agreedAt timestamp is compared against the latest policy version so we can re-prompt you."
 					},
 					"locale": {
 						"title": "Localization (NEXT_LOCALE):",
 						"desc": "A functional cookie that remembers your preferred interface language across all Xernerx subdomains for up to 1 year."
 					},
 					"appearance": {
-						"title": "Interface & Appearance (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord):",
-						"desc": "Functional cookies that preserve your visual customizations and allow the server to render your chosen theme and layout immediately without visual flickering."
+						"title": "Interface, Appearance & Workspace Preferences (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord, pref_*):",
+						"desc": "Functional cookies (including pref_showHeaderStore, pref_showHeaderCommandPalette, pref_showHeaderNotifications, pref_showHeaderDownload, pref_showHeaderAppDrawer, pref_showShortcutHints, pref_showDiscordCollectibles, pref_showGiftBadge, pref_reducedMotion, pref_defaultSidebarCollapsed, and pref_developerMode) that preserve your visual and workspace customizations so the server can render your layout immediately without visual flickering."
 					}
 				},
 				"localStorage": {
-					"title": "5. Local Storage & Similar Technologies",
-					"content": "In addition to cookies, we utilize browser localStorage to cache non-sensitive interface settings (such as theme and layout preferences) locally on your device for instant application startup. If you use the Xernerx Desktop client (Electron), essential and functional preferences are automatically enabled to support the native application environment."
+					"title": "5. Local Storage & Desktop Client Storage",
+					"content": "In addition to browser cookies, we use browser localStorage (including theme, accent, uiZoom, uiGap, textScale, pref_*, and xernerx_sidebar_view_* keys) to cache non-sensitive interface state locally for instant startup. In the Xernerx Desktop App (Electron), local configuration is stored in metadata.json and each account slot uses an isolated Chromium session partition (persist:xernerx and persist:xernerx-<slot>) so you can switch between multiple accounts safely."
 				},
 				"thirdParty": {
 					"title": "6. Third-Party Cookies",
-					"content": "Some features and pages integrate with third-party services, including Discord (for OAuth2 authentication), Stripe (for secure checkout and billing), and Google AdSense (for displaying advertisements). These third parties may set their own cookies in accordance with their respective privacy policies."
+					"content": "Some features integrate with third-party services, including Discord (for primary authentication), Stripe (for secure checkout, billing portals, and fraud prevention), Google AdSense (for displaying advertisements when consented), and optional connected account providers (GitHub, Twitch, Google/YouTube, X/Twitter, Spotify, Steam, and Reddit) when you initiate account linking. These third parties may set their own cookies in accordance with their respective policies."
 				},
 				"managing": {
 					"title": "7. Managing Your Preferences",
-					"content": "You can review or update your cookie consent choices at any time by clicking \"Cookie Preferences\" in the website footer. You may also configure your web browser to block or delete cookies, though blocking essential cookies will prevent you from signing in or using authenticated features."
+					"content": "You can review or update your cookie consent choices at any time by clicking \"Cookie Preferences\" in the website footer to reopen the preferences manager. You may also configure your web browser to block or delete cookies, though blocking essential cookies will prevent you from signing in or using authenticated features."
 				},
 				"changes": {
 					"title": "8. Changes to This Policy",
-					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology, infrastructure, or legal requirements. Continued use of our services constitutes acceptance of the updated policy."
+					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology, infrastructure, or legal requirements. When updated, we bump our policy version date so visitors are prompted to review their cookie preferences."
 				},
 				"contact": {
 					"title": "9. Contact",
@@ -2058,12 +2631,84 @@
 			"description": "legal@xernerx.com"
 		},
 		"download": {
-			"title": "Download Xernerx App",
-			"description": "Optimized for your system. One click and you are in. Experience the entire Xernerx Suite inside a fast, distraction-free native desktop client.",
+			"badge": "Xernerx Desktop App",
+			"title": "Your Xernerx World. Right on Your PC.",
+			"description": "Ditch the cluttered browser tabs. Get instant access to your servers, daily rewards, and Discord perks in one sleek desktop app.",
 			"button": "Stable",
 			"button2": "Canary",
 			"button3": "Download for",
-			"button4": "Other platforms",
+			"button4": "All platforms",
+			"comingSoon": "Coming soon for {platform}",
+			"tryInteractive": "Try clicking around the live preview!",
+			"preview": {
+				"windowTitle": "Xernerx Desktop",
+				"welcomeBack": "Welcome back, {name}!",
+				"dailyRewardReady": "Daily Gift Ready!",
+				"claimReward": "Claim +150 Credits",
+				"claimedReward": "Claimed +150 Credits!",
+				"discordStatus": "Showing on Discord Profile",
+				"overlayActive": "Mini Overlay Pinned",
+				"switchAccount": "Switch Account",
+				"mainRole": "Main Account",
+				"altRole": "Alt Account"
+			},
+			"pills": {
+				"multiAccount": "1-Click Account Switcher",
+				"discordRpc": "Discord Profile Status",
+				"liveOverlay": "In-Game Mini Overlay",
+				"qrPairing": "Phone QR Login",
+				"globalHotkey": "Quick Summon Shortcut"
+			},
+			"perks": {
+				"title": "Why It Feels Way Better Than a Browser",
+				"subtitle": "Built for everyday Discord users, server members, and community owners — click any card below to try it out.",
+				"multiAccount": {
+					"badge": "No More Logging Out",
+					"title": "Jump Between Accounts in 1 Click",
+					"description": "Have a main Discord account and an alt? Keep both signed in at the same time and swap between them instantly.",
+					"activeLabel": "Current",
+					"switchLabel": "Click to Switch",
+					"hint": "Click an account above to test switching!"
+				},
+				"discordRpc": {
+					"badge": "Flex Your Activity",
+					"title": "Live Status on Your Discord Profile",
+					"description": "Let friends see what you are exploring, customizing, or playing with right on your Discord profile card.",
+					"activityName": "Playing Xernerx",
+					"activityState": "Exploring Top Servers & Bots",
+					"activityStateAlt": "Opening Daily Mystery Gift",
+					"toggleActivity": "Switch Status Preview"
+				},
+				"overlay": {
+					"badge": "Game-Friendly",
+					"title": "Floating Mini Overlay",
+					"description": "Pin a tiny, see-through companion window over your favourite games so you never miss a vote, gift, or alert.",
+					"pinnedLabel": "PINNED ON TOP",
+					"unpinnedLabel": "FLOATING",
+					"latencyLabel": "Live Feed",
+					"eventLabel": "Daily streak reached 14 days! 🔥",
+					"eventLabel2": "New server reward unlocked! 🎁"
+				},
+				"qrLogin": {
+					"badge": "Zero Passwords",
+					"title": "Sign In With Your Phone",
+					"description": "Already logged in on your phone or browser? Scan a QR code or type a 6-letter code and you are in — no password or 2FA typing.",
+					"codeHint": "Click to shuffle code"
+				},
+				"hotkey": {
+					"badge": "Always One Tap Away",
+					"title": "Summon It From Anywhere",
+					"description": "Press Ctrl + Shift + X while gaming or chatting to pop Xernerx open instantly, then tuck it neatly into your system tray.",
+					"trayReady": "Lives quietly in your taskbar tray"
+				},
+				"engine": {
+					"badge": "Buttery Smooth",
+					"title": "Clean Borderless Window",
+					"description": "No ugly browser address bars or tab clutter — just smooth glass animations and your custom colours synced everywhere.",
+					"gpuLabel": "Smooth Animations",
+					"framelessLabel": "Borderless Design"
+				}
+			},
 			"highlights": {
 				"title": "Why Use the Desktop Client?",
 				"subtitle": "Built from the ground up to give server owners, community managers, and developers instant access to the Xernerx ecosystem without browser clutter.",
@@ -2186,7 +2831,8 @@
 			"linkCopiedDesc": "Copied direct link to version {version}",
 			"searchPlaceholder": "Search release notes or version (e.g. '1.3.4')...",
 			"jumpToVersion": "Releases:",
-			"noMatchingVersions": "No release notes match \"{query}\"."
+			"noMatchingVersions": "No release notes match \"{query}\".",
+			"rssFeed": "RSS Feed"
 		},
 		"software": {
 			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite over HTTP. Send JSON requests and receive JSON responses from any language using your scoped Bearer token.",
@@ -2222,62 +2868,384 @@
 		"searchPlaceholder": "Search frequently asked questions...",
 		"noResults": "No questions found matching \"{query}\".",
 		"category": {
-			"suite": "Xernerx Suite"
+			"suite": "Xernerx Suite",
+			"platform": "Platform & Clients",
+			"community": "Bots, Servers & Virtue",
+			"accountAndDevs": "Account, Billing & Devs"
+		},
+		"quickLinks": {
+			"label": "Quick Links & Vanity Routes",
+			"copied": "Link copied to clipboard",
+			"copyTooltip": "Copy direct link",
+			"languagePrefs": "Language Preferences",
+			"openApplications": "Open Applications",
+			"translationStudio": "Translation Studio",
+			"notificationPrefs": "Notification Matrix",
+			"canaryEnv": "Canary Environment",
+			"productionEnv": "Production Website",
+			"changelog": "Platform Changelog",
+			"changelogRss": "Changelog RSS Feed",
+			"discordSupport": "Discord Support Server",
+			"suggestions": "Suggestion Centre",
+			"cookiePolicy": "Cookie Policy",
+			"privacyPolicy": "Privacy Policy",
+			"termsPolicy": "Terms of Service",
+			"contactPage": "Contact & Departments",
+			"desktopDownload": "Desktop Client Download",
+			"systemStatus": "Live System Status",
+			"statusBadge": "Live Status SVG Badge",
+			"issueTracker": "Issue & Bug Tracker",
+			"roadmap": "Public Roadmap",
+			"botInvites": "Official Bot Invites",
+			"githubOrg": "Xernerx GitHub",
+			"npmPackage": "Xernerx on npm",
+			"apiTokens": "API Tokens",
+			"devPortal": "Developer Portal",
+			"v1ApiDocs": "REST API v1 Docs",
+			"coreApiDocs": "Core & Widget Docs",
+			"websocketDocs": "WebSocket Gateway Docs",
+			"npmPackagesDocs": "NPM Packages Docs",
+			"cdnDocs": "CDN Services Docs",
+			"apiGateway": "API Gateway",
+			"exploreBots": "Explore Bots",
+			"exploreServers": "Explore Servers",
+			"leaderboards": "Ecosystem Leaderboards",
+			"supporters": "Community Supporters",
+			"serverDashboard": "Server Dashboard",
+			"serverStats": "Server Analytics",
+			"serverSettings": "Server Settings",
+			"virtueSettings": "Virtue Progression Settings",
+			"signInPage": "Sign In & QR Pairing",
+			"devicesTab": "Active Devices & Pairing",
+			"accountSettings": "Account & Data Controls",
+			"connectionsTab": "OAuth Connections",
+			"profileSettings": "Public Profile Editor",
+			"appearanceTab": "Theme & Appearance",
+			"preferencesTab": "Workspace & Desktop Prefs",
+			"activityLog": "Account Activity Log",
+			"storeHub": "Xernerx Store",
+			"storeConsumers": "Consumer & Bot Passes",
+			"storeDevelopers": "Developer Pro Plans",
+			"billingTab": "Billing & Daily Gift",
+			"cdnPortal": "Media CDN Portal",
+			"mediaLibrary": "My Media Library",
+			"liveOverlay": "Live Overlay Monitor",
+			"tryCommandPalette": "Open Command Palette (Ctrl + K)",
+			"tryAppDrawer": "Open App Drawer (Ctrl + Space)",
+			"tryOmnibar": "Open URL Omnibar (Ctrl + .)",
+			"tryShortcutsModal": "View Shortcuts & Changelog (Ctrl + /)"
+		},
+		"overview": {
+			"navTitle": "Ecosystem & Navigation",
+			"title": "Ecosystem, Navigation & Shortcuts",
+			"table": {
+				"subdomain": "Subdomain",
+				"purpose": "Purpose & Core Features"
+			},
+			"subdomains": {
+				"www": "Marketing showcase, company timeline, official bot invites (/invites), open team applications (/applications), legal policies (/terms, /privacy, /cookies), and Desktop Client downloads (/download).",
+				"app": "Bot & Server Discovery (/bots, /servers), Ecosystem Leaderboards (/leaderboard), Supporters showcase (/supporters), Server Dashboard & Virtue config (/dashboard), Developer Portal & Organizations (/portal), Public User & Org profiles (/users/[id], /organization/[id]), and Live Overlay Monitor (/overlay).",
+				"account": "Unified Discord identity hub, QR/6-character device pairing & active sessions (/devices), secondary OAuth connections (/connections), theme & UI scaling (/appearance), workspace & desktop preferences (/preferences), localization (/language), notification matrix (/notifications), billing & daily gifts (/billing), API tokens (/tokens), personal activity & JSON data export (/activity), and media library (/media).",
+				"store": "Ecosystem store portal for Monthly & Annual subscriptions, the €0 Free Tier, the Ultra Ecosystem master pass, individual bot passes (Zodiac, Virtue, To-Do, Metamorphosis), Developer Pro, and server infrastructure.",
+				"cdn": "Distributed media content delivery network and private Vercel Blob storage with drag-and-drop/Ctrl+V upload, Public/Limited/Private access controls, /view/[id] web viewer, and /raw/[id] binary streaming.",
+				"docs": "Developer documentation hub featuring interactive REST API specs (/api/v1, /api/core, /api/secure) with an in-browser API Playground, CDN docs (/cdn), live GitHub/npm Package docs reader (/packages), and WebSocket Gateway RPC specs (/websocket).",
+				"info": "Support & feedback knowledgebank housing the chronological Platform Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
+				"api": "Core backend HTTP gateway, Bearer token validator, Discord & Stripe webhook processor, live SVG/PNG/iframe widget renderer (/core/*, /v1/*/badge.svg), and rate-limited REST router.",
+				"admin": "Internal staff RBAC portal for managing Discord-synced roles, users, Staff Subscriptions, elevated API tokens, Translation Studio (/translations), application reviews, platform announcements, roadmap/issue moderation, and store catalog items."
+			},
+			"card1": {
+				"title": "How is the Xernerx Suite organized across its 9 subdomains?",
+				"description": "The Xernerx Suite is a unified multi-application ecosystem where a single Discord sign-in, your theme & scaling preferences, and your notifications carry seamlessly across 9 specialized subdomains:"
+			},
+			"card2": {
+				"title": "How do the Command Palette (Ctrl + K), App Drawer (Ctrl + Space), and URL Omnibar (Ctrl + .) work?",
+				"description": "You can navigate across the entire suite without touching your mouse: (1) Press Ctrl + K to focus the current page's search bar, or press Ctrl + Shift + K (or Ctrl + K when no page search bar is mounted) to open the global Command Palette—which searches current page views, quick actions (theme toggle, sidebar toggle, copy URL), suite apps, account settings, live public bots and servers, and community issues/suggestions/roadmap items; (2) Press Ctrl + Space (or Alt + A) to open the App Drawer grid and launch any Xernerx subdomain; (3) Press Ctrl + . to open the URL Omnibar in the header, allowing you to switch subdomains, switch between Public/Canary/Dev environments, and type a custom path in one bar. Click any button below to test them live:"
+			},
+			"card3": {
+				"title": "What global keyboard shortcuts are available across all Xernerx web apps?",
+				"description": "Every application in the suite supports these global shortcuts: Ctrl + / opens the Keyboard Shortcuts & Changelog modal; Ctrl + K focuses page search or opens the Command Palette (Ctrl + Shift + K forces the Command Palette); Ctrl + Space or Alt + A opens the App Drawer; Ctrl + B collapses or expands the Sidebar; Ctrl + . toggles the URL Omnibar; Ctrl + I opens the Notifications drawer; Ctrl + , jumps straight to Account Settings (account.xernerx.com); Ctrl + S or Ctrl + Enter saves unsaved form changes (and Alt + R resets unsaved changes); Alt + 1..9 switches between sidebar views or tabs; Ctrl + Shift + C copies the current suite URL (automatically preserving your active ?view= parameter); Ctrl + R reloads application state; and Esc closes any open modal, popover, or drawer."
+			},
+			"card4": {
+				"title": "What official vanity URLs and quick redirects can I use?",
+				"description": "Across every Xernerx subdomain, /support and /discord redirect to our official Discord Support Server, /github opens github.com/xernerx, and /npm opens our npm package suite. On xernerx.com, use /invite or /invite/[slug] for bot invites, /desktop for the Desktop App download page, and /careers or /jobs for open team applications. On info.xernerx.com, use /bugs for the Issue Tracker (/issues) and /help for the FAQ (/faq). On app.xernerx.com, use /orgs or /organizations for the Developer Portal (/portal) and /leaderboards for /leaderboard. On account.xernerx.com, every settings tab has a clean vanity path: /profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media."
+			},
+			"card5": {
+				"title": "How does the floating Support Button work, and how can I contact specific departments?",
+				"description": "Clicking the floating Support button in the bottom-right corner of any page opens a quick-help popover with links to the Support Hub, Report an Issue, Suggest a Feature, and FAQ, plus a Join Support Server button. If you are signed in and not yet a member of our Discord server, clicking Join Support Server uses your authorized Discord guilds.join scope to add your account to the official Xernerx Support server automatically and open the support channel. For direct email inquiries, visit xernerx.com/contact to reach General Inquiries (info@xernerx.com), Technical Support (support@xernerx.com), Billing & Invoices (invoice@xernerx.com), Security Disclosures (security@xernerx.com), or Legal & Privacy (legal@xernerx.com)."
+			}
 		},
 		"environments": {
-			"title": "Environments",
+			"title": "Environments, Status, Roadmap & Feedback",
 			"card": {
-				"title": "What are environments?",
-				"description": "Within Xernerx Studios we speak of 3 environments: release (production), canary (beta) and dev (development). Here is what each of them mean:"
+				"title": "What are the Release, Canary, and Dev environments?",
+				"description": "Within Xernerx Studios we operate 3 isolated environments across all 9 suite subdomains (www, app, account, api, cdn, docs, info, store, and admin). Here is what each environment is used for:"
 			},
 			"table": {
 				"header": {
 					"environment": "Environment",
+					"domain": "Domain Pattern",
 					"description": "Description"
 				},
 				"release": {
 					"label": "Release",
-					"description": "The stable production environment used for general release."
+					"description": "The stable production environment (*.xernerx.com) used for general availability."
 				},
 				"canary": {
 					"label": "Canary",
-					"description": "The beta environment used for pre-release testing of new features."
+					"description": "The public staging and beta environment (*.canary.xernerx.com) where new features and merged translations arrive first."
 				},
 				"dev": {
 					"label": "Dev",
-					"description": "The development environment used for active building and testing."
+					"description": "The internal development environment (*.dev.xernerx.com) used for active building and local service orchestration."
 				}
+			},
+			"card2": {
+				"title": "How can I monitor live uptime, service latency, and active incidents?",
+				"description": "Visit info.xernerx.com/status to inspect real-time operational health and response latency across all 9 Xernerx Suite services, view verified active incidents from the issue tracker, or click Status Badge to embed our live SVG status shield (api.xernerx.com/v1/status/badge.svg) in your README or website."
+			},
+			"card3": {
+				"title": "Where can I read release notes, changelogs, or subscribe via RSS?",
+				"description": "Every Xernerx Suite web app exposes CORS-enabled GET /api/version and GET /api/changelog endpoints and automatically notifies you with an App Updated toast when a new version is deployed. You can press Ctrl + / anywhere to open the Changelog & Shortcuts modal, browse full version histories with direct version deep-links on info.xernerx.com/changelog, or subscribe to our RSS 2.0 feed at api.xernerx.com/v1/changelog/rss."
+			},
+			"card4": {
+				"title": "How does the Issue & Bug Tracker (info.xernerx.com/issues) work, and what do the release badges mean?",
+				"description": "On info.xernerx.com/issues (or vanity URL info.xernerx.com/bugs), you can filter reports by All Open, Verified (acknowledged by engineers), Unverified (community submitted), or Pending Release, and attach up to 10MB screenshots or logs (PNG, JPG, GIF, WEBP, TXT, LOG, JSON) via drag-and-drop or Ctrl + V paste. When our engineers link a fix to a target app version, the issue card displays a live deployment badge: Queued • app vX.Y.Z (awaiting build), Canary Only • app vX.Y.Z (live on *.canary.xernerx.com), or Live (Prod & Canary) • app vX.Y.Z once rolled out to Production."
+			},
+			"card5": {
+				"title": "What official vanity links and quick redirects are available across the suite?",
+				"description": "You can use clean vanity routes on any Xernerx domain: /support and /discord open our official Discord community, /github opens our GitHub organization, and /npm opens our npm package suite. On xernerx.com you can use /invite (or /invite/[slug]), /desktop (for /download), and /careers or /jobs (for /applications). On info.xernerx.com you can use /bugs (for /issues) and /help (for /faq). On account.xernerx.com every settings tab has a direct vanity path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
+			},
+			"card6": {
+				"title": "How do the Suggestion Centre (/suggestions) and Platform Roadmap (/roadmap) work?",
+				"description": "In the Suggestion Centre (info.xernerx.com/suggestions), you can filter ideas by product, sort by Most Upvoted, Newest, or Upvoted by Me, and submit new feature ideas (with real-time duplicate detection as you type). Popular suggestions are promoted by staff to the Platform Roadmap (info.xernerx.com/roadmap), which tracks milestones across Idea, Planned, In Progress, and Released stages alongside live Avg Issue Resolution Time metrics and the Known Issues Tracker. Click Notify Me (Watching) on any roadmap milestone to receive an automatic notification the moment it is released."
+			}
+		},
+		"desktop": {
+			"navTitle": "Desktop App & Overlay",
+			"title": "Desktop Client & Live Overlay Monitor",
+			"card1": {
+				"title": "What is the Xernerx Desktop App and how do I switch between Stable and Canary channels?",
+				"description": "The Xernerx Desktop App (xernerx.com/download or xernerx.com/desktop) is our native Electron companion client for Windows, macOS, and Linux. It wraps the Xernerx workspace in a clean borderless window with automatic background updates and native OS integration. When visiting the download page on Canary or Dev environments, you can toggle between the Stable release channel and the Canary build channel."
+			},
+			"card2": {
+				"title": "How does the 1-Click Multi-Account Switcher work in the Desktop App?",
+				"description": "Unlike a standard browser where signing into an alt Discord account logs out your main account, the Xernerx Desktop App isolates each account slot in its own dedicated Chromium session partition (persist:xernerx and persist:xernerx-<slot>) stored in your local metadata.json configuration. Open your user card in the sidebar to add an account slot or swap between multiple signed-in Discord accounts in one click."
+			},
+			"card3": {
+				"title": "What is the Always-on-Top Live Overlay Monitor (app.xernerx.com/overlay)?",
+				"description": "The Live Overlay Monitor (launched from your sidebar user card or at app.xernerx.com/overlay) is a compact, game-friendly companion view designed to be pinned on top of fullscreen applications and games. It displays real-time API latency (in ms) and operational health, a Live Feed tab of recent events and notifications, a Servers & Bots quick-status tab, and Quick Actions to open routes in your main window."
+			},
+			"card4": {
+				"title": "How do Discord Rich Presence (RPC), the Ctrl + Shift + X summon hotkey, and custom window controls work?",
+				"description": "When running the Desktop App, a dedicated Desktop Client section appears in account.xernerx.com/preferences. From there you can toggle Discord Rich Presence (broadcasting what you are exploring or managing on your Discord profile card), enable the global Ctrl + Shift + X hotkey to summon or hide the window from anywhere, configure Start on Boot, Always on Top, or Minimize to System Tray on Close, and switch your titlebar Window Controls style between System, Windows, macOS traffic lights, or Xernerx."
+			},
+			"card5": {
+				"title": "How can I inspect Desktop App logs, edit raw metadata.json, or clear the app cache?",
+				"description": "Inside account.xernerx.com/preferences when using the Desktop App, you can switch the Desktop Client panel into raw JSON Editor mode to inspect or edit your local metadata.json flags directly, open the Desktop Logs Modal to view or copy diagnostic runtime logs, or click Clear Cache to purge cached Chromium assets. Toggling engine flags such as Hardware Acceleration, Debug Mode, or Start Maximized/Minimized will prompt a one-click application restart to apply."
 			}
 		},
 		"translations": {
-			"title": "Translations",
+			"title": "Translations & Localization",
 			"card1": {
 				"title": "How do I become a translator?",
-				"p1": "You can apply directly from the Language preferences page if a language has less than 100% coverage.",
-				"p2": "Make sure you are logged in and on the account page."
+				"p1": "Sign in on account.xernerx.com, open Language preferences (/language or /?tab=language), and select any language with less than 100% translation coverage to reveal the Contribute card (or select + Contribute a translation from the dropdown).",
+				"p2": "Make sure you are logged in with your Discord account before submitting your translator request."
 			},
 			"card2": {
-				"title": "How long does it take for an application to be reviewed?",
-				"description": "Whenever an admin has time to review your submission and merge the translations with the live environment"
+				"title": "How does the Translation Studio work once my application is approved?",
+				"description": "Translator applications are reviewed by staff on admin.xernerx.com. Once approved, you immediately unlock the Translation Studio on admin.xernerx.com/?tab=translations, where you can translate missing keys one by one in the distraction-free New Entries card flow, search and refine existing translations in Review Existing mode against the English (UK) (en-GB) source of truth, or export dictionary JSON."
 			},
 			"card3": {
-				"title": "I translated but it didn't update?",
-				"description": "Translations cannot be automatically applied, the web page needs to be rebuild. Whenever you submit a review we get a notification asking to apply the newly added translations, we will allow this once reviewed."
+				"title": "I translated but it didn't update on the live site immediately?",
+				"description": "When you click Push to review in the Translation Studio, your changes are committed to the dictionary branch and automatically merged into the canary branch without requiring manual admin approval. The Translation Studio loads language JSON files directly from the Canary branch, stores the Canary version your translation was submitted against, and locks the submit button until the Canary version updates and the Canary build finishes and passes."
 			},
 			"card4": {
-				"title": "My language is not included in the list, how can I add it?",
-				"description": "For now you are required to request the language in our support channels, a language base will be created and then you can start translating for us!"
+				"title": "My language is not included in the list—how can I request it?",
+				"description": "Join our official Discord server via /support (or submit a request in the Suggestion Centre on info.xernerx.com/suggestions) and let our team know which language locale you would like to translate. Once we initialize the base locale file, you can start translating right away in the Translation Studio."
+			},
+			"card5": {
+				"title": "How does language detection and cross-subdomain syncing work?",
+				"description": "Your selected interface language is saved in the first-party NEXT_LOCALE cookie across all *.xernerx.com subdomains and synced to your account profile so every web app and the Desktop Client render in your language automatically. Your Language settings page also displays a read-only indicator of the locale currently reported by your Discord account."
 			}
 		},
 		"bots": {
-			"title": "Bots",
+			"navTitle": "Bots, Reviews & Rankings",
+			"title": "Bots, Discovery, Reviews & Leaderboards",
 			"card": {
-				"title": "How is the Estimated Value calculated?",
-				"description1": "The <strong>Estimated Value</strong> metric displayed on bot profiles is a purely statistical estimation of a bot's \"Audience & Reach Value\". It is explicitly designed to gamify audience reach and measure the scale of a bot's attention economy.",
+				"title": "How is the Estimated Value calculated on Bot and Organization profiles?",
+				"description1": "The <strong>Estimated Value</strong> metric displayed on bot and organization profiles is a purely statistical estimation of \"Audience & Reach Value\". It is designed to gamify community reach and measure the scale of a bot's attention economy.",
 				"disclaimer": "⚠️ Disclaimer: This valuation does NOT track, represent, or account for any actual financial income, subscription revenue, or server hosting expenses on the developer's end.",
-				"description2": "The formula combines a static baseline and a dynamic growth velocity multiplier:",
-				"baseline": "<strong>Baseline:</strong> Calculated by assigning a flat baseline weight to current active servers and users.",
-				"multiplier": "<strong>Momentum Multiplier:</strong> We compare current baseline metrics against the bot's baseline 30 days prior. Rapidly growing bots receive a premium multiplier (up to 3.0x), while bots actively bleeding users receive a penalty discount."
+				"description2": "The formula combines a static baseline and a dynamic 30-day growth velocity multiplier:",
+				"baseline": "<strong>Baseline:</strong> Calculated by assigning a flat baseline weight to current active servers and total user reach.",
+				"multiplier": "<strong>Momentum Multiplier:</strong> Compares current baseline metrics against the bot's baseline 30 days prior. Rapidly growing bots receive a growth multiplier (up to 3.0x), while bots losing active reach receive a proportional discount."
+			},
+			"card2": {
+				"title": "How do I register a Discord bot and bind an API token?",
+				"description": "Go to account.xernerx.com/tokens (/?tab=tokens) and create a new API token (prefixed with xrx_), which starts in a pending state. Use that token with your bot via the @xernerx/stats package or POST https://api.xernerx.com/v1/bots/[id]/stats. On its first stats request, the token automatically links to your bot—locking the token so it can only be used for GET requests and that bot's endpoints—while simultaneously creating your bot's profile from Discord so you can customize descriptions, links, webhooks, and slash commands in the Developer Portal on app.xernerx.com/portal."
+			},
+			"card3": {
+				"title": "Where can I find official pre-configured Discord bot invite links?",
+				"description": "Visit xernerx.com/invites (or use vanity links such as xernerx.com/invite/[slug]) to browse and copy official OAuth2 invite links for verified Xernerx applications—including Virtue, Metamorphosis, Zodiac, and To-Do—pre-configured with the exact Discord permissions each bot requires."
+			},
+			"card4": {
+				"title": "How do Bot Webhooks and live Test Pings work?",
+				"description": "In the Developer Portal (app.xernerx.com/portal/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...) and toggle any of the 8 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, and VOTE review. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
+			},
+			"card5": {
+				"title": "How do Bot and Server voting, 12-hour cooldowns, and the Ecosystem Leaderboards work?",
+				"description": "Any signed-in user can vote for a public Discord bot (app.xernerx.com/bots/[id]) or server (app.xernerx.com/servers/[id]) once every 12 hours. Every vote immediately records a new point on the historical statistics graph, fires subscribed POST vote webhooks, and rewards the voter with +100 Credits. Visit app.xernerx.com/leaderboard (or /leaderboards) to explore top rankings across three tabs: Top Bots (sorted by Votes, Users, or Servers), Top Servers (sorted by Votes or Members), and Daily Streaks (ranking users by Streak, Credits, Total Community Impact, Bugs reported, and Suggestions submitted)."
+			},
+			"card6": {
+				"title": "How do I manage my Discord server and configure the Virtue progression system?",
+				"description": "Open the Server Dashboard at app.xernerx.com/dashboard, which automatically lists every Discord server where you hold Administrator (0x8) or Manage Server (0x20) permissions. From there you can customize your public server listing, inspect historical member/message/boost/bot charts across 24h to All-Time timeframes, and open the Virtue tab (?tab=virtue) to configure XP curve difficulty (Easy, Casual, Balanced, Hard, Extreme), periodic reset cycles (Daily, Weekly, Monthly), tracked level roles, ignored roles, custom level-up messages ([@mention], [@level]), and auto-delete timers."
+			},
+			"card7": {
+				"title": "How do Developer Organizations work?",
+				"description": "On app.xernerx.com/portal (or vanity link app.xernerx.com/orgs), click New Organization in the sidebar to group multiple bots, linked Discord servers, and team members under a shared public profile (app.xernerx.com/organization/[id]). Organization owners can invite members by Discord User ID (delivering an interactive in-app invitation), assign custom organization roles, and transfer bots or servers between Personal and Organization workspaces."
+			},
+			"card8": {
+				"title": "How does Bot and Server Discovery work on app.xernerx.com?",
+				"description": "On app.xernerx.com, you can toggle between Bots and Servers in the hero explorer, search by keyword or tag, and browse algorithmic discovery categories including Top Voted, Newly Added, Staff Picks, Promoted, Biggest on Platform, Biggest Communities, and Newcomers. Each bot or server card displays live server/member counts, vote totals, verification badges, and short descriptions."
+			},
+			"card9": {
+				"title": "How do Slash Command syncing and interactive command search work on Bot profiles?",
+				"description": "Bot developers can publish their Discord slash commands either manually in app.xernerx.com/portal/bots/[id] under the Commands tab or automatically on bot startup via PUT https://api.xernerx.com/v1/bots/[id]/commands (which performs a clean bulk sync of your command array and required/optional parameters). Visitors viewing your public bot profile on app.xernerx.com/bots/[id] can open the Commands tab to search commands and parameters in real time and click any command pill to copy /command-name to their clipboard."
+			},
+			"card10": {
+				"title": "How do Bot Reviews, Star Ratings, and Developer Responses work?",
+				"description": "On any public bot profile (app.xernerx.com/bots/[id]) under the Reviews tab, signed-in users can submit a 1-to-5 star rating with an optional written review, edit or delete their review, and mark other community reviews as helpful. Visitors can filter reviews by star rating (1★ to 5★) or sort by Most Helpful, Newest, Highest Rated, and Lowest Rated. Verified owners of the bot can post an official Developer Response directly underneath any review, and receive real-time webhook alerts via the POST review, PATCH review, DELETE review, and VOTE review webhook triggers."
+			}
+		},
+		"servers": {
+			"navTitle": "Servers, Virtue & Orgs",
+			"title": "Server Dashboard, Virtue & Organizations",
+			"card1": {
+				"title": "Who can access the Server Dashboard (app.xernerx.com/dashboard) and how does Server Sync work?",
+				"description": "When you open app.xernerx.com/dashboard, Xernerx queries your Discord guilds and automatically lists every server where you hold Administrator (0x8) or Manage Server (0x20) permissions in the sidebar (switchable with Alt + 1..9 or ?guild=[id]). The Server Sync Data banner indicates whether the Xernerx Bot is currently connected to the server (Bot Connected vs Bot Not Connected), whether the community is Verified, and the guild's active Discord locale."
+			},
+			"card2": {
+				"title": "What server analytics and timeframes are tracked in the Server Dashboard?",
+				"description": "Once the Xernerx Bot is in your server, open the Stats tab (app.xernerx.com/dashboard?tab=stats) to inspect historical growth charts across four metrics: Members, Messages (30-minute intervals), Bots, and Server Boosts. You can filter the chart across 24 Hours (24h), 7 Days (7d), 30 Days (30d), 3 Months (3m), 6 Months (6m), 1 Year (1y), or All-Time (all)."
+			},
+			"card3": {
+				"title": "How does the Virtue Progression System (app.xernerx.com/dashboard?tab=virtue) work?",
+				"description": "Virtue is Xernerx's progression and engagement engine. Per-server text XP/levels/messages and voice XP/levels/time are tracked in the dedicated virtue database, while contributing to each user's unified global platform level in xernerx. In the Server Dashboard under the Virtue tab (?tab=virtue), server admins can configure: (1) Virtue Curve Mode—Easy (Very fast), Casual (Fast), Balanced (Standard), Hard (Slow curve), or Extreme (Prestige); (2) Automatic Reset Cycles—Daily, Weekly, or Monthly leaderboard wipes; (3) Tracked Level Roles (roles unlocked as members ascend) and Ignored Roles (exempt from earning score); and (4) Level-Up Announcements—toggleable channel embeds with a custom message template supporting [@mention] and [@level], a custom Announcement Channel ID, and an Auto-Delete timer in seconds."
+			},
+			"card4": {
+				"title": "How do Developer Organizations (app.xernerx.com/portal) and Organization Roles work?",
+				"description": "In the Developer Portal (app.xernerx.com/portal or vanity route app.xernerx.com/orgs), click New Organization in the sidebar to create a shared team workspace with its own public profile (app.xernerx.com/organization/[id]). Inside an organization workspace you can upload a custom avatar and banner to the CDN, write a Markdown profile, create custom Organization Roles (Roles tab), invite team members by Discord User ID (who receive an interactive Accept/Decline notification in their Notifications drawer), feature an official Discord server, and view combined Est. Network Value, Total Servers, and Total Users across all published organization bots."
+			},
+			"card5": {
+				"title": "How do I transfer a Bot or Server to an Organization, or reset/delete its data?",
+				"description": "Open the Settings tab of your bot (app.xernerx.com/portal/bots/[id]) or server (app.xernerx.com/dashboard?tab=settings). Under Transfer Organization, select any organization you own or belong to (or select Personal to move it back to your personal workspace) and save your changes. In the same Settings tab, you can also click Reset Data to clear all descriptions, external links, and widget toggles back to default without removing the listing, or click Delete to permanently purge the bot or server profile from Xernerx."
+			},
+			"card6": {
+				"title": "How do Public User Profiles (app.xernerx.com/users/[id]), Discord Collectibles, and Badges work?",
+				"description": "Every user has a customizable profile at app.xernerx.com/users/[id] (editable on account.xernerx.com/profile). Public profiles showcase your Discord avatar, animated Discord Avatar Decorations and Collectibles Nameplates (toggleable via showDiscordCollectibles in account.xernerx.com/preferences), Clan badge, short bio, full Markdown Info, pronouns, timezone with UTC offset, Global Level, Daily Streak, Published Bots, Official Servers, Organizations, and automatic ecosystem badges including Bot Developer, Bug Hunter, and Contributor."
+			}
+		},
+		"account": {
+			"navTitle": "Account, Privacy & Prefs",
+			"title": "Account, Devices, Customization & Privacy",
+			"card1": {
+				"title": "How do Discord OAuth2 sign-in and QR Code / 6-Character Device Pairing work?",
+				"description": "Xernerx Suite uses Discord OAuth2 as your primary identity across all *.xernerx.com subdomains (requesting profile, email, connections, guilds, and guilds.join scopes—clickable under About permissions on /login). When signing into the Xernerx Desktop App or a new browser, you can skip typing passwords or 2FA codes by scanning the login QR code with an already-authenticated phone or opening account.xernerx.com/devices (/?tab=devices) and entering the 6-character pairing code to approve the session instantly."
+			},
+			"card2": {
+				"title": "How do Personal and Bot API Bearer Tokens work?",
+				"description": "On account.xernerx.com/tokens (/?tab=tokens), you can generate Bearer tokens (prefixed with xrx_). Newly created tokens start in a pending state; when first used with a bot on POST /v1/bots/[id]/stats, the token automatically binds to that bot ID, transitions to active, and is restricted to GET requests and that bot's endpoints. Pass your token in the Authorization: Bearer <token> HTTP header when calling api.xernerx.com."
+			},
+			"card3": {
+				"title": "How do Public, Limited, and Private privacy levels and Terms/Cookie consent prompts work?",
+				"description": "Users, Bots, Servers, and Organizations support three privacy tiers: Public (visible in search, discovery, leaderboards, and embeds), Limited (hidden from public listings and leaderboards, but accessible to anyone with your direct link), and Private (visible only to you/owners, while external embeds and SVG badges return a privacy-safe Private placeholder). Whenever Xernerx updates its Terms of Service or Privacy Policy version timestamps, authenticated users are automatically prompted in-app to review and accept the revised policy, and you can manage Essential, Functional, Analytics, and Marketing cookie categories anytime via Cookie Preferences in the footer."
+			},
+			"card4": {
+				"title": "How do Daily Credits and activity streaks work?",
+				"description": "You can claim daily credits once every 24 hours from account.xernerx.com/billing or your sidebar user card. Consecutive daily claims within the 48-hour grace window build your streak multiplier, which can be displayed on your public profile badge (/v1/users/[id]/badge.svg?type=streak) and the community leaderboard."
+			},
+			"card5": {
+				"title": "How do I view and revoke active device sessions?",
+				"description": "Visit account.xernerx.com/devices (/?tab=devices) to view up to 10 active browser and Desktop App sessions with automatic OS (Windows, macOS, Linux, Android, iOS) and browser detection, truncated session identifiers, and last-active timestamps. You can revoke any individual device in one click or use Log Out All Other Devices to terminate every session except your current one."
+			},
+			"card6": {
+				"title": "Which secondary OAuth Connections are supported?",
+				"description": "On account.xernerx.com/connections (/?tab=connections), your Discord account is permanently linked as your Primary Identity. The Connections hub also includes secondary account integrations for GitHub, Twitch, YouTube, X (Twitter), Spotify, Steam, and Reddit (currently in preview while secondary OAuth linking workflows are being rolled out)."
+			},
+			"card7": {
+				"title": "How do Appearance themes, Discord accent sync, and custom UI scaling work?",
+				"description": "Open account.xernerx.com/appearance (/?tab=appearance) to switch between Dark, Light, and System themes, choose from 24 named preset accent colors such as Xerple, Crean, Cyber Neon, and Electric Blue (or toggle Sync Accent from Discord to automatically adopt your Discord profile banner/accent color), and customize UI Zoom (--ui-scale), Layout Spacing (Compact, Default, Spacious via --ui-gap), and Text Scale (--text-scale). Enable Sync Appearance Settings Across Clients to persist your visual setup to your account across every browser and the Desktop App."
+			},
+			"card8": {
+				"title": "How does the Granular Notification Matrix work across In-App, Discord, and Email?",
+				"description": "On account.xernerx.com/notifications (/?tab=notifications), you can search alerts or use Enable Category / Mute Category across 6 categories—API (rate limit warnings, token created/revoked, downtime), Billing (invoice paid, subscription expiring, payment failed), Apps (bot approved/rejected), Community (roadmap released, issue/suggestion status updates, application reviewed), General (birthday), and Virtue (level-up)—across In-App, Discord DM, and Email channels. Community email notifications are free for all users, while transactional API, Billing, and Apps email alerts unlock with an active subscription."
+			},
+			"card9": {
+				"title": "What Header and Workspace customization toggles are in Preferences (account.xernerx.com/preferences)?",
+				"description": "On account.xernerx.com/preferences (/?tab=preferences), you can declutter and tailor your workspace: (1) Header & Navigation Bar—individually show or hide the Store button, Command Palette button, Notifications bell, Desktop Download button, and App Drawer icon; and (2) Workspace, Profile & Motion—switch Global Sidebar Alignment between System, Left, or Right, and toggle Keyboard Shortcut Hints, Discord Collectibles (animated avatar decorations & nameplates), Daily Gift Badge indicator, Reduced Motion, Default Sidebar Collapsed, and Developer Mode."
+			},
+			"card10": {
+				"title": "How do I view my Account Activity Log, export my GDPR JSON data, or reset/delete my account?",
+				"description": "Open account.xernerx.com/activity (/?tab=activity) to search and filter your submitted Applications, Issues, and Suggestions alongside their live status badges and staff review notes, or click Export Data to download a complete JSON archive (xernerx-account-data-[id]-[date].json) of your profile and submissions. To clear your bio and preferences without closing your account, or to permanently purge your account across the ecosystem, visit account.xernerx.com (/?tab=account)."
+			}
+		},
+		"billing": {
+			"navTitle": "Store, Billing & CDN",
+			"title": "Store, Billing, Credits & CDN",
+			"card1": {
+				"title": "What plans and passes are available on the Xernerx Store?",
+				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories: (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and individual Zodiac, Virtue, To-Do, and Metamorphosis passes; (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects); and (3) Servers (?category=servers) for dedicated guild infrastructure."
+			},
+			"card2": {
+				"title": "How do I manage or cancel subscriptions, and how does the Supporters showcase work?",
+				"description": "Visit account.xernerx.com/billing (/?tab=billing) or store.xernerx.com. On the Billing tab you can filter subscriptions by All, Active, or History, check renewal dates (including a 7-day expiring-soon badge), and cancel any active Stripe subscription in one click (POST /secure/store/[userId]/cancel). Team members with Staff Subscriptions enabled automatically receive an active infinite pass across all services. All users with an active subscription or Staff Subscription are celebrated on the Community Supporters page at app.xernerx.com/supporters."
+			},
+			"card3": {
+				"title": "How do the Daily Credit Gift, 48-hour streak grace window, and voting rewards work?",
+				"description": "Every account starts with 1,000 Credits and can claim a Daily Gift once every 24 hours from account.xernerx.com/billing or the sidebar user card (POST /secure/store/[userId]/gift). Each claim awards a random base of 50–150 Credits plus a (streak × 10) streak bonus. Once your daily gift unlocks after 24 hours, you have a 48-hour grace window to claim it and increment your streak before it resets to 1. You also earn +100 Credits every time you vote for a bot or server (12h cooldown) and can track top balances and streaks on app.xernerx.com/leaderboard."
+			},
+			"card4": {
+				"title": "How does the Media CDN (cdn.xernerx.com) work and what are the storage quotas?",
+				"description": "Free accounts include 10 hosted files on cdn.xernerx.com, while active subscribers (such as Ultra Ecosystem or Staff Subscription holders) receive 1,000 hosted files. Upload media via drag-and-drop or clipboard paste (Ctrl + V) on cdn.xernerx.com or manage your files on account.xernerx.com/media (/?tab=media). Each file can be set to Public (accessible by anyone via /view/[id] or /raw/[id]), Limited (restricted to you and specific Discord User IDs you share it with), or Private (accessible only by you)."
+			},
+			"card5": {
+				"title": "How do I apply for open staff or developer positions at Xernerx Studios?",
+				"description": "Visit xernerx.com/applications (or vanity URLs xernerx.com/careers and xernerx.com/jobs) to browse open engineering, moderation, translator, and community roles, review requirements and benefits, and submit your application. You can track your application's review status and staff notes anytime on account.xernerx.com/activity and enable Application Reviewed alerts on account.xernerx.com/notifications."
+			}
+		},
+		"developers": {
+			"navTitle": "API, Widgets & Packages",
+			"title": "API, Widgets, NPM Packages & WebSocket",
+			"card1": {
+				"title": "Which API namespace should I use (/v1, /core, or /secure)?",
+				"description": "Use /v1/* (docs.xernerx.com/api/v1) for external developer integrations—including bot profiles, statistical snapshots (@xernerx/stats), bulk slash command syncing (PUT /v1/bots/[id]/commands), live SVG badges (/v1/[entity]/[id]/badge.svg), leaderboards (/v1/leaderboard), and changelog RSS (/v1/changelog/rss). Use /core/* and /info/* (docs.xernerx.com/api/core) for public embed widgets, Discord metadata lookups, and public roadmap/suggestions/issues queries. The /secure/* namespace (docs.xernerx.com/api/secure) is reserved for authenticated first-party suite applications and tokens explicitly granted the secure (or admin) permission flag by an administrator."
+			},
+			"card2": {
+				"title": "What are the API rate limits, CORS policies, and Interactive Playground features?",
+				"description": "Public requests to api.xernerx.com are rate-limited to 100 requests per minute per IP address (returning 429 Too Many Requests with Retry-After and X-RateLimit-* headers; first-party *.xernerx.com traffic is exempt, and extended limits are available via Developer Pro on store.xernerx.com/?category=developers). Public routes (/v1/*, /core/*, /api/version, /api/changelog) include permissive CORS headers. You can test live API requests with your Bearer token directly in your browser using the Interactive API Explorer on docs.xernerx.com/api/v1."
+			},
+			"card3": {
+				"title": "How do I embed live Bot, Server, Organization, or User widgets and SVG badges?",
+				"description": "Enable Public Embed Widget in your User, Bot, Server, or Organization Settings to unlock live cards at /core/[bots|guilds|organizations|users]/[id]—supporting JSON by default, interactive HTML iframes (?type=iframe&theme=dark|light), scalable SVGs (?type=svg), and high-DPI PNG cards (?type=png, served automatically to Discord/Twitter/Slack link unfurlers). You can also embed compact SVG shields via /v1/[entity]/[id]/badge.svg with ?theme=dark|light and ?style=rounded|pill|flat across bot metrics (votes, servers, users, status), server metrics (votes, members, messages, status), organization metrics (members, bots, servers, status), and user metrics (streak, bots, orgs, status)."
+			},
+			"card4": {
+				"title": "How do I connect a service to the real-time WebSocket Gateway?",
+				"description": "Install the @xernerx/websocket npm package (documented at docs.xernerx.com/packages and docs.xernerx.com/websocket) and connect to the WebSocket Gateway using an active token that has WebSocket Allowance (permissions.websocket: true) enabled. After sending the initial auth handshake payload, you can issue correlated JSON-RPC requests (GET, POST, PATCH, DELETE) to backend service modules such as virtue (guild leveling curves, text/voice XP, global levels) and xernerx (users, levels, credits, tokens, guilds, bots) using functionified SDK methods (get, create, update, delete)."
+			},
+			"card5": {
+				"title": "What features are exclusive to the Xernerx Desktop App?",
+				"description": "Download the native Electron client at xernerx.com/download (or xernerx.com/desktop) for Windows, macOS, and Linux. Desktop-exclusive features configurable in account.xernerx.com/preferences include: (1) Multi-Account Switcher with isolated Chromium session partitions; (2) Always-on-Top Live Overlay Monitor (app.xernerx.com/overlay); (3) Live Discord Rich Presence (RPC); and (4) Global summon shortcut (Ctrl + Shift + X), system tray mode, and customizable borderless window controls."
+			},
+			"card6": {
+				"title": "What global keyboard shortcuts are available across all Xernerx applications?",
+				"description": "Every Xernerx Suite application supports global keyboard shortcuts: Ctrl + K focuses the page search bar or opens the Command Palette (Ctrl + Shift + K always opens the Command Palette), Ctrl + Space (or Alt + A) opens the App Drawer, Ctrl + . toggles the cross-subdomain URL Omnibar, Ctrl + B toggles the Sidebar, Ctrl + I opens Notifications, Ctrl + , jumps to Account Settings, Ctrl + / opens the Keyboard Shortcuts & Changelog modal, Ctrl + S / Ctrl + Enter saves unsaved changes, Alt + 1..9 switches sidebar views, and Ctrl + Shift + C copies the current suite URL."
+			},
+			"card7": {
+				"title": "How do Token Lifecycle States (Pending, Active, Inactive, Suspended) and Elevated Permissions work?",
+				"description": "When you create a token on account.xernerx.com/tokens, it starts as Pending without a bound bot. The first time you send a stats payload to POST /v1/bots/[id]/stats using that token, Xernerx verifies the bot on Discord, binds the token to that botId, sets its status to Active, and scopes it to GET requests and that bot's /v1/bots/[id]/* endpoints. You can add co-owners by Discord User ID or regenerate/delete tokens anytime. For internal services or advanced partner integrations, staff administrators can grant elevated token flags including Secure Passage (permissions.secure for /secure/* endpoints), WebSocket Allowance (permissions.websocket), and Xernerx System status (isXernerx)."
+			},
+			"card8": {
+				"title": "How does the Open-Source NPM Package Documentation Reader (docs.xernerx.com/packages) work?",
+				"description": "Visit docs.xernerx.com/packages to browse official open-source Xernerx developer libraries and frameworks published on npm and GitHub (such as xernerx, @xernerx/framework, @xernerx/stats, and @xernerx/websocket). The documentation reader dynamically indexes every published semantic version and lets you switch versions via the Version Selector, inspect Classes, Interfaces, Functions, Constructors, Properties, and Methods, or use the global package search bar to jump to any symbol across all latest packages."
 			}
 		}
 	},
@@ -2388,7 +3356,10 @@
 				"copyCommand": "Copy /{name}",
 				"commandCopied": "Copied /{name} to clipboard",
 				"noCommandsMatch": "No commands match \"{query}\".",
-				"commandsCount": "{count} Commands"
+				"commandsCount": "{count} Commands",
+				"embedBadges": "Embed Badges",
+				"embedBadgesDesc": "Copy live SVG status shields for your GitHub README or website.",
+				"snippetCopied": "Copied {format} embed snippet!"
 			},
 			"avatarAlt": "Bot Avatar",
 			"nav": {
@@ -2396,7 +3367,8 @@
 				"backToExplore": "Back to Explore",
 				"categoryAlgorithms": "Algorithms",
 				"categoryCategories": "Categories",
-				"categoryNavigation": "Navigation"
+				"categoryNavigation": "Navigation",
+				"botProfile": "Bot Profile"
 			},
 			"reviews": {
 				"characters": "characters",
@@ -2498,6 +3470,8 @@
 			},
 			"botNotConnected": "Bot Not Connected",
 			"deleteConfirmDesc": "Are you sure you want to completely delete this guild from the database? This action cannot be undone.",
+			"deleteSuccess": "Server data deleted successfully",
+			"deleteFailed": "Failed to delete server data",
 			"links": {
 				"description": "Customize links to your external websites and Discord communities.",
 				"invitePlaceholder": "https://discord.gg/your-invite",
@@ -2880,7 +3854,9 @@
 					},
 					"reset": {
 						"title": "Reset Application Data",
-						"desc": "Are you sure you want to clear all profile descriptions, links, and widgets back to default?"
+						"desc": "Are you sure you want to clear all profile descriptions, links, and widgets back to default?",
+						"confirm": "Reset Data",
+						"cancel": "Cancel"
 					}
 				},
 				"toast": {
@@ -2893,7 +3869,11 @@
 					"header": "Webhooks",
 					"triggers": "Triggers",
 					"url": "Webhook URL",
-					"webhookNumber": "Webhook #{number}"
+					"webhookNumber": "Webhook #{number}",
+					"testButton": "Test Ping",
+					"urlRequired": "Please enter a webhook URL first.",
+					"testSuccess": "Webhook responded with {status} ({latency}ms)",
+					"testFailed": "Webhook test failed: {error}"
 				}
 			},
 			"info": {
@@ -2981,7 +3961,8 @@
 				"profile": "Profile",
 				"publishedBots": "Published Bots",
 				"organizations": "Organizations",
-				"management": "Management"
+				"management": "Management",
+				"officialServers": "Official Servers"
 			},
 			"profile": {
 				"noDetails": "This user has not added a detailed bio yet.",
@@ -2994,7 +3975,15 @@
 				"streak": "Daily Streak",
 				"days": "{count} days",
 				"totalServers": "Bot Servers",
-				"totalUsers": "Bot Users"
+				"totalUsers": "Bot Users",
+				"badges": {
+					"botDeveloper": "Bot Developer",
+					"bugHunter": "Bug Hunter",
+					"contributor": "Contributor"
+				},
+				"officialServers": "Official Servers",
+				"membersCount": "{count} members",
+				"votesCount": "{count} votes"
 			}
 		},
 		"servers": {
@@ -3006,7 +3995,8 @@
 				"allServers": "All Servers",
 				"backToExplore": "Back to Explore",
 				"backToServers": "Back to Servers",
-				"serverDetails": "Server Details"
+				"serverDetails": "Server Details",
+				"serverProfile": "Server Profile"
 			},
 			"noDetailedDesc": "This server has not provided a detailed description yet.",
 			"noServersDesc": "Try adjusting your search or check back later.",
@@ -3022,7 +4012,8 @@
 			"idCopied": "Server ID copied to clipboard",
 			"shareProfile": "Share",
 			"profileLinkCopied": "Server link copied to clipboard",
-			"manageServer": "Manage Server"
+			"manageServer": "Manage Server",
+			"publishedBy": "Organization"
 		},
 		"supporters": {
 			"itsYou": "It's You!",
@@ -3044,7 +4035,65 @@
 			"modalDescription": "Copy and paste any of the snippets below to embed this live widget.",
 			"modalTitle": "Embed Profile Widget",
 			"previewLabel": "Live Widget Preview",
-			"title": "Public Embed Widget"
+			"title": "Public Embed Widget",
+			"badgesTitle": "Live SVG Badges",
+			"badgesDescription": "Embed dynamic SVG status and metric shields in your README, documentation, or website.",
+			"badgesButton": "Embed Badges",
+			"badgesModalTitle": "Live SVG Badges",
+			"badgesModalDescription": "Copy a Markdown or HTML snippet to embed real-time metric badges.",
+			"previewTitle": "Widget Preview",
+			"badgeTypes": {
+				"streak": "Streak",
+				"orgs": "Organizations"
+			},
+			"customizer": {
+				"themeLabel": "Appearance Theme",
+				"themeDark": "Dark",
+				"themeLight": "Light",
+				"styleRounded": "Rounded",
+				"stylePill": "Pill",
+				"styleFlat": "Flat"
+			}
+		},
+		"leaderboard": {
+			"title": "Leaderboards",
+			"description": "The highest-voted bots, top communities, and longest daily streaks across the ecosystem.",
+			"backToExplore": "Back to Explore",
+			"privacyNotice": "Only public bots, servers, and user profiles are listed here.",
+			"empty": "No entries ranked in this category yet.",
+			"tabs": {
+				"bots": "Top Bots",
+				"servers": "Top Servers",
+				"streaks": "Daily Streaks"
+			},
+			"metrics": {
+				"votes": "Votes",
+				"users": "Users",
+				"members": "Members",
+				"streak": "Streak",
+				"credits": "Credits",
+				"totalImpact": "Total",
+				"bugs": "Bugs",
+				"suggestions": "Ideas"
+			},
+			"sortBy": "Sort by",
+			"searchPlaceholder": "Search leaderboard..."
+		},
+		"overlay": {
+			"title": "Xernerx Live Monitor",
+			"subtitle": "Always-on-Top Companion",
+			"pingLabel": "API Latency",
+			"statusOnline": "Operational",
+			"statusOffline": "Reconnecting",
+			"tabs": {
+				"feed": "Live Feed",
+				"servers": "Servers & Bots",
+				"quick": "Quick Actions"
+			},
+			"emptyFeed": "No recent events or notifications.",
+			"openInMain": "Open in Main Window",
+			"refreshNow": "Refresh",
+			"closeOverlay": "Close Overlay"
 		}
 	},
 	"cdn": {
@@ -3100,7 +4149,11 @@
 				"noDescription": "No description",
 				"backToPackages": "Back to Packages",
 				"navigation": "Navigation",
-				"selectVersion": "Select version..."
+				"selectVersion": "Select version...",
+				"all": "ALL",
+				"classBadge": "Class",
+				"interfaceBadge": "Interface",
+				"functionBadge": "Function"
 			},
 			"page": {
 				"title": "Xernerx Developer Software",
@@ -3109,10 +4162,20 @@
 					"title": "Available Packages",
 					"description": "Select a package below to view its comprehensive API documentation and types.",
 					"versionsAvailable": "{count} versions available",
+					"symbolsCount": "{count} symbols",
 					"latest": "Latest:",
 					"viewDocs": "View Docs",
 					"noPackages": "No packages found or GitHub API rate limited."
 				}
+			},
+			"catalog": {
+				"frameworkDesc": "A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, and multi-shard coordination.",
+				"statsDesc": "Lightweight daemon for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.",
+				"websocketDesc": "Universal client library for connecting, authenticating, and making RPC queries against the Xernerx WebSocket microservice router.",
+				"uiDesc": "Accessible, modern React primitive components engineered for the Xernerx Suite following Modern Round Glassmorphism Pop guidelines.",
+				"componentsDesc": "High-level application shell components including AppLayout, Header, Navigation Sidebar, Footer, and responsive wrappers.",
+				"libDesc": "Core shared utilities, MongoDB Mongoose schemas, NextAuth configuration, and localized JSON dictionaries.",
+				"stylesDesc": "Centrally configured Tailwind CSS v4 design tokens, CSS variables, Glassmorphism utilities, and font pairings."
 			},
 			"sidebar": {
 				"backToCategories": "Back to Categories",
@@ -3180,7 +4243,70 @@
 					"users": "Users",
 					"guilds": "Guilds",
 					"categoryNavigation": "Navigation",
-					"categoryRestApi": "REST API"
+					"categoryRestApi": "REST API",
+					"overviewAndAuth": "Overview & Auth",
+					"allEndpoints": "All Endpoints"
+				},
+				"endpointSingular": "Endpoint",
+				"endpointPlural": "Endpoints",
+				"hideDetails": "Hide Details",
+				"showDetails": "Code & Params",
+				"authBadgeSecure": "Admin / Secure",
+				"authBadgeToken": "Bearer Token",
+				"authBadgePublic": "Public",
+				"copyEndpointUrl": "Copy full endpoint URL",
+				"copied": "Copied",
+				"copyUrl": "Copy URL",
+				"tryInPlayground": "Load into API Playground",
+				"testRoute": "Test",
+				"activeNamespace": "Active",
+				"browseEndpoints": "Browse Endpoints",
+				"switchNamespace": "Switch Namespace",
+				"rateLimitSummary": "100 requests / minute / IP window for external clients • CORS enabled across *.xernerx.com",
+				"manageTokensLink": "Manage API Tokens",
+				"searchEndpointsPlaceholder": "Search endpoints by path (/v1/bots), method (POST), or keyword...",
+				"filteringEndpoints": "Filtered Endpoints",
+				"clearFilters": "Clear Filters",
+				"badgeRelease": "Release",
+				"badgeCanary": "Canary",
+				"badgeInternal": "Internal",
+				"badgeCanaryDev": "Canary / Dev",
+				"badgePort5000": "Port 5000",
+				"namespaces": {
+					"heading": "API Namespaces",
+					"subheading": "The Xernerx API Gateway is organized into three isolated namespaces based on access scope.",
+					"v1Title": "Public Bot & Telemetry API",
+					"v1Desc": "Bot profiles, server/shard telemetry (@xernerx/stats), bulk slash command sync, dynamic SVG shields, leaderboards, and changelog feeds.",
+					"coreTitle": "Core, Widgets & Info Hub API",
+					"coreDesc": "Interactive SVG/PNG/HTML profile widgets, localized 54-item FAQ & Discord embed catalog, Roadmap/Suggestions/Issues, and Discord guild proxies.",
+					"secureTitle": "Internal & Admin Operations",
+					"secureDesc": "Staff moderation, RBAC roles, store catalog & Stripe webhooks, Translation Studio sync, token validation, and system configuration."
+				},
+				"tokenFlow": {
+					"badge1": "1. Pending",
+					"step1Title": "Generate Token",
+					"step1Desc": "Create a token on account.xernerx.com/tokens with v1 permissions. New tokens start in Pending.",
+					"badge2": "2. Active",
+					"step2Title": "Auto-Link Bot",
+					"step2Desc": "Send your first POST /v1/bots/[id]/stats request (or use @xernerx/stats) to link your bot and create its Portal profile.",
+					"badge3": "3. Scoped",
+					"step3Title": "Scoped Access",
+					"step3Desc": "Once Active, the token is permanently scoped to GET requests and updates for that linked bot."
+				},
+				"groups": {
+					"v1Profiles": "Bot Profiles",
+					"v1Stats": "Telemetry & Stats",
+					"v1Commands": "Slash Commands",
+					"v1Badges": "SVG Badges & Shields",
+					"v1Platform": "Leaderboards & Feeds",
+					"coreEmbeds": "Profile Widgets",
+					"coreFaq": "FAQ & Bot Knowledge",
+					"coreInfo": "Roadmap & Feedback",
+					"coreDiscord": "Discord Identity Proxy",
+					"secureEntities": "Users, Bots & Guilds",
+					"secureCommerce": "Store, Billing & Tokens",
+					"secureModeration": "RBAC, Invites & Dispatch",
+					"secureSystem": "Translations & System"
 				}
 			},
 			"v1": {
@@ -3235,6 +4361,18 @@
 					"deleteBotCommands": {
 						"title": "Delete Bot Commands",
 						"description": "Wipe all synchronized commands for a Discord bot."
+					},
+					"fetchLeaderboard": {
+						"title": "Fetch Platform Leaderboard",
+						"description": "Retrieve top public Discord bots, servers, and user daily credit streaks ranked across the Xernerx ecosystem."
+					},
+					"fetchChangelogRss": {
+						"title": "Fetch Changelog RSS Feed",
+						"description": "Retrieve an RSS 2.0 XML feed of the latest release notes and version updates across all Xernerx Suite applications."
+					},
+					"fetchVersionChangelog": {
+						"title": "Fetch Service Version & Changelog",
+						"description": "Query live semantic version and Markdown release notes on any Xernerx Suite subdomain (/api/version and /api/changelog)."
 					}
 				},
 				"common": {
@@ -3276,6 +4414,26 @@
 				"fetchGuildEmbed": {
 					"title": "Fetch Public Server Widget",
 					"description": "Retrieve the public widget for a server by ID (requires widgets enabled in Server Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
+				},
+				"fetchUserEmbed": {
+					"title": "Fetch Public User Widget",
+					"description": "Retrieve the public widget for a user by ID (requires widgets enabled in Account Settings). Supports JSON by default, SVG card via ?type=svg, or HTML iframe via ?type=iframe."
+				},
+				"infoRoadmap": {
+					"title": "Public Roadmap & Milestones",
+					"description": "Retrieve public engineering roadmap items, filterable product categories, and submit community milestone interactions."
+				},
+				"infoSuggestions": {
+					"title": "Community Suggestions",
+					"description": "Fetch community feature requests, submit new suggestions, and cast upvotes or downvotes."
+				},
+				"infoIssues": {
+					"title": "Public Issue Tracker & Metrics",
+					"description": "Query public bug reports, submit new issue tickets, and retrieve resolution time metrics."
+				},
+				"infoFaq": {
+					"title": "Platform FAQ & Bot Knowledge Base",
+					"description": "Fetch the localized 9-category, 54-card Xernerx Suite FAQ catalog, search answers, or retrieve pre-formatted Discord embed payloads with vanity quick links for Discord bots."
 				}
 			},
 			"secure": {
@@ -3310,7 +4468,40 @@
 				"systemSettings": {
 					"title": "System Settings",
 					"description": "Manage global system configurations and core settings."
+				},
+				"manageBots": {
+					"title": "Manage Bots, Webhooks & Reviews",
+					"description": "Register and configure Discord bots, manage vote webhooks, trigger test payloads, and moderate community bot reviews."
+				},
+				"manageGuilds": {
+					"title": "Manage Guilds, Virtue & Discord Sync",
+					"description": "Manage registered Discord servers, Virtue module configurations, server voting, and live Discord role/channel synchronization."
+				},
+				"manageOrganizations": {
+					"title": "Manage Organizations & Members",
+					"description": "Create and update developer organizations, configure team roles, and manage organization member rosters."
+				},
+				"manageStore": {
+					"title": "Store Catalog, Checkout & Subscriptions",
+					"description": "Manage storefront categories and items, create Stripe Checkout sessions, process gifts, and handle subscription cancellations and webhooks."
+				},
+				"manageDispatch": {
+					"title": "Dispatch Notifications, Email & Downloads",
+					"description": "Send and manage in-app notifications, transactional Postmark emails, Discord webhook dispatches, and desktop client release metadata."
+				},
+				"manageFeedbackAdmin": {
+					"title": "Moderate Issues, Roadmap & Suggestions",
+					"description": "Administrative endpoints for triaging bug reports, publishing roadmap milestones, and moderating community suggestions."
 				}
+			},
+			"playground": {
+				"title": "Interactive API Explorer",
+				"description": "Test live requests against the Xernerx API gateway directly from your browser and inspect real-time JSON responses.",
+				"presets": "Quick Presets",
+				"send": "Send Request",
+				"sending": "Sending...",
+				"bearerToken": "Bearer Token (Optional)",
+				"jsonBody": "JSON Request Body"
 			}
 		},
 		"cdn": {
@@ -3346,6 +4537,8 @@
 			"upload": {
 				"title": "Upload Media",
 				"description": "Upload a new file to the private Vercel Blob store and create a MongoDB metadata record.",
+				"summaryNew": "Upload new media blob (multipart/form-data)",
+				"summaryScoped": "Upload or replace scoped media blob by ID",
 				"contentType": "Content-Type",
 				"formFields": "Form Fields",
 				"fields": {
@@ -3370,6 +4563,8 @@
 			"list": {
 				"title": "List Media",
 				"description": "Retrieve a list of media records that the authenticated user owns or has shared access to.",
+				"summaryOwned": "List owned and shared media records",
+				"summaryAdmin": "List all platform media records (requires manageMedia)",
 				"queryParams": "Query Parameters",
 				"params": {
 					"adminDesc1": "If set to ",
@@ -3380,6 +4575,8 @@
 			"manage": {
 				"title": "Manage Media",
 				"description": "Update metadata properties of an existing media record or permanently delete it.",
+				"summaryPatch": "Update media privacy tier or shared User ID allowlist",
+				"summaryDelete": "Permanently delete media blob & MongoDB metadata record",
 				"jsonBodyParams": "JSON Body Parameters",
 				"fields": {
 					"privacyDesc1": "Either ",
@@ -3394,6 +4591,8 @@
 			"proxy": {
 				"title": "Secure Media Proxy",
 				"description": "Since underlying Vercel Blobs are securely restricted, media must be streamed via the secure proxy endpoint which verifies access permissions dynamically.",
+				"summaryRaw": "Stream raw binary file with dynamic privacy & session verification",
+				"summaryView": "Open interactive web media viewer with download & link actions",
 				"details1": "Provides a direct byte-stream of the requested file with appropriate ",
 				"details2": " headers. If the media is private, the proxy verifies that the requester's session ID matches the ",
 				"details3": ", exists in the ",
@@ -3417,10 +4616,11 @@
 				"title": "WebSocket Gateway",
 				"description": "High-performance RPC-over-WebSocket daemon mediating real-time database operations and cross-service coordination for Xernerx bots and applications.",
 				"alertTitle": "WebSocket Allowance Required",
-				"alertDescription": "All WebSocket connections start in an unauthenticated state and must immediately authenticate with a valid token. In addition, the token needs websocket allowance. Tokens without this allowance will be rejected with a <code class=\"bg-orange-500/20 px-1.5 py-0.5 rounded text-xs font-mono\">Forbidden: Token needs websocket allowance</code> error."
+				"alertDescription": "All WebSocket connections start in an unauthenticated state and must immediately authenticate with a valid token. In addition, the token needs websocket allowance. Tokens without this allowance will be rejected with a <code class=\"bg-(--accent-orange)/20 text-(--accent-orange) px-1.5 py-0.5 rounded-lg text-xs font-mono\">Forbidden: Token needs websocket allowance</code> error."
 			},
 			"overview": {
 				"title": "Overview & Architecture",
+				"subtitle": "Correlated Request-Response RPC over persistent WebSocket",
 				"description1": "The Xernerx <strong>WebSocket Gateway</strong> operates as a private, authenticated RPC microservice daemon. Rather than exposing direct database ports or requiring external bot runtimes and dashboard instances to maintain direct MongoDB connection pools, client processes establish a persistent socket connection to execute structured queries and mutations.",
 				"description2": "The gateway uses a <strong>correlated Request-Response RPC pattern</strong> over JSON payloads. Every client message provides an arbitrary request identifier (<code>id</code>), which the gateway mirrors in its response payload to allow multiplexed asynchronous communication over a single connection.",
 				"cards": {
@@ -3486,8 +4686,10 @@
 			"services": {
 				"title": "Available Services & Actions",
 				"description": "Services represent backend domains dynamically loaded from the server's app directory.",
+				"searchPlaceholder": "Search RPC services, database models, or actions (guilds, text, voice, users, levels)...",
 				"activeBadge": "Active",
 				"stubBadge": "Stub",
+				"actionsCount": "{count} actions",
 				"table": {
 					"action": "Action",
 					"database": "Database",
@@ -3534,7 +4736,10 @@
 	"components": {
 		"applayout": {},
 		"cards": {
-			"botcard": {},
+			"botcard": {
+				"unknownBot": "Unknown Bot",
+				"noDescription": "No description provided."
+			},
 			"botrow": {
 				"text1": "Servers",
 				"text2": "Users"
@@ -3555,7 +4760,10 @@
 				"inviteApproved": "Invite approved!",
 				"inviteDenied": "Invite declined!",
 				"failedDelete": "Failed to delete notification",
-				"notificationDeleted": "Notification deleted"
+				"notificationDeleted": "Notification deleted",
+				"filterAll": "All",
+				"filterUnread": "Unread",
+				"noUnread": "You're all caught up!"
 			},
 			"sidebarsuite": {
 				"text1": "Suite"
@@ -3580,7 +4788,10 @@
 				"unnamedRole": "Unnamed Role",
 				"userIdCopied": "User ID copied to clipboard",
 				"giftReadyTooltip": "Daily reward ready to claim!",
-				"viewPublicProfile": "View Public Profile"
+				"viewPublicProfile": "View Public Profile",
+				"switchAccount": "Switch Account",
+				"addAccount": "Add Account Slot",
+				"launchOverlay": "Live Overlay Monitor"
 			}
 		},
 		"cookieprompt": {},
@@ -3600,11 +4811,27 @@
 		},
 		"page": {},
 		"sidebar": {
+			"title": "Navigation",
 			"alt1": "User Avatar",
 			"alt2": "Avatar Decoration",
 			"alt": "User Avatar"
 		},
-		"themescript": {}
+		"themescript": {},
+		"termsPrompt": {
+			"title": "Terms & Privacy Agreement",
+			"description": "We've updated our Terms of Service and Privacy Policy. To continue using Xernerx Studios services, you must review and agree to these documents.",
+			"termsLink": "Terms of Service",
+			"privacyLink": "Privacy Policy",
+			"warning": "If you do not agree, you will be signed out and unable to access authenticated services.",
+			"decline": "Decline & Sign Out",
+			"saving": "Saving...",
+			"agree": "I Agree"
+		},
+		"versionTracker": {
+			"title": "App Updated!",
+			"description": "Xernerx {app} has been updated to v{version}. Want to see what's new?",
+			"viewChangelog": "View Changelog"
+		}
 	},
 	"lib": {
 		"navigation": {
@@ -3636,7 +4863,16 @@
 			"details": "Error Details:",
 			"unknown": "Unknown Error",
 			"digest": "Digest: ",
-			"retry": "Try again"
+			"retry": "Try again",
+			"copyError": "Copy Full Error",
+			"copied": "Copied to Clipboard",
+			"databaseErrorTitle": "Database Error"
+		},
+		"notPermitted": {
+			"title": "Access Denied",
+			"descriptionView": "You do not have the required permissions to access the {view} view.",
+			"descriptionDefault": "You do not have the required permissions to view this content.",
+			"backButton": "Go Back"
 		}
 	},
 	"info": {
@@ -3671,6 +4907,10 @@
 				"changelog": {
 					"title": "Changelog",
 					"description": "See the latest updates, version history, and release notes across the Xernerx ecosystem."
+				},
+				"status": {
+					"title": "System Status",
+					"description": "Live uptime, response latency, and operational health across all Xernerx services."
 				}
 			}
 		},
@@ -3706,6 +4946,13 @@
 				"recentlyResolved": "Recently Resolved",
 				"noResolvedIssues": "No recently resolved issues.",
 				"fixedOn": "Fixed {date}"
+			},
+			"actions": {
+				"notifyMe": "Notify Me",
+				"watching": "Watching",
+				"loginRequired": "Sign in to upvote or watch roadmap milestones",
+				"watchAdded": "You will be notified when this milestone is released!",
+				"watchRemoved": "Release notifications disabled for this milestone."
 			}
 		},
 		"suggestions": {
@@ -3802,6 +5049,58 @@
 				"verified": "This issue has been acknowledged by the developers and should see a fix at some point.",
 				"submitted": "This issue has been submitted by the community and has not yet been acknowledged.",
 				"resolved": "This issue has been resolved."
+			}
+		},
+		"status": {
+			"subtitle": "Live ecosystem telemetry & health matrix",
+			"refresh": "Refresh Status",
+			"badgeButton": "Status Badge",
+			"badgeModalTitle": "Embed Live Status Badge",
+			"badgeModalDesc": "Embed a real-time ecosystem health badge in your README, documentation, or website.",
+			"servicesHeading": "Ecosystem Services",
+			"searchPlaceholder": "Filter services...",
+			"activeIncidentsHeading": "Active Tracked Issues",
+			"viewAllIssues": "View Issue Tracker →",
+			"noActiveIncidents": "No active verified incidents reported. All systems are running smoothly.",
+			"banner": {
+				"checking": "Checking Ecosystem Status...",
+				"allOperational": "All Systems Operational",
+				"partialOutage": "{count} / {total} Services Operational"
+			},
+			"states": {
+				"operational": "Operational",
+				"degraded": "Degraded",
+				"down": "Outage",
+				"checking": "Checking"
+			},
+			"services": {
+				"www": "Main Website",
+				"app": "User Dashboard",
+				"account": "Identity & Account Hub",
+				"api": "Core API Gateway",
+				"cdn": "Media CDN",
+				"docs": "Developer Documentation",
+				"info": "Support & Info Hub",
+				"store": "Store & Billing",
+				"admin": "Staff Portal"
+			},
+			"botsHeading": "Official Bots",
+			"botsOnlineCount": "{online}/{total} Online",
+			"botStates": {
+				"online": "Online",
+				"idle": "Idle",
+				"dnd": "Degraded",
+				"offline": "Offline"
+			},
+			"botServers": "servers",
+			"botShards": "shards",
+			"officialBot": "Official Bot",
+			"monitoredByXernerx": "Monitored by Xernerx",
+			"history": {
+				"ago24h": "24h ago",
+				"now": "Now",
+				"uptime": "{percent}% uptime",
+				"noData": "No record"
 			}
 		}
 	}

@@ -15,7 +15,7 @@ export default function Page() {
 	useEffect(() => {
 		hide();
 	}, [hide]);
-	const sections: Section[] = [
+	const rawSections: Section[] = [
 		{
 			id: 'introduction',
 			title: t('www.terms.sections.introduction.title'),
@@ -64,6 +64,25 @@ export default function Page() {
 			content: <p>{t('www.terms.sections.accounts.content')}</p>,
 		},
 		{
+			id: 'store-and-billing',
+			title: t('www.terms.sections.storeAndBilling.title'),
+			content: (
+				<div className="space-y-4">
+					<p>{t('www.terms.sections.storeAndBilling.content')}</p>
+					<ul className="list-disc pl-6 space-y-2">
+						<li>{t('www.terms.sections.storeAndBilling.items.0')}</li>
+						<li>{t('www.terms.sections.storeAndBilling.items.1')}</li>
+						<li>{t('www.terms.sections.storeAndBilling.items.2')}</li>
+					</ul>
+				</div>
+			),
+		},
+		{
+			id: 'desktop-client',
+			title: t('www.terms.sections.desktopClient.title'),
+			content: <p>{t('www.terms.sections.desktopClient.content')}</p>,
+		},
+		{
 			id: 'data',
 			title: t('www.terms.sections.data.title'),
 			content: (
@@ -71,6 +90,10 @@ export default function Page() {
 					{t('www.terms.sections.data.contentPrefix')}
 					<a href="/privacy" target="_blank" rel="noreferrer" className="text-(--accent) hover:underline font-medium">
 						{t('www.terms.sections.data.contentLink')}
+					</a>
+					{t('www.terms.sections.data.contentMiddle')}
+					<a href="/cookies" target="_blank" rel="noreferrer" className="text-(--accent) hover:underline font-medium">
+						{t('www.terms.sections.data.cookiesLink')}
 					</a>
 					{t('www.terms.sections.data.contentSuffix')}
 				</p>
@@ -126,6 +149,10 @@ export default function Page() {
 			),
 		},
 	];
+	const sections: Section[] = rawSections.map((section, idx) => ({
+		...section,
+		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
+	}));
 	const { scrollYProgress } = useScroll();
 	const scaleX = useSpring(scrollYProgress, {
 		stiffness: 100,
@@ -163,7 +190,7 @@ export default function Page() {
 			<div className="min-h-screen px-6 py-32">
 				<div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					<aside className="hidden lg:block sticky top-32 self-start">
-						<h3 className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.terms.toc')}</h3>
+						<p className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.terms.toc')}</p>
 						<nav className="space-y-4 text-sm">
 							{sections.map((section) => (
 								<a
@@ -177,7 +204,7 @@ export default function Page() {
 						</nav>
 					</aside>
 
-					<main className="space-y-16">
+					<div className="space-y-16">
 						<header className="text-center mb-16 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm">
 							<h1
 								className="text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm"
@@ -207,7 +234,7 @@ export default function Page() {
 								</section>
 							))}
 						</div>
-					</main>
+					</div>
 				</div>
 			</div>
 		</div>

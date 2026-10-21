@@ -1,8 +1,9 @@
-import { database } from '@xernerx/lib/core';
 /** @format */
 
+import { database } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { ActivityType, EmbedBuilder, PresenceData } from 'discord.js';
+import { getApiBaseUrl } from '../lib/api.js';
 
 export default class ClientReadyEvent extends EventBuilder {
 	constructor() {
@@ -15,11 +16,116 @@ export default class ClientReadyEvent extends EventBuilder {
 
 	override async run() {
 		this.updatePresence();
+		this.updateBotStatuses();
+		this.uploadCommands();
 
 		if (process.env.ENVIRONMENT?.toUpperCase() !== 'PRODUCTION') return;
 
 		this.updateStats();
 		this.updateGuilds();
+	}
+
+	async updateBotStatuses() {
+		try {
+			const db = await database('xernerx');
+			const SettingModel = (db.models.core as any).Setting;
+			const BotModel = (db.models.bots as any).Bot;
+
+			const [mainOrgSetting, adminServerSetting] = await Promise.all([SettingModel.findOne({ id: 'main_org_id' }).lean(), SettingModel.findOne({ id: 'admin_server_id' }).lean()]);
+
+			const mainOrgId = mainOrgSetting?.value ? String(mainOrgSetting.value) : null;
+			const adminServerId = adminServerSetting?.value ? String(adminServerSetting.value) : null;
+
+			if (!mainOrgId || !BotModel) return;
+
+			const orgBots = await BotModel.find({ organization: mainOrgId }).lean();
+			if (!orgBots.length) return;
+
+			const botIds = orgBots.map((b: any) => String(b.id)).filter(Boolean);
+
+			// Prioritize fetching presences from the main admin server, then any other cached guild
+			const orderedGuilds = [
+				...(adminServerId && this.client.guilds.cache.has(adminServerId) ? [this.client.guilds.cache.get(adminServerId)!] : []),
+				...Array.from(this.client.guilds.cache.values()).filter((g) => g.id !== adminServerId),
+			];
+
+			for (const guild of orderedGuilds.slice(0, 5)) {
+				await guild.members.fetch({ user: botIds, withPresences: true }).catch(() => null);
+			}
+
+			const bucketMs = 30 * 60 * 1000;
+			const currentBucket = String(Math.floor(Date.now() / bucketMs) * bucketMs);
+			const cutoffTs = Number(currentBucket) - 48 * bucketMs;
+
+			const historyDoc = await SettingModel.findOne({ id: 'system_status_history_24h' }).lean();
+			let storedHistory: { services: Record<string, any>; bots: Record<string, any> } = { services: {}, bots: {} };
+			if (historyDoc?.value) {
+				try {
+					const parsed = JSON.parse(historyDoc.value);
+					if (parsed && typeof parsed === 'object') {
+						storedHistory = {
+							services: parsed.services || {},
+							bots: parsed.bots || {},
+						};
+					}
+				} catch {}
+			}
+
+			for (const botDoc of orgBots) {
+				const botId = String(botDoc.id);
+				let status: 'online' | 'idle' | 'dnd' | 'offline' = 'offline';
+				let activity = '';
+
+				if (botId === this.client.user?.id) {
+					const rawSelfStatus = this.client.user?.presence?.status;
+					status = rawSelfStatus === 'idle' || rawSelfStatus === 'dnd' ? rawSelfStatus : 'online';
+					activity = this.client.user?.presence?.activities?.[0]?.state || this.client.user?.presence?.activities?.[0]?.name || '';
+				} else {
+					for (const guild of orderedGuilds) {
+						const presence = guild.presences?.cache?.get(botId) || guild.members.cache.get(botId)?.presence;
+						if (presence && presence.status && presence.status !== 'offline' && presence.status !== 'invisible') {
+							status = presence.status === 'idle' || presence.status === 'dnd' ? presence.status : 'online';
+							activity = presence.activities?.[0]?.state || presence.activities?.[0]?.name || '';
+							break;
+						}
+					}
+				}
+
+				storedHistory.bots[botId] = storedHistory.bots[botId] || {};
+				storedHistory.bots[botId][currentBucket] = { status, ping: null };
+				for (const tsKey of Object.keys(storedHistory.bots[botId])) {
+					if (Number(tsKey) < cutoffTs) delete storedHistory.bots[botId][tsKey];
+				}
+
+				await BotModel.findOneAndUpdate(
+					{ id: botId },
+					{
+						$set: {
+							status,
+							statusUpdatedAt: new Date(),
+							activity,
+						},
+					}
+				);
+			}
+
+			await SettingModel.findOneAndUpdate(
+				{ id: 'system_status_history_24h' },
+				{
+					$set: {
+						id: 'system_status_history_24h',
+						value: JSON.stringify(storedHistory),
+						valueType: 'json',
+						description: 'Rolling 24-hour status & latency history for suite services and main org bots',
+					},
+				},
+				{ upsert: true }
+			);
+		} catch (error) {
+			console.error('Failed to sync main org bot statuses:', error);
+		}
+
+		setTimeout(() => this.updateBotStatuses(), 60_000);
 	}
 
 	async updateGuilds() {
@@ -95,7 +201,10 @@ export default class ClientReadyEvent extends EventBuilder {
 						inline: true,
 					},
 				])
-				.setFooter({ text: `Running again in ${Math.round(cooldown / 1000 / 60)}m` })
+				.setFooter({
+					text: `${this.client.user?.username || 'Xernerx Bot'} • Running again in ${Math.round(cooldown / 1000 / 60)}m`,
+					iconURL: this.client.user?.displayAvatarURL(),
+				})
 				.setTimestamp(new Date().setHours(24, 0, 0, 0));
 
 			if (channel && channel.isTextBased && channel.isTextBased()) {
@@ -185,5 +294,59 @@ export default class ClientReadyEvent extends EventBuilder {
 		this.client.user?.setPresence(presence);
 
 		setTimeout(() => this.updatePresence(), 60000);
+	}
+
+	async uploadCommands() {
+		const token = process.env.XERNERX_TOKEN;
+		const botId = this.client.user?.id;
+		if (!botId) return;
+
+		const commands = Array.from(this.client.commands.slash.values()).map((cmd) => cmd.data.toJSON());
+		if (!commands.length) return;
+
+		if (token) {
+			try {
+				const apiUrl = `${getApiBaseUrl()}/v1/bots/${botId}/commands`;
+				const res = await fetch(apiUrl, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify(commands),
+				});
+
+				if (res.ok) {
+					console.log(`[Commands] Synced ${commands.length} slash commands to Xernerx API (${apiUrl})`);
+					return;
+				}
+				console.warn(`[Commands] API returned ${res.status} when syncing commands to ${apiUrl}`);
+			} catch (err: any) {
+				console.error('[Commands] Failed to sync commands via API:', err?.message || err);
+			}
+		}
+
+		// Fallback: If XERNERX_TOKEN is not configured or API is unreachable, sync directly to DB if connected
+		try {
+			const db = await database('xernerx');
+			const CommandModel = (db.models.bots as any)?.Command;
+			if (CommandModel) {
+				await CommandModel.deleteMany({ botId });
+				const insertPayload = commands.map((cmd: any) => ({
+					botId,
+					commandId: cmd.id || cmd.name,
+					name: cmd.name,
+					description: cmd.description,
+					type: cmd.type || 1,
+					body: cmd,
+				}));
+				if (insertPayload.length > 0) {
+					await CommandModel.insertMany(insertPayload);
+					console.log(`[Commands] Synced ${insertPayload.length} slash commands directly to database.`);
+				}
+			}
+		} catch (dbErr: any) {
+			console.error('[Commands] Direct database sync fallback failed:', dbErr?.message || dbErr);
+		}
 	}
 }

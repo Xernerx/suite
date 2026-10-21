@@ -7,8 +7,15 @@ import { getServerSession } from 'next-auth';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Portal',
-	description: 'Manage your Xernerx developer organizations and applications.',
+	title: 'Developer Portal & Organizations',
+	description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, configure webhooks, and monitor application telemetry.',
+	robots: {
+		index: false,
+		follow: false,
+	},
+	alternates: {
+		canonical: '/portal',
+	},
 };
 
 import { redirect } from 'next/navigation';

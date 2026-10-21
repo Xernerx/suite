@@ -5,6 +5,7 @@ import { Schema } from 'mongoose';
 const schema = new Schema(
 	{
 		id: { type: String, required: true },
+		authorId: { type: String, default: null }, // Optional Discord/Xernerx user ID of reporter
 		title: { type: String, required: true },
 		description: { type: String, required: true },
 		productId: { type: String, required: true }, // Open string for autocomplete

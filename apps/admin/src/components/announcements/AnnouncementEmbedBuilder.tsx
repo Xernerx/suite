@@ -2,8 +2,9 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Plus, Trash } from 'lucide-react';
-import { Button } from '@xernerx/ui';
+import { Button, Input } from '@xernerx/ui';
 import { useDictionary, useUser } from '@xernerx/providers';
 import type { EmbedData } from './types';
 
@@ -70,7 +71,7 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 				<div key={eIdx} className="relative flex group max-w-xl">
 					{/* The left color pillar */}
 					<div
-						className="w-1.5 rounded-l-md relative shrink-0 cursor-pointer transition-transform hover:scale-x-150 origin-left"
+						className="w-1.5 rounded-l-xl relative shrink-0 cursor-pointer transition-transform hover:scale-x-150 origin-left"
 						style={{ backgroundColor: typeof emb.color === 'string' ? emb.color : '#202225' }}
 					>
 						<input
@@ -83,31 +84,32 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 					</div>
 
 					{/* The embed body */}
-					<div className="bg-(--background) border border-(--border)/10 rounded-r-md p-4 flex flex-col gap-1 flex-1 relative min-w-0">
-						<button type="button" onClick={() => removeEmbed(eIdx)} className="absolute top-2 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+					<div className="bg-(--background) border border-(--border)/10 rounded-r-xl p-4 flex flex-col gap-1 flex-1 relative min-w-0">
+						<button type="button" onClick={() => removeEmbed(eIdx)} className="absolute top-2 right-2 text-(--accent-red) opacity-0 group-hover:opacity-100 transition-opacity">
 							<Trash size={14} />
 						</button>
 
 						{/* Author */}
 						<div className="flex items-center gap-2 text-xs font-semibold mb-1">
-							<input
+							<Input
 								placeholder={t('admin.dashboard.announcements.authorName')}
 								value={emb.author?.name || ''}
 								onChange={(e) => updateEmbed(eIdx, 'author', { ...emb.author, name: e.target.value })}
-								className="bg-transparent outline-none w-full placeholder:text-(--text-muted) text-(--text) font-bold"
+								className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none w-full placeholder:text-(--text-muted) text-(--text) font-bold"
 							/>
 						</div>
-						<input
+						<Input
 							placeholder={t('admin.dashboard.announcements.embedTitle')}
 							value={emb.title || ''}
 							onChange={(e) => updateEmbed(eIdx, 'title', e.target.value)}
-							className="text-base font-bold text-blue-400 bg-transparent outline-none w-full mb-1 placeholder:text-(--text-muted)"
+							className="text-base font-bold text-(--accent) !bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none w-full mb-1 placeholder:text-(--text-muted)"
 						/>
-						<textarea
+						<Input
+							variant="textarea"
 							placeholder={t('admin.dashboard.announcements.embedDesc')}
 							value={emb.description || ''}
 							onChange={(e) => updateEmbed(eIdx, 'description', e.target.value)}
-							className="bg-transparent outline-none w-full text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[40px]"
+							className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none w-full text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[40px]"
 						/>
 
 						{/* Fields */}
@@ -115,28 +117,29 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 							<div className="flex flex-wrap gap-x-4 gap-y-2 mt-2">
 								{emb.fields.map((f, fIdx) => (
 									<div key={fIdx} className={`flex flex-col relative group/field ${f.inline ? 'w-[30%]' : 'w-full'}`}>
-										<input
+										<Input
 											placeholder={t('admin.dashboard.announcements.fieldName')}
 											value={f.name}
 											onChange={(e) => updateField(eIdx, fIdx, 'name', e.target.value)}
-											className="bg-transparent outline-none font-semibold text-sm text-(--text) placeholder:text-(--text-muted)"
+											className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none font-semibold text-sm text-(--text) placeholder:text-(--text-muted)"
 										/>
-										<textarea
+										<Input
+											variant="textarea"
 											placeholder={t('admin.dashboard.announcements.fieldValue')}
 											value={f.value}
 											onChange={(e) => updateField(eIdx, fIdx, 'value', e.target.value)}
-											className="bg-transparent outline-none text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[30px]"
+											className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[30px]"
 										/>
 
-										<div className="absolute -top-6 -right-2 opacity-0 group-hover/field:opacity-100 flex gap-2 bg-(--foreground) border border-(--border)/10 rounded p-1.5 shadow-lg z-10">
+										<div className="absolute -top-6 -right-2 opacity-0 group-hover/field:opacity-100 flex gap-2 bg-(--foreground) border border-(--border)/10 rounded-xl p-1.5 shadow-lg z-10">
 											<button
 												type="button"
 												onClick={() => updateField(eIdx, fIdx, 'inline', !f.inline)}
-												className={`text-[10px] font-bold ${f.inline ? 'text-green-400' : 'text-(--text-muted)'}`}
+												className={`text-[10px] font-bold ${f.inline ? 'text-(--accent-green)' : 'text-(--text-muted)'}`}
 											>
 												{t('admin.dashboard.announcements.inline')}
 											</button>
-											<button type="button" onClick={() => removeField(eIdx, fIdx)} className="text-red-400 text-[10px]">
+											<button type="button" onClick={() => removeField(eIdx, fIdx)} className="text-(--accent-red) text-[10px]">
 												<Trash size={12} />
 											</button>
 										</div>
@@ -144,19 +147,28 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 								))}
 							</div>
 						)}
-						<button type="button" onClick={() => addField(eIdx)} className="text-xs font-medium text-blue-400 hover:text-blue-300 text-left w-fit mt-1">
+						<button type="button" onClick={() => addField(eIdx)} className="text-xs font-medium text-(--accent) hover:text-(--accent) text-left w-fit mt-1">
 							{t('admin.dashboard.announcements.addField')}
 						</button>
 
 						{/* Footer */}
 						<div className="mt-3 pt-2 flex items-center gap-2 text-xs">
-							{emb.footer?.icon_url && <img src={emb.footer.icon_url} alt={t('admin.dashboard.announcements.footerIconAlt')} className="w-5 h-5 rounded-full object-cover" />}
+							{emb.footer?.icon_url && (
+								<Image
+									src={emb.footer.icon_url}
+									alt={t('admin.dashboard.announcements.footerIconAlt')}
+									width={20}
+									height={20}
+									unoptimized
+									className="w-5 h-5 rounded-full object-cover"
+								/>
+							)}
 							<div className="flex flex-1 items-center gap-1.5 min-w-0 justify-start">
-								<input
+								<Input
 									placeholder={t('admin.dashboard.announcements.footerText')}
 									value={emb.footer?.text || ''}
 									onChange={(e) => updateEmbed(eIdx, 'footer', { ...emb.footer, text: e.target.value })}
-									className="bg-transparent outline-none text-(--text-muted) placeholder:text-(--text-muted)/50 text-[11px]"
+									className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none text-(--text-muted) placeholder:text-(--text-muted)/50 text-[11px]"
 									size={Math.max(14, emb.footer?.text?.length || 0)}
 								/>
 								{emb.timestamp && (

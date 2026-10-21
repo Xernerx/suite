@@ -2,6 +2,7 @@
 'use client';
 
 import { ArrowUpRight, Link as LinkIcon, Loader2, Copy, Check } from 'lucide-react';
+import Image from 'next/image';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
@@ -109,9 +110,12 @@ export default function InvitesPage() {
 								</div>
 
 								{invite.botAvatar ? (
-									<img
+									<Image
 										src={invite.botAvatar}
 										alt={invite.botName}
+										width={56}
+										height={56}
+										unoptimized
 										className="w-14 h-14 rounded-2xl mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-md"
 									/>
 								) : (
@@ -120,7 +124,7 @@ export default function InvitesPage() {
 									</div>
 								)}
 
-								<h3 className="font-bold text-2xl text-(--text) mb-2">{invite.botName}</h3>
+								<h2 className="font-bold text-2xl text-(--text) mb-2">{invite.botName}</h2>
 								<div className="text-sm text-(--text-muted) flex items-center justify-between gap-2 mt-auto pt-2">
 									<span className="font-mono bg-(--foreground)/50 px-2.5 py-1 rounded-lg text-xs border border-(--border)/10">/invites/{invite.id}</span>
 									<button
@@ -129,7 +133,7 @@ export default function InvitesPage() {
 										title={t('www.invites.copyInviteUrl')}
 										className="p-2 rounded-xl bg-(--background)/60 hover:bg-(--accent) hover:text-white text-(--text-muted) border border-(--border)/10 transition-colors cursor-pointer"
 									>
-										{copiedId === invite.id ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+										{copiedId === invite.id ? <Check size={14} className="text-(--accent-green)" /> : <Copy size={14} />}
 									</button>
 								</div>
 							</a>

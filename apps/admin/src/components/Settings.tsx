@@ -1,16 +1,17 @@
 /** @format */
 'use client';
 
-import { Save, Server, Loader2, RefreshCw, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useEnvironment, useToast, useSession } from '@xernerx/providers';
+import { Save, Server, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEnvironment, useToast, useSession, useDictionary } from '@xernerx/providers';
 import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
-import { useDictionary } from '@xernerx/providers';
+import { SisterServersSection } from './settings/SisterServersSection';
+
 export default function Settings() {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
-	const { toast } = useToast();
+	const { toast, remind } = useToast();
 	const { data: session } = useSession();
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
@@ -18,10 +19,12 @@ export default function Settings() {
 	const [mainOrgId, setMainOrgId] = useState('');
 	const [organizations, setOrganizations] = useState<{ _id: string; name: string }[]>([]);
 	const [appWebhookUrl, setAppWebhookUrl] = useState('');
+	const [auditWebhookUrl, setAuditWebhookUrl] = useState('');
 	const [joinRoles, setJoinRoles] = useState<string[]>([]);
 	const [botJoinRoles, setBotJoinRoles] = useState<string[]>([]);
 	const [sisterServers, setSisterServers] = useState<{ id: string }[]>([]);
 	const [roadmapProducts, setRoadmapProducts] = useState<string[]>(['Dashboard', 'API', 'CDN', 'Bots']);
+	const [initialSnapshot, setInitialSnapshot] = useState<string>('');
 	const [availableRoles, setAvailableRoles] = useState<
 		{
 			id: string;
@@ -56,7 +59,7 @@ export default function Settings() {
 	const fetchSettings = async () => {
 		setIsLoading(true);
 		try {
-			const [adminRes, mainOrgRes, orgsRes, webhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
+			const [adminRes, mainOrgRes, orgsRes, webhookRes, auditWebhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
 					credentials: 'include',
 				}),
@@ -67,6 +70,9 @@ export default function Settings() {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_audit_webhook_url'), {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/join_roles'), {
@@ -85,13 +91,24 @@ export default function Settings() {
 					credentials: 'include',
 				}),
 			]);
+			let loadedAdminServerId = '';
+			let loadedMainOrgId = '';
+			let loadedAppWebhook = '';
+			let loadedAuditWebhook = '';
+			let loadedJoinRoles: string[] = [];
+			let loadedBotJoinRoles: string[] = [];
+			let loadedRoadmapProducts: string[] = ['Dashboard', 'API', 'CDN', 'Bots'];
+			let loadedSisterServers: { id: string }[] = [];
+
 			if (adminRes.ok) {
 				const data = await adminRes.json();
-				setAdminServerId(data.value || '');
+				loadedAdminServerId = data.value || '';
+				setAdminServerId(loadedAdminServerId);
 			}
 			if (mainOrgRes.ok) {
 				const data = await mainOrgRes.json();
-				setMainOrgId(data.value || '');
+				loadedMainOrgId = data.value || '';
+				setMainOrgId(loadedMainOrgId);
 			}
 			if (orgsRes.ok) {
 				const orgsData = await orgsRes.json();
@@ -99,48 +116,70 @@ export default function Settings() {
 			}
 			if (webhookRes.ok) {
 				const data = await webhookRes.json();
-				setAppWebhookUrl(data.value || '');
+				loadedAppWebhook = data.value || '';
+				setAppWebhookUrl(loadedAppWebhook);
+			}
+			if (auditWebhookRes.ok) {
+				const data = await auditWebhookRes.json();
+				loadedAuditWebhook = data.value || '';
+				setAuditWebhookUrl(loadedAuditWebhook);
 			}
 			if (joinRes.ok) {
 				const data = await joinRes.json();
 				try {
 					const parsed = JSON.parse(data.value || '[]');
-					setJoinRoles(Array.isArray(parsed) ? parsed : []);
+					loadedJoinRoles = Array.isArray(parsed) ? parsed : [];
 				} catch {
-					setJoinRoles([]);
+					loadedJoinRoles = [];
 				}
+				setJoinRoles(loadedJoinRoles);
 			}
 			if (roadmapRes.ok) {
 				const data = await roadmapRes.json();
 				try {
 					const parsed = JSON.parse(data.value || '[]');
-					setRoadmapProducts(Array.isArray(parsed) && parsed.length ? parsed : ['Dashboard', 'API', 'CDN', 'Bots']);
+					loadedRoadmapProducts = Array.isArray(parsed) && parsed.length ? parsed : ['Dashboard', 'API', 'CDN', 'Bots'];
 				} catch {
-					setRoadmapProducts(['Dashboard', 'API', 'CDN', 'Bots']);
+					loadedRoadmapProducts = ['Dashboard', 'API', 'CDN', 'Bots'];
 				}
+				setRoadmapProducts(loadedRoadmapProducts);
 			}
 			if (botJoinRes.ok) {
 				const data = await botJoinRes.json();
 				try {
 					const parsed = JSON.parse(data.value || '[]');
-					setBotJoinRoles(Array.isArray(parsed) ? parsed : []);
+					loadedBotJoinRoles = Array.isArray(parsed) ? parsed : [];
 				} catch {
-					setBotJoinRoles([]);
+					loadedBotJoinRoles = [];
 				}
+				setBotJoinRoles(loadedBotJoinRoles);
 			}
 			if (sisterRes.ok) {
 				const data = await sisterRes.json();
 				try {
 					const parsed = JSON.parse(data.value || '[]');
-					setSisterServers(Array.isArray(parsed) ? parsed : []);
+					loadedSisterServers = Array.isArray(parsed) ? parsed : [];
 				} catch {
-					setSisterServers([]);
+					loadedSisterServers = [];
 				}
+				setSisterServers(loadedSisterServers);
 			}
 			if (rolesRes.ok) {
 				const rolesData = await rolesRes.json();
 				setAvailableRoles(Array.isArray(rolesData) ? rolesData : []);
 			}
+			setInitialSnapshot(
+				JSON.stringify({
+					adminServerId: loadedAdminServerId,
+					mainOrgId: loadedMainOrgId,
+					appWebhookUrl: loadedAppWebhook,
+					auditWebhookUrl: loadedAuditWebhook,
+					joinRoles: loadedJoinRoles,
+					botJoinRoles: loadedBotJoinRoles,
+					roadmapProducts: loadedRoadmapProducts,
+					sisterServers: loadedSisterServers,
+				})
+			);
 		} catch (err: any) {
 			console.error('Failed to fetch settings:', err);
 		} finally {
@@ -150,102 +189,119 @@ export default function Settings() {
 	useEffect(() => {
 		fetchSettings();
 	}, []);
-	const handleSave = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setIsSaving(true);
+
+	const currentSnapshot = useMemo(
+		() =>
+			JSON.stringify({
+				adminServerId,
+				mainOrgId,
+				appWebhookUrl,
+				auditWebhookUrl,
+				joinRoles,
+				botJoinRoles,
+				roadmapProducts,
+				sisterServers,
+			}),
+		[adminServerId, mainOrgId, appWebhookUrl, auditWebhookUrl, joinRoles, botJoinRoles, roadmapProducts, sisterServers]
+	);
+
+	const isDirty = Boolean(initialSnapshot) && currentSnapshot !== initialSnapshot;
+
+	const handleSave = useCallback(
+		async (e?: React.FormEvent) => {
+			if (e) e.preventDefault();
+			setIsSaving(true);
+			try {
+				await Promise.all([
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: adminServerId, valueType: 'string' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/main_org_id'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: mainOrgId, valueType: 'string' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: appWebhookUrl, valueType: 'string' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_audit_webhook_url'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: auditWebhookUrl, valueType: 'string' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/join_roles'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: JSON.stringify(joinRoles), valueType: 'json' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/bot_join_roles'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: JSON.stringify(botJoinRoles), valueType: 'json' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: JSON.stringify(roadmapProducts.filter(Boolean)), valueType: 'json' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: JSON.stringify(sisterServers), valueType: 'json' }),
+					}),
+				]);
+				setInitialSnapshot(currentSnapshot);
+				toast({
+					title: t('admin.settings.toasts.saveSuccess'),
+					type: 'success',
+				});
+			} catch (err: any) {
+				toast({
+					title: err.message,
+					type: 'error',
+				});
+			} finally {
+				setIsSaving(false);
+			}
+		},
+		[adminServerId, mainOrgId, appWebhookUrl, auditWebhookUrl, joinRoles, botJoinRoles, roadmapProducts, sisterServers, currentSnapshot, getEnvUrl, toast, t]
+	);
+
+	const handleReset = useCallback(() => {
+		if (!initialSnapshot) return;
 		try {
-			await Promise.all([
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: adminServerId,
-						valueType: 'string',
-					}),
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/main_org_id'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: mainOrgId,
-						valueType: 'string',
-					}),
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: appWebhookUrl,
-						valueType: 'string',
-					}),
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/join_roles'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: JSON.stringify(joinRoles),
-						valueType: 'json',
-					}),
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/bot_join_roles'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: JSON.stringify(botJoinRoles),
-						valueType: 'json',
-					}),
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: JSON.stringify(roadmapProducts.filter(Boolean)),
-						valueType: 'json',
-					}),
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), {
-					method: 'PATCH',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					credentials: 'include',
-					body: JSON.stringify({
-						value: JSON.stringify(sisterServers),
-						valueType: 'json',
-					}),
-				}),
-			]);
-			toast({
-				title: t('admin.settings.toasts.saveSuccess'),
-				type: 'success',
-			});
-		} catch (err: any) {
-			toast({
-				title: err.message,
-				type: 'error',
-			});
-		} finally {
-			setIsSaving(false);
+			const parsed = JSON.parse(initialSnapshot);
+			setAdminServerId(parsed.adminServerId || '');
+			setMainOrgId(parsed.mainOrgId || '');
+			setAppWebhookUrl(parsed.appWebhookUrl || '');
+			setAuditWebhookUrl(parsed.auditWebhookUrl || '');
+			setJoinRoles(parsed.joinRoles || []);
+			setBotJoinRoles(parsed.botJoinRoles || []);
+			setRoadmapProducts(parsed.roadmapProducts || ['Dashboard', 'API', 'CDN', 'Bots']);
+			setSisterServers(parsed.sisterServers || []);
+		} catch {}
+	}, [initialSnapshot]);
+
+	useEffect(() => {
+		if (isDirty) {
+			remind(true, () => handleSave(), handleReset, isSaving);
+		} else {
+			remind(false);
 		}
-	};
+		return () => remind(false);
+	}, [isDirty, isSaving, remind, handleSave, handleReset]);
 	if (isLoading) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
@@ -357,6 +413,17 @@ export default function Settings() {
 						gap: 'calc(var(--ui-gap) * 0.5)',
 					}}
 				>
+					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.auditWebhookUrl')}</label>
+					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.auditWebhookUrlDesc')}</p>
+					<Input value={auditWebhookUrl} onChange={(e) => setAuditWebhookUrl(e.target.value)} placeholder={t('admin.settings.auditWebhookUrlPlaceholder')} />
+				</div>
+
+				<div
+					className="flex flex-col max-w-md"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
 					<label className="text-xs font-semibold text-(--text)">{t('admin.dashboard.settings.joinRolesHumans')}</label>
 					<p className="text-xs text-(--text-muted) mb-1">{t('admin.dashboard.settings.joinRolesHumansDesc')}</p>
 					<MultiSelector
@@ -389,82 +456,10 @@ export default function Settings() {
 					/>
 				</div>
 
-				<div
-					className="flex flex-col max-w-md"
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<div className="flex justify-between items-center">
-						<div>
-							<label className="text-xs font-semibold text-(--text)">{t('admin.dashboard.settings.sisterServers')}</label>
-							<p className="text-xs text-(--text-muted) mb-1">{t('admin.dashboard.settings.sisterServersDesc')}</p>
-						</div>
-						<Button type="button" variant="ghost" size="sm" onClick={() => setSisterServers([...sisterServers, { id: '' }])}>
-							{' '}
-							{t('admin.dashboard.settings.add')}{' '}
-						</Button>
-					</div>
-					{sisterServers.map((server, idx) => (
-						<div key={idx} className="flex gap-2">
-							<div className="flex-1">
-								<Selector
-									value={server.id}
-									onChange={(val: string) => {
-										const newServers = [...sisterServers];
-										newServers[idx].id = val;
-										setSisterServers(newServers);
-									}}
-									options={[{ value: '', label: t('admin.dashboard.settings.selectServer') }, ...userGuilds.map((g) => ({ value: g.id, label: g.name }))]}
-									placeholder={t('admin.dashboard.settings.selectDiscordGuild')}
-								/>
-							</div>
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								disabled={!server.id}
-								onClick={async () => {
-									toast({ title: t('admin.settings.toasts.syncInitiated'), type: 'info' });
-									try {
-										const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers/sync'), {
-											method: 'POST',
-											headers: { 'Content-Type': 'application/json' },
-											credentials: 'include',
-											body: JSON.stringify({ guildId: server.id }),
-										});
-										if (res.ok) {
-											toast({ title: t('admin.settings.toasts.syncStarted', { id: server.id }), type: 'success' });
-										} else {
-											toast({ title: t('admin.settings.toasts.syncFailed'), type: 'error' });
-										}
-									} catch (err) {
-										console.error(err);
-									}
-								}}
-							>
-								<RefreshCw size={16} />
-							</Button>
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								className="text-(--error)"
-								onClick={() => {
-									const newServers = [...sisterServers];
-									newServers.splice(idx, 1);
-									setSisterServers(newServers);
-									toast({ title: t('admin.settings.toasts.sisterServerRemoved'), type: 'info' });
-								}}
-							>
-								<Trash2 size={16} />
-							</Button>
-						</div>
-					))}
-				</div>
+				<SisterServersSection sisterServers={sisterServers} setSisterServers={setSisterServers} userGuilds={userGuilds} />
 
 				<div className="flex justify-end pt-4 border-t border-(--border)/10 mt-4">
-					<Button type="submit" variant="primary" disabled={isSaving}>
+					<Button type="submit" variant="primary" disabled={isSaving || !isDirty}>
 						{isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
 						{t('admin.settings.saveButton')}
 					</Button>

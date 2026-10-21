@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** @format */
 import { spawnSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';

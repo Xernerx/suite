@@ -2,6 +2,7 @@
 'use client';
 
 import { User } from 'lucide-react';
+import Image from 'next/image';
 import { Button, Modal } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
@@ -23,7 +24,7 @@ export default function InviteMemberModal({ open, onOpenChange, inviteUserObj, c
 					<div className="flex flex-col gap-2 p-4 bg-(--background)/50 rounded-2xl border border-(--border)/10">
 						<div className="flex items-center gap-4">
 							{inviteUserObj.avatarUrl ? (
-								<img src={inviteUserObj.avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full shadow-sm" />
+								<Image src={inviteUserObj.avatarUrl} alt="Avatar" width={48} height={48} unoptimized className="w-12 h-12 rounded-full shadow-sm" />
 							) : (
 								<div className="w-12 h-12 bg-(--border)/10 rounded-full flex items-center justify-center">
 									<User className="text-(--text-muted) w-6 h-6" />

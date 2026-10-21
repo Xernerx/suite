@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -34,6 +35,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			return NextResponse.json({ error: 'Role not found' }, { status: 404 });
 		}
 
+		await recordAuditLog(req, {
+			action: 'role.updated',
+			targetType: 'role',
+			targetId: id,
+			summary: `Updated role "${updatedRole.name || id}"`,
+			metadata: { name: updatedRole.name, discordRole: updatedRole.role },
+		});
+
 		return NextResponse.json(updatedRole, { status: 200 });
 	} catch (error) {
 		console.error('Failed to update role:', error);
@@ -52,6 +61,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		if (!deletedRole) {
 			return NextResponse.json({ error: 'Role not found' }, { status: 404 });
 		}
+
+		await recordAuditLog(req, {
+			action: 'role.deleted',
+			targetType: 'role',
+			targetId: id,
+			summary: `Deleted role "${deletedRole.name || id}"`,
+		});
 
 		return NextResponse.json({ success: true, deleted: deletedRole }, { status: 200 });
 	} catch (error) {
