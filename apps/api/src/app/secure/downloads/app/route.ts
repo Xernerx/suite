@@ -9,12 +9,13 @@ export async function GET(request: Request) {
 
 		// Use the canary tag release if requested, otherwise default to latest stable
 		const githubUrl = channel === 'canary' ? 'https://api.github.com/repos/Xernerx/suite/releases/tags/canary' : 'https://api.github.com/repos/Xernerx/suite/releases/latest';
+		const githubToken = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN;
 
 		// Fetch the release from the GitHub repository
 		const response = await fetch(githubUrl, {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
-				...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
+				...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
 			},
 			next: { revalidate: 60 }, // Cache release data
 		});
@@ -31,12 +32,12 @@ export async function GET(request: Request) {
 		let macos: Record<string, string> | null = null;
 		let linux: Record<string, string> | null = null;
 
-		// Loop through the assets to match platforms, ignoring blockmaps
+		// Loop through the assets to match platforms, ignoring blockmaps and metadata yml files
 		for (const asset of assets) {
 			const name = asset.name.toLowerCase();
 			const browser_download_url = asset.browser_download_url;
 
-			if (name.includes('blockmap')) continue;
+			if (name.includes('blockmap') || name.endsWith('.yml')) continue;
 
 			// Match Windows (e.g., .exe, .msi)
 			if (name.endsWith('.exe') || name.endsWith('.msi') || name.includes('win')) {
