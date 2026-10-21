@@ -59,7 +59,27 @@ export async function GET(req: Request) {
 		} else {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
 		}
-		const userMedia = await MediaModel.find(query).sort({ createdAt: -1 }).lean();
+		const [userMedia, activeSubscriptions, creditDoc] = await Promise.all([
+			MediaModel.find(query).sort({ createdAt: -1 }).lean(),
+			models.users.Subscription
+				? models.users.Subscription.find({
+						ownerId: userId,
+						status: { $in: ['active', 'trialing'] },
+						$or: [{ currentPeriodEnd: { $exists: false } }, { currentPeriodEnd: { $gt: new Date() } }],
+					})
+						.lean()
+						.catch(() => [])
+				: Promise.resolve([]),
+			(models.users as any).Credit
+				? (models.users as any).Credit.findOne({ ownerId: userId })
+						.lean()
+						.catch(() => null)
+				: Promise.resolve(null),
+		]);
+
+		const extraCdnSlots = Math.max(0, Number((creditDoc as any)?.extraCdnSlots) || 0);
+		const maxUploads = (activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
+		const selfUploadCount = userMedia.filter((m: any) => m.uploaderId === userId).length;
 
 		const domain = process.env.DOMAIN || 'xernerx.com';
 		const isDev = process.env.ENVIRONMENT === 'DEVELOPMENT';
@@ -70,7 +90,17 @@ export async function GET(req: Request) {
 			url: `${baseUrl}/view/${m._id}`,
 		}));
 
-		return NextResponse.json({ media: mappedMedia }, { headers: corsHeaders });
+		return NextResponse.json(
+			{
+				media: mappedMedia,
+				quota: {
+					used: selfUploadCount,
+					max: maxUploads,
+					extraSlots: extraCdnSlots,
+				},
+			},
+			{ headers: corsHeaders }
+		);
 	} catch (error: any) {
 		console.error('Failed to fetch media:', error);
 		return NextResponse.json({ error: 'Failed to fetch media' }, { status: 500, headers: corsHeaders });

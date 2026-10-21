@@ -37,8 +37,11 @@ export async function POST(req: Request) {
 		const { models } = await database('xernerx');
 		const Item = models.store.Item as any;
 
-		if (!body.name?.trim() || !body.skuId?.trim() || !body.categoryId?.trim()) {
-			return NextResponse.json({ error: 'Name, SKU ID (Stripe Product ID), and Category are required' }, { status: 400 });
+		const itemType = ['subscription', 'credit_pack', 'credit_perk'].includes(body.itemType) ? body.itemType : 'subscription';
+		const requiresSku = itemType !== 'credit_perk';
+
+		if (!body.name?.trim() || (requiresSku && !body.skuId?.trim()) || !body.categoryId?.trim()) {
+			return NextResponse.json({ error: 'Name, Category, and SKU ID (for Stripe products) are required' }, { status: 400 });
 		}
 
 		const id =
@@ -69,7 +72,13 @@ export async function POST(req: Request) {
 			name: body.name.trim(),
 			description: body.description?.trim() || '',
 			categoryId: body.categoryId.trim(),
-			skuId: body.skuId.trim(),
+			skuId: body.skuId?.trim() || '',
+			itemType,
+			creditCost: Math.max(0, Number(body.creditCost) || 0),
+			creditAmount: Math.max(0, Number(body.creditAmount) || 0),
+			perkType: ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge'].includes(body.perkType) ? body.perkType : 'none',
+			perkValue: body.perkValue ?? null,
+			durationDays: Math.max(0, Number(body.durationDays) || 0),
 			features,
 			badge: body.badge?.trim() || null,
 			discountPercent: Math.max(0, Math.min(100, Number(body.discountPercent) || 0)),

@@ -21,17 +21,18 @@ export async function POST(req: Request) {
 		}
 
 		const body = await req.json();
-		const { priceId, successUrl, cancelUrl, discountPercent } = body;
+		const { priceId, successUrl, cancelUrl, discountPercent, itemType, itemId, creditAmount } = body;
 
 		if (!priceId) {
 			return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
 		}
 
 		const origin = req.headers.get('origin') || 'https://store.xernerx.com';
+		const isCreditPack = itemType === 'credit_pack';
 
 		// 3. Create the Stripe Checkout Session
 		const sessionParams: Stripe.Checkout.SessionCreateParams = {
-			mode: 'subscription',
+			mode: isCreditPack ? 'payment' : 'subscription',
 			line_items: [
 				{
 					price: priceId,
@@ -41,9 +42,12 @@ export async function POST(req: Request) {
 			client_reference_id: userId,
 			metadata: {
 				userId: userId,
+				itemType: isCreditPack ? 'credit_pack' : 'subscription',
+				itemId: itemId ? String(itemId) : '',
+				creditAmount: creditAmount ? String(creditAmount) : '0',
 			},
-			success_url: successUrl || `${origin}/?success=true`,
-			cancel_url: cancelUrl || `${origin}/?canceled=true`,
+			success_url: successUrl || `${origin}/${isCreditPack ? '?category=credits&success=true' : '?success=true'}`,
+			cancel_url: cancelUrl || `${origin}/${isCreditPack ? '?category=credits&canceled=true' : '?canceled=true'}`,
 			allow_promotion_codes: true,
 		};
 

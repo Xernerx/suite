@@ -302,7 +302,7 @@ export default function SidebarUserCard({
 				</div>
 
 				{/* Discord Badges / Clan Tag & Streak Badge Row */}
-				{(activeUser?.clan?.tag || clanBadgeUrl || currentStreak > 0) && (
+				{(activeUser?.clan?.tag || clanBadgeUrl || currentStreak > 0 || (Array.isArray(activeUser?.credits?.activeBadges) && activeUser.credits.activeBadges.length > 0)) && (
 					<div className="flex flex-wrap items-center gap-1.5">
 						{activeUser?.clan?.tag && (
 							<div className="bg-(--foreground)/30 backdrop-blur-md text-(--text) text-[10px] font-extrabold px-2 py-1 rounded-lg flex items-center gap-1.5 border border-(--border)/5">
@@ -320,6 +320,13 @@ export default function SidebarUserCard({
 								<span>{currentStreak}</span>
 							</div>
 						)}
+						{Array.isArray(activeUser?.credits?.activeBadges) &&
+							activeUser.credits.activeBadges.map((badgeId: string) => (
+								<div key={badgeId} className="flex items-center gap-1 text-(--accent) text-[10px] font-extrabold bg-(--accent)/15 px-2 py-1 rounded-lg border border-(--accent)/30">
+									<Sparkles size={11} />
+									<span>{t(`account.profile.showcases.badges.${badgeId}`)}</span>
+								</div>
+							))}
 					</div>
 				)}
 
@@ -352,14 +359,18 @@ export default function SidebarUserCard({
 					</div>
 				</div>
 
-				{/* Credits Balance Display */}
-				<div className="flex items-center justify-between bg-(--foreground)/30 backdrop-blur-md px-3 py-2 rounded-xl border border-(--border)/5">
+				{/* Credits Balance Display (Clickable link to Credit Store) */}
+				<Link
+					href={getEnvUrl('https://store.xernerx.com/?category=credits')}
+					onClick={onClose}
+					className="flex items-center justify-between bg-(--foreground)/30 hover:bg-(--accent)/10 backdrop-blur-md px-3 py-2 rounded-xl border border-(--border)/5 hover:border-(--accent)/30 transition-all"
+				>
 					<span className="text-xs text-(--text-muted) font-medium">{t('components.cards.sidebaruser.text1')}</span>
 					<div className="flex items-center gap-1.5 text-(--accent-green) text-xs font-extrabold">
 						<Coins size={14} />
 						<span>{activeUser?.credits?.balance?.toLocaleString() ?? 0}</span>
 					</div>
-				</div>
+				</Link>
 
 				{/* Daily Present Action Widget */}
 				<div className="w-full">

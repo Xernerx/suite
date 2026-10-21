@@ -1,7 +1,9 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
+import { applySubscriptionCreditMultiplier } from '@/lib/creditMultiplier';
 
 export async function POST(req: Request, context: { params: Promise<{ id: string }> | { id: string } }) {
 	try {
@@ -47,7 +49,11 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 
 		// Random base reward (e.g., between 50 and 150 credits) + bonus scaling with the streak
 		const randomBase = Math.floor(Math.random() * 101) + 50;
-		const rewardCredits = randomBase + newStreak * 10;
+		const baseRewardCredits = randomBase + newStreak * 10;
+
+		// Check user subscriptions right before adding credits (125% for any sub, 200% for Ultra)
+		const multiplierResult = await applySubscriptionCreditMultiplier(userId, baseRewardCredits);
+		const rewardCredits = multiplierResult.finalCredits;
 
 		// Next gift available 24 hours from now
 		const nextGiftIn = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -60,6 +66,16 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 					streak: newStreak,
 					giftIn: nextGiftIn,
 				},
+				$push: {
+					transactions: {
+						id: crypto.randomUUID(),
+						type: 'earn',
+						amount: rewardCredits,
+						itemId: 'daily_gift',
+						itemName: multiplierResult.multiplierPercent > 100 ? `Daily Gift (${multiplierResult.multiplierPercent}% Subscriber Bonus)` : 'Daily Gift',
+						createdAt: now,
+					},
+				},
 			},
 			{ returnDocument: 'after' }
 		);
@@ -68,6 +84,10 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
 			success: true,
 			reward: rewardCredits,
 			rewardEarned: rewardCredits,
+			baseReward: baseRewardCredits,
+			multiplier: multiplierResult.multiplier,
+			multiplierPercent: multiplierResult.multiplierPercent,
+			tier: multiplierResult.tier,
 			streak: newStreak,
 			credits: updatedCredit,
 		});

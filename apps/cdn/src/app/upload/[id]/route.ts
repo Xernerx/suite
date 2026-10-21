@@ -72,22 +72,32 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 
 		// 1.5. Storage Limits Check
 		const SubscriptionModel = models.users.Subscription;
-		const activeSubscriptions = await SubscriptionModel.find({
-			ownerId: targetUserId,
-			status: { $in: ['active', 'trialing'] },
-		}).lean();
+		const CreditModel = (models.users as any).Credit;
+		const [activeSubscriptions, creditDoc] = await Promise.all([
+			SubscriptionModel.find({
+				ownerId: targetUserId,
+				status: { $in: ['active', 'trialing'] },
+				$or: [{ currentPeriodEnd: { $exists: false } }, { currentPeriodEnd: { $gt: new Date() } }],
+			}).lean(),
+			CreditModel
+				? CreditModel.findOne({ ownerId: targetUserId })
+						.lean()
+						.catch(() => null)
+				: Promise.resolve(null),
+		]);
 
 		const MediaModel = models.core.Media;
 		const currentUploadCount = await MediaModel.countDocuments({ uploaderId: targetUserId });
 
-		// If they have any active subscription (like the Ultra plan), they get 1000. Otherwise 10.
-		const maxUploads = activeSubscriptions.length > 0 ? 1000 : 10;
+		// Base 10 free slots (or 1000 with active subscription) + permanent extraCdnSlots bought in the Credit Store
+		const extraCdnSlots = Math.max(0, Number((creditDoc as any)?.extraCdnSlots) || 0);
+		const maxUploads = (activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
 
 		// Admins (canManage) bypass the quota limits entirely
 		if (currentUploadCount >= maxUploads && !canManage) {
 			return NextResponse.json(
 				{
-					error: `Storage limit reached. You have used ${currentUploadCount}/${maxUploads} uploads. Upgrade to Ultra to increase your limit!`,
+					error: `Storage limit reached (${currentUploadCount}/${maxUploads} slots). Redeem extra CDN slots in the Credit Store or upgrade to Ultra!`,
 				},
 				{ status: 403, headers: corsHeaders }
 			);

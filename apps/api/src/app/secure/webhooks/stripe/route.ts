@@ -37,13 +37,36 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ error: 'Database model initialization failed' }, { status: 500 });
 		}
 
-		// 2. Handle New Subscriptions
+		// 2. Handle Completed Checkouts (Subscriptions & Credit Packs)
 		if (event.type === 'checkout.session.completed') {
 			const session = event.data.object as Stripe.Checkout.Session;
 
 			const userId = session.client_reference_id || session.metadata?.userId;
 			const subscriptionId = session.subscription as string;
 			const customerId = session.customer as string;
+
+			if (userId && session.mode === 'payment' && session.metadata?.itemType === 'credit_pack') {
+				const creditAmount = Math.max(0, Number(session.metadata?.creditAmount) || 0);
+				if (creditAmount > 0 && (models.users as any).Credit) {
+					await (models.users as any).Credit.findOneAndUpdate(
+						{ ownerId: userId },
+						{
+							$inc: { balance: creditAmount },
+							$push: {
+								transactions: {
+									id: session.id,
+									type: 'topup',
+									amount: creditAmount,
+									itemId: session.metadata?.itemId || 'credit_pack',
+									itemName: `${creditAmount.toLocaleString()} Credits Top-Up`,
+									createdAt: new Date(),
+								},
+							},
+						},
+						{ upsert: true, runValidators: true }
+					);
+				}
+			}
 
 			if (userId && subscriptionId) {
 				const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as Stripe.Subscription;
@@ -67,6 +90,22 @@ export async function POST(req: NextRequest) {
 					},
 					{ runValidators: true }
 				);
+
+				if ((models.users as any).Subscription) {
+					await (models.users as any).Subscription.findOneAndUpdate(
+						{ ownerId: userId, stripeSubscriptionId: subscriptionId },
+						{
+							$set: {
+								ownerId: userId,
+								stripeSubscriptionId: subscriptionId,
+								priceId,
+								status,
+								currentPeriodEnd,
+							},
+						},
+						{ upsert: true, runValidators: true }
+					);
+				}
 			}
 		}
 

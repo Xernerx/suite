@@ -7,6 +7,7 @@ import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@x
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { timezones } from '@xernerx/lib';
+import { ProfileShowcases } from './ProfileShowcases';
 export default function Profile() {
 	const { t } = useDictionary();
 	const { data: session } = useSession();
@@ -366,6 +367,9 @@ export default function Profile() {
 						</div>
 					</div>
 				</div>
+
+				{/* Profile Showcase Slots & Vanity Badges */}
+				{userId && <ProfileShowcases user={user} userId={userId} mutate={mutate} />}
 			</div>
 		</div>
 	);

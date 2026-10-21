@@ -24,6 +24,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const [media, setMedia] = useState<any[]>([]);
+	const [quota, setQuota] = useState<{ used: number; max: number; extraSlots: number } | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [uploading, setUploading] = useState(false);
 	const [editMedia, setEditMedia] = useState<any | null>(null);
@@ -92,6 +93,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 			if (res.ok) {
 				const data = await res.json();
 				setMedia(data.media || []);
+				if (data.quota) setQuota(data.quota);
 			}
 		} catch (err) {
 			console.error(err);
@@ -277,7 +279,18 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 					</h1>
 					<p className="text-(--text-muted) text-sm mt-1">{scope === 'admin' ? t('admin.dashboard.media.subtitle') : t('account.media.description')}</p>
 				</div>
-				<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center gap-3">
+					{scope === 'self' && quota && (
+						<a
+							href={getEnvUrl('https://store.xernerx.com/?category=credits')}
+							className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-(--foreground)/35 hover:bg-(--accent)/15 border border-(--border)/15 hover:border-(--accent)/35 text-xs font-bold text-(--text) transition-all"
+						>
+							<span className="font-mono text-(--accent)">
+								{quota.used} / {quota.max}
+							</span>
+							<span className="text-(--text-muted)">{t('account.media.slotsUsed')}</span>
+						</a>
+					)}
 					{scope === 'self' && canManage && (
 						<a href={getEnvUrl('https://admin.xernerx.com/?view=media')}>
 							<Button variant="secondary">

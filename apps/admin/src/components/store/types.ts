@@ -19,6 +19,12 @@ export interface StoreItem {
 	categoryId: string;
 	categoryName?: string;
 	skuId: string;
+	itemType?: 'subscription' | 'credit_pack' | 'credit_perk';
+	creditCost?: number;
+	creditAmount?: number;
+	perkType?: 'none' | 'cdn_slots' | 'showcase_slots' | 'trial_pass' | 'vanity_badge';
+	perkValue?: any;
+	durationDays?: number;
 	features: string[];
 	badge?: string | null;
 	discountPercent: number;

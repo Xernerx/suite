@@ -1347,7 +1347,25 @@
 				"featuresPlaceholder": "Feature 1\nFeature 2\nFeature 3",
 				"order": "Sort Order",
 				"featured": "Featured Hero Card (highlighted display)",
-				"enabled": "Active in Store"
+				"enabled": "Active in Store",
+				"itemType": "Product Type",
+				"creditAmount": "Credits Granted",
+				"creditCost": "Credit Cost",
+				"perkType": "Perk Type",
+				"perkValue": "Perk Value (Slots / Target ID / Badge ID)",
+				"perkValuePlaceholder": "e.g. 3, ultra, bot-virtue, high_roller",
+				"durationDays": "Trial Duration (Days)",
+				"types": {
+					"subscription": "Recurring Subscription (Stripe)",
+					"creditPack": "Credit Top-Up Pack (Stripe SKU)",
+					"creditPerk": "Credit Store Perk (Redeemable)"
+				},
+				"perks": {
+					"cdnSlots": "CDN Upload Slots",
+					"showcaseSlots": "Profile Showcase Slots",
+					"trialPass": "Trial Pass",
+					"vanityBadge": "Vanity Badge"
+				}
 			},
 			"categoryModal": {
 				"createTitle": "Create Category",
@@ -1475,6 +1493,35 @@
 			"toast": {
 				"success": "Profile updated successfully!",
 				"error": "Failed to save changes. Please try again."
+			},
+			"showcases": {
+				"title": "Featured Showcases",
+				"subtitle": "Pin custom projects, links, or CDN artwork to your public profile. Unlock additional showcase slots in the Credit Store.",
+				"addButton": "Add Showcase",
+				"unlockMoreSlots": "Unlock More Slots",
+				"emptySlotPrompt": "Add Showcase Card",
+				"badgesHeading": "Vanity & Patron Badges",
+				"badgesSubtitle": "Toggle which unlocked Credit Store vanity badges are displayed on your public profile and sidebar card.",
+				"badgeUnlocked": "Unlocked — Toggle visibility",
+				"badgeRequirement": "Unlock for {credits} Credits",
+				"unlockLink": "Credit Store →",
+				"badges": {
+					"credit_patron": "Credit Patron",
+					"high_roller": "High Roller",
+					"vault_sovereign": "Vault Sovereign"
+				},
+				"modal": {
+					"createTitle": "Add Profile Showcase",
+					"editTitle": "Edit Profile Showcase",
+					"titleLabel": "Title",
+					"titlePlaceholder": "e.g. My Portfolio or Featured Project",
+					"descLabel": "Description",
+					"descPlaceholder": "Brief summary of what you are showcasing...",
+					"tagLabel": "Tag / Badge (Optional)",
+					"tagPlaceholder": "e.g. Open Source, Artwork",
+					"linkLabel": "External Link (Optional)",
+					"imageLabel": "Preview Image URL (Optional)"
+				}
 			}
 		},
 		"appearance": {
@@ -1868,7 +1915,39 @@
 			},
 			"checkoutFailed": "Checkout Failed",
 			"discountBadge": "-{percent}% OFF",
-			"noItems": "No store products found."
+			"noItems": "No store products found.",
+			"credits": {
+				"lifetimeSpent": "{amount} Spent Lifetime",
+				"ownedCdnSlots": "{count} CDN Slots (+{extra} bonus)",
+				"ownedShowcaseSlots": "{count} Showcase Slots (+{extra} bonus)",
+				"ownedBadges": "{count} Vanity Badges",
+				"signInToRedeem": "Sign In to Redeem",
+				"topUpButton": "Buy Credits (€)",
+				"perksHeading": "Redeemable Credit Perks",
+				"perksSubheading": "Spend your earned or purchased credits on permanent slots, trial passes, and vanity badges.",
+				"alreadyUnlocked": "Unlocked & Owned",
+				"redeemButton": "Redeem for {cost} Credits",
+				"needMoreCredits": "Need {missing} More Credits — Top Up",
+				"packsHeading": "Credit Top-Up Packs",
+				"packsSubheading": "Instant one-time credit bundles with up to +40% bonus credits on larger packs.",
+				"oneTimePurchase": "one-time",
+				"buyPackButton": "Purchase Credit Pack",
+				"skuPending": "Link Stripe SKU in Admin",
+				"redeemSuccessTitle": "Perk Redeemed!",
+				"redeemSuccessDesc": "Unlocked {item} for {cost} credits.",
+				"redeemFailed": "Could not redeem perk",
+				"confirmRedeemTitle": "Redeem {item}?",
+				"confirmRedeemDesc": "You are about to spend {cost} credits on {item}. Your remaining balance will be {remaining} credits.",
+				"confirmRedeemButton": "Confirm & Redeem",
+				"filters": {
+					"all": "All Items",
+					"cdnSlots": "CDN Slots",
+					"showcaseSlots": "Showcase Slots",
+					"trialPasses": "Trial Passes",
+					"vanityBadges": "Vanity Badges",
+					"creditPacks": "Buy Credits (€)"
+				}
+			}
 		},
 		"login": {
 			"description": "Loading...",
@@ -1904,6 +1983,7 @@
 			"copyUrl": "Copy Direct URL",
 			"urlCopied": "Direct URL copied to clipboard",
 			"dropzoneHint": "Drag & drop files here or press Ctrl + V to paste & upload",
+			"slotsUsed": "CDN Slots",
 			"modal": {
 				"title": "Edit Media Metadata",
 				"description": "Editing metadata for {filename}",

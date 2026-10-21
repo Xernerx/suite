@@ -155,19 +155,27 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 								</h3>
 								{item.description && <p className="text-xs text-(--text-muted) mb-3 line-clamp-2">{item.description}</p>}
 
-								{/* SKU ID info */}
+								{/* SKU ID or Credit Cost info */}
 								<div className="flex items-center justify-between p-2 rounded-xl bg-(--background)/50 border border-(--border)/10 mb-3 text-xs">
 									<div className="flex items-center gap-1.5 text-(--text-muted) font-mono text-[11px] truncate">
 										<Tag size={12} className="shrink-0 text-(--accent)" />
-										<span className="truncate">{item.skuId}</span>
+										<span className="truncate">
+											{item.itemType === 'credit_perk'
+												? `${(item.creditCost || 0).toLocaleString()} Credits (${item.perkType || 'perk'})`
+												: item.itemType === 'credit_pack'
+													? `${item.skuId} (+${(item.creditAmount || 0).toLocaleString()} Credits)`
+													: item.skuId}
+										</span>
 									</div>
-									<button
-										onClick={() => handleCopySku(item.skuId)}
-										className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer shrink-0"
-										title={t('admin.store.tooltips.copySku')}
-									>
-										{copiedSku === item.skuId ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
-									</button>
+									{item.skuId && (
+										<button
+											onClick={() => handleCopySku(item.skuId)}
+											className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer shrink-0"
+											title={t('admin.store.tooltips.copySku')}
+										>
+											{copiedSku === item.skuId ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
+										</button>
+									)}
 								</div>
 
 								{/* Discount controller */}

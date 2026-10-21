@@ -47,10 +47,12 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 	const totalUsers = bots.reduce((acc, bot) => acc + (bot.stats?.userCount || 0), 0);
 
 	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false);
+	const showcases = Array.isArray(user?.showcases) ? user.showcases : [];
+	const activeVanityBadges: string[] = Array.isArray(user?.credits?.activeBadges) ? user.credits.activeBadges : [];
 
 	const verifiedIssues = user?.communityStats?.verifiedIssuesCount || 0;
 	const approvedSuggestions = user?.communityStats?.approvedSuggestionsCount || 0;
-	const hasBadges = verifiedIssues > 0 || approvedSuggestions > 0 || bots.length > 0;
+	const hasBadges = verifiedIssues > 0 || approvedSuggestions > 0 || bots.length > 0 || activeVanityBadges.length > 0;
 
 	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak || publicConnections.length > 0 || hasBadges);
 
@@ -62,7 +64,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 				</div>
 			)}
 
-			{!user?.info && bots.length === 0 && organizations.length === 0 && servers.length === 0 && !hasDetails && (
+			{!user?.info && showcases.length === 0 && bots.length === 0 && organizations.length === 0 && servers.length === 0 && !hasDetails && (
 				<div className="bg-(--foreground)/30 backdrop-blur-md p-8 rounded-3xl border border-(--border)/10 text-center text-(--text-muted) py-12">{t('app.users.profile.noDetails')}</div>
 			)}
 
@@ -87,6 +89,58 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				<div className="lg:col-span-2 flex flex-col gap-10">
+					{showcases.length > 0 && (
+						<div className="flex flex-col gap-6">
+							<div className="flex items-center gap-3">
+								<h2 className="text-2xl font-bold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{t('account.profile.showcases.title')}
+								</h2>
+								<span className="bg-(--accent)/15 text-(--accent) border border-(--accent)/25 text-xs font-bold px-2.5 py-0.5 rounded-full">{showcases.length}</span>
+							</div>
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								{showcases.map((sc: any) => {
+									const CardWrapper: any = sc.linkUrl ? 'a' : 'div';
+									const wrapperProps = sc.linkUrl ? { href: sc.linkUrl, target: '_blank', rel: 'noopener noreferrer' } : {};
+									return (
+										<CardWrapper
+											key={sc.id}
+											{...wrapperProps}
+											className="flex flex-col justify-between p-5 rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] transition-all group"
+										>
+											<div className="flex flex-col gap-3">
+												{sc.imageUrl && (
+													<div className="h-36 w-full rounded-2xl overflow-hidden border border-(--border)/15 bg-(--background)/50">
+														<img src={sc.imageUrl} alt={sc.title} className="h-full w-full object-cover" />
+													</div>
+												)}
+												<div className="flex items-start justify-between gap-2">
+													<h3
+														className="font-bold text-lg text-(--text) group-hover:text-(--accent) transition-colors truncate"
+														style={{ fontFamily: 'var(--font-fredoka)' }}
+													>
+														{sc.title}
+													</h3>
+													{sc.tag && (
+														<span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
+															{sc.tag}
+														</span>
+													)}
+												</div>
+												{sc.description && <p className="text-sm text-(--text-muted) line-clamp-3">{sc.description}</p>}
+											</div>
+											{sc.linkUrl && (
+												<div className="flex items-center gap-1.5 text-xs font-bold text-(--accent) mt-4 pt-3 border-t border-(--border)/10">
+													<ExternalLink size={12} />
+													<span className="truncate">{sc.linkUrl}</span>
+												</div>
+											)}
+										</CardWrapper>
+									);
+								})}
+							</div>
+						</div>
+					)}
+
 					{bots.length > 0 && (
 						<div className="flex flex-col gap-6">
 							<div className="flex items-center gap-3">
@@ -266,6 +320,15 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 							{hasBadges && (
 								<div className="flex flex-wrap gap-2">
+									{activeVanityBadges.map((badgeId) => (
+										<span
+											key={badgeId}
+											className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/20 text-(--accent) border border-(--accent)/35 shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
+										>
+											<Award size={12} />
+											{t(`account.profile.showcases.badges.${badgeId}`)}
+										</span>
+									))}
 									{bots.length > 0 && (
 										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
 											<Server size={12} />

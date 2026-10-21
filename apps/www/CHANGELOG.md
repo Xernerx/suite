@@ -2,6 +2,28 @@
 
 # www
 
+## 0.15.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.8.2
+    - @xernerx/lib@1.10.0
+    - @xernerx/providers@0.11.2
+    - @xernerx/feedback@0.0.42
+    - @xernerx/ui@0.6.2
+
+## 0.15.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.8.1
+    - @xernerx/lib@1.9.0
+    - @xernerx/providers@0.11.1
+    - @xernerx/feedback@0.0.41
+    - @xernerx/ui@0.6.1
+
 ## 0.15.1
 
 ### Patch Changes

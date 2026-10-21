@@ -58,6 +58,20 @@ const schema = new Schema(
 		},
 
 		hooks: { type: [{ name: String, description: String, url: String, data: String }] }, // List of user webhooks
+
+		showcases: {
+			type: [
+				{
+					id: { type: String, required: true },
+					title: { type: String, required: true },
+					description: { type: String, default: '' },
+					imageUrl: { type: String, default: '' },
+					linkUrl: { type: String, default: '' },
+					tag: { type: String, default: '' },
+				},
+			],
+			default: [],
+		},
 	},
 	{ timestamps: true }
 );

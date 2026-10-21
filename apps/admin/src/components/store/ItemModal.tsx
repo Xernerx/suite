@@ -21,7 +21,13 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
 	const [categoryId, setCategoryId] = useState('');
+	const [itemType, setItemType] = useState<'subscription' | 'credit_pack' | 'credit_perk'>('subscription');
 	const [skuId, setSkuId] = useState('');
+	const [creditCost, setCreditCost] = useState<number>(0);
+	const [creditAmount, setCreditAmount] = useState<number>(0);
+	const [perkType, setPerkType] = useState<'none' | 'cdn_slots' | 'showcase_slots' | 'trial_pass' | 'vanity_badge'>('none');
+	const [perkValue, setPerkValue] = useState<string>('');
+	const [durationDays, setDurationDays] = useState<number>(0);
 	const [badge, setBadge] = useState('');
 	const [discountPercent, setDiscountPercent] = useState<number>(0);
 	const [featuresText, setFeaturesText] = useState('');
@@ -35,7 +41,13 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 			setName(item.name || '');
 			setDescription(item.description || '');
 			setCategoryId(item.categoryId || (categories[0]?.id ?? ''));
+			setItemType(item.itemType || 'subscription');
 			setSkuId(item.skuId || '');
+			setCreditCost(item.creditCost ?? 0);
+			setCreditAmount(item.creditAmount ?? 0);
+			setPerkType(item.perkType || 'none');
+			setPerkValue(item.perkValue !== undefined && item.perkValue !== null ? String(item.perkValue) : '');
+			setDurationDays(item.durationDays ?? 0);
 			setBadge(item.badge || '');
 			setDiscountPercent(item.discountPercent ?? 0);
 			setFeaturesText((item.features || []).join('\n'));
@@ -46,7 +58,13 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 			setName('');
 			setDescription('');
 			setCategoryId(categories[0]?.id || 'consumers');
+			setItemType('subscription');
 			setSkuId('');
+			setCreditCost(0);
+			setCreditAmount(0);
+			setPerkType('none');
+			setPerkValue('');
+			setDurationDays(0);
 			setBadge('');
 			setDiscountPercent(0);
 			setFeaturesText('');
@@ -56,9 +74,11 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 		}
 	}, [item, categories, isOpen]);
 
+	const requiresSku = itemType !== 'credit_perk';
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!name.trim() || !skuId.trim() || !categoryId) return;
+		if (!name.trim() || !categoryId || (requiresSku && !skuId.trim())) return;
 
 		setLoading(true);
 		try {
@@ -67,11 +87,19 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 				.map((s) => s.trim())
 				.filter(Boolean);
 
+			const resolvedPerkValue = perkType === 'cdn_slots' || perkType === 'showcase_slots' ? Math.max(1, Number(perkValue) || 1) : perkValue.trim() || null;
+
 			await onSave({
 				name: name.trim(),
 				description: description.trim(),
 				categoryId,
+				itemType,
 				skuId: skuId.trim(),
+				creditCost: Math.max(0, Number(creditCost) || 0),
+				creditAmount: Math.max(0, Number(creditAmount) || 0),
+				perkType: itemType === 'credit_perk' ? perkType : 'none',
+				perkValue: itemType === 'credit_perk' ? resolvedPerkValue : null,
+				durationDays: itemType === 'credit_perk' && perkType === 'trial_pass' ? Math.max(1, Number(durationDays) || 3) : 0,
 				badge: badge.trim() || null,
 				discountPercent: Math.min(100, Math.max(0, Number(discountPercent) || 0)),
 				features,
@@ -104,10 +132,69 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 					</div>
 
 					<div className="flex flex-col gap-1.5">
-						<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.skuId')}</label>
-						<Input value={skuId} onChange={(e: any) => setSkuId(e.target.value)} placeholder={t('admin.store.itemModal.skuIdPlaceholder')} required />
+						<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.itemType')}</label>
+						<Selector
+							value={itemType}
+							onChange={(val) => setItemType(val as any)}
+							options={[
+								{ value: 'subscription', label: t('admin.store.itemModal.types.subscription') },
+								{ value: 'credit_pack', label: t('admin.store.itemModal.types.creditPack') },
+								{ value: 'credit_perk', label: t('admin.store.itemModal.types.creditPerk') },
+							]}
+						/>
 					</div>
 				</div>
+
+				{requiresSku && (
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div className="flex flex-col gap-1.5">
+							<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.skuId')}</label>
+							<Input value={skuId} onChange={(e: any) => setSkuId(e.target.value)} placeholder={t('admin.store.itemModal.skuIdPlaceholder')} required />
+						</div>
+
+						{itemType === 'credit_pack' && (
+							<div className="flex flex-col gap-1.5">
+								<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.creditAmount')}</label>
+								<Input type="number" min="1" value={creditAmount} onChange={(e: any) => setCreditAmount(Number(e.target.value))} />
+							</div>
+						)}
+					</div>
+				)}
+
+				{itemType === 'credit_perk' && (
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 rounded-2xl bg-(--background)/50 border border-(--border)/10">
+						<div className="flex flex-col gap-1.5">
+							<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.creditCost')}</label>
+							<Input type="number" min="0" value={creditCost} onChange={(e: any) => setCreditCost(Number(e.target.value))} />
+						</div>
+
+						<div className="flex flex-col gap-1.5">
+							<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.perkType')}</label>
+							<Selector
+								value={perkType}
+								onChange={(val) => setPerkType(val as any)}
+								options={[
+									{ value: 'cdn_slots', label: t('admin.store.itemModal.perks.cdnSlots') },
+									{ value: 'showcase_slots', label: t('admin.store.itemModal.perks.showcaseSlots') },
+									{ value: 'trial_pass', label: t('admin.store.itemModal.perks.trialPass') },
+									{ value: 'vanity_badge', label: t('admin.store.itemModal.perks.vanityBadge') },
+								]}
+							/>
+						</div>
+
+						<div className="flex flex-col gap-1.5">
+							<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.perkValue')}</label>
+							<Input value={perkValue} onChange={(e: any) => setPerkValue(e.target.value)} placeholder={t('admin.store.itemModal.perkValuePlaceholder')} />
+						</div>
+
+						{perkType === 'trial_pass' && (
+							<div className="flex flex-col gap-1.5">
+								<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.durationDays')}</label>
+								<Input type="number" min="1" value={durationDays} onChange={(e: any) => setDurationDays(Number(e.target.value))} />
+							</div>
+						)}
+					</div>
+				)}
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div className="flex flex-col gap-1.5">
@@ -167,7 +254,7 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 					<Button variant="secondary" onClick={onClose} type="button">
 						{t('admin.store.buttons.cancel')}
 					</Button>
-					<Button variant="primary" type="submit" disabled={loading || !name.trim() || !skuId.trim()}>
+					<Button variant="primary" type="submit" disabled={loading || !name.trim() || (requiresSku && !skuId.trim())}>
 						{loading ? t('admin.store.buttons.saving') : t('admin.store.buttons.save')}
 					</Button>
 				</div>
