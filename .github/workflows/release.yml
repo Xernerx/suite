@@ -2,9 +2,12 @@ name: Release
 
 on:
     push:
+        branches:
+            - main
         tags:
             - 'desktop@*'
             - 'mobile@*'
+    workflow_dispatch:
 
 env:
     FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -13,10 +16,51 @@ jobs:
     build:
         uses: ./.github/workflows/build.yml
 
+    check-version:
+        name: Check Desktop Release Version
+        runs-on: ubuntu-latest
+        outputs:
+            desktop_changed: ${{ steps.check.outputs.desktop_changed }}
+            tag_name: ${{ steps.check.outputs.tag_name }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Check desktop version & existing release
+              id: check
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  NEW_VERSION=$(jq -r .version clients/desktop/package.json)
+                  if [[ "${{ github.ref }}" == refs/tags/desktop@* ]]; then
+                    TAG_NAME="${{ github.ref_name }}"
+                  else
+                    TAG_NAME="desktop@${NEW_VERSION}"
+                  fi
+                  echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+
+                  OLD_VERSION=$(git show ${{ github.event.before }}:clients/desktop/package.json 2>/dev/null | jq -r .version || echo "none")
+                  ASSET_COUNT=$(gh release view "${TAG_NAME}" --repo "${{ github.repository }}" --json assets -q '.assets | map(select(.name | test("\\.(exe|dmg|AppImage)$"))) | length' 2>/dev/null || echo "0")
+
+                  echo "Old version: ${OLD_VERSION}"
+                  echo "New version: ${NEW_VERSION}"
+                  echo "Target tag: ${TAG_NAME} (existing installer assets: ${ASSET_COUNT})"
+
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                    echo "desktop_changed=true" >> $GITHUB_OUTPUT
+                  elif [[ "${{ github.ref }}" == refs/tags/desktop@* ]] && [ "${ASSET_COUNT}" -lt 3 ]; then
+                    echo "desktop_changed=true" >> $GITHUB_OUTPUT
+                  elif [ "${{ github.ref }}" = "refs/heads/main" ] && [ "${NEW_VERSION}" != "null" ] && ( [ "${OLD_VERSION}" != "${NEW_VERSION}" ] || [ "${ASSET_COUNT}" -lt 3 ] ); then
+                    echo "desktop_changed=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "desktop_changed=false" >> $GITHUB_OUTPUT
+                  fi
+
     release-desktop:
-        name: Release Desktop
-        needs: [build]
-        if: startsWith(github.ref, 'refs/tags/desktop@')
+        name: Release Desktop (${{ matrix.os }})
+        needs: [build, check-version]
+        if: needs.check-version.outputs.desktop_changed == 'true'
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
@@ -38,23 +82,64 @@ jobs:
             - name: Install deps
               run: pnpm install
 
-            - name: Build desktop
-              run: pnpm --filter ./clients/desktop build
+            - name: Build and Package Desktop
+              run: |
+                  pnpm --filter ./clients/desktop build
+                  pnpm --filter ./clients/desktop dist --publish never
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Package desktop
-              run: pnpm --filter ./clients/desktop dist -- --publish=never
+            - name: Upload Desktop Release Artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: desktop-stable-${{ matrix.os }}
+                  path: |
+                      clients/desktop/release/*.exe
+                      clients/desktop/release/*.dmg
+                      clients/desktop/release/*.AppImage
+                      clients/desktop/release/*.yml
+                      clients/desktop/release/*.blockmap
+                  if-no-files-found: error
+
+    publish-desktop:
+        name: Publish Desktop Release
+        needs: [check-version, release-desktop]
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Download All Desktop Artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  path: release-artifacts
+
+            - name: Ensure Release Tag Exists
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                  TAG_NAME="${{ needs.check-version.outputs.tag_name }}"
+                  if ! git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+                    git tag "${TAG_NAME}"
+                    git push origin "${TAG_NAME}" || true
+                  fi
 
             - name: Publish Desktop Release
               uses: softprops/action-gh-release@v2
               with:
                   files: |
-                      clients/desktop/release/**/*.exe
-                      clients/desktop/release/**/*.dmg
-                      clients/desktop/release/**/*.AppImage
-                      clients/desktop/release/**/*.yml
-                      clients/desktop/release/**/*.blockmap
-                  tag_name: ${{ github.ref_name }}
-                  name: Desktop ${{ github.ref_name }}
+                      release-artifacts/**/*.exe
+                      release-artifacts/**/*.dmg
+                      release-artifacts/**/*.AppImage
+                      release-artifacts/**/*.yml
+                      release-artifacts/**/*.blockmap
+                  tag_name: ${{ needs.check-version.outputs.tag_name }}
+                  name: Desktop ${{ needs.check-version.outputs.tag_name }}
+                  draft: false
+                  prerelease: false
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

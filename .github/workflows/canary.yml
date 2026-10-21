@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - canary
+    workflow_dispatch:
 
 jobs:
     # 1. Call the shared build workflow
@@ -27,7 +28,7 @@ jobs:
                   NEW_VERSION=$(jq -r .version clients/desktop/package.json)
                   echo "Old version: $OLD_VERSION"
                   echo "New version: $NEW_VERSION"
-                  if [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ "$NEW_VERSION" != "null" ]; then
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ] || ( [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ "$NEW_VERSION" != "null" ] ); then
                     echo "changed=true" >> $GITHUB_OUTPUT
                   else
                     echo "changed=false" >> $GITHUB_OUTPUT
@@ -102,6 +103,9 @@ jobs:
                   gh release delete canary --yes --cleanup-tag || true
                   git tag -d canary || true
                   git push origin --delete refs/tags/canary || true
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Create Version Tag & Rolling Canary Release
               run: |
@@ -115,8 +119,8 @@ jobs:
                   TITLE="v${VERSION}-canary"
 
                   # 1. Create and push a unique permanent historical version tag (e.g. v2.0.1-canary.7c210b8)
-                  git tag "${VERSIONED_TAG}"
-                  git push origin "${VERSIONED_TAG}"
+                  git tag "${VERSIONED_TAG}" || true
+                  git push origin "${VERSIONED_TAG}" || true
 
                   # 2. Create and push the rolling 'canary' tag
                   git tag canary
@@ -133,4 +137,5 @@ jobs:
                       all-artifacts/desktop-release-windows-latest/*.exe \
                       all-artifacts/desktop-release-macos-latest/*.dmg
               env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

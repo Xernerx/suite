@@ -2,6 +2,12 @@
 
 # @xernerx/desktop
 
+## 2.2.1
+
+### Patch Changes
+
+- Fixed push issues
+
 ## 2.2.0
 
 ### Minor Changes
