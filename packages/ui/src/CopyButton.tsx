@@ -38,9 +38,9 @@ export function CopyButton({ value, label, copiedLabel, toastTitle, toastDescrip
 	};
 
 	const variantClasses: Record<NonNullable<CopyButtonProps['variant']>, string> = {
-		pill: 'bg-(--background)/60 hover:bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--text)',
-		ghost: 'bg-transparent hover:bg-(--foreground)/50 text-(--text-muted) hover:text-(--text)',
-		surface: 'bg-(--foreground)/40 hover:bg-(--accent)/10 border border-(--border)/15 hover:border-(--accent)/30 text-(--text) hover:text-(--accent)',
+		pill: 'bg-(--background)/60 hover:bg-(--background) backdrop-blur-md border border-(--border)/10 text-(--text-muted) hover:text-(--text)',
+		ghost: 'bg-transparent hover:bg-(--foreground)/40 text-(--text-muted) hover:text-(--text)',
+		surface: 'bg-(--foreground)/30 hover:bg-(--accent)/10 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/30 text-(--text) hover:text-(--accent)',
 	};
 
 	const sizeClasses = size === 'sm' ? 'px-2.5 py-1 text-xs rounded-xl gap-1.5' : 'px-3.5 py-1.5 text-sm rounded-2xl gap-2';

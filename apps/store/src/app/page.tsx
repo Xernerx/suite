@@ -2,16 +2,19 @@
 
 'use client';
 
-import { Bot, Code, Server, Sparkles, Tag, ShoppingBag } from 'lucide-react';
+import { Bot, Code, Coins, Server, Sparkles, Tag, ShoppingBag } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CatalogCategory, CatalogItem, UserSubscription } from '../components/types';
 import { DynamicCategoryView } from '../components/DynamicCategoryView';
+import { CreditStoreView } from '../components/CreditStoreView';
 
 const ICONS_MAP: Record<string, any> = {
 	Bot,
 	Code,
+	Coins,
 	Server,
 	Sparkles,
 	Tag,
@@ -24,7 +27,7 @@ export default function StorePage() {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
 	const { hide } = useSidebar();
-	const { user, loading: userLoading } = useUser() as { user: any; loading: boolean };
+	const { user, loading: userLoading, mutate } = useUser() as { user: any; loading: boolean; mutate?: () => Promise<any> };
 
 	const [categories, setCategories] = useState<CatalogCategory[]>([]);
 	const [items, setItems] = useState<CatalogItem[]>([]);
@@ -114,6 +117,40 @@ export default function StorePage() {
 		}
 	};
 
+	const handleBuyCreditPack = async (priceId: string, pack: CatalogItem) => {
+		if (!priceId) return;
+		if (!user) {
+			if (typeof window !== 'undefined') {
+				window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+			}
+			return;
+		}
+		setActionLoading(priceId);
+		try {
+			const response = await fetch(getEnvUrl('https://api.xernerx.com/secure/store/checkout'), {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({
+					priceId,
+					discountPercent: pack.discountPercent || 0,
+					itemType: 'credit_pack',
+					itemId: pack.id,
+					creditAmount: pack.creditAmount || 0,
+				}),
+			});
+			if (!response.ok) throw new Error('Network response was not ok');
+			const data = await response.json();
+			if (data.url) {
+				window.location.assign(data.url);
+			}
+		} catch (error: any) {
+			console.error('Failed to create credit checkout session:', error);
+			toast({ type: 'error', title: t('account.store.checkoutFailed'), description: error.message });
+			setActionLoading(null);
+		}
+	};
+
 	const handleCancelClick = (subscriptionId: string) => {
 		router.push(`/${subscriptionId}/cancel`);
 	};
@@ -128,6 +165,8 @@ export default function StorePage() {
 
 	// Compute discount for current category
 	const categoryMaxDiscount = currentItems.reduce((max, item) => Math.max(max, item.discountPercent || 0), 0);
+
+	if (loading) return <Loading />;
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen transition-colors duration-200" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
@@ -162,47 +201,52 @@ export default function StorePage() {
 					</div>
 				)}
 
-				{/* Global Billing Interval Toggle */}
-				<div className="flex items-center gap-2 p-1 rounded-full border border-(--border)/10 bg-(--foreground) mt-2">
-					<button
-						onClick={() => {
-							setBillingInterval('month');
-							updateStoreUrlParams(currentCategory?.id, 'month');
-						}}
-						className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-							billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-						}`}
-					>
-						{t('account.store.billing.monthly')}
-					</button>
-					<button
-						onClick={() => {
-							setBillingInterval('year');
-							updateStoreUrlParams(currentCategory?.id, 'year');
-						}}
-						className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-							billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-						}`}
-					>
-						{t('account.store.billing.annually')}
-						{categoryMaxDiscount > 0 && <span className="bg-(--accent-green)/10 text-(--accent-green) px-1.5 py-0.5 rounded-xl text-[10px] font-bold">-{categoryMaxDiscount}%</span>}
-					</button>
-				</div>
+				{/* Global Billing Interval Toggle (Only for recurring subscription categories) */}
+				{currentCategory?.id !== 'credits' && (
+					<div className="flex items-center gap-2 p-1 rounded-full border border-(--border)/10 bg-(--foreground) mt-2">
+						<button
+							onClick={() => {
+								setBillingInterval('month');
+								updateStoreUrlParams(currentCategory?.id, 'month');
+							}}
+							className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
+								billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+							}`}
+						>
+							{t('account.store.billing.monthly')}
+						</button>
+						<button
+							onClick={() => {
+								setBillingInterval('year');
+								updateStoreUrlParams(currentCategory?.id, 'year');
+							}}
+							className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
+								billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+							}`}
+						>
+							{t('account.store.billing.annually')}
+							{categoryMaxDiscount > 0 && <span className="bg-(--accent-green)/10 text-(--accent-green) px-1.5 py-0.5 rounded-xl text-[10px] font-bold">-{categoryMaxDiscount}%</span>}
+						</button>
+					</div>
+				)}
 			</div>
 
-			{/* Dynamic Category View */}
-			{currentCategory && (
-				<DynamicCategoryView
-					category={currentCategory}
-					items={currentItems}
-					billingInterval={billingInterval}
-					userLoading={userLoading || loading}
-					actionLoading={actionLoading}
-					getActiveSubscription={getActiveSubscription}
-					handleSubscribe={handleSubscribe}
-					handleCancelClick={handleCancelClick}
-				/>
-			)}
+			{/* Category View */}
+			{currentCategory &&
+				(currentCategory.id === 'credits' ? (
+					<CreditStoreView items={currentItems} user={user} userLoading={userLoading || loading} mutateUser={mutate} actionLoading={actionLoading} onBuyCreditPack={handleBuyCreditPack} />
+				) : (
+					<DynamicCategoryView
+						category={currentCategory}
+						items={currentItems}
+						billingInterval={billingInterval}
+						userLoading={userLoading || loading}
+						actionLoading={actionLoading}
+						getActiveSubscription={getActiveSubscription}
+						handleSubscribe={handleSubscribe}
+						handleCancelClick={handleCancelClick}
+					/>
+				))}
 
 			<p className="mt-12 text-center text-xs text-(--text-muted) opacity-70">{t('account.store.taxNotice')}</p>
 		</div>

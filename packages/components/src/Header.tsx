@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, ChevronLeft, Download, Gift, LayoutGrid, Monitor, Search, SidebarClose, SidebarOpen, Smartphone, Store, Tablet, User as UserIcon } from 'lucide-react';
+import { Bell, ChevronLeft, Clock, Download, Gift, LayoutGrid, Megaphone, Monitor, RefreshCw, Search, SidebarClose, SidebarOpen, Smartphone, Store, Tablet, User as UserIcon, X } from 'lucide-react';
 import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useTheme, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
@@ -13,18 +13,14 @@ import BannerDev from '../../public/banner-dev.svg';
 import BannerPublic from '../../public/banner.svg';
 import Image from 'next/image';
 import Link from 'next/link';
-import SidebarNotifications from './cards/SidebarNotifications';
+import SidebarNotifications, { getReadyCooldownReminders } from './cards/SidebarNotifications';
 import SidebarUserCard from './cards/SidebarUser';
 import { HeaderOmnibar, SubSelector } from './HeaderOmnibar';
 import { HeaderWindowControls, useWindowControlsStyle } from './HeaderWindowControls';
 
 export { SubSelector };
 
-const deviceIcons = {
-	desktop: Monitor,
-	mobile: Smartphone,
-	tablet: Tablet,
-} as const;
+const deviceIcons = { desktop: Monitor, mobile: Smartphone, tablet: Tablet } as const;
 
 export function Header() {
 	const { state, toggle, setMobileOpen, isMobileOpen, view } = useSidebar();
@@ -36,59 +32,69 @@ export function Header() {
 	const [isElectron, setIsElectron] = useState(false);
 
 	const { data: session } = useSession();
-	const { user: discordUser } = useUser();
+	const { user: discordUser, loading: userLoading } = useUser();
 	const activeUser = discordUser || session?.user;
 
+	const [isMounted, setIsMounted] = useState(false);
 	const { notifications } = useNotifications();
-	const hasUnread = notifications.some((n) => !n.read);
+	const readyReminders = isMounted && !userLoading && discordUser ? getReadyCooldownReminders(discordUser, getEnvUrl, t) : [];
+	const totalUnreadCount = notifications.filter((n) => !n.read).length + readyReminders.length;
+	const hasUnread = totalUnreadCount > 0;
+
+	useEffect(() => {
+		if (!isMounted || typeof window === 'undefined') return;
+		const bridge = (window as any).electron;
+		if (bridge?.setBadgeCount) bridge.setBadgeCount(activeUser ? totalUnreadCount : 0);
+	}, [isMounted, activeUser, totalUnreadCount]);
 
 	const [userMenuOpen, setUserMenuOpen] = useState(false);
 	const userMenuRef = useRef<HTMLDivElement>(null);
-
 	const [notificationsOpen, setNotificationsOpen] = useState(false);
 	const notificationsRef = useRef<HTMLDivElement>(null);
-
 	const [optionsOpen, setOptionsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(true);
+	const [activeAnnouncement, setActiveAnnouncement] = useState<any | null>(null);
+	const [nowMs, setNowMs] = useState(() => Date.now());
+	const [desktopUpdateState, setDesktopUpdateState] = useState<{ checking?: boolean; outdated?: boolean; latestVersion?: string } | null>(null);
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
 	const pathname = usePathname();
 
 	const resolveOmnibarUrl = (pre: string, env: string, rawPath: string) => {
 		let fullPath = rawPath.trim();
-		if (fullPath && !fullPath.startsWith('/')) {
-			fullPath = '/' + fullPath;
-		}
-		if (env === 'dev' && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-			return getEnvUrl(`https://${pre}.xernerx.com${fullPath}`);
-		}
+		if (fullPath && !fullPath.startsWith('/')) fullPath = '/' + fullPath;
+		const host = typeof window !== 'undefined' ? window.location.hostname : '';
+		const isLocalHost = host === 'localhost' || host === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
+		if (env === 'dev' && isLocalHost) return getEnvUrl(`https://${pre}.xernerx.com${fullPath}`);
 		return `https://${pre}.${env === 'public' ? '' : env + '.'}xernerx.com${fullPath}`;
 	};
 
-	const [isMounted, setIsMounted] = useState(false);
 	useEffect(() => {
 		setIsMounted(true);
-		const electronBridge = (window as any).electron;
-		const detectedElectron = Boolean(electronBridge) || navigator.userAgent.toLowerCase().includes('electron');
+		const detectedElectron = Boolean((window as any).electron) || navigator.userAgent.toLowerCase().includes('electron');
 		setIsElectron(detectedElectron);
-		if (detectedElectron) {
-			document.documentElement.classList.add('is-electron');
-		}
-
+		if (detectedElectron) document.documentElement.classList.add('is-electron');
+		if ((window as any).__xernerxDesktopUpdateState) setDesktopUpdateState((window as any).__xernerxDesktopUpdateState);
+		const handleDesktopUpdateState = (e: Event) => {
+			const detail = (e as CustomEvent).detail;
+			if (detail) setDesktopUpdateState(detail);
+		};
+		window.addEventListener('xernerx:desktop-update-state', handleDesktopUpdateState);
 		const timer = setTimeout(() => setIsExpanded(false), 2000);
-		return () => clearTimeout(timer);
+		const clock = setInterval(() => setNowMs(Date.now()), 30000);
+		return () => {
+			clearTimeout(timer);
+			clearInterval(clock);
+			window.removeEventListener('xernerx:desktop-update-state', handleDesktopUpdateState);
+		};
 	}, []);
 
 	const isApp = type === 'application' || isElectron;
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
-			if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-				setUserMenuOpen(false);
-			}
-			if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
-				setNotificationsOpen(false);
-			}
+			if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false);
+			if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) setNotificationsOpen(false);
 		}
 		document.addEventListener('mousedown', handleClickOutside);
 		return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -118,7 +124,6 @@ export function Header() {
 	useEffect(() => {
 		setUserMenuOpen(false);
 		setNotificationsOpen(false);
-
 		const electronBridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
 		if (electronBridge?.setActivity) {
 			const host = window.location.hostname;
@@ -132,29 +137,9 @@ export function Header() {
 			else if (pathname?.startsWith('/dashboard')) appLabel = 'Server Dashboard';
 			else if (pathname?.startsWith('/portal')) appLabel = 'Developer Portal';
 			else if (pathname?.startsWith('/overlay')) appLabel = 'Live Overlay Monitor';
-
-			electronBridge.setActivity({
-				details: appLabel,
-				state: view ? `Viewing ${view}` : 'Exploring Xernerx Suite',
-			});
+			electronBridge.setActivity({ details: appLabel, state: view ? `Viewing ${view}` : 'Exploring Xernerx Suite' });
 		}
 	}, [pathname, view]);
-
-	useEffect(() => {
-		if (!activeUser?.id) return;
-		const electronBridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
-		if (electronBridge?.syncAccountProfile) {
-			const resolvedAvatar = activeUser?.avatar
-				? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
-				: activeUser?.image;
-			electronBridge.syncAccountProfile({
-				id: String(activeUser.id),
-				username: activeUser.username || activeUser.name,
-				globalName: activeUser.global_name || activeUser.name,
-				avatar: resolvedAvatar,
-			});
-		}
-	}, [activeUser]);
 
 	const avatarUrl = activeUser?.avatar
 		? `https://cdn.discordapp.com/avatars/${activeUser.id}/${activeUser.avatar}.${activeUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`
@@ -162,8 +147,33 @@ export function Header() {
 	const decorationUrl =
 		preferences.showDiscordCollectibles && activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
 
-	const giftInTime = activeUser?.credits?.giftIn ? new Date(activeUser.credits.giftIn).getTime() : 0;
-	const isGiftReady = preferences.showGiftBadge && isMounted && Boolean(activeUser) && Date.now() >= giftInTime;
+	useEffect(() => {
+		if (!activeUser?.id) return;
+		(window as any).electron?.syncAccountProfile?.({
+			id: String(activeUser.id),
+			username: activeUser.username || activeUser.name,
+			globalName: activeUser.global_name || activeUser.name,
+			avatar: avatarUrl,
+		});
+	}, [activeUser, avatarUrl]);
+
+	const hasLoadedCredits = !userLoading && Boolean(discordUser?.credits);
+	const giftInTime = hasLoadedCredits && discordUser?.credits?.giftIn ? new Date(discordUser.credits.giftIn).getTime() : null;
+	const isGiftReady =
+		preferences.showGiftBadge && isMounted && hasLoadedCredits && (giftInTime !== null ? Number.isFinite(giftInTime) && Date.now() >= giftInTime : (discordUser?.credits?.streak ?? 0) === 0);
+
+	useEffect(() => {
+		if (!hasLoadedCredits || !isGiftReady || !discordUser?.id || typeof window === 'undefined') return;
+		const bridge = (window as any).electron;
+		if (!bridge?.notify) return;
+		try {
+			const storageKey = `xernerx-gift-notified:${discordUser.id}`;
+			const cycleStamp = giftInTime !== null ? String(giftInTime) : 'streak-0';
+			if (localStorage.getItem(storageKey) === cycleStamp) return;
+			localStorage.setItem(storageKey, cycleStamp);
+			bridge.notify({ title: t('www.download.preview.dailyRewardReady'), body: t('components.cards.sidebaruser.text1'), link: getEnvUrl('https://account.xernerx.com/?tab=billing') });
+		} catch {}
+	}, [hasLoadedCredits, isGiftReady, discordUser?.id, giftInTime, t, getEnvUrl]);
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
 	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[12px] w-[12px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
@@ -172,12 +182,8 @@ export function Header() {
 	const effectiveIsCanary = isMounted ? isCanary : false;
 
 	const renderBanner = () => {
-		if (effectiveIsDev) {
-			return <BannerDev className="h-10 text-(--accent) hover:text-(--accent-orange) transition-colors" />;
-		}
-		if (effectiveIsCanary) {
-			return <BannerCanary className="h-10 text-(--accent) hover:text-(--accent) transition-colors" />;
-		}
+		if (effectiveIsDev) return <BannerDev className="h-10 text-(--accent) hover:text-(--accent-orange) transition-colors" />;
+		if (effectiveIsCanary) return <BannerCanary className="h-10 text-(--accent) hover:text-(--accent) transition-colors" />;
 		return <BannerPublic className="h-10 text-(--accent) hover:text-(--hover-accent) transition-colors" />;
 	};
 
@@ -185,37 +191,44 @@ export function Header() {
 		if (typeof window === 'undefined') return { pre: 'app', env: 'public', path: '/' };
 		const host = window.location.hostname;
 		const port = window.location.port;
-		const env = host.includes('.dev.') || host === 'localhost' || host === '127.0.0.1' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
-
+		const isLocalHost = host === 'localhost' || host === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
+		const env = host.includes('.dev.') || isLocalHost ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 		let pre = 'app';
-		const portMap: Record<string, string> = {
-			'4000': 'www',
-			'4001': 'api',
-			'4002': 'cdn',
-			'4003': 'account',
-			'4004': 'app',
-			'4005': 'docs',
-			'4006': 'admin',
-			'4007': 'info',
-			'4008': 'store',
-		};
-		if ((host === 'localhost' || host === '127.0.0.1') && portMap[port]) {
-			pre = portMap[port];
-		} else {
-			['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => {
-				if (host.startsWith(`${p}.`)) pre = p;
-			});
-		}
+		const portMap: Record<string, string> = { '4000': 'www', '4001': 'api', '4002': 'cdn', '4003': 'account', '4004': 'app', '4005': 'docs', '4006': 'admin', '4007': 'info', '4008': 'store' };
+		if (isLocalHost && portMap[port]) pre = portMap[port];
+		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
 
 		const params = new URLSearchParams(window.location.search);
-		if (state !== 'hidden' && view && !params.has('view')) {
-			params.set('view', view);
-		}
+		if (state !== 'hidden' && view && !params.has('view')) params.set('view', view);
 		const queryStr = params.toString();
 		return { pre, env, path: pathname + (queryStr ? `?${queryStr}` : '') + (window.location.hash || '') };
 	};
 
 	const urlState = getInitialUrlState();
+
+	useEffect(() => {
+		if (!isMounted || typeof window === 'undefined') return;
+		fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements?activeOnly=true&app=${encodeURIComponent(urlState.pre)}`), { credentials: 'include' })
+			.then((res) => (res.ok ? res.json() : []))
+			.then((list: any[]) => {
+				if (!Array.isArray(list) || list.length === 0) return setActiveAnnouncement(null);
+				const dismissed: string[] = JSON.parse(localStorage.getItem('xernerx-dismissed-announcements') || '[]');
+				const match = list.find((a) => a?.id && !dismissed.includes(a.id) && a?.expiresAt && new Date(a.expiresAt).getTime() > Date.now());
+				setActiveAnnouncement(match || null);
+			})
+			.catch(() => {});
+	}, [isMounted, getEnvUrl, urlState.pre]);
+
+	const dismissBanner = (id: string) => {
+		try {
+			const dismissed: string[] = JSON.parse(localStorage.getItem('xernerx-dismissed-announcements') || '[]');
+			if (!dismissed.includes(id)) localStorage.setItem('xernerx-dismissed-announcements', JSON.stringify([...dismissed, id]));
+		} catch {}
+		setActiveAnnouncement(null);
+	};
+
+	const bannerExpiresMs = activeAnnouncement?.expiresAt ? new Date(activeAnnouncement.expiresAt).getTime() : 0;
+	const bannerMinsLeft = bannerExpiresMs > nowMs ? Math.max(1, Math.floor((bannerExpiresMs - nowMs) / 60000)) : 0;
 
 	const headerIconBtnClass =
 		effectiveControls === 'xernerx'
@@ -226,13 +239,25 @@ export function Header() {
 
 	return (
 		<div className="relative flex flex-col w-full z-[9999] shrink-0">
+			{activeAnnouncement && bannerMinsLeft > 0 && (
+				<div className="flex items-center justify-between gap-3 px-4 py-1.5 bg-(--accent)/15 border-b border-(--accent)/30 backdrop-blur-md text-xs text-(--text)">
+					<div className="flex items-center gap-2 min-w-0">
+						<Megaphone size={13} className="text-(--accent) shrink-0" />
+						<span className="font-bold truncate">{activeAnnouncement.title}</span>
+						{activeAnnouncement.message?.content && <span className="text-(--text-muted) truncate hidden sm:inline">— {activeAnnouncement.message.content}</span>}
+						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--accent)/20 text-(--accent) border border-(--accent)/30 shrink-0">
+							<Clock size={10} />
+							{t('admin.dashboard.announcements.expiresIn', { hours: Math.floor(bannerMinsLeft / 60), minutes: bannerMinsLeft % 60 })}
+						</span>
+					</div>
+					<button type="button" onClick={() => dismissBanner(activeAnnouncement.id)} className="text-(--text-muted) hover:text-(--text) cursor-pointer shrink-0">
+						<X size={13} />
+					</button>
+				</div>
+			)}
 			<header
 				className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} h-[50px] shrink-0 items-center justify-between w-full bg-(--background)`}
-				style={{
-					paddingLeft: 'var(--ui-gap)',
-					paddingRight: 'var(--ui-gap)',
-					fontSize: 'var(--text-scale, 14px)',
-				}}
+				style={{ paddingLeft: 'var(--ui-gap)', paddingRight: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 			>
 				{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent-orange) shadow-[0_0_12px_rgba(249,115,22,0.8)]" />}
 				{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent) shadow-[0_0_12px_rgba(59,130,246,0.8)]" />}
@@ -249,13 +274,7 @@ export function Header() {
 							type="button"
 							aria-label={t('components.sidebar.title')}
 							title={t('components.sidebar.title')}
-							onClick={() => {
-								if (window.innerWidth < 768) {
-									setMobileOpen(!isMobileOpen);
-								} else {
-									toggle();
-								}
-							}}
+							onClick={() => (window.innerWidth < 768 ? setMobileOpen(!isMobileOpen) : toggle())}
 							className={`relative z-10 ${effectiveControls === 'windows' ? 'p-2' : ''} ${headerIconBtnClass}`}
 							style={isRightAligned ? { marginLeft: 'var(--ui-gap)' } : { marginRight: 'var(--ui-gap)' }}
 						>
@@ -288,23 +307,51 @@ export function Header() {
 						className={`${optionsOpen ? 'flex animate-in fade-in slide-in-from-right-2 duration-150' : 'hidden md:flex'} ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${effectiveControls === 'windows' ? 'gap-4' : 'gap-2'} shrink-0`}
 					>
 						{!isApp && preferences.showHeaderDownload && (
-							<motion.div
-								animate={{ width: isExpanded ? 'auto' : '20px' }}
-								onHoverStart={() => setIsExpanded(true)}
-								onHoverEnd={() => setIsExpanded(false)}
-								className="hidden sm:flex [.is-electron_&]:!hidden items-center overflow-hidden"
-							>
-								<Link
-									suppressHydrationWarning
-									href={getEnvUrl('https://www.xernerx.com/download')}
-									className="flex items-center gap-2 text-(--text) cursor-pointer hover:text-(--accent) transition-colors whitespace-nowrap"
+							<div className="hidden sm:flex [.is-electron_&]:!hidden items-center gap-2">
+								<button
+									type="button"
+									onClick={() => typeof window !== 'undefined' && (window.location.href = `xernerx://open?url=${encodeURIComponent(window.location.href)}`)}
+									title={t('components.header.openInDesktop')}
+									className="flex items-center gap-1.5 rounded-full bg-(--accent)/10 hover:bg-(--accent)/20 border border-(--accent)/30 px-2.5 py-1 text-xs font-bold text-(--accent) transition-colors cursor-pointer whitespace-nowrap"
 								>
-									<Download size={20} className="shrink-0" />
-									<motion.span animate={{ opacity: isExpanded ? 1 : 0 }} className="font-medium">
-										{t('components.header.text1')}
-									</motion.span>
-								</Link>
-							</motion.div>
+									<Monitor size={13} className="shrink-0" />
+									<span className="hidden lg:inline">{t('components.header.openInDesktop')}</span>
+								</button>
+								<motion.div
+									animate={{ width: isExpanded ? 'auto' : '20px' }}
+									onHoverStart={() => setIsExpanded(true)}
+									onHoverEnd={() => setIsExpanded(false)}
+									className="flex items-center overflow-hidden"
+								>
+									<Link
+										suppressHydrationWarning
+										href={getEnvUrl('https://www.xernerx.com/download')}
+										className="flex items-center gap-2 text-(--text) cursor-pointer hover:text-(--accent) transition-colors whitespace-nowrap"
+									>
+										<Download size={20} className="shrink-0" />
+										<motion.span animate={{ opacity: isExpanded ? 1 : 0 }} className="font-medium">
+											{t('components.header.text1')}
+										</motion.span>
+									</Link>
+								</motion.div>
+							</div>
+						)}
+
+						{isMounted && isApp && desktopUpdateState?.outdated && (
+							<button
+								type="button"
+								onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-desktop-updater'))}
+								aria-label={t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })}
+								title={t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })}
+								className={`relative ${headerIconBtnClass} text-(--accent-orange)`}
+							>
+								{desktopUpdateState.checking ? (
+									<RefreshCw size={effectiveControls === 'windows' ? 20 : 16} className="animate-spin text-(--accent)" />
+								) : (
+									<Download size={effectiveControls === 'windows' ? 20 : 16} />
+								)}
+								<span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent-orange) border-2 border-(--background) animate-pulse" />
+							</button>
 						)}
 
 						{preferences.showHeaderCommandPalette && (
@@ -349,21 +396,18 @@ export function Header() {
 							<div ref={notificationsRef} className="relative flex items-center">
 								<button
 									type="button"
-									onClick={() => {
-										setNotificationsOpen((prev) => {
-											const next = !prev;
-											if (next) setUserMenuOpen(false);
-											return next;
-										});
-									}}
+									onClick={() => setNotificationsOpen((prev) => (!prev && setUserMenuOpen(false), !prev))}
 									aria-label={t('components.header.notifications')}
 									title={t('components.header.notifications')}
 									className={`relative ${headerIconBtnClass} ${notificationsOpen ? 'text-(--accent)' : ''}`}
 								>
 									<Bell size={effectiveControls === 'windows' ? 20 : 16} />
-									{hasUnread && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent) border-2 border-(--background)" />}
+									{hasUnread && (
+										<span className="absolute -top-1.5 -right-1.5 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-(--accent-red) text-[9px] font-extrabold leading-none text-white border-2 border-(--background) shadow-xs">
+											{totalUnreadCount > 9 ? '9+' : totalUnreadCount}
+										</span>
+									)}
 								</button>
-
 								<AnimatePresence>{notificationsOpen && <SidebarNotifications isCollapsed={false} placement="top" onClose={() => setNotificationsOpen(false)} />}</AnimatePresence>
 							</div>
 						)}
@@ -372,13 +416,7 @@ export function Header() {
 							<div ref={userMenuRef} className="relative flex items-center">
 								<button
 									type="button"
-									onClick={() => {
-										setUserMenuOpen((prev) => {
-											const next = !prev;
-											if (next) setNotificationsOpen(false);
-											return next;
-										});
-									}}
+									onClick={() => setUserMenuOpen((prev) => (!prev && setNotificationsOpen(false), !prev))}
 									className="relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden"
 									aria-label={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
 									title={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
@@ -395,7 +433,6 @@ export function Header() {
 													draggable={false}
 													loading="eager"
 												/>
-
 												{decorationUrl && (
 													<Image
 														src={decorationUrl}
@@ -423,7 +460,6 @@ export function Header() {
 										)}
 									</div>
 								</button>
-
 								<AnimatePresence>{userMenuOpen && <SidebarUserCard activeUser={activeUser} placement="top" onClose={() => setUserMenuOpen(false)} />}</AnimatePresence>
 							</div>
 						)}
@@ -433,16 +469,15 @@ export function Header() {
 						type="button"
 						aria-label={t('components.header.title1')}
 						title={t('components.header.title1')}
-						onClick={() => {
+						onClick={() =>
 							setOptionsOpen((prev) => {
-								const next = !prev;
-								if (!next) {
+								if (prev) {
 									setNotificationsOpen(false);
 									setUserMenuOpen(false);
 								}
-								return next;
-							});
-						}}
+								return !prev;
+							})
+						}
 						className={`relative md:hidden ${headerIconBtnClass}`}
 					>
 						<ChevronLeft

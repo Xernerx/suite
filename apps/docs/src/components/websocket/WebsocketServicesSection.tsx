@@ -17,6 +17,7 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 
 	const virtueActions = [
 		{ action: 'guilds', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id }', desc: t('docs.websocket.services.virtue.guildsDesc'), html: true },
+		{ action: 'users', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id }', desc: t('docs.websocket.services.virtue.usersDesc'), html: false },
 		{ action: 'text', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.textDesc'), html: false },
 		{ action: 'voice', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.voiceDesc'), html: false },
 		{ action: 'globalLevel', db: 'xernerx', dbClass: 'text-(--accent)', filter: '{ ownerId }', desc: t('docs.websocket.services.virtue.globalLevelDesc'), html: false },

@@ -284,7 +284,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 										<button
 											type="button"
 											onClick={() => openEditModal(invite)}
-											aria-label="Edit"
+											aria-label={t('common.edit')}
 											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
 										>
 											<Edit2 size={16} />
@@ -292,7 +292,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 										<button
 											type="button"
 											onClick={() => handleDelete(invite.id)}
-											aria-label="Delete"
+											aria-label={t('common.delete')}
 											className="p-2 rounded-xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors"
 										>
 											<Trash2 size={16} />

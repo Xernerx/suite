@@ -12,12 +12,15 @@ interface V1SubProps {
 	methodFilter?: string;
 	defaultExpanded?: boolean;
 	onTryRoute?: (method: string, path: string) => void;
+	botId?: string;
 }
 
-export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute }: V1SubProps) {
+export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute, botId = '' }: V1SubProps) {
 	const { t } = useDictionary();
 
 	if (activeGroup !== 'all' && activeGroup !== 'v1-commands') return null;
+
+	const effectiveBotId = botId.trim() || 'YOUR_BOT_ID';
 
 	const sections = [
 		{
@@ -34,19 +37,24 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst commands = await response.json();\nconsole.log(commands);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X GET "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN"`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst commands = await response.json();\nconsole.log(commands);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/commands', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst commands = await response.json();\nconsole.log(commands);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst commands = await stats.getCommands();\nconsole.log(commands);`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.get(url, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.get(url, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -74,19 +82,24 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands', {\n    method: 'PUT',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify([\n        {\n            name: "ping",\n            description: "Replies with Pong!",\n            type: 1\n        }\n    ])\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X PUT "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '[{"name":"ping","description":"Replies with Pong!","type":1}]'`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands', {\n    method: 'PUT',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify([\n        {\n            name: "ping",\n            description: "Replies with Pong!",\n            type: 1\n        }\n    ])\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/commands', {\n    method: 'PUT',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify([\n        {\n            name: "ping",\n            description: "Replies with Pong!",\n            type: 1\n        }\n    ])\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.syncCommands([\n    {\n        name: 'ping',\n        description: 'Replies with Pong!',\n        type: 1\n    }\n]);`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = [\n    {\n        "name": "ping",\n        "description": "Replies with Pong!",\n        "type": 1\n    }\n]\n\nresponse = requests.put(url, json=data, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = [\n    {\n        "name": "ping",\n        "description": "Replies with Pong!",\n        "type": 1\n    }\n]\n\nresponse = requests.put(url, json=data, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -107,19 +120,24 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X DELETE "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN"`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/commands', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.clearCommands();`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/commands"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>

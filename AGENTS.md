@@ -8,30 +8,30 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 
 ## 🧭 Workspace Directory & Port Map
 
-| Workspace Path        | Package / Service Name | Dev Port | Subdomain (Public / Canary / Dev)                             | Purpose                                                                          |
-| :-------------------- | :--------------------- | :------- | :------------------------------------------------------------ | :------------------------------------------------------------------------------- |
-| `apps/www`            | `www`                  | `4000`   | `xernerx.com`                                                 | Marketing showcase, legal (`terms`, `privacy`), applications, desktop download   |
-| `apps/api`            | `api`                  | `4001`   | `api.xernerx.com`                                             | Core backend gateway, Bearer token validator, Discord & Stripe webhooks          |
-| `apps/cdn`            | `cdn`                  | `4002`   | `cdn.xernerx.com`                                             | Media pipeline, `@vercel/blob` private storage, `/raw/[id]` streaming            |
-| `apps/account`        | `account`              | `4003`   | `account.xernerx.com`                                         | Identity hub, profile settings, localization, tokens, and billing history        |
-| `apps/app`            | `app`                  | `4004`   | `app.xernerx.com`                                             | User dashboard, bot & server explorer, Virtue settings, dev `/portal`            |
-| `apps/docs`           | `docs`                 | `4005`   | `docs.xernerx.com`                                            | Developer documentation, interactive API specs, package docs reader              |
-| `apps/admin`          | `admin`                | `4006`   | `admin.xernerx.com`                                           | Internal staff portal, RBAC role management, moderation, system config           |
-| `apps/info`           | `info`                 | `4007`   | `info.xernerx.com`                                            | Feedback & support hub (`roadmap`, `suggestions`, `bugs`, `faq`, `changelog`)    |
-| `apps/store`          | `store`                | `4008`   | `store.xernerx.com`                                           | Store portal, Virtue subscriptions, add-ons, credits, and checkout               |
-| `packages/components` | `@xernerx/components`  | —        | —                                                             | Shared application shell (`AppLayout`, `Header`, `Sidebar`, `Footer`)            |
-| `packages/feedback`   | `@xernerx/feedback`    | —        | —                                                             | Route feedback & error boundaries (`Loading`, `Error`, `NotFound`)               |
-| `packages/lib`        | `@xernerx/lib`         | —        | —                                                             | Mongoose models, NextAuth, i18n dictionaries, server utilities                   |
-| `packages/providers`  | `@xernerx/providers`   | —        | —                                                             | Global React context providers & hooks (`useUser`, `useDictionary`)              |
-| `packages/public`     | —                      | —        | —                                                             | Canonical static branding assets synced across web apps                          |
-| `packages/styles`     | `@xernerx/styles`      | —        | —                                                             | Central Tailwind CSS v4 stylesheet & CSS variable design tokens                  |
-| `packages/ui`         | `@xernerx/ui`          | —        | —                                                             | Primitive UI components (`Button`, `Modal`, `Input`, `Selector`, `Toggle`, etc.) |
-| `services/bot`        | `bot`                  | —        | —                                                             | Discord bot daemon (`@xernerx/framework`) syncing guilds and members             |
-| `services/websocket`  | `websocket`            | `5000`   | —                                                             | Real-time bidirectional WebSocket gateway & microservice router                  |
-| `clients/desktop`     | `desktop`              | —        | —                                                             | Electron desktop companion client wrapping `app.xernerx.com`                     |
+| Workspace Path        | Package / Service Name | Dev Port | Subdomain (Public / Canary / Dev)                             | Purpose                                                                                   |
+| :-------------------- | :--------------------- | :------- | :------------------------------------------------------------ | :---------------------------------------------------------------------------------------- |
+| `apps/www`            | `www`                  | `4000`   | `xernerx.com`                                                 | Marketing showcase, legal (`terms`, `privacy`), applications, desktop download            |
+| `apps/api`            | `api`                  | `4001`   | `api.xernerx.com`                                             | Core backend gateway, Bearer token validator, Discord & Stripe webhooks                   |
+| `apps/cdn`            | `cdn`                  | `4002`   | `cdn.xernerx.com`                                             | Media pipeline, `@vercel/blob` private storage, `/raw/[id]` streaming                     |
+| `apps/account`        | `account`              | `4003`   | `account.xernerx.com`                                         | Identity hub, profile settings, localization, tokens, and billing history                 |
+| `apps/app`            | `app`                  | `4004`   | `app.xernerx.com`                                             | User dashboard, bot & server explorer, Virtue settings, dev `/portal`                     |
+| `apps/docs`           | `docs`                 | `4005`   | `docs.xernerx.com`                                            | Developer documentation, interactive API specs, package docs reader                       |
+| `apps/admin`          | `admin`                | `4006`   | `admin.xernerx.com`                                           | Internal staff portal, RBAC role management, moderation, system config                    |
+| `apps/info`           | `info`                 | `4007`   | `info.xernerx.com`                                            | Feedback & support hub (`roadmap`, `suggestions`, `bugs`, `faq`, `changelog`)             |
+| `apps/store`          | `store`                | `4008`   | `store.xernerx.com`                                           | Store portal, Virtue subscriptions, add-ons, credits, and checkout                        |
+| `packages/components` | `@xernerx/components`  | —        | —                                                             | Shared application shell (`AppLayout`, `Header`, `Sidebar`, `Footer`)                     |
+| `packages/feedback`   | `@xernerx/feedback`    | —        | —                                                             | Route feedback & error boundaries (`Loading`, `Error`, `NotFound`)                        |
+| `packages/lib`        | `@xernerx/lib`         | —        | —                                                             | Mongoose models, NextAuth, i18n dictionaries, server utilities                            |
+| `packages/providers`  | `@xernerx/providers`   | —        | —                                                             | Global React context providers & hooks (`useUser`, `useDictionary`)                       |
+| `packages/public`     | —                      | —        | —                                                             | Canonical static branding assets synced across web apps                                   |
+| `packages/styles`     | `@xernerx/styles`      | —        | —                                                             | Central Tailwind CSS v4 stylesheet & CSS variable design tokens                           |
+| `packages/ui`         | `@xernerx/ui`          | —        | —                                                             | Primitive UI components (`Button`, `Modal`, `Input`, `Selector`, `Toggle`, `Check`, etc.) |
+| `services/bot`        | `bot`                  | —        | —                                                             | Discord bot daemon (`@xernerx/framework`) syncing guilds and members                      |
+| `services/websocket`  | `websocket`            | `5000`   | —                                                             | Real-time bidirectional WebSocket gateway & microservice router                           |
+| `clients/desktop`     | `desktop`              | —        | —                                                             | Electron desktop companion client wrapping `app.xernerx.com`                              |
 | `clients/mobile`      | —                      | —        | Placeholder workspace for future cross-platform mobile client |
-| `.xernerx/cli`        | `@xernerx/cli`         | —        | —                                                             | Internal `suite` CLI orchestrating dev, locales, env sync, and builds            |
-| `.xernerx/database`   | —                      | `27017`  | —                                                             | Local WiredTiger persistence directory for `mongodb-memory-server`               |
+| `.xernerx/cli`        | `@xernerx/cli`         | —        | —                                                             | Internal `suite` CLI orchestrating dev, locales, env sync, and builds                     |
+| `.xernerx/database`   | —                      | `27017`  | —                                                             | Local WiredTiger persistence directory for `mongodb-memory-server`                        |
 
 ---
 
@@ -80,17 +80,23 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 - **`packages/lib/src/dictionaries/en-GB.json` is the primary source of truth** for localization keys.
 - Never manually edit `packages/lib/src/i18n.config.ts`; it is auto-generated by `pnpm suite generate-locales`.
 
-### 5. Client / Server Boundary Isolation
+### 5. Client / Server Boundary Isolation & Universal Privacy Truth
 
 - Server-only modules (Mongoose models, database connection, Postmark mailers, server dictionaries) live in `@xernerx/lib/server` (guarded by `import 'server-only'`).
 - **Never import `@xernerx/lib/server` inside `'use client'` components.** Client components must fetch or mutate data via `api.xernerx.com` endpoints using `useEnvironment().getEnvUrl()`.
+- **Universal 3-Tier Privacy Truth (`public` | `limited` | `private`):**
+    - **`public` (Listed & Publicly Accessible):** Displayed in public directories, explorers, leaderboards, and search results, and accessible by anyone.
+    - **`limited` (Unlisted / Direct-Link Access):** Not private, but **never** listed in public directories, explorers, leaderboards, or search results. Accessible by anyone who has the direct link or ID.
+    - **`private` (Hard Private / Owner Only):** Strictly private—never listed and **no one** except the owner (or explicitly authorized co-owners/organization members) can view or access it, even with a direct link or ID.
+    - **Applies Everywhere:** This 3-tier privacy truth applies universally across the entire suite—all Next.js web applications (`apps/*`), API routes (`apps/api`), CDN media (`apps/cdn`), Users, Bots, Servers/Guilds, Organizations, WebSocket services (`services/websocket`), and Discord bots (`services/bot`).
 
 ### 6. Frontend Application Architecture (`apps/*`)
 
 - **Reuse Shared UI First:** Before rendering custom UI elements, always check `@xernerx/ui` and `@xernerx/components` for existing primitives and components.
-- **Form Controls (`Input.tsx`, `Selector.tsx`, `MultiSelector.tsx`, `Toggle.tsx`):**
+- **Form Controls (`Input.tsx`, `Selector.tsx`, `MultiSelector.tsx`, `Toggle.tsx`, `Check.tsx`):**
     - Never render raw native `<input type="text">`, `<input type="number">`, `<textarea>`, `<select>`, or `<input type="checkbox">` elements for standard form controls.
-    - Always use `<Input />`, `<Input variant="textarea" />`, `<Selector />`, `<MultiSelector />`, and `<Toggle />` from `@xernerx/ui`.
+    - Always use `<Input />`, `<Input variant="textarea" />`, `<Selector />`, `<MultiSelector />`, `<Toggle />`, and `<Check />` from `@xernerx/ui`.
+    - **`<Toggle />` vs `<Check />`:** Use `<Toggle />` (`Toggle.tsx`) strictly for **On / Off** boolean state switches (enabling or disabling a setting/feature). Use `<Check />` (`Check.tsx`) strictly for **selecting** items (multi-select cards, list selection, checkboxes, and option selection).
 - **No Native Browser Dialogs (`prompt()`, `confirm()`, `alert()`):**
     - **NEVER EVER use `window.prompt()` / `prompt()`, `window.confirm()` / `confirm()`, or `window.alert()` / `alert()` for anything.**
     - Always use `<Modal />` + `<Input />` from `@xernerx/ui` instead of `prompt()`, `<Confirm />` from `@xernerx/ui` instead of `confirm()`, and `useToast().toast()` from `@xernerx/providers` instead of `alert()`.
@@ -101,3 +107,31 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 - **500-Line Inline Code Cap:** Any `page.tsx` or component file exceeding 500 lines of inline UI/JSX code must be broken down into sub-components (a file >500 lines that mainly composes imported components is fine).
 - **Strict `src/components/` Placement:** All app-specific components must be housed in `apps/<app>/src/components/` (next to `src/app/`), **never** co-located inside `src/app/` route folders.
 - **Strict 3-Route Local `/api` Rule:** Frontend apps may only house `/api/auth/[...nextauth]`, `/api/changelog`, and `/api/version` locally (with the sole exception of `/api/connections/[provider]` and `/api/connections/[provider]/callback` on `apps/account` for linking secondary OAuth connections to an already-authenticated Discord account). All other backend endpoints (including Stripe store routes) must live in `apps/api` (`api.xernerx.com/secure/*` or `/v1/*`).
+
+### 7. Cross-Workspace Synchronization & Living Documentation
+
+- **Keep `www/download` Conformant with Live App UI & Layout:**
+    - Whenever any change is made to the application UI, layout, header, sidebar, window controls, overlay, or core shell (`@xernerx/components`, `@xernerx/ui`, `apps/app`, or `clients/desktop`), you **must** update `apps/www/src/app/download/page.tsx` (`apps/www/src/components/DesktopInteractivePreview.tsx` and `DesktopPerksBento.tsx`) so the interactive desktop preview and feature showcase stay 100% conformant with how the actual app looks and behaves.
+- **Keep `apps/docs` Synced with All API & WebSocket Changes:**
+    - Whenever adding, modifying, or deleting any API routes (`apps/api/src/app/{v1,core,secure,info}/**` or `apps/cdn`) or WebSocket services/actions (`services/websocket/src/app/**`), you **must** update the documentation in `apps/docs` (`apps/docs/src/app/api/[version]/page.tsx`, `apps/docs/src/components/V1PlatformEndpoints.tsx`, `apps/docs/src/components/CdnEndpoints.tsx`, `apps/docs/src/app/websocket/page.tsx`, and `packages/lib/src/dictionaries/en-GB.json` under `docs.*`) as well as the public docs catalog blueprints in `apps/api/src/lib/docsBlueprints*.ts`.
+- **Proactively Update the FAQ (`apps/info/faq` & `/core/faq`):**
+    - Whenever shipping a new feature, altering a user-facing workflow, changing limits/permissions/shortcuts, or making any change where a user question may be forthcoming, you **must** proactively update or add the relevant entries in the FAQ (`apps/info/src/components/faq/*`, `packages/lib/src/dictionaries/en-GB.json` under `info.faq.*`, and the public FAQ API blueprints in `apps/api/src/lib/faqBlueprints*.ts`).
+
+### 8. Public API Versioning & Breaking-Change Policy (`/v1/*` → `/v2/*`)
+
+- **Additive (Non-Breaking) Changes Stay in Current Version (`/v1/*`):**
+    - Adding a brand-new endpoint (e.g., `POST /v1/bots/[id]/releases`), adding a new **optional** request field/query parameter, or adding a new property to a JSON response object are **non-breaking** and belong in the active version (`/v1/*`).
+- **Breaking Changes Require a New Version (`/v2/*`):**
+    - **Never make breaking changes in-place to existing `/v1/*` (or any published `/vN/*`) routes.**
+    - A change is **breaking** if it:
+        1. Removes or renames an existing JSON response field.
+        2. Changes a field's data type or format (e.g., `number` → `array` or timestamp `number` → ISO `string`).
+        3. Makes a previously optional request field or parameter `required`.
+        4. Changes the response envelope structure (e.g., `[...]` → `{ data: [...] }`).
+        5. Removes an endpoint or changes its authentication/permission requirements.
+    - When a breaking change is required on a public developer endpoint:
+        1. Create the new version route under `apps/api/src/app/v2/...` (re-exporting unchanged handlers from `v1` rather than duplicating code).
+        2. Keep the `/v1/...` route functioning as a backward-compatible adapter for existing SDKs (`@xernerx/stats`, `@xernerx/framework`) and bots, and attach standard deprecation headers (`X-API-Version: v1`, `Deprecation: true`, `Sunset: <ISO-Date>`).
+        3. Register the new version (`v2`) in `apps/docs/src/app/api/[version]/page.tsx` and `apps/api/src/lib/docsBlueprints*.ts`.
+- **Internal Suite Endpoints (`/secure/*` & `/core/*`):**
+    - Because internal `/secure/*` and `/core/*` routes are consumed by monorepo apps deployed in lockstep, they do not use `/vN/` URL prefixes, provided all monorepo callers (including `clients/desktop`) are updated in the same change.

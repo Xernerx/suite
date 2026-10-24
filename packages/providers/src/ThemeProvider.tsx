@@ -9,6 +9,12 @@ import { useSession } from 'next-auth/react';
 type Theme = 'light' | 'dark' | 'system';
 
 export type LayoutAlignment = 'system' | 'left' | 'right';
+export type DotMatrixStage = 'default' | 'ripple' | 'orbit' | 'blank';
+export type DotMatrixType = 'default' | 'full' | 'icon' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'blank';
+export type DotMatrixAnimation = 'animate' | 'static' | 'always';
+
+const VALID_MATRIX_TYPES: readonly DotMatrixType[] = ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'blank'];
+const VALID_MATRIX_ANIMS: readonly DotMatrixAnimation[] = ['animate', 'static', 'always'];
 
 export interface UIPreferences {
 	showHeaderStore: boolean;
@@ -23,6 +29,9 @@ export interface UIPreferences {
 	defaultSidebarCollapsed: boolean;
 	developerMode: boolean;
 	alignment: LayoutAlignment;
+	dotMatrixStage?: DotMatrixStage;
+	dotMatrixType?: DotMatrixType;
+	dotMatrixAnimation?: DotMatrixAnimation;
 }
 
 export const DEFAULT_UI_PREFERENCES: UIPreferences = {
@@ -38,6 +47,9 @@ export const DEFAULT_UI_PREFERENCES: UIPreferences = {
 	defaultSidebarCollapsed: false,
 	developerMode: false,
 	alignment: 'system',
+	dotMatrixStage: 'default',
+	dotMatrixType: 'default',
+	dotMatrixAnimation: 'animate',
 };
 
 type ThemeContextType = {
@@ -46,6 +58,7 @@ type ThemeContextType = {
 	setTheme: (theme: Theme) => void;
 	setAccent: (color?: string | number | null) => void;
 	preferences: UIPreferences;
+	uiPreferences: UIPreferences;
 	setPreference: <K extends keyof UIPreferences>(key: K, value: UIPreferences[K]) => void;
 	resetPreferences: () => void;
 };
@@ -105,6 +118,18 @@ function loadStoredUIPreferences(): UIPreferences {
 		if (key === 'alignment') {
 			if (raw === 'system' || raw === 'left' || raw === 'right') {
 				result.alignment = raw;
+			}
+		} else if (key === 'dotMatrixStage') {
+			if (raw === 'default' || raw === 'ripple' || raw === 'orbit' || raw === 'blank') {
+				result.dotMatrixStage = raw;
+			}
+		} else if (key === 'dotMatrixType') {
+			if (raw && (VALID_MATRIX_TYPES as readonly string[]).includes(raw)) {
+				result.dotMatrixType = raw as DotMatrixType;
+			}
+		} else if (key === 'dotMatrixAnimation') {
+			if (raw && (VALID_MATRIX_ANIMS as readonly string[]).includes(raw)) {
+				result.dotMatrixAnimation = raw as DotMatrixAnimation;
 			}
 		} else if (raw === 'true') {
 			(result as any)[key] = true;
@@ -247,33 +272,66 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 					}
 					if (appPrefs.uiGap) setThemeVar('--ui-gap', `${appPrefs.uiGap}px`);
 					if (appPrefs.textScale) setThemeVar('--text-scale', `${appPrefs.textScale}px`);
+				}
 
-					if (appPrefs.uiPreferences && typeof appPrefs.uiPreferences === 'object') {
-						const mergedPrefs: UIPreferences = { ...DEFAULT_UI_PREFERENCES };
-						(Object.keys(DEFAULT_UI_PREFERENCES) as Array<keyof UIPreferences>).forEach((k) => {
-							if (k === 'alignment') {
-								const remoteAlign = appPrefs.uiPreferences[k];
-								if (remoteAlign === 'system' || remoteAlign === 'left' || remoteAlign === 'right') {
-									mergedPrefs.alignment = remoteAlign;
-									setPref(`pref_${k}`, remoteAlign);
-								} else {
-									const localAlign = getPref(`pref_${k}`);
-									if (localAlign === 'system' || localAlign === 'left' || localAlign === 'right') {
-										mergedPrefs.alignment = localAlign;
-									}
-								}
-							} else if (typeof appPrefs.uiPreferences[k] === 'boolean') {
-								(mergedPrefs as any)[k] = appPrefs.uiPreferences[k];
-								setPref(`pref_${k}`, String(appPrefs.uiPreferences[k]));
+				if (appPrefs?.uiPreferences && typeof appPrefs.uiPreferences === 'object') {
+					const mergedPrefs: UIPreferences = { ...DEFAULT_UI_PREFERENCES };
+					(Object.keys(DEFAULT_UI_PREFERENCES) as Array<keyof UIPreferences>).forEach((k) => {
+						if (k === 'alignment') {
+							const remoteAlign = appPrefs.uiPreferences[k];
+							if (remoteAlign === 'system' || remoteAlign === 'left' || remoteAlign === 'right') {
+								mergedPrefs.alignment = remoteAlign;
+								setPref(`pref_${k}`, remoteAlign);
 							} else {
-								const localVal = getPref(`pref_${k}`);
-								if (localVal === 'true' || localVal === 'false') (mergedPrefs as any)[k] = localVal === 'true';
+								const localAlign = getPref(`pref_${k}`);
+								if (localAlign === 'system' || localAlign === 'left' || localAlign === 'right') {
+									mergedPrefs.alignment = localAlign;
+								}
 							}
-						});
-						setPreferencesState(mergedPrefs);
-						if (typeof document !== 'undefined') {
-							document.documentElement.classList.toggle('reduce-motion', mergedPrefs.reducedMotion);
+						} else if (k === 'dotMatrixStage') {
+							const remoteStage = appPrefs.uiPreferences[k];
+							if (remoteStage === 'default' || remoteStage === 'ripple' || remoteStage === 'orbit' || remoteStage === 'blank') {
+								mergedPrefs.dotMatrixStage = remoteStage;
+								setPref(`pref_${k}`, remoteStage);
+							} else {
+								const localStage = getPref(`pref_${k}`);
+								if (localStage === 'default' || localStage === 'ripple' || localStage === 'orbit' || localStage === 'blank') {
+									mergedPrefs.dotMatrixStage = localStage;
+								}
+							}
+						} else if (k === 'dotMatrixType') {
+							const remoteType = appPrefs.uiPreferences[k];
+							if (remoteType && (VALID_MATRIX_TYPES as readonly string[]).includes(remoteType)) {
+								mergedPrefs.dotMatrixType = remoteType as DotMatrixType;
+								setPref(`pref_${k}`, remoteType);
+							} else {
+								const localType = getPref(`pref_${k}`);
+								if (localType && (VALID_MATRIX_TYPES as readonly string[]).includes(localType)) {
+									mergedPrefs.dotMatrixType = localType as DotMatrixType;
+								}
+							}
+						} else if (k === 'dotMatrixAnimation') {
+							const remoteAnim = appPrefs.uiPreferences[k];
+							if (remoteAnim && (VALID_MATRIX_ANIMS as readonly string[]).includes(remoteAnim)) {
+								mergedPrefs.dotMatrixAnimation = remoteAnim as DotMatrixAnimation;
+								setPref(`pref_${k}`, remoteAnim);
+							} else {
+								const localAnim = getPref(`pref_${k}`);
+								if (localAnim && (VALID_MATRIX_ANIMS as readonly string[]).includes(localAnim)) {
+									mergedPrefs.dotMatrixAnimation = localAnim as DotMatrixAnimation;
+								}
+							}
+						} else if (typeof appPrefs.uiPreferences[k] === 'boolean') {
+							(mergedPrefs as any)[k] = appPrefs.uiPreferences[k];
+							setPref(`pref_${k}`, String(appPrefs.uiPreferences[k]));
+						} else {
+							const localVal = getPref(`pref_${k}`);
+							if (localVal === 'true' || localVal === 'false') (mergedPrefs as any)[k] = localVal === 'true';
 						}
+					});
+					setPreferencesState(mergedPrefs);
+					if (typeof document !== 'undefined') {
+						document.documentElement.classList.toggle('reduce-motion', mergedPrefs.reducedMotion);
 					}
 				}
 			} catch (e) {
@@ -364,6 +422,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				setTheme: updateTheme,
 				setAccent: applyAccent,
 				preferences,
+				uiPreferences: preferences,
 				setPreference,
 				resetPreferences,
 			}}
@@ -408,8 +467,16 @@ export function useEffectiveAlignment(): {
 				setWindowControls(detail.windowControls);
 			}
 		};
+		const unsubscribe = electronBridge?.onMetadataUpdated?.((meta: any) => {
+			if (meta?.windowControls) {
+				setWindowControls(meta.windowControls);
+			}
+		});
 		window.addEventListener('xernerx:metadata-updated', handleMetaUpdate);
-		return () => window.removeEventListener('xernerx:metadata-updated', handleMetaUpdate);
+		return () => {
+			window.removeEventListener('xernerx:metadata-updated', handleMetaUpdate);
+			unsubscribe?.();
+		};
 	}, []);
 
 	const prefAlignment = ctx?.preferences?.alignment || 'system';

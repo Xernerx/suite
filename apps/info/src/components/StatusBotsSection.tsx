@@ -1,8 +1,10 @@
 /** @format */
 'use client';
 
-import React from 'react';
-import { Bot, ExternalLink, Server, Users } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bot, Code2, ExternalLink, Server, Users } from 'lucide-react';
+import Image from 'next/image';
+import { CodeBlock, Modal } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Status24hBar, type StatusBucketPoint } from './Status24hBar';
 
@@ -28,6 +30,7 @@ interface StatusBotsSectionProps {
 export function StatusBotsSection({ bots, loading, botHistory }: StatusBotsSectionProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const [selectedBotForBadge, setSelectedBotForBadge] = useState<MainOrgBotStatus | null>(null);
 
 	if (!loading && bots.length === 0) return null;
 
@@ -113,19 +116,75 @@ export function StatusBotsSection({ bots, loading, botHistory }: StatusBotsSecti
 									<Server size={12} className="text-(--accent)" />
 									{bot.guildCount > 0 ? `${bot.guildCount.toLocaleString()} ${t('info.status.botServers')}` : t('info.status.officialBot')}
 								</span>
-								<span className="inline-flex items-center gap-1.5">
-									<Users size={12} className="text-(--accent)" />
-									{bot.userCount > 0
-										? `${bot.userCount.toLocaleString()}`
-										: bot.shardCount > 0
-											? `${bot.shardCount} ${t('info.status.botShards')}`
-											: t('info.status.monitoredByXernerx')}
-								</span>
+								<div className="flex items-center gap-2">
+									<span className="inline-flex items-center gap-1.5">
+										<Users size={12} className="text-(--accent)" />
+										{bot.userCount > 0
+											? `${bot.userCount.toLocaleString()}`
+											: bot.shardCount > 0
+												? `${bot.shardCount} ${t('info.status.botShards')}`
+												: t('info.status.monitoredByXernerx')}
+									</span>
+									<button
+										type="button"
+										onClick={() => setSelectedBotForBadge(bot)}
+										title={t('info.status.botBadgeButton')}
+										className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-(--background)/60 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+									>
+										<Code2 size={11} />
+										<span>{t('info.status.botBadgeShort')}</span>
+									</button>
+								</div>
 							</div>
 						</div>
 					);
 				})}
 			</div>
+
+			{selectedBotForBadge && (
+				<Modal
+					open={Boolean(selectedBotForBadge)}
+					onOpenChange={(open) => {
+						if (!open) setSelectedBotForBadge(null);
+					}}
+					title={t('info.status.botBadgeModalTitle', { name: selectedBotForBadge.name })}
+					description={t('info.status.botBadgeModalDesc', { name: selectedBotForBadge.name })}
+					maxWidth="max-w-3xl"
+				>
+					<CodeBlock
+						preview={
+							<Image
+								src={getEnvUrl(`https://api.xernerx.com/v1/status/badge.svg?bot=${encodeURIComponent(selectedBotForBadge.id)}`)}
+								alt={`${selectedBotForBadge.name} Status`}
+								width={180}
+								height={24}
+								unoptimized
+								className="h-6 w-auto"
+							/>
+						}
+						tabs={[
+							{
+								id: 'markdown',
+								label: t('app.widgets.formatMarkdown'),
+								language: 'markdown',
+								code: `[![${selectedBotForBadge.name} Status](${getEnvUrl(`https://api.xernerx.com/v1/status/badge.svg?bot=${encodeURIComponent(selectedBotForBadge.id)}`)})](${getEnvUrl(`https://app.xernerx.com/bots/${selectedBotForBadge.id}`)})`,
+							},
+							{
+								id: 'html',
+								label: t('app.widgets.formatHtmlImg'),
+								language: 'html',
+								code: `<a href="${getEnvUrl(`https://app.xernerx.com/bots/${selectedBotForBadge.id}`)}" target="_blank" rel="noopener noreferrer">\n  <img src="${getEnvUrl(`https://api.xernerx.com/v1/status/badge.svg?bot=${encodeURIComponent(selectedBotForBadge.id)}`)}" alt="${selectedBotForBadge.name} Status" />\n</a>`,
+							},
+							{
+								id: 'svg',
+								label: t('app.widgets.formatDirectSvg'),
+								language: 'url',
+								code: getEnvUrl(`https://api.xernerx.com/v1/status/badge.svg?bot=${encodeURIComponent(selectedBotForBadge.id)}`),
+							},
+						]}
+					/>
+				</Modal>
+			)}
 		</div>
 	);
 }

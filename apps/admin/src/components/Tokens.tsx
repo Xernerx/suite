@@ -251,7 +251,7 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 				<div className="relative flex-1">
 					<Input variant="search" shortcut={true} placeholder={t('admin.tokens.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 				</div>
-				<div className="flex items-center gap-1.5 flex-wrap bg-(--foreground)/30 border border-(--border)/10 p-1.5 rounded-2xl shrink-0">
+				<div className="flex items-center gap-1.5 flex-wrap bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-1.5 rounded-2xl shrink-0">
 					{(['all', 'active', 'inactive', 'suspended', 'pending'] as const).map((st) => (
 						<button
 							key={st}

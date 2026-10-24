@@ -29,3 +29,13 @@
     - Always call `await database.connect()` (from `@xernerx/lib/server`) before querying Mongoose models from `registry`.
 3. **Consistent Responses:**
     - Return standardized JSON responses with appropriate HTTP status codes (`200`, `201`, `400`, `401`, `403`, `404`, `429`, `500`) and ensure CORS compatibility with all suite subdomains.
+4. **Universal 3-Tier Privacy Truth (`public` | `limited` | `private`):**
+    - **`public`:** Listed in public directories, explorers, leaderboards, and search results; accessible by anyone.
+    - **`limited`:** Unlisted (excluded from all public directory/explorer/search listings), but accessible by anyone via direct link or ID lookup.
+    - **`private`:** Hard private—never listed and **no one** except the owner (or authorized co-owners/organization members) may access or view it, even with a direct link or ID. Enforce this across all Users, Bots, Servers/Guilds, Organizations, and Media endpoints.
+5. **Public API Versioning & Breaking-Change Policy (`/v1/*` → `/v2/*`):**
+    - **Additive (Non-Breaking) Changes:** New endpoints, new optional request parameters, and new response fields stay in `/v1/*`.
+    - **Breaking Changes:** Never modify existing `/v1/*` contracts in a breaking way (removing/renaming response fields, changing field types, making optional inputs required, or altering response envelopes). Instead, introduce `/v2/*` for the breaking contract, re-export unchanged routes from `v1`, keep `/v1/*` working as a compatibility adapter with `X-API-Version: v1`, `Deprecation: true`, and `Sunset` headers, and add the new version to `apps/docs`.
+6. **Sync Docs & FAQ on Route Changes:**
+    - Whenever adding, modifying, or deleting any API routes (`/v1/*`, `/core/*`, `/secure/*`, `/info/*`), always update the corresponding documentation in `apps/docs` (`apps/docs/src/app/api/[version]/page.tsx`, `V1PlatformEndpoints.tsx`, `packages/lib/src/dictionaries/en-GB.json`) and `src/lib/docsBlueprints*.ts`.
+    - When a new endpoint or behavior introduces user-facing concepts or questions, also update the FAQ in `apps/info/src/components/faq/*` and `src/lib/faqBlueprints*.ts`.

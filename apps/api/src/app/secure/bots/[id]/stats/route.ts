@@ -1,6 +1,7 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import { MEMBER_MILESTONE_THRESHOLDS, SERVER_MILESTONE_THRESHOLDS } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -10,7 +11,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const limitParam = url.searchParams.get('limit');
 		const afterParam = url.searchParams.get('after');
 
-		const limit = limitParam !== null ? parseInt(limitParam, 10) : 5000;
+		const limit = limitParam !== null ? Math.max(1, parseInt(limitParam, 10) || 5000) : 5000;
 
 		const db = await database('xernerx');
 		const StatModel = (db.models.bots as any).Stat;
@@ -21,22 +22,42 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			query.$or = [{ timestamp: { $gte: afterNumber } }, { timestamp: { $gte: new Date(afterNumber) } }];
 		}
 
-		let rawStatsQuery = StatModel.find(query).select('timestamp createdAt guildCount servers userCount users shardCount voteCount votes onlineSince').sort({ timestamp: -1 });
+		// Sort ascending by timestamp so milestone threshold crossings and downsampling cover the full history from oldest to newest
+		const rawStats = await StatModel.find(query).select('timestamp guildCount servers userCount users shardCount voteCount votes onlineSince').sort({ timestamp: 1 }).lean();
 
-		if (limitParam !== null) {
-			rawStatsQuery = rawStatsQuery.limit(limit);
+		// Always preserve the exact first snapshot that crossed each server or member milestone threshold
+		const mustKeepIndices = new Set<number>();
+		if (rawStats.length > 0) {
+			mustKeepIndices.add(0);
+			mustKeepIndices.add(rawStats.length - 1);
+
+			let nextServerIdx = 0;
+			let nextMemberIdx = 0;
+
+			for (let i = 0; i < rawStats.length; i++) {
+				const s = rawStats[i] as any;
+				const guilds = Number(s.guildCount ?? s.servers ?? 0) || 0;
+				const users = Number(s.userCount ?? s.users ?? 0) || 0;
+
+				while (nextServerIdx < SERVER_MILESTONE_THRESHOLDS.length && guilds >= SERVER_MILESTONE_THRESHOLDS[nextServerIdx]) {
+					mustKeepIndices.add(i);
+					nextServerIdx++;
+				}
+				while (nextMemberIdx < MEMBER_MILESTONE_THRESHOLDS.length && users >= MEMBER_MILESTONE_THRESHOLDS[nextMemberIdx]) {
+					mustKeepIndices.add(i);
+					nextMemberIdx++;
+				}
+			}
 		}
 
-		const rawStats = await rawStatsQuery.lean();
-
-		// Downsample to max 'limit' items to avoid payload size limits and frontend lag
-		const downsampled = [];
+		// Downsample to max 'limit' items to avoid payload size limits and frontend lag while keeping milestone crossings
+		const stats = [];
 		const step = Math.max(1, Math.ceil(rawStats.length / limit));
-		for (let i = 0; i < rawStats.length; i += step) {
-			downsampled.push(rawStats[i]);
+		for (let i = 0; i < rawStats.length; i++) {
+			if (i % step === 0 || mustKeepIndices.has(i)) {
+				stats.push(rawStats[i]);
+			}
 		}
-
-		const stats = downsampled.reverse();
 
 		return NextResponse.json(stats, { status: 200 });
 	} catch (error) {

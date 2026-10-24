@@ -42,6 +42,7 @@ export default function IssuesPage() {
 	const [showForm, setShowForm] = useState(false);
 	const [attachment, setAttachment] = useState<File | null>(null);
 	const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+	const [preUploadedScreenshot, setPreUploadedScreenshot] = useState<string | null>(null);
 	const [uploading, setUploading] = useState(false);
 
 	useEffect(() => {
@@ -60,6 +61,9 @@ export default function IssuesPage() {
 			const qParam = params.get('q');
 			const prodParam = params.get('product');
 			const statusParam = params.get('status') as any;
+			const reportParam = params.get('report');
+			const pageParam = params.get('page');
+			const screenshotParam = params.get('screenshot');
 			const savedDraft = sessionStorage.getItem('xernerx_issue_draft') || sessionStorage.getItem('xernerx_bug_draft');
 			if (qParam) {
 				setSearch(qParam);
@@ -68,7 +72,36 @@ export default function IssuesPage() {
 				sessionStorage.removeItem('xernerx_issue_draft');
 				sessionStorage.removeItem('xernerx_bug_draft');
 			}
-			if (prodParam) setSelectedProduct(prodParam);
+			if (reportParam === '1') {
+				setShowForm(true);
+				setProduct(prodParam || 'App');
+				if (pageParam) {
+					setDescription((prev) => (prev.trim() ? prev : `**Page:** \`${pageParam}\`\n\n`));
+				}
+				if (screenshotParam) {
+					setPreUploadedScreenshot(screenshotParam);
+				}
+				const bridge = (window as any).electron;
+				if (bridge?.consumeBugReport) {
+					bridge
+						.consumeBugReport()
+						.then(async (report: any) => {
+							if (!report?.dataUrl) return;
+							if (report.pageUrl && !pageParam) {
+								setDescription((prev) => (prev.trim() ? prev : `**Page:** \`${report.pageUrl}\`\n\n`));
+							}
+							try {
+								const res = await fetch(report.dataUrl);
+								const blob = await res.blob();
+								const file = new File([blob], report.filename || `xernerx-issue-${Date.now()}.png`, { type: 'image/png' });
+								setAttachment(file);
+							} catch {}
+						})
+						.catch(() => {});
+				}
+			} else if (prodParam) {
+				setSelectedProduct(prodParam);
+			}
 			if (statusParam && ['all', 'verified', 'submitted', 'release'].includes(statusParam)) {
 				setStatusFilter(statusParam);
 			}
@@ -164,44 +197,23 @@ export default function IssuesPage() {
 
 	const submitIssue = async (e: any) => {
 		e.preventDefault();
-		if (!user)
-			return toast({
-				type: 'error',
-				title: t('info.bugs.toasts.notAuthenticated'),
-				description: t('info.bugs.toasts.mustBeLoggedIn'),
-			});
-		if (!product) {
-			return toast({
-				type: 'error',
-				title: t('info.bugs.toasts.error'),
-				description: t('info.bugs.toasts.productRequired'),
-			});
-		}
+		if (!user) return toast({ type: 'error', title: t('info.bugs.toasts.notAuthenticated'), description: t('info.bugs.toasts.mustBeLoggedIn') });
+		if (!product) return toast({ type: 'error', title: t('info.bugs.toasts.error'), description: t('info.bugs.toasts.productRequired') });
 		if (!title || !description) return;
 
 		setUploading(true);
 		let finalDescription = description;
 
 		try {
-			if (attachment) {
+			if (preUploadedScreenshot) {
+				finalDescription += `\n\n**Attachment:** [Screenshot](${preUploadedScreenshot})`;
+			} else if (attachment) {
 				const formData = new FormData();
 				formData.append('file', attachment);
-
-				const cdnRes = await fetch(getEnvUrl('https://cdn.xernerx.com/upload'), {
-					method: 'POST',
-					credentials: 'include',
-					body: formData,
-				});
-
-				if (!cdnRes.ok) {
-					const errText = await cdnRes.text();
-					throw new Error(errText || t('info.bugs.toasts.failedToUpload'));
-				}
-
+				const cdnRes = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${user.id}`), { method: 'POST', credentials: 'include', body: formData });
+				if (!cdnRes.ok) throw new Error((await cdnRes.text()) || t('info.bugs.toasts.failedToUpload'));
 				const cdnData = await cdnRes.json();
-				if (cdnData.url) {
-					finalDescription += `\n\n**Attachment:** [${attachment.name}](${cdnData.url})`;
-				}
+				if (cdnData.url) finalDescription += `\n\n**Attachment:** [${attachment.name}](${cdnData.url})`;
 			}
 		} catch (err: any) {
 			setUploading(false);
@@ -215,19 +227,9 @@ export default function IssuesPage() {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({
-					title,
-					description: finalDescription,
-					productId: resolved?.name || product,
-					botId: resolved?.id || null,
-				}),
+				body: JSON.stringify({ title, description: finalDescription, productId: resolved?.name || product, botId: resolved?.id || null }),
 			});
-			if (res.status === 409)
-				return toast({
-					type: 'error',
-					title: t('info.bugs.toasts.duplicate'),
-					description: t('info.bugs.toasts.duplicateTitle'),
-				});
+			if (res.status === 409) return toast({ type: 'error', title: t('info.bugs.toasts.duplicate'), description: t('info.bugs.toasts.duplicateTitle') });
 			if (!res.ok) throw new Error('Failed');
 			toast({ type: 'success', title: t('info.bugs.toasts.success'), description: t('info.bugs.toasts.submitted') });
 			setTitle('');
@@ -235,10 +237,11 @@ export default function IssuesPage() {
 			setProduct('');
 			setSearch('');
 			setAttachment(null);
+			setPreUploadedScreenshot(null);
 			setUploading(false);
 			setShowForm(false);
 			fetchIssues();
-		} catch (err) {
+		} catch {
 			setUploading(false);
 			toast({ type: 'error', title: t('info.bugs.toasts.error'), description: t('info.bugs.toasts.failedToPost') });
 		}
@@ -316,11 +319,39 @@ export default function IssuesPage() {
 								attachment={attachment}
 								setAttachment={setAttachment}
 								attachmentPreview={attachmentPreview}
+								preUploadedScreenshot={preUploadedScreenshot}
+								onClearPreUploaded={() => setPreUploadedScreenshot(null)}
 								uploading={uploading}
 								submitIssue={submitIssue}
 								handlePaste={handlePaste}
 								onCancel={() => setShowForm(false)}
 							/>
+						) : !user && showForm ? (
+							<motion.div
+								key="login-prompt"
+								initial={{ opacity: 0, scale: 0.96, y: 10 }}
+								animate={{ opacity: 1, scale: 1, y: 0 }}
+								exit={{ opacity: 0, scale: 0.96, y: -10 }}
+								className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-3xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
+							>
+								<div className="text-base font-bold text-(--text)">{t('info.bugs.newBug')}</div>
+								<div className="text-sm">{t('info.suggestions.loginToSubmit')}</div>
+								<div className="flex items-center gap-2">
+									<Button
+										onClick={() => {
+											if (typeof window !== 'undefined') {
+												window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+											}
+										}}
+									>
+										<LogIn size={16} />
+										{t('common.sidebar.login')}
+									</Button>
+									<Button variant="secondary" onClick={() => setShowForm(false)}>
+										{t('info.bugs.cancel')}
+									</Button>
+								</div>
+							</motion.div>
 						) : (
 							<motion.div
 								key="search-list"
@@ -334,7 +365,7 @@ export default function IssuesPage() {
 									<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
 										<p className="text-xs text-(--text-muted)">{t('info.bugs.startTyping')}</p>
-										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10">
+										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
 											{(
 												[
 													{ id: 'all', label: t('info.bugs.filters.all') },
@@ -365,7 +396,7 @@ export default function IssuesPage() {
 												className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
 													selectedProduct === null
 														? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-														: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+														: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
 												}`}
 											>
 												{t('info.bugs.allProducts')}
@@ -381,7 +412,7 @@ export default function IssuesPage() {
 														className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
 															isSelected
 																? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-																: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+																: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
 														}`}
 													>
 														{botInfo?.avatarUrl && (

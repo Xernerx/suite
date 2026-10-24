@@ -50,7 +50,7 @@ export function BotProfilePreview({ botId, getEnvUrl, onClear }: BotProfilePrevi
 		<button
 			type="button"
 			onClick={onClear}
-			aria-label="Clear"
+			aria-label={t('common.clear')}
 			className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-(--accent-red)/10 text-(--text-muted) hover:text-(--accent-red) transition-colors cursor-pointer"
 		>
 			<X size={10} />

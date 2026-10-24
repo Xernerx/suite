@@ -1,10 +1,10 @@
 {
 	"name": "api",
-	"version": "0.16.0",
+	"version": "0.19.1",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
-		"dev": "pnpm initialize && next dev -p 4001",
+		"dev": "next dev -p 4001",
 		"build": "next build",
 		"start": "next start",
 		"lint": "eslint"
@@ -15,14 +15,14 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^14.4.0",
-		"lucide-react": "^1.59.0",
-		"mongoose": "^9.11.2",
-		"next": "^16.4.2",
+		"framer-motion": "^14.6.0",
+		"lucide-react": "^1.61.0",
+		"mongoose": "^9.11.4",
+		"next": "^16.4.3",
 		"next-auth": "^4.24.15",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
-		"stripe": "^23.0.0"
+		"stripe": "^23.0.1"
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.3",
@@ -31,7 +31,7 @@
 		"@types/react-dom": "^19.3.0",
 		"babel-plugin-react-compiler": "1.0.0",
 		"eslint": "^10.13.0",
-		"eslint-config-next": "^16.4.2",
+		"eslint-config-next": "^16.4.3",
 		"tailwindcss": "^4.3.3",
 		"typescript": "^6.0.3"
 	}

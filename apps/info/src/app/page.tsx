@@ -4,17 +4,29 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Activity, Bug, Compass, History, LifeBuoy, Map, MessageSquare } from 'lucide-react';
+import { Activity, ArrowRight, Bug, Code, Compass, History, LifeBuoy, Map, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+type SearchCategory = 'faq' | 'issues' | 'suggestions' | 'roadmap' | 'docs' | 'changelog' | 'status';
+
 type SearchResultItem = {
 	id: string;
-	category: 'faq' | 'issues' | 'suggestions' | 'roadmap';
+	category: SearchCategory;
 	title: string;
 	description?: string;
+	keywords?: string;
+	subLabel?: string;
 	href: string;
+	external?: boolean;
 };
+
+function matchesTokens(haystack: string, rawQuery: string): boolean {
+	const tokens = rawQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+	if (tokens.length === 0) return false;
+	const lower = haystack.toLowerCase();
+	return tokens.every((tok) => lower.includes(tok));
+}
 
 export default function InfoHomePage() {
 	const { t } = useDictionary();
@@ -23,10 +35,14 @@ export default function InfoHomePage() {
 	const router = useRouter();
 
 	const [searchQuery, setSearchQuery] = useState('');
+	const [activeCategoryFilter, setActiveCategoryFilter] = useState<'all' | SearchCategory>('all');
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const [roadmapItems, setRoadmapItems] = useState<any[]>([]);
 	const [issueItems, setIssueItems] = useState<any[]>([]);
 	const [suggestionItems, setSuggestionItems] = useState<any[]>([]);
+	const [faqCatalogItems, setFaqCatalogItems] = useState<any[]>([]);
+	const [docsCatalogItems, setDocsCatalogItems] = useState<any[]>([]);
+	const [changelogItems, setChangelogItems] = useState<any[]>([]);
 
 	useEffect(() => {
 		hide();
@@ -44,75 +60,63 @@ export default function InfoHomePage() {
 			fetch(getEnvUrl('https://api.xernerx.com/info/suggestions'))
 				.then((res) => (res.ok ? res.json() : { data: [] }))
 				.catch(() => ({ data: [] })),
-		]).then(([rData, iData, sData]) => {
+			fetch(getEnvUrl('https://api.xernerx.com/core/faq?flat=true'))
+				.then((res) => (res.ok ? res.json() : { items: [] }))
+				.catch(() => ({ items: [] })),
+			fetch(getEnvUrl('https://api.xernerx.com/core/docs?flat=true'))
+				.then((res) => (res.ok ? res.json() : { items: [] }))
+				.catch(() => ({ items: [] })),
+			fetch('/api/changelog')
+				.then((res) => (res.ok ? res.json() : []))
+				.catch(() => []),
+		]).then(([rData, iData, sData, faqData, docsData, clData]) => {
 			setRoadmapItems(Array.isArray(rData?.data) ? rData.data : []);
 			setIssueItems(Array.isArray(iData?.data) ? iData.data : []);
 			setSuggestionItems(Array.isArray(sData?.data) ? sData.data : []);
+			setFaqCatalogItems(Array.isArray(faqData?.items) ? faqData.items : []);
+			setDocsCatalogItems(Array.isArray(docsData?.items) ? docsData.items : []);
+			setChangelogItems(Array.isArray(clData) ? clData : Array.isArray(clData?.releases) ? clData.releases : []);
 		});
 	}, [isReady, getEnvUrl]);
 
 	const searchableItems: SearchResultItem[] = useMemo(() => {
-		const faqEntries: SearchResultItem[] = [
-			{ id: 'faq-ov-1', category: 'faq', title: t('faq.overview.card1.title'), description: t('faq.overview.card1.description'), href: '/faq?view=overview' },
-			{ id: 'faq-ov-2', category: 'faq', title: t('faq.overview.card2.title'), description: t('faq.overview.card2.description'), href: '/faq?view=overview' },
-			{ id: 'faq-ov-3', category: 'faq', title: t('faq.overview.card3.title'), description: t('faq.overview.card3.description'), href: '/faq?view=overview' },
-			{ id: 'faq-ov-4', category: 'faq', title: t('faq.overview.card4.title'), description: t('faq.overview.card4.description'), href: '/faq?view=overview' },
-			{ id: 'faq-ov-5', category: 'faq', title: t('faq.overview.card5.title'), description: t('faq.overview.card5.description'), href: '/faq?view=overview' },
-			{ id: 'faq-env-1', category: 'faq', title: t('faq.environments.card.title'), description: t('faq.environments.card.description'), href: '/faq?view=environments' },
-			{ id: 'faq-env-2', category: 'faq', title: t('faq.environments.card2.title'), description: t('faq.environments.card2.description'), href: '/faq?view=environments' },
-			{ id: 'faq-env-3', category: 'faq', title: t('faq.environments.card3.title'), description: t('faq.environments.card3.description'), href: '/faq?view=environments' },
-			{ id: 'faq-env-4', category: 'faq', title: t('faq.environments.card4.title'), description: t('faq.environments.card4.description'), href: '/faq?view=environments' },
-			{ id: 'faq-env-6', category: 'faq', title: t('faq.environments.card6.title'), description: t('faq.environments.card6.description'), href: '/faq?view=environments' },
-			{ id: 'faq-desk-1', category: 'faq', title: t('faq.desktop.card1.title'), description: t('faq.desktop.card1.description'), href: '/faq?view=desktop' },
-			{ id: 'faq-desk-2', category: 'faq', title: t('faq.desktop.card2.title'), description: t('faq.desktop.card2.description'), href: '/faq?view=desktop' },
-			{ id: 'faq-desk-3', category: 'faq', title: t('faq.desktop.card3.title'), description: t('faq.desktop.card3.description'), href: '/faq?view=desktop' },
-			{ id: 'faq-desk-4', category: 'faq', title: t('faq.desktop.card4.title'), description: t('faq.desktop.card4.description'), href: '/faq?view=desktop' },
-			{ id: 'faq-desk-5', category: 'faq', title: t('faq.desktop.card5.title'), description: t('faq.desktop.card5.description'), href: '/faq?view=desktop' },
-			{ id: 'faq-bots-8', category: 'faq', title: t('faq.bots.card8.title'), description: t('faq.bots.card8.description'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-2', category: 'faq', title: t('faq.bots.card2.title'), description: t('faq.bots.card2.description'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-9', category: 'faq', title: t('faq.bots.card9.title'), description: t('faq.bots.card9.description'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-10', category: 'faq', title: t('faq.bots.card10.title'), description: t('faq.bots.card10.description'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-1', category: 'faq', title: t('faq.bots.card.title'), description: t('faq.bots.card.description2'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-4', category: 'faq', title: t('faq.bots.card4.title'), description: t('faq.bots.card4.description'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-5', category: 'faq', title: t('faq.bots.card5.title'), description: t('faq.bots.card5.description'), href: '/faq?view=bots' },
-			{ id: 'faq-bots-3', category: 'faq', title: t('faq.bots.card3.title'), description: t('faq.bots.card3.description'), href: '/faq?view=bots' },
-			{ id: 'faq-srv-1', category: 'faq', title: t('faq.servers.card1.title'), description: t('faq.servers.card1.description'), href: '/faq?view=servers' },
-			{ id: 'faq-srv-2', category: 'faq', title: t('faq.servers.card2.title'), description: t('faq.servers.card2.description'), href: '/faq?view=servers' },
-			{ id: 'faq-srv-3', category: 'faq', title: t('faq.servers.card3.title'), description: t('faq.servers.card3.description'), href: '/faq?view=servers' },
-			{ id: 'faq-srv-4', category: 'faq', title: t('faq.servers.card4.title'), description: t('faq.servers.card4.description'), href: '/faq?view=servers' },
-			{ id: 'faq-srv-5', category: 'faq', title: t('faq.servers.card5.title'), description: t('faq.servers.card5.description'), href: '/faq?view=servers' },
-			{ id: 'faq-srv-6', category: 'faq', title: t('faq.servers.card6.title'), description: t('faq.servers.card6.description'), href: '/faq?view=servers' },
-			{ id: 'faq-acc-1', category: 'faq', title: t('faq.account.card1.title'), description: t('faq.account.card1.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-5', category: 'faq', title: t('faq.account.card5.title'), description: t('faq.account.card5.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-6', category: 'faq', title: t('faq.account.card6.title'), description: t('faq.account.card6.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-7', category: 'faq', title: t('faq.account.card7.title'), description: t('faq.account.card7.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-9', category: 'faq', title: t('faq.account.card9.title'), description: t('faq.account.card9.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-8', category: 'faq', title: t('faq.account.card8.title'), description: t('faq.account.card8.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-10', category: 'faq', title: t('faq.account.card10.title'), description: t('faq.account.card10.description'), href: '/faq?view=account' },
-			{ id: 'faq-acc-3', category: 'faq', title: t('faq.account.card3.title'), description: t('faq.account.card3.description'), href: '/faq?view=account' },
-			{ id: 'faq-bill-1', category: 'faq', title: t('faq.billing.card1.title'), description: t('faq.billing.card1.description'), href: '/faq?view=billing' },
-			{ id: 'faq-bill-2', category: 'faq', title: t('faq.billing.card2.title'), description: t('faq.billing.card2.description'), href: '/faq?view=billing' },
-			{ id: 'faq-bill-3', category: 'faq', title: t('faq.billing.card3.title'), description: t('faq.billing.card3.description'), href: '/faq?view=billing' },
-			{ id: 'faq-bill-4', category: 'faq', title: t('faq.billing.card4.title'), description: t('faq.billing.card4.description'), href: '/faq?view=billing' },
-			{ id: 'faq-bill-5', category: 'faq', title: t('faq.billing.card5.title'), description: t('faq.billing.card5.description'), href: '/faq?view=billing' },
-			{ id: 'faq-dev-1', category: 'faq', title: t('faq.developers.card1.title'), description: t('faq.developers.card1.description'), href: '/faq?view=developers' },
-			{ id: 'faq-dev-7', category: 'faq', title: t('faq.developers.card7.title'), description: t('faq.developers.card7.description'), href: '/faq?view=developers' },
-			{ id: 'faq-dev-3', category: 'faq', title: t('faq.developers.card3.title'), description: t('faq.developers.card3.description'), href: '/faq?view=developers' },
-			{ id: 'faq-dev-8', category: 'faq', title: t('faq.developers.card8.title'), description: t('faq.developers.card8.description'), href: '/faq?view=developers' },
-			{ id: 'faq-dev-4', category: 'faq', title: t('faq.developers.card4.title'), description: t('faq.developers.card4.description'), href: '/faq?view=developers' },
-			{ id: 'faq-dev-2', category: 'faq', title: t('faq.developers.card2.title'), description: t('faq.developers.card2.description'), href: '/faq?view=developers' },
-			{ id: 'faq-tr-1', category: 'faq', title: t('faq.translations.card1.title'), description: t('faq.translations.card1.p1'), href: '/faq?view=translations' },
-			{ id: 'faq-tr-2', category: 'faq', title: t('faq.translations.card2.title'), description: t('faq.translations.card2.description'), href: '/faq?view=translations' },
-			{ id: 'faq-tr-3', category: 'faq', title: t('faq.translations.card3.title'), description: t('faq.translations.card3.description'), href: '/faq?view=translations' },
-			{ id: 'faq-tr-4', category: 'faq', title: t('faq.translations.card4.title'), description: t('faq.translations.card4.description'), href: '/faq?view=translations' },
-			{ id: 'faq-tr-5', category: 'faq', title: t('faq.translations.card5.title'), description: t('faq.translations.card5.description'), href: '/faq?view=translations' },
-		];
+		const trimmedQ = searchQuery.trim();
+		const qParam = trimmedQ ? `&q=${encodeURIComponent(trimmedQ)}` : '';
+
+		const faqEntries: SearchResultItem[] =
+			faqCatalogItems.length > 0
+				? faqCatalogItems.map((item: any, idx: number) => ({
+						id: `faq-${item.fullId || item.id || idx}`,
+						category: 'faq' as const,
+						title: item.question || item.id || '',
+						description: item.answer || '',
+						subLabel: item.categoryTitle || '',
+						keywords: `${item.slug || ''} ${item.categoryTitle || ''} ${item.sectionTitle || ''} ${Array.isArray(item.bullets) ? item.bullets.join(' ') : ''}`,
+						href: `/faq?category=${encodeURIComponent(item.categoryId || 'overview')}${qParam}`,
+					}))
+				: [
+						{ id: 'faq-ov-1', category: 'faq', title: t('faq.overview.card1.title'), description: t('faq.overview.card1.description'), href: `/faq?category=overview${qParam}` },
+						{ id: 'faq-ov-2', category: 'faq', title: t('faq.overview.card2.title'), description: t('faq.overview.card2.description'), href: `/faq?category=overview${qParam}` },
+						{ id: 'faq-ov-3', category: 'faq', title: t('faq.overview.card3.title'), description: t('faq.overview.card3.description'), href: `/faq?category=overview${qParam}` },
+						{ id: 'faq-ov-4', category: 'faq', title: t('faq.overview.card4.title'), description: t('faq.overview.card4.description'), href: `/faq?category=overview${qParam}` },
+						{ id: 'faq-ov-5', category: 'faq', title: t('faq.overview.card5.title'), description: t('faq.overview.card5.description'), href: `/faq?category=overview${qParam}` },
+						{ id: 'faq-env-1', category: 'faq', title: t('faq.environments.card.title'), description: t('faq.environments.card.description'), href: `/faq?category=environments${qParam}` },
+						{ id: 'faq-desk-1', category: 'faq', title: t('faq.desktop.card1.title'), description: t('faq.desktop.card1.description'), href: `/faq?category=desktop${qParam}` },
+						{ id: 'faq-bots-1', category: 'faq', title: t('faq.bots.card8.title'), description: t('faq.bots.card8.description'), href: `/faq?category=bots${qParam}` },
+						{ id: 'faq-srv-1', category: 'faq', title: t('faq.servers.card1.title'), description: t('faq.servers.card1.description'), href: `/faq?category=servers${qParam}` },
+						{ id: 'faq-acc-1', category: 'faq', title: t('faq.account.card1.title'), description: t('faq.account.card1.description'), href: `/faq?category=account${qParam}` },
+						{ id: 'faq-bill-1', category: 'faq', title: t('faq.billing.card1.title'), description: t('faq.billing.card1.description'), href: `/faq?category=billing${qParam}` },
+						{ id: 'faq-dev-1', category: 'faq', title: t('faq.developers.card1.title'), description: t('faq.developers.card1.description'), href: `/faq?category=developers${qParam}` },
+						{ id: 'faq-tr-1', category: 'faq', title: t('faq.translations.card1.title'), description: t('faq.translations.card1.p1'), href: `/faq?category=translations${qParam}` },
+					];
 
 		const issues: SearchResultItem[] = issueItems.map((item, idx) => ({
 			id: `issue-${item._id || idx}`,
 			category: 'issues',
 			title: item.title || '',
 			description: item.description || '',
+			subLabel: item.product || item.status || '',
+			keywords: `${item.product || ''} ${item.status || ''}`,
 			href: item.title ? `/issues?q=${encodeURIComponent(item.title)}` : '/issues',
 		}));
 
@@ -121,6 +125,8 @@ export default function InfoHomePage() {
 			category: 'suggestions',
 			title: item.title || '',
 			description: item.description || '',
+			subLabel: item.product || '',
+			keywords: `${item.product || ''} ${item.status || ''}`,
 			href: item.title ? `/suggestions?q=${encodeURIComponent(item.title)}` : '/suggestions',
 		}));
 
@@ -129,21 +135,64 @@ export default function InfoHomePage() {
 			category: 'roadmap',
 			title: item.title || '',
 			description: item.description || '',
-			href: '/roadmap',
+			subLabel: item.product || item.status || '',
+			keywords: `${item.product || ''} ${item.status || ''} ${item.version || ''}`,
+			href: item.title ? `/roadmap?q=${encodeURIComponent(item.title)}` : '/roadmap',
 		}));
 
-		return [...faqEntries, ...issues, ...suggestions, ...roadmap];
-	}, [t, issueItems, suggestionItems, roadmapItems]);
+		const docsEntries: SearchResultItem[] = docsCatalogItems.map((doc: any, idx: number) => {
+			const prefix = doc.method && doc.path ? `${doc.method} ${doc.path} — ` : '';
+			return {
+				id: `doc-${doc.id || idx}`,
+				category: 'docs',
+				title: `${prefix}${doc.title || doc.id || ''}`,
+				description: doc.description || '',
+				subLabel: doc.categoryTitle || 'Docs',
+				keywords: `${doc.method || ''} ${doc.path || ''} ${doc.categoryTitle || ''} ${doc.sectionTitle || ''} ${Array.isArray(doc.keywords) ? doc.keywords.join(' ') : ''}`,
+				href: getEnvUrl(doc.url || 'https://docs.xernerx.com'),
+				external: true,
+			};
+		});
+
+		const changelogEntries: SearchResultItem[] = changelogItems.slice(0, 40).map((rel: any, idx: number) => ({
+			id: `changelog-${rel.version || rel.tag || idx}`,
+			category: 'changelog',
+			title: `${rel.app || 'Xernerx'} ${rel.version || rel.tag || ''}`.trim(),
+			description: rel.summary || rel.body || rel.changes?.join(' • ') || t('info.home.portals.changelog.description'),
+			subLabel: rel.date || '',
+			keywords: `changelog release update version ${rel.version || ''} ${rel.app || ''}`,
+			href: '/changelog',
+		}));
+
+		const statusEntries: SearchResultItem[] = [
+			{
+				id: 'status-matrix',
+				category: 'status',
+				title: t('info.home.portals.status.title'),
+				description: t('info.home.portals.status.description'),
+				subLabel: 'info.xernerx.com/status',
+				keywords: 'status uptime latency ping outage operational websites applications bots services api cdn websocket',
+				href: '/status',
+			},
+		];
+
+		return [...faqEntries, ...roadmap, ...suggestions, ...issues, ...docsEntries, ...changelogEntries, ...statusEntries];
+	}, [t, faqCatalogItems, issueItems, suggestionItems, roadmapItems, docsCatalogItems, changelogItems, searchQuery, getEnvUrl]);
+
+	const matchedAllCategories = useMemo(() => {
+		const q = searchQuery.trim();
+		if (!q) return [];
+		return searchableItems.filter((item) => matchesTokens(`${item.title} ${item.description || ''} ${item.subLabel || ''} ${item.keywords || ''}`, q));
+	}, [searchableItems, searchQuery]);
 
 	const filteredResults = useMemo(() => {
-		const q = searchQuery.trim().toLowerCase();
-		if (!q) return [];
-		return searchableItems.filter((item) => item.title.toLowerCase().includes(q) || (item.description && item.description.toLowerCase().includes(q))).slice(0, 8);
-	}, [searchableItems, searchQuery]);
+		const base = activeCategoryFilter === 'all' ? matchedAllCategories : matchedAllCategories.filter((item) => item.category === activeCategoryFilter);
+		return base.slice(0, 20);
+	}, [matchedAllCategories, activeCategoryFilter]);
 
 	useEffect(() => {
 		setSelectedIndex(0);
-	}, [searchQuery]);
+	}, [searchQuery, activeCategoryFilter]);
 
 	const handleSearchKeyDown = (e: React.KeyboardEvent) => {
 		if (filteredResults.length === 0) return;
@@ -157,14 +206,15 @@ export default function InfoHomePage() {
 			e.preventDefault();
 			const selected = filteredResults[selectedIndex];
 			if (selected) {
-				router.push(selected.href);
+				if (selected.external) window.location.href = selected.href;
+				else router.push(selected.href);
 			}
 		} else if (e.key === 'Escape') {
 			setSearchQuery('');
 		}
 	};
 
-	const categoryBadge = (category: SearchResultItem['category']) => {
+	const categoryBadge = (category: SearchCategory) => {
 		switch (category) {
 			case 'faq':
 				return {
@@ -185,9 +235,40 @@ export default function InfoHomePage() {
 					cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20',
 				};
 			case 'roadmap':
-				return { label: t('info.home.searchCategories.roadmap'), icon: <Map className="w-3.5 h-3.5 text-(--accent)" />, cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20' };
+				return {
+					label: t('info.home.searchCategories.roadmap'),
+					icon: <Map className="w-3.5 h-3.5 text-(--accent)" />,
+					cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20',
+				};
+			case 'docs':
+				return {
+					label: t('info.home.searchCategories.docs'),
+					icon: <Code className="w-3.5 h-3.5 text-(--accent)" />,
+					cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20',
+				};
+			case 'changelog':
+				return {
+					label: t('info.home.searchCategories.changelog'),
+					icon: <History className="w-3.5 h-3.5 text-(--accent-orange)" />,
+					cls: 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20',
+				};
+			case 'status':
+				return {
+					label: t('info.home.searchCategories.status'),
+					icon: <Activity className="w-3.5 h-3.5 text-(--accent-green)" />,
+					cls: 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20',
+				};
 		}
 	};
+
+	const filterPills: Array<{ key: 'all' | SearchCategory; label: string }> = [
+		{ key: 'all', label: t('info.home.searchCategories.all') },
+		{ key: 'faq', label: t('info.home.searchCategories.faq') },
+		{ key: 'roadmap', label: t('info.home.searchCategories.roadmap') },
+		{ key: 'suggestions', label: t('info.home.searchCategories.suggestions') },
+		{ key: 'issues', label: t('info.home.searchCategories.issues') },
+		{ key: 'docs', label: t('info.home.searchCategories.docs') },
+	];
 
 	const portals = [
 		{
@@ -273,38 +354,60 @@ export default function InfoHomePage() {
 								animate={{ opacity: 1, y: 0 }}
 								exit={{ opacity: 0, y: 8 }}
 								transition={{ duration: 0.15 }}
-								className="absolute left-0 right-0 top-full mt-3 rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl p-3 flex flex-col gap-1.5 max-h-96 overflow-y-auto z-40"
+								className="absolute left-0 right-0 top-full mt-3 rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl p-3 flex flex-col gap-2 max-h-[440px] overflow-hidden z-40"
 							>
-								{filteredResults.length > 0 ? (
-									filteredResults.map((result, idx) => {
-										const badge = categoryBadge(result.category);
-										const isSelected = idx === selectedIndex;
+								<div className="flex flex-wrap items-center gap-1.5 px-2 pt-1 pb-2 border-b border-(--border)/10 shrink-0">
+									{filterPills.map((pill) => {
+										const count = pill.key === 'all' ? matchedAllCategories.length : matchedAllCategories.filter((i) => i.category === pill.key).length;
+										const isActive = activeCategoryFilter === pill.key;
 										return (
-											<Link
-												key={result.id}
-												href={result.href}
-												onMouseEnter={() => setSelectedIndex(idx)}
-												className={`flex items-center justify-between gap-4 px-4 py-3 rounded-2xl transition-colors ${
-													isSelected ? 'bg-(--accent)/15 text-(--text)' : 'hover:bg-(--background)/60 text-(--text)'
+											<button
+												key={pill.key}
+												type="button"
+												onClick={() => setActiveCategoryFilter(pill.key)}
+												className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+													isActive ? 'bg-(--accent) text-white' : 'bg-(--background)/60 text-(--text-muted) hover:text-(--text)'
 												}`}
 											>
-												<div className="flex flex-col gap-1 min-w-0">
-													<div className="flex items-center gap-2">
-														<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${badge.cls}`}>
-															{badge.icon}
-															{badge.label}
-														</span>
-														<span className="font-semibold text-sm truncate">{result.title}</span>
-													</div>
-													{result.description && <p className="text-xs text-(--text-muted) line-clamp-1">{result.description}</p>}
-												</div>
-												<ArrowRight className={`w-4 h-4 shrink-0 transition-opacity ${isSelected ? 'opacity-100 text-(--accent)' : 'opacity-40'}`} />
-											</Link>
+												{pill.label} ({count})
+											</button>
 										);
-									})
-								) : (
-									<div className="py-8 text-center text-sm text-(--text-muted)">{t('info.home.searchEmpty', { query: searchQuery.trim() })}</div>
-								)}
+									})}
+								</div>
+
+								<div className="flex flex-col gap-1 overflow-y-auto flex-1 pr-1">
+									{filteredResults.length > 0 ? (
+										filteredResults.map((result, idx) => {
+											const badge = categoryBadge(result.category);
+											const isSelected = idx === selectedIndex;
+											return (
+												<Link
+													key={result.id}
+													href={result.href}
+													onMouseEnter={() => setSelectedIndex(idx)}
+													className={`flex items-center justify-between gap-4 px-4 py-3 rounded-2xl transition-colors ${
+														isSelected ? 'bg-(--accent)/15 text-(--text)' : 'hover:bg-(--background)/60 text-(--text)'
+													}`}
+												>
+													<div className="flex flex-col gap-1 min-w-0">
+														<div className="flex items-center gap-2">
+															<span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border shrink-0 ${badge.cls}`}>
+																{badge.icon}
+																{badge.label}
+															</span>
+															{result.subLabel && <span className="text-[11px] font-bold text-(--text-muted) shrink-0">{result.subLabel} •</span>}
+															<span className="font-semibold text-sm truncate">{result.title}</span>
+														</div>
+														{result.description && <p className="text-xs text-(--text-muted) line-clamp-1">{result.description}</p>}
+													</div>
+													<ArrowRight className={`w-4 h-4 shrink-0 transition-opacity ${isSelected ? 'opacity-100 text-(--accent)' : 'opacity-40'}`} />
+												</Link>
+											);
+										})
+									) : (
+										<div className="py-8 text-center text-sm text-(--text-muted)">{t('info.home.searchEmpty', { query: searchQuery.trim() })}</div>
+									)}
+								</div>
 							</motion.div>
 						)}
 					</AnimatePresence>

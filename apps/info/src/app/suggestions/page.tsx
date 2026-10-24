@@ -335,7 +335,7 @@ export default function SuggestionsPage() {
 									<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
 										<p className="text-xs text-(--text-muted)">{t('info.suggestions.startTyping')}</p>
-										<div className="flex items-center gap-1 p-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10">
+										<div className="flex items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
 											{(
 												[
 													{ id: 'top', label: t('info.suggestions.sort.top') },
@@ -365,7 +365,7 @@ export default function SuggestionsPage() {
 												className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
 													selectedProduct === null
 														? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-														: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+														: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
 												}`}
 											>
 												{t('info.suggestions.allProducts')}
@@ -381,7 +381,7 @@ export default function SuggestionsPage() {
 														className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
 															isSelected
 																? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-																: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/40 hover:text-(--text)'
+																: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
 														}`}
 													>
 														{botInfo?.avatarUrl && (

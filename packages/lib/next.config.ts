@@ -5,9 +5,27 @@ import type { NextConfig } from 'next';
 export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 	return {
 		poweredByHeader: false,
+		cacheMaxMemorySize: 16 * 1024 * 1024,
+		onDemandEntries: {
+			maxInactiveAge: 15 * 1000,
+			pagesBufferLength: 2,
+			...appConfig.onDemandEntries,
+		},
 		...appConfig,
 		experimental: {
 			turbopackFileSystemCacheForDev: false,
+			turbopackMemoryEviction: 'full',
+			turbopackGc: {
+				minProgressMs: 100,
+				rootTtlMs: 60 * 1000,
+			},
+			turbopackPluginRuntimeStrategy: 'forceWorkerThreads',
+			workerThreads: true,
+			cpus: 2,
+			memoryBasedWorkersCount: true,
+			webpackMemoryOptimizations: true,
+			preloadEntriesOnStart: false,
+			optimizePackageImports: ['lucide-react', 'react-icons', 'recharts', 'framer-motion', '@xernerx/ui', '@xernerx/components', '@xernerx/providers', '@xernerx/feedback'],
 			...appConfig.experimental,
 		},
 		async headers() {

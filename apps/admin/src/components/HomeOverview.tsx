@@ -302,7 +302,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 			<div className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col gap-4">
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div className="flex items-center gap-3">
-						<div className="p-2.5 rounded-2xl bg-(--accent-green)/10 border border-(--accent-green)/20 text-(--accent-green)">
+						<div className="p-2.5 rounded-2xl bg-(--accent-green)/15 border border-(--accent-green)/25 text-(--accent-green)">
 							<Activity size={20} />
 						</div>
 						<div>
@@ -335,7 +335,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 								key={app.id}
 								type="button"
 								onClick={() => onNavigate('seo')}
-								className="flex flex-col justify-between gap-2 p-3 rounded-2xl border border-(--border)/10 bg-(--background)/60 hover:border-(--accent)/40 text-left transition-all cursor-pointer"
+								className="flex flex-col justify-between gap-2 p-3 rounded-2xl border border-(--border)/10 bg-(--background)/60 hover:bg-(--background) hover:border-(--accent)/40 text-left transition-all cursor-pointer"
 							>
 								<div className="flex items-center justify-between gap-1.5">
 									<span className="text-xs font-bold text-(--text) truncate uppercase">{app.id}</span>

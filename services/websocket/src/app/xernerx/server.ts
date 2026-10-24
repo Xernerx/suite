@@ -100,7 +100,58 @@ export default async function Server(msg: any) {
 				throw error;
 			}
 
-		case 'update':
+		case 'update': {
+			if ((msg.action === 'credits' || msg.action === 'credit') && typeof msg.body?.balance === 'number' && !msg.body?.skipMultiplier) {
+				try {
+					const db = await database('xernerx');
+					const filter = getFilter(msg.action, msg.body);
+					const ownerId = filter.ownerId;
+					const existing = (await model.findOne(filter).lean()) as any;
+					const prevBalance = existing?.balance || 0;
+					const gained = msg.body.balance - prevBalance;
+
+					if (ownerId && gained > 0) {
+						const now = Date.now();
+						const [userDoc, subDocs, ultraItem] = await Promise.all([
+							(db.models.users as any)?.User?.findOne({ id: ownerId })
+								.lean()
+								.catch(() => null),
+							(db.models.users as any)?.Subscription?.find({ ownerId, status: { $in: ['active', 'trialing'] } })
+								.lean()
+								.catch(() => []),
+							(db.models.store as any)?.Item?.findOne({ id: 'ultra' })
+								.lean()
+								.catch(() => null),
+						]);
+
+						const billingSubs = Array.isArray(userDoc?.billing?.subscriptions) ? userDoc.billing.subscriptions : [];
+						const validSubs = [...(Array.isArray(subDocs) ? subDocs : []), ...billingSubs].filter((s: any) => {
+							if (!s || (s.status !== 'active' && s.status !== 'trialing')) return false;
+							if (!s.currentPeriodEnd) return true;
+							const endMs = new Date(s.currentPeriodEnd).getTime();
+							return Number.isNaN(endMs) || endMs > now;
+						});
+
+						const ultraSkuId = ultraItem?.skuId || 'prod_V0pD5uXoTQkrYS';
+						const hasUltra =
+							Boolean(userDoc?.staffSubscription) ||
+							validSubs.some(
+								(s: any) =>
+									String(s.stripeSubscriptionId || '')
+										.toLowerCase()
+										.includes('ultra') ||
+									String(s.priceId || '')
+										.toLowerCase()
+										.includes('ultra') ||
+									s.priceId === ultraSkuId
+							);
+
+						const multiplier = hasUltra ? 2 : validSubs.length > 0 ? 1.25 : 1;
+						msg.body.balance = prevBalance + Math.round(gained * multiplier);
+					}
+				} catch {}
+			}
+
 			return model
 				.findOneAndUpdate(
 					getFilter(msg.action, msg.body),
@@ -114,6 +165,7 @@ export default async function Server(msg: any) {
 					}
 				)
 				.lean();
+		}
 
 		case 'delete':
 			return model.findOneAndDelete(getFilter(msg.action, msg.body)).lean();

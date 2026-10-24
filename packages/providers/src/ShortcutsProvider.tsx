@@ -136,6 +136,11 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 				navigator.clipboard.writeText(currentUrl).then(() => {
 					toast({ type: 'success', title: t('components.header.urlCopied'), description: currentUrl });
 				});
+			} else if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'r' || e.key === 'R')) {
+				if (typeof window !== 'undefined' && (window as any).electron) {
+					e.preventDefault();
+					window.location.reload();
+				}
 			} else if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !isInput) {
 				e.preventDefault();
 				toggleSidebar();
@@ -147,7 +152,17 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 			}
 		};
 		window.addEventListener('keydown', handleKeyDown);
-		return () => window.removeEventListener('keydown', handleKeyDown);
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		const unsubQuickLaunch = bridge?.onQuickLaunch?.(() => {
+			setHelpOpen(false);
+			setNavOpen(false);
+			setUrlPlacerOpen(false);
+			setSearchOpen(true);
+		});
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+			unsubQuickLaunch?.();
+		};
 	}, [getEnvUrl, toast, t, isSearchOpen, sidebar.state, sidebar.view]);
 	const value = {
 		isHelpOpen,
@@ -335,7 +350,12 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 										className="pl-8 pr-3 py-1.5 rounded-xl bg-(--background) border border-(--border)/10 text-xs text-(--text) placeholder:text-(--text-muted) outline-none focus:border-(--accent) w-48 transition"
 									/>
 								</div>
-								<button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
+								<button
+									type="button"
+									onClick={onClose}
+									aria-label={t('common.close')}
+									className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition"
+								>
 									<X size={18} />
 								</button>
 							</div>
@@ -368,7 +388,24 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 														<a
 															key={idx}
 															href={resolvedHref}
-															onClick={onClose}
+															onClick={(e) => {
+																const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+																if (bridge?.openCompanionWindow && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+																	e.preventDefault();
+																	bridge.openCompanionWindow(resolvedHref);
+																	onClose();
+																	return;
+																}
+																onClose();
+															}}
+															onAuxClick={(e) => {
+																const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+																if (bridge?.openCompanionWindow && e.button === 1) {
+																	e.preventDefault();
+																	bridge.openCompanionWindow(resolvedHref);
+																	onClose();
+																}
+															}}
 															onMouseEnter={() => setSelectedIndex(globalIdx)}
 															className="group flex flex-col items-center gap-3 cursor-pointer"
 														>

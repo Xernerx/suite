@@ -22,6 +22,19 @@ const schema = new Schema(
 			showGiftBadge: { type: Boolean, default: true },
 			reducedMotion: { type: Boolean, default: false },
 			defaultSidebarCollapsed: { type: Boolean, default: false },
+			developerMode: { type: Boolean, default: false },
+			alignment: { type: String, enum: ['system', 'left', 'right'], default: 'system' },
+			dotMatrixStage: { type: String, enum: ['default', 'ripple', 'orbit', 'blank'], default: 'default' },
+			dotMatrixType: {
+				type: String,
+				enum: ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'blank'],
+				default: 'default',
+			},
+			dotMatrixAnimation: {
+				type: String,
+				enum: ['animate', 'static', 'always'],
+				default: 'animate',
+			},
 		},
 	},
 	{ timestamps: true }

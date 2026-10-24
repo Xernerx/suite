@@ -3,9 +3,8 @@
 
 import { useState } from 'react';
 import { Settings } from 'lucide-react';
-import { Input } from '@xernerx/ui';
+import { Input, Markdown } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
-import ReactMarkdown from 'react-markdown';
 
 interface GeneralTabProps {
 	botConfig: any;
@@ -34,39 +33,17 @@ export default function GeneralTab({ botConfig, setBotConfig, availableTags }: G
 						placeholder={t('app.portal.bot.general.shortDescPlaceholder')}
 					/>
 				</div>
-				<div className="flex flex-col gap-2">
-					<div className="flex items-center justify-between">
-						<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.longDesc')}</label>
-						<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
-							<button
-								onClick={() => setMarkdownPreview(false)}
-								className={`px-3 py-1 rounded-xl transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-							>
-								{t('app.portal.info.write')}
-							</button>
-							<button
-								onClick={() => setMarkdownPreview(true)}
-								className={`px-3 py-1 rounded-xl transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-							>
-								{t('app.portal.info.preview')}
-							</button>
-						</div>
-					</div>
-
-					{markdownPreview ? (
-						<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
-							{botConfig.info ? <ReactMarkdown>{botConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">{t('app.portal.info.nothingToPreview')}</span>}
-						</div>
-					) : (
-						<Input
-							variant="textarea"
-							value={botConfig.info || ''}
-							onChange={(e) => setBotConfig({ ...botConfig, info: e.target.value })}
-							placeholder={t('app.portal.bot.general.longDescPlaceholder')}
-							className="min-h-[120px]"
-						/>
-					)}
-				</div>
+				<Markdown
+					editable
+					preview={markdownPreview}
+					onPreviewChange={setMarkdownPreview}
+					label={t('app.portal.bot.general.longDesc')}
+					value={botConfig.info || ''}
+					onChange={(val) => setBotConfig({ ...botConfig, info: val })}
+					placeholder={t('app.portal.bot.general.longDescPlaceholder')}
+					emptyText={t('app.portal.info.nothingToPreview')}
+					rows={4}
+				/>
 				<div className="flex flex-col gap-2">
 					<label className="text-sm font-bold text-(--text)">{t('app.portal.bot.general.tags')}</label>
 					<div className="flex flex-wrap gap-2 mb-1">

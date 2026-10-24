@@ -69,7 +69,7 @@ export const dictionary = async (locale: Locale) => {
 
 	return {
 		dictionary: activeDict,
-		fallbackDictionary: defaultDict,
+		fallbackDictionary: targetLocale === defaultLocale ? null : defaultDict,
 		locales: localesList,
 		currentLocale: targetLocale,
 	};

@@ -13,6 +13,10 @@ export function SubSelector({ name, options, defaultValue }: { name: string; opt
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
+		setValue(defaultValue);
+	}, [defaultValue]);
+
+	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
 			if (ref.current && !ref.current.contains(e.target as Node)) {
 				setIsOpen(false);
@@ -85,8 +89,8 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: 
 					<div className="flex items-center gap-1">
 						<button
 							type="button"
-							aria-label="Back"
-							title="Back"
+							aria-label={t('common.navigation.back')}
+							title={t('common.navigation.back')}
 							onClick={() => window.history.back()}
 							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all"
 						>
@@ -94,8 +98,8 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: 
 						</button>
 						<button
 							type="button"
-							aria-label="Forward"
-							title="Forward"
+							aria-label={t('common.navigation.forward')}
+							title={t('common.navigation.forward')}
 							onClick={() => window.history.forward()}
 							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all"
 						>
@@ -103,8 +107,8 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: 
 						</button>
 						<button
 							type="button"
-							aria-label="Reload"
-							title="Reload"
+							aria-label={t('common.navigation.reload')}
+							title={t('common.navigation.reload')}
 							onClick={() => window.location.reload()}
 							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all"
 						>
@@ -112,8 +116,8 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: 
 						</button>
 						<button
 							type="button"
-							aria-label="Home"
-							title="Home"
+							aria-label={t('common.navigation.home')}
+							title={t('common.navigation.home')}
 							onClick={() => (window.location.href = '/')}
 							className="text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) p-1.5 rounded-xl transition-all ml-1"
 						>
@@ -176,8 +180,8 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: 
 
 						<button
 							type="button"
-							aria-label="Close"
-							title="Close"
+							aria-label={t('common.close')}
+							title={t('common.close')}
 							onClick={onClose}
 							className="text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 p-1.5 rounded-xl transition-all cursor-pointer"
 						>

@@ -3,6 +3,7 @@
 
 import { Check, Copy, ExternalLink, RefreshCw, Terminal } from 'lucide-react';
 import { Button, Modal } from '@xernerx/ui';
+import { Loading } from '@xernerx/feedback';
 import { useCallback, useEffect, useState } from 'react';
 import { useDictionary, useToast } from '@xernerx/providers';
 
@@ -44,6 +45,12 @@ export function DesktopLogsModal({ open, onOpenChange, desktopMeta }: DesktopLog
 				if (res && typeof res === 'object') {
 					if (res.path) setLogPath(res.path);
 					const fileBody = res.content ? String(res.content).trim() : '';
+					setLogContent(fileBody ? `${headerLines.join('\n')}${fileBody}` : headerLines.join('\n'));
+					setLoading(false);
+					return;
+				}
+				if (typeof res === 'string') {
+					const fileBody = res.trim();
 					setLogContent(fileBody ? `${headerLines.join('\n')}${fileBody}` : headerLines.join('\n'));
 					setLoading(false);
 					return;
@@ -100,9 +107,15 @@ export function DesktopLogsModal({ open, onOpenChange, desktopMeta }: DesktopLog
 					</div>
 				)}
 
-				<pre className="max-h-96 min-h-56 overflow-y-auto rounded-2xl border border-(--border)/10 bg-(--background)/80 p-4 font-mono text-xs text-(--text) whitespace-pre-wrap break-words leading-relaxed select-all">
-					{loading ? '...' : logContent}
-				</pre>
+				{loading ? (
+					<div className="flex min-h-56 items-center justify-center rounded-2xl border border-(--border)/10 bg-(--background)/80 p-4">
+						<Loading variant="small" />
+					</div>
+				) : (
+					<pre className="max-h-96 min-h-56 overflow-y-auto rounded-2xl border border-(--border)/10 bg-(--background)/80 p-4 font-mono text-xs text-(--text) whitespace-pre-wrap break-words leading-relaxed select-all">
+						{logContent}
+					</pre>
+				)}
 
 				<div className="flex flex-wrap items-center justify-between gap-2">
 					<div className="flex items-center gap-2">

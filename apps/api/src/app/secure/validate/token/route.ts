@@ -15,8 +15,8 @@ export async function POST(req: NextRequest) {
 		// 1. Initialize your custom database connection and grab the model
 		const db = (await database('xernerx')).models.users.Token;
 
-		// 2. Find the token by the custom 'id' field using the resolved model
-		const tokenDoc = await db.findOne({ id: token });
+		// 2. Find the token by the custom 'id' field and atomically update usage telemetry
+		const tokenDoc = await db.findOneAndUpdate({ id: token }, { $inc: { requestCount: 1 }, $set: { lastUsedAt: new Date() } }, { returnDocument: 'after' });
 
 		if (!tokenDoc) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 401 });

@@ -57,6 +57,29 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 			if (searchable) {
 				setTimeout(() => inputRef.current?.focus(), 50);
 			}
+
+			const elevated: Array<{ el: HTMLElement; prevZ: string; prevPos: string }> = [];
+			let curr = ref.current?.parentElement;
+			let depth = 0;
+			while (curr && curr !== document.body && curr.tagName !== 'MAIN' && curr.getAttribute('role') !== 'dialog' && depth < 6) {
+				const computed = window.getComputedStyle(curr);
+				const prevZ = curr.style.zIndex;
+				const prevPos = curr.style.position;
+				if (computed.position === 'static') {
+					curr.style.position = 'relative';
+				}
+				curr.style.zIndex = '60';
+				elevated.push({ el: curr, prevZ, prevPos });
+				curr = curr.parentElement;
+				depth++;
+			}
+
+			return () => {
+				elevated.forEach(({ el, prevZ, prevPos }) => {
+					el.style.zIndex = prevZ;
+					el.style.position = prevPos;
+				});
+			};
 		} else {
 			setQuery('');
 		}
@@ -83,7 +106,7 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 	}
 	const filteredOptions = options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()));
 	return (
-		<div ref={ref} className={`relative w-full ${className ?? ''}`}>
+		<div ref={ref} className={`relative w-full ${open ? 'z-[100]' : ''} ${className ?? ''}`}>
 			{label && <label className="mb-2 block text-sm font-medium text-(--text)">{label}</label>}
 
 			<Button

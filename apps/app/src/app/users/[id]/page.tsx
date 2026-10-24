@@ -145,17 +145,14 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					return;
 				}
 
-				if (userData?.privacy === 'private' && uid !== id) {
-					setNotFound(true);
-					return;
-				}
-
 				setUser(userData || { id });
 				setDiscordUser(discordData);
 
+				const isSelf = Boolean(uid && (uid === id || uid === userData?.id));
+
 				if (botsRes.ok) {
 					const fetchedBots = await botsRes.json();
-					const publicBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy !== 'private' || uid === id) : [];
+					const publicBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy === 'public' || isSelf) : [];
 
 					const botsWithDiscord = await Promise.all(
 						publicBots.map(async (b: any) => {
@@ -176,7 +173,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				let publicOrgs: any[] = [];
 				if (orgsRes.ok) {
 					const fetchedOrgs = await orgsRes.json();
-					publicOrgs = Array.isArray(fetchedOrgs) ? fetchedOrgs.filter((o: any) => o.privacy !== 'private' || uid === id) : [];
+					publicOrgs = Array.isArray(fetchedOrgs) ? fetchedOrgs.filter((o: any) => (o.privacy || o.config?.privacy) === 'public' || isSelf) : [];
 					setOrganizations(publicOrgs);
 				}
 
@@ -190,7 +187,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				const guildsRes = await fetch(getEnvUrl(guildsQueryUrl));
 				if (guildsRes.ok) {
 					const fetchedGuilds = await guildsRes.json();
-					const publicGuilds = Array.isArray(fetchedGuilds) ? fetchedGuilds.filter((g: any) => g.privacy !== 'private' || uid === id) : [];
+					const publicGuilds = Array.isArray(fetchedGuilds) ? fetchedGuilds.filter((g: any) => g.privacy === 'public' || isSelf) : [];
 					setServers(publicGuilds);
 				}
 			} catch (error) {
@@ -227,12 +224,25 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 	}
 
 	const currentView = view || 'profile';
+	const uid = (session as any)?.user?.id;
+	const isPrivateProfile = user?.privacy === 'private' && uid !== id && uid !== user?.id;
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pb-24">
-			<Header user={user} discordUser={discordUser} id={id} />
+			<Header user={user} discordUser={discordUser} bots={bots} id={user?.id || id} isPrivate={isPrivateProfile} />
 
-			<div className="mt-4">{currentView === 'profile' && <Profile user={user} bots={bots} organizations={organizations} servers={servers} />}</div>
+			<div className="mt-4">
+				{isPrivateProfile ? (
+					<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-12 text-center">
+						<h2 className="text-2xl font-bold mb-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('app.users.notFoundTitle')}
+						</h2>
+						<p className="text-sm text-(--text-muted)">{t('app.users.notFoundDesc')}</p>
+					</div>
+				) : (
+					currentView === 'profile' && <Profile user={user} bots={bots} organizations={organizations} servers={servers} />
+				)}
+			</div>
 		</div>
 	);
 }

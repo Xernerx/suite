@@ -1,7 +1,10 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -9,22 +12,33 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const db = (await database('xernerx')).models.guilds.Guild as any;
 		const StatModel = (await database('xernerx')).models.guilds.Stat as any;
 
-		const guild = await db.findOne({ id }).lean();
-		const stats = await StatModel.find({ id }).sort({ timestamp: 1 }).lean();
+		const guild = await db.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		const guildId = guild?.id || id;
+		const stats = await StatModel.find({ id: guildId }).sort({ timestamp: 1 }).lean();
 
 		if (guild) {
 			const VoteModel = (await database('xernerx')).models.guilds.Vote as any;
-			guild.voteCount = await VoteModel.countDocuments({ guildId: id });
+			guild.voteCount = await VoteModel.countDocuments({ guildId });
 		}
 
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
+		let activeToken = botToken;
 		let botInServer = false;
 		if (botToken) {
 			try {
-				// Do a quick check against Discord to see if the bot is in this server
-				const discordRes = await fetch(`https://discord.com/api/v10/guilds/${id}?with_counts=false`, {
+				// Do a quick check against Discord to see if the public bot is in this server
+				let discordRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=false`, {
 					headers: { Authorization: `Bot ${botToken}` },
 				});
+				if (!discordRes.ok && process.env.DISCORD_CLIENT_TOKEN && process.env.DISCORD_CLIENT_TOKEN !== botToken) {
+					const fallbackRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=false`, {
+						headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+					});
+					if (fallbackRes.ok) {
+						discordRes = fallbackRes;
+						activeToken = process.env.DISCORD_CLIENT_TOKEN;
+					}
+				}
 				botInServer = discordRes.ok;
 
 				if (discordRes.ok && guild) {
@@ -58,11 +72,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 					}
 
 					if (needsUpdate) {
-						await db.updateOne({ id }, { $set: updates });
+						await db.updateOne({ id: guildId }, { $set: updates });
 					}
 				} else if (guild && guild.bot !== botInServer) {
 					// Bot is no longer in the server, update the database
-					await db.updateOne({ id }, { $set: { bot: botInServer } });
+					await db.updateOne({ id: guildId }, { $set: { bot: botInServer } });
 					guild.bot = botInServer;
 				}
 			} catch (e) {
@@ -71,10 +85,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		let activeChannels: { id: string; name: string }[] = [];
-		if (botInServer && botToken) {
+		if (botInServer && activeToken) {
 			try {
-				const channelsRes = await fetch(`https://discord.com/api/v10/guilds/${id}/channels`, {
-					headers: { Authorization: `Bot ${botToken}` },
+				const channelsRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
+					headers: { Authorization: `Bot ${activeToken}` },
 					next: { revalidate: 60 },
 				});
 				if (channelsRes.ok) {
@@ -95,6 +109,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 					privacy: 'private',
 					widgets: false,
 					verified: false,
+					vanityUnlocked: false,
 					bot: botInServer,
 					channels: activeChannels,
 				},
@@ -106,6 +121,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const fullGuild = {
 			...guild,
 			widgets: Boolean(guild.widgets),
+			vanityUnlocked: Boolean(guild.vanityUnlocked || guild.vanitySlug || guild.verified),
 			stats: stats || [],
 			channels: activeChannels,
 		};
@@ -121,10 +137,78 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 	try {
 		const { id } = await params;
 		const body = await req.json();
-		const db = (await database('xernerx')).models.guilds.Guild as any;
+		const { models } = await database('xernerx');
+		const db = models.guilds.Guild as any;
 
-		const updateData: any = {};
+		const existingGuild = await db.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		const guildId = existingGuild?.id || id;
+
+		const session = (await getServerSession(auth).catch(() => null)) as any;
+		const actorUserId = session?.user?.id || body.owner || existingGuild?.owner;
+
+		const isVanityAlreadyUnlocked = Boolean(existingGuild?.vanityUnlocked || existingGuild?.vanitySlug || existingGuild?.verified);
+
+		if (body.action === 'unlock_vanity') {
+			if (isVanityAlreadyUnlocked) {
+				return NextResponse.json({ ...existingGuild, id: guildId, vanityUnlocked: true }, { status: 200 });
+			}
+			const unlockRes = await unlockVanityWithUserCredits(models, actorUserId, existingGuild?.name || body.name || `Server ${guildId}`);
+			if (!unlockRes.ok) {
+				return NextResponse.json({ error: unlockRes.error }, { status: 403 });
+			}
+			const unlockedDoc = await db
+				.findOneAndUpdate(
+					{ id: guildId },
+					{ $set: { id: guildId, name: existingGuild?.name || body.name || 'Server', vanityUnlocked: true } },
+					{ returnDocument: 'after', upsert: true, runValidators: true }
+				)
+				.lean();
+			return NextResponse.json(
+				{
+					...unlockedDoc,
+					widgets: Boolean(unlockedDoc.widgets),
+					vanityUnlocked: true,
+					vanitySlug: unlockedDoc.vanitySlug,
+					links: unlockedDoc.links || {},
+					usedSlot: unlockRes.usedSlot,
+					cost: unlockRes.cost,
+				},
+				{ status: 200 }
+			);
+		}
+
+		const updateData: any = { id: guildId };
+		const unsetData: any = {};
+
+		if (body.vanitySlug !== undefined) {
+			const rawSlug = normalizeVanitySlug(body.vanitySlug);
+			if (rawSlug === '') {
+				if (existingGuild?.vanitySlug) {
+					unsetData['vanitySlug'] = 1;
+				}
+				delete body.vanitySlug;
+			} else {
+				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
+					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
+				}
+				const slugTaken = await db.findOne({ vanitySlug: rawSlug, id: { $ne: guildId } }).lean();
+				if (slugTaken) {
+					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
+				}
+				if (!isVanityAlreadyUnlocked) {
+					const unlockRes = await unlockVanityWithUserCredits(models, actorUserId, existingGuild?.name || body.name || `Server ${guildId}`);
+					if (!unlockRes.ok) {
+						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
+					}
+					updateData['vanityUnlocked'] = true;
+				}
+				updateData['vanitySlug'] = rawSlug;
+				body.vanitySlug = rawSlug;
+			}
+		}
+
 		if (body.name !== undefined) updateData['name'] = body.name;
+		else if (!existingGuild?.name) updateData['name'] = 'Unknown Guild';
 		if (body.icon !== undefined) updateData['icon'] = body.icon;
 		if (body.banner !== undefined) updateData['banner'] = body.banner;
 		if (body.description !== undefined) updateData['description'] = body.description;
@@ -138,9 +222,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 		if (body.links !== undefined) updateData['links'] = body.links;
 
-		const finalUpdate = Object.keys(updateData).length > 0 ? updateData : body;
+		const finalSet = Object.keys(updateData).length > 0 ? updateData : body;
+		const mongoUpdate: any = {};
+		if (Object.keys(finalSet).length > 0) mongoUpdate.$set = finalSet;
+		if (Object.keys(unsetData).length > 0) mongoUpdate.$unset = unsetData;
 
-		const updatedGuild = await db.findOneAndUpdate({ id }, { $set: finalUpdate }, { returnDocument: 'after', upsert: true, runValidators: true }).lean();
+		const updatedGuild = await db.findOneAndUpdate({ id: guildId }, mongoUpdate, { returnDocument: 'after', upsert: true, runValidators: true }).lean();
 
 		// Map to flat object so the frontend receives the correct response structure
 		const flatGuild = {
@@ -156,6 +243,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			bot: updatedGuild.bot,
 			privacy: updatedGuild.privacy,
 			widgets: Boolean(updatedGuild.widgets),
+			vanityUnlocked: Boolean(updatedGuild.vanityUnlocked || updatedGuild.vanitySlug || updatedGuild.verified),
+			vanitySlug: updatedGuild.vanitySlug,
 			links: updatedGuild.links || {},
 		};
 
@@ -171,7 +260,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		const { id } = await params;
 		const db = (await database('xernerx')).models.guilds.Guild as any;
 
-		const deletedGuild = await db.findOneAndDelete({ id });
+		const deletedGuild = await db.findOneAndDelete({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 
 		if (!deletedGuild) {
 			return NextResponse.json({ error: 'Guild not found' }, { status: 404 });

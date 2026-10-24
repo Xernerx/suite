@@ -5,6 +5,8 @@ import { Schema } from 'mongoose';
 const schema = new Schema(
 	{
 		id: { type: String, unique: true, required: true }, // User ID
+		vanitySlug: { type: String, trim: true, lowercase: true, sparse: true },
+		vanityUnlocked: { type: Boolean, default: false },
 		name: { type: String }, // User name
 		icon: { type: String }, // User icon URL (optional)
 		description: { type: String }, // Short description of the user
@@ -58,6 +60,20 @@ const schema = new Schema(
 		},
 
 		hooks: { type: [{ name: String, description: String, url: String, data: String }] }, // List of user webhooks
+
+		showcases: {
+			type: [
+				{
+					id: { type: String, required: true },
+					title: { type: String, required: true },
+					description: { type: String, default: '' },
+					imageUrl: { type: String, default: '' },
+					linkUrl: { type: String, default: '' },
+					tag: { type: String, default: '' },
+				},
+			],
+			default: [],
+		},
 	},
 	{ timestamps: true }
 );

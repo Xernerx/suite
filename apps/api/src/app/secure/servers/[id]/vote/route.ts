@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
+import { applySubscriptionCreditMultiplier } from '@/lib/creditMultiplier';
 
 const COOLDOWN_HOURS = 12;
 
@@ -62,11 +63,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 		// 2. Log the vote in the distinct collection
 		await VoteModel.create({ guildId: id, userId });
 
-		// 3. Reward the user with 100 credits
+		// 3. Reward the user with 100 base credits (multiplied by 125% for any sub or 200% for Ultra)
+		const multiplierResult = await applySubscriptionCreditMultiplier(userId, 100);
 		const CreditModel = (db.models.users as any).Credit;
-		await CreditModel.updateOne({ ownerId: userId }, { $inc: { balance: 100 } }, { upsert: true });
+		await CreditModel.updateOne({ ownerId: userId }, { $inc: { balance: multiplierResult.finalCredits } }, { upsert: true });
 
-		return NextResponse.json({ success: true, message: 'Vote cast successfully and 100 credits awarded' }, { status: 201 });
+		return NextResponse.json({ success: true, reward: multiplierResult.finalCredits, message: `Vote cast successfully and ${multiplierResult.finalCredits} credits awarded` }, { status: 201 });
 	} catch (error) {
 		console.error('Failed to cast vote:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

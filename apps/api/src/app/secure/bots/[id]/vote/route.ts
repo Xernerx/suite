@@ -1,9 +1,11 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
-import { database, sendWebhook } from '@xernerx/lib/server';
+import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
+import { applySubscriptionCreditMultiplier } from '@/lib/creditMultiplier';
+import { dispatchBotWebhook } from '@/lib/webhookDispatcher';
 
 const COOLDOWN_HOURS = 12;
 
@@ -76,9 +78,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 			timestamp: new Date(),
 		});
 
-		// 3. Reward the user with 100 credits
+		// 3. Reward the user with 100 base credits (multiplied by 125% for any sub or 200% for Ultra)
+		const multiplierResult = await applySubscriptionCreditMultiplier(userId, 100);
 		const CreditModel = (db.models.users as any).Credit;
-		await CreditModel.updateOne({ ownerId: userId }, { $inc: { balance: 100 } }, { upsert: true });
+		await CreditModel.updateOne({ ownerId: userId }, { $inc: { balance: multiplierResult.finalCredits } }, { upsert: true });
 
 		// 4. Trigger bot webhooks
 		const BotModel = (db.models.bots as any).Bot;
@@ -109,25 +112,31 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 					const authorName = session?.user?.name || session?.user?.global_name || 'A user';
 					const authorIcon = session?.user?.image || undefined;
 
-					await sendWebhook({
+					await dispatchBotWebhook({
+						botId: id,
 						url: hook.url,
-						embeds: [
-							{
-								author: {
-									name: authorName,
-									icon_url: authorIcon,
+						event: 'POST vote',
+						payload: {
+							username: 'Xernerx App',
+							avatar_url: 'https://xernerx.com/logo.png',
+							embeds: [
+								{
+									author: {
+										name: authorName,
+										icon_url: authorIcon,
+									},
+									title: 'New Vote!',
+									url: `https://xernerx.com/bots/${id}`,
+									description: `This user just voted for your bot! Your bot now has **${totalVotes}** votes.`,
+									color: 0xff00a0,
+									footer: {
+										text: finalBotName,
+										icon_url: finalBotAvatar,
+									},
+									timestamp: new Date().toISOString(),
 								},
-								title: 'New Vote!',
-								url: `https://xernerx.com/bots/${id}`,
-								description: `This user just voted for your bot! Your bot now has **${totalVotes}** votes.`,
-								color: 0xff00a0,
-								footer: {
-									text: finalBotName,
-									icon_url: finalBotAvatar,
-								},
-								timestamp: new Date().toISOString(),
-							},
-						],
+							],
+						},
 					});
 				} catch (e) {
 					console.error('Failed to trigger bot webhook for vote', e);

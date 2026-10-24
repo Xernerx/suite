@@ -35,6 +35,7 @@ function getMethodBadgeStyle(method: string): string {
 		case 'POST':
 			return 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30';
 		case 'PUT':
+			return 'bg-(--accent-violet)/15 text-(--accent-violet) border-(--accent-violet)/30';
 		case 'PATCH':
 			return 'bg-(--accent-orange)/15 text-(--accent-orange) border-(--accent-orange)/30';
 		case 'DELETE':

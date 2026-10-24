@@ -104,7 +104,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 			</div>
 
 			{filteredItems.length === 0 ? (
-				<div className="flex flex-col items-center justify-center p-12 text-center border border-(--border)/10 rounded-2xl bg-(--foreground)/10">
+				<div className="flex flex-col items-center justify-center p-12 text-center border border-(--border)/10 rounded-3xl bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 					<PackageSearch className="w-12 h-12 text-(--text-muted) mb-3 opacity-50" />
 					<p className="text-(--text-muted) text-sm">{t('admin.store.table.noItems')}</p>
 				</div>
@@ -113,19 +113,19 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 					{filteredItems.map((item) => (
 						<div
 							key={item.id}
-							className={`relative flex flex-col justify-between p-5 rounded-2xl border transition-all duration-200 ${
+							className={`relative flex flex-col justify-between p-5 rounded-3xl border backdrop-blur-md transition-all duration-200 ${
 								item.enabled
 									? item.isFeatured
-										? 'border-(--accent) bg-(--foreground)/25 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
-										: 'border-(--border)/15 bg-(--foreground)/20 shadow-xs'
-									: 'border-(--border)/5 bg-(--foreground)/5 opacity-60'
+										? 'border-(--accent) bg-(--foreground)/35 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
+										: 'border-(--border)/10 bg-(--foreground)/30 shadow-xs'
+									: 'border-(--border)/10 bg-(--foreground)/20 opacity-60'
 							}`}
 						>
 							<div>
 								{/* Header & Badges */}
 								<div className="flex items-start justify-between gap-3 mb-2">
 									<div className="flex flex-wrap items-center gap-1.5">
-										<span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-(--foreground) text-(--text-muted) border border-(--border)/10">
+										<span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-(--background)/60 text-(--text-muted) border border-(--border)/10">
 											{item.categoryName || item.categoryId}
 										</span>
 										{item.isFeatured && (
@@ -155,23 +155,37 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 								</h3>
 								{item.description && <p className="text-xs text-(--text-muted) mb-3 line-clamp-2">{item.description}</p>}
 
-								{/* SKU ID info */}
-								<div className="flex items-center justify-between p-2 rounded-xl bg-(--background)/50 border border-(--border)/10 mb-3 text-xs">
+								{/* SKU ID or Credit Cost info */}
+								<div className="flex items-center justify-between p-2 rounded-2xl bg-(--background)/90 border border-(--border)/10 mb-3 text-xs">
 									<div className="flex items-center gap-1.5 text-(--text-muted) font-mono text-[11px] truncate">
 										<Tag size={12} className="shrink-0 text-(--accent)" />
-										<span className="truncate">{item.skuId}</span>
+										<span className="truncate">
+											{item.itemType === 'credit_perk'
+												? t('admin.store.table.creditPerkLabel', {
+														cost: (item.creditCost || 0).toLocaleString(),
+														type: item.perkType || 'perk',
+													})
+												: item.itemType === 'credit_pack'
+													? t('admin.store.table.creditPackLabel', {
+															sku: item.skuId,
+															amount: (item.creditAmount || 0).toLocaleString(),
+														})
+													: item.skuId}
+										</span>
 									</div>
-									<button
-										onClick={() => handleCopySku(item.skuId)}
-										className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer shrink-0"
-										title={t('admin.store.tooltips.copySku')}
-									>
-										{copiedSku === item.skuId ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
-									</button>
+									{item.skuId && (
+										<button
+											onClick={() => handleCopySku(item.skuId)}
+											className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer shrink-0"
+											title={t('admin.store.tooltips.copySku')}
+										>
+											{copiedSku === item.skuId ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
+										</button>
+									)}
 								</div>
 
 								{/* Discount controller */}
-								<div className="flex items-center justify-between p-2.5 rounded-xl bg-(--foreground)/30 border border-(--border)/10 mb-4">
+								<div className="flex items-center justify-between p-2.5 rounded-2xl bg-(--background)/90 border border-(--border)/10 mb-4">
 									<span className="text-xs text-(--text-muted) font-medium">{t('admin.store.table.discount')}:</span>
 
 									{editingDiscountId === item.id ? (
@@ -202,7 +216,7 @@ export function StoreItemsTab({ items, categories, onEdit, onToggleEnabled, onQu
 														setEditingDiscountId(item.id);
 														setTempDiscount(item.discountPercent);
 													}}
-													className="px-2 py-0.5 rounded-lg text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/20 cursor-pointer hover:opacity-80"
+													className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/20 cursor-pointer hover:opacity-80"
 													title={t('admin.store.tooltips.editDiscount')}
 												>
 													{t('admin.store.table.percentOff', { percent: item.discountPercent })}

@@ -74,9 +74,9 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 						className="w-1.5 rounded-l-xl relative shrink-0 cursor-pointer transition-transform hover:scale-x-150 origin-left"
 						style={{ backgroundColor: typeof emb.color === 'string' ? emb.color : '#202225' }}
 					>
-						<input
+						<Input
 							type="color"
-							className="absolute inset-0 opacity-0 cursor-pointer w-[200%] h-full -ml-2"
+							className="absolute inset-0 opacity-0 cursor-pointer w-[200%] h-full -ml-2 !p-0 !border-none"
 							value={typeof emb.color === 'string' ? emb.color : '#000000'}
 							onChange={(e) => updateEmbed(eIdx, 'color', e.target.value)}
 							title={t('admin.dashboard.announcements.changeColor')}

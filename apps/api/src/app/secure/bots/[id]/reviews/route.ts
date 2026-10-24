@@ -1,15 +1,21 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
-import { database, sendWebhook } from '@xernerx/lib/server';
+import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
+import { dispatchBotWebhook } from '@/lib/webhookDispatcher';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const id = (await params).id;
+		const rawId = (await params).id;
 
 		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any).Bot;
+		const botDoc = await BotModel.findOne({ $or: [{ id: rawId }, { vanitySlug: rawId.toLowerCase() }] })
+			.select('id')
+			.lean();
+		const id = botDoc?.id || rawId;
 		const ReviewModel = (db.models.bots as any).Review;
 
 		const reviews = await ReviewModel.find({ botId: id }).sort({ createdAt: -1 }).lean();
@@ -50,7 +56,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const id = (await params).id;
+		const rawId = (await params).id;
 		const userId = session.user.id;
 
 		const body = await request.json();
@@ -65,6 +71,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 		}
 
 		const db = await database('xernerx');
+		const BotLookupModel = (db.models.bots as any).Bot;
+		const resolvedBot = await BotLookupModel.findOne({ $or: [{ id: rawId }, { vanitySlug: rawId.toLowerCase() }] })
+			.select('id')
+			.lean();
+		const id = resolvedBot?.id || rawId;
 		const ReviewModel = (db.models.bots as any).Review;
 
 		const existingReview = await ReviewModel.findOne({ botId: id, userId }).lean();
@@ -100,32 +111,38 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 					const authorName = session?.user?.name || session?.user?.global_name || 'A user';
 					const authorIcon = session?.user?.image || undefined;
 
-					await sendWebhook({
+					await dispatchBotWebhook({
+						botId: id,
 						url: hook.url,
-						embeds: [
-							{
-								author: {
-									name: authorName,
-									icon_url: authorIcon,
-								},
-								title: eventType === 'POST review' ? 'New Review!' : 'Review Updated!',
-								url: `https://xernerx.com/bots/${id}`,
-								description: content || '*No text provided.*',
-								fields: [
-									{
-										name: 'Rating',
-										value: `**${rating}** ${'⭐'.repeat(rating)}`,
-										inline: true,
+						event: eventType,
+						payload: {
+							username: 'Xernerx App',
+							avatar_url: 'https://xernerx.com/logo.png',
+							embeds: [
+								{
+									author: {
+										name: authorName,
+										icon_url: authorIcon,
 									},
-								],
-								color: 0xff00a0,
-								footer: {
-									text: finalBotName,
-									icon_url: finalBotAvatar,
+									title: eventType === 'POST review' ? 'New Review!' : 'Review Updated!',
+									url: `https://xernerx.com/bots/${id}`,
+									description: content || '*No text provided.*',
+									fields: [
+										{
+											name: 'Rating',
+											value: `**${rating}** ${'⭐'.repeat(rating)}`,
+											inline: true,
+										},
+									],
+									color: 0xff00a0,
+									footer: {
+										text: finalBotName,
+										icon_url: finalBotAvatar,
+									},
+									timestamp: new Date().toISOString(),
 								},
-								timestamp: new Date().toISOString(),
-							},
-						],
+							],
+						},
 					});
 				} catch (e) {
 					console.error('Failed to trigger bot webhook for review', e);
@@ -147,10 +164,15 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
-		const id = (await params).id;
+		const rawId = (await params).id;
 		const userId = session.user.id;
 
 		const db = await database('xernerx');
+		const BotLookupModel = (db.models.bots as any).Bot;
+		const resolvedBot = await BotLookupModel.findOne({ $or: [{ id: rawId }, { vanitySlug: rawId.toLowerCase() }] })
+			.select('id')
+			.lean();
+		const id = resolvedBot?.id || rawId;
 		const ReviewModel = (db.models.bots as any).Review;
 
 		await ReviewModel.deleteOne({ botId: id, userId });
@@ -183,25 +205,31 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 					const authorName = session?.user?.name || session?.user?.global_name || 'A user';
 					const authorIcon = session?.user?.image || undefined;
 
-					await sendWebhook({
+					await dispatchBotWebhook({
+						botId: id,
 						url: hook.url,
-						embeds: [
-							{
-								author: {
-									name: authorName,
-									icon_url: authorIcon,
+						event: 'DELETE review',
+						payload: {
+							username: 'Xernerx App',
+							avatar_url: 'https://xernerx.com/logo.png',
+							embeds: [
+								{
+									author: {
+										name: authorName,
+										icon_url: authorIcon,
+									},
+									title: 'Review Deleted',
+									url: `https://xernerx.com/bots/${id}`,
+									description: `This user deleted their review.`,
+									color: 0xff0000,
+									footer: {
+										text: finalBotName,
+										icon_url: finalBotAvatar,
+									},
+									timestamp: new Date().toISOString(),
 								},
-								title: 'Review Deleted',
-								url: `https://xernerx.com/bots/${id}`,
-								description: `This user deleted their review.`,
-								color: 0xff0000,
-								footer: {
-									text: finalBotName,
-									icon_url: finalBotAvatar,
-								},
-								timestamp: new Date().toISOString(),
-							},
-						],
+							],
+						},
 					});
 				} catch (e) {
 					console.error('Failed to trigger bot webhook for review deletion', e);

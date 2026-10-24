@@ -2,6 +2,158 @@
 
 # auth
 
+## 2.7.0
+
+### Minor Changes
+
+- ### Interactive Dot-Matrix Profile Header, Badge & Customization Studio (`@xernerx/feedback`, `@xernerx/lib`, `apps/store`, `apps/account`, `apps/app`, `apps/api`, `@xernerx/components`)
+    - **Full-Bleed Reactive Canvas Engine (`packages/feedback/src/XernerxDotLogo.tsx`, `packages/feedback/src/dotLogoPaths.ts`)**:
+        - Built the interactive HTML5 Canvas Dot-Matrix lattice renderer supporting `logo`, `banner`, and `ambient` layouts with real-time pointer-repulsion physics, spring-back velocity damping, traveling sine waves, and 5 color variants (`classic`, `prism`, `cyber`, `aurora`, and `ember`).
+        - Fixed `banner` coordinate scaling so the background lattice spans 100% of wide banner containers while centering the `XERNERX` wordmark in the upper focal band so it is never occluded by bottom-left profile avatars.
+        - Added `vivid` high-contrast rendering mode (`vivid={true}`) boosting background lattice visibility, center wordmark luminance, and ambient radial glow across both Light and Dark themes.
+    - **5-Theme Persistence & API Serialization (`packages/lib/src/models/xernerx/users/Credit.ts`, `apps/api/src/app/secure/users/[id]/route.ts`, `apps/api/src/app/core/users/[id]/route.ts`)**:
+        - Added `dotMatrixVariant` (`'classic' | 'prism' | 'cyber' | 'aurora' | 'ember'`, default `'classic'`) to `models.users.Credit` (bumping Mongoose model cache to `__models_v19` in `packages/lib/src/database.ts`).
+        - Extended `GET / PATCH /secure/users/[id]` and `GET /core/users/[id]` to validate, persist, and expose `dotMatrixVariant` alongside `unlockedBadges` and `activeBadges`.
+    - **Interactive Store Preview & Account Studio (`apps/store/src/components/DotMatrixPerkPreview.tsx`, `apps/account/src/components/DotMatrixBannerStudio.tsx`)**:
+        - Embedded `DotMatrixPerkPreview.tsx` directly inside the `3,500`-credit `dot_matrix_banner` card in `CreditStoreView.tsx` so shoppers can test pointer repulsion and switch between all 5 color themes before redeeming.
+        - Built `DotMatrixBannerStudio.tsx` and `DotMatrixSettingsCard.tsx` in `apps/account` (`Profile.tsx` & `ProfileShowcases.tsx`), giving owners of `dot_matrix_banner` a live interactive header preview, 1-click active banner toggle, and 5-theme preset selector.
+    - **Public Profile Header, Sidebar Card, Hover Popover & SVG Embed Widget (`apps/app/src/components/users/Header.tsx`, `packages/components/src/cards/SidebarUser.tsx`, `packages/components/src/cards/UserProfilePopover.tsx`, `apps/api/src/lib/widgetRenderer.ts`)**:
+        - Upgraded public user profile headers (`Header.tsx`) to render the interactive `XernerxDotLogo` (`variant="banner"`, `vivid={true}`, `colorVariant={dotMatrixVariant}`) with pointer event forwarding and an animated `Dot-Matrix` HUD pill badge.
+        - Upgraded `SidebarUser.tsx` and `UserProfilePopover.tsx` to render an interactive mini Dot-Matrix banner header and HUD badge when `dot_matrix_banner` is active.
+        - Upgraded `widgetRenderer.ts` (`GET /core/users/[id]?widget=svg`) to render a vector SVG dot-matrix header grid and `DOT-MATRIX` pill badge using the user's selected `dotMatrixVariant` palette.
+
+    ### Bot Milestones, Biggest Bot Profile Showcases & Official Milestone SVGs (`@xernerx/lib`, `packages/public`, `apps/app`, `apps/api`, `services/bot`)
+    - **Canonical Milestone Engine (`packages/lib/src/milestones.ts`)**:
+        - Created `MILESTONE_TIERS` (`10`, `25`, `50`, `100`, `250`, `500`, `1,000`, `2,500`, `5,000`, `10,000`, `25,000`, `50,000`, `100,000`), `evaluateMilestones()`, `getHighestMilestoneBadge()`, and `getMilestoneProgress()` mapped to `/servers/Servers*.svg` and `/members/Members*.svg` static assets synced across all apps via `pnpm suite initialize`.
+    - **Bot Milestones View & Next-Tier Progress Queue (`apps/app/src/components/bots/Milestones.tsx`, `apps/app/src/components/bots/Profile.tsx`)**:
+        - Built the dedicated **Milestones** tab and overview showcase on bot profiles displaying unlocked Server and Member milestone SVG badges, unlock timestamps, and queued progress bars toward the next milestone tier.
+    - **Biggest Bot Milestones on User Profiles (`apps/app/src/components/users/BiggestBotMilestonesCard.tsx`, `apps/api/src/app/core/users/[id]/route.ts`, `apps/api/src/lib/widgetRenderer.ts`)**:
+        - Automatically resolves a bot owner's largest bot in `GET /core/users/[id]`, computes its highest Server and Member milestone badges plus next-tier progress, and displays them on public user profiles (`BiggestBotMilestonesCard.tsx`) and user SVG widgets (`widgetRenderer.ts`).
+
+    ### Universal 3-Tier Privacy Truth (`public` | `limited` | `private`) Across Web Apps, API, CDN & Bots (`AGENTS.md`, `@xernerx/lib`, `apps/api`, `apps/app`, `apps/account`, `apps/cdn`, `services/bot`)
+    - **3-Tier Privacy Enforcement (`@xernerx/lib`, `apps/api`, `apps/cdn`, `services/bot`)**:
+        - Standardized privacy across User Profiles, Bots, Servers/Guilds, Organizations, and CDN Media into three tiers:
+            - `public`: Listed in public directories, explorers, leaderboards, and search results, and accessible by anyone.
+            - `limited`: Unlisted (hidden from public directories, explorers, leaderboards, and search results) but accessible via direct link or ID.
+            - `private`: Strictly owner-only (never listed and inaccessible even with a direct link or ID unless authenticated as the owner or an authorized organization/co-owner member).
+        - Updated `services/bot` multi-instance daemon (`services/bot/src/instances/*`, `services/bot/src/lib/botUtils.ts`) and all `apps/api` and `apps/cdn` routes to enforce `public | limited | private` visibility boundaries.
+
+    ### Credit Ecosystem Expansion: Tipping, Organization Treasuries, Spotlight Boosts, Daily Streak Ladder & Ledger (`apps/store`, `apps/account`, `apps/app`, `apps/admin`, `apps/api`, `@xernerx/lib`)
+    - **Peer-to-Peer Credit Tipping (`apps/app/src/components/users/TipCreditsModal.tsx`, `apps/api/src/app/secure/store/credits/tip/route.ts`, `apps/api/src/app/secure/users/[id]/credits/tip/route.ts`)**:
+        - Enabled users to send direct credit tips with custom notes to bot developers and community members from public user profiles, recording paired debit/credit ledger entries.
+    - **Organization Credit Treasuries (`apps/app/src/components/portal/OrganizationTreasuryCard.tsx`, `apps/api/src/app/secure/organizations/[id]/treasury/route.ts`)**:
+        - Added pooled organization credit treasuries allowing members to contribute credits and fund organization-owned bot/server spotlight boosts.
+    - **Bot & Server Spotlight Boosts (`apps/app/src/components/SpotlightBoostModal.tsx`, `apps/api/src/app/secure/bots/[id]/boost/route.ts`, `apps/api/src/app/secure/guilds/[id]/boost/route.ts`)**:
+        - Added credit-powered Spotlight Boosts to feature bots and servers in explorer spotlight carousels.
+    - **Daily Streak Ladder, Transaction Ledger, Achievements & Referrals (`apps/store/src/components/DailyStreakLadder.tsx`, `apps/store/src/components/CreditLedgerCard.tsx`, `apps/account/src/components/CreditLedgerCard.tsx`, `apps/account/src/components/AchievementsReferralCard.tsx`, `apps/admin/src/components/AdminUserCreditsModal.tsx`)**:
+        - Added the 7-day progressive reward streak ladder in `apps/store`, full credit transaction history ledgers in `apps/store` and `apps/account`, user achievements & referral code claiming (`/secure/users/[id]/achievements`, `/secure/users/[id]/referrals`), and an Admin User Credit & Perk Manager (`AdminUserCreditsModal.tsx`) in `apps/admin`.
+
+    ### Developer Portal, Public API Versioning Policy (`/v1/*` → `/v2/*`), Bot Releases & Living Documentation (`apps/api`, `apps/docs`, `apps/info`, `apps/app`)
+    - **Public API Versioning & Breaking-Change Policy (`AGENTS.md`, `apps/api/AGENTS.md`, `apps/docs/src/components/api/ApiOverviewAndAuth.tsx`)**:
+        - Established and documented the non-breaking (`/v1/*`) vs breaking (`/v2/*` with `X-API-Version`, `Deprecation`, and `Sunset` adapter headers) public API versioning standard.
+    - **Bot Releases, Webhook Delivery Replay & Growth Telemetry (`apps/api/src/app/v1/bots/[id]/releases/route.ts`, `apps/app/src/components/bots/Releases.tsx`, `apps/app/src/components/portal/BotReleasesAndCommandsManager.tsx`, `apps/app/src/components/portal/WebhookDeliveriesCard.tsx`, `apps/app/src/components/portal/bot/GrowthTelemetryTab.tsx`)**:
+        - Added public (`GET / POST /v1/bots/[id]/releases`) and portal (`/secure/bots/[id]/releases`) bot release notes management, webhook delivery history inspection & 1-click payload replay (`/secure/bots/[id]/hooks/replay`), 1-click API token rolling (`/secure/tokens/[id]/roll`), and historical bot growth telemetry charts.
+    - **Interactive WebSocket Playground, API Docs Sync & FAQ Expansion (`apps/docs/src/components/websocket/WebsocketPlayground.tsx`, `apps/docs/src/components/api/*.tsx`, `apps/info/src/components/faq/*.tsx`, `apps/api/src/lib/docsBlueprints*.ts`, `apps/api/src/lib/faqBlueprints*.ts`)**:
+        - Added an interactive WebSocket testing playground on `docs.xernerx.com/websocket`, documented 100% of `/v1/*`, `/secure/*`, `/core/*`, and `/info/*` API routes, and expanded the `info.xernerx.com/faq` knowledgebank and public `/core/faq` & `/core/docs` blueprints.
+
+    ### Desktop Companion v2.3, UI Primitives (`<Check />` vs `<Toggle />`) & Strict `AGENTS.md` Architecture Compliance (`clients/desktop`, `apps/www`, `@xernerx/ui`, `@xernerx/components`, `@xernerx/providers`, `@xernerx/cli`)
+    - **Desktop Companion Enhancements & `/download` Parity (`clients/desktop`, `apps/www/src/components/DesktopInteractivePreview.tsx`, `apps/www/src/components/DesktopPerksBento.tsx`, `apps/www/src/components/DesktopPowerPerksRow.tsx`)**:
+        - Added CDN Watch Folder auto-upload (`desktopExtras.ts`), Quick Screen Capture, Streamer Mode auto-detection, and Battery Saver power monitoring in `clients/desktop`, and synced `xernerx.com/download` interactive previews.
+    - **Selection Primitive `<Check />` vs Boolean `<Toggle />` (`packages/ui/src/Check.tsx`, `packages/components/src/media/MediaGridCard.tsx`)**:
+        - Introduced `<Check />` in `@xernerx/ui` strictly for item/option selection (such as multi-selecting media cards in `MediaManager.tsx`, token scopes, and role permissions) while reserving `<Toggle />` strictly for boolean On/Off state switches.
+    - **Strict `AGENTS.md` Compliance & Automated Suite Linter (`.xernerx/cli/commands/lint.ts`)**:
+        - Modularized all large pages and components across `apps/*` and `packages/*` so every source file strictly obeys the 500-line cap after Prettier formatting, `src/components/` placement rule, 3-route local `/api` rule, `useDictionary()` `t()` localization completeness in `en-GB.json`, and zero ESLint errors across all 19 workspace projects.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.9.0
+    - @xernerx/feedback@0.1.0
+    - @xernerx/lib@1.11.0
+    - @xernerx/providers@0.12.0
+    - @xernerx/styles@0.1.15
+    - @xernerx/ui@0.7.0
+
+## 2.6.0
+
+### Minor Changes
+
+- <!-- @format -->
+
+    ### Credit Store, Ecosystem Perks, Profile Showcases & Subscription Credit Multipliers (`apps/store`, `apps/api`, `apps/admin`, `apps/account`, `apps/app`, `apps/cdn`, `services/websocket`, `@xernerx/components`, `@xernerx/lib`)
+    - **Dedicated Credit Store & Perks Hub (`apps/store/src/components/CreditStoreView.tsx`, `apps/store/src/app/page.tsx`)**:
+        - Added the **Credits & Perks** (`category=credits`) tab on `store.xernerx.com` featuring a live Credit Wallet & Perks summary bar (current credit balance, daily streak badge, lifetime credits spent, owned CDN slots, owned showcase slots, unlocked vanity badges, and 1-click Daily Reward claiming).
+        - Added filterable perk categories (**All Items**, **CDN Slots**, **Showcase Slots**, **Trial Passes**, **Vanity Badges**, and **Buy Credits (€)**) with `<Confirm />` redemption modals showing current balance, item cost, and remaining balance.
+        - Seeded initial Credit Store catalog items in `apps/api/src/lib/storeSeed.ts`:
+            - **CDN Upload Slots**: `+1 CDN Media Slot` (`1,000` credits), `+3 CDN Media Slots` (`2,500` credits), and `+10 CDN Media Slots` (`7,500` credits).
+            - **Profile Showcase Slots**: `+1 Profile Showcase Slot` (`1,500` credits) and `+3 Profile Showcase Slots` (`3,500` credits).
+            - **Trial Passes**: `3-Day Virtue Trial` (`900` credits), `3-Day Zodiac Trial` (`900` credits), `3-Day Ultra Ecosystem Trial` (`2,000` credits), and `7-Day Ultra Ecosystem Trial` (`4,000` credits).
+            - **High-Spender & Patron Vanity Badges**: `Credit Patron` (`2,500` credits), `High Roller` (`10,000` credits), and `Vault Sovereign` (`25,000` credits).
+            - **Stripe Credit Top-Up Packs**: `500 Credits Pack` (`€5`), `1,200 Credits Pack` (`€10`, +20% bonus), `3,250 Credits Vault` (`€25`, +30% bonus), and `7,000 Credits Treasury` (`€50`, +40% bonus) linked to Stripe Product/Price SKUs.
+
+    - **Credit Redemption Engine, One-Time Stripe Top-Ups & Admin Catalog Controls (`apps/api`, `apps/admin`, `@xernerx/lib`)**:
+        - Extended `models.users.Credit` (`Credit.ts`), `models.users.Profile` (`Profile.ts`), and `models.store.Item` (`Item.ts`) to track `totalSpent`, `extraCdnSlots`, `extraShowcaseSlots`, `unlockedBadges`, `activeBadges`, `transactions`, `showcases`, and store item types (`subscription`, `credit_pack`, `credit_perk`).
+        - Created `POST /secure/store/credits/redeem` (`apps/api/src/app/secure/store/credits/redeem/route.ts`) to atomically deduct credit balances, record ledger transactions, auto-unlock lifetime spender milestone badges (`2,500`, `10,000`, `25,000` credits), increment CDN/showcase slot quotas, and provision/extend `trialing` subscriptions.
+        - Updated `POST /secure/store/checkout` and `POST /secure/webhooks/stripe` to support one-time `mode: 'payment'` Stripe Checkout sessions for `credit_pack` SKUs and credit user balances upon `checkout.session.completed`.
+        - Upgraded Admin Store Management (`ItemModal.tsx`, `StoreItemsTab.tsx`, `/secure/store/items`) to configure `itemType`, `skuId`, `creditCost`, `creditAmount`, `perkType`, `perkValue`, and `durationDays`.
+
+    - **Server-Side 125% & 200% Subscription Credit Multipliers (`apps/api/src/lib/creditMultiplier.ts`, `services/websocket`)**:
+        - Built `applySubscriptionCreditMultiplier()` to inspect a user's active/trialing subscriptions right before adding earned credits, applying a **200% (`2.0x`)** multiplier for active **Ultra** (or staff) subscriptions and a **125% (`1.25x`)** multiplier for any other active subscription.
+        - Wired the server-side credit multiplier into Daily Gift claims (`/secure/store/[id]/gift`, `/secure/users/[id]/credits/claim`), Bot/Server/Guild voting rewards (`/secure/bots/[id]/vote`, `/secure/servers/[id]/vote`, `/secure/guilds/[id]/vote`), and WebSocket credit balance increments (`services/websocket/src/app/xernerx/server.ts`).
+
+    - **CDN Slot Quota & Public Profile Showcases (`apps/cdn`, `apps/account`, `apps/app`, `@xernerx/components`)**:
+        - Updated `POST /upload/[id]` and `GET /media` on `apps/cdn` to stack `extraCdnSlots` on top of base/subscription upload limits and surfaced a live `{used} / {max} CDN Slots` badge in `MediaManager.tsx` linking to the Credit Store.
+        - Built `ProfileShowcases.tsx` in `apps/account` so users can manage their pinned Showcase Cards (`1` free base slot + `extraShowcaseSlots`) and toggle unlocked Vanity Badges on/off, rendered live on public user profiles (`apps/app/src/components/users/Profile.tsx`) and `SidebarUser.tsx`.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.8.2
+    - @xernerx/lib@1.10.0
+    - @xernerx/providers@0.11.2
+    - @xernerx/feedback@0.0.42
+    - @xernerx/ui@0.6.2
+
+## 2.5.0
+
+### Minor Changes
+
+- <!-- @format -->
+
+    ### Credit Store, Ecosystem Perks, Profile Showcases & Subscription Credit Multipliers (`apps/store`, `apps/api`, `apps/admin`, `apps/account`, `apps/app`, `apps/cdn`, `services/websocket`, `@xernerx/components`, `@xernerx/lib`)
+    - **Dedicated Credit Store & Perks Hub (`apps/store/src/components/CreditStoreView.tsx`, `apps/store/src/app/page.tsx`)**:
+        - Added the **Credits & Perks** (`category=credits`) tab on `store.xernerx.com` featuring a live Credit Wallet & Perks summary bar (current credit balance, daily streak badge, lifetime credits spent, owned CDN slots, owned showcase slots, unlocked vanity badges, and 1-click Daily Reward claiming).
+        - Added filterable perk categories (**All Items**, **CDN Slots**, **Showcase Slots**, **Trial Passes**, **Vanity Badges**, and **Buy Credits (€)**) with `<Confirm />` redemption modals showing current balance, item cost, and remaining balance.
+        - Seeded initial Credit Store catalog items in `apps/api/src/lib/storeSeed.ts`:
+            - **CDN Upload Slots**: `+1 CDN Media Slot` (`1,000` credits), `+3 CDN Media Slots` (`2,500` credits), and `+10 CDN Media Slots` (`7,500` credits).
+            - **Profile Showcase Slots**: `+1 Profile Showcase Slot` (`1,500` credits) and `+3 Profile Showcase Slots` (`3,500` credits).
+            - **Trial Passes**: `3-Day Virtue Trial` (`900` credits), `3-Day Zodiac Trial` (`900` credits), `3-Day Ultra Ecosystem Trial` (`2,000` credits), and `7-Day Ultra Ecosystem Trial` (`4,000` credits).
+            - **High-Spender & Patron Vanity Badges**: `Credit Patron` (`2,500` credits), `High Roller` (`10,000` credits), and `Vault Sovereign` (`25,000` credits).
+            - **Stripe Credit Top-Up Packs**: `500 Credits Pack` (`€5`), `1,200 Credits Pack` (`€10`, +20% bonus), `3,250 Credits Vault` (`€25`, +30% bonus), and `7,000 Credits Treasury` (`€50`, +40% bonus) linked to Stripe Product/Price SKUs.
+
+    - **Credit Redemption Engine, One-Time Stripe Top-Ups & Admin Catalog Controls (`apps/api`, `apps/admin`, `@xernerx/lib`)**:
+        - Extended `models.users.Credit` (`Credit.ts`), `models.users.Profile` (`Profile.ts`), and `models.store.Item` (`Item.ts`) to track `totalSpent`, `extraCdnSlots`, `extraShowcaseSlots`, `unlockedBadges`, `activeBadges`, `transactions`, `showcases`, and store item types (`subscription`, `credit_pack`, `credit_perk`).
+        - Created `POST /secure/store/credits/redeem` (`apps/api/src/app/secure/store/credits/redeem/route.ts`) to atomically deduct credit balances, record ledger transactions, auto-unlock lifetime spender milestone badges (`2,500`, `10,000`, `25,000` credits), increment CDN/showcase slot quotas, and provision/extend `trialing` subscriptions.
+        - Updated `POST /secure/store/checkout` and `POST /secure/webhooks/stripe` to support one-time `mode: 'payment'` Stripe Checkout sessions for `credit_pack` SKUs and credit user balances upon `checkout.session.completed`.
+        - Upgraded Admin Store Management (`ItemModal.tsx`, `StoreItemsTab.tsx`, `/secure/store/items`) to configure `itemType`, `skuId`, `creditCost`, `creditAmount`, `perkType`, `perkValue`, and `durationDays`.
+
+    - **Server-Side 125% & 200% Subscription Credit Multipliers (`apps/api/src/lib/creditMultiplier.ts`, `services/websocket`)**:
+        - Built `applySubscriptionCreditMultiplier()` to inspect a user's active/trialing subscriptions right before adding earned credits, applying a **200% (`2.0x`)** multiplier for active **Ultra** (or staff) subscriptions and a **125% (`1.25x`)** multiplier for any other active subscription.
+        - Wired the server-side credit multiplier into Daily Gift claims (`/secure/store/[id]/gift`, `/secure/users/[id]/credits/claim`), Bot/Server/Guild voting rewards (`/secure/bots/[id]/vote`, `/secure/servers/[id]/vote`, `/secure/guilds/[id]/vote`), and WebSocket credit balance increments (`services/websocket/src/app/xernerx/server.ts`).
+
+    - **CDN Slot Quota & Public Profile Showcases (`apps/cdn`, `apps/account`, `apps/app`, `@xernerx/components`)**:
+        - Updated `POST /upload/[id]` and `GET /media` on `apps/cdn` to stack `extraCdnSlots` on top of base/subscription upload limits and surfaced a live `{used} / {max} CDN Slots` badge in `MediaManager.tsx` linking to the Credit Store.
+        - Built `ProfileShowcases.tsx` in `apps/account` so users can manage their pinned Showcase Cards (`1` free base slot + `extraShowcaseSlots`) and toggle unlocked Vanity Badges on/off, rendered live on public user profiles (`apps/app/src/components/users/Profile.tsx`) and `SidebarUser.tsx`.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.8.1
+    - @xernerx/lib@1.9.0
+    - @xernerx/providers@0.11.1
+    - @xernerx/feedback@0.0.41
+    - @xernerx/ui@0.6.1
+
 ## 2.4.0
 
 ### Minor Changes

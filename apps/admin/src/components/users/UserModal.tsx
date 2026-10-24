@@ -264,7 +264,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 				<div className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					{loadingDetails ? (
 						<div className="flex justify-center py-6">
-							<Loading />
+							<Loading variant="small" />
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-3 overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>

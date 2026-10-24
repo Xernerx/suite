@@ -4,6 +4,7 @@
 import { Save, Server, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useEnvironment, useToast, useSession, useDictionary } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import { SisterServersSection } from './settings/SisterServersSection';
@@ -302,14 +303,7 @@ export default function Settings() {
 		}
 		return () => remind(false);
 	}, [isDirty, isSaving, remind, handleSave, handleReset]);
-	if (isLoading) {
-		return (
-			<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
-				<Loader2 size={32} className="animate-spin mb-4 opacity-50" />
-				<p>{t('admin.settings.loading')}</p>
-			</div>
-		);
-	}
+	if (isLoading) return <Loading />;
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full relative"

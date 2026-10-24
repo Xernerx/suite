@@ -15,6 +15,8 @@ const hookSchema = new Schema(
 const schema = new Schema(
 	{
 		id: { type: String, unique: true, required: true }, // Guild ID
+		vanitySlug: { type: String, trim: true, lowercase: true, sparse: true },
+		vanityUnlocked: { type: Boolean, default: false },
 		name: { type: String, required: true }, // Guild name
 		icon: { type: String }, // Guild icon URL (optional)
 		banner: { type: String },
@@ -22,6 +24,9 @@ const schema = new Schema(
 		info: { type: String }, // Long description about the guild
 		owner: { type: String }, // Owner Discord user ID of the guild
 		organization: { type: String }, // Organization or developer of the guild
+		promotedUntil: { type: Date }, // Timestamp until which the server is promoted
+		boostedUntil: { type: Date }, // Timestamp until which the server is spotlight boosted via credits
+		boostedBy: { type: String }, // User ID who most recently boosted the server
 		verified: { type: Boolean, default: false }, // Whether the guild has been verified
 		bot: { type: Boolean, default: false }, // Whether the bot is in this server
 		messages: { type: Number, default: 0 }, // Total messages sent in this server

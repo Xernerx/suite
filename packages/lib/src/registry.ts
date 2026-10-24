@@ -28,6 +28,7 @@ import DispatchInviteSchema from './models/xernerx/dispatch/Invite';
 
 import GuildMemberSchema from './models/xernerx/guilds/Member';
 import GuildProfileSchema from './models/xernerx/guilds/Profile';
+import GuildReviewSchema from './models/xernerx/guilds/Review';
 import GuildRoleSchema from './models/xernerx/guilds/Role';
 import GuildStatSchema from './models/xernerx/guilds/Stat';
 import GuildVoteSchema from './models/xernerx/guilds/Vote';
@@ -76,6 +77,7 @@ export const xernerxModels = {
 	guilds: {
 		Member: { schema: GuildMemberSchema, modelName: 'Member' },
 		Guild: { schema: GuildProfileSchema, modelName: 'Guild', collection: 'profiles' },
+		Review: { schema: GuildReviewSchema, modelName: 'Review', collection: 'reviews' },
 		Role: { schema: GuildRoleSchema, modelName: 'Role' },
 		Stat: { schema: GuildStatSchema, modelName: 'Stat', collection: 'stats' },
 		Vote: { schema: GuildVoteSchema, modelName: 'Vote', collection: 'votes' },
@@ -96,12 +98,18 @@ export const xernerxModels = {
 };
 
 import VirtueGuildSchema from './models/virtue/profiles/Guild';
+import VirtueUserSchema from './models/virtue/profiles/User';
 import VirtueTextLevelSchema from './models/virtue/levels/Text';
 import VirtueVoiceLevelSchema from './models/virtue/levels/Voice';
 
 export const virtueModels = {
 	profiles: {
 		Guild: { schema: VirtueGuildSchema, modelName: 'Guild', collection: 'guilds' },
+		User: { schema: VirtueUserSchema, modelName: 'User', collection: 'users' },
+		Text: { schema: VirtueTextLevelSchema, modelName: 'Text', collection: 'text' },
+		Voice: { schema: VirtueVoiceLevelSchema, modelName: 'Voice', collection: 'voice' },
+	},
+	levels: {
 		Text: { schema: VirtueTextLevelSchema, modelName: 'Text', collection: 'text' },
 		Voice: { schema: VirtueVoiceLevelSchema, modelName: 'Voice', collection: 'voice' },
 	},

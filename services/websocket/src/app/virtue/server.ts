@@ -11,6 +11,14 @@ async function getModel(action: string) {
 			return (db.models.profiles as any)?.Guild;
 		}
 
+		case 'users':
+		case 'user':
+		case 'profiles':
+		case 'profile': {
+			const db = await database('virtue');
+			return (db.models.profiles as any)?.User;
+		}
+
 		case 'text':
 		case 'textLevels':
 		case 'members': {
@@ -43,6 +51,10 @@ function getFilter(action: string, body: any) {
 
 		case 'guilds':
 		case 'settings':
+		case 'users':
+		case 'user':
+		case 'profiles':
+		case 'profile':
 			return {
 				id: body.id,
 			};

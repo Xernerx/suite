@@ -37,8 +37,26 @@ export default function BillingAndStore({ searchQuery = '' }: { searchQuery?: st
 					<FaqQuickLinks
 						links={[
 							{ label: t('faq.quickLinks.billingTab'), href: 'https://account.xernerx.com/?tab=billing', vanity: 'account.xernerx.com/billing' },
+							{ label: t('faq.quickLinks.creditStore'), href: 'https://store.xernerx.com/?category=credits', vanity: 'store.xernerx.com/?category=credits' },
 							{ label: t('faq.quickLinks.leaderboards'), href: 'https://app.xernerx.com/leaderboard', vanity: 'app.xernerx.com/leaderboard' },
 							{ label: t('faq.quickLinks.supporters'), href: 'https://app.xernerx.com/supporters', vanity: 'app.xernerx.com/supporters' },
+						]}
+					/>
+				</div>
+			),
+		},
+		{
+			id: 'card6',
+			title: t('faq.billing.card6.title'),
+			searchableText: `${t('faq.billing.card6.title')} ${t('faq.billing.card6.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.billing.card6.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.creditStore'), href: 'https://store.xernerx.com/?category=credits', vanity: 'store.xernerx.com/?category=credits' },
+							{ label: t('faq.quickLinks.billingTab'), href: 'https://account.xernerx.com/?tab=billing', vanity: 'account.xernerx.com/billing' },
+							{ label: t('faq.quickLinks.profileSettings'), href: 'https://account.xernerx.com/?tab=profile', vanity: 'account.xernerx.com/profile' },
 						]}
 					/>
 				</div>
@@ -93,13 +111,31 @@ export default function BillingAndStore({ searchQuery = '' }: { searchQuery?: st
 				</div>
 			),
 		},
+		{
+			id: 'card7',
+			title: t('faq.billing.card7.title'),
+			searchableText: `${t('faq.billing.card7.title')} ${t('faq.billing.card7.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.billing.card7.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.creditStore'), href: 'https://store.xernerx.com/?category=credits', vanity: 'store.xernerx.com/?category=credits' },
+							{ label: t('faq.quickLinks.billingTab'), href: 'https://account.xernerx.com/?tab=billing', vanity: 'account.xernerx.com/billing' },
+							{ label: t('faq.quickLinks.exploreBots'), href: 'https://app.xernerx.com/bots', vanity: 'app.xernerx.com/bots' },
+							{ label: t('faq.quickLinks.supporters'), href: 'https://app.xernerx.com/supporters', vanity: 'app.xernerx.com/supporters' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.billing.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.billing.title')}
 			</HeadingTag>

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { ArrowLeft, Code, Cpu, Database, Key, Layers, Radio, Terminal, X } from 'lucide-react';
+import { ArrowLeft, Code, Cpu, Database, Key, Layers, Play, Radio, Terminal, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
@@ -13,6 +13,7 @@ import { WebsocketAuthSection } from '@/components/websocket/WebsocketAuthSectio
 import { WebsocketProtocolSection } from '@/components/websocket/WebsocketProtocolSection';
 import { WebsocketServicesSection } from '@/components/websocket/WebsocketServicesSection';
 import { WebsocketClientSection } from '@/components/websocket/WebsocketClientSection';
+import { WebsocketPlayground } from '@/components/websocket/WebsocketPlayground';
 import { useDocsAccess } from '@/components/useDocsAccess';
 
 const WS_SERVICES = ['ALL', 'virtue', 'xernerx', 'planned'] as const;
@@ -25,6 +26,7 @@ const HASH_TO_VIEW: Record<string, string> = {
 	services: 'services',
 	client: 'client',
 	example: 'client',
+	playground: 'playground',
 };
 
 export default function WebsocketDocsPage() {
@@ -75,6 +77,7 @@ export default function WebsocketDocsPage() {
 			{ label: t('docs.websocket.nav.authentication'), view: 'authentication', icon: Key, category: t('docs.websocket.nav.categoryWebsocket') },
 			{ label: t('docs.websocket.nav.rpcProtocol'), view: 'protocol', icon: Code, category: t('docs.websocket.nav.categoryWebsocket') },
 			{ label: t('docs.websocket.nav.servicesAndActions'), view: 'services', icon: Database, category: t('docs.websocket.nav.categoryWebsocket') },
+			{ label: t('docs.websocket.nav.playground'), view: 'playground', icon: Play, category: t('docs.websocket.nav.categoryWebsocket') },
 			{ label: t('docs.websocket.nav.clientExample'), view: 'client', icon: Terminal, category: t('docs.websocket.nav.categoryWebsocket') },
 			{ label: t('docs.api.common.nav.allEndpoints'), view: 'all', icon: Layers, category: t('docs.websocket.nav.categoryWebsocket') },
 		]);
@@ -157,15 +160,23 @@ export default function WebsocketDocsPage() {
 				{isFiltering ? (
 					<WebsocketServicesSection searchQuery={searchQuery} serviceFilter={serviceFilter} />
 				) : activeView === 'overview' ? (
-					<WebsocketOverviewSection onSelectView={(nextView) => setView(nextView)} />
+					<div className="space-y-8">
+						<WebsocketOverviewSection onSelectView={(nextView) => setView(nextView)} />
+						<WebsocketPlayground />
+					</div>
 				) : activeView === 'connecting' ? (
 					<WebsocketConnectingSection />
 				) : activeView === 'authentication' ? (
 					<WebsocketAuthSection />
 				) : activeView === 'protocol' ? (
-					<WebsocketProtocolSection />
+					<div className="space-y-8">
+						<WebsocketProtocolSection />
+						<WebsocketPlayground />
+					</div>
 				) : activeView === 'services' ? (
 					<WebsocketServicesSection searchQuery={searchQuery} serviceFilter={serviceFilter} />
+				) : activeView === 'playground' ? (
+					<WebsocketPlayground />
 				) : activeView === 'client' ? (
 					<WebsocketClientSection />
 				) : (
@@ -173,6 +184,7 @@ export default function WebsocketDocsPage() {
 						<WebsocketOverviewSection onSelectView={(nextView) => setView(nextView)} />
 						<WebsocketAuthSection />
 						<WebsocketProtocolSection />
+						<WebsocketPlayground />
 						<WebsocketServicesSection searchQuery={searchQuery} serviceFilter={serviceFilter} />
 						<WebsocketClientSection />
 					</div>

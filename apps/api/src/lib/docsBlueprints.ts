@@ -178,6 +178,18 @@ export const DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		],
 		keywords: ['websocket', 'client', 'example', 'typescript', 'node', 'reconnect'],
 	},
+	{
+		id: 'ws-playground',
+		slug: 'playground',
+		category: 'websocket',
+		categoryTitleKey: 'docs.home.categories.websocket.title',
+		sectionTitleKey: 'docs.websocket.nav.playground',
+		titleKey: 'docs.websocket.playground.title',
+		descKey: 'docs.websocket.playground.subtitle',
+		docPath: '/websocket#playground',
+		quickLinks: [{ label: 'Interactive RPC Playground', href: 'https://docs.xernerx.com/websocket#playground' }],
+		keywords: ['websocket', 'playground', 'rpc', 'interactive', 'sandbox', 'test', 'gateway'],
+	},
 
 	// Developer Packages
 	{

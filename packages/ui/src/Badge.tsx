@@ -14,12 +14,12 @@ export interface BadgeProps {
 
 export function Badge({ children, variant = 'accent', size = 'sm', icon, dot = false, className = '' }: BadgeProps) {
 	const variantClasses: Record<NonNullable<BadgeProps['variant']>, string> = {
-		accent: 'bg-(--accent)/10 text-(--accent) border-(--accent)/25',
-		success: 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/25',
-		warning: 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/25',
-		danger: 'bg-(--accent-red)/10 text-(--accent-red) border-(--accent-red)/25',
-		muted: 'bg-(--background)/60 text-(--text-muted) border-(--border)/10',
-		outline: 'bg-transparent text-(--text) border-(--border)/20',
+		accent: 'bg-(--accent)/10 text-(--accent) border-(--accent)/25 backdrop-blur-md',
+		success: 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/25 backdrop-blur-md',
+		warning: 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/25 backdrop-blur-md',
+		danger: 'bg-(--accent-red)/10 text-(--accent-red) border-(--accent-red)/25 backdrop-blur-md',
+		muted: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 backdrop-blur-md',
+		outline: 'bg-(--foreground)/30 text-(--text) border-(--border)/20 backdrop-blur-md',
 	};
 
 	const dotClasses: Record<NonNullable<BadgeProps['variant']>, string> = {

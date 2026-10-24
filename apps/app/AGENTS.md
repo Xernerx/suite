@@ -22,5 +22,9 @@
     - Check `usePlatform()`. When `type === 'application'` (running inside the Electron desktop wrapper `clients/desktop`), visiting `/` automatically redirects the user to `/dashboard`. Preserve this behavior when modifying the landing page.
 2. **Environment-Aware API Calls:**
     - Always build API URLs using `useEnvironment().getEnvUrl('api', '/secure/...')` so requests route accurately across `public`, `canary`, and `dev` environments.
-3. **Localization (`DictionaryProvider` & `t`):**
+3. **Universal 3-Tier Privacy Truth (`public` | `limited` | `private`):**
+    - **`public`:** Listed in public explorers/leaderboards/search and accessible by anyone.
+    - **`limited`:** Never listed in public explorers/leaderboards/search, but accessible by anyone with the direct link or ID (`/bots/[id]`, `/servers/[id]`, `/users/[id]`, `/organization/[id]`).
+    - **`private`:** Hard private—never listed and strictly inaccessible to anyone except the owner (or authorized co-owners/organization members), even with a direct link or ID.
+4. **Localization (`DictionaryProvider` & `t`):**
     - Use `useDictionary()` (`app.*` namespace in `packages/lib/src/dictionaries/en-GB.json`) for all UI labels, empty states, and toast messages. Always inspect `packages/providers/src/DictionaryProvider.tsx` to verify how `t(path, variables?)` operates rather than guessing its signature.

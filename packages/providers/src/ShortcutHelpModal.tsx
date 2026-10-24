@@ -155,7 +155,7 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 								<button
 									type="button"
 									onClick={onClose}
-									aria-label="Close"
+									aria-label={t('common.close')}
 									className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition cursor-pointer"
 								>
 									<X size={18} />
@@ -243,7 +243,12 @@ export function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onC
 									</div>
 								</div>
 
-								<button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition">
+								<button
+									type="button"
+									onClick={onClose}
+									aria-label={t('common.close')}
+									className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition"
+								>
 									<X size={18} />
 								</button>
 							</div>

@@ -162,7 +162,7 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json({ mainOrgId: null, bots: [] });
 		}
 
-		const orgBots = await BotModel.find({ organization: mainOrgId }).lean();
+		const orgBots = await BotModel.find({ organization: mainOrgId, privacy: 'public' }).lean();
 		if (!orgBots.length) {
 			return NextResponse.json({ mainOrgId, bots: [] });
 		}

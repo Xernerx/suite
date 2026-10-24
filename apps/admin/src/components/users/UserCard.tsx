@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Settings2, User as UserIcon, Copy, Check } from 'lucide-react';
+import { Settings2, User as UserIcon, Copy, Check, Coins } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './types';
 import { UserModal } from './UserModal';
@@ -17,9 +17,10 @@ interface UserCardProps {
 	onUserUpdated: (updated: FullUser) => void;
 	onDiscordFetched: (id: string, discord: DiscordProfile) => void;
 	onViewAuditLogs?: (userId: string) => void;
+	onManageCredits?: (user: UserSummary) => void;
 }
 
-export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated, onDiscordFetched, onViewAuditLogs }: UserCardProps) {
+export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated, onDiscordFetched, onViewAuditLogs, onManageCredits }: UserCardProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -128,8 +129,23 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 					</div>
 				</div>
 
-				<div className="flex items-center justify-center w-8 h-8 rounded-full bg-(--border)/10 opacity-0 group-hover:opacity-100 transition-all text-(--text) relative z-10 shrink-0 mr-2">
-					<Settings2 size={16} />
+				<div className="flex items-center gap-1.5 relative z-10 shrink-0 mr-2">
+					{onManageCredits && (
+						<button
+							type="button"
+							title={t('admin.users.creditsModal.manageButton')}
+							onClick={(e) => {
+								e.stopPropagation();
+								onManageCredits({ ...user, discord: discord || user.discord });
+							}}
+							className="flex items-center justify-center w-8 h-8 rounded-full bg-(--accent)/15 hover:bg-(--accent)/25 text-(--accent) opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+						>
+							<Coins size={15} />
+						</button>
+					)}
+					<div className="flex items-center justify-center w-8 h-8 rounded-full bg-(--border)/10 opacity-0 group-hover:opacity-100 transition-all text-(--text)">
+						<Settings2 size={16} />
+					</div>
 				</div>
 			</motion.div>
 

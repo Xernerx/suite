@@ -6,6 +6,7 @@ import { ArrowRight, Briefcase, Loader2, LogIn } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useEnvironment, useSidebar, useUser, useDictionary } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import Link from 'next/link';
 
 interface ApplicationConfig {
@@ -61,6 +62,8 @@ export default function ApplicationsPage() {
 		fetchApplications();
 	}, [getEnvUrl]);
 
+	if (loading) return <Loading />;
+
 	return (
 		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-7xl mx-auto w-full">
 			<div className="mb-12">
@@ -70,11 +73,7 @@ export default function ApplicationsPage() {
 				<p className="text-lg text-(--text-muted) max-w-2xl">{t('www.applications.subtitle')}</p>
 			</div>
 
-			{loading ? (
-				<div className="flex justify-center items-center py-24">
-					<Loader2 className="w-8 h-8 animate-spin text-(--accent)" />
-				</div>
-			) : error ? (
+			{error ? (
 				<motion.div
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}

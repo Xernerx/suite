@@ -85,7 +85,7 @@ export default function Page() {
 
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
-			const requestedCat = params.get('category')?.toLowerCase();
+			const requestedCat = (params.get('category') || params.get('view'))?.toLowerCase();
 			const requestedQuery = params.get('q') || params.get('search');
 			if (requestedQuery) {
 				setSearchQuery((prev) => prev || requestedQuery);
@@ -110,7 +110,7 @@ export default function Page() {
 
 	return (
 		<div className="flex flex-col w-full">
-			<div className="max-w-3xl mx-auto w-full pt-6 px-4">
+			<div className="max-w-7xl mx-auto w-full pt-6" style={{ paddingInline: 'var(--ui-gap)' }}>
 				<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('faq.searchPlaceholder')} />
 			</div>
 

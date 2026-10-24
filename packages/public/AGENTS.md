@@ -4,7 +4,7 @@
 
 ## 🧭 Overview
 
-`packages/public` is the canonical central repository for static branding assets (`logo.svg`, `logo.png`, `icon.png`, `banner.png`, `banner.svg`, `banner-canary.svg`, `banner-dev.svg`) and domain/crawler files (`ads.txt`, `sitemap.xml`) shared across all Next.js applications in the suite.
+`packages/public` is the canonical central repository for static branding assets (`logo.svg`, `logo.png`, `icon.png`, `banner.png`, `banner.svg`, `banner-canary.svg`, `banner-dev.svg`), tiered milestone badge icons (`servers/Servers.svg`, `servers/Servers-1.svg`..`Servers-16.svg`, `members/Members.svg`, `members/Members-1.svg`..`Members-16.svg` and `.png` counterparts), and domain/crawler files (`ads.txt`, `sitemap.xml`) shared across all Next.js applications in the suite.
 
 ## ⚠️ Important Rules & Gotchas
 

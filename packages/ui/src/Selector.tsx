@@ -74,6 +74,29 @@ export function Selector({ value, options, onChange, placeholder, items, require
 			setTimeout(() => {
 				inputRef.current?.focus();
 			}, 50);
+
+			const elevated: Array<{ el: HTMLElement; prevZ: string; prevPos: string }> = [];
+			let curr = ref.current?.parentElement;
+			let depth = 0;
+			while (curr && curr !== document.body && curr.tagName !== 'MAIN' && curr.getAttribute('role') !== 'dialog' && depth < 6) {
+				const computed = window.getComputedStyle(curr);
+				const prevZ = curr.style.zIndex;
+				const prevPos = curr.style.position;
+				if (computed.position === 'static') {
+					curr.style.position = 'relative';
+				}
+				curr.style.zIndex = '60';
+				elevated.push({ el: curr, prevZ, prevPos });
+				curr = curr.parentElement;
+				depth++;
+			}
+
+			return () => {
+				elevated.forEach(({ el, prevZ, prevPos }) => {
+					el.style.zIndex = prevZ;
+					el.style.position = prevPos;
+				});
+			};
 		} else {
 			setQuery('');
 		}
@@ -87,7 +110,7 @@ export function Selector({ value, options, onChange, placeholder, items, require
 		return valueMatch || labelMatch;
 	});
 	return (
-		<div className="relative w-full" ref={ref}>
+		<div className={`relative w-full ${isOpen ? 'z-[100]' : ''}`} ref={ref}>
 			{required && (
 				<input tabIndex={-1} autoComplete="off" value={value} onChange={() => {}} required className="pointer-events-none absolute bottom-0 left-1/2 h-px w-px -translate-x-1/2 opacity-0" />
 			)}

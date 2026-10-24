@@ -11,6 +11,8 @@ const schema = new Schema(
 		uploaderId: { type: String, required: true },
 		privacy: { type: String, enum: ['public', 'limited', 'private'], default: 'private' },
 		shared: [{ type: String }],
+		folder: { type: String, default: 'Uncategorized' },
+		tags: { type: [String], default: [] },
 	},
 	{ timestamps: true }
 );

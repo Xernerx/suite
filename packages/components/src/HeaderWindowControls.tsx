@@ -4,7 +4,7 @@
 
 import { Copy, Minus, Square, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { usePlatform, useTheme } from '@xernerx/providers';
+import { useDictionary, usePlatform, useTheme } from '@xernerx/providers';
 
 export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx';
 
@@ -33,8 +33,16 @@ export function useWindowControlsStyle(): {
 				setWindowControls(detail.windowControls);
 			}
 		};
+		const unsubscribe = electronBridge?.onMetadataUpdated?.((meta: any) => {
+			if (meta?.windowControls) {
+				setWindowControls(meta.windowControls);
+			}
+		});
 		window.addEventListener('xernerx:metadata-updated', handleMetaUpdate);
-		return () => window.removeEventListener('xernerx:metadata-updated', handleMetaUpdate);
+		return () => {
+			window.removeEventListener('xernerx:metadata-updated', handleMetaUpdate);
+			unsubscribe?.();
+		};
 	}, []);
 
 	const effectiveControls = windowControls === 'system' ? (platform === 'macos' ? 'macos' : 'windows') : windowControls;
@@ -50,6 +58,7 @@ export function useWindowControlsStyle(): {
 }
 
 export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: boolean; effectiveControls: 'windows' | 'macos' | 'xernerx' }) {
+	const { t } = useDictionary();
 	const [maximized, setMaximized] = useState(false);
 
 	async function toggleMaximize() {
@@ -69,8 +78,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 				<>
 					<button
 						type="button"
-						aria-label="Minimize"
-						title="Minimize"
+						aria-label={t('common.window.minimize')}
+						title={t('common.window.minimize')}
 						onClick={() => (window as any).electron?.minimize?.()}
 						className="group/btn h-3.5 w-3.5 rounded-full bg-(--border)/35 hover:bg-(--accent-orange) text-(--background) flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
 					>
@@ -78,8 +87,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 					</button>
 					<button
 						type="button"
-						aria-label="Maximize"
-						title="Maximize"
+						aria-label={t('common.window.maximize')}
+						title={t('common.window.maximize')}
 						onClick={toggleMaximize}
 						className="group/btn h-3.5 w-3.5 rounded-full bg-(--border)/35 hover:bg-(--accent-green) text-(--background) flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
 					>
@@ -91,8 +100,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 					</button>
 					<button
 						type="button"
-						aria-label="Close"
-						title="Close"
+						aria-label={t('common.close')}
+						title={t('common.close')}
 						onClick={() => (window as any).electron?.close?.()}
 						className="group/btn h-3.5 w-3.5 rounded-full bg-(--accent-red)/60 hover:bg-(--accent-red) text-(--background) flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
 					>
@@ -103,8 +112,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 				<>
 					<button
 						type="button"
-						aria-label="Minimize"
-						title="Minimize"
+						aria-label={t('common.window.minimize')}
+						title={t('common.window.minimize')}
 						onClick={() => (window as any).electron?.minimize?.()}
 						className="h-8 w-8 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer"
 					>
@@ -112,8 +121,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 					</button>
 					<button
 						type="button"
-						aria-label="Maximize"
-						title="Maximize"
+						aria-label={t('common.window.maximize')}
+						title={t('common.window.maximize')}
 						onClick={toggleMaximize}
 						className="h-8 w-8 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer"
 					>
@@ -121,8 +130,8 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 					</button>
 					<button
 						type="button"
-						aria-label="Close"
-						title="Close"
+						aria-label={t('common.close')}
+						title={t('common.close')}
 						onClick={() => (window as any).electron?.close?.()}
 						className="h-8 w-8 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent-red)/20 hover:border-(--accent-red)/40 hover:text-(--accent-red) transition-all cursor-pointer"
 					>
@@ -131,15 +140,33 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 				</>
 			) : (
 				<>
-					<button type="button" aria-label="Minimize" title="Minimize" className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={() => (window as any).electron?.minimize?.()}>
+					<button
+						type="button"
+						aria-label={t('common.window.minimize')}
+						title={t('common.window.minimize')}
+						className="text-(--text) cursor-pointer hover:text-(--accent)"
+						onClick={() => (window as any).electron?.minimize?.()}
+					>
 						<Minus size={20} />
 					</button>
 
-					<button type="button" aria-label="Maximize" title="Maximize" className="text-(--text) cursor-pointer hover:text-(--accent)" onClick={toggleMaximize}>
+					<button
+						type="button"
+						aria-label={t('common.window.maximize')}
+						title={t('common.window.maximize')}
+						className="text-(--text) cursor-pointer hover:text-(--accent)"
+						onClick={toggleMaximize}
+					>
 						{maximized ? <Copy size={20} /> : <Square size={14} />}
 					</button>
 
-					<button type="button" aria-label="Close" title="Close" className="text-(--text) cursor-pointer hover:text-(--accent-red)" onClick={() => (window as any).electron?.close?.()}>
+					<button
+						type="button"
+						aria-label={t('common.close')}
+						title={t('common.close')}
+						className="text-(--text) cursor-pointer hover:text-(--accent-red)"
+						onClick={() => (window as any).electron?.close?.()}
+					>
 						<X size={20} />
 					</button>
 				</>

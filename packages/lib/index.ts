@@ -7,4 +7,5 @@ export * from './src/env';
 export * from './src/products';
 export * from './src/permissions';
 export * from './src/timezones';
+export * from './src/milestones';
 export type { Locale } from './src/i18n.config';

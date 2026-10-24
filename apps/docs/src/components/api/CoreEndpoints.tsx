@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Server, Shield, Globe, Key, Map, Lightbulb, Bug, HelpCircle, Code } from 'lucide-react';
+import { Server, Shield, Globe, Key, Map, Lightbulb, Bug, HelpCircle, Code, Activity, BookOpen } from 'lucide-react';
 import Image from 'next/image';
 import { CodeBlock } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
@@ -152,6 +152,32 @@ export function CoreEndpoints({ activeGroup = 'all', searchQuery = '', methodFil
 					/>
 				</div>
 			),
+		},
+		{
+			id: 'core-docs',
+			group: 'core-faq',
+			title: t('docs.api.core.infoDocs.title'),
+			icon: BookOpen,
+			description: t('docs.api.core.infoDocs.description'),
+			routes: [
+				{ method: 'GET', path: '/core/docs?locale=en-GB&category=&q=&flat=false', auth: 'public' as const },
+				{ method: 'GET', path: '/core/docs/[id]?locale=en-GB', auth: 'public' as const },
+				{ method: 'GET', path: '/core/changelog/reactions', auth: 'public' as const },
+				{ method: 'POST', path: '/core/changelog/reactions', auth: 'token' as const },
+			],
+		},
+		{
+			id: 'info-status',
+			group: 'core-info',
+			title: t('docs.api.core.infoStatus.title'),
+			icon: Activity,
+			description: t('docs.api.core.infoStatus.description'),
+			routes: [
+				{ method: 'GET', path: '/info/status/bots?refresh=false', auth: 'public' as const },
+				{ method: 'GET', path: '/info/status/history?refresh=false', auth: 'public' as const },
+				{ method: 'GET', path: '/info/status/cron', auth: 'public' as const },
+				{ method: 'POST', path: '/info/status/history', auth: 'public' as const },
+			],
 		},
 		{
 			id: 'info-roadmap',

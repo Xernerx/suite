@@ -22,4 +22,8 @@
 ## ⚠️ Important Rules & Gotchas
 
 1. **Never Expose Raw Vercel Blob URLs Directly:** All blobs are stored with private access in `@vercel/blob` and must be served exclusively through `/raw/[id]` so privacy permissions and quotas are respected.
-2. **Quota Enforcement:** When modifying user upload handlers, ensure tier upload limits (Free vs Ultra) are checked against the user's current media count.
+2. **Universal 3-Tier Privacy Truth (`public` | `limited` | `private`):**
+    - **`public`:** Publicly listed and accessible by anyone.
+    - **`limited`:** Unlisted in public galleries, but accessible by anyone with the direct `/raw/[id]` or `/view/[id]` link/ID.
+    - **`private`:** Hard private—restricted strictly to the owner (`uploaderId`) or explicitly shared users.
+3. **Quota Enforcement:** When modifying user upload handlers, ensure tier upload limits (Free vs Ultra) are checked against the user's current media count.

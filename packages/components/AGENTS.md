@@ -19,3 +19,4 @@
 2. **Policy Version Constants (`TermsPrompt.tsx`):** `TERMS_VERSION` and `PRIVACY_VERSION` control when users are prompted to accept updated legal policies. `pnpm suite commit` tracks policy edits against this file.
 3. **Client Directives & Styling:** All interactive components must include `'use client';` and use CSS variables (`var(--ui-gap)`, `bg-(--foreground)`, `text-(--text)`).
 4. **Localization:** Never hardcode text; use `useDictionary()`.
+5. **Sync `www/download` Preview on Shell/UI Changes:** Whenever changing the shared application layout, `Header`, `Sidebar`, window controls, or navigation shell in `@xernerx/components`, ensure `apps/www/src/app/download/page.tsx` (`DesktopInteractivePreview.tsx` and `DesktopPerksBento.tsx`) and relevant FAQ entries in `apps/info` stay conformant with the updated UI.

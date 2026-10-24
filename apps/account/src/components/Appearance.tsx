@@ -1,10 +1,11 @@
 /** @format */
 'use client';
 
-import { Columns3, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
+import { Columns3, EyeOff, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
 import { Button, Selector, Slider, Toggle } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useSession, useTheme, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSession, useTheme, useToast, type DotMatrixAnimation, type DotMatrixStage, type DotMatrixType } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
+import { DotMatrixSettingsCard } from './DotMatrixSettingsCard';
 
 const PRESET_COLORS = [
 	{ key: 'purple', value: '#8b7cf6' },
@@ -73,9 +74,13 @@ export default function Appearance() {
 	const { data: session } = useSession();
 
 	const { getEnvUrl } = useEnvironment();
-	const { setTheme, setAccent } = useTheme();
+	const { setTheme, setAccent, uiPreferences, setPreference } = useTheme();
 	const { toast } = useToast();
 	const { t } = useDictionary();
+
+	const dotMatrixStage: DotMatrixStage = uiPreferences?.dotMatrixStage || 'default';
+	const dotMatrixType: DotMatrixType = uiPreferences?.dotMatrixType || (dotMatrixStage === 'orbit' ? 'orbit' : dotMatrixStage === 'blank' ? 'blank' : 'default');
+	const dotMatrixAnimation: DotMatrixAnimation = uiPreferences?.dotMatrixAnimation || (dotMatrixStage === 'ripple' ? 'always' : 'animate');
 
 	const [clientSync, setClientSync] = useState<boolean>(() => {
 		return getPref('clientSync') === 'true';
@@ -90,6 +95,7 @@ export default function Appearance() {
 	const [uiZoom, setUiZoom] = useState<number>(100);
 	const [uiGap, setUiGap] = useState<string>('16');
 	const [textScale, setTextScale] = useState<number>(14);
+	const [isUiHidden, setIsUiHidden] = useState<boolean>(false);
 
 	useEffect(() => {
 		(() => {
@@ -150,6 +156,11 @@ export default function Appearance() {
 				textScale: overrides.textScale || textScale,
 				clientSync: isSyncEnabled,
 				syncFromDiscord: overrides.syncFromDiscord !== undefined ? overrides.syncFromDiscord : syncFromDiscord,
+				uiPreferences: {
+					dotMatrixStage: overrides.dotMatrixStage || dotMatrixStage,
+					dotMatrixType: overrides.dotMatrixType || dotMatrixType,
+					dotMatrixAnimation: overrides.dotMatrixAnimation || dotMatrixAnimation,
+				},
 			},
 		};
 
@@ -254,6 +265,24 @@ export default function Appearance() {
 		saveToDb({ textScale: val });
 	};
 
+	const handleDotMatrixTypeChange = (nextType: DotMatrixType) => {
+		setPreference('dotMatrixType', nextType);
+		saveToDb({ dotMatrixType: nextType });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.dotMatrixStage.title'),
+		});
+	};
+
+	const handleDotMatrixAnimationChange = (nextAnim: DotMatrixAnimation) => {
+		setPreference('dotMatrixAnimation', nextAnim);
+		saveToDb({ dotMatrixAnimation: nextAnim });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.dotMatrixStage.title'),
+		});
+	};
+
 	const handleResetDefaults = () => {
 		setSelectedTheme('system');
 		setTheme('system');
@@ -276,87 +305,37 @@ export default function Appearance() {
 		setPref('textScale', '14');
 		setThemeVar('--text-scale', '14px');
 
-		saveToDb({
-			theme: 'system',
-			accent: '#8b7cf6',
-			uiZoom: 100,
-			uiGap: '16',
-			textScale: 14,
-		});
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.resetSuccess'),
-		});
+		setPreference('dotMatrixStage', 'default');
+		setPreference('dotMatrixType', 'default');
+		setPreference('dotMatrixAnimation', 'animate');
+
+		saveToDb({ theme: 'system', accent: '#8b7cf6', uiZoom: 100, uiGap: '16', textScale: 14, dotMatrixStage: 'default', dotMatrixType: 'default', dotMatrixAnimation: 'animate' });
+		toast({ type: 'success', title: t('account.appearance.toast.resetSuccess') });
 	};
 
+	const renderOption = (Icon: any, text: string) => (
+		<div className="flex items-center gap-2.5">
+			<Icon size={16} />
+			<span className="font-medium">{text}</span>
+		</div>
+	);
+
 	const themeOptions = [
-		{
-			value: 'dark',
-			label: (
-				<div className="flex items-center gap-2.5">
-					<Moon size={16} />
-					<span className="font-medium">{t('account.appearance.theme.options.dark')}</span>
-				</div>
-			),
-		},
-		{
-			value: 'light',
-			label: (
-				<div className="flex items-center gap-2.5">
-					<Sun size={16} />
-					<span className="font-medium">{t('account.appearance.theme.options.light')}</span>
-				</div>
-			),
-		},
-		{
-			value: 'system',
-			label: (
-				<div className="flex items-center gap-2.5">
-					<Laptop size={16} />
-					<span className="font-medium">{t('account.appearance.theme.options.system')}</span>
-				</div>
-			),
-		},
+		{ value: 'dark', label: renderOption(Moon, t('account.appearance.theme.options.dark')) },
+		{ value: 'light', label: renderOption(Sun, t('account.appearance.theme.options.light')) },
+		{ value: 'system', label: renderOption(Laptop, t('account.appearance.theme.options.system')) },
 	];
 
 	const densityOptions = [
-		{
-			value: '10',
-			label: (
-				<div className="flex items-center gap-2.5">
-					<Columns3 size={16} />
-					<span className="font-medium">{t('account.appearance.density.compact')}</span>
-				</div>
-			),
-		},
-		{
-			value: '16',
-			label: (
-				<div className="flex items-center gap-2.5">
-					<Columns3 size={16} />
-					<span className="font-medium">{t('account.appearance.density.default')}</span>
-				</div>
-			),
-		},
-		{
-			value: '24',
-			label: (
-				<div className="flex items-center gap-2.5">
-					<Columns3 size={16} />
-					<span className="font-medium">{t('account.appearance.density.spacious')}</span>
-				</div>
-			),
-		},
+		{ value: '10', label: renderOption(Columns3, t('account.appearance.density.compact')) },
+		{ value: '16', label: renderOption(Columns3, t('account.appearance.density.default')) },
+		{ value: '24', label: renderOption(Columns3, t('account.appearance.density.spacious')) },
 	];
 
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full"
-			style={{
-				padding: 'var(--ui-gap)',
-				gap: 'var(--ui-gap)',
-				fontSize: 'var(--text-scale, 14px)',
-			}}
+			className={`flex flex-col max-w-7xl mx-auto w-full transition-opacity duration-300 ${isUiHidden ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'}`}
+			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 		>
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
@@ -366,10 +345,16 @@ export default function Appearance() {
 					<p className="text-sm text-(--text-muted)">{t('account.appearance.description')}</p>
 				</div>
 
-				<Button variant="secondary" onClick={handleResetDefaults} className="flex items-center gap-2 shrink-0">
-					<RotateCcw size={15} />
-					{t('account.appearance.resetDefaults')}
-				</Button>
+				<div className="flex flex-wrap items-center gap-2 shrink-0">
+					<Button variant="secondary" onClick={() => setIsUiHidden(true)} className="flex items-center gap-2">
+						<EyeOff size={15} />
+						{t('account.appearance.hideUi')}
+					</Button>
+					<Button variant="secondary" onClick={handleResetDefaults} className="flex items-center gap-2">
+						<RotateCcw size={15} />
+						{t('account.appearance.resetDefaults')}
+					</Button>
+				</div>
 			</div>
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -386,6 +371,16 @@ export default function Appearance() {
 						<Selector value={selectedTheme} options={themeOptions} onChange={handleThemeChange} />
 					</div>
 				</div>
+
+				{/* Dot-Matrix Background Stage & Animation Card */}
+				<DotMatrixSettingsCard
+					dotMatrixType={dotMatrixType}
+					dotMatrixAnimation={dotMatrixAnimation}
+					onChangeType={handleDotMatrixTypeChange}
+					onChangeAnimation={handleDotMatrixAnimationChange}
+					isUiHidden={isUiHidden}
+					onToggleHideUi={() => setIsUiHidden((prev) => !prev)}
+				/>
 
 				{/* Sync Accent with Clients */}
 				<div

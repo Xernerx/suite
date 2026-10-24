@@ -13,16 +13,19 @@ interface V1SubProps {
 	methodFilter?: string;
 	defaultExpanded?: boolean;
 	onTryRoute?: (method: string, path: string) => void;
+	botId?: string;
 }
 
-export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute }: V1SubProps) {
+export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute, botId = '' }: V1SubProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const apiBase = getEnvUrl('https://api.xernerx.com');
 	const appBase = getEnvUrl('https://app.xernerx.com');
 
-	const sampleBadgeUrl = `${apiBase}/v1/bots/1059956767103668244/badge.svg?type=votes`;
-	const sampleBotUrl = `${appBase}/bots/1059956767103668244`;
+	const effectiveBotId = botId.trim() || 'YOUR_BOT_ID';
+	const badgeBotId = botId.trim() || '1059956767103668244';
+	const sampleBadgeUrl = `${apiBase}/v1/bots/${badgeBotId}/badge.svg?type=votes`;
+	const sampleBotUrl = `${appBase}/bots/${badgeBotId}`;
 
 	const sections = [
 		{
@@ -47,19 +50,24 @@ export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', meth
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst profile = await response.json();\nconsole.log(profile);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X GET "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN"`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst profile = await response.json();\nconsole.log(profile);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/profile', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst profile = await response.json();\nconsole.log(profile);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst profile = await stats.getProfile();\nconsole.log(profile);`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.get(url, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.get(url, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -123,19 +131,24 @@ export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', meth
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile', {\n    method: 'PATCH',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        description: "An updated short description for my bot!"\n    })\n});\n\nconst updatedProfile = await response.json();\nconsole.log(updatedProfile);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X PATCH "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '{"description":"An updated short description for my bot!"}'`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile', {\n    method: 'PATCH',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        description: "An updated short description for my bot!"\n    })\n});\n\nconst updatedProfile = await response.json();\nconsole.log(updatedProfile);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/profile', {\n    method: 'PATCH',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        description: "An updated short description for my bot!"\n    })\n});\n\nconst updatedProfile = await response.json();\nconsole.log(updatedProfile);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.updateProfile({\n    description: 'An updated short description for my bot!'\n});`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "description": "An updated short description for my bot!"\n}\n\nresponse = requests.patch(url, json=data, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "description": "An updated short description for my bot!"\n}\n\nresponse = requests.patch(url, json=data, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -157,19 +170,24 @@ export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', meth
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X DELETE "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN"`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/profile', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.deleteProfile();`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>

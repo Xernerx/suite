@@ -1,9 +1,9 @@
 /** @format */
 'use client';
 
-import { Bot, Compass, LayoutDashboard, ArrowLeft, ExternalLink, Copy, Check } from 'lucide-react';
+import { Bot, Compass, LayoutDashboard, ArrowLeft, ExternalLink, Copy, Check, Rocket } from 'lucide-react';
 import { Tabs, Confirm, Button } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSession, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -11,11 +11,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import GeneralTab from '@/components/portal/bot/GeneralTab';
+import GrowthTelemetryTab from '@/components/portal/bot/GrowthTelemetryTab';
 import LinksTab from '@/components/portal/bot/LinksTab';
 import WebhooksTab from '@/components/portal/bot/WebhooksTab';
 import SettingsTab from '@/components/portal/bot/SettingsTab';
+import BotReleasesAndCommandsManager from '@/components/portal/BotReleasesAndCommandsManager';
+import SpotlightBoostModal from '@/components/SpotlightBoostModal';
 
-const VALID_TABS = ['general', 'links', 'webhooks', 'settings'];
+const VALID_TABS = ['general', 'releases', 'growth', 'links', 'webhooks', 'settings'];
 
 export default function PortalBotPage() {
 	const params = useParams();
@@ -23,6 +26,7 @@ export default function PortalBotPage() {
 	const botId = params.id as string;
 
 	const { data: session } = useSession();
+	const { mutate: mutateUser } = useUser();
 	const { getEnvUrl, isReady: envReady } = useEnvironment();
 	const { t } = useDictionary();
 	const { show, setView, setNavItems, clearNavItems } = useSidebar();
@@ -31,12 +35,14 @@ export default function PortalBotPage() {
 
 	const [botConfig, setBotConfig] = useState<any>(null);
 	const [originalBotConfig, setOriginalBotConfig] = useState<any>(null);
+	const [webhookDeliveries, setWebhookDeliveries] = useState<any[]>([]);
 	const [organizations, setOrganizations] = useState<any[]>([]);
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [configLoading, setConfigLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 	const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+	const [boostModalOpen, setBoostModalOpen] = useState(false);
 	const [copiedId, setCopiedId] = useState(false);
 
 	const initialTab = searchParams.get('tab');
@@ -83,7 +89,15 @@ export default function PortalBotPage() {
 				let currentBotData = null;
 				if (botRes.ok) {
 					const data = await botRes.json();
-					const hooksData = hooksRes.ok ? await hooksRes.json() : [];
+					const hooksRaw = hooksRes.ok ? await hooksRes.json() : [];
+					const hooksData = (Array.isArray(hooksRaw) ? hooksRaw : hooksRaw?.hooks || []).map((h: any) => ({
+						...(h.id ? { id: h.id } : {}),
+						botId: h.botId || botId,
+						url: h.url,
+						events: h.events || [],
+					}));
+					const deliveriesData = Array.isArray(hooksRaw?.deliveries) ? hooksRaw.deliveries : (Array.isArray(hooksRaw) ? hooksRaw : []).flatMap((h: any) => h.deliveries || []);
+					setWebhookDeliveries(deliveriesData);
 
 					if (tagsRes.ok) {
 						setAvailableTags(await tagsRes.json());
@@ -214,13 +228,17 @@ export default function PortalBotPage() {
 					]);
 
 					if (res.ok && hooksRes.ok) {
+						const updatedBot = await res.json().catch(() => null);
+						const nextBotConfig = updatedBot ? { ...botConfig, ...updatedBot, hooks: botConfig.hooks } : botConfig;
+						mutateUser().catch(() => null);
 						toast({ title: t('common.toast.savedSuccess'), type: 'success' });
 						remind(false);
 
 						if (botConfig.organization !== originalBotConfig.organization) {
 							window.location.reload();
 						} else {
-							setOriginalBotConfig(JSON.parse(JSON.stringify(botConfig)));
+							setBotConfig(nextBotConfig);
+							setOriginalBotConfig(JSON.parse(JSON.stringify(nextBotConfig)));
 						}
 					} else {
 						let errorMessage = t('common.toast.saveFailed');
@@ -322,8 +340,12 @@ export default function PortalBotPage() {
 							</button>
 						</div>
 					</div>
-					<div className="relative z-10 flex items-center gap-2 shrink-0">
-						<Link href={`/bots/${botConfig.id}`}>
+					<div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
+						<Button variant="primary" onClick={() => setBoostModalOpen(true)} className="gap-2">
+							<Rocket className="w-4 h-4" />
+							{t('app.boost.boostBotBtn')}
+						</Button>
+						<Link href={`/bots/${botConfig.vanitySlug || botConfig.id}`}>
 							<Button variant="secondary" className="gap-2">
 								<ExternalLink className="w-4 h-4" />
 								{t('app.portal.workspace.viewPublicProfile')}
@@ -338,6 +360,8 @@ export default function PortalBotPage() {
 						onChange={handleTabChange}
 						tabs={[
 							{ id: 'general', label: t('app.portal.bot.tabs.general') },
+							{ id: 'releases', label: t('app.portal.bot.tabs.releasesAndCommands') },
+							{ id: 'growth', label: t('app.portal.bot.tabs.growth') },
 							{ id: 'links', label: t('app.portal.bot.tabs.links') },
 							{ id: 'webhooks', label: t('app.portal.bot.tabs.webhooks') },
 							{ id: 'settings', label: t('app.portal.bot.tabs.settings') },
@@ -346,13 +370,42 @@ export default function PortalBotPage() {
 
 					{activeTab === 'general' && <GeneralTab botConfig={botConfig} setBotConfig={setBotConfig} availableTags={availableTags} />}
 
+					{activeTab === 'releases' && <BotReleasesAndCommandsManager botId={botId} botConfig={botConfig} setBotConfig={setBotConfig} setOriginalBotConfig={setOriginalBotConfig} />}
+
+					{activeTab === 'growth' && <GrowthTelemetryTab botConfig={botConfig} botId={botId} />}
+
 					{activeTab === 'links' && <LinksTab botConfig={botConfig} setBotConfig={setBotConfig} />}
 
-					{activeTab === 'webhooks' && <WebhooksTab botConfig={botConfig} setBotConfig={setBotConfig} />}
+					{activeTab === 'webhooks' && <WebhooksTab botConfig={botConfig} setBotConfig={setBotConfig} deliveries={webhookDeliveries} onDeliveriesChange={setWebhookDeliveries} />}
 
-					{activeTab === 'settings' && <SettingsTab botConfig={botConfig} setBotConfig={setBotConfig} organizations={organizations} onDeleteClick={() => setIsConfirmDeleteOpen(true)} />}
+					{activeTab === 'settings' && (
+						<SettingsTab
+							botConfig={botConfig}
+							setBotConfig={setBotConfig}
+							onVanityUnlocked={() => {
+								setBotConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+								setOriginalBotConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+							}}
+							organizations={organizations}
+							onDeleteClick={() => setIsConfirmDeleteOpen(true)}
+						/>
+					)}
 				</div>
 			</div>
+
+			<SpotlightBoostModal
+				isOpen={boostModalOpen}
+				onClose={() => setBoostModalOpen(false)}
+				targetType="bot"
+				targetId={botConfig.id}
+				targetName={botConfig.discord?.global_name || botConfig.discord?.username || botConfig.name}
+				currentBoostedUntil={botConfig.boostedUntil}
+				onBoostSuccess={(boostedUntil) => {
+					setBotConfig((prev: any) => (prev ? { ...prev, boostedUntil } : prev));
+					setOriginalBotConfig((prev: any) => (prev ? { ...prev, boostedUntil } : prev));
+					mutateUser().catch(() => null);
+				}}
+			/>
 
 			<Confirm
 				open={isConfirmDeleteOpen}

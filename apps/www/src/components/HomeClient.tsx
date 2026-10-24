@@ -3,12 +3,13 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Boxes, ExternalLink, LayoutDashboard, Package } from 'lucide-react';
-import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useLoading, useSidebar } from '@xernerx/providers';
 
-import Banner from '@/../public/banner.svg';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import Timeline from '@/components/Timeline';
 import { LandingCta, PlatformHighlights } from '@/components/PlatformHighlights';
+import { WwwDeepSearch } from '@/components/WwwDeepSearch';
 
 export type ShowcasePackage = {
 	name: string;
@@ -20,6 +21,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 	const { hide } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
+	const { setBackgroundMode, setDotVariant } = useLoading();
 
 	const servicesRef = useRef<HTMLDivElement>(null);
 	const softwareRef = useRef<HTMLDivElement>(null);
@@ -84,7 +86,30 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 	useEffect(() => {
 		hide();
-	}, [hide]);
+		setBackgroundMode('sticky-ripple');
+		setDotVariant('full');
+
+		const scrollEl = document.getElementById('main-scroll-container');
+		const handleScroll = () => {
+			if (!scrollEl) return;
+			const vh = scrollEl.clientHeight || window.innerHeight || 800;
+			const top = scrollEl.scrollTop;
+			if (top < vh * 0.7) {
+				setDotVariant('full');
+			} else if (top < vh * 2.1) {
+				setDotVariant('icon');
+			} else {
+				setDotVariant('orbit');
+			}
+		};
+
+		scrollEl?.addEventListener('scroll', handleScroll, { passive: true });
+		return () => {
+			scrollEl?.removeEventListener('scroll', handleScroll);
+			setBackgroundMode(null);
+			setDotVariant(null);
+		};
+	}, [hide, setBackgroundMode, setDotVariant]);
 
 	return (
 		<div className="flex flex-col selection:bg-(--accent) selection:text-white">
@@ -116,24 +141,51 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 								{t('www.hero.buttons.software')}
 							</a>
 						</div>
+
+						<WwwDeepSearch packages={publicPackages} />
+
+						<nav aria-label="Quick navigation" className="mt-6 flex flex-wrap items-center gap-2">
+							<a
+								href="#about"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+							>
+								{t('www.hero.links.about')}
+							</a>
+							<a
+								href="#highlights"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+							>
+								{t('www.hero.links.highlights')}
+							</a>
+							<a
+								href="#timeline"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+							>
+								{t('www.hero.links.timeline')}
+							</a>
+							<Link
+								href="/invites"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+							>
+								{t('www.hero.links.invites')}
+							</Link>
+							<Link
+								href="/applications"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+							>
+								{t('www.hero.links.careers')}
+							</Link>
+							<Link
+								href="/contact"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+							>
+								{t('www.hero.links.contact')}
+							</Link>
+						</nav>
 					</motion.div>
 
-					{/* RIGHT: BANNER VISUAL */}
-					<motion.div
-						initial={{ opacity: 1, scale: 1, rotate: 0 }}
-						animate={{ opacity: 1, scale: 1, rotate: 0 }}
-						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-						className="relative flex justify-center items-center w-full"
-					>
-						{/* Floating effect */}
-						<motion.div
-							animate={{ y: [-15, 15, -15] }}
-							transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-							className="w-full relative z-10 scale-[1.25] lg:scale-[1.4] origin-center pl-8 lg:pl-16"
-						>
-							<Banner className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-2xl text-(--text)" />
-						</motion.div>
-					</motion.div>
+					{/* RIGHT: OPEN STAGE FOR APPLAYOUT STICKY REACTIVE DOT-MATRIX LOGO */}
+					<div className="hidden lg:block min-h-[320px] w-full pointer-events-none" />
 				</div>
 			</section>
 
@@ -218,9 +270,9 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 							<div className="relative z-10 flex flex-col items-start gap-4">
 								<div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">{point.icon}</div>
-								<h2 className="text-xl font-bold mt-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								<div className="text-xl font-bold mt-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{point.title}
-								</h2>
+								</div>
 								<p className="text-white/90 text-sm leading-relaxed">{point.desc}</p>
 							</div>
 						</motion.div>
@@ -279,11 +331,11 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 									</div>
 									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
 									<div className="flex items-center gap-3 mb-3">
-										<h3 className="font-bold text-xl text-(--text)">
+										<div className="font-bold text-xl text-(--text)">
 											<a href={item.link} className="after:absolute after:inset-0">
 												{item.title}
 											</a>
-										</h3>
+										</div>
 										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
 									</div>
 									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
@@ -316,11 +368,11 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 									</div>
 									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
 									<div className="flex items-center gap-3 mb-3">
-										<h3 className="font-bold text-xl text-(--text) font-mono">
+										<div className="font-bold text-xl text-(--text) font-mono">
 											<a href={getEnvUrl(item.link)} className="after:absolute after:inset-0">
 												{item.title}
 											</a>
-										</h3>
+										</div>
 										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
 									</div>
 									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
@@ -332,7 +384,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			</section>
 
 			{/* ABOUT SECTION (Asymmetrical Bento-style) */}
-			<section className="max-w-7xl mx-auto px-6 relative" style={{ padding: 'calc(var(--ui-gap) * 6) 0' }}>
+			<section id="about" className="max-w-7xl mx-auto px-6 relative" style={{ padding: 'calc(var(--ui-gap) * 6) 0' }}>
 				<div className="relative grid md:grid-cols-12 gap-8 items-center">
 					{/* Massive Watermark */}
 					<div
@@ -395,9 +447,9 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 							key={pillar.title}
 							className="bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/30 rounded-[2rem] p-8 shadow-xl transition-colors flex flex-col gap-3"
 						>
-							<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							<div className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 								{pillar.title}
-							</h3>
+							</div>
 							<p className="text-sm text-(--text-muted) leading-relaxed">{pillar.desc}</p>
 						</div>
 					))}

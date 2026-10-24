@@ -31,11 +31,19 @@ export async function GET(request: Request) {
 		let windows: Record<string, string> | null = null;
 		let macos: Record<string, string> | null = null;
 		let linux: Record<string, string> | null = null;
+		let extractedVersion: string | null = null;
 
 		// Loop through the assets to match platforms, ignoring blockmaps and metadata yml files
 		for (const asset of assets) {
 			const name = asset.name.toLowerCase();
 			const browser_download_url = asset.browser_download_url;
+
+			if (!extractedVersion && typeof asset.name === 'string') {
+				const verMatch = asset.name.match(/Xernerx[\s_-]*App-(.+)-setup\./i);
+				if (verMatch?.[1]) {
+					extractedVersion = verMatch[1].trim();
+				}
+			}
 
 			if (name.includes('blockmap') || name.endsWith('.yml')) continue;
 
@@ -53,7 +61,22 @@ export async function GET(request: Request) {
 			}
 		}
 
+		if (!extractedVersion) {
+			const rawTag = String(release.tag_name || release.name || '').trim();
+			const cleaned = rawTag
+				.replace(/^Desktop\s+/i, '')
+				.replace(/^desktop@/i, '')
+				.replace(/^v/i, '')
+				.trim();
+			if (cleaned && cleaned !== 'canary') {
+				extractedVersion = cleaned;
+			}
+		}
+
 		return NextResponse.json({
+			version: extractedVersion,
+			tagName: release.tag_name || null,
+			publishedAt: release.published_at || null,
 			windows,
 			macos,
 			linux,

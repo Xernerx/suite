@@ -111,7 +111,7 @@ export function MediaModals({
 					description={t('account.media.modal.description', { filename: editMedia.filename })}
 				>
 					<div className="space-y-4">
-						<div className="flex flex-col gap-1.5">
+						<div className="relative z-30 flex flex-col gap-1.5">
 							<label className="text-sm font-medium text-(--text)">{t('account.media.modal.privacyLevel')}</label>
 							<Selector
 								value={editMedia.privacy}
@@ -122,6 +122,29 @@ export function MediaModals({
 									{ label: t('account.media.privacy.private'), value: 'private' },
 								]}
 							/>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+							<div className="flex flex-col gap-1.5">
+								<label className="text-sm font-medium text-(--text)">{t('account.media.folderLabel')}</label>
+								<Input value={editMedia.folder || 'Uncategorized'} onChange={(e: any) => setEditMedia({ ...editMedia, folder: e.target.value })} placeholder="Uncategorized" />
+							</div>
+							<div className="flex flex-col gap-1.5">
+								<label className="text-sm font-medium text-(--text)">{t('account.media.tagsLabel')}</label>
+								<Input
+									value={Array.isArray(editMedia.tags) ? editMedia.tags.join(', ') : editMedia.tags || ''}
+									onChange={(e: any) =>
+										setEditMedia({
+											...editMedia,
+											tags: String(e.target.value)
+												.split(',')
+												.map((tag) => tag.trim())
+												.filter(Boolean),
+										})
+									}
+									placeholder={t('account.media.tagsPlaceholder')}
+								/>
+							</div>
 						</div>
 
 						{editMedia.privacy === 'private' && (
@@ -171,7 +194,7 @@ export function MediaModals({
 													<button
 														type="button"
 														onClick={() => removeSharedUser(id)}
-														aria-label="Remove"
+														aria-label={t('common.remove')}
 														className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-(--accent-red)/10 text-(--text-muted) hover:text-(--accent-red) transition-colors cursor-pointer"
 													>
 														<X size={14} />

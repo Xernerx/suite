@@ -2,7 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
+
+function buildOrgQuery(id: string) {
+	const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+	return isObjectId ? { $or: [{ _id: id }, { vanitySlug: id.toLowerCase() }] } : { vanitySlug: id.toLowerCase() };
+}
 
 export async function GET(req: Request, props: { params: Promise<{ id: string }> }) {
 	try {
@@ -10,7 +18,7 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
 		const OrganizationModel = db.Organization;
 
 		const { id } = await props.params;
-		const organization = await OrganizationModel.findOne({ _id: id }).lean();
+		const organization = await OrganizationModel.findOne(buildOrgQuery(id)).lean();
 
 		if (!organization) {
 			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
@@ -25,6 +33,8 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
 			verified: organization.verified,
 			privacy: organization.config?.privacy || organization.privacy,
 			widgets: Boolean(organization.widgets),
+			vanityUnlocked: Boolean(organization.vanityUnlocked || organization.vanitySlug || organization.verified),
+			vanitySlug: organization.vanitySlug,
 		};
 
 		return NextResponse.json(flatOrg, { status: 200 });
@@ -37,12 +47,73 @@ export async function GET(req: Request, props: { params: Promise<{ id: string }>
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const body = await req.json();
-		const db = (await database('xernerx')).models.organizations as any;
+		const fullDb = await database('xernerx');
+		const db = fullDb.models.organizations as any;
 		const OrganizationModel = db.Organization;
 
 		const { id } = await params;
+		const existingOrg = await OrganizationModel.findOne(buildOrgQuery(id)).lean();
+		if (!existingOrg) {
+			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+		}
+		const orgId = existingOrg._id;
+
+		const session = (await getServerSession(auth).catch(() => null)) as any;
+		const actorUserId = session?.user?.id || existingOrg.owner;
+		const isVanityAlreadyUnlocked = Boolean(existingOrg.vanityUnlocked || existingOrg.vanitySlug || existingOrg.verified);
+
+		if (body.action === 'unlock_vanity') {
+			if (!isVanityAlreadyUnlocked) {
+				const unlockRes = await unlockVanityWithUserCredits(fullDb.models, actorUserId, existingOrg.name || `Organization ${orgId}`);
+				if (!unlockRes.ok) {
+					return NextResponse.json({ error: unlockRes.error }, { status: 403 });
+				}
+				const unlockedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, { $set: { vanityUnlocked: true } }, { returnDocument: 'after', runValidators: true }).lean();
+				return NextResponse.json(
+					{
+						...unlockedOrg,
+						widgets: Boolean(unlockedOrg?.widgets),
+						vanityUnlocked: true,
+						vanitySlug: unlockedOrg?.vanitySlug,
+						usedSlot: unlockRes.usedSlot,
+						cost: unlockRes.cost,
+					},
+					{ status: 200 }
+				);
+			}
+			return NextResponse.json({ ...existingOrg, vanityUnlocked: true }, { status: 200 });
+		}
 
 		const updateData: any = {};
+		const unsetData: any = {};
+
+		if (body.vanitySlug !== undefined) {
+			const rawSlug = normalizeVanitySlug(body.vanitySlug);
+			if (rawSlug === '') {
+				if (existingOrg.vanitySlug) {
+					unsetData['vanitySlug'] = 1;
+				}
+				delete body.vanitySlug;
+			} else {
+				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
+					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
+				}
+				const slugTaken = await OrganizationModel.findOne({ vanitySlug: rawSlug, _id: { $ne: orgId } }).lean();
+				if (slugTaken) {
+					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
+				}
+				if (!isVanityAlreadyUnlocked) {
+					const unlockRes = await unlockVanityWithUserCredits(fullDb.models, actorUserId, existingOrg.name || `Organization ${orgId}`);
+					if (!unlockRes.ok) {
+						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
+					}
+					updateData['vanityUnlocked'] = true;
+				}
+				updateData['vanitySlug'] = rawSlug;
+				body.vanitySlug = rawSlug;
+			}
+		}
+
 		if (body.name !== undefined) updateData['name'] = body.name;
 		if (body.description !== undefined) updateData['description'] = body.description;
 		if (body.icon !== undefined) updateData['icon'] = body.icon;
@@ -57,7 +128,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 
 		if (body.action === 'remove_member' && body.targetId) {
-			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: id }, { $pull: { members: { userId: body.targetId } } }, { returnDocument: 'after', runValidators: true }).lean();
+			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, { $pull: { members: { userId: body.targetId } } }, { returnDocument: 'after', runValidators: true }).lean();
 
 			if (!updatedOrg) return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
 
@@ -66,7 +137,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				await Dispatch.create({
 					id: crypto.randomUUID(),
 					targetId: body.targetId,
-					senderId: id,
+					senderId: String(orgId),
 					type: 'organization_kick',
 					category: 'notification',
 					status: 'unread',
@@ -88,13 +159,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				verified: updatedOrg.verified,
 				privacy: updatedOrg.config?.privacy || updatedOrg.privacy,
 				widgets: Boolean(updatedOrg.widgets),
+				vanitySlug: updatedOrg.vanitySlug,
 			};
 			return NextResponse.json(flatOrg, { status: 200 });
 		}
 
-		const finalUpdate = Object.keys(updateData).length > 0 ? updateData : body;
+		const finalSet = Object.keys(updateData).length > 0 ? updateData : body;
+		const mongoUpdate: any = {};
+		if (Object.keys(finalSet).length > 0) mongoUpdate.$set = finalSet;
+		if (Object.keys(unsetData).length > 0) mongoUpdate.$unset = unsetData;
 
-		const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: id }, { $set: finalUpdate }, { returnDocument: 'after', runValidators: true }).lean();
+		const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, mongoUpdate, { returnDocument: 'after', runValidators: true }).lean();
 
 		if (!updatedOrg) {
 			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
@@ -108,7 +183,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			icon: updatedOrg.icon,
 			verified: updatedOrg.verified,
 			privacy: updatedOrg.config?.privacy || updatedOrg.privacy,
-			widgets: Boolean(updatedOrg.widgets),
+			widgets: Boolean(organizationPrivacyFallback(updatedOrg)),
+			vanityUnlocked: Boolean(updatedOrg.vanityUnlocked || updatedOrg.vanitySlug || updatedOrg.verified),
+			vanitySlug: updatedOrg.vanitySlug,
 		};
 
 		return NextResponse.json(flatOrg, { status: 200 });
@@ -118,13 +195,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 	}
 }
 
+function organizationPrivacyFallback(org: any) {
+	return org?.widgets;
+}
+
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const db = (await database('xernerx')).models.organizations as any;
 		const OrganizationModel = db.Organization;
 
 		const { id } = await params;
-		const deletedOrg = await OrganizationModel.findOneAndDelete({ _id: id });
+		const deletedOrg = await OrganizationModel.findOneAndDelete(buildOrgQuery(id));
 
 		if (!deletedOrg) {
 			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });

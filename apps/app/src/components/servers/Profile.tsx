@@ -3,8 +3,8 @@
 
 import { Building2, Code2, ExternalLink, FileText, Globe, LifeBuoy, Link as LinkIcon, MessageSquare, Server, Shield } from 'lucide-react';
 import Link from 'next/link';
-import ReactMarkdown from 'react-markdown';
 import { useDictionary } from '@xernerx/providers';
+import { Markdown } from '@xernerx/ui';
 
 export function ServerProfile({ server, organizationData }: { server: any; organizationData: any }) {
 	const { t } = useDictionary();
@@ -18,9 +18,9 @@ export function ServerProfile({ server, organizationData }: { server: any; organ
 					<h2 className="text-2xl font-bold mb-6 text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('app.servers.about', { name: server.name })}
 					</h2>
-					<div className="prose max-w-none text-(--text-muted) flex-1 prose-headings:font-fredoka prose-a:text-(--accent) hover:prose-a:text-(--accent)/80">
-						{server.info ? <ReactMarkdown>{String(server.info)}</ReactMarkdown> : t('app.servers.noDetailedDesc')}
-					</div>
+					<Markdown className="flex-1" emptyText={t('app.servers.noDetailedDesc')}>
+						{server.info ? String(server.info) : ''}
+					</Markdown>
 				</div>
 			</div>
 
@@ -34,7 +34,7 @@ export function ServerProfile({ server, organizationData }: { server: any; organ
 						{organizationData?.name && (
 							<div className="flex flex-col gap-1">
 								<span className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">{t('app.servers.publishedBy')}</span>
-								{organizationData.privacy === 'public' || organizationData.config?.privacy === 'public' ? (
+								{(organizationData.privacy || organizationData.config?.privacy) !== 'private' ? (
 									<Link href={`/organization/${organizationData._id}`} className="flex items-center gap-2 text-sm font-semibold text-(--accent) hover:underline">
 										<Building2 className="w-4 h-4 shrink-0" />
 										<span>{organizationData.name}</span>

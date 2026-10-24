@@ -27,6 +27,25 @@ export async function GET() {
 		await Promise.allSettled(
 			uniqueSkuIds.map(async (skuId) => {
 				try {
+					if (skuId.startsWith('price_')) {
+						const price = await stripe.prices.retrieve(skuId, { expand: ['product'] });
+						const prod = typeof price.product === 'object' && price.product && !('deleted' in price.product) ? price.product : null;
+						priceCache[skuId] = {
+							name: prod?.name || skuId,
+							description: prod?.description || null,
+							prices: [
+								{
+									id: price.id,
+									unitAmount: price.unit_amount,
+									currency: price.currency,
+									interval: price.recurring?.interval,
+									intervalCount: price.recurring?.interval_count,
+								},
+							],
+						};
+						return;
+					}
+
 					const [product, pricesList] = await Promise.all([stripe.products.retrieve(skuId), stripe.prices.list({ product: skuId, active: true })]);
 
 					priceCache[skuId] = {

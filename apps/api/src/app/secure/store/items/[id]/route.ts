@@ -20,6 +20,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		if (body.description !== undefined) item.description = body.description.trim();
 		if (body.categoryId !== undefined) item.categoryId = body.categoryId.trim();
 		if (body.skuId !== undefined) item.skuId = body.skuId.trim();
+		if (body.itemType !== undefined && ['subscription', 'credit_pack', 'credit_perk'].includes(body.itemType)) {
+			item.itemType = body.itemType;
+		}
+		if (body.creditCost !== undefined) item.creditCost = Math.max(0, Number(body.creditCost) || 0);
+		if (body.creditAmount !== undefined) item.creditAmount = Math.max(0, Number(body.creditAmount) || 0);
+		if (body.perkType !== undefined && ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge', 'streak_shield', 'boost_bot', 'boost_server'].includes(body.perkType)) {
+			item.perkType = body.perkType;
+		}
+		if (body.perkValue !== undefined) item.perkValue = body.perkValue;
+		if (body.durationDays !== undefined) item.durationDays = Math.max(0, Number(body.durationDays) || 0);
 		if (body.badge !== undefined) item.badge = body.badge?.trim() || null;
 		if (body.discountPercent !== undefined) {
 			item.discountPercent = Math.max(0, Math.min(100, Number(body.discountPercent) || 0));

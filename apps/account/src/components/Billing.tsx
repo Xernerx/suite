@@ -4,8 +4,11 @@
 import { Coins, CreditCard, ExternalLink, Flame, Gift, Loader2, RefreshCw, ShieldCheck, Sparkles, Clock } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Confirm, EmptyState, Tabs } from '@xernerx/ui';
+import { Loading } from '@xernerx/feedback';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { products } from '@xernerx/lib';
+import { CreditLedgerCard } from './CreditLedgerCard';
+import { AchievementsReferralCard } from './AchievementsReferralCard';
 
 interface UserSubscription {
 	stripeSubscriptionId: string;
@@ -44,12 +47,17 @@ export default function Billing() {
 	const [subFilter, setSubFilter] = useState<'all' | 'active' | 'history'>('all');
 	const [timeLeft, setTimeLeft] = useState<string>('');
 
+	const hasLoadedCredits = !userLoading && Boolean(user?.credits);
 	const creditBalance = user?.credits?.balance ?? 0;
 	const creditStreak = user?.credits?.streak ?? 0;
-	const nextGiftMs = user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : 0;
-	const canClaimGift = creditStreak === 0 || nextGiftMs <= Date.now();
+	const nextGiftMs = hasLoadedCredits && user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : null;
+	const canClaimGift = hasLoadedCredits && (nextGiftMs !== null ? Number.isFinite(nextGiftMs) && nextGiftMs <= Date.now() : creditStreak === 0);
 
 	useEffect(() => {
+		if (!hasLoadedCredits || nextGiftMs === null) {
+			setTimeLeft('');
+			return;
+		}
 		const updateCountdown = () => {
 			const diff = nextGiftMs - Date.now();
 			if (diff <= 0) {
@@ -64,7 +72,7 @@ export default function Billing() {
 		updateCountdown();
 		const interval = setInterval(updateCountdown, 1000);
 		return () => clearInterval(interval);
-	}, [nextGiftMs]);
+	}, [hasLoadedCredits, nextGiftMs]);
 
 	const handleClaimDailyGift = async () => {
 		if (!user?.id || claimingGift) return;
@@ -245,6 +253,7 @@ export default function Billing() {
 	}, [subFilter, enriched, activeSubs, historySubs]);
 
 	const isLoading = userLoading || loading;
+	if (isLoading) return <Loading />;
 
 	return (
 		<div
@@ -317,6 +326,12 @@ export default function Billing() {
 					</Button>
 				</div>
 
+				{/* Credit Balance Activity Ledger */}
+				<CreditLedgerCard transactions={user?.credits?.transactions} streakShields={user?.credits?.streakShields ?? 0} />
+
+				{/* Contributor Achievements & Referral Program */}
+				<AchievementsReferralCard userId={user?.id} mutate={mutate} />
+
 				{/* Subscription Filter Tabs */}
 				{!isLoading && enriched.length > 0 && (
 					<div className="flex items-center justify-between">
@@ -333,22 +348,8 @@ export default function Billing() {
 					</div>
 				)}
 
-				{/* Loading */}
-				{isLoading && (
-					<div
-						className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm items-center justify-center"
-						style={{
-							padding: 'calc(var(--ui-gap) * 3)',
-							gap: 'var(--ui-gap)',
-						}}
-					>
-						<Loader2 size={28} className="animate-spin text-(--accent)" />
-						<p className="text-sm text-(--text-muted)">{t('account.billing.loading')}</p>
-					</div>
-				)}
-
 				{/* Empty state */}
-				{!isLoading && filteredSubs.length === 0 && !user?.staffSubscription && (
+				{filteredSubs.length === 0 && !user?.staffSubscription && (
 					<EmptyState
 						icon={<CreditCard size={28} />}
 						title={t('account.billing.empty.title')}

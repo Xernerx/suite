@@ -13,6 +13,8 @@ const schema = new Schema(
 			websocket: Boolean, // can connect to the websocket gateway directly
 		},
 		botId: { type: String },
+		lastUsedAt: { type: Date, default: null },
+		requestCount: { type: Number, default: 0 },
 	},
 	{ timestamps: true }
 );

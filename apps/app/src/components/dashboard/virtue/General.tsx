@@ -4,8 +4,10 @@
 
 import { AlertCircle, Check, Info, Loader2, Save, Sparkles, Trophy } from 'lucide-react';
 import { Button, Input, Selector, Toggle } from '@xernerx/ui';
+import { Loading } from '@xernerx/feedback';
 import { useCallback, useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import ConfigPortabilityCard, { VirtueConfigShape } from '@/components/virtue/ConfigPortabilityCard';
 
 interface VirtueProfile {
 	id: string;
@@ -133,12 +135,7 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 	};
 
 	if (loading) {
-		return (
-			<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
-				<Loader2 className="w-8 h-8 animate-spin text-(--accent) mb-3" />
-				<span className="text-sm font-medium">{t('app.dashboard.virtue.loading')}</span>
-			</div>
-		);
+		return <Loading />;
 	}
 
 	if (!profile) {
@@ -162,8 +159,50 @@ export default function VirtueGeneral({ id }: { id?: string }) {
 		);
 	}
 
+	const currentConfigObject: VirtueConfigShape = {
+		mode,
+		cycles,
+		roles: {
+			ignored: ignoredRoles
+				.split(',')
+				.map((r) => r.trim())
+				.filter(Boolean),
+			tracked: trackedRoles
+				.split(',')
+				.map((r) => r.trim())
+				.filter(Boolean),
+		},
+		levelUp,
+		levelMessage,
+		levelChannel: levelChannel.trim() || null,
+		autoDelete: Number(autoDelete) || 0,
+	};
+
+	const handleApplyPortableConfig = (cfg: Partial<VirtueConfigShape>) => {
+		if (cfg.mode && ['easy', 'casual', 'balanced', 'hard', 'extreme'].includes(cfg.mode)) {
+			setMode(cfg.mode);
+		}
+		if (cfg.cycles && typeof cfg.cycles === 'object') {
+			setCycles({
+				daily: Boolean(cfg.cycles.daily),
+				weekly: Boolean(cfg.cycles.weekly),
+				monthly: Boolean(cfg.cycles.monthly),
+			});
+		}
+		if (cfg.roles && typeof cfg.roles === 'object') {
+			if (Array.isArray(cfg.roles.ignored)) setIgnoredRoles(cfg.roles.ignored.join(', '));
+			if (Array.isArray(cfg.roles.tracked)) setTrackedRoles(cfg.roles.tracked.join(', '));
+		}
+		if (typeof cfg.levelUp === 'boolean') setLevelUp(cfg.levelUp);
+		if (typeof cfg.levelMessage === 'string') setLevelMessage(cfg.levelMessage);
+		if (cfg.levelChannel !== undefined) setLevelChannel(cfg.levelChannel || '');
+		if (typeof cfg.autoDelete === 'number') setAutoDelete(cfg.autoDelete);
+	};
+
 	return (
 		<div className="flex flex-col gap-8">
+			{id && <ConfigPortabilityCard guildId={id} currentConfig={currentConfigObject} onApplyConfig={handleApplyPortableConfig} />}
+
 			{/* Virtue Leveling Configuration Card */}
 			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
 				<div className="flex items-center justify-between mb-6">

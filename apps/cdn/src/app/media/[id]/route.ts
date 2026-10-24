@@ -87,7 +87,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		}
 
 		const body = await req.json();
-		const { privacy, shared } = body;
+		const { privacy, shared, folder, tags } = body;
 
 		const { models } = await database('xernerx');
 		const UserModel = models.users.User;
@@ -112,6 +112,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const updateFields: any = {};
 		if (privacy !== undefined) updateFields.privacy = privacy;
 		if (shared !== undefined) updateFields.shared = Array.isArray(shared) ? shared : [];
+		if (folder !== undefined) updateFields.folder = String(folder).trim() || 'Uncategorized';
+		if (tags !== undefined) {
+			updateFields.tags = Array.isArray(tags)
+				? tags.map((t: any) => String(t).trim()).filter(Boolean)
+				: String(tags)
+						.split(',')
+						.map((t) => t.trim())
+						.filter(Boolean);
+		}
 
 		const updated = await MediaModel.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
 

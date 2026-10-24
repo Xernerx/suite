@@ -1,6 +1,6 @@
 /** @format */
 
-import { BrowserWindow, screen, session, shell } from 'electron';
+import { BrowserWindow, globalShortcut, nativeImage, screen, session, shell } from 'electron';
 import Store from 'electron-store';
 
 export interface DesktopAccountProfile {
@@ -12,7 +12,75 @@ export interface DesktopAccountProfile {
 	lastActive: number;
 }
 
+export interface OverlayRuntimeState {
+	ghostMode: boolean;
+	opacity: number;
+}
+
 let overlayWin: BrowserWindow | null = null;
+let overlayGhostMode = false;
+let overlayOpacity = 1;
+let overlayHoveringInteractive = false;
+
+function broadcastOverlayState() {
+	const state: OverlayRuntimeState = {
+		ghostMode: overlayGhostMode,
+		opacity: overlayOpacity,
+	};
+	for (const bw of BrowserWindow.getAllWindows()) {
+		if (!bw.isDestroyed()) {
+			bw.webContents.send('overlay:state', state);
+		}
+	}
+}
+
+export function getOverlayState(): OverlayRuntimeState {
+	return {
+		ghostMode: overlayGhostMode,
+		opacity: overlayOpacity,
+	};
+}
+
+export function setOverlayGhostMode(enabled: boolean): OverlayRuntimeState {
+	overlayGhostMode = Boolean(enabled);
+	if (overlayWin && !overlayWin.isDestroyed()) {
+		try {
+			if (overlayGhostMode && !overlayHoveringInteractive) {
+				overlayWin.setIgnoreMouseEvents(true, { forward: true });
+			} else {
+				overlayWin.setIgnoreMouseEvents(false);
+			}
+		} catch {}
+	}
+	broadcastOverlayState();
+	return getOverlayState();
+}
+
+export function setOverlayInteractiveHover(hovering: boolean): OverlayRuntimeState {
+	overlayHoveringInteractive = Boolean(hovering);
+	if (overlayWin && !overlayWin.isDestroyed()) {
+		try {
+			if (overlayGhostMode && !overlayHoveringInteractive) {
+				overlayWin.setIgnoreMouseEvents(true, { forward: true });
+			} else {
+				overlayWin.setIgnoreMouseEvents(false);
+			}
+		} catch {}
+	}
+	return getOverlayState();
+}
+
+export function setOverlayOpacity(opacity: number): OverlayRuntimeState {
+	const clamped = Math.max(0.3, Math.min(1, Number(opacity) || 1));
+	overlayOpacity = Math.round(clamped * 100) / 100;
+	if (overlayWin && !overlayWin.isDestroyed()) {
+		try {
+			overlayWin.setOpacity(overlayOpacity);
+		} catch {}
+	}
+	broadcastOverlayState();
+	return getOverlayState();
+}
 
 export function getActivePartition(store: Store): string {
 	const slot = (store.get('activeAccountSlot') as string) || 'default';
@@ -107,6 +175,14 @@ export function configureFramelessWindow(
 	try {
 		targetWin.setMenuBarVisibility(false);
 		targetWin.removeMenu();
+		targetWin.webContents.session.setPermissionRequestHandler((_webContents, permission, callback) => {
+			if (permission === 'notifications') return callback(true);
+			callback(true);
+		});
+		targetWin.webContents.session.setPermissionCheckHandler((_webContents, permission) => {
+			if (permission === 'notifications') return true;
+			return true;
+		});
 	} catch {}
 
 	targetWin.webContents.setWindowOpenHandler(({ url }) => {
@@ -136,10 +212,25 @@ export function configureFramelessWindow(
 					contextIsolation: true,
 					nodeIntegration: false,
 					sandbox: false,
+					backgroundThrottling: true,
+					spellcheck: false,
 					partition: opts.getPartition(),
 				},
 			},
 		};
+	});
+
+	targetWin.webContents.on('before-input-event', (event, input) => {
+		if (input.type !== 'keyDown') return;
+		const key = input.key.toLowerCase();
+		if (((input.control || input.meta) && !input.alt && key === 'r') || input.key === 'F5') {
+			event.preventDefault();
+			if (input.shift) {
+				targetWin.webContents.reloadIgnoringCache();
+			} else {
+				targetWin.webContents.reload();
+			}
+		}
 	});
 
 	targetWin.webContents.on('did-finish-load', () => {
@@ -153,12 +244,16 @@ export function toggleOverlayWindow(opts: { webUrl: string; preloadPath: string;
 	if (overlayWin && !overlayWin.isDestroyed()) {
 		overlayWin.close();
 		overlayWin = null;
+		try {
+			globalShortcut.unregister('Alt+Shift+O');
+		} catch {}
 		return false;
 	}
 
 	const { workArea } = screen.getPrimaryDisplay();
 	const width = 400;
-	const height = 540;
+	const height = 560;
+	const appIcon = nativeImage.createFromPath(opts.iconPath);
 
 	overlayWin = new BrowserWindow({
 		width,
@@ -173,15 +268,25 @@ export function toggleOverlayWindow(opts: { webUrl: string; preloadPath: string;
 		alwaysOnTop: true,
 		skipTaskbar: false,
 		backgroundColor: '#09090b',
-		icon: opts.iconPath,
+		icon: appIcon.isEmpty() ? opts.iconPath : appIcon,
 		webPreferences: {
 			preload: opts.preloadPath,
 			contextIsolation: true,
 			nodeIntegration: false,
 			sandbox: false,
+			backgroundThrottling: true,
+			spellcheck: false,
 			partition: opts.partition,
 		},
 	});
+
+	try {
+		if (!appIcon.isEmpty()) overlayWin.setIcon(appIcon);
+		overlayWin.setOpacity(overlayOpacity);
+		if (overlayGhostMode) {
+			overlayWin.setIgnoreMouseEvents(true, { forward: true });
+		}
+	} catch {}
 
 	configureFramelessWindow(overlayWin, {
 		preloadPath: opts.preloadPath,
@@ -193,9 +298,68 @@ export function toggleOverlayWindow(opts: { webUrl: string; preloadPath: string;
 	overlayWin.setAlwaysOnTop(true, 'floating');
 	overlayWin.loadURL(`${opts.webUrl}/overlay`).catch(() => {});
 
+	try {
+		globalShortcut.unregister('Alt+Shift+O');
+		globalShortcut.register('Alt+Shift+O', () => {
+			setOverlayGhostMode(!overlayGhostMode);
+		});
+	} catch {}
+
 	overlayWin.on('closed', () => {
 		overlayWin = null;
+		overlayHoveringInteractive = false;
+		try {
+			globalShortcut.unregister('Alt+Shift+O');
+		} catch {}
 	});
 
 	return true;
+}
+
+export function openCompanionWindow(opts: { targetUrl: string; preloadPath: string; iconPath: string; partition: string; streamerMode?: boolean; shouldOpenExternal?: () => boolean }): BrowserWindow {
+	const { workArea } = screen.getPrimaryDisplay();
+	const width = Math.min(1160, workArea.width - 80);
+	const height = Math.min(780, workArea.height - 80);
+	const offset = (BrowserWindow.getAllWindows().length % 5) * 28;
+	const appIcon = nativeImage.createFromPath(opts.iconPath);
+
+	const companionWin = new BrowserWindow({
+		width,
+		height,
+		x: workArea.x + 80 + offset,
+		y: workArea.y + 60 + offset,
+		roundedCorners: true,
+		frame: false,
+		transparent: false,
+		resizable: true,
+		autoHideMenuBar: true,
+		backgroundColor: '#09090b',
+		icon: appIcon.isEmpty() ? opts.iconPath : appIcon,
+		webPreferences: {
+			preload: opts.preloadPath,
+			contextIsolation: true,
+			nodeIntegration: false,
+			sandbox: false,
+			backgroundThrottling: true,
+			spellcheck: false,
+			partition: opts.partition,
+		},
+	});
+
+	try {
+		if (!appIcon.isEmpty()) companionWin.setIcon(appIcon);
+		companionWin.setContentProtection(Boolean(opts.streamerMode));
+	} catch {}
+
+	configureFramelessWindow(companionWin, {
+		preloadPath: opts.preloadPath,
+		iconPath: opts.iconPath,
+		getPartition: () => opts.partition,
+		shouldOpenExternal: opts.shouldOpenExternal || (() => true),
+	});
+
+	companionWin.loadURL(opts.targetUrl).catch(() => {});
+	companionWin.show();
+	companionWin.focus();
+	return companionWin;
 }

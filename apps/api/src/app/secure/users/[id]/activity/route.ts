@@ -42,13 +42,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 		const configMap = new Map<string, any>();
 		for (const cfg of appConfigs) {
-			if (cfg.id) configMap.set(cfg.id, cfg);
+			if (cfg.id) configMap.set(String(cfg.id), cfg);
+			if (cfg._id) configMap.set(String(cfg._id), cfg);
 		}
 
-		const enrichedApplications = applications.map((app: any) => ({
-			...app,
-			configTitle: configMap.get(app.targetId)?.title || app.targetId || 'Application',
-		}));
+		const enrichedApplications = applications.map((app: any) => {
+			const cfg = configMap.get(String(app.targetId));
+			return {
+				...app,
+				configTitle: cfg?.name || cfg?.title || app.targetId || 'Application',
+				configDescription: cfg?.description || '',
+				questions: Array.isArray(cfg?.questions) ? cfg.questions : [],
+			};
+		});
 
 		return NextResponse.json({
 			profile: profile || { id },

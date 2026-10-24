@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Loader2, Moon, Search, Settings, SidebarIcon, Sun, Trophy, X } from 'lucide-react';
+import { ArrowRight, Camera, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Loader2, Moon, Search, Settings, SidebarIcon, Sun, Trophy, X } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -13,7 +13,10 @@ import { useSidebar } from './SidebarProvider';
 import { useTheme } from './ThemeProvider';
 import { useToast } from './ToastProvider';
 import { useUser } from './UserProvider';
-import { ACCOUNT_TABS, ADMIN_TABS, buildDynamicPaletteItems, type PaletteActionItem, SUPPORT_PORTALS } from './commandPaletteData';
+import { buildDeepLinkPaletteItems, buildDynamicPaletteItems, matchesPaletteQuery, type PaletteActionItem, type PaletteSectionKey } from './commandPaletteData';
+
+let cachedFaqCatalog: any[] | null = null;
+let cachedDocsCatalog: any[] | null = null;
 
 export function CommandPaletteModal({
 	isOpen,
@@ -45,6 +48,8 @@ export function CommandPaletteModal({
 	const [liveBots, setLiveBots] = useState<any[]>([]);
 	const [liveServers, setLiveServers] = useState<any[]>([]);
 	const [communityData, setCommunityData] = useState<{ issues: any[]; suggestions: any[]; roadmap: any[] }>({ issues: [], suggestions: [], roadmap: [] });
+	const [faqCatalog, setFaqCatalog] = useState<any[]>(cachedFaqCatalog || []);
+	const [docsCatalog, setDocsCatalog] = useState<any[]>(cachedDocsCatalog || []);
 	const [searchingLive, setSearchingLive] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,9 +62,7 @@ export function CommandPaletteModal({
 			return;
 		}
 		setTimeout(() => inputRef.current?.focus(), 20);
-		fetch(getEnvUrl('https://api.xernerx.com/secure/core'), {
-			credentials: 'include',
-		})
+		fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' })
 			.then((res) => (res.ok ? res.json() : []))
 			.then((data) => setRoles(Array.isArray(data) ? data : []))
 			.catch(() => {});
@@ -74,12 +77,30 @@ export function CommandPaletteModal({
 			fetch(getEnvUrl('https://api.xernerx.com/info/roadmap'))
 				.then((r) => (r.ok ? r.json() : { data: [] }))
 				.catch(() => ({ data: [] })),
-		]).then(([iRes, sRes, rRes]) => {
+			cachedFaqCatalog
+				? Promise.resolve({ items: cachedFaqCatalog })
+				: fetch(getEnvUrl('https://api.xernerx.com/core/faq?flat=true'))
+						.then((r) => (r.ok ? r.json() : { items: [] }))
+						.catch(() => ({ items: [] })),
+			cachedDocsCatalog
+				? Promise.resolve({ items: cachedDocsCatalog })
+				: fetch(getEnvUrl('https://api.xernerx.com/core/docs?flat=true'))
+						.then((r) => (r.ok ? r.json() : { items: [] }))
+						.catch(() => ({ items: [] })),
+		]).then(([iRes, sRes, rRes, faqRes, docsRes]) => {
 			setCommunityData({
 				issues: Array.isArray(iRes?.data) ? iRes.data : [],
 				suggestions: Array.isArray(sRes?.data) ? sRes.data : [],
 				roadmap: Array.isArray(rRes?.data) ? rRes.data : [],
 			});
+			if (Array.isArray(faqRes?.items) && faqRes.items.length > 0) {
+				cachedFaqCatalog = faqRes.items;
+				setFaqCatalog(faqRes.items);
+			}
+			if (Array.isArray(docsRes?.items) && docsRes.items.length > 0) {
+				cachedDocsCatalog = docsRes.items;
+				setDocsCatalog(docsRes.items);
+			}
 		});
 	}, [isOpen, getEnvUrl]);
 
@@ -119,16 +140,13 @@ export function CommandPaletteModal({
 	const allItems: PaletteActionItem[] = useMemo(() => {
 		const list: PaletteActionItem[] = [];
 
-		// 1. Active Page Sidebar Views
 		if (sidebar.state !== 'hidden' && sidebar.navItems.length > 0) {
 			sidebar.navItems.forEach((item, idx) => {
-				const resolvedLabel = t(item.label);
-				const resolvedCategory = item.category ? t(item.category) : undefined;
 				list.push({
 					id: `view-${item.view || item.label}-${idx}`,
 					section: 'views',
-					label: resolvedLabel,
-					subtitle: resolvedCategory,
+					label: t(item.label),
+					subtitle: item.category ? t(item.category) : undefined,
 					shortcut: idx < 9 ? `Alt + ${idx + 1}` : undefined,
 					icon: item.icon || Layers,
 					onSelect: () => {
@@ -141,7 +159,55 @@ export function CommandPaletteModal({
 			});
 		}
 
-		// 2. Quick Actions
+		const electronBridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (electronBridge) {
+			list.push(
+				{
+					id: 'action-desktop-companion',
+					section: 'actions',
+					label: t('account.preferences.desktop.newCompanionWindow'),
+					shortcut: 'Ctrl + Shift + N',
+					icon: Layers,
+					onSelect: () => {
+						electronBridge.openCompanionWindow?.();
+						onClose();
+					},
+				},
+				{
+					id: 'action-desktop-capture',
+					section: 'actions',
+					label: t('account.preferences.desktop.quickCapture'),
+					shortcut: 'Ctrl + Shift + S',
+					icon: Camera,
+					onSelect: () => {
+						electronBridge.quickCapture?.('screen');
+						onClose();
+					},
+				},
+				{
+					id: 'action-desktop-overlay',
+					section: 'actions',
+					label: t('account.preferences.desktop.launchOverlay'),
+					icon: Layers,
+					onSelect: () => {
+						electronBridge.toggleOverlay?.();
+						onClose();
+					},
+				}
+			);
+		} else {
+			list.push({
+				id: 'action-open-in-desktop',
+				section: 'actions',
+				label: t('components.header.openInDesktop'),
+				icon: Compass,
+				onSelect: () => {
+					if (typeof window !== 'undefined') window.location.href = `xernerx://open?url=${encodeURIComponent(window.location.href)}`;
+					onClose();
+				},
+			});
+		}
+
 		list.push({
 			id: 'action-theme',
 			section: 'actions',
@@ -168,26 +234,8 @@ export function CommandPaletteModal({
 		}
 
 		list.push(
-			{
-				id: 'action-app-drawer',
-				section: 'actions',
-				label: t('common.shortcuts.modal.palette.actions.openAppDrawer'),
-				shortcut: 'Ctrl + Space',
-				icon: LayoutGrid,
-				onSelect: () => {
-					onOpenAppDrawer();
-				},
-			},
-			{
-				id: 'action-omnibar',
-				section: 'actions',
-				label: t('common.shortcuts.modal.palette.actions.toggleOmnibar'),
-				shortcut: 'Ctrl + .',
-				icon: Globe,
-				onSelect: () => {
-					onOpenOmnibar();
-				},
-			},
+			{ id: 'action-app-drawer', section: 'actions', label: t('common.shortcuts.modal.palette.actions.openAppDrawer'), shortcut: 'Ctrl + Space', icon: LayoutGrid, onSelect: onOpenAppDrawer },
+			{ id: 'action-omnibar', section: 'actions', label: t('common.shortcuts.modal.palette.actions.toggleOmnibar'), shortcut: 'Ctrl + .', icon: Globe, onSelect: onOpenOmnibar },
 			{
 				id: 'action-copy-url',
 				section: 'actions',
@@ -196,26 +244,13 @@ export function CommandPaletteModal({
 				icon: Copy,
 				onSelect: () => {
 					const urlObj = new URL(window.location.href);
-					if (sidebar.state !== 'hidden' && sidebar.view && !urlObj.searchParams.has('view')) {
-						urlObj.searchParams.set('view', sidebar.view);
-					}
+					if (sidebar.state !== 'hidden' && sidebar.view && !urlObj.searchParams.has('view')) urlObj.searchParams.set('view', sidebar.view);
 					const currentUrl = urlObj.toString();
-					navigator.clipboard.writeText(currentUrl).then(() => {
-						toast({ type: 'success', title: t('components.header.urlCopied'), description: currentUrl });
-					});
+					navigator.clipboard.writeText(currentUrl).then(() => toast({ type: 'success', title: t('components.header.urlCopied'), description: currentUrl }));
 					onClose();
 				},
 			},
-			{
-				id: 'action-shortcuts',
-				section: 'actions',
-				label: t('common.shortcuts.modal.palette.actions.openShortcuts'),
-				shortcut: 'Ctrl + /',
-				icon: HelpCircle,
-				onSelect: () => {
-					onOpenHelp();
-				},
-			},
+			{ id: 'action-shortcuts', section: 'actions', label: t('common.shortcuts.modal.palette.actions.openShortcuts'), shortcut: 'Ctrl + /', icon: HelpCircle, onSelect: onOpenHelp },
 			{
 				id: 'action-account',
 				section: 'actions',
@@ -229,15 +264,12 @@ export function CommandPaletteModal({
 			}
 		);
 
-		// 3. Suite Applications
 		visibleNavigation.forEach((app, idx) => {
-			const resolvedLabel = t(app.label);
-			const resolvedCategory = app.category ? t(app.category) : undefined;
 			list.push({
 				id: `app-${app.href}-${idx}`,
 				section: 'apps',
-				label: resolvedLabel,
-				subtitle: resolvedCategory,
+				label: t(app.label),
+				subtitle: app.category ? t(app.category) : undefined,
 				icon: app.icon || Compass,
 				onSelect: () => {
 					window.location.href = getEnvUrl(app.href);
@@ -258,88 +290,26 @@ export function CommandPaletteModal({
 			},
 		});
 
-		// 4. Account & Developer Settings Deep-Links
-		ACCOUNT_TABS.forEach((tab) => {
-			list.push({
-				id: `settings-account-${tab.view}`,
-				section: 'settings',
-				label: t(tab.labelKey),
-				subtitle: t(tab.catKey),
-				icon: tab.icon,
-				onSelect: () => {
-					const accountBase = getEnvUrl('https://account.xernerx.com');
-					try {
-						if (window.location.origin === new URL(accountBase).origin && window.location.pathname === '/') {
-							sidebar.setView(tab.view);
-							onClose();
-							return;
-						}
-					} catch {}
-					window.location.href = `${accountBase}/?tab=${tab.view}`;
-					onClose();
-				},
-			});
-		});
-
-		// 5. Support Hub Portals
-		SUPPORT_PORTALS.forEach((portal) => {
-			list.push({
-				id: `support-${portal.path}`,
-				section: 'support',
-				label: t(portal.labelKey),
-				subtitle: t('common.footer.sections.support'),
-				icon: portal.icon,
-				onSelect: () => {
-					window.location.href = `${getEnvUrl('https://info.xernerx.com')}${portal.path}`;
-					onClose();
-				},
-			});
-		});
-
-		// 6. Admin Panel Deep-Links (for Staff)
-		if (hasAdminAccess) {
-			ADMIN_TABS.forEach((tab) => {
-				list.push({
-					id: `admin-${tab.view}`,
-					section: 'admin',
-					label: t(tab.labelKey),
-					subtitle: t(tab.catKey),
-					icon: tab.icon,
-					onSelect: () => {
-						const adminBase = getEnvUrl('https://admin.xernerx.com');
-						try {
-							if (window.location.origin === new URL(adminBase).origin && window.location.pathname === '/') {
-								sidebar.setView(tab.view);
-								onClose();
-								return;
-							}
-						} catch {}
-						window.location.href = `${adminBase}/?tab=${tab.view}`;
-						onClose();
-					},
-				});
-			});
-		}
-
+		list.push(...buildDeepLinkPaletteItems({ t, getEnvUrl, sidebar, hasAdminAccess, onClose }));
 		return list;
 	}, [sidebar, resolvedTheme, setTheme, t, visibleNavigation, hasAdminAccess, getEnvUrl, router, onClose, onOpenAppDrawer, onOpenHelp, onOpenOmnibar, toast]);
 
 	const filteredItems = useMemo(() => {
 		const trimmed = query.trim().toLowerCase();
 		if (!trimmed) return allItems;
-		const staticMatches = allItems.filter(
-			(item) => item.label.toLowerCase().includes(trimmed) || (item.subtitle && item.subtitle.toLowerCase().includes(trimmed)) || (item.shortcut && item.shortcut.toLowerCase().includes(trimmed))
-		);
+		const staticMatches = allItems.filter((item) => matchesPaletteQuery(`${item.label} ${item.subtitle || ''} ${item.shortcut || ''} ${item.keywords || ''}`, trimmed));
 		const dynamicItems = buildDynamicPaletteItems({
 			trimmedQuery: trimmed,
 			liveBots,
 			liveServers,
 			communityData,
+			faqCatalog,
+			docsCatalog,
 			getEnvUrl,
 			onClose,
 		});
 		return [...staticMatches, ...dynamicItems];
-	}, [allItems, query, liveBots, liveServers, communityData, getEnvUrl, onClose]);
+	}, [allItems, query, liveBots, liveServers, communityData, faqCatalog, docsCatalog, getEnvUrl, onClose]);
 
 	useEffect(() => {
 		setSelectedIndex(0);
@@ -360,12 +330,15 @@ export function CommandPaletteModal({
 		}
 	};
 
-	const sections: Array<{ key: 'views' | 'actions' | 'bots' | 'servers' | 'community' | 'apps' | 'settings' | 'support' | 'admin'; title: string }> = [
+	const sections: Array<{ key: PaletteSectionKey; title: string }> = [
 		{ key: 'views', title: t('common.shortcuts.modal.palette.sections.views') },
 		{ key: 'actions', title: t('common.shortcuts.modal.palette.sections.actions') },
 		{ key: 'bots', title: t('common.shortcuts.modal.palette.sections.bots') },
 		{ key: 'servers', title: t('common.shortcuts.modal.palette.sections.servers') },
+		{ key: 'docs', title: t('common.shortcuts.modal.palette.sections.docs') },
+		{ key: 'faq', title: t('common.shortcuts.modal.palette.sections.faq') },
 		{ key: 'community', title: t('common.shortcuts.modal.palette.sections.community') },
+		{ key: 'store', title: t('common.shortcuts.modal.palette.sections.store') },
 		{ key: 'apps', title: t('common.shortcuts.modal.palette.sections.apps') },
 		{ key: 'settings', title: t('common.shortcuts.modal.palette.sections.settings') },
 		{ key: 'support', title: t('common.shortcuts.modal.palette.sections.support') },
@@ -396,7 +369,12 @@ export function CommandPaletteModal({
 								placeholder={t('common.shortcuts.modal.palette.placeholder')}
 								className="w-full bg-transparent text-sm text-(--text) placeholder:text-(--text-muted) outline-none"
 							/>
-							<button type="button" onClick={onClose} aria-label="Close" className="rounded-lg p-1.5 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition shrink-0">
+							<button
+								type="button"
+								onClick={onClose}
+								aria-label={t('common.close')}
+								className="rounded-lg p-1.5 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition shrink-0"
+							>
 								<X size={16} />
 							</button>
 						</div>

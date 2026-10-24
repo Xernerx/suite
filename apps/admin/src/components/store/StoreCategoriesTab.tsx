@@ -64,7 +64,7 @@ export function StoreCategoriesTab({ categories, onEdit, onToggleEnabled, onDele
 			</div>
 
 			{filteredCategories.length === 0 ? (
-				<div className="flex flex-col items-center justify-center p-12 text-center border border-(--border)/10 rounded-2xl bg-(--foreground)/10">
+				<div className="flex flex-col items-center justify-center p-12 text-center border border-(--border)/10 rounded-3xl bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 					<Folder className="w-12 h-12 text-(--text-muted) mb-3 opacity-50" />
 					<p className="text-(--text-muted) text-sm">{t('admin.store.table.noCategories')}</p>
 				</div>
@@ -73,8 +73,8 @@ export function StoreCategoriesTab({ categories, onEdit, onToggleEnabled, onDele
 					{filteredCategories.map((cat) => (
 						<div
 							key={cat.id}
-							className={`flex flex-col justify-between p-5 rounded-2xl border transition-all duration-200 ${
-								cat.enabled ? 'border-(--border)/15 bg-(--foreground)/20 shadow-xs' : 'border-(--border)/5 bg-(--foreground)/5 opacity-60'
+							className={`flex flex-col justify-between p-5 rounded-3xl border backdrop-blur-md transition-all duration-200 ${
+								cat.enabled ? 'border-(--border)/10 bg-(--foreground)/30 shadow-xs' : 'border-(--border)/10 bg-(--foreground)/20 opacity-60'
 							}`}
 						>
 							<div className="flex items-start justify-between gap-3 mb-3">

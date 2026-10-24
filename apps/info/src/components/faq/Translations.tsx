@@ -97,7 +97,7 @@ export default function Translations({ searchQuery = '' }: { searchQuery?: strin
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.translations.title')}
 			</HeadingTag>

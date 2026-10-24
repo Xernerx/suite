@@ -7,6 +7,7 @@ import { confirm, isCancel } from '@clack/prompts';
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
 import { generateLocalesCommand } from './generateLocales';
+import { initializeCommand } from './initialize';
 import { walkAndSync } from './init';
 import { getLocalIp } from '../utils/ip';
 
@@ -47,6 +48,9 @@ export default function registerDev(program: Command) {
 
 			console.log('[CLI] Pre-flight: Generating locales...');
 			generateLocalesCommand();
+
+			console.log('[CLI] Pre-flight: Syncing shared public assets...');
+			initializeCommand();
 
 			console.log('[CLI] Synchronizing root .env to all workspaces...');
 			walkAndSync(process.cwd(), rootEnvPath);
@@ -147,6 +151,7 @@ export default function registerDev(program: Command) {
 								port: 27017,
 								dbPath: dbPath,
 								storageEngine: 'wiredTiger',
+								args: ['--wiredTigerCacheSizeGB', '0.25'],
 							},
 						});
 
@@ -166,6 +171,10 @@ export default function registerDev(program: Command) {
 			if (options.prepareOnly) {
 				console.log('[CLI] Preparation complete. Exiting (--prepare-only).');
 				return;
+			}
+
+			if (!process.env.NODE_OPTIONS || !process.env.NODE_OPTIONS.includes('--max-old-space-size')) {
+				process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : ''}--max-old-space-size=512 --max-semi-space-size=16`;
 			}
 
 			if (options.only) {
@@ -202,7 +211,7 @@ export default function registerDev(program: Command) {
 					console.log('[CLI] Local IP mode detected. Starting apps without tunnel...');
 					printEndpointsBox(currentDomain, hasCustomDomain);
 					process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
-					runCommand('npx', ['concurrently', '-n', 'apps', '-c', 'blue', '"pnpm --parallel --filter ./apps/* --filter ./services/* --filter ./clients/* dev"']);
+					runCommand('pnpm', ['--parallel', '--filter', './apps/*', '--filter', './services/*', '--filter', './clients/*', 'dev']);
 				}
 			}
 		});

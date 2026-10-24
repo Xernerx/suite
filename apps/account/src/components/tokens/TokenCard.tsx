@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Settings2 } from 'lucide-react';
+import { Activity, Clock, Settings2 } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 import { Badge, CopyButton } from '@xernerx/ui';
 import { TokenListInfo } from './types';
@@ -45,7 +45,17 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 					{token.status}
 				</Badge>
 			</div>
-			<div className="flex items-center text-xs font-medium text-(--accent) opacity-0 transition-opacity group-hover:opacity-100 mt-2">
+
+			<div className="flex flex-wrap items-center gap-1.5">
+				<Badge variant="muted" size="sm" icon={<Activity size={11} />}>
+					{t('account.tokens.requestsBadge', { count: (token.requestCount ?? 0).toLocaleString() })}
+				</Badge>
+				<Badge variant="muted" size="sm" icon={<Clock size={11} />}>
+					{token.lastUsedAt ? t('account.tokens.lastUsedBadge', { date: new Date(token.lastUsedAt).toLocaleDateString() }) : t('account.tokens.neverUsedBadge')}
+				</Badge>
+			</div>
+
+			<div className="flex items-center text-xs font-medium text-(--accent) opacity-0 transition-opacity group-hover:opacity-100 mt-1">
 				<Settings2 size={14} className="mr-1.5" /> {t('account.tokens.manageSettings')}
 			</div>
 		</motion.div>

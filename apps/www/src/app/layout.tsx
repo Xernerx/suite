@@ -64,18 +64,16 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getServerSession(auth);
+	const [headersList, cookieStore, themeProps] = await Promise.all([headers(), cookies(), getThemeLayoutProps()]);
 
-	const headersList = await headers();
 	const host = headersList.get('host') || '';
 	const initialEnv: 'dev' | 'canary' | 'public' =
 		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 
-	const cookieStore = await cookies();
-	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';
-	const dict = await dictionary(locale as Locale);
+	const locale = cookieStore.get('NEXT_LOCALE')?.value || headersList.get('x-locale') || 'en-GB';
+	const hasSessionCookie = Boolean(cookieStore.get('__Secure-next-auth.session-token') || cookieStore.get('next-auth.session-token'));
 
-	const themeProps = await getThemeLayoutProps();
+	const [session, dict] = await Promise.all([hasSessionCookie ? getServerSession(auth) : Promise.resolve(null), dictionary(locale as Locale)]);
 
 	return (
 		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>

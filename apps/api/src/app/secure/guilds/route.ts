@@ -9,7 +9,7 @@ export async function GET(req: Request) {
 	try {
 		const url = new URL(req.url);
 		const limit = parseInt(url.searchParams.get('limit') || '50', 10);
-		const privacy = url.searchParams.get('privacy') || 'public';
+		const privacy = 'public';
 		const category = url.searchParams.get('category');
 		const search = url.searchParams.get('search');
 		const idsParam = url.searchParams.get('ids');
@@ -52,7 +52,8 @@ export async function GET(req: Request) {
 			sortOptions = { createdAt: -1 };
 		} else if (category === 'promoted') {
 			sortOptions = { 'statsData.voteCount': -1 };
-			query.promoted = true;
+			const now = new Date();
+			query.$or = [{ promoted: true }, { promotedUntil: { $gt: now } }, { boostedUntil: { $gt: now } }];
 		}
 
 		const guilds = await GuildModel.aggregate([
@@ -92,6 +93,9 @@ export async function GET(req: Request) {
 					verified: 1,
 					owner: 1,
 					organization: 1,
+					promotedUntil: 1,
+					boostedUntil: 1,
+					boostedBy: 1,
 					voteCount: '$computedVoteCount',
 					memberCount: { $ifNull: ['$statsData.members', 0] },
 					links: 1,

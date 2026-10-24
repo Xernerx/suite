@@ -16,7 +16,7 @@ async function authCommands(req: NextRequest, botId: string) {
 
 	if (!TokenModel || !BotModel || !CommandModel) return { error: 'Database models not found', status: 500 };
 
-	const isSystemToken = Boolean(process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN);
+	const isSystemToken = Boolean((process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN) || (process.env.XERNERX_APP_TOKEN && tokenValue === process.env.XERNERX_APP_TOKEN));
 	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
 
 	if (!tokenDoc && !isSystemToken) return { error: 'Invalid token', status: 401 };
@@ -29,6 +29,7 @@ async function authCommands(req: NextRequest, botId: string) {
 			bot: true,
 			name: 'Xernerx App',
 			privacy: 'private',
+			owners: tokenDoc?.owners || [],
 		}).catch(() => null);
 	}
 	if (!bot && !isSystemToken) return { error: 'Bot not found', status: 404 };

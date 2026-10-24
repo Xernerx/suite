@@ -5,17 +5,27 @@ import { NextResponse } from 'next/server';
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
 
-	if (!id || !process.env.DISCORD_CLIENT_TOKEN) {
+	const token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
+	if (!id || !token) {
 		return NextResponse.json({ error: 'Missing ID or token' }, { status: 400 });
 	}
 
 	try {
-		const res = await fetch(`https://discord.com/api/v10/guilds/${id}?with_counts=true`, {
+		let res = await fetch(`https://discord.com/api/v10/guilds/${id}?with_counts=true`, {
 			headers: {
-				Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}`,
+				Authorization: `Bot ${token}`,
 			},
 			next: { revalidate: 3600 },
 		});
+
+		if (!res.ok && process.env.DISCORD_CLIENT_TOKEN && process.env.DISCORD_CLIENT_TOKEN !== token) {
+			res = await fetch(`https://discord.com/api/v10/guilds/${id}?with_counts=true`, {
+				headers: {
+					Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}`,
+				},
+				next: { revalidate: 3600 },
+			});
+		}
 
 		if (!res.ok) {
 			return NextResponse.json({ error: 'Discord guild not found' }, { status: res.status });

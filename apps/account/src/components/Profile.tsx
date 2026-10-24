@@ -1,12 +1,14 @@
 /** @format */
 'use client';
 
-import { Button, Divider, Input, Selector } from '@xernerx/ui';
-import { Info, User as UserIcon, ExternalLink, Copy, Check } from 'lucide-react';
+import { Badge, Button, Divider, Input, Markdown, Selector } from '@xernerx/ui';
+import { XernerxDotLogo } from '@xernerx/feedback';
+import { Info, User as UserIcon, ExternalLink, Copy, Check, Coins, Sparkles, Lock } from 'lucide-react';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { timezones } from '@xernerx/lib';
+import { ProfileShowcases } from './ProfileShowcases';
 export default function Profile() {
 	const { t } = useDictionary();
 	const { data: session } = useSession();
@@ -15,8 +17,47 @@ export default function Profile() {
 	const { toast, remind } = useToast();
 	const [copiedId, setCopiedId] = useState(false);
 	const [markdownPreview, setMarkdownPreview] = useState(false);
+	const [unlockingVanity, setUnlockingVanity] = useState(false);
 	const activeUser = user || session?.user;
 	const userId = activeUser?.id;
+	const isVanityUnlocked = Boolean((user as any)?.vanityUnlocked || (user as any)?.vanitySlug || (user as any)?.verified);
+	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
+
+	const handleUnlockVanity = async () => {
+		if (!userId) return;
+		setUnlockingVanity(true);
+		try {
+			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ action: 'unlock_vanity' }),
+			});
+			const data = await res.json().catch(() => ({}));
+			if (!res.ok) {
+				toast({
+					title: t('account.profile.toast.error'),
+					description: data.error,
+					type: 'error',
+				});
+				return;
+			}
+			if (mutate) await mutate();
+			toast({
+				title: t('app.dashboard.settings.vanityUnlockSuccessTitle'),
+				description: t('app.dashboard.settings.vanityUnlockSuccessDesc'),
+				type: 'success',
+			});
+		} catch (err: any) {
+			toast({
+				title: t('account.profile.toast.error'),
+				description: err.message,
+				type: 'error',
+			});
+		} finally {
+			setUnlockingVanity(false);
+		}
+	};
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
 
 	const handleCopyId = () => {
@@ -28,6 +69,7 @@ export default function Profile() {
 	};
 
 	const [formData, setFormData] = useState({
+		vanitySlug: '',
 		description: '',
 		info: '',
 		birthday: '',
@@ -36,6 +78,7 @@ export default function Profile() {
 		timezone: '',
 	});
 	const [initialData, setInitialData] = useState({
+		vanitySlug: '',
 		description: '',
 		info: '',
 		birthday: '',
@@ -48,6 +91,7 @@ export default function Profile() {
 		(() => {
 			if (user) {
 				const loadedData = {
+					vanitySlug: (user as any).vanitySlug || '',
 					description: user.description || '',
 					info: user.info || '',
 					birthday: user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '',
@@ -74,6 +118,7 @@ export default function Profile() {
 				setIsSaving(true);
 				try {
 					const updatePayload = {
+						vanitySlug: formData.vanitySlug.trim().toLowerCase(),
 						description: formData.description,
 						info: formData.info,
 						birthday: formData.birthday || undefined,
@@ -89,7 +134,10 @@ export default function Profile() {
 						credentials: 'include',
 						body: JSON.stringify(updatePayload),
 					});
-					if (!res.ok) throw new Error('Failed to update profile');
+					if (!res.ok) {
+						const errData = await res.json().catch(() => ({}));
+						throw new Error(errData.error || t('account.profile.toast.error'));
+					}
 					if (mutate) mutate();
 					setInitialData(formData);
 					toast({
@@ -97,9 +145,10 @@ export default function Profile() {
 						type: 'success',
 					});
 					remind(false);
-				} catch (error) {
+				} catch (error: any) {
 					toast({
 						title: t('account.profile.toast.error'),
+						description: error?.message,
 						type: 'error',
 					});
 				} finally {
@@ -174,14 +223,19 @@ export default function Profile() {
 			>
 				{/* Profile Summary Card */}
 				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					className="relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{
 						padding: 'var(--ui-gap)',
 						gap: 'var(--ui-gap)',
 					}}
 				>
+					{Array.isArray(user?.credits?.activeBadges) && user.credits.activeBadges.includes('dot_matrix_banner') && (
+						<div className="absolute inset-0 opacity-65 pointer-events-none">
+							<XernerxDotLogo variant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} backgroundMode ripple={true} vivid={true} />
+						</div>
+					)}
 					<div
-						className="flex items-center"
+						className="relative z-10 flex items-center"
 						style={{
 							gap: 'var(--ui-gap)',
 						}}
@@ -226,7 +280,7 @@ export default function Profile() {
 						</div>
 					</div>
 					{userId && (
-						<div className="flex items-center shrink-0">
+						<div className="relative z-10 flex items-center shrink-0">
 							<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com/')}users/${userId}`, '_blank')} className="gap-2">
 								<ExternalLink size={16} />
 								{t('account.profile.viewPublicProfile')}
@@ -243,6 +297,64 @@ export default function Profile() {
 						gap: 'var(--ui-gap)',
 					}}
 				>
+					{/* Vanity Profile URL */}
+					<div
+						className="flex flex-col"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.4)',
+						}}
+					>
+						<div className="flex flex-wrap items-center justify-between gap-2">
+							<div className="flex flex-wrap items-center gap-2">
+								<label className="block text-sm font-medium text-(--text)">{t('account.profile.vanitySlug.label')}</label>
+								{isVanityUnlocked ? (
+									<Badge variant="accent" size="sm" icon={<Sparkles size={11} />}>
+										{t('app.dashboard.settings.vanityUnlockedBadge')}
+									</Badge>
+								) : (
+									<Badge variant="muted" size="sm" icon={<Coins size={11} />}>
+										{extraVanitySlots > 0 ? t('app.dashboard.settings.vanitySlotAvailableBadge', { count: extraVanitySlots }) : t('app.dashboard.settings.vanityCostBadge')}
+									</Badge>
+								)}
+							</div>
+							<span className="text-xs font-mono text-(--accent)">xernerx.com/users/{formData.vanitySlug || userId || 'slug'}</span>
+						</div>
+						{isVanityUnlocked ? (
+							<div className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-2">
+								<span className="text-xs font-mono font-bold text-(--text-muted) px-2 shrink-0">xernerx.com/users/</span>
+								<div className="flex-1">
+									<Input
+										type="text"
+										value={formData.vanitySlug}
+										onChange={(e) =>
+											handleChange(
+												'vanitySlug',
+												e.target.value
+													.toLowerCase()
+													.replace(/[^a-z0-9-]/g, '-')
+													.replace(/-+/g, '-')
+													.slice(0, 32)
+											)
+										}
+										placeholder={t('account.profile.vanitySlug.placeholder')}
+									/>
+								</div>
+							</div>
+						) : (
+							<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-3">
+								<p className="text-xs text-(--text-muted) flex items-center gap-1.5">
+									<Lock size={13} className="text-(--accent) shrink-0" />
+									<span>{t('app.dashboard.settings.vanityLockedHint')}</span>
+								</p>
+								<Button variant="primary" onClick={handleUnlockVanity} loading={unlockingVanity} className="shrink-0 gap-2">
+									{extraVanitySlots > 0 ? <Sparkles size={15} /> : <Coins size={15} />}
+									<span>{extraVanitySlots > 0 ? t('app.dashboard.settings.redeemVanitySlotBtn') : t('app.dashboard.settings.unlockVanityBtn')}</span>
+								</Button>
+							</div>
+						)}
+						<span className="text-xs text-(--text-muted)">{t('account.profile.vanitySlug.hint', { slug: formData.vanitySlug || userId || 'slug' })}</span>
+					</div>
+
 					{/* Description */}
 					<div
 						className="flex flex-col"
@@ -255,40 +367,17 @@ export default function Profile() {
 					</div>
 
 					{/* Info (Long Description) */}
-					<div
-						className="flex flex-col"
-						style={{
-							gap: 'calc(var(--ui-gap) * 0.4)',
-						}}
-					>
-						<div className="flex items-center justify-between">
-							<label className="block text-sm font-medium text-(--text)">{t('account.profile.infoField.label')}</label>
-							<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-lg p-1 text-xs">
-								<button
-									type="button"
-									onClick={() => setMarkdownPreview(false)}
-									className={`px-3 py-1 rounded-xl transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-								>
-									{t('account.profile.infoField.write')}
-								</button>
-								<button
-									type="button"
-									onClick={() => setMarkdownPreview(true)}
-									className={`px-3 py-1 rounded-xl transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-								>
-									{t('account.profile.infoField.preview')}
-								</button>
-							</div>
-						</div>
-
-						{markdownPreview ? (
-							<div className="w-full min-h-[120px] rounded-xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka whitespace-pre-wrap text-(--text)">
-								{formData.info ? formData.info : <span className="text-(--text-muted) italic">{t('account.profile.infoField.nothingToPreview')}</span>}
-							</div>
-						) : (
-							<Input variant="textarea" rows={4} value={formData.info} onChange={(e) => handleChange('info', e.target.value)} placeholder={t('account.profile.infoField.placeholder')} />
-						)}
-					</div>
+					<Markdown
+						editable
+						preview={markdownPreview}
+						onPreviewChange={setMarkdownPreview}
+						label={t('account.profile.infoField.label')}
+						value={formData.info}
+						onChange={(val) => handleChange('info', val)}
+						placeholder={t('account.profile.infoField.placeholder')}
+						emptyText={t('account.profile.infoField.nothingToPreview')}
+						rows={4}
+					/>
 
 					{/* Group 1: Birthday & Timezone */}
 					<div
@@ -366,6 +455,9 @@ export default function Profile() {
 						</div>
 					</div>
 				</div>
+
+				{/* Profile Showcase Slots & Vanity Badges */}
+				{userId && <ProfileShowcases user={user} userId={userId} mutate={mutate} />}
 			</div>
 		</div>
 	);

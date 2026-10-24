@@ -60,6 +60,22 @@ export default function AccountAndSecurity({ searchQuery = '' }: { searchQuery?:
 			),
 		},
 		{
+			id: 'card11',
+			title: t('faq.account.card11.title'),
+			searchableText: `${t('faq.account.card11.title')} ${t('faq.account.card11.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.account.card11.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.profileSettings'), href: 'https://account.xernerx.com/?tab=profile', vanity: 'account.xernerx.com/profile' },
+							{ label: t('faq.quickLinks.creditStore'), href: 'https://store.xernerx.com/?category=credits', vanity: 'store.xernerx.com/?category=credits' },
+						]}
+					/>
+				</div>
+			),
+		},
+		{
 			id: 'card7',
 			title: t('faq.account.card7.title'),
 			searchableText: `${t('faq.account.card7.title')} ${t('faq.account.card7.description')}`,
@@ -141,13 +157,30 @@ export default function AccountAndSecurity({ searchQuery = '' }: { searchQuery?:
 				</div>
 			),
 		},
+		{
+			id: 'card12',
+			title: t('faq.account.card12.title'),
+			searchableText: `${t('faq.account.card12.title')} ${t('faq.account.card12.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.account.card12.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.accountSettings'), href: 'https://account.xernerx.com/?tab=account', vanity: 'account.xernerx.com' },
+							{ label: t('faq.quickLinks.activityLog'), href: 'https://account.xernerx.com/?tab=activity', vanity: 'account.xernerx.com/activity' },
+							{ label: t('faq.quickLinks.privacyPolicy'), href: 'https://www.xernerx.com/privacy', vanity: 'xernerx.com/privacy' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.account.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.account.title')}
 			</HeadingTag>

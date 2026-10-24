@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './users/types';
 import { UserCard } from './users/UserCard';
+import { AdminUserCreditsModal } from './AdminUserCreditsModal';
 
 export default function Users({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (userId: string) => void }) {
 	const { t } = useDictionary();
@@ -22,6 +23,7 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [filterRoleIds, setFilterRoleIds] = useState<string[]>([]);
 	const [limit, setLimit] = useState(30);
+	const [creditsTargetUser, setCreditsTargetUser] = useState<UserSummary | null>(null);
 
 	useEffect(() => {
 		if (initialSearch !== undefined) setSearch(initialSearch);
@@ -301,17 +303,20 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 									onUserUpdated={handleUserUpdated}
 									onDiscordFetched={handleDiscordFetched}
 									onViewAuditLogs={onViewAuditLogs}
+									onManageCredits={setCreditsTargetUser}
 								/>
 							))}
 						</AnimatePresence>
 					</motion.div>
 					{filteredUsers.length > limit && (
 						<div ref={loadMoreRef} className="h-14 w-full flex items-center justify-center my-6">
-							<Loading />
+							<Loading variant="small" />
 						</div>
 					)}
 				</>
 			)}
+
+			<AdminUserCreditsModal user={creditsTargetUser} onClose={() => setCreditsTargetUser(null)} />
 		</div>
 	);
 }

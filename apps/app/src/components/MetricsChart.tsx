@@ -164,7 +164,7 @@ export function MetricsChart({
 				>
 					{loading ? (
 						<div className="w-full h-full flex items-center justify-center">
-							<Loading />
+							<Loading variant="small" />
 						</div>
 					) : (
 						<ResponsiveContainer width="100%" height="100%">

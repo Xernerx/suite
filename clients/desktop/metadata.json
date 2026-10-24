@@ -5,9 +5,16 @@
 	"startMaximized": false,
 	"startOnBoot": false,
 	"alwaysOnTop": false,
-	"minimizeOnClose": false,
+	"minimizeOnClose": true,
 	"globalHotkey": true,
+	"globalQuickLauncher": true,
+	"quickCaptureHotkey": false,
+	"streamerMode": false,
+	"batterySaver": true,
 	"openExternalInBrowser": true,
 	"discordRpc": true,
-	"windowControls": "system"
+	"desktopNotifications": true,
+	"dailyStreakReminder": true,
+	"windowControls": "system",
+	"startupLocation": "last"
 }

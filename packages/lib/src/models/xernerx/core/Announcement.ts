@@ -65,6 +65,9 @@ const AnnouncementSchema = new Schema(
 		scheduledFor: { type: Date, default: null }, // Null means send immediately
 		sentAt: { type: Date, default: null }, // Null means not sent yet
 		discordMessageId: { type: String, default: null }, // Used to PATCH edit the message later
+		startsAt: { type: Date, default: null },
+		expiresAt: { type: Date, default: null },
+		targetApps: { type: [String], default: ['all'] },
 	},
 	{ timestamps: true }
 );

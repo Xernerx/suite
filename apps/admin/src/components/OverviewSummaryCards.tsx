@@ -73,7 +73,7 @@ export default function OverviewSummaryCards({ appsCount, syncedCount, canaryAhe
 
 	return (
 		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
+			<div className="p-5 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.services')}</span>
 					<Server size={18} className="text-(--accent)" />
@@ -82,7 +82,7 @@ export default function OverviewSummaryCards({ appsCount, syncedCount, canaryAhe
 				<div className="text-xs text-(--text-muted)">{t('admin.dashboard.overview.cards.synced', { count: syncedCount, ahead: canaryAheadCount })}</div>
 			</div>
 
-			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
+			<div className="p-5 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.openIssues')}</span>
 					<AlertCircle size={18} className="text-(--accent-red)" />
@@ -91,7 +91,7 @@ export default function OverviewSummaryCards({ appsCount, syncedCount, canaryAhe
 				<div className="text-xs text-(--accent-orange)">{t('admin.dashboard.overview.cards.pendingReview', { count: pendingReviewCount })}</div>
 			</div>
 
-			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
+			<div className="p-5 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.resolvedIssues')}</span>
 					<CheckCircle2 size={18} className="text-(--accent-green)" />
@@ -100,7 +100,7 @@ export default function OverviewSummaryCards({ appsCount, syncedCount, canaryAhe
 				<div className="text-xs text-(--text-muted)">{t('info.roadmap.metrics.recentResolutions')}</div>
 			</div>
 
-			<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
+			<div className="p-5 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col gap-2">
 				<div className="flex items-center justify-between text-(--text-muted)">
 					<span className="text-xs font-bold uppercase tracking-wider">{t('admin.dashboard.overview.cards.avgResolution')}</span>
 					<Clock size={18} className="text-(--accent)" />

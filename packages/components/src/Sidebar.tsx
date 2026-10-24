@@ -10,7 +10,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Divider } from '@xernerx/ui';
 import Image from 'next/image';
 import Link from 'next/link';
-import SidebarNotifications from './cards/SidebarNotifications';
+import SidebarNotifications, { getReadyCooldownReminders } from './cards/SidebarNotifications';
 import SidebarUserCard from './cards/SidebarUser';
 import { useWindowControlsStyle } from './HeaderWindowControls';
 import { usePathname } from 'next/navigation';
@@ -25,7 +25,7 @@ const deviceIcons = {
 export function Sidebar() {
 	const { data: session } = useSession();
 	const { state, isMobileOpen, setMobileOpen, navItems, view, setView } = useSidebar();
-	const { user: discordUser } = useUser();
+	const { user: discordUser, loading: userLoading } = useUser();
 	const { device } = usePlatform();
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
@@ -42,8 +42,12 @@ export function Sidebar() {
 
 	const isCollapsed = state === 'closed' && !isMobileOpen;
 	const activeUser = discordUser || session?.user;
-	const giftInTime = activeUser?.credits?.giftIn ? new Date(activeUser.credits.giftIn).getTime() : 0;
-	const isGiftReady = preferences.showGiftBadge && isMounted && Boolean(activeUser) && Date.now() >= giftInTime;
+	const readyReminders = isMounted && !userLoading && discordUser ? getReadyCooldownReminders(discordUser, getEnvUrl, t) : [];
+	const totalUnread = unreadCount + readyReminders.length;
+	const hasLoadedCredits = !userLoading && Boolean(discordUser?.credits);
+	const giftInTime = hasLoadedCredits && discordUser?.credits?.giftIn ? new Date(discordUser.credits.giftIn).getTime() : null;
+	const isGiftReady =
+		preferences.showGiftBadge && isMounted && hasLoadedCredits && (giftInTime !== null ? Number.isFinite(giftInTime) && Date.now() >= giftInTime : (discordUser?.credits?.streak ?? 0) === 0);
 
 	// Resolve Discord CDN URLs for Avatar, Decoration, and Nameplate
 	const avatarUrl = activeUser?.avatar
@@ -161,12 +165,12 @@ export function Sidebar() {
 										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 										<span
 											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
-											${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+											${isCollapsed ? 'w-0 opacity-0' : 'flex-1 min-w-0 opacity-100'}`}
 										>
 											{item.label}
 										</span>
 										{!isCollapsed && shortcutLabel && (
-											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded-xl border border-(--border)/10 shrink-0">
+											<kbd className="hidden md:inline-flex absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/95 backdrop-blur-md px-1.5 py-0.5 rounded-xl border border-(--border)/15 shadow-xs z-10">
 												{shortcutLabel}
 											</kbd>
 										)}
@@ -194,12 +198,12 @@ export function Sidebar() {
 										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 										<span
 											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
-											${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}
+											${isCollapsed ? 'w-0 opacity-0' : 'flex-1 min-w-0 opacity-100'}`}
 										>
 											{item.label}
 										</span>
 										{!isCollapsed && shortcutLabel && (
-											<kbd className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/60 px-1.5 py-0.5 rounded-xl border border-(--border)/10 shrink-0">
+											<kbd className="hidden md:inline-flex absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono text-(--text-muted) bg-(--background)/95 backdrop-blur-md px-1.5 py-0.5 rounded-xl border border-(--border)/15 shadow-xs z-10">
 												{shortcutLabel}
 											</kbd>
 										)}
@@ -335,7 +339,11 @@ export function Sidebar() {
 												className={`transition-transform duration-200 ${activeMenu === 'notifications' && !nameplateUrl ? 'text-(--accent)' : ''}`}
 											/>
 
-											{unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent-red) border-2 border-(--foreground)" />}
+											{totalUnread > 0 && (
+												<span className="absolute -top-1.5 -right-1.5 flex min-w-[16px] h-[16px] px-1 items-center justify-center rounded-full bg-(--accent-red) text-[9px] font-extrabold leading-none text-white border-2 border-(--background) shadow-xs">
+													{totalUnread > 9 ? '9+' : totalUnread}
+												</span>
+											)}
 										</div>
 									</button>
 

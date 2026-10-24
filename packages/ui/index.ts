@@ -2,6 +2,7 @@
 
 export * from './src/Button';
 export * from './src/Toggle';
+export * from './src/Check';
 export * from './src/Divider';
 export * from './src/Selector';
 export * from './src/Confirm';
@@ -17,3 +18,4 @@ export * from './src/Tooltip';
 export * from './src/Badge';
 export * from './src/EmptyState';
 export * from './src/CopyButton';
+export * from './src/Markdown';

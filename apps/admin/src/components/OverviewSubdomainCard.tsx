@@ -144,7 +144,7 @@ export default function OverviewSubdomainCard({
 	const envBoxes = envFilter === 'all' ? allEnvBoxes : allEnvBoxes.filter((b) => b.envType === envFilter);
 
 	return (
-		<div className="p-5 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col justify-between gap-4 transition-colors hover:border-(--accent)/30">
+		<div className="p-5 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col justify-between gap-4 transition-colors hover:border-(--accent)/30">
 			{/* Card Header */}
 			<div className="flex items-start justify-between gap-2">
 				<div>
@@ -158,9 +158,9 @@ export default function OverviewSubdomainCard({
 							<span>{app.name}</span>
 							<ExternalLink size={13} className="text-(--text-muted)" />
 						</a>
-						<span className="text-xs font-mono px-2 py-0.5 rounded-xl bg-(--background)/60 text-(--text-muted) border border-(--border)/10">{app.id}</span>
+						<span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-(--background)/60 text-(--text-muted) border border-(--border)/10">{app.id}</span>
 						{isGateway && (
-							<span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+							<span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 								{t('admin.dashboard.overview.serviceGateway')}
 							</span>
 						)}
@@ -172,8 +172,8 @@ export default function OverviewSubdomainCard({
 				</div>
 
 				<span
-					className={`text-[11px] font-bold uppercase px-2.5 py-1 rounded-xl border ${
-						isSynced ? 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20' : 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20'
+					className={`text-[11px] font-bold uppercase px-2.5 py-1 rounded-full border ${
+						isSynced ? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30' : 'bg-(--accent-orange)/15 text-(--accent-orange) border-(--accent-orange)/30'
 					}`}
 				>
 					{isSynced ? t('admin.dashboard.overview.syncedBadge') : t('admin.dashboard.overview.canaryAheadBadge')}
@@ -189,7 +189,7 @@ export default function OverviewSubdomainCard({
 					const isLhLoading = Boolean(lighthouseLoading[env.key]);
 
 					return (
-						<div key={env.key} className="p-3 rounded-xl bg-(--background)/50 border border-(--border)/10 flex flex-col items-center justify-between gap-2.5">
+						<div key={env.key} className="p-3 rounded-2xl bg-(--background)/60 border border-(--border)/10 flex flex-col items-center justify-between gap-2.5">
 							{/* Top Row: Clickable Env Name + Clickable Version (Changelog Modal) */}
 							<div className="w-full flex items-center justify-between text-xs">
 								<a

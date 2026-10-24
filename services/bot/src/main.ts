@@ -1,40 +1,39 @@
 /** @format */
 
-import { XernerxClient } from '@xernerx/framework';
-import { XernerxStats } from '@xernerx/stats';
+import fs from 'fs';
 import path from 'path';
+import { XernerxAppClient } from './instances/app/index.js';
+import { XernerxBotClient } from './instances/bot/index.js';
 
-for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')]) {
+for (const envPath of [path.resolve(process.cwd(), '../../.env'), path.resolve(process.cwd(), '.env')]) {
 	try {
-		process.loadEnvFile(envPath);
+		if (fs.existsSync(envPath)) {
+			const content = fs.readFileSync(envPath, 'utf8');
+			for (const line of content.split('\n')) {
+				const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+				if (match) {
+					const key = match[1];
+					let val = (match[2] || '').trim();
+					if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+						val = val.slice(1, -1);
+					}
+					if (val) process.env[key] = val;
+				}
+			}
+		}
 	} catch {}
 }
 
-export class Client extends XernerxClient {
-	constructor() {
-		super({
-			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences'],
-			token: process.env.DISCORD_CLIENT_TOKEN as string,
-			guildId: '687429190165069838',
-			global: process.env.ENVIRONMENT === 'production',
-		});
+export const appClient = process.env.DISCORD_CLIENT_TOKEN ? new XernerxAppClient() : null;
+export const botClient = process.env.DISCORD_BOT_TOKEN ? new XernerxBotClient() : null;
 
-		this.init();
+async function startInstances() {
+	if (appClient) {
+		await appClient.init();
 	}
-
-	async init() {
-		await this.modules.commandHandler.loadSlashCommands({
-			directory: 'dist/commands/slash',
-		});
-
-		await this.modules.eventHandler.loadEvents({
-			directory: 'dist/events',
-		});
-
-		await this.connect();
+	if (botClient) {
+		await botClient.init();
 	}
 }
 
-export const client = new Client();
-
-new XernerxStats(client as any, { token: process.env.XERNERX_TOKEN! });
+startInstances();
