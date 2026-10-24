@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 		const filteredIssues =
 			status === 'open' ? enriched.filter((issue: any) => issue.status !== 'resolved' || (issue.resolvedApp && issue.resolvedVersion && issue.releaseStatus !== 'production')) : enriched;
 
-		const authorIds = [...new Set(filteredIssues.map((i: any) => i.authorId).filter(Boolean))];
+		const authorIds: string[] = [...new Set<string>(filteredIssues.map((i: any) => i.authorId).filter(Boolean))];
 		const users = await models.users.User.find({ id: { $in: authorIds } }).lean();
 		const userMap: Record<string, any> = {};
 

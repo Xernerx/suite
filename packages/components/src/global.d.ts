@@ -133,3 +133,8 @@ declare module 'next-auth/jwt' {
 		[index: string]: any;
 	}
 }
+
+declare module '*.svg' {
+	const content: any;
+	export default content;
+}

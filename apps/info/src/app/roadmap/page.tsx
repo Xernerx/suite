@@ -454,7 +454,7 @@ export default function RoadmapPage() {
 																	</a>
 																)}
 
-																<RoadmapActionBar item={item} onUpdate={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))} />
+																<RoadmapActionBar item={item} onUpdate={(updated: any) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))} />
 															</motion.div>
 														);
 													})}
@@ -478,7 +478,7 @@ export default function RoadmapPage() {
 							getProductColor={getProductColor}
 							resolveBot={resolveBot}
 							statusColors={statusColors}
-							onUpdateItem={(updated) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))}
+							onUpdateItem={(updated: any) => setRoadmap((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))}
 						/>
 					</div>
 
