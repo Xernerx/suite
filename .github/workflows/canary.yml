@@ -77,6 +77,8 @@ jobs:
                       clients/desktop/release/*.exe
                       clients/desktop/release/*.dmg
                       clients/desktop/release/*.AppImage
+                      clients/desktop/release/*.yml
+                      clients/desktop/release/*.blockmap
                   if-no-files-found: error
 
     # 4. Cleanly wipe the old rolling canary release/tag, push a unique historical tag, and create the fresh rolling release
@@ -116,7 +118,7 @@ jobs:
                   VERSION=$(node -p "require('./clients/desktop/package.json').version")
                   COMMIT=$(git rev-parse --short HEAD)
                   VERSIONED_TAG="v${VERSION}-canary.${COMMIT}"
-                  TITLE="v${VERSION}-canary"
+                  TITLE="v${VERSION}-canary.${COMMIT}"
 
                   # 1. Create and push a unique permanent historical version tag (e.g. v2.0.1-canary.7c210b8)
                   git tag "${VERSIONED_TAG}" || true
@@ -133,9 +135,9 @@ jobs:
                       --prerelease \
                       --draft=false \
                       --repo ${{ github.repository }} \
-                      all-artifacts/desktop-release-ubuntu-latest/*.AppImage \
-                      all-artifacts/desktop-release-windows-latest/*.exe \
-                      all-artifacts/desktop-release-macos-latest/*.dmg
+                      all-artifacts/desktop-release-ubuntu-latest/* \
+                      all-artifacts/desktop-release-windows-latest/* \
+                      all-artifacts/desktop-release-macos-latest/*
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

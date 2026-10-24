@@ -180,6 +180,46 @@ const CREDIT_STORE_ITEMS = [
 		enabled: true,
 	},
 
+	// Custom Vanity URLs
+	{
+		id: 'perk-vanity-1',
+		name: '+1 Custom Vanity URL Slot',
+		description: 'Unlock a permanent custom vanity URL slug for your User Profile, Bot, Server, or Organization.',
+		categoryId: 'credits',
+		skuId: '',
+		itemType: 'credit_perk',
+		creditCost: 2000,
+		creditAmount: 0,
+		perkType: 'vanity_url',
+		perkValue: 1,
+		durationDays: 0,
+		isFeatured: false,
+		badge: 'Vanity URL',
+		discountPercent: 0,
+		features: ['+1 Permanent Custom Vanity URL Slot', 'Redeemable on any Profile, Bot, Server, or Organization you own', 'Change your custom slug anytime once unlocked'],
+		order: 25,
+		enabled: true,
+	},
+	{
+		id: 'perk-vanity-3',
+		name: '+3 Custom Vanity URL Slots',
+		description: 'Bundle of 3 permanent Custom Vanity URL slots for your profiles, bots, and servers at a 1,000-credit discount.',
+		categoryId: 'credits',
+		skuId: '',
+		itemType: 'credit_perk',
+		creditCost: 5000,
+		creditAmount: 0,
+		perkType: 'vanity_url',
+		perkValue: 3,
+		durationDays: 0,
+		isFeatured: true,
+		badge: 'Save 1,000 Credits',
+		discountPercent: 0,
+		features: ['+3 Permanent Custom Vanity URL Slots', 'Save 1,000 Credits compared to single slots', 'Use across your User Profile, Bots, Servers & Organizations'],
+		order: 26,
+		enabled: true,
+	},
+
 	// Trial Passes
 	{
 		id: 'perk-trial-virtue-3d',
@@ -258,7 +298,51 @@ const CREDIT_STORE_ITEMS = [
 		enabled: true,
 	},
 
+	// Streak Protection & Gamification Perks
+	{
+		id: 'perk-streak-shield',
+		name: 'Daily Streak Shield',
+		description: 'Protect your daily credit streak from resetting if you ever miss the 48-hour claim grace window. Stackable up to 3 shields.',
+		categoryId: 'credits',
+		skuId: '',
+		itemType: 'credit_perk',
+		creditCost: 500,
+		creditAmount: 0,
+		perkType: 'streak_shield',
+		perkValue: 1,
+		durationDays: 0,
+		isFeatured: false,
+		badge: 'Max 3 Active',
+		discountPercent: 0,
+		features: ['Automatically saves your streak if you miss a daily claim window', 'Stackable up to 3 active Streak Shields in your wallet'],
+		order: 35,
+		enabled: true,
+	},
+
 	// High-Spender & Patron Vanity Badges
+	{
+		id: 'perk-badge-dotmatrix',
+		name: 'Interactive Dot-Matrix Profile Header & Badge',
+		description: 'Unlock the live reactive antigravity dot-matrix banner studio with 8 customizable formations and the exclusive Dot-Matrix Architect badge across your profile and sidebar card.',
+		categoryId: 'credits',
+		skuId: '',
+		itemType: 'credit_perk',
+		creditCost: 3500,
+		creditAmount: 0,
+		perkType: 'vanity_badge',
+		perkValue: 'dot_matrix_banner',
+		durationDays: 0,
+		isFeatured: true,
+		badge: 'Interactive Banner',
+		discountPercent: 0,
+		features: [
+			'8 selectable live formations (Orbit, Vortex, Helix, Prism, Infinity, Wavegrid, Crest & Wordmark)',
+			'Interactive cursor repulsion & click shockwave physics on your profile & sidebar card',
+			'Exclusive "Dot-Matrix Architect" badge + live formation switcher on your public header',
+		],
+		order: 39,
+		enabled: true,
+	},
 	{
 		id: 'perk-badge-patron',
 		name: 'Credit Patron Badge',
@@ -325,35 +409,12 @@ export async function ensureStoreSeed() {
 
 	const count = await Category.countDocuments();
 	if (count === 0) {
-		// Seed default categories
 		await Category.create([
-			{
-				id: 'consumers',
-				name: 'Bots, Servers & Ultra',
-				description: 'Individual bot passes and the all-in-one Ultra bundle.',
-				icon: 'Bot',
-				order: 0,
-				enabled: true,
-			},
-			{
-				id: 'developers',
-				name: 'Developer API',
-				description: 'Developer API access, higher rate limits, and custom domains.',
-				icon: 'Code',
-				order: 1,
-				enabled: true,
-			},
-			{
-				id: 'servers',
-				name: 'Servers',
-				description: 'Dedicated guild & server infrastructure passes.',
-				icon: 'Server',
-				order: 2,
-				enabled: true,
-			},
+			{ id: 'consumers', name: 'Bots, Servers & Ultra', description: 'Individual bot passes and the all-in-one Ultra bundle.', icon: 'Bot', order: 0, enabled: true },
+			{ id: 'developers', name: 'Developer API', description: 'Developer API access, higher rate limits, and custom domains.', icon: 'Code', order: 1, enabled: true },
+			{ id: 'servers', name: 'Servers', description: 'Dedicated guild & server infrastructure passes.', icon: 'Server', order: 2, enabled: true },
 		]);
 
-		// Seed default subscription products
 		await Item.create([
 			{
 				id: 'ultra',
@@ -375,58 +436,24 @@ export async function ensureStoreSeed() {
 				order: 0,
 				enabled: true,
 			},
-			{
-				id: 'bot-zodiac',
-				name: 'Zodiac Pass',
+			...[
+				{ id: 'bot-zodiac', name: 'Zodiac Pass', skuId: 'prod_V0pSuzpbmBFsRv', feat: 'Direct developer support', order: 1 },
+				{ id: 'bot-virtue', name: 'Virtue Pass', skuId: 'prod_V0pRf7S9w9Pjb9', feat: 'Advanced moderation suite', order: 2 },
+				{ id: 'bot-todo', name: 'To-Do Pass', skuId: 'prod_V0pREm72CzuoVc', feat: 'Unlimited task boards', order: 3 },
+				{ id: 'bot-metamorphosis', name: 'Metamorphosis Pass', skuId: 'prod_V0pQ0EDH0iEDIm', feat: 'Dynamic logging channels', order: 4 },
+			].map((b) => ({
+				id: b.id,
+				name: b.name,
 				description: 'Individual bot license pass with premium feature access.',
 				categoryId: 'consumers',
-				skuId: 'prod_V0pSuzpbmBFsRv',
+				skuId: b.skuId,
 				itemType: 'subscription',
 				isFeatured: false,
 				discountPercent: 0,
-				features: ['Premium Zodiac access', '125% Credit Multiplier on earned credits', 'Direct developer support'],
-				order: 1,
+				features: [`Premium ${b.name.replace(' Pass', '')} access`, '125% Credit Multiplier on earned credits', b.feat],
+				order: b.order,
 				enabled: true,
-			},
-			{
-				id: 'bot-virtue',
-				name: 'Virtue Pass',
-				description: 'Individual bot license pass with premium feature access.',
-				categoryId: 'consumers',
-				skuId: 'prod_V0pRf7S9w9Pjb9',
-				itemType: 'subscription',
-				isFeatured: false,
-				discountPercent: 0,
-				features: ['Premium Virtue access', '125% Credit Multiplier on earned credits', 'Advanced moderation suite'],
-				order: 2,
-				enabled: true,
-			},
-			{
-				id: 'bot-todo',
-				name: 'To-Do Pass',
-				description: 'Individual bot license pass with premium feature access.',
-				categoryId: 'consumers',
-				skuId: 'prod_V0pREm72CzuoVc',
-				itemType: 'subscription',
-				isFeatured: false,
-				discountPercent: 0,
-				features: ['Premium To-Do access', '125% Credit Multiplier on earned credits', 'Unlimited task boards'],
-				order: 3,
-				enabled: true,
-			},
-			{
-				id: 'bot-metamorphosis',
-				name: 'Metamorphosis Pass',
-				description: 'Individual bot license pass with premium feature access.',
-				categoryId: 'consumers',
-				skuId: 'prod_V0pQ0EDH0iEDIm',
-				itemType: 'subscription',
-				isFeatured: false,
-				discountPercent: 0,
-				features: ['Premium Metamorphosis access', '125% Credit Multiplier on earned credits', 'Dynamic logging channels'],
-				order: 4,
-				enabled: true,
-			},
+			})),
 			{
 				id: 'dev-pro',
 				name: 'Developer Pro',
@@ -459,5 +486,9 @@ export async function ensureStoreSeed() {
 
 	for (const creditItem of CREDIT_STORE_ITEMS) {
 		await Item.updateOne({ id: creditItem.id }, { $setOnInsert: creditItem }, { upsert: true });
+	}
+	const dotMatrixSeed = CREDIT_STORE_ITEMS.find((i) => i.id === 'perk-badge-dotmatrix');
+	if (dotMatrixSeed) {
+		await Item.updateOne({ id: 'perk-badge-dotmatrix' }, { $set: { description: dotMatrixSeed.description, features: dotMatrixSeed.features } });
 	}
 }

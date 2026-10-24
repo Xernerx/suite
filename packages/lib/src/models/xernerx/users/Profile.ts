@@ -5,6 +5,8 @@ import { Schema } from 'mongoose';
 const schema = new Schema(
 	{
 		id: { type: String, unique: true, required: true }, // User ID
+		vanitySlug: { type: String, trim: true, lowercase: true, sparse: true },
+		vanityUnlocked: { type: Boolean, default: false },
 		name: { type: String }, // User name
 		icon: { type: String }, // User icon URL (optional)
 		description: { type: String }, // Short description of the user

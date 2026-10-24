@@ -6,6 +6,19 @@ import { renderWidgetHtml, renderWidgetPng, renderWidgetSvg, resolveAppBaseUrl }
 
 export const dynamic = 'force-dynamic';
 
+const VANITY_BADGE_LABELS: Record<string, string> = {
+	dot_matrix_banner: 'Dot-Matrix Architect',
+	credit_patron: 'Credit Patron',
+	high_roller: 'High Roller',
+	vault_sovereign: 'Vault Sovereign',
+	streak_master_7: '7-Day Streak Master',
+	streak_master_30: '30-Day Streak Veteran',
+	streak_master_100: '100-Day Streak Legend',
+	top_voter_10: 'Community Voter',
+	top_voter_50: 'Super Supporter',
+	ecosystem_builder: 'Ecosystem Builder',
+};
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
@@ -22,7 +35,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const BotModel = (db.models.bots as any).Bot;
 		const OrganizationModel = (db.models.organizations as any).Organization;
 
-		const user = await UserModel.findOne({ id }).lean();
+		const user = await UserModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		const resolvedId = user?.id || id;
+
 		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
 		if (user?.privacy === 'private' || (isExternalWidget && !user?.widgets)) {
 			return NextResponse.json({ error: 'User profile is private or widgets are disabled' }, { status: 404 });
@@ -31,7 +46,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		let discordUser: any = null;
 		if (process.env.DISCORD_CLIENT_TOKEN) {
 			try {
-				const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
+				const discordRes = await fetch(`https://discord.com/api/v10/users/${resolvedId}`, {
 					headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
 					next: { revalidate: 3600 },
 				});
@@ -48,27 +63,32 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		const [creditDoc, botCount, orgCount] = await Promise.all([
-			CreditModel.findOne({ ownerId: id })
-				.select('streak')
+			CreditModel.findOne({ ownerId: resolvedId })
+				.select('streak activeBadges dotMatrixVariant')
 				.lean()
 				.catch(() => null),
-			BotModel.countDocuments({ owners: id, privacy: 'public' }).catch(() => 0),
+			BotModel.countDocuments({ owners: resolvedId, privacy: 'public' }).catch(() => 0),
 			OrganizationModel.countDocuments({
-				$or: [{ owner: id }, { members: id }],
+				$or: [{ owner: resolvedId }, { members: resolvedId }],
 				$and: [{ $or: [{ 'config.privacy': 'public' }, { privacy: 'public' }] }],
 			}).catch(() => 0),
 		]);
+
+		const rawActiveBadges: string[] = Array.isArray((creditDoc as any)?.activeBadges) ? (creditDoc as any).activeBadges : [];
+		const vanityBadges: string[] = rawActiveBadges.map((b) => VANITY_BADGE_LABELS[b] || b).filter(Boolean);
+		const dotMatrixBanner = rawActiveBadges.includes('dot_matrix_banner');
+		const dotMatrixVariant = (creditDoc as any)?.dotMatrixVariant || 'orbit';
 
 		let avatarUrl: string | null = user?.icon && user.icon.startsWith('http') ? user.icon : null;
 		let bannerUrl: string | null = null;
 
 		if (discordUser?.avatar) {
 			const ext = discordUser.avatar.startsWith('a_') ? 'gif' : 'png';
-			avatarUrl = avatarUrl || `https://cdn.discordapp.com/avatars/${id}/${discordUser.avatar}.${ext}?size=512`;
+			avatarUrl = avatarUrl || `https://cdn.discordapp.com/avatars/${resolvedId}/${discordUser.avatar}.${ext}?size=512`;
 		}
 		if (discordUser?.banner) {
 			const ext = discordUser.banner.startsWith('a_') ? 'gif' : 'png';
-			bannerUrl = `https://cdn.discordapp.com/banners/${id}/${discordUser.banner}.${ext}?size=1024`;
+			bannerUrl = `https://cdn.discordapp.com/banners/${resolvedId}/${discordUser.banner}.${ext}?size=1024`;
 		}
 
 		const displayName = user?.name || discordUser?.global_name || discordUser?.username || 'Xernerx User';
@@ -76,7 +96,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const handle = username && username !== displayName ? `@${username}` : null;
 
 		const payload = {
-			id,
+			id: resolvedId,
+			vanitySlug: user?.vanitySlug || null,
 			name: displayName,
 			username,
 			handle,
@@ -86,6 +107,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			bannerUrl,
 			verified: Boolean(user?.verified),
 			streak: (creditDoc as any)?.streak || 0,
+			vanityBadges,
+			dotMatrixBanner,
+			dotMatrixVariant,
 			botCount: botCount || 0,
 			orgCount: orgCount || 0,
 		};
@@ -98,7 +122,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			avatarUrl: payload.avatarUrl,
 			bannerUrl: payload.bannerUrl,
 			verified: payload.verified,
-			profileUrl: `${resolveAppBaseUrl(req.url)}/users/${payload.id}`,
+			vanityBadges: payload.vanityBadges,
+			dotMatrixBanner: payload.dotMatrixBanner,
+			streak: payload.streak,
+			profileUrl: `${resolveAppBaseUrl(req.url)}/users/${payload.vanitySlug || payload.id}`,
 			theme: (url.searchParams.get('theme') === 'light' ? 'light' : 'dark') as 'dark' | 'light',
 			stats: [
 				{ label: 'Day Streak', value: payload.streak },

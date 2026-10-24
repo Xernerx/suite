@@ -145,22 +145,11 @@ export default function PortalPage() {
 				]);
 
 				const botMap = new Map<string, any>();
-				if (ownerRes.ok) {
-					const ownerBots = await ownerRes.json();
-					if (Array.isArray(ownerBots)) {
-						ownerBots.forEach((b: any) => {
-							if (b?.id) botMap.set(b.id, b);
-						});
-					}
-				}
-
-				for (const orgBotRes of orgBotResponses) {
-					if (orgBotRes.ok) {
-						const orgBotsList = await orgBotRes.json();
-						if (Array.isArray(orgBotsList)) {
-							orgBotsList.forEach((b: any) => {
-								if (b?.id) botMap.set(b.id, b);
-							});
+				for (const botRes of [ownerRes, ...orgBotResponses]) {
+					if (botRes.ok) {
+						const botList = await botRes.json();
+						if (Array.isArray(botList)) {
+							botList.forEach((b: any) => b?.id && botMap.set(b.id, b));
 						}
 					}
 				}
@@ -179,13 +168,12 @@ export default function PortalPage() {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${sessionData.user.id}/discord/guilds`));
 				if (res.ok) {
 					const data = await res.json();
-					const managedGuilds = data.filter((guild: any) => {
-						const perms = BigInt(guild.permissions || 0);
-						const hasAdmin = (perms & BigInt(0x8)) === BigInt(0x8);
-						const hasManageServer = (perms & BigInt(0x20)) === BigInt(0x20);
-						return hasAdmin || hasManageServer;
-					});
-					setGuilds(managedGuilds);
+					setGuilds(
+						data.filter((guild: any) => {
+							const perms = BigInt(guild.permissions || 0);
+							return (perms & BigInt(0x8)) === BigInt(0x8) || (perms & BigInt(0x20)) === BigInt(0x20);
+						})
+					);
 				}
 			} catch (error) {
 				console.error('Failed to fetch guilds:', error);
@@ -243,14 +231,15 @@ export default function PortalPage() {
 
 		if (bots.length > 0) {
 			bots.forEach((bot) => {
+				const avatarHash = bot.discord?.avatar || bot.avatar;
 				dynamicItems.push({
 					label: bot.discord?.username || bot.name || bot.id,
 					href: `/portal/bots/${bot.id}`,
 					category: t('common.nav.categories.bots'),
-					icon: bot.discord?.avatar
+					icon: avatarHash
 						? () => (
 								<Image
-									src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=64`}
+									src={`https://cdn.discordapp.com/avatars/${bot.id}/${avatarHash}.png?size=64`}
 									alt={bot.name || bot.id}
 									width={20}
 									height={20}
@@ -258,18 +247,7 @@ export default function PortalPage() {
 									className="w-5 h-5 rounded-xl object-cover"
 								/>
 							)
-						: bot.avatar
-							? () => (
-									<Image
-										src={`https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64`}
-										alt={bot.name || bot.id}
-										width={20}
-										height={20}
-										unoptimized
-										className="w-5 h-5 rounded-xl object-cover"
-									/>
-								)
-							: (Bot as any),
+						: (Bot as any),
 				});
 			});
 		}
@@ -368,12 +346,17 @@ export default function PortalPage() {
 						body: JSON.stringify(finalConfig),
 					});
 					if (res.ok) {
-						setOrgConfig(finalConfig);
-						setOriginalOrgConfig(JSON.parse(JSON.stringify(finalConfig)));
+						const updated = await res.json().catch(() => null);
+						const merged = updated ? { ...finalConfig, ...updated } : finalConfig;
+						setOrgConfig(merged);
+						setOriginalOrgConfig(JSON.parse(JSON.stringify(merged)));
 						setPendingUploads({});
 						toast({ title: t('common.toast.savedSuccess'), type: 'success' });
 						remind(false);
-					} else toast({ title: t('common.toast.saveFailed'), type: 'error' });
+					} else {
+						const errData = await res.json().catch(() => ({}));
+						toast({ title: t('common.toast.saveFailed'), description: errData.error, type: 'error' });
+					}
 				} catch (e) {
 					toast({ title: t('common.toast.saveError'), type: 'error' });
 				} finally {
@@ -411,9 +394,7 @@ export default function PortalPage() {
 
 	const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'iconUrl' | 'bannerUrl') => {
 		const file = e.target.files?.[0];
-		if (!file) return;
-
-		setPendingUploads((prev) => ({ ...prev, [field]: file }));
+		if (file) setPendingUploads((prev) => ({ ...prev, [field]: file }));
 	};
 
 	if (loading) {
@@ -426,20 +407,12 @@ export default function PortalPage() {
 
 	return (
 		<>
-			<div
-				className="flex flex-col max-w-7xl mx-auto w-full"
-				style={{
-					padding: 'var(--ui-gap)',
-					gap: 'var(--ui-gap)',
-					fontSize: 'var(--text-scale, 14px)',
-				}}
-			>
+			<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 				{selectedOrg === 'personal' ? (
 					<PersonalWorkspace session={session} bots={bots} organizations={organizations} />
 				) : selectedOrg ? (
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 						<OrgWorkspaceHeader organization={selectedOrg} />
-
 						{configLoading ? (
 							<div className="flex flex-col w-full h-full text-center items-center justify-center py-20 text-(--text-muted)">
 								<Loading variant="default" />
@@ -452,21 +425,11 @@ export default function PortalPage() {
 										setActiveTab(tab);
 										router.replace(`/portal?org=${selectedOrg._id}&tab=${tab}`, { scroll: false });
 									}}
-									tabs={[
-										{ id: 'info', label: t('app.portal.tabs.info') },
-										{ id: 'members', label: t('app.portal.tabs.members') },
-										{ id: 'roles', label: t('app.portal.tabs.roles') },
-										{ id: 'bots', label: t('app.portal.tabs.bots') },
-										{ id: 'servers', label: t('app.portal.tabs.servers') },
-										{ id: 'links', label: t('app.portal.tabs.links') },
-										{ id: 'settings', label: t('app.portal.tabs.settings') },
-									]}
+									tabs={['info', 'members', 'roles', 'bots', 'servers', 'links', 'settings'].map((id) => ({ id, label: t(`app.portal.tabs.${id}`) }))}
 								/>
-
 								{activeTab === 'info' && (
 									<OrgInfoTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} pendingUploads={pendingUploads} handleUpload={handleUpload} uploadingMedia={uploadingMedia} />
 								)}
-
 								{activeTab === 'members' && (
 									<OrgMembersTab
 										session={session}
@@ -480,22 +443,28 @@ export default function PortalPage() {
 										setOrgMembers={setOrgMembers}
 									/>
 								)}
-
 								{activeTab === 'roles' && <OrgRolesTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} />}
-
-								{activeTab === 'bots' && <OrgBotsTab bots={bots} selectedOrg={selectedOrg} />}
-
+								{activeTab === 'bots' && <OrgBotsTab bots={bots} selectedOrg={selectedOrg} orgGuilds={orgGuilds} />}
 								{activeTab === 'servers' && <OrgServersTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} orgGuilds={orgGuilds} />}
-
 								{activeTab === 'links' && <OrgLinksTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} />}
-
-								{activeTab === 'settings' && <OrgSettingsTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} setIsConfirmDeleteOpen={setIsConfirmDeleteOpen} />}
+								{activeTab === 'settings' && (
+									<OrgSettingsTab
+										orgConfig={orgConfig}
+										setOrgConfig={setOrgConfig}
+										onVanityUnlocked={() => {
+											setOrgConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+											setOriginalOrgConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+										}}
+										setIsConfirmDeleteOpen={setIsConfirmDeleteOpen}
+										orgBots={bots.filter((b) => b.organization === selectedOrg._id)}
+										orgGuilds={orgGuilds}
+									/>
+								)}
 							</div>
 						) : null}
 					</div>
 				) : null}
 			</div>
-
 			<CreateOrgModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
 			<Confirm

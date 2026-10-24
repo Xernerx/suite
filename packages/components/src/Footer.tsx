@@ -2,11 +2,30 @@
 // Force recompile
 'use client';
 
-import { Activity, BookOpen, Briefcase, Bug, CircleQuestionMark, Cookie, FileText, History, LifeBuoy, Mail, Map, MessageCircle, MessageSquare, Package, Shield, SlidersHorizontal } from 'lucide-react';
+import {
+	Activity,
+	BookOpen,
+	Briefcase,
+	Bug,
+	CircleQuestionMark,
+	Cookie,
+	Download,
+	FileText,
+	History,
+	LifeBuoy,
+	Link as LinkIcon,
+	Mail,
+	Map,
+	MessageCircle,
+	MessageSquare,
+	Package,
+	Shield,
+	SlidersHorizontal,
+} from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
-import { BsGithub } from 'react-icons/bs';
+import { BsFacebook, BsGithub, BsLinkedin, BsReddit, BsTwitterX, BsWhatsapp } from 'react-icons/bs';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -25,9 +44,36 @@ export function Footer() {
 			.catch(() => setSystemOnline(false));
 	}, [isReady]);
 
+	const shareLinks = [
+		{
+			href: 'https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.xernerx.com&text=Xernerx%20Studios%20%E2%80%94%20Modern%20Software%2C%20Bots%20%26%20Developer%20Tools',
+			label: t('common.footer.share.twitter'),
+			icon: BsTwitterX,
+		},
+		{
+			href: 'https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fwww.xernerx.com',
+			label: t('common.footer.share.facebook'),
+			icon: BsFacebook,
+		},
+		{
+			href: 'https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fwww.xernerx.com',
+			label: t('common.footer.share.linkedin'),
+			icon: BsLinkedin,
+		},
+		{
+			href: 'https://www.reddit.com/submit?url=https%3A%2F%2Fwww.xernerx.com&title=Xernerx%20Studios',
+			label: t('common.footer.share.reddit'),
+			icon: BsReddit,
+		},
+		{
+			href: 'https://api.whatsapp.com/send?text=https%3A%2F%2Fwww.xernerx.com',
+			label: t('common.footer.share.whatsapp'),
+			icon: BsWhatsapp,
+		},
+	];
+
 	return (
 		<motion.footer
-			data-nosnippet
 			initial={{ opacity: 1, y: 0 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"
@@ -42,17 +88,38 @@ export function Footer() {
 				{/* ---------------------------------------------------------------- */}
 				<div className="flex flex-col justify-between text-center md:text-left" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col items-center md:items-start" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-						<h2 className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</h2>
+						<div className="text-lg font-semibold text-(--text)">{t('components.footer.text1')}</div>
 
 						<p className="max-w-md leading-7 text-(--text-muted)">{t('common.footer.tagline')}</p>
 
-						<div className="mt-1 inline-flex items-center gap-2 rounded-full border border-(--border)/15 bg-(--foreground)/40 px-3 py-1 text-xs font-medium text-(--text-muted)">
+						<div className="mt-1 inline-flex items-center gap-2 rounded-full border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs px-3 py-1 text-xs font-medium text-(--text-muted)">
 							<span
 								className={`h-2 w-2 rounded-full ${
 									systemOnline === null ? 'bg-(--text-muted) animate-pulse' : systemOnline ? 'bg-(--accent-green) shadow-[0_0_8px_rgba(52,211,153,0.7)]' : 'bg-(--accent-orange)'
 								}`}
 							/>
 							<span>{systemOnline === false ? t('common.footer.links.statusDegraded') : t('common.footer.links.statusOperational')}</span>
+						</div>
+
+						<div className="mt-2 flex flex-wrap items-center justify-center md:justify-start gap-2" aria-label={t('common.footer.share.label')}>
+							<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted) mr-1">{t('common.footer.share.label')}:</span>
+							{shareLinks.map((item) => {
+								const ShareIcon = item.icon;
+								return (
+									<a
+										key={item.href}
+										href={item.href}
+										target="_blank"
+										rel="noopener noreferrer"
+										aria-label={item.label}
+										title={item.label}
+										className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent)"
+									>
+										<ShareIcon size={13} />
+										<span className="sr-only">{item.label}</span>
+									</a>
+								);
+							})}
 						</div>
 					</div>
 
@@ -64,6 +131,8 @@ export function Footer() {
 				{/* Resources */}
 				{/* ---------------------------------------------------------------- */}
 				<FooterSection title={t('common.footer.sections.resources')}>
+					<FooterLink href={resolveUrl('https://www.xernerx.com/download')} icon={Download} label={t('common.footer.links.download')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/invites')} icon={LinkIcon} label={t('common.footer.links.invites')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />
@@ -104,7 +173,7 @@ export function Footer() {
 function FooterSection({ title, children }: { title?: string; children: React.ReactNode }) {
 	return (
 		<div className="flex flex-col items-center md:items-start" style={{ gap: 'var(--ui-gap)' }}>
-			<h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-(--text)">{title}</h3>
+			<div className="text-sm font-semibold uppercase tracking-[0.2em] text-(--text)">{title}</div>
 
 			<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 				{children}

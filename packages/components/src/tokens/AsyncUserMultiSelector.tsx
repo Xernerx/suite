@@ -8,6 +8,7 @@ import { ChevronDown, User as UserIcon, X } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Input } from '@xernerx/ui';
+import { UserProfilePopover } from '../cards/UserProfilePopover';
 import type { UserOption } from './types';
 
 export interface AsyncUserMultiSelectorProps {
@@ -172,23 +173,27 @@ export function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholde
 								key={id}
 								className="flex items-center gap-1.5 rounded-xl border border-(--border)/15 bg-(--background)/50 backdrop-blur-md pl-2 pr-1.5 py-1 text-xs text-(--text) shadow-sm transition hover:border-(--accent)/50"
 							>
-								{u?.avatar ? (
-									<Image
-										src={`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`}
-										alt=""
-										width={16}
-										height={16}
-										unoptimized
-										className="h-4 w-4 rounded-full object-cover shrink-0"
-									/>
-								) : (
-									<UserIcon size={12} className="text-(--text-muted) shrink-0" />
-								)}
-								<span className="font-medium truncate max-w-[120px]">{u ? u.global_name || u.name || u.username || u.id : id}</span>
+								<UserProfilePopover userId={id} initialUser={u}>
+									<div className="flex items-center gap-1.5 hover:text-(--accent) transition-colors">
+										{u?.avatar ? (
+											<Image
+												src={`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`}
+												alt=""
+												width={16}
+												height={16}
+												unoptimized
+												className="h-4 w-4 rounded-full object-cover shrink-0"
+											/>
+										) : (
+											<UserIcon size={12} className="text-(--text-muted) shrink-0" />
+										)}
+										<span className="font-medium truncate max-w-[120px]">{u ? u.global_name || u.name || u.username || u.id : id}</span>
+									</div>
+								</UserProfilePopover>
 								<button
 									type="button"
 									onClick={() => handleRemove(id)}
-									aria-label="Remove"
+									aria-label={t('common.remove')}
 									className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full hover:bg-(--accent-red)/10 text-(--text-muted) hover:text-(--accent-red) transition-colors cursor-pointer"
 								>
 									<X size={10} />
@@ -240,7 +245,7 @@ export function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholde
 								{preloadUsers ? (
 									loading && users.length === 0 ? (
 										<div className="py-6 flex justify-center">
-											<Loading />
+											<Loading variant="small" />
 										</div>
 									) : filteredUsers.length === 0 ? (
 										<div className="py-4 text-center text-xs text-(--text-muted)">{t('admin.tokens.empty.title')}</div>
@@ -275,7 +280,7 @@ export function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholde
 									<div className="py-4 text-center text-xs text-(--text-muted)">{t('account.tokens.manage.invalidIdPrompt')}</div>
 								) : loading ? (
 									<div className="py-6 flex justify-center">
-										<Loading />
+										<Loading variant="small" />
 									</div>
 								) : canAddSingle ? (
 									<button

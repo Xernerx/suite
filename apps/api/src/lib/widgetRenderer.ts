@@ -17,6 +17,9 @@ export interface WidgetRenderOptions {
 	avatarUrl: string | null;
 	bannerUrl: string | null;
 	verified: boolean;
+	vanityBadges?: string[];
+	dotMatrixBanner?: boolean;
+	streak?: number;
 	profileUrl: string;
 	stats: WidgetStat[];
 	theme?: 'dark' | 'light';
@@ -175,69 +178,17 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 						),
 				h(
 					'div',
-					{
-						style: {
-							display: 'flex',
-							flexDirection: 'column',
-							flex: 1,
-						},
-					},
+					{ style: { display: 'flex', flexDirection: 'column', flex: 1 } },
 					h(
 						'div',
-						{
-							style: {
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'space-between',
-								width: '100%',
-								marginBottom: '6px',
-							},
-						},
-						h(
-							'span',
-							{
-								style: {
-									fontSize: '18px',
-									fontWeight: 800,
-									color: isLight ? '#4f46e5' : '#818cf8',
-									letterSpacing: '2px',
-								},
-							},
-							typeLabel
-						),
-						h(
-							'span',
-							{
-								style: {
-									fontSize: '18px',
-									fontWeight: 800,
-									color: '#64748b',
-									letterSpacing: '1.5px',
-								},
-							},
-							'XERNERX STUDIOS'
-						)
+						{ style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '6px' } },
+						h('span', { style: { fontSize: '18px', fontWeight: 800, color: isLight ? '#4f46e5' : '#818cf8', letterSpacing: '2px' } }, typeLabel),
+						h('span', { style: { fontSize: '18px', fontWeight: 800, color: '#64748b', letterSpacing: '1.5px' } }, 'XERNERX STUDIOS')
 					),
 					h(
 						'div',
-						{
-							style: {
-								display: 'flex',
-								alignItems: 'center',
-								gap: '12px',
-							},
-						},
-						h(
-							'span',
-							{
-								style: {
-									fontSize: '38px',
-									fontWeight: 800,
-									color: isLight ? '#0f172a' : '#f8fafc',
-								},
-							},
-							displayName
-						),
+						{ style: { display: 'flex', alignItems: 'center', gap: '12px' } },
+						h('span', { style: { fontSize: '38px', fontWeight: 800, color: isLight ? '#0f172a' : '#f8fafc' } }, displayName),
 						opts.verified
 							? h(
 									'span',
@@ -255,32 +206,50 @@ export async function renderWidgetPng(opts: WidgetRenderOptions): Promise<ImageR
 									'VERIFIED'
 								)
 							: null,
-						opts.handle
-							? h(
-									'span',
-									{
-										style: {
-											fontSize: '20px',
-											fontWeight: 600,
-											color: '#64748b',
-										},
-									},
-									opts.handle
-								)
-							: null
+						opts.handle ? h('span', { style: { fontSize: '20px', fontWeight: 600, color: '#64748b' } }, opts.handle) : null
 					),
-					h(
-						'div',
-						{
-							style: {
-								fontSize: '22px',
-								color: isLight ? '#475569' : '#94a3b8',
-								marginTop: '8px',
-								lineHeight: 1.35,
-							},
-						},
-						displayDesc
-					)
+					h('div', { style: { fontSize: '21px', color: isLight ? '#475569' : '#94a3b8', marginTop: '6px', lineHeight: 1.3 } }, displayDesc),
+					(opts.streak && opts.streak > 0) || (opts.vanityBadges && opts.vanityBadges.length > 0)
+						? h(
+								'div',
+								{ style: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginTop: '10px' } },
+								opts.streak && opts.streak > 0
+									? h(
+											'span',
+											{
+												style: {
+													fontSize: '15px',
+													fontWeight: 800,
+													color: isLight ? '#d97706' : '#fbbf24',
+													background: 'rgba(245, 158, 11, 0.16)',
+													border: '1px solid rgba(251, 191, 36, 0.4)',
+													borderRadius: '999px',
+													padding: '3px 12px',
+												},
+											},
+											`🔥 ${opts.streak}d Streak`
+										)
+									: null,
+								...(opts.vanityBadges || []).slice(0, 3).map((badge, bIdx) =>
+									h(
+										'span',
+										{
+											key: `vb-${bIdx}`,
+											style: {
+												fontSize: '15px',
+												fontWeight: 700,
+												color: isLight ? '#4f46e5' : '#a5b4fc',
+												background: 'rgba(99, 102, 241, 0.16)',
+												border: '1px solid rgba(129, 140, 248, 0.35)',
+												borderRadius: '999px',
+												padding: '3px 12px',
+											},
+										},
+										`✦ ${badge}`
+									)
+								)
+							)
+						: null
 				)
 			),
 			h(
@@ -385,6 +354,18 @@ export async function renderWidgetSvg(opts: WidgetRenderOptions): Promise<string
 		})
 		.join('');
 
+	const pillList = [...(opts.streak && opts.streak > 0 ? [`🔥 ${opts.streak}d Streak`] : []), ...(opts.vanityBadges || []).slice(0, 2)];
+	let pillCursorX = 94;
+	const pillsSvg = pillList
+		.map((label) => {
+			const safeLbl = escapeXml(label);
+			const pillW = Math.min(135, Math.max(54, Math.round(label.length * 5.4 + 16)));
+			const x = pillCursorX;
+			pillCursorX += pillW + 6;
+			return `<g transform="translate(${x}, 82)"><rect width="${pillW}" height="16" rx="8" fill="${accentColor}" fill-opacity="0.14" stroke="${accentColor}" stroke-opacity="0.35" /><text x="${Math.round(pillW / 2)}" y="11.5" text-anchor="middle" fill="${accentColor}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="8.5" font-weight="700">${safeLbl}</text></g>`;
+		})
+		.join('');
+
 	return `<svg xmlns="http://www.w3.org/2000/svg" width="420" height="172" viewBox="0 0 420 172" fill="none" role="img" aria-label="${safeName}">
 	<defs>
 		<linearGradient id="bg" x1="0" y1="0" x2="420" y2="172" gradientUnits="userSpaceOnUse">
@@ -398,9 +379,13 @@ export async function renderWidgetSvg(opts: WidgetRenderOptions): Promise<string
 		<clipPath id="avatarClip">
 			<rect x="24" y="22" width="56" height="56" rx="16" />
 		</clipPath>
+		<pattern id="dotMatrixPattern" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+			<circle cx="6" cy="6" r="1.5" fill="${accentColor}" fill-opacity="0.22" />
+		</pattern>
 	</defs>
 
 	<rect width="418" height="170" x="1" y="1" rx="20" fill="url(#bg)" stroke="url(#accentGlow)" stroke-width="1.5" />
+	${opts.dotMatrixBanner ? `<rect width="416" height="96" x="2" y="2" rx="19" fill="url(#dotMatrixPattern)" />` : ''}
 
 	<rect x="24" y="22" width="56" height="56" rx="16" fill="${avatarBg}" stroke="${strokeColor}" stroke-opacity="0.08" />
 	${
@@ -409,14 +394,15 @@ export async function renderWidgetSvg(opts: WidgetRenderOptions): Promise<string
 			: `<text x="52" y="57" text-anchor="middle" fill="${accentColor}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" font-weight="800">${initial}</text>`
 	}
 
-	<text x="94" y="36" fill="${accentColor}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="9" font-weight="800" letter-spacing="1.2">${typeLabel}</text>
-	<text x="396" y="36" text-anchor="end" fill="#64748b" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="9" font-weight="700">XERNERX</text>
+	<text x="94" y="34" fill="${accentColor}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="9" font-weight="800" letter-spacing="1.2">${typeLabel}</text>
+	<text x="396" y="34" text-anchor="end" fill="#64748b" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="9" font-weight="700">XERNERX</text>
 
-	<text x="94" y="58" fill="${textPrimary}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="18" font-weight="800">${safeName}${opts.verified ? ' ✓' : ''}</text>
+	<text x="94" y="54" fill="${textPrimary}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="18" font-weight="800">${safeName}${opts.verified ? ' ✓' : ''}</text>
 
-	<text x="94" y="78" fill="${textMuted}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="500">${safeDesc}</text>
+	<text x="94" y="72" fill="${textMuted}" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="12" font-weight="500">${safeDesc}</text>
+	${pillsSvg}
 
-	<line x1="24" y1="102" x2="396" y2="102" stroke="${strokeColor}" stroke-opacity="0.06" />
+	<line x1="24" y1="104" x2="396" y2="104" stroke="${strokeColor}" stroke-opacity="0.06" />
 
 	${statsMarkup}
 </svg>`;
@@ -429,6 +415,11 @@ export function renderWidgetHtml(opts: WidgetRenderOptions): string {
 	const safeDesc = escapeXml(rawDesc);
 	const initial = escapeXml((opts.name || 'X').charAt(0).toUpperCase());
 	const isLight = opts.theme === 'light';
+
+	const pillsHtml = [
+		...(opts.streak && opts.streak > 0 ? [`<span class="pill pill-streak">🔥 ${opts.streak}d Streak</span>`] : []),
+		...(opts.vanityBadges || []).slice(0, 3).map((b) => `<span class="pill">✦ ${escapeXml(b)}</span>`),
+	].join('');
 
 	const statsHtml = opts.stats
 		.slice(0, 3)
@@ -450,7 +441,7 @@ export function renderWidgetHtml(opts: WidgetRenderOptions): string {
 <style>
 	* { box-sizing: border-box; margin: 0; padding: 0; }
 	html, body { width: 100%; height: 100%; background: transparent; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: ${isLight ? '#0f172a' : '#f8fafc'}; overflow: hidden; }
-	.card { display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; padding: 18px 20px; border-radius: 20px; background: ${isLight ? 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)' : 'linear-gradient(135deg, #0b0e17 0%, #111625 100%)'}; border: 1px solid rgba(99, 102, 241, 0.35); text-decoration: none; color: inherit; position: relative; overflow: hidden; transition: border-color 0.2s ease, transform 0.2s ease; }
+	.card { display: flex; flex-direction: column; justify-content: space-between; width: 100%; height: 100%; padding: 18px 20px; border-radius: 20px; background: ${opts.dotMatrixBanner ? `radial-gradient(${isLight ? 'rgba(79,70,229,0.18)' : 'rgba(129,140,248,0.22)'} 1.4px, transparent 1.4px) 0 0 / 12px 12px, ` : ''}${isLight ? 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)' : 'linear-gradient(135deg, #0b0e17 0%, #111625 100%)'}; border: 1px solid rgba(99, 102, 241, 0.35); text-decoration: none; color: inherit; position: relative; overflow: hidden; transition: border-color 0.2s ease, transform 0.2s ease; }
 	.card:hover { border-color: rgba(129, 140, 248, 0.75); }
 	.top { display: flex; align-items: center; gap: 14px; }
 	.avatar { width: 54px; height: 54px; border-radius: 15px; object-fit: cover; background: ${isLight ? '#f1f5f9' : '#1e2436'}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: ${isLight ? '#4f46e5' : '#818cf8'}; flex-shrink: 0; border: 1px solid ${isLight ? 'rgba(15,23,42,0.08)' : 'rgba(255,255,255,0.08)'}; }
@@ -460,6 +451,9 @@ export function renderWidgetHtml(opts: WidgetRenderOptions): string {
 	.brand { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: #64748b; }
 	.name { font-size: 17px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ${isLight ? '#0f172a' : '#f8fafc'}; }
 	.desc { font-size: 12px; color: ${isLight ? '#475569' : '#94a3b8'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+	.pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+	.pill { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 999px; background: rgba(99, 102, 241, 0.15); color: ${isLight ? '#4f46e5' : '#818cf8'}; border: 1px solid rgba(99, 102, 241, 0.3); }
+	.pill-streak { background: rgba(245, 158, 11, 0.15); color: ${isLight ? '#d97706' : '#fbbf24'}; border-color: rgba(245, 158, 11, 0.35); }
 	.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 12px; border-top: 1px solid ${isLight ? 'rgba(15,23,42,0.06)' : 'rgba(255,255,255,0.06)'}; }
 	.stat { display: flex; align-items: center; justify-content: space-between; background: ${isLight ? '#f1f5f9' : '#151924'}; border: 1px solid ${isLight ? 'rgba(15,23,42,0.07)' : 'rgba(255,255,255,0.07)'}; border-radius: 10px; padding: 7px 10px; }
 	.stat-val { font-size: 13px; font-weight: 800; color: ${isLight ? '#0f172a' : '#f8fafc'}; }
@@ -477,6 +471,7 @@ export function renderWidgetHtml(opts: WidgetRenderOptions): string {
 				</div>
 				<div class="name">${safeName}${opts.verified ? ' ✓' : ''}</div>
 				<div class="desc">${safeDesc}</div>
+				${pillsHtml ? `<div class="pills">${pillsHtml}</div>` : ''}
 			</div>
 		</div>
 		<div class="stats">${statsHtml}</div>

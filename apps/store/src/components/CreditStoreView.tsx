@@ -3,9 +3,12 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Award, Check, Clock, Coins, Flame, Gift, HardDrive, LayoutGrid, Loader2, ShoppingBag, Sparkles, Zap } from 'lucide-react';
+import { Award, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
 import { Badge, Button, Confirm, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import { CreditLedgerCard } from './CreditLedgerCard';
+import { DailyStreakLadder } from './DailyStreakLadder';
+import { DotMatrixPerkPreview } from './DotMatrixPerkPreview';
 import { CatalogItem } from './types';
 
 interface CreditStoreViewProps {
@@ -17,14 +20,21 @@ interface CreditStoreViewProps {
 	onBuyCreditPack: (priceId: string, item: CatalogItem) => void;
 }
 
-type PerkFilter = 'all' | 'cdn_slots' | 'showcase_slots' | 'trial_pass' | 'vanity_badge' | 'credit_packs';
+type PerkFilter = 'all' | 'cdn_slots' | 'showcase_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'credit_packs';
 
-const FALLBACK_EUR_PRICES: Record<string, string> = {
-	'credits-500': '€5.00',
-	'credits-1200': '€10.00',
-	'credits-3250': '€25.00',
-	'credits-7000': '€50.00',
+const PERK_ICONS: Record<string, any> = {
+	cdn_slots: HardDrive,
+	showcase_slots: LayoutGrid,
+	vanity_url: Globe,
+	trial_pass: Zap,
+	streak_shield: Shield,
+	dot_matrix_banner: Cpu,
+	credit_patron: Coins,
+	high_roller: Gem,
+	vault_sovereign: Crown,
+	vanity_badge: Award,
 };
+const FALLBACK_EUR_PRICES: Record<string, string> = { 'credits-500': '€5.00', 'credits-1200': '€10.00', 'credits-3250': '€25.00', 'credits-7000': '€50.00' };
 
 export function CreditStoreView({ items, user, userLoading, mutateUser, actionLoading, onBuyCreditPack }: CreditStoreViewProps) {
 	const { t } = useDictionary();
@@ -37,16 +47,22 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	const [confirmItem, setConfirmItem] = useState<CatalogItem | null>(null);
 	const [redeemingId, setRedeemingId] = useState<string | null>(null);
 
+	const hasLoadedCredits = !userLoading && Boolean(user?.credits);
 	const creditBalance = user?.credits?.balance ?? 0;
 	const creditStreak = user?.credits?.streak ?? 0;
 	const totalSpent = user?.credits?.totalSpent ?? 0;
 	const extraCdnSlots = user?.credits?.extraCdnSlots ?? 0;
 	const extraShowcaseSlots = user?.credits?.extraShowcaseSlots ?? 0;
+	const extraVanitySlots = user?.credits?.extraVanitySlots ?? 0;
 	const unlockedBadges: string[] = Array.isArray(user?.credits?.unlockedBadges) ? user.credits.unlockedBadges : [];
-	const nextGiftMs = user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : 0;
-	const canClaimGift = Boolean(user?.id) && (creditStreak === 0 || nextGiftMs <= Date.now());
+	const nextGiftMs = hasLoadedCredits && user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : null;
+	const canClaimGift = hasLoadedCredits && Boolean(user?.id) && (nextGiftMs !== null ? Number.isFinite(nextGiftMs) && nextGiftMs <= Date.now() : creditStreak === 0);
 
 	useEffect(() => {
+		if (!hasLoadedCredits || nextGiftMs === null) {
+			setTimeLeft('');
+			return;
+		}
 		const updateTimer = () => {
 			const diff = nextGiftMs - Date.now();
 			if (diff <= 0) {
@@ -61,7 +77,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 		updateTimer();
 		const id = setInterval(updateTimer, 1000);
 		return () => clearInterval(id);
-	}, [nextGiftMs]);
+	}, [hasLoadedCredits, nextGiftMs]);
 
 	const handleClaimDaily = async () => {
 		if (!user?.id || claimingDaily) return;
@@ -126,36 +142,12 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	};
 
 	const creditPacks = useMemo(() => items.filter((i) => i.itemType === 'credit_pack').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
-
 	const creditPerks = useMemo(() => items.filter((i) => i.itemType === 'credit_perk').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
-
-	const filteredPerks = useMemo(() => {
-		if (filter === 'credit_packs') return [];
-		if (filter === 'all') return creditPerks;
-		return creditPerks.filter((i) => i.perkType === filter);
-	}, [creditPerks, filter]);
-
-	const getPerkIcon = (perkType?: string) => {
-		switch (perkType) {
-			case 'cdn_slots':
-				return HardDrive;
-			case 'showcase_slots':
-				return LayoutGrid;
-			case 'trial_pass':
-				return Zap;
-			case 'vanity_badge':
-				return Award;
-			default:
-				return Sparkles;
-		}
-	};
-
+	const filteredPerks = useMemo(() => (filter === 'credit_packs' ? [] : filter === 'all' ? creditPerks : creditPerks.filter((i) => i.perkType === filter)), [creditPerks, filter]);
+	const getPerkIcon = (perkType?: string, perkValue?: string | number | null) => PERK_ICONS[String(perkValue || '')] || PERK_ICONS[String(perkType || '')] || Sparkles;
 	const getEffectiveCreditCost = (item: CatalogItem) => {
 		const base = Math.max(0, Number(item.creditCost) || 0);
-		if (item.discountPercent && item.discountPercent > 0) {
-			return Math.round(base * (1 - item.discountPercent / 100));
-		}
-		return base;
+		return item.discountPercent && item.discountPercent > 0 ? Math.round(base * (1 - item.discountPercent / 100)) : base;
 	};
 
 	return (
@@ -194,6 +186,12 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 								<LayoutGrid size={11} className="text-(--accent)" />
 								{t('account.store.credits.ownedShowcaseSlots', { count: 1 + extraShowcaseSlots, extra: extraShowcaseSlots })}
 							</span>
+							{extraVanitySlots > 0 && (
+								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
+									<Globe size={11} className="text-(--accent)" />
+									{t('account.store.credits.ownedVanitySlots', { count: extraVanitySlots })}
+								</span>
+							)}
 							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
 								<Award size={11} className="text-(--accent)" />
 								{t('account.store.credits.ownedBadges', { count: unlockedBadges.length })}
@@ -225,6 +223,9 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 				</div>
 			</div>
 
+			{/* 7-Day Daily Streak Ladder & Subscriber Multiplier */}
+			<DailyStreakLadder streak={creditStreak} canClaim={canClaimGift} user={user} onClaim={handleClaimDaily} claiming={claimingDaily} />
+
 			{/* Filter Tabs */}
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<Tabs
@@ -235,8 +236,10 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 						{ id: 'all', label: t('account.store.credits.filters.all') },
 						{ id: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
 						{ id: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
+						{ id: 'vanity_url', label: t('account.store.credits.filters.vanityUrls') },
 						{ id: 'trial_pass', label: t('account.store.credits.filters.trialPasses') },
 						{ id: 'vanity_badge', label: t('account.store.credits.filters.vanityBadges') },
+						{ id: 'streak_shield', label: t('account.store.credits.filters.streakShields') },
 						{ id: 'credit_packs', label: t('account.store.credits.filters.creditPacks') },
 					]}
 				/>
@@ -255,9 +258,12 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 						{filteredPerks.map((item) => {
-							const PerkIcon = getPerkIcon(item.perkType);
+							const PerkIcon = getPerkIcon(item.perkType, item.perkValue);
 							const effectiveCost = getEffectiveCreditCost(item);
-							const isOwnedBadge = item.perkType === 'vanity_badge' && unlockedBadges.includes(String(item.perkValue || item.id));
+							const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix';
+							const isOwnedBadge =
+								(item.perkType === 'vanity_badge' && unlockedBadges.includes(String(item.perkValue || item.id))) ||
+								(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3);
 							const canAfford = creditBalance >= effectiveCost;
 
 							return (
@@ -286,6 +292,8 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 												</span>
 											)}
 										</div>
+
+										{isDotMatrix && <DotMatrixPerkPreview initialVariant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} />}
 
 										<div>
 											<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -317,12 +325,25 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 										)}
 									</div>
 
-									<div className="pt-2">
+									<div className="pt-2 flex flex-col gap-2">
 										{isOwnedBadge ? (
-											<Button variant="secondary" disabled className="w-full flex items-center justify-center gap-2">
-												<Check size={15} className="text-(--accent-green)" />
-												{t('account.store.credits.alreadyUnlocked')}
-											</Button>
+											<>
+												<Button variant="secondary" disabled className="w-full flex items-center justify-center gap-2">
+													<Check size={15} className="text-(--accent-green)" />
+													{t('account.store.credits.alreadyUnlocked')}
+												</Button>
+												{isDotMatrix && (
+													<Button
+														variant="primary"
+														size="sm"
+														onClick={() => (window.location.href = getEnvUrl('https://account.xernerx.com/?tab=profile'))}
+														className="w-full flex items-center justify-center gap-1.5"
+													>
+														<ExternalLink size={14} />
+														{t('account.store.credits.dotMatrixPreview.customizeInProfile')}
+													</Button>
+												)}
+											</>
 										) : (
 											<Button
 												variant={canAfford ? 'primary' : 'secondary'}
@@ -444,6 +465,9 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 					</div>
 				</div>
 			)}
+
+			{/* Credit Balance Activity Ledger */}
+			{user?.id && <CreditLedgerCard transactions={user?.credits?.transactions} streakShields={user?.credits?.streakShields ?? 0} />}
 
 			<Confirm
 				open={Boolean(confirmItem)}

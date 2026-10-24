@@ -18,13 +18,48 @@ export default function Home() {
 	const { type } = usePlatform();
 	const router = useRouter();
 
-	// Redirect to dashboard only on app start if running within the desktop application wrapper
+	// Redirect on initial cold app start if running within the desktop application wrapper and startupLocation is not 'explore'
 	useEffect(() => {
-		if (type === 'application' && !sessionStorage.getItem('hasRedirectedToDashboard')) {
-			sessionStorage.setItem('hasRedirectedToDashboard', 'true');
-			router.replace('/dashboard');
+		if (type !== 'application' || !isReady) return;
+		if (sessionStorage.getItem('hasRedirectedToDashboard')) return;
+		sessionStorage.setItem('hasRedirectedToDashboard', 'true');
+
+		// Never hijack intentional in-app navigation to Explore from another suite page
+		if (typeof document !== 'undefined' && document.referrer) return;
+
+		const startupUrlMap: Record<string, string> = {
+			dashboard: '/dashboard',
+			portal: '/portal',
+			account: 'https://account.xernerx.com',
+			store: 'https://store.xernerx.com',
+			api: 'https://api.xernerx.com',
+			docs: 'https://docs.xernerx.com',
+			cdn: 'https://cdn.xernerx.com',
+			website: 'https://www.xernerx.com',
+			help: 'https://info.xernerx.com',
+			admin: 'https://admin.xernerx.com',
+		};
+
+		const applyStartupRedirect = (loc?: string) => {
+			const normalized = (loc || 'dashboard').trim().toLowerCase();
+			if (normalized === 'explore' || normalized === 'last') return;
+			const target = startupUrlMap[normalized] || '/dashboard';
+			if (target.startsWith('http')) {
+				window.location.replace(getEnvUrl(target));
+			} else {
+				router.replace(target);
+			}
+		};
+
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (bridge?.getMetadata) {
+			Promise.resolve(bridge.getMetadata())
+				.then((meta: any) => applyStartupRedirect(meta?.startupLocation || bridge?.metadata?.startupLocation))
+				.catch(() => applyStartupRedirect(bridge?.metadata?.startupLocation));
+		} else {
+			applyStartupRedirect(bridge?.metadata?.startupLocation);
 		}
-	}, [type, router]);
+	}, [type, isReady, getEnvUrl, router]);
 
 	// Complex state for categorized bots
 	const [categorizedBots, setCategorizedBots] = useState<{

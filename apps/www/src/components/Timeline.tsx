@@ -56,7 +56,7 @@ export default function Timeline() {
 	const { t } = useDictionary();
 
 	return (
-		<section className="relative py-32 mb-32 max-w-7xl mx-auto px-6">
+		<section id="timeline" className="relative py-32 mb-32 max-w-7xl mx-auto px-6">
 			<div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
 				{/* STICKY LEFT (Editorial Hero) */}
 				<div className="lg:col-span-5 relative">
@@ -136,7 +136,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 								: t(`www.timeline.events.${index}.date`)}
 						</span>
 
-						<h3 className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
+						<div className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
 							{finalLink ? (
 								<a href={finalLink} className="after:absolute after:inset-0 flex items-center justify-between w-full">
 									<span>{t(`www.timeline.events.${index}.title`)}</span>
@@ -145,7 +145,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 							) : (
 								t(`www.timeline.events.${index}.title`)
 							)}
-						</h3>
+						</div>
 					</div>
 				</div>
 

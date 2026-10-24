@@ -56,6 +56,10 @@ export async function POST(req: Request) {
 			if (Array.isArray(creditDoc.unlockedBadges) && creditDoc.unlockedBadges.includes(badgeId)) {
 				return NextResponse.json({ error: 'You already own this vanity badge.' }, { status: 409 });
 			}
+		} else if (item.perkType === 'streak_shield') {
+			if ((creditDoc.streakShields || 0) >= 3) {
+				return NextResponse.json({ error: 'You already have the maximum of 3 active Streak Shields.' }, { status: 409 });
+			}
 		}
 
 		if ((creditDoc.balance || 0) < effectiveCost) {
@@ -89,10 +93,17 @@ export async function POST(req: Request) {
 		} else if (item.perkType === 'showcase_slots') {
 			const slots = Math.max(1, Number(item.perkValue) || 1);
 			updateInc.extraShowcaseSlots = slots;
+		} else if (item.perkType === 'vanity_url') {
+			const slots = Math.max(1, Number(item.perkValue) || 1);
+			updateInc.extraVanitySlots = slots;
 		} else if (item.perkType === 'vanity_badge') {
 			const badgeId = String(item.perkValue || item.id);
 			badgesToUnlock.add(badgeId);
 			badgesToActivate.add(badgeId);
+		} else if (item.perkType === 'streak_shield') {
+			const currentShields = creditDoc.streakShields || 0;
+			const toAdd = Math.min(3 - currentShields, Math.max(1, Number(item.perkValue) || 1));
+			updateInc.streakShields = toAdd;
 		} else if (item.perkType === 'trial_pass') {
 			const targetItemId = String(item.perkValue || 'ultra');
 			const durationDays = Math.max(1, Number(item.durationDays) || 3);

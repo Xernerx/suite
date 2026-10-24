@@ -41,6 +41,16 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 				]
 			),
 			c(
+				'card11',
+				'showcases-badges',
+				'faq.account.card11.title',
+				['faq.account.card11.description'],
+				[
+					ql('profileSettings', 'https://account.xernerx.com/?tab=profile', 'account.xernerx.com/profile'),
+					ql('creditStore', 'https://store.xernerx.com/?category=credits', 'store.xernerx.com/?category=credits'),
+				]
+			),
+			c(
 				'card7',
 				'appearance',
 				'faq.account.card7.title',
@@ -89,6 +99,17 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('termsPolicy', 'https://www.xernerx.com/terms', 'xernerx.com/terms'),
 				]
 			),
+			c(
+				'card12',
+				'personal-data-export',
+				'faq.account.card12.title',
+				['faq.account.card12.description'],
+				[
+					ql('accountSettings', 'https://account.xernerx.com/?tab=account', 'account.xernerx.com'),
+					ql('activityLog', 'https://account.xernerx.com/?tab=activity', 'account.xernerx.com/activity'),
+					ql('privacyPolicy', 'https://www.xernerx.com/privacy', 'xernerx.com/privacy'),
+				]
+			),
 		],
 	},
 	{
@@ -116,7 +137,31 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 				['faq.billing.card3.description'],
 				[
 					ql('billingTab', 'https://account.xernerx.com/?tab=billing', 'account.xernerx.com/billing'),
+					ql('creditStore', 'https://store.xernerx.com/?category=credits', 'store.xernerx.com/?category=credits'),
 					ql('leaderboards', 'https://app.xernerx.com/leaderboard', 'app.xernerx.com/leaderboard'),
+					ql('supporters', 'https://app.xernerx.com/supporters', 'app.xernerx.com/supporters'),
+				]
+			),
+			c(
+				'card6',
+				'credit-store-perks',
+				'faq.billing.card6.title',
+				['faq.billing.card6.description'],
+				[
+					ql('creditStore', 'https://store.xernerx.com/?category=credits', 'store.xernerx.com/?category=credits'),
+					ql('billingTab', 'https://account.xernerx.com/?tab=billing', 'account.xernerx.com/billing'),
+					ql('profileSettings', 'https://account.xernerx.com/?tab=profile', 'account.xernerx.com/profile'),
+				]
+			),
+			c(
+				'card7',
+				'credit-tipping',
+				'faq.billing.card7.title',
+				['faq.billing.card7.description'],
+				[
+					ql('creditStore', 'https://store.xernerx.com/?category=credits', 'store.xernerx.com/?category=credits'),
+					ql('billingTab', 'https://account.xernerx.com/?tab=billing', 'account.xernerx.com/billing'),
+					ql('exploreBots', 'https://app.xernerx.com/bots', 'app.xernerx.com/bots'),
 					ql('supporters', 'https://app.xernerx.com/supporters', 'app.xernerx.com/supporters'),
 				]
 			),

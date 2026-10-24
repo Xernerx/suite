@@ -1,5 +1,6 @@
 /** @format */
 
+import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
@@ -15,7 +16,37 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 		const { models } = await database('xernerx');
 		const existing = (await models.core.Issue.findOne({ id }).lean()) as any;
+
+		const shouldAwardBounty =
+			existing && !existing.bountyAwarded && existing.authorId && (body.status === 'resolved' || body.acknowledged === true || existing.status === 'resolved' || existing.acknowledged === true);
+
+		if (shouldAwardBounty) {
+			body.bountyAwarded = true;
+		}
+
 		const updated = (await models.core.Issue.findOneAndUpdate({ id }, body, { new: true }).lean()) as any;
+
+		if (updated && shouldAwardBounty && updated.authorId) {
+			const CreditModel = (models.users as any).Credit;
+			await CreditModel.findOneAndUpdate(
+				{ ownerId: updated.authorId },
+				{
+					$inc: { balance: 500 },
+					$push: {
+						transactions: {
+							id: crypto.randomUUID(),
+							type: 'bounty',
+							amount: 500,
+							multiplierPercent: 100,
+							itemId: `issue_bounty_${id}`,
+							itemName: `Bug Bounty — ${updated.title}`,
+							createdAt: new Date(),
+						},
+					},
+				},
+				{ upsert: true }
+			);
+		}
 
 		if (updated) {
 			const wasVerified = !existing?.acknowledged && updated.acknowledged;

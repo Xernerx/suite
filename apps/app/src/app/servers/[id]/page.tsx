@@ -5,10 +5,12 @@ import { use, useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSession, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { Activity, ArrowLeft, Server, Settings } from 'lucide-react';
+import { Activity, ArrowLeft, Server, Settings, Star, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { ServerHeader } from '@/components/servers/Header';
+import { ServerLeaderboard } from '@/components/servers/Leaderboard';
 import { ServerProfile } from '@/components/servers/Profile';
+import { ServerReviews } from '@/components/servers/Reviews';
 import { ServerStatsView } from '@/components/servers/ServerStatsView';
 
 interface GuildProfile {
@@ -65,6 +67,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	useEffect(() => {
 		const sessionData = session as any;
 		const uid = sessionData?.user?.id;
+		const resolvedGuildId = server?.id || id;
 		if (!uid) {
 			setCanManageServer(false);
 			return;
@@ -73,7 +76,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 			.then((res) => (res.ok ? res.json() : []))
 			.then((guilds: any[]) => {
 				if (!Array.isArray(guilds)) return;
-				const match = guilds.find((g) => g.id === id);
+				const match = guilds.find((g) => g.id === resolvedGuildId || g.id === id);
 				if (match) {
 					const perms = BigInt(match.permissions || 0);
 					const hasAdmin = (perms & BigInt(0x8)) === BigInt(0x8);
@@ -84,21 +87,24 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 				}
 			})
 			.catch(() => setCanManageServer(false));
-	}, [session, id, getEnvUrl]);
+	}, [session, id, server?.id, getEnvUrl]);
 
 	useEffect(() => {
 		show();
+		const resolvedGuildId = server?.id || id;
 		const items: any[] = [
 			{ label: t('app.servers.nav.backToServers'), href: '/servers', icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.organization.nav.profile'), view: 'profile', icon: Server, category: t('app.servers.nav.serverDetails') },
 			{ label: t('app.bots.tabs.statistics'), view: 'statistics', icon: Activity, category: t('app.servers.nav.serverDetails') },
+			{ label: t('app.servers.tabs.leaderboard'), view: 'leaderboard', icon: Trophy, category: t('app.servers.nav.serverDetails') },
+			{ label: t('app.servers.tabs.reviews'), view: 'reviews', icon: Star, category: t('app.servers.nav.serverDetails') },
 		];
 		if (canManageServer) {
-			items.push({ label: t('app.servers.manageServer'), href: `/dashboard?guild=${id}`, icon: Settings, category: t('app.bots.tabs.categoryManagement') });
+			items.push({ label: t('app.servers.manageServer'), href: `/dashboard?guild=${resolvedGuildId}`, icon: Settings, category: t('app.bots.tabs.categoryManagement') });
 		}
 		setNavItems(items);
 		return () => hide();
-	}, [setNavItems, show, hide, t, canManageServer, id]);
+	}, [setNavItems, show, hide, t, canManageServer, id, server?.id]);
 
 	useEffect(() => {
 		const fetchServer = async () => {
@@ -126,9 +132,10 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	}, [id, getEnvUrl]);
 
 	useEffect(() => {
+		const targetId = server?.id || id;
 		const fetchVoteStatus = async () => {
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/vote`), { credentials: 'include' });
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${targetId}/vote`), { credentials: 'include' });
 				if (res.ok) {
 					const data = await res.json();
 					setCanVote(data.canVote);
@@ -137,12 +144,13 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 			} catch {}
 		};
 		fetchVoteStatus();
-	}, [id, getEnvUrl]);
+	}, [id, server?.id, getEnvUrl]);
 
 	const handleVote = async () => {
+		const targetId = server?.id || id;
 		setVoting(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/vote`), {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${targetId}/vote`), {
 				method: 'POST',
 				credentials: 'include',
 			});
@@ -181,10 +189,22 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 		);
 	}
 
+	const resolvedId = server.id || id;
+
 	return (
 		<div className="flex flex-col w-full min-h-screen pb-24">
-			<ServerHeader server={server} organizationData={organizationData} canVote={canVote} voting={voting} timeLeft={timeLeft} onVote={handleVote} />
-			<div className="w-full">{view === 'statistics' ? <ServerStatsView server={server} /> : <ServerProfile server={server} organizationData={organizationData} />}</div>
+			<ServerHeader server={server} setServer={setServer} organizationData={organizationData} canVote={canVote} nextVoteAt={nextVoteAt} voting={voting} timeLeft={timeLeft} onVote={handleVote} />
+			<div className="w-full">
+				{view === 'statistics' ? (
+					<ServerStatsView server={server} />
+				) : view === 'leaderboard' ? (
+					<ServerLeaderboard server={server} id={resolvedId} />
+				) : view === 'reviews' ? (
+					<ServerReviews server={server} id={resolvedId} canManageServer={canManageServer} />
+				) : (
+					<ServerProfile server={server} organizationData={organizationData} />
+				)}
+			</div>
 		</div>
 	);
 }

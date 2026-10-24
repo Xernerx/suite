@@ -256,7 +256,7 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 				>
 					{loadingDetails ? (
 						<div className="flex justify-center py-6">
-							<Loading />
+							<Loading variant="small" />
 						</div>
 					) : (
 						<form

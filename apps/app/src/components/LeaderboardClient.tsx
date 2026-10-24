@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Trophy, Server, Users, Flame, Coins, ShieldCheck, ChevronUp, Lock, ArrowLeft, Bot, Crown, Medal, Award } from 'lucide-react';
+import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Input, Selector } from '@xernerx/ui';
@@ -31,15 +32,7 @@ export default function LeaderboardClient() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [discordMap, setDiscordMap] = useState<Record<string, DiscordProfile>>({});
-	const [data, setData] = useState<{
-		bots: any[];
-		servers: any[];
-		streaks: any[];
-	}>({
-		bots: [],
-		servers: [],
-		streaks: [],
-	});
+	const [data, setData] = useState<{ bots: any[]; servers: any[]; streaks: any[] }>({ bots: [], servers: [], streaks: [] });
 
 	useEffect(() => {
 		hide();
@@ -52,11 +45,7 @@ export default function LeaderboardClient() {
 		const sortParam = params.get('sort');
 		if (tabParam && ['bots', 'servers', 'streaks'].includes(tabParam)) {
 			setActiveTab(tabParam);
-			if (sortParam) {
-				setSortBy(sortParam);
-			} else {
-				setSortBy(tabParam === 'streaks' ? 'streak' : 'votes');
-			}
+			setSortBy(sortParam || (tabParam === 'streaks' ? 'streak' : 'votes'));
 		} else if (sortParam) {
 			setSortBy(sortParam);
 		}
@@ -140,19 +129,17 @@ export default function LeaderboardClient() {
 	];
 
 	const sortOptions = useMemo(() => {
-		if (activeTab === 'bots') {
+		if (activeTab === 'bots')
 			return [
 				{ id: 'votes', label: t('app.leaderboard.metrics.votes') },
 				{ id: 'servers', label: t('app.leaderboard.tabs.servers') },
 				{ id: 'users', label: t('app.leaderboard.metrics.users') },
 			];
-		}
-		if (activeTab === 'servers') {
+		if (activeTab === 'servers')
 			return [
 				{ id: 'votes', label: t('app.leaderboard.metrics.votes') },
 				{ id: 'members', label: t('app.leaderboard.metrics.members') },
 			];
-		}
 		return [
 			{ id: 'streak', label: t('app.leaderboard.metrics.streak') },
 			{ id: 'balance', label: t('app.leaderboard.metrics.credits') },
@@ -216,11 +203,11 @@ export default function LeaderboardClient() {
 		<div className="flex flex-wrap items-center gap-2">
 			{activeTab === 'bots' && (
 				<>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Server size={13} className="text-(--accent)" />
 						{(entry.guildCount || 0).toLocaleString()}
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Users size={13} className="text-(--accent)" />
 						{(entry.userCount || 0).toLocaleString()}
 					</span>
@@ -233,7 +220,7 @@ export default function LeaderboardClient() {
 
 			{activeTab === 'servers' && (
 				<>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Users size={13} className="text-(--accent)" />
 						{(entry.memberCount || 0).toLocaleString()}
 					</span>
@@ -250,7 +237,7 @@ export default function LeaderboardClient() {
 						<Flame size={13} />
 						{t('app.users.profile.days', { count: entry.streak || 0 })}
 					</span>
-					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/80 border border-(--border)/10 text-xs font-bold text-(--text)">
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-bold text-(--text)">
 						<Coins size={13} className="text-(--accent)" />
 						{(entry.balance || 0).toLocaleString()}
 					</span>
@@ -314,15 +301,7 @@ export default function LeaderboardClient() {
 				</div>
 
 				<div className="w-full lg:w-56 shrink-0">
-					<Selector
-						items={true}
-						value={sortBy}
-						onChange={handleSortChange}
-						options={sortOptions.map((opt) => ({
-							value: opt.id,
-							label: `${t('app.leaderboard.sortBy')}: ${opt.label}`,
-						}))}
-					/>
+					<Selector items={true} value={sortBy} onChange={handleSortChange} options={sortOptions.map((opt) => ({ value: opt.id, label: `${t('app.leaderboard.sortBy')}: ${opt.label}` }))} />
 				</div>
 			</div>
 
@@ -353,31 +332,35 @@ export default function LeaderboardClient() {
 										: 'order-3 md:order-3';
 
 								const borderAccent = isFirst
-									? 'border-(--accent)/50 hover:border-(--accent) shadow-[0_10px_40px_color-mix(in_srgb,var(--accent)_22%,transparent)] ring-1 ring-(--accent)/25'
+									? 'border-amber-400/50 hover:border-amber-400 shadow-[0_10px_40px_rgba(234,179,8,0.22)] ring-1 ring-amber-400/30'
 									: isSecond
-										? 'border-(--accent)/25 hover:border-(--accent)/50 shadow-[0_6px_25px_color-mix(in_srgb,var(--accent)_12%,transparent)]'
-										: 'border-(--border)/15 hover:border-(--accent)/40 shadow-sm';
+										? 'border-slate-300/40 hover:border-slate-300/75 shadow-[0_6px_28px_rgba(203,213,225,0.14)] ring-1 ring-slate-300/20'
+										: 'border-amber-600/40 hover:border-amber-600/75 shadow-[0_6px_28px_rgba(217,119,6,0.15)] ring-1 ring-amber-600/20';
 
 								const badgeTone = isFirst
-									? 'bg-(--accent) text-white shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_50%,transparent)]'
-									: 'bg-(--background)/85 text-(--accent) border border-(--accent)/30 backdrop-blur-md';
+									? 'bg-[color-mix(in_srgb,#eab308_22%,var(--background))] text-amber-400 border border-amber-400/45 shadow-[0_0_20px_rgba(234,179,8,0.35)] backdrop-blur-md'
+									: isSecond
+										? 'bg-[color-mix(in_srgb,#cbd5e1_20%,var(--background))] text-slate-300 border border-slate-300/40 shadow-[0_0_15px_rgba(203,213,225,0.2)] backdrop-blur-md'
+										: 'bg-[color-mix(in_srgb,#d97706_22%,var(--background))] text-amber-500 border border-amber-600/40 shadow-[0_0_15px_rgba(217,119,6,0.25)] backdrop-blur-md';
+
+								const bannerGradient = isFirst
+									? 'from-amber-500/25 via-(--foreground) to-(--background)'
+									: isSecond
+										? 'from-slate-400/20 via-(--foreground) to-(--background)'
+										: 'from-amber-700/25 via-(--foreground) to-(--background)';
+
+								const avatarRing = isFirst ? 'h-24 w-24 ring-2 ring-amber-400/50' : isSecond ? 'h-20 w-20 ring-2 ring-slate-300/35' : 'h-20 w-20 ring-2 ring-amber-600/35';
 
 								const pedestalTone = isFirst
-									? 'from-(--accent)/25 via-(--accent)/10 to-transparent border-t border-(--accent)/30 text-(--accent)'
+									? 'from-amber-500/25 via-amber-500/10 to-transparent border-t border-amber-400/35 text-amber-400'
 									: isSecond
-										? 'from-(--accent)/15 via-(--accent)/5 to-transparent border-t border-(--accent)/20 text-(--accent)'
-										: 'from-(--accent)/10 via-transparent to-transparent border-t border-(--border)/15 text-(--text-muted)';
+										? 'from-slate-300/20 via-slate-300/5 to-transparent border-t border-slate-300/30 text-slate-300'
+										: 'from-amber-600/20 via-amber-600/5 to-transparent border-t border-amber-600/30 text-amber-500';
 
-								return (
-									<Link
-										key={entry.id}
-										href={getHref(entry)}
-										className={`group relative flex flex-col rounded-3xl border bg-(--foreground)/35 backdrop-blur-md overflow-hidden transition-all duration-300 hover:-translate-y-1.5 ${orderAndElevation} ${borderAccent}`}
-									>
+								const cardContent = (
+									<>
 										{/* Banner */}
-										<div
-											className={`${isFirst ? 'h-36' : 'h-28'} w-full relative bg-gradient-to-br from-(--accent)/20 via-(--foreground) to-(--background) overflow-hidden shrink-0`}
-										>
+										<div className={`${isFirst ? 'h-36' : 'h-28'} w-full relative bg-gradient-to-br ${bannerGradient} overflow-hidden shrink-0`}>
 											{bannerUrl && <Image src={bannerUrl} alt={name} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />}
 											<div className="absolute inset-0 bg-gradient-to-t from-(--foreground) via-transparent to-black/25" />
 											<div className={`absolute top-3 right-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${badgeTone}`}>
@@ -389,9 +372,7 @@ export default function LeaderboardClient() {
 										{/* Body */}
 										<div className="flex flex-col items-center text-center px-6 pb-5 -mt-11 relative z-10 flex-1">
 											<div
-												className={`${
-													isFirst ? 'h-24 w-24 ring-2 ring-(--accent)/40' : 'h-20 w-20'
-												} rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-xl flex items-center justify-center shrink-0`}
+												className={`${avatarRing} rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-xl flex items-center justify-center shrink-0`}
 											>
 												{avatarUrl ? (
 													<Image src={avatarUrl} alt={name} width={isFirst ? 96 : 80} height={isFirst ? 96 : 80} unoptimized className="h-full w-full object-cover" />
@@ -418,13 +399,28 @@ export default function LeaderboardClient() {
 
 										{/* Podium Step Base */}
 										<div
-											className={`flex items-center justify-center gap-1.5 bg-gradient-to-t ${
-												isFirst ? 'py-2.5' : isSecond ? 'py-2' : 'py-1.5'
-											} text-xs font-black tracking-widest uppercase ${pedestalTone}`}
+											className={`flex items-center justify-center gap-1.5 bg-gradient-to-t ${isFirst ? 'py-2.5' : isSecond ? 'py-2' : 'py-1.5'} text-xs font-black tracking-widest uppercase ${pedestalTone}`}
 										>
 											<RankIcon size={13} />
 											<span>#{index + 1}</span>
 										</div>
+									</>
+								);
+
+								const cardClass = `group relative flex flex-col rounded-3xl border bg-(--foreground)/35 backdrop-blur-md overflow-hidden transition-all duration-300 hover:-translate-y-1.5 w-full ${orderAndElevation} ${borderAccent}`;
+
+								return activeTab === 'streaks' ? (
+									<UserProfilePopover
+										key={entry.id}
+										userId={String(entry.id)}
+										initialUser={{ id: String(entry.id), name, avatarUrl, bannerUrl }}
+										className={`w-full ${orderAndElevation}`}
+									>
+										<div className={cardClass}>{cardContent}</div>
+									</UserProfilePopover>
+								) : (
+									<Link key={entry.id} href={getHref(entry)} className={cardClass}>
+										{cardContent}
 									</Link>
 								);
 							})}
@@ -437,14 +433,10 @@ export default function LeaderboardClient() {
 							{listEntries.map((entry: any, idx: number) => {
 								const rank = showPodium ? idx + 4 : idx + 1;
 								const { name, handle, avatarUrl, bannerUrl } = resolveEntryDisplay(entry);
-
-								return (
-									<Link
-										key={entry.id}
-										href={getHref(entry)}
-										className="group relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md hover:border-(--accent)/40 hover:bg-(--foreground)/50 overflow-hidden transition-all shadow-sm"
-										style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-									>
+								const rowClass =
+									'group relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md hover:border-(--accent)/40 hover:bg-(--foreground)/50 overflow-hidden transition-all shadow-sm w-full';
+								const rowInner = (
+									<>
 										{bannerUrl && (
 											<div
 												className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none"
@@ -455,7 +447,6 @@ export default function LeaderboardClient() {
 											<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-(--border)/15 bg-(--background)/80 text-sm font-black text-(--text-muted) group-hover:text-(--accent) group-hover:border-(--accent)/30 transition-colors shrink-0">
 												#{rank}
 											</div>
-
 											{avatarUrl ? (
 												<Image
 													src={avatarUrl}
@@ -470,7 +461,6 @@ export default function LeaderboardClient() {
 													{name.charAt(0).toUpperCase()}
 												</div>
 											)}
-
 											<div className="min-w-0">
 												<div className="flex items-center gap-2">
 													<h2 className="text-base font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">{name}</h2>
@@ -480,8 +470,19 @@ export default function LeaderboardClient() {
 												{entry.description && <p className="text-xs text-(--text-muted) truncate max-w-lg mt-0.5">{entry.description}</p>}
 											</div>
 										</div>
-
 										<div className="relative z-10 shrink-0">{renderMetricBadges(entry)}</div>
+									</>
+								);
+
+								return activeTab === 'streaks' ? (
+									<UserProfilePopover key={entry.id} userId={String(entry.id)} initialUser={{ id: String(entry.id), name, avatarUrl, bannerUrl }} className="w-full">
+										<div className={rowClass} style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+											{rowInner}
+										</div>
+									</UserProfilePopover>
+								) : (
+									<Link key={entry.id} href={getHref(entry)} className={rowClass} style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+										{rowInner}
 									</Link>
 								);
 							})}

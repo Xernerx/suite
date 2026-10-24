@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		}
 		if (body.creditCost !== undefined) item.creditCost = Math.max(0, Number(body.creditCost) || 0);
 		if (body.creditAmount !== undefined) item.creditAmount = Math.max(0, Number(body.creditAmount) || 0);
-		if (body.perkType !== undefined && ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge'].includes(body.perkType)) {
+		if (body.perkType !== undefined && ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge', 'streak_shield', 'boost_bot', 'boost_server'].includes(body.perkType)) {
 			item.perkType = body.perkType;
 		}
 		if (body.perkValue !== undefined) item.perkValue = body.perkValue;

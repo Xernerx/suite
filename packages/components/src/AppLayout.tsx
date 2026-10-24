@@ -16,6 +16,7 @@ import {
 	ToastProvider,
 	UserProvider,
 	DispatchProvider,
+	LoadingProvider,
 	useSession,
 	signOut,
 	useEnvironment,
@@ -113,7 +114,9 @@ export function AppLayout({
 														<CookieProvider>
 															<VersionTracker />
 															<SupportProvider>
-																<Page>{children}</Page>
+																<LoadingProvider>
+																	<Page>{children}</Page>
+																</LoadingProvider>
 															</SupportProvider>
 															<CookiePrompt />
 															<TermsPrompt />

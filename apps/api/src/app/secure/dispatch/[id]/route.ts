@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database, sendWebhook } from '@xernerx/lib/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
@@ -29,7 +31,41 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const { models } = await database('xernerx');
 		const Dispatch = models.dispatch.Invite as any;
 
-		const updatedItem = await Dispatch.findOneAndUpdate({ id }, { $set: body }, { new: true });
+		const existingItem = await Dispatch.findOne({ id }).lean();
+		if (!existingItem) {
+			return NextResponse.json({ error: 'Dispatch item not found' }, { status: 404 });
+		}
+
+		let updateQuery: any;
+		const { userId, ...restBody } = body || {};
+		const actorUserId = userId || (existingItem.targetId !== 'global' ? existingItem.targetId : null);
+
+		if (restBody.status === 'read' || restBody.status === 'unread') {
+			const isSharedOrInvite = existingItem.targetId === 'global' || existingItem.category === 'invite';
+			if (isSharedOrInvite) {
+				if (restBody.status === 'read' && actorUserId) {
+					updateQuery = { $addToSet: { readBy: String(actorUserId) } };
+				} else if (restBody.status === 'unread' && actorUserId) {
+					updateQuery = { $pull: { readBy: String(actorUserId) } };
+				} else {
+					updateQuery = {};
+				}
+			} else if (restBody.status === 'read') {
+				updateQuery = {
+					$set: { ...restBody, status: 'read', readAt: new Date() },
+					...(actorUserId ? { $addToSet: { readBy: String(actorUserId) } } : {}),
+				};
+			} else {
+				updateQuery = {
+					$set: { ...restBody, status: 'unread', readAt: null },
+					...(actorUserId ? { $pull: { readBy: String(actorUserId) } } : {}),
+				};
+			}
+		} else {
+			updateQuery = { $set: restBody };
+		}
+
+		const updatedItem = Object.keys(updateQuery).length > 0 ? await Dispatch.findOneAndUpdate({ id }, updateQuery, { new: true }) : existingItem;
 
 		if (!updatedItem) {
 			return NextResponse.json({ error: 'Dispatch item not found' }, { status: 404 });
@@ -101,14 +137,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		const { searchParams } = new URL(req.url);
+		const userId = searchParams.get('userId');
 		const { models } = await database('xernerx');
 		const Dispatch = models.dispatch.Invite as any;
 
-		const deletedItem = await Dispatch.findOneAndDelete({ id });
-
-		if (!deletedItem) {
+		const existingItem = await Dispatch.findOne({ id }).lean();
+		if (!existingItem) {
 			return NextResponse.json({ error: 'Dispatch item not found' }, { status: 404 });
 		}
+
+		if (existingItem.targetId === 'global' && userId) {
+			await Dispatch.findOneAndUpdate({ id }, { $addToSet: { deletedBy: String(userId) } }, { new: true });
+			return NextResponse.json({ success: true, deletedId: id });
+		}
+
+		await Dispatch.findOneAndDelete({ id });
 
 		return NextResponse.json({ success: true, deletedId: id });
 	} catch (err: any) {

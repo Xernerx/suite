@@ -7,6 +7,8 @@ export interface TokenListInfo {
 	id?: string;
 	name: string;
 	status: TokenStatus;
+	requestCount?: number;
+	lastUsedAt?: string | null;
 	permissions?: {
 		secure?: boolean;
 		websocket?: boolean;
@@ -19,6 +21,8 @@ export interface FullToken extends TokenListInfo {
 	owners: string[];
 	botId?: string;
 	createdAt: string;
+	requestCount?: number;
+	lastUsedAt?: string | null;
 }
 
 export interface Token {
@@ -32,6 +36,8 @@ export interface Token {
 		websocket?: boolean;
 	};
 	botId?: string;
+	requestCount?: number;
+	lastUsedAt?: string | null;
 	createdAt?: string;
 	updatedAt?: string;
 }

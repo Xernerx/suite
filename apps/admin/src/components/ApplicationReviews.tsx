@@ -5,7 +5,9 @@ import { Check, Clock, Copy, ExternalLink, FileText, Loader2, ShieldAlert, User 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { useEnvironment, useToast, useUser } from '@xernerx/providers';
+import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 
@@ -228,6 +230,8 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 		});
 	}, [applications, search, statusFilter, appUsers, appConfigs]);
 
+	if (isLoading && applications.length === 0) return <Loading />;
+
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full relative"
@@ -362,15 +366,12 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 					<div className="flex flex-col gap-6 pt-2">
 						{selectedApp.ownerId && selectedApp.ownerId !== 'anonymous' && (
 							<div className="flex items-center gap-2">
-								<a
-									href={getEnvUrl(`https://app.xernerx.com/users/${selectedApp.ownerId}`)}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-xs font-mono text-(--text-muted) hover:text-(--accent) transition-colors flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-(--background)/60 border border-(--border)/10"
-								>
-									{selectedApp.ownerId}
-									<ExternalLink size={11} />
-								</a>
+								<UserProfilePopover userId={selectedApp.ownerId} initialUser={appUsers[selectedApp.ownerId]}>
+									<span className="text-xs font-mono text-(--text-muted) hover:text-(--accent) transition-colors flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-(--background)/60 border border-(--border)/10">
+										{selectedApp.ownerId}
+										<ExternalLink size={11} />
+									</span>
+								</UserProfilePopover>
 								<button
 									type="button"
 									onClick={() => {

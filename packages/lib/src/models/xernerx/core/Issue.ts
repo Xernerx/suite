@@ -15,6 +15,7 @@ const schema = new Schema(
 		resolvedApp: { type: String, default: null }, // Suite app subdomain ID (e.g. 'app', 'info', 'api', 'www')
 		resolvedVersion: { type: String, default: null }, // Version that fixed the issue (e.g. '2.6.12')
 		acknowledged: { type: Boolean, default: false }, // If false, it stays in the admin review queue and does not appear on the roadmap Known Issues tracker
+		bountyAwarded: { type: Boolean, default: false }, // Tracks whether the +500 Credit bug bounty has been granted to authorId
 	},
 	{ timestamps: true } // Provides createdAt automatically
 );

@@ -1,33 +1,11 @@
 /** @format */
 'use client';
 
-import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-	User,
-	ShieldCheck,
-	Server,
-	Users,
-	Building2,
-	Sparkles,
-	Clock,
-	Award,
-	Flame,
-	Globe,
-	Bug,
-	Lightbulb,
-	ExternalLink,
-	Code2,
-	AtSign,
-	Video,
-	Tv,
-	Music,
-	Gamepad2,
-	MessageCircle,
-	CheckCircle2,
-} from 'lucide-react';
+import { User, ShieldCheck, Server, Users, Building2, Sparkles, Clock, Award, Flame, Globe, ExternalLink, Code2, AtSign, Video, Tv, Music, Gamepad2, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { Markdown } from '@xernerx/ui';
 
 const PROVIDER_META: Record<string, { label: string; icon: any }> = {
 	github: { label: 'GitHub', icon: Code2 },
@@ -48,19 +26,14 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false);
 	const showcases = Array.isArray(user?.showcases) ? user.showcases : [];
-	const activeVanityBadges: string[] = Array.isArray(user?.credits?.activeBadges) ? user.credits.activeBadges : [];
 
-	const verifiedIssues = user?.communityStats?.verifiedIssuesCount || 0;
-	const approvedSuggestions = user?.communityStats?.approvedSuggestionsCount || 0;
-	const hasBadges = verifiedIssues > 0 || approvedSuggestions > 0 || bots.length > 0 || activeVanityBadges.length > 0;
-
-	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak || publicConnections.length > 0 || hasBadges);
+	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak || publicConnections.length > 0);
 
 	return (
 		<div className="flex flex-col gap-8">
 			{user?.info && (
-				<div className="prose max-w-none prose-headings:font-fredoka bg-(--foreground)/30 backdrop-blur-md p-8 rounded-3xl border border-(--border)/10 shadow-sm mb-4">
-					<ReactMarkdown>{user.info}</ReactMarkdown>
+				<div className="bg-(--foreground)/30 backdrop-blur-md p-8 rounded-3xl border border-(--border)/10 shadow-sm mb-4">
+					<Markdown>{user.info}</Markdown>
 				</div>
 			)}
 
@@ -317,38 +290,6 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 									{t('app.users.profile.information')}
 								</h3>
 							</div>
-
-							{hasBadges && (
-								<div className="flex flex-wrap gap-2">
-									{activeVanityBadges.map((badgeId) => (
-										<span
-											key={badgeId}
-											className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/20 text-(--accent) border border-(--accent)/35 shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
-										>
-											<Award size={12} />
-											{t(`account.profile.showcases.badges.${badgeId}`)}
-										</span>
-									))}
-									{bots.length > 0 && (
-										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-											<Server size={12} />
-											{t('app.users.profile.badges.botDeveloper')}
-										</span>
-									)}
-									{verifiedIssues > 0 && (
-										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-											<Bug size={12} />
-											{t('app.users.profile.badges.bugHunter')} ({verifiedIssues})
-										</span>
-									)}
-									{approvedSuggestions > 0 && (
-										<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-											<Lightbulb size={12} />
-											{t('app.users.profile.badges.contributor')} ({approvedSuggestions})
-										</span>
-									)}
-								</div>
-							)}
 
 							<div className="flex flex-col gap-3">
 								{user?.pronouns && (

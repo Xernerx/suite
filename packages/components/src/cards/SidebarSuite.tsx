@@ -46,7 +46,24 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 						<Link
 							key={sIdx}
 							href={resolvedHref}
-							onClick={onClose}
+							onClick={(e) => {
+								const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+								if (bridge?.openCompanionWindow && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+									e.preventDefault();
+									bridge.openCompanionWindow(resolvedHref);
+									onClose();
+									return;
+								}
+								onClose();
+							}}
+							onAuxClick={(e) => {
+								const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+								if (bridge?.openCompanionWindow && e.button === 1) {
+									e.preventDefault();
+									bridge.openCompanionWindow(resolvedHref);
+									onClose();
+								}
+							}}
 							className="flex items-center rounded-xl font-medium text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)"
 							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
 						>

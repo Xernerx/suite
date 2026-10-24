@@ -443,7 +443,7 @@ export default function Translations({ initialLocale = '' }: { initialLocale?: s
 
 			{loading ? (
 				<div className="flex h-40 items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
-					<Loading />
+					<Loading variant="small" />
 				</div>
 			) : (
 				<>

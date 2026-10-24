@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { LogOut, Settings, Info, User as UserIcon, ExternalLink } from 'lucide-react';
+import { LogOut, Settings, Info, User as UserIcon, ExternalLink, Download } from 'lucide-react';
 import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
 import { Button, CopyButton, Selector } from '@xernerx/ui';
 import { WidgetSettingsCard } from '@xernerx/components';
@@ -18,6 +18,7 @@ export default function Account() {
 	const [isConfirmAccountOpen, setIsConfirmAccountOpen] = useState(false);
 	const [isDeletingData, setIsDeletingData] = useState(false);
 	const [isConfirmDataOpen, setIsConfirmDataOpen] = useState(false);
+	const [isExportingData, setIsExportingData] = useState(false);
 	const activeUser = discordUser || session?.user;
 	const userId = activeUser?.id;
 	const [privacy, setPrivacy] = useState(activeUser?.privacy || 'private');
@@ -156,6 +157,41 @@ export default function Account() {
 				title: t('account.profile.privacy.toast.error'),
 				description: error.message,
 			});
+		}
+	};
+	const handleExportData = async () => {
+		if (!userId) return;
+		setIsExportingData(true);
+		try {
+			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/core/users/${userId}/export`, {
+				method: 'GET',
+				credentials: 'include',
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.error || t('account.account.export.toastError'));
+			}
+			const blob = await res.blob();
+			const url = window.URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'xernerx-data-export.json';
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			window.URL.revokeObjectURL(url);
+			toast({
+				type: 'success',
+				title: t('account.account.export.toastSuccess'),
+			});
+		} catch (error: any) {
+			toast({
+				type: 'error',
+				title: t('account.account.export.toastError'),
+				description: error.message,
+			});
+		} finally {
+			setIsExportingData(false);
 		}
 	};
 
@@ -343,6 +379,37 @@ export default function Account() {
 				</div>
 
 				{userId && <WidgetSettingsCard entityType="users" entityId={userId} entityName={displayName} enabled={Boolean(widgets)} onChange={handleWidgetsChange} />}
+
+				{/* Personal Data Archive Export Card */}
+				<div
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{
+						padding: 'var(--ui-gap)',
+						gap: 'var(--ui-gap)',
+					}}
+				>
+					<div
+						className="flex flex-col max-w-xl"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.25)',
+						}}
+					>
+						<div
+							className="flex items-center text-(--text) font-semibold text-base"
+							style={{
+								gap: 'calc(var(--ui-gap) * 0.5)',
+							}}
+						>
+							<Download size={18} className="text-(--accent)" />
+							<h3>{t('account.account.export.title')}</h3>
+						</div>
+						<p className="text-xs text-(--text-muted)">{t('account.account.export.description')}</p>
+					</div>
+					<Button variant="secondary" onClick={handleExportData} loading={isExportingData} className="gap-2 shrink-0">
+						<Download size={16} />
+						<span>{t('account.account.export.button')}</span>
+					</Button>
+				</div>
 
 				<AccountDangerZone
 					isConfirmDataOpen={isConfirmDataOpen}

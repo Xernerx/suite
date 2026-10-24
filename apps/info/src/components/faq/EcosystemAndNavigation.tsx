@@ -165,13 +165,31 @@ export default function EcosystemAndNavigation({ searchQuery = '' }: { searchQue
 				</div>
 			),
 		},
+		{
+			id: 'card6',
+			title: t('faq.overview.card6.title'),
+			searchableText: `${t('faq.overview.card6.title')} ${t('faq.overview.card6.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.overview.card6.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.exploreBots'), href: 'https://app.xernerx.com/bots', vanity: 'app.xernerx.com/bots/[slug]' },
+							{ label: t('faq.quickLinks.exploreServers'), href: 'https://app.xernerx.com/servers', vanity: 'app.xernerx.com/servers/[slug]' },
+							{ label: t('faq.quickLinks.profileSettings'), href: 'https://account.xernerx.com/?tab=profile', vanity: 'app.xernerx.com/users/[slug]' },
+							{ label: t('faq.quickLinks.creditStore'), href: 'https://store.xernerx.com/?category=credits', vanity: 'store.xernerx.com/?category=credits' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.overview.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-3xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.overview.title')}
 			</HeadingTag>

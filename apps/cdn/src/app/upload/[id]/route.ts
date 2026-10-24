@@ -7,8 +7,8 @@ import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 
 function getCorsHeaders(origin: string | null) {
-	const isLocal = origin?.includes('localhost');
-	const isXernerx = origin?.endsWith('.xernerx.com');
+	const isLocal = origin?.includes('localhost') || origin?.includes('127.0.0.1') || (origin ? /^https?:\/\/(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?::\d+)?$/.test(origin) : false);
+	const isXernerx = origin?.endsWith('.xernerx.com') || (origin ? origin.includes('.dev.') : false);
 
 	const allowedOrigin = isLocal || isXernerx ? origin : 'https://xernerx.com';
 
@@ -109,6 +109,20 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 		const privacy = (formData.get('privacy') as string) || 'private';
 		const rawShared = formData.get('shared') as string;
 		const shared = rawShared ? JSON.parse(rawShared) : [];
+		const folder = ((formData.get('folder') as string) || 'Uncategorized').trim() || 'Uncategorized';
+		const rawTags = formData.get('tags') as string;
+		let tags: string[] = [];
+		if (rawTags) {
+			try {
+				const parsed = JSON.parse(rawTags);
+				tags = Array.isArray(parsed) ? parsed.map((t) => String(t).trim()).filter(Boolean) : [];
+			} catch {
+				tags = rawTags
+					.split(',')
+					.map((t) => t.trim())
+					.filter(Boolean);
+			}
+		}
 
 		if (!file) {
 			return NextResponse.json({ error: 'No file provided' }, { status: 400, headers: corsHeaders });
@@ -131,6 +145,8 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 			uploaderId: targetUserId,
 			privacy: ['public', 'limited', 'private'].includes(privacy) ? privacy : 'private',
 			shared: Array.isArray(shared) ? shared : [],
+			folder,
+			tags,
 		});
 
 		const domain = process.env.DOMAIN || 'xernerx.com';

@@ -5,7 +5,7 @@ import { useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { User, Activity, Terminal, ArrowLeft, Star, Settings } from 'lucide-react';
+import { User, Activity, Terminal, ArrowLeft, Star, Settings, Trophy, Tag } from 'lucide-react';
 import Link from 'next/link';
 
 import Header from '@/components/bots/Header';
@@ -13,6 +13,8 @@ import Profile from '@/components/bots/Profile';
 import Stats from '@/components/bots/Stats';
 import Commands from '@/components/bots/Commands';
 import Reviews from '@/components/bots/Reviews';
+import Milestones from '@/components/bots/Milestones';
+import Releases from '@/components/bots/Releases';
 
 interface BotProfile {
 	id: string;
@@ -27,6 +29,7 @@ interface BotProfile {
 	tags?: string[];
 	links?: Record<string, string>;
 	commands?: any[];
+	releases?: any[];
 	discord?: any;
 	ownersData?: any[];
 }
@@ -48,7 +51,9 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 			{ label: t('app.bots.id.text16'), href: '/bots', icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.bots.tabs.profile'), view: 'profile', icon: User, category: t('app.bots.tabs.categoryBotDetails') },
 			{ label: t('app.bots.tabs.statistics'), view: 'stats', icon: Activity, category: t('app.bots.tabs.categoryBotDetails') },
+			{ label: t('app.bots.tabs.milestones'), view: 'milestones', icon: Trophy, category: t('app.bots.tabs.categoryBotDetails') },
 			{ label: t('app.bots.tabs.commands'), view: 'commands', icon: Terminal, category: t('app.bots.tabs.categoryBotDetails') },
+			{ label: t('app.bots.tabs.releases'), view: 'releases', icon: Tag, category: t('app.bots.tabs.categoryBotDetails') },
 			{ label: t('app.bots.tabs.reviews'), view: 'reviews', icon: Star, category: t('app.bots.tabs.categoryBotDetails') },
 		];
 
@@ -70,10 +75,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 		if (!isReady) return;
 		const fetchBot = async () => {
 			try {
-				const [res, discordRes] = await Promise.all([
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${id}/profile`)),
-					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`)).catch(() => null),
-				]);
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${id}/profile`));
 				if (res.ok) {
 					const botData = await res.json();
 					const uid = (session as any)?.user?.id;
@@ -84,8 +86,14 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 						return;
 					}
 
-					if (discordRes && discordRes.ok) {
-						botData.discord = await discordRes.json();
+					const targetSnowflake = botData.id || id;
+					try {
+						const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${targetSnowflake}/discord`));
+						if (discordRes.ok) {
+							botData.discord = await discordRes.json();
+						}
+					} catch {
+						// Ignore discord fetch failure
 					}
 
 					if (Array.isArray(botData.owners) && botData.owners.length > 0 && (!botData.ownersData || botData.ownersData.length === 0)) {
@@ -138,16 +146,19 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	}
 
 	const currentView = view || 'profile';
+	const resolvedBotId = bot.id || id;
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pb-24">
-			<Header bot={bot} id={id} setBot={setBot} />
+			<Header bot={bot} id={resolvedBotId} setBot={setBot} />
 
 			<div className="mt-4">
 				{currentView === 'profile' && <Profile bot={bot} />}
-				{currentView === 'stats' && <Stats bot={bot} id={id} />}
+				{currentView === 'stats' && <Stats bot={bot} id={resolvedBotId} />}
+				{currentView === 'milestones' && <Milestones bot={bot} id={resolvedBotId} />}
 				{currentView === 'commands' && <Commands bot={bot} />}
-				{currentView === 'reviews' && <Reviews bot={bot} id={id} />}
+				{currentView === 'releases' && <Releases bot={bot} id={resolvedBotId} />}
+				{currentView === 'reviews' && <Reviews bot={bot} id={resolvedBotId} />}
 			</div>
 		</div>
 	);

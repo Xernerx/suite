@@ -4,6 +4,7 @@
 
 import { Bot, Code, Coins, Server, Sparkles, Tag, ShoppingBag } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CatalogCategory, CatalogItem, UserSubscription } from '../components/types';
@@ -164,6 +165,8 @@ export default function StorePage() {
 
 	// Compute discount for current category
 	const categoryMaxDiscount = currentItems.reduce((max, item) => Math.max(max, item.discountPercent || 0), 0);
+
+	if (loading) return <Loading />;
 
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen transition-colors duration-200" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>

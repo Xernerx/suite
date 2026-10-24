@@ -1,9 +1,9 @@
 /** @format */
 'use client';
 
-import { Building2, Compass, Server, ExternalLink, Copy, Check, Trophy } from 'lucide-react';
+import { Building2, Compass, Server, ExternalLink, Copy, Check, Trophy, Rocket } from 'lucide-react';
 import { Confirm, Tabs, Button } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useSession, useSidebar, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSession, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useState, useMemo } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -15,22 +15,15 @@ import Statistics from '@/components/dashboard/Statistics';
 import Links from '@/components/dashboard/Links';
 import VirtueGeneral from '@/components/dashboard/virtue/General';
 import Settings from '@/components/dashboard/Settings';
+import SpotlightBoostModal from '@/components/SpotlightBoostModal';
 
 const VALID_DASHBOARD_TABS = ['info', 'stats', 'links', 'virtue', 'settings'];
 
-type Guild = {
-	id: string;
-	name: string;
-	icon: string | null;
-	iconUrl: string | null;
-	banner: string | null;
-	bannerUrl: string | null;
-	permissions: string;
-	features: string[];
-};
+type Guild = { id: string; name: string; icon: string | null; iconUrl: string | null; banner: string | null; bannerUrl: string | null; permissions: string; features: string[] };
 
 export default function DashboardPage() {
 	const { data: session, status } = useSession();
+	const { mutate: mutateUser } = useUser();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
 	const { view, setNavItems, clearNavItems, show, setView } = useSidebar();
@@ -45,6 +38,7 @@ export default function DashboardPage() {
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 	const [deleteGuildConfirmOpen, setDeleteGuildConfirmOpen] = useState(false);
+	const [boostModalOpen, setBoostModalOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [rateLimited, setRateLimited] = useState(false);
 	const [copiedId, setCopiedId] = useState(false);
@@ -130,18 +124,12 @@ export default function DashboardPage() {
 				}
 
 				const data: Guild[] = await res.json();
-
-				// Filter for Manage Server (0x20) or Administrator (0x8)
 				const managedGuilds = data.filter((guild) => {
 					const perms = BigInt(guild.permissions || 0);
-					const hasAdmin = (perms & BigInt(0x8)) === BigInt(0x8);
-					const hasManageServer = (perms & BigInt(0x20)) === BigInt(0x20);
-					return hasAdmin || hasManageServer;
+					return (perms & BigInt(0x8)) === BigInt(0x8) || (perms & BigInt(0x20)) === BigInt(0x20);
 				});
 
 				setGuilds(managedGuilds);
-
-				// Append guilds to sidebar
 				setNavItems([
 					...staticItems,
 					...managedGuilds.map((g) => ({
@@ -155,12 +143,14 @@ export default function DashboardPage() {
 					})),
 				]);
 
-				// Auto-select requested ?guild= / ?view=server-<id> or first server contextually
 				if (managedGuilds.length > 0) {
 					const params = new URLSearchParams(window.location.search);
-					const requestedGuildId = params.get('guild') || (params.get('view')?.startsWith('server-') ? params.get('view')!.replace('server-', '') : null);
-					const matchedGuild = requestedGuildId ? managedGuilds.find((g) => g.id === requestedGuildId) : null;
-					const initialGuild = matchedGuild || managedGuilds[0];
+					const tabParam = params.get('tab');
+					const requestedGuildId =
+						params.get('guild') ||
+						(params.get('view')?.startsWith('server-') ? params.get('view')!.replace('server-', '') : null) ||
+						(tabParam?.startsWith('server-') ? tabParam.replace('server-', '') : null);
+					const initialGuild = (requestedGuildId ? managedGuilds.find((g) => g.id === requestedGuildId) : null) || managedGuilds[0];
 					setSelectedGuild(initialGuild);
 					setView(`server-${initialGuild.id}`);
 				}
@@ -248,16 +238,20 @@ export default function DashboardPage() {
 					widgets: Boolean(guildConfig.widgets),
 					locale: guildConfig.locale,
 					links: guildConfig.links,
+					vanitySlug: guildConfig.vanitySlug,
 				}),
 			});
 			if (res.ok) {
 				const updated = await res.json();
-				setOriginalGuildConfig(updated);
-				setGuildConfig(updated);
+				const merged = { ...guildConfig, ...updated };
+				setOriginalGuildConfig(merged);
+				setGuildConfig(merged);
+				mutateUser().catch(() => null);
 				toast({ title: t('common.toast.savedSuccess'), type: 'success' });
 				remind(false);
 			} else {
-				toast({ title: t('common.toast.saveFailed'), type: 'error' });
+				const errData = await res.json().catch(() => ({}));
+				toast({ title: t('common.toast.saveFailed'), description: errData.error, type: 'error' });
 			}
 		} catch (error) {
 			console.error('Failed to save config', error);
@@ -369,8 +363,12 @@ export default function DashboardPage() {
 									</button>
 								</div>
 							</div>
-							<div className="relative z-10 flex items-center gap-2 shrink-0">
-								<Link href={`/servers/${selectedGuild.id}`}>
+							<div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
+								<Button variant="primary" onClick={() => setBoostModalOpen(true)} className="gap-2">
+									<Rocket className="w-4 h-4" />
+									{t('app.boost.boostServerBtn')}
+								</Button>
+								<Link href={`/servers/${guildConfig?.vanitySlug || selectedGuild.id}`}>
 									<Button variant="secondary" className="gap-2">
 										<ExternalLink className="w-4 h-4" />
 										{t('app.portal.workspace.viewPublicProfile')}
@@ -414,7 +412,18 @@ export default function DashboardPage() {
 
 								{activeTab === 'virtue' && selectedGuild && <VirtueGeneral id={selectedGuild.id} />}
 
-								{activeTab === 'settings' && <Settings guildConfig={guildConfig} setGuildConfig={setGuildConfig} organizations={organizations} handleDeleteGuild={handleDeleteGuild} />}
+								{activeTab === 'settings' && (
+									<Settings
+										guildConfig={guildConfig}
+										setGuildConfig={setGuildConfig}
+										onVanityUnlocked={() => {
+											setGuildConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+											setOriginalGuildConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+										}}
+										organizations={organizations}
+										handleDeleteGuild={handleDeleteGuild}
+									/>
+								)}
 							</div>
 						) : null}
 					</div>
@@ -447,6 +456,22 @@ export default function DashboardPage() {
 						{t('app.dashboard.text25')}
 					</a>
 				</div>
+			)}
+
+			{selectedGuild && (
+				<SpotlightBoostModal
+					isOpen={boostModalOpen}
+					onClose={() => setBoostModalOpen(false)}
+					targetType="server"
+					targetId={selectedGuild.id}
+					targetName={selectedGuild.name}
+					currentBoostedUntil={guildConfig?.boostedUntil}
+					onBoostSuccess={(boostedUntil) => {
+						setGuildConfig((prev: any) => (prev ? { ...prev, boostedUntil } : prev));
+						setOriginalGuildConfig((prev: any) => (prev ? { ...prev, boostedUntil } : prev));
+						mutateUser().catch(() => null);
+					}}
+				/>
 			)}
 
 			<Confirm

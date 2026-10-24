@@ -58,99 +58,81 @@ export default function StatusClient() {
 		hide();
 	}, [hide]);
 
-	const checkAllServices = useCallback(async () => {
-		if (!isReady) return;
-		setRefreshing(true);
+	const checkAllServices = useCallback(
+		async (forceRefresh = false) => {
+			if (!isReady) return;
+			setRefreshing(true);
 
-		try {
-			const [versionsRes, issuesRes, botsRes, historyRes] = await Promise.all([
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/versions')).catch(() => null),
-				fetch(getEnvUrl('https://api.xernerx.com/info/issues')).catch(() => null),
-				fetch(getEnvUrl('https://api.xernerx.com/info/status/bots'), { cache: 'no-store' }).catch(() => null),
-				fetch(getEnvUrl('https://api.xernerx.com/info/status/history'), { cache: 'no-store' }).catch(() => null),
-			]);
+			try {
+				const historyUrl = forceRefresh ? 'https://api.xernerx.com/info/status/history?refresh=true' : 'https://api.xernerx.com/info/status/history';
+				const [versionsRes, issuesRes, botsRes, historyRes] = await Promise.all([
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/versions')).catch(() => null),
+					fetch(getEnvUrl('https://api.xernerx.com/info/issues')).catch(() => null),
+					fetch(getEnvUrl('https://api.xernerx.com/info/status/bots'), { cache: 'no-store' }).catch(() => null),
+					fetch(getEnvUrl(historyUrl), { cache: 'no-store' }).catch(() => null),
+				]);
 
-			const versionsData = versionsRes && versionsRes.ok ? await versionsRes.json().catch(() => null) : null;
-			const issuesData = issuesRes && issuesRes.ok ? await issuesRes.json().catch(() => null) : null;
-			const botsData = botsRes && botsRes.ok ? await botsRes.json().catch(() => null) : null;
-			const historyData = historyRes && historyRes.ok ? await historyRes.json().catch(() => null) : null;
+				const versionsData = versionsRes && versionsRes.ok ? await versionsRes.json().catch(() => null) : null;
+				const issuesData = issuesRes && issuesRes.ok ? await issuesRes.json().catch(() => null) : null;
+				const botsData = botsRes && botsRes.ok ? await botsRes.json().catch(() => null) : null;
+				const historyData = historyRes && historyRes.ok ? await historyRes.json().catch(() => null) : null;
 
-			if (historyData?.services) setServiceHistory(historyData.services);
-			if (historyData?.bots) setBotHistory(historyData.bots);
+				if (historyData?.services) setServiceHistory(historyData.services);
+				if (historyData?.bots) setBotHistory(historyData.bots);
 
-			if (Array.isArray(issuesData?.data)) {
-				setVerifiedIssues(issuesData.data.filter((issue: any) => issue.status !== 'resolved' && issue.status !== 'closed').slice(0, 6));
-			}
+				if (Array.isArray(issuesData?.data)) {
+					setVerifiedIssues(issuesData.data.filter((issue: any) => issue.status !== 'resolved' && issue.status !== 'closed').slice(0, 6));
+				}
 
-			if (Array.isArray(botsData?.bots)) {
-				setBots(botsData.bots);
-			}
+				if (Array.isArray(botsData?.bots)) {
+					setBots(botsData.bots);
+				}
 
-			const updated = await Promise.all(
-				SUITE_SERVICES.map(async (svc) => {
-					const targetUrl = getEnvUrl(`https://${svc.host}/api/version`);
-					const start = performance.now();
-					let ping: number | null = null;
-					let version: string | null = null;
-					let isUp = false;
+				const updated = await Promise.all(
+					SUITE_SERVICES.map(async (svc) => {
+						const liveSvc = historyData?.liveServices?.[svc.id];
+						const mapSvc = versionsData?.map?.[svc.id];
 
-					try {
-						const controller = new AbortController();
-						const timeout = setTimeout(() => controller.abort(), 5000);
-						const res = await fetch(targetUrl, { signal: controller.signal, cache: 'no-store' });
-						clearTimeout(timeout);
-						if (res.ok) {
-							ping = Math.round(performance.now() - start);
-							const data = await res.json().catch(() => ({}));
-							version = data?.version || null;
-							isUp = true;
+						let ping: number | null = liveSvc?.ping ?? mapSvc?.devLatencyMs ?? mapSvc?.prodLatencyMs ?? mapSvc?.canaryLatencyMs ?? null;
+						let version: string | null = liveSvc?.version ?? mapSvc?.localVersion ?? mapSvc?.devVersion ?? mapSvc?.prodVersion ?? mapSvc?.canaryVersion ?? null;
+						let isUp = Boolean(version || liveSvc?.status === 'operational' || liveSvc?.status === 'degraded');
+
+						if (!isUp) {
+							const targetUrl = getEnvUrl(`https://${svc.host}/api/version`);
+							const start = performance.now();
+							try {
+								const controller = new AbortController();
+								const timeout = setTimeout(() => controller.abort(), 5000);
+								const res = await fetch(targetUrl, { signal: controller.signal, cache: 'no-store' });
+								clearTimeout(timeout);
+								if (res.ok) {
+									ping = Math.round(performance.now() - start);
+									const data = await res.json().catch(() => ({}));
+									version = data?.version || null;
+									isUp = true;
+								}
+							} catch {}
 						}
-					} catch {}
 
-					// Fallback to backend version matrix if direct browser CORS check didn't resolve
-					if (!isUp && versionsData?.apps?.[svc.id]) {
-						const appMatrix = versionsData.apps[svc.id];
-						const activeEnv = appMatrix.production?.online ? appMatrix.production : appMatrix.canary?.online ? appMatrix.canary : appMatrix.dev;
-						if (activeEnv?.online) {
-							isUp = true;
-							version = activeEnv.version || null;
-							ping = activeEnv.ping ?? null;
-						}
-					}
+						const status: ServiceStatus['status'] = !isUp ? 'down' : ping && ping > 1200 ? 'degraded' : 'operational';
 
-					const status: ServiceStatus['status'] = !isUp ? 'down' : ping && ping > 1200 ? 'degraded' : 'operational';
+						return {
+							...svc,
+							status,
+							version,
+							ping,
+						};
+					})
+				);
 
-					return {
-						...svc,
-						status,
-						version,
-						ping,
-					};
-				})
-			);
-
-			setServices(updated);
-			setLastChecked(new Date());
-
-			// Persist current check into the 24h status history bucket
-			fetch(getEnvUrl('https://api.xernerx.com/info/status/history'), {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					services: updated.map((s) => ({ id: s.id, status: s.status, ping: s.ping })),
-					bots: Array.isArray(botsData?.bots) ? botsData.bots.map((b: MainOrgBotStatus) => ({ id: b.id, status: b.status })) : [],
-				}),
-			})
-				.then((r) => (r.ok ? r.json() : null))
-				.then((recorded) => {
-					if (recorded?.services) setServiceHistory(recorded.services);
-					if (recorded?.bots) setBotHistory(recorded.bots);
-				})
-				.catch(() => null);
-		} finally {
-			setRefreshing(false);
-		}
-	}, [isReady, getEnvUrl]);
+				setServices(updated);
+				setLastChecked(new Date());
+			} finally {
+				setRefreshing(false);
+			}
+		},
+		[isReady, getEnvUrl]
+	);
 
 	useEffect(() => {
 		if (isReady) {
@@ -251,7 +233,7 @@ export default function StatusClient() {
 						<Code2 size={15} />
 						{t('info.status.badgeButton')}
 					</Button>
-					<Button variant="secondary" onClick={checkAllServices} disabled={refreshing} className="flex items-center gap-2 shrink-0">
+					<Button variant="secondary" onClick={() => checkAllServices(true)} disabled={refreshing} className="flex items-center gap-2 shrink-0">
 						<RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
 						{t('info.status.refresh')}
 					</Button>

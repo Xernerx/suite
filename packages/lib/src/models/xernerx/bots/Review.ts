@@ -8,7 +8,13 @@ const schema = new Schema(
 		content: { type: String, maxlength: 2000 },
 		upvotes: { type: [String], default: [] },
 		downvotes: { type: [String], default: [] },
+		helpfulUserIds: { type: [String], default: [] },
 		devResponse: { type: String, maxlength: 2000 },
+		reply: {
+			authorId: { type: String },
+			content: { type: String, maxlength: 2000 },
+			updatedAt: { type: Date },
+		},
 	},
 	{ timestamps: true }
 );

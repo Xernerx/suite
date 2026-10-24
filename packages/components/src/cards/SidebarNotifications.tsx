@@ -2,8 +2,8 @@
 // Force recompile 2
 'use client';
 
-import { AlertTriangle, Bell, Check, CheckCircle2, ExternalLink, Info, Loader2, Mail, RefreshCw, Trash2, X } from 'lucide-react';
-import { Notification, useDictionary, useEnvironment, useNotifications, useToast } from '@xernerx/providers';
+import { AlertTriangle, Bell, Check, CheckCircle2, ExternalLink, Gift, Info, Loader2, Mail, RefreshCw, Trash2, X } from 'lucide-react';
+import { Notification, useDictionary, useEnvironment, useNotifications, useSession, useToast, useUser } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
 import { useEffect, useState } from 'react';
 
@@ -11,18 +11,126 @@ import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { useWindowControlsStyle } from '../HeaderWindowControls';
 
+export interface CooldownReminderItem {
+	id: string;
+	kind: 'daily_gift' | 'vote';
+	targetId?: string;
+	targetType?: 'bot' | 'server';
+	title: string;
+	message: string;
+	link: string;
+}
+
+export function getReadyCooldownReminders(activeUser: any, getEnvUrl: (url: string) => string, t: (key: string, vars?: Record<string, string | number>) => string): CooldownReminderItem[] {
+	if (!activeUser) return [];
+	const now = Date.now();
+	const items: CooldownReminderItem[] = [];
+
+	const dailyGiftReminderAt = activeUser?.notifications?.dailyGiftReminderAt;
+	const hasLoadedCredits = Boolean(activeUser?.credits);
+	const giftInTime = hasLoadedCredits && activeUser?.credits?.giftIn ? new Date(activeUser.credits.giftIn).getTime() : null;
+	if (dailyGiftReminderAt && hasLoadedCredits) {
+		const remindMs = new Date(dailyGiftReminderAt).getTime();
+		if ((!Number.isNaN(remindMs) && now >= remindMs) || (giftInTime !== null && Number.isFinite(giftInTime) && now >= giftInTime)) {
+			items.push({
+				id: 'reminder:daily-gift',
+				kind: 'daily_gift',
+				title: t('components.cards.sidebarnotifications.dailyGiftReadyTitle'),
+				message: t('components.cards.sidebarnotifications.dailyGiftReadyDesc'),
+				link: getEnvUrl('https://account.xernerx.com/?tab=billing'),
+			});
+		}
+	}
+
+	const rawVoteReminders = activeUser?.notifications?.voteReminders;
+	const entries: any[] = Array.isArray(rawVoteReminders)
+		? rawVoteReminders
+		: rawVoteReminders && typeof rawVoteReminders === 'object'
+			? Object.entries(rawVoteReminders).map(([k, v]: [string, any]) => (typeof v === 'string' ? { id: k, remindAt: v } : { id: k, ...v }))
+			: [];
+
+	for (const entry of entries) {
+		const rawTime = entry?.remindAt || entry?.nextVoteAt || entry?.expiresAt;
+		if (!rawTime) continue;
+		const remindMs = new Date(rawTime).getTime();
+		if (Number.isNaN(remindMs) || now < remindMs) continue;
+		const rawId = String(entry?.targetId || entry?.botId || entry?.guildId || entry?.id || '');
+		const isServer =
+			entry?.targetType === 'server' || entry?.targetType === 'guild' || entry?.type === 'server' || entry?.type === 'guild' || rawId.startsWith('server:') || rawId.startsWith('guild:');
+		const cleanId = rawId.replace(/^(bot|server|guild):/, '');
+		const targetName = entry?.targetName || entry?.name || cleanId;
+		items.push({
+			id: `reminder:vote:${cleanId}`,
+			kind: 'vote',
+			targetId: cleanId,
+			targetType: isServer ? 'server' : 'bot',
+			title: t('components.cards.sidebarnotifications.voteReadyTitle', { name: targetName }),
+			message: t('components.cards.sidebarnotifications.voteReadyDesc', { name: targetName }),
+			link: getEnvUrl(`https://app.xernerx.com/${isServer ? 'servers' : 'bots'}/${cleanId}`),
+		});
+	}
+
+	return items;
+}
+
 interface SidebarNotificationsProps {
 	isCollapsed: boolean;
 	placement?: 'top' | 'bottom';
 	onClose: () => void;
 }
 
+function formatNotificationDate(iso?: string): string {
+	if (!iso) return '';
+	const date = new Date(iso);
+	if (Number.isNaN(date.getTime())) return '';
+	const now = new Date();
+	const sameYear = date.getFullYear() === now.getFullYear();
+	return date.toLocaleString(undefined, {
+		month: 'short',
+		day: 'numeric',
+		...(sameYear ? {} : { year: 'numeric' }),
+		hour: '2-digit',
+		minute: '2-digit',
+	});
+}
+
 export default function SidebarNotifications({ isCollapsed, placement = 'bottom', onClose }: SidebarNotificationsProps) {
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
 	const { toast } = useToast();
-	const { notifications, unreadCount, markAsRead, markAllAsRead, refresh } = useNotifications();
+	const { notifications, unreadCount, markAsRead, markAsUnread, markAllAsRead, deleteNotification, refresh } = useNotifications();
 	const { isRightAligned } = useWindowControlsStyle();
+	const { user: discordUser, loading: userLoading, mutate: mutateUser } = useUser();
+	const { data: session } = useSession();
+	const activeUser = discordUser || session?.user;
+	const readyReminders = !userLoading && discordUser ? getReadyCooldownReminders(discordUser, getEnvUrl, t) : [];
+	const totalUnread = unreadCount + readyReminders.length;
+
+	const dismissReminder = async (reminder: CooldownReminderItem) => {
+		if (!activeUser?.id) return;
+		try {
+			const nextNotifications = { ...(activeUser.notifications || {}) };
+			if (reminder.kind === 'daily_gift') {
+				nextNotifications.dailyGiftReminderAt = null;
+			} else if (Array.isArray(nextNotifications.voteReminders)) {
+				nextNotifications.voteReminders = nextNotifications.voteReminders.filter((r: any) => String(r?.targetId || r?.id || '').replace(/^(bot|server|guild):/, '') !== reminder.targetId);
+			} else if (nextNotifications.voteReminders && typeof nextNotifications.voteReminders === 'object') {
+				const copy = { ...nextNotifications.voteReminders };
+				delete copy[reminder.targetId || ''];
+				delete copy[`bot:${reminder.targetId}`];
+				delete copy[`server:${reminder.targetId}`];
+				delete copy[`guild:${reminder.targetId}`];
+				nextNotifications.voteReminders = copy;
+			}
+			await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${activeUser.id}`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ notifications: nextNotifications }),
+			});
+			await mutateUser();
+		} catch {}
+	};
 
 	const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
 	const [mounted, setMounted] = useState(false);
@@ -57,24 +165,10 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 		if (!selectedNotification) return;
 		setIsProcessing(true);
 		try {
-			if (selectedNotification.userId === 'global') {
-				const readGlobals = JSON.parse(localStorage.getItem('xernerx-read-globals') || '[]');
-				const newReadGlobals = readGlobals.filter((id: string) => id !== selectedNotification.id);
-				localStorage.setItem('xernerx-read-globals', JSON.stringify(newReadGlobals));
-			} else {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${selectedNotification.id}`), {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify({ status: 'unread' }),
-				});
-				if (!res.ok) throw new Error(t('components.cards.sidebarnotifications.failedMarkUnread'));
-			}
-
-			await refresh();
+			await markAsUnread(selectedNotification.id);
 			setSelectedNotification(null);
 		} catch (err: any) {
-			toast({ title: err.message, type: 'error' });
+			toast({ title: err.message || t('components.cards.sidebarnotifications.failedMarkUnread'), type: 'error' });
 		} finally {
 			setIsProcessing(false);
 		}
@@ -110,24 +204,11 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 		if (!selectedNotification) return;
 		setIsProcessing(true);
 		try {
-			if (selectedNotification.userId === 'global') {
-				const deletedGlobals = JSON.parse(localStorage.getItem('xernerx-deleted-globals') || '[]');
-				if (!deletedGlobals.includes(selectedNotification.id)) {
-					localStorage.setItem('xernerx-deleted-globals', JSON.stringify([...deletedGlobals, selectedNotification.id]));
-				}
-			} else {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/dispatch/${selectedNotification.id}`), {
-					method: 'DELETE',
-					credentials: 'include',
-				});
-				if (!res.ok) throw new Error(t('components.cards.sidebarnotifications.failedDelete'));
-			}
-
-			await refresh();
+			await deleteNotification(selectedNotification.id);
 			setSelectedNotification(null);
 			toast({ title: t('components.cards.sidebarnotifications.notificationDeleted'), type: 'success' });
 		} catch (err: any) {
-			toast({ title: err.message, type: 'error' });
+			toast({ title: err.message || t('components.cards.sidebarnotifications.failedDelete'), type: 'error' });
 		} finally {
 			setIsProcessing(false);
 		}
@@ -171,7 +252,11 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 						<div className="flex items-center gap-2">
 							<Bell size={14} className="text-(--text-muted)" />
 							<span className="text-sm font-semibold text-(--text)">{t('components.cards.sidebarnotifications.text1')}</span>
-							{unreadCount > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-(--accent-red) text-[9px] font-bold text-white">{unreadCount}</span>}
+							{totalUnread > 0 && (
+								<span className="flex min-w-[18px] h-[18px] px-1.5 items-center justify-center rounded-full bg-(--accent-red) text-[10px] font-extrabold leading-none text-white shadow-xs">
+									{totalUnread > 99 ? '99+' : totalUnread}
+								</span>
+							)}
 						</div>
 						<div className="flex items-center gap-2">
 							<button
@@ -205,7 +290,7 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 								filterMode === 'all' ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 							}`}
 						>
-							{t('components.cards.sidebarnotifications.filterAll')} ({notifications.length})
+							{t('components.cards.sidebarnotifications.filterAll')} ({notifications.length + readyReminders.length})
 						</button>
 						<button
 							type="button"
@@ -214,14 +299,42 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 								filterMode === 'unread' ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 							}`}
 						>
-							{t('components.cards.sidebarnotifications.filterUnread')} ({unreadCount})
+							{t('components.cards.sidebarnotifications.filterUnread')} ({totalUnread})
 						</button>
 					</div>
 				</div>
 
 				{/* Notification List */}
 				<div className="flex flex-col max-h-[300px] overflow-y-auto" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					{visibleNotifications.length === 0 ? (
+					{readyReminders.map((reminder) => (
+						<div key={reminder.id} className="flex items-start justify-between gap-2 rounded-2xl bg-(--accent)/10 border border-(--accent)/30 p-2.5">
+							<a
+								href={reminder.link}
+								onClick={() => {
+									dismissReminder(reminder);
+									onClose();
+								}}
+								className="flex items-start gap-2.5 flex-1 min-w-0 text-left"
+							>
+								<div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-(--accent)/20 text-(--accent)">
+									{reminder.kind === 'daily_gift' ? <Gift size={14} /> : <Bell size={14} />}
+								</div>
+								<div className="flex flex-col min-w-0">
+									<span className="text-xs font-bold text-(--text) truncate">{reminder.title}</span>
+									<span className="text-[11px] text-(--text-muted) truncate">{reminder.message}</span>
+								</div>
+							</a>
+							<button
+								type="button"
+								onClick={() => dismissReminder(reminder)}
+								title={t('components.cards.sidebarnotifications.text8')}
+								className="h-6 w-6 shrink-0 flex items-center justify-center rounded-lg text-(--text-muted) hover:text-(--text) hover:bg-(--background)/60 transition-colors cursor-pointer"
+							>
+								<X size={12} />
+							</button>
+						</div>
+					))}
+					{visibleNotifications.length === 0 && readyReminders.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-8 text-(--text-muted)">
 							<Bell size={24} className="opacity-20 mb-2" />
 							<span className="text-xs">{filterMode === 'unread' ? t('components.cards.sidebarnotifications.noUnread') : t('components.cards.sidebarnotifications.text4')}</span>
@@ -238,7 +351,10 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 							>
 								<div className="flex items-center justify-center shrink-0 w-6 mt-0.5">{getIcon(notification.type)}</div>
 								<div className="flex flex-col flex-1 overflow-hidden" style={{ marginLeft: 'calc(var(--ui-gap) * 0.5)' }}>
-									<span className={`text-sm truncate ${!notification.read ? 'font-bold text-(--text)' : 'font-medium text-(--text-muted)'}`}>{notification.title}</span>
+									<div className="flex items-center justify-between gap-2">
+										<span className={`text-sm truncate ${!notification.read ? 'font-bold text-(--text)' : 'font-medium text-(--text-muted)'}`}>{notification.title}</span>
+										{notification.createdAt && <span className="text-[10px] font-medium text-(--text-muted)/80 shrink-0">{formatNotificationDate(notification.createdAt)}</span>}
+									</div>
 									<span className="text-xs text-(--text-muted) truncate mt-0.5">{notification.message}</span>
 								</div>
 								{!notification.read && <div className="shrink-0 h-2 w-2 rounded-full bg-(--accent-red) ml-2 mt-1.5" />}

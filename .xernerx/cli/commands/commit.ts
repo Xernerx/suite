@@ -148,6 +148,12 @@ export default function registerCommit(program: Command) {
 				// Safely ignore git errors if not in a git repo
 			}
 
-			runSync('npx @changesets/cli');
+			const changesetDir = path.resolve(process.cwd(), '.changeset');
+			const existingChangesets = fs.existsSync(changesetDir) ? fs.readdirSync(changesetDir).filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md') : [];
+			if (!process.stdin.isTTY && existingChangesets.length > 0) {
+				runSync('npx @changesets/cli status');
+			} else {
+				runSync('npx @changesets/cli');
+			}
 		});
 }

@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import Image from 'next/image';
 import { User, ShieldCheck, ChevronRight, Server, Users, TrendingUp, Shield, Image as ImageIcon } from 'lucide-react';
+import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary } from '@xernerx/providers';
+import { Markdown } from '@xernerx/ui';
 
 export default function Profile({ organization, bots, servers }: { organization: any; bots: any[]; servers: any[] }) {
 	const { t } = useDictionary();
@@ -20,8 +21,8 @@ export default function Profile({ organization, bots, servers }: { organization:
 		<div className="flex flex-col gap-8">
 			{/* Organization Info Markdown - Now at the top */}
 			{organization.info && (
-				<div className="prose max-w-none prose-headings:font-fredoka bg-(--foreground)/30 p-8 rounded-3xl border border-(--border)/10 shadow-sm mb-4">
-					<ReactMarkdown>{organization.info}</ReactMarkdown>
+				<div className="bg-(--foreground)/30 backdrop-blur-md p-8 rounded-3xl border border-(--border)/10 shadow-sm mb-4">
+					<Markdown>{organization.info}</Markdown>
 				</div>
 			)}
 
@@ -187,25 +188,26 @@ export default function Profile({ organization, bots, servers }: { organization:
 									return (
 										<div className="flex flex-col gap-2">
 											<div className="text-xs font-bold text-(--text-muted) uppercase tracking-widest px-2">{t('app.organization.profile.owner')}</div>
-											<Link
-												href={`/users/${owner.id}`}
-												className="flex items-center gap-3 p-3 rounded-2xl hover:bg-(--background) border border-transparent hover:border-(--border)/10 transition-colors group"
-											>
-												<Image
-													src={
-														owner.avatar
-															? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
-															: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator || 0) % 5}.png`
-													}
-													alt={owner.global_name || owner.username}
-													width={40}
-													height={40}
-													className="rounded-full shadow-sm group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
-												/>
-												<div className="flex flex-col min-w-0">
-													<span className="text-sm font-bold text-(--text) truncate">{owner.global_name || owner.username}</span>
+											<UserProfilePopover userId={owner.id} initialUser={owner} className="w-full">
+												<div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-(--background) border border-transparent hover:border-(--border)/10 transition-colors group w-full">
+													<Image
+														src={
+															owner.avatar
+																? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
+																: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator || 0) % 5}.png`
+														}
+														alt={owner.global_name || owner.username}
+														width={40}
+														height={40}
+														className="rounded-full shadow-sm group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
+													/>
+													<div className="flex flex-col min-w-0">
+														<span className="text-sm font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">
+															{owner.global_name || owner.username}
+														</span>
+													</div>
 												</div>
-											</Link>
+											</UserProfilePopover>
 										</div>
 									);
 								})()}
@@ -219,26 +221,26 @@ export default function Profile({ organization, bots, servers }: { organization:
 										<div key={role.id} className="flex flex-col gap-2">
 											<div className="text-xs font-bold text-(--text-muted) uppercase tracking-widest px-2">{role.name}</div>
 											{roleMembers.map((member: any) => (
-												<Link
-													href={`/users/${member.id}`}
-													key={member.id}
-													className="flex items-center gap-3 p-3 rounded-2xl hover:bg-(--background) border border-transparent hover:border-(--border)/10 transition-colors group"
-												>
-													<Image
-														src={
-															member.avatar
-																? `https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png?size=64`
-																: `https://cdn.discordapp.com/embed/avatars/${Number(member.discriminator || 0) % 5}.png`
-														}
-														alt={member.global_name || member.username}
-														width={40}
-														height={40}
-														className="rounded-full shadow-sm group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
-													/>
-													<div className="flex flex-col min-w-0">
-														<span className="text-sm font-bold text-(--text) truncate">{member.global_name || member.username}</span>
+												<UserProfilePopover key={member.id} userId={member.id} initialUser={member} className="w-full">
+													<div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-(--background) border border-transparent hover:border-(--border)/10 transition-colors group w-full">
+														<Image
+															src={
+																member.avatar
+																	? `https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png?size=64`
+																	: `https://cdn.discordapp.com/embed/avatars/${Number(member.discriminator || 0) % 5}.png`
+															}
+															alt={member.global_name || member.username}
+															width={40}
+															height={40}
+															className="rounded-full shadow-sm group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
+														/>
+														<div className="flex flex-col min-w-0">
+															<span className="text-sm font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">
+																{member.global_name || member.username}
+															</span>
+														</div>
 													</div>
-												</Link>
+												</UserProfilePopover>
 											))}
 										</div>
 									);
@@ -253,26 +255,26 @@ export default function Profile({ organization, bots, servers }: { organization:
 										<div className="flex flex-col gap-2">
 											<div className="text-xs font-bold text-(--text-muted) uppercase tracking-widest px-2">{t('app.organization.profile.members')}</div>
 											{unassignedMembers.map((member: any) => (
-												<Link
-													href={`/users/${member.id}`}
-													key={member.id}
-													className="flex items-center gap-3 p-3 rounded-2xl hover:bg-(--background) border border-transparent hover:border-(--border)/10 transition-colors group"
-												>
-													<Image
-														src={
-															member.avatar
-																? `https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png?size=64`
-																: `https://cdn.discordapp.com/embed/avatars/${Number(member.discriminator || 0) % 5}.png`
-														}
-														alt={member.global_name || member.username}
-														width={40}
-														height={40}
-														className="rounded-full shadow-sm group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
-													/>
-													<div className="flex flex-col min-w-0">
-														<span className="text-sm font-bold text-(--text) truncate">{member.global_name || member.username}</span>
+												<UserProfilePopover key={member.id} userId={member.id} initialUser={member} className="w-full">
+													<div className="flex items-center gap-3 p-3 rounded-2xl hover:bg-(--background) border border-transparent hover:border-(--border)/10 transition-colors group w-full">
+														<Image
+															src={
+																member.avatar
+																	? `https://cdn.discordapp.com/avatars/${member.id}/${member.avatar}.png?size=64`
+																	: `https://cdn.discordapp.com/embed/avatars/${Number(member.discriminator || 0) % 5}.png`
+															}
+															alt={member.global_name || member.username}
+															width={40}
+															height={40}
+															className="rounded-full shadow-sm group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
+														/>
+														<div className="flex flex-col min-w-0">
+															<span className="text-sm font-bold text-(--text) group-hover:text-(--accent) transition-colors truncate">
+																{member.global_name || member.username}
+															</span>
+														</div>
 													</div>
-												</Link>
+												</UserProfilePopover>
 											))}
 										</div>
 									);

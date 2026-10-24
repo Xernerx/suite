@@ -300,18 +300,18 @@ export default function Roadmap() {
 
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 				{['idea', 'planned', 'active', 'released'].map((colStatus) => (
-					<div key={colStatus} className="flex flex-col gap-2 p-2 bg-(--foreground)/10 rounded-2xl">
+					<div key={colStatus} className="flex flex-col gap-2 p-3 bg-(--foreground)/20 backdrop-blur-md border border-(--border)/10 rounded-3xl">
 						<h3 className="font-bold capitalize px-2">{t(`info.roadmap.timeline.status.${colStatus}`)}</h3>
 						{filteredData
 							.filter((i: any) => i.status === colStatus)
 							.map((item: any) => {
 								const resolvedBot = resolveItemBot(item);
 								return (
-									<div key={item.id} className="p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm text-sm flex flex-col gap-2 group">
+									<div key={item.id} className="p-4 rounded-2xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 shadow-sm text-sm flex flex-col gap-2 group">
 										<div className="font-bold">{item.title}</div>
 										<div className="text-(--text-muted) flex items-center gap-1.5 flex-wrap">
 											{resolvedBot ? (
-												<span className="inline-flex items-center gap-1.5 bg-(--foreground)/50 px-2 py-0.5 rounded-full border border-(--border)/10 text-(--text) text-xs font-medium">
+												<span className="inline-flex items-center gap-1.5 bg-(--background)/60 px-2 py-0.5 rounded-full border border-(--border)/10 text-(--text) text-xs font-medium">
 													{resolvedBot.avatarUrl && (
 														<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
 													)}

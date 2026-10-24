@@ -51,6 +51,9 @@ export interface AnnouncementItem {
 		components?: any[];
 	};
 	scheduledFor?: string | null;
+	startsAt?: string | null;
+	expiresAt?: string | null;
+	targetApps?: string[];
 	sentAt?: string | null;
 }
 

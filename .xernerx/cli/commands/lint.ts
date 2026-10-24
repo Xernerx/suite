@@ -136,6 +136,29 @@ export function runSuiteArchitectureLint(): boolean {
 		}
 	}
 
+	// 5. Section 7 — Living Documentation Rule (All apps/api routes must be documented in apps/docs)
+	const apiAppDir = path.join(appsDir, 'api', 'src', 'app');
+	const docsApiComponentsDir = path.join(appsDir, 'docs', 'src', 'components', 'api');
+	if (fs.existsSync(apiAppDir) && fs.existsSync(docsApiComponentsDir)) {
+		const docsApiText = walkFiles(docsApiComponentsDir)
+			.filter((f) => f.endsWith('.ts') || f.endsWith('.tsx'))
+			.map((f) => fs.readFileSync(f, 'utf-8'))
+			.join('\n');
+
+		const apiRouteFiles = walkFiles(apiAppDir).filter((f) => path.basename(f) === 'route.ts');
+		for (const rf of apiRouteFiles) {
+			const routeRel = path
+				.relative(apiAppDir, rf)
+				.replace(/\\/g, '/')
+				.replace(/\/route\.ts$/, '');
+			if (routeRel === 'api/auth/[...nextauth]') continue;
+			const routePath = `/${routeRel}`;
+			if (!docsApiText.includes(routePath)) {
+				errors.push(`[Docs Sync Rule] API route '${routePath}' (apps/api/src/app/${routeRel}/route.ts) is not documented in apps/docs/src/components/api/*.tsx.`);
+			}
+		}
+	}
+
 	if (errors.length > 0) {
 		console.error(`\n[Suite Lint] Found ${errors.length} AGENTS.md compliance violation(s):`);
 		for (const err of errors) {
@@ -145,7 +168,7 @@ export function runSuiteArchitectureLint(): boolean {
 		return false;
 	}
 
-	console.log('[Suite Lint] ✔ All AGENTS.md architecture & localization checks passed (500-line cap, src/components, 3-route API, t() & en-GB.json).');
+	console.log('[Suite Lint] ✔ All AGENTS.md architecture, localization & living documentation checks passed (500-line cap, src/components, 3-route API, t() & en-GB.json, API docs sync).');
 	return true;
 }
 

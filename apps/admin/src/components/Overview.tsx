@@ -304,7 +304,7 @@ export default function Overview() {
 
 					{/* Filter & Environment Toggle Bar */}
 					<div className="flex flex-wrap items-center gap-2">
-						<div className="inline-flex items-center p-1 rounded-xl bg-(--foreground)/40 border border-(--border)/10 text-xs">
+						<div className="inline-flex items-center p-1 rounded-full bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 shadow-xs text-xs">
 							{(
 								[
 									{ id: 'all', label: t('admin.dashboard.overview.filterAll', { count: apps.length }) },
@@ -316,8 +316,8 @@ export default function Overview() {
 									key={tab.id}
 									type="button"
 									onClick={() => setStatusFilter(tab.id)}
-									className={`px-2.5 py-1 rounded-lg font-semibold transition-colors cursor-pointer ${
-										statusFilter === tab.id ? 'bg-(--accent) text-white' : 'text-(--text-muted) hover:text-(--text)'
+									className={`px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer ${
+										statusFilter === tab.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 									}`}
 								>
 									{tab.label}
@@ -325,7 +325,7 @@ export default function Overview() {
 							))}
 						</div>
 
-						<div className="inline-flex items-center p-1 rounded-xl bg-(--foreground)/40 border border-(--border)/10 text-xs">
+						<div className="inline-flex items-center p-1 rounded-full bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 shadow-xs text-xs">
 							{(
 								[
 									{ id: 'all', label: t('admin.dashboard.overview.envAll') },
@@ -338,8 +338,8 @@ export default function Overview() {
 									key={tab.id}
 									type="button"
 									onClick={() => setEnvFilter(tab.id)}
-									className={`px-2.5 py-1 rounded-lg font-semibold transition-colors cursor-pointer ${
-										envFilter === tab.id ? 'bg-(--accent) text-white' : 'text-(--text-muted) hover:text-(--text)'
+									className={`px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer ${
+										envFilter === tab.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 									}`}
 								>
 									{tab.label}
@@ -374,7 +374,9 @@ export default function Overview() {
 			<Modal open={changelogModal.open} onOpenChange={(open) => setChangelogModal((prev) => ({ ...prev, open }))} title={changelogModal.title}>
 				<div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
 					{changelogModal.loading ? (
-						<p className="text-sm text-(--text-muted) py-6 text-center">{t('admin.dashboard.overview.changelogLoading')}</p>
+						<div className="flex justify-center py-6">
+							<Loading variant="small" />
+						</div>
 					) : changelogModal.entries.length === 0 ? (
 						<p className="text-sm text-(--text-muted) py-6 text-center">{t('admin.dashboard.overview.changelogEmpty')}</p>
 					) : (

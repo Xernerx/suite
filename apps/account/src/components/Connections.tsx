@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePlatform, useSession, useToast, useUser } from '@xernerx/providers';
 import { Button, Toggle } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Link as LinkIcon, CheckCircle2, ExternalLink, Code2, AtSign, Video, Tv, Shield, Music, Gamepad2, MessageCircle, Unplug, Plus, Lock } from 'lucide-react';
@@ -63,16 +63,54 @@ const OAUTH_PROVIDERS = [
 export default function Connections() {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
+	const { type } = usePlatform();
 	const { data: session } = useSession();
 	const { user: discordUser, mutate } = useUser();
 	const { toast } = useToast();
 
+	const isApplication = type === 'application';
 	const activeUser = discordUser || session?.user;
 	const userId = (activeUser as any)?.id;
 
 	const [loading, setLoading] = useState(true);
 	const [connections, setConnections] = useState<ConnectedAccount[]>([]);
 	const [busyProvider, setBusyProvider] = useState<string | null>(null);
+	const [discordRpcEnabled, setDiscordRpcEnabled] = useState(true);
+
+	useEffect(() => {
+		if (!isApplication || typeof window === 'undefined') return;
+		const bridge = (window as any).electron;
+		const applyMeta = (meta: any) => {
+			if (meta && typeof meta === 'object' && typeof meta.discordRpc === 'boolean') {
+				setDiscordRpcEnabled(meta.discordRpc);
+			}
+		};
+		if (bridge?.metadata) applyMeta(bridge.metadata);
+		bridge
+			?.getMetadata?.()
+			?.then?.(applyMeta)
+			?.catch?.(() => {});
+		const unsub = bridge?.onMetadataUpdated?.(applyMeta);
+		const handleMetaEvent = (e: Event) => applyMeta((e as CustomEvent)?.detail);
+		window.addEventListener('xernerx:metadata-updated', handleMetaEvent);
+		return () => {
+			window.removeEventListener('xernerx:metadata-updated', handleMetaEvent);
+			unsub?.();
+		};
+	}, [isApplication]);
+
+	const handleToggleDiscordRpc = async (val: boolean | React.ChangeEvent<HTMLInputElement>) => {
+		const next = typeof val === 'boolean' ? val : val.target.checked;
+		setDiscordRpcEnabled(next);
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		try {
+			const updated = await bridge?.updateMetadata?.({ discordRpc: next });
+			if (typeof window !== 'undefined') {
+				window.dispatchEvent(new CustomEvent('xernerx:metadata-updated', { detail: updated || { discordRpc: next } }));
+			}
+			toast({ type: 'success', title: t('account.preferences.toast.updated') });
+		} catch {}
+	};
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
@@ -176,37 +214,51 @@ export default function Connections() {
 			</div>
 
 			{/* Primary Required Login: Discord OAuth2 */}
-			<div
-				className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col sm:flex-row sm:items-center justify-between"
-				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-			>
-				<div className="flex items-center gap-4">
-					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
-						<Shield size={28} />
-					</div>
-					<div>
-						<div className="flex flex-wrap items-center gap-2">
-							<h2 className="text-lg font-bold text-(--text)">Discord</h2>
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
-								<CheckCircle2 size={12} />
-								{t('account.connections.connected')}
-							</span>
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-								<Lock size={11} />
-								{t('account.connections.primaryIdentity')}
-							</span>
+			<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="flex items-center gap-4">
+						<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
+							<Shield size={28} />
 						</div>
-						<p className="text-xs text-(--text-muted) mt-1">
-							{(activeUser as any)?.global_name || (activeUser as any)?.name} (@{(activeUser as any)?.username || 'discord'}) • ID: <code className="font-mono">{userId}</code>
-						</p>
+						<div>
+							<div className="flex flex-wrap items-center gap-2">
+								<h2 className="text-lg font-bold text-(--text)">Discord</h2>
+								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
+									<CheckCircle2 size={12} />
+									{t('account.connections.connected')}
+								</span>
+								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+									<Lock size={11} />
+									{t('account.connections.primaryIdentity')}
+								</span>
+							</div>
+							<p className="text-xs text-(--text-muted) mt-1">
+								{(activeUser as any)?.global_name || (activeUser as any)?.name} (@{(activeUser as any)?.username || 'discord'}) • ID: <code className="font-mono">{userId}</code>
+							</p>
+						</div>
 					</div>
+
+					{userId && (
+						<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com')}/users/${userId}`, '_blank')} className="flex items-center gap-2 shrink-0">
+							<ExternalLink size={15} />
+							{t('account.profile.viewPublicProfile')}
+						</Button>
+					)}
 				</div>
 
-				{userId && (
-					<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com')}/users/${userId}`, '_blank')} className="flex items-center gap-2 shrink-0">
-						<ExternalLink size={15} />
-						{t('account.profile.viewPublicProfile')}
-					</Button>
+				{isApplication && (
+					<div className="flex items-center justify-between pt-3 border-t border-(--border)/10 gap-4">
+						<div className="flex items-center gap-3 min-w-0">
+							<div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
+								<Gamepad2 size={16} />
+							</div>
+							<div className="flex flex-col min-w-0">
+								<span className="text-sm font-semibold text-(--text)">{t('account.preferences.desktopItems.discordRpc.title')}</span>
+								<span className="text-xs text-(--text-muted)">{t('account.preferences.desktopItems.discordRpc.description')}</span>
+							</div>
+						</div>
+						<Toggle checked={discordRpcEnabled} onChange={handleToggleDiscordRpc} suppressHydrationWarning />
+					</div>
 				)}
 			</div>
 

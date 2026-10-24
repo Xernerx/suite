@@ -2,7 +2,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Bug, Compass, ExternalLink, HelpCircle, LifeBuoy, Loader2, MessageCircle, MessageSquare, UserPlus, X } from 'lucide-react';
+import { Bug, Camera, Compass, ExternalLink, HelpCircle, LifeBuoy, Loader2, MessageCircle, MessageSquare, UserPlus, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import { useSidebar } from './SidebarProvider';
@@ -26,7 +26,62 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 	const [isPopoverOpen, setPopoverOpen] = useState(false);
 	const [isJoinModalOpen, setJoinModalOpen] = useState(false);
 	const [isJoining, setIsJoining] = useState(false);
+	const [isSnappingBug, setIsSnappingBug] = useState(false);
 	const popoverRef = useRef<HTMLDivElement>(null);
+
+	const handleReportBugOnPage = async () => {
+		if (typeof window === 'undefined') return;
+		const currentUrl = window.location.href;
+		setPopoverOpen(false);
+		setIsSnappingBug(true);
+
+		// Wait briefly so the support popover and floating button hide before capturing the page
+		await new Promise((resolve) => setTimeout(resolve, 160));
+
+		let uploadedScreenshotUrl = '';
+		const bridge = (window as any).electron;
+		if (bridge?.captureBugReport) {
+			try {
+				const captured = await bridge.captureBugReport({ pageUrl: currentUrl, product: 'App' });
+				const userId = (session as any)?.user?.id;
+				if (captured?.dataUrl && userId) {
+					try {
+						const blobRes = await fetch(captured.dataUrl);
+						const blob = await blobRes.blob();
+						const file = new File([blob], captured.filename || `xernerx-issue-${Date.now()}.png`, { type: 'image/png' });
+						const formData = new FormData();
+						formData.append('file', file);
+						formData.append('privacy', 'limited');
+						formData.append('folder', 'Bug Reports');
+						formData.append('tags', JSON.stringify(['bug', 'support']));
+
+						const uploadRes = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${userId}`), {
+							method: 'POST',
+							body: formData,
+							credentials: 'include',
+						});
+						if (uploadRes.ok) {
+							const data = await uploadRes.json();
+							if (data?.url) uploadedScreenshotUrl = getEnvUrl(data.url);
+						}
+					} catch {}
+				}
+			} catch {}
+		}
+
+		setIsSnappingBug(false);
+
+		const targetBase = getEnvUrl('https://info.xernerx.com/issues');
+		const params = new URLSearchParams({
+			report: '1',
+			page: currentUrl,
+			product: 'App',
+		});
+		if (uploadedScreenshotUrl) {
+			params.set('screenshot', uploadedScreenshotUrl);
+		}
+		window.location.href = `${targetBase}?${params.toString()}`;
+	};
 
 	const openDiscordChannel = () => {
 		const appUrl = `discord://-/channels/${adminServerId}/1136354838872068186`;
@@ -198,7 +253,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 		<SupportContext.Provider value={null}>
 			{children}
 
-			{!isMobileOpen && (
+			{!isMobileOpen && !isSnappingBug && (
 				<div
 					ref={popoverRef}
 					className="fixed z-[9999]"
@@ -236,6 +291,20 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 								</div>
 
 								<div className="flex flex-col gap-1">
+									<button
+										type="button"
+										onClick={handleReportBugOnPage}
+										className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-(--text) bg-(--accent-red)/10 hover:bg-(--accent-red)/20 border border-(--accent-red)/25 transition-colors cursor-pointer mb-0.5"
+									>
+										<div className="flex items-center gap-2.5">
+											<Camera size={15} className="text-(--accent-red)" />
+											<span>{t('common.supportprovider.links.reportBugHere')}</span>
+										</div>
+										<span className="rounded-full bg-(--accent-red)/15 border border-(--accent-red)/30 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-(--accent-red)">
+											{t('common.supportprovider.links.snapBadge')}
+										</span>
+									</button>
+
 									{quickLinks.map((link, idx) => {
 										const IconComp = link.icon;
 										return (

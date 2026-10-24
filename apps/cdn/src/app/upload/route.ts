@@ -41,6 +41,20 @@ export async function POST(req: Request) {
 		// 1. Parse form data
 		const formData = await req.formData();
 		const file = formData.get('file') as File;
+		const folder = ((formData.get('folder') as string) || 'Uncategorized').trim() || 'Uncategorized';
+		const rawTags = formData.get('tags') as string;
+		let tags: string[] = [];
+		if (rawTags) {
+			try {
+				const parsed = JSON.parse(rawTags);
+				tags = Array.isArray(parsed) ? parsed.map((t) => String(t).trim()).filter(Boolean) : [];
+			} catch {
+				tags = rawTags
+					.split(',')
+					.map((t) => t.trim())
+					.filter(Boolean);
+			}
+		}
 
 		if (!file) {
 			return NextResponse.json({ error: 'No file provided' }, { status: 400, headers: corsHeaders });
@@ -70,6 +84,8 @@ export async function POST(req: Request) {
 			uploaderId: 'system-anonymous', // DOES NOT tie to the user!
 			privacy: 'public', // Must be public so admins can view it when reading the bug report
 			shared: [],
+			folder,
+			tags,
 		});
 
 		const domain = process.env.DOMAIN || 'xernerx.com';

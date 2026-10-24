@@ -12,12 +12,15 @@ interface V1SubProps {
 	methodFilter?: string;
 	defaultExpanded?: boolean;
 	onTryRoute?: (method: string, path: string) => void;
+	botId?: string;
 }
 
-export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute }: V1SubProps) {
+export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', methodFilter = 'ALL', defaultExpanded = true, onTryRoute, botId = '' }: V1SubProps) {
 	const { t } = useDictionary();
 
 	if (activeGroup !== 'all' && activeGroup !== 'v1-stats') return null;
+
+	const effectiveBotId = botId.trim() || 'YOUR_BOT_ID';
 
 	const sections = [
 		{
@@ -34,19 +37,24 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst stats = await response.json();\nconsole.log(stats);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X GET "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN"`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst stats = await response.json();\nconsole.log(stats);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/stats', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst stats = await response.json();\nconsole.log(stats);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst currentStats = await stats.getStats();\nconsole.log(currentStats);`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.get(url, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.get(url, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -106,19 +114,24 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {\n    method: 'POST',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1500,\n        shardCount: 2,\n        userCount: 450000\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X POST "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '{"serverCount":1500,"shardCount":2,"userCount":450000}'`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats', {\n    method: 'POST',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1500,\n        shardCount: 2,\n        userCount: 450000\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/stats', {\n    method: 'POST',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1500,\n        shardCount: 2,\n        userCount: 450000\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.postStats({\n    serverCount: 1500,\n    shardCount: 2,\n    userCount: 450000\n});`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "serverCount": 1500,\n    "shardCount": 2,\n    "userCount": 450000\n}\n\nresponse = requests.post(url, json=data, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "serverCount": 1500,\n    "shardCount": 2,\n    "userCount": 450000\n}\n\nresponse = requests.post(url, json=data, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -139,19 +152,24 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats?statId=...', {\n    method: 'PATCH',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1550\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X PATCH "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats?statId=..." \\\n  -H "Authorization: Bearer YOUR_API_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '{"serverCount":1550}'`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats?statId=...', {\n    method: 'PATCH',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1550\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/stats?statId=...', {\n    method: 'PATCH',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify({\n        serverCount: 1550\n    })\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.updateStats('STAT_ENTRY_ID', { serverCount: 1550 });`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats?statId=..."\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "serverCount": 1550\n}\n\nresponse = requests.patch(url, json=data, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats?statId=..."\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN",\n    "Content-Type": "application/json"\n}\ndata = {\n    "serverCount": 1550\n}\n\nresponse = requests.patch(url, json=data, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>
@@ -172,19 +190,24 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 					<CodeBlock
 						tabs={[
 							{
-								label: 'TypeScript',
-								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats?statId=...', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X DELETE "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats?statId=..." \\\n  -H "Authorization: Bearer YOUR_API_TOKEN"`,
 							},
 							{
-								label: 'JavaScript',
-								language: 'javascript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats?statId=...', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/stats?statId=...', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst data = await response.json();\nconsole.log(data);`,
+							},
+							{
+								label: '@xernerx/stats SDK',
+								language: 'typescript',
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.deleteStats('STAT_ENTRY_ID');`,
 							},
 							{
 								label: 'Python',
 								language: 'python',
-								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/YOUR_BOT_ID/stats?statId=..."\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
+								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/stats?statId=..."\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
 							},
 						]}
 					/>

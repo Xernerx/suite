@@ -78,7 +78,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			action: `application.${status}`,
 			category: 'application',
 			targetId: id,
-			targetLabel: config?.title || updatedApplication.targetId || id,
+			targetLabel: config?.name || config?.title || updatedApplication.targetId || id,
 			details: {
 				status,
 				reviewedBy,
@@ -91,7 +91,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			await sendUserNotification({
 				targetId: updatedApplication.ownerId,
 				title: `Application ${status === 'approved' ? 'Approved' : 'Reviewed'}`,
-				message: `Your application for "${config?.title || updatedApplication.targetId}" has been ${status}.${reviewNote ? ` Note: ${reviewNote}` : ''}`,
+				message: `Your application for "${config?.name || config?.title || updatedApplication.targetId}" has been ${status}.${reviewNote ? ` Note: ${reviewNote}` : ''}`,
 				type: status === 'approved' ? 'success' : 'warning',
 				link: 'https://xernerx.com/applications',
 			});

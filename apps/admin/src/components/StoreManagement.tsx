@@ -243,28 +243,28 @@ export default function StoreManagement() {
 
 			{/* Stats Grid */}
 			<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-				<div className="p-4 rounded-2xl border border-(--border)/10 bg-(--foreground)/20">
+				<div className="p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 					<div className="flex items-center gap-2 text-(--text-muted) text-xs mb-1">
 						<Tag size={14} className="text-(--accent)" /> {t('admin.store.stats.totalItems')}
 					</div>
 					<div className="text-2xl font-bold">{items.length}</div>
 				</div>
 
-				<div className="p-4 rounded-2xl border border-(--border)/10 bg-(--foreground)/20">
+				<div className="p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 					<div className="flex items-center gap-2 text-(--text-muted) text-xs mb-1">
 						<CheckCircle2 size={14} className="text-(--accent-green)" /> {t('admin.store.stats.activeItems')}
 					</div>
 					<div className="text-2xl font-bold">{activeItemsCount}</div>
 				</div>
 
-				<div className="p-4 rounded-2xl border border-(--border)/10 bg-(--foreground)/20">
+				<div className="p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 					<div className="flex items-center gap-2 text-(--text-muted) text-xs mb-1">
 						<Percent size={14} className="text-(--accent-orange)" /> {t('admin.store.stats.discounted')}
 					</div>
 					<div className="text-2xl font-bold">{discountedItemsCount}</div>
 				</div>
 
-				<div className="p-4 rounded-2xl border border-(--border)/10 bg-(--foreground)/20">
+				<div className="p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 					<div className="flex items-center gap-2 text-(--text-muted) text-xs mb-1">
 						<Folder size={14} className="text-(--accent)" /> {t('admin.store.stats.categories')}
 					</div>
@@ -273,7 +273,7 @@ export default function StoreManagement() {
 			</div>
 
 			{/* Tabs Switcher */}
-			<div className="flex items-center gap-2 p-1 rounded-full border border-(--border)/10 bg-(--foreground)/30 w-fit">
+			<div className="flex items-center gap-2 p-1 rounded-full border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs w-fit">
 				<button
 					onClick={() => setActiveTab('items')}
 					className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer ${

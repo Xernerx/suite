@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import { UserProfilePopover } from '@xernerx/components';
 import { Button, Input } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { ScrollText, RefreshCw, Shield, Bug, Inbox, Ticket, Server, User, Clock, Download, Copy, Check, ExternalLink } from 'lucide-react';
@@ -229,16 +230,15 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 									<div className="flex flex-col gap-1 min-w-0">
 										<div className="flex flex-wrap items-center gap-2">
 											{/^\d{17,20}$/.test(log.actorId || '') ? (
-												<a
-													href={`${getEnvUrl('https://app.xernerx.com')}/users/${log.actorId}`}
-													target="_blank"
-													rel="noopener noreferrer"
-													title={t('admin.dashboard.audit.viewActorProfile')}
-													className="inline-flex items-center gap-1 font-bold text-sm text-(--text) hover:text-(--accent) transition-colors"
-												>
-													<span>{log.actorName || log.actorId}</span>
-													<ExternalLink size={12} className="opacity-60" />
-												</a>
+												<UserProfilePopover userId={log.actorId} initialUser={{ id: log.actorId, name: log.actorName || log.actorId }}>
+													<span
+														title={t('admin.dashboard.audit.viewActorProfile')}
+														className="inline-flex items-center gap-1 font-bold text-sm text-(--text) hover:text-(--accent) transition-colors"
+													>
+														<span>{log.actorName || log.actorId}</span>
+														<ExternalLink size={12} className="opacity-60" />
+													</span>
+												</UserProfilePopover>
 											) : (
 												<span className="font-bold text-sm text-(--text)">{log.actorName || log.actorId}</span>
 											)}

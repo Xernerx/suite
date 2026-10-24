@@ -4,6 +4,7 @@
 
 import { AlertCircle, Check, Sparkles, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Loading } from '@xernerx/feedback';
 import { useDictionary } from '@xernerx/providers';
 import { CatalogItem, UserSubscription } from './types';
 
@@ -83,7 +84,9 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 			)}
 
 			{userLoading ? (
-				<div className="w-full py-3 px-4 rounded-xl bg-(--background) text-(--text-muted) text-center text-sm animate-pulse">{t('account.store.buttons.loading')}</div>
+				<div className="w-full py-2 flex items-center justify-center">
+					<Loading variant="small" />
+				</div>
 			) : currentSub ? (
 				<div className="space-y-2">
 					<button

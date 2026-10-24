@@ -15,6 +15,8 @@ const hookSchema = new Schema(
 const schema = new Schema(
 	{
 		guild: { type: String }, // Discord guild ID (optional, if tied to a server)
+		vanitySlug: { type: String, trim: true, lowercase: true, sparse: true },
+		vanityUnlocked: { type: Boolean, default: false },
 		name: { type: String, required: true }, // Organization name
 		icon: { type: String }, // Organization icon URL (optional)
 		iconUrl: { type: String }, // New custom avatar CDN URL
@@ -46,6 +48,22 @@ const schema = new Schema(
 			default: [],
 		},
 		hooks: { type: [hookSchema], default: [] }, // List of webhooks
+		treasuryBalance: { type: Number, default: 0, min: 0 }, // Shared Organization Credit Pool
+		treasuryLedger: {
+			type: [
+				{
+					id: { type: String },
+					userId: { type: String },
+					username: { type: String },
+					type: { type: String, enum: ['deposit', 'boost', 'vanity'], default: 'deposit' },
+					amount: { type: Number, default: 0 },
+					targetId: { type: String, default: null },
+					targetName: { type: String, default: null },
+					createdAt: { type: Date, default: Date.now },
+				},
+			],
+			default: [],
+		},
 	},
 	{ timestamps: true }
 );

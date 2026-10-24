@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { Users, User, Trash2, Copy, Check } from 'lucide-react';
+import { UserProfilePopover } from '@xernerx/components';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import Image from 'next/image';
@@ -215,25 +216,27 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 						<div className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 							<div className="flex items-center justify-between text-sm">
 								<div className="flex items-center gap-2 flex-wrap">
-									<Link href={`/users/${selectedOrg.owner}`} className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-										{memberProfiles[selectedOrg.owner]?.avatar ? (
-											<Image
-												src={`https://cdn.discordapp.com/avatars/${selectedOrg.owner}/${memberProfiles[selectedOrg.owner].avatar}.png`}
-												alt="Avatar"
-												width={24}
-												height={24}
-												unoptimized
-												className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-											/>
-										) : (
-											<div className="w-6 h-6 rounded-full bg-(--accent)/10 flex items-center justify-center border border-(--accent)/20 shadow-sm">
-												<User className="w-3 h-3 text-(--accent)" />
-											</div>
-										)}
-										<span className="font-medium">
-											{memberProfiles[selectedOrg.owner]?.global_name || memberProfiles[selectedOrg.owner]?.username || t('app.portal.members.unknownUser')}
-										</span>
-									</Link>
+									<UserProfilePopover userId={selectedOrg.owner} initialUser={memberProfiles[selectedOrg.owner]}>
+										<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
+											{memberProfiles[selectedOrg.owner]?.avatar ? (
+												<Image
+													src={`https://cdn.discordapp.com/avatars/${selectedOrg.owner}/${memberProfiles[selectedOrg.owner].avatar}.png`}
+													alt="Avatar"
+													width={24}
+													height={24}
+													unoptimized
+													className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+												/>
+											) : (
+												<div className="w-6 h-6 rounded-full bg-(--accent)/10 flex items-center justify-center border border-(--accent)/20 shadow-sm">
+													<User className="w-3 h-3 text-(--accent)" />
+												</div>
+											)}
+											<span className="font-medium">
+												{memberProfiles[selectedOrg.owner]?.global_name || memberProfiles[selectedOrg.owner]?.username || t('app.portal.members.unknownUser')}
+											</span>
+										</div>
+									</UserProfilePopover>
 									<button
 										type="button"
 										onClick={() => handleCopyMemberId(selectedOrg.owner)}
@@ -252,25 +255,27 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 								orgConfig.members.map((memberId: string) => (
 									<div key={memberId} className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-(--border)/5">
 										<div className="flex items-center gap-2 flex-wrap">
-											<Link href={`/users/${memberId}`} className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-												{memberProfiles[memberId]?.avatar ? (
-													<Image
-														src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
-														alt="Avatar"
-														width={24}
-														height={24}
-														unoptimized
-														className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-													/>
-												) : (
-													<div className="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm">
-														<User className="w-3 h-3 text-(--text-muted)" />
-													</div>
-												)}
-												<span className="font-medium">
-													{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
-												</span>
-											</Link>
+											<UserProfilePopover userId={memberId} initialUser={memberProfiles[memberId]}>
+												<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
+													{memberProfiles[memberId]?.avatar ? (
+														<Image
+															src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
+															alt="Avatar"
+															width={24}
+															height={24}
+															unoptimized
+															className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+														/>
+													) : (
+														<div className="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm">
+															<User className="w-3 h-3 text-(--text-muted)" />
+														</div>
+													)}
+													<span className="font-medium">
+														{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
+													</span>
+												</div>
+											</UserProfilePopover>
 											<button
 												type="button"
 												onClick={() => handleCopyMemberId(memberId)}
@@ -297,23 +302,25 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 									return (
 										<div key={app.id} className="flex items-center justify-between text-sm mt-2 first:mt-0 pt-2 first:pt-0 border-t first:border-t-0 border-(--border)/5">
 											<div className="flex items-center gap-2 flex-wrap">
-												<Link href={`/users/${app.userId}`} className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-													{profile?.avatar ? (
-														<Image
-															src={`https://cdn.discordapp.com/avatars/${app.userId}/${profile.avatar}.png`}
-															alt={profile?.global_name || profile?.username || ''}
-															width={24}
-															height={24}
-															unoptimized
-															className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-														/>
-													) : (
-														<div className="w-6 h-6 rounded-full bg-(--foreground)/30 flex items-center justify-center border border-(--border)/10 shadow-sm text-(--text-muted)">
-															<User className="w-3 h-3 text-(--text-muted)" />
-														</div>
-													)}
-													<span className="font-medium">{profile?.global_name || profile?.username || t('app.portal.members.unknownUser')}</span>
-												</Link>
+												<UserProfilePopover userId={app.userId} initialUser={profile}>
+													<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
+														{profile?.avatar ? (
+															<Image
+																src={`https://cdn.discordapp.com/avatars/${app.userId}/${profile.avatar}.png`}
+																alt={profile?.global_name || profile?.username || ''}
+																width={24}
+																height={24}
+																unoptimized
+																className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+															/>
+														) : (
+															<div className="w-6 h-6 rounded-full bg-(--foreground)/30 flex items-center justify-center border border-(--border)/10 shadow-sm text-(--text-muted)">
+																<User className="w-3 h-3 text-(--text-muted)" />
+															</div>
+														)}
+														<span className="font-medium">{profile?.global_name || profile?.username || t('app.portal.members.unknownUser')}</span>
+													</div>
+												</UserProfilePopover>
 												<button
 													type="button"
 													onClick={() => handleCopyMemberId(app.userId)}

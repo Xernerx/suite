@@ -13,7 +13,7 @@ function getCorsHeaders(origin: string | null) {
 
 	return {
 		'Access-Control-Allow-Origin': allowedOrigin || '*',
-		'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+		'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
 		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 		'Access-Control-Allow-Credentials': 'true',
 	};
@@ -40,6 +40,8 @@ export async function GET(req: Request) {
 
 		const url = new URL(req.url);
 		const reqAdmin = url.searchParams.get('admin') === 'true';
+		const folderParam = url.searchParams.get('folder');
+		const tagParam = url.searchParams.get('tag');
 
 		let query: any = {};
 
@@ -58,6 +60,13 @@ export async function GET(req: Request) {
 			}
 		} else {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
+		}
+
+		if (folderParam && folderParam !== 'all') {
+			query.folder = folderParam;
+		}
+		if (tagParam) {
+			query.tags = tagParam;
 		}
 		const [userMedia, activeSubscriptions, creditDoc] = await Promise.all([
 			MediaModel.find(query).sort({ createdAt: -1 }).lean(),
@@ -104,5 +113,42 @@ export async function GET(req: Request) {
 	} catch (error: any) {
 		console.error('Failed to fetch media:', error);
 		return NextResponse.json({ error: 'Failed to fetch media' }, { status: 500, headers: corsHeaders });
+	}
+}
+
+export async function PATCH(req: Request) {
+	const origin = req.headers.get('origin');
+	const corsHeaders = getCorsHeaders(origin);
+
+	try {
+		const session = await getServerSession(auth);
+		const userId = (session?.user as any)?.id;
+		if (!userId) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
+		}
+
+		const body = await req.json().catch(() => ({}));
+		const ids: string[] = Array.isArray(body.ids) ? body.ids : [];
+		if (ids.length === 0) {
+			return NextResponse.json({ error: 'No media IDs provided' }, { status: 400, headers: corsHeaders });
+		}
+
+		const { models } = await database('xernerx');
+		const user = await models.users.User.findOne({ id: userId }).lean();
+		const roles = await models.core.Role.find({ id: { $in: user?.roles || [] } });
+		const canManage = roles.some((r) => r.permissions?.manageMedia);
+
+		const updateFields: Record<string, any> = {};
+		if (body.privacy !== undefined) updateFields.privacy = body.privacy;
+		if (body.folder !== undefined) updateFields.folder = String(body.folder).trim() || 'Uncategorized';
+		if (body.tags !== undefined) updateFields.tags = Array.isArray(body.tags) ? body.tags : [];
+
+		const filter: any = { _id: { $in: ids } };
+		if (!canManage) filter.uploaderId = userId;
+
+		await models.core.Media.updateMany(filter, { $set: updateFields });
+		return NextResponse.json({ success: true }, { headers: corsHeaders });
+	} catch (error: any) {
+		return NextResponse.json({ error: error.message || 'Bulk update failed' }, { status: 500, headers: corsHeaders });
 	}
 }

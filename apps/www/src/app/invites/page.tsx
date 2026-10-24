@@ -5,6 +5,7 @@ import { ArrowUpRight, Link as LinkIcon, Loader2, Copy, Check } from 'lucide-rea
 import Image from 'next/image';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import { Input } from '@xernerx/ui';
 
 interface Invite {
@@ -68,6 +69,8 @@ export default function InvitesPage() {
 		setTimeout(() => setCopiedId((prev) => (prev === id ? null : prev)), 2000);
 	};
 
+	if (loading) return <Loading />;
+
 	return (
 		<div className="min-h-screen py-32 relative">
 			<div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -78,18 +81,14 @@ export default function InvitesPage() {
 						</h1>
 						<p className="text-lg text-(--text-muted) max-w-2xl leading-relaxed">{t('www.invites.description')}</p>
 					</div>
-					{!loading && invites.length > 0 && (
+					{invites.length > 0 && (
 						<div className="w-full md:max-w-sm">
 							<Input variant="search" shortcut={true} placeholder={t('www.invites.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
 						</div>
 					)}
 				</div>
 
-				{loading ? (
-					<div className="flex justify-center items-center py-24">
-						<Loader2 className="w-8 h-8 animate-spin text-(--accent)" />
-					</div>
-				) : invites.length === 0 ? (
+				{invites.length === 0 ? (
 					<div className="text-center py-32 rounded-3xl bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10">
 						<p className="text-(--text-muted)">{t('www.invites.empty')}</p>
 					</div>

@@ -19,4 +19,6 @@
 
 1. **Legal Policy Versioning (`terms` & `privacy`):**
     - When modifying `src/app/terms/*`, `src/app/privacy/*`, or their dictionary strings under `www.terms.*` / `www.privacy.*`, `pnpm suite commit` will prompt to bump `TERMS_VERSION` or `PRIVACY_VERSION` in `packages/components/src/TermsPrompt.tsx` so users are re-prompted for consent.
-2. **Localization (`DictionaryProvider` & `t`):** All marketing and legal copy must use `useDictionary()` (`www.*` namespace in `packages/lib/src/dictionaries/en-GB.json`). Always inspect `packages/providers/src/DictionaryProvider.tsx` to verify how `t(path, variables?)` operates rather than guessing its signature.
+2. **Keep `/download` Preview Conformant with Actual App UI:**
+    - Whenever any UI, layout, header, sidebar, overlay, or desktop feature changes across `@xernerx/components`, `apps/app`, or `clients/desktop`, update `src/app/download/page.tsx`, `src/components/DesktopInteractivePreview.tsx`, and `src/components/DesktopPerksBento.tsx` so the interactive showcase always matches how the real application looks.
+3. **Localization (`DictionaryProvider` & `t`):** All marketing and legal copy must use `useDictionary()` (`www.*` namespace in `packages/lib/src/dictionaries/en-GB.json`). Always inspect `packages/providers/src/DictionaryProvider.tsx` to verify how `t(path, variables?)` operates rather than guessing its signature.

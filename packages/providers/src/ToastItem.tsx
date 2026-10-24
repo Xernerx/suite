@@ -74,11 +74,13 @@ export function ToastItem({
 	const icons = {
 		success: <CheckCircle className="text-(--accent-green)" size={20} />,
 		error: <AlertCircle className="text-(--accent-red)" size={20} />,
+		warning: <AlertCircle className="text-(--accent-orange)" size={20} />,
 		info: <Info className="text-(--accent)" size={20} />,
 	};
 	const progressColors = {
 		success: 'bg-(--accent-green)',
 		error: 'bg-(--accent-red)',
+		warning: 'bg-(--accent-orange)',
 		info: 'bg-(--accent)',
 	};
 

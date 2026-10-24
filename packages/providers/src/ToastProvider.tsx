@@ -12,7 +12,7 @@ import { ToastItem, formatErrorPayload } from './ToastItem';
 // Types & Context
 // -----------------------------------------------------------------------------
 
-export type ToastType = 'success' | 'error' | 'info';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 export interface Toast {
 	id: string;
 	title: string;

@@ -5,6 +5,7 @@ import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { randomUUID } from 'crypto';
+import { collectBotDeliveries } from '@/lib/webhookDispatcher';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -16,7 +17,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		const HookModel = (db.models.bots as any).Hook;
 
 		const hooks = await HookModel.find({ botId: id }).lean();
-		return NextResponse.json(hooks, { status: 200 });
+		const deliveries = collectBotDeliveries(hooks);
+
+		return NextResponse.json({ hooks, deliveries }, { status: 200 });
 	} catch (error) {
 		console.error('Failed to fetch hooks:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -30,7 +33,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 		const { id } = await params;
 		const body = await request.json();
-		const hooks = Array.isArray(body) ? body : [];
+		const hooks = Array.isArray(body) ? body : Array.isArray(body?.hooks) ? body.hooks : [];
 
 		const db = await database('xernerx');
 		const BotProfileModel = (db.models.bots as any).Bot;
@@ -58,6 +61,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 			return NextResponse.json({ error: 'Webhook URL cannot be empty.' }, { status: 400 });
 		}
 
+		const existingHooks = await HookModel.find({ botId: id }).lean();
+		const deliveriesByUrl = new Map<string, any[]>();
+		for (const existing of existingHooks) {
+			if (existing.url && Array.isArray(existing.deliveries) && existing.deliveries.length > 0) {
+				const prev = deliveriesByUrl.get(existing.url) || [];
+				deliveriesByUrl.set(existing.url, [...prev, ...existing.deliveries].slice(-25));
+			}
+		}
+
 		await HookModel.deleteMany({ botId: id });
 		if (hooks.length > 0) {
 			await HookModel.insertMany(
@@ -66,11 +78,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 					botId: id,
 					url: h.url,
 					events: h.events || [],
+					deliveries: Array.isArray(h.deliveries) && h.deliveries.length > 0 ? h.deliveries.slice(-25) : deliveriesByUrl.get(h.url) || [],
 				}))
 			);
 		}
 
-		return NextResponse.json({ success: true, message: 'Hooks synced successfully' }, { status: 200 });
+		const updatedHooks = await HookModel.find({ botId: id }).lean();
+		const deliveries = collectBotDeliveries(updatedHooks);
+
+		return NextResponse.json({ success: true, message: 'Hooks synced successfully', hooks: updatedHooks, deliveries }, { status: 200 });
 	} catch (error) {
 		console.error('Failed to sync hooks:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

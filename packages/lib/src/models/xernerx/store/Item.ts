@@ -18,7 +18,7 @@ const schema = new Schema(
 		creditAmount: { type: Number, default: 0, min: 0 },
 		perkType: {
 			type: String,
-			enum: ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge'],
+			enum: ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge', 'streak_shield', 'boost_bot', 'boost_server', 'vanity_url'],
 			default: 'none',
 		},
 		perkValue: { type: Schema.Types.Mixed, default: null },

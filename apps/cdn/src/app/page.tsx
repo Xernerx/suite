@@ -1,17 +1,17 @@
 /** @format */
 'use client';
 
-import { useDictionary, useEnvironment, usePermissions, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useLoading, usePermissions, useSidebar, useToast } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Check, Copy, ExternalLink, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import Banner from '@/../public/banner.svg';
-
 export default function Home() {
+	const { hide } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
+	const { setBackgroundMode, setDotVariant } = useLoading();
 	const { permissions } = usePermissions();
 	const { toast } = useToast();
 	const [uploading, setUploading] = useState(false);
@@ -20,6 +20,17 @@ export default function Home() {
 	const [copied, setCopied] = useState(false);
 
 	const canManage = permissions.manageMedia;
+
+	useEffect(() => {
+		hide();
+		setBackgroundMode('sticky-ripple');
+		setDotVariant('full');
+
+		return () => {
+			setBackgroundMode(null);
+			setDotVariant(null);
+		};
+	}, [hide, setBackgroundMode, setDotVariant]);
 
 	const uploadFile = useCallback(
 		async (file: File) => {
@@ -168,21 +179,8 @@ export default function Home() {
 						)}
 					</motion.div>
 
-					{/* RIGHT: BANNER VISUAL */}
-					<motion.div
-						initial={{ opacity: 1, scale: 1, rotate: 0 }}
-						animate={{ opacity: 1, scale: 1, rotate: 0 }}
-						transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-						className="relative flex justify-center items-center w-full"
-					>
-						<motion.div
-							animate={{ y: [-15, 15, -15] }}
-							transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-							className="w-full relative z-10 scale-[1.25] lg:scale-[1.4] origin-center pl-8 lg:pl-16"
-						>
-							<Banner className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-2xl text-(--text)" />
-						</motion.div>
-					</motion.div>
+					{/* RIGHT: OPEN STAGE FOR APPLAYOUT STICKY REACTIVE DOT-MATRIX LOGO */}
+					<div className="hidden lg:block min-h-[320px] w-full pointer-events-none" />
 				</div>
 			</section>
 		</div>

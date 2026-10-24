@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, Check, Copy, RotateCcw } from 'lucide-react';
+import { Check, Copy, RotateCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useLoading } from '@xernerx/providers';
+import { XernerxDotLogo } from './XernerxDotLogo';
 
 export function Error({
 	error,
@@ -15,11 +16,18 @@ export function Error({
 	reset: () => void;
 }) {
 	const { t } = useDictionary();
+	const { setBackgroundMode, setDotVariant } = useLoading();
 	const [copied, setCopied] = useState(false);
 
 	useEffect(() => {
 		console.warn('Route Error:', error?.message || error);
-	}, [error]);
+		setBackgroundMode('sticky-ripple');
+		setDotVariant('error');
+		return () => {
+			setBackgroundMode(null);
+			setDotVariant(null);
+		};
+	}, [error, setBackgroundMode, setDotVariant]);
 
 	const buildFullErrorString = () => {
 		const lines = [
@@ -53,8 +61,8 @@ export function Error({
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				<div className="rounded-2xl bg-(--accent-red)/10 p-4 border border-(--accent-red)/20">
-					<AlertTriangle size={32} className="text-(--accent-red)" />
+				<div className="rounded-2xl bg-(--accent-red)/10 p-3 border border-(--accent-red)/20 w-24 flex items-center justify-center">
+					<XernerxDotLogo variant="error" width={88} height={72} cols={28} showAmbientField={false} ripple={true} className="w-full" />
 				</div>
 
 				<div

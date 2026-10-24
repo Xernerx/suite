@@ -13,6 +13,7 @@ const schema = new Schema(
 		upvotes: { type: [String], default: [] }, // Array of user IDs who upvoted
 		downvotes: { type: [String], default: [] }, // Array of user IDs who downvoted
 		status: { type: String, enum: ['pending', 'accepted', 'declined', 'implemented'], default: 'pending' },
+		bountyAwarded: { type: Boolean, default: false }, // Tracks whether the +250 Credit suggestion bounty has been granted to authorId
 	},
 	{ timestamps: true }
 );

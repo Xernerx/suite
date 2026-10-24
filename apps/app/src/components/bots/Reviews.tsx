@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useEnvironment, useUser, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input } from '@xernerx/ui';
@@ -166,7 +167,7 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 	if (reviewsLoading) {
 		return (
 			<div className="flex justify-center p-12 bg-(--foreground)/50 border border-(--border)/10 rounded-3xl">
-				<Loading />
+				<Loading variant="small" />
 			</div>
 		);
 	}
@@ -336,23 +337,27 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 				{displayedReviews.map((review) => (
 					<div key={review._id} className="p-6 bg-(--foreground)/50 border border-(--border)/10 rounded-3xl flex flex-col gap-3">
 						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-3">
-								<Image
-									src={
-										review.user?.avatar
-											? `https://cdn.discordapp.com/avatars/${review.userId}/${review.user.avatar}.png?size=64`
-											: `https://cdn.discordapp.com/embed/avatars/${review.user?.discriminator ? Number(review.user.discriminator) % 5 : 0}.png`
-									}
-									alt="Avatar"
-									width={32}
-									height={32}
-									className="rounded-full object-cover"
-								/>
-								<div className="flex flex-col">
-									<span className="font-bold text-sm">{review.user?.global_name || review.user?.username || t('common.unknownUser')}</span>
-									<span className="text-xs text-(--text-muted)">{new Date(review.createdAt).toLocaleDateString()}</span>
+							<UserProfilePopover userId={review.userId} initialUser={review.user}>
+								<div className="flex items-center gap-3 group">
+									<Image
+										src={
+											review.user?.avatar
+												? `https://cdn.discordapp.com/avatars/${review.userId}/${review.user.avatar}.png?size=64`
+												: `https://cdn.discordapp.com/embed/avatars/${review.user?.discriminator ? Number(review.user.discriminator) % 5 : 0}.png`
+										}
+										alt="Avatar"
+										width={32}
+										height={32}
+										className="rounded-full object-cover group-hover:ring-2 group-hover:ring-(--accent)/50 transition-all"
+									/>
+									<div className="flex flex-col text-left">
+										<span className="font-bold text-sm group-hover:text-(--accent) transition-colors">
+											{review.user?.global_name || review.user?.username || t('common.unknownUser')}
+										</span>
+										<span className="text-xs text-(--text-muted)">{new Date(review.createdAt).toLocaleDateString()}</span>
+									</div>
 								</div>
-							</div>
+							</UserProfilePopover>
 							<div className="flex items-center text-(--accent)">
 								{[...Array(5)].map((_, i) => (
 									<Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'text-(--border)/30'}`} />

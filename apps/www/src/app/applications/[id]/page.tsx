@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 import { Loader2, ArrowLeft, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEnvironment, useUser, useToast, useSidebar, useDictionary } from '@xernerx/providers';
-import { Button, Input, Selector, Toggle } from '@xernerx/ui';
+import { Loading } from '@xernerx/feedback';
+import { Button, Check, Input, Selector } from '@xernerx/ui';
 import Link from 'next/link';
 
 interface Question {
@@ -135,12 +136,7 @@ export default function ApplicationFormPage() {
 	};
 
 	if (loading) {
-		return (
-			<div className="flex flex-col items-center justify-center min-h-screen">
-				<h1 className="sr-only">{t('www.applications.title')}</h1>
-				<Loader2 className="w-10 h-10 animate-spin text-(--accent)" />
-			</div>
-		);
+		return <Loading />;
 	}
 
 	if (error || !config) {
@@ -247,7 +243,7 @@ export default function ApplicationFormPage() {
 													key={oIdx}
 													className="flex items-center gap-3 cursor-pointer p-3 rounded-2xl border border-(--border)/10 hover:bg-(--border)/5 transition-colors"
 												>
-													<Toggle size="sm" checked={answers[q.id] === opt} onChange={() => handleAnswerChange(q.id, opt)} />
+													<Check size="sm" variant="circle" checked={answers[q.id] === opt} onChange={() => handleAnswerChange(q.id, opt)} />
 													<span className="text-sm">{opt}</span>
 												</label>
 											))}
@@ -258,7 +254,7 @@ export default function ApplicationFormPage() {
 										<div className="flex flex-col gap-2">
 											{q.options?.map((opt, oIdx) => (
 												<label key={oIdx} className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-(--border)/10 hover:bg-(--border)/5 transition-colors">
-													<Toggle size="sm" checked={(answers[q.id] || []).includes(opt)} onChange={(e) => handleCheckboxToggle(q.id, opt, e.target.checked)} />
+													<Check size="sm" checked={(answers[q.id] || []).includes(opt)} onChange={(e) => handleCheckboxToggle(q.id, opt, e.target.checked)} />
 													<span className="text-sm">{opt}</span>
 												</label>
 											))}

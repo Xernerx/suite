@@ -49,6 +49,13 @@ export function ApiOverviewAndAuth({
 			badge: t('docs.api.common.badgeInternal'),
 			badgeClass: 'bg-(--accent)/15 text-(--accent) border-(--accent)/30',
 		},
+		{
+			key: 'local',
+			title: t('docs.api.common.localEndpoint'),
+			url: 'http://localhost:4001',
+			badge: t('docs.api.common.badgeLocal'),
+			badgeClass: 'bg-(--accent)/15 text-(--accent) border-(--accent)/30',
+		},
 	];
 
 	const namespaces = [
@@ -95,7 +102,7 @@ export function ApiOverviewAndAuth({
 					</div>
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
 					{envCards.map((env) => (
 						<div key={env.key} className="flex flex-col justify-between gap-3 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4">
 							<div className="flex items-center justify-between gap-2">
@@ -115,6 +122,29 @@ export function ApiOverviewAndAuth({
 							</div>
 						</div>
 					))}
+				</div>
+
+				{/* Local Environment Port Map & Desktop Localhost Webhook Relay Callout */}
+				<div className="mt-4 rounded-2xl bg-(--background)/50 border border-(--accent)/25 p-4 flex flex-col gap-2.5">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<div>
+							<h3 className="text-sm font-bold text-(--text)">{t('docs.api.common.localEnvRouting.title')}</h3>
+							<p className="text-xs text-(--text-muted)">{t('docs.api.common.localEnvRouting.subtitle')}</p>
+						</div>
+						<span className="inline-flex items-center gap-1.5 rounded-full bg-(--accent)/15 border border-(--accent)/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-(--accent)">
+							<Sparkles size={11} />
+							{t('docs.api.common.localEnvRouting.relayBadge')}
+						</span>
+					</div>
+					<p className="text-xs text-(--text-muted) leading-relaxed">{t('docs.api.common.localEnvRouting.relayDesc')}</p>
+					<div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] font-mono">
+						<span className="font-sans font-bold text-(--text) mr-1">{t('docs.api.common.localEnvRouting.portsLabel')}</span>
+						{['www :4000', 'api :4001', 'cdn :4002', 'account :4003', 'app :4004', 'docs :4005', 'admin :4006', 'info :4007', 'store :4008', 'websocket :5000'].map((portBadge) => (
+							<span key={portBadge} className="rounded-full bg-(--foreground)/50 border border-(--border)/10 px-2.5 py-0.5 text-(--accent)">
+								{portBadge}
+							</span>
+						))}
+					</div>
 				</div>
 			</section>
 

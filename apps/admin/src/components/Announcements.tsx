@@ -32,6 +32,9 @@ export default function Announcements() {
 	const [webhookUrl, setWebhookUrl] = useState('');
 	const [content, setContent] = useState('');
 	const [scheduledFor, setScheduledFor] = useState('');
+	const [startsAt, setStartsAt] = useState('');
+	const [expiresAt, setExpiresAt] = useState('');
+	const [targetApps, setTargetApps] = useState<string[]>(['all']);
 
 	// VISUAL BUILDER STATES
 	const [embeds, setEmbeds] = useState<EmbedData[]>([]);
@@ -162,6 +165,9 @@ export default function Announcements() {
 				}),
 			}));
 
+			const resolvedScheduledFor = scheduledFor || startsAt || '';
+			const resolvedStartsAt = startsAt || scheduledFor || '';
+
 			const payload = {
 				title,
 				channelId,
@@ -171,7 +177,10 @@ export default function Announcements() {
 					embeds: cleanEmbeds,
 					components: cleanComponents,
 				},
-				scheduledFor: scheduledFor ? new Date(scheduledFor).toISOString() : null,
+				scheduledFor: resolvedScheduledFor ? new Date(resolvedScheduledFor).toISOString() : null,
+				startsAt: resolvedStartsAt ? new Date(resolvedStartsAt).toISOString() : null,
+				expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
+				targetApps: targetApps.length > 0 ? targetApps : ['all'],
 			};
 
 			const url = editingId ? getEnvUrl(`https://api.xernerx.com/secure/announcements/${editingId}`) : getEnvUrl('https://api.xernerx.com/secure/announcements');
@@ -238,6 +247,9 @@ export default function Announcements() {
 		setEmbeds(restoredEmbeds);
 		setComponents(a.message?.components || []);
 		setScheduledFor(a.scheduledFor ? new Date(a.scheduledFor).toISOString().slice(0, 16) : '');
+		setStartsAt(a.startsAt ? new Date(a.startsAt).toISOString().slice(0, 16) : a.scheduledFor ? new Date(a.scheduledFor).toISOString().slice(0, 16) : '');
+		setExpiresAt(a.expiresAt ? new Date(a.expiresAt).toISOString().slice(0, 16) : '');
+		setTargetApps(Array.isArray(a.targetApps) && a.targetApps.length > 0 ? a.targetApps : ['all']);
 		setIsOpen(true);
 	};
 
@@ -250,13 +262,16 @@ export default function Announcements() {
 		setEmbeds([]);
 		setComponents([]);
 		setScheduledFor('');
+		setStartsAt('');
+		setExpiresAt('');
+		setTargetApps(['all']);
 		setIsOpen(true);
 	};
 
 	const filteredAnnouncements = useMemo(() => {
 		const q = search.trim().toLowerCase();
 		return announcements.filter((a) => {
-			if (statusFilter === 'scheduled' && (Boolean(a.sentAt) || !a.scheduledFor)) return false;
+			if (statusFilter === 'scheduled' && (Boolean(a.sentAt) || !(a.scheduledFor || a.startsAt))) return false;
 			if (statusFilter === 'sent' && !a.sentAt) return false;
 			if (!q) return true;
 			const embedMatch = (a.message?.embeds || []).some(
@@ -341,6 +356,12 @@ export default function Announcements() {
 				setContent={setContent}
 				scheduledFor={scheduledFor}
 				setScheduledFor={setScheduledFor}
+				startsAt={startsAt}
+				setStartsAt={setStartsAt}
+				expiresAt={expiresAt}
+				setExpiresAt={setExpiresAt}
+				targetApps={targetApps}
+				setTargetApps={setTargetApps}
 				embeds={embeds}
 				setEmbeds={setEmbeds}
 				components={components}

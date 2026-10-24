@@ -1,5 +1,6 @@
 /** @format */
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
+import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
@@ -367,7 +368,7 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 					return (
 						<div
 							key={item.id}
-							className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm"
+							className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm"
 						>
 							<div>
 								<div className="font-bold flex items-center gap-2">
@@ -376,23 +377,20 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 								</div>
 								<div className="text-sm text-(--text-muted) mt-1">{item.description}</div>
 								<div className="flex flex-wrap items-center gap-2 mt-2">
-									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded-xl border border-(--accent)/20">
+									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2.5 py-1 rounded-full border border-(--accent)/20">
 										{resolvedBot?.avatarUrl && (
 											<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
 										)}
 										{resolvedBot ? resolvedBot.name : item.productId}
 									</div>
 									{authorId && /^\d{17,20}$/.test(String(authorId)) && (
-										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded-xl border border-(--border)/10 font-mono">
-											<a
-												href={`${getEnvUrl('https://app.xernerx.com')}/users/${authorId}`}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="inline-flex items-center gap-1 hover:text-(--accent) transition-colors"
-											>
-												<span>{item.author?.username || authorId}</span>
-												<ExternalLink size={11} />
-											</a>
+										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/90 text-(--text-muted) px-2.5 py-1 rounded-full border border-(--border)/10 font-mono">
+											<UserProfilePopover userId={String(authorId)} initialUser={item.author}>
+												<span className="inline-flex items-center gap-1 hover:text-(--accent) transition-colors">
+													<span>{item.author?.username || authorId}</span>
+													<ExternalLink size={11} />
+												</span>
+											</UserProfilePopover>
 											<button
 												type="button"
 												onClick={() => {
@@ -411,7 +409,7 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 										<button
 											type="button"
 											onClick={() => handleResolveClick(item)}
-											className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-xl border font-mono cursor-pointer transition-opacity hover:opacity-80 ${statusBadgeClass}`}
+											className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-mono cursor-pointer transition-opacity hover:opacity-80 ${statusBadgeClass}`}
 										>
 											<span>{t(`admin.dashboard.issues.releaseStatus.${releaseStatus}`)}</span>
 											<span>•</span>
@@ -421,7 +419,7 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 										</button>
 									)}
 									{item.acknowledged === false && (
-										<span className="text-xs bg-(--accent-orange)/10 text-(--accent-orange) px-2 py-1 rounded-xl border border-(--accent-orange)/20 font-medium">
+										<span className="text-xs bg-(--accent-orange)/10 text-(--accent-orange) px-2.5 py-1 rounded-full border border-(--accent-orange)/20 font-medium">
 											{t('admin.dashboard.issues.submitted')}
 										</span>
 									)}
@@ -437,7 +435,11 @@ export default function Issues({ initialSearch = '' }: { initialSearch?: string 
 						</div>
 					);
 				})}
-				{filteredData.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">{t('admin.dashboard.issues.noMatchingIssues')}</div>}
+				{filteredData.length === 0 && (
+					<div className="text-(--text-muted) text-center p-8 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl">
+						{t('admin.dashboard.issues.noMatchingIssues')}
+					</div>
+				)}
 			</div>
 
 			<Confirm

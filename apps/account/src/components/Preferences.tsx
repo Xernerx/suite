@@ -6,7 +6,7 @@ import { Button, Selector, Toggle } from '@xernerx/ui';
 import { DesktopPreferencesSection } from './DesktopPreferencesSection';
 import { useDictionary, usePlatform, useTheme, useToast, type UIPreferences } from '@xernerx/providers';
 
-type BooleanPreferenceKey = Exclude<keyof UIPreferences, 'alignment'>;
+type BooleanPreferenceKey = Exclude<keyof UIPreferences, 'alignment' | 'dotMatrixStage' | 'dotMatrixType' | 'dotMatrixAnimation'>;
 
 const HEADER_ITEMS: Array<{ key: BooleanPreferenceKey; icon: any }> = [
 	{ key: 'showHeaderStore', icon: Store },
@@ -116,7 +116,7 @@ export default function Preferences() {
 									<p className="text-xs text-(--text-muted)">{t(`account.preferences.items.${key}.description`)}</p>
 								</div>
 							</div>
-							<Toggle checked={preferences[key]} onChange={(val) => handleTogglePreference(key, val)} suppressHydrationWarning />
+							<Toggle checked={Boolean(preferences[key])} onChange={(val) => handleTogglePreference(key, val)} suppressHydrationWarning />
 						</div>
 					))}
 				</div>
@@ -163,7 +163,7 @@ export default function Preferences() {
 									<p className="text-xs text-(--text-muted)">{t(`account.preferences.items.${key}.description`)}</p>
 								</div>
 							</div>
-							<Toggle checked={preferences[key]} onChange={(val) => handleTogglePreference(key, val)} suppressHydrationWarning />
+							<Toggle checked={Boolean(preferences[key])} onChange={(val) => handleTogglePreference(key, val)} suppressHydrationWarning />
 						</div>
 					))}
 				</div>

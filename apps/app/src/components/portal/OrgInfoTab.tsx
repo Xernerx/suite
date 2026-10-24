@@ -4,11 +4,10 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Building2, Upload } from 'lucide-react';
-import { Input, Selector } from '@xernerx/ui';
+import { Input, Markdown, Selector } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { CircleFlag } from 'react-circle-flags';
-import ReactMarkdown from 'react-markdown';
 
 const getFlagCode = (localeCode: string) => {
 	switch (localeCode) {
@@ -96,39 +95,17 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 					<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.description')}</label>
 					<Input value={orgConfig.description || ''} onChange={(e) => setOrgConfig({ ...orgConfig, description: e.target.value })} placeholder={t('app.portal.placeholders.shortDesc')} />
 				</div>
-				<div className="flex flex-col gap-2">
-					<div className="flex items-center justify-between">
-						<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.extendedInfo')}</label>
-						<div className="flex items-center bg-(--foreground)/30 border border-(--border)/10 rounded-2xl p-1 text-xs">
-							<button
-								onClick={() => setMarkdownPreview(false)}
-								className={`px-3 py-1 rounded-xl transition-colors ${!markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-							>
-								{t('app.portal.info.write')}
-							</button>
-							<button
-								onClick={() => setMarkdownPreview(true)}
-								className={`px-3 py-1 rounded-xl transition-colors ${markdownPreview ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'}`}
-							>
-								{t('app.portal.info.preview')}
-							</button>
-						</div>
-					</div>
-
-					{markdownPreview ? (
-						<div className="w-full min-h-[120px] rounded-2xl border border-(--border)/10 bg-(--background)/50 p-6 text-sm overflow-auto prose max-w-none prose-headings:font-fredoka">
-							{orgConfig.info ? <ReactMarkdown>{orgConfig.info}</ReactMarkdown> : <span className="text-(--text-muted) italic">{t('app.portal.info.nothingToPreview')}</span>}
-						</div>
-					) : (
-						<Input
-							variant="textarea"
-							value={orgConfig.info || ''}
-							onChange={(e) => setOrgConfig({ ...orgConfig, info: e.target.value })}
-							placeholder={t('app.portal.placeholders.extendedInfo')}
-							className="min-h-[120px]"
-						/>
-					)}
-				</div>
+				<Markdown
+					editable
+					preview={markdownPreview}
+					onPreviewChange={setMarkdownPreview}
+					label={t('app.portal.labels.extendedInfo')}
+					value={orgConfig.info || ''}
+					onChange={(val) => setOrgConfig({ ...orgConfig, info: val })}
+					placeholder={t('app.portal.placeholders.extendedInfo')}
+					emptyText={t('app.portal.info.nothingToPreview')}
+					rows={4}
+				/>
 				<div className="flex flex-col gap-2">
 					<label className="text-sm font-bold text-(--text)">{t('app.portal.labels.locale')}</label>
 					<Selector

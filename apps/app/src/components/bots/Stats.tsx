@@ -48,14 +48,12 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 				if (res.ok) {
 					const data = await res.json();
 					const normalized = data.map((s: any) => {
-						let dateObj;
-						if (s.timestamp) dateObj = new Date(s.timestamp);
-						else if (s.createdAt) dateObj = new Date(s.createdAt);
+						const ts = s.timestamp ? (typeof s.timestamp === 'string' && /^\d+$/.test(s.timestamp) ? Number(s.timestamp) : new Date(s.timestamp).getTime()) : 0;
 						let sc = s.shardCount ?? s.shards ?? 0;
 						if (Array.isArray(sc)) sc = sc.length;
 						return {
 							...s,
-							timestamp: dateObj ? dateObj.getTime() : 0,
+							timestamp: Number.isFinite(ts) ? ts : 0,
 							guildCount: s.guildCount ?? s.servers ?? 0,
 							userCount: s.userCount ?? s.users ?? 0,
 							shardCount: typeof sc === 'object' ? 0 : sc,

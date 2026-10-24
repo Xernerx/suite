@@ -136,7 +136,7 @@ export default function Tokens() {
 
 			{/* Modals */}
 			<CreateTokenModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSuccess={fetchTokens} userId={(session?.user as any)?.id} />
-			<ManageTokenModal tokenId={selectedTokenId} onClose={() => setSelectedTokenId(null)} onSuccess={fetchTokens} />
+			<ManageTokenModal tokenId={selectedTokenId} onClose={() => setSelectedTokenId(null)} onSuccess={fetchTokens} onTokenRolled={(newId) => setSelectedTokenId(newId)} />
 		</div>
 	);
 }

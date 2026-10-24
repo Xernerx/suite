@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 		} else {
 			matchStage.privacy = 'public';
 			if (category === 'promoted') {
-				matchStage.promotedUntil = { $gt: now };
+				matchStage.$or = [{ promotedUntil: { $gt: now } }, { boostedUntil: { $gt: now } }];
 			} else if (url.searchParams.get('search')) {
 				const query = url.searchParams.get('search');
 				matchStage.$or = [{ id: { $regex: query, $options: 'i' } }, { name: { $regex: query, $options: 'i' } }, { tags: { $regex: query, $options: 'i' } }];
@@ -62,6 +62,9 @@ export async function GET(request: Request) {
 					avatar: 1,
 					description: 1,
 					organization: 1,
+					promotedUntil: 1,
+					boostedUntil: 1,
+					boostedBy: 1,
 					voteCount: { $ifNull: ['$statsData.voteCount', '$statsData.votes', 0] },
 					stats: {
 						$cond: {

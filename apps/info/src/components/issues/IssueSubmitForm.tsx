@@ -20,6 +20,8 @@ interface IssueSubmitFormProps {
 	attachment: File | null;
 	setAttachment: (file: File | null) => void;
 	attachmentPreview: string | null;
+	preUploadedScreenshot?: string | null;
+	onClearPreUploaded?: () => void;
 	uploading: boolean;
 	submitIssue: (e: any) => void;
 	handlePaste: (e: React.ClipboardEvent) => void;
@@ -38,6 +40,8 @@ export function IssueSubmitForm({
 	attachment,
 	setAttachment,
 	attachmentPreview,
+	preUploadedScreenshot,
+	onClearPreUploaded,
 	uploading,
 	submitIssue,
 	handlePaste,
@@ -83,13 +87,13 @@ export function IssueSubmitForm({
 				<div className="flex flex-col gap-2">
 					<label className="text-xs font-bold text-(--text-muted) uppercase">{t('info.bugs.attachFile')}</label>
 					<input ref={fileInputRef} type="file" onChange={(e) => setAttachment(e.target.files?.[0] || null)} className="hidden" accept="image/*,.txt,.log,.json" />
-					{attachment ? (
+					{attachment || preUploadedScreenshot ? (
 						<div className="flex items-center justify-between gap-3 p-3 rounded-xl border border-(--accent)/30 bg-(--background)/50">
 							<div className="flex items-center gap-3 min-w-0">
-								{attachmentPreview ? (
+								{attachmentPreview || preUploadedScreenshot ? (
 									<Image
-										src={attachmentPreview}
-										alt={attachment.name}
+										src={(attachmentPreview || preUploadedScreenshot)!}
+										alt={attachment?.name || 'Screenshot'}
 										width={48}
 										height={48}
 										unoptimized
@@ -101,8 +105,8 @@ export function IssueSubmitForm({
 									</div>
 								)}
 								<div className="flex flex-col min-w-0">
-									<span className="text-sm font-semibold text-(--text) truncate">{attachment.name}</span>
-									<span className="text-xs text-(--text-muted)">{(attachment.size / 1024).toFixed(1)} KB</span>
+									<span className="text-sm font-semibold text-(--text) truncate">{attachment ? attachment.name : 'page-screenshot.png'}</span>
+									<span className="text-xs text-(--text-muted)">{attachment ? `${(attachment.size / 1024).toFixed(1)} KB` : 'Captured from page'}</span>
 								</div>
 							</div>
 							<button
@@ -111,6 +115,7 @@ export function IssueSubmitForm({
 								aria-label={t('info.bugs.dropzone.remove')}
 								onClick={() => {
 									setAttachment(null);
+									onClearPreUploaded?.();
 									if (fileInputRef.current) fileInputRef.current.value = '';
 								}}
 								className="p-2 rounded-lg text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors cursor-pointer shrink-0"

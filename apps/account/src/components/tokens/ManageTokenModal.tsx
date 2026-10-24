@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import { Check, Copy, Eye, EyeOff, Loader2, Save, Trash2 } from 'lucide-react';
-import { Button, Confirm, Input, Modal, Toggle } from '@xernerx/ui';
+import { Activity, Check, Clock, Copy, Eye, EyeOff, Loader2, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { Badge, Button, Confirm, Input, Modal, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
@@ -14,21 +14,24 @@ interface ManageTokenModalProps {
 	tokenId: string | null;
 	onClose: () => void;
 	onSuccess: () => void;
+	onTokenRolled?: (newTokenId: string) => void;
 }
 
-export default function ManageTokenModal({ tokenId, onClose, onSuccess }: ManageTokenModalProps) {
+export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenRolled }: ManageTokenModalProps) {
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
 	const [token, setToken] = useState<FullToken | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
+	const [isRolling, setIsRolling] = useState(false);
 	const [name, setName] = useState('');
 	const [owners, setOwners] = useState<string[]>([]);
 	const [status, setStatus] = useState<TokenStatus>('active');
 	const [isTokenVisible, setIsTokenVisible] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+	const [confirmRollOpen, setConfirmRollOpen] = useState(false);
 
 	useEffect(() => {
 		if (!tokenId) {
@@ -68,11 +71,16 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 	const handleCopy = () => {
 		if (!token) return;
 		navigator.clipboard.writeText(token.id);
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (bridge?.guardClipboardSecret) {
+			bridge.guardClipboardSecret(token.id, 60000).catch(() => {});
+		} else {
+			toast({
+				title: t('account.tokens.manage.copySuccess'),
+				type: 'success',
+			});
+		}
 		setCopied(true);
-		toast({
-			title: t('account.tokens.manage.copySuccess'),
-			type: 'success',
-		});
 		setTimeout(() => setCopied(false), 2000);
 	};
 
@@ -140,6 +148,43 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 		}
 	};
 
+	const handleRollToken = async () => {
+		if (!token) return;
+		setIsRolling(true);
+		try {
+			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/tokens/${token.id}/roll`, {
+				method: 'POST',
+				credentials: 'include',
+			});
+			if (!res.ok) throw new Error('Roll failed');
+			const data = await res.json();
+			const nextRecord: FullToken = data.record || { ...token, id: data.token };
+			setToken(nextRecord);
+			setIsTokenVisible(true);
+			navigator.clipboard.writeText(nextRecord.id);
+			const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+			if (bridge?.guardClipboardSecret) {
+				bridge.guardClipboardSecret(nextRecord.id, 60000).catch(() => {});
+			}
+			setCopied(true);
+			setTimeout(() => setCopied(false), 2000);
+			toast({
+				title: t('account.tokens.manage.rollSuccess'),
+				type: 'success',
+			});
+			if (onTokenRolled) onTokenRolled(nextRecord.id);
+			onSuccess();
+		} catch {
+			toast({
+				title: t('account.tokens.manage.rollError'),
+				type: 'error',
+			});
+		} finally {
+			setIsRolling(false);
+			setConfirmRollOpen(false);
+		}
+	};
+
 	return (
 		<>
 			<Modal
@@ -151,7 +196,7 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 			>
 				{isLoading || !token ? (
 					<div className="flex h-64 items-center justify-center">
-						<Loading />
+						<Loading variant="small" />
 					</div>
 				) : (
 					<>
@@ -161,7 +206,17 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 								gap: 'calc(var(--ui-gap) * 0.5)',
 							}}
 						>
-							<label className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">{t('account.tokens.manage.accessKeyLabel')}</label>
+							<div className="flex items-center justify-between gap-2">
+								<label className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">{t('account.tokens.manage.accessKeyLabel')}</label>
+								<div className="flex flex-wrap items-center gap-1.5">
+									<Badge variant="muted" size="sm" icon={<Activity size={11} />}>
+										{t('account.tokens.requestsBadge', { count: (token.requestCount ?? 0).toLocaleString() })}
+									</Badge>
+									<Badge variant="muted" size="sm" icon={<Clock size={11} />}>
+										{token.lastUsedAt ? t('account.tokens.lastUsedBadge', { date: new Date(token.lastUsedAt).toLocaleDateString() }) : t('account.tokens.neverUsedBadge')}
+									</Badge>
+								</div>
+							</div>
 							<div className="flex items-center gap-2">
 								<div className="flex-1 flex items-center rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 px-3 py-2 overflow-hidden relative">
 									<code className={`text-sm font-mono truncate transition-all duration-300 ${isTokenVisible ? 'text-(--text)' : 'text-(--text-muted) blur-sm select-none'}`}>
@@ -178,6 +233,10 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 								<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--hover-accent) transition cursor-pointer">
 									{copied ? <Check size={16} /> : <Copy size={16} />}
 								</button>
+								<Button type="button" variant="secondary" size="sm" onClick={() => setConfirmRollOpen(true)} disabled={isRolling} className="shrink-0">
+									<RefreshCw size={14} className={isRolling ? 'animate-spin' : ''} />
+									{t('account.tokens.manage.rollButton')}
+								</Button>
 							</div>
 							<p className="text-[11px] text-(--accent-orange) mt-1">{t('account.tokens.manage.securityWarning')}</p>
 						</div>
@@ -267,6 +326,17 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess }: Manage
 				onConfirm={handleDelete}
 				variant="danger"
 				loading={isSaving}
+			/>
+			<Confirm
+				open={confirmRollOpen}
+				onOpenChange={setConfirmRollOpen}
+				title={t('account.tokens.manage.rollConfirmTitle')}
+				description={t('account.tokens.manage.rollConfirmDesc')}
+				confirmText={t('account.tokens.manage.rollButton')}
+				cancelText={t('account.tokens.create.cancelButton')}
+				onConfirm={handleRollToken}
+				variant="warning"
+				loading={isRolling}
 			/>
 		</>
 	);

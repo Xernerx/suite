@@ -1,7 +1,10 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -9,15 +12,33 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		const db = await database('xernerx');
 		const BotModel = (db.models.bots as any).Bot;
 
-		const bot = await BotModel.findOne({ id }).lean();
+		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
 
 		if (!bot) {
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
 		}
 
+		const botId = bot.id;
+
 		// Dynamically compute the overall vote count from the distinct votes collection
 		const VoteModel = (db.models.bots as any).Vote;
-		bot.voteCount = await VoteModel.countDocuments({ botId: id });
+		const CommandModel = (db.models.bots as any).Command;
+		bot.voteCount = await VoteModel.countDocuments({ botId });
+
+		if (CommandModel && (!Array.isArray(bot.commands) || bot.commands.length === 0)) {
+			const syncedCmds = await CommandModel.find({ botId })
+				.sort({ type: 1, name: 1 })
+				.lean()
+				.catch(() => []);
+			if (syncedCmds.length > 0) {
+				bot.commands = syncedCmds.map((c: any) => ({
+					...(c.body && typeof c.body === 'object' ? c.body : {}),
+					name: c.name || c.body?.name,
+					description: c.description || c.body?.description || '',
+					type: c.type || c.body?.type || 1,
+				}));
+			}
+		}
 
 		if (bot.organization) {
 			const OrganizationModel = (db.models.organizations as any).Organization;
@@ -31,7 +52,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		try {
 			const token = process.env.DISCORD_CLIENT_TOKEN;
 			if (token) {
-				const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
+				const discordRes = await fetch(`https://discord.com/api/v10/users/${botId}`, {
 					headers: { Authorization: `Bot ${token}` },
 				});
 				if (discordRes.ok) {
@@ -60,6 +81,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 			console.error('Failed to fetch Discord user:', e);
 		}
 
+		bot.vanityUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified);
 		return NextResponse.json(bot, { status: 200 });
 	} catch (error) {
 		console.error('Failed to fetch bot profile:', error);
@@ -75,21 +97,52 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 		const body = await request.json();
 
-		const bot = await BotModel.findOne({ id });
+		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 		if (!bot) {
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
 		}
 
-		// Security: In a real app we'd verify session matching bot.owners here.
-		// Since we don't have session object in this route easily without next-auth getServerSession,
-		// we assume the proxy or caller has verified ownership, or we should verify it if passed.
-		// Let's rely on the user ID being passed or just update it directly if called from secure portal route.
-		// Wait, Portal is a client-side fetch with credentials: 'include'. We need to check auth!
+		const session = (await getServerSession(auth).catch(() => null)) as any;
+		const actorUserId = session?.user?.id || (Array.isArray(bot.owners) ? bot.owners[0] : undefined);
+		const isVanityAlreadyUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified);
 
-		// Actually, let's just do the update. The user hasn't specified strict auth here yet other than `secure` route middleware which checks session?
-		// Wait, /secure routes in Next.js usually have middleware or check session!
+		if (body.action === 'unlock_vanity') {
+			if (!isVanityAlreadyUnlocked) {
+				const unlockRes = await unlockVanityWithUserCredits(db.models, actorUserId, bot.name || `Bot ${bot.id}`);
+				if (!unlockRes.ok) {
+					return NextResponse.json({ error: unlockRes.error }, { status: 403 });
+				}
+				bot.vanityUnlocked = true;
+				await bot.save();
+				return NextResponse.json({ message: 'Unlocked successfully', bot, vanityUnlocked: true, usedSlot: unlockRes.usedSlot, cost: unlockRes.cost }, { status: 200 });
+			}
+			return NextResponse.json({ message: 'Already unlocked', bot, vanityUnlocked: true }, { status: 200 });
+		}
 
-		const updatableFields = ['description', 'info', 'privacy', 'widgets', 'bot', 'organization', 'tags'];
+		if (body.vanitySlug !== undefined) {
+			const rawSlug = normalizeVanitySlug(body.vanitySlug);
+			if (rawSlug === '') {
+				bot.vanitySlug = undefined;
+			} else {
+				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
+					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
+				}
+				const existing = await BotModel.findOne({ vanitySlug: rawSlug, id: { $ne: bot.id } }).lean();
+				if (existing) {
+					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
+				}
+				if (!isVanityAlreadyUnlocked) {
+					const unlockRes = await unlockVanityWithUserCredits(db.models, actorUserId, bot.name || `Bot ${bot.id}`);
+					if (!unlockRes.ok) {
+						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
+					}
+					bot.vanityUnlocked = true;
+				}
+				bot.vanitySlug = rawSlug;
+			}
+		}
+
+		const updatableFields = ['description', 'info', 'privacy', 'widgets', 'bot', 'organization', 'tags', 'commands', 'releases'];
 		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 
 		if (body.links) {
@@ -117,7 +170,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 		const db = await database('xernerx');
 		const BotModel = (db.models.bots as any).Bot;
 
-		const result = await BotModel.deleteOne({ id });
+		const result = await BotModel.deleteOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 		if (result.deletedCount === 0) {
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
 		}

@@ -68,7 +68,17 @@
 				"discord": "Discord",
 				"status": "System Status",
 				"statusOperational": "All Systems Operational",
-				"statusDegraded": "System Status: Degraded"
+				"statusDegraded": "System Status: Degraded",
+				"download": "Desktop Client",
+				"invites": "Bot Invites"
+			},
+			"share": {
+				"label": "Share",
+				"twitter": "Share on X",
+				"facebook": "Share on Facebook",
+				"linkedin": "Share on LinkedIn",
+				"reddit": "Share on Reddit",
+				"whatsapp": "Share on WhatsApp"
 			},
 			"title": "Xernerx Studios",
 			"description": "© 2024 -",
@@ -151,7 +161,10 @@
 						"actions": "Quick Actions",
 						"apps": "Suite Applications",
 						"settings": "Account & Developer Settings",
+						"store": "Store & Credit Perks",
 						"support": "Support & Feedback Hub",
+						"docs": "Developer Docs & API Endpoints",
+						"faq": "FAQ & Knowledge Base",
 						"admin": "Admin Panel (Staff)",
 						"bots": "Public Bots",
 						"servers": "Public Servers",
@@ -249,6 +262,8 @@
 			"popoverSubtitle": "Quick links & live community support",
 			"links": {
 				"hub": "Support Hub",
+				"reportBugHere": "Report Bug on This Page",
+				"snapBadge": "Auto-Snap",
 				"reportIssue": "Report an Issue",
 				"suggestFeature": "Suggest a Feature",
 				"faq": "Frequently Asked Questions"
@@ -328,7 +343,22 @@
 		},
 		"permissionprovider": {
 			"fetchFailed": "Failed to fetch permissions"
-		}
+		},
+		"remove": "Remove",
+		"clear": "Clear",
+		"delete": "Delete",
+		"close": "Close",
+		"window": {
+			"minimize": "Minimize",
+			"maximize": "Maximize"
+		},
+		"navigation": {
+			"back": "Back",
+			"forward": "Forward",
+			"reload": "Reload",
+			"home": "Home"
+		},
+		"cancel": "Cancel"
 	},
 	"api": {
 		"title": "Xernerx API",
@@ -453,7 +483,21 @@
 			"updateFailed": "Failed to update user profile",
 			"assignRoleFailed": "Failed to assign Discord role",
 			"removeRoleFailed": "Failed to remove Discord role",
-			"manageProfileDesc": "Manage profile for {name}"
+			"manageProfileDesc": "Manage profile for {name}",
+			"creditsModal": {
+				"manageButton": "Manage Credits & Perks",
+				"title": "Manage User Credits & Badges",
+				"subtitle": "Grant or deduct Xernerx Credits and unlock vanity badges for {user}.",
+				"currentBalance": "Current Credit Balance",
+				"amountLabel": "Credit Adjustment (+ to grant, - to deduct)",
+				"badgeLabel": "Unlock & Equip Vanity Badge (Optional)",
+				"reasonLabel": "Audit Reason",
+				"reasonPlaceholder": "Community contribution, event prize, support adjustment...",
+				"defaultReason": "Admin Credit Adjustment",
+				"applyButton": "Apply Adjustment",
+				"successToast": "User credits updated and logged to Audit Log",
+				"errorToast": "Failed to adjust user credits"
+			}
 		},
 		"tokens": {
 			"title": "API Token Management",
@@ -1015,7 +1059,18 @@
 					"tosEmbedDesc": "We've recently updated our Terms of Service to better serve our community and comply with the latest regulations. Please take a moment to review the changes.",
 					"tosEmbedTitle": "Terms of Service Updated",
 					"tosTitle": "TOS Update"
-				}
+				},
+				"startsAtLabel": "Starts At (Optional)",
+				"expiresAtLabel": "Expires At (Optional)",
+				"targetAppsLabel": "Target Applications",
+				"targetAppsPlaceholder": "Select target apps (defaults to All Suite Apps)",
+				"targetAppAll": "All Suite Apps",
+				"startsIn": "Starts in {time}",
+				"expiresIn": "Expires in {time}",
+				"expired": "Expired",
+				"appsScopeLabel": "Target Apps:",
+				"startsAt": "Starts At (Optional)",
+				"expiresAt": "Expires At (Optional)"
 			},
 			"applicationReviews": {
 				"refreshing": "Refreshing...",
@@ -1328,7 +1383,9 @@
 				"addDiscount": "+ Add Discount",
 				"featuredBadge": "Featured",
 				"featuresCount": "✓ {count} features configured",
-				"percentOff": "-{percent}% OFF"
+				"percentOff": "-{percent}% OFF",
+				"creditPerkLabel": "{cost} Credits ({type})",
+				"creditPackLabel": "{sku} (+{amount} Credits)"
 			},
 			"itemModal": {
 				"createTitle": "Create Store Product",
@@ -1364,7 +1421,9 @@
 					"cdnSlots": "CDN Upload Slots",
 					"showcaseSlots": "Profile Showcase Slots",
 					"trialPass": "Trial Pass",
-					"vanityBadge": "Vanity Badge"
+					"vanityBadge": "Vanity Badge",
+					"streakShield": "Streak Shield (+1 Shield, Max 3)",
+					"vanityUrl": "Custom Vanity URL Slots"
 				}
 			},
 			"categoryModal": {
@@ -1399,6 +1458,17 @@
 				"copySku": "Copy SKU ID",
 				"editDiscount": "Click to edit discount"
 			}
+		},
+		"announcements": {
+			"startsAtLabel": "Starts At (Optional)",
+			"expiresAtLabel": "Expires At (Optional)",
+			"targetAppsLabel": "Target Applications",
+			"targetAppsPlaceholder": "Select target apps (defaults to All Suite Apps)",
+			"targetAppAll": "All Suite Apps",
+			"startsIn": "Starts in {time}",
+			"expiresIn": "Expires in {time}",
+			"expired": "Expired",
+			"appsScopeLabel": "Target Apps:"
 		}
 	},
 	"account": {
@@ -1432,7 +1502,14 @@
 				}
 			},
 			"resetDataConfirmDesc": "Are you sure you want to reset all your profile data? Your account will remain active.",
-			"resetDataConfirmButton": "Delete Data"
+			"resetDataConfirmButton": "Delete Data",
+			"export": {
+				"title": "Personal Data Archive",
+				"description": "Download a complete machine-readable JSON copy of your profile, appearance settings, credits ledger, showcases, connections, and owned bots & servers.",
+				"button": "Download My Data (.json)",
+				"toastSuccess": "Personal data archive downloaded",
+				"toastError": "Failed to export personal data archive"
+			}
 		},
 		"profile": {
 			"title": "Edit Profile",
@@ -1500,15 +1577,34 @@
 				"addButton": "Add Showcase",
 				"unlockMoreSlots": "Unlock More Slots",
 				"emptySlotPrompt": "Add Showcase Card",
-				"badgesHeading": "Vanity & Patron Badges",
-				"badgesSubtitle": "Toggle which unlocked Credit Store vanity badges are displayed on your public profile and sidebar card.",
+				"badgesHeading": "Vanity & Achievement Badges",
+				"badgesSubtitle": "Toggle which unlocked Credit Store & Achievement badges are displayed on your public profile and sidebar card.",
 				"badgeUnlocked": "Unlocked — Toggle visibility",
 				"badgeRequirement": "Unlock for {credits} Credits",
+				"badgeAchievementRequirement": "Unlock via Contributor Achievements",
 				"unlockLink": "Credit Store →",
+				"achievementsLink": "Achievements →",
 				"badges": {
 					"credit_patron": "Credit Patron",
 					"high_roller": "High Roller",
-					"vault_sovereign": "Vault Sovereign"
+					"vault_sovereign": "Vault Sovereign",
+					"dot_matrix_banner": "Dot-Matrix Architect",
+					"streak_master_7": "7-Day Streak Master",
+					"streak_master_30": "30-Day Streak Veteran",
+					"streak_master_100": "100-Day Streak Legend",
+					"top_voter_10": "Community Voter (10+ Votes)",
+					"top_voter_50": "Super Supporter (50+ Votes)",
+					"ecosystem_builder": "Ecosystem Builder"
+				},
+				"dotMatrixStudio": {
+					"title": "Interactive Dot-Matrix Banner Studio",
+					"subtitle": "Choose which live procedural dot-matrix formation renders across your Public Profile Header, Account Profile Card, and Sidebar User Card.",
+					"activeBadge": "Active on Profile",
+					"hiddenBadge": "Badge Hidden",
+					"previewBadge": "Live Preview",
+					"unlockCta": "Unlock in Credit Store (3,500 Credits)",
+					"formationLabel": "Active Banner Formation",
+					"savedToast": "Dot-matrix banner formation updated!"
 				},
 				"modal": {
 					"createTitle": "Add Profile Showcase",
@@ -1520,8 +1616,15 @@
 					"tagLabel": "Tag / Badge (Optional)",
 					"tagPlaceholder": "e.g. Open Source, Artwork",
 					"linkLabel": "External Link (Optional)",
-					"imageLabel": "Preview Image URL (Optional)"
+					"imageLabel": "Preview Image URL (Optional)",
+					"quickFillLabel": "Quick-Fill from My Ecosystem",
+					"quickFillPlaceholder": "Import from your Bots, Servers, Organizations, or Connections..."
 				}
+			},
+			"vanitySlug": {
+				"label": "Vanity Profile URL",
+				"placeholder": "your-custom-handle",
+				"hint": "3–32 lowercase letters, numbers, or hyphens. Accessible at xernerx.com/users/{slug}."
 			}
 		},
 		"appearance": {
@@ -1613,9 +1716,50 @@
 					"title": "Sync Failed",
 					"description": "Failed to sync appearance"
 				},
-				"resetSuccess": "Appearance reset to defaults"
+				"resetSuccess": "Appearance reset to defaults",
+				"dotMatrixStage": {
+					"title": "Background Stage Updated"
+				}
 			},
-			"resetDefaults": "Reset to Defaults"
+			"resetDefaults": "Reset to Defaults",
+			"hideUi": "Hide UI",
+			"showUi": "Show UI",
+			"dotMatrixStage": {
+				"title": "Dot-Matrix Background Stage",
+				"description": "Choose how the ambient interactive dot-matrix stage behaves behind pages after loading completes.",
+				"options": {
+					"default": "Default (Sticky on Home & Download)",
+					"ripple": "Ripple (Ambient Wave Everywhere)",
+					"orbit": "Orbit (Orbital Rings Everywhere)",
+					"blank": "Blank (Hidden After Loading)"
+				}
+			},
+			"dotMatrix": {
+				"title": "Dot-Matrix Background Profile & Motion",
+				"description": "Choose which dot-matrix formation the loading screen morphs into after loading completes, and how it animates.",
+				"typeLabel": "Matrix Profile",
+				"animationLabel": "Animation Mode",
+				"types": {
+					"default": "Default (Page Adaptive)",
+					"full": "Xernerx Wordmark",
+					"icon": "Xernerx Crest",
+					"orbit": "Orbital Rings",
+					"vortex": "Spiral Galaxy",
+					"helix": "Double Helix",
+					"prism": "Cyber Prism",
+					"infinity": "Infinity Loop",
+					"wavegrid": "Harmonic Wave Lattice",
+					"blank": "Blank (Disperse After Load)"
+				},
+				"animations": {
+					"animate": "Animate (Context Default)",
+					"static": "Static (Interactive Only)",
+					"always": "Always Animate (Continuous Ripple)"
+				},
+				"previewTitle": "Live Matrix Morph Preview",
+				"previewDesc": "Move your cursor over the matrix or click to trigger a shockwave. Use Test Loading Morph to preview the loading-to-profile transition.",
+				"testMorphBtn": "Test Loading Morph"
+			}
 		},
 		"language": {
 			"headerTitle": "Language Preferences",
@@ -1633,6 +1777,14 @@
 				"requestFailed": "Failed to submit translator application",
 				"requestSuccess": "Translator application submitted successfully!",
 				"notLoggedIn": "You must be logged in to apply"
+			},
+			"virtue": {
+				"title": "Virtue Language",
+				"description": "Select your preferred language for Virtue bot responses and user profile interactions.",
+				"toast": {
+					"updated": "Virtue language updated",
+					"syncFailed": "Failed to update Virtue language"
+				}
 			},
 			"discord": {
 				"title": "Discord Language",
@@ -1733,7 +1885,8 @@
 				"api": "API",
 				"billing": "Billing",
 				"apps": "Apps",
-				"community": "Community & Roadmap"
+				"community": "Community & Roadmap",
+				"voteReminders": "Vote & Cooldown Reminders"
 			},
 			"items": {
 				"birthday": "Birthday",
@@ -1750,12 +1903,38 @@
 				"roadmapReleased": "Roadmap Milestone Released",
 				"issueStatusUpdate": "Bug Report Status Update",
 				"suggestionStatusUpdate": "Suggestion Status Update",
-				"applicationReviewed": "Staff Application Reviewed"
+				"applicationReviewed": "Staff Application Reviewed",
+				"orgInvite": "Organization Invite",
+				"voteReminder": "Vote Cooldown Reminder",
+				"dailyGiftReminder": "Daily Gift Cooldown Reminder"
+			},
+			"voteReminders": {
+				"title": "Vote & Cooldown Reminders",
+				"botReminder": "Bot Vote Reminder ({name})",
+				"serverReminder": "Server Vote Reminder ({name})",
+				"dailyGiftReminder": "Daily Mystery Gift Reminder",
+				"scheduledFor": "Reminder scheduled for {time}.",
+				"readyNow": "Cooldown finished — ready to claim or vote now!",
+				"activeChannel": "Active",
+				"clearAll": "Clear All"
 			},
 			"channels": {
 				"discord": "Discord",
 				"mail": "Mail",
-				"inApp": "In-App"
+				"inApp": "In-App",
+				"desktop": "Desktop"
+			},
+			"systemCard": {
+				"badge": "Desktop Client",
+				"title": "Desktop Notifications (Windows & macOS)",
+				"description": "Configure native OS notification banners, taskbar badges, and background daily streak alerts for this device.",
+				"masterTitle": "Enable Native Desktop Notifications",
+				"masterDesc": "Deliver alerts to Windows Action Center and Apple Notification Center with taskbar/Dock unread badges. Turning this off mutes all Desktop channel toggles below.",
+				"streakTitle": "Daily Gift & Streak Guardian",
+				"streakDesc": "Notify me in the background as soon as my 24-hour Daily Mystery Gift cooldown finishes.",
+				"testButton": "Test Desktop Alert",
+				"enableAllSystem": "Enable All Desktop",
+				"muteAllSystem": "Mute All Desktop"
 			},
 			"toast": {
 				"success": "Updated notification preferences",
@@ -1815,11 +1994,19 @@
 				"userNotFound": "User not found",
 				"statusTitle": "Active Status",
 				"statusActive": "Token is active and can make API requests",
-				"statusInactive": "Token is temporarily disabled"
+				"statusInactive": "Token is temporarily disabled",
+				"rollButton": "Roll Token",
+				"rollConfirmTitle": "Roll Access Token",
+				"rollConfirmDesc": "Rolling this token immediately invalidates the current secret key and generates a new one while preserving all permissions, owners, and telemetry.",
+				"rollSuccess": "Token rolled and copied to clipboard!",
+				"rollError": "Failed to roll token"
 			},
 			"preview": {
 				"unknownBot": "Unknown Bot"
-			}
+			},
+			"requestsBadge": "{count} reqs",
+			"lastUsedBadge": "Used {date}",
+			"neverUsedBadge": "Never used"
 		},
 		"store": {
 			"title": "Xernerx Store",
@@ -1945,7 +2132,27 @@
 					"showcaseSlots": "Showcase Slots",
 					"trialPasses": "Trial Passes",
 					"vanityBadges": "Vanity Badges",
-					"creditPacks": "Buy Credits (€)"
+					"creditPacks": "Buy Credits (€)",
+					"streakShields": "Streak Shields",
+					"vanityUrls": "Vanity URLs"
+				},
+				"ladder": {
+					"title": "7-Day Daily Streak Ladder",
+					"subtitle": "Claim your daily credit gift within the 48h grace window to advance through each 7-day cycle and unlock the Day 7 Milestone Vault (+250 base credits).",
+					"cycleBadge": "Cycle #{cycle}",
+					"ultraMultiplierBadge": "200% Ultra Multiplier Active (2x)",
+					"subMultiplierBadge": "125% Subscriber Multiplier Active (1.25x)",
+					"freeMultiplierHint": "100% Base Rate · Subscribers get 125%–200%",
+					"dayLabel": "Day {day}",
+					"bonusSuffix": "Bonus",
+					"milestoneVault": "Milestone Vault (+250 Base)",
+					"plusRandomBase": "+ 50–150 Random Base"
+				},
+				"ownedVanitySlots": "{count} Vanity URL Slots",
+				"dotMatrixPreview": {
+					"liveBadge": "Live Interactive Banner",
+					"clickHint": "Hover or click for shockwave",
+					"customizeInProfile": "Customize Formation in Profile"
 				}
 			}
 		},
@@ -2000,6 +2207,24 @@
 				"public": "Public",
 				"limited": "Limited",
 				"private": "Private"
+			},
+			"allFolders": "All Folders",
+			"folderLabel": "Folder",
+			"tagsLabel": "Tags (comma-separated)",
+			"tagsPlaceholder": "avatar, banner, branding...",
+			"bulk": {
+				"selectedCount": "{count} selected",
+				"selectAll": "Select All",
+				"clear": "Clear"
+			},
+			"crop": {
+				"title": "Crop & Categorize Image",
+				"aspectFree": "Free / Original",
+				"aspectAvatar": "1:1 Avatar",
+				"aspectBanner": "16:9 Banner",
+				"zoomLabel": "Zoom & Drag to Position",
+				"uploadOriginal": "Upload Original",
+				"cropAndUpload": "Crop & Upload"
 			}
 		},
 		"connections": {
@@ -2082,7 +2307,13 @@
 				"nextClaimIn": "Next Reward in {hours}h",
 				"claimSuccess": "Claimed +{amount} credits! ({streak} day streak)",
 				"claimError": "Could not claim daily reward",
-				"nextClaimTimer": "Next Reward in {time}"
+				"nextClaimTimer": "Next Reward in {time}",
+				"ledger": {
+					"title": "Credit Balance & Transaction Ledger",
+					"shieldsActive": "{count} / 3 Streak Shields Active",
+					"empty": "No credit transactions recorded yet. Claim your daily gift or redeem a perk to see your history here.",
+					"defaultItem": "Credit Transaction"
+				}
 			},
 			"tabs": {
 				"all": "All ({count})",
@@ -2093,6 +2324,36 @@
 			"billingCycle": {
 				"month": "{price} / month",
 				"year": "{price} / year"
+			},
+			"achievements": {
+				"title": "Contributor Milestone Achievements",
+				"subtitle": "Complete ecosystem milestones to unlock permanent profile badges and bonus Xernerx Credits.",
+				"claimed": "Claimed",
+				"claimButton": "Claim",
+				"claimSuccess": "Achievement claimed! +{credits} Credits added to your balance.",
+				"claimError": "Failed to claim achievement",
+				"items": {
+					"streak_7": "7-Day Streak Master",
+					"streak_30": "30-Day Streak Veteran",
+					"streak_100": "100-Day Streak Legend",
+					"voter_10": "Community Voter (10 Votes)",
+					"voter_50": "Super Supporter (50 Votes)",
+					"ecosystem_builder": "Ecosystem Builder"
+				}
+			},
+			"referrals": {
+				"title": "Referral Program",
+				"subtitle": "Share your referral link or enter a friend's User ID — you both earn +250 Credits once you claim a Daily Gift!",
+				"copyLink": "Copy Referral Link",
+				"linkCopied": "Referral link copied to clipboard",
+				"referredByLabel": "Referred by User ID",
+				"bonusUnlocked": "+250 Referral Bonus Awarded",
+				"claimDailyToUnlock": "Claim Daily Gift to unlock +250 Credits",
+				"inputPlaceholder": "Enter referrer Discord / Xernerx User ID...",
+				"applyButton": "Apply Referrer",
+				"bonusAwardedToast": "Referrer linked! +250 Credits awarded to both accounts.",
+				"linkedToast": "Referrer linked! Claim your Daily Gift to unlock +250 Credits.",
+				"submitError": "Failed to link referrer"
 			}
 		},
 		"activity": {
@@ -2112,7 +2373,12 @@
 				"issues": "Bug Reports",
 				"suggestions": "Suggestions"
 			},
-			"notePrefix": "Note: {note}"
+			"notePrefix": "Note: {note}",
+			"submittedResponses": "Submitted Responses",
+			"reviewerNote": "Reviewer Note",
+			"noAnswerProvided": "No answer provided",
+			"viewApplication": "View Application Details",
+			"submittedOn": "Submitted on {date}"
 		},
 		"preferences": {
 			"title": "Preferences",
@@ -2161,7 +2427,36 @@
 				"copyLogs": "Copy Logs",
 				"logsCopied": "Logs copied to clipboard!",
 				"openLogFile": "Open Log File in OS",
-				"refreshLogs": "Refresh Logs"
+				"refreshLogs": "Refresh Logs",
+				"testNotification": "Test Notification",
+				"testNotificationTitle": "Xernerx Desktop Notification",
+				"testNotificationBody": "Native Windows & macOS system notifications are active and connected!",
+				"testNotificationSent": "Test system notification dispatched!",
+				"quickCapture": "Quick Capture & Screenshot Upload",
+				"streamerProtected": "Capture Protected",
+				"streamerActive": "Anti-Capture Active",
+				"batterySaverActive": "Battery Saver On",
+				"captureUploadedTitle": "Capture Uploaded to Xernerx CDN",
+				"captureUploadedDesc": "Shareable CDN link copied to your clipboard.",
+				"captureClipboardTitle": "Screen Capture Copied",
+				"captureClipboardDesc": "Screenshot copied directly to your system clipboard.",
+				"newCompanionWindow": "New Companion Window",
+				"dropUploadTitle": "Drop File to Upload to Xernerx CDN",
+				"dropUploadDesc": "Automatically uploads to your Desktop Captures folder and copies the shareable link.",
+				"clipboardGuardTitle": "Secret Token Copied (60s Auto-Clear)",
+				"clipboardGuardDesc": "For security, this token will be cleared from your clipboard in {seconds}s.",
+				"clipboardGuardKeep": "Keep in Clipboard",
+				"clipboardGuardCancelledTitle": "Auto-Clear Timer Disabled",
+				"clipboardGuardCancelledDesc": "Your copied token will remain in your clipboard.",
+				"clipboardGuardClearedTitle": "Clipboard Secret Auto-Cleared",
+				"clipboardGuardClearedDesc": "Your copied API token was automatically wiped from the clipboard after 60 seconds.",
+				"watchFolderTitle": "CDN Auto-Sync Watch Folder",
+				"watchFolderDesc": "Automatically upload newly saved screenshots or images from a local folder to your Xernerx CDN library and copy the shareable link.",
+				"watchFolderEmpty": "No watch folder selected",
+				"watchFolderSelect": "Choose Folder",
+				"watchFolderClear": "Stop Watching",
+				"watchFolderUploadedTitle": "Watch Folder Image Uploaded to CDN",
+				"watchFolderUploadedDesc": "{filename} uploaded and link copied to clipboard."
 			},
 			"items": {
 				"showHeaderStore": {
@@ -2259,6 +2554,35 @@
 					"title": "Discord Rich Presence",
 					"description": "Display your current Xernerx workspace activity and quick links on your Discord profile status."
 				},
+				"desktopNotifications": {
+					"title": "Native OS Notifications (Windows & macOS)",
+					"description": "Deliver real-time system notifications via Windows Action Center and Apple Notification Center with Dock/taskbar unread badges."
+				},
+				"dailyStreakReminder": {
+					"title": "Background Daily Gift & Streak Guardian",
+					"description": "Monitor your 24-hour Daily Mystery Gift cooldown in the system tray and notify you the moment your daily reward is ready."
+				},
+				"streamerMode": {
+					"title": "Streamer Protection (Anti-Capture)",
+					"description": "Use native OS window capture protection (win.setContentProtection) to hide sensitive tokens, billing, and screens from OBS and screen recorders."
+				},
+				"batterySaver": {
+					"title": "Smart Battery Saver & Wake Sync",
+					"description": "Automatically pause background canvas effects and throttle polling on laptop battery power, and instantly resync when waking from sleep."
+				},
+				"globalQuickLauncher": {
+					"title": "Global Spotlight Launcher (Ctrl + Shift + Space)",
+					"description": "Summon the Xernerx window and open the global Command Palette from anywhere in your OS (disabled by default to avoid shortcut conflicts)."
+				},
+				"quickCaptureHotkey": {
+					"title": "Global Quick Capture Hotkey (Ctrl + Shift + S)",
+					"description": "Capture your screen from anywhere in your OS, automatically upload to your Xernerx CDN media library, and copy the link to your clipboard."
+				},
+				"startupLocation": {
+					"title": "Startup Location",
+					"description": "Choose which Xernerx destination opens by default when you launch the Desktop App (Last Visited Page, Explore, Dashboard, Account, Store, Portal, API, Docs, CDN, Website, Support, or Admin).",
+					"lastVisited": "Last Visited Page (Resume Session)"
+				},
 				"windowControls": {
 					"title": "Window Control Buttons Style",
 					"description": "Choose the titlebar button style for minimize, maximize, and close (defaults to system OS detection, overridden by metadata.json).",
@@ -2351,6 +2675,26 @@
 			"buttons": {
 				"explore": "Explore Services",
 				"software": "View Software"
+			},
+			"links": {
+				"about": "About Our Studio",
+				"highlights": "Platform Highlights",
+				"timeline": "Company Timeline",
+				"invites": "Browse Bot Invites",
+				"careers": "View Open Positions",
+				"contact": "Contact Our Team"
+			},
+			"search": {
+				"placeholder": "Search pages, bots, packages, documentation, FAQ, or open roles...",
+				"empty": "No ecosystem results found matching \"{query}\".",
+				"categories": {
+					"all": "All",
+					"pages": "Pages & Suite",
+					"bots": "Bots & Servers",
+					"docs": "Docs & Packages",
+					"faq": "FAQ & Support",
+					"careers": "Careers"
+				}
 			}
 		},
 		"about": {
@@ -2727,10 +3071,16 @@
 				"claimReward": "Claim +150 Credits",
 				"claimedReward": "Claimed +150 Credits!",
 				"discordStatus": "Showing on Discord Profile",
+				"discordStatusOff": "Discord Rich Presence Hidden",
 				"overlayActive": "Mini Overlay Pinned",
 				"switchAccount": "Switch Account",
 				"mainRole": "Main Account",
-				"altRole": "Alt Account"
+				"altRole": "Alt Account",
+				"liveBadge": "LIVE",
+				"offBadge": "OFF",
+				"ghostBadge": "Ghost",
+				"ghostActive": "Click-Through ON",
+				"companionBadge": "Ctrl+Shift+N"
 			},
 			"pills": {
 				"multiAccount": "1-Click Account Switcher",
@@ -2787,6 +3137,62 @@
 					"description": "No ugly browser address bars or tab clutter — just smooth glass animations and your custom colours synced everywhere.",
 					"gpuLabel": "Smooth Animations",
 					"framelessLabel": "Borderless Design"
+				},
+				"notifications": {
+					"badge": "Native OS Alerts",
+					"title": "Windows Action Center & Apple Notification Center",
+					"description": "Receive real system notifications, taskbar flashes, and macOS Dock unread badges when a daily mystery gift is ready, an organization invite arrives, or a bot status changes.",
+					"toastTitle": "Daily Mystery Gift Ready!",
+					"toastBody": "Click to open Xernerx Desktop and claim your reward.",
+					"windowsLabel": "Windows Toast",
+					"macosLabel": "macOS Banner"
+				},
+				"streamerProtection": {
+					"badge": "Zero Leak Guarantee",
+					"title": "Streamer & Screen-Capture Protection",
+					"description": "Powered by native OS window capture shielding (setContentProtection), your API tokens, billing pages, and dashboard stay invisible to OBS, Streamlabs, and screen recorders.",
+					"protectedLabel": "PROTECTED IN OBS",
+					"unprotectedLabel": "VISIBLE",
+					"statusProtected": "Window masked from screen capture",
+					"statusVisible": "Standard window rendering"
+				},
+				"quickCapture": {
+					"badge": "1-Click Cloud Share",
+					"title": "Instant Screen Capture to Xernerx CDN",
+					"description": "Snap a screenshot from your system tray, taskbar JumpList, or optional Ctrl + Shift + S hotkey — it automatically uploads to cdn.xernerx.com and copies the share link to your clipboard.",
+					"actionLabel": "Snap & Upload",
+					"copiedLabel": "cdn.xernerx.com/raw/... Copied!"
+				},
+				"batteryAndJump": {
+					"badge": "Smart OS Integration",
+					"title": "Battery Saver, Wake Sync & Taskbar JumpList",
+					"description": "Automatically pauses background canvas effects on laptop battery power, instantly reconnects live feeds when waking from sleep, and adds quick-launch tasks to your Windows Taskbar & macOS Dock.",
+					"acMode": "AC Power • Full 60fps",
+					"batteryMode": "On Battery • Eco Mode Active"
+				},
+				"localRelay": {
+					"badge": "Zero-Ngrok Bot Dev",
+					"title": "Localhost Webhook Relay in Portal",
+					"description": "Developing a bot on your PC? Test vote, stat, and review webhooks directly against http://localhost:3000 or 127.0.0.1 from the Portal without setting up ngrok or public tunnels.",
+					"pingReady": "Click to Ping localhost:3000",
+					"pingSent": "200 OK • 4ms (Local Relay)"
+				},
+				"multiWindow": {
+					"badge": "Multi-Monitor Workspace",
+					"title": "Companion Windows & Custom Startup Page",
+					"description": "Middle-click or Ctrl+Click any nav item (or press Ctrl + Shift + N) to tear off a second synced window. Choose whether the app boots into Dashboard, Portal, Account, or resumes your last page.",
+					"startupLabel": "Startup: {target}",
+					"targetPortal": "Developer Portal",
+					"targetLast": "Resume Last Page",
+					"targetDashboard": "Dashboard"
+				},
+				"ghostAndGuardian": {
+					"badge": "Always-On Perks",
+					"title": "Click-Through Ghost Overlay & Streak Guardian",
+					"description": "Toggle Alt + Shift + O so mouse clicks pass straight through the floating overlay into your game, hold Shift while dragging any file to upload to CDN, and get background alerts before your daily streak expires.",
+					"ghostOn": "Click-Through ON • 70% Opacity",
+					"ghostOff": "Interactive Overlay • 100% Opacity",
+					"guardianHint": "Alt+Shift+O • Shift+Drop CDN • Streak Guardian"
 				}
 			},
 			"highlights": {
@@ -2941,7 +3347,10 @@
 			"description": "Join communities and developers using Xernerx Studios to manage Discord servers, automate workflows, and connect custom bots through our open JSON REST API. Sign in once with Discord to access our web dashboard, bot services, and developer tools.",
 			"dashboard": "Open Dashboard",
 			"download": "Get Desktop App",
-			"docs": "Read Documentation"
+			"docs": "Read Documentation",
+			"invites": "Official Bot Invites",
+			"careers": "Open Team Roles",
+			"contact": "Get in Touch"
 		}
 	},
 	"faq": {
@@ -3013,7 +3422,8 @@
 			"tryCommandPalette": "Open Command Palette (Ctrl + K)",
 			"tryAppDrawer": "Open App Drawer (Ctrl + Space)",
 			"tryOmnibar": "Open URL Omnibar (Ctrl + .)",
-			"tryShortcutsModal": "View Shortcuts & Changelog (Ctrl + /)"
+			"tryShortcutsModal": "View Shortcuts & Changelog (Ctrl + /)",
+			"creditStore": "Credit Store & Perks"
 		},
 		"overview": {
 			"navTitle": "Ecosystem & Navigation",
@@ -3052,6 +3462,10 @@
 			"card5": {
 				"title": "How does the floating Support Button work, and how can I contact specific departments?",
 				"description": "Clicking the floating Support button in the bottom-right corner of any page opens a quick-help popover with links to the Support Hub, Report an Issue, Suggest a Feature, and FAQ, plus a Join Support Server button. If you are signed in and not yet a member of our Discord server, clicking Join Support Server uses your authorized Discord guilds.join scope to add your account to the official Xernerx Support server automatically and open the support channel. For direct email inquiries, visit xernerx.com/contact to reach General Inquiries (info@xernerx.com), Technical Support (support@xernerx.com), Billing & Invoices (invoice@xernerx.com), Security Disclosures (security@xernerx.com), or Legal & Privacy (legal@xernerx.com)."
+			},
+			"card6": {
+				"title": "How do Custom Vanity Slugs work for Bots, Servers, and Users?",
+				"description": "Custom Vanity Slugs let you replace long Discord snowflake IDs with clean, memorable URLs across the suite—such as app.xernerx.com/bots/virtue, app.xernerx.com/servers/xernerx, and app.xernerx.com/users/alex. Vanity slugs can be unlocked via the Credit Store or supporter perks and configured directly in your Profile Settings, Server Dashboard, or Developer Portal."
 			}
 		},
 		"environments": {
@@ -3116,12 +3530,12 @@
 				"description": "The Live Overlay Monitor (launched from your sidebar user card or at app.xernerx.com/overlay) is a compact, game-friendly companion view designed to be pinned on top of fullscreen applications and games. It displays real-time API latency (in ms) and operational health, a Live Feed tab of recent events and notifications, a Servers & Bots quick-status tab, and Quick Actions to open routes in your main window."
 			},
 			"card4": {
-				"title": "How do Discord Rich Presence (RPC), the Ctrl + Shift + X summon hotkey, and custom window controls work?",
-				"description": "When running the Desktop App, a dedicated Desktop Client section appears in account.xernerx.com/preferences. From there you can toggle Discord Rich Presence (broadcasting what you are exploring or managing on your Discord profile card), enable the global Ctrl + Shift + X hotkey to summon or hide the window from anywhere, configure Start on Boot, Always on Top, or Minimize to System Tray on Close, and switch your titlebar Window Controls style between System, Windows, macOS traffic lights, or Xernerx."
+				"title": "How do Native Notifications, Streamer Protection, Quick Capture to CDN, and Desktop Hotkeys work?",
+				"description": "When running the Desktop App, a dedicated Desktop Client section appears in account.xernerx.com/preferences. From there you can choose your default Startup Location (Dashboard, Developer Portal, Account, Explore, Store, Docs, CDN, etc.), toggle Native OS Notifications (Windows Action Center toasts, Apple Notification Center banners, taskbar flashes, and macOS Dock unread badges), Streamer Protection (using native OS win.setContentProtection to hide your window from OBS and screen recorders), Smart Battery Saver & Wake Sync (throttling background canvas animations on battery power and resyncing on wake), Discord Rich Presence (RPC), the global Ctrl + Shift + X summon hotkey, and optional global hotkeys for the Spotlight Quick Launcher (Ctrl + Shift + Space, off by default to avoid app conflicts) and Quick Screen Capture to CDN (Ctrl + Shift + S)."
 			},
 			"card5": {
-				"title": "How can I inspect Desktop App logs, edit raw metadata.json, or clear the app cache?",
-				"description": "Inside account.xernerx.com/preferences when using the Desktop App, you can switch the Desktop Client panel into raw JSON Editor mode to inspect or edit your local metadata.json flags directly, open the Desktop Logs Modal to view or copy diagnostic runtime logs, or click Clear Cache to purge cached Chromium assets. Toggling engine flags such as Hardware Acceleration, Debug Mode, or Start Maximized/Minimized will prompt a one-click application restart to apply."
+				"title": "How can I use Taskbar JumpLists, inspect Desktop App logs, edit raw metadata.json, or clear the app cache?",
+				"description": "Right-clicking the Xernerx icon on your Windows Taskbar or macOS Dock gives you direct JumpList and Dock shortcuts to open your Dashboard, Developer Portal, Live Overlay, or trigger an instant Screen Capture to your Xernerx CDN media library. Inside account.xernerx.com/preferences, you can also switch the Desktop Client panel into raw JSON Editor mode to edit your local metadata.json flags directly, open the Desktop Logs Modal to inspect or copy diagnostic runtime logs, or click Clear Cache to purge cached Chromium assets."
 			}
 		},
 		"translations": {
@@ -3222,6 +3636,10 @@
 			"card6": {
 				"title": "How do Public User Profiles (app.xernerx.com/users/[id]), Discord Collectibles, and Badges work?",
 				"description": "Every user has a customizable profile at app.xernerx.com/users/[id] (editable on account.xernerx.com/profile). Public profiles showcase your Discord avatar, animated Discord Avatar Decorations and Collectibles Nameplates (toggleable via showDiscordCollectibles in account.xernerx.com/preferences), Clan badge, short bio, full Markdown Info, pronouns, timezone with UTC offset, Global Level, Daily Streak, Published Bots, Official Servers, Organizations, and automatic ecosystem badges including Bot Developer, Bug Hunter, and Contributor."
+			},
+			"card7": {
+				"title": "How do Virtue Server XP & Voice Leaderboards work?",
+				"description": "When Virtue's leveling module is enabled on your Discord server, members automatically earn XP from text messages and active time in voice channels. Server owners can customize XP rates, level-up role rewards, and announcements in the Virtue Dashboard, while members can browse real-time ranked XP and Voice Leaderboards on your public server page."
 			}
 		},
 		"account": {
@@ -3237,7 +3655,7 @@
 			},
 			"card3": {
 				"title": "How do Public, Limited, and Private privacy levels and Terms/Cookie consent prompts work?",
-				"description": "Users, Bots, Servers, and Organizations support three privacy tiers: Public (visible in search, discovery, leaderboards, and embeds), Limited (hidden from public listings and leaderboards, but accessible to anyone with your direct link), and Private (visible only to you/owners, while external embeds and SVG badges return a privacy-safe Private placeholder). Whenever Xernerx updates its Terms of Service or Privacy Policy version timestamps, authenticated users are automatically prompted in-app to review and accept the revised policy, and you can manage Essential, Functional, Analytics, and Marketing cookie categories anytime via Cookie Preferences in the footer."
+				"description": "Every User, Bot, Server, Organization, and CDN Media item enforces our Universal 3-Tier Privacy Truth: Public (listed in public directories, explorers, leaderboards, and search; accessible by anyone), Limited (unlisted—never shown in public directories, search, or leaderboards, but accessible to anyone with the direct link or ID), and Private (strictly owner-only—never listed and blocked from viewing even with a direct link or ID unless you are the authenticated owner or authorized co-owner/member)."
 			},
 			"card4": {
 				"title": "How do Daily Credits and activity streaks work?",
@@ -3252,8 +3670,8 @@
 				"description": "On account.xernerx.com/connections (/?tab=connections), your Discord account is permanently linked as your Primary Identity. The Connections hub also includes secondary account integrations for GitHub, Twitch, YouTube, X (Twitter), Spotify, Steam, and Reddit (currently in preview while secondary OAuth linking workflows are being rolled out)."
 			},
 			"card7": {
-				"title": "How do Appearance themes, Discord accent sync, and custom UI scaling work?",
-				"description": "Open account.xernerx.com/appearance (/?tab=appearance) to switch between Dark, Light, and System themes, choose from 24 named preset accent colors such as Xerple, Crean, Cyber Neon, and Electric Blue (or toggle Sync Accent from Discord to automatically adopt your Discord profile banner/accent color), and customize UI Zoom (--ui-scale), Layout Spacing (Compact, Default, Spacious via --ui-gap), and Text Scale (--text-scale). Enable Sync Appearance Settings Across Clients to persist your visual setup to your account across every browser and the Desktop App."
+				"title": "How do Appearance themes, Discord accent sync, Dot-Matrix profiles, and custom UI scaling work?",
+				"description": "Open account.xernerx.com/appearance (/?tab=appearance) to switch between Dark, Light, and System themes, choose from 24 named preset accent colors (or Sync Accent from Discord), configure the ambient Dot-Matrix Background Profile (Default page-adaptive, Xernerx Wordmark, Xernerx Crest, Orbital Rings, Spiral Galaxy, Double Helix, Cyber Prism, Infinity Loop, Harmonic Wave Lattice, or Blank after loading) and Animation Mode (Animate by context, Static interactive-only, or Always Animate continuous ripple) that the loading matrix smoothly morphs into, and customize UI Zoom (--ui-scale), Layout Spacing (--ui-gap), and Text Scale (--text-scale)."
 			},
 			"card8": {
 				"title": "How does the Granular Notification Matrix work across In-App, Discord, and Email?",
@@ -3266,6 +3684,14 @@
 			"card10": {
 				"title": "How do I view my Account Activity Log, export my GDPR JSON data, or reset/delete my account?",
 				"description": "Open account.xernerx.com/activity (/?tab=activity) to search and filter your submitted Applications, Issues, and Suggestions alongside their live status badges and staff review notes, or click Export Data to download a complete JSON archive (xernerx-account-data-[id]-[date].json) of your profile and submissions. To clear your bio and preferences without closing your account, or to permanently purge your account across the ecosystem, visit account.xernerx.com (/?tab=account)."
+			},
+			"card11": {
+				"title": "How do Profile Showcases and Vanity Badges work?",
+				"description": "Every user receives 1 free Profile Showcase slot in Account Settings -> Profile (account.xernerx.com/?tab=profile) to pin a custom card with a title, description, tag, cover image, and external link to their public profile (app.xernerx.com/users/[id]), with 1-click Quick-Fill from your Bots, Servers, Organizations, and linked OAuth Connections. You can unlock +1 or +3 additional permanent Showcase slots and collect Vanity Badges—including Dot-Matrix Architect (interactive dot-matrix profile banner), Credit Patron, High Roller, and Vault Sovereign—in the Credit Store."
+			},
+			"card12": {
+				"title": "How can I download a copy of my personal data (.json)?",
+				"description": "You can export a complete, machine-readable .json archive of your Xernerx account at any time with 1-Click Personal Data Export in Account Settings. The archive includes your profile metadata, linked connections, preferences, credit ledger history, owned entities, and recent security activity logs."
 			}
 		},
 		"billing": {
@@ -3281,15 +3707,23 @@
 			},
 			"card3": {
 				"title": "How do the Daily Credit Gift, 48-hour streak grace window, and voting rewards work?",
-				"description": "Every account starts with 1,000 Credits and can claim a Daily Gift once every 24 hours from account.xernerx.com/billing or the sidebar user card (POST /secure/store/[userId]/gift). Each claim awards a random base of 50–150 Credits plus a (streak × 10) streak bonus. Once your daily gift unlocks after 24 hours, you have a 48-hour grace window to claim it and increment your streak before it resets to 1. You also earn +100 Credits every time you vote for a bot or server (12h cooldown) and can track top balances and streaks on app.xernerx.com/leaderboard."
+				"description": "Claim your Daily Gift every 24h for 50 base Credits + streak bonuses (up to +100) + a +100 Milestone Bonus every 7th day, protected by up to 3 Streak Shields. You can also earn automatic Community Bounties (+500 Credits for verified/resolved bug reports on info.xernerx.com/bugs, +250 Credits for accepted/implemented suggestions on info.xernerx.com/suggestions), claim Contributor Milestone Achievements (Streak Master, Community Voter, Ecosystem Builder), and earn +250 Credits for both you and a friend via the Referral Program!"
 			},
 			"card4": {
 				"title": "How does the Media CDN (cdn.xernerx.com) work and what are the storage quotas?",
-				"description": "Free accounts include 10 hosted files on cdn.xernerx.com, while active subscribers (such as Ultra Ecosystem or Staff Subscription holders) receive 1,000 hosted files. Upload media via drag-and-drop or clipboard paste (Ctrl + V) on cdn.xernerx.com or manage your files on account.xernerx.com/media (/?tab=media). Each file can be set to Public (accessible by anyone via /view/[id] or /raw/[id]), Limited (restricted to you and specific Discord User IDs you share it with), or Private (accessible only by you)."
+				"description": "Every Xernerx account includes 10 Media CDN slots on cdn.xernerx.com (50 with Virtue/Zodiac, 100 with Xernerx Ultra, plus permanent +1/+3/+10 slot upgrades in the Credit Store). The Media Studio supports custom Folders, searchable #tags, multi-select bulk privacy/deletion controls, and a pre-upload Aspect-Ratio Image Cropper (1:1 Avatar, 16:9 Banner, or Freeform)."
 			},
 			"card5": {
 				"title": "How do I apply for open staff or developer positions at Xernerx Studios?",
 				"description": "Visit xernerx.com/applications (or vanity URLs xernerx.com/careers and xernerx.com/jobs) to browse open engineering, moderation, translator, and community roles, review requirements and benefits, and submit your application. You can track your application's review status and staff notes anytime on account.xernerx.com/activity and enable Application Reviewed alerts on account.xernerx.com/notifications."
+			},
+			"card6": {
+				"title": "What can I spend Credits on in the Credit Store, and how do Credit Top-Up Packs work?",
+				"description": "Visit store.xernerx.com/?category=credits to redeem Credits for permanent CDN Media Slots, Profile Showcase Slots, Custom Vanity URL Slots (2,000 Credits per slot or 5,000 Credits for a 3-slot bundle for Users, Bots, Servers & Organizations), Streak Shields (500 Credits, max 3 active), 3-Day/7-Day Trial Passes, and Vanity Badges (including the interactive Dot-Matrix Profile Banner). You can also spend Credits directly on Bot & Server pages or dashboards to activate 24-Hour (1,000 Credits) or 7-Day (5,000 Credits) Community Spotlight Boosts, send direct Creator Tips (50–2,500 Credits), and review your full Credit Balance & Transaction Ledger."
+			},
+			"card7": {
+				"title": "Can I tip Credits to other users or bot developers?",
+				"description": "Yes! Peer-to-Peer Credit Tipping allows you to send spendable Xernerx Credits directly to friends, community contributors, or your favorite bot developers from their public profile or bot listing page. Both the sender and recipient receive an instant ledger receipt in their Account Billing history."
 			}
 		},
 		"developers": {
@@ -3305,11 +3739,11 @@
 			},
 			"card3": {
 				"title": "How do I embed live Bot, Server, Organization, or User widgets and SVG badges?",
-				"description": "Enable Public Embed Widget in your User, Bot, Server, or Organization Settings to unlock live cards at /core/[bots|guilds|organizations|users]/[id]—supporting JSON by default, interactive HTML iframes (?type=iframe&theme=dark|light), scalable SVGs (?type=svg), and high-DPI PNG cards (?type=png, served automatically to Discord/Twitter/Slack link unfurlers). You can also embed compact SVG shields via /v1/[entity]/[id]/badge.svg with ?theme=dark|light and ?style=rounded|pill|flat across bot metrics (votes, servers, users, status), server metrics (votes, members, messages, status), organization metrics (members, bots, servers, status), and user metrics (streak, bots, orgs, status)."
+				"description": "Enable Public Embed Widget in your User, Bot, Server, or Organization Settings to unlock live cards at /core/[bots|guilds|organizations|users]/[id]—supporting JSON, HTML iframes (?type=iframe), SVGs (?type=svg), and PNG cards (?type=png), complete with active Vanity Badges and Daily Streaks on user cards. You can also embed compact SVG shields via /v1/[entity]/[id]/badge.svg (including status, ping, guilds, votes, and streak metrics) with 1-click Markdown/HTML copy from any Bot Statistics tab."
 			},
 			"card4": {
 				"title": "How do I connect a service to the real-time WebSocket Gateway?",
-				"description": "Install the @xernerx/websocket npm package (documented at docs.xernerx.com/packages and docs.xernerx.com/websocket) and connect to the WebSocket Gateway using an active token that has WebSocket Allowance (permissions.websocket: true) enabled. After sending the initial auth handshake payload, you can issue correlated JSON-RPC requests (GET, POST, PATCH, DELETE) to backend service modules such as virtue (guild leveling curves, text/voice XP, global levels) and xernerx (users, levels, credits, tokens, guilds, bots) using functionified SDK methods (get, create, update, delete)."
+				"description": "Install @xernerx/websocket or test live and simulated JSON-RPC frames directly in your browser using the Interactive WebSocket RPC Playground at docs.xernerx.com/websocket#playground. For outbound bot webhooks, the Developer Portal (/portal/bots/[id]) includes a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
 			},
 			"card5": {
 				"title": "What features are exclusive to the Xernerx Desktop App?",
@@ -3321,7 +3755,7 @@
 			},
 			"card7": {
 				"title": "How do Token Lifecycle States (Pending, Active, Inactive, Suspended) and Elevated Permissions work?",
-				"description": "When you create a token on account.xernerx.com/tokens, it starts as Pending without a bound bot. The first time you send a stats payload to POST /v1/bots/[id]/stats using that token, Xernerx verifies the bot on Discord, binds the token to that botId, sets its status to Active, and scopes it to GET requests and that bot's /v1/bots/[id]/* endpoints. You can add co-owners by Discord User ID or regenerate/delete tokens anytime. For internal services or advanced partner integrations, staff administrators can grant elevated token flags including Secure Passage (permissions.secure for /secure/* endpoints), WebSocket Allowance (permissions.websocket), and Xernerx System status (isXernerx)."
+				"description": "Tokens created on account.xernerx.com/tokens track live requestCount and lastUsedAt telemetry whenever validated via /secure/validate/token, and support 1-click Roll Token to rotate your secret key in-place without losing permissions, co-owners, or bound bot settings. Bots also unlock 16-tier Server Milestones (Servers-1..16) and Member Milestones (Members-1..16) displayed on bot profiles and showcased as Biggest Bot Milestone Badges on developer user profiles."
 			},
 			"card8": {
 				"title": "How does the Open-Source NPM Package Documentation Reader (docs.xernerx.com/packages) work?",
@@ -3501,7 +3935,56 @@
 				"profile": "Profile",
 				"reviews": "Reviews",
 				"settings": "Settings",
-				"statistics": "Statistics"
+				"statistics": "Statistics",
+				"milestones": "Milestones",
+				"releases": "Releases"
+			},
+			"milestones": {
+				"title": "Bot Milestones",
+				"subtitle": "Official server and member growth achievements across all 16 milestone tiers.",
+				"serversTitle": "Server Milestones",
+				"serversSubtitle": "Unlocked as your bot expands into more Discord servers.",
+				"membersTitle": "Member Milestones",
+				"membersSubtitle": "Unlocked as your bot reaches more combined community members.",
+				"unlockedCount": "{unlocked} / {total} Unlocked",
+				"currentPeak": "Peak Reached",
+				"nextTarget": "Next Milestone: {target}",
+				"maxTierReached": "All 16 Milestone Tiers Unlocked!",
+				"unlockedLabel": "Unlocked",
+				"lockedLabel": "Locked"
+			},
+			"releases": {
+				"title": "Release Notes & Changelog",
+				"subtitle": "Version history, new features, and updates published by the bot developers.",
+				"countBadge": "{count} Releases",
+				"emptyTitle": "No releases published yet",
+				"emptyDesc": "The developer has not published any versioned release notes for this bot yet.",
+				"latestBadge": "Latest"
+			},
+			"commands": {
+				"optionsCount": "{count} options",
+				"subcommandsCount": "{count} subcommands",
+				"copyBtn": "Copy {command}",
+				"previewerTitle": "Interactive Discord Slash-Command Previewer",
+				"resetValues": "Reset Values",
+				"copyFullCommand": "Copy {command}",
+				"noOptionsHint": "This command takes no options — ready to run!",
+				"autocompleteBadge": "Autocomplete",
+				"choicesBadge": "{count} choices",
+				"selectChoicePlaceholder": "Select an option choice...",
+				"sampleValuePlaceholder": "Enter sample {name}...",
+				"filterAll": "All ({count})",
+				"filterSlash": "Slash Commands ({count})",
+				"filterContext": "Context Commands ({count})",
+				"slashSectionTitle": "Slash Commands",
+				"slashSectionSubtitle": "Invoked in chat with a leading / prefix and optional parameters or subcommands.",
+				"contextSectionTitle": "Context Menu Commands",
+				"contextSectionSubtitle": "Invoked by right-clicking a user or message in Discord under the Apps menu.",
+				"userContextBadge": "User Context",
+				"messageContextBadge": "Message Context",
+				"userContextHint": "Right-click User → Apps → {name}",
+				"messageContextHint": "Right-click Message → Apps → {name}",
+				"contextDefaultDesc": "Discord context menu action triggered directly on a {target}."
 			}
 		},
 		"dashboard": {
@@ -3569,7 +4052,18 @@
 				"transferDescription": "Transfer this server to an organization you belong to or own.",
 				"transferTitle": "Transfer Organization",
 				"resetConfirmTitle": "Reset Server Data",
-				"resetConfirmDesc": "Are you sure you want to reset all server descriptions, links, and widgets back to default?"
+				"resetConfirmDesc": "Are you sure you want to reset all server descriptions, links, and widgets back to default?",
+				"vanitySlugTitle": "Vanity URL Slug",
+				"vanitySlugDesc": "Custom server link:",
+				"vanitySlugPlaceholder": "my-community-server",
+				"vanityUnlockedBadge": "Unlocked",
+				"vanityCostBadge": "2,000 Credits",
+				"vanitySlotAvailableBadge": "{count} Slot Available",
+				"vanityLockedHint": "Unlock a permanent custom Vanity URL with 2,000 Credits or a Credit Store Vanity URL Slot.",
+				"unlockVanityBtn": "Unlock (2,000 Credits)",
+				"redeemVanitySlotBtn": "Redeem Vanity Slot",
+				"vanityUnlockSuccessTitle": "Vanity URL Unlocked!",
+				"vanityUnlockSuccessDesc": "You can now set and customize your permanent Vanity URL slug."
 			},
 			"stats": {
 				"boosts": "Boosts",
@@ -3612,7 +4106,28 @@
 				},
 				"trackedRoles": "Tracked Level Roles",
 				"trackedRolesDesc": "Assign roles to unlock as members progress.",
-				"variables": "Variables: {user}, {level}, {role}"
+				"variables": "Variables: {user}, {level}, {role}",
+				"portability": {
+					"title": "Config Backup & Cross-Server Cloning",
+					"subtitle": "Export your Virtue leveling setup as JSON, import a backup, or clone settings from another server.",
+					"exportBtn": "Export JSON",
+					"importBtn": "Import JSON",
+					"exportSuccess": "Exported Virtue configuration JSON!",
+					"importSuccess": "Applied imported Virtue settings! Click Save Changes to persist.",
+					"importError": "Invalid Virtue configuration JSON.",
+					"cloneTitle": "Copy Settings from Another Server",
+					"cloneDesc": "Clone difficulty mode, cycles, announcement templates, and role rules from any server you manage.",
+					"selectServerPlaceholder": "Choose source server...",
+					"cloneBtn": "Clone Config",
+					"cloneSuccess": "Cloned Virtue settings from {server}! Click Save Changes to persist.",
+					"cloneNotFound": "Virtue is not configured on that server yet.",
+					"cloneFailed": "Failed to clone Virtue settings",
+					"modalTitle": "Import Virtue Configuration",
+					"modalDesc": "Upload an exported .json file or paste your configuration JSON below.",
+					"uploadFileLabel": "Choose .json Config File",
+					"jsonPlaceholder": "{\n  \"mode\": \"balanced\",\n  \"levelUp\": true\n}",
+					"applyBtn": "Apply Configuration"
+				}
 			}
 		},
 		"layout": {},
@@ -3843,7 +4358,10 @@
 				"resetData": "Reset Data",
 				"resetDesc": "Reset all organization settings and configurations back to default without deleting the organization itself.",
 				"deleteOrg": "Delete Organization",
-				"deleteDesc": "Permanently delete this organization and all of its associated data from Xernerx."
+				"deleteDesc": "Permanently delete this organization and all of its associated data from Xernerx.",
+				"vanitySlugTitle": "Vanity URL Slug",
+				"vanitySlugDesc": "Custom short link:",
+				"vanitySlugPlaceholder": "my-organization"
 			},
 			"modals": {
 				"create": {
@@ -3890,7 +4408,9 @@
 					"links": "Links",
 					"settings": "Settings",
 					"commands": "Commands",
-					"webhooks": "Webhooks"
+					"webhooks": "Webhooks",
+					"growth": "30d Growth",
+					"releasesAndCommands": "Releases & Commands"
 				},
 				"general": {
 					"header": "General Settings",
@@ -3950,10 +4470,84 @@
 					"triggers": "Triggers",
 					"url": "Webhook URL",
 					"webhookNumber": "Webhook #{number}",
+					"localRelayBadge": "Local Relay Ready",
 					"testButton": "Test Ping",
 					"urlRequired": "Please enter a webhook URL first.",
 					"testSuccess": "Webhook responded with {status} ({latency}ms)",
-					"testFailed": "Webhook test failed: {error}"
+					"testFailed": "Webhook test failed: {error}",
+					"deliveries": {
+						"title": "Recent Webhook Deliveries",
+						"subtitle": "Live outbound delivery log (latest 25 attempts) with 1-click payload replay.",
+						"refresh": "Refresh",
+						"emptyTitle": "No webhook deliveries recorded yet",
+						"emptyDesc": "Send a test ping above or trigger a vote/review event to inspect status codes, latency, and response snippets.",
+						"statusOk": "OK",
+						"statusError": "ERR",
+						"statusUnreachable": "TIMEOUT / ERR",
+						"inspectPayload": "Payload",
+						"replayButton": "Replay",
+						"requestPayload": "Request Payload",
+						"responseSnippet": "Response Snippet (First 200 chars)",
+						"emptyResponse": "No response body returned.",
+						"replaySuccess": "Webhook replayed ({status} in {latency}ms)",
+						"replayFailed": "Replay failed: {error}"
+					}
+				},
+				"growth": {
+					"metrics": {
+						"servers": "Servers",
+						"users": "Members",
+						"shards": "Shards",
+						"votes": "Votes"
+					},
+					"last30Days": "30d delta",
+					"chartTitle": "30-Day {metric} Telemetry",
+					"chartSubtitle": "Hover over any data point to inspect historical snapshots.",
+					"areaMode": "Area",
+					"barMode": "Bar"
+				},
+				"vanity": {
+					"title": "Custom Vanity URL Slug",
+					"description": "Set a memorable custom URL for your bot's public listing:",
+					"placeholder": "my-awesome-bot",
+					"saveBtn": "Save Slug",
+					"savedToast": "Vanity URL slug saved!"
+				},
+				"releases": {
+					"title": "Release Notes Publisher",
+					"subtitle": "Publish versioned changelogs that appear on your bot's public Releases tab.",
+					"versionLabel": "Version Tag",
+					"releaseTitleLabel": "Release Title",
+					"releaseTitlePlaceholder": "Major Economy & Moderation Update",
+					"bodyLabel": "Changelog (Markdown Supported)",
+					"bodyPlaceholder": "Describe new commands, improvements, and bug fixes...",
+					"publishBtn": "Publish Release",
+					"validationError": "Please provide both a version tag and a release title.",
+					"publishedToast": "Release note published!",
+					"deletedToast": "Release note deleted",
+					"deleteConfirmTitle": "Delete Release Note",
+					"deleteConfirmDesc": "Are you sure you want to delete release {version}? This action cannot be undone."
+				},
+				"commandsEditor": {
+					"title": "Visual Command Editor",
+					"subtitle": "Design and manage your bot's slash commands and context menu actions visually.",
+					"addCommandBtn": "Add Slash Command",
+					"addContextBtn": "Add Context Command",
+					"saveCommandsBtn": "Save Commands",
+					"emptyHint": "No commands configured yet. Click \"Add Slash Command\" or \"Add Context Command\" to get started.",
+					"slashSectionTitle": "Slash Commands (/)",
+					"contextSectionTitle": "Context Menu Commands (Apps)",
+					"cmdTypeLabel": "Command Type",
+					"typeSlash": "Slash Command (/)",
+					"typeUserContext": "User Context Menu",
+					"typeMessageContext": "Message Context Menu",
+					"cmdNameLabel": "Command Name",
+					"cmdDescLabel": "Description",
+					"cmdDescPlaceholder": "What does this command do?",
+					"addOptionBtn": "Add Option",
+					"optNamePlaceholder": "option_name",
+					"optDescPlaceholder": "Option description...",
+					"savedToast": "Commands saved!"
 				}
 			},
 			"info": {
@@ -3980,6 +4574,31 @@
 				"id": "ID: {id}",
 				"viewPublicProfile": "View Public Profile",
 				"idCopied": "ID copied to clipboard"
+			},
+			"treasury": {
+				"title": "Shared Organization Credit Treasury",
+				"subtitle": "Pool credits with team members to fund Spotlight Boosts for organization bots and servers.",
+				"poolBalance": "Treasury Pool",
+				"depositHeading": "Contribute Credits",
+				"yourBalance": "Your Balance: {balance}",
+				"depositButton": "Deposit",
+				"minDepositError": "Minimum deposit is 50 credits.",
+				"depositSuccess": "Deposited {amount} credits into {org}!",
+				"depositFailed": "Could not deposit credits into treasury",
+				"boostHeading": "Team Spotlight Boost",
+				"costLabel": "Cost: {cost} Credits",
+				"selectTarget": "Select bot or server...",
+				"duration24h": "24 Hours (1,000)",
+				"duration7d": "7 Days (5,000)",
+				"boostButton": "Activate Spotlight Boost",
+				"boostSuccess": "Activated {duration} Spotlight Boost from Treasury!",
+				"boostFailed": "Could not activate Spotlight Boost",
+				"ledgerHeading": "Recent Treasury Activity",
+				"emptyLedger": "No treasury deposits or boosts recorded yet.",
+				"depositedEntry": "deposited into treasury",
+				"boostedEntry": "boosted {target}",
+				"unlockVanityOption": "Unlock Vanity URL (2,000)",
+				"orgOnlyVanityError": "Organizations can only unlock a Vanity URL from the treasury (select a Bot or Server for Spotlight Boosts)."
 			}
 		},
 		"categories": {
@@ -4063,7 +4682,15 @@
 				},
 				"officialServers": "Official Servers",
 				"membersCount": "{count} members",
-				"votesCount": "{count} votes"
+				"votesCount": "{count} votes",
+				"cycleDotMatrixFormation": "Dot-Matrix Architect — Click to cycle formation",
+				"milestones": {
+					"title": "Biggest Bot Milestones",
+					"subtitle": "Highest server and member milestone badges achieved across this developer's bots.",
+					"badgeCount": "{count} Bots Tracked",
+					"tierUnlocked": "Tier #{tier} Unlocked",
+					"starterTier": "Starter Badge"
+				}
 			}
 		},
 		"servers": {
@@ -4093,7 +4720,38 @@
 			"shareProfile": "Share",
 			"profileLinkCopied": "Server link copied to clipboard",
 			"manageServer": "Manage Server",
-			"publishedBy": "Organization"
+			"publishedBy": "Organization",
+			"tabs": {
+				"leaderboard": "Leaderboard",
+				"reviews": "Reviews"
+			},
+			"leaderboard": {
+				"title": "Virtue XP & Voice Leaderboard",
+				"subtitle": "Top active members ranked by text chat XP and voice activity in this server.",
+				"searchPlaceholder": "Search ranked members...",
+				"textTab": "Text XP",
+				"voiceTab": "Voice XP",
+				"emptyTitle": "No leaderboard activity yet",
+				"emptyDesc": "Members will appear here as they chat and spend time in voice channels with Virtue enabled.",
+				"privateMember": "Private Member",
+				"privateBadge": "Private",
+				"xpLabel": "XP",
+				"voiceMinutes": "{count} mins in voice",
+				"levelProgress": "Level Progress",
+				"levelPill": "Level {level}"
+			},
+			"reviews": {
+				"placeholder": "Share your experience with this community server...",
+				"ownerResponse": "Official Server Owner Reply",
+				"replyPlaceholder": "Write an official server owner response to this review...",
+				"noReviews": "No reviews yet. Be the first to review this server!",
+				"toast": {
+					"submitted": "Server review submitted!",
+					"submitFailed": "Failed to submit server review",
+					"deleted": "Server review deleted",
+					"responseAdded": "Official reply published"
+				}
+			}
 		},
 		"supporters": {
 			"itsYou": "It's You!",
@@ -4168,12 +4826,88 @@
 			"tabs": {
 				"feed": "Live Feed",
 				"servers": "Servers & Bots",
+				"inspector": "Inspector",
 				"quick": "Quick Actions"
 			},
 			"emptyFeed": "No recent events or notifications.",
 			"openInMain": "Open in Main Window",
+			"ghostToggle": "Click-Through Mode",
+			"ghostActive": "Click-Through Active",
 			"refreshNow": "Refresh",
-			"closeOverlay": "Close Overlay"
+			"closeOverlay": "Close Overlay",
+			"gift": {
+				"title": "Daily Gift",
+				"streakBadge": "{count}d",
+				"readyDesc": "Your 24h credit reward is ready to claim!",
+				"cooldownDesc": "Next reward unlocks in {time}",
+				"claimButton": "Claim Gift",
+				"claimedToast": "Claimed +{reward} credits! ({streak}d streak)",
+				"claimFailed": "Could not claim daily gift"
+			},
+			"ticker": {
+				"title": "Bot Status Ticker",
+				"countBadge": "{count} active"
+			},
+			"inspector": {
+				"botHealthTitle": "Live Bot Telemetry",
+				"noBots": "No bots registered in your workspace yet.",
+				"openPortal": "Portal",
+				"relayTitle": "Localhost Webhook Relay",
+				"relaySubtitle": "Ping a local webhook receiver directly from your PC",
+				"urlPlaceholder": "http://localhost:3000/webhook",
+				"pingButton": "Ping",
+				"pinging": "Pinging...",
+				"recentDeliveries": "Live Relay Stream",
+				"noDeliveries": "No local webhook pings sent in this session yet."
+			}
+		},
+		"boost": {
+			"buttonLabel": "Boost",
+			"spotlightBadge": "Spotlight",
+			"modalTitle": "Spotlight Boost — {name}",
+			"subtitle": "Feature on the Community Spotlight Row",
+			"description": "Promote this listing to the top of the Explore page and attach a glowing Spotlight badge.",
+			"activeUntil": "Currently boosted until {date} (new boost extends duration)",
+			"tier24hTitle": "24-Hour Spotlight",
+			"tier24hDesc": "Full 24 hours of top-row Spotlight placement and badge.",
+			"tier7dTitle": "7-Day Spotlight",
+			"tier7dDesc": "Full week of continuous Spotlight promotion.",
+			"saveBadge": "Save 2,000",
+			"creditsLabel": "Credits",
+			"yourBalance": "Your Credit Balance",
+			"confirmBtn": "Boost for {cost} Credits",
+			"signInRequired": "Please sign in to boost with credits.",
+			"failedTitle": "Spotlight Boost Failed",
+			"successTitle": "Spotlight Boost Activated!",
+			"successDesc": "{name} is now featured on the Community Spotlight!",
+			"boostServerBtn": "Boost Server",
+			"boostBotBtn": "Boost Bot"
+		},
+		"tip": {
+			"tipCreatorBtn": "Tip Creator",
+			"tipUserBtn": "Tip Credits",
+			"modalTitle": "Send Credit Tip to {name}",
+			"subtitle": "Support {name} with Xernerx Credits",
+			"description": "100% of your tip is transferred directly to the recipient’s credit wallet (50–2,500 credits per tip).",
+			"presetLabel": "Quick Preset Amounts",
+			"customAmountLabel": "Tip Amount (50 – 2,500 Credits)",
+			"noteLabel": "Appreciation Note (Optional)",
+			"notePlaceholder": "Keep up the awesome work on your bots!",
+			"yourBalance": "Your Credit Balance",
+			"sendBtn": "Send {amount} Credits",
+			"signInRequired": "Please sign in to send a credit tip.",
+			"failedTitle": "Could Not Send Tip",
+			"successTitle": "Credit Tip Sent!",
+			"successDesc": "Sent {amount} credits to {name}!"
+		},
+		"voteReminder": {
+			"remindMeBtn": "Remind Me",
+			"remindingBtn": "Reminder Set",
+			"enabledTitle": "Vote reminder enabled",
+			"enabledDesc": "We will notify you when you can vote for {name} again.",
+			"disabledTitle": "Vote reminder removed",
+			"loginRequired": "Sign in to set vote reminders",
+			"errorTitle": "Failed to update vote reminder"
 		}
 	},
 	"cdn": {
@@ -4310,6 +5044,15 @@
 				"prodEndpoint": "Production Endpoint",
 				"canaryEndpoint": "Canary Endpoint",
 				"devEndpoint": "Development Endpoint",
+				"localEndpoint": "Local Dev Endpoint",
+				"badgeLocal": "Localhost",
+				"localEnvRouting": {
+					"title": "Local Environment Routing & Desktop Localhost Webhook Relay",
+					"subtitle": "Running the Xernerx Suite locally via pnpm dev or testing a local Discord bot?",
+					"portsLabel": "Local Suite Port Map:",
+					"relayBadge": "Desktop App Zero-Ngrok Relay",
+					"relayDesc": "When testing Bot Webhooks in /portal/bots/[id] inside the Xernerx Desktop App, any http://localhost:*, 127.0.0.1, or LAN IP (192.168.x.x) webhook URL is automatically dispatched directly from your machine via Electron IPC — no ngrok or public tunnel required."
+				},
 				"auth": "Authentication",
 				"authDesc1": "All programmatic API requests across the platform must be authenticated using an API Token generated from your developer dashboard.",
 				"authDesc2": " Internal web requests may also utilize standard NextAuth session cookies.",
@@ -4453,6 +5196,21 @@
 					"fetchVersionChangelog": {
 						"title": "Fetch Service Version & Changelog",
 						"description": "Query live semantic version and Markdown release notes on any Xernerx Suite subdomain (/api/version and /api/changelog)."
+					},
+					"botWebhooksRelay": {
+						"title": "Bot Webhooks & Desktop Localhost Relay",
+						"description": "Receive real-time HTTP POST webhook dispatches when users vote, review, or update stats on your bot — with built-in localhost relay support in the Xernerx Desktop App.",
+						"localRelayTitle": "Testing on localhost / 127.0.0.1 (Zero Ngrok Required)",
+						"localRelayDesc": "When configuring webhooks in app.xernerx.com/portal/bots/[id] inside the Xernerx Desktop App, setting your Webhook URL to http://localhost:3000/... or http://127.0.0.1:... displays a Local Relay Ready badge. Clicking Test Ping dispatches the exact signed JSON payload and X-Xernerx-* headers directly from your local machine via Electron's main process.",
+						"headersAndEvents": "Webhook Headers & Event Triggers"
+					},
+					"postBotReleases": {
+						"title": "Publish Bot Release Changelog",
+						"description": "Publish a new versioned release entry to your bot's public changelog feed and notify subscribers.",
+						"versionDesc": "Semantic version tag for the release (e.g. \"1.4.0\").",
+						"titleDesc": "Short headline title summarizing the release.",
+						"notesDesc": "Markdown-formatted release notes detailing new features, fixes, and changes.",
+						"breakingDesc": "Optional boolean flag indicating whether this release includes breaking changes."
 					}
 				},
 				"common": {
@@ -4464,6 +5222,12 @@
 					"serverCountDesc": "The number of servers the bot is in (alias for guildCount).",
 					"shardCountDesc": "The number of active shards.",
 					"userCountDesc": "The estimated total number of users across all guilds."
+				},
+				"snippetGenerator": {
+					"botIdLabel": "Interactive Snippet Bot ID",
+					"botIdHelper": "Select one of your bots or paste a Bot ID to dynamically populate all code examples below.",
+					"selectBotPlaceholder": "Select your bot...",
+					"botIdPlaceholder": "Enter Bot ID (e.g. 1059956767103668244)"
 				}
 			},
 			"core": {
@@ -4514,6 +5278,14 @@
 				"infoFaq": {
 					"title": "Platform FAQ & Bot Knowledge Base",
 					"description": "Fetch the localized 9-category, 54-card Xernerx Suite FAQ catalog, search answers, or retrieve pre-formatted Discord embed payloads with vanity quick links for Discord bots."
+				},
+				"infoDocs": {
+					"title": "Developer Docs Catalog & Blueprints",
+					"description": "Query the localized Developer Documentation catalog, search across REST API, CDN, WebSocket, and NPM package specs, or retrieve ready-to-send Discord embeds by blueprint ID."
+				},
+				"infoStatus": {
+					"title": "Live Bot Presences & 24h Uptime Telemetry",
+					"description": "Retrieve live Discord Gateway presences and shard metrics for official Xernerx bots, or fetch and record rolling 24-hour 30-minute uptime and latency buckets across all suite services."
 				}
 			},
 			"secure": {
@@ -4572,6 +5344,26 @@
 				"manageFeedbackAdmin": {
 					"title": "Moderate Issues, Roadmap & Suggestions",
 					"description": "Administrative endpoints for triaging bug reports, publishing roadmap milestones, and moderating community suggestions."
+				},
+				"botReleases": {
+					"title": "Manage Bot Releases",
+					"description": "List, publish, or delete versioned release changelog entries for a bot."
+				},
+				"guildLeaderboard": {
+					"title": "Fetch Guild XP & Voice Leaderboard",
+					"description": "Retrieve ranked member XP, levels, message counts, and voice activity minutes for a Virtue-enabled server."
+				},
+				"guildReviews": {
+					"title": "Manage Guild Reviews",
+					"description": "List, submit, or moderate community ratings and reviews for a Discord server."
+				},
+				"creditsTip": {
+					"title": "Peer-to-Peer Credit Tip",
+					"description": "Transfer spendable Xernerx Credits from the authenticated user to another user or bot creator."
+				},
+				"userExport": {
+					"title": "Export Personal User Archive",
+					"description": "Generate and download a complete GDPR-compliant JSON archive of a user's profile, settings, and activity."
 				}
 			},
 			"playground": {
@@ -4602,7 +5394,7 @@
 			"description": "The Xernerx Content Delivery Network securely routes, caches, and accelerates media assets across the entire ecosystem. This documentation covers the internal HTTP API used for programmatically managing uploads and media retrieval.",
 			"notice": {
 				"title": "Internal API Usage Notice",
-				"description": "The CDN is primarily designed as an internal microservice for Xernerx ecosystem applications (like the Account and Admin dashboards). While these endpoints are documented for transparency and advanced developer integrations, they are tightly coupled to the internal authentication flow and are not intended for general public consumption like a standalone SaaS product."
+				"description": "All media is stored privately in @vercel/blob and streamed exclusively through cdn.xernerx.com/raw/[id]. Storage slot quotas scale automatically by tier (10 slots Free, 50 slots Virtue/Zodiac, 100 slots Ultra) and can be permanently expanded (+1, +3, or +10 slots) by redeeming Credits in the Credit Store."
 			},
 			"overview": {
 				"title": "Base URL & Authentication",
@@ -4690,7 +5482,8 @@
 				"servicesAndActions": "Services & Actions",
 				"clientExample": "Client Example",
 				"categoryNavigation": "Navigation",
-				"categoryWebsocket": "WebSocket"
+				"categoryWebsocket": "WebSocket",
+				"playground": "RPC Playground"
 			},
 			"hero": {
 				"title": "WebSocket Gateway",
@@ -4779,6 +5572,7 @@
 				"virtue": {
 					"description": "Manages leveling configurations and user activity tracking. Self-saved Virtue leveling data is stored in the isolated <code>virtue</code> database (separating text and voice levels per guild), while global user identity and combined platform levels are stored in the primary <code>xernerx</code> database.",
 					"guildsDesc": "Guild leveling mode (<code>easy</code>, <code>casual</code>, <code>balanced</code>, <code>hard</code>, <code>extreme</code>), cycles, level message, and ignored/tracked roles.",
+					"usersDesc": "Virtue user profile preferences, including bot interaction language and locale settings.",
 					"textDesc": "Guild member text level, text XP, and message count per server.",
 					"voiceDesc": "Guild member voice level, voice XP, and time spent in voice per server.",
 					"globalLevelDesc": "Global unified platform user level and XP (combined text & voice contribution).",
@@ -4789,7 +5583,7 @@
 					"description": "Primary platform service mediating global accounts, combined user leveling, economy credits, and ecosystem resources stored in the main <code>xernerx</code> database.",
 					"usersDesc": "Global user profile, appearance, preferences, and account metadata.",
 					"levelsDesc": "Unified platform user level and XP (aggregated across text and voice).",
-					"creditsDesc": "User balance, daily gift streak, and credit transaction status.",
+					"creditsDesc": "Read or update user credit balances, daily streaks, unlocked perks, and vanity badges. Positive balance increments via update automatically apply the user’s active Subscription Credit Multiplier (2.0x for Ultra, 1.25x for Bot Subscribers) unless skipMultiplier: true is passed in body.data.",
 					"tokensDesc": "API and WebSocket developer tokens and permission states.",
 					"guildsDesc": "Platform-wide guild profiles and institutional registration.",
 					"botsDesc": "Registered bot metadata, reviews, votes, and verification state.",
@@ -4810,6 +5604,30 @@
 				"step1Title": "1. Installation",
 				"step2Title": "2. Functionified Connection Example",
 				"step2Desc": "Provide your token (ensuring it has WebSocket allowance enabled) and call the built-in CRUD operations:"
+			},
+			"playground": {
+				"title": "Interactive RPC Playground",
+				"badge": "LIVE & SIMULATED",
+				"subtitle": "Construct, dispatch, and inspect real-time WebSocket RPC frames directly from your browser.",
+				"modeLive": "LIVE GATEWAY",
+				"modeSimulated": "SIMULATED PREVIEW",
+				"presetsLabel": "Quick Action Presets",
+				"serviceLabel": "Target Service",
+				"methodLabel": "RPC Method",
+				"actionLabel": "Action / Collection",
+				"actionPlaceholder": "e.g. guilds, levels, users, ping",
+				"tokenLabel": "Bearer / Bot Token (Optional)",
+				"tokenPlaceholder": "Paste XERNERX_TOKEN for live auth...",
+				"bodyLabel": "JSON Payload Body",
+				"sendButton": "Connect & Send RPC",
+				"simulateButton": "Simulate RPC",
+				"clearButton": "Reset",
+				"responseHeading": "Gateway RPC Response",
+				"framePreviewHeading": "Outbound RPC Frame Preview",
+				"responseTab": "Response Payload",
+				"requestTab": "Request Frame",
+				"helperNote": "If a local WebSocket daemon is not running or no token is supplied, the playground automatically falls back to a deterministic schema simulation.",
+				"invalidJson": "Invalid JSON in request body."
 			}
 		}
 	},
@@ -4843,7 +5661,11 @@
 				"notificationDeleted": "Notification deleted",
 				"filterAll": "All",
 				"filterUnread": "Unread",
-				"noUnread": "You're all caught up!"
+				"noUnread": "You're all caught up!",
+				"dailyGiftReadyTitle": "Daily Gift Ready to Claim!",
+				"dailyGiftReadyDesc": "Your 24-hour Daily Gift cooldown has finished. Claim your free credits now!",
+				"voteReadyTitle": "Vote Cooldown Ready: {name}",
+				"voteReadyDesc": "Your 12-hour vote cooldown for {name} has expired. Cast your next vote now!"
 			},
 			"sidebarsuite": {
 				"text1": "Suite"
@@ -4871,7 +5693,11 @@
 				"viewPublicProfile": "View Public Profile",
 				"switchAccount": "Switch Account",
 				"addAccount": "Add Account Slot",
-				"launchOverlay": "Live Overlay Monitor"
+				"launchOverlay": "Live Overlay Monitor",
+				"giftReminderSet": "We'll alert you in your Notification Bell when your Daily Gift is ready!",
+				"giftReminderCleared": "Daily Gift cooldown reminder removed.",
+				"enableGiftReminder": "Remind me when Daily Gift is ready",
+				"disableGiftReminder": "Cancel Daily Gift reminder"
 			}
 		},
 		"cookieprompt": {},
@@ -4882,12 +5708,17 @@
 		},
 		"header": {
 			"text1": "Download the app!",
+			"openInDesktop": "Open in App",
+			"checkUpdates": "Check for Desktop Updates",
+			"updateAvailable": "Desktop Update Available (v{version})",
 			"store": "Store",
 			"title1": "Open App Drawer (Ctrl + Space)",
 			"notifications": "Notifications (Ctrl + I)",
 			"commandPalette": "Open Command Palette (Ctrl + K)",
 			"copyUrl": "Copy URL",
-			"urlCopied": "URL copied to clipboard"
+			"urlCopied": "URL copied to clipboard",
+			"announcementEndsIn": "Ends in {time}",
+			"dismissAnnouncement": "Dismiss announcement"
 		},
 		"page": {},
 		"sidebar": {
@@ -4910,7 +5741,44 @@
 		"versionTracker": {
 			"title": "App Updated!",
 			"description": "Xernerx {app} has been updated to v{version}. Want to see what's new?",
-			"viewChangelog": "View Changelog"
+			"viewChangelog": "View Changelog",
+			"desktopOutdated": {
+				"badge": "Desktop Client Update",
+				"upToDateBadge": "Up to Date",
+				"checkingBadge": "Checking for Updates...",
+				"title": "Your Desktop App Is Outdated",
+				"modalTitleUpToDate": "Desktop App Updater",
+				"description": "You are currently running Xernerx App v{current}, and v{latest} is now available with new desktop features, security fixes, and performance improvements.",
+				"upToDateDescription": "You are running the latest available release of Xernerx App (v{current}).",
+				"currentLabel": "Installed Version",
+				"latestLabel": "Latest Release",
+				"channelLabel": "Release Channel",
+				"channelStable": "Stable",
+				"channelCanary": "Canary Preview",
+				"updateNow": "Download & Install Update",
+				"checkAgain": "Check for Updates",
+				"checkingNow": "Checking...",
+				"downloading": "Downloading Update ({progress}%)...",
+				"installing": "Launching Installer & Restarting...",
+				"downloadManual": "Download via Browser",
+				"remindLater": "Remind Me Later",
+				"close": "Close",
+				"upToDateToastTitle": "Desktop App Up to Date",
+				"upToDateToastDesc": "Xernerx App v{version} is already on the latest release.",
+				"errorFallback": "Automatic installer failed ({error}). Opening the download page instead."
+			}
+		},
+		"sidebarUser": {
+			"dailyGiftReminderEnable": "Remind me when Daily Gift is ready",
+			"dailyGiftReminderDisable": "Cancel Daily Gift reminder",
+			"dailyGiftReminderSetToast": "We'll alert you in your Notification Bell when your Daily Gift is ready!",
+			"dailyGiftReminderClearedToast": "Daily Gift cooldown reminder removed."
+		},
+		"notifications": {
+			"dailyGiftReadyTitle": "Daily Gift Ready to Claim!",
+			"dailyGiftReadyDesc": "Your 24-hour Daily Gift cooldown has finished. Claim your free credits now!",
+			"voteReadyTitle": "Vote Cooldown Ready: {name}",
+			"voteReadyDesc": "Your 12-hour vote cooldown for {name} has expired. Cast your next vote now!"
 		}
 	},
 	"lib": {
@@ -4959,13 +5827,17 @@
 		"home": {
 			"title": "Support",
 			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
-			"searchPlaceholder": "Search FAQ, known issues, suggestions, and roadmap...",
+			"searchPlaceholder": "Search all 70+ FAQ answers, roadmap milestones, issues, suggestions, docs, and status...",
 			"searchEmpty": "No results found matching \"{query}\".",
 			"searchCategories": {
+				"all": "All",
 				"faq": "FAQ",
 				"issues": "Issues",
 				"suggestions": "Suggestions",
-				"roadmap": "Roadmap"
+				"roadmap": "Roadmap",
+				"docs": "Docs",
+				"changelog": "Changelog",
+				"status": "Status"
 			},
 			"portals": {
 				"roadmap": {
@@ -5180,8 +6052,13 @@
 				"ago24h": "24h ago",
 				"now": "Now",
 				"uptime": "{percent}% uptime",
-				"noData": "No record"
-			}
+				"noData": "No record",
+				"sparklineAvg": "{ms}ms avg"
+			},
+			"botBadgeButton": "Embed Bot Status Badge",
+			"botBadgeShort": "Badge",
+			"botBadgeModalTitle": "Embed {name} Status Badge",
+			"botBadgeModalDesc": "Embed a live real-time SVG status and 24-hour uptime badge for {name} in your GitHub README, documentation, or website."
 		}
 	}
 }

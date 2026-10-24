@@ -109,6 +109,14 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 				if (orgRes.ok) {
 					const orgData = await orgRes.json();
+					const uid = (session as any)?.user?.id;
+					const isOrgMember = Boolean(uid && (orgData.owner === uid || (Array.isArray(orgData.members) && orgData.members.includes(uid))));
+					const orgPrivacy = orgData.privacy || orgData.config?.privacy || 'private';
+
+					if (orgPrivacy === 'private' && !isOrgMember) {
+						setOrganization(null);
+						return;
+					}
 
 					// Fetch Discord profiles for owner and members
 					const memberIds = [...new Set([orgData.owner, ...(orgData.members || [])])];
@@ -146,28 +154,32 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					orgData.membersData = membersWithDiscord.filter((m) => m && m.username);
 
 					setOrganization(orgData);
-				}
-				if (botsRes.ok) {
-					const fetchedBots = await botsRes.json();
 
-					const botsWithDiscord = await Promise.all(
-						fetchedBots.map(async (b: any) => {
-							try {
-								const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${b.id}/discord`));
-								if (res.ok) {
-									b.discord = await res.json();
+					if (botsRes.ok) {
+						const fetchedBots = await botsRes.json();
+						const visibleBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy === 'public' || isOrgMember) : [];
+
+						const botsWithDiscord = await Promise.all(
+							visibleBots.map(async (b: any) => {
+								try {
+									const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${b.id}/discord`));
+									if (res.ok) {
+										b.discord = await res.json();
+									}
+								} catch (e) {
+									console.error('Failed to fetch Discord data for bot', b.id);
 								}
-							} catch (e) {
-								console.error('Failed to fetch Discord data for bot', b.id);
-							}
-							return b;
-						})
-					);
+								return b;
+							})
+						);
 
-					setBots(botsWithDiscord);
-				}
-				if (serversRes.ok) {
-					setServers(await serversRes.json());
+						setBots(botsWithDiscord);
+					}
+					if (serversRes.ok) {
+						const fetchedServers = await serversRes.json();
+						const visibleServers = Array.isArray(fetchedServers) ? fetchedServers.filter((g: any) => g.privacy === 'public' || isOrgMember) : [];
+						setServers(visibleServers);
+					}
 				}
 			} catch (error) {
 				console.error('Failed to fetch organization profile', error);
@@ -176,7 +188,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 			}
 		};
 		fetchData();
-	}, [id, getEnvUrl, isReady]);
+	}, [id, getEnvUrl, isReady, session]);
 
 	if (loading) {
 		return (

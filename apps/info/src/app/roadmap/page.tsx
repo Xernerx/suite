@@ -80,16 +80,11 @@ export default function RoadmapPage() {
 
 				const botIds = new Set<string>();
 				botsList.forEach((b: any) => {
-					if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) {
-						botIds.add(String(b.id).trim());
-					}
+					if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) botIds.add(String(b.id).trim());
 				});
 				[...rItems, ...iItems].forEach((item: any) => {
-					if (item?.botId && /^\d{17,20}$/.test(String(item.botId).trim())) {
-						botIds.add(String(item.botId).trim());
-					} else if (item?.productId && /^\d{17,20}$/.test(String(item.productId).trim())) {
-						botIds.add(String(item.productId).trim());
-					}
+					if (item?.botId && /^\d{17,20}$/.test(String(item.botId).trim())) botIds.add(String(item.botId).trim());
+					else if (item?.productId && /^\d{17,20}$/.test(String(item.productId).trim())) botIds.add(String(item.productId).trim());
 				});
 
 				botIds.forEach((id) => {
@@ -97,13 +92,7 @@ export default function RoadmapPage() {
 						.then((res) => (res.ok ? res.json() : null))
 						.then((d) => {
 							if (!d) return;
-							setBotProfiles((prev) => ({
-								...prev,
-								[id]: {
-									name: d.global_name || d.username || id,
-									avatarUrl: d.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png',
-								},
-							}));
+							setBotProfiles((prev) => ({ ...prev, [id]: { name: d.global_name || d.username || id, avatarUrl: d.avatarUrl || 'https://cdn.discordapp.com/embed/avatars/0.png' } }));
 						})
 						.catch(() => {});
 				});
@@ -157,7 +146,11 @@ export default function RoadmapPage() {
 	});
 
 	const allProducts = Array.from(new Set(roadmap.map((i: any) => i.productId)));
-	const getProductColor = (_prod: string) => 'var(--accent)';
+	const productColors = ['#3b82f6', '#ec4899', '#10b981', '#f97316', '#8b5cf6', '#06b6d4', '#ef4444', '#eab308'];
+	const getProductColor = (prod: string) => {
+		const idx = allProducts.indexOf(prod);
+		return productColors[Math.max(0, idx) % productColors.length];
+	};
 
 	const statusColors: any = {
 		idea: 'bg-(--text-muted)',
@@ -222,7 +215,7 @@ export default function RoadmapPage() {
 						animate={{ opacity: 1, scale: 1 }}
 						transition={{ duration: 0.4, delay: 0.15 }}
 						whileHover={{ scale: 1.03 }}
-						className="flex flex-col items-center p-6 bg-(--accent)/5 backdrop-blur-md rounded-xl border border-(--accent)/20 shadow-sm"
+						className="flex flex-col items-center p-6 bg-(--foreground)/40 backdrop-blur-md rounded-2xl border border-(--accent)/25 shadow-sm"
 					>
 						<span className="text-3xl font-bold text-(--accent)">{formatTime(metrics?.avgTimeMs)}</span>
 						<span className="text-sm text-(--text-muted) uppercase tracking-widest mt-1">{t('info.roadmap.metrics.avgResolutionTime')}</span>
@@ -232,7 +225,7 @@ export default function RoadmapPage() {
 						animate={{ opacity: 1, scale: 1 }}
 						transition={{ duration: 0.4, delay: 0.25 }}
 						whileHover={{ scale: 1.03 }}
-						className="flex flex-col items-center p-6 bg-(--accent)/5 rounded-xl border border-(--accent)/20"
+						className="flex flex-col items-center p-6 bg-(--foreground)/40 backdrop-blur-md rounded-2xl border border-(--accent)/25 shadow-sm"
 					>
 						<span className="text-3xl font-bold text-(--accent)">{metrics?.recentResolutions?.length || 0}</span>
 						<span className="text-sm text-(--text-muted) uppercase tracking-widest mt-1">{t('info.roadmap.metrics.recentResolutions')}</span>
@@ -253,7 +246,7 @@ export default function RoadmapPage() {
 								className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
 									selectedProduct === null
 										? 'bg-(--accent) text-white border-(--accent) shadow-md'
-										: 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--border)/30'
+										: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:text-(--text) hover:border-(--border)/30'
 								}`}
 							>
 								{t('info.roadmap.allProducts')}
@@ -267,10 +260,10 @@ export default function RoadmapPage() {
 										key={prod}
 										type="button"
 										onClick={() => setSelectedProduct(isSelected ? null : prod)}
-										className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-											isSelected ? 'shadow-md scale-105' : 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:text-(--text)'
+										className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border backdrop-blur-md ${
+											isSelected ? 'shadow-md scale-105' : 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 shadow-xs hover:text-(--text)'
 										}`}
-										style={isSelected ? { backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`, borderColor: color, color: color } : undefined}
+										style={isSelected ? { backgroundColor: `color-mix(in srgb, ${color} 18%, var(--background))`, borderColor: color, color: color } : undefined}
 									>
 										<span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
 										{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}
@@ -289,8 +282,10 @@ export default function RoadmapPage() {
 									key={statusKey}
 									type="button"
 									onClick={() => setStatusFilter(statusKey)}
-									className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
-										active ? 'bg-(--foreground) text-(--text) border-(--accent)/50 shadow-sm' : 'bg-transparent text-(--text-muted) border-(--border)/10 hover:text-(--text)'
+									className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border backdrop-blur-md ${
+										active
+											? 'bg-(--accent)/15 text-(--text) border-(--accent)/50 shadow-sm'
+											: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 shadow-xs hover:text-(--text)'
 									}`}
 								>
 									{statusKey !== 'all' && <span className={`w-2 h-2 rounded-full ${statusColors[statusKey]}`} />}
@@ -352,22 +347,28 @@ export default function RoadmapPage() {
 										return (
 											<div key={quarter} className="flex flex-col relative shrink-0">
 												{/* Quarter Node on the Trunk */}
-												<div className="absolute left-0 flex items-center gap-4" style={{ top: '20px' }}>
+												<div className="absolute left-0 flex items-center gap-3 z-20" style={{ top: '16px' }}>
 													<div
 														className={`w-6 h-6 rounded-full border-4 border-(--background) z-20 relative ${quarter === 'Backlog' ? 'opacity-0' : quarter === currentQuarterStr ? 'bg-(--accent) shadow-[0_0_20px_var(--accent)] animate-pulse' : 'bg-(--accent)/40 shadow-[0_0_15px_var(--accent)]'}`}
 													>
 														{quarter === currentQuarterStr && (
 															<div className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none">
-																<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-(--background) px-2 py-1 rounded-xl shadow-lg">
+																<span className="whitespace-nowrap text-[10px] font-black uppercase bg-(--accent) text-white px-2.5 py-1 rounded-full shadow-lg">
 																	{t('info.roadmap.timeline.today')}
 																</span>
 																<div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-(--accent) mt-0.5"></div>
 															</div>
 														)}
 													</div>
-													<h2 className={`text-2xl font-black uppercase tracking-widest ${quarter === currentQuarterStr ? 'text-(--accent)' : 'text-(--text)'}`}>
-														{quarter === 'Backlog' ? '' : quarter}
-													</h2>
+													{quarter !== 'Backlog' && (
+														<h2
+															className={`text-xl font-black uppercase tracking-widest px-3.5 py-0.5 rounded-full bg-(--foreground)/40 border border-(--border)/10 shadow-xs ${
+																quarter === currentQuarterStr ? 'text-(--accent) border-(--accent)/30' : 'text-(--text)'
+															}`}
+														>
+															{quarter}
+														</h2>
+													)}
 												</div>
 
 												{/* Horizontal Cards Container for this Quarter */}
@@ -406,18 +407,18 @@ export default function RoadmapPage() {
 
 																{/* Card Hover Accent */}
 																<div
-																	className="absolute top-0 left-0 w-1 h-full opacity-40 group-hover/card:opacity-100 transition-opacity rounded-l-2xl"
-																	style={{ backgroundColor: color }}
+																	className="pointer-events-none absolute inset-0 rounded-[inherit] border-l-4 opacity-50 group-hover/card:opacity-100 transition-opacity duration-300"
+																	style={{ borderLeftColor: color }}
 																></div>
 
 																<div className="flex justify-between items-start mb-4 z-10">
 																	<span
 																		onClick={() => setSelectedProduct(selectedProduct === item.productId ? null : item.productId)}
-																		className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-xl tracking-wider border cursor-pointer hover:brightness-150 transition-all"
+																		className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider border cursor-pointer hover:brightness-125 transition-all"
 																		style={{
 																			color: color,
-																			backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
-																			borderColor: `color-mix(in srgb, ${color} 20%, transparent)`,
+																			backgroundColor: `color-mix(in srgb, ${color} 15%, var(--background))`,
+																			borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
 																		}}
 																	>
 																		{botInfo?.avatarUrl && (

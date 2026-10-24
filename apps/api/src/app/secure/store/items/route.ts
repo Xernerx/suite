@@ -76,7 +76,7 @@ export async function POST(req: Request) {
 			itemType,
 			creditCost: Math.max(0, Number(body.creditCost) || 0),
 			creditAmount: Math.max(0, Number(body.creditAmount) || 0),
-			perkType: ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge'].includes(body.perkType) ? body.perkType : 'none',
+			perkType: ['none', 'cdn_slots', 'showcase_slots', 'trial_pass', 'vanity_badge', 'streak_shield', 'boost_bot', 'boost_server'].includes(body.perkType) ? body.perkType : 'none',
 			perkValue: body.perkValue ?? null,
 			durationDays: Math.max(0, Number(body.durationDays) || 0),
 			features,

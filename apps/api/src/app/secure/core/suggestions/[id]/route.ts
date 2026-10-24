@@ -1,5 +1,6 @@
 /** @format */
 
+import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
@@ -10,7 +11,37 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 		const body = await req.json();
 		const { models } = await database('xernerx');
 		const existing = (await models.core.Suggestion.findOne({ id }).lean()) as any;
+
+		const nextStatus = body.status ?? existing?.status;
+		const shouldAwardBounty = existing && !existing.bountyAwarded && existing.authorId && (nextStatus === 'accepted' || nextStatus === 'implemented');
+
+		if (shouldAwardBounty) {
+			body.bountyAwarded = true;
+		}
+
 		const updated = (await models.core.Suggestion.findOneAndUpdate({ id }, body, { new: true }).lean()) as any;
+
+		if (updated && shouldAwardBounty && updated.authorId) {
+			const CreditModel = (models.users as any).Credit;
+			await CreditModel.findOneAndUpdate(
+				{ ownerId: updated.authorId },
+				{
+					$inc: { balance: 250 },
+					$push: {
+						transactions: {
+							id: crypto.randomUUID(),
+							type: 'bounty',
+							amount: 250,
+							multiplierPercent: 100,
+							itemId: `suggestion_bounty_${id}`,
+							itemName: `Suggestion Bounty — ${updated.title}`,
+							createdAt: new Date(),
+						},
+					},
+				},
+				{ upsert: true }
+			);
+		}
 
 		if (updated && existing?.status !== updated.status) {
 			await recordAuditLog({

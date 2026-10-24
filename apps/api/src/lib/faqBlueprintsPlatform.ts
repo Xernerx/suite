@@ -105,6 +105,18 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('issueTracker', 'https://info.xernerx.com/issues', 'info.xernerx.com/bugs'),
 				]
 			),
+			c(
+				'card6',
+				'custom-vanity-slugs',
+				'faq.overview.card6.title',
+				['faq.overview.card6.description'],
+				[
+					ql('exploreBots', 'https://app.xernerx.com/bots', 'app.xernerx.com/bots/[slug]'),
+					ql('exploreServers', 'https://app.xernerx.com/servers', 'app.xernerx.com/servers/[slug]'),
+					ql('profileSettings', 'https://account.xernerx.com/?tab=profile', 'app.xernerx.com/users/[slug]'),
+					ql('creditStore', 'https://store.xernerx.com/?category=credits', 'store.xernerx.com/?category=credits'),
+				]
+			),
 		],
 	},
 	{
@@ -365,6 +377,17 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('profileSettings', 'https://account.xernerx.com/?tab=profile', 'account.xernerx.com/profile'),
 					ql('preferencesTab', 'https://account.xernerx.com/?tab=preferences', 'account.xernerx.com/preferences'),
 					ql('supporters', 'https://app.xernerx.com/supporters', 'app.xernerx.com/supporters'),
+				]
+			),
+			c(
+				'card7',
+				'xp-voice-leaderboards',
+				'faq.servers.card7.title',
+				['faq.servers.card7.description'],
+				[
+					ql('virtueSettings', 'https://app.xernerx.com/dashboard?tab=virtue', 'app.xernerx.com/dashboard?tab=virtue'),
+					ql('exploreServers', 'https://app.xernerx.com/servers', 'app.xernerx.com/servers'),
+					ql('leaderboards', 'https://app.xernerx.com/leaderboard', 'app.xernerx.com/leaderboard'),
 				]
 			),
 		],

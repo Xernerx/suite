@@ -62,6 +62,7 @@ NEXTAUTH_SECRET="${randomToken}"
 DISCORD_CLIENT_ID="${discordClientId}"
 DISCORD_CLIENT_SECRET="${discordClientSecret}"
 DISCORD_CLIENT_TOKEN="${discordClientToken}"
+DISCORD_BOT_TOKEN=""
 DISCORD_GUILD_ID="${discordGuildId}"
 
 #################################################
@@ -121,6 +122,7 @@ POSTMARK_TOKEN=""
 
 WS_TOKEN=""
 XERNERX_TOKEN=""
+XERNERX_APP_TOKEN=""
 MONGO_VIRTUE="${mongoXernerx}"
 `;
 

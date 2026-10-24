@@ -41,6 +41,38 @@ export default function Language() {
 	const [translatorAppConfig, setTranslatorAppConfig] = useState('translator');
 	const [hasPendingApplication, setHasPendingApplication] = useState(false);
 	const [isCheckingApplication, setIsCheckingApplication] = useState(true);
+	const [virtueLocale, setVirtueLocale] = useState<string>('');
+	const [isLoadingVirtue, setIsLoadingVirtue] = useState(false);
+	const [isSavingVirtue, setIsSavingVirtue] = useState(false);
+
+	useEffect(() => {
+		if (!user?.id) return;
+		let isMounted = true;
+		setIsLoadingVirtue(true);
+
+		fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}/virtue`), {
+			credentials: 'include',
+			cache: 'no-store',
+		})
+			.then((res) => (res.ok ? res.json() : null))
+			.then((data) => {
+				if (!isMounted || !data) return;
+				const savedLang = data.language || data.locale || data.preferences?.locale || data.preferences?.language;
+				if (savedLang) {
+					setVirtueLocale(savedLang);
+				}
+			})
+			.catch((err) => {
+				console.error('Failed to load Virtue language preference:', err);
+			})
+			.finally(() => {
+				if (isMounted) setIsLoadingVirtue(false);
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [user?.id, getEnvUrl]);
 
 	useEffect(() => {
 		const checkApplicationStatus = async () => {
@@ -78,6 +110,7 @@ export default function Language() {
 
 	// Default to the user's saved preference first, then fallback to the cookie/context locale
 	const activeLocale = user?.preferences?.locale || currentLocale;
+	const activeVirtueLocale = virtueLocale || activeLocale;
 
 	// Fetch full role objects to check permissions
 	useEffect(() => {
@@ -196,6 +229,50 @@ export default function Language() {
 		router.refresh();
 	};
 
+	const handleVirtueLanguageChange = async (code: string) => {
+		if (!user?.id) {
+			toast({ title: t('account.language.coverage.notLoggedIn'), type: 'error' });
+			return;
+		}
+		if (activeVirtueLocale === code && virtueLocale === code) return;
+
+		const previousLocale = virtueLocale;
+		setVirtueLocale(code);
+		setIsSavingVirtue(true);
+
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}/virtue`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({
+					language: code,
+					locale: code,
+				}),
+			});
+
+			if (!res.ok) {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || t('account.language.virtue.toast.syncFailed'));
+			}
+
+			toast({
+				type: 'success',
+				title: t('account.language.virtue.toast.updated'),
+			});
+		} catch (err: any) {
+			setVirtueLocale(previousLocale);
+			console.error('Failed to sync language preference to Virtue user profile:', err);
+			toast({
+				type: 'error',
+				title: t('account.language.virtue.toast.syncFailed'),
+				description: err.message,
+			});
+		} finally {
+			setIsSavingVirtue(false);
+		}
+	};
+
 	const languageOptions = [
 		...locales.map((lang: { code: string; label: string; coverage: number }) => {
 			const countryCode = getFlagCode(lang.code);
@@ -303,6 +380,21 @@ export default function Language() {
 							</button>
 						</div>
 					)}
+				</div>
+
+				{/* Virtue Bot Language Section */}
+				<div
+					className="relative z-40 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+				>
+					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+						<h2 className="text-base font-semibold text-(--text)">{t('account.language.virtue.title')}</h2>
+						<p className="text-xs text-(--text-muted)">{t('account.language.virtue.description')}</p>
+					</div>
+
+					<div className="w-full sm:w-64">
+						<Selector value={activeVirtueLocale} options={languageOptions} onChange={handleVirtueLanguageChange} />
+					</div>
 				</div>
 
 				{/* Discord Visual Language Section */}

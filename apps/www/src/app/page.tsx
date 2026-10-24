@@ -2,19 +2,41 @@
 
 import HomeClient, { ShowcasePackage } from '@/components/HomeClient';
 
-async function getShowcasePackages(): Promise<ShowcasePackage[]> {
+const FALLBACK_SHOWCASE_PACKAGES: ShowcasePackage[] = [
+	{
+		name: 'xernerx',
+		desc: 'Core command-line orchestration and ecosystem utilities for the Xernerx Suite.',
+		link: 'https://docs.xernerx.com/packages/xernerx',
+	},
+	{
+		name: '@xernerx/framework',
+		desc: 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, and multi-shard coordination.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/framework',
+	},
+	{
+		name: '@xernerx/stats',
+		desc: 'Lightweight daemon for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/stats',
+	},
+];
+
+let cachedPackages: { data: ShowcasePackage[]; expiresAt: number } | null = null;
+let inflightRefresh: Promise<ShowcasePackage[]> | null = null;
+
+async function fetchShowcasePackagesFromRemote(): Promise<ShowcasePackage[]> {
 	try {
 		const res = await fetch('https://api.github.com/repos/Xernerx/docs/git/trees/main?recursive=1', {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
 				...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
 			},
+			signal: AbortSignal.timeout(1500),
 			next: { revalidate: 3600 },
 		});
 
-		if (!res.ok) return [];
+		if (!res.ok) return FALLBACK_SHOWCASE_PACKAGES;
 		const data = await res.json();
-		if (!data.tree) return [];
+		if (!data.tree) return FALLBACK_SHOWCASE_PACKAGES;
 
 		const docsPaths = data.tree.filter((item: any) => item.path.startsWith('packages/') && item.path.endsWith('/docs.json'));
 		const packagesMap = new Set<string>();
@@ -30,6 +52,7 @@ async function getShowcasePackages(): Promise<ShowcasePackage[]> {
 
 				try {
 					const npmRes = await fetch(`https://registry.npmjs.org/${name}`, {
+						signal: AbortSignal.timeout(1200),
 						next: { revalidate: 3600 },
 					});
 					if (npmRes.ok) {
@@ -66,10 +89,31 @@ async function getShowcasePackages(): Promise<ShowcasePackage[]> {
 			})
 		);
 
-		return pkgs;
+		const finalPkgs = pkgs.length > 0 ? pkgs : FALLBACK_SHOWCASE_PACKAGES;
+		cachedPackages = { data: finalPkgs, expiresAt: Date.now() + 3600_000 };
+		return finalPkgs;
 	} catch {
-		return [];
+		return cachedPackages?.data || FALLBACK_SHOWCASE_PACKAGES;
 	}
+}
+
+async function getShowcasePackages(): Promise<ShowcasePackage[]> {
+	const now = Date.now();
+	if (cachedPackages && now < cachedPackages.expiresAt) {
+		return cachedPackages.data;
+	}
+
+	if (!inflightRefresh) {
+		inflightRefresh = fetchShowcasePackagesFromRemote().finally(() => {
+			inflightRefresh = null;
+		});
+	}
+
+	if (cachedPackages) {
+		return cachedPackages.data;
+	}
+
+	return Promise.race([inflightRefresh, new Promise<ShowcasePackage[]>((resolve) => setTimeout(() => resolve(FALLBACK_SHOWCASE_PACKAGES), 150))]);
 }
 
 export default async function Home() {

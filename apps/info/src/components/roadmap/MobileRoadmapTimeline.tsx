@@ -74,11 +74,11 @@ export default function MobileRoadmapTimeline({
 										<div className="absolute top-0 -left-[3px] w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
 										<span
 											onClick={() => setSelectedProduct(selectedProduct === prod ? null : prod)}
-											className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2 py-1 rounded-xl w-fit cursor-pointer hover:brightness-150 transition-all"
+											className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-full w-fit cursor-pointer hover:brightness-125 transition-all"
 											style={{
 												color: color,
-												backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`,
-												border: `1px solid color-mix(in srgb, ${color} 20%, transparent)`,
+												backgroundColor: `color-mix(in srgb, ${color} 15%, var(--background))`,
+												border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
 											}}
 										>
 											{prodBotInfo?.avatarUrl && (
@@ -92,7 +92,7 @@ export default function MobileRoadmapTimeline({
 												key={item.id}
 												className="flex flex-col p-5 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg relative overflow-hidden"
 											>
-												<div className="absolute top-0 left-0 w-1 h-full opacity-60" style={{ backgroundColor: color }}></div>
+												<div className="pointer-events-none absolute inset-0 rounded-[inherit] border-l-4 opacity-60" style={{ borderLeftColor: color }}></div>
 												<div className="flex justify-between items-start mb-2">
 													<div className="flex items-center gap-2">
 														<span className={`w-2 h-2 rounded-full ${statusColors[item.status || 'idea'] || 'bg-(--text-muted)'}`}></span>

@@ -3,6 +3,7 @@
 'use client';
 
 import { ArrowUpRight, Compass, Lock, Palette } from 'lucide-react';
+import Link from 'next/link';
 import { useDictionary, useEnvironment, usePlatform } from '@xernerx/providers';
 
 export function PlatformHighlights() {
@@ -31,7 +32,7 @@ export function PlatformHighlights() {
 	];
 
 	return (
-		<section className="max-w-7xl mx-auto px-6 relative" style={{ paddingBottom: 'calc(var(--ui-gap) * 6)' }}>
+		<section id="highlights" className="max-w-7xl mx-auto px-6 relative" style={{ paddingBottom: 'calc(var(--ui-gap) * 6)' }}>
 			<div className="mb-12 max-w-2xl">
 				<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('www.highlights.title')}
@@ -47,12 +48,12 @@ export function PlatformHighlights() {
 					>
 						<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{card.icon}</div>
 
-						<h3 className="text-xl font-bold text-(--text) mb-3 flex items-center justify-between gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						<div className="text-xl font-bold text-(--text) mb-3 flex items-center justify-between gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							<a href={card.link} className="after:absolute after:inset-0 flex items-center justify-between w-full">
 								<span>{card.title}</span>
 								<ArrowUpRight size={20} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
 							</a>
-						</h3>
+						</div>
 
 						<p className="text-sm text-(--text-muted) leading-relaxed">{card.desc}</p>
 					</div>
@@ -87,12 +88,12 @@ export function LandingCta() {
 						{t('www.cta.dashboard')}
 					</a>
 					{type !== 'application' && (
-						<a
+						<Link
 							href="/download"
 							className="px-8 py-4 rounded-2xl bg-(--foreground)/50 text-(--text) font-bold text-sm hover:bg-(--foreground)/80 transition-all border border-(--border)/10 backdrop-blur-md"
 						>
 							{t('www.cta.download')}
-						</a>
+						</Link>
 					)}
 					<a
 						href={getEnvUrl('https://docs.xernerx.com')}
@@ -100,6 +101,24 @@ export function LandingCta() {
 					>
 						{t('www.cta.docs')}
 					</a>
+					<Link
+						href="/invites"
+						className="px-6 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
+					>
+						{t('www.cta.invites')}
+					</Link>
+					<Link
+						href="/applications"
+						className="px-6 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
+					>
+						{t('www.cta.careers')}
+					</Link>
+					<Link
+						href="/contact"
+						className="px-6 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
+					>
+						{t('www.cta.contact')}
+					</Link>
 				</div>
 			</div>
 		</section>

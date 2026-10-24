@@ -47,8 +47,8 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 				</div>
 
 				{urgentItems.length === 0 ? (
-					<div className="flex items-center gap-4 p-6 rounded-3xl border border-(--accent-green)/20 bg-(--accent-green)/5">
-						<div className="p-3 rounded-2xl bg-(--accent-green)/15 text-(--accent-green) shrink-0">
+					<div className="flex items-center gap-4 p-6 rounded-3xl border border-(--accent-green)/25 bg-(--accent-green)/5 backdrop-blur-md shadow-sm">
+						<div className="p-3 rounded-2xl bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25 shrink-0">
 							<CheckCircle2 size={24} />
 						</div>
 						<div>
@@ -62,17 +62,17 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 							const IconComp = item.icon;
 							const toneClasses =
 								item.severity === 'critical'
-									? 'border-(--accent-red)/30 bg-(--accent-red)/5 hover:border-(--accent-red)/50'
+									? 'border-(--accent-red)/30 bg-(--accent-red)/5 backdrop-blur-md shadow-sm hover:border-(--accent-red)/50'
 									: item.severity === 'warning'
-										? 'border-(--accent-orange)/30 bg-(--accent-orange)/5 hover:border-(--accent-orange)/50'
-										: 'border-(--accent)/30 bg-(--accent)/5 hover:border-(--accent)/50';
+										? 'border-(--accent-orange)/30 bg-(--accent-orange)/5 backdrop-blur-md shadow-sm hover:border-(--accent-orange)/50'
+										: 'border-(--accent)/30 bg-(--accent)/5 backdrop-blur-md shadow-sm hover:border-(--accent)/50';
 
 							const badgeClasses =
 								item.severity === 'critical'
-									? 'bg-(--accent-red)/20 text-(--accent-red) border-(--accent-red)/30'
+									? 'bg-(--accent-red)/15 text-(--accent-red) border-(--accent-red)/30'
 									: item.severity === 'warning'
-										? 'bg-(--accent-orange)/20 text-(--accent-orange) border-(--accent-orange)/30'
-										: 'bg-(--accent)/20 text-(--accent) border-(--accent)/30';
+										? 'bg-(--accent-orange)/15 text-(--accent-orange) border-(--accent-orange)/30'
+										: 'bg-(--accent)/15 text-(--accent) border-(--accent)/30';
 
 							return (
 								<div
@@ -137,11 +137,11 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 								<div
 									key={card.id}
 									onClick={() => onNavigate(card.view)}
-									className="group flex flex-col justify-between gap-4 p-5 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 hover:border-(--accent)/40 transition-all cursor-pointer"
+									className="group flex flex-col justify-between gap-4 p-5 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm hover:bg-(--foreground)/50 hover:border-(--accent)/40 transition-all cursor-pointer"
 								>
 									<div className="flex items-start justify-between gap-3">
 										<div className="flex items-center gap-3 min-w-0">
-											<div className="p-2.5 rounded-2xl bg-(--background)/80 border border-(--border)/10 text-(--accent) shrink-0">
+											<div className="p-2.5 rounded-2xl bg-(--background)/60 border border-(--border)/10 text-(--accent) shrink-0">
 												<IconComp size={18} />
 											</div>
 											<div className="min-w-0">
@@ -151,12 +151,12 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 										</div>
 										{card.badge && (
 											<span
-												className={`px-2 py-0.5 rounded-full text-[11px] font-bold border shrink-0 ${
+												className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border shrink-0 ${
 													card.badge.tone === 'urgent'
 														? 'bg-(--accent-red)/15 text-(--accent-red) border-(--accent-red)/30'
 														: card.badge.tone === 'ok'
 															? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30'
-															: 'bg-(--background)/80 text-(--text-muted) border-(--border)/15'
+															: 'bg-(--background)/60 text-(--text-muted) border-(--border)/10'
 												}`}
 											>
 												{card.badge.text}
@@ -191,18 +191,22 @@ export function HomeOverviewSections({ urgentItems, moduleCards, auditLogs, onNa
 				</div>
 
 				{auditLogs.length === 0 ? (
-					<div className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground)/20 text-center text-xs text-(--text-muted)">{t('admin.dashboard.home.noAudit')}</div>
+					<div className="p-6 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs text-center text-xs text-(--text-muted)">
+						{t('admin.dashboard.home.noAudit')}
+					</div>
 				) : (
 					<div className="flex flex-col gap-2.5">
 						{auditLogs.map((log: any) => (
 							<div
 								key={log.id}
 								onClick={() => onNavigate('audit', log.targetId || log.summary || log.actorId || log.action)}
-								className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 hover:border-(--border)/25 transition-all cursor-pointer"
+								className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs hover:bg-(--foreground)/50 hover:border-(--border)/25 transition-all cursor-pointer"
 							>
 								<div className="flex flex-wrap items-center gap-2 min-w-0">
 									<span className="font-bold text-xs text-(--text)">{log.actorName || log.actorId}</span>
-									<span className="px-2 py-0.5 rounded-xl text-[10px] font-mono font-bold uppercase bg-(--accent)/15 text-(--accent) border border-(--accent)/20">{log.action}</span>
+									<span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+										{log.action}
+									</span>
 									<span className="text-xs text-(--text-muted) truncate">{log.summary || log.targetLabel || log.targetId}</span>
 								</div>
 								<span className="inline-flex items-center gap-1 text-[11px] font-mono text-(--text-muted) shrink-0">

@@ -63,6 +63,36 @@ export function Status24hBar({ points, currentStatus, currentPing }: Status24hBa
 		return Math.round((upCount / recorded.length) * 1000) / 10;
 	}, [normalizedPoints]);
 
+	// Compute SVG latency sparkline path across buckets that have ping data
+	const sparklineData = useMemo(() => {
+		const pingPoints = normalizedPoints.map((pt, idx) => (typeof pt.ping === 'number' && pt.ping > 0 ? { idx, ping: pt.ping } : null)).filter(Boolean) as Array<{ idx: number; ping: number }>;
+
+		if (pingPoints.length === 0) return null;
+
+		const pings = pingPoints.map((p) => p.ping);
+		const minPing = Math.min(...pings);
+		const maxPing = Math.max(...pings);
+		const avgPing = Math.round(pings.reduce((a, b) => a + b, 0) / pings.length);
+		const range = Math.max(20, maxPing - minPing);
+
+		const width = 240;
+		const height = 22;
+		const coords = pingPoints.map((p) => {
+			const x = (p.idx / (BUCKET_COUNT - 1)) * width;
+			const y = height - 3 - ((p.ping - minPing) / range) * (height - 6);
+			return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+		});
+
+		if (coords.length === 1) {
+			coords.unshift({ x: 0, y: coords[0].y });
+		}
+
+		const linePath = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x},${c.y}`).join(' ');
+		const areaPath = `${linePath} L${coords[coords.length - 1].x},${height} L${coords[0].x},${height} Z`;
+
+		return { linePath, areaPath, minPing, maxPing, avgPing };
+	}, [normalizedPoints]);
+
 	const getBarColorClass = (point: StatusBucketPoint) => {
 		if (point.status === 'down' || point.status === 'offline') {
 			return 'bg-(--accent-red) hover:brightness-110';
@@ -117,6 +147,17 @@ export function Status24hBar({ points, currentStatus, currentPing }: Status24hBa
 					);
 				})}
 			</div>
+
+			{/* Latency Sparkline Curve (when ping telemetry is available) */}
+			{sparklineData && (
+				<div className="flex items-center justify-between gap-2 px-2.5 py-1 rounded-xl bg-(--background)/35 border border-(--border)/10">
+					<svg viewBox="0 0 240 22" className="w-full h-5 overflow-visible" preserveAspectRatio="none">
+						<path d={sparklineData.areaPath} fill="var(--accent)" fillOpacity="0.12" />
+						<path d={sparklineData.linePath} fill="none" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+					</svg>
+					<span className="text-[10px] font-mono text-(--text-muted) shrink-0">{t('info.status.history.sparklineAvg', { ms: sparklineData.avgPing })}</span>
+				</div>
+			)}
 
 			{/* Footer legend or live hover inspector */}
 			<div className="flex items-center justify-between text-[11px] font-mono text-(--text-muted) min-h-[16px]">

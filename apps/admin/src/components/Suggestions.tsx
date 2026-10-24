@@ -2,6 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
+import { UserProfilePopover } from '@xernerx/components';
 import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { Copy, Check, ExternalLink } from 'lucide-react';
@@ -213,34 +214,31 @@ export default function Suggestions({ initialSearch = '' }: { initialSearch?: st
 					return (
 						<div
 							key={item.id}
-							className="p-4 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col sm:flex-row justify-between items-start gap-4"
+							className="p-4 rounded-2xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm flex flex-col sm:flex-row justify-between items-start gap-4"
 						>
 							<div>
 								<div className="font-bold flex flex-wrap gap-2 items-center">
-									<span className="bg-(--foreground)/50 px-2 py-1 rounded-xl text-xs border border-(--border)/10 font-mono">
+									<span className="bg-(--background)/90 px-2.5 py-1 rounded-full text-xs border border-(--border)/10 font-mono">
 										{t('admin.dashboard.suggestions.votes')}: {netVotes}
 									</span>
 									{item.title}
 								</div>
 								<div className="text-sm text-(--text-muted) mb-2 mt-2">{item.description}</div>
 								<div className="flex flex-wrap items-center gap-2 mt-2">
-									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2 py-1 rounded-xl border border-(--accent)/20">
+									<div className="inline-flex items-center gap-1.5 text-xs bg-(--accent)/10 text-(--accent) w-fit px-2.5 py-1 rounded-full border border-(--accent)/20">
 										{resolvedBot?.avatarUrl && (
 											<Image src={resolvedBot.avatarUrl} alt={resolvedBot.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
 										)}
 										{resolvedBot ? resolvedBot.name : item.productId}
 									</div>
 									{authorId && /^\d{17,20}$/.test(String(authorId)) && (
-										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/60 text-(--text-muted) px-2 py-1 rounded-xl border border-(--border)/10 font-mono">
-											<a
-												href={`${getEnvUrl('https://app.xernerx.com')}/users/${authorId}`}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="inline-flex items-center gap-1 hover:text-(--accent) transition-colors"
-											>
-												<span>{item.author?.username || authorId}</span>
-												<ExternalLink size={11} />
-											</a>
+										<div className="inline-flex items-center gap-1.5 text-xs bg-(--background)/90 text-(--text-muted) px-2.5 py-1 rounded-full border border-(--border)/10 font-mono">
+											<UserProfilePopover userId={String(authorId)} initialUser={item.author}>
+												<span className="inline-flex items-center gap-1 hover:text-(--accent) transition-colors">
+													<span>{item.author?.username || authorId}</span>
+													<ExternalLink size={11} />
+												</span>
+											</UserProfilePopover>
 											<button
 												type="button"
 												onClick={() => {
@@ -266,7 +264,11 @@ export default function Suggestions({ initialSearch = '' }: { initialSearch?: st
 						</div>
 					);
 				})}
-				{filteredData.length === 0 && <div className="text-(--text-muted) text-center p-8 bg-(--foreground)/10 rounded-xl">{t('admin.dashboard.suggestions.noSuggestions')}</div>}
+				{filteredData.length === 0 && (
+					<div className="text-(--text-muted) text-center p-8 bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl">
+						{t('admin.dashboard.suggestions.noSuggestions')}
+					</div>
+				)}
 			</div>
 
 			<Confirm

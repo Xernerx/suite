@@ -3,13 +3,26 @@
 
 import { ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@xernerx/ui';
-import Logo from '../../public/logo.svg';
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useLoading } from '@xernerx/providers';
+import { XernerxDotLogo } from './XernerxDotLogo';
+
 export function NotFound() {
 	const { t } = useDictionary();
 	const router = useRouter();
+	const { setBackgroundMode, setDotVariant } = useLoading();
+
+	useEffect(() => {
+		setBackgroundMode('sticky-ripple');
+		setDotVariant('404');
+		return () => {
+			setBackgroundMode(null);
+			setDotVariant(null);
+		};
+	}, [setBackgroundMode, setDotVariant]);
+
 	return (
 		<div
 			className="flex min-h-screen w-full flex-col items-center justify-center overflow-hidden font-sans"
@@ -23,45 +36,14 @@ export function NotFound() {
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				{/* Logo Presentation */}
+				{/* Dot-Matrix 404 Presentation */}
 				<motion.div
-					initial={{
-						opacity: 0,
-						scale: 0.8,
-						filter: 'blur(10px)',
-					}}
-					animate={{
-						opacity: 1,
-						scale: 1,
-						filter: 'blur(0px)',
-					}}
-					transition={{
-						duration: 1,
-						ease: [0.16, 1, 0.3, 1],
-					}}
-					className="relative flex h-16 w-16 items-center justify-center"
+					initial={{ opacity: 0, scale: 0.9 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+					className="relative flex items-center justify-center w-52"
 				>
-					{/* The Glow */}
-					<Logo
-						viewBox="0 0 1250 1250"
-						className="absolute h-14 w-14 text-(--accent) opacity-40 blur-lg fill-current"
-						style={{
-							display: 'block',
-							width: '56px',
-							height: '56px',
-						}}
-					/>
-
-					{/* The Core */}
-					<Logo
-						viewBox="0 0 1250 1250"
-						className="relative h-14 w-14 text-(--text) drop-shadow-md fill-current transition-colors duration-500 hover:text-(--accent)"
-						style={{
-							display: 'block',
-							width: '56px',
-							height: '56px',
-						}}
-					/>
+					<XernerxDotLogo variant="404" width={208} height={92} cols={52} showAmbientField={false} ripple={true} className="w-full" />
 				</motion.div>
 
 				{/* Typography & Status Pill */}

@@ -1,11 +1,11 @@
 {
 	"name": "app",
-	"version": "2.13.0",
+	"version": "2.14.0",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
 		"initialize": "suite initialize",
-		"dev": "pnpm initialize && next dev -p 4004",
+		"dev": "next dev -p 4004",
 		"build": "next build",
 		"start": "next start -p 3000",
 		"lint": "eslint"
@@ -18,9 +18,9 @@
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^14.4.0",
-		"lucide-react": "^1.59.0",
-		"next": "^16.4.2",
+		"framer-motion": "^14.6.0",
+		"lucide-react": "^1.61.0",
+		"next": "^16.4.3",
 		"next-auth": "^4.24.15",
 		"react": "^19.3.1",
 		"react-circle-flags": "^0.0.30",
@@ -36,7 +36,7 @@
 		"@types/react-dom": "^19.3.0",
 		"babel-plugin-react-compiler": "^1.0.0",
 		"eslint": "^10.13.0",
-		"eslint-config-next": "^16.4.2",
+		"eslint-config-next": "^16.4.3",
 		"tailwindcss": "^4.3.3",
 		"typescript": "^6.0.3"
 	}

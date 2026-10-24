@@ -1,6 +1,8 @@
 /** @format */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { database } from '@xernerx/lib/server';
+import { collectBotDeliveries, dispatchBotWebhook } from '@/lib/webhookDispatcher';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -43,22 +45,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 					},
 				};
 
-		const start = Date.now();
-		const res = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'X-Xernerx-Event': 'test',
-				'X-Xernerx-Bot-Id': id,
-			},
-			body: JSON.stringify(payload),
+		const delivery = await dispatchBotWebhook({
+			botId: id,
+			url,
+			event: 'TEST ping',
+			payload,
 		});
-		const latencyMs = Date.now() - start;
+
+		const db = await database('xernerx');
+		const HookModel = (db.models.bots as any).Hook;
+		const hooks = HookModel ? await HookModel.find({ botId: id }).lean() : [];
+		const deliveries = collectBotDeliveries(hooks);
 
 		return NextResponse.json({
-			ok: res.ok,
-			status: res.status,
-			latencyMs,
+			ok: delivery.ok,
+			status: delivery.status,
+			latencyMs: delivery.latencyMs,
+			responseSnippet: delivery.responseSnippet,
+			delivery,
+			deliveries,
 		});
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message || 'Webhook delivery failed' }, { status: 500 });

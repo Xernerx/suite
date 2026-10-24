@@ -4,6 +4,7 @@
 import { Download, Loader2, Plus, RefreshCw } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ApplicationConfig, ApplicationFormData, Role } from './applications/types';
@@ -236,6 +237,8 @@ export default function ApplicationConfigs() {
 		URL.revokeObjectURL(url);
 	};
 
+	if (isLoading) return <Loading />;
+
 	return (
 		<div
 			className="flex flex-col max-w-7xl mx-auto w-full relative"
@@ -311,12 +314,7 @@ export default function ApplicationConfigs() {
 			</div>
 
 			{/* List */}
-			{isLoading ? (
-				<div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
-					<Loader2 size={32} className="animate-spin mb-4 opacity-50" />
-					<p>{t('admin.configs.loading')}</p>
-				</div>
-			) : filteredConfigs.length === 0 ? (
+			{filteredConfigs.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
 					<p className="text-sm text-(--text-muted)">{t('admin.configs.empty')}</p>
 				</div>

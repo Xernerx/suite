@@ -25,7 +25,7 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 	const [skuId, setSkuId] = useState('');
 	const [creditCost, setCreditCost] = useState<number>(0);
 	const [creditAmount, setCreditAmount] = useState<number>(0);
-	const [perkType, setPerkType] = useState<'none' | 'cdn_slots' | 'showcase_slots' | 'trial_pass' | 'vanity_badge'>('none');
+	const [perkType, setPerkType] = useState<'none' | 'cdn_slots' | 'showcase_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'boost_bot' | 'boost_server'>('none');
 	const [perkValue, setPerkValue] = useState<string>('');
 	const [durationDays, setDurationDays] = useState<number>(0);
 	const [badge, setBadge] = useState('');
@@ -87,7 +87,7 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 				.map((s) => s.trim())
 				.filter(Boolean);
 
-			const resolvedPerkValue = perkType === 'cdn_slots' || perkType === 'showcase_slots' ? Math.max(1, Number(perkValue) || 1) : perkValue.trim() || null;
+			const resolvedPerkValue = perkType === 'cdn_slots' || perkType === 'showcase_slots' || perkType === 'vanity_url' ? Math.max(1, Number(perkValue) || 1) : perkValue.trim() || null;
 
 			await onSave({
 				name: name.trim(),
@@ -176,8 +176,10 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 								options={[
 									{ value: 'cdn_slots', label: t('admin.store.itemModal.perks.cdnSlots') },
 									{ value: 'showcase_slots', label: t('admin.store.itemModal.perks.showcaseSlots') },
+									{ value: 'vanity_url', label: t('admin.store.itemModal.perks.vanityUrl') },
 									{ value: 'trial_pass', label: t('admin.store.itemModal.perks.trialPass') },
 									{ value: 'vanity_badge', label: t('admin.store.itemModal.perks.vanityBadge') },
+									{ value: 'streak_shield', label: t('admin.store.itemModal.perks.streakShield') },
 								]}
 							/>
 						</div>

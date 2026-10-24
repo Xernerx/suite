@@ -13,6 +13,7 @@ export async function GET(req: Request) {
 		const { searchParams } = new URL(req.url);
 		const owner = searchParams.get('owner'); // Optionally filter by owner
 		const user = searchParams.get('user'); // Optionally filter by owner or member
+		const admin = searchParams.get('admin') === 'true';
 
 		const db = (await database('xernerx')).models.organizations as any;
 		const OrganizationModel = db.Organization;
@@ -21,6 +22,8 @@ export async function GET(req: Request) {
 		if (owner) query.owner = owner;
 		if (user) {
 			query.$or = [{ owner: user }, { members: user }];
+		} else if (!owner && !admin) {
+			query.$or = [{ 'config.privacy': 'public' }, { privacy: 'public' }];
 		}
 
 		const organizations = await OrganizationModel.find(query);

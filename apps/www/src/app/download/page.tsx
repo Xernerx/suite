@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Download, Laptop, Sparkles } from 'lucide-react';
 import { FaApple, FaLinux, FaQuestion, FaWindows } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
-import { useDictionary, useEnvironment, usePlatform, useSidebar } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useLoading, usePlatform, useSidebar } from '@xernerx/providers';
 import { redirect } from 'next/navigation';
 import { DesktopPerksBento } from '@/components/DesktopPerksBento';
 import { DesktopInteractivePreview } from '@/components/DesktopInteractivePreview';
@@ -15,6 +15,7 @@ export default function Page() {
 	const { t } = useDictionary();
 	const { platform, type } = usePlatform();
 	const { hide } = useSidebar();
+	const { setBackgroundMode } = useLoading();
 	const { getEnvUrl, environment } = useEnvironment();
 	const [channel, setChannel] = useState<'stable' | 'canary'>('stable');
 	const [apps, setApps] = useState<Record<'windows' | 'macos' | 'linux', Record<string, string> | null>>({
@@ -28,7 +29,11 @@ export default function Page() {
 
 	useEffect(() => {
 		hide();
-	}, []);
+		setBackgroundMode('sticky-ripple');
+		return () => {
+			setBackgroundMode(null);
+		};
+	}, [hide, setBackgroundMode]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -65,7 +70,7 @@ export default function Page() {
 
 	return (
 		<div
-			className="flex flex-col max-w-[1400px] mx-auto w-full items-center justify-center"
+			className="relative flex flex-col max-w-[1400px] mx-auto w-full items-center justify-center"
 			style={{
 				padding: 'calc(var(--ui-gap) * 1.5)',
 				gap: 'calc(var(--ui-gap) * 2.25)',
@@ -75,7 +80,7 @@ export default function Page() {
 		>
 			{/* ASYMMETRIC SPLIT HERO + INTERACTIVE LIVE DESKTOP PLAYGROUND */}
 			<div
-				className="relative overflow-hidden rounded-3xl w-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_16%,transparent)] grid grid-cols-1 lg:grid-cols-12 items-center"
+				className="relative z-10 overflow-hidden rounded-3xl w-full bg-(--foreground)/15 border border-(--border)/10 shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_16%,transparent)] grid grid-cols-1 lg:grid-cols-12 items-center"
 				style={{
 					padding: 'calc(var(--ui-gap) * 2)',
 					gap: 'calc(var(--ui-gap) * 2)',
@@ -203,7 +208,9 @@ export default function Page() {
 			</div>
 
 			{/* ASYMMETRIC INTERACTIVE DESKTOP PERKS BENTO */}
-			<DesktopPerksBento />
+			<div className="relative z-10 w-full">
+				<DesktopPerksBento />
+			</div>
 		</div>
 	);
 }
