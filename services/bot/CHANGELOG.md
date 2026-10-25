@@ -2,6 +2,12 @@
 
 # bot
 
+## 2.0.1
+
+### Patch Changes
+
+- Fixed an issue where env's were shared on different branches
+
 ## 2.0.0
 
 ### Major Changes

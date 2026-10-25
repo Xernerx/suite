@@ -100,11 +100,14 @@ export default class BotClientReadyEvent extends EventBuilder {
 
 			// Probe all 9 suite web services and record current 30m bucket
 			const isDevEnv = process.env.ENVIRONMENT?.toLowerCase() === 'development';
+			const isCanaryEnv = process.env.ENVIRONMENT?.toLowerCase() === 'canary';
 			await Promise.all(
 				SUITE_SERVICES.map(async (svc) => {
 					const urls = isDevEnv
 						? [`http://127.0.0.1:${svc.devPort}/api/version`, `https://${svc.id}.canary.xernerx.com/api/version`, `https://${svc.host}/api/version`]
-						: [`https://${svc.host}/api/version`, `https://${svc.id}.canary.xernerx.com/api/version`];
+						: isCanaryEnv
+							? [`https://${svc.id}.canary.xernerx.com/api/version`, `https://${svc.host}/api/version`]
+							: [`https://${svc.host}/api/version`, `https://${svc.id}.canary.xernerx.com/api/version`];
 
 					let ok = false;
 					let ping: number | null = null;

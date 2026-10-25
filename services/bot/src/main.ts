@@ -5,7 +5,7 @@ import path from 'path';
 import { XernerxClient } from '@xernerx/framework';
 import { XernerxStats } from '@xernerx/stats';
 
-for (const envPath of [path.resolve(process.cwd(), '../../.env'), path.resolve(process.cwd(), '.env')]) {
+for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')]) {
 	try {
 		if (fs.existsSync(envPath)) {
 			const content = fs.readFileSync(envPath, 'utf8');
@@ -17,7 +17,7 @@ for (const envPath of [path.resolve(process.cwd(), '../../.env'), path.resolve(p
 					if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
 						val = val.slice(1, -1);
 					}
-					if (val) process.env[key] = val;
+					if (val && !process.env[key]) process.env[key] = val;
 				}
 			}
 		}
@@ -54,7 +54,7 @@ export class XernerxBotClient extends XernerxClient {
 
 		await this.connect();
 
-		if (process.env.XERNERX_TOKEN) {
+		if (process.env.XERNERX_TOKEN && process.env.ENVIRONMENT?.toUpperCase() === 'PRODUCTION') {
 			new XernerxStats(this as any, { token: process.env.XERNERX_TOKEN });
 		}
 	}

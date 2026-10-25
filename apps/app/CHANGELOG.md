@@ -2,6 +2,12 @@
 
 # app
 
+## 2.14.1
+
+### Patch Changes
+
+- Fixed an issue where env's were shared on different branches
+
 ## 2.14.0
 
 ### Minor Changes

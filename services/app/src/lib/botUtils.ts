@@ -113,13 +113,15 @@ export async function updateBotPresence(client: any) {
 		presence.activities = [{ name: 'Xernerx API online', state: `API is online, all features are working. (v${status.version})` }];
 	}
 
-	if (process.env.ENVIRONMENT?.toUpperCase() === 'DEVELOPMENT') {
+	const envUpper = process.env.ENVIRONMENT?.toUpperCase();
+	if (envUpper === 'DEVELOPMENT' || envUpper === 'CANARY') {
+		const envLabel = envUpper === 'CANARY' ? 'Canary' : 'Development';
 		presence.activities = [
 			{
 				type: ActivityType.Streaming,
-				name: 'Xernerx API (Development)',
+				name: `Xernerx API (${envLabel})`,
 				url: 'https://www.youtube.com/watch?v=nOv9HorOcJo',
-				state: `API: ${status ? 'Online' : 'Offline'} - Version: ${status?.version || 'Unknown'}`,
+				state: `API (${envLabel}): ${status ? 'Online' : 'Offline'} - Version: ${status?.version || 'Unknown'}`,
 			},
 		];
 		presence.status = 'online';
