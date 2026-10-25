@@ -2,6 +2,12 @@
 
 # bot
 
+## 2.0.0
+
+### Major Changes
+
+- Changed the single bot instance runner into their own dedicated bot runtimes.
+
 ## 1.3.0
 
 ### Minor Changes

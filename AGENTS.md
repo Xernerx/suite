@@ -26,7 +26,8 @@ This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`),
 | `packages/public`     | —                      | —        | —                                                             | Canonical static branding assets synced across web apps                                   |
 | `packages/styles`     | `@xernerx/styles`      | —        | —                                                             | Central Tailwind CSS v4 stylesheet & CSS variable design tokens                           |
 | `packages/ui`         | `@xernerx/ui`          | —        | —                                                             | Primitive UI components (`Button`, `Modal`, `Input`, `Selector`, `Toggle`, `Check`, etc.) |
-| `services/bot`        | `bot`                  | —        | —                                                             | Discord bot daemon (`@xernerx/framework`) syncing guilds and members                      |
+| `services/app`        | `@xernerx/app`         | —        | —                                                             | Xernerx App Discord bot daemon (`@xernerx/framework`) for support, docs, status, and info |
+| `services/bot`        | `bot`                  | —        | —                                                             | Xernerx Bot Discord daemon (`@xernerx/framework`) for directory, stats, and guild sync    |
 | `services/websocket`  | `websocket`            | `5000`   | —                                                             | Real-time bidirectional WebSocket gateway & microservice router                           |
 | `clients/desktop`     | `desktop`              | —        | —                                                             | Electron desktop companion client wrapping `app.xernerx.com`                              |
 | `clients/mobile`      | —                      | —        | Placeholder workspace for future cross-platform mobile client |

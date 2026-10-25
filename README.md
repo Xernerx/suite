@@ -52,7 +52,8 @@
 
 | Workspace                                       | Source Path          | Description                                                                            |
 | :---------------------------------------------- | :------------------- | :------------------------------------------------------------------------------------- |
-| **[Bot](./services/bot/README.md)**             | `services/bot`       | Discord bot daemon (`@xernerx/framework`) syncing guilds, members, and statistics      |
+| **[App Bot](./services/app/README.md)**         | `services/app`       | Xernerx App Discord bot daemon (`@xernerx/framework`) for support, docs, and status    |
+| **[Bot](./services/bot/README.md)**             | `services/bot`       | Xernerx Bot Discord daemon (`@xernerx/framework`) syncing guilds, members, and stats   |
 | **[Websocket](./services/websocket/README.md)** | `services/websocket` | Real-time bidirectional WebSocket JSON-RPC gateway & microservice router (port `5000`) |
 | **[Desktop](./clients/desktop/README.md)**      | `clients/desktop`    | Electron desktop companion client wrapping `app.xernerx.com`                           |
 | **[Mobile](./clients/mobile/README.md)**        | `clients/mobile`     | Cross-platform mobile client workspace                                                 |
