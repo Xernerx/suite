@@ -2,6 +2,26 @@
 
 # docs
 
+## 1.5.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.4.0
+    - @xernerx/providers@0.15.0
+    - @xernerx/components@0.9.5
+    - @xernerx/ui@0.7.5
+
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.3.0
+    - @xernerx/providers@0.14.0
+    - @xernerx/components@0.9.4
+    - @xernerx/ui@0.7.4
+
 ## 1.5.1
 
 ### Patch Changes

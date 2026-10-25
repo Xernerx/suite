@@ -135,18 +135,28 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			if (!scrollEl) return;
 			const vh = scrollEl.clientHeight || window.innerHeight || 800;
 			const top = scrollEl.scrollTop;
-			if (top < vh * 0.7) {
+			const triggerY = vh * 0.58;
+			const isPast = (id: string, offset = 0) => {
+				const el = document.getElementById(id);
+				return el ? el.getBoundingClientRect().top <= triggerY + offset : false;
+			};
+
+			if (top < vh * 0.55) {
 				setDotVariant('full');
-			} else if (top < vh * 3.2) {
-				setDotVariant('icon');
-			} else if (top < vh * 5.1) {
-				setDotVariant('prism');
-			} else if (top < vh * 6.4) {
-				setDotVariant('infinity');
-			} else if (top < vh * 7.5) {
-				setDotVariant('helix');
-			} else {
+			} else if (isPast('cta', 120)) {
+				setDotVariant('vortex');
+			} else if (isPast('timeline')) {
+				setDotVariant('chronos');
+			} else if (isPast('highlights')) {
 				setDotVariant('orbit');
+			} else if (isPast('about', -vh * 0.35)) {
+				setDotVariant('helix');
+			} else if (isPast('about')) {
+				setDotVariant('infinity');
+			} else if (isPast('software')) {
+				setDotVariant('prism');
+			} else {
+				setDotVariant('icon');
 			}
 		};
 

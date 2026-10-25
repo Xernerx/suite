@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@xernerx/providers';
+import { beginDotRearrangeMorph, createDotMorphBuffer } from './dotLogoMorph';
 import { computeDotCoverage, DotLogoVariant, DotParticle, FULL_LOGO_BOUNDS, FULL_LOGO_PATHS, ICON_LOGO_PATHS, isAnimatedProceduralVariant, parseCssColor, Shockwave } from './dotLogoPaths';
 
 export interface XernerxDotLogoProps {
@@ -175,26 +176,6 @@ export function XernerxDotLogo({
 			}
 		}
 
-		morphShapeRef.current = (nextVariant: DotLogoVariant) => {
-			for (let i = 0; i < dots.length; i++) {
-				const d = dots[i];
-				const nextCov = computeCoverageForVariant(nextVariant, d.homeX, d.homeY);
-				const covDelta = nextCov - d.targetCoverage;
-				if (Math.abs(covDelta) > 0.05 && !reducedMotion) {
-					if (covDelta > 0) {
-						d.x += (activeW * 0.5 - d.homeX) * 0.22;
-						d.y += (activeH * 0.5 - d.homeY) * 0.22;
-						d.vx += -d.ny * 2.6 + d.nx * 1.4;
-						d.vy += d.nx * 2.6 + d.ny * 1.4;
-					} else {
-						d.vx += d.nx * 2.4 - d.ny * 1.2;
-						d.vy += d.ny * 2.4 + d.nx * 1.2;
-					}
-				}
-				d.targetCoverage = nextCov;
-			}
-		};
-
 		const pointer = { x: -9999, y: -9999, active: false };
 		const shockwaves: Shockwave[] = [];
 		const updatePointerFromClient = (clientX: number, clientY: number) => {
@@ -259,6 +240,8 @@ export function XernerxDotLogo({
 
 		let rafId = 0;
 		let isRunning = false;
+		let morphStartAt = 0;
+		const morphDuration = 1.95;
 		const constructDuration = 3.4;
 		let lastColorSync = performance.now();
 		let lastFrameTime = performance.now();
@@ -266,6 +249,18 @@ export function XernerxDotLogo({
 		let rippleBlend = rippleRef.current ? 1 : 0;
 		let visibilityBlend = blankRef.current ? 0 : 1;
 		let subduedBlend = subduedRef.current ? 1 : 0;
+		const morphBuf = createDotMorphBuffer(dots.length);
+
+		morphShapeRef.current = (nextVariant: DotLogoVariant) => {
+			morphStartAt = beginDotRearrangeMorph({
+				buf: morphBuf,
+				dots,
+				nextVariant,
+				computeCoverage: computeCoverageForVariant,
+				procTime,
+				reducedMotion,
+			});
+		};
 
 		const initConstructDots = () => {
 			visibilityBlend = 1;
@@ -280,6 +275,21 @@ export function XernerxDotLogo({
 			if (typeof document !== 'undefined' && document.hidden) return;
 			const constructAge = constructStartRef.current > 0 ? (now - constructStartRef.current) * 0.001 : 99;
 			const isConstructing = constructStartRef.current > 0 && constructAge < constructDuration;
+			const morphAge = morphStartAt > 0 ? (now - morphStartAt) * 0.001 : 99;
+			const isMorphing = morphStartAt > 0 && morphAge < morphDuration;
+			if (morphStartAt > 0 && !isMorphing) {
+				morphStartAt = 0;
+				for (let i = 0; i < dots.length; i++) {
+					if (morphBuf.active[i] === 2) {
+						morphBuf.active[i] = 0;
+						dots[i].coverage = dots[i].targetCoverage;
+						dots[i].x = dots[i].homeX;
+						dots[i].y = dots[i].homeY;
+					} else {
+						morphBuf.active[i] = 0;
+					}
+				}
+			}
 			if (constructStartRef.current > 0 && constructAge >= 2.85 && !constructPulseRef.current) {
 				constructPulseRef.current = true;
 				shockwaves.push({ x: activeW * 0.5, y: activeH * 0.28, birth: now });
@@ -288,7 +298,7 @@ export function XernerxDotLogo({
 				constructStartRef.current = 0;
 				if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('xernerx:construct-complete'));
 			}
-			if (backgroundMode && !isConstructing && !pointer.active && shockwaves.length === 0 && now - lastFrameTime < 30) {
+			if (backgroundMode && !isConstructing && !isMorphing && !pointer.active && shockwaves.length === 0 && now - lastFrameTime < 30) {
 				isRunning = true;
 				rafId = requestAnimationFrame(renderFrame);
 				return;
@@ -299,7 +309,7 @@ export function XernerxDotLogo({
 				syncThemeColors();
 				lastColorSync = now;
 			}
-			const targetRipple = rippleRef.current && !reducedMotion ? 1 : 0;
+			const targetRipple = (rippleRef.current || isMorphing) && !reducedMotion ? 1 : 0;
 			const targetVisibility = blankRef.current ? 0 : 1;
 			const targetSubdued = subduedRef.current ? 1 : 0;
 			rippleBlend += (targetRipple - rippleBlend) * 0.06;
@@ -346,6 +356,19 @@ export function XernerxDotLogo({
 					} else {
 						d.coverage = d.targetCoverage;
 					}
+				} else if (isMorphing && morphBuf.active[i] !== 0) {
+					const mMode = morphBuf.active[i];
+					const p = Math.max(0, Math.min(1, (morphAge - morphBuf.delay[i]) / (morphDuration - 0.3)));
+					const ease = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+					if (mMode === 1) {
+						if (liveProcedural && p > 0.72) d.targetCoverage = computeCoverageForVariant(activeVar, d.homeX, d.homeY, procTime);
+						d.coverage = morphBuf.fromCov[i] + (d.targetCoverage - morphBuf.fromCov[i]) * ease;
+						constructGlint = Math.sin(p * Math.PI) * 0.52;
+					} else {
+						d.coverage = morphBuf.fromCov[i] * (1 - ease * 0.72);
+						constructGlint = Math.sin(p * Math.PI) * 0.42;
+					}
+					maxMotionEnergy = 1;
 				} else {
 					if (liveProcedural) d.targetCoverage = computeCoverageForVariant(activeVar, d.homeX, d.homeY, procTime);
 					const covDiff = Math.abs(d.targetCoverage - d.coverage);
@@ -356,7 +379,9 @@ export function XernerxDotLogo({
 				const logoBlend = Math.max(0, Math.min(1, (d.coverage - 0.22) / 0.52));
 				const waveDiag = activeVar === 'helix' ? Math.sin(d.nx * 5.8 - procTime * 4.2 + d.ny * 1.5) : Math.sin(d.nx * 5.2 - d.ny * 3.8 - t * 3.4);
 				const waveRadial =
-					activeVar === 'vortex' || activeVar === 'orbit' ? Math.cos(d.distCenter * 7.2 - Math.atan2(d.ny, d.nx) * 2 - procTime * 3.6) : Math.cos(d.distCenter * 6.4 - t * 2.8);
+					activeVar === 'vortex' || activeVar === 'orbit' || activeVar === 'chronos'
+						? Math.cos(d.distCenter * 7.2 - Math.atan2(d.ny, d.nx) * 2 - procTime * 3.6)
+						: Math.cos(d.distCenter * 6.4 - t * 2.8);
 				const rawWave = Math.pow((waveDiag * 0.65 + waveRadial * 0.35 + 1) * 0.5, 1.5) * rippleBlend;
 				const waveNorm = isConstructing ? rawWave * (0.3 + 0.7 * constructFloatBlend) + (1 - constructFloatBlend) * 0.45 : rawWave;
 				const floatScale = (backgroundMode ? 2.8 : activeW <= 96 ? 0.85 : 1.9) * rippleBlend * constructFloatBlend;
@@ -403,6 +428,22 @@ export function XernerxDotLogo({
 				if (reducedMotion) {
 					d.x = d.homeX;
 					d.y = d.homeY;
+				} else if (isMorphing && morphBuf.active[i] !== 0) {
+					const mMode = morphBuf.active[i];
+					const p = Math.max(0, Math.min(1, (morphAge - morphBuf.delay[i]) / (morphDuration - 0.3)));
+					const ease = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+					const destX = mMode === 1 ? targetX : morphBuf.toX[i] + floatX;
+					const destY = mMode === 1 ? targetY : morphBuf.toY[i] + floatY;
+					const dx = destX - morphBuf.fromX[i];
+					const dy = destY - morphBuf.fromY[i];
+					const dist = Math.hypot(dx, dy);
+					const arcAmp = Math.sin(p * Math.PI) * Math.min(Math.abs(morphBuf.arc[i]), dist * 0.32) * (morphBuf.arc[i] >= 0 ? 1 : -1);
+					const px = dist > 1 ? -dy / dist : 0;
+					const py = dist > 1 ? dx / dist : 0;
+					d.x = morphBuf.fromX[i] + dx * ease + px * arcAmp;
+					d.y = morphBuf.fromY[i] + dy * ease + py * arcAmp;
+					d.vx = 0;
+					d.vy = 0;
 				} else {
 					d.vx = (d.vx + (targetX - d.x) * 0.11) * 0.8;
 					d.vy = (d.vy + (targetY - d.y) * 0.11) * 0.8;
@@ -431,7 +472,17 @@ export function XernerxDotLogo({
 				const logoBaseAlpha = loadingBaseAlpha + (0.38 - loadingBaseAlpha) * subduedBlend;
 				const logoRawAlpha = Math.min(1, logoBaseAlpha + waveNorm * 0.48 + cursorBoost * 0.52 + shockBoost * 0.48);
 				const ambientRawAlpha = (isBannerVivid ? 0.16 : backgroundMode ? 0.08 : 0.11) + activeEnergy * 0.34;
-				const alpha = (ambientRawAlpha + (logoRawAlpha - ambientRawAlpha) * logoBlend) * visibilityBlend * gridScale;
+				if (isMorphing && morphBuf.active[i] !== 0 && showAmbientField) {
+					const ambAlpha = (isBannerVivid ? 0.16 : backgroundMode ? 0.08 : 0.11) * visibilityBlend;
+					if (ambAlpha > 0.005) {
+						ctx.beginPath();
+						ctx.arc(targetX, targetY, Math.max(0.5, cellRadiusBase * 0.28), 0, Math.PI * 2);
+						ctx.fillStyle = `rgba(${mutedRgb[0]}, ${mutedRgb[1]}, ${mutedRgb[2]}, ${ambAlpha.toFixed(3)})`;
+						ctx.fill();
+					}
+				}
+				const morphFade = isMorphing && morphBuf.active[i] === 2 ? Math.max(0, 1 - Math.max(0, (morphAge - morphBuf.delay[i]) / (morphDuration - 0.3) - 0.55) / 0.45) : 1;
+				const alpha = (ambientRawAlpha + (logoRawAlpha - ambientRawAlpha) * logoBlend) * visibilityBlend * gridScale * morphFade;
 				if (alpha > 0.005 && radius > 0.15) {
 					ctx.beginPath();
 					ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
@@ -442,6 +493,7 @@ export function XernerxDotLogo({
 
 			const needsMoreFrames =
 				isConstructing ||
+				isMorphing ||
 				(!reducedMotion && (targetRipple > 0 || rippleBlend > 0.004 || pointer.active || shockwaves.length > 0 || maxMotionEnergy > 0.04)) ||
 				Math.abs(targetVisibility - visibilityBlend) > 0.01 ||
 				Math.abs(targetSubdued - subduedBlend) > 0.01;

@@ -87,7 +87,7 @@ export function LandingCta() {
 	const { type } = usePlatform();
 
 	return (
-		<section className="max-w-7xl mx-auto px-6 pb-32 relative">
+		<section id="cta" className="max-w-7xl mx-auto px-6 pb-32 relative">
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
 				whileInView={{ opacity: 1, y: 0 }}

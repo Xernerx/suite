@@ -2,6 +2,58 @@
 
 # @xernerx/components
 
+## 0.9.5
+
+### Patch Changes
+
+- ### Canonical Xernerx Watermark Enforcement & `chronos` / `vortex` Landing Stage Transitions (`@xernerx/feedback`, `@xernerx/providers`, `@xernerx/components`, `www`, `api`)
+    - **Canonical Xernerx Watermark on `www`, `api` & `docs` (`packages/components/src/Page.tsx`, `packages/providers/src/LoadingProvider.tsx`, `apps/api/src/app/page.tsx`)**:
+        - Added `isFixedWatermarkApp` detection in `Page.tsx` for `www` (`4000`), `api` (`4001`), and `docs` (`4005`) so user-customized `uiPreferences.dotMatrixType`, `dotMatrixStage`, and `dotMatrixAnimation` settings never override the canonical Xernerx watermark or the landing page scroll transitions.
+        - Enabled `sticky-ripple` background mode for `docs` (`4005` / `docs.xernerx.com`) in `LoadingProvider.tsx` and set `setDotVariant('icon')` on `apps/api/src/app/page.tsx` so both `api` and `docs` always display the centered Xernerx `icon` dot-matrix watermark.
+    - **`chronos` Temporal Astrolabe Variant & Section-Aware Landing Transitions (`packages/feedback/src/dotLogoPaths.ts`, `packages/feedback/src/XernerxDotLogo.tsx`, `apps/www/src/components/HomeClient.tsx`, `apps/www/src/components/PlatformHighlights.tsx`)**:
+        - Added the procedural `chronos` dot-matrix variant in `dotLogoPaths.ts` featuring a pulsing temporal core, outer dial ring with 12 milestone ticks, counter-rotating inner astrolabe gear ring, sweeping minute/hour clockwork hands, and an orbiting milestone node.
+        - Created `dotLogoMorph.ts` (`createDotMorphBuffer` & `beginDotRearrangeMorph`) and wired it into `XernerxDotLogo.tsx` so switching between any two dot-matrix variants (both from the global loading state to the user's selected shape and across landing page scroll sections) physically rearranges the lit dots along 1.95-second cubic ease-in-out curved flight paths while keeping stationary ambient grid dots rendered at every matrix cell so the background lattice never develops holes.
+        - Updated `HomeClient.tsx` to transition the background dot-matrix stage using live DOM section scroll positions across all 8 landing page stages:
+            - **Hero**: `full` (Upper-stage `XERNERX` wordmark + crest)
+            - **Selling Points & Consumer Services (`#services`)**: `icon` (Xernerx crest logo)
+            - **Developer Software (`#software`)**: `prism` (Hexagonal rotating prism)
+            - **About Us (`#about`)**: `infinity` (Twin-core Lemniscate of Bernoulli ribbon)
+            - **Ecosystem Pillars (`#about` lower)**: `helix` (3D spinning DNA double-helix)
+            - **Platform Highlights (`#highlights`)**: `orbit` (Multi-axis 3D orbital rings with revolving satellites)
+            - **The Journey So Far (`#timeline`)**: `chronos` (Animated Chrono-Astrolabe clockwork dial)
+            - **Closing Call to Action (`#cta`)**: `vortex` (Spiraling 3-arm galaxy portal with counter-rotating star halo)
+
+- Updated dependencies
+    - @xernerx/feedback@0.4.0
+    - @xernerx/providers@0.15.0
+    - @xernerx/ui@0.7.5
+
+## 0.9.4
+
+### Patch Changes
+
+- ### Canonical Xernerx Watermark Enforcement & `chronos` / `vortex` Landing Stage Transitions (`@xernerx/feedback`, `@xernerx/providers`, `@xernerx/components`, `www`, `api`)
+    - **Canonical Xernerx Watermark on `www`, `api` & `docs` (`packages/components/src/Page.tsx`, `packages/providers/src/LoadingProvider.tsx`, `apps/api/src/app/page.tsx`)**:
+        - Added `isFixedWatermarkApp` detection in `Page.tsx` for `www` (`4000`), `api` (`4001`), and `docs` (`4005`) so user-customized `uiPreferences.dotMatrixType`, `dotMatrixStage`, and `dotMatrixAnimation` settings never override the canonical Xernerx watermark or the landing page scroll transitions.
+        - Enabled `sticky-ripple` background mode for `docs` (`4005` / `docs.xernerx.com`) in `LoadingProvider.tsx` and set `setDotVariant('icon')` on `apps/api/src/app/page.tsx` so both `api` and `docs` always display the centered Xernerx `icon` dot-matrix watermark.
+    - **`chronos` Temporal Astrolabe Variant & Section-Aware Landing Transitions (`packages/feedback/src/dotLogoPaths.ts`, `packages/feedback/src/XernerxDotLogo.tsx`, `apps/www/src/components/HomeClient.tsx`, `apps/www/src/components/PlatformHighlights.tsx`)**:
+        - Added the procedural `chronos` dot-matrix variant in `dotLogoPaths.ts` featuring a pulsing temporal core, outer dial ring with 12 milestone ticks, counter-rotating inner astrolabe gear ring, sweeping minute/hour clockwork hands, and an orbiting milestone node.
+        - Created `dotLogoMorph.ts` (`createDotMorphBuffer` & `beginDotRearrangeMorph`) and wired it into `XernerxDotLogo.tsx` so switching between any two dot-matrix variants (both from the global loading state to the user's selected shape and across landing page scroll sections) physically rearranges the lit dots along 1.95-second cubic ease-in-out curved flight paths while keeping stationary ambient grid dots rendered at every matrix cell so the background lattice never develops holes.
+        - Updated `HomeClient.tsx` to transition the background dot-matrix stage using live DOM section scroll positions across all 8 landing page stages:
+            - **Hero**: `full` (Upper-stage `XERNERX` wordmark + crest)
+            - **Selling Points & Consumer Services (`#services`)**: `icon` (Xernerx crest logo)
+            - **Developer Software (`#software`)**: `prism` (Hexagonal rotating prism)
+            - **About Us (`#about`)**: `infinity` (Twin-core Lemniscate of Bernoulli ribbon)
+            - **Ecosystem Pillars (`#about` lower)**: `helix` (3D spinning DNA double-helix)
+            - **Platform Highlights (`#highlights`)**: `orbit` (Multi-axis 3D orbital rings with revolving satellites)
+            - **The Journey So Far (`#timeline`)**: `chronos` (Animated Chrono-Astrolabe clockwork dial)
+            - **Closing Call to Action (`#cta`)**: `vortex` (Spiraling 3-arm galaxy portal with counter-rotating star halo)
+
+- Updated dependencies
+    - @xernerx/feedback@0.3.0
+    - @xernerx/providers@0.14.0
+    - @xernerx/ui@0.7.4
+
 ## 0.9.3
 
 ### Patch Changes

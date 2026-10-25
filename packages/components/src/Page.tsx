@@ -241,9 +241,25 @@ export function Page({ children }: { children: React.ReactNode }) {
 		};
 	}, [t, toast]);
 
-	const stage = uiPreferences?.dotMatrixStage || 'default';
-	const matrixType = uiPreferences?.dotMatrixType && uiPreferences.dotMatrixType !== 'default' ? uiPreferences.dotMatrixType : stage === 'orbit' ? 'orbit' : stage === 'blank' ? 'blank' : 'default';
-	const matrixAnim = uiPreferences?.dotMatrixAnimation || (stage === 'ripple' ? 'always' : 'animate');
+	const isFixedWatermarkApp =
+		typeof window !== 'undefined' &&
+		(['4000', '4001', '4005'].includes(window.location.port) ||
+			['xernerx.com', 'dev.xernerx.com', 'canary.xernerx.com'].includes(window.location.hostname) ||
+			window.location.hostname.startsWith('www.') ||
+			window.location.hostname.startsWith('api.') ||
+			window.location.hostname.startsWith('docs.'));
+
+	const stage = isFixedWatermarkApp ? 'default' : uiPreferences?.dotMatrixStage || 'default';
+	const matrixType = isFixedWatermarkApp
+		? 'default'
+		: uiPreferences?.dotMatrixType && uiPreferences.dotMatrixType !== 'default'
+			? uiPreferences.dotMatrixType
+			: stage === 'orbit'
+				? 'orbit'
+				: stage === 'blank'
+					? 'blank'
+					: 'default';
+	const matrixAnim = isFixedWatermarkApp ? 'animate' : uiPreferences?.dotMatrixAnimation || (stage === 'ripple' ? 'always' : 'animate');
 
 	const activeLoading = isLoading || entryLoading;
 	const isFeedbackVariant = dotVariant === '404' || dotVariant === 'error' || dotVariant === 'lock';
