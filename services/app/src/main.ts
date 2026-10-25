@@ -32,21 +32,36 @@ export class XernerxAppClient extends XernerxClient {
 		const origClear = console.clear;
 		console.clear = () => {};
 		super({
-			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences'],
+			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences', 'MessageContent'],
 			token: APP_BOT_TOKEN as string,
 			guildId: SUPPORT_GUILD_IDS,
 			global: false,
 		});
 		console.clear = origClear;
+
+		const loadTsOrJsFiles = (dir: string) => {
+			try {
+				return fs
+					.readdirSync(dir)
+					.filter((file) => (file.endsWith('.ts') || file.endsWith('.js')) && !file.endsWith('.d.ts'))
+					.map((file) => path.join(dir, file));
+			} catch {
+				return [];
+			}
+		};
+		(this.modules.commandHandler as any).loadFiles = loadTsOrJsFiles;
+		(this.modules.eventHandler as any).loadFiles = loadTsOrJsFiles;
 	}
 
 	async init() {
+		const baseDir = fs.existsSync(path.resolve(process.cwd(), 'src/commands')) ? 'src' : 'dist';
+
 		await this.modules.commandHandler.loadSlashCommands({
-			directory: 'dist/commands/slash',
+			directory: `${baseDir}/commands/slash`,
 		});
 
 		await this.modules.eventHandler.loadEvents({
-			directory: 'dist/events',
+			directory: `${baseDir}/events`,
 		});
 
 		await this.connect();

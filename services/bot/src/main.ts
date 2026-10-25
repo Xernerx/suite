@@ -37,19 +37,34 @@ export class XernerxBotClient extends XernerxClient {
 			global: process.env.ENVIRONMENT?.toUpperCase() === 'PRODUCTION',
 		});
 		console.clear = origClear;
+
+		const loadTsOrJsFiles = (dir: string) => {
+			try {
+				return fs
+					.readdirSync(dir)
+					.filter((file) => (file.endsWith('.ts') || file.endsWith('.js')) && !file.endsWith('.d.ts'))
+					.map((file) => path.join(dir, file));
+			} catch {
+				return [];
+			}
+		};
+		(this.modules.commandHandler as any).loadFiles = loadTsOrJsFiles;
+		(this.modules.eventHandler as any).loadFiles = loadTsOrJsFiles;
 	}
 
 	async init() {
+		const baseDir = fs.existsSync(path.resolve(process.cwd(), 'src/commands')) ? 'src' : 'dist';
+
 		await this.modules.commandHandler.loadSlashCommands({
-			directory: 'dist/commands/slash',
+			directory: `${baseDir}/commands/slash`,
 		});
 
 		await this.modules.commandHandler.loadContextCommands({
-			directory: 'dist/commands/context',
+			directory: `${baseDir}/commands/context`,
 		});
 
 		await this.modules.eventHandler.loadEvents({
-			directory: 'dist/events',
+			directory: `${baseDir}/events`,
 		});
 
 		await this.connect();

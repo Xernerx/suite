@@ -6,6 +6,7 @@ import { Button, Input, Modal, MultiSelector, Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import { AnnouncementEmbedBuilder } from './AnnouncementEmbedBuilder';
 import { AnnouncementActionRowsBuilder } from './AnnouncementActionRowsBuilder';
+import type { BoilerplateTemplateType } from './boilerplateTemplates';
 import type { ChannelOption, ComponentRow, EmbedData } from './types';
 
 interface AnnouncementModalProps {
@@ -34,7 +35,7 @@ interface AnnouncementModalProps {
 	setEmbeds: React.Dispatch<React.SetStateAction<EmbedData[]>>;
 	components: ComponentRow[];
 	setComponents: React.Dispatch<React.SetStateAction<ComponentRow[]>>;
-	fillBoilerplate: (type: 'tos' | 'privacy') => void;
+	fillBoilerplate: (type: BoilerplateTemplateType) => void;
 	onSubmit: (e: React.FormEvent) => void;
 	saving: boolean;
 }
@@ -103,7 +104,19 @@ export function AnnouncementModal({
 			maxWidth="max-w-4xl"
 		>
 			<form onSubmit={onSubmit} className="flex flex-col gap-6 max-h-[75vh] overflow-y-auto pr-2">
-				<div className="flex gap-2">
+				<div className="flex flex-wrap gap-2">
+					<Button type="button" variant="ghost" onClick={() => fillBoilerplate('welcome')}>
+						{t('admin.dashboard.announcements.loadWelcome')}
+					</Button>
+					<Button type="button" variant="ghost" onClick={() => fillBoilerplate('rules')}>
+						{t('admin.dashboard.announcements.loadRules')}
+					</Button>
+					<Button type="button" variant="ghost" onClick={() => fillBoilerplate('support')}>
+						{t('admin.dashboard.announcements.loadSupport')}
+					</Button>
+					<Button type="button" variant="ghost" onClick={() => fillBoilerplate('ecosystem')}>
+						{t('admin.dashboard.announcements.loadEcosystem')}
+					</Button>
 					<Button type="button" variant="ghost" onClick={() => fillBoilerplate('tos')}>
 						{t('admin.dashboard.announcements.loadTos')}
 					</Button>

@@ -3,7 +3,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Plus, Trash } from 'lucide-react';
+import { Link2, Plus, Trash } from 'lucide-react';
 import { Button, Input } from '@xernerx/ui';
 import { useDictionary, useUser } from '@xernerx/providers';
 import type { EmbedData } from './types';
@@ -23,6 +23,7 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 			...embeds,
 			{
 				title: '',
+				url: '',
 				description: '',
 				color: '#8b7cf6',
 				fields: [],
@@ -102,8 +103,17 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 							placeholder={t('admin.dashboard.announcements.embedTitle')}
 							value={emb.title || ''}
 							onChange={(e) => updateEmbed(eIdx, 'title', e.target.value)}
-							className="text-base font-bold text-(--accent) !bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none w-full mb-1 placeholder:text-(--text-muted)"
+							className={`text-base font-bold text-(--accent) !bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none w-full placeholder:text-(--text-muted) ${emb.url ? 'underline decoration-(--accent)/60 underline-offset-2' : ''}`}
 						/>
+						<div className="flex items-center gap-1.5 mb-1 text-xs text-(--text-muted)">
+							<Link2 size={12} className={emb.url ? 'text-(--accent) shrink-0' : 'text-(--text-muted)/60 shrink-0'} />
+							<Input
+								placeholder={t('admin.dashboard.announcements.embedUrl')}
+								value={emb.url || ''}
+								onChange={(e) => updateEmbed(eIdx, 'url', e.target.value)}
+								className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none w-full text-xs text-(--accent) placeholder:text-(--text-muted)/50"
+							/>
+						</div>
 						<Input
 							variant="textarea"
 							placeholder={t('admin.dashboard.announcements.embedDesc')}
@@ -131,17 +141,19 @@ export function AnnouncementEmbedBuilder({ embeds, setEmbeds }: AnnouncementEmbe
 											className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none text-sm text-(--text-muted) placeholder:text-(--text-muted)/50 resize-none min-h-[30px]"
 										/>
 
-										<div className="absolute -top-6 -right-2 opacity-0 group-hover/field:opacity-100 flex gap-2 bg-(--foreground) border border-(--border)/10 rounded-xl p-1.5 shadow-lg z-10">
-											<button
-												type="button"
-												onClick={() => updateField(eIdx, fIdx, 'inline', !f.inline)}
-												className={`text-[10px] font-bold ${f.inline ? 'text-(--accent-green)' : 'text-(--text-muted)'}`}
-											>
-												{t('admin.dashboard.announcements.inline')}
-											</button>
-											<button type="button" onClick={() => removeField(eIdx, fIdx)} className="text-(--accent-red) text-[10px]">
-												<Trash size={12} />
-											</button>
+										<div className="absolute bottom-full right-0 pb-1 opacity-0 pointer-events-none group-hover/field:opacity-100 group-hover/field:pointer-events-auto group-focus-within/field:opacity-100 group-focus-within/field:pointer-events-auto z-10">
+											<div className="flex gap-2 bg-(--foreground) border border-(--border)/10 rounded-xl p-1.5 shadow-lg">
+												<button
+													type="button"
+													onClick={() => updateField(eIdx, fIdx, 'inline', !f.inline)}
+													className={`text-[10px] font-bold ${f.inline ? 'text-(--accent-green)' : 'text-(--text-muted)'}`}
+												>
+													{t('admin.dashboard.announcements.inline')}
+												</button>
+												<button type="button" onClick={() => removeField(eIdx, fIdx)} className="text-(--accent-red) text-[10px]">
+													<Trash size={12} />
+												</button>
+											</div>
 										</div>
 									</div>
 								))}

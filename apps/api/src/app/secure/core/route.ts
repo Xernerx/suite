@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 			sisterServers = JSON.parse(sisterServersSetting?.value || '[]');
 		} catch (e) {}
 
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 		const mappings: Record<string, string> = {};
 
 		// If a role name and bot token exist, create the role on sister servers

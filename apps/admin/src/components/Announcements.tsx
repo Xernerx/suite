@@ -9,6 +9,7 @@ import { Loading } from '@xernerx/feedback';
 import type { AnnouncementItem, ChannelOption, ComponentRow, EmbedData } from './announcements/types';
 import { AnnouncementCard } from './announcements/AnnouncementCard';
 import { AnnouncementModal } from './announcements/AnnouncementModal';
+import { buildBoilerplateTemplate, type BoilerplateTemplateType } from './announcements/boilerplateTemplates';
 
 export default function Announcements() {
 	const { t } = useDictionary();
@@ -94,45 +95,19 @@ export default function Announcements() {
 				setWebhookUrl(data.url);
 				toast({ type: 'success', title: t('admin.dashboard.announcements.toasts.webhookLinked') });
 			} else {
-				throw new Error(data.error || t('admin.dashboard.announcements.toasts.createWebhookFailed'));
+				throw new Error(data.details || data.error || t('admin.dashboard.announcements.toasts.createWebhookFailed'));
 			}
 		} catch (e: any) {
 			toast({ type: 'error', title: t('admin.dashboard.announcements.toasts.createWebhookFailed'), description: e.message });
 		}
 	};
 
-	const fillBoilerplate = (type: 'tos' | 'privacy') => {
-		const avatarUrl = user?.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png` : undefined;
-
-		setTitle(type === 'tos' ? t('admin.dashboard.announcements.templates.tosTitle') : t('admin.dashboard.announcements.templates.privacyTitle'));
-		setContent('');
-		setEmbeds([
-			{
-				title: type === 'tos' ? t('admin.dashboard.announcements.templates.tosEmbedTitle') : t('admin.dashboard.announcements.templates.privacyEmbedTitle'),
-				description: type === 'tos' ? t('admin.dashboard.announcements.templates.tosEmbedDesc') : t('admin.dashboard.announcements.templates.privacyEmbedDesc'),
-				color: '#8b7cf6',
-				fields: [],
-				author: { name: '', url: '', icon_url: '' },
-				footer: {
-					text: user?.username || user?.global_name || '',
-					icon_url: avatarUrl,
-				},
-				timestamp: new Date().toISOString(),
-			},
-		]);
-		setComponents([
-			{
-				type: 1,
-				components: [
-					{
-						type: 2,
-						style: 5,
-						label: type === 'tos' ? t('admin.dashboard.announcements.templates.tosButtonLabel') : t('admin.dashboard.announcements.templates.privacyButtonLabel'),
-						url: `https://xernerx.com/${type === 'tos' ? 'terms' : 'privacy'}`,
-					},
-				],
-			},
-		]);
+	const fillBoilerplate = (type: BoilerplateTemplateType) => {
+		const tpl = buildBoilerplateTemplate(type, t, user);
+		setTitle(tpl.title);
+		setContent(tpl.content);
+		setEmbeds(tpl.embeds);
+		setComponents(tpl.components);
 	};
 
 	const saveAnnouncement = async (e: React.FormEvent) => {
@@ -140,9 +115,14 @@ export default function Announcements() {
 		setSaving(true);
 
 		try {
-			// Clean up embeds (remove empty authors/footers)
+			// Clean up embeds (remove empty authors/footers/urls)
 			const cleanEmbeds = embeds.map((emb) => {
 				const cleaned = { ...emb };
+				if (cleaned.url && cleaned.url.trim()) {
+					cleaned.url = cleaned.url.trim();
+				} else {
+					delete cleaned.url;
+				}
 				if (cleaned.author && !cleaned.author.name) delete cleaned.author;
 				if (cleaned.footer && !cleaned.footer.text) delete cleaned.footer;
 				if (cleaned.color && typeof cleaned.color === 'string') {

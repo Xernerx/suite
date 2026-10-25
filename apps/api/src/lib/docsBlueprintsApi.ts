@@ -289,7 +289,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 			{ label: 'Developer Portal Webhooks', href: 'https://app.xernerx.com/portal' },
 			{ label: 'Download Desktop App', href: 'https://xernerx.com/download' },
 		],
-		keywords: ['webhooks', 'localhost', '127.0.0.1', 'relay', 'desktop', 'portal', 'vote', 'review', 'stat', 'ngrok'],
+		keywords: ['webhooks', 'localhost', '127.0.0.1', 'relay', 'desktop', 'portal', 'vote', 'review', 'stat', 'release', 'ngrok'],
 	},
 	{
 		id: 'api-post-bot-releases',

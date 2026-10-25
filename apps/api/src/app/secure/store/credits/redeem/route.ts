@@ -96,6 +96,9 @@ export async function POST(req: Request) {
 		} else if (item.perkType === 'vanity_url') {
 			const slots = Math.max(1, Number(item.perkValue) || 1);
 			updateInc.extraVanitySlots = slots;
+		} else if (item.perkType === 'bot_slots') {
+			const slots = Math.max(1, Number(item.perkValue) || 1);
+			updateInc.extraBotSlots = slots;
 		} else if (item.perkType === 'vanity_badge') {
 			const badgeId = String(item.perkValue || item.id);
 			badgesToUnlock.add(badgeId);

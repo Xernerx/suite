@@ -4,6 +4,7 @@ import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
+import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export const dynamic = 'force-dynamic';
 
@@ -87,6 +88,26 @@ export async function POST(req: NextRequest) {
 			status: 'pending',
 			upvotes: [session.user.id],
 		});
+
+		await dispatchAppCommunityWebhook(
+			{ models },
+			{
+				feedType: 'suggestions',
+				title: `💡 New Community Suggestion: ${String(body.title).slice(0, 120)}`,
+				url: `https://info.xernerx.com/suggestions?id=${suggestion.id}`,
+				description: String(body.description || '').slice(0, 350),
+				color: 0x8b7cf6,
+				fields: [
+					{ name: 'Product', value: `\`${String(body.productId || 'Suite')}\``, inline: true },
+					{ name: 'Submitted By', value: `<@${session.user.id}>`, inline: true },
+				],
+				ctaLinks: [
+					{ label: 'Vote & Discuss', url: `https://info.xernerx.com/suggestions?id=${suggestion.id}` },
+					{ label: 'Submit Suggestion (+250 Credits)', url: 'https://info.xernerx.com/suggestions' },
+				],
+			}
+		).catch(() => {});
+
 		return NextResponse.json({ data: suggestion });
 	} catch (err) {
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

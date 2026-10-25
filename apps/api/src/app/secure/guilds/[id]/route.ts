@@ -93,7 +93,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 				});
 				if (channelsRes.ok) {
 					const channelsData = await channelsRes.json();
-					activeChannels = channelsData.map((c: any) => ({ id: c.id, name: c.name }));
+					if (Array.isArray(channelsData)) {
+						activeChannels = channelsData
+							.filter((c: any) => c.type === 0 || c.type === 5 || c.type === 15 || c.type === 16)
+							.sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+							.map((c: any) => ({ id: c.id, name: c.name, type: c.type }));
+					}
 				}
 			} catch (e) {
 				console.error('[Guild GET] Error fetching channels:', e);

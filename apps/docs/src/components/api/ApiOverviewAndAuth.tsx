@@ -212,24 +212,24 @@ export function ApiOverviewAndAuth({
 				<CodeBlock
 					tabs={[
 						{
-							label: 'TypeScript',
+							label: '@xernerx/stats SDK (Node.js)',
 							language: 'typescript',
-							code: `const headers: HeadersInit = {\n  'Authorization': 'Bearer xnx_live_abc123def456...',\n  'Content-Type': 'application/json'\n};`,
+							code: `import { XernerxStats } from '@xernerx/stats';\n\n// Automatically posts server/user/shard telemetry & auto-registers your bot on first connect!\nnew XernerxStats(client, {\n  token: process.env.XERNERX_TOKEN!, // Your xrx_... token from account.xernerx.com\n});`,
 						},
 						{
-							label: 'JavaScript',
-							language: 'javascript',
-							code: `const headers = {\n  'Authorization': 'Bearer xnx_live_abc123def456...',\n  'Content-Type': 'application/json'\n};`,
+							label: 'TypeScript (fetch)',
+							language: 'typescript',
+							code: `// First POST automatically creates your bot profile & activates your token!\nawait fetch('https://api.xernerx.com/v1/bots/YOUR_DISCORD_BOT_ID/stats', {\n  method: 'POST',\n  headers: {\n    'Authorization': 'Bearer xrx_a1b2c3d4e5f6...',\n    'Content-Type': 'application/json',\n  },\n  body: JSON.stringify({ serverCount: 120, shardCount: 1, userCount: 45000 }),\n});`,
 						},
 						{
 							label: 'Python',
 							language: 'python',
-							code: `headers = {\n    "Authorization": "Bearer xnx_live_abc123def456...",\n    "Content-Type": "application/json"\n}`,
+							code: `import requests\n\nrequests.post(\n    "https://api.xernerx.com/v1/bots/YOUR_DISCORD_BOT_ID/stats",\n    headers={"Authorization": "Bearer xrx_a1b2c3d4e5f6..."},\n    json={"serverCount": 120, "shardCount": 1, "userCount": 45000},\n)`,
 						},
 						{
 							label: 'cURL',
 							language: 'bash',
-							code: `curl -H "Authorization: Bearer xnx_live_abc123def456..." https://api.xernerx.com/v1/bots/YOUR_BOT_ID/profile`,
+							code: `curl -X POST https://api.xernerx.com/v1/bots/YOUR_DISCORD_BOT_ID/stats \\\n  -H "Authorization: Bearer xrx_a1b2c3d4e5f6..." \\\n  -H "Content-Type: application/json" \\\n  -d '{"serverCount":120,"shardCount":1,"userCount":45000}'`,
 						},
 					]}
 				/>

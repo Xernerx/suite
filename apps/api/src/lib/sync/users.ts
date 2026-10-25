@@ -3,7 +3,7 @@
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function syncUserRoles(userId: string, db: any, targetGuildId?: string) {
-	const botToken = process.env.DISCORD_CLIENT_TOKEN;
+	const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 	if (!botToken) {
 		console.log('[UserSync] No bot token for user role sync');
 		return;

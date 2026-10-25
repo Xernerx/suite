@@ -19,6 +19,7 @@ export interface EmbedFooter {
 
 export interface EmbedData {
 	title?: string;
+	url?: string;
 	description?: string;
 	color?: string | number;
 	fields?: EmbedField[];

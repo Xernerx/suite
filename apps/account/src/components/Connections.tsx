@@ -3,10 +3,10 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useDictionary, useEnvironment, usePlatform, useSession, useToast, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePlatform, useSession, useSupport, useToast, useUser } from '@xernerx/providers';
 import { Button, Toggle } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { Link as LinkIcon, CheckCircle2, ExternalLink, Code2, AtSign, Video, Tv, Shield, Music, Gamepad2, MessageCircle, Unplug, Plus, Lock } from 'lucide-react';
+import { Link as LinkIcon, CheckCircle2, ExternalLink, Code2, AtSign, Video, Tv, Shield, Music, Gamepad2, MessageCircle, Unplug, Plus, Lock, UserPlus } from 'lucide-react';
 
 interface ConnectedAccount {
 	provider: string;
@@ -67,6 +67,7 @@ export default function Connections() {
 	const { data: session } = useSession();
 	const { user: discordUser, mutate } = useUser();
 	const { toast } = useToast();
+	const supportCtx = useSupport();
 
 	const isApplication = type === 'application';
 	const activeUser = discordUser || session?.user;
@@ -239,10 +240,18 @@ export default function Connections() {
 					</div>
 
 					{userId && (
-						<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com')}/users/${userId}`, '_blank')} className="flex items-center gap-2 shrink-0">
-							<ExternalLink size={15} />
-							{t('account.profile.viewPublicProfile')}
-						</Button>
+						<div className="flex flex-wrap items-center gap-2 shrink-0">
+							{supportCtx && (
+								<Button variant={supportCtx.isMember ? 'secondary' : 'primary'} onClick={() => supportCtx.triggerDiscordAction()} className="flex items-center gap-2 shrink-0">
+									{supportCtx.isMember ? <MessageCircle size={15} /> : <UserPlus size={15} />}
+									{supportCtx.isMember ? t('common.supportprovider.description') : t('common.supportprovider.joinButton')}
+								</Button>
+							)}
+							<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com')}/users/${userId}`, '_blank')} className="flex items-center gap-2 shrink-0">
+								<ExternalLink size={15} />
+								{t('account.profile.viewPublicProfile')}
+							</Button>
+						</div>
 					)}
 				</div>
 

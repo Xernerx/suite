@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Plus, Trash } from 'lucide-react';
 import { Button, Input, Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
@@ -14,14 +14,46 @@ interface AnnouncementActionRowsBuilderProps {
 
 export function AnnouncementActionRowsBuilder({ components, setComponents }: AnnouncementActionRowsBuilderProps) {
 	const { t } = useDictionary();
+	const [activeBtnKey, setActiveBtnKey] = useState<string | null>(null);
+	const builderRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handlePointerDownOutside = (event: MouseEvent) => {
+			if (!activeBtnKey) return;
+			const target = event.target as HTMLElement | null;
+			if (!target) return;
+			const activeEl = builderRef.current?.querySelector(`[data-btn-key="${activeBtnKey}"]`);
+			if (activeEl && !activeEl.contains(target)) {
+				setActiveBtnKey(null);
+			}
+		};
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setActiveBtnKey(null);
+			}
+		};
+
+		document.addEventListener('mousedown', handlePointerDownOutside);
+		document.addEventListener('keydown', handleKeyDown);
+		return () => {
+			document.removeEventListener('mousedown', handlePointerDownOutside);
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [activeBtnKey]);
 
 	const addActionRow = () => setComponents([...components, { type: 1, components: [] }]);
-	const removeActionRow = (index: number) => setComponents(components.filter((_, i) => i !== index));
+	const removeActionRow = (index: number) => {
+		setActiveBtnKey(null);
+		setComponents(components.filter((_, i) => i !== index));
+	};
 
 	const addButtonToRow = (rowIndex: number) => {
 		const arr = [...components];
+		const newIndex = arr[rowIndex].components.length;
 		arr[rowIndex].components.push({ type: 2, style: 1, label: t('admin.dashboard.announcements.newButton'), custom_id: `btn_${Date.now()}` });
 		setComponents(arr);
+		setActiveBtnKey(`${rowIndex}-${newIndex}`);
 	};
 
 	const updateButton = (rowIndex: number, btnIndex: number, key: string, val: any) => {
@@ -33,14 +65,17 @@ export function AnnouncementActionRowsBuilder({ components, setComponents }: Ann
 	const removeButton = (rowIndex: number, btnIndex: number) => {
 		const arr = [...components];
 		arr[rowIndex].components = arr[rowIndex].components.filter((_, i) => i !== btnIndex);
+		setActiveBtnKey(null);
 		setComponents(arr);
 	};
 
 	return (
-		<div className="flex flex-col gap-2 mt-4">
+		<div ref={builderRef} className="flex flex-col gap-2 mt-4">
 			{components.map((row, rIdx) => (
 				<div key={rIdx} className="flex gap-2 flex-wrap items-center relative group max-w-xl">
 					{row.components.map((btn, bIdx) => {
+						const btnKey = `${rIdx}-${bIdx}`;
+						const isPinnedOpen = activeBtnKey === btnKey;
 						const styleColors: Record<number, string> = {
 							1: 'bg-(--accent) hover:bg-(--hover-accent) text-white',
 							2: 'bg-(--foreground) hover:bg-(--foreground)/80 text-(--text) border border-(--border)/10',
@@ -50,7 +85,13 @@ export function AnnouncementActionRowsBuilder({ components, setComponents }: Ann
 						};
 
 						return (
-							<div key={bIdx} className={`relative flex items-center ${styleColors[btn.style] || styleColors[2]} px-3 py-1.5 rounded-xl font-medium text-sm transition-colors group/btn`}>
+							<div
+								key={bIdx}
+								data-btn-key={btnKey}
+								onMouseDown={() => setActiveBtnKey(btnKey)}
+								onFocusCapture={() => setActiveBtnKey(btnKey)}
+								className={`relative flex items-center ${styleColors[btn.style] || styleColors[2]} px-3 py-1.5 rounded-xl font-medium text-sm transition-colors group/btn`}
+							>
 								<Input
 									placeholder={t('admin.dashboard.announcements.label')}
 									value={btn.label || ''}
@@ -58,31 +99,41 @@ export function AnnouncementActionRowsBuilder({ components, setComponents }: Ann
 									className="!bg-transparent !border-none !p-0 !rounded-none !ring-0 outline-none text-center placeholder:opacity-50 w-20"
 								/>
 
-								{/* Editor Popout */}
-								<div className="absolute bottom-10 left-0 bg-(--foreground) border border-(--border)/10 p-3 rounded-2xl hidden group-hover/btn:flex flex-col gap-2 z-20 w-56 shadow-xl">
-									<label className="text-[10px] uppercase font-bold text-(--text-muted)">{t('admin.dashboard.announcements.buttonStyle')}</label>
-									<Selector
-										value={String(btn.style)}
-										onChange={(val) => updateButton(rIdx, bIdx, 'style', parseInt(val, 10))}
-										options={[
-											{ value: '1', label: t('admin.dashboard.announcements.stylePrimary') },
-											{ value: '2', label: t('admin.dashboard.announcements.styleSecondary') },
-											{ value: '3', label: t('admin.dashboard.announcements.styleSuccess') },
-											{ value: '4', label: t('admin.dashboard.announcements.styleDanger') },
-											{ value: '5', label: t('admin.dashboard.announcements.styleLink') },
-										]}
-									/>
-									<label className="text-[10px] uppercase font-bold text-(--text-muted) mt-1">
-										{btn.style === 5 ? t('admin.dashboard.announcements.url') : t('admin.dashboard.announcements.customId')}
-									</label>
-									{btn.style === 5 ? (
-										<Input placeholder="https://..." value={btn.url || ''} onChange={(e) => updateButton(rIdx, bIdx, 'url', e.target.value)} className="text-xs" />
-									) : (
-										<Input placeholder="custom_id" value={btn.custom_id || ''} onChange={(e) => updateButton(rIdx, bIdx, 'custom_id', e.target.value)} className="text-xs" />
-									)}
-									<button type="button" onClick={() => removeButton(rIdx, bIdx)} className="text-(--accent-red) text-xs text-left mt-1 hover:opacity-80 cursor-pointer">
-										<Trash size={12} className="inline mr-1 -mt-0.5" /> {t('admin.dashboard.announcements.removeButton')}
-									</button>
+								{/* Editor Popout with contiguous pb-2 hover bridge */}
+								<div className={`absolute bottom-full left-0 pb-2 z-30 w-64 ${isPinnedOpen ? 'flex' : 'hidden group-hover/btn:flex group-focus-within/btn:flex'}`}>
+									<div className="bg-(--foreground) border border-(--border)/10 p-3 rounded-2xl flex flex-col gap-2 w-full shadow-xl text-(--text)">
+										<label className="text-[10px] uppercase font-bold text-(--text-muted)">{t('admin.dashboard.announcements.buttonStyle')}</label>
+										<Selector
+											items={true}
+											value={String(btn.style)}
+											onChange={(val) => updateButton(rIdx, bIdx, 'style', parseInt(val, 10))}
+											options={[
+												{ value: '1', label: t('admin.dashboard.announcements.stylePrimary') },
+												{ value: '2', label: t('admin.dashboard.announcements.styleSecondary') },
+												{ value: '3', label: t('admin.dashboard.announcements.styleSuccess') },
+												{ value: '4', label: t('admin.dashboard.announcements.styleDanger') },
+												{ value: '5', label: t('admin.dashboard.announcements.styleLink') },
+											]}
+										/>
+										<label className="text-[10px] uppercase font-bold text-(--text-muted) mt-1">
+											{btn.style === 5 ? t('admin.dashboard.announcements.url') : t('admin.dashboard.announcements.customId')}
+										</label>
+										{btn.style === 5 ? (
+											<Input placeholder="https://..." value={btn.url || ''} onChange={(e) => updateButton(rIdx, bIdx, 'url', e.target.value)} className="text-xs" />
+										) : (
+											<Input placeholder="custom_id" value={btn.custom_id || ''} onChange={(e) => updateButton(rIdx, bIdx, 'custom_id', e.target.value)} className="text-xs" />
+										)}
+										<button
+											type="button"
+											onClick={(e) => {
+												e.stopPropagation();
+												removeButton(rIdx, bIdx);
+											}}
+											className="text-(--accent-red) text-xs text-left mt-1 hover:opacity-80 cursor-pointer"
+										>
+											<Trash size={12} className="inline mr-1 -mt-0.5" /> {t('admin.dashboard.announcements.removeButton')}
+										</button>
+									</div>
 								</div>
 							</div>
 						);

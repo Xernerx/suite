@@ -38,6 +38,63 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			return NextResponse.json({ error: 'Token already exists' }, { status: 409 });
 		}
 
+		// Enforce 1 free Bot / API Token slot (+ extraBotSlots from Credit Store, or Unlimited with Developer Pro / Ultra / Staff)
+		const isAdminCreation = userId === 'admin' || Boolean(body.permissions?.secure) || Boolean(body.permissions?.websocket);
+		if (!isAdminCreation) {
+			const SubscriptionModel = (db.models.users as any).Subscription;
+			const CreditModel = (db.models.users as any).Credit;
+			const ItemModel = (db.models.store as any)?.Item;
+
+			const [activeSubs, creditDoc, devItems] = await Promise.all([
+				SubscriptionModel
+					? SubscriptionModel.find({
+							ownerId: userId,
+							status: { $in: ['active', 'trialing'] },
+							currentPeriodEnd: { $gt: new Date() },
+						}).lean()
+					: [],
+				CreditModel ? CreditModel.findOne({ ownerId: userId }).lean() : null,
+				ItemModel
+					? ItemModel.find({ id: { $in: ['dev-pro', 'ultra'] } })
+							.select('id skuId')
+							.lean()
+							.catch(() => [])
+					: [],
+			]);
+
+			const unlimitedPriceIds = new Set<string>([
+				'dev-pro',
+				'ultra',
+				'prod_V0oBbO5pVQMxcC',
+				'prod_V0pD5uXoTQkrYS',
+				'credit_trial_ultra',
+				'credit_trial_dev-pro',
+				...(devItems || []).map((i: any) => i.skuId).filter(Boolean),
+			]);
+
+			const hasUnlimitedSub = (activeSubs || []).some(
+				(sub: any) => sub.stripeSubscriptionId === 'staff_infinite_sub' || unlimitedPriceIds.has(sub.priceId) || String(sub.stripeSubscriptionId || '').startsWith('credit_trial_ultra')
+			);
+
+			if (!hasUnlimitedSub) {
+				const extraBotSlots = Math.max(0, Number(creditDoc?.extraBotSlots) || 0);
+				const maxSlots = 1 + extraBotSlots;
+				const currentTokensCount = await TokenModel.countDocuments({ owners: userId });
+
+				if (currentTokensCount >= maxSlots) {
+					return NextResponse.json(
+						{
+							error: `Free accounts include 1 Bot & API Token slot (currently using ${currentTokensCount}/${maxSlots}). Unlock additional permanent Bot Slots with Credits in the Credit Store or upgrade to Developer Pro / Ultra for unlimited bots.`,
+							code: 'BOT_SLOT_LIMIT_REACHED',
+							usedSlots: currentTokensCount,
+							maxSlots,
+						},
+						{ status: 403 }
+					);
+				}
+			}
+		}
+
 		const resolvedOwners = Array.from(new Set([...(Array.isArray(body.owners) ? body.owners : []), userId].filter(Boolean)));
 
 		const newToken = await TokenModel.create({

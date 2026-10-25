@@ -247,7 +247,11 @@ export function Header() {
 						{activeAnnouncement.message?.content && <span className="text-(--text-muted) truncate hidden sm:inline">— {activeAnnouncement.message.content}</span>}
 						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--accent)/20 text-(--accent) border border-(--accent)/30 shrink-0">
 							<Clock size={10} />
-							{t('admin.dashboard.announcements.expiresIn', { hours: Math.floor(bannerMinsLeft / 60), minutes: bannerMinsLeft % 60 })}
+							{t('admin.dashboard.announcements.expiresIn', {
+								hours: Math.floor(bannerMinsLeft / 60),
+								minutes: bannerMinsLeft % 60,
+								time: `${Math.floor(bannerMinsLeft / 60)}h ${bannerMinsLeft % 60}m`,
+							})}
 						</span>
 					</div>
 					<button type="button" onClick={() => dismissBanner(activeAnnouncement.id)} className="text-(--text-muted) hover:text-(--text) cursor-pointer shrink-0">

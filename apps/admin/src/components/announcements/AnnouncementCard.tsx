@@ -34,7 +34,7 @@ export function AnnouncementCard({ announcement: a, onEdit, onDelete }: Announce
 		const totalMins = Math.max(1, Math.floor((targetMs - now) / 60000));
 		const hours = Math.floor(totalMins / 60);
 		const minutes = totalMins % 60;
-		return { hours, minutes };
+		return { hours, minutes, time: `${hours}h ${minutes}m` };
 	};
 
 	const targetApps = Array.isArray(a.targetApps) && a.targetApps.length > 0 ? a.targetApps : ['all'];

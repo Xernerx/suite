@@ -3,7 +3,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { Award, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
+import { Award, Bot, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
 import { Badge, Button, Confirm, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { CreditLedgerCard } from './CreditLedgerCard';
@@ -20,11 +20,12 @@ interface CreditStoreViewProps {
 	onBuyCreditPack: (priceId: string, item: CatalogItem) => void;
 }
 
-type PerkFilter = 'all' | 'cdn_slots' | 'showcase_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'credit_packs';
+type PerkFilter = 'all' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'credit_packs';
 
 const PERK_ICONS: Record<string, any> = {
 	cdn_slots: HardDrive,
 	showcase_slots: LayoutGrid,
+	bot_slots: Bot,
 	vanity_url: Globe,
 	trial_pass: Zap,
 	streak_shield: Shield,
@@ -53,6 +54,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	const totalSpent = user?.credits?.totalSpent ?? 0;
 	const extraCdnSlots = user?.credits?.extraCdnSlots ?? 0;
 	const extraShowcaseSlots = user?.credits?.extraShowcaseSlots ?? 0;
+	const extraBotSlots = user?.credits?.extraBotSlots ?? 0;
 	const extraVanitySlots = user?.credits?.extraVanitySlots ?? 0;
 	const unlockedBadges: string[] = Array.isArray(user?.credits?.unlockedBadges) ? user.credits.unlockedBadges : [];
 	const nextGiftMs = hasLoadedCredits && user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : null;
@@ -186,6 +188,10 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 								<LayoutGrid size={11} className="text-(--accent)" />
 								{t('account.store.credits.ownedShowcaseSlots', { count: 1 + extraShowcaseSlots, extra: extraShowcaseSlots })}
 							</span>
+							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
+								<Bot size={11} className="text-(--accent)" />
+								{t('account.store.credits.ownedBotSlots', { count: 1 + extraBotSlots, extra: extraBotSlots })}
+							</span>
 							{extraVanitySlots > 0 && (
 								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
 									<Globe size={11} className="text-(--accent)" />
@@ -236,6 +242,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 						{ id: 'all', label: t('account.store.credits.filters.all') },
 						{ id: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
 						{ id: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
+						{ id: 'bot_slots', label: t('account.store.credits.filters.botSlots') },
 						{ id: 'vanity_url', label: t('account.store.credits.filters.vanityUrls') },
 						{ id: 'trial_pass', label: t('account.store.credits.filters.trialPasses') },
 						{ id: 'vanity_badge', label: t('account.store.credits.filters.vanityBadges') },

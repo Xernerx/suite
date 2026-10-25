@@ -11,7 +11,17 @@ import { useDictionary } from './DictionaryProvider';
 import { useToast } from './ToastProvider';
 import { useEffectiveAlignment } from './ThemeProvider';
 
-const SupportContext = createContext(null);
+export interface SupportContextValue {
+	support: boolean;
+	isMember: boolean;
+	isJoining: boolean;
+	adminServerId: string;
+	openDiscordChannel: () => void;
+	triggerDiscordAction: () => void;
+	joinServer: () => Promise<void>;
+}
+
+const SupportContext = createContext<SupportContextValue | null>(null);
 
 export function SupportProvider({ children }: { children: React.ReactNode }) {
 	const { t } = useDictionary();
@@ -178,11 +188,6 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 		if (!isReady) return;
 		(async () => {
 			try {
-				const sessionWithError = session as {
-					accessToken?: string;
-				};
-				if (!sessionWithError?.accessToken) return;
-
 				let serverId = '687429190165069838';
 				try {
 					const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
@@ -190,8 +195,9 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					});
 					if (res.ok) {
 						const data = await res.json();
-						if (data?.data?.value) {
-							serverId = data.data.value;
+						const resolvedId = data?.value || data?.data?.value;
+						if (resolvedId) {
+							serverId = String(resolvedId).trim();
 							setAdminServerId(serverId);
 						}
 					}
@@ -204,16 +210,20 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					};
 					accessToken?: string;
 				};
-				if (!sessionWithId?.user?.id || !sessionWithId?.accessToken) return;
+				if (!sessionWithId?.user?.id) return;
+
+				const headers: Record<string, string> = {};
+				if (sessionWithId.accessToken) {
+					headers.Authorization = `Bearer ${sessionWithId.accessToken}`;
+				}
 
 				const guildsUrl = getEnvUrl(`https://api.xernerx.com/core/users/${sessionWithId.user.id}/discord/guilds`);
 				const guilds = await fetch(guildsUrl, {
-					headers: {
-						Authorization: `Bearer ${sessionWithId.accessToken}`,
-					},
-				}).then((res) => res.json());
+					headers,
+					credentials: 'include',
+				}).then((res) => (res.ok ? res.json() : []));
 				if (Array.isArray(guilds)) {
-					const guild = guilds.find((g: any) => g.id === serverId);
+					const guild = guilds.find((g: any) => String(g.id) === String(serverId));
 					setSupport(!!guild);
 				}
 			} catch (error) {
@@ -250,7 +260,17 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 	];
 
 	return (
-		<SupportContext.Provider value={null}>
+		<SupportContext.Provider
+			value={{
+				support,
+				isMember: support,
+				isJoining,
+				adminServerId,
+				openDiscordChannel,
+				triggerDiscordAction: handleDiscordAction,
+				joinServer: handleConfirmJoinServer,
+			}}
+		>
 			{children}
 
 			{!isMobileOpen && !isSnappingBug && (

@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -70,6 +71,27 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 						link: 'https://info.xernerx.com/issues',
 					});
 				}
+				await dispatchAppCommunityWebhook(
+					{ models },
+					{
+						feedType: 'issues',
+						title: `✅ Issue Resolved: ${String(updated.title || id).slice(0, 120)}`,
+						url: 'https://info.xernerx.com/bugs',
+						description: `A tracked issue has been resolved by the Xernerx engineering team${versionSuffix}.`,
+						color: 0x22c55e,
+						fields: [
+							{ name: 'Product', value: `\`${updated.productId || 'Suite'}\``, inline: true },
+							...(updated.authorId ? [{ name: 'Reporter', value: `<@${updated.authorId}>`, inline: true }] : []),
+							...(updated.resolvedApp || updated.resolvedVersion
+								? [{ name: 'Fix Target', value: `\`${updated.resolvedApp || 'suite'}${updated.resolvedVersion ? ` v${updated.resolvedVersion}` : ''}\``, inline: true }]
+								: []),
+						],
+						ctaLinks: [
+							{ label: 'View Bug Tracker', url: 'https://info.xernerx.com/bugs' },
+							{ label: 'Release Changelog', url: 'https://info.xernerx.com/changelog' },
+						],
+					}
+				).catch(() => {});
 			} else if (wasVerified) {
 				await recordAuditLog({
 					action: 'issue.verify',
@@ -86,6 +108,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 						link: 'https://info.xernerx.com/issues',
 					});
 				}
+				await dispatchAppCommunityWebhook(
+					{ models },
+					{
+						feedType: 'issues',
+						title: `🛡️ Bug Verified (+500 Credits): ${String(updated.title || id).slice(0, 120)}`,
+						url: 'https://info.xernerx.com/bugs',
+						description: String(updated.description || 'Verified by engineering and queued for resolution.').slice(0, 300),
+						color: 0x8b7cf6,
+						fields: [
+							{ name: 'Product', value: `\`${updated.productId || 'Suite'}\``, inline: true },
+							...(updated.authorId ? [{ name: 'Reporter', value: `<@${updated.authorId}> (\`+500 Credits\`)`, inline: true }] : []),
+						],
+						ctaLinks: [{ label: 'Track on Bug Tracker', url: 'https://info.xernerx.com/bugs' }],
+					}
+				).catch(() => {});
 			}
 		}
 

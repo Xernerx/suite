@@ -104,4 +104,10 @@ export const permissions: PermissionDefinition[] = [
 		description: 'Permission to configure store categories, items, pricing, and discounts.',
 		defaultValue: false,
 	},
+	{
+		key: 'manageSupport',
+		label: 'Manage Support',
+		description: 'Permission to configure Discord support channels, support bots, troubleshooting checklists, and manage support tickets.',
+		defaultValue: false,
+	},
 ];

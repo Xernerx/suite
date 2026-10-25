@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Activity, AlertTriangle, Gauge, Key, Languages, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server, ScrollText } from 'lucide-react';
+import { Activity, AlertTriangle, Gauge, Key, Languages, LifeBuoy, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server, ScrollText } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 
@@ -24,6 +24,7 @@ import Roadmap from '@/components/Roadmap';
 import Issues from '@/components/Issues';
 import Media from '@/components/Media';
 import StoreManagement from '@/components/StoreManagement';
+import Support from '@/components/Support';
 import { permissions } from '@xernerx/lib';
 
 export default function Home() {
@@ -145,6 +146,7 @@ export default function Home() {
 		const canManageSuggestions = hasDbFallback || (userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false);
 		const canManageIssues = hasDbFallback || (userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false);
 		const canManageStore = hasDbFallback || (userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false);
+		const canManageSupport = hasDbFallback || (userRolePermissions.manageSupport ?? userRolePermissions.settings ?? permissions.find((p) => p.key === 'manageSupport')?.defaultValue ?? false);
 		const canMedia = canManageMedia || canUploadMedia;
 
 		const isServerSet = hasDbFallback || !!adminServerId;
@@ -162,6 +164,40 @@ export default function Home() {
 			view: 'seo',
 			icon: Gauge,
 		});
+
+		if (canRoles && isServerSet) {
+			items.push({
+				category: t('common.nav.categories.system'),
+				label: t('common.nav.items.roles'),
+				view: 'roles',
+				icon: Shield,
+			});
+		}
+
+		if (canSettings) {
+			items.push({
+				category: t('common.nav.categories.system'),
+				label: t('common.nav.items.settings'),
+				view: 'settings',
+				icon: Server,
+			});
+		}
+
+		items.push({
+			category: t('common.nav.categories.system'),
+			label: t('admin.dashboard.nav.auditLogs'),
+			view: 'audit',
+			icon: ScrollText,
+		});
+
+		if (canManageSupport) {
+			items.push({
+				category: t('common.nav.categories.support'),
+				label: t('admin.dashboard.nav.support'),
+				view: 'support',
+				icon: LifeBuoy,
+			});
+		}
 
 		if (canMedia) {
 			items.push({
@@ -234,31 +270,6 @@ export default function Home() {
 				icon: Megaphone,
 			});
 		}
-
-		if (canRoles && isServerSet) {
-			items.push({
-				category: t('common.nav.categories.system'),
-				label: t('common.nav.items.roles'),
-				view: 'roles',
-				icon: Shield,
-			});
-		}
-
-		if (canSettings) {
-			items.push({
-				category: t('common.nav.categories.system'),
-				label: t('common.nav.items.settings'),
-				view: 'settings',
-				icon: Server,
-			});
-		}
-
-		items.push({
-			category: t('common.nav.categories.system'),
-			label: t('admin.dashboard.nav.auditLogs'),
-			view: 'audit',
-			icon: ScrollText,
-		});
 
 		if (canManageRoadmap) {
 			items.push({
@@ -380,12 +391,14 @@ export default function Home() {
 	const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
 	const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
 	const canManageStore = userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false;
+	const canManageSupport = userRolePermissions.manageSupport ?? userRolePermissions.settings ?? permissions.find((p) => p.key === 'manageSupport')?.defaultValue ?? false;
 
 	const isServerSet = !!adminServerId;
 
 	allowedViews.push('overview');
 	allowedViews.push('seo');
 	allowedViews.push('audit');
+	if (canManageSupport) allowedViews.push('support');
 	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
 	if (canUsers && isServerSet) allowedViews.push('users');
@@ -437,6 +450,7 @@ export default function Home() {
 			)}
 			{activeView === 'seo' && <Overview />}
 			{activeView === 'audit' && <AuditLogs initialSearch={triageQuery} />}
+			{activeView === 'support' && <Support />}
 			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations initialLocale={triageQuery} />}
 			{activeView === 'users' && <Users initialSearch={triageQuery} onViewAuditLogs={(userId) => handleNavigateFromOverview('audit', userId)} />}

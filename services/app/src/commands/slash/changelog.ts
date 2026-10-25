@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { SlashCommandBuilder, type SlashCommandAutocomplete, type SlashCommandOptions } from '@xernerx/framework';
-import { EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { getApiBaseUrl, getUserAccentColor } from '../../lib/botUtils.js';
 
 interface ChangelogPayload {
@@ -133,7 +133,7 @@ export default class ChangelogCommand extends SlashCommandBuilder {
 	override async exec({ interaction, options }: SlashCommandOptions) {
 		const replyMethod = interaction.deferred ? 'editReply' : 'reply';
 		const botUser = interaction.client.user;
-		const botAvatar = botUser?.displayAvatarURL();
+		const botAvatar = botUser?.displayAvatarURL({ size: 256 });
 		const botName = botUser?.username || 'Xernerx App';
 		const rawVersion = (options as any)?.version?.value || interaction.options.getString('version') || '';
 
@@ -155,27 +155,30 @@ export default class ChangelogCommand extends SlashCommandBuilder {
 			}
 
 			const formattedBody = cleanChangelogMarkdown(payload.content);
-			const changelogUrl = `https://info.xernerx.com/changelog`;
+			const changelogUrl = 'https://info.xernerx.com/changelog';
 
 			const embed = new EmbedBuilder()
 				.setColor(accentColor)
-				.setTitle(`Xernerx Suite • v${payload.selectedVersion}`)
+				.setTitle(`Xernerx Suite Release Notes • v${payload.selectedVersion}`)
 				.setURL(changelogUrl)
 				.setDescription(formattedBody || 'No release notes recorded for this version.')
-				.addFields([
-					{
-						name: 'Links',
-						value: `[Full Changelog](${changelogUrl}) • [RSS Feed](https://api.xernerx.com/v1/changelog/rss.xml)`,
-						inline: false,
-					},
-				])
 				.setFooter({
-					text: `${botName} • Changelog`,
+					text: `${botName} • Release Changelog`,
 					iconURL: botAvatar,
 				})
 				.setTimestamp();
 
-			await (interaction as any)[replyMethod]({ embeds: [embed] });
+			if (botAvatar) {
+				embed.setThumbnail(botAvatar);
+			}
+
+			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+				new ButtonBuilder().setLabel('Read Full Changelog').setStyle(ButtonStyle.Link).setURL(changelogUrl),
+				new ButtonBuilder().setLabel('RSS Feed').setStyle(ButtonStyle.Link).setURL('https://api.xernerx.com/v1/changelog/rss.xml'),
+				new ButtonBuilder().setLabel('Product Roadmap').setStyle(ButtonStyle.Link).setURL('https://info.xernerx.com/roadmap')
+			);
+
+			await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
 		} catch (error) {
 			console.error('Error executing /changelog:', error);
 			const errEmbed = new EmbedBuilder()

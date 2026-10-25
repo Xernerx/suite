@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import { Key, Plus } from 'lucide-react';
+import { Bot, Coins, Key, Plus } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { Button, EmptyState, Input, Tabs } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { TokenListInfo } from './tokens/types';
@@ -15,6 +15,7 @@ import ManageTokenModal from './tokens/ManageTokenModal';
 export default function Tokens() {
 	const { t } = useDictionary();
 	const { data: session } = useSession();
+	const { user } = useUser() as { user: any };
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const [tokens, setTokens] = useState<TokenListInfo[]>([]);
@@ -23,6 +24,21 @@ export default function Tokens() {
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+	const extraBotSlots = Math.max(0, Number(user?.credits?.extraBotSlots) || 0);
+	const maxBotSlots = 1 + extraBotSlots;
+	const activeSubs = Array.isArray(user?.subscriptions) ? user.subscriptions : Array.isArray(user?.billing?.subscriptions) ? user.billing.subscriptions : [];
+	const hasUnlimitedBotSlots = activeSubs.some(
+		(s: any) =>
+			(s.status === 'active' || s.status === 'trialing') &&
+			(s.stripeSubscriptionId === 'staff_infinite_sub' ||
+				s.priceId === 'dev-pro' ||
+				s.priceId === 'ultra' ||
+				s.priceId === 'prod_V0oBbO5pVQMxcC' ||
+				s.priceId === 'prod_V0pD5uXoTQkrYS' ||
+				String(s.stripeSubscriptionId || '').startsWith('credit_trial_ultra'))
+	);
+	const isAtSlotLimit = !hasUnlimitedBotSlots && tokens.length >= maxBotSlots;
 
 	const fetchTokens = async () => {
 		try {
@@ -99,10 +115,28 @@ export default function Tokens() {
 					</div>
 				</div>
 
-				<Button onClick={() => setIsCreateOpen(true)} className="gap-2 bg-(--accent) text-white hover:bg-(--hover-accent) rounded-2xl px-5 py-2.5">
-					<Plus size={16} />
-					{t('account.tokens.generateButton')}
-				</Button>
+				<div className="flex flex-wrap items-center gap-3">
+					<span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-(--background)/60 border border-(--border)/10 text-(--text)">
+						<Bot size={14} className="text-(--accent)" />
+						{hasUnlimitedBotSlots ? t('account.tokens.slotsUnlimited', { used: tokens.length }) : t('account.tokens.slotsUsed', { used: tokens.length, max: maxBotSlots })}
+					</span>
+					{isAtSlotLimit && (
+						<Button
+							variant="secondary"
+							onClick={() => {
+								window.location.href = getEnvUrl('https://store.xernerx.com/?tab=credits');
+							}}
+							className="gap-1.5 rounded-2xl"
+						>
+							<Coins size={15} className="text-(--accent)" />
+							{t('account.tokens.unlockMoreSlots')}
+						</Button>
+					)}
+					<Button onClick={() => setIsCreateOpen(true)} disabled={isAtSlotLimit} className="gap-2 bg-(--accent) text-white hover:bg-(--hover-accent) rounded-2xl px-5 py-2.5">
+						<Plus size={16} />
+						{t('account.tokens.generateButton')}
+					</Button>
+				</div>
 			</div>
 
 			{/* Search & Status Filters */}
