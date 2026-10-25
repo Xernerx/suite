@@ -1,1361 +1,1451 @@
 {
-	"metadata": {
-		"label": "Nederlands"
-	},
-	"common": {
-		"cookiePrompt": {
-			"title": "Cookievoorkeuren",
-			"description": "We gebruiken cookies om ervoor te zorgen dat je sessie veilig blijft, je thema te onthouden en ons te helpen de app te verbeteren.",
-			"manage": {
-				"essential": {
-					"label": "Essentieel",
-					"description": "Vereist voor sessies en beveiliging."
-				},
-				"functional": {
-					"label": "Functioneel",
-					"description": "Onthoudt je thema en lay-outstatus."
-				},
-				"analytics": {
-					"label": "Analytisch",
-					"description": "Helpt ons fouten en verkeer te analyseren."
-				},
-				"marketing": {
-					"label": "Marketing",
-					"description": "Maakt relevante advertenties en campagnemetingen mogelijk."
-				}
-			},
-			"buttons": {
-				"acceptAll": "Alles accepteren",
-				"essentialOnly": "Alleen essentieel",
-				"manage": "Beheren",
-				"save": "Mijn voorkeuren opslaan"
-			}
-		},
-		"footer": {
-			"tagline": "Het bouwen van moderne software, infrastructuur en ontwikkelingstools met een focus op prestaties, eenvoud en lange termijn onderhoudbaarheid.",
-			"sections": {
-				"resources": "Bronnen",
-				"support": "Ondersteuning",
-				"developer": "Ontwikkelaar"
-			},
-			"links": {
-				"privacy": "Privacy",
-				"terms": "Voorwaarden",
-				"cookies": "Cookies",
-				"cookiePreferences": "Cookievoorkeuren",
-				"contact": "Contact",
-				"help": "Helpcentrum",
-				"issues": "Problemen",
-				"suggestions": "Suggesties",
-				"roadmap": "Roadmap",
-				"github": "GitHub",
-				"npm": "npm",
-				"documentation": "Documentatie",
-				"discord": "Discord",
-				"faq": "Veel Gestelde Vragen",
-				"careers": "Vacatures",
-				"status": "Systeemstatus",
-				"statusOperational": "Alle systemen operationeel",
-				"statusDegraded": "Systeemstatus: Vertraagd"
-			},
-			"title": "Xernerx Studios",
-			"description": "© 2024 -",
-			"description2": "Xernerx Studios"
-		},
-		"sidebar": {
-			"login": "Inloggen",
-			"alt": "Gebruiker Avatar",
-			"alt2": "Avatar Decoratie"
-		},
-		"nav": {
-			"categories": {
-				"account": "Account",
-				"preferences": "Voorkeuren",
-				"billing": "Facturering",
-				"developer": "Ontwikkelaar",
-				"moderator": "Moderator",
-				"administrator": "Administrator",
-				"translator": "Vertaler",
-				"xernerxSuite": "Xernerx Suite",
-				"system": "Systeem",
-				"bots": "Bots",
-				"product": "Product"
-			},
-			"items": {
-				"account": "Account",
-				"profile": "Profiel",
-				"connections": "Verbindingen",
-				"devices": "Apparaten",
-				"appearance": "Weergave",
-				"language": "Taal",
-				"notifications": "Meldingen",
-				"billing": "Facturering",
-				"tokens": "Tokens",
-				"store": "Winkel",
-				"users": "Gebruikers",
-				"roles": "Rollen",
-				"translations": "Vertalingen",
-				"applications": "Applicaties",
-				"settings": "Instellingen",
-				"environments": "Omgevingen",
-				"applications_review": "Aanvragen beoordelen",
-				"applications_manage": "Beheer Aanvragen",
-				"roadmap": "Roadmap",
-				"suggestions": "Suggesties",
-				"issues": "Problemen"
-			}
-		},
-		"buttons": {
-			"cancel": "Annuleren",
-			"confirm": "Bevestigen",
-			"proceed": "Doorgaan"
-		},
-		"shortcuts": {
-			"modal": {
-				"navigation": {
-					"empty": "Geen applicaties beschikbaar.",
-					"title": "App-overzicht",
-					"description": "Schakel snel en makkelijk tussen applicaties"
-				}
-			}
-		},
-		"botrow": {
-			"description": "Servers",
-			"description2": "Gebruikers"
-		},
-		"sidebarnotifications": {
-			"description": "Notificaties",
-			"button2": "Alles gelezen",
-			"description2": "Nog geen notificaties",
-			"button3": "Afwijzen",
-			"button4": "Accepteren",
-			"tooltip": "Notificatie Verwijderen",
-			"tooltip2": "Alles Markeren als Ongelezen",
-			"button5": "Link Openen",
-			"button6": "Sluiten",
-			"button": "Herladen"
-		},
-		"sidebarsuite": {
-			"description": "Suite"
-		},
-		"sidebaruser": {
-			"alt": "Gebruikersbanner",
-			"alt2": "Gebruikersprofiel",
-			"alt3": "Avatar Decoratie",
-			"alt4": "Clan Badge",
-			"description": "Credits Balans",
-			"description2": "Volgende Cadeau Over",
-			"description3": "Profiel Bewerken",
-			"description4": "Admin Paneel",
-			"description5": "Kopieer Gebruiker ID"
-		},
-		"header": {
-			"description": "Download de app!",
-			"tooltip": "Open App Overzicht (Ctrl + K)"
-		},
-		"error": {
-			"title": "Er ging iets mis!",
-			"description": "Er is een probleem met het laden van dit onderdeel.",
-			"button": "Opnieuw proberen"
-		},
-		"globalerror": {
-			"title": "Fatale Applicatie Fout",
-			"button": "Applicatie Herstarten"
-		},
-		"notfound": {
-			"description": "Error 404",
-			"title": "Signaal Verloren.",
-			"description2": "De resource die je hebt aangevraagd kan niet worden gevonden in het huidige routingmanifest.",
-			"button": "Ga Terug",
-			"button2": "Naar Hoofdpagina"
-		},
-		"shortcutsprovider": {
-			"title": "Wijzigingsregister",
-			"description": "Recente applicatie aanpassingen en uitgaven.",
-			"title2": "Keyboard Snelkoppelingen",
-			"description2": "Snelle commando's om efficient te navigeren",
-			"tooltip": "Bekijk Wijzigingsregister",
-			"description3": "App:",
-			"description4": "Druk",
-			"description5": "sluiten",
-			"text": "Esc"
-		},
-		"supportprovider": {
-			"description": "Krijg Ondersteuning"
-		},
-		"toastprovider": {
-			"description": "Opgepast — je hebt onopgeslagen aanpassingen!",
-			"button": "Reset",
-			"button2": "Opslaan"
-		},
-		"multiselector": {
-			"description": "Geen opties"
-		},
-		"selector": {
-			"placeholder": "Zoek...",
-			"description": "Geen opties gevonden"
-		}
-	},
-	"api": {
-		"title": "Xernerx API",
-		"description": "Je hebt de kernservice en endpoint-router voor de Xernerx-suite bereikt. Op dit domein vinden geen bronbeheer, configuratiewijzigingen of interactieve besturing plaats.",
-		"section": {
-			"title": "Op zoek naar toegang?",
-			"description": "Ga naar je account om API-tokens te genereren, je actieve sessies te bekijken of ontwikkelaarsleutels te beheren."
-		},
-		"button": {
-			"account": "Jouw account",
-			"docs": "Lees de documentatie"
-		},
-		"fact": "Nutteloos feit: ",
-		"facts": [
-			"Deze pagina verbruikt ongeveer 0,00004 kWh aan serverenergie om je te vertellen dat je een token nodig hebt.",
-			"Virtue beoordeelt momenteel het ontbreken van een Authorization-header.",
-			"Metamorphosis heeft dit verzoek omgezet in teleurstelling omdat je je bearer-token bent vergeten.",
-			"Zodiakale grafieken geven aan dat je huidige pad geen geldige API-sleutel heeft.",
-			"Ergens huilt er een database-index omdat je hebt opgevraagd zonder token.",
-			"Fout 418: Ik ben een theepot, maar zelfs een theepot heeft een geldig bearer-token nodig.",
-			"Geen token, geen data. Dat zijn de regels, ik heb ze niet bedacht (ja, dat heb ik wel)."
-		]
-	},
-	"account": {
-		"account": {
-			"title": "Accountinstellingen",
-			"description": "Beheer je accountsessie, gegevensprivacy en algemene profielgegevens.",
-			"fallbackName": "Gebruiker",
-			"session": {
-				"title": "Actieve sessie",
-				"description": "Meld je af bij je actieve accountsessie op dit apparaat. Je moet opnieuw authenticeren om toegang te krijgen tot je werkruimte.",
-				"button": "Uitloggen"
-			},
-			"danger": {
-				"title": "Gebruikersgegevens en account verwijderen",
-				"description": "Verwijder permanent je profielgegevens, opgeslagen voorkeuren en sluit je account in het hele ecosysteem. Deze actie kan niet ongedaan worden gemaakt.",
-				"button": "Account verwijderen",
-				"confirmTitle": "Bevestig accountverwijdering",
-				"confirmDescription": "Je staat op het punt een permanente verwijdering van je gebruikersgegevens te starten. Zodra dit is voltooid, kunnen je inloggegevens en profiel niet meer worden hersteld.",
-				"confirmButton": "Verwijder mijn account"
-			}
-		},
-		"profile": {
-			"title": "Profiel bewerken",
-			"description": "Beheer je openbare profielgegevens en persoonlijke voorkeuren.",
-			"descriptionField": {
-				"label": "Beschrijving",
-				"placeholder": "Korte bio..."
-			},
-			"infoField": {
-				"label": "Info (Lange beschrijving)",
-				"placeholder": "Vertel ons meer over jezelf..."
-			},
-			"birthday": {
-				"label": "Geboortedatum"
-			},
-			"timezone": {
-				"label": "Tijdzone",
-				"placeholder": "bijv. Europe/Brussels"
-			},
-			"gender": {
-				"label": "Geslacht",
-				"male": "Man",
-				"female": "Vrouw",
-				"other": "Anders"
-			},
-			"pronouns": {
-				"label": "Voornaamwoorden",
-				"placeholder": "bijv. diens/die"
-			},
-			"privacy": {
-				"label": "Privacyniveau",
-				"public": "Openbaar",
-				"limited": "Beperkt",
-				"private": "Privé",
-				"tooltip": {
-					"title": "Privacyopties:",
-					"privateTitle": "Privé:",
-					"privateDesc": "Volledig privé; niemand behalve jij kan je profiel zien.",
-					"limitedTitle": "Beperkt:",
-					"limitedDesc": "Iedereen met je accountlink kan je profiel zien; je wordt alleen niet openbaar vermeld.",
-					"publicTitle": "Openbaar:",
-					"publicDesc": "Iedereen kan je profiel zien en het wordt niet verborgen in openbare ruimtes."
-				}
-			},
-			"save": "Wijzigingen opslaan",
-			"saving": "Opslaan...",
-			"toast": {
-				"success": "Profiel succesvol bijgewerkt!",
-				"error": "Opslaan mislukt. Probeer het opnieuw."
-			}
-		},
-		"appearance": {
-			"title": "Weergave",
-			"description": "Pas aan hoe de interface eruitziet en aanvoelt in je werkruimte.",
-			"theme": {
-				"title": "Thema",
-				"description": "Kies je bevorzugde interface-themamodus.",
-				"options": {
-					"dark": "Donker",
-					"light": "Licht",
-					"system": "Systeem"
-				}
-			},
-			"discordSync": {
-				"title": "Accent synchroniseren vanuit Discord",
-				"description": "Neem automatisch de accentkleur van je Discord-profielthema over als je werkruimte-accent."
-			},
-			"clientSync": {
-				"title": "Weergaveinstellingen synchroniseren tussen clients",
-				"description": "Laad weergaveinstellingen automatisch in op al je apparaten."
-			},
-			"accentColor": {
-				"title": "Accentkleur",
-				"description": "Selecteer een aangepaste accentkleur voor je werkruimtethema."
-			},
-			"colors": {
-				"purple": "Xerple",
-				"green": "Crean",
-				"neon": "Cyber Neon",
-				"blue": "Elektrisch Blauw",
-				"pink": "Levendig Roze",
-				"orange": "Zonsondergang Oranje",
-				"yellow": "Goudgeel",
-				"crimson": "Diep Karmozijn",
-				"mint": "Mint Bries",
-				"indigo": "Koninklijk Indigo",
-				"lime": "Zuur Limoen",
-				"charcoal": "Leegte Houtskool"
-			},
-			"zoom": {
-				"title": "UI-zoomniveau",
-				"description": "Schaal de interfacezoom gelijkmatig over de toepassing."
-			},
-			"density": {
-				"title": "Lay-out Spacing",
-				"description": "Schakel tussen compacte, standaard en ruime interface-opvulmarges.",
-				"compact": "Compact",
-				"default": "Standaard",
-				"spacious": "Ruim"
-			},
-			"textScale": {
-				"title": "Tekstschaal",
-				"description": "Configureer de basistypografiegrootte voor leesbaarheid."
-			},
-			"toast": {
-				"clientSyncEnabled": {
-					"title": "Client-synchronisatie ingeschakeld",
-					"description": "Je weergaveinstellingen worden nu gesynchroniseerd met je account."
-				},
-				"clientSyncDisabled": {
-					"title": "Client-synchronisatie uitgeschakeld",
-					"description": "Je weergaveinstellingen blijven lokaal op deze browser."
-				},
-				"accentColor": {
-					"title": "Accentkleur bijgewerkt!",
-					"description": "Accentkleur ingesteld op {color}"
-				},
-				"theme": {
-					"title": "Thema bijgewerkt!",
-					"description": "Thema ingesteld op {theme}"
-				},
-				"density": {
-					"title": "Lay-outdichtheid bijgewerkt!"
-				}
-			}
-		},
-		"language": {
-			"headerTitle": "Taalvoorkeuren",
-			"headerDescription": "Kies je interfacelokalisatie en bekijk regionale voorkeuren.",
-			"title": "Taal",
-			"description": "Selecteer je voorkeurstaal voor de interface.",
-			"contributeLabel": "+ Draag een vertaling bij",
-			"coverage": {
-				"title": "Help ons vertalen!",
-				"description": "Je geselecteerde taal is momenteel voor {coverage}% vertaald. Heb je een paar minuten om ons te helpen het af te maken?",
-				"button": "Bijdragen"
-			},
-			"discord": {
-				"title": "Discord-taal",
-				"description": "Je huidige Discord-accounttaalinstelling (alleen-lezen indicator)."
-			}
-		},
-		"signin": {
-			"button": "Doorgaan met Discord",
-			"redirecting": "Doorverwijzen…",
-			"aboutToggle": "Over machtigingen",
-			"permissions": {
-				"profile": {
-					"title": "Gebruikersnaam & Profiel",
-					"description": "Wordt gebruikt om je profiel binnen de app weer te geven."
-				},
-				"email": {
-					"title": "E-mailadres",
-					"description": "Wordt gebruikt voor meldingen en belangrijke account-updates."
-				},
-				"connections": {
-					"title": "Verbindingen",
-					"description": "Wordt weergegeven op je profiel voor personalisatie."
-				},
-				"joinServers": {
-					"title": "Servers deelnemen",
-					"description": "Wordt gebruikt om toe te treden tot door Xernerx Studios beheerde servers. Voegt je niet toe aan een server zonder jouw invoer!"
-				},
-				"servers": {
-					"title": "Servers",
-					"description": "Wordt gebruikt om je dashboardervaring mogelijk te maken."
-				},
-				"memberInfo": {
-					"title": "Serverlid-informatie",
-					"description": "Wordt gebruikt voor rollen, bijnamen en serverspecifieke functies."
-				},
-				"footer": "Xernerx verkoopt je gegevens niet. Alle gegevens zijn openbaar via de Discord-API of worden intern gebruikt voor functies."
-			}
-		},
-		"signout": {
-			"title": "Uitloggen",
-			"description": "Weet je zeker dat je wilt uitloggen? Je moet opnieuw authenticeren om toegang te krijgen tot je dashboard.",
-			"confirmButton": "Ja, log me uit",
-			"signingOut": "Uitloggen…",
-			"cancelButton": "Annuleren"
-		},
-		"user": {
-			"createError": "Kan gebruikersprofiel niet initialiseren.",
-			"fetchError": "Kan gebruikersprofielgegevens niet laden.",
-			"networkError": "Netwerkfout bij het verbinden met de gebruikersservice.",
-			"created": "Welkom! Gebruikersprofiel succesvol aangemaakt."
-		},
-		"notifications": {
-			"title": "Meldingen",
-			"description": "Beheer hoe je meldingen en waarschuwingen via verschillende kanalen ontvangt.",
-			"itemDescription": "Configureer waarschuwingen voor {item}.",
-			"categories": {
-				"general": "Algemeen",
-				"virtue": "Virtue",
-				"api": "API & Ontwikkelaar",
-				"billing": "Facturering & Abonnementen",
-				"apps": "Bots & Applicaties",
-				"community": "Community & Roadmap"
-			},
-			"items": {
-				"birthday": "Verjaardag",
-				"levelup": "Niveau Omhoog",
-				"rateLimitWarning": "Limiet Waarschuwing",
-				"tokenCreated": "Token Aangemaakt",
-				"tokenRevoked": "Token Ingetrokken",
-				"downtime": "Service Storing",
-				"invoicePaid": "Factuur Betaald",
-				"subscriptionExpiring": "Abonnement Verloopt",
-				"paymentFailed": "Betaling Mislukt",
-				"botApproved": "Bot Goedgekeurd",
-				"botRejected": "Bot Afgewezen",
-				"roadmapReleased": "Roadmap Mijlpaal Uitgebracht",
-				"issueStatusUpdate": "Bugmelding Statusupdate",
-				"suggestionStatusUpdate": "Suggestie Statusupdate",
-				"applicationReviewed": "Sollicitatie Beoordeeld"
-			},
-			"channels": {
-				"discord": "Discord",
-				"mail": "E-mail",
-				"inApp": "In-App"
-			},
-			"toast": {
-				"success": "Meldingsvoorkeuren bijgewerkt",
-				"error": "Opslaan van wijzigingen mislukt"
-			}
-		},
-		"tokens": {
-			"title": "API-tokens",
-			"description": "Beheer je veilige authenticatiesleutels",
-			"generateButton": "Token genereren",
-			"manageSettings": "Instellingen beheren",
-			"empty": {
-				"title": "Geen tokens gevonden",
-				"description": "Je hebt geen actieve API-tokens. Genereer er een om je services te authenticeren."
-			},
-			"toast": {
-				"loadError": "Fout bij laden van tokens, fout: {error}"
-			},
-			"create": {
-				"modalTitle": "Nieuw token genereren",
-				"nameLabel": "Tokennaam",
-				"namePlaceholder": "bijv. Productie API-toegang",
-				"cancelButton": "Annuleren",
-				"submitButton": "Token aanmaken",
-				"success": "Token succesvol aangemaakt",
-				"errorTitle": "Aanmaken mislukt",
-				"errorDesc": "Kon geen nieuw token genereren. Fout: {error}"
-			},
-			"manage": {
-				"modalTitle": "Token beheren",
-				"revokeTitle": "Token intrekken",
-				"accessKeyLabel": "Toegangssleutel",
-				"securityWarning": "Behandel dit token als een wachtwoord. Stel het niet bloot in client-side code.",
-				"nameLabel": "Tokennaam",
-				"ownersLabel": "Eigenaren (Discord-ID's)",
-				"ownersPlaceholder": "Kommagescheiden ID's",
-				"closeButton": "Sluiten",
-				"saveButton": "Wijzigingen opslaan",
-				"loadError": "Kan token niet laden, fout: {error}",
-				"copySuccess": "Token gekopieerd naar klembord",
-				"updateSuccess": "Token bijgewerkt",
-				"updateError": "Bijwerken mislukt",
-				"deleteConfirm": "Weet je zeker dat je dit token permanent wilt verwijderen?",
-				"deleteSuccess": "Token verwijderd",
-				"deleteError": "Verwijderen mislukt"
-			}
-		},
-		"activity": {
-			"navLabel": "Activiteit & Gegevens",
-			"title": "Mijn Activiteit & Accountgegevens",
-			"description": "Volg al je ingediende sollicitaties, bugrapporten en suggesties, of exporteer je volledige accountgegevens.",
-			"exportData": "Mijn gegevens exporteren (JSON)",
-			"exportSuccess": "Het exporteren van je accountgegevens is gestart",
-			"refresh": "Vernieuwen",
-			"fetchError": "Kan accountactiviteit niet laden",
-			"searchPlaceholder": "Zoek in inzendingen...",
-			"emptyTitle": "Nog geen inzendingen",
-			"emptyDescription": "Alle sollicitaties, bugrapporten of suggesties die je indient bij Xernerx verschijnen hier.",
-			"tabs": {
-				"all": "Alles",
-				"applications": "Sollicitaties",
-				"issues": "Bugrapporten",
-				"suggestions": "Suggesties"
-			}
-		},
-		"connections": {
-			"title": "Koppelingen",
-			"description": "Koppel externe accounts via OAuth om je profielen binnen het Xernerx-ecosysteem te verifiëren.",
-			"connected": "Gekoppeld",
-			"primaryIdentity": "Vereiste Login",
-			"availableTitle": "OAuth Koppelingen",
-			"availableDesc": "Optionele geverifieerde externe accounts. Deze kunnen niet worden gebruikt om in te loggen — Discord blijft je vereiste inlogidentiteit.",
-			"verifiedBadge": "Geverifieerd",
-			"notConnected": "Niet gekoppeld",
-			"connectButton": "Koppelen",
-			"disconnect": "Ontkoppelen",
-			"showOnProfile": "Toon op openbaar profiel",
-			"oauthSuccess": "{provider}-account succesvol gekoppeld!",
-			"oauthNotConfigured": "{provider} OAuth-inloggegevens zijn nog niet geconfigureerd.",
-			"oauthError": "Kon de OAuth-koppeling niet voltooien.",
-			"disconnectSuccess": "Koppeling verwijderd.",
-			"disconnectError": "Kon koppeling niet verwijderen.",
-			"saveError": "Kon koppelingsinstellingen niet bijwerken."
-		},
-		"devices": {
-			"title": "Actieve Apparaten & Sessies",
-			"description": "Bekijk recente browsers en apparaten die toegang hebben gehad tot je Xernerx-account.",
-			"currentSession": "Huidige Sessie",
-			"revokeOthers": "Andere Sessies Intrekken",
-			"revokeSuccess": "Andere apparaatsessies zijn ingetrokken."
-		},
-		"billing": {
-			"credits": {
-				"unit": "Credits",
-				"streakDays": "{count} Dagen Reeks",
-				"description": "Claim je dagelijkse creditcadeau om je reeks op te bouwen en tot +200 bonuscredits per dag te verdienen.",
-				"claimButton": "Claim Dagelijkse Beloning",
-				"nextClaimIn": "Volgende Beloning over {hours}u",
-				"claimSuccess": "+{amount} credits geclaimd! ({streak} dagen reeks)",
-				"claimError": "Kon dagelijkse beloning niet claimen"
-			}
-		}
-	},
-	"www": {
-		"hero": {
-			"title": "Empowering Developers. Connecting Communities.",
-			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
-		},
-		"about": {
-			"title": "Over Xernerx",
-			"description": "Opgericht in 2024, is Xernerx geëvolueerd van een gericht ontwikkelingsinitiatief tot een gestructureerd ecosysteem van automatiseringstools en infrastructuurframeworks. Elk systeem is gebouwd met schaalbaarheid, onderhoudbaarheid en architectonische helderheid als uitgangspunten."
-		},
-		"sections": {
-			"services": {
-				"title": "Diensten"
-			},
-			"packages": {
-				"title": "Pakketten"
-			},
-			"applications": {
-				"title": "Applicaties"
-			}
-		},
-		"services": {
-			"dashboard": {
-				"title": "Dashboard",
-				"desc": "Beheer applicaties, configureer implementaties en monitor systeemprestaties."
-			}
-		},
-		"packages": {
-			"framework": {
-				"title": "Xernerx Framework",
-				"desc": "Een modulair fundament voor schaalbare Discord-applicaties."
-			},
-			"stats": {
-				"title": "Xernerx Stats",
-				"desc": "Analytische hulpmiddelen voor het meten van prestaties."
-			}
-		},
-		"applications": {
-			"todo": {
-				"title": "Takenlijst-bot",
-				"desc": "Gestructureerde productiviteitstools."
-			},
-			"zodiac": {
-				"title": "Zodiac",
-				"desc": "Op astrologie gebaseerde interactietools."
-			},
-			"metamorphosis": {
-				"title": "Metamorphosis",
-				"desc": "Geavanceerde hulpmiddelen voor rolomzetting."
-			}
-		},
-		"history": {
-			"title": "Onze geschiedenis",
-			"description": "Een gestructureerde voortgang van experimentatie naar stabiele infrastructuurtechniek."
-		},
-		"privacy": {
-			"toc": "Inhoud",
-			"header": {
-				"title": "Privacybeleid",
-				"effectiveDate": "Ingangsdatum:"
-			},
-			"sections": {
-				"introduction": {
-					"title": "1. Inleiding",
-					"content": "Dit privacybeleid legt uit hoe Xernerx Studios (\"wij\", \"ons\", \"onze\") je persoonsgegevens verzamelt, gebruikt en beschermt wanneer je onze websites, dashboards, Discord-bots, API's, CDN en desktopapplicaties gebruikt."
-				},
-				"dataCollected": {
-					"title": "2. Informatie die we verzamelen",
-					"account": {
-						"title": "Account- & apparaatsessie-informatie:",
-						"desc": "Wanneer je inlogt via Discord OAuth2 of via onze QR-code / 6-cijferige koppelcode voor apparaten, verzamelen we je Discord-ID, gebruikersnaam, avatar, e-mailadres, aangepaste profielinstellingen (weergavenaam, bio, voornaamwoorden, banner) en metadata van recente apparaatsessies (browser, besturingssysteem, apparaattype en laatst actieve tijdstempel voor maximaal 10 apparaten) zodat je actieve sessies kunt beheren."
-					},
-					"connections": {
-						"title": "Gekoppelde accounts van derden:",
-						"desc": "Als je optioneel externe accounts koppelt (zoals GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam of Reddit) in je Accountinstellingen, slaan we de openbare account-ID, gebruikersnaam, weergavenaam, avatar-URL, profiel-URL en je zichtbaarheidsvoorkeur (\"Toon op openbaar profiel\") op. OAuth-toegangstokens worden direct na verificatie verwijderd."
-					},
-					"developers": {
-						"title": "Voor API- & bot-ontwikkelaars:",
-						"desc": "Scoped Bearer API-tokens, webhook-URL's, applicatie- en organisatiemetadata, realtime WebSocket-gatewaytelemetrie en configuratie-instellingen die worden gebruikt om je integraties op onze infrastructuur te laten draaien."
-					},
-					"botUsers": {
-						"title": "Voor eindgebruikers van bots & community's:",
-						"desc": "Wanneer je interactie hebt met een door Xernerx aangedreven bot (zoals Virtue, Zodiac, Metamorphosis of Takenlijst-bot), verwerken we je Discord-ID, server-ID's, commando-invoer en optionele betrokkenheidsstatistieken (zoals tekst- en spraak-XP/levels). We slaan geen onbewerkte berichtlogboeken op, tenzij dit expliciet vereist is voor een ingeschakelde serverfunctie."
-					},
-					"cdnAndContent": {
-						"title": "CDN-media & community-inzendingen:",
-						"desc": "Bestanden en afbeeldingen die worden geüpload naar cdn.xernerx.com of worden bijgevoegd bij bugrapporten en suggesties, worden opgeslagen in afgeschermde cloudopslag en uitgeleverd volgens jouw gekozen zichtbaarheidsinstelling (openbaar, beperkt tot specifieke gebruikers, of privé)."
-					},
-					"desktop": {
-						"title": "Xernerx Desktop Client:",
-						"desc": "Bij gebruik van de Xernerx Desktop App worden vensterstatus, updatekanaalvoorkeuren (Stable/Canary), sneltoetsen en geïsoleerde multi-accountsessies lokaal op je apparaat opgeslagen. Indien ingeschakeld communiceert de app lokaal met je Discord-client voor Rich Presence (RPC) en worden diagnostische logboeken alleen lokaal weggeschreven wanneer Debug Logging is ingeschakeld."
-					},
-					"usage": {
-						"title": "Gebruiks- & diagnostische gegevens:",
-						"desc": "Foutlogboeken, beveiligingsaudittrails en systeeminteracties om de platformstabiliteit te waarborgen, rate-limits te handhaven en misbruik te voorkomen."
-					},
-					"integration": {
-						"title": "Facturerings-, winkel- & beloningsgegevens:",
-						"desc": "Abonnementsstatus, factuurgeschiedenis en regionale afrekendetails die veilig worden verwerkt via Stripe (wij slaan nooit volledige betaalkaartnummers op), evenals saldi van virtuele credits en tijdstempels van dagelijkse cadeaureeksen."
-					}
-				},
-				"apiData": {
-					"title": "3. API-gegevensverzameling & verplichtingen voor ontwikkelaars",
-					"content": "Wanneer ontwikkelaars onze REST API (/v1/* en /secure/*), insluitbare openbare widgets of realtime WebSocket-gateway gebruiken om botstatistieken te synchroniseren of metadata op te halen, slaan we deze gegevens op om openbare pagina's en analyses weer te geven. Het is ontwikkelaars ten strengste verboden om ongevraagde persoonlijk identificeerbare informatie (PII) van hun eindgebruikers naar onze API te verzenden. Wij verkopen of delen geen API-gegevens met externe adverteerders."
-				},
-				"legalBasis": {
-					"title": "4. Juridische grondslag voor verwerking",
-					"content": "Wij verwerken persoonsgegevens op basis van contractuele noodzakelijkheid (om de door jou gevraagde diensten en abonnementen te leveren), gerechtvaardigde belangen (beveiliging, fraudepreventie en serviceverbetering), naleving van wettelijke verplichtingen of je uitdrukkelijke toestemming waar van toepassing."
-				},
-				"usage": {
-					"title": "5. Hoe we informatie gebruiken",
-					"items": [
-						"Om je account aan te bieden, te authenticeren en te synchroniseren tussen alle Xernerx-webapplicaties, bots en desktopclients.",
-						"Om winkelabonnementen te verwerken, virtuele credits toe te kennen, CDN-opslagquota te handhaven en de betrouwbaarheid van het platform te verbeteren.",
-						"Om ondersteuning te bieden, platformupdates te communiceren en belangrijke servicegerelateerde e-mails te sturen (zoals facturen, beveiligingsmeldingen en organisatie-uitnodigingen). Je kunt je meldingsvoorkeuren op elk moment aanpassen.",
-						"Om misbruik te detecteren, onze Servicevoorwaarden te handhaven en te voldoen aan wettelijke verplichtingen."
-					]
-				},
-				"sharing": {
-					"title": "6. Gegevens delen",
-					"items": [
-						"Cloudhosting-, database- en afgeschermde blob-opslagproviders.",
-						"Betalingsverwerkers (Stripe) voor abonnementsafhandeling, Adaptive Pricing-lokalisatie en factuurbeheer.",
-						"Geautoriseerde integraties van derden en gekoppelde accounts die je zelf expliciet koppelt of inschakelt als openbare profielwidgets.",
-						"Wetshandhavings- of toezichthoudende instanties wanneer dit wettelijk verplicht is."
-					]
-				},
-				"retention": {
-					"title": "7. Bewaartermijn van gegevens",
-					"content": "Wij bewaren persoonsgegevens niet langer dan noodzakelijk is om onze diensten te leveren en de doeleinden in dit beleid te vervullen, tenzij een langere bewaartermijn wettelijk verplicht is (zoals fiscale administratie). Tijdelijke QR-/koppelcode-inlogtickets verlopen automatisch na 3 minuten."
-				},
-				"security": {
-					"title": "8. Gegevensbeveiliging",
-					"content": "We implementeren robuuste technische en organisatorische beveiligingsmaatregelen, waaronder AES-256-GCM-versleuteling voor apparaatkoppelingstokens, HTTP-only sessiecookies, scoped Bearer-tokens en strikte rolgebaseerde toegangscontrole. Geen enkele internetverbinding of opslagsysteem is echter 100% veilig."
-				},
-				"rights": {
-					"title": "9. Jouw rechten (AVG / GDPR & CCPA)",
-					"items": [
-						"Recht op inzage en gegevensoverdraagbaarheid (op elk moment beschikbaar via de zelfbedieningsfunctie \"Mijn gegevens exporteren (JSON)\" in Account -> Activiteit).",
-						"Recht op rectificatie, profielreset of permanente accountverwijdering (direct beschikbaar via Account -> Instellingen).",
-						"Recht om bepaalde gegevensverwerkingen te beperken of er bezwaar tegen te maken, en om gekoppelde accounts van derden op elk moment te ontkoppelen.",
-						"Recht om je toestemming voor niet-essentiële cookies en marketingcommunicatie op elk moment in te trekken."
-					],
-					"content": "Onder gegevensbeschermingswetgeving zoals de AVG (GDPR) en CCPA heb je uitgebreide rechten met betrekking tot je persoonsgegevens. Je kunt de meeste van deze rechten direct uitoefenen via je Accountdashboard of door contact op te nemen met ons juridische team."
-				},
-				"cookies": {
-					"title": "10. Cookies & Tracking",
-					"content": "We gebruiken cookies en lokale opslag om je sessie veilig te houden op alle *.xernerx.com-subdomeinen, je thema- en werkruimtevoorkeuren te onthouden en de prestaties van de site te meten. Diensten van derden zoals Google AdSense kunnen met jouw toestemming ook cookies gebruiken om relevante advertenties weer te geven. Voor een volledig overzicht van alle cookies die we plaatsen en hoe je je voorkeuren beheert, lees ons ",
-					"linkText": "Cookiebeleid",
-					"contentSuffix": "."
-				},
-				"international": {
-					"title": "11. Internationale overdrachten",
-					"content": "Als persoonsgegevens worden overgedragen buiten je jurisdictie (waaronder buiten de Europese Economische Ruimte), implementeren we passende juridische en technische waarborgen om ervoor te zorgen dat je gegevens beschermd blijven."
-				},
-				"childrensPrivacy": {
-					"title": "12. Privacy van kinderen",
-					"content": "Onze diensten zijn niet gericht op kinderen jonger dan 13 jaar (of de wettelijke minimumleeftijd voor digitale toestemming in jouw land). Wij verzamelen niet bewust persoonsgegevens van kinderen. Als je vermoedt dat een kind persoonsgegevens aan ons heeft verstrekt, neem dan contact met ons op zodat wij deze direct kunnen verwijderen."
-				},
-				"changes": {
-					"title": "13. Wijzigingen in dit beleid",
-					"content": "We kunnen dit privacybeleid periodiek bijwerken. Bij materiële wijzigingen werken we de versiedatum bij en vragen we ingelogde gebruikers om het herziene beleid te bekijken en te accepteren."
-				},
-				"contact": {
-					"title": "14. Contact",
-					"prefix": "Voor privacygerelateerde vragen of gegevensverzoeken kun je contact opnemen met"
-				}
-			},
-			"description": "legal@xernerx.com"
-		},
-		"terms": {
-			"toc": "Inhoud",
-			"header": {
-				"title": "Servicevoorwaarden",
-				"effectiveDate": "Ingangsdatum:"
-			},
-			"sections": {
-				"introduction": {
-					"title": "1. Inleiding",
-					"content": "Deze Servicevoorwaarden (\"Voorwaarden\") regelen je toegang tot en gebruik van alle websites, dashboards, Discord-bots, softwarepakketten, API's, CDN-diensten en desktopclients aangeboden door Xernerx Studios (\"wij\", \"ons\" of \"onze\"). Door toegang te krijgen tot of gebruik te maken van onze diensten, ga je ermee akkoord juridisch gebonden te zijn aan deze Voorwaarden."
-				},
-				"eligibility": {
-					"title": "2. Geschiktheid",
-					"content": "Je moet ten minste 13 jaar oud zijn (of de minimumleeftijd voor digitale toestemming in jouw jurisdictie hebben bereikt) om onze diensten te gebruiken. Door onze diensten te gebruiken, verklaar je dat je aan deze vereiste voldoet en handelt in overeenstemming met de Servicevoorwaarden van Discord."
-				},
-				"acceptableUse": {
-					"title": "3. Acceptabel gebruik",
-					"items": [
-						"Deelnemen aan onwettige, frauduleuze, lasterlijke of misbruikmakende activiteiten, of illegale inhoud uploaden naar ons CDN of onze communityportalen.",
-						"Proberen toegang te krijgen tot accounts, afgeschermde CDN-bestanden, API-endpoints of beheertools zonder expliciete toestemming.",
-						"Platform-ratelimits, WebSocket-gateways of beveiligingsmechanismen verstoren, overbelasten of omzeilen.",
-						"Kwetsbaarheden in een Xernerx-dienst, bot of clientapplicatie reverse-engineeren, scrapen of exploiteren."
-					]
-				},
-				"apiUsage": {
-					"title": "4. Voorwaarden voor API, Widgets & WebSocket Gateway",
-					"content": "Ontwikkelaars die gebruikmaken van onze REST API (/v1/* en /secure/*), insluitbare openbare widgets of realtime WebSocket RPC-gateway moeten zich aan de volgende regels houden:",
-					"items": [
-						"Respecteer alle ratelimits en planquota; spam, scrape of misbruik geen API-endpoints of WebSocket-verbindingen.",
-						"Je bent zelf volledig verantwoordelijk voor het veilig houden van je Bearer API-tokens; wij zijn niet aansprakelijk voor ongeautoriseerde acties door gelekte sleutels.",
-						"Telemetrie, commandoregisters en statistieken die naar het platform worden gestuurd, moeten nauwkeurig zijn en mogen nooit kunstmatig worden opgeblazen.",
-						"Wij behouden ons het recht voor om API-tokens onmiddellijk in te trekken, openbare widgets uit te schakelen of applicaties op te schorten die de stabiliteit van het platform aantasten of deze Voorwaarden schenden."
-					]
-				},
-				"botUsage": {
-					"title": "5. Voorwaarden voor eindgebruikers van bots",
-					"content": "Gebruikers die interactie hebben met door Xernerx aangedreven Discord-bots (waaronder Virtue, Metamorphosis, Zodiac en Takenlijst-bot) gaan ermee akkoord commando-invoer niet te misbruiken, geen geautomatiseerde spamverzoeken uit te voeren en andere communityleden niet lastig te vallen. Servereigenaren en beheerders zijn verantwoordelijk voor het configureren van botmodules in overeenstemming met zowel deze Voorwaarden als de Servicevoorwaarden van Discord."
-				},
-				"accounts": {
-					"title": "6. Gebruikersaccounts, QR-inloggen & gekoppelde accounts",
-					"content": "Je logt in via Discord OAuth2 of via ons versleutelde QR-code / 6-cijferige koppelcode-systeem. Keur nooit een QR-code goed en voer nooit een koppelcode in die je niet zelf hebt gestart. Je kunt optioneel ook accounts van derden koppelen (zoals GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam of Reddit) om op je openbare profiel te tonen. Je bent verantwoordelijk voor alle activiteiten onder je account en kunt actieve apparaatsessies of gekoppelde accounts op elk moment intrekken in je Accountinstellingen."
-				},
-				"storeAndBilling": {
-					"title": "7. Winkel, abonnementen & virtuele credits",
-					"content": "Betaalde abonnementen (waaronder de Xernerx Ultra-bundel, individuele Bot Passes, Server Infrastructure Passes en Developer API Pro) en add-ons worden vooraf gefactureerd op een terugkerende maandelijkse of jaarlijkse cyclus via Stripe, waarbij lokale valuta kunnen worden weergegeven via Stripe Adaptive Pricing:",
-					"items": [
-						"Je kunt een doorlopend abonnement op elk moment opzeggen via het Factureringsportaal; je abonnementsvoordelen blijven actief tot het einde van de reeds betaalde factureringsperiode.",
-						"Virtuele Credits, dagelijkse verrassingscadeaus en inlogreeks-beloningen zijn niet-monetaire digitale platformfuncties zonder echte geldwaarde. Ze kunnen niet worden ingewisseld voor contant geld, niet worden overgedragen tussen gebruikers en niet worden gerestitueerd buiten dwingende wettelijke consumentenrechten.",
-						"Als een abonnement wordt gedowngraded of verloopt, vallen functies en CDN-opslagquota terug naar de standaardlimieten; bestaande bestanden worden niet zonder kennisgeving direct verwijderd, maar nieuwe uploads kunnen worden beperkt zolang je boven je actieve quotum zit."
-					]
-				},
-				"desktopClient": {
-					"title": "8. Xernerx Desktop Client",
-					"content": "Wij verlenen je een beperkte, niet-exclusieve, herroepbare licentie om de Xernerx Desktop-applicatie te downloaden en te gebruiken voor persoonlijk gebruik of intern communitybeheer. De Desktop-client kan automatisch updates downloaden en installeren (via Stable- of Canary-releasekanalen), optionele globale sneltoetsen registreren, een zwevende mini-overlay weergeven, geïsoleerde multi-accountsessies beheren en lokaal communiceren met Discord voor Rich Presence."
-				},
-				"data": {
-					"title": "9. Gebruikersgegevens & cookies",
-					"contentPrefix": "Door onze diensten te gebruiken, ga je akkoord met onze gegevensverwerkings- en cookiepraktijken zoals beschreven in ons ",
-					"contentLink": "Privacybeleid",
-					"contentMiddle": " en ",
-					"cookiesLink": "Cookiebeleid",
-					"contentSuffix": ". Je kunt je accountgegevens op elk moment exporteren of je account verwijderen via je Accountdashboard."
-				},
-				"availability": {
-					"title": "10. Beschikbaarheid van de service",
-					"content": "We streven naar een hoge beschikbaarheid in onze hele suite, maar garanderen geen ononderbroken of foutloze werking. Functies, botmodules, API's of experimentele Canary-builds kunnen op elk moment worden gewijzigd, opgeschort of stopgezet."
-				},
-				"thirdParty": {
-					"title": "11. Diensten van derden",
-					"content": "Ons ecosysteem integreert met externe platforms waaronder Discord, Stripe, Google (voor vertaal- en advertentiediensten) en optionele providers van gekoppelde accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam en Reddit). Wij zijn niet verantwoordelijk voor de beschikbaarheid, het beleid of de onafhankelijke praktijken van diensten van derden."
-				},
-				"intellectualProperty": {
-					"title": "12. Intellectueel eigendom & gebruikersinhoud",
-					"content": "Alle Xernerx-software, broncode (met uitzondering van open-source pakketten die onder hun respectievelijke repositorylicenties vallen), branding en visuele materialen blijven het exclusieve eigendom van Xernerx Studios. Je behoudt het eigendom van media en inhoud die je uploadt naar cdn.xernerx.com of indient op ons platform, en verleent Xernerx Studios een wereldwijde, niet-exclusieve, royaltyvrije licentie om die inhoud te hosten, cachen en leveren, uitsluitend volgens de door jou ingestelde zichtbaarheidsrechten (openbaar, beperkt of privé)."
-				},
-				"warranty": {
-					"title": "13. Disclaimer van garanties",
-					"content": "Diensten worden geleverd \"zoals ze zijn\" (\"as is\") en \"zoals beschikbaar\" zonder enige vorm van garantie, expliciet, impliciet of wettelijk, inclusief impliciete garanties van verkoopbaarheid, geschiktheid voor een bepaald doel of niet-inbreuk."
-				},
-				"liability": {
-					"title": "14. Beperking van aansprakelijkheid",
-					"content": "Voor zover maximaal toegestaan door de toepasselijke wetgeving, is Xernerx Studios niet aansprakelijk voor enige indirecte, incidentele, bijzondere, gevolg- of strafschade, of enig verlies van gegevens, inkomsten of winst voortvloeiend uit je gebruik van onze diensten."
-				},
-				"indemnification": {
-					"title": "15. Vrijwaring",
-					"content": "Je gaat ermee akkoord Xernerx Studios en haar teamleden te vrijwaren en schadeloos te stellen voor claims, schade of aansprakelijkheden die voortvloeien uit je misbruik van onze diensten, je geüploade inhoud, je ontwikkelaarsapplicaties of je schending van deze Voorwaarden."
-				},
-				"governingLaw": {
-					"title": "16. Toepasselijk recht",
-					"content": "Deze Voorwaarden worden beheerst door en geïnterpreteerd in overeenstemming met de toepasselijke wetgeving, met inachtneming van dwingende consumentenbeschermingswetten in het land waar je woont."
-				},
-				"changes": {
-					"title": "17. Wijzigingen in de voorwaarden",
-					"content": "We kunnen deze Voorwaarden van tijd tot tijd bijwerken. Wanneer materiële updates worden gepubliceerd, werken we de ingangsdatum bij en vragen we ingelogde gebruikers om de herziene Voorwaarden te bekijken en te accepteren voordat ze het platform verder gebruiken."
-				},
-				"contact": {
-					"title": "18. Contact",
-					"prefix": "Voor juridische vragen kun je contact opnemen met"
-				}
-			},
-			"description": "legal@xernerx.com"
-		},
-		"cookies": {
-			"toc": "Inhoud",
-			"header": {
-				"title": "Cookiebeleid",
-				"effectiveDate": "Ingangsdatum:"
-			},
-			"sections": {
-				"introduction": {
-					"title": "1. Inleiding",
-					"content": "Dit Cookiebeleid legt uit hoe Xernerx Studios (\"wij\", \"ons\" of \"onze\") cookies, lokale opslag, sessiepartities en vergelijkbare technologieën gebruikt wanneer je onze websites, dashboards, API's en desktopapplicaties bezoekt of gebruikt."
-				},
-				"whatAreCookies": {
-					"title": "2. Wat zijn cookies?",
-					"content": "Cookies zijn kleine tekstbestanden die door je webbrowser op je apparaat worden opgeslagen wanneer je een website bezoekt. Ze stellen het platform in staat je apparaat te herkennen, je ingelogde sessie naadloos te behouden op alle Xernerx-subdomeinen (*.xernerx.com) en je aangepaste interfacevoorkeuren te onthouden."
-				},
-				"categories": {
-					"title": "3. Categorieën cookies die we gebruiken",
-					"essential": {
-						"title": "Essentiële cookies:",
-						"desc": "Strikt noodzakelijk voor de kernwerking en beveiliging van onze diensten. Dit omvat Discord OAuth2-authenticatiesessies, CSRF-bescherming, statusverificatie bij het koppelen van extra accounts en je opgeslagen cookietoestemming. Omdat het platform zonder deze cookies niet veilig kan functioneren, kunnen ze niet worden uitgeschakeld."
-					},
-					"functional": {
-						"title": "Functionele cookies:",
-						"desc": "Worden gebruikt om je persoonlijke voorkeuren op alle subdomeinen te onthouden, waaronder je geselecteerde taal, interfacethema (donker, licht of systeem), accentkleur, lay-outdichtheid, UI-zoom, tekstschaal en werkruimte-instellingen."
-					},
-					"analytics": {
-						"title": "Analytische cookies:",
-						"desc": "Helpen ons te begrijpen hoe bezoekers onze websites gebruiken, de prestaties van het platform te monitoren en technische fouten op te sporen zodat we de betrouwbaarheid kunnen verbeteren."
-					},
-					"marketing": {
-						"title": "Marketing- & advertentiecookies:",
-						"desc": "Worden gebruikt door advertentiepartners van derden (zoals Google AdSense) om relevante advertenties te tonen en de effectiviteit van campagnes te meten."
-					}
-				},
-				"cookiesUsed": {
-					"title": "4. Specifieke cookies die we plaatsen",
-					"content": "Binnen het Xernerx-ecosysteem (.xernerx.com) plaatsen en lezen we de volgende first-party cookies:",
-					"auth": {
-						"title": "Authenticatie & OAuth-status (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state, __xernerx_conn_oauth):",
-						"desc": "Essentiële HTTP-only beveiligde cookies beheerd door NextAuth om je sessie over subdomeinen te authenticeren, cross-site request forgery te voorkomen en kortstondige (10 minuten) PKCE/OAuth-status te verifiëren bij het koppelen van accounts van derden op account.xernerx.com."
-					},
-					"consent": {
-						"title": "Cookietoestemming (xernerx-cookie-consent):",
-						"desc": "Een essentiële cookie die je gekozen cookiecategorieën (essential, functional, analytics, marketing) en een agreedAt-tijdstempel tot 1 jaar bewaart. Als we een materiële update van dit Cookiebeleid publiceren, wordt de agreedAt-tijdstempel vergeleken met de nieuwste beleidsversie zodat we je opnieuw om toestemming kunnen vragen."
-					},
-					"locale": {
-						"title": "Taalinstelling (NEXT_LOCALE):",
-						"desc": "Een functionele cookie die je gekozen interfacetaal op alle Xernerx-subdomeinen tot 1 jaar onthoudt."
-					},
-					"appearance": {
-						"title": "Interface-, weergave- & werkruimtevoorkeuren (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord, pref_*):",
-						"desc": "Functionele cookies (waaronder pref_showHeaderStore, pref_showHeaderCommandPalette, pref_showHeaderNotifications, pref_showHeaderDownload, pref_showHeaderAppDrawer, pref_showShortcutHints, pref_showDiscordCollectibles, pref_showGiftBadge, pref_reducedMotion, pref_defaultSidebarCollapsed en pref_developerMode) die je visuele en werkruimte-aanpassingen bewaren zodat de server je lay-out direct zonder flikkering kan renderen."
-					}
-				},
-				"localStorage": {
-					"title": "5. Lokale opslag & Desktop Client-opslag",
-					"content": "Naast browsercookies gebruiken we localStorage van de browser (waaronder theme, accent, uiZoom, uiGap, textScale, pref_* en xernerx_sidebar_view_*-sleutels) om niet-gevoelige interfacestatus lokaal te cachen voor direct opstarten. In de Xernerx Desktop App (Electron) wordt lokale configuratie opgeslagen in metadata.json en gebruikt elk accountslot een geïsoleerde Chromium-sessiepartitie (persist:xernerx en persist:xernerx-<slot>) zodat je veilig tussen meerdere accounts kunt schakelen."
-				},
-				"thirdParty": {
-					"title": "6. Cookies van derden",
-					"content": "Sommige functies integreren met diensten van derden, waaronder Discord (voor primaire authenticatie), Stripe (voor veilig afrekenen, factureringsportalen en fraudepreventie), Google AdSense (voor het weergeven van advertenties na toestemming) en optionele providers van gekoppelde accounts (GitHub, Twitch, Google/YouTube, X/Twitter, Spotify, Steam en Reddit) wanneer je een accountkoppeling start. Deze derden kunnen hun eigen cookies plaatsen volgens hun eigen privacybeleid."
-				},
-				"managing": {
-					"title": "7. Je voorkeuren beheren",
-					"content": "Je kunt je cookievoorkeuren op elk moment bekijken of bijwerken door onderaan de website in de voettekst op \"Cookievoorkeuren\" te klikken. Je kunt ook je webbrowser zo instellen dat cookies worden geblokkeerd of verwijderd, al zorgt het blokkeren van essentiële cookies ervoor dat je niet kunt inloggen of beveiligde functies kunt gebruiken."
-				},
-				"changes": {
-					"title": "8. Wijzigingen in dit beleid",
-					"content": "We kunnen dit Cookiebeleid van tijd tot tijd bijwerken om wijzigingen in onze technologie, infrastructuur of wettelijke vereisten weer te geven. Bij een update verhogen we de versiedatum van het beleid zodat bezoekers worden gevraagd hun cookievoorkeuren te controleren."
-				},
-				"contact": {
-					"title": "9. Contact",
-					"prefix": "Voor vragen over ons gebruik van cookies kun je contact opnemen met"
-				}
-			},
-			"description": "legal@xernerx.com"
-		},
-		"changelog": {
-			"rssFeed": "RSS-feed"
-		}
-	},
-	"admin": {
-		"roles": {
-			"title": "Rollen Beheer",
-			"serverId": "Server ID",
-			"members": "Leden",
-			"newRoleButton": "Nieuwe Rol",
-			"searchPlaceholder": "Zoek op rol naam, UUID of Discord ID",
-			"noRolesFound": "Geen rol gevonden met jouw zoekopdracht.",
-			"unnamedRole": "Naamloze Rol",
-			"unlinked": "Geen Link",
-			"synced": "Gesynchroniseerd",
-			"uuid": "UUID:",
-			"noneUnlinked": "Geen (Geen link)",
-			"manageConfig": "Beheer Rol Configuratie",
-			"roleNameLabel": "Rol Naam",
-			"roleNamePlaceholder": "b.v. Administrator",
-			"linkDiscordRoleLabel": "Link Discord Rol",
-			"selectDiscordRolePlaceholder": "Selecteer Discord Rol",
-			"syncNameWithDiscord": "Synchroniseer naam met Discord",
-			"permissionsHeader": "Rechten",
-			"deleteRole": "Rol Verwijderen",
-			"saveChanges": "Aanpassingen Opslaan",
-			"saving": "Opslaan...",
-			"confirmDelete": "Verwijder",
-			"cancel": "Annuleer",
-			"createModalTitle": "Nieuwe Rol Maken",
-			"createButton": "Rol Maken",
-			"creating": "Maken...",
-			"errorPrefix": "Error:",
-			"card": {
-				"idPrefix": "Id: {id}"
-			}
-		},
-		"dashboard": {
-			"overview": {
-				"title": "Suite Overzicht & SEO",
-				"subtitle": "Monitor live versies, latentie, probleemstatus en Seobility SEO-scores over alle 9 Xernerx Suite subdomeinen.",
-				"refresh": "Statistieken Vernieuwen",
-				"refreshing": "Vernieuwen...",
-				"envProduction": "Productie URL's",
-				"envCanary": "Canary URL's",
-				"cards": {
-					"services": "Suite Services",
-					"synced": "{count} gesynchroniseerd • {ahead} canary voorop",
-					"openIssues": "Openstaande Problemen",
-					"pendingReview": "{count} wachtend op verificatie",
-					"resolvedIssues": "Opgeloste Problemen",
-					"avgResolution": "Gem. Oplostijd",
-					"hours": "{count}u"
-				},
-				"seoSectionTitle": "Subdomein SEO-scores & Live Telemetrie",
-				"seoSectionSubtitle": "Klik op een Seobility-badge om een volledige on-page SEO-controle uit te voeren of te bekijken.",
-				"prodVersion": "Prod",
-				"canaryVersion": "Canary",
-				"devVersion": "Dev",
-				"localVersion": "Lokaal",
-				"syncedBadge": "Gesynchroniseerd",
-				"canaryAheadBadge": "Canary Voorop",
-				"seobilityCheck": "Seobility",
-				"lighthouseCheck": "Lighthouse",
-				"lighthouseScan": "Lighthouse Starten",
-				"lighthouseScanning": "Controleren...",
-				"lighthouseRescan": "Chrome Lighthouse audit opnieuw uitvoeren",
-				"lighthouseCategories": {
-					"seo": "SEO",
-					"perf": "Perf",
-					"a11y": "A11y",
-					"bp": "Best"
-				},
-				"ping": "{ms} ms",
-				"pinging": "Pingen...",
-				"pingOffline": "Offline",
-				"repingTooltip": "Klik om de laadtijd te pingen",
-				"openSite": "Site Openen",
-				"auditAllProd": "Audit Prod",
-				"auditAllCanary": "Audit Canary",
-				"auditingProgress": "Controleren ({current}/{total})...",
-				"filterAll": "Alle ({count})",
-				"filterSynced": "Gesynchroniseerd ({count})",
-				"filterCanaryAhead": "Canary Voorop ({count})",
-				"envAll": "Alle Omg.",
-				"envProdOnly": "Alleen Prod",
-				"envCanaryOnly": "Alleen Canary",
-				"envDevOnly": "Alleen Dev",
-				"serviceGateway": "Service Gateway",
-				"gatewayOnline": "Gateway Online",
-				"gatewayOffline": "Gateway Onbereikbaar",
-				"gatewayDesc": "Backend-service zonder HTML (SEO-widgets overgeslagen)",
-				"viewChangelogTooltip": "Klik om wijzigingsregister te bekijken",
-				"changelogTitle": "{name} ({env}) Wijzigingsregister",
-				"changelogLoading": "Wijzigingsregister laden...",
-				"changelogEmpty": "Geen wijzigingsregister gevonden voor deze omgeving.",
-				"declareIncident": "Incident melden",
-				"incidentModalTitle": "Globale statusmelding uitzenden",
-				"incidentModalDesc": "Verstuurt direct een statusmelding over alle Xernerx-subdomeinen gekoppeld aan info.xernerx.com/status.",
-				"incidentSeverity": "Ernst van melding",
-				"incidentTitleLabel": "Titel van melding",
-				"incidentMessageLabel": "Statusbericht",
-				"incidentBroadcastSuccess": "Globale statusmelding verzonden",
-				"broadcastAlert": "Melding uitzenden"
-			},
-			"issues": {
-				"title": "Problemen",
-				"logBug": "Probleem Vastleggen",
-				"status": "Status",
-				"resolved": "Opgelost",
-				"verified": "Geverifieerd",
-				"pending": "In Afwachting",
-				"modalTitle": "Nieuw Probleem Vastleggen",
-				"titlePlaceholder": "Titel",
-				"descPlaceholder": "Beschrijving",
-				"productPlaceholder": "Selecteer Product",
-				"save": "Opslaan",
-				"cancel": "Annuleren",
-				"submitted": "Ingediend",
-				"verify": "Verifieer"
-			},
-			"roadmap": {
-				"title": "Roadmap Beheer",
-				"addItem": "Item Toevoegen",
-				"modalTitle": "Roadmap Item Toevoegen",
-				"titlePlaceholder": "Titel",
-				"descPlaceholder": "Beschrijving",
-				"productPlaceholder": "Selecteer Product",
-				"quarterPlaceholder": "Doelkwartaal (bijv. Q1 2026)",
-				"statusPlaceholder": "Selecteer Status",
-				"changelogPlaceholder": "Changelog URL (Optioneel)",
-				"save": "Opslaan",
-				"cancel": "Annuleren"
-			},
-			"suggestions": {
-				"title": "Community Suggesties",
-				"status": "Status",
-				"open": "Open",
-				"approved": "Goedgekeurd",
-				"rejected": "Afgewezen",
-				"implemented": "Geïmplementeerd",
-				"moveToRoadmap": "Naar Roadmap Verplaatsen",
-				"votes": "Stemmen"
-			},
-			"nav": {
-				"auditLogs": "Auditlogs"
-			},
-			"audit": {
-				"title": "Auditlogs",
-				"description": "Onveranderlijk beveiligings- en beheerlogboek voor de hele Xernerx Suite.",
-				"refresh": "Vernieuwen",
-				"searchPlaceholder": "Zoek op beheerder, actie of doel...",
-				"fetchError": "Kan auditlogs niet laden",
-				"emptyTitle": "Geen auditgebeurtenissen gevonden",
-				"emptyDescription": "Beheerdersacties voor problemen, suggesties, sollicitaties en instellingen verschijnen hier.",
-				"categories": {
-					"all": "Alle",
-					"issue": "Problemen",
-					"suggestion": "Suggesties",
-					"application": "Sollicitaties",
-					"setting": "Instellingen",
-					"role": "Rollen",
-					"user": "Gebruikers",
-					"system": "Systeem"
-				},
-				"exportCsv": "Exporteer CSV",
-				"exportJson": "Exporteer JSON"
-			}
-		},
-		"settings": {
-			"auditWebhookUrl": "Admin Audit Discord Webhook URL",
-			"auditWebhookUrlDesc": "Stuurt beveiligings- en beheeracties in realtime door naar je staff Discord-kanaal.",
-			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/..."
-		},
-		"translations": {
-			"review": {
-				"completionProgress": "{translated} van {total} sleutels vertaald ({percent}%)",
-				"missingOnly": "Alleen Ontbrekend ({count})",
-				"copySource": "Kopieer Bron"
-			}
-		}
-	},
-	"info": {
-		"home": {
-			"title": "Ondersteuning",
-			"description": "Welkom bij de kennisbank. Verken onze transparante roadmap, dien nieuwe ideeën in, meld problemen en vind antwoorden op al je vragen.",
-			"portals": {
-				"roadmap": {
-					"title": "Roadmap",
-					"description": "Bekijk waar we nu aan bouwen, wat er binnenkort aankomt en volg onze voortgang op langetermijndoelen."
-				},
-				"suggestions": {
-					"title": "Suggesties",
-					"description": "Heb je een geweldig idee? Dien het in bij onze community-sandbox waar anderen erop kunnen stemmen voor de roadmap!"
-				},
-				"bugs": {
-					"title": "Problemen",
-					"description": "Een probleem gevonden? Meld het hier zodat onze technici het kunnen oplossen en naar de bekende problemen kunnen verplaatsen."
-				},
-				"faq": {
-					"title": "Veelgestelde Vragen",
-					"description": "Veelgestelde vragen, facturatie en algemene hulp met je Xernerx-account."
-				},
-				"status": {
-					"title": "Systeemstatus",
-					"description": "Live uptime, responstijd en operationele status van alle Xernerx-diensten."
-				}
-			}
-		},
-		"roadmap": {
-			"title": "Platform Roadmap",
-			"description": "Onze chronologische reis van functies, optimalisaties en releases. Zie precies wat er aankomt en wanneer.",
-			"metrics": {
-				"avgResolutionTime": "Gemiddelde oplostijd van problemen",
-				"recentResolutions": "Recent opgeloste problemen",
-				"hours": "{count} uur",
-				"na": "N.v.t."
-			},
-			"timeline": {
-				"today": "Vandaag",
-				"backlog": "Backlog",
-				"readChangelog": "Changelog Lezen",
-				"status": {
-					"idea": "Idee",
-					"planned": "Gepland",
-					"active": "In Uitvoering",
-					"released": "Uitgebracht"
-				}
-			},
-			"knownIssues": {
-				"title": "Bekende Problemen Tracker",
-				"description": "Een transparant logboek van actieve problemen en recent opgeloste problemen binnen ons ecosysteem.",
-				"openIssues": "Openstaande Problemen",
-				"noOpenIssues": "Geen actieve problemen bekend! Alles werkt soepel.",
-				"recentlyResolved": "Recent Opgelost",
-				"noResolvedIssues": "Geen recent opgeloste problemen.",
-				"fixedOn": "Opgelost op {date}"
-			},
-			"actions": {
-				"notifyMe": "Houd Mij Op De Hoogte",
-				"watching": "Volgend",
-				"loginRequired": "Log in om op roadmap-mijlpalen te stemmen of ze te volgen",
-				"watchAdded": "Je ontvangt een melding zodra deze mijlpaal wordt uitgebracht!",
-				"watchRemoved": "Meldingen voor deze mijlpaal uitgeschakeld."
-			}
-		},
-		"suggestions": {
-			"title": "Functie Sandbox",
-			"description": "Stem op ideeën of dien je eigen idee in. Populaire suggesties worden beoordeeld door ons team en toegevoegd aan de roadmap.",
-			"newSuggestion": "Nieuwe Suggestie",
-			"titlePlaceholder": "Titel",
-			"descriptionPlaceholder": "Beschrijving",
-			"selectProduct": "Selecteer Product",
-			"submit": "Indienen",
-			"cancel": "Annuleren",
-			"searchPlaceholder": "Zoek suggesties (bijv. 'discord bot')...",
-			"startTyping": "Begin met typen voor een nieuwe suggestie",
-			"noMatch": "Geen suggesties komen overeen met \"{query}\".",
-			"addAsNew": "Als nieuwe suggestie toevoegen",
-			"loginToSubmit": "Log in om dit als een nieuw idee in te dienen!",
-			"toasts": {
-				"notAuthenticated": "Niet Geauthenticeerd",
-				"mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
-				"mustBeLoggedInVote": "Je moet ingelogd zijn om te stemmen.",
-				"productRequired": "Selecteer een product.",
-				"duplicateTitle": "Er bestaat al een suggestie met deze exacte titel!",
-				"duplicate": "Duplicaat",
-				"submitted": "Suggestie ingediend!",
-				"success": "Succes",
-				"failedToPost": "Plaatsen mislukt",
-				"failedToVote": "Stemmen mislukt",
-				"error": "Fout"
-			}
-		},
-		"bugs": {
-			"title": "Problemen",
-			"description": "Meld problemen die je tegenkomt. Problemen worden beoordeeld door ons team en geverifieerd.",
-			"newBug": "Nieuw Probleem",
-			"titlePlaceholder": "Titel",
-			"descriptionPlaceholder": "Beschrijving",
-			"selectProduct": "Selecteer Product",
-			"attachFile": "Bijlage Screenshot/Log (Optioneel)",
-			"uploading": "Uploaden...",
-			"submit": "Indienen",
-			"cancel": "Annuleren",
-			"searchPlaceholder": "Zoek problemen (bijv. 'inlogfout')...",
-			"startTyping": "Begin met typen voor een nieuw probleem",
-			"noMatch": "Geen problemen komen overeen met \"{query}\".",
-			"reportAsNew": "Als nieuw probleem melden",
-			"status": {
-				"resolved": "Opgelost",
-				"verified": "Geverifieerd",
-				"pendingReview": "In Afwachting",
-				"submitted": "Ingediend"
-			},
-			"releaseStatus": {
-				"production": "Live (Prod & Canary) • {app} v{version}",
-				"canary": "Alleen Canary • {app} v{version}",
-				"pending": "In Wachtrij • {app} v{version}"
-			},
-			"releaseTooltips": {
-				"production": "Deze oplossing staat live op zowel Canary als Productie ({app} v{version}).",
-				"canary": "Deze oplossing staat momenteel live op Canary ({app} v{version}) en wacht op uitrol naar Productie.",
-				"pending": "Deze oplossing staat ingepland voor {app} v{version}."
-			},
-			"toasts": {
-				"notAuthenticated": "Niet Geauthenticeerd",
-				"mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
-				"productRequired": "Selecteer een product.",
-				"duplicate": "Duplicaat",
-				"duplicateTitle": "Er bestaat al een probleem met deze exacte titel!",
-				"submitted": "Probleem ingediend!",
-				"success": "Succes",
-				"uploadFailed": "Upload Mislukt",
-				"failedToUpload": "Uploaden van bijlage mislukt",
-				"failedToPost": "Plaatsen mislukt",
-				"error": "Fout"
-			},
-			"tooltips": {
-				"verified": "Dit probleem is erkend door de ontwikkelaars en zal op termijn worden opgelost.",
-				"submitted": "Dit probleem is ingediend door de community en is nog niet beoordeeld of erkend door de ontwikkelaars.",
-				"resolved": "Dit probleem is opgelost."
-			}
-		},
-		"status": {
-			"subtitle": "Live ecosysteem-telemetrie & gezondheidsmatrix",
-			"refresh": "Status vernieuwen",
-			"servicesHeading": "Ecosysteemdiensten",
-			"searchPlaceholder": "Diensten filteren...",
-			"activeIncidentsHeading": "Actieve geregistreerde problemen",
-			"viewAllIssues": "Bekijk Issue Tracker →",
-			"noActiveIncidents": "Geen actieve geverifieerde incidenten gemeld. Alle systemen werken naar behoren.",
-			"banner": {
-				"checking": "Ecosysteemstatus controleren...",
-				"allOperational": "Alle systemen operationeel",
-				"partialOutage": "{count} / {total} diensten operationeel"
-			},
-			"states": {
-				"operational": "Operationeel",
-				"degraded": "Vertraagd",
-				"down": "Storing",
-				"checking": "Controleren"
-			},
-			"services": {
-				"www": "Hoofdwebsite",
-				"app": "Gebruikersdashboard",
-				"account": "Accountportaal",
-				"api": "Core API Gateway",
-				"cdn": "Media CDN",
-				"docs": "Documentatie",
-				"info": "Support & Info Hub",
-				"store": "Winkel & Facturatie",
-				"admin": "Beheerdersportaal"
-			}
-		}
-	},
-	"lib": {
-		"navigation": {
-			"categories": {
-				"user": "Gebruiker",
-				"developer": "Ontwikkelaar",
-				"public": "Openbaar",
-				"management": "Beheer"
-			},
-			"items": {
-				"explore": "Ontdekken",
-				"dashboard": "Dashboard",
-				"account": "Account",
-				"store": "Winkel",
-				"portal": "Portaal",
-				"api": "API",
-				"docs": "Documentatie",
-				"cdn": "CDN",
-				"website": "Website",
-				"admin": "Beheerder",
-				"help": "Ondersteuning"
-			}
-		}
-	},
-	"docs": {
-		"api": {
-			"playground": {
-				"title": "Interactieve API Explorer",
-				"description": "Test live verzoeken tegen de Xernerx API-gateway direct vanuit je browser en bekijk realtime JSON-responsen.",
-				"presets": "Snelkeuzes",
-				"send": "Verzoek versturen",
-				"sending": "Versturen...",
-				"bearerToken": "Bearer Token (Optioneel)",
-				"jsonBody": "JSON Request Body"
-			}
-		}
-	},
-	"app": {
-		"users": {
-			"profile": {
-				"badges": {
-					"botDeveloper": "Bot Ontwikkelaar",
-					"bugHunter": "Bug Hunter",
-					"contributor": "Bijdrager"
-				}
-			}
-		},
-		"portal": {
-			"bot": {
-				"webhooks": {
-					"testButton": "Test Ping",
-					"urlRequired": "Voer eerst een webhook-URL in.",
-					"testSuccess": "Webhook antwoordde met {status} ({latency}ms)",
-					"testFailed": "Webhook-test mislukt: {error}"
-				}
-			}
-		},
-		"bots": {
-			"id": {
-				"embedBadges": "Badges Insluiten",
-				"embedBadgesDesc": "Kopieer live SVG-statusbadges voor je GitHub README of website.",
-				"snippetCopied": "{format} insluitcode gekopieerd!"
-			}
-		},
-		"leaderboard": {
-			"title": "Ranglijsten",
-			"description": "De meest gestemde bots, grootste servers en langste dagelijkse reeksen in het ecosysteem.",
-			"backToExplore": "Terug naar Ontdekken",
-			"privacyNotice": "Alleen openbare bots, servers en gebruikersprofielen worden hier vermeld.",
-			"empty": "Nog geen vermeldingen in deze categorie.",
-			"tabs": {
-				"bots": "Top Bots",
-				"servers": "Top Servers",
-				"streaks": "Dagelijkse Reeksen"
-			},
-			"metrics": {
-				"votes": "Stemmen",
-				"users": "Gebruikers",
-				"members": "Leden",
-				"streak": "Reeks",
-				"credits": "Credits",
-				"totalImpact": "Totaal",
-				"bugs": "Bugs",
-				"suggestions": "Ideeën"
-			},
-			"sortBy": "Sorteer op",
-			"searchPlaceholder": "Zoek op de ranglijst..."
-		},
-		"widgets": {
-			"badgesTitle": "Live SVG-badges",
-			"badgesDescription": "Sluit dynamische SVG-status- en statistiekbadges in je README, documentatie of website in.",
-			"badgesButton": "Badges insluiten",
-			"badgesModalTitle": "Live SVG-badges",
-			"badgesModalDescription": "Kopieer een Markdown- of HTML-fragment om realtime statistiekbadges in te sluiten."
-		}
-	}
+    "metadata": {
+        "label": "Nederlands"
+    },
+    "common": {
+        "cookiePrompt": {
+            "title": "Cookievoorkeuren",
+            "description": "We gebruiken cookies om ervoor te zorgen dat je sessie veilig blijft, je thema te onthouden en ons te helpen de app te verbeteren.",
+            "manage": {
+                "essential": {
+                    "label": "Essentieel",
+                    "description": "Vereist voor sessies en beveiliging."
+                },
+                "functional": {
+                    "label": "Functioneel",
+                    "description": "Onthoudt je thema en lay-outstatus."
+                },
+                "analytics": {
+                    "label": "Analytisch",
+                    "description": "Helpt ons fouten en verkeer te analyseren."
+                },
+                "marketing": {
+                    "label": "Marketing",
+                    "description": "Maakt relevante advertenties en campagnemetingen mogelijk."
+                }
+            },
+            "buttons": {
+                "acceptAll": "Alles accepteren",
+                "essentialOnly": "Alleen essentieel",
+                "manage": "Beheren",
+                "save": "Mijn voorkeuren opslaan"
+            }
+        },
+        "footer": {
+            "tagline": "Het bouwen van moderne software, infrastructuur en ontwikkelingstools met een focus op prestaties, eenvoud en lange termijn onderhoudbaarheid.",
+            "sections": {
+                "resources": "Bronnen",
+                "support": "Ondersteuning",
+                "developer": "Ontwikkelaar"
+            },
+            "links": {
+                "privacy": "Privacy",
+                "terms": "Voorwaarden",
+                "cookies": "Cookies",
+                "cookiePreferences": "Cookievoorkeuren",
+                "contact": "Contact",
+                "help": "Helpcentrum",
+                "issues": "Problemen",
+                "suggestions": "Suggesties",
+                "roadmap": "Roadmap",
+                "github": "GitHub",
+                "npm": "npm",
+                "documentation": "Documentatie",
+                "discord": "Discord",
+                "faq": "Veel Gestelde Vragen",
+                "careers": "Vacatures",
+                "status": "Systeemstatus",
+                "statusOperational": "Alle systemen operationeel",
+                "statusDegraded": "Systeemstatus: Vertraagd",
+                "changelog": "Wijzigingslogboek",
+                "download": "Desktop Client",
+                "invites": "Bot Uitnodigingen"
+            },
+            "title": "Xernerx Studios",
+            "description": "© 2024 -",
+            "description2": "Xernerx Studios",
+            "share": {
+                "label": "Delen",
+                "twitter": "Delen op X",
+                "facebook": "Delen op Facebook",
+                "linkedin": "Delen op LinkedIn",
+                "reddit": "Delen op Reddit",
+                "whatsapp": "Delen op WhatsApp"
+            }
+        },
+        "sidebar": {
+            "login": "Inloggen",
+            "alt": "Gebruiker Avatar",
+            "alt2": "Avatar Decoratie"
+        },
+        "nav": {
+            "categories": {
+                "account": "Account",
+                "preferences": "Voorkeuren",
+                "billing": "Facturering",
+                "developer": "Ontwikkelaar",
+                "moderator": "Moderator",
+                "administrator": "Administrator",
+                "translator": "Vertaler",
+                "xernerxSuite": "Xernerx Suite",
+                "system": "Systeem",
+                "bots": "Bots",
+                "product": "Product",
+                "support": "Ondersteuning"
+            },
+            "items": {
+                "account": "Account",
+                "profile": "Profiel",
+                "connections": "Verbindingen",
+                "devices": "Apparaten",
+                "appearance": "Weergave",
+                "language": "Taal",
+                "notifications": "Meldingen",
+                "billing": "Facturering",
+                "tokens": "Tokens",
+                "store": "Winkel",
+                "users": "Gebruikers",
+                "roles": "Rollen",
+                "translations": "Vertalingen",
+                "applications": "Applicaties",
+                "settings": "Instellingen",
+                "environments": "Omgevingen",
+                "applications_review": "Aanvragen beoordelen",
+                "applications_manage": "Beheer Aanvragen",
+                "roadmap": "Roadmap",
+                "suggestions": "Suggesties",
+                "issues": "Problemen",
+                "preferences": "Voorkeuren"
+            }
+        },
+        "buttons": {
+            "cancel": "Annuleren",
+            "confirm": "Bevestigen",
+            "proceed": "Doorgaan",
+            "delete": "Verwijder",
+            "close": "Sluiten"
+        },
+        "shortcuts": {
+            "modal": {
+                "navigation": {
+                    "empty": "Geen applicaties beschikbaar.",
+                    "title": "App-overzicht",
+                    "description": "Schakel snel en makkelijk tussen applicaties",
+                    "searchPlaceholder": "Filter applicaties...",
+                    "navigateHint": "Gebruik de pijl-toetsen om te selecteren, Enter om te openen",
+                    "other": "Andere"
+                },
+                "palette": {
+                    "title": "Commando Pallette",
+                    "placeholder": "Zoek menus, snelle acties of suite applicaties...",
+                    "empty": "Geen commando of pagina gevonden.",
+                    "sections": {
+                        "views": "Huidige Pagina Menus",
+                        "actions": "Snelle Acties",
+                        "apps": "Suite Applicaties",
+                        "settings": "Account & Ontwikkelaar Instellingen",
+                        "store": "Winkel & Credits",
+                        "support": "Ondersteuning & Feedback Hub",
+                        "docs": "Ontwikkelaar Documentatie & API Endpoints",
+                        "faq": "FaQ & Kennisbank",
+                        "admin": "Administrator Paneel (Werknemers)",
+                        "bots": "Publieke Bots",
+                        "servers": "Publieke Servers",
+                        "community": "Problemen, Suggesties & Roadmap"
+                    },
+                    "actions": {
+                        "switchThemeLight": "Verander naar licht thema",
+                        "switchThemeDark": "Verander naar donker thema",
+                        "toggleSidebar": "Schakel de zijbalk",
+                        "openAppDrawer": "Open apps",
+                        "toggleOmnibar": "Open URL omnibar",
+                        "copyUrl": "Kopieer Huidige Suite URL",
+                        "openShortcuts": "Zie Keyboard Snelkoppelingen",
+                        "openAccount": "Open Account Instellingen"
+                    },
+                    "footer": {
+                        "navigate": "navigeren",
+                        "select": "Selecteren",
+                        "close": "Sluiten"
+                    },
+                    "searching": "Zoeken in ecosysteem...."
+                }
+            },
+            "items": {
+                "toggleHelp": "Help-menu omschakelen",
+                "searchOrPalette": "Focus op zoeken op pagina's of open het opdrachtpalet",
+                "openAppDrawer": "Open App-stuurprogramma",
+                "toggleSidebar": "Schakel de zichtbaarheid van de zijbalk van applicaties in of uit",
+                "toggleOmnibar": "Open URL omnibar",
+                "toggleNotifications": "Open Notificaties",
+                "openAccountSettings": "Open Account Instellingen",
+                "saveChanges": "Sla aanpassingen op",
+                "switchSidebarViews": "Schakel tussen zijbalkweergaven of tabbladen",
+                "copyUrl": "Kopieer huidige suite URL",
+                "reloadApp": "Herlaad de applicatie",
+                "closeModals": "Sluit de actieve overlays of modals"
+            }
+        },
+        "botrow": {
+            "description": "Servers",
+            "description2": "Gebruikers"
+        },
+        "sidebarnotifications": {
+            "description": "Notificaties",
+            "button2": "Alles gelezen",
+            "description2": "Nog geen notificaties",
+            "button3": "Afwijzen",
+            "button4": "Accepteren",
+            "tooltip": "Notificatie Verwijderen",
+            "tooltip2": "Alles Markeren als Ongelezen",
+            "button5": "Link Openen",
+            "button6": "Sluiten",
+            "button": "Herladen"
+        },
+        "sidebarsuite": {
+            "description": "Suite"
+        },
+        "sidebaruser": {
+            "alt": "Gebruikersbanner",
+            "alt2": "Gebruikersprofiel",
+            "alt3": "Avatar Decoratie",
+            "alt4": "Clan Badge",
+            "description": "Credits Balans",
+            "description2": "Volgende Cadeau Over",
+            "description3": "Profiel Bewerken",
+            "description4": "Admin Paneel",
+            "description5": "Kopieer Gebruiker ID"
+        },
+        "header": {
+            "description": "Download de app!",
+            "tooltip": "Open App Overzicht (Ctrl + K)",
+            "store": "Winkel"
+        },
+        "error": {
+            "title": "Er ging iets mis!",
+            "description": "Er is een probleem met het laden van dit onderdeel.",
+            "button": "Opnieuw proberen"
+        },
+        "globalerror": {
+            "title": "Fatale Applicatie Fout",
+            "button": "Applicatie Herstarten",
+            "description": "De kern layout kan niet geladen worden."
+        },
+        "notfound": {
+            "description": "Error 404",
+            "title": "Signaal Verloren.",
+            "description2": "De resource die je hebt aangevraagd kan niet worden gevonden in het huidige routingmanifest.",
+            "button": "Ga Terug",
+            "button2": "Naar Hoofdpagina"
+        },
+        "shortcutsprovider": {
+            "title": "Wijzigingsregister",
+            "description": "Recente applicatie aanpassingen en uitgaven.",
+            "title2": "Keyboard Snelkoppelingen",
+            "description2": "Snelle commando's om efficient te navigeren",
+            "tooltip": "Bekijk Wijzigingsregister",
+            "description3": "App:",
+            "description4": "Druk",
+            "description5": "sluiten",
+            "text": "Esc",
+            "selectVersion": "Selecteer Versie",
+            "loadingChangelog": "Laden van wijzigingslogboek...",
+            "viewFullChangelog": "Zie Volledige Wijzigingslogboek"
+        },
+        "supportprovider": {
+            "description": "Krijg Ondersteuning",
+            "joinButton": "Neem deel aan de Ondersteuningsserver",
+            "popoverTitle": "Help Nodig?",
+            "popoverSubtitle": "Snelle Links & Live community ondersteuning",
+            "links": {
+                "hub": "Ondersteuning Hub",
+                "reportBugHere": "Rapporteer een Fout op deze pagina",
+                "snapBadge": "Automatische-Foto",
+                "reportIssue": "Rapporteer een Probleem",
+                "suggestFeature": "Suggereer een optie",
+                "faq": "Veel Gestelde Vragen"
+            },
+            "joinModal": {
+                "title": "Neem deel aan de Ondersteuningsserver"
+            }
+        },
+        "toastprovider": {
+            "description": "Opgepast — je hebt onopgeslagen aanpassingen!",
+            "button": "Reset",
+            "button2": "Opslaan"
+        },
+        "multiselector": {
+            "description": "Geen opties"
+        },
+        "selector": {
+            "placeholder": "Zoek...",
+            "description": "Geen opties gevonden"
+        },
+        "confirm": {
+            "typeToConfirmBefore": "Typ",
+            "typeToConfirmAfter": "Om te bevestigen:"
+        }
+    },
+    "api": {
+        "title": "Xernerx API",
+        "description": "Je hebt de kernservice en endpoint-router voor de Xernerx-suite bereikt. Op dit domein vinden geen bronbeheer, configuratiewijzigingen of interactieve besturing plaats.",
+        "section": {
+            "title": "Op zoek naar toegang?",
+            "description": "Ga naar je account om API-tokens te genereren, je actieve sessies te bekijken of ontwikkelaarsleutels te beheren."
+        },
+        "button": {
+            "account": "Jouw account",
+            "docs": "Lees de documentatie"
+        },
+        "fact": "Nutteloos feit: ",
+        "facts": [
+            "Deze pagina verbruikt ongeveer 0,00004 kWh aan serverenergie om je te vertellen dat je een token nodig hebt.",
+            "Virtue beoordeelt momenteel het ontbreken van een Authorization-header.",
+            "Metamorphosis heeft dit verzoek omgezet in teleurstelling omdat je je bearer-token bent vergeten.",
+            "Zodiakale grafieken geven aan dat je huidige pad geen geldige API-sleutel heeft.",
+            "Ergens huilt er een database-index omdat je hebt opgevraagd zonder token.",
+            "Fout 418: Ik ben een theepot, maar zelfs een theepot heeft een geldig bearer-token nodig.",
+            "Geen token, geen data. Dat zijn de regels, ik heb ze niet bedacht (ja, dat heb ik wel)."
+        ]
+    },
+    "account": {
+        "account": {
+            "title": "Accountinstellingen",
+            "description": "Beheer je accountsessie, gegevensprivacy en algemene profielgegevens.",
+            "fallbackName": "Gebruiker",
+            "session": {
+                "title": "Actieve sessie",
+                "description": "Meld je af bij je actieve accountsessie op dit apparaat. Je moet opnieuw authenticeren om toegang te krijgen tot je werkruimte.",
+                "button": "Uitloggen"
+            },
+            "danger": {
+                "title": "Gebruikersgegevens en account verwijderen",
+                "description": "Verwijder permanent je profielgegevens, opgeslagen voorkeuren en sluit je account in het hele ecosysteem. Deze actie kan niet ongedaan worden gemaakt.",
+                "button": "Account verwijderen",
+                "confirmTitle": "Bevestig accountverwijdering",
+                "confirmDescription": "Je staat op het punt een permanente verwijdering van je gebruikersgegevens te starten. Zodra dit is voltooid, kunnen je inloggegevens en profiel niet meer worden hersteld.",
+                "confirmButton": "Verwijder mijn account"
+            }
+        },
+        "profile": {
+            "title": "Profiel bewerken",
+            "description": "Beheer je openbare profielgegevens en persoonlijke voorkeuren.",
+            "descriptionField": {
+                "label": "Beschrijving",
+                "placeholder": "Korte bio..."
+            },
+            "infoField": {
+                "label": "Info (Lange beschrijving)",
+                "placeholder": "Vertel ons meer over jezelf..."
+            },
+            "birthday": {
+                "label": "Geboortedatum"
+            },
+            "timezone": {
+                "label": "Tijdzone",
+                "placeholder": "bijv. Europe/Brussels"
+            },
+            "gender": {
+                "label": "Geslacht",
+                "male": "Man",
+                "female": "Vrouw",
+                "other": "Anders"
+            },
+            "pronouns": {
+                "label": "Voornaamwoorden",
+                "placeholder": "bijv. diens/die"
+            },
+            "privacy": {
+                "label": "Privacyniveau",
+                "public": "Openbaar",
+                "limited": "Beperkt",
+                "private": "Privé",
+                "tooltip": {
+                    "title": "Privacyopties:",
+                    "privateTitle": "Privé:",
+                    "privateDesc": "Volledig privé; niemand behalve jij kan je profiel zien.",
+                    "limitedTitle": "Beperkt:",
+                    "limitedDesc": "Iedereen met je accountlink kan je profiel zien; je wordt alleen niet openbaar vermeld.",
+                    "publicTitle": "Openbaar:",
+                    "publicDesc": "Iedereen kan je profiel zien en het wordt niet verborgen in openbare ruimtes."
+                }
+            },
+            "save": "Wijzigingen opslaan",
+            "saving": "Opslaan...",
+            "toast": {
+                "success": "Profiel succesvol bijgewerkt!",
+                "error": "Opslaan mislukt. Probeer het opnieuw."
+            }
+        },
+        "appearance": {
+            "title": "Weergave",
+            "description": "Pas aan hoe de interface eruitziet en aanvoelt in je werkruimte.",
+            "theme": {
+                "title": "Thema",
+                "description": "Kies je bevorzugde interface-themamodus.",
+                "options": {
+                    "dark": "Donker",
+                    "light": "Licht",
+                    "system": "Systeem"
+                }
+            },
+            "discordSync": {
+                "title": "Accent synchroniseren vanuit Discord",
+                "description": "Neem automatisch de accentkleur van je Discord-profielthema over als je werkruimte-accent."
+            },
+            "clientSync": {
+                "title": "Weergaveinstellingen synchroniseren tussen clients",
+                "description": "Laad weergaveinstellingen automatisch in op al je apparaten."
+            },
+            "accentColor": {
+                "title": "Accentkleur",
+                "description": "Selecteer een aangepaste accentkleur voor je werkruimtethema."
+            },
+            "colors": {
+                "purple": "Xerple",
+                "green": "Crean",
+                "neon": "Cyber Neon",
+                "blue": "Elektrisch Blauw",
+                "pink": "Levendig Roze",
+                "orange": "Zonsondergang Oranje",
+                "yellow": "Goudgeel",
+                "crimson": "Diep Karmozijn",
+                "mint": "Mint Bries",
+                "indigo": "Koninklijk Indigo",
+                "lime": "Zuur Limoen",
+                "charcoal": "Leegte Houtskool"
+            },
+            "zoom": {
+                "title": "UI-zoomniveau",
+                "description": "Schaal de interfacezoom gelijkmatig over de toepassing."
+            },
+            "density": {
+                "title": "Lay-out Spacing",
+                "description": "Schakel tussen compacte, standaard en ruime interface-opvulmarges.",
+                "compact": "Compact",
+                "default": "Standaard",
+                "spacious": "Ruim"
+            },
+            "textScale": {
+                "title": "Tekstschaal",
+                "description": "Configureer de basistypografiegrootte voor leesbaarheid."
+            },
+            "toast": {
+                "clientSyncEnabled": {
+                    "title": "Client-synchronisatie ingeschakeld",
+                    "description": "Je weergaveinstellingen worden nu gesynchroniseerd met je account."
+                },
+                "clientSyncDisabled": {
+                    "title": "Client-synchronisatie uitgeschakeld",
+                    "description": "Je weergaveinstellingen blijven lokaal op deze browser."
+                },
+                "accentColor": {
+                    "title": "Accentkleur bijgewerkt!",
+                    "description": "Accentkleur ingesteld op {color}"
+                },
+                "theme": {
+                    "title": "Thema bijgewerkt!",
+                    "description": "Thema ingesteld op {theme}"
+                },
+                "density": {
+                    "title": "Lay-outdichtheid bijgewerkt!"
+                }
+            }
+        },
+        "language": {
+            "headerTitle": "Taalvoorkeuren",
+            "headerDescription": "Kies je interfacelokalisatie en bekijk regionale voorkeuren.",
+            "title": "Taal",
+            "description": "Selecteer je voorkeurstaal voor de interface.",
+            "contributeLabel": "+ Draag een vertaling bij",
+            "coverage": {
+                "title": "Help ons vertalen!",
+                "description": "Je geselecteerde taal is momenteel voor {coverage}% vertaald. Heb je een paar minuten om ons te helpen het af te maken?",
+                "button": "Bijdragen"
+            },
+            "discord": {
+                "title": "Discord-taal",
+                "description": "Je huidige Discord-accounttaalinstelling (alleen-lezen indicator)."
+            }
+        },
+        "signin": {
+            "button": "Doorgaan met Discord",
+            "redirecting": "Doorverwijzen…",
+            "aboutToggle": "Over machtigingen",
+            "permissions": {
+                "profile": {
+                    "title": "Gebruikersnaam & Profiel",
+                    "description": "Wordt gebruikt om je profiel binnen de app weer te geven."
+                },
+                "email": {
+                    "title": "E-mailadres",
+                    "description": "Wordt gebruikt voor meldingen en belangrijke account-updates."
+                },
+                "connections": {
+                    "title": "Verbindingen",
+                    "description": "Wordt weergegeven op je profiel voor personalisatie."
+                },
+                "joinServers": {
+                    "title": "Servers deelnemen",
+                    "description": "Wordt gebruikt om toe te treden tot door Xernerx Studios beheerde servers. Voegt je niet toe aan een server zonder jouw invoer!"
+                },
+                "servers": {
+                    "title": "Servers",
+                    "description": "Wordt gebruikt om je dashboardervaring mogelijk te maken."
+                },
+                "memberInfo": {
+                    "title": "Serverlid-informatie",
+                    "description": "Wordt gebruikt voor rollen, bijnamen en serverspecifieke functies."
+                },
+                "footer": "Xernerx verkoopt je gegevens niet. Alle gegevens zijn openbaar via de Discord-API of worden intern gebruikt voor functies."
+            }
+        },
+        "signout": {
+            "title": "Uitloggen",
+            "description": "Weet je zeker dat je wilt uitloggen? Je moet opnieuw authenticeren om toegang te krijgen tot je dashboard.",
+            "confirmButton": "Ja, log me uit",
+            "signingOut": "Uitloggen…",
+            "cancelButton": "Annuleren"
+        },
+        "user": {
+            "createError": "Kan gebruikersprofiel niet initialiseren.",
+            "fetchError": "Kan gebruikersprofielgegevens niet laden.",
+            "networkError": "Netwerkfout bij het verbinden met de gebruikersservice.",
+            "created": "Welkom! Gebruikersprofiel succesvol aangemaakt."
+        },
+        "notifications": {
+            "title": "Meldingen",
+            "description": "Beheer hoe je meldingen en waarschuwingen via verschillende kanalen ontvangt.",
+            "itemDescription": "Configureer waarschuwingen voor {item}.",
+            "categories": {
+                "general": "Algemeen",
+                "virtue": "Virtue",
+                "api": "API & Ontwikkelaar",
+                "billing": "Facturering & Abonnementen",
+                "apps": "Bots & Applicaties",
+                "community": "Community & Roadmap"
+            },
+            "items": {
+                "birthday": "Verjaardag",
+                "levelup": "Niveau Omhoog",
+                "rateLimitWarning": "Limiet Waarschuwing",
+                "tokenCreated": "Token Aangemaakt",
+                "tokenRevoked": "Token Ingetrokken",
+                "downtime": "Service Storing",
+                "invoicePaid": "Factuur Betaald",
+                "subscriptionExpiring": "Abonnement Verloopt",
+                "paymentFailed": "Betaling Mislukt",
+                "botApproved": "Bot Goedgekeurd",
+                "botRejected": "Bot Afgewezen",
+                "roadmapReleased": "Roadmap Mijlpaal Uitgebracht",
+                "issueStatusUpdate": "Bugmelding Statusupdate",
+                "suggestionStatusUpdate": "Suggestie Statusupdate",
+                "applicationReviewed": "Sollicitatie Beoordeeld"
+            },
+            "channels": {
+                "discord": "Discord",
+                "mail": "E-mail",
+                "inApp": "In-App"
+            },
+            "toast": {
+                "success": "Meldingsvoorkeuren bijgewerkt",
+                "error": "Opslaan van wijzigingen mislukt"
+            }
+        },
+        "tokens": {
+            "title": "API-tokens",
+            "description": "Beheer je veilige authenticatiesleutels",
+            "generateButton": "Token genereren",
+            "manageSettings": "Instellingen beheren",
+            "empty": {
+                "title": "Geen tokens gevonden",
+                "description": "Je hebt geen actieve API-tokens. Genereer er een om je services te authenticeren."
+            },
+            "toast": {
+                "loadError": "Fout bij laden van tokens, fout: {error}"
+            },
+            "create": {
+                "modalTitle": "Nieuw token genereren",
+                "nameLabel": "Tokennaam",
+                "namePlaceholder": "bijv. Productie API-toegang",
+                "cancelButton": "Annuleren",
+                "submitButton": "Token aanmaken",
+                "success": "Token succesvol aangemaakt",
+                "errorTitle": "Aanmaken mislukt",
+                "errorDesc": "Kon geen nieuw token genereren. Fout: {error}"
+            },
+            "manage": {
+                "modalTitle": "Token beheren",
+                "revokeTitle": "Token intrekken",
+                "accessKeyLabel": "Toegangssleutel",
+                "securityWarning": "Behandel dit token als een wachtwoord. Stel het niet bloot in client-side code.",
+                "nameLabel": "Tokennaam",
+                "ownersLabel": "Eigenaren (Discord-ID's)",
+                "ownersPlaceholder": "Kommagescheiden ID's",
+                "closeButton": "Sluiten",
+                "saveButton": "Wijzigingen opslaan",
+                "loadError": "Kan token niet laden, fout: {error}",
+                "copySuccess": "Token gekopieerd naar klembord",
+                "updateSuccess": "Token bijgewerkt",
+                "updateError": "Bijwerken mislukt",
+                "deleteConfirm": "Weet je zeker dat je dit token permanent wilt verwijderen?",
+                "deleteSuccess": "Token verwijderd",
+                "deleteError": "Verwijderen mislukt"
+            }
+        },
+        "activity": {
+            "navLabel": "Activiteit & Gegevens",
+            "title": "Mijn Activiteit & Accountgegevens",
+            "description": "Volg al je ingediende sollicitaties, bugrapporten en suggesties, of exporteer je volledige accountgegevens.",
+            "exportData": "Mijn gegevens exporteren (JSON)",
+            "exportSuccess": "Het exporteren van je accountgegevens is gestart",
+            "refresh": "Vernieuwen",
+            "fetchError": "Kan accountactiviteit niet laden",
+            "searchPlaceholder": "Zoek in inzendingen...",
+            "emptyTitle": "Nog geen inzendingen",
+            "emptyDescription": "Alle sollicitaties, bugrapporten of suggesties die je indient bij Xernerx verschijnen hier.",
+            "tabs": {
+                "all": "Alles",
+                "applications": "Sollicitaties",
+                "issues": "Bugrapporten",
+                "suggestions": "Suggesties"
+            }
+        },
+        "connections": {
+            "title": "Koppelingen",
+            "description": "Koppel externe accounts via OAuth om je profielen binnen het Xernerx-ecosysteem te verifiëren.",
+            "connected": "Gekoppeld",
+            "primaryIdentity": "Vereiste Login",
+            "availableTitle": "OAuth Koppelingen",
+            "availableDesc": "Optionele geverifieerde externe accounts. Deze kunnen niet worden gebruikt om in te loggen — Discord blijft je vereiste inlogidentiteit.",
+            "verifiedBadge": "Geverifieerd",
+            "notConnected": "Niet gekoppeld",
+            "connectButton": "Koppelen",
+            "disconnect": "Ontkoppelen",
+            "showOnProfile": "Toon op openbaar profiel",
+            "oauthSuccess": "{provider}-account succesvol gekoppeld!",
+            "oauthNotConfigured": "{provider} OAuth-inloggegevens zijn nog niet geconfigureerd.",
+            "oauthError": "Kon de OAuth-koppeling niet voltooien.",
+            "disconnectSuccess": "Koppeling verwijderd.",
+            "disconnectError": "Kon koppeling niet verwijderen.",
+            "saveError": "Kon koppelingsinstellingen niet bijwerken."
+        },
+        "devices": {
+            "title": "Actieve Apparaten & Sessies",
+            "description": "Bekijk recente browsers en apparaten die toegang hebben gehad tot je Xernerx-account.",
+            "currentSession": "Huidige Sessie",
+            "revokeOthers": "Andere Sessies Intrekken",
+            "revokeSuccess": "Andere apparaatsessies zijn ingetrokken."
+        },
+        "billing": {
+            "credits": {
+                "unit": "Credits",
+                "streakDays": "{count} Dagen Reeks",
+                "description": "Claim je dagelijkse creditcadeau om je reeks op te bouwen en tot +200 bonuscredits per dag te verdienen.",
+                "claimButton": "Claim Dagelijkse Beloning",
+                "nextClaimIn": "Volgende Beloning over {hours}u",
+                "claimSuccess": "+{amount} credits geclaimd! ({streak} dagen reeks)",
+                "claimError": "Kon dagelijkse beloning niet claimen"
+            }
+        }
+    },
+    "www": {
+        "hero": {
+            "title": "Empowering Developers. Connecting Communities.",
+            "description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
+        },
+        "about": {
+            "title": "Over Xernerx",
+            "description": "Opgericht in 2024, is Xernerx geëvolueerd van een gericht ontwikkelingsinitiatief tot een gestructureerd ecosysteem van automatiseringstools en infrastructuurframeworks. Elk systeem is gebouwd met schaalbaarheid, onderhoudbaarheid en architectonische helderheid als uitgangspunten."
+        },
+        "sections": {
+            "services": {
+                "title": "Diensten"
+            },
+            "packages": {
+                "title": "Pakketten"
+            },
+            "applications": {
+                "title": "Applicaties"
+            }
+        },
+        "services": {
+            "dashboard": {
+                "title": "Dashboard",
+                "desc": "Beheer applicaties, configureer implementaties en monitor systeemprestaties."
+            }
+        },
+        "packages": {
+            "framework": {
+                "title": "Xernerx Framework",
+                "desc": "Een modulair fundament voor schaalbare Discord-applicaties."
+            },
+            "stats": {
+                "title": "Xernerx Stats",
+                "desc": "Analytische hulpmiddelen voor het meten van prestaties."
+            }
+        },
+        "applications": {
+            "todo": {
+                "title": "Takenlijst-bot",
+                "desc": "Gestructureerde productiviteitstools."
+            },
+            "zodiac": {
+                "title": "Zodiac",
+                "desc": "Op astrologie gebaseerde interactietools."
+            },
+            "metamorphosis": {
+                "title": "Metamorphosis",
+                "desc": "Geavanceerde hulpmiddelen voor rolomzetting."
+            }
+        },
+        "history": {
+            "title": "Onze geschiedenis",
+            "description": "Een gestructureerde voortgang van experimentatie naar stabiele infrastructuurtechniek."
+        },
+        "privacy": {
+            "toc": "Inhoud",
+            "header": {
+                "title": "Privacybeleid",
+                "effectiveDate": "Ingangsdatum:"
+            },
+            "sections": {
+                "introduction": {
+                    "title": "1. Inleiding",
+                    "content": "Dit privacybeleid legt uit hoe Xernerx Studios (\"wij\", \"ons\", \"onze\") je persoonsgegevens verzamelt, gebruikt en beschermt wanneer je onze websites, dashboards, Discord-bots, API's, CDN en desktopapplicaties gebruikt."
+                },
+                "dataCollected": {
+                    "title": "2. Informatie die we verzamelen",
+                    "account": {
+                        "title": "Account- & apparaatsessie-informatie:",
+                        "desc": "Wanneer je inlogt via Discord OAuth2 of via onze QR-code / 6-cijferige koppelcode voor apparaten, verzamelen we je Discord-ID, gebruikersnaam, avatar, e-mailadres, aangepaste profielinstellingen (weergavenaam, bio, voornaamwoorden, banner) en metadata van recente apparaatsessies (browser, besturingssysteem, apparaattype en laatst actieve tijdstempel voor maximaal 10 apparaten) zodat je actieve sessies kunt beheren."
+                    },
+                    "connections": {
+                        "title": "Gekoppelde accounts van derden:",
+                        "desc": "Als je optioneel externe accounts koppelt (zoals GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam of Reddit) in je Accountinstellingen, slaan we de openbare account-ID, gebruikersnaam, weergavenaam, avatar-URL, profiel-URL en je zichtbaarheidsvoorkeur (\"Toon op openbaar profiel\") op. OAuth-toegangstokens worden direct na verificatie verwijderd."
+                    },
+                    "developers": {
+                        "title": "Voor API- & bot-ontwikkelaars:",
+                        "desc": "Scoped Bearer API-tokens, webhook-URL's, applicatie- en organisatiemetadata, realtime WebSocket-gatewaytelemetrie en configuratie-instellingen die worden gebruikt om je integraties op onze infrastructuur te laten draaien."
+                    },
+                    "botUsers": {
+                        "title": "Voor eindgebruikers van bots & community's:",
+                        "desc": "Wanneer je interactie hebt met een door Xernerx aangedreven bot (zoals Virtue, Zodiac, Metamorphosis of Takenlijst-bot), verwerken we je Discord-ID, server-ID's, commando-invoer en optionele betrokkenheidsstatistieken (zoals tekst- en spraak-XP/levels). We slaan geen onbewerkte berichtlogboeken op, tenzij dit expliciet vereist is voor een ingeschakelde serverfunctie."
+                    },
+                    "cdnAndContent": {
+                        "title": "CDN-media & community-inzendingen:",
+                        "desc": "Bestanden en afbeeldingen die worden geüpload naar cdn.xernerx.com of worden bijgevoegd bij bugrapporten en suggesties, worden opgeslagen in afgeschermde cloudopslag en uitgeleverd volgens jouw gekozen zichtbaarheidsinstelling (openbaar, beperkt tot specifieke gebruikers, of privé)."
+                    },
+                    "desktop": {
+                        "title": "Xernerx Desktop Client:",
+                        "desc": "Bij gebruik van de Xernerx Desktop App worden vensterstatus, updatekanaalvoorkeuren (Stable/Canary), sneltoetsen en geïsoleerde multi-accountsessies lokaal op je apparaat opgeslagen. Indien ingeschakeld communiceert de app lokaal met je Discord-client voor Rich Presence (RPC) en worden diagnostische logboeken alleen lokaal weggeschreven wanneer Debug Logging is ingeschakeld."
+                    },
+                    "usage": {
+                        "title": "Gebruiks- & diagnostische gegevens:",
+                        "desc": "Foutlogboeken, beveiligingsaudittrails en systeeminteracties om de platformstabiliteit te waarborgen, rate-limits te handhaven en misbruik te voorkomen."
+                    },
+                    "integration": {
+                        "title": "Facturerings-, winkel- & beloningsgegevens:",
+                        "desc": "Abonnementsstatus, factuurgeschiedenis en regionale afrekendetails die veilig worden verwerkt via Stripe (wij slaan nooit volledige betaalkaartnummers op), evenals saldi van virtuele credits en tijdstempels van dagelijkse cadeaureeksen."
+                    }
+                },
+                "apiData": {
+                    "title": "3. API-gegevensverzameling & verplichtingen voor ontwikkelaars",
+                    "content": "Wanneer ontwikkelaars onze REST API (/v1/* en /secure/*), insluitbare openbare widgets of realtime WebSocket-gateway gebruiken om botstatistieken te synchroniseren of metadata op te halen, slaan we deze gegevens op om openbare pagina's en analyses weer te geven. Het is ontwikkelaars ten strengste verboden om ongevraagde persoonlijk identificeerbare informatie (PII) van hun eindgebruikers naar onze API te verzenden. Wij verkopen of delen geen API-gegevens met externe adverteerders."
+                },
+                "legalBasis": {
+                    "title": "4. Juridische grondslag voor verwerking",
+                    "content": "Wij verwerken persoonsgegevens op basis van contractuele noodzakelijkheid (om de door jou gevraagde diensten en abonnementen te leveren), gerechtvaardigde belangen (beveiliging, fraudepreventie en serviceverbetering), naleving van wettelijke verplichtingen of je uitdrukkelijke toestemming waar van toepassing."
+                },
+                "usage": {
+                    "title": "5. Hoe we informatie gebruiken",
+                    "items": [
+                        "Om je account aan te bieden, te authenticeren en te synchroniseren tussen alle Xernerx-webapplicaties, bots en desktopclients.",
+                        "Om winkelabonnementen te verwerken, virtuele credits toe te kennen, CDN-opslagquota te handhaven en de betrouwbaarheid van het platform te verbeteren.",
+                        "Om ondersteuning te bieden, platformupdates te communiceren en belangrijke servicegerelateerde e-mails te sturen (zoals facturen, beveiligingsmeldingen en organisatie-uitnodigingen). Je kunt je meldingsvoorkeuren op elk moment aanpassen.",
+                        "Om misbruik te detecteren, onze Servicevoorwaarden te handhaven en te voldoen aan wettelijke verplichtingen."
+                    ]
+                },
+                "sharing": {
+                    "title": "6. Gegevens delen",
+                    "items": [
+                        "Cloudhosting-, database- en afgeschermde blob-opslagproviders.",
+                        "Betalingsverwerkers (Stripe) voor abonnementsafhandeling, Adaptive Pricing-lokalisatie en factuurbeheer.",
+                        "Geautoriseerde integraties van derden en gekoppelde accounts die je zelf expliciet koppelt of inschakelt als openbare profielwidgets.",
+                        "Wetshandhavings- of toezichthoudende instanties wanneer dit wettelijk verplicht is."
+                    ]
+                },
+                "retention": {
+                    "title": "7. Bewaartermijn van gegevens",
+                    "content": "Wij bewaren persoonsgegevens niet langer dan noodzakelijk is om onze diensten te leveren en de doeleinden in dit beleid te vervullen, tenzij een langere bewaartermijn wettelijk verplicht is (zoals fiscale administratie). Tijdelijke QR-/koppelcode-inlogtickets verlopen automatisch na 3 minuten."
+                },
+                "security": {
+                    "title": "8. Gegevensbeveiliging",
+                    "content": "We implementeren robuuste technische en organisatorische beveiligingsmaatregelen, waaronder AES-256-GCM-versleuteling voor apparaatkoppelingstokens, HTTP-only sessiecookies, scoped Bearer-tokens en strikte rolgebaseerde toegangscontrole. Geen enkele internetverbinding of opslagsysteem is echter 100% veilig."
+                },
+                "rights": {
+                    "title": "9. Jouw rechten (AVG / GDPR & CCPA)",
+                    "items": [
+                        "Recht op inzage en gegevensoverdraagbaarheid (op elk moment beschikbaar via de zelfbedieningsfunctie \"Mijn gegevens exporteren (JSON)\" in Account -> Activiteit).",
+                        "Recht op rectificatie, profielreset of permanente accountverwijdering (direct beschikbaar via Account -> Instellingen).",
+                        "Recht om bepaalde gegevensverwerkingen te beperken of er bezwaar tegen te maken, en om gekoppelde accounts van derden op elk moment te ontkoppelen.",
+                        "Recht om je toestemming voor niet-essentiële cookies en marketingcommunicatie op elk moment in te trekken."
+                    ],
+                    "content": "Onder gegevensbeschermingswetgeving zoals de AVG (GDPR) en CCPA heb je uitgebreide rechten met betrekking tot je persoonsgegevens. Je kunt de meeste van deze rechten direct uitoefenen via je Accountdashboard of door contact op te nemen met ons juridische team."
+                },
+                "cookies": {
+                    "title": "10. Cookies & Tracking",
+                    "content": "We gebruiken cookies en lokale opslag om je sessie veilig te houden op alle *.xernerx.com-subdomeinen, je thema- en werkruimtevoorkeuren te onthouden en de prestaties van de site te meten. Diensten van derden zoals Google AdSense kunnen met jouw toestemming ook cookies gebruiken om relevante advertenties weer te geven. Voor een volledig overzicht van alle cookies die we plaatsen en hoe je je voorkeuren beheert, lees ons ",
+                    "linkText": "Cookiebeleid",
+                    "contentSuffix": "."
+                },
+                "international": {
+                    "title": "11. Internationale overdrachten",
+                    "content": "Als persoonsgegevens worden overgedragen buiten je jurisdictie (waaronder buiten de Europese Economische Ruimte), implementeren we passende juridische en technische waarborgen om ervoor te zorgen dat je gegevens beschermd blijven."
+                },
+                "childrensPrivacy": {
+                    "title": "12. Privacy van kinderen",
+                    "content": "Onze diensten zijn niet gericht op kinderen jonger dan 13 jaar (of de wettelijke minimumleeftijd voor digitale toestemming in jouw land). Wij verzamelen niet bewust persoonsgegevens van kinderen. Als je vermoedt dat een kind persoonsgegevens aan ons heeft verstrekt, neem dan contact met ons op zodat wij deze direct kunnen verwijderen."
+                },
+                "changes": {
+                    "title": "13. Wijzigingen in dit beleid",
+                    "content": "We kunnen dit privacybeleid periodiek bijwerken. Bij materiële wijzigingen werken we de versiedatum bij en vragen we ingelogde gebruikers om het herziene beleid te bekijken en te accepteren."
+                },
+                "contact": {
+                    "title": "14. Contact",
+                    "prefix": "Voor privacygerelateerde vragen of gegevensverzoeken kun je contact opnemen met"
+                }
+            },
+            "description": "legal@xernerx.com"
+        },
+        "terms": {
+            "toc": "Inhoud",
+            "header": {
+                "title": "Servicevoorwaarden",
+                "effectiveDate": "Ingangsdatum:"
+            },
+            "sections": {
+                "introduction": {
+                    "title": "1. Inleiding",
+                    "content": "Deze Servicevoorwaarden (\"Voorwaarden\") regelen je toegang tot en gebruik van alle websites, dashboards, Discord-bots, softwarepakketten, API's, CDN-diensten en desktopclients aangeboden door Xernerx Studios (\"wij\", \"ons\" of \"onze\"). Door toegang te krijgen tot of gebruik te maken van onze diensten, ga je ermee akkoord juridisch gebonden te zijn aan deze Voorwaarden."
+                },
+                "eligibility": {
+                    "title": "2. Geschiktheid",
+                    "content": "Je moet ten minste 13 jaar oud zijn (of de minimumleeftijd voor digitale toestemming in jouw jurisdictie hebben bereikt) om onze diensten te gebruiken. Door onze diensten te gebruiken, verklaar je dat je aan deze vereiste voldoet en handelt in overeenstemming met de Servicevoorwaarden van Discord."
+                },
+                "acceptableUse": {
+                    "title": "3. Acceptabel gebruik",
+                    "items": [
+                        "Deelnemen aan onwettige, frauduleuze, lasterlijke of misbruikmakende activiteiten, of illegale inhoud uploaden naar ons CDN of onze communityportalen.",
+                        "Proberen toegang te krijgen tot accounts, afgeschermde CDN-bestanden, API-endpoints of beheertools zonder expliciete toestemming.",
+                        "Platform-ratelimits, WebSocket-gateways of beveiligingsmechanismen verstoren, overbelasten of omzeilen.",
+                        "Kwetsbaarheden in een Xernerx-dienst, bot of clientapplicatie reverse-engineeren, scrapen of exploiteren."
+                    ]
+                },
+                "apiUsage": {
+                    "title": "4. Voorwaarden voor API, Widgets & WebSocket Gateway",
+                    "content": "Ontwikkelaars die gebruikmaken van onze REST API (/v1/* en /secure/*), insluitbare openbare widgets of realtime WebSocket RPC-gateway moeten zich aan de volgende regels houden:",
+                    "items": [
+                        "Respecteer alle ratelimits en planquota; spam, scrape of misbruik geen API-endpoints of WebSocket-verbindingen.",
+                        "Je bent zelf volledig verantwoordelijk voor het veilig houden van je Bearer API-tokens; wij zijn niet aansprakelijk voor ongeautoriseerde acties door gelekte sleutels.",
+                        "Telemetrie, commandoregisters en statistieken die naar het platform worden gestuurd, moeten nauwkeurig zijn en mogen nooit kunstmatig worden opgeblazen.",
+                        "Wij behouden ons het recht voor om API-tokens onmiddellijk in te trekken, openbare widgets uit te schakelen of applicaties op te schorten die de stabiliteit van het platform aantasten of deze Voorwaarden schenden."
+                    ]
+                },
+                "botUsage": {
+                    "title": "5. Voorwaarden voor eindgebruikers van bots",
+                    "content": "Gebruikers die interactie hebben met door Xernerx aangedreven Discord-bots (waaronder Virtue, Metamorphosis, Zodiac en Takenlijst-bot) gaan ermee akkoord commando-invoer niet te misbruiken, geen geautomatiseerde spamverzoeken uit te voeren en andere communityleden niet lastig te vallen. Servereigenaren en beheerders zijn verantwoordelijk voor het configureren van botmodules in overeenstemming met zowel deze Voorwaarden als de Servicevoorwaarden van Discord."
+                },
+                "accounts": {
+                    "title": "6. Gebruikersaccounts, QR-inloggen & gekoppelde accounts",
+                    "content": "Je logt in via Discord OAuth2 of via ons versleutelde QR-code / 6-cijferige koppelcode-systeem. Keur nooit een QR-code goed en voer nooit een koppelcode in die je niet zelf hebt gestart. Je kunt optioneel ook accounts van derden koppelen (zoals GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam of Reddit) om op je openbare profiel te tonen. Je bent verantwoordelijk voor alle activiteiten onder je account en kunt actieve apparaatsessies of gekoppelde accounts op elk moment intrekken in je Accountinstellingen."
+                },
+                "storeAndBilling": {
+                    "title": "7. Winkel, abonnementen & virtuele credits",
+                    "content": "Betaalde abonnementen (waaronder de Xernerx Ultra-bundel, individuele Bot Passes, Server Infrastructure Passes en Developer API Pro) en add-ons worden vooraf gefactureerd op een terugkerende maandelijkse of jaarlijkse cyclus via Stripe, waarbij lokale valuta kunnen worden weergegeven via Stripe Adaptive Pricing:",
+                    "items": [
+                        "Je kunt een doorlopend abonnement op elk moment opzeggen via het Factureringsportaal; je abonnementsvoordelen blijven actief tot het einde van de reeds betaalde factureringsperiode.",
+                        "Virtuele Credits, dagelijkse verrassingscadeaus en inlogreeks-beloningen zijn niet-monetaire digitale platformfuncties zonder echte geldwaarde. Ze kunnen niet worden ingewisseld voor contant geld, niet worden overgedragen tussen gebruikers en niet worden gerestitueerd buiten dwingende wettelijke consumentenrechten.",
+                        "Als een abonnement wordt gedowngraded of verloopt, vallen functies en CDN-opslagquota terug naar de standaardlimieten; bestaande bestanden worden niet zonder kennisgeving direct verwijderd, maar nieuwe uploads kunnen worden beperkt zolang je boven je actieve quotum zit."
+                    ]
+                },
+                "desktopClient": {
+                    "title": "8. Xernerx Desktop Client",
+                    "content": "Wij verlenen je een beperkte, niet-exclusieve, herroepbare licentie om de Xernerx Desktop-applicatie te downloaden en te gebruiken voor persoonlijk gebruik of intern communitybeheer. De Desktop-client kan automatisch updates downloaden en installeren (via Stable- of Canary-releasekanalen), optionele globale sneltoetsen registreren, een zwevende mini-overlay weergeven, geïsoleerde multi-accountsessies beheren en lokaal communiceren met Discord voor Rich Presence."
+                },
+                "data": {
+                    "title": "9. Gebruikersgegevens & cookies",
+                    "contentPrefix": "Door onze diensten te gebruiken, ga je akkoord met onze gegevensverwerkings- en cookiepraktijken zoals beschreven in ons ",
+                    "contentLink": "Privacybeleid",
+                    "contentMiddle": " en ",
+                    "cookiesLink": "Cookiebeleid",
+                    "contentSuffix": ". Je kunt je accountgegevens op elk moment exporteren of je account verwijderen via je Accountdashboard."
+                },
+                "availability": {
+                    "title": "10. Beschikbaarheid van de service",
+                    "content": "We streven naar een hoge beschikbaarheid in onze hele suite, maar garanderen geen ononderbroken of foutloze werking. Functies, botmodules, API's of experimentele Canary-builds kunnen op elk moment worden gewijzigd, opgeschort of stopgezet."
+                },
+                "thirdParty": {
+                    "title": "11. Diensten van derden",
+                    "content": "Ons ecosysteem integreert met externe platforms waaronder Discord, Stripe, Google (voor vertaal- en advertentiediensten) en optionele providers van gekoppelde accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam en Reddit). Wij zijn niet verantwoordelijk voor de beschikbaarheid, het beleid of de onafhankelijke praktijken van diensten van derden."
+                },
+                "intellectualProperty": {
+                    "title": "12. Intellectueel eigendom & gebruikersinhoud",
+                    "content": "Alle Xernerx-software, broncode (met uitzondering van open-source pakketten die onder hun respectievelijke repositorylicenties vallen), branding en visuele materialen blijven het exclusieve eigendom van Xernerx Studios. Je behoudt het eigendom van media en inhoud die je uploadt naar cdn.xernerx.com of indient op ons platform, en verleent Xernerx Studios een wereldwijde, niet-exclusieve, royaltyvrije licentie om die inhoud te hosten, cachen en leveren, uitsluitend volgens de door jou ingestelde zichtbaarheidsrechten (openbaar, beperkt of privé)."
+                },
+                "warranty": {
+                    "title": "13. Disclaimer van garanties",
+                    "content": "Diensten worden geleverd \"zoals ze zijn\" (\"as is\") en \"zoals beschikbaar\" zonder enige vorm van garantie, expliciet, impliciet of wettelijk, inclusief impliciete garanties van verkoopbaarheid, geschiktheid voor een bepaald doel of niet-inbreuk."
+                },
+                "liability": {
+                    "title": "14. Beperking van aansprakelijkheid",
+                    "content": "Voor zover maximaal toegestaan door de toepasselijke wetgeving, is Xernerx Studios niet aansprakelijk voor enige indirecte, incidentele, bijzondere, gevolg- of strafschade, of enig verlies van gegevens, inkomsten of winst voortvloeiend uit je gebruik van onze diensten."
+                },
+                "indemnification": {
+                    "title": "15. Vrijwaring",
+                    "content": "Je gaat ermee akkoord Xernerx Studios en haar teamleden te vrijwaren en schadeloos te stellen voor claims, schade of aansprakelijkheden die voortvloeien uit je misbruik van onze diensten, je geüploade inhoud, je ontwikkelaarsapplicaties of je schending van deze Voorwaarden."
+                },
+                "governingLaw": {
+                    "title": "16. Toepasselijk recht",
+                    "content": "Deze Voorwaarden worden beheerst door en geïnterpreteerd in overeenstemming met de toepasselijke wetgeving, met inachtneming van dwingende consumentenbeschermingswetten in het land waar je woont."
+                },
+                "changes": {
+                    "title": "17. Wijzigingen in de voorwaarden",
+                    "content": "We kunnen deze Voorwaarden van tijd tot tijd bijwerken. Wanneer materiële updates worden gepubliceerd, werken we de ingangsdatum bij en vragen we ingelogde gebruikers om de herziene Voorwaarden te bekijken en te accepteren voordat ze het platform verder gebruiken."
+                },
+                "contact": {
+                    "title": "18. Contact",
+                    "prefix": "Voor juridische vragen kun je contact opnemen met"
+                }
+            },
+            "description": "legal@xernerx.com"
+        },
+        "cookies": {
+            "toc": "Inhoud",
+            "header": {
+                "title": "Cookiebeleid",
+                "effectiveDate": "Ingangsdatum:"
+            },
+            "sections": {
+                "introduction": {
+                    "title": "1. Inleiding",
+                    "content": "Dit Cookiebeleid legt uit hoe Xernerx Studios (\"wij\", \"ons\" of \"onze\") cookies, lokale opslag, sessiepartities en vergelijkbare technologieën gebruikt wanneer je onze websites, dashboards, API's en desktopapplicaties bezoekt of gebruikt."
+                },
+                "whatAreCookies": {
+                    "title": "2. Wat zijn cookies?",
+                    "content": "Cookies zijn kleine tekstbestanden die door je webbrowser op je apparaat worden opgeslagen wanneer je een website bezoekt. Ze stellen het platform in staat je apparaat te herkennen, je ingelogde sessie naadloos te behouden op alle Xernerx-subdomeinen (*.xernerx.com) en je aangepaste interfacevoorkeuren te onthouden."
+                },
+                "categories": {
+                    "title": "3. Categorieën cookies die we gebruiken",
+                    "essential": {
+                        "title": "Essentiële cookies:",
+                        "desc": "Strikt noodzakelijk voor de kernwerking en beveiliging van onze diensten. Dit omvat Discord OAuth2-authenticatiesessies, CSRF-bescherming, statusverificatie bij het koppelen van extra accounts en je opgeslagen cookietoestemming. Omdat het platform zonder deze cookies niet veilig kan functioneren, kunnen ze niet worden uitgeschakeld."
+                    },
+                    "functional": {
+                        "title": "Functionele cookies:",
+                        "desc": "Worden gebruikt om je persoonlijke voorkeuren op alle subdomeinen te onthouden, waaronder je geselecteerde taal, interfacethema (donker, licht of systeem), accentkleur, lay-outdichtheid, UI-zoom, tekstschaal en werkruimte-instellingen."
+                    },
+                    "analytics": {
+                        "title": "Analytische cookies:",
+                        "desc": "Helpen ons te begrijpen hoe bezoekers onze websites gebruiken, de prestaties van het platform te monitoren en technische fouten op te sporen zodat we de betrouwbaarheid kunnen verbeteren."
+                    },
+                    "marketing": {
+                        "title": "Marketing- & advertentiecookies:",
+                        "desc": "Worden gebruikt door advertentiepartners van derden (zoals Google AdSense) om relevante advertenties te tonen en de effectiviteit van campagnes te meten."
+                    }
+                },
+                "cookiesUsed": {
+                    "title": "4. Specifieke cookies die we plaatsen",
+                    "content": "Binnen het Xernerx-ecosysteem (.xernerx.com) plaatsen en lezen we de volgende first-party cookies:",
+                    "auth": {
+                        "title": "Authenticatie & OAuth-status (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state, __xernerx_conn_oauth):",
+                        "desc": "Essentiële HTTP-only beveiligde cookies beheerd door NextAuth om je sessie over subdomeinen te authenticeren, cross-site request forgery te voorkomen en kortstondige (10 minuten) PKCE/OAuth-status te verifiëren bij het koppelen van accounts van derden op account.xernerx.com."
+                    },
+                    "consent": {
+                        "title": "Cookietoestemming (xernerx-cookie-consent):",
+                        "desc": "Een essentiële cookie die je gekozen cookiecategorieën (essential, functional, analytics, marketing) en een agreedAt-tijdstempel tot 1 jaar bewaart. Als we een materiële update van dit Cookiebeleid publiceren, wordt de agreedAt-tijdstempel vergeleken met de nieuwste beleidsversie zodat we je opnieuw om toestemming kunnen vragen."
+                    },
+                    "locale": {
+                        "title": "Taalinstelling (NEXT_LOCALE):",
+                        "desc": "Een functionele cookie die je gekozen interfacetaal op alle Xernerx-subdomeinen tot 1 jaar onthoudt."
+                    },
+                    "appearance": {
+                        "title": "Interface-, weergave- & werkruimtevoorkeuren (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord, pref_*):",
+                        "desc": "Functionele cookies (waaronder pref_showHeaderStore, pref_showHeaderCommandPalette, pref_showHeaderNotifications, pref_showHeaderDownload, pref_showHeaderAppDrawer, pref_showShortcutHints, pref_showDiscordCollectibles, pref_showGiftBadge, pref_reducedMotion, pref_defaultSidebarCollapsed en pref_developerMode) die je visuele en werkruimte-aanpassingen bewaren zodat de server je lay-out direct zonder flikkering kan renderen."
+                    }
+                },
+                "localStorage": {
+                    "title": "5. Lokale opslag & Desktop Client-opslag",
+                    "content": "Naast browsercookies gebruiken we localStorage van de browser (waaronder theme, accent, uiZoom, uiGap, textScale, pref_* en xernerx_sidebar_view_*-sleutels) om niet-gevoelige interfacestatus lokaal te cachen voor direct opstarten. In de Xernerx Desktop App (Electron) wordt lokale configuratie opgeslagen in metadata.json en gebruikt elk accountslot een geïsoleerde Chromium-sessiepartitie (persist:xernerx en persist:xernerx-<slot>) zodat je veilig tussen meerdere accounts kunt schakelen."
+                },
+                "thirdParty": {
+                    "title": "6. Cookies van derden",
+                    "content": "Sommige functies integreren met diensten van derden, waaronder Discord (voor primaire authenticatie), Stripe (voor veilig afrekenen, factureringsportalen en fraudepreventie), Google AdSense (voor het weergeven van advertenties na toestemming) en optionele providers van gekoppelde accounts (GitHub, Twitch, Google/YouTube, X/Twitter, Spotify, Steam en Reddit) wanneer je een accountkoppeling start. Deze derden kunnen hun eigen cookies plaatsen volgens hun eigen privacybeleid."
+                },
+                "managing": {
+                    "title": "7. Je voorkeuren beheren",
+                    "content": "Je kunt je cookievoorkeuren op elk moment bekijken of bijwerken door onderaan de website in de voettekst op \"Cookievoorkeuren\" te klikken. Je kunt ook je webbrowser zo instellen dat cookies worden geblokkeerd of verwijderd, al zorgt het blokkeren van essentiële cookies ervoor dat je niet kunt inloggen of beveiligde functies kunt gebruiken."
+                },
+                "changes": {
+                    "title": "8. Wijzigingen in dit beleid",
+                    "content": "We kunnen dit Cookiebeleid van tijd tot tijd bijwerken om wijzigingen in onze technologie, infrastructuur of wettelijke vereisten weer te geven. Bij een update verhogen we de versiedatum van het beleid zodat bezoekers worden gevraagd hun cookievoorkeuren te controleren."
+                },
+                "contact": {
+                    "title": "9. Contact",
+                    "prefix": "Voor vragen over ons gebruik van cookies kun je contact opnemen met"
+                }
+            },
+            "description": "legal@xernerx.com"
+        },
+        "changelog": {
+            "rssFeed": "RSS-feed"
+        }
+    },
+    "admin": {
+        "roles": {
+            "title": "Rollen Beheer",
+            "serverId": "Server ID",
+            "members": "Leden",
+            "newRoleButton": "Nieuwe Rol",
+            "searchPlaceholder": "Zoek op rol naam, UUID of Discord ID",
+            "noRolesFound": "Geen rol gevonden met jouw zoekopdracht.",
+            "unnamedRole": "Naamloze Rol",
+            "unlinked": "Geen Link",
+            "synced": "Gesynchroniseerd",
+            "uuid": "UUID:",
+            "noneUnlinked": "Geen (Geen link)",
+            "manageConfig": "Beheer Rol Configuratie",
+            "roleNameLabel": "Rol Naam",
+            "roleNamePlaceholder": "b.v. Administrator",
+            "linkDiscordRoleLabel": "Link Discord Rol",
+            "selectDiscordRolePlaceholder": "Selecteer Discord Rol",
+            "syncNameWithDiscord": "Synchroniseer naam met Discord",
+            "permissionsHeader": "Rechten",
+            "deleteRole": "Rol Verwijderen",
+            "saveChanges": "Aanpassingen Opslaan",
+            "saving": "Opslaan...",
+            "confirmDelete": "Verwijder",
+            "cancel": "Annuleer",
+            "createModalTitle": "Nieuwe Rol Maken",
+            "createButton": "Rol Maken",
+            "creating": "Maken...",
+            "errorPrefix": "Error:",
+            "card": {
+                "idPrefix": "Id: {id}"
+            }
+        },
+        "dashboard": {
+            "overview": {
+                "title": "Suite Overzicht & SEO",
+                "subtitle": "Monitor live versies, latentie, probleemstatus en Seobility SEO-scores over alle 9 Xernerx Suite subdomeinen.",
+                "refresh": "Statistieken Vernieuwen",
+                "refreshing": "Vernieuwen...",
+                "envProduction": "Productie URL's",
+                "envCanary": "Canary URL's",
+                "cards": {
+                    "services": "Suite Services",
+                    "synced": "{count} gesynchroniseerd • {ahead} canary voorop",
+                    "openIssues": "Openstaande Problemen",
+                    "pendingReview": "{count} wachtend op verificatie",
+                    "resolvedIssues": "Opgeloste Problemen",
+                    "avgResolution": "Gem. Oplostijd",
+                    "hours": "{count}u"
+                },
+                "seoSectionTitle": "Subdomein SEO-scores & Live Telemetrie",
+                "seoSectionSubtitle": "Klik op een Seobility-badge om een volledige on-page SEO-controle uit te voeren of te bekijken.",
+                "prodVersion": "Prod",
+                "canaryVersion": "Canary",
+                "devVersion": "Dev",
+                "localVersion": "Lokaal",
+                "syncedBadge": "Gesynchroniseerd",
+                "canaryAheadBadge": "Canary Voorop",
+                "seobilityCheck": "Seobility",
+                "lighthouseCheck": "Lighthouse",
+                "lighthouseScan": "Lighthouse Starten",
+                "lighthouseScanning": "Controleren...",
+                "lighthouseRescan": "Chrome Lighthouse audit opnieuw uitvoeren",
+                "lighthouseCategories": {
+                    "seo": "SEO",
+                    "perf": "Perf",
+                    "a11y": "A11y",
+                    "bp": "Best"
+                },
+                "ping": "{ms} ms",
+                "pinging": "Pingen...",
+                "pingOffline": "Offline",
+                "repingTooltip": "Klik om de laadtijd te pingen",
+                "openSite": "Site Openen",
+                "auditAllProd": "Audit Prod",
+                "auditAllCanary": "Audit Canary",
+                "auditingProgress": "Controleren ({current}/{total})...",
+                "filterAll": "Alle ({count})",
+                "filterSynced": "Gesynchroniseerd ({count})",
+                "filterCanaryAhead": "Canary Voorop ({count})",
+                "envAll": "Alle Omg.",
+                "envProdOnly": "Alleen Prod",
+                "envCanaryOnly": "Alleen Canary",
+                "envDevOnly": "Alleen Dev",
+                "serviceGateway": "Service Gateway",
+                "gatewayOnline": "Gateway Online",
+                "gatewayOffline": "Gateway Onbereikbaar",
+                "gatewayDesc": "Backend-service zonder HTML (SEO-widgets overgeslagen)",
+                "viewChangelogTooltip": "Klik om wijzigingsregister te bekijken",
+                "changelogTitle": "{name} ({env}) Wijzigingsregister",
+                "changelogLoading": "Wijzigingsregister laden...",
+                "changelogEmpty": "Geen wijzigingsregister gevonden voor deze omgeving.",
+                "declareIncident": "Incident melden",
+                "incidentModalTitle": "Globale statusmelding uitzenden",
+                "incidentModalDesc": "Verstuurt direct een statusmelding over alle Xernerx-subdomeinen gekoppeld aan info.xernerx.com/status.",
+                "incidentSeverity": "Ernst van melding",
+                "incidentTitleLabel": "Titel van melding",
+                "incidentMessageLabel": "Statusbericht",
+                "incidentBroadcastSuccess": "Globale statusmelding verzonden",
+                "broadcastAlert": "Melding uitzenden"
+            },
+            "issues": {
+                "title": "Problemen",
+                "logBug": "Probleem Vastleggen",
+                "status": "Status",
+                "resolved": "Opgelost",
+                "verified": "Geverifieerd",
+                "pending": "In Afwachting",
+                "modalTitle": "Nieuw Probleem Vastleggen",
+                "titlePlaceholder": "Titel",
+                "descPlaceholder": "Beschrijving",
+                "productPlaceholder": "Selecteer Product",
+                "save": "Opslaan",
+                "cancel": "Annuleren",
+                "submitted": "Ingediend",
+                "verify": "Verifieer"
+            },
+            "roadmap": {
+                "title": "Roadmap Beheer",
+                "addItem": "Item Toevoegen",
+                "modalTitle": "Roadmap Item Toevoegen",
+                "titlePlaceholder": "Titel",
+                "descPlaceholder": "Beschrijving",
+                "productPlaceholder": "Selecteer Product",
+                "quarterPlaceholder": "Doelkwartaal (bijv. Q1 2026)",
+                "statusPlaceholder": "Selecteer Status",
+                "changelogPlaceholder": "Changelog URL (Optioneel)",
+                "save": "Opslaan",
+                "cancel": "Annuleren"
+            },
+            "suggestions": {
+                "title": "Community Suggesties",
+                "status": "Status",
+                "open": "Open",
+                "approved": "Goedgekeurd",
+                "rejected": "Afgewezen",
+                "implemented": "Geïmplementeerd",
+                "moveToRoadmap": "Naar Roadmap Verplaatsen",
+                "votes": "Stemmen"
+            },
+            "nav": {
+                "auditLogs": "Auditlogs"
+            },
+            "audit": {
+                "title": "Auditlogs",
+                "description": "Onveranderlijk beveiligings- en beheerlogboek voor de hele Xernerx Suite.",
+                "refresh": "Vernieuwen",
+                "searchPlaceholder": "Zoek op beheerder, actie of doel...",
+                "fetchError": "Kan auditlogs niet laden",
+                "emptyTitle": "Geen auditgebeurtenissen gevonden",
+                "emptyDescription": "Beheerdersacties voor problemen, suggesties, sollicitaties en instellingen verschijnen hier.",
+                "categories": {
+                    "all": "Alle",
+                    "issue": "Problemen",
+                    "suggestion": "Suggesties",
+                    "application": "Sollicitaties",
+                    "setting": "Instellingen",
+                    "role": "Rollen",
+                    "user": "Gebruikers",
+                    "system": "Systeem"
+                },
+                "exportCsv": "Exporteer CSV",
+                "exportJson": "Exporteer JSON"
+            }
+        },
+        "settings": {
+            "auditWebhookUrl": "Admin Audit Discord Webhook URL",
+            "auditWebhookUrlDesc": "Stuurt beveiligings- en beheeracties in realtime door naar je staff Discord-kanaal.",
+            "auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/..."
+        },
+        "translations": {
+            "review": {
+                "completionProgress": "{translated} van {total} sleutels vertaald ({percent}%)",
+                "missingOnly": "Alleen Ontbrekend ({count})",
+                "copySource": "Kopieer Bron"
+            }
+        }
+    },
+    "info": {
+        "home": {
+            "title": "Ondersteuning",
+            "description": "Welkom bij de kennisbank. Verken onze transparante roadmap, dien nieuwe ideeën in, meld problemen en vind antwoorden op al je vragen.",
+            "portals": {
+                "roadmap": {
+                    "title": "Roadmap",
+                    "description": "Bekijk waar we nu aan bouwen, wat er binnenkort aankomt en volg onze voortgang op langetermijndoelen."
+                },
+                "suggestions": {
+                    "title": "Suggesties",
+                    "description": "Heb je een geweldig idee? Dien het in bij onze community-sandbox waar anderen erop kunnen stemmen voor de roadmap!"
+                },
+                "bugs": {
+                    "title": "Problemen",
+                    "description": "Een probleem gevonden? Meld het hier zodat onze technici het kunnen oplossen en naar de bekende problemen kunnen verplaatsen."
+                },
+                "faq": {
+                    "title": "Veelgestelde Vragen",
+                    "description": "Veelgestelde vragen, facturatie en algemene hulp met je Xernerx-account."
+                },
+                "status": {
+                    "title": "Systeemstatus",
+                    "description": "Live uptime, responstijd en operationele status van alle Xernerx-diensten."
+                }
+            }
+        },
+        "roadmap": {
+            "title": "Platform Roadmap",
+            "description": "Onze chronologische reis van functies, optimalisaties en releases. Zie precies wat er aankomt en wanneer.",
+            "metrics": {
+                "avgResolutionTime": "Gemiddelde oplostijd van problemen",
+                "recentResolutions": "Recent opgeloste problemen",
+                "hours": "{count} uur",
+                "na": "N.v.t."
+            },
+            "timeline": {
+                "today": "Vandaag",
+                "backlog": "Backlog",
+                "readChangelog": "Changelog Lezen",
+                "status": {
+                    "idea": "Idee",
+                    "planned": "Gepland",
+                    "active": "In Uitvoering",
+                    "released": "Uitgebracht"
+                }
+            },
+            "knownIssues": {
+                "title": "Bekende Problemen Tracker",
+                "description": "Een transparant logboek van actieve problemen en recent opgeloste problemen binnen ons ecosysteem.",
+                "openIssues": "Openstaande Problemen",
+                "noOpenIssues": "Geen actieve problemen bekend! Alles werkt soepel.",
+                "recentlyResolved": "Recent Opgelost",
+                "noResolvedIssues": "Geen recent opgeloste problemen.",
+                "fixedOn": "Opgelost op {date}"
+            },
+            "actions": {
+                "notifyMe": "Houd Mij Op De Hoogte",
+                "watching": "Volgend",
+                "loginRequired": "Log in om op roadmap-mijlpalen te stemmen of ze te volgen",
+                "watchAdded": "Je ontvangt een melding zodra deze mijlpaal wordt uitgebracht!",
+                "watchRemoved": "Meldingen voor deze mijlpaal uitgeschakeld."
+            }
+        },
+        "suggestions": {
+            "title": "Functie Sandbox",
+            "description": "Stem op ideeën of dien je eigen idee in. Populaire suggesties worden beoordeeld door ons team en toegevoegd aan de roadmap.",
+            "newSuggestion": "Nieuwe Suggestie",
+            "titlePlaceholder": "Titel",
+            "descriptionPlaceholder": "Beschrijving",
+            "selectProduct": "Selecteer Product",
+            "submit": "Indienen",
+            "cancel": "Annuleren",
+            "searchPlaceholder": "Zoek suggesties (bijv. 'discord bot')...",
+            "startTyping": "Begin met typen voor een nieuwe suggestie",
+            "noMatch": "Geen suggesties komen overeen met \"{query}\".",
+            "addAsNew": "Als nieuwe suggestie toevoegen",
+            "loginToSubmit": "Log in om dit als een nieuw idee in te dienen!",
+            "toasts": {
+                "notAuthenticated": "Niet Geauthenticeerd",
+                "mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
+                "mustBeLoggedInVote": "Je moet ingelogd zijn om te stemmen.",
+                "productRequired": "Selecteer een product.",
+                "duplicateTitle": "Er bestaat al een suggestie met deze exacte titel!",
+                "duplicate": "Duplicaat",
+                "submitted": "Suggestie ingediend!",
+                "success": "Succes",
+                "failedToPost": "Plaatsen mislukt",
+                "failedToVote": "Stemmen mislukt",
+                "error": "Fout"
+            }
+        },
+        "bugs": {
+            "title": "Problemen",
+            "description": "Meld problemen die je tegenkomt. Problemen worden beoordeeld door ons team en geverifieerd.",
+            "newBug": "Nieuw Probleem",
+            "titlePlaceholder": "Titel",
+            "descriptionPlaceholder": "Beschrijving",
+            "selectProduct": "Selecteer Product",
+            "attachFile": "Bijlage Screenshot/Log (Optioneel)",
+            "uploading": "Uploaden...",
+            "submit": "Indienen",
+            "cancel": "Annuleren",
+            "searchPlaceholder": "Zoek problemen (bijv. 'inlogfout')...",
+            "startTyping": "Begin met typen voor een nieuw probleem",
+            "noMatch": "Geen problemen komen overeen met \"{query}\".",
+            "reportAsNew": "Als nieuw probleem melden",
+            "status": {
+                "resolved": "Opgelost",
+                "verified": "Geverifieerd",
+                "pendingReview": "In Afwachting",
+                "submitted": "Ingediend"
+            },
+            "releaseStatus": {
+                "production": "Live (Prod & Canary) • {app} v{version}",
+                "canary": "Alleen Canary • {app} v{version}",
+                "pending": "In Wachtrij • {app} v{version}"
+            },
+            "releaseTooltips": {
+                "production": "Deze oplossing staat live op zowel Canary als Productie ({app} v{version}).",
+                "canary": "Deze oplossing staat momenteel live op Canary ({app} v{version}) en wacht op uitrol naar Productie.",
+                "pending": "Deze oplossing staat ingepland voor {app} v{version}."
+            },
+            "toasts": {
+                "notAuthenticated": "Niet Geauthenticeerd",
+                "mustBeLoggedIn": "Je moet ingelogd zijn om te plaatsen.",
+                "productRequired": "Selecteer een product.",
+                "duplicate": "Duplicaat",
+                "duplicateTitle": "Er bestaat al een probleem met deze exacte titel!",
+                "submitted": "Probleem ingediend!",
+                "success": "Succes",
+                "uploadFailed": "Upload Mislukt",
+                "failedToUpload": "Uploaden van bijlage mislukt",
+                "failedToPost": "Plaatsen mislukt",
+                "error": "Fout"
+            },
+            "tooltips": {
+                "verified": "Dit probleem is erkend door de ontwikkelaars en zal op termijn worden opgelost.",
+                "submitted": "Dit probleem is ingediend door de community en is nog niet beoordeeld of erkend door de ontwikkelaars.",
+                "resolved": "Dit probleem is opgelost."
+            }
+        },
+        "status": {
+            "subtitle": "Live ecosysteem-telemetrie & gezondheidsmatrix",
+            "refresh": "Status vernieuwen",
+            "servicesHeading": "Ecosysteemdiensten",
+            "searchPlaceholder": "Diensten filteren...",
+            "activeIncidentsHeading": "Actieve geregistreerde problemen",
+            "viewAllIssues": "Bekijk Issue Tracker →",
+            "noActiveIncidents": "Geen actieve geverifieerde incidenten gemeld. Alle systemen werken naar behoren.",
+            "banner": {
+                "checking": "Ecosysteemstatus controleren...",
+                "allOperational": "Alle systemen operationeel",
+                "partialOutage": "{count} / {total} diensten operationeel"
+            },
+            "states": {
+                "operational": "Operationeel",
+                "degraded": "Vertraagd",
+                "down": "Storing",
+                "checking": "Controleren"
+            },
+            "services": {
+                "www": "Hoofdwebsite",
+                "app": "Gebruikersdashboard",
+                "account": "Accountportaal",
+                "api": "Core API Gateway",
+                "cdn": "Media CDN",
+                "docs": "Documentatie",
+                "info": "Support & Info Hub",
+                "store": "Winkel & Facturatie",
+                "admin": "Beheerdersportaal"
+            }
+        }
+    },
+    "lib": {
+        "navigation": {
+            "categories": {
+                "user": "Gebruiker",
+                "developer": "Ontwikkelaar",
+                "public": "Openbaar",
+                "management": "Beheer"
+            },
+            "items": {
+                "explore": "Ontdekken",
+                "dashboard": "Dashboard",
+                "account": "Account",
+                "store": "Winkel",
+                "portal": "Portaal",
+                "api": "API",
+                "docs": "Documentatie",
+                "cdn": "CDN",
+                "website": "Website",
+                "admin": "Beheerder",
+                "help": "Ondersteuning"
+            }
+        }
+    },
+    "docs": {
+        "api": {
+            "playground": {
+                "title": "Interactieve API Explorer",
+                "description": "Test live verzoeken tegen de Xernerx API-gateway direct vanuit je browser en bekijk realtime JSON-responsen.",
+                "presets": "Snelkeuzes",
+                "send": "Verzoek versturen",
+                "sending": "Versturen...",
+                "bearerToken": "Bearer Token (Optioneel)",
+                "jsonBody": "JSON Request Body"
+            }
+        }
+    },
+    "app": {
+        "users": {
+            "profile": {
+                "badges": {
+                    "botDeveloper": "Bot Ontwikkelaar",
+                    "bugHunter": "Bug Hunter",
+                    "contributor": "Bijdrager"
+                }
+            }
+        },
+        "portal": {
+            "bot": {
+                "webhooks": {
+                    "testButton": "Test Ping",
+                    "urlRequired": "Voer eerst een webhook-URL in.",
+                    "testSuccess": "Webhook antwoordde met {status} ({latency}ms)",
+                    "testFailed": "Webhook-test mislukt: {error}"
+                }
+            }
+        },
+        "bots": {
+            "id": {
+                "embedBadges": "Badges Insluiten",
+                "embedBadgesDesc": "Kopieer live SVG-statusbadges voor je GitHub README of website.",
+                "snippetCopied": "{format} insluitcode gekopieerd!"
+            }
+        },
+        "leaderboard": {
+            "title": "Ranglijsten",
+            "description": "De meest gestemde bots, grootste servers en langste dagelijkse reeksen in het ecosysteem.",
+            "backToExplore": "Terug naar Ontdekken",
+            "privacyNotice": "Alleen openbare bots, servers en gebruikersprofielen worden hier vermeld.",
+            "empty": "Nog geen vermeldingen in deze categorie.",
+            "tabs": {
+                "bots": "Top Bots",
+                "servers": "Top Servers",
+                "streaks": "Dagelijkse Reeksen"
+            },
+            "metrics": {
+                "votes": "Stemmen",
+                "users": "Gebruikers",
+                "members": "Leden",
+                "streak": "Reeks",
+                "credits": "Credits",
+                "totalImpact": "Totaal",
+                "bugs": "Bugs",
+                "suggestions": "Ideeën"
+            },
+            "sortBy": "Sorteer op",
+            "searchPlaceholder": "Zoek op de ranglijst..."
+        },
+        "widgets": {
+            "badgesTitle": "Live SVG-badges",
+            "badgesDescription": "Sluit dynamische SVG-status- en statistiekbadges in je README, documentatie of website in.",
+            "badgesButton": "Badges insluiten",
+            "badgesModalTitle": "Live SVG-badges",
+            "badgesModalDescription": "Kopieer een Markdown- of HTML-fragment om realtime statistiekbadges in te sluiten."
+        }
+    }
 }
