@@ -41,14 +41,16 @@ export default function Image() {
 
 			<div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 				<div style={{ fontSize: '72px', fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.05 }}>Xernerx Studios</div>
-				<div style={{ fontSize: '30px', color: '#a1a1aa', maxWidth: '880px', lineHeight: 1.4 }}>Next-generation Discord bots, modular frameworks, and real-time community infrastructure.</div>
+				<div style={{ fontSize: '30px', color: '#a1a1aa', maxWidth: '920px', lineHeight: 1.4 }}>
+					1 Account, 1 Place, 1 Setup — Unified Discord bot dashboard, real-time bot stats, public bot list & developer frameworks.
+				</div>
 			</div>
 
 			<div
 				style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '28px', color: '#71717a', fontSize: '20px' }}
 			>
-				<span>Xernerx Suite Ecosystem</span>
-				<span>Official Platform</span>
+				<span>Xernerx Suite v5 • Virtue • Metamorphosis • Zodiac</span>
+				<span>1 Account, 1 Place, 1 Setup</span>
 			</div>
 		</div>,
 		{ ...size }

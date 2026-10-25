@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSession } from './SessionProvider';
 
 export type AppBackgroundDotMode = 'blank' | 'sticky-reactive' | 'sticky-ripple';
-export type AppDotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit';
+export type AppDotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid';
 
 export interface LoadingContextType {
 	isLoading: boolean;

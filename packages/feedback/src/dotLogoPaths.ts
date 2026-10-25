@@ -368,7 +368,7 @@ export function computeDotCoverage(params: {
 			boxW = boxH * aspect;
 		}
 		offX = (activeW - boxW) * 0.5;
-		offY = isBanner ? (activeH - boxH) * 0.5 : Math.max(activeH * 0.08, (activeH - boxH) * 0.44);
+		offY = isBanner ? (activeH - boxH) * 0.5 : targetVar === 'full' ? Math.max(activeH * 0.05, (activeH - boxH) * 0.14) : Math.max(activeH * 0.08, (activeH - boxH) * 0.44);
 	}
 
 	let hits = 0;

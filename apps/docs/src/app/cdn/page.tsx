@@ -5,9 +5,11 @@ import { ArrowLeft, Eye, FileText, Globe, Layers, Trash2, Upload, X } from 'luci
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
+import { Loading, NotPermitted } from '@xernerx/feedback';
 import { Input } from '@xernerx/ui';
 import { CdnOverviewAndAuth } from '@/components/cdn/CdnOverviewAndAuth';
 import { CdnEndpoints } from '@/components/cdn/CdnEndpoints';
+import { useDocsAccess } from '@/components/useDocsAccess';
 
 const HTTP_METHODS = ['ALL', 'GET', 'POST', 'PATCH', 'DELETE'] as const;
 
@@ -22,13 +24,15 @@ const HASH_TO_VIEW: Record<string, string> = {
 
 export default function CdnDocsPage() {
 	const { t } = useDictionary();
-	const { setNavItems, show, clearNavItems, view, setView } = useSidebar();
+	const { setNavItems, show, hide, clearNavItems, view, setView } = useSidebar();
+	const { isAdmin, loading } = useDocsAccess();
 
 	const [searchQuery, setSearchQuery] = useState('');
 	const [methodFilter, setMethodFilter] = useState<string>('ALL');
 
 	// Initialize default view or sync from URL hash
 	useEffect(() => {
+		if (!isAdmin) return;
 		const applyHash = () => {
 			if (typeof window === 'undefined') return;
 			const rawHash = window.location.hash.replace('#', '');
@@ -48,9 +52,14 @@ export default function CdnDocsPage() {
 		applyHash();
 		window.addEventListener('hashchange', applyHash);
 		return () => window.removeEventListener('hashchange', applyHash);
-	}, [setView, view]);
+	}, [setView, view, isAdmin]);
 
 	useEffect(() => {
+		if (!loading && !isAdmin) {
+			clearNavItems();
+			hide();
+			return;
+		}
 		show();
 		setNavItems([
 			{ label: t('docs.cdn.nav.backToCategories'), href: '/', icon: ArrowLeft, category: t('docs.cdn.nav.category.navigation') },
@@ -63,7 +72,10 @@ export default function CdnDocsPage() {
 		]);
 
 		return () => clearNavItems();
-	}, [setNavItems, show, clearNavItems, t]);
+	}, [setNavItems, show, hide, clearNavItems, t, isAdmin, loading]);
+
+	if (loading) return <Loading />;
+	if (!isAdmin) return <NotPermitted />;
 
 	const activeView = view || 'overview';
 	const isFiltering = searchQuery.trim().length > 0 || methodFilter !== 'ALL';

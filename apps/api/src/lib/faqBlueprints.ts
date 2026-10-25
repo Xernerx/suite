@@ -240,10 +240,10 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 			),
 			c(
 				'card4',
-				'websocket',
+				'webhooks',
 				'faq.developers.card4.title',
 				['faq.developers.card4.description'],
-				[ql('websocketDocs', 'https://docs.xernerx.com/websocket', 'docs.xernerx.com/websocket'), ql('npmPackagesDocs', 'https://docs.xernerx.com/packages', 'docs.xernerx.com/packages')]
+				[ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
 			),
 			c(
 				'card2',

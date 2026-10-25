@@ -2,6 +2,17 @@
 
 # cdn
 
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.2.0
+    - @xernerx/lib@1.13.0
+    - @xernerx/components@0.9.3
+    - @xernerx/providers@0.13.1
+    - @xernerx/ui@0.7.3
+
 ## 1.2.2
 
 ### Patch Changes

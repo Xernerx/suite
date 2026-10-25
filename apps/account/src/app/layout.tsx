@@ -13,19 +13,21 @@ import { cookies, headers } from 'next/headers';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Account | Profile Settings, Tokens & Billing',
+		default: 'Xernerx Account | 1 Account, 1 Place, 1 Setup Across Xernerx',
 		template: 'Xernerx Account | %s',
 	},
-	description: 'Manage your Xernerx Studios identity, profile settings, linked OAuth connections, developer API tokens, appearance preferences, and billing history.',
+	description:
+		'Your single Xernerx Account across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac. Manage your unified profile, themes, linked connections, developer API tokens, and billing in one place.',
 
 	metadataBase: new URL('https://account.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Account | Profile Settings, Tokens & Billing',
+			default: 'Xernerx Account | 1 Account, 1 Place, 1 Setup Across Xernerx',
 			template: 'Xernerx Account | %s',
 		},
-		description: 'Manage your Xernerx Studios identity, profile settings, linked OAuth connections, developer API tokens, appearance preferences, and billing history.',
+		description:
+			'Your single Xernerx Account across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac. Manage your unified profile, themes, linked connections, developer API tokens, and billing in one place.',
 		url: 'https://account.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -42,10 +44,10 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Account | Profile Settings, Tokens & Billing',
+			default: 'Xernerx Account | 1 Account, 1 Place, 1 Setup Across Xernerx',
 			template: 'Xernerx Account | %s',
 		},
-		description: 'Manage your Xernerx Studios identity, profile settings, linked OAuth connections, developer API tokens, appearance preferences, and billing history.',
+		description: '1 Account, 1 Place, 1 Setup across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac.',
 		images: ['/banner.png'],
 	},
 

@@ -560,13 +560,8 @@
 		}
 	},
 	"www": {
-		"hero": {
-			"title": "Empowering Developers. Connecting Communities.",
-			"description": "From open-source frameworks that power your next big project, to intuitive bots and platforms that bring your community together. Xernerx is an ecosystem built for developers and users, by developers."
-		},
 		"about": {
-			"title": "Over Xernerx",
-			"description": "Opgericht in 2024, is Xernerx geëvolueerd van een gericht ontwikkelingsinitiatief tot een gestructureerd ecosysteem van automatiseringstools en infrastructuurframeworks. Elk systeem is gebouwd met schaalbaarheid, onderhoudbaarheid en architectonische helderheid als uitgangspunten."
+			"title": "Over Xernerx"
 		},
 		"sections": {
 			"services": {
@@ -577,12 +572,6 @@
 			},
 			"applications": {
 				"title": "Applicaties"
-			}
-		},
-		"services": {
-			"dashboard": {
-				"title": "Dashboard",
-				"desc": "Beheer applicaties, configureer implementaties en monitor systeemprestaties."
 			}
 		},
 		"packages": {

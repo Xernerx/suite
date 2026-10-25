@@ -14,7 +14,7 @@ export default function DocsHome() {
 	const { t } = useDictionary();
 	const { hide } = useSidebar();
 	const router = useRouter();
-	const { hasWebsocket } = useDocsAccess();
+	const { isAdmin, hasWebsocket } = useDocsAccess();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -22,7 +22,15 @@ export default function DocsHome() {
 		hide();
 	}, [hide]);
 
-	const visibleCategories = useMemo(() => categories.filter((c) => (c.href === '/websocket' ? hasWebsocket : true)), [hasWebsocket]);
+	const visibleCategories = useMemo(
+		() =>
+			categories.filter((c) => {
+				if (c.href === '/websocket') return hasWebsocket;
+				if (c.href === '/cdn') return isAdmin;
+				return true;
+			}),
+		[hasWebsocket, isAdmin]
+	);
 
 	const filteredTopics = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
@@ -30,6 +38,7 @@ export default function DocsHome() {
 		return searchTopics
 			.filter((item) => {
 				if (item.href.startsWith('/websocket') && !hasWebsocket) return false;
+				if (item.href.startsWith('/cdn') && !isAdmin) return false;
 				const title = t(item.titleKey).toLowerCase();
 				const desc = t(item.descKey).toLowerCase();
 				const category = t(item.categoryKey).toLowerCase();

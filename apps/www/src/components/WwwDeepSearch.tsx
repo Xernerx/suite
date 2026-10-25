@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Bot, Boxes, Briefcase, Compass, LifeBuoy, Server } from 'lucide-react';
+import { ArrowRight, Bot, Boxes, Briefcase, Compass, LifeBuoy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
@@ -188,6 +188,16 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 
 		const officialBots: WwwSearchResult[] = [
 			{
+				id: 'bot-virtue',
+				category: 'bots',
+				title: t('www.applications.virtue.title'),
+				description: t('www.applications.virtue.desc'),
+				subLabel: t('www.tags.discordBot'),
+				keywords: 'virtue leveling xp voice progression roles leaderboard discord bot',
+				href: getEnvUrl('https://app.xernerx.com/dashboard?tab=virtue'),
+				external: true,
+			},
+			{
 				id: 'bot-todo',
 				category: 'bots',
 				title: t('www.applications.todo.title'),
@@ -358,7 +368,7 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 	];
 
 	return (
-		<div className="relative w-full max-w-xl mt-6 text-left z-30">
+		<div className="relative w-full max-w-2xl mx-auto mt-6 text-left z-30">
 			<Input variant="search" shortcut={true} placeholder={t('www.hero.search.placeholder')} value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} />
 
 			<AnimatePresence>

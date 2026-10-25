@@ -3,9 +3,8 @@
 'use client';
 
 import { ArrowUpRight, Bot, Building2, Calendar, Globe, LogOut, RefreshCw, ShieldCheck, Star, UserPlus } from 'lucide-react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-import { useEffect, useRef, useState } from 'react';
 import { useEnvironment, useDictionary } from '@xernerx/providers';
 
 type Milestone = {
@@ -38,6 +37,9 @@ const milestones: Milestone[] = [
 		link: 'https://app.xernerx.com/bots/881678826906730547',
 	},
 	{
+		icon: <Calendar />,
+	},
+	{
 		icon: <LogOut />,
 	},
 	{
@@ -45,10 +47,44 @@ const milestones: Milestone[] = [
 		link: 'https://app.xernerx.com/bots/950251264095162418',
 	},
 	{
+		icon: <ArrowUpRight />,
+		link: 'https://docs.xernerx.com/packages/@xernerx/framework',
+	},
+	{
 		icon: <RefreshCw />,
 	},
 	{
+		icon: <Globe />,
+	},
+	{
+		icon: <RefreshCw />,
+		link: 'https://docs.xernerx.com/packages/@xernerx/framework',
+	},
+	{
+		icon: <Building2 />,
+	},
+	{
+		icon: <ShieldCheck />,
+		link: 'https://docs.xernerx.com/packages/@xernerx/stats',
+	},
+	{
+		icon: <UserPlus />,
+	},
+	{
+		icon: <Bot />,
+		link: 'https://app.xernerx.com/bots',
+	},
+	{
+		icon: <Star />,
+		link: 'https://app.xernerx.com/bots/1484880634844287138',
+	},
+	{
+		icon: <RefreshCw />,
+		link: 'https://account.xernerx.com',
+	},
+	{
 		icon: <Calendar />,
+		link: 'https://app.xernerx.com',
 	},
 ];
 
@@ -106,12 +142,20 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 
 			{/* CARD */}
 			<motion.div
-				initial={{ opacity: 1, x: 0, scale: 1 }}
+				initial={{ opacity: 0, x: 24, scale: 0.98 }}
 				whileInView={{ opacity: 1, x: 0, scale: 1 }}
-				viewport={{ once: true, margin: '-100px' }}
-				transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-				className={`block w-full rounded-[2rem] transition-all duration-500 bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 p-8 lg:p-10 shadow-2xl relative overflow-hidden group ${finalLink ? 'hover:border-(--accent)/50 hover:shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_40%,transparent)] hover:-translate-y-2' : ''}`}
+				whileHover={{ y: -6, scale: 1.01 }}
+				viewport={{ once: true, margin: '-80px' }}
+				transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+				className={`block w-full rounded-3xl transition-colors duration-500 bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 p-8 lg:p-10 shadow-2xl relative overflow-hidden group ${finalLink ? 'hover:border-(--accent)/50 hover:shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_40%,transparent)]' : 'hover:border-(--accent)/30'}`}
 			>
+				<div
+					className="absolute inset-0 opacity-[0.05] group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none"
+					style={{
+						backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+						backgroundSize: '18px 18px',
+					}}
+				/>
 				{/* Frosted glow on hover */}
 				{finalLink && <div className="absolute -top-20 -right-20 w-64 h-64 bg-(--accent)/20 rounded-full blur-[80px] group-hover:bg-(--accent)/30 transition-colors duration-700" />}
 
@@ -131,9 +175,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 
 					<div className="flex flex-col flex-1 min-w-0">
 						<span className="text-xs uppercase tracking-widest text-(--accent) font-black mb-1">
-							{t(`www.timeline.events.${index}.date`) === 'DYNAMIC_DATE'
-								? new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
-								: t(`www.timeline.events.${index}.date`)}
+							{t(`www.timeline.events.${index}.date`).replace('DYNAMIC_DATE', new Date().toLocaleDateString(undefined, { month: 'long', year: 'numeric' }))}
 						</span>
 
 						<div className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">

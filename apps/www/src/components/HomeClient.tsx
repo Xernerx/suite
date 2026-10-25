@@ -2,7 +2,7 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Boxes, ExternalLink, LayoutDashboard, Package } from 'lucide-react';
+import { Boxes, Layers, Package, ShieldCheck, Sparkles } from 'lucide-react';
 import { useDictionary, useEnvironment, useLoading, useSidebar } from '@xernerx/providers';
 
 import { useEffect, useRef, useState } from 'react';
@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Timeline from '@/components/Timeline';
 import { LandingCta, PlatformHighlights } from '@/components/PlatformHighlights';
 import { WwwDeepSearch } from '@/components/WwwDeepSearch';
+import { BotProfileData, buildConsumerServiceItems, DeveloperSoftwareCard, ServiceProfileCard } from '@/components/LandingServiceCards';
 
 export type ShowcasePackage = {
 	name: string;
@@ -19,21 +20,25 @@ export type ShowcasePackage = {
 
 export default function HomeClient({ initialPackages = [] }: { initialPackages?: ShowcasePackage[] }) {
 	const { hide } = useSidebar();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
-	const { setBackgroundMode, setDotVariant } = useLoading();
+	const { isLoading, setBackgroundMode, setDotVariant } = useLoading();
 
 	const servicesRef = useRef<HTMLDivElement>(null);
 	const softwareRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLElement | null>(null);
 	const [ready, setReady] = useState(false);
+	const [matrixConstructed, setMatrixConstructed] = useState(false);
+	const [botProfiles, setBotProfiles] = useState<Record<string, BotProfileData>>({});
+
+	const consumerServiceItems = buildConsumerServiceItems(t, getEnvUrl);
 
 	const staticSoftwareItems = [
 		{
 			icon: <Package size={24} />,
-			title: 'REST API',
+			title: 'REST API (v1)',
 			desc: t('www.software.apiDesc'),
-			link: 'https://docs.xernerx.com/api',
+			link: 'https://docs.xernerx.com/api/v1',
 			tag: t('www.software.apiTag'),
 		},
 		{
@@ -43,16 +48,13 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			link: 'https://docs.xernerx.com/packages',
 			tag: t('www.software.npmPackageTag'),
 		},
-		{
-			icon: <Boxes size={24} />,
-			title: t('docs.home.categories.cdn.title'),
-			desc: t('docs.home.categories.cdn.description'),
-			link: 'https://docs.xernerx.com/cdn',
-			tag: t('www.software.apiTag'),
-		},
 	];
 
-	const publicPackages = initialPackages.filter((pkg) => !pkg.name.toLowerCase().includes('websocket'));
+	const internalPackageKeywords = ['websocket', '@xernerx/ui', '@xernerx/components', '@xernerx/lib', '@xernerx/styles', '@xernerx/providers', '@xernerx/feedback', '@xernerx/cli'];
+	const publicPackages = initialPackages.filter((pkg) => {
+		const lower = pkg.name.toLowerCase();
+		return !internalPackageKeywords.some((kw) => lower.includes(kw));
+	});
 
 	const softwareItems =
 		publicPackages.length > 0
@@ -85,9 +87,48 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 	const softwareX = useTransform(softwareProgress, [0, 1], ['0%', '70%']);
 
 	useEffect(() => {
+		if (!isReady) return;
+		let active = true;
+		fetch(getEnvUrl('https://api.xernerx.com/info/status/bots'))
+			.then((r) => (r.ok ? r.json() : null))
+			.then((data) => {
+				if (!active || !Array.isArray(data?.bots)) return;
+				const nextMap: Record<string, BotProfileData> = {};
+				for (const bot of data.bots) {
+					if (bot?.id) {
+						nextMap[String(bot.id)] = {
+							id: String(bot.id),
+							name: bot.name,
+							avatarUrl: bot.avatarUrl,
+							status: bot.status,
+							activity: bot.activity,
+							guildCount: bot.guildCount,
+							userCount: bot.userCount,
+						};
+					}
+				}
+				setBotProfiles((prev) => ({ ...prev, ...nextMap }));
+			})
+			.catch(() => {});
+		return () => {
+			active = false;
+		};
+	}, [isReady, getEnvUrl]);
+
+	useEffect(() => {
 		hide();
 		setBackgroundMode('sticky-ripple');
 		setDotVariant('full');
+		(window as any).__xernerxConstructPending = true;
+		window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: true } }));
+		window.dispatchEvent(new CustomEvent('xernerx:construct-logo'));
+
+		const handleConstructComplete = () => {
+			setMatrixConstructed(true);
+			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
+		};
+		window.addEventListener('xernerx:construct-complete', handleConstructComplete);
+		const fallbackTimer = window.setTimeout(handleConstructComplete, 3550);
 
 		const scrollEl = document.getElementById('main-scroll-container');
 		const handleScroll = () => {
@@ -96,8 +137,14 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			const top = scrollEl.scrollTop;
 			if (top < vh * 0.7) {
 				setDotVariant('full');
-			} else if (top < vh * 2.1) {
+			} else if (top < vh * 3.2) {
 				setDotVariant('icon');
+			} else if (top < vh * 5.1) {
+				setDotVariant('prism');
+			} else if (top < vh * 6.4) {
+				setDotVariant('infinity');
+			} else if (top < vh * 7.5) {
+				setDotVariant('helix');
 			} else {
 				setDotVariant('orbit');
 			}
@@ -105,29 +152,52 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 		scrollEl?.addEventListener('scroll', handleScroll, { passive: true });
 		return () => {
+			window.clearTimeout(fallbackTimer);
+			window.removeEventListener('xernerx:construct-complete', handleConstructComplete);
+			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
 			scrollEl?.removeEventListener('scroll', handleScroll);
 			setBackgroundMode(null);
 			setDotVariant(null);
 		};
 	}, [hide, setBackgroundMode, setDotVariant]);
 
+	const pageReady = !isLoading && matrixConstructed;
+
 	return (
-		<div className="flex flex-col selection:bg-(--accent) selection:text-white">
-			{/* HERO SECTION */}
-			<section className="min-h-[90vh] flex items-center justify-center px-6 pt-20 pb-16 relative">
-				<div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
-					{/* LEFT: TEXT */}
-					<motion.div initial={{ opacity: 1, x: 0 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">
+		<motion.div
+			initial={{ opacity: 0, y: '56vh' }}
+			animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: '56vh' }}
+			transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+			className={`flex flex-col selection:bg-(--accent) selection:text-white ${pageReady ? '' : 'pointer-events-none select-none'}`}
+		>
+			{/* HERO SECTION — Sits cleanly beneath the constructed XERNERX dot-matrix stage */}
+			<section className="min-h-screen flex flex-col items-center justify-start px-6 pt-[52vh] sm:pt-[54vh] pb-12 relative">
+				<div className="w-full max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+					<motion.div
+						initial={{ opacity: 0, y: 36 }}
+						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
+						transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+						className="w-full flex flex-col items-center text-center bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 rounded-[2.75rem] px-8 py-8 sm:px-12 sm:py-10 lg:px-16 lg:py-11 shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_18%,transparent)] relative overflow-hidden"
+					>
+						<div
+							className="absolute inset-0 opacity-[0.06] pointer-events-none"
+							style={{
+								backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+								backgroundSize: '20px 20px',
+							}}
+						/>
+						<div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[32rem] h-36 rounded-full bg-(--accent)/15 blur-3xl pointer-events-none" />
+
 						<h1
-							className="text-6xl lg:text-7xl xl:text-[5.5rem] font-extrabold tracking-tight mb-8 leading-[1.05] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
+							className="relative z-10 text-4xl sm:text-5xl lg:text-6xl xl:text-[4.25rem] font-extrabold tracking-tight mb-4 leading-[1.06] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
 							style={{ fontFamily: 'var(--font-fredoka)' }}
 						>
 							{t('www.hero.title')}
 						</h1>
 
-						<p className="max-w-xl text-lg text-(--text-muted) leading-relaxed mb-10 border-l-2 border-(--border)/20 pl-6">{t('www.hero.description')}</p>
+						<p className="relative z-10 max-w-3xl mx-auto text-base sm:text-lg text-(--text-muted) leading-relaxed mb-7">{t('www.hero.description')}</p>
 
-						<div className="flex flex-wrap items-center gap-4">
+						<div className="relative z-10 flex flex-wrap items-center justify-center gap-4">
 							<a
 								href="#services"
 								className="px-8 py-4 rounded-2xl bg-(--accent) text-white font-bold text-sm hover:opacity-90 transition-all shadow-[0_0_40px_-10px_var(--accent)] hover:shadow-[0_0_60px_-15px_var(--accent)] hover:-translate-y-1"
@@ -136,144 +206,100 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 							</a>
 							<a
 								href="#software"
-								className="px-8 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
+								className="px-8 py-4 rounded-2xl bg-(--background)/60 text-(--text) font-bold text-sm hover:bg-(--accent)/15 hover:text-(--accent) hover:border-(--accent)/30 transition-all border border-(--border)/10 backdrop-blur-md"
 							>
 								{t('www.hero.buttons.software')}
 							</a>
 						</div>
 
-						<WwwDeepSearch packages={publicPackages} />
+						<div className="relative z-30 w-full flex justify-center">
+							<WwwDeepSearch packages={publicPackages} />
+						</div>
 
-						<nav aria-label="Quick navigation" className="mt-6 flex flex-wrap items-center gap-2">
+						<nav aria-label="Quick navigation" className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-2">
 							<a
 								href="#about"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.about')}
 							</a>
 							<a
 								href="#highlights"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.highlights')}
 							</a>
 							<a
 								href="#timeline"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.timeline')}
 							</a>
 							<Link
 								href="/invites"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.invites')}
 							</Link>
 							<Link
 								href="/applications"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.careers')}
 							</Link>
 							<Link
 								href="/contact"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--foreground)/30 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
+								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.contact')}
 							</Link>
 						</nav>
 					</motion.div>
-
-					{/* RIGHT: OPEN STAGE FOR APPLAYOUT STICKY REACTIVE DOT-MATRIX LOGO */}
-					<div className="hidden lg:block min-h-[320px] w-full pointer-events-none" />
 				</div>
 			</section>
 
-			{/* SELLING POINTS (Floating Bento Cards) */}
-			<section className="px-6 relative -mt-10 z-20">
+			{/* SELLING POINTS (Fluid Dot-Matrix Glass Bento Cards) */}
+			<section className="px-6 relative z-20 pb-8">
 				<div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
 					{[
 						{
 							title: t('www.features.scale.title'),
 							desc: t('www.features.scale.description'),
-							icon: (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-								</svg>
-							),
+							icon: <Layers className="w-6 h-6" />,
 						},
 						{
 							title: t('www.features.opensource.title'),
 							desc: t('www.features.opensource.description'),
-							icon: (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-								</svg>
-							),
+							icon: <ShieldCheck className="w-6 h-6" />,
 						},
 						{
 							title: t('www.features.design.title'),
 							desc: t('www.features.design.description'),
-							icon: (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<circle cx="12" cy="12" r="10" />
-									<path d="M8 14s1.5 2 4 2 4-2 4-2" />
-									<line x1="9" y1="9" x2="9.01" y2="9" />
-									<line x1="15" y1="9" x2="15.01" y2="9" />
-								</svg>
-							),
+							icon: <Sparkles className="w-6 h-6" />,
 						},
 					].map((point, i) => (
 						<motion.div
 							key={point.title}
-							initial={{ opacity: 1, y: 0 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true, margin: '-50px' }}
-							transition={{ duration: 0.6, delay: i * 0.15, ease: 'easeOut' }}
-							className="bg-(--accent) text-white rounded-[2.5rem] p-8 lg:p-10 shadow-xl relative overflow-hidden group hover:-translate-y-2 transition-transform"
+							initial={{ opacity: 0, y: 40 }}
+							animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+							whileHover={{ y: -8, scale: 1.015 }}
+							transition={{ duration: 1.6, delay: 0.25 + i * 0.16, ease: [0.22, 1, 0.36, 1] }}
+							className="bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/45 rounded-3xl p-8 lg:p-10 shadow-xl hover:shadow-[0_16px_44px_-12px_color-mix(in_srgb,var(--accent)_32%,transparent)] relative overflow-hidden group transition-colors"
 						>
 							<div
-								className="absolute inset-0 opacity-10 pointer-events-none"
-								style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, white 2px, transparent 2px)', backgroundSize: '32px 32px' }}
+								className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-500 pointer-events-none"
+								style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }}
 							/>
-							<div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl group-hover:bg-white/30 transition-colors" />
+							<div className="absolute -top-12 -right-12 w-36 h-36 bg-(--accent)/15 rounded-full blur-3xl group-hover:bg-(--accent)/30 transition-colors pointer-events-none" />
 
 							<div className="relative z-10 flex flex-col items-start gap-4">
-								<div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/20">{point.icon}</div>
-								<div className="text-xl font-bold mt-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								<div className="w-14 h-14 rounded-2xl bg-(--accent)/15 text-(--accent) flex items-center justify-center backdrop-blur-md border border-(--accent)/30 shadow-[0_0_24px_-6px_var(--accent)] group-hover:scale-110 transition-transform">
+									{point.icon}
+								</div>
+								<div className="text-xl font-bold mt-1 text-(--text) group-hover:text-(--accent) transition-colors" style={{ fontFamily: 'var(--font-fredoka)' }}>
 									{point.title}
 								</div>
-								<p className="text-white/90 text-sm leading-relaxed">{point.desc}</p>
+								<p className="text-(--text-muted) text-sm leading-relaxed">{point.desc}</p>
 							</div>
 						</motion.div>
 					))}
@@ -290,56 +316,10 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 						<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">{t('www.sections.consumer.description')}</p>
 					</div>
 
-					<div className="relative z-10 w-full overflow-hidden flex items-center h-[350px]">
+					<div className="relative z-10 w-full overflow-hidden flex items-center h-[430px]">
 						<motion.div style={{ x: servicesX }} className="flex gap-8 px-6 md:px-12 xl:px-[15vw] absolute left-0 w-max">
-							{[
-								{
-									icon: <LayoutDashboard size={24} />,
-									title: t('www.services.dashboard.title'),
-									desc: t('www.services.dashboard.desc'),
-									link: getEnvUrl('https://app.xernerx.com'),
-									tag: t('www.tags.platform'),
-								},
-								{
-									icon: <Boxes size={24} />,
-									title: t('www.applications.todo.title'),
-									desc: t('www.applications.todo.desc'),
-									link: getEnvUrl('https://app.xernerx.com/bots/782105629572464652'),
-									tag: t('www.tags.discordBot'),
-								},
-								{
-									icon: <Boxes size={24} />,
-									title: t('www.applications.zodiac.title'),
-									desc: t('www.applications.zodiac.desc'),
-									link: getEnvUrl('https://app.xernerx.com/bots/950251264095162418'),
-									tag: t('www.tags.discordBot'),
-								},
-								{
-									icon: <Boxes size={24} />,
-									title: t('www.applications.metamorphosis.title'),
-									desc: t('www.applications.metamorphosis.desc'),
-									link: getEnvUrl('https://app.xernerx.com/bots/881678826906730547'),
-									tag: t('www.tags.discordBot'),
-								},
-							].map((item) => (
-								<div
-									key={item.title}
-									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
-								>
-									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
-										<ExternalLink className="text-(--text)" size={20} />
-									</div>
-									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
-									<div className="flex items-center gap-3 mb-3">
-										<div className="font-bold text-xl text-(--text)">
-											<a href={item.link} className="after:absolute after:inset-0">
-												{item.title}
-											</a>
-										</div>
-										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
-									</div>
-									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
-								</div>
+							{consumerServiceItems.map((item) => (
+								<ServiceProfileCard key={item.id} item={item} profile={botProfiles[item.botId]} />
 							))}
 						</motion.div>
 					</div>
@@ -356,27 +336,10 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 						<p className="max-w-2xl ml-auto text-base text-(--text-muted) leading-relaxed">{t('www.sections.developer.description')}</p>
 					</div>
 
-					<div className="relative z-10 w-full overflow-hidden flex items-center h-[350px]">
+					<div className="relative z-10 w-full overflow-hidden flex items-center h-[370px]">
 						<motion.div style={{ x: softwareX }} className="flex gap-8 px-6 md:px-12 xl:px-[15vw] absolute right-0 w-max">
 							{softwareItems.map((item) => (
-								<div
-									key={item.title}
-									className="group shrink-0 w-[85vw] md:w-[450px] flex flex-col rounded-[2.5rem] p-8 transition-all relative overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
-								>
-									<div className="absolute top-0 right-0 p-8 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none">
-										<ExternalLink className="text-(--text)" size={20} />
-									</div>
-									<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{item.icon}</div>
-									<div className="flex items-center gap-3 mb-3">
-										<div className="font-bold text-xl text-(--text) font-mono">
-											<a href={getEnvUrl(item.link)} className="after:absolute after:inset-0">
-												{item.title}
-											</a>
-										</div>
-										<span className="text-[10px] font-bold uppercase tracking-widest text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-full">{item.tag}</span>
-									</div>
-									<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
-								</div>
+								<DeveloperSoftwareCard key={item.title} item={item} href={getEnvUrl(item.link)} />
 							))}
 						</motion.div>
 					</div>
@@ -395,10 +358,10 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					</div>
 
 					<motion.div
-						initial={{ opacity: 1, y: 0 }}
+						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
-						transition={{ duration: 0.8 }}
+						transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
 						className="md:col-span-5 lg:col-span-4"
 					>
 						<h2 className="text-5xl font-extrabold mb-6 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -407,14 +370,21 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					</motion.div>
 
 					<motion.div
-						initial={{ opacity: 1, x: 0 }}
+						initial={{ opacity: 0, x: 24 }}
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
-						transition={{ duration: 0.8, delay: 0.2 }}
+						transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
 						className="md:col-span-7 lg:col-span-8 relative"
 					>
-						<div className="bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 p-10 lg:p-14 rounded-[3rem] shadow-xl relative overflow-hidden group hover:border-(--accent)/30 transition-colors flex flex-col gap-6">
-							<div className="absolute top-0 right-0 w-32 h-32 bg-(--accent)/10 rounded-full blur-3xl group-hover:bg-(--accent)/20 transition-colors" />
+						<div className="bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 p-10 lg:p-14 rounded-[3rem] shadow-xl relative overflow-hidden group hover:border-(--accent)/40 transition-all flex flex-col gap-6">
+							<div
+								className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none"
+								style={{
+									backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+									backgroundSize: '22px 22px',
+								}}
+							/>
+							<div className="absolute top-0 right-0 w-40 h-40 bg-(--accent)/15 rounded-full blur-3xl group-hover:bg-(--accent)/25 transition-colors" />
 							<p className="text-lg lg:text-xl text-(--text-muted) leading-relaxed relative z-10 font-medium">{t('www.about.description')}</p>
 							<p className="text-base lg:text-lg text-(--text-muted) leading-relaxed relative z-10">{t('www.about.description2')}</p>
 						</div>
@@ -442,16 +412,28 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 								desc: t('www.about.pillars.identity.description'),
 							},
 						] as const
-					).map((pillar) => (
-						<div
+					).map((pillar, idx) => (
+						<motion.div
 							key={pillar.title}
-							className="bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/30 rounded-[2rem] p-8 shadow-xl transition-colors flex flex-col gap-3"
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							whileHover={{ y: -6, scale: 1.015 }}
+							viewport={{ once: true, margin: '-50px' }}
+							transition={{ duration: 0.55, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+							className="relative overflow-hidden group bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 rounded-3xl p-8 shadow-xl hover:shadow-[0_14px_40px_-12px_color-mix(in_srgb,var(--accent)_30%,transparent)] transition-colors flex flex-col gap-3"
 						>
-							<div className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							<div
+								className="absolute inset-0 opacity-[0.05] group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none"
+								style={{
+									backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+									backgroundSize: '18px 18px',
+								}}
+							/>
+							<div className="relative z-10 text-lg font-bold text-(--text) group-hover:text-(--accent) transition-colors" style={{ fontFamily: 'var(--font-fredoka)' }}>
 								{pillar.title}
 							</div>
-							<p className="text-sm text-(--text-muted) leading-relaxed">{pillar.desc}</p>
-						</div>
+							<p className="relative z-10 text-sm text-(--text-muted) leading-relaxed">{pillar.desc}</p>
+						</motion.div>
 					))}
 				</div>
 			</section>
@@ -464,6 +446,6 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 			{/* CLOSING CALL TO ACTION */}
 			<LandingCta />
-		</div>
+		</motion.div>
 	);
 }

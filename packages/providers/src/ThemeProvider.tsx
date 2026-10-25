@@ -432,10 +432,20 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	);
 }
 
-export function useTheme() {
+const FALLBACK_THEME_CONTEXT: ThemeContextType = {
+	theme: 'dark',
+	resolvedTheme: 'dark',
+	setTheme: () => {},
+	setAccent: () => {},
+	preferences: DEFAULT_UI_PREFERENCES,
+	uiPreferences: DEFAULT_UI_PREFERENCES,
+	setPreference: () => {},
+	resetPreferences: () => {},
+};
+
+export function useTheme(): ThemeContextType {
 	const ctx = useContext(ThemeContext);
-	if (!ctx) throw new Error('useTheme must be used inside ThemeProvider');
-	return ctx;
+	return ctx ?? FALLBACK_THEME_CONTEXT;
 }
 
 export function useEffectiveAlignment(): {
@@ -463,14 +473,10 @@ export function useEffectiveAlignment(): {
 
 		const handleMetaUpdate = (e: Event) => {
 			const detail = (e as CustomEvent)?.detail;
-			if (detail?.windowControls) {
-				setWindowControls(detail.windowControls);
-			}
+			if (detail?.windowControls) setWindowControls(detail.windowControls);
 		};
 		const unsubscribe = electronBridge?.onMetadataUpdated?.((meta: any) => {
-			if (meta?.windowControls) {
-				setWindowControls(meta.windowControls);
-			}
+			if (meta?.windowControls) setWindowControls(meta.windowControls);
 		});
 		window.addEventListener('xernerx:metadata-updated', handleMetaUpdate);
 		return () => {
@@ -482,9 +488,5 @@ export function useEffectiveAlignment(): {
 	const prefAlignment = ctx?.preferences?.alignment || 'system';
 	const effectiveControls = windowControls === 'system' ? (isMacPlatform ? 'macos' : 'windows') : windowControls;
 	const effectiveAlignment: 'left' | 'right' = prefAlignment === 'right' ? 'right' : prefAlignment === 'left' ? 'left' : effectiveControls === 'macos' || isMacPlatform ? 'right' : 'left';
-
-	return {
-		effectiveAlignment,
-		isRightAligned: effectiveAlignment === 'right',
-	};
+	return { effectiveAlignment, isRightAligned: effectiveAlignment === 'right' };
 }
