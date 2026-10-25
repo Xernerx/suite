@@ -2,44 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-
-async function authCommands(req: NextRequest, botId: string) {
-	const authHeader = req.headers.get('Authorization');
-	if (!authHeader) return { error: 'Missing Authorization header', status: 401 };
-
-	const tokenValue = authHeader.replace(/^Bearer\s+/i, '').trim();
-
-	const db = await database('xernerx');
-	const TokenModel = (db.models.users as any).Token;
-	const BotModel = (db.models.bots as any).Profile || (db.models.bots as any).Bot;
-	const CommandModel = (db.models.bots as any).Command;
-
-	if (!TokenModel || !BotModel || !CommandModel) return { error: 'Database models not found', status: 500 };
-
-	const isSystemToken = Boolean((process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN) || (process.env.XERNERX_APP_TOKEN && tokenValue === process.env.XERNERX_APP_TOKEN));
-	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
-
-	if (!tokenDoc && !isSystemToken) return { error: 'Invalid token', status: 401 };
-	if (tokenDoc && (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended')) return { error: 'Token is inactive or suspended', status: 403 };
-
-	let bot = await BotModel.findOne({ id: botId });
-	if (!bot && isSystemToken) {
-		bot = await BotModel.create({
-			id: botId,
-			bot: true,
-			name: 'Xernerx App',
-			privacy: 'private',
-			owners: tokenDoc?.owners || [],
-		}).catch(() => null);
-	}
-	if (!bot && !isSystemToken) return { error: 'Bot not found', status: 404 };
-
-	const tokenOwners = tokenDoc?.owners || [];
-	const botOwners = bot?.owners || [];
-	const hasFullAccess = isSystemToken || tokenDoc?.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
-
-	return { hasFullAccess, CommandModel, BotModel };
-}
+import { authenticateV1BotRequest } from '@/lib/v1BotAuth';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -59,14 +22,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authResult = await authCommands(req, id);
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { hasFullAccess, CommandModel, BotModel } = authResult;
+		const { botId: id, hasFullAccess, CommandModel, BotModel } = authResult as Required<typeof authResult>;
 		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-		const body = await req.json().catch(() => null);
+		const rawBody = await req.json().catch(() => null);
+		const body = Array.isArray(rawBody) ? rawBody : Array.isArray(rawBody?.commands) ? rawBody.commands : null;
 		if (!Array.isArray(body)) {
 			return NextResponse.json({ error: 'Expected an array of Discord application command objects.' }, { status: 400 });
 		}
@@ -77,7 +41,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 		const insertPayload = body
 			.map((cmd: any) => ({
 				botId: id,
-				commandId: cmd.id || cmd.name, // Fallback to name if Discord ID isn't present
+				commandId: cmd.id || cmd.name,
 				name: cmd.name,
 				description: cmd.description,
 				type: cmd.type || 1,
@@ -93,26 +57,37 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 		return NextResponse.json({ message: 'Commands synced successfully', count: insertPayload.length }, { status: 201 });
 	} catch (error: any) {
-		console.error('Failed to POST bot commands:', error);
+		console.error('Failed to sync bot commands:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
 	}
 }
 
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+	return PUT(req, context);
+}
+
+export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+	return PUT(req, context);
+}
+
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authResult = await authCommands(req, id);
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { hasFullAccess, CommandModel } = authResult;
+		const { botId: id, hasFullAccess, CommandModel, BotModel } = authResult as Required<typeof authResult>;
 		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
 		const commandId = req.nextUrl.searchParams.get('commandId');
 
 		if (commandId) {
 			await CommandModel.deleteOne({ commandId, botId: id });
+			const remaining = await CommandModel.find({ botId: id }).lean();
+			await BotModel.updateOne({ id }, { $set: { commands: remaining.map((c: any) => c.body || c) } }).catch(() => {});
 		} else {
 			await CommandModel.deleteMany({ botId: id });
+			await BotModel.updateOne({ id }, { $set: { commands: [] } }).catch(() => {});
 		}
 
 		return NextResponse.json({ message: 'Commands deleted successfully' });

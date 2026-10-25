@@ -48,7 +48,12 @@ export function V1PlatformEndpoints({
 			title: t('docs.api.v1.endpoints.postBotReleases.title'),
 			icon: Rocket,
 			description: t('docs.api.v1.endpoints.postBotReleases.description'),
-			routes: [{ method: 'POST', path: '/v1/bots/[id]/releases', auth: 'token' as const }],
+			routes: [
+				{ method: 'GET', path: '/v1/bots/[id]/releases', auth: 'public' as const },
+				{ method: 'POST', path: '/v1/bots/[id]/releases', auth: 'token' as const },
+				{ method: 'PATCH', path: '/v1/bots/[id]/releases?releaseId=...', auth: 'token' as const },
+				{ method: 'DELETE', path: '/v1/bots/[id]/releases?releaseId=...', auth: 'token' as const },
+			],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
 					<h3 className="font-semibold text-(--text) mb-3 flex items-center gap-2">

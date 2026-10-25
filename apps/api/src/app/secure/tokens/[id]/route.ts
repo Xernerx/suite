@@ -38,11 +38,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			return NextResponse.json({ error: 'Token already exists' }, { status: 409 });
 		}
 
+		const resolvedOwners = Array.from(new Set([...(Array.isArray(body.owners) ? body.owners : []), userId].filter(Boolean)));
+
 		const newToken = await TokenModel.create({
 			...body,
-			owners: body.owners || [userId],
+			owners: resolvedOwners,
 			id,
 		});
+
+		if (newToken.botId) {
+			const BotModel = (db.models.bots as any)?.Bot;
+			if (BotModel) {
+				await BotModel.updateOne({ id: newToken.botId }, { $addToSet: { owners: { $each: resolvedOwners } } }).catch(() => {});
+			}
+		}
 
 		return NextResponse.json(newToken, { status: 201 });
 	} catch (error) {
@@ -61,6 +70,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const token = await TokenModel.findOneAndUpdate({ id }, body, { new: true });
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
+		}
+
+		if (token.botId && Array.isArray(token.owners) && token.owners.length > 0) {
+			const BotModel = (db.models.bots as any)?.Bot;
+			if (BotModel) {
+				await BotModel.updateOne({ id: token.botId }, { $addToSet: { owners: { $each: token.owners.filter(Boolean) } } }).catch(() => {});
+			}
 		}
 
 		return NextResponse.json(token, { status: 200 });

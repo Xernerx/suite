@@ -20,7 +20,19 @@ export async function GET(request: Request) {
 		let matchStage: any = {};
 
 		if (owner) {
-			matchStage = { owners: owner };
+			const TokenModel = (db.models.users as any)?.Token;
+			let tokenBotIds: string[] = [];
+			if (TokenModel) {
+				const userTokens = await TokenModel.find({ owners: owner, botId: { $exists: true, $ne: null } })
+					.select('botId')
+					.lean()
+					.catch(() => []);
+				tokenBotIds = Array.from(new Set(userTokens.map((t: any) => String(t.botId || '').trim()).filter(Boolean)));
+				if (tokenBotIds.length > 0) {
+					await BotModel.updateMany({ id: { $in: tokenBotIds }, owners: { $ne: owner } }, { $addToSet: { owners: owner } }).catch(() => {});
+				}
+			}
+			matchStage = tokenBotIds.length > 0 ? { $or: [{ owners: owner }, { id: { $in: tokenBotIds } }] } : { owners: owner };
 		} else if (organization) {
 			matchStage = { organization };
 		} else {

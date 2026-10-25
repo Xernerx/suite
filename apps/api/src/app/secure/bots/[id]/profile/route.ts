@@ -170,9 +170,17 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 		const db = await database('xernerx');
 		const BotModel = (db.models.bots as any).Bot;
 
+		const targetBot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] })
+			.select('id')
+			.lean();
 		const result = await BotModel.deleteOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 		if (result.deletedCount === 0) {
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
+		}
+
+		const TokenModel = (db.models.users as any)?.Token;
+		if (TokenModel) {
+			await TokenModel.updateMany({ botId: targetBot?.id || id }, { $unset: { botId: 1 }, $set: { status: 'pending' } }).catch(() => {});
 		}
 
 		return NextResponse.json({ message: 'Bot deleted successfully' }, { status: 200 });

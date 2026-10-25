@@ -25,13 +25,15 @@ for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process
 
 const SUPPORT_GUILD_IDS = ['687429190165069838', '784094726432489522'];
 
+const APP_BOT_TOKEN = process.env.DISCORD_CLIENT_TOKEN || process.env.DISCORD_BOT_TOKEN;
+
 export class XernerxAppClient extends XernerxClient {
 	constructor() {
 		const origClear = console.clear;
 		console.clear = () => {};
 		super({
 			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences'],
-			token: process.env.DISCORD_CLIENT_TOKEN as string,
+			token: APP_BOT_TOKEN as string,
 			guildId: SUPPORT_GUILD_IDS,
 			global: false,
 		});
@@ -51,10 +53,10 @@ export class XernerxAppClient extends XernerxClient {
 	}
 }
 
-export const client = process.env.DISCORD_CLIENT_TOKEN ? new XernerxAppClient() : null;
+export const client = APP_BOT_TOKEN ? new XernerxAppClient() : null;
 
 if (client) {
 	client.init();
 } else {
-	console.warn('[XernerxApp] DISCORD_CLIENT_TOKEN is not set; skipping startup.');
+	console.warn('[XernerxApp] DISCORD_CLIENT_TOKEN / DISCORD_BOT_TOKEN is not set; skipping startup.');
 }

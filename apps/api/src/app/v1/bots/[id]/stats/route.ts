@@ -2,101 +2,74 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database, sendWebhook } from '@xernerx/lib/server';
+import { authenticateV1BotRequest, fetchDiscordBotIdentity } from '@/lib/v1BotAuth';
+
+async function getBotMeta(BotModel: any, id: string) {
+	const botDoc = await BotModel.findOne({ id }).select('name avatar').lean();
+	let name = botDoc?.name;
+	let avatar = botDoc?.avatar;
+
+	if (!name || name === 'Unknown Bot' || !avatar) {
+		const discordIdentity = await fetchDiscordBotIdentity(id);
+		if (discordIdentity.name && (!name || name === 'Unknown Bot')) {
+			name = discordIdentity.name;
+		}
+		if (discordIdentity.avatar && !avatar) {
+			avatar = discordIdentity.avatar;
+		}
+		if (name || avatar) {
+			await BotModel.updateOne(
+				{ id },
+				{
+					$set: {
+						...(name ? { name } : {}),
+						...(avatar ? { avatar } : {}),
+					},
+				}
+			);
+		}
+	}
+
+	let avatarUrl: string | undefined = undefined;
+	if (avatar) {
+		avatarUrl = avatar.startsWith('http') ? avatar : `https://cdn.discordapp.com/avatars/${id}/${avatar}.${avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`;
+	} else {
+		try {
+			const defaultIndex = Number(BigInt(id) >> BigInt(22)) % 6;
+			avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
+		} catch {
+			avatarUrl = undefined;
+		}
+	}
+
+	return {
+		name: name || 'your bot',
+		displayName: name || 'Unknown Bot',
+		avatarUrl,
+	};
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authHeader = req.headers.get('Authorization');
-
-		if (!authHeader) {
-			return NextResponse.json({ error: 'Missing Authorization header' }, { status: 401 });
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
+		if (authResult.error) {
+			return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 		}
 
-		// Extract token (support "Bearer <token>" or just "<token>")
-		const tokenValue = authHeader.replace(/^Bearer\s+/i, '').trim();
+		const { botId: id, BotModel, StatModel, VoteModel, HookModel } = authResult as Required<typeof authResult>;
 
-		const db = await database('xernerx');
-		const TokenModel = (db.models.users as any).Token; // Note: Token is usually in users collection (models.users.Token)
-		const BotModel = (db.models.bots as any).Bot;
-		const StatModel = (db.models.bots as any).Stat;
-
-		if (!TokenModel || !BotModel || !StatModel) {
+		if (!StatModel) {
 			return NextResponse.json({ error: 'Database models not found' }, { status: 500 });
 		}
 
-		// 1. Fetch Token
-		const tokenDoc = await TokenModel.findOne({ id: tokenValue });
-		if (!tokenDoc) {
-			return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
-		}
-
-		if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') {
-			return NextResponse.json({ error: 'Token is inactive or suspended' }, { status: 403 });
-		}
-
-		// 2. Parse Body Stats
 		const body = await req.json().catch(() => ({}));
 
-		// 3. Token Assignment Logic
-		if (!tokenDoc.botId) {
-			// First time: claim the bot ID
-			const existingBot = await BotModel.findOne({ id });
-			if (existingBot) {
-				const tokenOwners = tokenDoc.owners || [];
-				const botOwners = existingBot.owners || [];
-
-				const hasAccess = tokenOwners.some((owner: string) => botOwners.includes(owner));
-				if (!hasAccess) {
-					return NextResponse.json({ error: 'Bot ID is already assigned to another profile' }, { status: 403 });
-				}
-
-				// If they own it, link it directly without creating a new profile
-				await TokenModel.updateOne({ id: tokenValue }, { $set: { botId: id, status: 'active' } });
-			} else {
-				// Fetch bot info from Discord
-				let botName = 'Unknown Bot';
-				let botAvatar = null;
-				try {
-					const discordToken = process.env.DISCORD_CLIENT_TOKEN;
-					if (discordToken) {
-						const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
-							headers: { Authorization: `Bot ${discordToken}` },
-						});
-						if (discordRes.ok) {
-							const discordUser = await discordRes.json();
-							botName = discordUser.username;
-							botAvatar = discordUser.avatar;
-						}
-					}
-				} catch (e) {
-					console.error('Failed to fetch Discord user for bot profile:', e);
-				}
-
-				// Create Bot profile
-				await BotModel.create({
-					id,
-					name: botName,
-					avatar: botAvatar,
-					owners: tokenDoc.owners || [],
-				});
-
-				// Update Token
-				await TokenModel.updateOne({ id: tokenValue }, { $set: { botId: id, status: 'active' } });
-			}
-		} else {
-			// Recurring: ensure botId matches
-			if (tokenDoc.botId !== id) {
-				return NextResponse.json({ error: 'Token is not assigned to this bot ID' }, { status: 403 });
-			}
-		}
-
-		// 4. Update Stats
 		const serverCount = typeof body.serverCount === 'number' ? body.serverCount : typeof body.guildCount === 'number' ? body.guildCount : 0;
 		const shardCount = typeof body.shardCount === 'number' ? body.shardCount : 0;
 		const userCount = typeof body.userCount === 'number' ? body.userCount : 0;
 
-		const VoteModel = (db.models.bots as any).Vote;
-		const currentVoteCount = await VoteModel.countDocuments({ botId: id });
+		const currentVoteCount = VoteModel ? await VoteModel.countDocuments({ botId: id }) : 0;
 
 		await StatModel.create({
 			id,
@@ -107,7 +80,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			timestamp: new Date(),
 		});
 
-		// Fast cache update on BotModel
 		const updateFields: any = {};
 		if (typeof body.voteCount === 'number') {
 			updateFields.voteCount = body.voteCount;
@@ -118,9 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		}
 
 		const botMeta = await getBotMeta(BotModel, id);
-
-		const HookModel = (db.models.bots as any).Hook;
-		const hooks = await HookModel.find({ botId: id }).lean();
+		const hooks = HookModel ? await HookModel.find({ botId: id }).lean() : [];
 
 		if (hooks?.length) {
 			for (const hook of hooks) {
@@ -154,85 +124,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 	}
 }
 
-async function getBotMeta(BotModel: any, id: string) {
-	const botDoc = await BotModel.findOne({ id }).select('name avatar').lean();
-	let name = botDoc?.name;
-	let avatar = botDoc?.avatar;
-
-	if ((!name || !avatar) && process.env.DISCORD_CLIENT_TOKEN) {
-		try {
-			const res = await fetch(`https://discord.com/api/v10/users/${id}`, {
-				headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
-			});
-			if (res.ok) {
-				const user = await res.json();
-				if (!name && (user.global_name || user.username)) {
-					name = user.global_name || user.username;
-				}
-				if (!avatar && user.avatar) {
-					avatar = user.avatar;
-				}
-				if (name || avatar) {
-					await BotModel.updateOne(
-						{ id },
-						{
-							$set: {
-								...(name ? { name } : {}),
-								...(avatar ? { avatar } : {}),
-							},
-						}
-					);
-				}
-			}
-		} catch (e) {
-			console.error('Failed to fetch Discord user for bot meta:', e);
-		}
-	}
-
-	let avatarUrl: string | undefined = undefined;
-	if (avatar) {
-		avatarUrl = avatar.startsWith('http') ? avatar : `https://cdn.discordapp.com/avatars/${id}/${avatar}.${avatar.startsWith('a_') ? 'gif' : 'png'}?size=128`;
-	} else {
-		try {
-			const defaultIndex = Number(BigInt(id) >> BigInt(22)) % 6;
-			avatarUrl = `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
-		} catch {
-			avatarUrl = undefined;
-		}
-	}
-
-	return {
-		name: name || 'your bot',
-		displayName: name || 'Unknown Bot',
-		avatarUrl,
-	};
-}
-
-async function authStats(req: NextRequest, botId: string) {
-	const authHeader = req.headers.get('Authorization');
-	if (!authHeader) return { error: 'Missing Authorization header', status: 401 };
-
-	const tokenValue = authHeader.replace(/^Bearer\s+/i, '').trim();
-
-	const db = await database('xernerx');
-	const TokenModel = (db.models.users as any).Token;
-	const BotModel = (db.models.bots as any).Profile || (db.models.bots as any).Bot;
-	const StatModel = (db.models.bots as any).Stat;
-
-	if (!TokenModel || !BotModel || !StatModel) return { error: 'Database models not found', status: 500 };
-
-	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
-	if (!tokenDoc) return { error: 'Invalid token', status: 401 };
-	if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') return { error: 'Token is inactive or suspended', status: 403 };
-
-	const bot = await BotModel.findOne({ id: botId });
-	if (!bot) return { error: 'Bot not found', status: 404 };
-
-	const tokenOwners = tokenDoc.owners || [];
-	const botOwners = bot.owners || [];
-	const hasFullAccess = tokenDoc.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
-
-	return { hasFullAccess, StatModel };
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+	return POST(req, context);
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -253,11 +146,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authResult = await authStats(req, id);
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { hasFullAccess, StatModel } = authResult;
+		const { botId: id, hasFullAccess, StatModel, BotModel, HookModel, VoteModel } = authResult as Required<typeof authResult>;
 		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
 		const statId = req.nextUrl.searchParams.get('statId');
@@ -267,6 +160,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		delete body.id;
 		delete body.timestamp;
 
+		if (typeof body.serverCount === 'number' && body.guildCount === undefined) {
+			body.guildCount = body.serverCount;
+		}
+
 		if (statId) {
 			await StatModel.updateOne({ _id: statId, id }, { $set: body });
 		} else {
@@ -274,15 +171,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			if (latest) {
 				await StatModel.updateOne({ _id: latest._id }, { $set: body });
 			} else {
-				return NextResponse.json({ error: 'No stats found to update' }, { status: 404 });
+				const currentVoteCount = VoteModel ? await VoteModel.countDocuments({ botId: id }) : 0;
+				await StatModel.create({
+					id,
+					guildCount: typeof body.guildCount === 'number' ? body.guildCount : 0,
+					shardCount: typeof body.shardCount === 'number' ? body.shardCount : 0,
+					userCount: typeof body.userCount === 'number' ? body.userCount : 0,
+					voteCount: currentVoteCount,
+					timestamp: new Date(),
+				});
 			}
 		}
 
-		const db = await database('xernerx');
-		const HookModel = (db.models.bots as any).Hook;
-		const BotModel = (db.models.bots as any).Bot || (db.models.bots as any).Profile;
 		const botMeta = await getBotMeta(BotModel, id);
-		const hooks = await HookModel.find({ botId: id }).lean();
+		const hooks = HookModel ? await HookModel.find({ botId: id }).lean() : [];
 
 		if (hooks?.length) {
 			for (const hook of hooks) {
@@ -318,11 +220,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authResult = await authStats(req, id);
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { hasFullAccess, StatModel } = authResult;
+		const { botId: id, hasFullAccess, StatModel, BotModel, HookModel } = authResult as Required<typeof authResult>;
 		if (!hasFullAccess) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
 		const statId = req.nextUrl.searchParams.get('statId');
@@ -333,11 +235,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 			await StatModel.deleteMany({ id });
 		}
 
-		const db = await database('xernerx');
-		const HookModel = (db.models.bots as any).Hook;
-		const BotModel = (db.models.bots as any).Bot || (db.models.bots as any).Profile;
 		const botMeta = await getBotMeta(BotModel, id);
-		const hooks = await HookModel.find({ botId: id }).lean();
+		const hooks = HookModel ? await HookModel.find({ botId: id }).lean() : [];
 
 		if (hooks?.length) {
 			for (const hook of hooks) {

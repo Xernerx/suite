@@ -54,7 +54,7 @@ export class XernerxBotClient extends XernerxClient {
 
 		await this.connect();
 
-		if (process.env.XERNERX_TOKEN && process.env.ENVIRONMENT?.toUpperCase() === 'PRODUCTION') {
+		if (process.env.XERNERX_TOKEN) {
 			new XernerxStats(this as any, { token: process.env.XERNERX_TOKEN });
 		}
 	}
