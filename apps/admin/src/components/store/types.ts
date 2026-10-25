@@ -22,7 +22,7 @@ export interface StoreItem {
 	itemType?: 'subscription' | 'credit_pack' | 'credit_perk';
 	creditCost?: number;
 	creditAmount?: number;
-	perkType?: 'none' | 'cdn_slots' | 'showcase_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'boost_bot' | 'boost_server';
+	perkType?: 'none' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'boost_bot' | 'boost_server';
 	perkValue?: any;
 	durationDays?: number;
 	features: string[];
@@ -32,6 +32,28 @@ export interface StoreItem {
 	enabled: boolean;
 	order: number;
 	metadata?: Record<string, any>;
+	createdAt?: string;
+	updatedAt?: string;
+}
+
+export interface StoreCoupon {
+	id: string;
+	code: string;
+	name: string;
+	description?: string;
+	discountType: 'percent' | 'amount';
+	percentOff: number;
+	amountOff: number;
+	currency: string;
+	duration: 'once' | 'repeating' | 'forever';
+	durationInMonths?: number | null;
+	maxRedemptions?: number | null;
+	timesRedeemed: number;
+	expiresAt?: string | null;
+	appliesToProducts?: string[];
+	stripeCouponId?: string | null;
+	stripePromotionCodeId?: string | null;
+	enabled: boolean;
 	createdAt?: string;
 	updatedAt?: string;
 }

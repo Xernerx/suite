@@ -5,9 +5,10 @@ import { Save, Server, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useEnvironment, useToast, useSession, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
+import { Button, MultiSelector, Selector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import { SisterServersSection } from './settings/SisterServersSection';
+import { WebhooksSection } from './settings/WebhooksSection';
 
 export default function Settings() {
 	const { t } = useDictionary();
@@ -19,6 +20,8 @@ export default function Settings() {
 	const [adminServerId, setAdminServerId] = useState('');
 	const [mainOrgId, setMainOrgId] = useState('');
 	const [organizations, setOrganizations] = useState<{ _id: string; name: string }[]>([]);
+	const [issuesWebhookUrl, setIssuesWebhookUrl] = useState('');
+	const [suggestionsWebhookUrl, setSuggestionsWebhookUrl] = useState('');
 	const [appWebhookUrl, setAppWebhookUrl] = useState('');
 	const [auditWebhookUrl, setAuditWebhookUrl] = useState('');
 	const [joinRoles, setJoinRoles] = useState<string[]>([]);
@@ -60,7 +63,7 @@ export default function Settings() {
 	const fetchSettings = async () => {
 		setIsLoading(true);
 		try {
-			const [adminRes, mainOrgRes, orgsRes, webhookRes, auditWebhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
+			const [adminRes, mainOrgRes, orgsRes, issuesWebhookRes, suggestionsWebhookRes, webhookRes, auditWebhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
 					credentials: 'include',
 				}),
@@ -68,6 +71,12 @@ export default function Settings() {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/organizations'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/issues_webhook_url'), {
+					credentials: 'include',
+				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/suggestions_webhook_url'), {
 					credentials: 'include',
 				}),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
@@ -94,6 +103,8 @@ export default function Settings() {
 			]);
 			let loadedAdminServerId = '';
 			let loadedMainOrgId = '';
+			let loadedIssuesWebhook = '';
+			let loadedSuggestionsWebhook = '';
 			let loadedAppWebhook = '';
 			let loadedAuditWebhook = '';
 			let loadedJoinRoles: string[] = [];
@@ -114,6 +125,16 @@ export default function Settings() {
 			if (orgsRes.ok) {
 				const orgsData = await orgsRes.json();
 				setOrganizations(Array.isArray(orgsData) ? orgsData : []);
+			}
+			if (issuesWebhookRes.ok) {
+				const data = await issuesWebhookRes.json();
+				loadedIssuesWebhook = data.value || '';
+				setIssuesWebhookUrl(loadedIssuesWebhook);
+			}
+			if (suggestionsWebhookRes.ok) {
+				const data = await suggestionsWebhookRes.json();
+				loadedSuggestionsWebhook = data.value || '';
+				setSuggestionsWebhookUrl(loadedSuggestionsWebhook);
 			}
 			if (webhookRes.ok) {
 				const data = await webhookRes.json();
@@ -173,6 +194,8 @@ export default function Settings() {
 				JSON.stringify({
 					adminServerId: loadedAdminServerId,
 					mainOrgId: loadedMainOrgId,
+					issuesWebhookUrl: loadedIssuesWebhook,
+					suggestionsWebhookUrl: loadedSuggestionsWebhook,
 					appWebhookUrl: loadedAppWebhook,
 					auditWebhookUrl: loadedAuditWebhook,
 					joinRoles: loadedJoinRoles,
@@ -196,6 +219,8 @@ export default function Settings() {
 			JSON.stringify({
 				adminServerId,
 				mainOrgId,
+				issuesWebhookUrl,
+				suggestionsWebhookUrl,
 				appWebhookUrl,
 				auditWebhookUrl,
 				joinRoles,
@@ -203,7 +228,7 @@ export default function Settings() {
 				roadmapProducts,
 				sisterServers,
 			}),
-		[adminServerId, mainOrgId, appWebhookUrl, auditWebhookUrl, joinRoles, botJoinRoles, roadmapProducts, sisterServers]
+		[adminServerId, mainOrgId, issuesWebhookUrl, suggestionsWebhookUrl, appWebhookUrl, auditWebhookUrl, joinRoles, botJoinRoles, roadmapProducts, sisterServers]
 	);
 
 	const isDirty = Boolean(initialSnapshot) && currentSnapshot !== initialSnapshot;
@@ -225,6 +250,18 @@ export default function Settings() {
 						headers: { 'Content-Type': 'application/json' },
 						credentials: 'include',
 						body: JSON.stringify({ value: mainOrgId, valueType: 'string' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/issues_webhook_url'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: issuesWebhookUrl, valueType: 'string' }),
+					}),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/suggestions_webhook_url'), {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						credentials: 'include',
+						body: JSON.stringify({ value: suggestionsWebhookUrl, valueType: 'string' }),
 					}),
 					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
 						method: 'PATCH',
@@ -277,7 +314,22 @@ export default function Settings() {
 				setIsSaving(false);
 			}
 		},
-		[adminServerId, mainOrgId, appWebhookUrl, auditWebhookUrl, joinRoles, botJoinRoles, roadmapProducts, sisterServers, currentSnapshot, getEnvUrl, toast, t]
+		[
+			adminServerId,
+			mainOrgId,
+			issuesWebhookUrl,
+			suggestionsWebhookUrl,
+			appWebhookUrl,
+			auditWebhookUrl,
+			joinRoles,
+			botJoinRoles,
+			roadmapProducts,
+			sisterServers,
+			currentSnapshot,
+			getEnvUrl,
+			toast,
+			t,
+		]
 	);
 
 	const handleReset = useCallback(() => {
@@ -286,6 +338,8 @@ export default function Settings() {
 			const parsed = JSON.parse(initialSnapshot);
 			setAdminServerId(parsed.adminServerId || '');
 			setMainOrgId(parsed.mainOrgId || '');
+			setIssuesWebhookUrl(parsed.issuesWebhookUrl || '');
+			setSuggestionsWebhookUrl(parsed.suggestionsWebhookUrl || '');
 			setAppWebhookUrl(parsed.appWebhookUrl || '');
 			setAuditWebhookUrl(parsed.auditWebhookUrl || '');
 			setJoinRoles(parsed.joinRoles || []);
@@ -390,27 +444,17 @@ export default function Settings() {
 					/>
 				</div>
 
-				<div
-					className="flex flex-col max-w-md"
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.appWebhookUrl')}</label>
-					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.appWebhookUrlDesc')}</p>
-					<Input value={appWebhookUrl} onChange={(e) => setAppWebhookUrl(e.target.value)} placeholder={t('admin.settings.appWebhookUrlPlaceholder')} />
-				</div>
-
-				<div
-					className="flex flex-col max-w-md"
-					style={{
-						gap: 'calc(var(--ui-gap) * 0.5)',
-					}}
-				>
-					<label className="text-xs font-semibold text-(--text)">{t('admin.settings.auditWebhookUrl')}</label>
-					<p className="text-xs text-(--text-muted) mb-1">{t('admin.settings.auditWebhookUrlDesc')}</p>
-					<Input value={auditWebhookUrl} onChange={(e) => setAuditWebhookUrl(e.target.value)} placeholder={t('admin.settings.auditWebhookUrlPlaceholder')} />
-				</div>
+				<WebhooksSection
+					adminServerId={adminServerId}
+					issuesWebhookUrl={issuesWebhookUrl}
+					setIssuesWebhookUrl={setIssuesWebhookUrl}
+					suggestionsWebhookUrl={suggestionsWebhookUrl}
+					setSuggestionsWebhookUrl={setSuggestionsWebhookUrl}
+					appWebhookUrl={appWebhookUrl}
+					setAppWebhookUrl={setAppWebhookUrl}
+					auditWebhookUrl={auditWebhookUrl}
+					setAuditWebhookUrl={setAuditWebhookUrl}
+				/>
 
 				<div
 					className="flex flex-col max-w-md"

@@ -42,6 +42,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 						userId: '000000000000000000',
 						subscribedEvents: events,
 						message: 'Test webhook ping from Xernerx Developer Portal',
+						...(events.includes('POST release')
+							? {
+									release: {
+										id: '00000000-0000-0000-0000-000000000000',
+										version: 'v1.0.0',
+										title: 'Test Release Ping',
+										body: 'Sample release notes dispatched by the Xernerx Developer Portal webhook test.',
+										createdAt: new Date().toISOString(),
+									},
+								}
+							: {}),
 					},
 				};
 

@@ -18,9 +18,13 @@ import CoreSuggestionSchema from './models/xernerx/core/Suggestion';
 import CoreRoadmapItemSchema from './models/xernerx/core/RoadmapItem';
 import CoreIssueSchema from './models/xernerx/core/Issue';
 import CoreAuditLogSchema from './models/xernerx/core/AuditLog';
+import CoreSupportChannelSchema from './models/xernerx/core/SupportChannel';
+import CoreSupportBotSchema from './models/xernerx/core/SupportBot';
+import CoreSupportTicketSchema from './models/xernerx/core/SupportTicket';
 
 import StoreCategorySchema from './models/xernerx/store/Category';
 import StoreItemSchema from './models/xernerx/store/Item';
+import StoreCouponSchema from './models/xernerx/store/Coupon';
 
 import DispatchApplicationSchema from './models/xernerx/dispatch/Application';
 import DispatchApplicationConfigSchema from './models/xernerx/dispatch/ApplicationConfig';
@@ -64,10 +68,14 @@ export const xernerxModels = {
 		RoadmapItem: { schema: CoreRoadmapItemSchema, modelName: 'RoadmapItem' },
 		Issue: { schema: CoreIssueSchema, modelName: 'Issue' },
 		AuditLog: { schema: CoreAuditLogSchema, modelName: 'AuditLog', collection: 'audit_logs' },
+		SupportChannel: { schema: CoreSupportChannelSchema, modelName: 'SupportChannel', collection: 'support_channels' },
+		SupportBot: { schema: CoreSupportBotSchema, modelName: 'SupportBot', collection: 'support_bots' },
+		SupportTicket: { schema: CoreSupportTicketSchema, modelName: 'SupportTicket', collection: 'support_tickets' },
 	},
 	store: {
 		Category: { schema: StoreCategorySchema, modelName: 'Category', collection: 'categories' },
 		Item: { schema: StoreItemSchema, modelName: 'Item', collection: 'items' },
+		Coupon: { schema: StoreCouponSchema, modelName: 'Coupon', collection: 'coupons' },
 	},
 	dispatch: {
 		Application: { schema: DispatchApplicationSchema, modelName: 'Application' },

@@ -11,6 +11,7 @@ const schema = new Schema(
 		extraCdnSlots: { type: Number, default: 0, min: 0 },
 		extraShowcaseSlots: { type: Number, default: 0, min: 0 },
 		extraVanitySlots: { type: Number, default: 0, min: 0 },
+		extraBotSlots: { type: Number, default: 0, min: 0 },
 		streakShields: { type: Number, default: 0, min: 0, max: 3 },
 		referredBy: { type: String, default: null },
 		referralBonusClaimed: { type: Boolean, default: false },

@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -61,6 +62,29 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 					message: `Your suggestion "${updated.title}" is now marked as ${updated.status}.`,
 					link: 'https://info.xernerx.com/suggestions',
 				});
+			}
+
+			if (updated.status === 'accepted' || updated.status === 'implemented') {
+				const isImplemented = updated.status === 'implemented';
+				await dispatchAppCommunityWebhook(
+					{ models },
+					{
+						feedType: 'suggestions',
+						title: `${isImplemented ? '🚀 Suggestion Shipped' : '🌟 Suggestion Accepted (+250 Credits)'}: ${String(updated.title || id).slice(0, 120)}`,
+						url: 'https://info.xernerx.com/suggestions',
+						description: String(updated.description || '').slice(0, 300),
+						color: isImplemented ? 0x22c55e : 0x8b7cf6,
+						fields: [
+							{ name: 'Status', value: isImplemented ? '`Implemented`' : '`Accepted`', inline: true },
+							{ name: 'Product', value: `\`${updated.productId || 'Suite'}\``, inline: true },
+							...(updated.authorId ? [{ name: 'Author', value: `<@${updated.authorId}>`, inline: true }] : []),
+						],
+						ctaLinks: [
+							{ label: 'View Suggestions Hub', url: 'https://info.xernerx.com/suggestions' },
+							{ label: 'View Roadmap', url: 'https://info.xernerx.com/roadmap' },
+						],
+					}
+				).catch(() => {});
 			}
 		}
 

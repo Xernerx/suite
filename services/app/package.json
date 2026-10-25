@@ -1,13 +1,13 @@
 {
 	"name": "@xernerx/app",
-	"version": "2.0.1",
+	"version": "2.1.0",
 	"description": "Xernerx App Discord bot daemon for support, docs, status, and community hub",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"dev": "tsx watch src/main.ts",
+		"dev": "node --watch --import tsx src/main.ts",
 		"build": "tsc",
-		"start": "tsx src/main.ts"
+		"start": "node --import tsx src/main.ts"
 	},
 	"engines": {
 		"node": ">=22"

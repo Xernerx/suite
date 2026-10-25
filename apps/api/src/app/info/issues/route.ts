@@ -5,6 +5,7 @@ import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { enrichIssuesWithVersionStatus } from '@/lib/suiteVersions';
+import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export const dynamic = 'force-dynamic';
 
@@ -111,6 +112,25 @@ export async function POST(req: NextRequest) {
 			status: 'open',
 			acknowledged: false, // Default to unacknowledged for admin review
 		});
+
+		await dispatchAppCommunityWebhook(
+			{ models },
+			{
+				feedType: 'issues',
+				title: `🐛 New Bug Report: ${String(body.title).slice(0, 120)}`,
+				url: `https://info.xernerx.com/bugs?id=${issue.id}`,
+				description: String(body.description || '').slice(0, 350),
+				color: 0xf59e0b,
+				fields: [
+					{ name: 'Product', value: `\`${String(body.productId || 'Suite')}\``, inline: true },
+					{ name: 'Reported By', value: `<@${session.user.id}>`, inline: true },
+				],
+				ctaLinks: [
+					{ label: 'Inspect Issue', url: `https://info.xernerx.com/bugs?id=${issue.id}` },
+					{ label: 'Report a Bug (+500 Credits)', url: 'https://info.xernerx.com/bugs' },
+				],
+			}
+		).catch(() => {});
 
 		return NextResponse.json({ data: issue });
 	} catch (err) {

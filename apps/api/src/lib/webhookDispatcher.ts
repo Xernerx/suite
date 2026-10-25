@@ -141,3 +141,119 @@ export function collectBotDeliveries(hooks: any[]): WebhookDeliveryRecord[] {
 	}
 	return all.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 25);
 }
+
+export async function dispatchBotReleaseWebhooks(bot: any, newRelease: any): Promise<WebhookDeliveryRecord[]> {
+	const deliveries: WebhookDeliveryRecord[] = [];
+	if (!bot?.id || !newRelease) return deliveries;
+
+	try {
+		const db = await database('xernerx');
+		const HookModel = (db.models.bots as any).Hook;
+		if (!HookModel) return deliveries;
+
+		const hooks = await HookModel.find({ botId: bot.id }).lean();
+		const matchingHooks = (hooks || []).filter((hook: any) => hook?.url && Array.isArray(hook.events) && (hook.events.includes('POST release') || hook.events.includes('POST releases')));
+
+		if (matchingHooks.length === 0) return deliveries;
+
+		let discordBot: any = null;
+		try {
+			const res = await fetch(`https://discord.com/api/v10/users/${bot.id}`, {
+				headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+				next: { revalidate: 3600 },
+			});
+			if (res.ok) discordBot = await res.json();
+		} catch {}
+
+		const finalBotName = discordBot?.global_name || discordBot?.username || bot?.name || 'Unknown Bot';
+		const rawAvatar = discordBot?.avatar || bot?.avatar;
+		const finalBotAvatar = rawAvatar ? (String(rawAvatar).startsWith('http') ? String(rawAvatar) : `https://cdn.discordapp.com/avatars/${bot.id}/${rawAvatar}.png`) : undefined;
+
+		const rawVersion = String(newRelease.version || '1.0.0').trim();
+		const formattedVersion = rawVersion.toLowerCase().startsWith('v') ? rawVersion : `v${rawVersion}`;
+		const profileSlug = bot.vanitySlug || bot.id;
+		const releasesUrl = `https://app.xernerx.com/bots/${profileSlug}?tab=releases`;
+		const releaseIso = new Date(newRelease.createdAt || Date.now()).toISOString();
+
+		const releaseEmbed = {
+			author: {
+				name: `${finalBotName} • New Release`,
+				...(finalBotAvatar ? { icon_url: finalBotAvatar } : {}),
+				url: `https://app.xernerx.com/bots/${profileSlug}`,
+			},
+			title: `🚀 ${formattedVersion} — ${newRelease.title}`,
+			url: releasesUrl,
+			description: newRelease.body ? String(newRelease.body).slice(0, 3800) : '*No release notes provided.*',
+			fields: [
+				{
+					name: 'Version',
+					value: `\`${formattedVersion}\``,
+					inline: true,
+				},
+				{
+					name: 'Changelog',
+					value: `[View on Xernerx](${releasesUrl})`,
+					inline: true,
+				},
+			],
+			color: 0xff00a0,
+			footer: {
+				text: `${finalBotName} • Xernerx Releases`,
+				...(finalBotAvatar ? { icon_url: finalBotAvatar } : {}),
+			},
+			timestamp: releaseIso,
+		};
+
+		const releasePayloadObj = {
+			id: newRelease.id,
+			version: newRelease.version,
+			title: newRelease.title,
+			body: newRelease.body || '',
+			authorId: newRelease.authorId,
+			createdAt: releaseIso,
+		};
+
+		for (const hook of matchingHooks) {
+			try {
+				const isDiscordWebhook = hook.url.includes('discord.com/api/webhooks/') || hook.url.includes('discordapp.com/api/webhooks/');
+				const payload = isDiscordWebhook
+					? {
+							username: 'Xernerx App',
+							avatar_url: 'https://xernerx.com/logo.png',
+							embeds: [releaseEmbed],
+						}
+					: {
+							event: 'POST release',
+							botId: bot.id,
+							timestamp: releaseIso,
+							bot: {
+								id: bot.id,
+								name: finalBotName,
+								vanitySlug: bot.vanitySlug || null,
+								avatar: finalBotAvatar || null,
+								url: releasesUrl,
+							},
+							release: releasePayloadObj,
+							data: {
+								release: releasePayloadObj,
+							},
+							embeds: [releaseEmbed],
+						};
+
+				const delivery = await dispatchBotWebhook({
+					botId: bot.id,
+					url: hook.url,
+					event: 'POST release',
+					payload,
+				});
+				deliveries.push(delivery);
+			} catch (err) {
+				console.error('Failed to trigger bot webhook for release:', err);
+			}
+		}
+	} catch (err) {
+		console.error('Failed to process bot release webhooks:', err);
+	}
+
+	return deliveries;
+}

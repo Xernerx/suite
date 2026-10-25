@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { dispatchBotReleaseWebhooks } from '@/lib/webhookDispatcher';
 
 async function canManageBot(db: any, bot: any, userId: string | undefined) {
 	if (!userId || !bot) return false;
@@ -98,6 +99,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		bot.releases = [newRelease, ...(Array.isArray(bot.releases) ? bot.releases : [])];
 		await bot.save();
+
+		await dispatchBotReleaseWebhooks(bot, newRelease);
 
 		return NextResponse.json({ release: newRelease, releases: bot.releases }, { status: 201 });
 	} catch (error) {

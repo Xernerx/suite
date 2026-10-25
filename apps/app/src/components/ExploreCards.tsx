@@ -10,11 +10,15 @@ import Link from 'next/link';
 
 export interface BotProfile {
 	id: string;
+	name?: string;
+	avatar?: string;
+	banner?: string;
+	vanitySlug?: string;
 	description?: string;
 	stats?: {
 		guildCount: number;
 		userCount: number;
-	};
+	} | null;
 	voteCount?: number;
 }
 
@@ -38,38 +42,63 @@ export interface GuildProfile {
 
 export function BotCard({ bot }: { bot: BotProfile }) {
 	const { t } = useDictionary();
-	const { getEnvUrl } = useEnvironment();
-	const [discord, setDiscord] = useState<DiscordProfile | null>(null);
-	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(null);
-	const [loading, setLoading] = useState(true);
+	const { getEnvUrl, isReady } = useEnvironment();
+	const [discord, setDiscord] = useState<DiscordProfile | null>(() => {
+		if (!bot.name && !bot.avatar) return null;
+		return {
+			global_name: bot.name,
+			username: bot.name,
+			avatarUrl: bot.avatar ? (bot.avatar.startsWith('http') ? bot.avatar : `https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=512`) : null,
+			bannerUrl: bot.banner ? (bot.banner.startsWith('http') ? bot.banner : `https://cdn.discordapp.com/banners/${bot.id}/${bot.banner}.png?size=1024`) : null,
+		};
+	});
+	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(() => (bot.stats ? { guildCount: bot.stats.guildCount ?? 0, userCount: bot.stats.userCount ?? 0 } : null));
+	const [loading, setLoading] = useState(() => !bot.name && !bot.avatar);
 
 	useEffect(() => {
+		if (!isReady || !bot.id) return;
+		let cancelled = false;
+		const controller = new AbortController();
+
 		const fetchData = async () => {
 			try {
-				const [discordRes, statsRes] = await Promise.all([
-					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`)),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${bot.id}/stats?limit=1`)),
-				]);
+				const discordPromise = fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`), {
+					signal: controller.signal,
+				}).catch(() => null);
 
-				if (discordRes.ok) {
-					const data = await discordRes.json();
-					setDiscord(data);
+				const statsPromise = !bot.stats
+					? fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${bot.id}/stats?limit=1`), {
+							signal: controller.signal,
+						}).catch(() => null)
+					: Promise.resolve(null);
+
+				const [discordRes, statsRes] = await Promise.all([discordPromise, statsPromise]);
+				if (cancelled) return;
+
+				if (discordRes && discordRes.ok) {
+					const data = await discordRes.json().catch(() => null);
+					if (!cancelled && data) setDiscord(data);
 				}
 
-				if (statsRes.ok) {
-					const data = await statsRes.json();
-					if (data && data.length > 0) {
-						setStats({ guildCount: data[0].guildCount, userCount: data[0].userCount });
+				if (statsRes && statsRes.ok) {
+					const data = await statsRes.json().catch(() => null);
+					if (!cancelled && Array.isArray(data) && data.length > 0) {
+						setStats({ guildCount: data[0].guildCount ?? 0, userCount: data[0].userCount ?? 0 });
 					}
 				}
-			} catch (error) {
-				console.error(`Failed to fetch data for ${bot.id}:`, error);
+			} catch {
+				// Ignore transient/aborted client fetch errors
 			} finally {
-				setLoading(false);
+				if (!cancelled) setLoading(false);
 			}
 		};
 		fetchData();
-	}, [bot.id, getEnvUrl]);
+
+		return () => {
+			cancelled = true;
+			controller.abort();
+		};
+	}, [bot.id, bot.stats, getEnvUrl, isReady]);
 
 	const name = discord?.global_name || discord?.username || t('common.unknownBot');
 	const avatar = discord?.avatarUrl;

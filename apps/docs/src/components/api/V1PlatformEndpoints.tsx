@@ -265,12 +265,17 @@ export function V1PlatformEndpoints({
 								{
 									label: 'Express / Node.js Receiver',
 									language: 'typescript',
-									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat"\n  const deliveryId = req.headers['x-xernerx-delivery'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
+									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat", "POST release"\n  const deliveryId = req.headers['x-xernerx-delivery'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
 								},
 								{
 									label: 'Webhook JSON Payload',
 									language: 'json',
 									code: `{\n  "event": "POST vote",\n  "botId": "${effectiveBotId}",\n  "test": true,\n  "timestamp": "2026-10-24T20:15:00.000Z",\n  "data": {\n    "userId": "987654321098765432",\n    "votes": 42,\n    "message": "Test webhook ping from Xernerx Developer Portal"\n  }\n}`,
+								},
+								{
+									label: 'POST release Payload',
+									language: 'json',
+									code: `{\n  "event": "POST release",\n  "botId": "${effectiveBotId}",\n  "timestamp": "2026-10-25T14:00:00.000Z",\n  "bot": {\n    "id": "${effectiveBotId}",\n    "name": "My Bot",\n    "vanitySlug": "my-bot",\n    "url": "https://app.xernerx.com/bots/my-bot?tab=releases"\n  },\n  "release": {\n    "id": "b1f23c45-6789-4012-89ab-cdef01234567",\n    "version": "v1.2.0",\n    "title": "Major Update",\n    "body": "Added new slash commands and webhook triggers.",\n    "authorId": "123456789012345678",\n    "createdAt": "2026-10-25T14:00:00.000Z"\n  }\n}`,
 								},
 							]}
 						/>

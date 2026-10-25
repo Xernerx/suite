@@ -52,7 +52,10 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 					userId: userId || owners[0],
 				}),
 			});
-			if (!res.ok) throw new Error('Failed to create token');
+			if (!res.ok) {
+				const errData = await res.json().catch(() => ({}));
+				throw new Error(errData.error || 'Failed to create token');
+			}
 			toast({
 				title: t('account.tokens.create.success'),
 				type: 'success',

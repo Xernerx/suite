@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { authenticateV1BotRequest } from '@/lib/v1BotAuth';
+import { dispatchBotReleaseWebhooks } from '@/lib/webhookDispatcher';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -69,6 +70,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		bot.releases = [newRelease, ...(Array.isArray(bot.releases) ? bot.releases : [])];
 		await bot.save();
+
+		await dispatchBotReleaseWebhooks(bot, newRelease);
 
 		return NextResponse.json({ release: newRelease, releases: bot.releases }, { status: 201 });
 	} catch (error) {

@@ -3,6 +3,7 @@
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -36,6 +37,25 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 						prefKey: 'roadmapReleased',
 					});
 				}
+
+				await dispatchAppCommunityWebhook(
+					{ models },
+					{
+						feedType: 'suggestions',
+						title: `🎉 Roadmap Milestone Released: ${String(updated.title || id).slice(0, 120)}`,
+						url: updated.changelogUrl || 'https://info.xernerx.com/roadmap',
+						description: String(updated.description || 'This milestone is now live across the Xernerx Suite!').slice(0, 350),
+						color: 0x22c55e,
+						fields: [
+							{ name: 'Product', value: `\`${updated.productId || 'Suite'}\``, inline: true },
+							...(updated.targetQuarter ? [{ name: 'Release Cycle', value: `\`${updated.targetQuarter}\``, inline: true }] : []),
+						],
+						ctaLinks: [
+							{ label: 'Explore Roadmap', url: 'https://info.xernerx.com/roadmap' },
+							{ label: 'Read Changelog', url: updated.changelogUrl || 'https://info.xernerx.com/changelog' },
+						],
+					}
+				).catch(() => {});
 			}
 		}
 

@@ -3,7 +3,7 @@
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function syncSisterServers(addedServers: string[], db: any) {
-	const botToken = process.env.DISCORD_CLIENT_TOKEN;
+	const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 	if (!botToken) {
 		console.log('[Sync] No bot token for sister server sync');
 		return;

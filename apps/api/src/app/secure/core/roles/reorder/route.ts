@@ -35,7 +35,7 @@ export async function PATCH(req: Request) {
 		} catch (e) {}
 
 		const allGuildIds = [mainServerId, ...sisterServers.map((s) => s.id)].filter(Boolean);
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!botToken || allGuildIds.length === 0) {
 			return NextResponse.json({ success: true, message: 'Database updated, but Discord sync skipped (missing config)' }, { status: 200 });

@@ -100,6 +100,7 @@
 				"translator": "Translator",
 				"xernerxSuite": "Xernerx Suite",
 				"system": "System",
+				"support": "Support",
 				"bots": "Bots",
 				"product": "Product"
 			},
@@ -775,12 +776,106 @@
 			},
 			"auditWebhookUrl": "Admin Audit Discord Webhook URL",
 			"auditWebhookUrlDesc": "Forwards security audit logs and administrative actions to your staff Discord channel in real time.",
-			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/..."
+			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/...",
+			"issuesWebhookUrl": "Issues & Bug Tracker Webhook URL",
+			"issuesWebhookUrlDesc": "Posts live embeds to your #issues channel whenever bugs are reported, verified (+500 Credits), or resolved.",
+			"suggestionsWebhookUrl": "Suggestions & Roadmap Webhook URL",
+			"suggestionsWebhookUrlDesc": "Posts live embeds to your #suggestions channel whenever feature ideas are submitted, accepted (+250 Credits), or shipped.",
+			"linkChannelPlaceholder": "Quick-link a Discord channel to auto-generate webhook..."
+		},
+		"support": {
+			"title": "Discord Support & Ticket Intake",
+			"description": "Manage Xernerx App support channels, selectable support bots, troubleshooting checklists, and active Discord support threads.",
+			"refreshButton": "Refresh",
+			"tabs": {
+				"tickets": "Support Tickets",
+				"channels": "Support Channels",
+				"bots": "Support Bots",
+				"checklist": "Troubleshooting Checklist"
+			},
+			"tickets": {
+				"searchPlaceholder": "Search tickets by user, thread ID, server, or command...",
+				"filterAll": "All",
+				"statusOpen": "Open",
+				"statusOnHold": "On-Hold",
+				"statusResolved": "Resolved",
+				"statusClosed": "Closed",
+				"emptyTitle": "No Support Tickets Found",
+				"emptyDesc": "When users send a message in a configured Discord support channel, Xernerx App automatically opens a guided intake thread and tracks it here.",
+				"unassignedBot": "General Support",
+				"botBadge": "Bot: {bot}",
+				"reopenButton": "Reopen",
+				"holdButton": "Hold",
+				"resolveButton": "Resolve",
+				"closeButton": "Close",
+				"initialPromptLabel": "Initial Message",
+				"reportedServer": "Reported Server",
+				"reportedChannel": "Reported Channel",
+				"reportedMessage": "Message ID",
+				"reportedCommand": "Command",
+				"notProvided": "Not provided",
+				"checklistLabel": "Checklist",
+				"deleteModalTitle": "Delete Support Ticket Record",
+				"deleteModalDesc": "Are you sure you want to delete support ticket #{id} ({user}) from the database?"
+			},
+			"channels": {
+				"formTitle": "Configure Support or Status Channel",
+				"formSubtitle": "Messages sent in a Support channel automatically create a guided intake thread managed by Xernerx App.",
+				"channelSelectLabel": "Discord Channel",
+				"channelSelectPlaceholder": "Select a channel...",
+				"customChannelIdLabel": "Or Enter Channel ID Manually",
+				"typeLabel": "Channel Purpose",
+				"typeSupport": "Support Ticket Intake",
+				"typeStatus": "Status Channel",
+				"roleSelectLabel": "Staff Notification Role",
+				"roleSelectPlaceholder": "Select a staff role to ping...",
+				"noRoleOption": "None (Do not ping role)",
+				"customRoleIdLabel": "Or Enter Role ID Manually",
+				"saveButton": "Save Channel",
+				"emptyTitle": "No Support Channels Configured",
+				"emptyDesc": "Add a Discord channel above to enable automatic support thread creation.",
+				"deleteModalTitle": "Remove Support Channel",
+				"deleteModalDesc": "Are you sure you want to remove {channel} from support channels?"
+			},
+			"bots": {
+				"formTitle": "Add Support Bot for Server",
+				"formSubtitle": "When 2 or more bots are configured for a server, Xernerx App prompts users to select which bot they need help with.",
+				"selectLabel": "Select Registered Bot",
+				"selectPlaceholder": "Choose a bot from the ecosystem...",
+				"customBotIdLabel": "Or Enter Discord Bot ID Manually",
+				"addButton": "Add Support Bot",
+				"emptyTitle": "No Support Bots Configured",
+				"emptyDesc": "Add bots above so users can select which bot their support ticket is about.",
+				"deleteModalTitle": "Remove Support Bot",
+				"deleteModalDesc": "Are you sure you want to remove {bot} from this server's support bot list?"
+			},
+			"checklist": {
+				"title": "Intake Troubleshooting Checklist",
+				"subtitle": "Configure the interactive checklist questions shown on the final intake step of every Discord support ticket.",
+				"resetButton": "Reset Defaults",
+				"saveButton": "Save Checklist",
+				"newQuestionLabel": "Add Checklist Question",
+				"newQuestionPlaceholder": "e.g. Checked if the bot has required channel permissions?",
+				"addButton": "Add Question"
+			},
+			"toasts": {
+				"loadError": "Failed to load support configuration",
+				"saveError": "Failed to save support changes",
+				"deleteError": "Failed to remove item",
+				"channelSaved": "Support channel saved",
+				"channelRemoved": "Support channel removed",
+				"botAdded": "Support bot added",
+				"botRemoved": "Support bot removed",
+				"checklistSaved": "Troubleshooting checklist updated",
+				"ticketUpdated": "Support ticket status updated",
+				"ticketDeleted": "Support ticket deleted"
+			}
 		},
 		"dashboard": {
 			"nav": {
 				"overview": "Overview",
 				"seo": "SEO",
+				"support": "Discord Support",
 				"media": "Media",
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
@@ -1058,19 +1153,88 @@
 					"tosButtonLabel": "Read Terms of Service",
 					"tosEmbedDesc": "We've recently updated our Terms of Service to better serve our community and comply with the latest regulations. Please take a moment to review the changes.",
 					"tosEmbedTitle": "Terms of Service Updated",
-					"tosTitle": "TOS Update"
+					"tosTitle": "TOS Update",
+					"welcomeTitle": "Official Server Welcome Hub",
+					"welcomeEmbedTitle": "Welcome to Xernerx Studios",
+					"welcomeEmbedDesc": "Welcome to the official Xernerx Studios community hub! Explore our Discord bots, developer frameworks, real-time analytics, and companion web & desktop applications.",
+					"welcomeField1Name": "🚀 Getting Started",
+					"welcomeField1Val": "• Run /sync to synchronize your Xernerx Web Profile roles.\n• Run /faq or /docs to search our knowledge base and API reference.\n• Run /status to inspect live uptime across all suite services.",
+					"welcomeField2Name": "🌐 The Xernerx Web Suite",
+					"welcomeField2Val": "• xernerx.com — Official showcase & Desktop Client\n• app.xernerx.com — Bot & Server Explorer & Developer Portal\n• store.xernerx.com — Subscriptions & Daily Credit Gifts\n• info.xernerx.com — Roadmap, Suggestions, Bug Tracker & FAQ",
+					"welcomeBtnApp": "Open Web App",
+					"welcomeBtnDesktop": "Download Desktop Client",
+					"welcomeBtnInfo": "Support & Info Hub",
+					"supportTitle": "Official Support & Bounties Panel",
+					"supportEmbedTitle": "Xernerx Support, Commands & Credit Bounties",
+					"supportEmbedDesc": "Need assistance or want to help improve the Xernerx Suite? Use our slash commands in the server or earn Credits by reporting verified bugs and accepted suggestions.",
+					"supportField1Name": "⚡ Server Slash Commands",
+					"supportField1Val": "• /faq & /docs — Search FAQs, REST API v1 & SDK docs\n• /status — Live service & bot uptime telemetry\n• /issues & /suggestions — Track bugs & vote on ideas\n• /roadmap & /changelog — Follow upcoming & shipped releases",
+					"supportField2Name": "🪙 Community Credit Bounties",
+					"supportField2Val": "• Verified Bug Report: +500 Credits\n• Accepted Suggestion: +250 Credits",
+					"supportBtnBug": "Report a Bug (+500 Credits)",
+					"supportBtnSuggest": "Suggest Feature (+250 Credits)",
+					"supportBtnFaq": "Browse FAQ",
+					"ecosystemTitle": "Official Ecosystem Showcase Panel",
+					"ecosystemEmbedTitle": "Official Xernerx Bots & Developer Ecosystem",
+					"ecosystemEmbedDesc": "Discover our official Discord bots, explore community servers, and build with our open-source TypeScript SDKs.",
+					"ecosystemField1Name": "🤖 Official Bots",
+					"ecosystemField1Val": "• Virtue — Leveling, voice XP, leaderboards & rank cards\n• Zodiac — Daily horoscopes & cosmic compatibility\n• To-Do — Task lists, reminders & productivity\n• Metamorphosis — Dynamic voice channels & automation",
+					"ecosystemField2Name": "🛠️ Developer Platform",
+					"ecosystemField2Val": "Publish bots on app.xernerx.com, stream live metrics with @xernerx/stats, and build with @xernerx/framework.",
+					"ecosystemBtnExplore": "Explore Bots & Servers",
+					"ecosystemBtnPortal": "Developer Portal",
+					"ecosystemBtnDocs": "Developer Docs",
+					"welcomeEmbed2Title": "Explore the Xernerx Ecosystem",
+					"welcomeE2F1Name": "🌐 Web & Desktop App (app.xernerx.com)",
+					"welcomeE2F1Val": "Discover bots & servers, configure Virtue, manage your Developer Portal, or download the Desktop Client with built-in game overlay.",
+					"welcomeE2F2Name": "🧭 Support, Bounties & Roadmap (info.xernerx.com)",
+					"welcomeE2F2Val": "Track upcoming releases, vote on suggestions (+250 Credits when accepted), and report bugs (+500 Credits when verified).",
+					"welcomeE2F3Name": "🪙 Daily Credits & Perks (store.xernerx.com)",
+					"welcomeE2F3Val": "Claim your free Daily Credit Gift on the Web Store to unlock extra CDN slots, Profile Showcases, Vanity URLs, and Spotlight Boosts.",
+					"welcomeEmbed3Title": "Quick Start & Community Rules",
+					"welcomeE3F1Name": "⚡ Server Slash Commands",
+					"welcomeE3F1Val": "• /sync — Sync your Xernerx web profile roles with Discord\n• /faq & /docs — Instant answers & API documentation\n• /status — Live uptime across all 9 services & official bots",
+					"welcomeE3F2Name": "🛡️ Keep It Clean & Respectful",
+					"welcomeE3F2Val": "• Treat everyone with respect; zero tolerance for harassment or spam.\n• Never share API tokens or credentials in chat.\n• Governed by our Terms & Privacy Policy.",
+					"welcomeBtnCredits": "Claim Daily Credits",
+					"welcomeBtnAccount": "Account & Sync",
+					"rulesTitle": "Official Community Guidelines Panel",
+					"rulesEmbedTitle": "Xernerx Studios • Community Guidelines & Safety",
+					"rulesEmbedDesc": "To keep the Xernerx community welcoming, productive, and safe for everyone, all members must adhere to our community standards and Discord’s Terms of Service.",
+					"rulesF1Name": "1. Be Respectful & Constructive",
+					"rulesF1Val": "Treat all members, developers, and staff with respect. Harassment, hate speech, discrimination, or personal attacks are strictly prohibited.",
+					"rulesF2Name": "2. Keep Channels On-Topic & Spam-Free",
+					"rulesF2Val": "Use the designated channels for support and showcase discussions. Avoid flooding chat, mass-pinging, or posting unsolicited advertisements.",
+					"rulesF3Name": "3. Security, Privacy & API Integrity",
+					"rulesF3Val": "Never share API bearer tokens, session cookies, or private credentials in public channels. Do not attempt to exploit or abuse Xernerx services.",
+					"rulesBtnModeration": "Safety & Moderation FAQ"
 				},
 				"startsAtLabel": "Starts At (Optional)",
 				"expiresAtLabel": "Expires At (Optional)",
 				"targetAppsLabel": "Target Applications",
 				"targetAppsPlaceholder": "Select target apps (defaults to All Suite Apps)",
 				"targetAppAll": "All Suite Apps",
-				"startsIn": "Starts in {time}",
-				"expiresIn": "Expires in {time}",
+				"startsIn": "Starts in {hours}h {minutes}m",
+				"expiresIn": "Expires in {hours}h {minutes}m",
 				"expired": "Expired",
 				"appsScopeLabel": "Target Apps:",
 				"startsAt": "Starts At (Optional)",
-				"expiresAt": "Expires At (Optional)"
+				"expiresAt": "Expires At (Optional)",
+				"loadWelcome": "Load Welcome Hub",
+				"loadSupport": "Load Support & Bounties",
+				"loadEcosystem": "Load Ecosystem Panel",
+				"loadRules": "Load Rules Panel",
+				"embedUrl": "Embed Title URL (https://...)",
+				"targetApps": {
+					"all": "All Suite Apps",
+					"app": "Dashboard App (app)",
+					"store": "Web Store (store)",
+					"account": "Account Hub (account)",
+					"docs": "Developer Docs (docs)",
+					"info": "Support & Info (info)",
+					"www": "Main Website (www)",
+					"admin": "Admin Portal (admin)"
+				}
 			},
 			"applicationReviews": {
 				"refreshing": "Refreshing...",
@@ -1337,6 +1501,26 @@
 			"uploadMedia": {
 				"label": "Upload Media",
 				"description": "Permission to upload media and manage own media files on the CDN."
+			},
+			"manageRoadmap": {
+				"label": "Manage Roadmap",
+				"description": "Permission to create, update, and publish roadmap items."
+			},
+			"manageSuggestions": {
+				"label": "Manage Suggestions",
+				"description": "Permission to triage, accept, and decline community suggestions."
+			},
+			"manageIssues": {
+				"label": "Manage Issues",
+				"description": "Permission to log bugs and mark them as resolved for health metrics."
+			},
+			"manageStore": {
+				"label": "Manage Store",
+				"description": "Permission to configure store categories, items, pricing, and discounts."
+			},
+			"manageSupport": {
+				"label": "Manage Support",
+				"description": "Permission to configure Discord support channels, support bots, troubleshooting checklists, and manage support tickets."
 			}
 		},
 		"store": {
@@ -1344,17 +1528,20 @@
 			"description": "Configure dynamic store categories, products, Stripe SKU IDs, and promotional discounts without server resets.",
 			"tabs": {
 				"items": "Products & SKU IDs",
-				"categories": "Categories"
+				"categories": "Categories",
+				"coupons": "Coupons & Promo Codes"
 			},
 			"stats": {
 				"totalItems": "Total Products",
 				"activeItems": "Active Products",
 				"categories": "Categories",
-				"discounted": "Discounted / On Sale"
+				"discounted": "Discounted / On Sale",
+				"coupons": "Active Coupons"
 			},
 			"buttons": {
 				"newItem": "New Product",
 				"newCategory": "New Category",
+				"newCoupon": "New Coupon",
 				"save": "Save Changes",
 				"cancel": "Cancel",
 				"delete": "Delete",
@@ -1420,6 +1607,7 @@
 				"perks": {
 					"cdnSlots": "CDN Upload Slots",
 					"showcaseSlots": "Profile Showcase Slots",
+					"botSlots": "Bot & API Token Slots",
 					"trialPass": "Trial Pass",
 					"vanityBadge": "Vanity Badge",
 					"streakShield": "Streak Shield (+1 Shield, Max 3)",
@@ -1438,14 +1626,54 @@
 				"enabled": "Active in Store",
 				"iconPlaceholder": "Bot, Code, Server, Zap..."
 			},
+			"coupons": {
+				"searchPlaceholder": "Search coupons by promo code, name, or description...",
+				"filterExpired": "Expired",
+				"allDurations": "All Durations",
+				"durationOnce": "Once",
+				"durationRepeating": "Repeating",
+				"durationForever": "Forever",
+				"repeatingMonths": "{months} mo",
+				"noCoupons": "No store coupons or promotion codes found.",
+				"stripeSynced": "Stripe Synced",
+				"copyCode": "Copy Promo Code",
+				"redemptionsLabel": "Redeemed",
+				"expiredBadge": "Expired",
+				"expiresOn": "Expires {date}"
+			},
+			"couponModal": {
+				"createTitle": "Create Store Coupon",
+				"editTitle": "Edit Store Coupon",
+				"code": "Promotion Code",
+				"codePlaceholder": "e.g. SPRING25 or XRX-LAUNCH",
+				"generateCode": "Generate",
+				"name": "Coupon Name",
+				"namePlaceholder": "e.g. Spring 25% Launch Discount",
+				"descriptionPlaceholder": "Internal note or campaign description...",
+				"discountType": "Discount Type",
+				"typePercent": "Percentage (%)",
+				"typeAmount": "Fixed Amount ($ USD)",
+				"percentOff": "Percentage Off (%)",
+				"amountOff": "Amount Off ($ USD)",
+				"duration": "Billing Duration",
+				"durationInMonths": "Duration (Months)",
+				"maxRedemptions": "Max Redemptions (Optional)",
+				"maxRedemptionsPlaceholder": "Unlimited",
+				"expiresAt": "Expiration Date (Optional)",
+				"enabled": "Active in Store & Stripe Checkout"
+			},
 			"alerts": {
 				"itemSaved": "Product saved successfully.",
 				"itemDeleted": "Product deleted successfully.",
 				"categorySaved": "Category saved successfully.",
 				"categoryDeleted": "Category deleted successfully.",
+				"couponSaved": "Coupon saved and synced successfully.",
+				"couponDeleted": "Coupon deleted successfully.",
+				"couponCodeCopied": "Promo code copied to clipboard.",
 				"skuCopied": "SKU ID copied to clipboard.",
 				"deleteItemConfirm": "Are you sure you want to delete product \"{name}\"?",
 				"deleteCategoryConfirm": "Are you sure you want to delete category \"{name}\"? All products in this category will also be removed.",
+				"deleteCouponConfirm": "Are you sure you want to delete coupon \"{code}\"? Its Stripe promotion code will also be deactivated.",
 				"deleteFailed": "Delete Failed",
 				"discountFailed": "Discount Update Failed",
 				"fetchFailed": "Fetch Error",
@@ -1947,6 +2175,9 @@
 			"title": "API Tokens",
 			"description": "Manage your secure authentication keys",
 			"generateButton": "Generate Token",
+			"slotsUsed": "{used} / {max} Bot Slots",
+			"slotsUnlimited": "{used} / ∞ Bot Slots",
+			"unlockMoreSlots": "Unlock More Slots",
 			"manageSettings": "Manage Settings",
 			"searchPlaceholder": "Search tokens by name or ID...",
 			"filterAll": "All",
@@ -2107,6 +2338,8 @@
 				"lifetimeSpent": "{amount} Spent Lifetime",
 				"ownedCdnSlots": "{count} CDN Slots (+{extra} bonus)",
 				"ownedShowcaseSlots": "{count} Showcase Slots (+{extra} bonus)",
+				"ownedBotSlots": "{count} Bot Slots (+{extra} bonus)",
+				"ownedVanitySlots": "{count} Vanity URL Slots",
 				"ownedBadges": "{count} Vanity Badges",
 				"signInToRedeem": "Sign In to Redeem",
 				"topUpButton": "Buy Credits (€)",
@@ -2130,6 +2363,7 @@
 					"all": "All Items",
 					"cdnSlots": "CDN Slots",
 					"showcaseSlots": "Showcase Slots",
+					"botSlots": "Bot Slots",
 					"trialPasses": "Trial Passes",
 					"vanityBadges": "Vanity Badges",
 					"creditPacks": "Buy Credits (€)",
@@ -2148,7 +2382,6 @@
 					"milestoneVault": "Milestone Vault (+250 Base)",
 					"plusRandomBase": "+ 50–150 Random Base"
 				},
-				"ownedVanitySlots": "{count} Vanity URL Slots",
 				"dotMatrixPreview": {
 					"liveBadge": "Live Interactive Banner",
 					"clickHint": "Hover or click for shockwave",
@@ -3583,7 +3816,7 @@
 			},
 			"card4": {
 				"title": "How do Bot Webhooks and live Test Pings work?",
-				"description": "In the Developer Portal (app.xernerx.com/portal/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...) and toggle any of the 8 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, and VOTE review. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
+				"description": "In the Developer Portal (app.xernerx.com/portal/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...) and toggle any of the 9 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, VOTE review, and POST release. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
 			},
 			"card5": {
 				"title": "How do Bot and Server voting, 12-hour cooldowns, and the Ecosystem Leaderboards work?",
@@ -4127,6 +4360,11 @@
 					"uploadFileLabel": "Choose .json Config File",
 					"jsonPlaceholder": "{\n  \"mode\": \"balanced\",\n  \"levelUp\": true\n}",
 					"applyBtn": "Apply Configuration"
+				},
+				"cycles": {
+					"daily": "Daily",
+					"weekly": "Weekly",
+					"monthly": "Monthly"
 				}
 			}
 		},
@@ -5199,14 +5437,14 @@
 					},
 					"botWebhooksRelay": {
 						"title": "Bot Webhooks & Desktop Localhost Relay",
-						"description": "Receive real-time HTTP POST webhook dispatches when users vote, review, or update stats on your bot — with built-in localhost relay support in the Xernerx Desktop App.",
+						"description": "Receive real-time HTTP POST webhook dispatches when users vote, review, update stats, or publish a new release on your bot — with built-in localhost relay support in the Xernerx Desktop App.",
 						"localRelayTitle": "Testing on localhost / 127.0.0.1 (Zero Ngrok Required)",
 						"localRelayDesc": "When configuring webhooks in app.xernerx.com/portal/bots/[id] inside the Xernerx Desktop App, setting your Webhook URL to http://localhost:3000/... or http://127.0.0.1:... displays a Local Relay Ready badge. Clicking Test Ping dispatches the exact signed JSON payload and X-Xernerx-* headers directly from your local machine via Electron's main process.",
 						"headersAndEvents": "Webhook Headers & Event Triggers"
 					},
 					"postBotReleases": {
 						"title": "Publish Bot Release Changelog",
-						"description": "Publish a new versioned release entry to your bot's public changelog feed and notify subscribers.",
+						"description": "Publish a new versioned release entry to your bot's public changelog feed and automatically dispatch the release payload to subscribed POST release webhooks.",
 						"versionDesc": "Semantic version tag for the release (e.g. \"1.4.0\").",
 						"titleDesc": "Short headline title summarizing the release.",
 						"notesDesc": "Markdown-formatted release notes detailing new features, fixes, and changes.",
@@ -5821,6 +6059,11 @@
 			"descriptionView": "You do not have the required permissions to access the {view} view.",
 			"descriptionDefault": "You do not have the required permissions to view this content.",
 			"backButton": "Go Back"
+		},
+		"notFound": {
+			"title": "Page Not Found",
+			"description": "The page you are looking for does not exist or has been moved.",
+			"backHome": "Back to Home"
 		}
 	},
 	"info": {
@@ -5863,6 +6106,10 @@
 				"status": {
 					"title": "System Status",
 					"description": "Live uptime, response latency, and operational health across all Xernerx services."
+				},
+				"issues": {
+					"title": "Issue Tracker",
+					"description": "Report bugs and track verified fixes across the suite."
 				}
 			}
 		},

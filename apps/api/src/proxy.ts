@@ -76,16 +76,30 @@ export async function proxy(req: NextRequest) {
 	const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
 	const isXernerxDomain = isAuthorizedOrigin || isAuthorizedHost;
 
+	let rateLimitRemaining = MAX_REQUESTS;
+	let rateLimitResetSec = Math.ceil((Date.now() + WINDOW_MS) / 1000);
+
 	if (!isLoopback && !isXernerxDomain) {
 		const now = Date.now();
 		const clientRate = rateLimitMap.get(ip);
 
 		if (!clientRate || now > clientRate.resetTime) {
-			rateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_MS });
+			const resetTime = now + WINDOW_MS;
+			rateLimitMap.set(ip, { count: 1, resetTime });
+			rateLimitRemaining = MAX_REQUESTS - 1;
+			rateLimitResetSec = Math.ceil(resetTime / 1000);
 		} else {
 			clientRate.count++;
+			rateLimitRemaining = Math.max(0, MAX_REQUESTS - clientRate.count);
+			rateLimitResetSec = Math.ceil(clientRate.resetTime / 1000);
 			if (clientRate.count > MAX_REQUESTS) {
-				return errorResponse('Too Many Requests: Rate limit exceeded', 429);
+				const retryAfterSec = Math.max(1, Math.ceil((clientRate.resetTime - now) / 1000));
+				const res429 = errorResponse('Too Many Requests: Rate limit exceeded (100 requests per minute)', 429);
+				res429.headers.set('X-RateLimit-Limit', String(MAX_REQUESTS));
+				res429.headers.set('X-RateLimit-Remaining', '0');
+				res429.headers.set('X-RateLimit-Reset', String(rateLimitResetSec));
+				res429.headers.set('Retry-After', String(retryAfterSec));
+				return res429;
 			}
 		}
 	}
@@ -161,11 +175,16 @@ export async function proxy(req: NextRequest) {
 	// 3. Pass all actual requests to your existing proxy
 	const response = await i18nProxyHandler(req as never);
 
-	// 4. Attach the required CORS headers to the final success response
+	// 4. Attach the required CORS and rate-limit headers to the final success response
 	if (response && response.headers) {
 		response.headers.set('Access-Control-Allow-Origin', origin || '*');
 		if (origin) {
 			response.headers.set('Access-Control-Allow-Credentials', 'true');
+		}
+		if (!isLoopback && !isXernerxDomain) {
+			response.headers.set('X-RateLimit-Limit', String(MAX_REQUESTS));
+			response.headers.set('X-RateLimit-Remaining', String(rateLimitRemaining));
+			response.headers.set('X-RateLimit-Reset', String(rateLimitResetSec));
 		}
 	}
 

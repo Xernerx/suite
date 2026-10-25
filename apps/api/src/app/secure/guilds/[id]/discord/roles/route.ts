@@ -6,7 +6,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 	try {
 		const guildId = (await params).id;
 		const body = await req.json();
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!botToken) {
 			return NextResponse.json({ error: 'Discord token missing' }, { status: 500 });
@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 	try {
 		const guildId = (await params).id;
 		const rolesArray = await req.json(); // [{ id, position }]
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!botToken) {
 			return NextResponse.json({ error: 'Discord token missing' }, { status: 500 });

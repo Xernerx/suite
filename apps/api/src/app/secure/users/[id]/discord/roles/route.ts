@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		const adminServerSetting = await models.core.Setting.findOne({ id: 'admin_server_id' }).lean();
 		const guildId = adminServerSetting?.value;
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!guildId || !botToken) {
 			return NextResponse.json({ error: 'Discord configuration missing on server' }, { status: 500 });
@@ -72,7 +72,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
 		const adminServerSetting = await models.core.Setting.findOne({ id: 'admin_server_id' }).lean();
 		const guildId = adminServerSetting?.value;
-		const botToken = process.env.DISCORD_CLIENT_TOKEN;
+		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
 
 		if (!guildId || !botToken) {
 			return NextResponse.json({ error: 'Discord configuration missing on server' }, { status: 500 });

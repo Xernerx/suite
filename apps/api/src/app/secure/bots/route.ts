@@ -72,6 +72,8 @@ export async function GET(request: Request) {
 					id: 1,
 					name: 1,
 					avatar: 1,
+					banner: 1,
+					vanitySlug: 1,
 					description: 1,
 					organization: 1,
 					promotedUntil: 1,

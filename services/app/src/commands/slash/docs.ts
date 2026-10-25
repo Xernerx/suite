@@ -1,9 +1,101 @@
 /** @format */
 
 import { SlashCommandBuilder, type SlashCommandAutocomplete, type SlashCommandOptions } from '@xernerx/framework';
-import { EmbedBuilder } from 'discord.js';
-import { findDocsItem, searchDocs } from '../../lib/api.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder } from 'discord.js';
+import { fetchDocsItems, findDocsItem, searchDocs } from '../../lib/api.js';
 import { getUserAccentColor } from '../../lib/botUtils.js';
+
+export type DocsSectionTab = 'overview' | 'api' | 'cdn' | 'websocket' | 'packages';
+
+const DOCS_TABS: { id: DocsSectionTab; label: string }[] = [
+	{ id: 'overview', label: 'Overview' },
+	{ id: 'api', label: 'REST API v1' },
+	{ id: 'cdn', label: 'CDN & Media' },
+	{ id: 'packages', label: 'Packages & SDKs' },
+];
+
+export async function buildDocsOverviewMessage(client: Client, tab: DocsSectionTab = 'overview', requesterUserId?: string) {
+	const botUser = client.user;
+	const botAvatar = botUser?.displayAvatarURL({ size: 256 });
+	const botName = botUser?.username || 'Xernerx App';
+
+	const [accentColor, allDocs] = await Promise.all([getUserAccentColor(requesterUserId), fetchDocsItems()]);
+
+	const embed = new EmbedBuilder()
+		.setColor(accentColor)
+		.setTitle('Xernerx Suite • Developer Documentation')
+		.setURL('https://docs.xernerx.com')
+		.setDescription(
+			'Explore official developer guides, interactive REST API v1 endpoints, WebSocket RPC protocols, and open-source SDK packages.\nUse `/docs <topic>` to inspect any endpoint or package directly.'
+		);
+
+	if (botAvatar) {
+		embed.setThumbnail(botAvatar);
+	}
+
+	if (tab === 'overview') {
+		embed.addFields([
+			{
+				name: '🌐 REST API v1',
+				value: '• [API Overview](https://docs.xernerx.com/api/v1#overview)\n• [Authentication](https://docs.xernerx.com/api/v1#authentication)\n• [Bot & Metric Endpoints](https://docs.xernerx.com/api/v1#fetch-bot-profile)',
+				inline: true,
+			},
+			{
+				name: '🖼️ CDN Services',
+				value: '• [CDN Overview](https://docs.xernerx.com/cdn#overview)\n• [Upload API](https://docs.xernerx.com/cdn#upload)\n• [Media Streaming Proxy](https://docs.xernerx.com/cdn#proxy)',
+				inline: true,
+			},
+			{
+				name: '⚡ WebSocket Gateway',
+				value: '• [Gateway Architecture](https://docs.xernerx.com/websocket#overview)\n• [Connecting & Auth](https://docs.xernerx.com/websocket#connecting)\n• [RPC Protocol](https://docs.xernerx.com/websocket#protocol)',
+				inline: true,
+			},
+			{
+				name: '📦 Official NPM Packages',
+				value: '• [@xernerx/framework](https://docs.xernerx.com/packages/@xernerx/framework) • [@xernerx/stats](https://docs.xernerx.com/packages/@xernerx/stats) • [@xernerx/websocket](https://docs.xernerx.com/packages/@xernerx/websocket) • [@xernerx/ui](https://docs.xernerx.com/packages/@xernerx/ui)',
+				inline: false,
+			},
+		]);
+	} else {
+		const filtered = allDocs.filter((d) => d.category.toLowerCase().includes(tab) || d.categoryTitle.toLowerCase().includes(tab));
+		const display = (filtered.length > 0 ? filtered : allDocs).slice(0, 8);
+		embed.addFields([
+			{
+				name: `${DOCS_TABS.find((t) => t.id === tab)?.label || 'Documentation'} Reference`,
+				value:
+					display
+						.map((d) => {
+							const prefix = d.method && d.path ? `\`${d.method} ${d.path}\` — ` : '';
+							return `• ${prefix}**[${d.title}](${d.url})**`;
+						})
+						.join('\n') || 'Browse the full reference at [docs.xernerx.com](https://docs.xernerx.com).',
+				inline: false,
+			},
+		]);
+	}
+
+	embed
+		.setFooter({
+			text: `${botName} • Developer Docs`,
+			iconURL: botAvatar,
+		})
+		.setTimestamp();
+
+	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		...DOCS_TABS.map((t) =>
+			new ButtonBuilder()
+				.setCustomId(`docs:${t.id}`)
+				.setLabel(t.label)
+				.setStyle(t.id === tab ? ButtonStyle.Primary : ButtonStyle.Secondary)
+		),
+		new ButtonBuilder().setLabel('Open Docs').setStyle(ButtonStyle.Link).setURL('https://docs.xernerx.com')
+	);
+
+	return {
+		embeds: [embed],
+		components: [row],
+	};
+}
 
 export default class DocsCommand extends SlashCommandBuilder {
 	constructor() {
@@ -56,46 +148,13 @@ export default class DocsCommand extends SlashCommandBuilder {
 		const botAvatar = botUser?.displayAvatarURL();
 		const botName = botUser?.username || 'Xernerx App';
 		const replyMethod = interaction.deferred ? 'editReply' : 'reply';
-		const accentColor = await getUserAccentColor(interaction.user.id);
 
 		if (!rawInput || !String(rawInput).trim()) {
-			const overviewEmbed = new EmbedBuilder()
-				.setColor(accentColor)
-				.setTitle('Xernerx Developer Documentation')
-				.setURL('https://docs.xernerx.com')
-				.setDescription('Explore official guides, API references, and open-source packages for the **Xernerx Suite**. Use `/docs <topic>` to view specific endpoints or SDK details.')
-				.addFields([
-					{
-						name: 'REST API v1',
-						value: '• [API Overview](https://docs.xernerx.com/api/v1#overview)\n• [Authentication](https://docs.xernerx.com/api/v1#authentication)\n• [Bot & Metric Endpoints](https://docs.xernerx.com/api/v1#fetch-bot-profile)',
-						inline: true,
-					},
-					{
-						name: 'CDN Services',
-						value: '• [Overview](https://docs.xernerx.com/cdn#overview)\n• [Upload API](https://docs.xernerx.com/cdn#upload)\n• [Media Streaming Proxy](https://docs.xernerx.com/cdn#proxy)',
-						inline: true,
-					},
-					{
-						name: 'WebSocket Gateway',
-						value: '• [Gateway Architecture](https://docs.xernerx.com/websocket#overview)\n• [Connecting & Auth](https://docs.xernerx.com/websocket#connecting)\n• [RPC Protocol](https://docs.xernerx.com/websocket#protocol)',
-						inline: true,
-					},
-					{
-						name: 'Developer Packages',
-						value: '• [@xernerx/framework](https://docs.xernerx.com/packages/@xernerx/framework)\n• [@xernerx/stats](https://docs.xernerx.com/packages/@xernerx/stats)\n• [@xernerx/websocket](https://docs.xernerx.com/packages/@xernerx/websocket)\n• [@xernerx/ui](https://docs.xernerx.com/packages/@xernerx/ui)',
-						inline: false,
-					},
-				])
-				.setFooter({
-					text: `${botName} • Docs`,
-					iconURL: botAvatar,
-				})
-				.setTimestamp();
-
-			return await (interaction as any)[replyMethod]({ embeds: [overviewEmbed] });
+			const payload = await buildDocsOverviewMessage(interaction.client, 'overview', interaction.user.id);
+			return await (interaction as any)[replyMethod](payload);
 		}
 
-		const item = await findDocsItem(String(rawInput));
+		const [accentColor, item] = await Promise.all([getUserAccentColor(interaction.user.id), findDocsItem(String(rawInput))]);
 
 		if (!item) {
 			const notFoundEmbed = new EmbedBuilder()
@@ -129,7 +188,7 @@ export default class DocsCommand extends SlashCommandBuilder {
 		if (item.method && item.path) {
 			embed.addFields([
 				{
-					name: 'Endpoint',
+					name: 'Endpoint Signature',
 					value: `• **Method:** \`${item.method}\` • **Path:** \`${item.path}\``,
 					inline: false,
 				},
@@ -146,6 +205,15 @@ export default class DocsCommand extends SlashCommandBuilder {
 			]);
 		}
 
-		await (interaction as any)[replyMethod]({ embeds: [embed] });
+		const buttons: ButtonBuilder[] = [
+			new ButtonBuilder()
+				.setLabel('Read on Developer Docs')
+				.setStyle(ButtonStyle.Link)
+				.setURL(item.url || 'https://docs.xernerx.com'),
+			new ButtonBuilder().setLabel('Developer Portal').setStyle(ButtonStyle.Link).setURL('https://app.xernerx.com/portal'),
+		];
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);
+
+		await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
 	}
 }

@@ -2,11 +2,113 @@
 
 import { database } from '@xernerx/lib/core';
 import { SlashCommandBuilder, type SlashCommandAutocomplete, type SlashCommandOptions } from '@xernerx/framework';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder } from 'discord.js';
 import { getUserAccentColor } from '../../lib/botUtils.js';
 
+export type IssuesFilterTab = 'all' | 'open' | 'resolved';
+
+const ISSUES_TABS: { id: IssuesFilterTab; label: string }[] = [
+	{ id: 'all', label: 'All Issues' },
+	{ id: 'open', label: 'Open Issues' },
+	{ id: 'resolved', label: 'Resolved Fixes' },
+];
+
 function formatIssueStatus(status?: string): string {
-	return status === 'resolved' ? 'Resolved' : 'Open';
+	return status === 'resolved' ? '🟢 Resolved' : '🟠 Open';
+}
+
+export async function buildIssuesOverviewMessage(client: Client, tab: IssuesFilterTab = 'all', requesterUserId?: string) {
+	const botUser = client.user;
+	const botAvatar = botUser?.displayAvatarURL({ size: 256 });
+	const botName = botUser?.username || 'Xernerx App';
+	const issuesUrl = 'https://info.xernerx.com/bugs';
+
+	const [db, accentColor] = await Promise.all([database('xernerx'), getUserAccentColor(requesterUserId)]);
+	const IssueModel = (db.models.core as any).Issue;
+
+	const items = IssueModel
+		? await IssueModel.find({ acknowledged: true })
+				.sort({ createdAt: -1 })
+				.lean()
+				.catch(() => [])
+		: [];
+
+	const openIssues = items.filter((i: any) => i.status !== 'resolved');
+	const resolvedIssues = items.filter((i: any) => i.status === 'resolved');
+
+	const formatList = (list: any[], emptyText: string, limit = 6) =>
+		list.length > 0
+			? list
+					.slice(0, limit)
+					.map((i: any) => {
+						const fixTag = i.resolvedVersion ? ` — Fixed in \`v${i.resolvedVersion}\`` : '';
+						return `• **${i.title}** (\`${i.productId || 'Suite'}\`)${fixTag}`;
+					})
+					.join('\n')
+			: emptyText;
+
+	const overviewEmbed = new EmbedBuilder()
+		.setColor(accentColor)
+		.setTitle('Xernerx Suite • Issue & Bug Tracker')
+		.setURL(issuesUrl)
+		.setDescription(`Report reproducible bugs on [info.xernerx.com/bugs](${issuesUrl}). Every verified bug report automatically awards a **+500 Credit Bounty** to the reporter!`);
+
+	if (botAvatar) {
+		overviewEmbed.setThumbnail(botAvatar);
+	}
+
+	if (tab === 'all') {
+		overviewEmbed.addFields([
+			{
+				name: `🟠 Known Open Issues (${openIssues.length})`,
+				value: formatList(openIssues, 'No open known issues currently tracked.'),
+				inline: false,
+			},
+			{
+				name: `🟢 Recently Resolved (${resolvedIssues.length})`,
+				value: formatList(resolvedIssues, 'No recently resolved issues listed.'),
+				inline: false,
+			},
+		]);
+	} else if (tab === 'open') {
+		overviewEmbed.addFields([
+			{
+				name: `🟠 Known Open Issues (${openIssues.length})`,
+				value: formatList(openIssues, 'No open known issues currently tracked.', 12),
+				inline: false,
+			},
+		]);
+	} else {
+		overviewEmbed.addFields([
+			{
+				name: `🟢 Recently Resolved Fixes (${resolvedIssues.length})`,
+				value: formatList(resolvedIssues, 'No recently resolved issues listed.', 12),
+				inline: false,
+			},
+		]);
+	}
+
+	overviewEmbed
+		.setFooter({
+			text: `${botName} • Bug Tracker`,
+			iconURL: botAvatar,
+		})
+		.setTimestamp();
+
+	const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+		...ISSUES_TABS.map((t) =>
+			new ButtonBuilder()
+				.setCustomId(`issues:${t.id}`)
+				.setLabel(t.label)
+				.setStyle(t.id === tab ? ButtonStyle.Primary : ButtonStyle.Secondary)
+		),
+		new ButtonBuilder().setLabel('Report a Bug (+500 Credits)').setStyle(ButtonStyle.Link).setURL(issuesUrl)
+	);
+
+	return {
+		embeds: [overviewEmbed],
+		components: [row],
+	};
 }
 
 export default class IssuesCommand extends SlashCommandBuilder {
@@ -61,7 +163,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 
 			await interaction.respond(
 				filtered.slice(0, 25).map((item: any) => {
-					const statusLabel = formatIssueStatus(item.status);
+					const statusLabel = item.status === 'resolved' ? 'Resolved' : 'Open';
 					const rawLabel = `[${statusLabel}] ${item.title}`;
 					return {
 						name: rawLabel.length > 100 ? `${rawLabel.slice(0, 97)}...` : rawLabel,
@@ -86,6 +188,11 @@ export default class IssuesCommand extends SlashCommandBuilder {
 		const issuesUrl = 'https://info.xernerx.com/bugs';
 
 		try {
+			if (!rawInput || !String(rawInput).trim()) {
+				const payload = await buildIssuesOverviewMessage(interaction.client, 'all', interaction.user.id);
+				return await (interaction as any)[replyMethod](payload);
+			}
+
 			const [db, accentColor] = await Promise.all([database('xernerx'), getUserAccentColor(interaction.user.id)]);
 			const IssueModel = (db.models.core as any).Issue;
 
@@ -96,106 +203,62 @@ export default class IssuesCommand extends SlashCommandBuilder {
 						.catch(() => [])
 				: [];
 
-			if (rawInput && String(rawInput).trim()) {
-				const q = String(rawInput).trim().toLowerCase();
-				const found = items.find(
-					(i: any) =>
-						String(i.id || '').toLowerCase() === q ||
-						String(i._id || '').toLowerCase() === q ||
-						String(i.title || '').toLowerCase() === q ||
-						String(i.title || '')
-							.toLowerCase()
-							.includes(q)
-				);
+			const q = String(rawInput).trim().toLowerCase();
+			const found = items.find(
+				(i: any) =>
+					String(i.id || '').toLowerCase() === q ||
+					String(i._id || '').toLowerCase() === q ||
+					String(i.title || '').toLowerCase() === q ||
+					String(i.title || '')
+						.toLowerCase()
+						.includes(q)
+			);
 
-				if (!found) {
-					const notFoundEmbed = new EmbedBuilder()
-						.setColor(0xe06c75)
-						.setTitle('Issue Not Found')
-						.setDescription(`We couldn't find a tracked issue matching **"${rawInput}"**.\n\nReport bugs or view known issues at [info.xernerx.com/bugs](${issuesUrl}).`)
-						.setFooter({
-							text: `${botName} • Issues`,
-							iconURL: botAvatar,
-						})
-						.setTimestamp();
-
-					return await (interaction as any)[replyMethod]({ embeds: [notFoundEmbed] });
-				}
-
-				const createdTs = found.createdAt ? Math.floor(new Date(found.createdAt).getTime() / 1000) : null;
-				const resolvedTs = found.resolvedAt ? Math.floor(new Date(found.resolvedAt).getTime() / 1000) : null;
-
-				const resolutionLines: string[] = [`• **Bounty:** \`${found.bountyAwarded ? '+500 Credits Awarded' : '+500 Credits on Verification'}\``];
-				if (found.resolvedApp || found.resolvedVersion) {
-					resolutionLines.unshift(`• **Fix Target:** \`${found.resolvedApp || 'suite'}${found.resolvedVersion ? ` v${found.resolvedVersion}` : ''}\``);
-				}
-				if (resolvedTs) {
-					resolutionLines.unshift(`• **Resolved:** <t:${resolvedTs}:R>`);
-				}
-
-				const itemEmbed = new EmbedBuilder()
-					.setColor(accentColor)
-					.setTitle(found.title)
-					.setURL(issuesUrl)
-					.setDescription(found.description || 'No description provided.')
-					.addFields([
-						{
-							name: 'Issue Details',
-							value: [
-								`• **Status:** ${formatIssueStatus(found.status)}`,
-								`• **Product:** \`${found.productId || 'Suite'}\``,
-								...(found.authorId ? [`• **Reporter:** <@${found.authorId}>`] : []),
-								...(createdTs ? [`• **Reported:** <t:${createdTs}:R>`] : []),
-							].join('\n'),
-							inline: true,
-						},
-						{
-							name: 'Resolution & Bounty',
-							value: resolutionLines.join('\n'),
-							inline: true,
-						},
-					])
+			if (!found) {
+				const notFoundEmbed = new EmbedBuilder()
+					.setColor(0xe06c75)
+					.setTitle('Issue Not Found')
+					.setDescription(`We couldn't find a tracked issue matching **"${rawInput}"**.\n\nReport bugs or view known issues at [info.xernerx.com/bugs](${issuesUrl}).`)
 					.setFooter({
 						text: `${botName} • Issues`,
 						iconURL: botAvatar,
 					})
 					.setTimestamp();
 
-				const row = new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setLabel('View Bug Tracker').setStyle(ButtonStyle.Link).setURL(issuesUrl));
-
-				return await (interaction as any)[replyMethod]({ embeds: [itemEmbed], components: [row] });
+				return await (interaction as any)[replyMethod]({ embeds: [notFoundEmbed] });
 			}
 
-			// Overview of issues
-			const openIssues = items.filter((i: any) => i.status !== 'resolved');
-			const resolvedIssues = items.filter((i: any) => i.status === 'resolved');
+			const createdTs = found.createdAt ? Math.floor(new Date(found.createdAt).getTime() / 1000) : null;
+			const resolvedTs = found.resolvedAt ? Math.floor(new Date(found.resolvedAt).getTime() / 1000) : null;
 
-			const formatList = (list: any[], emptyText: string) =>
-				list.length > 0
-					? list
-							.slice(0, 6)
-							.map((i: any) => {
-								const fixTag = i.resolvedVersion ? ` — Fixed in \`v${i.resolvedVersion}\`` : '';
-								return `• **${i.title}** (\`${i.productId || 'Suite'}\`)${fixTag}`;
-							})
-							.join('\n')
-					: emptyText;
+			const resolutionLines: string[] = [`• **Bounty:** \`${found.bountyAwarded ? '+500 Credits Awarded' : '+500 Credits on Verification'}\``];
+			if (found.resolvedApp || found.resolvedVersion) {
+				resolutionLines.unshift(`• **Fix Target:** \`${found.resolvedApp || 'suite'}${found.resolvedVersion ? ` v${found.resolvedVersion}` : ''}\``);
+			}
+			if (resolvedTs) {
+				resolutionLines.unshift(`• **Resolved:** <t:${resolvedTs}:R>`);
+			}
 
-			const overviewEmbed = new EmbedBuilder()
+			const itemEmbed = new EmbedBuilder()
 				.setColor(accentColor)
-				.setTitle('Xernerx Issue & Bug Tracker')
+				.setTitle(found.title)
 				.setURL(issuesUrl)
-				.setDescription(`Report bugs on [info.xernerx.com/bugs](${issuesUrl}). Acknowledged bug reports automatically award a **+500 Credit Bounty** to the reporter.`)
+				.setDescription(found.description || 'No description provided.')
 				.addFields([
 					{
-						name: `Known Open Issues (${openIssues.length})`,
-						value: formatList(openIssues, 'No open known issues currently tracked.'),
-						inline: false,
+						name: 'Issue Details',
+						value: [
+							`• **Status:** ${formatIssueStatus(found.status)}`,
+							`• **Product:** \`${found.productId || 'Suite'}\``,
+							...(found.authorId ? [`• **Reporter:** <@${found.authorId}>`] : []),
+							...(createdTs ? [`• **Reported:** <t:${createdTs}:R>`] : []),
+						].join('\n'),
+						inline: true,
 					},
 					{
-						name: `Recently Resolved (${resolvedIssues.length})`,
-						value: formatList(resolvedIssues, 'No recently resolved issues listed.'),
-						inline: false,
+						name: 'Resolution & Bounty',
+						value: resolutionLines.join('\n'),
+						inline: true,
 					},
 				])
 				.setFooter({
@@ -204,9 +267,12 @@ export default class IssuesCommand extends SlashCommandBuilder {
 				})
 				.setTimestamp();
 
-			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setLabel('Report a Bug').setStyle(ButtonStyle.Link).setURL(issuesUrl));
+			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+				new ButtonBuilder().setLabel('View Bug Tracker').setStyle(ButtonStyle.Link).setURL(issuesUrl),
+				new ButtonBuilder().setLabel('System Status').setStyle(ButtonStyle.Link).setURL('https://info.xernerx.com/status')
+			);
 
-			await (interaction as any)[replyMethod]({ embeds: [overviewEmbed], components: [row] });
+			return await (interaction as any)[replyMethod]({ embeds: [itemEmbed], components: [row] });
 		} catch (error) {
 			console.error('Error executing /issues:', error);
 			const errEmbed = new EmbedBuilder()
