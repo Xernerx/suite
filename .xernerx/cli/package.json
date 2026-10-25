@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/cli",
-	"version": "2.3.0",
+	"version": "2.4.0",
 	"type": "module",
 	"description": "Internal CLI for Xernerx Suite",
 	"private": true,

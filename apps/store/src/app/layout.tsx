@@ -70,7 +70,11 @@ export default async function RootLayout({
 	const headersList = await headers();
 	const host = headersList.get('host') || '';
 	const initialEnv: 'dev' | 'canary' | 'public' =
-		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development' ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
+		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development'
+			? 'dev'
+			: host.includes('.canary.') || process.env.ENVIRONMENT?.toLowerCase() === 'canary'
+				? 'canary'
+				: 'public';
 
 	const cookieStore = await cookies();
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || headersList.get('x-locale') || 'en';

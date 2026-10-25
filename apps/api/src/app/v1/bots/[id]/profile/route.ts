@@ -2,61 +2,27 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-
-async function authenticateAndGetBot(req: NextRequest, botId: string) {
-	const authHeader = req.headers.get('Authorization');
-	if (!authHeader) return { error: 'Missing Authorization header', status: 401 };
-
-	const tokenValue = authHeader.replace(/^Bearer\s+/i, '').trim();
-
-	const db = await database('xernerx');
-	const TokenModel = (db.models.users as any).Token;
-	const BotModel = (db.models.bots as any).Profile || (db.models.bots as any).Bot;
-
-	if (!TokenModel || !BotModel) return { error: 'Database models not found', status: 500 };
-
-	const isSystemToken = Boolean((process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN) || (process.env.XERNERX_APP_TOKEN && tokenValue === process.env.XERNERX_APP_TOKEN));
-	const tokenDoc = await TokenModel.findOne({ id: tokenValue });
-
-	if (!tokenDoc && !isSystemToken) return { error: 'Invalid token', status: 401 };
-	if (tokenDoc && (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended')) return { error: 'Token is inactive or suspended', status: 403 };
-
-	let bot = await BotModel.findOne({ id: botId });
-	if (!bot && isSystemToken) {
-		bot = await BotModel.create({
-			id: botId,
-			bot: true,
-			name: 'Xernerx App',
-			privacy: 'private',
-			owners: tokenDoc?.owners || [],
-		}).catch(() => null);
-	}
-	if (!bot && !isSystemToken) return { error: 'Bot not found', status: 404 };
-
-	// Check full access (System token OR Token assigned to bot OR Token owner owns the bot)
-	const tokenOwners = tokenDoc?.owners || [];
-	const botOwners = bot?.owners || [];
-	const hasFullAccess = isSystemToken || tokenDoc?.botId === botId || tokenOwners.some((owner: string) => botOwners.includes(owner));
-
-	return { bot, hasFullAccess, BotModel };
-}
+import { authenticateV1BotRequest } from '@/lib/v1BotAuth';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
-		const authResult = await authenticateAndGetBot(req, id);
-		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+		const authHeader = req.headers.get('Authorization');
 
-		const { bot, hasFullAccess } = authResult;
+		if (authHeader) {
+			const authResult = await authenticateV1BotRequest(req, id, { isMutation: false });
+			if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		if (!hasFullAccess && bot.privacy === 'private') {
-			return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
-		}
+			const { bot, hasFullAccess } = authResult;
 
-		if (hasFullAccess) {
-			return NextResponse.json(bot);
-		} else {
-			// Sanitized public return
+			if (!hasFullAccess && bot.privacy === 'private') {
+				return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
+			}
+
+			if (hasFullAccess) {
+				return NextResponse.json(bot);
+			}
+
 			return NextResponse.json({
 				id: bot.id,
 				name: bot.name,
@@ -71,6 +37,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 				voteCount: bot.voteCount,
 			});
 		}
+
+		// Unauthenticated public GET fallback
+		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any).Bot || (db.models.bots as any).Profile;
+		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		if (!bot) return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
+		if (bot.privacy === 'private') {
+			return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
+		}
+
+		return NextResponse.json({
+			id: bot.id,
+			name: bot.name,
+			avatar: bot.avatar,
+			description: bot.description,
+			info: bot.info,
+			organization: bot.organization,
+			verified: bot.verified,
+			tags: bot.tags,
+			links: bot.links,
+			owners: bot.owners,
+			voteCount: bot.voteCount,
+		});
 	} catch (error: any) {
 		console.error('Failed to GET bot profile:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -79,11 +68,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authResult = await authenticateAndGetBot(req, id);
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { bot, hasFullAccess, BotModel } = authResult;
+		const { botId: id, hasFullAccess, BotModel } = authResult as Required<typeof authResult>;
 
 		if (!hasFullAccess) {
 			return NextResponse.json({ error: 'Forbidden: You do not have permission to modify this bot.' }, { status: 403 });
@@ -101,7 +90,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		delete body.name;
 		delete body.avatar;
 
-		await BotModel.updateOne({ id }, { $set: body });
+		if (Object.keys(body).length > 0) {
+			await BotModel.updateOne({ id }, { $set: body });
+		}
 
 		const updatedBot = await BotModel.findOne({ id });
 		return NextResponse.json(updatedBot);
@@ -111,19 +102,30 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 	}
 }
 
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+	return PATCH(req, context);
+}
+
+export async function PUT(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+	return PATCH(req, context);
+}
+
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
-		const authResult = await authenticateAndGetBot(req, id);
+		const { id: rawId } = await params;
+		const authResult = await authenticateV1BotRequest(req, rawId, { isMutation: true });
 		if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
 
-		const { hasFullAccess, BotModel } = authResult;
+		const { botId: id, hasFullAccess, BotModel, TokenModel } = authResult as Required<typeof authResult>;
 
 		if (!hasFullAccess) {
 			return NextResponse.json({ error: 'Forbidden: You do not have permission to delete this bot.' }, { status: 403 });
 		}
 
 		await BotModel.deleteOne({ id });
+		if (TokenModel) {
+			await TokenModel.updateMany({ botId: id }, { $unset: { botId: 1 }, $set: { status: 'pending' } }).catch(() => {});
+		}
 		return NextResponse.json({ message: 'Bot profile deleted successfully' });
 	} catch (error: any) {
 		console.error('Failed to DELETE bot profile:', error);

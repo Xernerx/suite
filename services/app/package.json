@@ -1,0 +1,35 @@
+{
+	"name": "@xernerx/app",
+	"version": "2.0.1",
+	"description": "Xernerx App Discord bot daemon for support, docs, status, and community hub",
+	"main": "dist/main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/main.ts",
+		"build": "tsc",
+		"start": "tsx src/main.ts"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"keywords": [],
+	"author": "Xernerx Studios",
+	"license": "MIT",
+	"packageManager": "pnpm@11.20.0",
+	"devDependencies": {
+		"@types/react": "^19.3.0",
+		"prettier": "^3.9.10",
+		"tsc-watch": "^7.2.1",
+		"tsx": "^4.23.15",
+		"typescript": "^6.0.3"
+	},
+	"dependencies": {
+		"@xernerx/framework": "^1.0.2",
+		"@xernerx/lib": "workspace:*",
+		"discord.js": "^14.27.0",
+		"mongoose": "^9.11.4",
+		"next": "^16.4.3",
+		"server-only": "^0.0.1",
+		"tslib": "^2.8.1"
+	}
+}

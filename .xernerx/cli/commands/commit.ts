@@ -84,11 +84,89 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 	return { termsChanged, privacyChanged, cookiesChanged };
 }
 
+function flattenDictionary(obj: Record<string, any>, prefix = '', out: Record<string, string> = {}): Record<string, string> {
+	for (const [k, v] of Object.entries(obj || {})) {
+		const p = prefix ? `${prefix}.${k}` : k;
+		if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+			flattenDictionary(v, p, out);
+		} else {
+			out[p] = JSON.stringify(v);
+		}
+	}
+	return out;
+}
+
+function deleteNestedKey(obj: Record<string, any>, keyPath: string): boolean {
+	const parts = keyPath.split('.');
+	const stack: Array<[Record<string, any>, string]> = [];
+	let cur: any = obj;
+	for (let i = 0; i < parts.length - 1; i++) {
+		if (!cur || typeof cur !== 'object' || !(parts[i] in cur)) return false;
+		stack.push([cur, parts[i]]);
+		cur = cur[parts[i]];
+	}
+	const last = parts[parts.length - 1];
+	if (!cur || typeof cur !== 'object' || !(last in cur)) return false;
+	delete cur[last];
+	for (let i = stack.length - 1; i >= 0; i--) {
+		const [parent, key] = stack[i];
+		if (parent[key] && typeof parent[key] === 'object' && Object.keys(parent[key]).length === 0) {
+			delete parent[key];
+		} else {
+			break;
+		}
+	}
+	return true;
+}
+
+function pruneUpdatedLocaleKeys() {
+	try {
+		const dictDir = path.resolve(process.cwd(), 'packages/lib/src/dictionaries');
+		const enGbPath = path.join(dictDir, 'en-GB.json');
+		if (!fs.existsSync(enGbPath)) return;
+
+		const currentEnFlat = flattenDictionary(JSON.parse(fs.readFileSync(enGbPath, 'utf8')));
+		let headEnFlat: Record<string, string> = {};
+		try {
+			const headRaw = execSync('git show HEAD:"packages/lib/src/dictionaries/en-GB.json"', {
+				stdio: ['pipe', 'pipe', 'ignore'],
+			}).toString();
+			headEnFlat = flattenDictionary(JSON.parse(headRaw));
+		} catch {
+			// Ignore if not in git repo
+		}
+
+		const modifiedEnKeys = new Set<string>();
+		for (const [k, oldVal] of Object.entries(headEnFlat)) {
+			if (!k.startsWith('metadata.') && k in currentEnFlat && currentEnFlat[k] !== oldVal) {
+				modifiedEnKeys.add(k);
+			}
+		}
+
+		for (const file of fs.readdirSync(dictDir)) {
+			if (file === 'en-GB.json' || !file.endsWith('.json')) continue;
+			const localePath = path.join(dictDir, file);
+			const localeObj = JSON.parse(fs.readFileSync(localePath, 'utf8'));
+			const localeFlat = flattenDictionary(localeObj);
+
+			const keysToRemove = Object.keys(localeFlat).filter((k) => !k.startsWith('metadata.') && (!(k in currentEnFlat) || modifiedEnKeys.has(k)));
+			if (keysToRemove.length > 0) {
+				for (const k of keysToRemove) deleteNestedKey(localeObj, k);
+				fs.writeFileSync(localePath, JSON.stringify(localeObj, null, '\t') + '\n');
+				console.log(`[i18n] Pruned ${keysToRemove.length} updated/orphaned key(s) from ${file}: ${keysToRemove.join(', ')}`);
+			}
+		}
+	} catch {
+		// Safely ignore errors
+	}
+}
+
 export default function registerCommit(program: Command) {
 	program
 		.command('commit')
 		.description('Format, build, and create a changeset')
 		.action(async () => {
+			pruneUpdatedLocaleKeys();
 			runSync('npx prettier --write .');
 
 			try {

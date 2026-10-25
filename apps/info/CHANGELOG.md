@@ -2,6 +2,17 @@
 
 # info
 
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.11.1
+    - @xernerx/components@0.9.1
+    - @xernerx/providers@0.12.1
+    - @xernerx/feedback@0.1.1
+    - @xernerx/ui@0.7.1
+
 ## 1.8.1
 
 ### Patch Changes

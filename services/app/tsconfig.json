@@ -1,0 +1,30 @@
+{
+	"include": ["src"],
+	"exclude": ["node_modules", ".github", "docs"],
+	"compilerOptions": {
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noUnusedLocals": true,
+		"strict": true,
+		"useUnknownInCatchVariables": true,
+		"declaration": true,
+		"importHelpers": true,
+		"newLine": "lf",
+		"noEmitHelpers": true,
+		"outDir": "./dist",
+		"removeComments": false,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"experimentalDecorators": true,
+		"lib": ["ESNext"],
+		"useDefineForClassFields": true,
+		"target": "ES2022",
+		"module": "ESNext",
+		"rootDir": "./src",
+		"moduleResolution": "Bundler",
+		"skipLibCheck": true,
+		"jsx": "react-jsx"
+	}
+}

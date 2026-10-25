@@ -28,6 +28,72 @@ export async function getUserAccentColor(userId?: string): Promise<number> {
 	}
 }
 
+export async function recordSelfBotUptime(client: any, status: 'online' | 'idle' | 'dnd' | 'offline', activity: string) {
+	const botId = client.user?.id;
+	if (!botId) return;
+
+	try {
+		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any)?.Bot;
+		const SettingModel = (db.models.core as any)?.Setting;
+		const wsPing = typeof client.ws?.ping === 'number' && client.ws.ping > 0 ? Math.round(client.ws.ping) : null;
+
+		if (BotModel) {
+			await BotModel.findOneAndUpdate(
+				{ id: botId },
+				{
+					$set: {
+						status,
+						statusUpdatedAt: new Date(),
+						activity,
+					},
+				}
+			).catch(() => null);
+		}
+
+		if (SettingModel) {
+			const bucketMs = 30 * 60 * 1000;
+			const currentBucket = String(Math.floor(Date.now() / bucketMs) * bucketMs);
+			const cutoffTs = Number(currentBucket) - 48 * bucketMs;
+
+			const historyDoc = await SettingModel.findOne({ id: 'system_status_history_24h' }).lean();
+			let storedHistory: { services: Record<string, any>; bots: Record<string, any> } = { services: {}, bots: {} };
+			if (historyDoc?.value) {
+				try {
+					const parsed = JSON.parse(historyDoc.value);
+					if (parsed && typeof parsed === 'object') {
+						storedHistory = {
+							services: parsed.services || {},
+							bots: parsed.bots || {},
+						};
+					}
+				} catch {}
+			}
+
+			storedHistory.bots[botId] = storedHistory.bots[botId] || {};
+			storedHistory.bots[botId][currentBucket] = { status, ping: wsPing };
+			for (const tsKey of Object.keys(storedHistory.bots[botId])) {
+				if (Number(tsKey) < cutoffTs) delete storedHistory.bots[botId][tsKey];
+			}
+
+			await SettingModel.findOneAndUpdate(
+				{ id: 'system_status_history_24h' },
+				{
+					$set: {
+						id: 'system_status_history_24h',
+						value: JSON.stringify(storedHistory),
+						valueType: 'json',
+						description: 'Rolling 24-hour status & latency history for suite services and main org bots',
+					},
+				},
+				{ upsert: true }
+			).catch(() => null);
+		}
+	} catch (err) {
+		console.error('[BotUtils] Failed to record self bot uptime:', err);
+	}
+}
+
 export async function updateBotPresence(client: any) {
 	const versionUrl = process.env.URL ? `${process.env.URL}/api/version` : `${getApiBaseUrl()}/api/version`;
 	const status: any = await fetch(versionUrl)
@@ -47,19 +113,25 @@ export async function updateBotPresence(client: any) {
 		presence.activities = [{ name: 'Xernerx API online', state: `API is online, all features are working. (v${status.version})` }];
 	}
 
-	if (process.env.ENVIRONMENT?.toUpperCase() === 'DEVELOPMENT') {
+	const envUpper = process.env.ENVIRONMENT?.toUpperCase();
+	if (envUpper === 'DEVELOPMENT' || envUpper === 'CANARY') {
+		const envLabel = envUpper === 'CANARY' ? 'Canary' : 'Development';
 		presence.activities = [
 			{
 				type: ActivityType.Streaming,
-				name: 'Xernerx API (Development)',
+				name: `Xernerx API (${envLabel})`,
 				url: 'https://www.youtube.com/watch?v=nOv9HorOcJo',
-				state: `API: ${status ? 'Online' : 'Offline'} - Version: ${status?.version || 'Unknown'}`,
+				state: `API (${envLabel}): ${status ? 'Online' : 'Offline'} - Version: ${status?.version || 'Unknown'}`,
 			},
 		];
 		presence.status = 'online';
 	}
 
 	client.user?.setPresence(presence);
+
+	const effectiveStatus: 'online' | 'dnd' = presence.status === 'dnd' ? 'dnd' : 'online';
+	const effectiveActivity = (presence.activities?.[0] as any)?.state || (presence.activities?.[0] as any)?.name || '';
+	await recordSelfBotUptime(client, effectiveStatus, effectiveActivity);
 
 	setTimeout(() => updateBotPresence(client), 60_000);
 }

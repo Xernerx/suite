@@ -3575,7 +3575,7 @@
 			},
 			"card2": {
 				"title": "How do I register a Discord bot and bind an API token?",
-				"description": "Go to account.xernerx.com/tokens (/?tab=tokens) and create a new API token (prefixed with xrx_), which starts in a pending state. Use that token with your bot via the @xernerx/stats package or POST https://api.xernerx.com/v1/bots/[id]/stats. On its first stats request, the token automatically links to your bot—locking the token so it can only be used for GET requests and that bot's endpoints—while simultaneously creating your bot's profile from Discord so you can customize descriptions, links, webhooks, and slash commands in the Developer Portal on app.xernerx.com/portal."
+				"description": "Go to account.xernerx.com/tokens (/?tab=tokens) and create a new API token (prefixed with xrx_), which starts in a pending state. Use that token with your bot via @xernerx/stats, @xernerx/framework, or any POST, PUT, PATCH, or DELETE request to https://api.xernerx.com/v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases). On its first mutation request, the token automatically binds to your bot and user account—transitioning to active and scoping the token to that bot—while simultaneously creating your bot's profile from Discord so you can customize descriptions, links, webhooks, and slash commands in the Developer Portal on app.xernerx.com/portal."
 			},
 			"card3": {
 				"title": "Where can I find official pre-configured Discord bot invite links?",
@@ -3651,7 +3651,7 @@
 			},
 			"card2": {
 				"title": "How do Personal and Bot API Bearer Tokens work?",
-				"description": "On account.xernerx.com/tokens (/?tab=tokens), you can generate Bearer tokens (prefixed with xrx_). Newly created tokens start in a pending state; when first used with a bot on POST /v1/bots/[id]/stats, the token automatically binds to that bot ID, transitions to active, and is restricted to GET requests and that bot's endpoints. Pass your token in the Authorization: Bearer <token> HTTP header when calling api.xernerx.com."
+				"description": "On account.xernerx.com/tokens (/?tab=tokens), you can generate Bearer tokens (prefixed with xrx_). Newly created tokens start in a pending state; when first used with a bot on any POST, PUT, PATCH, or DELETE request to /v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases), the token automatically creates the bot profile if needed, binds to that bot ID and your user account, transitions to active, and is scoped to GET requests and that bot's endpoints. Pass your token in the Authorization: Bearer <token> HTTP header when calling api.xernerx.com."
 			},
 			"card3": {
 				"title": "How do Public, Limited, and Private privacy levels and Terms/Cookie consent prompts work?",
@@ -5111,7 +5111,7 @@
 					"step1Desc": "Create a token on account.xernerx.com/tokens with v1 permissions. New tokens start in Pending.",
 					"badge2": "2. Active",
 					"step2Title": "Auto-Link Bot",
-					"step2Desc": "Send your first POST /v1/bots/[id]/stats request (or use @xernerx/stats) to link your bot and create its Portal profile.",
+					"step2Desc": "Send any POST, PUT, PATCH, or DELETE request to /v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases) to automatically bind your token and user and create the bot's Portal profile.",
 					"badge3": "3. Scoped",
 					"step3Title": "Scoped Access",
 					"step3Desc": "Once Active, the token is permanently scoped to GET requests and updates for that linked bot."

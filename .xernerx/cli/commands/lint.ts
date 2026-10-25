@@ -1,6 +1,7 @@
 /** @format */
 
 import { Command } from 'commander';
+import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { runCommand } from '../utils/run';
@@ -42,6 +43,18 @@ function walkFiles(dir: string): string[] {
 
 function getNestedValue(obj: Record<string, any>, keyPath: string): unknown {
 	return keyPath.split('.').reduce<any>((acc, part) => (acc !== null && acc !== undefined ? acc[part] : undefined), obj);
+}
+
+function flattenDictionary(obj: Record<string, any>, prefix = '', out: Record<string, string> = {}): Record<string, string> {
+	for (const [k, v] of Object.entries(obj || {})) {
+		const p = prefix ? `${prefix}.${k}` : k;
+		if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+			flattenDictionary(v, p, out);
+		} else {
+			out[p] = JSON.stringify(v);
+		}
+	}
+	return out;
 }
 
 export function runSuiteArchitectureLint(): boolean {
@@ -131,6 +144,44 @@ export function runSuiteArchitectureLint(): boolean {
 				const resolved = getNestedValue(enGb, key);
 				if (resolved === undefined) {
 					errors.push(`[Missing i18n Key] ${relPath} references t('${key}'), which is missing from packages/lib/src/dictionaries/en-GB.json.`);
+				}
+			}
+		}
+	}
+
+	// 4b. Stale & Orphaned Translation Keys Across Non-en-GB Locale Files
+	const dictDir = path.join(rootDir, 'packages/lib/src/dictionaries');
+	if (fs.existsSync(dictDir)) {
+		const currentEnFlat = flattenDictionary(enGb);
+		let headEnFlat: Record<string, string> = {};
+		try {
+			const headRaw = execSync('git show HEAD:"packages/lib/src/dictionaries/en-GB.json"', {
+				cwd: rootDir,
+				stdio: ['pipe', 'pipe', 'ignore'],
+			}).toString();
+			headEnFlat = flattenDictionary(JSON.parse(headRaw));
+		} catch {
+			// Ignore if not in git repo
+		}
+
+		const modifiedEnKeys = new Set<string>();
+		for (const [k, oldVal] of Object.entries(headEnFlat)) {
+			if (!k.startsWith('metadata.') && k in currentEnFlat && currentEnFlat[k] !== oldVal) {
+				modifiedEnKeys.add(k);
+			}
+		}
+
+		for (const file of fs.readdirSync(dictDir)) {
+			if (file === 'en-GB.json' || !file.endsWith('.json')) continue;
+			const localePath = path.join(dictDir, file);
+			const localeFlat = flattenDictionary(JSON.parse(fs.readFileSync(localePath, 'utf-8')));
+
+			for (const k of Object.keys(localeFlat)) {
+				if (k.startsWith('metadata.')) continue;
+				if (!(k in currentEnFlat)) {
+					errors.push(`[Orphaned i18n Key] packages/lib/src/dictionaries/${file} contains '${k}', which no longer exists in en-GB.json. Delete it.`);
+				} else if (modifiedEnKeys.has(k)) {
+					errors.push(`[Stale i18n Key Rule] '${k}' was updated in en-GB.json but was not deleted from packages/lib/src/dictionaries/${file}.`);
 				}
 			}
 		}

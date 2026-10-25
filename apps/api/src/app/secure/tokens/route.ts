@@ -29,8 +29,10 @@ export async function GET(request: NextRequest) {
 		// Clean up for standard view format
 		const formattedTokens = tokens.map((t) => ({
 			id: t.id,
-			status: t.status,
+			status: t.botId && t.status === 'pending' ? 'active' : !t.botId && t.status === 'active' ? 'pending' : t.status,
 			name: t.name,
+			botId: t.botId || null,
+			owners: Array.isArray(t.owners) ? t.owners : [],
 			permissions: t.permissions,
 			requestCount: t.requestCount || 0,
 			lastUsedAt: t.lastUsedAt || null,
