@@ -2,6 +2,56 @@
 
 # app
 
+## 2.15.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.4.0
+    - @xernerx/providers@0.15.0
+    - @xernerx/components@0.9.5
+    - @xernerx/ui@0.7.5
+
+## 2.15.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.3.0
+    - @xernerx/providers@0.14.0
+    - @xernerx/components@0.9.4
+    - @xernerx/ui@0.7.4
+
+## 2.15.1
+
+### Patch Changes
+
+- ### Landing Page Dot-Matrix Construction Stage, Live Bot Service Cards & 21-Milestone Studio Timeline (`www`, `@xernerx/feedback`, `@xernerx/lib`, `@xernerx/components`, `@xernerx/providers`)
+    - **3-Act On-Grid Dot-Matrix Construction Engine (`packages/feedback/src/XernerxDotLogo.tsx`, `packages/feedback/src/dotLogoPaths.ts`, `packages/components/src/Page.tsx`)**:
+        - Implemented a 3.4-second 3-act dot-matrix construction sequence on the landing page (`backgroundMode` + `xernerx:construct-logo`):
+            - **Act 1 (`0.0s – 0.9s`, Matrix Lattice Scanwave)**: Dots materialize directly on their matrix grid cells (`homeX`, `homeY`) in a radial scanwave from the upper-center stage with a crisp `--accent` activation glint.
+            - **Act 2 (`0.75s – 2.85s`, `XERNERX` Crest & Wordmark Ignition)**: Across the active matrix grid, a left-to-right `--accent` construction wavefront sweeps through the crest and letters of `XERNERX`, smoothly expanding and locking each logo dot into full coverage.
+            - **Act 3 (`2.85s – 3.4s`, Completion Shockwave & Content Reveal)**: Fires a radial completion shockwave from the upper-stage logo across the ambient matrix lattice and dispatches `xernerx:construct-complete` so the landing page content glides up from the bottom of the screen to sit cleanly beneath the constructed `XERNERX` logo.
+        - Positioned the `full` dot-matrix logo in the upper stage (`offY = Math.max(activeH * 0.05, (activeH - boxH) * 0.14)`) so the constructed wordmark remains permanently visible above the Hero card.
+        - Prevented mid-animation canvas teardowns by storing construction state (`constructStartRef`, `constructPulseRef`) and theme synchronization (`resolvedThemeRef`, `colorSyncRef`) in component-level refs, ignoring minor scrollbar width deltas (`<= 24px`) in `ResizeObserver` commits, and locking `targetVariant` and `overflow-hidden` in `Page.tsx` while `stagePreview` is active.
+    - **Restructured Glassmorphic Hero, Live Bot Profile Showcases & Bento Cards (`apps/www/src/components/HomeClient.tsx`, `apps/www/src/components/LandingServiceCards.tsx`, `apps/www/src/components/PlatformHighlights.tsx`, `apps/www/src/components/WwwDeepSearch.tsx`)**:
+        - Replaced the legacy 2-column SVG hero layout with a full-width (`max-w-7xl`) centered glassmorphic Hero card (`pt-[52vh] sm:pt-[54vh]`) positioned cleanly beneath the constructed `XERNERX` dot-matrix stage, complete with a dot-matrix micro-grid backdrop, widened deep search bar (`max-w-2xl`), and quick-navigation pills.
+        - Created `LandingServiceCards.tsx` (`ServiceProfileCard` & `DeveloperSoftwareCard`) to enrich Consumer Services cards (`Virtue`, `Xernerx Bot`, `Xernerx App`, `Dashboard`, `Store`, `Identity`) with live bot profile banners, avatars, real-time online status indicators, Discord activity strings, and live server/member telemetry fetched from `GET /info/status/bots`.
+        - Upgraded Selling Point cards, About Us pillars, Platform Highlights, and the bottom CTA (`PlatformHighlights.tsx`) with subtle dot-matrix radial grid overlays and glassmorphic accents matching the fluid background canvas.
+    - **Chronological 21-Milestone Journey Timeline & Accurate Virtue Leveling Copy (`apps/www/src/components/Timeline.tsx`, `packages/lib/src/dictionaries/en-GB.json`)**:
+        - Expanded `www.timeline.events` into 21 strictly chronological milestones (`2021` – `2026`) covering the whole studio journey—from initial Discord bot experiments (`2021`) and early utility prototypes (`2022`) to the `@xernerx/framework` & stats engines (`2023`), `api.xernerx.com` & `app.xernerx.com` (`2024`), `account`/`docs`/`info`/`store` & Virtue (`2025`), and the Electron desktop companion, CDN media vault, and interactive dot-matrix identity (`2026`).
+        - Updated `Timeline.tsx` with year badges, milestone step counters (`#01` – `#21`), and interactive dot-matrix card surfaces.
+        - Updated Virtue descriptions across `en-GB.json` (`www.applications.virtue.desc`, `www.about.pillars.communities.description`, `www.timeline.events.18.description`) to accurately describe Virtue as a dedicated Discord leveling bot for text and voice XP progression, and pruned stale keys across non-`en-GB` locale dictionaries.
+    - **Resilient `useTheme()` Fallback for Global Error Boundaries (`packages/providers/src/ThemeProvider.tsx`)**:
+        - Added `FALLBACK_THEME_CONTEXT` to `useTheme()` so `<XernerxDotLogo />` inside `global-error.tsx` renders safely even when mounted outside `ThemeProvider`.
+
+- Updated dependencies
+    - @xernerx/feedback@0.2.0
+    - @xernerx/lib@1.13.0
+    - @xernerx/components@0.9.3
+    - @xernerx/providers@0.13.1
+    - @xernerx/ui@0.7.3
+
 ## 2.15.0
 
 ### Minor Changes

@@ -2,6 +2,7 @@
 
 'use client';
 
+import { motion } from 'framer-motion';
 import { ArrowUpRight, Compass, Lock, Palette } from 'lucide-react';
 import Link from 'next/link';
 import { useDictionary, useEnvironment, usePlatform } from '@xernerx/providers';
@@ -41,22 +42,39 @@ export function PlatformHighlights() {
 			</div>
 
 			<div className="grid md:grid-cols-3 gap-8">
-				{cards.map((card) => (
-					<div
+				{cards.map((card, i) => (
+					<motion.div
 						key={card.title}
-						className="group relative flex flex-col rounded-[2.5rem] p-8 lg:p-10 transition-all overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 shadow-xl"
+						initial={{ opacity: 0, y: 24 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						whileHover={{ y: -8, scale: 1.015 }}
+						viewport={{ once: true, margin: '-50px' }}
+						transition={{ duration: 0.55, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+						className="group relative flex flex-col rounded-3xl p-8 lg:p-10 transition-colors overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/50 shadow-xl hover:shadow-[0_16px_50px_-12px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
 					>
-						<div className="w-14 h-14 rounded-2xl bg-(--accent)/10 flex items-center justify-center text-(--accent) mb-6">{card.icon}</div>
+						<div
+							className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-500 pointer-events-none"
+							style={{
+								backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+								backgroundSize: '18px 18px',
+							}}
+						/>
+						<div className="relative z-10 w-14 h-14 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent) mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+							{card.icon}
+						</div>
 
-						<div className="text-xl font-bold text-(--text) mb-3 flex items-center justify-between gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						<div
+							className="relative z-10 text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mb-3 flex items-center justify-between gap-2"
+							style={{ fontFamily: 'var(--font-fredoka)' }}
+						>
 							<a href={card.link} className="after:absolute after:inset-0 flex items-center justify-between w-full">
 								<span>{card.title}</span>
 								<ArrowUpRight size={20} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
 							</a>
 						</div>
 
-						<p className="text-sm text-(--text-muted) leading-relaxed">{card.desc}</p>
-					</div>
+						<p className="relative z-10 text-sm text-(--text-muted) leading-relaxed">{card.desc}</p>
+					</motion.div>
 				))}
 			</div>
 		</section>
@@ -69,8 +87,21 @@ export function LandingCta() {
 	const { type } = usePlatform();
 
 	return (
-		<section className="max-w-7xl mx-auto px-6 pb-32 relative">
-			<div className="relative rounded-[3rem] p-10 md:p-16 overflow-hidden bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 shadow-2xl flex flex-col items-center text-center">
+		<section id="cta" className="max-w-7xl mx-auto px-6 pb-32 relative">
+			<motion.div
+				initial={{ opacity: 0, y: 24 }}
+				whileInView={{ opacity: 1, y: 0 }}
+				viewport={{ once: true, margin: '-80px' }}
+				transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+				className="relative rounded-[3rem] p-10 md:p-16 overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 transition-colors shadow-2xl flex flex-col items-center text-center group"
+			>
+				<div
+					className="absolute inset-0 opacity-[0.07] group-hover:opacity-[0.14] transition-opacity duration-500 pointer-events-none"
+					style={{
+						backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+						backgroundSize: '20px 20px',
+					}}
+				/>
 				<div className="absolute -top-24 -left-24 w-72 h-72 bg-(--accent)/15 rounded-full blur-3xl pointer-events-none" />
 				<div className="absolute -bottom-24 -right-24 w-72 h-72 bg-(--accent)/15 rounded-full blur-3xl pointer-events-none" />
 
@@ -120,7 +151,7 @@ export function LandingCta() {
 						{t('www.cta.contact')}
 					</Link>
 				</div>
-			</div>
+			</motion.div>
 		</section>
 	);
 }

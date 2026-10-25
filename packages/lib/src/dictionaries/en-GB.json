@@ -2858,6 +2858,10 @@
 			"selectOption": "Select an option",
 			"submit": "Submit Application",
 			"yourAnswer": "Your answer...",
+			"virtue": {
+				"title": "Virtue",
+				"desc": "Text and voice XP leveling for Discord servers—featuring customizable XP curve modes, reset cycles, and level-up role rewards configured directly from your Xernerx Dashboard."
+			},
 			"todo": {
 				"title": "To-Do List Bot",
 				"desc": "Structured productivity tooling for Discord communities. Organize personal checklists, collaborate on shared server tasks, and automate recurring team reminders directly inside your channels."
@@ -2904,7 +2908,7 @@
 		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
-			"description": "Empowering developers with open-source frameworks, modern software, and developer tools, while connecting communities through intuitive Discord bots and platforms. Xernerx Studios is a unified ecosystem built for developers and communities. We combine scalable cloud infrastructure with modular libraries and an open JSON REST API so teams can build and grow faster.",
+			"description": "Xernerx Studios is a development studio dedicated to consumer and developer simplicity. We build Discord bots that power thousands of communities—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—alongside reliable open-source frameworks (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
 			"buttons": {
 				"explore": "Explore Services",
 				"software": "View Software"
@@ -2932,25 +2936,25 @@
 		},
 		"about": {
 			"title": "About Xernerx",
-			"description": "Founded in 2024, Xernerx Studios evolved from a focused development initiative into a modern software ecosystem of Discord bots, developer tools, and infrastructure frameworks. Every system is built with scalability, maintainability, and architectural clarity as first principles.",
-			"description2": "Our platform unifies consumer applications and developer tooling under a single cohesive network. From multipurpose server management with Virtue and upcoming integrations for Metamorphosis and Zodiac to open-source packages and a language-agnostic JSON REST API, we engineer reliable software that scales alongside your community.",
+			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity. Across our in-house Discord bots—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—our open-source developer frameworks, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
+			"description2": "At the core of our ecosystem is 1 Account, 1 Place, 1 Setup: one Xernerx Account used across everything Xernerx—whether you are configuring Virtue, Metamorphosis, or Zodiac for your server, discovering new communities, or using our Developer Portal and frameworks to track bot stats, publicly list your bots, and promote them.",
 			"watermark": "ABOUT US",
 			"pillars": {
 				"communities": {
-					"title": "Community Platforms & Bots",
-					"description": "Configure Virtue server modules, manage multi-server organizations, and explore our growing suite of Discord bots including Metamorphosis, Zodiac, and To-Do List Bot. Our tools help server owners automate moderation, boost member engagement, and track community growth in real time."
+					"title": "Discord Bots & Community Services",
+					"description": "We build and maintain dedicated Discord bots for communities worldwide—including text & voice XP leveling with Virtue, multilingual translation with Metamorphosis, astrology with Zodiac, and productivity with To-Do List Bot."
 				},
 				"frameworks": {
-					"title": "Open-Source Packages & Tooling",
-					"description": "Build applications faster with our modular NPM packages and developer libraries. Every package ships with clear class references, practical examples, and versioned documentation so developers can integrate with confidence."
+					"title": "Open-Source Frameworks & Tooling",
+					"description": "Easy, reliable bot development powered by our open-source NPM packages (@xernerx/framework, @xernerx/stats) and clean integrations with both the Xernerx ecosystem and third-party services."
 				},
 				"infrastructure": {
-					"title": "Open JSON REST API",
-					"description": "Connect any bot or application in any programming language using standard HTTP JSON requests and responses. As long as your scoped Bearer token grants access, you can synchronize bot telemetry, command registries, and public profile metadata from any stack."
+					"title": "Bot Stats, Public Listing & Setup Dashboard",
+					"description": "Evolved across five full generations from a monthly Excel stat sheet into Version 5 of the Xernerx Suite—combining our service setup dashboard, real-time bot statistics collector, and public Discord bot list in one place."
 				},
 				"identity": {
-					"title": "One Account Everywhere",
-					"description": "Sign in once with Discord to unify your identity across every Xernerx web application, desktop client, and bot service. Your language preferences, custom themes, and account settings stay automatically synchronized wherever you interact with Xernerx."
+					"title": "1 Account, 1 Place, 1 Setup",
+					"description": "Your single Xernerx Account connects you across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac. Your identity, custom themes, preferences, and server setups stay unified everywhere."
 				}
 			}
 		},
@@ -2966,17 +2970,17 @@
 			},
 			"consumer": {
 				"title": "Consumer Services",
-				"description": "Powerful, user-friendly applications and platforms designed to bring communities together and streamline digital experiences. Explore our web dashboard and Discord bots built for server management, productivity, localization, and community engagement."
+				"description": "1 Account, 1 Place, 1 Setup. Sign in once with your Xernerx Account to configure our Discord services—Virtue, Metamorphosis, and Zodiac (plus To-Do List Bot)—discover verified bots and servers, and manage everything from one simple dashboard."
 			},
 			"developer": {
 				"title": "Developer Software",
-				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools. Integrate our public REST API and modular NPM packages into your workflow."
+				"description": "Everything you need for easy bot development: reliable open-source frameworks (@xernerx/framework, @xernerx/stats) and our public v1 Bot Stats & Registry API to track telemetry, sync slash commands, publish releases, and integrate with the Xernerx ecosystem and third parties."
 			}
 		},
 		"services": {
 			"dashboard": {
-				"title": "Dashboard",
-				"desc": "Manage applications, configure Virtue server deployments, and monitor real-time bot telemetry from a unified web control center. Collaborate with organization members and customize server modules effortlessly."
+				"title": "Xernerx Suite & Dashboard",
+				"desc": "1 place for bot setup, server management, and bot discovery. Configure Virtue, Metamorphosis, and Zodiac, explore public bots and servers, or track stats, list, and promote your own bots in the Developer Portal."
 			}
 		},
 		"packages": {
@@ -3451,16 +3455,16 @@
 		},
 		"features": {
 			"scale": {
-				"title": "Built for Scale",
-				"description": "Our infrastructure and tools are designed from the ground up to handle massive communities and workloads effortlessly. High-availability services and automated load balancing keep your applications responsive at any size."
+				"title": "1 Account, 1 Place, 1 Setup",
+				"description": "One Xernerx Account works across our entire studio ecosystem—whether you are using the Xernerx Suite, configuring Virtue, Metamorphosis, or Zodiac, or discovering new bots and servers."
 			},
 			"opensource": {
-				"title": "Open Source Heart",
-				"description": "We believe in transparent development. Our software tools, modular frameworks, and developer utilities are freely available so builders everywhere can inspect, extend, and push the ecosystem forward."
+				"title": "Open-Source Heart",
+				"description": "We build reliable open-source frameworks (@xernerx/framework, @xernerx/stats) and clean v1 REST & webhook integrations so developers can build, scale, and connect bots effortlessly."
 			},
 			"design": {
-				"title": "User-Centric Design",
-				"description": "Whether it is a CLI tool or a web dashboard, we prioritize intuitive interfaces and seamless developer experiences. Every workflow is crafted for clarity, speed, and accessibility across all devices."
+				"title": "Consumer & Developer Simplicity",
+				"description": "From our in-house Discord bots to our service dashboard, bot statistics tracker, and public bot list, every product we ship is crafted to be fast and intuitive for both end users and developers."
 			}
 		},
 		"tags": {
@@ -3473,7 +3477,7 @@
 				"line2": "Journey",
 				"line3": "So Far."
 			},
-			"description": "From early experimentation with bots to stable infrastructure engineering, see how Xernerx Studios evolved over the years into a unified platform for developers and communities.",
+			"description": "From early experimentation with Discord bots to coining the name 'Xernerx' in 2022 and evolving through five platform generations, see how Xernerx Studios grew into a unified ecosystem for communities and developers.",
 			"events": {
 				"0": {
 					"date": "March 2020",
@@ -3511,24 +3515,74 @@
 					"description": "Discord-Translate was rebuilt from the ground up and relaunched as Metamorphosis with improved infrastructure. The rewrite introduced faster translation pipelines and automated role routing."
 				},
 				"7": {
+					"date": "January 2022",
+					"title": "Version 0: Monthly Excel Stat Sheets",
+					"description": "Our bot statistics tracking began as Version 0 by manually recording server and member counts into an Excel spreadsheet every month. Those spreadsheets laid the foundation for tracking long-term community growth across our bots."
+				},
+				"8": {
 					"date": "February 2022",
 					"title": "Leadership Transition",
 					"description": "Johannes stepped down from daily operations. Infrastructure responsibilities and backend architecture were restructured internally to prepare for long-term platform scalability."
 				},
-				"8": {
+				"9": {
 					"date": "March 2022",
 					"title": "Zodiac Development",
 					"description": "Max began development of Zodiac, expanding our catalog into astrology and personality tooling. Social communities quickly adopted Zodiac for daily horoscopes and interactive birth chart insights."
 				},
-				"9": {
-					"date": "February 2026",
-					"title": "Xernerx Studios Rebrand",
-					"description": "The company rebranded to Xernerx Studios, reflecting a major evolution in focus and identity. We launched the unified Xernerx Suite monorepo, open JSON REST API, and open-source developer packages."
-				},
 				"10": {
+					"date": "April 2022",
+					"title": "Xernerx Framework Begins",
+					"description": "The name 'Xernerx' was coined with the first release of our class-based Discord.js framework. It was created so our bots could share a clean, modular command and event structure instead of repetitive boilerplate."
+				},
+				"11": {
+					"date": "May 2023",
+					"title": "Automated Database Statistics",
+					"description": "Manual monthly spreadsheet logging was replaced by an automated database collector for our Discord bots. Server and member counts were now captured and stored automatically without manual entry."
+				},
+				"12": {
+					"date": "July 2023",
+					"title": "Version 1: Portal Development Stats Page",
+					"description": "We launched Version 1 as the /stats section on the original Portal Development website. It displayed live 24-hour and lifetime server, user, and shard graphs directly from our database."
+				},
+				"13": {
+					"date": "October 2024",
+					"title": "Xernerx Framework TypeScript Rewrite",
+					"description": "The Xernerx Framework was rebuilt from scratch in TypeScript for Discord.js v14. The rewrite introduced strict typing, automated command registration, and built-in dashboard hooks."
+				},
+				"14": {
+					"date": "March 2025",
+					"title": "Xernerx Studios Founded",
+					"description": "We founded Xernerx Studios (xernerx.com), starting out as a dedicated RESTful statistics API for Discord bots. This marked the beginning of unifying our developer tools and bot services under the Xernerx brand."
+				},
+				"15": {
+					"date": "June 2025",
+					"title": "Version 2: New Web UI & Xernerx Stats",
+					"description": "We rewrote the project for Version 2 on app.xernerx.com with a dedicated web interface, Discord sign-in, and scoped API tokens. Alongside it, we published @xernerx/stats so developers could push bot telemetry automatically."
+				},
+				"16": {
+					"date": "August 2025",
+					"title": "Version 3: Profiles & Organizations",
+					"description": "Another full rewrite brought Version 3 to life, introducing customizable User and Bot Profiles, 30-day telemetry charts, and milestone badges. It also added outbound webhooks, embeddable widgets, and Developer Organizations."
+				},
+				"17": {
+					"date": "April 2026",
+					"title": "Version 4: Public Discord Bot List",
+					"description": "We rewrote the platform from the ground up for Version 4, launching our public Discord Bot List (/bots) alongside xernerx.com. Developers could now publicly list, showcase, and promote their bots to communities alongside live statistics."
+				},
+				"18": {
+					"date": "May 2026",
+					"title": "Virtue Development Begins",
+					"description": "Development began on Virtue, our dedicated Discord leveling bot for text and voice XP progression. Virtue was designed from day one to be configured directly through our web dashboard."
+				},
+				"19": {
+					"date": "August 2026",
+					"title": "Version 5: The Xernerx Suite",
+					"description": "We rebuilt the entire platform into Version 5 as the unified Xernerx Suite monorepo powered by shared @xernerx/* packages. Version 5 united 1 Account (account.xernerx.com), our service setup dashboard, bot stats, public bot list, and desktop app."
+				},
+				"20": {
 					"date": "DYNAMIC_DATE",
 					"title": "Today",
-					"description": "You're all caught up! Today Xernerx Studios continues to ship modern software, Discord bots like Virtue, Metamorphosis, and Zodiac, and open-source developer tools for communities worldwide."
+					"description": "You're all caught up! Today Xernerx Studios unites our Discord bots—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—our open-source frameworks, and the Xernerx Suite under 1 Account, 1 Place, 1 Setup."
 				}
 			}
 		},
@@ -3554,7 +3608,7 @@
 			"rssFeed": "RSS Feed"
 		},
 		"software": {
-			"apiDesc": "Official documentation and endpoints for interacting with the Xernerx Suite over HTTP. Send JSON requests and receive JSON responses from any language using your scoped Bearer token.",
+			"apiDesc": "Public v1 JSON REST API and embeddable widgets for Discord bot developers—automate server/member/shard statistics, sync slash commands, and publish release notes using your scoped Bearer token.",
 			"apiTag": "API",
 			"npmPackageTag": "NPM Package",
 			"packageDesc": "Official documentation, class references, and integration guides for the {name} NPM package."
@@ -3576,8 +3630,8 @@
 			}
 		},
 		"cta": {
-			"title": "Ready to Build and Connect?",
-			"description": "Join communities and developers using Xernerx Studios to manage Discord servers, automate workflows, and connect custom bots through our open JSON REST API. Sign in once with Discord to access our web dashboard, bot services, and developer tools.",
+			"title": "1 Account. 1 Place. 1 Setup.",
+			"description": "Sign in once with your Xernerx Account to configure Virtue, Metamorphosis, and Zodiac in one dashboard, discover Discord bots and servers, or track stats, publicly list, and promote your own bots.",
 			"dashboard": "Open Dashboard",
 			"download": "Get Desktop App",
 			"docs": "Read Documentation",
@@ -3961,10 +4015,10 @@
 		},
 		"developers": {
 			"navTitle": "API, Widgets & Packages",
-			"title": "API, Widgets, NPM Packages & WebSocket",
+			"title": "API, Widgets, Webhooks & NPM Packages",
 			"card1": {
 				"title": "Which API namespace should I use (/v1, /core, or /secure)?",
-				"description": "Use /v1/* (docs.xernerx.com/api/v1) for external developer integrations—including bot profiles, statistical snapshots (@xernerx/stats), bulk slash command syncing (PUT /v1/bots/[id]/commands), live SVG badges (/v1/[entity]/[id]/badge.svg), leaderboards (/v1/leaderboard), and changelog RSS (/v1/changelog/rss). Use /core/* and /info/* (docs.xernerx.com/api/core) for public embed widgets, Discord metadata lookups, and public roadmap/suggestions/issues queries. The /secure/* namespace (docs.xernerx.com/api/secure) is reserved for authenticated first-party suite applications and tokens explicitly granted the secure (or admin) permission flag by an administrator."
+				"description": "Use /v1/* (docs.xernerx.com/api/v1) for public bot developer integrations—including bot profiles, statistical snapshots (@xernerx/stats), bulk slash command syncing (PUT /v1/bots/[id]/commands), release notes (POST /v1/bots/[id]/releases), live SVG badges (/v1/[entity]/[id]/badge.svg), leaderboards (/v1/leaderboard), and changelog RSS (/v1/changelog/rss). Use /core/* and /info/* (docs.xernerx.com/api/core) for public embed widgets, Discord metadata lookups, and public roadmap/suggestions/issues queries. Roughly 70% of our HTTP API (/secure/*) and 100% of our WebSocket Gateway are private internal infrastructure built to run Xernerx Suite applications and in-house bots, and are off-limits to the public."
 			},
 			"card2": {
 				"title": "What are the API rate limits, CORS policies, and Interactive Playground features?",
@@ -3975,8 +4029,8 @@
 				"description": "Enable Public Embed Widget in your User, Bot, Server, or Organization Settings to unlock live cards at /core/[bots|guilds|organizations|users]/[id]—supporting JSON, HTML iframes (?type=iframe), SVGs (?type=svg), and PNG cards (?type=png), complete with active Vanity Badges and Daily Streaks on user cards. You can also embed compact SVG shields via /v1/[entity]/[id]/badge.svg (including status, ping, guilds, votes, and streak metrics) with 1-click Markdown/HTML copy from any Bot Statistics tab."
 			},
 			"card4": {
-				"title": "How do I connect a service to the real-time WebSocket Gateway?",
-				"description": "Install @xernerx/websocket or test live and simulated JSON-RPC frames directly in your browser using the Interactive WebSocket RPC Playground at docs.xernerx.com/websocket#playground. For outbound bot webhooks, the Developer Portal (/portal/bots/[id]) includes a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
+				"title": "How do Outbound Bot Webhooks work, and is the WebSocket Gateway public?",
+				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (app.xernerx.com/portal/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 9 event triggers (votes, stats, reviews, and releases), complete with a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
 			},
 			"card5": {
 				"title": "What features are exclusive to the Xernerx Desktop App?",
@@ -3992,7 +4046,7 @@
 			},
 			"card8": {
 				"title": "How does the Open-Source NPM Package Documentation Reader (docs.xernerx.com/packages) work?",
-				"description": "Visit docs.xernerx.com/packages to browse official open-source Xernerx developer libraries and frameworks published on npm and GitHub (such as xernerx, @xernerx/framework, @xernerx/stats, and @xernerx/websocket). The documentation reader dynamically indexes every published semantic version and lets you switch versions via the Version Selector, inspect Classes, Interfaces, Functions, Constructors, Properties, and Methods, or use the global package search bar to jump to any symbol across all latest packages."
+				"description": "Visit docs.xernerx.com/packages to browse official open-source Xernerx developer libraries and frameworks published on npm and GitHub (such as xernerx, @xernerx/framework, and @xernerx/stats). The documentation reader dynamically indexes every published semantic version and lets you switch versions via the Version Selector, inspect Classes, Interfaces, Functions, Constructors, Properties, and Methods, or use the global package search bar to jump to any symbol across all latest packages."
 			}
 		}
 	},

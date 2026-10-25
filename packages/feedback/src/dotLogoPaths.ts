@@ -1,6 +1,6 @@
 /** @format */
 
-export type DotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid';
+export type DotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos';
 
 export interface SvgTranslatedPath {
 	tx: number;
@@ -29,7 +29,7 @@ function isDigitFour(u: number, v: number, offsetX: number): boolean {
 }
 
 export function isAnimatedProceduralVariant(variant: DotLogoVariant): boolean {
-	return variant === 'orbit' || variant === 'vortex' || variant === 'helix' || variant === 'prism' || variant === 'infinity' || variant === 'wavegrid';
+	return variant === 'orbit' || variant === 'vortex' || variant === 'helix' || variant === 'prism' || variant === 'infinity' || variant === 'wavegrid' || variant === 'chronos';
 }
 
 export function sampleProceduralVariant(variant: DotLogoVariant, u: number, v: number, time = 0): number {
@@ -251,6 +251,25 @@ export function sampleProceduralVariant(variant: DotLogoVariant, u: number, v: n
 		return 0;
 	}
 
+	if (variant === 'chronos') {
+		const cx = (u - 0.5) * 1.35;
+		const cy = v - 0.5;
+		const r = Math.hypot(cx, cy);
+		if (r > 0.47) return 0;
+		if (r <= 0.056 + Math.sin(time * 3.4) * 0.008) return 1.0;
+		const theta = Math.atan2(cy, cx);
+		const fastHand = time * 1.25 - Math.PI * 0.5;
+		const slowHand = time * 0.28 + Math.PI * 0.2;
+		if (Math.hypot(cx - Math.cos(fastHand) * 0.415, cy - Math.sin(fastHand) * 0.415) <= 0.044) return 1.0;
+		if (distToSegment(cx, cy, 0, 0, Math.cos(fastHand) * 0.365, Math.sin(fastHand) * 0.365) <= 0.024) return 1.0;
+		if (distToSegment(cx, cy, 0, 0, Math.cos(slowHand) * 0.245, Math.sin(slowHand) * 0.245) <= 0.028) return 0.95;
+		if (Math.abs(r - 0.415) <= 0.022) return 0.9;
+		const tickMod = Math.abs((((theta + Math.PI * 2) % (Math.PI / 6)) - Math.PI / 12) * r);
+		if (r >= 0.35 && r <= 0.445 && tickMod <= 0.017) return 0.98;
+		if (Math.abs(r - 0.285) <= 0.02 && Math.cos(theta * 8 - time * 1.9) > -0.08) return 0.82;
+		return 0;
+	}
+
 	return 0;
 }
 
@@ -367,8 +386,17 @@ export function computeDotCoverage(params: {
 			boxH = activeH * maxFracH;
 			boxW = boxH * aspect;
 		}
+		const isLandingStage =
+			targetVar === 'full' &&
+			typeof window !== 'undefined' &&
+			window.location.pathname === '/' &&
+			(window.location.port === '4000' ||
+				window.location.hostname === 'xernerx.com' ||
+				window.location.hostname === 'dev.xernerx.com' ||
+				window.location.hostname === 'canary.xernerx.com' ||
+				window.location.hostname.startsWith('www.'));
 		offX = (activeW - boxW) * 0.5;
-		offY = isBanner ? (activeH - boxH) * 0.5 : Math.max(activeH * 0.08, (activeH - boxH) * 0.44);
+		offY = isBanner ? (activeH - boxH) * 0.5 : isLandingStage ? Math.max(activeH * 0.05, (activeH - boxH) * 0.14) : Math.max(activeH * 0.08, (activeH - boxH) * 0.44);
 	}
 
 	let hits = 0;

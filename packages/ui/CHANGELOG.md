@@ -2,6 +2,27 @@
 
 # @xernerx/ui
 
+## 0.7.5
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.15.0
+
+## 0.7.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.14.0
+
+## 0.7.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.13.1
+
 ## 0.7.2
 
 ### Patch Changes

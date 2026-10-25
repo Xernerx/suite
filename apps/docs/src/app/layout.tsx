@@ -13,19 +13,21 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Docs | Developer Guides, Packages & API Specs',
+		default: 'Xernerx Docs | Bot Frameworks, NPM Packages & v1 Stats API',
 		template: 'Xernerx Docs | %s',
 	},
-	description: 'Official developer documentation, guides, NPM package references, and REST/WebSocket API specifications for Xernerx Studios.',
+	description:
+		'Official developer documentation for Xernerx Studios—featuring open-source Discord bot frameworks (@xernerx/framework, @xernerx/stats), embed widgets, and the public v1 Bot Stats & Registry REST API.',
 
 	metadataBase: new URL('https://docs.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Docs | Developer Guides, Packages & API Specs',
+			default: 'Xernerx Docs | Bot Frameworks, NPM Packages & v1 Stats API',
 			template: 'Xernerx Docs | %s',
 		},
-		description: 'Official developer documentation, guides, NPM package references, and REST/WebSocket API specifications for Xernerx Studios.',
+		description:
+			'Official developer documentation for Xernerx Studios—featuring open-source Discord bot frameworks (@xernerx/framework, @xernerx/stats), embed widgets, and the public v1 Bot Stats & Registry REST API.',
 		url: 'https://docs.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -42,10 +44,10 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Docs | Developer Guides, Packages & API Specs',
+			default: 'Xernerx Docs | Bot Frameworks, NPM Packages & v1 Stats API',
 			template: 'Xernerx Docs | %s',
 		},
-		description: 'Official developer documentation, guides, NPM package references, and REST/WebSocket API specifications for Xernerx Studios.',
+		description: 'Official developer documentation for Xernerx Studios—open-source Discord bot frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Bot Stats & Registry REST API.',
 		images: ['/banner.png'],
 	},
 

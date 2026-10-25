@@ -29,12 +29,7 @@ export default function Settings() {
 	const [sisterServers, setSisterServers] = useState<{ id: string }[]>([]);
 	const [roadmapProducts, setRoadmapProducts] = useState<string[]>(['Dashboard', 'API', 'CDN', 'Bots']);
 	const [initialSnapshot, setInitialSnapshot] = useState<string>('');
-	const [availableRoles, setAvailableRoles] = useState<
-		{
-			id: string;
-			name: string;
-		}[]
-	>([]);
+	const [availableRoles, setAvailableRoles] = useState<{ id: string; name: string }[]>([]);
 	const [userGuilds, setUserGuilds] = useState<any[]>([]);
 
 	useEffect(() => {
@@ -64,42 +59,18 @@ export default function Settings() {
 		setIsLoading(true);
 		try {
 			const [adminRes, mainOrgRes, orgsRes, issuesWebhookRes, suggestionsWebhookRes, webhookRes, auditWebhookRes, joinRes, botJoinRes, roadmapRes, sisterRes, rolesRes] = await Promise.all([
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/main_org_id'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/organizations'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/issues_webhook_url'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/suggestions_webhook_url'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_audit_webhook_url'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/join_roles'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/bot_join_roles'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), {
-					credentials: 'include',
-				}),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/core'), {
-					credentials: 'include',
-				}),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/main_org_id'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/organizations'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/issues_webhook_url'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/suggestions_webhook_url'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/app_webhook_url'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_audit_webhook_url'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/join_roles'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/bot_join_roles'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/roadmap_products'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/sister_servers'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' }),
 			]);
 			let loadedAdminServerId = '';
 			let loadedMainOrgId = '';

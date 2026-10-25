@@ -13,19 +13,21 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Studios | Explore Discord Bots & Communities',
-		template: 'Xernerx Studios | %s',
+		default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+		template: 'Xernerx App | %s',
 	},
-	description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios. Power up your server, manage bot dashboards, or find your next home.',
+	description:
+		'1 Account, 1 Place, 1 Setup. Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, or track bot statistics and promote your bots in the Developer Portal.',
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Studios | Explore Discord Bots & Communities',
-			template: 'Xernerx Studios | %s',
+			default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+			template: 'Xernerx App | %s',
 		},
-		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios. Power up your server, manage bot dashboards, or find your next home.',
+		description:
+			'1 Account, 1 Place, 1 Setup. Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, or track bot statistics and promote your bots.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -42,10 +44,10 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Studios | Explore Discord Bots & Communities',
-			template: 'Xernerx Studios | %s',
+			default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+			template: 'Xernerx App | %s',
 		},
-		description: 'Discover thousands of unique Discord bots and vibrant communities on Xernerx Studios.',
+		description: 'Discover Discord bots & servers, configure Virtue, Metamorphosis & Zodiac in one place, and track or promote your bots.',
 		images: ['/banner.png'],
 	},
 

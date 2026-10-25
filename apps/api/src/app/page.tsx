@@ -20,7 +20,7 @@ export default function Home() {
 	useEffect(() => {
 		hide();
 		setBackgroundMode('sticky-ripple');
-		setDotVariant('full');
+		setDotVariant('icon');
 
 		const randomIndex = Math.floor(Math.random() * uselessFacts.length);
 		setFact(uselessFacts[randomIndex]?.trim());

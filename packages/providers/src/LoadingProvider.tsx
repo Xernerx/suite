@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useSession } from './SessionProvider';
 
 export type AppBackgroundDotMode = 'blank' | 'sticky-reactive' | 'sticky-ripple';
-export type AppDotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit';
+export type AppDotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos';
 
 export interface LoadingContextType {
 	isLoading: boolean;
@@ -45,8 +45,9 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 			const isWww = port === '4000' || hostname === 'xernerx.com' || hostname === 'www.xernerx.com' || hostname === 'canary.xernerx.com' || hostname === 'dev.xernerx.com';
 			const isApi = port === '4001' || hostname.startsWith('api.');
 			const isCdn = port === '4002' || hostname.startsWith('cdn.');
+			const isDocs = port === '4005' || hostname.startsWith('docs.');
 
-			if (pathname === '/download') {
+			if (pathname === '/download' || isDocs) {
 				setAutoMode('sticky-ripple');
 			} else if (pathname === '/' && (isWww || isApi || isCdn)) {
 				setAutoMode('sticky-ripple');

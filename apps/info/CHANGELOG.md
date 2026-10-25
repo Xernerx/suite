@@ -2,6 +2,37 @@
 
 # info
 
+## 1.8.6
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.4.0
+    - @xernerx/providers@0.15.0
+    - @xernerx/components@0.9.5
+    - @xernerx/ui@0.7.5
+
+## 1.8.5
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.3.0
+    - @xernerx/providers@0.14.0
+    - @xernerx/components@0.9.4
+    - @xernerx/ui@0.7.4
+
+## 1.8.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/feedback@0.2.0
+    - @xernerx/lib@1.13.0
+    - @xernerx/components@0.9.3
+    - @xernerx/providers@0.13.1
+    - @xernerx/ui@0.7.3
+
 ## 1.8.3
 
 ### Patch Changes
