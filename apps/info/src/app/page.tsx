@@ -414,7 +414,7 @@ export default function InfoHomePage() {
 				</div>
 			</motion.div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto w-full">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-(--page-width) mx-auto w-full">
 				{portals.map((portal, i) => (
 					<Link href={portal.href} key={i}>
 						<motion.div

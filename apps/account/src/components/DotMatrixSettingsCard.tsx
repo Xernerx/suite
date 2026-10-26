@@ -1,9 +1,8 @@
 /** @format */
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { Activity, Atom, Dna, Eye, EyeOff, Grid, Hexagon, Infinity as InfinityIcon, Orbit, Play, Shield, Sparkles, Type, Waves, Pause } from 'lucide-react';
+import { useState } from 'react';
+import { Activity, Atom, Dna, EyeOff, Grid, Hexagon, Infinity as InfinityIcon, Orbit, Play, Shield, Sparkles, Type, Waves, Pause } from 'lucide-react';
 import { Button, Selector } from '@xernerx/ui';
 import { XernerxDotLogo } from '@xernerx/feedback';
 import { useDictionary, type DotMatrixAnimation, type DotMatrixType } from '@xernerx/providers';
@@ -17,28 +16,9 @@ interface DotMatrixSettingsCardProps {
 	onToggleHideUi?: () => void;
 }
 
-export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixAnimation, onChangeType, onChangeAnimation, isUiHidden = false, onToggleHideUi }: DotMatrixSettingsCardProps) {
+export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixAnimation, onChangeType, onChangeAnimation, onToggleHideUi }: DotMatrixSettingsCardProps) {
 	const { t } = useDictionary();
 	const [isSimulatingLoad, setIsSimulatingLoad] = useState(false);
-
-	useEffect(() => {
-		if (typeof window === 'undefined') return;
-		window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: isUiHidden } }));
-		return () => {
-			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
-		};
-	}, [isUiHidden]);
-
-	useEffect(() => {
-		if (!isUiHidden || typeof window === 'undefined') return;
-		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				onToggleHideUi?.();
-			}
-		};
-		window.addEventListener('keydown', onKeyDown);
-		return () => window.removeEventListener('keydown', onKeyDown);
-	}, [isUiHidden, onToggleHideUi]);
 
 	const triggerLoadMorphPreview = () => {
 		setIsSimulatingLoad(true);
@@ -128,19 +108,6 @@ export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixAnimation, onCha
 					</div>
 				</div>
 			</div>
-
-			{isUiHidden &&
-				typeof document !== 'undefined' &&
-				createPortal(
-					<div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-(--background)/85 backdrop-blur-xl border border-(--accent)/35 p-1.5 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_25%,transparent)]">
-						<Button size="sm" variant="primary" onClick={onToggleHideUi} className="inline-flex items-center gap-2 rounded-full px-4">
-							<Eye size={14} />
-							<span>{t('account.appearance.showUi')}</span>
-							<kbd className="ml-1 rounded-full bg-(--background)/30 px-2 py-0.5 text-[10px] font-mono">Esc</kbd>
-						</Button>
-					</div>,
-					document.body
-				)}
 		</>
 	);
 }

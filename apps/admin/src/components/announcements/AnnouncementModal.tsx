@@ -40,7 +40,7 @@ interface AnnouncementModalProps {
 	saving: boolean;
 }
 
-const TARGET_APP_KEYS = ['all', 'app', 'store', 'account', 'docs', 'info', 'www'] as const;
+const TARGET_APP_KEYS = ['all', 'app', 'portal', 'store', 'account', 'docs', 'info', 'www'] as const;
 
 export function AnnouncementModal({
 	open,

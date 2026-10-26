@@ -121,7 +121,7 @@ export default function Profile() {
 						vanitySlug: formData.vanitySlug.trim().toLowerCase(),
 						description: formData.description,
 						info: formData.info,
-						birthday: formData.birthday || undefined,
+						birthday: formData.birthday || null,
 						gender: formData.gender,
 						pronouns: formData.pronouns,
 						timezone: formData.timezone,
@@ -138,8 +138,14 @@ export default function Profile() {
 						const errData = await res.json().catch(() => ({}));
 						throw new Error(errData.error || t('account.profile.toast.error'));
 					}
-					if (mutate) mutate();
-					setInitialData(formData);
+					const savedData = await res.json().catch(() => null);
+					const nextFormData = {
+						...formData,
+						vanitySlug: savedData?.vanitySlug !== undefined ? savedData.vanitySlug : formData.vanitySlug.trim().toLowerCase(),
+					};
+					setFormData(nextFormData);
+					setInitialData({ ...nextFormData });
+					if (mutate) await mutate();
 					toast({
 						title: t('account.profile.toast.success'),
 						type: 'success',
@@ -190,7 +196,7 @@ export default function Profile() {
 	}));
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',

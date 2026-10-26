@@ -1,41 +1,70 @@
 /** @format */
 'use client';
 
-import { ArrowRight, Box, Check, Copy, GitBranch, Terminal } from 'lucide-react';
+import { ArrowRight, Box, FileText, GitBranch, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
+import { PackageInstallBar } from '@/components/packages/PackageInstallBar';
 import { PackagesSearch, SearchIndexItem } from '@/components/packages/PackagesSearch';
 import { PackagesSidebar } from '@/components/packages/PackagesSidebar';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 
 export function PackagesPageClient({ packages, index }: { packages: any[]; index: SearchIndexItem[] }) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const [query, setQuery] = useState('');
-	const [copiedPkg, setCopiedPkg] = useState<string | null>(null);
+	const [scopeFilter, setScopeFilter] = useState<'all' | 'collection' | 'modular'>('all');
 
 	const q = query.trim().toLowerCase();
-	const filteredPackages = q ? packages.filter((pkg) => pkg.name.toLowerCase().includes(q) || (pkg.description && pkg.description.toLowerCase().includes(q))) : packages;
-
-	const handleCopyInstall = (pkgName: string) => {
-		navigator.clipboard.writeText(`pnpm add ${pkgName}`);
-		setCopiedPkg(pkgName);
-		setTimeout(() => setCopiedPkg(null), 1800);
-	};
+	const filteredPackages = packages.filter((pkg) => {
+		if (scopeFilter === 'collection' && !pkg.isCollection) return false;
+		if (scopeFilter === 'modular' && pkg.isCollection) return false;
+		if (!q) return true;
+		return pkg.name.toLowerCase().includes(q) || (pkg.description && pkg.description.toLowerCase().includes(q));
+	});
 
 	return (
-		<div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white relative">
+		<div className="max-w-(--page-width) mx-auto py-8 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white relative">
 			<PackagesSidebar packages={packages} />
 
 			{/* Clean Top Page Header */}
 			<motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-2 pb-6 mb-6 border-b border-(--border)/10">
-				<div className="flex flex-wrap items-center gap-3">
+				<div className="flex flex-wrap items-center gap-2.5">
 					<h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('docs.packages.page.title')}
 					</h1>
+					<span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-(--accent) text-white border border-(--accent) shadow-xs">xernerx</span>
 					<span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30">@xernerx/*</span>
 				</div>
 				<p className="text-sm sm:text-base text-(--text-muted) leading-relaxed max-w-3xl">{t('docs.packages.page.description')}</p>
+
+				{/* Scope Filter Pills (`All`, `xernerx`, `@xernerx/*`) */}
+				<div className="flex flex-wrap items-center gap-2 pt-2">
+					{(
+						[
+							{ id: 'all', label: t('docs.packages.page.filterAll') },
+							{ id: 'collection', label: t('docs.packages.page.filterCollection') },
+							{ id: 'modular', label: t('docs.packages.page.filterModular') },
+						] as const
+					).map((tab) => {
+						const isActive = scopeFilter === tab.id;
+						return (
+							<button
+								key={tab.id}
+								type="button"
+								onClick={() => setScopeFilter(tab.id)}
+								className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
+									isActive
+										? 'bg-(--accent) text-white border-(--accent) shadow-xs'
+										: 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/30'
+								}`}
+							>
+								{tab.label}
+							</button>
+						);
+					})}
+				</div>
 			</motion.div>
 
 			<PackagesSearch index={index} query={query} onQueryChange={setQuery} />
@@ -59,21 +88,36 @@ export function PackagesPageClient({ packages, index }: { packages: any[]; index
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					{filteredPackages.map((pkg) => {
-						const isCopied = copiedPkg === pkg.name;
 						const symbolCount = index.filter((item) => item.packageName === pkg.name).length;
+						const isCollection = Boolean(pkg.isCollection);
 
 						return (
 							<div
 								key={pkg.name}
-								className="flex flex-col justify-between bg-(--background)/50 border border-(--border)/10 rounded-2xl p-5 hover:border-(--accent)/40 hover:bg-(--background)/80 transition-all gap-4"
+								className={`flex flex-col justify-between rounded-2xl p-5 transition-all gap-4 ${
+									isCollection
+										? 'md:col-span-2 bg-(--accent)/8 border-2 border-(--accent)/35 hover:border-(--accent)/60 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
+										: 'bg-(--background)/50 border border-(--border)/10 hover:border-(--accent)/40 hover:bg-(--background)/80'
+								}`}
 							>
 								<div className="flex flex-col gap-2.5">
 									<div className="flex items-center justify-between gap-2 flex-wrap">
-										<Link href={`/packages/${pkg.name}/${pkg.versions[0]}`} className="text-lg font-bold font-mono text-(--accent) hover:underline">
-											{pkg.name}
-										</Link>
-										<div className="flex items-center gap-1.5">
-											<span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/30">
+										<div className="flex items-center gap-2 flex-wrap">
+											<Link href={`/packages/${pkg.name}/${pkg.versions[0]}`} className="text-lg font-bold font-mono text-(--accent) hover:underline">
+												{pkg.name}
+											</Link>
+											<span
+												className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+													isCollection ? 'bg-(--accent) text-white border-(--accent)' : 'bg-(--foreground)/60 text-(--text-muted) border-(--border)/10'
+												}`}
+											>
+												{isCollection && <Layers size={11} />}
+												<span>{isCollection ? t('docs.packages.page.collectionBadge') : t('docs.packages.page.modularBadge')}</span>
+											</span>
+										</div>
+
+										<div className="flex items-center gap-1.5 flex-wrap">
+											<span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 												v{pkg.versions[0]}
 											</span>
 											{symbolCount > 0 && (
@@ -81,25 +125,42 @@ export function PackagesPageClient({ packages, index }: { packages: any[]; index
 													{t('docs.packages.page.overview.symbolsCount', { count: symbolCount })}
 												</span>
 											)}
+											{pkg.hasChangelog && (
+												<a
+													href={`${getEnvUrl('https://info.xernerx.com/changelog')}#${pkg.name.toLowerCase()}`}
+													className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent)/25 transition-colors"
+												>
+													<FileText size={10} />
+													<span>{t('docs.packages.page.changelogBadge')}</span>
+												</a>
+											)}
 										</div>
 									</div>
 
 									<p className="text-xs sm:text-sm text-(--text-muted) leading-relaxed">{pkg.description}</p>
 
-									{/* 1-Click Install Command Bar */}
-									<div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-(--foreground)/40 border border-(--border)/10 mt-1">
-										<div className="flex items-center gap-2 min-w-0">
-											<Terminal size={13} className="text-(--accent) shrink-0" />
-											<code className="text-xs font-mono text-(--text) truncate">pnpm add {pkg.name}</code>
+									{isCollection && Array.isArray(pkg.bundledPackages) && pkg.bundledPackages.length > 0 && (
+										<div className="flex flex-wrap items-center gap-1.5 pt-1">
+											<span className="text-[11px] font-bold text-(--text-muted) mr-1">{t('docs.packages.page.bundlesLabel')}</span>
+											{pkg.bundledPackages.map((subName: string) => {
+												const matchedSub = packages.find((p) => p.name === subName);
+												const targetHref = matchedSub ? `/packages/${matchedSub.name}/${matchedSub.versions[0]}` : '/packages';
+												return (
+													<Link
+														key={subName}
+														href={targetHref}
+														className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-(--background)/70 text-(--accent) border border-(--accent)/25 hover:bg-(--accent)/15 transition-colors"
+													>
+														{subName}
+													</Link>
+												);
+											})}
 										</div>
-										<button
-											type="button"
-											onClick={() => handleCopyInstall(pkg.name)}
-											className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium bg-(--background)/70 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 transition-colors cursor-pointer shrink-0"
-										>
-											{isCopied ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
-											<span>{isCopied ? t('docs.api.common.copied') : t('app.widgets.copy')}</span>
-										</button>
+									)}
+
+									{/* 1-Click Install Command Bar */}
+									<div className="mt-1">
+										<PackageInstallBar pkgName={pkg.name} fullWidth />
 									</div>
 								</div>
 

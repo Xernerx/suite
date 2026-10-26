@@ -169,65 +169,74 @@ export default function registerCommit(program: Command) {
 			pruneUpdatedLocaleKeys();
 			runSync('npx prettier --write .');
 
-			try {
-				const { termsChanged, privacyChanged, cookiesChanged } = detectPolicyChanges();
-				const newDate = new Date().toISOString().split('T')[0] + 'T00:00:00Z';
+			if (process.stdin.isTTY) {
+				try {
+					const { termsChanged, privacyChanged, cookiesChanged } = detectPolicyChanges();
+					const newDate = new Date().toISOString().split('T')[0] + 'T00:00:00Z';
 
-				if (termsChanged || privacyChanged) {
-					const changedLabels = [termsChanged && 'Terms of Service', privacyChanged && 'Privacy Policy'].filter(Boolean).join(' & ');
-					const bump = await select({
-						message: `You have modified the ${changedLabels}. Do you want to enforce re-agreement for all users?`,
-						options: [
-							{ label: 'No, this was just a minor typo or layout fix', value: false },
-							{ label: 'Yes, this is a significant policy update', value: true },
-						],
-					});
+					if (termsChanged || privacyChanged) {
+						const changedLabels = [termsChanged && 'Terms of Service', privacyChanged && 'Privacy Policy'].filter(Boolean).join(' & ');
+						const bump = await select({
+							message: `You have modified the ${changedLabels}. Do you want to enforce re-agreement for all users?`,
+							options: [
+								{ label: 'No, this was just a minor typo or layout fix', value: false },
+								{ label: 'Yes, this is a significant policy update', value: true },
+							],
+						});
 
-					if (!isCancel(bump) && bump) {
-						const termsPromptPath = path.resolve(process.cwd(), 'packages/components/src/TermsPrompt.tsx');
-						let content = fs.readFileSync(termsPromptPath, 'utf8');
+						if (!isCancel(bump) && bump) {
+							const termsPromptPath = path.resolve(process.cwd(), 'packages/components/src/TermsPrompt.tsx');
+							let content = fs.readFileSync(termsPromptPath, 'utf8');
 
-						if (termsChanged) {
-							content = content.replace(/const TERMS_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const TERMS_VERSION = new Date('${newDate}').getTime();`);
+							if (termsChanged) {
+								content = content.replace(/const TERMS_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const TERMS_VERSION = new Date('${newDate}').getTime();`);
+							}
+							if (privacyChanged) {
+								content = content.replace(/const PRIVACY_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const PRIVACY_VERSION = new Date('${newDate}').getTime();`);
+							}
+
+							fs.writeFileSync(termsPromptPath, content);
+							console.log(`\n✅ Bumped ${changedLabels} date(s) to ${newDate} in TermsPrompt.tsx\n`);
+
+							execSync(`git add "${termsPromptPath}"`);
 						}
-						if (privacyChanged) {
-							content = content.replace(/const PRIVACY_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const PRIVACY_VERSION = new Date('${newDate}').getTime();`);
+					}
+
+					if (cookiesChanged) {
+						const bumpCookies = await select({
+							message: 'You have modified the Cookie Policy. Do you want to re-prompt cookie preferences for all users?',
+							options: [
+								{ label: 'No, this was just a minor typo or layout fix', value: false },
+								{ label: 'Yes, this is a significant cookie policy update', value: true },
+							],
+						});
+
+						if (!isCancel(bumpCookies) && bumpCookies) {
+							const cookieProviderPath = path.resolve(process.cwd(), 'packages/providers/src/CookieProvider.tsx');
+							let content = fs.readFileSync(cookieProviderPath, 'utf8');
+
+							content = content.replace(/const COOKIES_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const COOKIES_VERSION = new Date('${newDate}').getTime();`);
+
+							fs.writeFileSync(cookieProviderPath, content);
+							console.log(`\n✅ Bumped COOKIES_VERSION date to ${newDate} in CookieProvider.tsx\n`);
+
+							execSync(`git add "${cookieProviderPath}"`);
 						}
-
-						fs.writeFileSync(termsPromptPath, content);
-						console.log(`\n✅ Bumped ${changedLabels} date(s) to ${newDate} in TermsPrompt.tsx\n`);
-
-						execSync(`git add "${termsPromptPath}"`);
 					}
+				} catch (e) {
+					// Safely ignore git errors if not in a git repo
 				}
-
-				if (cookiesChanged) {
-					const bumpCookies = await select({
-						message: 'You have modified the Cookie Policy. Do you want to re-prompt cookie preferences for all users?',
-						options: [
-							{ label: 'No, this was just a minor typo or layout fix', value: false },
-							{ label: 'Yes, this is a significant cookie policy update', value: true },
-						],
-					});
-
-					if (!isCancel(bumpCookies) && bumpCookies) {
-						const cookieProviderPath = path.resolve(process.cwd(), 'packages/providers/src/CookieProvider.tsx');
-						let content = fs.readFileSync(cookieProviderPath, 'utf8');
-
-						content = content.replace(/const COOKIES_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const COOKIES_VERSION = new Date('${newDate}').getTime();`);
-
-						fs.writeFileSync(cookieProviderPath, content);
-						console.log(`\n✅ Bumped COOKIES_VERSION date to ${newDate} in CookieProvider.tsx\n`);
-
-						execSync(`git add "${cookieProviderPath}"`);
-					}
-				}
-			} catch (e) {
-				// Safely ignore git errors if not in a git repo
 			}
 
 			const changesetDir = path.resolve(process.cwd(), '.changeset');
 			const existingChangesets = fs.existsSync(changesetDir) ? fs.readdirSync(changesetDir).filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md') : [];
+			for (const file of existingChangesets) {
+				const fp = path.join(changesetDir, file);
+				const raw = fs.readFileSync(fp, 'utf8');
+				if (/^<!--\s*@format\s*-->\s*/.test(raw)) {
+					fs.writeFileSync(fp, raw.replace(/^<!--\s*@format\s*-->\s*/, ''));
+				}
+			}
 			if (!process.stdin.isTTY && existingChangesets.length > 0) {
 				runSync('npx @changesets/cli status');
 			} else {

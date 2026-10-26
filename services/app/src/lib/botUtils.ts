@@ -94,24 +94,61 @@ export async function recordSelfBotUptime(client: any, status: 'online' | 'idle'
 	}
 }
 
+let appPresenceIndex = 0;
+
 export async function updateBotPresence(client: any) {
 	const versionUrl = process.env.URL ? `${process.env.URL}/api/version` : `${getApiBaseUrl()}/api/version`;
 	const status: any = await fetch(versionUrl)
 		.then((res) => res.json())
 		.catch(() => null);
 
-	const presence: PresenceData = {
-		status: 'dnd',
-		activities: [],
-	};
+	const isApiOnline = Boolean(status && status.version);
+	const versionLabel = status?.version ? `v${status.version}` : 'Unknown';
 
-	if (!status || !status.version) {
-		presence.status = 'dnd';
-		presence.activities = [{ name: 'Xernerx API offline', state: 'API is offline, some features may not respond as intended.' }];
-	} else {
-		presence.status = 'online';
-		presence.activities = [{ name: 'Xernerx API online', state: `API is online, all features are working. (v${status.version})` }];
-	}
+	const onlineRotations: { type: ActivityType; name: string; state: string }[] = [
+		{
+			type: ActivityType.Watching,
+			name: `Xernerx Suite ${versionLabel}`,
+			state: '🟢 All systems operational • /status',
+		},
+		{
+			type: ActivityType.Listening,
+			name: 'Support & Community Hub',
+			state: 'Need help? Use /faq, /docs or open a support post',
+		},
+		{
+			type: ActivityType.Watching,
+			name: 'Roadmap, Issues & Ideas',
+			state: 'Track updates with /roadmap, /issues & /suggestions',
+		},
+		{
+			type: ActivityType.Playing,
+			name: `docs.xernerx.com • ${versionLabel}`,
+			state: 'Explore SDK docs, API specs & /changelog',
+		},
+	];
+
+	const current = onlineRotations[appPresenceIndex % onlineRotations.length];
+	appPresenceIndex = (appPresenceIndex + 1) % onlineRotations.length;
+
+	const presence: PresenceData = {
+		status: isApiOnline ? 'online' : 'dnd',
+		activities: isApiOnline
+			? [
+					{
+						type: current.type,
+						name: current.name,
+						state: current.state,
+					},
+				]
+			: [
+					{
+						type: ActivityType.Watching,
+						name: 'Xernerx Platform Status',
+						state: '⚠️ API unreachable — check /status for live updates',
+					},
+				],
+	};
 
 	const envUpper = process.env.ENVIRONMENT?.toUpperCase();
 	if (envUpper === 'DEVELOPMENT' || envUpper === 'CANARY') {
@@ -119,12 +156,12 @@ export async function updateBotPresence(client: any) {
 		presence.activities = [
 			{
 				type: ActivityType.Streaming,
-				name: `Xernerx API (${envLabel})`,
+				name: `Xernerx App (${envLabel})`,
 				url: 'https://www.youtube.com/watch?v=nOv9HorOcJo',
-				state: `API (${envLabel}): ${status ? 'Online' : 'Offline'} - Version: ${status?.version || 'Unknown'}`,
+				state: isApiOnline ? `🟢 Suite ${versionLabel} (${envLabel}) • ${current.name}` : `⚠️ API (${envLabel}) Offline • Check local dev gateway`,
 			},
 		];
-		presence.status = 'online';
+		presence.status = isApiOnline ? 'online' : 'dnd';
 	}
 
 	client.user?.setPresence(presence);
@@ -140,6 +177,10 @@ export async function syncBotCommands(client: any, xernerxToken?: string) {
 	const botId = client.user?.id;
 	if (!botId) return;
 
+	// When a Xernerx API token is configured, the loaded `XernerxCommands` extension (@xernerx/commands)
+	// automatically posts and synchronizes commands via `/v1/bots/:id/commands`.
+	if (xernerxToken) return;
+
 	const slashCommands = Array.from(client.commands?.slash?.values?.() || []).map((cmd: any) => ({
 		...cmd.data.toJSON(),
 		type: 1,
@@ -149,28 +190,6 @@ export async function syncBotCommands(client: any, xernerxToken?: string) {
 		description: cmd.description || '',
 	}));
 	const commands = [...slashCommands, ...contextCommands];
-
-	if (xernerxToken) {
-		try {
-			const apiUrl = `${getApiBaseUrl()}/v1/bots/${botId}/commands`;
-			const res = await fetch(apiUrl, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${xernerxToken}`,
-				},
-				body: JSON.stringify(commands),
-			});
-
-			if (res.ok) {
-				console.log(`[Commands] Synced ${commands.length} slash commands for ${client.user?.username || botId} to Xernerx API (${apiUrl})`);
-				return;
-			}
-			console.warn(`[Commands] API returned ${res.status} when syncing commands for ${client.user?.username || botId} to ${apiUrl}`);
-		} catch (err: any) {
-			console.error(`[Commands] Failed to sync commands via API for ${client.user?.username || botId}:`, err?.message || err);
-		}
-	}
 
 	try {
 		const db = await database('xernerx');

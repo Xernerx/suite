@@ -68,8 +68,31 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 
 	const isDirty = token ? name !== token.name || [...owners].sort().join(',') !== [...token.owners].sort().join(',') || status !== token.status : false;
 
-	const handleCopy = () => {
+	const verifyDesktopBiometric = async (): Promise<boolean> => {
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (!bridge?.verifyBiometrics) return true;
+		try {
+			const res = await bridge.verifyBiometrics(t('account.preferences.desktop.biometricPromptToken'));
+			return !res || res.verified !== false;
+		} catch {
+			return true;
+		}
+	};
+
+	const handleToggleVisible = async () => {
+		if (!isTokenVisible) {
+			const ok = await verifyDesktopBiometric();
+			if (!ok) return;
+		}
+		setIsTokenVisible(!isTokenVisible);
+	};
+
+	const handleCopy = async () => {
 		if (!token) return;
+		if (!isTokenVisible) {
+			const ok = await verifyDesktopBiometric();
+			if (!ok) return;
+		}
 		navigator.clipboard.writeText(token.id);
 		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
 		if (bridge?.guardClipboardSecret) {
@@ -225,7 +248,7 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 								</div>
 								<button
 									type="button"
-									onClick={() => setIsTokenVisible(!isTokenVisible)}
+									onClick={handleToggleVisible}
 									className="p-2.5 rounded-xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 text-(--text-muted) hover:text-(--text) hover:border-(--accent) transition cursor-pointer"
 								>
 									{isTokenVisible ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -233,7 +256,17 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 								<button type="button" onClick={handleCopy} className="p-2.5 rounded-xl bg-(--accent) text-white hover:bg-(--hover-accent) transition cursor-pointer">
 									{copied ? <Check size={16} /> : <Copy size={16} />}
 								</button>
-								<Button type="button" variant="secondary" size="sm" onClick={() => setConfirmRollOpen(true)} disabled={isRolling} className="shrink-0">
+								<Button
+									type="button"
+									variant="secondary"
+									size="sm"
+									onClick={async () => {
+										const ok = await verifyDesktopBiometric();
+										if (ok) setConfirmRollOpen(true);
+									}}
+									disabled={isRolling}
+									className="shrink-0"
+								>
 									<RefreshCw size={14} className={isRolling ? 'animate-spin' : ''} />
 									{t('account.tokens.manage.rollButton')}
 								</Button>

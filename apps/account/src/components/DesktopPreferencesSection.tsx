@@ -2,7 +2,7 @@
 
 'use client';
 
-import { BellRing, Camera, Code2, Compass, FileText, FolderSync, Layers, LayoutTemplate, RefreshCw, Save, Trash2, X } from 'lucide-react';
+import { BellRing, Camera, Code2, Columns2, Compass, FileText, FolderSync, Layers, LayoutTemplate, Lock, RefreshCw, Save, Trash2, X } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Selector, Toggle } from '@xernerx/ui';
 import { DesktopAccountSwitcher } from './DesktopAccountSwitcher';
 import { DesktopLogsModal } from './DesktopLogsModal';
@@ -274,17 +274,17 @@ export function DesktopPreferencesSection() {
 	const startupLocationOptions = [
 		{ value: 'last', label: t('account.preferences.desktopItems.startupLocation.lastVisited') },
 		...navigation
-			.filter((item) => !item.adminOnly || hasAdminAccess || desktopMeta.startupLocation === 'admin')
+			.filter((item) => {
+				const locKey = item.label.split('.').pop();
+				return !item.adminOnly || hasPermission(item.requiredPermission || 'access') || desktopMeta.startupLocation === locKey;
+			})
 			.map((item) => ({ value: (item.label.split('.').pop() || 'dashboard') as StartupLocation, label: t(item.label) })),
 	];
 
 	return (
 		<>
 			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden">
-				<div
-					className="bg-(--background)/50 border-b border-(--border)/10 flex flex-col sm:flex-row sm:items-center justify-between"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
+				<div className="bg-(--background)/50 border-b border-(--border)/10 flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
 						<div className="flex flex-wrap items-center gap-2">
 							<h2 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -304,7 +304,13 @@ export function DesktopPreferencesSection() {
 						<p className="text-xs text-(--text-muted)">{t('account.preferences.sections.desktopDesc')}</p>
 					</div>
 
-					<div className="flex flex-wrap items-center gap-2 shrink-0">
+					<div className="flex flex-wrap items-center gap-2">
+						<Button variant="secondary" size="sm" onClick={() => (window as any).electron?.setDockedMode?.()} className="flex items-center gap-1.5">
+							<Columns2 size={14} /> {t('account.preferences.desktop.dockToggle')}
+						</Button>
+						<Button variant="secondary" size="sm" onClick={() => (window as any).electron?.lockPrivacyShield?.()} className="flex items-center gap-1.5">
+							<Lock size={14} /> {t('account.preferences.desktop.lockNow')}
+						</Button>
 						<Button variant="secondary" size="sm" onClick={handleQuickCapture} disabled={capturing} className="flex items-center gap-1.5">
 							<Camera size={14} /> {t('account.preferences.desktop.quickCapture')}
 						</Button>

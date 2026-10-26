@@ -52,7 +52,7 @@ export async function buildDocsOverviewMessage(client: Client, tab: DocsSectionT
 			},
 			{
 				name: '📦 Official NPM Packages',
-				value: '• [@xernerx/framework](https://docs.xernerx.com/packages/@xernerx/framework) • [@xernerx/stats](https://docs.xernerx.com/packages/@xernerx/stats) • [@xernerx/websocket](https://docs.xernerx.com/packages/@xernerx/websocket) • [@xernerx/ui](https://docs.xernerx.com/packages/@xernerx/ui)',
+				value: '• [xernerx](https://docs.xernerx.com/packages/xernerx) • [@xernerx/framework](https://docs.xernerx.com/packages/@xernerx/framework) • [@xernerx/commands](https://docs.xernerx.com/packages/@xernerx/commands) • [@xernerx/stats](https://docs.xernerx.com/packages/@xernerx/stats) • [@xernerx/websocket](https://docs.xernerx.com/packages/@xernerx/websocket) • [@xernerx/terminal](https://docs.xernerx.com/packages/@xernerx/terminal)',
 				inline: false,
 			},
 		]);
@@ -210,7 +210,7 @@ export default class DocsCommand extends SlashCommandBuilder {
 				.setLabel('Read on Developer Docs')
 				.setStyle(ButtonStyle.Link)
 				.setURL(item.url || 'https://docs.xernerx.com'),
-			new ButtonBuilder().setLabel('Developer Portal').setStyle(ButtonStyle.Link).setURL('https://app.xernerx.com/portal'),
+			new ButtonBuilder().setLabel('Developer Portal').setStyle(ButtonStyle.Link).setURL('https://portal.xernerx.com'),
 		];
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons);
 

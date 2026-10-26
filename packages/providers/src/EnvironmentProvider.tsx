@@ -89,6 +89,12 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 						case 'store.xernerx.com':
 							url.port = '4008';
 							break;
+						case 'portal.xernerx.com':
+							url.port = '4009';
+							break;
+						case 'hosting.xernerx.com':
+							url.port = '4010';
+							break;
 						case 'xernerx.com':
 						case 'www.xernerx.com':
 							url.port = '4000';

@@ -29,7 +29,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		docPath: '/api/v1#authentication',
 		quickLinks: [
 			{ label: 'Authentication Guide', href: 'https://docs.xernerx.com/api/v1#authentication' },
-			{ label: 'Developer Portal Tokens', href: 'https://app.xernerx.com/portal' },
+			{ label: 'Developer Portal Tokens', href: 'https://portal.xernerx.com' },
 		],
 		keywords: ['auth', 'authentication', 'bearer', 'token', 'authorization', 'header', 'secure', 'passage'],
 	},
@@ -63,7 +63,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		docPath: '/api/v1#update-bot-profile',
 		quickLinks: [
 			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#update-bot-profile' },
-			{ label: 'Developer Portal', href: 'https://app.xernerx.com/portal' },
+			{ label: 'Developer Portal', href: 'https://portal.xernerx.com' },
 		],
 		keywords: ['patch', 'bots', 'bot', 'profile', 'update', 'description', 'privacy', 'links'],
 	},
@@ -154,8 +154,11 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		method: 'GET',
 		path: '/v1/bots/:id/commands',
 		docPath: '/api/v1#fetch-bot-commands',
-		quickLinks: [{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#fetch-bot-commands' }],
-		keywords: ['get', 'bots', 'commands', 'slash', 'options', 'subcommands'],
+		quickLinks: [
+			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#fetch-bot-commands' },
+			{ label: '@xernerx/commands SDK', href: 'https://docs.xernerx.com/packages/@xernerx/commands' },
+		],
+		keywords: ['get', 'bots', 'commands', 'slash', 'options', 'subcommands', '@xernerx/commands', 'commandsclient'],
 	},
 	{
 		id: 'api-sync-bot-commands',
@@ -170,9 +173,10 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		docPath: '/api/v1#sync-bot-commands',
 		quickLinks: [
 			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#sync-bot-commands' },
+			{ label: '@xernerx/commands SDK', href: 'https://docs.xernerx.com/packages/@xernerx/commands' },
 			{ label: '@xernerx/framework', href: 'https://docs.xernerx.com/packages/@xernerx/framework' },
 		],
-		keywords: ['put', 'bots', 'commands', 'sync', 'bulk', 'deploy', 'slash'],
+		keywords: ['put', 'post', 'bots', 'commands', 'sync', 'bulk', 'deploy', 'slash', '@xernerx/commands', 'xernerxcommands', 'commandsclient'],
 	},
 	{
 		id: 'api-delete-bot-commands',
@@ -185,8 +189,11 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		method: 'DELETE',
 		path: '/v1/bots/:id/commands',
 		docPath: '/api/v1#delete-bot-commands',
-		quickLinks: [{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#delete-bot-commands' }],
-		keywords: ['delete', 'bots', 'commands', 'wipe'],
+		quickLinks: [
+			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#delete-bot-commands' },
+			{ label: '@xernerx/commands SDK', href: 'https://docs.xernerx.com/packages/@xernerx/commands' },
+		],
+		keywords: ['delete', 'bots', 'commands', 'wipe', 'clearcommands', 'deletecommands', '@xernerx/commands'],
 	},
 	{
 		id: 'api-fetch-badges',
@@ -286,7 +293,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		path: 'http://localhost:3000/webhooks/xernerx',
 		docPath: '/api/v1#bot-webhooks-local-relay',
 		quickLinks: [
-			{ label: 'Developer Portal Webhooks', href: 'https://app.xernerx.com/portal' },
+			{ label: 'Developer Portal Webhooks', href: 'https://portal.xernerx.com' },
 			{ label: 'Download Desktop App', href: 'https://xernerx.com/download' },
 		],
 		keywords: ['webhooks', 'localhost', '127.0.0.1', 'relay', 'desktop', 'portal', 'vote', 'review', 'stat', 'release', 'ngrok'],
@@ -304,7 +311,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		docPath: '/api/v1#post-bot-releases',
 		quickLinks: [
 			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#post-bot-releases' },
-			{ label: 'Developer Portal', href: 'https://app.xernerx.com/portal' },
+			{ label: 'Developer Portal', href: 'https://portal.xernerx.com' },
 		],
 		keywords: ['post', 'bots', 'releases', 'changelog', 'version', 'semver', 'notes', 'breaking'],
 	},

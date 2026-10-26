@@ -2,6 +2,20 @@
 
 import { cookies, headers } from 'next/headers';
 
+function resolvePageWidthValue(pageWidth?: string): string {
+	switch (pageWidth) {
+		case 'compact':
+			return '80rem';
+		case 'wide':
+			return '112rem';
+		case 'full':
+			return '100%';
+		case 'default':
+		default:
+			return '96rem';
+	}
+}
+
 export async function getThemeLayoutProps() {
 	const cookieStore = await cookies();
 	const headerStore = await headers();
@@ -13,12 +27,14 @@ export async function getThemeLayoutProps() {
 	const theme = cookieStore.get('theme')?.value || 'system';
 	const uiZoom = cookieStore.get('uiZoom')?.value;
 	const uiGap = cookieStore.get('uiGap')?.value;
+	const pageWidth = cookieStore.get('pageWidth')?.value;
 	const textScale = cookieStore.get('textScale')?.value;
 
 	const isLight = theme === 'light';
 
 	const initialStyles: Record<string, string> = {
 		'--accent': accent,
+		'--page-width': resolvePageWidthValue(pageWidth),
 	};
 
 	if (uiZoom) {

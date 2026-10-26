@@ -143,7 +143,7 @@ export default function APIDocs() {
 	};
 
 	return (
-		<div className="max-w-5xl mx-auto py-10 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
+		<div className="max-w-(--page-width) mx-auto py-10 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
 			{/* Clean Page Header & Namespace Switcher */}
 			<div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-(--border)/10 pb-6">
 				<div className="space-y-2">

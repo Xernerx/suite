@@ -175,7 +175,7 @@ export default function DocsHome() {
 
 			{/* Categories Grid */}
 			<div
-				className="max-w-5xl mx-auto w-full z-10 flex flex-col mt-8"
+				className="max-w-(--page-width) mx-auto w-full z-10 flex flex-col mt-8"
 				style={{
 					gap: 'calc(var(--ui-gap) * 1.5)',
 				}}

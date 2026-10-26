@@ -53,6 +53,11 @@ export async function fetchDiscordBotIdentity(botId: string): Promise<{ name: st
  */
 export async function authenticateV1BotRequest(req: NextRequest, rawBotId: string, options: { isMutation?: boolean } = {}): Promise<V1BotAuthResult> {
 	const { isMutation = false } = options;
+	const cleanId = (rawBotId || '').trim();
+	if (!cleanId || ['undefined', 'null', 'nan'].includes(cleanId.toLowerCase())) {
+		return { error: 'Bot not found (invalid bot ID)', status: 404 };
+	}
+
 	const authHeader = req.headers.get('Authorization');
 
 	if (!authHeader) {

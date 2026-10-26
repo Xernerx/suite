@@ -51,6 +51,17 @@ export function ThemeScript() {
 				setThemeVar('--ui-gap', gap + 'px');
 			}
 
+			const pageWidth = getPref('pageWidth');
+			if (pageWidth) {
+				const widthMap: Record<string, string> = {
+					compact: '80rem',
+					default: '96rem',
+					wide: '112rem',
+					full: '100%',
+				};
+				setThemeVar('--page-width', widthMap[pageWidth] || '96rem');
+			}
+
 			const textScale = getPref('textScale');
 			if (textScale) {
 				setThemeVar('--text-scale', textScale + 'px');

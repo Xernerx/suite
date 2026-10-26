@@ -82,7 +82,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 		const commandId = req.nextUrl.searchParams.get('commandId');
 
 		if (commandId) {
-			await CommandModel.deleteOne({ commandId, botId: id });
+			await CommandModel.deleteOne({ $or: [{ commandId }, { name: commandId }], botId: id });
 			const remaining = await CommandModel.find({ botId: id }).lean();
 			await BotModel.updateOne({ id }, { $set: { commands: remaining.map((c: any) => c.body || c) } }).catch(() => {});
 		} else {

@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Bell, Check, EyeOff, Gift, Layers, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
+import { Activity, Bell, Building2, Check, Columns2, EyeOff, Gift, Layers, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
 export function DesktopInteractivePreview() {
@@ -41,6 +41,9 @@ export function DesktopInteractivePreview() {
 					<div className="flex items-center gap-2.5">
 						{controlStyle === 'macos' && (
 							<button type="button" onClick={cycleControls} className="group/tl flex items-center gap-1.5 mr-1 hover:cursor-pointer">
+								<span className="h-5 w-5 rounded-full flex items-center justify-center text-(--text-muted)">
+									<Columns2 size={11} />
+								</span>
 								<span className="h-3.5 w-3.5 rounded-full bg-(--border)/35 group-hover/tl:bg-(--accent-orange) flex items-center justify-center text-(--background) transition-colors">
 									<Minus size={8} strokeWidth={3} className="opacity-0 group-hover/tl:opacity-100 transition-opacity" />
 								</span>
@@ -62,6 +65,9 @@ export function DesktopInteractivePreview() {
 						<span className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-(--foreground)/35 border border-(--border)/10 px-2 py-0.5 text-[10px] font-mono font-bold text-(--text-muted)">
 							<Search size={10} className="text-(--accent)" />
 							Ctrl K
+						</span>
+						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
+							<Building2 size={11} />
 						</span>
 						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
 							<Store size={11} />
@@ -89,6 +95,9 @@ export function DesktopInteractivePreview() {
 						</button>
 						{controlStyle !== 'macos' && (
 							<button type="button" onClick={cycleControls} className="flex items-center gap-1.5 ml-1 hover:cursor-pointer">
+								<span className="h-5 w-5 rounded-full flex items-center justify-center text-(--text-muted)">
+									<Columns2 size={11} />
+								</span>
 								{controlStyle === 'xernerx' ? (
 									<>
 										<span className="h-5 w-5 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted)">

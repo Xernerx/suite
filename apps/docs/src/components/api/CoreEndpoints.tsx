@@ -245,7 +245,10 @@ export function CoreEndpoints({ activeGroup = 'all', searchQuery = '', methodFil
 			title: t('docs.api.core.fetchDiscordRoles.title'),
 			icon: Key,
 			description: t('docs.api.core.fetchDiscordRoles.description'),
-			routes: [{ method: 'GET', path: '/core/guilds/[id]/discord/roles', auth: 'public' as const }],
+			routes: [
+				{ method: 'GET', path: '/core/guilds/[id]/discord/roles', auth: 'public' as const },
+				{ method: 'GET', path: '/core/guilds/[id]/discord/channels', auth: 'public' as const },
+			],
 		},
 	].filter((s) => activeGroup === 'all' || s.group === activeGroup);
 

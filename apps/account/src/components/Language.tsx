@@ -305,7 +305,7 @@ export default function Language() {
 
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',

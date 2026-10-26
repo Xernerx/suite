@@ -257,13 +257,13 @@ export default function SuggestionsPage() {
 	}, [search, selectedProduct, sortBy, user, suggestions, orgBots, botProfiles]);
 
 	return (
-		<div className="flex flex-col max-w-[1600px] mx-auto w-full p-8 md:p-12 pb-24 gap-12">
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 pb-24 gap-12">
 			<motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
 				<h1 className="text-4xl font-bold mb-4 text-(--text)">{t('info.suggestions.title')}</h1>
 				<p className="text-(--text-muted)">{t('info.suggestions.description')}</p>
 			</motion.div>
 
-			<div className="max-w-3xl mx-auto w-full">
+			<div className="w-full">
 				{loading ? (
 					<div className="flex items-center justify-center py-24">
 						<Loading />

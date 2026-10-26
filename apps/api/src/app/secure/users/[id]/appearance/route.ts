@@ -21,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const { models } = await database('xernerx');
 
 		const rawAppearance = body.appearance || body;
-		const { uiPreferences, ...restAppearance } = rawAppearance;
+		const { uiPreferences, _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ownerId: _omitOwner, ...restAppearance } = rawAppearance || {};
 		const appearanceUpdate: Record<string, any> = { ...restAppearance };
 
 		if (uiPreferences && typeof uiPreferences === 'object') {

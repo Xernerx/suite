@@ -1,11 +1,12 @@
 /** @format */
 'use client';
 
-import { Columns3, EyeOff, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
-import { Button, Selector, Slider, Toggle } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useSession, useTheme, useToast, type DotMatrixAnimation, type DotMatrixStage, type DotMatrixType } from '@xernerx/providers';
+import { EyeOff, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
+import { Button, Selector, Toggle } from '@xernerx/ui';
+import { useDictionary, useEnvironment, useSession, useShortcuts, useTheme, useToast, type DotMatrixAnimation, type DotMatrixStage, type DotMatrixType } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { DotMatrixSettingsCard } from './DotMatrixSettingsCard';
+import { AppearanceScalingCards } from './AppearanceScalingCards';
 
 const PRESET_COLORS = [
 	{ key: 'purple', value: '#8b7cf6' },
@@ -75,6 +76,7 @@ export default function Appearance() {
 
 	const { getEnvUrl } = useEnvironment();
 	const { setTheme, setAccent, uiPreferences, setPreference } = useTheme();
+	const { isContentHidden: isUiHidden, setContentHidden: setIsUiHidden, toggleContentHidden } = useShortcuts();
 	const { toast } = useToast();
 	const { t } = useDictionary();
 
@@ -94,8 +96,15 @@ export default function Appearance() {
 
 	const [uiZoom, setUiZoom] = useState<number>(100);
 	const [uiGap, setUiGap] = useState<string>('16');
+	const [pageWidth, setPageWidth] = useState<string>('default');
 	const [textScale, setTextScale] = useState<number>(14);
-	const [isUiHidden, setIsUiHidden] = useState<boolean>(false);
+
+	const PAGE_WIDTH_MAP: Record<string, string> = {
+		compact: '80rem',
+		default: '96rem',
+		wide: '112rem',
+		full: '100%',
+	};
 
 	useEffect(() => {
 		(() => {
@@ -130,6 +139,14 @@ export default function Appearance() {
 				setThemeVar('--ui-gap', '16px');
 			}
 
+			const storedPageWidth = getPref('pageWidth');
+			if (storedPageWidth && PAGE_WIDTH_MAP[storedPageWidth]) {
+				setPageWidth(storedPageWidth);
+				setThemeVar('--page-width', PAGE_WIDTH_MAP[storedPageWidth]);
+			} else {
+				setThemeVar('--page-width', '96rem');
+			}
+
 			const storedTextScale = getPref('textScale');
 			if (storedTextScale) {
 				const val = parseInt(storedTextScale, 10);
@@ -153,6 +170,7 @@ export default function Appearance() {
 				accent: overrides.accent || selectedColor,
 				uiZoom: overrides.uiZoom || uiZoom,
 				uiGap: overrides.uiGap || uiGap,
+				pageWidth: overrides.pageWidth || pageWidth,
 				textScale: overrides.textScale || textScale,
 				clientSync: isSyncEnabled,
 				syncFromDiscord: overrides.syncFromDiscord !== undefined ? overrides.syncFromDiscord : syncFromDiscord,
@@ -258,6 +276,18 @@ export default function Appearance() {
 		});
 	};
 
+	const handlePageWidthChange = (val: string) => {
+		const resolvedCss = PAGE_WIDTH_MAP[val] || '96rem';
+		setPageWidth(val);
+		setPref('pageWidth', val);
+		setThemeVar('--page-width', resolvedCss);
+		saveToDb({ pageWidth: val });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.pageWidth.title'),
+		});
+	};
+
 	const handleTextScaleChange = (val: number) => {
 		setTextScale(val);
 		setPref('textScale', String(val));
@@ -301,6 +331,10 @@ export default function Appearance() {
 		setPref('uiGap', '16');
 		setThemeVar('--ui-gap', '16px');
 
+		setPageWidth('default');
+		setPref('pageWidth', 'default');
+		setThemeVar('--page-width', '96rem');
+
 		setTextScale(14);
 		setPref('textScale', '14');
 		setThemeVar('--text-scale', '14px');
@@ -309,7 +343,17 @@ export default function Appearance() {
 		setPreference('dotMatrixType', 'default');
 		setPreference('dotMatrixAnimation', 'animate');
 
-		saveToDb({ theme: 'system', accent: '#8b7cf6', uiZoom: 100, uiGap: '16', textScale: 14, dotMatrixStage: 'default', dotMatrixType: 'default', dotMatrixAnimation: 'animate' });
+		saveToDb({
+			theme: 'system',
+			accent: '#8b7cf6',
+			uiZoom: 100,
+			uiGap: '16',
+			pageWidth: 'default',
+			textScale: 14,
+			dotMatrixStage: 'default',
+			dotMatrixType: 'default',
+			dotMatrixAnimation: 'animate',
+		});
 		toast({ type: 'success', title: t('account.appearance.toast.resetSuccess') });
 	};
 
@@ -326,15 +370,9 @@ export default function Appearance() {
 		{ value: 'system', label: renderOption(Laptop, t('account.appearance.theme.options.system')) },
 	];
 
-	const densityOptions = [
-		{ value: '10', label: renderOption(Columns3, t('account.appearance.density.compact')) },
-		{ value: '16', label: renderOption(Columns3, t('account.appearance.density.default')) },
-		{ value: '24', label: renderOption(Columns3, t('account.appearance.density.spacious')) },
-	];
-
 	return (
 		<div
-			className={`flex flex-col max-w-7xl mx-auto w-full transition-opacity duration-300 ${isUiHidden ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'}`}
+			className={`flex flex-col max-w-(--page-width) mx-auto w-full transition-opacity duration-300 ${isUiHidden ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'}`}
 			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 		>
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
@@ -379,7 +417,7 @@ export default function Appearance() {
 					onChangeType={handleDotMatrixTypeChange}
 					onChangeAnimation={handleDotMatrixAnimationChange}
 					isUiHidden={isUiHidden}
-					onToggleHideUi={() => setIsUiHidden((prev) => !prev)}
+					onToggleHideUi={toggleContentHidden}
 				/>
 
 				{/* Sync Accent with Clients */}
@@ -441,47 +479,16 @@ export default function Appearance() {
 					</div>
 				</div>
 
-				{/* UI Zoom Level */}
-				<div
-					className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.zoom.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.zoom.description')}</p>
-					</div>
-					<div className="w-full pt-2">
-						<Slider value={uiZoom} onChange={handleUiZoomChange} min={80} max={125} step={5} unit="%" />
-					</div>
-				</div>
-
-				{/* Layout Density Selector */}
-				<div
-					className="relative z-40 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.density.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.density.description')}</p>
-					</div>
-					<div className="w-full sm:w-56">
-						<Selector value={uiGap} options={densityOptions} onChange={handleUiGapChange} />
-					</div>
-				</div>
-
-				{/* Text Scale Slider */}
-				<div
-					className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.textScale.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.textScale.description')}</p>
-					</div>
-					<div className="w-full pt-2">
-						<Slider value={textScale} onChange={handleTextScaleChange} min={10} max={20} step={1} unit="px" />
-					</div>
-				</div>
+				<AppearanceScalingCards
+					uiZoom={uiZoom}
+					onUiZoomChange={handleUiZoomChange}
+					uiGap={uiGap}
+					onUiGapChange={handleUiGapChange}
+					pageWidth={pageWidth}
+					onPageWidthChange={handlePageWidthChange}
+					textScale={textScale}
+					onTextScaleChange={handleTextScaleChange}
+				/>
 			</div>
 		</div>
 	);

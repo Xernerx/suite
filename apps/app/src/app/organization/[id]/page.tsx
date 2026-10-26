@@ -5,7 +5,7 @@ import { useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { User, ArrowLeft, Settings, Users, Bot, Server, LayoutDashboard, Building2, Compass } from 'lucide-react';
+import { User, ArrowLeft, Settings, Users, Bot, Server, LayoutDashboard, Compass } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,6 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 		const items: any[] = [
 			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass, category: t('app.portal.categories.navigation') },
 			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, category: t('app.portal.categories.navigation') },
-			{ label: t('app.home.text7'), href: '/portal', icon: Building2, category: t('app.portal.categories.navigation') },
 			{ label: t('app.organization.nav.goBack'), onClick: () => router.back(), icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.organization.nav.profile'), view: 'profile', icon: User, category: t('app.organization.nav.orgDetails') },
 		];
@@ -85,7 +84,12 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 		const uid = (session as any)?.user?.id;
 		if (organization && uid && (organization.owner === uid || organization.members?.includes(uid))) {
-			items.push({ label: t('app.organization.nav.settings'), href: `/portal?org=${organization._id}&tab=settings`, icon: Settings, category: t('app.organization.nav.management') });
+			items.push({
+				label: t('app.organization.nav.settings'),
+				href: getEnvUrl(`https://portal.xernerx.com/?org=${organization._id}&tab=settings`),
+				icon: Settings,
+				category: t('app.organization.nav.management'),
+			});
 		}
 
 		setNavItems(items);

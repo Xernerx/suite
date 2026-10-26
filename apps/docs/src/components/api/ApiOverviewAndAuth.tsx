@@ -139,11 +139,13 @@ export function ApiOverviewAndAuth({
 					<p className="text-xs text-(--text-muted) leading-relaxed">{t('docs.api.common.localEnvRouting.relayDesc')}</p>
 					<div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px] font-mono">
 						<span className="font-sans font-bold text-(--text) mr-1">{t('docs.api.common.localEnvRouting.portsLabel')}</span>
-						{['www :4000', 'api :4001', 'cdn :4002', 'account :4003', 'app :4004', 'docs :4005', 'admin :4006', 'info :4007', 'store :4008', 'websocket :5000'].map((portBadge) => (
-							<span key={portBadge} className="rounded-full bg-(--foreground)/50 border border-(--border)/10 px-2.5 py-0.5 text-(--accent)">
-								{portBadge}
-							</span>
-						))}
+						{['www :4000', 'api :4001', 'cdn :4002', 'account :4003', 'app :4004', 'docs :4005', 'admin :4006', 'info :4007', 'store :4008', 'portal :4009', 'websocket :5000'].map(
+							(portBadge) => (
+								<span key={portBadge} className="rounded-full bg-(--foreground)/50 border border-(--border)/10 px-2.5 py-0.5 text-(--accent)">
+									{portBadge}
+								</span>
+							)
+						)}
 					</div>
 				</div>
 			</section>
@@ -215,6 +217,11 @@ export function ApiOverviewAndAuth({
 							label: '@xernerx/stats SDK (Node.js)',
 							language: 'typescript',
 							code: `import { XernerxStats } from '@xernerx/stats';\n\n// Automatically posts server/user/shard telemetry & auto-registers your bot on first connect!\nnew XernerxStats(client, {\n  token: process.env.XERNERX_TOKEN!, // Your xrx_... token from account.xernerx.com\n});`,
+						},
+						{
+							label: '@xernerx/commands SDK (Node.js)',
+							language: 'typescript',
+							code: `import { XernerxCommands } from '@xernerx/commands';\n\n// Registers developer commands (xc!) & automatically syncs slash/context commands on startup!\nclient.modules.extensionHandler.loadExtensions(\n  new XernerxCommands(client, {\n    token: process.env.XERNERX_TOKEN!, // Your xrx_... token from account.xernerx.com\n  })\n);`,
 						},
 						{
 							label: 'TypeScript (fetch)',

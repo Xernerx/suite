@@ -1,6 +1,6 @@
 {
 	"name": "info",
-	"version": "1.8.6",
+	"version": "1.9.0",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -16,6 +16,7 @@
 		"@xernerx/feedback": "workspace:*",
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
+		"@xernerx/styles": "workspace:*",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.6.0",
 		"lucide-react": "^1.61.0",

@@ -196,7 +196,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 									type: 'info' as const,
 									read: isRead,
 									readAt: d.readAt || null,
-									link: '/portal',
+									link: getEnvUrl('https://portal.xernerx.com'),
 									createdAt: d.createdAt,
 									isInvite: true,
 									inAppAllowed: prefs.inApp,

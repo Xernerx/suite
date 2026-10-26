@@ -188,9 +188,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.vanitySlug !== undefined) {
 			const rawSlug = normalizeVanitySlug(body.vanitySlug);
 			if (rawSlug === '') {
-				if (existingGuild?.vanitySlug) {
-					unsetData['vanitySlug'] = 1;
-				}
+				unsetData['vanitySlug'] = 1;
 				delete body.vanitySlug;
 			} else {
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
@@ -227,7 +225,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 		if (body.links !== undefined) updateData['links'] = body.links;
 
-		const finalSet = Object.keys(updateData).length > 0 ? updateData : body;
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, action: _omitAction, ...cleanBody } = body || {};
+		const finalSet = Object.keys(updateData).length > 0 ? updateData : cleanBody;
 		const mongoUpdate: any = {};
 		if (Object.keys(finalSet).length > 0) mongoUpdate.$set = finalSet;
 		if (Object.keys(unsetData).length > 0) mongoUpdate.$unset = unsetData;
@@ -249,7 +248,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			privacy: updatedGuild.privacy,
 			widgets: Boolean(updatedGuild.widgets),
 			vanityUnlocked: Boolean(updatedGuild.vanityUnlocked || updatedGuild.vanitySlug || updatedGuild.verified),
-			vanitySlug: updatedGuild.vanitySlug,
+			vanitySlug: updatedGuild.vanitySlug || '',
 			links: updatedGuild.links || {},
 		};
 

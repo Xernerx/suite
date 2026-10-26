@@ -2,6 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { XernerxCommands } from '@xernerx/commands';
 import { XernerxClient } from '@xernerx/framework';
 import { XernerxStats } from '@xernerx/stats';
 
@@ -28,12 +29,17 @@ const DEV_GUILD_IDS = ['687429190165069838', '784094726432489522'];
 
 export class XernerxBotClient extends XernerxClient {
 	constructor() {
+		const owners = (process.env.DISCORD_OWNER_IDS || process.env.OWNER_ID || '482513687417061376')
+			.split(',')
+			.map((id) => id.trim())
+			.filter(Boolean);
 		const origClear = console.clear;
 		console.clear = () => {};
 		super({
-			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences'],
+			intents: ['Guilds', 'GuildMessages', 'GuildMembers', 'GuildPresences', 'MessageContent'],
 			token: process.env.DISCORD_BOT_TOKEN as string,
 			guildId: DEV_GUILD_IDS,
+			owners,
 			global: process.env.ENVIRONMENT?.toUpperCase() === 'PRODUCTION',
 		});
 		console.clear = origClear;
@@ -67,10 +73,22 @@ export class XernerxBotClient extends XernerxClient {
 			directory: `${baseDir}/events`,
 		});
 
+		const isDev = process.env.ENVIRONMENT?.toUpperCase() === 'DEVELOPMENT';
+
+		await this.modules.extensionHandler.loadExtensions(
+			new XernerxCommands(this as any, {
+				token: process.env.XERNERX_TOKEN,
+				dev: isDev,
+			}) as any
+		);
+
 		await this.connect();
 
 		if (process.env.XERNERX_TOKEN) {
-			new XernerxStats(this as any, { token: process.env.XERNERX_TOKEN });
+			new XernerxStats(this as any, {
+				token: process.env.XERNERX_TOKEN,
+				dev: isDev,
+			});
 		}
 	}
 }

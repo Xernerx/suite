@@ -3,16 +3,18 @@
 
 import { useEffect } from 'react';
 import { useSidebar, useDictionary } from '@xernerx/providers';
-import { ArrowLeft, Box, Code, FileCode2, Layers } from 'lucide-react';
+import { ArrowLeft, Box, Code, FileCode2, FileText, Layers } from 'lucide-react';
 
 interface PackageDocSidebarProps {
 	items: { label: string; href: string; category: string }[];
 	hasClasses?: boolean;
 	hasInterfaces?: boolean;
 	hasFunctions?: boolean;
+	hasChangelog?: boolean;
+	changelogHref?: string;
 }
 
-export function PackageDocSidebar({ items, hasClasses = false, hasInterfaces = false, hasFunctions = false }: PackageDocSidebarProps) {
+export function PackageDocSidebar({ items, hasClasses = false, hasInterfaces = false, hasFunctions = false, hasChangelog = false, changelogHref }: PackageDocSidebarProps) {
 	const { setNavItems, show, clearNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
 
@@ -29,13 +31,14 @@ export function PackageDocSidebar({ items, hasClasses = false, hasInterfaces = f
 			...(hasClasses ? [{ label: t('docs.packages.details.classes'), view: 'classes', icon: Box, category: t('docs.packages.details.navigation') }] : []),
 			...(hasInterfaces ? [{ label: t('docs.packages.details.interfaces'), view: 'interfaces', icon: FileCode2, category: t('docs.packages.details.navigation') }] : []),
 			...(hasFunctions ? [{ label: t('docs.packages.details.functions'), view: 'functions', icon: Code, category: t('docs.packages.details.navigation') }] : []),
+			...(hasChangelog && changelogHref ? [{ label: t('docs.packages.details.changelog'), href: changelogHref, icon: FileText, category: t('docs.packages.details.navigation') }] : []),
 		];
 
 		const mappedItems = items.map((i) => ({ ...i, icon: FileCode2 }));
 		setNavItems([{ label: t('docs.packages.details.backToPackages'), href: '/packages', icon: ArrowLeft, category: t('docs.packages.details.navigation') }, ...viewFilters, ...mappedItems]);
 
 		return () => clearNavItems();
-	}, [setNavItems, show, clearNavItems, items, hasClasses, hasInterfaces, hasFunctions, t]);
+	}, [setNavItems, show, clearNavItems, items, hasClasses, hasInterfaces, hasFunctions, hasChangelog, changelogHref, t]);
 
 	return null;
 }

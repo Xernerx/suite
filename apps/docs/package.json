@@ -1,6 +1,6 @@
 {
 	"name": "docs",
-	"version": "1.5.3",
+	"version": "1.6.0",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
@@ -10,10 +10,12 @@
 		"lint": "eslint"
 	},
 	"dependencies": {
+		"@svgr/webpack": "^8.1.0",
 		"@xernerx/components": "workspace:*",
 		"@xernerx/feedback": "workspace:*",
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
+		"@xernerx/styles": "workspace:*",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.6.0",
 		"lucide-react": "^1.61.0",

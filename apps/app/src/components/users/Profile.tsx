@@ -24,7 +24,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 	const totalServers = bots.reduce((acc, bot) => acc + (bot.stats?.guildCount || 0), 0);
 	const totalUsers = bots.reduce((acc, bot) => acc + (bot.stats?.userCount || 0), 0);
 
-	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false);
+	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false && c.provider !== 'easypanel' && c.provider !== 'ssh');
 	const showcases = Array.isArray(user?.showcases) ? user.showcases : [];
 
 	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak || publicConnections.length > 0);

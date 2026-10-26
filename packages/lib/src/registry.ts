@@ -107,6 +107,7 @@ export const xernerxModels = {
 
 import VirtueGuildSchema from './models/virtue/profiles/Guild';
 import VirtueUserSchema from './models/virtue/profiles/User';
+import VirtueLevelSchema from './models/virtue/levels/Level';
 import VirtueTextLevelSchema from './models/virtue/levels/Text';
 import VirtueVoiceLevelSchema from './models/virtue/levels/Voice';
 
@@ -114,10 +115,12 @@ export const virtueModels = {
 	profiles: {
 		Guild: { schema: VirtueGuildSchema, modelName: 'Guild', collection: 'guilds' },
 		User: { schema: VirtueUserSchema, modelName: 'User', collection: 'users' },
+		Level: { schema: VirtueLevelSchema, modelName: 'Level', collection: 'levels' },
 		Text: { schema: VirtueTextLevelSchema, modelName: 'Text', collection: 'text' },
 		Voice: { schema: VirtueVoiceLevelSchema, modelName: 'Voice', collection: 'voice' },
 	},
 	levels: {
+		Level: { schema: VirtueLevelSchema, modelName: 'Level', collection: 'levels' },
 		Text: { schema: VirtueTextLevelSchema, modelName: 'Text', collection: 'text' },
 		Voice: { schema: VirtueVoiceLevelSchema, modelName: 'Voice', collection: 'voice' },
 	},

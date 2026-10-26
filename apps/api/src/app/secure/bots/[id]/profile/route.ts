@@ -114,9 +114,25 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 				}
 				bot.vanityUnlocked = true;
 				await bot.save();
-				return NextResponse.json({ message: 'Unlocked successfully', bot, vanityUnlocked: true, usedSlot: unlockRes.usedSlot, cost: unlockRes.cost }, { status: 200 });
+				const unlockedObj = bot.toObject ? bot.toObject() : bot;
+				return NextResponse.json(
+					{
+						...unlockedObj,
+						bot: Boolean(unlockedObj.bot ?? true),
+						vanityUnlocked: true,
+						vanitySlug: unlockedObj.vanitySlug || '',
+						usedSlot: unlockRes.usedSlot,
+						cost: unlockRes.cost,
+						message: 'Unlocked successfully',
+					},
+					{ status: 200 }
+				);
 			}
-			return NextResponse.json({ message: 'Already unlocked', bot, vanityUnlocked: true }, { status: 200 });
+			const existingObj = bot.toObject ? bot.toObject() : bot;
+			return NextResponse.json(
+				{ ...existingObj, bot: Boolean(existingObj.bot ?? true), vanityUnlocked: true, vanitySlug: existingObj.vanitySlug || '', message: 'Already unlocked' },
+				{ status: 200 }
+			);
 		}
 
 		if (body.vanitySlug !== undefined) {
@@ -142,10 +158,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			}
 		}
 
-		const updatableFields = ['description', 'info', 'privacy', 'widgets', 'bot', 'organization', 'tags', 'commands', 'releases'];
+		const updatableFields = ['description', 'info', 'privacy', 'widgets', 'organization', 'tags', 'commands', 'releases'];
 		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 
-		if (body.links) {
+		if (body.links && typeof body.links === 'object') {
 			if (!bot.links) bot.links = {};
 			for (const field of linksFields) {
 				if (body.links[field] !== undefined) bot.links[field] = body.links[field];
@@ -156,8 +172,23 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			if (body[field] !== undefined) bot[field] = body[field];
 		}
 
+		if (typeof body.bot === 'boolean') {
+			bot.bot = body.bot;
+		}
+
 		await bot.save();
-		return NextResponse.json({ message: 'Updated successfully', bot }, { status: 200 });
+		const savedObj = bot.toObject ? bot.toObject() : bot;
+		return NextResponse.json(
+			{
+				...savedObj,
+				bot: Boolean(savedObj.bot ?? true),
+				widgets: Boolean(savedObj.widgets),
+				vanityUnlocked: Boolean(savedObj.vanityUnlocked || savedObj.vanitySlug || savedObj.verified),
+				vanitySlug: savedObj.vanitySlug || '',
+				message: 'Updated successfully',
+			},
+			{ status: 200 }
+		);
 	} catch (error) {
 		console.error('Failed to update bot profile:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

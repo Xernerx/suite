@@ -1,7 +1,7 @@
 /** @format */
 
 export { auth, wrapAuthRouteHandler, encryptQrHandoffTicket, decryptQrHandoffTicket } from './src/auth';
-export { navigation } from './src/navigation';
+export { navigation, headerSubdomainsCatalog, type NavigationItem, type HeaderSubdomainItem } from './src/navigation';
 export { proxy } from './src/proxy';
 export * from './src/env';
 export * from './src/products';

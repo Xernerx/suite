@@ -39,6 +39,8 @@ const schema = new Schema(
 					displayName: { type: String },
 					avatar: { type: String },
 					url: { type: String },
+					secret: { type: String },
+					token: { type: String },
 					showOnProfile: { type: Boolean, default: true },
 					connectedAt: { type: Date, default: Date.now },
 				},

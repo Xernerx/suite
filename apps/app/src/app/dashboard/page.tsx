@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Building2, Compass, Server, ExternalLink, Copy, Check, Trophy, Rocket } from 'lucide-react';
+import { Compass, Server, ExternalLink, Copy, Check, Trophy, Rocket } from 'lucide-react';
 import { Confirm, Tabs, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useState, useMemo } from 'react';
@@ -94,7 +94,6 @@ export default function DashboardPage() {
 		const staticItems = [
 			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass as any, category: t('app.dashboard.categories.navigation') },
 			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy as any, category: t('app.dashboard.categories.navigation') },
-			{ label: t('app.dashboard.nav.portal'), href: '/portal', icon: Building2 as any, category: t('app.dashboard.categories.navigation') },
 		];
 
 		// Populate static items immediately so they aren't blocked by the fetch or StrictMode
@@ -167,7 +166,7 @@ export default function DashboardPage() {
 			clearNavItems();
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [session, getEnvUrl]);
+	}, [(session as any)?.user?.id, (session as any)?.accessToken, status, isReady, getEnvUrl]);
 
 	useEffect(() => {
 		if (!view || !view.startsWith('server-') || guilds.length === 0) return;
@@ -198,7 +197,7 @@ export default function DashboardPage() {
 				if (guildRes.ok) {
 					const data = await guildRes.json();
 					setGuildConfig(data);
-					setOriginalGuildConfig(data);
+					setOriginalGuildConfig(JSON.parse(JSON.stringify(data)));
 				}
 
 				if (orgsRes.ok) {
@@ -244,7 +243,7 @@ export default function DashboardPage() {
 			if (res.ok) {
 				const updated = await res.json();
 				const merged = { ...guildConfig, ...updated };
-				setOriginalGuildConfig(merged);
+				setOriginalGuildConfig(JSON.parse(JSON.stringify(merged)));
 				setGuildConfig(merged);
 				mutateUser().catch(() => null);
 				toast({ title: t('common.toast.savedSuccess'), type: 'success' });
@@ -267,9 +266,10 @@ export default function DashboardPage() {
 	}, [guildConfig, originalGuildConfig]);
 
 	useEffect(() => {
-		remind(isDirty, handleSaveConfig, () => setGuildConfig(originalGuildConfig), saving);
+		if (activeTab === 'virtue') return;
+		remind(isDirty, handleSaveConfig, () => setGuildConfig(JSON.parse(JSON.stringify(originalGuildConfig))), saving);
 		return () => remind(false);
-	}, [isDirty, saving, originalGuildConfig, remind, guildConfig, selectedGuild]);
+	}, [activeTab, isDirty, saving, originalGuildConfig, remind, guildConfig, selectedGuild]);
 
 	const handleDeleteGuild = () => {
 		if (!selectedGuild) return;
@@ -303,7 +303,7 @@ export default function DashboardPage() {
 
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',
@@ -410,7 +410,7 @@ export default function DashboardPage() {
 
 								{activeTab === 'links' && <Links guildConfig={guildConfig} setGuildConfig={setGuildConfig} />}
 
-								{activeTab === 'virtue' && selectedGuild && <VirtueGeneral id={selectedGuild.id} />}
+								{activeTab === 'virtue' && selectedGuild && <VirtueGeneral id={selectedGuild.id} managedGuilds={guilds} />}
 
 								{activeTab === 'settings' && (
 									<Settings

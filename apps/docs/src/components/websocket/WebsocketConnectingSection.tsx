@@ -95,9 +95,14 @@ export function WebsocketConnectingSection() {
 					<CodeBlock
 						tabs={[
 							{
+								label: 'GET /health',
+								language: 'text',
+								code: 'ok',
+							},
+							{
 								label: 'GET /',
-								language: 'json',
-								code: `{\n  "online": true,\n  "version": "1.0.0"\n}`,
+								language: 'text',
+								code: 'alive',
 							},
 						]}
 					/>

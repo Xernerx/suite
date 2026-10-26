@@ -15,6 +15,12 @@ export const permissions: PermissionDefinition[] = [
 		defaultValue: false,
 	},
 	{
+		key: 'hosting',
+		label: 'Server Hosting Access',
+		description: 'Allow or deny access to the Xernerx Server Hosting & Easypanel console (hosting.xernerx.com).',
+		defaultValue: false,
+	},
+	{
 		key: 'users',
 		label: 'Manage Users',
 		description: 'Permission to view, update, and delete platform users.',

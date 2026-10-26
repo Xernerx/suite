@@ -23,6 +23,7 @@ interface ServiceStatus {
 const SUITE_SERVICES: Array<{ id: string; labelKey: string; host: string; port: number }> = [
 	{ id: 'www', labelKey: 'info.status.services.www', host: 'xernerx.com', port: 4000 },
 	{ id: 'app', labelKey: 'info.status.services.app', host: 'app.xernerx.com', port: 4004 },
+	{ id: 'portal', labelKey: 'info.status.services.portal', host: 'portal.xernerx.com', port: 4009 },
 	{ id: 'account', labelKey: 'info.status.services.account', host: 'account.xernerx.com', port: 4003 },
 	{ id: 'api', labelKey: 'info.status.services.api', host: 'api.xernerx.com', port: 4001 },
 	{ id: 'cdn', labelKey: 'info.status.services.cdn', host: 'cdn.xernerx.com', port: 4002 },
@@ -30,6 +31,7 @@ const SUITE_SERVICES: Array<{ id: string; labelKey: string; host: string; port: 
 	{ id: 'info', labelKey: 'info.status.services.info', host: 'info.xernerx.com', port: 4007 },
 	{ id: 'store', labelKey: 'info.status.services.store', host: 'store.xernerx.com', port: 4008 },
 	{ id: 'admin', labelKey: 'info.status.services.admin', host: 'admin.xernerx.com', port: 4006 },
+	{ id: 'hosting', labelKey: 'info.status.services.hosting', host: 'hosting.xernerx.com', port: 4010 },
 ];
 
 export default function StatusClient() {
@@ -166,7 +168,7 @@ export default function StatusClient() {
 	})();
 
 	return (
-		<div className="flex flex-col max-w-6xl mx-auto w-full p-6 md:p-10" style={{ gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-6 md:p-10" style={{ gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Hero Banner */}
 			<div
 				className={`flex flex-col md:flex-row md:items-center justify-between rounded-3xl border backdrop-blur-md shadow-sm transition-all ${

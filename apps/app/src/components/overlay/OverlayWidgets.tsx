@@ -2,9 +2,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, Bot, Clock, ExternalLink, Flame, Gift, Send, Sparkles, Webhook } from 'lucide-react';
+import { Activity, Bot, Camera, Clock, ExternalLink, Flame, Gift, RefreshCw, Send, Sparkles, Webhook } from 'lucide-react';
 import { Badge, Button, Input } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
+import { OverlayBotRunnerCard } from './OverlayBotRunnerCard';
 
 function formatCountdown(targetDate: Date): string {
 	const diffMs = Math.max(0, targetDate.getTime() - Date.now());
@@ -186,11 +187,40 @@ interface OverlayBotWebhookInspectorProps {
 
 export function OverlayBotWebhookInspector({ bots, onNavigateMain }: OverlayBotWebhookInspectorProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
 	const [relayUrl, setRelayUrl] = useState('http://localhost:3000/webhook');
 	const [pinging, setPinging] = useState(false);
 	const [deliveries, setDeliveries] = useState<any[]>([]);
+	const [captureSources, setCaptureSources] = useState<Array<{ id: string; name: string; type: 'screen' | 'window'; thumbnailDataUrl: string }>>([]);
+	const [showSourcePicker, setShowSourcePicker] = useState(false);
+	const [snipping, setSnipping] = useState(false);
+
+	const loadSources = async () => {
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (!bridge?.listCaptureSources) return;
+		const list = await bridge.listCaptureSources();
+		if (Array.isArray(list)) setCaptureSources(list);
+	};
+
+	const handleInstantSnip = async (sourceId?: string) => {
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (!bridge?.captureSourceToCdn) return;
+		setSnipping(true);
+		try {
+			const res = await bridge.captureSourceToCdn(sourceId);
+			if (res?.ok) {
+				setShowSourcePicker(false);
+				toast({
+					type: 'success',
+					title: t('app.overlay.snip.capturedToast'),
+				});
+			}
+		} finally {
+			setSnipping(false);
+		}
+	};
 
 	useEffect(() => {
 		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
@@ -243,6 +273,64 @@ export function OverlayBotWebhookInspector({ bots, onNavigateMain }: OverlayBotW
 
 	return (
 		<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+			<OverlayBotRunnerCard bots={bots} compact />
+
+			{/* Instant Snip-to-CDN & Offline Developer Vault Quick Actions */}
+			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/35 backdrop-blur-md p-3.5" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+				<div className="flex flex-wrap items-center justify-between gap-2">
+					<div className="flex flex-col">
+						<span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-(--text)">
+							<Camera size={13} className="text-(--accent)" />
+							{t('app.overlay.snip.title')}
+						</span>
+						<span className="text-[11px] text-(--text-muted)">{t('app.overlay.snip.subtitle')}</span>
+					</div>
+					<div className="flex flex-wrap items-center gap-1.5">
+						<Button variant="primary" size="sm" onClick={() => handleInstantSnip()} loading={snipping}>
+							<Camera size={12} />
+							<span>{t('app.overlay.snip.snapScreenBtn')}</span>
+						</Button>
+						<Button
+							variant="secondary"
+							size="sm"
+							onClick={async () => {
+								const next = !showSourcePicker;
+								setShowSourcePicker(next);
+								if (next) await loadSources();
+							}}
+						>
+							<span>{t('app.overlay.snip.pickWindowBtn')}</span>
+						</Button>
+					</div>
+				</div>
+
+				{showSourcePicker && (
+					<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
+						<div className="flex items-center justify-between">
+							<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">{t('app.overlay.snip.selectSourceLabel')}</span>
+							<button type="button" onClick={loadSources} className="inline-flex items-center gap-1 text-[10px] font-bold text-(--accent) hover:underline cursor-pointer">
+								<RefreshCw size={10} />
+								<span>{t('app.overlay.snip.refreshSources')}</span>
+							</button>
+						</div>
+						<div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+							{captureSources.map((src) => (
+								<button
+									key={src.id}
+									type="button"
+									onClick={() => handleInstantSnip(src.id)}
+									className="group flex flex-col rounded-2xl border border-(--border)/10 bg-(--background)/60 hover:border-(--accent)/40 p-1.5 text-left transition-all cursor-pointer overflow-hidden"
+								>
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img src={src.thumbnailDataUrl} alt={src.name} className="h-20 w-full object-cover rounded-xl mb-1" />
+									<span className="text-[10px] font-bold text-(--text) group-hover:text-(--accent) truncate w-full px-1">{src.name}</span>
+								</button>
+							))}
+						</div>
+					</div>
+				)}
+			</div>
+
 			{/* Live Bot Telemetry */}
 			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/35 backdrop-blur-md p-3.5" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				<div className="flex items-center justify-between">
@@ -250,7 +338,11 @@ export function OverlayBotWebhookInspector({ bots, onNavigateMain }: OverlayBotW
 						<Activity size={13} className="text-(--accent)" />
 						{t('app.overlay.inspector.botHealthTitle')}
 					</span>
-					<button type="button" onClick={() => onNavigateMain('/portal')} className="inline-flex items-center gap-1 text-[11px] font-bold text-(--accent) hover:underline cursor-pointer">
+					<button
+						type="button"
+						onClick={() => onNavigateMain(getEnvUrl('https://portal.xernerx.com'))}
+						className="inline-flex items-center gap-1 text-[11px] font-bold text-(--accent) hover:underline cursor-pointer"
+					>
 						<span>{t('app.overlay.inspector.openPortal')}</span>
 						<ExternalLink size={11} />
 					</button>
@@ -267,7 +359,7 @@ export function OverlayBotWebhookInspector({ bots, onNavigateMain }: OverlayBotW
 								<button
 									key={bot.id}
 									type="button"
-									onClick={() => onNavigateMain(`/portal/bots/${bot.id}`)}
+									onClick={() => onNavigateMain(getEnvUrl(`https://portal.xernerx.com/bots/${bot.id}`))}
 									className="flex items-center justify-between rounded-2xl bg-(--background)/60 hover:bg-(--background) border border-(--border)/10 px-3 py-2 text-left transition-colors cursor-pointer"
 								>
 									<div className="flex items-center gap-2 min-w-0">

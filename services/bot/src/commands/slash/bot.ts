@@ -1,9 +1,10 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { database, evaluateBotMilestones, formatMilestoneCount, getHighestMilestoneBadge } from '@xernerx/lib/core';
 import { SlashCommandBuilder, type SlashCommandAutocomplete, type SlashCommandOptions } from '@xernerx/framework';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder } from 'discord.js';
 import { getUserAccentColor } from '../../lib/botUtils.js';
+import { ensureMilestoneEmojisLoaded, formatMilestoneProgressBar, getMilestoneEmoji } from '../../lib/milestoneEmojis.js';
 
 export type StatsTimeframe = '24h' | '7d' | '30d' | '1y' | 'all';
 
@@ -245,6 +246,11 @@ export default class BotCommand extends SlashCommandBuilder {
 					options: BOT_SUBCOMMAND_OPTIONS,
 				},
 				{
+					name: 'milestones',
+					description: 'View unlocked Server and Member milestone badges and next-tier progress for a Xernerx bot.',
+					options: BOT_SUBCOMMAND_OPTIONS,
+				},
+				{
 					name: 'commands',
 					description: 'List synced slash commands and descriptions for a Xernerx bot.',
 					options: BOT_SUBCOMMAND_OPTIONS,
@@ -362,6 +368,100 @@ export default class BotCommand extends SlashCommandBuilder {
 						: undefined);
 
 			const botUrl = `https://app.xernerx.com/bots/${botId}`;
+
+			if (subcommand === 'milestones') {
+				const [, allStats] = await Promise.all([
+					ensureMilestoneEmojisLoaded(interaction.client),
+					StatModel
+						? StatModel.find({ id: botId })
+								.sort({ timestamp: 1 })
+								.lean()
+								.catch(() => [])
+						: Promise.resolve([]),
+				]);
+
+				const latestStat = allStats.length > 0 ? allStats[allStats.length - 1] : null;
+				const currentGuilds = Math.max(Number((latestStat as any)?.guildCount ?? 0) || 0, botId === clientBotUser?.id ? interaction.client.guilds.cache.size : 0);
+				const currentUsers = Math.max(
+					Number((latestStat as any)?.userCount ?? 0) || 0,
+					botId === clientBotUser?.id ? interaction.client.guilds.cache.reduce((acc, g) => acc + (g.memberCount || 0), 0) : 0
+				);
+
+				const serverEval = evaluateBotMilestones(currentGuilds, allStats as any, 'servers');
+				const memberEval = evaluateBotMilestones(currentUsers, allStats as any, 'members');
+
+				const serverUnlockedCount = serverEval.milestones.filter((m) => m.unlocked).length;
+				const memberUnlockedCount = memberEval.milestones.filter((m) => m.unlocked).length;
+
+				const highestServerEmoji = getMilestoneEmoji(interaction.client, 'servers', serverEval.highestUnlocked?.tier ?? 0);
+				const highestMemberEmoji = getMilestoneEmoji(interaction.client, 'members', memberEval.highestUnlocked?.tier ?? 0);
+
+				const nextServerEmoji = serverEval.nextMilestone ? getMilestoneEmoji(interaction.client, 'servers', serverEval.nextMilestone.tier) : highestServerEmoji;
+				const nextMemberEmoji = memberEval.nextMilestone ? getMilestoneEmoji(interaction.client, 'members', memberEval.nextMilestone.tier) : highestMemberEmoji;
+
+				const formatTrackGrid = (milestones: typeof serverEval.milestones, type: 'servers' | 'members') =>
+					milestones
+						.map((m) => {
+							const emoji = getMilestoneEmoji(interaction.client, type, m.tier);
+							const statusMark = m.unlocked ? '✓' : '🔒';
+							return `${emoji} \`#${m.tier} ${formatMilestoneCount(m.threshold)} ${statusMark}\``;
+						})
+						.join(' • ');
+
+				const milestonesEmbed = new EmbedBuilder()
+					.setColor(accentColor)
+					.setTitle(`${botDisplayName} • Milestones`)
+					.setURL(`${botUrl}?tab=milestones`)
+					.setDescription(
+						`Official Server and Member growth milestones unlocked by [**${botDisplayName}**](${botUrl}?tab=milestones).\n` +
+							`• **Servers Unlocked:** \`${serverUnlockedCount} / ${serverEval.milestones.length}\` • **Members Unlocked:** \`${memberUnlockedCount} / ${memberEval.milestones.length}\``
+					)
+					.addFields([
+						{
+							name: 'Server Milestone',
+							value: [
+								`${highestServerEmoji} **${serverEval.highestUnlocked ? `${serverEval.highestUnlocked.label} (Tier #${serverEval.highestUnlocked.tier})` : 'Starter Tier'}**`,
+								`• **Current Peak:** \`${currentGuilds.toLocaleString()} Servers\``,
+								serverEval.nextMilestone
+									? `• **Next:** ${nextServerEmoji} **${serverEval.nextMilestone.label}** (\`${serverEval.progressPercent}%\`)\n\`${formatMilestoneProgressBar(serverEval.progressPercent)}\``
+									: '• **Progress:** `MAX TIER REACHED (100%)`',
+							].join('\n'),
+							inline: true,
+						},
+						{
+							name: 'Member Milestone',
+							value: [
+								`${highestMemberEmoji} **${memberEval.highestUnlocked ? `${memberEval.highestUnlocked.label} (Tier #${memberEval.highestUnlocked.tier})` : 'Starter Tier'}**`,
+								`• **Current Peak:** \`${currentUsers.toLocaleString()} Members\``,
+								memberEval.nextMilestone
+									? `• **Next:** ${nextMemberEmoji} **${memberEval.nextMilestone.label}** (\`${memberEval.progressPercent}%\`)\n\`${formatMilestoneProgressBar(memberEval.progressPercent)}\``
+									: '• **Progress:** `MAX TIER REACHED (100%)`',
+							].join('\n'),
+							inline: true,
+						},
+						{
+							name: `Server Track (${serverUnlockedCount}/${serverEval.milestones.length})`,
+							value: formatTrackGrid(serverEval.milestones, 'servers'),
+							inline: false,
+						},
+						{
+							name: `Member Track (${memberUnlockedCount}/${memberEval.milestones.length})`,
+							value: formatTrackGrid(memberEval.milestones, 'members'),
+							inline: false,
+						},
+					])
+					.setFooter({
+						text: `${clientBotName} • Bot Milestones`,
+						iconURL: clientBotAvatar,
+					})
+					.setTimestamp();
+
+				if (botAvatarUrl) {
+					milestonesEmbed.setThumbnail(botAvatarUrl);
+				}
+
+				return await (interaction as any)[replyMethod]({ embeds: [milestonesEmbed] });
+			}
 
 			if (subcommand === 'commands') {
 				const syncedCommands = CommandModel
@@ -541,7 +641,8 @@ export default class BotCommand extends SlashCommandBuilder {
 			}
 
 			// Default: 'profile' subcommand
-			const [latestStat, voteCount, commandCount, orgDoc] = await Promise.all([
+			const [, latestStat, voteCount, commandCount, orgDoc] = await Promise.all([
+				ensureMilestoneEmojisLoaded(interaction.client),
 				StatModel
 					? StatModel.findOne({ id: botId })
 							.sort({ timestamp: -1 })
@@ -560,6 +661,11 @@ export default class BotCommand extends SlashCommandBuilder {
 
 			const guildCount = (latestStat as any)?.guildCount ?? (botId === clientBotUser?.id ? interaction.client.guilds.cache.size : 0);
 			const userCount = (latestStat as any)?.userCount ?? (botId === clientBotUser?.id ? interaction.client.guilds.cache.reduce((acc, g) => acc + (g.memberCount || 0), 0) : 0);
+
+			const serverMilestone = getHighestMilestoneBadge(guildCount, 'servers');
+			const memberMilestone = getHighestMilestoneBadge(userCount, 'members');
+			const serverMilestoneEmoji = getMilestoneEmoji(interaction.client, 'servers', serverMilestone.tier);
+			const memberMilestoneEmoji = getMilestoneEmoji(interaction.client, 'members', memberMilestone.tier);
 
 			const ownerMentions = Array.isArray(bot.owners) && bot.owners.length > 0 ? bot.owners.map((id: string) => `<@${id}>`).join(', ') : 'Xernerx Studios';
 
@@ -585,6 +691,14 @@ export default class BotCommand extends SlashCommandBuilder {
 							`• **Commands:** \`${Number(commandCount).toLocaleString()}\``,
 						].join('\n'),
 						inline: true,
+					},
+					{
+						name: 'Milestones',
+						value: [
+							`${serverMilestoneEmoji} **${serverMilestone.label}** ${serverMilestone.unlocked ? `(\`Tier #${serverMilestone.tier}\`)` : '(`Starter Tier`)'}`,
+							`${memberMilestoneEmoji} **${memberMilestone.label}** ${memberMilestone.unlocked ? `(\`Tier #${memberMilestone.tier}\`)` : '(`Starter Tier`)'}`,
+						].join('\n'),
+						inline: false,
 					},
 					{
 						name: 'Ownership',

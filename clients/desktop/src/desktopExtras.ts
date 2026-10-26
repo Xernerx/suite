@@ -1,9 +1,10 @@
 /** @format */
 
-import { BrowserWindow, clipboard, dialog, nativeImage } from 'electron';
+import { BrowserWindow, app, clipboard, dialog, nativeImage } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import type { LocalWebhookRelayResult } from './features.js';
+import { STARTUP_LOCATION_URLS, loadEnvDomain, resolveDesktopTargetUrl } from './metadata.js';
 
 const MIME_BY_EXT: Record<string, string> = {
 	'.png': 'image/png',
@@ -114,7 +115,12 @@ export function applyWindowsThumbarButtons(
 					if (win.isMinimized()) win.restore();
 					win.show();
 					win.focus();
-					win.loadURL(`${opts.webUrl}/portal`).catch(() => {});
+					const portalUrl = resolveDesktopTargetUrl(STARTUP_LOCATION_URLS.portal, {
+						isPackaged: app.isPackaged,
+						isCanary: app.getVersion().includes('canary'),
+						domain: loadEnvDomain(),
+					});
+					win.loadURL(portalUrl).catch(() => {});
 				},
 			},
 			{

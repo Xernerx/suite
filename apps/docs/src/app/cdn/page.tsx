@@ -82,7 +82,7 @@ export default function CdnDocsPage() {
 	const showEndpointSearchBar = activeView !== 'overview' || isFiltering;
 
 	return (
-		<div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white">
+		<div className="max-w-(--page-width) mx-auto py-8 px-4 sm:px-6 lg:px-8 w-full selection:bg-(--accent) selection:text-white">
 			{/* Clean Top Page Header */}
 			<motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-2 pb-6 mb-6 border-b border-(--border)/10">
 				<div className="flex flex-wrap items-center gap-3">

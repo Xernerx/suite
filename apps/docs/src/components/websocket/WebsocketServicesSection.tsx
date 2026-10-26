@@ -20,8 +20,6 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 		{ action: 'users', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id }', desc: t('docs.websocket.services.virtue.usersDesc'), html: false },
 		{ action: 'text', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.textDesc'), html: false },
 		{ action: 'voice', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.voiceDesc'), html: false },
-		{ action: 'globalLevel', db: 'xernerx', dbClass: 'text-(--accent)', filter: '{ ownerId }', desc: t('docs.websocket.services.virtue.globalLevelDesc'), html: false },
-		{ action: 'globalUser', db: 'xernerx', dbClass: 'text-(--accent)', filter: '{ id }', desc: t('docs.websocket.services.virtue.globalUserDesc'), html: false },
 	];
 
 	const xernerxActions = [
@@ -29,6 +27,8 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 		{ action: 'levels', db: 'xernerx', filter: '{ id } or { ownerId }', desc: t('docs.websocket.services.xernerx.levelsDesc') },
 		{ action: 'credits', db: 'xernerx', filter: '{ id } or { ownerId }', desc: t('docs.websocket.services.xernerx.creditsDesc') },
 		{ action: 'tokens', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.tokensDesc') },
+		{ action: 'appearance', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.appearanceDesc') },
+		{ action: 'subscriptions', db: 'xernerx', filter: '{ id } or { ownerId }', desc: t('docs.websocket.services.xernerx.subscriptionsDesc') },
 		{ action: 'guilds', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.guildsDesc') },
 		{ action: 'bots', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.botsDesc') },
 	];

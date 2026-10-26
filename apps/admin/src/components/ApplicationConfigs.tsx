@@ -241,7 +241,7 @@ export default function ApplicationConfigs() {
 
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full relative"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full relative"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',

@@ -142,7 +142,7 @@ export default function EcosystemAndNavigation({ searchQuery = '' }: { searchQue
 							{ label: t('faq.quickLinks.desktopDownload'), href: 'https://www.xernerx.com/download', vanity: 'xernerx.com/desktop' },
 							{ label: t('faq.quickLinks.openApplications'), href: 'https://www.xernerx.com/applications', vanity: 'xernerx.com/careers • /jobs' },
 							{ label: t('faq.quickLinks.issueTracker'), href: 'https://info.xernerx.com/issues', vanity: 'info.xernerx.com/bugs' },
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/orgs' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 						]}
 					/>
 				</div>
@@ -189,7 +189,7 @@ export default function EcosystemAndNavigation({ searchQuery = '' }: { searchQue
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.overview.title')}
 			</HeadingTag>

@@ -68,13 +68,17 @@ interface HeaderOmnibarProps {
 	onClose: () => void;
 	urlState: { pre: string; env: string; path: string };
 	resolveOmnibarUrl: (pre: string, env: string, rawPath: string) => string;
+	hasAdminAccess?: boolean;
+	hasHostingAccess?: boolean;
 }
 
-export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: HeaderOmnibarProps) {
+export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, hasAdminAccess = false, hasHostingAccess = false }: HeaderOmnibarProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const urlFormRef = useRef<HTMLFormElement>(null);
 	const [urlCopied, setUrlCopied] = useState(false);
+	const subdomainOptions = ['app', 'portal', 'www', 'api', 'cdn', 'docs', ...(hasAdminAccess ? ['admin'] : []), ...(hasHostingAccess ? ['hosting'] : []), 'account', 'store', 'info'];
+	if (!subdomainOptions.includes(urlState.pre)) subdomainOptions.push(urlState.pre);
 
 	return (
 		<AnimatePresence>
@@ -138,7 +142,7 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl }: 
 						}}
 					>
 						<span className="text-(--text-muted) select-none text-sm font-medium pr-1">https://</span>
-						<SubSelector name="pre" options={['app', 'www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info']} defaultValue={urlState.pre} />
+						<SubSelector name="pre" options={subdomainOptions} defaultValue={urlState.pre} />
 						<span className="text-(--text-muted) select-none text-sm font-medium px-0.5">.</span>
 						<SubSelector name="env" options={['public', 'canary', 'dev']} defaultValue={urlState.env} />
 						<span className="text-(--text-muted) select-none text-sm font-medium pl-0.5 pr-2">.xernerx.com</span>

@@ -146,7 +146,7 @@ export const searchTopics = [
 		icon: Globe,
 		color: 'text-(--accent)',
 		bg: 'bg-(--accent)/10',
-		keywords: 'get /v1/bots/:id/commands slash commands',
+		keywords: 'get /v1/bots/:id/commands slash commands @xernerx/commands commandsclient',
 	},
 	{
 		titleKey: 'docs.api.v1.endpoints.syncBotCommands.title',
@@ -156,7 +156,7 @@ export const searchTopics = [
 		icon: Globe,
 		color: 'text-(--accent)',
 		bg: 'bg-(--accent)/10',
-		keywords: 'put /v1/bots/:id/commands sync bulk slash commands',
+		keywords: 'put post /v1/bots/:id/commands sync bulk slash commands @xernerx/commands xernerxcommands commandsclient',
 	},
 	{
 		titleKey: 'docs.api.v1.endpoints.deleteBotCommands.title',
@@ -166,7 +166,7 @@ export const searchTopics = [
 		icon: Globe,
 		color: 'text-(--accent)',
 		bg: 'bg-(--accent)/10',
-		keywords: 'delete /v1/bots/:id/commands wipe commands',
+		keywords: 'delete /v1/bots/:id/commands wipe commands @xernerx/commands',
 	},
 	{
 		titleKey: 'docs.api.v1.endpoints.fetchLeaderboard.title',
@@ -350,6 +350,6 @@ export const searchTopics = [
 		icon: Package,
 		color: 'text-(--accent)',
 		bg: 'bg-(--accent)/10',
-		keywords: 'npm packages @xernerx/framework @xernerx/stats @xernerx/websocket classes interfaces functions',
+		keywords: 'npm packages xernerx @xernerx/framework @xernerx/commands @xernerx/stats @xernerx/websocket @xernerx/terminal classes interfaces functions changelog',
 	},
 ];

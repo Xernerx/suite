@@ -34,8 +34,8 @@ The **App** service (`app.xernerx.com`, dev port `4004`) is the primary workspac
 
 - **Discovery Hub (`/`, `/bots`, `/servers`, `/leaderboard`, `/supporters`):** Explore verified and community Discord bots, public servers, top voter/streak leaderboards, and platform supporters.
 - **Public Profiles (`/bots/[id]`, `/servers/[id]`, `/organization/[id]`, `/users/[id]`):** Rich profile pages featuring live statistics charts, slash command browsers, community reviews, voting, and embeddable widgets.
-- **Server Dashboard (`/dashboard`):** Manage connected Discord servers, configure **Virtue** bot modules,webhooks, custom links, and public server profile widgets.
-- **Developer Portal (`/portal`, `/portal/bots/[id]`):** Register and manage Discord bots and developer organizations, configure vote webhooks, inspect API statistics, and generate embed codes (`WidgetSettingsCard.tsx`).
+- **Server Dashboard (`/dashboard`):** Manage connected Discord servers, configure **Virtue** bot modules, webhooks, custom links, and public server profile widgets.
+- **Developer Portal Redirect (`/portal`):** Redirects to the dedicated Developer Portal at [`portal.xernerx.com`](https://portal.xernerx.com) (`apps/portal`, dev port `4009`).
 
 ---
 

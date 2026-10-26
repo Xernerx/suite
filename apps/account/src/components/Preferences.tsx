@@ -1,15 +1,15 @@
 /** @format */
 'use client';
 
-import { Bell, Code2, Columns2, Command, Download, Gift, Keyboard, LayoutGrid, PanelLeftClose, RotateCcw, SlidersHorizontal, Sparkles, Store, Zap } from 'lucide-react';
-import { Button, Selector, Toggle } from '@xernerx/ui';
+import { Bell, Code2, Columns2, Command, Download, Gift, Globe, Keyboard, LayoutGrid, PanelLeftClose, RotateCcw, SlidersHorizontal, Sparkles, Zap } from 'lucide-react';
+import { Button, Check, Selector, Toggle } from '@xernerx/ui';
+import { headerSubdomainsCatalog } from '@xernerx/lib';
 import { DesktopPreferencesSection } from './DesktopPreferencesSection';
-import { useDictionary, usePlatform, useTheme, useToast, type UIPreferences } from '@xernerx/providers';
+import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, usePermissions, usePlatform, useTheme, useToast, type HeaderSubdomainId, type UIPreferences } from '@xernerx/providers';
 
-type BooleanPreferenceKey = Exclude<keyof UIPreferences, 'alignment' | 'dotMatrixStage' | 'dotMatrixType' | 'dotMatrixAnimation'>;
+type BooleanPreferenceKey = Exclude<keyof UIPreferences, 'headerSubdomains' | 'alignment' | 'dotMatrixStage' | 'dotMatrixType' | 'dotMatrixAnimation'>;
 
 const HEADER_ITEMS: Array<{ key: BooleanPreferenceKey; icon: any }> = [
-	{ key: 'showHeaderStore', icon: Store },
 	{ key: 'showHeaderCommandPalette', icon: Command },
 	{ key: 'showHeaderNotifications', icon: Bell },
 	{ key: 'showHeaderDownload', icon: Download },
@@ -28,11 +28,24 @@ const WORKSPACE_ITEMS: Array<{ key: BooleanPreferenceKey; icon: any }> = [
 export default function Preferences() {
 	const { t } = useDictionary();
 	const { preferences, setPreference, resetPreferences } = useTheme();
+	const { hasPermission } = usePermissions();
+	const hasAdminAccess = hasPermission('access');
 	const { type } = usePlatform();
 	const { toast } = useToast();
 
 	const isApplication = type === 'application';
 	const visibleHeaderItems = HEADER_ITEMS.filter((item) => !(isApplication && item.key === 'showHeaderDownload'));
+	const activeSubdomains: HeaderSubdomainId[] = Array.isArray(preferences.headerSubdomains) ? preferences.headerSubdomains : DEFAULT_HEADER_SUBDOMAINS;
+
+	const handleToggleSubdomain = (subId: HeaderSubdomainId) => {
+		const exists = activeSubdomains.includes(subId);
+		const next = exists ? activeSubdomains.filter((id) => id !== subId) : [...activeSubdomains, subId];
+		setPreference('headerSubdomains', next);
+		toast({
+			type: 'success',
+			title: t('account.preferences.toast.updated'),
+		});
+	};
 
 	const handleTogglePreference = (key: BooleanPreferenceKey, val: boolean | React.ChangeEvent<HTMLInputElement>) => {
 		const checked = typeof val === 'boolean' ? val : val.target.checked;
@@ -68,7 +81,7 @@ export default function Preferences() {
 
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',
@@ -101,6 +114,55 @@ export default function Preferences() {
 				</div>
 
 				<div className="flex flex-col">
+					<div className="flex flex-col border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className="flex items-start gap-3.5 max-w-2xl">
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
+								<Globe size={18} />
+							</div>
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+								<h3 className="text-base font-semibold text-(--text)">{t('account.preferences.items.headerSubdomains.title')}</h3>
+								<p className="text-xs text-(--text-muted)">{t('account.preferences.items.headerSubdomains.description')}</p>
+							</div>
+						</div>
+
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5" style={{ gap: 'calc(var(--ui-gap) * 0.6)' }}>
+							{headerSubdomainsCatalog
+								.filter((sub) => !sub.adminOnly || hasPermission(sub.requiredPermission || 'access'))
+								.map((sub) => {
+									const SubIcon = sub.icon;
+									const isPinned = activeSubdomains.includes(sub.id);
+									return (
+										<div
+											key={sub.id}
+											onClick={() => handleToggleSubdomain(sub.id)}
+											className={`flex items-center justify-between gap-2.5 rounded-2xl border p-3 transition-all cursor-pointer select-none ${
+												isPinned
+													? 'bg-(--accent)/12 border-(--accent)/40 text-(--text) shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
+													: 'bg-(--background)/50 border-(--border)/10 text-(--text-muted) hover:border-(--accent)/30 hover:text-(--text)'
+											}`}
+										>
+											<div className="flex items-center gap-2.5 min-w-0">
+												<div
+													className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border transition-colors ${
+														isPinned ? 'bg-(--accent)/20 border-(--accent)/40 text-(--accent)' : 'bg-(--foreground)/40 border-(--border)/10 text-(--text-muted)'
+													}`}
+												>
+													<SubIcon size={15} />
+												</div>
+												<div className="flex flex-col min-w-0">
+													<span className="text-xs font-bold text-(--text) truncate">{t(sub.label)}</span>
+													<span className="text-[10px] font-mono text-(--text-muted) truncate">{sub.host}</span>
+												</div>
+											</div>
+											<div onClick={(e) => e.stopPropagation()}>
+												<Check checked={isPinned} onCheckedChange={() => handleToggleSubdomain(sub.id)} size="sm" />
+											</div>
+										</div>
+									);
+								})}
+						</div>
+					</div>
+
 					{visibleHeaderItems.map(({ key, icon: Icon }) => (
 						<div
 							key={key}

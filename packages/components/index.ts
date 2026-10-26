@@ -17,3 +17,5 @@ export * from './src/tokens/types';
 export * from './src/tokens/BotProfilePreview';
 export * from './src/tokens/AsyncUserMultiSelector';
 export * from './src/cards/UserProfilePopover';
+export * from './src/SpotlightBoostModal';
+export * from './src/OverlayBotRunnerCard';

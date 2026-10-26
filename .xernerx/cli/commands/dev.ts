@@ -229,6 +229,8 @@ function printEndpointsBox(domain: string, isCustomDomain: boolean) {
 			{ name: 'Admin', port: 4006 },
 			{ name: 'Info', port: 4007 },
 			{ name: 'Store', port: 4008 },
+			{ name: 'Portal', port: 4009 },
+			{ name: 'Hosting', port: 4010 },
 		];
 
 		const boxWidth = 56;

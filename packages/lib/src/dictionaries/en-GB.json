@@ -142,7 +142,8 @@
 				"switchSidebarViews": "Switch sidebar views or tabs",
 				"copyUrl": "Copy current suite URL",
 				"reloadApp": "Reload the application state",
-				"closeModals": "Close active overlays or modals"
+				"closeModals": "Close active overlays or modals",
+				"toggleContentUi": "Hide / Show Page Content UI (Background View)"
 			},
 			"modal": {
 				"navigation": {
@@ -1228,6 +1229,7 @@
 				"targetApps": {
 					"all": "All Suite Apps",
 					"app": "Dashboard App (app)",
+					"portal": "Developer Portal (portal)",
 					"store": "Web Store (store)",
 					"account": "Account Hub (account)",
 					"docs": "Developer Docs (docs)",
@@ -1457,6 +1459,10 @@
 			"access": {
 				"label": "Dashboard Access",
 				"description": "Allow or deny access to the Xernerx admin panel."
+			},
+			"hosting": {
+				"label": "Server Hosting Access",
+				"description": "Allow or deny access to the Xernerx Server Hosting & Easypanel console (hosting.xernerx.com)."
 			},
 			"users": {
 				"label": "Manage Users",
@@ -1947,6 +1953,9 @@
 				"resetSuccess": "Appearance reset to defaults",
 				"dotMatrixStage": {
 					"title": "Background Stage Updated"
+				},
+				"pageWidth": {
+					"title": "Page width updated"
 				}
 			},
 			"resetDefaults": "Reset to Defaults",
@@ -1987,6 +1996,14 @@
 				"previewTitle": "Live Matrix Morph Preview",
 				"previewDesc": "Move your cursor over the matrix or click to trigger a shockwave. Use Test Loading Morph to preview the loading-to-profile transition.",
 				"testMorphBtn": "Test Loading Morph"
+			},
+			"pageWidth": {
+				"title": "Page Content Width",
+				"description": "Control the maximum horizontal width of the main content body across all Xernerx applications.",
+				"compact": "Compact (1280px)",
+				"default": "Default (1536px)",
+				"wide": "Wide (1792px)",
+				"full": "Full Width (100%)"
 			}
 		},
 		"language": {
@@ -2477,7 +2494,26 @@
 			"oauthError": "Could not complete OAuth connection flow.",
 			"disconnectSuccess": "Connection removed.",
 			"disconnectError": "Failed to remove connection.",
-			"saveError": "Failed to update connection settings."
+			"saveError": "Failed to update connection settings.",
+			"easypanel": {
+				"title": "Easypanel (Server Hosting)",
+				"staffBadge": "Staff Hosting",
+				"description": "Link your Easypanel credentials for 1-click access and authentication inside hosting.xernerx.com.",
+				"connectedAs": "Linked as {email} • Private staff credential (never shown on public profile)",
+				"openHosting": "Open Hosting Console",
+				"editButton": "Edit Credentials",
+				"modalTitle": "Connect Easypanel Account",
+				"modalDescription": "Store your Easypanel login credentials for quick access across one-dummi and two-dummi in hosting.xernerx.com. These credentials are strictly private to your account.",
+				"emailLabel": "Easypanel Email",
+				"emailPlaceholder": "staff@xernerx.com",
+				"passwordLabel": "Easypanel Password (Optional)",
+				"passwordPlaceholder": "••••••••••••",
+				"tokenLabel": "Easypanel API Token (Optional)",
+				"tokenPlaceholder": "ep_...",
+				"saveButton": "Save Credentials",
+				"emailRequired": "Please enter your Easypanel account email.",
+				"savedToast": "Easypanel credentials saved!"
+			}
 		},
 		"devices": {
 			"title": "Active Devices & Sessions",
@@ -2689,9 +2725,22 @@
 				"watchFolderSelect": "Choose Folder",
 				"watchFolderClear": "Stop Watching",
 				"watchFolderUploadedTitle": "Watch Folder Image Uploaded to CDN",
-				"watchFolderUploadedDesc": "{filename} uploaded and link copied to clipboard."
+				"watchFolderUploadedDesc": "{filename} uploaded and link copied to clipboard.",
+				"dockToggle": "Dock Sidebar",
+				"dockRestore": "Restore Normal Window",
+				"lockNow": "Lock Shield",
+				"privacyShieldBadge": "Idle Privacy Shield",
+				"privacyShieldTitle": "Workspace Locked for Privacy",
+				"privacyShieldDesc": "Your session is shielded while away or locked to protect tokens, billing, and dashboards.",
+				"privacyShieldUnlock": "Unlock Workspace",
+				"biometricPromptPrivacy": "Verify your identity to unlock Xernerx Privacy Shield",
+				"biometricPromptToken": "Verify your identity to reveal or roll your Xernerx Bot API Token"
 			},
 			"items": {
+				"headerSubdomains": {
+					"title": "Pinned Header Subdomains",
+					"description": "Choose which Xernerx subdomains appear as quick-access shortcut icons in the top navigation bar across all applications (defaults to Portal and Store)."
+				},
 				"showHeaderStore": {
 					"title": "Show Store Button in Header",
 					"description": "Display the quick-access Store icon in the top navigation bar."
@@ -2794,6 +2843,18 @@
 				"dailyStreakReminder": {
 					"title": "Background Daily Gift & Streak Guardian",
 					"description": "Monitor your 24-hour Daily Mystery Gift cooldown in the system tray and notify you the moment your daily reward is ready."
+				},
+				"idleAfkRpc": {
+					"title": "Auto-AFK Presence & Idle Throttling",
+					"description": "Automatically switch your Discord Rich Presence to Away and pause background animations after 5 minutes of OS inactivity."
+				},
+				"idlePrivacyShield": {
+					"title": "Idle & Screen-Lock Privacy Shield",
+					"description": "Automatically lock and blur the Xernerx window with a privacy shield when your PC locks or sits idle for 5 minutes."
+				},
+				"explorerContextMenu": {
+					"title": "Windows Explorer 'Upload to Xernerx CDN' Menu",
+					"description": "Add a right-click 'Upload to Xernerx CDN' option in Windows File Explorer to upload any file and copy its CDN link in one click."
 				},
 				"streamerMode": {
 					"title": "Streamer Protection (Anti-Capture)",
@@ -3596,7 +3657,12 @@
 			"noMatchingInvites": "No invites match \"{query}\"."
 		},
 		"changelog": {
-			"category": "Changelogs",
+			"category": "Applications",
+			"packagesCategory": "NPM Packages",
+			"filterAll": "All Changelogs",
+			"filterApps": "Web Applications",
+			"filterPackages": "NPM Packages",
+			"viewPackageDocs": "Package Docs",
 			"noLogs": "No changelogs found.",
 			"title": "{name} Changelog",
 			"subtitle": "See the latest updates and release notes.",
@@ -3862,7 +3928,7 @@
 			},
 			"card2": {
 				"title": "How do I register a Discord bot and bind an API token?",
-				"description": "Go to account.xernerx.com/tokens (/?tab=tokens) and create a new API token (prefixed with xrx_), which starts in a pending state. Use that token with your bot via @xernerx/stats, @xernerx/framework, or any POST, PUT, PATCH, or DELETE request to https://api.xernerx.com/v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases). On its first mutation request, the token automatically binds to your bot and user account—transitioning to active and scoping the token to that bot—while simultaneously creating your bot's profile from Discord so you can customize descriptions, links, webhooks, and slash commands in the Developer Portal on app.xernerx.com/portal."
+				"description": "Go to account.xernerx.com/tokens (/?tab=tokens) and create a new API token (prefixed with xrx_), which starts in a pending state. Use that token with your bot via @xernerx/stats, @xernerx/framework, or any POST, PUT, PATCH, or DELETE request to https://api.xernerx.com/v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases). On its first mutation request, the token automatically binds to your bot and user account—transitioning to active and scoping the token to that bot—while simultaneously creating your bot's profile from Discord so you can customize descriptions, links, webhooks, and slash commands in the Developer Portal on portal.xernerx.com."
 			},
 			"card3": {
 				"title": "Where can I find official pre-configured Discord bot invite links?",
@@ -3870,7 +3936,7 @@
 			},
 			"card4": {
 				"title": "How do Bot Webhooks and live Test Pings work?",
-				"description": "In the Developer Portal (app.xernerx.com/portal/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...) and toggle any of the 9 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, VOTE review, and POST release. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
+				"description": "In the Developer Portal (portal.xernerx.com/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...) and toggle any of the 9 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, VOTE review, and POST release. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
 			},
 			"card5": {
 				"title": "How do Bot and Server voting, 12-hour cooldowns, and the Ecosystem Leaderboards work?",
@@ -3882,7 +3948,7 @@
 			},
 			"card7": {
 				"title": "How do Developer Organizations work?",
-				"description": "On app.xernerx.com/portal (or vanity link app.xernerx.com/orgs), click New Organization in the sidebar to group multiple bots, linked Discord servers, and team members under a shared public profile (app.xernerx.com/organization/[id]). Organization owners can invite members by Discord User ID (delivering an interactive in-app invitation), assign custom organization roles, and transfer bots or servers between Personal and Organization workspaces."
+				"description": "On portal.xernerx.com, click New Organization in the sidebar to group multiple bots, linked Discord servers, and team members under a shared public profile (app.xernerx.com/organization/[id]). Organization owners can invite members by Discord User ID (delivering an interactive in-app invitation), assign custom organization roles, and transfer bots or servers between Personal and Organization workspaces."
 			},
 			"card8": {
 				"title": "How does Bot and Server Discovery work on app.xernerx.com?",
@@ -3890,7 +3956,7 @@
 			},
 			"card9": {
 				"title": "How do Slash Command syncing and interactive command search work on Bot profiles?",
-				"description": "Bot developers can publish their Discord slash commands either manually in app.xernerx.com/portal/bots/[id] under the Commands tab or automatically on bot startup via PUT https://api.xernerx.com/v1/bots/[id]/commands (which performs a clean bulk sync of your command array and required/optional parameters). Visitors viewing your public bot profile on app.xernerx.com/bots/[id] can open the Commands tab to search commands and parameters in real time and click any command pill to copy /command-name to their clipboard."
+				"description": "Bot developers can publish their Discord slash commands either manually in portal.xernerx.com/bots/[id] under the Commands tab or automatically on bot startup via PUT https://api.xernerx.com/v1/bots/[id]/commands (which performs a clean bulk sync of your command array and required/optional parameters). Visitors viewing your public bot profile on app.xernerx.com/bots/[id] can open the Commands tab to search commands and parameters in real time and click any command pill to copy /command-name to their clipboard."
 			},
 			"card10": {
 				"title": "How do Bot Reviews, Star Ratings, and Developer Responses work?",
@@ -3913,12 +3979,12 @@
 				"description": "Virtue is Xernerx's progression and engagement engine. Per-server text XP/levels/messages and voice XP/levels/time are tracked in the dedicated virtue database, while contributing to each user's unified global platform level in xernerx. In the Server Dashboard under the Virtue tab (?tab=virtue), server admins can configure: (1) Virtue Curve Mode—Easy (Very fast), Casual (Fast), Balanced (Standard), Hard (Slow curve), or Extreme (Prestige); (2) Automatic Reset Cycles—Daily, Weekly, or Monthly leaderboard wipes; (3) Tracked Level Roles (roles unlocked as members ascend) and Ignored Roles (exempt from earning score); and (4) Level-Up Announcements—toggleable channel embeds with a custom message template supporting [@mention] and [@level], a custom Announcement Channel ID, and an Auto-Delete timer in seconds."
 			},
 			"card4": {
-				"title": "How do Developer Organizations (app.xernerx.com/portal) and Organization Roles work?",
-				"description": "In the Developer Portal (app.xernerx.com/portal or vanity route app.xernerx.com/orgs), click New Organization in the sidebar to create a shared team workspace with its own public profile (app.xernerx.com/organization/[id]). Inside an organization workspace you can upload a custom avatar and banner to the CDN, write a Markdown profile, create custom Organization Roles (Roles tab), invite team members by Discord User ID (who receive an interactive Accept/Decline notification in their Notifications drawer), feature an official Discord server, and view combined Est. Network Value, Total Servers, and Total Users across all published organization bots."
+				"title": "How do Developer Organizations (portal.xernerx.com) and Organization Roles work?",
+				"description": "In the Developer Portal (portal.xernerx.com), click New Organization in the sidebar to create a shared team workspace with its own public profile (app.xernerx.com/organization/[id]). Inside an organization workspace you can upload a custom avatar and banner to the CDN, write a Markdown profile, create custom Organization Roles (Roles tab), invite team members by Discord User ID (who receive an interactive Accept/Decline notification in their Notifications drawer), feature an official Discord server, and view combined Est. Network Value, Total Servers, and Total Users across all published organization bots."
 			},
 			"card5": {
 				"title": "How do I transfer a Bot or Server to an Organization, or reset/delete its data?",
-				"description": "Open the Settings tab of your bot (app.xernerx.com/portal/bots/[id]) or server (app.xernerx.com/dashboard?tab=settings). Under Transfer Organization, select any organization you own or belong to (or select Personal to move it back to your personal workspace) and save your changes. In the same Settings tab, you can also click Reset Data to clear all descriptions, external links, and widget toggles back to default without removing the listing, or click Delete to permanently purge the bot or server profile from Xernerx."
+				"description": "Open the Settings tab of your bot (portal.xernerx.com/bots/[id]) or server (app.xernerx.com/dashboard?tab=settings). Under Transfer Organization, select any organization you own or belong to (or select Personal to move it back to your personal workspace) and save your changes. In the same Settings tab, you can also click Reset Data to clear all descriptions, external links, and widget toggles back to default without removing the listing, or click Delete to permanently purge the bot or server profile from Xernerx."
 			},
 			"card6": {
 				"title": "How do Public User Profiles (app.xernerx.com/users/[id]), Discord Collectibles, and Badges work?",
@@ -4030,7 +4096,7 @@
 			},
 			"card4": {
 				"title": "How do Outbound Bot Webhooks work, and is the WebSocket Gateway public?",
-				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (app.xernerx.com/portal/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 9 event triggers (votes, stats, reviews, and releases), complete with a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
+				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (portal.xernerx.com/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 9 event triggers (votes, stats, reviews, and releases), complete with a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
 			},
 			"card5": {
 				"title": "What features are exclusive to the Xernerx Desktop App?",
@@ -4391,8 +4457,16 @@
 					"saveError": "Failed to save Virtue settings",
 					"savedSuccess": "Virtue settings saved successfully!"
 				},
-				"trackedRoles": "Tracked Level Roles",
-				"trackedRolesDesc": "Assign roles to unlock as members progress.",
+				"trackedRoles": "Tracked Roles",
+				"trackedRolesDesc": "Only members with these roles accumulate XP (leave empty to track everyone).",
+				"levelRoles": "Level Roles",
+				"levelRolesDesc": "Link Discord roles to specific levels so members automatically unlock them as they progress.",
+				"levelLabel": "Level",
+				"roleLabel": "Discord Role",
+				"roleIdPlaceholder": "Role ID (e.g. 123456789012345678)",
+				"selectRolePlaceholder": "Select a server role...",
+				"addLevelRole": "Add Level Role",
+				"noLevelRoles": "No level roles linked yet. Add a level and role above to automatically reward members as they level up.",
 				"variables": "Variables: {user}, {level}, {role}",
 				"portability": {
 					"title": "Config Backup & Cross-Server Cloning",
@@ -5151,6 +5225,38 @@
 				"pinging": "Pinging...",
 				"recentDeliveries": "Live Relay Stream",
 				"noDeliveries": "No local webhook pings sent in this session yet."
+			},
+			"runner": {
+				"title": "Local Bot Runner & Crash Monitor",
+				"subtitle": "Link a local bot folder on your PC to start, restart, stream live stdout/stderr logs, and receive native crash alerts.",
+				"defaultBotLabel": "Local Bot Process",
+				"linkFolder": "Link Folder",
+				"changeFolder": "Change Folder",
+				"folderLinked": "Local bot folder linked",
+				"startBtn": "Start",
+				"stopBtn": "Stop",
+				"statusRunning": "Running (PID {pid})",
+				"statusStopped": "Stopped",
+				"statusCrashed": "Crashed (Exit {code})",
+				"apiTab": "API Requests ({count})",
+				"terminalTab": "Terminal ({count})",
+				"testEndpointBtn": "Test",
+				"malformedBadge": "undefined param",
+				"noApiLogs": "No outbound API requests recorded yet. Start your bot or test an endpoint above.",
+				"noTerminalLogs": "No terminal output yet.",
+				"openVscode": "VS Code",
+				"openCursor": "Cursor",
+				"openTerminal": "Terminal",
+				"openExplorer": "Explorer"
+			},
+			"snip": {
+				"capturedToast": "Screen captured & sent to CDN uploader",
+				"title": "Instant Snip-to-CDN",
+				"subtitle": "Capture any display or open window directly to your Xernerx CDN vault.",
+				"snapScreenBtn": "Snap Screen",
+				"pickWindowBtn": "Pick Window",
+				"selectSourceLabel": "Select Display or Window",
+				"refreshSources": "Refresh"
 			}
 		},
 		"boost": {
@@ -5246,6 +5352,12 @@
 				"classes": "Classes",
 				"interfaces": "Interfaces",
 				"functions": "Functions",
+				"types": "Types",
+				"variables": "Variables",
+				"changelog": "Changelog",
+				"viewFullChangelog": "View on Info Hub",
+				"collectionBannerTitle": "All-in-One Package Collection",
+				"collectionBannerDesc": "xernerx bundles and re-exports every modular @xernerx/* package in a single unified dependency.",
 				"constructor": "Constructor",
 				"properties": "Properties",
 				"methods": "Methods",
@@ -5259,14 +5371,23 @@
 				"all": "ALL",
 				"classBadge": "Class",
 				"interfaceBadge": "Interface",
-				"functionBadge": "Function"
+				"functionBadge": "Function",
+				"typeBadge": "Type",
+				"variableBadge": "Variable"
 			},
 			"page": {
 				"title": "Xernerx Developer Software",
-				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools on top of the Xernerx Ecosystem.",
+				"description": "Robust, open-source frameworks and libraries built to empower developers to create their own incredible tools on top of the Xernerx Ecosystem. Install the unified xernerx collection or individual @xernerx/* modular packages.",
+				"filterAll": "All Packages",
+				"filterCollection": "xernerx (All-in-One)",
+				"filterModular": "@xernerx/* (Modular)",
+				"collectionBadge": "All-in-One Collection",
+				"modularBadge": "Modular Package",
+				"bundlesLabel": "Bundles & re-exports:",
+				"changelogBadge": "Changelog",
 				"overview": {
 					"title": "Available Packages",
-					"description": "Select a package below to view its comprehensive API documentation and types.",
+					"description": "Select the all-in-one xernerx SDK or any modular @xernerx/* package below to view its comprehensive API documentation, types, and changelog.",
 					"versionsAvailable": "{count} versions available",
 					"symbolsCount": "{count} symbols",
 					"latest": "Latest:",
@@ -5275,8 +5396,11 @@
 				}
 			},
 			"catalog": {
+				"xernerxDesc": "The official all-in-one Xernerx Suite SDK and bot framework, bundling and re-exporting all @xernerx/* packages (@xernerx/framework, @xernerx/commands, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket).",
 				"frameworkDesc": "A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, and multi-shard coordination.",
+				"commandsDesc": "Built-in slash/message command suite and automated command synchronization client for Discord bots on the Xernerx Suite API.",
 				"statsDesc": "Lightweight daemon for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.",
+				"terminalDesc": "Structured ANSI terminal logger, child-scope formatters, and interactive CLI spinners for Xernerx services and Discord bots.",
 				"websocketDesc": "Universal client library for connecting, authenticating, and making RPC queries against the Xernerx WebSocket microservice router.",
 				"uiDesc": "Accessible, modern React primitive components engineered for the Xernerx Suite following Modern Round Glassmorphism Pop guidelines.",
 				"componentsDesc": "High-level application shell components including AppLayout, Header, Navigation Sidebar, Footer, and responsive wrappers.",
@@ -5287,7 +5411,8 @@
 				"backToCategories": "Back to Categories",
 				"availablePackages": "Available Packages",
 				"categoryNavigation": "Navigation",
-				"categoryPackages": "Packages"
+				"categoryCollection": "All-in-One SDK",
+				"categoryPackages": "Scoped Packages (@xernerx/*)"
 			},
 			"search": {
 				"placeholder": "Search classes, interfaces, and functions across all latest packages...",
@@ -5493,7 +5618,7 @@
 						"title": "Bot Webhooks & Desktop Localhost Relay",
 						"description": "Receive real-time HTTP POST webhook dispatches when users vote, review, update stats, or publish a new release on your bot — with built-in localhost relay support in the Xernerx Desktop App.",
 						"localRelayTitle": "Testing on localhost / 127.0.0.1 (Zero Ngrok Required)",
-						"localRelayDesc": "When configuring webhooks in app.xernerx.com/portal/bots/[id] inside the Xernerx Desktop App, setting your Webhook URL to http://localhost:3000/... or http://127.0.0.1:... displays a Local Relay Ready badge. Clicking Test Ping dispatches the exact signed JSON payload and X-Xernerx-* headers directly from your local machine via Electron's main process.",
+						"localRelayDesc": "When configuring webhooks in portal.xernerx.com/bots/[id] inside the Xernerx Desktop App, setting your Webhook URL to http://localhost:3000/... or http://127.0.0.1:... displays a Local Relay Ready badge. Clicking Test Ping dispatches the exact signed JSON payload and X-Xernerx-* headers directly from your local machine via Electron's main process.",
 						"headersAndEvents": "Webhook Headers & Event Triggers"
 					},
 					"postBotReleases": {
@@ -5877,6 +6002,8 @@
 					"levelsDesc": "Unified platform user level and XP (aggregated across text and voice).",
 					"creditsDesc": "Read or update user credit balances, daily streaks, unlocked perks, and vanity badges. Positive balance increments via update automatically apply the user’s active Subscription Credit Multiplier (2.0x for Ultra, 1.25x for Bot Subscribers) unless skipMultiplier: true is passed in body.data.",
 					"tokensDesc": "API and WebSocket developer tokens and permission states.",
+					"appearanceDesc": "User theme, accent color, UI scaling, and layout customization settings.",
+					"subscriptionsDesc": "Active and historical user subscription records and billing states.",
 					"guildsDesc": "Platform-wide guild profiles and institutional registration.",
 					"botsDesc": "Registered bot metadata, reviews, votes, and verification state.",
 					"exampleTitle": "Example: Query Global User & Level"
@@ -6092,6 +6219,7 @@
 				"cdn": "CDN",
 				"website": "Website",
 				"admin": "Admin",
+				"hosting": "Hosting",
 				"help": "Support"
 			}
 		}
@@ -6329,13 +6457,15 @@
 			"services": {
 				"www": "Main Website",
 				"app": "User Dashboard",
+				"portal": "Developer Portal",
 				"account": "Identity & Account Hub",
 				"api": "Core API Gateway",
 				"cdn": "Media CDN",
 				"docs": "Developer Documentation",
 				"info": "Support & Info Hub",
 				"store": "Store & Billing",
-				"admin": "Staff Portal"
+				"admin": "Staff Portal",
+				"hosting": "Server Hosting"
 			},
 			"botsHeading": "Official Bots",
 			"botsOnlineCount": "{online}/{total} Online",
@@ -6360,6 +6490,65 @@
 			"botBadgeShort": "Badge",
 			"botBadgeModalTitle": "Embed {name} Status Badge",
 			"botBadgeModalDesc": "Embed a live real-time SVG status and 24-hour uptime badge for {name} in your GitHub README, documentation, or website."
+		}
+	},
+	"hosting": {
+		"nav": {
+			"categories": {
+				"nodes": "Server Nodes",
+				"workspace": "Workspace"
+			}
+		},
+		"console": {
+			"splitView": "Split-Screen View",
+			"staffGuardedBadge": "Staff Guarded",
+			"reloadAll": "Reload All Nodes",
+			"reloadNode": "Reload Node",
+			"openExternal": "Open External",
+			"configureNodes": "Configure Nodes",
+			"enterFullBleed": "Full Bleed (Alt + F)",
+			"exitFullBleed": "Exit Full Bleed (Alt + F)",
+			"reloadingToast": "Reloading {node}...",
+			"reloadingAllToast": "Reloading all server nodes...",
+			"linkAccount": "Link Easypanel Account",
+			"copyPassword": "Password",
+			"copyEmailTooltip": "Click to copy Easypanel email",
+			"copyPasswordTooltip": "Click to copy Easypanel password",
+			"emailField": "Easypanel email",
+			"passwordField": "Easypanel password",
+			"copiedToast": "Copied {field} to clipboard!"
+		},
+		"configModal": {
+			"title": "Configure Easypanel Server Nodes",
+			"description": "Manage the cluster node URLs embedded inside hosting.xernerx.com. Changes are persisted globally across the staff hosting console.",
+			"cookieHint": "Tip: Host your Easypanel instances on *.xernerx.com subdomains (e.g. one-dummi.xernerx.com & two-dummi.xernerx.com) with X-Frame-Options disabled and SameSite=Lax so first-party session cookies work seamlessly inside the iframe.",
+			"nodeLabel": "Node #{index}",
+			"nameField": "Node ID / Label",
+			"regionField": "Cluster Role / Region",
+			"urlField": "Easypanel Console URL",
+			"sshField": "SSH Target (root@ip)",
+			"addNode": "Add Server Node",
+			"deleteNode": "Remove",
+			"resetDefaults": "Reset Defaults",
+			"cancel": "Cancel",
+			"save": "Save Nodes",
+			"invalidError": "Every server node must have a valid ID/name and an http:// or https:// URL.",
+			"savedToast": "Server node configuration saved!"
+		},
+		"sshModal": {
+			"title": "Server SSH Console (root@ip)",
+			"description": "Execute remote SSH commands on your server nodes directly inside the web terminal.",
+			"targetLabel": "SSH Target (root@ip)",
+			"portLabel": "Port",
+			"passwordLabel": "SSH Root Password",
+			"copyCmd": "Copy ssh Command",
+			"copyPassword": "Copy Password",
+			"openTerminalApp": "Connect & Test",
+			"runButton": "Run",
+			"clearConsole": "Clear output",
+			"emptyPrompt": "Ready to execute commands on {target} — select a preset above or enter a command.",
+			"missingIpError": "Please enter a valid server IP (e.g. root@123.45.67.89).",
+			"execFailed": "SSH command execution failed"
 		}
 	}
 }

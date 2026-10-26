@@ -7,9 +7,10 @@ import { database, sendWebhook } from '@xernerx/lib/server';
 import { syncUserRoles } from '@/lib/sync/users';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		const includeSecrets = req.nextUrl.searchParams.get('includeSecrets') === 'true';
 		const { models } = await database('xernerx');
 
 		const user = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
@@ -36,8 +37,27 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 				.catch(() => 0),
 		]);
 
+		const sanitizedConnections = Array.isArray((user as any).connections)
+			? (user as any).connections.map((conn: any) => {
+					if (includeSecrets) {
+						return {
+							...conn,
+							hasSecret: Boolean(conn.secret),
+							hasToken: Boolean(conn.token),
+						};
+					}
+					const { secret, token, ...rest } = conn;
+					return {
+						...rest,
+						hasSecret: Boolean(secret),
+						hasToken: Boolean(token),
+					};
+				})
+			: [];
+
 		return NextResponse.json({
 			...user,
+			connections: sanitizedConnections,
 			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug || user.verified),
 			appearance: appearance || {},
 			credits: credits || { balance: 0, streak: 0 },
@@ -121,7 +141,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const existingDoc = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
 		const resolvedId = existingDoc?.id || id;
 
-		const { appearance, credits, level, ...userBody } = body;
+		const { appearance, credits, level, _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...userBody } = body || {};
 		const unsetFields: Record<string, 1> = {};
 		const isVanityAlreadyUnlocked = Boolean(existingDoc?.vanityUnlocked || existingDoc?.vanitySlug || existingDoc?.verified);
 
@@ -136,21 +156,27 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				return NextResponse.json({
 					...unlockedUser,
 					vanityUnlocked: true,
+					vanitySlug: unlockedUser?.vanitySlug || '',
 					credits: unlockRes.credits || {},
 					usedSlot: unlockRes.usedSlot,
 					cost: unlockRes.cost,
 				});
 			}
-			return NextResponse.json({ ...existingDoc, vanityUnlocked: true });
+			return NextResponse.json({ ...existingDoc, vanityUnlocked: true, vanitySlug: existingDoc?.vanitySlug || '' });
+		}
+
+		delete userBody.action;
+
+		if (userBody.birthday === '' || userBody.birthday === null) {
+			delete userBody.birthday;
+			unsetFields.birthday = 1;
 		}
 
 		if (userBody.vanitySlug !== undefined) {
 			const rawSlug = normalizeVanitySlug(userBody.vanitySlug);
 			if (rawSlug === '') {
 				delete userBody.vanitySlug;
-				if (existingDoc?.vanitySlug) {
-					unsetFields.vanitySlug = 1;
-				}
+				unsetFields.vanitySlug = 1;
 			} else {
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
 					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
@@ -225,30 +251,46 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
+		let updatedAppearance: any = null;
 		if (appearance) {
-			const { uiPreferences, ...restAppearance } = appearance;
+			const { uiPreferences, _id: _aId, __v: _aV, createdAt: _aCreated, updatedAt: _aUpdated, ownerId: _aOwner, ...restAppearance } = appearance;
 			const appearanceUpdate: Record<string, any> = { ...restAppearance };
 			if (uiPreferences && typeof uiPreferences === 'object') {
 				for (const [k, v] of Object.entries(uiPreferences)) {
 					appearanceUpdate[`uiPreferences.${k}`] = v;
 				}
 			}
-			await models.users.Appearance.findOneAndUpdate({ ownerId: resolvedId }, { $set: appearanceUpdate }, { upsert: true, runValidators: true });
+			updatedAppearance = await models.users.Appearance.findOneAndUpdate(
+				{ ownerId: resolvedId },
+				{ $set: appearanceUpdate },
+				{ upsert: true, returnDocument: 'after', runValidators: true }
+			).lean();
+		} else {
+			updatedAppearance = await models.users.Appearance.findOne({ ownerId: resolvedId }).lean();
 		}
 
+		let updatedCredits: any = null;
 		if (credits) {
-			await models.users.Credit.findOneAndUpdate({ ownerId: resolvedId }, { $set: credits }, { upsert: true, runValidators: true });
+			const { _id: _cId, __v: _cV, createdAt: _cCreated, updatedAt: _cUpdated, ownerId: _cOwner, ...cleanCredits } = credits;
+			updatedCredits = await models.users.Credit.findOneAndUpdate({ ownerId: resolvedId }, { $set: cleanCredits }, { upsert: true, returnDocument: 'after', runValidators: true }).lean();
+		} else {
+			updatedCredits = await models.users.Credit.findOne({ ownerId: resolvedId }).lean();
 		}
 
+		let updatedLevel: any = null;
 		if (level) {
-			await models.users.Level.findOneAndUpdate({ ownerId: resolvedId }, { $set: level }, { upsert: true, runValidators: true });
+			const { _id: _lId, __v: _lV, createdAt: _lCreated, updatedAt: _lUpdated, ownerId: _lOwner, ...cleanLevel } = level;
+			updatedLevel = await models.users.Level.findOneAndUpdate({ ownerId: resolvedId }, { $set: cleanLevel }, { upsert: true, returnDocument: 'after', runValidators: true }).lean();
+		} else {
+			updatedLevel = await models.users.Level.findOne({ ownerId: resolvedId }).lean();
 		}
 
 		return NextResponse.json({
 			...updatedUser,
-			appearance: appearance || {},
-			credits: credits || {},
-			level: level || {},
+			vanitySlug: updatedUser.vanitySlug || '',
+			appearance: updatedAppearance || {},
+			credits: updatedCredits || {},
+			level: updatedLevel || {},
 		});
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });

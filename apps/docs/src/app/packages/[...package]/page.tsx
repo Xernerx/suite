@@ -4,12 +4,67 @@
 import type { Metadata } from 'next';
 import { PackageDetailsClient } from '@/components/packages/PackageDetailsClient';
 
+function parsePackageRouteSegments(segments: string[]): { pkgName: string; version: string | null } {
+	const decoded = segments.map((s) => decodeURIComponent(s));
+	if (decoded.length === 0) return { pkgName: '', version: null };
+
+	const last = decoded[decoded.length - 1];
+	const isVersionSegment = /^\d+\.\d+/.test(last) || last === 'latest';
+
+	if (isVersionSegment && decoded.length >= 2) {
+		return {
+			pkgName: decoded.slice(0, -1).join('/'),
+			version: last === 'latest' ? null : last,
+		};
+	}
+
+	return {
+		pkgName: decoded.join('/'),
+		version: null,
+	};
+}
+
+async function getAvailableVersions(pkgName: string): Promise<string[]> {
+	try {
+		const ghToken = process.env.GITHUB_TOKEN || process.env.GITHUB_PAT;
+		const res = await fetch('https://api.github.com/repos/Xernerx/docs/git/trees/main?recursive=1', {
+			headers: {
+				Accept: 'application/vnd.github.v3+json',
+				...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+			},
+			next: { revalidate: 300 },
+		});
+		const data = await res.json();
+		if (!data.tree) return [];
+
+		const versions = data.tree
+			.filter((item: any) => item.path.startsWith(`packages/${pkgName}/`) && item.path.endsWith('/docs.json'))
+			.map((item: any) => item.path.replace(`packages/${pkgName}/`, '').replace('/docs.json', ''));
+
+		return versions.sort((a: string, b: string) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }));
+	} catch {
+		return [];
+	}
+}
+
+async function getPackageData(pkgName: string, version: string) {
+	try {
+		const res = await fetch(`https://raw.githubusercontent.com/Xernerx/docs/main/packages/${pkgName}/${version}/docs.json`, {
+			next: { revalidate: 300 },
+		});
+		if (!res.ok) return null;
+		return await res.json();
+	} catch (e) {
+		console.error('Failed to fetch package data:', e);
+		return null;
+	}
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ package: string[] }> }): Promise<Metadata> {
 	const resolvedParams = await params;
-	const pkgParts = [...resolvedParams.package];
-	const version = pkgParts.pop() || 'latest';
-	const pkgName = decodeURIComponent(pkgParts.join('/'));
-	const canonicalPath = `/packages/${pkgParts.join('/')}/${version}`;
+	const { pkgName, version: parsedVersion } = parsePackageRouteSegments(resolvedParams.package || []);
+	const version = parsedVersion || 'latest';
+	const canonicalPath = `/packages/${pkgName}/${version}`;
 	const title = `${pkgName} (${version}) — Package Reference`;
 	const description = `Official TypeScript API documentation, classes, methods, and usage examples for ${pkgName} version ${version} by Xernerx Studios.`;
 
@@ -34,48 +89,12 @@ export async function generateMetadata({ params }: { params: Promise<{ package: 
 	};
 }
 
-async function getPackageData(pkgName: string, version: string) {
-	try {
-		const res = await fetch(`https://raw.githubusercontent.com/Xernerx/docs/main/packages/${pkgName}/${version}/docs.json`, {
-			next: { revalidate: 3600 },
-		});
-		if (!res.ok) return null;
-		return await res.json();
-	} catch (e) {
-		console.error('Failed to fetch package data:', e);
-		return null;
-	}
-}
-
-async function getAvailableVersions(pkgName: string) {
-	try {
-		const res = await fetch('https://api.github.com/repos/Xernerx/docs/git/trees/main?recursive=1', {
-			headers: {
-				Accept: 'application/vnd.github.v3+json',
-				...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
-			},
-			next: { revalidate: 3600 },
-		});
-		const data = await res.json();
-		if (!data.tree) return [];
-
-		const versions = data.tree
-			.filter((item: any) => item.path.startsWith(`packages/${pkgName}/`) && item.path.endsWith('/docs.json'))
-			.map((item: any) => item.path.replace(`packages/${pkgName}/`, '').replace('/docs.json', ''));
-
-		return versions.sort((a: string, b: string) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }));
-	} catch {
-		return [];
-	}
-}
-
 export default async function PackageDetails({ params }: { params: Promise<{ package: string[] }> }) {
 	const resolvedParams = await params;
-	const pkgParts = [...resolvedParams.package];
-	const version = pkgParts.pop()!;
-	const pkgName = decodeURIComponent(pkgParts.join('/'));
+	const { pkgName, version: parsedVersion } = parsePackageRouteSegments(resolvedParams.package || []);
+	const availableVersions = await getAvailableVersions(pkgName);
+	const resolvedVersion = parsedVersion || availableVersions[0] || 'latest';
+	const data = await getPackageData(pkgName, resolvedVersion);
 
-	const [data, availableVersions] = await Promise.all([getPackageData(pkgName, version), getAvailableVersions(pkgName)]);
-
-	return <PackageDetailsClient data={data} availableVersions={availableVersions} pkgName={pkgName} version={version} />;
+	return <PackageDetailsClient data={data} availableVersions={availableVersions} pkgName={pkgName} version={resolvedVersion} />;
 }
