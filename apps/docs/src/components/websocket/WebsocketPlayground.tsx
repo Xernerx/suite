@@ -217,7 +217,7 @@ export function WebsocketPlayground() {
 					ws.onmessage = (event) => {
 						try {
 							const data = JSON.parse(String(event.data));
-							if (data.id === `auth-${reqId}` && !data.error) {
+							if (data.id === `auth-${reqId}` && data.success === true) {
 								return;
 							}
 							clearTimeout(timeout);

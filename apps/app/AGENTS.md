@@ -4,7 +4,7 @@
 
 ## 🧭 Overview
 
-`apps/app` (`app.xernerx.com`, dev port `4004`) is the primary user-facing application, hosting the Discord Bot & Server Explorer (`/`), Server & Bot Management Dashboard (`/dashboard`), Developer Portal (`/portal`), and Organization profiles (`/organization/[id]`).
+`apps/app` (`app.xernerx.com`, dev port `4004`) is the primary user-facing application, hosting the Discord Bot & Server Explorer (`/`), Server Management Dashboard (`/dashboard`), Live Overlay (`/overlay`), and public User/Organization/Bot/Server profiles (`/users/[id]`, `/organization/[id]`, `/bots/[id]`, `/servers/[id]`). Note: the Developer Portal now lives in its own dedicated workspace `apps/portal` (`portal.xernerx.com`, dev port `4009`), with `/portal` on `apps/app` acting as a backward-compatible redirect.
 
 ## 🏗️ Key Routes & Architecture
 
@@ -12,9 +12,9 @@
     - Public discovery hub featuring Promoted, Top Voted, Biggest, and Newcomer listings.
     - Syncs active explorer mode (`bots` vs `servers`) to `localStorage('explore-context')`.
 - **Dashboard (`/dashboard`):**
-    - Authenticated workspace for configuring Discord servers (Virtue moderation/utility modules, statistics, links, webhooks) and managing user-owned bots.
-- **Developer Portal (`/portal`, `/portal/bots/[id]`):**
-    - Bot registration, webhook configuration, API statistics, and team/organization management.
+    - Authenticated workspace for configuring Discord servers (Virtue moderation/utility modules, statistics, links, webhooks).
+- **Portal Redirect (`/portal`, `/portal/bots/[id]`):**
+    - Lightweight backward-compatible redirects to `https://portal.xernerx.com` (`:4009`).
 
 ## ⚠️ Important Rules & Gotchas
 

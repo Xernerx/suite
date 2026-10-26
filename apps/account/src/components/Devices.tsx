@@ -138,7 +138,7 @@ export default function Devices() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="flex flex-col max-w-5xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/10 pb-6" style={{ gap: 'var(--ui-gap)' }}>
 				<div>
 					<h1 className="text-3xl font-bold text-(--text) flex items-center gap-3" style={{ fontFamily: 'var(--font-fredoka)' }}>

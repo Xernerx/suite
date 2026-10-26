@@ -19,7 +19,6 @@ export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 				minProgressMs: 100,
 				rootTtlMs: 60 * 1000,
 			},
-			turbopackPluginRuntimeStrategy: 'forceWorkerThreads',
 			workerThreads: true,
 			cpus: 2,
 			memoryBasedWorkersCount: true,

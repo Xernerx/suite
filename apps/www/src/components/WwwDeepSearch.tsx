@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Bot, Boxes, Briefcase, Compass, LifeBuoy } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -35,8 +35,20 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 	const router = useRouter();
 
 	const [query, setQuery] = useState('');
+	const [isOpen, setIsOpen] = useState(false);
 	const [activeCategory, setActiveCategory] = useState<'all' | WwwSearchCategory>('all');
 	const [selectedIndex, setSelectedIndex] = useState(0);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const handlePointerDown = (e: MouseEvent) => {
+			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+				setIsOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handlePointerDown);
+		return () => document.removeEventListener('mousedown', handlePointerDown);
+	}, []);
 	const [faqItems, setFaqItems] = useState<any[]>([]);
 	const [docsItems, setDocsItems] = useState<any[]>([]);
 	const [careerItems, setCareerItems] = useState<any[]>([]);
@@ -150,8 +162,18 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 				title: t('www.services.dashboard.title'),
 				description: t('www.services.dashboard.desc'),
 				subLabel: 'app.xernerx.com',
-				keywords: 'dashboard explore bots servers leaderboard portal virtue',
+				keywords: 'dashboard explore bots servers leaderboard virtue',
 				href: getEnvUrl('https://app.xernerx.com'),
+				external: true,
+			},
+			{
+				id: 'page-portal',
+				category: 'pages',
+				title: 'Developer Portal & Organizations',
+				description: 'Manage your Discord bots, organizations, releases, slash commands, and webhooks.',
+				subLabel: 'portal.xernerx.com',
+				keywords: 'portal developer bots organizations webhooks releases commands',
+				href: getEnvUrl('https://portal.xernerx.com'),
 				external: true,
 			},
 			{
@@ -331,7 +353,7 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 				else router.push(selected.href);
 			}
 		} else if (e.key === 'Escape') {
-			setQuery('');
+			setIsOpen(false);
 		}
 	};
 
@@ -368,17 +390,28 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 	];
 
 	return (
-		<div className="relative w-full max-w-2xl mx-auto mt-6 text-left z-30">
-			<Input variant="search" shortcut={true} placeholder={t('www.hero.search.placeholder')} value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleKeyDown} />
+		<div ref={containerRef} className="relative w-full max-w-2xl mx-auto mt-6 text-left z-30">
+			<Input
+				variant="search"
+				shortcut={true}
+				placeholder={t('www.hero.search.placeholder')}
+				value={query}
+				onFocus={() => setIsOpen(true)}
+				onChange={(e) => {
+					setQuery(e.target.value);
+					setIsOpen(true);
+				}}
+				onKeyDown={handleKeyDown}
+			/>
 
 			<AnimatePresence>
-				{query.trim().length > 0 && (
+				{isOpen && query.trim().length > 0 && (
 					<motion.div
 						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: 8 }}
 						transition={{ duration: 0.15 }}
-						className="absolute left-0 right-0 top-full mt-3 rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl p-3 flex flex-col gap-2 max-h-[420px] overflow-hidden z-50"
+						className="absolute left-0 right-0 top-full mt-3 rounded-3xl bg-(--foreground)/95 backdrop-blur-2xl border border-(--border)/15 shadow-[0_24px_60px_rgba(0,0,0,0.65)] p-3 flex flex-col gap-2 max-h-[420px] overflow-hidden z-50"
 					>
 						<div className="flex flex-wrap items-center gap-1.5 px-2 pt-1 pb-2 border-b border-(--border)/10 shrink-0">
 							{pills.map((pill) => {

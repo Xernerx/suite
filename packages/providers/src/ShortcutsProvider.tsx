@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, RefreshCw, Save, Search, Settings, SidebarIcon, X } from 'lucide-react';
+import { Bell, Compass, Copy, EyeOff, Globe, HelpCircle, Layers, LayoutGrid, RefreshCw, Save, Search, Settings, SidebarIcon, X } from 'lucide-react';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { navigation } from '@xernerx/lib';
@@ -18,6 +18,9 @@ type ShortcutsContextType = {
 	setNavOpen: (open: boolean) => void;
 	isSidebarVisible: boolean;
 	toggleSidebar: () => void;
+	isContentHidden: boolean;
+	setContentHidden: (hidden: boolean) => void;
+	toggleContentHidden: () => void;
 	isUrlPlacerOpen: boolean;
 	setUrlPlacerOpen: (open: boolean) => void;
 	shortcuts: ShortcutItem[];
@@ -44,6 +47,11 @@ const defaultShortcuts: ShortcutItem[] = [
 		key: 'Ctrl + B',
 		description: 'common.shortcuts.items.toggleSidebar',
 		icon: SidebarIcon,
+	},
+	{
+		key: 'Alt + H',
+		description: 'common.shortcuts.items.toggleContentUi',
+		icon: EyeOff,
 	},
 	{
 		key: 'Ctrl + .',
@@ -96,8 +104,10 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 	const [isNavOpen, setNavOpen] = useState(false);
 	const [isUrlPlacerOpen, setUrlPlacerOpen] = useState(false);
 	const [isSidebarVisible, setSidebarVisible] = useState(true);
+	const [isContentHidden, setContentHidden] = useState(false);
 	const [shortcuts, setShortcuts] = useState<ShortcutItem[]>(defaultShortcuts);
 	const toggleSidebar = () => setSidebarVisible((prev) => !prev);
+	const toggleContentHidden = () => setContentHidden((prev) => !prev);
 	const registerShortcut = (newShortcut: ShortcutItem) => {
 		setShortcuts((prev) => {
 			if (prev.some((s) => s.key === newShortcut.key)) return prev;
@@ -123,6 +133,12 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 			} else if (((e.ctrlKey || e.metaKey) && (e.key === ' ' || e.code === 'Space')) || (e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'a' || e.key === 'A') && !isInput)) {
 				e.preventDefault();
 				setNavOpen((prev) => !prev);
+			} else if (
+				(e.altKey && !e.ctrlKey && !e.metaKey && (e.key === 'h' || e.key === 'H') && !isInput) ||
+				((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'h' || e.key === 'H') && !isInput)
+			) {
+				e.preventDefault();
+				setContentHidden((prev) => !prev);
 			} else if ((e.ctrlKey || e.metaKey) && e.key === ',' && !isInput) {
 				e.preventDefault();
 				window.location.href = getEnvUrl('https://account.xernerx.com');
@@ -149,6 +165,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 				setSearchOpen(false);
 				setNavOpen(false);
 				setUrlPlacerOpen(false);
+				setContentHidden(false);
 			}
 		};
 		window.addEventListener('keydown', handleKeyDown);
@@ -175,6 +192,9 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 		setUrlPlacerOpen,
 		isSidebarVisible,
 		toggleSidebar,
+		isContentHidden,
+		setContentHidden,
+		toggleContentHidden,
 		shortcuts,
 		registerShortcut,
 	};
@@ -238,9 +258,8 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 	const activeUser = discordUser || session?.user;
 	const userRoleIds = Array.isArray((activeUser as any)?.roles) ? (activeUser as any).roles : [];
 	const activeRoles = roles.filter((r) => userRoleIds.includes(r.id));
-	const hasAdminAccess = activeRoles.some((r) => r.permissions?.access === true);
 	const visibleNavigation = navigation
-		.filter((item) => !item.adminOnly || hasAdminAccess)
+		.filter((item) => !item.adminOnly || activeRoles.some((r) => r.permissions?.[item.requiredPermission || 'access'] === true))
 		.filter((item) => {
 			if (!filterQuery.trim()) return true;
 			const q = filterQuery.toLowerCase();

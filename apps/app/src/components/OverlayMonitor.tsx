@@ -202,7 +202,7 @@ export function OverlayMonitor() {
 			{/* Owned Bots Live Status Ticker */}
 			<OverlayBotsTicker
 				bots={ownedBots.length > 0 ? ownedBots : topBots}
-				onSelectBot={(botId) => navigateInMain(ownedBots.some((b) => b.id === botId) ? `/portal/bots/${botId}` : `/bots/${botId}`)}
+				onSelectBot={(botId) => navigateInMain(ownedBots.some((b) => b.id === botId) ? getEnvUrl(`https://portal.xernerx.com/bots/${botId}`) : `/bots/${botId}`)}
 			/>
 
 			<Tabs
@@ -296,7 +296,7 @@ export function OverlayMonitor() {
 				<div className="grid grid-cols-1" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 					{[
 						{ label: t('app.home.text6'), path: '/dashboard', icon: LayoutDashboard },
-						{ label: t('app.home.text7'), path: '/portal', icon: TerminalSquare },
+						{ label: t('app.home.text7'), path: getEnvUrl('https://portal.xernerx.com'), icon: TerminalSquare },
 						{ label: t('app.dashboard.nav.explore'), path: '/', icon: Compass },
 						{ label: t('app.leaderboard.title'), path: '/leaderboard', icon: Trophy },
 					].map((item) => {

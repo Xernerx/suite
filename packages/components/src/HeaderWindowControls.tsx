@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Copy, Minus, Square, X } from 'lucide-react';
+import { Columns2, Copy, Minus, PanelLeft, PanelRight, Square, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDictionary, usePlatform, useTheme } from '@xernerx/providers';
 
@@ -60,6 +60,7 @@ export function useWindowControlsStyle(): {
 export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: boolean; effectiveControls: 'windows' | 'macos' | 'xernerx' }) {
 	const { t } = useDictionary();
 	const [maximized, setMaximized] = useState(false);
+	const [dockedSide, setDockedSide] = useState<'left' | 'right' | null>(null);
 
 	async function toggleMaximize() {
 		const electron = (window as any).electron;
@@ -67,13 +68,45 @@ export function HeaderWindowControls({ isApp, effectiveControls }: { isApp: bool
 		setMaximized(Boolean(await electron?.isMaximized?.()));
 	}
 
+	async function cycleDockedMode() {
+		const electron = (window as any).electron;
+		if (!electron?.setDockedMode) return;
+		const res = await electron.setDockedMode();
+		if (res && typeof res === 'object') {
+			setDockedSide(res.side || null);
+		}
+	}
+
 	useEffect(() => {
 		const electronBridge = (window as any).electron;
 		electronBridge?.isMaximized?.()?.then?.((val: boolean) => setMaximized(Boolean(val)));
+		electronBridge?.getDockedState?.()?.then?.((st: any) => {
+			if (st && typeof st === 'object') setDockedSide(st.side || null);
+		});
+		const unsubDock = electronBridge?.onDockedStateChange?.((st: any) => {
+			if (st && typeof st === 'object') setDockedSide(st.side || null);
+		});
+		return () => {
+			unsubDock?.();
+		};
 	}, []);
+
+	const dockTitle = dockedSide ? t('account.preferences.desktop.dockRestore') : t('account.preferences.desktop.dockToggle');
+	const DockIcon = dockedSide === 'left' ? PanelLeft : dockedSide === 'right' ? PanelRight : Columns2;
 
 	return (
 		<div className={`${isApp ? 'flex' : 'hidden [.is-electron_&]:flex'} group/controls items-center ${effectiveControls === 'windows' ? 'gap-4' : 'gap-2'}`}>
+			<button
+				type="button"
+				aria-label={dockTitle}
+				title={dockTitle}
+				onClick={cycleDockedMode}
+				className={`h-7 w-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+					dockedSide ? 'bg-(--accent)/20 border border-(--accent)/40 text-(--accent)' : 'text-(--text-muted) hover:text-(--accent) hover:bg-(--foreground)/50'
+				}`}
+			>
+				<DockIcon size={14} />
+			</button>
 			{effectiveControls === 'macos' ? (
 				<>
 					<button

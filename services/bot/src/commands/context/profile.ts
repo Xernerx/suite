@@ -1,9 +1,10 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { database, formatMilestoneCount, getHighestMilestoneBadge } from '@xernerx/lib/core';
 import { ContextCommandBuilder, type ContextCommandOptions } from '@xernerx/framework';
 import { ApplicationCommandType, EmbedBuilder } from 'discord.js';
 import { DEFAULT_XERNERX_COLOR, getUserAccentColor, parseHexColor } from '../../lib/botUtils.js';
+import { ensureMilestoneEmojisLoaded, getMilestoneEmoji } from '../../lib/milestoneEmojis.js';
 
 const VANITY_BADGE_LABELS: Record<string, string> = {
 	dot_matrix_banner: 'Dot-Matrix Architect',
@@ -75,7 +76,8 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 					return await (interaction as any)[replyMethod]({ embeds: [privateEmbed] });
 				}
 
-				const [latestStat, voteCount, commandCount] = await Promise.all([
+				const [, latestStat, voteCount, commandCount] = await Promise.all([
+					ensureMilestoneEmojisLoaded(interaction.client),
 					StatModel
 						? StatModel.findOne({ id: targetId })
 								.sort({ timestamp: -1 })
@@ -89,6 +91,11 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 				const guildCount = (latestStat as any)?.guildCount ?? 0;
 				const userCount = (latestStat as any)?.userCount ?? 0;
 				const botUrl = `https://app.xernerx.com/bots/${targetId}`;
+
+				const serverMilestone = getHighestMilestoneBadge(guildCount, 'servers');
+				const memberMilestone = getHighestMilestoneBadge(userCount, 'members');
+				const serverEmoji = getMilestoneEmoji(interaction.client, 'servers', serverMilestone.tier);
+				const memberEmoji = getMilestoneEmoji(interaction.client, 'members', memberMilestone.tier);
 
 				const botEmbed = new EmbedBuilder()
 					.setColor(accentColor)
@@ -112,6 +119,14 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 							value: Array.isArray(bot.owners) && bot.owners.length > 0 ? bot.owners.map((id: string) => `<@${id}>`).join(', ') : 'Xernerx Studios',
 							inline: true,
 						},
+						{
+							name: 'Milestones',
+							value: [
+								`${serverEmoji} **${serverMilestone.label}** ${serverMilestone.unlocked ? `(\`Tier #${serverMilestone.tier}\`)` : '(`Starter Tier`)'}`,
+								`${memberEmoji} **${memberMilestone.label}** ${memberMilestone.unlocked ? `(\`Tier #${memberMilestone.tier}\`)` : '(`Starter Tier`)'}`,
+							].join('\n'),
+							inline: false,
+						},
 					])
 					.setFooter({
 						text: `${clientBotName} • Bot Profile`,
@@ -126,8 +141,11 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 			const UserModel = (db.models.users as any).User;
 			const AppearanceModel = (db.models.users as any).Appearance;
 			const CreditModel = (db.models.users as any).Credit;
+			const BotModel = (db.models.bots as any).Bot;
+			const StatModel = (db.models.bots as any).Stat;
 
-			const [userProfile, appearanceDoc, creditDoc] = await Promise.all([
+			const [, userProfile, appearanceDoc, creditDoc, publicBots] = await Promise.all([
+				ensureMilestoneEmojisLoaded(interaction.client),
 				UserModel.findOne({ id: targetId })
 					.lean()
 					.catch(() => null),
@@ -140,6 +158,12 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 				CreditModel.findOne({ ownerId: targetId })
 					.lean()
 					.catch(() => null),
+				BotModel
+					? BotModel.find({ owners: targetId, privacy: 'public' })
+							.select('id name')
+							.lean()
+							.catch(() => [])
+					: Promise.resolve([]),
 			]);
 
 			const accentColor = parseHexColor(appearanceDoc?.accent) ?? (await getUserAccentColor(interaction.user.id)) ?? DEFAULT_XERNERX_COLOR;
@@ -198,6 +222,43 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 					iconURL: clientBotAvatar,
 				})
 				.setTimestamp();
+
+			if (publicBots.length > 0) {
+				const botStatsList = await Promise.all(
+					publicBots.map(async (b: any) => {
+						const latest = StatModel
+							? await StatModel.findOne({ id: String(b.id) })
+									.sort({ timestamp: -1 })
+									.lean()
+									.catch(() => null)
+							: null;
+						return {
+							bot: b,
+							guildCount: Number((latest as any)?.guildCount ?? 0) || 0,
+							userCount: Number((latest as any)?.userCount ?? 0) || 0,
+						};
+					})
+				);
+
+				const maxGuildEntry = botStatsList.reduce((best, cur) => (cur.guildCount > best.guildCount ? cur : best), botStatsList[0]);
+				const maxUserEntry = botStatsList.reduce((best, cur) => (cur.userCount > best.userCount ? cur : best), botStatsList[0]);
+
+				const serverBadge = getHighestMilestoneBadge(maxGuildEntry.guildCount, 'servers');
+				const memberBadge = getHighestMilestoneBadge(maxUserEntry.userCount, 'members');
+				const serverEmoji = getMilestoneEmoji(interaction.client, 'servers', serverBadge.tier);
+				const memberEmoji = getMilestoneEmoji(interaction.client, 'members', memberBadge.tier);
+
+				userEmbed.addFields([
+					{
+						name: 'Bot Milestones',
+						value: [
+							`${serverEmoji} **${serverBadge.label}** — [${maxGuildEntry.bot.name || maxGuildEntry.bot.id}](https://app.xernerx.com/bots/${maxGuildEntry.bot.id}) (\`${formatMilestoneCount(maxGuildEntry.guildCount)}\`)`,
+							`${memberEmoji} **${memberBadge.label}** — [${maxUserEntry.bot.name || maxUserEntry.bot.id}](https://app.xernerx.com/bots/${maxUserEntry.bot.id}) (\`${formatMilestoneCount(maxUserEntry.userCount)}\`)`,
+						].join('\n'),
+						inline: false,
+					},
+				]);
+			}
 
 			await (interaction as any)[replyMethod]({ embeds: [userEmbed] });
 		} catch (error) {

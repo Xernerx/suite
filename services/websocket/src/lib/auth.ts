@@ -20,10 +20,16 @@ export interface TokenVerificationResult {
 
 /**
  * Validates whether a token is permitted to use the WebSocket gateway.
- * A token is ONLY valid if its schema state has `permissions.websocket` set to `true`.
+ * A token is ONLY valid if it exists in `users.tokens`, is not inactive/suspended,
+ * and has `permissions.websocket === true`.
  */
 export async function verifyWebsocketToken(token: unknown): Promise<TokenVerificationResult> {
 	if (!token || typeof token !== 'string') {
+		return { valid: false, message: 'Missing or invalid token' };
+	}
+
+	const cleanToken = token.trim().replace(/^Bearer\s+/i, '');
+	if (!cleanToken) {
 		return { valid: false, message: 'Missing or invalid token' };
 	}
 
@@ -31,79 +37,54 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any)?.Token;
 
-		// 1. Direct database Token lookup (Admin / developer generated tokens)
-		if (TokenModel) {
-			const tokenDoc = await TokenModel.findOne({ id: token });
-
-			if (tokenDoc) {
-				if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') {
-					return { valid: false, message: `Forbidden: Token is ${tokenDoc.status}` };
-				}
-
-				if (!tokenDoc.permissions?.websocket) {
-					return {
-						valid: false,
-						message: 'Forbidden: Token needs websocket allowance',
-					};
-				}
-
-				return {
-					valid: true,
-					tokenId: tokenDoc.id,
-					userId: tokenDoc.owners?.[0],
-					tokenDoc,
-				};
-			}
+		if (!TokenModel) {
+			return { valid: false, message: 'Token store unavailable' };
 		}
 
-		// 2. JWT token verification
+		// Resolve candidate token ID (either direct token string or extracted from a signed JWT)
+		let candidateTokenId: string | null = cleanToken;
+		let jwtUserId: string | undefined;
+
 		const secret = getSecret();
-		if (secret) {
+		if (secret && cleanToken.split('.').length === 3) {
 			try {
-				const { payload } = await jwtVerify(token, secret);
-
-				// If the JWT payload references a database token ID
-				const tokenId = (payload as any)?.tokenId || (payload as any)?.id;
-				if (tokenId && typeof tokenId === 'string' && TokenModel) {
-					const dbToken = await TokenModel.findOne({ id: tokenId });
-					if (!dbToken) {
-						return { valid: false, message: 'Token not found' };
-					}
-					if (dbToken.status === 'inactive' || dbToken.status === 'suspended') {
-						return { valid: false, message: `Forbidden: Token is ${dbToken.status}` };
-					}
-					if (!dbToken.permissions?.websocket) {
-						return {
-							valid: false,
-							message: 'Forbidden: Token needs websocket allowance',
-						};
-					}
-					return {
-						valid: true,
-						tokenId: dbToken.id,
-						userId: (payload as any)?.userId || dbToken.owners?.[0],
-						tokenDoc: dbToken,
-					};
+				const { payload } = await jwtVerify(cleanToken, secret);
+				const extractedId = (payload as any)?.tokenId || (payload as any)?.id;
+				jwtUserId = (payload as any)?.userId;
+				if (extractedId && typeof extractedId === 'string') {
+					candidateTokenId = extractedId;
 				}
-
-				// If the JWT payload itself contains the permissions object
-				if ((payload as any)?.permissions?.websocket === true || (payload as any)?.websocket === true) {
-					return {
-						valid: true,
-						userId: (payload as any)?.userId,
-					};
-				}
-
-				return {
-					valid: false,
-					message: 'Forbidden: Token needs websocket allowance',
-				};
 			} catch {
-				// JWT verification failed, proceed to fallback check
+				// Not a valid JWT; fall back to checking the literal token string in DB
 			}
 		}
 
-		return { valid: false, message: 'Invalid token' };
+		const tokenDoc = await TokenModel.findOne({ id: candidateTokenId });
+
+		if (!tokenDoc) {
+			return { valid: false, message: 'Unauthorized: Invalid token' };
+		}
+
+		if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') {
+			return { valid: false, message: `Forbidden: Token is ${tokenDoc.status}` };
+		}
+
+		if (tokenDoc.permissions?.websocket !== true) {
+			return {
+				valid: false,
+				message: 'Forbidden: Token does not have websocket permission',
+			};
+		}
+
+		// Record token usage telemetry
+		await TokenModel.updateOne({ id: tokenDoc.id }, { $inc: { requestCount: 1 }, $set: { lastUsedAt: new Date() } }).catch(() => {});
+
+		return {
+			valid: true,
+			tokenId: tokenDoc.id,
+			userId: jwtUserId || tokenDoc.owners?.[0],
+			tokenDoc,
+		};
 	} catch (error) {
 		terminal.error(`WebSocket token verification error: ${error instanceof Error ? error.message : String(error)}`);
 		return { valid: false, message: 'Internal authentication error' };
@@ -111,19 +92,31 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
 }
 
 /**
- * Verifies that an already-authenticated token still has active websocket permissions.
+ * Verifies that an already-authenticated token still has active websocket permissions
+ * and increments usage telemetry.
  */
 export async function checkTokenWebsocketAccess(tokenId: string): Promise<boolean> {
+	if (!tokenId || typeof tokenId !== 'string') return false;
+
 	try {
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any)?.Token;
 		if (!TokenModel) return false;
 
-		const tokenDoc = await TokenModel.findOne({ id: tokenId });
-		if (!tokenDoc) return false;
-		if (tokenDoc.status === 'inactive' || tokenDoc.status === 'suspended') return false;
+		const tokenDoc = await TokenModel.findOneAndUpdate(
+			{
+				id: tokenId,
+				status: { $nin: ['inactive', 'suspended'] },
+				'permissions.websocket': true,
+			},
+			{
+				$inc: { requestCount: 1 },
+				$set: { lastUsedAt: new Date() },
+			},
+			{ returnDocument: 'after' }
+		).lean();
 
-		return Boolean(tokenDoc.permissions?.websocket);
+		return Boolean(tokenDoc && (tokenDoc as any).permissions?.websocket === true);
 	} catch (e) {
 		terminal.error(`Failed to check token websocket access: ${e instanceof Error ? e.message : String(e)}`);
 		return false;

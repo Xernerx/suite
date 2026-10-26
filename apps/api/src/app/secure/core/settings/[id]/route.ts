@@ -31,7 +31,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const db = (await database('xernerx')).models.core as any;
 		const SettingModel = db.Setting;
 
-		const updateData = { ...body, id };
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		const updateData = { ...cleanBody, id };
 		// Make sure it has a name
 		if (!updateData.name) {
 			updateData.name = id.replace(/_/g, ' ');

@@ -87,7 +87,8 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 				}
 			})
 			.catch(() => setCanManageServer(false));
-	}, [session, id, server?.id, getEnvUrl]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [(session as any)?.user?.id, id, server?.id, getEnvUrl]);
 
 	useEffect(() => {
 		show();

@@ -10,20 +10,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx';
-export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'website' | 'help' | 'admin';
+export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'website' | 'help' | 'admin' | 'hosting';
 
 export const STARTUP_LOCATION_URLS: Record<Exclude<StartupLocation, 'last'>, string> = {
 	explore: 'https://app.xernerx.com',
 	dashboard: 'https://app.xernerx.com/dashboard',
 	account: 'https://account.xernerx.com',
 	store: 'https://store.xernerx.com',
-	portal: 'https://app.xernerx.com/portal',
+	portal: 'https://portal.xernerx.com',
 	api: 'https://api.xernerx.com',
 	docs: 'https://docs.xernerx.com',
 	cdn: 'https://cdn.xernerx.com',
 	website: 'https://www.xernerx.com',
 	help: 'https://info.xernerx.com',
 	admin: 'https://admin.xernerx.com',
+	hosting: 'https://hosting.xernerx.com',
 };
 
 export function normalizeStartupLocation(raw?: string | null): StartupLocation {
@@ -51,6 +52,8 @@ const SUBDOMAIN_TO_PORT: Record<string, string> = {
 	admin: '4006',
 	info: '4007',
 	store: '4008',
+	portal: '4009',
+	hosting: '4010',
 };
 
 const PORT_TO_SUBDOMAIN: Record<string, string> = {
@@ -63,6 +66,8 @@ const PORT_TO_SUBDOMAIN: Record<string, string> = {
 	'4006': 'admin',
 	'4007': 'info',
 	'4008': 'store',
+	'4009': 'portal',
+	'4010': 'hosting',
 };
 
 export function loadEnvDomain(): string {
@@ -159,6 +164,9 @@ export type Metadata = {
 	discordRpc?: boolean;
 	desktopNotifications?: boolean;
 	dailyStreakReminder?: boolean;
+	idlePrivacyShield?: boolean;
+	idleAfkRpc?: boolean;
+	explorerContextMenu?: boolean;
 	cdnWatchFolder?: string;
 	windowControls?: WindowControlsStyle;
 	startupLocation?: StartupLocation;
@@ -181,6 +189,9 @@ export const DEFAULT_METADATA: Metadata = {
 	discordRpc: true,
 	desktopNotifications: true,
 	dailyStreakReminder: true,
+	idlePrivacyShield: false,
+	idleAfkRpc: true,
+	explorerContextMenu: false,
 	cdnWatchFolder: '',
 	windowControls: 'system',
 	startupLocation: 'dashboard',
@@ -210,6 +221,9 @@ export function sanitizeMetadata(raw?: Partial<Metadata> | null): Metadata {
 		discordRpc: merged.discordRpc !== false,
 		desktopNotifications: merged.desktopNotifications !== false,
 		dailyStreakReminder: merged.dailyStreakReminder !== false,
+		idlePrivacyShield: Boolean(merged.idlePrivacyShield),
+		idleAfkRpc: merged.idleAfkRpc !== false,
+		explorerContextMenu: Boolean(merged.explorerContextMenu),
 		cdnWatchFolder: typeof merged.cdnWatchFolder === 'string' ? merged.cdnWatchFolder.trim() : '',
 		windowControls: validControls.includes(merged.windowControls as WindowControlsStyle) ? (merged.windowControls as WindowControlsStyle) : 'system',
 		startupLocation: normalizeStartupLocation(merged.startupLocation),
@@ -396,6 +410,7 @@ export function createSystemTray(
 		onToggleDiscordRpc?: (enabled: boolean) => void;
 		onQuickCapture?: (sourceType: 'screen' | 'clipboard') => void;
 		onOpenCompanionWindow?: () => void;
+		onSetDockedMode?: (side: 'left' | 'right' | null) => void;
 		onRestart?: () => void;
 	}
 ): Tray | null {
@@ -430,6 +445,23 @@ export function createSystemTray(
 					click: () => opts?.onOpenCompanionWindow?.(),
 				},
 				{
+					label: 'Docked Sidebar Mode',
+					submenu: [
+						{
+							label: 'Snap Left Sidebar',
+							click: () => opts?.onSetDockedMode?.('left'),
+						},
+						{
+							label: 'Snap Right Sidebar',
+							click: () => opts?.onSetDockedMode?.('right'),
+						},
+						{
+							label: 'Restore Normal Window',
+							click: () => opts?.onSetDockedMode?.(null),
+						},
+					],
+				},
+				{
 					label: 'Live Overlay Monitor',
 					click: () => onToggleOverlay(),
 				},
@@ -459,7 +491,12 @@ export function createSystemTray(
 						if (!win || win.isDestroyed()) return;
 						win.show();
 						win.focus();
-						win.loadURL(`${webUrl}/portal`).catch(() => {});
+						const portalUrl = resolveDesktopTargetUrl(STARTUP_LOCATION_URLS.portal, {
+							isPackaged: app.isPackaged,
+							isCanary: app.getVersion().includes('canary'),
+							domain: loadEnvDomain(),
+						});
+						win.loadURL(portalUrl).catch(() => {});
 					},
 				},
 				{ type: 'separator' },

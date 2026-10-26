@@ -15,6 +15,9 @@
 	"discordRpc": true,
 	"desktopNotifications": true,
 	"dailyStreakReminder": true,
+	"idlePrivacyShield": false,
+	"idleAfkRpc": true,
+	"explorerContextMenu": false,
 	"windowControls": "system",
 	"startupLocation": "last"
 }

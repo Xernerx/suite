@@ -243,7 +243,7 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 				'webhooks',
 				'faq.developers.card4.title',
 				['faq.developers.card4.description'],
-				[ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
+				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
 			),
 			c(
 				'card2',

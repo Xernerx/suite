@@ -20,7 +20,7 @@ export default function KnownIssuesSection({ issues, resolveBot }: KnownIssuesSe
 			whileInView={{ opacity: 1, y: 0 }}
 			viewport={{ once: true, margin: '-50px' }}
 			transition={{ duration: 0.5, ease: 'easeOut' }}
-			className="flex flex-col max-w-7xl mx-auto w-full p-8 md:p-12 mt-12 mb-24 rounded-3xl border border-(--border)/10 gap-8 bg-(--foreground)/30 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative overflow-hidden group"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 mt-12 mb-24 rounded-3xl border border-(--border)/10 gap-8 bg-(--foreground)/30 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative overflow-hidden group"
 		>
 			<div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-(--accent)/5 via-transparent to-transparent pointer-events-none z-0"></div>
 			<div className="absolute -top-32 -right-32 w-96 h-96 bg-(--accent)/10 rounded-full blur-[100px] pointer-events-none z-0 group-hover:bg-(--accent)/20 transition-all duration-700"></div>

@@ -47,9 +47,9 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/commands', {\n    method: 'GET',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst commands = await response.json();\nconsole.log(commands);`,
 							},
 							{
-								label: '@xernerx/stats SDK',
+								label: '@xernerx/commands SDK',
 								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst commands = await stats.getCommands();\nconsole.log(commands);`,
+								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst currentCommands = await commands.getCommands();\nconsole.log(currentCommands);`,
 							},
 							{
 								label: 'Python',
@@ -66,7 +66,10 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 			title: t('docs.api.v1.endpoints.syncBotCommands.title'),
 			icon: Code,
 			description: t('docs.api.v1.endpoints.syncBotCommands.description'),
-			routes: [{ method: 'PUT', path: '/v1/bots/[id]/commands', auth: 'token' as const }],
+			routes: [
+				{ method: 'POST', path: '/v1/bots/[id]/commands', auth: 'token' as const },
+				{ method: 'PUT', path: '/v1/bots/[id]/commands', auth: 'token' as const },
+			],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
 					<div className="bg-(--accent)/10 border border-(--accent)/20 p-4 rounded-2xl mb-6">
@@ -82,9 +85,14 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 					<CodeBlock
 						tabs={[
 							{
-								label: 'cURL',
-								language: 'bash',
-								code: `curl -X PUT "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '[{"name":"ping","description":"Replies with Pong!","type":1}]'`,
+								label: '@xernerx/commands (Extension)',
+								language: 'typescript',
+								code: `import { XernerxCommands } from '@xernerx/commands';\n\n// Registers built-in developer commands (xc!) and auto-syncs slash & context commands on startup\nclient.modules.extensionHandler.loadExtensions(\n    new XernerxCommands(client, {\n        token: process.env.XERNERX_TOKEN!,\n        prefix: 'xc!',\n        useEmbeds: true,\n    })\n);`,
+							},
+							{
+								label: '@xernerx/commands (CommandsClient)',
+								language: 'typescript',
+								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait commands.postCommands([\n    {\n        name: 'ping',\n        description: 'Replies with Pong!',\n        type: 1\n    }\n]);`,
 							},
 							{
 								label: 'TypeScript (fetch)',
@@ -92,9 +100,9 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/commands', {\n    method: 'PUT',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN',\n        'Content-Type': 'application/json'\n    },\n    body: JSON.stringify([\n        {\n            name: "ping",\n            description: "Replies with Pong!",\n            type: 1\n        }\n    ])\n});\n\nconst result = await response.json();\nconsole.log(result);`,
 							},
 							{
-								label: '@xernerx/stats SDK',
-								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.syncCommands([\n    {\n        name: 'ping',\n        description: 'Replies with Pong!',\n        type: 1\n    }\n]);`,
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X PUT "https://api.xernerx.com/v1/bots/${effectiveBotId}/commands" \\\n  -H "Authorization: Bearer YOUR_API_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '[{"name":"ping","description":"Replies with Pong!","type":1}]'`,
 							},
 							{
 								label: 'Python',
@@ -111,7 +119,7 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 			title: t('docs.api.v1.endpoints.deleteBotCommands.title'),
 			icon: Code,
 			description: t('docs.api.v1.endpoints.deleteBotCommands.description'),
-			routes: [{ method: 'DELETE', path: '/v1/bots/[id]/commands', auth: 'token' as const }],
+			routes: [{ method: 'DELETE', path: '/v1/bots/[id]/commands?commandId=...', auth: 'token' as const }],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
 					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
@@ -130,9 +138,9 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/commands', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
 							},
 							{
-								label: '@xernerx/stats SDK',
+								label: '@xernerx/commands SDK',
 								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.clearCommands();`,
+								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\n// Delete a single command by ID or name, or clear all commands\nawait commands.deleteCommands('ping');\nawait commands.clearCommands();`,
 							},
 							{
 								label: 'Python',

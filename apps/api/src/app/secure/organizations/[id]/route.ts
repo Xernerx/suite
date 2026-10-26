@@ -90,9 +90,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.vanitySlug !== undefined) {
 			const rawSlug = normalizeVanitySlug(body.vanitySlug);
 			if (rawSlug === '') {
-				if (existingOrg.vanitySlug) {
-					unsetData['vanitySlug'] = 1;
-				}
+				unsetData['vanitySlug'] = 1;
 				delete body.vanitySlug;
 			} else {
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
@@ -121,6 +119,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.bannerUrl !== undefined) updateData['bannerUrl'] = body.bannerUrl;
 		if (body.info !== undefined) updateData['info'] = body.info;
 		if (body.locale !== undefined) updateData['locale'] = body.locale;
+		if (body.guild !== undefined) updateData['guild'] = body.guild;
 		if (body.links !== undefined) updateData['links'] = body.links;
 		if (body.roles !== undefined) updateData['roles'] = body.roles;
 		if (body.verified !== undefined) updateData['verified'] = body.verified;
@@ -128,9 +127,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 
 		if (body.action === 'remove_member' && body.targetId) {
-			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, { $pull: { members: { userId: body.targetId } } }, { returnDocument: 'after', runValidators: true }).lean();
+			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, { $pull: { members: body.targetId } }, { returnDocument: 'after', runValidators: true }).lean();
 
 			if (!updatedOrg) return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+
+			await db.Member?.deleteMany({ organizationId: String(orgId), userId: body.targetId }).catch(() => null);
 
 			try {
 				const Dispatch = (await database('xernerx')).models.dispatch as any;
@@ -159,17 +160,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				verified: updatedOrg.verified,
 				privacy: updatedOrg.config?.privacy || updatedOrg.privacy,
 				widgets: Boolean(updatedOrg.widgets),
-				vanitySlug: updatedOrg.vanitySlug,
+				vanitySlug: updatedOrg.vanitySlug || '',
 			};
 			return NextResponse.json(flatOrg, { status: 200 });
 		}
 
-		const finalSet = Object.keys(updateData).length > 0 ? updateData : body;
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, action: _omitAction, ...cleanBody } = body || {};
+		const finalSet = Object.keys(updateData).length > 0 ? updateData : cleanBody;
 		const mongoUpdate: any = {};
 		if (Object.keys(finalSet).length > 0) mongoUpdate.$set = finalSet;
 		if (Object.keys(unsetData).length > 0) mongoUpdate.$unset = unsetData;
 
-		const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, mongoUpdate, { returnDocument: 'after', runValidators: true }).lean();
+		const updatedOrg =
+			Object.keys(mongoUpdate).length > 0 ? await OrganizationModel.findOneAndUpdate({ _id: orgId }, mongoUpdate, { returnDocument: 'after', runValidators: true }).lean() : existingOrg;
 
 		if (!updatedOrg) {
 			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
@@ -185,7 +188,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			privacy: updatedOrg.config?.privacy || updatedOrg.privacy,
 			widgets: Boolean(organizationPrivacyFallback(updatedOrg)),
 			vanityUnlocked: Boolean(updatedOrg.vanityUnlocked || updatedOrg.vanitySlug || updatedOrg.verified),
-			vanitySlug: updatedOrg.vanitySlug,
+			vanitySlug: updatedOrg.vanitySlug || '',
 		};
 
 		return NextResponse.json(flatOrg, { status: 200 });

@@ -3,10 +3,11 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useDictionary, useEnvironment, usePlatform, useSession, useSupport, useToast, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePermissions, usePlatform, useSession, useSupport, useToast, useUser } from '@xernerx/providers';
 import { Button, Toggle } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Link as LinkIcon, CheckCircle2, ExternalLink, Code2, AtSign, Video, Tv, Shield, Music, Gamepad2, MessageCircle, Unplug, Plus, Lock, UserPlus } from 'lucide-react';
+import EasypanelConnectionCard from './EasypanelConnectionCard';
 
 interface ConnectedAccount {
 	provider: string;
@@ -15,6 +16,10 @@ interface ConnectedAccount {
 	displayName?: string;
 	avatar?: string;
 	url?: string;
+	secret?: string;
+	token?: string;
+	hasSecret?: boolean;
+	hasToken?: boolean;
 	showOnProfile: boolean;
 	connectedAt?: string;
 }
@@ -63,12 +68,14 @@ const OAUTH_PROVIDERS = [
 export default function Connections() {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
+	const { hasPermission } = usePermissions();
 	const { type } = usePlatform();
 	const { data: session } = useSession();
 	const { user: discordUser, mutate } = useUser();
 	const { toast } = useToast();
 	const supportCtx = useSupport();
 
+	const hasHostingAccess = hasPermission('hosting');
 	const isApplication = type === 'application';
 	const activeUser = discordUser || session?.user;
 	const userId = (activeUser as any)?.id;
@@ -144,7 +151,7 @@ export default function Connections() {
 			setLoading(false);
 			return;
 		}
-		fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), { credentials: 'include', cache: 'no-store' })
+		fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}?includeSecrets=true`), { credentials: 'include', cache: 'no-store' })
 			.then((res) => (res.ok ? res.json() : null))
 			.then((data) => {
 				if (Array.isArray(data?.connections)) {
@@ -154,6 +161,8 @@ export default function Connections() {
 			.catch(() => {})
 			.finally(() => setLoading(false));
 	}, [isReady, userId, getEnvUrl]);
+
+	const easypanelConnection = connections.find((c) => c.provider === 'easypanel');
 
 	const handleConnect = (providerId: string) => {
 		setBusyProvider(providerId);
@@ -199,7 +208,7 @@ export default function Connections() {
 
 	return (
 		<div
-			className="flex flex-col max-w-7xl mx-auto w-full"
+			className="flex flex-col max-w-(--page-width) mx-auto w-full"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',
@@ -270,6 +279,20 @@ export default function Connections() {
 					</div>
 				)}
 			</div>
+
+			{/* Staff-Only Server Hosting Connection: Easypanel (Only rendered when user has 'hosting' permission) */}
+			{hasHostingAccess && (
+				<EasypanelConnectionCard
+					connection={easypanelConnection}
+					defaultEmail={(activeUser as any)?.email || ''}
+					isBusy={busyProvider === 'easypanel'}
+					onDisconnect={() => handleDisconnect('easypanel')}
+					onSaved={(savedConn) => {
+						setConnections((prev) => [...prev.filter((c) => c.provider !== 'easypanel'), savedConn]);
+						if (mutate) mutate();
+					}}
+				/>
+			)}
 
 			{/* Optional OAuth Connections Grid */}
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>

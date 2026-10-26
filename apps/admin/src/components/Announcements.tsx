@@ -278,7 +278,7 @@ export default function Announcements() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 				<div className="flex flex-col">
 					<h1 className="text-4xl font-extrabold tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>

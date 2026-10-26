@@ -47,11 +47,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		}
 
 		const nextLang = body?.language || body?.locale || body?.preferences?.locale || body?.preferences?.language;
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, preferences: _omitPrefs, ...cleanBody } = body || {};
 		const setPayload: Record<string, any> = {
-			...body,
+			...cleanBody,
 			id,
 		};
-		delete setPayload.preferences;
 
 		if (nextLang) {
 			setPayload.language = nextLang;

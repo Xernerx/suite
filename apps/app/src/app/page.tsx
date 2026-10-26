@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Flame, LayoutDashboard, Sparkles, TerminalSquare, Trophy, Users, ChevronUp } from 'lucide-react';
+import { Flame, LayoutDashboard, Sparkles, Trophy, Users, ChevronUp } from 'lucide-react';
 import { Loading } from '@xernerx/feedback';
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, usePlatform, useSidebar } from '@xernerx/providers';
@@ -29,7 +29,7 @@ export default function Home() {
 
 		const startupUrlMap: Record<string, string> = {
 			dashboard: '/dashboard',
-			portal: '/portal',
+			portal: 'https://portal.xernerx.com',
 			account: 'https://account.xernerx.com',
 			store: 'https://store.xernerx.com',
 			api: 'https://api.xernerx.com',
@@ -237,7 +237,9 @@ export default function Home() {
 			</section>
 
 			{/* Unified Sticky Bar */}
-			<section className={`sticky top-4 z-50 flex flex-col md:flex-row items-center justify-center mb-12 w-full px-4 max-w-6xl mx-auto transition-all duration-500 ${isScrolled ? 'top-8' : ''}`}>
+			<section
+				className={`sticky top-4 z-50 flex flex-col md:flex-row items-center justify-center mb-12 w-full px-4 max-w-(--page-width) mx-auto transition-all duration-500 ${isScrolled ? 'top-8' : ''}`}
+			>
 				<div
 					className={`w-full p-2 rounded-2xl border transition-all duration-500 flex flex-col md:flex-row items-center gap-2 ${
 						isScrolled ? 'bg-(--background)/80 border-(--border)/20 backdrop-blur-xl shadow-2xl scale-[1.02]' : 'bg-(--foreground)/40 border-(--border)/10 backdrop-blur-md shadow-lg'
@@ -251,13 +253,6 @@ export default function Home() {
 						>
 							<LayoutDashboard className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							<span className="text-sm font-bold">{t('app.home.text6')}</span>
-						</Link>
-						<Link
-							href="/portal"
-							className="flex items-center justify-center gap-2 px-5 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
-						>
-							<TerminalSquare className="w-4 h-4 group-hover:scale-110 transition-transform" />
-							<span className="text-sm font-bold">{t('app.home.text7')}</span>
 						</Link>
 						<Link
 							href="/leaderboard"
@@ -294,7 +289,7 @@ export default function Home() {
 			</section>
 
 			{/* Grid Section */}
-			<section className="flex flex-col w-full max-w-6xl mx-auto mb-24 relative z-10">
+			<section className="flex flex-col w-full max-w-(--page-width) mx-auto mb-24 relative z-10">
 				{loading ? (
 					<div className="flex items-center justify-center py-20">
 						<Loading />

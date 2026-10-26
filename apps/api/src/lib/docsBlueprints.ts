@@ -23,7 +23,22 @@ export interface RawDocBlueprint {
 export const DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 	...API_DOCS_BLUEPRINTS,
 
-	// Developer Packages
+	// Developer Packages (All-in-One `xernerx` & Modular `@xernerx/*`)
+	{
+		id: 'pkg-xernerx',
+		slug: 'xernerx',
+		category: 'packages',
+		categoryTitleKey: 'docs.home.categories.npm.title',
+		sectionTitleKey: 'docs.packages.page.title',
+		rawTitle: 'xernerx (All-in-One SDK)',
+		descKey: 'docs.packages.catalog.xernerxDesc',
+		docPath: '/packages/xernerx',
+		quickLinks: [
+			{ label: 'xernerx Documentation', href: 'https://docs.xernerx.com/packages/xernerx' },
+			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/xernerx', external: true },
+		],
+		keywords: ['npm', 'package', 'xernerx', 'collection', 'bundle', 'sdk', 'framework', 'commands', 'stats', 'terminal', 'websocket'],
+	},
 	{
 		id: 'pkg-xernerx-framework',
 		slug: 'xernerx-framework',
@@ -40,6 +55,21 @@ export const DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		keywords: ['npm', 'package', 'framework', 'discord.js', 'commands', 'inhibitors', 'events', 'sharding'],
 	},
 	{
+		id: 'pkg-xernerx-commands',
+		slug: 'xernerx-commands',
+		category: 'packages',
+		categoryTitleKey: 'docs.home.categories.npm.title',
+		sectionTitleKey: 'docs.packages.page.title',
+		rawTitle: '@xernerx/commands',
+		descKey: 'docs.packages.catalog.commandsDesc',
+		docPath: '/packages/@xernerx/commands',
+		quickLinks: [
+			{ label: 'Commands Documentation', href: 'https://docs.xernerx.com/packages/@xernerx/commands' },
+			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/commands', external: true },
+		],
+		keywords: ['npm', 'package', 'commands', 'slash', 'ping', 'evaluate', 'haste', 'git', 'source', 'debug', 'repeat', 'sudo', 'su', 'jsk', 'jishaku', 'sync', 'discord.js'],
+	},
+	{
 		id: 'pkg-xernerx-stats',
 		slug: 'xernerx-stats',
 		category: 'packages',
@@ -53,5 +83,36 @@ export const DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/stats', external: true },
 		],
 		keywords: ['npm', 'package', 'stats', 'telemetry', 'guildcount', 'sync', 'daemon'],
+	},
+	{
+		id: 'pkg-xernerx-terminal',
+		slug: 'xernerx-terminal',
+		category: 'packages',
+		categoryTitleKey: 'docs.home.categories.npm.title',
+		sectionTitleKey: 'docs.packages.page.title',
+		rawTitle: '@xernerx/terminal',
+		descKey: 'docs.packages.catalog.terminalDesc',
+		docPath: '/packages/@xernerx/terminal',
+		quickLinks: [
+			{ label: 'Terminal Documentation', href: 'https://docs.xernerx.com/packages/@xernerx/terminal' },
+			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/terminal', external: true },
+		],
+		keywords: ['npm', 'package', 'terminal', 'logger', 'spinner', 'ansi', 'cli'],
+	},
+	{
+		id: 'pkg-xernerx-websocket',
+		slug: 'xernerx-websocket',
+		category: 'packages',
+		categoryTitleKey: 'docs.home.categories.npm.title',
+		sectionTitleKey: 'docs.packages.page.title',
+		rawTitle: '@xernerx/websocket',
+		descKey: 'docs.packages.catalog.websocketDesc',
+		docPath: '/packages/@xernerx/websocket',
+		quickLinks: [
+			{ label: 'WebSocket Package Docs', href: 'https://docs.xernerx.com/packages/@xernerx/websocket' },
+			{ label: 'WebSocket Gateway Guide', href: 'https://docs.xernerx.com/websocket' },
+			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/websocket', external: true },
+		],
+		keywords: ['npm', 'package', 'websocket', 'rpc', 'gateway', 'client', 'virtue', 'xernerx'],
 	},
 ];

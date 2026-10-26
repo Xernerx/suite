@@ -37,6 +37,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const inFlightRef = useRef(false);
 	const fetchedUserIdRef = useRef<string | null>(null);
+	const discordCacheRef = useRef<any>(null);
 
 	const fetchUser = useCallback(
 		async (force = false) => {
@@ -65,8 +66,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				return;
 			}
 
-			// Prevent duplicate in-flight requests or redundant fetches for the same user
-			if (inFlightRef.current || (!force && fetchedUserIdRef.current === userId && user)) {
+			// Prevent duplicate in-flight requests or redundant non-forced fetches for the same user
+			if (!force && (inFlightRef.current || fetchedUserIdRef.current === userId)) {
 				return;
 			}
 
@@ -84,7 +85,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 					}),
 				]);
 
-				const discord = discordResult.status === 'fulfilled' ? discordResult.value : null;
+				const fetchedDiscord = discordResult.status === 'fulfilled' ? discordResult.value : null;
+				if (fetchedDiscord) {
+					discordCacheRef.current = fetchedDiscord;
+				}
+				const discord = fetchedDiscord || discordCacheRef.current;
 				let xernerx = null;
 
 				if (xernerxResult.status === 'fulfilled') {
@@ -151,7 +156,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 				setLoading(false);
 			}
 		},
-		[session, status, getEnvUrl, setAccent, toast, t, user]
+		[session, status, getEnvUrl, setAccent, toast, t]
 	);
 
 	const mutate = useCallback(async () => {

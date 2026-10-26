@@ -23,6 +23,9 @@ let metadata: Record<string, any> = {
 	discordRpc: true,
 	desktopNotifications: true,
 	dailyStreakReminder: true,
+	idlePrivacyShield: false,
+	idleAfkRpc: true,
+	explorerContextMenu: false,
 	windowControls: 'system',
 	startupLocation: 'dashboard',
 	cdnWatchFolder: '',
@@ -179,6 +182,39 @@ contextBridge.exposeInMainWorld('electron', {
 		return () => ipcRenderer.removeListener('overlay:state', listener);
 	},
 	openCompanionWindow: (targetUrl?: string) => ipcRenderer.invoke('window:openCompanion', targetUrl),
+	getDockedState: () => ipcRenderer.invoke('window:getDockedState'),
+	setDockedMode: (side?: 'left' | 'right' | null) => ipcRenderer.invoke('window:setDockedMode', side),
+	onDockedStateChange: (callback: (state: any) => void) => {
+		const listener = (_: any, state: any) => callback(state);
+		ipcRenderer.on('window:dockedState', listener);
+		return () => ipcRenderer.removeListener('window:dockedState', listener);
+	},
+	getIdleState: () => ipcRenderer.invoke('app:getIdleState'),
+	unlockPrivacyShield: () => ipcRenderer.invoke('app:unlockPrivacyShield'),
+	lockPrivacyShield: () => ipcRenderer.invoke('app:lockPrivacyShield'),
+	onIdleStateChange: (callback: (state: any) => void) => {
+		const listener = (_: any, state: any) => callback(state);
+		ipcRenderer.on('idle:updated', listener);
+		return () => ipcRenderer.removeListener('idle:updated', listener);
+	},
+	prepareCdnDragFile: (payload: { url: string; filename: string }) => ipcRenderer.invoke('cdn:prepareDragFile', payload),
+	startCdnDrag: (payload: { url: string; filename?: string }) => ipcRenderer.send('cdn:startDrag', payload),
+	getBotRunners: () => ipcRenderer.invoke('botRunner:getAll'),
+	selectBotRunnerDirectory: () => ipcRenderer.invoke('botRunner:selectDirectory'),
+	configureBotRunner: (payload: { botId: string; name?: string; cwd?: string; command?: string; remove?: boolean }) => ipcRenderer.invoke('botRunner:configure', payload),
+	startBotRunner: (botId: string) => ipcRenderer.invoke('botRunner:start', botId),
+	stopBotRunner: (botId: string) => ipcRenderer.invoke('botRunner:stop', botId),
+	restartBotRunner: (botId: string) => ipcRenderer.invoke('botRunner:restart', botId),
+	probeBotRunnerApi: (payload: { botId: string; url: string; method?: string }) => ipcRenderer.invoke('botRunner:probeApi', payload),
+	openBotRunnerTarget: (payload: { cwd: string; target: 'vscode' | 'cursor' | 'terminal' | 'explorer' }) => ipcRenderer.invoke('botRunner:openTarget', payload),
+	onBotRunnersChange: (callback: (states: any[]) => void) => {
+		const listener = (_: any, states: any[]) => callback(states);
+		ipcRenderer.on('botRunner:updated', listener);
+		return () => ipcRenderer.removeListener('botRunner:updated', listener);
+	},
+	listCaptureSources: () => ipcRenderer.invoke('capture:listSources'),
+	captureSourceToCdn: (sourceId?: string) => ipcRenderer.invoke('capture:sourceToCdn', sourceId),
+	verifyBiometrics: (reason?: string) => ipcRenderer.invoke('biometrics:verify', reason),
 	relayLocalWebhook: (req: { url: string; botId?: string; events?: string[] }) => ipcRenderer.invoke('app:relayWebhook', req),
 	getWebhookHistory: () => ipcRenderer.invoke('app:getWebhookHistory'),
 	onWebhookDelivery: (callback: (payload: any) => void) => {

@@ -28,11 +28,14 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 		const guildId = guild.id;
 
+		let levelsRaw: any[] = [];
 		let textRaw: any[] = [];
 		let voiceRaw: any[] = [];
 
 		try {
 			const virtueDb = await database('virtue');
+			const LevelsOverall = (virtueDb.models.levels as any)?.Level;
+			const ProfilesOverall = (virtueDb.models.profiles as any)?.Level;
 			const LevelsText = (virtueDb.models.levels as any)?.Text;
 			const LevelsVoice = (virtueDb.models.levels as any)?.Voice;
 			const ProfilesText = (virtueDb.models.profiles as any)?.Text;
@@ -40,44 +43,59 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 			const query = { $or: [{ guildId }, { guild: guildId }] };
 
-			const [lt, pt, lv, pv] = await Promise.all([
+			const [ll, pl, lt, pt, lv, pv] = await Promise.all([
+				LevelsOverall
+					? LevelsOverall.find(query)
+							.sort({ level: -1, xp: -1 })
+							.limit(50)
+							.lean()
+							.catch(() => [])
+					: Promise.resolve([]),
+				ProfilesOverall
+					? ProfilesOverall.find(query)
+							.sort({ level: -1, xp: -1 })
+							.limit(50)
+							.lean()
+							.catch(() => [])
+					: Promise.resolve([]),
 				LevelsText
 					? LevelsText.find(query)
-							.sort({ xp: -1 })
+							.sort({ level: -1, xp: -1 })
 							.limit(50)
 							.lean()
 							.catch(() => [])
 					: Promise.resolve([]),
 				ProfilesText
 					? ProfilesText.find(query)
-							.sort({ xp: -1 })
+							.sort({ level: -1, xp: -1 })
 							.limit(50)
 							.lean()
 							.catch(() => [])
 					: Promise.resolve([]),
 				LevelsVoice
 					? LevelsVoice.find(query)
-							.sort({ xp: -1 })
+							.sort({ level: -1, xp: -1 })
 							.limit(50)
 							.lean()
 							.catch(() => [])
 					: Promise.resolve([]),
 				ProfilesVoice
 					? ProfilesVoice.find(query)
-							.sort({ xp: -1 })
+							.sort({ level: -1, xp: -1 })
 							.limit(50)
 							.lean()
 							.catch(() => [])
 					: Promise.resolve([]),
 			]);
 
+			levelsRaw = (Array.isArray(ll) && ll.length > 0 ? ll : pl) || [];
 			textRaw = (Array.isArray(lt) && lt.length > 0 ? lt : pt) || [];
 			voiceRaw = (Array.isArray(lv) && lv.length > 0 ? lv : pv) || [];
 		} catch (e) {
 			console.warn('[GuildLeaderboard] Failed to query Virtue levels:', e);
 		}
 
-		const allUserIds = Array.from(new Set([...textRaw, ...voiceRaw].map((entry: any) => String(entry?.userId || entry?.id || '')).filter(Boolean)));
+		const allUserIds = Array.from(new Set([...levelsRaw, ...textRaw, ...voiceRaw].map((entry: any) => String(entry?.userId || entry?.id || '')).filter(Boolean)));
 
 		const users =
 			allUserIds.length > 0
@@ -91,7 +109,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 			if (u?.id) userMap.set(String(u.id), u);
 		}
 
-		const enrichEntry = (entry: any, type: 'text' | 'voice') => {
+		const enrichEntry = (entry: any, type: 'levels' | 'text' | 'voice') => {
 			const uid = String(entry?.userId || entry?.id || '');
 			const profile = userMap.get(uid);
 			const isPrivate = profile?.privacy === 'private';
@@ -144,6 +162,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 		return NextResponse.json(
 			{
+				levels: levelsRaw.map((e) => enrichEntry(e, 'levels')),
 				text: textRaw.map((e) => enrichEntry(e, 'text')),
 				voice: voiceRaw.map((e) => enrichEntry(e, 'voice')),
 			},

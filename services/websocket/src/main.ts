@@ -180,7 +180,7 @@ async function start() {
 		terminal.error(`WebSocketServer error: ${err.message}`);
 	});
 
-	wss.on('connection', async (ws: AuthedWebSocket, req) => {
+	wss.on('connection', (ws: AuthedWebSocket, req) => {
 		ws.authed = false;
 
 		const ip = req.headers['cf-connecting-ip'] || req.headers['x-forwarded-for']?.toString().split(',')[0] || req.socket.remoteAddress;
@@ -192,81 +192,106 @@ async function start() {
 		});
 
 		// Check for pre-authentication via URL query parameter (?token=...) or Authorization header
-		try {
-			const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
-			const queryToken = url.searchParams.get('token');
-			const authHeader = req.headers['authorization'];
-			const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
-			const initialToken = queryToken || bearerToken;
-
-			if (initialToken) {
-				const res = await verifyWebsocketToken(initialToken);
-				if (res.valid) {
-					ws.authed = true;
-					ws.authError = undefined;
-					ws.tokenId = res.tokenId;
-					ws.userId = res.userId;
-					ws.tokenDoc = res.tokenDoc;
-					terminal.log(`Connection pre-authenticated from ${ip} (token: ${res.tokenId || 'jwt'})`);
-				} else {
-					ws.authError = res.message;
-					terminal.warn(`Pre-auth failed from ${ip}: ${res.message}`);
-				}
-			}
-		} catch (e) {
-			terminal.warn(`Pre-auth parse error from ${ip}: ${(e as Error).message}`);
-		}
-
-		ws.on('message', async (data) => {
+		const preAuthPromise = (async () => {
 			try {
-				const msg = JSON.parse(data.toString());
+				const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+				const queryToken = url.searchParams.get('token');
+				const authHeader = req.headers['authorization'];
+				const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+				const initialToken = queryToken || bearerToken;
 
-				if (!msg.service) {
-					return send(ws, { message: 'Invalid message format' });
-				}
-
-				if (msg.service === 'auth') {
-					const { token } = msg.body ?? {};
-
-					if (!token || typeof token !== 'string') {
-						return send(ws, { id: msg.id, success: false, message: 'Missing token' });
-					}
-
-					const res = await verifyWebsocketToken(token);
-
-					if (!res.valid) {
+				if (initialToken) {
+					const res = await verifyWebsocketToken(initialToken);
+					if (res.valid && res.tokenId) {
+						ws.authed = true;
+						ws.authError = undefined;
+						ws.tokenId = res.tokenId;
+						ws.userId = res.userId;
+						ws.tokenDoc = res.tokenDoc;
+						terminal.log(`Connection pre-authenticated from ${ip} (token: ${res.tokenId})`);
+					} else {
 						ws.authed = false;
-						ws.authError = res.message;
-						return send(ws, { id: msg.id, success: false, message: res.message || 'Invalid token' });
-					}
-
-					ws.authed = true;
-					ws.authError = undefined;
-					ws.tokenId = res.tokenId;
-					ws.userId = res.userId;
-					ws.tokenDoc = res.tokenDoc;
-
-					terminal.log(`Client authenticated from ${ip} (token: ${res.tokenId || 'jwt'})`);
-					return send(ws, { id: msg.id, success: true });
-				}
-
-				if (!ws.authed) {
-					return send(ws, { id: msg.id, message: ws.authError || 'unauthorized' });
-				}
-
-				// Extra safety check: ensure the token state hasn't been revoked
-				if (ws.tokenId) {
-					const hasAccess = await checkTokenWebsocketAccess(ws.tokenId);
-					if (!hasAccess) {
-						ws.authed = false;
-						return send(ws, { id: msg.id, message: 'Forbidden: websocket permission revoked' });
+						ws.tokenId = undefined;
+						ws.userId = undefined;
+						ws.tokenDoc = undefined;
+						ws.authError = res.message || 'Forbidden: Token does not have websocket permission';
+						terminal.warn(`Pre-auth failed from ${ip}: ${ws.authError}`);
 					}
 				}
-
-				await handleMessage(ws, msg);
-			} catch {
-				send(ws, { message: 'Invalid JSON' });
+			} catch (e) {
+				terminal.warn(`Pre-auth parse error from ${ip}: ${(e as Error).message}`);
 			}
+		})();
+
+		let messageQueue: Promise<void> = preAuthPromise;
+
+		ws.on('message', (data) => {
+			messageQueue = messageQueue
+				.then(async () => {
+					try {
+						const msg = JSON.parse(data.toString());
+
+						if (!msg.service) {
+							return send(ws, { message: 'Invalid message format' });
+						}
+
+						if (msg.service === 'auth') {
+							const { token } = msg.body ?? {};
+
+							if (!token || typeof token !== 'string') {
+								ws.authed = false;
+								ws.tokenId = undefined;
+								ws.userId = undefined;
+								ws.tokenDoc = undefined;
+								return send(ws, { id: msg.id, success: false, message: 'Missing token' });
+							}
+
+							const res = await verifyWebsocketToken(token);
+
+							if (!res.valid || !res.tokenId) {
+								ws.authed = false;
+								ws.tokenId = undefined;
+								ws.userId = undefined;
+								ws.tokenDoc = undefined;
+								ws.authError = res.message || 'Forbidden: Token does not have websocket permission';
+								return send(ws, { id: msg.id, success: false, message: ws.authError });
+							}
+
+							ws.authed = true;
+							ws.authError = undefined;
+							ws.tokenId = res.tokenId;
+							ws.userId = res.userId;
+							ws.tokenDoc = res.tokenDoc;
+
+							terminal.log(`Client authenticated from ${ip} (token: ${res.tokenId})`);
+							return send(ws, { id: msg.id, success: true });
+						}
+
+						if (!ws.authed || !ws.tokenId) {
+							return send(ws, {
+								id: msg.id,
+								message: ws.authError || 'Unauthorized: A valid token with websocket permission is required',
+							});
+						}
+
+						// Enforce live token state & websocket permission on every message
+						const hasAccess = await checkTokenWebsocketAccess(ws.tokenId);
+						if (!hasAccess) {
+							ws.authed = false;
+							ws.tokenId = undefined;
+							ws.tokenDoc = undefined;
+							ws.authError = 'Forbidden: Token websocket permission revoked or token inactive';
+							return send(ws, { id: msg.id, message: ws.authError });
+						}
+
+						await handleMessage(ws, msg);
+					} catch {
+						send(ws, { message: 'Invalid JSON' });
+					}
+				})
+				.catch((err) => {
+					terminal.error(`Unexpected message queue error: ${(err as Error)?.message || err}`);
+				});
 		});
 
 		ws.on('close', () => {

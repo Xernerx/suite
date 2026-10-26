@@ -59,7 +59,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 
 		const uid = (session as any)?.user?.id;
 		if (bot && uid && (bot.owners?.includes(uid) || bot.owners?.[0] === uid)) {
-			items.push({ label: t('app.bots.tabs.settings'), href: `/portal/bots/${bot.id}`, icon: Settings, category: t('app.bots.tabs.categoryManagement') });
+			items.push({ label: t('app.bots.tabs.settings'), href: getEnvUrl(`https://portal.xernerx.com/bots/${bot.id}`), icon: Settings, category: t('app.bots.tabs.categoryManagement') });
 		}
 
 		setNavItems(items);

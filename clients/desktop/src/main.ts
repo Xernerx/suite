@@ -45,6 +45,32 @@ import {
 	syncCdnWatchFolder,
 } from './desktopExtras.js';
 import {
+	type DockedSide,
+	type LocalBotOpenTarget,
+	captureDesktopSourceAndDispatch,
+	configureLocalBotRunner,
+	dispatchLocalFileToCdnUpload,
+	extractUploadArgFile,
+	getIdleState,
+	getLocalBotRunnersState,
+	getWindowDockedState,
+	initIdleAndLockMonitor,
+	listDesktopCaptureSources,
+	lockIdlePrivacyShield,
+	openLocalBotPathInTarget,
+	prepareCdnDragFile,
+	probeBotRunnerApiEndpoint,
+	selectLocalBotDirectory,
+	setWindowDockedMode,
+	startLocalBot,
+	startNativeCdnDrag,
+	stopAllLocalBots,
+	stopLocalBot,
+	syncExplorerContextMenu,
+	unlockIdlePrivacyShield,
+	verifyOsBiometrics,
+} from './nativeSuite.js';
+import {
 	configureFramelessWindow,
 	getAccountsState,
 	getActivePartition,
@@ -65,6 +91,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const iconPath = path.join(__dirname, '../public/icon.ico');
 const preloadPath = path.join(__dirname, 'preload.cjs');
+if (!app.isPackaged) {
+	app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
+}
 configureAppNotificationIdentity(iconPath, path.resolve(__dirname, '..'));
 const isCanary = app.getVersion().includes('canary');
 const domain = loadEnvDomain();
@@ -182,6 +211,7 @@ function applyRuntimeMetadata(targetMeta: Metadata) {
 	broadcastPowerState(targetMeta, 'preference-changed');
 	syncDiscordRpc(targetMeta.discordRpc !== false);
 	syncCdnWatchFolder(targetMeta.cdnWatchFolder, { getWin: () => win, log });
+	syncExplorerContextMenu(Boolean(targetMeta.explorerContextMenu), iconPath, log);
 	broadcastMetadataUpdate(targetMeta);
 }
 
@@ -220,7 +250,7 @@ export function relaunchApp(finalMeta?: Partial<Metadata>) {
 	const appRoot = path.resolve(__dirname, '..');
 	const rawArgs = process.argv
 		.slice(1)
-		.filter((arg) => !arg.startsWith('--jump=') && !arg.startsWith('xernerx://'))
+		.filter((arg) => !arg.startsWith('--jump=') && !arg.startsWith('--upload=') && !arg.startsWith('xernerx://'))
 		.map((arg) => (arg === '.' ? appRoot : arg));
 	const filteredArgs = rawArgs.length > 0 ? rawArgs : app.isPackaged ? [] : [appRoot];
 	const relaunchArgs = filteredArgs.includes('--relaunch') ? filteredArgs : [...filteredArgs, '--relaunch'];
@@ -433,6 +463,56 @@ function registerIpcHandlers() {
 	ipcMain.handle('overlay:setGhostMode', (_, enabled: boolean) => setOverlayGhostMode(enabled));
 	ipcMain.handle('overlay:setInteractiveHover', (_, hovering: boolean) => setOverlayInteractiveHover(hovering));
 	ipcMain.handle('overlay:setOpacity', (_, opacity: number) => setOverlayOpacity(opacity));
+
+	ipcMain.handle('window:getDockedState', () => getWindowDockedState());
+	ipcMain.handle('window:setDockedMode', (_, side?: DockedSide) => setWindowDockedMode(win, side));
+
+	ipcMain.handle('app:getIdleState', () => getIdleState());
+	ipcMain.handle('app:unlockPrivacyShield', () => unlockIdlePrivacyShield());
+	ipcMain.handle('app:lockPrivacyShield', () => lockIdlePrivacyShield());
+
+	ipcMain.handle('cdn:prepareDragFile', (_, payload: { url: string; filename: string }) => prepareCdnDragFile(payload));
+	ipcMain.on('cdn:startDrag', (event, payload: { url: string; filename?: string }) => {
+		startNativeCdnDrag(event.sender, { url: payload?.url || '', filename: payload?.filename, iconPath });
+	});
+
+	const notifyBotCrash = (info: { botId: string; name: string; exitCode: number; lastLine: string }) => {
+		dispatchNativeNotification(
+			{
+				title: `${info.name} Crashed (Exit ${info.exitCode})`,
+				body: info.lastLine || 'Local bot process terminated unexpectedly.',
+				link: resolveDesktopTargetUrl(`https://portal.xernerx.com/bots/${info.botId}`, { isPackaged: app.isPackaged, isCanary, domain }),
+				urgency: 'critical',
+				force: true,
+			},
+			{
+				getWin: () => win,
+				getTray: () => tray,
+				getMeta: () => getMetadata(),
+				webUrl: WEB_URL,
+				iconPath,
+				log,
+			}
+		);
+	};
+
+	ipcMain.handle('botRunner:getAll', () => getLocalBotRunnersState(store));
+	ipcMain.handle('botRunner:selectDirectory', () => selectLocalBotDirectory(win));
+	ipcMain.handle('botRunner:configure', (_, payload: { botId: string; name?: string; cwd?: string; command?: string; remove?: boolean }) => configureLocalBotRunner(store, payload));
+	ipcMain.handle('botRunner:start', (_, botId: string) => startLocalBot(store, botId, { log, onCrash: notifyBotCrash }));
+	ipcMain.handle('botRunner:stop', (_, botId: string) => stopLocalBot(store, botId));
+	ipcMain.handle('botRunner:probeApi', (_, payload: { botId: string; url: string; method?: string }) => probeBotRunnerApiEndpoint(store, payload));
+	ipcMain.handle('botRunner:openTarget', (_, payload: { cwd: string; target: LocalBotOpenTarget }) => openLocalBotPathInTarget(payload?.cwd, payload?.target));
+	ipcMain.handle('botRunner:restart', async (_, botId: string) => {
+		stopLocalBot(store, botId);
+		await new Promise((r) => setTimeout(r, 350));
+		return startLocalBot(store, botId, { log, onCrash: notifyBotCrash });
+	});
+
+	ipcMain.handle('capture:listSources', () => listDesktopCaptureSources());
+	ipcMain.handle('capture:sourceToCdn', (_, sourceId?: string) => captureDesktopSourceAndDispatch(sourceId, { getWin: () => win, log }));
+
+	ipcMain.handle('biometrics:verify', (_, reason?: string) => verifyOsBiometrics(reason));
 
 	ipcMain.handle('app:clearCache', async () => {
 		if (win && !win.isDestroyed()) await win.webContents.session.clearCache();
@@ -762,7 +842,15 @@ async function createWindow() {
 
 		syncStreamerProtection(launchMeta);
 		syncCdnWatchFolder(launchMeta.cdnWatchFolder, { getWin: () => win, log });
+		syncExplorerContextMenu(Boolean(launchMeta.explorerContextMenu), iconPath, log);
 		broadcastPowerState(launchMeta, 'init');
+
+		const initialUploadFile = extractUploadArgFile(process.argv);
+		if (initialUploadFile) {
+			setTimeout(() => {
+				dispatchLocalFileToCdnUpload(initialUploadFile, { getWin: () => win, log });
+			}, 1500);
+		}
 
 		if (launchMeta.debug) {
 			setTimeout(() => {
@@ -800,6 +888,16 @@ if (!gotTheLock) {
 	app.quit();
 } else {
 	app.on('second-instance', (_event, commandLine) => {
+		const uploadFile = extractUploadArgFile(commandLine);
+		if (uploadFile) {
+			if (win && !win.isDestroyed()) {
+				if (win.isMinimized()) win.restore();
+				win.show();
+				win.focus();
+			}
+			dispatchLocalFileToCdnUpload(uploadFile, { getWin: () => win, log });
+			return;
+		}
 		const handledJump = handleJumpArgs(commandLine, {
 			webUrl: WEB_URL,
 			getWin: () => win,
@@ -860,12 +958,15 @@ if (!gotTheLock) {
 
 	app.on('will-quit', () => {
 		globalShortcut.unregisterAll();
+		stopAllLocalBots();
 		syncDiscordRpc(false);
 	});
 
 	app.whenReady().then(() => {
+		registerIpcHandlers();
 		configureAppNotificationIdentity(iconPath, path.resolve(__dirname, '..'));
 		initPowerMonitor(() => getMetadata(), log);
+		initIdleAndLockMonitor(() => getMetadata(), log);
 		initDailyGiftMonitor(
 			() => getMetadata(),
 			(streak) => {
@@ -920,6 +1021,9 @@ if (!gotTheLock) {
 				},
 				onQuickCapture: triggerQuickCapture,
 				onOpenCompanionWindow: () => spawnCompanion(),
+				onSetDockedMode: (side) => {
+					setWindowDockedMode(win, side);
+				},
 				onRestart: () => {
 					relaunchApp();
 				},

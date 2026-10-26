@@ -109,13 +109,7 @@ export function PackagesSearch({ index, query: controlledQuery, onQueryChange }:
 										<div className="min-w-0">
 											<div className="flex items-center gap-2 flex-wrap">
 												<span className="font-bold text-sm text-(--text) font-mono">{result.name}</span>
-												<span
-													className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-														result.kind === 'Function'
-															? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30'
-															: 'bg-(--accent)/15 text-(--accent) border-(--accent)/30'
-													}`}
-												>
+												<span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-(--accent)/15 text-(--accent) border-(--accent)/30">
 													{result.kind}
 												</span>
 											</div>

@@ -6,11 +6,12 @@ import { Divider } from '@xernerx/ui';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { navigation } from '@xernerx/lib';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment, usePermissions } from '@xernerx/providers';
 
 export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: boolean; onClose: () => void }) {
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
+	const { hasPermission } = usePermissions();
 
 	return (
 		<motion.div
@@ -40,37 +41,39 @@ export default function SidebarSuite({ isCollapsed, onClose }: { isCollapsed: bo
 			<Divider />
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-				{navigation.map((service, sIdx) => {
-					const resolvedHref = getEnvUrl(service.href);
-					return (
-						<Link
-							key={sIdx}
-							href={resolvedHref}
-							onClick={(e) => {
-								const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
-								if (bridge?.openCompanionWindow && (e.ctrlKey || e.metaKey || e.shiftKey)) {
-									e.preventDefault();
-									bridge.openCompanionWindow(resolvedHref);
+				{navigation
+					.filter((service) => !service.adminOnly || hasPermission(service.requiredPermission || 'access'))
+					.map((service, sIdx) => {
+						const resolvedHref = getEnvUrl(service.href);
+						return (
+							<Link
+								key={sIdx}
+								href={resolvedHref}
+								onClick={(e) => {
+									const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+									if (bridge?.openCompanionWindow && (e.ctrlKey || e.metaKey || e.shiftKey)) {
+										e.preventDefault();
+										bridge.openCompanionWindow(resolvedHref);
+										onClose();
+										return;
+									}
 									onClose();
-									return;
-								}
-								onClose();
-							}}
-							onAuxClick={(e) => {
-								const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
-								if (bridge?.openCompanionWindow && e.button === 1) {
-									e.preventDefault();
-									bridge.openCompanionWindow(resolvedHref);
-									onClose();
-								}
-							}}
-							className="flex items-center rounded-xl font-medium text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)"
-							style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
-						>
-							<span>{t(service.label)}</span>
-						</Link>
-					);
-				})}
+								}}
+								onAuxClick={(e) => {
+									const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+									if (bridge?.openCompanionWindow && e.button === 1) {
+										e.preventDefault();
+										bridge.openCompanionWindow(resolvedHref);
+										onClose();
+									}
+								}}
+								className="flex items-center rounded-xl font-medium text-(--text-muted) transition-colors hover:bg-(--background) hover:text-(--text)"
+								style={{ padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
+							>
+								<span>{t(service.label)}</span>
+							</Link>
+						);
+					})}
 			</div>
 		</motion.div>
 	);

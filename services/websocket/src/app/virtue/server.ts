@@ -2,54 +2,72 @@
 
 import { database } from '@xernerx/lib/core';
 
-async function getModel(action: string) {
+async function getModels(action: string) {
+	const db = await database('virtue');
+
 	switch (action) {
-		// ================= VIRTUE SELF-SAVED ITEMS (virtue DB) =================
 		case 'guilds':
-		case 'settings': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.Guild;
-		}
+		case 'guild':
+		case 'settings':
+			return {
+				primary: (db.models.profiles as any)?.Guild,
+				fallback: null,
+			};
 
 		case 'users':
 		case 'user':
 		case 'profiles':
-		case 'profile': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.User;
-		}
+		case 'profile':
+			return {
+				primary: (db.models.profiles as any)?.User,
+				fallback: null,
+			};
+
+		case 'levels':
+		case 'level':
+		case 'members':
+		case 'member':
+			return {
+				primary: (db.models.levels as any)?.Level || (db.models.profiles as any)?.Level,
+				fallback: (db.models.profiles as any)?.Level || (db.models.profiles as any)?.Text || null,
+			};
 
 		case 'text':
 		case 'textLevels':
-		case 'members': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.Text;
-		}
+			return {
+				primary: (db.models.levels as any)?.Text || (db.models.profiles as any)?.Text,
+				fallback: (db.models.profiles as any)?.Text || null,
+			};
 
 		case 'voice':
-		case 'voiceLevels': {
-			const db = await database('virtue');
-			return (db.models.profiles as any)?.Voice;
-		}
+		case 'voiceLevels':
+			return {
+				primary: (db.models.levels as any)?.Voice || (db.models.profiles as any)?.Voice,
+				fallback: (db.models.profiles as any)?.Voice || null,
+			};
 
 		default:
-			return null;
+			return { primary: null, fallback: null };
 	}
 }
 
 function getFilter(action: string, body: any) {
 	switch (action) {
+		case 'levels':
+		case 'level':
+		case 'members':
+		case 'member':
 		case 'text':
 		case 'textLevels':
 		case 'voice':
 		case 'voiceLevels':
-		case 'members':
 			return {
 				id: body.id,
 				guild: body.guild,
 			};
 
 		case 'guilds':
+		case 'guild':
 		case 'settings':
 		case 'users':
 		case 'user':
@@ -65,15 +83,23 @@ function getFilter(action: string, body: any) {
 }
 
 export default async function Server(msg: any) {
-	const model = await getModel(msg.action);
+	const { primary: model, fallback } = await getModels(msg.action);
 
 	if (!model) {
 		throw new Error('Unknown action');
 	}
 
+	const filter = getFilter(msg.action, msg.body);
+
 	switch (msg.method) {
-		case 'get':
-			return model.findOne(getFilter(msg.action, msg.body)).lean();
+		case 'get': {
+			const doc = await model.findOne(filter).lean();
+			if (doc) return doc;
+			if (fallback && fallback !== model) {
+				return fallback.findOne(filter).lean();
+			}
+			return null;
+		}
 
 		case 'create':
 			try {
@@ -81,7 +107,7 @@ export default async function Server(msg: any) {
 				return res?.toObject ? res.toObject() : res;
 			} catch (error: any) {
 				if (error?.code === 11000) {
-					return model.findOne(getFilter(msg.action, msg.body)).lean();
+					return model.findOne(filter).lean();
 				}
 
 				throw error;
@@ -90,7 +116,7 @@ export default async function Server(msg: any) {
 		case 'update':
 			return model
 				.findOneAndUpdate(
-					getFilter(msg.action, msg.body),
+					filter,
 					{
 						$set: msg.body,
 					},
@@ -103,7 +129,7 @@ export default async function Server(msg: any) {
 				.lean();
 
 		case 'delete':
-			return model.findOneAndDelete(getFilter(msg.action, msg.body)).lean();
+			return model.findOneAndDelete(filter).lean();
 
 		default:
 			throw new Error('Unknown method');

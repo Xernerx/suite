@@ -230,7 +230,8 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 				console.warn('Failed to fetch Discord guilds:', error);
 			}
 		})();
-	}, [session, isReady, getEnvUrl]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [(session as any)?.user?.id, (session as any)?.accessToken, isReady, getEnvUrl]);
 
 	const quickLinks = [
 		{

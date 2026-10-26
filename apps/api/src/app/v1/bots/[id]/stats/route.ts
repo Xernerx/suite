@@ -68,6 +68,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const serverCount = typeof body.serverCount === 'number' ? body.serverCount : typeof body.guildCount === 'number' ? body.guildCount : 0;
 		const shardCount = typeof body.shardCount === 'number' ? body.shardCount : 0;
 		const userCount = typeof body.userCount === 'number' ? body.userCount : 0;
+		const onlineSince = typeof body.onlineSince === 'number' ? body.onlineSince : 0;
+		const shards = Array.isArray(body.shards) ? body.shards : [];
 
 		const currentVoteCount = VoteModel ? await VoteModel.countDocuments({ botId: id }) : 0;
 
@@ -77,6 +79,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			shardCount: shardCount,
 			userCount: userCount,
 			voteCount: currentVoteCount,
+			onlineSince,
+			shards,
 			timestamp: new Date(),
 		});
 
@@ -178,6 +182,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 					shardCount: typeof body.shardCount === 'number' ? body.shardCount : 0,
 					userCount: typeof body.userCount === 'number' ? body.userCount : 0,
 					voteCount: currentVoteCount,
+					onlineSince: typeof body.onlineSince === 'number' ? body.onlineSince : 0,
+					shards: Array.isArray(body.shards) ? body.shards : [],
 					timestamp: new Date(),
 				});
 			}

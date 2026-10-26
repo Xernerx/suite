@@ -110,7 +110,7 @@ export default function Page() {
 
 	return (
 		<div className="flex flex-col w-full">
-			<div className="max-w-7xl mx-auto w-full pt-6" style={{ paddingInline: 'var(--ui-gap)' }}>
+			<div className="max-w-(--page-width) mx-auto w-full pt-6" style={{ paddingInline: 'var(--ui-gap)' }}>
 				<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('faq.searchPlaceholder')} />
 			</div>
 

@@ -135,7 +135,10 @@ export function CommandPaletteModal({
 	const userRoleIds = Array.isArray((activeUser as any)?.roles) ? (activeUser as any).roles : [];
 	const activeRoles = roles.filter((r) => userRoleIds.includes(r.id));
 	const hasAdminAccess = activeRoles.some((r) => r.permissions?.access === true);
-	const visibleNavigation = useMemo(() => navigation.filter((item) => !item.adminOnly || hasAdminAccess), [navigation, hasAdminAccess]);
+	const visibleNavigation = useMemo(
+		() => navigation.filter((item) => !item.adminOnly || activeRoles.some((r) => r.permissions?.[item.requiredPermission || 'access'] === true)),
+		[navigation, activeRoles]
+	);
 
 	const allItems: PaletteActionItem[] = useMemo(() => {
 		const list: PaletteActionItem[] = [];

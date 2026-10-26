@@ -8,6 +8,7 @@ import { getApiBaseUrl, getUserAccentColor } from '../../lib/botUtils.js';
 const SUITE_SERVICES = [
 	{ id: 'www', name: 'Website', domain: 'xernerx.com' },
 	{ id: 'app', name: 'App', domain: 'app.xernerx.com' },
+	{ id: 'portal', name: 'Portal', domain: 'portal.xernerx.com' },
 	{ id: 'account', name: 'Account', domain: 'account.xernerx.com' },
 	{ id: 'store', name: 'Store', domain: 'store.xernerx.com' },
 	{ id: 'info', name: 'Info', domain: 'info.xernerx.com' },

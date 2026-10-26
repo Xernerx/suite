@@ -1,6 +1,26 @@
 /** @format */
 
-import { BatteryCharging, Bell, Camera, Command, Cpu, ExternalLink, Flame, Gamepad2, Keyboard, Maximize2, Minimize2, Monitor, Pin, Power, ShieldCheck, Terminal } from 'lucide-react';
+import {
+	BatteryCharging,
+	Bell,
+	Camera,
+	Clock,
+	Command,
+	Cpu,
+	ExternalLink,
+	Flame,
+	FolderUp,
+	Gamepad2,
+	Keyboard,
+	Lock,
+	Maximize2,
+	Minimize2,
+	Monitor,
+	Pin,
+	Power,
+	ShieldCheck,
+	Terminal,
+} from 'lucide-react';
 
 export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx';
 export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'website' | 'help' | 'admin';
@@ -22,6 +42,9 @@ export interface DesktopMetadata {
 	discordRpc: boolean;
 	desktopNotifications: boolean;
 	dailyStreakReminder: boolean;
+	idlePrivacyShield: boolean;
+	idleAfkRpc: boolean;
+	explorerContextMenu: boolean;
 	windowControls: WindowControlsStyle;
 	startupLocation: StartupLocation;
 	cdnWatchFolder?: string;
@@ -44,6 +67,9 @@ export const DEFAULT_DESKTOP_METADATA: DesktopMetadata = {
 	discordRpc: true,
 	desktopNotifications: true,
 	dailyStreakReminder: true,
+	idlePrivacyShield: false,
+	idleAfkRpc: true,
+	explorerContextMenu: false,
 	windowControls: 'system',
 	startupLocation: 'dashboard',
 	cdnWatchFolder: '',
@@ -55,8 +81,11 @@ export const RESTART_REQUIRED_KEYS: Array<BooleanDesktopKey> = ['hardwareAcceler
 
 export const DESKTOP_ITEMS: Array<{ key: BooleanDesktopKey; icon: any; requiresRestart: boolean }> = [
 	{ key: 'discordRpc', icon: Gamepad2, requiresRestart: false },
+	{ key: 'idleAfkRpc', icon: Clock, requiresRestart: false },
+	{ key: 'idlePrivacyShield', icon: Lock, requiresRestart: false },
 	{ key: 'streamerMode', icon: ShieldCheck, requiresRestart: false },
 	{ key: 'batterySaver', icon: BatteryCharging, requiresRestart: false },
+	{ key: 'explorerContextMenu', icon: FolderUp, requiresRestart: false },
 	{ key: 'desktopNotifications', icon: Bell, requiresRestart: false },
 	{ key: 'dailyStreakReminder', icon: Flame, requiresRestart: false },
 	{ key: 'globalHotkey', icon: Keyboard, requiresRestart: false },
@@ -96,6 +125,9 @@ export function normalizeDesktopMetadata(raw?: Record<string, any> | null): Desk
 		discordRpc: merged.discordRpc !== false,
 		desktopNotifications: merged.desktopNotifications !== false,
 		dailyStreakReminder: merged.dailyStreakReminder !== false,
+		idlePrivacyShield: Boolean(merged.idlePrivacyShield),
+		idleAfkRpc: merged.idleAfkRpc !== false,
+		explorerContextMenu: Boolean(merged.explorerContextMenu),
 		windowControls: validControls.includes(merged.windowControls as WindowControlsStyle) ? (merged.windowControls as WindowControlsStyle) : 'system',
 		startupLocation: VALID_STARTUP_LOCATIONS.includes(rawLoc as StartupLocation) ? (rawLoc as StartupLocation) : 'dashboard',
 		cdnWatchFolder: typeof merged.cdnWatchFolder === 'string' ? merged.cdnWatchFolder.trim() : '',

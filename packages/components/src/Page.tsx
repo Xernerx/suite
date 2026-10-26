@@ -1,9 +1,10 @@
 /** @format */
 'use client';
 
-import { useDictionary, useEnvironment, useLoading, usePlatform, useSidebar, useTheme, useToast, useUser } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useLoading, usePlatform, useShortcuts, useSidebar, useTheme, useToast, useUser } from '@xernerx/providers';
 import { XernerxDotLogo } from '@xernerx/feedback';
-import { UploadCloud } from 'lucide-react';
+import { Button } from '@xernerx/ui';
+import { Eye, Lock, ShieldCheck, UploadCloud } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
@@ -16,6 +17,7 @@ import { Sidebar } from './Sidebar';
 export function Page({ children }: { children: React.ReactNode }) {
 	const { device } = usePlatform();
 	const { state } = useSidebar();
+	const { isContentHidden, setContentHidden } = useShortcuts();
 	const { isRightAligned } = useWindowControlsStyle();
 	const { isLoading, message, backgroundMode, dotVariant } = useLoading();
 	const { uiPreferences } = useTheme();
@@ -27,6 +29,8 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const activeUser = discordUser || session?.user;
 
 	const [isBatterySaverActive, setIsBatterySaverActive] = useState(false);
+	const [isSystemIdle, setIsSystemIdle] = useState(false);
+	const [privacyShieldLocked, setPrivacyShieldLocked] = useState(false);
 	const [entryLoading, setEntryLoading] = useState(true);
 	const [isDragUploading, setIsDragUploading] = useState(false);
 	const [stagePreview, setStagePreview] = useState(false);
@@ -134,10 +138,39 @@ export function Page({ children }: { children: React.ReactNode }) {
 			?.then?.(applyPowerState)
 			?.catch?.(() => {});
 		const unsubPower = bridge.onPowerStateChange?.(applyPowerState);
+
+		const applyIdleState = (idleState: any) => {
+			if (!idleState || typeof idleState !== 'object') return;
+			setIsSystemIdle(Boolean(idleState.isIdle));
+			setPrivacyShieldLocked(Boolean(idleState.shieldActive));
+		};
+		bridge
+			.getIdleState?.()
+			?.then?.(applyIdleState)
+			?.catch?.(() => {});
+		const unsubIdle = bridge.onIdleStateChange?.(applyIdleState);
+
 		return () => {
 			unsubPower?.();
+			unsubIdle?.();
 		};
 	}, [uiPreferences?.reducedMotion]);
+
+	const handleUnlockPrivacyShield = useCallback(async () => {
+		const bridge = (window as any).electron;
+		try {
+			if (bridge?.verifyBiometrics) {
+				const bio = await bridge.verifyBiometrics(t('account.preferences.desktop.biometricPromptPrivacy'));
+				if (bio && bio.verified === false) {
+					return;
+				}
+			}
+			setPrivacyShieldLocked(false);
+			await bridge?.unlockPrivacyShield?.();
+		} catch {
+			setPrivacyShieldLocked(false);
+		}
+	}, [t]);
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
@@ -262,15 +295,16 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const matrixAnim = isFixedWatermarkApp ? 'animate' : uiPreferences?.dotMatrixAnimation || (stage === 'ripple' ? 'always' : 'animate');
 
 	const activeLoading = isLoading || entryLoading;
+	const effectiveStagePreview = stagePreview || isContentHidden;
 	const isFeedbackVariant = dotVariant === '404' || dotVariant === 'error' || dotVariant === 'lock';
-	const targetVariant = isFeedbackVariant || stagePreview ? dotVariant : matrixType !== 'default' && matrixType !== 'blank' ? matrixType : dotVariant;
+	const targetVariant = isFeedbackVariant ? dotVariant : matrixType !== 'default' && matrixType !== 'blank' ? matrixType : dotVariant;
 
 	const effectiveVariant = activeLoading ? 'full' : targetVariant;
 	const effectiveRipple = activeLoading
 		? true
-		: isBatterySaverActive
+		: isBatterySaverActive || isSystemIdle || privacyShieldLocked
 			? false
-			: stagePreview
+			: effectiveStagePreview
 				? matrixAnim !== 'static'
 				: matrixAnim === 'always'
 					? true
@@ -279,9 +313,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 						: backgroundMode === 'sticky-ripple';
 	const effectiveBlank = activeLoading
 		? false
-		: stagePreview
+		: effectiveStagePreview
 			? false
-			: isBatterySaverActive
+			: isBatterySaverActive || isSystemIdle || privacyShieldLocked
 				? true
 				: matrixType === 'blank'
 					? true
@@ -331,6 +365,29 @@ export function Page({ children }: { children: React.ReactNode }) {
 					<span className="text-xs text-(--text-muted)">{t('account.preferences.desktop.dropUploadDesc')}</span>
 				</div>
 			)}
+			{privacyShieldLocked && (
+				<div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-(--background)/90 backdrop-blur-2xl p-6 text-center select-none">
+					<div className="flex flex-col items-center max-w-md rounded-3xl border border-(--border)/15 bg-(--foreground)/40 p-8 shadow-2xl" style={{ gap: 'var(--ui-gap)' }}>
+						<div className="w-40">
+							<XernerxDotLogo variant="lock" width={200} height={150} ripple={false} showAmbientField={false} />
+						</div>
+						<div className="flex flex-col items-center gap-1.5">
+							<span className="inline-flex items-center gap-1.5 rounded-full bg-(--accent)/15 border border-(--accent)/30 px-3 py-1 text-[11px] font-bold text-(--accent)">
+								<ShieldCheck size={13} />
+								{t('account.preferences.desktop.privacyShieldBadge')}
+							</span>
+							<h2 className="text-xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{t('account.preferences.desktop.privacyShieldTitle')}
+							</h2>
+							<p className="text-xs text-(--text-muted)">{t('account.preferences.desktop.privacyShieldDesc')}</p>
+						</div>
+						<Button variant="primary" onClick={handleUnlockPrivacyShield} className="w-full flex items-center justify-center gap-2 rounded-2xl">
+							<Lock size={15} />
+							<span>{t('account.preferences.desktop.privacyShieldUnlock')}</span>
+						</Button>
+					</div>
+				</div>
+			)}
 			{/* Header stays completely fixed at the top */}
 			<Header />
 
@@ -343,7 +400,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 				{/* Scrollable Content Area with a prominent, symmetrical radial and linear accent gradient */}
 				<div
 					id="main-scroll-container"
-					className={`relative h-full flex-1 ${isLoading || stagePreview ? 'overflow-hidden' : 'overflow-y-auto'} shadow-inner
+					className={`relative h-full flex-1 ${isLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto'} shadow-inner
                         ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'} 
                     `}
 					style={{
@@ -354,14 +411,14 @@ export function Page({ children }: { children: React.ReactNode }) {
 					{/* Centralized AppLayout Dot-Matrix Loading & Sticky Stage */}
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
 						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100vh / var(--ui-zoom, 1) - 3.5rem)' }}>
-							<XernerxDotLogo variant={effectiveVariant} backgroundMode ripple={effectiveRipple} blank={effectiveBlank} subdued={!isLoading && !stagePreview} />
+							<XernerxDotLogo variant={effectiveVariant} backgroundMode ripple={effectiveRipple} blank={effectiveBlank} subdued={!isLoading && !effectiveStagePreview} />
 							{isLoading && message && <div className="absolute bottom-14 font-medium text-(--accent) text-sm">{message}</div>}
 						</div>
 					</div>
 
 					<div
 						className={`relative z-10 flex flex-col transition-opacity duration-500 ${showFooter ? 'min-h-full justify-between' : ''} ${
-							isLoading ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'
+							isLoading || effectiveStagePreview ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'
 						}`}
 					>
 						<main className="relative z-10" style={{ padding: 'var(--ui-gap)' }}>
@@ -371,6 +428,23 @@ export function Page({ children }: { children: React.ReactNode }) {
 						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}
 						{showFooter && <Footer />}
 					</div>
+
+					{effectiveStagePreview && (
+						<div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-(--background)/85 backdrop-blur-xl border border-(--accent)/35 p-1.5 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_25%,transparent)]">
+							<button
+								type="button"
+								onClick={() => {
+									setStagePreview(false);
+									setContentHidden(false);
+								}}
+								className="inline-flex items-center gap-2 rounded-full bg-(--accent) hover:bg-(--hover-accent) text-white px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+							>
+								<Eye size={14} />
+								<span>{t('account.appearance.showUi')}</span>
+								<kbd className="ml-1 rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-mono">Alt + H / Esc</kbd>
+							</button>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

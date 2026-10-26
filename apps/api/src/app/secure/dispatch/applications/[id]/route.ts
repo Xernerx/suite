@@ -28,7 +28,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const { models } = await database('xernerx');
 		const ApplicationConfig = models.dispatch.ApplicationConfig as any;
 
-		const updatedItem = await ApplicationConfig.findOneAndUpdate({ id }, { $set: body }, { new: true });
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		const updatedItem = await ApplicationConfig.findOneAndUpdate({ id }, { $set: cleanBody }, { new: true });
 
 		if (!updatedItem) {
 			return NextResponse.json({ error: 'Application config not found' }, { status: 404 });

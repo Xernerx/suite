@@ -153,7 +153,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	};
 
 	return (
-		<div className="w-full max-w-6xl flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
+		<div className="w-full max-w-(--page-width) flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
 			{/* Wallet & Perks Status Bar */}
 			<div
 				className="flex flex-col lg:flex-row lg:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"

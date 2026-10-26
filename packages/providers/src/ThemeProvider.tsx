@@ -12,12 +12,32 @@ export type LayoutAlignment = 'system' | 'left' | 'right';
 export type DotMatrixStage = 'default' | 'ripple' | 'orbit' | 'blank';
 export type DotMatrixType = 'default' | 'full' | 'icon' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'blank';
 export type DotMatrixAnimation = 'animate' | 'static' | 'always';
+export type HeaderSubdomainId = 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'api' | 'www' | 'admin' | 'hosting';
 
 const VALID_MATRIX_TYPES: readonly DotMatrixType[] = ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'blank'];
 const VALID_MATRIX_ANIMS: readonly DotMatrixAnimation[] = ['animate', 'static', 'always'];
+export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'api', 'www', 'admin', 'hosting'];
+export const DEFAULT_HEADER_SUBDOMAINS: HeaderSubdomainId[] = ['portal', 'store'];
+
+export function parseHeaderSubdomains(raw: unknown): HeaderSubdomainId[] | null {
+	if (Array.isArray(raw)) {
+		return raw.filter((v): v is HeaderSubdomainId => typeof v === 'string' && (VALID_HEADER_SUBDOMAINS as readonly string[]).includes(v));
+	}
+	if (typeof raw === 'string') {
+		if (raw === 'none') return [];
+		const parts = raw
+			.split(',')
+			.map((s) => s.trim())
+			.filter((v): v is HeaderSubdomainId => (VALID_HEADER_SUBDOMAINS as readonly string[]).includes(v));
+		if (parts.length > 0) return parts;
+	}
+	return null;
+}
 
 export interface UIPreferences {
+	headerSubdomains: HeaderSubdomainId[];
 	showHeaderStore: boolean;
+	showHeaderPortal: boolean;
 	showHeaderCommandPalette: boolean;
 	showHeaderNotifications: boolean;
 	showHeaderDownload: boolean;
@@ -35,7 +55,9 @@ export interface UIPreferences {
 }
 
 export const DEFAULT_UI_PREFERENCES: UIPreferences = {
+	headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS],
 	showHeaderStore: true,
+	showHeaderPortal: true,
 	showHeaderCommandPalette: true,
 	showHeaderNotifications: true,
 	showHeaderDownload: true,
@@ -112,10 +134,17 @@ function getPref(key: string): string | null {
 
 function loadStoredUIPreferences(): UIPreferences {
 	if (typeof window === 'undefined') return DEFAULT_UI_PREFERENCES;
-	const result = { ...DEFAULT_UI_PREFERENCES };
+	const result: UIPreferences = { ...DEFAULT_UI_PREFERENCES, headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS] };
+	let hasExplicitSubdomains = false;
 	(Object.keys(DEFAULT_UI_PREFERENCES) as Array<keyof UIPreferences>).forEach((key) => {
 		const raw = getPref(`pref_${key}`);
-		if (key === 'alignment') {
+		if (key === 'headerSubdomains') {
+			const parsed = parseHeaderSubdomains(raw);
+			if (parsed !== null) {
+				result.headerSubdomains = parsed;
+				hasExplicitSubdomains = true;
+			}
+		} else if (key === 'alignment') {
 			if (raw === 'system' || raw === 'left' || raw === 'right') {
 				result.alignment = raw;
 			}
@@ -137,6 +166,12 @@ function loadStoredUIPreferences(): UIPreferences {
 			(result as any)[key] = false;
 		}
 	});
+	if (!hasExplicitSubdomains) {
+		result.headerSubdomains = [...(result.showHeaderPortal !== false ? (['portal'] as HeaderSubdomainId[]) : []), ...(result.showHeaderStore !== false ? (['store'] as HeaderSubdomainId[]) : [])];
+	} else {
+		result.showHeaderStore = result.headerSubdomains.includes('store');
+		result.showHeaderPortal = result.headerSubdomains.includes('portal');
+	}
 	return result;
 }
 
@@ -150,19 +185,10 @@ function getSystemTheme(): 'light' | 'dark' {
 function applyTheme(theme: Theme) {
 	if (typeof window === 'undefined') return;
 	const root = document.documentElement;
-
-	if (theme === 'dark') {
-		root.classList.add('dark');
-		return;
-	}
-
-	if (theme === 'light') {
-		root.classList.remove('dark');
-		return;
-	}
-
-	const prefersDark = getSystemTheme();
-	root.classList.toggle('dark', prefersDark === 'dark');
+	const resolved = theme === 'system' ? getSystemTheme() : theme;
+	root.classList.toggle('dark', resolved === 'dark');
+	root.style.colorScheme = resolved;
+	root.dataset.theme = resolved;
 }
 
 function applyAccent(color?: string | number | null) {
@@ -231,6 +257,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 			setThemeVar('--ui-gap', `${storedGap}px`);
 		}
 
+		const storedPageWidth = getPref('pageWidth');
+		const pageWidthMap: Record<string, string> = {
+			compact: '80rem',
+			default: '96rem',
+			wide: '112rem',
+			full: '100%',
+		};
+		if (storedPageWidth && pageWidthMap[storedPageWidth]) {
+			setThemeVar('--page-width', pageWidthMap[storedPageWidth]);
+		}
+
 		const storedTextScale = getPref('textScale');
 		if (storedTextScale) {
 			setThemeVar('--text-scale', `${storedTextScale}px`);
@@ -257,6 +294,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 					if (appPrefs.accent) setPref('accent', appPrefs.accent);
 					if (appPrefs.uiZoom) setPref('uiZoom', String(appPrefs.uiZoom));
 					if (appPrefs.uiGap) setPref('uiGap', String(appPrefs.uiGap));
+					if (appPrefs.pageWidth) setPref('pageWidth', String(appPrefs.pageWidth));
 					if (appPrefs.textScale) setPref('textScale', String(appPrefs.textScale));
 					if (appPrefs.syncFromDiscord !== undefined) setPref('syncFromDiscord', String(appPrefs.syncFromDiscord));
 
@@ -271,13 +309,30 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 						setThemeVar('--ui-scale', String(appPrefs.uiZoom));
 					}
 					if (appPrefs.uiGap) setThemeVar('--ui-gap', `${appPrefs.uiGap}px`);
+					if (appPrefs.pageWidth && pageWidthMap[appPrefs.pageWidth]) {
+						setThemeVar('--page-width', pageWidthMap[appPrefs.pageWidth]);
+					}
 					if (appPrefs.textScale) setThemeVar('--text-scale', `${appPrefs.textScale}px`);
 				}
 
 				if (appPrefs?.uiPreferences && typeof appPrefs.uiPreferences === 'object') {
-					const mergedPrefs: UIPreferences = { ...DEFAULT_UI_PREFERENCES };
+					const mergedPrefs: UIPreferences = { ...DEFAULT_UI_PREFERENCES, headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS] };
+					let hasRemoteSubdomains = false;
 					(Object.keys(DEFAULT_UI_PREFERENCES) as Array<keyof UIPreferences>).forEach((k) => {
-						if (k === 'alignment') {
+						if (k === 'headerSubdomains') {
+							const remoteSubs = parseHeaderSubdomains(appPrefs.uiPreferences[k]);
+							if (remoteSubs !== null) {
+								mergedPrefs.headerSubdomains = remoteSubs;
+								setPref(`pref_${k}`, remoteSubs.length > 0 ? remoteSubs.join(',') : 'none');
+								hasRemoteSubdomains = true;
+							} else {
+								const localSubs = parseHeaderSubdomains(getPref(`pref_${k}`));
+								if (localSubs !== null) {
+									mergedPrefs.headerSubdomains = localSubs;
+									hasRemoteSubdomains = true;
+								}
+							}
+						} else if (k === 'alignment') {
 							const remoteAlign = appPrefs.uiPreferences[k];
 							if (remoteAlign === 'system' || remoteAlign === 'left' || remoteAlign === 'right') {
 								mergedPrefs.alignment = remoteAlign;
@@ -329,6 +384,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 							if (localVal === 'true' || localVal === 'false') (mergedPrefs as any)[k] = localVal === 'true';
 						}
 					});
+					if (!hasRemoteSubdomains) {
+						mergedPrefs.headerSubdomains = [
+							...(mergedPrefs.showHeaderPortal !== false ? (['portal'] as HeaderSubdomainId[]) : []),
+							...(mergedPrefs.showHeaderStore !== false ? (['store'] as HeaderSubdomainId[]) : []),
+						];
+					} else {
+						mergedPrefs.showHeaderStore = mergedPrefs.headerSubdomains.includes('store');
+						mergedPrefs.showHeaderPortal = mergedPrefs.headerSubdomains.includes('portal');
+					}
 					setPreferencesState(mergedPrefs);
 					if (typeof document !== 'undefined') {
 						document.documentElement.classList.toggle('reduce-motion', mergedPrefs.reducedMotion);
@@ -377,9 +441,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 	const setPreference = useCallback(
 		<K extends keyof UIPreferences>(key: K, value: UIPreferences[K]) => {
+			if (key === 'headerSubdomains' && Array.isArray(value)) {
+				const subs = (value as HeaderSubdomainId[]).filter((v) => (VALID_HEADER_SUBDOMAINS as readonly string[]).includes(v));
+				setPref('pref_headerSubdomains', subs.length > 0 ? subs.join(',') : 'none');
+				setPref('pref_showHeaderStore', String(subs.includes('store')));
+				setPref('pref_showHeaderPortal', String(subs.includes('portal')));
+				setPreferencesState((prev) => {
+					const next: UIPreferences = {
+						...prev,
+						headerSubdomains: subs,
+						showHeaderStore: subs.includes('store'),
+						showHeaderPortal: subs.includes('portal'),
+					};
+					syncPreferencesToRemote(next);
+					return next;
+				});
+				return;
+			}
 			setPref(`pref_${key}`, String(value));
 			setPreferencesState((prev) => {
 				const next = { ...prev, [key]: value };
+				if (key === 'showHeaderStore' || key === 'showHeaderPortal') {
+					const targetSub: HeaderSubdomainId = key === 'showHeaderStore' ? 'store' : 'portal';
+					const currentSubs = Array.isArray(prev.headerSubdomains) ? prev.headerSubdomains : [...DEFAULT_HEADER_SUBDOMAINS];
+					const nextSubs = value ? Array.from(new Set([...currentSubs, targetSub])) : currentSubs.filter((s) => s !== targetSub);
+					next.headerSubdomains = nextSubs;
+					setPref('pref_headerSubdomains', nextSubs.length > 0 ? nextSubs.join(',') : 'none');
+				}
 				if (key === 'reducedMotion' && typeof document !== 'undefined') {
 					document.documentElement.classList.toggle('reduce-motion', Boolean(value));
 				}
@@ -392,13 +480,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 	const resetPreferences = useCallback(() => {
 		(Object.keys(DEFAULT_UI_PREFERENCES) as Array<keyof UIPreferences>).forEach((k) => {
-			setPref(`pref_${k}`, String(DEFAULT_UI_PREFERENCES[k]));
+			const val = DEFAULT_UI_PREFERENCES[k];
+			if (k === 'headerSubdomains' && Array.isArray(val)) {
+				setPref(`pref_${k}`, val.join(','));
+			} else {
+				setPref(`pref_${k}`, String(val));
+			}
 		});
 		if (typeof document !== 'undefined') {
 			document.documentElement.classList.remove('reduce-motion');
 		}
-		setPreferencesState(DEFAULT_UI_PREFERENCES);
-		syncPreferencesToRemote(DEFAULT_UI_PREFERENCES);
+		setPreferencesState({ ...DEFAULT_UI_PREFERENCES, headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS] });
+		syncPreferencesToRemote({ ...DEFAULT_UI_PREFERENCES, headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS] });
 	}, [syncPreferencesToRemote]);
 
 	useEffect(() => {
@@ -408,6 +501,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 			const resolved = getSystemTheme();
 			setResolvedTheme(resolved);
 			document.documentElement.classList.toggle('dark', resolved === 'dark');
+			document.documentElement.style.colorScheme = resolved;
+			document.documentElement.dataset.theme = resolved;
 		};
 
 		media.addEventListener('change', handler);

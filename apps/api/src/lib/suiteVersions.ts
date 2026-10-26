@@ -17,11 +17,13 @@ export interface SuiteAppVersionInfo {
 export const SUITE_APPS = [
 	{ id: 'www', name: 'Website', domain: 'www.xernerx.com', devPort: 4000 },
 	{ id: 'app', name: 'App', domain: 'app.xernerx.com', devPort: 4004 },
+	{ id: 'portal', name: 'Portal', domain: 'portal.xernerx.com', devPort: 4009 },
 	{ id: 'account', name: 'Account', domain: 'account.xernerx.com', devPort: 4003 },
 	{ id: 'store', name: 'Store', domain: 'store.xernerx.com', devPort: 4008 },
 	{ id: 'info', name: 'Info & Support', domain: 'info.xernerx.com', devPort: 4007 },
 	{ id: 'docs', name: 'Docs', domain: 'docs.xernerx.com', devPort: 4005 },
 	{ id: 'admin', name: 'Admin', domain: 'admin.xernerx.com', devPort: 4006 },
+	{ id: 'hosting', name: 'Hosting', domain: 'hosting.xernerx.com', devPort: 4010 },
 	{ id: 'api', name: 'API', domain: 'api.xernerx.com', devPort: 4001 },
 	{ id: 'cdn', name: 'CDN', domain: 'cdn.xernerx.com', devPort: 4002 },
 ] as const;

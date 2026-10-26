@@ -155,7 +155,7 @@ export function buildBoilerplateTemplate(
 					type: 1,
 					components: [
 						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.ecosystemBtnExplore'), url: 'https://app.xernerx.com' },
-						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.ecosystemBtnPortal'), url: 'https://app.xernerx.com/portal' },
+						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.ecosystemBtnPortal'), url: 'https://portal.xernerx.com' },
 						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.ecosystemBtnDocs'), url: 'https://docs.xernerx.com' },
 					],
 				},

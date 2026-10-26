@@ -2,8 +2,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, ChevronLeft, Clock, Download, Gift, LayoutGrid, Megaphone, Monitor, RefreshCw, Search, SidebarClose, SidebarOpen, Smartphone, Store, Tablet, User as UserIcon, X } from 'lucide-react';
-import { useDictionary, useEnvironment, useNotifications, usePlatform, useShortcuts, useSidebar, useTheme, useUser } from '@xernerx/providers';
+import { Bell, ChevronLeft, Clock, Download, Gift, LayoutGrid, Megaphone, Monitor, RefreshCw, Search, SidebarClose, SidebarOpen, Smartphone, Tablet, User as UserIcon, X } from 'lucide-react';
+import { headerSubdomainsCatalog } from '@xernerx/lib';
+import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, useEnvironment, useNotifications, usePermissions, usePlatform, useShortcuts, useSidebar, useTheme, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -28,6 +29,9 @@ export function Header() {
 	const { type, device } = usePlatform();
 	const { getEnvUrl, isDev, isCanary } = useEnvironment();
 	const { preferences } = useTheme();
+	const { hasPermission } = usePermissions();
+	const hasAdminAccess = hasPermission('access');
+	const hasHostingAccess = hasPermission('hosting');
 	const { effectiveControls, isRightAligned } = useWindowControlsStyle();
 	const [isElectron, setIsElectron] = useState(false);
 
@@ -106,11 +110,7 @@ export function Header() {
 			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
 				e.preventDefault();
 				setOptionsOpen(true);
-				setNotificationsOpen((prev) => {
-					const next = !prev;
-					if (next) setUserMenuOpen(false);
-					return next;
-				});
+				setNotificationsOpen((prev) => (!prev && setUserMenuOpen(false), !prev));
 			}
 			if (e.key === 'Escape') {
 				setNotificationsOpen(false);
@@ -128,15 +128,18 @@ export function Header() {
 		if (electronBridge?.setActivity) {
 			const host = window.location.hostname;
 			const port = window.location.port;
-			let appLabel = 'Xernerx App';
-			if (port === '4003' || host.startsWith('account.')) appLabel = 'Account Settings';
-			else if (port === '4005' || host.startsWith('docs.')) appLabel = 'Developer Docs';
-			else if (port === '4006' || host.startsWith('admin.')) appLabel = 'Admin Portal';
-			else if (port === '4007' || host.startsWith('info.')) appLabel = 'Support & Roadmap';
-			else if (port === '4008' || host.startsWith('store.')) appLabel = 'Xernerx Store';
-			else if (pathname?.startsWith('/dashboard')) appLabel = 'Server Dashboard';
-			else if (pathname?.startsWith('/portal')) appLabel = 'Developer Portal';
-			else if (pathname?.startsWith('/overlay')) appLabel = 'Live Overlay Monitor';
+			const activityMap: Array<[boolean, string]> = [
+				[port === '4003' || host.startsWith('account.'), 'Account Settings'],
+				[port === '4005' || host.startsWith('docs.'), 'Developer Docs'],
+				[port === '4006' || host.startsWith('admin.'), 'Admin Portal'],
+				[port === '4007' || host.startsWith('info.'), 'Support & Roadmap'],
+				[port === '4008' || host.startsWith('store.'), 'Xernerx Store'],
+				[port === '4009' || host.startsWith('portal.') || Boolean(pathname?.startsWith('/portal')), 'Developer Portal'],
+				[port === '4010' || host.startsWith('hosting.'), 'Server Hosting'],
+				[Boolean(pathname?.startsWith('/dashboard')), 'Server Dashboard'],
+				[Boolean(pathname?.startsWith('/overlay')), 'Live Overlay Monitor'],
+			];
+			const appLabel = activityMap.find(([cond]) => cond)?.[1] || 'Xernerx App';
 			electronBridge.setActivity({ details: appLabel, state: view ? `Viewing ${view}` : 'Exploring Xernerx Suite' });
 		}
 	}, [pathname, view]);
@@ -194,9 +197,21 @@ export function Header() {
 		const isLocalHost = host === 'localhost' || host === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
 		const env = host.includes('.dev.') || isLocalHost ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 		let pre = 'app';
-		const portMap: Record<string, string> = { '4000': 'www', '4001': 'api', '4002': 'cdn', '4003': 'account', '4004': 'app', '4005': 'docs', '4006': 'admin', '4007': 'info', '4008': 'store' };
+		const portMap: Record<string, string> = {
+			'4000': 'www',
+			'4001': 'api',
+			'4002': 'cdn',
+			'4003': 'account',
+			'4004': 'app',
+			'4005': 'docs',
+			'4006': 'admin',
+			'4007': 'info',
+			'4008': 'store',
+			'4009': 'portal',
+			'4010': 'hosting',
+		};
 		if (isLocalHost && portMap[port]) pre = portMap[port];
-		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
+		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
 
 		const params = new URLSearchParams(window.location.search);
 		if (state !== 'hidden' && view && !params.has('view')) params.set('view', view);
@@ -377,18 +392,40 @@ export function Header() {
 							</button>
 						)}
 
-						{preferences.showHeaderStore && (
-							<Link
-								suppressHydrationWarning
-								href={getEnvUrl('https://store.xernerx.com')}
-								aria-label={t('components.header.store')}
-								title={t('components.header.store')}
-								className={headerIconBtnClass}
-							>
-								<Store size={effectiveControls === 'windows' ? 20 : 16} />
-								<span className="sr-only">{t('components.header.store')}</span>
-							</Link>
-						)}
+						{headerSubdomainsCatalog
+							.filter(
+								(sub) =>
+									(!sub.adminOnly || hasPermission(sub.requiredPermission || 'access')) &&
+									(Array.isArray(preferences.headerSubdomains) ? preferences.headerSubdomains : DEFAULT_HEADER_SUBDOMAINS).includes(sub.id)
+							)
+							.map((sub) => {
+								const SubIcon = sub.icon;
+								const label = t(sub.label);
+								const resolvedHref = getEnvUrl(sub.href);
+								const isCurrent = isMounted && urlState.pre === sub.id;
+								const openCompanionIfModified = (e: React.MouseEvent, isMiddle = false) => {
+									const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+									if (bridge?.openCompanionWindow && (isMiddle ? e.button === 1 : e.ctrlKey || e.metaKey || e.shiftKey)) {
+										e.preventDefault();
+										bridge.openCompanionWindow(resolvedHref);
+									}
+								};
+								return (
+									<Link
+										key={sub.id}
+										suppressHydrationWarning
+										href={resolvedHref}
+										aria-label={label}
+										title={label}
+										onClick={(e) => openCompanionIfModified(e, false)}
+										onAuxClick={(e) => openCompanionIfModified(e, true)}
+										className={`${headerIconBtnClass} ${isCurrent ? 'text-(--accent)' : ''}`}
+									>
+										<SubIcon size={effectiveControls === 'windows' ? 20 : 16} />
+										<span className="sr-only">{label}</span>
+									</Link>
+								);
+							})}
 
 						{state === 'hidden' && preferences.showHeaderAppDrawer && (
 							<button type="button" className={headerIconBtnClass} onClick={() => setNavOpen(true)} aria-label={t('components.header.title1')} title={t('components.header.title1')}>
@@ -497,7 +534,14 @@ export function Header() {
 					{(isRightAligned || effectiveControls !== 'macos') && <HeaderWindowControls isApp={isApp} effectiveControls={effectiveControls} />}
 				</div>
 			</header>
-			<HeaderOmnibar isOpen={isUrlPlacerOpen} onClose={() => setUrlPlacerOpen(false)} urlState={urlState} resolveOmnibarUrl={resolveOmnibarUrl} />
+			<HeaderOmnibar
+				isOpen={isUrlPlacerOpen}
+				onClose={() => setUrlPlacerOpen(false)}
+				urlState={urlState}
+				resolveOmnibarUrl={resolveOmnibarUrl}
+				hasAdminAccess={hasAdminAccess}
+				hasHostingAccess={hasHostingAccess}
+			/>
 		</div>
 	);
 }

@@ -29,7 +29,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const db = (await database('xernerx')).models.core as any;
 		const RoleModel = db.Role;
 
-		const updatedRole = await RoleModel.findOneAndUpdate({ id }, body, { returnDocument: 'after' }).lean();
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		const updatedRole = await RoleModel.findOneAndUpdate({ id }, { $set: cleanBody }, { returnDocument: 'after' }).lean();
 
 		if (!updatedRole) {
 			return NextResponse.json({ error: 'Role not found' }, { status: 404 });

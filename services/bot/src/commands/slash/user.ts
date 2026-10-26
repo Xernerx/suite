@@ -1,9 +1,10 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { database, formatMilestoneCount, getHighestMilestoneBadge } from '@xernerx/lib/core';
 import { SlashCommandBuilder, type SlashCommandOptions } from '@xernerx/framework';
 import { EmbedBuilder } from 'discord.js';
 import { DEFAULT_XERNERX_COLOR, getUserAccentColor, parseHexColor } from '../../lib/botUtils.js';
+import { ensureMilestoneEmojisLoaded, getMilestoneEmoji } from '../../lib/milestoneEmojis.js';
 
 const VANITY_BADGE_LABELS: Record<string, string> = {
 	dot_matrix_banner: 'Dot-Matrix Architect',
@@ -221,7 +222,9 @@ export default class UserCommand extends SlashCommandBuilder {
 			}
 
 			// Default: 'profile' subcommand
-			const [publicBots, publicOrgs, roles] = await Promise.all([
+			const StatModel = (db.models.bots as any).Stat;
+			const [, publicBots, publicOrgs, roles] = await Promise.all([
+				ensureMilestoneEmojisLoaded(interaction.client),
 				BotModel.find({ owners: targetId, privacy: 'public' })
 					.select('id name verified')
 					.lean()
@@ -305,7 +308,39 @@ export default class UserCommand extends SlashCommandBuilder {
 			}
 
 			if (publicBots.length > 0) {
+				const botStatsList = await Promise.all(
+					publicBots.map(async (b: any) => {
+						const latest = StatModel
+							? await StatModel.findOne({ id: String(b.id) })
+									.sort({ timestamp: -1 })
+									.lean()
+									.catch(() => null)
+							: null;
+						return {
+							bot: b,
+							guildCount: Number((latest as any)?.guildCount ?? 0) || 0,
+							userCount: Number((latest as any)?.userCount ?? 0) || 0,
+						};
+					})
+				);
+
+				const maxGuildEntry = botStatsList.reduce((best, cur) => (cur.guildCount > best.guildCount ? cur : best), botStatsList[0]);
+				const maxUserEntry = botStatsList.reduce((best, cur) => (cur.userCount > best.userCount ? cur : best), botStatsList[0]);
+
+				const serverBadge = getHighestMilestoneBadge(maxGuildEntry.guildCount, 'servers');
+				const memberBadge = getHighestMilestoneBadge(maxUserEntry.userCount, 'members');
+				const serverEmoji = getMilestoneEmoji(interaction.client, 'servers', serverBadge.tier);
+				const memberEmoji = getMilestoneEmoji(interaction.client, 'members', memberBadge.tier);
+
 				embed.addFields([
+					{
+						name: 'Bot Milestones',
+						value: [
+							`${serverEmoji} **${serverBadge.label}** — [${maxGuildEntry.bot.name || maxGuildEntry.bot.id}](https://app.xernerx.com/bots/${maxGuildEntry.bot.id}) (\`${formatMilestoneCount(maxGuildEntry.guildCount)}\`)`,
+							`${memberEmoji} **${memberBadge.label}** — [${maxUserEntry.bot.name || maxUserEntry.bot.id}](https://app.xernerx.com/bots/${maxUserEntry.bot.id}) (\`${formatMilestoneCount(maxUserEntry.userCount)}\`)`,
+						].join('\n'),
+						inline: false,
+					},
 					{
 						name: `Bots (${publicBots.length})`,
 						value: publicBots

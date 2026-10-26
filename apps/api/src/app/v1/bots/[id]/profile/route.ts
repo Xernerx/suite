@@ -7,6 +7,9 @@ import { authenticateV1BotRequest } from '@/lib/v1BotAuth';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		if (!id || ['undefined', 'null', 'nan'].includes(id.trim().toLowerCase())) {
+			return NextResponse.json({ error: 'Bot not found (invalid bot ID)' }, { status: 404 });
+		}
 		const authHeader = req.headers.get('Authorization');
 
 		if (authHeader) {

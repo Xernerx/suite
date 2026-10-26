@@ -25,8 +25,27 @@ export function MediaGridCard({ item, rawUrl, viewUrl, isSelected, copiedId, onT
 	const isImage = item.mimeType?.startsWith('image/');
 	const isVideo = item.mimeType?.startsWith('video/');
 
+	const handlePrepareNativeDrag = () => {
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (bridge?.prepareCdnDragFile && rawUrl) {
+			bridge.prepareCdnDragFile({ url: rawUrl, filename: item.filename || `xernerx-${item._id}` }).catch(() => {});
+		}
+	};
+
+	const handleNativeDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
+		if (bridge?.startCdnDrag && rawUrl) {
+			e.preventDefault();
+			bridge.startCdnDrag({ url: rawUrl, filename: item.filename || `xernerx-${item._id}` });
+		}
+	};
+
 	return (
 		<div
+			draggable
+			onMouseEnter={handlePrepareNativeDrag}
+			onMouseDown={handlePrepareNativeDrag}
+			onDragStart={handleNativeDragStart}
 			className={`relative group bg-(--foreground)/30 backdrop-blur-md border rounded-3xl overflow-hidden shadow-sm transition-all flex flex-col ${
 				isSelected ? 'border-(--accent) ring-2 ring-(--accent)/30' : 'border-(--border)/10 hover:border-(--accent)/30'
 			}`}

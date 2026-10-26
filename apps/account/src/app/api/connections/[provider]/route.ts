@@ -7,8 +7,14 @@ import crypto from 'crypto';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
-const SUPPORTED_PROVIDERS = ['github', 'twitch', 'youtube', 'twitter', 'spotify', 'reddit', 'steam'] as const;
+const SUPPORTED_PROVIDERS = ['github', 'twitch', 'youtube', 'twitter', 'spotify', 'reddit', 'steam', 'easypanel'] as const;
 type SupportedProvider = (typeof SUPPORTED_PROVIDERS)[number];
+
+async function userHasHostingPermission(models: any, userRoles: string[] = []): Promise<boolean> {
+	if (!Array.isArray(userRoles) || userRoles.length === 0) return false;
+	const roles = await models.core.Role.find({ id: { $in: userRoles } }).lean();
+	return roles.some((r: any) => Boolean(r?.permissions?.hosting));
+}
 
 function base64UrlEncode(buf: Buffer) {
 	return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -26,7 +32,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 	const session = await getServerSession(auth as AuthOptions);
 	const userId = (session?.user as any)?.id;
 	if (!userId) {
+		if (req.nextUrl.searchParams.get('mode') === 'json') {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
 		return NextResponse.redirect(`${origin}/login`);
+	}
+
+	if (provider === 'easypanel') {
+		if (req.nextUrl.searchParams.get('mode') === 'json') {
+			const { models } = await database('xernerx');
+			const user = (await models.users.User.findOne({ id: userId }).lean()) as any;
+			if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+			const allowed = await userHasHostingPermission(models, user.roles || []);
+			if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+			const conn = (Array.isArray(user.connections) ? user.connections : []).find((c: any) => c.provider === 'easypanel') || null;
+			return NextResponse.json({ connection: conn });
+		}
+		return NextResponse.redirect(`${origin}/?view=connections&open=easypanel`);
 	}
 
 	const state = crypto.randomBytes(24).toString('hex');
@@ -162,6 +184,80 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 	return response;
 }
 
+export async function POST(req: NextRequest, { params }: { params: Promise<{ provider: string }> }) {
+	try {
+		const { provider: rawProvider } = await params;
+		const provider = rawProvider.toLowerCase();
+		if (provider !== 'easypanel') {
+			return NextResponse.json({ error: 'Unsupported credential provider' }, { status: 400 });
+		}
+
+		const session = await getServerSession(auth as AuthOptions);
+		const userId = (session?.user as any)?.id;
+		if (!userId) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
+		const { models } = await database('xernerx');
+		const user = (await models.users.User.findOne({ id: userId }).lean()) as any;
+		if (!user) {
+			return NextResponse.json({ error: 'User not found' }, { status: 404 });
+		}
+
+		const allowed = await userHasHostingPermission(models, user.roles || []);
+		if (!allowed) {
+			return NextResponse.json({ error: 'Missing hosting permission' }, { status: 403 });
+		}
+
+		const body = await req.json().catch(() => ({}));
+		const existingConnections = Array.isArray(user.connections) ? user.connections : [];
+		const existingConn = existingConnections.find((c: any) => c.provider === 'easypanel');
+
+		const email = String(body.email ?? existingConn?.username ?? '').trim();
+		if (!email) {
+			return NextResponse.json({ error: 'Easypanel account email is required' }, { status: 400 });
+		}
+
+		const nextSecret = body.password !== undefined ? String(body.password) : existingConn?.secret || '';
+		const nextToken = body.apiToken !== undefined ? String(body.apiToken).trim() : existingConn?.token || '';
+
+		const newConnection = {
+			provider: 'easypanel',
+			id: email.toLowerCase(),
+			username: email,
+			displayName: email,
+			secret: nextSecret,
+			token: nextToken,
+			showOnProfile: false,
+			connectedAt: existingConn?.connectedAt || new Date(),
+		};
+
+		const updatedConnections = [...existingConnections.filter((c: any) => c.provider !== 'easypanel'), newConnection];
+
+		await models.users.User.findOneAndUpdate({ id: userId }, { $set: { connections: updatedConnections } });
+
+		const sanitizedConnections = updatedConnections.map((conn: any) => {
+			const { secret, token, ...rest } = conn;
+			return {
+				...rest,
+				hasSecret: Boolean(secret),
+				hasToken: Boolean(token),
+			};
+		});
+
+		return NextResponse.json({
+			connection: {
+				...newConnection,
+				hasSecret: Boolean(newConnection.secret),
+				hasToken: Boolean(newConnection.token),
+			},
+			connections: sanitizedConnections,
+		});
+	} catch (err: any) {
+		return NextResponse.json({ error: err.message }, { status: 500 });
+	}
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ provider: string }> }) {
 	try {
 		const { provider: rawProvider } = await params;
@@ -173,7 +269,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pr
 		}
 
 		const body = await req.json();
-		const showOnProfile = Boolean(body.showOnProfile);
+		const showOnProfile = provider === 'easypanel' ? false : Boolean(body.showOnProfile);
 
 		const { models } = await database('xernerx');
 		const user = (await models.users.User.findOne({ id: userId }).lean()) as any;

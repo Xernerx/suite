@@ -35,7 +35,6 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 		const items: any[] = [
 			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass, category: t('app.portal.categories.navigation') },
 			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, category: t('app.portal.categories.navigation') },
-			{ label: t('app.home.text7'), href: '/portal', icon: Building2, category: t('app.portal.categories.navigation') },
 			{ label: t('app.users.nav.goBack'), onClick: () => router.back(), icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.users.nav.profile'), view: 'profile', icon: User, category: t('app.users.nav.userDetails') },
 		];

@@ -91,7 +91,7 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('desktopDownload', 'https://www.xernerx.com/download', 'xernerx.com/desktop'),
 					ql('openApplications', 'https://www.xernerx.com/applications', 'xernerx.com/careers • /jobs'),
 					ql('issueTracker', 'https://info.xernerx.com/issues', 'info.xernerx.com/bugs'),
-					ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/orgs'),
+					ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'),
 				]
 			),
 			c(
@@ -259,7 +259,7 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 				['faq.bots.card2.description'],
 				[
 					ql('apiTokens', 'https://account.xernerx.com/?tab=tokens', 'account.xernerx.com/tokens'),
-					ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal'),
+					ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'),
 					ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1'),
 				]
 			),
@@ -268,14 +268,14 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 				'commands',
 				'faq.bots.card9.title',
 				['faq.bots.card9.description'],
-				[ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
+				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
 			),
 			c(
 				'card10',
 				'reviews',
 				'faq.bots.card10.title',
 				['faq.bots.card10.description'],
-				[ql('exploreBots', 'https://app.xernerx.com/bots', 'app.xernerx.com/bots'), ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal')]
+				[ql('exploreBots', 'https://app.xernerx.com/bots', 'app.xernerx.com/bots'), ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com')]
 			),
 			c(
 				'card1',
@@ -290,7 +290,7 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 				'webhooks',
 				'faq.bots.card4.title',
 				['faq.bots.card4.description'],
-				[ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
+				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
 			),
 			c(
 				'card5',
@@ -356,17 +356,14 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 				'organizations',
 				'faq.servers.card4.title',
 				['faq.servers.card4.description'],
-				[ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/orgs'), ql('serverDashboard', 'https://app.xernerx.com/dashboard', 'app.xernerx.com/dashboard')]
+				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('serverDashboard', 'https://app.xernerx.com/dashboard', 'app.xernerx.com/dashboard')]
 			),
 			c(
 				'card5',
 				'transfers',
 				'faq.servers.card5.title',
 				['faq.servers.card5.description'],
-				[
-					ql('devPortal', 'https://app.xernerx.com/portal', 'app.xernerx.com/portal'),
-					ql('serverSettings', 'https://app.xernerx.com/dashboard?tab=settings', 'app.xernerx.com/dashboard?tab=settings'),
-				]
+				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('serverSettings', 'https://app.xernerx.com/dashboard?tab=settings', 'app.xernerx.com/dashboard?tab=settings')]
 			),
 			c(
 				'card6',

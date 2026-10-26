@@ -355,7 +355,12 @@ export function configureOsTaskbarAndDock(opts: {
 						if (!win || win.isDestroyed()) return;
 						win.show();
 						win.focus();
-						win.loadURL(`${opts.webUrl}/portal`).catch(() => {});
+						const portalUrl = resolveDesktopTargetUrl(STARTUP_LOCATION_URLS.portal, {
+							isPackaged: app.isPackaged,
+							isCanary: app.getVersion().includes('canary'),
+							domain: loadEnvDomain(),
+						});
+						win.loadURL(portalUrl).catch(() => {});
 					},
 				},
 				{

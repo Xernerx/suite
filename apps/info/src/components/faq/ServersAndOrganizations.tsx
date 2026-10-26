@@ -69,7 +69,7 @@ export default function ServersAndOrganizations({ searchQuery = '' }: { searchQu
 					<p className="text-(--text) leading-relaxed">{t('faq.servers.card4.description')}</p>
 					<FaqQuickLinks
 						links={[
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/orgs' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 							{ label: t('faq.quickLinks.serverDashboard'), href: 'https://app.xernerx.com/dashboard', vanity: 'app.xernerx.com/dashboard' },
 						]}
 					/>
@@ -85,7 +85,7 @@ export default function ServersAndOrganizations({ searchQuery = '' }: { searchQu
 					<p className="text-(--text) leading-relaxed">{t('faq.servers.card5.description')}</p>
 					<FaqQuickLinks
 						links={[
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/portal' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 							{ label: t('faq.quickLinks.serverSettings'), href: 'https://app.xernerx.com/dashboard?tab=settings', vanity: 'app.xernerx.com/dashboard?tab=settings' },
 						]}
 					/>
@@ -132,7 +132,7 @@ export default function ServersAndOrganizations({ searchQuery = '' }: { searchQu
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.servers.title')}
 			</HeadingTag>

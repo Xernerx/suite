@@ -37,7 +37,7 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 					<FaqQuickLinks
 						links={[
 							{ label: t('faq.quickLinks.apiTokens'), href: 'https://account.xernerx.com/?tab=tokens', vanity: 'account.xernerx.com/tokens' },
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/portal' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 							{ label: t('faq.quickLinks.v1ApiDocs'), href: 'https://docs.xernerx.com/api/v1', vanity: 'docs.xernerx.com/api/v1' },
 						]}
 					/>
@@ -53,7 +53,7 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 					<p className="text-(--text) leading-relaxed">{t('faq.bots.card9.description')}</p>
 					<FaqQuickLinks
 						links={[
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/portal' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 							{ label: t('faq.quickLinks.v1ApiDocs'), href: 'https://docs.xernerx.com/api/v1', vanity: 'docs.xernerx.com/api/v1' },
 						]}
 					/>
@@ -70,7 +70,7 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 					<FaqQuickLinks
 						links={[
 							{ label: t('faq.quickLinks.exploreBots'), href: 'https://app.xernerx.com/bots', vanity: 'app.xernerx.com/bots' },
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/portal' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 						]}
 					/>
 				</div>
@@ -114,7 +114,7 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 					<p className="text-(--text) leading-relaxed">{t('faq.bots.card4.description')}</p>
 					<FaqQuickLinks
 						links={[
-							{ label: t('faq.quickLinks.devPortal'), href: 'https://app.xernerx.com/portal', vanity: 'app.xernerx.com/portal' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
 							{ label: t('faq.quickLinks.v1ApiDocs'), href: 'https://docs.xernerx.com/api/v1', vanity: 'docs.xernerx.com/api/v1' },
 						]}
 					/>
@@ -160,7 +160,7 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 	const HeadingTag = q ? 'h2' : 'h1';
 
 	return (
-		<div className="flex flex-col max-w-7xl mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<HeadingTag className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 				{t('faq.bots.title')}
 			</HeadingTag>

@@ -14,11 +14,22 @@ let socket: net.Socket | null = null;
 let pendingClient: net.Socket | null = null;
 let isReady = false;
 let isEnabled = true;
+let isIdleOverride = false;
 const startTimestamp = Math.floor(Date.now() / 1000);
 let lastActivity: RpcActivityPayload = {
 	details: 'In Xernerx Desktop',
 	state: 'Managing Workspace',
 };
+
+function getEffectiveActivity(): RpcActivityPayload {
+	if (isIdleOverride) {
+		return {
+			details: lastActivity.details || 'In Xernerx Desktop',
+			state: 'Away from Desk (Idle)',
+		};
+	}
+	return lastActivity;
+}
 
 function getIpcPath(index: number): string {
 	if (process.platform === 'win32') {
@@ -95,7 +106,7 @@ function tryConnectPipe(index = 0) {
 		}
 		if (!isReady) {
 			isReady = true;
-			sendActivityFrame(lastActivity);
+			sendActivityFrame(getEffectiveActivity());
 		}
 	});
 
@@ -157,6 +168,14 @@ export function syncDiscordRpc(enabled: boolean, activity?: RpcActivityPayload) 
 	if (!socket || socket.destroyed) {
 		tryConnectPipe(0);
 	} else if (isReady) {
-		sendActivityFrame(lastActivity);
+		sendActivityFrame(getEffectiveActivity());
+	}
+}
+
+export function setRpcIdleOverride(idle: boolean) {
+	if (isIdleOverride === idle) return;
+	isIdleOverride = idle;
+	if (isEnabled && isReady) {
+		sendActivityFrame(getEffectiveActivity());
 	}
 }

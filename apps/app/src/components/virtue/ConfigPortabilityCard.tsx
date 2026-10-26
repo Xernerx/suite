@@ -6,6 +6,11 @@ import { Copy, Download, FileJson, Sparkles, Upload } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
 
+export interface VirtueLevelRole {
+	level: number;
+	roleId: string;
+}
+
 export interface VirtueConfigShape {
 	mode: 'easy' | 'casual' | 'balanced' | 'hard' | 'extreme';
 	cycles: {
@@ -16,7 +21,9 @@ export interface VirtueConfigShape {
 	roles: {
 		ignored: string[];
 		tracked: string[];
+		levels?: VirtueLevelRole[];
 	};
+	levelRoles?: VirtueLevelRole[];
 	levelUp: boolean;
 	levelMessage: string;
 	levelChannel: string | null;
@@ -30,32 +37,33 @@ interface ConfigPortabilityCardProps {
 	managedGuilds?: { id: string; name: string }[];
 }
 
-export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyConfig, managedGuilds = [] }: ConfigPortabilityCardProps) {
+export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyConfig, managedGuilds }: ConfigPortabilityCardProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { data: session } = useSession();
 	const { toast } = useToast();
 
-	const [guilds, setGuilds] = useState<{ id: string; name: string }[]>(managedGuilds);
+	const [guilds, setGuilds] = useState<{ id: string; name: string }[]>(() => (managedGuilds ? managedGuilds.filter((g) => g.id !== guildId) : []));
 	const [sourceGuildId, setSourceGuildId] = useState<string>('');
 	const [cloning, setCloning] = useState<boolean>(false);
 
 	const [importModalOpen, setImportModalOpen] = useState<boolean>(false);
 	const [importJsonText, setImportJsonText] = useState<string>('');
 
+	const userId = (session as any)?.user?.id as string | undefined;
+	const accessToken = (session as any)?.accessToken as string | undefined;
+
 	useEffect(() => {
-		if (managedGuilds.length > 0) {
+		if (managedGuilds && managedGuilds.length > 0) {
 			setGuilds(managedGuilds.filter((g) => g.id !== guildId));
 			return;
 		}
-		if (!isReady) return;
-		const sessionData = session as any;
-		if (!sessionData?.user?.id) return;
+		if (!isReady || !userId) return;
 
 		const fetchManagedGuilds = async () => {
 			try {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${sessionData.user.id}/discord/guilds`), {
-					headers: sessionData.accessToken ? { Authorization: `Bearer ${sessionData.accessToken}` } : undefined,
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${userId}/discord/guilds`), {
+					headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
 				});
 				if (res.ok) {
 					const data = await res.json();
@@ -74,7 +82,7 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 		};
 
 		fetchManagedGuilds();
-	}, [guildId, managedGuilds, isReady, session, getEnvUrl]);
+	}, [guildId, managedGuilds, isReady, userId, accessToken, getEnvUrl]);
 
 	const handleExportJson = () => {
 		const exportPayload = {
@@ -110,6 +118,7 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 				mode: cfg.mode,
 				cycles: cfg.cycles,
 				roles: cfg.roles,
+				levelRoles: cfg.levelRoles || cfg.roles?.levels,
 				levelUp: cfg.levelUp,
 				levelMessage: cfg.levelMessage,
 				levelChannel: cfg.levelChannel,
@@ -161,6 +170,7 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 				mode: data.mode,
 				cycles: data.cycles,
 				roles: data.roles,
+				levelRoles: data.levelRoles || data.roles?.levels,
 				levelUp: data.levelUp,
 				levelMessage: data.levelMessage,
 				levelChannel: data.levelChannel,

@@ -181,22 +181,24 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			className={`flex flex-col selection:bg-(--accent) selection:text-white ${pageReady ? '' : 'pointer-events-none select-none'}`}
 		>
 			{/* HERO SECTION — Sits cleanly beneath the constructed XERNERX dot-matrix stage */}
-			<section className="min-h-screen flex flex-col items-center justify-start px-6 pt-[52vh] sm:pt-[54vh] pb-12 relative">
+			<section className="min-h-screen flex flex-col items-center justify-start px-6 pt-[52vh] sm:pt-[54vh] pb-12 relative z-30">
 				<div className="w-full max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
 					<motion.div
 						initial={{ opacity: 0, y: 36 }}
 						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
 						transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-						className="w-full flex flex-col items-center text-center bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 rounded-[2.75rem] px-8 py-8 sm:px-12 sm:py-10 lg:px-16 lg:py-11 shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_18%,transparent)] relative overflow-hidden"
+						className="w-full flex flex-col items-center text-center bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 rounded-[2.75rem] px-8 py-8 sm:px-12 sm:py-10 lg:px-16 lg:py-11 shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_18%,transparent)] relative"
 					>
-						<div
-							className="absolute inset-0 opacity-[0.06] pointer-events-none"
-							style={{
-								backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
-								backgroundSize: '20px 20px',
-							}}
-						/>
-						<div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[32rem] h-36 rounded-full bg-(--accent)/15 blur-3xl pointer-events-none" />
+						<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2.75rem]">
+							<div
+								className="absolute inset-0 opacity-[0.06]"
+								style={{
+									backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
+									backgroundSize: '20px 20px',
+								}}
+							/>
+							<div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[32rem] h-36 rounded-full bg-(--accent)/15 blur-3xl" />
+						</div>
 
 						<h1
 							className="relative z-10 text-4xl sm:text-5xl lg:text-6xl xl:text-[4.25rem] font-extrabold tracking-tight mb-4 leading-[1.06] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
@@ -319,7 +321,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			{/* CONSUMER SERVICES (Horizontal Scroll) */}
 			<section id="services" ref={servicesRef} className="relative h-[300vh]">
 				<div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
-					<div className="w-full max-w-7xl mx-auto text-left mb-16 relative z-10 px-6 xl:px-[15vw]">
+					<div className="w-full text-left mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('www.sections.consumer.title')}
 						</h2>
@@ -339,7 +341,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			{/* DEVELOPER SOFTWARE (Mirrored Horizontal Scroll) */}
 			<section id="software" ref={softwareRef} className="relative h-[200vh]">
 				<div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
-					<div className="w-full max-w-7xl mx-auto text-right mb-16 relative z-10 px-6 xl:px-[15vw]">
+					<div className="w-full text-right mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('www.sections.developer.title')}
 						</h2>

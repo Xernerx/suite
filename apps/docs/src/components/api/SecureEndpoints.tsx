@@ -311,6 +311,7 @@ export function SecureEndpoints({ activeGroup = 'all', searchQuery = '', methodF
 				{ method: 'GET', path: '/secure/core/lighthouse', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/core/audit', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/core/audit', auth: 'secure' as const },
+				{ method: 'POST', path: '/secure/hosting/ssh', auth: 'secure' as const },
 			],
 		},
 	].filter((s) => activeGroup === 'all' || s.group === activeGroup);

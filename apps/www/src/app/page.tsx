@@ -5,18 +5,33 @@ import HomeClient, { ShowcasePackage } from '@/components/HomeClient';
 const FALLBACK_SHOWCASE_PACKAGES: ShowcasePackage[] = [
 	{
 		name: 'xernerx',
-		desc: 'Core command-line orchestration and ecosystem utilities for the Xernerx Suite.',
+		desc: 'The official all-in-one Xernerx Suite SDK and bot framework, bundling and re-exporting @xernerx/framework, @xernerx/commands, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket.',
 		link: 'https://docs.xernerx.com/packages/xernerx',
 	},
 	{
 		name: '@xernerx/framework',
-		desc: 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, and multi-shard coordination.',
+		desc: 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, extensions, and multi-shard coordination.',
 		link: 'https://docs.xernerx.com/packages/@xernerx/framework',
 	},
 	{
+		name: '@xernerx/commands',
+		desc: 'Extension for @xernerx/framework containing Jishaku-inspired developer commands (xc!, evaluate, ping, shell, git, source, debug, repeat, su/sudo, transpile, haste, documentation) and automatic command synchronization.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/commands',
+	},
+	{
 		name: '@xernerx/stats',
-		desc: 'Lightweight daemon for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.',
+		desc: 'Official SDK for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.',
 		link: 'https://docs.xernerx.com/packages/@xernerx/stats',
+	},
+	{
+		name: '@xernerx/websocket',
+		desc: 'Universal client library for connecting, authenticating, and making RPC queries against the Xernerx WebSocket microservice router.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/websocket',
+	},
+	{
+		name: '@xernerx/terminal',
+		desc: 'A powerful CLI logger and interactive terminal spinner for Xernerx projects.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/terminal',
 	},
 ];
 
