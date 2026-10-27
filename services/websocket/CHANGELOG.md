@@ -2,6 +2,12 @@
 
 # @xernerx/websocket
 
+## 1.3.6
+
+### Patch Changes
+
+- Fixed issues regarding the spawn process in different environment
+
 ## 1.3.5
 
 ### Patch Changes
