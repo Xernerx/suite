@@ -153,8 +153,10 @@ async function start() {
 	await loadServices();
 
 	const port = Number(process.env.PORT) || 5000;
+	const isDev = process.env.ENVIRONMENT?.toUpperCase() === 'DEVELOPMENT' || process.env.NODE_ENV?.toUpperCase() === 'DEVELOPMENT';
+	const publicWsUrl = isDev ? 'wss://ws.dev.xernerx.com' : 'wss://ws.xernerx.com';
 
-	const server = http.createServer((req, res) => {
+	const requestHandler: http.RequestListener = (req, res) => {
 		res.setHeader('Access-Control-Allow-Origin', '*');
 		res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 		res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -173,12 +175,24 @@ async function start() {
 
 		res.writeHead(200, { 'Content-Type': 'text/plain' });
 		res.end('alive');
-	});
+	};
 
-	const wss = new WebSocketServer({ server });
+	const server = http.createServer(requestHandler);
+
+	const wss = new WebSocketServer({ noServer: true });
 	wss.on('error', (err) => {
 		terminal.error(`WebSocketServer error: ${err.message}`);
 	});
+
+	const attachUpgradeHandler = (httpServer: http.Server) => {
+		httpServer.on('upgrade', (req, socket, head) => {
+			wss.handleUpgrade(req, socket, head, (ws) => {
+				wss.emit('connection', ws, req);
+			});
+		});
+	};
+
+	attachUpgradeHandler(server);
 
 	wss.on('connection', (ws: AuthedWebSocket, req) => {
 		ws.authed = false;
@@ -299,12 +313,26 @@ async function start() {
 		});
 	});
 
-	server.listen(port, () => {
+	server.listen(port, '0.0.0.0', () => {
 		terminal.log(`Server running on port ${port}`);
 		terminal.log(`Local gateway: ws://localhost:${port}`);
-		terminal.log(`Cloudflare tunnel: wss://ws.dev.xernerx.com`);
+		terminal.log(`Cloudflare tunnel: ${publicWsUrl}`);
 		terminal.log(`Websocket is ready`);
 	});
+
+	if (!process.env.PORT && !isDev) {
+		for (const fallbackPort of [80, 3000]) {
+			if (fallbackPort === port) continue;
+			try {
+				const auxServer = http.createServer(requestHandler);
+				attachUpgradeHandler(auxServer);
+				auxServer.on('error', () => {});
+				auxServer.listen(fallbackPort, '0.0.0.0', () => {
+					terminal.log(`Auxiliary listener bound on port ${fallbackPort}`);
+				});
+			} catch {}
+		}
+	}
 }
 
 start();
