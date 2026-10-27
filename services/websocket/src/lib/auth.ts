@@ -76,8 +76,17 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
 			};
 		}
 
-		// Record token usage telemetry
-		await TokenModel.updateOne({ id: tokenDoc.id }, { $inc: { requestCount: 1 }, $set: { lastUsedAt: new Date() } }).catch(() => {});
+		// Record token usage telemetry and activate pending tokens
+		await TokenModel.updateOne(
+			{ id: tokenDoc.id },
+			{
+				$inc: { requestCount: 1 },
+				$set: {
+					lastUsedAt: new Date(),
+					...(tokenDoc.status === 'pending' ? { status: 'active' } : {}),
+				},
+			}
+		).catch(() => {});
 
 		return {
 			valid: true,

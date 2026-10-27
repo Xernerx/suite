@@ -2,6 +2,18 @@
 
 # @xernerx/websocket
 
+## 1.3.6
+
+### Patch Changes
+
+- Fixed issues regarding the spawn process in different environment
+
+## 1.3.5
+
+### Patch Changes
+
+- Updated WebSocket startup logging to use `wss://ws.xernerx.com` in production and `wss://ws.dev.xernerx.com` in development, bound auxiliary HTTP/WebSocket upgrade listeners on ports 80 and 3000 in production for reverse-proxy compatibility, and automatically activated pending tokens on first WebSocket authentication.
+
 ## 1.3.4
 
 ### Patch Changes
