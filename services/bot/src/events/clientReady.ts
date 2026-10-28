@@ -1,10 +1,12 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { createLogger, database } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { EmbedBuilder } from 'discord.js';
 import { DEFAULT_XERNERX_COLOR, syncBotCommands, updateBotPresence } from '../lib/botUtils.js';
 import { syncMilestoneApplicationEmojis } from '../lib/milestoneEmojis.js';
+
+const botLog = createLogger('BOT');
 
 export default class BotClientReadyEvent extends EventBuilder {
 	constructor() {
@@ -72,7 +74,7 @@ export default class BotClientReadyEvent extends EventBuilder {
 				}
 			}
 		} catch (error) {
-			console.error('Failed to sync guilds:', error);
+			botLog.error(`Failed to sync guilds: ${(error as any)?.message || error}`);
 		}
 
 		try {
@@ -111,7 +113,7 @@ export default class BotClientReadyEvent extends EventBuilder {
 
 			setTimeout(this.updateGuilds.bind(this), cooldown);
 		} catch (err) {
-			console.error('Failed to send stats embed', err);
+			botLog.error(`Failed to send stats embed: ${(err as any)?.message || err}`);
 			const cooldown = new Date().setHours(24, 0, 0, 0) - new Date().getTime();
 			setTimeout(this.updateGuilds.bind(this), cooldown);
 		}
@@ -153,7 +155,7 @@ export default class BotClientReadyEvent extends EventBuilder {
 				);
 			}
 		} catch (error) {
-			console.error('Failed to sync guild stats:', error);
+			botLog.error(`Failed to sync guild stats: ${(error as any)?.message || error}`);
 		}
 
 		setTimeout(this.updateStats.bind(this), 10 * 60 * 1000);

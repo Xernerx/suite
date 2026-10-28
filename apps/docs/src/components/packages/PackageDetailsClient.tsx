@@ -11,7 +11,7 @@ import { VersionSelector } from '@/components/packages/VersionSelector';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 
-const BUNDLED_SUBPACKAGES = ['@xernerx/framework', '@xernerx/commands', '@xernerx/stats', '@xernerx/terminal', '@xernerx/websocket'];
+const BUNDLED_SUBPACKAGES = ['@xernerx/framework', '@xernerx/commands', '@xernerx/hooks', '@xernerx/stats', '@xernerx/terminal', '@xernerx/websocket'];
 
 export function PackageDetailsClient({ data, availableVersions, pkgName, version }: { data: any; availableVersions: string[]; pkgName: string; version: string }) {
 	const { t } = useDictionary();

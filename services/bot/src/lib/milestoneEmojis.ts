@@ -3,7 +3,9 @@
 import fs from 'fs';
 import path from 'path';
 import { Client } from 'discord.js';
-import { MEMBER_MILESTONES, SERVER_MILESTONES } from '@xernerx/lib/core';
+import { createLogger, MEMBER_MILESTONES, SERVER_MILESTONES } from '@xernerx/lib/core';
+
+const botLog = createLogger('BOT');
 
 let emojiCacheLoadedAt = 0;
 const EMOJI_CACHE_TTL_MS = 5 * 60 * 1000;
@@ -103,7 +105,7 @@ export async function syncMilestoneApplicationEmojis(client: Client): Promise<vo
 
 		if (uploaded > 0) {
 			emojiCacheLoadedAt = Date.now();
-			console.log(`[Milestones] Synced ${uploaded} milestone badge emoji(s) to application emojis.`);
+			botLog.log(`Synced ${uploaded} milestone badge emoji(s) to application emojis.`);
 		}
 	} catch {
 	} finally {

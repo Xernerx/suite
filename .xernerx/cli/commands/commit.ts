@@ -5,6 +5,10 @@ import { spawnSync, execSync } from 'child_process';
 import { select, isCancel } from '@clack/prompts';
 import fs from 'fs';
 import path from 'path';
+import { terminal } from '../utils/terminal';
+
+const commitLog = terminal.child({ scope: 'COMMIT' });
+const i18nLog = terminal.child({ scope: 'I18N' });
 
 function runSync(cmd: string) {
 	spawnSync(cmd, { stdio: 'inherit', shell: true });
@@ -153,7 +157,7 @@ function pruneUpdatedLocaleKeys() {
 			if (keysToRemove.length > 0) {
 				for (const k of keysToRemove) deleteNestedKey(localeObj, k);
 				fs.writeFileSync(localePath, JSON.stringify(localeObj, null, '\t') + '\n');
-				console.log(`[i18n] Pruned ${keysToRemove.length} updated/orphaned key(s) from ${file}: ${keysToRemove.join(', ')}`);
+				i18nLog.log(`Pruned ${keysToRemove.length} updated/orphaned key(s) from ${file}: ${keysToRemove.join(', ')}`);
 			}
 		}
 	} catch {
@@ -196,7 +200,7 @@ export default function registerCommit(program: Command) {
 							}
 
 							fs.writeFileSync(termsPromptPath, content);
-							console.log(`\n✅ Bumped ${changedLabels} date(s) to ${newDate} in TermsPrompt.tsx\n`);
+							commitLog.log(`✔ Bumped ${changedLabels} date(s) to ${newDate} in TermsPrompt.tsx`);
 
 							execSync(`git add "${termsPromptPath}"`);
 						}
@@ -218,7 +222,7 @@ export default function registerCommit(program: Command) {
 							content = content.replace(/const COOKIES_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const COOKIES_VERSION = new Date('${newDate}').getTime();`);
 
 							fs.writeFileSync(cookieProviderPath, content);
-							console.log(`\n✅ Bumped COOKIES_VERSION date to ${newDate} in CookieProvider.tsx\n`);
+							commitLog.log(`✔ Bumped COOKIES_VERSION date to ${newDate} in CookieProvider.tsx`);
 
 							execSync(`git add "${cookieProviderPath}"`);
 						}

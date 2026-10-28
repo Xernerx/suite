@@ -49,7 +49,7 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 							{
 								label: '@xernerx/commands SDK',
 								language: 'typescript',
-								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst currentCommands = await commands.getCommands();\nconsole.log(currentCommands);`,
+								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst currentCommands = await commands.get();\nconsole.log(currentCommands);`,
 							},
 							{
 								label: 'Python',
@@ -92,7 +92,7 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 							{
 								label: '@xernerx/commands (CommandsClient)',
 								language: 'typescript',
-								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait commands.postCommands([\n    {\n        name: 'ping',\n        description: 'Replies with Pong!',\n        type: 1\n    }\n]);`,
+								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait commands.post([\n    {\n        name: 'ping',\n        description: 'Replies with Pong!',\n        type: 1\n    }\n]);`,
 							},
 							{
 								label: 'TypeScript (fetch)',
@@ -140,7 +140,7 @@ export function V1CommandsEndpoints({ activeGroup = 'all', searchQuery = '', met
 							{
 								label: '@xernerx/commands SDK',
 								language: 'typescript',
-								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\n// Delete a single command by ID or name, or clear all commands\nawait commands.deleteCommands('ping');\nawait commands.clearCommands();`,
+								code: `import { CommandsClient } from '@xernerx/commands';\n\nconst commands = new CommandsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\n// Delete a single command by ID or name, or clear all commands\nawait commands.delete('ping');\nawait commands.clear();`,
 							},
 							{
 								label: 'Python',

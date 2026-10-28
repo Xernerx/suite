@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { CodeBlock, Input, Selector } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
-import { Activity, Bot, Code, Rocket, Rss, Trophy, Webhook } from 'lucide-react';
+import { Activity, Bot, Code, FileCode2, Rocket, Rss, Trophy, Webhook } from 'lucide-react';
 import { EndpointSection } from './EndpointSection';
 
 interface V1SubProps {
@@ -263,6 +263,11 @@ export function V1PlatformEndpoints({
 						<CodeBlock
 							tabs={[
 								{
+									label: '@xernerx/hooks (Extension)',
+									language: 'typescript',
+									code: `import { XernerxHooks } from '@xernerx/hooks';\n\nclient.modules.extensionHandler.loadExtensions(\n  new XernerxHooks(client, {\n    token: process.env.XERNERX_TOKEN!,\n    secret: process.env.XERNERX_WEBHOOK_SECRET!,\n    port: 3000,\n    path: '/webhooks/xernerx',\n  })\n);`,
+								},
+								{
 									label: 'Express / Node.js Receiver',
 									language: 'typescript',
 									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat", "POST release"\n  const deliveryId = req.headers['x-xernerx-delivery'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
@@ -280,6 +285,47 @@ export function V1PlatformEndpoints({
 							]}
 						/>
 					</div>
+				</div>
+			),
+		},
+		{
+			id: 'haste-documents',
+			title: t('docs.api.v1.endpoints.hasteDocuments.title'),
+			icon: FileCode2,
+			description: t('docs.api.v1.endpoints.hasteDocuments.description'),
+			routes: [
+				{ method: 'GET', path: '/v1/haste', auth: 'public' as const },
+				{ method: 'POST', path: '/v1/haste', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/haste/:id', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/haste/:id/raw', auth: 'public' as const },
+				{ method: 'PATCH', path: '/v1/haste/:id', auth: 'public' as const },
+				{ method: 'DELETE', path: '/v1/haste/:id', auth: 'public' as const },
+				{ method: 'POST', path: 'https://haste.xernerx.com/documents/:userId', auth: 'public' as const },
+			],
+			extra: (
+				<div className="p-6 border-t border-(--border)/10">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
+					</h3>
+					<CodeBlock
+						tabs={[
+							{
+								label: '@xernerx/commands',
+								language: 'typescript',
+								code: `// Drop-in Hastebin compatible endpoint verified by Xernerx userId (from client.owners)\nconst ownerId = client.owners?.[0] ?? 'YOUR_XERNERX_USER_ID';\nconst response = await fetch(\`https://haste.xernerx.com/documents/\${ownerId}\`, {\n\tmethod: 'POST',\n\tbody: codeOutput,\n});\nconst { key } = await response.json();\nconsole.log(\`https://haste.xernerx.com/\${key}\`);`,
+							},
+							{
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/haste', {\n\tmethod: 'POST',\n\theaders: { 'Content-Type': 'application/json' },\n\tbody: JSON.stringify({\n\t\tuserId: 'YOUR_XERNERX_USER_ID',\n\t\ttitle: 'Eval Log',\n\t\tlanguage: 'typescript',\n\t\tprivacy: 'limited',\n\t\texpiresIn: '7d',\n\t\tcontent: 'console.log("Hello Xernerx Haste!");',\n\t}),\n});\nconst { key, url, rawUrl } = await response.json();`,
+							},
+							{
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X POST "https://haste.xernerx.com/documents/YOUR_XERNERX_USER_ID?language=typescript&expiresIn=7d" \\\n  -H "Content-Type: text/plain" \\\n  --data-binary "console.log('Hello Xernerx Haste!');"`,
+							},
+						]}
+					/>
 				</div>
 			),
 		},

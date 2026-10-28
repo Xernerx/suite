@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/cli",
-	"version": "2.4.1",
+	"version": "2.4.2",
 	"type": "module",
 	"description": "Internal CLI for Xernerx Suite",
 	"private": true,
@@ -10,6 +10,7 @@
 	"dependencies": {
 		"@changesets/cli": "^3.0.3",
 		"@clack/prompts": "^1.8.1",
+		"@xernerx/terminal": "^1.1.15",
 		"commander": "^15.0.0",
 		"mongodb-memory-server": "^11.3.0",
 		"shx": "^0.4.0",

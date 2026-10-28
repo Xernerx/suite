@@ -4,14 +4,17 @@ import fs from 'fs';
 import path from 'path';
 import { Command } from 'commander';
 import { runCommand } from '../utils/run';
+import { terminal } from '../utils/terminal';
 import crypto from 'crypto';
 import { text, isCancel } from '@clack/prompts';
 import { getLocalIp } from '../utils/ip';
 
+const initLog = terminal.child({ scope: 'INIT' });
+
 async function ask(message: string, placeholder = ''): Promise<string> {
 	const res = await text({ message, placeholder });
 	if (isCancel(res)) {
-		console.log('\n[CLI] Setup cancelled.');
+		initLog.warn('Setup cancelled.');
 		process.exit(0);
 	}
 	return (res as string) || '';
@@ -20,14 +23,12 @@ async function ask(message: string, placeholder = ''): Promise<string> {
 export async function initCommand() {
 	const rootEnv = path.join(process.cwd(), '.env');
 
-	console.log('\n=======================================');
-	console.log('   Xernerx Suite - Environment Setup   ');
-	console.log('=======================================\n');
+	initLog.box('Xernerx Suite - Environment Setup');
 
 	let domain = await ask('What is the primary domain for this project? (Leave blank for local pure dev)');
 	if (!domain || domain.trim() === '') {
 		domain = getLocalIp();
-		console.log(`[CLI] No domain provided. Defaulting to local IP: ${domain}`);
+		initLog.log(`No domain provided. Defaulting to local IP: ${domain}`);
 	}
 	const discordClientId = await ask('Discord Client ID (Optional):');
 	const discordClientSecret = await ask('Discord Client Secret (Optional):');
@@ -127,13 +128,13 @@ MONGO_VIRTUE="${mongoXernerx}"
 `;
 
 	fs.writeFileSync(rootEnv, boilerplateEnv);
-	console.log('\n[init] Generated root .env file.');
+	initLog.log('Generated root .env file.');
 
-	console.log('[init] Syncing .env to all workspaces...');
+	initLog.log('Syncing .env to all workspaces...');
 	walkAndSync(process.cwd(), rootEnv);
-	console.log('[init] Environment synchronization complete!\n');
+	initLog.log('Environment synchronization complete!');
 
-	console.log('================================================================');
+	console.log('\n================================================================');
 	console.log(' 🔑 ACTION REQUIRED: CLAIM MASTER ADMIN (OWNER) ROLE');
 	console.log('================================================================');
 	console.log(' To access the Admin Dashboard on this fresh setup, you must');
@@ -172,11 +173,11 @@ export default function registerInit(program: Command) {
 			const rootEnvPath = path.join(process.cwd(), '.env');
 			const envInitialized = fs.existsSync(rootEnvPath);
 			if (envInitialized) {
-				console.log('\n[CLI] Suite is already initialized! Please use the native `suite` command directly for other operations (e.g., `suite dev`).\n');
+				initLog.warn('Suite is already initialized! Please use the native `suite` command directly for other operations (e.g., `suite dev`).');
 				process.exit(0);
 			} else {
 				await initCommand();
-				console.log('[CLI] Linking the `suite` command globally so you can use it natively...');
+				initLog.log('Linking the `suite` command globally so you can use it natively...');
 				runCommand('npm', ['link']);
 			}
 		});

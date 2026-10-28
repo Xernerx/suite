@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { Command } from 'commander';
 import { runCommand } from './utils/run';
+import { terminal } from './utils/terminal';
 import { initCommand } from './commands/init';
 import registerInit from './commands/init';
 import registerDev from './commands/dev';
@@ -25,7 +26,7 @@ async function main() {
 	const isSkippedCommand = process.argv.some((arg) => skipInitCommands.includes(arg));
 
 	if (!fs.existsSync(rootEnvPath) && !isCI && !isSkippedCommand) {
-		console.log('\n[CLI] No .env file found. Running interactive initialization...');
+		terminal.log('No .env file found. Running interactive initialization...');
 		await initCommand();
 		envInitialized = true;
 	}
@@ -49,7 +50,7 @@ async function main() {
 	program.action(async () => {
 		if (!fs.existsSync(rootEnvPath) && !envInitialized && !isCI && !isSkippedCommand) {
 			await initCommand();
-			console.log('[CLI] Linking the `suite` command globally so you can use it natively...');
+			terminal.log('Linking the `suite` command globally so you can use it natively...');
 			runCommand('npm', ['link']);
 		} else {
 			program.help();
@@ -60,6 +61,6 @@ async function main() {
 }
 
 main().catch((err) => {
-	console.error(err);
+	terminal.error(err);
 	process.exit(1);
 });

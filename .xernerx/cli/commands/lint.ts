@@ -5,6 +5,9 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { runCommand } from '../utils/run';
+import { terminal } from '../utils/terminal';
+
+const lintLog = terminal.child({ scope: 'LINT' });
 
 const VALID_ROUTER_FILES = new Set([
 	'page.tsx',
@@ -211,15 +214,14 @@ export function runSuiteArchitectureLint(): boolean {
 	}
 
 	if (errors.length > 0) {
-		console.error(`\n[Suite Lint] Found ${errors.length} AGENTS.md compliance violation(s):`);
+		lintLog.error(`Found ${errors.length} AGENTS.md compliance violation(s):`);
 		for (const err of errors) {
-			console.error(`  ✖ ${err}`);
+			lintLog.error(`  ✖ ${err}`);
 		}
-		console.error('');
 		return false;
 	}
 
-	console.log('[Suite Lint] ✔ All AGENTS.md architecture, localization & living documentation checks passed (500-line cap, src/components, 3-route API, t() & en-GB.json, API docs sync).');
+	lintLog.log('✔ All AGENTS.md architecture, localization & living documentation checks passed (500-line cap, src/components, 3-route API, t() & en-GB.json, API docs sync).');
 	return true;
 }
 

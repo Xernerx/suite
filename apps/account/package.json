@@ -1,6 +1,6 @@
 {
 	"name": "account",
-	"version": "2.9.1",
+	"version": "2.9.2",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
@@ -16,6 +16,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
+		"@xernerx/terminal": "^1.1.15",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.6.0",
 		"lucide-react": "^1.61.0",

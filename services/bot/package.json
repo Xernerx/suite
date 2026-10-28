@@ -1,6 +1,6 @@
 {
 	"name": "bot",
-	"version": "2.1.1",
+	"version": "2.1.2",
 	"description": "Xernerx Bot Discord daemon for directory, stats, and guild synchronization",
 	"main": "dist/main.js",
 	"type": "module",
@@ -24,10 +24,11 @@
 		"typescript": "^6.0.3"
 	},
 	"dependencies": {
-		"@xernerx/commands": "^0.2.2",
-		"@xernerx/framework": "^1.0.3",
+		"@xernerx/commands": "^0.2.6",
+		"@xernerx/framework": "^1.1.1",
 		"@xernerx/lib": "workspace:*",
-		"@xernerx/stats": "^1.0.12",
+		"@xernerx/stats": "^1.0.14",
+		"@xernerx/terminal": "^1.1.15",
 		"discord.js": "^14.27.0",
 		"mongoose": "^9.11.4",
 		"next": "^16.4.3",

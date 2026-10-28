@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/lib",
-	"version": "1.15.0",
+	"version": "1.16.0",
 	"private": true,
 	"main": "./index.ts",
 	"type": "module",
@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@react-email/render": "^2.1.1",
+		"@xernerx/terminal": "^1.1.15",
 		"lucide-react": "^1.61.0",
 		"mongoose": "^9.11.4",
 		"next": "^16.4.3",

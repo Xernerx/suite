@@ -33,12 +33,12 @@ minimumReleaseAgeExclude:
     - '@next/swc-win32-arm64-msvc@16.3.1'
     - '@next/swc-win32-x64-msvc@16.3.1'
     - next@16.3.1
-    - '@xernerx/commands@0.2.2'
-    - '@xernerx/commands@0.2.3'
-    - '@xernerx/framework@1.0.3'
-    - '@xernerx/stats@1.0.12'
-    - '@xernerx/terminal@1.1.14'
+    - '@xernerx/commands@0.2.2 || 0.2.3 || 0.2.4 || 0.2.6'
+    - '@xernerx/framework@1.0.3 || 1.1.1'
+    - '@xernerx/stats@1.0.12 || 1.0.14'
+    - '@xernerx/terminal@1.1.14 || 1.1.15'
     - 'xernerx@5.0.1'
+    - '@xernerx/extension-builder@0.1.0'
 
 overrides:
     suite: 'link:'

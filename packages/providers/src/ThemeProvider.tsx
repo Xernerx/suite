@@ -12,11 +12,11 @@ export type LayoutAlignment = 'system' | 'left' | 'right';
 export type DotMatrixStage = 'default' | 'ripple' | 'orbit' | 'blank';
 export type DotMatrixType = 'default' | 'full' | 'icon' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'blank';
 export type DotMatrixAnimation = 'animate' | 'static' | 'always';
-export type HeaderSubdomainId = 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'api' | 'www' | 'admin' | 'hosting';
+export type HeaderSubdomainId = 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'api' | 'www' | 'admin' | 'hosting';
 
 const VALID_MATRIX_TYPES: readonly DotMatrixType[] = ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'blank'];
 const VALID_MATRIX_ANIMS: readonly DotMatrixAnimation[] = ['animate', 'static', 'always'];
-export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'api', 'www', 'admin', 'hosting'];
+export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'api', 'www', 'admin', 'hosting'];
 export const DEFAULT_HEADER_SUBDOMAINS: HeaderSubdomainId[] = ['portal', 'store'];
 
 export function parseHeaderSubdomains(raw: unknown): HeaderSubdomainId[] | null {

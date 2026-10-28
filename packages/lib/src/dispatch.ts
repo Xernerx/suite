@@ -2,6 +2,9 @@
 
 import { ServerClient } from 'postmark';
 import { render } from '@react-email/render';
+import { createLogger } from './terminal';
+
+const dispatchLog = createLogger('DISPATCH');
 
 let postmarkClient: ServerClient | null = null;
 let cachedPostmarkToken: string | undefined;
@@ -25,7 +28,7 @@ export interface MailPayload {
 export async function sendMail(payload: MailPayload) {
 	const client = getPostmarkClient();
 	if (!client) {
-		console.warn('POSTMARK_TOKEN is missing. Email dispatch skipped.', payload.subject);
+		dispatchLog.warn(`POSTMARK_TOKEN is missing. Email dispatch skipped: ${payload.subject}`);
 		return;
 	}
 
@@ -38,7 +41,7 @@ export async function sendMail(payload: MailPayload) {
 			HtmlBody: html,
 		});
 	} catch (error) {
-		console.error('Failed to send email via Postmark:', error);
+		dispatchLog.error(`Failed to send email via Postmark: ${(error as any)?.message || error}`);
 		throw error;
 	}
 }
@@ -67,7 +70,7 @@ export async function sendWebhook(payload: WebhookPayload) {
 			throw new Error(`Discord Webhook returned ${res.status}: ${text}`);
 		}
 	} catch (error) {
-		console.error('Failed to send Discord webhook:', error);
+		dispatchLog.error(`Failed to send Discord webhook: ${(error as any)?.message || error}`);
 		throw error;
 	}
 }

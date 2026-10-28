@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/app",
-	"version": "2.3.0",
+	"version": "2.3.1",
 	"description": "Xernerx App Discord bot daemon for support, docs, status, and community hub",
 	"main": "dist/main.js",
 	"type": "module",
@@ -24,9 +24,10 @@
 		"typescript": "^6.0.3"
 	},
 	"dependencies": {
-		"@xernerx/commands": "^0.2.2",
-		"@xernerx/framework": "^1.0.3",
+		"@xernerx/commands": "^0.2.6",
+		"@xernerx/framework": "^1.1.1",
 		"@xernerx/lib": "workspace:*",
+		"@xernerx/terminal": "^1.1.15",
 		"discord.js": "^14.27.0",
 		"mongoose": "^9.11.4",
 		"next": "^16.4.3",

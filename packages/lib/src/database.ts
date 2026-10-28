@@ -2,7 +2,10 @@
 
 import mongoose, { Connection, Model, Schema } from 'mongoose';
 
-import { xernerxModels, virtueModels } from './registry';
+import { xernerxModels, virtueModels, hasteModels } from './registry';
+import { createLogger } from './terminal';
+
+const dbLog = createLogger('DB');
 
 const globalWithMongoose = global as typeof global & {
 	__connections?: Record<string, Record<string, Connection>>;
@@ -128,6 +131,7 @@ if (process.env.NODE_ENV !== 'production') {
 const getUris = (): Record<string, string> => ({
 	xernerx: process.env.MONGO_XERNERX || '',
 	virtue: process.env.MONGO_VIRTUE || process.env.MONGO_XERNERX || '',
+	haste: process.env.MONGO_HASTE || '',
 });
 
 interface ModelDefinition {
@@ -139,9 +143,10 @@ interface ModelDefinition {
 const registries: Record<string, any> = {
 	xernerx: xernerxModels,
 	virtue: virtueModels,
+	haste: hasteModels,
 };
 
-export async function database(projectId: 'xernerx' | 'virtue') {
+export async function database(projectId: 'xernerx' | 'virtue' | 'haste') {
 	if (!activeConnections[projectId]) activeConnections[projectId] = {};
 	if (!cachedModels[projectId]) cachedModels[projectId] = {};
 
@@ -188,7 +193,7 @@ export async function database(projectId: 'xernerx' | 'virtue') {
 			serverSelectionTimeoutMS: 5000,
 			socketTimeoutMS: 30000,
 		});
-		rootConn.on('error', (err) => console.warn(`Mongoose connection error for ${projectId}:`, err?.message || err));
+		rootConn.on('error', (err) => dbLog.warn(`Mongoose connection error for ${projectId}: ${err?.message || err}`));
 		rootConnections[projectId] = rootConn;
 	}
 
@@ -212,7 +217,7 @@ export async function database(projectId: 'xernerx' | 'virtue') {
 				}
 				projectModels[uriSuffix][key] = conn.models[def.modelName] || conn.model(def.modelName, def.schema, def.collection);
 			} catch (err) {
-				console.warn(`Failed to initialize ${def.modelName} in ${uriSuffix}:`, err);
+				dbLog.warn(`Failed to initialize ${def.modelName} in ${uriSuffix}: ${(err as any)?.message || err}`);
 			}
 		}
 	}

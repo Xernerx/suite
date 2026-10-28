@@ -125,3 +125,11 @@ export const virtueModels = {
 		Voice: { schema: VirtueVoiceLevelSchema, modelName: 'Voice', collection: 'voice' },
 	},
 };
+
+import HasteDocumentSchema from './models/haste/documents/Document';
+
+export const hasteModels = {
+	documents: {
+		Document: { schema: HasteDocumentSchema, modelName: 'Document', collection: 'documents' },
+	},
+};

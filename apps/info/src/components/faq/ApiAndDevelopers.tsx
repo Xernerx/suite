@@ -110,6 +110,22 @@ export default function ApiAndDevelopers({ searchQuery = '' }: { searchQuery?: s
 				</div>
 			),
 		},
+		{
+			id: 'card9',
+			title: t('faq.developers.card9.title'),
+			searchableText: `${t('faq.developers.card9.title')} ${t('faq.developers.card9.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.developers.card9.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.hasteStudio'), href: 'https://haste.xernerx.com', vanity: 'haste.xernerx.com' },
+							{ label: t('faq.quickLinks.v1ApiDocs'), href: 'https://docs.xernerx.com/api/v1#haste-documents', vanity: 'docs.xernerx.com/api/v1#haste-documents' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.developers.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;

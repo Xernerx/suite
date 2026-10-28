@@ -1,7 +1,7 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.4.0",
+	"version": "2.4.1",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
@@ -14,6 +14,7 @@
 	"license": "MIT",
 	"packageManager": "pnpm@11.24.0",
 	"dependencies": {
+		"@xernerx/terminal": "^1.1.15",
 		"electron-store": "^12.0.0",
 		"electron-updater": "^6.8.11"
 	},

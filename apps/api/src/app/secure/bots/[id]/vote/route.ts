@@ -106,6 +106,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 					? `https://cdn.discordapp.com/avatars/${id}/${bot.avatar}.png`
 					: undefined;
 
+			const voteNow = new Date();
+			const nextVoteAtIso = new Date(voteNow.getTime() + COOLDOWN_HOURS * 60 * 60 * 1000).toISOString();
+
 			for (const hook of hooks) {
 				if (!hook.url || !hook.events?.includes('POST vote')) continue;
 				try {
@@ -116,7 +119,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 						botId: id,
 						url: hook.url,
 						event: 'POST vote',
+						secret: hook.secret,
 						payload: {
+							event: 'POST vote',
+							botId: id,
+							timestamp: voteNow.toISOString(),
+							data: {
+								userId,
+								username: authorName,
+								avatar: authorIcon || null,
+								voted: true,
+								voteCount: totalVotes,
+								lastVotedAt: voteNow.toISOString(),
+								nextVoteAt: nextVoteAtIso,
+							},
 							username: 'Xernerx App',
 							avatar_url: 'https://xernerx.com/logo.png',
 							embeds: [
@@ -133,7 +149,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 										text: finalBotName,
 										icon_url: finalBotAvatar,
 									},
-									timestamp: new Date().toISOString(),
+									timestamp: voteNow.toISOString(),
 								},
 							],
 						},

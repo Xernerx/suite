@@ -50,7 +50,17 @@ export async function dispatchBotWebhook({ botId, url, event, payload, secret, h
 			} catch {}
 		}
 
-		const rawBody = JSON.stringify(payload);
+		const isDiscordWebhook = /^https:\/\/(ptb\.|canary\.)?discord(app)?\.com\/api\/webhooks\//i.test(url);
+		const outgoingPayload = isDiscordWebhook
+			? Object.fromEntries(Object.entries(payload).filter(([key]) => ['content', 'username', 'avatar_url', 'embeds', 'tts', 'allowed_mentions', 'components'].includes(key)))
+			: {
+					event,
+					botId,
+					timestamp: payload.timestamp || new Date().toISOString(),
+					...payload,
+				};
+
+		const rawBody = JSON.stringify(outgoingPayload);
 		const signingSecret = resolvedSecret || process.env.WEBHOOK_SIGNING_SECRET || process.env.NEXTAUTH_SECRET || `xnx_whsec_${botId}`;
 		const signature = createHmac('sha256', signingSecret).update(rawBody).digest('hex');
 
@@ -62,6 +72,7 @@ export async function dispatchBotWebhook({ botId, url, event, payload, secret, h
 				'X-Xernerx-Bot-Id': botId,
 				'X-Xernerx-Delivery-Id': deliveryId,
 				'X-Xernerx-Signature': `sha256=${signature}`,
+				...(resolvedSecret ? { 'X-Xernerx-Secret': resolvedSecret } : {}),
 				...headers,
 			},
 			body: rawBody,

@@ -244,7 +244,7 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 							<div className="flex flex-col gap-2">
 								<span className="text-sm font-semibold text-(--text-muted)">{t('app.portal.bot.webhooks.triggers')}</span>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-									{['POST vote', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'].map((event) => (
+									{['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'].map((event) => (
 										<label key={event} className="flex items-center gap-2 cursor-pointer">
 											<Toggle
 												checked={hook.events?.includes(event) || false}

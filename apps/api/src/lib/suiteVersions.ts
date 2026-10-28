@@ -24,6 +24,7 @@ export const SUITE_APPS = [
 	{ id: 'docs', name: 'Docs', domain: 'docs.xernerx.com', devPort: 4005 },
 	{ id: 'admin', name: 'Admin', domain: 'admin.xernerx.com', devPort: 4006 },
 	{ id: 'hosting', name: 'Hosting', domain: 'hosting.xernerx.com', devPort: 4010 },
+	{ id: 'haste', name: 'Haste', domain: 'haste.xernerx.com', devPort: 4011 },
 	{ id: 'api', name: 'API', domain: 'api.xernerx.com', devPort: 4001 },
 	{ id: 'cdn', name: 'CDN', domain: 'cdn.xernerx.com', devPort: 4002 },
 ] as const;

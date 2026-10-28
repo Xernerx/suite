@@ -3856,7 +3856,8 @@
 			"tryAppDrawer": "Open App Drawer (Ctrl + Space)",
 			"tryOmnibar": "Open URL Omnibar (Ctrl + .)",
 			"tryShortcutsModal": "View Shortcuts & Changelog (Ctrl + /)",
-			"creditStore": "Credit Store & Perks"
+			"creditStore": "Credit Store & Perks",
+			"hasteStudio": "Xernerx Haste"
 		},
 		"overview": {
 			"navTitle": "Ecosystem & Navigation",
@@ -4193,6 +4194,10 @@
 			"card8": {
 				"title": "How does the Open-Source NPM Package Documentation Reader (docs.xernerx.com/packages) work?",
 				"description": "Visit docs.xernerx.com/packages to browse official open-source Xernerx developer libraries and frameworks published on npm and GitHub (such as xernerx, @xernerx/framework, and @xernerx/stats). The documentation reader dynamically indexes every published semantic version and lets you switch versions via the Version Selector, inspect Classes, Interfaces, Functions, Constructors, Properties, and Methods, or use the global package search bar to jump to any symbol across all latest packages."
+			},
+			"card9": {
+				"title": "How does Xernerx Haste (haste.xernerx.com) work for bots and developers?",
+				"description": "Xernerx Haste (haste.xernerx.com) is our first-party code pastebin and Hastebin-compatible server backed by a dedicated MongoDB cluster with automatic TTL expirations (1h, 24h, 7d, 30d, or never) and 3-tier privacy (public, limited, and private). Any registered Xernerx user can publish pastes from the web studio or programmatically via POST https://haste.xernerx.com/documents/[userId] or POST https://api.xernerx.com/v1/haste by passing their Xernerx User ID (such as from client.owners in @xernerx/commands), while any unauthenticated user can view public and limited pastes."
 			}
 		}
 	},
@@ -5497,7 +5502,9 @@
 				"uiDesc": "Accessible, modern React primitive components engineered for the Xernerx Suite following Modern Round Glassmorphism Pop guidelines.",
 				"componentsDesc": "High-level application shell components including AppLayout, Header, Navigation Sidebar, Footer, and responsive wrappers.",
 				"libDesc": "Core shared utilities, MongoDB Mongoose schemas, NextAuth configuration, and localized JSON dictionaries.",
-				"stylesDesc": "Centrally configured Tailwind CSS v4 design tokens, CSS variables, Glassmorphism utilities, and font pairings."
+				"stylesDesc": "Centrally configured Tailwind CSS v4 design tokens, CSS variables, Glassmorphism utilities, and font pairings.",
+				"hooksDesc": "First-party webhook receiver and user engagement cache (voted, reviewed, tipped) with HMAC-SHA256 verification and @xernerx/framework extension support.",
+				"extensionBuilderDesc": "Base ExtensionBuilder lifecycle and EventEmitter architecture for building modular @xernerx/framework extensions."
 			},
 			"sidebar": {
 				"backToCategories": "Back to Categories",
@@ -5720,6 +5727,14 @@
 						"titleDesc": "Short headline title summarizing the release.",
 						"notesDesc": "Markdown-formatted release notes detailing new features, fixes, and changes.",
 						"breakingDesc": "Optional boolean flag indicating whether this release includes breaking changes."
+					},
+					"hasteDocuments": {
+						"title": "Xernerx Haste Documents & Pastebin",
+						"description": "Create, inspect, update, and stream raw code snippets on haste.xernerx.com. Supports drop-in Hastebin POST /documents/:userId uploads for @xernerx/commands and Discord bots using lightweight Xernerx User ID verification, TTL expirations, and 3-tier privacy."
+					},
+					"fetchBotUserEngagement": {
+						"title": "Fetch User Bot Engagement (Voted, Reviewed, Tipped)",
+						"description": "Check whether a Discord user has an active 12-hour vote cooldown, has left a review, and their cumulative credit tips for a bot. Used by @xernerx/framework and @xernerx/hooks engagement validators."
 					}
 				},
 				"common": {
@@ -6316,7 +6331,8 @@
 				"website": "Website",
 				"admin": "Admin",
 				"hosting": "Hosting",
-				"help": "Support"
+				"help": "Support",
+				"haste": "Haste"
 			}
 		}
 	},
@@ -6650,6 +6666,112 @@
 			"missingIpError": "Please enter a valid server IP (e.g. root@123.45.67.89).",
 			"execFailed": "SSH command execution failed",
 			"useLinkedSecret": "Use Linked Secret"
+		}
+	},
+	"haste": {
+		"sidebar": {
+			"title": "Xernerx Haste"
+		},
+		"tabs": {
+			"editor": "New Paste",
+			"public": "Explore Public",
+			"mine": "My Hastes"
+		},
+		"hero": {
+			"title": "Xernerx Haste",
+			"badge": "Pastebin & Code Studio",
+			"subtitle": "Share code snippets, command evaluation outputs, and logs across the Xernerx ecosystem with TTL expirations and 3-tier privacy."
+		},
+		"authBanner": {
+			"title": "Sign in with your Xernerx Account to publish from the web studio",
+			"description": "Anyone can view public and limited pastes without signing in. To create a paste, sign in or POST with your Xernerx User ID.",
+			"signInCta": "Sign In"
+		},
+		"editor": {
+			"titleLabel": "Paste Title (Optional)",
+			"titlePlaceholder": "e.g. Eval Output, Error Stacktrace, Config Snippet...",
+			"languageLabel": "Syntax Language",
+			"privacyLabel": "Visibility & Privacy",
+			"expirationLabel": "Expiration (TTL)",
+			"linesCount": "{count} lines",
+			"contentPlaceholder": "Paste or type your code, logs, or command output here..."
+		},
+		"privacy": {
+			"public": "Public",
+			"limited": "Limited",
+			"private": "Private",
+			"publicOption": "Public (Listed & Open)",
+			"limitedOption": "Limited (Unlisted Link)",
+			"privateOption": "Private (Owner Only)"
+		},
+		"expiration": {
+			"1h": "1 Hour",
+			"24h": "24 Hours",
+			"7d": "7 Days",
+			"30d": "30 Days",
+			"never": "Never Expire"
+		},
+		"actions": {
+			"publish": "Save & Publish",
+			"publishing": "Publishing...",
+			"clear": "Clear",
+			"open": "Open",
+			"copyCode": "Copy Code",
+			"copyLink": "Copy Link",
+			"raw": "Raw",
+			"download": "Download",
+			"fork": "Fork",
+			"delete": "Delete",
+			"backToStudio": "Back to Haste Studio"
+		},
+		"explorer": {
+			"searchPlaceholder": "Search pastes by title, ID, or language...",
+			"allLanguages": "All Languages",
+			"emptyPublicTitle": "No Public Hastes Found",
+			"emptyPublicDescription": "No public code snippets matched your filter. Publish a public paste to see it featured here!",
+			"emptyMineTitle": "No Personal Hastes Yet",
+			"emptyMineDescription": "Sign in and publish a paste from the editor or via your bot using your Xernerx User ID to manage your hastes here."
+		},
+		"viewer": {
+			"viewsCount": "{count} views",
+			"expiresOn": "Expires {date}",
+			"ownerControls": "Owner Paste Controls",
+			"notFoundTitle": "Haste Document Not Found",
+			"notFoundDescription": "This paste may have expired via its TTL schedule, been deleted by its author, or never existed.",
+			"privateTitle": "Private Haste Document",
+			"privateDescription": "This paste is marked as strictly private and can only be viewed by its owner."
+		},
+		"integration": {
+			"title": "Drop-in @xernerx/commands & API Integration",
+			"subtitle": "Pass your Xernerx User ID (such as from client.owners) to create pastes directly from bots, CLI scripts, or services."
+		},
+		"shortcuts": {
+			"publishHaste": "Publish Haste Document"
+		},
+		"confirmDelete": {
+			"title": "Delete Haste Document",
+			"description": "Are you sure you want to permanently delete this paste? Direct links and raw URLs for this ID will stop working immediately.",
+			"confirm": "Delete Paste",
+			"cancel": "Cancel"
+		},
+		"toasts": {
+			"authRequiredTitle": "Account Required",
+			"authRequiredDescription": "Please sign in with your Xernerx account to publish pastes from the web editor.",
+			"emptyContentTitle": "Empty Paste",
+			"emptyContentDescription": "Enter or paste some code before publishing.",
+			"createdTitle": "Haste Published!",
+			"createdDescription": "Your paste is live and ready to share.",
+			"updatedTitle": "Haste Updated",
+			"updatedDescription": "Paste privacy and expiration settings have been saved.",
+			"deletedTitle": "Haste Deleted",
+			"deletedDescription": "The paste has been permanently removed.",
+			"copiedTitle": "Copied to Clipboard",
+			"copiedCodeDescription": "Paste contents copied to your clipboard.",
+			"copiedLinkDescription": "Shareable Haste URL copied to your clipboard.",
+			"errorTitle": "Action Failed",
+			"createFailedDescription": "Could not publish your paste. Please verify your account and try again.",
+			"updateFailedDescription": "Could not update paste settings.",
+			"deleteFailedDescription": "Could not delete this paste."
 		}
 	}
 }

@@ -256,6 +256,13 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('storeDevelopers', 'https://store.xernerx.com/?category=developers', 'store.xernerx.com/?category=developers'),
 				]
 			),
+			c(
+				'card9',
+				'haste-pastebin',
+				'faq.developers.card9.title',
+				['faq.developers.card9.description'],
+				[ql('hasteStudio', 'https://haste.xernerx.com', 'haste.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1#haste-documents', 'docs.xernerx.com/api/v1#haste-documents')]
+			),
 		],
 	},
 	{
