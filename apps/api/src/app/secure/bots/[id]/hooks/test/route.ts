@@ -9,6 +9,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const { id } = await params;
 		const body = await req.json().catch(() => ({}));
 		const url = String(body.url || '').trim();
+		const secret = typeof body.secret === 'string' && body.secret.trim() ? body.secret.trim() : undefined;
 		const events: string[] = Array.isArray(body.events) && body.events.length > 0 ? body.events : ['POST vote'];
 
 		if (!url.startsWith('https://') && !url.startsWith('http://')) {
@@ -61,6 +62,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			url,
 			event: 'TEST ping',
 			payload,
+			secret,
 		});
 
 		const db = await database('xernerx');

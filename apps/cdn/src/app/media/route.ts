@@ -44,14 +44,17 @@ export async function GET(req: Request) {
 		const tagParam = url.searchParams.get('tag');
 
 		let query: any = {};
+		let isStaffSubscribed = false;
+		let canManage = false;
 
 		if (userId) {
 			const UserModel = models.users.User;
 			const user = await UserModel.findOne({ id: userId }).lean();
+			isStaffSubscribed = Boolean((user as any)?.staffSubscription);
 			const roleIds = user?.roles || [];
 
 			const roles = await RoleModel.find({ id: { $in: roleIds } });
-			const canManage = roles.some((r) => r.permissions?.manageMedia);
+			canManage = roles.some((r) => r.permissions?.manageMedia);
 
 			if (canManage && reqAdmin) {
 				query = {}; // Admin sees everything
@@ -87,7 +90,7 @@ export async function GET(req: Request) {
 		]);
 
 		const extraCdnSlots = Math.max(0, Number((creditDoc as any)?.extraCdnSlots) || 0);
-		const maxUploads = (activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
+		const maxUploads = (isStaffSubscribed || canManage || activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
 		const selfUploadCount = userMedia.filter((m: any) => m.uploaderId === userId).length;
 
 		const domain = process.env.DOMAIN || 'xernerx.com';

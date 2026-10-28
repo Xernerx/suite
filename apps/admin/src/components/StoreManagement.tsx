@@ -6,7 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Plus, ShoppingBag, Folder, Tag, CheckCircle2, Percent, TicketPercent } from 'lucide-react';
+import { Plus, ShoppingBag, Folder, Tag, CheckCircle2, Percent, TicketPercent, Download, RefreshCw } from 'lucide-react';
 
 import { StoreCategory, StoreCoupon, StoreItem } from './store/types';
 import { StoreItemsTab } from './store/StoreItemsTab';
@@ -23,6 +23,7 @@ export default function StoreManagement() {
 
 	const [activeTab, setActiveTab] = useState<'items' | 'categories' | 'coupons'>('items');
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 
 	const [categories, setCategories] = useState<StoreCategory[]>([]);
 	const [items, setItems] = useState<StoreItem[]>([]);
@@ -38,37 +39,91 @@ export default function StoreManagement() {
 	const [couponModalOpen, setCouponModalOpen] = useState(false);
 	const [selectedCoupon, setSelectedCoupon] = useState<StoreCoupon | null>(null);
 
-	const fetchData = useCallback(async () => {
-		if (!isReady) return;
-		setLoading(true);
-		try {
-			const [catsRes, itemsRes, couponsRes] = await Promise.all([
-				fetch(getEnvUrl('https://api.xernerx.com/secure/store/categories'), { credentials: 'include' }),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/store/items'), { credentials: 'include' }),
-				fetch(getEnvUrl('https://api.xernerx.com/secure/store/coupons'), { credentials: 'include' }),
-			]);
+	const fetchData = useCallback(
+		async (isManual = false) => {
+			if (!isReady) return;
+			if (isManual) setRefreshing(true);
+			else setLoading(true);
+			try {
+				const [catsRes, itemsRes, couponsRes] = await Promise.all([
+					fetch(getEnvUrl('https://api.xernerx.com/secure/store/categories'), { credentials: 'include' }),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/store/items'), { credentials: 'include' }),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/store/coupons'), { credentials: 'include' }),
+				]);
 
-			if (catsRes.ok) {
-				const catsData = await catsRes.json();
-				setCategories(Array.isArray(catsData) ? catsData : []);
-			}
+				if (catsRes.ok) {
+					const catsData = await catsRes.json();
+					setCategories(Array.isArray(catsData) ? catsData : []);
+				}
 
-			if (itemsRes.ok) {
-				const itemsData = await itemsRes.json();
-				setItems(Array.isArray(itemsData) ? itemsData : []);
-			}
+				if (itemsRes.ok) {
+					const itemsData = await itemsRes.json();
+					setItems(Array.isArray(itemsData) ? itemsData : []);
+				}
 
-			if (couponsRes.ok) {
-				const couponsData = await couponsRes.json();
-				setCoupons(Array.isArray(couponsData) ? couponsData : []);
+				if (couponsRes.ok) {
+					const couponsData = await couponsRes.json();
+					setCoupons(Array.isArray(couponsData) ? couponsData : []);
+				}
+			} catch (err: any) {
+				console.error('Failed to fetch store admin data:', err);
+				toast({ type: 'error', title: t('admin.store.alerts.fetchFailed'), description: err.message });
+			} finally {
+				setLoading(false);
+				setRefreshing(false);
 			}
-		} catch (err: any) {
-			console.error('Failed to fetch store admin data:', err);
-			toast({ type: 'error', title: t('admin.store.alerts.fetchFailed'), description: err.message });
-		} finally {
-			setLoading(false);
+		},
+		[getEnvUrl, isReady, toast, t]
+	);
+
+	const handleExportStore = (format: 'csv' | 'json') => {
+		const dateStr = new Date().toISOString().slice(0, 10);
+		const triggerDownload = (name: string, content: string, mime: string) => {
+			const blob = new Blob([content], { type: mime });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = name;
+			a.click();
+			URL.revokeObjectURL(url);
+		};
+		const toCsv = (headers: string[], rows: unknown[][]) => [headers.join(','), ...rows.map((r) => r.map((cell) => `"${String(cell ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
+
+		if (activeTab === 'coupons') {
+			if (coupons.length === 0) return;
+			if (format === 'json') return triggerDownload(`xernerx-store-coupons-${dateStr}.json`, JSON.stringify(coupons, null, 2), 'application/json');
+			return triggerDownload(
+				`xernerx-store-coupons-${dateStr}.csv`,
+				toCsv(
+					['id', 'code', 'name', 'discountType', 'percentOff', 'amountOff', 'currency', 'duration', 'timesRedeemed', 'maxRedemptions', 'enabled'],
+					coupons.map((c) => [c.id, c.code, c.name, c.discountType, c.percentOff, c.amountOff || 0, c.currency || 'usd', c.duration, c.timesRedeemed || 0, c.maxRedemptions || '', c.enabled])
+				),
+				'text/csv;charset=utf-8;'
+			);
 		}
-	}, [getEnvUrl, isReady, toast, t]);
+		if (activeTab === 'categories') {
+			if (categories.length === 0) return;
+			if (format === 'json') return triggerDownload(`xernerx-store-categories-${dateStr}.json`, JSON.stringify(categories, null, 2), 'application/json');
+			return triggerDownload(
+				`xernerx-store-categories-${dateStr}.csv`,
+				toCsv(
+					['id', 'name', 'description', 'order', 'enabled'],
+					categories.map((c) => [c.id, c.name, c.description || '', c.order ?? 0, c.enabled])
+				),
+				'text/csv;charset=utf-8;'
+			);
+		}
+		if (items.length === 0) return;
+		if (format === 'json') return triggerDownload(`xernerx-store-items-${dateStr}.json`, JSON.stringify(items, null, 2), 'application/json');
+		return triggerDownload(
+			`xernerx-store-items-${dateStr}.csv`,
+			toCsv(
+				['id', 'name', 'categoryId', 'itemType', 'discountPercent', 'creditCost', 'enabled'],
+				items.map((i) => [i.id, i.name, i.categoryId, i.itemType || 'subscription', i.discountPercent || 0, i.creditCost || 0, i.enabled])
+			),
+			'text/csv;charset=utf-8;'
+		);
+	};
 
 	useEffect(() => {
 		fetchData();
@@ -77,23 +132,14 @@ export default function StoreManagement() {
 	// Item operations
 	const handleSaveItem = async (data: Partial<StoreItem>) => {
 		try {
-			if (selectedItem) {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/store/items/${selectedItem.id}`), {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify(data),
-				});
-				if (!res.ok) throw new Error('Failed to update product');
-			} else {
-				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/store/items'), {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify(data),
-				});
-				if (!res.ok) throw new Error('Failed to create product');
-			}
+			const url = selectedItem ? `https://api.xernerx.com/secure/store/items/${selectedItem.id}` : 'https://api.xernerx.com/secure/store/items';
+			const res = await fetch(getEnvUrl(url), {
+				method: selectedItem ? 'PATCH' : 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) throw new Error(selectedItem ? 'Failed to update product' : 'Failed to create product');
 			toast({ type: 'success', title: t('admin.store.alerts.itemSaved') });
 			fetchData();
 		} catch (err: any) {
@@ -153,23 +199,14 @@ export default function StoreManagement() {
 	// Category operations
 	const handleSaveCategory = async (data: Partial<StoreCategory>) => {
 		try {
-			if (selectedCategory) {
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/store/categories/${selectedCategory.id}`), {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify(data),
-				});
-				if (!res.ok) throw new Error('Failed to update category');
-			} else {
-				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/store/categories'), {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify(data),
-				});
-				if (!res.ok) throw new Error('Failed to create category');
-			}
+			const url = selectedCategory ? `https://api.xernerx.com/secure/store/categories/${selectedCategory.id}` : 'https://api.xernerx.com/secure/store/categories';
+			const res = await fetch(getEnvUrl(url), {
+				method: selectedCategory ? 'PATCH' : 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) throw new Error(selectedCategory ? 'Failed to update category' : 'Failed to create category');
 			toast({ type: 'success', title: t('admin.store.alerts.categorySaved') });
 			fetchData();
 		} catch (err: any) {
@@ -290,7 +327,16 @@ export default function StoreManagement() {
 					<p className="text-sm text-(--text-muted) max-w-2xl">{t('admin.store.description')}</p>
 				</div>
 
-				<div className="flex flex-wrap items-center gap-3">
+				<div className="flex flex-wrap items-center gap-2">
+					<Button variant="secondary" size="sm" onClick={() => handleExportStore('csv')} className="flex items-center gap-1.5">
+						<Download size={14} /> {t('admin.users.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => handleExportStore('json')} className="flex items-center gap-1.5">
+						<Download size={14} /> {t('admin.users.exportJson')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => fetchData(true)} disabled={refreshing} className="flex items-center gap-1.5">
+						<RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} /> {t('admin.users.refresh')}
+					</Button>
 					<Button
 						variant="secondary"
 						onClick={() => {

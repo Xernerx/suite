@@ -51,6 +51,7 @@ export function buildSupportWelcomeContainer(userId: string): ContainerBuilder {
 			new ActionRowBuilder<ButtonBuilder>().setComponents(
 				new ButtonBuilder().setCustomId('resolve').setLabel('Resolve').setStyle(ButtonStyle.Success),
 				new ButtonBuilder().setCustomId('hold').setLabel('Hold').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setCustomId('reopen').setLabel('Reopen').setStyle(ButtonStyle.Primary),
 				new ButtonBuilder().setCustomId('close').setLabel('Close').setStyle(ButtonStyle.Danger)
 			)
 		);
@@ -140,6 +141,13 @@ export function buildSupportStepContainer(ticket: any, checklist: string[]): Con
 	container
 		.addTextDisplayComponents((text) =>
 			text.setContent(`> **Server:** ${guildName} (${guildId})\n> **Channel:** ${channelName} (${channelId})\n> **Message:** ${messageId}\n> **Command:** ${commandName}`)
+		)
+		.addActionRowComponents(
+			new ActionRowBuilder<ButtonBuilder>().addComponents(
+				new ButtonBuilder().setCustomId('1-edit').setLabel('Edit Server').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setCustomId('2-edit').setLabel('Edit Channel').setStyle(ButtonStyle.Secondary),
+				new ButtonBuilder().setCustomId('3-edit').setLabel('Edit Command / Msg').setStyle(ButtonStyle.Secondary)
+			)
 		)
 		.addSeparatorComponents((separator) => separator.setDivider(true).setSpacing(SeparatorSpacingSize.Large))
 		.addTextDisplayComponents((text) => text.setContent('### Troubleshooting Checklist\nPlease toggle the checks below that you have already tried:'));
@@ -347,6 +355,42 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 
 				await interaction.reply({
 					content: `Ticket placed **On-Hold** by ${interaction.user}.`,
+					components: [new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId('reopen').setLabel('Reopen Ticket').setStyle(ButtonStyle.Primary))],
+				});
+				return true;
+			}
+
+			if (action === 'reopen') {
+				const isTicketOwner = interaction.user.id === ticket.userId;
+				const isStaff = hasStaffPermission(interaction, channelConfig?.role);
+
+				if (!isTicketOwner && !isStaff) {
+					await interaction.reply({
+						flags: MessageFlags.Ephemeral,
+						content: 'Only the ticket creator or support staff can reopen this ticket.',
+					});
+					return true;
+				}
+
+				if (ticket.status === 'open') {
+					await interaction.reply({
+						flags: MessageFlags.Ephemeral,
+						content: 'This support ticket is already open.',
+					});
+					return true;
+				}
+
+				const baseName = thread.name.replace(/^\[(OPEN|ON-HOLD|RESOLVED|CLOSED)\]-/, '');
+				await thread.setLocked(false).catch(() => {});
+				await thread.setArchived(false).catch(() => {});
+				await thread.setAutoArchiveDuration(ThreadAutoArchiveDuration.OneWeek).catch(() => {});
+				await thread.setName(`[OPEN]-${baseName}`).catch(() => {});
+
+				ticket.status = 'open';
+				await ticket.save();
+
+				await interaction.reply({
+					content: `Ticket **Reopened** by ${interaction.user}.`,
 				});
 				return true;
 			}
@@ -425,6 +469,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 								.setCustomId('guild-id')
 								.setLabel('Server ID')
 								.setPlaceholder('Enter the Discord Server ID...')
+								.setValue(ticket.guild?.id ? String(ticket.guild.id) : '')
 								.setStyle(TextInputStyle.Short)
 								.setRequired(false)
 								.setMaxLength(30)
@@ -434,6 +479,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 								.setCustomId('guild-name')
 								.setLabel('Server Name')
 								.setPlaceholder('Enter the Discord Server name...')
+								.setValue(ticket.guild?.name ? String(ticket.guild.name) : '')
 								.setStyle(TextInputStyle.Short)
 								.setRequired(false)
 								.setMaxLength(100)
@@ -454,6 +500,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 								.setCustomId('channel-id')
 								.setLabel('Channel ID')
 								.setPlaceholder('Enter the Channel ID...')
+								.setValue(ticket.channel?.id ? String(ticket.channel.id) : '')
 								.setStyle(TextInputStyle.Short)
 								.setRequired(false)
 								.setMaxLength(30)
@@ -463,6 +510,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 								.setCustomId('channel-name')
 								.setLabel('Channel Name')
 								.setPlaceholder('Enter the Channel name...')
+								.setValue(ticket.channel?.name ? String(ticket.channel.name) : '')
 								.setStyle(TextInputStyle.Short)
 								.setRequired(false)
 								.setMaxLength(100)
@@ -483,6 +531,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 								.setCustomId('message-id')
 								.setLabel('Message ID')
 								.setPlaceholder('Enter the Message ID (if applicable)...')
+								.setValue(ticket.message?.id ? String(ticket.message.id) : '')
 								.setStyle(TextInputStyle.Short)
 								.setRequired(false)
 								.setMaxLength(30)
@@ -492,6 +541,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 								.setCustomId('command-name')
 								.setLabel('Command Name')
 								.setPlaceholder('e.g. /settings or /rank...')
+								.setValue(ticket.command?.name ? String(ticket.command.name) : '')
 								.setStyle(TextInputStyle.Short)
 								.setRequired(false)
 								.setMaxLength(100)
@@ -526,7 +576,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 				const name = interaction.fields.getTextInputValue('guild-name').trim();
 
 				ticket.guild = { id: id || null, name: name || null };
-				ticket.index = 1;
+				ticket.index = Math.max(Number(ticket.index || 0), 1);
 				await ticket.save();
 
 				const container = buildSupportStepContainer(ticket, checklist);
@@ -546,7 +596,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 				const name = interaction.fields.getTextInputValue('channel-name').trim();
 
 				ticket.channel = { id: id || null, name: name || null };
-				ticket.index = 2;
+				ticket.index = Math.max(Number(ticket.index || 0), 2);
 				await ticket.save();
 
 				const container = buildSupportStepContainer(ticket, checklist);
@@ -564,6 +614,7 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 			if (interaction.customId === 'message-command-info') {
 				const id = interaction.fields.getTextInputValue('message-id').trim();
 				const name = interaction.fields.getTextInputValue('command-name').trim();
+				const wasAlreadyStep3 = Number(ticket.index || 0) >= 3;
 
 				ticket.message = { id: id || null };
 				ticket.command = { id: name || null, name: name || null };
@@ -580,7 +631,9 @@ export async function handleSupportInteraction(interaction: Interaction): Promis
 					await interaction.reply({ flags: MessageFlags.Ephemeral, content: 'Information saved.' });
 				}
 
-				await notifyStaffIfReady();
+				if (!wasAlreadyStep3) {
+					await notifyStaffIfReady();
+				}
 				return true;
 			}
 		}

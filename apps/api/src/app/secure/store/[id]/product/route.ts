@@ -56,122 +56,142 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		if (!userId) return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
 
-		const user = await (await database('xernerx')).models.users.User.findOne({ id: userId });
+		const { models } = await database('xernerx');
+		const user = await models.users.User.findOne({ id: userId });
 		if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-		// 1. Ensure the user has a Stripe Customer ID
-		let customerId = user.stripeCustomerId;
-		if (!customerId) {
-			const customer = await stripe.customers.create({
-				email: user.email || undefined,
-				name: user.name || undefined,
-				metadata: { userId: user.id },
-			});
-			customerId = customer.id;
-			user.stripeCustomerId = customerId;
-			await user.save();
-		}
+		const fallbackPeriodEnd = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000);
+		let customerId = (user as any).stripeCustomerId || null;
+		let activeStaffSub: Stripe.Subscription | undefined;
+		let syncedEntries: Array<{ stripeSubscriptionId: string; priceId: string; status: string; currentPeriodEnd: Date }> = [];
 
-		// 2. Collect all products defined in database (or fallback to static library)
-		const { models } = await database('xernerx');
-		const Item = models.store.Item as any;
-		const dbItems = await Item.find({ enabled: true }).select('skuId').lean();
-		let allProductIds = Array.from(new Set(dbItems.map((i: any) => i.skuId).filter(Boolean))) as string[];
-		if (allProductIds.length === 0) {
-			allProductIds = [...(products.users || []), ...(products.developers || []), ...(products.servers || [])];
-		}
-
-		if (allProductIds.length === 0) {
-			return NextResponse.json({ error: 'No products configured to grant' }, { status: 400 });
-		}
-
-		// 3. Fetch all products from Stripe to get their default prices
-		const stripeProducts = await stripe.products.list({
-			ids: allProductIds,
-			limit: 100,
-		});
-
-		const priceIds = stripeProducts.data.map((p) => (typeof p.default_price === 'string' ? p.default_price : p.default_price?.id)).filter(Boolean) as string[];
-
-		if (priceIds.length === 0) {
-			return NextResponse.json({ error: 'No default prices found for the configured products' }, { status: 400 });
-		}
-
-		// 4. Check if an active staff override subscription already exists in Stripe
-		const existingSubs = await stripe.subscriptions.list({
-			customer: customerId,
-			status: 'active',
-		});
-
-		let activeStaffSub = existingSubs.data.find((s: any) => s.metadata.xernerx_staff_override === 'true');
-		const fallbackPeriodEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
-
-		if (activeStaffSub) {
-			// Check if current subscription items match all priceIds from the library
-			const currentSubPriceIds = activeStaffSub.items.data.map((item) => item.price.id);
-			const needsUpdate = priceIds.some((id) => !currentSubPriceIds.includes(id)) || currentSubPriceIds.some((id) => !priceIds.includes(id));
-
-			if (needsUpdate) {
-				// Automatically sync items: update/remove old ones, add new ones from @xernerx/lib
-				const itemsParam: Stripe.SubscriptionUpdateParams.Item[] = activeStaffSub.items.data.map((item) => {
-					if (!priceIds.includes(item.price.id)) {
-						return { id: item.id, deleted: true };
-					}
-					return { id: item.id, price: item.price.id };
+		try {
+			// 1. Ensure the user has a Stripe Customer ID
+			if (!customerId) {
+				const customer = await stripe.customers.create({
+					email: user.email || undefined,
+					name: user.name || undefined,
+					metadata: { userId: user.id },
 				});
-
-				priceIds.forEach((newPriceId) => {
-					if (!currentSubPriceIds.includes(newPriceId)) {
-						itemsParam.push({ price: newPriceId });
-					}
-				});
-
-				activeStaffSub = await stripe.subscriptions.update(activeStaffSub.id, {
-					items: itemsParam,
-				});
-			}
-		} else {
-			// Create a brand new master subscription if none exists
-			const subPayload: Stripe.SubscriptionCreateParams = {
-				customer: customerId,
-				items: priceIds.map((price) => ({ price })),
-				metadata: { xernerx_staff_override: 'true' },
-			};
-
-			if (STAFF_COUPON_ID) {
-				subPayload.discounts = [{ coupon: STAFF_COUPON_ID }];
+				customerId = customer.id;
 			}
 
-			activeStaffSub = await stripe.subscriptions.create(subPayload);
+			// 2. Collect all products defined in database (or fallback to static library)
+			const Item = models.store.Item as any;
+			const dbItems = await Item.find({ enabled: true }).select('skuId').lean();
+			let allProductIds = Array.from(new Set(dbItems.map((i: any) => i.skuId).filter(Boolean))) as string[];
+			if (allProductIds.length === 0) {
+				allProductIds = [...(products.users || []), ...(products.developers || []), ...(products.servers || [])];
+			}
+
+			if (allProductIds.length > 0) {
+				const stripeProducts = await stripe.products.list({
+					ids: allProductIds,
+					limit: 100,
+				});
+
+				const priceIds = stripeProducts.data.map((p) => (typeof p.default_price === 'string' ? p.default_price : p.default_price?.id)).filter(Boolean) as string[];
+
+				if (priceIds.length > 0) {
+					const existingSubs = await stripe.subscriptions.list({
+						customer: customerId,
+						status: 'active',
+					});
+
+					activeStaffSub = existingSubs.data.find((s: any) => s.metadata?.xernerx_staff_override === 'true');
+
+					if (activeStaffSub) {
+						const currentSubPriceIds = activeStaffSub.items.data.map((item) => item.price.id);
+						const needsUpdate = priceIds.some((id) => !currentSubPriceIds.includes(id)) || currentSubPriceIds.some((id) => !priceIds.includes(id));
+
+						if (needsUpdate) {
+							const itemsParam: Stripe.SubscriptionUpdateParams.Item[] = activeStaffSub.items.data.map((item) => {
+								if (!priceIds.includes(item.price.id)) {
+									return { id: item.id, deleted: true };
+								}
+								return { id: item.id, price: item.price.id };
+							});
+
+							priceIds.forEach((newPriceId) => {
+								if (!currentSubPriceIds.includes(newPriceId)) {
+									itemsParam.push({ price: newPriceId });
+								}
+							});
+
+							activeStaffSub = await stripe.subscriptions.update(activeStaffSub.id, {
+								items: itemsParam,
+							});
+						}
+					} else {
+						const subPayload: Stripe.SubscriptionCreateParams = {
+							customer: customerId,
+							items: priceIds.map((price) => ({ price })),
+							metadata: { xernerx_staff_override: 'true' },
+						};
+
+						if (STAFF_COUPON_ID) {
+							subPayload.discounts = [{ coupon: STAFF_COUPON_ID }];
+						}
+
+						activeStaffSub = await stripe.subscriptions.create(subPayload);
+					}
+
+					const rawPeriodEnd = (activeStaffSub as any).current_period_end;
+					const finalPeriodEnd = rawPeriodEnd ? new Date(rawPeriodEnd * 1000) : fallbackPeriodEnd;
+					syncedEntries = activeStaffSub.items.data.map((item) => ({
+						stripeSubscriptionId: activeStaffSub!.id,
+						priceId: item.price.id,
+						status: activeStaffSub!.status || 'active',
+						currentPeriodEnd: finalPeriodEnd,
+					}));
+				}
+			}
+		} catch (stripeErr: any) {
+			console.warn('[StaffSubscription] Falling back to local staff_infinite_sub override:', stripeErr?.message);
 		}
 
-		const rawPeriodEnd = (activeStaffSub as any).current_period_end;
-		const finalPeriodEnd = rawPeriodEnd ? new Date(rawPeriodEnd * 1000) : fallbackPeriodEnd;
+		if (syncedEntries.length === 0) {
+			syncedEntries = [
+				{
+					stripeSubscriptionId: 'staff_infinite_sub',
+					priceId: 'ultra',
+					status: 'active',
+					currentPeriodEnd: fallbackPeriodEnd,
+				},
+			];
+		}
 
-		// 5. Sync database subscriptions array to match active items cleanly
-		user.subscriptions = user.subscriptions || [];
-
-		// Filter out existing entries that belong to this staff subscription ID to prevent duplicates
-		user.subscriptions = user.subscriptions.filter((sub: any) => sub.stripeSubscriptionId !== activeStaffSub?.id);
-
-		// Push current active items
-		activeStaffSub.items.data.forEach((item) => {
-			user.subscriptions.push({
-				stripeSubscriptionId: activeStaffSub!.id,
-				priceId: item.price.id,
-				status: activeStaffSub!.status,
-				currentPeriodEnd: finalPeriodEnd,
+		const SubscriptionModel = models.users.Subscription as any;
+		if (SubscriptionModel) {
+			const subIdsToReplace = Array.from(new Set(['staff_infinite_sub', ...syncedEntries.map((e) => e.stripeSubscriptionId)]));
+			await SubscriptionModel.deleteMany({
+				ownerId: userId,
+				stripeSubscriptionId: { $in: subIdsToReplace },
 			});
-		});
+			await SubscriptionModel.insertMany(
+				syncedEntries.map((entry) => ({
+					ownerId: userId,
+					...entry,
+				}))
+			);
+		}
 
-		// Toggle the staff flag locally
-		user.staffSubscription = true;
+		const updatedUser = await models.users.User.findOneAndUpdate(
+			{ id: userId },
+			{
+				$set: {
+					staffSubscription: true,
+					...(customerId ? { stripeCustomerId: customerId } : {}),
+				},
+			},
+			{ returnDocument: 'after' }
+		).lean();
 
-		await user.save();
+		const allSubscriptions = SubscriptionModel ? await SubscriptionModel.find({ ownerId: userId }).lean() : syncedEntries;
 
-		return NextResponse.json(user, { status: 200 });
+		return NextResponse.json({ ...updatedUser, staffSubscription: true, subscriptions: allSubscriptions }, { status: 200 });
 	} catch (error: any) {
-		console.error('Error applying staff subscription via Stripe:', error);
+		console.error('Error applying staff subscription:', error);
 		return NextResponse.json({ error: 'Failed to apply staff subscription', details: error.message }, { status: 500 });
 	}
 }

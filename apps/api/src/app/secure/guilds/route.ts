@@ -8,7 +8,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
 	try {
 		const url = new URL(req.url);
-		const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+		const all = url.searchParams.get('all') === 'true';
+		const limit = parseInt(url.searchParams.get('limit') || (all ? '500' : '50'), 10);
 		const privacy = 'public';
 		const category = url.searchParams.get('category');
 		const search = url.searchParams.get('search');
@@ -20,9 +21,13 @@ export async function GET(req: Request) {
 		const db = await database('xernerx');
 		const GuildModel = db.models.guilds.Guild as any;
 
-		let query: any = { privacy };
+		let query: any = all ? {} : { privacy };
 
-		if (idsParam) {
+		if (all) {
+			if (search) {
+				query.$or = [{ id: { $regex: search, $options: 'i' } }, { name: { $regex: search, $options: 'i' } }];
+			}
+		} else if (idsParam) {
 			const ids = idsParam.split(',').map((id) => id.trim());
 			query = { id: { $in: ids } }; // If querying by explicit IDs, bypass privacy check
 		} else if (organization) {
@@ -88,6 +93,10 @@ export async function GET(req: Request) {
 					name: 1,
 					icon: 1,
 					banner: 1,
+					vanitySlug: 1,
+					vanityUnlocked: 1,
+					widgets: 1,
+					bot: 1,
 					description: 1,
 					privacy: 1,
 					verified: 1,

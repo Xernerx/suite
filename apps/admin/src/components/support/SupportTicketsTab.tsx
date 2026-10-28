@@ -2,7 +2,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { CheckCircle2, Clock, Hash, Lock, MessageSquare, Server, Terminal, Trash2, User, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, Download, Hash, Lock, MessageSquare, Server, Terminal, Trash2, User, XCircle } from 'lucide-react';
 import { Button, Confirm, Input } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import type { BotDiscordProfile, SupportBotItem, SupportTicketItem } from './types';
@@ -40,16 +40,58 @@ export function SupportTicketsTab({ tickets, bots, botProfiles, checklist, updat
 			if (statusFilter !== 'all' && ticket.status !== statusFilter) return false;
 			if (!search.trim()) return true;
 			const q = search.toLowerCase();
+			const botLabel = ticket.bot ? (botNameMap[ticket.bot] || ticket.bot).toLowerCase() : '';
 			return (
 				ticket.id.toLowerCase().includes(q) ||
 				ticket.userId.toLowerCase().includes(q) ||
 				(ticket.username && ticket.username.toLowerCase().includes(q)) ||
+				botLabel.includes(q) ||
 				(ticket.initialMessage && ticket.initialMessage.toLowerCase().includes(q)) ||
 				(ticket.command?.name && ticket.command.name.toLowerCase().includes(q)) ||
-				(ticket.guild?.name && ticket.guild.name.toLowerCase().includes(q))
+				(ticket.guild?.name && ticket.guild.name.toLowerCase().includes(q)) ||
+				(ticket.guild?.id && ticket.guild.id.toLowerCase().includes(q))
 			);
 		});
-	}, [tickets, statusFilter, search]);
+	}, [tickets, statusFilter, search, botNameMap]);
+
+	const exportTickets = (format: 'csv' | 'json') => {
+		if (filteredTickets.length === 0) return;
+		const dateStr = new Date().toISOString().slice(0, 10);
+		if (format === 'json') {
+			const blob = new Blob([JSON.stringify(filteredTickets, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `xernerx-support-tickets-${dateStr}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+			return;
+		}
+		const headers = ['id', 'status', 'userId', 'username', 'bot', 'guildId', 'guildName', 'command', 'initialMessage', 'createdAt'];
+		const rows = filteredTickets.map((tk) =>
+			[
+				tk.id,
+				tk.status,
+				tk.userId,
+				tk.username || '',
+				tk.bot ? botNameMap[tk.bot] || tk.bot : '',
+				tk.guild?.id || '',
+				tk.guild?.name || '',
+				tk.command?.name || '',
+				tk.initialMessage || '',
+				tk.createdAt || '',
+			]
+				.map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+				.join(',')
+		);
+		const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-support-tickets-${dateStr}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	};
 
 	const statusBadgeStyle = (status: SupportTicketItem['status']) => {
 		switch (status) {
@@ -94,6 +136,14 @@ export function SupportTicketsTab({ tickets, bots, botProfiles, checklist, updat
 							{f.label}
 						</button>
 					))}
+					<Button variant="secondary" size="sm" onClick={() => exportTickets('csv')} disabled={filteredTickets.length === 0} className="flex items-center gap-1.5">
+						<Download size={13} />
+						{t('admin.users.exportCsv')}
+					</Button>
+					<Button variant="secondary" size="sm" onClick={() => exportTickets('json')} disabled={filteredTickets.length === 0} className="flex items-center gap-1.5">
+						<Download size={13} />
+						{t('admin.users.exportJson')}
+					</Button>
 				</div>
 			</div>
 

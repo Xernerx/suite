@@ -13,20 +13,36 @@ interface DynamicFeaturedCardProps {
 	billingInterval: 'month' | 'year';
 	userLoading: boolean;
 	actionLoading: string | null;
+	appliedCoupon?: {
+		code: string;
+		name: string;
+		discountType: 'percent' | 'amount';
+		percentOff: number;
+		amountOff: number;
+	} | null;
 	getActiveSubscription: (priceId: string | null) => UserSubscription | null | undefined;
 	handleSubscribe: (priceId: string | null, discountPercent: number) => void;
 	handleCancelClick: (subscriptionId: string) => void;
 }
 
-export function DynamicFeaturedCard({ item, billingInterval, userLoading, actionLoading, getActiveSubscription, handleSubscribe, handleCancelClick }: DynamicFeaturedCardProps) {
+export function DynamicFeaturedCard({ item, billingInterval, userLoading, actionLoading, appliedCoupon, getActiveSubscription, handleSubscribe, handleCancelClick }: DynamicFeaturedCardProps) {
 	const { t } = useDictionary();
 
 	const activePrice = item.prices.find((p) => p.interval === billingInterval) || item.prices[0];
 	const currentSub = getActiveSubscription(activePrice?.id || null);
 
 	const originalAmount = activePrice ? activePrice.unitAmount / 100 : null;
-	const discountedAmount = activePrice?.discountedAmount ? activePrice.discountedAmount / 100 : originalAmount;
-	const hasDiscount = item.discountPercent > 0 && originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
+	const baseDiscounted = activePrice?.discountedAmount ? activePrice.discountedAmount / 100 : originalAmount;
+	const effectiveDiscountPercent = appliedCoupon?.discountType === 'percent' ? Math.max(item.discountPercent || 0, appliedCoupon.percentOff || 0) : item.discountPercent || 0;
+	const discountedAmount =
+		originalAmount === null
+			? null
+			: appliedCoupon?.discountType === 'amount'
+				? Math.max(0, (baseDiscounted ?? originalAmount) - (appliedCoupon.amountOff || 0))
+				: effectiveDiscountPercent > 0
+					? originalAmount * (1 - effectiveDiscountPercent / 100)
+					: baseDiscounted;
+	const hasDiscount = originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
 
 	return (
 		<motion.div

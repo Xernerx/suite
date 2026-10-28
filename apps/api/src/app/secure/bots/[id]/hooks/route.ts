@@ -63,10 +63,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 		const existingHooks = await HookModel.find({ botId: id }).lean();
 		const deliveriesByUrl = new Map<string, any[]>();
+		const secretByUrl = new Map<string, string>();
 		for (const existing of existingHooks) {
 			if (existing.url && Array.isArray(existing.deliveries) && existing.deliveries.length > 0) {
 				const prev = deliveriesByUrl.get(existing.url) || [];
 				deliveriesByUrl.set(existing.url, [...prev, ...existing.deliveries].slice(-25));
+			}
+			if (existing.url && typeof (existing as any).secret === 'string' && (existing as any).secret) {
+				secretByUrl.set(existing.url, (existing as any).secret);
 			}
 		}
 
@@ -77,6 +81,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 					id: h.id || randomUUID(),
 					botId: id,
 					url: h.url,
+					secret: typeof h.secret === 'string' ? h.secret.trim() : secretByUrl.get(h.url) || '',
 					events: h.events || [],
 					deliveries: Array.isArray(h.deliveries) && h.deliveries.length > 0 ? h.deliveries.slice(-25) : deliveriesByUrl.get(h.url) || [],
 				}))

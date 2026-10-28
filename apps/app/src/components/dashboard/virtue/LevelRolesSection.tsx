@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Award, Plus, Trash2 } from 'lucide-react';
 import { Button, Input, Selector } from '@xernerx/ui';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useToast } from '@xernerx/providers';
 import type { VirtueConfigShape, VirtueLevelRole } from '@/components/virtue/ConfigPortabilityCard';
 
 export interface DiscordRole {
@@ -115,6 +115,7 @@ interface LevelRolesSectionProps {
 
 export default function LevelRolesSection({ levelRoles, setLevelRoles, roleSelectorOptions }: LevelRolesSectionProps) {
 	const { t } = useDictionary();
+	const { toast } = useToast();
 	const [newRoleLevel, setNewRoleLevel] = useState<string>('5');
 	const [newRoleId, setNewRoleId] = useState<string>('');
 
@@ -123,8 +124,12 @@ export default function LevelRolesSection({ levelRoles, setLevelRoles, roleSelec
 		const parsedLevel = Math.max(1, Number(newRoleLevel) || 1);
 		if (!trimmedRoleId) return;
 
+		if (levelRoles.some((item) => item.roleId === trimmedRoleId)) {
+			toast({ type: 'warning', title: t('app.dashboard.virtue.duplicateRoleWarning') });
+		}
+
 		setLevelRoles((prev) => {
-			const filtered = prev.filter((item) => !(item.level === parsedLevel && item.roleId === trimmedRoleId));
+			const filtered = prev.filter((item) => item.roleId !== trimmedRoleId && !(item.level === parsedLevel && item.roleId === trimmedRoleId));
 			return [...filtered, { level: parsedLevel, roleId: trimmedRoleId }].sort((a, b) => a.level - b.level);
 		});
 		setNewRoleId('');

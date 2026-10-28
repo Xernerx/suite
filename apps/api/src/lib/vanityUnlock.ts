@@ -26,7 +26,47 @@ export async function unlockVanityWithUserCredits(models: any, userId: string, e
 		return { ok: false, error: 'Unauthorized: Please sign in to unlock a Custom Vanity URL.' };
 	}
 
+	const UserModel = (models.users as any)?.User;
+	const SubscriptionModel = (models.users as any)?.Subscription;
 	const Credit = (models.users as any).Credit;
+
+	if (UserModel || SubscriptionModel) {
+		const [userDoc, subDocs] = await Promise.all([
+			UserModel
+				? UserModel.findOne({ id: userId })
+						.lean()
+						.catch(() => null)
+				: Promise.resolve(null),
+			SubscriptionModel
+				? SubscriptionModel.find({
+						ownerId: userId,
+						status: { $in: ['active', 'trialing'] },
+					})
+						.lean()
+						.catch(() => [])
+				: Promise.resolve([]),
+		]);
+		const hasStaffOrUltra =
+			Boolean((userDoc as any)?.staffSubscription) ||
+			(Array.isArray(subDocs) &&
+				subDocs.some(
+					(s: any) =>
+						s.stripeSubscriptionId === 'staff_infinite_sub' ||
+						String(s.priceId || '')
+							.toLowerCase()
+							.includes('ultra') ||
+						String(s.stripeSubscriptionId || '').startsWith('credit_trial_ultra')
+				));
+		if (hasStaffOrUltra) {
+			const creditDoc = Credit
+				? await Credit.findOne({ ownerId: userId })
+						.lean()
+						.catch(() => null)
+				: null;
+			return { ok: true, usedSlot: false, cost: 0, credits: creditDoc || {} };
+		}
+	}
+
 	let creditDoc = await Credit.findOne({ ownerId: userId });
 	if (!creditDoc) {
 		creditDoc = await Credit.create({ ownerId: userId, balance: 0, streak: 0 });

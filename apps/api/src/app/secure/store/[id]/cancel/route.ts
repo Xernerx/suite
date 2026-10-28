@@ -15,13 +15,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		if (!targetId) return NextResponse.json({ error: 'Target ID is required' }, { status: 400 });
 
+		const { models } = await database('xernerx');
+		const SubscriptionModel = models.users.Subscription as any;
+
 		// 1. User-initiated cancellation by Stripe subscription ID
-		if (targetId.startsWith('sub_')) {
+		if (targetId.startsWith('sub_') || targetId === 'staff_infinite_sub') {
+			if (targetId === 'staff_infinite_sub') {
+				if (SubscriptionModel) {
+					await SubscriptionModel.deleteMany({ stripeSubscriptionId: 'staff_infinite_sub' });
+				}
+				return NextResponse.json({ success: true, status: 'canceled' });
+			}
+
 			const canceledSubscription = await stripe.subscriptions.update(targetId, {
 				cancel_at_period_end: true,
 			});
 
-			const { models } = await database('xernerx');
+			if (SubscriptionModel) {
+				await SubscriptionModel.updateMany({ stripeSubscriptionId: targetId }, { $set: { status: canceledSubscription.status } });
+			}
+
 			await models.users.User.findOneAndUpdate(
 				{ 'billing.subscriptions.stripeSubscriptionId': targetId },
 				{
@@ -36,40 +49,44 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		}
 
 		// 2. Admin staff override cancellation by user ID
-		const user = await (await database('xernerx')).models.users.User.findOne({ id: targetId });
+		const user = await models.users.User.findOne({ id: targetId });
 		if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-		if (user.stripeCustomerId) {
-			// 1. Fetch active subscriptions for this customer from Stripe
-			const subs = await stripe.subscriptions.list({
-				customer: user.stripeCustomerId,
-				status: 'active',
-			});
+		const canceledSubIds: string[] = ['staff_infinite_sub'];
 
-			// 2. Find any subscriptions flagged as staff overrides
-			const staffSubs = subs.data.filter((s: any) => s.metadata.xernerx_staff_override === 'true');
+		if ((user as any).stripeCustomerId) {
+			try {
+				const subs = await stripe.subscriptions.list({
+					customer: (user as any).stripeCustomerId,
+					status: 'active',
+				});
 
-			for (const s of staffSubs) {
-				try {
-					// 3. Cancel the bundled subscription in Stripe
-					await stripe.subscriptions.cancel(s.id);
-				} catch (err: any) {
-					console.warn(`Stripe cancellation failed for ${s.id}:`, err.message);
+				const staffSubs = subs.data.filter((s: any) => s.metadata?.xernerx_staff_override === 'true');
+
+				for (const s of staffSubs) {
+					canceledSubIds.push(s.id);
+					try {
+						await stripe.subscriptions.cancel(s.id);
+					} catch (err: any) {
+						console.warn(`Stripe cancellation failed for ${s.id}:`, err.message);
+					}
 				}
-
-				// 4. Clean up our local database arrays matching this subscription ID
-				if (user.subscriptions) {
-					user.subscriptions = user.subscriptions.filter((sub: any) => sub.stripeSubscriptionId !== s.id);
-				}
+			} catch (err: any) {
+				console.warn('Stripe subscription listing skipped during staff cancel:', err?.message);
 			}
 		}
 
-		// Unflag it locally
-		user.staffSubscription = false;
+		if (SubscriptionModel) {
+			await SubscriptionModel.deleteMany({
+				ownerId: targetId,
+				stripeSubscriptionId: { $in: canceledSubIds },
+			});
+		}
 
-		await user.save();
+		const updatedUser = await models.users.User.findOneAndUpdate({ id: targetId }, { $set: { staffSubscription: false } }, { returnDocument: 'after' }).lean();
+		const remainingSubs = SubscriptionModel ? await SubscriptionModel.find({ ownerId: targetId }).lean() : [];
 
-		return NextResponse.json(user, { status: 200 });
+		return NextResponse.json({ ...updatedUser, staffSubscription: false, subscriptions: remainingSubs }, { status: 200 });
 	} catch (error: any) {
 		console.error('Error canceling staff subscription via Stripe:', error);
 		return NextResponse.json({ error: 'Failed to cancel staff subscription', details: error.message }, { status: 500 });

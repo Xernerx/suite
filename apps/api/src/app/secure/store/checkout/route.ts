@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { auth } from '@xernerx/lib';
+import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
 		}
 
 		const body = await req.json();
-		const { priceId, successUrl, cancelUrl, discountPercent, itemType, itemId, creditAmount } = body;
+		const { priceId, successUrl, cancelUrl, discountPercent, promoCode, itemType, itemId, creditAmount } = body;
 
 		if (!priceId) {
 			return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
@@ -51,13 +52,47 @@ export async function POST(req: Request) {
 			allow_promotion_codes: true,
 		};
 
-		if (discountPercent && Number(discountPercent) > 0) {
+		let effectiveDiscountPercent = Number(discountPercent) || 0;
+		let appliedStripeCouponId: string | null = null;
+		let appliedStripePromoId: string | null = null;
+
+		if (promoCode && typeof promoCode === 'string') {
+			try {
+				const { models } = await database('xernerx');
+				const Coupon = (models.store as any).Coupon;
+				const cleanCode = promoCode.trim().toUpperCase();
+				const couponDoc = Coupon ? await Coupon.findOne({ code: cleanCode, enabled: true }).lean() : null;
+				if (couponDoc) {
+					const notExpired = !couponDoc.expiresAt || new Date(couponDoc.expiresAt).getTime() > Date.now();
+					const underLimit = !couponDoc.maxRedemptions || (couponDoc.timesRedeemed || 0) < couponDoc.maxRedemptions;
+					if (notExpired && underLimit) {
+						if (couponDoc.stripePromotionCodeId) {
+							appliedStripePromoId = couponDoc.stripePromotionCodeId;
+						} else if (couponDoc.stripeCouponId) {
+							appliedStripeCouponId = couponDoc.stripeCouponId;
+						} else if (couponDoc.discountType === 'percent' && couponDoc.percentOff > 0) {
+							effectiveDiscountPercent = Math.max(effectiveDiscountPercent, Number(couponDoc.percentOff));
+						}
+					}
+				}
+			} catch (err) {
+				console.warn('Could not look up promoCode in database:', err);
+			}
+		}
+
+		if (appliedStripePromoId) {
+			delete sessionParams.allow_promotion_codes;
+			sessionParams.discounts = [{ promotion_code: appliedStripePromoId }];
+		} else if (appliedStripeCouponId) {
+			delete sessionParams.allow_promotion_codes;
+			sessionParams.discounts = [{ coupon: appliedStripeCouponId }];
+		} else if (effectiveDiscountPercent > 0) {
 			delete sessionParams.allow_promotion_codes;
 			try {
 				const coupon = await stripe.coupons.create({
-					percent_off: Math.min(100, Math.max(1, Number(discountPercent))),
+					percent_off: Math.min(100, Math.max(1, effectiveDiscountPercent)),
 					duration: 'once',
-					name: `${discountPercent}% Store Discount`,
+					name: `${effectiveDiscountPercent}% Store Discount`,
 				});
 				sessionParams.discounts = [{ coupon: coupon.id }];
 			} catch (couponErr) {

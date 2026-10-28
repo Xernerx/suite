@@ -14,12 +14,19 @@ export async function GET(request: Request) {
 		const category = url.searchParams.get('category');
 		const owner = url.searchParams.get('owner');
 		const organization = url.searchParams.get('organization');
-		const limit = parseInt(url.searchParams.get('limit') || (owner || organization ? '100' : '3'));
+		const all = url.searchParams.get('all') === 'true';
+		const limit = parseInt(url.searchParams.get('limit') || (all ? '500' : owner || organization ? '100' : '3'));
 		const now = new Date();
 
 		let matchStage: any = {};
 
-		if (owner) {
+		if (all) {
+			matchStage = {};
+			if (url.searchParams.get('search')) {
+				const query = url.searchParams.get('search');
+				matchStage.$or = [{ id: { $regex: query, $options: 'i' } }, { name: { $regex: query, $options: 'i' } }, { tags: { $regex: query, $options: 'i' } }];
+			}
+		} else if (owner) {
 			const TokenModel = (db.models.users as any)?.Token;
 			let tokenBotIds: string[] = [];
 			if (TokenModel) {
@@ -74,6 +81,11 @@ export async function GET(request: Request) {
 					avatar: 1,
 					banner: 1,
 					vanitySlug: 1,
+					vanityUnlocked: 1,
+					verified: 1,
+					privacy: 1,
+					widgets: 1,
+					owners: 1,
 					description: 1,
 					organization: 1,
 					promotedUntil: 1,

@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/app",
-	"version": "2.2.0",
+	"version": "2.3.0",
 	"description": "Xernerx App Discord bot daemon for support, docs, status, and community hub",
 	"main": "dist/main.js",
 	"type": "module",

@@ -22,8 +22,20 @@ export const permissions: PermissionDefinition[] = [
 	},
 	{
 		key: 'users',
-		label: 'Manage Users',
+		label: 'Users',
 		description: 'Permission to view, update, and delete platform users.',
+		defaultValue: false,
+	},
+	{
+		key: 'bots',
+		label: 'Bots',
+		description: 'Permission to view, verify, update, and delete platform bots.',
+		defaultValue: false,
+	},
+	{
+		key: 'servers',
+		label: 'Servers',
+		description: 'Permission to view, verify, update, and delete platform servers.',
 		defaultValue: false,
 	},
 	{

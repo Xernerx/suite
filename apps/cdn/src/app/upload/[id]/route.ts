@@ -73,6 +73,13 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 		// 1.5. Storage Limits Check
 		const SubscriptionModel = models.users.Subscription;
 		const CreditModel = (models.users as any).Credit;
+		const targetUserDoc =
+			targetUserId === userId
+				? user
+				: await UserModel.findOne({ id: targetUserId })
+						.lean()
+						.catch(() => null);
+		const isStaffSubscribed = Boolean((targetUserDoc as any)?.staffSubscription);
 		const [activeSubscriptions, creditDoc] = await Promise.all([
 			SubscriptionModel.find({
 				ownerId: targetUserId,
@@ -89,9 +96,9 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 		const MediaModel = models.core.Media;
 		const currentUploadCount = await MediaModel.countDocuments({ uploaderId: targetUserId });
 
-		// Base 10 free slots (or 1000 with active subscription) + permanent extraCdnSlots bought in the Credit Store
+		// Base 10 free slots (or 1000 with active subscription / staffSubscription / manageMedia) + permanent extraCdnSlots bought in the Credit Store
 		const extraCdnSlots = Math.max(0, Number((creditDoc as any)?.extraCdnSlots) || 0);
-		const maxUploads = (activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
+		const maxUploads = (isStaffSubscribed || canManage || activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
 
 		// Admins (canManage) bypass the quota limits entirely
 		if (currentUploadCount >= maxUploads && !canManage) {

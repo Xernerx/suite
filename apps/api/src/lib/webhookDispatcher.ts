@@ -1,6 +1,6 @@
 /** @format */
 
-import { randomUUID } from 'crypto';
+import { createHmac, randomUUID } from 'crypto';
 import { database } from '@xernerx/lib/server';
 
 export interface WebhookDeliveryRecord {
@@ -20,11 +20,12 @@ export interface DispatchBotWebhookOptions {
 	url: string;
 	event: string;
 	payload: Record<string, any>;
+	secret?: string;
 	headers?: Record<string, string>;
 	timeoutMs?: number;
 }
 
-export async function dispatchBotWebhook({ botId, url, event, payload, headers = {}, timeoutMs = 8000 }: DispatchBotWebhookOptions): Promise<WebhookDeliveryRecord> {
+export async function dispatchBotWebhook({ botId, url, event, payload, secret, headers = {}, timeoutMs = 8000 }: DispatchBotWebhookOptions): Promise<WebhookDeliveryRecord> {
 	const deliveryId = randomUUID();
 	const start = Date.now();
 	let status = 0;
@@ -35,6 +36,24 @@ export async function dispatchBotWebhook({ botId, url, event, payload, headers =
 	const timer = setTimeout(() => controller.abort(), timeoutMs);
 
 	try {
+		let resolvedSecret = typeof secret === 'string' && secret.trim() ? secret.trim() : '';
+		if (!resolvedSecret) {
+			try {
+				const db = await database('xernerx');
+				const HookModel = (db.models.bots as any).Hook;
+				if (HookModel) {
+					const matchedHook = await HookModel.findOne({ botId, url }).select('secret').lean();
+					if (matchedHook?.secret && typeof matchedHook.secret === 'string' && matchedHook.secret.trim()) {
+						resolvedSecret = matchedHook.secret.trim();
+					}
+				}
+			} catch {}
+		}
+
+		const rawBody = JSON.stringify(payload);
+		const signingSecret = resolvedSecret || process.env.WEBHOOK_SIGNING_SECRET || process.env.NEXTAUTH_SECRET || `xnx_whsec_${botId}`;
+		const signature = createHmac('sha256', signingSecret).update(rawBody).digest('hex');
+
 		const res = await fetch(url, {
 			method: 'POST',
 			headers: {
@@ -42,9 +61,10 @@ export async function dispatchBotWebhook({ botId, url, event, payload, headers =
 				'X-Xernerx-Event': event,
 				'X-Xernerx-Bot-Id': botId,
 				'X-Xernerx-Delivery-Id': deliveryId,
+				'X-Xernerx-Signature': `sha256=${signature}`,
 				...headers,
 			},
-			body: JSON.stringify(payload),
+			body: rawBody,
 			signal: controller.signal,
 		});
 
@@ -245,6 +265,7 @@ export async function dispatchBotReleaseWebhooks(bot: any, newRelease: any): Pro
 					url: hook.url,
 					event: 'POST release',
 					payload,
+					secret: hook.secret,
 				});
 				deliveries.push(delivery);
 			} catch (err) {

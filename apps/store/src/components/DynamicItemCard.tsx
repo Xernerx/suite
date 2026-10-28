@@ -10,20 +10,36 @@ interface DynamicItemCardProps {
 	item: CatalogItem;
 	billingInterval: 'month' | 'year';
 	actionLoading: string | null;
+	appliedCoupon?: {
+		code: string;
+		name: string;
+		discountType: 'percent' | 'amount';
+		percentOff: number;
+		amountOff: number;
+	} | null;
 	getActiveSubscription: (priceId: string | null) => UserSubscription | null | undefined;
 	handleSubscribe: (priceId: string | null, discountPercent: number) => void;
 	handleCancelClick: (subscriptionId: string) => void;
 }
 
-export function DynamicItemCard({ item, billingInterval, actionLoading, getActiveSubscription, handleSubscribe, handleCancelClick }: DynamicItemCardProps) {
+export function DynamicItemCard({ item, billingInterval, actionLoading, appliedCoupon, getActiveSubscription, handleSubscribe, handleCancelClick }: DynamicItemCardProps) {
 	const { t } = useDictionary();
 
 	const activePrice = item.prices.find((p) => p.interval === billingInterval) || item.prices[0];
 	const currentSub = getActiveSubscription(activePrice?.id || null);
 
 	const originalAmount = activePrice ? activePrice.unitAmount / 100 : null;
-	const discountedAmount = activePrice?.discountedAmount ? activePrice.discountedAmount / 100 : originalAmount;
-	const hasDiscount = item.discountPercent > 0 && originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
+	const baseDiscounted = activePrice?.discountedAmount ? activePrice.discountedAmount / 100 : originalAmount;
+	const effectiveDiscountPercent = appliedCoupon?.discountType === 'percent' ? Math.max(item.discountPercent || 0, appliedCoupon.percentOff || 0) : item.discountPercent || 0;
+	const discountedAmount =
+		originalAmount === null
+			? null
+			: appliedCoupon?.discountType === 'amount'
+				? Math.max(0, (baseDiscounted ?? originalAmount) - (appliedCoupon.amountOff || 0))
+				: effectiveDiscountPercent > 0
+					? originalAmount * (1 - effectiveDiscountPercent / 100)
+					: baseDiscounted;
+	const hasDiscount = originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
 
 	return (
 		<div className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md flex flex-col justify-between shadow-sm hover:border-(--accent)/50 hover:bg-(--foreground)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all">

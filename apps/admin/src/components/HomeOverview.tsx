@@ -12,6 +12,8 @@ import { buildHomeOverviewCards } from './overview/buildHomeOverviewCards';
 
 export interface AdminPermissionsMap {
 	canUsers: boolean;
+	canBots: boolean;
+	canServers: boolean;
 	canRoles: boolean;
 	canApplicationsReview: boolean;
 	canApplicationsManage: boolean;
@@ -48,6 +50,8 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 	const [suggestions, setSuggestions] = useState<any[]>([]);
 	const [roadmap, setRoadmap] = useState<any[]>([]);
 	const [users, setUsers] = useState<any[]>([]);
+	const [bots, setBots] = useState<any[]>([]);
+	const [servers, setServers] = useState<any[]>([]);
 	const [roles, setRoles] = useState<any[]>([]);
 	const [tokens, setTokens] = useState<any[]>([]);
 	const [storeItems, setStoreItems] = useState<any[]>([]);
@@ -174,6 +178,24 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
+				if (permissions.canBots && permissions.isServerSet) {
+					tasks.push(
+						fetch(getEnvUrl('https://api.xernerx.com/secure/bots?all=true'), { credentials: 'include' })
+							.then((r) => (r.ok ? r.json() : []))
+							.then((d) => setBots(Array.isArray(d) ? d : []))
+							.catch(() => {})
+					);
+				}
+
+				if (permissions.canServers && permissions.isServerSet) {
+					tasks.push(
+						fetch(getEnvUrl('https://api.xernerx.com/secure/guilds?all=true'), { credentials: 'include' })
+							.then((r) => (r.ok ? r.json() : []))
+							.then((d) => setServers(Array.isArray(d) ? d : []))
+							.catch(() => {})
+					);
+				}
+
 				if (permissions.canRoles && permissions.isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' })
@@ -267,6 +289,8 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 		suggestions,
 		roadmap,
 		users,
+		bots,
+		servers,
 		roles,
 		tokens,
 		storeItems,

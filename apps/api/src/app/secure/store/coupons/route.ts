@@ -13,10 +13,39 @@ const stripe = isStripeConfigured
 		})
 	: null;
 
-export async function GET() {
+export async function GET(req: Request) {
 	try {
 		const { models } = await database('xernerx');
 		const Coupon = (models.store as any).Coupon;
+
+		const url = new URL(req.url);
+		const codeQuery = url.searchParams.get('code')?.trim().toUpperCase();
+		if (codeQuery) {
+			const found = await Coupon.findOne({ code: codeQuery }).lean();
+			if (!found || !found.enabled) {
+				return NextResponse.json({ valid: false, error: 'Invalid or inactive promotion code' }, { status: 404 });
+			}
+			if (found.expiresAt && new Date(found.expiresAt).getTime() < Date.now()) {
+				return NextResponse.json({ valid: false, error: 'This promotion code has expired' }, { status: 400 });
+			}
+			if (found.maxRedemptions && (found.timesRedeemed || 0) >= found.maxRedemptions) {
+				return NextResponse.json({ valid: false, error: 'This promotion code has reached its redemption limit' }, { status: 400 });
+			}
+			return NextResponse.json({
+				valid: true,
+				coupon: {
+					id: found.id,
+					code: found.code,
+					name: found.name,
+					discountType: found.discountType || 'percent',
+					percentOff: found.percentOff || 0,
+					amountOff: found.amountOff || 0,
+					currency: found.currency || 'usd',
+					duration: found.duration || 'once',
+					durationInMonths: found.durationInMonths || null,
+				},
+			});
+		}
 
 		if (stripe) {
 			try {

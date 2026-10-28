@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -104,7 +105,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 		const session = (await getServerSession(auth).catch(() => null)) as any;
 		const actorUserId = session?.user?.id || (Array.isArray(bot.owners) ? bot.owners[0] : undefined);
-		const isVanityAlreadyUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified);
+		const isVanityAlreadyUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified || body.vanityUnlocked || body.verified);
 
 		if (body.action === 'unlock_vanity') {
 			if (!isVanityAlreadyUnlocked) {
@@ -158,7 +159,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			}
 		}
 
-		const updatableFields = ['description', 'info', 'privacy', 'widgets', 'organization', 'tags', 'commands', 'releases'];
+		const updatableFields = ['name', 'description', 'info', 'privacy', 'widgets', 'verified', 'vanityUnlocked', 'owners', 'organization', 'tags', 'commands', 'releases'];
 		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 
 		if (body.links && typeof body.links === 'object') {
@@ -178,6 +179,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 		await bot.save();
 		const savedObj = bot.toObject ? bot.toObject() : bot;
+
+		await recordAuditLog(request, {
+			action: 'bot.update',
+			targetType: 'bot',
+			targetId: bot.id,
+			summary: `Updated bot profile "${savedObj.name || bot.id}"`,
+			metadata: {
+				privacy: savedObj.privacy,
+				verified: Boolean(savedObj.verified),
+				vanitySlug: savedObj.vanitySlug || '',
+			},
+		});
+
 		return NextResponse.json(
 			{
 				...savedObj,
@@ -202,7 +216,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 		const BotModel = (db.models.bots as any).Bot;
 
 		const targetBot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] })
-			.select('id')
+			.select('id name')
 			.lean();
 		const result = await BotModel.deleteOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 		if (result.deletedCount === 0) {
@@ -213,6 +227,13 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 		if (TokenModel) {
 			await TokenModel.updateMany({ botId: targetBot?.id || id }, { $unset: { botId: 1 }, $set: { status: 'pending' } }).catch(() => {});
 		}
+
+		await recordAuditLog(request, {
+			action: 'bot.delete',
+			targetType: 'bot',
+			targetId: targetBot?.id || id,
+			summary: `Deleted bot "${targetBot?.name || targetBot?.id || id}"`,
+		});
 
 		return NextResponse.json({ message: 'Bot deleted successfully' }, { status: 200 });
 	} catch (error) {

@@ -1,5 +1,5 @@
 /** @format */
-import { Bug, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
+import { Bot, Bug, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
 import type { AdminPermissionsMap } from '../HomeOverview';
 import type { ModuleCard, UrgentItem } from './HomeOverviewSections';
 
@@ -13,6 +13,8 @@ interface BuildCardsInput {
 	suggestions: any[];
 	roadmap: any[];
 	users: any[];
+	bots: any[];
+	servers: any[];
 	roles: any[];
 	tokens: any[];
 	storeItems: any[];
@@ -32,6 +34,8 @@ export function buildHomeOverviewCards({
 	suggestions,
 	roadmap,
 	users,
+	bots,
+	servers,
 	roles,
 	tokens,
 	storeItems,
@@ -188,6 +192,30 @@ export function buildHomeOverviewCards({
 			meta: t('admin.dashboard.home.cards.usersMeta', { total: users.length, verified: verifiedUsers }),
 			icon: UsersIcon,
 			badge: { text: `${users.length}`, tone: 'normal' },
+		});
+	}
+
+	if (permissions.canBots && permissions.isServerSet) {
+		const verifiedBots = bots.filter((b) => b.verified).length;
+		moduleCards.push({
+			id: 'mod-bots',
+			view: 'bots',
+			title: t('admin.dashboard.home.cards.botsTitle'),
+			meta: t('admin.dashboard.home.cards.botsMeta', { total: bots.length, verified: verifiedBots }),
+			icon: Bot,
+			badge: { text: `${bots.length}`, tone: 'normal' },
+		});
+	}
+
+	if (permissions.canServers && permissions.isServerSet) {
+		const verifiedServers = servers.filter((s) => s.verified).length;
+		moduleCards.push({
+			id: 'mod-servers',
+			view: 'servers',
+			title: t('admin.dashboard.home.cards.serversTitle'),
+			meta: t('admin.dashboard.home.cards.serversMeta', { total: servers.length, verified: verifiedServers }),
+			icon: Server,
+			badge: { text: `${servers.length}`, tone: 'normal' },
 		});
 	}
 

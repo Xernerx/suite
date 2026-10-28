@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -151,7 +152,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const session = (await getServerSession(auth).catch(() => null)) as any;
 		const actorUserId = session?.user?.id || body.owner || existingGuild?.owner;
 
-		const isVanityAlreadyUnlocked = Boolean(existingGuild?.vanityUnlocked || existingGuild?.vanitySlug || existingGuild?.verified);
+		const isVanityAlreadyUnlocked = Boolean(existingGuild?.vanityUnlocked || existingGuild?.vanitySlug || existingGuild?.verified || body.vanityUnlocked || body.verified);
 
 		if (body.action === 'unlock_vanity') {
 			if (isVanityAlreadyUnlocked) {
@@ -219,7 +220,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.locale !== undefined) updateData['locale'] = body.locale;
 		if (body.owner !== undefined) updateData['owner'] = body.owner;
 		if (body.organization !== undefined) updateData['organization'] = body.organization;
-		if (body.verified !== undefined) updateData['verified'] = body.verified;
+		if (body.verified !== undefined) updateData['verified'] = Boolean(body.verified);
+		if (body.vanityUnlocked !== undefined) updateData['vanityUnlocked'] = Boolean(body.vanityUnlocked);
 		if (body.bot !== undefined) updateData['bot'] = body.bot;
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
@@ -232,6 +234,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (Object.keys(unsetData).length > 0) mongoUpdate.$unset = unsetData;
 
 		const updatedGuild = await db.findOneAndUpdate({ id: guildId }, mongoUpdate, { returnDocument: 'after', upsert: true, runValidators: true }).lean();
+
+		await recordAuditLog(req, {
+			action: 'server.update',
+			targetType: 'server',
+			targetId: guildId,
+			summary: `Updated server "${updatedGuild?.name || guildId}"`,
+			metadata: {
+				privacy: updatedGuild?.privacy,
+				verified: Boolean(updatedGuild?.verified),
+				vanitySlug: updatedGuild?.vanitySlug || '',
+			},
+		});
 
 		// Map to flat object so the frontend receives the correct response structure
 		const flatGuild = {
@@ -269,6 +283,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		if (!deletedGuild) {
 			return NextResponse.json({ error: 'Guild not found' }, { status: 404 });
 		}
+
+		await recordAuditLog(req, {
+			action: 'server.delete',
+			targetType: 'server',
+			targetId: deletedGuild.id || id,
+			summary: `Deleted server "${deletedGuild.name || deletedGuild.id || id}"`,
+		});
 
 		return NextResponse.json({ success: true }, { status: 200 });
 	} catch (error) {
