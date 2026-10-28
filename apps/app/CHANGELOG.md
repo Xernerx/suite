@@ -2,6 +2,19 @@
 
 # app
 
+## 2.16.3
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/components@0.11.1
+    - @xernerx/feedback@0.4.4
+    - @xernerx/lib@1.16.1
+    - @xernerx/providers@0.17.1
+    - @xernerx/styles@0.1.17
+    - @xernerx/ui@0.7.9
+
 ## 2.16.2
 
 ### Patch Changes

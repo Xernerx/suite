@@ -2,6 +2,12 @@
 
 # @xernerx/cli
 
+## 2.4.3
+
+### Patch Changes
+
+- Fixed a push error
+
 ## 2.4.2
 
 ### Patch Changes

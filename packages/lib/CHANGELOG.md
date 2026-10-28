@@ -2,6 +2,12 @@
 
 # @xernerx/lib
 
+## 1.16.1
+
+### Patch Changes
+
+- Fixed a push error
+
 ## 1.16.0
 
 ### Minor Changes

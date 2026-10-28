@@ -2,6 +2,14 @@
 
 # @xernerx/providers
 
+## 0.17.1
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/lib@1.16.1
+
 ## 0.17.0
 
 ### Minor Changes

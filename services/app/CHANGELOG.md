@@ -2,6 +2,14 @@
 
 # `@xernerx/app`
 
+## 2.3.2
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/lib@1.16.1
+
 ## 2.3.1
 
 ### Patch Changes

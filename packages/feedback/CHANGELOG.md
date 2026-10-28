@@ -2,6 +2,15 @@
 
 # @xernerx/feedback
 
+## 0.4.4
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/providers@0.17.1
+    - @xernerx/ui@0.7.9
+
 ## 0.4.3
 
 ### Patch Changes

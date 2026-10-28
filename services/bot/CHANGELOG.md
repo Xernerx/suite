@@ -2,6 +2,14 @@
 
 # bot
 
+## 2.1.3
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/lib@1.16.1
+
 ## 2.1.2
 
 ### Patch Changes

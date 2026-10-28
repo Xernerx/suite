@@ -2,6 +2,12 @@
 
 # @xernerx/styles
 
+## 0.1.17
+
+### Patch Changes
+
+- Fixed a push error
+
 ## 0.1.16
 
 ### Patch Changes

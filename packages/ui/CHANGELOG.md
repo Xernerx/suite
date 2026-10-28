@@ -2,6 +2,14 @@
 
 # @xernerx/ui
 
+## 0.7.9
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/providers@0.17.1
+
 ## 0.7.8
 
 ### Patch Changes

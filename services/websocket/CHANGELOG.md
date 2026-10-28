@@ -2,6 +2,14 @@
 
 # @xernerx/websocket
 
+## 1.3.9
+
+### Patch Changes
+
+- Fixed a push error
+- Updated dependencies
+    - @xernerx/lib@1.16.1
+
 ## 1.3.8
 
 ### Patch Changes
