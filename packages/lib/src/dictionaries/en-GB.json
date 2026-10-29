@@ -3014,6 +3014,43 @@
 			"metamorphosis": {
 				"title": "Metamorphosis",
 				"desc": "Advanced multilingual translation and role transformation utilities. Bridge global Discord communities with real-time message localization and automated language routing."
+			},
+			"overview": {
+				"departmentsTitle": "Teams & Focus Areas at Xernerx Studios",
+				"departmentsSubtitle": "We collaborate across engineering, community trust, technical support, and localization to build reliable Discord bots, open-source TypeScript SDKs, and the unified Xernerx Suite.",
+				"departments": {
+					"engineering": {
+						"title": "Platform & Bot Engineering",
+						"description": "Design and maintain our Next.js web applications, REST APIs, real-time WebSocket gateways, Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot), and open-source NPM packages (@xernerx/framework, @xernerx/stats)."
+					},
+					"moderation": {
+						"title": "Community Moderation & Trust",
+						"description": "Review public bot and server directory submissions, verify bot ownership and security compliance, moderate community spaces, and uphold safety standards across the Xernerx ecosystem."
+					},
+					"support": {
+						"title": "Technical Support & Documentation",
+						"description": "Assist server administrators and bot developers with dashboard configuration, API token setup, and troubleshooting while expanding our interactive guides and FAQ knowledge base."
+					},
+					"localization": {
+						"title": "Localization & Quality Assurance",
+						"description": "Translate and proofread the Xernerx Suite across supported languages using our built-in Translation Portal, and test new Canary features across web and desktop before public release."
+					}
+				},
+				"processTitle": "How Our Application Process Works",
+				"process": {
+					"step1": {
+						"title": "1. Select a Role & Submit",
+						"description": "Sign in with your Xernerx Account, choose an open team application above, and complete the role questionnaire with your relevant experience and examples."
+					},
+					"step2": {
+						"title": "2. Team & Technical Review",
+						"description": "Our department leads review every submission in the Staff Portal. You can track real-time status updates directly from your Xernerx notifications and Discord."
+					},
+					"step3": {
+						"title": "3. Onboarding & Access",
+						"description": "Accepted contributors receive scoped role-based permissions, access to our internal tools and Canary testing environments, and a warm welcome from the team."
+					}
+				}
 			}
 		},
 		"contact": {
@@ -3049,7 +3086,7 @@
 		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
-			"description": "Xernerx Studios is a development studio dedicated to consumer and developer simplicity. We build Discord bots that power thousands of communities—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—alongside reliable open-source frameworks (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
+			"description": "Xernerx Studios is a development studio dedicated to empowering developers and connecting communities through consumer and developer simplicity. We build Discord bots that power thousands of communities—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—alongside reliable open-source frameworks and SDKs (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
 			"buttons": {
 				"explore": "Explore Services",
 				"software": "View Software"
@@ -3077,7 +3114,7 @@
 		},
 		"about": {
 			"title": "About Xernerx",
-			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity. Across our in-house Discord bots—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—our open-source developer frameworks, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
+			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity—empowering developers and connecting communities worldwide. Across our in-house Discord bots—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—our open-source developer frameworks and SDKs, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
 			"description2": "At the core of our ecosystem is 1 Account, 1 Place, 1 Setup: one Xernerx Account used across everything Xernerx—whether you are configuring Virtue, Metamorphosis, or Zodiac for your server, discovering new communities, or using our Developer Portal and frameworks to track bot stats, publicly list your bots, and promote them.",
 			"watermark": "ABOUT US",
 			"pillars": {
@@ -3734,7 +3771,23 @@
 			"searchPlaceholder": "Search application invites...",
 			"copyInviteUrl": "Copy Invite Link",
 			"inviteUrlCopied": "Invite link copied to clipboard",
-			"noMatchingInvites": "No invites match \"{query}\"."
+			"noMatchingInvites": "No invites match \"{query}\".",
+			"guide": {
+				"title": "How Official Xernerx Bot Invites Work",
+				"subtitle": "Every invite link on this page connects directly to Discord's official OAuth2 authorization flow with least-privilege permissions tailored to each service.",
+				"permissions": {
+					"title": "Pre-Configured OAuth2 Permissions",
+					"description": "Each invite requests only the specific Discord permissions and slash-command scopes required for that bot—such as role management for Virtue level rewards or message translation hooks for Metamorphosis."
+				},
+				"dashboard": {
+					"title": "1 Account, 1 Place, 1 Setup",
+					"description": "Once invited to your Discord server, your bot automatically appears in the Xernerx Suite Dashboard (app.xernerx.com) so you can configure XP curves, channels, and modules in real time."
+				},
+				"verified": {
+					"title": "Verified & Monitored Infrastructure",
+					"description": "All official Xernerx Studios bots are verified Discord applications running on our managed multi-node infrastructure with 24/7 telemetry, automatic shard recovery, and strict privacy controls."
+				}
+			}
 		},
 		"changelog": {
 			"category": "Applications",

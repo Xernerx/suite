@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 
-import type { Locale } from '@xernerx/lib';
+import { defaultEnGbDictionary, type Locale } from '@xernerx/lib';
 
 const DictionaryContext = createContext<any | null>(null);
 
@@ -19,15 +19,17 @@ export function DictionaryProvider({
 	children: React.ReactNode;
 }) {
 	const currentLanguage = dictionary.locales.find((language) => language.code == dictionary.currentLocale);
+	const activeDictionary = dictionary.dictionary || defaultEnGbDictionary;
+	const fallbackDictionary = dictionary.fallbackDictionary || (dictionary.currentLocale !== 'en-GB' ? defaultEnGbDictionary : null);
 
 	const t = useMemo(() => {
 		return function translate(path: string, variables?: Record<string, string | number>) {
 			// 1. Try active language dictionary
-			let value = getNestedValue(dictionary.dictionary, path);
+			let value = getNestedValue(activeDictionary, path);
 
 			// 2. Fall back to the default/fallback dictionary if missing
-			if (value === undefined && dictionary.fallbackDictionary) {
-				value = getNestedValue(dictionary.fallbackDictionary, path);
+			if (value === undefined && fallbackDictionary) {
+				value = getNestedValue(fallbackDictionary, path);
 			}
 
 			// 3. Last resort fallback to path string
@@ -44,12 +46,12 @@ export function DictionaryProvider({
 
 			return value;
 		};
-	}, [dictionary.dictionary, dictionary.fallbackDictionary]);
+	}, [activeDictionary, fallbackDictionary]);
 
 	return (
 		<DictionaryContext.Provider
 			value={{
-				dictionary: dictionary.dictionary,
+				dictionary: activeDictionary,
 				currentLocale: dictionary.currentLocale,
 				locales: dictionary.locales,
 				currentLanguage,

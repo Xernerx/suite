@@ -92,7 +92,7 @@ export default function Timeline() {
 	const { t } = useDictionary();
 
 	return (
-		<section id="timeline" className="relative py-32 mb-32 max-w-(--page-width) mx-auto px-6">
+		<section id="timeline" className="relative py-32 mb-32 max-w-(--page-width) mx-auto w-full px-6">
 			<div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
 				{/* STICKY LEFT (Editorial Hero) */}
 				<div className="lg:col-span-5 relative">
@@ -147,7 +147,26 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 				whileHover={{ y: -6, scale: 1.01 }}
 				viewport={{ once: true, margin: '-80px' }}
 				transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-				className={`block w-full rounded-3xl transition-colors duration-500 bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 p-8 lg:p-10 shadow-2xl relative overflow-hidden group ${finalLink ? 'hover:border-(--accent)/50 hover:shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_40%,transparent)]' : 'hover:border-(--accent)/30'}`}
+				onClick={
+					finalLink
+						? () => {
+								window.location.href = finalLink;
+							}
+						: undefined
+				}
+				onKeyDown={
+					finalLink
+						? (e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									window.location.href = finalLink;
+								}
+							}
+						: undefined
+				}
+				role={finalLink ? 'link' : undefined}
+				tabIndex={finalLink ? 0 : undefined}
+				className={`block w-full rounded-3xl transition-colors duration-500 bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 p-8 lg:p-10 shadow-2xl relative overflow-hidden group ${finalLink ? 'cursor-pointer hover:border-(--accent)/50 hover:shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_40%,transparent)]' : 'hover:border-(--accent)/30'}`}
 			>
 				<div
 					className="absolute inset-0 opacity-[0.05] group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none"
@@ -179,13 +198,9 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 						</span>
 
 						<div className="text-2xl font-black flex items-center justify-between text-(--text) leading-tight">
-							{finalLink ? (
-								<a href={finalLink} className="after:absolute after:inset-0 flex items-center justify-between w-full">
-									<span>{t(`www.timeline.events.${index}.title`)}</span>
-									<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-								</a>
-							) : (
-								t(`www.timeline.events.${index}.title`)
+							<span>{t(`www.timeline.events.${index}.title`)}</span>
+							{finalLink && (
+								<ArrowUpRight size={24} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
 							)}
 						</div>
 					</div>

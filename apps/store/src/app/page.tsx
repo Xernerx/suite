@@ -240,7 +240,10 @@ export default function StorePage() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen transition-colors duration-200" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div
+			className="flex flex-col items-center justify-center max-w-(--page-width) mx-auto w-full min-h-screen transition-colors duration-200"
+			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+		>
 			<div className="max-w-4xl w-full flex flex-col items-center mb-4" style={{ gap: 'var(--ui-gap)' }}>
 				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('account.store.title')}

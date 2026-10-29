@@ -316,7 +316,7 @@ export default function InfoHomePage() {
 	];
 
 	return (
-		<div className="flex flex-col max-w-[1600px] mx-auto w-full p-8 md:p-12 gap-16 min-h-[80vh] justify-center relative">
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 gap-16 min-h-[80vh] justify-center relative">
 			{/* Decorative background glow */}
 			<div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-(--accent)/10 blur-[120px] rounded-full pointer-events-none -z-10"></div>
 

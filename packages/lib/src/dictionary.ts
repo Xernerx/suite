@@ -39,7 +39,7 @@ async function loadLocaleDict(code: Locale): Promise<any> {
 	return localesConfig[code].load();
 }
 
-export const dictionary = async (locale: Locale) => {
+export const dictionary = async (locale: Locale, options?: { includeDefault?: boolean }) => {
 	const targetLocale = localesConfig[locale] ? locale : defaultLocale;
 	const isDev = process.env.NODE_ENV === 'development';
 	const defaultDict = await loadLocaleDict(defaultLocale);
@@ -66,10 +66,11 @@ export const dictionary = async (locale: Locale) => {
 	}
 
 	const localesList = await localesCoveragePromise;
+	const keepFullPayload = isDev || Boolean(options?.includeDefault);
 
 	return {
-		dictionary: activeDict,
-		fallbackDictionary: targetLocale === defaultLocale ? null : defaultDict,
+		dictionary: !keepFullPayload && targetLocale === defaultLocale ? null : activeDict,
+		fallbackDictionary: keepFullPayload && targetLocale !== defaultLocale ? defaultDict : null,
 		locales: localesList,
 		currentLocale: targetLocale,
 	};

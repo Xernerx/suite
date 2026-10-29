@@ -250,7 +250,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ language
 		}
 
 		// Fallback to local dictionary if GitHub canary fetch is unavailable
-		const fallbackData = await dictionary(validLanguage);
+		const fallbackData = await dictionary(validLanguage, { includeDefault: true });
 		return NextResponse.json({
 			...fallbackData,
 			source: 'local',

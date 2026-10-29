@@ -2,6 +2,12 @@
 
 # @xernerx/lib
 
+## 1.16.3
+
+### Patch Changes
+
+- Enforce `--page-width` across all remaining application layouts, optimize SSR HTML payload size by deduplicating the fallback dictionary, and resolve all Seobility SEO and Google AdSense crawler visibility issues on `www.xernerx.com`.
+
 ## 1.16.2
 
 ### Patch Changes

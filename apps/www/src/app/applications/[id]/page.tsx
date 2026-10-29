@@ -179,7 +179,7 @@ export default function ApplicationFormPage() {
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-4xl mx-auto w-full pb-24">
+		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-(--page-width) mx-auto w-full pb-24">
 			<Link href="/applications" className="flex items-center gap-2 text-(--text-muted) hover:text-(--text) mb-8 transition-colors w-fit group">
 				<ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> {t('www.applications.backToApps')}
 			</Link>

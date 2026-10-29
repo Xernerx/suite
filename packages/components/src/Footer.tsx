@@ -82,7 +82,7 @@ export function Footer() {
 			{/* Fading top border */}
 			<div className="pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />
 
-			<div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
+			<div className="mx-auto grid w-full max-w-(--page-width) grid-cols-1 px-8 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:px-12" style={{ gap: 'var(--ui-gap)' }}>
 				{/* ---------------------------------------------------------------- */}
 				{/* Brand */}
 				{/* ---------------------------------------------------------------- */}
@@ -106,18 +106,17 @@ export function Footer() {
 							{shareLinks.map((item) => {
 								const ShareIcon = item.icon;
 								return (
-									<a
+									<button
 										key={item.href}
-										href={item.href}
-										target="_blank"
-										rel="noopener noreferrer"
+										type="button"
+										onClick={() => window.open(item.href, '_blank', 'noopener,noreferrer')}
 										aria-label={item.label}
 										title={item.label}
-										className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent)"
+										className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent) cursor-pointer"
 									>
 										<ShareIcon size={13} />
 										<span className="sr-only">{item.label}</span>
-									</a>
+									</button>
 								);
 							})}
 						</div>

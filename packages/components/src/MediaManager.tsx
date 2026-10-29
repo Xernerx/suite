@@ -336,8 +336,8 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 
 	return (
 		<div
-			className={`flex flex-col w-full max-w-(--page-width) mx-auto rounded-3xl transition-all ${isDragging ? 'ring-2 ring-(--accent) bg-(--accent)/5 p-4' : ''}`}
-			style={{ gap: 'var(--ui-gap)' }}
+			className={`flex flex-col max-w-(--page-width) mx-auto w-full rounded-3xl transition-all ${isDragging ? 'ring-2 ring-(--accent) bg-(--accent)/5 p-4' : ''}`}
+			style={{ gap: 'var(--ui-gap)', ...(scope === 'self' ? { padding: 'var(--ui-gap)' } : {}) }}
 			onDragOver={(e) => {
 				if (!canUpload && !canManage) return;
 				e.preventDefault();

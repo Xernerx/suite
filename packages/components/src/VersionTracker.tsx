@@ -171,7 +171,7 @@ export function VersionTracker() {
 						let fallbackAssetUrl: string | null = ipcRes.downloadUrl || null;
 						if (!fallbackAssetUrl) {
 							try {
-								const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/downloads/app?channel=${channel}`));
+								const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/downloads/app?channel=${channel}`));
 								if (res.ok) {
 									const data = await res.json();
 									const ua = navigator.userAgent.toLowerCase();
@@ -193,7 +193,7 @@ export function VersionTracker() {
 
 				// Fallback for older installed desktop binaries that don't yet expose `checkForUpdate`
 				if (!resolved) {
-					const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/downloads/app?channel=${channel}`));
+					const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/downloads/app?channel=${channel}`));
 					if (res.ok) {
 						const data = await res.json();
 						const ua = navigator.userAgent.toLowerCase();
@@ -308,7 +308,13 @@ export function VersionTracker() {
 			setInstalling(true);
 			setInstallStatus('downloading');
 			setProgress(1);
-			const ok = await electron.installUpdate();
+			const ok = await electron.installUpdate({
+				outdated: desktopUpdate.outdated,
+				currentVersion: desktopUpdate.currentVersion,
+				latestVersion: desktopUpdate.latestVersion,
+				channel: desktopUpdate.channel,
+				downloadUrl: desktopUpdate.downloadUrl,
+			});
 			if (!ok) {
 				setInstalling(false);
 				setInstallStatus('error');

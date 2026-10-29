@@ -37,6 +37,7 @@ const APPS = [
 	{ id: 'docs', name: 'Docs', devPort: 4005 },
 	{ id: 'info', name: 'Info', devPort: 4007 },
 	{ id: 'store', name: 'Store', devPort: 4008 },
+	{ id: 'haste', name: 'Haste', devPort: 4011 },
 	{ id: 'www', name: 'Website', devPort: 4000 },
 ] as const;
 

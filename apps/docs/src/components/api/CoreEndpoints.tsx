@@ -164,6 +164,7 @@ export function CoreEndpoints({ activeGroup = 'all', searchQuery = '', methodFil
 				{ method: 'GET', path: '/core/docs/[id]?locale=en-GB', auth: 'public' as const },
 				{ method: 'GET', path: '/core/changelog/reactions', auth: 'public' as const },
 				{ method: 'POST', path: '/core/changelog/reactions', auth: 'token' as const },
+				{ method: 'GET', path: '/core/downloads/app?channel=stable|canary', auth: 'public' as const },
 			],
 		},
 		{

@@ -97,7 +97,7 @@ jobs:
                       clients/desktop/release/*.exe
                       clients/desktop/release/*.dmg
                       clients/desktop/release/*.AppImage
-                      clients/desktop/release/*.yml
+                      clients/desktop/release/latest*.yml
                       clients/desktop/release/*.blockmap
                   if-no-files-found: error
 
@@ -134,7 +134,7 @@ jobs:
                       release-artifacts/**/*.exe
                       release-artifacts/**/*.dmg
                       release-artifacts/**/*.AppImage
-                      release-artifacts/**/*.yml
+                      release-artifacts/**/latest*.yml
                       release-artifacts/**/*.blockmap
                   tag_name: ${{ needs.check-version.outputs.tag_name }}
                   name: Desktop ${{ needs.check-version.outputs.tag_name }}

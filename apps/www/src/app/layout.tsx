@@ -13,11 +13,10 @@ import { getServerSession } from 'next-auth';
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx Studios | 1 Account, 1 Place, 1 Setup — Discord Bots, Stats & Suite',
+		default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 		template: 'Xernerx Studios | %s',
 	},
-	description:
-		'Xernerx Studios is a development studio built for consumer and developer simplicity. Use 1 Xernerx Account across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac to configure services in 1 dashboard, or build with reliable frameworks, track bot stats, publicly list, and promote Discord bots.',
+	description: 'Xernerx Studios builds Discord bots (Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 	keywords: [
 		'Xernerx',
 		'Xernerx Studios',
@@ -39,11 +38,10 @@ export const metadata: Metadata = {
 
 	openGraph: {
 		title: {
-			default: 'Xernerx Studios | 1 Account, 1 Place, 1 Setup — Discord Bots, Stats & Suite',
+			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description:
-			'1 Account, 1 Place, 1 Setup. Use your Xernerx Account across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac—configure services in one dashboard, or track bot stats, publicly list, and promote your Discord bots.',
+		description: 'Xernerx Studios builds Discord bots (Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 		url: 'https://www.xernerx.com',
 		siteName: 'Xernerx Studios',
 		images: [
@@ -51,7 +49,7 @@ export const metadata: Metadata = {
 				url: '/banner.png',
 				width: 1200,
 				height: 630,
-				alt: 'Xernerx Studios — 1 Account, 1 Place, 1 Setup',
+				alt: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			},
 		],
 		type: 'website',
@@ -60,11 +58,10 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx Studios | 1 Account, 1 Place, 1 Setup — Discord Bots, Stats & Suite',
+			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description:
-			'1 Account, 1 Place, 1 Setup. Configure Virtue, Metamorphosis, and Zodiac in one dashboard, or build with reliable frameworks, track bot stats, publicly list, and promote Discord bots.',
+		description: 'Xernerx Studios builds Discord bots (Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 		images: ['/banner.png'],
 	},
 

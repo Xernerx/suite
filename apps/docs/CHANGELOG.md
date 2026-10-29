@@ -2,6 +2,35 @@
 
 # docs
 
+## 1.8.6
+
+### Patch Changes
+
+- Enforce `--page-width` across all remaining application layouts, optimize SSR HTML payload size by deduplicating the fallback dictionary, and resolve all Seobility SEO and Google AdSense crawler visibility issues on `www.xernerx.com`.
+- Updated dependencies
+    - @xernerx/components@0.12.3
+    - @xernerx/lib@1.16.3
+    - @xernerx/providers@0.18.1
+    - @xernerx/feedback@0.4.6
+    - @xernerx/ui@0.7.11
+
+## 1.8.5
+
+### Patch Changes
+
+- ### Core Desktop Download Route & GitHub Release Asset Deduplication (`api`, `@xernerx/components`, `desktop`, `docs`, `www`)
+    - **Core Desktop Download Endpoint (`apps/api/src/app/core/downloads/app/route.ts`, `apps/api/AGENTS.md`)**:
+        - Moved `GET /secure/downloads/app` to `GET /core/downloads/app` so public desktop release metadata and installer asset lookups reside under `/core` while keeping `/secure/*` strictly locked down.
+    - **Desktop Auto-Updater & Consumer Updates (`clients/desktop/src/updater.ts`, `clients/desktop/src/main.ts`, `clients/desktop/src/preload.cts`, `packages/components/src/VersionTracker.tsx`, `apps/www/src/app/download/page.tsx`)**:
+        - Updated all desktop release metadata consumers (`updater.ts`, `VersionTracker.tsx`, `www/download`) to query `/core/downloads/app?channel=...` and forward resolved `targetInfo` through `installUpdate` IPC.
+    - **API Documentation Sync (`apps/docs/src/components/api/CoreEndpoints.tsx`, `apps/docs/src/components/api/SecureEndpoints.tsx`)**:
+        - Documented `GET /core/downloads/app?channel=stable|canary` under `CoreEndpoints` and removed the legacy `/secure/downloads/app` entry from `SecureEndpoints`.
+    - **GitHub Release Workflow Asset Deduplication (`.github/workflows/release.yml`, `.github/workflows/canary.yml`)**:
+        - Scoped `.yml` artifact glob patterns to `latest*.yml` (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`) to exclude duplicate `builder-debug.yml` files across the 3 OS matrix runners that caused `softprops/action-gh-release@v2` concurrent upload `404 Not Found` collisions.
+
+- Updated dependencies
+    - @xernerx/components@0.12.2
+
 ## 1.8.4
 
 ### Patch Changes

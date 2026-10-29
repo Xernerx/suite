@@ -1,6 +1,6 @@
 {
 	"name": "api",
-	"version": "0.24.3",
+	"version": "0.24.5",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
