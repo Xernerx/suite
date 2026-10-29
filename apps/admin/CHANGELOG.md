@@ -2,6 +2,17 @@
 
 # admin
 
+## 0.21.8
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.16.5
+    - @xernerx/components@0.12.5
+    - @xernerx/providers@0.18.3
+    - @xernerx/feedback@0.4.8
+    - @xernerx/ui@0.7.13
+
 ## 0.21.7
 
 ### Patch Changes

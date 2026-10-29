@@ -2,6 +2,12 @@
 
 # @xernerx/cli
 
+## 2.4.4
+
+### Patch Changes
+
+- Fixed an issue where Virtue db and Xernerx db collided
+
 ## 2.4.3
 
 ### Patch Changes

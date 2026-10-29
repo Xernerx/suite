@@ -2,6 +2,12 @@
 
 # @xernerx/lib
 
+## 1.16.5
+
+### Patch Changes
+
+- Fixed an issue where Virtue db and Xernerx db collided
+
 ## 1.16.4
 
 ### Patch Changes

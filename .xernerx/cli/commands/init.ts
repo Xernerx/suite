@@ -124,7 +124,7 @@ POSTMARK_TOKEN=""
 WS_TOKEN=""
 XERNERX_TOKEN=""
 XERNERX_APP_TOKEN=""
-MONGO_VIRTUE="${mongoXernerx}"
+MONGO_VIRTUE=""
 `;
 
 	fs.writeFileSync(rootEnv, boilerplateEnv);
