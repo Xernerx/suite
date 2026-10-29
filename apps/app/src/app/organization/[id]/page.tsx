@@ -220,7 +220,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 	const currentView = view || 'profile';
 
 	return (
-		<div className="flex flex-col w-full min-h-screen pb-24">
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
 			<Header organization={organization} id={id} servers={servers} />
 
 			<div className="mt-4">{currentView === 'profile' && <Profile organization={organization} bots={bots} servers={servers} />}</div>

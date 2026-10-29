@@ -70,7 +70,7 @@ export default function Page() {
 
 	return (
 		<div
-			className="relative flex flex-col max-w-[1400px] mx-auto w-full items-center justify-center"
+			className="relative flex flex-col max-w-(--page-width) mx-auto w-full items-center justify-center"
 			style={{
 				padding: 'calc(var(--ui-gap) * 1.5)',
 				gap: 'calc(var(--ui-gap) * 2.25)',

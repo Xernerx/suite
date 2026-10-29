@@ -2,7 +2,10 @@
 
 export interface HasteAuthor {
 	id: string;
-	name: string;
+	name?: string;
+	username?: string;
+	globalName?: string;
+	avatarUrl?: string | null;
 	image?: string | null;
 	verified?: boolean;
 }
@@ -19,13 +22,13 @@ export interface HasteDocumentItem {
 	views: number;
 	size: number;
 	expiresIn: '1h' | '24h' | '7d' | '30d' | 'never';
-	expiresAt: number | null;
-	createdAt: number;
-	updatedAt: number;
+	expiresAt: number | string | null;
+	createdAt: number | string;
+	updatedAt: number | string;
 	url: string;
 	rawUrl: string;
-	isOwner: boolean;
-	author?: HasteAuthor;
+	isOwner?: boolean;
+	author?: HasteAuthor | null;
 }
 
 export const HASTE_LANGUAGES = [

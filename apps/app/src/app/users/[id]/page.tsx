@@ -227,7 +227,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 	const isPrivateProfile = user?.privacy === 'private' && uid !== id && uid !== user?.id;
 
 	return (
-		<div className="flex flex-col w-full min-h-screen pb-24">
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
 			<Header user={user} discordUser={discordUser} bots={bots} id={user?.id || id} isPrivate={isPrivateProfile} />
 
 			<div className="mt-4">

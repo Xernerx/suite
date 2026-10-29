@@ -198,7 +198,7 @@ export default function RoadmapPage() {
 	});
 
 	return (
-		<div className="flex flex-col w-full min-h-screen overflow-hidden">
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen overflow-hidden">
 			{/* Header & Metrics */}
 			<motion.div
 				initial={{ opacity: 1, y: 0 }}

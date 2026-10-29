@@ -73,7 +73,7 @@ export default function InvitesPage() {
 
 	return (
 		<div className="min-h-screen py-32 relative">
-			<div className="max-w-7xl mx-auto px-6 relative z-10">
+			<div className="max-w-(--page-width) mx-auto px-6 relative z-10">
 				<div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
 					<div>
 						<h1 className="text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>

@@ -50,7 +50,7 @@ export default function ContactPage() {
 		hide();
 	}, [hide]);
 	return (
-		<div className="mx-auto w-full max-w-7xl px-6 py-20">
+		<div className="mx-auto w-full max-w-(--page-width) px-6 py-20">
 			<motion.div
 				initial={{
 					opacity: 1,

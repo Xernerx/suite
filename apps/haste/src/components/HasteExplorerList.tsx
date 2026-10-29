@@ -3,20 +3,21 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Clock, Code2, Copy, ExternalLink, Eye, FileCode2, Globe, Link2, Lock, RefreshCw, Trash2 } from 'lucide-react';
-import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
+import { useSession } from 'next-auth/react';
+import { Clock, Code2, Copy, ExternalLink, Eye, FileCode2, FolderGit2, Globe, Link2, Lock, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { formatBytes, HASTE_LANGUAGES, type HasteDocumentItem } from './hasteConstants';
 
-interface HasteExplorerListProps {
-	mode: 'public' | 'mine';
-}
-
-export function HasteExplorerList({ mode }: HasteExplorerListProps) {
+export function HasteExplorerList() {
 	const { t } = useDictionary();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
 	const { user } = useUser();
+	const { data: session } = useSession();
+	const { setView } = useSidebar();
+
+	const effectiveUserId = user?.userId || (session?.user as any)?.id || '';
 
 	const [documents, setDocuments] = useState<HasteDocumentItem[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -28,7 +29,7 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 	const languageOptions = useMemo(() => [{ value: 'all', label: t('haste.explorer.allLanguages') }, ...HASTE_LANGUAGES.map((lang) => ({ value: lang.value, label: lang.label }))], [t]);
 
 	const fetchDocuments = useCallback(async () => {
-		if (mode === 'mine' && !user?.userId) {
+		if (!isReady || !effectiveUserId) {
 			setDocuments([]);
 			setLoading(false);
 			return;
@@ -37,10 +38,8 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 		try {
 			const params = new URLSearchParams();
 			params.set('limit', '50');
-			if (mode === 'mine' && user?.userId) {
-				params.set('mine', 'true');
-				params.set('userId', user.userId);
-			}
+			params.set('mine', 'true');
+			params.set('userId', effectiveUserId);
 			if (searchQuery.trim()) {
 				params.set('search', searchQuery.trim());
 			}
@@ -50,12 +49,13 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 
 			const url = getEnvUrl(`https://api.xernerx.com/v1/haste?${params.toString()}`);
 			const res = await fetch(url, {
-				headers: user?.userId ? { 'x-user-id': user.userId } : undefined,
+				headers: { 'x-user-id': effectiveUserId },
 				cache: 'no-store',
 			});
 			const json = await res.json();
-			if (res.ok && json.data?.documents) {
-				setDocuments(json.data.documents);
+			const list = Array.isArray(json?.data) ? json.data : Array.isArray(json?.data?.documents) ? json.data.documents : [];
+			if (res.ok) {
+				setDocuments(list);
 			} else {
 				setDocuments([]);
 			}
@@ -64,7 +64,7 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 		} finally {
 			setLoading(false);
 		}
-	}, [getEnvUrl, languageFilter, mode, searchQuery, user?.userId]);
+	}, [effectiveUserId, getEnvUrl, isReady, languageFilter, searchQuery]);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -84,13 +84,13 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 	};
 
 	const handleDeleteConfirmed = async () => {
-		if (!deletingId || !user?.userId) return;
+		if (!deletingId || !effectiveUserId) return;
 		setDeleteLoading(true);
 		try {
-			const url = getEnvUrl(`https://api.xernerx.com/v1/haste/${deletingId}?userId=${encodeURIComponent(user.userId)}`);
+			const url = getEnvUrl(`https://api.xernerx.com/v1/haste/${deletingId}?userId=${encodeURIComponent(effectiveUserId)}`);
 			const res = await fetch(url, {
 				method: 'DELETE',
-				headers: { 'x-user-id': user.userId },
+				headers: { 'x-user-id': effectiveUserId },
 			});
 			if (res.ok) {
 				setDocuments((prev) => prev.filter((doc) => doc.id !== deletingId));
@@ -145,32 +145,51 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 
 	return (
 		<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
-			<div
-				className="flex flex-col md:flex-row items-stretch md:items-center justify-between rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm"
-				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-			>
-				<div className="flex-1 min-w-0">
-					<Input
-						variant="search"
-						shortcut={true}
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						onSearch={(val) => setSearchQuery(val)}
-						placeholder={t('haste.explorer.searchPlaceholder')}
-					/>
-				</div>
-				<div className="flex items-center shrink-0" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
-					<div className="w-48">
-						<Selector value={languageFilter} options={languageOptions} onChange={setLanguageFilter} />
+			{/* Header & Filter Bar */}
+			<div className="flex flex-col rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="flex items-center" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+						<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+							<FolderGit2 className="w-6 h-6" />
+						</div>
+						<div className="flex flex-col">
+							<h1 className="text-xl sm:text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{t('haste.tabs.mine')}
+							</h1>
+							<p className="text-xs sm:text-sm text-(--text-muted)">{t('haste.hero.subtitle')}</p>
+						</div>
 					</div>
-					<Button variant="secondary" className="rounded-2xl h-11 px-4" onClick={() => void fetchDocuments()} disabled={loading}>
-						<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+
+					<Button variant="primary" size="sm" className="rounded-2xl px-4 py-2.5 shrink-0" onClick={() => setView('editor')}>
+						<Plus className="w-4 h-4 mr-1.5" />
+						{t('haste.tabs.editor')}
 					</Button>
+				</div>
+
+				<div className="flex flex-col md:flex-row items-stretch md:items-center justify-between pt-2 border-t border-(--border)/10" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="flex-1 min-w-0">
+						<Input
+							variant="search"
+							shortcut={true}
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							onSearch={(val) => setSearchQuery(val)}
+							placeholder={t('haste.explorer.searchPlaceholder')}
+						/>
+					</div>
+					<div className="flex items-center shrink-0" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+						<div className="w-48">
+							<Selector value={languageFilter} options={languageOptions} onChange={setLanguageFilter} />
+						</div>
+						<Button variant="secondary" className="rounded-2xl h-11 px-4" onClick={() => void fetchDocuments()} disabled={loading}>
+							<RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+						</Button>
+					</div>
 				</div>
 			</div>
 
 			{loading ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-(--ui-gap)">
+				<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
 					{[0, 1, 2, 3].map((item) => (
 						<div key={item} className="h-44 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 animate-pulse" style={{ padding: 'var(--ui-gap)' }} />
 					))}
@@ -184,9 +203,13 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 						<FileCode2 className="w-7 h-7" />
 					</div>
 					<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{mode === 'mine' ? t('haste.explorer.emptyMineTitle') : t('haste.explorer.emptyPublicTitle')}
+						{t('haste.explorer.emptyMineTitle')}
 					</h3>
-					<p className="text-sm text-(--text-muted) max-w-md">{mode === 'mine' ? t('haste.explorer.emptyMineDescription') : t('haste.explorer.emptyPublicDescription')}</p>
+					<p className="text-sm text-(--text-muted) max-w-md">{t('haste.explorer.emptyMineDescription')}</p>
+					<Button variant="primary" size="sm" className="rounded-2xl px-4 py-2 mt-1" onClick={() => setView('editor')}>
+						<Plus className="w-4 h-4 mr-1.5" />
+						{t('haste.tabs.editor')}
+					</Button>
 				</div>
 			) : (
 				<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
@@ -245,11 +268,9 @@ export function HasteExplorerList({ mode }: HasteExplorerListProps) {
 											{t('haste.actions.open')}
 										</Button>
 									</Link>
-									{(mode === 'mine' || doc.isOwner) && (
-										<Button variant="danger" size="sm" className="rounded-xl px-2.5 py-1.5" onClick={() => setDeletingId(doc.id)}>
-											<Trash2 className="w-3.5 h-3.5" />
-										</Button>
-									)}
+									<Button variant="danger" size="sm" className="rounded-xl px-2.5 py-1.5" onClick={() => setDeletingId(doc.id)}>
+										<Trash2 className="w-3.5 h-3.5" />
+									</Button>
 								</div>
 							</div>
 						</div>

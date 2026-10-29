@@ -296,11 +296,11 @@ export function V1PlatformEndpoints({
 			routes: [
 				{ method: 'GET', path: '/v1/haste', auth: 'public' as const },
 				{ method: 'POST', path: '/v1/haste', auth: 'public' as const },
-				{ method: 'GET', path: '/v1/haste/:id', auth: 'public' as const },
-				{ method: 'GET', path: '/v1/haste/:id/raw', auth: 'public' as const },
-				{ method: 'PATCH', path: '/v1/haste/:id', auth: 'public' as const },
-				{ method: 'DELETE', path: '/v1/haste/:id', auth: 'public' as const },
-				{ method: 'POST', path: 'https://haste.xernerx.com/documents/:userId', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/haste/[id]', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/haste/[id]/raw', auth: 'public' as const },
+				{ method: 'PATCH', path: '/v1/haste/[id]', auth: 'public' as const },
+				{ method: 'DELETE', path: '/v1/haste/[id]', auth: 'public' as const },
+				{ method: 'POST', path: 'https://haste.xernerx.com/documents/[userId]', auth: 'public' as const },
 			],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">

@@ -4,8 +4,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Check, Clock, Code2, Copy, Download, ExternalLink, Eye, FileCode2, GitFork, Globe, Link2, Lock, ShieldAlert, Trash2, User } from 'lucide-react';
-import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
+import { useSession } from 'next-auth/react';
+import { ArrowLeft, Check, Clock, Code2, Copy, Download, ExternalLink, Eye, FileCode2, FolderGit2, GitFork, Globe, Link2, Lock, Plus, Trash2, User } from 'lucide-react';
+import { Loading, NotFound } from '@xernerx/feedback';
+import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Button, CodeBlock, Confirm, Selector } from '@xernerx/ui';
 import { formatBytes, HASTE_FILE_EXTENSION_MAP, type HasteDocumentItem } from './hasteConstants';
 
@@ -15,45 +17,78 @@ interface HasteDocumentViewerProps {
 
 export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	const { t } = useDictionary();
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { toast } = useToast();
 	const { user } = useUser();
+	const { data: session, status } = useSession();
+	const { show, hide, setNavItems, clearNavItems } = useSidebar();
 	const router = useRouter();
+
+	const effectiveUserId = user?.userId || (session?.user as any)?.id || '';
 
 	const [doc, setDoc] = useState<HasteDocumentItem | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [errorStatus, setErrorStatus] = useState<number | null>(null);
+	const [redirectingToLogin, setRedirectingToLogin] = useState(false);
 	const [copiedCode, setCopiedCode] = useState(false);
 	const [copiedLink, setCopiedLink] = useState(false);
 	const [updatingMeta, setUpdatingMeta] = useState(false);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 	const [deleteLoading, setDeleteLoading] = useState(false);
 
+	// Configure sidebar for authenticated users; hide for unauthenticated viewers
+	useEffect(() => {
+		if (status === 'authenticated') {
+			show();
+			setNavItems([
+				{
+					label: t('haste.tabs.editor'),
+					icon: Plus,
+					onClick: () => router.push('/?view=editor'),
+					category: t('haste.sidebar.title'),
+				},
+				{
+					label: t('haste.tabs.mine'),
+					icon: FolderGit2,
+					onClick: () => router.push('/?view=mine'),
+					category: t('haste.sidebar.title'),
+				},
+			]);
+		} else if (status === 'unauthenticated') {
+			hide();
+			clearNavItems();
+		}
+		return () => clearNavItems();
+	}, [clearNavItems, hide, router, setNavItems, show, status, t]);
+
 	const fetchDocument = useCallback(async () => {
+		if (!isReady || status === 'loading') return;
 		setLoading(true);
-		setErrorStatus(null);
 		try {
 			const cleanId = id.split('.')[0] || id;
-			const query = user?.userId ? `?userId=${encodeURIComponent(user.userId)}` : '';
+			const query = effectiveUserId ? `?userId=${encodeURIComponent(effectiveUserId)}` : '';
 			const url = getEnvUrl(`https://api.xernerx.com/v1/haste/${encodeURIComponent(cleanId)}${query}`);
 			const res = await fetch(url, {
-				headers: user?.userId ? { 'x-user-id': user.userId } : undefined,
+				headers: effectiveUserId ? { 'x-user-id': effectiveUserId } : undefined,
 				cache: 'no-store',
 			});
-			const json = await res.json();
-			if (res.ok && json.data) {
-				setDoc(json.data);
+			const json = await res.json().catch(() => null);
+			const docData = json?.data || (json?.id ? json : null);
+
+			if (res.ok && docData) {
+				setDoc(docData);
+			} else if (res.status === 403 && status === 'unauthenticated') {
+				setRedirectingToLogin(true);
+				window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+				return;
 			} else {
 				setDoc(null);
-				setErrorStatus(res.status);
 			}
 		} catch {
 			setDoc(null);
-			setErrorStatus(500);
 		} finally {
 			setLoading(false);
 		}
-	}, [getEnvUrl, id, user?.userId]);
+	}, [effectiveUserId, getEnvUrl, id, isReady, status]);
 
 	useEffect(() => {
 		void fetchDocument();
@@ -119,7 +154,7 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	};
 
 	const handleUpdateMetadata = async (patch: { privacy?: 'public' | 'limited' | 'private'; expiresIn?: '1h' | '24h' | '7d' | '30d' | 'never' }) => {
-		if (!doc || !user?.userId || updatingMeta) return;
+		if (!doc || !effectiveUserId || updatingMeta) return;
 		setUpdatingMeta(true);
 		try {
 			const url = getEnvUrl(`https://api.xernerx.com/v1/haste/${doc.id}`);
@@ -127,16 +162,17 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
-					'x-user-id': user.userId,
+					'x-user-id': effectiveUserId,
 				},
 				body: JSON.stringify({
-					userId: user.userId,
+					userId: effectiveUserId,
 					...patch,
 				}),
 			});
 			const json = await res.json();
-			if (res.ok && json.data) {
-				setDoc((prev) => (prev ? { ...prev, ...json.data } : prev));
+			const updated = json?.data || (json?.id ? json : null);
+			if (res.ok && updated) {
+				setDoc((prev) => (prev ? { ...prev, ...updated } : prev));
 				toast({
 					title: t('haste.toasts.updatedTitle'),
 					description: t('haste.toasts.updatedDescription'),
@@ -145,7 +181,7 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 			} else {
 				toast({
 					title: t('haste.toasts.errorTitle'),
-					description: json.message || t('haste.toasts.updateFailedDescription'),
+					description: json?.error || json?.message || t('haste.toasts.updateFailedDescription'),
 					type: 'error',
 				});
 			}
@@ -161,13 +197,13 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	};
 
 	const handleDelete = async () => {
-		if (!doc || !user?.userId) return;
+		if (!doc || !effectiveUserId) return;
 		setDeleteLoading(true);
 		try {
-			const url = getEnvUrl(`https://api.xernerx.com/v1/haste/${doc.id}?userId=${encodeURIComponent(user.userId)}`);
+			const url = getEnvUrl(`https://api.xernerx.com/v1/haste/${doc.id}?userId=${encodeURIComponent(effectiveUserId)}`);
 			const res = await fetch(url, {
 				method: 'DELETE',
-				headers: { 'x-user-id': user.userId },
+				headers: { 'x-user-id': effectiveUserId },
 			});
 			if (res.ok) {
 				toast({
@@ -195,57 +231,34 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 		}
 	};
 
-	const isOwner = Boolean(doc && (doc.isOwner || (user?.userId && user.userId === doc.userId)));
+	const isOwner = Boolean(doc && (doc.isOwner || (effectiveUserId && effectiveUserId === doc.userId)));
 	const linesCount = useMemo(() => (doc?.content ? doc.content.split(/\r?\n/).length : 0), [doc?.content]);
+	const authorDisplayName = doc?.author?.globalName || doc?.author?.username || doc?.author?.name || null;
 
-	if (loading) {
-		return (
-			<div className="flex flex-col w-full max-w-7xl mx-auto" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-				<div className="h-28 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 animate-pulse" />
-				<div className="h-[520px] rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 animate-pulse" />
-			</div>
-		);
+	if (!isReady || status === 'loading' || loading || redirectingToLogin) {
+		return <Loading />;
 	}
 
 	if (!doc) {
-		return (
-			<div className="flex flex-col w-full max-w-3xl mx-auto items-center justify-center text-center" style={{ padding: 'calc(var(--ui-gap) * 2)', gap: 'var(--ui-gap)' }}>
-				<div
-					className="flex flex-col items-center justify-center w-full rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10"
-					style={{ padding: 'calc(var(--ui-gap) * 2.5)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-(--accent-red)/15 text-(--accent-red) border border-(--accent-red)/30">
-						<ShieldAlert className="w-8 h-8" />
-					</div>
-					<h1 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{errorStatus === 403 ? t('haste.viewer.privateTitle') : t('haste.viewer.notFoundTitle')}
-					</h1>
-					<p className="text-sm text-(--text-muted) max-w-md">{errorStatus === 403 ? t('haste.viewer.privateDescription') : t('haste.viewer.notFoundDescription')}</p>
-					<Link href="/">
-						<Button variant="primary" className="rounded-2xl px-5 py-2.5">
-							<ArrowLeft className="w-4 h-4 mr-2" />
-							{t('haste.actions.backToStudio')}
-						</Button>
-					</Link>
-				</div>
-			</div>
-		);
+		return <NotFound />;
 	}
 
 	return (
-		<div className="flex flex-col w-full max-w-7xl mx-auto" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-			{/* Top Metadata & Action Card */}
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<div
 				className="flex flex-col rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_10%,transparent)]"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
+				{/* Header & Action Toolbar */}
 				<div className="flex flex-col lg:flex-row items-start lg:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex items-start min-w-0" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
-						<Link href="/">
-							<Button variant="secondary" size="icon" className="rounded-2xl h-12 w-12 shrink-0">
-								<ArrowLeft className="w-5 h-5" />
-							</Button>
-						</Link>
+						{status === 'authenticated' && (
+							<Link href="/">
+								<Button variant="secondary" size="icon" className="rounded-2xl h-11 w-11 shrink-0">
+									<ArrowLeft className="w-5 h-5" />
+								</Button>
+							</Link>
+						)}
 						<div className="flex flex-col min-w-0" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 							<div className="flex items-center flex-wrap gap-2">
 								<h1 className="text-xl sm:text-2xl font-bold text-(--text) truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -275,10 +288,10 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 
 							<div className="flex items-center flex-wrap gap-3 text-xs text-(--text-muted)">
 								<span className="font-mono text-(--text) font-semibold">#{doc.id}</span>
-								{doc.author && (
+								{authorDisplayName && (
 									<span className="inline-flex items-center gap-1">
 										<User className="w-3.5 h-3.5 text-(--accent)" />
-										{doc.author.name}
+										{authorDisplayName}
 									</span>
 								)}
 								<span className="inline-flex items-center gap-1">
@@ -349,20 +362,20 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 						</div>
 					</div>
 				)}
-			</div>
 
-			{/* Document Code Display */}
-			<div className="flex flex-col rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm overflow-hidden" style={{ padding: 'var(--ui-gap)' }}>
-				<CodeBlock
-					tabs={[
-						{
-							id: doc.id,
-							label: `${doc.id}.${HASTE_FILE_EXTENSION_MAP[doc.language] || 'txt'}`,
-							language: doc.language || 'plaintext',
-							code: doc.content || '',
-						},
-					]}
-				/>
+				{/* Document Code Display */}
+				<div className="pt-1">
+					<CodeBlock
+						tabs={[
+							{
+								id: doc.id,
+								label: `${doc.id}.${HASTE_FILE_EXTENSION_MAP[doc.language] || 'txt'}`,
+								language: doc.language || 'plaintext',
+								code: doc.content || '',
+							},
+						]}
+					/>
+				</div>
 			</div>
 
 			<Confirm

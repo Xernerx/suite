@@ -92,7 +92,7 @@ export default function Timeline() {
 	const { t } = useDictionary();
 
 	return (
-		<section id="timeline" className="relative py-32 mb-32 max-w-7xl mx-auto px-6">
+		<section id="timeline" className="relative py-32 mb-32 max-w-(--page-width) mx-auto px-6">
 			<div className="grid lg:grid-cols-12 gap-16 lg:gap-24">
 				{/* STICKY LEFT (Editorial Hero) */}
 				<div className="lg:col-span-5 relative">

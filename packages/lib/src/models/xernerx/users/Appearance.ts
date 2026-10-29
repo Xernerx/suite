@@ -8,14 +8,14 @@ const schema = new Schema(
 		accent: { type: String },
 		uiZoom: { type: Number, default: 100 },
 		uiGap: { type: String, default: '16' },
-		pageWidth: { type: String, enum: ['compact', 'default', 'wide', 'full'], default: 'default' },
+		pageWidth: { type: String, default: '90' },
 		textScale: { type: Number, default: 14 },
 		clientSync: { type: Boolean, default: false },
 		syncFromDiscord: { type: Boolean, default: true },
 		uiPreferences: {
 			headerSubdomains: {
 				type: [String],
-				enum: ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'api', 'www', 'admin', 'hosting'],
+				enum: ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'api', 'www', 'admin', 'hosting'],
 				default: ['portal', 'store'],
 			},
 			showHeaderStore: { type: Boolean, default: true },

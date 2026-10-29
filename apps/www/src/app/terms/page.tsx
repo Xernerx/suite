@@ -188,7 +188,7 @@ export default function Page() {
 			/>
 
 			<div className="min-h-screen px-6 py-32">
-				<div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
+				<div className="max-w-(--page-width) mx-auto grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					<aside className="hidden lg:block sticky top-32 self-start">
 						<p className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.terms.toc')}</p>
 						<nav className="space-y-4 text-sm">

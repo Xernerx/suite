@@ -19,6 +19,30 @@ const VALID_MATRIX_ANIMS: readonly DotMatrixAnimation[] = ['animate', 'static', 
 export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'api', 'www', 'admin', 'hosting'];
 export const DEFAULT_HEADER_SUBDOMAINS: HeaderSubdomainId[] = ['portal', 'store'];
 
+const LEGACY_PAGE_WIDTH_PERCENT: Record<string, number> = {
+	compact: 75,
+	default: 90,
+	wide: 95,
+	full: 100,
+};
+
+export function parsePageWidthPercent(raw: unknown): number {
+	if (typeof raw === 'number' && Number.isFinite(raw)) {
+		return Math.min(100, Math.max(60, Math.round(raw / 5) * 5));
+	}
+	if (typeof raw === 'string') {
+		const trimmed = raw.trim().toLowerCase();
+		if (trimmed in LEGACY_PAGE_WIDTH_PERCENT) {
+			return LEGACY_PAGE_WIDTH_PERCENT[trimmed];
+		}
+		const num = parseInt(trimmed.replace('%', ''), 10);
+		if (!isNaN(num)) {
+			return Math.min(100, Math.max(60, Math.round(num / 5) * 5));
+		}
+	}
+	return 90;
+}
+
 export function parseHeaderSubdomains(raw: unknown): HeaderSubdomainId[] | null {
 	if (Array.isArray(raw)) {
 		return raw.filter((v): v is HeaderSubdomainId => typeof v === 'string' && (VALID_HEADER_SUBDOMAINS as readonly string[]).includes(v));
@@ -258,14 +282,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		const storedPageWidth = getPref('pageWidth');
-		const pageWidthMap: Record<string, string> = {
-			compact: '80rem',
-			default: '96rem',
-			wide: '112rem',
-			full: '100%',
-		};
-		if (storedPageWidth && pageWidthMap[storedPageWidth]) {
-			setThemeVar('--page-width', pageWidthMap[storedPageWidth]);
+		if (storedPageWidth) {
+			const pct = parsePageWidthPercent(storedPageWidth);
+			setThemeVar('--page-width', `${pct}%`);
+		} else {
+			setThemeVar('--page-width', '90%');
 		}
 
 		const storedTextScale = getPref('textScale');
@@ -309,8 +330,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 						setThemeVar('--ui-scale', String(appPrefs.uiZoom));
 					}
 					if (appPrefs.uiGap) setThemeVar('--ui-gap', `${appPrefs.uiGap}px`);
-					if (appPrefs.pageWidth && pageWidthMap[appPrefs.pageWidth]) {
-						setThemeVar('--page-width', pageWidthMap[appPrefs.pageWidth]);
+					if (appPrefs.pageWidth) {
+						const pct = parsePageWidthPercent(appPrefs.pageWidth);
+						setPref('pageWidth', String(pct));
+						setThemeVar('--page-width', `${pct}%`);
 					}
 					if (appPrefs.textScale) setThemeVar('--text-scale', `${appPrefs.textScale}px`);
 				}

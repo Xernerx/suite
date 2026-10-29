@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Columns3, Maximize2 } from 'lucide-react';
+import { Columns3 } from 'lucide-react';
 import { Selector, Slider } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
@@ -11,8 +11,8 @@ interface AppearanceScalingCardsProps {
 	onUiZoomChange: (val: number) => void;
 	uiGap: string;
 	onUiGapChange: (val: string) => void;
-	pageWidth: string;
-	onPageWidthChange: (val: string) => void;
+	pageWidth: number;
+	onPageWidthChange: (val: number) => void;
 	textScale: number;
 	onTextScaleChange: (val: number) => void;
 }
@@ -31,13 +31,6 @@ export function AppearanceScalingCards({ uiZoom, onUiZoomChange, uiGap, onUiGapC
 		{ value: '10', label: renderOption(Columns3, t('account.appearance.density.compact')) },
 		{ value: '16', label: renderOption(Columns3, t('account.appearance.density.default')) },
 		{ value: '24', label: renderOption(Columns3, t('account.appearance.density.spacious')) },
-	];
-
-	const pageWidthOptions = [
-		{ value: 'compact', label: renderOption(Maximize2, t('account.appearance.pageWidth.compact')) },
-		{ value: 'default', label: renderOption(Maximize2, t('account.appearance.pageWidth.default')) },
-		{ value: 'wide', label: renderOption(Maximize2, t('account.appearance.pageWidth.wide')) },
-		{ value: 'full', label: renderOption(Maximize2, t('account.appearance.pageWidth.full')) },
 	];
 
 	return (
@@ -70,17 +63,17 @@ export function AppearanceScalingCards({ uiZoom, onUiZoomChange, uiGap, onUiGapC
 				</div>
 			</div>
 
-			{/* Page Content Width Selector */}
+			{/* Page Content Width Slider */}
 			<div
-				className="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+				className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 			>
 				<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 					<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.pageWidth.title')}</h2>
 					<p className="text-xs text-(--text-muted)">{t('account.appearance.pageWidth.description')}</p>
 				</div>
-				<div className="w-full sm:w-56">
-					<Selector value={pageWidth} options={pageWidthOptions} onChange={onPageWidthChange} />
+				<div className="w-full pt-2">
+					<Slider value={pageWidth} onChange={onPageWidthChange} min={60} max={100} step={5} unit="%" />
 				</div>
 			</div>
 

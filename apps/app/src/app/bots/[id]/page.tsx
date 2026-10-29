@@ -149,7 +149,7 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	const resolvedBotId = bot.id || id;
 
 	return (
-		<div className="flex flex-col w-full min-h-screen pb-24">
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
 			<Header bot={bot} id={resolvedBotId} setBot={setBot} />
 
 			<div className="mt-4">

@@ -21,10 +21,13 @@ export async function GET(req: Request) {
 		const url = new URL(req.url);
 		const search = (url.searchParams.get('search') || '').trim();
 		const language = (url.searchParams.get('language') || '').trim().toLowerCase();
-		const mine = url.searchParams.get('mine') === 'true' || url.searchParams.get('mine') === '1';
 		const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 30));
 
 		const viewerUserId = await extractViewerUserId(req);
+		if (!viewerUserId) {
+			return NextResponse.json({ error: 'Authentication or userId is required to list your haste documents.' }, { status: 401 });
+		}
+
 		const { models } = await database('haste');
 		const DocumentModel = models.documents?.Document;
 		if (!DocumentModel) {
@@ -34,16 +37,10 @@ export async function GET(req: Request) {
 		const now = new Date();
 		const expiryFilter = { $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }] };
 
-		let query: Record<string, any> = { ...expiryFilter };
-
-		if (mine) {
-			if (!viewerUserId) {
-				return NextResponse.json({ error: 'Authentication or userId required for mine=true' }, { status: 401 });
-			}
-			query.userId = viewerUserId;
-		} else {
-			query.privacy = 'public';
-		}
+		let query: Record<string, any> = {
+			...expiryFilter,
+			userId: viewerUserId,
+		};
 
 		if (language && language !== 'all') {
 			query.language = normalizeHasteLanguage(language);

@@ -51,7 +51,7 @@
 	/* Scalers & Spacing Defaults */
 	--text-scale: 14px;
 	--ui-gap: 16px;
-	--page-width: 96rem;
+	--page-width: 90%;
 	--ui-scale: 100; /* Raw number format */
 	--ui-zoom: 1;
 }

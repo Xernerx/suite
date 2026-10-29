@@ -158,7 +158,7 @@ function ServersListContent() {
 	const effectiveView = searchParams.get('category') || view;
 
 	return (
-		<div className="flex flex-col w-full min-h-screen">
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen">
 			{/* Header Navigation */}
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
 				<div className="flex items-center gap-4">
