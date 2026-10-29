@@ -5,18 +5,23 @@ import HomeClient, { ShowcasePackage } from '@/components/HomeClient';
 const FALLBACK_SHOWCASE_PACKAGES: ShowcasePackage[] = [
 	{
 		name: 'xernerx',
-		desc: 'The official all-in-one Xernerx Suite SDK and bot framework, bundling and re-exporting @xernerx/framework, @xernerx/commands, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket.',
+		desc: 'The official all-in-one Xernerx Suite SDK, CLI (create-xernerx-app), and bot framework bundling and re-exporting all @xernerx/* packages.',
 		link: 'https://docs.xernerx.com/packages/xernerx',
 	},
 	{
 		name: '@xernerx/framework',
-		desc: 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, extensions, and multi-shard coordination.',
+		desc: 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, engagement validators, inhibitors, and multi-shard coordination.',
 		link: 'https://docs.xernerx.com/packages/@xernerx/framework',
 	},
 	{
 		name: '@xernerx/commands',
 		desc: 'Extension for @xernerx/framework containing Jishaku-inspired developer commands (xc!, evaluate, ping, shell, git, source, debug, repeat, su/sudo, transpile, haste, documentation) and automatic command synchronization.',
 		link: 'https://docs.xernerx.com/packages/@xernerx/commands',
+	},
+	{
+		name: '@xernerx/hooks',
+		desc: 'First-party webhook receiver and user engagement cache (voted, reviewed, tipped) with HMAC-SHA256 verification and @xernerx/framework extension support.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/hooks',
 	},
 	{
 		name: '@xernerx/stats',
@@ -30,10 +35,17 @@ const FALLBACK_SHOWCASE_PACKAGES: ShowcasePackage[] = [
 	},
 	{
 		name: '@xernerx/terminal',
-		desc: 'A powerful CLI logger and interactive terminal spinner for Xernerx projects.',
+		desc: 'Structured ANSI terminal logger, child-scope formatters, and interactive CLI spinners for Xernerx services and Discord bots.',
 		link: 'https://docs.xernerx.com/packages/@xernerx/terminal',
 	},
+	{
+		name: '@xernerx/extension-builder',
+		desc: 'Base ExtensionBuilder lifecycle and EventEmitter architecture for building modular @xernerx/framework extensions.',
+		link: 'https://docs.xernerx.com/packages/@xernerx/extension-builder',
+	},
 ];
+
+const FALLBACK_PACKAGE_DESC_MAP = new Map<string, string>(FALLBACK_SHOWCASE_PACKAGES.filter((p) => p.desc).map((p) => [p.name, p.desc!]));
 
 let cachedPackages: { data: ShowcasePackage[]; expiresAt: number } | null = null;
 let inflightRefresh: Promise<ShowcasePackage[]> | null = null;
@@ -54,16 +66,19 @@ async function fetchShowcasePackagesFromRemote(): Promise<ShowcasePackage[]> {
 		if (!data.tree) return FALLBACK_SHOWCASE_PACKAGES;
 
 		const docsPaths = data.tree.filter((item: any) => item.path.startsWith('packages/') && item.path.endsWith('/docs.json'));
-		const packagesMap = new Set<string>();
+		const packagesMap = new Set<string>(FALLBACK_SHOWCASE_PACKAGES.map((p) => p.name));
 		for (const item of docsPaths) {
 			const pathParts = item.path.replace('packages/', '').replace('/docs.json', '').split('/');
 			pathParts.pop(); // remove version
-			packagesMap.add(pathParts.join('/'));
+			const pkgName = pathParts.join('/');
+			if (pkgName && (pkgName === 'xernerx' || pkgName.startsWith('@xernerx/'))) {
+				packagesMap.add(pkgName);
+			}
 		}
 
 		const pkgs = await Promise.all(
 			Array.from(packagesMap).map(async (name) => {
-				let desc: string | undefined;
+				let desc: string | undefined = FALLBACK_PACKAGE_DESC_MAP.get(name);
 
 				try {
 					const npmRes = await fetch(`https://registry.npmjs.org/${name}`, {
@@ -88,7 +103,7 @@ async function fetchShowcasePackagesFromRemote(): Promise<ShowcasePackage[]> {
 							}
 						}
 
-						if (parsedDesc && !parsedDesc.includes('<!-- @format -->')) {
+						if (parsedDesc && !parsedDesc.includes('<!-- @format -->') && parsedDesc.length > 25) {
 							desc = parsedDesc;
 						}
 					}

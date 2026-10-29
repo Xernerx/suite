@@ -305,15 +305,15 @@ export const FALLBACK_DOCS_ITEMS: DocsItem[] = [
 		sectionTitle: 'Developer Software',
 		title: 'xernerx (All-in-One SDK)',
 		description:
-			'The official all-in-one Xernerx Suite SDK and bot framework, bundling and re-exporting all @xernerx/* packages (@xernerx/framework, @xernerx/commands, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket).',
+			'The official all-in-one Xernerx Suite SDK, CLI (create-xernerx-app), and bot framework bundling and re-exporting all @xernerx/* packages (@xernerx/framework, @xernerx/commands, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, @xernerx/websocket, and @xernerx/extension-builder).',
 		markdown:
-			'**xernerx** is the official all-in-one Xernerx Suite SDK and bot framework, bundling and re-exporting `@xernerx/framework`, `@xernerx/commands`, `@xernerx/stats`, `@xernerx/terminal`, and `@xernerx/websocket` in a single dependency.',
+			'**xernerx** is the official all-in-one Xernerx Suite SDK, CLI (`create-xernerx-app`), and bot framework bundling and re-exporting `@xernerx/framework`, `@xernerx/commands`, `@xernerx/hooks`, `@xernerx/stats`, `@xernerx/terminal`, `@xernerx/websocket`, and `@xernerx/extension-builder` in a single dependency.',
 		url: 'https://docs.xernerx.com/packages/xernerx',
 		quickLinks: [
 			{ label: 'xernerx Documentation', href: 'https://docs.xernerx.com/packages/xernerx' },
 			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/xernerx', external: true },
 		],
-		keywords: ['npm', 'package', 'xernerx', 'collection', 'bundle', 'sdk', 'framework', 'commands', 'stats', 'terminal', 'websocket'],
+		keywords: ['npm', 'package', 'xernerx', 'collection', 'bundle', 'sdk', 'framework', 'commands', 'hooks', 'stats', 'terminal', 'websocket', 'extension-builder'],
 	},
 	{
 		id: 'pkg-xernerx-framework',
@@ -399,5 +399,39 @@ export const FALLBACK_DOCS_ITEMS: DocsItem[] = [
 			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/terminal', external: true },
 		],
 		keywords: ['npm', 'package', 'terminal', 'cli', 'logger', 'spinner', 'boxen', 'chalk'],
+	},
+	{
+		id: 'pkg-xernerx-hooks',
+		slug: 'xernerx-hooks',
+		category: 'packages',
+		categoryTitle: 'NPM Packages',
+		sectionTitle: 'Developer Software',
+		title: '@xernerx/hooks',
+		description: 'First-party webhook receiver and user engagement cache (voted, reviewed, tipped) with HMAC-SHA256 verification and @xernerx/framework extension support.',
+		markdown:
+			'**@xernerx/hooks** is the official first-party webhook receiver (`HooksClient`) and `@xernerx/framework` extension (`XernerxHooks`) providing an engagement cache (`voted`, `reviewed`, `tipped`) with HMAC-SHA256 verification.',
+		url: 'https://docs.xernerx.com/packages/@xernerx/hooks',
+		quickLinks: [
+			{ label: 'Hooks Documentation', href: 'https://docs.xernerx.com/packages/@xernerx/hooks' },
+			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/hooks', external: true },
+		],
+		keywords: ['npm', 'package', 'hooks', 'webhooks', 'voted', 'reviewed', 'tipped', 'hmac', 'sha256', 'xernerxhooks', 'hooksclient'],
+	},
+	{
+		id: 'pkg-xernerx-extension-builder',
+		slug: 'xernerx-extension-builder',
+		category: 'packages',
+		categoryTitle: 'NPM Packages',
+		sectionTitle: 'Developer Software',
+		title: '@xernerx/extension-builder',
+		description: 'Base ExtensionBuilder lifecycle and EventEmitter architecture for building modular @xernerx/framework extensions.',
+		markdown:
+			'**@xernerx/extension-builder** provides the base `ExtensionBuilder` lifecycle (`defer`, `main`) and `EventEmitter` architecture for authoring modular `@xernerx/framework` extensions.',
+		url: 'https://docs.xernerx.com/packages/@xernerx/extension-builder',
+		quickLinks: [
+			{ label: 'Extension Builder Docs', href: 'https://docs.xernerx.com/packages/@xernerx/extension-builder' },
+			{ label: 'NPM Registry', href: 'https://www.npmjs.com/package/@xernerx/extension-builder', external: true },
+		],
+		keywords: ['npm', 'package', 'extension', 'builder', 'extensionbuilder', 'lifecycle', 'defer', 'main', 'framework'],
 	},
 ];
