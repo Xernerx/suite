@@ -631,7 +631,7 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.handle('app:checkForUpdate', () => checkDesktopRelease(log));
-	ipcMain.handle('app:installUpdate', () => downloadAndInstallUpdate(updaterContext));
+	ipcMain.handle('app:installUpdate', (_, targetInfo?: Parameters<typeof downloadAndInstallUpdate>[1]) => downloadAndInstallUpdate(updaterContext, targetInfo));
 
 	ipcMain.on('app:restart', (_, finalMeta?: Partial<Metadata>) => {
 		relaunchApp(finalMeta);

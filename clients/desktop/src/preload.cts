@@ -229,7 +229,7 @@ contextBridge.exposeInMainWorld('electron', {
 	switchAccount: (slot: string) => ipcRenderer.invoke('accounts:switch', slot),
 	removeAccount: (slot: string) => ipcRenderer.invoke('accounts:remove', slot),
 	checkForUpdate: () => ipcRenderer.invoke('app:checkForUpdate'),
-	installUpdate: () => ipcRenderer.invoke('app:installUpdate'),
+	installUpdate: (targetInfo?: Record<string, any>) => ipcRenderer.invoke('app:installUpdate', targetInfo),
 	onUpdateProgress: (callback: (payload: any) => void) => {
 		const listener = (_: any, payload: any) => callback(payload);
 		ipcRenderer.on('update:progress', listener);

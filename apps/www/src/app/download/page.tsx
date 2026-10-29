@@ -39,7 +39,7 @@ export default function Page() {
 		let cancelled = false;
 		(async () => {
 			try {
-				const endpoint = `https://api.xernerx.com/secure/downloads/app?channel=${channel}`;
+				const endpoint = `https://api.xernerx.com/core/downloads/app?channel=${channel}`;
 				let fetchedApps = await fetch(getEnvUrl(endpoint))
 					.then((r) => (r.ok ? r.json() : null))
 					.catch(() => null);

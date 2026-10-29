@@ -2,6 +2,13 @@
 
 # auth
 
+## 2.10.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.2
+
 ## 2.10.1
 
 ### Patch Changes

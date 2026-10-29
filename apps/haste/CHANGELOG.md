@@ -2,6 +2,13 @@
 
 # Changelog
 
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.2
+
 ## 1.2.1
 
 ### Patch Changes

@@ -2,6 +2,23 @@
 
 # api
 
+## 0.24.4
+
+### Patch Changes
+
+- ### Core Desktop Download Route & GitHub Release Asset Deduplication (`api`, `@xernerx/components`, `desktop`, `docs`, `www`)
+    - **Core Desktop Download Endpoint (`apps/api/src/app/core/downloads/app/route.ts`, `apps/api/AGENTS.md`)**:
+        - Moved `GET /secure/downloads/app` to `GET /core/downloads/app` so public desktop release metadata and installer asset lookups reside under `/core` while keeping `/secure/*` strictly locked down.
+    - **Desktop Auto-Updater & Consumer Updates (`clients/desktop/src/updater.ts`, `clients/desktop/src/main.ts`, `clients/desktop/src/preload.cts`, `packages/components/src/VersionTracker.tsx`, `apps/www/src/app/download/page.tsx`)**:
+        - Updated all desktop release metadata consumers (`updater.ts`, `VersionTracker.tsx`, `www/download`) to query `/core/downloads/app?channel=...` and forward resolved `targetInfo` through `installUpdate` IPC.
+    - **API Documentation Sync (`apps/docs/src/components/api/CoreEndpoints.tsx`, `apps/docs/src/components/api/SecureEndpoints.tsx`)**:
+        - Documented `GET /core/downloads/app?channel=stable|canary` under `CoreEndpoints` and removed the legacy `/secure/downloads/app` entry from `SecureEndpoints`.
+    - **GitHub Release Workflow Asset Deduplication (`.github/workflows/release.yml`, `.github/workflows/canary.yml`)**:
+        - Scoped `.yml` artifact glob patterns to `latest*.yml` (`latest.yml`, `latest-mac.yml`, `latest-linux.yml`) to exclude duplicate `builder-debug.yml` files across the 3 OS matrix runners that caused `softprops/action-gh-release@v2` concurrent upload `404 Not Found` collisions.
+
+- Updated dependencies
+    - @xernerx/components@0.12.2
+
 ## 0.24.3
 
 ### Patch Changes

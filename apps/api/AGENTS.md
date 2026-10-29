@@ -15,7 +15,8 @@
     - `/secure/dispatch/*`: Staff application submissions/reviews, email dispatches, and webhook notifications.
     - `/secure/tokens/*` & `/secure/validate/token`: API token CRUD and Bearer token validation.
     - `/secure/webhooks/stripe`: Stripe checkout and subscription lifecycle webhook receiver.
-    - `/secure/downloads/app`: Desktop companion app binary download endpoints.
+- **`/core/*` (Public Suite Core & Metadata Endpoints):**
+    - `/core/downloads/app`: Desktop companion app binary download and release metadata endpoints.
 - **`/v1/*` (Public Developer API):**
     - `/v1/bots/[id]/commands`, `/v1/bots/[id]/profile`, `/v1/bots/[id]/stats`.
 

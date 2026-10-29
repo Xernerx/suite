@@ -2,6 +2,13 @@
 
 # app
 
+## 2.16.6
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.2
+
 ## 2.16.5
 
 ### Patch Changes

@@ -257,7 +257,6 @@ export function SecureEndpoints({ activeGroup = 'all', searchQuery = '', methodF
 				{ method: 'DELETE', path: '/secure/dispatch/[id]', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/dispatch/email', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/dispatch/webhook', auth: 'secure' as const },
-				{ method: 'GET', path: '/secure/downloads/app', auth: 'secure' as const },
 			],
 		},
 		{
