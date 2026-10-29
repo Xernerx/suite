@@ -110,12 +110,25 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 				try {
 					const authorName = session?.user?.name || session?.user?.global_name || 'A user';
 					const authorIcon = session?.user?.image || undefined;
+					const nowIso = new Date().toISOString();
 
 					await dispatchBotWebhook({
 						botId: id,
 						url: hook.url,
 						event: eventType,
+						secret: hook.secret,
 						payload: {
+							event: eventType,
+							botId: id,
+							timestamp: nowIso,
+							data: {
+								userId,
+								username: authorName,
+								avatar: authorIcon || null,
+								reviewed: true,
+								rating,
+								content: content || '',
+							},
 							username: 'Xernerx App',
 							avatar_url: 'https://xernerx.com/logo.png',
 							embeds: [
@@ -139,7 +152,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 										text: finalBotName,
 										icon_url: finalBotAvatar,
 									},
-									timestamp: new Date().toISOString(),
+									timestamp: nowIso,
 								},
 							],
 						},
@@ -204,12 +217,25 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 				try {
 					const authorName = session?.user?.name || session?.user?.global_name || 'A user';
 					const authorIcon = session?.user?.image || undefined;
+					const nowIso = new Date().toISOString();
 
 					await dispatchBotWebhook({
 						botId: id,
 						url: hook.url,
 						event: 'DELETE review',
+						secret: hook.secret,
 						payload: {
+							event: 'DELETE review',
+							botId: id,
+							timestamp: nowIso,
+							data: {
+								userId,
+								username: authorName,
+								avatar: authorIcon || null,
+								reviewed: false,
+								rating: null,
+								content: null,
+							},
 							username: 'Xernerx App',
 							avatar_url: 'https://xernerx.com/logo.png',
 							embeds: [
@@ -226,7 +252,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 										text: finalBotName,
 										icon_url: finalBotAvatar,
 									},
-									timestamp: new Date().toISOString(),
+									timestamp: nowIso,
 								},
 							],
 						},

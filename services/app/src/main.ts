@@ -4,6 +4,9 @@ import fs from 'fs';
 import path from 'path';
 import { XernerxCommands } from '@xernerx/commands';
 import { XernerxClient } from '@xernerx/framework';
+import { createLogger } from '@xernerx/lib/core';
+
+const appBotLog = createLogger('APP-BOT');
 
 for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')]) {
 	try {
@@ -88,5 +91,5 @@ export const client = APP_BOT_TOKEN ? new XernerxAppClient() : null;
 if (client) {
 	client.init();
 } else {
-	console.warn('[XernerxApp] DISCORD_CLIENT_TOKEN / DISCORD_BOT_TOKEN is not set; skipping startup.');
+	appBotLog.warn('DISCORD_CLIENT_TOKEN / DISCORD_BOT_TOKEN is not set; skipping startup.');
 }

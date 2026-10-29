@@ -289,10 +289,12 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 								key={uid || idx}
 								className={`flex flex-col md:flex-row md:items-center justify-between rounded-3xl border backdrop-blur-md transition-all ${
 									rank === 1
-										? 'bg-(--foreground)/45 border-(--accent)/45 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_18%,transparent)]'
-										: isTopThree
-											? 'bg-(--foreground)/40 border-(--accent)/25 shadow-sm'
-											: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30'
+										? 'bg-(--foreground)/45 border-amber-400/50 shadow-[0_0_24px_rgba(234,179,8,0.18)]'
+										: rank === 2
+											? 'bg-(--foreground)/40 border-slate-300/40 shadow-[0_0_18px_rgba(203,213,225,0.12)]'
+											: rank === 3
+												? 'bg-(--foreground)/40 border-amber-600/40 shadow-[0_0_18px_rgba(217,119,6,0.14)]'
+												: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30'
 								}`}
 								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 							>
@@ -301,10 +303,12 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 									<div
 										className={`flex h-11 min-w-11 px-2.5 items-center justify-center gap-1 rounded-2xl text-sm font-black shrink-0 ${
 											rank === 1
-												? 'bg-(--accent) text-white shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_45%,transparent)]'
-												: isTopThree
-													? 'bg-(--accent)/15 text-(--accent) border border-(--accent)/35'
-													: 'bg-(--background)/70 text-(--text-muted) border border-(--border)/10'
+												? 'bg-[color-mix(in_srgb,#eab308_22%,var(--background))] text-amber-400 border border-amber-400/45 shadow-[0_0_16px_rgba(234,179,8,0.3)]'
+												: rank === 2
+													? 'bg-[color-mix(in_srgb,#cbd5e1_20%,var(--background))] text-slate-300 border border-slate-300/40'
+													: rank === 3
+														? 'bg-[color-mix(in_srgb,#d97706_22%,var(--background))] text-amber-500 border border-amber-600/40'
+														: 'bg-(--background)/70 text-(--text-muted) border border-(--border)/10'
 										}`}
 									>
 										{isTopThree && <RankIcon size={14} />}

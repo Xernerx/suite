@@ -2,6 +2,9 @@
 
 import { Command } from 'commander';
 import { execSync, spawnSync } from 'child_process';
+import { terminal } from '../utils/terminal';
+
+const shipLog = terminal.child({ scope: 'SHIP' });
 
 function runSync(cmd: string) {
 	spawnSync(cmd, { stdio: 'inherit', shell: true });
@@ -14,7 +17,7 @@ export default function registerShip(program: Command) {
 		.action(() => {
 			const versionProcess = spawnSync('npx @changesets/cli version', { stdio: 'inherit', shell: true });
 			if (versionProcess.status !== 0) {
-				console.log('\n[CLI] Versioning was skipped or failed. Aborting release.');
+				shipLog.warn('Versioning was skipped or failed. Aborting release.');
 				return;
 			}
 			runSync('git add .');
@@ -31,7 +34,7 @@ export default function registerShip(program: Command) {
 					.filter(Boolean);
 				const clientReleaseTags = headTags.filter((t) => t.startsWith('desktop@') || t.startsWith('mobile@'));
 				for (const tag of clientReleaseTags) {
-					console.log(`[CLI] Pushing client release tag ${tag} individually to trigger Release workflow...`);
+					shipLog.log(`Pushing client release tag ${tag} individually to trigger Release workflow...`);
 					runSync(`git push origin refs/tags/${tag}`);
 				}
 			} catch {

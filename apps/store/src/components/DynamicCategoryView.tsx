@@ -15,12 +15,29 @@ interface DynamicCategoryViewProps {
 	billingInterval: 'month' | 'year';
 	userLoading: boolean;
 	actionLoading: string | null;
+	appliedCoupon?: {
+		code: string;
+		name: string;
+		discountType: 'percent' | 'amount';
+		percentOff: number;
+		amountOff: number;
+	} | null;
 	getActiveSubscription: (priceId: string | null) => UserSubscription | null | undefined;
 	handleSubscribe: (priceId: string | null, discountPercent: number) => void;
 	handleCancelClick: (subscriptionId: string) => void;
 }
 
-export function DynamicCategoryView({ category, items, billingInterval, userLoading, actionLoading, getActiveSubscription, handleSubscribe, handleCancelClick }: DynamicCategoryViewProps) {
+export function DynamicCategoryView({
+	category,
+	items,
+	billingInterval,
+	userLoading,
+	actionLoading,
+	appliedCoupon,
+	getActiveSubscription,
+	handleSubscribe,
+	handleCancelClick,
+}: DynamicCategoryViewProps) {
 	const { t } = useDictionary();
 
 	const featuredItems = items.filter((i) => i.isFeatured);
@@ -88,6 +105,7 @@ export function DynamicCategoryView({ category, items, billingInterval, userLoad
 							billingInterval={billingInterval}
 							userLoading={userLoading}
 							actionLoading={actionLoading}
+							appliedCoupon={appliedCoupon}
 							getActiveSubscription={getActiveSubscription}
 							handleSubscribe={handleSubscribe}
 							handleCancelClick={handleCancelClick}
@@ -113,6 +131,7 @@ export function DynamicCategoryView({ category, items, billingInterval, userLoad
 								item={item}
 								billingInterval={billingInterval}
 								actionLoading={actionLoading}
+								appliedCoupon={appliedCoupon}
 								getActiveSubscription={getActiveSubscription}
 								handleSubscribe={handleSubscribe}
 								handleCancelClick={handleCancelClick}

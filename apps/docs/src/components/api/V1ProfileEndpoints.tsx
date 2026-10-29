@@ -180,14 +180,43 @@ export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', meth
 								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/profile', {\n    method: 'DELETE',\n    headers: {\n        'Authorization': 'Bearer YOUR_API_TOKEN'\n    }\n});\n\nconst result = await response.json();\nconsole.log(result);`,
 							},
 							{
-								label: '@xernerx/stats SDK',
-								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.deleteProfile();`,
-							},
-							{
 								label: 'Python',
 								language: 'python',
 								code: `import requests\n\nurl = "https://api.xernerx.com/v1/bots/${effectiveBotId}/profile"\nheaders = {\n    "Authorization": "Bearer YOUR_API_TOKEN"\n}\n\nresponse = requests.delete(url, headers=headers)\nprint(response.json())`,
+							},
+						]}
+					/>
+				</div>
+			),
+		},
+		{
+			id: 'fetch-bot-user-engagement',
+			group: 'v1-profiles',
+			title: t('docs.api.v1.endpoints.fetchBotUserEngagement.title'),
+			icon: Server,
+			description: t('docs.api.v1.endpoints.fetchBotUserEngagement.description'),
+			routes: [{ method: 'GET', path: '/v1/bots/[id]/users/[userId]', auth: 'public' as const }],
+			extra: (
+				<div className="p-6 border-t border-(--border)/10">
+					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
+						<Code size={16} /> {t('docs.api.v1.common.fetchExamples')}
+					</h3>
+					<CodeBlock
+						tabs={[
+							{
+								label: '@xernerx/hooks SDK',
+								language: 'typescript',
+								code: `import { HooksClient } from '@xernerx/hooks';\n\nconst hooks = new HooksClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst engagement = await hooks.getUser('482513687417061376');\nconsole.log(engagement.voted, engagement.reviewed, engagement.tipped);`,
+							},
+							{
+								label: 'TypeScript (fetch)',
+								language: 'typescript',
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/users/482513687417061376');\nconst { voted, lastVotedAt, nextVoteAt, reviewed, rating, tipped } = await response.json();\nconsole.log({ voted, reviewed, tipped });`,
+							},
+							{
+								label: 'cURL',
+								language: 'bash',
+								code: `curl -X GET "https://api.xernerx.com/v1/bots/${effectiveBotId}/users/482513687417061376"`,
 							},
 						]}
 					/>

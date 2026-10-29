@@ -4,12 +4,14 @@ import { PackagesPageClient } from '@/components/packages/PackagesPageClient';
 import { SearchIndexItem } from '@/components/packages/PackagesSearch';
 
 const FALLBACK_PACKAGE_DESCRIPTIONS: Record<string, string> = {
-	xernerx: 'The official all-in-one Xernerx Suite SDK and bot framework, bundling and re-exporting all @xernerx/* packages.',
-	'@xernerx/framework': 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, inhibitors, and multi-shard coordination.',
-	'@xernerx/commands': 'Built-in slash/message command suite and automated command synchronization client for Discord bots on the Xernerx Suite API.',
-	'@xernerx/stats': 'Lightweight daemon for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.',
+	xernerx: 'The official all-in-one Xernerx Suite SDK, CLI (create-xernerx-app), and bot framework bundling and re-exporting all @xernerx/* packages.',
+	'@xernerx/framework': 'A modular, high-performance Discord.js v14 application framework with built-in command handlers, engagement validators, inhibitors, and multi-shard coordination.',
+	'@xernerx/commands': 'Built-in developer message command suite and automated slash/context command synchronization client for Discord bots on the Xernerx Suite API.',
+	'@xernerx/hooks': 'First-party webhook receiver and user engagement cache (voted, reviewed, tipped) with HMAC-SHA256 verification and @xernerx/framework extension support.',
+	'@xernerx/stats': 'Lightweight daemon and REST client for real-time Discord bot statistics collection, automated telemetry snapshotting, and synchronization to the Xernerx API.',
 	'@xernerx/terminal': 'Structured ANSI terminal logger, child-scope formatters, and interactive CLI spinners for Xernerx services and Discord bots.',
 	'@xernerx/websocket': 'Universal client library for connecting, authenticating, and making RPC queries against the Xernerx WebSocket microservice router.',
+	'@xernerx/extension-builder': 'Base ExtensionBuilder lifecycle and EventEmitter architecture for building modular @xernerx/framework extensions.',
 };
 
 // Recursively extract all items of a specific kind (reusing logic from package renderer)
@@ -60,7 +62,8 @@ async function getPackages() {
 			.map(([name, versions]) => ({
 				name,
 				isCollection: name === 'xernerx',
-				bundledPackages: name === 'xernerx' ? ['@xernerx/framework', '@xernerx/commands', '@xernerx/stats', '@xernerx/terminal', '@xernerx/websocket'] : [],
+				bundledPackages:
+					name === 'xernerx' ? ['@xernerx/framework', '@xernerx/commands', '@xernerx/hooks', '@xernerx/stats', '@xernerx/terminal', '@xernerx/websocket', '@xernerx/extension-builder'] : [],
 				versions: versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' })),
 			}))
 			.sort((a, b) => {

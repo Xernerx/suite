@@ -332,30 +332,30 @@ export default function LeaderboardClient() {
 										: 'order-3 md:order-3';
 
 								const borderAccent = isFirst
-									? 'border-(--accent)/60 hover:border-(--accent) shadow-[0_10px_40px_color-mix(in_srgb,var(--accent)_22%,transparent)] ring-1 ring-(--accent)/30'
+									? 'border-amber-400/50 hover:border-amber-400 shadow-[0_10px_40px_rgba(234,179,8,0.22)] ring-1 ring-amber-400/30'
 									: isSecond
-										? 'border-(--accent)/35 hover:border-(--accent)/65 shadow-[0_6px_28px_color-mix(in_srgb,var(--accent)_14%,transparent)] ring-1 ring-(--accent)/20'
-										: 'border-(--border)/25 hover:border-(--accent)/50 shadow-sm ring-1 ring-(--border)/15';
+										? 'border-slate-300/40 hover:border-slate-300/75 shadow-[0_6px_28px_rgba(203,213,225,0.14)] ring-1 ring-slate-300/20'
+										: 'border-amber-600/40 hover:border-amber-600/75 shadow-[0_6px_28px_rgba(217,119,6,0.15)] ring-1 ring-amber-600/20';
 
 								const badgeTone = isFirst
-									? 'bg-(--accent)/20 text-(--accent) border border-(--accent)/45 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_35%,transparent)] backdrop-blur-md'
+									? 'bg-[color-mix(in_srgb,#eab308_22%,var(--background))] text-amber-400 border border-amber-400/45 shadow-[0_0_20px_rgba(234,179,8,0.35)] backdrop-blur-md'
 									: isSecond
-										? 'bg-(--accent)/15 text-(--accent) border border-(--accent)/30 backdrop-blur-md'
-										: 'bg-(--background)/80 text-(--text) border border-(--border)/20 backdrop-blur-md';
+										? 'bg-[color-mix(in_srgb,#cbd5e1_20%,var(--background))] text-slate-300 border border-slate-300/40 shadow-[0_0_15px_rgba(203,213,225,0.2)] backdrop-blur-md'
+										: 'bg-[color-mix(in_srgb,#d97706_22%,var(--background))] text-amber-500 border border-amber-600/40 shadow-[0_0_15px_rgba(217,119,6,0.25)] backdrop-blur-md';
 
 								const bannerGradient = isFirst
-									? 'from-(--accent)/30 via-(--foreground) to-(--background)'
+									? 'from-amber-500/25 via-(--foreground) to-(--background)'
 									: isSecond
-										? 'from-(--accent)/20 via-(--foreground) to-(--background)'
-										: 'from-(--accent)/12 via-(--foreground) to-(--background)';
+										? 'from-slate-400/20 via-(--foreground) to-(--background)'
+										: 'from-amber-700/25 via-(--foreground) to-(--background)';
 
-								const avatarRing = isFirst ? 'h-24 w-24 ring-2 ring-(--accent)/60' : isSecond ? 'h-20 w-20 ring-2 ring-(--accent)/35' : 'h-20 w-20 ring-2 ring-(--border)/30';
+								const avatarRing = isFirst ? 'h-24 w-24 ring-2 ring-amber-400/50' : isSecond ? 'h-20 w-20 ring-2 ring-slate-300/35' : 'h-20 w-20 ring-2 ring-amber-600/35';
 
 								const pedestalTone = isFirst
-									? 'from-(--accent)/25 via-(--accent)/10 to-transparent border-t border-(--accent)/35 text-(--accent)'
+									? 'from-amber-500/25 via-amber-500/10 to-transparent border-t border-amber-400/35 text-amber-400'
 									: isSecond
-										? 'from-(--accent)/15 via-(--accent)/5 to-transparent border-t border-(--accent)/25 text-(--accent)'
-										: 'from-(--foreground)/60 via-(--foreground)/20 to-transparent border-t border-(--border)/20 text-(--text-muted)';
+										? 'from-slate-300/20 via-slate-300/5 to-transparent border-t border-slate-300/30 text-slate-300'
+										: 'from-amber-600/20 via-amber-600/5 to-transparent border-t border-amber-600/30 text-amber-500';
 
 								const cardContent = (
 									<>

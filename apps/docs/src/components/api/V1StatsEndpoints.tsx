@@ -49,7 +49,7 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 							{
 								label: '@xernerx/stats SDK',
 								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst currentStats = await stats.getStats();\nconsole.log(currentStats);`,
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst currentStats = await stats.get();\nconsole.log(currentStats);`,
 							},
 							{
 								label: 'Python',
@@ -126,7 +126,7 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 							{
 								label: '@xernerx/stats SDK',
 								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.postStats({\n    serverCount: 1500,\n    shardCount: 2,\n    userCount: 450000\n});`,
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.post({\n    guildCount: 1500,\n    shardCount: 2,\n    userCount: 450000\n});`,
 							},
 							{
 								label: 'Python',
@@ -164,7 +164,7 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 							{
 								label: '@xernerx/stats SDK',
 								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.updateStats('STAT_ENTRY_ID', { serverCount: 1550 });`,
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.update('STAT_ENTRY_ID', { guildCount: 1550 });`,
 							},
 							{
 								label: 'Python',
@@ -202,7 +202,7 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 							{
 								label: '@xernerx/stats SDK',
 								language: 'typescript',
-								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.deleteStats('STAT_ENTRY_ID');`,
+								code: `import { StatsClient } from '@xernerx/stats';\n\nconst stats = new StatsClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nawait stats.delete('STAT_ENTRY_ID');`,
 							},
 							{
 								label: 'Python',

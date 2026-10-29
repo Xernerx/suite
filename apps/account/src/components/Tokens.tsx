@@ -28,16 +28,18 @@ export default function Tokens() {
 	const extraBotSlots = Math.max(0, Number(user?.credits?.extraBotSlots) || 0);
 	const maxBotSlots = 1 + extraBotSlots;
 	const activeSubs = Array.isArray(user?.subscriptions) ? user.subscriptions : Array.isArray(user?.billing?.subscriptions) ? user.billing.subscriptions : [];
-	const hasUnlimitedBotSlots = activeSubs.some(
-		(s: any) =>
-			(s.status === 'active' || s.status === 'trialing') &&
-			(s.stripeSubscriptionId === 'staff_infinite_sub' ||
-				s.priceId === 'dev-pro' ||
-				s.priceId === 'ultra' ||
-				s.priceId === 'prod_V0oBbO5pVQMxcC' ||
-				s.priceId === 'prod_V0pD5uXoTQkrYS' ||
-				String(s.stripeSubscriptionId || '').startsWith('credit_trial_ultra'))
-	);
+	const hasUnlimitedBotSlots =
+		Boolean(user?.staffSubscription) ||
+		activeSubs.some(
+			(s: any) =>
+				(s.status === 'active' || s.status === 'trialing') &&
+				(s.stripeSubscriptionId === 'staff_infinite_sub' ||
+					s.priceId === 'dev-pro' ||
+					s.priceId === 'ultra' ||
+					s.priceId === 'prod_V0oBbO5pVQMxcC' ||
+					s.priceId === 'prod_V0pD5uXoTQkrYS' ||
+					String(s.stripeSubscriptionId || '').startsWith('credit_trial_ultra'))
+		);
 	const isAtSlotLimit = !hasUnlimitedBotSlots && tokens.length >= maxBotSlots;
 
 	const fetchTokens = async () => {

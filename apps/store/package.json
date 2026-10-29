@@ -1,6 +1,6 @@
 {
 	"name": "store",
-	"version": "0.7.4",
+	"version": "0.8.3",
 	"private": true,
 	"scripts": {
 		"initialize": "suite initialize",
@@ -16,6 +16,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
+		"@xernerx/terminal": "^1.1.15",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.6.0",
 		"lucide-react": "^1.61.0",

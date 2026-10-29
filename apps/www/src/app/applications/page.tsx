@@ -65,7 +65,7 @@ export default function ApplicationsPage() {
 	if (loading) return <Loading />;
 
 	return (
-		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-7xl mx-auto w-full">
+		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-(--page-width) mx-auto w-full">
 			<div className="mb-12">
 				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('www.applications.title')}

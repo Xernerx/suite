@@ -126,7 +126,9 @@
 				"roadmap": "Roadmap",
 				"suggestions": "Suggestions",
 				"issues": "Issues",
-				"preferences": "Preferences"
+				"preferences": "Preferences",
+				"bots": "Bots",
+				"servers": "Servers"
 			}
 		},
 		"shortcuts": {
@@ -386,7 +388,7 @@
 	},
 	"admin": {
 		"roles": {
-			"title": "Role Management",
+			"title": "Roles",
 			"description": "Configure custom system roles and map them directly to Discord server roles.",
 			"serverId": "Server ID",
 			"members": "Members",
@@ -437,7 +439,7 @@
 			"refresh": "Refresh"
 		},
 		"users": {
-			"title": "User Management",
+			"title": "Users",
 			"description": "Manage platform users, view Discord integrations, and adjust roles or permissions.",
 			"searchPlaceholder": "Search by name, id, or discord username...",
 			"sortLabel": "Sort:",
@@ -499,10 +501,12 @@
 				"applyButton": "Apply Adjustment",
 				"successToast": "User credits updated and logged to Audit Log",
 				"errorToast": "Failed to adjust user credits"
-			}
+			},
+			"viewAuditLogs": "View Audit Logs",
+			"privacyLabel": "Privacy"
 		},
 		"tokens": {
-			"title": "API Token Management",
+			"title": "Tokens",
 			"description": "Manage organization access tokens, bot identifiers, and secure endpoint permissions.",
 			"generateButton": "New Token",
 			"searchPlaceholder": "Search tokens by name, ID, or Bot ID...",
@@ -568,7 +572,7 @@
 			}
 		},
 		"translations": {
-			"title": "Translation Studio",
+			"title": "Translations",
 			"description": "Select your target language and manage translation keys against English source.",
 			"pushToReview": "Push to review",
 			"exportJson": "Export JSON",
@@ -752,7 +756,7 @@
 		},
 		"settings": {
 			"loading": "Loading settings...",
-			"title": "Platform Settings",
+			"title": "Settings",
 			"description": "Configure global application settings and platform integrations.",
 			"coreConfig": "Core Configuration",
 			"adminServerId": "Admin Server ID",
@@ -882,7 +886,9 @@
 				"invites": "Invites",
 				"announcements": "Announcements",
 				"store": "Store",
-				"auditLogs": "Audit Logs"
+				"auditLogs": "Audit Logs",
+				"bots": "Bots",
+				"servers": "Servers"
 			},
 			"home": {
 				"title": "Admin Overview",
@@ -919,7 +925,7 @@
 					"translationsMeta": "{avg}% average coverage across {total} locales",
 					"roadmapTitle": "Platform Roadmap",
 					"roadmapMeta": "{active} in progress • {planned} planned • {ideas} ideas",
-					"usersTitle": "Platform Users",
+					"usersTitle": "Users",
 					"usersMeta": "{total} registered • {verified} verified",
 					"rolesTitle": "Roles & RBAC",
 					"rolesMeta": "{total} system roles • {synced} Discord-linked",
@@ -934,7 +940,11 @@
 					"mediaTitle": "CDN Media Library",
 					"mediaMeta": "{total} uploaded assets in storage",
 					"settingsTitle": "System Configuration",
-					"settingsMeta": "Admin Guild ID: {serverId}"
+					"settingsMeta": "Admin Guild ID: {serverId}",
+					"botsTitle": "Bots",
+					"botsMeta": "{total} registered • {verified} verified",
+					"serversTitle": "Servers",
+					"serversMeta": "{total} registered • {verified} verified"
 				}
 			},
 			"overview": {
@@ -1446,7 +1456,9 @@
 					"setting": "Settings",
 					"role": "Roles",
 					"user": "Users",
-					"system": "System"
+					"system": "System",
+					"bot": "Bot",
+					"server": "Server"
 				},
 				"exportCsv": "Export CSV",
 				"exportJson": "Export JSON",
@@ -1465,7 +1477,7 @@
 				"description": "Allow or deny access to the Xernerx Server Hosting & Easypanel console (hosting.xernerx.com)."
 			},
 			"users": {
-				"label": "Manage Users",
+				"label": "Users",
 				"description": "Permission to view, update, and delete platform users."
 			},
 			"roles": {
@@ -1527,10 +1539,18 @@
 			"manageSupport": {
 				"label": "Manage Support",
 				"description": "Permission to configure Discord support channels, support bots, troubleshooting checklists, and manage support tickets."
+			},
+			"bots": {
+				"label": "Bots",
+				"description": "Permission to view, verify, update, and delete platform bots."
+			},
+			"servers": {
+				"label": "Servers",
+				"description": "Permission to view, verify, update, and delete platform servers."
 			}
 		},
 		"store": {
-			"title": "Store Management",
+			"title": "Store",
 			"description": "Configure dynamic store categories, products, Stripe SKU IDs, and promotional discounts without server resets.",
 			"tabs": {
 				"items": "Products & SKU IDs",
@@ -1703,6 +1723,59 @@
 			"expiresIn": "Expires in {time}",
 			"expired": "Expired",
 			"appsScopeLabel": "Target Apps:"
+		},
+		"bots": {
+			"title": "Bots",
+			"description": "View, verify, configure, and manage all registered Discord bots across the Xernerx ecosystem.",
+			"searchPlaceholder": "Search bots by name, ID, or vanity slug...",
+			"filterAll": "All Privacy Tiers",
+			"filterVerified": "Verified Only",
+			"privacyPublic": "Public (Listed)",
+			"privacyLimited": "Limited (Unlisted)",
+			"privacyPrivate": "Private (Owner Only)",
+			"noBotsFound": "No bots found matching your filters.",
+			"fetchError": "Failed to load bots.",
+			"openProfile": "Open Public Bot Profile",
+			"manageBot": "Manage Bot",
+			"manageBotDesc": "Edit platform configuration and verification status for {name}.",
+			"serversStat": "Servers",
+			"votesStat": "Votes",
+			"vanitySlugLabel": "Vanity Slug",
+			"ownersLabel": "Owner Discord IDs (comma-separated)",
+			"verifiedToggle": "Verified Badge",
+			"vanityUnlockedToggle": "Vanity Unlocked",
+			"widgetsToggle": "Public Widgets",
+			"deleteBot": "Delete Bot",
+			"deleteConfirmTitle": "Delete Bot Profile",
+			"deleteConfirmDesc": "Are you sure you want to permanently delete {name}? Type the Bot ID below to confirm.",
+			"toast": {
+				"updateSuccess": "Bot updated successfully!",
+				"updateError": "Failed to update bot.",
+				"deleteSuccess": "Bot deleted successfully.",
+				"deleteError": "Failed to delete bot."
+			}
+		},
+		"servers": {
+			"title": "Servers",
+			"description": "View, verify, configure, and manage all registered Discord servers across the Xernerx ecosystem.",
+			"searchPlaceholder": "Search servers by name, ID, or vanity slug...",
+			"noServersFound": "No servers found matching your filters.",
+			"fetchError": "Failed to load servers.",
+			"openProfile": "Open Public Server Profile",
+			"manageServer": "Manage Server",
+			"manageServerDesc": "Edit platform configuration and verification status for {name}.",
+			"membersStat": "Members",
+			"ownerLabel": "Owner Discord ID",
+			"deleteServer": "Delete Server",
+			"deleteConfirmTitle": "Delete Server Profile",
+			"deleteConfirmDesc": "Are you sure you want to permanently delete {name}? Type the Server ID below to confirm.",
+			"toast": {
+				"updateSuccess": "Server updated successfully!",
+				"updateError": "Failed to update server.",
+				"deleteSuccess": "Server deleted successfully.",
+				"deleteError": "Failed to delete server."
+			},
+			"filterBotActive": "Bot Installed"
 		}
 	},
 	"account": {
@@ -2404,6 +2477,13 @@
 					"clickHint": "Hover or click for shockwave",
 					"customizeInProfile": "Customize Formation in Profile"
 				}
+			},
+			"promo": {
+				"placeholder": "Have a promo code? (e.g. XERNERX20)",
+				"applyButton": "Apply Code",
+				"invalidCode": "Invalid or expired promotion code",
+				"appliedToast": "Promotion code {code} applied!",
+				"remove": "Remove promotion code"
 			}
 		},
 		"login": {
@@ -3776,7 +3856,8 @@
 			"tryAppDrawer": "Open App Drawer (Ctrl + Space)",
 			"tryOmnibar": "Open URL Omnibar (Ctrl + .)",
 			"tryShortcutsModal": "View Shortcuts & Changelog (Ctrl + /)",
-			"creditStore": "Credit Store & Perks"
+			"creditStore": "Credit Store & Perks",
+			"hasteStudio": "Xernerx Haste"
 		},
 		"overview": {
 			"navTitle": "Ecosystem & Navigation",
@@ -3794,7 +3875,7 @@
 				"docs": "Developer documentation hub featuring interactive REST API specs (/api/v1, /api/core, /api/secure) with an in-browser API Playground, CDN docs (/cdn), live GitHub/npm Package docs reader (/packages), and WebSocket Gateway RPC specs (/websocket).",
 				"info": "Support & feedback knowledgebank housing the chronological Platform Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
 				"api": "Core backend HTTP gateway, Bearer token validator, Discord & Stripe webhook processor, live SVG/PNG/iframe widget renderer (/core/*, /v1/*/badge.svg), and rate-limited REST router.",
-				"admin": "Internal staff RBAC portal for managing Discord-synced roles, users, Staff Subscriptions, elevated API tokens, Translation Studio (/translations), application reviews, platform announcements, roadmap/issue moderation, and store catalog items."
+				"admin": "Internal staff RBAC portal for managing Discord-synced roles, users, bots, servers, Staff Subscriptions, elevated API tokens, Translation Studio (/translations), application reviews, platform announcements, roadmap/issue/suggestion moderation, support configurations & tickets, and store catalog items."
 			},
 			"card1": {
 				"title": "How is the Xernerx Suite organized across its 9 subdomains?",
@@ -3935,8 +4016,8 @@
 				"description": "Visit xernerx.com/invites (or use vanity links such as xernerx.com/invite/[slug]) to browse and copy official OAuth2 invite links for verified Xernerx applications—including Virtue, Metamorphosis, Zodiac, and To-Do—pre-configured with the exact Discord permissions each bot requires."
 			},
 			"card4": {
-				"title": "How do Bot Webhooks and live Test Pings work?",
-				"description": "In the Developer Portal (portal.xernerx.com/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...) and toggle any of the 9 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, VOTE review, and POST release. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
+				"title": "How do Bot Webhooks, Signing Secrets, and live Test Pings work?",
+				"description": "In the Developer Portal (portal.xernerx.com/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...), configure or roll a cryptographic Signing Secret (whsec_...) used to sign payloads in the X-Xernerx-Signature (sha256) header, and toggle any of the 9 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, VOTE review, and POST release. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
 			},
 			"card5": {
 				"title": "How do Bot and Server voting, 12-hour cooldowns, and the Ecosystem Leaderboards work?",
@@ -4051,8 +4132,8 @@
 			"navTitle": "Store, Billing & CDN",
 			"title": "Store, Billing, Credits & CDN",
 			"card1": {
-				"title": "What plans and passes are available on the Xernerx Store?",
-				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories: (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and individual Zodiac, Virtue, To-Do, and Metamorphosis passes; (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects); and (3) Servers (?category=servers) for dedicated guild infrastructure."
+				"title": "What plans, passes, and promo codes are available on the Xernerx Store?",
+				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories—or apply promotional coupon codes (including via ?promo=CODE or ?code=CODE links): (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and individual Zodiac, Virtue, To-Do, and Metamorphosis passes; (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects); and (3) Servers (?category=servers) for dedicated guild infrastructure."
 			},
 			"card2": {
 				"title": "How do I manage or cancel subscriptions, and how does the Supporters showcase work?",
@@ -4064,7 +4145,7 @@
 			},
 			"card4": {
 				"title": "How does the Media CDN (cdn.xernerx.com) work and what are the storage quotas?",
-				"description": "Every Xernerx account includes 10 Media CDN slots on cdn.xernerx.com (50 with Virtue/Zodiac, 100 with Xernerx Ultra, plus permanent +1/+3/+10 slot upgrades in the Credit Store). The Media Studio supports custom Folders, searchable #tags, multi-select bulk privacy/deletion controls, and a pre-upload Aspect-Ratio Image Cropper (1:1 Avatar, 16:9 Banner, or Freeform)."
+				"description": "Every Xernerx account includes 10 Media CDN slots on cdn.xernerx.com (1,000 with an active subscription or Staff Subscription, plus permanent +1/+3/+10 slot upgrades in the Credit Store). The Media Studio supports custom Folders, searchable #tags, multi-select bulk privacy/deletion controls, and a pre-upload Aspect-Ratio Image Cropper (1:1 Avatar, 16:9 Banner, or Freeform)."
 			},
 			"card5": {
 				"title": "How do I apply for open staff or developer positions at Xernerx Studios?",
@@ -4096,7 +4177,7 @@
 			},
 			"card4": {
 				"title": "How do Outbound Bot Webhooks work, and is the WebSocket Gateway public?",
-				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (portal.xernerx.com/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 9 event triggers (votes, stats, reviews, and releases), complete with a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
+				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (portal.xernerx.com/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 9 event triggers (votes, stats, reviews, and releases), complete with per-webhook HMAC-SHA256 Signing Secrets (whsec_...), a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
 			},
 			"card5": {
 				"title": "What features are exclusive to the Xernerx Desktop App?",
@@ -4113,6 +4194,10 @@
 			"card8": {
 				"title": "How does the Open-Source NPM Package Documentation Reader (docs.xernerx.com/packages) work?",
 				"description": "Visit docs.xernerx.com/packages to browse official open-source Xernerx developer libraries and frameworks published on npm and GitHub (such as xernerx, @xernerx/framework, and @xernerx/stats). The documentation reader dynamically indexes every published semantic version and lets you switch versions via the Version Selector, inspect Classes, Interfaces, Functions, Constructors, Properties, and Methods, or use the global package search bar to jump to any symbol across all latest packages."
+			},
+			"card9": {
+				"title": "How does Xernerx Haste (haste.xernerx.com) work for bots and developers?",
+				"description": "Xernerx Haste (haste.xernerx.com) is our first-party code pastebin and Hastebin-compatible server backed by a dedicated MongoDB cluster with automatic TTL expirations (1h, 24h, 7d, 30d, or never) and 3-tier privacy (public, limited, and private). Any registered Xernerx user can publish pastes from the web studio or programmatically via POST https://haste.xernerx.com/documents/[userId] or POST https://api.xernerx.com/v1/haste by passing their Xernerx User ID (such as from client.owners in @xernerx/commands), while any unauthenticated user can view public and limited pastes."
 			}
 		}
 	},
@@ -4493,7 +4578,8 @@
 					"daily": "Daily",
 					"weekly": "Weekly",
 					"monthly": "Monthly"
-				}
+				},
+				"duplicateRoleWarning": "Role reassigned to the new level milestone."
 			}
 		},
 		"layout": {},
@@ -4857,7 +4943,18 @@
 						"emptyResponse": "No response body returned.",
 						"replaySuccess": "Webhook replayed ({status} in {latency}ms)",
 						"replayFailed": "Replay failed: {error}"
-					}
+					},
+					"deleteConfirmTitle": "Remove Webhook",
+					"deleteConfirmDesc": "Are you sure you want to remove Webhook #{number}?",
+					"secretLabel": "Signing Secret",
+					"secretPlaceholder": "whsec_...",
+					"showSecret": "Reveal Secret",
+					"hideSecret": "Hide Secret",
+					"generateSecret": "Roll Secret",
+					"copySecret": "Copy Secret",
+					"secretGenerated": "Generated new webhook signing secret (save changes to apply)",
+					"secretCopied": "Signing secret copied to clipboard",
+					"secretHint": "Used to sign outgoing webhook payloads in the X-Xernerx-Signature (sha256) header."
 				},
 				"growth": {
 					"metrics": {
@@ -5405,7 +5502,9 @@
 				"uiDesc": "Accessible, modern React primitive components engineered for the Xernerx Suite following Modern Round Glassmorphism Pop guidelines.",
 				"componentsDesc": "High-level application shell components including AppLayout, Header, Navigation Sidebar, Footer, and responsive wrappers.",
 				"libDesc": "Core shared utilities, MongoDB Mongoose schemas, NextAuth configuration, and localized JSON dictionaries.",
-				"stylesDesc": "Centrally configured Tailwind CSS v4 design tokens, CSS variables, Glassmorphism utilities, and font pairings."
+				"stylesDesc": "Centrally configured Tailwind CSS v4 design tokens, CSS variables, Glassmorphism utilities, and font pairings.",
+				"hooksDesc": "First-party webhook receiver and user engagement cache (voted, reviewed, tipped) with HMAC-SHA256 verification and @xernerx/framework extension support.",
+				"extensionBuilderDesc": "Base ExtensionBuilder lifecycle and EventEmitter architecture for building modular @xernerx/framework extensions."
 			},
 			"sidebar": {
 				"backToCategories": "Back to Categories",
@@ -5628,6 +5727,14 @@
 						"titleDesc": "Short headline title summarizing the release.",
 						"notesDesc": "Markdown-formatted release notes detailing new features, fixes, and changes.",
 						"breakingDesc": "Optional boolean flag indicating whether this release includes breaking changes."
+					},
+					"hasteDocuments": {
+						"title": "Xernerx Haste Documents & Pastebin",
+						"description": "Create, inspect, update, and stream raw code snippets on haste.xernerx.com. Supports drop-in Hastebin POST /documents/:userId uploads for @xernerx/commands and Discord bots using lightweight Xernerx User ID verification, TTL expirations, and 3-tier privacy."
+					},
+					"fetchBotUserEngagement": {
+						"title": "Fetch User Bot Engagement (Voted, Reviewed, Tipped)",
+						"description": "Check whether a Discord user has an active 12-hour vote cooldown, has left a review, and their cumulative credit tips for a bot. Used by @xernerx/framework and @xernerx/hooks engagement validators."
 					}
 				},
 				"common": {
@@ -5790,7 +5897,11 @@
 				"send": "Send Request",
 				"sending": "Sending...",
 				"bearerToken": "Bearer Token (Optional)",
-				"jsonBody": "JSON Request Body"
+				"jsonBody": "JSON Request Body",
+				"curlCopied": "cURL command copied to clipboard!",
+				"recentHistory": "Recent",
+				"clearHistory": "Clear history",
+				"copyCurl": "Copy cURL"
 			}
 		},
 		"cdn": {
@@ -6220,7 +6331,8 @@
 				"website": "Website",
 				"admin": "Admin",
 				"hosting": "Hosting",
-				"help": "Support"
+				"help": "Support",
+				"haste": "Haste"
 			}
 		}
 	},
@@ -6533,7 +6645,11 @@
 			"cancel": "Cancel",
 			"save": "Save Nodes",
 			"invalidError": "Every server node must have a valid ID/name and an http:// or https:// URL.",
-			"savedToast": "Server node configuration saved!"
+			"savedToast": "Server node configuration saved!",
+			"deleteConfirmTitle": "Remove Hosting Node",
+			"deleteConfirmDesc": "Are you sure you want to remove node {name} from the console configuration?",
+			"resetConfirmTitle": "Reset Nodes to Default",
+			"resetConfirmDesc": "Are you sure you want to reset all hosting node configurations back to default (one-dummi & two-dummi)?"
 		},
 		"sshModal": {
 			"title": "Server SSH Console (root@ip)",
@@ -6548,7 +6664,114 @@
 			"clearConsole": "Clear output",
 			"emptyPrompt": "Ready to execute commands on {target} — select a preset above or enter a command.",
 			"missingIpError": "Please enter a valid server IP (e.g. root@123.45.67.89).",
-			"execFailed": "SSH command execution failed"
+			"execFailed": "SSH command execution failed",
+			"useLinkedSecret": "Use Linked Secret"
+		}
+	},
+	"haste": {
+		"sidebar": {
+			"title": "Xernerx Haste"
+		},
+		"tabs": {
+			"editor": "New Paste",
+			"public": "Explore Public",
+			"mine": "My Hastes"
+		},
+		"hero": {
+			"title": "Xernerx Haste",
+			"badge": "Pastebin & Code Studio",
+			"subtitle": "Share code snippets, command evaluation outputs, and logs across the Xernerx ecosystem with TTL expirations and 3-tier privacy."
+		},
+		"authBanner": {
+			"title": "Sign in with your Xernerx Account to publish from the web studio",
+			"description": "Anyone can view public and limited pastes without signing in. To create a paste, sign in or POST with your Xernerx User ID.",
+			"signInCta": "Sign In"
+		},
+		"editor": {
+			"titleLabel": "Paste Title (Optional)",
+			"titlePlaceholder": "e.g. Eval Output, Error Stacktrace, Config Snippet...",
+			"languageLabel": "Syntax Language",
+			"privacyLabel": "Visibility & Privacy",
+			"expirationLabel": "Expiration (TTL)",
+			"linesCount": "{count} lines",
+			"contentPlaceholder": "Paste or type your code, logs, or command output here..."
+		},
+		"privacy": {
+			"public": "Public",
+			"limited": "Limited",
+			"private": "Private",
+			"publicOption": "Public (Listed & Open)",
+			"limitedOption": "Limited (Unlisted Link)",
+			"privateOption": "Private (Owner Only)"
+		},
+		"expiration": {
+			"1h": "1 Hour",
+			"24h": "24 Hours",
+			"7d": "7 Days",
+			"30d": "30 Days",
+			"never": "Never Expire"
+		},
+		"actions": {
+			"publish": "Save & Publish",
+			"publishing": "Publishing...",
+			"clear": "Clear",
+			"open": "Open",
+			"copyCode": "Copy Code",
+			"copyLink": "Copy Link",
+			"raw": "Raw",
+			"download": "Download",
+			"fork": "Fork",
+			"delete": "Delete",
+			"backToStudio": "Back to Haste Studio"
+		},
+		"explorer": {
+			"searchPlaceholder": "Search pastes by title, ID, or language...",
+			"allLanguages": "All Languages",
+			"emptyPublicTitle": "No Public Hastes Found",
+			"emptyPublicDescription": "No public code snippets matched your filter. Publish a public paste to see it featured here!",
+			"emptyMineTitle": "No Personal Hastes Yet",
+			"emptyMineDescription": "Sign in and publish a paste from the editor or via your bot using your Xernerx User ID to manage your hastes here."
+		},
+		"viewer": {
+			"viewsCount": "{count} views",
+			"expiresOn": "Expires {date}",
+			"ownerControls": "Owner Paste Controls",
+			"notFoundTitle": "Haste Document Not Found",
+			"notFoundDescription": "This paste may have expired via its TTL schedule, been deleted by its author, or never existed.",
+			"privateTitle": "Private Haste Document",
+			"privateDescription": "This paste is marked as strictly private and can only be viewed by its owner."
+		},
+		"integration": {
+			"title": "Drop-in @xernerx/commands & API Integration",
+			"subtitle": "Pass your Xernerx User ID (such as from client.owners) to create pastes directly from bots, CLI scripts, or services."
+		},
+		"shortcuts": {
+			"publishHaste": "Publish Haste Document"
+		},
+		"confirmDelete": {
+			"title": "Delete Haste Document",
+			"description": "Are you sure you want to permanently delete this paste? Direct links and raw URLs for this ID will stop working immediately.",
+			"confirm": "Delete Paste",
+			"cancel": "Cancel"
+		},
+		"toasts": {
+			"authRequiredTitle": "Account Required",
+			"authRequiredDescription": "Please sign in with your Xernerx account to publish pastes from the web editor.",
+			"emptyContentTitle": "Empty Paste",
+			"emptyContentDescription": "Enter or paste some code before publishing.",
+			"createdTitle": "Haste Published!",
+			"createdDescription": "Your paste is live and ready to share.",
+			"updatedTitle": "Haste Updated",
+			"updatedDescription": "Paste privacy and expiration settings have been saved.",
+			"deletedTitle": "Haste Deleted",
+			"deletedDescription": "The paste has been permanently removed.",
+			"copiedTitle": "Copied to Clipboard",
+			"copiedCodeDescription": "Paste contents copied to your clipboard.",
+			"copiedLinkDescription": "Shareable Haste URL copied to your clipboard.",
+			"errorTitle": "Action Failed",
+			"createFailedDescription": "Could not publish your paste. Please verify your account and try again.",
+			"updateFailedDescription": "Could not update paste settings.",
+			"deleteFailedDescription": "Could not delete this paste."
 		}
 	}
 }

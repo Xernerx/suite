@@ -5,11 +5,12 @@ import { ArrowUpDown, Download, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Input, MultiSelector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './users/types';
 import { UserCard } from './users/UserCard';
 import { AdminUserCreditsModal } from './AdminUserCreditsModal';
+import { useInfiniteScroll } from './useInfiniteScroll';
 
 export default function Users({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (userId: string) => void }) {
 	const { t } = useDictionary();
@@ -33,26 +34,6 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 	useEffect(() => {
 		setLimit(30);
 	}, [search, sortOrder, filterRoleIds]);
-
-	const observer = useRef<IntersectionObserver | null>(null);
-	const lastIncrementTime = useRef(0);
-	const loadMoreRef = useCallback(
-		(node: HTMLDivElement | null) => {
-			if (loading) return;
-			if (observer.current) observer.current.disconnect();
-			observer.current = new IntersectionObserver((entries) => {
-				if (entries[0].isIntersecting) {
-					const now = Date.now();
-					if (now - lastIncrementTime.current > 500) {
-						setLimit((prev) => prev + 30);
-						lastIncrementTime.current = now;
-					}
-				}
-			});
-			if (node) observer.current.observe(node);
-		},
-		[loading]
-	);
 
 	const fetchData = useCallback(
 		async (isManual = false) => {
@@ -147,6 +128,7 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 	}, [users, search, sortOrder, filterRoleIds]);
 
 	const renderedUsers = filteredUsers.slice(0, limit);
+	const loadMoreRef = useInfiniteScroll(filteredUsers.length > limit, loading, () => setLimit((prev) => prev + 30));
 
 	const exportUsers = (format: 'csv' | 'json') => {
 		if (filteredUsers.length === 0) return;

@@ -1,18 +1,40 @@
 /** @format */
 'use client';
 
-import { Activity, AlertTriangle, Gauge, Key, Languages, LifeBuoy, Shield, Ticket, Users as UsersIcon, Link, Megaphone, Image, Map, Inbox, Bug, ShoppingBag, Server, ScrollText } from 'lucide-react';
+import {
+	Activity,
+	AlertTriangle,
+	Bot,
+	Gauge,
+	Key,
+	Languages,
+	LifeBuoy,
+	Shield,
+	Ticket,
+	Users as UsersIcon,
+	Link,
+	Megaphone,
+	Image,
+	Map,
+	Inbox,
+	Bug,
+	ShoppingBag,
+	Server,
+	ScrollText,
+} from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 
 import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
 import AuditLogs from '@/components/AuditLogs';
+import Bots from '@/components/Bots';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import HomeOverview from '@/components/HomeOverview';
 import Overview from '@/components/Overview';
 import Roles from '@/components/Roles';
+import Servers from '@/components/Servers';
 import Tokens from '@/components/Tokens';
 import Translations from '@/components/Translations';
 import Users from '@/components/Users';
@@ -133,6 +155,8 @@ export default function Home() {
 
 		const canTranslations = hasDbFallback || (userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false);
 		const canUsers = hasDbFallback || (userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true);
+		const canBots = hasDbFallback || (userRolePermissions.bots ?? userRolePermissions.users ?? true);
+		const canServers = hasDbFallback || (userRolePermissions.servers ?? userRolePermissions.users ?? true);
 		const canApplicationsReview = hasDbFallback || (userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false);
 		const canApplicationsManage = hasDbFallback || (userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false);
 		const canRoles = hasDbFallback || (userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false);
@@ -218,90 +242,40 @@ export default function Home() {
 		}
 
 		if (canUsers && isServerSet) {
-			items.push({
-				category: t('common.nav.categories.moderator'),
-				label: t('common.nav.items.users'),
-				view: 'users',
-				icon: UsersIcon,
-			});
+			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.users'), view: 'users', icon: UsersIcon });
 		}
-
+		if (canBots && isServerSet) {
+			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.bots'), view: 'bots', icon: Bot });
+		}
+		if (canServers && isServerSet) {
+			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.servers'), view: 'servers', icon: Server });
+		}
 		if (canApplicationsReview && isServerSet) {
-			items.push({
-				category: t('common.nav.categories.moderator'),
-				label: t('common.nav.items.applications_review'),
-				view: 'applications_review',
-				icon: Ticket,
-			});
+			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.applications_review'), view: 'applications_review', icon: Ticket });
 		}
-
 		if (canApplicationsManage && isServerSet) {
-			items.push({
-				category: t('common.nav.categories.administrator'),
-				label: t('common.nav.items.applications_manage'),
-				view: 'applications_manage',
-				icon: Ticket,
-			});
+			items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.applications_manage'), view: 'applications_manage', icon: Ticket });
 		}
-
 		if (canTokens && isServerSet) {
-			items.push({
-				category: t('common.nav.categories.administrator'),
-				label: t('common.nav.items.tokens'),
-				view: 'tokens',
-				icon: Key,
-			});
+			items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.tokens'), view: 'tokens', icon: Key });
 		}
-
 		if (canInvites) {
-			items.push({
-				category: t('common.nav.categories.administrator'),
-				label: t('admin.dashboard.nav.invites'),
-				view: 'invites',
-				icon: Link,
-			});
+			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.invites'), view: 'invites', icon: Link });
 		}
-
 		if (canAnnouncements) {
-			items.push({
-				category: t('common.nav.categories.administrator'),
-				label: t('admin.dashboard.nav.announcements'),
-				view: 'announcements',
-				icon: Megaphone,
-			});
+			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
 		}
-
 		if (canManageRoadmap) {
-			items.push({
-				category: t('common.nav.categories.product'),
-				label: t('common.nav.items.roadmap'),
-				view: 'roadmap',
-				icon: Map,
-			});
+			items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.roadmap'), view: 'roadmap', icon: Map });
 		}
 		if (canManageSuggestions) {
-			items.push({
-				category: t('common.nav.categories.product'),
-				label: t('common.nav.items.suggestions'),
-				view: 'suggestions',
-				icon: Inbox,
-			});
+			items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.suggestions'), view: 'suggestions', icon: Inbox });
 		}
 		if (canManageIssues) {
-			items.push({
-				category: t('common.nav.categories.product'),
-				label: t('common.nav.items.issues'),
-				view: 'issues',
-				icon: Bug,
-			});
+			items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.issues'), view: 'issues', icon: Bug });
 		}
 		if (canManageStore) {
-			items.push({
-				category: t('common.nav.categories.product'),
-				label: t('admin.dashboard.nav.store'),
-				view: 'store',
-				icon: ShoppingBag,
-			});
+			items.push({ category: t('common.nav.categories.product'), label: t('admin.dashboard.nav.store'), view: 'store', icon: ShoppingBag });
 		}
 
 		setNavItems(items);
@@ -376,6 +350,8 @@ export default function Home() {
 
 	const allowedViews = [];
 	const canUsers = userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true;
+	const canBots = userRolePermissions.bots ?? userRolePermissions.users ?? true;
+	const canServers = userRolePermissions.servers ?? userRolePermissions.users ?? true;
 	const canRoles = userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false;
 	const canApplicationsReview = userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false;
 	const canApplicationsManage = userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false;
@@ -402,6 +378,8 @@ export default function Home() {
 	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
 	if (canUsers && isServerSet) allowedViews.push('users');
+	if (canBots && isServerSet) allowedViews.push('bots');
+	if (canServers && isServerSet) allowedViews.push('servers');
 	if (canApplicationsReview && isServerSet) allowedViews.push('applications_review');
 	if (canApplicationsManage && isServerSet) allowedViews.push('applications_manage');
 	if (canRoles && isServerSet) allowedViews.push('roles');
@@ -429,6 +407,8 @@ export default function Home() {
 				<HomeOverview
 					permissions={{
 						canUsers,
+						canBots,
+						canServers,
 						canRoles,
 						canApplicationsReview,
 						canApplicationsManage,
@@ -454,6 +434,8 @@ export default function Home() {
 			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations initialLocale={triageQuery} />}
 			{activeView === 'users' && <Users initialSearch={triageQuery} onViewAuditLogs={(userId) => handleNavigateFromOverview('audit', userId)} />}
+			{activeView === 'bots' && <Bots initialSearch={triageQuery} onViewAuditLogs={(botId) => handleNavigateFromOverview('audit', botId)} />}
+			{activeView === 'servers' && <Servers initialSearch={triageQuery} onViewAuditLogs={(serverId) => handleNavigateFromOverview('audit', serverId)} />}
 			{activeView === 'applications_review' && <ApplicationReviews initialSearch={triageQuery} />}
 			{activeView === 'applications_manage' && <ApplicationConfigs />}
 			{activeView === 'roles' && <Roles />}

@@ -5,11 +5,43 @@ import path from 'path';
 import { execSync } from 'child_process';
 import { confirm, isCancel } from '@clack/prompts';
 import { Command } from 'commander';
-import { runCommand } from '../utils/run';
+import { type ScopedProcessSpec, runScopedProcesses } from '../utils/run';
+import { terminal } from '../utils/terminal';
 import { generateLocalesCommand } from './generateLocales';
 import { initializeCommand } from './initialize';
 import { walkAndSync } from './init';
 import { getLocalIp } from '../utils/ip';
+import { SUITE_APPS, startLazyAppsSupervisor } from '../utils/lazyProxy';
+
+function getServiceSpecs(rootDir: string): ScopedProcessSpec[] {
+	return [
+		{ scope: 'APP-BOT', command: 'pnpm', args: ['--silent', 'run', 'dev'], cwd: path.join(rootDir, 'services/app') },
+		{ scope: 'BOT', command: 'pnpm', args: ['--silent', 'run', 'dev'], cwd: path.join(rootDir, 'services/bot') },
+		{ scope: 'WS', command: 'pnpm', args: ['--silent', 'run', 'dev'], cwd: path.join(rootDir, 'services/websocket') },
+	];
+}
+
+function getClientSpecs(rootDir: string): ScopedProcessSpec[] {
+	return [{ scope: 'DESKTOP', command: 'pnpm', args: ['--silent', 'run', 'dev'], cwd: path.join(rootDir, 'clients/desktop') }];
+}
+
+function getEagerAppSpecs(rootDir: string): ScopedProcessSpec[] {
+	return SUITE_APPS.map((app) => ({
+		scope: `${app.label}:${app.port}`,
+		command: 'pnpm',
+		args: ['--silent', 'run', 'dev'],
+		cwd: path.join(rootDir, app.dir),
+	}));
+}
+
+function getTunnelSpec(): ScopedProcessSpec {
+	return {
+		scope: 'TUNNEL',
+		command: 'cloudflared',
+		args: ['tunnel', 'run'],
+		env: { TUNNEL_LOGLEVEL: 'info' },
+	};
+}
 
 export default function registerDev(program: Command) {
 	program
@@ -17,14 +49,16 @@ export default function registerDev(program: Command) {
 		.description('Start the development servers and conditionally run the tunnel')
 		.option('--only <type>', 'Run only a specific workspace type (apps, services, clients, tunnel)')
 		.option('--prepare-only', 'Run only the environment preparation step and exit')
+		.option('--eager', 'Start all 12 web apps immediately instead of waiting for URL requests')
+		.option('--idle-timeout <seconds>', 'Seconds of inactivity before spinning down an awake app (0 to disable)', '60')
 		.action(async (options) => {
 			const rootEnvPath = path.join(process.cwd(), '.env');
 
 			try {
 				const currentBranch = execSync('git branch --show-current').toString().trim();
-				if (currentBranch === 'canary') {
-					console.log('[CLI] Checking for updates on canary branch...');
-					execSync('git fetch origin refs/heads/canary', { stdio: 'ignore' });
+				if (currentBranch === 'canary' && process.stdin.isTTY && !options.prepareOnly) {
+					terminal.log('Checking for updates on canary branch...');
+					execSync('git fetch origin refs/heads/canary', { stdio: 'ignore', timeout: 10000 });
 					const behindCount = parseInt(execSync('git rev-list --count HEAD..origin/canary').toString().trim());
 
 					if (behindCount > 0) {
@@ -33,26 +67,26 @@ export default function registerDev(program: Command) {
 							initialValue: true,
 						});
 						if (!isCancel(pull) && pull) {
-							console.log('[CLI] Discarding local dictionary changes to favor remote...');
+							terminal.log('Discarding local dictionary changes to favor remote...');
 							try {
 								execSync('git checkout HEAD -- packages/lib/src/dictionaries', { stdio: 'ignore' });
 							} catch (e) {}
-							console.log('[CLI] Pulling with autostash to preserve your other local work...');
+							terminal.log('Pulling with autostash to preserve your other local work...');
 							execSync('git pull origin refs/heads/canary --autostash', { stdio: 'inherit' });
 						}
 					}
 				}
 			} catch (e: any) {
-				console.log('\x1b[31m[CLI] Git operation failed:\x1b[0m', e.message || e.toString());
+				terminal.error('Git operation failed:', e.message || e.toString());
 			}
 
-			console.log('[CLI] Pre-flight: Generating locales...');
+			terminal.log('Pre-flight: Generating locales...');
 			generateLocalesCommand();
 
-			console.log('[CLI] Pre-flight: Syncing shared public assets...');
+			terminal.log('Pre-flight: Syncing shared public assets...');
 			initializeCommand();
 
-			console.log('[CLI] Synchronizing root .env to all workspaces...');
+			terminal.log('Synchronizing root .env to all workspaces...');
 			walkAndSync(process.cwd(), rootEnvPath);
 			let hasCustomDomain = false;
 			let currentDomain = '';
@@ -88,7 +122,7 @@ export default function registerDev(program: Command) {
 				if (shouldInjectIp && !isLocalhost) {
 					const localIp = getLocalIp();
 					if (currentDomain !== localIp) {
-						console.log(`[CLI] Dynamically injecting DOMAIN to local IP: ${localIp}`);
+						terminal.log(`Dynamically injecting DOMAIN to local IP: ${localIp}`);
 						if (hasDomainDefined) {
 							envContent = envContent.replace(/^DOMAIN=".*"/m, `DOMAIN="${localIp}"`);
 						} else {
@@ -102,7 +136,7 @@ export default function registerDev(program: Command) {
 						}
 
 						fs.writeFileSync(rootEnvPath, envContent);
-						console.log('[CLI] Syncing updated .env to workspaces...');
+						terminal.log('Syncing updated .env to workspaces...');
 						walkAndSync(process.cwd(), rootEnvPath);
 					}
 					hasCustomDomain = false;
@@ -124,7 +158,7 @@ export default function registerDev(program: Command) {
 								envContent += `\nNEXT_PUBLIC_DOMAIN="${currentDomain}"\n`;
 							}
 							fs.writeFileSync(rootEnvPath, envContent);
-							console.log(`[CLI] Syncing custom domain '${currentDomain}' to NEXT_PUBLIC_DOMAIN...`);
+							terminal.log(`Syncing custom domain '${currentDomain}' to NEXT_PUBLIC_DOMAIN...`);
 							walkAndSync(process.cwd(), rootEnvPath);
 						}
 					}
@@ -135,8 +169,8 @@ export default function registerDev(program: Command) {
 				const mongoUri = mongoMatch ? mongoMatch[1].trim() : '';
 
 				if (!mongoUri) {
-					console.log('[CLI] No remote MongoDB URI detected in .env.');
-					console.log('[CLI] Spawning built-in mongodb-memory-server (Zero Configuration)...');
+					terminal.log('No remote MongoDB URI detected in .env.');
+					terminal.log('Spawning built-in mongodb-memory-server (Zero Configuration)...');
 					try {
 						// Dynamically import to not block the rest of the CLI
 						const { MongoMemoryServer } = await import('mongodb-memory-server');
@@ -156,20 +190,20 @@ export default function registerDev(program: Command) {
 						});
 
 						process.env.MONGO_XERNERX = mongod.getUri();
-						console.log(`[CLI] \x1b[32m✔\x1b[0m MongoDB successfully running natively at ${mongod.getUri()}`);
+						terminal.log(`\x1b[32m✔\x1b[0m MongoDB successfully running natively at ${mongod.getUri()}`);
 					} catch (e: any) {
 						if (e.message?.includes('EADDRINUSE')) {
 							process.env.MONGO_XERNERX = 'mongodb://127.0.0.1:27017/';
-							console.log('[CLI] Local MongoDB is already running on port 27017. Attaching...');
+							terminal.log('Local MongoDB is already running on port 27017. Attaching...');
 						} else {
-							console.log('\x1b[31m[ERROR]\x1b[0m Failed to spawn mongodb-memory-server:', e.message);
+							terminal.error('Failed to spawn mongodb-memory-server:', e.message);
 						}
 					}
 				}
 			}
 
 			if (options.prepareOnly) {
-				console.log('[CLI] Preparation complete. Exiting (--prepare-only).');
+				terminal.log('Preparation complete. Exiting (--prepare-only).');
 				return;
 			}
 
@@ -177,81 +211,92 @@ export default function registerDev(program: Command) {
 				process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : ''}--max-old-space-size=512 --max-semi-space-size=16`;
 			}
 
+			const parsedIdleTimeout = Number.parseFloat(options.idleTimeout ?? '60');
+			const idleTimeoutSeconds = Number.isFinite(parsedIdleTimeout) && parsedIdleTimeout >= 0 ? parsedIdleTimeout : 60;
+			const isLazy = !options.eager;
+
 			if (options.only) {
 				const type = options.only;
-				console.log(`[CLI] Running only: ${type}`);
+				terminal.log(`Running only: ${type}`);
 				if (type === 'apps') {
-					runCommand('pnpm', ['--parallel', '--filter', './apps/*', 'dev']);
+					process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
+					if (isLazy) {
+						terminal.log(`Starting On-Demand URL Listener for all 12 apps (idle spin-down: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'})...`);
+						await startLazyAppsSupervisor({
+							domain: currentDomain,
+							isCustomDomain: hasCustomDomain,
+							idleTimeoutSeconds,
+						});
+						printEndpointsBox(currentDomain, hasCustomDomain, true, idleTimeoutSeconds, 200);
+					} else {
+						printEndpointsBox(currentDomain, hasCustomDomain, false, 0, 8000);
+						runScopedProcesses(getEagerAppSpecs(process.cwd()));
+					}
 				} else if (type === 'services') {
-					runCommand('pnpm', ['--parallel', '--filter', './services/*', 'dev']);
+					runScopedProcesses(getServiceSpecs(process.cwd()));
 				} else if (type === 'clients') {
-					runCommand('pnpm', ['--parallel', '--filter', './clients/*', 'dev']);
+					runScopedProcesses(getClientSpecs(process.cwd()));
 				} else if (type === 'tunnel') {
-					process.env.TUNNEL_LOGLEVEL = 'info';
-					runCommand('cloudflared', ['tunnel', 'run']);
+					runScopedProcesses([getTunnelSpec()]);
 				} else {
-					console.log(`\x1b[31m[ERROR]\x1b[0m Unknown --only type: ${type}`);
+					terminal.error(`Unknown --only type: ${type}`);
 				}
 			} else {
-				if (hasCustomDomain) {
-					console.log('[CLI] Custom domain detected. Starting apps and Cloudflare Tunnel...');
-					printEndpointsBox(currentDomain, hasCustomDomain);
-					process.env.TUNNEL_LOGLEVEL = 'info';
-					process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
-					runCommand('npx', [
-						'concurrently',
-						'-n',
-						'apps,tunnel',
-						'-c',
-						'blue,green',
-						'"pnpm --parallel --filter ./apps/* --filter ./services/* --filter ./clients/* dev"',
-						'"cloudflared tunnel run"',
-					]);
+				process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
+
+				if (isLazy) {
+					terminal.log(`Starting On-Demand URL Listener for apps (4000-4011) [idle spin-down: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'}]...`);
+					await startLazyAppsSupervisor({
+						domain: currentDomain,
+						isCustomDomain: hasCustomDomain,
+						idleTimeoutSeconds,
+					});
+
+					const specs: ScopedProcessSpec[] = [...getServiceSpecs(process.cwd()), ...getClientSpecs(process.cwd())];
+					if (hasCustomDomain) {
+						terminal.log('Custom domain detected. Starting services, clients, and Cloudflare Tunnel...');
+						specs.push(getTunnelSpec());
+					} else {
+						terminal.log('Local IP mode detected. Starting services and clients alongside On-Demand URL Listener...');
+					}
+					printEndpointsBox(currentDomain, hasCustomDomain, true, idleTimeoutSeconds, 1500);
+					runScopedProcesses(specs);
 				} else {
-					console.log('[CLI] Local IP mode detected. Starting apps without tunnel...');
-					printEndpointsBox(currentDomain, hasCustomDomain);
-					process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
-					runCommand('pnpm', ['--parallel', '--filter', './apps/*', '--filter', './services/*', '--filter', './clients/*', 'dev']);
+					const specs: ScopedProcessSpec[] = [...getEagerAppSpecs(process.cwd()), ...getServiceSpecs(process.cwd()), ...getClientSpecs(process.cwd())];
+					if (hasCustomDomain) {
+						terminal.log('Custom domain detected (--eager). Starting all apps, services, clients, and Cloudflare Tunnel...');
+						specs.push(getTunnelSpec());
+					} else {
+						terminal.log('Local IP mode detected (--eager). Starting all apps, services, and clients without tunnel...');
+					}
+					printEndpointsBox(currentDomain, hasCustomDomain, false, 0, 8000);
+					runScopedProcesses(specs);
 				}
 			}
 		});
 }
 
-function printEndpointsBox(domain: string, isCustomDomain: boolean) {
+function printEndpointsBox(domain: string, isCustomDomain: boolean, isLazy = true, idleTimeoutSeconds = 60, delayMs = 8000) {
 	setTimeout(() => {
-		const apps = [
-			{ name: 'WWW', port: 4000 },
-			{ name: 'API', port: 4001 },
-			{ name: 'CDN', port: 4002 },
-			{ name: 'Account', port: 4003 },
-			{ name: 'App', port: 4004 },
-			{ name: 'Docs', port: 4005 },
-			{ name: 'Admin', port: 4006 },
-			{ name: 'Info', port: 4007 },
-			{ name: 'Store', port: 4008 },
-			{ name: 'Portal', port: 4009 },
-			{ name: 'Hosting', port: 4010 },
-		];
+		const lines = SUITE_APPS.map((app) => {
+			const url = isCustomDomain ? `https://${app.id}.dev.${domain}` : `http://${domain}:${app.port}`;
+			return `\x1b[35m${app.label.padEnd(8)}\x1b[0m \x1b[90m→\x1b[0m  \x1b[36m${url}\x1b[0m`;
+		}).join('\n');
 
-		const boxWidth = 56;
-		console.log('\n\x1b[36m╭' + '─'.repeat(boxWidth) + '╮\x1b[0m');
+		terminal.box(lines, {
+			title: isLazy ? 'XERNERX SUITE ENDPOINTS (ON-DEMAND)' : 'XERNERX SUITE ENDPOINTS',
+			titleAlignment: 'center',
+			textAlignment: 'left',
+			height: undefined,
+			fullscreen: false,
+			padding: { top: 0, bottom: 0, left: 2, right: 2 },
+			margin: { top: 1, bottom: 1, left: 0, right: 0 },
+		});
 
-		const title = 'Xernerx Suite Endpoints';
-		const titlePadding = Math.floor((boxWidth - title.length) / 2);
-		console.log('\x1b[36m│\x1b[0m' + ' '.repeat(titlePadding) + '\x1b[1m' + title + '\x1b[0m' + ' '.repeat(boxWidth - titlePadding - title.length) + '\x1b[36m│\x1b[0m');
-		console.log('\x1b[36m├' + '─'.repeat(boxWidth) + '┤\x1b[0m');
-
-		for (const app of apps) {
-			const url = isCustomDomain ? `https://${app.name.toLowerCase()}.dev.${domain}` : `http://${domain}:${app.port}`;
-			const lineStr = `  \x1b[35m${app.name.padEnd(8)}\x1b[0m →  ${url} `;
-			// Visible length = 2 (spaces) + 8 (name padded) + 4 (" →  ") + url.length + 1 (space)
-			const visibleLength = 2 + 8 + 4 + url.length + 1;
-			const padding = ' '.repeat(Math.max(0, boxWidth - visibleLength));
-			console.log('\x1b[36m│\x1b[0m' + lineStr + padding + '\x1b[36m│\x1b[0m');
+		if (isLazy) {
+			terminal.log(`Apps sleep until their URL is visited (auto-spin-down after \x1b[1m${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'}\x1b[0m idle).`);
 		}
-
-		console.log('\x1b[36m╰' + '─'.repeat(boxWidth) + '╯\x1b[0m\n');
-		console.log(`\x1b[33m[IMPORTANT]\x1b[0m Please use the above \x1b[1mIP URLs\x1b[0m instead of localhost!`);
-		console.log(`\x1b[33m[IMPORTANT]\x1b[0m Cookies and authentication will \x1b[1mfail\x1b[0m on localhost!\n`);
-	}, 8000); // 8 second delay to print AFTER Next.js boots
+		terminal.warn(`Please use the above \x1b[1m${isCustomDomain ? '*.dev' : 'IP'} URLs\x1b[0m instead of localhost!`);
+		terminal.warn(`Cookies and authentication will \x1b[1mfail\x1b[0m on localhost!\n`);
+	}, delayMs);
 }

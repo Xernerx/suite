@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { Command } from 'commander';
+import { terminal } from '../utils/terminal';
 
 export function initializeCommand() {
 	let repoRoot = process.cwd();
@@ -15,14 +16,14 @@ export function initializeCommand() {
 
 	const sourceDir = path.join(repoRoot, 'packages', 'public');
 	if (!fs.existsSync(sourceDir)) {
-		console.warn(`[CLI] Source directory ${sourceDir} does not exist, skipping public asset sync.`);
+		terminal.warn(`Source directory ${sourceDir} does not exist, skipping public asset sync.`);
 		return;
 	}
 
 	if (process.cwd() !== repoRoot) {
 		const targetDir = path.join(process.cwd(), 'public');
 		syncPublicAssets(sourceDir, targetDir);
-		console.log(`[CLI] Synced public assets from ${sourceDir} to ${targetDir}`);
+		terminal.log(`Synced public assets from ${sourceDir} to ${targetDir}`);
 		return;
 	}
 
@@ -44,7 +45,7 @@ export function initializeCommand() {
 	for (const targetDir of targets) {
 		syncPublicAssets(sourceDir, targetDir);
 	}
-	console.log(`[CLI] Synced public assets to ${targets.length} applications.`);
+	terminal.log(`Synced public assets to ${targets.length} applications.`);
 }
 
 export default function registerInitialize(program: Command) {

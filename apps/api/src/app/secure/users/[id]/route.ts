@@ -55,15 +55,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 				})
 			: [];
 
+		const resolvedSubscriptions = Array.isArray(subscriptions) ? [...subscriptions] : [];
+		const hasStaffSubRecord = resolvedSubscriptions.some((s: any) => s.stripeSubscriptionId === 'staff_infinite_sub');
+		const isStaffSubActive = Boolean((user as any).staffSubscription || hasStaffSubRecord);
+		if (isStaffSubActive && !resolvedSubscriptions.some((s: any) => s.status === 'active' || s.status === 'trialing')) {
+			resolvedSubscriptions.push({
+				ownerId: resolvedId,
+				stripeSubscriptionId: 'staff_infinite_sub',
+				priceId: 'ultra',
+				status: 'active',
+				currentPeriodEnd: new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000),
+			} as any);
+		}
+
 		return NextResponse.json({
 			...user,
+			staffSubscription: isStaffSubActive,
 			connections: sanitizedConnections,
-			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug || user.verified),
+			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug || user.verified || isStaffSubActive),
 			appearance: appearance || {},
 			credits: credits || { balance: 0, streak: 0 },
 			level: (levels && levels[0]) || { level: 1, xp: 0 },
 			levels: levels || [],
-			subscriptions: subscriptions || [],
+			subscriptions: resolvedSubscriptions,
 			organizations: organizations || [],
 			communityStats: {
 				verifiedIssuesCount: verifiedIssuesCount || 0,
@@ -208,6 +222,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		// findOneAndUpdate with { returnDocument: 'after' } returns the updated document rather than the old one
 		const updatedUser =
 			Object.keys(mongoUpdate).length > 0 ? await models.users.User.findOneAndUpdate({ id: resolvedId }, mongoUpdate, { returnDocument: 'after', runValidators: true }).lean() : existingDoc;
+
+		if (typeof userBody.staffSubscription === 'boolean' && models.users.Subscription) {
+			if (userBody.staffSubscription) {
+				const existingStaffSub = await models.users.Subscription.findOne({ ownerId: resolvedId, stripeSubscriptionId: 'staff_infinite_sub' }).lean();
+				if (!existingStaffSub) {
+					await models.users.Subscription.create({
+						ownerId: resolvedId,
+						stripeSubscriptionId: 'staff_infinite_sub',
+						priceId: 'ultra',
+						status: 'active',
+						currentPeriodEnd: new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000),
+					});
+				}
+			} else {
+				await models.users.Subscription.deleteMany({ ownerId: resolvedId, stripeSubscriptionId: 'staff_infinite_sub' });
+			}
+		}
 
 		if (userBody.roles && oldUser && updatedUser) {
 			const oldRoles = new Set(oldUser.roles || []);

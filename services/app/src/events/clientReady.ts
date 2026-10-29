@@ -1,8 +1,10 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { createLogger, database } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { syncBotCommands, updateBotPresence } from '../lib/botUtils.js';
+
+const appBotLog = createLogger('APP-BOT');
 
 const SUITE_SERVICES = [
 	{ id: 'www', host: 'www.xernerx.com', devPort: 4000 },
@@ -178,7 +180,7 @@ export default class AppClientReadyEvent extends EventBuilder {
 				{ upsert: true }
 			);
 		} catch (error) {
-			console.error('Failed to sync main org bot statuses:', error);
+			appBotLog.error(`Failed to sync main org bot statuses: ${(error as any)?.message || error}`);
 		}
 
 		setTimeout(() => this.updateBotStatuses(), 60_000);

@@ -24,6 +24,8 @@ const schema = new Schema(
 		lastSeenVersions: { type: Map, of: String, default: {} }, // User's last seen app versions
 
 		verified: { type: Boolean, default: false }, // Whether the user has been verified
+		staffSubscription: { type: Boolean, default: false }, // Infinite staff subscription override
+		stripeCustomerId: { type: String, default: null }, // Linked Stripe customer ID
 		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service
 		agreedPrivacy: { type: Date, default: null }, // Timestamp of when the user agreed to the Privacy Policy
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the user

@@ -33,7 +33,7 @@ export function PlatformHighlights() {
 	];
 
 	return (
-		<section id="highlights" className="max-w-7xl mx-auto px-6 relative" style={{ paddingBottom: 'calc(var(--ui-gap) * 6)' }}>
+		<section id="highlights" className="max-w-(--page-width) mx-auto px-6 relative" style={{ paddingBottom: 'calc(var(--ui-gap) * 6)' }}>
 			<div className="mb-12 max-w-2xl">
 				<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('www.highlights.title')}
@@ -87,7 +87,7 @@ export function LandingCta() {
 	const { type } = usePlatform();
 
 	return (
-		<section id="cta" className="max-w-7xl mx-auto px-6 pb-32 relative">
+		<section id="cta" className="max-w-(--page-width) mx-auto px-6 pb-32 relative">
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
 				whileInView={{ opacity: 1, y: 0 }}

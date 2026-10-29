@@ -13,6 +13,7 @@
     - `--background`, `--foreground`, `--border`
     - `--text`, `--text-muted`
 - **Dynamic Layout & Scaling:**
+    - `--page-width`: Controls maximum page container width (`max-w-(--page-width) mx-auto w-full`, defaults to `90%` via the `60%–100%` Page Content Width slider).
     - `--text-scale`: Controls root `html` font size.
     - `--ui-scale`: Controls root `html` zoom (`calc(var(--ui-scale) * 1%)`).
     - `--ui-gap`: Controls dynamic layout density spacing.

@@ -1,6 +1,6 @@
 {
 	"name": "hosting",
-	"version": "1.1.0",
+	"version": "1.2.3",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -17,6 +17,7 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
+		"@xernerx/terminal": "^1.1.15",
 		"@xernerx/ui": "workspace:*",
 		"discord-api-types": "^0.38.57",
 		"framer-motion": "^14.6.0",

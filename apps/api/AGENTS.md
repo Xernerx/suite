@@ -39,3 +39,13 @@
 6. **Sync Docs & FAQ on Route Changes:**
     - Whenever adding, modifying, or deleting any API routes (`/v1/*`, `/core/*`, `/secure/*`, `/info/*`), always update the corresponding documentation in `apps/docs` (`apps/docs/src/app/api/[version]/page.tsx`, `V1PlatformEndpoints.tsx`, `packages/lib/src/dictionaries/en-GB.json`) and `src/lib/docsBlueprints*.ts`.
     - When a new endpoint or behavior introduces user-facing concepts or questions, also update the FAQ in `apps/info/src/components/faq/*` and `src/lib/faqBlueprints*.ts`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

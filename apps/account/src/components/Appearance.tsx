@@ -96,14 +96,24 @@ export default function Appearance() {
 
 	const [uiZoom, setUiZoom] = useState<number>(100);
 	const [uiGap, setUiGap] = useState<string>('16');
-	const [pageWidth, setPageWidth] = useState<string>('default');
+	const [pageWidth, setPageWidth] = useState<number>(90);
 	const [textScale, setTextScale] = useState<number>(14);
 
-	const PAGE_WIDTH_MAP: Record<string, string> = {
-		compact: '80rem',
-		default: '96rem',
-		wide: '112rem',
-		full: '100%',
+	const parseStoredPageWidth = (raw: string | null): number => {
+		if (!raw) return 90;
+		const legacyMap: Record<string, number> = {
+			compact: 75,
+			default: 90,
+			wide: 95,
+			full: 100,
+		};
+		const trimmed = raw.trim().toLowerCase();
+		if (trimmed in legacyMap) return legacyMap[trimmed];
+		const parsed = parseInt(trimmed.replace('%', ''), 10);
+		if (!isNaN(parsed)) {
+			return Math.min(100, Math.max(60, Math.round(parsed / 5) * 5));
+		}
+		return 90;
 	};
 
 	useEffect(() => {
@@ -140,12 +150,9 @@ export default function Appearance() {
 			}
 
 			const storedPageWidth = getPref('pageWidth');
-			if (storedPageWidth && PAGE_WIDTH_MAP[storedPageWidth]) {
-				setPageWidth(storedPageWidth);
-				setThemeVar('--page-width', PAGE_WIDTH_MAP[storedPageWidth]);
-			} else {
-				setThemeVar('--page-width', '96rem');
-			}
+			const resolvedWidth = parseStoredPageWidth(storedPageWidth);
+			setPageWidth(resolvedWidth);
+			setThemeVar('--page-width', `${resolvedWidth}%`);
 
 			const storedTextScale = getPref('textScale');
 			if (storedTextScale) {
@@ -276,16 +283,11 @@ export default function Appearance() {
 		});
 	};
 
-	const handlePageWidthChange = (val: string) => {
-		const resolvedCss = PAGE_WIDTH_MAP[val] || '96rem';
+	const handlePageWidthChange = (val: number) => {
 		setPageWidth(val);
-		setPref('pageWidth', val);
-		setThemeVar('--page-width', resolvedCss);
-		saveToDb({ pageWidth: val });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.pageWidth.title'),
-		});
+		setPref('pageWidth', String(val));
+		setThemeVar('--page-width', `${val}%`);
+		saveToDb({ pageWidth: String(val) });
 	};
 
 	const handleTextScaleChange = (val: number) => {
@@ -331,9 +333,9 @@ export default function Appearance() {
 		setPref('uiGap', '16');
 		setThemeVar('--ui-gap', '16px');
 
-		setPageWidth('default');
-		setPref('pageWidth', 'default');
-		setThemeVar('--page-width', '96rem');
+		setPageWidth(90);
+		setPref('pageWidth', '90');
+		setThemeVar('--page-width', '90%');
 
 		setTextScale(14);
 		setPref('textScale', '14');
@@ -348,7 +350,7 @@ export default function Appearance() {
 			accent: '#8b7cf6',
 			uiZoom: 100,
 			uiGap: '16',
-			pageWidth: 'default',
+			pageWidth: '90',
 			textScale: 14,
 			dotMatrixStage: 'default',
 			dotMatrixType: 'default',

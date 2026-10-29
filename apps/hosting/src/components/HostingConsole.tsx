@@ -1,13 +1,19 @@
 /** @format */
 'use client';
 
-import { Columns2, Copy, ExternalLink, KeyRound, Maximize2, Minimize2, Plus, RefreshCw, RotateCcw, Save, Server, Settings2, ShieldCheck, Terminal, Trash2 } from 'lucide-react';
-import { Badge, Button, Input, Modal } from '@xernerx/ui';
+import { Columns2, Copy, ExternalLink, KeyRound, Maximize2, Minimize2, RefreshCw, Server, Settings2, ShieldCheck, Terminal } from 'lucide-react';
+import { Badge, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useTheme, useToast, useUser } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import HostingSshModal, { buildThemedNodeUrl, DEFAULT_HOSTING_NODES, type HostingNodeConfig, resolveNodeSshTarget } from './HostingSshModal';
+import HostingNodeConfigModal from './HostingNodeConfigModal';
 
 export { DEFAULT_HOSTING_NODES, type HostingNodeConfig };
+
+interface NodePingState {
+	status: 'checking' | 'online' | 'unreachable';
+	latencyMs: number | null;
+}
 
 interface HostingConsoleProps {
 	activeView: string;
@@ -32,16 +38,40 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 
 	const [fullBleed, setFullBleed] = useState(false);
 	const [reloadCounters, setReloadCounters] = useState<Record<string, number>>({});
-	const [draftNodes, setDraftNodes] = useState<HostingNodeConfig[]>(nodes);
 	const [savingConfig, setSavingConfig] = useState(false);
 	const [easypanelConn, setEasypanelConn] = useState<{ username: string; secret?: string; token?: string } | null>(null);
 	const [sshModalOpen, setSshModalOpen] = useState(false);
 	const [sshModalNode, setSshModalNode] = useState<HostingNodeConfig | undefined>(undefined);
+	const [nodePings, setNodePings] = useState<Record<string, NodePingState>>({});
 	const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
 
-	useEffect(() => {
-		setDraftNodes(nodes);
+	const probeNodesReachability = useCallback(async () => {
+		for (const node of nodes) {
+			if (!node.url) continue;
+			setNodePings((prev) => ({
+				...prev,
+				[node.id]: { status: prev[node.id]?.status || 'checking', latencyMs: prev[node.id]?.latencyMs ?? null },
+			}));
+			const start = performance.now();
+			const controller = new AbortController();
+			const timer = setTimeout(() => controller.abort(), 5000);
+			try {
+				await fetch(node.url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+				const elapsed = Math.max(1, Math.round(performance.now() - start));
+				setNodePings((prev) => ({ ...prev, [node.id]: { status: 'online', latencyMs: elapsed } }));
+			} catch {
+				setNodePings((prev) => ({ ...prev, [node.id]: { status: 'unreachable', latencyMs: null } }));
+			} finally {
+				clearTimeout(timer);
+			}
+		}
 	}, [nodes]);
+
+	useEffect(() => {
+		probeNodesReachability();
+		const interval = setInterval(probeNodesReachability, 30000);
+		return () => clearInterval(interval);
+	}, [probeNodesReachability]);
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
@@ -82,10 +112,12 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 
 	const handleReloadNode = (nodeId: string) => {
 		setReloadCounters((prev) => ({ ...prev, [nodeId]: (prev[nodeId] || 0) + 1 }));
+		probeNodesReachability();
 		toast({ type: 'info', title: t('hosting.console.reloadingToast', { node: nodeId }) });
 	};
 
 	const handleReloadCurrent = () => {
+		probeNodesReachability();
 		if (isSplitView) {
 			const nextCounters = { ...reloadCounters };
 			nodes.forEach((n) => {
@@ -100,44 +132,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 		}
 	};
 
-	const handleUpdateDraftNode = (index: number, field: keyof HostingNodeConfig, value: string) => {
-		setDraftNodes((prev) => prev.map((item, idx) => (idx === index ? { ...item, [field]: value } : item)));
-	};
-
-	const handleAddDraftNode = () => {
-		const nextIdx = draftNodes.length + 1;
-		setDraftNodes((prev) => [...prev, { id: `node-${nextIdx}`, name: `node-${nextIdx}`, url: `https://node-${nextIdx}.xernerx.com`, region: `Node ${nextIdx}` }]);
-	};
-
-	const handleRemoveDraftNode = (index: number) => {
-		if (draftNodes.length <= 1) return;
-		setDraftNodes((prev) => prev.filter((_, idx) => idx !== index));
-	};
-
-	const handleResetDefaultNodes = () => {
-		setDraftNodes(DEFAULT_HOSTING_NODES);
-	};
-
-	const handleSaveNodesConfig = async () => {
-		const sanitized = draftNodes
-			.map((n) => ({
-				id: (n.id || n.name || 'node')
-					.trim()
-					.toLowerCase()
-					.replace(/[^a-z0-9-_]/g, '-'),
-				name: (n.name || n.id || 'node').trim(),
-				url: (n.url || '').trim(),
-				region: (n.region || '').trim(),
-				sshTarget: (n.sshTarget || '').trim(),
-				sshPort: (n.sshPort || '22').trim(),
-			}))
-			.filter((n) => n.id && n.url);
-
-		if (sanitized.length === 0) {
-			toast({ type: 'error', title: t('hosting.configModal.invalidError') });
-			return;
-		}
-
+	const handleSaveNodesConfig = async (sanitized: HostingNodeConfig[]) => {
 		setSavingConfig(true);
 		try {
 			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/hosting_nodes_config'), {
@@ -184,6 +179,16 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 					<div className="flex items-center gap-1.5 rounded-xl bg-(--background)/60 border border-(--border)/10 p-1">
 						{nodes.map((node) => {
 							const isSelected = !isSplitView && selectedNode?.id === node.id;
+							const ping = nodePings[node.id];
+							const isUnreachable = ping?.status === 'unreachable';
+							const dotClass = isUnreachable
+								? 'bg-(--accent-red)'
+								: ping?.status === 'checking'
+									? 'bg-(--accent-orange) animate-pulse'
+									: isSelected
+										? 'bg-(--accent-green) animate-pulse'
+										: 'bg-(--accent-green)/75';
+
 							return (
 								<button
 									key={node.id}
@@ -193,9 +198,10 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 										isSelected ? 'bg-(--accent) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
 									}`}
 								>
-									<span className={`h-2 w-2 rounded-full ${isSelected ? 'bg-(--accent-green) animate-pulse' : 'bg-(--accent-green)/70'}`} />
+									<span className={`h-2 w-2 rounded-full ${dotClass}`} />
 									<Server size={13} />
 									<span>{node.name}</span>
+									{ping?.latencyMs !== null && ping?.latencyMs !== undefined && <span className="text-[10px] font-mono opacity-80">{ping.latencyMs}ms</span>}
 								</button>
 							);
 						})}
@@ -311,7 +317,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				</div>
 			</div>
 
-			{/* Persistent Multi-Node Iframe Stage (All nodes stay mounted in DOM for 0ms switching) */}
+			{/* Persistent Multi-Node Iframe Stage */}
 			<div
 				className={`flex-1 w-full min-h-0 ${isSplitView ? 'grid grid-cols-1 lg:grid-cols-2' : 'flex flex-col'}`}
 				style={{ gap: isSplitView && !fullBleed ? 'calc(var(--ui-gap) * 0.75)' : '0px' }}
@@ -319,6 +325,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				{nodes.map((node) => {
 					const isVisible = isSplitView || selectedNode?.id === node.id;
 					const reloadKey = reloadCounters[node.id] || 0;
+					const ping = nodePings[node.id];
 					return (
 						<div
 							key={node.id}
@@ -329,11 +336,12 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 							{isSplitView && (
 								<div className="flex items-center justify-between px-3.5 py-2 bg-(--background)/70 border-b border-(--border)/10 shrink-0">
 									<div className="flex items-center gap-2 min-w-0">
-										<span className="h-2 w-2 rounded-full bg-(--accent-green) animate-pulse shrink-0" />
+										<span className={`h-2 w-2 rounded-full ${ping?.status === 'unreachable' ? 'bg-(--accent-red)' : 'bg-(--accent-green) animate-pulse'} shrink-0`} />
 										<span className="text-xs font-extrabold text-(--text) truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>
 											{node.name}
 										</span>
 										{node.region && <span className="text-[10px] font-semibold text-(--accent)">({node.region})</span>}
+										{ping?.latencyMs !== null && ping?.latencyMs !== undefined && <span className="text-[10px] font-mono text-(--text-muted)">{ping.latencyMs}ms</span>}
 										<span className="font-mono text-[11px] text-(--text-muted) truncate hidden sm:inline">{node.url}</span>
 									</div>
 									<div className="flex items-center gap-1.5 shrink-0">
@@ -383,94 +391,9 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				})}
 			</div>
 
-			{/* Node URLs Configuration Modal */}
-			<Modal open={configModalOpen} onOpenChange={setConfigModalOpen} maxWidth="max-w-2xl" title={t('hosting.configModal.title')} description={t('hosting.configModal.description')}>
-				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="rounded-2xl bg-(--accent)/10 border border-(--accent)/25 p-3 text-xs text-(--text-muted)">{t('hosting.configModal.cookieHint')}</div>
+			<HostingNodeConfigModal open={configModalOpen} onOpenChange={setConfigModalOpen} nodes={nodes} savingConfig={savingConfig} onSaveNodes={handleSaveNodesConfig} />
 
-					<div className="flex flex-col max-h-[50vh] overflow-y-auto pr-1" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
-						{draftNodes.map((node, index) => (
-							<div key={index} className="flex flex-col rounded-2xl bg-(--background)/50 border border-(--border)/10 p-3.5" style={{ gap: 'calc(var(--ui-gap) * 0.6)' }}>
-								<div className="flex items-center justify-between gap-2">
-									<span className="text-xs font-extrabold uppercase tracking-wider text-(--accent)">{t('hosting.configModal.nodeLabel', { index: index + 1 })}</span>
-									{draftNodes.length > 1 && (
-										<button
-											type="button"
-											onClick={() => handleRemoveDraftNode(index)}
-											className="inline-flex items-center gap-1 text-xs font-semibold text-(--text-muted) hover:text-(--accent-red) transition-colors cursor-pointer"
-										>
-											<Trash2 size={13} />
-											<span>{t('hosting.configModal.deleteNode')}</span>
-										</button>
-									)}
-								</div>
-
-								<div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 'calc(var(--ui-gap) * 0.6)' }}>
-									<div className="flex flex-col gap-1">
-										<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.configModal.nameField')}</span>
-										<Input
-											value={node.name}
-											onChange={(e) => {
-												const val = e.target.value;
-												handleUpdateDraftNode(index, 'name', val);
-												handleUpdateDraftNode(
-													index,
-													'id',
-													val
-														.toLowerCase()
-														.replace(/[^a-z0-9-_]/g, '-')
-														.replace(/-+/g, '-')
-												);
-											}}
-											placeholder="one-dummi"
-										/>
-									</div>
-									<div className="flex flex-col gap-1">
-										<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.configModal.regionField')}</span>
-										<Input value={node.region || ''} onChange={(e) => handleUpdateDraftNode(index, 'region', e.target.value)} placeholder="Primary Node" />
-									</div>
-								</div>
-
-								<div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'calc(var(--ui-gap) * 0.6)' }}>
-									<div className="sm:col-span-2 flex flex-col gap-1">
-										<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.configModal.urlField')}</span>
-										<Input value={node.url} onChange={(e) => handleUpdateDraftNode(index, 'url', e.target.value)} placeholder="https://one-dummi.xernerx.com" />
-									</div>
-									<div className="flex flex-col gap-1">
-										<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.configModal.sshField')}</span>
-										<Input value={node.sshTarget || ''} onChange={(e) => handleUpdateDraftNode(index, 'sshTarget', e.target.value)} placeholder="root@123.45.67.89" />
-									</div>
-								</div>
-							</div>
-						))}
-					</div>
-
-					<div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-(--border)/10">
-						<div className="flex items-center gap-2">
-							<Button variant="secondary" size="sm" onClick={handleAddDraftNode} className="flex items-center gap-1.5">
-								<Plus size={14} />
-								{t('hosting.configModal.addNode')}
-							</Button>
-							<Button variant="ghost" size="sm" onClick={handleResetDefaultNodes} className="flex items-center gap-1.5 text-(--text-muted)">
-								<RotateCcw size={14} />
-								{t('hosting.configModal.resetDefaults')}
-							</Button>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<Button variant="secondary" size="sm" onClick={() => setConfigModalOpen(false)}>
-								{t('hosting.configModal.cancel')}
-							</Button>
-							<Button variant="primary" size="sm" onClick={handleSaveNodesConfig} loading={savingConfig} className="flex items-center gap-1.5">
-								<Save size={14} />
-								{t('hosting.configModal.save')}
-							</Button>
-						</div>
-					</div>
-				</div>
-			</Modal>
-
-			<HostingSshModal open={sshModalOpen} onOpenChange={setSshModalOpen} activeNode={sshModalNode || selectedNode} nodes={nodes} userId={userId} />
+			<HostingSshModal open={sshModalOpen} onOpenChange={setSshModalOpen} activeNode={sshModalNode || selectedNode} nodes={nodes} userId={userId} defaultPassword={easypanelConn?.secret} />
 		</div>
 	);
 }

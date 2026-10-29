@@ -1,11 +1,11 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUp, Bot, Hash, Plus, RotateCcw, Save, Shield, Trash2 } from 'lucide-react';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { BotProfilePreview } from '@xernerx/components';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useToast } from '@xernerx/providers';
 import type { BotDiscordProfile, DiscordChannelOption, DiscordRoleOption, RegisteredBotOption, SupportBotItem, SupportChannelItem } from './types';
 
 interface SupportChannelsTabProps {
@@ -354,8 +354,31 @@ const DEFAULT_CHECKLIST_ITEMS = ['Retried the command?', 'Bot is online?', 'Have
 
 export function SupportChecklistTab({ checklist, saving, onSaveChecklist }: SupportChecklistTabProps) {
 	const { t } = useDictionary();
+	const { remind } = useToast();
 	const [items, setItems] = useState<string[]>(checklist);
 	const [newQuestion, setNewQuestion] = useState('');
+	const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+
+	useEffect(() => {
+		setItems(checklist);
+	}, [checklist]);
+
+	const isDirty = JSON.stringify(items) !== JSON.stringify(checklist);
+
+	useEffect(() => {
+		if (isDirty) {
+			remind(
+				true,
+				() => onSaveChecklist(items),
+				() => setItems(checklist),
+				saving
+			);
+		} else {
+			remind(false);
+		}
+		return () => remind(false);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isDirty, items, checklist, saving]);
 
 	const handleAddQuestion = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -387,11 +410,11 @@ export function SupportChecklistTab({ checklist, saving, onSaveChecklist }: Supp
 					<p className="text-xs text-(--text-muted)">{t('admin.support.checklist.subtitle')}</p>
 				</div>
 				<div className="flex items-center gap-2">
-					<Button variant="secondary" size="sm" onClick={() => setItems(DEFAULT_CHECKLIST_ITEMS)} disabled={saving}>
+					<Button variant="secondary" size="sm" onClick={() => setConfirmResetOpen(true)} disabled={saving}>
 						<RotateCcw size={14} className="mr-1.5" />
 						{t('admin.support.checklist.resetButton')}
 					</Button>
-					<Button size="sm" onClick={() => onSaveChecklist(items)} disabled={saving || items.length === 0}>
+					<Button size="sm" onClick={() => onSaveChecklist(items)} disabled={saving || items.length === 0 || !isDirty}>
 						<Save size={14} className="mr-1.5" />
 						{t('admin.support.checklist.saveButton')}
 					</Button>
@@ -433,6 +456,19 @@ export function SupportChecklistTab({ checklist, saving, onSaveChecklist }: Supp
 					</div>
 				))}
 			</div>
+
+			<Confirm
+				open={confirmResetOpen}
+				onOpenChange={setConfirmResetOpen}
+				title={t('admin.support.checklist.resetButton')}
+				description={t('admin.support.checklist.subtitle')}
+				confirmText={t('admin.support.checklist.resetButton')}
+				variant="danger"
+				onConfirm={() => {
+					setItems(DEFAULT_CHECKLIST_ITEMS);
+					setConfirmResetOpen(false);
+				}}
+			/>
 		</div>
 	);
 }

@@ -136,6 +136,7 @@ export function Header() {
 				[port === '4008' || host.startsWith('store.'), 'Xernerx Store'],
 				[port === '4009' || host.startsWith('portal.') || Boolean(pathname?.startsWith('/portal')), 'Developer Portal'],
 				[port === '4010' || host.startsWith('hosting.'), 'Server Hosting'],
+				[port === '4011' || host.startsWith('haste.'), 'Xernerx Haste'],
 				[Boolean(pathname?.startsWith('/dashboard')), 'Server Dashboard'],
 				[Boolean(pathname?.startsWith('/overlay')), 'Live Overlay Monitor'],
 			];
@@ -209,9 +210,10 @@ export function Header() {
 			'4008': 'store',
 			'4009': 'portal',
 			'4010': 'hosting',
+			'4011': 'haste',
 		};
 		if (isLocalHost && portMap[port]) pre = portMap[port];
-		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
+		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting', 'haste'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
 
 		const params = new URLSearchParams(window.location.search);
 		if (state !== 'hidden' && view && !params.has('view')) params.set('view', view);

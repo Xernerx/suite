@@ -53,13 +53,18 @@ export function ThemeScript() {
 
 			const pageWidth = getPref('pageWidth');
 			if (pageWidth) {
-				const widthMap: Record<string, string> = {
-					compact: '80rem',
-					default: '96rem',
-					wide: '112rem',
-					full: '100%',
+				const legacyMap: Record<string, number> = {
+					compact: 75,
+					default: 90,
+					wide: 95,
+					full: 100,
 				};
-				setThemeVar('--page-width', widthMap[pageWidth] || '96rem');
+				const trimmed = pageWidth.trim().toLowerCase();
+				const parsed = trimmed in legacyMap ? legacyMap[trimmed] : parseInt(trimmed.replace('%', ''), 10);
+				const pct = !isNaN(parsed) ? Math.min(100, Math.max(60, Math.round(parsed / 5) * 5)) : 90;
+				setThemeVar('--page-width', pct + '%');
+			} else {
+				setThemeVar('--page-width', '90%');
 			}
 
 			const textScale = getPref('textScale');

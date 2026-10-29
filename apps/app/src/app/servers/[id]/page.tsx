@@ -193,7 +193,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	const resolvedId = server.id || id;
 
 	return (
-		<div className="flex flex-col w-full min-h-screen pb-24">
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
 			<ServerHeader server={server} setServer={setServer} organizationData={organizationData} canVote={canVote} nextVoteAt={nextVoteAt} voting={voting} timeLeft={timeLeft} onVote={handleVote} />
 			<div className="w-full">
 				{view === 'statistics' ? (

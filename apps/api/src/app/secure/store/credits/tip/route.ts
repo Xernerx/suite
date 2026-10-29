@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { dispatchBotWebhook } from '@/lib/webhookDispatcher';
 
 const MIN_TIP = 10;
 const MAX_TIP = 2500;
@@ -35,14 +36,22 @@ export async function POST(req: Request) {
 
 		let resolvedRecipientId = targetUserId ? String(targetUserId).trim() : '';
 		let targetLabel = resolvedRecipientId;
+		let canonicalBotId = '';
+		let resolvedBotDoc: any = null;
+
+		if (botId) {
+			resolvedBotDoc = await BotModel.findOne({ $or: [{ id: String(botId) }, { vanitySlug: String(botId).toLowerCase() }] }).lean();
+			if (resolvedBotDoc?.id) {
+				canonicalBotId = String(resolvedBotDoc.id);
+			}
+		}
 
 		if (!resolvedRecipientId && botId) {
-			const bot = await BotModel.findOne({ $or: [{ id: String(botId) }, { vanitySlug: String(botId).toLowerCase() }] }).lean();
-			if (!bot || !Array.isArray(bot.owners) || !bot.owners[0]) {
+			if (!resolvedBotDoc || !Array.isArray(resolvedBotDoc.owners) || !resolvedBotDoc.owners[0]) {
 				return NextResponse.json({ error: 'Bot or primary bot owner not found.' }, { status: 404 });
 			}
-			resolvedRecipientId = String(bot.owners[0]);
-			targetLabel = bot.name || resolvedRecipientId;
+			resolvedRecipientId = String(resolvedBotDoc.owners[0]);
+			targetLabel = resolvedBotDoc.name || resolvedRecipientId;
 		} else if (resolvedRecipientId) {
 			const recipientUser = await UserModel.findOne({
 				$or: [{ id: resolvedRecipientId }, { vanitySlug: resolvedRecipientId.toLowerCase() }],
@@ -88,11 +97,13 @@ export async function POST(req: Request) {
 		const now = new Date();
 		const txIdBase = crypto.randomBytes(6).toString('hex');
 
+		const effectiveBotId = canonicalBotId || (botId ? String(botId) : '');
+
 		const senderTx = {
 			id: `tx_tip_sent_${txIdBase}`,
 			type: 'tip_sent',
 			amount: -rawAmount,
-			itemId: botId ? `tip_bot_${botId}` : `tip_user_${resolvedRecipientId}`,
+			itemId: effectiveBotId ? `tip_bot_${effectiveBotId}` : `tip_user_${resolvedRecipientId}`,
 			itemName: cleanNote ? `Tip to ${targetLabel} — "${cleanNote}"` : `Tip to ${targetLabel}`,
 			createdAt: now,
 		};
@@ -129,10 +140,101 @@ export async function POST(req: Request) {
 			{ upsert: true, returnDocument: 'after' }
 		);
 
+		let totalTippedForBot = rawAmount;
+		if (effectiveBotId) {
+			const validBotTipIds = new Set<string>([`tip_bot_${effectiveBotId}`]);
+			if (botId) validBotTipIds.add(`tip_bot_${botId}`);
+			if (resolvedBotDoc?.vanitySlug) validBotTipIds.add(`tip_bot_${String(resolvedBotDoc.vanitySlug).toLowerCase()}`);
+
+			const updatedTxList = Array.isArray((updatedSender as any)?.transactions) ? (updatedSender as any).transactions : [];
+			totalTippedForBot = updatedTxList
+				.filter((tx: any) => (tx?.type === 'tip_sent' || tx?.type === 'tip_out') && typeof tx?.itemId === 'string' && validBotTipIds.has(tx.itemId))
+				.reduce((sum: number, tx: any) => sum + Math.abs(Number(tx?.amount) || 0), 0);
+
+			if (!totalTippedForBot || totalTippedForBot < rawAmount) {
+				totalTippedForBot = rawAmount;
+			}
+
+			try {
+				const HookModel = (models.bots as any).Hook;
+				const hooks = HookModel ? await HookModel.find({ botId: effectiveBotId }).lean() : [];
+				if (hooks?.length) {
+					const authorIcon = (session?.user as any)?.image || undefined;
+					const finalBotName = resolvedBotDoc?.name || targetLabel || 'Bot';
+					const finalBotAvatar = resolvedBotDoc?.avatar
+						? String(resolvedBotDoc.avatar).startsWith('http')
+							? String(resolvedBotDoc.avatar)
+							: `https://cdn.discordapp.com/avatars/${effectiveBotId}/${resolvedBotDoc.avatar}.png`
+						: undefined;
+					const nowIso = now.toISOString();
+
+					for (const hook of hooks) {
+						if (!hook.url || !hook.events?.includes('POST tip')) continue;
+						await dispatchBotWebhook({
+							botId: effectiveBotId,
+							url: hook.url,
+							event: 'POST tip',
+							secret: hook.secret,
+							payload: {
+								event: 'POST tip',
+								botId: effectiveBotId,
+								timestamp: nowIso,
+								data: {
+									userId: senderId,
+									username: senderName,
+									avatar: authorIcon || null,
+									amount: rawAmount,
+									tipped: totalTippedForBot,
+									totalTipped: totalTippedForBot,
+									note: cleanNote || null,
+								},
+								username: 'Xernerx App',
+								avatar_url: 'https://xernerx.com/logo.png',
+								embeds: [
+									{
+										author: {
+											name: senderName,
+											icon_url: authorIcon,
+										},
+										title: 'New Credit Tip!',
+										url: `https://xernerx.com/bots/${effectiveBotId}`,
+										description: cleanNote
+											? `This user just tipped **${rawAmount.toLocaleString()}** credits to your bot!\n\n> ${cleanNote}`
+											: `This user just tipped **${rawAmount.toLocaleString()}** credits to your bot!`,
+										fields: [
+											{
+												name: 'Tip Amount',
+												value: `**${rawAmount.toLocaleString()}** Credits`,
+												inline: true,
+											},
+											{
+												name: 'Total Tipped by User',
+												value: `**${totalTippedForBot.toLocaleString()}** Credits`,
+												inline: true,
+											},
+										],
+										color: 0xff00a0,
+										footer: {
+											text: finalBotName,
+											icon_url: finalBotAvatar,
+										},
+										timestamp: nowIso,
+									},
+								],
+							},
+						});
+					}
+				}
+			} catch (hookErr) {
+				console.error('Failed to trigger bot webhook for tip:', hookErr);
+			}
+		}
+
 		return NextResponse.json({
 			success: true,
 			balance: updatedSender.balance ?? 0,
 			amount: rawAmount,
+			tipped: effectiveBotId ? totalTippedForBot : rawAmount,
 			recipientId: resolvedRecipientId,
 		});
 	} catch (error: any) {

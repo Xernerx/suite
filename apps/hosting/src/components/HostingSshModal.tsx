@@ -39,6 +39,7 @@ interface HostingSshModalProps {
 	activeNode?: HostingNodeConfig;
 	nodes: HostingNodeConfig[];
 	userId?: string;
+	defaultPassword?: string;
 }
 
 interface TerminalHistoryEntry {
@@ -88,14 +89,14 @@ export function resolveNodeSshTarget(node?: HostingNodeConfig): string {
 	return 'root@';
 }
 
-export default function HostingSshModal({ open, onOpenChange, activeNode, nodes, userId }: HostingSshModalProps) {
+export default function HostingSshModal({ open, onOpenChange, activeNode, nodes, userId, defaultPassword }: HostingSshModalProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
 	const [target, setTarget] = useState(() => resolveNodeSshTarget(activeNode));
 	const [port, setPort] = useState(() => activeNode?.sshPort || '22');
-	const [password, setPassword] = useState('');
+	const [password, setPassword] = useState(() => defaultPassword || '');
 	const [command, setCommand] = useState('');
 	const [cwd, setCwd] = useState('~');
 	const [running, setRunning] = useState(false);
@@ -109,8 +110,12 @@ export default function HostingSshModal({ open, onOpenChange, activeNode, nodes,
 			setTarget(resolveNodeSshTarget(activeNode));
 			setPort(activeNode?.sshPort || '22');
 			setCwd('~');
+			if (defaultPassword && !password) {
+				setPassword(defaultPassword);
+			}
 		}
-	}, [open, activeNode]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [open, activeNode, defaultPassword]);
 
 	useEffect(() => {
 		outputEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -264,7 +269,14 @@ export default function HostingSshModal({ open, onOpenChange, activeNode, nodes,
 						<Input value={port} onChange={(e) => setPort(e.target.value)} placeholder="22" />
 					</div>
 					<div className="sm:col-span-4 flex flex-col gap-1">
-						<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.sshModal.passwordLabel')}</span>
+						<div className="flex items-center justify-between gap-1">
+							<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.sshModal.passwordLabel')}</span>
+							{defaultPassword && password !== defaultPassword && (
+								<button type="button" onClick={() => setPassword(defaultPassword)} className="text-[10px] font-bold text-(--accent) hover:underline cursor-pointer">
+									{t('hosting.sshModal.useLinkedSecret')}
+								</button>
+							)}
+						</div>
 						<Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••••••" />
 					</div>
 				</div>

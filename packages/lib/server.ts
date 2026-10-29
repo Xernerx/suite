@@ -7,3 +7,4 @@ export * from './src/registry';
 export * from './src/themeLayout';
 export * from './src/dispatch';
 export * from './src/emails/BasicTemplate';
+export * from './src/terminal';

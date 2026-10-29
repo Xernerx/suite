@@ -182,7 +182,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		>
 			{/* HERO SECTION — Sits cleanly beneath the constructed XERNERX dot-matrix stage */}
 			<section className="min-h-screen flex flex-col items-center justify-start px-6 pt-[52vh] sm:pt-[54vh] pb-12 relative z-30">
-				<div className="w-full max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+				<div className="w-full max-w-(--page-width) mx-auto flex flex-col items-center text-center relative z-10">
 					<motion.div
 						initial={{ opacity: 0, y: 36 }}
 						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
@@ -272,7 +272,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 			{/* SELLING POINTS (Fluid Dot-Matrix Glass Bento Cards) */}
 			<section className="px-6 relative z-20 pb-8">
-				<div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
+				<div className="max-w-(--page-width) mx-auto grid md:grid-cols-3 gap-6">
 					{[
 						{
 							title: t('www.features.scale.title'),
@@ -359,7 +359,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			</section>
 
 			{/* ABOUT SECTION (Asymmetrical Bento-style) */}
-			<section id="about" className="max-w-7xl mx-auto px-6 relative" style={{ padding: 'calc(var(--ui-gap) * 6) 0' }}>
+			<section id="about" className="max-w-(--page-width) mx-auto px-6 relative" style={{ padding: 'calc(var(--ui-gap) * 6) 0' }}>
 				<div className="relative grid md:grid-cols-12 gap-8 items-center">
 					{/* Massive Watermark */}
 					<div

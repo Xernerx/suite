@@ -1,6 +1,6 @@
 /** @format */
 
-import { BookOpen, Cloud, Globe, LayoutDashboard, Server, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
+import { BookOpen, Cloud, FileCode2, Globe, LayoutDashboard, Server, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
 
 export type NavigationItem = {
 	label: string;
@@ -23,6 +23,7 @@ export const navigation: NavigationItem[] = [
 	{ label: 'lib.navigation.items.api', href: 'https://api.xernerx.com', icon: Terminal, category: 'lib.navigation.categories.developer' },
 	{ label: 'lib.navigation.items.docs', href: 'https://docs.xernerx.com', icon: BookOpen, category: 'lib.navigation.categories.developer' },
 	{ label: 'lib.navigation.items.cdn', href: 'https://cdn.xernerx.com', icon: Cloud, category: 'lib.navigation.categories.developer' },
+	{ label: 'lib.navigation.items.haste', href: 'https://haste.xernerx.com', icon: FileCode2, category: 'lib.navigation.categories.developer' },
 
 	// External
 	{ label: 'lib.navigation.items.website', href: 'https://www.xernerx.com', icon: Globe, category: 'lib.navigation.categories.public' },
@@ -34,7 +35,7 @@ export const navigation: NavigationItem[] = [
 ];
 
 export type HeaderSubdomainItem = {
-	id: 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'api' | 'www' | 'admin' | 'hosting';
+	id: 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'api' | 'www' | 'admin' | 'hosting';
 	label: string;
 	host: string;
 	href: string;
@@ -51,6 +52,7 @@ export const headerSubdomainsCatalog: HeaderSubdomainItem[] = [
 	{ id: 'info', label: 'lib.navigation.items.help', host: 'info.xernerx.com', href: 'https://info.xernerx.com', icon: LifeBuoy },
 	{ id: 'docs', label: 'lib.navigation.items.docs', host: 'docs.xernerx.com', href: 'https://docs.xernerx.com', icon: BookOpen },
 	{ id: 'cdn', label: 'lib.navigation.items.cdn', host: 'cdn.xernerx.com', href: 'https://cdn.xernerx.com', icon: Cloud },
+	{ id: 'haste', label: 'lib.navigation.items.haste', host: 'haste.xernerx.com', href: 'https://haste.xernerx.com', icon: FileCode2 },
 	{ id: 'api', label: 'lib.navigation.items.api', host: 'api.xernerx.com', href: 'https://api.xernerx.com', icon: Terminal },
 	{ id: 'www', label: 'lib.navigation.items.website', host: 'www.xernerx.com', href: 'https://www.xernerx.com', icon: Globe },
 	{ id: 'admin', label: 'lib.navigation.items.admin', host: 'admin.xernerx.com', href: 'https://admin.xernerx.com', icon: ShieldAlert, adminOnly: true, requiredPermission: 'access' },

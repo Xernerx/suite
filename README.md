@@ -37,6 +37,7 @@
 | **[Store](./apps/store/README.md)**     | `4008`   | [`store.xernerx.com`](https://store.xernerx.com)     | [`store.canary`](https://store.canary.xernerx.com)     | [`store.dev`](https://store.dev.xernerx.com)     | Storefront for Xernerx Ultra, bot/server passes, gifting, and Stripe checkout |
 | **[Portal](./apps/portal/README.md)**   | `4009`   | [`portal.xernerx.com`](https://portal.xernerx.com)   | [`portal.canary`](https://portal.canary.xernerx.com)   | [`portal.dev`](https://portal.dev.xernerx.com)   | Developer portal, organizations, bot publishing, slash commands, & webhooks   |
 | **[Hosting](./apps/hosting/README.md)** | `4010`   | [`hosting.xernerx.com`](https://hosting.xernerx.com) | [`hosting.canary`](https://hosting.canary.xernerx.com) | [`hosting.dev`](https://hosting.dev.xernerx.com) | Staff-only multi-node server hosting & Easypanel infrastructure console       |
+| **[Haste](./apps/haste/README.md)**     | `4011`   | [`haste.xernerx.com`](https://haste.xernerx.com)     | [`haste.canary`](https://haste.canary.xernerx.com)     | [`haste.dev`](https://haste.dev.xernerx.com)     | First-party Hastebin-compatible code pastebin, TTL expirations, & `/raw/[id]` |
 
 ### 📦 Shared Workspace Packages (`packages/*`)
 

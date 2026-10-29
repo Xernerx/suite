@@ -2,6 +2,7 @@
 
 import { BrowserWindow, Tray, app, globalShortcut, ipcMain, nativeImage, screen, shell } from 'electron';
 import Store from 'electron-store';
+import { Terminal } from '@xernerx/terminal';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
@@ -114,7 +115,21 @@ let ipcRegistered = false;
 let pendingDeepLink: string | null = null;
 let pendingBugReport: { dataUrl: string; filename: string; pageUrl: string; product?: string; timestamp: number } | null = null;
 
+const desktopTerminal = new Terminal({
+	title: 'XERNERX',
+	scope: 'DESKTOP',
+	format: ['title', 'scope', 'datetime', 'memory'],
+	spin: false,
+});
+
 function log(message: string) {
+	if (/error|failed|exception/i.test(message)) {
+		desktopTerminal.error(message);
+	} else if (/warn/i.test(message)) {
+		desktopTerminal.warn(message);
+	} else {
+		desktopTerminal.log(message);
+	}
 	try {
 		const file = path.join(app.getPath('desktop'), 'xernerx-debug.log');
 		fs.appendFileSync(file, `[${new Date().toISOString()}] ${message}\n`);
@@ -295,6 +310,7 @@ function createSplash() {
 		width: 500,
 		height: 350,
 		center: true,
+		movable: true,
 		roundedCorners: true,
 		frame: false,
 		transparent: true,

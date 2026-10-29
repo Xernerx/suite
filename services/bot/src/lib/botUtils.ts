@@ -1,8 +1,10 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { createLogger, database } from '@xernerx/lib/core';
 import { ActivityType, PresenceData } from 'discord.js';
 import { getApiBaseUrl } from './api.js';
+
+const botLog = createLogger('BOT');
 
 export { getApiBaseUrl };
 export const DEFAULT_XERNERX_COLOR = 0x8b7cf6;
@@ -90,7 +92,7 @@ export async function recordSelfBotUptime(client: any, status: 'online' | 'idle'
 			).catch(() => null);
 		}
 	} catch (err) {
-		console.error('[BotUtils] Failed to record self bot uptime:', err);
+		botLog.error(`Failed to record self bot uptime: ${(err as any)?.message || err}`);
 	}
 }
 
@@ -193,7 +195,7 @@ export async function syncBotCommands(client: any, xernerxToken?: string) {
 			}));
 			if (insertPayload.length > 0) {
 				await CommandModel.insertMany(insertPayload);
-				console.log(`[Commands] Synced ${insertPayload.length} commands for ${client.user?.username || botId} directly to database.`);
+				botLog.log(`Synced ${insertPayload.length} commands for ${client.user?.username || botId} directly to database.`);
 			}
 			const BotModel = (db.models.bots as any)?.Bot;
 			if (BotModel) {
@@ -201,6 +203,6 @@ export async function syncBotCommands(client: any, xernerxToken?: string) {
 			}
 		}
 	} catch (dbErr: any) {
-		console.error('[Commands] Direct database sync fallback failed:', dbErr?.message || dbErr);
+		botLog.error(`Direct database sync fallback failed: ${dbErr?.message || dbErr}`);
 	}
 }

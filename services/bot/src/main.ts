@@ -4,7 +4,10 @@ import fs from 'fs';
 import path from 'path';
 import { XernerxCommands } from '@xernerx/commands';
 import { XernerxClient } from '@xernerx/framework';
+import { createLogger } from '@xernerx/lib/core';
 import { XernerxStats } from '@xernerx/stats';
+
+const botLog = createLogger('BOT');
 
 for (const envPath of [path.resolve(process.cwd(), '.env'), path.resolve(process.cwd(), '../../.env')]) {
 	try {
@@ -75,21 +78,25 @@ export class XernerxBotClient extends XernerxClient {
 
 		const isDev = process.env.ENVIRONMENT?.toUpperCase() === 'DEVELOPMENT';
 
-		await this.modules.extensionHandler.loadExtensions(
+		const extensions: any[] = [
 			new XernerxCommands(this as any, {
 				token: process.env.XERNERX_TOKEN,
 				dev: isDev,
-			}) as any
-		);
-
-		await this.connect();
+			}),
+		];
 
 		if (process.env.XERNERX_TOKEN) {
-			new XernerxStats(this as any, {
-				token: process.env.XERNERX_TOKEN,
-				dev: isDev,
-			});
+			extensions.push(
+				new XernerxStats(this as any, {
+					token: process.env.XERNERX_TOKEN,
+					dev: isDev,
+				})
+			);
 		}
+
+		await this.modules.extensionHandler.loadExtensions(...extensions);
+
+		await this.connect();
 	}
 }
 
@@ -98,5 +105,5 @@ export const client = process.env.DISCORD_BOT_TOKEN ? new XernerxBotClient() : n
 if (client) {
 	client.init();
 } else {
-	console.warn('[XernerxBot] DISCORD_BOT_TOKEN is not set; skipping startup.');
+	botLog.warn('DISCORD_BOT_TOKEN is not set; skipping startup.');
 }

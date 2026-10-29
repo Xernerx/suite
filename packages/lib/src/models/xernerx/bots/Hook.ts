@@ -6,6 +6,7 @@ const schema = new Schema(
 	{
 		botId: { type: String, required: true },
 		url: { type: String, required: true },
+		secret: { type: String, default: '' },
 		events: { type: [String], default: [] },
 		deliveries: {
 			type: [

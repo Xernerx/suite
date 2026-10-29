@@ -6,7 +6,7 @@ import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { UserProfilePopover } from '@xernerx/components';
 import { Button, Input } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { ScrollText, RefreshCw, Shield, Bug, Inbox, Ticket, Server, User, Clock, Download, Copy, Check, ExternalLink } from 'lucide-react';
+import { ScrollText, RefreshCw, Shield, Bug, Inbox, Ticket, Server, User, Bot, Clock, Download, Copy, Check, ExternalLink } from 'lucide-react';
 
 interface AuditLogEntry {
 	id: string;
@@ -23,7 +23,7 @@ interface AuditLogEntry {
 	createdAt: string;
 }
 
-const CATEGORIES = ['all', 'issue', 'suggestion', 'application', 'setting', 'role', 'user', 'system'] as const;
+const CATEGORIES = ['all', 'issue', 'suggestion', 'application', 'setting', 'role', 'user', 'bot', 'server', 'system'] as const;
 
 export default function AuditLogs({ initialSearch = '', initialCategory = 'all' }: { initialSearch?: string; initialCategory?: string }) {
 	const { t } = useDictionary();
@@ -144,6 +144,10 @@ export default function AuditLogs({ initialSearch = '', initialCategory = 'all' 
 				return <Shield size={16} className="text-(--accent)" />;
 			case 'user':
 				return <User size={16} className="text-(--accent)" />;
+			case 'bot':
+				return <Bot size={16} className="text-(--accent)" />;
+			case 'server':
+				return <Server size={16} className="text-(--accent)" />;
 			default:
 				return <ScrollText size={16} className="text-(--accent)" />;
 		}

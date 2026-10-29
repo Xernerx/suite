@@ -3,6 +3,9 @@
 import fs from 'fs';
 import path from 'path';
 import { Command } from 'commander';
+import { terminal } from '../utils/terminal';
+
+const i18nLog = terminal.child({ scope: 'I18N' });
 
 export function generateLocalesCommand() {
 	const dictionariesDir = path.join(process.cwd(), 'packages/lib/src/dictionaries');
@@ -44,7 +47,7 @@ export const defaultLocale: Locale = supportedLocales[0] || 'en-GB';
 `;
 
 	fs.writeFileSync(outputFile, codeOutput);
-	console.log(`[i18n] Generated i18n.config.ts with ${locales.length} locales.`);
+	i18nLog.log(`Generated i18n.config.ts with ${locales.length} locales.`);
 }
 
 export default function registerGenerateLocales(program: Command) {

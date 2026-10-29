@@ -350,6 +350,6 @@ export const searchTopics = [
 		icon: Package,
 		color: 'text-(--accent)',
 		bg: 'bg-(--accent)/10',
-		keywords: 'npm packages xernerx @xernerx/framework @xernerx/commands @xernerx/stats @xernerx/websocket @xernerx/terminal classes interfaces functions changelog',
+		keywords: 'npm packages xernerx @xernerx/framework @xernerx/commands @xernerx/hooks @xernerx/stats @xernerx/websocket @xernerx/terminal classes interfaces functions changelog',
 	},
 ];

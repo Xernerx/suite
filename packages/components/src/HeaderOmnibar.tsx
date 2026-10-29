@@ -77,7 +77,7 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 	const { toast } = useToast();
 	const urlFormRef = useRef<HTMLFormElement>(null);
 	const [urlCopied, setUrlCopied] = useState(false);
-	const subdomainOptions = ['app', 'portal', 'www', 'api', 'cdn', 'docs', ...(hasAdminAccess ? ['admin'] : []), ...(hasHostingAccess ? ['hosting'] : []), 'account', 'store', 'info'];
+	const subdomainOptions = ['app', 'portal', 'www', 'api', 'cdn', 'haste', 'docs', ...(hasAdminAccess ? ['admin'] : []), ...(hasHostingAccess ? ['hosting'] : []), 'account', 'store', 'info'];
 	if (!subdomainOptions.includes(urlState.pre)) subdomainOptions.push(urlState.pre);
 
 	return (
