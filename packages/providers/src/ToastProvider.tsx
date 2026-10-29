@@ -148,10 +148,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 					onMouseLeave={() => setIsStackHovered(false)}
 					className={`fixed left-4 right-4 z-[9999] flex flex-col sm:w-[380px] transition-all duration-300 ${
 						isRightAligned ? 'sm:right-auto' : 'sm:left-auto'
-					} ${isStackHovered ? 'max-h-[80vh] overflow-y-auto overflow-x-hidden pr-1 pt-2' : 'overflow-visible pt-7'}`}
+					} ${isStackHovered ? 'max-h-[80dvh] overflow-y-auto overflow-x-hidden pr-1 pt-2' : 'overflow-visible pt-7'}`}
 					style={{
-						bottom: 'var(--ui-gap)',
-						...(isRightAligned ? { left: 'var(--ui-gap)' } : { right: 'var(--ui-gap)' }),
+						bottom: 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))',
+						...(isRightAligned ? { left: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))' } : { right: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))' }),
 						gap: isStackHovered ? 'calc(var(--ui-gap) * 0.65)' : '0px',
 					}}
 				>
@@ -233,7 +233,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 								</button>
 							</div>
 
-							<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background)/70 p-4 max-h-[50vh] overflow-auto gap-3">
+							<div className="flex flex-col rounded-2xl border border-(--border)/10 bg-(--background)/70 p-4 max-h-[50dvh] overflow-auto gap-3">
 								<pre className="text-xs font-mono text-(--text) whitespace-pre-wrap break-words leading-relaxed m-0">
 									{formatErrorPayload(inspectedError.title, inspectedError.description, typeof window !== 'undefined' ? window.location.href : undefined, inspectedError.createdAt)}
 								</pre>
@@ -274,7 +274,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 							stiffness: 300,
 							damping: 30,
 						}}
-						className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9998] w-[90%] max-w-3xl flex items-center justify-between overflow-hidden rounded-3xl border border-(--border)/20 bg-(--foreground)/50 backdrop-blur-xl shadow-2xl p-4 px-6 text-(--text)"
+						className="fixed left-1/2 -translate-x-1/2 z-[9998] w-[90%] max-w-3xl flex items-center justify-between overflow-hidden rounded-3xl border border-(--border)/20 bg-(--foreground)/50 backdrop-blur-xl shadow-2xl p-4 px-6 text-(--text)"
+						style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
 					>
 						<div className="flex flex-col ml-2">
 							<span className="font-bold text-sm tracking-wide">{t('common.toastprovider.description')}</span>

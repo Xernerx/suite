@@ -2,6 +2,26 @@
 
 # @xernerx/lib
 
+## 1.16.4
+
+### Patch Changes
+
+- ### Mobile `100dvh` Viewport Lock, CSS `env(safe-area-inset-*)` Support (SO to `@zanderp25`) & `www` SEO / `--page-width` Overhaul
+
+    Huge shoutout (`SO`) to **@zanderp25** for discovering and reproducing the mobile iOS Safari viewport/header scroll overlap issue and providing the `vh` → `dvh` and `env(safe-area-inset-*)` solution!
+
+    - **Dynamic Viewport Height (`vh` → `dvh`) & Document Scroll Lock (`@xernerx/styles`, `@xernerx/components`, `apps/*`):**
+    - Locked `html, body` to `height: 100dvh; overflow: hidden; overscroll-behavior: none;` in `packages/styles/globals.css` and mapped `h-screen`, `min-h-screen`, and `max-h-screen` utilities to `100dvh` so mobile address bars never cause the outer document viewport to scroll `<Header />` into the status bar or Dynamic Island.
+    - Updated `Page.tsx` to use a `fixed inset-0 flex h-dvh` shell (`height: calc(100dvh / var(--ui-zoom, 1))`) with `min-h-0 overscroll-y-contain` on `#main-scroll-container` so touch scrolling stays strictly inside `<main>`.
+    - Converted viewport-relative heights (`[...vh]`) across packages and apps to `dvh` and bound page scroll listeners directly to `#main-scroll-container`.
+    - **Safe-Area Insets (`env(safe-area-inset-*)`) & `viewportFit: 'cover'`:**
+    - Exported `viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover' }` across all 12 Next.js application root layouts.
+    - Added `--safe-top`, `--safe-right`, `--safe-bottom`, and `--safe-left` tokens and applied `env(safe-area-inset-*, 0px)` offsets across `Header`, `HeaderOmnibar`, `Sidebar`, `Page`, `Footer`, `CookiePrompt`, `Modal`, `ToastProvider`, `SupportProvider`, and `CommandPaletteModal`.
+    - **`www.xernerx.com` Seobility SEO & AdSense Crawler Visibility Overhaul (`www`, `@xernerx/lib`, `@xernerx/providers`):**
+    - Optimized root and route metadata titles (`<580px`), meta descriptions (`<1000px`), H1 keyword parity, external link counts, and server-rendered semantic HTML fallbacks.
+    - Bypassed client-side loading gates (`opacity-0`) for search engine and AdSense crawlers in `LoadingProvider.tsx` and `Page.tsx`.
+    - Replaced remaining hardcoded `max-w-*` widths with `max-w-(--page-width)`.
+
 ## 1.16.3
 
 ### Patch Changes

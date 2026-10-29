@@ -92,7 +92,7 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className="relative w-full max-w-2xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+						className="relative w-full max-w-2xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85dvh] flex flex-col"
 						style={{
 							padding: 'var(--ui-gap)',
 							gap: 'var(--ui-gap)',
@@ -220,7 +220,7 @@ export function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onC
 							animate={{ opacity: 1, scale: 1, y: 0 }}
 							exit={{ opacity: 0, scale: 0.95, y: 20 }}
 							transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-							className="relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+							className="relative w-full max-w-lg rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85dvh] flex flex-col"
 							style={{
 								padding: 'var(--ui-gap)',
 								gap: 'var(--ui-gap)',

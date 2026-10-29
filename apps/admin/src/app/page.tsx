@@ -318,7 +318,7 @@ export default function Home() {
 	if (dbError) {
 		return (
 			<div
-				className="flex flex-col items-center justify-center min-h-[60vh] max-w-(--page-width) mx-auto w-full"
+				className="flex flex-col items-center justify-center min-h-[60dvh] max-w-(--page-width) mx-auto w-full"
 				style={{
 					padding: 'var(--ui-gap)',
 					gap: 'var(--ui-gap)',

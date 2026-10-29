@@ -31,7 +31,7 @@ export function Loading({ message, variant = 'default' }: { message?: string; va
 
 	// Default full loading state is housed centrally inside AppLayout (Page.tsx)
 	return (
-		<div className="flex h-full min-h-[60vh] w-full flex-col items-center justify-center" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex h-full min-h-[60dvh] w-full flex-col items-center justify-center" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			{message && <div className="font-medium text-(--accent) text-sm mt-44">{message}</div>}
 		</div>
 	);

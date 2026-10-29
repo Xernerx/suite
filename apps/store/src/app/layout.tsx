@@ -6,11 +6,17 @@ import './globals.css';
 import { Locale, dictionary, getThemeLayoutProps } from '@xernerx/lib/server';
 
 import { AppLayout } from '@xernerx/components';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { SessionProvider, PermissionProvider } from '@xernerx/providers';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { cookies, headers } from 'next/headers';
+
+export const viewport: Viewport = {
+	width: 'device-width',
+	initialScale: 1,
+	viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
 	title: {

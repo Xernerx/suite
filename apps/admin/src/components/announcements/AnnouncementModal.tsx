@@ -103,7 +103,7 @@ export function AnnouncementModal({
 			description={t('admin.dashboard.announcements.modalDesc')}
 			maxWidth="max-w-4xl"
 		>
-			<form onSubmit={onSubmit} className="flex flex-col gap-6 max-h-[75vh] overflow-y-auto pr-2">
+			<form onSubmit={onSubmit} className="flex flex-col gap-6 max-h-[75dvh] overflow-y-auto pr-2">
 				<div className="flex flex-wrap gap-2">
 					<Button type="button" variant="ghost" onClick={() => fillBoilerplate('welcome')}>
 						{t('admin.dashboard.announcements.loadWelcome')}

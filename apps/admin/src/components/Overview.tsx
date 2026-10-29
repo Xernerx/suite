@@ -372,7 +372,7 @@ export default function Overview() {
 
 			{/* Changelog Preview Modal */}
 			<Modal open={changelogModal.open} onOpenChange={(open) => setChangelogModal((prev) => ({ ...prev, open }))} title={changelogModal.title}>
-				<div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
+				<div className="flex flex-col gap-3 max-h-[60dvh] overflow-y-auto pr-1">
 					{changelogModal.loading ? (
 						<div className="flex justify-center py-6">
 							<Loading variant="small" />

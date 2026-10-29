@@ -71,8 +71,8 @@ export function CookiePrompt() {
 		<div
 			className="fixed z-[100] w-[calc(100%-2rem)] max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl"
 			style={{
-				bottom: 'var(--ui-gap)',
-				left: 'var(--ui-gap)',
+				bottom: 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))',
+				left: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
 				padding: 'var(--ui-gap)',
 				fontSize: 'var(--text-scale, 14px)',
 			}}

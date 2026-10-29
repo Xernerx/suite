@@ -99,7 +99,7 @@ export function GlobalError({
 										{copied ? t('feedback.error.copied') : t('feedback.error.copyError')}
 									</button>
 								</div>
-								<div className="p-4 max-h-[36vh] overflow-auto flex flex-col gap-2">
+								<div className="p-4 max-h-[36dvh] overflow-auto flex flex-col gap-2">
 									<p className="text-xs font-mono text-(--text) whitespace-pre-wrap break-words">{error.message || t('feedback.error.unknown')}</p>
 									{error.digest && (
 										<p className="text-xs font-mono text-(--text-muted)">

@@ -161,11 +161,17 @@ export default function Home() {
 	// Handle scroll for sticky bar effect
 	const [isScrolled, setIsScrolled] = useState(false);
 	useEffect(() => {
+		const scrollEl = document.getElementById('main-scroll-container');
 		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 150);
+			const top = scrollEl ? scrollEl.scrollTop : window.scrollY;
+			setIsScrolled(top > 150);
 		};
-		window.addEventListener('scroll', handleScroll);
-		return () => window.removeEventListener('scroll', handleScroll);
+		scrollEl?.addEventListener('scroll', handleScroll, { passive: true });
+		window.addEventListener('scroll', handleScroll, { passive: true });
+		return () => {
+			scrollEl?.removeEventListener('scroll', handleScroll);
+			window.removeEventListener('scroll', handleScroll);
+		};
 	}, []);
 
 	// Helper to render a bot category grid

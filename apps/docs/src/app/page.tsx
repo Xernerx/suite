@@ -73,7 +73,7 @@ export default function DocsHome() {
 
 	return (
 		<div
-			className="flex flex-col min-h-[85vh] w-full relative overflow-hidden"
+			className="flex flex-col min-h-[85dvh] w-full relative overflow-hidden"
 			style={{
 				padding: 'calc(var(--ui-gap) * 2)',
 				gap: 'calc(var(--ui-gap) * 3)',

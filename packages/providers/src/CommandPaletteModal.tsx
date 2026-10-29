@@ -351,7 +351,7 @@ export function CommandPaletteModal({
 	return (
 		<AnimatePresence>
 			{isOpen && (
-				<div className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] p-4">
+				<div className="fixed inset-0 z-50 flex items-start justify-center pt-[calc(12dvh+env(safe-area-inset-top,0px))] p-4">
 					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
 					<motion.div
@@ -359,7 +359,7 @@ export function CommandPaletteModal({
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.96, y: -10 }}
 						transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-						className="relative w-full max-w-xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[75vh] flex flex-col overflow-hidden"
+						className="relative w-full max-w-xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[75dvh] flex flex-col overflow-hidden"
 					>
 						<div className="flex items-center gap-3 px-5 py-4 border-b border-(--border)/10 bg-(--background)/40 shrink-0">
 							{searchingLive ? <Loader2 size={18} className="text-(--accent) animate-spin shrink-0" /> : <Search size={18} className="text-(--accent) shrink-0" />}

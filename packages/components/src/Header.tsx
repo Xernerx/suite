@@ -255,9 +255,15 @@ export function Header() {
 				: 'flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors';
 
 	return (
-		<div className="relative flex flex-col w-full z-[9999] shrink-0">
+		<div className="relative flex flex-col w-full z-[9999] shrink-0 bg-(--background)" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
 			{activeAnnouncement && bannerMinsLeft > 0 && (
-				<div className="flex items-center justify-between gap-3 px-4 py-1.5 bg-(--accent)/15 border-b border-(--accent)/30 backdrop-blur-md text-xs text-(--text)">
+				<div
+					className="flex items-center justify-between gap-3 py-1.5 bg-(--accent)/15 border-b border-(--accent)/30 backdrop-blur-md text-xs text-(--text)"
+					style={{
+						paddingLeft: 'calc(1rem + env(safe-area-inset-left, 0px))',
+						paddingRight: 'calc(1rem + env(safe-area-inset-right, 0px))',
+					}}
+				>
 					<div className="flex items-center gap-2 min-w-0">
 						<Megaphone size={13} className="text-(--accent) shrink-0" />
 						<span className="font-bold truncate">{activeAnnouncement.title}</span>
@@ -277,8 +283,12 @@ export function Header() {
 				</div>
 			)}
 			<header
-				className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} h-[50px] shrink-0 items-center justify-between w-full bg-(--background)`}
-				style={{ paddingLeft: 'var(--ui-gap)', paddingRight: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
+				className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} h-[50px] shrink-0 items-center justify-between w-full bg-(--background) touch-none`}
+				style={{
+					paddingLeft: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
+					paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
+					fontSize: 'var(--text-scale, 14px)',
+				}}
 			>
 				{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent-orange) shadow-[0_0_12px_rgba(249,115,22,0.8)]" />}
 				{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent) shadow-[0_0_12px_rgba(59,130,246,0.8)]" />}
