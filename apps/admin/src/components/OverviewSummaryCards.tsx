@@ -30,7 +30,37 @@ export interface LighthouseScoreData {
 	updatedAt: number;
 }
 
+export interface McpSeoIssue {
+	severity: 'high' | 'medium' | 'low';
+	category: string;
+	title: string;
+	detail: string;
+	action: string;
+	url: string;
+}
+
+export interface McpSeoScoreData {
+	score: number;
+	geoScore: number;
+	checksPassed: number;
+	checksTotal: number;
+	aeoReady: boolean;
+	wordCount: number;
+	loadTimeMs: number;
+	titleLen: number;
+	descriptionLen: number;
+	internalLinks: number;
+	externalLinks: number;
+	scoreBreakdown: Record<string, boolean>;
+	recommendations: string[];
+	issues: McpSeoIssue[];
+	prevScore?: number;
+	prevGeoScore?: number;
+	updatedAt: number;
+}
+
 export const LIGHTHOUSE_STORAGE_KEY = 'xernerx_lighthouse_scores_v1';
+export const MCP_SEO_STORAGE_KEY = 'xernerx_mcp_seo_scores_v1';
 
 const SUITE_APP_DEFS = [
 	['www', 'Website', 'www.xernerx.com'],

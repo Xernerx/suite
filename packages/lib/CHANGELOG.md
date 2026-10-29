@@ -2,6 +2,12 @@
 
 # @xernerx/lib
 
+## 1.16.6
+
+### Patch Changes
+
+- Integrated My Creative Tools SEO & GEO Analyzer into the Admin SEO & Subdomain Telemetry dashboard (`GET /secure/core/seo-analyzer`), adding 10-point SEO/GEO readiness scores, 21-point technical & content checklist audits, AEO/FAQ status detection, and prioritized action items across all suite subdomains.
+
 ## 1.16.5
 
 ### Patch Changes

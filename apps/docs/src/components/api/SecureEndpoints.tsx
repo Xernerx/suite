@@ -308,6 +308,7 @@ export function SecureEndpoints({ activeGroup = 'all', searchQuery = '', methodF
 				{ method: 'POST', path: '/secure/core/settings/sister_servers/sync', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/core/versions', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/core/lighthouse', auth: 'secure' as const },
+				{ method: 'GET', path: '/secure/core/seo-analyzer', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/core/audit', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/core/audit', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/hosting/ssh', auth: 'secure' as const },

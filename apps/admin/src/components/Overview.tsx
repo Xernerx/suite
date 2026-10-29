@@ -6,8 +6,9 @@ import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Activity, Gauge, Megaphone, RefreshCw } from 'lucide-react';
-import OverviewSummaryCards, { FALLBACK_APPS, LIGHTHOUSE_STORAGE_KEY, type LighthouseScoreData, type SuiteAppVersionInfo } from './OverviewSummaryCards';
+import OverviewSummaryCards, { FALLBACK_APPS, LIGHTHOUSE_STORAGE_KEY, MCP_SEO_STORAGE_KEY, type LighthouseScoreData, type McpSeoScoreData, type SuiteAppVersionInfo } from './OverviewSummaryCards';
 import OverviewSubdomainCard, { type EnvFilterMode } from './OverviewSubdomainCard';
+import SeoAnalyzerReportModal from './SeoAnalyzerReportModal';
 
 type StatusFilterMode = 'all' | 'synced' | 'ahead';
 
@@ -31,7 +32,17 @@ export default function Overview() {
 
 	const [lighthouseScores, setLighthouseScores] = useState<Record<string, LighthouseScoreData>>({});
 	const [lighthouseLoading, setLighthouseLoading] = useState<Record<string, boolean>>({});
+	const [mcpSeoScores, setMcpSeoScores] = useState<Record<string, McpSeoScoreData>>({});
+	const [mcpSeoLoading, setMcpSeoLoading] = useState<Record<string, boolean>>({});
 	const [batchAuditState, setBatchAuditState] = useState<{ active: boolean; current: number; total: number } | null>(null);
+
+	const [mcpModal, setMcpModal] = useState<{
+		open: boolean;
+		key: string;
+		appName: string;
+		envLabel: string;
+		targetUrl: string;
+	}>({ open: false, key: '', appName: '', envLabel: '', targetUrl: '' });
 
 	const [changelogModal, setChangelogModal] = useState<{
 		open: boolean;
@@ -53,7 +64,40 @@ export default function Overview() {
 			const cached = localStorage.getItem(LIGHTHOUSE_STORAGE_KEY);
 			if (cached) setLighthouseScores(JSON.parse(cached));
 		} catch {}
+		try {
+			const cachedMcp = localStorage.getItem(MCP_SEO_STORAGE_KEY);
+			if (cachedMcp) setMcpSeoScores(JSON.parse(cachedMcp));
+		} catch {}
 	}, []);
+
+	const runMcpSeoAudit = useCallback(
+		async (key: string, targetUrl: string, silent = false) => {
+			setMcpSeoLoading((prev) => ({ ...prev, [key]: true }));
+			try {
+				const endpoint = getEnvUrl(`https://api.xernerx.com/secure/core/seo-analyzer?key=${encodeURIComponent(key)}&url=${encodeURIComponent(targetUrl)}`);
+				const res = await fetch(endpoint, { credentials: 'include', cache: 'no-store' });
+				const payload = await res.json().catch(() => null);
+				if (!res.ok || !payload?.data) {
+					throw new Error(payload?.error || t('admin.dashboard.overview.auditUnavailable'));
+				}
+				const entry: McpSeoScoreData = payload.data;
+				setMcpSeoScores((prev) => {
+					const next = payload.map && typeof payload.map === 'object' ? payload.map : { ...prev, [key]: entry };
+					try {
+						localStorage.setItem(MCP_SEO_STORAGE_KEY, JSON.stringify(next));
+					} catch {}
+					return next;
+				});
+			} catch (err: any) {
+				if (!silent) {
+					toast({ type: 'error', title: t('common.toast.error'), description: err.message });
+				}
+			} finally {
+				setMcpSeoLoading((prev) => ({ ...prev, [key]: false }));
+			}
+		},
+		[getEnvUrl, toast, t]
+	);
 
 	const runLighthouseAudit = useCallback(
 		async (key: string, targetUrl: string, silent = false) => {
@@ -93,7 +137,8 @@ export default function Overview() {
 				const app = htmlApps[i];
 				setBatchAuditState({ active: true, current: i + 1, total: htmlApps.length });
 				const host = targetEnv === 'prod' ? (app.id === 'www' ? 'www.xernerx.com' : `${app.id}.xernerx.com`) : `${app.id}.canary.xernerx.com`;
-				await runLighthouseAudit(`${app.id}-${targetEnv}`, `https://${host}/`, true);
+				const targetUrl = `https://${host}/`;
+				await Promise.all([runLighthouseAudit(`${app.id}-${targetEnv}`, targetUrl, true), runMcpSeoAudit(`${app.id}-${targetEnv}`, targetUrl, true)]);
 			}
 		} finally {
 			setBatchAuditState(null);
@@ -183,7 +228,7 @@ export default function Overview() {
 	const fetchOverviewData = async (forceRefresh = false) => {
 		if (forceRefresh) setRefreshing(true);
 		try {
-			const [versionsRes, issuesRes, metricsRes, lhRes] = await Promise.all([
+			const [versionsRes, issuesRes, metricsRes, lhRes, mcpRes] = await Promise.all([
 				fetch(getEnvUrl(`https://api.xernerx.com/secure/core/versions${forceRefresh ? '?refresh=true' : ''}`), { credentials: 'include', cache: 'no-store' })
 					.then((r) => (r.ok ? r.json() : null))
 					.catch(() => null),
@@ -194,6 +239,9 @@ export default function Overview() {
 					.then((r) => (r.ok ? r.json() : null))
 					.catch(() => null),
 				fetch(getEnvUrl('https://api.xernerx.com/secure/core/lighthouse'), { credentials: 'include', cache: 'no-store' })
+					.then((r) => (r.ok ? r.json() : null))
+					.catch(() => null),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/core/seo-analyzer'), { credentials: 'include', cache: 'no-store' })
 					.then((r) => (r.ok ? r.json() : null))
 					.catch(() => null),
 			]);
@@ -208,6 +256,15 @@ export default function Overview() {
 					const merged = { ...prev, ...lhRes.data };
 					try {
 						localStorage.setItem(LIGHTHOUSE_STORAGE_KEY, JSON.stringify(merged));
+					} catch {}
+					return merged;
+				});
+			}
+			if (mcpRes?.data && typeof mcpRes.data === 'object' && Object.keys(mcpRes.data).length > 0) {
+				setMcpSeoScores((prev) => {
+					const merged = { ...prev, ...mcpRes.data };
+					try {
+						localStorage.setItem(MCP_SEO_STORAGE_KEY, JSON.stringify(merged));
 					} catch {}
 					return merged;
 				});
@@ -362,13 +419,33 @@ export default function Overview() {
 							pingingKeys={pingingKeys}
 							lighthouseScores={lighthouseScores}
 							lighthouseLoading={lighthouseLoading}
+							mcpSeoScores={mcpSeoScores}
+							mcpSeoLoading={mcpSeoLoading}
 							onPing={measureSitePing}
 							onRunLighthouse={runLighthouseAudit}
+							onRunMcpSeo={runMcpSeoAudit}
+							onOpenMcpModal={(key, appName, envLabel, targetUrl) => setMcpModal({ open: true, key, appName, envLabel, targetUrl })}
 							onOpenChangelog={handleOpenChangelog}
 						/>
 					))}
 				</div>
 			</div>
+
+			{/* My Creative Tools SEO / AEO / GEO Analyzer Report Modal */}
+			<SeoAnalyzerReportModal
+				open={mcpModal.open}
+				onOpenChange={(open) => setMcpModal((prev) => ({ ...prev, open }))}
+				appName={mcpModal.appName}
+				envLabel={mcpModal.envLabel}
+				targetUrl={mcpModal.targetUrl}
+				data={mcpSeoScores[mcpModal.key] || null}
+				loading={Boolean(mcpSeoLoading[mcpModal.key])}
+				onRescan={() => {
+					if (mcpModal.key && mcpModal.targetUrl) {
+						runMcpSeoAudit(mcpModal.key, mcpModal.targetUrl);
+					}
+				}}
+			/>
 
 			{/* Changelog Preview Modal */}
 			<Modal open={changelogModal.open} onOpenChange={(open) => setChangelogModal((prev) => ({ ...prev, open }))} title={changelogModal.title}>
