@@ -124,12 +124,13 @@ export async function checkDesktopRelease(log?: (msg: string) => void): Promise<
 				version?: string | null;
 				tagName?: string | null;
 				publishedAt?: string | null;
-				windows?: { name: string; url: string; size: number } | null;
-				macos?: { name: string; url: string; size: number } | null;
-				linux?: { name: string; url: string; size: number } | null;
+				windows?: { name: string; url?: string; browser_download_url?: string; size?: number } | null;
+				macos?: { name: string; url?: string; browser_download_url?: string; size?: number } | null;
+				linux?: { name: string; url?: string; browser_download_url?: string; size?: number } | null;
 			};
 
 			const asset = process.platform === 'win32' ? data.windows : process.platform === 'darwin' ? data.macos : data.linux;
+			const resolvedDownloadUrl = asset?.url || asset?.browser_download_url || null;
 
 			// Fallback version extraction from asset filename if API route didn't return `version`
 			let latestVersion = cleanVersionString(data.version);
@@ -149,9 +150,9 @@ export async function checkDesktopRelease(log?: (msg: string) => void): Promise<
 				tagName: data.tagName || null,
 				publishedAt: data.publishedAt || null,
 				channel,
-				downloadUrl: asset?.url || null,
+				downloadUrl: resolvedDownloadUrl,
 				fileName: asset?.name || null,
-				size: asset?.size ?? null,
+				size: typeof asset?.size === 'number' ? asset.size : null,
 			};
 
 			cachedUpdateInfo = result;

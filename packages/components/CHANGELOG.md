@@ -2,6 +2,16 @@
 
 # @xernerx/components
 
+## 0.12.1
+
+### Patch Changes
+
+- ### Desktop Auto-Updater & Release Asset Payload (`api`, `@xernerx/components`, `desktop`)
+    - **Release Asset Payload Compatibility (`apps/api/src/app/secure/downloads/app/route.ts`)**:
+        - Added `url` (alongside `browser_download_url`) and `size` to `windows`, `macos`, and `linux` platform asset payloads returned by `GET /secure/downloads/app` so existing installed desktop clients (`updater.ts`) receive a valid download URL and byte size.
+    - **Desktop Updater Fallback Resolution (`clients/desktop/src/updater.ts`, `packages/components/src/VersionTracker.tsx`)**:
+        - Updated `checkDesktopRelease()` and `VersionTracker` to resolve `asset.url || asset.browser_download_url` and surface the specific updater error message from `onUpdateProgress` when falling back to manual download.
+
 ## 0.12.0
 
 ### Minor Changes

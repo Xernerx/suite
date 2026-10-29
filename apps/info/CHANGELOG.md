@@ -2,6 +2,13 @@
 
 # info
 
+## 1.10.3
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.1
+
 ## 1.10.2
 
 ### Patch Changes

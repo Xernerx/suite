@@ -74,6 +74,7 @@ export function VersionTracker() {
 	const [installing, setInstalling] = useState(false);
 	const [installStatus, setInstallStatus] = useState<'idle' | 'downloading' | 'installing' | 'error'>('idle');
 	const [progress, setProgress] = useState(0);
+	const lastUpdateErrorRef = useRef<string | null>(null);
 
 	// 1. Web App Changelog Version Tracker
 	useEffect(() => {
@@ -167,13 +168,25 @@ export function VersionTracker() {
 				if (typeof electron?.checkForUpdate === 'function') {
 					const ipcRes = await electron.checkForUpdate();
 					if (ipcRes && ipcRes.latestVersion) {
+						let fallbackAssetUrl: string | null = ipcRes.downloadUrl || null;
+						if (!fallbackAssetUrl) {
+							try {
+								const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/downloads/app?channel=${channel}`));
+								if (res.ok) {
+									const data = await res.json();
+									const ua = navigator.userAgent.toLowerCase();
+									const asset = ua.includes('mac') ? data.macos : ua.includes('linux') ? data.linux : data.windows;
+									fallbackAssetUrl = asset?.url || asset?.browser_download_url || null;
+								}
+							} catch {}
+						}
 						resolved = {
 							checking: false,
 							outdated: Boolean(ipcRes.outdated),
 							currentVersion: cleanVer(ipcRes.currentVersion || currentVersion),
 							latestVersion: cleanVer(ipcRes.latestVersion),
 							channel: ipcRes.channel || channel,
-							downloadUrl: ipcRes.downloadUrl || null,
+							downloadUrl: fallbackAssetUrl,
 						};
 					}
 				}
@@ -197,7 +210,7 @@ export function VersionTracker() {
 								currentVersion,
 								latestVersion,
 								channel,
-								downloadUrl: asset?.url || null,
+								downloadUrl: asset?.url || asset?.browser_download_url || null,
 							};
 						}
 					}
@@ -247,6 +260,7 @@ export function VersionTracker() {
 
 		const unsubscribeProgress = electron.onUpdateProgress?.((payload: any) => {
 			if (payload.status === 'downloading' || payload.status === 'checking') {
+				lastUpdateErrorRef.current = null;
 				setInstalling(true);
 				setInstallStatus('downloading');
 				setProgress(payload.progress || 1);
@@ -255,6 +269,9 @@ export function VersionTracker() {
 				setInstallStatus('installing');
 				setProgress(100);
 			} else if (payload.status === 'error') {
+				if (payload.error) {
+					lastUpdateErrorRef.current = String(payload.error);
+				}
 				setInstalling(false);
 				setInstallStatus('error');
 			}
@@ -287,6 +304,7 @@ export function VersionTracker() {
 		const electron = getElectron();
 
 		if (typeof electron?.installUpdate === 'function') {
+			lastUpdateErrorRef.current = null;
 			setInstalling(true);
 			setInstallStatus('downloading');
 			setProgress(1);
@@ -297,7 +315,9 @@ export function VersionTracker() {
 				const fallbackUrl = desktopUpdate.downloadUrl || getEnvUrl('https://www.xernerx.com/download');
 				toast({
 					title: t('components.versionTracker.desktopOutdated.title'),
-					description: t('components.versionTracker.desktopOutdated.errorFallback', { error: 'Download interrupted' }),
+					description: t('components.versionTracker.desktopOutdated.errorFallback', {
+						error: lastUpdateErrorRef.current || 'Download interrupted',
+					}),
 					type: 'error',
 				});
 				if (electron?.openExternal) {
