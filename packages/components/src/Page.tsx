@@ -41,8 +41,17 @@ export function Page({ children }: { children: React.ReactNode }) {
 			const detail = (e as CustomEvent<{ active?: boolean }>).detail;
 			setStagePreview(Boolean(detail?.active));
 		};
+		const preventWindowScroll = () => {
+			if (window.scrollY !== 0 || window.scrollX !== 0) {
+				window.scrollTo(0, 0);
+			}
+		};
 		window.addEventListener('xernerx:stage-preview', onStagePreview);
-		return () => window.removeEventListener('xernerx:stage-preview', onStagePreview);
+		window.addEventListener('scroll', preventWindowScroll, { passive: true });
+		return () => {
+			window.removeEventListener('xernerx:stage-preview', onStagePreview);
+			window.removeEventListener('scroll', preventWindowScroll);
+		};
 	}, []);
 
 	const uploadFileToDesktopCdn = useCallback(
@@ -341,8 +350,8 @@ export function Page({ children }: { children: React.ReactNode }) {
 
 	return (
 		<div
-			className="relative flex h-screen w-full flex-col overflow-hidden bg-(--background)"
-			style={{ height: 'calc(100vh / var(--ui-zoom, 1))' }}
+			className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden overscroll-none bg-(--background)"
+			style={{ height: 'calc(100dvh / var(--ui-zoom, 1))' }}
 			onDragOver={(e) => {
 				if (typeof window === 'undefined' || !(window as any).electron) return;
 				if ((e.shiftKey || e.altKey) && e.dataTransfer?.types?.includes('Files')) {
@@ -403,7 +412,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 			<Header />
 
 			{/* Middle layout container filling the screen */}
-			<div className={`flex flex-1 overflow-hidden ${isRightAligned ? 'flex-row-reverse' : ''}`}>
+			<div className={`flex flex-1 min-h-0 overflow-hidden ${isRightAligned ? 'flex-row-reverse' : ''}`}>
 				<NextTopLoader color="var(--accent)" showSpinner={false} shadow="none" height={3} />
 
 				<Sidebar />
@@ -411,17 +420,18 @@ export function Page({ children }: { children: React.ReactNode }) {
 				{/* Scrollable Content Area with a prominent, symmetrical radial and linear accent gradient */}
 				<div
 					id="main-scroll-container"
-					className={`relative h-full flex-1 ${isLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto'} shadow-inner
+					className={`relative h-full min-h-0 flex-1 ${isLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'} shadow-inner
                         ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'} 
                     `}
 					style={{
+						WebkitOverflowScrolling: 'touch',
 						background:
 							'radial-gradient(circle at 50% 15%, color-mix(in srgb, var(--accent) 30%, var(--foreground)) 0%, var(--foreground) 75%), linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 0%, var(--foreground) 50%, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 100%)',
 					}}
 				>
 					{/* Centralized AppLayout Dot-Matrix Loading & Sticky Stage */}
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
-						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100vh / var(--ui-zoom, 1) - 3.5rem)' }}>
+						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 3.5rem - env(safe-area-inset-top, 0px))' }}>
 							<XernerxDotLogo variant={effectiveVariant} backgroundMode ripple={effectiveRipple} blank={effectiveBlank} subdued={!isLoading && !effectiveStagePreview} />
 							{isLoading && message && <div className="absolute bottom-14 font-medium text-(--accent) text-sm">{message}</div>}
 						</div>
@@ -432,7 +442,15 @@ export function Page({ children }: { children: React.ReactNode }) {
 							isLoading || effectiveStagePreview ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'
 						}`}
 					>
-						<main className="relative z-10" style={{ padding: 'var(--ui-gap)' }}>
+						<main
+							className="relative z-10"
+							style={{
+								paddingTop: 'var(--ui-gap)',
+								paddingBottom: showFooter ? 'var(--ui-gap)' : 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))',
+								paddingLeft: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
+								paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
+							}}
+						>
 							{children}
 						</main>
 
@@ -441,7 +459,10 @@ export function Page({ children }: { children: React.ReactNode }) {
 					</div>
 
 					{effectiveStagePreview && (
-						<div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-(--background)/85 backdrop-blur-xl border border-(--accent)/35 p-1.5 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_25%,transparent)]">
+						<div
+							className="fixed left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-(--background)/85 backdrop-blur-xl border border-(--accent)/35 p-1.5 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_25%,transparent)]"
+							style={{ bottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}
+						>
 							<button
 								type="button"
 								onClick={() => {

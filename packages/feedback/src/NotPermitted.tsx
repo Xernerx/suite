@@ -22,7 +22,7 @@ export function NotPermitted({ view }: { view?: string }) {
 	}, [setBackgroundMode, setDotVariant]);
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-[50vh] w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col items-center justify-center min-h-[50dvh] w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 			<div
 				className="flex flex-col items-center text-center max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 				style={{ padding: 'calc(var(--ui-gap) * 2)', gap: 'calc(var(--ui-gap) * 1.5)' }}

@@ -33,7 +33,7 @@ export default function Home() {
 
 	return (
 		<div className="flex flex-col selection:bg-(--accent) selection:text-white">
-			<section className="min-h-[90vh] flex items-center justify-center px-6 py-16 relative">
+			<section className="min-h-[90dvh] flex items-center justify-center px-6 py-16 relative">
 				<div className="w-full max-w-(--page-width) mx-auto grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-8 items-center relative z-10">
 					{/* LEFT: TEXT */}
 					<motion.div initial={{ opacity: 1, x: 0 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col text-left">

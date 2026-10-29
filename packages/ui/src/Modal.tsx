@@ -40,7 +40,15 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 
 	const modalContent = (
 		<div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/30 backdrop-blur-sm animate-in fade-in duration-200 font-sans antialiased text-(--text)">
-			<div className="flex flex-col min-h-full items-center p-4 sm:p-8">
+			<div
+				className="flex flex-col min-h-full items-center p-4 sm:p-8"
+				style={{
+					paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
+					paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))',
+					paddingLeft: 'calc(1rem + env(safe-area-inset-left, 0px))',
+					paddingRight: 'calc(1rem + env(safe-area-inset-right, 0px))',
+				}}
+			>
 				{/* Spacer to push down */}
 				<div className="flex-grow shrink-0 h-12 sm:h-16"></div>
 

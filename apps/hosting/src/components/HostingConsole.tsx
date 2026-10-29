@@ -161,7 +161,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 
 	return (
 		<div
-			className={`flex flex-col flex-1 w-full ${fullBleed ? 'max-w-none' : 'max-w-(--page-width) mx-auto'} h-[calc(100vh-50px)] overflow-hidden`}
+			className={`flex flex-col flex-1 w-full ${fullBleed ? 'max-w-none' : 'max-w-(--page-width) mx-auto'} h-[calc(100dvh-50px-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px))] overflow-hidden`}
 			style={{
 				padding: fullBleed ? '0px' : 'calc(var(--ui-gap) * 0.75)',
 				gap: fullBleed ? '0px' : 'calc(var(--ui-gap) * 0.75)',

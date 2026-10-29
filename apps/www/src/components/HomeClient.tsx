@@ -195,7 +195,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			className={`flex flex-col selection:bg-(--accent) selection:text-white ${pageReady ? '' : 'pointer-events-none select-none'}`}
 		>
 			{/* HERO SECTION — Sits cleanly beneath the constructed XERNERX dot-matrix stage */}
-			<section className="min-h-screen flex flex-col items-center justify-start px-6 pt-[52vh] sm:pt-[54vh] pb-12 relative z-30">
+			<section className="min-h-dvh flex flex-col items-center justify-start px-6 pt-[52dvh] sm:pt-[54dvh] pb-12 relative z-30">
 				<div className="w-full max-w-(--page-width) mx-auto flex flex-col items-center text-center relative z-10">
 					<motion.div
 						initial={false}
@@ -333,8 +333,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			</section>
 
 			{/* CONSUMER SERVICES (Horizontal Scroll) */}
-			<section id="services" ref={servicesRef} className="relative h-[300vh]">
-				<div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
+			<section id="services" ref={servicesRef} className="relative h-[300dvh]">
+				<div className="sticky top-0 h-dvh flex flex-col justify-center overflow-hidden">
 					<div className="w-full text-left mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('www.sections.consumer.title')}
@@ -353,8 +353,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			</section>
 
 			{/* DEVELOPER SOFTWARE (Mirrored Horizontal Scroll) */}
-			<section id="software" ref={softwareRef} className="relative h-[200vh]">
-				<div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
+			<section id="software" ref={softwareRef} className="relative h-[200dvh]">
+				<div className="sticky top-0 h-dvh flex flex-col justify-center overflow-hidden">
 					<div className="w-full text-right mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('www.sections.developer.title')}

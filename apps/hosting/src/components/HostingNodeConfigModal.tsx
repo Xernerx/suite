@@ -98,7 +98,7 @@ export default function HostingNodeConfigModal({ open, onOpenChange, nodes, savi
 				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="rounded-2xl bg-(--accent)/10 border border-(--accent)/25 p-3 text-xs text-(--text-muted)">{t('hosting.configModal.cookieHint')}</div>
 
-					<div className="flex flex-col max-h-[50vh] overflow-y-auto pr-1" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+					<div className="flex flex-col max-h-[50dvh] overflow-y-auto pr-1" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 						{draftNodes.map((node, index) => (
 							<div key={index} className="flex flex-col rounded-2xl bg-(--background)/50 border border-(--border)/10 p-3.5" style={{ gap: 'calc(var(--ui-gap) * 0.6)' }}>
 								<div className="flex items-center justify-between gap-2">

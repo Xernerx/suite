@@ -163,4 +163,13 @@
 		<changefreq>monthly</changefreq>
 		<priority>0.8</priority>
 	</url>
+
+	<!-- ================================================================== -->
+	<!-- HASTE (haste.xernerx.com)                                          -->
+	<!-- ================================================================== -->
+	<url>
+		<loc>https://haste.xernerx.com/</loc>
+		<changefreq>weekly</changefreq>
+		<priority>0.7</priority>
+	</url>
 </urlset>

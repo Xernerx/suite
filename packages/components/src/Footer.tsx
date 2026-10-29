@@ -77,7 +77,12 @@ export function Footer() {
 			initial={{ opacity: 1, y: 0 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="relative z-0 w-full overflow-hidden bg-(--background) backdrop-blur-md"
-			style={{ fontSize: 'var(--text-scale, 14px)' }}
+			style={{
+				fontSize: 'var(--text-scale, 14px)',
+				paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+				paddingLeft: 'env(safe-area-inset-left, 0px)',
+				paddingRight: 'env(safe-area-inset-right, 0px)',
+			}}
 		>
 			{/* Fading top border */}
 			<div className="pointer-events-none absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-(--accent) to-transparent opacity-50" />

@@ -102,20 +102,20 @@ export function Sidebar() {
 	return (
 		<>
 			{/* Mobile Backdrop */}
-			{isMobileOpen && <div className="fixed inset-0 top-[72px] z-40 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />}
+			{isMobileOpen && <div className="fixed inset-0 top-[calc(72px+env(safe-area-inset-top,0px))] z-40 bg-black/50 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />}
 
 			<aside
 				className={`
                     fixed top-0 bottom-0 ${isRightAligned ? 'right-0' : 'left-0'} z-50 flex flex-col bg-(--background) transition-all duration-300 ease-in-out
-                    w-full pt-[72px] pb-4
+                    w-full pt-[calc(72px+env(safe-area-inset-top,0px))] pb-4
                     md:w-80 md:top-0 md:bottom-auto md:sticky md:h-full md:pt-0 md:pb-0
                     ${isMobileOpen ? 'translate-x-0' : isRightAligned ? 'translate-x-full' : '-translate-x-full'} 
                     md:translate-x-0 
                     ${isCollapsed ? 'md:w-[80px]' : ''}
                 `}
 				style={{
-					paddingLeft: 'var(--ui-gap)',
-					paddingRight: 'var(--ui-gap)',
+					paddingLeft: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
+					paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
 					fontSize: 'var(--text-scale, 14px)',
 				}}
 			>
@@ -217,7 +217,11 @@ export function Sidebar() {
 				<Divider />
 				{/* Bottom Ecosystem & User Section */}
 
-				<div ref={menuRef} className={`relative flex flex-col ${isCollapsed ? 'items-center' : ''}`} style={{ paddingBottom: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' }}>
+				<div
+					ref={menuRef}
+					className={`relative flex flex-col ${isCollapsed ? 'items-center' : ''}`}
+					style={{ paddingBottom: 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))', gap: 'calc(var(--ui-gap) * 0.5)' }}
+				>
 					{!activeUser ? (
 						<Link
 							href={loginHref}

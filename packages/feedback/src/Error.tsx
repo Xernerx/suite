@@ -48,7 +48,7 @@ export function Error({
 
 	return (
 		<div
-			className="flex h-full min-h-[60vh] flex-col items-center justify-center text-center"
+			className="flex h-full min-h-[60dvh] flex-col items-center justify-center text-center"
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',
@@ -89,7 +89,7 @@ export function Error({
 							</button>
 						</div>
 
-						<div className="p-4 max-h-[36vh] overflow-auto flex flex-col gap-2">
+						<div className="p-4 max-h-[36dvh] overflow-auto flex flex-col gap-2">
 							<p className="text-xs font-mono text-(--text) whitespace-pre-wrap break-words">{error?.message || t('feedback.error.unknown')}</p>
 							{error?.digest && (
 								<p className="text-xs font-mono text-(--text-muted)">

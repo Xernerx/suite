@@ -279,8 +279,8 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 					ref={popoverRef}
 					className="fixed z-[9999]"
 					style={{
-						bottom: 'var(--ui-gap)',
-						...(isRightAligned ? { left: 'var(--ui-gap)' } : { right: 'var(--ui-gap)' }),
+						bottom: 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))',
+						...(isRightAligned ? { left: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))' } : { right: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))' }),
 					}}
 				>
 					<AnimatePresence>

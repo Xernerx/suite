@@ -385,7 +385,7 @@ export default function ApplicationReviews({ initialSearch = '' }: { initialSear
 							</div>
 						)}
 
-						<div className="flex flex-col gap-4 max-h-[52vh] overflow-y-auto pr-1 custom-scrollbar">
+						<div className="flex flex-col gap-4 max-h-[52dvh] overflow-y-auto pr-1 custom-scrollbar">
 							<h3 className="text-xs font-bold text-(--text-muted) uppercase tracking-widest border-b border-(--border)/10 pb-2">
 								{t('admin.dashboard.applicationReviews.formResponses')}
 							</h3>

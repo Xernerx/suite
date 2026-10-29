@@ -334,7 +334,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 							duration: 0.2,
 							ease: [0.16, 1, 0.3, 1],
 						}}
-						className="relative w-full max-w-3xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85vh] flex flex-col"
+						className="relative w-full max-w-3xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85dvh] flex flex-col"
 						style={{
 							padding: 'var(--ui-gap)',
 							gap: 'var(--ui-gap)',

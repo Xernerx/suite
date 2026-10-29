@@ -127,7 +127,7 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 			maxWidth="max-w-xl"
 			title={item ? t('admin.store.itemModal.editTitle') : t('admin.store.itemModal.createTitle')}
 		>
-			<form onSubmit={handleSubmit} className="flex flex-col gap-4 max-h-[75vh] overflow-y-auto pr-1">
+			<form onSubmit={handleSubmit} className="flex flex-col gap-4 max-h-[75dvh] overflow-y-auto pr-1">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div className="flex flex-col gap-1.5">
 						<label className="text-xs font-semibold text-(--text-muted)">{t('admin.store.itemModal.name')}</label>

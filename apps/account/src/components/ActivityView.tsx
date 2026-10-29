@@ -424,7 +424,7 @@ export default function ActivityView() {
 							</div>
 						)}
 
-						<div className="flex flex-col gap-3 max-h-[52vh] overflow-y-auto pr-1 custom-scrollbar">
+						<div className="flex flex-col gap-3 max-h-[52dvh] overflow-y-auto pr-1 custom-scrollbar">
 							<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('account.activity.submittedResponses')}</span>
 							{selectedAppPairs.map((pair, idx) => (
 								<div key={pair.id} className="flex flex-col gap-1.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4">

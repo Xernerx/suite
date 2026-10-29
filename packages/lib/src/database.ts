@@ -132,11 +132,15 @@ if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__models_v26 = cachedModels;
 }
 
-const getUris = (): Record<string, string> => ({
-	xernerx: process.env.MONGO_XERNERX || '',
-	virtue: process.env.MONGO_VIRTUE || process.env.MONGO_XERNERX || '',
-	haste: process.env.MONGO_HASTE || '',
-});
+const getUris = (): Record<string, string> => {
+	const xernerxUri = process.env.MONGO_XERNERX || '';
+	const isLocalMemoryServer = xernerxUri.includes('127.0.0.1') || xernerxUri.includes('localhost');
+	return {
+		xernerx: xernerxUri,
+		virtue: process.env.MONGO_VIRTUE || (isLocalMemoryServer ? xernerxUri : ''),
+		haste: process.env.MONGO_HASTE || (isLocalMemoryServer ? xernerxUri : ''),
+	};
+};
 
 interface ModelDefinition {
 	schema: Schema;

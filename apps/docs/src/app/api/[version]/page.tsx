@@ -140,7 +140,12 @@ export default function APIDocs() {
 		setMethodFilter('ALL');
 		setView('playground');
 		if (typeof window !== 'undefined') {
-			window.scrollTo({ top: 0, behavior: 'smooth' });
+			const scrollEl = document.getElementById('main-scroll-container');
+			if (scrollEl) {
+				scrollEl.scrollTo({ top: 0, behavior: 'smooth' });
+			} else {
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+			}
 		}
 	};
 

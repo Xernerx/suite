@@ -30,7 +30,7 @@ export default function ReturnPage({ session, dbError }: { session: Session | nu
 
 	if (dbError) {
 		return (
-			<div className="flex flex-col items-center justify-center min-h-[70vh] w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+			<div className="flex flex-col items-center justify-center min-h-[70dvh] w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 				<div
 					className="flex flex-col items-center text-center max-w-2xl w-full rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
@@ -55,7 +55,7 @@ export default function ReturnPage({ session, dbError }: { session: Session | nu
 									{copied ? t('feedback.error.copied') : t('feedback.error.copyError')}
 								</button>
 							</div>
-							<div className="p-4 max-h-[36vh] overflow-auto">
+							<div className="p-4 max-h-[36dvh] overflow-auto">
 								<p className="text-xs font-mono text-(--text) whitespace-pre-wrap break-words">{dbError}</p>
 							</div>
 						</div>

@@ -3,7 +3,7 @@
 
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { useDictionary, useSidebar } from '@xernerx/providers';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 type Section = {
 	id: string;
 	title: string;
@@ -154,7 +154,16 @@ export default function Page() {
 		...section,
 		title: `${idx + 1}. ${String(section.title).replace(/^\d+\.\s*/, '')}`,
 	}));
-	const { scrollYProgress } = useScroll();
+	const containerRef = useRef<HTMLElement | null>(null);
+	const [ready, setReady] = useState(false);
+	useEffect(() => {
+		const el = document.getElementById('main-scroll-container');
+		if (el) {
+			containerRef.current = el;
+			setReady(true);
+		}
+	}, []);
+	const { scrollYProgress } = useScroll(ready ? { container: containerRef } : {});
 	const scaleX = useSpring(scrollYProgress, {
 		stiffness: 100,
 		damping: 30,
@@ -170,6 +179,7 @@ export default function Page() {
 				});
 			},
 			{
+				root: document.getElementById('main-scroll-container'),
 				rootMargin: '-40% 0px -50% 0px',
 			}
 		);
@@ -184,8 +194,9 @@ export default function Page() {
 			<motion.div
 				style={{
 					scaleX,
+					top: 'env(safe-area-inset-top, 0px)',
 				}}
-				className="fixed top-0 left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
+				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
 			/>
 
 			<div className="min-h-screen px-6 py-32">

@@ -88,7 +88,11 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 					animate={{ height: 44, opacity: 1, transitionEnd: { overflow: 'visible' } }}
 					exit={{ height: 0, opacity: 0, overflow: 'hidden' }}
 					transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-					className="flex items-center w-full shrink-0 bg-(--background) px-4 gap-3 relative z-[999]"
+					className="flex items-center w-full shrink-0 bg-(--background) gap-3 relative z-[999]"
+					style={{
+						paddingLeft: 'calc(1rem + env(safe-area-inset-left, 0px))',
+						paddingRight: 'calc(1rem + env(safe-area-inset-right, 0px))',
+					}}
 				>
 					<div className="flex items-center gap-1">
 						<button

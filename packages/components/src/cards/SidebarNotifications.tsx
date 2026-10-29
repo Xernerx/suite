@@ -370,7 +370,7 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 				createPortal(
 					<div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200" style={{ zIndex: 2147483640 }}>
 						<div
-							className="flex flex-col w-full max-w-2xl max-h-[90vh] rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl animate-in zoom-in-95 duration-200"
+							className="flex flex-col w-full max-w-2xl max-h-[90dvh] rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl animate-in zoom-in-95 duration-200"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 						>
 							{/* Modal Header (Fixed) */}
