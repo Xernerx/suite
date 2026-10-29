@@ -88,7 +88,7 @@ function resolveEnvHref(href: string, reqUrl?: string): string {
 
 export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: string) {
 	const normalizedLocale = (requestedLocale || 'en-GB') as Locale;
-	const dictBundle = await dictionary(normalizedLocale);
+	const dictBundle = await dictionary(normalizedLocale, { includeDefault: true });
 	const t = (key: string): string => getNestedValue(dictBundle.dictionary, key) ?? getNestedValue(dictBundle.fallbackDictionary, key) ?? key;
 
 	const infoBase = resolveEnvHref('https://info.xernerx.com', reqUrl);

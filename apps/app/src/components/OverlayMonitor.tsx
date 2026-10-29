@@ -122,7 +122,7 @@ export function OverlayMonitor() {
 	};
 
 	return (
-		<div className="flex flex-col w-full max-w-md mx-auto" style={{ gap: 'var(--ui-gap)' }}>
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto" style={{ gap: 'var(--ui-gap)' }}>
 			{/* Telemetry Status Card */}
 			<div
 				className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/40 backdrop-blur-md shadow-sm"

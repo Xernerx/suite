@@ -122,10 +122,7 @@ export default function ContactPage() {
 				{contacts.map((contact, index) => (
 					<motion.div
 						key={contact.email}
-						initial={{
-							opacity: 0,
-							y: 15,
-						}}
+						initial={false}
 						animate={{
 							opacity: 1,
 							y: 0,

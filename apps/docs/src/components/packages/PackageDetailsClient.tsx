@@ -11,7 +11,7 @@ import { VersionSelector } from '@/components/packages/VersionSelector';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
 
-const BUNDLED_SUBPACKAGES = ['@xernerx/framework', '@xernerx/commands', '@xernerx/hooks', '@xernerx/stats', '@xernerx/terminal', '@xernerx/websocket'];
+const BUNDLED_SUBPACKAGES = ['@xernerx/framework', '@xernerx/commands', '@xernerx/extension-builder', '@xernerx/hooks', '@xernerx/stats', '@xernerx/terminal', '@xernerx/websocket'];
 
 export function PackageDetailsClient({ data, availableVersions, pkgName, version }: { data: any; availableVersions: string[]; pkgName: string; version: string }) {
 	const { t } = useDictionary();
@@ -32,7 +32,7 @@ export function PackageDetailsClient({ data, availableVersions, pkgName, version
 
 	if (!data) {
 		return (
-			<div className="max-w-4xl mx-auto py-12 px-6 lg:px-8 w-full text-center">
+			<div className="max-w-(--page-width) mx-auto py-12 px-6 lg:px-8 w-full text-center">
 				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-8 space-y-4">
 					<h1 className="text-2xl font-bold text-(--accent-red)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('docs.packages.details.packageNotFound')}

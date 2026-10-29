@@ -33,7 +33,7 @@ export function PlatformHighlights() {
 	];
 
 	return (
-		<section id="highlights" className="max-w-(--page-width) mx-auto px-6 relative" style={{ paddingBottom: 'calc(var(--ui-gap) * 6)' }}>
+		<section id="highlights" className="max-w-(--page-width) mx-auto w-full px-6 relative" style={{ paddingBottom: 'calc(var(--ui-gap) * 6)' }}>
 			<div className="mb-12 max-w-2xl">
 				<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('www.highlights.title')}
@@ -50,7 +50,18 @@ export function PlatformHighlights() {
 						whileHover={{ y: -8, scale: 1.015 }}
 						viewport={{ once: true, margin: '-50px' }}
 						transition={{ duration: 0.55, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-						className="group relative flex flex-col rounded-3xl p-8 lg:p-10 transition-colors overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/50 shadow-xl hover:shadow-[0_16px_50px_-12px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+						onClick={() => {
+							window.location.href = card.link;
+						}}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								window.location.href = card.link;
+							}
+						}}
+						role="link"
+						tabIndex={0}
+						className="group relative flex flex-col rounded-3xl p-8 lg:p-10 transition-colors overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/50 shadow-xl hover:shadow-[0_16px_50px_-12px_color-mix(in_srgb,var(--accent)_35%,transparent)] cursor-pointer"
 					>
 						<div
 							className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-500 pointer-events-none"
@@ -67,10 +78,8 @@ export function PlatformHighlights() {
 							className="relative z-10 text-xl font-bold text-(--text) group-hover:text-(--accent) transition-colors mb-3 flex items-center justify-between gap-2"
 							style={{ fontFamily: 'var(--font-fredoka)' }}
 						>
-							<a href={card.link} className="after:absolute after:inset-0 flex items-center justify-between w-full">
-								<span>{card.title}</span>
-								<ArrowUpRight size={20} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-							</a>
+							<span>{card.title}</span>
+							<ArrowUpRight size={20} className="text-(--text-muted) shrink-0 group-hover:text-(--accent) group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
 						</div>
 
 						<p className="relative z-10 text-sm text-(--text-muted) leading-relaxed">{card.desc}</p>
@@ -87,7 +96,7 @@ export function LandingCta() {
 	const { type } = usePlatform();
 
 	return (
-		<section id="cta" className="max-w-(--page-width) mx-auto px-6 pb-32 relative">
+		<section id="cta" className="max-w-(--page-width) mx-auto w-full px-6 pb-32 relative">
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
 				whileInView={{ opacity: 1, y: 0 }}

@@ -139,11 +139,7 @@ async function getShowcasePackages(): Promise<ShowcasePackage[]> {
 		});
 	}
 
-	if (cachedPackages) {
-		return cachedPackages.data;
-	}
-
-	return Promise.race([inflightRefresh, new Promise<ShowcasePackage[]>((resolve) => setTimeout(() => resolve(FALLBACK_SHOWCASE_PACKAGES), 150))]);
+	return cachedPackages?.data || FALLBACK_SHOWCASE_PACKAGES;
 }
 
 export default async function Home() {

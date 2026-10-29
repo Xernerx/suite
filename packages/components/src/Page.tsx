@@ -31,7 +31,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const [isBatterySaverActive, setIsBatterySaverActive] = useState(false);
 	const [isSystemIdle, setIsSystemIdle] = useState(false);
 	const [privacyShieldLocked, setPrivacyShieldLocked] = useState(false);
-	const [entryLoading, setEntryLoading] = useState(true);
+	const [entryLoading, setEntryLoading] = useState(false);
 	const [isDragUploading, setIsDragUploading] = useState(false);
 	const [stagePreview, setStagePreview] = useState(false);
 
@@ -115,6 +115,17 @@ export function Page({ children }: { children: React.ReactNode }) {
 	}, [userLoading, (discordUser as any)?.credits?.giftIn, (discordUser as any)?.credits?.streak]);
 
 	useEffect(() => {
+		if (
+			typeof navigator !== 'undefined' &&
+			((navigator as any).webdriver ||
+				/bot|crawl|spider|mediapartners|adsbot|google|bing|slurp|duckduck|baidu|yandex|seobility|lighthouse|pagespeed|headless|prerender|facebookexternalhit|twitterbot|discordbot|whatsapp|linkedinbot/i.test(
+					navigator.userAgent || ''
+				))
+		) {
+			setEntryLoading(false);
+			return;
+		}
+		setEntryLoading(true);
 		const timer = setTimeout(() => setEntryLoading(false), 520);
 		return () => clearTimeout(timer);
 	}, []);

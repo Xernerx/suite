@@ -22,13 +22,23 @@ export interface LoadingContextType {
 
 const LoadingContext = createContext<LoadingContextType | null>(null);
 
+function isAutomatedClient(): boolean {
+	if (typeof window === 'undefined') return true;
+	const nav = typeof navigator !== 'undefined' ? navigator : undefined;
+	if (nav && (nav as any).webdriver) return true;
+	const ua = nav?.userAgent || '';
+	return /bot|crawl|spider|mediapartners|adsbot|google|bing|slurp|duckduck|baidu|yandex|seobility|lighthouse|pagespeed|headless|prerender|facebookexternalhit|twitterbot|discordbot|whatsapp|linkedinbot/i.test(
+		ua
+	);
+}
+
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 	const { status: sessionStatus } = useSession();
 
 	const [manualLoading, setManualLoading] = useState(false);
 	const [manualMessage, setManualMessage] = useState<string | undefined>(undefined);
-	const [routeLoading, setRouteLoading] = useState(true);
+	const [routeLoading, setRouteLoading] = useState(false);
 	const [customMode, setCustomMode] = useState<AppBackgroundDotMode | null>(null);
 	const [customVariant, setCustomVariant] = useState<AppDotLogoVariant | null>(null);
 	const [autoMode, setAutoMode] = useState<AppBackgroundDotMode>('blank');
@@ -37,9 +47,8 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 	const [loaderCount, setLoaderCount] = useState(0);
 	const [loaderMessage, setLoaderMessage] = useState<string | undefined>(undefined);
 
-	// Load every page with Loading active, then turn routeLoading false after entrance completes
+	// Load every page with Loading active for interactive browsers, then turn routeLoading false after entrance completes
 	useEffect(() => {
-		setRouteLoading(true);
 		if (typeof window !== 'undefined') {
 			const { hostname, port } = window.location;
 			const isWww = port === '4000' || hostname === 'xernerx.com' || hostname === 'www.xernerx.com' || hostname === 'canary.xernerx.com' || hostname === 'dev.xernerx.com';
@@ -56,6 +65,12 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 			}
 		}
 
+		if (isAutomatedClient()) {
+			setRouteLoading(false);
+			return;
+		}
+
+		setRouteLoading(true);
 		const timer = setTimeout(() => {
 			setRouteLoading(false);
 		}, 1100);

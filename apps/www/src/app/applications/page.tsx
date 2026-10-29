@@ -1,12 +1,10 @@
 /** @format */
-// Force recompile
 'use client';
 
-import { ArrowRight, Briefcase, Loader2, LogIn } from 'lucide-react';
+import { ArrowRight, Briefcase, Code2, Globe2, Headphones, ShieldCheck, LogIn } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useEnvironment, useSidebar, useUser, useDictionary } from '@xernerx/providers';
-import { Loading } from '@xernerx/feedback';
 import Link from 'next/link';
 
 interface ApplicationConfig {
@@ -39,7 +37,7 @@ export default function ApplicationsPage() {
 		async function fetchApplications() {
 			try {
 				const response = await fetch(getEnvUrl('https://api.xernerx.com/secure/applications/open'), {
-					credentials: 'include', // public open roles don't necessarily need cookies, but let's be explicit
+					credentials: 'include',
 				});
 
 				if (!response.ok) throw new Error('Failed to fetch applications');
@@ -60,46 +58,87 @@ export default function ApplicationsPage() {
 		}
 
 		fetchApplications();
-	}, [getEnvUrl]);
+	}, [getEnvUrl, isReady, t]);
 
-	if (loading) return <Loading />;
+	const departments = [
+		{
+			key: 'engineering',
+			icon: Code2,
+			title: t('www.applications.overview.departments.engineering.title'),
+			description: t('www.applications.overview.departments.engineering.description'),
+		},
+		{
+			key: 'moderation',
+			icon: ShieldCheck,
+			title: t('www.applications.overview.departments.moderation.title'),
+			description: t('www.applications.overview.departments.moderation.description'),
+		},
+		{
+			key: 'support',
+			icon: Headphones,
+			title: t('www.applications.overview.departments.support.title'),
+			description: t('www.applications.overview.departments.support.description'),
+		},
+		{
+			key: 'localization',
+			icon: Globe2,
+			title: t('www.applications.overview.departments.localization.title'),
+			description: t('www.applications.overview.departments.localization.description'),
+		},
+	];
+
+	const steps = [
+		{
+			key: 'step1',
+			title: t('www.applications.overview.process.step1.title'),
+			description: t('www.applications.overview.process.step1.description'),
+		},
+		{
+			key: 'step2',
+			title: t('www.applications.overview.process.step2.title'),
+			description: t('www.applications.overview.process.step2.description'),
+		},
+		{
+			key: 'step3',
+			title: t('www.applications.overview.process.step3.title'),
+			description: t('www.applications.overview.process.step3.description'),
+		},
+	];
 
 	return (
-		<div className="flex flex-col min-h-screen pt-24 px-6 md:px-12 max-w-(--page-width) mx-auto w-full">
-			<div className="mb-12">
+		<div className="flex flex-col min-h-screen pt-24 pb-20 px-6 md:px-12 max-w-(--page-width) mx-auto w-full gap-16">
+			<div>
 				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('www.applications.title')}
 				</h1>
-				<p className="text-lg text-(--text-muted) max-w-2xl">{t('www.applications.subtitle')}</p>
+				<p className="text-lg text-(--text-muted) max-w-2xl leading-relaxed">{t('www.applications.subtitle')}</p>
 			</div>
 
 			{error ? (
-				<motion.div
-					initial={{ opacity: 0, y: 10 }}
-					animate={{ opacity: 1, y: 0 }}
-					className="bg-(--accent-red)/10 border border-(--accent-red)/20 text-(--accent-red) p-6 rounded-2xl backdrop-blur-md"
-				>
+				<motion.div initial={false} animate={{ opacity: 1, y: 0 }} className="bg-(--accent-red)/10 border border-(--accent-red)/20 text-(--accent-red) p-6 rounded-2xl backdrop-blur-md">
 					{error}
 				</motion.div>
-			) : applications.length === 0 ? (
+			) : !loading && applications.length === 0 ? (
 				<motion.div
-					initial={{ opacity: 0, scale: 0.95 }}
+					initial={false}
 					animate={{ opacity: 1, scale: 1 }}
-					className="flex flex-col items-center justify-center py-24 text-center border border-dashed border-(--border)/20 rounded-3xl bg-(--text-muted)/5 backdrop-blur-xl"
+					className="flex flex-col items-center justify-center py-16 px-6 text-center border border-dashed border-(--border)/20 rounded-3xl bg-(--foreground)/30 backdrop-blur-md"
 				>
-					<Briefcase className="w-12 h-12 text-(--text-muted) mb-4 opacity-50" />
-					<h2 className="text-2xl font-bold mb-2">{t('www.applications.noRoles')}</h2>
-					<p className="text-(--text-muted) max-w-sm">{t('www.applications.noRolesDesc')}</p>
+					<Briefcase className="w-12 h-12 text-(--accent) mb-4 opacity-80" />
+					<h2 className="text-2xl font-bold mb-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.applications.noRoles')}
+					</h2>
+					<p className="text-(--text-muted) max-w-md">{t('www.applications.noRolesDesc')}</p>
 				</motion.div>
-			) : (
+			) : applications.length > 0 ? (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{applications.map((app, i) => (
 						<motion.div
-							initial={{ opacity: 0, y: 20 }}
+							initial={false}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: i * 0.1, duration: 0.4 }}
 							key={app.id}
-							className="flex flex-col p-6 rounded-3xl border border-(--border)/10 bg-(--text-muted)/5 backdrop-blur-2xl hover:bg-(--text-muted)/10 hover:border-(--accent)/50 transition-all duration-300 group shadow-lg shadow-black/5"
+							className="flex flex-col p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md hover:border-(--accent)/50 transition-all duration-300 group shadow-sm"
 						>
 							<div className="flex items-start justify-between mb-4">
 								<div className="flex items-center justify-center w-12 h-12 rounded-full bg-(--accent)/20 text-(--accent)">
@@ -147,7 +186,7 @@ export default function ApplicationsPage() {
 							{app.requireLogin !== false && !user ? (
 								<Link
 									href={`${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin + `/applications/${app.id}` : '')}`}
-									className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-(--accent) text-white font-semibold shadow-md shadow-(--accent)/20 hover:opacity-90 hover:shadow-lg hover:shadow-(--accent)/30 transition-all active:scale-[0.98] group"
+									className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-(--accent) text-(--text) font-semibold shadow-sm hover:bg-(--hover-accent) transition-all active:scale-[0.98] group"
 								>
 									{t('www.applications.loginApply')}
 									<LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -155,7 +194,7 @@ export default function ApplicationsPage() {
 							) : (
 								<Link
 									href={`/applications/${app.id}`}
-									className="flex items-center justify-center gap-2 w-full py-4 rounded-xl bg-(--accent) text-white font-semibold shadow-md shadow-(--accent)/20 hover:opacity-90 hover:shadow-lg hover:shadow-(--accent)/30 transition-all active:scale-[0.98] group"
+									className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-(--accent) text-(--text) font-semibold shadow-sm hover:bg-(--hover-accent) transition-all active:scale-[0.98] group"
 								>
 									{t('www.applications.applyNow')}
 									<ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
@@ -164,7 +203,48 @@ export default function ApplicationsPage() {
 						</motion.div>
 					))}
 				</div>
-			)}
+			) : null}
+
+			{/* Departments & Contributor Overview */}
+			<section className="flex flex-col gap-8">
+				<div className="flex flex-col gap-2">
+					<h2 className="text-3xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.applications.overview.departmentsTitle')}
+					</h2>
+					<p className="text-(--text-muted) max-w-3xl leading-relaxed">{t('www.applications.overview.departmentsSubtitle')}</p>
+				</div>
+
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					{departments.map((dept) => (
+						<div key={dept.key} className="flex flex-col p-8 rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md shadow-sm gap-4">
+							<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+								<dept.icon size={22} />
+							</div>
+							<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{dept.title}
+							</h3>
+							<p className="text-sm text-(--text-muted) leading-relaxed">{dept.description}</p>
+						</div>
+					))}
+				</div>
+			</section>
+
+			{/* Application Process Steps */}
+			<section className="flex flex-col gap-6 rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md p-8 md:p-10 shadow-sm">
+				<h2 className="text-2xl md:text-3xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('www.applications.overview.processTitle')}
+				</h2>
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+					{steps.map((step) => (
+						<div key={step.key} className="flex flex-col gap-2 p-6 rounded-2xl bg-(--background)/50 border border-(--border)/10">
+							<h3 className="text-lg font-bold text-(--accent)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{step.title}
+							</h3>
+							<p className="text-sm text-(--text-muted) leading-relaxed">{step.description}</p>
+						</div>
+					))}
+				</div>
+			</section>
 		</div>
 	);
 }

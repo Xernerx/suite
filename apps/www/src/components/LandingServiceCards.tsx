@@ -227,7 +227,18 @@ export function DeveloperSoftwareCard({ item, href }: { item: DeveloperSoftwareC
 		<motion.div
 			whileHover={{ y: -8, scale: 1.015 }}
 			transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-			className="group shrink-0 w-[85vw] md:w-[430px] flex flex-col rounded-3xl overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/50 shadow-xl hover:shadow-[0_16px_50px_-12px_color-mix(in_srgb,var(--accent)_35%,transparent)] transition-colors relative"
+			onClick={() => {
+				window.location.href = href;
+			}}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					window.location.href = href;
+				}
+			}}
+			role="link"
+			tabIndex={0}
+			className="group shrink-0 w-[85vw] md:w-[430px] flex flex-col rounded-3xl overflow-hidden bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/50 shadow-xl hover:shadow-[0_16px_50px_-12px_color-mix(in_srgb,var(--accent)_35%,transparent)] transition-colors relative cursor-pointer"
 		>
 			{/* Interactive Dot-Matrix Header Ribbon */}
 			<div className="relative h-20 w-full overflow-hidden bg-gradient-to-r from-(--accent)/20 via-(--background)/60 to-(--accent)/10 border-b border-(--border)/10 px-7 flex items-center justify-between">
@@ -250,11 +261,7 @@ export function DeveloperSoftwareCard({ item, href }: { item: DeveloperSoftwareC
 				<div className="w-13 h-13 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent) mb-5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
 					{item.icon}
 				</div>
-				<div className="font-bold text-xl text-(--text) group-hover:text-(--accent) transition-colors font-mono mb-2.5">
-					<a href={href} className="after:absolute after:inset-0">
-						{item.title}
-					</a>
-				</div>
+				<div className="font-bold text-xl text-(--text) group-hover:text-(--accent) transition-colors font-mono mb-2.5">{item.title}</div>
 				<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
 			</div>
 		</motion.div>
