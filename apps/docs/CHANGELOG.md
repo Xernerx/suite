@@ -2,6 +2,26 @@
 
 # docs
 
+## 1.8.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.1
+
+## 1.8.3
+
+### Patch Changes
+
+- ### Landing Page (`www`), Documentation (`docs`) & Discord Bot Catalogs (`@xernerx/app`, `bot`)
+    - **Showcase Package Discovery & Fallback Seeding (`apps/www/src/app/page.tsx`)**:
+        - Added `@xernerx/hooks` and `@xernerx/extension-builder` to `FALLBACK_SHOWCASE_PACKAGES` and updated the `xernerx` all-in-one SDK description.
+        - Seeded `packagesMap` inside `fetchShowcasePackagesFromRemote()` with all `FALLBACK_SHOWCASE_PACKAGES` names and mapped fallback descriptions (`FALLBACK_PACKAGE_DESC_MAP`) so first-party packages always render both during the initial 150ms SSR race and after remote GitHub/NPM refreshes.
+    - **Docs Package Catalog Seeding (`apps/docs/src/app/packages/page.tsx`)**:
+        - Seeded `packagesMap` with all keys from `FALLBACK_PACKAGE_DESCRIPTIONS` so `@xernerx/hooks` and `@xernerx/extension-builder` always appear in the package explorer even before a remote `docs.json` tree entry is fetched.
+    - **Discord Bot Docs Catalog Fallbacks (`services/app/src/lib/catalogFallbacks.ts`, `services/bot/src/lib/catalogFallbacks.ts`)**:
+        - Added `@xernerx/hooks` and `@xernerx/extension-builder` fallback entries and updated the `xernerx` SDK bundle description.
+
 ## 1.8.2
 
 ### Patch Changes

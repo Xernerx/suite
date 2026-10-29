@@ -2,6 +2,13 @@
 
 # admin
 
+## 0.21.4
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.1
+
 ## 0.21.3
 
 ### Patch Changes

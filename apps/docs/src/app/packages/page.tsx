@@ -58,6 +58,12 @@ async function getPackages() {
 			packagesMap.get(pkgName)!.push(version);
 		}
 
+		for (const fallbackPkg of Object.keys(FALLBACK_PACKAGE_DESCRIPTIONS)) {
+			if (!packagesMap.has(fallbackPkg)) {
+				packagesMap.set(fallbackPkg, ['1.0.0']);
+			}
+		}
+
 		const packages = Array.from(packagesMap.entries())
 			.map(([name, versions]) => ({
 				name,

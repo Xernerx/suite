@@ -2,6 +2,13 @@
 
 # cdn
 
+## 1.2.11
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/components@0.12.1
+
 ## 1.2.10
 
 ### Patch Changes

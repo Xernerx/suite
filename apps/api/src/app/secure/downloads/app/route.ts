@@ -28,15 +28,16 @@ export async function GET(request: Request) {
 
 		const assets = release.assets || [];
 
-		let windows: Record<string, string> | null = null;
-		let macos: Record<string, string> | null = null;
-		let linux: Record<string, string> | null = null;
+		let windows: Record<string, string | number> | null = null;
+		let macos: Record<string, string | number> | null = null;
+		let linux: Record<string, string | number> | null = null;
 		let extractedVersion: string | null = null;
 
 		// Loop through the assets to match platforms, ignoring blockmaps and metadata yml files
 		for (const asset of assets) {
 			const name = asset.name.toLowerCase();
 			const browser_download_url = asset.browser_download_url;
+			const size = typeof asset.size === 'number' ? asset.size : 0;
 
 			if (!extractedVersion && typeof asset.name === 'string') {
 				const verMatch = asset.name.match(/Xernerx[\s_-]*App-(.+)-setup\./i);
@@ -49,15 +50,15 @@ export async function GET(request: Request) {
 
 			// Match Windows (e.g., .exe, .msi)
 			if (name.endsWith('.exe') || name.endsWith('.msi') || name.includes('win')) {
-				windows = { browser_download_url, name: asset.name };
+				windows = { browser_download_url, url: browser_download_url, name: asset.name, size };
 			}
 			// Match macOS (e.g., .dmg, .pkg, or mac zips)
 			else if (name.endsWith('.dmg') || name.endsWith('.pkg') || name.includes('mac') || name.includes('darwin')) {
-				macos = { browser_download_url, name: asset.name };
+				macos = { browser_download_url, url: browser_download_url, name: asset.name, size };
 			}
 			// Match Linux (e.g., .AppImage, .deb, .rpm)
-			else if (name.endsWith('.appimage') || name.endsWith('.deb') || name.endsWith('.rpm') || name.includes('linux')) {
-				linux = { browser_download_url, name: asset.name };
+			else if (name.endsWith('.appimage') || name.endsWith('.deb') || name.includes('rpm') || name.includes('linux')) {
+				linux = { browser_download_url, url: browser_download_url, name: asset.name, size };
 			}
 		}
 
