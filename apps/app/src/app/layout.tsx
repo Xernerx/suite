@@ -19,21 +19,35 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+		default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 		template: 'Xernerx App | %s',
 	},
-	description:
-		'1 Account, 1 Place, 1 Setup. Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, or track bot statistics and promote your bots in the Developer Portal.',
+	description: 'Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
+	keywords: [
+		'Xernerx',
+		'Xernerx Studios',
+		'Discord bots',
+		'Discord servers',
+		'bot list',
+		'server directory',
+		'Virtue',
+		'Metamorphosis',
+		'Zodiac',
+		'leaderboard',
+		'dashboard',
+		'SEO',
+		'branding',
+		'audit',
+	],
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+			default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 			template: 'Xernerx App | %s',
 		},
-		description:
-			'1 Account, 1 Place, 1 Setup. Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, or track bot statistics and promote your bots.',
+		description: 'Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -50,7 +64,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+			default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 			template: 'Xernerx App | %s',
 		},
 		description: 'Discover Discord bots & servers, configure Virtue, Metamorphosis & Zodiac in one place, and track or promote your bots.',

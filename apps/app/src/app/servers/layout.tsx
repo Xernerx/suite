@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
 	title: 'Explore & Join Public Discord Servers',
 	description: 'Discover, vote for, and join vibrant Discord communities and verified public servers across the Xernerx Studios global directory.',
+	keywords: ['Xernerx', 'Discord servers', 'communities', 'vote', 'directory', 'explore', 'verified'],
 	alternates: {
 		canonical: '/servers',
 	},

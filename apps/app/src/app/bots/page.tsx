@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Flame, Trophy, Sparkles, Server, Users, Search, ArrowLeft, Hash, ChevronUp } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BotCard, type BotProfile } from '@/components/ExploreCards';
+import { AppSeoSection } from '@/components/AppSeoSection';
 
 function BotsListContent() {
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -186,23 +187,27 @@ export default function BotsList() {
 	const { t } = useDictionary();
 
 	return (
-		<Suspense
-			fallback={
-				<div className="flex flex-col w-full min-h-screen">
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
-						<div className="flex items-center gap-4">
-							<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('app.categories.biggestBots')}
-							</h1>
+		<div className="flex flex-col w-full">
+			<Suspense
+				fallback={
+					<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-[40dvh]">
+						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
+							<div className="flex items-center gap-4">
+								<div className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{t('app.categories.biggestBots')}
+								</div>
+							</div>
+						</div>
+						<div className="flex-1 flex items-center justify-center py-20">
+							<Loading />
 						</div>
 					</div>
-					<div className="flex-1 flex items-center justify-center py-32">
-						<Loading />
-					</div>
-				</div>
-			}
-		>
-			<BotsListContent />
-		</Suspense>
+				}
+			>
+				<BotsListContent />
+			</Suspense>
+
+			<AppSeoSection page="bots" />
+		</div>
 	);
 }

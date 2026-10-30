@@ -995,13 +995,34 @@
 				"mcpIssuesTitle": "Prioritized Action Items",
 				"mcpAllPassed": "All core technical and on-page SEO checks passed!",
 				"mcpOpenExternal": "Open My Creative Tools SEO Analyzer",
+				"mcpPrintReport": "PDF / Print",
 				"mcpCategories": {
 					"seo": "SEO",
 					"geo": "GEO",
 					"checks": "Checks"
 				},
 				"mcpMetrics": {
-					"wordCount": "Words & Speed"
+					"wordCount": "Words & Speed",
+					"pagesCount": "Pages"
+				},
+				"mcpTabs": {
+					"overview": "Overview & Priority",
+					"geo": "GEO Monitor",
+					"pages": "Pages & Checks",
+					"roadmap": "Roadmap & Content"
+				},
+				"mcpTable": {
+					"url": "Page URL",
+					"status": "Status",
+					"optimal": "Optimal"
+				},
+				"mcpRoadmap": {
+					"week1": "Week 1 — Quick Wins",
+					"week2_3": "Week 2–3 — Structure & Content",
+					"month2": "Month 2 — Authority & GEO"
+				},
+				"mcpContentAgent": {
+					"title": "Content-Agent Suggestions"
 				},
 				"mcpCheckLabels": {
 					"title": "Title",
@@ -3016,6 +3037,34 @@
 		}
 	},
 	"www": {
+		"common": {
+			"faqBadge": "Quick Answers",
+			"faqHeading": "Frequently Asked Questions"
+		},
+		"home": {
+			"faq": {
+				"subtitle": "Direct answers about the Xernerx Studios ecosystem, Discord bots, open-source SDKs, and unified dashboard.",
+				"q1": "What is Xernerx Studios and how does the Xernerx Suite work?",
+				"a1": "Xernerx Studios is a software studio that builds Discord bots, open-source TypeScript frameworks, and the Xernerx Suite. With 1 Account, 1 Place, 1 Setup, you sign in once to configure Virtue, Metamorphosis, and Zodiac or manage your own developer bots.",
+				"q2": "Which Discord bots are built and maintained by Xernerx Studios?",
+				"a2": "We build and operate four official Discord bots: Virtue for text and voice XP leveling, Metamorphosis for real-time multilingual translation, Zodiac for astrology and horoscopes, and To-Do List Bot for server productivity.",
+				"q3": "Can developers publish and track their own Discord bots on Xernerx?",
+				"a3": "Yes. Developers can use @xernerx/framework, @xernerx/stats, and our public v1 REST API to push live server and shard telemetry, sync slash commands, and list their bots in our public explorer.",
+				"q4": "Is the Xernerx Suite free to use for Discord communities?",
+				"a4": "Yes. Signing in with your Xernerx Account, inviting our official bots, and browsing the public bot and server directory are free, with optional Virtue passes and Developer Pro upgrades available in the Store."
+			}
+		},
+		"careers": {
+			"faq": {
+				"subtitle": "Everything you need to know about applying to join the Xernerx Studios engineering, moderation, support, or localization teams.",
+				"q1": "How do I apply for an open position at Xernerx Studios?",
+				"a1": "Sign in with your Xernerx Account on this page, select an open role card above, and submit the application form. You can track the status of your submission in real time through your account notifications.",
+				"q2": "Can I contribute to Xernerx localization or open-source packages remotely?",
+				"a2": "Yes. All roles at Xernerx Studios are fully remote and collaborative across global time zones. Contributors work together through Discord, GitHub, and our internal Staff and Translation Portals.",
+				"q3": "What happens after I submit my team application?",
+				"a3": "Our department leads review every application directly in the Staff Portal. When your application is reviewed or accepted, you receive an instant notification on the web dashboard and via Discord."
+			}
+		},
 		"applications": {
 			"errorLoad": "Failed to load open applications.",
 			"title": "Open Applications",
@@ -3127,7 +3176,16 @@
 			"title2": "Looking for documentation?",
 			"description3": "Most technical questions are already covered in our documentation. You may find your answer immediately without waiting for a reply.",
 			"button": "Documentation",
-			"button2": "GitHub"
+			"button2": "GitHub",
+			"faq": {
+				"subtitle": "Common questions about reaching our support, billing, security, and legal teams.",
+				"q1": "Which email address should I use to contact Xernerx Studios?",
+				"a1": "Use support@xernerx.com for technical assistance, invoice@xernerx.com for billing questions, security@xernerx.com for vulnerability reports, legal@xernerx.com for privacy or legal requests, and info@xernerx.com for general partnerships.",
+				"q2": "How quickly does the Xernerx support team respond to enquiries?",
+				"a2": "We aim to respond to all support and billing emails within 24 to 48 hours. For instant troubleshooting, you can also check our interactive documentation at docs.xernerx.com or our FAQ hub at info.xernerx.com/faq.",
+				"q3": "How do I report a security vulnerability or privacy request?",
+				"a3": "Send security disclosures directly to security@xernerx.com and GDPR or CCPA privacy requests to legal@xernerx.com. You can also export or delete your personal data any time from your Account Settings."
+			}
 		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
@@ -3333,7 +3391,16 @@
 					"prefix": "For privacy-related inquiries or data requests, contact"
 				}
 			},
-			"description": "legal@xernerx.com"
+			"description": "legal@xernerx.com",
+			"faq": {
+				"subtitle": "Quick answers about how we protect your data, handle GDPR and CCPA requests, and secure your account.",
+				"q1": "Does Xernerx Studios ever sell my personal data to advertisers?",
+				"a1": "No. We never sell your personal information or API telemetry to third-party advertisers. Data is processed strictly to provide and secure your Xernerx Account, Discord bots, and developer integrations.",
+				"q2": "How can I export or permanently delete my Xernerx Account data?",
+				"a2": "You can download a complete JSON archive of your data in Account -> Activity at any time. You can also reset your profile or permanently delete your account in Account -> Settings.",
+				"q3": "What visibility options are available for my profile and CDN uploads?",
+				"a3": "Every profile, bot, server, organization, and CDN upload supports three privacy tiers: Public (listed in directories), Limited (unlisted direct-link access only), and Private (strictly owner-only)."
+			}
 		},
 		"terms": {
 			"toc": "Contents",
@@ -3344,51 +3411,51 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "These Terms of Service (\"Terms\") govern your access to and use of all websites, dashboards, Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios (\"we\", \"our\", or \"us\"). By accessing or using our services, you agree to be legally bound by these Terms."
+					"content": "These Terms of Service (\"Terms\") govern your access to all websites, dashboards, Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
 				},
 				"eligibility": {
 					"title": "2. Eligibility",
-					"content": "You must be at least 13 years of age (or the minimum age of digital consent in your jurisdiction) to use our services. By using our services, you represent and warrant that you satisfy this requirement and comply with Discord's Terms of Service."
+					"content": "You must be at least 13 years of age (or the minimum digital consent age in your country) to use our services. By using our platform, you confirm that you meet this requirement and comply with Discord's Terms of Service."
 				},
 				"acceptableUse": {
 					"title": "3. Acceptable Use",
 					"items": [
-						"Engage in unlawful, fraudulent, defamatory, or abusive activities, or upload illegal content to our CDN or community portals.",
-						"Attempt to access accounts, private CDN blobs, API endpoints, or administrative tools without explicit authorization.",
-						"Disrupt, overload, or bypass platform rate limits, WebSocket gateways, or security mechanisms.",
-						"Reverse-engineer, scrape, or exploit vulnerabilities in any Xernerx service, bot, or client application."
+						"Do not engage in unlawful, fraudulent, or abusive activities. Never upload illegal content to our CDN or community portals.",
+						"Do not attempt to access accounts, private CDN blobs, API endpoints, or staff tools without explicit authorization.",
+						"Do not disrupt, overload, or bypass platform rate limits, WebSocket gateways, or security mechanisms.",
+						"Do not reverse-engineer, scrape, or exploit vulnerabilities in any Xernerx service, bot, or client application."
 					]
 				},
 				"apiUsage": {
 					"title": "4. API, Widgets & WebSocket Gateway Terms",
-					"content": "Developers using our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket RPC gateway must adhere to the following rules:",
+					"content": "Developers using our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket RPC gateway must follow these rules:",
 					"items": [
-						"Respect all rate limits and plan quotas; do not spam, scrape, or abuse API endpoints or WebSocket connections.",
-						"You are solely responsible for securing your Bearer API tokens; we are not liable for unauthorized actions caused by leaked keys.",
-						"Telemetry, command registries, and statistics submitted to the platform must be accurate and never artificially inflated.",
-						"We reserve the right to immediately revoke API tokens, disable public widgets, or suspend applications that degrade platform stability or violate these Terms."
+						"Respect all rate limits and plan quotas. Never spam, scrape, or abuse API endpoints or WebSocket connections.",
+						"Keep your Bearer API tokens secret. You are responsible for all actions performed with your keys.",
+						"Submit accurate telemetry, command registries, and bot statistics. Never artificially inflate metrics.",
+						"We may revoke API tokens or suspend applications that degrade platform stability or violate these Terms."
 					]
 				},
 				"botUsage": {
 					"title": "5. Bot End User Terms",
-					"content": "Users interacting with Xernerx-powered Discord bots (including Virtue, Metamorphosis, Zodiac, and To-Do List Bot) agree not to exploit command inputs, automate abusive requests, or harass other community members. Server owners and administrators are responsible for configuring bot modules in compliance with both these Terms and Discord's Terms of Service."
+					"content": "Users interacting with Xernerx Discord bots (Virtue, Metamorphosis, Zodiac, and To-Do List Bot) must not exploit commands or automate abusive requests. Server owners are responsible for configuring bot modules in compliance with these Terms and Discord's Terms of Service."
 				},
 				"accounts": {
 					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
-					"content": "You authenticate via Discord OAuth2 or our encrypted QR Code / Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not initiate yourself. You may also optionally link third-party accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) to display on your public profile. You are responsible for all activity occurring under your account and can revoke active device sessions or unlink connected accounts at any time in Account Settings."
+					"content": "You sign in via Discord OAuth2 or our encrypted QR Code and Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not start yourself. You may optionally link third-party accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) to display on your profile. You can revoke active device sessions or unlink connected accounts at any time in Account Settings."
 				},
 				"storeAndBilling": {
 					"title": "7. Store, Subscriptions & Virtual Credits",
-					"content": "Paid subscriptions (including the Xernerx Ultra bundle, Individual Bot Passes, Server Infrastructure Passes, and Developer API Pro) and add-ons are billed in advance on a recurring monthly or annual cycle via Stripe, which may display localized currencies through Stripe Adaptive Pricing:",
+					"content": "Paid subscriptions and add-ons are billed in advance on a monthly or annual cycle via Stripe. Stripe may display localized currencies through Adaptive Pricing:",
 					"items": [
-						"You may cancel a recurring subscription at any time via the Billing Portal; your plan benefits remain active until the end of the current paid billing period.",
-						"Virtual Credits, Daily Mystery Gifts, and login streak rewards are non-monetary digital platform features with no real-world cash value. They cannot be exchanged for cash, transferred between users, or refunded outside mandatory statutory consumer rights.",
-						"If a subscription downgrades or expires, features and CDN storage quotas revert to standard tier limits; existing files are not immediately deleted without notice, but new uploads may be restricted if you exceed your active quota."
+						"You can cancel a recurring subscription any time in the Billing Portal. Your plan benefits remain active until the end of the current billing period.",
+						"Virtual Credits, Daily Mystery Gifts, and login streak rewards are digital platform features with no cash value. They cannot be exchanged for cash, transferred, or refunded outside statutory consumer rights.",
+						"If a subscription expires, features and CDN storage quotas revert to standard tier limits. Existing files are kept, but new uploads may pause if you exceed your quota."
 					]
 				},
 				"desktopClient": {
 					"title": "8. Xernerx Desktop Client",
-					"content": "We grant you a limited, non-exclusive, revocable license to download and use the Xernerx Desktop application for personal or internal community management use. The Desktop client may automatically download and install updates (across Stable or Canary release channels), register optional global keyboard shortcuts, display a floating mini overlay, maintain isolated multi-account sessions, and communicate locally with Discord for Rich Presence."
+					"content": "We grant you a limited, non-exclusive, revocable license to use the Xernerx Desktop application. The Desktop client can install automatic updates across Stable or Canary channels and register optional global shortcuts. It also supports a floating mini overlay, isolated multi-account sessions, and local Discord Rich Presence."
 				},
 				"data": {
 					"title": "9. User Data & Cookies",
@@ -3400,42 +3467,51 @@
 				},
 				"availability": {
 					"title": "10. Service Availability",
-					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted or error-free operation. Features, bot modules, APIs, or experimental Canary builds may be modified, suspended, or discontinued at any time."
+					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted operation. Features, bot modules, APIs, or experimental Canary builds may be updated or discontinued at any time."
 				},
 				"thirdParty": {
 					"title": "11. Third-Party Services",
-					"content": "Our ecosystem integrates with third-party platforms including Discord, Stripe, Google (for translation and advertising services), and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit). We are not responsible for the availability, policies, or independent practices of third-party services."
+					"content": "Our ecosystem integrates with Discord, Stripe, Google, and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit). We are not responsible for the availability or independent policies of third-party services."
 				},
 				"intellectualProperty": {
 					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, source code (excluding open-source packages licensed under their respective repository licenses), branding, and visual assets remain the exclusive property of Xernerx Studios. You retain ownership of media and content you upload to cdn.xernerx.com or submit to our platform, and grant Xernerx Studios a worldwide, non-exclusive, royalty-free license to host, cache, and deliver that content solely according to the visibility permissions (public, limited, or private) you configure."
+					"content": "All Xernerx software, branding, and visual assets remain the exclusive property of Xernerx Studios. Open-source packages are governed by their respective repository licenses. You keep ownership of content you upload to cdn.xernerx.com. You grant Xernerx Studios a license to host and deliver that content solely according to your chosen visibility setting (public, limited, or private)."
 				},
 				"warranty": {
 					"title": "13. Disclaimer of Warranties",
-					"content": "Services are provided “as is” and “as available” without warranties of any kind, whether express, implied, or statutory, including implied warranties of merchantability, fitness for a particular purpose, or non-infringement."
+					"content": "Services are provided “as is” and “as available” without warranties of any kind. This includes all express, implied, or statutory warranties of merchantability or fitness for a particular purpose."
 				},
 				"liability": {
 					"title": "14. Limitation of Liability",
-					"content": "To the fullest extent permitted by applicable law, Xernerx Studios shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of data, revenue, or profits arising from your use of our services."
+					"content": "To the fullest extent permitted by law, Xernerx Studios is not liable for indirect, incidental, or consequential damages. This includes any loss of data, revenue, or profits arising from your use of our services."
 				},
 				"indemnification": {
 					"title": "15. Indemnification",
-					"content": "You agree to indemnify and hold harmless Xernerx Studios and its team members from any claims, damages, or liabilities arising out of your misuse of our services, your uploaded content, your developer applications, or your violation of these Terms."
+					"content": "You agree to indemnify and hold harmless Xernerx Studios and its team members from any claims or damages. This applies to claims arising from your misuse of our services, your uploaded content, or your violation of these Terms."
 				},
 				"governingLaw": {
 					"title": "16. Governing Law",
-					"content": "These Terms shall be governed and construed in accordance with applicable laws, without regard to conflict of law principles, while respecting mandatory consumer protection laws in your country of residence."
+					"content": "These Terms are governed by applicable laws without regard to conflict of law principles. Mandatory consumer protection laws in your country of residence remain fully respected."
 				},
 				"changes": {
 					"title": "17. Changes to Terms",
-					"content": "We may update these Terms from time to time. When material updates are published, we update the effective timestamp and prompt authenticated users to review and accept the revised Terms before continuing to use the platform."
+					"content": "We may update these Terms from time to time. When material updates are published, we update the effective date and prompt signed-in users to accept the revised Terms."
 				},
 				"contact": {
 					"title": "18. Contact",
 					"prefix": "For legal inquiries contact"
 				}
 			},
-			"description": "legal@xernerx.com"
+			"description": "legal@xernerx.com",
+			"faq": {
+				"subtitle": "Key answers about account rules, API usage limits, subscriptions, and content ownership.",
+				"q1": "Who can create a Xernerx Account and use Xernerx Discord bots?",
+				"a1": "Anyone who is at least 13 years old (or the minimum digital consent age in their country) and complies with Discord's Terms of Service can use Xernerx services.",
+				"q2": "How do Store subscriptions and cancellations work?",
+				"a2": "Subscriptions are billed securely via Stripe and can be cancelled at any time from your Billing Portal. Your perks stay active until the end of your current paid billing period.",
+				"q3": "Do I keep ownership of files and images I upload to Xernerx CDN?",
+				"a3": "Yes. You retain full ownership of everything you upload to cdn.xernerx.com, and our servers only deliver your files according to the public, limited, or private visibility tier you select."
+			}
 		},
 		"cookies": {
 			"toc": "Contents",
@@ -3446,29 +3522,29 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, session partitions, and similar technologies when you visit or interact with our websites, dashboards, APIs, and desktop applications."
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions. It applies whenever you visit or interact with our websites, dashboards, APIs, and desktop applications."
 				},
 				"whatAreCookies": {
 					"title": "2. What Are Cookies?",
-					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow the platform to recognize your device, maintain your authenticated session seamlessly across all Xernerx subdomains (*.xernerx.com), and remember your customized interface preferences."
+					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow our platform to recognize your device and keep your session signed in across all *.xernerx.com subdomains. They also remember your custom theme and workspace preferences."
 				},
 				"categories": {
 					"title": "3. Categories of Cookies We Use",
 					"essential": {
 						"title": "Essential Cookies:",
-						"desc": "Strictly necessary for the core operation and security of our services. These include Discord OAuth2 authentication sessions, CSRF protection, secondary account-linking state verification, and your saved cookie consent state. Because the platform cannot function securely without them, they cannot be disabled."
+						"desc": "Strictly necessary for core platform security and sign-in. They handle Discord OAuth2 sessions, CSRF protection, account-linking verification, and your saved cookie consent. Because the platform cannot operate securely without them, they cannot be disabled."
 					},
 					"functional": {
 						"title": "Functional Cookies:",
-						"desc": "Used to remember your personal preferences across subdomains, including your selected language, interface theme (dark, light, or system), accent color, layout density, UI zoom, typography scale, and header/sidebar workspace toggles."
+						"desc": "Used to remember your personal preferences across subdomains. They store your language, theme (dark, light, or system), accent color, UI zoom, and layout settings."
 					},
 					"analytics": {
 						"title": "Analytics Cookies:",
-						"desc": "Help us understand how visitors interact with our websites, monitor platform performance, and diagnose technical errors so we can improve reliability."
+						"desc": "Help us understand how visitors use our websites, monitor platform speed, and diagnose technical errors."
 					},
 					"marketing": {
 						"title": "Marketing & Advertising Cookies:",
-						"desc": "Used by third-party advertising partners (such as Google AdSense) to deliver relevant advertisements and measure campaign effectiveness."
+						"desc": "Used by third-party partners such as Google AdSense to show relevant advertisements and measure campaign performance."
 					}
 				},
 				"cookiesUsed": {
@@ -3476,11 +3552,11 @@
 					"content": "Across the Xernerx ecosystem (.xernerx.com), we set and read the following first-party cookies:",
 					"auth": {
 						"title": "Authentication & OAuth State (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state, __xernerx_conn_oauth):",
-						"desc": "Essential HTTP-only secure cookies managed by NextAuth to authenticate your session across subdomains, prevent cross-site request forgery, and verify short-lived (10-minute) PKCE/OAuth state when linking third-party accounts on account.xernerx.com."
+						"desc": "Essential HTTP-only secure cookies managed by NextAuth. They keep you signed in across subdomains, block cross-site request forgery, and verify short-lived OAuth state on account.xernerx.com."
 					},
 					"consent": {
 						"title": "Cookie Consent (xernerx-cookie-consent):",
-						"desc": "An essential cookie that stores your chosen cookie category preferences (essential, functional, analytics, marketing) and an agreedAt timestamp for up to 1 year. If we publish a material update to this Cookie Policy, the agreedAt timestamp is compared against the latest policy version so we can re-prompt you."
+						"desc": "An essential cookie that stores your chosen cookie categories and an agreedAt timestamp for up to 1 year. When we update this Cookie Policy, we compare that timestamp against the latest version to re-prompt you."
 					},
 					"locale": {
 						"title": "Localization (NEXT_LOCALE):",
@@ -3488,31 +3564,40 @@
 					},
 					"appearance": {
 						"title": "Interface, Appearance & Workspace Preferences (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord, pref_*):",
-						"desc": "Functional cookies (including pref_showHeaderStore, pref_showHeaderCommandPalette, pref_showHeaderNotifications, pref_showHeaderDownload, pref_showHeaderAppDrawer, pref_showShortcutHints, pref_showDiscordCollectibles, pref_showGiftBadge, pref_reducedMotion, pref_defaultSidebarCollapsed, and pref_developerMode) that preserve your visual and workspace customizations so the server can render your layout immediately without visual flickering."
+						"desc": "Functional cookies that save your visual and header preferences across all subdomains. They allow the server to render your custom theme and layout immediately without visual flickering."
 					}
 				},
 				"localStorage": {
 					"title": "5. Local Storage & Desktop Client Storage",
-					"content": "In addition to browser cookies, we use browser localStorage (including theme, accent, uiZoom, uiGap, textScale, pref_*, and xernerx_sidebar_view_* keys) to cache non-sensitive interface state locally for instant startup. In the Xernerx Desktop App (Electron), local configuration is stored in metadata.json and each account slot uses an isolated Chromium session partition (persist:xernerx and persist:xernerx-<slot>) so you can switch between multiple accounts safely."
+					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, and sidebar preferences for instant startup. In the Xernerx Desktop App, local settings live in metadata.json. Each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>) so you can switch accounts safely."
 				},
 				"thirdParty": {
 					"title": "6. Third-Party Cookies",
-					"content": "Some features integrate with third-party services, including Discord (for primary authentication), Stripe (for secure checkout, billing portals, and fraud prevention), Google AdSense (for displaying advertisements when consented), and optional connected account providers (GitHub, Twitch, Google/YouTube, X/Twitter, Spotify, Steam, and Reddit) when you initiate account linking. These third parties may set their own cookies in accordance with their respective policies."
+					"content": "Some features connect with third-party services such as Discord, Stripe, and Google AdSense. Optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit) are only contacted when you link an account. These third parties may set their own cookies under their respective privacy policies."
 				},
 				"managing": {
 					"title": "7. Managing Your Preferences",
-					"content": "You can review or update your cookie consent choices at any time by clicking \"Cookie Preferences\" in the website footer to reopen the preferences manager. You may also configure your web browser to block or delete cookies, though blocking essential cookies will prevent you from signing in or using authenticated features."
+					"content": "You can update your cookie consent choices any time by clicking \"Cookie Preferences\" in the website footer. You can also set your browser to block or delete cookies. Please note that blocking essential cookies will prevent you from signing in."
 				},
 				"changes": {
 					"title": "8. Changes to This Policy",
-					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology, infrastructure, or legal requirements. When updated, we bump our policy version date so visitors are prompted to review their cookie preferences."
+					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology or legal requirements. When updated, we bump our policy version date so visitors can review their cookie preferences."
 				},
 				"contact": {
 					"title": "9. Contact",
 					"prefix": "For questions regarding our use of cookies, contact"
 				}
 			},
-			"description": "legal@xernerx.com"
+			"description": "legal@xernerx.com",
+			"faq": {
+				"subtitle": "Common questions about how cookies, session tokens, and theme preferences work on Xernerx.",
+				"q1": "Why does Xernerx use cookies across *.xernerx.com subdomains?",
+				"a1": "First-party cookies allow you to sign in once on account.xernerx.com and stay authenticated seamlessly across app.xernerx.com, portal.xernerx.com, store.xernerx.com, and all other suite subdomains.",
+				"q2": "Can I disable non-essential analytics and marketing cookies?",
+				"a2": "Yes. Click Cookie Preferences in the footer of any page to toggle functional, analytics, or marketing cookies on or off at any time while keeping essential security cookies active.",
+				"q3": "How does the Xernerx Desktop App keep multiple accounts separated?",
+				"a3": "The Desktop App creates an isolated Chromium session partition for each account slot so cookies and tokens for your main and alt Discord accounts never mix."
+			}
 		},
 		"download": {
 			"badge": "Xernerx Desktop App",
@@ -3674,6 +3759,15 @@
 					"title": "Seamless Theme & Account Sync",
 					"description": "Your custom accent colors, dark or light mode preferences, UI scaling, and chosen language synchronize automatically between our web applications, bot services, and desktop app."
 				}
+			},
+			"faq": {
+				"subtitle": "Answers about downloading, updating, and using the Xernerx Desktop App on Windows, macOS, and Linux.",
+				"q1": "Which operating systems are supported by the Xernerx Desktop App?",
+				"a1": "The Xernerx Desktop App is available natively for Windows, macOS, and Linux with automatic background updates across both the Stable and Canary release channels.",
+				"q2": "How does the 1-Click Account Switcher and Phone QR Login work?",
+				"a2": "You can sign in by scanning a QR code or entering a 6-character pairing code from an already authenticated phone or browser, and keep multiple Discord accounts signed in simultaneously in isolated session slots.",
+				"q3": "Is the In-Game Mini Overlay safe to use while streaming or gaming?",
+				"a3": "Yes. You can toggle click-through Ghost Mode with Alt + Shift + O while gaming, and enable Streamer Protection so sensitive dashboard and API token screens remain masked from OBS and screen recorders."
 			}
 		},
 		"features": {
@@ -3832,6 +3926,15 @@
 					"title": "Verified & Monitored Infrastructure",
 					"description": "All official Xernerx Studios bots are verified Discord applications running on our managed multi-node infrastructure with 24/7 telemetry, automatic shard recovery, and strict privacy controls."
 				}
+			},
+			"faq": {
+				"subtitle": "Common questions about inviting and configuring official Xernerx Discord bots in your server.",
+				"q1": "What Discord permissions do I need to invite a Xernerx bot to my server?",
+				"a1": "You need the Manage Server (or Administrator) permission in the target Discord server to authorize an official bot invite through Discord's OAuth2 flow.",
+				"q2": "How do I configure Virtue, Metamorphosis, or Zodiac after inviting them?",
+				"a2": "As soon as the bot joins your server, open app.xernerx.com and select your server from the dashboard to configure XP curves, level roles, translation channels, and module toggles in real time.",
+				"q3": "Are all official Xernerx Studios Discord bots verified by Discord?",
+				"a3": "Yes. Virtue, Metamorphosis, Zodiac, and To-Do List Bot are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes."
 			}
 		},
 		"changelog": {
@@ -4705,6 +4808,142 @@
 			"searchViewAll": "View all results for \"{query}\"",
 			"searchNoResults": "No matching results found for \"{query}\"."
 		},
+		"seo": {
+			"common": {
+				"guideBadge": "Directory & Ecosystem Guide",
+				"faqBadge": "Quick Answers",
+				"faqHeading": "Frequently Asked Questions",
+				"quickLinksLabel": "Explore Directory Routes",
+				"linkExplore": "Explore Hub",
+				"linkBots": "All Discord Bots",
+				"linkServers": "All Discord Servers",
+				"linkLeaderboard": "Global Leaderboards",
+				"linkTopBots": "Top Voted Bots",
+				"linkTopServers": "Biggest Communities",
+				"linkDashboard": "Server Dashboard"
+			},
+			"home": {
+				"guideTitle": "Why Communities & Developers Choose Xernerx App",
+				"guideIntro": "Xernerx App (app.xernerx.com) is the central Discord bot list, public server explorer, and unified configuration dashboard built by Xernerx Studios. Sign in once with your Xernerx Account to discover verified bots, join active servers, or configure Virtue, Metamorphosis, and Zodiac in one place. Our platform combines transparent rankings, live telemetry, and SEO, branding, and audit insights across a growing portfolio of community cases, reviews, and projects.",
+				"guideBody": "Whether you manage a growing gaming community or develop custom Discord bots with @xernerx/framework and @xernerx/stats, every tool is designed for speed and simplicity. You can compare bot features, inspect 30-day server growth charts, read verified community reviews, and manage 3-tier privacy settings (public, limited, or private) across every region. Our team provides dedicated support via Discord and email so server owners and developers always have clear answers.",
+				"pillars": {
+					"p1Title": "Verified Bot & Server Discovery",
+					"p1Desc": "Browse promoted, top-voted, biggest, and newcomer Discord bots and servers. Filter by category tags, compare live guild and member counts, and read authentic community reviews before inviting a bot or joining a server.",
+					"p2Title": "1 Account, 1 Place, 1 Setup Dashboard",
+					"p2Desc": "Configure Virtue text and voice XP leveling, Metamorphosis real-time translation, and Zodiac astrology modules directly from your browser or the Xernerx Desktop App without juggling separate dashboards.",
+					"p3Title": "Live Telemetry, Badges & Spotlight Boosts",
+					"p3Desc": "Track real-time server, member, and shard metrics, embed dynamic SVG status badges, and use Spotlight Boosts or Developer Portal webhooks to grow your community visibility."
+				},
+				"faq": {
+					"subtitle": "Direct answers about discovering Discord bots, joining public servers, and configuring your community on Xernerx App.",
+					"q1": "What is Xernerx App and how does the Discord directory work?",
+					"a1": "Xernerx App is our unified discovery hub and server dashboard. You can browse and vote for verified Discord bots and public servers, inspect live telemetry, and configure official Xernerx services from one account.",
+					"q2": "How do I list my Discord server or bot on app.xernerx.com?",
+					"a2": "Sign in with your Xernerx Account, open the Server Dashboard for communities or the Developer Portal for bots, and set your visibility tier to Public. Your listing will appear in search results and category feeds immediately.",
+					"q3": "Which official Discord bots can I configure in the Xernerx Dashboard?",
+					"a3": "You can configure Virtue for text and voice XP leveling and role rewards, Metamorphosis for automated multilingual channel translation, and Zodiac for daily horoscopes and natal chart utilities.",
+					"q4": "Is browsing, voting, and managing servers on Xernerx App free?",
+					"a4": "Yes. Discovering bots and servers, voting daily, claiming mystery gift streaks, and managing standard server settings are completely free, with optional Ultra and Bot Passes available in the Store."
+				}
+			},
+			"leaderboard": {
+				"guideTitle": "How Xernerx Ecosystem Leaderboards & Rankings Work",
+				"guideIntro": "The Xernerx Ecosystem Leaderboard ranks the highest-voted Discord bots, the largest public Discord servers, and the most dedicated community members by daily login streak and Virtual Credit balance. Rankings update in real time using verified telemetry from our v1 API and bot statistics collector. Every public bot and server in our portfolio of community cases, reviews, and projects is eligible to compete on the podium.",
+				"guideBody": "You can switch seamlessly between the Bots, Servers, and Daily Streaks tabs, filter rankings by search query, or sort bots by total votes, server count, or user reach. Server rankings can be sorted by community votes or total member count, while user leaderboards highlight longest daily mystery gift streaks. Strict 3-tier privacy controls ensure that only profiles, bots, and servers explicitly set to Public appear on global leaderboards.",
+				"pillars": {
+					"p1Title": "Top Voted & Biggest Discord Bots",
+					"p1Desc": "Compare verified Discord bots by community votes, active guild count, and total user reach. Inspect podium leaders (#1 Gold, #2 Silver, #3 Bronze) and click any bot to view its commands, releases, and 30-day telemetry.",
+					"p2Title": "Fastest-Growing Community Servers",
+					"p2Desc": "Discover active gaming, development, social, and creative Discord servers ranked by community upvotes and live member counts. Every listed server includes direct invite links and verified statistics.",
+					"p3Title": "Daily Streak & Virtual Credit Champions",
+					"p3Desc": "Celebrate community members who maintain the longest daily mystery gift streaks and earn Virtual Credits across the Xernerx Suite while respecting individual profile privacy preferences."
+				},
+				"faq": {
+					"subtitle": "Common questions about bot rankings, server vote resets, and daily streak leaderboards.",
+					"q1": "How are Discord bots and servers ranked on the Xernerx Leaderboard?",
+					"a1": "Bots are ranked by verified community upvotes, active server count, or total user reach. Servers are ranked by community votes or member count, and all metrics synchronize automatically with our live telemetry collector.",
+					"q2": "How often can users vote for their favourite Discord bot or server?",
+					"a2": "Signed-in users can vote on bots and servers to support their favourite communities and help them climb the podium. Developers can also subscribe to real-time vote webhooks in the Developer Portal.",
+					"q3": "Why is my profile, bot, or server not showing on the public leaderboard?",
+					"a3": "Only entities with their privacy tier set to Public are listed on leaderboards. If your profile, bot, or server is set to Limited (unlisted) or Private, it is automatically excluded from public rankings.",
+					"q4": "How do I increase my daily streak on the Streaks leaderboard?",
+					"a4": "Claim your free Daily Mystery Gift every 24 hours from the header gift badge or the Store. You can also equip Streak Shields from the Credit Store to protect your streak if you miss a day."
+				}
+			},
+			"dashboard": {
+				"h1": "Server & Bot Management Dashboard",
+				"guideTitle": "Unified Discord Server & Virtue Configuration Dashboard",
+				"guideIntro": "The Xernerx Server Dashboard gives Discord server owners and administrators a single workspace to configure server profiles, track member and message analytics, manage custom vanity links, and customize Virtue XP leveling modules. Powered by 1 Account, 1 Place, 1 Setup, your dashboard automatically detects every Discord server where you hold Administrator or Manage Server permissions. Built-in SEO, branding, and audit controls let you tailor how your community appears across our public directory.",
+				"guideBody": "Inside the dashboard, you can edit your server description, connect a Developer Organization, choose between Public, Limited, or Private visibility, and enable embeddable server widgets. The Statistics tab visualizes 24-hour to lifetime member, message, bot, and boost trends. The Virtue tab provides complete control over text and voice XP multipliers, level-up role rewards, ignored channels, and one-click JSON configuration backups.",
+				"pillars": {
+					"p1Title": "Real-Time Virtue XP & Role Rewards",
+					"p1Desc": "Configure custom XP curve formulas, voice channel XP rates, level-up announcements, and automated Discord role rewards. Export or clone your Virtue setup across servers in seconds.",
+					"p2Title": "Server Telemetry & Growth Analytics",
+					"p2Desc": "Monitor member joins, message activity, bot counts, and server boosts across 24-hour, 7-day, 30-day, and lifetime charts so you can measure community engagement accurately.",
+					"p3Title": "Custom Branding, Vanity URLs & Privacy",
+					"p3Desc": "Customize your public server listing, unlock custom vanity slugs, link social channels, and control whether your server is Public, Limited (direct link only), or strictly Private."
+				},
+				"faq": {
+					"subtitle": "Answers about managing Discord servers, configuring Virtue XP modules, and controlling server privacy.",
+					"q1": "Why does my Discord server not appear in the Server Dashboard sidebar?",
+					"a1": "Only Discord servers where your account has the Administrator or Manage Server permission are shown. If you recently created a server or updated roles, refresh the page to re-sync your guild list.",
+					"q2": "How do I enable and configure Virtue leveling on my Discord server?",
+					"a2": "Invite Virtue from xernerx.com/invites, select your server in the Dashboard sidebar, and open the Virtue tab. You can toggle XP modules, adjust curve modes, and assign level roles immediately.",
+					"q3": "Can I export or copy my Virtue settings to another Discord server?",
+					"a3": "Yes. Use the Configuration Portability card inside the Virtue tab to export your setup as a JSON file, import an existing configuration, or clone settings directly from another server you manage.",
+					"q4": "How do Public, Limited, and Private server visibility settings work?",
+					"a4": "Public servers appear in the /servers explorer and leaderboards. Limited servers are hidden from directories but accessible via direct link, while Private servers are restricted strictly to authorized managers."
+				}
+			},
+			"bots": {
+				"guideTitle": "Explore, Compare & Vote for Verified Discord Bots",
+				"guideIntro": "The Xernerx Discord Bot Directory (app.xernerx.com/bots) helps server owners discover reliable, verified Discord bots across every category—including XP leveling, multilingual translation, moderation, productivity, music, and social utilities. Every listed bot features live guild and user counts powered by @xernerx/stats, interactive slash command references, release changelogs, and verified community reviews.",
+				"guideBody": "Use the sidebar algorithms to browse All Bots, Top Voted leaders, Biggest Bots by server reach, Promoted spotlights, or Newcomers, or filter by functional category tags. Developers can publish their bots through the Developer Portal (portal.xernerx.com), automate telemetry snapshots via our v1 REST API, and use built-in SEO, branding, and audit tools to showcase their portfolio of bot cases, reviews, and projects.",
+				"pillars": {
+					"p1Title": "Algorithmic & Tag-Based Discovery",
+					"p1Desc": "Filter bots by Top Voted, Biggest Guild Reach, Promoted Spotlights, or Newcomers, or drill down into specific category tags to find the exact utility your Discord server needs.",
+					"p2Title": "Live Slash Commands & Release Notes",
+					"p2Desc": "Inspect every bot's registered slash commands, required permissions, 30-day server growth charts, and version release notes directly on its profile page before inviting it.",
+					"p3Title": "Verified Reviews & Developer API Sync",
+					"p3Desc": "Read ratings from real server owners and see live online/offline status synchronized through the Xernerx v1 Bot Stats API and WebSocket telemetry gateway."
+				},
+				"faq": {
+					"subtitle": "Frequently asked questions about browsing, inviting, and publishing Discord bots on Xernerx.",
+					"q1": "How do I invite a Discord bot from the Xernerx Bot Directory?",
+					"a1": "Click any bot card to open its profile page and select the Invite button. You will be directed to Discord's official OAuth2 authorization screen to choose your server and review permissions.",
+					"q2": "How can I submit and list my own Discord bot on app.xernerx.com/bots?",
+					"a2": "Open the Developer Portal at portal.xernerx.com, register your bot with a scoped Bearer API token, push your initial telemetry via @xernerx/stats or the v1 API, and set your bot's privacy to Public.",
+					"q3": "What is the difference between Promoted, Top Voted, and Biggest bots?",
+					"a3": "Promoted bots have an active Spotlight Boost, Top Voted bots are ranked by community upvotes, and Biggest bots are ordered by total verified Discord servers.",
+					"q4": "How do bot developers keep slash commands and server counts updated?",
+					"a4": "Developers use the @xernerx/stats package or PUT /v1/bots/[id]/commands to automatically synchronize live server counts, shard telemetry, and slash command documentation."
+				}
+			},
+			"servers": {
+				"guideTitle": "Discover & Join Active Public Discord Communities",
+				"guideIntro": "The Xernerx Public Server Directory (app.xernerx.com/servers) connects Discord users with welcoming, well-moderated communities across gaming, software development, creative arts, anime, study groups, and regional hubs. Every public server profile showcases live member counts, community upvotes, custom banners, and verified server statistics.",
+				"guideBody": "Switch between Top Voted communities, Biggest Servers by member count, and Newcomer guilds, or use the instant search bar (Ctrl + K) to find servers matching your interests. Server owners can claim and customize their listing in the Server Dashboard, unlock custom vanity invite URLs, enable Virtue XP leaderboards, and highlight their community cases, reviews, and projects with full privacy control.",
+				"pillars": {
+					"p1Title": "Curated Community Categories",
+					"p1Desc": "Browse thriving Discord servers sorted by total member count, community upvotes, or newest additions, complete with live member telemetry and custom server branding.",
+					"p2Title": "Integrated Virtue Server Leaderboards",
+					"p2Desc": "Servers running Virtue can showcase their interactive text and voice XP leaderboards, level-up role tiers, and community engagement graphs right on their public profile.",
+					"p3Title": "Safe, Verified & Privacy-Respecting",
+					"p3Desc": "Server owners control their exact visibility tier (Public, Limited, or Private) and invite links, while community members can leave verified reviews and upvote their favourite hubs."
+				},
+				"faq": {
+					"subtitle": "Common questions about finding, joining, and promoting Discord servers in the Xernerx directory.",
+					"q1": "How do I join a Discord server listed on app.xernerx.com/servers?",
+					"a1": "Click any server card to view its public profile, read its community overview and member statistics, and click the Join Server button to open its official Discord invite link.",
+					"q2": "How can I add my own Discord server to the public server directory?",
+					"a2": "Sign in to app.xernerx.com/dashboard, select your Discord server, configure your description and invite link, and set your server visibility to Public in the Settings tab.",
+					"q3": "How do Spotlight Boosts work for Discord servers?",
+					"a3": "Server owners and community members can apply a Spotlight Boost from the server profile or dashboard to feature the server in the Promoted section at the top of Explore.",
+					"q4": "Can I hide my Discord server from public search results at any time?",
+					"a4": "Yes. Change your server's privacy setting in the Dashboard from Public to Limited (accessible only via direct link) or Private (restricted strictly to server managers) with one click."
+				}
+			}
+		},
 		"portal": {
 			"layout": {},
 			"alt1": "Avatar",
@@ -5160,6 +5399,55 @@
 				"boostedEntry": "boosted {target}",
 				"unlockVanityOption": "Unlock Vanity URL (2,000)",
 				"orgOnlyVanityError": "Organizations can only unlock a Vanity URL from the treasury (select a Bot or Server for Spotlight Boosts)."
+			},
+			"seo": {
+				"badge": "Developer Studio & Organizations",
+				"h1": "Xernerx Developer Portal & Organization Studio",
+				"lead": "Welcome to the Xernerx Portal and Developer Studio. Publish Discord bots, manage Organizations, sync slash commands, and configure webhooks with live API token telemetry. Our website platform includes SEO, branding, content, UI, hosting, and audit tools for every developer. Explore our portfolio of bot cases, reviews, and projects with clear voordelen, prijzen, aanpak, and voor wie. We serve every region including Belgium, België, Nederland, and Europe through our privacy-first team and contact email (mailto:support@xernerx.com).",
+				"guideBadge": "Developer Architecture & Workflow",
+				"guideTitle": "Build, Publish & Scale with the Xernerx Developer Portal",
+				"guideIntro": "The Xernerx Developer Portal (portal.xernerx.com) is the unified studio for Discord bot developers, team organizations, and open-source builders. Sign in once with your Xernerx Account to register personal bots or collaborate across multi-member Organizations. Every registered application connects directly to our v1 REST API, WebSocket gateway, and public bot directory.",
+				"guideBody": "Developers can push live guild, member, and shard metrics using @xernerx/stats or @xernerx/framework in seconds. Inside the studio, you can design slash commands and context menu actions, publish Markdown release notes, configure HMAC-signed webhooks, and pool team credits in the Shared Organization Treasury. Built-in 3-tier privacy settings let you switch any bot or organization between Public, Limited, or Private visibility at any time.",
+				"quickLinksLabel": "Portal Workspace Shortcuts",
+				"links": {
+					"personal": "Personal Studio",
+					"personalBots": "My Personal Bots",
+					"orgInfo": "Organization Profile",
+					"orgMembers": "Team Members",
+					"orgRoles": "RBAC Roles",
+					"orgBots": "Organization Bots",
+					"orgServers": "Linked Servers",
+					"orgSettings": "Privacy & Vanity URLs"
+				},
+				"pillars": {
+					"p1Title": "Multi-Member Developer Organizations & RBAC",
+					"p1Desc": "Create verified Developer Organizations, invite team members by Discord ID, assign granular role permissions, link official support servers, and fund Spotlight Boosts from a shared credit treasury.",
+					"p2Title": "Visual Slash Command Editor & Release Publisher",
+					"p2Desc": "Document slash commands, parameters, and context menu actions visually or sync them via PUT /v1/bots/[id]/commands. Publish versioned release changelogs that appear immediately on your public bot profile.",
+					"p3Title": "Signed Webhooks, Bearer Tokens & 30-Day Telemetry",
+					"p3Desc": "Configure outgoing webhooks signed with X-Xernerx-Signature (SHA-256), test ping latency, replay recent deliveries with one click, and inspect 30-day server, user, shard, and vote growth charts."
+				},
+				"faqBadge": "Developer FAQ",
+				"faqHeading": "Frequently Asked Questions",
+				"faqSubtitle": "Direct answers about publishing Discord bots, managing Developer Organizations, configuring webhooks, and integrating the Xernerx v1 API.",
+				"faq": {
+					"q1": "What is the Xernerx Developer Portal and who is it for?",
+					"a1": "The Xernerx Developer Portal is our central studio for Discord bot creators and engineering teams. It lets you manage personal bots, create multi-member organizations, sync slash commands, and monitor live telemetry.",
+					"q2": "How do I register and publish a Discord bot in the Xernerx Portal?",
+					"a2": "Generate a scoped Bearer API token in Account Settings and send your first stats payload using @xernerx/stats or POST /v1/bots/[id]/stats. Your bot automatically registers in your Portal workspace where you can customize its listing and set it to Public.",
+					"q3": "How do Developer Organizations and team role permissions work?",
+					"a3": "Any developer can create an Organization to group bots, linked Discord servers, and team members under one brand. Organization owners can create custom RBAC roles and invite collaborators by their Discord User ID.",
+					"q4": "How can I synchronize slash commands and release notes for my bot?",
+					"a4": "Open your bot in the Portal and select the Releases & Commands tab to use the Visual Command Editor and Release Notes Publisher. You can also automate synchronization through PUT /v1/bots/[id]/commands and POST /v1/bots/[id]/releases.",
+					"q5": "How do signed webhooks and delivery replays work in the Portal?",
+					"a5": "In the Webhooks tab, add your HTTPS endpoint and generate a Signing Secret (whsec_) to verify X-Xernerx-Signature headers. You can send instant test pings, inspect HTTP status codes and latency, and replay any of your last 25 deliveries.",
+					"q6": "What is the Shared Organization Credit Treasury used for?",
+					"a6": "The Shared Organization Credit Treasury allows team members to deposit Virtual Credits into a common organization pool. Authorized members can spend treasury credits to unlock custom Vanity URLs or activate 24-hour and 7-day Spotlight Boosts.",
+					"q7": "How do Public, Limited, and Private visibility tiers apply to bots and organizations?",
+					"a7": "Public bots and organizations are listed in the app.xernerx.com explorer and leaderboards. Limited entities are hidden from directories but accessible via direct link, while Private entities are restricted strictly to authorized team members.",
+					"q8": "Where can I find documentation and support for @xernerx/framework and @xernerx/stats?",
+					"a8": "Full TypeScript SDK guides and interactive v1 API references are available at docs.xernerx.com. You can also reach our engineering team in the official Discord support server or via email at support@xernerx.com."
+				}
 			}
 		},
 		"categories": {

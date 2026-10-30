@@ -6,6 +6,7 @@ import LeaderboardClient from '@/components/LeaderboardClient';
 export const metadata: Metadata = {
 	title: 'Ecosystem Leaderboards & Top Rankings',
 	description: 'Explore the highest-voted Discord bots, top community servers, and longest daily user streaks across the Xernerx Studios ecosystem.',
+	keywords: ['Xernerx', 'leaderboard', 'Discord bots', 'Discord servers', 'votes', 'streaks', 'rankings', 'community'],
 	alternates: {
 		canonical: '/leaderboard',
 	},

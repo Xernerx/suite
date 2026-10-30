@@ -39,6 +39,53 @@ export interface McpSeoIssue {
 	url: string;
 }
 
+export interface McpGeoSignal {
+	key: string;
+	label: string;
+	detail: string;
+	ok: boolean;
+	weight: number;
+	earnedPoints: number;
+	maxPoints: number;
+}
+
+export interface McpSeoPageReport {
+	url: string;
+	score: number;
+	title: string;
+	description: string;
+	firstParagraph: string;
+	titleLen: number;
+	descriptionLen: number;
+	wordCount: number;
+	readabilityWps: number;
+	loadTimeMs: number;
+	internalLinks: number;
+	externalLinks: number;
+	imagesTotal: number;
+	imagesMissingAlt: number;
+	canonical: string;
+	hasNoindex: boolean;
+	aeoReady: boolean;
+	hasFaqSchema: boolean;
+	hasFaqBlock: boolean;
+	hasStructuredData: boolean;
+	checksPassed: number;
+	checksTotal: number;
+	scoreBreakdown: Record<string, boolean>;
+	headings: { tag: string; text: string }[];
+	recommendations: string[];
+	issues: McpSeoIssue[];
+}
+
+export interface McpContentAgent {
+	detectedCategory: string;
+	seoTitle: string;
+	metaDescription: string;
+	h1Suggestion: string;
+	faqSuggestion: string;
+}
+
 export interface McpSeoScoreData {
 	score: number;
 	geoScore: number;
@@ -51,9 +98,21 @@ export interface McpSeoScoreData {
 	descriptionLen: number;
 	internalLinks: number;
 	externalLinks: number;
+	pagesCount?: number;
+	candidatesFound?: number;
+	highPriorityCount?: number;
+	executiveSummary?: string;
 	scoreBreakdown: Record<string, boolean>;
 	recommendations: string[];
 	issues: McpSeoIssue[];
+	geoSignals?: McpGeoSignal[];
+	pages?: McpSeoPageReport[];
+	roadmap?: {
+		week1: McpSeoIssue[];
+		week2_3: McpSeoIssue[];
+		month2: McpSeoIssue[];
+	};
+	contentAgent?: McpContentAgent;
 	prevScore?: number;
 	prevGeoScore?: number;
 	updatedAt: number;

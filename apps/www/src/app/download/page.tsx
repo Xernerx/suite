@@ -10,6 +10,7 @@ import { useDictionary, useEnvironment, useLoading, usePlatform, useSidebar } fr
 import { redirect } from 'next/navigation';
 import { DesktopPerksBento } from '@/components/DesktopPerksBento';
 import { DesktopInteractivePreview } from '@/components/DesktopInteractivePreview';
+import { PageFaqSection } from '@/components/PageFaqSection';
 
 export default function Page() {
 	const { t } = useDictionary();
@@ -210,6 +211,18 @@ export default function Page() {
 			{/* ASYMMETRIC INTERACTIVE DESKTOP PERKS BENTO */}
 			<div className="relative z-10 w-full">
 				<DesktopPerksBento />
+			</div>
+
+			{/* DESKTOP FAQ */}
+			<div className="relative z-10 w-full">
+				<PageFaqSection
+					subtitle={t('www.download.faq.subtitle')}
+					items={[
+						{ question: t('www.download.faq.q1'), answer: t('www.download.faq.a1') },
+						{ question: t('www.download.faq.q2'), answer: t('www.download.faq.a2') },
+						{ question: t('www.download.faq.q3'), answer: t('www.download.faq.a3') },
+					]}
+				/>
 			</div>
 		</div>
 	);

@@ -10,6 +10,7 @@ import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Input, Selector } from '@xernerx/ui';
+import { AppSeoSection } from '@/components/AppSeoSection';
 
 type LeaderboardTab = 'bots' | 'servers' | 'streaks';
 
@@ -490,6 +491,8 @@ export default function LeaderboardClient() {
 					)}
 				</div>
 			)}
+
+			<AppSeoSection page="leaderboard" />
 		</div>
 	);
 }

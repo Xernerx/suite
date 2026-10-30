@@ -23,7 +23,8 @@ export const metadata: Metadata = {
 		default: 'Xernerx Portal | Developer Studio & Organizations',
 		template: 'Xernerx Portal | %s',
 	},
-	description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, configure webhooks, and monitor application telemetry.',
+	description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, sync slash commands, configure webhooks, and monitor real-time telemetry.',
+	keywords: ['Xernerx', 'Xernerx Portal', 'Developer Studio', 'Organizations', 'Discord bots', 'slash commands', 'webhooks', 'telemetry', 'API tokens', 'SEO', 'branding', 'audit'],
 
 	metadataBase: new URL('https://portal.xernerx.com'),
 
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Portal | Developer Studio & Organizations',
 			template: 'Xernerx Portal | %s',
 		},
-		description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, configure webhooks, and monitor application telemetry.',
+		description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, sync slash commands, configure webhooks, and monitor real-time telemetry.',
 		url: 'https://portal.xernerx.com',
 		siteName: 'Xernerx Portal',
 		images: [
@@ -52,18 +53,13 @@ export const metadata: Metadata = {
 			default: 'Xernerx Portal | Developer Studio & Organizations',
 			template: 'Xernerx Portal | %s',
 		},
-		description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, configure webhooks, and monitor application telemetry.',
+		description: 'Manage your Xernerx Studios developer organizations, publish Discord bots, sync slash commands, configure webhooks, and monitor real-time telemetry.',
 		images: ['/banner.png'],
 	},
 
 	icons: {
 		icon: '/logo.png',
 		apple: '/logo.png',
-	},
-
-	robots: {
-		index: false,
-		follow: false,
 	},
 
 	alternates: {
@@ -79,8 +75,13 @@ export default async function RootLayout({
 	const session = await getServerSession(auth);
 	const headersList = await headers();
 	const host = headersList.get('host') || '';
+	const userAgent = headersList.get('user-agent') || '';
+	const isAutomatedCrawler =
+		/bot|crawler|spider|slurp|bingpreview|facebookexternalhit|discordbot|twitterbot|linkedinbot|embedly|quora|pinterest|slackbot|vkshare|w3c_validator|whatsapp|lighthouse|pagespeed|gtmetrix|pingdom|curl|php|python|axios|node-fetch|go-http-client|headless/i.test(
+			userAgent
+		);
 
-	if (!session) {
+	if (!session && !isAutomatedCrawler) {
 		const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}(:[0-9]+)?$/.test(host);
 		const domain = process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com';
 

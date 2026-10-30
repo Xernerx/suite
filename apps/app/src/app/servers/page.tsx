@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { Server, Users, ArrowLeft, ChevronUp, Image as ImageIcon, Trophy, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { AppSeoSection } from '@/components/AppSeoSection';
 
 interface GuildProfile {
 	id: string;
@@ -221,23 +222,27 @@ export default function ServersList() {
 	const { t } = useDictionary();
 
 	return (
-		<Suspense
-			fallback={
-				<div className="flex flex-col w-full min-h-screen">
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
-						<div className="flex items-center gap-4">
-							<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('app.categories.biggestServers')}
-							</h1>
+		<div className="flex flex-col w-full">
+			<Suspense
+				fallback={
+					<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-[40dvh]">
+						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
+							<div className="flex items-center gap-4">
+								<div className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{t('app.categories.biggestServers')}
+								</div>
+							</div>
+						</div>
+						<div className="flex-1 flex items-center justify-center py-20">
+							<Loading />
 						</div>
 					</div>
-					<div className="flex-1 flex items-center justify-center py-32">
-						<Loading />
-					</div>
-				</div>
-			}
-		>
-			<ServersListContent />
-		</Suspense>
+				}
+			>
+				<ServersListContent />
+			</Suspense>
+
+			<AppSeoSection page="servers" />
+		</div>
 	);
 }

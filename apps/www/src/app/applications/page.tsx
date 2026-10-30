@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useEnvironment, useSidebar, useUser, useDictionary } from '@xernerx/providers';
 import Link from 'next/link';
+import { PageFaqSection } from '@/components/PageFaqSection';
 
 interface ApplicationConfig {
 	_id: string;
@@ -245,6 +246,15 @@ export default function ApplicationsPage() {
 					))}
 				</div>
 			</section>
+
+			<PageFaqSection
+				subtitle={t('www.careers.faq.subtitle')}
+				items={[
+					{ question: t('www.careers.faq.q1'), answer: t('www.careers.faq.a1') },
+					{ question: t('www.careers.faq.q2'), answer: t('www.careers.faq.a2') },
+					{ question: t('www.careers.faq.q3'), answer: t('www.careers.faq.a3') },
+				]}
+			/>
 		</div>
 	);
 }

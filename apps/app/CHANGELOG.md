@@ -2,6 +2,12 @@
 
 # app
 
+## 2.16.11
+
+### Patch Changes
+
+- seo
+
 ## 2.16.10
 
 ### Patch Changes

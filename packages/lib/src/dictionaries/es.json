@@ -131,8 +131,7 @@
 			},
 			"sections": {
 				"introduction": {
-					"title": "1. Introducción",
-					"content": "Esta Política de Privacidad explica cómo Xernerx Studios (\"nosotros\", \"nuestro\") recopila, utiliza y protege tus datos personales cuando utilizas nuestros servicios."
+					"title": "1. Introducción"
 				},
 				"dataCollected": {
 					"title": "2. Información que recopilamos",
@@ -213,73 +212,6 @@
 			"header": {
 				"title": "Términos de Servicio",
 				"effectiveDate": "Fecha de entrada en vigor:"
-			},
-			"sections": {
-				"introduction": {
-					"title": "1. Introducción",
-					"content": "Estos Términos de Servicio (\"Términos\") rigen tu acceso y uso de los servicios proporcionados por Xernerx Studios (\"nosotros\", \"nuestro\"). Al acceder o utilizar nuestros servicios, aceptas estar legalmente vinculado por estos Términos."
-				},
-				"eligibility": {
-					"title": "2. Elegibilidad",
-					"content": "Debes cumplir con la edad legal mínima en tu jurisdicción para utilizar nuestros servicios. Al utilizar nuestros servicios, declaras que cumples con este requisito."
-				},
-				"acceptableUse": {
-					"title": "3. Uso aceptable",
-					"items": [
-						"Participar en actividades ilícitas.",
-						"Acceder a datos sin autorización explícita.",
-						"Intentar interrumpir la infraestructura del servicio.",
-						"Realizar ingeniería inversa o explotar vulnerabilidades."
-					]
-				},
-				"accounts": {
-					"title": "6. Cuentas de usuario",
-					"content": "Eres responsable de mantener la confidencialidad de las credenciales de tu cuenta y de todas las actividades realizadas bajo la misma. No somos responsables de las pérdidas derivadas de un acceso no autorizado."
-				},
-				"data": {
-					"title": "9. Datos de usuario y cookies",
-					"contentPrefix": "Al utilizar nuestros servicios, aceptas nuestras prácticas de manejo de datos descritas en nuestra ",
-					"contentLink": "Política de Privacidad",
-					"contentMiddle": " y ",
-					"cookiesLink": "Política de Cookies",
-					"contentSuffix": ". Los datos pueden incluir información de la cuenta, métricas de uso y datos basados en integraciones."
-				},
-				"availability": {
-					"title": "10. Disponibilidad del servicio",
-					"content": "Nos esforzamos por lograr un tiempo de actividad fiable, pero no garantizamos un servicio ininterrumpido. Los servicios pueden modificarse, suspenderse o discontinuarse en cualquier momento."
-				},
-				"thirdParty": {
-					"title": "11. Servicios de terceros",
-					"content": "Nuestros servicios pueden integrarse con plataformas de terceros como Discord, Stripe y proveedores OAuth opcionales. No somos responsables de las políticas, disponibilidad o prácticas de datos de terceros."
-				},
-				"intellectualProperty": {
-					"title": "12. Propiedad intelectual",
-					"content": "Todo el software, código, marca y materiales siguen siendo propiedad exclusiva de Xernerx Studios o sus licenciantes. Queda prohibida la reproducción o distribución no autorizada."
-				},
-				"warranty": {
-					"title": "13. Descargo de garantías",
-					"content": "Los servicios se proporcionan \"tal cual\" sin garantías de ningún tipo, ya sean expresas o implícitas."
-				},
-				"liability": {
-					"title": "14. Limitación de responsabilidad",
-					"content": "Hasta el máximo permitido por la ley, Xernerx Studios no será responsable de daños indirectos, incidentales o consecuentes derivados del uso de nuestros servicios."
-				},
-				"indemnification": {
-					"title": "15. Indemnización",
-					"content": "Acuerdas indemnizar y eximir de responsabilidad a Xernerx Studios de reclamaciones o responsabilidades derivadas del mal uso de nuestros servicios o violación de estos Términos."
-				},
-				"governingLaw": {
-					"title": "16. Ley aplicable",
-					"content": "Estos Términos se regirán de acuerdo con las leyes aplicables dentro de tu jurisdicción."
-				},
-				"changes": {
-					"title": "17. Cambios en los Términos",
-					"content": "Podemos actualizar estos Términos periódicamente. El uso continuado de nuestros servicios tras las actualizaciones constituye su aceptación."
-				},
-				"contact": {
-					"title": "18. Contacto",
-					"prefix": "Para consultas legales contacta a"
-				}
 			}
 		}
 	},

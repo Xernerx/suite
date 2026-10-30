@@ -125,8 +125,7 @@
 			},
 			"sections": {
 				"introduction": {
-					"title": "1. Introduction",
-					"content": "Cette Politique de confidentialité explique comment Xernerx Studios (« nous », « notre ») collecte, utilise et protège vos données personnelles lorsque vous utilisez nos services."
+					"title": "1. Introduction"
 				},
 				"dataCollected": {
 					"title": "2. Informations que nous collectons",
@@ -202,73 +201,6 @@
 			"header": {
 				"title": "Conditions d'utilisation",
 				"effectiveDate": "Date d'effet :"
-			},
-			"sections": {
-				"introduction": {
-					"title": "1. Introduction",
-					"content": "Ces Conditions d'utilisation (« Conditions ») régissent votre accès et votre utilisation des services fournis par Xernerx Studios (« nous », « notre »). En accédant à nos services, vous acceptez d'être lié par ces Conditions."
-				},
-				"eligibility": {
-					"title": "2. Éligibilité",
-					"content": "Vous devez avoir l'âge légal minimum dans votre juridiction pour utiliser nos services. En utilisant nos services, vous déclarez satisfaire à cette exigence."
-				},
-				"acceptableUse": {
-					"title": "3. Utilisation acceptable",
-					"items": [
-						"Se livrer à des activités illégales.",
-						"Accéder aux données sans autorisation explicite.",
-						"Tenter de perturber l'infrastructure du service.",
-						"Effectuer de l'ingénierie inverse ou exploiter des vulnérabilités."
-					]
-				},
-				"accounts": {
-					"title": "6. Comptes utilisateurs",
-					"content": "Vous êtes responsable du maintien de la confidentialité de vos identifiants de compte et de toutes les activités effectuées sous votre compte. Nous ne sommes pas responsables des pertes résultant d'un accès non autorisé."
-				},
-				"data": {
-					"title": "9. Données utilisateur et cookies",
-					"contentPrefix": "En utilisant nos services, vous acceptez nos pratiques de traitement des données décrites dans notre ",
-					"contentLink": "Politique de confidentialité",
-					"contentMiddle": " et notre ",
-					"cookiesLink": "Politique relative aux cookies",
-					"contentSuffix": ". Les données peuvent inclure des informations de compte, des mesures d'utilisation et des données d'intégration."
-				},
-				"availability": {
-					"title": "6. Disponibilité du service",
-					"content": "Nous nous efforçons d'assurer une disponibilité fiable mais ne garantissons pas un service ininterrompu. Les services peuvent être modifiés, suspendus ou interrompus à tout moment."
-				},
-				"thirdParty": {
-					"title": "7. Services tiers",
-					"content": "Nos services peuvent s'intégrer à des plateformes tierces telles que Discord. Nous ne sommes pas responsables des politiques, de la disponibilité ou des pratiques de données des tiers."
-				},
-				"intellectualProperty": {
-					"title": "8. Propriété intellectuelle",
-					"content": "Tous les logiciels, codes, marques et matériaux restent la propriété exclusive de Xernerx Studios ou de ses concédants de licence. Toute reproduction ou distribution non autorisée est interdite."
-				},
-				"warranty": {
-					"title": "9. Exclusion de garanties",
-					"content": "Les services sont fournis « en l'état » sans aucune garantie d'aucune sorte, expresse ou implicite."
-				},
-				"liability": {
-					"title": "10. Limitation de responsabilité",
-					"content": "Dans toute la mesure permise par la loi, Xernerx Studios ne sera pas responsable des dommages indirects, accessoires ou consécutifs découlant de l'utilisation de nos services."
-				},
-				"indemnification": {
-					"title": "11. Indemnisation",
-					"content": "Vous acceptez d'indemniser et de dégager de toute responsabilité Xernerx Studios contre toute réclamation ou responsabilité découlant d'une mauvaise utilisation de nos services ou d'une violation de ces Conditions."
-				},
-				"governingLaw": {
-					"title": "12. Loi applicable",
-					"content": "Ces Conditions sont régies conformément aux lois applicables dans votre juridiction."
-				},
-				"changes": {
-					"title": "13. Modifications des conditions",
-					"content": "Nous pouvons mettre à jour ces Conditions de temps à autre. L'utilisation continue de nos services après les mises à jour constitue une acceptation."
-				},
-				"contact": {
-					"title": "14. Contact",
-					"prefix": "Pour toute demande d'ordre juridique, contactez"
-				}
 			}
 		}
 	},

@@ -2,6 +2,12 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.2.10
+
+### Patch Changes
+
+- seo
+
 ## 1.2.9
 
 ### Patch Changes
