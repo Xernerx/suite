@@ -1,5 +1,7 @@
 /** @format */
 
+import fs from 'fs';
+import path from 'path';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +28,25 @@ const FETCH_HEADERS: Record<string, string> = {
 
 function escapeXml(str: string): string {
 	return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+function readLocalAppChangelog(appId: string): string | null {
+	const cwd = process.cwd();
+	const candidates = [
+		path.resolve(cwd, '..', appId, 'CHANGELOG.md'),
+		path.resolve(cwd, 'apps', appId, 'CHANGELOG.md'),
+		path.resolve(cwd, '../../apps', appId, 'CHANGELOG.md'),
+		...(appId === 'api' ? [path.resolve(cwd, 'CHANGELOG.md')] : []),
+	];
+	for (const filePath of candidates) {
+		try {
+			if (fs.existsSync(filePath)) {
+				const raw = fs.readFileSync(filePath, 'utf8').trim();
+				if (raw) return raw;
+			}
+		} catch {}
+	}
+	return null;
 }
 
 async function fetchChangelogFromUrl(url: string, timeoutMs = 4000): Promise<string | null> {
@@ -122,8 +143,8 @@ export async function GET() {
 		Promise.all(
 			APPS.map(async (app) => {
 				try {
-					let content: string | null = null;
-					if (isDevEnv) {
+					let content: string | null = readLocalAppChangelog(app.id);
+					if (!content && isDevEnv) {
 						content = await fetchChangelogFromUrl(`http://127.0.0.1:${app.devPort}/api/changelog?version=all`, 2000);
 					}
 					if (!content) {
@@ -154,6 +175,12 @@ export async function GET() {
 	]);
 
 	items.push(...pkgItems);
+	const seenGuids = new Set<string>();
+	const uniqueItems = items.filter((item) => {
+		if (seenGuids.has(item.guid)) return false;
+		seenGuids.add(item.guid);
+		return true;
+	});
 
 	const rssXml = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -164,7 +191,7 @@ export async function GET() {
 		<language>en-gb</language>
 		<lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 		<atom:link href="https://api.xernerx.com/v1/changelog/rss.xml" rel="self" type="application/rss+xml" />
-		${items
+		${uniqueItems
 			.slice(0, 45)
 			.map(
 				(item) => `<item>

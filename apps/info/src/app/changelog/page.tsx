@@ -1,5 +1,7 @@
 /** @format */
 
+import fs from 'fs';
+import path from 'path';
 import { Metadata } from 'next';
 import ChangelogClient, { type ChangelogEntry } from '@/components/changelog/ChangelogClient';
 import SidebarTrigger from '@/components/changelog/SidebarTrigger';
@@ -47,7 +49,7 @@ const FETCH_HEADERS: Record<string, string> = {
 };
 
 function cleanChangelogMarkdown(raw: string): string {
-	return raw
+	const cleaned = raw
 		.replace(/^([ \t]*[-*][ \t]*)<!--\s*@format\s*-->[ \t]*\r?\n+[ \t]+/gim, '$1')
 		.replace(/^[ \t]*[-*][ \t]*<!--\s*@format\s*-->[ \t]*\r?\n*/gim, '')
 		.replace(/<!--\s*@format\s*-->[ \t]*\r?\n*/gi, '')
@@ -56,6 +58,63 @@ function cleanChangelogMarkdown(raw: string): string {
 		.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
 		.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
 		.trim();
+
+	const lines = cleaned.split(/\r?\n/);
+	const sections: Array<{ heading: string; versionId: string; bodyLines: string[] }> = [];
+	let current: { heading: string; versionId: string; bodyLines: string[] } | null = null;
+	const preamble: string[] = [];
+
+	for (const line of lines) {
+		if (line.startsWith('## ')) {
+			const versionId = line
+				.replace(/^##\s+/, '')
+				.replace(/[^a-zA-Z0-9.-]/g, '')
+				.replace(/^v/i, '');
+			current = { heading: line.trim(), versionId, bodyLines: [] };
+			sections.push(current);
+		} else if (current) {
+			current.bodyLines.push(line);
+		} else {
+			preamble.push(line);
+		}
+	}
+
+	if (sections.length === 0) return cleaned;
+
+	const deduped = new Map<string, { heading: string; bodies: string[] }>();
+	for (const sec of sections) {
+		const body = sec.bodyLines.join('\n').trim();
+		if (!body) continue;
+		const key = sec.versionId || sec.heading;
+		const existing = deduped.get(key);
+		if (!existing) {
+			deduped.set(key, { heading: sec.heading, bodies: [body] });
+		} else if (!existing.bodies.includes(body)) {
+			existing.bodies.push(body);
+		}
+	}
+
+	return [...preamble.filter((l) => l.trim().length > 0), ...Array.from(deduped.values()).map((s) => `${s.heading}\n\n${s.bodies.join('\n\n')}`)].join('\n\n').trim();
+}
+
+function readLocalAppChangelog(appId: string): string | null {
+	const cwd = process.cwd();
+	const candidates = [
+		path.resolve(cwd, '..', appId, 'CHANGELOG.md'),
+		path.resolve(cwd, 'apps', appId, 'CHANGELOG.md'),
+		path.resolve(cwd, '../../apps', appId, 'CHANGELOG.md'),
+		...(appId === 'info' ? [path.resolve(cwd, 'CHANGELOG.md')] : []),
+	];
+	for (const filePath of candidates) {
+		try {
+			if (fs.existsSync(filePath)) {
+				const raw = fs.readFileSync(filePath, 'utf8');
+				const cleaned = cleanChangelogMarkdown(raw);
+				if (cleaned) return cleaned;
+			}
+		} catch {}
+	}
+	return null;
 }
 
 async function fetchChangelogFromUrl(url: string, timeoutMs = 4000): Promise<string | null> {
@@ -158,8 +217,13 @@ async function getChangelogs(): Promise<ChangelogEntry[]> {
 	const [appResults, pkgResults] = await Promise.all([
 		Promise.all(
 			APPS.map(async (app): Promise<ChangelogEntry | null> => {
+				const fsContent = readLocalAppChangelog(app.id);
+				if (fsContent) return { appName: app.name, content: fsContent, group: 'applications' };
+
 				if (isDevEnv) {
-					const localContent = await fetchChangelogFromUrl(`http://127.0.0.1:${app.devPort}/api/changelog?version=all`, 2000);
+					const localContent =
+						(await fetchChangelogFromUrl(`http://localhost:${app.devPort}/api/changelog?version=all`, 2000)) ||
+						(await fetchChangelogFromUrl(`http://127.0.0.1:${app.devPort}/api/changelog?version=all`, 2000));
 					if (localContent) return { appName: app.name, content: localContent, group: 'applications' };
 				}
 				const canaryContent = await fetchChangelogFromUrl(`https://${app.id}.canary.${baseDomain}/api/changelog?version=all`);

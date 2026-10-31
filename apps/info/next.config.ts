@@ -5,7 +5,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
 	poweredByHeader: false,
 	outputFileTracingIncludes: {
-		'/changelog': ['../../apps/*/CHANGELOG.md'],
+		'/changelog': ['../../apps/*/CHANGELOG.md', '../*/CHANGELOG.md', './CHANGELOG.md'],
 	},
 	async redirects() {
 		return [

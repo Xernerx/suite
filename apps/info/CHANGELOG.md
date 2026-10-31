@@ -2,6 +2,16 @@
 
 # info
 
+## 1.10.10
+
+### Patch Changes
+
+- <!-- @format -->
+
+    ### Support & Changelog Hub
+    - **Web Application Changelogs**: Restored all 12 Xernerx web application changelogs (`App`, `Portal`, `Account`, `Admin`, `Hosting`, `API`, `CDN`, `Docs`, `Info`, `Store`, `Haste`, and `Website`) on `/changelog` with instant server-side loading and browser fallback support.
+    - **Package Release Deduplication**: Fixed duplicate release entries on `@xernerx/extension-builder` and prevented release cards from persisting when switching between packages.
+
 ## 1.10.9
 
 ### Patch Changes
