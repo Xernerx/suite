@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useSidebar, useEnvironment } from '@xernerx/providers';
 import { useEffect } from 'react';
 import { useDictionary } from '@xernerx/providers';
+import { PageFaqSection } from '@/components/PageFaqSection';
 export default function ContactPage() {
 	const { t } = useDictionary();
 
@@ -176,6 +177,17 @@ export default function ContactPage() {
 						</div>
 					</motion.div>
 				))}
+			</div>
+
+			<div className="mt-16">
+				<PageFaqSection
+					subtitle={t('www.contact.faq.subtitle')}
+					items={[
+						{ question: t('www.contact.faq.q1'), answer: t('www.contact.faq.a1') },
+						{ question: t('www.contact.faq.q2'), answer: t('www.contact.faq.a2') },
+						{ question: t('www.contact.faq.q3'), answer: t('www.contact.faq.a3') },
+					]}
+				/>
 			</div>
 		</div>
 	);

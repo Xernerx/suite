@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ExploreSearchBar } from '@/components/ExploreSearchBar';
 import { BotCard, ServerCard, type BotProfile, type GuildProfile } from '@/components/ExploreCards';
+import { AppSeoSection } from '@/components/AppSeoSection';
 
 export default function Home() {
 	const { hide } = useSidebar();
@@ -344,6 +345,8 @@ export default function Home() {
 					</div>
 				)}
 			</section>
+
+			<AppSeoSection page="home" />
 		</div>
 	);
 }

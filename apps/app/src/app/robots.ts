@@ -6,8 +6,8 @@ export default function robots(): MetadataRoute.Robots {
 	return {
 		rules: {
 			userAgent: '*',
-			allow: ['/', '/bots', '/servers', '/leaderboard', '/users', '/organization'],
-			disallow: ['/api/', '/portal', '/dashboard', '/overlay'],
+			allow: ['/', '/bots', '/servers', '/leaderboard', '/dashboard', '/users', '/organization'],
+			disallow: ['/api/', '/portal', '/overlay'],
 		},
 		sitemap: 'https://app.xernerx.com/sitemap.xml',
 	};

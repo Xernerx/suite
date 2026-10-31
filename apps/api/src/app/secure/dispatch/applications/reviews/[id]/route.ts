@@ -29,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 					reviewNote,
 				},
 			},
-			{ new: true }
+			{ returnDocument: 'after' }
 		);
 
 		if (!updatedApplication) {
@@ -44,7 +44,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				const User = models.users.User as any;
 				const Role = models.core.Role as any;
 
-				await User.findOneAndUpdate({ id: updatedApplication.ownerId }, { $addToSet: { roles: config.rewardRole } }, { upsert: true, new: true });
+				await User.findOneAndUpdate({ id: updatedApplication.ownerId }, { $addToSet: { roles: config.rewardRole } }, { upsert: true, returnDocument: 'after' });
 				console.log(`Successfully assigned Xernerx role ${config.rewardRole} to user ${updatedApplication.ownerId}`);
 
 				// Fetch the Xernerx role to see if it has a tied Discord role

@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
-const SUPPORTED_PROVIDERS = ['github', 'twitch', 'youtube', 'twitter', 'spotify', 'reddit', 'steam', 'easypanel'] as const;
+const SUPPORTED_PROVIDERS = ['github', 'twitch', 'youtube', 'twitter', 'spotify', 'reddit', 'steam', 'easypanel', 'vercel'] as const;
 type SupportedProvider = (typeof SUPPORTED_PROVIDERS)[number];
 
 async function userHasHostingPermission(models: any, userRoles: string[] = []): Promise<boolean> {
@@ -55,10 +55,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 	const verifier = base64UrlEncode(crypto.randomBytes(32));
 	const codeChallenge = base64UrlEncode(crypto.createHash('sha256').update(verifier).digest());
 	const redirectUri = `${origin}/api/connections/${provider}/callback`;
+	const returnTo = req.nextUrl.searchParams.get('returnTo') || '';
 
 	let authorizeUrl: string | null = null;
 
 	switch (provider) {
+		case 'vercel': {
+			const { models } = await database('xernerx');
+			const user = (await models.users.User.findOne({ id: userId }).lean()) as any;
+			const allowed = user ? await userHasHostingPermission(models, user.roles || []) : false;
+			if (!allowed) {
+				return NextResponse.redirect(`${origin}/?view=connections&error=oauth_denied&provider=vercel`);
+			}
+			const clientId = process.env.VERCEL_CLIENT_ID;
+			if (!clientId) {
+				return NextResponse.redirect(`${origin}/?view=connections&error=not_configured&provider=vercel`);
+			}
+			const url = new URL('https://vercel.com/oauth/authorize');
+			url.searchParams.set('client_id', clientId);
+			url.searchParams.set('redirect_uri', redirectUri);
+			url.searchParams.set('state', state);
+			authorizeUrl = url.toString();
+			break;
+		}
 		case 'github': {
 			const clientId = process.env.GITHUB_CLIENT_ID;
 			if (!clientId) {
@@ -171,6 +190,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 			verifier,
 			userId,
 			provider,
+			returnTo,
 		}),
 		{
 			httpOnly: true,
@@ -188,7 +208,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
 	try {
 		const { provider: rawProvider } = await params;
 		const provider = rawProvider.toLowerCase();
-		if (provider !== 'easypanel') {
+		if (provider !== 'easypanel' && provider !== 'vercel') {
 			return NextResponse.json({ error: 'Unsupported credential provider' }, { status: 400 });
 		}
 
@@ -211,18 +231,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
 
 		const body = await req.json().catch(() => ({}));
 		const existingConnections = Array.isArray(user.connections) ? user.connections : [];
-		const existingConn = existingConnections.find((c: any) => c.provider === 'easypanel');
+		const existingConn = existingConnections.find((c: any) => c.provider === provider);
 
-		const email = String(body.email ?? existingConn?.username ?? '').trim();
+		const email = String(body.email ?? body.username ?? existingConn?.username ?? (provider === 'vercel' ? 'vercel' : '')).trim();
 		if (!email) {
-			return NextResponse.json({ error: 'Easypanel account email is required' }, { status: 400 });
+			return NextResponse.json({ error: provider === 'vercel' ? 'Vercel account or team slug is required' : 'Easypanel account email is required' }, { status: 400 });
 		}
 
-		const nextSecret = body.password !== undefined ? String(body.password) : existingConn?.secret || '';
+		const nextSecret = body.password !== undefined ? String(body.password) : body.teamId !== undefined ? String(body.teamId).trim() : existingConn?.secret || '';
 		const nextToken = body.apiToken !== undefined ? String(body.apiToken).trim() : existingConn?.token || '';
+		if (provider === 'vercel' && !nextToken) {
+			return NextResponse.json({ error: 'Vercel Access Token is required' }, { status: 400 });
+		}
 
 		const newConnection = {
-			provider: 'easypanel',
+			provider,
 			id: email.toLowerCase(),
 			username: email,
 			displayName: email,
@@ -232,7 +255,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
 			connectedAt: existingConn?.connectedAt || new Date(),
 		};
 
-		const updatedConnections = [...existingConnections.filter((c: any) => c.provider !== 'easypanel'), newConnection];
+		const updatedConnections = [...existingConnections.filter((c: any) => c.provider !== provider), newConnection];
 
 		await models.users.User.findOneAndUpdate({ id: userId }, { $set: { connections: updatedConnections } });
 
@@ -269,7 +292,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pr
 		}
 
 		const body = await req.json();
-		const showOnProfile = provider === 'easypanel' ? false : Boolean(body.showOnProfile);
+		const showOnProfile = provider === 'easypanel' || provider === 'vercel' ? false : Boolean(body.showOnProfile);
 
 		const { models } = await database('xernerx');
 		const user = (await models.users.User.findOne({ id: userId }).lean()) as any;

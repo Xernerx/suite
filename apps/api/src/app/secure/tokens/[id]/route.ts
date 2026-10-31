@@ -124,7 +124,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any).Token;
 
-		const token = await TokenModel.findOneAndUpdate({ id }, body, { new: true });
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		const token = await TokenModel.findOneAndUpdate({ id }, cleanBody, { returnDocument: 'after' });
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
 		}

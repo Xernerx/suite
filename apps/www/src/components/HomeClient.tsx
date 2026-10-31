@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Timeline from '@/components/Timeline';
 import { LandingCta, PlatformHighlights } from '@/components/PlatformHighlights';
+import { PageFaqSection } from '@/components/PageFaqSection';
 import { WwwDeepSearch } from '@/components/WwwDeepSearch';
 import { BotProfileData, buildConsumerServiceItems, DeveloperSoftwareCard, ServiceProfileCard } from '@/components/LandingServiceCards';
 
@@ -262,19 +263,19 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 								{t('www.hero.links.timeline')}
 							</a>
 							<Link
-								href="/invites"
+								href={getEnvUrl('https://www.xernerx.com/invites')}
 								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.invites')}
 							</Link>
 							<Link
-								href="/applications"
+								href={getEnvUrl('https://www.xernerx.com/applications')}
 								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.careers')}
 							</Link>
 							<Link
-								href="/contact"
+								href={getEnvUrl('https://www.xernerx.com/contact')}
 								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
 							>
 								{t('www.hero.links.contact')}
@@ -469,6 +470,19 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 			{/* HISTORY */}
 			<Timeline />
+
+			{/* FAQ SECTION */}
+			<div className="px-6 pb-16">
+				<PageFaqSection
+					subtitle={t('www.home.faq.subtitle')}
+					items={[
+						{ question: t('www.home.faq.q1'), answer: t('www.home.faq.a1') },
+						{ question: t('www.home.faq.q2'), answer: t('www.home.faq.a2') },
+						{ question: t('www.home.faq.q3'), answer: t('www.home.faq.a3') },
+						{ question: t('www.home.faq.q4'), answer: t('www.home.faq.a4') },
+					]}
+				/>
+			</div>
 
 			{/* CLOSING CALL TO ACTION */}
 			<LandingCta />

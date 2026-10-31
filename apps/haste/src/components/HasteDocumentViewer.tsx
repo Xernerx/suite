@@ -232,7 +232,7 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	};
 
 	const isOwner = Boolean(doc && (doc.isOwner || (effectiveUserId && effectiveUserId === doc.userId)));
-	const linesCount = useMemo(() => (doc?.content ? doc.content.split(/\r?\n/).length : 0), [doc?.content]);
+	const linesCount = useMemo(() => (doc?.content ? doc.content.split(/\r?\n/).length : 0), [doc]);
 	const authorDisplayName = doc?.author?.globalName || doc?.author?.username || doc?.author?.name || null;
 
 	if (!isReady || status === 'loading' || loading || redirectingToLogin) {

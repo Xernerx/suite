@@ -45,14 +45,22 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
 
-	const [activeTab, setActiveTab] = useState<'text' | 'voice'>('text');
+	const [activeTab, setActiveTab] = useState<'levels' | 'text' | 'voice'>('levels');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [loading, setLoading] = useState(true);
-	const [leaderboard, setLeaderboard] = useState<{ text: LeaderboardEntry[]; voice: LeaderboardEntry[] }>({
+	const [leaderboard, setLeaderboard] = useState<{ levels: LeaderboardEntry[]; text: LeaderboardEntry[]; voice: LeaderboardEntry[] }>({
+		levels: [],
 		text: [],
 		voice: [],
 	});
 	const [discordMap, setDiscordMap] = useState<Record<string, any>>({});
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const trackParam = new URLSearchParams(window.location.search).get('track');
+		if (trackParam === 'text' || trackParam === 'voice') setActiveTab(trackParam);
+		else if (trackParam === 'server' || trackParam === 'levels') setActiveTab('levels');
+	}, []);
 
 	useEffect(() => {
 		if (!isReady || !id) return;
@@ -66,14 +74,19 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 				});
 				if (!res.ok || cancelled) return;
 				const data = await res.json();
+				const levelsList = Array.isArray(data?.levels) ? data.levels : [];
 				const textList = Array.isArray(data?.text) ? data.text : Array.isArray(data) ? data : [];
 				const voiceList = Array.isArray(data?.voice) ? data.voice : [];
 
 				if (cancelled) return;
-				setLeaderboard({ text: textList, voice: voiceList });
+				setLeaderboard({
+					levels: levelsList.length > 0 ? levelsList : textList,
+					text: textList,
+					voice: voiceList,
+				});
 
 				const idsToFetch = new Set<string>();
-				for (const item of [...textList, ...voiceList]) {
+				for (const item of [...levelsList, ...textList, ...voiceList]) {
 					const uid = String(item?.userId || item?.ownerId || item?.id || '');
 					if (uid && !item?.isPrivate && !item?.user?.username && !item?.username && !item?.global_name) {
 						idsToFetch.add(uid);
@@ -138,7 +151,7 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 	};
 
 	const activeEntries = useMemo(() => {
-		const list = activeTab === 'text' ? leaderboard.text : leaderboard.voice;
+		const list = activeTab === 'levels' ? leaderboard.levels : activeTab === 'text' ? leaderboard.text : leaderboard.voice;
 		const q = searchQuery.trim().toLowerCase();
 		if (!q) return list;
 		return list.filter((entry) => {
@@ -184,6 +197,19 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 					</div>
 
 					<div className="flex items-center p-1 rounded-2xl bg-(--background)/60 border border-(--border)/10 shrink-0">
+						<button
+							type="button"
+							onClick={() => setActiveTab('levels')}
+							className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+								activeTab === 'levels' ? 'bg-(--accent) text-white shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]' : 'text-(--text-muted) hover:text-(--text)'
+							}`}
+						>
+							<Sparkles size={14} />
+							<span>{t('app.servers.leaderboard.unifiedTab')}</span>
+							<span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeTab === 'levels' ? 'bg-white/20 text-white' : 'bg-(--foreground) text-(--text-muted)'}`}>
+								{leaderboard.levels.length}
+							</span>
+						</button>
 						<button
 							type="button"
 							onClick={() => setActiveTab('text')}

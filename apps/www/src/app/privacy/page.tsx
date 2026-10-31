@@ -4,6 +4,7 @@
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
+import { PageFaqSection } from '@/components/PageFaqSection';
 type Section = {
 	id: string;
 	title: string;
@@ -203,7 +204,7 @@ export default function Page() {
 				<div className="max-w-(--page-width) mx-auto w-full grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-16">
 					{/* TOC */}
 					<aside className="hidden lg:block sticky top-32 self-start">
-						<p className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.privacy.toc')}</p>
+						<div className="text-sm uppercase tracking-wide text-(--text-muted) mb-6">{t('www.privacy.toc')}</div>
 
 						<nav className="space-y-4 text-sm">
 							{sections.map((section) => (
@@ -229,7 +230,7 @@ export default function Page() {
 							>
 								{t('www.privacy.header.title')}
 							</h1>
-							<p className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.privacy.header.effectiveDate')} 21 October 2026</p>
+							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.privacy.header.effectiveDate')} 21 October 2026</div>
 						</header>
 
 						<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm space-y-16">
@@ -247,6 +248,15 @@ export default function Page() {
 								</section>
 							))}
 						</div>
+
+						<PageFaqSection
+							subtitle={t('www.privacy.faq.subtitle')}
+							items={[
+								{ question: t('www.privacy.faq.q1'), answer: t('www.privacy.faq.a1') },
+								{ question: t('www.privacy.faq.q2'), answer: t('www.privacy.faq.a2') },
+								{ question: t('www.privacy.faq.q3'), answer: t('www.privacy.faq.a3') },
+							]}
+						/>
 					</div>
 				</div>
 			</div>

@@ -3,7 +3,8 @@
 
 import { useDictionary } from '@xernerx/providers';
 import Image from 'next/image';
-import { Activity, ExternalLink, FileText, Gauge, Globe, RefreshCw, Search, Server } from 'lucide-react';
+import { Activity, ExternalLink, FileText, Gauge, Globe, RefreshCw, Search, Server, Sparkles } from 'lucide-react';
+import type { McpSeoScoreData } from './OverviewSummaryCards';
 
 export interface SuiteAppVersionInfo {
 	id: string;
@@ -43,8 +44,12 @@ interface OverviewSubdomainCardProps {
 	pingingKeys: Record<string, boolean>;
 	lighthouseScores: Record<string, LighthouseScoreData>;
 	lighthouseLoading: Record<string, boolean>;
+	mcpSeoScores: Record<string, McpSeoScoreData>;
+	mcpSeoLoading: Record<string, boolean>;
 	onPing: (key: string, versionEndpointUrl: string) => void;
 	onRunLighthouse: (key: string, targetUrl: string) => void;
+	onRunMcpSeo: (key: string, targetUrl: string) => void;
+	onOpenMcpModal: (key: string, appName: string, envLabel: string, targetUrl: string) => void;
 	onOpenChangelog: (appName: string, envLabel: string, siteOriginUrl: string) => void;
 }
 
@@ -58,8 +63,12 @@ export default function OverviewSubdomainCard({
 	pingingKeys,
 	lighthouseScores,
 	lighthouseLoading,
+	mcpSeoScores,
+	mcpSeoLoading,
 	onPing,
 	onRunLighthouse,
+	onRunMcpSeo,
+	onOpenMcpModal,
 	onOpenChangelog,
 }: OverviewSubdomainCardProps) {
 	const { t } = useDictionary();
@@ -89,6 +98,12 @@ export default function OverviewSubdomainCard({
 	const getLighthouseScoreStyle = (score: number) => {
 		if (score >= 90) return 'border-(--accent-green)/50 bg-(--accent-green)/10 text-(--accent-green)';
 		if (score >= 50) return 'border-(--accent-orange)/50 bg-(--accent-orange)/10 text-(--accent-orange)';
+		return 'border-(--accent-red)/50 bg-(--accent-red)/10 text-(--accent-red)';
+	};
+
+	const getTenPointScoreStyle = (score: number) => {
+		if (score >= 8) return 'border-(--accent-green)/50 bg-(--accent-green)/10 text-(--accent-green)';
+		if (score >= 5) return 'border-(--accent-orange)/50 bg-(--accent-orange)/10 text-(--accent-orange)';
 		return 'border-(--accent-red)/50 bg-(--accent-red)/10 text-(--accent-red)';
 	};
 
@@ -187,6 +202,8 @@ export default function OverviewSubdomainCard({
 					const isPinging = Boolean(pingingKeys[env.key]);
 					const lhData = lighthouseScores[env.key];
 					const isLhLoading = Boolean(lighthouseLoading[env.key]);
+					const mcpData = mcpSeoScores[env.key];
+					const isMcpLoading = Boolean(mcpSeoLoading[env.key]);
 
 					return (
 						<div key={env.key} className="p-3 rounded-2xl bg-(--background)/60 border border-(--border)/10 flex flex-col items-center justify-between gap-2.5">
@@ -303,6 +320,78 @@ export default function OverviewSubdomainCard({
 											</button>
 										)}
 									</div>
+
+									{/* My Creative Tools SEO / AEO / GEO Analyzer Bar */}
+									<div className="w-full px-2.5 py-2 rounded-lg bg-(--foreground)/30 border border-(--border)/10 flex items-center justify-between gap-2">
+										<button
+											type="button"
+											onClick={() => onOpenMcpModal(env.key, app.name, env.label, env.siteHref)}
+											className="flex items-center gap-1.5 text-[11px] font-semibold text-(--text-muted) hover:text-(--accent) transition-colors cursor-pointer"
+											title={t('admin.dashboard.overview.mcpViewReportTooltip')}
+										>
+											<Sparkles size={13} className="text-(--accent)" />
+											<span>{t('admin.dashboard.overview.mcpCheck')}</span>
+										</button>
+
+										{mcpData ? (
+											<div className="flex items-center gap-2">
+												<button
+													type="button"
+													onClick={() => onOpenMcpModal(env.key, app.name, env.label, env.siteHref)}
+													className="flex items-center gap-2 cursor-pointer hover:opacity-85 transition-opacity"
+													title={`${t('admin.dashboard.overview.mcpViewReportTooltip')}\n${new Date(mcpData.updatedAt).toLocaleString()}`}
+												>
+													<div className="flex items-center gap-1">
+														<span className="text-[10px] text-(--text-muted)">{t('admin.dashboard.overview.mcpCategories.seo')}</span>
+														<span
+															className={`px-1.5 h-6 rounded-full border text-[10px] font-mono font-bold inline-flex items-center justify-center ${getTenPointScoreStyle(mcpData.score)}`}
+														>
+															{mcpData.score}/10
+														</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<span className="text-[10px] text-(--text-muted)">{t('admin.dashboard.overview.mcpCategories.geo')}</span>
+														<span
+															className={`px-1.5 h-6 rounded-full border text-[10px] font-mono font-bold inline-flex items-center justify-center ${getTenPointScoreStyle(mcpData.geoScore)}`}
+														>
+															{mcpData.geoScore}/10
+														</span>
+													</div>
+													<div className="flex items-center gap-1">
+														<span className="text-[10px] text-(--text-muted)">{t('admin.dashboard.overview.mcpCategories.checks')}</span>
+														<span
+															className={`px-1.5 h-6 rounded-full border text-[10px] font-mono font-bold inline-flex items-center justify-center ${
+																mcpData.checksPassed === mcpData.checksTotal
+																	? 'border-(--accent-green)/50 bg-(--accent-green)/10 text-(--accent-green)'
+																	: 'border-(--accent-orange)/50 bg-(--accent-orange)/10 text-(--accent-orange)'
+															}`}
+														>
+															{mcpData.checksPassed}/{mcpData.checksTotal}
+														</span>
+													</div>
+												</button>
+												<button
+													type="button"
+													onClick={() => onRunMcpSeo(env.key, env.siteHref)}
+													disabled={isMcpLoading}
+													title={t('admin.dashboard.overview.mcpRescan')}
+													className="p-1 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer disabled:opacity-50"
+												>
+													<RefreshCw size={11} className={isMcpLoading ? 'animate-spin' : ''} />
+												</button>
+											</div>
+										) : (
+											<button
+												type="button"
+												onClick={() => onRunMcpSeo(env.key, env.siteHref)}
+												disabled={isMcpLoading}
+												className="text-[11px] font-semibold text-(--accent) hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+											>
+												<RefreshCw size={11} className={isMcpLoading ? 'animate-spin' : ''} />
+												<span>{isMcpLoading ? t('admin.dashboard.overview.lighthouseScanning') : t('admin.dashboard.overview.mcpRunScan')}</span>
+											</button>
+										)}
+									</div>
 								</>
 							)}
 
@@ -326,6 +415,15 @@ export default function OverviewSubdomainCard({
 
 								{!isGateway && (
 									<div className="flex items-center gap-3">
+										<a
+											href="https://mycreativeplan.com/my-creative-tools-seo-analyzer/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="inline-flex items-center gap-1 hover:text-(--text) transition-colors"
+										>
+											<Sparkles size={11} />
+											<span>{t('admin.dashboard.overview.mcpCheckShort')}</span>
+										</a>
 										<a
 											href={`https://pagespeed.web.dev/analysis?url=${encodedUrl}`}
 											target="_blank"

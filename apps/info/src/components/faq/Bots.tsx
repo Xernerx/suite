@@ -61,6 +61,23 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 			),
 		},
 		{
+			id: 'card11',
+			title: t('faq.bots.card11.title'),
+			searchableText: `${t('faq.bots.card11.title')} ${t('faq.bots.card11.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.bots.card11.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.exploreBots'), href: 'https://app.xernerx.com/bots', vanity: 'app.xernerx.com/bots' },
+							{ label: t('faq.quickLinks.v1ApiDocs'), href: 'https://docs.xernerx.com/api/v1', vanity: 'docs.xernerx.com/api/v1' },
+							{ label: t('faq.quickLinks.systemStatus'), href: 'https://info.xernerx.com/status', vanity: 'info.xernerx.com/status' },
+						]}
+					/>
+				</div>
+			),
+		},
+		{
 			id: 'card10',
 			title: t('faq.bots.card10.title'),
 			searchableText: `${t('faq.bots.card10.title')} ${t('faq.bots.card10.description')}`,

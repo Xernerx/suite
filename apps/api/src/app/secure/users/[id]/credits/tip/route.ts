@@ -97,7 +97,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 				$inc: { balance: -rawAmount, totalSpent: rawAmount },
 				$push: { transactions: { $each: [senderTx], $slice: -100 } },
 			},
-			{ new: true }
+			{ returnDocument: 'after' }
 		).lean();
 
 		await Credit.findOneAndUpdate(
@@ -107,7 +107,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 				$inc: { balance: rawAmount },
 				$push: { transactions: { $each: [recipientTx], $slice: -100 } },
 			},
-			{ upsert: true, new: true }
+			{ upsert: true, returnDocument: 'after' }
 		);
 
 		return NextResponse.json({

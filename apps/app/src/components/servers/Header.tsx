@@ -6,13 +6,14 @@ import { Bell, BellRing, Building2, Check, Image as ImageIcon, Rocket, Share2, S
 import Image from 'next/image';
 import Link from 'next/link';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
-import { Button, CopyButton } from '@xernerx/ui';
+import { Button, CopyButton, Tooltip } from '@xernerx/ui';
 import SpotlightBoostModal from '@/components/SpotlightBoostModal';
 
 export interface ServerHeaderProps {
 	server: any;
 	setServer?: any;
 	organizationData: any;
+	canManageServer?: boolean;
 	canVote: boolean;
 	nextVoteAt?: string | null;
 	voting: boolean;
@@ -20,7 +21,7 @@ export interface ServerHeaderProps {
 	onVote: () => void;
 }
 
-export function ServerHeader({ server, setServer, organizationData, canVote, nextVoteAt, voting, timeLeft, onVote }: ServerHeaderProps) {
+export function ServerHeader({ server, setServer, organizationData, canManageServer = false, canVote, nextVoteAt, voting, timeLeft, onVote }: ServerHeaderProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const { getEnvUrl } = useEnvironment();
@@ -167,15 +168,17 @@ export function ServerHeader({ server, setServer, organizationData, canVote, nex
 					>
 						{t('app.servers.joinServer')}
 					</Button>
-					<Button
-						variant="secondary"
-						onClick={() => setBoostModalOpen(true)}
-						title={t('app.boost.buttonLabel')}
-						className="px-3.5 justify-center border border-(--accent)/30 hover:border-(--accent) bg-(--accent)/10 text-(--accent)"
-					>
-						<Rocket className="w-4 h-4 mr-1.5" />
-						{t('app.boost.buttonLabel')}
-					</Button>
+					{canManageServer && (
+						<Button
+							variant="secondary"
+							onClick={() => setBoostModalOpen(true)}
+							title={t('app.boost.buttonLabel')}
+							className="px-3.5 justify-center border border-(--accent)/30 hover:border-(--accent) bg-(--accent)/10 text-(--accent)"
+						>
+							<Rocket className="w-4 h-4 mr-1.5" />
+							{t('app.boost.buttonLabel')}
+						</Button>
+					)}
 					<Button
 						variant="secondary"
 						onClick={handleShareProfile}
@@ -186,16 +189,26 @@ export function ServerHeader({ server, setServer, organizationData, canVote, nex
 					</Button>
 				</div>
 				<div className="flex gap-2">
-					<Button
-						variant={canVote ? 'secondary' : 'ghost'}
-						className={`flex-1 justify-center ${canVote ? 'hover:border-(--accent) hover:text-(--accent)' : 'opacity-70 cursor-not-allowed border-(--border)/5 bg-(--foreground)/30'}`}
-						onClick={onVote}
-						disabled={!canVote || voting}
-						loading={voting}
-					>
-						{canVote ? t('app.servers.voteForServer', { count: server.voteCount || 0 }) : t('app.servers.voteAvailableIn', { time: timeLeft })}
-					</Button>
-					{!canVote && nextVoteAt && (
+					{!sessionUserId ? (
+						<Tooltip content={t('app.bots.id.signInToVote')}>
+							<span className="inline-flex flex-1">
+								<Button variant="ghost" disabled className="flex-1 justify-center opacity-70 cursor-not-allowed border-(--border)/5 bg-(--foreground)/30 pointer-events-none">
+									{t('app.servers.voteForServer', { count: server.voteCount || 0 })}
+								</Button>
+							</span>
+						</Tooltip>
+					) : (
+						<Button
+							variant={canVote ? 'secondary' : 'ghost'}
+							className={`flex-1 justify-center ${canVote ? 'hover:border-(--accent) hover:text-(--accent)' : 'opacity-70 cursor-not-allowed border-(--border)/5 bg-(--foreground)/30'}`}
+							onClick={onVote}
+							disabled={!canVote || voting}
+							loading={voting}
+						>
+							{canVote || !nextVoteAt ? t('app.servers.voteForServer', { count: server.voteCount || 0 }) : t('app.servers.voteAvailableIn', { time: timeLeft || '...' })}
+						</Button>
+					)}
+					{sessionUserId && !canVote && nextVoteAt && (
 						<Button
 							variant="secondary"
 							onClick={handleToggleReminder}
@@ -211,15 +224,17 @@ export function ServerHeader({ server, setServer, organizationData, canVote, nex
 					)}
 				</div>
 			</div>
-			<SpotlightBoostModal
-				isOpen={boostModalOpen}
-				onClose={() => setBoostModalOpen(false)}
-				targetType="server"
-				targetId={server.id}
-				targetName={server.name}
-				currentBoostedUntil={activeBoostUntil}
-				onBoostSuccess={(boostedUntil) => setServer?.((prev: any) => (prev ? { ...prev, boostedUntil, promotedUntil: boostedUntil } : prev))}
-			/>
+			{canManageServer && (
+				<SpotlightBoostModal
+					isOpen={boostModalOpen}
+					onClose={() => setBoostModalOpen(false)}
+					targetType="server"
+					targetId={server.id}
+					targetName={server.name}
+					currentBoostedUntil={activeBoostUntil}
+					onBoostSuccess={(boostedUntil) => setServer?.((prev: any) => (prev ? { ...prev, boostedUntil, promotedUntil: boostedUntil } : prev))}
+				/>
+			)}
 		</div>
 	);
 }

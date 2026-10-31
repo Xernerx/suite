@@ -129,7 +129,7 @@ export function LandingCta() {
 					</a>
 					{type !== 'application' && (
 						<Link
-							href="/download"
+							href={getEnvUrl('https://www.xernerx.com/download')}
 							className="px-8 py-4 rounded-2xl bg-(--foreground)/50 text-(--text) font-bold text-sm hover:bg-(--foreground)/80 transition-all border border-(--border)/10 backdrop-blur-md"
 						>
 							{t('www.cta.download')}
@@ -142,19 +142,19 @@ export function LandingCta() {
 						{t('www.cta.docs')}
 					</a>
 					<Link
-						href="/invites"
+						href={getEnvUrl('https://www.xernerx.com/invites')}
 						className="px-6 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
 					>
 						{t('www.cta.invites')}
 					</Link>
 					<Link
-						href="/applications"
+						href={getEnvUrl('https://www.xernerx.com/applications')}
 						className="px-6 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
 					>
 						{t('www.cta.careers')}
 					</Link>
 					<Link
-						href="/contact"
+						href={getEnvUrl('https://www.xernerx.com/contact')}
 						className="px-6 py-4 rounded-2xl bg-(--foreground)/30 text-(--text) font-bold text-sm hover:bg-(--foreground)/60 transition-all border border-(--border)/10 backdrop-blur-md"
 					>
 						{t('www.cta.contact')}

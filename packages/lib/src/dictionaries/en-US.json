@@ -431,8 +431,7 @@
 			},
 			"sections": {
 				"introduction": {
-					"title": "1. Introduction",
-					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our websites, dashboards, Discord bots, APIs, CDN, and desktop applications."
+					"title": "1. Introduction"
 				},
 				"dataCollected": {
 					"title": "2. Information We Collect",
@@ -544,100 +543,6 @@
 				"title": "Terms of Service",
 				"effectiveDate": "Effective Date:"
 			},
-			"sections": {
-				"introduction": {
-					"title": "1. Introduction",
-					"content": "These Terms of Service (\"Terms\") govern your access to and use of all websites, dashboards, Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios (\"we\", \"our\", or \"us\"). By accessing or using our services, you agree to be legally bound by these Terms."
-				},
-				"eligibility": {
-					"title": "2. Eligibility",
-					"content": "You must be at least 13 years of age (or the minimum age of digital consent in your jurisdiction) to use our services. By using our services, you represent and warrant that you satisfy this requirement and comply with Discord's Terms of Service."
-				},
-				"acceptableUse": {
-					"title": "3. Acceptable Use",
-					"items": [
-						"Engage in unlawful, fraudulent, defamatory, or abusive activities, or upload illegal content to our CDN or community portals.",
-						"Attempt to access accounts, private CDN blobs, API endpoints, or administrative tools without explicit authorization.",
-						"Disrupt, overload, or bypass platform rate limits, WebSocket gateways, or security mechanisms.",
-						"Reverse-engineer, scrape, or exploit vulnerabilities in any Xernerx service, bot, or client application."
-					]
-				},
-				"apiUsage": {
-					"title": "4. API, Widgets & WebSocket Gateway Terms",
-					"content": "Developers using our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket RPC gateway must adhere to the following rules:",
-					"items": [
-						"Respect all rate limits and plan quotas; do not spam, scrape, or abuse API endpoints or WebSocket connections.",
-						"You are solely responsible for securing your Bearer API tokens; we are not liable for unauthorized actions caused by leaked keys.",
-						"Telemetry, command registries, and statistics submitted to the platform must be accurate and never artificially inflated.",
-						"We reserve the right to immediately revoke API tokens, disable public widgets, or suspend applications that degrade platform stability or violate these Terms."
-					]
-				},
-				"botUsage": {
-					"title": "5. Bot End User Terms",
-					"content": "Users interacting with Xernerx-powered Discord bots (including Virtue, Metamorphosis, Zodiac, and To-Do List Bot) agree not to exploit command inputs, automate abusive requests, or harass other community members. Server owners and administrators are responsible for configuring bot modules in compliance with both these Terms and Discord's Terms of Service."
-				},
-				"accounts": {
-					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
-					"content": "You authenticate via Discord OAuth2 or our encrypted QR Code / Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not initiate yourself. You may also optionally link third-party accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) to display on your public profile. You are responsible for all activity occurring under your account and can revoke active device sessions or unlink connected accounts at any time in Account Settings."
-				},
-				"storeAndBilling": {
-					"title": "7. Store, Subscriptions & Virtual Credits",
-					"content": "Paid subscriptions (including the Xernerx Ultra bundle, Individual Bot Passes, Server Infrastructure Passes, and Developer API Pro) and add-ons are billed in advance on a recurring monthly or annual cycle via Stripe, which may display localized currencies through Stripe Adaptive Pricing:",
-					"items": [
-						"You may cancel a recurring subscription at any time via the Billing Portal; your plan benefits remain active until the end of the current paid billing period.",
-						"Virtual Credits, Daily Mystery Gifts, and login streak rewards are non-monetary digital platform features with no real-world cash value. They cannot be exchanged for cash, transferred between users, or refunded outside mandatory statutory consumer rights.",
-						"If a subscription downgrades or expires, features and CDN storage quotas revert to standard tier limits; existing files are not immediately deleted without notice, but new uploads may be restricted if you exceed your active quota."
-					]
-				},
-				"desktopClient": {
-					"title": "8. Xernerx Desktop Client",
-					"content": "We grant you a limited, non-exclusive, revocable license to download and use the Xernerx Desktop application for personal or internal community management use. The Desktop client may automatically download and install updates (across Stable or Canary release channels), register optional global keyboard shortcuts, display a floating mini overlay, maintain isolated multi-account sessions, and communicate locally with Discord for Rich Presence."
-				},
-				"data": {
-					"title": "9. User Data & Cookies",
-					"contentPrefix": "By using our services, you agree to our data handling and cookie practices as described in our ",
-					"contentLink": "Privacy Policy",
-					"contentMiddle": " and ",
-					"cookiesLink": "Cookie Policy",
-					"contentSuffix": ". You may export your account data or delete your account at any time through your Account Dashboard."
-				},
-				"availability": {
-					"title": "10. Service Availability",
-					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted or error-free operation. Features, bot modules, APIs, or experimental Canary builds may be modified, suspended, or discontinued at any time."
-				},
-				"thirdParty": {
-					"title": "11. Third-Party Services",
-					"content": "Our ecosystem integrates with third-party platforms including Discord, Stripe, Google (for translation and advertising services), and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit). We are not responsible for the availability, policies, or independent practices of third-party services."
-				},
-				"intellectualProperty": {
-					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, source code (excluding open-source packages licensed under their respective repository licenses), branding, and visual assets remain the exclusive property of Xernerx Studios. You retain ownership of media and content you upload to cdn.xernerx.com or submit to our platform, and grant Xernerx Studios a worldwide, non-exclusive, royalty-free license to host, cache, and deliver that content solely according to the visibility permissions (public, limited, or private) you configure."
-				},
-				"warranty": {
-					"title": "13. Disclaimer of Warranties",
-					"content": "Services are provided \"as is\" and \"as available\" without warranties of any kind, whether express, implied, or statutory, including implied warranties of merchantability, fitness for a particular purpose, or non-infringement."
-				},
-				"liability": {
-					"title": "14. Limitation of Liability",
-					"content": "To the fullest extent permitted by applicable law, Xernerx Studios shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of data, revenue, or profits arising from your use of our services."
-				},
-				"indemnification": {
-					"title": "15. Indemnification",
-					"content": "You agree to indemnify and hold harmless Xernerx Studios and its team members from any claims, damages, or liabilities arising out of your misuse of our services, your uploaded content, your developer applications, or your violation of these Terms."
-				},
-				"governingLaw": {
-					"title": "16. Governing Law",
-					"content": "These Terms shall be governed and construed in accordance with applicable laws, without regard to conflict of law principles, while respecting mandatory consumer protection laws in your country of residence."
-				},
-				"changes": {
-					"title": "17. Changes to Terms",
-					"content": "We may update these Terms from time to time. When material updates are published, we update the effective timestamp and prompt authenticated users to review and accept the revised Terms before continuing to use the platform."
-				},
-				"contact": {
-					"title": "18. Contact",
-					"prefix": "For legal inquiries contact"
-				}
-			},
 			"description": "legal@xernerx.com"
 		},
 		"cookies": {
@@ -645,75 +550,6 @@
 			"header": {
 				"title": "Cookie Policy",
 				"effectiveDate": "Effective Date:"
-			},
-			"sections": {
-				"introduction": {
-					"title": "1. Introduction",
-					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, session partitions, and similar technologies when you visit or interact with our websites, dashboards, APIs, and desktop applications."
-				},
-				"whatAreCookies": {
-					"title": "2. What Are Cookies?",
-					"content": "Cookies are small text files stored on your device by your web browser when you visit a website. They allow the platform to recognize your device, maintain your authenticated session seamlessly across all Xernerx subdomains (*.xernerx.com), and remember your customized interface preferences."
-				},
-				"categories": {
-					"title": "3. Categories of Cookies We Use",
-					"essential": {
-						"title": "Essential Cookies:",
-						"desc": "Strictly necessary for the core operation and security of our services. These include Discord OAuth2 authentication sessions, CSRF protection, secondary account-linking state verification, and your saved cookie consent state. Because the platform cannot function securely without them, they cannot be disabled."
-					},
-					"functional": {
-						"title": "Functional Cookies:",
-						"desc": "Used to remember your personal preferences across subdomains, including your selected language, interface theme (dark, light, or system), accent color, layout density, UI zoom, typography scale, and header/sidebar workspace toggles."
-					},
-					"analytics": {
-						"title": "Analytics Cookies:",
-						"desc": "Help us understand how visitors interact with our websites, monitor platform performance, and diagnose technical errors so we can improve reliability."
-					},
-					"marketing": {
-						"title": "Marketing & Advertising Cookies:",
-						"desc": "Used by third-party advertising partners (such as Google AdSense) to deliver relevant advertisements and measure campaign effectiveness."
-					}
-				},
-				"cookiesUsed": {
-					"title": "4. Specific Cookies We Set",
-					"content": "Across the Xernerx ecosystem (.xernerx.com), we set and read the following first-party cookies:",
-					"auth": {
-						"title": "Authentication & OAuth State (__Secure-next-auth.session-token, __Secure-next-auth.csrf-token, __Secure-next-auth.callback-url, __Secure-next-auth.state, __xernerx_conn_oauth):",
-						"desc": "Essential HTTP-only secure cookies managed by NextAuth to authenticate your session across subdomains, prevent cross-site request forgery, and verify short-lived (10-minute) PKCE/OAuth state when linking third-party accounts on account.xernerx.com."
-					},
-					"consent": {
-						"title": "Cookie Consent (xernerx-cookie-consent):",
-						"desc": "An essential cookie that stores your chosen cookie category preferences (essential, functional, analytics, marketing) and an agreedAt timestamp for up to 1 year. If we publish a material update to this Cookie Policy, the agreedAt timestamp is compared against the latest policy version so we can re-prompt you."
-					},
-					"locale": {
-						"title": "Localization (NEXT_LOCALE):",
-						"desc": "A functional cookie that remembers your preferred interface language across all Xernerx subdomains for up to 1 year."
-					},
-					"appearance": {
-						"title": "Interface, Appearance & Workspace Preferences (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord, pref_*):",
-						"desc": "Functional cookies (including pref_showHeaderStore, pref_showHeaderCommandPalette, pref_showHeaderNotifications, pref_showHeaderDownload, pref_showHeaderAppDrawer, pref_showShortcutHints, pref_showDiscordCollectibles, pref_showGiftBadge, pref_reducedMotion, pref_defaultSidebarCollapsed, and pref_developerMode) that preserve your visual and workspace customizations so the server can render your layout immediately without visual flickering."
-					}
-				},
-				"localStorage": {
-					"title": "5. Local Storage & Desktop Client Storage",
-					"content": "In addition to browser cookies, we use browser localStorage (including theme, accent, uiZoom, uiGap, textScale, pref_*, and xernerx_sidebar_view_* keys) to cache non-sensitive interface state locally for instant startup. In the Xernerx Desktop App (Electron), local configuration is stored in metadata.json and each account slot uses an isolated Chromium session partition (persist:xernerx and persist:xernerx-<slot>) so you can switch between multiple accounts safely."
-				},
-				"thirdParty": {
-					"title": "6. Third-Party Cookies",
-					"content": "Some features integrate with third-party services, including Discord (for primary authentication), Stripe (for secure checkout, billing portals, and fraud prevention), Google AdSense (for displaying advertisements when consented), and optional connected account providers (GitHub, Twitch, Google/YouTube, X/Twitter, Spotify, Steam, and Reddit) when you initiate account linking. These third parties may set their own cookies in accordance with their respective policies."
-				},
-				"managing": {
-					"title": "7. Managing Your Preferences",
-					"content": "You can review or update your cookie consent choices at any time by clicking \"Cookie Preferences\" in the website footer to reopen the preferences manager. You may also configure your web browser to block or delete cookies, though blocking essential cookies will prevent you from signing in or using authenticated features."
-				},
-				"changes": {
-					"title": "8. Changes to This Policy",
-					"content": "We may update this Cookie Policy from time to time to reflect changes in our technology, infrastructure, or legal requirements. When updated, we bump our policy version date so visitors are prompted to review their cookie preferences."
-				},
-				"contact": {
-					"title": "9. Contact",
-					"prefix": "For questions regarding our use of cookies, contact"
-				}
 			},
 			"description": "legal@xernerx.com"
 		}

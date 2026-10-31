@@ -19,21 +19,35 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+		default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 		template: 'Xernerx App | %s',
 	},
-	description:
-		'1 Account, 1 Place, 1 Setup. Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, or track bot statistics and promote your bots in the Developer Portal.',
+	description: 'Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
+	keywords: [
+		'Xernerx',
+		'Xernerx Studios',
+		'Discord bots',
+		'Discord servers',
+		'bot list',
+		'server directory',
+		'Virtue',
+		'Metamorphosis',
+		'Zodiac',
+		'leaderboard',
+		'dashboard',
+		'SEO',
+		'branding',
+		'audit',
+	],
 
 	metadataBase: new URL('https://app.xernerx.com'),
 
 	openGraph: {
 		title: {
-			default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+			default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 			template: 'Xernerx App | %s',
 		},
-		description:
-			'1 Account, 1 Place, 1 Setup. Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, or track bot statistics and promote your bots.',
+		description: 'Discover public Discord bots and servers, configure Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -50,7 +64,7 @@ export const metadata: Metadata = {
 	twitter: {
 		card: 'summary_large_image',
 		title: {
-			default: 'Xernerx App | Bot List, Stats Collector & Unified Service Dashboard',
+			default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 			template: 'Xernerx App | %s',
 		},
 		description: 'Discover Discord bots & servers, configure Virtue, Metamorphosis & Zodiac in one place, and track or promote your bots.',
@@ -75,13 +89,16 @@ export default async function RootLayout({
 	const session = await getServerSession(auth);
 
 	const headersList = await headers();
-	const host = headersList.get('host') || '';
-	const initialEnv: 'dev' | 'canary' | 'public' =
-		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development'
+	const host = (headersList.get('x-forwarded-host') || headersList.get('host') || '').split(',')[0].trim().toLowerCase();
+	const initialEnv: 'dev' | 'canary' | 'public' = host.includes('.canary.')
+		? 'canary'
+		: host.includes('.dev.') || host.includes('localhost') || host.includes('127.0.0.1')
 			? 'dev'
-			: host.includes('.canary.') || process.env.ENVIRONMENT?.toLowerCase() === 'canary'
+			: !host && process.env.ENVIRONMENT?.toLowerCase() === 'canary'
 				? 'canary'
-				: 'public';
+				: !host && process.env.ENVIRONMENT?.toLowerCase() === 'development'
+					? 'dev'
+					: 'public';
 
 	const cookieStore = await cookies();
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';

@@ -14,6 +14,8 @@ const SUITE_SERVICES = [
 	{ id: 'info', name: 'Info', domain: 'info.xernerx.com' },
 	{ id: 'docs', name: 'Docs', domain: 'docs.xernerx.com' },
 	{ id: 'admin', name: 'Admin', domain: 'admin.xernerx.com' },
+	{ id: 'hosting', name: 'Hosting', domain: 'hosting.xernerx.com' },
+	{ id: 'haste', name: 'Haste', domain: 'haste.xernerx.com' },
 	{ id: 'api', name: 'API', domain: 'api.xernerx.com' },
 	{ id: 'cdn', name: 'CDN', domain: 'cdn.xernerx.com' },
 ] as const;
@@ -138,12 +140,12 @@ export async function buildStatusMessage(client: Client, requesterUserId?: strin
 		.addFields([
 			{
 				name: 'Web Applications',
-				value: serviceLines.slice(0, 5).join('\n'),
+				value: serviceLines.slice(0, 6).join('\n'),
 				inline: true,
 			},
 			{
 				name: 'Platform & Infrastructure',
-				value: serviceLines.slice(5).join('\n'),
+				value: serviceLines.slice(6).join('\n'),
 				inline: true,
 			},
 		]);

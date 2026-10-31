@@ -18,6 +18,7 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 	const virtueActions = [
 		{ action: 'guilds', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id }', desc: t('docs.websocket.services.virtue.guildsDesc'), html: true },
 		{ action: 'users', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id }', desc: t('docs.websocket.services.virtue.usersDesc'), html: false },
+		{ action: 'members', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.membersDesc'), html: false },
 		{ action: 'text', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.textDesc'), html: false },
 		{ action: 'voice', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.voiceDesc'), html: false },
 	];
@@ -31,6 +32,7 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 		{ action: 'subscriptions', db: 'xernerx', filter: '{ id } or { ownerId }', desc: t('docs.websocket.services.xernerx.subscriptionsDesc') },
 		{ action: 'guilds', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.guildsDesc') },
 		{ action: 'bots', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.botsDesc') },
+		{ action: 'settings', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.settingsDesc') },
 	];
 
 	const filteredVirtue = virtueActions.filter((a) => !q || 'virtue'.includes(q) || a.action.toLowerCase().includes(q) || a.db.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));

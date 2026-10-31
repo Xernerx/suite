@@ -32,6 +32,9 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 	const [cycles, setCycles] = useState({ daily: false, weekly: false, monthly: false });
 	const [ignoredRoles, setIgnoredRoles] = useState<string[]>([]);
 	const [trackedRoles, setTrackedRoles] = useState<string[]>([]);
+	const [ignoredChannels, setIgnoredChannels] = useState<string[]>([]);
+	const [stackRoles, setStackRoles] = useState<boolean>(true);
+	const [boosterMultiplier, setBoosterMultiplier] = useState<number>(1);
 	const [levelRoles, setLevelRoles] = useState<VirtueLevelRole[]>([]);
 	const [discordRoles, setDiscordRoles] = useState<DiscordRole[]>([]);
 	const [discordChannels, setDiscordChannels] = useState<DiscordChannel[]>([]);
@@ -73,7 +76,10 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 				};
 				const nextIgnored = Array.isArray(data.roles?.ignored) ? data.roles.ignored.map(String).filter(Boolean) : [];
 				const nextTracked = Array.isArray(data.roles?.tracked) ? data.roles.tracked.map(String).filter(Boolean) : [];
-				const nextLevelRoles = normalizeLevelRoles(data.levelRoles ?? data.roles?.levels);
+				const nextIgnoredChannels = Array.isArray(data.channels?.ignored) ? data.channels.ignored.map(String).filter(Boolean) : [];
+				const nextStackRoles = data.stackRoles !== false;
+				const nextBoosterMultiplier = Math.max(1, Number(data.boosterMultiplier) || 1);
+				const nextLevelRoles = normalizeLevelRoles(data);
 				const nextLevelUp = data.levelUp ?? true;
 				const nextLevelMessage = data.levelMessage || '[@mention] reached level [@level] :tada:!';
 				const nextLevelChannel = data.levelChannel || '';
@@ -84,6 +90,9 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 				setCycles(nextCycles);
 				setIgnoredRoles(nextIgnored);
 				setTrackedRoles(nextTracked);
+				setIgnoredChannels(nextIgnoredChannels);
+				setStackRoles(nextStackRoles);
+				setBoosterMultiplier(nextBoosterMultiplier);
 				setLevelRoles(nextLevelRoles);
 				setLevelUp(nextLevelUp);
 				setLevelMessage(nextLevelMessage);
@@ -95,6 +104,9 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 						cycles: nextCycles,
 						ignoredRoles: nextIgnored,
 						trackedRoles: nextTracked,
+						ignoredChannels: nextIgnoredChannels,
+						stackRoles: nextStackRoles,
+						boosterMultiplier: nextBoosterMultiplier,
 						levelRoles: nextLevelRoles,
 						levelUp: nextLevelUp,
 						levelMessage: nextLevelMessage,
@@ -134,13 +146,16 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 				cycles,
 				ignoredRoles,
 				trackedRoles,
+				ignoredChannels,
+				stackRoles,
+				boosterMultiplier,
 				levelRoles,
 				levelUp,
 				levelMessage,
 				levelChannel,
 				autoDelete,
 			}),
-		[mode, cycles, ignoredRoles, trackedRoles, levelRoles, levelUp, levelMessage, levelChannel, autoDelete]
+		[mode, cycles, ignoredRoles, trackedRoles, ignoredChannels, stackRoles, boosterMultiplier, levelRoles, levelUp, levelMessage, levelChannel, autoDelete]
 	);
 
 	const isDirty = useMemo(() => {
@@ -162,12 +177,15 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 
 			if (res.ok) {
 				const updated = await res.json();
-				const savedRoles = normalizeLevelRoles(updated.levelRoles ?? updated.roles?.levels ?? currentConfigObject.levelRoles);
+				const savedRoles = normalizeLevelRoles(updated).length > 0 || currentConfigObject.levelRoles?.length === 0 ? normalizeLevelRoles(updated) : normalizeLevelRoles(currentConfigObject);
 				const nextSnapshot = buildConfigSnapshot({
 					mode: updated.mode || currentConfigObject.mode,
 					cycles: updated.cycles || currentConfigObject.cycles,
 					ignoredRoles: Array.isArray(updated.roles?.ignored) ? updated.roles.ignored : currentConfigObject.roles.ignored,
 					trackedRoles: Array.isArray(updated.roles?.tracked) ? updated.roles.tracked : currentConfigObject.roles.tracked,
+					ignoredChannels: Array.isArray(updated.channels?.ignored) ? updated.channels.ignored : currentConfigObject.channels?.ignored || [],
+					stackRoles: updated.stackRoles !== undefined ? Boolean(updated.stackRoles) : currentConfigObject.stackRoles,
+					boosterMultiplier: updated.boosterMultiplier !== undefined ? Number(updated.boosterMultiplier) : currentConfigObject.boosterMultiplier,
 					levelRoles: savedRoles,
 					levelUp: updated.levelUp ?? currentConfigObject.levelUp,
 					levelMessage: updated.levelMessage ?? currentConfigObject.levelMessage,
@@ -204,7 +222,10 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 		setCycles({ ...originalConfig.cycles });
 		setIgnoredRoles([...originalConfig.roles.ignored]);
 		setTrackedRoles([...originalConfig.roles.tracked]);
-		setLevelRoles(normalizeLevelRoles(originalConfig.levelRoles ?? originalConfig.roles.levels));
+		setIgnoredChannels([...(originalConfig.channels?.ignored || [])]);
+		setStackRoles(originalConfig.stackRoles !== false);
+		setBoosterMultiplier(Math.max(1, Number(originalConfig.boosterMultiplier) || 1));
+		setLevelRoles(normalizeLevelRoles(originalConfig));
 		setLevelUp(originalConfig.levelUp);
 		setLevelMessage(originalConfig.levelMessage);
 		setLevelChannel(originalConfig.levelChannel || '');
@@ -259,10 +280,21 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 		if (cfg.roles && typeof cfg.roles === 'object') {
 			if (Array.isArray(cfg.roles.ignored)) setIgnoredRoles(cfg.roles.ignored.map(String).filter(Boolean));
 			if (Array.isArray(cfg.roles.tracked)) setTrackedRoles(cfg.roles.tracked.map(String).filter(Boolean));
-			if (Array.isArray(cfg.roles.levels)) setLevelRoles(normalizeLevelRoles(cfg.roles.levels));
 		}
-		if (Array.isArray(cfg.levelRoles)) {
-			setLevelRoles(normalizeLevelRoles(cfg.levelRoles));
+		if (cfg.channels && typeof cfg.channels === 'object') {
+			if (Array.isArray(cfg.channels.ignored)) setIgnoredChannels(cfg.channels.ignored.map(String).filter(Boolean));
+		}
+		if (typeof cfg.stackRoles === 'boolean') setStackRoles(cfg.stackRoles);
+		if (typeof cfg.boosterMultiplier === 'number') setBoosterMultiplier(Math.max(1, cfg.boosterMultiplier));
+		if (
+			Array.isArray(cfg.levelRoles) ||
+			Array.isArray(cfg.textLevelRoles) ||
+			Array.isArray(cfg.voiceLevelRoles) ||
+			Array.isArray(cfg.roles?.levels) ||
+			Array.isArray(cfg.roles?.textLevels) ||
+			Array.isArray(cfg.roles?.voiceLevels)
+		) {
+			setLevelRoles(normalizeLevelRoles(cfg));
 		}
 		if (typeof cfg.levelUp === 'boolean') setLevelUp(cfg.levelUp);
 		if (typeof cfg.levelMessage === 'string') setLevelMessage(cfg.levelMessage);
@@ -289,17 +321,24 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 		color: role.color > 0 ? `#${role.color.toString(16).padStart(6, '0')}` : undefined,
 	}));
 
+	const multiChannelOptions = discordChannels.map((channel) => ({
+		label: channel.type === 2 || channel.type === 13 ? `🔊 ${channel.name}` : `#${channel.name}`,
+		value: channel.id,
+	}));
+
 	const channelSelectorOptions = [
 		{ value: '', label: t('app.dashboard.virtue.channelPlaceholder') },
-		...discordChannels.map((channel) => ({
-			value: channel.id,
-			label: (
-				<span className="inline-flex items-center gap-1.5">
-					{channel.type === 5 ? <Megaphone size={13} className="text-(--text-muted) shrink-0" /> : <Hash size={13} className="text-(--text-muted) shrink-0" />}
-					<span>{channel.name}</span>
-				</span>
-			),
-		})),
+		...discordChannels
+			.filter((channel) => channel.type === 0 || channel.type === 5)
+			.map((channel) => ({
+				value: channel.id,
+				label: (
+					<span className="inline-flex items-center gap-1.5">
+						{channel.type === 5 ? <Megaphone size={13} className="text-(--text-muted) shrink-0" /> : <Hash size={13} className="text-(--text-muted) shrink-0" />}
+						<span>{channel.name}</span>
+					</span>
+				),
+			})),
 	];
 
 	return (
@@ -316,20 +355,36 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 				</div>
 
 				<div className="flex flex-col gap-6">
-					{/* Level Mode Selector */}
-					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.difficultyMode')}</label>
-						<Selector
-							value={mode}
-							onChange={(val: any) => setMode(val)}
-							options={[
-								{ label: t('app.dashboard.virtue.modes.easy'), value: 'easy' },
-								{ label: t('app.dashboard.virtue.modes.casual'), value: 'casual' },
-								{ label: t('app.dashboard.virtue.modes.balanced'), value: 'balanced' },
-								{ label: t('app.dashboard.virtue.modes.hard'), value: 'hard' },
-								{ label: t('app.dashboard.virtue.modes.extreme'), value: 'extreme' },
-							]}
-						/>
+					{/* Level Mode & Booster Bonus */}
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.difficultyMode')}</label>
+							<Selector
+								value={mode}
+								onChange={(val: any) => setMode(val)}
+								options={[
+									{ label: t('app.dashboard.virtue.modes.easy'), value: 'easy' },
+									{ label: t('app.dashboard.virtue.modes.casual'), value: 'casual' },
+									{ label: t('app.dashboard.virtue.modes.balanced'), value: 'balanced' },
+									{ label: t('app.dashboard.virtue.modes.hard'), value: 'hard' },
+									{ label: t('app.dashboard.virtue.modes.extreme'), value: 'extreme' },
+								]}
+							/>
+						</div>
+
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.boosterBonus')}</label>
+							<Selector
+								value={String(boosterMultiplier)}
+								onChange={(val: string) => setBoosterMultiplier(Math.max(1, Number(val) || 1))}
+								options={[
+									{ label: t('app.dashboard.virtue.boosterOptions.m1'), value: '1' },
+									{ label: t('app.dashboard.virtue.boosterOptions.m125'), value: '1.25' },
+									{ label: t('app.dashboard.virtue.boosterOptions.m15'), value: '1.5' },
+									{ label: t('app.dashboard.virtue.boosterOptions.m2'), value: '2' },
+								]}
+							/>
+						</div>
 					</div>
 
 					{/* Reset Cycles */}
@@ -415,10 +470,10 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 					)}
 
 					{/* Level Roles (Link Roles to Specific Levels) */}
-					<LevelRolesSection levelRoles={levelRoles} setLevelRoles={setLevelRoles} roleSelectorOptions={roleSelectorOptions} />
+					<LevelRolesSection levelRoles={levelRoles} setLevelRoles={setLevelRoles} roleSelectorOptions={roleSelectorOptions} stackRoles={stackRoles} setStackRoles={setStackRoles} />
 
-					{/* Role Rules */}
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					{/* Role & Channel Rules */}
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 						<div className="flex flex-col gap-2">
 							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.ignoredRoles')}</label>
 							<MultiSelector value={ignoredRoles} onChange={setIgnoredRoles} options={multiRoleOptions} placeholder={t('app.dashboard.virtue.rolesPlaceholder')} />
@@ -429,6 +484,12 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.trackedRoles')}</label>
 							<MultiSelector value={trackedRoles} onChange={setTrackedRoles} options={multiRoleOptions} placeholder={t('app.dashboard.virtue.rolesPlaceholder')} />
 							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.virtue.trackedRolesDesc')}</span>
+						</div>
+
+						<div className="flex flex-col gap-2">
+							<label className="text-sm font-bold text-(--text)">{t('app.dashboard.virtue.ignoredChannels')}</label>
+							<MultiSelector value={ignoredChannels} onChange={setIgnoredChannels} options={multiChannelOptions} placeholder={t('app.dashboard.virtue.ignoredChannelsPlaceholder')} />
+							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.virtue.ignoredChannelsDesc')}</span>
 						</div>
 					</div>
 				</div>

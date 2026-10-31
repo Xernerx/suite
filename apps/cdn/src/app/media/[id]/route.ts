@@ -122,7 +122,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 						.filter(Boolean);
 		}
 
-		const updated = await MediaModel.findByIdAndUpdate(id, { $set: updateFields }, { new: true });
+		const updated = await MediaModel.findByIdAndUpdate(id, { $set: updateFields }, { returnDocument: 'after' });
 
 		return NextResponse.json({ success: true, media: updated }, { headers: corsHeaders });
 	} catch (error: any) {

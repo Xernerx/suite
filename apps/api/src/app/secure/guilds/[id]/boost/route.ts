@@ -74,7 +74,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 				$inc: { balance: -tier.cost, totalSpent: tier.cost },
 				$push: { transactions: { $each: [txEntry], $slice: -100 } },
 			},
-			{ new: true }
+			{ returnDocument: 'after' }
 		).lean();
 
 		return NextResponse.json({

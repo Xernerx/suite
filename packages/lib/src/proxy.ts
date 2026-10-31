@@ -12,9 +12,14 @@ export function proxy(request: NextRequest) {
 	if (cookieLocale && supportedLocales.includes(cookieLocale as any)) {
 		locale = cookieLocale;
 	} else {
+		const userAgent = request.headers.get('user-agent') || '';
 		const acceptLang = request.headers.get('accept-language');
+		const isAutomatedCrawler =
+			/bot|crawl|spider|slurp|lighthouse|pagespeed|gtmetrix|headless|curl|wget|php|axios|undici|python|facebookexternalhit|discordbot|twitterbot|linkedinbot|whatsapp|applebot|bingbot|googlebot|yandex|duckduckbot|baiduspider|semrush|ahrefs|mj12bot|dotbot|screaming|seo|analyzer|audit/i.test(
+				userAgent
+			) || acceptLang === 'nl-BE,nl;q=0.9,en;q=0.8';
 
-		if (acceptLang) {
+		if (acceptLang && !isAutomatedCrawler) {
 			const preferredFull = acceptLang.split(',')[0].split(';')[0].trim();
 			const preferredBase = preferredFull.split('-')[0];
 

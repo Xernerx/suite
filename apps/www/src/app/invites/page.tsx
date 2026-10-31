@@ -6,6 +6,7 @@ import Image from 'next/image';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
+import { PageFaqSection } from '@/components/PageFaqSection';
 
 interface Invite {
 	id: string;
@@ -219,6 +220,15 @@ export default function InvitesPage() {
 						))}
 					</div>
 				</section>
+
+				<PageFaqSection
+					subtitle={t('www.invites.faq.subtitle')}
+					items={[
+						{ question: t('www.invites.faq.q1'), answer: t('www.invites.faq.a1') },
+						{ question: t('www.invites.faq.q2'), answer: t('www.invites.faq.a2') },
+						{ question: t('www.invites.faq.q3'), answer: t('www.invites.faq.a3') },
+					]}
+				/>
 			</div>
 		</div>
 	);

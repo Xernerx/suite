@@ -2,6 +2,39 @@
 
 # docs
 
+## 1.8.10
+
+### Patch Changes
+
+- ### API v1 Leaderboard Tracks, Virtue Multi-Track Role Schema & WebSocket RPC Updates
+    - **`GET /v1/leaderboard` & Virtue Guild Configuration (`api`, `@xernerx/lib`):**
+        - Extended `GET /v1/leaderboard` with `levels` (Global Xernerx XP rankings), `virtueGuilds`, and optional `?guild=[guildId]` query support returning per-server `guildLevels` (`server`, `text`, and `voice` tracks).
+        - Extended `PATCH /secure/guilds/[id]/virtue` and the Virtue Guild schema to persist `textLevelRoles`, `voiceLevelRoles`, `stackRoles`, `boosterMultiplier`, and `channels.ignored`, while maintaining backward compatibility with `levelRoles` (`track: 'server' | 'text' | 'voice'`).
+        - Added `GET` & `POST /secure/hosting/vercel` for querying Vercel team projects/deployments and triggering redeployments using either a linked user OAuth token or team fallback token.
+    - **WebSocket Gateway (`websocket`) & Developer Documentation (`docs`):**
+        - Added `settings` action support to `service: "xernerx"` and bulk guild/member level queries plus guild XP reset support to `service: "virtue"`.
+        - Updated `docs.xernerx.com` API and WebSocket reference pages with `/v1/leaderboard?guild=[guildId]`, `/secure/hosting/vercel`, and the `members` (`virtue`) and `settings` (`xernerx`) WebSocket actions.
+
+- Updated dependencies
+    - @xernerx/lib@1.17.0
+    - @xernerx/components@0.12.7
+    - @xernerx/styles@0.2.2
+    - @xernerx/providers@0.18.5
+    - @xernerx/feedback@0.4.10
+    - @xernerx/ui@0.7.15
+
+## 1.8.9
+
+### Patch Changes
+
+- Integrated My Creative Tools SEO & GEO Analyzer into the Admin SEO & Subdomain Telemetry dashboard (`GET /secure/core/seo-analyzer`), adding 10-point SEO/GEO readiness scores, 21-point technical & content checklist audits, AEO/FAQ status detection, and prioritized action items across all suite subdomains.
+- Updated dependencies
+    - @xernerx/lib@1.16.6
+    - @xernerx/components@0.12.6
+    - @xernerx/providers@0.18.4
+    - @xernerx/feedback@0.4.9
+    - @xernerx/ui@0.7.14
+
 ## 1.8.8
 
 ### Patch Changes

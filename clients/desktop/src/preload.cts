@@ -86,6 +86,7 @@ contextBridge.exposeInMainWorld('electron', {
 	minimize: () => ipcRenderer.send('window:minimize'),
 	maximize: () => ipcRenderer.send('window:maximize'),
 	close: () => ipcRenderer.send('window:close'),
+	reload: (ignoreCache?: boolean) => ipcRenderer.send('window:reload', Boolean(ignoreCache)),
 	isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
 	getMetadata: () => {
 		if (!inFlightMetadataPromise) {

@@ -56,7 +56,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 					const channels = await channelRes.json();
 					if (Array.isArray(channels)) {
 						profile.serverChannels = channels
-							.filter((c: any) => c && c.id && (Number(c.type) === 0 || Number(c.type) === 5))
+							.filter((c: any) => c && c.id && (Number(c.type) === 0 || Number(c.type) === 5 || Number(c.type) === 2 || Number(c.type) === 13))
 							.sort((a: any, b: any) => (Number(a.position) || 0) - (Number(b.position) || 0))
 							.map((c: any) => ({
 								id: String(c.id),
@@ -94,8 +94,26 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		}
 
 		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		const stripSubdocId = (arr: any[]) => arr.map(({ _id: _itemOmitId, ...item }: any) => item);
 		if (Array.isArray(cleanBody.levelRoles)) {
-			cleanBody.levelRoles = cleanBody.levelRoles.map(({ _id: _itemOmitId, ...item }: any) => item);
+			cleanBody.levelRoles = stripSubdocId(cleanBody.levelRoles);
+		}
+		if (Array.isArray(cleanBody.textLevelRoles)) {
+			cleanBody.textLevelRoles = stripSubdocId(cleanBody.textLevelRoles);
+		}
+		if (Array.isArray(cleanBody.voiceLevelRoles)) {
+			cleanBody.voiceLevelRoles = stripSubdocId(cleanBody.voiceLevelRoles);
+		}
+		if (cleanBody.roles && typeof cleanBody.roles === 'object') {
+			if (Array.isArray(cleanBody.roles.levels)) {
+				cleanBody.roles.levels = stripSubdocId(cleanBody.roles.levels);
+			}
+			if (Array.isArray(cleanBody.roles.textLevels)) {
+				cleanBody.roles.textLevels = stripSubdocId(cleanBody.roles.textLevels);
+			}
+			if (Array.isArray(cleanBody.roles.voiceLevels)) {
+				cleanBody.roles.voiceLevels = stripSubdocId(cleanBody.roles.voiceLevels);
+			}
 		}
 
 		const updated = await GuildModel.findOneAndUpdate({ id }, { $set: cleanBody }, { returnDocument: 'after', upsert: true, runValidators: true }).lean();

@@ -8,57 +8,77 @@ import Link from 'next/link';
 import { Server, Users, ChevronUp } from 'lucide-react';
 import Image from 'next/image';
 
-interface BotProfile {
-	id: string;
-	description?: string | null;
-	voteCount?: number;
-}
-
 interface DiscordProfile {
 	global_name?: string;
 	username?: string;
+	avatar?: string | null;
 	avatarUrl?: string | null;
 	bannerUrl?: string | null;
 }
 
+interface BotProfile {
+	id: string;
+	name?: string;
+	description?: string | null;
+	voteCount?: number;
+	discord?: DiscordProfile | null;
+}
+
 export function BotCard({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPrefix?: string }) {
-	const { getEnvUrl } = useEnvironment();
+	const { getEnvUrl, isReady } = useEnvironment();
 	const { t } = useDictionary();
-	const [discord, setDiscord] = useState<DiscordProfile | null>(null);
+	const [discord, setDiscord] = useState<DiscordProfile | null>(bot.discord || null);
 	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(!bot.discord);
 
 	useEffect(() => {
+		if (!isReady || !bot?.id) return;
+
+		const controller = new AbortController();
+
 		const fetchData = async () => {
 			try {
 				const [discordRes, statsRes] = await Promise.all([
-					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`), { next: { revalidate: 300 } }),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${bot.id}/stats?limit=1`), { next: { revalidate: 300 } }),
+					bot.discord
+						? Promise.resolve(null)
+						: fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`), {
+								signal: controller.signal,
+							}).catch(() => null),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${bot.id}/stats?limit=1`), {
+						credentials: 'include',
+						signal: controller.signal,
+					}).catch(() => null),
 				]);
 
-				if (discordRes.ok) {
-					const data = await discordRes.json();
-					setDiscord(data);
+				if (discordRes?.ok) {
+					const data = await discordRes.json().catch(() => null);
+					if (data) setDiscord(data);
+				} else if (bot.discord) {
+					setDiscord(bot.discord);
 				}
 
-				if (statsRes.ok) {
-					const data = await statsRes.json();
-					if (data && data.length > 0) {
-						const statsData = { guildCount: data[0].guildCount, userCount: data[0].userCount };
-						setStats(statsData);
+				if (statsRes?.ok) {
+					const data = await statsRes.json().catch(() => null);
+					if (Array.isArray(data) && data.length > 0) {
+						setStats({ guildCount: data[0].guildCount, userCount: data[0].userCount });
 					}
 				}
-			} catch (error) {
-				console.error(`Failed to fetch data for ${bot.id}:`, error);
+			} catch {
+				// Ignore aborted or offline fetches in dev
 			} finally {
-				setLoading(false);
+				if (!controller.signal.aborted) {
+					setLoading(false);
+				}
 			}
 		};
-		fetchData();
-	}, [bot.id, getEnvUrl]);
 
-	const name = discord?.global_name || discord?.username || t('components.cards.botcard.unknownBot');
-	const avatar = discord?.avatarUrl;
+		fetchData();
+
+		return () => controller.abort();
+	}, [bot.id, bot.discord, getEnvUrl, isReady]);
+
+	const name = discord?.global_name || discord?.username || bot.name || t('components.cards.botcard.unknownBot');
+	const avatar = discord?.avatarUrl || (discord?.avatar ? `https://cdn.discordapp.com/avatars/${bot.id}/${discord.avatar}.png?size=128` : null);
 	const banner = discord?.bannerUrl;
 
 	return (

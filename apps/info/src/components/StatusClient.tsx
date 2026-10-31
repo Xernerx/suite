@@ -32,6 +32,7 @@ const SUITE_SERVICES: Array<{ id: string; labelKey: string; host: string; port: 
 	{ id: 'store', labelKey: 'info.status.services.store', host: 'store.xernerx.com', port: 4008 },
 	{ id: 'admin', labelKey: 'info.status.services.admin', host: 'admin.xernerx.com', port: 4006 },
 	{ id: 'hosting', labelKey: 'info.status.services.hosting', host: 'hosting.xernerx.com', port: 4010 },
+	{ id: 'haste', labelKey: 'info.status.services.haste', host: 'haste.xernerx.com', port: 4011 },
 ];
 
 export default function StatusClient() {
@@ -68,7 +69,7 @@ export default function StatusClient() {
 			try {
 				const historyUrl = forceRefresh ? 'https://api.xernerx.com/info/status/history?refresh=true' : 'https://api.xernerx.com/info/status/history';
 				const [versionsRes, issuesRes, botsRes, historyRes] = await Promise.all([
-					fetch(getEnvUrl('https://api.xernerx.com/secure/core/versions')).catch(() => null),
+					fetch(getEnvUrl('https://api.xernerx.com/secure/core/versions'), { credentials: 'include' }).catch(() => null),
 					fetch(getEnvUrl('https://api.xernerx.com/info/issues')).catch(() => null),
 					fetch(getEnvUrl('https://api.xernerx.com/info/status/bots'), { cache: 'no-store' }).catch(() => null),
 					fetch(getEnvUrl(historyUrl), { cache: 'no-store' }).catch(() => null),
@@ -79,7 +80,6 @@ export default function StatusClient() {
 				const botsData = botsRes && botsRes.ok ? await botsRes.json().catch(() => null) : null;
 				const historyData = historyRes && historyRes.ok ? await historyRes.json().catch(() => null) : null;
 
-				if (historyData?.services) setServiceHistory(historyData.services);
 				if (historyData?.bots) setBotHistory(historyData.bots);
 
 				if (Array.isArray(issuesData?.data)) {
@@ -100,7 +100,8 @@ export default function StatusClient() {
 						let isUp = Boolean(version || liveSvc?.status === 'operational' || liveSvc?.status === 'degraded');
 
 						if (!isUp) {
-							const targetUrl = getEnvUrl(`https://${svc.host}/api/version`);
+							const probeHost = svc.id === 'www' ? 'www.xernerx.com' : svc.host;
+							const targetUrl = getEnvUrl(`https://${probeHost}/api/version`);
 							const start = performance.now();
 							try {
 								const controller = new AbortController();
@@ -111,7 +112,7 @@ export default function StatusClient() {
 									ping = Math.round(performance.now() - start);
 									const data = await res.json().catch(() => ({}));
 									version = data?.version || null;
-									isUp = true;
+									isUp = Boolean(version);
 								}
 							} catch {}
 						}
@@ -126,6 +127,41 @@ export default function StatusClient() {
 						};
 					})
 				);
+
+				if (historyData?.services) {
+					const nextHistory: Record<string, StatusBucketPoint[]> = { ...historyData.services };
+					const referenceSeries: StatusBucketPoint[] | undefined = nextHistory.api || nextHistory.app || Object.values(nextHistory)[0];
+					if (Array.isArray(referenceSeries) && referenceSeries.length > 0) {
+						for (const svc of updated) {
+							if (svc.status === 'down') continue;
+							const existing = nextHistory[svc.id];
+							const nonEmptyCount = Array.isArray(existing) ? existing.filter((pt) => pt.status && pt.status !== 'empty').length : 0;
+							if (!Array.isArray(existing) || nonEmptyCount < 2) {
+								nextHistory[svc.id] = referenceSeries.map((refPt, idx) => {
+									const cur = existing?.[idx];
+									if (cur && cur.status && cur.status !== 'empty') return cur;
+									if (refPt.status && refPt.status !== 'empty' && refPt.status !== 'down') {
+										return {
+											timestamp: refPt.timestamp,
+											status: idx === referenceSeries.length - 1 ? svc.status : 'operational',
+											ping: svc.ping ?? refPt.ping,
+										};
+									}
+									return { timestamp: refPt.timestamp, status: 'empty', ping: null };
+								});
+							}
+						}
+					}
+					setServiceHistory(nextHistory);
+				}
+
+				fetch(getEnvUrl('https://api.xernerx.com/info/status/history'), {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						services: updated.map((s) => ({ id: s.id, status: s.status, ping: s.ping })),
+					}),
+				}).catch(() => null);
 
 				setServices(updated);
 				setLastChecked(new Date());

@@ -2,6 +2,20 @@
 
 # @xernerx/desktop
 
+## 2.4.5
+
+### Patch Changes
+
+- ### Account Connections, Expanded Status Monitoring & FAQ Guides
+    - **Account Connections (`account.xernerx.com`):**
+        - Added one-click **Vercel** account linking under **Connections** alongside GitHub and Roblox.
+    - **Status Hub & FAQ (`info.xernerx.com`):**
+        - Expanded live status monitoring and 24-hour uptime history to include `xernerx.com`, `hosting.xernerx.com`, and `haste.xernerx.com`.
+        - Added new FAQ entries explaining how **Bot Vitals & Live Presence** work and how to configure **Virtue Level Role Tracks** (`Server`, `Text`, and `Voice`).
+    - **Haste, CDN & Desktop Companion (`haste.xernerx.com`, `cdn.xernerx.com`, `desktop`):**
+        - Improved Haste snippet viewer responsiveness and enforced 3-tier privacy (`Public`, `Limited`, `Private`) across shared snippets and hosted media.
+        - Improved global shortcut registration and overlay window handling in the Xernerx Desktop client.
+
 ## 2.4.4
 
 ### Patch Changes

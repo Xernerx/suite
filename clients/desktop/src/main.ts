@@ -338,23 +338,32 @@ async function waitForServer(targetUrl?: string) {
 	}
 	const maxAttempts = 4;
 	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		let retryLabel = 'Retrying';
 		try {
 			const controller = new AbortController();
 			const timeout = setTimeout(() => controller.abort(), 4000);
 			const res = await fetch(`${checkOrigin}/api/version`, { signal: controller.signal });
 			clearTimeout(timeout);
-			if (res.ok || res.status >= 400) {
+			if (res.ok || (res.status >= 400 && res.status < 500)) {
 				sendStatus('Ready');
 				return;
 			}
+			const bodySnippet = await res.text().catch(() => '');
+			const isTunnel1033 = res.status === 530 || /1033|Argo\s*Tunnel|Cloudflare\s*Tunnel/i.test(bodySnippet);
+			retryLabel = isTunnel1033 ? 'Tunnel Error (1033) — Retrying' : `Server Error (${res.status}) — Retrying`;
+			if (attempt === maxAttempts) {
+				log(`WARNING: Server check returned HTTP ${res.status} after ${maxAttempts} attempts; proceeding to launch with error guard.`);
+				return;
+			}
 		} catch (e) {
+			retryLabel = 'Server Unreachable — Retrying';
 			if (attempt === maxAttempts) {
 				log(`WARNING: Server check timed out after ${maxAttempts} attempts (${(e as Error).message}); proceeding to launch.`);
 				return;
 			}
 		}
 		for (let s = 2; s > 0; s--) {
-			sendStatus(`Retrying in ${s}s`);
+			sendStatus(`${retryLabel} in ${s}s`);
 			await new Promise((r) => setTimeout(r, 1000));
 		}
 	}
@@ -418,6 +427,13 @@ function registerIpcHandlers() {
 		} else {
 			win?.close();
 		}
+	});
+
+	ipcMain.on('window:reload', (event, ignoreCache?: boolean) => {
+		const target = BrowserWindow.fromWebContents(event.sender) || win;
+		if (!target || target.isDestroyed()) return;
+		if (ignoreCache) target.webContents.reloadIgnoringCache();
+		else target.webContents.reload();
 	});
 
 	ipcMain.handle('window:isMaximized', (event) => {
@@ -731,14 +747,15 @@ function createMainWindow(bounds: Electron.Rectangle) {
 		win.webContents.on('will-redirect', (_, url) => log(`REDIRECT: ${url}`));
 	}
 
-	const recordLastVisited = (_event: unknown, url: string) => {
+	const recordLastVisited = (url: string, httpResponseCode?: number) => {
 		if (!url || !/^https?:\/\//i.test(url) || url.includes('/overlay')) return;
+		if (typeof httpResponseCode === 'number' && httpResponseCode >= 500) return;
 		try {
 			store.set('lastVisitedUrl', url);
 		} catch {}
 	};
-	win.webContents.on('did-navigate', recordLastVisited);
-	win.webContents.on('did-navigate-in-page', recordLastVisited);
+	win.webContents.on('did-navigate', (_event, url, httpResponseCode) => recordLastVisited(url, httpResponseCode));
+	win.webContents.on('did-navigate-in-page', (_event, url) => recordLastVisited(url));
 
 	win.webContents.on('before-input-event', (event, input) => {
 		if ((input.control || input.meta) && input.shift && input.key.toLowerCase() === 'n') {
@@ -809,7 +826,9 @@ async function createWindow() {
 			log(`WARNING: Initial loadURL(${startupUrl}) failed (${err?.message || err}); retrying in 1s...`);
 			await new Promise((r) => setTimeout(r, 1000));
 			await win.loadURL(startupUrl).catch((retryErr) => {
-				if (retryErr?.errno !== -3 && retryErr?.code !== 'ERR_ABORTED') throw retryErr;
+				if (retryErr?.errno !== -3 && retryErr?.code !== 'ERR_ABORTED') {
+					log(`WARNING: Retry loadURL(${startupUrl}) failed (${retryErr?.message || retryErr}); showing error recovery window.`);
+				}
 			});
 		});
 

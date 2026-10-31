@@ -29,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const ApplicationConfig = models.dispatch.ApplicationConfig as any;
 
 		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
-		const updatedItem = await ApplicationConfig.findOneAndUpdate({ id }, { $set: cleanBody }, { new: true });
+		const updatedItem = await ApplicationConfig.findOneAndUpdate({ id }, { $set: cleanBody }, { returnDocument: 'after' });
 
 		if (!updatedItem) {
 			return NextResponse.json({ error: 'Application config not found' }, { status: 404 });

@@ -83,7 +83,7 @@ export async function authenticateV1BotRequest(req: NextRequest, rawBotId: strin
 
 	const isSystemToken = Boolean((process.env.XERNERX_TOKEN && tokenValue === process.env.XERNERX_TOKEN) || (process.env.XERNERX_APP_TOKEN && tokenValue === process.env.XERNERX_APP_TOKEN));
 
-	const tokenDoc = await TokenModel.findOneAndUpdate({ id: tokenValue }, { $inc: { requestCount: 1 }, $set: { lastUsedAt: new Date() } }, { new: true });
+	const tokenDoc = await TokenModel.findOneAndUpdate({ id: tokenValue }, { $inc: { requestCount: 1 }, $set: { lastUsedAt: new Date() } }, { returnDocument: 'after' });
 
 	if (!tokenDoc && !isSystemToken) {
 		return { error: 'Invalid token', status: 401 };

@@ -13,6 +13,8 @@ interface ConnectedAccount {
 	displayName?: string;
 	avatar?: string;
 	url?: string;
+	secret?: string;
+	token?: string;
 	showOnProfile: boolean;
 	connectedAt: Date;
 }
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 		return NextResponse.redirect(`${origin}/?view=connections&error=invalid_state`);
 	}
 
-	let oauthState: { state: string; verifier: string; userId: string; provider: string };
+	let oauthState: { state: string; verifier: string; userId: string; provider: string; returnTo?: string };
 	try {
 		oauthState = JSON.parse(cookieRaw);
 	} catch {
@@ -54,6 +56,60 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 		let connectedProfile: Omit<ConnectedAccount, 'showOnProfile' | 'connectedAt'> | null = null;
 
 		switch (provider) {
+			case 'vercel': {
+				const code = req.nextUrl.searchParams.get('code');
+				if (!code) throw new Error('Missing code');
+				const callbackTeamId = req.nextUrl.searchParams.get('teamId') || '';
+
+				const tokenRes = await fetch('https://api.vercel.com/v2/oauth/access_token', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Accept: 'application/json',
+					},
+					body: new URLSearchParams({
+						client_id: process.env.VERCEL_CLIENT_ID || '',
+						client_secret: process.env.VERCEL_CLIENT_SECRET || '',
+						code,
+						redirect_uri: redirectUri,
+					}),
+				});
+				const tokenData = await tokenRes.json().catch(() => ({}));
+				if (!tokenData.access_token) throw new Error('Vercel OAuth token exchange failed');
+
+				const resolvedTeamId = String(tokenData.team_id || callbackTeamId || '').trim();
+
+				const [userRes, teamRes] = await Promise.all([
+					fetch('https://api.vercel.com/v2/user', {
+						headers: { Authorization: `Bearer ${tokenData.access_token}` },
+					}).catch(() => null),
+					resolvedTeamId
+						? fetch(`https://api.vercel.com/v2/teams/${encodeURIComponent(resolvedTeamId)}`, {
+								headers: { Authorization: `Bearer ${tokenData.access_token}` },
+							}).catch(() => null)
+						: Promise.resolve(null),
+				]);
+
+				const userData = userRes && userRes.ok ? await userRes.json().catch(() => null) : null;
+				const teamData = teamRes && teamRes.ok ? await teamRes.json().catch(() => null) : null;
+				const vUser = userData?.user || null;
+
+				const slugOrUsername = String(teamData?.slug || vUser?.username || vUser?.email || 'vercel').trim();
+				const displayName = String(teamData?.name || vUser?.name || slugOrUsername).trim();
+
+				connectedProfile = {
+					provider: 'vercel',
+					id: String(vUser?.id || vUser?.uid || tokenData.user_id || slugOrUsername),
+					username: slugOrUsername,
+					displayName,
+					avatar: vUser?.avatar ? `https://vercel.com/api/www/avatar/${vUser.avatar}?s=120` : '',
+					url: teamData?.slug ? `https://vercel.com/${teamData.slug}` : 'https://vercel.com/dashboard',
+					secret: resolvedTeamId,
+					token: tokenData.access_token,
+				};
+				break;
+			}
+
 			case 'github': {
 				const code = req.nextUrl.searchParams.get('code');
 				if (!code) throw new Error('Missing code');
@@ -370,9 +426,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 		const existingConnections: ConnectedAccount[] = Array.isArray(user?.connections) ? user.connections : [];
 		const existingMatch = existingConnections.find((c) => c.provider === provider);
 
+		const isStaffProvider = provider === 'vercel' || provider === 'easypanel';
 		const newEntry: ConnectedAccount = {
 			...connectedProfile,
-			showOnProfile: existingMatch ? existingMatch.showOnProfile !== false : true,
+			showOnProfile: isStaffProvider ? false : existingMatch ? existingMatch.showOnProfile !== false : true,
 			connectedAt: new Date(),
 		};
 
@@ -380,7 +437,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 
 		await models.users.User.findOneAndUpdate({ id: userId }, { $set: { connections: updatedConnections } }, { upsert: false });
 
-		const res = NextResponse.redirect(`${origin}/?view=connections&connected=${provider}`);
+		let finalRedirect = `${origin}/?view=connections&connected=${provider}`;
+		if (oauthState.returnTo) {
+			try {
+				const parsedReturn = new URL(oauthState.returnTo);
+				const baseDomain = process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com';
+				if (parsedReturn.hostname.endsWith(baseDomain) || parsedReturn.hostname === 'localhost' || parsedReturn.hostname === '127.0.0.1') {
+					parsedReturn.searchParams.set('connected', provider);
+					finalRedirect = parsedReturn.toString();
+				}
+			} catch {}
+		}
+
+		const res = NextResponse.redirect(finalRedirect);
 		res.cookies.delete('__xernerx_conn_oauth');
 		return res;
 	} catch (err: any) {

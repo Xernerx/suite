@@ -4,7 +4,7 @@
 import { Compass, Server, ExternalLink, Copy, Check, Trophy, Rocket } from 'lucide-react';
 import { Confirm, Tabs, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast, useUser } from '@xernerx/providers';
-import { useEffect, useState, useMemo } from 'react';
+import { Suspense, useEffect, useState, useMemo } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
@@ -16,12 +16,13 @@ import Links from '@/components/dashboard/Links';
 import VirtueGeneral from '@/components/dashboard/virtue/General';
 import Settings from '@/components/dashboard/Settings';
 import SpotlightBoostModal from '@/components/SpotlightBoostModal';
+import { AppSeoSection } from '@/components/AppSeoSection';
 
 const VALID_DASHBOARD_TABS = ['info', 'stats', 'links', 'virtue', 'settings'];
 
 type Guild = { id: string; name: string; icon: string | null; iconUrl: string | null; banner: string | null; bannerUrl: string | null; permissions: string; features: string[] };
 
-export default function DashboardPage() {
+function DashboardContent() {
 	const { data: session, status } = useSession();
 	const { mutate: mutateUser } = useUser();
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -311,7 +312,11 @@ export default function DashboardPage() {
 			}}
 		>
 			{loading ? (
-				<Loading message={t('app.dashboard.loadingServers')} />
+				<div className="flex flex-col items-center justify-center text-center py-12 gap-3">
+					<h1 className="sr-only">{t('app.seo.dashboard.h1')}</h1>
+					<p className="sr-only">{t('app.seo.dashboard.guideIntro')}</p>
+					<Loading message={t('app.dashboard.loadingServers')} />
+				</div>
 			) : selectedGuild ? (
 				<>
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -483,6 +488,26 @@ export default function DashboardPage() {
 				confirmKeyword={selectedGuild?.name || 'DELETE'}
 				onConfirm={confirmDeleteGuild}
 			/>
+		</div>
+	);
+}
+
+export default function DashboardPage() {
+	const { t } = useDictionary();
+
+	return (
+		<div className="flex flex-col w-full">
+			<Suspense
+				fallback={
+					<div className="flex flex-col items-center justify-center text-center py-12 px-4 gap-3 max-w-(--page-width) mx-auto">
+						<Loading message={t('app.dashboard.loadingServers')} />
+					</div>
+				}
+			>
+				<DashboardContent />
+			</Suspense>
+
+			<AppSeoSection page="dashboard" />
 		</div>
 	);
 }

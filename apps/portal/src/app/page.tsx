@@ -19,6 +19,7 @@ import OrgServersTab from '@/components/portal/OrgServersTab';
 import OrgLinksTab from '@/components/portal/OrgLinksTab';
 import OrgSettingsTab from '@/components/portal/OrgSettingsTab';
 import CreateOrgModal from '@/components/portal/CreateOrgModal';
+import PortalSeoSection from '@/components/portal/PortalSeoSection';
 
 type Organization = {
 	_id: string;
@@ -69,7 +70,12 @@ export default function PortalPage() {
 		if (!envReady || status === 'loading') return;
 
 		if (status === 'unauthenticated') {
-			window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+			const isCrawler = typeof navigator !== 'undefined' && /bot|crawler|spider|lighthouse|headless|curl|php/i.test(navigator.userAgent);
+			if (!isCrawler) {
+				window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+			} else {
+				setLoading(false);
+			}
 			return;
 		}
 
@@ -398,18 +404,16 @@ export default function PortalPage() {
 		if (file) setPendingUploads((prev) => ({ ...prev, [field]: file }));
 	};
 
-	if (loading) {
-		return (
-			<div className="flex-1 flex flex-col items-center justify-center py-20 text-(--text-muted)">
-				<Loading variant="default" />
-			</div>
-		);
-	}
-
 	return (
 		<>
 			<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
-				{selectedOrg === 'personal' ? (
+				{loading ? (
+					<div className="flex-1 flex flex-col items-center justify-center text-center py-20 gap-3 text-(--text-muted)">
+						<h1 className="sr-only">{t('app.portal.seo.h1')}</h1>
+						<p className="sr-only">{t('app.portal.seo.lead')}</p>
+						<Loading variant="default" />
+					</div>
+				) : selectedOrg === 'personal' ? (
 					<PersonalWorkspace session={session} bots={bots} organizations={organizations} />
 				) : selectedOrg ? (
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
@@ -466,6 +470,9 @@ export default function PortalPage() {
 					</div>
 				) : null}
 			</div>
+
+			<PortalSeoSection />
+
 			<CreateOrgModal open={createModalOpen} onOpenChange={setCreateModalOpen} />
 
 			<Confirm

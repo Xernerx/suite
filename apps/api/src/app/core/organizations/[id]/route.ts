@@ -21,7 +21,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const BotModel = (db.models.bots as any).Bot;
 		const GuildModel = (db.models.guilds as any).Guild;
 
-		const organization = await OrganizationModel.findOne({ _id: id }).lean();
+		const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+		const query = isObjectId ? { $or: [{ _id: id }, { vanitySlug: id.toLowerCase() }] } : { vanitySlug: id.toLowerCase() };
+		const organization = await OrganizationModel.findOne(query).lean();
 		const privacy = organization?.config?.privacy || organization?.privacy;
 		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
 
@@ -29,9 +31,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			return NextResponse.json({ error: 'Organization profile not found or private' }, { status: 404 });
 		}
 
+		const orgId = String(organization._id);
 		const [botCount, serverCount] = await Promise.all([
-			BotModel.countDocuments({ organization: id, privacy: { $ne: 'private' } }),
-			GuildModel.countDocuments({ organization: id, privacy: { $ne: 'private' } }),
+			BotModel.countDocuments({ organization: orgId, privacy: { $ne: 'private' } }),
+			GuildModel.countDocuments({ organization: orgId, privacy: { $ne: 'private' } }),
 		]);
 
 		const memberCount = new Set([organization.owner, ...(organization.members || [])].filter(Boolean)).size;

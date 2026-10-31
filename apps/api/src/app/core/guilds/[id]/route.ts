@@ -21,24 +21,25 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const StatModel = (db.models.guilds as any).Stat;
 		const VoteModel = (db.models.guilds as any).Vote;
 
-		const guild = await GuildModel.findOne({ id }).lean();
+		const guild = await GuildModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
 		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
 		if (!guild || guild.privacy === 'private' || (isExternalWidget && !guild.widgets)) {
 			return NextResponse.json({ error: 'Guild profile not found or private' }, { status: 404 });
 		}
 
-		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ guildId: id })]);
+		const resolvedId = String(guild.id);
+		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id: resolvedId }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ guildId: resolvedId })]);
 
 		const iconUrl = guild.icon
 			? guild.icon.startsWith('http')
 				? guild.icon
-				: `https://cdn.discordapp.com/icons/${id}/${guild.icon}.${guild.icon.startsWith('a_') ? 'gif' : 'png'}?size=512`
+				: `https://cdn.discordapp.com/icons/${resolvedId}/${guild.icon}.${guild.icon.startsWith('a_') ? 'gif' : 'png'}?size=512`
 			: null;
 
 		const bannerUrl = guild.banner
 			? guild.banner.startsWith('http')
 				? guild.banner
-				: `https://cdn.discordapp.com/banners/${id}/${guild.banner}.${guild.banner.startsWith('a_') ? 'gif' : 'png'}?size=1024`
+				: `https://cdn.discordapp.com/banners/${resolvedId}/${guild.banner}.${guild.banner.startsWith('a_') ? 'gif' : 'png'}?size=1024`
 			: null;
 
 		const payload = {

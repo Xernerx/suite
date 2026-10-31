@@ -24,7 +24,186 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		// Dynamically compute the overall vote count from the distinct votes collection
 		const VoteModel = (db.models.bots as any).Vote;
 		const CommandModel = (db.models.bots as any).Command;
+		const StatModel = (db.models.bots as any).Stat;
+		const ReviewModel = (db.models.bots as any).Review;
+		const UserModel = (db.models.users as any)?.User;
 		bot.voteCount = await VoteModel.countDocuments({ botId });
+
+		// Attach latest telemetry snapshot & all-time peaks for Profile Overview & Milestones
+		if (StatModel) {
+			const [latestStat, peakAgg] = await Promise.all([
+				StatModel.findOne({ id: botId })
+					.sort({ timestamp: -1 })
+					.lean()
+					.catch(() => null),
+				StatModel.aggregate([
+					{ $match: { id: botId } },
+					{
+						$group: {
+							_id: null,
+							maxGuilds: { $max: '$guildCount' },
+							maxUsers: { $max: '$userCount' },
+						},
+					},
+				]).catch(() => []),
+			]);
+
+			if (latestStat) {
+				bot.latestStat = latestStat;
+				bot.guildCount = latestStat.guildCount ?? latestStat.servers ?? 0;
+				bot.userCount = latestStat.userCount ?? latestStat.users ?? 0;
+				bot.shardCount = latestStat.shardCount ?? (Array.isArray(latestStat.shards) ? latestStat.shards.length : 0);
+				bot.onlineSince = latestStat.onlineSince ?? 0;
+			}
+			bot.peakStats = {
+				guildCount: Math.max(Number(peakAgg?.[0]?.maxGuilds) || 0, Number(bot.guildCount) || 0),
+				userCount: Math.max(Number(peakAgg?.[0]?.maxUsers) || 0, Number(bot.userCount) || 0),
+			};
+		}
+
+		// Attach review summary & top 2 helpful reviews
+		if (ReviewModel) {
+			const allReviews = await ReviewModel.find({ botId })
+				.sort({ createdAt: -1 })
+				.lean()
+				.catch(() => []);
+			const totalCount = allReviews.length;
+			const avgRating = totalCount > 0 ? Number((allReviews.reduce((acc: number, r: any) => acc + (Number(r.rating) || 0), 0) / totalCount).toFixed(1)) : 0;
+			const breakdown: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+			for (const r of allReviews) {
+				const star = Math.min(5, Math.max(1, Math.round(Number(r.rating) || 5)));
+				breakdown[star] = (breakdown[star] || 0) + 1;
+			}
+
+			const topReviewsRaw = [...allReviews]
+				.sort((a: any, b: any) => {
+					const scoreA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
+					const scoreB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
+					if (scoreB !== scoreA) return scoreB - scoreA;
+					return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+				})
+				.slice(0, 2);
+
+			const reviewerIds = Array.from(new Set(topReviewsRaw.map((r: any) => r.userId).filter(Boolean)));
+			const userDocs =
+				UserModel && reviewerIds.length > 0
+					? await UserModel.find({ id: { $in: reviewerIds } })
+							.lean()
+							.catch(() => [])
+					: [];
+			const userDocMap = new Map<string, any>((userDocs || []).map((u: any) => [u.id, u]));
+
+			const recentReviews = await Promise.all(
+				topReviewsRaw.map(async (r: any) => {
+					const stored = userDocMap.get(r.userId);
+					if (stored) {
+						return {
+							...r,
+							user: {
+								id: stored.id,
+								username: stored.username || stored.name,
+								global_name: stored.globalName || stored.global_name || stored.username || stored.name,
+								avatar: stored.avatar,
+								avatarUrl: stored.avatarUrl || stored.image,
+							},
+						};
+					}
+					if (process.env.DISCORD_CLIENT_TOKEN && r.userId) {
+						try {
+							const dRes = await fetch(`https://discord.com/api/v10/users/${r.userId}`, {
+								headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+								next: { revalidate: 3600 },
+							});
+							if (dRes.ok) {
+								return { ...r, user: await dRes.json() };
+							}
+						} catch {}
+					}
+					return { ...r, user: { id: r.userId } };
+				})
+			);
+
+			bot.reviewSummary = {
+				count: totalCount,
+				average: avgRating,
+				breakdown,
+				recent: recentReviews,
+			};
+		}
+
+		// Attach related bots (More by this developer & Similar bots by tags)
+		try {
+			const ownerList = Array.isArray(bot.owners) ? bot.owners.filter(Boolean) : [];
+			const tagList = Array.isArray(bot.tags) ? bot.tags.filter(Boolean) : [];
+
+			const devConditions: any[] = [];
+			if (ownerList.length > 0) devConditions.push({ owners: { $in: ownerList } });
+			if (bot.organization) devConditions.push({ organization: bot.organization });
+
+			const developerBotsRaw =
+				devConditions.length > 0
+					? await BotModel.find({
+							id: { $ne: botId },
+							privacy: 'public',
+							$or: devConditions,
+						})
+							.select('id vanitySlug name avatar description verified tags voteCount status')
+							.limit(4)
+							.lean()
+							.catch(() => [])
+					: [];
+
+			const devBotIds = new Set<string>([botId, ...developerBotsRaw.map((b: any) => b.id)]);
+
+			const similarBotsRaw =
+				tagList.length > 0
+					? await BotModel.find({
+							id: { $nin: Array.from(devBotIds) },
+							privacy: 'public',
+							tags: { $in: tagList },
+						})
+							.select('id vanitySlug name avatar description verified tags voteCount status')
+							.limit(4)
+							.lean()
+							.catch(() => [])
+					: [];
+
+			const allRelatedIds = Array.from(new Set([...developerBotsRaw.map((b: any) => b.id), ...similarBotsRaw.map((b: any) => b.id)]));
+			const [relatedStats, relatedVotes] = await Promise.all([
+				StatModel && allRelatedIds.length > 0
+					? StatModel.aggregate([
+							{ $match: { id: { $in: allRelatedIds } } },
+							{ $sort: { timestamp: -1 } },
+							{
+								$group: {
+									_id: '$id',
+									guildCount: { $first: '$guildCount' },
+									userCount: { $first: '$userCount' },
+								},
+							},
+						]).catch(() => [])
+					: [],
+				VoteModel && allRelatedIds.length > 0 ? VoteModel.aggregate([{ $match: { botId: { $in: allRelatedIds } } }, { $group: { _id: '$botId', count: { $sum: 1 } } }]).catch(() => []) : [],
+			]);
+
+			const statMap = new Map<string, any>((relatedStats || []).map((s: any) => [s._id, s]));
+			const voteMap = new Map<string, any>((relatedVotes || []).map((v: any) => [v._id, v.count]));
+
+			const enrichBotSummary = (b: any) => {
+				const st = statMap.get(b.id);
+				return {
+					...b,
+					guildCount: st?.guildCount ?? 0,
+					userCount: st?.userCount ?? 0,
+					voteCount: voteMap.get(b.id) ?? b.voteCount ?? 0,
+				};
+			};
+
+			bot.relatedBots = {
+				developerBots: developerBotsRaw.map(enrichBotSummary),
+				similarBots: similarBotsRaw.map(enrichBotSummary),
+			};
+		} catch {}
 
 		if (CommandModel && (!Array.isArray(bot.commands) || bot.commands.length === 0)) {
 			const syncedCmds = await CommandModel.find({ botId })

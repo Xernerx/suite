@@ -1,11 +1,11 @@
 /** @format */
 'use client';
 
-import { Columns2, Server, Settings2, ShieldAlert } from 'lucide-react';
+import { Cloud, Columns2, Server, Settings2, ShieldAlert } from 'lucide-react';
 import { useDictionary, useEnvironment, useSession, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
-import HostingConsole, { DEFAULT_HOSTING_NODES, type HostingNodeConfig } from '@/components/HostingConsole';
+import HostingConsole, { DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig } from '@/components/HostingConsole';
 import ReturnPage from '@/components/ReturnPage';
 
 export default function HostingPage() {
@@ -47,17 +47,21 @@ export default function HostingPage() {
 						try {
 							const parsed = JSON.parse(settingDoc.value);
 							if (Array.isArray(parsed) && parsed.length > 0) {
-								setNodes(
-									parsed.map((n: HostingNodeConfig) => {
-										const def = DEFAULT_HOSTING_NODES.find((d) => d.id === n.id);
-										return {
-											...def,
-											...n,
-											sshTarget: n.sshTarget || def?.sshTarget,
-											sshPort: n.sshPort || def?.sshPort,
-										};
-									})
-								);
+								const merged: HostingNodeConfig[] = parsed.map((n: HostingNodeConfig) => {
+									const def = DEFAULT_HOSTING_NODES.find((d) => d.id === n.id);
+									return {
+										...def,
+										...n,
+										sshTarget: n.sshTarget || def?.sshTarget,
+										sshPort: n.sshPort || def?.sshPort,
+										provider: n.provider || def?.provider || (n.id === 'vercel' || n.url?.includes('vercel.com') ? 'vercel' : 'easypanel'),
+									};
+								});
+								const defaultVercel = DEFAULT_HOSTING_NODES.find((d) => d.id === 'vercel');
+								if (defaultVercel && !merged.some((n: HostingNodeConfig) => isVercelNode(n))) {
+									merged.push(defaultVercel);
+								}
+								setNodes(merged);
 							}
 						} catch {}
 					}
@@ -96,7 +100,7 @@ export default function HostingPage() {
 		const navItems: any[] = [
 			...nodes.map((node) => ({
 				category: t('hosting.nav.categories.nodes'),
-				icon: Server,
+				icon: isVercelNode(node) ? Cloud : Server,
 				label: node.name,
 				view: node.id,
 			})),

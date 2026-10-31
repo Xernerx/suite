@@ -133,6 +133,12 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	}, [id, getEnvUrl]);
 
 	useEffect(() => {
+		const uid = (session as any)?.user?.id;
+		if (!uid) {
+			setCanVote(false);
+			setNextVoteAt(null);
+			return;
+		}
 		const targetId = server?.id || id;
 		const fetchVoteStatus = async () => {
 			try {
@@ -145,7 +151,7 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 			} catch {}
 		};
 		fetchVoteStatus();
-	}, [id, server?.id, getEnvUrl]);
+	}, [id, server?.id, getEnvUrl, (session as any)?.user?.id]);
 
 	const handleVote = async () => {
 		const targetId = server?.id || id;
@@ -194,7 +200,17 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
-			<ServerHeader server={server} setServer={setServer} organizationData={organizationData} canVote={canVote} nextVoteAt={nextVoteAt} voting={voting} timeLeft={timeLeft} onVote={handleVote} />
+			<ServerHeader
+				server={server}
+				setServer={setServer}
+				organizationData={organizationData}
+				canManageServer={canManageServer}
+				canVote={canVote}
+				nextVoteAt={nextVoteAt}
+				voting={voting}
+				timeLeft={timeLeft}
+				onVote={handleVote}
+			/>
 			<div className="w-full">
 				{view === 'statistics' ? (
 					<ServerStatsView server={server} />

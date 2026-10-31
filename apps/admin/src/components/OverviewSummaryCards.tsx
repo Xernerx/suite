@@ -30,7 +30,96 @@ export interface LighthouseScoreData {
 	updatedAt: number;
 }
 
+export interface McpSeoIssue {
+	severity: 'high' | 'medium' | 'low';
+	category: string;
+	title: string;
+	detail: string;
+	action: string;
+	url: string;
+}
+
+export interface McpGeoSignal {
+	key: string;
+	label: string;
+	detail: string;
+	ok: boolean;
+	weight: number;
+	earnedPoints: number;
+	maxPoints: number;
+}
+
+export interface McpSeoPageReport {
+	url: string;
+	score: number;
+	title: string;
+	description: string;
+	firstParagraph: string;
+	titleLen: number;
+	descriptionLen: number;
+	wordCount: number;
+	readabilityWps: number;
+	loadTimeMs: number;
+	internalLinks: number;
+	externalLinks: number;
+	imagesTotal: number;
+	imagesMissingAlt: number;
+	canonical: string;
+	hasNoindex: boolean;
+	aeoReady: boolean;
+	hasFaqSchema: boolean;
+	hasFaqBlock: boolean;
+	hasStructuredData: boolean;
+	checksPassed: number;
+	checksTotal: number;
+	scoreBreakdown: Record<string, boolean>;
+	headings: { tag: string; text: string }[];
+	recommendations: string[];
+	issues: McpSeoIssue[];
+}
+
+export interface McpContentAgent {
+	detectedCategory: string;
+	seoTitle: string;
+	metaDescription: string;
+	h1Suggestion: string;
+	faqSuggestion: string;
+}
+
+export interface McpSeoScoreData {
+	score: number;
+	geoScore: number;
+	checksPassed: number;
+	checksTotal: number;
+	aeoReady: boolean;
+	wordCount: number;
+	loadTimeMs: number;
+	titleLen: number;
+	descriptionLen: number;
+	internalLinks: number;
+	externalLinks: number;
+	pagesCount?: number;
+	candidatesFound?: number;
+	highPriorityCount?: number;
+	executiveSummary?: string;
+	scoreBreakdown: Record<string, boolean>;
+	recommendations: string[];
+	issues: McpSeoIssue[];
+	geoSignals?: McpGeoSignal[];
+	pages?: McpSeoPageReport[];
+	roadmap?: {
+		week1: McpSeoIssue[];
+		week2_3: McpSeoIssue[];
+		month2: McpSeoIssue[];
+	};
+	contentAgent?: McpContentAgent;
+	prevScore?: number;
+	prevGeoScore?: number;
+	updatedAt: number;
+}
+
 export const LIGHTHOUSE_STORAGE_KEY = 'xernerx_lighthouse_scores_v1';
+export const MCP_SEO_STORAGE_KEY = 'xernerx_mcp_seo_scores_v1';
 
 const SUITE_APP_DEFS = [
 	['www', 'Website', 'www.xernerx.com'],

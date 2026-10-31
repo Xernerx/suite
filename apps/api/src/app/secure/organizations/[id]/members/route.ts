@@ -26,7 +26,7 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
 			return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
 		}
 
-		const updatedMember = await db.Member.findOneAndUpdate({ ownerId: id, userId: body.userId }, { $set: { roles: body.roles || [] } }, { new: true, upsert: true }).lean();
+		const updatedMember = await db.Member.findOneAndUpdate({ ownerId: id, userId: body.userId }, { $set: { roles: body.roles || [] } }, { returnDocument: 'after', upsert: true }).lean();
 
 		return NextResponse.json(updatedMember, { status: 200 });
 	} catch (error) {

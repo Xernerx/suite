@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
 	title: 'Explore & Vote for Top Discord Bots',
 	description: 'Browse, search, and vote for top Discord bots on Xernerx Studios, including productivity, translation, moderation, and utility bots.',
+	keywords: ['Xernerx', 'Discord bots', 'vote', 'explore', 'productivity', 'translation', 'moderation', 'utility', 'Virtue', 'Metamorphosis', 'Zodiac'],
 	alternates: {
 		canonical: '/bots',
 	},

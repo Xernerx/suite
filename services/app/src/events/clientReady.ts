@@ -15,6 +15,8 @@ const SUITE_SERVICES = [
 	{ id: 'info', host: 'info.xernerx.com', devPort: 4007 },
 	{ id: 'docs', host: 'docs.xernerx.com', devPort: 4005 },
 	{ id: 'admin', host: 'admin.xernerx.com', devPort: 4006 },
+	{ id: 'hosting', host: 'hosting.xernerx.com', devPort: 4010 },
+	{ id: 'haste', host: 'haste.xernerx.com', devPort: 4011 },
 	{ id: 'api', host: 'api.xernerx.com', devPort: 4001 },
 	{ id: 'cdn', host: 'cdn.xernerx.com', devPort: 4002 },
 ] as const;
@@ -30,6 +32,8 @@ async function probeServiceEndpoint(url: string, timeoutMs = 4500): Promise<{ ok
 		});
 		clearTimeout(timeout);
 		if (!res.ok) return { ok: false, ping: null };
+		const data = (await res.json().catch(() => null)) as any;
+		if (!data?.version) return { ok: false, ping: null };
 		return { ok: true, ping: Date.now() - start };
 	} catch {
 		return { ok: false, ping: null };
@@ -94,6 +98,16 @@ export default class AppClientReadyEvent extends EventBuilder {
 				} catch {}
 			}
 
+			const recordedBuckets = new Set<string>();
+			for (const series of [...Object.values(storedHistory.services), ...Object.values(storedHistory.bots)]) {
+				if (!series || typeof series !== 'object') continue;
+				for (const [tsKey, pt] of Object.entries(series as Record<string, any>)) {
+					if (Number(tsKey) >= cutoffTs && pt && pt.status && pt.status !== 'down' && pt.status !== 'offline' && pt.status !== 'empty') {
+						recordedBuckets.add(tsKey);
+					}
+				}
+			}
+
 			const isDevEnv = process.env.ENVIRONMENT?.toLowerCase() === 'development';
 			const isCanaryEnv = process.env.ENVIRONMENT?.toLowerCase() === 'canary';
 			await Promise.all(
@@ -118,6 +132,13 @@ export default class AppClientReadyEvent extends EventBuilder {
 					const status = !ok ? 'down' : ping !== null && ping > 1200 ? 'degraded' : 'operational';
 					storedHistory.services[svc.id] = storedHistory.services[svc.id] || {};
 					storedHistory.services[svc.id][currentBucket] = { status, ping };
+					if (ok) {
+						for (const bTsKey of recordedBuckets) {
+							if (!storedHistory.services[svc.id][bTsKey]) {
+								storedHistory.services[svc.id][bTsKey] = { status: 'operational', ping };
+							}
+						}
+					}
 					for (const tsKey of Object.keys(storedHistory.services[svc.id])) {
 						if (Number(tsKey) < cutoffTs) delete storedHistory.services[svc.id][tsKey];
 					}

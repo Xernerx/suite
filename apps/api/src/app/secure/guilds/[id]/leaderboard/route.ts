@@ -88,9 +88,55 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 					: Promise.resolve([]),
 			]);
 
-			levelsRaw = (Array.isArray(ll) && ll.length > 0 ? ll : pl) || [];
-			textRaw = (Array.isArray(lt) && lt.length > 0 ? lt : pt) || [];
-			voiceRaw = (Array.isArray(lv) && lv.length > 0 ? lv : pv) || [];
+			const mergeDocs = (a: any[], b: any[]) => {
+				const byUser = new Map<string, any>();
+				for (const doc of [...(a || []), ...(b || [])]) {
+					const uid = String(doc?.userId || doc?.ownerId || doc?.id || '');
+					if (!uid) continue;
+					const existing = byUser.get(uid);
+					if (
+						!existing ||
+						(Number(doc.level) || 0) > (Number(existing.level) || 0) ||
+						((Number(doc.level) || 0) === (Number(existing.level) || 0) && (Number(doc.xp) || 0) > (Number(existing.xp) || 0))
+					) {
+						byUser.set(uid, doc);
+					}
+				}
+				return Array.from(byUser.values()).sort((x, y) => (Number(y.level) || 0) - (Number(x.level) || 0) || (Number(y.xp) || 0) - (Number(x.xp) || 0));
+			};
+
+			textRaw = mergeDocs(lt, pt);
+			voiceRaw = mergeDocs(lv, pv);
+
+			const serverByUser = new Map<string, any>();
+			for (const doc of mergeDocs(ll, pl)) {
+				const uid = String(doc?.userId || doc?.ownerId || doc?.id || '');
+				if (uid) serverByUser.set(uid, doc);
+			}
+			const combinedTrackUsers = new Map<string, { id: string; xp: number; maxLevel: number }>();
+			for (const doc of [...textRaw, ...voiceRaw]) {
+				const uid = String(doc?.userId || doc?.ownerId || doc?.id || '');
+				if (!uid) continue;
+				const prev = combinedTrackUsers.get(uid) || { id: uid, xp: 0, maxLevel: 0 };
+				prev.xp += Number(doc.xp) || 0;
+				prev.maxLevel = Math.max(prev.maxLevel, Number(doc.level) || 0);
+				combinedTrackUsers.set(uid, prev);
+			}
+			for (const [uid, comb] of combinedTrackUsers.entries()) {
+				const existing = serverByUser.get(uid);
+				if (!existing || ((Number(existing.level) || 0) === 0 && (Number(existing.xp) || 0) === 0)) {
+					serverByUser.set(uid, {
+						id: uid,
+						userId: uid,
+						guild: guildId,
+						level: comb.maxLevel,
+						xp: comb.xp,
+					});
+				}
+			}
+			levelsRaw = Array.from(serverByUser.values())
+				.sort((x, y) => (Number(y.level) || 0) - (Number(x.level) || 0) || (Number(y.xp) || 0) - (Number(x.xp) || 0))
+				.slice(0, 50);
 		} catch (e) {
 			console.warn('[GuildLeaderboard] Failed to query Virtue levels:', e);
 		}
