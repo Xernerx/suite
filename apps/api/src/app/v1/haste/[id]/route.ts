@@ -136,7 +136,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			updates.expiresAt = computeExpiresAt(nextExpiresIn);
 		}
 
-		const updated = (await DocumentModel.findOneAndUpdate({ id: cleanId }, { $set: updates }, { new: true }).lean()) as any;
+		const updated = (await DocumentModel.findOneAndUpdate({ id: cleanId }, { $set: updates }, { returnDocument: 'after' }).lean()) as any;
 		const baseUrl = resolveHasteBaseUrl(req);
 
 		return NextResponse.json(

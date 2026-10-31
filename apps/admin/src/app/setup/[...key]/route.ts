@@ -75,7 +75,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ key: str
 					permissions: perms,
 				},
 			},
-			{ upsert: true, new: true }
+			{ upsert: true, returnDocument: 'after' }
 		);
 
 		// Assign role to the current user

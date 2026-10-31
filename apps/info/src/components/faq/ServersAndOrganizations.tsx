@@ -126,6 +126,22 @@ export default function ServersAndOrganizations({ searchQuery = '' }: { searchQu
 				</div>
 			),
 		},
+		{
+			id: 'card8',
+			title: t('faq.servers.card8.title'),
+			searchableText: `${t('faq.servers.card8.title')} ${t('faq.servers.card8.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.servers.card8.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.virtueSettings'), href: 'https://app.xernerx.com/dashboard?tab=virtue', vanity: 'app.xernerx.com/dashboard?tab=virtue' },
+							{ label: t('faq.quickLinks.botInvites'), href: 'https://www.xernerx.com/invites', vanity: 'xernerx.com/invite' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.servers.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;

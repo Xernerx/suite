@@ -40,6 +40,10 @@ async function getModel(action: string) {
 		case 'bot':
 			return (db.models.bots as any)?.Bot;
 
+		case 'settings':
+		case 'setting':
+			return (db.models.core as any)?.Setting;
+
 		default:
 			return null;
 	}
@@ -53,6 +57,8 @@ function getFilter(action: string, body: any) {
 		case 'credit':
 		case 'subscriptions':
 		case 'subscription':
+		case 'appearance':
+		case 'appearances':
 			return {
 				ownerId: body.ownerId || body.id,
 			};
@@ -63,12 +69,12 @@ function getFilter(action: string, body: any) {
 		case 'profiles':
 		case 'tokens':
 		case 'token':
-		case 'appearance':
-		case 'appearances':
 		case 'guilds':
 		case 'guild':
 		case 'bots':
 		case 'bot':
+		case 'settings':
+		case 'setting':
 			return {
 				id: body.id,
 			};
@@ -87,6 +93,10 @@ export default async function Server(msg: any) {
 
 	switch (msg.method) {
 		case 'get':
+			if (!msg.body?.ownerId && !msg.body?.id && (msg.action === 'levels' || msg.action === 'level')) {
+				const limit = Math.min(200, Math.max(1, Number(msg.body?.limit) || 100));
+				return model.find({}).sort({ level: -1, xp: -1 }).limit(limit).lean();
+			}
 			return model.findOne(getFilter(msg.action, msg.body)).lean();
 
 		case 'create':

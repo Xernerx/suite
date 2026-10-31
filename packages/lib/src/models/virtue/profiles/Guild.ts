@@ -16,10 +16,45 @@ const schema = new Schema(
 			weekly: { type: Boolean, default: false },
 			daily: { type: Boolean, default: false },
 		},
+		cycleState: {
+			lastDailyReset: { type: String, default: null },
+			lastWeeklyReset: { type: String, default: null },
+			lastMonthlyReset: { type: String, default: null },
+		},
+		channels: {
+			ignored: { type: [String], default: [] },
+			tracked: { type: [String], default: [] },
+		},
+		stackRoles: { type: Boolean, default: true },
+		boosterMultiplier: { type: Number, default: 1 },
+		xpMultiplier: { type: Number, default: 1 },
 		roles: {
 			ignored: { type: [String], default: [] },
 			tracked: { type: [String], default: [] },
 			levels: {
+				type: [
+					{
+						level: { type: Number, required: true },
+						roleId: { type: String, required: true },
+						track: {
+							type: String,
+							enum: ['server', 'unified', 'text', 'voice'],
+							default: 'server',
+						},
+					},
+				],
+				default: [],
+			},
+			textLevels: {
+				type: [
+					{
+						level: { type: Number, required: true },
+						roleId: { type: String, required: true },
+					},
+				],
+				default: [],
+			},
+			voiceLevels: {
 				type: [
 					{
 						level: { type: Number, required: true },
@@ -30,6 +65,29 @@ const schema = new Schema(
 			},
 		},
 		levelRoles: {
+			type: [
+				{
+					level: { type: Number, required: true },
+					roleId: { type: String, required: true },
+					track: {
+						type: String,
+						enum: ['server', 'unified', 'text', 'voice'],
+						default: 'server',
+					},
+				},
+			],
+			default: [],
+		},
+		textLevelRoles: {
+			type: [
+				{
+					level: { type: Number, required: true },
+					roleId: { type: String, required: true },
+				},
+			],
+			default: [],
+		},
+		voiceLevelRoles: {
 			type: [
 				{
 					level: { type: Number, required: true },

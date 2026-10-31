@@ -1,14 +1,15 @@
 /** @format */
 'use client';
 
-import { Columns2, Copy, ExternalLink, KeyRound, Maximize2, Minimize2, RefreshCw, Server, Settings2, ShieldCheck, Terminal } from 'lucide-react';
+import { Cloud, Columns2, Copy, ExternalLink, KeyRound, Maximize2, Minimize2, RefreshCw, Server, Settings2, ShieldCheck, Terminal } from 'lucide-react';
 import { Badge, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useTheme, useToast, useUser } from '@xernerx/providers';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import HostingSshModal, { buildThemedNodeUrl, DEFAULT_HOSTING_NODES, type HostingNodeConfig, resolveNodeSshTarget } from './HostingSshModal';
+import HostingSshModal, { buildThemedNodeUrl, DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig, resolveNodeSshTarget } from './HostingSshModal';
 import HostingNodeConfigModal from './HostingNodeConfigModal';
+import HostingVercelPanel from './HostingVercelPanel';
 
-export { DEFAULT_HOSTING_NODES, type HostingNodeConfig };
+export { DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig };
 
 interface NodePingState {
 	status: 'checking' | 'online' | 'unreachable';
@@ -40,6 +41,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 	const [reloadCounters, setReloadCounters] = useState<Record<string, number>>({});
 	const [savingConfig, setSavingConfig] = useState(false);
 	const [easypanelConn, setEasypanelConn] = useState<{ username: string; secret?: string; token?: string } | null>(null);
+	const [vercelConn, setVercelConn] = useState<{ username: string; secret?: string; token?: string } | null>(null);
 	const [sshModalOpen, setSshModalOpen] = useState(false);
 	const [sshModalNode, setSshModalNode] = useState<HostingNodeConfig | undefined>(undefined);
 	const [nodePings, setNodePings] = useState<Record<string, NodePingState>>({});
@@ -56,7 +58,8 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 			const controller = new AbortController();
 			const timer = setTimeout(() => controller.abort(), 5000);
 			try {
-				await fetch(node.url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+				const targetProbeUrl = isVercelNode(node) ? 'https://www.xernerx.com/api/version' : node.url;
+				await fetch(targetProbeUrl, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
 				const elapsed = Math.max(1, Math.round(performance.now() - start));
 				setNodePings((prev) => ({ ...prev, [node.id]: { status: 'online', latencyMs: elapsed } }));
 			} catch {
@@ -87,18 +90,24 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 		});
 	}, [resolvedTheme]);
 
-	useEffect(() => {
+	const loadUserConnections = useCallback(() => {
 		if (!isReady || !userId) return;
 		fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}?includeSecrets=true`), { credentials: 'include', cache: 'no-store' })
 			.then((res) => (res.ok ? res.json() : null))
 			.then((data) => {
 				if (Array.isArray(data?.connections)) {
 					const foundEp = data.connections.find((c: any) => c.provider === 'easypanel');
-					if (foundEp) setEasypanelConn(foundEp);
+					setEasypanelConn(foundEp || null);
+					const foundVercel = data.connections.find((c: any) => c.provider === 'vercel');
+					setVercelConn(foundVercel || null);
 				}
 			})
 			.catch(() => {});
 	}, [isReady, userId, getEnvUrl]);
+
+	useEffect(() => {
+		loadUserConnections();
+	}, [loadUserConnections]);
 
 	const handleCopyCred = async (value: string, label: string) => {
 		try {
@@ -199,7 +208,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 									}`}
 								>
 									<span className={`h-2 w-2 rounded-full ${dotClass}`} />
-									<Server size={13} />
+									{isVercelNode(node) ? <Cloud size={13} /> : <Server size={13} />}
 									<span>{node.name}</span>
 									{ping?.latencyMs !== null && ping?.latencyMs !== undefined && <span className="text-[10px] font-mono opacity-80">{ping.latencyMs}ms</span>}
 								</button>
@@ -231,7 +240,22 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				</div>
 
 				<div className="flex flex-wrap items-center gap-2 shrink-0">
-					{easypanelConn ? (
+					{!isSplitView && isVercelNode(selectedNode) ? (
+						vercelConn ? (
+							<div className="inline-flex items-center gap-1.5 rounded-xl bg-(--background)/60 border border-(--border)/10 px-2.5 py-1">
+								<Cloud size={12} className="text-(--accent) shrink-0" />
+								<span className="text-[11px] font-bold text-(--text) max-w-36 truncate">@{vercelConn.username}</span>
+							</div>
+						) : (
+							<a
+								href={`${getEnvUrl('https://account.xernerx.com')}/api/connections/vercel?returnTo=${encodeURIComponent(typeof window !== 'undefined' ? `${window.location.origin}/?node=vercel` : 'https://hosting.xernerx.com/?node=vercel')}`}
+								className="inline-flex items-center gap-1.5 rounded-2xl bg-(--accent)/10 hover:bg-(--accent)/20 border border-(--accent)/25 px-3 py-1.5 text-xs font-bold text-(--accent) transition-colors"
+							>
+								<Cloud size={13} />
+								<span className="hidden sm:inline">{t('account.connections.vercel.oauthButton')}</span>
+							</a>
+						)
+					) : easypanelConn ? (
 						<div className="inline-flex items-center gap-1 rounded-xl bg-(--background)/60 border border-(--border)/10 px-2 py-1">
 							<KeyRound size={12} className="text-(--accent) shrink-0" />
 							<button
@@ -267,18 +291,23 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 						</a>
 					)}
 
-					<Button
-						variant="secondary"
-						size="sm"
-						onClick={() => {
-							setSshModalNode(selectedNode);
-							setSshModalOpen(true);
-						}}
-						className="flex items-center gap-1.5"
-					>
-						<Terminal size={13} className="text-(--accent)" />
-						<span className="font-mono text-[11px]">{resolveNodeSshTarget(selectedNode)}</span>
-					</Button>
+					{(!selectedNode || !isVercelNode(selectedNode) || isSplitView) && (
+						<Button
+							variant="secondary"
+							size="sm"
+							onClick={() => {
+								const sshNode = selectedNode && !isVercelNode(selectedNode) ? selectedNode : nodes.find((n) => !isVercelNode(n)) || DEFAULT_HOSTING_NODES[0];
+								setSshModalNode(sshNode);
+								setSshModalOpen(true);
+							}}
+							className="flex items-center gap-1.5"
+						>
+							<Terminal size={13} className="text-(--accent)" />
+							<span className="font-mono text-[11px]">
+								{resolveNodeSshTarget(selectedNode && !isVercelNode(selectedNode) ? selectedNode : nodes.find((n) => !isVercelNode(n)) || DEFAULT_HOSTING_NODES[0])}
+							</span>
+						</Button>
+					)}
 
 					<Button variant="secondary" size="sm" onClick={handleReloadCurrent} className="flex items-center gap-1.5">
 						<RefreshCw size={13} />
@@ -366,26 +395,30 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 								</div>
 							)}
 
-							<iframe
-								key={`${node.id}-${reloadKey}`}
-								ref={(el) => {
-									iframeRefs.current[node.id] = el;
-								}}
-								src={buildThemedNodeUrl(node.url, resolvedTheme)}
-								onLoad={(e) => {
-									try {
-										e.currentTarget.contentWindow?.postMessage({ type: 'theme', theme: resolvedTheme, colorScheme: resolvedTheme }, '*');
-									} catch {}
-								}}
-								title={`Easypanel — ${node.name}`}
-								data-theme={resolvedTheme}
-								style={{
-									colorScheme: resolvedTheme,
-									filter: resolvedTheme === 'dark' ? 'invert(0.92) hue-rotate(180deg)' : 'none',
-								}}
-								className="w-full h-full flex-1 border-0 bg-(--background) transition-[filter] duration-200"
-								allow="clipboard-read; clipboard-write; fullscreen"
-							/>
+							{isVercelNode(node) ? (
+								<HostingVercelPanel userId={userId} reloadTrigger={reloadKey} onTokenUpdated={loadUserConnections} />
+							) : (
+								<iframe
+									key={`${node.id}-${reloadKey}`}
+									ref={(el) => {
+										iframeRefs.current[node.id] = el;
+									}}
+									src={buildThemedNodeUrl(node.url, resolvedTheme)}
+									onLoad={(e) => {
+										try {
+											e.currentTarget.contentWindow?.postMessage({ type: 'theme', theme: resolvedTheme, colorScheme: resolvedTheme }, '*');
+										} catch {}
+									}}
+									title={`Easypanel — ${node.name}`}
+									data-theme={resolvedTheme}
+									style={{
+										colorScheme: resolvedTheme,
+										filter: resolvedTheme === 'dark' ? 'invert(0.92) hue-rotate(180deg)' : 'none',
+									}}
+									className="w-full h-full flex-1 border-0 bg-(--background) transition-[filter] duration-200"
+									allow="clipboard-read; clipboard-write; fullscreen"
+								/>
+							)}
 						</div>
 					);
 				})}

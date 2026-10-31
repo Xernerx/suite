@@ -84,12 +84,12 @@ export async function recordAndGetStatusHistory(options?: { forceRefresh?: boole
 		} catch {}
 	}
 
-	// Collect timestamps where the daemon already recorded bot heartbeats in the last 24h
+	// Collect timestamps where the daemon already recorded service or bot heartbeats in the last 24h
 	const daemonRecordedBuckets = new Set<string>();
-	for (const botSeries of Object.values(stored.bots)) {
-		if (!botSeries || typeof botSeries !== 'object') continue;
-		for (const [tsKey, pt] of Object.entries(botSeries)) {
-			if (Number(tsKey) >= cutoffTs && pt && pt.status && pt.status !== 'offline' && pt.status !== 'empty') {
+	for (const series of [...Object.values(stored.services), ...Object.values(stored.bots)]) {
+		if (!series || typeof series !== 'object') continue;
+		for (const [tsKey, pt] of Object.entries(series)) {
+			if (Number(tsKey) >= cutoffTs && pt && pt.status && pt.status !== 'down' && pt.status !== 'offline' && pt.status !== 'empty') {
 				daemonRecordedBuckets.add(tsKey);
 			}
 		}
@@ -97,12 +97,16 @@ export async function recordAndGetStatusHistory(options?: { forceRefresh?: boole
 
 	const liveServices: Record<string, LiveServiceSnapshot> = {};
 
-	// Record current bucket for Suite Apps from versionsMap
+	// Record current bucket for Suite Apps from versionsMap (falling back to daemon telemetry if edge fetch is blocked)
 	for (const app of SUITE_APPS) {
 		const info = versionsMap[app.id];
-		const ping = info ? (info.devLatencyMs ?? info.prodLatencyMs ?? info.canaryLatencyMs ?? null) : null;
+		const existingSeries = stored.services[app.id] || {};
+		const existingKeys = Object.keys(existingSeries).sort((a, b) => Number(b) - Number(a));
+		const latestStored = existingKeys.length > 0 ? existingSeries[existingKeys[0]] : null;
+
+		const ping = info ? (info.devLatencyMs ?? info.prodLatencyMs ?? info.canaryLatencyMs ?? latestStored?.ping ?? null) : (latestStored?.ping ?? null);
 		const version = info ? (info.localVersion ?? info.devVersion ?? info.prodVersion ?? info.canaryVersion ?? null) : null;
-		const isUp = Boolean(version);
+		const isUp = Boolean(version || (latestStored?.status && latestStored.status !== 'down') || daemonRecordedBuckets.size > 0);
 		const status: 'operational' | 'degraded' | 'down' = !isUp ? 'down' : ping && ping > 1200 ? 'degraded' : 'operational';
 
 		liveServices[app.id] = {
@@ -114,9 +118,11 @@ export async function recordAndGetStatusHistory(options?: { forceRefresh?: boole
 			ping,
 		};
 
-		stored.services[app.id] = stored.services[app.id] || {};
+		stored.services[app.id] = existingSeries;
 		if (isUp || ping !== null) {
-			stored.services[app.id][String(currentBucket)] = { status, ping };
+			if (version || !stored.services[app.id][String(currentBucket)]) {
+				stored.services[app.id][String(currentBucket)] = { status, ping };
+			}
 
 			// Backfill missing buckets where the suite daemon was active before website cron tracking began
 			if (isUp) {

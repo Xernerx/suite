@@ -56,14 +56,35 @@ export async function POST(req: NextRequest) {
 			} catch {}
 		}
 
+		const recordedBuckets = new Set<string>();
+		for (const series of [...Object.values(stored.services), ...Object.values(stored.bots)]) {
+			if (!series || typeof series !== 'object') continue;
+			for (const [tsKey, pt] of Object.entries(series)) {
+				if (Number(tsKey) >= cutoffTs && pt && pt.status && pt.status !== 'down' && pt.status !== 'offline' && pt.status !== 'empty') {
+					recordedBuckets.add(tsKey);
+				}
+			}
+		}
+
 		if (Array.isArray(body?.services)) {
 			for (const svc of body.services) {
 				if (!svc?.id || !svc?.status || svc.status === 'checking') continue;
 				stored.services[svc.id] = stored.services[svc.id] || {};
+				const pingVal = typeof svc.ping === 'number' ? svc.ping : null;
 				stored.services[svc.id][String(currentBucket)] = {
 					status: String(svc.status),
-					ping: typeof svc.ping === 'number' ? svc.ping : null,
+					ping: pingVal,
 				};
+				if (svc.status === 'operational' || svc.status === 'degraded') {
+					for (const bTsKey of recordedBuckets) {
+						if (!stored.services[svc.id][bTsKey]) {
+							stored.services[svc.id][bTsKey] = {
+								status: 'operational',
+								ping: pingVal,
+							};
+						}
+					}
+				}
 			}
 		}
 

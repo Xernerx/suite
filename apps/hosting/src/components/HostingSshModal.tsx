@@ -12,6 +12,7 @@ export interface HostingNodeConfig {
 	region?: string;
 	sshTarget?: string;
 	sshPort?: string;
+	provider?: 'easypanel' | 'vercel';
 }
 
 export const DEFAULT_HOSTING_NODES: HostingNodeConfig[] = [
@@ -22,6 +23,7 @@ export const DEFAULT_HOSTING_NODES: HostingNodeConfig[] = [
 		region: 'Primary Node',
 		sshTarget: 'root@172.235.181.92',
 		sshPort: '22',
+		provider: 'easypanel',
 	},
 	{
 		id: 'two-dummi',
@@ -30,8 +32,20 @@ export const DEFAULT_HOSTING_NODES: HostingNodeConfig[] = [
 		region: 'Secondary Node',
 		sshTarget: 'root@62.235.163.212',
 		sshPort: '22',
+		provider: 'easypanel',
+	},
+	{
+		id: 'vercel',
+		name: 'vercel',
+		url: 'https://vercel.com/dashboard',
+		region: 'Edge & Web Cloud',
+		provider: 'vercel',
 	},
 ];
+
+export function isVercelNode(node?: HostingNodeConfig): boolean {
+	return Boolean(node && (node.provider === 'vercel' || node.id === 'vercel' || node.url?.toLowerCase().includes('vercel.com')));
+}
 
 interface HostingSshModalProps {
 	open: boolean;
@@ -235,27 +249,29 @@ export default function HostingSshModal({ open, onOpenChange, activeNode, nodes,
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 				{/* Node Quick Switcher Pills */}
 				<div className="flex flex-wrap items-center gap-1.5">
-					{nodes.map((n) => {
-						const nodeTarget = resolveNodeSshTarget(n);
-						const isCurrent = normalizedTarget === nodeTarget;
-						return (
-							<button
-								key={n.id}
-								type="button"
-								onClick={() => {
-									setTarget(nodeTarget);
-									setPort(n.sshPort || '22');
-									setCwd('~');
-								}}
-								className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all cursor-pointer ${
-									isCurrent ? 'bg-(--accent) text-(--text) border-(--accent)' : 'bg-(--background)/60 text-(--text-muted) border-(--border)/10 hover:text-(--text)'
-								}`}
-							>
-								<Server size={12} />
-								<span>{n.name}</span>
-							</button>
-						);
-					})}
+					{nodes
+						.filter((n) => !isVercelNode(n))
+						.map((n) => {
+							const nodeTarget = resolveNodeSshTarget(n);
+							const isCurrent = normalizedTarget === nodeTarget;
+							return (
+								<button
+									key={n.id}
+									type="button"
+									onClick={() => {
+										setTarget(nodeTarget);
+										setPort(n.sshPort || '22');
+										setCwd('~');
+									}}
+									className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold border transition-all cursor-pointer ${
+										isCurrent ? 'bg-(--accent) text-(--text) border-(--accent)' : 'bg-(--background)/60 text-(--text-muted) border-(--border)/10 hover:text-(--text)'
+									}`}
+								>
+									<Server size={12} />
+									<span>{n.name}</span>
+								</button>
+							);
+						})}
 				</div>
 
 				{/* Target (root@ip), Port & Password */}

@@ -80,10 +80,59 @@ export function AppLayout({
 	initialEnvironment?: 'dev' | 'canary' | 'public';
 	enableAds?: boolean;
 }) {
+	if (typeof window !== 'undefined') {
+		const w = window as any;
+		w.googlefc = w.googlefc || {};
+		w.googlefc.controlledMessagingFunction = () => false;
+	}
+
 	React.useEffect(() => {
 		if (typeof document !== 'undefined') {
 			document.body.classList.add(fredoka.variable, cascadiaCode.variable);
 		}
+	}, []);
+
+	React.useEffect(() => {
+		if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+		const w = window as any;
+		w.googlefc = w.googlefc || {};
+		w.googlefc.controlledMessagingFunction = () => false;
+
+		const isGoogleCmpNode = (node: Element): boolean => {
+			const id = node.id || '';
+			const cls = typeof node.className === 'string' ? node.className : '';
+			if (
+				cls.includes('fc-consent-root') ||
+				cls.includes('fc-message-root') ||
+				cls.includes('fc-revocation') ||
+				cls.includes('google-revocation-link-placeholder') ||
+				id.startsWith('google-anno') ||
+				node.getAttribute('name') === 'googlefcPresent'
+			) {
+				return true;
+			}
+			const text = `${node.textContent || ''} ${(node as HTMLElement).shadowRoot?.textContent || ''}`;
+			if (text.includes('CMP ID: 300') || text.includes('Complies with IAB TCF')) {
+				return true;
+			}
+			return false;
+		};
+
+		const sweep = () => {
+			for (const child of Array.from(document.body.children)) {
+				if (child.classList.contains(fredoka.variable)) continue;
+				if (isGoogleCmpNode(child)) {
+					(child as HTMLElement).style.setProperty('display', 'none', 'important');
+					child.remove();
+				}
+			}
+		};
+
+		sweep();
+		const observer = new MutationObserver(() => sweep());
+		observer.observe(document.body, { childList: true, subtree: true });
+		return () => observer.disconnect();
 	}, []);
 
 	return (

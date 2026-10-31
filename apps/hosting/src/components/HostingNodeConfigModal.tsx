@@ -57,18 +57,24 @@ export default function HostingNodeConfigModal({ open, onOpenChange, nodes, savi
 	};
 
 	const handleSave = async () => {
-		const sanitized = draftNodes
-			.map((n) => ({
-				id: (n.id || n.name || 'node')
+		const sanitized: HostingNodeConfig[] = draftNodes
+			.map((n) => {
+				const id = (n.id || n.name || 'node')
 					.trim()
 					.toLowerCase()
-					.replace(/[^a-z0-9-_]/g, '-'),
-				name: (n.name || n.id || 'node').trim(),
-				url: (n.url || '').trim(),
-				region: (n.region || '').trim(),
-				sshTarget: (n.sshTarget || '').trim(),
-				sshPort: (n.sshPort || '22').trim(),
-			}))
+					.replace(/[^a-z0-9-_]/g, '-');
+				const url = (n.url || '').trim();
+				const provider: 'easypanel' | 'vercel' = n.provider === 'vercel' || id === 'vercel' || url.toLowerCase().includes('vercel.com') ? 'vercel' : 'easypanel';
+				return {
+					id,
+					name: (n.name || n.id || 'node').trim(),
+					url,
+					region: (n.region || '').trim(),
+					sshTarget: (n.sshTarget || '').trim(),
+					sshPort: (n.sshPort || '22').trim(),
+					provider,
+				};
+			})
 			.filter((n) => n.id && n.url);
 
 		if (sanitized.length === 0) {
@@ -137,7 +143,11 @@ export default function HostingNodeConfigModal({ open, onOpenChange, nodes, savi
 									</div>
 									<div className="flex flex-col gap-1">
 										<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('hosting.configModal.regionField')}</span>
-										<Input value={node.region || ''} onChange={(e) => handleUpdateDraftNode(index, 'region', e.target.value)} placeholder="Primary Node" />
+										<Input
+											value={node.region || ''}
+											onChange={(e) => handleUpdateDraftNode(index, 'region', e.target.value)}
+											placeholder={t('hosting.configModal.regionPlaceholder')}
+										/>
 									</div>
 								</div>
 

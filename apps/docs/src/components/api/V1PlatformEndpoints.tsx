@@ -128,7 +128,10 @@ export function V1PlatformEndpoints({
 			title: t('docs.api.v1.endpoints.fetchLeaderboard.title'),
 			icon: Trophy,
 			description: t('docs.api.v1.endpoints.fetchLeaderboard.description'),
-			routes: [{ method: 'GET', path: '/v1/leaderboard', auth: 'public' as const }],
+			routes: [
+				{ method: 'GET', path: '/v1/leaderboard', auth: 'public' as const },
+				{ method: 'GET', path: '/v1/leaderboard?guild=[guildId]', auth: 'public' as const },
+			],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10">
 					<h3 className="font-semibold text-(--text) mb-4 flex items-center gap-2">
@@ -144,7 +147,7 @@ export function V1PlatformEndpoints({
 							{
 								label: 'TypeScript (fetch)',
 								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/leaderboard');\nconst { bots, servers, streaks } = await response.json();\nconsole.log({ bots, servers, streaks });`,
+								code: `const response = await fetch('https://api.xernerx.com/v1/leaderboard');\nconst { bots, servers, streaks, levels, virtueGuilds, guildLevels } = await response.json();\nconsole.log({ bots, servers, streaks, levels, virtueGuilds, guildLevels });`,
 							},
 							{
 								label: '@xernerx/stats SDK',

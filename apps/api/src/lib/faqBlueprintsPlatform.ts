@@ -271,6 +271,17 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
 			),
 			c(
+				'card11',
+				'vitals-presence',
+				'faq.bots.card11.title',
+				['faq.bots.card11.description'],
+				[
+					ql('exploreBots', 'https://app.xernerx.com/bots', 'app.xernerx.com/bots'),
+					ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1'),
+					ql('systemStatus', 'https://info.xernerx.com/status', 'info.xernerx.com/status'),
+				]
+			),
+			c(
 				'card10',
 				'reviews',
 				'faq.bots.card10.title',
@@ -385,6 +396,16 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('virtueSettings', 'https://app.xernerx.com/dashboard?tab=virtue', 'app.xernerx.com/dashboard?tab=virtue'),
 					ql('exploreServers', 'https://app.xernerx.com/servers', 'app.xernerx.com/servers'),
 					ql('leaderboards', 'https://app.xernerx.com/leaderboard', 'app.xernerx.com/leaderboard'),
+				]
+			),
+			c(
+				'card8',
+				'virtue-level-role-tracks',
+				'faq.servers.card8.title',
+				['faq.servers.card8.description'],
+				[
+					ql('virtueSettings', 'https://app.xernerx.com/dashboard?tab=virtue', 'app.xernerx.com/dashboard?tab=virtue'),
+					ql('botInvites', 'https://www.xernerx.com/invites', 'xernerx.com/invite'),
 				]
 			),
 		],

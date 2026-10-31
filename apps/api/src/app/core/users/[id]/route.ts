@@ -31,6 +31,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const db = await database('xernerx');
 		const UserModel = (db.models.users as any).User;
+		const AppearanceModel = (db.models.users as any).Appearance;
 		const CreditModel = (db.models.users as any).Credit;
 		const BotModel = (db.models.bots as any).Bot;
 		const OrganizationModel = (db.models.organizations as any).Organization;
@@ -44,14 +45,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		let discordUser: any = null;
-		if (process.env.DISCORD_CLIENT_TOKEN) {
+		const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
+		for (const token of tokens) {
 			try {
 				const discordRes = await fetch(`https://discord.com/api/v10/users/${resolvedId}`, {
-					headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+					headers: { Authorization: `Bot ${token}` },
 					next: { revalidate: 3600 },
 				});
 				if (discordRes.ok) {
 					discordUser = await discordRes.json();
+					break;
 				}
 			} catch {
 				// Ignore Discord API error and fall back to database fields
@@ -62,11 +65,17 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
-		const [creditDoc, botCount, orgCount] = await Promise.all([
+		const [creditDoc, appearanceDoc, botCount, orgCount] = await Promise.all([
 			CreditModel.findOne({ ownerId: resolvedId })
 				.select('streak activeBadges dotMatrixVariant')
 				.lean()
 				.catch(() => null),
+			AppearanceModel
+				? AppearanceModel.findOne({ ownerId: resolvedId })
+						.select('accent theme')
+						.lean()
+						.catch(() => null)
+				: Promise.resolve(null),
 			BotModel.countDocuments({ owners: resolvedId, privacy: 'public' }).catch(() => 0),
 			OrganizationModel.countDocuments({
 				$or: [{ owner: resolvedId }, { members: resolvedId }],
@@ -105,6 +114,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			pronouns: user?.pronouns || null,
 			avatarUrl,
 			bannerUrl,
+			accent: (appearanceDoc as any)?.accent || null,
 			verified: Boolean(user?.verified),
 			streak: (creditDoc as any)?.streak || 0,
 			vanityBadges,

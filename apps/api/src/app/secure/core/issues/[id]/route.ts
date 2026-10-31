@@ -25,7 +25,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 			body.bountyAwarded = true;
 		}
 
-		const updated = (await models.core.Issue.findOneAndUpdate({ id }, body, { new: true }).lean()) as any;
+		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		const updated = (await models.core.Issue.findOneAndUpdate({ id }, cleanBody, { returnDocument: 'after' }).lean()) as any;
 
 		if (updated && shouldAwardBounty && updated.authorId) {
 			const CreditModel = (models.users as any).Credit;

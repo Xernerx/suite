@@ -89,13 +89,16 @@ export default async function RootLayout({
 	const session = await getServerSession(auth);
 
 	const headersList = await headers();
-	const host = headersList.get('host') || '';
-	const initialEnv: 'dev' | 'canary' | 'public' =
-		host.includes('.dev.') || host.includes('localhost') || process.env.ENVIRONMENT?.toLowerCase() === 'development'
+	const host = (headersList.get('x-forwarded-host') || headersList.get('host') || '').split(',')[0].trim().toLowerCase();
+	const initialEnv: 'dev' | 'canary' | 'public' = host.includes('.canary.')
+		? 'canary'
+		: host.includes('.dev.') || host.includes('localhost') || host.includes('127.0.0.1')
 			? 'dev'
-			: host.includes('.canary.') || process.env.ENVIRONMENT?.toLowerCase() === 'canary'
+			: !host && process.env.ENVIRONMENT?.toLowerCase() === 'canary'
 				? 'canary'
-				: 'public';
+				: !host && process.env.ENVIRONMENT?.toLowerCase() === 'development'
+					? 'dev'
+					: 'public';
 
 	const cookieStore = await cookies();
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || 'en';

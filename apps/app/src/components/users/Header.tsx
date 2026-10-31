@@ -225,18 +225,18 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 						<Settings className="w-4 h-4 mr-1.5" />
 						{t('app.users.editProfile')}
 					</Button>
-				) : (
+				) : Boolean((session as any)?.user?.id) ? (
 					<Button variant="primary" onClick={() => setTipModalOpen(true)}>
 						<Coins className="w-4 h-4 mr-1.5" />
 						{t('app.tip.tipUserBtn')}
 					</Button>
-				)}
+				) : null}
 				<Button variant="secondary" onClick={handleShareProfile} title={t('app.users.shareProfile')}>
 					<Share2 className="w-4 h-4 mr-1.5" />
 					{t('app.users.shareProfile')}
 				</Button>
 			</div>
-			<TipCreditsModal isOpen={tipModalOpen} onClose={() => setTipModalOpen(false)} recipientId={id} recipientName={displayName} />
+			{Boolean((session as any)?.user?.id) && !isOwnProfile && <TipCreditsModal isOpen={tipModalOpen} onClose={() => setTipModalOpen(false)} recipientId={id} recipientName={displayName} />}
 		</div>
 	);
 }

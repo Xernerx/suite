@@ -34,6 +34,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 			return NextResponse.json({ error: 'Bot not found.' }, { status: 404 });
 		}
 
+		let isAuthorizedDeveloper = Array.isArray(bot.owners) && bot.owners.includes(userId);
+		if (!isAuthorizedDeveloper && bot.organization) {
+			const Organization = (models.organizations as any)?.Organization;
+			if (Organization) {
+				const org = await Organization.findById(bot.organization).select('ownerId members').lean();
+				if (org && (org.ownerId === userId || (Array.isArray(org.members) && org.members.some((m: any) => m.userId === userId || m === userId)))) {
+					isAuthorizedDeveloper = true;
+				}
+			}
+		}
+
+		if (!isAuthorizedDeveloper) {
+			return NextResponse.json({ error: 'Forbidden: Only the bot developer can boost this bot.' }, { status: 403 });
+		}
+
 		let creditDoc = await Credit.findOne({ ownerId: userId });
 		if (!creditDoc) {
 			creditDoc = await Credit.create({ ownerId: userId, balance: 0, streak: 0 });
@@ -74,7 +89,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 				$inc: { balance: -tier.cost, totalSpent: tier.cost },
 				$push: { transactions: { $each: [txEntry], $slice: -100 } },
 			},
-			{ new: true }
+			{ returnDocument: 'after' }
 		).lean();
 
 		return NextResponse.json({

@@ -888,7 +888,8 @@
 				"store": "Store",
 				"auditLogs": "Audit Logs",
 				"bots": "Bots",
-				"servers": "Servers"
+				"servers": "Servers",
+				"virtue": "Virtue"
 			},
 			"home": {
 				"title": "Admin Overview",
@@ -1842,6 +1843,88 @@
 				"deleteError": "Failed to delete server."
 			},
 			"filterBotActive": "Bot Installed"
+		},
+		"virtue": {
+			"title": "Virtue",
+			"subtitle": "Manage global XP doubler events, schedule future boosts, and sync events with the main Discord server.",
+			"cancelScheduledBtn": "Cancel Scheduled Event",
+			"endEventBtn": "End Event (Reset to 1x)",
+			"quickStartBtn": "Quick Start 48h 2x XP",
+			"defaultEventLabel": "Double XP Event",
+			"weekendEventLabel": "Weekend Double XP",
+			"globalBoostFallback": "Global XP Boost",
+			"standardRateTitle": "Standard Progression Rate (1x XP)",
+			"activeRateTitle": "{label} ({multiplier}x XP)",
+			"statusLive": "LIVE",
+			"statusScheduled": "SCHEDULED",
+			"statusExpired": "EXPIRED",
+			"statusInactive": "INACTIVE",
+			"discordSynced": "Synced to Discord Event",
+			"discordSyncing": "Syncing with Main Discord Server",
+			"scopeSummaryEverything": "Global XP, All Server XP, and Level-Up Credits",
+			"scopeSummaryGlobalOnly": "Global Xernerx XP only",
+			"scopeSummaryGlobalAndServers": "Global XP and All Server XP",
+			"activeDescWithExpiry": "Multiplying {scope} by {multiplier}x until {expiresAt}.",
+			"activeDescNoExpiry": "Multiplying {scope} by {multiplier}x (no expiration set).",
+			"scheduledDescWithExpiry": "Scheduled to start on {startsAt} and run until {expiresAt}.",
+			"scheduledDescNoExpiry": "Scheduled to start on {startsAt}.",
+			"inactiveDesc": "No global XP multiplier is currently active. Enable or schedule an event below, or click Quick Start 48h 2x XP.",
+			"plannerTitle": "Global XP Doubler & Event Planner",
+			"enableToggleTitle": "Enable / Schedule XP Event",
+			"enableToggleDesc": "Activates immediately or at the scheduled start time below.",
+			"syncToggleTitle": "Sync Event on Main Discord Server",
+			"syncToggleDesc": "Automatically creates, updates, or removes a Discord Scheduled Event on the main server.",
+			"labelFieldTitle": "Event Name / Banner Label",
+			"labelFieldDesc": "Used as the Discord Scheduled Event title and status label.",
+			"labelFieldPlaceholder": "Weekend Double XP",
+			"multiplierFieldTitle": "XP Multiplier Rate",
+			"multiplierFieldDesc": "Select the global XP boost factor applied during the event.",
+			"multiplierOptions": {
+				"m125": "1.25x (+25% XP Boost)",
+				"m15": "1.5x (+50% XP Boost)",
+				"m2": "2x (Global XP Doubler)",
+				"m25": "2.5x (+150% Super Boost)",
+				"m3": "3x (Triple XP Event)",
+				"m5": "5x (Mega XP Event)"
+			},
+			"scopeFieldTitle": "Multiplier Scope",
+			"scopeFieldDesc": "Choose which progression tracks receive the global multiplier.",
+			"scopeOptions": {
+				"globalAndServers": "Global XP + All Server XP (Unified, Text & Voice)",
+				"globalOnly": "Global Xernerx XP Only",
+				"everything": "Global XP + All Server XP + Level-Up Credits"
+			},
+			"startFieldTitle": "Scheduled Start Time (Optional — Leave blank to start now)",
+			"startFieldDesc": "Plan an upcoming event in the future; Virtue activates it automatically at this time.",
+			"startPresets": {
+				"now": "Start Immediately",
+				"in1h": "In 1 Hour",
+				"in6h": "In 6 Hours",
+				"tomorrow": "Tomorrow 18:00",
+				"weekend": "Upcoming Weekend (Fri 18:00 • 48h)"
+			},
+			"endFieldTitle": "Scheduled End / Expiration Time (Optional)",
+			"endFieldDesc": "Duration presets below are calculated from the start time (or now if starting immediately).",
+			"endPresets": {
+				"none": "No Expiry",
+				"h12": "+12 Hours",
+				"h24": "+24 Hours",
+				"h48": "+48h (Weekend)",
+				"d7": "+7 Days"
+			},
+			"scheduleBtn": "Schedule Global XP Event",
+			"saveBtn": "Save Global XP Settings",
+			"toasts": {
+				"endedTitle": "Global XP Event Ended",
+				"endedDesc": "Virtue XP rates set to normal (1x) and any synced Discord event was removed.",
+				"scheduledTitle": "Scheduled {multiplier}x XP Event",
+				"scheduledDescSynced": "{label} is scheduled for {startsAt} and synced with the main Discord server.",
+				"scheduledDescUnsynced": "{label} is scheduled for {startsAt}.",
+				"activeTitle": "Global {multiplier}x XP Active",
+				"activeDescSynced": "{label} is now live across Virtue and synced with the main Discord server.",
+				"activeDescUnsynced": "{label} is now live across Virtue.",
+				"saveError": "Failed to save Global XP settings"
+			}
 		}
 	},
 	"account": {
@@ -2659,6 +2742,14 @@
 				"saveButton": "Save Credentials",
 				"emailRequired": "Please enter your Easypanel account email.",
 				"savedToast": "Easypanel credentials saved!"
+			},
+			"vercel": {
+				"title": "Vercel (Edge & Web Cloud)",
+				"description": "Sign in with your Vercel account via OAuth2 to link your staff identity inside hosting.xernerx.com.",
+				"connectedAs": "Signed in as {team} • Private staff OAuth connection (never shown on public profile)",
+				"openHosting": "Open Vercel Console",
+				"oauthButton": "Sign in with Vercel",
+				"reconnectOauth": "Reconnect Vercel"
 			}
 		},
 		"devices": {
@@ -4243,6 +4334,10 @@
 			"card10": {
 				"title": "How do Bot Reviews, Star Ratings, and Developer Responses work?",
 				"description": "On any public bot profile (app.xernerx.com/bots/[id]) under the Reviews tab, signed-in users can submit a 1-to-5 star rating with an optional written review, edit or delete their review, and mark other community reviews as helpful. Visitors can filter reviews by star rating (1★ to 5★) or sort by Most Helpful, Newest, Highest Rated, and Lowest Rated. Verified owners of the bot can post an official Developer Response directly underneath any review, and receive real-time webhook alerts via the POST review, PATCH review, DELETE review, and VOTE review webhook triggers."
+			},
+			"card11": {
+				"title": "How do Bot Vitals, online presence tracking, and telemetry work — and what is available to any bot owner vs. Xernerx Studios?",
+				"description": "Every bot profile on app.xernerx.com/bots/[id] features a Bot Vitals & Info card alongside live telemetry: (1) Available to All Bot Owners—the Bot Vitals card automatically decodes the bot's Discord creation date from its Snowflake ID, displays its Xernerx listing date, counts synced Slash and Context commands (PUT /v1/bots/[id]/commands or @xernerx/commands), lists Vanity URLs and official links, and tracks 32-tier Server & Member Milestone badges. Any bot owner can also push onlineSince uptime, serverCount, userCount, shardCount, per-shard health matrices (shards: [{ id, guilds, ping, status }]), and custom telemetry to POST /v1/bots/[id]/stats via @xernerx/stats; (2) Official Xernerx Studios Bots Only—live Discord Gateway presence (online/idle/dnd/offline status and active custom activity text) and 24-hour status history on info.xernerx.com/status are tracked automatically via the Xernerx Bot and Xernerx App daemons and are exclusively scoped to official Xernerx Studios bots."
 			}
 		},
 		"servers": {
@@ -4275,6 +4370,10 @@
 			"card7": {
 				"title": "How do Virtue Server XP & Voice Leaderboards work?",
 				"description": "When Virtue's leveling module is enabled on your Discord server, members automatically earn XP from text messages and active time in voice channels. Server owners can customize XP rates, level-up role rewards, and announcements in the Virtue Dashboard, while members can browse real-time ranked XP and Voice Leaderboards on your public server page."
+			},
+			"card8": {
+				"title": "Can I assign Virtue level roles for Text XP and Voice XP independently or based on Unified Server XP?",
+				"description": "Yes! In the Server Dashboard under the Virtue tab (app.xernerx.com/dashboard?tab=virtue), each Level Role can be assigned to one of three XP tracks: (1) Unified Server XP (Combined)—unlocks when a member reaches the target combined Server Level from both text and voice activity; (2) Text XP (Messages Only)—unlocks independently when a member reaches the target level on the text chat XP track; or (3) Voice XP (Voice Time Only)—unlocks independently when a member reaches the target level on the voice channel XP track. Members can also run /roles in Discord to view all configured level roles, their track badges (SERVER, TEXT, VOICE), and their live unlock progress."
 			}
 		},
 		"account": {
@@ -4498,6 +4597,7 @@
 				"text16": "Back to Bots",
 				"publishedBy": "Published by",
 				"vote": "Vote",
+				"signInToVote": "Sign in to vote",
 				"voteAgainIn": "Vote again in {time}",
 				"voted": "Voted!",
 				"voting": "Voting...",
@@ -4624,6 +4724,81 @@
 				"userContextHint": "Right-click User → Apps → {name}",
 				"messageContextHint": "Right-click Message → Apps → {name}",
 				"contextDefaultDesc": "Discord context menu action triggered directly on a {target}."
+			},
+			"overview": {
+				"aboutBot": "About {name}",
+				"kpiServers": "Active Servers",
+				"kpiUsers": "Total Reach",
+				"kpiVotes": "Community Votes",
+				"kpiRating": "User Rating",
+				"kpiRuntime": "Uptime & Shards",
+				"reviewsCount": "{count} reviews",
+				"noRatingsYet": "No reviews yet",
+				"shardsCount": "{count} Shards",
+				"featuredCommandsTitle": "Featured Commands",
+				"featuredCommandsSubtitle": "Quick-reference slash commands you can run right now.",
+				"viewAllCommands": "View all {count} commands",
+				"latestReleaseTitle": "Latest Release",
+				"viewAllReleases": "Release history ({count})",
+				"recentReviewsTitle": "Community Reviews",
+				"recentReviewsSubtitle": "What server owners and members say about {name}.",
+				"viewAllReviews": "See all reviews",
+				"writeFirstReview": "Write a review",
+				"vitalsTitle": "Bot Vitals & Info",
+				"statusLabel": "Live Status",
+				"statusOnline": "Online",
+				"statusIdle": "Idle",
+				"statusDnd": "Do Not Disturb",
+				"statusOffline": "Offline",
+				"activityLabel": "Current Activity",
+				"discordCreatedLabel": "Created on Discord",
+				"listedOnXernerxLabel": "Listed on Xernerx",
+				"vanityUrlLabel": "Vanity URL",
+				"vanityCopied": "Vanity URL copied to clipboard",
+				"commandBreakdownLabel": "Command Suite",
+				"slashAndContextCount": "{slash} Slash • {context} Context",
+				"linksTitle": "Official Links",
+				"milestonesCardTitle": "Milestone Badges",
+				"milestonesCardSubtitle": "Highest unlocked server & member tiers.",
+				"viewAllMilestones": "View all 32 milestones",
+				"serverTierLabel": "Server Tier",
+				"memberTierLabel": "Member Tier",
+				"unrankedTier": "Tier 0",
+				"nextTierProgress": "Next: {target} ({percent}%)",
+				"maxTierUnlocked": "Max Tier Reached",
+				"widgetCardTitle": "Embeddable Bot Card",
+				"widgetCardSubtitle": "Share a live auto-updating SVG card on GitHub or your website.",
+				"copyMarkdown": "Markdown",
+				"copyHtml": "HTML Embed",
+				"copySvgUrl": "SVG URL",
+				"moreFromDeveloperTitle": "More by {developer}",
+				"moreFromDeveloperSubtitle": "Other bots built and maintained by this team.",
+				"similarBotsTitle": "Similar Bots",
+				"similarBotsSubtitle": "Bots sharing matching categories and tags.",
+				"shardMatrixTitle": "Shard Health & Telemetry Matrix",
+				"shardMatrixSubtitle": "Live cluster distribution and shard runtime diagnostics.",
+				"shardLabel": "Shard #{id}",
+				"shardGuilds": "{count} servers",
+				"shardPing": "{ping}ms",
+				"shardHealthy": "Healthy",
+				"customTelemetryTitle": "Custom Bot Telemetry",
+				"remainingToNextTier": "{remaining} away from {target}"
+			},
+			"verifiedBadge": "Verified",
+			"explore": {
+				"subtitle": "Discover verified Discord bots, compare live community growth, and invite top bots to your server.",
+				"viewBot": "View Profile",
+				"quickInvite": "Invite",
+				"spotlightBadge": "Spotlight Bot",
+				"featuredBadge": "Featured #1",
+				"sortDefault": "Sort: Default",
+				"sortServers": "Sort: Most Servers",
+				"sortUsers": "Sort: Most Users",
+				"sortVotes": "Sort: Most Votes",
+				"sortRating": "Sort: Highest Rated",
+				"sortNewest": "Sort: Newest",
+				"surpriseMe": "Surprise Me",
+				"showingCount": "Showing {count} bots"
 			}
 		},
 		"dashboard": {
@@ -4747,6 +4922,17 @@
 				"trackedRolesDesc": "Only members with these roles accumulate XP (leave empty to track everyone).",
 				"levelRoles": "Level Roles",
 				"levelRolesDesc": "Link Discord roles to specific levels so members automatically unlock them as they progress.",
+				"trackLabel": "XP Track",
+				"tracks": {
+					"all": "All Tracks",
+					"server": "Unified Server XP (Combined)",
+					"text": "Text XP (Messages Only)",
+					"voice": "Voice XP (Voice Time Only)",
+					"serverShort": "Unified XP",
+					"textShort": "Text XP",
+					"voiceShort": "Voice XP",
+					"helperHint": "Assign roles based on Unified Server XP (combined text & voice activity) or independently on Text XP and Voice XP tracks."
+				},
 				"levelLabel": "Level",
 				"roleLabel": "Discord Role",
 				"roleIdPlaceholder": "Role ID (e.g. 123456789012345678)",
@@ -4780,7 +4966,20 @@
 					"weekly": "Weekly",
 					"monthly": "Monthly"
 				},
-				"duplicateRoleWarning": "Role reassigned to the new level milestone."
+				"duplicateRoleWarning": "Role reassigned to the new level milestone.",
+				"boosterBonus": "Server Booster XP Bonus",
+				"boosterOptions": {
+					"m1": "1x (Disabled)",
+					"m125": "1.25x (+25% Booster XP)",
+					"m15": "1.5x (+50% Booster XP)",
+					"m2": "2x (Double Booster XP)"
+				},
+				"ignoredChannels": "Ignored Channels",
+				"ignoredChannelsPlaceholder": "Select channels to mute XP...",
+				"ignoredChannelsDesc": "Messages and voice activity in these channels will not grant server XP.",
+				"stackRoles": "Stack Level Roles",
+				"stackRolesEnabledDesc": "Members keep all unlocked milestone roles as they level up.",
+				"stackRolesDisabledDesc": "Unlocking a higher role replaces previous lower-level roles on that track."
 			}
 		},
 		"layout": {},
@@ -5578,6 +5777,7 @@
 				"title": "Virtue XP & Voice Leaderboard",
 				"subtitle": "Top active members ranked by text chat XP and voice activity in this server.",
 				"searchPlaceholder": "Search ranked members...",
+				"unifiedTab": "Server Level",
 				"textTab": "Text XP",
 				"voiceTab": "Voice XP",
 				"emptyTitle": "No leaderboard activity yet",
@@ -5651,7 +5851,8 @@
 			"tabs": {
 				"bots": "Top Bots",
 				"servers": "Top Servers",
-				"streaks": "Daily Streaks"
+				"streaks": "Daily Streaks",
+				"levels": "Levels"
 			},
 			"metrics": {
 				"votes": "Votes",
@@ -5659,6 +5860,12 @@
 				"members": "Members",
 				"streak": "Streak",
 				"credits": "Credits",
+				"level": "Level",
+				"xp": "XP",
+				"globalTrack": "Global Level",
+				"serverTrack": "Server Level",
+				"textTrack": "Text Level",
+				"voiceTrack": "Voice Level",
 				"totalImpact": "Total",
 				"bugs": "Bugs",
 				"suggestions": "Ideas"
@@ -6491,7 +6698,8 @@
 					"voiceDesc": "Guild member voice level, voice XP, and time spent in voice per server.",
 					"globalLevelDesc": "Global unified platform user level and XP (combined text & voice contribution).",
 					"globalUserDesc": "Global Xernerx user account profile and settings.",
-					"exampleTitle": "Example: Update Guild Leveling Configuration"
+					"exampleTitle": "Example: Update Guild Leveling Configuration",
+					"membersDesc": "Unified server member level and XP (combined text & voice activity per server)."
 				},
 				"xernerx": {
 					"description": "Primary platform service mediating global accounts, combined user leveling, economy credits, and ecosystem resources stored in the main <code>xernerx</code> database.",
@@ -6503,7 +6711,8 @@
 					"subscriptionsDesc": "Active and historical user subscription records and billing states.",
 					"guildsDesc": "Platform-wide guild profiles and institutional registration.",
 					"botsDesc": "Registered bot metadata, reviews, votes, and verification state.",
-					"exampleTitle": "Example: Query Global User & Level"
+					"exampleTitle": "Example: Query Global User & Level",
+					"settingsDesc": "Core system configuration and global event settings (such as Virtue Global XP multipliers)."
 				},
 				"metamorphosis": {
 					"desc": "Metamorphosis bot profiles and integration hooks."
@@ -6963,7 +7172,8 @@
 				"info": "Support & Info Hub",
 				"store": "Store & Billing",
 				"admin": "Staff Portal",
-				"hosting": "Server Hosting"
+				"hosting": "Server Hosting",
+				"haste": "Haste Pastebin"
 			},
 			"botsHeading": "Official Bots",
 			"botsOnlineCount": "{online}/{total} Online",
@@ -7035,7 +7245,8 @@
 			"deleteConfirmTitle": "Remove Hosting Node",
 			"deleteConfirmDesc": "Are you sure you want to remove node {name} from the console configuration?",
 			"resetConfirmTitle": "Reset Nodes to Default",
-			"resetConfirmDesc": "Are you sure you want to reset all hosting node configurations back to default (one-dummi & two-dummi)?"
+			"resetConfirmDesc": "Are you sure you want to reset all hosting node configurations back to default (one-dummi & two-dummi)?",
+			"regionPlaceholder": "Primary Node"
 		},
 		"sshModal": {
 			"title": "Server SSH Console (root@ip)",
@@ -7052,6 +7263,42 @@
 			"missingIpError": "Please enter a valid server IP (e.g. root@123.45.67.89).",
 			"execFailed": "SSH command execution failed",
 			"useLinkedSecret": "Use Linked Secret"
+		},
+		"vercel": {
+			"kpiProduction": "Production Edge Apps",
+			"kpiCanary": "Canary Edge Apps",
+			"kpiDeployments": "Recent Deployments",
+			"kpiUserOauth": "Your Vercel Account",
+			"probingEdge": "Probing edge endpoints...",
+			"apiConnected": "Live Vercel REST API",
+			"connectForBuilds": "Link token for build history",
+			"notLinked": "Not Linked",
+			"linkToken": "Link Vercel Token",
+			"editToken": "Configure Token",
+			"tabSuiteApps": "Suite Edge Apps",
+			"tabDeployments": "Deployments",
+			"filter_all": "All",
+			"filter_online": "Online",
+			"filter_issues": "Issues",
+			"searchPlaceholder": "Search apps, domains, branches, commits...",
+			"refresh": "Refresh",
+			"redeployTooltip": "Trigger 1-click Production Redeploy on Vercel",
+			"openInVercel": "Open project on Vercel",
+			"productionLabel": "Production",
+			"canaryLabel": "Canary",
+			"offline": "Offline",
+			"ssoOrOffline": "SSO / Offline",
+			"connectCardTitle": "Connect Your Vercel Access Token",
+			"connectCardDesc": "Link a Vercel Access Token from vercel.com/account/tokens to inspect live build logs, Git commit deployments, and trigger 1-click redeployments directly inside hosting.xernerx.com.",
+			"createVercelToken": "Create Token on Vercel",
+			"noDeployments": "No matching Vercel deployments found.",
+			"redeployButton": "Redeploy",
+			"visitUrl": "Visit",
+			"inspectLogs": "Inspect Build",
+			"tokenRequired": "Please enter a valid Vercel Access Token.",
+			"tokenSavedToast": "Vercel API credentials saved!",
+			"redeployTriggered": "Triggered Vercel redeploy for {name}!",
+			"redeployFailed": "Failed to trigger Vercel redeploy."
 		}
 	},
 	"haste": {

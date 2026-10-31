@@ -419,3 +419,21 @@ html.reduce-motion *::after {
 		background-color: var(--accent);
 	}
 }
+
+/* Suppress Google AdSense / Funding Choices floating IAB TCF badge (CMP ID: 300) */
+.fc-consent-root,
+.fc-message-root,
+.fc-revocation-link-placeholder,
+.fc-revocation-button,
+.google-revocation-link-placeholder,
+div[class*='fc-revocation'],
+div[id^='google-anno'],
+iframe[name='googlefcPresent'],
+iframe[src*='fundingchoicesmessages.google.com'] {
+	display: none !important;
+	visibility: hidden !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+	width: 0 !important;
+	height: 0 !important;
+}

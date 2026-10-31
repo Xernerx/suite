@@ -8,6 +8,7 @@ import { Button, Toggle } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { Link as LinkIcon, CheckCircle2, ExternalLink, Code2, AtSign, Video, Tv, Shield, Music, Gamepad2, MessageCircle, Unplug, Plus, Lock, UserPlus } from 'lucide-react';
 import EasypanelConnectionCard from './EasypanelConnectionCard';
+import VercelConnectionCard from './VercelConnectionCard';
 
 interface ConnectedAccount {
 	provider: string;
@@ -163,6 +164,7 @@ export default function Connections() {
 	}, [isReady, userId, getEnvUrl]);
 
 	const easypanelConnection = connections.find((c) => c.provider === 'easypanel');
+	const vercelConnection = connections.find((c) => c.provider === 'vercel');
 
 	const handleConnect = (providerId: string) => {
 		setBusyProvider(providerId);
@@ -280,18 +282,21 @@ export default function Connections() {
 				)}
 			</div>
 
-			{/* Staff-Only Server Hosting Connection: Easypanel (Only rendered when user has 'hosting' permission) */}
+			{/* Staff-Only Server Hosting Connections: Easypanel & Vercel (Only rendered when user has 'hosting' permission) */}
 			{hasHostingAccess && (
-				<EasypanelConnectionCard
-					connection={easypanelConnection}
-					defaultEmail={(activeUser as any)?.email || ''}
-					isBusy={busyProvider === 'easypanel'}
-					onDisconnect={() => handleDisconnect('easypanel')}
-					onSaved={(savedConn) => {
-						setConnections((prev) => [...prev.filter((c) => c.provider !== 'easypanel'), savedConn]);
-						if (mutate) mutate();
-					}}
-				/>
+				<>
+					<EasypanelConnectionCard
+						connection={easypanelConnection}
+						defaultEmail={(activeUser as any)?.email || ''}
+						isBusy={busyProvider === 'easypanel'}
+						onDisconnect={() => handleDisconnect('easypanel')}
+						onSaved={(savedConn) => {
+							setConnections((prev) => [...prev.filter((c) => c.provider !== 'easypanel'), savedConn]);
+							if (mutate) mutate();
+						}}
+					/>
+					<VercelConnectionCard connection={vercelConnection} isBusy={busyProvider === 'vercel'} onDisconnect={() => handleDisconnect('vercel')} />
+				</>
 			)}
 
 			{/* Optional OAuth Connections Grid */}

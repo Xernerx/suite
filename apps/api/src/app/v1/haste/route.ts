@@ -37,7 +37,7 @@ export async function GET(req: Request) {
 		const now = new Date();
 		const expiryFilter = { $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }] };
 
-		let query: Record<string, any> = {
+		const query: Record<string, any> = {
 			...expiryFilter,
 			userId: viewerUserId,
 		};

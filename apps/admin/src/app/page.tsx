@@ -47,6 +47,7 @@ import Issues from '@/components/Issues';
 import Media from '@/components/Media';
 import StoreManagement from '@/components/StoreManagement';
 import Support from '@/components/Support';
+import VirtueAdmin from '@/components/VirtueAdmin';
 import { permissions } from '@xernerx/lib';
 
 export default function Home() {
@@ -62,6 +63,7 @@ export default function Home() {
 	const [userRolePermissions, setUserRolePermissions] = useState<Record<string, boolean>>({});
 	const [dbError, setDbError] = useState<string | null>(null);
 	const [triageQuery, setTriageQuery] = useState<string>('');
+	const [virtueAvatarUrl, setVirtueAvatarUrl] = useState<string | null>(null);
 	const hasInitializedView = useRef(false);
 
 	const handleNavigateFromOverview = (targetView: string, query?: string) => {
@@ -97,6 +99,51 @@ export default function Home() {
 			}
 		}
 		fetchServer();
+	}, [getEnvUrl, isReady]);
+
+	useEffect(() => {
+		if (!isReady) return;
+		const VIRTUE_BOT_ID = '1484880634844287138';
+
+		async function fetchVirtueAvatar() {
+			try {
+				const resolveUrl = (botId: string, avatarHash?: string | null, directUrl?: string | null) => {
+					if (directUrl && String(directUrl).startsWith('http')) return String(directUrl);
+					if (avatarHash && String(avatarHash).startsWith('http')) return String(avatarHash);
+					if (avatarHash && botId) {
+						return `https://cdn.discordapp.com/avatars/${botId}/${avatarHash}.${String(avatarHash).startsWith('a_') ? 'gif' : 'png'}?size=128`;
+					}
+					return null;
+				};
+
+				const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${VIRTUE_BOT_ID}/discord`)).catch(() => null);
+				if (discordRes?.ok) {
+					const discordData = await discordRes.json();
+					const fetchedUrl = resolveUrl(VIRTUE_BOT_ID, discordData?.avatar, discordData?.avatarUrl);
+					if (fetchedUrl) {
+						setVirtueAvatarUrl(fetchedUrl);
+						return;
+					}
+				}
+
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/bots?all=true&limit=100'), { credentials: 'include' }).catch(() => null);
+				if (!res?.ok) return;
+				const bots = await res.json();
+				if (!Array.isArray(bots)) return;
+				const virtueBot =
+					bots.find((b: any) => String(b?.id) === VIRTUE_BOT_ID) || bots.find((b: any) => b?.vanitySlug?.toLowerCase() === 'virtue' || b?.name?.toLowerCase().includes('virtue'));
+				if (!virtueBot) return;
+
+				const botId = String(virtueBot.id || VIRTUE_BOT_ID);
+				const initialUrl = resolveUrl(botId, virtueBot.discord?.avatar || virtueBot.avatar, virtueBot.discord?.avatarUrl);
+				if (initialUrl) {
+					setVirtueAvatarUrl(initialUrl);
+				}
+			} catch {
+				// Ignore avatar fetch errors
+			}
+		}
+		fetchVirtueAvatar();
 	}, [getEnvUrl, isReady]);
 
 	useEffect(() => {
@@ -147,56 +194,45 @@ export default function Home() {
 		}
 	}, [user, userLoading, getEnvUrl, isReady]);
 
+	const hasDbFallback = Boolean(dbError);
+	const canTranslations = hasDbFallback || (userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false);
+	const canUsers = hasDbFallback || (userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true);
+	const canBots = hasDbFallback || (userRolePermissions.bots ?? userRolePermissions.users ?? true);
+	const canServers = hasDbFallback || (userRolePermissions.servers ?? userRolePermissions.users ?? true);
+	const canApplicationsReview = hasDbFallback || (userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false);
+	const canApplicationsManage = hasDbFallback || (userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false);
+	const canRoles = hasDbFallback || (userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false);
+	const canTokens = hasDbFallback || (userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false);
+	const canSettings = hasDbFallback || (userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false);
+	const canInvites = hasDbFallback || (userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false);
+	const canAnnouncements = hasDbFallback || (userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false);
+	const canManageMedia = hasDbFallback || (userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false);
+	const canUploadMedia = hasDbFallback || (userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true);
+	const canManageRoadmap = hasDbFallback || (userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false);
+	const canManageSuggestions = hasDbFallback || (userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false);
+	const canManageIssues = hasDbFallback || (userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false);
+	const canManageStore = hasDbFallback || (userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false);
+	const canManageSupport = hasDbFallback || (userRolePermissions.manageSupport ?? userRolePermissions.settings ?? permissions.find((p) => p.key === 'manageSupport')?.defaultValue ?? false);
+	const canMedia = canManageMedia || canUploadMedia;
+	const isServerSet = hasDbFallback || !!adminServerId;
+
 	useEffect(() => {
 		if ((userLoading || roleLoading || serverLoading) && !dbError) return;
 
-		const items = [];
-		const hasDbFallback = Boolean(dbError);
-
-		const canTranslations = hasDbFallback || (userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false);
-		const canUsers = hasDbFallback || (userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true);
-		const canBots = hasDbFallback || (userRolePermissions.bots ?? userRolePermissions.users ?? true);
-		const canServers = hasDbFallback || (userRolePermissions.servers ?? userRolePermissions.users ?? true);
-		const canApplicationsReview = hasDbFallback || (userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false);
-		const canApplicationsManage = hasDbFallback || (userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false);
-		const canRoles = hasDbFallback || (userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false);
-		const canTokens = hasDbFallback || (userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false);
-		const canSettings = hasDbFallback || (userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false);
-		const canInvites = hasDbFallback || (userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false);
-		const canAnnouncements = hasDbFallback || (userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false);
-		const canManageMedia = hasDbFallback || (userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false);
-		const canUploadMedia = hasDbFallback || (userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true);
-		const canManageRoadmap = hasDbFallback || (userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false);
-		const canManageSuggestions = hasDbFallback || (userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false);
-		const canManageIssues = hasDbFallback || (userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false);
-		const canManageStore = hasDbFallback || (userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false);
-		const canManageSupport = hasDbFallback || (userRolePermissions.manageSupport ?? userRolePermissions.settings ?? permissions.find((p) => p.key === 'manageSupport')?.defaultValue ?? false);
-		const canMedia = canManageMedia || canUploadMedia;
-
-		const isServerSet = hasDbFallback || !!adminServerId;
-
-		items.push({
-			category: t('common.nav.categories.system'),
-			label: t('admin.dashboard.nav.overview'),
-			view: 'overview',
-			icon: Activity,
-		});
-
-		items.push({
-			category: t('common.nav.categories.system'),
-			label: t('admin.dashboard.nav.seo'),
-			view: 'seo',
-			icon: Gauge,
-		});
-
-		if (canRoles && isServerSet) {
-			items.push({
+		const items: any[] = [
+			{
 				category: t('common.nav.categories.system'),
-				label: t('common.nav.items.roles'),
-				view: 'roles',
-				icon: Shield,
-			});
-		}
+				label: t('admin.dashboard.nav.overview'),
+				view: 'overview',
+				icon: Activity,
+			},
+			{
+				category: t('common.nav.categories.system'),
+				label: t('admin.dashboard.nav.seo'),
+				view: 'seo',
+				icon: Gauge,
+			},
+		];
 
 		if (canSettings) {
 			items.push({
@@ -223,59 +259,38 @@ export default function Home() {
 			});
 		}
 
-		if (canMedia) {
-			items.push({
-				category: t('admin.dashboard.nav.media'),
-				label: t('admin.dashboard.nav.mediaLibrary'),
-				view: 'media',
-				icon: Image,
-			});
-		}
-
 		if (canTranslations && isServerSet) {
 			items.push({
-				category: t('common.nav.categories.translator'),
+				category: t('common.nav.categories.support'),
 				label: t('common.nav.items.translations'),
 				view: 'translations',
 				icon: Languages,
 			});
 		}
 
-		if (canUsers && isServerSet) {
-			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.users'), view: 'users', icon: UsersIcon });
-		}
-		if (canBots && isServerSet) {
-			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.bots'), view: 'bots', icon: Bot });
-		}
-		if (canServers && isServerSet) {
-			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.servers'), view: 'servers', icon: Server });
-		}
-		if (canApplicationsReview && isServerSet) {
+		if (canUsers && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.users'), view: 'users', icon: UsersIcon });
+		if (canBots && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.bots'), view: 'bots', icon: Bot });
+		if (canServers && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.servers'), view: 'servers', icon: Server });
+		if (canApplicationsReview && isServerSet)
 			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.applications_review'), view: 'applications_review', icon: Ticket });
-		}
-		if (canApplicationsManage && isServerSet) {
+		if (canMedia) items.push({ category: t('common.nav.categories.moderator'), label: t('admin.dashboard.nav.mediaLibrary'), view: 'media', icon: Image });
+		if (canRoles && isServerSet) items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.roles'), view: 'roles', icon: Shield });
+		if (canApplicationsManage && isServerSet)
 			items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.applications_manage'), view: 'applications_manage', icon: Ticket });
-		}
-		if (canTokens && isServerSet) {
-			items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.tokens'), view: 'tokens', icon: Key });
-		}
-		if (canInvites) {
-			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.invites'), view: 'invites', icon: Link });
-		}
-		if (canAnnouncements) {
-			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
-		}
-		if (canManageRoadmap) {
-			items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.roadmap'), view: 'roadmap', icon: Map });
-		}
-		if (canManageSuggestions) {
-			items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.suggestions'), view: 'suggestions', icon: Inbox });
-		}
-		if (canManageIssues) {
-			items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.issues'), view: 'issues', icon: Bug });
-		}
-		if (canManageStore) {
-			items.push({ category: t('common.nav.categories.product'), label: t('admin.dashboard.nav.store'), view: 'store', icon: ShoppingBag });
+		if (canTokens && isServerSet) items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.tokens'), view: 'tokens', icon: Key });
+		if (canInvites) items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.invites'), view: 'invites', icon: Link });
+		if (canAnnouncements) items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
+		if (canManageRoadmap) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.roadmap'), view: 'roadmap', icon: Map });
+		if (canManageSuggestions) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.suggestions'), view: 'suggestions', icon: Inbox });
+		if (canManageIssues) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.issues'), view: 'issues', icon: Bug });
+		if (canManageStore) items.push({ category: t('common.nav.categories.product'), label: t('admin.dashboard.nav.store'), view: 'store', icon: ShoppingBag });
+		if (canSettings || canBots) {
+			items.push({
+				category: t('common.nav.categories.bots'),
+				label: t('admin.dashboard.nav.virtue'),
+				view: 'virtue',
+				icon: virtueAvatarUrl ? () => <img src={virtueAvatarUrl} alt={t('admin.dashboard.nav.virtue')} className="w-5 h-5 rounded-full object-cover shrink-0" /> : Bot,
+			});
 		}
 
 		setNavItems(items);
@@ -301,7 +316,7 @@ export default function Home() {
 		}
 
 		show();
-	}, [userLoading, roleLoading, serverLoading, adminServerId, userRolePermissions, dbError, view, setView, setNavItems, show, t]);
+	}, [userLoading, roleLoading, serverLoading, adminServerId, userRolePermissions, dbError, view, setView, setNavItems, show, t, virtueAvatarUrl]);
 
 	useEffect(() => {
 		if (!hasInitializedView.current || !view || typeof window === 'undefined') return;
@@ -334,7 +349,7 @@ export default function Home() {
 					</div>
 					<div className="flex flex-col w-full" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 						<h1 className="text-xl font-bold text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							Database Error
+							{t('feedback.error.title')}
 						</h1>
 						<p className="text-sm text-(--text-muted)">{t('feedback.error.description')}</p>
 						<div className="mt-4 p-4 bg-(--background) rounded-xl border border-(--border)/10 text-left w-full overflow-auto">
@@ -348,32 +363,7 @@ export default function Home() {
 		);
 	}
 
-	const allowedViews = [];
-	const canUsers = userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true;
-	const canBots = userRolePermissions.bots ?? userRolePermissions.users ?? true;
-	const canServers = userRolePermissions.servers ?? userRolePermissions.users ?? true;
-	const canRoles = userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false;
-	const canApplicationsReview = userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false;
-	const canApplicationsManage = userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false;
-	const canTokens = userRolePermissions.tokens ?? permissions.find((p) => p.key === 'tokens')?.defaultValue ?? false;
-	const canTranslations = userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false;
-	const canSettings = userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false;
-	const canInvites = userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false;
-	const canAnnouncements = userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false;
-	const canManageMedia = userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false;
-	const canUploadMedia = userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true;
-	const canMedia = canManageMedia || canUploadMedia;
-	const canManageRoadmap = userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false;
-	const canManageSuggestions = userRolePermissions.manageSuggestions ?? permissions.find((p) => p.key === 'manageSuggestions')?.defaultValue ?? false;
-	const canManageIssues = userRolePermissions.manageIssues ?? permissions.find((p) => p.key === 'manageIssues')?.defaultValue ?? false;
-	const canManageStore = userRolePermissions.manageStore ?? userRolePermissions.store ?? permissions.find((p) => p.key === 'manageStore')?.defaultValue ?? false;
-	const canManageSupport = userRolePermissions.manageSupport ?? userRolePermissions.settings ?? permissions.find((p) => p.key === 'manageSupport')?.defaultValue ?? false;
-
-	const isServerSet = !!adminServerId;
-
-	allowedViews.push('overview');
-	allowedViews.push('seo');
-	allowedViews.push('audit');
+	const allowedViews = ['overview', 'seo', 'audit'];
 	if (canManageSupport) allowedViews.push('support');
 	if (canMedia) allowedViews.push('media');
 	if (canTranslations && isServerSet) allowedViews.push('translations');
@@ -385,6 +375,7 @@ export default function Home() {
 	if (canRoles && isServerSet) allowedViews.push('roles');
 	if (canTokens && isServerSet) allowedViews.push('tokens');
 	if (canSettings) allowedViews.push('settings');
+	if (canSettings || canBots) allowedViews.push('virtue');
 	if (canInvites) allowedViews.push('invites');
 	if (canAnnouncements) allowedViews.push('announcements');
 	if (canManageRoadmap) allowedViews.push('roadmap');
@@ -441,6 +432,7 @@ export default function Home() {
 			{activeView === 'roles' && <Roles />}
 			{activeView === 'tokens' && <Tokens initialSearch={triageQuery} onViewAuditLogs={(tokenId) => handleNavigateFromOverview('audit', tokenId)} />}
 			{activeView === 'settings' && <Settings />}
+			{activeView === 'virtue' && <VirtueAdmin avatarUrl={virtueAvatarUrl} adminServerId={adminServerId} />}
 			{activeView === 'invites' && <Invites initialSearch={triageQuery} />}
 			{activeView === 'announcements' && <Announcements />}
 			{activeView === 'roadmap' && <Roadmap />}

@@ -1,6 +1,6 @@
 {
 	"name": "www",
-	"version": "0.19.13",
+	"version": "0.19.14",
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -19,8 +19,8 @@
 		"@xernerx/styles": "workspace:*",
 		"@xernerx/terminal": "^1.1.15",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^14.6.0",
-		"lucide-react": "^1.61.0",
+		"framer-motion": "^14.9.0",
+		"lucide-react": "^1.65.0",
 		"next": "^16.4.3",
 		"next-auth": "^4.24.15",
 		"react": "^19.3.1",
@@ -30,7 +30,7 @@
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.3",
-		"@types/node": "^26.6.5",
+		"@types/node": "^26.6.6",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"babel-plugin-react-compiler": "1.0.0",

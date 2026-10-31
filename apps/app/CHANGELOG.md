@@ -2,6 +2,32 @@
 
 # app
 
+## 2.17.0
+
+### Minor Changes
+
+- ### Bot Directory Redesign, Per-Track Virtue Level Roles & Global Level Leaderboards
+    - **Bot Directory & Profile Experience (`/bots` & `/bots/[id]`):**
+        - Introduced a Featured Bot Spotlight carousel and horizontal category discovery rows (`Top Voted`, `Most Popular`, `Verified Bots`, and `Recently Added`) for faster bot exploration.
+        - Added a sticky Bot Floating Action Bar and a Bot Vitals Sidebar displaying live online status, Discord presence activity, shard health, and server reach.
+    - **Virtue Per-Track Level Roles & Server Progression:**
+        - Server administrators can now assign automated Discord role rewards independently to **Server Level (Combined)**, **Text Level (Messages)**, or **Voice Level (Time in Voice)** tracks, with an optional **Stack Level Roles** toggle.
+        - Added **Server Booster XP Bonus** multipliers (`1.25x` to `2x`) and **Ignored Channels** controls so specific text or voice channels can be muted from granting XP.
+    - **Global & Server Level Leaderboards (`/leaderboard`):**
+        - Added a dedicated **Levels** leaderboard tab with support for switching between Global Xernerx Levels and individual Virtue server tracks (`Server Level`, `Text Level`, and `Voice Level`).
+    - **3-Tier Privacy Enforcement:**
+        - Improved `Public`, `Limited` (direct-link only), and `Private` visibility handling across Bot, Server, User, and Organization profiles and social link previews.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.17.0
+    - @xernerx/components@0.12.7
+    - @xernerx/styles@0.2.2
+    - @xernerx/providers@0.18.5
+    - @xernerx/feedback@0.4.10
+    - @xernerx/ui@0.7.15
+
 ## 2.16.11
 
 ### Patch Changes

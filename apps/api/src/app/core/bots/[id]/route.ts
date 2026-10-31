@@ -21,22 +21,24 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const StatModel = (db.models.bots as any).Stat;
 		const VoteModel = (db.models.bots as any).Vote;
 
-		const bot = await BotModel.findOne({ id }).lean();
+		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
 		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
 		if (!bot || bot.privacy === 'private' || (isExternalWidget && !bot.widgets)) {
 			return NextResponse.json({ error: 'Bot profile not found or private' }, { status: 404 });
 		}
 
-		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ botId: id })]);
+		const resolvedId = String(bot.id);
+		const [latestStat, voteCount] = await Promise.all([StatModel.findOne({ id: resolvedId }).sort({ timestamp: -1 }).lean(), VoteModel.countDocuments({ botId: resolvedId })]);
 
 		let discordName: string | undefined;
 		let avatarUrl: string | null = bot.avatar && bot.avatar.startsWith('http') ? bot.avatar : null;
 		let bannerUrl: string | null = null;
 
-		if (process.env.DISCORD_CLIENT_TOKEN) {
+		const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
+		for (const token of tokens) {
 			try {
-				const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
-					headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+				const discordRes = await fetch(`https://discord.com/api/v10/users/${resolvedId}`, {
+					headers: { Authorization: `Bot ${token}` },
 					next: { revalidate: 3600 },
 				});
 				if (discordRes.ok) {
@@ -44,12 +46,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 					discordName = discordUser.global_name || discordUser.username;
 					if (discordUser.avatar) {
 						const ext = discordUser.avatar.startsWith('a_') ? 'gif' : 'png';
-						avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${discordUser.avatar}.${ext}?size=512`;
+						avatarUrl = `https://cdn.discordapp.com/avatars/${resolvedId}/${discordUser.avatar}.${ext}?size=512`;
 					}
 					if (discordUser.banner) {
 						const ext = discordUser.banner.startsWith('a_') ? 'gif' : 'png';
-						bannerUrl = `https://cdn.discordapp.com/banners/${id}/${discordUser.banner}.${ext}?size=1024`;
+						bannerUrl = `https://cdn.discordapp.com/banners/${resolvedId}/${discordUser.banner}.${ext}?size=1024`;
 					}
+					break;
 				}
 			} catch {
 				// Ignore Discord API error and fall back to database fields
@@ -58,7 +61,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		if (!avatarUrl && bot.avatar && !bot.avatar.startsWith('http')) {
 			const ext = bot.avatar.startsWith('a_') ? 'gif' : 'png';
-			avatarUrl = `https://cdn.discordapp.com/avatars/${id}/${bot.avatar}.${ext}?size=512`;
+			avatarUrl = `https://cdn.discordapp.com/avatars/${resolvedId}/${bot.avatar}.${ext}?size=512`;
 		}
 
 		const payload = {

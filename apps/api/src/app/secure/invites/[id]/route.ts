@@ -8,7 +8,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const body = await req.json();
 		const resolvedParams = await params;
 		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
-		const invite = await (await database('xernerx')).models.core.AppInvite.findOneAndUpdate({ id: resolvedParams.id }, { $set: cleanBody }, { new: true });
+		const invite = await (await database('xernerx')).models.core.AppInvite.findOneAndUpdate({ id: resolvedParams.id }, { $set: cleanBody }, { returnDocument: 'after' });
 		if (!invite) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 		return NextResponse.json(invite);
 	} catch (error) {

@@ -10,6 +10,7 @@ const APPS = [
 	{ id: 'account', name: 'Account', devPort: 4003 },
 	{ id: 'admin', name: 'Admin', devPort: 4006 },
 	{ id: 'hosting', name: 'Hosting', devPort: 4010 },
+	{ id: 'haste', name: 'Haste', devPort: 4011 },
 	{ id: 'api', name: 'API', devPort: 4001 },
 	{ id: 'cdn', name: 'CDN', devPort: 4002 },
 	{ id: 'docs', name: 'Docs', devPort: 4005 },

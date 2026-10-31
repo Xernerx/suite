@@ -1,4 +1,11 @@
 {
+	"git": {
+		"deploymentEnabled": {
+			"main": true,
+			"canary": true,
+			"dictionary": false
+		}
+	},
 	"crons": [
 		{
 			"path": "/info/status/cron",

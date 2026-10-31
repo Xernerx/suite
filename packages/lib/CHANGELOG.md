@@ -2,6 +2,19 @@
 
 # @xernerx/lib
 
+## 1.17.0
+
+### Minor Changes
+
+- ### API v1 Leaderboard Tracks, Virtue Multi-Track Role Schema & WebSocket RPC Updates
+    - **`GET /v1/leaderboard` & Virtue Guild Configuration (`api`, `@xernerx/lib`):**
+        - Extended `GET /v1/leaderboard` with `levels` (Global Xernerx XP rankings), `virtueGuilds`, and optional `?guild=[guildId]` query support returning per-server `guildLevels` (`server`, `text`, and `voice` tracks).
+        - Extended `PATCH /secure/guilds/[id]/virtue` and the Virtue Guild schema to persist `textLevelRoles`, `voiceLevelRoles`, `stackRoles`, `boosterMultiplier`, and `channels.ignored`, while maintaining backward compatibility with `levelRoles` (`track: 'server' | 'text' | 'voice'`).
+        - Added `GET` & `POST /secure/hosting/vercel` for querying Vercel team projects/deployments and triggering redeployments using either a linked user OAuth token or team fallback token.
+    - **WebSocket Gateway (`websocket`) & Developer Documentation (`docs`):**
+        - Added `settings` action support to `service: "xernerx"` and bulk guild/member level queries plus guild XP reset support to `service: "virtue"`.
+        - Updated `docs.xernerx.com` API and WebSocket reference pages with `/v1/leaderboard?guild=[guildId]`, `/secure/hosting/vercel`, and the `members` (`virtue`) and `settings` (`xernerx`) WebSocket actions.
+
 ## 1.16.6
 
 ### Patch Changes

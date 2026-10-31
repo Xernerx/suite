@@ -60,7 +60,7 @@ async function writeStoredScores(scores: Record<string, LighthouseScoreRecord>):
 				valueType: 'json',
 				description: 'Cached Chrome Lighthouse audit scores across Suite subdomains and environments.',
 			},
-			{ upsert: true, new: true }
+			{ upsert: true, returnDocument: 'after' }
 		);
 	} catch {}
 }

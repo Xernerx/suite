@@ -93,6 +93,21 @@ export default async function Server(msg: any) {
 
 	switch (msg.method) {
 		case 'get': {
+			if (!msg.body?.id && ['guilds', 'guild', 'settings'].includes(msg.action)) {
+				const query = Array.isArray(msg.body?.ids) && msg.body.ids.length > 0 ? { id: { $in: msg.body.ids } } : {};
+				return model.find(query).lean();
+			}
+
+			if (!msg.body?.id && msg.body?.guild && ['levels', 'level', 'members', 'member', 'text', 'textLevels', 'voice', 'voiceLevels'].includes(msg.action)) {
+				const limit = Math.min(200, Math.max(1, Number(msg.body?.limit) || 100));
+				const docs = await model.find({ guild: msg.body.guild }).sort({ level: -1, xp: -1, messages: -1, timeSpent: -1 }).limit(limit).lean();
+				if (Array.isArray(docs) && docs.length > 0) return docs;
+				if (fallback && fallback !== model) {
+					return fallback.find({ guild: msg.body.guild }).sort({ level: -1, xp: -1, messages: -1, timeSpent: -1 }).limit(limit).lean();
+				}
+				return [];
+			}
+
 			const doc = await model.findOne(filter).lean();
 			if (doc) return doc;
 			if (fallback && fallback !== model) {
@@ -114,6 +129,14 @@ export default async function Server(msg: any) {
 			}
 
 		case 'update':
+			if (msg.body?.guild && msg.body?.resetGuild === true && !msg.body?.id && ['levels', 'level', 'members', 'member', 'text', 'textLevels', 'voice', 'voiceLevels'].includes(msg.action)) {
+				await model.updateMany({ guild: msg.body.guild }, { $set: { level: 0, xp: 0, messages: 0, timeSpent: 0 } });
+				if (fallback && fallback !== model) {
+					await fallback.updateMany({ guild: msg.body.guild }, { $set: { level: 0, xp: 0, messages: 0, timeSpent: 0 } }).catch(() => null);
+				}
+				return { success: true, guild: msg.body.guild };
+			}
+
 			return model
 				.findOneAndUpdate(
 					filter,

@@ -6,9 +6,12 @@ import { Copy, Download, FileJson, Sparkles, Upload } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
 
+export type VirtueLevelRoleTrack = 'server' | 'text' | 'voice';
+
 export interface VirtueLevelRole {
 	level: number;
 	roleId: string;
+	track?: VirtueLevelRoleTrack;
 }
 
 export interface VirtueConfigShape {
@@ -22,8 +25,18 @@ export interface VirtueConfigShape {
 		ignored: string[];
 		tracked: string[];
 		levels?: VirtueLevelRole[];
+		textLevels?: { level: number; roleId: string }[];
+		voiceLevels?: { level: number; roleId: string }[];
 	};
+	channels?: {
+		ignored: string[];
+		tracked?: string[];
+	};
+	stackRoles?: boolean;
+	boosterMultiplier?: number;
 	levelRoles?: VirtueLevelRole[];
+	textLevelRoles?: { level: number; roleId: string }[];
+	voiceLevelRoles?: { level: number; roleId: string }[];
 	levelUp: boolean;
 	levelMessage: string;
 	levelChannel: string | null;
@@ -119,6 +132,8 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 				cycles: cfg.cycles,
 				roles: cfg.roles,
 				levelRoles: cfg.levelRoles || cfg.roles?.levels,
+				textLevelRoles: cfg.textLevelRoles || cfg.roles?.textLevels,
+				voiceLevelRoles: cfg.voiceLevelRoles || cfg.roles?.voiceLevels,
 				levelUp: cfg.levelUp,
 				levelMessage: cfg.levelMessage,
 				levelChannel: cfg.levelChannel,
@@ -171,6 +186,8 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 				cycles: data.cycles,
 				roles: data.roles,
 				levelRoles: data.levelRoles || data.roles?.levels,
+				textLevelRoles: data.textLevelRoles || data.roles?.textLevels,
+				voiceLevelRoles: data.voiceLevelRoles || data.roles?.voiceLevels,
 				levelUp: data.levelUp,
 				levelMessage: data.levelMessage,
 				levelChannel: data.levelChannel,

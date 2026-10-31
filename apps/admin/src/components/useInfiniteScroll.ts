@@ -13,7 +13,9 @@ export function useInfiniteScroll(hasMore: boolean, loading: boolean, onLoadMore
 	const sentinelRef = useRef<HTMLDivElement | null>(null);
 	const lastTriggerRef = useRef(0);
 	const onLoadMoreRef = useRef(onLoadMore);
-	onLoadMoreRef.current = onLoadMore;
+	useEffect(() => {
+		onLoadMoreRef.current = onLoadMore;
+	}, [onLoadMore]);
 
 	const tryLoadMore = useCallback((requirePositiveScroll: boolean) => {
 		const now = Date.now();

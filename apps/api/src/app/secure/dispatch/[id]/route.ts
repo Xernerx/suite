@@ -65,7 +65,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			updateQuery = { $set: restBody };
 		}
 
-		const updatedItem = Object.keys(updateQuery).length > 0 ? await Dispatch.findOneAndUpdate({ id }, updateQuery, { new: true }) : existingItem;
+		const updatedItem = Object.keys(updateQuery).length > 0 ? await Dispatch.findOneAndUpdate({ id }, updateQuery, { returnDocument: 'after' }) : existingItem;
 
 		if (!updatedItem) {
 			return NextResponse.json({ error: 'Dispatch item not found' }, { status: 404 });
@@ -148,7 +148,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		}
 
 		if (existingItem.targetId === 'global' && userId) {
-			await Dispatch.findOneAndUpdate({ id }, { $addToSet: { deletedBy: String(userId) } }, { new: true });
+			await Dispatch.findOneAndUpdate({ id }, { $addToSet: { deletedBy: String(userId) } }, { returnDocument: 'after' });
 			return NextResponse.json({ success: true, deletedId: id });
 		}
 

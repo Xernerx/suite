@@ -2,6 +2,27 @@
 
 # admin
 
+## 0.23.0
+
+### Minor Changes
+
+- ### Admin Virtue Global XP Planner, Sidebar Re-categorization & Vercel Hosting Console
+    - **Admin Portal (`admin.xernerx.com`):**
+        - Added the **Virtue** global XP doubler and scheduled event planner (`VirtueAdmin`) under the **Bots** category with automatic Discord Scheduled Event synchronization on the main server.
+        - Reorganized Admin sidebar categories: moved **Translations** under **Support**, **Media Library** under **Moderator**, and **Roles** under **Administrator**.
+    - **Hosting Infrastructure Console (`hosting.xernerx.com`):**
+        - Added the **Vercel Cloud** view (`HostingVercelPanel` & `HostingVercelDeployments`) with OAuth2 user token integration, deployment status filtering, and one-click redeployments alongside Easypanel node and SSH management.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.17.0
+    - @xernerx/components@0.12.7
+    - @xernerx/styles@0.2.2
+    - @xernerx/providers@0.18.5
+    - @xernerx/feedback@0.4.10
+    - @xernerx/ui@0.7.15
+
 ## 0.22.0
 
 ### Minor Changes
