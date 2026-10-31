@@ -2,6 +2,15 @@
 
 # @xernerx/websocket
 
+## 1.4.1
+
+### Patch Changes
+
+- <!-- @format -->
+
+    ### Virtue WebSocket Service (`virtue`)
+    - **Guild Member Level & XP Aggregation**: Updated `virtue` `levels`/`members` guild queries (`type: 'get'`) to merge and deduplicate records across unified `Level`, `Text`, `Voice`, and legacy `profiles` collections by highest `(level, xp)`.
+
 ## 1.4.0
 
 ### Minor Changes

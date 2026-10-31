@@ -71,12 +71,21 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/leaderboard`), {
 					credentials: 'include',
-				});
-				if (!res.ok || cancelled) return;
-				const data = await res.json();
-				const levelsList = Array.isArray(data?.levels) ? data.levels : [];
-				const textList = Array.isArray(data?.text) ? data.text : Array.isArray(data) ? data : [];
-				const voiceList = Array.isArray(data?.voice) ? data.voice : [];
+				}).catch(() => null);
+				let data = res && res.ok ? await res.json().catch(() => null) : null;
+				let levelsList = Array.isArray(data?.levels) ? data.levels : [];
+				let textList = Array.isArray(data?.text) ? data.text : Array.isArray(data) ? data : [];
+				let voiceList = Array.isArray(data?.voice) ? data.voice : [];
+
+				if (levelsList.length === 0 && textList.length === 0 && voiceList.length === 0) {
+					const fallbackRes = await fetch(getEnvUrl(`https://api.xernerx.com/v1/leaderboard?guild=${encodeURIComponent(id)}`)).catch(() => null);
+					const fallbackData = fallbackRes && fallbackRes.ok ? await fallbackRes.json().catch(() => null) : null;
+					if (fallbackData?.guildLevels) {
+						levelsList = Array.isArray(fallbackData.guildLevels.server) ? fallbackData.guildLevels.server : [];
+						textList = Array.isArray(fallbackData.guildLevels.text) ? fallbackData.guildLevels.text : [];
+						voiceList = Array.isArray(fallbackData.guildLevels.voice) ? fallbackData.guildLevels.voice : [];
+					}
+				}
 
 				if (cancelled) return;
 				setLeaderboard({

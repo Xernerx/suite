@@ -29,7 +29,8 @@ async function getModels(action: string) {
 		case 'member':
 			return {
 				primary: (db.models.levels as any)?.Level || (db.models.profiles as any)?.Level,
-				fallback: (db.models.profiles as any)?.Level || (db.models.profiles as any)?.Text || null,
+				fallback: (db.models.levels as any)?.Text || (db.models.profiles as any)?.Level || (db.models.profiles as any)?.Text || null,
+				extra: [(db.models.levels as any)?.Voice, (db.models.profiles as any)?.Level, (db.models.profiles as any)?.Text, (db.models.profiles as any)?.Voice].filter(Boolean),
 			};
 
 		case 'text':
@@ -37,6 +38,7 @@ async function getModels(action: string) {
 			return {
 				primary: (db.models.levels as any)?.Text || (db.models.profiles as any)?.Text,
 				fallback: (db.models.profiles as any)?.Text || null,
+				extra: [],
 			};
 
 		case 'voice':
@@ -44,10 +46,11 @@ async function getModels(action: string) {
 			return {
 				primary: (db.models.levels as any)?.Voice || (db.models.profiles as any)?.Voice,
 				fallback: (db.models.profiles as any)?.Voice || null,
+				extra: [],
 			};
 
 		default:
-			return { primary: null, fallback: null };
+			return { primary: null, fallback: null, extra: [] };
 	}
 }
 
@@ -83,7 +86,7 @@ function getFilter(action: string, body: any) {
 }
 
 export default async function Server(msg: any) {
-	const { primary: model, fallback } = await getModels(msg.action);
+	const { primary: model, fallback, extra = [] } = await getModels(msg.action);
 
 	if (!model) {
 		throw new Error('Unknown action');
@@ -100,20 +103,46 @@ export default async function Server(msg: any) {
 
 			if (!msg.body?.id && msg.body?.guild && ['levels', 'level', 'members', 'member', 'text', 'textLevels', 'voice', 'voiceLevels'].includes(msg.action)) {
 				const limit = Math.min(200, Math.max(1, Number(msg.body?.limit) || 100));
-				const docs = await model.find({ guild: msg.body.guild }).sort({ level: -1, xp: -1, messages: -1, timeSpent: -1 }).limit(limit).lean();
-				if (Array.isArray(docs) && docs.length > 0) return docs;
-				if (fallback && fallback !== model) {
-					return fallback.find({ guild: msg.body.guild }).sort({ level: -1, xp: -1, messages: -1, timeSpent: -1 }).limit(limit).lean();
+				const candidateModels = Array.from(new Set([model, fallback, ...extra].filter(Boolean)));
+				const results = await Promise.all(
+					candidateModels.map((m: any) =>
+						m
+							.find({ guild: msg.body.guild })
+							.sort({ level: -1, xp: -1, messages: -1, timeSpent: -1 })
+							.limit(limit)
+							.lean()
+							.catch(() => [])
+					)
+				);
+				const mergedByUser = new Map<string, any>();
+				for (const arr of results) {
+					for (const doc of arr || []) {
+						const uid = String(doc?.id || doc?.ownerId || doc?.userId || '');
+						if (!uid) continue;
+						const existing = mergedByUser.get(uid);
+						if (
+							!existing ||
+							(Number(doc.level) || 0) > (Number(existing.level) || 0) ||
+							((Number(doc.level) || 0) === (Number(existing.level) || 0) && (Number(doc.xp) || 0) > (Number(existing.xp) || 0))
+						) {
+							mergedByUser.set(uid, doc);
+						}
+					}
 				}
-				return [];
+				return Array.from(mergedByUser.values())
+					.sort((a, b) => (Number(b.level) || 0) - (Number(a.level) || 0) || (Number(b.xp) || 0) - (Number(a.xp) || 0))
+					.slice(0, limit);
 			}
 
 			const doc = await model.findOne(filter).lean();
-			if (doc) return doc;
-			if (fallback && fallback !== model) {
-				return fallback.findOne(filter).lean();
+			if (doc && ((Number((doc as any).level) || 0) > 0 || (Number((doc as any).xp) || 0) > 0 || !['levels', 'level', 'members', 'member'].includes(msg.action))) {
+				return doc;
 			}
-			return null;
+			if (fallback && fallback !== model) {
+				const fbDoc = await fallback.findOne(filter).lean();
+				if (fbDoc) return fbDoc;
+			}
+			return doc || null;
 		}
 
 		case 'create':

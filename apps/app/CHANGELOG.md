@@ -2,6 +2,15 @@
 
 # app
 
+## 2.17.1
+
+### Patch Changes
+
+- <!-- @format -->
+
+    ### Server Directory & Leaderboards
+    - **Server Leaderboard Fallback**: Added automatic `/v1/leaderboard?guild=` fallback on server pages when the primary guild leaderboard endpoint returns empty sets so server XP, text, and voice rankings always populate reliably.
+
 ## 2.17.0
 
 ### Minor Changes
