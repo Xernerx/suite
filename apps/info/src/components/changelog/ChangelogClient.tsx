@@ -30,18 +30,72 @@ function normalizeChangelogBody(raw: string): string {
 
 const REACTION_EMOJIS = ['🔥', '🚀', '❤️', '🎉'] as const;
 
-export default function ChangelogClient({ changelogs }: { changelogs: ChangelogEntry[] }) {
+const CLIENT_APPS = [
+	{ id: 'app', name: 'App' },
+	{ id: 'portal', name: 'Portal' },
+	{ id: 'account', name: 'Account' },
+	{ id: 'admin', name: 'Admin' },
+	{ id: 'hosting', name: 'Hosting' },
+	{ id: 'api', name: 'API' },
+	{ id: 'cdn', name: 'CDN' },
+	{ id: 'docs', name: 'Docs' },
+	{ id: 'info', name: 'Info' },
+	{ id: 'store', name: 'Store' },
+	{ id: 'haste', name: 'Haste' },
+	{ id: 'www', name: 'Website' },
+] as const;
+
+export default function ChangelogClient({ changelogs: initialChangelogs }: { changelogs: ChangelogEntry[] }) {
 	const { setNavItems, clearNavItems, show, setView, view } = useSidebar();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { t } = useDictionary();
 
+	const [fallbackApps, setFallbackApps] = useState<ChangelogEntry[]>([]);
 	const [search, setSearch] = useState('');
 	const [groupFilter, setGroupFilter] = useState<'all' | 'applications' | 'packages'>('all');
 	const [activeVersionId, setActiveVersionId] = useState<string | null>(null);
 	const [reactions, setReactions] = useState<Record<string, Record<string, number>>>({});
 	const [reactedMap, setReactedMap] = useState<Record<string, boolean>>({});
 	const hasAppliedUrlParam = useRef(false);
+
+	const changelogs = useMemo(() => {
+		const existingNames = new Set(initialChangelogs.map((c) => c.appName.toLowerCase()));
+		const missing = fallbackApps.filter((a) => !existingNames.has(a.appName.toLowerCase()));
+		if (missing.length === 0) return initialChangelogs;
+		const apps = [...initialChangelogs.filter((c) => (c.group || 'applications') === 'applications'), ...missing];
+		const pkgs = initialChangelogs.filter((c) => c.group === 'packages');
+		return [...apps, ...pkgs];
+	}, [initialChangelogs, fallbackApps]);
+
+	useEffect(() => {
+		const existingNames = new Set(initialChangelogs.map((c) => c.appName.toLowerCase()));
+		const missingApps = CLIENT_APPS.filter((a) => !existingNames.has(a.name.toLowerCase()));
+		if (missingApps.length === 0) return;
+		let cancelled = false;
+		Promise.all(
+			missingApps.map(async (app): Promise<ChangelogEntry | null> => {
+				try {
+					const host = app.id === 'www' ? 'https://xernerx.com' : `https://${app.id}.xernerx.com`;
+					const res = await fetch(`${getEnvUrl(host)}/api/changelog?version=all`);
+					if (!res.ok) return null;
+					const data = await res.json();
+					const raw = data?.fullContent || data?.content;
+					const cleaned = typeof raw === 'string' ? normalizeChangelogBody(raw.replace(/^#\s+[^\r\n]+\r?\n*/gm, '')) : '';
+					return cleaned ? { appName: app.name, content: cleaned, group: 'applications' } : null;
+				} catch {
+					return null;
+				}
+			})
+		).then((loaded) => {
+			if (!cancelled) {
+				setFallbackApps(loaded.filter((e): e is ChangelogEntry => e !== null));
+			}
+		});
+		return () => {
+			cancelled = true;
+		};
+	}, [initialChangelogs, getEnvUrl]);
 
 	useEffect(() => {
 		try {
@@ -146,45 +200,37 @@ export default function ChangelogClient({ changelogs }: { changelogs: ChangelogE
 	const parsedSections = useMemo(() => {
 		if (!activeLog?.content) return [];
 		const lines = activeLog.content.split(/\r?\n/);
-		const sections: Array<{ id: string; label: string; body: string; markdown: string }> = [];
+		const sectionsMap = new Map<string, { id: string; label: string; body: string; markdown: string }>();
 		let currentHeading = '';
 		let currentLines: string[] = [];
 
+		const pushSection = () => {
+			if (!currentHeading) return;
+			const rawBlock = normalizeChangelogBody(currentLines.join('\n'));
+			if (!rawBlock) return;
+			const id = toVersionId(currentHeading) || `sec-${sectionsMap.size}`;
+			const label = currentHeading.replace(/^##\s+/, '').trim();
+			const existing = sectionsMap.get(id);
+			if (!existing) {
+				sectionsMap.set(id, { id, label, body: rawBlock, markdown: `${currentHeading}\n${rawBlock}` });
+			} else if (!existing.body.includes(rawBlock)) {
+				const mergedBody = `${existing.body}\n\n${rawBlock}`;
+				sectionsMap.set(id, { id, label, body: mergedBody, markdown: `${currentHeading}\n${mergedBody}` });
+			}
+		};
+
 		for (const line of lines) {
 			if (line.startsWith('## ')) {
-				if (currentHeading || currentLines.length > 0) {
-					const rawBlock = normalizeChangelogBody(currentLines.join('\n'));
-					if (currentHeading && rawBlock) {
-						const id = toVersionId(currentHeading);
-						sections.push({
-							id: id || `sec-${sections.length}`,
-							label: currentHeading.replace(/^##\s+/, '').trim(),
-							body: rawBlock,
-							markdown: `${currentHeading}\n${rawBlock}`,
-						});
-					}
-				}
+				pushSection();
 				currentHeading = line;
 				currentLines = [];
 			} else {
 				currentLines.push(line);
 			}
 		}
+		pushSection();
 
-		if (currentHeading) {
-			const rawBlock = normalizeChangelogBody(currentLines.join('\n'));
-			if (rawBlock) {
-				const id = toVersionId(currentHeading);
-				sections.push({
-					id: id || `sec-${sections.length}`,
-					label: currentHeading.replace(/^##\s+/, '').trim(),
-					body: rawBlock,
-					markdown: `${currentHeading}\n${rawBlock}`,
-				});
-			}
-		}
-
-		return sections;
+		return Array.from(sectionsMap.values());
 	}, [activeLog]);
 
 	const filteredSections = useMemo(() => {
@@ -338,7 +384,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: ChangelogE
 							const isSelected = activeVersionId === sec.id;
 							return (
 								<button
-									key={sec.id}
+									key={`${activeLog.appName}-pill-${sec.id}`}
 									type="button"
 									onClick={() => jumpToVersion(sec.id)}
 									className={`text-xs font-mono font-semibold px-2.5 py-1 rounded-full border transition-all cursor-pointer backdrop-blur-md ${
@@ -371,7 +417,7 @@ export default function ChangelogClient({ changelogs }: { changelogs: ChangelogE
 
 						return (
 							<div
-								key={sec.id}
+								key={`${activeLog.appName}-sec-${sec.id}`}
 								id={sec.id}
 								className={`relative group/item scroll-mt-24 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border shadow-sm p-6 sm:p-8 transition-all ${
 									isHighlighted ? 'border-(--accent)/50 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_18%,transparent)]' : 'border-(--border)/10 hover:border-(--accent)/35'

@@ -2,6 +2,15 @@
 
 # api
 
+## 0.26.1
+
+### Patch Changes
+
+- <!-- @format -->
+
+    ### Changelog RSS Feed (`/v1/changelog/rss.xml`)
+    - **Local Workspace Resolution & GUID Deduplication**: Updated `/v1/changelog/rss.xml` to read traced application `CHANGELOG.md` files directly from the workspace filesystem before falling back to remote endpoints, and deduplicated feed items by `guid`.
+
 ## 0.26.0
 
 ### Minor Changes
