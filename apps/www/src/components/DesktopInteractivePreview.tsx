@@ -7,6 +7,19 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Activity, Bell, Building2, Check, Columns2, EyeOff, Gift, Layers, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
+const PREVIEW_CRESTS = [
+	'/icon.png',
+	'/icon-blue.png',
+	'/icon-cyan.png',
+	'/icon-green.png',
+	'/icon-gold.png',
+	'/icon-orange.png',
+	'/icon-red.png',
+	'/icon-pink.png',
+	'/icon-white.png',
+	'/icon-black.png',
+] as const;
+
 export function DesktopInteractivePreview() {
 	const { t } = useDictionary();
 	const [activeAccount, setActiveAccount] = useState<'main' | 'alt'>('main');
@@ -17,12 +30,14 @@ export function DesktopInteractivePreview() {
 	const [osToastOpen, setOsToastOpen] = useState(false);
 	const [omnibarOpen, setOmnibarOpen] = useState(false);
 	const [rpcEnabled, setRpcEnabled] = useState(true);
-	const [controlStyle, setControlStyle] = useState<'xernerx' | 'macos' | 'windows'>('macos');
+	const [controlStyle, setControlStyle] = useState<'xernerx' | 'capsule' | 'squircle' | 'minimal' | 'macos' | 'windows'>('macos');
+	const [crestIdx, setCrestIdx] = useState(0);
 
 	const currentName = activeAccount === 'main' ? 'Alex' : 'Alex_Alt';
 
 	const cycleControls = () => {
-		setControlStyle((prev) => (prev === 'macos' ? 'xernerx' : prev === 'xernerx' ? 'windows' : 'macos'));
+		const order: Array<'macos' | 'xernerx' | 'capsule' | 'squircle' | 'minimal' | 'windows'> = ['macos', 'xernerx', 'capsule', 'squircle', 'minimal', 'windows'];
+		setControlStyle((prev) => order[(order.indexOf(prev) + 1) % order.length]);
 	};
 
 	return (
@@ -56,7 +71,13 @@ export function DesktopInteractivePreview() {
 								</span>
 							</button>
 						)}
-						<div className="h-6 w-6 rounded-full bg-(--accent) flex items-center justify-center text-[11px] font-black text-(--text)">X</div>
+						<button
+							type="button"
+							onClick={() => setCrestIdx((prev) => (prev + 1) % PREVIEW_CRESTS.length)}
+							className="h-6 w-6 rounded-full flex items-center justify-center hover:scale-110 transition-transform hover:cursor-pointer"
+						>
+							<img src={PREVIEW_CRESTS[crestIdx]} alt="Xernerx Crest" className="h-5 w-5 object-contain select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)]" draggable={false} />
+						</button>
 						<span className="text-xs font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{t('www.download.preview.windowTitle')}
 						</span>
@@ -101,24 +122,38 @@ export function DesktopInteractivePreview() {
 							{t('www.download.preview.overlayActive')}
 						</button>
 						{controlStyle !== 'macos' && (
-							<button type="button" onClick={cycleControls} className="flex items-center gap-1.5 ml-1 hover:cursor-pointer">
-								<span className="h-5 w-5 rounded-full flex items-center justify-center text-(--text-muted)">
-									<Columns2 size={11} />
-								</span>
-								{controlStyle === 'xernerx' ? (
+							<button
+								type="button"
+								onClick={cycleControls}
+								className={`flex items-center ml-1 hover:cursor-pointer ${
+									controlStyle === 'capsule' ? 'gap-1 rounded-full bg-(--foreground)/50 border border-(--border)/15 px-1.5 py-0.5' : 'gap-1.5'
+								}`}
+							>
+								{controlStyle === 'xernerx' || controlStyle === 'squircle' || controlStyle === 'capsule' ? (
 									<>
-										<span className="h-5 w-5 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted)">
-											<Minus size={11} />
-										</span>
-										<span className="h-5 w-5 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted)">
-											<Square size={9} />
-										</span>
-										<span className="h-5 w-5 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted)">
-											<X size={11} />
-										</span>
+										{[Columns2, Minus, Square, X].map((IconComp, idx) => (
+											<span
+												key={idx}
+												className={`h-5 w-5 ${controlStyle === 'squircle' ? 'rounded-md' : 'rounded-full'} ${
+													controlStyle === 'capsule' ? '' : 'bg-(--foreground)/50 border border-(--border)/15'
+												} flex items-center justify-center text-(--text-muted)`}
+											>
+												<IconComp size={idx === 2 ? 9 : 11} />
+											</span>
+										))}
 									</>
+								) : controlStyle === 'minimal' ? (
+									<div className="flex items-center gap-1.5">
+										<span className="h-5 w-5 rounded-full flex items-center justify-center text-(--text-muted)">
+											<Columns2 size={11} />
+										</span>
+										<span className="h-3 w-3 rounded-full bg-(--accent)/45" />
+										<span className="h-3 w-3 rounded-full bg-(--accent)" />
+										<span className="h-3 w-3 rounded-full bg-(--accent-red)/75" />
+									</div>
 								) : (
 									<div className="flex items-center gap-2.5 text-(--text-muted)">
+										<Columns2 size={12} />
 										<Minus size={13} />
 										<Square size={10} />
 										<X size={13} />
@@ -167,7 +202,7 @@ export function DesktopInteractivePreview() {
 								key={activeAccount}
 								initial={{ scale: 0.8, opacity: 0 }}
 								animate={{ scale: 1, opacity: 1 }}
-								className="h-9 w-9 rounded-full bg-(--accent) flex items-center justify-center text-xs font-black text-(--text) shrink-0 shadow-sm"
+								className="h-9 w-9 rounded-full bg-(--accent) flex items-center justify-center text-xs font-black text-(--accent-contrast) shrink-0 shadow-sm"
 							>
 								{activeAccount === 'main' ? 'A' : '2'}
 							</motion.div>
@@ -183,7 +218,7 @@ export function DesktopInteractivePreview() {
 								setActiveAccount((prev) => (prev === 'main' ? 'alt' : 'main'));
 								setClaimed(false);
 							}}
-							className="inline-flex items-center gap-1.5 rounded-xl bg-(--accent)/15 hover:bg-(--accent) text-(--accent) hover:text-(--text) border border-(--accent)/30 px-3 py-1.5 text-xs font-bold transition-all hover:cursor-pointer shrink-0"
+							className="inline-flex items-center gap-1.5 rounded-xl bg-(--accent)/15 hover:bg-(--accent) text-(--accent) hover:text-(--accent-contrast) border border-(--accent)/30 px-3 py-1.5 text-xs font-bold transition-all hover:cursor-pointer shrink-0"
 						>
 							<RefreshCw size={12} />
 							{t('www.download.preview.switchAccount')}
@@ -212,7 +247,9 @@ export function DesktopInteractivePreview() {
 							whileTap={{ scale: 0.95 }}
 							onClick={() => setClaimed((v) => !v)}
 							className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all hover:cursor-pointer ${
-								claimed ? 'bg-(--accent-green)/15 border border-(--accent-green)/30 text-(--accent-green)' : 'bg-(--accent) hover:bg-(--hover-accent) text-(--text) shadow-sm'
+								claimed
+									? 'bg-(--accent-green)/15 border border-(--accent-green)/30 text-(--accent-green)'
+									: 'bg-(--accent) hover:bg-(--hover-accent) text-(--accent-contrast) shadow-sm'
 							}`}
 						>
 							{claimed ? <Check size={13} /> : <Sparkles size={13} />}
@@ -322,7 +359,7 @@ export function DesktopInteractivePreview() {
 							</span>
 							<span
 								className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold ${
-									claimed ? 'bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/30' : 'bg-(--accent) text-(--text)'
+									claimed ? 'bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/30' : 'bg-(--accent) text-(--accent-contrast)'
 								}`}
 							>
 								{claimed ? <Check size={9} /> : <Sparkles size={9} />}

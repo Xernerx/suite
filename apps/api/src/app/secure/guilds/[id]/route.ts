@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -149,10 +149,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const existingGuild = await db.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
 		const guildId = existingGuild?.id || id;
 
+		const caller = await resolveCallerAuth(req, ['servers']);
+		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
 		const session = (await getServerSession(auth).catch(() => null)) as any;
-		const actorUserId = session?.user?.id || body.owner || existingGuild?.owner;
+		const actorUserId = caller.userId || session?.user?.id || body.owner || existingGuild?.owner;
 
-		const isVanityAlreadyUnlocked = Boolean(existingGuild?.vanityUnlocked || existingGuild?.vanitySlug || existingGuild?.verified || body.vanityUnlocked || body.verified);
+		const isVanityAlreadyUnlocked = Boolean(existingGuild?.vanityUnlocked || existingGuild?.vanitySlug || existingGuild?.verified || (isStaffOrSystem && (body.vanityUnlocked || body.verified)));
 
 		if (body.action === 'unlock_vanity') {
 			if (isVanityAlreadyUnlocked) {
@@ -192,6 +194,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				unsetData['vanitySlug'] = 1;
 				delete body.vanitySlug;
 			} else {
+				if (!isVanityAlreadyUnlocked && !isStaffOrSystem) {
+					return NextResponse.json({ error: 'Custom Vanity URL is locked. Unlock it first before setting a vanity slug.' }, { status: 403 });
+				}
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
 					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
 				}
@@ -199,13 +204,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				if (slugTaken) {
 					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
 				}
-				if (!isVanityAlreadyUnlocked) {
-					const unlockRes = await unlockVanityWithUserCredits(models, actorUserId, existingGuild?.name || body.name || `Server ${guildId}`);
-					if (!unlockRes.ok) {
-						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
-					}
-					updateData['vanityUnlocked'] = true;
-				}
+				updateData['vanityUnlocked'] = true;
 				updateData['vanitySlug'] = rawSlug;
 				body.vanitySlug = rawSlug;
 			}
@@ -220,16 +219,17 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.locale !== undefined) updateData['locale'] = body.locale;
 		if (body.owner !== undefined) updateData['owner'] = body.owner;
 		if (body.organization !== undefined) updateData['organization'] = body.organization;
-		if (body.verified !== undefined) updateData['verified'] = Boolean(body.verified);
-		if (body.vanityUnlocked !== undefined) updateData['vanityUnlocked'] = Boolean(body.vanityUnlocked);
+		if (isStaffOrSystem && body.verified !== undefined) updateData['verified'] = Boolean(body.verified);
+		if (isStaffOrSystem && body.vanityUnlocked !== undefined) updateData['vanityUnlocked'] = Boolean(body.vanityUnlocked);
 		if (body.bot !== undefined) updateData['bot'] = body.bot;
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 		if (body.links !== undefined) updateData['links'] = body.links;
-		if (body.voteCount !== undefined) updateData['voteCount'] = Math.max(0, Number(body.voteCount) || 0);
-		if (body.memberCount !== undefined) updateData['memberCount'] = Math.max(0, Number(body.memberCount) || 0);
-		if (body.promotedUntil !== undefined) updateData['promotedUntil'] = body.promotedUntil || null;
-		if (body.boostedUntil !== undefined) updateData['boostedUntil'] = body.boostedUntil || null;
+		if (Array.isArray(body.tags)) updateData['tags'] = body.tags;
+		if (isStaffOrSystem && body.voteCount !== undefined) updateData['voteCount'] = Math.max(0, Number(body.voteCount) || 0);
+		if (isStaffOrSystem && body.memberCount !== undefined) updateData['memberCount'] = Math.max(0, Number(body.memberCount) || 0);
+		if (isStaffOrSystem && body.promotedUntil !== undefined) updateData['promotedUntil'] = body.promotedUntil || null;
+		if (isStaffOrSystem && body.boostedUntil !== undefined) updateData['boostedUntil'] = body.boostedUntil || null;
 
 		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, action: _omitAction, ...cleanBody } = body || {};
 		const finalSet = Object.keys(updateData).length > 0 ? updateData : cleanBody;

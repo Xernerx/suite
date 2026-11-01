@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
 				source: '/:path*',
 				has: [{ type: 'host', value: 'xernerx.com' }],
 				destination: 'https://www.xernerx.com/:path*',
-				permanent: true,
+				statusCode: 301,
 			},
 			{
 				source: '/invite',

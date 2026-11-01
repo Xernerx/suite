@@ -2,6 +2,27 @@
 
 # app
 
+## 2.19.0
+
+### Minor Changes
+
+- Added support for Avatar Frame Shaders, Animated Nameplates, and Profile Card Themes on public user profiles and leaderboards, added customizable Overlay HUD Skins on `/overlay`, and streamlined Server Dashboard navigation tabs and vanity URL slug controls.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 2.18.0
 
 ### Minor Changes

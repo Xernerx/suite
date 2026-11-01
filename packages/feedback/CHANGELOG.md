@@ -2,6 +2,19 @@
 
 # @xernerx/feedback
 
+## 0.5.0
+
+### Minor Changes
+
+- Expanded `XernerxDotLogo` with 4 new formations (`supernova`, `tesseract`, `synthwave`, `lotus`) and 5 morphable render styles (`dots`, `constellation`, `hexgrid`, `aurora`, `glyphs`), and added `AmbientStageCanvas` and `CursorFxCanvas` procedural 60fps canvas engines.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/providers@0.20.0
+    - @xernerx/ui@0.7.17
+
 ## 0.4.11
 
 ### Patch Changes

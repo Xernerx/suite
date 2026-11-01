@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -383,9 +383,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
 		}
 
+		const caller = await resolveCallerAuth(request, ['bots']);
+		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
 		const session = (await getServerSession(auth).catch(() => null)) as any;
-		const actorUserId = session?.user?.id || (Array.isArray(bot.owners) ? bot.owners[0] : undefined);
-		const isVanityAlreadyUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified || body.vanityUnlocked || body.verified);
+		const actorUserId = caller.userId || session?.user?.id || (Array.isArray(bot.owners) ? bot.owners[0] : undefined);
+		const isVanityAlreadyUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified || (isStaffOrSystem && (body.vanityUnlocked || body.verified)));
 
 		if (body.action === 'unlock_vanity') {
 			if (!isVanityAlreadyUnlocked) {
@@ -421,6 +423,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			if (rawSlug === '') {
 				bot.vanitySlug = undefined;
 			} else {
+				if (!isVanityAlreadyUnlocked && !isStaffOrSystem) {
+					return NextResponse.json({ error: 'Custom Vanity URL is locked. Unlock it first before setting a vanity slug.' }, { status: 403 });
+				}
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
 					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
 				}
@@ -428,13 +433,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 				if (existing) {
 					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
 				}
-				if (!isVanityAlreadyUnlocked) {
-					const unlockRes = await unlockVanityWithUserCredits(db.models, actorUserId, bot.name || `Bot ${bot.id}`);
-					if (!unlockRes.ok) {
-						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
-					}
-					bot.vanityUnlocked = true;
-				}
+				bot.vanityUnlocked = true;
 				bot.vanitySlug = rawSlug;
 			}
 		}
@@ -445,16 +444,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			'info',
 			'privacy',
 			'widgets',
-			'verified',
-			'vanityUnlocked',
 			'owners',
 			'organization',
 			'tags',
 			'commands',
 			'releases',
-			'voteCount',
-			'promotedUntil',
-			'boostedUntil',
+			...(isStaffOrSystem ? ['verified', 'vanityUnlocked', 'voteCount', 'promotedUntil', 'boostedUntil'] : []),
 		];
 		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 

@@ -24,7 +24,7 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
 	const [copiedVanity, setCopiedVanity] = useState(false);
 
-	const isVanityUnlocked = Boolean(guildConfig.vanityUnlocked || guildConfig.vanitySlug || guildConfig.verified);
+	const isVanityUnlocked = Boolean(guildConfig.vanityUnlocked || guildConfig.verified);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
 	const publicServerUrl = getEnvUrl(`https://app.xernerx.com/servers/${guildConfig.vanitySlug || guildConfig.id}`);
 

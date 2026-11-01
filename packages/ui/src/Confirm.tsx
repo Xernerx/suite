@@ -33,7 +33,7 @@ const variantStyles = {
 	primary: {
 		icon: Info,
 		iconWrapper: 'bg-(--accent)/10 text-(--accent)',
-		button: 'bg-(--accent) text-white hover:bg-(--hover-accent)',
+		button: 'bg-(--accent) text-(--accent-contrast) border border-(--border)/15 hover:bg-(--hover-accent)',
 	},
 };
 

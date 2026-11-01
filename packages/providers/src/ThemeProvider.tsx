@@ -10,14 +10,165 @@ type Theme = 'light' | 'dark' | 'system';
 
 export type LayoutAlignment = 'system' | 'left' | 'right';
 export type DotMatrixStage = 'default' | 'ripple' | 'orbit' | 'blank';
-export type DotMatrixType = 'default' | 'full' | 'icon' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'blank';
+export type DotMatrixType = 'default' | 'full' | 'icon' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos' | 'supernova' | 'tesseract' | 'synthwave' | 'lotus' | 'blank';
+export type DotMatrixRenderStyle = 'dots' | 'constellation' | 'hexgrid' | 'aurora' | 'glyphs';
 export type DotMatrixAnimation = 'animate' | 'static' | 'always';
+export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx' | 'capsule' | 'squircle' | 'minimal';
+export type UIIconStyle = 'standard' | 'duotone' | 'bold' | 'precision';
+export type AmbientSceneType = 'default' | 'mesh_lava' | 'cyber_grid' | 'topography' | 'nebula_cosmos' | 'prism_caustics';
+export type SurfaceStyleType = 'default' | 'crystal' | 'holographic' | 'neon' | 'obsidian';
+export type CursorFxType = 'default' | 'starlight_trail' | 'plasma_sparks' | 'cyber_reticle' | 'sonic_rings' | 'aurora_ribbon';
+export type OverlaySkinType = 'default' | 'hud_tactical' | 'frosted_prism' | 'neon_arcade' | 'minimal_pill';
 export type HeaderSubdomainId = 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'api' | 'www' | 'admin' | 'hosting';
 
-const VALID_MATRIX_TYPES: readonly DotMatrixType[] = ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'blank'];
+const VALID_MATRIX_TYPES: readonly DotMatrixType[] = [
+	'default',
+	'full',
+	'icon',
+	'orbit',
+	'vortex',
+	'helix',
+	'prism',
+	'infinity',
+	'wavegrid',
+	'chronos',
+	'supernova',
+	'tesseract',
+	'synthwave',
+	'lotus',
+	'blank',
+];
+const VALID_RENDER_STYLES: readonly DotMatrixRenderStyle[] = ['dots', 'constellation', 'hexgrid', 'aurora', 'glyphs'];
 const VALID_MATRIX_ANIMS: readonly DotMatrixAnimation[] = ['animate', 'static', 'always'];
+const VALID_WINDOW_CONTROLS: readonly WindowControlsStyle[] = ['system', 'windows', 'macos', 'xernerx', 'capsule', 'squircle', 'minimal'];
+const VALID_UI_ICON_STYLES: readonly UIIconStyle[] = ['standard', 'duotone', 'bold', 'precision'];
+const VALID_AMBIENT_SCENES: readonly AmbientSceneType[] = ['default', 'mesh_lava', 'cyber_grid', 'topography', 'nebula_cosmos', 'prism_caustics'];
+const VALID_SURFACE_STYLES: readonly SurfaceStyleType[] = ['default', 'crystal', 'holographic', 'neon', 'obsidian'];
+const VALID_CURSOR_FX: readonly CursorFxType[] = ['default', 'starlight_trail', 'plasma_sparks', 'cyber_reticle', 'sonic_rings', 'aurora_ribbon'];
+const VALID_OVERLAY_SKINS: readonly OverlaySkinType[] = ['default', 'hud_tactical', 'frosted_prism', 'neon_arcade', 'minimal_pill'];
 export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'api', 'www', 'admin', 'hosting'];
 export const DEFAULT_HEADER_SUBDOMAINS: HeaderSubdomainId[] = ['portal', 'store'];
+
+const COSMETIC_CHILD_TO_BUNDLE: Record<string, string> = {
+	ambient_mesh_lava: 'ambient_scenes_pack',
+	ambient_cyber_grid: 'ambient_scenes_pack',
+	ambient_topography: 'ambient_scenes_pack',
+	ambient_nebula_cosmos: 'ambient_scenes_pack',
+	ambient_prism_caustics: 'ambient_scenes_pack',
+	surface_crystal: 'surface_styles_pack',
+	surface_holographic: 'surface_styles_pack',
+	surface_neon: 'surface_styles_pack',
+	surface_obsidian: 'surface_styles_pack',
+	cursor_starlight_trail: 'cursor_fx_bundle',
+	cursor_plasma_sparks: 'cursor_fx_bundle',
+	cursor_cyber_reticle: 'cursor_fx_bundle',
+	cursor_sonic_rings: 'cursor_fx_bundle',
+	cursor_aurora_ribbon: 'cursor_fx_bundle',
+	skin_hud_tactical: 'overlay_skins_bundle',
+	skin_frosted_prism: 'overlay_skins_bundle',
+	skin_neon_arcade: 'overlay_skins_bundle',
+	skin_minimal_pill: 'overlay_skins_bundle',
+};
+
+function hasBadgeUnlock(unlocked: string[], req?: string): boolean {
+	if (!req) return true;
+	if (unlocked.includes(req)) return true;
+	const bundle = COSMETIC_CHILD_TO_BUNDLE[req];
+	return Boolean(bundle && unlocked.includes(bundle));
+}
+
+function enforceUnlockedCosmetics(prefs: UIPreferences, unlocked: string[]): UIPreferences {
+	const next = { ...prefs };
+	const typeMap: Partial<Record<DotMatrixType, string>> = {
+		orbit: 'dot_matrix_banner',
+		vortex: 'dot_matrix_banner',
+		helix: 'dot_matrix_banner',
+		prism: 'dot_matrix_banner',
+		infinity: 'dot_matrix_banner',
+		wavegrid: 'dot_matrix_banner',
+		chronos: 'stage_constellation',
+		supernova: 'stage_constellation',
+		tesseract: 'stage_hexgrid',
+		synthwave: 'stage_aurora',
+		lotus: 'stage_glyphs',
+	};
+	const renderMap: Partial<Record<DotMatrixRenderStyle, string>> = {
+		constellation: 'stage_constellation',
+		hexgrid: 'stage_hexgrid',
+		aurora: 'stage_aurora',
+		glyphs: 'stage_glyphs',
+	};
+	const wcMap: Partial<Record<WindowControlsStyle, string>> = {
+		capsule: 'window_styles_pack',
+		squircle: 'window_styles_pack',
+		minimal: 'window_styles_pack',
+	};
+	const iconMap: Partial<Record<UIIconStyle, string>> = {
+		duotone: 'ui_icon_packs',
+		bold: 'ui_icon_packs',
+		precision: 'ui_icon_packs',
+	};
+	const sceneMap: Partial<Record<AmbientSceneType, string>> = {
+		mesh_lava: 'ambient_mesh_lava',
+		cyber_grid: 'ambient_cyber_grid',
+		topography: 'ambient_topography',
+		nebula_cosmos: 'ambient_nebula_cosmos',
+		prism_caustics: 'ambient_prism_caustics',
+	};
+	const surfMap: Partial<Record<SurfaceStyleType, string>> = {
+		crystal: 'surface_crystal',
+		holographic: 'surface_holographic',
+		neon: 'surface_neon',
+		obsidian: 'surface_obsidian',
+	};
+	const fxMap: Partial<Record<CursorFxType, string>> = {
+		starlight_trail: 'cursor_starlight_trail',
+		plasma_sparks: 'cursor_plasma_sparks',
+		cyber_reticle: 'cursor_cyber_reticle',
+		sonic_rings: 'cursor_sonic_rings',
+		aurora_ribbon: 'cursor_aurora_ribbon',
+	};
+	const skinMap: Partial<Record<OverlaySkinType, string>> = {
+		hud_tactical: 'skin_hud_tactical',
+		frosted_prism: 'skin_frosted_prism',
+		neon_arcade: 'skin_neon_arcade',
+		minimal_pill: 'skin_minimal_pill',
+	};
+
+	if (next.dotMatrixType && !hasBadgeUnlock(unlocked, typeMap[next.dotMatrixType])) {
+		next.dotMatrixType = 'default';
+		setPref('pref_dotMatrixType', 'default');
+	}
+	if (next.dotMatrixRenderStyle && !hasBadgeUnlock(unlocked, renderMap[next.dotMatrixRenderStyle])) {
+		next.dotMatrixRenderStyle = 'dots';
+		setPref('pref_dotMatrixRenderStyle', 'dots');
+	}
+	if (next.windowControls && !hasBadgeUnlock(unlocked, wcMap[next.windowControls])) {
+		next.windowControls = 'system';
+		setPref('pref_windowControls', 'system');
+	}
+	if (next.uiIconStyle && !hasBadgeUnlock(unlocked, iconMap[next.uiIconStyle])) {
+		next.uiIconStyle = 'standard';
+		setPref('pref_uiIconStyle', 'standard');
+	}
+	if (next.ambientScene && !hasBadgeUnlock(unlocked, sceneMap[next.ambientScene])) {
+		next.ambientScene = 'default';
+		setPref('pref_ambientScene', 'default');
+	}
+	if (next.surfaceStyle && !hasBadgeUnlock(unlocked, surfMap[next.surfaceStyle])) {
+		next.surfaceStyle = 'default';
+		setPref('pref_surfaceStyle', 'default');
+	}
+	if (next.cursorFx && !hasBadgeUnlock(unlocked, fxMap[next.cursorFx])) {
+		next.cursorFx = 'default';
+		setPref('pref_cursorFx', 'default');
+	}
+	if (next.overlaySkin && !hasBadgeUnlock(unlocked, skinMap[next.overlaySkin])) {
+		next.overlaySkin = 'default';
+		setPref('pref_overlaySkin', 'default');
+	}
+	return next;
+}
 
 const LEGACY_PAGE_WIDTH_PERCENT: Record<string, number> = {
 	compact: 75,
@@ -75,7 +226,14 @@ export interface UIPreferences {
 	alignment: LayoutAlignment;
 	dotMatrixStage?: DotMatrixStage;
 	dotMatrixType?: DotMatrixType;
+	dotMatrixRenderStyle?: DotMatrixRenderStyle;
 	dotMatrixAnimation?: DotMatrixAnimation;
+	windowControls?: WindowControlsStyle;
+	uiIconStyle?: UIIconStyle;
+	ambientScene?: AmbientSceneType;
+	surfaceStyle?: SurfaceStyleType;
+	cursorFx?: CursorFxType;
+	overlaySkin?: OverlaySkinType;
 }
 
 export const DEFAULT_UI_PREFERENCES: UIPreferences = {
@@ -95,7 +253,14 @@ export const DEFAULT_UI_PREFERENCES: UIPreferences = {
 	alignment: 'system',
 	dotMatrixStage: 'default',
 	dotMatrixType: 'default',
+	dotMatrixRenderStyle: 'dots',
 	dotMatrixAnimation: 'animate',
+	windowControls: 'system',
+	uiIconStyle: 'standard',
+	ambientScene: 'default',
+	surfaceStyle: 'default',
+	cursorFx: 'default',
+	overlaySkin: 'default',
 };
 
 type ThemeContextType = {
@@ -180,9 +345,37 @@ function loadStoredUIPreferences(): UIPreferences {
 			if (raw && (VALID_MATRIX_TYPES as readonly string[]).includes(raw)) {
 				result.dotMatrixType = raw as DotMatrixType;
 			}
+		} else if (key === 'dotMatrixRenderStyle') {
+			if (raw && (VALID_RENDER_STYLES as readonly string[]).includes(raw)) {
+				result.dotMatrixRenderStyle = raw as DotMatrixRenderStyle;
+			}
 		} else if (key === 'dotMatrixAnimation') {
 			if (raw && (VALID_MATRIX_ANIMS as readonly string[]).includes(raw)) {
 				result.dotMatrixAnimation = raw as DotMatrixAnimation;
+			}
+		} else if (key === 'windowControls') {
+			if (raw && (VALID_WINDOW_CONTROLS as readonly string[]).includes(raw)) {
+				result.windowControls = raw as WindowControlsStyle;
+			}
+		} else if (key === 'uiIconStyle') {
+			if (raw && (VALID_UI_ICON_STYLES as readonly string[]).includes(raw)) {
+				result.uiIconStyle = raw as UIIconStyle;
+			}
+		} else if (key === 'ambientScene') {
+			if (raw && (VALID_AMBIENT_SCENES as readonly string[]).includes(raw)) {
+				result.ambientScene = raw as AmbientSceneType;
+			}
+		} else if (key === 'surfaceStyle') {
+			if (raw && (VALID_SURFACE_STYLES as readonly string[]).includes(raw)) {
+				result.surfaceStyle = raw as SurfaceStyleType;
+			}
+		} else if (key === 'cursorFx') {
+			if (raw && (VALID_CURSOR_FX as readonly string[]).includes(raw)) {
+				result.cursorFx = raw as CursorFxType;
+			}
+		} else if (key === 'overlaySkin') {
+			if (raw && (VALID_OVERLAY_SKINS as readonly string[]).includes(raw)) {
+				result.overlaySkin = raw as OverlaySkinType;
 			}
 		} else if (raw === 'true') {
 			(result as any)[key] = true;
@@ -215,6 +408,38 @@ function applyTheme(theme: Theme) {
 	root.dataset.theme = resolved;
 }
 
+function syncAccentCssVars(colorStr: string) {
+	if (typeof window === 'undefined') return;
+
+	const isDark = document.documentElement.classList.contains('dark');
+	const parsed = tinycolor(colorStr);
+	const accent = parsed.isValid() ? parsed : tinycolor(DEFAULT_ACCENT);
+	const hex = accent.toHexString();
+	const lum = accent.getLuminance();
+
+	const accentContrast = lum > 0.42 ? '#09090b' : '#fafafa';
+	const surfaceHex = isDark ? '#09090b' : '#fafafa';
+	const surfaceContrast = tinycolor.readability(accent, surfaceHex);
+
+	let readable = accent.clone();
+	if (!isDark && surfaceContrast < 2.2) {
+		readable = accent.toHsl().s < 0.15 ? tinycolor('#27272a') : accent.clone().darken(35);
+	} else if (isDark && surfaceContrast < 2.2) {
+		readable = accent.toHsl().s < 0.15 ? tinycolor('#e4e4e7') : accent.clone().lighten(35);
+	}
+
+	const readableHex = readable.toHexString();
+	const hoverHex = lum > 0.85 ? accent.clone().darken(10).toHexString() : lum < 0.08 ? accent.clone().lighten(14).toHexString() : accent.clone().darken(8).toHexString();
+
+	setThemeVar('--accent', hex);
+	setThemeVar('--accent-contrast', accentContrast);
+	setThemeVar('--accent-readable', readableHex);
+	setThemeVar('--hover-accent', hoverHex);
+	setThemeVar('--accent-hover', hoverHex);
+	setThemeVar('--active-accent', readableHex);
+	setThemeVar('--accent-active', readable.clone().setAlpha(0.15).toRgbString());
+}
+
 function applyAccent(color?: string | number | null) {
 	if (typeof window === 'undefined') return;
 
@@ -230,11 +455,7 @@ function applyAccent(color?: string | number | null) {
 	}
 
 	setPref('accent', colorStr);
-
-	const accent = tinycolor(colorStr);
-	setThemeVar('--accent', accent.toHexString());
-	setThemeVar('--accent-hover', accent.clone().darken(8).toHexString());
-	setThemeVar('--accent-active', accent.clone().setAlpha(0.15).toRgbString());
+	syncAccentCssVars(colorStr);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -255,17 +476,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		setPreferencesState(loaded);
 		if (typeof document !== 'undefined') {
 			document.documentElement.classList.toggle('reduce-motion', loaded.reducedMotion);
+			document.documentElement.dataset.iconStyle = loaded.uiIconStyle || 'standard';
+			document.documentElement.dataset.surfaceStyle = loaded.surfaceStyle || 'default';
+			delete document.documentElement.dataset.fontPack;
+			document.documentElement.dataset.overlaySkin = loaded.overlaySkin || 'default';
 		}
 	}, []);
 
 	useEffect(() => {
 		if (!isReady) return;
 		const storedAccent = getPref('accent') || DEFAULT_ACCENT;
-
-		const accent = tinycolor(storedAccent);
-		setThemeVar('--accent', accent.toHexString());
-		setThemeVar('--accent-hover', accent.clone().darken(8).toHexString());
-		setThemeVar('--accent-active', accent.clone().setAlpha(0.15).toRgbString());
+		syncAccentCssVars(storedAccent);
 
 		const storedZoom = getPref('uiZoom');
 		if (storedZoom) {
@@ -399,6 +620,83 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 									mergedPrefs.dotMatrixAnimation = localAnim as DotMatrixAnimation;
 								}
 							}
+						} else if (k === 'dotMatrixRenderStyle') {
+							const remoteRender = appPrefs.uiPreferences[k];
+							if (remoteRender && (VALID_RENDER_STYLES as readonly string[]).includes(remoteRender)) {
+								mergedPrefs.dotMatrixRenderStyle = remoteRender as DotMatrixRenderStyle;
+								setPref(`pref_${k}`, remoteRender);
+							} else {
+								const localRender = getPref(`pref_${k}`);
+								if (localRender && (VALID_RENDER_STYLES as readonly string[]).includes(localRender)) {
+									mergedPrefs.dotMatrixRenderStyle = localRender as DotMatrixRenderStyle;
+								}
+							}
+						} else if (k === 'windowControls') {
+							const remoteWc = appPrefs.uiPreferences[k];
+							if (remoteWc && (VALID_WINDOW_CONTROLS as readonly string[]).includes(remoteWc)) {
+								mergedPrefs.windowControls = remoteWc as WindowControlsStyle;
+								setPref(`pref_${k}`, remoteWc);
+							} else {
+								const localWc = getPref(`pref_${k}`);
+								if (localWc && (VALID_WINDOW_CONTROLS as readonly string[]).includes(localWc)) {
+									mergedPrefs.windowControls = localWc as WindowControlsStyle;
+								}
+							}
+						} else if (k === 'uiIconStyle') {
+							const remoteIcon = appPrefs.uiPreferences[k];
+							if (remoteIcon && (VALID_UI_ICON_STYLES as readonly string[]).includes(remoteIcon)) {
+								mergedPrefs.uiIconStyle = remoteIcon as UIIconStyle;
+								setPref(`pref_${k}`, remoteIcon);
+							} else {
+								const localIcon = getPref(`pref_${k}`);
+								if (localIcon && (VALID_UI_ICON_STYLES as readonly string[]).includes(localIcon)) {
+									mergedPrefs.uiIconStyle = localIcon as UIIconStyle;
+								}
+							}
+						} else if (k === 'ambientScene') {
+							const remoteScene = appPrefs.uiPreferences[k];
+							if (remoteScene && (VALID_AMBIENT_SCENES as readonly string[]).includes(remoteScene)) {
+								mergedPrefs.ambientScene = remoteScene as AmbientSceneType;
+								setPref(`pref_${k}`, remoteScene);
+							} else {
+								const localScene = getPref(`pref_${k}`);
+								if (localScene && (VALID_AMBIENT_SCENES as readonly string[]).includes(localScene)) {
+									mergedPrefs.ambientScene = localScene as AmbientSceneType;
+								}
+							}
+						} else if (k === 'surfaceStyle') {
+							const remoteSurf = appPrefs.uiPreferences[k];
+							if (remoteSurf && (VALID_SURFACE_STYLES as readonly string[]).includes(remoteSurf)) {
+								mergedPrefs.surfaceStyle = remoteSurf as SurfaceStyleType;
+								setPref(`pref_${k}`, remoteSurf);
+							} else {
+								const localSurf = getPref(`pref_${k}`);
+								if (localSurf && (VALID_SURFACE_STYLES as readonly string[]).includes(localSurf)) {
+									mergedPrefs.surfaceStyle = localSurf as SurfaceStyleType;
+								}
+							}
+						} else if (k === 'cursorFx') {
+							const remoteFx = appPrefs.uiPreferences[k];
+							if (remoteFx && (VALID_CURSOR_FX as readonly string[]).includes(remoteFx)) {
+								mergedPrefs.cursorFx = remoteFx as CursorFxType;
+								setPref(`pref_${k}`, remoteFx);
+							} else {
+								const localFx = getPref(`pref_${k}`);
+								if (localFx && (VALID_CURSOR_FX as readonly string[]).includes(localFx)) {
+									mergedPrefs.cursorFx = localFx as CursorFxType;
+								}
+							}
+						} else if (k === 'overlaySkin') {
+							const remoteSkin = appPrefs.uiPreferences[k];
+							if (remoteSkin && (VALID_OVERLAY_SKINS as readonly string[]).includes(remoteSkin)) {
+								mergedPrefs.overlaySkin = remoteSkin as OverlaySkinType;
+								setPref(`pref_${k}`, remoteSkin);
+							} else {
+								const localSkin = getPref(`pref_${k}`);
+								if (localSkin && (VALID_OVERLAY_SKINS as readonly string[]).includes(localSkin)) {
+									mergedPrefs.overlaySkin = localSkin as OverlaySkinType;
+								}
+							}
 						} else if (typeof appPrefs.uiPreferences[k] === 'boolean') {
 							(mergedPrefs as any)[k] = appPrefs.uiPreferences[k];
 							setPref(`pref_${k}`, String(appPrefs.uiPreferences[k]));
@@ -416,9 +714,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 						mergedPrefs.showHeaderStore = mergedPrefs.headerSubdomains.includes('store');
 						mergedPrefs.showHeaderPortal = mergedPrefs.headerSubdomains.includes('portal');
 					}
-					setPreferencesState(mergedPrefs);
+					const unlockedList: string[] = Array.isArray(data?.credits?.unlockedBadges) ? data.credits.unlockedBadges : [];
+					const gatedPrefs = enforceUnlockedCosmetics(mergedPrefs, unlockedList);
+					setPreferencesState(gatedPrefs);
 					if (typeof document !== 'undefined') {
-						document.documentElement.classList.toggle('reduce-motion', mergedPrefs.reducedMotion);
+						document.documentElement.classList.toggle('reduce-motion', gatedPrefs.reducedMotion);
+						document.documentElement.dataset.iconStyle = gatedPrefs.uiIconStyle || 'standard';
+						document.documentElement.dataset.surfaceStyle = gatedPrefs.surfaceStyle || 'default';
+						delete document.documentElement.dataset.fontPack;
+						document.documentElement.dataset.overlaySkin = gatedPrefs.overlaySkin || 'default';
+					}
+				} else {
+					const unlockedList: string[] = Array.isArray(data?.credits?.unlockedBadges) ? data.credits.unlockedBadges : [];
+					const gatedPrefs = enforceUnlockedCosmetics(loadStoredUIPreferences(), unlockedList);
+					setPreferencesState(gatedPrefs);
+					if (typeof document !== 'undefined') {
+						document.documentElement.classList.toggle('reduce-motion', gatedPrefs.reducedMotion);
+						document.documentElement.dataset.iconStyle = gatedPrefs.uiIconStyle || 'standard';
+						document.documentElement.dataset.surfaceStyle = gatedPrefs.surfaceStyle || 'default';
+						delete document.documentElement.dataset.fontPack;
+						document.documentElement.dataset.overlaySkin = gatedPrefs.overlaySkin || 'default';
 					}
 				}
 			} catch (e) {
@@ -433,6 +748,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;
 		setResolvedTheme(resolved);
 		applyTheme(theme);
+		syncAccentCssVars(getPref('accent') || DEFAULT_ACCENT);
 	}, [theme]);
 
 	function updateTheme(next: Theme) {
@@ -494,6 +810,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				if (key === 'reducedMotion' && typeof document !== 'undefined') {
 					document.documentElement.classList.toggle('reduce-motion', Boolean(value));
 				}
+				if (key === 'uiIconStyle' && typeof document !== 'undefined') {
+					document.documentElement.dataset.iconStyle = String(value || 'standard');
+				}
+				if (key === 'surfaceStyle' && typeof document !== 'undefined') {
+					document.documentElement.dataset.surfaceStyle = String(value || 'default');
+				}
+				if (key === 'overlaySkin' && typeof document !== 'undefined') {
+					document.documentElement.dataset.overlaySkin = String(value || 'default');
+				}
+				if (key === 'windowControls' && typeof window !== 'undefined') {
+					const electronBridge = (window as any).electron;
+					if (electronBridge?.setMetadata) {
+						electronBridge.setMetadata({ windowControls: value }).catch?.(() => {});
+					}
+					window.dispatchEvent(new CustomEvent('xernerx:metadata-updated', { detail: { windowControls: value } }));
+				}
 				syncPreferencesToRemote(next);
 				return next;
 			});
@@ -512,6 +844,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		});
 		if (typeof document !== 'undefined') {
 			document.documentElement.classList.remove('reduce-motion');
+			document.documentElement.dataset.iconStyle = 'standard';
+			document.documentElement.dataset.surfaceStyle = 'default';
+			delete document.documentElement.dataset.fontPack;
+			document.documentElement.dataset.overlaySkin = 'default';
 		}
 		setPreferencesState({ ...DEFAULT_UI_PREFERENCES, headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS] });
 		syncPreferencesToRemote({ ...DEFAULT_UI_PREFERENCES, headerSubdomains: [...DEFAULT_HEADER_SUBDOMAINS] });
@@ -526,6 +862,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 			document.documentElement.classList.toggle('dark', resolved === 'dark');
 			document.documentElement.style.colorScheme = resolved;
 			document.documentElement.dataset.theme = resolved;
+			syncAccentCssVars(getPref('accent') || DEFAULT_ACCENT);
 		};
 
 		media.addEventListener('change', handler);
@@ -571,7 +908,7 @@ export function useEffectiveAlignment(): {
 	isRightAligned: boolean;
 } {
 	const ctx = useContext(ThemeContext);
-	const [windowControls, setWindowControls] = useState<'system' | 'windows' | 'macos' | 'xernerx'>('system');
+	const [windowControls, setWindowControls] = useState<WindowControlsStyle>('system');
 	const [isMacPlatform, setIsMacPlatform] = useState(false);
 
 	useEffect(() => {
@@ -604,7 +941,8 @@ export function useEffectiveAlignment(): {
 	}, []);
 
 	const prefAlignment = ctx?.preferences?.alignment || 'system';
-	const effectiveControls = windowControls === 'system' ? (isMacPlatform ? 'macos' : 'windows') : windowControls;
+	const prefControls = ctx?.preferences?.windowControls && ctx.preferences.windowControls !== 'system' ? ctx.preferences.windowControls : windowControls;
+	const effectiveControls = prefControls === 'system' ? (isMacPlatform ? 'macos' : 'windows') : prefControls;
 	const effectiveAlignment: 'left' | 'right' = prefAlignment === 'right' ? 'right' : prefAlignment === 'left' ? 'left' : effectiveControls === 'macos' || isMacPlatform ? 'right' : 'left';
 	return { effectiveAlignment, isRightAligned: effectiveAlignment === 'right' };
 }

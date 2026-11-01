@@ -22,13 +22,35 @@ async function resolveDefaultJoinRoles(db: any): Promise<string[]> {
 	return Array.from(roles);
 }
 
-async function ensureUserBonusAndDefaults(userId: string) {
-	if (!userId) return;
+export async function ensureUserBonusAndDefaults(userId: string) {
+	if (!userId || !/^\d{15,22}$/.test(String(userId))) return;
 	try {
 		const db = await database('xernerx');
 		const CreditModel = (db.models.users as any)?.Credit;
 		const LevelModel = (db.models.users as any)?.Level;
 		const UserModel = (db.models.users as any)?.User;
+
+		if (UserModel) {
+			const userDoc = (await UserModel.findOne({ id: userId }).lean()) as any;
+			if (!userDoc) {
+				const defaultRoles = await resolveDefaultJoinRoles(db);
+				await UserModel.create({
+					id: userId,
+					roles: defaultRoles,
+				}).catch(() => {});
+			} else {
+				const updates: Record<string, any> = {};
+				if (userDoc.agreedTerms && userDoc.agreedPrivacy && !userDoc.verified) {
+					updates.verified = true;
+				}
+				if (!Array.isArray(userDoc.roles) || userDoc.roles.length === 0) {
+					updates.roles = await resolveDefaultJoinRoles(db);
+				}
+				if (Object.keys(updates).length > 0) {
+					await UserModel.updateOne({ id: userId }, { $set: updates }).catch(() => {});
+				}
+			}
+		}
 
 		if (CreditModel) {
 			const existingCredit = (await CreditModel.findOne({ ownerId: userId }).lean()) as any;
@@ -83,22 +105,6 @@ async function ensureUserBonusAndDefaults(userId: string) {
 					level: 1,
 					xp: 0,
 				}).catch(() => {});
-			}
-		}
-
-		if (UserModel) {
-			const userDoc = (await UserModel.findOne({ id: userId }).lean()) as any;
-			if (userDoc) {
-				const updates: Record<string, any> = {};
-				if (userDoc.agreedTerms && userDoc.agreedPrivacy && !userDoc.verified) {
-					updates.verified = true;
-				}
-				if (!Array.isArray(userDoc.roles) || userDoc.roles.length === 0) {
-					updates.roles = await resolveDefaultJoinRoles(db);
-				}
-				if (Object.keys(updates).length > 0) {
-					await UserModel.updateOne({ id: userId }, { $set: updates }).catch(() => {});
-				}
 			}
 		}
 	} catch {}
@@ -204,11 +210,9 @@ export default async function Server(msg: any) {
 		case 'create': {
 			const isUserAction = msg.action === 'users' || msg.action === 'user' || msg.action === 'profile' || msg.action === 'profiles';
 			const isCreditAction = msg.action === 'credits' || msg.action === 'credit';
+			const isLevelAction = msg.action === 'levels' || msg.action === 'level';
+			const targetUserId = String(msg.body?.ownerId || msg.body?.id || '');
 			if (isUserAction) {
-				const keys = Object.keys(msg.body || {}).filter((k) => k !== 'id' && msg.body[k] !== undefined && msg.body[k] !== null && msg.body[k] !== '');
-				if (keys.length === 0) {
-					return model.findOne(getFilter(msg.action, msg.body)).lean();
-				}
 				if (msg.body?.agreedTerms && msg.body?.agreedPrivacy) {
 					msg.body.verified = true;
 				}
@@ -235,15 +239,17 @@ export default async function Server(msg: any) {
 			}
 			try {
 				const res = await model.create(msg.body);
-				if (isUserAction && msg.body?.id) {
-					await ensureUserBonusAndDefaults(String(msg.body.id));
-					return model.findOne(getFilter(msg.action, msg.body)).lean();
+				if ((isUserAction || isCreditAction || isLevelAction) && targetUserId) {
+					await ensureUserBonusAndDefaults(targetUserId);
+					if (isUserAction) {
+						return model.findOne(getFilter(msg.action, msg.body)).lean();
+					}
 				}
 				return res?.toObject ? res.toObject() : res;
 			} catch (error: any) {
 				if (error?.code === 11000) {
-					if (isUserAction && msg.body?.id) {
-						await ensureUserBonusAndDefaults(String(msg.body.id));
+					if ((isUserAction || isCreditAction || isLevelAction) && targetUserId) {
+						await ensureUserBonusAndDefaults(targetUserId);
 					}
 					return model.findOne(getFilter(msg.action, msg.body)).lean();
 				}
@@ -253,9 +259,15 @@ export default async function Server(msg: any) {
 
 		case 'update': {
 			const isUserAction = msg.action === 'users' || msg.action === 'user' || msg.action === 'profile' || msg.action === 'profiles';
+			const isCreditAction = msg.action === 'credits' || msg.action === 'credit';
+			const isLevelAction = msg.action === 'levels' || msg.action === 'level';
+			const targetUserId = String(msg.body?.ownerId || msg.body?.id || '');
 			if (isUserAction) {
 				const keys = Object.keys(msg.body || {}).filter((k) => k !== 'id' && msg.body[k] !== undefined && msg.body[k] !== null && msg.body[k] !== '');
 				if (keys.length === 0) {
+					if (targetUserId) {
+						await ensureUserBonusAndDefaults(targetUserId);
+					}
 					return model.findOne(getFilter(msg.action, msg.body)).lean();
 				}
 				if (msg.body?.agreedTerms && msg.body?.agreedPrivacy) {
@@ -327,9 +339,11 @@ export default async function Server(msg: any) {
 				)
 				.lean();
 
-			if (isUserAction && msg.body?.id) {
-				await ensureUserBonusAndDefaults(String(msg.body.id));
-				return model.findOne(getFilter(msg.action, msg.body)).lean();
+			if ((isUserAction || isCreditAction || isLevelAction) && targetUserId) {
+				await ensureUserBonusAndDefaults(targetUserId);
+				if (isUserAction) {
+					return model.findOne(getFilter(msg.action, msg.body)).lean();
+				}
 			}
 
 			return updatedDoc;

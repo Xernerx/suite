@@ -319,6 +319,10 @@ export default function PortalPage() {
 				setSaving(true);
 				try {
 					const finalConfig = { ...orgConfig };
+					if (!finalConfig.vanityUnlocked && !finalConfig.verified) {
+						delete finalConfig.vanitySlug;
+						delete finalConfig.vanityUnlocked;
+					}
 					for (const field of ['iconUrl', 'bannerUrl'] as const) {
 						if (pendingUploads[field]) {
 							const formData = new FormData();

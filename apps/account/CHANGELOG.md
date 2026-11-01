@@ -2,6 +2,27 @@
 
 # auth
 
+## 2.12.0
+
+### Minor Changes
+
+- Added the Profile Identity Cosmetics Studio and Dot-Matrix Banner Studio integrated with the global unsaved-changes bar, expanded Appearance with stage render forms, ambient canvas scenes, glass surface styles, interactive cursor & click shockwave FX, header/icon packs, and overlay HUD skins, added 10 Desktop App Icon crests in Desktop Preferences, and added Monochrome White and Obsidian Black accent colors with high-contrast Light/Dark adaptation.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 2.11.0
 
 ### Minor Changes

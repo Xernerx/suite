@@ -130,47 +130,27 @@
 				"dataCollected": {
 					"title": "2. Informations que nous collectons",
 					"account": {
-						"title": "Informations du compte :",
-						"desc": "E-mail, nom d'utilisateur et identifiants de profil."
+						"title": "Informations du compte :"
 					},
 					"usage": {
 						"title": "Données d'utilisation :",
 						"desc": "Journaux, interactions système et paramètres de configuration."
-					},
-					"integration": {
-						"title": "Données d'intégration :",
-						"desc": "Données fournies via des plateformes tierces telles que Discord."
 					}
 				},
 				"legalBasis": {
-					"title": "3. Base juridique du traitement",
-					"content": "Nous traitons les données personnelles sur la base de la nécessité contractuelle, des intérêts légitimes, des obligations légales ou du consentement de l'utilisateur le cas échéant."
+					"title": "3. Base juridique du traitement"
 				},
 				"usage": {
-					"title": "4. Comment nous utilisons les informations",
-					"items": [
-						"Fournir et maintenir les services.",
-						"Améliorer la fiabilité et les performances.",
-						"Fournir du support et communiquer des mises à jour.",
-						"Garantir le respect des obligations légales."
-					]
+					"title": "4. Comment nous utilisons les informations"
 				},
 				"sharing": {
-					"title": "6. Partage des données",
-					"items": [
-						"Fournisseurs d'hébergement et d'infrastructure.",
-						"Prestataires de paiement (Stripe) pour la facturation et la gestion des abonnements.",
-						"Intégrations tierces autorisées.",
-						"Autorités légales lorsque la loi l'exige."
-					]
+					"title": "6. Partage des données"
 				},
 				"retention": {
-					"title": "7. Conservation des données",
-					"content": "Nous conservons les données uniquement aussi longtemps que nécessaire pour remplir les objectifs décrits dans cette politique, sauf si une conservation plus longue est requise par la loi."
+					"title": "7. Conservation des données"
 				},
 				"security": {
-					"title": "8. Sécurité des données",
-					"content": "Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles pour protéger les données. Cependant, aucun système n'est absolument sécurisé."
+					"title": "8. Sécurité des données"
 				},
 				"rights": {
 					"title": "9. Vos droits",

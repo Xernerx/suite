@@ -5,11 +5,14 @@
 import { BellRing, Camera, Code2, Columns2, Compass, FileText, FolderSync, Layers, LayoutTemplate, Lock, RefreshCw, Save, Trash2, X } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Selector, Toggle } from '@xernerx/ui';
 import { DesktopAccountSwitcher } from './DesktopAccountSwitcher';
+import { DesktopAppIconPicker } from './DesktopAppIconPicker';
 import { DesktopLogsModal } from './DesktopLogsModal';
+import { isCosmeticUnlocked, WINDOW_CONTROL_UNLOCK_MAP } from './cosmeticUnlocks';
 import {
 	type BooleanDesktopKey,
 	DEFAULT_DESKTOP_METADATA,
 	DESKTOP_ITEMS,
+	type DesktopAppIcon,
 	type DesktopMetadata,
 	normalizeDesktopMetadata,
 	RESTART_REQUIRED_KEYS,
@@ -18,17 +21,18 @@ import {
 	type WindowControlsStyle,
 } from './desktopPreferencesConfig';
 import { navigation } from '@xernerx/lib';
-import { useDictionary, useEnvironment, useNotifications, usePermissions, useTheme, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useNotifications, usePermissions, useTheme, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 
-export { DEFAULT_DESKTOP_METADATA, type DesktopMetadata, type StartupLocation, type WindowControlsStyle } from './desktopPreferencesConfig';
+export { DEFAULT_DESKTOP_METADATA, type DesktopAppIcon, type DesktopMetadata, type StartupLocation, type WindowControlsStyle } from './desktopPreferencesConfig';
 
 export function DesktopPreferencesSection() {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { notifyNative } = useNotifications();
 	const { hasPermission } = usePermissions();
-	const { preferences } = useTheme();
+	const { user } = useUser();
+	const { preferences, setPreference } = useTheme();
 	const { toast } = useToast();
 	const hasAdminAccess = hasPermission('access');
 
@@ -119,8 +123,36 @@ export function DesktopPreferencesSection() {
 	};
 
 	const handleWindowControlsChange = async (val: string) => {
-		await persistDesktopMetadata({ ...desktopMeta, windowControls: (val as WindowControlsStyle) || 'system' });
+		const next = (val as WindowControlsStyle) || 'system';
+		const reqUnlock = WINDOW_CONTROL_UNLOCK_MAP[next];
+		if (!isCosmeticUnlocked(user, hasAdminAccess, reqUnlock)) {
+			toast({
+				type: 'info',
+				title: t('account.appearance.dotMatrix.lockedToastTitle'),
+				description: t('account.preferences.windowControlsLockedDesc'),
+				action: {
+					label: t('account.appearance.dotMatrix.openCreditStore'),
+					onClick: () => {
+						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+					},
+				},
+			});
+			return;
+		}
+		setPreference('windowControls', next);
+		await persistDesktopMetadata({ ...desktopMeta, windowControls: next });
 		toast({ type: 'success', title: t('account.preferences.toast.updated') });
+	};
+
+	const handleAppIconChange = async (nextIcon: DesktopAppIcon) => {
+		const target = nextIcon || 'default';
+		const changed = target !== desktopMeta.appIcon;
+		await persistDesktopMetadata({ ...desktopMeta, appIcon: target });
+		toast({ type: 'success', title: t('account.preferences.toast.updated') });
+		if (changed) {
+			setNeedsRestart(true);
+			setRestartConfirmOpen(true);
+		}
 	};
 
 	const handleStartupLocationChange = async (val: string) => {
@@ -158,7 +190,7 @@ export function DesktopPreferencesSection() {
 			setJsonError(null);
 			const previousMeta = metaRef.current;
 			const nextMeta = normalizeDesktopMetadata(parsed);
-			const requiresRestart = RESTART_REQUIRED_KEYS.some((k) => Boolean(nextMeta[k]) !== Boolean(previousMeta[k]));
+			const requiresRestart = RESTART_REQUIRED_KEYS.some((k) => Boolean(nextMeta[k]) !== Boolean(previousMeta[k])) || nextMeta.appIcon !== previousMeta.appIcon;
 			await persistDesktopMetadata(nextMeta);
 			toast({ type: 'success', title: t('account.preferences.desktop.jsonSaved') });
 			if (requiresRestart) {
@@ -241,10 +273,13 @@ export function DesktopPreferencesSection() {
 		await (window as any).electron?.restart?.(finalMeta);
 	};
 
-	const windowControlsOptions = (['system', 'windows', 'macos', 'xernerx'] as const).map((value) => ({
-		value,
-		label: t(`account.preferences.desktopItems.windowControls.options.${value}`),
-	}));
+	const windowControlsOptions = (['system', 'windows', 'macos', 'xernerx', 'capsule', 'squircle', 'minimal'] as const).map((value) => {
+		const unlocked = isCosmeticUnlocked(user, hasAdminAccess, WINDOW_CONTROL_UNLOCK_MAP[value]);
+		return {
+			value,
+			label: unlocked ? t(`account.preferences.desktopItems.windowControls.options.${value}`) : `${t(`account.preferences.desktopItems.windowControls.options.${value}`)} 🔒`,
+		};
+	});
 
 	const handleSelectWatchFolder = async () => {
 		const updated = await (window as any).electron?.selectWatchFolder?.();
@@ -414,6 +449,8 @@ export function DesktopPreferencesSection() {
 								<Selector value={desktopMeta.windowControls || 'system'} options={windowControlsOptions} onChange={handleWindowControlsChange} items={false} />
 							</div>
 						</div>
+
+						<DesktopAppIconPicker value={desktopMeta.appIcon || 'default'} onChange={handleAppIconChange} />
 
 						<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 							<div className="flex items-start gap-3.5 max-w-2xl">

@@ -5,6 +5,8 @@ import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { STARTUP_LOCATION_URLS, loadEnvDomain, normalizeStartupLocation, resolveDesktopTargetUrl, type Metadata } from './metadata.js';
+import { applyWindowsThumbarButtons } from './desktopExtras.js';
+import { resolveOsShellIconPath } from './notifications.js';
 
 export interface DesktopPowerState {
 	onBattery: boolean;
@@ -272,7 +274,7 @@ export function configureOsTaskbarAndDock(opts: {
 	const baseArgs = app.isPackaged ? [] : [appRoot];
 
 	if (process.platform === 'win32') {
-		const taskIconPath = fs.existsSync(opts.iconPath) ? opts.iconPath : process.execPath;
+		const taskIconPath = resolveOsShellIconPath(opts.iconPath);
 		try {
 			app.setUserTasks([
 				{
@@ -312,29 +314,24 @@ export function configureOsTaskbarAndDock(opts: {
 
 		try {
 			const win = opts.getWin();
-			const pngPath = path.join(path.dirname(opts.iconPath), 'icon.png');
-			const resolvedThumbPath = fs.existsSync(opts.iconPath) ? opts.iconPath : pngPath;
-			if (win && !win.isDestroyed() && fs.existsSync(resolvedThumbPath)) {
-				const thumbIcon = nativeImage.createFromPath(resolvedThumbPath).resize({ width: 16, height: 16 });
-				if (!thumbIcon.isEmpty()) {
-					win.setThumbarButtons([
-						{
-							tooltip: 'Live Overlay Monitor',
-							icon: thumbIcon,
-							click: () => opts.onToggleOverlay(),
-						},
-						{
-							tooltip: 'Quick Capture to CDN',
-							icon: thumbIcon,
-							click: () => opts.onQuickCapture('screen'),
-						},
-					]);
-				}
-			}
+			applyWindowsThumbarButtons(win, {
+				webUrl: opts.webUrl,
+				onToggleOverlay: () => opts.onToggleOverlay(),
+				onQuickCapture: () => opts.onQuickCapture('screen'),
+			});
 		} catch {}
 	}
 
 	if (process.platform === 'darwin' && app.dock) {
+		try {
+			const pngPath = opts.iconPath.replace(/\.ico$/i, '.png');
+			if (fs.existsSync(pngPath)) {
+				const dockIcon = nativeImage.createFromPath(pngPath);
+				if (!dockIcon.isEmpty()) {
+					app.dock.setIcon(dockIcon);
+				}
+			}
+		} catch {}
 		try {
 			const currentMeta = opts.getMeta();
 			const dockMenu = Menu.buildFromTemplate([

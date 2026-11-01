@@ -4,6 +4,27 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.9.0
+
+### Minor Changes
+
+- Expanded the Credit Store with interactive live previews and new cosmetic categories—including Stage Render Forms, Ambient Canvas Scenes, Glass Surface Styles, Cursor Trail & Click Shockwave FX, Header & Icon Packs, Avatar Frame Shaders, Animated Nameplates, Profile Card Themes, Overlay HUD Skins, and Master Cosmetic Bundles—and synced the updated color-variant branding assets.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 0.8.11
 
 ### Patch Changes

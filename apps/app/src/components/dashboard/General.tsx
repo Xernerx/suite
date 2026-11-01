@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Settings, Server, Bot, Sparkles, ExternalLink, Tag, Plus, X } from 'lucide-react';
+import { Settings, Server, Bot, ExternalLink, Tag, Plus, X } from 'lucide-react';
 import { Input, Markdown } from '@xernerx/ui';
-import { useDictionary } from '@xernerx/providers';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 
 const PRESET_SERVER_TAGS = ['Community', 'Gaming', 'Chill', 'Developer', 'Anime', 'Music', 'Art', 'Tech', 'Roleplay', 'Giveaways', 'Study', 'Esports'];
 
@@ -15,6 +15,7 @@ interface GeneralProps {
 
 export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const [markdownPreview, setMarkdownPreview] = useState(false);
 	const [tagInput, setTagInput] = useState('');
 
@@ -85,7 +86,7 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 					<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.botNotConnectedDesc')}</p>
 					<div className="flex flex-wrap items-center justify-center gap-3">
 						<a
-							href={`https://discord.com/oauth2/authorize?client_id=1086366527940792381&permissions=8&scope=bot%20applications.commands&guild_id=${encodeURIComponent(guildConfig.id || '')}`}
+							href={getEnvUrl('https://xernerx.com/invite/xernerx')}
 							target="_blank"
 							rel="noopener noreferrer"
 							className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-extrabold bg-(--accent) text-(--text-active) hover:bg-(--hover-accent) transition-all shadow-sm"
@@ -93,16 +94,6 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 							<Bot className="w-4 h-4" />
 							{t('app.dashboard.inviteXernerxBot')}
 							<ExternalLink className="w-3.5 h-3.5 opacity-80" />
-						</a>
-						<a
-							href={`https://discord.com/oauth2/authorize?client_id=1484880634844287138&permissions=8&scope=bot%20applications.commands&guild_id=${encodeURIComponent(guildConfig.id || '')}`}
-							target="_blank"
-							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-extrabold bg-(--background)/60 text-(--text) border border-(--border)/15 hover:border-(--accent)/40 hover:text-(--accent) transition-all"
-						>
-							<Sparkles className="w-4 h-4 text-(--accent)" />
-							{t('app.dashboard.inviteVirtueBot')}
-							<ExternalLink className="w-3.5 h-3.5 opacity-70" />
 						</a>
 					</div>
 				</div>

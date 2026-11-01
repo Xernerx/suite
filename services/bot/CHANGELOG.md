@@ -2,6 +2,13 @@
 
 # bot
 
+## 2.1.12
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.19.0
+
 ## 2.1.11
 
 ### Patch Changes

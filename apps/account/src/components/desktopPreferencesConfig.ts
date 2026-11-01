@@ -22,8 +22,22 @@ import {
 	Terminal,
 } from 'lucide-react';
 
-export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx';
+export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx' | 'capsule' | 'squircle' | 'minimal';
+export type DesktopAppIcon = 'default' | 'blue' | 'cyan' | 'green' | 'gold' | 'orange' | 'red' | 'pink' | 'white' | 'black';
 export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'website' | 'help' | 'admin';
+
+export const DESKTOP_APP_ICON_OPTIONS: Array<{ value: DesktopAppIcon; previewSrc: string }> = [
+	{ value: 'default', previewSrc: '/icon.png' },
+	{ value: 'blue', previewSrc: '/icon-blue.png' },
+	{ value: 'cyan', previewSrc: '/icon-cyan.png' },
+	{ value: 'green', previewSrc: '/icon-green.png' },
+	{ value: 'gold', previewSrc: '/icon-gold.png' },
+	{ value: 'orange', previewSrc: '/icon-orange.png' },
+	{ value: 'red', previewSrc: '/icon-red.png' },
+	{ value: 'pink', previewSrc: '/icon-pink.png' },
+	{ value: 'white', previewSrc: '/icon-white.png' },
+	{ value: 'black', previewSrc: '/icon-black.png' },
+];
 
 export interface DesktopMetadata {
 	hardwareAcceleration: boolean;
@@ -46,6 +60,7 @@ export interface DesktopMetadata {
 	idleAfkRpc: boolean;
 	explorerContextMenu: boolean;
 	windowControls: WindowControlsStyle;
+	appIcon: DesktopAppIcon;
 	startupLocation: StartupLocation;
 	cdnWatchFolder?: string;
 }
@@ -71,11 +86,12 @@ export const DEFAULT_DESKTOP_METADATA: DesktopMetadata = {
 	idleAfkRpc: true,
 	explorerContextMenu: false,
 	windowControls: 'system',
+	appIcon: 'default',
 	startupLocation: 'dashboard',
 	cdnWatchFolder: '',
 };
 
-export type BooleanDesktopKey = Exclude<keyof DesktopMetadata, 'windowControls' | 'startupLocation' | 'cdnWatchFolder'>;
+export type BooleanDesktopKey = Exclude<keyof DesktopMetadata, 'windowControls' | 'appIcon' | 'startupLocation' | 'cdnWatchFolder'>;
 
 export const RESTART_REQUIRED_KEYS: Array<BooleanDesktopKey> = ['hardwareAcceleration', 'debug', 'startMaximized', 'startMinimized'];
 
@@ -105,7 +121,9 @@ export const VALID_STARTUP_LOCATIONS: StartupLocation[] = ['last', 'explore', 'd
 
 export function normalizeDesktopMetadata(raw?: Record<string, any> | null): DesktopMetadata {
 	const merged = { ...DEFAULT_DESKTOP_METADATA, ...(raw && typeof raw === 'object' ? raw : {}) };
-	const validControls: WindowControlsStyle[] = ['system', 'windows', 'macos', 'xernerx'];
+	const validControls: WindowControlsStyle[] = ['system', 'windows', 'macos', 'xernerx', 'capsule', 'squircle', 'minimal'];
+	const validIcons: DesktopAppIcon[] = ['default', 'blue', 'cyan', 'green', 'gold', 'orange', 'red', 'pink', 'white', 'black'];
+	const rawIcon = typeof merged.appIcon === 'string' ? merged.appIcon.trim().toLowerCase() : 'default';
 	const rawLoc = typeof merged.startupLocation === 'string' ? merged.startupLocation.trim().toLowerCase() : 'dashboard';
 	return {
 		...merged,
@@ -129,6 +147,7 @@ export function normalizeDesktopMetadata(raw?: Record<string, any> | null): Desk
 		idleAfkRpc: merged.idleAfkRpc !== false,
 		explorerContextMenu: Boolean(merged.explorerContextMenu),
 		windowControls: validControls.includes(merged.windowControls as WindowControlsStyle) ? (merged.windowControls as WindowControlsStyle) : 'system',
+		appIcon: validIcons.includes(rawIcon as DesktopAppIcon) ? (rawIcon as DesktopAppIcon) : 'default',
 		startupLocation: VALID_STARTUP_LOCATIONS.includes(rawLoc as StartupLocation) ? (rawLoc as StartupLocation) : 'dashboard',
 		cdnWatchFolder: typeof merged.cdnWatchFolder === 'string' ? merged.cdnWatchFolder.trim() : '',
 	};

@@ -107,7 +107,7 @@ export function ToastItem({
 				transition: { duration: 0.18 },
 			}}
 			transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-			className={`pointer-events-auto flex w-full items-start overflow-hidden rounded-2xl border border-(--border)/15 bg-(--foreground) shadow-2xl backdrop-blur-md ${
+			className={`xrx-overlay-surface pointer-events-auto flex w-full items-start overflow-hidden rounded-2xl border border-(--border)/15 bg-(--foreground) shadow-2xl backdrop-blur-md ${
 				isCollapsedBehind ? 'absolute inset-x-0 bottom-0 select-none' : 'relative'
 			} ${!isStackHovered && index >= 3 ? 'pointer-events-none' : ''}`}
 			style={{

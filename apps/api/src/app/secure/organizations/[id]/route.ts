@@ -6,7 +6,7 @@ import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 function buildOrgQuery(id: string) {
 	const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
@@ -75,9 +75,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		}
 		const orgId = existingOrg._id;
 
+		const caller = await resolveCallerAuth(req, ['organizations']);
+		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
 		const session = (await getServerSession(auth).catch(() => null)) as any;
-		const actorUserId = session?.user?.id || existingOrg.owner;
-		const isVanityAlreadyUnlocked = Boolean(existingOrg.vanityUnlocked || existingOrg.vanitySlug || existingOrg.verified);
+		const actorUserId = caller.userId || session?.user?.id || existingOrg.owner;
+		const isVanityAlreadyUnlocked = Boolean(existingOrg.vanityUnlocked || existingOrg.vanitySlug || existingOrg.verified || (isStaffOrSystem && (body.vanityUnlocked || body.verified)));
 
 		if (body.action === 'unlock_vanity') {
 			if (!isVanityAlreadyUnlocked) {
@@ -110,6 +112,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				unsetData['vanitySlug'] = 1;
 				delete body.vanitySlug;
 			} else {
+				if (!isVanityAlreadyUnlocked && !isStaffOrSystem) {
+					return NextResponse.json({ error: 'Custom Vanity URL is locked. Unlock it first before setting a vanity slug.' }, { status: 403 });
+				}
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
 					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
 				}
@@ -117,13 +122,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				if (slugTaken) {
 					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
 				}
-				if (!isVanityAlreadyUnlocked) {
-					const unlockRes = await unlockVanityWithUserCredits(fullDb.models, actorUserId, existingOrg.name || `Organization ${orgId}`);
-					if (!unlockRes.ok) {
-						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
-					}
-					updateData['vanityUnlocked'] = true;
-				}
+				updateData['vanityUnlocked'] = true;
 				updateData['vanitySlug'] = rawSlug;
 				body.vanitySlug = rawSlug;
 			}
@@ -141,11 +140,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (Array.isArray(body.members)) updateData['members'] = body.members;
 		if (body.links !== undefined) updateData['links'] = body.links;
 		if (body.roles !== undefined) updateData['roles'] = body.roles;
-		if (body.verified !== undefined) updateData['verified'] = Boolean(body.verified);
-		if (body.vanityUnlocked !== undefined) updateData['vanityUnlocked'] = Boolean(body.vanityUnlocked);
+		if (isStaffOrSystem && body.verified !== undefined) updateData['verified'] = Boolean(body.verified);
+		if (isStaffOrSystem && body.vanityUnlocked !== undefined) updateData['vanityUnlocked'] = Boolean(body.vanityUnlocked);
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
-		if (typeof body.treasuryBalance === 'number') updateData['treasuryBalance'] = Math.max(0, body.treasuryBalance);
+		if (isStaffOrSystem && typeof body.treasuryBalance === 'number') updateData['treasuryBalance'] = Math.max(0, body.treasuryBalance);
 
 		if (body.action === 'remove_member' && body.targetId) {
 			const updatedOrg = await OrganizationModel.findOneAndUpdate({ _id: orgId }, { $pull: { members: body.targetId } }, { returnDocument: 'after', runValidators: true }).lean();

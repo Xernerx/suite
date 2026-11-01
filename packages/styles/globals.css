@@ -34,9 +34,11 @@
 
 :root {
 	--accent: #8b7cf6;
+	--accent-contrast: #fafafa;
+	--accent-readable: #8b7cf6;
 
 	--hover-accent: color-mix(in srgb, var(--accent) 85%, white 15%);
-	--active-accent: color-mix(in srgb, var(--accent) 85%, black 15%);
+	--active-accent: color-mix(in srgb, var(--accent-readable) 85%, black 15%);
 
 	--accent-green: #39ff14;
 	--accent-orange: #ff6600;
@@ -338,16 +340,19 @@ html.reduce-motion *::after {
 	}
 
 	&.bg-\(--accent\)\/5 {
-		background-color: color-mix(in srgb, var(--accent) 6%, var(--background));
+		background-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 6%, var(--background));
 	}
 	&.bg-\(--accent\)\/10 {
-		background-color: color-mix(in srgb, var(--accent) 10%, var(--background));
+		background-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 10%, var(--background));
+	}
+	&.bg-\(--accent\)\/12 {
+		background-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 12%, var(--background));
 	}
 	&.bg-\(--accent\)\/15 {
-		background-color: color-mix(in srgb, var(--accent) 15%, var(--background));
+		background-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 15%, var(--background));
 	}
 	&.bg-\(--accent\)\/20 {
-		background-color: color-mix(in srgb, var(--accent) 20%, var(--background));
+		background-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 20%, var(--background));
 	}
 
 	&.bg-\(--accent-green\)\/5 {
@@ -392,7 +397,7 @@ html.reduce-motion *::after {
 	&.hover\:bg-\(--accent\)\/10:hover,
 	&.hover\:bg-\(--accent\)\/15:hover,
 	&.hover\:bg-\(--accent\)\/20:hover {
-		background-color: color-mix(in srgb, var(--accent) 18%, var(--background));
+		background-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 18%, var(--background));
 	}
 
 	&.hover\:bg-\(--accent-red\)\/10:hover,
@@ -418,6 +423,266 @@ html.reduce-motion *::after {
 	&.hover\:bg-\(--accent\):hover {
 		background-color: var(--accent);
 	}
+}
+
+/* Ensure text-(--accent) and border-(--accent)* remain legible when monochrome white/black accents match the active theme surface */
+.text-\(--accent\) {
+	color: var(--accent-readable, var(--accent));
+}
+
+.border-\(--accent\) {
+	border-color: var(--accent-readable, var(--accent));
+}
+
+.border-\(--accent\)\/15 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 15%, transparent);
+}
+
+.border-\(--accent\)\/20 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 20%, transparent);
+}
+
+.border-\(--accent\)\/25 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 25%, transparent);
+}
+
+.border-\(--accent\)\/30 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 30%, transparent);
+}
+
+.border-\(--accent\)\/35 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 35%, transparent);
+}
+
+.border-\(--accent\)\/40 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 40%, transparent);
+}
+
+.border-\(--accent\)\/45 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 45%, transparent);
+}
+
+.border-\(--accent\)\/50 {
+	border-color: color-mix(in srgb, var(--accent-readable, var(--accent)) 50%, transparent);
+}
+
+/* UI Icon Pack Styles (Credit Store / Ultra Ecosystem) */
+html[data-icon-style='duotone'] svg.lucide {
+	fill: color-mix(in srgb, currentColor 18%, transparent);
+	filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent-readable, var(--accent)) 28%, transparent));
+}
+
+html[data-icon-style='bold'] svg.lucide {
+	stroke-width: 2.6px !important;
+}
+
+html[data-icon-style='precision'] svg.lucide {
+	stroke-width: 1.35px !important;
+}
+
+/* Suite-Wide Card & Glass Surface Themes (Credit Store / Ultra Ecosystem) */
+html[data-surface-style='crystal'] :is(.rounded-3xl, .rounded-2xl).backdrop-blur-md,
+.xrx-surface-preview-crystal {
+	background-color: color-mix(in srgb, var(--foreground) 42%, color-mix(in srgb, var(--background) 85%, var(--accent))) !important;
+	border-color: color-mix(in srgb, var(--text) 18%, color-mix(in srgb, var(--accent) 32%, transparent)) !important;
+	box-shadow:
+		inset 0 1px 0 0 color-mix(in srgb, var(--text) 24%, transparent),
+		inset 0 0 22px 0 color-mix(in srgb, var(--accent) 8%, transparent),
+		0 8px 28px -8px rgba(0, 0, 0, 0.18) !important;
+}
+
+html[data-surface-style='holographic'] :is(.rounded-3xl, .rounded-2xl).backdrop-blur-md,
+.xrx-surface-preview-holographic {
+	background-image: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--accent) 16%, color-mix(in srgb, var(--foreground) 38%, var(--background))) 0%,
+		color-mix(in srgb, var(--foreground) 34%, var(--background)) 48%,
+		color-mix(in srgb, var(--accent) 22%, color-mix(in srgb, var(--foreground) 40%, var(--background))) 100%
+	) !important;
+	border-color: color-mix(in srgb, var(--accent) 42%, color-mix(in srgb, var(--text) 15%, transparent)) !important;
+	box-shadow:
+		inset 0 1px 1px 0 color-mix(in srgb, var(--accent) 30%, transparent),
+		0 0 22px -4px color-mix(in srgb, var(--accent) 20%, transparent) !important;
+}
+
+html[data-surface-style='neon'] :is(.rounded-3xl, .rounded-2xl).backdrop-blur-md,
+.xrx-surface-preview-neon {
+	background-color: color-mix(in srgb, var(--background) 86%, var(--foreground)) !important;
+	border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important;
+	box-shadow:
+		0 0 18px 0 color-mix(in srgb, var(--accent) 24%, transparent),
+		inset 0 0 14px 0 color-mix(in srgb, var(--accent) 12%, transparent) !important;
+}
+
+html[data-surface-style='obsidian'] :is(.rounded-3xl, .rounded-2xl).backdrop-blur-md,
+.xrx-surface-preview-obsidian {
+	background-color: color-mix(in srgb, var(--background) 94%, var(--foreground)) !important;
+	backdrop-filter: none !important;
+	border-color: color-mix(in srgb, var(--border) 22%, transparent) !important;
+	box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--text) 8%, transparent) !important;
+}
+
+/* Profile Cosmetics: Avatar Frame Shaders, Animated Nameplates & Card Themes */
+@keyframes xrx-spin-slow {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes xrx-shimmer-slide {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+.xrx-avatar-frame-plasma_ring {
+	box-shadow:
+		0 0 0 2px var(--background),
+		0 0 0 4px var(--accent),
+		0 0 18px 3px color-mix(in srgb, var(--accent) 65%, transparent);
+}
+
+.xrx-avatar-frame-holo_crown {
+	box-shadow:
+		0 0 0 2px var(--background),
+		0 0 0 4px color-mix(in srgb, var(--accent) 75%, var(--text)),
+		0 -4px 16px 2px color-mix(in srgb, var(--accent) 55%, transparent),
+		0 4px 16px 2px color-mix(in srgb, var(--text) 30%, transparent);
+}
+
+.xrx-avatar-frame-cyber_hex {
+	box-shadow:
+		0 0 0 2px var(--accent),
+		inset 0 0 12px color-mix(in srgb, var(--accent) 55%, transparent),
+		0 0 14px color-mix(in srgb, var(--accent) 50%, transparent);
+	outline: 2px dashed color-mix(in srgb, var(--accent) 70%, transparent);
+	outline-offset: 3px;
+}
+
+.xrx-avatar-frame-solar_flare {
+	box-shadow:
+		0 0 0 2px var(--background),
+		0 0 0 4px color-mix(in srgb, var(--accent) 85%, var(--accent-orange)),
+		0 0 24px 5px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.xrx-nameplate-aurora_wave {
+	background: linear-gradient(
+		115deg,
+		color-mix(in srgb, var(--accent) 42%, var(--background)) 0%,
+		color-mix(in srgb, var(--foreground) 70%, var(--background)) 45%,
+		color-mix(in srgb, var(--accent) 55%, var(--background)) 100%
+	);
+	background-size: 220% 220%;
+	animation: xrx-shimmer-slide 6s ease infinite;
+}
+
+.xrx-nameplate-synth_horizon {
+	background:
+		repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 18%, transparent) 0px, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px, transparent 6px),
+		linear-gradient(90deg, color-mix(in srgb, var(--accent) 38%, var(--background)), color-mix(in srgb, var(--background) 85%, var(--accent)));
+}
+
+.xrx-nameplate-nebula_shimmer {
+	background:
+		radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--accent) 50%, transparent) 0%, transparent 55%),
+		radial-gradient(circle at 82% 70%, color-mix(in srgb, var(--accent) 42%, transparent) 0%, transparent 55%), color-mix(in srgb, var(--foreground) 50%, var(--background));
+	background-size: 180% 180%;
+	animation: xrx-shimmer-slide 8s ease infinite;
+}
+
+.xrx-nameplate-cyber_circuit {
+	background:
+		repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent) 0px, color-mix(in srgb, var(--accent) 16%, transparent) 1px, transparent 1px, transparent 14px),
+		repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 12%, transparent) 0px, color-mix(in srgb, var(--accent) 12%, transparent) 1px, transparent 1px, transparent 14px),
+		linear-gradient(135deg, color-mix(in srgb, var(--background) 88%, var(--accent)), color-mix(in srgb, var(--foreground) 65%, var(--accent)));
+}
+
+.xrx-profile-card-holographic {
+	background-image: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--accent) 24%, color-mix(in srgb, var(--foreground) 45%, var(--background))) 0%,
+		color-mix(in srgb, var(--foreground) 38%, var(--background)) 50%,
+		color-mix(in srgb, var(--accent) 30%, color-mix(in srgb, var(--foreground) 45%, var(--background))) 100%
+	) !important;
+	border-color: color-mix(in srgb, var(--accent) 50%, transparent) !important;
+	box-shadow: 0 0 28px -4px color-mix(in srgb, var(--accent) 28%, transparent) !important;
+}
+
+.xrx-profile-card-celestial {
+	background-image:
+		radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--accent) 34%, transparent) 0%, transparent 50%),
+		radial-gradient(circle at 15% 85%, color-mix(in srgb, var(--accent) 26%, transparent) 0%, transparent 50%) !important;
+	border-color: color-mix(in srgb, var(--accent) 42%, transparent) !important;
+}
+
+.xrx-profile-card-cyber_neon {
+	border-color: color-mix(in srgb, var(--accent) 65%, transparent) !important;
+	box-shadow:
+		0 0 24px 0 color-mix(in srgb, var(--accent) 30%, transparent),
+		inset 0 0 18px 0 color-mix(in srgb, var(--accent) 15%, transparent) !important;
+}
+
+.xrx-profile-card-obsidian_gold {
+	background-color: color-mix(in srgb, var(--background) 92%, var(--foreground)) !important;
+	border-color: color-mix(in srgb, var(--accent) 48%, var(--text)) !important;
+	box-shadow: inset 0 1px 0 0 color-mix(in srgb, var(--accent) 45%, transparent) !important;
+}
+
+/* Custom Toast, Modal & Command Palette (Ctrl+K) Skins (Credit Store / Ultra Ecosystem) */
+html[data-overlay-skin='hud_tactical'] :is(.xrx-overlay-surface, [role='dialog']),
+.xrx-skin-preview-hud_tactical {
+	border-radius: 1rem !important;
+	border: 1.5px solid color-mix(in srgb, var(--accent) 60%, transparent) !important;
+	background-image:
+		linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, transparent) 0px, transparent 3px),
+		repeating-linear-gradient(0deg, color-mix(in srgb, var(--accent) 4%, transparent) 0px, color-mix(in srgb, var(--accent) 4%, transparent) 1px, transparent 1px, transparent 4px) !important;
+	box-shadow:
+		0 0 0 1px color-mix(in srgb, var(--background) 80%, transparent),
+		0 0 28px -4px color-mix(in srgb, var(--accent) 32%, transparent),
+		inset 0 2px 0 0 var(--accent) !important;
+}
+
+html[data-overlay-skin='frosted_prism'] :is(.xrx-overlay-surface, [role='dialog']),
+.xrx-skin-preview-frosted_prism {
+	background-image: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--accent) 20%, color-mix(in srgb, var(--background) 86%, var(--foreground))) 0%,
+		color-mix(in srgb, var(--background) 90%, var(--foreground)) 50%,
+		color-mix(in srgb, var(--accent) 26%, color-mix(in srgb, var(--background) 85%, var(--foreground))) 100%
+	) !important;
+	border-color: color-mix(in srgb, var(--text) 25%, var(--accent)) !important;
+	box-shadow:
+		inset 0 1.5px 1px 0 color-mix(in srgb, var(--text) 32%, transparent),
+		inset 0 -1px 1px 0 color-mix(in srgb, var(--accent) 35%, transparent),
+		0 16px 40px -8px color-mix(in srgb, var(--accent) 26%, rgba(0, 0, 0, 0.35)) !important;
+}
+
+html[data-overlay-skin='neon_arcade'] :is(.xrx-overlay-surface, [role='dialog']),
+.xrx-skin-preview-neon_arcade {
+	background-color: color-mix(in srgb, var(--background) 93%, var(--foreground)) !important;
+	border: 2px solid var(--accent) !important;
+	box-shadow:
+		0 0 22px 1px color-mix(in srgb, var(--accent) 45%, transparent),
+		inset 0 0 18px 0 color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+
+html[data-overlay-skin='minimal_pill'] :is(.xrx-overlay-surface, [role='dialog']),
+.xrx-skin-preview-minimal_pill {
+	border-radius: 2.25rem !important;
+	border-color: color-mix(in srgb, var(--border) 8%, transparent) !important;
+	box-shadow:
+		0 24px 52px -12px rgba(0, 0, 0, 0.42),
+		inset 0 1px 0 0 color-mix(in srgb, var(--text) 12%, transparent) !important;
 }
 
 /* Suppress Google AdSense / Funding Choices floating IAB TCF badge (CMP ID: 300) */

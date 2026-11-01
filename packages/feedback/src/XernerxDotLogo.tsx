@@ -5,10 +5,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@xernerx/providers';
 import { beginDotRearrangeMorph, createDotMorphBuffer } from './dotLogoMorph';
-import { computeDotCoverage, DotLogoVariant, DotParticle, FULL_LOGO_BOUNDS, FULL_LOGO_PATHS, ICON_LOGO_PATHS, isAnimatedProceduralVariant, parseCssColor, Shockwave } from './dotLogoPaths';
+import {
+	computeDotCoverage,
+	DotLogoVariant,
+	DotMatrixRenderStyle,
+	DotParticle,
+	FULL_LOGO_BOUNDS,
+	FULL_LOGO_PATHS,
+	ICON_LOGO_PATHS,
+	isAnimatedProceduralVariant,
+	parseCssColor,
+	Shockwave,
+} from './dotLogoPaths';
+import { drawRenderStyleBackdrop, drawStyledParticle } from './dotLogoRenderStyles';
 
 export interface XernerxDotLogoProps {
 	variant?: DotLogoVariant;
+	renderStyle?: DotMatrixRenderStyle;
 	width?: number;
 	height?: number;
 	cols?: number;
@@ -23,6 +36,7 @@ export interface XernerxDotLogoProps {
 
 export function XernerxDotLogo({
 	variant = 'icon',
+	renderStyle = 'dots',
 	width,
 	height,
 	cols,
@@ -41,6 +55,7 @@ export function XernerxDotLogo({
 	const { resolvedTheme, preferences } = useTheme();
 	const reducedMotion = Boolean(preferences?.reducedMotion);
 	const variantRef = useRef<DotLogoVariant>(variant);
+	const renderStyleRef = useRef<DotMatrixRenderStyle>(renderStyle);
 	const resolvedThemeRef = useRef(resolvedTheme);
 	const rippleRef = useRef(ripple);
 	const blankRef = useRef(blank);
@@ -62,8 +77,9 @@ export function XernerxDotLogo({
 		rippleRef.current = ripple;
 		blankRef.current = blank;
 		subduedRef.current = subdued;
+		renderStyleRef.current = renderStyle;
 		wakeLoopRef.current?.();
-	}, [ripple, blank, subdued]);
+	}, [ripple, blank, subdued, renderStyle]);
 
 	useEffect(() => {
 		if (variantRef.current !== variant) {
@@ -249,6 +265,9 @@ export function XernerxDotLogo({
 		let rippleBlend = rippleRef.current ? 1 : 0;
 		let visibilityBlend = blankRef.current ? 0 : 1;
 		let subduedBlend = subduedRef.current ? 1 : 0;
+		let styleBlend = renderStyleRef.current === 'dots' ? 0 : 1;
+		let nonDotDissolve = renderStyleRef.current !== 'dots' && initialVar !== 'full' ? 1 : 0;
+		let activeStyle: DotMatrixRenderStyle = renderStyleRef.current;
 		const morphBuf = createDotMorphBuffer(dots.length);
 
 		morphShapeRef.current = (nextVariant: DotLogoVariant) => {
@@ -312,10 +331,17 @@ export function XernerxDotLogo({
 			const targetRipple = (rippleRef.current || isMorphing) && !reducedMotion ? 1 : 0;
 			const targetVisibility = blankRef.current ? 0 : 1;
 			const targetSubdued = subduedRef.current ? 1 : 0;
+			if (renderStyleRef.current !== 'dots') activeStyle = renderStyleRef.current;
+			const targetStyleBlend = renderStyleRef.current === 'dots' ? 0 : 1;
+			const activeVar = variantRef.current;
+			const targetNonDotDissolve = renderStyleRef.current === 'dots' || isConstructing || activeVar === 'full' ? 0 : 1;
 			rippleBlend += (targetRipple - rippleBlend) * 0.06;
 			visibilityBlend += (targetVisibility - visibilityBlend) * 0.09;
 			subduedBlend += (targetSubdued - subduedBlend) * 0.07;
-			procTime += dt * rippleBlend;
+			styleBlend += (targetStyleBlend - styleBlend) * 0.08;
+			nonDotDissolve += (targetNonDotDissolve - nonDotDissolve) * 0.055;
+			if (renderStyleRef.current === 'dots' && styleBlend < 0.02) activeStyle = 'dots';
+			procTime += dt * (rippleBlend > 0.01 ? rippleBlend : activeStyle !== 'dots' ? 0.65 : 0);
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			ctx.clearRect(0, 0, activeW, activeH);
 			if (blankRef.current && visibilityBlend < 0.005) {
@@ -323,9 +349,28 @@ export function XernerxDotLogo({
 				return;
 			}
 			const t = now * 0.001;
-			const activeVar = variantRef.current;
 			const isDangerVar = activeVar === 'error' || activeVar === 'lock' || activeVar === '404';
 			const activeHighlightRgb = isDangerVar ? dangerRgb : accentRgb;
+			drawRenderStyleBackdrop({
+				ctx,
+				renderStyle: activeStyle,
+				styleBlend,
+				nonDotDissolve,
+				visibilityBlend,
+				dots,
+				gridCols,
+				cellStepX,
+				cellStepY,
+				activeW,
+				activeH,
+				accentRgb: activeHighlightRgb,
+				textRgb,
+				procTime,
+				variant: activeVar,
+				pointer,
+				shockwaves,
+				now,
+			});
 			const liveProcedural = isAnimatedProceduralVariant(activeVar) && rippleBlend > 0.005 && !reducedMotion;
 			const covLerp = liveProcedural ? 0.24 : 0.075;
 			const constructFloatBlend = isConstructing ? Math.max(0, Math.min(1, (constructAge - 2.6) / 0.8)) : 1;
@@ -472,7 +517,7 @@ export function XernerxDotLogo({
 				const logoBaseAlpha = loadingBaseAlpha + (0.38 - loadingBaseAlpha) * subduedBlend;
 				const logoRawAlpha = Math.min(1, logoBaseAlpha + waveNorm * 0.48 + cursorBoost * 0.52 + shockBoost * 0.48);
 				const ambientRawAlpha = (isBannerVivid ? 0.16 : backgroundMode ? 0.08 : 0.11) + activeEnergy * 0.34;
-				if (isMorphing && morphBuf.active[i] !== 0 && showAmbientField) {
+				if (isMorphing && morphBuf.active[i] !== 0 && showAmbientField && activeStyle === 'dots') {
 					const ambAlpha = (isBannerVivid ? 0.16 : backgroundMode ? 0.08 : 0.11) * visibilityBlend;
 					if (ambAlpha > 0.005) {
 						ctx.beginPath();
@@ -484,19 +529,32 @@ export function XernerxDotLogo({
 				const morphFade = isMorphing && morphBuf.active[i] === 2 ? Math.max(0, 1 - Math.max(0, (morphAge - morphBuf.delay[i]) / (morphDuration - 0.3) - 0.55) / 0.45) : 1;
 				const alpha = (ambientRawAlpha + (logoRawAlpha - ambientRawAlpha) * logoBlend) * visibilityBlend * gridScale * morphFade;
 				if (alpha > 0.005 && radius > 0.15) {
-					ctx.beginPath();
-					ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
-					ctx.fillStyle = `rgba(${rCol}, ${gCol}, ${bCol}, ${alpha.toFixed(3)})`;
-					ctx.fill();
+					drawStyledParticle({
+						ctx,
+						renderStyle: activeStyle,
+						styleBlend,
+						nonDotDissolve,
+						index: i,
+						x: d.x,
+						y: d.y,
+						radius,
+						logoBlend,
+						rCol,
+						gCol,
+						bCol,
+						alpha,
+					});
 				}
 			}
 
 			const needsMoreFrames =
 				isConstructing ||
 				isMorphing ||
-				(!reducedMotion && (targetRipple > 0 || rippleBlend > 0.004 || pointer.active || shockwaves.length > 0 || maxMotionEnergy > 0.04)) ||
+				(!reducedMotion && (targetRipple > 0 || rippleBlend > 0.004 || activeStyle !== 'dots' || pointer.active || shockwaves.length > 0 || maxMotionEnergy > 0.04)) ||
 				Math.abs(targetVisibility - visibilityBlend) > 0.01 ||
-				Math.abs(targetSubdued - subduedBlend) > 0.01;
+				Math.abs(targetSubdued - subduedBlend) > 0.01 ||
+				Math.abs(targetStyleBlend - styleBlend) > 0.01 ||
+				Math.abs(targetNonDotDissolve - nonDotDissolve) > 0.01;
 
 			if (needsMoreFrames) {
 				isRunning = true;

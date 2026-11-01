@@ -30,8 +30,10 @@ import {
 	loadMetadata,
 	normalizeStartupLocation,
 	persistMetadata,
+	resolveAppIconPath,
 	resolveDesktopTargetUrl,
 	syncGlobalHotkey,
+	updateSystemTrayIcon,
 	watchMetadataFile,
 } from './metadata.js';
 import { type DesktopNotificationPayload, applyWindowAppDetails, configureAppNotificationIdentity, dispatchNativeNotification, syncAppBadgeCount } from './notifications.js';
@@ -84,18 +86,22 @@ import {
 	syncAccountSlotProfile,
 	toggleOverlayWindow,
 } from './overlay.js';
-import { type RpcActivityPayload, syncDiscordRpc } from './rpc.js';
+import { type RpcActivityPayload, setRpcLogger, syncDiscordRpc } from './rpc.js';
 import { checkDesktopRelease, downloadAndInstallUpdate, runStartupUpdater } from './updater.js';
 
 const store = new Store();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const iconPath = path.join(__dirname, '../public/icon.ico');
+const publicDir = path.join(__dirname, '../public');
 const preloadPath = path.join(__dirname, 'preload.cjs');
+
+function getActiveIconPath(metaOverride?: Metadata): string {
+	const currentMeta = metaOverride || getMetadata();
+	return resolveAppIconPath(publicDir, currentMeta.appIcon, 'ico');
+}
 if (!app.isPackaged) {
 	app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
 }
-configureAppNotificationIdentity(iconPath, path.resolve(__dirname, '..'));
 const isCanary = app.getVersion().includes('canary');
 const domain = loadEnvDomain();
 const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(domain);
@@ -202,10 +208,42 @@ function spawnCompanion(rawTargetUrl?: string) {
 	openCompanionWindow({
 		targetUrl: resolvedUrl,
 		preloadPath,
-		iconPath,
+		iconPath: getActiveIconPath(currentMeta),
 		partition: getActivePartition(store),
 		streamerMode: Boolean(currentMeta.streamerMode),
 		shouldOpenExternal: () => getMetadata().openExternalInBrowser !== false,
+	});
+}
+
+function syncRuntimeAppIcon(targetMeta: Metadata) {
+	const currentIconPath = getActiveIconPath(targetMeta);
+	const appIconImg = nativeImage.createFromPath(currentIconPath);
+
+	for (const bw of BrowserWindow.getAllWindows()) {
+		if (!bw || bw.isDestroyed() || bw === splash) continue;
+		try {
+			applyWindowAppDetails(bw, currentIconPath);
+			if (!appIconImg.isEmpty()) bw.setIcon(appIconImg);
+		} catch {}
+	}
+
+	updateSystemTrayIcon(tray, publicDir, targetMeta.appIcon);
+	configureAppNotificationIdentity(currentIconPath, path.resolve(__dirname, '..'));
+	configureOsTaskbarAndDock({
+		iconPath: currentIconPath,
+		webUrl: WEB_URL,
+		getWin: () => win,
+		getMeta: () => getMetadata(),
+		onToggleOverlay: () =>
+			toggleOverlayWindow({
+				webUrl: WEB_URL,
+				preloadPath,
+				iconPath: getActiveIconPath(),
+				partition: getActivePartition(store),
+			}),
+		onQuickCapture: triggerQuickCapture,
+		onToggleStreamerMode: (enabled) => saveMetadata({ streamerMode: enabled }),
+		onToggleDiscordRpc: (enabled) => saveMetadata({ discordRpc: enabled }),
 	});
 }
 
@@ -220,13 +258,14 @@ function applyRuntimeMetadata(targetMeta: Metadata) {
 			}
 		} catch {}
 	}
+	syncRuntimeAppIcon(targetMeta);
 	syncGlobalHotkey(targetMeta.globalHotkey !== false, () => win);
 	syncFeatureShortcuts(targetMeta, { getWin: () => win, onQuickCapture: triggerQuickCapture });
 	syncStreamerProtection(targetMeta);
 	broadcastPowerState(targetMeta, 'preference-changed');
 	syncDiscordRpc(targetMeta.discordRpc !== false);
 	syncCdnWatchFolder(targetMeta.cdnWatchFolder, { getWin: () => win, log });
-	syncExplorerContextMenu(Boolean(targetMeta.explorerContextMenu), iconPath, log);
+	syncExplorerContextMenu(Boolean(targetMeta.explorerContextMenu), getActiveIconPath(targetMeta), log);
 	broadcastMetadataUpdate(targetMeta);
 }
 
@@ -505,7 +544,7 @@ function registerIpcHandlers() {
 
 	ipcMain.handle('cdn:prepareDragFile', (_, payload: { url: string; filename: string }) => prepareCdnDragFile(payload));
 	ipcMain.on('cdn:startDrag', (event, payload: { url: string; filename?: string }) => {
-		startNativeCdnDrag(event.sender, { url: payload?.url || '', filename: payload?.filename, iconPath });
+		startNativeCdnDrag(event.sender, { url: payload?.url || '', filename: payload?.filename, iconPath: getActiveIconPath() });
 	});
 
 	const notifyBotCrash = (info: { botId: string; name: string; exitCode: number; lastLine: string }) => {
@@ -522,7 +561,7 @@ function registerIpcHandlers() {
 				getTray: () => tray,
 				getMeta: () => getMetadata(),
 				webUrl: WEB_URL,
-				iconPath,
+				iconPath: getActiveIconPath(),
 				log,
 			}
 		);
@@ -589,7 +628,7 @@ function registerIpcHandlers() {
 			getTray: () => tray,
 			getMeta: () => getMetadata(),
 			webUrl: WEB_URL,
-			iconPath,
+			iconPath: getActiveIconPath(),
 			log,
 		});
 
@@ -613,7 +652,7 @@ function registerIpcHandlers() {
 		return toggleOverlayWindow({
 			webUrl: WEB_URL,
 			preloadPath,
-			iconPath,
+			iconPath: getActiveIconPath(),
 			partition: getActivePartition(store),
 		});
 	});
@@ -660,7 +699,9 @@ function registerIpcHandlers() {
 
 function createMainWindow(bounds: Electron.Rectangle) {
 	registerIpcHandlers();
-	const appIcon = nativeImage.createFromPath(iconPath);
+	const currentMeta = getMetadata();
+	const initialIconPath = getActiveIconPath(currentMeta);
+	const initialAppIcon = nativeImage.createFromPath(initialIconPath);
 
 	win = new BrowserWindow({
 		width: bounds.width,
@@ -672,7 +713,7 @@ function createMainWindow(bounds: Electron.Rectangle) {
 		transparent: false,
 		resizable: true,
 		backgroundColor: '#00000000',
-		icon: iconPath,
+		icon: initialIconPath,
 		show: false,
 		webPreferences: {
 			preload: preloadPath,
@@ -685,24 +726,24 @@ function createMainWindow(bounds: Electron.Rectangle) {
 		},
 	});
 
-	const currentMeta = getMetadata();
 	if (currentMeta.alwaysOnTop) win.setAlwaysOnTop(true);
 	try {
-		applyWindowAppDetails(win, iconPath);
-		if (!appIcon.isEmpty()) win.setIcon(appIcon);
+		applyWindowAppDetails(win, initialIconPath);
+		if (!initialAppIcon.isEmpty()) win.setIcon(initialAppIcon);
 		win.setContentProtection(Boolean(currentMeta.streamerMode));
 	} catch {}
 
 	win.on('show', () => {
 		try {
-			if (!appIcon.isEmpty()) win.setIcon(appIcon);
+			const currentIcon = nativeImage.createFromPath(getActiveIconPath());
+			if (!currentIcon.isEmpty()) win.setIcon(currentIcon);
 			applyWindowsThumbarButtons(win, {
 				webUrl: WEB_URL,
 				onToggleOverlay: () =>
 					toggleOverlayWindow({
 						webUrl: WEB_URL,
 						preloadPath,
-						iconPath,
+						iconPath: getActiveIconPath(),
 						partition: getActivePartition(store),
 					}),
 				onQuickCapture: () => triggerQuickCapture('screen'),
@@ -711,7 +752,8 @@ function createMainWindow(bounds: Electron.Rectangle) {
 	});
 	win.webContents.on('did-finish-load', () => {
 		try {
-			if (!appIcon.isEmpty()) win.setIcon(appIcon);
+			const currentIcon = nativeImage.createFromPath(getActiveIconPath());
+			if (!currentIcon.isEmpty()) win.setIcon(currentIcon);
 		} catch {}
 	});
 
@@ -775,7 +817,7 @@ function createMainWindow(bounds: Electron.Rectangle) {
 
 	configureFramelessWindow(win, {
 		preloadPath,
-		iconPath,
+		iconPath: getActiveIconPath(currentMeta),
 		getPartition: () => getActivePartition(store),
 		shouldOpenExternal: () => getMetadata().openExternalInBrowser !== false,
 	});
@@ -836,7 +878,7 @@ async function createWindow() {
 			toggleOverlayWindow({
 				webUrl: WEB_URL,
 				preloadPath,
-				iconPath,
+				iconPath: getActiveIconPath(launchMeta),
 				partition: getActivePartition(store),
 			});
 		} else if (jumpTarget === 'capture') {
@@ -859,7 +901,7 @@ async function createWindow() {
 		}
 
 		configureOsTaskbarAndDock({
-			iconPath,
+			iconPath: getActiveIconPath(launchMeta),
 			webUrl: WEB_URL,
 			getWin: () => win,
 			getMeta: () => getMetadata(),
@@ -867,7 +909,7 @@ async function createWindow() {
 				toggleOverlayWindow({
 					webUrl: WEB_URL,
 					preloadPath,
-					iconPath,
+					iconPath: getActiveIconPath(),
 					partition: getActivePartition(store),
 				}),
 			onQuickCapture: triggerQuickCapture,
@@ -877,7 +919,7 @@ async function createWindow() {
 
 		syncStreamerProtection(launchMeta);
 		syncCdnWatchFolder(launchMeta.cdnWatchFolder, { getWin: () => win, log });
-		syncExplorerContextMenu(Boolean(launchMeta.explorerContextMenu), iconPath, log);
+		syncExplorerContextMenu(Boolean(launchMeta.explorerContextMenu), getActiveIconPath(launchMeta), log);
 		broadcastPowerState(launchMeta, 'init');
 
 		const initialUploadFile = extractUploadArgFile(process.argv);
@@ -922,6 +964,7 @@ if (!gotTheLock && process.argv.includes('--relaunch')) {
 if (!gotTheLock) {
 	app.quit();
 } else {
+	configureAppNotificationIdentity(getActiveIconPath(meta), path.resolve(__dirname, '..'));
 	app.on('second-instance', (_event, commandLine) => {
 		const uploadFile = extractUploadArgFile(commandLine);
 		if (uploadFile) {
@@ -940,7 +983,7 @@ if (!gotTheLock) {
 				toggleOverlayWindow({
 					webUrl: WEB_URL,
 					preloadPath,
-					iconPath,
+					iconPath: getActiveIconPath(),
 					partition: getActivePartition(store),
 				}),
 			onQuickCapture: triggerQuickCapture,
@@ -973,15 +1016,16 @@ if (!gotTheLock) {
 
 	app.on('browser-window-created', (_event, childWin) => {
 		if (childWin === splash) return;
+		const childIconPath = getActiveIconPath();
 		try {
-			applyWindowAppDetails(childWin, iconPath);
-			const appIcon = nativeImage.createFromPath(iconPath);
+			applyWindowAppDetails(childWin, childIconPath);
+			const appIcon = nativeImage.createFromPath(childIconPath);
 			if (!appIcon.isEmpty()) childWin.setIcon(appIcon);
 			childWin.setContentProtection(Boolean(getMetadata().streamerMode));
 		} catch {}
 		configureFramelessWindow(childWin, {
 			preloadPath,
-			iconPath,
+			iconPath: childIconPath,
 			getPartition: () => getActivePartition(store),
 			shouldOpenExternal: () => getMetadata().openExternalInBrowser !== false,
 		});
@@ -998,8 +1042,11 @@ if (!gotTheLock) {
 	});
 
 	app.whenReady().then(() => {
+		setRpcLogger(log);
 		registerIpcHandlers();
-		configureAppNotificationIdentity(iconPath, path.resolve(__dirname, '..'));
+		const readyMeta = getMetadata();
+		const readyIconPath = getActiveIconPath(readyMeta);
+		configureAppNotificationIdentity(readyIconPath, path.resolve(__dirname, '..'));
 		initPowerMonitor(() => getMetadata(), log);
 		initIdleAndLockMonitor(() => getMetadata(), log);
 		initDailyGiftMonitor(
@@ -1016,7 +1063,7 @@ if (!gotTheLock) {
 						getTray: () => tray,
 						getMeta: () => getMetadata(),
 						webUrl: WEB_URL,
-						iconPath,
+						iconPath: getActiveIconPath(),
 						log,
 					}
 				);
@@ -1030,14 +1077,14 @@ if (!gotTheLock) {
 			}
 		} catch {}
 		tray = createSystemTray(
-			iconPath,
+			readyIconPath,
 			WEB_URL,
 			() => win,
 			() =>
 				toggleOverlayWindow({
 					webUrl: WEB_URL,
 					preloadPath,
-					iconPath,
+					iconPath: getActiveIconPath(),
 					partition: getActivePartition(store),
 				}),
 			() => {
@@ -1054,6 +1101,11 @@ if (!gotTheLock) {
 				onToggleDiscordRpc: (enabled) => {
 					saveMetadata({ discordRpc: enabled });
 				},
+				onSelectAppIcon: (appIcon) => {
+					if (getMetadata().appIcon !== appIcon) {
+						relaunchApp({ appIcon });
+					}
+				},
 				onQuickCapture: triggerQuickCapture,
 				onOpenCompanionWindow: () => spawnCompanion(),
 				onSetDockedMode: (side) => {
@@ -1064,7 +1116,6 @@ if (!gotTheLock) {
 				},
 			}
 		);
-		const readyMeta = getMetadata();
 		syncGlobalHotkey(readyMeta.globalHotkey !== false, () => win);
 		syncFeatureShortcuts(readyMeta, { getWin: () => win, onQuickCapture: triggerQuickCapture });
 		syncDiscordRpc(readyMeta.discordRpc !== false);

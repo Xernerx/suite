@@ -6,6 +6,7 @@ import { Award, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Heart, LayoutGrid, 
 import { Badge, Button, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { DotMatrixBannerStudio } from './DotMatrixBannerStudio';
+import { ProfileCosmeticsStudio } from './ProfileCosmeticsStudio';
 
 interface QuickFillPreset {
 	value: string;
@@ -40,6 +41,12 @@ interface ProfileShowcasesProps {
 	user: any;
 	userId: string;
 	mutate?: () => Promise<any>;
+	avatarFrame: string;
+	nameplate: string;
+	cardTheme: string;
+	dotMatrixVariant: string;
+	onChangeCosmetic: (field: 'avatarFrame' | 'nameplate' | 'cardTheme', value: string) => void;
+	onChangeDotMatrixVariant: (variant: string) => void;
 }
 
 const VANITY_BADGES: Array<{ id: string; labelKey: string; threshold?: number; source?: 'achievement'; Icon: any }> = [
@@ -55,7 +62,7 @@ const VANITY_BADGES: Array<{ id: string; labelKey: string; threshold?: number; s
 	{ id: 'ecosystem_builder', labelKey: 'account.profile.showcases.badges.ecosystem_builder', source: 'achievement', Icon: Rocket },
 ];
 
-export function ProfileShowcases({ user, userId, mutate }: ProfileShowcasesProps) {
+export function ProfileShowcases({ user, userId, mutate, avatarFrame, nameplate, cardTheme, dotMatrixVariant, onChangeCosmetic, onChangeDotMatrixVariant }: ProfileShowcasesProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
@@ -417,12 +424,13 @@ export function ProfileShowcases({ user, userId, mutate }: ProfileShowcasesProps
 					})}
 				</div>
 
+				<ProfileCosmeticsStudio user={user} avatarFrame={avatarFrame as any} nameplate={nameplate as any} cardTheme={cardTheme as any} onChangeCosmetic={onChangeCosmetic} />
+
 				<DotMatrixBannerStudio
-					userId={userId}
 					isUnlocked={unlockedBadges.includes('dot_matrix_banner')}
 					isActive={activeBadges.includes('dot_matrix_banner')}
-					savedVariant={(user?.credits?.dotMatrixVariant as any) || 'orbit'}
-					mutate={mutate}
+					selectedVariant={(dotMatrixVariant as any) || 'orbit'}
+					onChangeVariant={(next) => onChangeDotMatrixVariant(next)}
 				/>
 			</div>
 

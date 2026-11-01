@@ -19,12 +19,13 @@ export default function Page() {
 	const { setBackgroundMode } = useLoading();
 	const { getEnvUrl, environment } = useEnvironment();
 	const [channel, setChannel] = useState<'stable' | 'canary'>('stable');
-	const [apps, setApps] = useState<Record<'windows' | 'macos' | 'linux', Record<string, string> | null>>({
+	const [apps, setApps] = useState<Record<'windows' | 'macos' | 'linux', Record<string, any> | null>>({
 		windows: null,
 		macos: null,
 		linux: null,
 	});
-	const [app, setApp] = useState<Record<string, string> | null>(null);
+	const [releaseMeta, setReleaseMeta] = useState<{ version?: string | null; publishedAt?: string | null }>({});
+	const [app, setApp] = useState<Record<string, any> | null>(null);
 	const [show, setShow] = useState(false);
 	const showChannelSelector = environment === 'canary' || environment === 'dev';
 
@@ -52,9 +53,18 @@ export default function Page() {
 				}
 
 				if (!cancelled && fetchedApps && typeof fetchedApps === 'object') {
-					setApps(fetchedApps);
+					const platformMap = {
+						windows: fetchedApps.windows && typeof fetchedApps.windows === 'object' ? fetchedApps.windows : null,
+						macos: fetchedApps.macos && typeof fetchedApps.macos === 'object' ? fetchedApps.macos : null,
+						linux: fetchedApps.linux && typeof fetchedApps.linux === 'object' ? fetchedApps.linux : null,
+					};
+					setApps(platformMap);
+					setReleaseMeta({
+						version: typeof fetchedApps.version === 'string' ? fetchedApps.version : null,
+						publishedAt: typeof fetchedApps.publishedAt === 'string' ? fetchedApps.publishedAt : null,
+					});
 					const targetPlatform = platform === 'windows' || platform === 'macos' || platform === 'linux' ? platform : 'windows';
-					setApp(fetchedApps[targetPlatform] || fetchedApps.windows || null);
+					setApp(platformMap[targetPlatform] || platformMap.windows || null);
 				}
 			} catch {
 				// Ignore transient network errors
@@ -111,7 +121,7 @@ export default function Page() {
 									whileHover={{ scale: 1.02, y: -1 }}
 									whileTap={{ scale: 0.98 }}
 									onClick={() => (window.location.href = app.browser_download_url)}
-									className="flex items-center justify-center gap-3 rounded-2xl bg-(--accent) hover:bg-(--hover-accent) text-(--text) font-extrabold transition hover:cursor-pointer shadow-[0_0_25px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+									className="flex items-center justify-center gap-3 rounded-2xl bg-(--accent) hover:bg-(--hover-accent) text-(--accent-contrast) font-extrabold transition hover:cursor-pointer shadow-[0_0_25px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
 									style={{
 										minWidth: 240,
 										padding: 'calc(var(--ui-gap) * 0.85) calc(var(--ui-gap) * 1.5)',
@@ -135,7 +145,7 @@ export default function Page() {
 										type="button"
 										onClick={() => setChannel('stable')}
 										className={`rounded-2xl px-4 py-2 text-xs font-bold transition-all hover:cursor-pointer ${
-											channel === 'stable' ? 'bg-(--accent) text-(--text) shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
+											channel === 'stable' ? 'bg-(--accent) text-(--accent-contrast) shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
 										}`}
 									>
 										{t('www.download.button')}
@@ -144,7 +154,7 @@ export default function Page() {
 										type="button"
 										onClick={() => setChannel('canary')}
 										className={`rounded-2xl px-4 py-2 text-xs font-bold transition-all hover:cursor-pointer ${
-											channel === 'canary' ? 'bg-(--accent) text-(--text) shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
+											channel === 'canary' ? 'bg-(--accent) text-(--accent-contrast) shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
 										}`}
 									>
 										{t('www.download.button2')}
@@ -155,16 +165,23 @@ export default function Page() {
 
 						{/* Other Platforms Rollout */}
 						<div className="flex flex-col items-center lg:items-start gap-2 w-full">
-							<button
-								type="button"
-								onClick={() => setShow((s) => !s)}
-								className="flex items-center gap-2 rounded-full bg-(--background)/50 border border-(--border)/10 px-3.5 py-1 text-xs font-semibold text-(--text-muted) transition hover:text-(--text) hover:border-(--accent)/30 hover:cursor-pointer"
-							>
-								{t('www.download.button4')}
-								<motion.span animate={{ rotate: show ? 180 : 0 }} transition={{ duration: 0.2 }}>
-									<ChevronDown size={14} />
-								</motion.span>
-							</button>
+							<div className="flex flex-wrap items-center gap-2">
+								<button
+									type="button"
+									onClick={() => setShow((s) => !s)}
+									className="flex items-center gap-2 rounded-full bg-(--background)/50 border border-(--border)/10 px-3.5 py-1 text-xs font-semibold text-(--text-muted) transition hover:text-(--text) hover:border-(--accent)/30 hover:cursor-pointer"
+								>
+									{t('www.download.button4')}
+									<motion.span animate={{ rotate: show ? 180 : 0 }} transition={{ duration: 0.2 }}>
+										<ChevronDown size={14} />
+									</motion.span>
+								</button>
+								{releaseMeta.version && (
+									<span className="inline-flex items-center rounded-full bg-(--accent)/10 border border-(--accent)/25 px-2.5 py-0.5 font-mono text-[11px] font-bold text-(--accent)">
+										v{releaseMeta.version.replace(/^v/i, '')}
+									</span>
+								)}
+							</div>
 
 							<AnimatePresence>
 								{show && (
@@ -175,22 +192,25 @@ export default function Page() {
 										transition={{ duration: 0.2 }}
 										className="flex flex-wrap justify-center lg:justify-start gap-2 mt-1 w-full"
 									>
-										{Object.entries(apps)
-											.filter(([, value]) => value)
-											.map(([key, value]) => (
-												<button
-													type="button"
-													key={key}
-													onClick={() => (window.location.href = value!.browser_download_url)}
-													className="flex items-center gap-2 rounded-2xl border border-(--border)/10 bg-(--background)/60 text-xs font-semibold text-(--text) transition hover:border-(--accent)/40 hover:bg-(--accent)/10 hover:cursor-pointer"
-													style={{
-														padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
-													}}
-												>
-													{key === 'windows' ? <FaWindows /> : key === 'macos' ? <FaApple /> : key === 'linux' ? <FaLinux /> : <FaQuestion />}
-													<span className="capitalize">{key}</span>
-												</button>
-											))}
+										{(['windows', 'macos', 'linux'] as const)
+											.filter((key) => Boolean(apps[key]?.browser_download_url))
+											.map((key) => {
+												const value = apps[key]!;
+												return (
+													<button
+														type="button"
+														key={key}
+														onClick={() => (window.location.href = value.browser_download_url)}
+														className="flex items-center gap-2 rounded-2xl border border-(--border)/10 bg-(--background)/60 text-xs font-semibold text-(--text) transition hover:border-(--accent)/40 hover:bg-(--accent)/10 hover:cursor-pointer"
+														style={{
+															padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+														}}
+													>
+														{key === 'windows' ? <FaWindows /> : key === 'macos' ? <FaApple /> : <FaLinux />}
+														<span>{key === 'macos' ? 'macOS' : key === 'windows' ? 'Windows' : 'Linux'}</span>
+													</button>
+												);
+											})}
 									</motion.div>
 								)}
 							</AnimatePresence>

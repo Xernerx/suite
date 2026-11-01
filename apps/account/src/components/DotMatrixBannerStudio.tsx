@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Check, Cpu, ExternalLink, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, Cpu, ExternalLink, Lock, Sparkles } from 'lucide-react';
 import { XernerxDotLogo, type DotLogoVariant } from '@xernerx/feedback';
 import { Badge, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
@@ -19,46 +19,39 @@ const FORMATIONS: { id: DotLogoVariant; labelKey: string }[] = [
 ];
 
 interface DotMatrixBannerStudioProps {
-	userId: string;
 	isUnlocked: boolean;
 	isActive: boolean;
-	savedVariant?: DotLogoVariant;
-	mutate?: () => Promise<any>;
+	selectedVariant: DotLogoVariant;
+	onChangeVariant: (nextVariant: DotLogoVariant) => void;
 }
 
-export function DotMatrixBannerStudio({ userId, isUnlocked, isActive, savedVariant = 'orbit', mutate }: DotMatrixBannerStudioProps) {
+export function DotMatrixBannerStudio({ isUnlocked, isActive, selectedVariant = 'orbit', onChangeVariant }: DotMatrixBannerStudioProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
-	const [selected, setSelected] = useState<DotLogoVariant>(savedVariant || 'orbit');
-	const [savingVariant, setSavingVariant] = useState<DotLogoVariant | null>(null);
+	const [previewVariant, setPreviewVariant] = useState<DotLogoVariant | null>(null);
 
-	useEffect(() => {
-		if (savedVariant) {
-			setSelected(savedVariant);
-		}
-	}, [savedVariant]);
-
-	const handleSelectFormation = async (nextVariant: DotLogoVariant) => {
-		setSelected(nextVariant);
-		if (!isUnlocked || !userId) return;
-		setSavingVariant(nextVariant);
-		try {
-			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({ credits: { dotMatrixVariant: nextVariant } }),
+	const handleSelectFormation = (nextVariant: DotLogoVariant) => {
+		if (!isUnlocked) {
+			setPreviewVariant(nextVariant);
+			toast({
+				type: 'info',
+				title: t('account.appearance.dotMatrix.lockedToastTitle'),
+				description: t('account.profile.showcases.dotMatrixStudio.lockedToastDesc'),
+				action: {
+					label: t('account.appearance.dotMatrix.openCreditStore'),
+					onClick: () => {
+						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+					},
+				},
 			});
-			if (!res.ok) throw new Error('Failed to update formation');
-			if (mutate) await mutate();
-			toast({ type: 'success', title: t('account.profile.showcases.dotMatrixStudio.savedToast') });
-		} catch {
-			toast({ type: 'error', title: t('account.profile.toast.error') });
-		} finally {
-			setSavingVariant(null);
+			return;
 		}
+		setPreviewVariant(null);
+		onChangeVariant(nextVariant);
 	};
+
+	const activeDisplayVariant = previewVariant || selectedVariant;
 
 	return (
 		<div className="flex flex-col rounded-2xl border border-(--accent)/30 bg-(--background)/60 p-4 gap-3 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_10%,transparent)]">
@@ -95,15 +88,22 @@ export function DotMatrixBannerStudio({ userId, isUnlocked, isActive, savedVaria
 
 			<div className="relative h-32 w-full rounded-2xl overflow-hidden border border-(--accent)/35 bg-(--background)/80 shadow-[inset_0_0_24px_color-mix(in_srgb,var(--accent)_14%,transparent)]">
 				<div className="absolute inset-0">
-					<XernerxDotLogo variant={selected} backgroundMode ripple={true} vivid={true} />
+					<XernerxDotLogo variant={activeDisplayVariant} backgroundMode ripple={true} vivid={true} />
 				</div>
 				<div className="relative z-10 flex items-center justify-between px-3 py-2 pointer-events-none">
 					<span className="inline-flex items-center gap-1 rounded-full bg-(--background)/80 backdrop-blur-md border border-(--accent)/30 px-2.5 py-0.5 text-[10px] font-bold text-(--accent)">
 						<Sparkles size={10} />
-						{t(`account.appearance.dotMatrix.types.${selected}`)}
+						{t(`account.appearance.dotMatrix.types.${activeDisplayVariant}`)}
 					</span>
 					<span className="inline-flex items-center gap-1 rounded-full bg-(--background)/75 backdrop-blur-md border border-(--border)/15 px-2.5 py-0.5 text-[10px] font-semibold text-(--text-muted)">
-						{t('account.store.credits.dotMatrixPreview.clickHint')}
+						{!isUnlocked && previewVariant ? (
+							<>
+								<Lock size={10} className="text-(--accent)" />
+								{t('account.profile.cosmeticsStudio.previewOnly')}
+							</>
+						) : (
+							t('account.store.credits.dotMatrixPreview.clickHint')
+						)}
 					</span>
 				</div>
 			</div>
@@ -112,12 +112,11 @@ export function DotMatrixBannerStudio({ userId, isUnlocked, isActive, savedVaria
 				<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('account.profile.showcases.dotMatrixStudio.formationLabel')}</span>
 				<div className="flex flex-wrap items-center gap-1.5">
 					{FORMATIONS.map((f) => {
-						const active = selected === f.id;
+						const active = isUnlocked ? selectedVariant === f.id : activeDisplayVariant === f.id;
 						return (
 							<button
 								key={f.id}
 								type="button"
-								disabled={savingVariant === f.id}
 								onClick={() => handleSelectFormation(f.id)}
 								className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-all cursor-pointer ${
 									active
@@ -125,7 +124,7 @@ export function DotMatrixBannerStudio({ userId, isUnlocked, isActive, savedVaria
 										: 'bg-(--foreground)/40 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/35 hover:text-(--text)'
 								}`}
 							>
-								{active && <Check size={12} />}
+								{active && isUnlocked ? <Check size={12} /> : !isUnlocked ? <Lock size={11} className="opacity-80" /> : null}
 								<span>{t(f.labelKey)}</span>
 							</button>
 						);

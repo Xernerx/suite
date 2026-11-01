@@ -3,37 +3,27 @@
 
 import { EyeOff, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
 import { Button, Selector, Toggle } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useSession, useShortcuts, useTheme, useToast, type DotMatrixAnimation, type DotMatrixStage, type DotMatrixType } from '@xernerx/providers';
+import {
+	useDictionary,
+	useEnvironment,
+	useSession,
+	useShortcuts,
+	useTheme,
+	useToast,
+	type AmbientSceneType,
+	type CursorFxType,
+	type DotMatrixAnimation,
+	type DotMatrixRenderStyle,
+	type DotMatrixStage,
+	type DotMatrixType,
+	type OverlaySkinType,
+	type SurfaceStyleType,
+} from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { DotMatrixSettingsCard } from './DotMatrixSettingsCard';
+import { AmbientAndSurfaceCard } from './AmbientAndSurfaceCard';
 import { AppearanceScalingCards } from './AppearanceScalingCards';
-
-const PRESET_COLORS = [
-	{ key: 'purple', value: '#8b7cf6' },
-	{ key: 'violet', value: '#7c3aed' },
-	{ key: 'indigo', value: '#6366f1' },
-	{ key: 'cobalt', value: '#2563eb' },
-	{ key: 'blue', value: '#3b82f6' },
-	{ key: 'sky', value: '#38bdf8' },
-	{ key: 'cyan', value: '#06b6d4' },
-	{ key: 'mint', value: '#2dd4bf' },
-	{ key: 'emerald', value: '#10b981' },
-	{ key: 'green', value: '#a4b795' },
-	{ key: 'neon', value: '#39ff14' },
-	{ key: 'lime', value: '#acc813' },
-	{ key: 'yellow', value: '#eab308' },
-	{ key: 'gold', value: '#f59e0b' },
-	{ key: 'orange', value: '#f97316' },
-	{ key: 'peach', value: '#fdba74' },
-	{ key: 'coral', value: '#fb7185' },
-	{ key: 'crimson', value: '#ef4444' },
-	{ key: 'berry', value: '#e11d48' },
-	{ key: 'pink', value: '#ec4899' },
-	{ key: 'magenta', value: '#d946ef' },
-	{ key: 'lavender', value: '#c084fc' },
-	{ key: 'slate', value: '#64748b' },
-	{ key: 'charcoal', value: '#27272a' },
-] as const;
+import { AppearanceAccentPicker, PRESET_COLORS } from './AppearanceAccentPicker';
 
 function setThemeVar(name: string, value: string) {
 	if (typeof document === 'undefined') return;
@@ -82,7 +72,12 @@ export default function Appearance() {
 
 	const dotMatrixStage: DotMatrixStage = uiPreferences?.dotMatrixStage || 'default';
 	const dotMatrixType: DotMatrixType = uiPreferences?.dotMatrixType || (dotMatrixStage === 'orbit' ? 'orbit' : dotMatrixStage === 'blank' ? 'blank' : 'default');
+	const dotMatrixRenderStyle: DotMatrixRenderStyle = uiPreferences?.dotMatrixRenderStyle || 'dots';
 	const dotMatrixAnimation: DotMatrixAnimation = uiPreferences?.dotMatrixAnimation || (dotMatrixStage === 'ripple' ? 'always' : 'animate');
+	const ambientScene: AmbientSceneType = uiPreferences?.ambientScene || 'default';
+	const surfaceStyle: SurfaceStyleType = uiPreferences?.surfaceStyle || 'default';
+	const cursorFx: CursorFxType = uiPreferences?.cursorFx || 'default';
+	const overlaySkin: OverlaySkinType = uiPreferences?.overlaySkin || 'default';
 
 	const [clientSync, setClientSync] = useState<boolean>(() => {
 		return getPref('clientSync') === 'true';
@@ -184,7 +179,12 @@ export default function Appearance() {
 				uiPreferences: {
 					dotMatrixStage: overrides.dotMatrixStage || dotMatrixStage,
 					dotMatrixType: overrides.dotMatrixType || dotMatrixType,
+					dotMatrixRenderStyle: overrides.dotMatrixRenderStyle || dotMatrixRenderStyle,
 					dotMatrixAnimation: overrides.dotMatrixAnimation || dotMatrixAnimation,
+					ambientScene: overrides.ambientScene || ambientScene,
+					surfaceStyle: overrides.surfaceStyle || surfaceStyle,
+					cursorFx: overrides.cursorFx || cursorFx,
+					overlaySkin: overrides.overlaySkin || overlaySkin,
 				},
 			},
 		};
@@ -245,10 +245,12 @@ export default function Appearance() {
 		setAccent(hex);
 		setPref('accent', hex);
 		saveToDb({ accent: hex });
+		const matchedKey = PRESET_COLORS.find((c) => c.value.toLowerCase() === hex.toLowerCase())?.key;
+		const colorLabel = matchedKey ? t(`account.appearance.colors.${matchedKey}`) : hex;
 		toast({
 			type: 'success',
 			title: t('account.appearance.toast.accentColor.title'),
-			description: t('account.appearance.toast.accentColor.description', { color: PRESET_COLORS.find((c) => c.value == hex)?.key || '' }),
+			description: t('account.appearance.toast.accentColor.description', { color: colorLabel }),
 		});
 	};
 
@@ -306,12 +308,57 @@ export default function Appearance() {
 		});
 	};
 
+	const handleDotMatrixRenderStyleChange = (nextStyle: DotMatrixRenderStyle) => {
+		setPreference('dotMatrixRenderStyle', nextStyle);
+		saveToDb({ dotMatrixRenderStyle: nextStyle });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.dotMatrixStage.title'),
+		});
+	};
+
 	const handleDotMatrixAnimationChange = (nextAnim: DotMatrixAnimation) => {
 		setPreference('dotMatrixAnimation', nextAnim);
 		saveToDb({ dotMatrixAnimation: nextAnim });
 		toast({
 			type: 'success',
 			title: t('account.appearance.toast.dotMatrixStage.title'),
+		});
+	};
+
+	const handleAmbientSceneChange = (nextScene: AmbientSceneType) => {
+		setPreference('ambientScene', nextScene);
+		saveToDb({ ambientScene: nextScene });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.ambientScene.title'),
+		});
+	};
+
+	const handleSurfaceStyleChange = (nextStyle: SurfaceStyleType) => {
+		setPreference('surfaceStyle', nextStyle);
+		saveToDb({ surfaceStyle: nextStyle });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.surfaceStyle.title'),
+		});
+	};
+
+	const handleCursorFxChange = (nextFx: CursorFxType) => {
+		setPreference('cursorFx', nextFx);
+		saveToDb({ cursorFx: nextFx });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.cursorFx.title'),
+		});
+	};
+
+	const handleOverlaySkinChange = (nextSkin: OverlaySkinType) => {
+		setPreference('overlaySkin', nextSkin);
+		saveToDb({ overlaySkin: nextSkin });
+		toast({
+			type: 'success',
+			title: t('account.appearance.toast.overlaySkin.title'),
 		});
 	};
 
@@ -343,7 +390,12 @@ export default function Appearance() {
 
 		setPreference('dotMatrixStage', 'default');
 		setPreference('dotMatrixType', 'default');
+		setPreference('dotMatrixRenderStyle', 'dots');
 		setPreference('dotMatrixAnimation', 'animate');
+		setPreference('ambientScene', 'default');
+		setPreference('surfaceStyle', 'default');
+		setPreference('cursorFx', 'default');
+		setPreference('overlaySkin', 'default');
 
 		saveToDb({
 			theme: 'system',
@@ -354,7 +406,12 @@ export default function Appearance() {
 			textScale: 14,
 			dotMatrixStage: 'default',
 			dotMatrixType: 'default',
+			dotMatrixRenderStyle: 'dots',
 			dotMatrixAnimation: 'animate',
+			ambientScene: 'default',
+			surfaceStyle: 'default',
+			cursorFx: 'default',
+			overlaySkin: 'default',
 		});
 		toast({ type: 'success', title: t('account.appearance.toast.resetSuccess') });
 	};
@@ -407,7 +464,7 @@ export default function Appearance() {
 						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.theme.title')}</h2>
 						<p className="text-xs text-(--text-muted)">{t('account.appearance.theme.description')}</p>
 					</div>
-					<div className="w-full sm:w-56">
+					<div className="w-full sm:w-auto">
 						<Selector value={selectedTheme} options={themeOptions} onChange={handleThemeChange} />
 					</div>
 				</div>
@@ -415,10 +472,25 @@ export default function Appearance() {
 				{/* Dot-Matrix Background Stage & Animation Card */}
 				<DotMatrixSettingsCard
 					dotMatrixType={dotMatrixType}
+					dotMatrixRenderStyle={dotMatrixRenderStyle}
 					dotMatrixAnimation={dotMatrixAnimation}
 					onChangeType={handleDotMatrixTypeChange}
+					onChangeRenderStyle={handleDotMatrixRenderStyleChange}
 					onChangeAnimation={handleDotMatrixAnimationChange}
 					isUiHidden={isUiHidden}
+					onToggleHideUi={toggleContentHidden}
+				/>
+
+				{/* Standalone Full-Screen Ambient Shaders, Card Surfaces, Cursor FX & Overlay Skins */}
+				<AmbientAndSurfaceCard
+					ambientScene={ambientScene}
+					surfaceStyle={surfaceStyle}
+					cursorFx={cursorFx}
+					overlaySkin={overlaySkin}
+					onChangeAmbientScene={handleAmbientSceneChange}
+					onChangeSurfaceStyle={handleSurfaceStyleChange}
+					onChangeCursorFx={handleCursorFxChange}
+					onChangeOverlaySkin={handleOverlaySkinChange}
 					onToggleHideUi={toggleContentHidden}
 				/>
 
@@ -447,39 +519,7 @@ export default function Appearance() {
 				</div>
 
 				{/* Accent Color Picker */}
-				<div
-					className={`flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-opacity ${syncFromDiscord ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.accentColor.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.accentColor.description')}</p>
-					</div>
-
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-2" style={{ gap: 'var(--ui-gap)' }}>
-						{PRESET_COLORS.map((color) => {
-							const isSelected = selectedColor.toLowerCase() === color.value.toLowerCase();
-							const label = t(`account.appearance.colors.${color.key}`);
-
-							return (
-								<button
-									key={color.value}
-									onClick={() => handleSelectColor(color.value)}
-									className={`flex items-center rounded-2xl border transition-all text-left ${
-										isSelected ? 'border-(--accent) bg-(--active-accent)/20 shadow-xs' : 'border-(--border)/10 hover:border-(--border)/40'
-									}`}
-									style={{
-										padding: 'calc(var(--ui-gap) * 0.75)',
-										gap: 'calc(var(--ui-gap) * 0.5)',
-									}}
-								>
-									<div className="h-8 w-8 rounded-full shadow-inner shrink-0 border border-(--border)/10" style={{ backgroundColor: color.value }} />
-									<span className="text-xs font-medium text-(--text) truncate">{label}</span>
-								</button>
-							);
-						})}
-					</div>
-				</div>
+				<AppearanceAccentPicker selectedColor={selectedColor} syncFromDiscord={syncFromDiscord} onSelectColor={handleSelectColor} />
 
 				<AppearanceScalingCards
 					uiZoom={uiZoom}

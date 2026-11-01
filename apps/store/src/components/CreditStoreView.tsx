@@ -20,7 +20,7 @@ interface CreditStoreViewProps {
 	onBuyCreditPack: (priceId: string, item: CatalogItem) => void;
 }
 
-type PerkFilter = 'all' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'credit_packs';
+type PerkFilter = 'all' | 'stage_style' | 'icon_pack' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'credit_packs';
 
 const PERK_ICONS: Record<string, any> = {
 	cdn_slots: HardDrive,
@@ -29,11 +29,47 @@ const PERK_ICONS: Record<string, any> = {
 	vanity_url: Globe,
 	trial_pass: Zap,
 	streak_shield: Shield,
+	stage_style: Cpu,
+	ambient_scene: Sparkles,
+	surface_style: Gem,
+	profile_cosmetic: Crown,
+	cursor_fx: Sparkles,
+	overlay_skin: LayoutGrid,
+	icon_pack: Sparkles,
+	window_style: LayoutGrid,
 	dot_matrix_banner: Cpu,
 	credit_patron: Coins,
 	high_roller: Gem,
 	vault_sovereign: Crown,
 	vanity_badge: Award,
+};
+const CHILD_TO_BUNDLE: Record<string, string> = {
+	ambient_mesh_lava: 'ambient_scenes_pack',
+	ambient_cyber_grid: 'ambient_scenes_pack',
+	ambient_topography: 'ambient_scenes_pack',
+	ambient_nebula_cosmos: 'ambient_scenes_pack',
+	ambient_prism_caustics: 'ambient_scenes_pack',
+	surface_crystal: 'surface_styles_pack',
+	surface_holographic: 'surface_styles_pack',
+	surface_neon: 'surface_styles_pack',
+	surface_obsidian: 'surface_styles_pack',
+	frame_plasma_ring: 'profile_frames_pack',
+	frame_holo_crown: 'profile_frames_pack',
+	frame_cyber_hex: 'profile_frames_pack',
+	frame_solar_flare: 'profile_frames_pack',
+	nameplate_aurora_wave: 'profile_nameplates_pack',
+	nameplate_synth_horizon: 'profile_nameplates_pack',
+	nameplate_nebula_shimmer: 'profile_nameplates_pack',
+	nameplate_cyber_circuit: 'profile_nameplates_pack',
+	cursor_starlight_trail: 'cursor_fx_bundle',
+	cursor_plasma_sparks: 'cursor_fx_bundle',
+	cursor_cyber_reticle: 'cursor_fx_bundle',
+	cursor_sonic_rings: 'cursor_fx_bundle',
+	cursor_aurora_ribbon: 'cursor_fx_bundle',
+	skin_hud_tactical: 'overlay_skins_bundle',
+	skin_frosted_prism: 'overlay_skins_bundle',
+	skin_neon_arcade: 'overlay_skins_bundle',
+	skin_minimal_pill: 'overlay_skins_bundle',
 };
 const FALLBACK_EUR_PRICES: Record<string, string> = { 'credits-500': '€5.00', 'credits-1200': '€10.00', 'credits-3250': '€25.00', 'credits-7000': '€50.00' };
 
@@ -145,7 +181,21 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 
 	const creditPacks = useMemo(() => items.filter((i) => i.itemType === 'credit_pack').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
 	const creditPerks = useMemo(() => items.filter((i) => i.itemType === 'credit_perk').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
-	const filteredPerks = useMemo(() => (filter === 'credit_packs' ? [] : filter === 'all' ? creditPerks : creditPerks.filter((i) => i.perkType === filter)), [creditPerks, filter]);
+	const filteredPerks = useMemo(
+		() =>
+			filter === 'credit_packs'
+				? []
+				: filter === 'all'
+					? creditPerks
+					: filter === 'stage_style'
+						? creditPerks.filter((i) => i.perkType === 'stage_style' || i.perkType === 'ambient_scene' || i.perkType === 'surface_style')
+						: filter === 'icon_pack'
+							? creditPerks.filter((i) => i.perkType === 'icon_pack' || i.perkType === 'window_style' || i.perkType === 'cursor_fx' || i.perkType === 'overlay_skin')
+							: filter === 'vanity_badge'
+								? creditPerks.filter((i) => i.perkType === 'vanity_badge' || i.perkType === 'profile_cosmetic')
+								: creditPerks.filter((i) => i.perkType === filter),
+		[creditPerks, filter]
+	);
 	const getPerkIcon = (perkType?: string, perkValue?: string | number | null) => PERK_ICONS[String(perkValue || '')] || PERK_ICONS[String(perkType || '')] || Sparkles;
 	const getEffectiveCreditCost = (item: CatalogItem) => {
 		const base = Math.max(0, Number(item.creditCost) || 0);
@@ -180,28 +230,20 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 							)}
 						</div>
 						<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
-								<HardDrive size={11} className="text-(--accent)" />
-								{t('account.store.credits.ownedCdnSlots', { count: 10 + extraCdnSlots, extra: extraCdnSlots })}
-							</span>
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
-								<LayoutGrid size={11} className="text-(--accent)" />
-								{t('account.store.credits.ownedShowcaseSlots', { count: 1 + extraShowcaseSlots, extra: extraShowcaseSlots })}
-							</span>
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
-								<Bot size={11} className="text-(--accent)" />
-								{t('account.store.credits.ownedBotSlots', { count: 1 + extraBotSlots, extra: extraBotSlots })}
-							</span>
-							{extraVanitySlots > 0 && (
-								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
-									<Globe size={11} className="text-(--accent)" />
-									{t('account.store.credits.ownedVanitySlots', { count: extraVanitySlots })}
-								</span>
-							)}
-							<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
-								<Award size={11} className="text-(--accent)" />
-								{t('account.store.credits.ownedBadges', { count: unlockedBadges.length })}
-							</span>
+							{[
+								{ icon: HardDrive, text: t('account.store.credits.ownedCdnSlots', { count: 10 + extraCdnSlots, extra: extraCdnSlots }), show: true },
+								{ icon: LayoutGrid, text: t('account.store.credits.ownedShowcaseSlots', { count: 1 + extraShowcaseSlots, extra: extraShowcaseSlots }), show: true },
+								{ icon: Bot, text: t('account.store.credits.ownedBotSlots', { count: 1 + extraBotSlots, extra: extraBotSlots }), show: true },
+								{ icon: Globe, text: t('account.store.credits.ownedVanitySlots', { count: extraVanitySlots }), show: extraVanitySlots > 0 },
+								{ icon: Award, text: t('account.store.credits.ownedBadges', { count: unlockedBadges.length }), show: true },
+							]
+								.filter((p) => p.show)
+								.map((pill, i) => (
+									<span key={i} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
+										<pill.icon size={11} className="text-(--accent)" />
+										{pill.text}
+									</span>
+								))}
 						</div>
 					</div>
 				</div>
@@ -240,6 +282,8 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 					onChange={(id) => setFilter(id as PerkFilter)}
 					tabs={[
 						{ id: 'all', label: t('account.store.credits.filters.all') },
+						{ id: 'stage_style', label: t('account.store.credits.filters.stageStyles') },
+						{ id: 'icon_pack', label: t('account.store.credits.filters.iconPacks') },
 						{ id: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
 						{ id: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
 						{ id: 'bot_slots', label: t('account.store.credits.filters.botSlots') },
@@ -267,9 +311,12 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 						{filteredPerks.map((item) => {
 							const PerkIcon = getPerkIcon(item.perkType, item.perkValue);
 							const effectiveCost = getEffectiveCreditCost(item);
-							const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix';
+							const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix' || item.perkType === 'profile_cosmetic';
+							const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
+							const badgeKey = String(item.perkValue || item.id);
 							const isOwnedBadge =
-								(item.perkType === 'vanity_badge' && unlockedBadges.includes(String(item.perkValue || item.id))) ||
+								((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isStageOrIcon) &&
+									(unlockedBadges.includes(badgeKey) || Boolean(CHILD_TO_BUNDLE[badgeKey] && unlockedBadges.includes(CHILD_TO_BUNDLE[badgeKey])))) ||
 								(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3);
 							const canAfford = creditBalance >= effectiveCost;
 
@@ -300,7 +347,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 											)}
 										</div>
 
-										{isDotMatrix && <DotMatrixPerkPreview initialVariant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} />}
+										<DotMatrixPerkPreview initialVariant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} perkValue={String(item.perkValue || '')} />
 
 										<div>
 											<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -339,15 +386,21 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 													<Check size={15} className="text-(--accent-green)" />
 													{t('account.store.credits.alreadyUnlocked')}
 												</Button>
-												{isDotMatrix && (
+												{(isDotMatrix || isStageOrIcon) && (
 													<Button
 														variant="primary"
 														size="sm"
-														onClick={() => (window.location.href = getEnvUrl('https://account.xernerx.com/?tab=profile'))}
+														onClick={() =>
+															(window.location.href = getEnvUrl(
+																`https://account.xernerx.com/?tab=${
+																	isDotMatrix ? 'profile' : item.perkValue === 'ui_icon_packs' || item.perkType === 'window_style' ? 'preferences' : 'appearance'
+																}`
+															))
+														}
 														className="w-full flex items-center justify-center gap-1.5"
 													>
 														<ExternalLink size={14} />
-														{t('account.store.credits.dotMatrixPreview.customizeInProfile')}
+														{t(isDotMatrix ? 'account.store.credits.dotMatrixPreview.customizeInProfile' : 'account.store.credits.equipInSettings')}
 													</Button>
 												)}
 											</>

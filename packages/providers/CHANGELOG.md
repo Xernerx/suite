@@ -2,6 +2,17 @@
 
 # @xernerx/providers
 
+## 0.20.0
+
+### Minor Changes
+
+- Updated `ThemeProvider` to manage and sync `dotMatrixRenderStyle`, `ambientScene`, `surfaceStyle`, `cursorFx`, `overlaySkin`, `uiIconStyle`, and `windowControls` across Browser and Desktop, enforce Credit Store cosmetic unlock checks on sync, and compute adaptive `--accent-contrast` and `--accent-readable` CSS tokens.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.19.0
+
 ## 0.19.0
 
 ### Minor Changes

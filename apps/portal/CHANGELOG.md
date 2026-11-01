@@ -2,6 +2,27 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.4.0
+
+### Minor Changes
+
+- Separated Bot Releases and Slash Commands into dedicated `ReleasesTab` and `CommandsTab` management views in the Developer Portal, and refined bot and organization vanity URL slug settings.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 1.3.0
 
 ### Minor Changes

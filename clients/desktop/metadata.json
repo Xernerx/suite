@@ -1,9 +1,9 @@
 {
 	"debug": false,
 	"hardwareAcceleration": true,
-	"startMinimized": false,
+	"startMinimized": true,
 	"startMaximized": false,
-	"startOnBoot": false,
+	"startOnBoot": true,
 	"alwaysOnTop": false,
 	"minimizeOnClose": true,
 	"globalHotkey": true,
@@ -15,9 +15,11 @@
 	"discordRpc": true,
 	"desktopNotifications": true,
 	"dailyStreakReminder": true,
-	"idlePrivacyShield": false,
+	"idlePrivacyShield": true,
 	"idleAfkRpc": true,
-	"explorerContextMenu": false,
-	"windowControls": "system",
+	"explorerContextMenu": true,
+	"cdnWatchFolder": "",
+	"windowControls": "xernerx",
+	"appIcon": "default",
 	"startupLocation": "last"
 }

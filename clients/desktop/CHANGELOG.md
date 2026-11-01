@@ -2,6 +2,12 @@
 
 # @xernerx/desktop
 
+## 2.5.0
+
+### Minor Changes
+
+- Added 10 customizable Desktop App Icon crests (Xerple, Electric Blue, Arctic Cyan, Lush Green, Amber Gold, Sunset Orange, Crimson Red, Vibrant Pink, Monochrome White, and Obsidian Black) for the taskbar, system tray, Start Menu shortcut, and native OS notifications.
+
 ## 2.4.5
 
 ### Patch Changes

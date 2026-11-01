@@ -53,7 +53,7 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 					ref={ref}
 					role="dialog"
 					aria-modal="true"
-					className={`flex flex-col w-full max-h-full overflow-hidden ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
+					className={`xrx-overlay-surface flex flex-col w-full max-h-full overflow-hidden ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					{(title || description) && (

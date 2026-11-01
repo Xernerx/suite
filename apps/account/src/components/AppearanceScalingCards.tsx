@@ -58,7 +58,7 @@ export function AppearanceScalingCards({ uiZoom, onUiZoomChange, uiGap, onUiGapC
 					<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.density.title')}</h2>
 					<p className="text-xs text-(--text-muted)">{t('account.appearance.density.description')}</p>
 				</div>
-				<div className="w-full sm:w-56">
+				<div className="w-full sm:w-auto">
 					<Selector value={uiGap} options={densityOptions} onChange={onUiGapChange} />
 				</div>
 			</div>

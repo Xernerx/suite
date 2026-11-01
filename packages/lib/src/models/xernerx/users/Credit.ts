@@ -21,8 +21,25 @@ const schema = new Schema(
 		activeBadges: { type: [String], default: [] },
 		dotMatrixVariant: {
 			type: String,
-			enum: ['full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid'],
+			enum: ['full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'chronos', 'supernova', 'tesseract', 'synthwave', 'lotus'],
 			default: 'orbit',
+		},
+		profileCosmetics: {
+			avatarFrame: {
+				type: String,
+				enum: ['none', 'plasma_ring', 'holo_crown', 'cyber_hex', 'solar_flare'],
+				default: 'none',
+			},
+			nameplate: {
+				type: String,
+				enum: ['none', 'aurora_wave', 'synth_horizon', 'nebula_shimmer', 'cyber_circuit'],
+				default: 'none',
+			},
+			cardTheme: {
+				type: String,
+				enum: ['default', 'holographic', 'celestial', 'cyber_neon', 'obsidian_gold'],
+				default: 'default',
+			},
 		},
 		transactions: {
 			type: [
