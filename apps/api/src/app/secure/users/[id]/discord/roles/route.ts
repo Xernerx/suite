@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog } from '@/lib/auditAndNotify';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -45,6 +46,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			const errorData = await response.json();
 			return NextResponse.json({ error: 'Failed to assign Discord role', details: errorData }, { status: response.status });
 		}
+
+		await recordAuditLog(req, {
+			action: 'user.discord_role.add',
+			targetType: 'user',
+			targetId: userId,
+			summary: `Assigned Discord role ${roleId} to user "${user.name || userId}"`,
+			metadata: { discordRoleId: roleId, guildId },
+		});
 
 		return NextResponse.json({ success: true, message: 'Role assigned successfully' }, { status: 200 });
 	} catch (error: any) {
@@ -90,6 +99,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 			const errorData = await response.json();
 			return NextResponse.json({ error: 'Failed to remove Discord role', details: errorData }, { status: response.status });
 		}
+
+		await recordAuditLog(req, {
+			action: 'user.discord_role.remove',
+			targetType: 'user',
+			targetId: userId,
+			summary: `Removed Discord role ${roleId} from user "${user.name || userId}"`,
+			metadata: { discordRoleId: roleId, guildId },
+		});
 
 		return NextResponse.json({ success: true, message: 'Role removed successfully' }, { status: 200 });
 	} catch (error: any) {

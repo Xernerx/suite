@@ -14,6 +14,7 @@ export interface AdminPermissionsMap {
 	canUsers: boolean;
 	canBots: boolean;
 	canServers: boolean;
+	canOrganizations?: boolean;
 	canRoles: boolean;
 	canApplicationsReview: boolean;
 	canApplicationsManage: boolean;
@@ -52,6 +53,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 	const [users, setUsers] = useState<any[]>([]);
 	const [bots, setBots] = useState<any[]>([]);
 	const [servers, setServers] = useState<any[]>([]);
+	const [organizations, setOrganizations] = useState<any[]>([]);
 	const [roles, setRoles] = useState<any[]>([]);
 	const [tokens, setTokens] = useState<any[]>([]);
 	const [storeItems, setStoreItems] = useState<any[]>([]);
@@ -196,6 +198,15 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
+				if ((permissions.canOrganizations ?? permissions.canUsers) && permissions.isServerSet) {
+					tasks.push(
+						fetch(getEnvUrl('https://api.xernerx.com/secure/organizations?admin=true'), { credentials: 'include' })
+							.then((r) => (r.ok ? r.json() : []))
+							.then((d) => setOrganizations(Array.isArray(d) ? d : []))
+							.catch(() => {})
+					);
+				}
+
 				if (permissions.canRoles && permissions.isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' })
@@ -291,6 +302,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 		users,
 		bots,
 		servers,
+		organizations,
 		roles,
 		tokens,
 		storeItems,

@@ -6,7 +6,7 @@ import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/provi
 import { Loading } from '@xernerx/feedback';
 import { Button, Selector, Input } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogIn } from 'lucide-react';
+import { LogIn, Lightbulb, Sparkles, CheckCircle2, ThumbsUp } from 'lucide-react';
 import { SuggestionCard } from '@/components/suggestions/SuggestionCard';
 
 function fuzzySearch(query: string, text: string) {
@@ -37,6 +37,7 @@ export default function SuggestionsPage() {
 	const [product, setProduct] = useState('');
 	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<'top' | 'newest' | 'mine'>('top');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'planned' | 'implemented'>('all');
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
 
@@ -228,9 +229,13 @@ export default function SuggestionsPage() {
 
 	const filteredSuggestions = useMemo(() => {
 		const filtered = suggestions.filter((s: any) => {
-			if (sortBy === 'mine' && !(user && s.upvotes?.includes(user.id))) {
+			if (sortBy === 'mine' && !(user && (s.upvotes?.includes(user.id) || s.authorId === user.id || s.author?.id === user.id))) {
 				return false;
 			}
+			const rawStatus = String(s.status || 'open').toLowerCase();
+			if (statusFilter === 'open' && rawStatus !== 'open' && rawStatus !== 'pending' && rawStatus !== 'submitted') return false;
+			if (statusFilter === 'planned' && rawStatus !== 'planned' && rawStatus !== 'active' && rawStatus !== 'approved' && rawStatus !== 'in_progress') return false;
+			if (statusFilter === 'implemented' && rawStatus !== 'implemented' && rawStatus !== 'completed' && rawStatus !== 'released') return false;
 			const botInfo = resolveBot(s);
 			const prodName = botInfo?.name || s.productId || '';
 			if (selectedProduct) {
@@ -254,7 +259,20 @@ export default function SuggestionsPage() {
 			const votesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
 			return votesB - votesA;
 		});
-	}, [search, selectedProduct, sortBy, user, suggestions, orgBots, botProfiles]);
+	}, [search, selectedProduct, sortBy, statusFilter, user, suggestions, orgBots, botProfiles]);
+
+	const suggestionStats = useMemo(() => {
+		let planned = 0;
+		let implemented = 0;
+		let myUpvotes = 0;
+		for (const s of suggestions) {
+			const st = String(s.status || 'open').toLowerCase();
+			if (st === 'planned' || st === 'active' || st === 'approved' || st === 'in_progress') planned++;
+			if (st === 'implemented' || st === 'completed' || st === 'released') implemented++;
+			if (user?.id && (s.upvotes?.includes(user.id) || s.authorId === user.id || s.author?.id === user.id)) myUpvotes++;
+		}
+		return { total: suggestions.length, planned, implemented, myUpvotes };
+	}, [suggestions, user?.id]);
 
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 pb-24 gap-12">
@@ -331,10 +349,77 @@ export default function SuggestionsPage() {
 								transition={{ duration: 0.2, ease: 'easeOut' }}
 								className="flex flex-col gap-4 w-full"
 							>
+								<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-2">
+									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+										<div>
+											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.total')}</span>
+											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+												{suggestionStats.total}
+											</p>
+										</div>
+										<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+											<Lightbulb size={18} />
+										</div>
+									</div>
+									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+										<div>
+											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.planned')}</span>
+											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+												{suggestionStats.planned}
+											</p>
+										</div>
+										<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+											<Sparkles size={18} />
+										</div>
+									</div>
+									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+										<div>
+											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.implemented')}</span>
+											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+												{suggestionStats.implemented}
+											</p>
+										</div>
+										<div className="p-2.5 rounded-2xl bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
+											<CheckCircle2 size={18} />
+										</div>
+									</div>
+									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+										<div>
+											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.myUpvotes')}</span>
+											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+												{suggestionStats.myUpvotes}
+											</p>
+										</div>
+										<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+											<ThumbsUp size={18} />
+										</div>
+									</div>
+								</div>
+
 								<div className="flex flex-col gap-2.5">
 									<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
-										<p className="text-xs text-(--text-muted)">{t('info.suggestions.startTyping')}</p>
+										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
+											{(
+												[
+													{ id: 'all', label: t('info.suggestions.filters.all') },
+													{ id: 'open', label: t('info.suggestions.filters.open') },
+													{ id: 'planned', label: t('info.suggestions.filters.planned') },
+													{ id: 'implemented', label: t('info.suggestions.filters.implemented') },
+												] as Array<{ id: 'all' | 'open' | 'planned' | 'implemented'; label: string }>
+											).map((opt) => (
+												<button
+													key={opt.id}
+													type="button"
+													onClick={() => setStatusFilter(opt.id)}
+													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+														statusFilter === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+													}`}
+												>
+													{opt.label}
+												</button>
+											))}
+										</div>
 										<div className="flex items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
 											{(
 												[

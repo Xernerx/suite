@@ -65,6 +65,8 @@ export function MetricsChart({
 	const activeDescriptor = metrics.find((m) => m.id === activeMetric) || metrics[0];
 	const sourceForPeak = allTimeData && allTimeData.length > 0 ? allTimeData : data;
 	const highestValue = sourceForPeak.length > 0 ? Math.max(...sourceForPeak.map((s) => Number(s[activeMetric]) || 0)) : 0;
+	const windowPeak = data.length > 0 ? Math.max(...data.map((s) => Number(s[activeMetric]) || 0)) : 0;
+	const windowAvg = data.length > 0 ? data.reduce((sum, s) => sum + (Number(s[activeMetric]) || 0), 0) / data.length : 0;
 	const firstPoint = Number(data[0]?.[activeMetric]) || 0;
 	const lastPoint = Number(data[data.length - 1]?.[activeMetric]) || 0;
 	const gainLoss = lastPoint - firstPoint;
@@ -149,6 +151,16 @@ export function MetricsChart({
 							<span className="text-(--text-muted) bg-(--background)/60 px-2.5 py-1 rounded-xl border border-(--border)/10">
 								{t('app.bots.id.text12')} {formatPeak ? formatPeak(highestValue, activeMetric) : defaultFormatPeak(highestValue)}
 							</span>
+							{timeframe !== 'all' && (
+								<span className="text-(--accent) bg-(--accent)/10 px-2.5 py-1 rounded-xl border border-(--accent)/25 font-mono">
+									{t('app.bots.id.timeframePeak')} {formatPeak ? formatPeak(windowPeak, activeMetric) : defaultFormatPeak(windowPeak)}
+								</span>
+							)}
+							{data.length > 1 && (
+								<span className="text-(--text-muted) bg-(--background)/60 px-2.5 py-1 rounded-xl border border-(--border)/10 font-mono">
+									{t('app.bots.id.timeframeAvg')} {formatPeak ? formatPeak(windowAvg, activeMetric) : defaultFormatPeak(windowAvg)}
+								</span>
+							)}
 						</div>
 					</div>
 

@@ -16,9 +16,10 @@ interface BotCardProps {
 	onBotUpdated: (updated: AdminBotSummary) => void;
 	onDiscordFetched: (id: string, discord: BotDiscordProfile) => void;
 	onViewAuditLogs?: (botId: string) => void;
+	onNavigateEntity?: (tab: string, query: string) => void;
 }
 
-export function BotCard({ bot, getEnvUrl, onBotDeleted, onBotUpdated, onDiscordFetched, onViewAuditLogs }: BotCardProps) {
+export function BotCard({ bot, getEnvUrl, onBotDeleted, onBotUpdated, onDiscordFetched, onViewAuditLogs, onNavigateEntity }: BotCardProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -154,6 +155,7 @@ export function BotCard({ bot, getEnvUrl, onBotDeleted, onBotUpdated, onDiscordF
 				onBotDeleted={onBotDeleted}
 				onBotUpdated={onBotUpdated}
 				onViewAuditLogs={onViewAuditLogs}
+				onNavigateEntity={onNavigateEntity}
 			/>
 		</>
 	);

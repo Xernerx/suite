@@ -6,7 +6,7 @@ import { useDictionary, useEnvironment, useToast, useSession, useTheme } from '@
 import { getHighestMilestoneBadge } from '@xernerx/lib';
 import { XernerxDotLogo, type DotLogoVariant } from '@xernerx/feedback';
 import { Button, CopyButton, Tooltip } from '@xernerx/ui';
-import { User, Share2, Settings, Sparkles, Coins, Cpu, Crown, Gem, Flame, Zap, Bot, Bug, Lightbulb, Trophy, Heart, Award, Rocket } from 'lucide-react';
+import { User, Share2, Settings, Sparkles, Coins, Cpu, Crown, Gem, Flame, Zap, Bot, Bug, Lightbulb, Trophy, Heart, Award, Rocket, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import TipCreditsModal from '@/components/users/TipCreditsModal';
@@ -142,6 +142,13 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 					<h1 className="text-4xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{displayName}
 					</h1>
+					{user?.verified && (
+						<Tooltip content={t('app.bots.verifiedBadge')}>
+							<span className="inline-flex items-center justify-center shrink-0">
+								<ShieldCheck className="w-6 h-6 text-(--accent-green)" />
+							</span>
+						</Tooltip>
+					)}
 					{username && <span className="text-sm font-semibold text-(--text-muted)">@{username}</span>}
 					<CopyButton value={id} label={id} toastTitle={t('app.users.idCopied')} />
 					{discordUser?.clan?.tag && (

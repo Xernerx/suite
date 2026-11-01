@@ -1,10 +1,11 @@
 /** @format */
 'use client';
 
-import { ArrowRight, Briefcase, Code2, Globe2, Headphones, ShieldCheck, LogIn } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowRight, Briefcase, Code2, Globe2, Headphones, ShieldCheck, LogIn, FileText, ExternalLink } from 'lucide-react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useEnvironment, useSidebar, useUser, useDictionary } from '@xernerx/providers';
+import { Input } from '@xernerx/ui';
 import Link from 'next/link';
 import { PageFaqSection } from '@/components/PageFaqSection';
 
@@ -28,6 +29,15 @@ export default function ApplicationsPage() {
 	const [applications, setApplications] = useState<ApplicationConfig[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [searchQuery, setSearchQuery] = useState('');
+
+	const filteredApplications = useMemo(() => {
+		if (!searchQuery.trim()) return applications;
+		const q = searchQuery.toLowerCase();
+		return applications.filter(
+			(app) => app.name?.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q) || (Array.isArray(app.requirements) && app.requirements.some((r) => r.toLowerCase().includes(q)))
+		);
+	}, [applications, searchQuery]);
 
 	useEffect(() => {
 		hide();
@@ -108,18 +118,46 @@ export default function ApplicationsPage() {
 
 	return (
 		<div className="flex flex-col min-h-screen pt-24 pb-20 px-6 md:px-12 max-w-(--page-width) mx-auto w-full gap-16">
-			<div>
-				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					{t('www.applications.title')}
-				</h1>
-				<p className="text-lg text-(--text-muted) max-w-2xl leading-relaxed">{t('www.applications.subtitle')}</p>
+			<div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+				<div>
+					<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.applications.title')}
+					</h1>
+					<p className="text-lg text-(--text-muted) max-w-2xl leading-relaxed">{t('www.applications.subtitle')}</p>
+				</div>
+				{applications.length > 0 && (
+					<div className="w-full lg:w-80 shrink-0">
+						<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('www.applications.searchPlaceholder')} />
+					</div>
+				)}
 			</div>
+
+			{user && (
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl border border-(--accent)/30 bg-(--accent)/10 backdrop-blur-md shadow-sm -mt-6">
+					<div className="flex items-center gap-3.5">
+						<div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-(--accent)/20 text-(--accent) border border-(--accent)/30 shrink-0">
+							<FileText className="w-5 h-5" />
+						</div>
+						<div>
+							<h2 className="text-sm font-extrabold text-(--text)">{t('www.applications.trackSubmittedTitle')}</h2>
+							<p className="text-xs text-(--text-muted)">{t('www.applications.trackSubmittedDesc')}</p>
+						</div>
+					</div>
+					<a
+						href={`${getEnvUrl('https://account.xernerx.com')}/?view=activity`}
+						className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-extrabold bg-(--accent) text-white hover:bg-(--hover-accent) transition-all shrink-0 self-start sm:self-auto"
+					>
+						<span>{t('www.applications.viewMyApplications')}</span>
+						<ExternalLink className="w-3.5 h-3.5" />
+					</a>
+				</div>
+			)}
 
 			{error ? (
 				<motion.div initial={false} animate={{ opacity: 1, y: 0 }} className="bg-(--accent-red)/10 border border-(--accent-red)/20 text-(--accent-red) p-6 rounded-2xl backdrop-blur-md">
 					{error}
 				</motion.div>
-			) : !loading && applications.length === 0 ? (
+			) : !loading && filteredApplications.length === 0 ? (
 				<motion.div
 					initial={false}
 					animate={{ opacity: 1, scale: 1 }}
@@ -131,9 +169,9 @@ export default function ApplicationsPage() {
 					</h2>
 					<p className="text-(--text-muted) max-w-md">{t('www.applications.noRolesDesc')}</p>
 				</motion.div>
-			) : applications.length > 0 ? (
+			) : filteredApplications.length > 0 ? (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{applications.map((app, i) => (
+					{filteredApplications.map((app, i) => (
 						<motion.div
 							initial={false}
 							animate={{ opacity: 1, y: 0 }}
@@ -145,6 +183,11 @@ export default function ApplicationsPage() {
 								<div className="flex items-center justify-center w-12 h-12 rounded-full bg-(--accent)/20 text-(--accent)">
 									<Briefcase className="w-6 h-6" />
 								</div>
+								{Array.isArray(app.questions) && app.questions.length > 0 && (
+									<span className="px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+										{t('www.applications.questionsCount', { count: app.questions.length })}
+									</span>
+								)}
 							</div>
 							<h2 className="text-2xl font-bold mb-3 group-hover:text-(--accent) transition-colors">{app.name}</h2>
 							<p className="text-(--text-muted) mb-6 line-clamp-2 leading-relaxed">{app.description || t('www.applications.noDesc')}</p>

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { ensureStoreSeed } from '@/lib/storeSeed';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET() {
 	try {
@@ -34,6 +35,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json();
 		const { models } = await database('xernerx');
 		const Category = models.store.Category as any;
@@ -62,6 +68,13 @@ export async function POST(req: Request) {
 			icon: body.icon?.trim() || 'ShoppingBag',
 			order: typeof body.order === 'number' ? body.order : 0,
 			enabled: typeof body.enabled === 'boolean' ? body.enabled : true,
+		});
+
+		await recordAuditLog(req, {
+			action: 'store.category.created',
+			targetType: 'setting',
+			targetId: category.id,
+			summary: `Created store category "${category.name}"`,
 		});
 
 		return NextResponse.json(category, { status: 201 });

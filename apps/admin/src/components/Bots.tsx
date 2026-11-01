@@ -11,7 +11,15 @@ import { AdminBotSummary, BotDiscordProfile } from './bots/types';
 import { BotCard } from './bots/BotCard';
 import { useInfiniteScroll } from './useInfiniteScroll';
 
-export default function Bots({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (botId: string) => void }) {
+export default function Bots({
+	initialSearch = '',
+	onViewAuditLogs,
+	onNavigateEntity,
+}: {
+	initialSearch?: string;
+	onViewAuditLogs?: (botId: string) => void;
+	onNavigateEntity?: (tab: string, query: string) => void;
+}) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 
@@ -232,6 +240,7 @@ export default function Bots({ initialSearch = '', onViewAuditLogs }: { initialS
 									onBotUpdated={handleBotUpdated}
 									onDiscordFetched={handleDiscordFetched}
 									onViewAuditLogs={onViewAuditLogs}
+									onNavigateEntity={onNavigateEntity}
 								/>
 							))}
 						</AnimatePresence>

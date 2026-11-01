@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 import { ArrowLeft, Check, Clock, Code2, Copy, Download, ExternalLink, Eye, FileCode2, FolderGit2, GitFork, Globe, Link2, Lock, Plus, Trash2, User } from 'lucide-react';
 import { Loading, NotFound } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
-import { Button, CodeBlock, Confirm, Selector } from '@xernerx/ui';
+import { Button, CodeBlock, Confirm, Markdown, Selector } from '@xernerx/ui';
 import { formatBytes, HASTE_FILE_EXTENSION_MAP, type HasteDocumentItem } from './hasteConstants';
 
 interface HasteDocumentViewerProps {
@@ -31,6 +31,8 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	const [redirectingToLogin, setRedirectingToLogin] = useState(false);
 	const [copiedCode, setCopiedCode] = useState(false);
 	const [copiedLink, setCopiedLink] = useState(false);
+	const [copiedRaw, setCopiedRaw] = useState(false);
+	const [renderMarkdown, setRenderMarkdown] = useState(true);
 	const [updatingMeta, setUpdatingMeta] = useState(false);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 	const [deleteLoading, setDeleteLoading] = useState(false);
@@ -137,6 +139,19 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 			type: 'success',
 		});
 		setTimeout(() => setCopiedLink(false), 2000);
+	};
+
+	const handleCopyRawUrl = () => {
+		if (!doc) return;
+		const url = getEnvUrl(`https://haste.xernerx.com/raw/${doc.id}`);
+		navigator.clipboard.writeText(url);
+		setCopiedRaw(true);
+		toast({
+			title: t('haste.toasts.copiedTitle'),
+			description: t('haste.toasts.copiedRawUrlDescription'),
+			type: 'success',
+		});
+		setTimeout(() => setCopiedRaw(false), 2000);
 	};
 
 	const handleDownload = () => {
@@ -310,6 +325,12 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 
 					{/* Primary Action Toolbar */}
 					<div className="flex items-center flex-wrap gap-2 shrink-0">
+						{doc.language === 'markdown' && (
+							<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={() => setRenderMarkdown((prev) => !prev)}>
+								<Eye className="w-4 h-4 mr-1.5 text-(--accent)" />
+								{renderMarkdown ? t('haste.actions.viewRawSource') : t('haste.actions.previewMarkdown')}
+							</Button>
+						)}
 						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyCode}>
 							{copiedCode ? <Check className="w-4 h-4 mr-1.5 text-(--accent-green)" /> : <Copy className="w-4 h-4 mr-1.5" />}
 							{t('haste.actions.copyCode')}
@@ -317,6 +338,10 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyLink}>
 							{copiedLink ? <Check className="w-4 h-4 mr-1.5 text-(--accent-green)" /> : <Link2 className="w-4 h-4 mr-1.5" />}
 							{t('haste.actions.copyLink')}
+						</Button>
+						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyRawUrl}>
+							{copiedRaw ? <Check className="w-4 h-4 mr-1.5 text-(--accent-green)" /> : <Copy className="w-4 h-4 mr-1.5" />}
+							{t('haste.actions.copyRawUrl')}
 						</Button>
 						<Link href={`/raw/${doc.id}`} target="_blank">
 							<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2">
@@ -365,16 +390,22 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 
 				{/* Document Code Display */}
 				<div className="pt-1">
-					<CodeBlock
-						tabs={[
-							{
-								id: doc.id,
-								label: `${doc.id}.${HASTE_FILE_EXTENSION_MAP[doc.language] || 'txt'}`,
-								language: doc.language || 'plaintext',
-								code: doc.content || '',
-							},
-						]}
-					/>
+					{doc.language === 'markdown' && renderMarkdown ? (
+						<div className="p-6 rounded-2xl bg-(--background)/60 border border-(--border)/10">
+							<Markdown>{doc.content || ''}</Markdown>
+						</div>
+					) : (
+						<CodeBlock
+							tabs={[
+								{
+									id: doc.id,
+									label: `${doc.id}.${HASTE_FILE_EXTENSION_MAP[doc.language] || 'txt'}`,
+									language: doc.language || 'plaintext',
+									code: doc.content || '',
+								},
+							]}
+						/>
+					)}
 				</div>
 			</div>
 

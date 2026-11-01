@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 		const Bot = (models.bots as any).Bot;
 		const Credit = (models.users as any).Credit;
 
-		const bot = await Bot.findOne({ id });
+		const bot = await Bot.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 		if (!bot) {
 			return NextResponse.json({ error: 'Bot not found.' }, { status: 404 });
 		}
@@ -37,10 +37,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 		let isAuthorizedDeveloper = Array.isArray(bot.owners) && bot.owners.includes(userId);
 		if (!isAuthorizedDeveloper && bot.organization) {
 			const Organization = (models.organizations as any)?.Organization;
-			if (Organization) {
-				const org = await Organization.findById(bot.organization).select('ownerId members').lean();
-				if (org && (org.ownerId === userId || (Array.isArray(org.members) && org.members.some((m: any) => m.userId === userId || m === userId)))) {
-					isAuthorizedDeveloper = true;
+			const Member = (models.organizations as any)?.Member;
+			if (Organization && /^[0-9a-fA-F]{24}$/.test(String(bot.organization))) {
+				const org = await Organization.findById(bot.organization).select('owner ownerId members').lean();
+				if (org) {
+					const isOrgOwner = org.owner === userId || org.ownerId === userId;
+					const isOrgMember = Array.isArray(org.members) && org.members.some((m: any) => m?.userId === userId || m === userId);
+					const isMemberDoc = !isOrgOwner && !isOrgMember && Member ? Boolean(await Member.exists({ ownerId: String(org._id), userId })) : false;
+					if (isOrgOwner || isOrgMember || isMemberDoc) {
+						isAuthorizedDeveloper = true;
+					}
 				}
 			}
 		}

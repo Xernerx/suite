@@ -128,7 +128,8 @@
 				"issues": "Issues",
 				"preferences": "Preferences",
 				"bots": "Bots",
-				"servers": "Servers"
+				"servers": "Servers",
+				"organizations": "Organizations"
 			}
 		},
 		"shortcuts": {
@@ -172,6 +173,7 @@
 						"admin": "Admin Panel (Staff)",
 						"bots": "Public Bots",
 						"servers": "Public Servers",
+						"organizations": "Public Organizations",
 						"community": "Issues, Suggestions & Roadmap"
 					},
 					"actions": {
@@ -474,8 +476,37 @@
 				"idPrefix": "ID: {id}",
 				"creditsLabel": "Credits",
 				"dailyStreakLabel": "Daily Streak",
+				"globalLevelLabel": "Global Level",
+				"globalXpLabel": "Global XP",
+				"levelBadge": "Lvl {level} • {xp} XP",
+				"levelShort": "Lvl {level}",
 				"fetchError": "Error: {error}",
 				"loadError": "Failed to load data"
+			},
+			"sortOptions": {
+				"highestLevel": "Sort: Highest Level / XP",
+				"mostCredits": "Sort: Most Credits",
+				"longestStreak": "Sort: Longest Streak"
+			},
+			"actions": {
+				"syncRoles": "Sync Discord Roles",
+				"syncRolesSuccess": "Synced Discord roles across all servers",
+				"syncRolesError": "Failed to sync Discord roles",
+				"sendNotification": "Send Notification",
+				"notifyModalTitle": "Send Direct Notification",
+				"notifyModalDesc": "Dispatch an in-app notification directly to {name}.",
+				"notifyType": "Notification Type",
+				"typeInfo": "Info",
+				"typeSuccess": "Success",
+				"typeWarning": "Warning",
+				"typeError": "Alert / Error",
+				"notifyTitleLabel": "Title",
+				"notifyTitlePlaceholder": "e.g., Account Update or Staff Notice",
+				"notifyMessageLabel": "Message",
+				"notifyMessagePlaceholder": "Write your notification message...",
+				"notifyLinkLabel": "Optional Action URL",
+				"notifySuccess": "Notification sent to user",
+				"notifyError": "Failed to send notification"
 			},
 			"idCopied": "ID copied to clipboard",
 			"emailCopied": "Email copied to clipboard",
@@ -503,7 +534,72 @@
 				"errorToast": "Failed to adjust user credits"
 			},
 			"viewAuditLogs": "View Audit Logs",
-			"privacyLabel": "Privacy"
+			"privacyLabel": "Privacy",
+			"tabs": {
+				"profile": "Profile & Identity",
+				"economy": "Economy, Level & Perks",
+				"assets": "Showcases, Connections & Devices"
+			},
+			"fields": {
+				"verifiedToggle": "Verified User",
+				"verifiedDesc": "Indicates the user has accepted the Terms of Service and Privacy Policy.",
+				"vanityUnlockedToggle": "Vanity URL Unlocked",
+				"vanitySlugLabel": "Vanity URL Slug",
+				"vanitySlugPlaceholder": "custom-slug",
+				"widgetsToggle": "Public Embed Widgets",
+				"iconLabel": "Custom Avatar URL",
+				"iconPlaceholder": "https://...",
+				"emailLabel": "Email Address",
+				"emailPlaceholder": "user@example.com",
+				"pronounsLabel": "Pronouns",
+				"pronounsPlaceholder": "they/them",
+				"genderLabel": "Gender",
+				"genderUnspecified": "Unspecified",
+				"genderMale": "Male",
+				"genderFemale": "Female",
+				"genderOther": "Other",
+				"birthdayLabel": "Birthday",
+				"timezoneLabel": "Timezone",
+				"timezonePlaceholder": "Europe/London",
+				"infoLabel": "Long About Me Bio (Markdown)",
+				"streakShieldsLabel": "Streak Shields (0–3)",
+				"totalSpentLabel": "Total Credits Spent",
+				"referredByLabel": "Referred By (User ID)",
+				"referralBonusClaimedToggle": "Referral Bonus Claimed",
+				"dotMatrixVariantLabel": "Dot-Matrix Banner Formation",
+				"extraSlotsTitle": "Permanent Slot Upgrades",
+				"extraBotSlotsLabel": "Extra Bot / Token Slots",
+				"extraCdnSlotsLabel": "Extra CDN Storage Slots",
+				"extraShowcaseSlotsLabel": "Extra Showcase Slots",
+				"extraVanitySlotsLabel": "Extra Vanity URL Slots",
+				"unlockedBadgesLabel": "Unlocked Vanity Badges",
+				"activeBadgesLabel": "Equipped Vanity Badges",
+				"claimedAchievementsLabel": "Claimed Achievements",
+				"claimedAchievementsPlaceholder": "first_vote, streak_7...",
+				"transactionsTitle": "Recent Credit Transactions",
+				"noTransactions": "No credit transactions recorded.",
+				"showcasesTitle": "Profile Showcases ({count})",
+				"noShowcases": "No profile showcase cards.",
+				"removeShowcase": "Remove Showcase",
+				"connectionsTitle": "Connected Accounts ({count})",
+				"noConnections": "No linked OAuth accounts.",
+				"showOnProfile": "Visible on Profile",
+				"unlinkConnection": "Unlink",
+				"devicesTitle": "Logged-In Devices ({count})",
+				"noDevices": "No device sessions recorded.",
+				"clearAllDevices": "Clear All Devices",
+				"revokeDevice": "Revoke",
+				"agreedTerms": "Terms Accepted",
+				"agreedPrivacy": "Privacy Accepted",
+				"notAccepted": "Not Accepted",
+				"verifiedFilter": "Verified Only",
+				"ownedBotsTitle": "Owned Bots ({count})",
+				"noOwnedBots": "No owned bots.",
+				"ownedServersTitle": "Owned Servers ({count})",
+				"noOwnedServers": "No owned servers.",
+				"organizationsTitle": "Organizations ({count})",
+				"noOrganizations": "No organizations."
+			}
 		},
 		"tokens": {
 			"title": "Tokens",
@@ -783,9 +879,9 @@
 			"auditWebhookUrlDesc": "Forwards security audit logs and administrative actions to your staff Discord channel in real time.",
 			"auditWebhookUrlPlaceholder": "https://discord.com/api/webhooks/...",
 			"issuesWebhookUrl": "Issues & Bug Tracker Webhook URL",
-			"issuesWebhookUrlDesc": "Posts live embeds to your #issues channel whenever bugs are reported, verified (+500 Credits), or resolved.",
+			"issuesWebhookUrlDesc": "Posts live embeds to your #issues channel whenever bugs are reported, verified, or resolved.",
 			"suggestionsWebhookUrl": "Suggestions & Roadmap Webhook URL",
-			"suggestionsWebhookUrlDesc": "Posts live embeds to your #suggestions channel whenever feature ideas are submitted, accepted (+250 Credits), or shipped.",
+			"suggestionsWebhookUrlDesc": "Posts live embeds to your #suggestions channel whenever feature ideas are submitted, accepted, or shipped.",
 			"linkChannelPlaceholder": "Quick-link a Discord channel to auto-generate webhook..."
 		},
 		"support": {
@@ -1238,37 +1334,37 @@
 					"welcomeField1Name": "🚀 Getting Started",
 					"welcomeField1Val": "• Run /sync to synchronize your Xernerx Web Profile roles.\n• Run /faq or /docs to search our knowledge base and API reference.\n• Run /status to inspect live uptime across all suite services.",
 					"welcomeField2Name": "🌐 The Xernerx Web Suite",
-					"welcomeField2Val": "• xernerx.com — Official showcase & Desktop Client\n• app.xernerx.com — Bot & Server Explorer & Developer Portal\n• store.xernerx.com — Subscriptions & Daily Credit Gifts\n• info.xernerx.com — Roadmap, Suggestions, Bug Tracker & FAQ",
+					"welcomeField2Val": "• xernerx.com — Official showcase & Desktop Client\n• app.xernerx.com — Bot & Server Explorer & Dashboard\n• portal.xernerx.com — Developer Portal & Organizations\n• info.xernerx.com — Roadmap, Suggestions, Bug Tracker & FAQ",
 					"welcomeBtnApp": "Open Web App",
 					"welcomeBtnDesktop": "Download Desktop Client",
 					"welcomeBtnInfo": "Support & Info Hub",
-					"supportTitle": "Official Support & Bounties Panel",
-					"supportEmbedTitle": "Xernerx Support, Commands & Credit Bounties",
-					"supportEmbedDesc": "Need assistance or want to help improve the Xernerx Suite? Use our slash commands in the server or earn Credits by reporting verified bugs and accepted suggestions.",
+					"supportTitle": "Official Support & Feedback Panel",
+					"supportEmbedTitle": "Xernerx Support, Commands & Feedback Hub",
+					"supportEmbedDesc": "Need assistance or want to help improve the Xernerx Suite? Use our slash commands in the server, open a support ticket, or submit bug reports and feature suggestions.",
 					"supportField1Name": "⚡ Server Slash Commands",
 					"supportField1Val": "• /faq & /docs — Search FAQs, REST API v1 & SDK docs\n• /status — Live service & bot uptime telemetry\n• /issues & /suggestions — Track bugs & vote on ideas\n• /roadmap & /changelog — Follow upcoming & shipped releases",
-					"supportField2Name": "🪙 Community Credit Bounties",
-					"supportField2Val": "• Verified Bug Report: +500 Credits\n• Accepted Suggestion: +250 Credits",
-					"supportBtnBug": "Report a Bug (+500 Credits)",
-					"supportBtnSuggest": "Suggest Feature (+250 Credits)",
+					"supportField2Name": "🧭 Feedback & Support Hub",
+					"supportField2Val": "• Bug Tracker: info.xernerx.com/bugs\n• Feature Suggestions: info.xernerx.com/suggestions\n• Platform Roadmap: info.xernerx.com/roadmap",
+					"supportBtnBug": "Report a Bug",
+					"supportBtnSuggest": "Suggest a Feature",
 					"supportBtnFaq": "Browse FAQ",
 					"ecosystemTitle": "Official Ecosystem Showcase Panel",
 					"ecosystemEmbedTitle": "Official Xernerx Bots & Developer Ecosystem",
 					"ecosystemEmbedDesc": "Discover our official Discord bots, explore community servers, and build with our open-source TypeScript SDKs.",
 					"ecosystemField1Name": "🤖 Official Bots",
-					"ecosystemField1Val": "• Virtue — Leveling, voice XP, leaderboards & rank cards\n• Zodiac — Daily horoscopes & cosmic compatibility\n• To-Do — Task lists, reminders & productivity\n• Metamorphosis — Dynamic voice channels & automation",
+					"ecosystemField1Val": "• To-Do List (TDL) — Task lists, shared boards, reminders & productivity\n• Virtue — Leveling, voice XP, leaderboards & rank cards\n• Metamorphosis — Real-time multilingual translation & routing\n• Zodiac — Daily horoscopes & cosmic compatibility",
 					"ecosystemField2Name": "🛠️ Developer Platform",
 					"ecosystemField2Val": "Publish bots on app.xernerx.com, stream live metrics with @xernerx/stats, and build with @xernerx/framework.",
 					"ecosystemBtnExplore": "Explore Bots & Servers",
 					"ecosystemBtnPortal": "Developer Portal",
 					"ecosystemBtnDocs": "Developer Docs",
 					"welcomeEmbed2Title": "Explore the Xernerx Ecosystem",
-					"welcomeE2F1Name": "🌐 Web & Desktop App (app.xernerx.com)",
-					"welcomeE2F1Val": "Discover bots & servers, configure Virtue, manage your Developer Portal, or download the Desktop Client with built-in game overlay.",
-					"welcomeE2F2Name": "🧭 Support, Bounties & Roadmap (info.xernerx.com)",
-					"welcomeE2F2Val": "Track upcoming releases, vote on suggestions (+250 Credits when accepted), and report bugs (+500 Credits when verified).",
-					"welcomeE2F3Name": "🪙 Daily Credits & Perks (store.xernerx.com)",
-					"welcomeE2F3Val": "Claim your free Daily Credit Gift on the Web Store to unlock extra CDN slots, Profile Showcases, Vanity URLs, and Spotlight Boosts.",
+					"welcomeE2F1Name": "🤖 Official Flagship Bots",
+					"welcomeE2F1Val": "Supercharge your server with To-Do List (TDL), Virtue, Metamorphosis, and Zodiac — all managed from one unified Xernerx Account.",
+					"welcomeE2F2Name": "🌐 Web & Desktop App (app.xernerx.com)",
+					"welcomeE2F2Val": "Discover bots & servers, configure server modules, manage your Developer Portal, or download the Desktop Client with built-in game overlay.",
+					"welcomeE2F3Name": "🧭 Support, Suggestions & Roadmap (info.xernerx.com)",
+					"welcomeE2F3Val": "Track upcoming releases on our public roadmap, vote on community feature ideas, and report bugs directly to our engineering team.",
 					"welcomeEmbed3Title": "Quick Start & Community Rules",
 					"welcomeE3F1Name": "⚡ Server Slash Commands",
 					"welcomeE3F1Val": "• /sync — Sync your Xernerx web profile roles with Discord\n• /faq & /docs — Instant answers & API documentation\n• /status — Live uptime across all 9 services & official bots",
@@ -1382,7 +1478,8 @@
 				"dynamicForm": "Dynamic Form",
 				"open": "Open",
 				"closed": "Closed",
-				"none": "None"
+				"none": "None",
+				"grantVerified": "Grant Verified User Status & Free Vanity URL on Approval"
 			},
 			"settings": {
 				"joinRolesHumans": "Join Roles (Humans)",
@@ -1525,7 +1622,8 @@
 					"user": "Users",
 					"system": "System",
 					"bot": "Bot",
-					"server": "Server"
+					"server": "Server",
+					"token": "Tokens"
 				},
 				"exportCsv": "Export CSV",
 				"exportJson": "Export JSON",
@@ -1809,6 +1907,22 @@
 			"votesStat": "Votes",
 			"vanitySlugLabel": "Vanity Slug",
 			"ownersLabel": "Owner Discord IDs (comma-separated)",
+			"ownersSelectLabel": "Owners",
+			"selectOwnersPlaceholder": "Select bot owners...",
+			"organizationLabel": "Organization",
+			"noOrganization": "None (Individual Ownership)",
+			"inspectOwner": "Inspect Primary Owner",
+			"tagsLabel": "Directory Tags",
+			"selectTagsPlaceholder": "Select tags...",
+			"promotedUntilLabel": "Promoted Until",
+			"boostedUntilLabel": "Boosted Until",
+			"inviteUrlLabel": "Invite URL",
+			"supportUrlLabel": "Support Server URL",
+			"websiteUrlLabel": "Website URL",
+			"githubUrlLabel": "GitHub Repository URL",
+			"tabs": {
+				"linksAndPromotion": "Links, Tags & Promotion"
+			},
 			"verifiedToggle": "Verified Badge",
 			"vanityUnlockedToggle": "Vanity Unlocked",
 			"widgetsToggle": "Public Widgets",
@@ -1833,6 +1947,7 @@
 			"manageServerDesc": "Edit platform configuration and verification status for {name}.",
 			"membersStat": "Members",
 			"ownerLabel": "Owner Discord ID",
+			"noOwner": "Unassigned Owner",
 			"deleteServer": "Delete Server",
 			"deleteConfirmTitle": "Delete Server Profile",
 			"deleteConfirmDesc": "Are you sure you want to permanently delete {name}? Type the Server ID below to confirm.",
@@ -1843,6 +1958,30 @@
 				"deleteError": "Failed to delete server."
 			},
 			"filterBotActive": "Bot Installed"
+		},
+		"organizations": {
+			"title": "Organizations",
+			"description": "View, verify, configure, and manage all developer and community organizations across the Xernerx ecosystem.",
+			"searchPlaceholder": "Search organizations by name, ID, owner, or vanity slug...",
+			"noOrgsFound": "No organizations found matching your filters.",
+			"fetchError": "Failed to load organizations.",
+			"openProfile": "Open Public Organization Profile",
+			"manageOrg": "Manage Organization",
+			"manageOrgDesc": "Edit platform configuration, membership, and verification status for {name}.",
+			"unnamedOrg": "Unnamed Organization",
+			"treasuryStat": "Treasury",
+			"treasuryLabel": "Treasury Balance (Credits)",
+			"membersLabel": "Organization Members",
+			"selectMembersPlaceholder": "Select organization members...",
+			"deleteOrg": "Delete Organization",
+			"deleteConfirmTitle": "Delete Organization",
+			"deleteConfirmDesc": "Are you sure you want to permanently delete {name}? Type the Organization ID below to confirm.",
+			"toast": {
+				"updateSuccess": "Organization updated successfully!",
+				"updateError": "Failed to update organization.",
+				"deleteSuccess": "Organization deleted successfully.",
+				"deleteError": "Failed to delete organization."
+			}
 		},
 		"virtue": {
 			"title": "Virtue",
@@ -2421,9 +2560,16 @@
 			"searchPlaceholder": "Search tokens by name or ID...",
 			"filterAll": "All",
 			"filterActive": "Active",
+			"filterPending": "Pending",
 			"filterInactive": "Inactive",
+			"unboundBadge": "Unbound",
 			"copyId": "Copy Token ID",
 			"idCopied": "Token ID copied to clipboard",
+			"totalRequestsPill": "{count} Total Requests",
+			"sortMostRequests": "Most Requests",
+			"sortRecentlyUsed": "Recently Used",
+			"sortName": "Name (A–Z)",
+			"openInPortal": "Portal",
 			"noMatchingTokens": "No tokens match your filter.",
 			"empty": {
 				"title": "No tokens found",
@@ -2688,6 +2834,11 @@
 				"private": "Private"
 			},
 			"allFolders": "All Folders",
+			"totalSize": "{size} Total",
+			"sortNewest": "Newest First",
+			"sortOldest": "Oldest First",
+			"sortLargest": "Largest Size",
+			"sortName": "Filename (A–Z)",
 			"folderLabel": "Folder",
 			"tagsLabel": "Tags (comma-separated)",
 			"tagsPlaceholder": "avatar, banner, branding...",
@@ -2818,7 +2969,14 @@
 					"title": "Credit Balance & Transaction Ledger",
 					"shieldsActive": "{count} / 3 Streak Shields Active",
 					"empty": "No credit transactions recorded yet. Claim your daily gift or redeem a perk to see your history here.",
-					"defaultItem": "Credit Transaction"
+					"defaultItem": "Credit Transaction",
+					"filterAll": "All",
+					"filterEarned": "Earned",
+					"filterSpent": "Spent",
+					"showAll": "Show All ({count})",
+					"showLess": "Show Less",
+					"exportCsv": "Export CSV",
+					"exportedToast": "Credit ledger exported to CSV"
 				}
 			},
 			"tabs": {
@@ -2877,8 +3035,13 @@
 				"all": "All",
 				"applications": "Applications",
 				"issues": "Bug Reports",
-				"suggestions": "Suggestions"
+				"suggestions": "Suggestions",
+				"reviews": "Reviews"
 			},
+			"botReview": "Bot Review",
+			"serverReview": "Server Review",
+			"viewTarget": "View Profile",
+			"noReviewComment": "Rated {rating}/5 stars",
 			"notePrefix": "Note: {note}",
 			"submittedResponses": "Submitted Responses",
 			"reviewerNote": "Reviewer Note",
@@ -3136,9 +3299,9 @@
 			"faq": {
 				"subtitle": "Direct answers about the Xernerx Studios ecosystem, Discord bots, open-source SDKs, and unified dashboard.",
 				"q1": "What is Xernerx Studios and how does the Xernerx Suite work?",
-				"a1": "Xernerx Studios is a software studio that builds Discord bots, open-source TypeScript frameworks, and the Xernerx Suite. With 1 Account, 1 Place, 1 Setup, you sign in once to configure Virtue, Metamorphosis, and Zodiac or manage your own developer bots.",
+				"a1": "Xernerx Studios is a software studio that builds Discord bots, open-source TypeScript frameworks, and the Xernerx Suite. With 1 Account, 1 Place, 1 Setup, you sign in once to configure To-Do List (TDL), Virtue, Metamorphosis, and Zodiac or manage your own developer bots.",
 				"q2": "Which Discord bots are built and maintained by Xernerx Studios?",
-				"a2": "We build and operate four official Discord bots: Virtue for text and voice XP leveling, Metamorphosis for real-time multilingual translation, Zodiac for astrology and horoscopes, and To-Do List Bot for server productivity.",
+				"a2": "We build and operate four official Discord bots: To-Do List Bot (TDL) for server productivity and checklists, Virtue for text and voice XP leveling, Metamorphosis for real-time multilingual translation, and Zodiac for astrology and horoscopes.",
 				"q3": "Can developers publish and track their own Discord bots on Xernerx?",
 				"a3": "Yes. Developers can use @xernerx/framework, @xernerx/stats, and our public v1 REST API to push live server and shard telemetry, sync slash commands, and list their bots in our public explorer.",
 				"q4": "Is the Xernerx Suite free to use for Discord communities?",
@@ -3168,6 +3331,11 @@
 			"benefits": "Benefits",
 			"loginApply": "Log in to Apply",
 			"applyNow": "Apply Now",
+			"searchPlaceholder": "Search open roles or departments...",
+			"questionsCount": "{count} Questions",
+			"trackSubmittedTitle": "Already submitted an application?",
+			"trackSubmittedDesc": "Review your submitted responses, status updates, and reviewer notes in your Account Activity hub.",
+			"viewMyApplications": "View My Applications",
 			"errorLoadApp": "Failed to load application",
 			"mustLogin": "You must be logged in to apply.",
 			"submissionFailed": "Submission failed",
@@ -3280,7 +3448,7 @@
 		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
-			"description": "Xernerx Studios is a development studio dedicated to empowering developers and connecting communities through consumer and developer simplicity. We build Discord bots that power thousands of communities—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—alongside reliable open-source frameworks and SDKs (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
+			"description": "Xernerx Studios is a development studio dedicated to empowering developers and connecting communities through consumer and developer simplicity. We build Discord bots that power thousands of communities—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—alongside reliable open-source frameworks and SDKs (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
 			"buttons": {
 				"explore": "Explore Services",
 				"software": "View Software"
@@ -3308,13 +3476,13 @@
 		},
 		"about": {
 			"title": "About Xernerx",
-			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity—empowering developers and connecting communities worldwide. Across our in-house Discord bots—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—our open-source developer frameworks and SDKs, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
-			"description2": "At the core of our ecosystem is 1 Account, 1 Place, 1 Setup: one Xernerx Account used across everything Xernerx—whether you are configuring Virtue, Metamorphosis, or Zodiac for your server, discovering new communities, or using our Developer Portal and frameworks to track bot stats, publicly list your bots, and promote them.",
+			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity—empowering developers and connecting communities worldwide. Across our in-house Discord bots—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—our open-source developer frameworks and SDKs, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
+			"description2": "At the core of our ecosystem is 1 Account, 1 Place, 1 Setup: one Xernerx Account used across everything Xernerx—whether you are configuring To-Do List, Virtue, Metamorphosis, or Zodiac for your server, discovering new communities, or using our Developer Portal and frameworks to track bot stats, publicly list your bots, and promote them.",
 			"watermark": "ABOUT US",
 			"pillars": {
 				"communities": {
 					"title": "Discord Bots & Community Services",
-					"description": "We build and maintain dedicated Discord bots for communities worldwide—including text & voice XP leveling with Virtue, multilingual translation with Metamorphosis, astrology with Zodiac, and productivity with To-Do List Bot."
+					"description": "We build and maintain dedicated Discord bots for communities worldwide—including productivity with To-Do List Bot, text & voice XP leveling with Virtue, multilingual translation with Metamorphosis, and astrology with Zodiac."
 				},
 				"frameworks": {
 					"title": "Open-Source Frameworks & Tooling",
@@ -3326,7 +3494,7 @@
 				},
 				"identity": {
 					"title": "1 Account, 1 Place, 1 Setup",
-					"description": "Your single Xernerx Account connects you across the Xernerx Suite, Virtue, Metamorphosis, and Zodiac. Your identity, custom themes, preferences, and server setups stay unified everywhere."
+					"description": "Your single Xernerx Account connects you across the Xernerx Suite, To-Do List, Virtue, Metamorphosis, and Zodiac. Your identity, custom themes, preferences, and server setups stay unified everywhere."
 				}
 			}
 		},
@@ -3342,7 +3510,7 @@
 			},
 			"consumer": {
 				"title": "Consumer Services",
-				"description": "1 Account, 1 Place, 1 Setup. Sign in once with your Xernerx Account to configure our Discord services—Virtue, Metamorphosis, and Zodiac (plus To-Do List Bot)—discover verified bots and servers, and manage everything from one simple dashboard."
+				"description": "1 Account, 1 Place, 1 Setup. Sign in once with your Xernerx Account to configure our Discord services—To-Do List, Virtue, Metamorphosis, and Zodiac—discover verified bots and servers, and manage everything from one simple dashboard."
 			},
 			"developer": {
 				"title": "Developer Software",
@@ -3352,7 +3520,7 @@
 		"services": {
 			"dashboard": {
 				"title": "Xernerx Suite & Dashboard",
-				"desc": "1 place for bot setup, server management, and bot discovery. Configure Virtue, Metamorphosis, and Zodiac, explore public bots and servers, or track stats, list, and promote your own bots in the Developer Portal."
+				"desc": "1 place for bot setup, server management, and bot discovery. Configure To-Do List, Virtue, Metamorphosis, and Zodiac, explore public bots and servers, or track stats, list, and promote your own bots in the Developer Portal."
 			}
 		},
 		"packages": {
@@ -3864,7 +4032,7 @@
 		"features": {
 			"scale": {
 				"title": "1 Account, 1 Place, 1 Setup",
-				"description": "One Xernerx Account works across our entire studio ecosystem—whether you are using the Xernerx Suite, configuring Virtue, Metamorphosis, or Zodiac, or discovering new bots and servers."
+				"description": "One Xernerx Account works across our entire studio ecosystem—whether you are using the Xernerx Suite, configuring To-Do List, Virtue, Metamorphosis, or Zodiac, or discovering new bots and servers."
 			},
 			"opensource": {
 				"title": "Open-Source Heart",
@@ -3990,7 +4158,7 @@
 				"20": {
 					"date": "DYNAMIC_DATE",
 					"title": "Today",
-					"description": "You're all caught up! Today Xernerx Studios unites our Discord bots—Virtue, Metamorphosis, Zodiac, and To-Do List Bot—our open-source frameworks, and the Xernerx Suite under 1 Account, 1 Place, 1 Setup."
+					"description": "You're all caught up! Today Xernerx Studios unites our Discord bots—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—our open-source frameworks, and the Xernerx Suite under 1 Account, 1 Place, 1 Setup."
 				}
 			}
 		},
@@ -4022,10 +4190,10 @@
 				"subtitle": "Common questions about inviting and configuring official Xernerx Discord bots in your server.",
 				"q1": "What Discord permissions do I need to invite a Xernerx bot to my server?",
 				"a1": "You need the Manage Server (or Administrator) permission in the target Discord server to authorize an official bot invite through Discord's OAuth2 flow.",
-				"q2": "How do I configure Virtue, Metamorphosis, or Zodiac after inviting them?",
+				"q2": "How do I configure To-Do List, Virtue, Metamorphosis, or Zodiac after inviting them?",
 				"a2": "As soon as the bot joins your server, open app.xernerx.com and select your server from the dashboard to configure XP curves, level roles, translation channels, and module toggles in real time.",
 				"q3": "Are all official Xernerx Studios Discord bots verified by Discord?",
-				"a3": "Yes. Virtue, Metamorphosis, Zodiac, and To-Do List Bot are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes."
+				"a3": "Yes. To-Do List Bot, Virtue, Metamorphosis, and Zodiac are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes."
 			}
 		},
 		"changelog": {
@@ -4043,7 +4211,13 @@
 			"searchPlaceholder": "Search release notes or version (e.g. '1.3.4')...",
 			"jumpToVersion": "Releases:",
 			"noMatchingVersions": "No release notes match \"{query}\".",
-			"rssFeed": "RSS Feed"
+			"rssFeed": "RSS Feed",
+			"latestVersionBadge": "Latest: v{version}",
+			"kpi": {
+				"appsTracked": "Web Applications",
+				"packagesTracked": "SDK Packages",
+				"releasesInFeed": "Releases in Feed"
+			}
 		},
 		"software": {
 			"apiDesc": "Public v1 JSON REST API and embeddable widgets for Discord bot developers—automate server/member/shard statistics, sync slash commands, and publish release notes using your scoped Bearer token.",
@@ -4069,7 +4243,7 @@
 		},
 		"cta": {
 			"title": "1 Account. 1 Place. 1 Setup.",
-			"description": "Sign in once with your Xernerx Account to configure Virtue, Metamorphosis, and Zodiac in one dashboard, discover Discord bots and servers, or track stats, publicly list, and promote your own bots.",
+			"description": "Sign in once with your Xernerx Account to configure To-Do List, Virtue, Metamorphosis, and Zodiac in one dashboard, discover Discord bots and servers, or track stats, publicly list, and promote your own bots.",
 			"dashboard": "Open Dashboard",
 			"download": "Get Desktop App",
 			"docs": "Read Documentation",
@@ -4305,7 +4479,7 @@
 			},
 			"card3": {
 				"title": "Where can I find official pre-configured Discord bot invite links?",
-				"description": "Visit xernerx.com/invites (or use vanity links such as xernerx.com/invite/[slug]) to browse and copy official OAuth2 invite links for verified Xernerx applications—including Virtue, Metamorphosis, Zodiac, and To-Do—pre-configured with the exact Discord permissions each bot requires."
+				"description": "Visit xernerx.com/invites (or use vanity links such as xernerx.com/invite/[slug]) to browse and copy official OAuth2 invite links for verified Xernerx applications—including To-Do List, Virtue, Metamorphosis, and Zodiac—pre-configured with the exact Discord permissions each bot requires."
 			},
 			"card4": {
 				"title": "How do Bot Webhooks, Signing Secrets, and live Test Pings work?",
@@ -4313,7 +4487,7 @@
 			},
 			"card5": {
 				"title": "How do Bot and Server voting, 12-hour cooldowns, and the Ecosystem Leaderboards work?",
-				"description": "Any signed-in user can vote for a public Discord bot (app.xernerx.com/bots/[id]) or server (app.xernerx.com/servers/[id]) once every 12 hours. Every vote immediately records a new point on the historical statistics graph, fires subscribed POST vote webhooks, and rewards the voter with +100 Credits. Visit app.xernerx.com/leaderboard (or /leaderboards) to explore top rankings across three tabs: Top Bots (sorted by Votes, Users, or Servers), Top Servers (sorted by Votes or Members), and Daily Streaks (ranking users by Streak, Credits, Total Community Impact, Bugs reported, and Suggestions submitted)."
+				"description": "Any signed-in user can vote for a public Discord bot (app.xernerx.com/bots/[id]) or server (app.xernerx.com/servers/[id]) once every 12 hours. Every vote immediately records a new point on the historical statistics graph and fires subscribed POST vote webhooks. Visit app.xernerx.com/leaderboard (or /leaderboards) to explore top rankings across three tabs: Top Bots (sorted by Votes, Users, or Servers), Top Servers (sorted by Votes or Members), and Daily Streaks."
 			},
 			"card6": {
 				"title": "How do I manage my Discord server and configure the Virtue progression system?",
@@ -4591,6 +4765,8 @@
 				"text10": "Growth",
 				"text11": "%)",
 				"text12": "Highest:",
+				"timeframePeak": "Window Peak:",
+				"timeframeAvg": "Avg:",
 				"text13": "Parameters",
 				"text14": "Required",
 				"text15": "This bot has not exposed any commands yet.",
@@ -4846,6 +5022,12 @@
 				"virtue": "Virtue"
 			},
 			"botNotConnected": "Bot Not Connected",
+			"botNotConnectedDesc": "Invite Xernerx Bot or Virtue to unlock automated server telemetry, member growth charts, and leveling.",
+			"inviteXernerxBot": "Invite Xernerx Bot",
+			"inviteVirtueBot": "Invite Virtue",
+			"tagsLabel": "Community & Discovery Tags",
+			"tagsDesc": "Add up to 12 tags so users can find your server by topic in the Server Explorer.",
+			"tagsPlaceholder": "Add custom tag and press Enter...",
 			"deleteConfirmDesc": "Are you sure you want to completely delete this guild from the database? This action cannot be undone.",
 			"deleteSuccess": "Server data deleted successfully",
 			"deleteFailed": "Failed to delete server data",
@@ -4877,7 +5059,17 @@
 				"unlockVanityBtn": "Unlock (2,000 Credits)",
 				"redeemVanitySlotBtn": "Redeem Vanity Slot",
 				"vanityUnlockSuccessTitle": "Vanity URL Unlocked!",
-				"vanityUnlockSuccessDesc": "You can now set and customize your permanent Vanity URL slug."
+				"vanityUnlockSuccessDesc": "You can now set and customize your permanent Vanity URL slug.",
+				"copyVanityUrl": "Copy Link",
+				"vanityUrlCopied": "Public vanity URL copied to clipboard!",
+				"openPublicProfile": "Open Public Page",
+				"backupTitle": "Server Profile Backup & Restore",
+				"backupDesc": "Export your server description, extended Markdown info, community tags, external links, and widget preferences as JSON, or restore from a backup.",
+				"exportJson": "Export JSON",
+				"importJson": "Import JSON",
+				"exportSuccess": "Exported server profile configuration JSON!",
+				"importSuccess": "Applied imported server profile settings! Click Save Changes to persist.",
+				"importError": "Invalid server profile JSON file."
 			},
 			"stats": {
 				"boosts": "Boosts",
@@ -5023,13 +5215,13 @@
 			},
 			"home": {
 				"guideTitle": "Why Communities & Developers Choose Xernerx App",
-				"guideIntro": "Xernerx App (app.xernerx.com) is the central Discord bot list, public server explorer, and unified configuration dashboard built by Xernerx Studios. Sign in once with your Xernerx Account to discover verified bots, join active servers, or configure Virtue, Metamorphosis, and Zodiac in one place. Our platform combines transparent rankings, live telemetry, and SEO, branding, and audit insights across a growing portfolio of community cases, reviews, and projects.",
+				"guideIntro": "Xernerx App (app.xernerx.com) is the central Discord bot list, public server explorer, and unified configuration dashboard built by Xernerx Studios. Sign in once with your Xernerx Account to discover verified bots, join active servers, or configure To-Do List, Virtue, Metamorphosis, and Zodiac in one place. Our platform combines transparent rankings, live telemetry, and SEO, branding, and audit insights across a growing portfolio of community cases, reviews, and projects.",
 				"guideBody": "Whether you manage a growing gaming community or develop custom Discord bots with @xernerx/framework and @xernerx/stats, every tool is designed for speed and simplicity. You can compare bot features, inspect 30-day server growth charts, read verified community reviews, and manage 3-tier privacy settings (public, limited, or private) across every region. Our team provides dedicated support via Discord and email so server owners and developers always have clear answers.",
 				"pillars": {
 					"p1Title": "Verified Bot & Server Discovery",
 					"p1Desc": "Browse promoted, top-voted, biggest, and newcomer Discord bots and servers. Filter by category tags, compare live guild and member counts, and read authentic community reviews before inviting a bot or joining a server.",
 					"p2Title": "1 Account, 1 Place, 1 Setup Dashboard",
-					"p2Desc": "Configure Virtue text and voice XP leveling, Metamorphosis real-time translation, and Zodiac astrology modules directly from your browser or the Xernerx Desktop App without juggling separate dashboards.",
+					"p2Desc": "Configure To-Do List productivity boards, Virtue text and voice XP leveling, Metamorphosis real-time translation, and Zodiac astrology modules directly from your browser or the Xernerx Desktop App without juggling separate dashboards.",
 					"p3Title": "Live Telemetry, Badges & Spotlight Boosts",
 					"p3Desc": "Track real-time server, member, and shard metrics, embed dynamic SVG status badges, and use Spotlight Boosts or Developer Portal webhooks to grow your community visibility."
 				},
@@ -5040,9 +5232,9 @@
 					"q2": "How do I list my Discord server or bot on app.xernerx.com?",
 					"a2": "Sign in with your Xernerx Account, open the Server Dashboard for communities or the Developer Portal for bots, and set your visibility tier to Public. Your listing will appear in search results and category feeds immediately.",
 					"q3": "Which official Discord bots can I configure in the Xernerx Dashboard?",
-					"a3": "You can configure Virtue for text and voice XP leveling and role rewards, Metamorphosis for automated multilingual channel translation, and Zodiac for daily horoscopes and natal chart utilities.",
+					"a3": "You can configure To-Do List for productivity and checklists, Virtue for text and voice XP leveling and role rewards, Metamorphosis for automated multilingual channel translation, and Zodiac for daily horoscopes and natal chart utilities.",
 					"q4": "Is browsing, voting, and managing servers on Xernerx App free?",
-					"a4": "Yes. Discovering bots and servers, voting daily, claiming mystery gift streaks, and managing standard server settings are completely free, with optional Ultra and Bot Passes available in the Store."
+					"a4": "Yes. Discovering bots and servers, voting, and managing standard server settings are completely free, with optional Ultra and Bot Passes available in the Store."
 				}
 			},
 			"leaderboard": {
@@ -5263,6 +5455,9 @@
 				"inviteButton": "Invite",
 				"inviteHelp": "They will receive an invitation to join this organization.",
 				"noRole": "No Role",
+				"searchPlaceholder": "Search members by name or Discord ID...",
+				"allRoles": "All Roles",
+				"noMatchingMembers": "No members match your filter.",
 				"removeModal": {
 					"cancel": "Cancel",
 					"confirm": "Remove Member",
@@ -5285,6 +5480,12 @@
 			"bots": {
 				"header": "Organization Bots",
 				"noBots": "No bots registered to this organization.",
+				"linkBotLabel": "Link a Personal Bot",
+				"linkBotPlaceholder": "Select one of your bots to assign to this organization...",
+				"linkBotButton": "Link Bot",
+				"unlinkBot": "Move to Personal",
+				"linkedToast": "Bot linked to organization!",
+				"unlinkedToast": "Bot moved back to personal workspace.",
 				"commands": {
 					"addCommand": "Add Command",
 					"commandNumber": "Command #{number}",
@@ -5327,7 +5528,13 @@
 				"transferFirst": "Transfer a server to this organization first via the Server Dashboard.",
 				"linkedServers": "Linked Servers",
 				"transferred": "Servers transferred to this organization.",
-				"noServers": "No servers transferred to this organization yet."
+				"noServers": "No servers transferred to this organization yet.",
+				"linkServerLabel": "Link a Managed Discord Server",
+				"linkServerPlaceholder": "Select a server you manage to assign to this organization...",
+				"linkServerButton": "Link Server",
+				"unlinkServer": "Unlink",
+				"linkedToast": "Server linked to organization!",
+				"unlinkedToast": "Server unlinked from organization."
 			},
 			"links": {
 				"header": "Organization Links",
@@ -5425,6 +5632,10 @@
 					"public": "Public",
 					"private": "Private",
 					"limited": "Limited",
+					"ownersHeader": "Bot Owners & Co-Owners",
+					"ownersDesc": "Add or manage Discord users who have full developer access to manage this bot in the Developer Portal.",
+					"ownersPlaceholder": "Select or search user by Discord ID...",
+					"minOneOwnerToast": "A bot must have at least one owner.",
 					"transferHeader": "Transfer Organization",
 					"transferDesc": "Move this application to a different organization you manage.",
 					"noOrg": "Personal (No Organization)",
@@ -5478,13 +5689,25 @@
 						"responseSnippet": "Response Snippet (First 200 chars)",
 						"emptyResponse": "No response body returned.",
 						"replaySuccess": "Webhook replayed ({status} in {latency}ms)",
-						"replayFailed": "Replay failed: {error}"
+						"replayFailed": "Replay failed: {error}",
+						"filterAll": "All ({count})",
+						"filterOk": "2xx OK ({count})",
+						"filterFailed": "Failed ({count})",
+						"successRate": "{rate}% Success",
+						"copyPayload": "Copy JSON",
+						"payloadCopied": "Webhook payload copied to clipboard"
 					},
 					"deleteConfirmTitle": "Remove Webhook",
 					"deleteConfirmDesc": "Are you sure you want to remove Webhook #{number}?",
 					"secretLabel": "Signing Secret",
 					"secretPlaceholder": "whsec_...",
 					"showSecret": "Reveal Secret",
+					"selectAllEvents": "Select All",
+					"clearAllEvents": "Clear All",
+					"verifySignatureTitle": "Verify X-Xernerx-Signature (HMAC-SHA256)",
+					"verifySignatureDesc": "Every outbound webhook request includes an X-Xernerx-Signature header signed with your webhook's secret.",
+					"copySnippet": "Copy Verification Snippet",
+					"snippetCopied": "Verification snippet copied to clipboard!",
 					"hideSecret": "Hide Secret",
 					"generateSecret": "Roll Secret",
 					"copySecret": "Copy Secret",
@@ -5500,10 +5723,15 @@
 						"votes": "Votes"
 					},
 					"last30Days": "30d delta",
+					"lastNDays": "{days}d delta",
+					"rangeDays": "{days}D",
 					"chartTitle": "30-Day {metric} Telemetry",
+					"chartTitleNDays": "{days}-Day {metric} Telemetry",
 					"chartSubtitle": "Hover over any data point to inspect historical snapshots.",
 					"areaMode": "Area",
-					"barMode": "Bar"
+					"barMode": "Bar",
+					"exportCsv": "Export CSV",
+					"exportedToast": "Growth telemetry exported to CSV"
 				},
 				"vanity": {
 					"title": "Custom Vanity URL Slug",
@@ -5572,7 +5800,25 @@
 			"workspace": {
 				"id": "ID: {id}",
 				"viewPublicProfile": "View Public Profile",
-				"idCopied": "ID copied to clipboard"
+				"idCopied": "ID copied to clipboard",
+				"kpiBots": "Published Bots",
+				"kpiBotsSub": "{count} personal • {orgCount} in orgs",
+				"kpiServersReached": "Total Servers Reached",
+				"kpiServersReachedSub": "Across all your bots",
+				"kpiUsersReached": "Total Users Reached",
+				"kpiUsersReachedSub": "Combined community reach",
+				"kpiVotes": "Combined Votes",
+				"kpiVotesSub": "{count} managed servers",
+				"quickActionsTitle": "Developer Quick Actions",
+				"createOrgBtn": "New Organization",
+				"manageTokensBtn": "API Tokens",
+				"openDocsBtn": "API & SDK Docs",
+				"openDashboardBtn": "Server Dashboard",
+				"managedServersTitle": "Managed Discord Servers",
+				"managedServersSubtitle": "Servers where you hold Administrator or Manage Server permissions.",
+				"noManagedServers": "No managed Discord servers found on your account.",
+				"manageInDashboard": "Configure",
+				"viewServerListing": "Public Page"
 			},
 			"treasury": {
 				"title": "Shared Organization Credit Treasury",
@@ -5680,6 +5926,14 @@
 			"notFoundTitle": "Organization Not Found",
 			"profile": {
 				"estNetworkValue": "Est. Network Value",
+				"combinedVotes": "Combined Votes",
+				"publishedAssets": "Published Assets",
+				"verifiedOrg": "Verified Organization",
+				"recentActivityTitle": "Recent Releases & Milestones",
+				"recentActivitySubtitle": "Latest version updates and community milestones across this organization's bots.",
+				"noRecentActivity": "No release notes or milestones published yet.",
+				"releaseBadge": "Release {version}",
+				"milestoneUnlocked": "{count} Servers Milestone",
 				"members": "Members",
 				"noDetails": "This organization has not provided a detailed description yet.",
 				"noMembers": "No member profiles available.",
@@ -5723,6 +5977,16 @@
 				"days": "{count} days",
 				"totalServers": "Bot Servers",
 				"totalUsers": "Bot Users",
+				"kpi": {
+					"globalLevel": "Global Level",
+					"xpProgress": "{xp} XP Earned",
+					"dailyStreak": "Daily Streak",
+					"streakActive": "Active Credit Streak",
+					"publishedAssets": "Ecosystem Assets",
+					"botsAndServersSub": "{bots} Bots · {servers} Servers",
+					"communityReach": "Community Reach",
+					"orgsAndReachSub": "{orgs} Orgs · {connections} Connections"
+				},
 				"badges": {
 					"botDeveloper": "Bot Developer",
 					"bugHunter": "Bug Hunter",
@@ -5800,6 +6064,33 @@
 					"deleted": "Server review deleted",
 					"responseAdded": "Official reply published"
 				}
+			},
+			"overview": {
+				"kpiMembers": "Total Members",
+				"kpiMembersSub": "Community size",
+				"kpiMessages": "Messages Logged",
+				"kpiMessagesSub": "Tracked activity",
+				"kpiVotes": "Community Votes",
+				"kpiVotesSub": "12h vote cooldown",
+				"kpiRating": "Community Rating",
+				"reviewsCount": "{count} reviews",
+				"noRatingsYet": "No ratings yet",
+				"podiumTitle": "Top Active Members",
+				"podiumSubtitle": "Highest ranked community members on the Virtue XP leaderboard.",
+				"viewFullLeaderboard": "Full Leaderboard",
+				"recentReviewsTitle": "Recent Community Reviews",
+				"recentReviewsSubtitle": "What members are saying about this server.",
+				"viewAllReviews": "All Reviews ({count})",
+				"writeFirstReview": "Write a Review",
+				"vitalsTitle": "Server Vitals",
+				"verifiedServer": "Verified Community",
+				"standardServer": "Standard Listing",
+				"privacyTier": "Visibility Tier",
+				"tagsHeading": "Community Tags",
+				"linksHeading": "Official Links",
+				"discoverSimilarTitle": "Discover More Communities",
+				"discoverSimilarSubtitle": "Other active public Discord servers on Xernerx.",
+				"exploreAllServers": "Explore All Servers"
 			}
 		},
 		"supporters": {
@@ -5871,7 +6162,12 @@
 				"suggestions": "Ideas"
 			},
 			"sortBy": "Sort by",
-			"searchPlaceholder": "Search leaderboard..."
+			"searchPlaceholder": "Search leaderboard...",
+			"myStandingTitle": "Your Current Standing",
+			"rankedNumber": "Ranked #{rank}",
+			"unrankedInTop": "Outside Top {count} (or Profile Unlisted)",
+			"viewMyProfile": "My Profile",
+			"claimDailyGift": "Daily Gift"
 		},
 		"overlay": {
 			"title": "Xernerx Live Monitor",
@@ -5886,6 +6182,10 @@
 				"quick": "Quick Actions"
 			},
 			"emptyFeed": "No recent events or notifications.",
+			"noUnreadFeed": "You're all caught up! No unread notifications.",
+			"filterAll": "All",
+			"filterUnread": "Unread ({count})",
+			"markAllRead": "Mark All Read",
 			"openInMain": "Open in Main Window",
 			"ghostToggle": "Click-Through Mode",
 			"ghostActive": "Click-Through Active",
@@ -6011,6 +6311,10 @@
 			"dropzoneHint": "Drop a file here, paste from clipboard (Ctrl + V), or click to upload",
 			"uploadedSuccess": "File uploaded to CDN!",
 			"urlCopied": "CDN link copied to clipboard",
+			"privacyLabel": "Asset Visibility",
+			"privacyPublic": "Public (CDN Cached)",
+			"privacyLimited": "Limited (Direct Link)",
+			"privacyPrivate": "Private (Owner Only)",
 			"errors": {
 				"uploadFailed": "Upload failed. Ensure you are logged in and have permission.",
 				"generic": "Failed to upload file"
@@ -6019,6 +6323,9 @@
 		"view": {
 			"actions": {
 				"copyDirectLink": "Copy Direct Link",
+				"copyMarkdown": "Copy Markdown",
+				"markdownCopied": "Markdown embed copied to clipboard",
+				"linkCopied": "Direct raw URL copied to clipboard",
 				"openOriginal": "Open Original",
 				"download": "Download"
 			},
@@ -6075,6 +6382,9 @@
 				"modularBadge": "Modular Package",
 				"bundlesLabel": "Bundles & re-exports:",
 				"changelogBadge": "Changelog",
+				"copyImport": "Copy Import",
+				"importCopied": "Copied import statement to clipboard!",
+				"viewOnNpm": "NPM",
 				"overview": {
 					"title": "Available Packages",
 					"description": "Select the all-in-one xernerx SDK or any modular @xernerx/* package below to view its comprehensive API documentation, types, and changelog.",
@@ -6752,7 +7062,11 @@
 				"responseTab": "Response Payload",
 				"requestTab": "Request Frame",
 				"helperNote": "If a local WebSocket daemon is not running or no token is supplied, the playground automatically falls back to a deterministic schema simulation.",
-				"invalidJson": "Invalid JSON in request body."
+				"invalidJson": "Invalid JSON in request body.",
+				"formatJson": "Format JSON",
+				"copyWscat": "Copy wscat CLI",
+				"wscatCopied": "wscat command copied to clipboard",
+				"recentDispatches": "Recent Dispatches"
 			}
 		}
 	},
@@ -6843,7 +7157,22 @@
 			"copyUrl": "Copy URL",
 			"urlCopied": "URL copied to clipboard",
 			"announcementEndsIn": "Ends in {time}",
-			"dismissAnnouncement": "Dismiss announcement"
+			"dismissAnnouncement": "Dismiss announcement",
+			"omnibar": {
+				"placeholder": "/path or search bots, servers, orgs...",
+				"routesHeading": "Subdomain Routes ({app})",
+				"liveResultsHeading": "Live Directory Matches",
+				"quickActionsHeading": "Quick Actions",
+				"badgeBot": "Bot",
+				"badgeServer": "Server",
+				"badgeOrg": "Org",
+				"badgeRoute": "Route",
+				"actionNewPaste": "New Haste Paste",
+				"actionCopyDiscordId": "Copy My Discord ID",
+				"actionToggleTheme": "Toggle Light / Dark Theme",
+				"actionDailyCredits": "Claim Daily Credits in Store",
+				"discordIdCopied": "Discord ID copied to clipboard"
+			}
 		},
 		"page": {},
 		"sidebar": {
@@ -7008,6 +7337,7 @@
 			"searchPlaceholder": "Search roadmap milestones and known issues...",
 			"allProducts": "All Products",
 			"allStatuses": "All Statuses",
+			"currentQuarterFilter": "Current Quarter ({quarter})",
 			"noMatchingItems": "No roadmap milestones match your current filters.",
 			"metrics": {
 				"avgResolutionTime": "Avg Issue Resolution Time",
@@ -7052,6 +7382,18 @@
 				"newest": "Newest",
 				"mine": "Upvoted by Me"
 			},
+			"filters": {
+				"all": "All Statuses",
+				"open": "Under Review",
+				"planned": "Planned",
+				"implemented": "Implemented"
+			},
+			"kpi": {
+				"total": "Total Ideas",
+				"planned": "Planned / Active",
+				"implemented": "Implemented",
+				"myUpvotes": "My Upvotes"
+			},
 			"newSuggestion": "New Suggestion",
 			"titlePlaceholder": "Title",
 			"descriptionPlaceholder": "Description",
@@ -7085,7 +7427,14 @@
 				"all": "All Open",
 				"verified": "Verified",
 				"submitted": "Unverified",
-				"release": "Pending Release"
+				"release": "Pending Release",
+				"mine": "My Reports"
+			},
+			"kpi": {
+				"openIssues": "Open Issues",
+				"verified": "Verified by Team",
+				"pendingRelease": "Queued for Release",
+				"myReports": "My Reports"
 			},
 			"dropzone": {
 				"prompt": "Drop a screenshot or log file here, paste from clipboard (Ctrl + V), or click to browse",
@@ -7177,6 +7526,12 @@
 			},
 			"botsHeading": "Official Bots",
 			"botsOnlineCount": "{online}/{total} Online",
+			"kpi": {
+				"operationalServices": "Operational Services",
+				"officialBotsOnline": "Official Bots Online",
+				"avgLatency": "Avg Suite Latency",
+				"uptimeSla24h": "24h Uptime SLA"
+			},
 			"botStates": {
 				"online": "Online",
 				"idle": "Idle",
@@ -7348,9 +7703,13 @@
 			"publish": "Save & Publish",
 			"publishing": "Publishing...",
 			"clear": "Clear",
+			"importFile": "Import File",
 			"open": "Open",
 			"copyCode": "Copy Code",
 			"copyLink": "Copy Link",
+			"copyRawUrl": "Copy Raw URL",
+			"previewMarkdown": "Rendered Preview",
+			"viewRawSource": "Source Code",
 			"raw": "Raw",
 			"download": "Download",
 			"fork": "Fork",
@@ -7398,6 +7757,9 @@
 			"updatedDescription": "Paste privacy and expiration settings have been saved.",
 			"deletedTitle": "Haste Deleted",
 			"deletedDescription": "The paste has been permanently removed.",
+			"fileImportedTitle": "File Imported",
+			"fileImportedDescription": "Loaded {name} ({language}) into the editor.",
+			"copiedRawUrlDescription": "Raw stream URL copied to clipboard.",
 			"copiedTitle": "Copied to Clipboard",
 			"copiedCodeDescription": "Paste contents copied to your clipboard.",
 			"copiedLinkDescription": "Shareable Haste URL copied to your clipboard.",

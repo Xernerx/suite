@@ -3,9 +3,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import React from 'react';
 import { sendMail, BasicTemplate } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function POST(req: NextRequest) {
 	try {
+		const caller = await resolveCallerAuth(req);
+		if (!caller.isStaff && !caller.isSystemToken) {
+			return NextResponse.json({ error: 'Forbidden: Staff or system token required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json();
 		const { to, subject, templateId, data } = body;
 

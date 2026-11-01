@@ -2,9 +2,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing manageStore permission.' }, { status: 403 });
+		}
+
 		const itemId = (await params).id;
 		const body = await req.json();
 
@@ -53,6 +59,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 		await item.save();
 
+		await recordAuditLog(req, {
+			action: 'store.item.updated',
+			targetType: 'setting',
+			targetId: itemId,
+			summary: `Updated store item "${item.name}"`,
+			metadata: { categoryId: item.categoryId, itemType: item.itemType, enabled: item.enabled },
+		});
+
 		return NextResponse.json(item);
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message }, { status: 500 });
@@ -61,6 +75,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing manageStore permission.' }, { status: 403 });
+		}
+
 		const itemId = (await params).id;
 		const { models } = await database('xernerx');
 		const Item = models.store.Item as any;
@@ -69,6 +88,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 		if (!deleted) {
 			return NextResponse.json({ error: 'Item not found' }, { status: 404 });
 		}
+
+		await recordAuditLog(req, {
+			action: 'store.item.deleted',
+			targetType: 'setting',
+			targetId: itemId,
+			summary: `Deleted store item "${deleted.name || itemId}"`,
+		});
 
 		return NextResponse.json({ success: true, id: itemId });
 	} catch (err: any) {

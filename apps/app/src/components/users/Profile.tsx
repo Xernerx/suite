@@ -21,8 +21,10 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 
-	const totalServers = bots.reduce((acc, bot) => acc + (bot.stats?.guildCount || 0), 0);
-	const totalUsers = bots.reduce((acc, bot) => acc + (bot.stats?.userCount || 0), 0);
+	const totalServers = bots.reduce((acc, bot) => acc + (bot.guildCount ?? bot.stats?.guildCount ?? bot.latestStat?.guildCount ?? 0), 0);
+	const totalUsers = bots.reduce((acc, bot) => acc + (bot.userCount ?? bot.stats?.userCount ?? bot.latestStat?.userCount ?? 0), 0);
+	const totalGuildMembers = servers.reduce((acc, srv) => acc + (srv.memberCount || 0), 0);
+	const combinedReach = totalUsers + totalGuildMembers;
 
 	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false && c.provider !== 'easypanel' && c.provider !== 'ssh');
 	const showcases = Array.isArray(user?.showcases) ? user.showcases : [];
@@ -31,6 +33,75 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 	return (
 		<div className="flex flex-col gap-8">
+			{/* Universal 4-Card User KPI Strip */}
+			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+				<div className="bg-(--foreground)/40 border border-(--border)/10 p-5 rounded-3xl flex flex-col justify-between gap-2 backdrop-blur-md shadow-sm">
+					<div className="flex items-center justify-between">
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('app.users.profile.kpi.globalLevel')}</span>
+						<div className="w-8 h-8 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent)">
+							<Award className="w-4 h-4" />
+						</div>
+					</div>
+					<div>
+						<div className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							Lv. {Number(user?.level || 1).toLocaleString()}
+						</div>
+						<div className="text-xs text-(--text-muted) mt-0.5">{t('app.users.profile.kpi.xpProgress', { xp: Number(user?.xp || 0).toLocaleString() })}</div>
+					</div>
+				</div>
+
+				<div className="bg-(--foreground)/40 border border-(--border)/10 p-5 rounded-3xl flex flex-col justify-between gap-2 backdrop-blur-md shadow-sm">
+					<div className="flex items-center justify-between">
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('app.users.profile.kpi.dailyStreak')}</span>
+						<div className="w-8 h-8 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent)">
+							<Flame className="w-4 h-4" />
+						</div>
+					</div>
+					<div>
+						<div className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('app.users.profile.days', { count: Number(user?.credits?.streak || 0).toLocaleString() })}
+						</div>
+						<div className="text-xs text-(--text-muted) mt-0.5">{t('app.users.profile.kpi.streakActive')}</div>
+					</div>
+				</div>
+
+				<div className="bg-(--foreground)/40 border border-(--border)/10 p-5 rounded-3xl flex flex-col justify-between gap-2 backdrop-blur-md shadow-sm">
+					<div className="flex items-center justify-between">
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('app.users.profile.kpi.publishedAssets')}</span>
+						<div className="w-8 h-8 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent)">
+							<Server className="w-4 h-4" />
+						</div>
+					</div>
+					<div>
+						<div className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{(bots.length + servers.length).toLocaleString()}
+						</div>
+						<div className="text-xs text-(--text-muted) mt-0.5">{t('app.users.profile.kpi.botsAndServersSub', { bots: bots.length, servers: servers.length })}</div>
+					</div>
+				</div>
+
+				<div className="bg-(--foreground)/40 border border-(--border)/10 p-5 rounded-3xl flex flex-col justify-between gap-2 backdrop-blur-md shadow-sm">
+					<div className="flex items-center justify-between">
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">
+							{bots.length > 0 ? t('app.users.profile.totalServers') : t('app.users.profile.kpi.communityReach')}
+						</span>
+						<div className="w-8 h-8 rounded-2xl bg-(--accent)/15 border border-(--accent)/25 flex items-center justify-center text-(--accent)">
+							<Users className="w-4 h-4" />
+						</div>
+					</div>
+					<div>
+						<div className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{bots.length > 0 ? totalServers.toLocaleString() : combinedReach > 0 ? combinedReach.toLocaleString() : (organizations.length + publicConnections.length).toLocaleString()}
+						</div>
+						<div className="text-xs text-(--text-muted) mt-0.5">
+							{bots.length > 0
+								? `${totalUsers.toLocaleString()} ${t('app.users.profile.totalUsers')}`
+								: t('app.users.profile.kpi.orgsAndReachSub', { orgs: organizations.length, connections: publicConnections.length })}
+						</div>
+					</div>
+				</div>
+			</div>
+
 			{user?.info && (
 				<div className="bg-(--foreground)/30 backdrop-blur-md p-8 rounded-3xl border border-(--border)/10 shadow-sm mb-4">
 					<Markdown>{user.info}</Markdown>
@@ -39,25 +110,6 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 			{!user?.info && showcases.length === 0 && bots.length === 0 && organizations.length === 0 && servers.length === 0 && !hasDetails && (
 				<div className="bg-(--foreground)/30 backdrop-blur-md p-8 rounded-3xl border border-(--border)/10 text-center text-(--text-muted) py-12">{t('app.users.profile.noDetails')}</div>
-			)}
-
-			{bots.length > 0 && (
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-					<div className="bg-(--foreground)/40 border border-(--border)/10 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 backdrop-blur-md shadow-sm">
-						<Server className="w-8 h-8 text-(--accent)" />
-						<div className="text-3xl font-bold" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{totalServers.toLocaleString()}
-						</div>
-						<div className="text-sm font-semibold uppercase tracking-wider text-(--text-muted)">{t('app.users.profile.totalServers')}</div>
-					</div>
-					<div className="bg-(--foreground)/40 border border-(--border)/10 p-6 rounded-3xl flex flex-col items-center justify-center gap-3 backdrop-blur-md shadow-sm">
-						<Users className="w-8 h-8 text-(--accent)" />
-						<div className="text-3xl font-bold" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{totalUsers.toLocaleString()}
-						</div>
-						<div className="text-sm font-semibold uppercase tracking-wider text-(--text-muted)">{t('app.users.profile.totalUsers')}</div>
-					</div>
-				</div>
 			)}
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -124,15 +176,19 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 								{bots.map((bot) => {
-									const avatarUrl = bot.discord?.avatar
-										? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=128`
-										: bot.avatar
-											? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=128`
-											: null;
+									const avatarUrl =
+										bot.discord?.avatarUrl ||
+										(bot.discord?.avatar
+											? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.discord.avatar}.png?size=128`
+											: bot.avatar
+												? String(bot.avatar).startsWith('http')
+													? bot.avatar
+													: `https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=128`
+												: null);
 
 									return (
 										<Link
-											href={`/bots/${bot.id}`}
+											href={`/bots/${bot.vanitySlug || bot.id}`}
 											key={bot.id}
 											className="flex flex-col p-5 rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] transition-all group"
 										>
@@ -162,11 +218,12 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 													</div>
 													<div className="flex items-center gap-2 text-xs text-(--text-muted) mt-0.5">
 														<span className="flex items-center gap-1">
-															<Server className="w-3 h-3 text-(--accent)" /> {(bot.stats?.guildCount || 0).toLocaleString()}
+															<Server className="w-3 h-3 text-(--accent)" />{' '}
+															{(bot.guildCount ?? bot.stats?.guildCount ?? bot.latestStat?.guildCount ?? 0).toLocaleString()}
 														</span>
 														<span>•</span>
 														<span className="flex items-center gap-1">
-															<Users className="w-3 h-3 text-(--accent)" /> {(bot.stats?.userCount || 0).toLocaleString()}
+															<Users className="w-3 h-3 text-(--accent)" /> {(bot.userCount ?? bot.stats?.userCount ?? bot.latestStat?.userCount ?? 0).toLocaleString()}
 														</span>
 													</div>
 												</div>
@@ -193,7 +250,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 									return (
 										<Link
-											href={`/organization/${org._id}`}
+											href={`/organization/${org.vanitySlug || org._id}`}
 											key={org._id}
 											className="flex flex-col p-5 rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] transition-all group"
 										>
@@ -239,7 +296,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 
 									return (
 										<Link
-											href={`/servers/${server.id}`}
+											href={`/servers/${server.vanitySlug || server.id}`}
 											key={server.id}
 											className="flex flex-col p-5 rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] transition-all group"
 										>

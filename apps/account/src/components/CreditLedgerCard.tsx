@@ -2,10 +2,10 @@
 
 'use client';
 
-import React, { useMemo } from 'react';
-import { ArrowDownLeft, ArrowUpRight, Crown, History, Shield, Sparkles } from 'lucide-react';
-import { Badge } from '@xernerx/ui';
-import { useDictionary } from '@xernerx/providers';
+import React, { useMemo, useState } from 'react';
+import { ArrowDownLeft, ArrowUpRight, Crown, Download, History, Shield, Sparkles } from 'lucide-react';
+import { Badge, Button } from '@xernerx/ui';
+import { useDictionary, useToast } from '@xernerx/providers';
 
 export interface CreditTransactionEntry {
 	id?: string;
@@ -24,29 +24,107 @@ interface CreditLedgerCardProps {
 
 export function CreditLedgerCard({ transactions = [], streakShields = 0 }: CreditLedgerCardProps) {
 	const { t } = useDictionary();
+	const { toast } = useToast();
+	const [filter, setFilter] = useState<'all' | 'earned' | 'spent'>('all');
+	const [showAll, setShowAll] = useState(false);
+
+	const isEarnedEntry = (tx: CreditTransactionEntry) => (tx.amount || 0) >= 0 && tx.type !== 'spend' && tx.type !== 'tip_out';
+
+	const allSorted = useMemo(() => {
+		if (!Array.isArray(transactions)) return [];
+		return [...transactions].sort((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime());
+	}, [transactions]);
+
+	const totals = useMemo(() => {
+		let earned = 0;
+		let spent = 0;
+		for (const tx of allSorted) {
+			const amt = Math.abs(Number(tx.amount) || 0);
+			if (isEarnedEntry(tx)) earned += amt;
+			else spent += amt;
+		}
+		return { earned, spent };
+	}, [allSorted]);
+
+	const filtered = useMemo(() => {
+		if (filter === 'earned') return allSorted.filter(isEarnedEntry);
+		if (filter === 'spent') return allSorted.filter((tx) => !isEarnedEntry(tx));
+		return allSorted;
+	}, [allSorted, filter]);
 
 	const sorted = useMemo(() => {
-		if (!Array.isArray(transactions)) return [];
-		return [...transactions].sort((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()).slice(0, 12);
-	}, [transactions]);
+		return showAll ? filtered : filtered.slice(0, 12);
+	}, [filtered, showAll]);
+
+	const handleExportCsv = () => {
+		const header = ['Date', 'Type', 'Item', 'Amount', 'MultiplierPercent'];
+		const rows = filtered.map((tx) => [
+			tx.createdAt ? new Date(tx.createdAt).toISOString() : '',
+			tx.type || (isEarnedEntry(tx) ? 'earn' : 'spend'),
+			`"${String(tx.itemName || tx.itemId || t('account.billing.credits.ledger.defaultItem')).replace(/"/g, '""')}"`,
+			String(isEarnedEntry(tx) ? Math.abs(Number(tx.amount) || 0) : -Math.abs(Number(tx.amount) || 0)),
+			String(Number(tx.multiplierPercent) || 100),
+		]);
+		const csv = [header.join(','), ...rows.map((r) => r.join(','))].join('\n');
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-credit-ledger.csv`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+		toast({ type: 'success', title: t('account.billing.credits.ledger.exportedToast') });
+	};
 
 	return (
 		<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.85)' }}>
 			<div className="flex flex-wrap items-center justify-between gap-2">
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-2">
 					<History size={18} className="text-(--accent)" />
 					<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
 						{t('account.billing.credits.ledger.title')}
 					</h3>
 					<Badge variant="muted" size="sm">
-						{sorted.length}
+						{allSorted.length}
 					</Badge>
+					{allSorted.length > 0 && (
+						<div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-(--background)/60 border border-(--border)/10">
+							<span className="text-(--accent-green)">+{totals.earned.toLocaleString()}</span>
+							<span className="text-(--text-muted)">/</span>
+							<span className="text-(--text)">-{totals.spent.toLocaleString()}</span>
+						</div>
+					)}
 				</div>
 
-				<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--background)/60 text-(--text) border border-(--border)/10">
-					<Shield size={13} className="text-(--accent)" />
-					{t('account.billing.credits.ledger.shieldsActive', { count: streakShields })}
-				</span>
+				<div className="flex flex-wrap items-center gap-2">
+					{allSorted.length > 0 && (
+						<div className="inline-flex items-center rounded-full border border-(--border)/10 bg-(--background)/50 p-0.5 gap-0.5">
+							{(['all', 'earned', 'spent'] as const).map((fKey) => (
+								<button
+									key={fKey}
+									type="button"
+									onClick={() => setFilter(fKey)}
+									className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+										filter === fKey ? 'bg-(--accent) text-(--text)' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{t(`account.billing.credits.ledger.filter${fKey.charAt(0).toUpperCase() + fKey.slice(1)}`)}
+								</button>
+							))}
+						</div>
+					)}
+					<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-(--background)/60 text-(--text) border border-(--border)/10">
+						<Shield size={13} className="text-(--accent)" />
+						{t('account.billing.credits.ledger.shieldsActive', { count: streakShields })}
+					</span>
+					{allSorted.length > 0 && (
+						<Button size="sm" variant="secondary" onClick={handleExportCsv}>
+							<Download size={13} /> {t('account.billing.credits.ledger.exportCsv')}
+						</Button>
+					)}
+				</div>
 			</div>
 
 			{sorted.length === 0 ? (
@@ -89,6 +167,15 @@ export function CreditLedgerCard({ transactions = [], streakShields = 0 }: Credi
 							</div>
 						);
 					})}
+					{filtered.length > 12 && (
+						<button
+							type="button"
+							onClick={() => setShowAll((prev) => !prev)}
+							className="mt-1 self-center px-3.5 py-1.5 rounded-full text-xs font-bold bg-(--background)/60 hover:bg-(--accent)/15 text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+						>
+							{showAll ? t('account.billing.credits.ledger.showLess') : t('account.billing.credits.ledger.showAll', { count: filtered.length })}
+						</button>
+					)}
 				</div>
 			)}
 		</div>

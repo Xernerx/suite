@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Activity, CheckCircle2, ChevronDown, ChevronUp, Clock, RefreshCw, RotateCcw, XCircle } from 'lucide-react';
+import { Activity, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Copy, RefreshCw, RotateCcw, XCircle } from 'lucide-react';
 import { Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 
@@ -32,6 +32,24 @@ export default function WebhookDeliveriesCard({ botId, deliveries, onDeliveriesC
 	const [replayingId, setReplayingId] = useState<string | null>(null);
 	const [refreshing, setRefreshing] = useState(false);
 	const [expandedId, setExpandedId] = useState<string | null>(null);
+	const [statusFilter, setStatusFilter] = useState<'all' | 'ok' | 'failed'>('all');
+	const [copiedPayloadId, setCopiedPayloadId] = useState<string | null>(null);
+
+	const okCount = deliveries.filter((d) => d.ok).length;
+	const failedCount = deliveries.length - okCount;
+	const successRate = deliveries.length > 0 ? Math.round((okCount / deliveries.length) * 100) : 100;
+	const visibleDeliveries = deliveries.filter((d) => {
+		if (statusFilter === 'ok') return d.ok;
+		if (statusFilter === 'failed') return !d.ok;
+		return true;
+	});
+
+	const handleCopyPayload = (id: string, payload: any) => {
+		navigator.clipboard.writeText(JSON.stringify(payload || {}, null, 2));
+		setCopiedPayloadId(id);
+		toast({ type: 'success', title: t('app.portal.bot.webhooks.deliveries.payloadCopied') });
+		setTimeout(() => setCopiedPayloadId((prev) => (prev === id ? null : prev)), 2000);
+	};
 
 	const handleRefresh = async () => {
 		setRefreshing(true);
@@ -97,20 +115,55 @@ export default function WebhookDeliveriesCard({ botId, deliveries, onDeliveriesC
 						<Activity className="h-5 w-5" />
 					</div>
 					<div>
-						<h3 className="text-base font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{t('app.portal.bot.webhooks.deliveries.title')}
-						</h3>
+						<div className="flex flex-wrap items-center gap-2">
+							<h3 className="text-base font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{t('app.portal.bot.webhooks.deliveries.title')}
+							</h3>
+							{deliveries.length > 0 && (
+								<span
+									className={`px-2 py-0.5 rounded-full text-[11px] font-mono font-bold border ${
+										successRate >= 90
+											? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30'
+											: 'bg-(--accent-orange)/15 text-(--accent-orange) border-(--accent-orange)/30'
+									}`}
+								>
+									{t('app.portal.bot.webhooks.deliveries.successRate', { rate: successRate })}
+								</span>
+							)}
+						</div>
 						<p className="text-xs text-(--text-muted)">{t('app.portal.bot.webhooks.deliveries.subtitle')}</p>
 					</div>
 				</div>
 
-				<Button variant="secondary" size="sm" onClick={handleRefresh} loading={refreshing}>
-					{!refreshing && <RefreshCw size={13} />}
-					<span>{t('app.portal.bot.webhooks.deliveries.refresh')}</span>
-				</Button>
+				<div className="flex flex-wrap items-center gap-2">
+					{deliveries.length > 0 && (
+						<div className="inline-flex items-center rounded-full border border-(--border)/10 bg-(--background)/50 p-0.5 gap-0.5">
+							{(['all', 'ok', 'failed'] as const).map((key) => {
+								const count = key === 'all' ? deliveries.length : key === 'ok' ? okCount : failedCount;
+								const labelKey = key === 'all' ? 'filterAll' : key === 'ok' ? 'filterOk' : 'filterFailed';
+								return (
+									<button
+										key={key}
+										type="button"
+										onClick={() => setStatusFilter(key)}
+										className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+											statusFilter === key ? 'bg-(--accent) text-(--text)' : 'text-(--text-muted) hover:text-(--text)'
+										}`}
+									>
+										{t(`app.portal.bot.webhooks.deliveries.${labelKey}`, { count })}
+									</button>
+								);
+							})}
+						</div>
+					)}
+					<Button variant="secondary" size="sm" onClick={handleRefresh} loading={refreshing}>
+						{!refreshing && <RefreshCw size={13} />}
+						<span>{t('app.portal.bot.webhooks.deliveries.refresh')}</span>
+					</Button>
+				</div>
 			</div>
 
-			{deliveries.length === 0 ? (
+			{visibleDeliveries.length === 0 ? (
 				<div className="flex flex-col items-center justify-center rounded-2xl border border-(--border)/10 bg-(--background)/50 p-8 text-center">
 					<Clock className="h-7 w-7 text-(--text-muted) opacity-60 mb-2" />
 					<p className="text-sm font-bold text-(--text)">{t('app.portal.bot.webhooks.deliveries.emptyTitle')}</p>
@@ -118,7 +171,7 @@ export default function WebhookDeliveriesCard({ botId, deliveries, onDeliveriesC
 				</div>
 			) : (
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-					{deliveries.map((delivery) => {
+					{visibleDeliveries.map((delivery) => {
 						const isExpanded = expandedId === delivery.id;
 						const formattedTime = delivery.timestamp ? new Date(delivery.timestamp).toLocaleString() : '—';
 
@@ -178,9 +231,19 @@ export default function WebhookDeliveriesCard({ botId, deliveries, onDeliveriesC
 								{isExpanded && (
 									<div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-2 border-t border-(--border)/10 text-xs font-mono">
 										<div className="flex flex-col gap-1">
-											<span className="text-[11px] font-sans font-bold uppercase tracking-wider text-(--text-muted)">
-												{t('app.portal.bot.webhooks.deliveries.requestPayload')}
-											</span>
+											<div className="flex items-center justify-between gap-2">
+												<span className="text-[11px] font-sans font-bold uppercase tracking-wider text-(--text-muted)">
+													{t('app.portal.bot.webhooks.deliveries.requestPayload')}
+												</span>
+												<button
+													type="button"
+													onClick={() => handleCopyPayload(delivery.id, delivery.payload)}
+													className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-sans font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent)/25 transition-colors cursor-pointer"
+												>
+													{copiedPayloadId === delivery.id ? <Check size={10} /> : <Copy size={10} />}
+													<span>{t('app.portal.bot.webhooks.deliveries.copyPayload')}</span>
+												</button>
+											</div>
 											<pre className="p-3 rounded-2xl bg-(--foreground)/50 border border-(--border)/10 text-(--text) overflow-x-auto max-h-44">
 												{JSON.stringify(delivery.payload || {}, null, 2)}
 											</pre>

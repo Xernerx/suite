@@ -14,19 +14,33 @@ export async function GET(req: Request) {
 		const owner = searchParams.get('owner'); // Optionally filter by owner
 		const user = searchParams.get('user'); // Optionally filter by owner or member
 		const admin = searchParams.get('admin') === 'true';
+		const search = searchParams.get('search')?.trim() || '';
+		const limitParam = parseInt(searchParams.get('limit') || '0', 10);
 
 		const db = (await database('xernerx')).models.organizations as any;
 		const OrganizationModel = db.Organization;
 
-		const query: any = {};
-		if (owner) query.owner = owner;
+		const andConditions: any[] = [];
+		if (owner) andConditions.push({ owner });
 		if (user) {
-			query.$or = [{ owner: user }, { members: user }];
+			andConditions.push({ $or: [{ owner: user }, { members: user }] });
 		} else if (!owner && !admin) {
-			query.$or = [{ 'config.privacy': 'public' }, { privacy: 'public' }];
+			andConditions.push({ $or: [{ 'config.privacy': 'public' }, { privacy: 'public' }] });
 		}
 
-		const organizations = await OrganizationModel.find(query);
+		if (search) {
+			const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const regex = new RegExp(escaped, 'i');
+			andConditions.push({
+				$or: [{ name: regex }, { description: regex }, { vanitySlug: regex }],
+			});
+		}
+
+		const query = andConditions.length > 0 ? { $and: andConditions } : {};
+		let dbQuery = OrganizationModel.find(query);
+		if (limitParam > 0) dbQuery = dbQuery.limit(limitParam);
+
+		const organizations = await dbQuery;
 		return NextResponse.json(organizations, { status: 200 });
 	} catch (error) {
 		console.error('Failed to fetch organizations:', error);
@@ -53,24 +67,27 @@ export async function POST(req: Request) {
 
 		const RoleModel = db.Role;
 
-		// In a real scenario, we'd also add this org to the User's `organizations` array
-		// But for now, we just create the Organization document
-		const newOrg = await OrganizationModel.create(body);
+		const defaultRoles =
+			Array.isArray(body.roles) && body.roles.length > 0
+				? body.roles
+				: [
+						{ id: crypto.randomUUID(), name: 'Owner', permissions: ['*'] },
+						{ id: crypto.randomUUID(), name: 'Member', permissions: [] },
+					];
 
-		await RoleModel.create([
-			{
-				id: crypto.randomUUID(),
+		const newOrg = await OrganizationModel.create({
+			...body,
+			roles: defaultRoles,
+		});
+
+		await RoleModel.create(
+			defaultRoles.map((r: any) => ({
+				id: r.id || crypto.randomUUID(),
 				ownerId: newOrg._id.toString(),
-				name: 'Owner',
-				permissions: ['*'], // Full permissions by default
-			},
-			{
-				id: crypto.randomUUID(),
-				ownerId: newOrg._id.toString(),
-				name: 'Member',
-				permissions: [], // Base permissions by default
-			},
-		]);
+				name: r.name,
+				permissions: Array.isArray(r.permissions) ? r.permissions : [],
+			}))
+		);
 
 		return NextResponse.json(newOrg, { status: 201 });
 	} catch (error) {

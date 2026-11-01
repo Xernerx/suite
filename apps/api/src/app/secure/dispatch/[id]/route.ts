@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database, sendWebhook } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +35,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		const existingItem = await Dispatch.findOne({ id }).lean();
 		if (!existingItem) {
 			return NextResponse.json({ error: 'Dispatch item not found' }, { status: 404 });
+		}
+
+		if (existingItem.category === 'application') {
+			const caller = await resolveCallerAuth(req, ['applications_review', 'applications_manage']);
+			if (!caller.authorized) {
+				return NextResponse.json({ error: 'Forbidden: Application review permission required' }, { status: caller.userId ? 403 : 401 });
+			}
+		} else if (existingItem.type === 'organization_invite' && body?.status === 'approved') {
+			const caller = await resolveCallerAuth(req, ['users']);
+			if (!caller.authorized && caller.userId !== existingItem.targetId) {
+				return NextResponse.json({ error: 'Forbidden: Only the invited user may accept this organization invite' }, { status: caller.userId ? 403 : 401 });
+			}
 		}
 
 		let updateQuery: any;
@@ -145,6 +158,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		const existingItem = await Dispatch.findOne({ id }).lean();
 		if (!existingItem) {
 			return NextResponse.json({ error: 'Dispatch item not found' }, { status: 404 });
+		}
+
+		if (existingItem.category === 'application') {
+			const caller = await resolveCallerAuth(req, ['applications_review', 'applications_manage']);
+			if (!caller.authorized) {
+				return NextResponse.json({ error: 'Forbidden: Application review permission required' }, { status: caller.userId ? 403 : 401 });
+			}
 		}
 
 		if (existingItem.targetId === 'global' && userId) {

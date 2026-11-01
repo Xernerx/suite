@@ -3,21 +3,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { getSuiteVersionsMap, SUITE_APPS } from '@/lib/suiteVersions';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
-async function verifyHostingStaff(userId: string) {
-	if (!userId) return { allowed: false, user: null, models: null, status: 401, error: 'Unauthorized: Missing userId' };
+async function verifyHostingStaff(req: NextRequest, fallbackUserId?: string) {
+	const caller = await resolveCallerAuth(req, ['hosting']);
+	if (!caller.authorized && !caller.permissions.access) {
+		return { allowed: false, user: null, models: null, status: caller.userId ? 403 : 401, error: 'Forbidden: Missing server hosting permission' };
+	}
+	const resolvedUserId = caller.userId && caller.userId !== 'system' ? caller.userId : fallbackUserId || '';
+	if (!resolvedUserId) return { allowed: false, user: null, models: null, status: 401, error: 'Unauthorized: Missing userId' };
 	const { models } = await database('xernerx');
-	const user = (await models.users.User.findOne({ id: userId }).lean()) as any;
+	const user = (await models.users.User.findOne({ id: resolvedUserId }).lean()) as any;
 	if (!user) return { allowed: false, user: null, models, status: 404, error: 'User not found' };
 
-	const userRoles: string[] = Array.isArray(user.roles) ? user.roles : user.role ? [user.role] : [];
-	const roles = userRoles.length > 0 ? await models.core.Role.find({ id: { $in: userRoles } }).lean() : [];
-	const hasAccess = roles.some((r: any) => Boolean(r?.permissions?.hosting || r?.permissions?.access));
-	if (!hasAccess) {
-		return { allowed: false, user, models, status: 403, error: 'Forbidden: Missing server hosting permission' };
-	}
 	return { allowed: true, user, models, status: 200, error: null };
 }
 
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 		const userId = String(req.nextUrl.searchParams.get('userId') || '').trim();
 		const forceRefresh = req.nextUrl.searchParams.get('refresh') === 'true';
 
-		const authCheck = await verifyHostingStaff(userId);
+		const authCheck = await verifyHostingStaff(req, userId);
 		if (!authCheck.allowed) {
 			return NextResponse.json({ ok: false, error: authCheck.error }, { status: authCheck.status });
 		}
@@ -195,7 +195,7 @@ export async function POST(req: NextRequest) {
 		const userId = String(body.userId || '').trim();
 		const action = String(body.action || '').trim();
 
-		const authCheck = await verifyHostingStaff(userId);
+		const authCheck = await verifyHostingStaff(req, userId);
 		if (!authCheck.allowed || !authCheck.models) {
 			return NextResponse.json({ ok: false, error: authCheck.error }, { status: authCheck.status });
 		}

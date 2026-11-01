@@ -2,6 +2,7 @@
 
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
@@ -538,7 +539,7 @@ function buildContentAgent(home: any, targetUrl: string): McpContentAgent {
 		metaDescription:
 			currentDesc.length >= 110 && currentDesc.length <= 160
 				? currentDesc
-				: 'Configure Discord bots (Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and developer telemetry from 1 unified Xernerx Suite account.',
+				: 'Configure Discord bots (To-Do List, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and developer telemetry from 1 unified Xernerx Suite account.',
 		h1Suggestion: h1 || 'Empowering Developers. Connecting Communities.',
 		faqSuggestion:
 			'1. What is Xernerx Studios and how does 1 Account, 1 Place, 1 Setup work?\n2. Which Discord bots and open-source SDKs are included in the Xernerx Suite?\n3. How can developers publish bots and track live telemetry via the v1 API?',
@@ -791,6 +792,11 @@ function mapRawPageToReport(rawPage: any, rawHome?: any): McpSeoPageReport {
 
 export async function GET(req: NextRequest) {
 	try {
+		const caller = await resolveCallerAuth(req, ['settings', 'overview']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Admin access required.' }, { status: caller.authenticated ? 403 : 401 });
+		}
+
 		const targetUrl = req.nextUrl.searchParams.get('url');
 		const envKey = req.nextUrl.searchParams.get('key');
 		const maxPages = Math.max(1, Math.min(25, Number(req.nextUrl.searchParams.get('maxPages') || 8)));

@@ -2,9 +2,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['tokens']);
+		if (!caller.authenticated) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
 		const { id } = await params;
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any).Token;
@@ -13,6 +19,11 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
+		}
+
+		const owners: string[] = Array.isArray(token.owners) ? token.owners.map(String) : [];
+		if (!caller.authorized && (!caller.userId || !owners.includes(caller.userId))) {
+			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 		}
 
 		return NextResponse.json(token, { status: 200 });
@@ -24,13 +35,18 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['tokens']);
+		if (!caller.authenticated) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any).Token;
 
-		// The user ID should be provided in the body when creating a token
-		const userId = body.userId;
+		// Only staff with 'tokens' permission may create admin/system tokens or specify an arbitrary userId
+		const userId = caller.authorized ? body.userId || caller.userId : caller.userId;
 		if (!userId) return NextResponse.json({ error: 'userId required to create a token' }, { status: 400 });
 
 		const existingToken = await TokenModel.findOne({ id });
@@ -38,8 +54,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			return NextResponse.json({ error: 'Token already exists' }, { status: 409 });
 		}
 
+		if (!caller.authorized) {
+			body.permissions = { secure: false, websocket: false };
+			if (!body.botId) {
+				body.status = 'pending';
+			}
+		}
+
 		// Enforce 1 free Bot / API Token slot (+ extraBotSlots from Credit Store, or Unlimited with Developer Pro / Ultra / Staff)
-		const isAdminCreation = userId === 'admin' || Boolean(body.permissions?.secure) || Boolean(body.permissions?.websocket);
+		const isAdminCreation = caller.authorized && (userId === 'admin' || Boolean(body.permissions?.secure) || Boolean(body.permissions?.websocket));
 		if (!isAdminCreation) {
 			const SubscriptionModel = (db.models.users as any).Subscription;
 			const CreditModel = (db.models.users as any).Credit;
@@ -110,6 +133,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			}
 		}
 
+		await recordAuditLog(req, {
+			action: 'token.create',
+			targetType: 'token',
+			targetId: id,
+			summary: `Created API token "${newToken.name || id}"`,
+			metadata: { botId: newToken.botId || null, status: newToken.status || 'active', owners: resolvedOwners },
+		});
+
 		return NextResponse.json(newToken, { status: 201 });
 	} catch (error) {
 		console.error('POST Token Error:', error);
@@ -119,12 +150,34 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['tokens']);
+		if (!caller.authenticated) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any).Token;
 
+		const existingToken = await TokenModel.findOne({ id }).lean();
+		if (!existingToken) {
+			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
+		}
+
+		const existingOwners: string[] = Array.isArray(existingToken.owners) ? existingToken.owners.map(String) : [];
+		if (!caller.authorized && (!caller.userId || !existingOwners.includes(caller.userId))) {
+			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+		}
+
 		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...cleanBody } = body || {};
+		if (!caller.authorized) {
+			delete cleanBody.permissions;
+			delete cleanBody.botId;
+			if (cleanBody.status === 'active' && !existingToken.botId) {
+				cleanBody.status = 'pending';
+			}
+		}
 		const token = await TokenModel.findOneAndUpdate({ id }, cleanBody, { returnDocument: 'after' });
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
@@ -137,6 +190,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			}
 		}
 
+		await recordAuditLog(req, {
+			action: cleanBody.token ? 'token.regenerate' : 'token.update',
+			targetType: 'token',
+			targetId: id,
+			summary: cleanBody.token ? `Regenerated API token "${token.name || id}"` : `Updated API token "${token.name || id}"`,
+			metadata: { botId: token.botId || null, status: token.status || 'active' },
+		});
+
 		return NextResponse.json(token, { status: 200 });
 	} catch (error) {
 		console.error('PATCH Token Error:', error);
@@ -144,17 +205,40 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 	}
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['tokens']);
+		if (!caller.authenticated) {
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+		}
+
 		const { id } = await params;
 		const db = await database('xernerx');
 		const TokenModel = (db.models.users as any).Token;
+
+		const existingToken = await TokenModel.findOne({ id }).lean();
+		if (!existingToken) {
+			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
+		}
+
+		const existingOwners: string[] = Array.isArray(existingToken.owners) ? existingToken.owners.map(String) : [];
+		if (!caller.authorized && (!caller.userId || !existingOwners.includes(caller.userId))) {
+			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+		}
 
 		const token = await TokenModel.findOneAndDelete({ id });
 
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });
 		}
+
+		await recordAuditLog(req, {
+			action: 'token.delete',
+			targetType: 'token',
+			targetId: id,
+			summary: `Deleted API token "${token.name || id}"`,
+			metadata: { botId: token.botId || null },
+		});
 
 		return NextResponse.json({ success: true, message: 'Token deleted successfully' }, { status: 200 });
 	} catch (error) {

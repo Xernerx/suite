@@ -117,7 +117,7 @@ export default async function MediaViewPage({ params }: { params: Promise<{ id: 
 	return (
 		<div className="fixed inset-0 z-[9999] bg-(--background) flex flex-col items-center justify-center overflow-hidden group">
 			<h1 className="sr-only">{media.filename || 'Media Asset'}</h1>
-			<MediaActions rawUrl={rawUrl} />
+			<MediaActions rawUrl={rawUrl} filename={media.filename} mimeType={media.mimeType} size={media.size} privacy={media.privacy} />
 			{media.mimeType?.startsWith('image/') ? (
 				<Image src={rawUrl} alt={media.filename} fill unoptimized className="object-contain" />
 			) : media.mimeType?.startsWith('video/') ? (

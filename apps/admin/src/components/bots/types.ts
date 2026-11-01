@@ -24,6 +24,10 @@ export interface AdminBotSummary {
 	description?: string;
 	info?: string;
 	organization?: string | null;
+	tags?: string[];
+	links?: Record<string, string>;
+	promotedUntil?: string | null;
+	boostedUntil?: string | null;
 	voteCount?: number;
 	stats?: {
 		guildCount?: number;

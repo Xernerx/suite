@@ -2,6 +2,25 @@
 
 # Changelog
 
+## 1.3.0
+
+### Minor Changes
+
+-   - **File Drag-and-Drop Import & Auto-Language Detection**: Added drag-and-drop and file-picker import with automatic syntax language detection across 16 file extensions.
+    - **Rendered Markdown Preview & Raw URL Copy**: Added a live `Code` / `Preview` toggle for Markdown pastes and a 1-click `Copy Raw URL` action in the document viewer header.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 1.2.7
 
 ### Patch Changes

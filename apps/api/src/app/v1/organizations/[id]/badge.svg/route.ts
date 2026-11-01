@@ -20,7 +20,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 		const BotModel = (db.models.bots as any).Bot;
 		const GuildModel = (db.models.guilds as any).Guild;
 
-		const organization = (await OrganizationModel.findOne({ _id: id }).lean()) as any;
+		const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+		const orgQuery = isObjectId ? { $or: [{ _id: id }, { vanitySlug: id.toLowerCase() }] } : { vanitySlug: id.toLowerCase() };
+		const organization = (await OrganizationModel.findOne(orgQuery).lean()) as any;
+		const orgId = organization?._id ? String(organization._id) : id;
 		const privacy = organization?.config?.privacy || organization?.privacy;
 
 		if (!organization || privacy === 'private') {
@@ -29,11 +32,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			color = '#71717a';
 		} else {
 			if (type === 'bots') {
-				const botCount = await BotModel.countDocuments({ organization: id, privacy: { $ne: 'private' } });
+				const botCount = await BotModel.countDocuments({ organization: orgId, privacy: 'public' });
 				label = 'Xernerx Bots';
 				value = formatCompactNumber(botCount);
 			} else if (type === 'servers' || type === 'guilds') {
-				const serverCount = await GuildModel.countDocuments({ organization: id, privacy: { $ne: 'private' } });
+				const serverCount = await GuildModel.countDocuments({ organization: orgId, privacy: 'public' });
 				label = 'Xernerx Servers';
 				value = formatCompactNumber(serverCount);
 			} else if (type === 'status' || type === 'verified') {

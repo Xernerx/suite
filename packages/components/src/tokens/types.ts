@@ -7,6 +7,13 @@ export interface TokenListInfo {
 	id?: string;
 	name: string;
 	status: TokenStatus;
+	botId?: string | null;
+	botInfo?: {
+		id: string;
+		name: string;
+		vanitySlug?: string;
+		avatarUrl?: string | null;
+	} | null;
 	requestCount?: number;
 	lastUsedAt?: string | null;
 	permissions?: {

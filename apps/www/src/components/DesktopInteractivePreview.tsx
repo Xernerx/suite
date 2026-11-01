@@ -15,6 +15,7 @@ export function DesktopInteractivePreview() {
 	const [ghostMode, setGhostMode] = useState(false);
 	const [overlayOpacity, setOverlayOpacity] = useState<1 | 0.7>(1);
 	const [osToastOpen, setOsToastOpen] = useState(false);
+	const [omnibarOpen, setOmnibarOpen] = useState(false);
 	const [rpcEnabled, setRpcEnabled] = useState(true);
 	const [controlStyle, setControlStyle] = useState<'xernerx' | 'macos' | 'windows'>('macos');
 
@@ -62,10 +63,16 @@ export function DesktopInteractivePreview() {
 					</div>
 
 					<div className="flex items-center gap-1.5">
-						<span className="hidden sm:inline-flex items-center gap-1.5 rounded-xl bg-(--foreground)/35 border border-(--border)/10 px-2 py-0.5 text-[10px] font-mono font-bold text-(--text-muted)">
+						<button
+							type="button"
+							onClick={() => setOmnibarOpen((v) => !v)}
+							className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl border px-2 py-0.5 text-[10px] font-mono font-bold transition hover:cursor-pointer ${
+								omnibarOpen ? 'bg-(--accent)/15 border-(--accent)/40 text-(--accent)' : 'bg-(--foreground)/35 border-(--border)/10 text-(--text-muted) hover:text-(--text)'
+							}`}
+						>
 							<Search size={10} className="text-(--accent)" />
-							Ctrl K
-						</span>
+							Ctrl K / .
+						</button>
 						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
 							<Building2 size={11} />
 						</span>
@@ -121,6 +128,26 @@ export function DesktopInteractivePreview() {
 						)}
 					</div>
 				</div>
+
+				{/* Interactive Omnibar Preview Strip */}
+				<AnimatePresence>
+					{omnibarOpen && (
+						<motion.div
+							initial={{ height: 0, opacity: 0 }}
+							animate={{ height: 'auto', opacity: 1 }}
+							exit={{ height: 0, opacity: 0 }}
+							className="border-b border-(--border)/10 bg-(--background)/80 px-4 py-2 flex items-center justify-between gap-2 text-[11px] font-mono overflow-hidden"
+						>
+							<div className="flex items-center gap-1.5 truncate">
+								<span className="text-(--text-muted)">https://</span>
+								<span className="text-(--accent) font-bold">app</span>
+								<span className="text-(--text-muted)">.public.xernerx.com</span>
+								<span className="text-(--text) font-semibold">/servers/xernerx</span>
+							</div>
+							<span className="px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) text-[9px] font-sans font-bold shrink-0">{t('components.header.omnibar.badgeServer')}</span>
+						</motion.div>
+					)}
+				</AnimatePresence>
 
 				{/* Window Body (Matching Page.tsx radial + linear accent gradient) */}
 				<div

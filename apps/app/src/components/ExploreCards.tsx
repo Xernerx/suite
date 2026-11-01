@@ -31,6 +31,7 @@ export interface BotProfile {
 		guildCount: number;
 		userCount: number;
 	} | null;
+	discord?: DiscordProfile | null;
 	voteCount?: number;
 }
 
@@ -62,7 +63,9 @@ function formatCompactCount(num: number | undefined | null): string {
 export function BotCard({ bot, onSelectTag }: { bot: BotProfile; onSelectTag?: (tag: string) => void }) {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
+	const hasCachedDiscord = Boolean(bot.discord?.username || bot.discord?.global_name || bot.discord?.avatarUrl);
 	const [discord, setDiscord] = useState<DiscordProfile | null>(() => {
+		if (hasCachedDiscord && bot.discord) return bot.discord;
 		if (!bot.name && !bot.avatar) return null;
 		return {
 			global_name: bot.name,
@@ -72,18 +75,24 @@ export function BotCard({ bot, onSelectTag }: { bot: BotProfile; onSelectTag?: (
 		};
 	});
 	const [stats, setStats] = useState<{ guildCount: number; userCount: number } | null>(() => (bot.stats ? { guildCount: bot.stats.guildCount ?? 0, userCount: bot.stats.userCount ?? 0 } : null));
-	const [loading, setLoading] = useState(() => !bot.name && !bot.avatar);
+	const [loading, setLoading] = useState(() => !hasCachedDiscord && !bot.name && !bot.avatar);
 
 	useEffect(() => {
 		if (!isReady || !bot.id) return;
+		if (hasCachedDiscord && bot.stats) {
+			setLoading(false);
+			return;
+		}
 		let cancelled = false;
 		const controller = new AbortController();
 
 		const fetchData = async () => {
 			try {
-				const discordPromise = fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`), {
-					signal: controller.signal,
-				}).catch(() => null);
+				const discordPromise = !hasCachedDiscord
+					? fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`), {
+							signal: controller.signal,
+						}).catch(() => null)
+					: Promise.resolve(null);
 
 				const statsPromise = !bot.stats
 					? fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${bot.id}/stats?limit=1`), {

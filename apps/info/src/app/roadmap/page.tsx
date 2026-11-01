@@ -22,6 +22,7 @@ export default function RoadmapPage() {
 	const [loading, setLoading] = useState(true);
 	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 	const [statusFilter, setStatusFilter] = useState<'all' | 'idea' | 'planned' | 'active' | 'released'>('all');
+	const [onlyCurrentQuarter, setOnlyCurrentQuarter] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 
 	useEffect(() => {
@@ -160,8 +161,24 @@ export default function RoadmapPage() {
 	};
 
 	const normalizedQuery = searchQuery.trim().toLowerCase();
+	const statusCounts: Record<'all' | 'idea' | 'planned' | 'active' | 'released', number> = {
+		all: 0,
+		idea: 0,
+		planned: 0,
+		active: 0,
+		released: 0,
+	};
+	itemsWithQ.forEach((item: any) => {
+		if (selectedProduct && item.productId !== selectedProduct) return;
+		if (onlyCurrentQuarter && item.targetQuarter !== currentQuarterStr) return;
+		const st = (item.status || 'idea') as 'idea' | 'planned' | 'active' | 'released';
+		statusCounts.all += 1;
+		if (st in statusCounts) statusCounts[st] += 1;
+	});
+
 	const matchesRoadmapFilters = (item: any) => {
 		if (selectedProduct && item.productId !== selectedProduct) return false;
+		if (onlyCurrentQuarter && item.targetQuarter !== currentQuarterStr) return false;
 		if (statusFilter !== 'all' && (item.status || 'idea') !== statusFilter) return false;
 		if (normalizedQuery) {
 			const botInfo = resolveBot(item);
@@ -290,9 +307,22 @@ export default function RoadmapPage() {
 								>
 									{statusKey !== 'all' && <span className={`w-2 h-2 rounded-full ${statusColors[statusKey]}`} />}
 									<span>{statusKey === 'all' ? t('info.roadmap.allStatuses') : t(`info.roadmap.timeline.status.${statusKey}`)}</span>
+									<span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-(--background)/60 text-(--text-muted)">{statusCounts[statusKey]}</span>
 								</button>
 							);
 						})}
+						<button
+							type="button"
+							onClick={() => setOnlyCurrentQuarter((prev) => !prev)}
+							className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border backdrop-blur-md ${
+								onlyCurrentQuarter
+									? 'bg-(--accent) text-white border-(--accent) shadow-sm'
+									: 'bg-(--foreground)/30 text-(--accent) border-(--accent)/30 shadow-xs hover:bg-(--accent)/15'
+							}`}
+						>
+							<span className="w-2 h-2 rounded-full bg-current animate-pulse" />
+							<span>{t('info.roadmap.currentQuarterFilter', { quarter: currentQuarterStr })}</span>
+						</button>
 					</div>
 				</div>
 			</motion.div>

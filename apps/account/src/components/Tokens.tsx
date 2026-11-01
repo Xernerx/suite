@@ -1,9 +1,9 @@
 /** @format */
 'use client';
 
-import { Bot, Coins, Key, Plus } from 'lucide-react';
+import { Activity, Bot, Coins, Key, Plus } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
-import { Button, EmptyState, Input, Tabs } from '@xernerx/ui';
+import { Button, EmptyState, Input, Selector, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
@@ -23,7 +23,8 @@ export default function Tokens() {
 	const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'pending' | 'inactive'>('all');
+	const [sortBy, setSortBy] = useState<'requests' | 'recent' | 'name'>('requests');
 
 	const extraBotSlots = Math.max(0, Number(user?.credits?.extraBotSlots) || 0);
 	const maxBotSlots = 1 + extraBotSlots;
@@ -67,19 +68,41 @@ export default function Tokens() {
 		fetchTokens();
 	}, []);
 
+	const totalRequests = useMemo(() => tokens.reduce((sum, tk) => sum + (Number(tk.requestCount) || 0), 0), [tokens]);
+
 	const filteredTokens = useMemo(() => {
-		return tokens.filter((token) => {
-			if (statusFilter !== 'all' && token.status !== statusFilter) return false;
+		const list = tokens.filter((token) => {
+			if (statusFilter === 'active' && token.status !== 'active') return false;
+			if (statusFilter === 'pending' && token.status !== 'pending') return false;
+			if (statusFilter === 'inactive' && token.status !== 'inactive' && token.status !== 'suspended') return false;
 			if (!searchQuery.trim()) return true;
 			const q = searchQuery.toLowerCase();
-			return token.name?.toLowerCase().includes(q) || (token.id || token._id)?.toLowerCase().includes(q);
+			return (
+				token.name?.toLowerCase().includes(q) || (token.id || token._id)?.toLowerCase().includes(q) || token.botId?.toLowerCase().includes(q) || token.botInfo?.name?.toLowerCase().includes(q)
+			);
 		});
-	}, [tokens, searchQuery, statusFilter]);
+		return [...list].sort((a, b) => {
+			if (sortBy === 'recent') {
+				return new Date(b.lastUsedAt || 0).getTime() - new Date(a.lastUsedAt || 0).getTime();
+			}
+			if (sortBy === 'name') {
+				return String(a.name || '').localeCompare(String(b.name || ''));
+			}
+			return (Number(b.requestCount) || 0) - (Number(a.requestCount) || 0);
+		});
+	}, [tokens, searchQuery, statusFilter, sortBy]);
+
+	const sortOptions = [
+		{ value: 'requests', label: t('account.tokens.sortMostRequests') },
+		{ value: 'recent', label: t('account.tokens.sortRecentlyUsed') },
+		{ value: 'name', label: t('account.tokens.sortName') },
+	];
 
 	const statusTabs = [
 		{ id: 'all', label: t('account.tokens.filterAll'), count: tokens.length },
-		{ id: 'active', label: t('account.tokens.filterActive') },
-		{ id: 'inactive', label: t('account.tokens.filterInactive') },
+		{ id: 'active', label: t('account.tokens.filterActive'), count: tokens.filter((tk) => tk.status === 'active').length },
+		{ id: 'pending', label: t('account.tokens.filterPending'), count: tokens.filter((tk) => tk.status === 'pending').length },
+		{ id: 'inactive', label: t('account.tokens.filterInactive'), count: tokens.filter((tk) => tk.status === 'inactive' || tk.status === 'suspended').length },
 	];
 
 	return (
@@ -119,6 +142,10 @@ export default function Tokens() {
 
 				<div className="flex flex-wrap items-center gap-3">
 					<span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-(--background)/60 border border-(--border)/10 text-(--text)">
+						<Activity size={14} className="text-(--accent)" />
+						{t('account.tokens.totalRequestsPill', { count: totalRequests.toLocaleString() })}
+					</span>
+					<span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold bg-(--background)/60 border border-(--border)/10 text-(--text)">
 						<Bot size={14} className="text-(--accent)" />
 						{hasUnlimitedBotSlots ? t('account.tokens.slotsUnlimited', { used: tokens.length }) : t('account.tokens.slotsUsed', { used: tokens.length, max: maxBotSlots })}
 					</span>
@@ -144,8 +171,13 @@ export default function Tokens() {
 			{/* Search & Status Filters */}
 			{!isLoading && tokens.length > 0 && (
 				<div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-					<div className="w-full sm:max-w-sm">
-						<Input variant="search" shortcut={true} placeholder={t('account.tokens.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+						<div className="w-full sm:max-w-sm">
+							<Input variant="search" shortcut={true} placeholder={t('account.tokens.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+						</div>
+						<div className="w-full sm:w-44">
+							<Selector value={sortBy} options={sortOptions} onChange={(val) => setSortBy(val as typeof sortBy)} />
+						</div>
 					</div>
 					<Tabs size="sm" fullWidth={false} tabs={statusTabs} activeTab={statusFilter} onChange={(id) => setStatusFilter(id as typeof statusFilter)} />
 				</div>

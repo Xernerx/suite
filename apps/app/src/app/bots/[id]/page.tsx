@@ -87,13 +87,15 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 					}
 
 					const targetSnowflake = botData.id || id;
-					try {
-						const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${targetSnowflake}/discord`));
-						if (discordRes.ok) {
-							botData.discord = await discordRes.json();
+					if (!botData.discord || (!botData.discord.username && !botData.discord.global_name)) {
+						try {
+							const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${targetSnowflake}/discord`));
+							if (discordRes.ok) {
+								botData.discord = await discordRes.json();
+							}
+						} catch {
+							// Ignore discord fetch failure
 						}
-					} catch {
-						// Ignore discord fetch failure
 					}
 
 					if (Array.isArray(botData.owners) && botData.owners.length > 0 && (!botData.ownersData || botData.ownersData.length === 0)) {

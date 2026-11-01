@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { Button, Input, Modal } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { Activity, Bug, Clock, Download, ExternalLink, FileText, Inbox, RefreshCw, Ticket } from 'lucide-react';
+import { Activity, Bug, Clock, Download, ExternalLink, FileText, Inbox, RefreshCw, Star, Ticket } from 'lucide-react';
 
-type TabFilter = 'all' | 'applications' | 'issues' | 'suggestions';
+type TabFilter = 'all' | 'applications' | 'issues' | 'suggestions' | 'reviews';
 
 interface ApplicationQuestion {
 	id: string;
@@ -77,6 +77,7 @@ export default function ActivityView() {
 		issues: any[];
 		suggestions: any[];
 		applications: EnrichedApplication[];
+		reviews?: any[];
 		exportedAt?: string;
 	} | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -173,6 +174,17 @@ export default function ActivityView() {
 			application: undefined,
 			pairs: [] as { id: string; label: string; value: any }[],
 		})),
+		...(data?.reviews || []).map((r: any) => ({
+			id: `rev-${r.id}`,
+			kind: 'reviews' as const,
+			title: `${r.targetName || r.targetId} — ${r.targetType === 'server' ? t('account.activity.serverReview') : t('account.activity.botReview')}`,
+			subtitle: r.content || t('account.activity.noReviewComment', { rating: Number(r.rating || 5) }),
+			status: `${'★'.repeat(Math.max(1, Math.min(5, Number(r.rating || 5))))} (${Number(r.rating || 5)}/5)`,
+			createdAt: r.createdAt,
+			href: getEnvUrl(`https://app.xernerx.com/${r.targetType === 'server' ? 'servers' : 'bots'}/${encodeURIComponent(r.targetSlug || r.targetId)}`),
+			application: undefined,
+			pairs: [] as { id: string; label: string; value: any }[],
+		})),
 	].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
 	const filteredEntries = allEntries.filter((entry) => {
@@ -202,6 +214,8 @@ export default function ActivityView() {
 				return <Bug size={16} className="text-(--accent)" />;
 			case 'suggestions':
 				return <Inbox size={16} className="text-(--accent)" />;
+			case 'reviews':
+				return <Star size={16} className="text-(--accent)" />;
 			default:
 				return <Activity size={16} className="text-(--accent)" />;
 		}
@@ -240,7 +254,7 @@ export default function ActivityView() {
 			</div>
 
 			{/* Summary Stat Cards */}
-			<div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex items-center justify-between" style={{ padding: 'var(--ui-gap)' }}>
 					<div>
 						<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">{t('account.activity.tabs.applications')}</span>
@@ -274,6 +288,17 @@ export default function ActivityView() {
 						<Inbox size={20} />
 					</div>
 				</div>
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex items-center justify-between" style={{ padding: 'var(--ui-gap)' }}>
+					<div>
+						<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">{t('account.activity.tabs.reviews')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{data?.reviews?.length || 0}
+						</p>
+					</div>
+					<div className="p-3 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<Star size={20} />
+					</div>
+				</div>
 			</div>
 
 			{/* Filter & Search Bar */}
@@ -282,7 +307,7 @@ export default function ActivityView() {
 				style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}
 			>
 				<div className="flex flex-wrap items-center gap-1.5 bg-(--background)/60 p-1 rounded-2xl border border-(--border)/10">
-					{(['all', 'applications', 'issues', 'suggestions'] as const).map((key) => (
+					{(['all', 'applications', 'issues', 'suggestions', 'reviews'] as const).map((key) => (
 						<button
 							key={key}
 							type="button"

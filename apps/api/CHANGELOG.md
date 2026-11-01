@@ -2,6 +2,27 @@
 
 # api
 
+## 0.27.0
+
+### Minor Changes
+
+-   - **Comprehensive Endpoint Security, RBAC & SSRF Hardening**: Enforced `requireStaffPermission` and session ownership verification across 50+ `/secure/*` routes (`admin`, `announcements`, `bots`, `core`, `dictionary`, `dispatch`, `guilds`, `hosting`, `invites`, `organizations`, `store`, `tokens`, `users`), restricted `/secure/hosting/ssh` strictly to allowlisted Easypanel node hostnames, added XML/SVG entity escaping across `/v1/*/badge.svg` endpoints, and hardened `proxy.ts` rate limiting and CORS headers.
+    - **Centralized Staff Audit & Notification Dispatcher (`auditAndNotify.ts`)**: Added automated staff audit log recording and user notification dispatching when staff modify user profiles, credits, bots, servers, or organizations.
+    - **Welcome Sign-In Bonus & Default Join Roles**: Added automatic `+1,000 Credits` welcome sign-in bonus (`signInBonusClaimed`), initial Level 1 record provisioning, and default `join_roles` assignment in `/secure/users/[id]`.
+    - **User Activity Reviews & Admin Entity Endpoints**: Extended `GET /secure/users/[id]/activity` with authored bot and server reviews, expanded `PATCH /secure/users/[id]`, `/secure/bots/[id]/profile`, `/secure/guilds/[id]`, and `/secure/organizations/[id]` for full admin and portal management, and added `POST /secure/core/settings/sister_servers/sync`.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 0.26.1
 
 ### Patch Changes

@@ -147,7 +147,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 							privacy: 'public',
 							$or: devConditions,
 						})
-							.select('id vanitySlug name avatar description verified tags voteCount status')
+							.select('id vanitySlug name avatar description verified tags voteCount status discordCache')
 							.limit(4)
 							.lean()
 							.catch(() => [])
@@ -162,7 +162,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 							privacy: 'public',
 							tags: { $in: tagList },
 						})
-							.select('id vanitySlug name avatar description verified tags voteCount status')
+							.select('id vanitySlug name avatar description verified tags voteCount status discordCache')
 							.limit(4)
 							.lean()
 							.catch(() => [])
@@ -191,8 +191,20 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
 			const enrichBotSummary = (b: any) => {
 				const st = statMap.get(b.id);
+				const dc = b.discordCache;
 				return {
 					...b,
+					name: dc?.globalName || dc?.username || b.name,
+					avatar: b.avatar || dc?.avatarUrl || dc?.avatar,
+					discord: dc?.username
+						? {
+								id: b.id,
+								username: dc.username,
+								global_name: dc.globalName || dc.username,
+								avatar: dc.avatar || b.avatar,
+								avatarUrl: dc.avatarUrl || null,
+							}
+						: undefined,
 					guildCount: st?.guildCount ?? 0,
 					userCount: st?.userCount ?? 0,
 					voteCount: voteMap.get(b.id) ?? b.voteCount ?? 0,
@@ -228,34 +240,123 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 			}
 		}
 
-		// Fetch Discord Profile
+		// Fetch Discord Profile (with discordCache fallback & persistence)
 		try {
-			const token = process.env.DISCORD_CLIENT_TOKEN;
-			if (token) {
+			const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];
+			let discordUser: any = null;
+
+			for (const token of tokens) {
 				const discordRes = await fetch(`https://discord.com/api/v10/users/${botId}`, {
 					headers: { Authorization: `Bot ${token}` },
-				});
-				if (discordRes.ok) {
-					const discordUser = await discordRes.json();
-					bot.discord = discordUser;
+					next: { revalidate: 3600 },
+				}).catch(() => null);
+				if (discordRes?.ok) {
+					discordUser = await discordRes.json();
+					break;
 				}
+			}
 
-				if (bot.owners && bot.owners.length > 0) {
-					const ownersData = await Promise.all(
-						bot.owners.map(async (ownerId: string) => {
+			if (discordUser) {
+				const avatarUrl = discordUser.avatar ? `https://cdn.discordapp.com/avatars/${botId}/${discordUser.avatar}.${discordUser.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null;
+				const bannerUrl = discordUser.banner ? `https://cdn.discordapp.com/banners/${botId}/${discordUser.banner}.${discordUser.banner.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null;
+				bot.discord = {
+					...discordUser,
+					avatarUrl,
+					bannerUrl,
+				};
+				setTimeout(async () => {
+					try {
+						await BotModel.updateOne(
+							{ id: botId },
+							{
+								$set: {
+									discordCache: {
+										username: discordUser.username || '',
+										globalName: discordUser.global_name || discordUser.globalName || discordUser.username || '',
+										avatar: discordUser.avatar || '',
+										banner: discordUser.banner || '',
+										avatarUrl: avatarUrl || '',
+										bannerUrl: bannerUrl || '',
+										updatedAt: new Date(),
+									},
+								},
+							}
+						).catch(() => {});
+					} catch {}
+				}, 0);
+			} else if (bot.discordCache?.username || bot.name) {
+				const dc = bot.discordCache || {};
+				bot.discord = {
+					id: botId,
+					username: dc.username || bot.name || botId,
+					global_name: dc.globalName || bot.name || dc.username || botId,
+					avatar: dc.avatar || bot.avatar || null,
+					banner: dc.banner || null,
+					avatarUrl:
+						dc.avatarUrl ||
+						(dc.avatar
+							? `https://cdn.discordapp.com/avatars/${botId}/${dc.avatar}.png?size=1024`
+							: bot.avatar
+								? String(bot.avatar).startsWith('http')
+									? bot.avatar
+									: `https://cdn.discordapp.com/avatars/${botId}/${bot.avatar}.png?size=1024`
+								: null),
+					bannerUrl: dc.bannerUrl || null,
+					bot: true,
+				};
+			}
+
+			if (Array.isArray(bot.owners) && bot.owners.length > 0) {
+				const ownerDocs = UserModel
+					? await UserModel.find({ id: { $in: bot.owners } })
+							.select('id name icon vanitySlug discordCache')
+							.lean()
+							.catch(() => [])
+					: [];
+				const ownerDocMap = new Map<string, any>((ownerDocs || []).map((u: any) => [String(u.id), u]));
+
+				const ownersData = await Promise.all(
+					bot.owners.map(async (ownerId: string) => {
+						const doc = ownerDocMap.get(String(ownerId));
+						const dc = doc?.discordCache;
+						if (dc?.username) {
+							return {
+								id: ownerId,
+								vanitySlug: doc?.vanitySlug || undefined,
+								username: dc.username,
+								global_name: dc.globalName || dc.username,
+								avatar: dc.avatar || null,
+								avatarUrl: dc.avatarUrl || (dc.avatar ? `https://cdn.discordapp.com/avatars/${ownerId}/${dc.avatar}.png?size=128` : doc?.icon || null),
+								discriminator: '0',
+							};
+						}
+						for (const token of tokens) {
 							try {
 								const res = await fetch(`https://discord.com/api/v10/users/${ownerId}`, {
 									headers: { Authorization: `Bot ${token}` },
+									next: { revalidate: 3600 },
 								});
-								if (res.ok) return await res.json();
-							} catch (e) {
-								console.error(`Failed to fetch owner ${ownerId}`, e);
-							}
-							return null;
-						})
-					);
-					bot.ownersData = ownersData.filter(Boolean);
-				}
+								if (res.ok) {
+									const dJson = await res.json();
+									return { ...dJson, vanitySlug: doc?.vanitySlug || undefined };
+								}
+							} catch {}
+						}
+						if (doc?.name) {
+							return {
+								id: ownerId,
+								vanitySlug: doc?.vanitySlug || undefined,
+								username: doc.name,
+								global_name: doc.name,
+								avatar: null,
+								avatarUrl: doc.icon || null,
+								discriminator: '0',
+							};
+						}
+						return null;
+					})
+				);
+				bot.ownersData = ownersData.filter(Boolean);
 			}
 		} catch (e) {
 			console.error('Failed to fetch Discord user:', e);
@@ -338,7 +439,23 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 			}
 		}
 
-		const updatableFields = ['name', 'description', 'info', 'privacy', 'widgets', 'verified', 'vanityUnlocked', 'owners', 'organization', 'tags', 'commands', 'releases'];
+		const updatableFields = [
+			'name',
+			'description',
+			'info',
+			'privacy',
+			'widgets',
+			'verified',
+			'vanityUnlocked',
+			'owners',
+			'organization',
+			'tags',
+			'commands',
+			'releases',
+			'voteCount',
+			'promotedUntil',
+			'boostedUntil',
+		];
 		const linksFields = ['invite', 'support', 'community', 'github', 'website', 'privacy', 'terms', 'dashboard'];
 
 		if (body.links && typeof body.links === 'object') {
@@ -402,9 +519,19 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
 		}
 
+		const targetBotId = targetBot?.id || id;
+		const botModels = db.models.bots as any;
+		await Promise.all([
+			botModels?.Vote?.deleteMany({ $or: [{ botId: targetBotId }, { id: targetBotId }] }).catch(() => {}),
+			botModels?.Review?.deleteMany({ $or: [{ botId: targetBotId }, { id: targetBotId }] }).catch(() => {}),
+			botModels?.Stat?.deleteMany({ $or: [{ botId: targetBotId }, { id: targetBotId }] }).catch(() => {}),
+			botModels?.Command?.deleteMany({ $or: [{ botId: targetBotId }, { id: targetBotId }] }).catch(() => {}),
+			botModels?.Hook?.deleteMany({ $or: [{ botId: targetBotId }, { id: targetBotId }] }).catch(() => {}),
+		]);
+
 		const TokenModel = (db.models.users as any)?.Token;
 		if (TokenModel) {
-			await TokenModel.updateMany({ botId: targetBot?.id || id }, { $unset: { botId: 1 }, $set: { status: 'pending' } }).catch(() => {});
+			await TokenModel.updateMany({ botId: targetBotId }, { $unset: { botId: 1 }, $set: { status: 'pending' } }).catch(() => {});
 		}
 
 		await recordAuditLog(request, {

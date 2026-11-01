@@ -16,7 +16,7 @@
 - `clean` (`commands/clean.ts`): Purges `.next`, `dist`, `build`, and `node_modules` caches and reinstalls dependencies.
 - `generate-locales` (`commands/generateLocales.ts`): Scans `packages/lib/src/dictionaries/*.json` and writes `packages/lib/src/i18n.config.ts`.
 - `initialize` (`commands/initialize.ts`): Copies shared static files from `packages/public` into each web app's `public/` folder.
-- `commit` (`commands/commit.ts`): Formats code with Prettier, detects legal policy edits (`TermsPrompt.tsx` version bumps), and runs `@changesets/cli`.
+- `commit` (`commands/commit.ts`): Formats code with Prettier, detects legal policy edits (`TermsPrompt.tsx` version bumps), and prompts for separate per-app/per-package `.changeset/*.md` entries so every app's `CHANGELOG.md` only receives its own changes.
 - `ship` (`commands/ship.ts`): Versions, tags, and publishes/pushes releases.
 
 ## ⚠️ Important Rules & Gotchas

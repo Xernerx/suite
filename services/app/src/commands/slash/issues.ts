@@ -102,7 +102,7 @@ export async function buildIssuesOverviewMessage(client: Client, tab: IssuesFilt
 				.setLabel(t.label)
 				.setStyle(t.id === tab ? ButtonStyle.Primary : ButtonStyle.Secondary)
 		),
-		new ButtonBuilder().setLabel('Report a Bug (+500 Credits)').setStyle(ButtonStyle.Link).setURL(issuesUrl)
+		new ButtonBuilder().setLabel('Report a Bug').setStyle(ButtonStyle.Link).setURL(issuesUrl)
 	);
 
 	return {
@@ -231,12 +231,15 @@ export default class IssuesCommand extends SlashCommandBuilder {
 			const createdTs = found.createdAt ? Math.floor(new Date(found.createdAt).getTime() / 1000) : null;
 			const resolvedTs = found.resolvedAt ? Math.floor(new Date(found.resolvedAt).getTime() / 1000) : null;
 
-			const resolutionLines: string[] = [`• **Bounty:** \`${found.bountyAwarded ? '+500 Credits Awarded' : '+500 Credits on Verification'}\``];
+			const resolutionLines: string[] = [];
 			if (found.resolvedApp || found.resolvedVersion) {
 				resolutionLines.unshift(`• **Fix Target:** \`${found.resolvedApp || 'suite'}${found.resolvedVersion ? ` v${found.resolvedVersion}` : ''}\``);
 			}
 			if (resolvedTs) {
 				resolutionLines.unshift(`• **Resolved:** <t:${resolvedTs}:R>`);
+			}
+			if (resolutionLines.length === 0) {
+				resolutionLines.push(`• **Verified:** \`${found.acknowledged ? 'Yes' : 'Pending Review'}\``);
 			}
 
 			const itemEmbed = new EmbedBuilder()
@@ -256,7 +259,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 						inline: true,
 					},
 					{
-						name: 'Resolution & Bounty',
+						name: 'Resolution',
 						value: resolutionLines.join('\n'),
 						inline: true,
 					},

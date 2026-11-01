@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dns from 'node:dns/promises';
 import { Client } from 'ssh2';
 import { database } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +28,19 @@ function isCloudflareProxyIp(ip: string): boolean {
 	return false;
 }
 
+const ALLOWED_EASYPANEL_HOSTNAMES = new Set(['one-dummi.xernerx.com', 'two-dummi.xernerx.com']);
+
+function isAllowedEasypanelHostname(hostname: string): boolean {
+	const clean = hostname.trim().toLowerCase();
+	if (ALLOWED_EASYPANEL_HOSTNAMES.has(clean)) return true;
+	return /^[a-z0-9-]+-dummi\.xernerx\.com$/.test(clean);
+}
+
 async function tryResolveEasypanelServerIp(hostname: string, user: any, fallbackPassword?: string): Promise<string | null> {
 	try {
+		if (!isAllowedEasypanelHostname(hostname)) {
+			return null;
+		}
 		const epConn = Array.isArray(user?.connections) ? user.connections.find((c: any) => c.provider === 'easypanel') : null;
 		let token = epConn?.token || '';
 		if (!token) {
@@ -92,23 +104,21 @@ function shellSingleQuote(str: string): string {
 
 export async function POST(req: NextRequest) {
 	try {
+		const caller = await resolveCallerAuth(req, ['hosting']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing server hosting permission' }, { status: 403 });
+		}
+
 		const body = await req.json().catch(() => ({}));
-		const userId = String(body.userId || '').trim();
+		const userId = caller.userId && caller.userId !== 'system' ? caller.userId : String(body.userId || '').trim();
 		if (!userId) {
 			return NextResponse.json({ error: 'Unauthorized: Missing userId' }, { status: 401 });
 		}
 
 		const { models } = await database('xernerx');
 		const user = (await models.users.User.findOne({ id: userId }).lean()) as any;
-		if (!user) {
+		if (!user && !caller.isSystemToken) {
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
-		}
-
-		const userRoles: string[] = Array.isArray(user.roles) ? user.roles : [];
-		const roles = userRoles.length > 0 ? await models.core.Role.find({ id: { $in: userRoles } }).lean() : [];
-		const hasHostingPermission = roles.some((r: any) => Boolean(r?.permissions?.hosting));
-		if (!hasHostingPermission) {
-			return NextResponse.json({ error: 'Forbidden: Missing server hosting permission' }, { status: 403 });
 		}
 
 		const rawTarget = String(body.target || '').trim();

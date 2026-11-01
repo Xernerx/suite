@@ -2,6 +2,18 @@
 
 # `@xernerx/app`
 
+## 2.4.0
+
+### Minor Changes
+
+-   - **Automated Bot Icon Application Emoji Sync (`botIconEmojis.ts` & `userUpdate.ts`)**: Added automatic creation and synchronization of custom application emojis for official sister bots on `clientReady` and `userUpdate` events.
+    - **Issue & Suggestion Slash Command Badges**: Updated `/issues` and `/suggestions` slash commands to render custom bot application emoji badges alongside product names.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.18.0
+
 ## 2.3.9
 
 ### Patch Changes

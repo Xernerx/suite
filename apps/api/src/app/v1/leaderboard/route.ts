@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 		const { models } = await database('xernerx');
 
 		// 1. Strictly fetch ONLY users who have explicitly set privacy === 'public'
-		const publicUsers = (await models.users.User.find({ privacy: 'public' }).select('id name icon verified description').lean()) as any[];
+		const publicUsers = (await models.users.User.find({ privacy: 'public' }).select('id name icon verified description discordCache').lean()) as any[];
 		const publicUserMap = new Map<string, any>();
 		for (const u of publicUsers) {
 			if (u?.id) publicUserMap.set(String(u.id), u);
@@ -75,6 +75,7 @@ export async function GET(req: NextRequest) {
 						description: 1,
 						verified: { $ifNull: ['$verified', false] },
 						tags: { $ifNull: ['$tags', []] },
+						discord: { $ifNull: ['$discordCache', null] },
 						voteCount: '$computedVoteCount',
 						guildCount: '$computedGuildCount',
 						userCount: '$computedUserCount',
@@ -133,8 +134,10 @@ export async function GET(req: NextRequest) {
 						.limit(30)
 						.lean() as Promise<any[]>)
 				: Promise.resolve([]),
-			LevelModel
-				? (LevelModel.find({ $or: [{ level: { $gt: 0 } }, { xp: { $gt: 0 } }] })
+			LevelModel && publicUserIds.length > 0
+				? (LevelModel.find({
+						$and: [{ $or: [{ ownerId: { $in: publicUserIds } }, { id: { $in: publicUserIds } }] }, { $or: [{ level: { $gt: 0 } }, { xp: { $gt: 0 } }] }],
+					})
 						.sort({ level: -1, xp: -1 })
 						.limit(30)
 						.lean() as Promise<any[]>)
@@ -151,6 +154,7 @@ export async function GET(req: NextRequest) {
 					icon: u?.icon || null,
 					description: u?.description || '',
 					verified: Boolean(u?.verified),
+					discord: u?.discordCache || null,
 					streak: c.streak || 0,
 					balance: c.balance || 0,
 				};
@@ -343,7 +347,7 @@ export async function GET(req: NextRequest) {
 
 				if (levelUserIds.length > 0) {
 					const foundUsers = await models.users.User.find({ id: { $in: levelUserIds } })
-						.select('id name icon verified description privacy')
+						.select('id name icon verified description privacy discordCache')
 						.lean()
 						.catch(() => []);
 					for (const u of foundUsers || []) {
@@ -360,6 +364,7 @@ export async function GET(req: NextRequest) {
 						icon: u?.icon || null,
 						description: u?.description || '',
 						verified: Boolean(u?.verified),
+						discord: u?.discordCache || null,
 						level: Number(doc.level) || 0,
 						xp: Number(doc.xp) || 0,
 						messages: track === 'text' ? Number(doc.messages) || 0 : undefined,
@@ -376,36 +381,31 @@ export async function GET(req: NextRequest) {
 					text: (tDocs || []).filter((d: any) => Number(d?.level) > 0 || Number(d?.xp) > 0).map((d: any) => mapDoc(d, 'text')),
 					voice: (vDocs || []).filter((d: any) => Number(d?.level) > 0 || Number(d?.xp) > 0).map((d: any) => mapDoc(d, 'voice')),
 				};
-			} else {
-				const levelUserIds = Array.from(new Set((rawGlobalLevels || []).map((d: any) => String(d?.ownerId || d?.userId || d?.id || '')).filter(Boolean)));
-				if (levelUserIds.length > 0) {
-					const foundUsers = await models.users.User.find({ id: { $in: levelUserIds } })
-						.select('id name icon verified description privacy')
-						.lean()
-						.catch(() => []);
-					for (const u of foundUsers || []) {
-						if (u?.id) extraUsersMap.set(String(u.id), u);
-					}
-				}
 			}
 		} catch {}
 
 		const mapGlobalLevelDoc = (doc: any) => {
 			const uid = String(doc.ownerId || doc.userId || doc.id || '');
-			const u = publicUserMap.get(uid) || extraUsersMap.get(uid);
+			const u = publicUserMap.get(uid);
 			return {
 				id: uid,
 				name: u?.name || doc.name || null,
 				icon: u?.icon || null,
 				description: u?.description || '',
 				verified: Boolean(u?.verified),
+				discord: u?.discordCache || null,
 				level: Number(doc.level) || 0,
 				xp: Number(doc.xp) || 0,
 				track: 'global' as const,
 			};
 		};
 
-		const levels = (rawGlobalLevels || []).filter((l: any) => Boolean(l?.ownerId || l?.id) && (Number(l?.level) > 0 || Number(l?.xp) > 0)).map((l: any) => mapGlobalLevelDoc(l));
+		const levels = (rawGlobalLevels || [])
+			.filter((l: any) => {
+				const uid = String(l?.ownerId || l?.id || '');
+				return Boolean(uid && publicUserMap.has(uid) && (Number(l?.level) > 0 || Number(l?.xp) > 0));
+			})
+			.map((l: any) => mapGlobalLevelDoc(l));
 
 		return NextResponse.json({
 			bots: bots || [],

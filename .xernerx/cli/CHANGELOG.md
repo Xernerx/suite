@@ -2,6 +2,12 @@
 
 # @xernerx/cli
 
+## 2.5.0
+
+### Minor Changes
+
+-   - **Per-App Interactive Changeset Generator (`suite commit`)**: Upgraded `pnpm suite commit` to auto-detect modified workspaces and prompt for a separate version bump and dedicated changelog message per selected app/package, writing individual `.changeset/<pkg>.md` files so each app's `CHANGELOG.md` only contains its own changes.
+
 ## 2.4.4
 
 ### Patch Changes

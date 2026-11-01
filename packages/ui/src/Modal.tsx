@@ -39,49 +39,43 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 	if (!open || !mounted) return null;
 
 	const modalContent = (
-		<div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/30 backdrop-blur-sm animate-in fade-in duration-200 font-sans antialiased text-(--text)">
+		<div className="fixed inset-0 z-[9999] overflow-hidden bg-black/30 backdrop-blur-sm animate-in fade-in duration-200 font-sans antialiased text-(--text)">
 			<div
-				className="flex flex-col min-h-full items-center p-4 sm:p-8"
+				className="flex flex-col h-full w-full items-center justify-center p-4 sm:p-6"
 				style={{
-					paddingTop: 'calc(1rem + env(safe-area-inset-top, 0px))',
-					paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))',
+					paddingTop: 'calc(3.75rem + env(safe-area-inset-top, 0px))',
+					paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))',
 					paddingLeft: 'calc(1rem + env(safe-area-inset-left, 0px))',
 					paddingRight: 'calc(1rem + env(safe-area-inset-right, 0px))',
 				}}
 			>
-				{/* Spacer to push down */}
-				<div className="flex-grow shrink-0 h-12 sm:h-16"></div>
-
 				<div
 					ref={ref}
-					className={`flex flex-col w-full shrink-0 ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
-					style={{ padding: 'var(--ui-gap)' }}
+					role="dialog"
+					aria-modal="true"
+					className={`flex flex-col w-full max-h-full overflow-hidden ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
-					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-						{(title || description) && (
-							<div className="flex items-start justify-between shrink-0" style={{ gap: 'var(--ui-gap)' }}>
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-									{title && (
-										<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-											{title}
-										</h2>
-									)}
-									{description && <p className="text-xs text-(--text-muted) leading-relaxed">{description}</p>}
-								</div>
-								<Button type="button" variant="ghost" size="icon" onClick={() => onOpenChange(false)} aria-label={t('common.buttons.close')} className="shrink-0">
-									<X size={16} />
-								</Button>
+					{(title || description) && (
+						<div className="flex items-start justify-between shrink-0" style={{ gap: 'var(--ui-gap)' }}>
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+								{title && (
+									<h2 className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+										{title}
+									</h2>
+								)}
+								{description && <p className="text-xs text-(--text-muted) leading-relaxed">{description}</p>}
 							</div>
-						)}
-
-						<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-							{children}
+							<Button type="button" variant="ghost" size="icon" onClick={() => onOpenChange(false)} aria-label={t('common.buttons.close')} className="shrink-0">
+								<X size={16} />
+							</Button>
 						</div>
+					)}
+
+					<div className="flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1" style={{ gap: 'var(--ui-gap)' }}>
+						{children}
 					</div>
 				</div>
-
-				{/* Spacer to push up */}
-				<div className="flex-grow shrink-0 h-12 sm:h-16"></div>
 			</div>
 		</div>
 	);

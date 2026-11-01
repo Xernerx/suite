@@ -2,6 +2,14 @@
 
 # bot
 
+## 2.1.11
+
+### Patch Changes
+
+-   - **Directory Slash & Context Command Polish**: Updated `/bot`, `/server`, `/user`, and profile context menu embeds to respect 3-tier privacy settings.
+- Updated dependencies
+    - @xernerx/lib@1.18.0
+
 ## 2.1.10
 
 ### Patch Changes

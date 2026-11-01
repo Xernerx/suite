@@ -2,6 +2,14 @@
 
 # @xernerx/ui
 
+## 0.7.16
+
+### Patch Changes
+
+-   - **Modal & Selector Component Polish**: Refined `Modal` and `Selector` primitive accessibility and keyboard interaction handling.
+- Updated dependencies
+    - @xernerx/providers@0.19.0
+
 ## 0.7.15
 
 ### Patch Changes

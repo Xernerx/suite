@@ -18,6 +18,109 @@ export interface AuditLogInput {
 	details?: Record<string, any>;
 }
 
+export interface CallerAuthResult {
+	authenticated: boolean;
+	authorized: boolean;
+	isSystemToken: boolean;
+	isStaff: boolean;
+	userId: string | null;
+	permissions: Record<string, boolean>;
+}
+
+export async function resolveCallerAuth(req: Request, requiredPermissions?: string[]): Promise<CallerAuthResult> {
+	const isSystemToken = Boolean(req.headers.get('x-token-id'));
+	if (isSystemToken) {
+		return {
+			authenticated: true,
+			authorized: true,
+			isSystemToken: true,
+			isStaff: true,
+			userId: 'system',
+			permissions: {
+				access: true,
+				hosting: true,
+				users: true,
+				bots: true,
+				servers: true,
+				roles: true,
+				tokens: true,
+				translations: true,
+				applications_review: true,
+				applications_manage: true,
+				settings: true,
+				invites: true,
+				announcements: true,
+				manageMedia: true,
+				uploadMedia: true,
+				manageRoadmap: true,
+				manageSuggestions: true,
+				manageIssues: true,
+				manageStore: true,
+				manageSupport: true,
+			},
+		};
+	}
+
+	let userId: string | null = null;
+	try {
+		const session = (await getServerSession(auth)) as any;
+		if (session?.user?.id) {
+			userId = String(session.user.id);
+		}
+	} catch {}
+
+	if (!userId && process.env.ENVIRONMENT?.toLowerCase() === 'development') {
+		const origin = req.headers.get('origin') || '';
+		const host = req.headers.get('host') || '';
+		if (origin.includes('localhost') || origin.includes('127.0.0.1') || host.startsWith('localhost') || host.startsWith('127.0.0.1')) {
+			const headerActor = req.headers.get('x-actor-id');
+			if (headerActor) userId = String(headerActor);
+		}
+	}
+
+	if (!userId) {
+		return {
+			authenticated: false,
+			authorized: false,
+			isSystemToken: false,
+			isStaff: false,
+			userId: null,
+			permissions: {},
+		};
+	}
+
+	const mergedPermissions: Record<string, boolean> = {};
+	try {
+		const { models } = await database('xernerx');
+		const userDoc = (await models.users.User.findOne({ id: userId }).select('roles').lean()) as any;
+		const roleIds = Array.isArray(userDoc?.roles) ? userDoc.roles.map((r: any) => (typeof r === 'string' ? r : r?.id)).filter(Boolean) : [];
+		if (roleIds.length > 0 && models.core?.Role) {
+			const roleDocs = await models.core.Role.find({ id: { $in: roleIds } })
+				.select('permissions')
+				.lean();
+			for (const roleDoc of roleDocs as any[]) {
+				if (roleDoc?.permissions && typeof roleDoc.permissions === 'object') {
+					for (const [k, v] of Object.entries(roleDoc.permissions)) {
+						if (v === true) mergedPermissions[k] = true;
+					}
+				}
+			}
+		}
+	} catch {}
+
+	const isStaff = Boolean(mergedPermissions.access || Object.values(mergedPermissions).some(Boolean));
+	const authorized = !requiredPermissions || requiredPermissions.length === 0 ? true : requiredPermissions.some((perm) => Boolean(mergedPermissions[perm]));
+
+	return {
+		authenticated: true,
+		authorized,
+		isSystemToken: false,
+		isStaff,
+		userId,
+		permissions: mergedPermissions,
+	};
+}
+
 export async function recordAuditLog(reqOrInput: Request | AuditLogInput, maybeInput?: AuditLogInput): Promise<void> {
 	const input: AuditLogInput = (maybeInput ? maybeInput : reqOrInput) as AuditLogInput;
 	if (!input || !input.action) return;
@@ -25,6 +128,12 @@ export async function recordAuditLog(reqOrInput: Request | AuditLogInput, maybeI
 	try {
 		let actorId = input.actorId || null;
 		let actorName = input.actorName || null;
+
+		if (!actorId && maybeInput && typeof (reqOrInput as Request)?.headers?.get === 'function') {
+			const req = reqOrInput as Request;
+			actorId = req.headers.get('x-actor-id') || null;
+			actorName = req.headers.get('x-actor-name') || null;
+		}
 
 		if (!actorId) {
 			try {
@@ -41,6 +150,12 @@ export async function recordAuditLog(reqOrInput: Request | AuditLogInput, maybeI
 		const resolvedMetadata = input.metadata || input.details || {};
 
 		const { models } = await database('xernerx');
+		if (actorId && actorId !== 'staff' && actorId !== 'system' && !actorName) {
+			try {
+				const actorDoc = (await models.users.User.findOne({ id: actorId }).select('name').lean()) as any;
+				if (actorDoc?.name) actorName = actorDoc.name;
+			} catch {}
+		}
 		const entry = await models.core.AuditLog.create({
 			id: crypto.randomUUID(),
 			actorId: actorId || 'staff',

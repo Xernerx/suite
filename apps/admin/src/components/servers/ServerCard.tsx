@@ -15,9 +15,10 @@ interface ServerCardProps {
 	onServerDeleted: (id: string) => void;
 	onServerUpdated: (updated: AdminServerSummary) => void;
 	onViewAuditLogs?: (serverId: string) => void;
+	onNavigateEntity?: (tab: string, query: string) => void;
 }
 
-export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated, onViewAuditLogs }: ServerCardProps) {
+export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated, onViewAuditLogs, onNavigateEntity }: ServerCardProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -135,6 +136,7 @@ export function ServerCard({ server, getEnvUrl, onServerDeleted, onServerUpdated
 				onServerDeleted={onServerDeleted}
 				onServerUpdated={onServerUpdated}
 				onViewAuditLogs={onViewAuditLogs}
+				onNavigateEntity={onNavigateEntity}
 			/>
 		</>
 	);

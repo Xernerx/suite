@@ -2,9 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> | { id: string } }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['announcements']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing announcements permission.' }, { status: 403 });
+		}
+
 		const resolvedParams = await params;
 		const { id } = resolvedParams;
 		const body = await req.json();
@@ -30,6 +36,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (Array.isArray(body.targetApps)) announcement.targetApps = body.targetApps;
 
 		await announcement.save();
+
+		await recordAuditLog(req, {
+			action: 'announcement.updated',
+			targetType: 'setting',
+			targetId: id,
+			summary: `Updated announcement "${announcement.title || id}"`,
+		});
 
 		// If it was already sent, we should attempt to edit the Discord message
 		if (announcement.sentAt && announcement.discordMessageId) {
@@ -63,6 +76,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> | { id: string } }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['announcements']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing announcements permission.' }, { status: 403 });
+		}
+
 		const resolvedParams = await params;
 		const { id } = resolvedParams;
 		const { models } = await database('xernerx');
@@ -77,6 +95,13 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		// if (announcement.discordMessageId) { ... DELETE webhook message ... }
 
 		await Announcement.deleteOne({ id });
+
+		await recordAuditLog(req, {
+			action: 'announcement.deleted',
+			targetType: 'setting',
+			targetId: id,
+			summary: `Deleted announcement "${announcement.title || id}"`,
+		});
 
 		return NextResponse.json({ success: true });
 	} catch (err: any) {

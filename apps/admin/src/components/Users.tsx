@@ -1,18 +1,27 @@
 /** @format */
 'use client';
 
-import { ArrowUpDown, Download, RefreshCw } from 'lucide-react';
+import { CheckCircle2, Download, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Input, MultiSelector } from '@xernerx/ui';
+import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './users/types';
 import { UserCard } from './users/UserCard';
-import { AdminUserCreditsModal } from './AdminUserCreditsModal';
 import { useInfiniteScroll } from './useInfiniteScroll';
 
-export default function Users({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (userId: string) => void }) {
+type UserSortOption = 'name_asc' | 'name_desc' | 'level_desc' | 'credits_desc' | 'streak_desc';
+
+export default function Users({
+	initialSearch = '',
+	onViewAuditLogs,
+	onNavigateEntity,
+}: {
+	initialSearch?: string;
+	onViewAuditLogs?: (userId: string) => void;
+	onNavigateEntity?: (tab: string, query: string) => void;
+}) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const [users, setUsers] = useState<UserSummary[]>([]);
@@ -21,10 +30,10 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [search, setSearch] = useState(initialSearch);
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [sortBy, setSortBy] = useState<UserSortOption>('name_asc');
 	const [filterRoleIds, setFilterRoleIds] = useState<string[]>([]);
+	const [verifiedOnly, setVerifiedOnly] = useState(false);
 	const [limit, setLimit] = useState(30);
-	const [creditsTargetUser, setCreditsTargetUser] = useState<UserSummary | null>(null);
 
 	useEffect(() => {
 		if (initialSearch !== undefined) setSearch(initialSearch);
@@ -33,7 +42,7 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 	// Reset limit when filters change
 	useEffect(() => {
 		setLimit(30);
-	}, [search, sortOrder, filterRoleIds]);
+	}, [search, sortBy, filterRoleIds, verifiedOnly]);
 
 	const fetchData = useCallback(
 		async (isManual = false) => {
@@ -78,6 +87,15 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 							roles: updatedUser.roles,
 							stripeCustomerId: updatedUser.stripeCustomerId,
 							icon: updatedUser.icon,
+							verified: updatedUser.verified,
+							vanitySlug: updatedUser.vanitySlug,
+							level: updatedUser.level || u.level,
+							credits: updatedUser.credits
+								? {
+										balance: updatedUser.credits.balance ?? u.credits?.balance ?? 0,
+										streak: updatedUser.credits.streak ?? u.credits?.streak ?? 0,
+									}
+								: u.credits,
 						}
 					: u
 			)
@@ -110,22 +128,35 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 				const matchesSearch = nameMatch || idMatch || discordMatch;
 				const userRoleIds = getNormalizedRoles(user);
 				const matchesRoles = filterRoleIds.length === 0 || filterRoleIds.some((roleId) => userRoleIds.includes(roleId));
-				return matchesSearch && matchesRoles;
+				const matchesVerified = !verifiedOnly || Boolean(user.verified);
+				return matchesSearch && matchesRoles && matchesVerified;
 			})
 			.sort((a, b) => {
+				if (sortBy === 'level_desc') {
+					const lvlDiff = (b.level?.level ?? 1) - (a.level?.level ?? 1);
+					if (lvlDiff !== 0) return lvlDiff;
+					return (b.level?.xp ?? 0) - (a.level?.xp ?? 0);
+				}
+				if (sortBy === 'credits_desc') {
+					return (b.credits?.balance ?? 0) - (a.credits?.balance ?? 0);
+				}
+				if (sortBy === 'streak_desc') {
+					return (b.credits?.streak ?? 0) - (a.credits?.streak ?? 0);
+				}
+
 				const nameA = (a.name || a.discord?.username || '').toLowerCase();
 				const nameB = (b.name || b.discord?.username || '').toLowerCase();
 
 				// Always push empty names to the very bottom
 				if (!nameA && nameB) return 1;
 				if (nameA && !nameB) return -1;
-				if (sortOrder === 'asc') {
+				if (sortBy === 'name_asc') {
 					return nameA.localeCompare(nameB);
 				} else {
 					return nameB.localeCompare(nameA);
 				}
 			});
-	}, [users, search, sortOrder, filterRoleIds]);
+	}, [users, search, sortBy, filterRoleIds, verifiedOnly]);
 
 	const renderedUsers = filteredUsers.slice(0, limit);
 	const loadMoreRef = useInfiniteScroll(filteredUsers.length > limit, loading, () => setLimit((prev) => prev + 30));
@@ -139,6 +170,11 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 				id: u.id,
 				name: u.name || u.discord?.globalName || u.discord?.username || '',
 				discordUsername: u.discord?.username || '',
+				verified: Boolean(u.verified),
+				level: u.level?.level ?? 1,
+				xp: u.level?.xp ?? 0,
+				credits: u.credits?.balance ?? 0,
+				streak: u.credits?.streak ?? 0,
 				roles: getNormalizedRoles(u).map((rid) => roleMap.get(rid) || rid),
 				stripeCustomerId: u.stripeCustomerId || '',
 			}));
@@ -152,12 +188,23 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 			return;
 		}
 
-		const headers = ['id', 'name', 'discordUsername', 'roles', 'stripeCustomerId'];
+		const headers = ['id', 'name', 'discordUsername', 'verified', 'level', 'xp', 'credits', 'streak', 'roles', 'stripeCustomerId'];
 		const rows = filteredUsers.map((u) => {
 			const roleNames = getNormalizedRoles(u)
 				.map((rid) => roleMap.get(rid) || rid)
 				.join('; ');
-			return [u.id, u.name || u.discord?.globalName || u.discord?.username || '', u.discord?.username || '', roleNames, u.stripeCustomerId || '']
+			return [
+				u.id,
+				u.name || u.discord?.globalName || u.discord?.username || '',
+				u.discord?.username || '',
+				u.verified ? 'true' : 'false',
+				u.level?.level ?? 1,
+				u.level?.xp ?? 0,
+				u.credits?.balance ?? 0,
+				u.credits?.streak ?? 0,
+				roleNames,
+				u.stripeCustomerId || '',
+			]
 				.map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
 				.join(',');
 		});
@@ -250,14 +297,29 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 					/>
 				</div>
 				<button
-					onClick={() => setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))}
-					className="flex items-center justify-center gap-2 rounded-full border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm font-medium text-(--text) hover:bg-(--foreground)/50 transition-colors shrink-0 w-full sm:w-auto h-[56px] px-6 shadow-sm"
+					type="button"
+					onClick={() => setVerifiedOnly((prev) => !prev)}
+					className={`flex items-center justify-center gap-2 rounded-full border backdrop-blur-md text-sm font-medium transition-colors shrink-0 w-full sm:w-auto h-[56px] px-5 shadow-sm cursor-pointer ${
+						verifiedOnly ? 'border-(--accent-green)/40 bg-(--accent-green)/15 text-(--accent-green)' : 'border-(--border)/10 bg-(--foreground)/30 text-(--text) hover:bg-(--foreground)/50'
+					}`}
 				>
-					<ArrowUpDown size={16} />
-					<span>
-						{t('admin.users.sortLabel')} {sortOrder === 'asc' ? 'A - Z' : 'Z - A'}
-					</span>
+					<CheckCircle2 size={16} />
+					<span>{t('admin.users.fields.verifiedFilter')}</span>
 				</button>
+				<div className="relative w-full sm:w-56 z-50">
+					<Selector
+						value={sortBy}
+						onChange={(val) => setSortBy(val as UserSortOption)}
+						options={[
+							{ value: 'name_asc', label: `${t('admin.users.sortLabel')} A - Z` },
+							{ value: 'name_desc', label: `${t('admin.users.sortLabel')} Z - A` },
+							{ value: 'level_desc', label: t('admin.users.sortOptions.highestLevel') },
+							{ value: 'credits_desc', label: t('admin.users.sortOptions.mostCredits') },
+							{ value: 'streak_desc', label: t('admin.users.sortOptions.longestStreak') },
+						]}
+						toggleClassName="h-[56px] !rounded-full !text-sm shadow-sm"
+					/>
+				</div>
 			</div>
 
 			{/* User Grid (3 Columns) */}
@@ -285,7 +347,7 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 									onUserUpdated={handleUserUpdated}
 									onDiscordFetched={handleDiscordFetched}
 									onViewAuditLogs={onViewAuditLogs}
-									onManageCredits={setCreditsTargetUser}
+									onNavigateEntity={onNavigateEntity}
 								/>
 							))}
 						</AnimatePresence>
@@ -297,8 +359,6 @@ export default function Users({ initialSearch = '', onViewAuditLogs }: { initial
 					)}
 				</>
 			)}
-
-			<AdminUserCreditsModal user={creditsTargetUser} onClose={() => setCreditsTargetUser(null)} />
 		</div>
 	);
 }

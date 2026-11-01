@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 async function syncDiscordThreadStatus(threadId: string, status: string, username?: string | null) {
 	const primaryToken = process.env.DISCORD_CLIENT_TOKEN || process.env.DISCORD_BOT_TOKEN;
@@ -41,6 +41,11 @@ async function syncDiscordThreadStatus(threadId: string, status: string, usernam
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageSupport']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Support management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const { entity } = body;
@@ -103,6 +108,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageSupport']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Support management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const url = new URL(req.url);
 		const entity = url.searchParams.get('entity') || 'channel';

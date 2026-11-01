@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,6 +68,11 @@ async function writeStoredScores(scores: Record<string, LighthouseScoreRecord>):
 
 export async function GET(req: NextRequest) {
 	try {
+		const caller = await resolveCallerAuth(req, ['settings', 'overview']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Admin access required.' }, { status: caller.authenticated ? 403 : 401 });
+		}
+
 		const targetUrl = req.nextUrl.searchParams.get('url');
 		const envKey = req.nextUrl.searchParams.get('key');
 

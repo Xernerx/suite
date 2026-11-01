@@ -2,10 +2,19 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy, Eye, EyeOff, KeyRound, Link2, Loader2, RefreshCw, Send, Trash2 } from 'lucide-react';
+import { Check, Code2, Copy, Eye, EyeOff, KeyRound, Link2, Loader2, RefreshCw, Send, Trash2 } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import WebhookDeliveriesCard, { WebhookDeliveryItem } from '@/components/portal/WebhookDeliveriesCard';
+
+const ALL_WEBHOOK_EVENTS = ['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'];
+
+const SIGNATURE_SNIPPET = `import crypto from 'crypto';
+
+export function verifyXernerxWebhook(rawBody: string, signatureHeader: string, secret: string): boolean {
+	const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+	return crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(expected));
+}`;
 
 function generateWebhookSecret(): string {
 	const bytes = new Uint8Array(16);
@@ -55,6 +64,7 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 	const [confirmDeleteIdx, setConfirmDeleteIdx] = useState<number | null>(null);
 	const [revealedSecrets, setRevealedSecrets] = useState<Record<number, boolean>>({});
 	const [copiedSecretIdx, setCopiedSecretIdx] = useState<number | null>(null);
+	const [copiedSnippet, setCopiedSnippet] = useState(false);
 	const [localDeliveries, setLocalDeliveries] = useState<WebhookDeliveryItem[]>(deliveries);
 
 	const activeDeliveries = onDeliveriesChange ? deliveries : localDeliveries;
@@ -242,9 +252,35 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 								<p className="text-xs text-(--text-muted)">{t('app.portal.bot.webhooks.secretHint')}</p>
 							</div>
 							<div className="flex flex-col gap-2">
-								<span className="text-sm font-semibold text-(--text-muted)">{t('app.portal.bot.webhooks.triggers')}</span>
+								<div className="flex flex-wrap items-center justify-between gap-2">
+									<span className="text-sm font-semibold text-(--text-muted)">{t('app.portal.bot.webhooks.triggers')}</span>
+									<div className="flex items-center gap-1.5">
+										<button
+											type="button"
+											onClick={() => {
+												const newHooks = [...(botConfig.hooks || [])];
+												newHooks[index] = { ...(newHooks[index] || {}), events: [...ALL_WEBHOOK_EVENTS] };
+												setBotConfig({ ...botConfig, hooks: newHooks });
+											}}
+											className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent) hover:text-white transition-colors cursor-pointer"
+										>
+											{t('app.portal.bot.webhooks.selectAllEvents')}
+										</button>
+										<button
+											type="button"
+											onClick={() => {
+												const newHooks = [...(botConfig.hooks || [])];
+												newHooks[index] = { ...(newHooks[index] || {}), events: [] };
+												setBotConfig({ ...botConfig, hooks: newHooks });
+											}}
+											className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) border border-(--border)/10 hover:text-(--text) transition-colors cursor-pointer"
+										>
+											{t('app.portal.bot.webhooks.clearAllEvents')}
+										</button>
+									</div>
+								</div>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-									{['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'].map((event) => (
+									{ALL_WEBHOOK_EVENTS.map((event) => (
 										<label key={event} className="flex items-center gap-2 cursor-pointer">
 											<Toggle
 												checked={hook.events?.includes(event) || false}
@@ -273,6 +309,37 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 					>
 						{t('app.portal.bot.webhooks.addWebhook')}
 					</Button>
+				</div>
+
+				{/* HMAC Signature Verification Snippet Card */}
+				<div className="mt-6 pt-6 border-t border-(--border)/10 flex flex-col gap-3">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<div>
+							<h3 className="text-sm font-extrabold text-(--text) flex items-center gap-2">
+								<Code2 className="w-4 h-4 text-(--accent)" />
+								{t('app.portal.bot.webhooks.verifySignatureTitle')}
+							</h3>
+							<p className="text-xs text-(--text-muted) mt-0.5">{t('app.portal.bot.webhooks.verifySignatureDesc')}</p>
+						</div>
+						<Button
+							type="button"
+							variant="secondary"
+							size="sm"
+							onClick={() => {
+								navigator.clipboard.writeText(SIGNATURE_SNIPPET);
+								setCopiedSnippet(true);
+								toast({ type: 'success', title: t('app.portal.bot.webhooks.snippetCopied') });
+								setTimeout(() => setCopiedSnippet(false), 2000);
+							}}
+							className="flex items-center gap-1.5 text-xs"
+						>
+							{copiedSnippet ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
+							<span>{t('app.portal.bot.webhooks.copySnippet')}</span>
+						</Button>
+					</div>
+					<pre className="p-4 rounded-2xl bg-(--background)/60 border border-(--border)/10 text-xs font-mono text-(--text) overflow-x-auto leading-relaxed">
+						<code>{SIGNATURE_SNIPPET}</code>
+					</pre>
 				</div>
 			</div>
 

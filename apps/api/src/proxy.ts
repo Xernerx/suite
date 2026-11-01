@@ -7,9 +7,33 @@ import { proxy as i18nProxyHandler } from '@xernerx/lib';
 // --- IN-MEMORY RATE LIMITER CACHE ---
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-// Configuration: 100 requests per 1 minute window per IP
+// Configuration: 100 requests per 1 minute window per IP (300/min for authenticated first-party browser sessions)
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS = 100;
+const SESSION_MAX_REQUESTS = 300;
+
+const TRUSTED_SUITE_SUBDOMAINS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste']);
+
+function isAllowedSuiteHostname(hostname: string): boolean {
+	if (!hostname) return false;
+	const clean = hostname.toLowerCase();
+	const baseDomain = (process.env.DOMAIN || 'xernerx.com').toLowerCase();
+
+	if (clean === baseDomain || clean === `canary.${baseDomain}` || clean === `dev.${baseDomain}`) {
+		return true;
+	}
+
+	for (const suffix of [`.${baseDomain}`, `.canary.${baseDomain}`, `.dev.${baseDomain}`]) {
+		if (clean.endsWith(suffix)) {
+			const sub = clean.slice(0, -suffix.length);
+			if (TRUSTED_SUITE_SUBDOMAINS.has(sub)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
 
 // Cleanup old entries every 5 minutes to prevent memory bloat
 setInterval(
@@ -37,8 +61,8 @@ export async function proxy(req: NextRequest) {
 	}
 	const hostNameOnly = host.split(':')[0];
 
-	const isAuthorizedOrigin = originHostname.endsWith('.xernerx.com') || originHostname === 'xernerx.com';
-	const isAuthorizedHost = hostNameOnly.endsWith('.xernerx.com') || hostNameOnly === 'xernerx.com';
+	const isAuthorizedOrigin = isAllowedSuiteHostname(originHostname);
+	const isAuthorizedHost = isAllowedSuiteHostname(hostNameOnly);
 
 	// Explicitly identify trusted frontends (browsers send Origin)
 	const isLocalDevOrigin =
@@ -50,16 +74,15 @@ export async function proxy(req: NextRequest) {
 	const isSameOriginBrowser = !origin && isAuthorizedHost && hasSessionCookie;
 
 	const isTrustedFrontend = isAuthorizedOrigin || isLocalDevOrigin || isSameOriginBrowser;
-
-	// --- REUSABLE CORS HEADERS ---
-	const corsHeaders: Record<string, string> = {
-		'Access-Control-Allow-Origin': origin || '*',
-		'Access-Control-Allow-Credentials': 'true',
-	};
+	const allowedCorsOrigin = isAuthorizedOrigin || isLocalDevOrigin ? origin : 'https://xernerx.com';
 
 	const errorResponse = (message: string, status: number) => {
-		const headers: Record<string, string> = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': origin || '*' };
-		if (origin) {
+		const headers: Record<string, string> = {
+			'Content-Type': 'application/json',
+			'Access-Control-Allow-Origin': origin ? allowedCorsOrigin : '*',
+			Vary: 'Origin',
+		};
+		if (isAuthorizedOrigin || isLocalDevOrigin) {
 			headers['Access-Control-Allow-Credentials'] = 'true';
 		}
 		return new NextResponse(JSON.stringify({ error: message }), {
@@ -68,34 +91,36 @@ export async function proxy(req: NextRequest) {
 		});
 	};
 
-	// --- IP RATE LIMITING CHECK (Excluding .xernerx.com & Local Traffic) ---
+	// --- IP RATE LIMITING CHECK (Applied to all non-loopback API traffic) ---
 	const forwardedFor = req.headers.get('x-forwarded-for');
 	const realIp = req.headers.get('x-real-ip');
 	const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || '127.0.0.1';
 
 	const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
-	const isXernerxDomain = isAuthorizedOrigin || isAuthorizedHost;
+	const isAuthenticatedFrontendSession = isTrustedFrontend && hasSessionCookie;
+	const effectiveMaxRequests = isAuthenticatedFrontendSession ? SESSION_MAX_REQUESTS : MAX_REQUESTS;
+	const rateBucketKey = isAuthenticatedFrontendSession ? `sess:${ip}` : `pub:${ip}`;
 
-	let rateLimitRemaining = MAX_REQUESTS;
+	let rateLimitRemaining = effectiveMaxRequests;
 	let rateLimitResetSec = Math.ceil((Date.now() + WINDOW_MS) / 1000);
 
-	if (!isLoopback && !isXernerxDomain) {
+	if (!isLoopback) {
 		const now = Date.now();
-		const clientRate = rateLimitMap.get(ip);
+		const clientRate = rateLimitMap.get(rateBucketKey);
 
 		if (!clientRate || now > clientRate.resetTime) {
 			const resetTime = now + WINDOW_MS;
-			rateLimitMap.set(ip, { count: 1, resetTime });
-			rateLimitRemaining = MAX_REQUESTS - 1;
+			rateLimitMap.set(rateBucketKey, { count: 1, resetTime });
+			rateLimitRemaining = effectiveMaxRequests - 1;
 			rateLimitResetSec = Math.ceil(resetTime / 1000);
 		} else {
 			clientRate.count++;
-			rateLimitRemaining = Math.max(0, MAX_REQUESTS - clientRate.count);
+			rateLimitRemaining = Math.max(0, effectiveMaxRequests - clientRate.count);
 			rateLimitResetSec = Math.ceil(clientRate.resetTime / 1000);
-			if (clientRate.count > MAX_REQUESTS) {
+			if (clientRate.count > effectiveMaxRequests) {
 				const retryAfterSec = Math.max(1, Math.ceil((clientRate.resetTime - now) / 1000));
-				const res429 = errorResponse('Too Many Requests: Rate limit exceeded (100 requests per minute)', 429);
-				res429.headers.set('X-RateLimit-Limit', String(MAX_REQUESTS));
+				const res429 = errorResponse(`Too Many Requests: Rate limit exceeded (${effectiveMaxRequests} requests per minute)`, 429);
+				res429.headers.set('X-RateLimit-Limit', String(effectiveMaxRequests));
 				res429.headers.set('X-RateLimit-Remaining', '0');
 				res429.headers.set('X-RateLimit-Reset', String(rateLimitResetSec));
 				res429.headers.set('Retry-After', String(retryAfterSec));
@@ -107,8 +132,8 @@ export async function proxy(req: NextRequest) {
 	// 1. MUST HANDLE CORS PREFLIGHT FIRST
 	if (req.method === 'OPTIONS') {
 		const preflightHeaders = new Headers();
-		preflightHeaders.set('Access-Control-Allow-Origin', origin || '*');
-		if (origin) {
+		preflightHeaders.set('Access-Control-Allow-Origin', origin ? allowedCorsOrigin : '*');
+		if (isAuthorizedOrigin || isLocalDevOrigin) {
 			preflightHeaders.set('Access-Control-Allow-Credentials', 'true');
 		}
 		preflightHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
@@ -169,6 +194,10 @@ export async function proxy(req: NextRequest) {
 			if (!isTrustedFrontend) {
 				return errorResponse('Unauthorized: Missing Bearer Token', 401);
 			}
+			const isPublicSecurePost = req.nextUrl.pathname === '/secure/auth/qr' || req.nextUrl.pathname === '/secure/applications/submit';
+			if (req.method !== 'GET' && req.method !== 'HEAD' && !isPublicSecurePost && !hasSessionCookie && !isLocalDevOrigin) {
+				return errorResponse('Unauthorized: Session or Bearer Token required', 401);
+			}
 		}
 	}
 
@@ -177,12 +206,13 @@ export async function proxy(req: NextRequest) {
 
 	// 4. Attach the required CORS and rate-limit headers to the final success response
 	if (response && response.headers) {
-		response.headers.set('Access-Control-Allow-Origin', origin || '*');
-		if (origin) {
+		response.headers.set('Access-Control-Allow-Origin', origin ? allowedCorsOrigin : '*');
+		response.headers.set('Vary', 'Origin');
+		if (isAuthorizedOrigin || isLocalDevOrigin) {
 			response.headers.set('Access-Control-Allow-Credentials', 'true');
 		}
-		if (!isLoopback && !isXernerxDomain) {
-			response.headers.set('X-RateLimit-Limit', String(MAX_REQUESTS));
+		if (!isLoopback) {
+			response.headers.set('X-RateLimit-Limit', String(effectiveMaxRequests));
 			response.headers.set('X-RateLimit-Remaining', String(rateLimitRemaining));
 			response.headers.set('X-RateLimit-Reset', String(rateLimitResetSec));
 		}

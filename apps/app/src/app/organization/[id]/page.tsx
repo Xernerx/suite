@@ -38,23 +38,15 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 		if (bots.length > 0) {
 			items.push(
-				...bots.map((b) => ({
-					label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
-					href: `/bots/${b.id}`,
-					icon: b.discord?.avatar
-						? () => (
-								<Image
-									src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`}
-									alt={b.name}
-									width={20}
-									height={20}
-									unoptimized
-									className="w-5 h-5 rounded-full object-cover"
-								/>
-							)
-						: Bot,
-					category: t('app.organization.nav.publishedBots'),
-				}))
+				...bots.map((b) => {
+					const avatarUrl = b.discord?.avatarUrl || (b.discord?.avatar ? `https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64` : null);
+					return {
+						label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
+						href: `/bots/${b.vanitySlug || b.id}`,
+						icon: avatarUrl ? () => <Image src={avatarUrl} alt={b.name || b.id} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" /> : Bot,
+						category: t('app.organization.nav.publishedBots'),
+					};
+				})
 			);
 		}
 
@@ -106,9 +98,9 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 		const fetchData = async () => {
 			try {
 				const [orgRes, botsRes, serversRes] = await Promise.all([
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${id}`)),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${id}`)),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?organization=${id}`)),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${id}`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?organization=${id}`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?organization=${id}`), { credentials: 'include' }),
 				]);
 
 				if (orgRes.ok) {
@@ -123,12 +115,13 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 					}
 
 					// Fetch Discord profiles for owner and members
-					const memberIds = [...new Set([orgData.owner, ...(orgData.members || [])])];
+					const resolvedOrgId = orgData._id || id;
+					const memberIds = [...new Set([orgData.owner, ...(orgData.members || [])])].filter(Boolean);
 
 					// Fetch the member role mappings
 					let memberRoleMappings: any[] = [];
 					try {
-						const membersApiRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${id}/members`));
+						const membersApiRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations/${resolvedOrgId}/members`), { credentials: 'include' });
 						if (membersApiRes.ok) {
 							memberRoleMappings = await membersApiRes.json();
 						}
@@ -138,11 +131,11 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 					const membersWithDiscord = await Promise.all(
 						memberIds.map(async (memberId: string) => {
+							const roleMapping = memberRoleMappings.find((m) => m.userId === memberId);
 							try {
 								const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${memberId}/discord`));
 								if (res.ok) {
 									const discordData = await res.json();
-									const roleMapping = memberRoleMappings.find((m) => m.userId === memberId);
 									return {
 										...discordData,
 										id: memberId,
@@ -152,10 +145,10 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 							} catch (e) {
 								console.error('Failed to fetch Discord data for member', memberId);
 							}
-							return { id: memberId, roles: [] };
+							return { id: memberId, username: memberId, roles: roleMapping?.roles || [] };
 						})
 					);
-					orgData.membersData = membersWithDiscord.filter((m) => m && m.username);
+					orgData.membersData = membersWithDiscord.filter((m) => Boolean(m && m.id));
 
 					setOrganization(orgData);
 
@@ -165,6 +158,7 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 
 						const botsWithDiscord = await Promise.all(
 							visibleBots.map(async (b: any) => {
+								if (b.discord?.username || b.discord?.global_name) return b;
 								try {
 									const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${b.id}/discord`));
 									if (res.ok) {

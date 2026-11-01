@@ -2,9 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function PATCH(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['roles']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing roles permission.' }, { status: 403 });
+		}
+
 		const rolesArray = await req.json(); // [{ id: 'xernerx_role_id', position: 0 }, ...]
 		const db = (await database('xernerx')).models.core as any;
 		const RoleModel = db.Role;
@@ -19,6 +25,12 @@ export async function PATCH(req: Request) {
 
 		if (bulkOps.length > 0) {
 			await RoleModel.bulkWrite(bulkOps);
+			await recordAuditLog(req, {
+				action: 'role.reordered',
+				targetType: 'role',
+				summary: `Reordered ${rolesArray.length} staff roles`,
+				metadata: { count: rolesArray.length },
+			});
 		}
 
 		// 2. Fetch all roles to get their Discord mappings

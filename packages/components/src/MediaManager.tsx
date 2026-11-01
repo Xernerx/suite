@@ -37,6 +37,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [privacyFilter, setPrivacyFilter] = useState<'all' | 'public' | 'limited' | 'private' | 'shared'>('all');
 	const [folderFilter, setFolderFilter] = useState<string>('all');
+	const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'largest' | 'name'>('newest');
 	const [tagFilter, setTagFilter] = useState<string | null>(null);
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [bulkBusy, setBulkBusy] = useState(false);
@@ -206,9 +207,16 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 		return Array.from(set);
 	}, [media]);
 
+	const totalBytesFormatted = useMemo(() => {
+		const bytes = media.reduce((sum, m) => sum + (Number(m.size) || 0), 0);
+		if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+		if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+		return `${bytes} B`;
+	}, [media]);
+
 	const filteredMedia = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
-		return media.filter((item) => {
+		const list = media.filter((item) => {
 			if (privacyFilter === 'shared') {
 				if (!Array.isArray(item.shared) || item.shared.length === 0) return false;
 			} else if (privacyFilter !== 'all' && item.privacy !== privacyFilter) {
@@ -224,7 +232,13 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 			const tagMatch = Array.isArray(item.tags) && item.tags.some((tg: string) => tg.toLowerCase().includes(q));
 			return item.filename?.toLowerCase().includes(q) || item.mimeType?.toLowerCase().includes(q) || item._id?.toLowerCase().includes(q) || tagMatch;
 		});
-	}, [media, searchQuery, privacyFilter, folderFilter, tagFilter]);
+		return [...list].sort((a, b) => {
+			if (sortBy === 'oldest') return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+			if (sortBy === 'largest') return (Number(b.size) || 0) - (Number(a.size) || 0);
+			if (sortBy === 'name') return String(a.filename || '').localeCompare(String(b.filename || ''));
+			return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+		});
+	}, [media, searchQuery, privacyFilter, folderFilter, tagFilter, sortBy]);
 
 	const toggleSelect = (id: string) => {
 		setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -333,6 +347,12 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 	];
 
 	const folderOptions = [{ value: 'all', label: t('account.media.allFolders') }, ...availableFolders.map((f) => ({ value: f, label: f }))];
+	const sortOptions = [
+		{ value: 'newest', label: t('account.media.sortNewest') },
+		{ value: 'oldest', label: t('account.media.sortOldest') },
+		{ value: 'largest', label: t('account.media.sortLargest') },
+		{ value: 'name', label: t('account.media.sortName') },
+	];
 
 	return (
 		<div
@@ -370,6 +390,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 								{quota.used} / {quota.max}
 							</span>
 							<span className="text-(--text-muted)">{t('account.media.slotsUsed')}</span>
+							<span className="text-(--text-muted)">• {t('account.media.totalSize', { size: totalBytesFormatted })}</span>
 						</a>
 					)}
 					{scope === 'self' && canManage && (
@@ -396,8 +417,11 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 					<div className="flex-1 max-w-md">
 						<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('account.media.searchPlaceholder')} />
 					</div>
-					<div className="w-full sm:w-48">
+					<div className="w-full sm:w-44">
 						<Selector value={folderFilter} options={folderOptions} onChange={setFolderFilter} />
+					</div>
+					<div className="w-full sm:w-44">
+						<Selector value={sortBy} options={sortOptions} onChange={(v) => setSortBy(v as typeof sortBy)} />
 					</div>
 					{tagFilter && (
 						<button

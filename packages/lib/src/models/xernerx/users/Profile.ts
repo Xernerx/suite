@@ -9,6 +9,15 @@ const schema = new Schema(
 		vanityUnlocked: { type: Boolean, default: false },
 		name: { type: String }, // User name
 		icon: { type: String }, // User icon URL (optional)
+		discordCache: {
+			username: { type: String },
+			globalName: { type: String },
+			avatar: { type: String },
+			banner: { type: String },
+			avatarUrl: { type: String },
+			bannerUrl: { type: String },
+			updatedAt: { type: Date },
+		},
 		description: { type: String }, // Short description of the user
 		info: { type: String }, // Long description about the user
 		birthday: { type: Date }, // User's birthday (optional)

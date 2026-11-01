@@ -3,10 +3,15 @@
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['users']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing users permission.' }, { status: 403 });
+		}
+
 		const { id } = await params;
 		const { models } = await database('xernerx');
 		const CreditModel = (models.users as any).Credit;
@@ -19,6 +24,11 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['users']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing users permission.' }, { status: 403 });
+		}
+
 		const { id } = await params;
 		const body = await req.json().catch(() => ({}));
 		const rawAmount = Number(body.amount) || 0;
@@ -67,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			returnDocument: 'after',
 		}).lean();
 
-		await recordAuditLog({
+		await recordAuditLog(req, {
 			action: 'user.credits.adjust',
 			targetType: 'user',
 			targetId: id,

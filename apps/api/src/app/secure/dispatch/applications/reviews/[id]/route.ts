@@ -2,10 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth, sendUserNotification } from '@/lib/auditAndNotify';
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['applications_review', 'applications_manage']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Application review permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const { status, reviewedBy, reviewNote } = body;
@@ -38,10 +43,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 		const config = await ApplicationConfig.findOne({ id: updatedApplication.targetId }).lean();
 
-		// 2. If approved, assign the reward role to the Xernerx user profile
+		// 2. If approved and a rewardRole is configured, assign the role to the Xernerx user profile
 		if (status === 'approved' && updatedApplication.ownerId !== 'anonymous') {
+			const User = models.users.User as any;
 			if (config && config.rewardRole) {
-				const User = models.users.User as any;
 				const Role = models.core.Role as any;
 
 				await User.findOneAndUpdate({ id: updatedApplication.ownerId }, { $addToSet: { roles: config.rewardRole } }, { upsert: true, returnDocument: 'after' });

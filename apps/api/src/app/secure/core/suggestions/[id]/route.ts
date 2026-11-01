@@ -3,11 +3,16 @@
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth, sendUserNotification } from '@/lib/auditAndNotify';
 import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageSuggestions']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Suggestion management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const { models } = await database('xernerx');
@@ -71,7 +76,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 					{ models },
 					{
 						feedType: 'suggestions',
-						title: `${isImplemented ? '🚀 Suggestion Shipped' : '🌟 Suggestion Accepted (+250 Credits)'}: ${String(updated.title || id).slice(0, 120)}`,
+						title: `${isImplemented ? '🚀 Suggestion Shipped' : '🌟 Suggestion Accepted'}: ${String(updated.title || id).slice(0, 120)}`,
 						url: 'https://info.xernerx.com/suggestions',
 						description: String(updated.description || '').slice(0, 300),
 						color: isImplemented ? 0x22c55e : 0x8b7cf6,
@@ -97,6 +102,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageSuggestions']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Suggestion management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const { models } = await database('xernerx');
 		const deleted = (await models.core.Suggestion.findOneAndDelete({ id }).lean()) as any;

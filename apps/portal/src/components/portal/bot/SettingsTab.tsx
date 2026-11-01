@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, Building2, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock } from 'lucide-react';
+import { Shield, Building2, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock, Users, Copy, Check, ExternalLink } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Selector } from '@xernerx/ui';
-import { WidgetSettingsCard } from '@xernerx/components';
+import { AsyncUserMultiSelector, WidgetSettingsCard } from '@xernerx/components';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 
 interface SettingsTabProps {
@@ -22,9 +22,18 @@ export default function SettingsTab({ botConfig, setBotConfig, onVanityUnlocked,
 	const { user, mutate: mutateUser } = useUser();
 	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
+	const [copiedVanity, setCopiedVanity] = useState(false);
 
 	const isVanityUnlocked = Boolean(botConfig.vanityUnlocked || botConfig.vanitySlug || botConfig.verified);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
+	const publicBotUrl = getEnvUrl(`https://app.xernerx.com/bots/${botConfig.vanitySlug || botConfig.id}`);
+
+	const handleCopyVanityUrl = () => {
+		navigator.clipboard.writeText(publicBotUrl);
+		setCopiedVanity(true);
+		toast({ type: 'success', title: t('app.dashboard.settings.vanityUrlCopied') });
+		setTimeout(() => setCopiedVanity(false), 2000);
+	};
 
 	const handleUnlockVanity = async () => {
 		setUnlockingVanity(true);
@@ -108,8 +117,26 @@ export default function SettingsTab({ botConfig, setBotConfig, onVanityUnlocked,
 							</Badge>
 						)}
 					</div>
-					<div className="flex flex-wrap items-center gap-1 text-xs text-(--text-muted)">
-						{t('app.portal.bot.vanity.description')} <span className="font-mono text-(--accent)">xernerx.com/bots/{botConfig.vanitySlug || botConfig.id}</span>
+					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
+						<span>{t('app.portal.bot.vanity.description')}</span>
+						<span className="font-mono text-(--accent)">xernerx.com/bots/{botConfig.vanitySlug || botConfig.id}</span>
+						<button
+							type="button"
+							onClick={handleCopyVanityUrl}
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+						>
+							{copiedVanity ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
+							<span>{t('app.dashboard.settings.copyVanityUrl')}</span>
+						</button>
+						<a
+							href={publicBotUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors"
+						>
+							<span>{t('app.dashboard.settings.openPublicProfile')}</span>
+							<ExternalLink size={11} />
+						</a>
 					</div>
 					{!isVanityUnlocked && (
 						<p className="text-xs text-(--text-muted) flex items-center gap-1.5 mt-0.5">
@@ -151,6 +178,35 @@ export default function SettingsTab({ botConfig, setBotConfig, onVanityUnlocked,
 				enabled={Boolean(botConfig.widgets)}
 				onChange={(val) => setBotConfig({ ...botConfig, widgets: val })}
 			/>
+
+			{/* Bot Owners & Co-Owners Card */}
+			<div
+				className="relative z-35 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+			>
+				<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+					<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+						<Users size={18} className="text-(--accent)" />
+						<h3>{t('app.portal.bot.settings.ownersHeader')}</h3>
+					</div>
+					<p className="text-xs text-(--text-muted)">{t('app.portal.bot.settings.ownersDesc')}</p>
+				</div>
+				<div className="w-full sm:w-80 shrink-0">
+					<AsyncUserMultiSelector
+						values={Array.isArray(botConfig.owners) && botConfig.owners.length > 0 ? botConfig.owners : user?.id ? [user.id] : []}
+						onChange={(vals) => {
+							if (vals.length === 0) {
+								toast({ type: 'error', title: t('app.portal.bot.settings.minOneOwnerToast') });
+								return;
+							}
+							setBotConfig({ ...botConfig, owners: vals });
+						}}
+						getEnvUrl={getEnvUrl}
+						placeholder={t('app.portal.bot.settings.ownersPlaceholder')}
+						preloadUsers={true}
+					/>
+				</div>
+			</div>
 
 			{/* Transfer Organization Card */}
 			<div

@@ -2,11 +2,17 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['applications_review', 'applications_manage']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Application review permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { models } = await database('xernerx');
 		const Application = models.dispatch.Application as any;
 

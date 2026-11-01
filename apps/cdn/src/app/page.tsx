@@ -2,7 +2,7 @@
 'use client';
 
 import { useDictionary, useEnvironment, useLoading, usePermissions, useSidebar, useToast } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
+import { Button, Selector } from '@xernerx/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Check, Copy, ExternalLink, Upload } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -16,6 +16,7 @@ export default function Home() {
 	const { toast } = useToast();
 	const [uploading, setUploading] = useState(false);
 	const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+	const [uploadPrivacy, setUploadPrivacy] = useState<'public' | 'limited' | 'private'>('public');
 	const [isDragging, setIsDragging] = useState(false);
 	const [copied, setCopied] = useState(false);
 
@@ -38,6 +39,7 @@ export default function Home() {
 			try {
 				const formData = new FormData();
 				formData.append('file', file);
+				formData.append('privacy', uploadPrivacy);
 
 				const res = await fetch('/upload', {
 					method: 'POST',
@@ -59,7 +61,7 @@ export default function Home() {
 				setUploading(false);
 			}
 		},
-		[toast, t]
+		[toast, t, uploadPrivacy]
 	);
 
 	const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,6 +146,18 @@ export default function Home() {
 								<h2 className="font-bold text-sm text-(--text) uppercase tracking-wider mb-2">{t('cdn.home.directUpload')}</h2>
 								<p className="text-xs text-(--text-muted) mb-4">{t('cdn.home.dropzoneHint')}</p>
 								<div className="flex flex-col items-start gap-4">
+									<div className="w-full flex flex-col gap-1.5">
+										<label className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('cdn.home.privacyLabel')}</label>
+										<Selector
+											value={uploadPrivacy}
+											onChange={(val) => setUploadPrivacy(val as 'public' | 'limited' | 'private')}
+											options={[
+												{ value: 'public', label: t('cdn.home.privacyPublic') },
+												{ value: 'limited', label: t('cdn.home.privacyLimited') },
+												{ value: 'private', label: t('cdn.home.privacyPrivate') },
+											]}
+										/>
+									</div>
 									<input type="file" id="cdn-upload" className="hidden" onChange={handleUpload} disabled={uploading} />
 									<label htmlFor="cdn-upload" className="cursor-pointer">
 										<Button variant="primary" loading={uploading} style={{ pointerEvents: 'none' }}>

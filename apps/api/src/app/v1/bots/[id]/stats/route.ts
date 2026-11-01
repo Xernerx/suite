@@ -135,12 +135,32 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		const authHeader = req.headers.get('Authorization');
+
+		if (authHeader) {
+			const authResult = await authenticateV1BotRequest(req, id, { isMutation: false });
+			if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+			const { bot, botId, hasFullAccess, StatModel } = authResult as Required<typeof authResult>;
+			if (!hasFullAccess && bot.privacy === 'private') {
+				return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
+			}
+			const stats = await StatModel.find({ id: botId }).sort({ _id: -1 }).limit(100);
+			return NextResponse.json(stats);
+		}
+
 		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any).Bot;
 		const StatModel = (db.models.bots as any).Stat;
 
-		if (!StatModel) return NextResponse.json({ error: 'Database model not found' }, { status: 500 });
+		if (!StatModel || !BotModel) return NextResponse.json({ error: 'Database model not found' }, { status: 500 });
 
-		const stats = await StatModel.find({ id }).sort({ _id: -1 }).limit(100);
+		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		if (!bot) return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
+		if (bot.privacy === 'private') {
+			return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
+		}
+
+		const stats = await StatModel.find({ id: bot.id }).sort({ _id: -1 }).limit(100);
 		return NextResponse.json(stats);
 	} catch (error: any) {
 		console.error('Failed to GET bot stats:', error);

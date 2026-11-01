@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request) {
 	try {
@@ -49,6 +49,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['announcements']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing announcements permission.' }, { status: 403 });
+		}
+
 		const body = await req.json();
 		const { models } = await database('xernerx');
 		const Announcement = models.core.Announcement as any;

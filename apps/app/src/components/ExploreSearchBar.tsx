@@ -16,6 +16,7 @@ interface SearchResultItem {
 	avatarUrl?: string | null;
 	voteCount?: number;
 	memberCount?: number;
+	kind?: 'bot' | 'server' | 'organization';
 	href: string;
 }
 
@@ -52,12 +53,28 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 		setLoading(true);
 		const timer = setTimeout(async () => {
 			try {
+				const orgsPromise = fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?search=${encodeURIComponent(trimmed)}&limit=3`))
+					.then((r) => (r.ok ? r.json() : []))
+					.catch(() => []);
+
 				if (context === 'bots') {
-					const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?search=${encodeURIComponent(trimmed)}&limit=5`));
+					const [res, orgsData] = await Promise.all([fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?search=${encodeURIComponent(trimmed)}&limit=5`)), orgsPromise]);
+					const botItems: SearchResultItem[] = [];
 					if (res.ok) {
-						const bots: Array<{ id: string; description?: string; voteCount?: number }> = await res.json();
+						const bots: Array<{ id: string; description?: string; voteCount?: number; discord?: any }> = await res.json();
 						const enriched = await Promise.all(
 							bots.slice(0, 5).map(async (bot) => {
+								if (bot.discord?.username || bot.discord?.global_name) {
+									return {
+										id: bot.id,
+										name: bot.discord.global_name || bot.discord.username || bot.id,
+										description: bot.description,
+										avatarUrl: bot.discord.avatarUrl || null,
+										voteCount: bot.voteCount || 0,
+										kind: 'bot' as const,
+										href: `/bots/${bot.id}`,
+									};
+								}
 								try {
 									const dRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
 									const d = dRes.ok ? await dRes.json() : null;
@@ -67,6 +84,7 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 										description: bot.description,
 										avatarUrl: d?.avatarUrl || null,
 										voteCount: bot.voteCount || 0,
+										kind: 'bot' as const,
 										href: `/bots/${bot.id}`,
 									};
 								} catch {
@@ -76,29 +94,62 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 										description: bot.description,
 										avatarUrl: null,
 										voteCount: bot.voteCount || 0,
+										kind: 'bot' as const,
 										href: `/bots/${bot.id}`,
 									};
 								}
 							})
 						);
-						setResults(enriched);
+						botItems.push(...enriched);
 					}
+					const orgItems: SearchResultItem[] = Array.isArray(orgsData)
+						? orgsData.slice(0, 3).map((org: any) => {
+								const orgId = org._id || org.id;
+								return {
+									id: `org-${orgId}`,
+									name: org.name || orgId,
+									description: org.description,
+									avatarUrl: org.logoUrl || null,
+									memberCount: (Array.isArray(org.members) ? org.members.length : 0) + 1,
+									kind: 'organization' as const,
+									href: `/organization/${org.vanitySlug || orgId}`,
+								};
+							})
+						: [];
+					setResults([...botItems, ...orgItems]);
 				} else {
-					const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${encodeURIComponent(trimmed)}&limit=5&privacy=public`));
+					const [res, orgsData] = await Promise.all([fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${encodeURIComponent(trimmed)}&limit=5&privacy=public`)), orgsPromise]);
+					const serverItems: SearchResultItem[] = [];
 					if (res.ok) {
 						const guilds: Array<{ id: string; name: string; icon?: string; description?: string; voteCount?: number; memberCount?: number }> = await res.json();
-						setResults(
-							guilds.slice(0, 5).map((g) => ({
+						serverItems.push(
+							...guilds.slice(0, 5).map((g) => ({
 								id: g.id,
 								name: g.name || g.id,
 								description: g.description,
 								avatarUrl: g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null,
 								voteCount: g.voteCount || 0,
 								memberCount: g.memberCount,
+								kind: 'server' as const,
 								href: `/servers/${g.id}`,
 							}))
 						);
 					}
+					const orgItems: SearchResultItem[] = Array.isArray(orgsData)
+						? orgsData.slice(0, 3).map((org: any) => {
+								const orgId = org._id || org.id;
+								return {
+									id: `org-${orgId}`,
+									name: org.name || orgId,
+									description: org.description,
+									avatarUrl: org.logoUrl || null,
+									memberCount: (Array.isArray(org.members) ? org.members.length : 0) + 1,
+									kind: 'organization' as const,
+									href: `/organization/${org.vanitySlug || orgId}`,
+								};
+							})
+						: [];
+					setResults([...serverItems, ...orgItems]);
 				}
 			} catch {
 				setResults([]);
@@ -205,10 +256,12 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 													{item.memberCount}
 												</span>
 											)}
-											<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-(--foreground) border border-(--border)/10 text-[11px] font-semibold text-(--text-muted)">
-												<ChevronUp size={11} className="text-(--accent)" />
-												{item.voteCount || 0}
-											</span>
+											{item.voteCount !== undefined && (
+												<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-xl bg-(--foreground) border border-(--border)/10 text-[11px] font-semibold text-(--text-muted)">
+													<ChevronUp size={11} className="text-(--accent)" />
+													{item.voteCount || 0}
+												</span>
+											)}
 											{isSelected ? <CornerDownLeft size={14} className="text-(--accent)" /> : <ArrowRight size={14} className="text-(--text-muted)" />}
 										</div>
 									</button>

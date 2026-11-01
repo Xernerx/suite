@@ -180,10 +180,19 @@ export default function StatusClient() {
 
 	const botsOnlineCount = bots.filter((b) => b.status !== 'offline').length;
 	const botsOfflineCount = bots.filter((b) => b.status === 'offline').length;
+	const operationalServicesCount = services.filter((s) => s.status === 'operational').length;
 	const totalMonitoredCount = services.length + bots.length;
-	const operationalCount = services.filter((s) => s.status === 'operational').length + botsOnlineCount;
+	const operationalCount = operationalServicesCount + botsOnlineCount;
 	const downCount = services.filter((s) => s.status === 'down').length + botsOfflineCount;
 	const isChecking = services.some((s) => s.status === 'checking');
+
+	const overallUptime24h = (() => {
+		const allBuckets = Object.values(serviceHistory).flat();
+		const valid = allBuckets.filter((b) => b.status !== 'empty');
+		if (valid.length === 0) return '100.0';
+		const up = valid.filter((b) => b.status === 'operational' || b.status === 'degraded' || b.status === 'online' || b.status === 'idle' || b.status === 'dnd').length;
+		return ((up / valid.length) * 100).toFixed(1);
+	})();
 
 	const filteredServices = services.filter((s) => {
 		if (!search.trim()) return true;
@@ -275,6 +284,57 @@ export default function StatusClient() {
 						<RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
 						{t('info.status.refresh')}
 					</Button>
+				</div>
+			</div>
+
+			{/* 4-Card Live Telemetry Summary Strip */}
+			<div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex items-center justify-between" style={{ padding: 'var(--ui-gap)' }}>
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.status.kpi.operationalServices')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{operationalServicesCount} / {services.length}
+						</p>
+					</div>
+					<div className="p-3 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<Server size={20} />
+					</div>
+				</div>
+
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex items-center justify-between" style={{ padding: 'var(--ui-gap)' }}>
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.status.kpi.officialBotsOnline')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{botsOnlineCount} / {bots.length}
+						</p>
+					</div>
+					<div className="p-3 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<Globe size={20} />
+					</div>
+				</div>
+
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex items-center justify-between" style={{ padding: 'var(--ui-gap)' }}>
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.status.kpi.avgLatency')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{avgPing !== null ? `${avgPing} ms` : '—'}
+						</p>
+					</div>
+					<div className="p-3 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<Activity size={20} />
+					</div>
+				</div>
+
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex items-center justify-between" style={{ padding: 'var(--ui-gap)' }}>
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.status.kpi.uptimeSla24h')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{overallUptime24h}%
+						</p>
+					</div>
+					<div className="p-3 rounded-2xl bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
+						<CheckCircle2 size={20} />
+					</div>
 				</div>
 			</div>
 

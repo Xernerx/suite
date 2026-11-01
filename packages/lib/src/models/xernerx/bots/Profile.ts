@@ -10,6 +10,15 @@ const schema = new Schema(
 		bot: { type: Boolean, default: true }, // Is it a bot (vs server)
 		name: { type: String, required: false }, // Bot Name
 		avatar: { type: String }, // Bot Avatar Hash/URL
+		discordCache: {
+			username: { type: String },
+			globalName: { type: String },
+			avatar: { type: String },
+			banner: { type: String },
+			avatarUrl: { type: String },
+			bannerUrl: { type: String },
+			updatedAt: { type: Date },
+		},
 		description: { type: String }, // Short description of the bot
 		info: { type: String }, // Long description about the bot
 		owners: { type: [String] }, // List of user IDs who own the bot

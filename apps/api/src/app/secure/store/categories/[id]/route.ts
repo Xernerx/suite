@@ -2,9 +2,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const categoryId = (await params).id;
 		const body = await req.json();
 
@@ -24,6 +30,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 		await category.save();
 
+		await recordAuditLog(req, {
+			action: 'store.category.updated',
+			targetType: 'setting',
+			targetId: categoryId,
+			summary: `Updated store category "${category.name}"`,
+			metadata: { enabled: category.enabled },
+		});
+
 		return NextResponse.json(category);
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message }, { status: 500 });
@@ -32,6 +46,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const categoryId = (await params).id;
 		const { models } = await database('xernerx');
 		const Category = models.store.Category as any;
@@ -44,6 +63,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
 		// Delete items belonging to this category
 		await Item.deleteMany({ categoryId });
+
+		await recordAuditLog(req, {
+			action: 'store.category.deleted',
+			targetType: 'setting',
+			targetId: categoryId,
+			summary: `Deleted store category "${deleted.name || categoryId}"`,
+		});
 
 		return NextResponse.json({ success: true, id: categoryId });
 	} catch (err: any) {

@@ -2,6 +2,13 @@
 
 # @xernerx/lib
 
+## 1.18.0
+
+### Minor Changes
+
+-   - **Mongoose Schema Extensions & Timezone Utilities**: Added `signInBonusClaimed` to the `Credit` schema, expanded `Bot` and `User` profile models, and added comprehensive IANA timezone utilities (`timezones.ts`).
+    - **Ecosystem Localization Dictionary (`en-GB`)**: Added 450+ localization keys across `admin`, `app`, `portal`, `account`, `info`, `docs`, `haste`, `cdn`, and `www`.
+
 ## 1.17.0
 
 ### Minor Changes

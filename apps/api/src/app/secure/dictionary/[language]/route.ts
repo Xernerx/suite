@@ -5,6 +5,7 @@ import { database, dictionary, locales } from '@xernerx/lib/server';
 import { NextResponse } from 'next/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 type Locale = (typeof locales)[number];
 
@@ -262,6 +263,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ language
 }
 
 export async function POST(req: Request, { params }: { params: Promise<{ language: string }> }) {
+	const caller = await resolveCallerAuth(req, ['translations']);
+	if (!caller.authorized) {
+		return NextResponse.json({ error: 'Forbidden: Translations permission required' }, { status: caller.userId ? 403 : 401 });
+	}
+
 	const { language } = await params;
 
 	// 1. Await the session to resolve the promise

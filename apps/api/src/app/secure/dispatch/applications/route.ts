@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request) {
 	try {
@@ -19,6 +20,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['applications_manage']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Application management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json();
 		const { models } = await database('xernerx');
 		const ApplicationConfig = models.dispatch.ApplicationConfig as any;
@@ -38,10 +44,18 @@ export async function POST(req: Request) {
 			name: body.name,
 			description: body.description,
 			rewardRole: body.rewardRole,
+			grantVerified: Boolean(body.grantVerified),
 			requireLogin: body.requireLogin !== false,
 			benefits: body.benefits || [],
 			requirements: body.requirements || [],
 			questions: body.questions || [],
+		});
+
+		await recordAuditLog(req, {
+			action: 'application.config.created',
+			targetType: 'application',
+			targetId: newConfig.id,
+			summary: `Created application form "${newConfig.name}"`,
 		});
 
 		return NextResponse.json(newConfig, { status: 201 });

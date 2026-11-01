@@ -11,7 +11,15 @@ import { AdminServerSummary } from './servers/types';
 import { ServerCard } from './servers/ServerCard';
 import { useInfiniteScroll } from './useInfiniteScroll';
 
-export default function Servers({ initialSearch = '', onViewAuditLogs }: { initialSearch?: string; onViewAuditLogs?: (serverId: string) => void }) {
+export default function Servers({
+	initialSearch = '',
+	onViewAuditLogs,
+	onNavigateEntity,
+}: {
+	initialSearch?: string;
+	onViewAuditLogs?: (serverId: string) => void;
+	onNavigateEntity?: (tab: string, query: string) => void;
+}) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 
@@ -212,6 +220,7 @@ export default function Servers({ initialSearch = '', onViewAuditLogs }: { initi
 									onServerDeleted={handleServerDeleted}
 									onServerUpdated={handleServerUpdated}
 									onViewAuditLogs={onViewAuditLogs}
+									onNavigateEntity={onNavigateEntity}
 								/>
 							))}
 						</AnimatePresence>

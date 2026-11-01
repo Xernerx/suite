@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
 	return {
 		name: 'Xernerx Studios',
 		short_name: 'Xernerx',
-		description: '1 Account, 1 Place, 1 Setup. Unified dashboard and bot suite for Virtue, Metamorphosis, Zodiac, Discord bot stats, public bot listings, and developer frameworks.',
+		description: '1 Account, 1 Place, 1 Setup. Unified dashboard and bot suite for To-Do List, Virtue, Metamorphosis, Zodiac, Discord bot stats, public bot listings, and developer frameworks.',
 		start_url: '/',
 		display: 'standalone',
 		background_color: '#09090b',

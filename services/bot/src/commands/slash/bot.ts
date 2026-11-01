@@ -607,7 +607,7 @@ export default class BotCommand extends SlashCommandBuilder {
 					.setURL(botUrl)
 					.setDescription(
 						canVote
-							? `You can vote for **${botDisplayName}** right now on [app.xernerx.com](${botUrl}) to support the bot and earn **+100 base credits** (up to **200** with an active subscription multiplier).`
+							? `You can vote for **${botDisplayName}** right now on [app.xernerx.com](${botUrl}) to support the bot.`
 							: `You have already voted for **${botDisplayName}** within the last 12 hours.`
 					)
 					.addFields([
@@ -618,7 +618,7 @@ export default class BotCommand extends SlashCommandBuilder {
 						},
 						{
 							name: 'Bot Totals',
-							value: [`• **Total Votes:** \`${Number(totalVotes).toLocaleString()}\``, `• **Reward:** \`+100 Credits\``].join('\n'),
+							value: `• **Total Votes:** \`${Number(totalVotes).toLocaleString()}\``,
 							inline: true,
 						},
 					])

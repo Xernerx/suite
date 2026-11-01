@@ -202,7 +202,7 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 						name: 'Overview',
 						value: [
 							`• **User:** <@${targetId}>`,
-							...(userProfile?.verified ? ['• **Verified:** Yes'] : []),
+							...(userProfile?.verified || (userProfile?.agreedTerms && userProfile?.agreedPrivacy) ? ['• **Verified:** Yes'] : []),
 							...(userProfile?.pronouns ? [`• **Pronouns:** ${userProfile.pronouns}`] : []),
 						].join('\n'),
 						inline: true,

@@ -51,6 +51,16 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			defaultBannerUrl: 'https://cdn.discordapp.com/banners/1319029435655000234/e7e51d29fbe0e3e1982eb916f43c45ca.png?size=1024',
 		},
 		{
+			id: 'todo',
+			botId: '782105629572464652',
+			title: t('www.applications.todo.title'),
+			desc: t('www.applications.todo.desc'),
+			link: getEnvUrl('https://app.xernerx.com/bots/782105629572464652'),
+			tag: t('www.tags.discordBot'),
+			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/782105629572464652/d6d658830d9dc233d1a5fda2260d63bd.png?size=512',
+			defaultBannerUrl: 'https://cdn.discordapp.com/banners/782105629572464652/2559346d255761acba683faa54bdeae4.png?size=1024',
+		},
+		{
 			id: 'virtue',
 			botId: '1484880634844287138',
 			title: t('www.applications.virtue.title'),
@@ -79,16 +89,6 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			tag: t('www.tags.discordBot'),
 			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/950251264095162418/07a9e067135a204bb0fdc796b44bda63.png?size=512',
 			defaultBannerUrl: 'https://cdn.discordapp.com/banners/950251264095162418/1d84ea69bbfb26fd4cdc2e1bc50073ff.png?size=1024',
-		},
-		{
-			id: 'todo',
-			botId: '782105629572464652',
-			title: t('www.applications.todo.title'),
-			desc: t('www.applications.todo.desc'),
-			link: getEnvUrl('https://app.xernerx.com/bots/782105629572464652'),
-			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/782105629572464652/d6d658830d9dc233d1a5fda2260d63bd.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/782105629572464652/2559346d255761acba683faa54bdeae4.png?size=1024',
 		},
 	];
 }

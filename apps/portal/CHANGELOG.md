@@ -2,6 +2,27 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.3.0
+
+### Minor Changes
+
+-   - **Personal Workspace Server Hub & 4-Card KPI Strip**: Added a `My Managed Servers` tab and a 4-card ecosystem summary (`My Bots`, `Managed Servers`, `Total Reach`, `Total Votes`) to `PersonalWorkspace`.
+    - **Organization Bots, Servers & Members Management**: Added 1-click linking and unlinking of personal bots (`OrgBotsTab`) and managed servers (`OrgServersTab`) to organizations, plus a member search bar, role filter selector, and live member count badge in `OrgMembersTab`.
+    - **Bot Growth Telemetry Time-Range Selector (`7D` / `14D` / `30D`)**: Added a range switcher to dynamically recalculate metric delta cards and chart buckets in `GrowthTelemetryTab`.
+    - **Webhooks & Vanity URL Tooling**: Added `All` / `2xx OK` / `Failed` delivery filters, a live `Success Rate %` badge, and 1-click payload JSON copy in `WebhookDeliveriesCard`; added bulk event selection (`Select All` / `Clear All`) and an `X-Xernerx-Signature` HMAC-SHA256 verification snippet in `WebhooksTab`; and added 1-click Vanity URL copy/open actions in `SettingsTab`.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 1.2.11
 
 ### Patch Changes

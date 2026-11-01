@@ -2,30 +2,42 @@
 
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
-		const body = await req.json().catch(() => ({}));
-		const referrerId = String(body.referrerId || '').trim();
+		const isSystemToken = Boolean(req.headers.get('x-token-id'));
+		const session = (await getServerSession(auth)) as any;
+		const viewerId = session?.user?.id ? String(session.user.id) : null;
 
-		if (!referrerId) {
-			return NextResponse.json({ error: 'Referrer ID is required' }, { status: 400 });
+		if (!isSystemToken && (!viewerId || viewerId !== id)) {
+			return NextResponse.json({ error: 'Forbidden: You can only link a referrer to your own account.' }, { status: 403 });
 		}
-		if (referrerId === id) {
-			return NextResponse.json({ error: 'You cannot refer yourself' }, { status: 400 });
+
+		const body = await req.json().catch(() => ({}));
+		const rawReferrerId = String(body.referrerId || '').trim();
+
+		if (!rawReferrerId) {
+			return NextResponse.json({ error: 'Referrer ID is required' }, { status: 400 });
 		}
 
 		const { models } = await database('xernerx');
 		const CreditModel = (models.users as any).Credit;
 		const UserModel = (models.users as any).User;
 
-		const [userCredit, referrerUser, referrerCredit] = await Promise.all([
-			CreditModel.findOne({ ownerId: id }).lean(),
-			UserModel.findOne({ id: referrerId }).lean(),
-			CreditModel.findOne({ ownerId: referrerId }).lean(),
-		]);
+		const referrerUser = await UserModel.findOne({
+			$or: [{ id: rawReferrerId }, { vanitySlug: rawReferrerId.toLowerCase() }],
+		}).lean();
+		const referrerId = String(referrerUser?.id || rawReferrerId);
+
+		if (referrerId === id) {
+			return NextResponse.json({ error: 'You cannot refer yourself' }, { status: 400 });
+		}
+
+		const [userCredit, referrerCredit] = await Promise.all([CreditModel.findOne({ ownerId: id }).lean(), CreditModel.findOne({ ownerId: referrerId }).lean()]);
 
 		if ((userCredit as any)?.referredBy) {
 			return NextResponse.json({ error: 'A referrer has already been linked to your account' }, { status: 400 });

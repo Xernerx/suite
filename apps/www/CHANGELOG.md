@@ -2,6 +2,25 @@
 
 # www
 
+## 0.20.0
+
+### Minor Changes
+
+-   - **Applications Portal Search & Status Tracking**: Added a live search bar, question-count badges on open role cards, and a `Track Your Submitted Applications` banner linking to the Account Activity Hub.
+    - **Interactive Desktop Preview Sync**: Updated the `/download` interactive desktop preview omnibar (`Ctrl + .`) to showcase live entity search and quick action commands.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 0.19.14
 
 ### Patch Changes

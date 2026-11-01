@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const isStripeConfigured = Boolean(stripeKey && stripeKey !== 'sk_test_placeholder');
@@ -14,6 +15,11 @@ const stripe = isStripeConfigured
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const couponId = (await params).id;
 		const body = await req.json();
 
@@ -48,6 +54,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		}
 
 		await coupon.save();
+		await recordAuditLog(req, {
+			action: 'store.coupon.updated',
+			targetType: 'setting',
+			targetId: coupon.id,
+			summary: `Updated store coupon "${coupon.code}"`,
+			metadata: { enabled: coupon.enabled },
+		});
 		return NextResponse.json(coupon);
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message }, { status: 500 });
@@ -56,6 +69,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const couponId = (await params).id;
 		const { models } = await database('xernerx');
 		const Coupon = (models.store as any).Coupon;
@@ -73,6 +91,13 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 				await stripe.coupons.del(coupon.stripeCouponId).catch(() => null);
 			}
 		}
+
+		await recordAuditLog(req, {
+			action: 'store.coupon.deleted',
+			targetType: 'setting',
+			targetId: coupon.id,
+			summary: `Deleted store coupon "${coupon.code}"`,
+		});
 
 		return NextResponse.json({ success: true, id: coupon.id });
 	} catch (err: any) {

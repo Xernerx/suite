@@ -5,19 +5,10 @@ import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
 import { del } from '@vercel/blob';
+import { getCdnCorsHeaders } from '@/lib/cors';
 
 function getCorsHeaders(origin: string | null) {
-	const isLocal = origin?.includes('localhost');
-	const isXernerx = origin?.endsWith('.xernerx.com');
-
-	const allowedOrigin = isLocal || isXernerx ? origin : 'https://xernerx.com';
-
-	return {
-		'Access-Control-Allow-Origin': allowedOrigin || '*',
-		'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-		'Access-Control-Allow-Credentials': 'true',
-	};
+	return getCdnCorsHeaders(origin, 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
 }
 
 export async function OPTIONS(req: Request) {

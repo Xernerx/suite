@@ -44,8 +44,14 @@ export function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholde
 					if (isMounted) {
 						setUsers((prev) => {
 							const map = new Map(prev.map((u) => [u.id, u]));
-							data.forEach((u: UserOption) => {
-								if (!map.has(u.id)) map.set(u.id, u);
+							data.forEach((raw: any) => {
+								const normalized: UserOption = {
+									...raw,
+									username: raw.username || raw.discord?.username,
+									global_name: raw.global_name || raw.discord?.global_name,
+									avatar: raw.avatar || raw.discord?.avatar,
+								};
+								map.set(normalized.id, { ...map.get(normalized.id), ...normalized });
 							});
 							return Array.from(map.values());
 						});
@@ -66,7 +72,9 @@ export function AsyncUserMultiSelector({ values, onChange, getEnvUrl, placeholde
 	// Fetch Discord profile for selected values if missing
 	useEffect(() => {
 		values.forEach((val) => {
-			if (val && !users.find((u) => u.id === val) && !fetchedIds.current.has(val)) {
+			const existing = users.find((u) => u.id === val);
+			const hasProfile = Boolean(existing && (existing.username || existing.global_name || existing.name));
+			if (val && !hasProfile && !fetchedIds.current.has(val)) {
 				fetchedIds.current.add(val);
 				fetch(getEnvUrl(`https://api.xernerx.com/core/users/${val}/discord`), {
 					credentials: 'include',

@@ -21,19 +21,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 		const BotModel = (db.models.bots as any).Bot;
 		const OrganizationModel = (db.models.organizations as any).Organization;
 
-		const user = (await UserModel.findOne({ id }).lean()) as any;
+		const user = (await UserModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean()) as any;
+		const resolvedUserId = String(user?.id || id);
 
-		if (user?.privacy === 'private') {
+		if (!user || user?.privacy === 'private') {
 			label = 'Xernerx';
 			value = 'Private';
 			color = '#71717a';
 		} else if (type === 'bots') {
-			const botCount = await BotModel.countDocuments({ owners: id, privacy: 'public' });
+			const botCount = await BotModel.countDocuments({ owners: resolvedUserId, privacy: 'public' });
 			label = 'Xernerx Bots';
 			value = formatCompactNumber(botCount);
 		} else if (type === 'orgs' || type === 'organizations') {
 			const orgCount = await OrganizationModel.countDocuments({
-				$or: [{ owner: id }, { members: id }],
+				$or: [{ owner: resolvedUserId }, { members: resolvedUserId }],
 				$and: [{ $or: [{ 'config.privacy': 'public' }, { privacy: 'public' }] }],
 			});
 			label = 'Xernerx Orgs';
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			value = user?.verified ? 'Verified User' : 'Xernerx User';
 			color = user?.verified ? '#10b981' : '#6366f1';
 		} else {
-			const creditDoc = (await CreditModel.findOne({ ownerId: id }).select('streak').lean()) as any;
+			const creditDoc = (await CreditModel.findOne({ ownerId: resolvedUserId }).select('streak').lean()) as any;
 			label = 'Xernerx Streak';
 			value = `${creditDoc?.streak ?? 0}d`;
 		}

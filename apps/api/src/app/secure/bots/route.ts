@@ -42,7 +42,15 @@ export async function GET(request: Request) {
 			}
 			matchStage = tokenBotIds.length > 0 ? { $or: [{ owners: owner }, { id: { $in: tokenBotIds } }] } : { owners: owner };
 		} else if (organization) {
-			matchStage = { organization };
+			let resolvedOrgId = organization;
+			if (!/^[0-9a-fA-F]{24}$/.test(organization)) {
+				const orgDoc = await (db.models.organizations as any)?.Organization?.findOne({ vanitySlug: organization.toLowerCase() })
+					.select('_id')
+					.lean()
+					.catch(() => null);
+				if (orgDoc?._id) resolvedOrgId = String(orgDoc._id);
+			}
+			matchStage = { organization: resolvedOrgId };
 		} else {
 			matchStage.privacy = 'public';
 			if (category === 'promoted') {
@@ -126,6 +134,7 @@ export async function GET(request: Request) {
 					name: 1,
 					avatar: 1,
 					banner: 1,
+					discord: '$discordCache',
 					vanitySlug: 1,
 					vanityUnlocked: 1,
 					verified: 1,

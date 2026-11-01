@@ -2,6 +2,27 @@
 
 # auth
 
+## 2.11.0
+
+### Minor Changes
+
+-   - **Activity & Data Hub Reviews Tab**: Added a dedicated `Reviews` tab in `ActivityView` to inspect and jump to all bot and server reviews authored across the ecosystem.
+    - **Credit Balance & Transaction Ledger Filters**: Upgraded `CreditLedgerCard` with `All` / `Earned` / `Spent` filter pills, a live `+Earned / -Spent` net summary badge, and a `Show All / Show Less` toggle for full transaction history.
+    - **API Tokens Sort, Total Requests KPI & Portal Shortcut**: Upgraded `Tokens` and `TokenCard` with a `Total Requests` KPI pill, a sort selector (`Most Requests`, `Recently Used`, `Name A–Z`), and a 1-click `Portal` shortcut on bound token cards.
+    - **Profile & Layout Refinements**: Refined profile settings and root layout metadata.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 2.10.7
 
 ### Patch Changes

@@ -5,19 +5,10 @@ import { put } from '@vercel/blob';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
+import { getCdnCorsHeaders } from '@/lib/cors';
 
 function getCorsHeaders(origin: string | null) {
-	const isLocal = origin?.includes('localhost');
-	const isXernerx = origin?.endsWith('.xernerx.com');
-
-	const allowedOrigin = isLocal || isXernerx ? origin : 'https://xernerx.com';
-
-	return {
-		'Access-Control-Allow-Origin': allowedOrigin || '*',
-		'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-		'Access-Control-Allow-Credentials': 'true',
-	};
+	return getCdnCorsHeaders(origin, 'GET, POST, OPTIONS');
 }
 
 export async function OPTIONS(req: Request) {
@@ -42,6 +33,8 @@ export async function POST(req: Request) {
 		const formData = await req.formData();
 		const file = formData.get('file') as File;
 		const folder = ((formData.get('folder') as string) || 'Uncategorized').trim() || 'Uncategorized';
+		const rawPrivacy = ((formData.get('privacy') as string) || 'public').trim().toLowerCase();
+		const privacy: 'public' | 'limited' | 'private' = rawPrivacy === 'private' ? 'private' : rawPrivacy === 'limited' ? 'limited' : 'public';
 		const rawTags = formData.get('tags') as string;
 		let tags: string[] = [];
 		if (rawTags) {
@@ -81,8 +74,8 @@ export async function POST(req: Request) {
 			filename: file.name,
 			mimeType: file.type,
 			size: file.size,
-			uploaderId: 'system-anonymous', // DOES NOT tie to the user!
-			privacy: 'public', // Must be public so admins can view it when reading the bug report
+			uploaderId: privacy === 'private' ? userId : 'system-anonymous',
+			privacy,
 			shared: [],
 			folder,
 			tags,

@@ -114,7 +114,7 @@ export async function buildSuggestionsOverviewMessage(client: Client, tab: Sugge
 				.setLabel(t.label)
 				.setStyle(t.id === tab ? ButtonStyle.Primary : ButtonStyle.Secondary)
 		),
-		new ButtonBuilder().setLabel('Submit Suggestion (+250 Credits)').setStyle(ButtonStyle.Link).setURL(suggestionsUrl)
+		new ButtonBuilder().setLabel('Submit Suggestion').setStyle(ButtonStyle.Link).setURL(suggestionsUrl)
 	);
 
 	return {
@@ -262,11 +262,8 @@ export default class SuggestionsCommand extends SlashCommandBuilder {
 						inline: true,
 					},
 					{
-						name: 'Community & Bounty',
-						value: [
-							`• **Score:** \`▲ ${netVotes >= 0 ? `+${netVotes}` : netVotes}\` (\`${upvotes}\` up / \`${downvotes}\` down)`,
-							`• **Bounty:** \`${found.bountyAwarded ? '+250 Credits Awarded' : '+250 Credits on Acceptance'}\``,
-						].join('\n'),
+						name: 'Community Votes',
+						value: `• **Score:** \`▲ ${netVotes >= 0 ? `+${netVotes}` : netVotes}\` (\`${upvotes}\` up / \`${downvotes}\` down)`,
 						inline: true,
 					},
 				])
