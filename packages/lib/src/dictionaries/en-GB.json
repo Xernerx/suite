@@ -2199,7 +2199,8 @@
 					"previewBadge": "Live Preview",
 					"unlockCta": "Unlock in Credit Store (3,500 Credits)",
 					"formationLabel": "Active Banner Formation",
-					"savedToast": "Dot-matrix banner formation updated!"
+					"savedToast": "Dot-matrix banner formation updated!",
+					"lockedToastDesc": "Previewing formation live! Unlock Dot-Matrix Architect in the Credit Store to equip it on your profile."
 				},
 				"modal": {
 					"createTitle": "Add Profile Showcase",
@@ -2214,6 +2215,41 @@
 					"imageLabel": "Preview Image URL (Optional)",
 					"quickFillLabel": "Quick-Fill from My Ecosystem",
 					"quickFillPlaceholder": "Import from your Bots, Servers, Organizations, or Connections..."
+				}
+			},
+			"cosmeticsStudio": {
+				"title": "Profile Identity Cosmetics Studio",
+				"badge": "Shaders & Themes",
+				"subtitle": "Equip animated avatar frame shaders, shimmering gradient nameplates, and custom profile card themes across your Public Profile, Account Profile, and Sidebar Card.",
+				"unlockInStore": "Unlock in Credit Store",
+				"applyCosmetics": "Save & Equip",
+				"previewOnly": "Live Preview",
+				"lockedToastDesc": "Previewing live in studio! Unlock this cosmetic in the Credit Store to equip and save it to your profile.",
+				"savedTitle": "Profile Cosmetics Equipped!",
+				"savedDesc": "Your avatar frame, nameplate, and profile card theme are now active across the suite.",
+				"framesHeading": "Avatar Frame Shaders",
+				"nameplatesHeading": "Animated Nameplates",
+				"cardThemesHeading": "Profile Card Themes",
+				"frames": {
+					"none": "Default (No Frame)",
+					"plasma_ring": "Plasma Orbit Ring",
+					"holo_crown": "Holographic Prism Halo",
+					"cyber_hex": "Cyber Hex Shield",
+					"solar_flare": "Solar Corona Flare"
+				},
+				"nameplates": {
+					"none": "Default Typography",
+					"aurora_wave": "Aurora Ribbon",
+					"synth_horizon": "Synthwave Horizon",
+					"nebula_shimmer": "Nebula Starlight",
+					"cyber_circuit": "Cyber Pulse Tag"
+				},
+				"cardThemes": {
+					"default": "Standard Glass",
+					"holographic": "Holographic Foil",
+					"celestial": "Celestial Starlight",
+					"cyber_neon": "Cyber Neon Grid",
+					"obsidian_gold": "Obsidian & Gold"
 				}
 			},
 			"vanitySlug": {
@@ -2270,7 +2306,21 @@
 				"berry": "Wild Berry",
 				"cobalt": "Deep Cobalt",
 				"violet": "Cosmic Violet",
-				"slate": "Frosted Slate"
+				"slate": "Frosted Slate",
+				"white": "Monochrome White",
+				"black": "Obsidian Black"
+			},
+			"desktopIconPrompt": {
+				"badge": "Desktop Icon",
+				"activeBadge": "Active Icon",
+				"cardHint": "Matches {icon} desktop icon",
+				"title": "Match Desktop App Icon?",
+				"description": "Your selected accent color ({color}) has a matching Xernerx Desktop crest ({icon}). Would you like to update your taskbar and system tray icon to match?",
+				"currentLabel": "Current Icon",
+				"matchingLabel": "Matching Icon",
+				"confirm": "Set Desktop Icon",
+				"skip": "Keep Current Icon",
+				"toastSuccess": "Desktop app icon updated to {icon}!"
 			},
 			"zoom": {
 				"title": "UI Zoom Level",
@@ -2315,8 +2365,147 @@
 				"dotMatrixStage": {
 					"title": "Background Stage Updated"
 				},
+				"ambientScene": {
+					"title": "Ambient Background Scene Updated"
+				},
+				"surfaceStyle": {
+					"title": "Card & Glass Surface Theme Updated"
+				},
+				"cursorFx": {
+					"title": "Cursor Trail & Click FX Updated"
+				},
+				"overlaySkin": {
+					"title": "Modal, Toast & Command Palette Skin Updated"
+				},
 				"pageWidth": {
 					"title": "Page width updated"
+				}
+			},
+			"ambientScene": {
+				"title": "Full-Screen Ambient Canvas Scenes",
+				"badge": "Zero-Dot Shaders",
+				"description": "Standalone full-bleed procedural background environments that render behind your workspace independently of the Dot-Matrix engine.",
+				"previewMode": "Preview Mode",
+				"lockedToastTitle": "Ambient Scene Locked",
+				"lockedToastDesc": "Previewing live in viewport! Unlock the Full-Screen Ambient Canvas Pack in the Credit Store (or with Ultra Ecosystem) to equip it suite-wide.",
+				"options": {
+					"default": {
+						"label": "None (Off)",
+						"desc": "Standard clean theme backdrop with no full-screen ambient shader."
+					},
+					"mesh_lava": {
+						"label": "Liquid Mesh & Lava",
+						"desc": "Silky multi-layered organic fluid gradients that drift across the viewport."
+					},
+					"cyber_grid": {
+						"label": "Synth Horizon Grid",
+						"desc": "3D perspective wireframe horizon floor with atmospheric zenith glow and sun disc."
+					},
+					"topography": {
+						"label": "Isobaric Topography",
+						"desc": "Flowing elevation contour rings and cartographic wave lines."
+					},
+					"nebula_cosmos": {
+						"label": "Deep-Space Nebula",
+						"desc": "Volumetric cosmic dust clouds, parallax starfields, and shooting meteors."
+					},
+					"prism_caustics": {
+						"label": "Prism Light Caustics",
+						"desc": "Crystalline light refraction beams and shimmering underwater caustic ripples."
+					}
+				}
+			},
+			"surfaceStyle": {
+				"title": "Card & Glass Surface Architecture",
+				"badge": "Suite-Wide Material",
+				"description": "Transform the glassmorphism finish, specular border highlights, and elevation glow of cards, modals, and panels across every Xernerx app.",
+				"lockedToastTitle": "Surface Theme Locked",
+				"lockedToastDesc": "Unlock the Card & Glass Surface Architecture Pack in the Credit Store (or with Ultra Ecosystem) to equip this surface finish.",
+				"options": {
+					"default": {
+						"label": "Frosted Glass",
+						"desc": "Balanced translucent frosted glass with soft border elevation."
+					},
+					"crystal": {
+						"label": "Prismatic Crystal",
+						"desc": "High-clarity optical refraction with crisp top-edge specular highlights."
+					},
+					"holographic": {
+						"label": "Holographic Foil",
+						"desc": "Iridescent multi-tone border sheen and subtle diagonal prism wash."
+					},
+					"neon": {
+						"label": "Cyber Neon",
+						"desc": "Luminous accent-charged borders with outer and inset neon bloom."
+					},
+					"obsidian": {
+						"label": "Smoked Obsidian",
+						"desc": "Ultra-deep matte smoked glass with razor-sharp contrast framing."
+					}
+				}
+			},
+			"cursorFx": {
+				"title": "Cursor Trail & Click Shockwave FX",
+				"badge": "Interactive Pointer FX",
+				"description": "Add 60fps interactive pointer trails and click burst shockwaves tinted to your chosen accent color across Web and Desktop.",
+				"lockedToastTitle": "Cursor FX Locked",
+				"lockedToastDesc": "Unlock this Cursor FX (or the Complete Cursor FX Bundle) in the Credit Store to equip it across the suite.",
+				"options": {
+					"default": {
+						"label": "Standard Pointer (Off)",
+						"desc": "Clean native system cursor with no extra trail or click shockwave."
+					},
+					"starlight_trail": {
+						"label": "Starlight Sparkle Trail",
+						"desc": "4-point celestial starlight sparkles trailing your pointer with a radiant star burst on click."
+					},
+					"plasma_sparks": {
+						"label": "Plasma Click Sparks",
+						"desc": "High-velocity electric comet trail and an energetic 18-spark shower on every click."
+					},
+					"cyber_reticle": {
+						"label": "Cyber HUD Reticle",
+						"desc": "Rotating sci-fi targeting crosshair with corner lock brackets that pulses on click."
+					},
+					"sonic_rings": {
+						"label": "Sonic Pulse Rings",
+						"desc": "Concentric acoustic motion wake rings along your pointer path with dual sonic booms on click."
+					},
+					"aurora_ribbon": {
+						"label": "Aurora Silk Ribbon",
+						"desc": "Fluid multi-layered silk light ribbon that glides behind your cursor with soft click ripples."
+					}
+				}
+			},
+			"overlaySkin": {
+				"title": "Modal, Toast & Command Palette (Ctrl+K) Skins",
+				"badge": "Overlay Architecture",
+				"description": "Customize the framing, specular edges, and geometry of all Modals, Toast notifications, and the global Ctrl+K Command Palette.",
+				"testToastBtn": "Test Toast Skin",
+				"testToastDesc": "Your active overlay skin styles all Toast notifications, Modals, and Ctrl+K.",
+				"lockedToastTitle": "Overlay Skin Locked",
+				"lockedToastDesc": "Unlock this Overlay Skin (or the Complete Overlay Skin Bundle) in the Credit Store to equip it across the suite.",
+				"options": {
+					"default": {
+						"label": "Standard Glass",
+						"desc": "Clean rounded glassmorphism for modals, toasts, and Ctrl+K."
+					},
+					"hud_tactical": {
+						"label": "HUD Tactical",
+						"desc": "Scanline telemetry header bar and high-precision tactical framing."
+					},
+					"frosted_prism": {
+						"label": "Frosted Prism",
+						"desc": "Chromatic dispersion border and multi-angle crystal specular sheen."
+					},
+					"neon_arcade": {
+						"label": "Neon Arcade",
+						"desc": "High-voltage dual neon tube border and electric outer/inset bloom."
+					},
+					"minimal_pill": {
+						"label": "Minimal Floating Pill",
+						"desc": "Extra-rounded capsule geometry with deep borderless elevation."
+					}
 				}
 			},
 			"resetDefaults": "Reset to Defaults",
@@ -2336,7 +2525,11 @@
 				"title": "Dot-Matrix Background Profile & Motion",
 				"description": "Choose which dot-matrix formation the loading screen morphs into after loading completes, and how it animates.",
 				"typeLabel": "Matrix Profile",
+				"renderStyleLabel": "Stage Render Form",
 				"animationLabel": "Animation Mode",
+				"lockedToastTitle": "Cosmetic Perk Locked",
+				"lockedToastDesc": "Previewing live in card! Unlock this cosmetic perk in the Credit Store to equip it across the suite.",
+				"openCreditStore": "Open Credit Store",
 				"types": {
 					"default": "Default (Page Adaptive)",
 					"full": "Xernerx Wordmark",
@@ -2347,7 +2540,19 @@
 					"prism": "Cyber Prism",
 					"infinity": "Infinity Loop",
 					"wavegrid": "Harmonic Wave Lattice",
+					"chronos": "Chronos Dial",
+					"supernova": "Supernova Burst",
+					"tesseract": "4D Tesseract",
+					"synthwave": "Synth Horizon",
+					"lotus": "Cyber Lotus",
 					"blank": "Blank (Disperse After Load)"
+				},
+				"renderStyles": {
+					"dots": "Classic Dot Matrix",
+					"constellation": "Constellation Mesh",
+					"hexgrid": "Cyber Hex-Grid",
+					"aurora": "Aurora Bokeh & Waves",
+					"glyphs": "Cyber Glyphs (HUD)"
 				},
 				"animations": {
 					"animate": "Animate (Context Default)",
@@ -2744,6 +2949,7 @@
 				"confirmRedeemTitle": "Redeem {item}?",
 				"confirmRedeemDesc": "You are about to spend {cost} credits on {item}. Your remaining balance will be {remaining} credits.",
 				"confirmRedeemButton": "Confirm & Redeem",
+				"equipInSettings": "Equip in Account Settings",
 				"filters": {
 					"all": "All Items",
 					"cdnSlots": "CDN Slots",
@@ -2751,6 +2957,8 @@
 					"botSlots": "Bot Slots",
 					"trialPasses": "Trial Passes",
 					"vanityBadges": "Vanity Badges",
+					"stageStyles": "Backgrounds & Stages",
+					"iconPacks": "Icon & Header Packs",
 					"creditPacks": "Buy Credits (€)",
 					"streakShields": "Streak Shields",
 					"vanityUrls": "Vanity URLs"
@@ -2770,7 +2978,8 @@
 				"dotMatrixPreview": {
 					"liveBadge": "Live Interactive Banner",
 					"clickHint": "Hover or click for shockwave",
-					"customizeInProfile": "Customize Formation in Profile"
+					"customizeInProfile": "Customize Formation in Profile",
+					"testMorph": "Test Loading Morph"
 				}
 			},
 			"promo": {
@@ -3053,6 +3262,17 @@
 			"title": "Preferences",
 			"description": "Customize interface elements, workspace behavior, and native desktop client flags.",
 			"resetDefaults": "Reset Preferences",
+			"windowControlsLockedDesc": "Unlock the Glass Capsule, Squircle & Stealth Header Pack in the Credit Store (or with Ultra Ecosystem) to equip this header style.",
+			"uiIconStyleLockedDesc": "Unlock the Suite UI Icon Pack Bundle in the Credit Store (or with Ultra Ecosystem) to equip custom vector icon styles.",
+			"desktopIconLockedDesc": "Unlock this Desktop Crest Pack in the Credit Store (or with Ultra Ecosystem) to equip this taskbar & tray icon.",
+			"uiIconStyle": {
+				"title": "Suite UI Icon Pack Style",
+				"description": "Customize interface icon strokes and glow effects across the Sidebar, Header, and all Xernerx applications.",
+				"standard": "Standard Vector (Default)",
+				"duotone": "Duotone Accent Glow",
+				"bold": "Bold Pop (2.6px)",
+				"precision": "Thin Precision (1.35px)"
+			},
 			"toast": {
 				"updated": "Preference updated",
 				"reset": "Preferences reset to defaults"
@@ -3067,6 +3287,9 @@
 			},
 			"desktop": {
 				"badge": "Desktop Client",
+				"windowControlsCapsule": "Glass Island",
+				"windowControlsSquircle": "Squircles",
+				"windowControlsMinimal": "Stealth Dots",
 				"webNotice": "These native startup flags are stored in metadata.json and apply when running inside the Xernerx Desktop app.",
 				"restartBannerTitle": "Restart Required",
 				"restartBannerDesc": "You modified native desktop startup settings in metadata.json. Restart the app for changes to take effect.",
@@ -3137,6 +3360,9 @@
 				"biometricPromptToken": "Verify your identity to reveal or roll your Xernerx Bot API Token"
 			},
 			"items": {
+				"headerControlsStyle": {
+					"description": "Choose the button geometry for your top header bar and window controls across both Browser and Desktop."
+				},
 				"headerSubdomains": {
 					"title": "Pinned Header Subdomains",
 					"description": "Choose which Xernerx subdomains appear as quick-access shortcut icons in the top navigation bar across all applications (defaults to Portal and Store)."
@@ -3284,7 +3510,26 @@
 						"system": "System Detected (Auto)",
 						"windows": "Windows Classic",
 						"macos": "Traffic Lights (macOS)",
-						"xernerx": "Xernerx Glass Pills"
+						"xernerx": "Xernerx Glass Pills",
+						"capsule": "Unified Glass Island",
+						"squircle": "Modern Squircles",
+						"minimal": "Stealth Accent Dots"
+					}
+				},
+				"appIcon": {
+					"title": "Desktop App Icon (Taskbar & Tray)",
+					"description": "Choose your preferred Xernerx Desktop crest color for the taskbar, system tray, Start Menu shortcut, and OS notifications.",
+					"options": {
+						"default": "Xerple",
+						"blue": "Electric Blue",
+						"cyan": "Arctic Cyan",
+						"green": "Lush Green",
+						"gold": "Amber Gold",
+						"orange": "Sunset Orange",
+						"red": "Crimson Red",
+						"pink": "Vibrant Pink",
+						"white": "Monochrome White",
+						"black": "Obsidian Black"
 					}
 				}
 			}
@@ -3546,76 +3791,76 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our websites, dashboards, Discord bots, APIs, CDN, and desktop applications."
+					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our websites, dashboards, Developer Portal (portal.xernerx.com), Haste pastebin (haste.xernerx.com), Discord bots, APIs, CDN, and desktop applications."
 				},
 				"dataCollected": {
 					"title": "2. Information We Collect",
 					"account": {
 						"title": "Account & Device Session Information:",
-						"desc": "When you sign in via Discord OAuth2 or our QR Code / 6-character Pairing Code Device Sign-In flow, we collect your Discord ID, username, avatar, email address, custom profile settings (display name, bio, pronouns, banner), and recent device session metadata (browser, operating system, device type, and last-active timestamp for up to 10 devices) so you can review and manage active sessions."
+						"desc": "When you sign in via Discord OAuth2 or our QR Code / 6-character Pairing Code Device Sign-In flow, we collect your Discord ID, username, avatar, email address, custom profile settings (display name, bio, pronouns, birthday, timezone, banner, profile showcases, and vanity URL slug), and recent device session metadata (browser, operating system, device type, and last-active timestamp for up to 10 devices) so you can review and manage active sessions."
 					},
 					"connections": {
 						"title": "Connected Third-Party Accounts:",
-						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity."
+						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity. For authorized staff members who link infrastructure providers (such as Vercel or Easypanel) for internal hosting management, connection credentials are kept strictly private and are never exposed on public profiles."
 					},
 					"developers": {
-						"title": "For API & Bot Developers:",
-						"desc": "Scoped Bearer API tokens, webhook URLs, application and organization metadata, real-time WebSocket gateway telemetry, and configuration settings used to operate your integrations on our infrastructure."
+						"title": "For API, Portal & Bot Developers:",
+						"desc": "Scoped Bearer API tokens, webhook URLs and secrets (for vote, review, and tip events), bot release changelogs, slash command registries, organization membership and treasury records, real-time WebSocket gateway telemetry, and configuration settings managed via portal.xernerx.com and our API."
 					},
 					"botUsers": {
-						"title": "For Bot & Community End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (such as Virtue, Zodiac, Metamorphosis, or To-Do List Bot), we process your Discord ID, guild IDs, command inputs, and opt-in community engagement metrics (such as text and voice XP/leveling statistics). We do not store raw message logs unless explicitly required by an opt-in server feature."
+						"title": "For Bot, Virtue Leveling & Community End Users:",
+						"desc": "When you interact with a bot powered by Xernerx (such as Virtue, Zodiac, Metamorphosis, or To-Do List Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our global and server leveling bot), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened (we never record, listen to, or process voice audio). We also cache non-sensitive server role and channel metadata (IDs, names, colors, and positions) so server administrators can configure level-up role rewards and channel filters in the dashboard, and we read your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards."
 					},
 					"cdnAndContent": {
-						"title": "CDN Media & Community Submissions:",
-						"desc": "Files and images uploaded to cdn.xernerx.com or attached to bug reports and feature suggestions are stored in private cloud blob storage and served according to your configured visibility setting (public, limited to specific users, or private)."
+						"title": "CDN Media, Haste Pastes, Showcases & 3-Tier Privacy:",
+						"desc": "Files uploaded to cdn.xernerx.com, code and text snippets saved on haste.xernerx.com, profile showcases, and community bug/suggestion attachments are stored and served strictly according to our universal three-tier privacy model: Public (listed in public directories and accessible by anyone), Limited (unlisted from directories, leaderboards, and search results, but accessible via direct link or ID), and Private (strictly accessible only by the owner and explicitly authorized users or organization members). Haste pastes with a configured expiration (TTL) are automatically deleted upon expiry."
 					},
 					"desktop": {
-						"title": "Xernerx Desktop Client:",
-						"desc": "When using the Xernerx Desktop App, window state, update channel preferences (Stable/Canary), hotkey bindings, and isolated multi-account session slots are stored locally on your machine. If enabled, the app communicates locally with your Discord client for Rich Presence (RPC) and writes diagnostic logs locally only when Debug Logging is turned on."
+						"title": "Xernerx Desktop Client & Local Bot Runner:",
+						"desc": "When using the Xernerx Desktop App, window state, update channel preferences (Stable/Canary), hotkey bindings, local Bot Runner process configurations, and isolated multi-account session slots are stored locally on your machine. Local bot processes launched via the Desktop Bot Runner and local API latency telemetry execute on your own device. If enabled, the app communicates locally with your Discord client for Rich Presence (RPC) and writes diagnostic logs locally only when Debug Logging is turned on."
 					},
 					"usage": {
 						"title": "Usage & Diagnostic Data:",
 						"desc": "Error logs, security audit trails, and system interactions collected to maintain platform stability, enforce rate limits, and prevent abuse."
 					},
 					"integration": {
-						"title": "Billing, Store & Rewards Data:",
-						"desc": "Subscription status, billing history, and regional checkout details processed securely via Stripe (we never store raw payment card numbers), along with platform Virtual Credit balances and daily mystery gift streak timestamps."
+						"title": "Billing, Store, Credits & Rewards Data:",
+						"desc": "Subscription status, one-time Credit Top-Up Pack purchases, billing history, and regional checkout details processed securely via Stripe (we never store raw payment card numbers), along with Virtual Credit balances, transaction ledgers, daily mystery gift streaks, streak shields, referral attributions, achievement unlocks, Organization Treasury contributions, Spotlight Boost activations, and peer-to-peer credit tips (when you tip a bot, your Discord ID, tip amount, and optional note are shared with the bot's configured tip webhook)."
 					}
 				},
 				"apiData": {
 					"title": "3. API Data Collection & Developer Obligations",
-					"content": "When developers use our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket gateway to synchronize bot statistics or fetch metadata, we collect and store this data to render public pages and provide analytics. Developers are strictly prohibited from transmitting unrequested personally identifiable information (PII) of their end users to our API. We do not sell or share API data with third-party advertisers."
+					"content": "When developers use our REST API (/v1/* and /secure/*), Haste API (/v1/haste), embeddable public widgets, outgoing webhooks, or real-time WebSocket gateway to synchronize bot statistics or fetch metadata, we collect and store this data to render public pages and provide analytics. Developers are strictly prohibited from transmitting unrequested personally identifiable information (PII) of their end users to our API or Haste service. We do not sell or share API data with third-party advertisers."
 				},
 				"legalBasis": {
 					"title": "4. Legal Basis for Processing",
-					"content": "We process personal data based on contractual necessity (to deliver the services and subscriptions you request), legitimate interests (security, fraud prevention, and service improvement), compliance with legal obligations, or your explicit consent where applicable."
+					"content": "We process personal data based on contractual necessity (to deliver the services, subscriptions, and credit features you request), legitimate interests (security, fraud and manipulation prevention, and service improvement), compliance with legal obligations, or your explicit consent where applicable."
 				},
 				"usage": {
 					"title": "5. How We Use Information",
 					"items": [
-						"To provide, authenticate, and synchronize your account across all Xernerx web applications, bots, and desktop clients.",
-						"To process Store subscriptions, allocate Virtual Credits, enforce CDN storage quotas, and improve platform reliability.",
-						"To provide customer support, communicate platform updates, and send important service-related emails (e.g., billing receipts, security alerts, and organization invitations). You may manage your notification preferences at any time.",
-						"To detect abuse, enforce our Terms of Service, and comply with applicable legal obligations."
+						"To provide, authenticate, and synchronize your account across all Xernerx web applications, Developer Portal, Haste pastebin, bots, and desktop clients.",
+						"To process Store subscriptions and Credit Top-Up Packs, maintain Virtual Credit and Organization Treasury ledgers, deliver redeemed perks and Spotlight Boosts, and enforce CDN and Haste storage quotas.",
+						"To provide customer support (including guided Discord support threads), communicate platform updates, and send important service-related notifications and emails (e.g., billing receipts, security alerts, and organization invitations). You may manage your notification preferences at any time.",
+						"To detect abuse, prevent vote/referral/credit manipulation, enforce our Terms of Service, and comply with applicable legal obligations."
 					]
 				},
 				"sharing": {
 					"title": "6. Data Sharing",
 					"items": [
 						"Cloud hosting, database, and private blob storage infrastructure providers.",
-						"Payment processors (Stripe) for subscription checkout, Adaptive Pricing localization, and billing management.",
-						"Authorized third-party integrations and connected accounts that you explicitly link or enable as public profile widgets.",
+						"Payment processors (Stripe) for subscription and Credit Top-Up Pack checkout, Adaptive Pricing localization, and billing management.",
+						"Authorized third-party integrations, connected accounts that you explicitly enable on your public profile, and bot developers' configured webhook endpoints when you submit a public vote, review, or credit tip for their bot.",
 						"Law enforcement or regulatory authorities when strictly required by applicable law."
 					]
 				},
 				"retention": {
 					"title": "7. Data Retention",
-					"content": "We retain personal data only as long as necessary to provide our services and fulfill the purposes outlined in this Policy, unless longer retention is required by law (such as tax and accounting records). Ephemeral QR/pairing sign-in tickets automatically expire after 3 minutes."
+					"content": "We retain personal data only as long as necessary to provide our services and fulfill the purposes outlined in this Policy, unless longer retention is required by law (such as tax, billing, and accounting records). Code and text pastes created on haste.xernerx.com with an expiration timer (1 hour, 24 hours, 7 days, or 30 days) are automatically purged from our database upon expiration, and ephemeral QR/pairing sign-in tickets automatically expire after 3 minutes."
 				},
 				"security": {
 					"title": "8. Data Security",
-					"content": "We implement robust technical and organizational security measures, including AES-256-GCM encryption for cross-device sign-in tokens, HTTP-only session cookies, scoped Bearer token authentication, and strict role-based access controls. However, no internet transmission or storage system is 100% secure."
+					"content": "We implement robust technical and organizational security measures, including AES-256-GCM encryption for cross-device sign-in tokens, HMAC-SHA256 signatures for outgoing developer webhooks, HTTP-only session cookies, scoped Bearer token authentication, and strict role-based access controls. However, no internet transmission or storage system is 100% secure."
 				},
 				"rights": {
 					"title": "9. Your Rights (GDPR & CCPA)",
@@ -3657,8 +3902,8 @@
 				"a1": "No. We never sell your personal information or API telemetry to third-party advertisers. Data is processed strictly to provide and secure your Xernerx Account, Discord bots, and developer integrations.",
 				"q2": "How can I export or permanently delete my Xernerx Account data?",
 				"a2": "You can download a complete JSON archive of your data in Account -> Activity at any time. You can also reset your profile or permanently delete your account in Account -> Settings.",
-				"q3": "What visibility options are available for my profile and CDN uploads?",
-				"a3": "Every profile, bot, server, organization, and CDN upload supports three privacy tiers: Public (listed in directories), Limited (unlisted direct-link access only), and Private (strictly owner-only)."
+				"q3": "What visibility options are available for my profile, CDN uploads, and Haste pastes?",
+				"a3": "Every profile, bot, server, organization, CDN upload, and Haste paste supports three privacy tiers: Public (listed in directories), Limited (unlisted direct-link access only), and Private (strictly owner-only)."
 			}
 		},
 		"terms": {
@@ -3670,7 +3915,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "These Terms of Service (\"Terms\") govern your access to all websites, dashboards, Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
+					"content": "These Terms of Service (\"Terms\") govern your access to all websites, dashboards, Developer Portal (portal.xernerx.com), Haste pastebin (haste.xernerx.com), Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
 				},
 				"eligibility": {
 					"title": "2. Eligibility",
@@ -3679,42 +3924,42 @@
 				"acceptableUse": {
 					"title": "3. Acceptable Use",
 					"items": [
-						"Do not engage in unlawful, fraudulent, or abusive activities. Never upload illegal content to our CDN or community portals.",
-						"Do not attempt to access accounts, private CDN blobs, API endpoints, or staff tools without explicit authorization.",
-						"Do not disrupt, overload, or bypass platform rate limits, WebSocket gateways, or security mechanisms.",
-						"Do not reverse-engineer, scrape, or exploit vulnerabilities in any Xernerx service, bot, or client application."
+						"Do not engage in unlawful, fraudulent, or abusive activities. Never upload or publish illegal content, malware, doxxing material, or leaked credentials to our CDN (cdn.xernerx.com), Haste pastebin (haste.xernerx.com), profile showcases, or community portals.",
+						"Do not attempt to access accounts, private CDN blobs, private Haste pastes, API endpoints, or staff hosting/administration tools without explicit authorization.",
+						"Do not manipulate platform systems, including artificially inflating bot/server votes, reviews, referral bonuses, achievement unlocks, daily streaks, or Virtual Credit balances through multi-accounting, automation, or deceptive practices.",
+						"Do not disrupt, overload, scrape, or reverse-engineer any Xernerx service, rate limit, WebSocket gateway, or client application, or squat/impersonate others using custom Vanity URL slugs."
 					]
 				},
 				"apiUsage": {
-					"title": "4. API, Widgets & WebSocket Gateway Terms",
-					"content": "Developers using our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket RPC gateway must follow these rules:",
+					"title": "4. Developer Portal, API, Widgets & WebSocket Terms",
+					"content": "Developers using portal.xernerx.com, our REST API (/v1/* and /secure/*), Haste API (/v1/haste), outgoing webhooks, embeddable public widgets, or real-time WebSocket RPC gateway must follow these rules:",
 					"items": [
-						"Respect all rate limits and plan quotas. Never spam, scrape, or abuse API endpoints or WebSocket connections.",
-						"Keep your Bearer API tokens secret. You are responsible for all actions performed with your keys.",
-						"Submit accurate telemetry, command registries, and bot statistics. Never artificially inflate metrics.",
-						"We may revoke API tokens or suspend applications that degrade platform stability or violate these Terms."
+						"Respect all rate limits and plan quotas. Never spam, scrape, or abuse API endpoints, Haste document creation, webhook deliveries, or WebSocket connections.",
+						"Keep your Bearer API tokens and webhook secrets confidential. You are responsible for all actions performed with your keys and organization credentials.",
+						"Submit accurate telemetry, slash command registries, release notes, and bot statistics. Never artificially inflate server or user metrics.",
+						"We may revoke API tokens, disable webhooks, reclaim abusive vanity slugs, or suspend bots and organizations that degrade platform stability or violate these Terms."
 					]
 				},
 				"botUsage": {
-					"title": "5. Bot End User Terms",
-					"content": "Users interacting with Xernerx Discord bots (Virtue, Metamorphosis, Zodiac, and To-Do List Bot) must not exploit commands or automate abusive requests. Server owners are responsible for configuring bot modules in compliance with these Terms and Discord's Terms of Service."
+					"title": "5. Bot & Virtue Leveling Terms",
+					"content": "Users interacting with Xernerx Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, and Xernerx App/Bot) must not exploit commands, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, and XP curve modes configured by each server. Server administrators may enable automated Daily, Weekly, or Monthly leaderboard cycle resets (or trigger manual server resets) and import/clone Virtue configurations across servers they manage; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent."
 				},
 				"accounts": {
 					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
 					"content": "You sign in via Discord OAuth2 or our encrypted QR Code and Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not start yourself. You may optionally link third-party accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) to display on your profile. You can revoke active device sessions or unlink connected accounts at any time in Account Settings."
 				},
 				"storeAndBilling": {
-					"title": "7. Store, Subscriptions & Virtual Credits",
-					"content": "Paid subscriptions and add-ons are billed in advance on a monthly or annual cycle via Stripe. Stripe may display localized currencies through Adaptive Pricing:",
+					"title": "7. Store, Subscriptions, Virtual Credits & Perks",
+					"content": "Paid subscriptions, add-ons, and one-time Credit Top-Up Packs are billed in advance via Stripe, which may display localized currencies through Adaptive Pricing:",
 					"items": [
 						"You can cancel a recurring subscription any time in the Billing Portal. Your plan benefits remain active until the end of the current billing period.",
-						"Virtual Credits, Daily Mystery Gifts, and login streak rewards are digital platform features with no cash value. They cannot be exchanged for cash, transferred, or refunded outside statutory consumer rights.",
-						"If a subscription expires, features and CDN storage quotas revert to standard tier limits. Existing files are kept, but new uploads may pause if you exceed your quota."
+						"Virtual Credits—whether purchased via Credit Top-Up Packs or earned through Daily Mystery Gifts, login streaks, referrals, or achievements—are non-monetary digital platform tokens with no real-world cash value. Peer-to-peer credit tips, Organization Treasury deposits, and credit redemptions (including Spotlight Boosts, Vanity URL unlocks, extra CDN/Showcase/Bot slots, 7-Day Trial Passes, Streak Shields, and cosmetic profile badges or Dot-Matrix banners) are final, non-withdrawable, and non-refundable outside statutory consumer rights.",
+						"If a subscription or trial expires, features and CDN storage quotas revert to standard tier limits (plus any permanent slot upgrades you have unlocked). Existing files are kept, but new uploads may pause if you exceed your quota."
 					]
 				},
 				"desktopClient": {
-					"title": "8. Xernerx Desktop Client",
-					"content": "We grant you a limited, non-exclusive, revocable license to use the Xernerx Desktop application. The Desktop client can install automatic updates across Stable or Canary channels and register optional global shortcuts. It also supports a floating mini overlay, isolated multi-account sessions, and local Discord Rich Presence."
+					"title": "8. Xernerx Desktop Client & Local Bot Runner",
+					"content": "We grant you a limited, non-exclusive, revocable license to use the Xernerx Desktop application. The Desktop client can install automatic updates across Stable or Canary channels and register optional global shortcuts. It also supports a floating mini overlay, isolated multi-account sessions, local Discord Rich Presence, and an optional Local Bot Runner that spawns and monitors bot processes on your computer. Any local scripts or bot processes you execute through the Desktop Bot Runner run on your own machine at your sole responsibility."
 				},
 				"data": {
 					"title": "9. User Data & Cookies",
@@ -3726,7 +3971,7 @@
 				},
 				"availability": {
 					"title": "10. Service Availability",
-					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted operation. Features, bot modules, APIs, or experimental Canary builds may be updated or discontinued at any time."
+					"content": "We strive for high availability across our suite, but we do not guarantee uninterrupted operation. Features, bot modules, APIs, Haste storage, or experimental Canary builds may be updated or discontinued at any time."
 				},
 				"thirdParty": {
 					"title": "11. Third-Party Services",
@@ -3734,7 +3979,7 @@
 				},
 				"intellectualProperty": {
 					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, branding, and visual assets remain the exclusive property of Xernerx Studios. Open-source packages are governed by their respective repository licenses. You keep ownership of content you upload to cdn.xernerx.com. You grant Xernerx Studios a license to host and deliver that content solely according to your chosen visibility setting (public, limited, or private)."
+					"content": "All Xernerx software, branding, and visual assets remain the exclusive property of Xernerx Studios. Open-source packages are governed by their respective repository licenses. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
 				},
 				"warranty": {
 					"title": "13. Disclaimer of Warranties",
@@ -3746,7 +3991,7 @@
 				},
 				"indemnification": {
 					"title": "15. Indemnification",
-					"content": "You agree to indemnify and hold harmless Xernerx Studios and its team members from any claims or damages. This applies to claims arising from your misuse of our services, your uploaded content, or your violation of these Terms."
+					"content": "You agree to indemnify and hold harmless Xernerx Studios and its team members from any claims or damages. This applies to claims arising from your misuse of our services, your uploaded CDN files or Haste pastes, your bots, or your violation of these Terms."
 				},
 				"governingLaw": {
 					"title": "16. Governing Law",
@@ -3763,13 +4008,13 @@
 			},
 			"description": "legal@xernerx.com",
 			"faq": {
-				"subtitle": "Key answers about account rules, API usage limits, subscriptions, and content ownership.",
+				"subtitle": "Key answers about account rules, API usage limits, subscriptions, Virtual Credits, and content ownership.",
 				"q1": "Who can create a Xernerx Account and use Xernerx Discord bots?",
 				"a1": "Anyone who is at least 13 years old (or the minimum digital consent age in their country) and complies with Discord's Terms of Service can use Xernerx services.",
-				"q2": "How do Store subscriptions and cancellations work?",
-				"a2": "Subscriptions are billed securely via Stripe and can be cancelled at any time from your Billing Portal. Your perks stay active until the end of your current paid billing period.",
-				"q3": "Do I keep ownership of files and images I upload to Xernerx CDN?",
-				"a3": "Yes. You retain full ownership of everything you upload to cdn.xernerx.com, and our servers only deliver your files according to the public, limited, or private visibility tier you select."
+				"q2": "How do Store subscriptions, Credit Top-Up Packs, and cancellations work?",
+				"a2": "Subscriptions are billed securely via Stripe and can be cancelled at any time from your Billing Portal. One-time Credit Top-Up Packs, peer-to-peer tips, Organization Treasury deposits, and credit perk redemptions are immediate digital unlocks and are non-withdrawable.",
+				"q3": "Do I keep ownership of files uploaded to Xernerx CDN and pastes on Xernerx Haste?",
+				"a3": "Yes. You retain full ownership of everything you upload to cdn.xernerx.com and haste.xernerx.com, and our servers only deliver your content according to the public, limited, or private visibility tier and expiration timer you select."
 			}
 		},
 		"cookies": {
@@ -3781,7 +4026,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions. It applies whenever you visit or interact with our websites, dashboards, APIs, and desktop applications."
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions. It applies whenever you visit or interact with our websites, dashboards, Developer Portal, Haste pastebin, APIs, and desktop applications."
 				},
 				"whatAreCookies": {
 					"title": "2. What Are Cookies?",
@@ -3795,7 +4040,7 @@
 					},
 					"functional": {
 						"title": "Functional Cookies:",
-						"desc": "Used to remember your personal preferences across subdomains. They store your language, theme (dark, light, or system), accent color, UI zoom, and layout settings."
+						"desc": "Used to remember your personal preferences across subdomains. They store your language, theme (dark, light, or system), accent color, UI zoom, page width, and layout settings."
 					},
 					"analytics": {
 						"title": "Analytics Cookies:",
@@ -3822,13 +4067,13 @@
 						"desc": "A functional cookie that remembers your preferred interface language across all Xernerx subdomains for up to 1 year."
 					},
 					"appearance": {
-						"title": "Interface, Appearance & Workspace Preferences (theme, accent, uiZoom, uiGap, textScale, clientSync, syncFromDiscord, pref_*):",
-						"desc": "Functional cookies that save your visual and header preferences across all subdomains. They allow the server to render your custom theme and layout immediately without visual flickering."
+						"title": "Interface, Appearance & Workspace Preferences (theme, accent, uiZoom, uiGap, textScale, pageWidth, clientSync, syncFromDiscord, pref_*):",
+						"desc": "Functional cookies that save your visual, scaling, header, and dot-matrix animation preferences across all subdomains. They allow the server to render your custom theme and layout immediately without visual flickering."
 					}
 				},
 				"localStorage": {
 					"title": "5. Local Storage & Desktop Client Storage",
-					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, and sidebar preferences for instant startup. In the Xernerx Desktop App, local settings live in metadata.json. Each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>) so you can switch accounts safely."
+					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, page width, dot-matrix header animation (pref_dotLogoMode, pref_dotMatrixAnimation), and sidebar preferences for instant startup. In the Xernerx Desktop App, local settings and Local Bot Runner configurations live in metadata.json, and each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>) so you can switch accounts safely."
 				},
 				"thirdParty": {
 					"title": "6. Third-Party Cookies",
@@ -3851,7 +4096,7 @@
 			"faq": {
 				"subtitle": "Common questions about how cookies, session tokens, and theme preferences work on Xernerx.",
 				"q1": "Why does Xernerx use cookies across *.xernerx.com subdomains?",
-				"a1": "First-party cookies allow you to sign in once on account.xernerx.com and stay authenticated seamlessly across app.xernerx.com, portal.xernerx.com, store.xernerx.com, and all other suite subdomains.",
+				"a1": "First-party cookies allow you to sign in once on account.xernerx.com and stay authenticated seamlessly across app.xernerx.com, portal.xernerx.com, haste.xernerx.com, store.xernerx.com, and all other suite subdomains.",
 				"q2": "Can I disable non-essential analytics and marketing cookies?",
 				"a2": "Yes. Click Cookie Preferences in the footer of any page to toggle functional, analytics, or marketing cookies on or off at any time while keeping essential security cookies active.",
 				"q3": "How does the Xernerx Desktop App keep multiple accounts separated?",
@@ -4430,8 +4675,8 @@
 				"description": "The Live Overlay Monitor (launched from your sidebar user card or at app.xernerx.com/overlay) is a compact, game-friendly companion view designed to be pinned on top of fullscreen applications and games. It displays real-time API latency (in ms) and operational health, a Live Feed tab of recent events and notifications, a Servers & Bots quick-status tab, and Quick Actions to open routes in your main window."
 			},
 			"card4": {
-				"title": "How do Native Notifications, Streamer Protection, Quick Capture to CDN, and Desktop Hotkeys work?",
-				"description": "When running the Desktop App, a dedicated Desktop Client section appears in account.xernerx.com/preferences. From there you can choose your default Startup Location (Dashboard, Developer Portal, Account, Explore, Store, Docs, CDN, etc.), toggle Native OS Notifications (Windows Action Center toasts, Apple Notification Center banners, taskbar flashes, and macOS Dock unread badges), Streamer Protection (using native OS win.setContentProtection to hide your window from OBS and screen recorders), Smart Battery Saver & Wake Sync (throttling background canvas animations on battery power and resyncing on wake), Discord Rich Presence (RPC), the global Ctrl + Shift + X summon hotkey, and optional global hotkeys for the Spotlight Quick Launcher (Ctrl + Shift + Space, off by default to avoid app conflicts) and Quick Screen Capture to CDN (Ctrl + Shift + S)."
+				"title": "How do Custom Desktop App Icons, Native Notifications, Streamer Protection, Quick Capture to CDN, and Desktop Hotkeys work?",
+				"description": "When running the Desktop App, a dedicated Desktop Client section appears in account.xernerx.com/preferences. From there you can choose your preferred Desktop App Icon crest (10 color variants for your taskbar, system tray, and notifications—or get prompted automatically when selecting a matching Accent Color in account.xernerx.com/appearance), set your default Startup Location (Dashboard, Developer Portal, Account, Explore, Store, Docs, CDN, etc.), and toggle Native OS Notifications (Windows Action Center toasts, Apple Notification Center banners, taskbar flashes, and macOS Dock unread badges), Streamer Protection (using native OS win.setContentProtection to hide your window from OBS and screen recorders), Smart Battery Saver & Wake Sync (throttling background canvas animations on battery power and resyncing on wake), Discord Rich Presence (RPC), the global Ctrl + Shift + X summon hotkey, and optional global hotkeys for the Spotlight Quick Launcher (Ctrl + Shift + Space, off by default to avoid app conflicts) and Quick Screen Capture to CDN (Ctrl + Shift + S)."
 			},
 			"card5": {
 				"title": "How can I use Taskbar JumpLists, inspect Desktop App logs, edit raw metadata.json, or clear the app cache?",
@@ -5019,12 +5264,11 @@
 				"stats": "Stats",
 				"settings": "Settings",
 				"links": "Links",
-				"virtue": "Virtue"
+				"virtue": "Levels"
 			},
 			"botNotConnected": "Bot Not Connected",
-			"botNotConnectedDesc": "Invite Xernerx Bot or Virtue to unlock automated server telemetry, member growth charts, and leveling.",
+			"botNotConnectedDesc": "Invite Xernerx Bot to unlock automated server telemetry and member growth charts.",
 			"inviteXernerxBot": "Invite Xernerx Bot",
-			"inviteVirtueBot": "Invite Virtue",
 			"tagsLabel": "Community & Discovery Tags",
 			"tagsDesc": "Add up to 12 tags so users can find your server by topic in the Server Explorer.",
 			"tagsPlaceholder": "Add custom tag and press Enter...",
@@ -5603,6 +5847,7 @@
 					"links": "Links",
 					"settings": "Settings",
 					"commands": "Commands",
+					"releases": "Releases",
 					"webhooks": "Webhooks",
 					"growth": "30d Growth",
 					"releasesAndCommands": "Releases & Commands"

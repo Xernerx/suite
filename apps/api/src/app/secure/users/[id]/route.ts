@@ -112,7 +112,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			verified: isVerified,
 			staffSubscription: isStaffSubActive,
 			connections: sanitizedConnections,
-			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug || isStaffSubActive),
+			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug),
 			appearance: appearance || {},
 			credits: credits ? { ...credits, signInBonusClaimed } : { balance: 0, streak: 0, signInBonusClaimed: false },
 			level: (levels && levels[0]) || { level: 1, xp: 0 },
@@ -294,7 +294,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		}
 
 		const { appearance, credits: rawCredits, level: rawLevel, _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...userBody } = body || {};
-		const credits = isStaffOrSystem ? rawCredits : undefined;
+		let credits = isStaffOrSystem ? rawCredits : undefined;
+		if (!isStaffOrSystem && rawCredits && typeof rawCredits === 'object') {
+			const safeCredits: Record<string, any> = {};
+			if (Array.isArray(rawCredits.activeBadges)) safeCredits.activeBadges = rawCredits.activeBadges.map(String);
+			if (typeof rawCredits.dotMatrixVariant === 'string') safeCredits.dotMatrixVariant = rawCredits.dotMatrixVariant;
+			if (rawCredits.profileCosmetics && typeof rawCredits.profileCosmetics === 'object') {
+				safeCredits.profileCosmetics = {
+					avatarFrame: String(rawCredits.profileCosmetics.avatarFrame || 'none'),
+					nameplate: String(rawCredits.profileCosmetics.nameplate || 'none'),
+					cardTheme: String(rawCredits.profileCosmetics.cardTheme || 'default'),
+				};
+			}
+			if (Object.keys(safeCredits).length > 0) credits = safeCredits;
+		}
 		const level = isStaffOrSystem ? rawLevel : undefined;
 
 		if (!isStaffOrSystem) {
@@ -399,6 +412,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				delete userBody.vanitySlug;
 				unsetFields.vanitySlug = 1;
 			} else {
+				if (!isVanityAlreadyUnlocked && !isStaffOrSystem) {
+					return NextResponse.json({ error: 'Custom Vanity URL is locked. Unlock it first before setting a vanity slug.' }, { status: 403 });
+				}
 				if (!VANITY_SLUG_REGEX.test(rawSlug)) {
 					return NextResponse.json({ error: 'Vanity slug must be 2-32 characters (lowercase letters, numbers, and hyphens).' }, { status: 400 });
 				}
@@ -406,13 +422,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				if (slugTaken) {
 					return NextResponse.json({ error: 'This vanity slug is already taken.' }, { status: 409 });
 				}
-				if (!isVanityAlreadyUnlocked) {
-					const unlockRes = await unlockVanityWithUserCredits(models, resolvedId, existingDoc?.name || `User ${resolvedId}`);
-					if (!unlockRes.ok) {
-						return NextResponse.json({ error: unlockRes.error }, { status: 403 });
-					}
-					userBody.vanityUnlocked = true;
-				}
+				userBody.vanityUnlocked = true;
 				userBody.vanitySlug = rawSlug;
 			}
 		}
@@ -491,12 +501,119 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
+		const existingCredits = (await models.users.Credit.findOne({ ownerId: resolvedId }).lean()) as any;
+		const effectiveUnlockedBadges: string[] = Array.isArray(credits?.unlockedBadges)
+			? credits.unlockedBadges.map(String)
+			: Array.isArray(existingCredits?.unlockedBadges)
+				? existingCredits.unlockedBadges.map(String)
+				: [];
+
+		const CHILD_TO_BUNDLE_MAP: Record<string, string> = {
+			ambient_mesh_lava: 'ambient_scenes_pack',
+			ambient_cyber_grid: 'ambient_scenes_pack',
+			ambient_topography: 'ambient_scenes_pack',
+			ambient_nebula_cosmos: 'ambient_scenes_pack',
+			ambient_prism_caustics: 'ambient_scenes_pack',
+			surface_crystal: 'surface_styles_pack',
+			surface_holographic: 'surface_styles_pack',
+			surface_neon: 'surface_styles_pack',
+			surface_obsidian: 'surface_styles_pack',
+			frame_plasma_ring: 'profile_frames_pack',
+			frame_holo_crown: 'profile_frames_pack',
+			frame_cyber_hex: 'profile_frames_pack',
+			frame_solar_flare: 'profile_frames_pack',
+			nameplate_aurora_wave: 'profile_nameplates_pack',
+			nameplate_synth_horizon: 'profile_nameplates_pack',
+			nameplate_nebula_shimmer: 'profile_nameplates_pack',
+			nameplate_cyber_circuit: 'profile_nameplates_pack',
+			cursor_starlight_trail: 'cursor_fx_bundle',
+			cursor_plasma_sparks: 'cursor_fx_bundle',
+			cursor_cyber_reticle: 'cursor_fx_bundle',
+			cursor_sonic_rings: 'cursor_fx_bundle',
+			cursor_aurora_ribbon: 'cursor_fx_bundle',
+			skin_hud_tactical: 'overlay_skins_bundle',
+			skin_frosted_prism: 'overlay_skins_bundle',
+			skin_neon_arcade: 'overlay_skins_bundle',
+			skin_minimal_pill: 'overlay_skins_bundle',
+		};
+		const hasCosmeticBadge = (reqBadge?: string) => {
+			if (!reqBadge) return true;
+			if (effectiveUnlockedBadges.includes(reqBadge)) return true;
+			const parentBundle = CHILD_TO_BUNDLE_MAP[reqBadge];
+			return Boolean(parentBundle && effectiveUnlockedBadges.includes(parentBundle));
+		};
+
 		let updatedAppearance: any = null;
 		if (appearance) {
 			const { uiPreferences, _id: _aId, __v: _aV, createdAt: _aCreated, updatedAt: _aUpdated, ownerId: _aOwner, ...restAppearance } = appearance;
 			const appearanceUpdate: Record<string, any> = { ...restAppearance };
 			if (uiPreferences && typeof uiPreferences === 'object') {
-				for (const [k, v] of Object.entries(uiPreferences)) {
+				const typeUnlock: Record<string, string> = {
+					orbit: 'dot_matrix_banner',
+					vortex: 'dot_matrix_banner',
+					helix: 'dot_matrix_banner',
+					prism: 'dot_matrix_banner',
+					infinity: 'dot_matrix_banner',
+					wavegrid: 'dot_matrix_banner',
+					chronos: 'stage_constellation',
+					supernova: 'stage_constellation',
+					tesseract: 'stage_hexgrid',
+					synthwave: 'stage_aurora',
+					lotus: 'stage_glyphs',
+				};
+				const renderUnlock: Record<string, string> = {
+					constellation: 'stage_constellation',
+					hexgrid: 'stage_hexgrid',
+					aurora: 'stage_aurora',
+					glyphs: 'stage_glyphs',
+				};
+				const wcUnlock: Record<string, string> = {
+					capsule: 'window_styles_pack',
+					squircle: 'window_styles_pack',
+					minimal: 'window_styles_pack',
+				};
+				const iconUnlock: Record<string, string> = {
+					duotone: 'ui_icon_packs',
+					bold: 'ui_icon_packs',
+					precision: 'ui_icon_packs',
+				};
+				const sceneUnlock: Record<string, string> = {
+					mesh_lava: 'ambient_mesh_lava',
+					cyber_grid: 'ambient_cyber_grid',
+					topography: 'ambient_topography',
+					nebula_cosmos: 'ambient_nebula_cosmos',
+					prism_caustics: 'ambient_prism_caustics',
+				};
+				const surfUnlock: Record<string, string> = {
+					crystal: 'surface_crystal',
+					holographic: 'surface_holographic',
+					neon: 'surface_neon',
+					obsidian: 'surface_obsidian',
+				};
+				const fxUnlock: Record<string, string> = {
+					starlight_trail: 'cursor_starlight_trail',
+					plasma_sparks: 'cursor_plasma_sparks',
+					cyber_reticle: 'cursor_cyber_reticle',
+					sonic_rings: 'cursor_sonic_rings',
+					aurora_ribbon: 'cursor_aurora_ribbon',
+				};
+				const skinUnlock: Record<string, string> = {
+					hud_tactical: 'skin_hud_tactical',
+					frosted_prism: 'skin_frosted_prism',
+					neon_arcade: 'skin_neon_arcade',
+					minimal_pill: 'skin_minimal_pill',
+				};
+
+				for (const [k, rawVal] of Object.entries(uiPreferences)) {
+					let v = rawVal;
+					if (k === 'dotMatrixType' && typeof v === 'string' && !hasCosmeticBadge(typeUnlock[v])) v = 'default';
+					if (k === 'dotMatrixRenderStyle' && typeof v === 'string' && !hasCosmeticBadge(renderUnlock[v])) v = 'dots';
+					if (k === 'windowControls' && typeof v === 'string' && !hasCosmeticBadge(wcUnlock[v])) v = 'system';
+					if (k === 'uiIconStyle' && typeof v === 'string' && !hasCosmeticBadge(iconUnlock[v])) v = 'standard';
+					if (k === 'ambientScene' && typeof v === 'string' && !hasCosmeticBadge(sceneUnlock[v])) v = 'default';
+					if (k === 'surfaceStyle' && typeof v === 'string' && !hasCosmeticBadge(surfUnlock[v])) v = 'default';
+					if (k === 'cursorFx' && typeof v === 'string' && !hasCosmeticBadge(fxUnlock[v])) v = 'default';
+					if (k === 'overlaySkin' && typeof v === 'string' && !hasCosmeticBadge(skinUnlock[v])) v = 'default';
 					appearanceUpdate[`uiPreferences.${k}`] = v;
 				}
 			}
@@ -509,13 +626,45 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			updatedAppearance = await models.users.Appearance.findOne({ ownerId: resolvedId }).lean();
 		}
 
-		const existingCredits = credits ? await models.users.Credit.findOne({ ownerId: resolvedId }).lean() : null;
 		let updatedCredits: any = null;
 		if (credits) {
 			const { _id: _cId, __v: _cV, createdAt: _cCreated, updatedAt: _cUpdated, ownerId: _cOwner, ...cleanCredits } = credits;
+			if (cleanCredits.profileCosmetics && typeof cleanCredits.profileCosmetics === 'object') {
+				const frameUnlock: Record<string, string> = {
+					plasma_ring: 'frame_plasma_ring',
+					holo_crown: 'frame_holo_crown',
+					cyber_hex: 'frame_cyber_hex',
+					solar_flare: 'frame_solar_flare',
+				};
+				const npUnlock: Record<string, string> = {
+					aurora_wave: 'nameplate_aurora_wave',
+					synth_horizon: 'nameplate_synth_horizon',
+					nebula_shimmer: 'nameplate_nebula_shimmer',
+					cyber_circuit: 'nameplate_cyber_circuit',
+				};
+				const cardUnlock: Record<string, string> = {
+					holographic: 'nameplate_aurora_wave',
+					celestial: 'nameplate_synth_horizon',
+					cyber_neon: 'nameplate_nebula_shimmer',
+					obsidian_gold: 'nameplate_cyber_circuit',
+				};
+				const reqFrame = String(cleanCredits.profileCosmetics.avatarFrame || 'none');
+				const reqNp = String(cleanCredits.profileCosmetics.nameplate || 'none');
+				const reqCard = String(cleanCredits.profileCosmetics.cardTheme || 'default');
+				cleanCredits.profileCosmetics = {
+					avatarFrame: hasCosmeticBadge(frameUnlock[reqFrame]) ? reqFrame : 'none',
+					nameplate: hasCosmeticBadge(npUnlock[reqNp]) ? reqNp : 'none',
+					cardTheme: hasCosmeticBadge(cardUnlock[reqCard]) ? reqCard : 'default',
+				};
+			}
+			if (cleanCredits.dotMatrixVariant !== undefined) {
+				if (!hasCosmeticBadge('dot_matrix_banner')) {
+					cleanCredits.dotMatrixVariant = existingCredits?.dotMatrixVariant || 'orbit';
+				}
+			}
 			updatedCredits = await models.users.Credit.findOneAndUpdate({ ownerId: resolvedId }, { $set: cleanCredits }, { upsert: true, returnDocument: 'after', runValidators: true }).lean();
 		} else {
-			updatedCredits = await models.users.Credit.findOne({ ownerId: resolvedId }).lean();
+			updatedCredits = existingCredits;
 		}
 
 		const existingLevel = level ? await models.users.Level.findOne({ ownerId: resolvedId }).lean() : null;

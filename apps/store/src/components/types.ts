@@ -34,7 +34,25 @@ export interface CatalogItem {
 	itemType?: 'subscription' | 'credit_pack' | 'credit_perk';
 	creditCost?: number;
 	creditAmount?: number;
-	perkType?: 'none' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'boost_bot' | 'boost_server';
+	perkType?:
+		| 'none'
+		| 'cdn_slots'
+		| 'showcase_slots'
+		| 'bot_slots'
+		| 'vanity_url'
+		| 'trial_pass'
+		| 'vanity_badge'
+		| 'streak_shield'
+		| 'boost_bot'
+		| 'boost_server'
+		| 'stage_style'
+		| 'ambient_scene'
+		| 'surface_style'
+		| 'profile_cosmetic'
+		| 'cursor_fx'
+		| 'overlay_skin'
+		| 'icon_pack'
+		| 'window_style';
 	perkValue?: any;
 	durationDays?: number;
 	features: string[];

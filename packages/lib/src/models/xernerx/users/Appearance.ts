@@ -34,13 +34,48 @@ const schema = new Schema(
 			dotMatrixStage: { type: String, enum: ['default', 'ripple', 'orbit', 'blank'], default: 'default' },
 			dotMatrixType: {
 				type: String,
-				enum: ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'blank'],
+				enum: ['default', 'full', 'icon', 'orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'chronos', 'supernova', 'tesseract', 'synthwave', 'lotus', 'blank'],
 				default: 'default',
+			},
+			dotMatrixRenderStyle: {
+				type: String,
+				enum: ['dots', 'constellation', 'hexgrid', 'aurora', 'glyphs'],
+				default: 'dots',
 			},
 			dotMatrixAnimation: {
 				type: String,
 				enum: ['animate', 'static', 'always'],
 				default: 'animate',
+			},
+			windowControls: {
+				type: String,
+				enum: ['system', 'windows', 'macos', 'xernerx', 'capsule', 'squircle', 'minimal'],
+				default: 'system',
+			},
+			uiIconStyle: {
+				type: String,
+				enum: ['standard', 'duotone', 'bold', 'precision'],
+				default: 'standard',
+			},
+			ambientScene: {
+				type: String,
+				enum: ['default', 'mesh_lava', 'cyber_grid', 'topography', 'nebula_cosmos', 'prism_caustics'],
+				default: 'default',
+			},
+			surfaceStyle: {
+				type: String,
+				enum: ['default', 'crystal', 'holographic', 'neon', 'obsidian'],
+				default: 'default',
+			},
+			cursorFx: {
+				type: String,
+				enum: ['default', 'starlight_trail', 'plasma_sparks', 'cyber_reticle', 'sonic_rings', 'aurora_ribbon'],
+				default: 'default',
+			},
+			overlaySkin: {
+				type: String,
+				enum: ['default', 'hud_tactical', 'frosted_prism', 'neon_arcade', 'minimal_pill'],
+				default: 'default',
 			},
 		},
 	},

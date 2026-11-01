@@ -2,6 +2,14 @@
 
 # @xernerx/ui
 
+## 0.7.17
+
+### Patch Changes
+
+- Updated `Button`, `Confirm`, `Toggle`, and `Check` primitives to use `text-(--accent-contrast)` and `bg-(--accent-contrast)` on solid `--accent` backgrounds.
+- Updated dependencies
+    - @xernerx/providers@0.20.0
+
 ## 0.7.16
 
 ### Patch Changes

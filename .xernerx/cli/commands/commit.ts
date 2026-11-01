@@ -176,7 +176,9 @@ export default function registerCommit(program: Command) {
 			if (process.stdin.isTTY) {
 				try {
 					const { termsChanged, privacyChanged, cookiesChanged } = detectPolicyChanges();
-					const newDate = new Date().toISOString().split('T')[0] + 'T00:00:00Z';
+					const now = new Date();
+					const newDate = now.toISOString().split('T')[0] + 'T00:00:00Z';
+					const readableDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 					if (termsChanged || privacyChanged) {
 						const changedLabels = [termsChanged && 'Terms of Service', privacyChanged && 'Privacy Policy'].filter(Boolean).join(' & ');
@@ -194,9 +196,21 @@ export default function registerCommit(program: Command) {
 
 							if (termsChanged) {
 								content = content.replace(/const TERMS_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const TERMS_VERSION = new Date('${newDate}').getTime();`);
+								const termsPagePath = path.resolve(process.cwd(), 'apps/www/src/app/terms/page.tsx');
+								if (fs.existsSync(termsPagePath)) {
+									const pageContent = fs.readFileSync(termsPagePath, 'utf8').replace(/(\{t\('www\.terms\.header\.effectiveDate'\)\})\s+[^<]+/g, `$1 ${readableDate}`);
+									fs.writeFileSync(termsPagePath, pageContent);
+									execSync(`git add "${termsPagePath}"`);
+								}
 							}
 							if (privacyChanged) {
 								content = content.replace(/const PRIVACY_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const PRIVACY_VERSION = new Date('${newDate}').getTime();`);
+								const privacyPagePath = path.resolve(process.cwd(), 'apps/www/src/app/privacy/page.tsx');
+								if (fs.existsSync(privacyPagePath)) {
+									const pageContent = fs.readFileSync(privacyPagePath, 'utf8').replace(/(\{t\('www\.privacy\.header\.effectiveDate'\)\})\s+[^<]+/g, `$1 ${readableDate}`);
+									fs.writeFileSync(privacyPagePath, pageContent);
+									execSync(`git add "${privacyPagePath}"`);
+								}
 							}
 
 							fs.writeFileSync(termsPromptPath, content);
@@ -222,6 +236,12 @@ export default function registerCommit(program: Command) {
 							content = content.replace(/const COOKIES_VERSION = new Date\('.*'\)\.getTime\(\);/g, `const COOKIES_VERSION = new Date('${newDate}').getTime();`);
 
 							fs.writeFileSync(cookieProviderPath, content);
+							const cookiesPagePath = path.resolve(process.cwd(), 'apps/www/src/app/cookies/page.tsx');
+							if (fs.existsSync(cookiesPagePath)) {
+								const pageContent = fs.readFileSync(cookiesPagePath, 'utf8').replace(/(\{t\('www\.cookies\.header\.effectiveDate'\)\})\s+[^<]+/g, `$1 ${readableDate}`);
+								fs.writeFileSync(cookiesPagePath, pageContent);
+								execSync(`git add "${cookiesPagePath}"`);
+							}
 							commitLog.log(`✔ Bumped COOKIES_VERSION date to ${newDate} in CookieProvider.tsx`);
 
 							execSync(`git add "${cookieProviderPath}"`);

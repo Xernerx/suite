@@ -1,6 +1,9 @@
 /** @format */
 
-export type DotLogoVariant = 'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos';
+export type DotLogoVariant =
+	'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos' | 'supernova' | 'tesseract' | 'synthwave' | 'lotus';
+
+export type DotMatrixRenderStyle = 'dots' | 'constellation' | 'hexgrid' | 'aurora' | 'glyphs';
 
 export interface SvgTranslatedPath {
 	tx: number;
@@ -29,7 +32,19 @@ function isDigitFour(u: number, v: number, offsetX: number): boolean {
 }
 
 export function isAnimatedProceduralVariant(variant: DotLogoVariant): boolean {
-	return variant === 'orbit' || variant === 'vortex' || variant === 'helix' || variant === 'prism' || variant === 'infinity' || variant === 'wavegrid' || variant === 'chronos';
+	return (
+		variant === 'orbit' ||
+		variant === 'vortex' ||
+		variant === 'helix' ||
+		variant === 'prism' ||
+		variant === 'infinity' ||
+		variant === 'wavegrid' ||
+		variant === 'chronos' ||
+		variant === 'supernova' ||
+		variant === 'tesseract' ||
+		variant === 'synthwave' ||
+		variant === 'lotus'
+	);
 }
 
 export function sampleProceduralVariant(variant: DotLogoVariant, u: number, v: number, time = 0): number {
@@ -270,6 +285,111 @@ export function sampleProceduralVariant(variant: DotLogoVariant, u: number, v: n
 		return 0;
 	}
 
+	if (variant === 'supernova') {
+		const cx = (u - 0.5) * 1.35;
+		const cy = v - 0.5;
+		const r = Math.hypot(cx, cy);
+		if (r > 0.48) return 0;
+		if (r <= 0.078 + Math.sin(time * 3.8) * 0.012) return 1.0;
+		const rot = time * 0.22;
+		const cos = Math.cos(rot);
+		const sin = Math.sin(rot);
+		const rx = cx * cos - cy * sin;
+		const ry = cx * sin + cy * cos;
+		if (r <= 0.46 && Math.min(Math.abs(rx), Math.abs(ry)) <= Math.max(0.012, 0.038 * (1 - r / 0.48))) {
+			return 0.96;
+		}
+		const diagX = (rx + ry) * 0.7071;
+		const diagY = (rx - ry) * 0.7071;
+		if (r <= 0.36 && Math.min(Math.abs(diagX), Math.abs(diagY)) <= Math.max(0.01, 0.03 * (1 - r / 0.38))) {
+			return 0.88;
+		}
+		const pulseR = 0.14 + ((time * 0.14) % 0.32);
+		if (Math.abs(r - pulseR) <= 0.024) {
+			return Math.max(0.55, 0.92 * (1 - (pulseR - 0.14) / 0.36));
+		}
+		if (Math.abs(r - 0.39) <= 0.022 && Math.cos(Math.atan2(cy, cx) * 8 - time * 1.5) > 0.08) {
+			return 0.9;
+		}
+		return 0;
+	}
+
+	if (variant === 'tesseract') {
+		const cx = (u - 0.5) * 1.35;
+		const cy = v - 0.5;
+		if (Math.hypot(cx, cy) <= 0.052 + Math.sin(time * 3.2) * 0.008) return 1.0;
+		const rot1 = time * 0.42;
+		const c1 = Math.cos(rot1);
+		const s1 = Math.sin(rot1);
+		const rx = cx * c1 - cy * s1;
+		const ry = cx * s1 + cy * c1;
+		const rot2 = -time * 0.32 + Math.sin(time * 1.4) * 0.22;
+		const c2 = Math.cos(rot2);
+		const s2 = Math.sin(rot2);
+		const ix = cx * c2 - cy * s2;
+		const iy = cx * s2 + cy * c2;
+		const sOut = 0.34 + Math.sin(time * 1.6) * 0.018;
+		const sIn = 0.17 - Math.sin(time * 1.6) * 0.018;
+		const dOut = Math.max(Math.abs(rx), Math.abs(ry));
+		const dIn = Math.max(Math.abs(ix), Math.abs(iy));
+		if (Math.abs(dOut - sOut) <= 0.025) return 0.95;
+		if (Math.abs(dIn - sIn) <= 0.024) return 0.92;
+		const signs: readonly [number, number][] = [
+			[-1, -1],
+			[1, -1],
+			[1, 1],
+			[-1, 1],
+		];
+		for (let i = 0; i < signs.length; i++) {
+			const [sx, sy] = signs[i];
+			const ox = sx * sOut * c1 + sy * sOut * s1;
+			const oy = -sx * sOut * s1 + sy * sOut * c1;
+			const inX = sx * sIn * c2 + sy * sIn * s2;
+			const inY = -sx * sIn * s2 + sy * sIn * c2;
+			if (distToSegment(cx, cy, inX, inY, ox, oy) <= 0.024) return 0.86;
+		}
+		return 0;
+	}
+
+	if (variant === 'synthwave') {
+		const cx = (u - 0.5) * 2;
+		const cy = (v - 0.5) * 2;
+		if (Math.abs(cx) > 0.95 || Math.abs(cy) > 0.92) return 0;
+		if (Math.abs(cy - 0.12) <= 0.044) return 0.96;
+		if (cy <= 0.12) {
+			const sunR = Math.hypot(cx * 0.95, cy - 0.08);
+			if (sunR <= 0.62) {
+				const scanPhase = Math.sin((cy - time * 0.22) * 36);
+				if (cy < -0.2 || scanPhase > -0.12) return 0.92;
+			}
+			return 0;
+		}
+		const depth = (cy - 0.12) / 0.8;
+		const perspX = cx / (depth + 0.2);
+		const gridV = Math.abs(perspX * 1.5 - Math.round(perspX * 1.5));
+		const scrollZ = 1.1 / (depth + 0.16) + time * 1.65;
+		const gridH = Math.abs(scrollZ - Math.round(scrollZ));
+		if (gridV <= 0.13 || gridH <= 0.15) {
+			return Math.min(1, 0.66 + depth * 0.3);
+		}
+		return 0;
+	}
+
+	if (variant === 'lotus') {
+		const cx = (u - 0.5) * 1.35;
+		const cy = v - 0.5;
+		const r = Math.hypot(cx, cy);
+		if (r > 0.47) return 0;
+		if (r <= 0.058 + Math.sin(time * 3.2) * 0.008) return 1.0;
+		const theta = Math.atan2(cy, cx);
+		const petalInner = 0.155 + 0.115 * Math.abs(Math.cos(3 * (theta - time * 0.36)));
+		if (Math.abs(r - petalInner) <= 0.025) return 0.95;
+		const petalOuter = 0.265 + 0.135 * Math.abs(Math.sin(4 * (theta + time * 0.26)));
+		if (Math.abs(r - petalOuter) <= 0.025) return 0.9;
+		if (Math.abs(r - 0.435) <= 0.02 && Math.cos(theta * 12 - time * 1.5) > 0.12) return 0.84;
+		return 0;
+	}
+
 	return 0;
 }
 
@@ -368,7 +488,7 @@ export function computeDotCoverage(params: {
 	const bounds = targetVar === 'full' ? FULL_LOGO_BOUNDS : ICON_LOGO_BOUNDS;
 	const svgSpanX = bounds.maxX - bounds.minX;
 	const svgSpanY = bounds.maxY - bounds.minY;
-	const wideProcedural = targetVar === '404' || targetVar === 'helix' || targetVar === 'infinity' || targetVar === 'wavegrid';
+	const wideProcedural = targetVar === '404' || targetVar === 'helix' || targetVar === 'infinity' || targetVar === 'wavegrid' || targetVar === 'synthwave';
 	const aspect = isSvg ? svgSpanX / svgSpanY : targetVar === '404' ? 2.4 : wideProcedural ? 2.0 : 1.35;
 
 	let boxW = drawW;

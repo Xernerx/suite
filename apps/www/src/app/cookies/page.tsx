@@ -179,7 +179,7 @@ export default function Page() {
 							>
 								{t('www.cookies.header.title')}
 							</h1>
-							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.cookies.header.effectiveDate')} 21 October 2026</div>
+							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.cookies.header.effectiveDate')} 1 November 2026</div>
 						</header>
 
 						<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm space-y-16">

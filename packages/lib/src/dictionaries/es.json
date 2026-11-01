@@ -136,47 +136,27 @@
 				"dataCollected": {
 					"title": "2. Información que recopilamos",
 					"account": {
-						"title": "Información de la cuenta:",
-						"desc": "Correo electrónico, nombre de usuario e identificadores de perfil."
+						"title": "Información de la cuenta:"
 					},
 					"usage": {
 						"title": "Datos de uso:",
 						"desc": "Registros, interacciones del sistema y configuraciones."
-					},
-					"integration": {
-						"title": "Datos de integración:",
-						"desc": "Datos proporcionados a través de plataformas de terceros como Discord."
 					}
 				},
 				"legalBasis": {
-					"title": "4. Base legal para el procesamiento",
-					"content": "Procesamos datos personales basándonos en la necesidad contractual, intereses legítimos, obligaciones legales o el consentimiento del usuario cuando corresponda."
+					"title": "4. Base legal para el procesamiento"
 				},
 				"usage": {
-					"title": "5. Cómo utilizamos la información",
-					"items": [
-						"Proporcionar y mantener servicios.",
-						"Mejorar la fiabilidad y el rendimiento.",
-						"Brindar soporte y comunicar actualizaciones.",
-						"Garantizar el cumplimiento de obligaciones legales."
-					]
+					"title": "5. Cómo utilizamos la información"
 				},
 				"sharing": {
-					"title": "6. Compartir datos",
-					"items": [
-						"Proveedores de alojamiento e infraestructura.",
-						"Procesadores de pagos (Stripe) para la gestión de facturación y suscripciones.",
-						"Integraciones de terceros autorizadas.",
-						"Autoridades legales cuando lo requiera la ley."
-					]
+					"title": "6. Compartir datos"
 				},
 				"retention": {
-					"title": "7. Retención de datos",
-					"content": "Conservamos los datos solo durante el tiempo necesario para cumplir con los fines descritos en esta Política, a menos que la ley exija una retención mayor."
+					"title": "7. Retención de datos"
 				},
 				"security": {
-					"title": "8. Seguridad de los datos",
-					"content": "Implementamos medidas de seguridad técnicas y organizativas para proteger los datos. Sin embargo, ningún sistema es absolutamente seguro."
+					"title": "8. Seguridad de los datos"
 				},
 				"rights": {
 					"title": "9. Tus derechos",

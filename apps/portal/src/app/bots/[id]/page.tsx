@@ -12,13 +12,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import GeneralTab from '@/components/portal/bot/GeneralTab';
+import CommandsTab from '@/components/portal/bot/CommandsTab';
+import ReleasesTab from '@/components/portal/bot/ReleasesTab';
 import GrowthTelemetryTab from '@/components/portal/bot/GrowthTelemetryTab';
 import LinksTab from '@/components/portal/bot/LinksTab';
 import WebhooksTab from '@/components/portal/bot/WebhooksTab';
 import SettingsTab from '@/components/portal/bot/SettingsTab';
-import BotReleasesAndCommandsManager from '@/components/portal/BotReleasesAndCommandsManager';
 
-const VALID_TABS = ['general', 'releases', 'growth', 'links', 'webhooks', 'settings'];
+const VALID_TABS = ['general', 'commands', 'releases', 'growth', 'links', 'webhooks', 'settings'];
 
 export default function PortalBotPage() {
 	const params = useParams();
@@ -221,7 +222,7 @@ export default function PortalBotPage() {
 						commands: botConfig.commands,
 						releases: botConfig.releases,
 						links: botConfig.links,
-						vanitySlug: botConfig.vanitySlug,
+						...(botConfig.vanityUnlocked || botConfig.verified ? { vanitySlug: botConfig.vanitySlug } : {}),
 					};
 
 					const [res, hooksRes] = await Promise.all([
@@ -380,7 +381,8 @@ export default function PortalBotPage() {
 						onChange={handleTabChange}
 						tabs={[
 							{ id: 'general', label: t('app.portal.bot.tabs.general') },
-							{ id: 'releases', label: t('app.portal.bot.tabs.releasesAndCommands') },
+							{ id: 'commands', label: t('app.portal.bot.tabs.commands') },
+							{ id: 'releases', label: t('app.portal.bot.tabs.releases') },
 							{ id: 'growth', label: t('app.portal.bot.tabs.growth') },
 							{ id: 'links', label: t('app.portal.bot.tabs.links') },
 							{ id: 'webhooks', label: t('app.portal.bot.tabs.webhooks') },
@@ -388,9 +390,21 @@ export default function PortalBotPage() {
 						]}
 					/>
 
-					{activeTab === 'general' && <GeneralTab botConfig={botConfig} setBotConfig={setBotConfig} availableTags={availableTags} />}
+					{activeTab === 'general' && (
+						<GeneralTab
+							botConfig={botConfig}
+							setBotConfig={setBotConfig}
+							onVanityUnlocked={() => {
+								setBotConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+								setOriginalBotConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+							}}
+							availableTags={availableTags}
+						/>
+					)}
 
-					{activeTab === 'releases' && <BotReleasesAndCommandsManager botId={botId} botConfig={botConfig} setBotConfig={setBotConfig} setOriginalBotConfig={setOriginalBotConfig} />}
+					{activeTab === 'commands' && <CommandsTab botId={botId} botConfig={botConfig} setBotConfig={setBotConfig} setOriginalBotConfig={setOriginalBotConfig} />}
+
+					{activeTab === 'releases' && <ReleasesTab botId={botId} botConfig={botConfig} setBotConfig={setBotConfig} setOriginalBotConfig={setOriginalBotConfig} />}
 
 					{activeTab === 'growth' && <GrowthTelemetryTab botConfig={botConfig} botId={botId} />}
 
@@ -398,18 +412,7 @@ export default function PortalBotPage() {
 
 					{activeTab === 'webhooks' && <WebhooksTab botConfig={botConfig} setBotConfig={setBotConfig} deliveries={webhookDeliveries} onDeliveriesChange={setWebhookDeliveries} />}
 
-					{activeTab === 'settings' && (
-						<SettingsTab
-							botConfig={botConfig}
-							setBotConfig={setBotConfig}
-							onVanityUnlocked={() => {
-								setBotConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
-								setOriginalBotConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
-							}}
-							organizations={organizations}
-							onDeleteClick={() => setIsConfirmDeleteOpen(true)}
-						/>
-					)}
+					{activeTab === 'settings' && <SettingsTab botConfig={botConfig} setBotConfig={setBotConfig} organizations={organizations} onDeleteClick={() => setIsConfirmDeleteOpen(true)} />}
 				</div>
 			</div>
 

@@ -1,6 +1,7 @@
 /** @format */
 
 import { database } from '@xernerx/lib/core';
+import { ensureUserBonusAndDefaults } from '../xernerx/server';
 
 async function getModels(action: string) {
 	const db = await database('virtue');
@@ -93,10 +94,12 @@ export default async function Server(msg: any) {
 	}
 
 	const filter = getFilter(msg.action, msg.body);
+	const isGuildAction = ['guilds', 'guild', 'settings'].includes(msg.action);
+	const targetUserId = !isGuildAction && msg.body?.id ? String(msg.body.id) : '';
 
 	switch (msg.method) {
 		case 'get': {
-			if (!msg.body?.id && ['guilds', 'guild', 'settings'].includes(msg.action)) {
+			if (!msg.body?.id && isGuildAction) {
 				const query = Array.isArray(msg.body?.ids) && msg.body.ids.length > 0 ? { id: { $in: msg.body.ids } } : {};
 				return model.find(query).lean();
 			}
@@ -135,12 +138,18 @@ export default async function Server(msg: any) {
 			}
 
 			const doc = await model.findOne(filter).lean();
+			if (doc && targetUserId) {
+				await ensureUserBonusAndDefaults(targetUserId);
+			}
 			if (doc && ((Number((doc as any).level) || 0) > 0 || (Number((doc as any).xp) || 0) > 0 || !['levels', 'level', 'members', 'member'].includes(msg.action))) {
 				return doc;
 			}
 			if (fallback && fallback !== model) {
 				const fbDoc = await fallback.findOne(filter).lean();
-				if (fbDoc) return fbDoc;
+				if (fbDoc) {
+					if (targetUserId) await ensureUserBonusAndDefaults(targetUserId);
+					return fbDoc;
+				}
 			}
 			return doc || null;
 		}
@@ -148,16 +157,22 @@ export default async function Server(msg: any) {
 		case 'create':
 			try {
 				const res = await model.create(msg.body);
+				if (targetUserId) {
+					await ensureUserBonusAndDefaults(targetUserId);
+				}
 				return res?.toObject ? res.toObject() : res;
 			} catch (error: any) {
 				if (error?.code === 11000) {
+					if (targetUserId) {
+						await ensureUserBonusAndDefaults(targetUserId);
+					}
 					return model.findOne(filter).lean();
 				}
 
 				throw error;
 			}
 
-		case 'update':
+		case 'update': {
 			if (msg.body?.guild && msg.body?.resetGuild === true && !msg.body?.id && ['levels', 'level', 'members', 'member', 'text', 'textLevels', 'voice', 'voiceLevels'].includes(msg.action)) {
 				await model.updateMany({ guild: msg.body.guild }, { $set: { level: 0, xp: 0, messages: 0, timeSpent: 0 } });
 				if (fallback && fallback !== model) {
@@ -166,7 +181,7 @@ export default async function Server(msg: any) {
 				return { success: true, guild: msg.body.guild };
 			}
 
-			return model
+			const updated = await model
 				.findOneAndUpdate(
 					filter,
 					{
@@ -179,6 +194,13 @@ export default async function Server(msg: any) {
 					}
 				)
 				.lean();
+
+			if (targetUserId) {
+				await ensureUserBonusAndDefaults(targetUserId);
+			}
+
+			return updated;
+		}
 
 		case 'delete':
 			return model.findOneAndDelete(filter).lean();

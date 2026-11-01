@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { timezones } from '@xernerx/lib';
 import { ProfileShowcases } from './ProfileShowcases';
+import { AVATAR_FRAME_UNLOCK_MAP, isCosmeticUnlocked, NAMEPLATE_UNLOCK_MAP, PROFILE_CARD_THEME_UNLOCK_MAP } from './cosmeticUnlocks';
 export default function Profile() {
 	const { t } = useDictionary();
 	const { data: session } = useSession();
@@ -76,6 +77,10 @@ export default function Profile() {
 		gender: 'other',
 		pronouns: '',
 		timezone: '',
+		avatarFrame: 'none',
+		nameplate: 'none',
+		cardTheme: 'default',
+		dotMatrixVariant: 'orbit',
 	});
 	const [initialData, setInitialData] = useState({
 		vanitySlug: '',
@@ -85,11 +90,21 @@ export default function Profile() {
 		gender: 'other',
 		pronouns: '',
 		timezone: '',
+		avatarFrame: 'none',
+		nameplate: 'none',
+		cardTheme: 'default',
+		dotMatrixVariant: 'orbit',
 	});
 	const [isSaving, setIsSaving] = useState(false);
 	useEffect(() => {
 		(() => {
 			if (user) {
+				const rawFrame = (user as any)?.credits?.profileCosmetics?.avatarFrame || 'none';
+				const rawNameplate = (user as any)?.credits?.profileCosmetics?.nameplate || 'none';
+				const rawCardTheme = (user as any)?.credits?.profileCosmetics?.cardTheme || 'default';
+				const rawDotVariant = (user as any)?.credits?.dotMatrixVariant || 'orbit';
+				const isBannerUnlocked = Array.isArray(user?.credits?.unlockedBadges) && user.credits.unlockedBadges.includes('dot_matrix_banner');
+
 				const loadedData = {
 					vanitySlug: (user as any).vanitySlug || '',
 					description: user.description || '',
@@ -98,6 +113,10 @@ export default function Profile() {
 					gender: user.gender || 'other',
 					pronouns: user.pronouns || '',
 					timezone: user.timezone || '',
+					avatarFrame: isCosmeticUnlocked(user, false, AVATAR_FRAME_UNLOCK_MAP[rawFrame]) ? rawFrame : 'none',
+					nameplate: isCosmeticUnlocked(user, false, NAMEPLATE_UNLOCK_MAP[rawNameplate]) ? rawNameplate : 'none',
+					cardTheme: isCosmeticUnlocked(user, false, PROFILE_CARD_THEME_UNLOCK_MAP[rawCardTheme]) ? rawCardTheme : 'default',
+					dotMatrixVariant: isBannerUnlocked ? rawDotVariant : 'orbit',
 				};
 				setFormData(loadedData);
 				setInitialData(loadedData);
@@ -118,13 +137,21 @@ export default function Profile() {
 				setIsSaving(true);
 				try {
 					const updatePayload = {
-						vanitySlug: formData.vanitySlug.trim().toLowerCase(),
+						...(isVanityUnlocked ? { vanitySlug: formData.vanitySlug.trim().toLowerCase() } : {}),
 						description: formData.description,
 						info: formData.info,
 						birthday: formData.birthday || null,
 						gender: formData.gender,
 						pronouns: formData.pronouns,
 						timezone: formData.timezone,
+						credits: {
+							profileCosmetics: {
+								avatarFrame: formData.avatarFrame,
+								nameplate: formData.nameplate,
+								cardTheme: formData.cardTheme,
+							},
+							dotMatrixVariant: formData.dotMatrixVariant,
+						},
 					};
 					const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/users/${userId}`, {
 						method: 'PATCH',
@@ -172,18 +199,8 @@ export default function Profile() {
 	const tzList = Array.isArray(timezones)
 		? timezones
 		: [
-				{
-					value: 'UTC',
-					label: 'UTC',
-					offset: '+00:00',
-					region: 'UTC',
-				},
-				{
-					value: 'Europe/Brussels',
-					label: 'Brussels',
-					offset: '+02:00',
-					region: 'Europe',
-				},
+				{ value: 'UTC', label: 'UTC', offset: '+00:00', region: 'UTC' },
+				{ value: 'Europe/Brussels', label: 'Brussels', offset: '+02:00', region: 'Europe' },
 			];
 	const timezoneOptions = tzList.map((tz: any) => ({
 		value: tz.value,
@@ -195,64 +212,38 @@ export default function Profile() {
 		),
 	}));
 	return (
-		<div
-			className="flex flex-col max-w-(--page-width) mx-auto w-full"
-			style={{
-				padding: 'var(--ui-gap)',
-				gap: 'var(--ui-gap)',
-				fontSize: 'var(--text-scale, 14px)',
-			}}
-		>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			{/* Header */}
-			<div
-				className="flex flex-col"
-				style={{
-					gap: 'calc(var(--ui-gap) * 0.25)',
-				}}
-			>
-				<h1
-					className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm"
-					style={{
-						fontFamily: 'var(--font-fredoka)',
-					}}
-				>
+			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+				<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('account.profile.title')}
 				</h1>
 				<p className="text-sm text-(--text-muted)">{t('account.profile.description')}</p>
 			</div>
 
-			<div
-				className="flex flex-col"
-				style={{
-					gap: 'var(--ui-gap)',
-				}}
-			>
+			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				{/* Profile Summary Card */}
 				<div
-					className="relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{
-						padding: 'var(--ui-gap)',
-						gap: 'var(--ui-gap)',
-					}}
+					className={`relative overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm ${
+						formData.cardTheme && formData.cardTheme !== 'default' ? `xrx-profile-card-${formData.cardTheme}` : ''
+					} ${formData.nameplate && formData.nameplate !== 'none' ? `xrx-nameplate-${formData.nameplate}` : ''}`}
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					{Array.isArray(user?.credits?.activeBadges) && user.credits.activeBadges.includes('dot_matrix_banner') && (
 						<div className="absolute inset-0 opacity-65 pointer-events-none">
-							<XernerxDotLogo variant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} backgroundMode ripple={true} vivid={true} />
+							<XernerxDotLogo variant={(formData.dotMatrixVariant as any) || 'orbit'} backgroundMode ripple={true} vivid={true} />
 						</div>
 					)}
-					<div
-						className="relative z-10 flex items-center"
-						style={{
-							gap: 'var(--ui-gap)',
-						}}
-					>
+					<div className="relative z-10 flex items-center" style={{ gap: 'var(--ui-gap)' }}>
 						{avatarUrl ? (
 							<Image
 								src={avatarUrl}
 								alt={t('account.common.alt')}
 								width={80}
 								height={80}
-								className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0"
+								className={`h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 ${
+									formData.avatarFrame && formData.avatarFrame !== 'none' ? `xrx-avatar-frame-${formData.avatarFrame}` : ''
+								}`}
 								unoptimized
 								draggable={false}
 							/>
@@ -463,7 +454,19 @@ export default function Profile() {
 				</div>
 
 				{/* Profile Showcase Slots & Vanity Badges */}
-				{userId && <ProfileShowcases user={user} userId={userId} mutate={mutate} />}
+				{userId && (
+					<ProfileShowcases
+						user={user}
+						userId={userId}
+						mutate={mutate}
+						avatarFrame={formData.avatarFrame}
+						nameplate={formData.nameplate}
+						cardTheme={formData.cardTheme}
+						dotMatrixVariant={formData.dotMatrixVariant}
+						onChangeCosmetic={(field, value) => handleChange(field, value)}
+						onChangeDotMatrixVariant={(variant) => handleChange('dotMatrixVariant', variant)}
+					/>
+				)}
 			</div>
 		</div>
 	);

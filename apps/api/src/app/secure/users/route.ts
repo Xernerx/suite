@@ -1,16 +1,140 @@
 /** @format */
 
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+
+const SIGN_IN_BONUS_AMOUNT = 1000;
+const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
+
+async function reconcileVirtueAndOrphanUsers(xernerxDb: any) {
+	try {
+		const UserModel = xernerxDb.models.users?.User;
+		const LevelModel = xernerxDb.models.users?.Level;
+		const CreditModel = xernerxDb.models.users?.Credit;
+		const SettingModel = xernerxDb.models.core?.Setting;
+		if (!UserModel) return;
+
+		const virtueDb = await database('virtue').catch(() => null);
+		const VUser = (virtueDb?.models?.profiles as any)?.User;
+		const LLevel = (virtueDb?.models?.levels as any)?.Level;
+		const LText = (virtueDb?.models?.levels as any)?.Text;
+		const LVoice = (virtueDb?.models?.levels as any)?.Voice;
+		const PLevel = (virtueDb?.models?.profiles as any)?.Level;
+		const PText = (virtueDb?.models?.profiles as any)?.Text;
+		const PVoice = (virtueDb?.models?.profiles as any)?.Voice;
+
+		const [existingUserIds, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds] = await Promise.all([
+			UserModel.distinct('id').catch(() => []),
+			CreditModel ? CreditModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
+			LevelModel ? LevelModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
+			VUser ? VUser.distinct('id').catch(() => []) : Promise.resolve([]),
+			LLevel ? LLevel.distinct('id').catch(() => []) : Promise.resolve([]),
+			LText ? LText.distinct('id').catch(() => []) : Promise.resolve([]),
+			LVoice ? LVoice.distinct('id').catch(() => []) : Promise.resolve([]),
+			PLevel ? PLevel.distinct('id').catch(() => []) : Promise.resolve([]),
+			PText ? PText.distinct('id').catch(() => []) : Promise.resolve([]),
+			PVoice ? PVoice.distinct('id').catch(() => []) : Promise.resolve([]),
+		]);
+
+		const existingUserSet = new Set((existingUserIds || []).map((id: any) => String(id)));
+		const existingCreditSet = new Set((existingCreditOwnerIds || []).map((id: any) => String(id)));
+		const existingLevelSet = new Set((existingLevelOwnerIds || []).map((id: any) => String(id)));
+
+		const candidateIds = new Set<string>();
+		for (const list of [existingUserIds, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds]) {
+			for (const rawId of list || []) {
+				const uid = String(rawId || '').trim();
+				if (/^\d{15,22}$/.test(uid)) {
+					candidateIds.add(uid);
+				}
+			}
+		}
+
+		const missingUsers: string[] = [];
+		const missingCredits: string[] = [];
+		const missingLevels: string[] = [];
+
+		for (const uid of candidateIds) {
+			if (!existingUserSet.has(uid)) missingUsers.push(uid);
+			if (!existingCreditSet.has(uid)) missingCredits.push(uid);
+			if (!existingLevelSet.has(uid)) missingLevels.push(uid);
+		}
+
+		if (missingUsers.length === 0 && missingCredits.length === 0 && missingLevels.length === 0) {
+			return;
+		}
+
+		let defaultRoles = [DEFAULT_JOIN_ROLE_ID];
+		if (SettingModel) {
+			const joinRolesSetting = await SettingModel.findOne({ id: 'join_roles' })
+				.lean()
+				.catch(() => null);
+			if (joinRolesSetting?.value) {
+				try {
+					const parsed = JSON.parse(joinRolesSetting.value);
+					if (Array.isArray(parsed)) {
+						defaultRoles = Array.from(new Set([DEFAULT_JOIN_ROLE_ID, ...parsed.filter((r) => typeof r === 'string' && r)]));
+					}
+				} catch {}
+			}
+		}
+
+		await Promise.all([
+			...missingUsers.map((uid) =>
+				UserModel.create({
+					id: uid,
+					roles: defaultRoles,
+				}).catch(() => {})
+			),
+			...(CreditModel
+				? missingCredits.map((uid) =>
+						CreditModel.create({
+							ownerId: uid,
+							balance: SIGN_IN_BONUS_AMOUNT,
+							signInBonusClaimed: true,
+							transactions: [
+								{
+									id: crypto.randomUUID(),
+									type: 'earn',
+									amount: SIGN_IN_BONUS_AMOUNT,
+									multiplierPercent: 100,
+									itemId: 'signin_bonus',
+									itemName: 'Welcome Sign-In Bonus',
+									createdAt: new Date(),
+								},
+							],
+						}).catch(() => {})
+					)
+				: []),
+			...(LevelModel
+				? missingLevels.map((uid) =>
+						LevelModel.create({
+							id: crypto.randomUUID(),
+							ownerId: uid,
+							level: 1,
+							xp: 0,
+						}).catch(() => {})
+					)
+				: []),
+		]);
+	} catch {}
+}
 
 export async function GET(req: Request) {
 	try {
 		const url = new URL(req.url);
 		const privacy = url.searchParams.get('privacy');
-		const db = (await database('xernerx')).models.users as any;
+		const xernerxDb = await database('xernerx');
+		const db = xernerxDb.models.users as any;
+
+		const isPublicOnly = privacy === 'public' || url.searchParams.get('public') === 'true';
+		if (!isPublicOnly) {
+			await reconcileVirtueAndOrphanUsers(xernerxDb);
+		}
 
 		const query: Record<string, any> = {};
-		if (privacy === 'public' || url.searchParams.get('public') === 'true') {
+		if (isPublicOnly) {
 			query.privacy = 'public';
 		}
 

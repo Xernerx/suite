@@ -436,71 +436,33 @@
 				"dataCollected": {
 					"title": "2. Information We Collect",
 					"account": {
-						"title": "Account & Device Session Information:",
-						"desc": "When you sign in via Discord OAuth2 or our QR Code / 6-character Pairing Code Device Sign-In flow, we collect your Discord ID, username, avatar, email address, custom profile settings (display name, bio, pronouns, banner), and recent device session metadata (browser, operating system, device type, and last-active timestamp for up to 10 devices) so you can review and manage active sessions."
+						"title": "Account & Device Session Information:"
 					},
 					"connections": {
-						"title": "Connected Third-Party Accounts:",
-						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity."
-					},
-					"developers": {
-						"title": "For API & Bot Developers:",
-						"desc": "Scoped Bearer API tokens, webhook URLs, application and organization metadata, real-time WebSocket gateway telemetry, and configuration settings used to operate your integrations on our infrastructure."
-					},
-					"botUsers": {
-						"title": "For Bot & Community End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (such as Virtue, Zodiac, Metamorphosis, or To-Do List Bot), we process your Discord ID, guild IDs, command inputs, and opt-in community engagement metrics (such as text and voice XP/leveling statistics). We do not store raw message logs unless explicitly required by an opt-in server feature."
-					},
-					"cdnAndContent": {
-						"title": "CDN Media & Community Submissions:",
-						"desc": "Files and images uploaded to cdn.xernerx.com or attached to bug reports and feature suggestions are stored in private cloud blob storage and served according to your configured visibility setting (public, limited to specific users, or private)."
-					},
-					"desktop": {
-						"title": "Xernerx Desktop Client:",
-						"desc": "When using the Xernerx Desktop App, window state, update channel preferences (Stable/Canary), hotkey bindings, and isolated multi-account session slots are stored locally on your machine. If enabled, the app communicates locally with your Discord client for Rich Presence (RPC) and writes diagnostic logs locally only when Debug Logging is turned on."
+						"title": "Connected Third-Party Accounts:"
 					},
 					"usage": {
 						"title": "Usage & Diagnostic Data:",
 						"desc": "Error logs, security audit trails, and system interactions collected to maintain platform stability, enforce rate limits, and prevent abuse."
-					},
-					"integration": {
-						"title": "Billing, Store & Rewards Data:",
-						"desc": "Subscription status, billing history, and regional checkout details processed securely via Stripe (we never store raw payment card numbers), along with platform Virtual Credit balances and daily mystery gift streak timestamps."
 					}
 				},
 				"apiData": {
-					"title": "3. API Data Collection & Developer Obligations",
-					"content": "When developers use our REST API (/v1/* and /secure/*), embeddable public widgets, or real-time WebSocket gateway to synchronize bot statistics or fetch metadata, we collect and store this data to render public pages and provide analytics. Developers are strictly prohibited from transmitting unrequested personally identifiable information (PII) of their end users to our API. We do not sell or share API data with third-party advertisers."
+					"title": "3. API Data Collection & Developer Obligations"
 				},
 				"legalBasis": {
-					"title": "4. Legal Basis for Processing",
-					"content": "We process personal data based on contractual necessity (to deliver the services and subscriptions you request), legitimate interests (security, fraud prevention, and service improvement), compliance with legal obligations, or your explicit consent where applicable."
+					"title": "4. Legal Basis for Processing"
 				},
 				"usage": {
-					"title": "5. How We Use Information",
-					"items": [
-						"To provide, authenticate, and synchronize your account across all Xernerx web applications, bots, and desktop clients.",
-						"To process Store subscriptions, allocate Virtual Credits, enforce CDN storage quotas, and improve platform reliability.",
-						"To provide customer support, communicate platform updates, and send important service-related emails (e.g., billing receipts, security alerts, and organization invitations). You may manage your notification preferences at any time.",
-						"To detect abuse, enforce our Terms of Service, and comply with applicable legal obligations."
-					]
+					"title": "5. How We Use Information"
 				},
 				"sharing": {
-					"title": "6. Data Sharing",
-					"items": [
-						"Cloud hosting, database, and private blob storage infrastructure providers.",
-						"Payment processors (Stripe) for subscription checkout, Adaptive Pricing localization, and billing management.",
-						"Authorized third-party integrations and connected accounts that you explicitly link or enable as public profile widgets.",
-						"Law enforcement or regulatory authorities when strictly required by applicable law."
-					]
+					"title": "6. Data Sharing"
 				},
 				"retention": {
-					"title": "7. Data Retention",
-					"content": "We retain personal data only as long as necessary to provide our services and fulfill the purposes outlined in this Policy, unless longer retention is required by law (such as tax and accounting records). Ephemeral QR/pairing sign-in tickets automatically expire after 3 minutes."
+					"title": "7. Data Retention"
 				},
 				"security": {
-					"title": "8. Data Security",
-					"content": "We implement robust technical and organizational security measures, including AES-256-GCM encryption for cross-device sign-in tokens, HTTP-only session cookies, scoped Bearer token authentication, and strict role-based access controls. However, no internet transmission or storage system is 100% secure."
+					"title": "8. Data Security"
 				},
 				"rights": {
 					"title": "9. Your Rights (GDPR & CCPA)",

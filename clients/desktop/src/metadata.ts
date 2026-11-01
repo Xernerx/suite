@@ -10,7 +10,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx';
+export type DesktopAppIcon = 'default' | 'blue' | 'cyan' | 'green' | 'gold' | 'orange' | 'red' | 'pink' | 'white' | 'black';
 export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'website' | 'help' | 'admin' | 'hosting';
+
+export const VALID_APP_ICONS: DesktopAppIcon[] = ['default', 'blue', 'cyan', 'green', 'gold', 'orange', 'red', 'pink', 'white', 'black'];
+
+export function normalizeAppIcon(raw?: string | null): DesktopAppIcon {
+	if (!raw || typeof raw !== 'string') return 'default';
+	const cleaned = raw.trim().toLowerCase() as DesktopAppIcon;
+	return VALID_APP_ICONS.includes(cleaned) ? cleaned : 'default';
+}
+
+export function resolveAppIconPath(publicDir: string, appIcon?: string | null, ext: 'ico' | 'png' = 'ico'): string {
+	const variant = normalizeAppIcon(appIcon);
+	const filename = variant === 'default' ? `icon.${ext}` : `icon-${variant}.${ext}`;
+	const candidate = path.join(publicDir, filename);
+	if (fs.existsSync(candidate)) {
+		return candidate;
+	}
+	return path.join(publicDir, `icon.${ext}`);
+}
 
 export const STARTUP_LOCATION_URLS: Record<Exclude<StartupLocation, 'last'>, string> = {
 	explore: 'https://app.xernerx.com',
@@ -169,6 +188,7 @@ export type Metadata = {
 	explorerContextMenu?: boolean;
 	cdnWatchFolder?: string;
 	windowControls?: WindowControlsStyle;
+	appIcon?: DesktopAppIcon;
 	startupLocation?: StartupLocation;
 };
 
@@ -194,6 +214,7 @@ export const DEFAULT_METADATA: Metadata = {
 	explorerContextMenu: false,
 	cdnWatchFolder: '',
 	windowControls: 'system',
+	appIcon: 'default',
 	startupLocation: 'dashboard',
 };
 
@@ -226,6 +247,7 @@ export function sanitizeMetadata(raw?: Partial<Metadata> | null): Metadata {
 		explorerContextMenu: Boolean(merged.explorerContextMenu),
 		cdnWatchFolder: typeof merged.cdnWatchFolder === 'string' ? merged.cdnWatchFolder.trim() : '',
 		windowControls: validControls.includes(merged.windowControls as WindowControlsStyle) ? (merged.windowControls as WindowControlsStyle) : 'system',
+		appIcon: normalizeAppIcon(merged.appIcon),
 		startupLocation: normalizeStartupLocation(merged.startupLocation),
 	};
 }
@@ -397,6 +419,27 @@ export function syncGlobalHotkey(enabled: boolean | undefined, getWin: () => Bro
 	} catch {}
 }
 
+let activeTrayMenuUpdater: (() => void) | null = null;
+
+export function updateSystemTrayIcon(tray: Tray | null, publicDir: string, appIcon?: DesktopAppIcon) {
+	if (!tray) return;
+	try {
+		const icoPath = resolveAppIconPath(publicDir, appIcon, 'ico');
+		const pngPath = resolveAppIconPath(publicDir, appIcon, 'png');
+		const resolvedIconPath = process.platform === 'darwin' && fs.existsSync(pngPath) ? pngPath : fs.existsSync(icoPath) ? icoPath : pngPath;
+		if (fs.existsSync(resolvedIconPath)) {
+			let trayImg = nativeImage.createFromPath(resolvedIconPath);
+			if (process.platform === 'darwin' && !trayImg.isEmpty()) {
+				trayImg = trayImg.resize({ width: 18, height: 18 });
+			}
+			if (!trayImg.isEmpty()) {
+				tray.setImage(trayImg);
+			}
+		}
+		activeTrayMenuUpdater?.();
+	} catch {}
+}
+
 export function createSystemTray(
 	iconPath: string,
 	webUrl: string,
@@ -408,6 +451,7 @@ export function createSystemTray(
 		onToggleNotifications?: (enabled: boolean) => void;
 		onToggleStreamerMode?: (enabled: boolean) => void;
 		onToggleDiscordRpc?: (enabled: boolean) => void;
+		onSelectAppIcon?: (appIcon: DesktopAppIcon) => void;
 		onQuickCapture?: (sourceType: 'screen' | 'clipboard') => void;
 		onOpenCompanionWindow?: () => void;
 		onSetDockedMode?: (side: 'left' | 'right' | null) => void;
@@ -415,7 +459,7 @@ export function createSystemTray(
 	}
 ): Tray | null {
 	try {
-		const pngFallback = path.join(path.dirname(iconPath), 'icon.png');
+		const pngFallback = iconPath.replace(/\.ico$/i, '.png');
 		const resolvedIconPath = process.platform === 'darwin' && fs.existsSync(pngFallback) ? pngFallback : fs.existsSync(iconPath) ? iconPath : pngFallback;
 		if (!fs.existsSync(resolvedIconPath)) return null;
 
@@ -427,8 +471,22 @@ export function createSystemTray(
 		const tray = new Tray(trayIcon.isEmpty() ? resolvedIconPath : trayIcon);
 		tray.setToolTip('Xernerx App');
 
+		const ICON_MENU_OPTIONS: Array<{ value: DesktopAppIcon; label: string }> = [
+			{ value: 'default', label: 'Xerple (Default)' },
+			{ value: 'blue', label: 'Electric Blue' },
+			{ value: 'cyan', label: 'Arctic Cyan' },
+			{ value: 'green', label: 'Lush Green' },
+			{ value: 'gold', label: 'Amber Gold' },
+			{ value: 'orange', label: 'Sunset Orange' },
+			{ value: 'red', label: 'Crimson Red' },
+			{ value: 'pink', label: 'Vibrant Pink' },
+			{ value: 'white', label: 'Monochrome White' },
+			{ value: 'black', label: 'Obsidian Black' },
+		];
+
 		const buildMenu = () => {
 			const currentMeta = opts?.getMeta?.() || DEFAULT_METADATA;
+			const activeIcon = normalizeAppIcon(currentMeta.appIcon);
 			return Menu.buildFromTemplate([
 				{
 					label: 'Open Xernerx',
@@ -460,6 +518,17 @@ export function createSystemTray(
 							click: () => opts?.onSetDockedMode?.(null),
 						},
 					],
+				},
+				{
+					label: 'App Icon (Taskbar & Tray)',
+					submenu: ICON_MENU_OPTIONS.map((opt) => ({
+						label: opt.label,
+						type: 'radio' as const,
+						checked: activeIcon === opt.value,
+						click: () => {
+							opts?.onSelectAppIcon?.(opt.value);
+						},
+					})),
 				},
 				{
 					label: 'Live Overlay Monitor',
@@ -547,6 +616,12 @@ export function createSystemTray(
 					},
 				},
 			]);
+		};
+
+		activeTrayMenuUpdater = () => {
+			try {
+				tray.setContextMenu(buildMenu());
+			} catch {}
 		};
 
 		tray.setContextMenu(buildMenu());

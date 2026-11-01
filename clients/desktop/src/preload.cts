@@ -27,6 +27,7 @@ let metadata: Record<string, any> = {
 	idleAfkRpc: true,
 	explorerContextMenu: false,
 	windowControls: 'system',
+	appIcon: 'default',
 	startupLocation: 'dashboard',
 	cdnWatchFolder: '',
 };

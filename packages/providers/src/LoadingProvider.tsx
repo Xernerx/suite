@@ -23,7 +23,7 @@ export interface LoadingContextType {
 const LoadingContext = createContext<LoadingContextType | null>(null);
 
 function isAutomatedClient(): boolean {
-	if (typeof window === 'undefined') return true;
+	if (typeof window === 'undefined') return false;
 	const nav = typeof navigator !== 'undefined' ? navigator : undefined;
 	if (nav && (nav as any).webdriver) return true;
 	const ua = nav?.userAgent || '';
@@ -38,7 +38,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
 	const [manualLoading, setManualLoading] = useState(false);
 	const [manualMessage, setManualMessage] = useState<string | undefined>(undefined);
-	const [routeLoading, setRouteLoading] = useState(false);
+	const [routeLoading, setRouteLoading] = useState<boolean>(() => !isAutomatedClient());
 	const [customMode, setCustomMode] = useState<AppBackgroundDotMode | null>(null);
 	const [customVariant, setCustomVariant] = useState<AppDotLogoVariant | null>(null);
 	const [autoMode, setAutoMode] = useState<AppBackgroundDotMode>('blank');
@@ -47,7 +47,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 	const [loaderCount, setLoaderCount] = useState(0);
 	const [loaderMessage, setLoaderMessage] = useState<string | undefined>(undefined);
 
-	// Load every page with Loading active for interactive browsers, then turn routeLoading false after entrance completes
+	// Load every page with Loading active from initial render, then turn routeLoading false after entrance completes
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const { hostname, port } = window.location;

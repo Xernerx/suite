@@ -2,6 +2,27 @@
 
 # www
 
+## 0.21.0
+
+### Minor Changes
+
+- Fixed the Desktop App download metadata pill fallbacks on the Download page, updated the interactive Desktop App preview with clickable 10-color app icon crests and adaptive Light/Dark contrast, refreshed the Terms of Service, Privacy Policy, and Cookie Policy, and updated sitemaps and vanity redirects.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 0.20.0
 
 ### Minor Changes

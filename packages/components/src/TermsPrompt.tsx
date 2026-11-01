@@ -15,8 +15,8 @@ export function TermsPrompt() {
 	const [submitting, setSubmitting] = useState(false);
 
 	// These dates are automatically bumped by the `suite commit` script
-	const TERMS_VERSION = new Date('2026-10-21T00:00:00Z').getTime();
-	const PRIVACY_VERSION = new Date('2026-10-21T00:00:00Z').getTime();
+	const TERMS_VERSION = new Date('2026-11-01T00:00:00Z').getTime();
+	const PRIVACY_VERSION = new Date('2026-11-01T00:00:00Z').getTime();
 
 	useEffect(() => {
 		// Don't block the screen if they are currently trying to read the policies!

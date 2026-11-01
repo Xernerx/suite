@@ -250,9 +250,15 @@ export function Header() {
 	const headerIconBtnClass =
 		effectiveControls === 'xernerx'
 			? 'h-8 w-8 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer'
-			: effectiveControls === 'macos'
-				? 'h-8 w-8 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer'
-				: 'flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors';
+			: effectiveControls === 'squircle'
+				? 'h-8 w-8 rounded-xl bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer'
+				: effectiveControls === 'capsule'
+					? 'h-7 w-7 rounded-full flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:text-(--accent) transition-all cursor-pointer'
+					: effectiveControls === 'minimal'
+						? 'h-8 w-8 rounded-full bg-(--accent)/8 hover:bg-(--accent)/20 border border-(--accent)/20 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer'
+						: effectiveControls === 'macos'
+							? 'h-8 w-8 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer'
+							: 'flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors';
 
 	return (
 		<div className="relative flex flex-col w-full z-[9999] shrink-0 bg-(--background)" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
@@ -335,7 +341,9 @@ export function Header() {
 					style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
 				>
 					<div
-						className={`${optionsOpen ? 'flex animate-in fade-in slide-in-from-right-2 duration-150' : 'hidden md:flex'} ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${effectiveControls === 'windows' ? 'gap-4' : 'gap-2'} shrink-0`}
+						className={`${optionsOpen ? 'flex animate-in fade-in slide-in-from-right-2 duration-150' : 'hidden md:flex'} ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${
+							effectiveControls === 'windows' ? 'gap-4' : effectiveControls === 'capsule' ? 'gap-1.5 rounded-full bg-(--foreground)/50 border border-(--border)/15 px-2 py-0.5' : 'gap-2'
+						} shrink-0`}
 					>
 						{!isApp && preferences.showHeaderDownload && (
 							<div className="hidden sm:flex [.is-electron_&]:!hidden items-center gap-2">
@@ -394,9 +402,15 @@ export function Header() {
 								className={
 									effectiveControls === 'xernerx'
 										? 'flex items-center gap-2 h-8 px-3 rounded-full bg-(--foreground)/50 border border-(--border)/15 text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--text) transition-all cursor-pointer'
-										: effectiveControls === 'macos'
-											? 'flex items-center gap-2 h-8 px-3 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
-											: 'flex items-center gap-2 px-2.5 py-1 rounded-full bg-(--foreground)/40 hover:bg-(--foreground) border border-(--border)/10 hover:border-(--accent)/40 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
+										: effectiveControls === 'squircle'
+											? 'flex items-center gap-2 h-8 px-3 rounded-xl bg-(--foreground)/50 border border-(--border)/15 text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--text) transition-all cursor-pointer'
+											: effectiveControls === 'capsule'
+												? 'flex items-center gap-2 h-7 px-2.5 rounded-full hover:bg-(--accent)/20 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
+												: effectiveControls === 'minimal'
+													? 'flex items-center gap-2 h-8 px-3 rounded-full bg-(--accent)/8 hover:bg-(--accent)/20 border border-(--accent)/20 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
+													: effectiveControls === 'macos'
+														? 'flex items-center gap-2 h-8 px-3 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
+														: 'flex items-center gap-2 px-2.5 py-1 rounded-full bg-(--foreground)/40 hover:bg-(--foreground) border border-(--border)/10 hover:border-(--accent)/40 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
 								}
 							>
 								<Search size={15} className="text-(--accent)" />

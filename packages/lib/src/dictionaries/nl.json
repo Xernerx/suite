@@ -615,71 +615,33 @@
 				"dataCollected": {
 					"title": "2. Informatie die we verzamelen",
 					"account": {
-						"title": "Account- & apparaatsessie-informatie:",
-						"desc": "Wanneer je inlogt via Discord OAuth2 of via onze QR-code / 6-cijferige koppelcode voor apparaten, verzamelen we je Discord-ID, gebruikersnaam, avatar, e-mailadres, aangepaste profielinstellingen (weergavenaam, bio, voornaamwoorden, banner) en metadata van recente apparaatsessies (browser, besturingssysteem, apparaattype en laatst actieve tijdstempel voor maximaal 10 apparaten) zodat je actieve sessies kunt beheren."
+						"title": "Account- & apparaatsessie-informatie:"
 					},
 					"connections": {
-						"title": "Gekoppelde accounts van derden:",
-						"desc": "Als je optioneel externe accounts koppelt (zoals GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam of Reddit) in je Accountinstellingen, slaan we de openbare account-ID, gebruikersnaam, weergavenaam, avatar-URL, profiel-URL en je zichtbaarheidsvoorkeur (\"Toon op openbaar profiel\") op. OAuth-toegangstokens worden direct na verificatie verwijderd."
-					},
-					"developers": {
-						"title": "Voor API- & bot-ontwikkelaars:",
-						"desc": "Scoped Bearer API-tokens, webhook-URL's, applicatie- en organisatiemetadata, realtime WebSocket-gatewaytelemetrie en configuratie-instellingen die worden gebruikt om je integraties op onze infrastructuur te laten draaien."
-					},
-					"botUsers": {
-						"title": "Voor eindgebruikers van bots & community's:",
-						"desc": "Wanneer je interactie hebt met een door Xernerx aangedreven bot (zoals Virtue, Zodiac, Metamorphosis of Takenlijst-bot), verwerken we je Discord-ID, server-ID's, commando-invoer en optionele betrokkenheidsstatistieken (zoals tekst- en spraak-XP/levels). We slaan geen onbewerkte berichtlogboeken op, tenzij dit expliciet vereist is voor een ingeschakelde serverfunctie."
-					},
-					"cdnAndContent": {
-						"title": "CDN-media & community-inzendingen:",
-						"desc": "Bestanden en afbeeldingen die worden geüpload naar cdn.xernerx.com of worden bijgevoegd bij bugrapporten en suggesties, worden opgeslagen in afgeschermde cloudopslag en uitgeleverd volgens jouw gekozen zichtbaarheidsinstelling (openbaar, beperkt tot specifieke gebruikers, of privé)."
-					},
-					"desktop": {
-						"title": "Xernerx Desktop Client:",
-						"desc": "Bij gebruik van de Xernerx Desktop App worden vensterstatus, updatekanaalvoorkeuren (Stable/Canary), sneltoetsen en geïsoleerde multi-accountsessies lokaal op je apparaat opgeslagen. Indien ingeschakeld communiceert de app lokaal met je Discord-client voor Rich Presence (RPC) en worden diagnostische logboeken alleen lokaal weggeschreven wanneer Debug Logging is ingeschakeld."
+						"title": "Gekoppelde accounts van derden:"
 					},
 					"usage": {
 						"title": "Gebruiks- & diagnostische gegevens:",
 						"desc": "Foutlogboeken, beveiligingsaudittrails en systeeminteracties om de platformstabiliteit te waarborgen, rate-limits te handhaven en misbruik te voorkomen."
-					},
-					"integration": {
-						"title": "Facturerings-, winkel- & beloningsgegevens:",
-						"desc": "Abonnementsstatus, factuurgeschiedenis en regionale afrekendetails die veilig worden verwerkt via Stripe (wij slaan nooit volledige betaalkaartnummers op), evenals saldi van virtuele credits en tijdstempels van dagelijkse cadeaureeksen."
 					}
 				},
 				"apiData": {
-					"title": "3. API-gegevensverzameling & verplichtingen voor ontwikkelaars",
-					"content": "Wanneer ontwikkelaars onze REST API (/v1/* en /secure/*), insluitbare openbare widgets of realtime WebSocket-gateway gebruiken om botstatistieken te synchroniseren of metadata op te halen, slaan we deze gegevens op om openbare pagina's en analyses weer te geven. Het is ontwikkelaars ten strengste verboden om ongevraagde persoonlijk identificeerbare informatie (PII) van hun eindgebruikers naar onze API te verzenden. Wij verkopen of delen geen API-gegevens met externe adverteerders."
+					"title": "3. API-gegevensverzameling & verplichtingen voor ontwikkelaars"
 				},
 				"legalBasis": {
-					"title": "4. Juridische grondslag voor verwerking",
-					"content": "Wij verwerken persoonsgegevens op basis van contractuele noodzakelijkheid (om de door jou gevraagde diensten en abonnementen te leveren), gerechtvaardigde belangen (beveiliging, fraudepreventie en serviceverbetering), naleving van wettelijke verplichtingen of je uitdrukkelijke toestemming waar van toepassing."
+					"title": "4. Juridische grondslag voor verwerking"
 				},
 				"usage": {
-					"title": "5. Hoe we informatie gebruiken",
-					"items": [
-						"Om je account aan te bieden, te authenticeren en te synchroniseren tussen alle Xernerx-webapplicaties, bots en desktopclients.",
-						"Om winkelabonnementen te verwerken, virtuele credits toe te kennen, CDN-opslagquota te handhaven en de betrouwbaarheid van het platform te verbeteren.",
-						"Om ondersteuning te bieden, platformupdates te communiceren en belangrijke servicegerelateerde e-mails te sturen (zoals facturen, beveiligingsmeldingen en organisatie-uitnodigingen). Je kunt je meldingsvoorkeuren op elk moment aanpassen.",
-						"Om misbruik te detecteren, onze Servicevoorwaarden te handhaven en te voldoen aan wettelijke verplichtingen."
-					]
+					"title": "5. Hoe we informatie gebruiken"
 				},
 				"sharing": {
-					"title": "6. Gegevens delen",
-					"items": [
-						"Cloudhosting-, database- en afgeschermde blob-opslagproviders.",
-						"Betalingsverwerkers (Stripe) voor abonnementsafhandeling, Adaptive Pricing-lokalisatie en factuurbeheer.",
-						"Geautoriseerde integraties van derden en gekoppelde accounts die je zelf expliciet koppelt of inschakelt als openbare profielwidgets.",
-						"Wetshandhavings- of toezichthoudende instanties wanneer dit wettelijk verplicht is."
-					]
+					"title": "6. Gegevens delen"
 				},
 				"retention": {
-					"title": "7. Bewaartermijn van gegevens",
-					"content": "Wij bewaren persoonsgegevens niet langer dan noodzakelijk is om onze diensten te leveren en de doeleinden in dit beleid te vervullen, tenzij een langere bewaartermijn wettelijk verplicht is (zoals fiscale administratie). Tijdelijke QR-/koppelcode-inlogtickets verlopen automatisch na 3 minuten."
+					"title": "7. Bewaartermijn van gegevens"
 				},
 				"security": {
-					"title": "8. Gegevensbeveiliging",
-					"content": "We implementeren robuuste technische en organisatorische beveiligingsmaatregelen, waaronder AES-256-GCM-versleuteling voor apparaatkoppelingstokens, HTTP-only sessiecookies, scoped Bearer-tokens en strikte rolgebaseerde toegangscontrole. Geen enkele internetverbinding of opslagsysteem is echter 100% veilig."
+					"title": "8. Gegevensbeveiliging"
 				},
 				"rights": {
 					"title": "9. Jouw rechten (AVG / GDPR & CCPA)",

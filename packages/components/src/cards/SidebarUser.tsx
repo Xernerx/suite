@@ -200,6 +200,10 @@ export default function SidebarUserCard({
 
 	const activeVanityBadges: string[] = Array.isArray(activeUser?.credits?.activeBadges) ? activeUser.credits.activeBadges : [];
 	const hasDotMatrixBanner = activeVanityBadges.includes('dot_matrix_banner');
+	const profileCosmetics = activeUser?.credits?.profileCosmetics || {};
+	const customFrame = profileCosmetics.avatarFrame || 'none';
+	const customNameplate = profileCosmetics.nameplate || 'none';
+	const customCardTheme = profileCosmetics.cardTheme || 'default';
 	const verifiedIssues = activeUser?.communityStats?.verifiedIssuesCount || 0;
 	const approvedSuggestions = activeUser?.communityStats?.approvedSuggestionsCount || 0;
 
@@ -216,7 +220,9 @@ export default function SidebarUserCard({
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, y: placement === 'top' ? -8 : 8 }}
 			transition={{ duration: 0.15, ease: 'easeOut' }}
-			className={`bg-(--foreground)/30 backdrop-blur-md z-50 flex flex-col rounded-[24px] shadow-2xl text-left border border-(--border)/10
+			className={`bg-(--foreground)/30 backdrop-blur-md z-50 flex flex-col rounded-[24px] shadow-2xl text-left border border-(--border)/10 ${
+				customCardTheme !== 'default' ? `xrx-profile-card-${customCardTheme}` : ''
+			}
 				${
 					placement === 'top'
 						? `absolute top-full mt-2 ${isRightAligned ? 'left-0 origin-top-left' : 'right-0 origin-top-right'} w-80 max-w-[calc(100vw-2rem)]`
@@ -224,8 +230,11 @@ export default function SidebarUserCard({
 				}`}
 			style={{ fontSize: 'var(--text-scale, 14px)' }}
 		>
-			<div className="h-[120px] w-full relative overflow-hidden rounded-t-[24px]" style={{ backgroundColor: activeUser?.banner_color || 'var(--foreground)' }}>
-				{bannerUrl && <Image src={bannerUrl} alt={t('components.cards.sidebaruser.alt1')} fill className="object-cover" unoptimized draggable={false} />}
+			<div
+				className={`h-[120px] w-full relative overflow-hidden rounded-t-[24px] ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate}` : ''}`}
+				style={customNameplate === 'none' ? { backgroundColor: activeUser?.banner_color || 'var(--foreground)' } : undefined}
+			>
+				{bannerUrl && customNameplate === 'none' && <Image src={bannerUrl} alt={t('components.cards.sidebaruser.alt1')} fill className="object-cover" unoptimized draggable={false} />}
 				{hasDotMatrixBanner && (
 					<div className="absolute inset-0 opacity-70">
 						<XernerxDotLogo variant={(activeUser?.credits?.dotMatrixVariant as any) || 'orbit'} backgroundMode ripple={true} vivid={true} />
@@ -255,7 +264,9 @@ export default function SidebarUserCard({
 
 			<div className="relative flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 				<div className="flex justify-between items-start gap-2">
-					<div className="bg-(--foreground)/30 backdrop-blur-md border-(--foreground) relative -mt-[42px] rounded-full border-[6px] shrink-0">
+					<div
+						className={`bg-(--foreground)/30 backdrop-blur-md border-(--foreground) relative -mt-[42px] rounded-full border-[6px] shrink-0 ${customFrame !== 'none' ? `xrx-avatar-frame-${customFrame}` : ''}`}
+					>
 						{avatarUrl ? (
 							<div className="relative h-[80px] w-[80px]">
 								<Image src={avatarUrl} alt={t('components.cards.sidebaruser.alt2')} fill className="rounded-full object-cover" unoptimized draggable={false} />

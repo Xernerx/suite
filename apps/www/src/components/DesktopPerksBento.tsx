@@ -77,7 +77,7 @@ export function DesktopPerksBento() {
 									<div className="flex items-center gap-3 min-w-0">
 										<div
 											className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 transition-colors ${
-												isCurrent ? 'bg-(--accent) text-(--text)' : 'bg-(--foreground) border border-(--border)/20 text-(--text-muted)'
+												isCurrent ? 'bg-(--accent) text-(--accent-contrast)' : 'bg-(--foreground) border border-(--border)/20 text-(--text-muted)'
 											}`}
 										>
 											{acct.initial}
@@ -294,7 +294,7 @@ export function DesktopPerksBento() {
 						<div className="flex items-center gap-3 min-w-0">
 							<div className="relative h-10 w-10 rounded-2xl bg-(--accent)/15 border border-(--accent)/30 flex items-center justify-center text-(--accent) shrink-0">
 								<Bell size={18} />
-								<span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-(--accent) text-[9px] font-extrabold text-white flex items-center justify-center border border-(--background)">
+								<span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-(--accent) text-[9px] font-extrabold text-(--accent-contrast) flex items-center justify-center border border-(--background)">
 									1
 								</span>
 							</div>

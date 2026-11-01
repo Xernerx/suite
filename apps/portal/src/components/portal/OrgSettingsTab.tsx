@@ -25,7 +25,7 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, onVanityUnlock
 	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
 
-	const isVanityUnlocked = Boolean(orgConfig.vanityUnlocked || orgConfig.vanitySlug || orgConfig.verified);
+	const isVanityUnlocked = Boolean(orgConfig.vanityUnlocked || orgConfig.verified);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
 
 	const handleUnlockVanity = async () => {

@@ -1,11 +1,14 @@
 /** @format */
 
 import { MetadataRoute } from 'next';
+import { database } from '@xernerx/lib/server';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-	const now = new Date('2026-10-29T00:00:00Z');
+export const revalidate = 3600;
 
-	return [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+	const now = new Date();
+
+	const entries: MetadataRoute.Sitemap = [
 		// WWW (www.xernerx.com)
 		{ url: 'https://www.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
 		{ url: 'https://www.xernerx.com/download', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
@@ -20,9 +23,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		{ url: 'https://app.xernerx.com/', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: 'https://app.xernerx.com/bots', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: 'https://app.xernerx.com/servers', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-		{ url: 'https://app.xernerx.com/bots/782105629572464652', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://app.xernerx.com/bots/950251264095162418', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: 'https://app.xernerx.com/bots/881678826906730547', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+		{ url: 'https://app.xernerx.com/users', lastModified: now, changeFrequency: 'daily', priority: 0.85 },
+		{ url: 'https://app.xernerx.com/leaderboard', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
 
 		// DOCS (docs.xernerx.com)
 		{ url: 'https://docs.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
@@ -34,6 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
 		// INFO (info.xernerx.com)
 		{ url: 'https://info.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+		{ url: 'https://info.xernerx.com/status', lastModified: now, changeFrequency: 'hourly', priority: 0.85 },
 		{ url: 'https://info.xernerx.com/roadmap', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
 		{ url: 'https://info.xernerx.com/suggestions', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
 		{ url: 'https://info.xernerx.com/issues', lastModified: now, changeFrequency: 'daily', priority: 0.7 },
@@ -45,4 +48,72 @@ export default function sitemap(): MetadataRoute.Sitemap {
 		{ url: 'https://portal.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
 		{ url: 'https://haste.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
 	];
+
+	try {
+		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any)?.Bot;
+		const GuildModel = (db.models.guilds as any)?.Guild;
+		const OrganizationModel = (db.models.organizations as any)?.Organization;
+
+		const [publicBots, publicServers, publicOrgs] = await Promise.all([
+			BotModel
+				? BotModel.find({ privacy: 'public' })
+						.select('id vanitySlug updatedAt')
+						.limit(500)
+						.lean()
+						.catch(() => [])
+				: [],
+			GuildModel
+				? GuildModel.find({ privacy: 'public' })
+						.select('id vanitySlug updatedAt')
+						.limit(500)
+						.lean()
+						.catch(() => [])
+				: [],
+			OrganizationModel
+				? OrganizationModel.find({ $or: [{ privacy: 'public' }, { 'config.privacy': 'public' }] })
+						.select('_id vanitySlug updatedAt')
+						.limit(200)
+						.lean()
+						.catch(() => [])
+				: [],
+		]);
+
+		for (const bot of publicBots) {
+			const slugOrId = bot.vanitySlug || bot.id;
+			if (!slugOrId) continue;
+			entries.push({
+				url: `https://app.xernerx.com/bots/${encodeURIComponent(String(slugOrId))}`,
+				lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,
+				changeFrequency: 'weekly',
+				priority: 0.8,
+			});
+		}
+
+		for (const guild of publicServers) {
+			const slugOrId = guild.vanitySlug || guild.id;
+			if (!slugOrId) continue;
+			entries.push({
+				url: `https://app.xernerx.com/servers/${encodeURIComponent(String(slugOrId))}`,
+				lastModified: guild.updatedAt ? new Date(guild.updatedAt) : now,
+				changeFrequency: 'weekly',
+				priority: 0.8,
+			});
+		}
+
+		for (const org of publicOrgs) {
+			const slugOrId = org.vanitySlug || (org._id ? String(org._id) : '');
+			if (!slugOrId) continue;
+			entries.push({
+				url: `https://app.xernerx.com/organization/${encodeURIComponent(String(slugOrId))}`,
+				lastModified: org.updatedAt ? new Date(org.updatedAt) : now,
+				changeFrequency: 'weekly',
+				priority: 0.75,
+			});
+		}
+	} catch {
+		// Gracefully fall back to static entries if database is unreachable during build
+	}
+
+	return entries;
 }

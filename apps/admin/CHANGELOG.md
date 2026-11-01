@@ -2,6 +2,24 @@
 
 # admin
 
+## 0.24.1
+
+### Patch Changes
+
+- Synced the updated color-variant branding icons, logos, banners, and transparent dot-matrix animations across the Admin portal.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 0.24.0
 
 ### Minor Changes

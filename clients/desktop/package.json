@@ -1,7 +1,7 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.4.5",
+	"version": "2.5.0",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
@@ -36,6 +36,46 @@
 			{
 				"from": "metadata.json",
 				"to": "metadata.json"
+			},
+			{
+				"from": "public/icon.ico",
+				"to": "icon.ico"
+			},
+			{
+				"from": "public/icon-blue.ico",
+				"to": "icon-blue.ico"
+			},
+			{
+				"from": "public/icon-cyan.ico",
+				"to": "icon-cyan.ico"
+			},
+			{
+				"from": "public/icon-green.ico",
+				"to": "icon-green.ico"
+			},
+			{
+				"from": "public/icon-gold.ico",
+				"to": "icon-gold.ico"
+			},
+			{
+				"from": "public/icon-orange.ico",
+				"to": "icon-orange.ico"
+			},
+			{
+				"from": "public/icon-red.ico",
+				"to": "icon-red.ico"
+			},
+			{
+				"from": "public/icon-pink.ico",
+				"to": "icon-pink.ico"
+			},
+			{
+				"from": "public/icon-white.ico",
+				"to": "icon-white.ico"
+			},
+			{
+				"from": "public/icon-black.ico",
+				"to": "icon-black.ico"
 			}
 		],
 		"publish": [
@@ -54,6 +94,7 @@
 		},
 		"win": {
 			"target": "nsis",
+			"icon": "public/icon.ico",
 			"artifactName": "${productName}-${version}-setup.${ext}"
 		},
 		"mac": {

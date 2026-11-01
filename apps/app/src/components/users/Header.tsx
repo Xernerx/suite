@@ -37,6 +37,10 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 	const isOwnProfile = (session as any)?.user?.id === id;
 	const activeVanityBadges: string[] = Array.isArray(user?.credits?.activeBadges) ? user.credits.activeBadges : [];
 	const hasDotMatrixBanner = activeVanityBadges.includes('dot_matrix_banner');
+	const profileCosmetics = user?.credits?.profileCosmetics || {};
+	const customFrame = profileCosmetics.avatarFrame || 'none';
+	const customNameplate = profileCosmetics.nameplate || 'none';
+	const customCardTheme = profileCosmetics.cardTheme || 'default';
 	const savedDotVariant = ((user?.credits?.dotMatrixVariant as DotLogoVariant) || 'orbit') as DotLogoVariant;
 	const [overrideDotVariant, setOverrideDotVariant] = useState<DotLogoVariant | null>(null);
 	const activeDotVariant = overrideDotVariant || savedDotVariant;
@@ -94,7 +98,7 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 		<div
 			className={`flex flex-col md:flex-row items-start md:items-center gap-6 mb-12 p-8 rounded-3xl bg-(--foreground)/50 border backdrop-blur-md shadow-sm mt-8 relative ${
 				hasDotMatrixBanner ? 'border-(--accent)/35 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_18%,transparent)]' : 'border-(--border)/10'
-			}`}
+			} ${customCardTheme !== 'default' ? `xrx-profile-card-${customCardTheme}` : ''} ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate}` : ''}`}
 		>
 			<div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
 				{bannerUrl && <div className="absolute inset-0 opacity-20" style={{ backgroundImage: `url(${bannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />}
@@ -128,7 +132,7 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 					alt={displayName}
 					width={128}
 					height={128}
-					className="rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10 object-cover pointer-events-auto"
+					className={`rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10 object-cover pointer-events-auto ${customFrame !== 'none' ? `xrx-avatar-frame-${customFrame}` : ''}`}
 					unoptimized
 				/>
 			) : (

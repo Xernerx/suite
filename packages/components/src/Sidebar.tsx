@@ -59,6 +59,8 @@ export function Sidebar() {
 		preferences.showDiscordCollectibles && activeUser?.collectibles?.nameplate?.asset
 			? `https://cdn.discordapp.com/assets/collectibles/${activeUser.collectibles.nameplate.asset}asset.webm`
 			: null;
+	const customNameplate = (discordUser as any)?.credits?.profileCosmetics?.nameplate || 'none';
+	const customAvatarFrame = (discordUser as any)?.credits?.profileCosmetics?.avatarFrame || 'none';
 
 	const DeviceIcon = deviceIcons[device?.toLowerCase() as keyof typeof deviceIcons];
 	const iconStyles = 'text-(--accent-green) absolute -bottom-0.5 -right-0.5 h-[14px] w-[14px] border-2 border-(--background) rounded-full bg-(--foreground)/30 backdrop-blur-md z-20';
@@ -161,7 +163,9 @@ export function Sidebar() {
 											gap: isCollapsed ? 0 : 'var(--ui-gap)',
 										}}
 									>
-										{active && !isCollapsed && <div className={`absolute ${isRightAligned ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} h-5 w-1 bg-(--accent)`} />}
+										{active && !isCollapsed && (
+											<div className={`absolute ${isRightAligned ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} h-5 w-1 bg-(--accent-readable,var(--accent))`} />
+										)}
 										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 										<span
 											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
@@ -194,7 +198,9 @@ export function Sidebar() {
 											gap: isCollapsed ? 0 : 'var(--ui-gap)',
 										}}
 									>
-										{active && !isCollapsed && <div className={`absolute ${isRightAligned ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} h-5 w-1 bg-(--accent)`} />}
+										{active && !isCollapsed && (
+											<div className={`absolute ${isRightAligned ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} h-5 w-1 bg-(--accent-readable,var(--accent))`} />
+										)}
 										{Icon && <Icon size={14} strokeWidth={2} className={`shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-(--accent)' : ''}`} />}
 										<span
 											className={`whitespace-nowrap overflow-hidden transition-all duration-300 font-medium text-[14px] 
@@ -226,7 +232,7 @@ export function Sidebar() {
 						<Link
 							href={loginHref}
 							title={t('common.sidebar.login')}
-							className={`flex items-center justify-center rounded-xl bg-(--accent) text-white transition-colors hover:bg-(--hover-accent) mt-1
+							className={`flex items-center justify-center rounded-xl bg-(--accent) text-(--accent-contrast) border border-(--border)/15 transition-colors hover:bg-(--hover-accent) mt-1
                                 ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
                             `}
 							style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
@@ -243,14 +249,14 @@ export function Sidebar() {
 							{/* Combined Trigger Card Wrapper */}
 							<div
 								className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-colors 
-                                ${!nameplateUrl ? 'hover:bg-(--foreground)/30 backdrop-blur-md' : 'shadow-inner'}
-                                ${!nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/30 backdrop-blur-md' : ''}
+                                ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate} border border-(--accent)/35 shadow-sm` : !nameplateUrl ? 'hover:bg-(--foreground)/30 backdrop-blur-md' : 'shadow-inner'}
+                                ${customNameplate === 'none' && !nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/30 backdrop-blur-md' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                             `}
 								style={{ padding: 'calc(var(--ui-gap) * 0.75)', gap: 'var(--ui-gap)' }}
 							>
 								{/* Root Nameplate Video Background */}
-								{nameplateUrl && (
+								{nameplateUrl && customNameplate === 'none' && (
 									<>
 										<video src={nameplateUrl} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-fill z-0 pointer-events-none opacity-90" />
 										<div className="absolute inset-0 bg-black/10 z-0 pointer-events-none" />
@@ -274,7 +280,7 @@ export function Sidebar() {
 													src={avatarUrl}
 													alt={t('components.sidebar.alt1')}
 													fill
-													className="rounded-full border border-(--border) object-cover"
+													className={`rounded-full border border-(--border) object-cover ${customAvatarFrame !== 'none' ? `xrx-avatar-frame-${customAvatarFrame}` : ''}`}
 													unoptimized
 													draggable={false}
 													loading="eager"

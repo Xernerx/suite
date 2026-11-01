@@ -2,6 +2,12 @@
 
 # @xernerx/lib
 
+## 1.19.0
+
+### Minor Changes
+
+- Extended `User` schema with `uiPreferences` (`dotMatrixRenderStyle`, `ambientScene`, `surfaceStyle`, `cursorFx`, `overlaySkin`, `uiIconStyle`) and `credits.profileCosmetics` (`avatarFrame`, `nameplate`, `cardTheme`), and added localization keys in `en-GB.json` for all new Credit Store cosmetics, studios, and Desktop App Icon options.
+
 ## 1.18.0
 
 ### Minor Changes

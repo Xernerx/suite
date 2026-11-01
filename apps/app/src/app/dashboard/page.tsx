@@ -255,7 +255,7 @@ function DashboardContent() {
 					widgets: Boolean(guildConfig.widgets),
 					locale: guildConfig.locale,
 					links: guildConfig.links,
-					vanitySlug: guildConfig.vanitySlug,
+					...(guildConfig.vanityUnlocked || guildConfig.verified ? { vanitySlug: guildConfig.vanitySlug } : {}),
 					tags: Array.isArray(guildConfig.tags) ? guildConfig.tags : [],
 				}),
 			});

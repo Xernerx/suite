@@ -2,6 +2,27 @@
 
 # api
 
+## 0.28.0
+
+### Minor Changes
+
+- Expanded the Credit Store catalog seed and `/secure/store/credits/redeem` with stage render forms, ambient scenes, surface styles, cursor FX, header/icon packs, profile identity cosmetics, overlay HUD skins, and master cosmetic bundles; enforced Credit Store unlock verification on `/secure/users/[id]`; and added centralized vanity URL unlock verification (`vanityUnlock.ts`).
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 0.27.0
 
 ### Minor Changes

@@ -1,13 +1,30 @@
 /** @format */
 'use client';
 
-import { Bell, Code2, Columns2, Command, Download, Gift, Globe, Keyboard, LayoutGrid, PanelLeftClose, RotateCcw, SlidersHorizontal, Sparkles, Zap } from 'lucide-react';
+import { Bell, Code2, Columns2, Command, Download, Gift, Globe, Keyboard, LayoutGrid, LayoutTemplate, Lock, PanelLeftClose, RotateCcw, SlidersHorizontal, Sparkles, Zap } from 'lucide-react';
 import { Button, Check, Selector, Toggle } from '@xernerx/ui';
 import { headerSubdomainsCatalog } from '@xernerx/lib';
 import { DesktopPreferencesSection } from './DesktopPreferencesSection';
-import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, usePermissions, usePlatform, useTheme, useToast, type HeaderSubdomainId, type UIPreferences } from '@xernerx/providers';
+import { isCosmeticUnlocked, UI_ICON_STYLE_UNLOCK_MAP, WINDOW_CONTROL_UNLOCK_MAP } from './cosmeticUnlocks';
+import {
+	DEFAULT_HEADER_SUBDOMAINS,
+	useDictionary,
+	useEnvironment,
+	usePermissions,
+	usePlatform,
+	useTheme,
+	useToast,
+	useUser,
+	type HeaderSubdomainId,
+	type UIIconStyle,
+	type UIPreferences,
+	type WindowControlsStyle,
+} from '@xernerx/providers';
 
-type BooleanPreferenceKey = Exclude<keyof UIPreferences, 'headerSubdomains' | 'alignment' | 'dotMatrixStage' | 'dotMatrixType' | 'dotMatrixAnimation'>;
+type BooleanPreferenceKey = Exclude<
+	keyof UIPreferences,
+	'headerSubdomains' | 'alignment' | 'dotMatrixStage' | 'dotMatrixType' | 'dotMatrixRenderStyle' | 'dotMatrixAnimation' | 'windowControls' | 'uiIconStyle'
+>;
 
 const HEADER_ITEMS: Array<{ key: BooleanPreferenceKey; icon: any }> = [
 	{ key: 'showHeaderCommandPalette', icon: Command },
@@ -27,7 +44,9 @@ const WORKSPACE_ITEMS: Array<{ key: BooleanPreferenceKey; icon: any }> = [
 
 export default function Preferences() {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const { preferences, setPreference, resetPreferences } = useTheme();
+	const { user } = useUser();
 	const { hasPermission } = usePermissions();
 	const hasAdminAccess = hasPermission('access');
 	const { type } = usePlatform();
@@ -79,6 +98,71 @@ export default function Preferences() {
 		{ value: 'right', label: t('account.preferences.items.alignment.options.right') },
 	];
 
+	const renderLockableLabel = (text: string, locked: boolean) => (
+		<div className="flex items-center justify-between gap-2 w-full">
+			<span>{text}</span>
+			{locked && <Lock size={12} className="text-(--accent) shrink-0 opacity-80" />}
+		</div>
+	);
+
+	const windowControlsOptions = (['system', 'windows', 'macos', 'xernerx', 'capsule', 'squircle', 'minimal'] as const).map((value) => {
+		const unlocked = isCosmeticUnlocked(user, hasAdminAccess, WINDOW_CONTROL_UNLOCK_MAP[value]);
+		return {
+			value,
+			label: renderLockableLabel(t(`account.preferences.desktopItems.windowControls.options.${value}`), !unlocked),
+		};
+	});
+
+	const uiIconStyleOptions = (['standard', 'duotone', 'bold', 'precision'] as const).map((value) => {
+		const unlocked = isCosmeticUnlocked(user, hasAdminAccess, UI_ICON_STYLE_UNLOCK_MAP[value]);
+		return {
+			value,
+			label: renderLockableLabel(t(`account.preferences.uiIconStyle.${value}`), !unlocked),
+		};
+	});
+
+	const handleWindowControlsSelect = (val: string) => {
+		const next = (val || 'system') as WindowControlsStyle;
+		const reqUnlock = WINDOW_CONTROL_UNLOCK_MAP[next];
+		if (!isCosmeticUnlocked(user, hasAdminAccess, reqUnlock)) {
+			toast({
+				type: 'info',
+				title: t('account.appearance.dotMatrix.lockedToastTitle'),
+				description: t('account.preferences.windowControlsLockedDesc'),
+				action: {
+					label: t('account.appearance.dotMatrix.openCreditStore'),
+					onClick: () => {
+						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+					},
+				},
+			});
+			return;
+		}
+		setPreference('windowControls', next);
+		toast({ type: 'success', title: t('account.preferences.toast.updated') });
+	};
+
+	const handleUiIconStyleSelect = (val: string) => {
+		const next = (val || 'standard') as UIIconStyle;
+		const reqUnlock = UI_ICON_STYLE_UNLOCK_MAP[next];
+		if (!isCosmeticUnlocked(user, hasAdminAccess, reqUnlock)) {
+			toast({
+				type: 'info',
+				title: t('account.appearance.dotMatrix.lockedToastTitle'),
+				description: t('account.preferences.uiIconStyleLockedDesc'),
+				action: {
+					label: t('account.appearance.dotMatrix.openCreditStore'),
+					onClick: () => {
+						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+					},
+				},
+			});
+			return;
+		}
+		setPreference('uiIconStyle', next);
+		toast({ type: 'success', title: t('account.preferences.toast.updated') });
+	};
+
 	return (
 		<div
 			className="flex flex-col max-w-(--page-width) mx-auto w-full"
@@ -114,6 +198,21 @@ export default function Preferences() {
 				</div>
 
 				<div className="flex flex-col">
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className="flex items-start gap-3.5 max-w-2xl">
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
+								<LayoutTemplate size={18} />
+							</div>
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+								<h3 className="text-base font-semibold text-(--text)">{t('account.preferences.desktopItems.windowControls.title')}</h3>
+								<p className="text-xs text-(--text-muted)">{t('account.preferences.items.headerControlsStyle.description')}</p>
+							</div>
+						</div>
+						<div className="w-full sm:w-64 shrink-0">
+							<Selector value={preferences.windowControls || 'system'} options={windowControlsOptions} onChange={handleWindowControlsSelect} items />
+						</div>
+					</div>
+
 					<div className="flex flex-col border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 						<div className="flex items-start gap-3.5 max-w-2xl">
 							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
@@ -207,6 +306,22 @@ export default function Preferences() {
 						</div>
 						<div className="w-full sm:w-64 shrink-0">
 							<Selector value={preferences.alignment || 'system'} options={alignmentOptions} onChange={handleAlignmentChange} items={false} />
+						</div>
+					</div>
+
+					{/* Suite UI Icon Pack Style Selector */}
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className="flex items-start gap-3.5 max-w-2xl">
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
+								<Sparkles size={18} />
+							</div>
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+								<h3 className="text-base font-semibold text-(--text)">{t('account.preferences.uiIconStyle.title')}</h3>
+								<p className="text-xs text-(--text-muted)">{t('account.preferences.uiIconStyle.description')}</p>
+							</div>
+						</div>
+						<div className="w-full sm:w-64 shrink-0">
+							<Selector value={preferences.uiIconStyle || 'standard'} options={uiIconStyleOptions} onChange={handleUiIconStyleSelect} items />
 						</div>
 					</div>
 

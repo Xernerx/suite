@@ -1,7 +1,11 @@
 /** @format */
 
+import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+
+const SIGN_IN_BONUS_AMOUNT = 1000;
+const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
 
 export const dynamic = 'force-dynamic';
 
@@ -352,6 +356,54 @@ export async function GET(req: NextRequest) {
 						.catch(() => []);
 					for (const u of foundUsers || []) {
 						if (u?.id) extraUsersMap.set(String(u.id), u);
+					}
+
+					const missingLevelUserIds = levelUserIds.filter((uid) => /^\d{15,22}$/.test(uid) && !extraUsersMap.has(uid));
+					if (missingLevelUserIds.length > 0) {
+						let defaultRoles = [DEFAULT_JOIN_ROLE_ID];
+						const SettingModel = (models.core as any)?.Setting;
+						if (SettingModel) {
+							const joinRolesSetting = await SettingModel.findOne({ id: 'join_roles' })
+								.lean()
+								.catch(() => null);
+							if (joinRolesSetting?.value) {
+								try {
+									const parsed = JSON.parse(joinRolesSetting.value);
+									if (Array.isArray(parsed)) {
+										defaultRoles = Array.from(new Set([DEFAULT_JOIN_ROLE_ID, ...parsed.filter((r) => typeof r === 'string' && r)]));
+									}
+								} catch {}
+							}
+						}
+						await Promise.all(
+							missingLevelUserIds.flatMap((uid) => [
+								models.users.User.create({ id: uid, roles: defaultRoles }).catch(() => {}),
+								models.users.Credit.create({
+									ownerId: uid,
+									balance: SIGN_IN_BONUS_AMOUNT,
+									signInBonusClaimed: true,
+									transactions: [
+										{
+											id: crypto.randomUUID(),
+											type: 'earn',
+											amount: SIGN_IN_BONUS_AMOUNT,
+											multiplierPercent: 100,
+											itemId: 'signin_bonus',
+											itemName: 'Welcome Sign-In Bonus',
+											createdAt: new Date(),
+										},
+									],
+								}).catch(() => {}),
+								LevelModel
+									? LevelModel.create({
+											id: crypto.randomUUID(),
+											ownerId: uid,
+											level: 1,
+											xp: 0,
+										}).catch(() => {})
+									: Promise.resolve(),
+							])
+						);
 					}
 				}
 

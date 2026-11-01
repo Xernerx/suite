@@ -2,6 +2,12 @@
 
 # @xernerx/cli
 
+## 2.5.1
+
+### Patch Changes
+
+- Updated `suite commit` to automatically prune modified or deleted `en-GB.json` translation keys from secondary locale dictionaries and strip Prettier headers from `.changeset/*.md` files.
+
 ## 2.5.0
 
 ### Minor Changes

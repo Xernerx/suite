@@ -2,7 +2,7 @@
 'use client';
 
 import { useDictionary, useEnvironment, useLoading, usePlatform, useShortcuts, useSidebar, useTheme, useToast, useUser } from '@xernerx/providers';
-import { XernerxDotLogo } from '@xernerx/feedback';
+import { AmbientStageCanvas, CursorFxCanvas, XernerxDotLogo } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import { Eye, Lock, ShieldCheck, UploadCloud } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const [isBatterySaverActive, setIsBatterySaverActive] = useState(false);
 	const [isSystemIdle, setIsSystemIdle] = useState(false);
 	const [privacyShieldLocked, setPrivacyShieldLocked] = useState(false);
-	const [entryLoading, setEntryLoading] = useState(false);
+	const [entryLoading, setEntryLoading] = useState(true);
 	const [isDragUploading, setIsDragUploading] = useState(false);
 	const [stagePreview, setStagePreview] = useState(false);
 
@@ -317,7 +317,14 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const activeLoading = isLoading || entryLoading;
 	const effectiveStagePreview = stagePreview || isContentHidden;
 	const isFeedbackVariant = dotVariant === '404' || dotVariant === 'error' || dotVariant === 'lock';
-	const targetVariant = isFeedbackVariant ? dotVariant : matrixType !== 'default' && matrixType !== 'blank' ? matrixType : dotVariant;
+	const effectiveRenderStyle = isFixedWatermarkApp || isFeedbackVariant ? 'dots' : uiPreferences?.dotMatrixRenderStyle || 'dots';
+	const targetVariant = isFeedbackVariant
+		? dotVariant
+		: matrixType !== 'default' && matrixType !== 'blank'
+			? matrixType
+			: effectiveRenderStyle !== 'dots' && dotVariant === 'full'
+				? 'orbit'
+				: dotVariant;
 
 	const effectiveVariant = activeLoading ? 'full' : targetVariant;
 	const effectiveRipple = activeLoading
@@ -326,7 +333,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 			? false
 			: effectiveStagePreview
 				? matrixAnim !== 'static'
-				: matrixAnim === 'always'
+				: matrixAnim === 'always' || effectiveRenderStyle !== 'dots'
 					? true
 					: matrixAnim === 'static'
 						? false
@@ -339,7 +346,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 				? true
 				: matrixType === 'blank'
 					? true
-					: matrixType !== 'default'
+					: matrixType !== 'default' || effectiveRenderStyle !== 'dots'
 						? false
 						: matrixAnim === 'always'
 							? false
@@ -410,6 +417,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 			)}
 			{/* Header stays completely fixed at the top */}
 			<Header />
+			{!isFixedWatermarkApp && !isBatterySaverActive && !isSystemIdle && !privacyShieldLocked && uiPreferences?.cursorFx && uiPreferences.cursorFx !== 'default' && (
+				<CursorFxCanvas fx={uiPreferences.cursorFx} />
+			)}
 
 			{/* Middle layout container filling the screen */}
 			<div className={`flex flex-1 min-h-0 overflow-hidden ${isRightAligned ? 'flex-row-reverse' : ''}`}>
@@ -420,7 +430,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 				{/* Scrollable Content Area with a prominent, symmetrical radial and linear accent gradient */}
 				<div
 					id="main-scroll-container"
-					className={`relative h-full min-h-0 flex-1 ${isLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'} shadow-inner
+					className={`relative h-full min-h-0 flex-1 ${activeLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'} shadow-inner
                         ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'} 
                     `}
 					style={{
@@ -432,14 +442,26 @@ export function Page({ children }: { children: React.ReactNode }) {
 					{/* Centralized AppLayout Dot-Matrix Loading & Sticky Stage */}
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
 						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 3.5rem - env(safe-area-inset-top, 0px))' }}>
-							<XernerxDotLogo variant={effectiveVariant} backgroundMode ripple={effectiveRipple} blank={effectiveBlank} subdued={!isLoading && !effectiveStagePreview} />
-							{isLoading && message && <div className="absolute bottom-14 font-medium text-(--accent) text-sm">{message}</div>}
+							{!isFixedWatermarkApp && !isBatterySaverActive && !isSystemIdle && !privacyShieldLocked && (
+								<div className="absolute inset-0 pointer-events-none">
+									<AmbientStageCanvas scene={uiPreferences?.ambientScene || 'default'} />
+								</div>
+							)}
+							<XernerxDotLogo
+								variant={effectiveVariant}
+								renderStyle={effectiveRenderStyle}
+								backgroundMode
+								ripple={effectiveRipple}
+								blank={effectiveBlank}
+								subdued={!activeLoading && !effectiveStagePreview}
+							/>
+							{activeLoading && message && <div className="absolute bottom-14 font-medium text-(--accent) text-sm">{message}</div>}
 						</div>
 					</div>
 
 					<div
-						className={`relative z-10 flex flex-col transition-opacity duration-500 ${showFooter ? 'min-h-full justify-between' : ''} ${
-							isLoading || effectiveStagePreview ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'
+						className={`relative z-10 flex flex-col ${showFooter ? 'min-h-full justify-between' : ''} ${
+							activeLoading || effectiveStagePreview ? 'opacity-0 pointer-events-none select-none' : 'opacity-100 transition-opacity duration-500'
 						}`}
 					>
 						<main

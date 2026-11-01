@@ -9,6 +9,7 @@ import os from 'os';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import type { Metadata } from './metadata.js';
+import { resolveOsShellIconPath } from './notifications.js';
 import { setRpcIdleOverride } from './rpc.js';
 
 const MIME_BY_EXT: Record<string, string> = {
@@ -619,7 +620,7 @@ export function syncExplorerContextMenu(enabled: boolean, iconPath: string, log:
 
 	const appRoot = path.resolve(path.dirname(iconPath), '..');
 	const cmdValue = app.isPackaged ? `"${process.execPath}" --upload="%1"` : `"${process.execPath}" "${appRoot}" --upload="%1"`;
-	const resolvedIcon = fs.existsSync(iconPath) ? iconPath : process.execPath;
+	const resolvedIcon = resolveOsShellIconPath(iconPath);
 
 	execFile('reg.exe', ['add', REG_KEY_PATH, '/ve', '/d', 'Upload to Xernerx CDN', '/f'], { windowsHide: true }, (err) => {
 		if (err) {

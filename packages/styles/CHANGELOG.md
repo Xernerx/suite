@@ -2,6 +2,12 @@
 
 # @xernerx/styles
 
+## 0.3.0
+
+### Minor Changes
+
+- Added CSS rules in `globals.css` for glass surface styles (`crystal`, `prismatic`, `cybergrid`, `obsidian`), UI icon packs (`duotone`, `bold`, `precision`), avatar frame shaders, animated nameplates, profile card themes, overlay HUD skins, and `--accent-contrast` / `--accent-readable` tokens.
+
 ## 0.2.2
 
 ### Patch Changes

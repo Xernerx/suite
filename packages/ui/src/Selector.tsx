@@ -43,6 +43,7 @@ export function Selector({ value, options, onChange, placeholder, items, require
 	const resolvedPlaceholder = placeholder ?? t('common.selector.defaultPlaceholder');
 	const [isOpen, setIsOpen] = useState(false);
 	const [openUpwards, setOpenUpwards] = useState(false);
+	const [alignRight, setAlignRight] = useState(false);
 	const [query, setQuery] = useState('');
 	const ref = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +72,8 @@ export function Selector({ value, options, onChange, placeholder, items, require
 				} else {
 					setOpenUpwards(false);
 				}
+				const spaceRight = window.innerWidth - rect.left;
+				setAlignRight(spaceRight < 320 && rect.right > 320);
 			}
 			setTimeout(() => {
 				inputRef.current?.focus();
@@ -118,13 +121,13 @@ export function Selector({ value, options, onChange, placeholder, items, require
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className={`flex w-full items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none ${toggleClassName}`}
+				className={`flex w-full min-w-max items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none ${toggleClassName}`}
 				style={{
 					gap: 'var(--ui-gap)',
 				}}
 			>
-				<span className="font-medium">{selectedOption ? selectedOption.label : resolvedPlaceholder}</span>
-				<ChevronDown className={`h-4 w-4 text-(--text-muted) transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+				<span className="font-medium whitespace-nowrap">{selectedOption ? selectedOption.label : resolvedPlaceholder}</span>
+				<ChevronDown className={`h-4 w-4 shrink-0 text-(--text-muted) transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
 			</button>
 
 			<AnimatePresence>
@@ -146,7 +149,7 @@ export function Selector({ value, options, onChange, placeholder, items, require
 							duration: 0.15,
 							ease: 'easeOut',
 						}}
-						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl`}
+						className={`absolute ${alignRight ? 'right-0' : 'left-0'} ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] min-w-full w-max max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl`}
 						style={{
 							padding: 'calc(var(--ui-gap) * 0.25)',
 							display: 'flex',
@@ -180,7 +183,7 @@ export function Selector({ value, options, onChange, placeholder, items, require
 
 						{/* Options List */}
 						<div
-							className="overflow-y-auto max-h-52 flex flex-col"
+							className="overflow-y-auto overflow-x-hidden max-h-52 flex flex-col"
 							style={{
 								gap: 'calc(var(--ui-gap) * 0.25)',
 							}}
@@ -199,16 +202,16 @@ export function Selector({ value, options, onChange, placeholder, items, require
 												setIsOpen(false);
 												setQuery('');
 											}}
-											className={`flex w-full items-center justify-between rounded-xl text-sm transition-colors ${isSelected ? 'bg-(--active-accent)/20 text-(--accent)' : 'text-(--text) hover:bg-(--border)/5'}`}
+											className={`flex w-full items-center justify-between gap-3 whitespace-nowrap rounded-xl text-sm transition-colors ${isSelected ? 'bg-(--active-accent)/20 text-(--accent)' : 'text-(--text) hover:bg-(--border)/5'}`}
 											style={{
 												padding: 'calc(var(--ui-gap) * 0.6) var(--ui-gap)',
 											}}
 										>
-											<div className="flex items-center gap-2">
-												<span className="font-medium">{option.label}</span>
-												{option.badge && <span className="opacity-90">{option.badge}</span>}
+											<div className="flex items-center gap-2 whitespace-nowrap">
+												<span className="font-medium whitespace-nowrap">{option.label}</span>
+												{option.badge && <span className="opacity-90 shrink-0">{option.badge}</span>}
 											</div>
-											{isSelected && <Check className="h-4 w-4" />}
+											{isSelected && <Check className="h-4 w-4 shrink-0" />}
 										</button>
 									);
 								})

@@ -61,7 +61,7 @@ export const Check = forwardRef<HTMLInputElement, CheckProps>(
 						${activeSize.radius}
 						${
 							isActive
-								? 'bg-(--accent) border border-(--accent) text-white shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_35%,transparent)] scale-100'
+								? 'bg-(--accent) border border-(--border)/20 text-(--accent-contrast) shadow-[0_0_14px_color-mix(in_srgb,var(--accent-readable,var(--accent))_35%,transparent)] scale-100'
 								: 'bg-(--background)/70 border border-(--border)/25 text-transparent group-hover/check:border-(--accent)/50 group-hover/check:bg-(--background)/90'
 						}
 					`}

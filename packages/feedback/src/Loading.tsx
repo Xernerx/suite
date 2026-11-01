@@ -1,16 +1,18 @@
 /** @format */
 'use client';
 
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useLayoutEffect } from 'react';
 import { useLoading } from '@xernerx/providers';
 import { XernerxDotLogo } from './XernerxDotLogo';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export function Loading({ message, variant = 'default' }: { message?: string; variant?: 'default' | 'small' }) {
 	const isSmall = variant === 'small';
 	const loaderId = useId();
 	const { registerLoader, unregisterLoader } = useLoading();
 
-	useEffect(() => {
+	useIsomorphicLayoutEffect(() => {
 		if (isSmall) return;
 		registerLoader(loaderId, message);
 		return () => {

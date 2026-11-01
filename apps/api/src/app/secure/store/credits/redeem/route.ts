@@ -51,10 +51,29 @@ export async function POST(req: Request) {
 			creditDoc = await Credit.create({ ownerId: userId, balance: 0, streak: 0 });
 		}
 
-		if (item.perkType === 'vanity_badge') {
+		const ONE_TIME_UNLOCK_PERK_TYPES = new Set(['vanity_badge', 'stage_style', 'icon_pack', 'window_style', 'ambient_scene', 'surface_style', 'profile_cosmetic', 'cursor_fx', 'overlay_skin']);
+
+		const BUNDLE_CHILD_UNLOCKS: Record<string, string[]> = {
+			ambient_scenes_pack: ['ambient_mesh_lava', 'ambient_cyber_grid', 'ambient_topography', 'ambient_nebula_cosmos', 'ambient_prism_caustics'],
+			surface_styles_pack: ['surface_crystal', 'surface_holographic', 'surface_neon', 'surface_obsidian'],
+			profile_frames_pack: ['frame_plasma_ring', 'frame_holo_crown', 'frame_cyber_hex', 'frame_solar_flare'],
+			profile_nameplates_pack: ['nameplate_aurora_wave', 'nameplate_synth_horizon', 'nameplate_nebula_shimmer', 'nameplate_cyber_circuit'],
+			cursor_fx_bundle: ['cursor_starlight_trail', 'cursor_plasma_sparks', 'cursor_cyber_reticle', 'cursor_sonic_rings', 'cursor_aurora_ribbon'],
+			overlay_skins_bundle: ['skin_hud_tactical', 'skin_frosted_prism', 'skin_neon_arcade', 'skin_minimal_pill'],
+		};
+		const CHILD_TO_BUNDLE: Record<string, string> = {};
+		for (const [bundleId, children] of Object.entries(BUNDLE_CHILD_UNLOCKS)) {
+			for (const childId of children) {
+				CHILD_TO_BUNDLE[childId] = bundleId;
+			}
+		}
+
+		if (ONE_TIME_UNLOCK_PERK_TYPES.has(item.perkType)) {
 			const badgeId = String(item.perkValue || item.id);
-			if (Array.isArray(creditDoc.unlockedBadges) && creditDoc.unlockedBadges.includes(badgeId)) {
-				return NextResponse.json({ error: 'You already own this vanity badge.' }, { status: 409 });
+			const parentBundle = CHILD_TO_BUNDLE[badgeId];
+			const ownedList = Array.isArray(creditDoc.unlockedBadges) ? creditDoc.unlockedBadges : [];
+			if (ownedList.includes(badgeId) || (parentBundle && ownedList.includes(parentBundle))) {
+				return NextResponse.json({ error: 'You already own this cosmetic unlock.' }, { status: 409 });
 			}
 		} else if (item.perkType === 'streak_shield') {
 			if ((creditDoc.streakShields || 0) >= 3) {
@@ -99,10 +118,21 @@ export async function POST(req: Request) {
 		} else if (item.perkType === 'bot_slots') {
 			const slots = Math.max(1, Number(item.perkValue) || 1);
 			updateInc.extraBotSlots = slots;
-		} else if (item.perkType === 'vanity_badge') {
+		} else if (ONE_TIME_UNLOCK_PERK_TYPES.has(item.perkType)) {
 			const badgeId = String(item.perkValue || item.id);
 			badgesToUnlock.add(badgeId);
-			badgesToActivate.add(badgeId);
+			if (BUNDLE_CHILD_UNLOCKS[badgeId]) {
+				for (const childId of BUNDLE_CHILD_UNLOCKS[badgeId]) {
+					badgesToUnlock.add(childId);
+				}
+			}
+			const parentBundle = CHILD_TO_BUNDLE[badgeId];
+			if (parentBundle && BUNDLE_CHILD_UNLOCKS[parentBundle]?.every((c) => badgesToUnlock.has(c))) {
+				badgesToUnlock.add(parentBundle);
+			}
+			if (item.perkType === 'vanity_badge') {
+				badgesToActivate.add(badgeId);
+			}
 		} else if (item.perkType === 'streak_shield') {
 			const currentShields = creditDoc.streakShields || 0;
 			const toAdd = Math.min(3 - currentShields, Math.max(1, Number(item.perkValue) || 1));

@@ -2,6 +2,24 @@
 
 # docs
 
+## 1.9.1
+
+### Patch Changes
+
+- Updated the dynamic sitemap configuration and synced static branding assets.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.14.0
+    - @xernerx/feedback@0.5.0
+    - @xernerx/lib@1.19.0
+    - @xernerx/providers@0.20.0
+    - @xernerx/styles@0.3.0
+    - @xernerx/ui@0.7.17
+
 ## 1.9.0
 
 ### Minor Changes
