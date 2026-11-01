@@ -3,9 +3,15 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { syncSisterServers } from '@/lib/sync/settings';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['settings']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Settings permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json().catch(() => ({}));
 		const targetGuildId = body.guildId;
 

@@ -2,6 +2,24 @@
 
 # @xernerx/components
 
+## 0.13.0
+
+### Minor Changes
+
+-   - **Global Omnibar Live Entity Search & Quick Actions**: Upgraded `HeaderOmnibar` (`Ctrl + .`) with debounced live search for public Bots and Servers plus 1-click quick actions (`Toggle Theme`, `Copy Current URL`, `Claim Daily Gift`).
+    - **Media Manager Sort Selector & Total Size Readout**: Added a sort selector (`Newest First`, `Oldest First`, `Largest Size`, `Filename A–Z`) and a live total storage footprint readout to `MediaManager`.
+    - **User Profile Popover, Sidebar & Token Selector Enhancements**: Refined `UserProfilePopover`, `SidebarUser`, `TermsPrompt`, and `AsyncUserMultiSelector`.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 0.12.7
 
 ### Patch Changes

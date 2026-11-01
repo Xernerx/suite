@@ -172,7 +172,7 @@ export function ApplicationConfigModal({ open, onOpenChange, isEditing, formData
 						</div>
 					</div>
 
-					<div className="flex items-center gap-2 mt-2">
+					<div className="flex flex-col gap-2 mt-2">
 						<label className="flex items-center gap-2 text-sm text-(--text-muted) cursor-pointer select-none">
 							<Toggle size="md" checked={formData.requireLogin !== false} onChange={(e) => setFormData({ ...formData, requireLogin: e.target.checked })} />
 							{t('admin.dashboard.applicationConfigs.requiresUserLogin')}

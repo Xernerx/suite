@@ -2,6 +2,8 @@
 
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
 interface AchievementDefinition {
@@ -67,16 +69,32 @@ async function computeMetrics(models: any, userId: string) {
 	};
 }
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
 		const { models } = await database('xernerx');
-		const data = await computeMetrics(models, id);
+		const UserModel = (models.users as any).User;
+		const userDoc = await UserModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] })
+			.select('id privacy')
+			.lean()
+			.catch(() => null);
+		const resolvedUserId = String(userDoc?.id || id);
+
+		const isSystemToken = Boolean(req.headers.get('x-token-id'));
+		const session = (await getServerSession(auth)) as any;
+		const viewerId = session?.user?.id ? String(session.user.id) : null;
+		const isOwner = Boolean(viewerId && (viewerId === resolvedUserId || viewerId === id));
+
+		if (!isOwner && !isSystemToken && userDoc?.privacy === 'private') {
+			return NextResponse.json({ error: 'This user profile is private.' }, { status: 403 });
+		}
+
+		const data = await computeMetrics(models, resolvedUserId);
 
 		return NextResponse.json({
 			achievements: data.achievements,
-			referredBy: (data.creditDoc as any)?.referredBy || null,
-			referralBonusClaimed: Boolean((data.creditDoc as any)?.referralBonusClaimed),
+			referredBy: isOwner || isSystemToken ? (data.creditDoc as any)?.referredBy || null : null,
+			referralBonusClaimed: isOwner || isSystemToken ? Boolean((data.creditDoc as any)?.referralBonusClaimed) : false,
 		});
 	} catch (error: any) {
 		return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
@@ -86,6 +104,14 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		const isSystemToken = Boolean(req.headers.get('x-token-id'));
+		const session = (await getServerSession(auth)) as any;
+		const viewerId = session?.user?.id ? String(session.user.id) : null;
+
+		if (!isSystemToken && (!viewerId || viewerId !== id)) {
+			return NextResponse.json({ error: 'Forbidden: You can only claim achievements for your own account.' }, { status: 403 });
+		}
+
 		const { achievementId } = await req.json().catch(() => ({}));
 		if (!achievementId) {
 			return NextResponse.json({ error: 'achievementId is required' }, { status: 400 });

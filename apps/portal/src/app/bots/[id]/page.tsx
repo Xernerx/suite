@@ -150,6 +150,7 @@ export default function PortalBotPage() {
 
 					const botsWithDiscord = await Promise.all(
 						relatedBots.map(async (b: any) => {
+							if (b.discord?.username || b.discord?.global_name) return b;
 							try {
 								const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${b.id}/discord`));
 								if (res.ok) {
@@ -214,6 +215,7 @@ export default function PortalBotPage() {
 						info: botConfig.info,
 						privacy: botConfig.privacy,
 						widgets: Boolean(botConfig.widgets),
+						owners: Array.isArray(botConfig.owners) && botConfig.owners.length > 0 ? botConfig.owners : undefined,
 						organization: botConfig.organization,
 						tags: botConfig.tags,
 						commands: botConfig.commands,

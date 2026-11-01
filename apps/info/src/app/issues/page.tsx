@@ -37,7 +37,7 @@ export default function IssuesPage() {
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
 	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-	const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'submitted' | 'release'>('all');
+	const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'submitted' | 'release' | 'mine'>('all');
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
 	const [attachment, setAttachment] = useState<File | null>(null);
@@ -262,6 +262,7 @@ export default function IssuesPage() {
 			if (statusFilter === 'verified' && !s.acknowledged) return false;
 			if (statusFilter === 'submitted' && s.acknowledged) return false;
 			if (statusFilter === 'release' && !(s.resolvedApp && s.resolvedVersion)) return false;
+			if (statusFilter === 'mine' && !(user?.id && (s.authorId === user.id || s.author?.id === user.id))) return false;
 
 			const botInfo = resolveBot(s);
 			const prodName = botInfo?.name || s.productId || '';
@@ -275,7 +276,7 @@ export default function IssuesPage() {
 			if (!search) return true;
 			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
 		});
-	}, [search, selectedProduct, statusFilter, issues, orgBots, botProfiles]);
+	}, [search, selectedProduct, statusFilter, issues, orgBots, botProfiles, user?.id]);
 
 	const handlePaste = (e: React.ClipboardEvent) => {
 		const items = e.clipboardData?.items;
@@ -372,7 +373,8 @@ export default function IssuesPage() {
 													{ id: 'verified', label: t('info.bugs.filters.verified') },
 													{ id: 'submitted', label: t('info.bugs.filters.submitted') },
 													{ id: 'release', label: t('info.bugs.filters.release') },
-												] as Array<{ id: 'all' | 'verified' | 'submitted' | 'release'; label: string }>
+													...(user ? [{ id: 'mine', label: t('info.bugs.filters.mine') }] : []),
+												] as Array<{ id: 'all' | 'verified' | 'submitted' | 'release' | 'mine'; label: string }>
 											).map((opt) => (
 												<button
 													key={opt.id}

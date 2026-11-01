@@ -2,6 +2,17 @@
 
 # @xernerx/websocket
 
+## 1.5.0
+
+### Minor Changes
+
+-   - **Welcome Sign-In Bonus & Default Join Roles Provisioning**: Updated the `xernerx` WebSocket RPC service (`ensureUserBonusAndDefaults`) to automatically award the `+1,000 Credits` welcome sign-in bonus, create initial Level 1 records, sync verification flags, and assign default `join_roles` on user RPC queries.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.18.0
+
 ## 1.4.1
 
 ### Patch Changes

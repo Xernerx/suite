@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Settings as SettingsIcon, Building2, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock } from 'lucide-react';
+import { Settings as SettingsIcon, Building2, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock, Copy, Check, ExternalLink, Download, Upload } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import WidgetSettingsCard from '@/components/WidgetSettingsCard';
@@ -22,9 +22,58 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 	const { user, mutate: mutateUser } = useUser();
 	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
+	const [copiedVanity, setCopiedVanity] = useState(false);
 
 	const isVanityUnlocked = Boolean(guildConfig.vanityUnlocked || guildConfig.vanitySlug || guildConfig.verified);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
+	const publicServerUrl = getEnvUrl(`https://app.xernerx.com/servers/${guildConfig.vanitySlug || guildConfig.id}`);
+
+	const handleCopyVanityUrl = () => {
+		navigator.clipboard.writeText(publicServerUrl);
+		setCopiedVanity(true);
+		toast({ type: 'success', title: t('app.dashboard.settings.vanityUrlCopied') });
+		setTimeout(() => setCopiedVanity(false), 2000);
+	};
+
+	const handleExportProfileJson = () => {
+		const payload = {
+			description: guildConfig.description || '',
+			info: guildConfig.info || '',
+			tags: Array.isArray(guildConfig.tags) ? guildConfig.tags : [],
+			links: guildConfig.links || {},
+			locale: guildConfig.locale || 'en-GB',
+			widgets: Boolean(guildConfig.widgets),
+			exportedAt: new Date().toISOString(),
+		};
+		const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `xernerx-server-profile-${guildConfig.vanitySlug || guildConfig.id}.json`;
+		a.click();
+		URL.revokeObjectURL(url);
+		toast({ type: 'success', title: t('app.dashboard.settings.exportSuccess') });
+	};
+
+	const handleImportProfileJson = async (file: File) => {
+		try {
+			const text = await file.text();
+			const parsed = JSON.parse(text);
+			if (!parsed || typeof parsed !== 'object') throw new Error('Invalid JSON');
+			setGuildConfig({
+				...guildConfig,
+				description: typeof parsed.description === 'string' ? parsed.description : guildConfig.description,
+				info: typeof parsed.info === 'string' ? parsed.info : guildConfig.info,
+				tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 12) : guildConfig.tags,
+				links: parsed.links && typeof parsed.links === 'object' ? { ...guildConfig.links, ...parsed.links } : guildConfig.links,
+				locale: typeof parsed.locale === 'string' ? parsed.locale : guildConfig.locale,
+				widgets: typeof parsed.widgets === 'boolean' ? parsed.widgets : guildConfig.widgets,
+			});
+			toast({ type: 'success', title: t('app.dashboard.settings.importSuccess') });
+		} catch {
+			toast({ type: 'error', title: t('app.dashboard.settings.importError') });
+		}
+	};
 
 	const handleUnlockVanity = async () => {
 		setUnlockingVanity(true);
@@ -108,8 +157,26 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 							</Badge>
 						)}
 					</div>
-					<div className="flex flex-wrap items-center gap-1 text-xs text-(--text-muted)">
-						{t('app.dashboard.settings.vanitySlugDesc')} <span className="font-mono text-(--accent)">xernerx.com/servers/{guildConfig.vanitySlug || guildConfig.id}</span>
+					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
+						<span>{t('app.dashboard.settings.vanitySlugDesc')}</span>
+						<span className="font-mono text-(--accent)">xernerx.com/servers/{guildConfig.vanitySlug || guildConfig.id}</span>
+						<button
+							type="button"
+							onClick={handleCopyVanityUrl}
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+						>
+							{copiedVanity ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
+							<span>{t('app.dashboard.settings.copyVanityUrl')}</span>
+						</button>
+						<a
+							href={publicServerUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors"
+						>
+							<span>{t('app.dashboard.settings.openPublicProfile')}</span>
+							<ExternalLink size={11} />
+						</a>
 					</div>
 					{!isVanityUnlocked && (
 						<p className="text-xs text-(--text-muted) flex items-center gap-1.5 mt-0.5">
@@ -151,6 +218,43 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 				enabled={Boolean(guildConfig.widgets)}
 				onChange={(val) => setGuildConfig({ ...guildConfig, widgets: val })}
 			/>
+
+			{/* Server Profile Backup & Restore Card */}
+			<div
+				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+			>
+				<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
+					<div className="flex items-center text-(--text) font-semibold text-base" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+						<Download size={18} className="text-(--accent)" />
+						<h3>{t('app.dashboard.settings.backupTitle')}</h3>
+					</div>
+					<p className="text-xs text-(--text-muted)">{t('app.dashboard.settings.backupDesc')}</p>
+				</div>
+				<div className="flex flex-wrap items-center gap-2 shrink-0">
+					<Button variant="secondary" onClick={handleExportProfileJson} className="gap-2">
+						<Download size={15} />
+						<span>{t('app.dashboard.settings.exportJson')}</span>
+					</Button>
+					<input
+						type="file"
+						id="server-profile-json-import"
+						accept="application/json,.json"
+						className="hidden"
+						onChange={(e) => {
+							const f = e.target.files?.[0];
+							if (f) void handleImportProfileJson(f);
+							e.target.value = '';
+						}}
+					/>
+					<label htmlFor="server-profile-json-import" className="cursor-pointer">
+						<Button variant="secondary" className="gap-2" style={{ pointerEvents: 'none' }}>
+							<Upload size={15} />
+							<span>{t('app.dashboard.settings.importJson')}</span>
+						</Button>
+					</label>
+				</div>
+			</div>
 
 			{/* Transfer Organization Card */}
 			<div

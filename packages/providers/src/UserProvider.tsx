@@ -124,6 +124,34 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 						}
 					} else if (res.ok) {
 						xernerx = await res.json();
+
+						const needsSignInBonus = !xernerx?.credits?.signInBonusClaimed;
+						const needsJoinRoles = !Array.isArray(xernerx?.roles) || xernerx.roles.length === 0;
+
+						if (needsSignInBonus || needsJoinRoles) {
+							const postRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
+								method: 'POST',
+								credentials: 'include',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({
+									...(session?.user || {}),
+									credits: { balance: 1000 },
+									level: { level: 1, xp: 0 },
+									roles: ['1b333119-d818-4fb1-a5dc-12621fd14198'],
+								}),
+							}).catch(() => null);
+
+							if (postRes?.ok) {
+								const postData = await postRes.json();
+								xernerx = { ...xernerx, ...postData };
+								if (postData?.bonusGranted) {
+									toast({
+										title: t('account.user.created'),
+										type: 'info',
+									});
+								}
+							}
+						}
 					} else {
 						toast({
 							title: t('account.user.fetchError'),

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
 import { products } from '@xernerx/lib';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
 	apiVersion: '2026-10-28.endive',
@@ -52,6 +53,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['users', 'manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Staff permission required to grant staff subscription' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const userId = (await params).id;
 
 		if (!userId) return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -188,6 +194,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		).lean();
 
 		const allSubscriptions = SubscriptionModel ? await SubscriptionModel.find({ ownerId: userId }).lean() : syncedEntries;
+
+		await recordAuditLog(req, {
+			action: 'user.staff_subscription.grant',
+			targetType: 'user',
+			targetId: userId,
+			summary: `Granted staff subscription override to user "${user.name || userId}"`,
+			metadata: { staffSubscription: true, stripeCustomerId: customerId },
+		});
 
 		return NextResponse.json({ ...updatedUser, staffSubscription: true, subscriptions: allSubscriptions }, { status: 200 });
 	} catch (error: any) {

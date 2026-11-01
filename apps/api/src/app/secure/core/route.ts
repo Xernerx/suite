@@ -2,9 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
-export async function GET() {
+export async function GET(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req);
+		if (!caller.authenticated) {
+			return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+		}
+
 		const db = (await database('xernerx')).models.core as any;
 		const RoleModel = db.Role;
 		const roles = await RoleModel.find({}).lean();
@@ -17,6 +23,11 @@ export async function GET() {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['roles']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing roles permission.' }, { status: 403 });
+		}
+
 		const body = await req.json();
 		const db = (await database('xernerx')).models.core as any;
 		const RoleModel = db.Role;
@@ -65,6 +76,15 @@ export async function POST(req: Request) {
 			...body,
 			mappings,
 		});
+
+		await recordAuditLog(req, {
+			action: 'role.created',
+			targetType: 'role',
+			targetId: newRole.id,
+			summary: `Created role "${newRole.name || newRole.id}"`,
+			metadata: { name: newRole.name, discordRole: newRole.role || null },
+		});
+
 		return NextResponse.json(newRole, { status: 201 });
 	} catch (error) {
 		console.error('Failed to create role:', error);

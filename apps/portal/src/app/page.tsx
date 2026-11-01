@@ -84,7 +84,7 @@ export default function PortalPage() {
 		const populateDiscordBots = async (botList: any[]) => {
 			return Promise.all(
 				botList.map(async (bot: any) => {
-					if (bot.discord) return bot;
+					if (bot.discord?.username || bot.discord?.global_name) return bot;
 					try {
 						const discordRes = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${bot.id}/discord`));
 						if (discordRes.ok) {
@@ -239,22 +239,12 @@ export default function PortalPage() {
 		if (bots.length > 0) {
 			bots.forEach((bot) => {
 				const avatarHash = bot.discord?.avatar || bot.avatar;
+				const avatarUrl = bot.discord?.avatarUrl || (avatarHash ? `https://cdn.discordapp.com/avatars/${bot.id}/${avatarHash}.png?size=64` : null);
 				dynamicItems.push({
-					label: bot.discord?.username || bot.name || bot.id,
+					label: bot.discord?.global_name || bot.discord?.username || bot.name || bot.id,
 					href: `/bots/${bot.id}`,
 					category: t('common.nav.categories.bots'),
-					icon: avatarHash
-						? () => (
-								<Image
-									src={`https://cdn.discordapp.com/avatars/${bot.id}/${avatarHash}.png?size=64`}
-									alt={bot.name || bot.id}
-									width={20}
-									height={20}
-									unoptimized
-									className="w-5 h-5 rounded-xl object-cover"
-								/>
-							)
-						: (Bot as any),
+					icon: avatarUrl ? () => <Image src={avatarUrl} alt={bot.name || bot.id} width={20} height={20} unoptimized className="w-5 h-5 rounded-xl object-cover" /> : (Bot as any),
 				});
 			});
 		}
@@ -414,7 +404,7 @@ export default function PortalPage() {
 						<Loading variant="default" />
 					</div>
 				) : selectedOrg === 'personal' ? (
-					<PersonalWorkspace session={session} bots={bots} organizations={organizations} />
+					<PersonalWorkspace session={session} bots={bots} organizations={organizations} guilds={guilds} onCreateOrg={() => setCreateModalOpen(true)} />
 				) : selectedOrg ? (
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 						<OrgWorkspaceHeader organization={selectedOrg} />
@@ -449,8 +439,10 @@ export default function PortalPage() {
 									/>
 								)}
 								{activeTab === 'roles' && <OrgRolesTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} />}
-								{activeTab === 'bots' && <OrgBotsTab bots={bots} selectedOrg={selectedOrg} orgGuilds={orgGuilds} />}
-								{activeTab === 'servers' && <OrgServersTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} orgGuilds={orgGuilds} />}
+								{activeTab === 'bots' && <OrgBotsTab bots={bots} setBots={setBots} selectedOrg={selectedOrg} orgGuilds={orgGuilds} />}
+								{activeTab === 'servers' && (
+									<OrgServersTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} orgGuilds={orgGuilds} setOrgGuilds={setOrgGuilds} managedGuilds={guilds} />
+								)}
 								{activeTab === 'links' && <OrgLinksTab orgConfig={orgConfig} setOrgConfig={setOrgConfig} />}
 								{activeTab === 'settings' && (
 									<OrgSettingsTab

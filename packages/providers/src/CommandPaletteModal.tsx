@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Camera, Compass, Copy, Globe, HelpCircle, Layers, LayoutGrid, Loader2, Moon, Search, Settings, SidebarIcon, Sun, Trophy, X } from 'lucide-react';
+import { ArrowRight, Camera, Coins, Compass, Copy, FileCode2, Globe, HelpCircle, Layers, LayoutGrid, Loader2, Moon, Search, Settings, SidebarIcon, Sun, Trophy, User, X } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -47,6 +47,7 @@ export function CommandPaletteModal({
 	const [roles, setRoles] = useState<any[]>([]);
 	const [liveBots, setLiveBots] = useState<any[]>([]);
 	const [liveServers, setLiveServers] = useState<any[]>([]);
+	const [liveOrganizations, setLiveOrganizations] = useState<any[]>([]);
 	const [communityData, setCommunityData] = useState<{ issues: any[]; suggestions: any[]; roadmap: any[] }>({ issues: [], suggestions: [], roadmap: [] });
 	const [faqCatalog, setFaqCatalog] = useState<any[]>(cachedFaqCatalog || []);
 	const [docsCatalog, setDocsCatalog] = useState<any[]>(cachedDocsCatalog || []);
@@ -59,6 +60,7 @@ export function CommandPaletteModal({
 			setSelectedIndex(0);
 			setLiveBots([]);
 			setLiveServers([]);
+			setLiveOrganizations([]);
 			return;
 		}
 		setTimeout(() => inputRef.current?.focus(), 20);
@@ -109,6 +111,7 @@ export function CommandPaletteModal({
 		if (!isOpen || trimmed.length < 2) {
 			setLiveBots([]);
 			setLiveServers([]);
+			setLiveOrganizations([]);
 			setSearchingLive(false);
 			return;
 		}
@@ -121,10 +124,14 @@ export function CommandPaletteModal({
 				fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${encodeURIComponent(trimmed)}&limit=4`))
 					.then((r) => (r.ok ? r.json() : []))
 					.catch(() => []),
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?search=${encodeURIComponent(trimmed)}&limit=4`))
+					.then((r) => (r.ok ? r.json() : []))
+					.catch(() => []),
 			])
-				.then(([botsRes, guildsRes]) => {
+				.then(([botsRes, guildsRes, orgsRes]) => {
 					setLiveBots(Array.isArray(botsRes) ? botsRes : []);
 					setLiveServers(Array.isArray(guildsRes) ? guildsRes : []);
+					setLiveOrganizations(Array.isArray(orgsRes) ? orgsRes : []);
 				})
 				.finally(() => setSearchingLive(false));
 		}, 180);
@@ -264,8 +271,44 @@ export function CommandPaletteModal({
 					window.location.href = getEnvUrl('https://account.xernerx.com');
 					onClose();
 				},
+			},
+			{
+				id: 'action-new-paste',
+				section: 'actions',
+				label: t('components.header.omnibar.actionNewPaste'),
+				icon: FileCode2,
+				onSelect: () => {
+					window.location.href = getEnvUrl('https://haste.xernerx.com');
+					onClose();
+				},
+			},
+			{
+				id: 'action-daily-credits',
+				section: 'actions',
+				label: t('components.header.omnibar.actionDailyCredits'),
+				icon: Coins,
+				onSelect: () => {
+					window.location.href = getEnvUrl('https://store.xernerx.com/?tab=credits');
+					onClose();
+				},
 			}
 		);
+
+		const resolvedUserId = (activeUser as any)?.id || (activeUser as any)?.userId;
+		if (resolvedUserId) {
+			list.push({
+				id: 'action-copy-discord-id',
+				section: 'actions',
+				label: t('components.header.omnibar.actionCopyDiscordId'),
+				icon: User,
+				onSelect: () => {
+					navigator.clipboard.writeText(String(resolvedUserId)).then(() => {
+						toast({ type: 'success', title: t('components.header.omnibar.discordIdCopied'), description: String(resolvedUserId) });
+					});
+					onClose();
+				},
+			});
+		}
 
 		visibleNavigation.forEach((app, idx) => {
 			list.push({
@@ -305,6 +348,7 @@ export function CommandPaletteModal({
 			trimmedQuery: trimmed,
 			liveBots,
 			liveServers,
+			liveOrganizations,
 			communityData,
 			faqCatalog,
 			docsCatalog,
@@ -312,7 +356,7 @@ export function CommandPaletteModal({
 			onClose,
 		});
 		return [...staticMatches, ...dynamicItems];
-	}, [allItems, query, liveBots, liveServers, communityData, faqCatalog, docsCatalog, getEnvUrl, onClose]);
+	}, [allItems, query, liveBots, liveServers, liveOrganizations, communityData, faqCatalog, docsCatalog, getEnvUrl, onClose]);
 
 	useEffect(() => {
 		setSelectedIndex(0);
@@ -338,6 +382,7 @@ export function CommandPaletteModal({
 		{ key: 'actions', title: t('common.shortcuts.modal.palette.sections.actions') },
 		{ key: 'bots', title: t('common.shortcuts.modal.palette.sections.bots') },
 		{ key: 'servers', title: t('common.shortcuts.modal.palette.sections.servers') },
+		{ key: 'organizations', title: t('common.shortcuts.modal.palette.sections.organizations') },
 		{ key: 'docs', title: t('common.shortcuts.modal.palette.sections.docs') },
 		{ key: 'faq', title: t('common.shortcuts.modal.palette.sections.faq') },
 		{ key: 'community', title: t('common.shortcuts.modal.palette.sections.community') },

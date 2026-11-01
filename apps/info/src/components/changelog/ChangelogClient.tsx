@@ -292,6 +292,15 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 						<span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
 							{activeLog.group === 'packages' ? t('www.changelog.packagesCategory') : t('www.changelog.category')}
 						</span>
+						{parsedSections[0]?.id && (
+							<button
+								type="button"
+								onClick={() => jumpToVersion(parsedSections[0].id)}
+								className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-(--accent) text-white shadow-xs hover:bg-(--hover-accent) transition-colors cursor-pointer"
+							>
+								{t('www.changelog.latestVersionBadge', { version: parsedSections[0].id })}
+							</button>
+						)}
 					</div>
 					<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
 				</div>
@@ -308,6 +317,43 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 						<Rss size={15} className="text-(--accent-orange)" />
 						{t('www.changelog.rssFeed')}
 					</Button>
+				</div>
+			</div>
+
+			{/* 3-Card Release Telemetry Summary Strip */}
+			<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('www.changelog.kpi.appsTracked')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{changelogs.filter((c) => (c.group || 'applications') === 'applications').length}
+						</p>
+					</div>
+					<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<LayoutDashboard size={18} />
+					</div>
+				</div>
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('www.changelog.kpi.packagesTracked')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{changelogs.filter((c) => c.group === 'packages').length}
+						</p>
+					</div>
+					<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<Package size={18} />
+					</div>
+				</div>
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+					<div>
+						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('www.changelog.kpi.releasesInFeed')}</span>
+						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{parsedSections.length}
+						</p>
+					</div>
+					<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+						<Tag size={18} />
+					</div>
 				</div>
 			</div>
 

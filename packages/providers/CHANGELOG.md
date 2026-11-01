@@ -2,6 +2,18 @@
 
 # @xernerx/providers
 
+## 0.19.0
+
+### Minor Changes
+
+-   - **Global Command Palette Live Entity Search**: Upgraded `CommandPaletteModal` (`Ctrl + K` / `Ctrl + Shift + K`) and `commandPaletteData` to query live public Bots and Servers from `/core/bots` and `/core/guilds` alongside workspace routes and quick actions.
+    - **User Provider Welcome Bonus & Profile Sync**: Updated `UserProvider` to synchronize welcome sign-in bonus state and profile metadata.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.18.0
+
 ## 0.18.5
 
 ### Patch Changes

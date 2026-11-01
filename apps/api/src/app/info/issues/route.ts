@@ -43,30 +43,63 @@ export async function GET(req: NextRequest) {
 			status === 'open' ? enriched.filter((issue: any) => issue.status !== 'resolved' || (issue.resolvedApp && issue.resolvedVersion && issue.releaseStatus !== 'production')) : enriched;
 
 		const authorIds: string[] = [...new Set<string>(filteredIssues.map((i: any) => i.authorId).filter(Boolean))];
-		const users = await models.users.User.find({ id: { $in: authorIds } }).lean();
+		const users = await models.users.User.find({ id: { $in: authorIds } })
+			.select('id name icon vanitySlug discordCache')
+			.lean();
 		const userMap: Record<string, any> = {};
 
 		await Promise.all(
 			authorIds.map(async (id: string) => {
+				const dbUser = users.find((u: any) => u.id === id);
+				const cached = dbUser?.discordCache;
+				if (cached?.username || cached?.globalName) {
+					userMap[id] = {
+						id,
+						name: cached.globalName || cached.username || dbUser?.name,
+						icon: cached.avatarUrl || dbUser?.icon || null,
+						vanitySlug: dbUser?.vanitySlug,
+					};
+					return;
+				}
 				try {
-					if (process.env.DISCORD_CLIENT_TOKEN) {
+					const token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
+					if (token) {
 						const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
-							headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+							headers: { Authorization: `Bot ${token}` },
 							next: { revalidate: 3600 },
 						});
 						if (discordRes.ok) {
 							const data = await discordRes.json();
+							const avatarUrl = data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null;
 							userMap[id] = {
 								id,
 								name: data.global_name || data.username,
-								icon: data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null,
+								icon: avatarUrl,
+								vanitySlug: dbUser?.vanitySlug,
 							};
+							if (dbUser) {
+								models.users.User.updateOne(
+									{ id },
+									{
+										$set: {
+											name: data.global_name || data.username || dbUser.name,
+											...(avatarUrl ? { icon: avatarUrl } : {}),
+											discordCache: {
+												username: data.username,
+												globalName: data.global_name || null,
+												avatar: data.avatar || null,
+												avatarUrl,
+												cachedAt: new Date(),
+											},
+										},
+									}
+								).catch(() => {});
+							}
 							return;
 						}
 					}
 				} catch {}
-				const dbUser = users.find((u: any) => u.id === id);
-				userMap[id] = dbUser ? { id, name: dbUser.name, icon: dbUser.icon } : { id, name: 'Unknown User', icon: null };
+				userMap[id] = dbUser ? { id, name: dbUser.name, icon: dbUser.icon, vanitySlug: dbUser.vanitySlug } : { id, name: 'Unknown User', icon: null };
 			})
 		);
 
@@ -127,7 +160,7 @@ export async function POST(req: NextRequest) {
 				],
 				ctaLinks: [
 					{ label: 'Inspect Issue', url: `https://info.xernerx.com/bugs?id=${issue.id}` },
-					{ label: 'Report a Bug (+500 Credits)', url: 'https://info.xernerx.com/bugs' },
+					{ label: 'Report a Bug', url: 'https://info.xernerx.com/bugs' },
 				],
 			}
 		).catch(() => {});

@@ -2,9 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
-export async function GET() {
+export async function GET(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['settings']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing settings permission.' }, { status: caller.authenticated ? 403 : 401 });
+		}
+
 		const db = (await database('xernerx')).models.core as any;
 		const CoreModel = db.Core;
 

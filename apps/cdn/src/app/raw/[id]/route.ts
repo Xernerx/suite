@@ -1,22 +1,12 @@
 /** @format */
 
-import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
+import { getCdnCorsHeaders } from '@/lib/cors';
 
 function getCorsHeaders(origin: string | null) {
-	const isLocal = origin?.includes('localhost');
-	const isXernerx = origin?.endsWith('.xernerx.com');
-
-	const allowedOrigin = isLocal || isXernerx ? origin : 'https://xernerx.com';
-
-	return {
-		'Access-Control-Allow-Origin': allowedOrigin || '*',
-		'Access-Control-Allow-Methods': 'GET, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-		'Access-Control-Allow-Credentials': 'true',
-	};
+	return getCdnCorsHeaders(origin, 'GET, OPTIONS');
 }
 
 export async function OPTIONS(req: Request) {
@@ -84,9 +74,13 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		// Stream the response directly to the client
+		const isPrivate = media.privacy === 'private';
 		const headers = new Headers(corsHeaders);
 		headers.set('Content-Type', media.mimeType || 'application/octet-stream');
-		headers.set('Cache-Control', 'public, max-age=31536000, immutable'); // heavily cache since it's immutable
+		headers.set('Cache-Control', isPrivate ? 'private, no-store, no-cache, must-revalidate' : 'public, max-age=31536000, immutable');
+		if (isPrivate) {
+			headers.set('Vary', 'Origin, Cookie, Authorization');
+		}
 
 		return new Response(stream as any, {
 			status: 200,

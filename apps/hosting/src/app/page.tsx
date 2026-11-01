@@ -38,7 +38,7 @@ export default function HostingPage() {
 			try {
 				const [settingsRes, ...roleResponses] = await Promise.all([
 					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/hosting_nodes_config'), { credentials: 'include' }).catch(() => null),
-					...roleIds.map((roleId: string) => fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`)).catch(() => null)),
+					...roleIds.map((roleId: string) => fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' }).catch(() => null)),
 				]);
 
 				if (settingsRes && settingsRes.ok) {

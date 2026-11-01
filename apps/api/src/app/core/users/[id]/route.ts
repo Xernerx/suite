@@ -115,7 +115,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			avatarUrl,
 			bannerUrl,
 			accent: (appearanceDoc as any)?.accent || null,
-			verified: Boolean(user?.verified),
+			verified: Boolean(user?.verified || (user?.agreedTerms && user?.agreedPrivacy)),
 			streak: (creditDoc as any)?.streak || 0,
 			vanityBadges,
 			dotMatrixBanner,

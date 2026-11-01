@@ -3,11 +3,16 @@
 import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth, sendUserNotification } from '@/lib/auditAndNotify';
 import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageIssues']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Issue management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 
@@ -113,13 +118,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 					{ models },
 					{
 						feedType: 'issues',
-						title: `🛡️ Bug Verified (+500 Credits): ${String(updated.title || id).slice(0, 120)}`,
+						title: `🛡️ Bug Verified: ${String(updated.title || id).slice(0, 120)}`,
 						url: 'https://info.xernerx.com/bugs',
 						description: String(updated.description || 'Verified by engineering and queued for resolution.').slice(0, 300),
 						color: 0x8b7cf6,
 						fields: [
 							{ name: 'Product', value: `\`${updated.productId || 'Suite'}\``, inline: true },
-							...(updated.authorId ? [{ name: 'Reporter', value: `<@${updated.authorId}> (\`+500 Credits\`)`, inline: true }] : []),
+							...(updated.authorId ? [{ name: 'Reporter', value: `<@${updated.authorId}>`, inline: true }] : []),
 						],
 						ctaLinks: [{ label: 'Track on Bug Tracker', url: 'https://info.xernerx.com/bugs' }],
 					}
@@ -135,6 +140,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageIssues']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Issue management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const { models } = await database('xernerx');
 		const deleted = (await models.core.Issue.findOneAndDelete({ id }).lean()) as any;

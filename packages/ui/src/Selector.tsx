@@ -17,6 +17,7 @@ export interface SelectorProps {
 	placeholder?: string;
 	items?: boolean;
 	required?: boolean;
+	toggleClassName?: string;
 }
 
 // Helper to extract plain text string from any ReactNode (handles strings, elements, arrays)
@@ -37,7 +38,7 @@ function getLabelString(label: React.ReactNode): string {
 	}
 	return '';
 }
-export function Selector({ value, options, onChange, placeholder, items, required }: SelectorProps) {
+export function Selector({ value, options, onChange, placeholder, items, required, toggleClassName = '' }: SelectorProps) {
 	const { t } = useDictionary();
 	const resolvedPlaceholder = placeholder ?? t('common.selector.defaultPlaceholder');
 	const [isOpen, setIsOpen] = useState(false);
@@ -117,7 +118,7 @@ export function Selector({ value, options, onChange, placeholder, items, require
 			<button
 				type="button"
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex w-full items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none"
+				className={`flex w-full items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none ${toggleClassName}`}
 				style={{
 					gap: 'var(--ui-gap)',
 				}}

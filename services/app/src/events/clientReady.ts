@@ -3,6 +3,7 @@
 import { createLogger, database } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { syncBotCommands, updateBotPresence } from '../lib/botUtils.js';
+import { syncMainServerBotIconEmojis } from '../lib/botIconEmojis.js';
 
 const appBotLog = createLogger('APP-BOT');
 
@@ -52,6 +53,7 @@ export default class AppClientReadyEvent extends EventBuilder {
 	override async run() {
 		updateBotPresence(this.client);
 		this.updateBotStatuses();
+		syncMainServerBotIconEmojis(this.client);
 		syncBotCommands(this.client, process.env.XERNERX_APP_TOKEN || process.env.XERNERX_TOKEN);
 	}
 

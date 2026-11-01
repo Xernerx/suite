@@ -3,11 +3,17 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { syncSisterServers } from '@/lib/sync/settings';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		if (id.endsWith('_webhook_url')) {
+			const caller = await resolveCallerAuth(req, ['settings', 'access']);
+			if (!caller.authorized && !caller.isStaff) {
+				return NextResponse.json({ error: 'Forbidden: Webhook settings are restricted to staff.' }, { status: 403 });
+			}
+		}
 		const db = (await database('xernerx')).models.core as any;
 		const SettingModel = db.Setting;
 
@@ -26,6 +32,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['settings']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing settings permission.' }, { status: 403 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const db = (await database('xernerx')).models.core as any;

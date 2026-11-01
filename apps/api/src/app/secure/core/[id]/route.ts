@@ -2,10 +2,15 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req);
+		if (!caller.authenticated) {
+			return NextResponse.json({ error: 'Unauthorized: Authentication required.' }, { status: 401 });
+		}
+
 		const { id } = await params;
 		const db = (await database('xernerx')).models.core as any;
 		const RoleModel = db.Role;
@@ -24,6 +29,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['roles']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing roles permission.' }, { status: 403 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const db = (await database('xernerx')).models.core as any;
@@ -53,6 +63,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['roles']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing roles permission.' }, { status: 403 });
+		}
+
 		const { id } = await params;
 		const db = (await database('xernerx')).models.core as any;
 		const RoleModel = db.Role;

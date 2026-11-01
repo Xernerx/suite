@@ -5,6 +5,7 @@ import {
 	Activity,
 	AlertTriangle,
 	Bot,
+	Building2,
 	Gauge,
 	Key,
 	Languages,
@@ -32,6 +33,7 @@ import Bots from '@/components/Bots';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
 import HomeOverview from '@/components/HomeOverview';
+import Organizations from '@/components/Organizations';
 import Overview from '@/components/Overview';
 import Roles from '@/components/Roles';
 import Servers from '@/components/Servers';
@@ -157,7 +159,7 @@ export default function Home() {
 			try {
 				const roleDocs = await Promise.all(
 					roleIds.map(async (roleId: string) => {
-						const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`));
+						const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
 						if (res.ok) {
 							const roleDoc = await res.json();
 							return roleDoc.permissions || {};
@@ -199,6 +201,7 @@ export default function Home() {
 	const canUsers = hasDbFallback || (userRolePermissions.users ?? permissions.find((p) => p.key === 'users')?.defaultValue ?? true);
 	const canBots = hasDbFallback || (userRolePermissions.bots ?? userRolePermissions.users ?? true);
 	const canServers = hasDbFallback || (userRolePermissions.servers ?? userRolePermissions.users ?? true);
+	const canOrganizations = hasDbFallback || (userRolePermissions.organizations ?? userRolePermissions.users ?? true);
 	const canApplicationsReview = hasDbFallback || (userRolePermissions.applications_review ?? permissions.find((p) => p.key === 'applications_review')?.defaultValue ?? false);
 	const canApplicationsManage = hasDbFallback || (userRolePermissions.applications_manage ?? permissions.find((p) => p.key === 'applications_manage')?.defaultValue ?? false);
 	const canRoles = hasDbFallback || (userRolePermissions.roles ?? permissions.find((p) => p.key === 'roles')?.defaultValue ?? false);
@@ -271,6 +274,7 @@ export default function Home() {
 		if (canUsers && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.users'), view: 'users', icon: UsersIcon });
 		if (canBots && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.bots'), view: 'bots', icon: Bot });
 		if (canServers && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.servers'), view: 'servers', icon: Server });
+		if (canOrganizations && isServerSet) items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.organizations'), view: 'organizations', icon: Building2 });
 		if (canApplicationsReview && isServerSet)
 			items.push({ category: t('common.nav.categories.moderator'), label: t('common.nav.items.applications_review'), view: 'applications_review', icon: Ticket });
 		if (canMedia) items.push({ category: t('common.nav.categories.moderator'), label: t('admin.dashboard.nav.mediaLibrary'), view: 'media', icon: Image });
@@ -370,6 +374,7 @@ export default function Home() {
 	if (canUsers && isServerSet) allowedViews.push('users');
 	if (canBots && isServerSet) allowedViews.push('bots');
 	if (canServers && isServerSet) allowedViews.push('servers');
+	if (canOrganizations && isServerSet) allowedViews.push('organizations');
 	if (canApplicationsReview && isServerSet) allowedViews.push('applications_review');
 	if (canApplicationsManage && isServerSet) allowedViews.push('applications_manage');
 	if (canRoles && isServerSet) allowedViews.push('roles');
@@ -400,6 +405,7 @@ export default function Home() {
 						canUsers,
 						canBots,
 						canServers,
+						canOrganizations,
 						canRoles,
 						canApplicationsReview,
 						canApplicationsManage,
@@ -424,9 +430,14 @@ export default function Home() {
 			{activeView === 'support' && <Support />}
 			{activeView === 'media' && <Media />}
 			{activeView === 'translations' && <Translations initialLocale={triageQuery} />}
-			{activeView === 'users' && <Users initialSearch={triageQuery} onViewAuditLogs={(userId) => handleNavigateFromOverview('audit', userId)} />}
-			{activeView === 'bots' && <Bots initialSearch={triageQuery} onViewAuditLogs={(botId) => handleNavigateFromOverview('audit', botId)} />}
-			{activeView === 'servers' && <Servers initialSearch={triageQuery} onViewAuditLogs={(serverId) => handleNavigateFromOverview('audit', serverId)} />}
+			{activeView === 'users' && <Users initialSearch={triageQuery} onViewAuditLogs={(userId) => handleNavigateFromOverview('audit', userId)} onNavigateEntity={handleNavigateFromOverview} />}
+			{activeView === 'bots' && <Bots initialSearch={triageQuery} onViewAuditLogs={(botId) => handleNavigateFromOverview('audit', botId)} onNavigateEntity={handleNavigateFromOverview} />}
+			{activeView === 'servers' && (
+				<Servers initialSearch={triageQuery} onViewAuditLogs={(serverId) => handleNavigateFromOverview('audit', serverId)} onNavigateEntity={handleNavigateFromOverview} />
+			)}
+			{activeView === 'organizations' && (
+				<Organizations initialSearch={triageQuery} onViewAuditLogs={(orgId) => handleNavigateFromOverview('audit', orgId)} onNavigateEntity={handleNavigateFromOverview} />
+			)}
 			{activeView === 'applications_review' && <ApplicationReviews initialSearch={triageQuery} />}
 			{activeView === 'applications_manage' && <ApplicationConfigs />}
 			{activeView === 'roles' && <Roles />}

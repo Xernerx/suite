@@ -4,11 +4,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Clock, Code2, FileCode2, FolderGit2, Globe, Link2, Lock, Plus, Save, Trash2 } from 'lucide-react';
+import { Clock, Code2, FileCode2, FolderGit2, Globe, Link2, Lock, Plus, Save, Trash2, Upload } from 'lucide-react';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useShortcuts, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Button, Input, Selector } from '@xernerx/ui';
-import { formatBytes, HASTE_LANGUAGES } from './hasteConstants';
+import { detectHasteLanguageFromFilename, formatBytes, HASTE_LANGUAGES } from './hasteConstants';
 import { HasteExplorerList } from './HasteExplorerList';
 
 type HasteTab = 'editor' | 'mine';
@@ -33,6 +33,31 @@ export function HasteStudioClient() {
 	const [expiresIn, setExpiresIn] = useState<'1h' | '24h' | '7d' | '30d' | 'never'>('7d');
 	const [content, setContent] = useState('');
 	const [saving, setSaving] = useState(false);
+	const [isDraggingFile, setIsDraggingFile] = useState(false);
+
+	const handleImportFile = useCallback(
+		async (file: File) => {
+			if (!file) return;
+			try {
+				const text = await file.text();
+				const detectedLang = detectHasteLanguageFromFilename(file.name);
+				setContent(text);
+				setLanguage(detectedLang);
+				setTitle((prev) => (prev.trim() ? prev : file.name));
+				toast({
+					type: 'success',
+					title: t('haste.toasts.fileImportedTitle'),
+					description: t('haste.toasts.fileImportedDescription', { name: file.name, language: detectedLang }),
+				});
+			} catch {
+				toast({
+					type: 'error',
+					title: t('haste.toasts.errorTitle'),
+				});
+			}
+		},
+		[t, toast]
+	);
 
 	// Redirect unauthenticated users to Account Login
 	useEffect(() => {
@@ -221,7 +246,21 @@ export function HasteStudioClient() {
 				<HasteExplorerList />
 			) : (
 				<div
-					className="flex flex-col rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_10%,transparent)]"
+					onDragOver={(e) => {
+						e.preventDefault();
+						setIsDraggingFile(true);
+					}}
+					onDragLeave={() => setIsDraggingFile(false)}
+					onDrop={(e) => {
+						e.preventDefault();
+						setIsDraggingFile(false);
+						if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+							void handleImportFile(e.dataTransfer.files[0]);
+						}
+					}}
+					className={`flex flex-col rounded-3xl bg-(--foreground)/30 backdrop-blur-md border transition-all shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_10%,transparent)] ${
+						isDraggingFile ? 'border-(--accent) bg-(--accent)/10' : 'border-(--border)/10'
+					}`}
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					{/* Studio Header Row */}
@@ -238,7 +277,23 @@ export function HasteStudioClient() {
 							</div>
 						</div>
 
-						<div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+						<div className="flex items-center flex-wrap gap-2 self-end sm:self-auto shrink-0">
+							<input
+								type="file"
+								id="haste-file-import"
+								className="hidden"
+								onChange={(e) => {
+									const f = e.target.files?.[0];
+									if (f) void handleImportFile(f);
+									e.target.value = '';
+								}}
+							/>
+							<label htmlFor="haste-file-import" className="cursor-pointer">
+								<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" style={{ pointerEvents: 'none' }}>
+									<Upload className="w-4 h-4 mr-1.5" />
+									{t('haste.actions.importFile')}
+								</Button>
+							</label>
 							{content.length > 0 && (
 								<Button
 									variant="secondary"

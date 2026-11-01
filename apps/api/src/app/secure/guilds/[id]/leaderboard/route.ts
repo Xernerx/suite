@@ -146,7 +146,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 		const users =
 			allUserIds.length > 0
 				? await UserModel.find({ id: { $in: allUserIds } })
-						.select('id name icon privacy')
+						.select('id name icon privacy vanitySlug discordCache')
 						.lean()
 						.catch(() => [])
 				: [];
@@ -158,7 +158,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 		const enrichEntry = (entry: any, type: 'levels' | 'text' | 'voice') => {
 			const uid = String(entry?.userId || entry?.id || '');
 			const profile = userMap.get(uid);
-			const isPrivate = profile?.privacy === 'private';
+			const dc = profile?.discordCache;
 
 			const level = Number(entry?.level ?? 0);
 			const xp = Number(entry?.xp ?? 0);
@@ -166,28 +166,21 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 			const rawTimeSpent = Number(entry?.voiceMinutes ?? entry?.timeSpent ?? 0);
 			const voiceMinutes = entry?.voiceMinutes !== undefined ? Number(entry.voiceMinutes) : rawTimeSpent > 1000 ? Math.round(rawTimeSpent / 60) : rawTimeSpent;
 
-			if (isPrivate) {
-				return {
-					id: null,
-					userId: null,
-					name: 'Private User',
-					avatarUrl: null,
-					level,
-					xp,
-					nextLevelXp,
-					messages: type === 'text' ? Number(entry?.messages ?? 0) : undefined,
-					voiceMinutes: type === 'voice' ? voiceMinutes : undefined,
-					isPrivate: true,
-					user: null,
-				};
-			}
+			const avatarUrl =
+				dc?.avatarUrl ||
+				(dc?.avatar ? `https://cdn.discordapp.com/avatars/${uid}/${dc.avatar}.png?size=128` : null) ||
+				(profile?.icon ? (String(profile.icon).startsWith('http') ? profile.icon : `https://cdn.discordapp.com/avatars/${uid}/${profile.icon}.png?size=128`) : null);
 
-			const avatarUrl = profile?.icon ? (String(profile.icon).startsWith('http') ? profile.icon : `https://cdn.discordapp.com/avatars/${uid}/${profile.icon}.png?size=128`) : null;
+			const username = dc?.username || profile?.name || entry?.username || entry?.name || undefined;
+			const globalName = dc?.globalName || profile?.name || dc?.username || entry?.global_name || entry?.name || undefined;
 
 			return {
 				id: uid,
 				userId: uid,
-				name: profile?.name || entry?.name || undefined,
+				vanitySlug: profile?.vanitySlug || undefined,
+				name: globalName || username,
+				username,
+				global_name: globalName,
 				avatarUrl,
 				level,
 				xp,
@@ -195,14 +188,17 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 				messages: type === 'text' ? Number(entry?.messages ?? 0) : undefined,
 				voiceMinutes: type === 'voice' ? voiceMinutes : undefined,
 				isPrivate: false,
-				user: profile
-					? {
-							id: uid,
-							username: profile.name,
-							global_name: profile.name,
-							avatarUrl,
-						}
-					: null,
+				user:
+					username || globalName || avatarUrl
+						? {
+								id: uid,
+								vanitySlug: profile?.vanitySlug || undefined,
+								username,
+								global_name: globalName,
+								avatar: dc?.avatar || null,
+								avatarUrl,
+							}
+						: null,
 			};
 		};
 

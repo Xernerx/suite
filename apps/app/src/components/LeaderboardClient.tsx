@@ -189,7 +189,14 @@ export default function LeaderboardClient() {
 					...(nextData.guildLevels?.text || []),
 					...(nextData.guildLevels?.voice || []),
 				];
-				const idsToFetch = Array.from(new Set(allEntries.map((x) => (x?.id ? String(x.id) : '')).filter(Boolean)));
+				const nextMap: Record<string, DiscordProfile> = {};
+				for (const entry of allEntries) {
+					const eid = entry?.id ? String(entry.id) : '';
+					if (eid && (entry?.discord?.username || entry?.discord?.global_name)) {
+						nextMap[eid] = entry.discord;
+					}
+				}
+				const idsToFetch = Array.from(new Set(allEntries.map((x) => (x?.id ? String(x.id) : '')).filter((eid) => Boolean(eid && !nextMap[eid]))));
 				const entries = await Promise.all(
 					idsToFetch.map(async (id) => {
 						try {
@@ -201,7 +208,6 @@ export default function LeaderboardClient() {
 				);
 
 				if (cancelled) return;
-				const nextMap: Record<string, DiscordProfile> = {};
 				for (const item of entries) if (item) nextMap[item[0]] = item[1];
 				setDiscordMap(nextMap);
 			})
@@ -366,6 +372,13 @@ export default function LeaderboardClient() {
 	const podiumEntries = showPodium ? processedList.slice(0, 3) : [];
 	const listEntries = showPodium ? processedList.slice(3) : processedList;
 
+	const myStanding = useMemo(() => {
+		if (!sessionUserId || (activeTab !== 'streaks' && activeTab !== 'levels')) return null;
+		const idx = processedList.findIndex((item) => String(item.id) === sessionUserId);
+		if (idx === -1) return { rank: null, entry: null };
+		return { rank: idx + 1, entry: processedList[idx] };
+	}, [sessionUserId, activeTab, processedList]);
+
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full py-10 px-4" style={{ gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}>
 			<div className="flex flex-col md:flex-row md:items-end justify-between" style={{ gap: 'var(--ui-gap)' }}>
@@ -429,6 +442,40 @@ export default function LeaderboardClient() {
 					<Selector items={true} value={sortBy} onChange={handleSortChange} options={sortOptions.map((opt) => ({ value: opt.id, label: `${t('app.leaderboard.sortBy')}: ${opt.label}` }))} />
 				</div>
 			</div>
+
+			{/* Signed-in User Standing Banner on Streaks & Levels Tabs */}
+			{myStanding && (
+				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-3.5 rounded-3xl border border-(--accent)/30 bg-(--accent)/10 backdrop-blur-md shadow-sm">
+					<div className="flex flex-wrap items-center gap-3">
+						<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-(--accent) text-white shadow-xs">
+							<Trophy size={13} />
+							{myStanding.rank ? t('app.leaderboard.rankedNumber', { rank: myStanding.rank }) : t('app.leaderboard.myStandingTitle')}
+						</span>
+						<span className="text-xs sm:text-sm font-bold text-(--text)">
+							{myStanding.rank ? t('app.leaderboard.myStandingTitle') : t('app.leaderboard.unrankedInTop', { count: processedList.length })}
+						</span>
+						{myStanding.entry && renderMetricBadges(myStanding.entry)}
+					</div>
+					<div className="flex items-center gap-2 shrink-0">
+						{activeTab === 'streaks' && (
+							<a
+								href={getEnvUrl('https://store.xernerx.com/?tab=credits')}
+								className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl text-xs font-bold bg-(--background)/70 text-(--accent) border border-(--accent)/30 hover:bg-(--accent) hover:text-white transition-colors"
+							>
+								<Flame size={13} />
+								{t('app.leaderboard.claimDailyGift')}
+							</a>
+						)}
+						<Link
+							href={`/users/${sessionUserId}`}
+							className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl text-xs font-bold bg-(--background)/70 text-(--text) border border-(--border)/15 hover:border-(--accent)/40 hover:text-(--accent) transition-colors"
+						>
+							<Users size={13} />
+							{t('app.leaderboard.viewMyProfile')}
+						</Link>
+					</div>
+				</div>
+			)}
 
 			{loading ? (
 				<div className="flex items-center justify-center py-24">

@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 function getLogoDataUri(): string | undefined {
 	try {
@@ -19,6 +20,11 @@ function getLogoDataUri(): string | undefined {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['announcements', 'settings']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Announcements permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json();
 		const { channelId, name } = body;
 

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, CheckCircle2, Clock, Key, Play, Radio, RotateCcw, Sparkles, Terminal, Zap } from 'lucide-react';
+import { Activity, CheckCircle2, Clock, Code2, Copy, Key, Play, Radio, RotateCcw, Sparkles, Terminal, Zap } from 'lucide-react';
 import { Button, CodeBlock, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 
@@ -17,54 +17,12 @@ interface PresetAction {
 }
 
 const PRESET_ACTIONS: PresetAction[] = [
-	{
-		id: 'ping',
-		label: 'ping',
-		service: 'xernerx',
-		method: 'GET',
-		action: 'ping',
-		body: { echo: 'heartbeat' },
-	},
-	{
-		id: 'stats',
-		label: 'stats',
-		service: 'xernerx',
-		method: 'POST',
-		action: 'bots',
-		body: { id: '102938475612345678', guildCount: 420, shardCount: 2, userCount: 84500 },
-	},
-	{
-		id: 'guilds',
-		label: 'guilds',
-		service: 'virtue',
-		method: 'GET',
-		action: 'guilds',
-		body: { id: '102938475612345678' },
-	},
-	{
-		id: 'levels',
-		label: 'levels',
-		service: 'xernerx',
-		method: 'GET',
-		action: 'levels',
-		body: { ownerId: '482513687417061376' },
-	},
-	{
-		id: 'users',
-		label: 'users',
-		service: 'xernerx',
-		method: 'GET',
-		action: 'users',
-		body: { id: '482513687417061376' },
-	},
-	{
-		id: 'credits',
-		label: 'credits',
-		service: 'xernerx',
-		method: 'PATCH',
-		action: 'credits',
-		body: { ownerId: '482513687417061376', streak: 7 },
-	},
+	{ id: 'ping', label: 'ping', service: 'xernerx', method: 'GET', action: 'ping', body: { echo: 'heartbeat' } },
+	{ id: 'stats', label: 'stats', service: 'xernerx', method: 'POST', action: 'bots', body: { id: '102938475612345678', guildCount: 420, shardCount: 2, userCount: 84500 } },
+	{ id: 'guilds', label: 'guilds', service: 'virtue', method: 'GET', action: 'guilds', body: { id: '102938475612345678' } },
+	{ id: 'levels', label: 'levels', service: 'xernerx', method: 'GET', action: 'levels', body: { ownerId: '482513687417061376' } },
+	{ id: 'users', label: 'users', service: 'xernerx', method: 'GET', action: 'users', body: { id: '482513687417061376' } },
+	{ id: 'credits', label: 'credits', service: 'xernerx', method: 'PATCH', action: 'credits', body: { ownerId: '482513687417061376', streak: 7 } },
 ];
 
 function buildSimulatedResponse(reqId: string, service: string, method: string, action: string, parsedBody: Record<string, any>) {
@@ -158,6 +116,32 @@ export function WebsocketPlayground() {
 	const [latencyMs, setLatencyMs] = useState<number | null>(null);
 	const [responseJson, setResponseJson] = useState<string>('');
 	const [lastRequestJson, setLastRequestJson] = useState<string>('');
+	const [history, setHistory] = useState<{ id: string; service: string; method: string; action: string; bodyText: string; responseJson: string; latencyMs: number; mode: 'live' | 'simulated' }[]>(
+		[]
+	);
+
+	const handleFormatJson = () => {
+		try {
+			const parsed = bodyText.trim() ? JSON.parse(bodyText) : {};
+			setBodyText(JSON.stringify(parsed, null, 2));
+		} catch {
+			toast({ type: 'error', title: t('docs.websocket.playground.invalidJson') });
+		}
+	};
+
+	const handleCopyWscat = () => {
+		let parsed: Record<string, any> = {};
+		try {
+			parsed = bodyText.trim() ? JSON.parse(bodyText) : {};
+		} catch {
+			toast({ type: 'error', title: t('docs.websocket.playground.invalidJson') });
+			return;
+		}
+		const frame = JSON.stringify({ id: 'rpc-cli', service, method, action: action.trim() || undefined, body: parsed });
+		const cmd = `npx wscat -c wss://ws.xernerx.com -x '${frame.replace(/'/g, "'\\''")}'`;
+		navigator.clipboard.writeText(cmd);
+		toast({ type: 'success', title: t('docs.websocket.playground.wscatCopied') });
+	};
 
 	const handleSelectPreset = (preset: PresetAction) => {
 		setService(preset.service);
@@ -238,9 +222,11 @@ export function WebsocketPlayground() {
 				});
 
 				const elapsed = Math.max(1, Math.round(performance.now() - start));
+				const formattedRes = JSON.stringify(liveResult, null, 2);
 				setLatencyMs(elapsed);
 				setLastMode('live');
-				setResponseJson(JSON.stringify(liveResult, null, 2));
+				setResponseJson(formattedRes);
+				setHistory((prev) => [{ id: reqId, service, method, action: action.trim(), bodyText, responseJson: formattedRes, latencyMs: elapsed, mode: 'live' as const }, ...prev].slice(0, 5));
 				setDispatching(false);
 				return;
 			} catch {
@@ -251,9 +237,11 @@ export function WebsocketPlayground() {
 		await new Promise((r) => setTimeout(r, 120));
 		const simulated = buildSimulatedResponse(reqId, service, method, action.trim(), parsedBody);
 		const elapsed = Math.max(1, Math.round(performance.now() - start));
+		const formattedSim = JSON.stringify(simulated, null, 2);
 		setLatencyMs(elapsed);
 		setLastMode('simulated');
-		setResponseJson(JSON.stringify(simulated, null, 2));
+		setResponseJson(formattedSim);
+		setHistory((prev) => [{ id: reqId, service, method, action: action.trim(), bodyText, responseJson: formattedSim, latencyMs: elapsed, mode: 'simulated' as const }, ...prev].slice(0, 5));
 		setDispatching(false);
 	};
 
@@ -396,7 +384,17 @@ export function WebsocketPlayground() {
 
 					{/* JSON Body Textarea */}
 					<div className="flex flex-col gap-1.5">
-						<label className="text-xs font-bold text-(--text-muted)">{t('docs.websocket.playground.bodyLabel')}</label>
+						<div className="flex items-center justify-between gap-2">
+							<label className="text-xs font-bold text-(--text-muted)">{t('docs.websocket.playground.bodyLabel')}</label>
+							<button
+								type="button"
+								onClick={handleFormatJson}
+								className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--background)/60 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 transition-colors cursor-pointer"
+							>
+								<Code2 size={10} />
+								<span>{t('docs.websocket.playground.formatJson')}</span>
+							</button>
+						</div>
 						<Input variant="textarea" rows={5} value={bodyText} onChange={(e) => setBodyText(e.target.value)} className="font-mono text-xs" placeholder="{}" />
 					</div>
 
@@ -410,6 +408,11 @@ export function WebsocketPlayground() {
 						<Button variant="secondary" onClick={() => handleDispatch(true)} disabled={dispatching}>
 							<Sparkles size={14} className="text-(--accent)" />
 							<span>{t('docs.websocket.playground.simulateButton')}</span>
+						</Button>
+
+						<Button variant="secondary" size="sm" onClick={handleCopyWscat}>
+							<Copy size={13} className="text-(--accent)" />
+							<span>{t('docs.websocket.playground.copyWscat')}</span>
 						</Button>
 
 						{responseJson && (
@@ -470,6 +473,36 @@ export function WebsocketPlayground() {
 							/>
 						</div>
 					</div>
+
+					{history.length > 0 && (
+						<div className="flex flex-col gap-1.5">
+							<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('docs.websocket.playground.recentDispatches')}</span>
+							<div className="flex flex-wrap items-center gap-1.5">
+								{history.map((h) => (
+									<button
+										key={h.id}
+										type="button"
+										onClick={() => {
+											setService(h.service);
+											setMethod(h.method);
+											setAction(h.action);
+											setBodyText(h.bodyText);
+											setResponseJson(h.responseJson);
+											setLatencyMs(h.latencyMs);
+											setLastMode(h.mode);
+										}}
+										className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-(--background)/60 hover:bg-(--accent)/15 text-(--text) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+									>
+										<span className="font-bold text-(--accent)">{h.method}</span>
+										<span>
+											{h.service}/{h.action || 'default'}
+										</span>
+										<span className="text-(--text-muted)">({h.latencyMs}ms)</span>
+									</button>
+								))}
+							</div>
+						</div>
+					)}
 
 					<div className="p-3.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 flex items-start gap-2.5">
 						<Activity size={16} className="text-(--accent) shrink-0 mt-0.5" />

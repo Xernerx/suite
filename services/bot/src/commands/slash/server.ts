@@ -335,7 +335,7 @@ export default class ServerCommand extends SlashCommandBuilder {
 					.setURL(serverUrl)
 					.setDescription(
 						canVote
-							? `You can vote for **${serverName}** right now on [app.xernerx.com](${serverUrl}) to support the community and earn **+100 base credits** (up to **200** with an active subscription multiplier).`
+							? `You can vote for **${serverName}** right now on [app.xernerx.com](${serverUrl}) to support the community.`
 							: `You have already voted for **${serverName}** within the last 12 hours.`
 					)
 					.addFields([
@@ -346,7 +346,7 @@ export default class ServerCommand extends SlashCommandBuilder {
 						},
 						{
 							name: 'Server Totals',
-							value: [`• **Total Votes:** \`${Number(totalVotes).toLocaleString()}\``, `• **Reward:** \`+100 Credits\``].join('\n'),
+							value: `• **Total Votes:** \`${Number(totalVotes).toLocaleString()}\``,
 							inline: true,
 						},
 					])

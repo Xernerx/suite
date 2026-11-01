@@ -2,6 +2,21 @@
 
 # Changelog
 
+## 1.3.1
+
+### Patch Changes
+
+-   - **Hosting Console Localization & Telemetry**: Synced hosting node console views and status labels with the central localization dictionary.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 1.3.0
 
 ### Minor Changes

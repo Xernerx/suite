@@ -4,13 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 import { database, sendWebhook } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth, sendUserNotification } from '@/lib/auditAndNotify';
 import { syncUserRoles } from '@/lib/sync/users';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
-		const includeSecrets = req.nextUrl.searchParams.get('includeSecrets') === 'true';
+		const requestedSecrets = req.nextUrl.searchParams.get('includeSecrets') === 'true';
 		const { models } = await database('xernerx');
 
 		const user = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
@@ -20,14 +21,34 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 		}
 
 		const resolvedId = user.id;
+		let includeSecrets = false;
+		if (requestedSecrets) {
+			const caller = await resolveCallerAuth(req, ['users']);
+			includeSecrets = Boolean(caller.isSystemToken || caller.authorized || caller.userId === resolvedId || caller.userId === id);
+		}
 
 		// Fetch separated domain models in parallel
-		const [appearance, credits, levels, subscriptions, organizations, verifiedIssuesCount, approvedSuggestionsCount] = await Promise.all([
+		const [appearance, credits, levels, subscriptions, organizations, ownedBots, ownedServers, directOrgs, verifiedIssuesCount, approvedSuggestionsCount] = await Promise.all([
 			models.users.Appearance.findOne({ ownerId: resolvedId }).lean(),
 			models.users.Credit.findOne({ ownerId: resolvedId }).lean(),
 			models.users.Level.find({ ownerId: resolvedId }).lean(),
 			models.users.Subscription.find({ ownerId: resolvedId }).lean(),
 			models.organizations.Member.find({ userId: resolvedId }).lean(),
+			(models.bots.Bot as any)
+				.find({ owners: resolvedId })
+				.select(['id', 'name', 'avatar', 'privacy', 'verified', 'vanitySlug'])
+				.lean()
+				.catch(() => []),
+			(models.guilds.Guild as any)
+				.find({ owner: resolvedId })
+				.select(['id', 'name', 'icon', 'privacy', 'verified', 'vanitySlug'])
+				.lean()
+				.catch(() => []),
+			(models.organizations.Organization as any)
+				.find({ $or: [{ owner: resolvedId }, { members: resolvedId }] })
+				.select(['_id', 'name', 'icon', 'iconUrl', 'owner', 'verified', 'privacy', 'vanitySlug'])
+				.lean()
+				.catch(() => []),
 			(models.core.Issue as any).countDocuments({ authorId: resolvedId, acknowledged: true }).catch(() => 0),
 			(models.core.Suggestion as any)
 				.countDocuments({
@@ -36,6 +57,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 				})
 				.catch(() => 0),
 		]);
+
+		const userOrganizations = (directOrgs || []).map((org: any) => ({
+			id: String(org._id || org.id),
+			name: org.name || 'Unnamed Organization',
+			icon: org.iconUrl || org.icon || '',
+			privacy: org.privacy || 'private',
+			verified: Boolean(org.verified),
+			vanitySlug: org.vanitySlug || '',
+			isOwner: org.owner === resolvedId,
+		}));
 
 		const sanitizedConnections = Array.isArray((user as any).connections)
 			? (user as any).connections.map((conn: any) => {
@@ -68,17 +99,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			} as any);
 		}
 
+		const isVerified = Boolean(user.verified || (user.agreedTerms && user.agreedPrivacy));
+		if (isVerified && !user.verified) {
+			await models.users.User.updateOne({ id: resolvedId }, { $set: { verified: true } }).catch(() => {});
+		}
+
+		const hasBonusTx = Array.isArray((credits as any)?.transactions) && (credits as any).transactions.some((t: any) => t?.itemId === 'signin_bonus');
+		const signInBonusClaimed = Boolean((credits as any)?.signInBonusClaimed || hasBonusTx);
+
 		return NextResponse.json({
 			...user,
+			verified: isVerified,
 			staffSubscription: isStaffSubActive,
 			connections: sanitizedConnections,
-			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug || user.verified || isStaffSubActive),
+			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug || isStaffSubActive),
 			appearance: appearance || {},
-			credits: credits || { balance: 0, streak: 0 },
+			credits: credits ? { ...credits, signInBonusClaimed } : { balance: 0, streak: 0, signInBonusClaimed: false },
 			level: (levels && levels[0]) || { level: 1, xp: 0 },
 			levels: levels || [],
 			subscriptions: resolvedSubscriptions,
 			organizations: organizations || [],
+			ownedBots: ownedBots || [],
+			ownedServers: ownedServers || [],
+			userOrganizations,
 			communityStats: {
 				verifiedIssuesCount: verifiedIssuesCount || 0,
 				approvedSuggestionsCount: approvedSuggestionsCount || 0,
@@ -89,30 +132,61 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 	}
 }
 
+const SIGN_IN_BONUS_AMOUNT = 1000;
+const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		const caller = await resolveCallerAuth(req, ['users']);
+		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
+		if (!isStaffOrSystem && caller.userId !== id) {
+			return NextResponse.json({ error: 'Forbidden: You can only initialize your own account profile.' }, { status: 403 });
+		}
+
 		const body = await req.json().catch(() => ({}));
 		const { models } = await database('xernerx');
 
-		// Check if user already exists to prevent duplicate key errors
-		const existingUser = await models.users.User.findOne({ id });
-		if (existingUser) return NextResponse.json({ error: 'User already exists' }, { status: 409 });
-
-		const { appearance, credits, level, ...userBody } = body;
+		const existingUser = (await models.users.User.findOne({ id }).lean()) as any;
+		const { appearance, credits: rawCredits, level: rawLevel, _id: _omitId, __v: _omitV, ...userBody } = body || {};
+		const credits = isStaffOrSystem ? rawCredits : undefined;
+		const level = isStaffOrSystem ? rawLevel : undefined;
+		if (!isStaffOrSystem) {
+			delete userBody.roles;
+			delete userBody.staffSubscription;
+			delete userBody.verified;
+			delete userBody.vanityUnlocked;
+			delete userBody.stripeCustomerId;
+		}
 
 		// Fetch default join roles
 		const joinRolesSetting = await models.core.Setting.findOne({ id: 'join_roles' }).lean();
-		let joinRoles = [];
+		let joinRoles: string[] = [];
 		try {
 			joinRoles = JSON.parse(joinRolesSetting?.value || '[]');
 		} catch {}
-		const mergedRoles = Array.from(new Set([...(userBody.roles || []), ...joinRoles]));
+		const mergedRoles = Array.from(new Set([...(existingUser?.roles || []), ...(isStaffOrSystem ? userBody.roles || [] : []), DEFAULT_JOIN_ROLE_ID, ...joinRoles].filter(Boolean)));
 
-		// Create new user, enforcing the ID from the URL and injecting the default roles
-		const newUser = await models.users.User.create({ ...userBody, roles: mergedRoles, id });
+		let userDoc: any = existingUser;
+		let rolesJustGranted = false;
 
-		if (mergedRoles.length > 0) {
+		if (!existingUser) {
+			const created = await models.users.User.create({ ...userBody, roles: mergedRoles, id });
+			userDoc = created?.toObject ? created.toObject() : created;
+			rolesJustGranted = mergedRoles.length > 0;
+		} else {
+			const hadRoles = Array.isArray(existingUser.roles) && existingUser.roles.length > 0;
+			const backfillUpdates: Record<string, any> = { roles: mergedRoles };
+			if (!existingUser.name && userBody.name) backfillUpdates.name = userBody.name;
+			if (!existingUser.email && userBody.email) backfillUpdates.email = userBody.email;
+			if (existingUser.agreedTerms && existingUser.agreedPrivacy && !existingUser.verified) {
+				backfillUpdates.verified = true;
+			}
+			userDoc = await models.users.User.findOneAndUpdate({ id }, { $set: backfillUpdates }, { returnDocument: 'after', runValidators: true }).lean();
+			rolesJustGranted = !hadRoles && mergedRoles.length > 0;
+		}
+
+		if (rolesJustGranted) {
 			const webhookSetting = await models.core.Setting.findOne({ id: 'app_webhook_url' }).lean();
 			if (webhookSetting?.value) {
 				await sendWebhook({
@@ -130,17 +204,75 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			}
 		}
 
-		if (appearance) {
-			await models.users.Appearance.create({ ...appearance, ownerId: id, id: crypto.randomUUID() });
-		}
-		if (credits) {
-			await models.users.Credit.create({ ...credits, ownerId: id, id: crypto.randomUUID() });
-		}
-		if (level) {
-			await models.users.Level.create({ ...level, ownerId: id, id: crypto.randomUUID() });
+		let appearanceDoc = (await models.users.Appearance.findOne({ ownerId: id }).lean()) as any;
+		if (appearance && !appearanceDoc) {
+			const createdApp = await models.users.Appearance.create({ ...appearance, ownerId: id, id: crypto.randomUUID() });
+			appearanceDoc = createdApp?.toObject ? createdApp.toObject() : createdApp;
 		}
 
-		return NextResponse.json(newUser, { status: 201 });
+		const existingCredit = (await models.users.Credit.findOne({ ownerId: id }).lean()) as any;
+		let creditDoc: any = existingCredit;
+		let bonusGranted = false;
+		const bonusTx = {
+			id: crypto.randomUUID(),
+			type: 'earn',
+			amount: SIGN_IN_BONUS_AMOUNT,
+			multiplierPercent: 100,
+			itemId: 'signin_bonus',
+			itemName: 'Welcome Sign-In Bonus',
+			createdAt: new Date(),
+		};
+
+		if (!existingCredit) {
+			const initialBalance = Math.max(SIGN_IN_BONUS_AMOUNT, Number(credits?.balance) || 0);
+			const createdCredit = await models.users.Credit.create({
+				...(credits || {}),
+				ownerId: id,
+				balance: initialBalance,
+				signInBonusClaimed: true,
+				transactions: [bonusTx, ...(Array.isArray(credits?.transactions) ? credits.transactions : [])],
+			});
+			creditDoc = createdCredit?.toObject ? createdCredit.toObject() : createdCredit;
+			bonusGranted = true;
+		} else {
+			const hasBonusTx = Array.isArray(existingCredit.transactions) && existingCredit.transactions.some((t: any) => t?.itemId === 'signin_bonus');
+			const alreadyClaimed = Boolean(existingCredit.signInBonusClaimed || hasBonusTx);
+			if (!alreadyClaimed) {
+				creditDoc = await models.users.Credit.findOneAndUpdate(
+					{ ownerId: id },
+					{
+						$inc: { balance: SIGN_IN_BONUS_AMOUNT },
+						$set: { signInBonusClaimed: true },
+						$push: { transactions: { $each: [bonusTx], $position: 0 } },
+					},
+					{ returnDocument: 'after', runValidators: true }
+				).lean();
+				bonusGranted = true;
+			}
+		}
+
+		let levelDoc = (await models.users.Level.findOne({ ownerId: id }).lean()) as any;
+		if (!levelDoc) {
+			const createdLevel = await models.users.Level.create({
+				...(level || { level: 1, xp: 0 }),
+				ownerId: id,
+				id: crypto.randomUUID(),
+			});
+			levelDoc = createdLevel?.toObject ? createdLevel.toObject() : createdLevel;
+		}
+
+		return NextResponse.json(
+			{
+				...userDoc,
+				appearance: appearanceDoc || {},
+				credits: creditDoc || { balance: SIGN_IN_BONUS_AMOUNT, streak: 0, signInBonusClaimed: true },
+				level: levelDoc || { level: 1, xp: 0 },
+				levels: levelDoc ? [levelDoc] : [],
+				bonusGranted,
+				isNewProfile: !existingUser,
+			},
+			{ status: existingUser ? 200 : 201 }
+		);
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
 	}
@@ -155,9 +287,79 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const existingDoc = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
 		const resolvedId = existingDoc?.id || id;
 
-		const { appearance, credits, level, _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...userBody } = body || {};
+		const caller = await resolveCallerAuth(req, ['users']);
+		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
+		if (!isStaffOrSystem && caller.userId !== resolvedId && caller.userId !== id) {
+			return NextResponse.json({ error: 'Forbidden: You can only update your own profile.' }, { status: 403 });
+		}
+
+		const { appearance, credits: rawCredits, level: rawLevel, _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, ...userBody } = body || {};
+		const credits = isStaffOrSystem ? rawCredits : undefined;
+		const level = isStaffOrSystem ? rawLevel : undefined;
+
+		if (!isStaffOrSystem) {
+			if (userBody.action === 'send_notification') {
+				return NextResponse.json({ error: 'Forbidden: Only staff can dispatch manual notifications.' }, { status: 403 });
+			}
+			delete userBody.roles;
+			delete userBody.staffSubscription;
+			delete userBody.vanityUnlocked;
+			delete userBody.stripeCustomerId;
+			if (!(userBody.agreedTerms && userBody.agreedPrivacy)) {
+				delete userBody.verified;
+			}
+		}
+
 		const unsetFields: Record<string, 1> = {};
-		const isVanityAlreadyUnlocked = Boolean(existingDoc?.vanityUnlocked || existingDoc?.vanitySlug || existingDoc?.verified);
+		const isVanityAlreadyUnlocked = Boolean(existingDoc?.vanityUnlocked || existingDoc?.vanitySlug || (isStaffOrSystem && userBody.vanityUnlocked));
+
+		if (userBody.action === 'sync_roles') {
+			const db = await database('xernerx');
+			await syncUserRoles(resolvedId, db);
+			await recordAuditLog(req, {
+				action: 'user.roles.sync',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Synced Discord roles for user "${existingDoc?.name || resolvedId}"`,
+			});
+			return NextResponse.json({ success: true });
+		}
+
+		if (userBody.action === 'send_notification') {
+			const notifTitle = String(userBody.title || '').trim();
+			const notifMessage = String(userBody.message || '').trim();
+			const notifType = (['info', 'success', 'warning', 'error'].includes(userBody.type) ? userBody.type : 'info') as 'info' | 'success' | 'warning' | 'error';
+			const notifLink = userBody.link ? String(userBody.link).trim() : null;
+			if (!notifTitle || !notifMessage) {
+				return NextResponse.json({ error: 'Title and message are required.' }, { status: 400 });
+			}
+			await sendUserNotification({
+				targetId: resolvedId,
+				type: notifType,
+				title: notifTitle,
+				message: notifMessage,
+				link: notifLink,
+			});
+			await recordAuditLog(req, {
+				action: 'user.notify',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Sent notification "${notifTitle}" to user "${existingDoc?.name || resolvedId}"`,
+				metadata: { type: notifType, title: notifTitle, link: notifLink },
+			});
+			return NextResponse.json({ success: true });
+		}
+
+		if (userBody.agreedTerms && userBody.agreedPrivacy) {
+			userBody.verified = true;
+		} else if (userBody.verified === true) {
+			const now = new Date();
+			if (!existingDoc?.agreedTerms && !userBody.agreedTerms) userBody.agreedTerms = now;
+			if (!existingDoc?.agreedPrivacy && !userBody.agreedPrivacy) userBody.agreedPrivacy = now;
+		} else if (userBody.verified === false) {
+			userBody.agreedTerms = null;
+			userBody.agreedPrivacy = null;
+		}
 
 		if (userBody.action === 'unlock_vanity') {
 			delete userBody.action;
@@ -184,6 +386,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		if (userBody.birthday === '' || userBody.birthday === null) {
 			delete userBody.birthday;
 			unsetFields.birthday = 1;
+		}
+
+		if (userBody.gender === '' || userBody.gender === null) {
+			delete userBody.gender;
+			unsetFields.gender = 1;
 		}
 
 		if (userBody.vanitySlug !== undefined) {
@@ -240,11 +447,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			}
 		}
 
+		let addedRoles: string[] = [];
+		let removedRoles: string[] = [];
 		if (userBody.roles && oldUser && updatedUser) {
-			const oldRoles = new Set(oldUser.roles || []);
-			const newRoles = new Set(updatedUser.roles || []);
-			const addedRoles = [...newRoles].filter((r) => !oldRoles.has(r));
-			const removedRoles = [...oldRoles].filter((r) => !newRoles.has(r));
+			const oldRoles = new Set((oldUser.roles || []) as string[]);
+			const newRoles = new Set((updatedUser.roles || []) as string[]);
+			addedRoles = [...newRoles].filter((r) => !oldRoles.has(r));
+			removedRoles = [...oldRoles].filter((r) => !newRoles.has(r));
 
 			if (addedRoles.length > 0 || removedRoles.length > 0) {
 				const webhookSetting = await models.core.Setting.findOne({ id: 'app_webhook_url' }).lean();
@@ -300,6 +509,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			updatedAppearance = await models.users.Appearance.findOne({ ownerId: resolvedId }).lean();
 		}
 
+		const existingCredits = credits ? await models.users.Credit.findOne({ ownerId: resolvedId }).lean() : null;
 		let updatedCredits: any = null;
 		if (credits) {
 			const { _id: _cId, __v: _cV, createdAt: _cCreated, updatedAt: _cUpdated, ownerId: _cOwner, ...cleanCredits } = credits;
@@ -308,12 +518,138 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			updatedCredits = await models.users.Credit.findOne({ ownerId: resolvedId }).lean();
 		}
 
+		const existingLevel = level ? await models.users.Level.findOne({ ownerId: resolvedId }).lean() : null;
 		let updatedLevel: any = null;
 		if (level) {
 			const { _id: _lId, __v: _lV, createdAt: _lCreated, updatedAt: _lUpdated, ownerId: _lOwner, ...cleanLevel } = level;
 			updatedLevel = await models.users.Level.findOneAndUpdate({ ownerId: resolvedId }, { $set: cleanLevel }, { upsert: true, returnDocument: 'after', runValidators: true }).lean();
 		} else {
 			updatedLevel = await models.users.Level.findOne({ ownerId: resolvedId }).lean();
+		}
+
+		const changes: string[] = [];
+		const metaChanges: Record<string, any> = {};
+
+		if (userBody.name !== undefined && (existingDoc?.name || null) !== (updatedUser.name || null)) {
+			changes.push(`name: "${existingDoc?.name || ''}" → "${updatedUser.name || ''}"`);
+			metaChanges.name = updatedUser.name || null;
+		}
+		if (userBody.privacy !== undefined && (existingDoc?.privacy || 'public') !== (updatedUser.privacy || 'public')) {
+			changes.push(`privacy: ${existingDoc?.privacy || 'public'} → ${updatedUser.privacy}`);
+			metaChanges.privacy = updatedUser.privacy;
+		}
+		if (userBody.description !== undefined && (existingDoc?.description || null) !== (updatedUser.description || null)) {
+			changes.push('description updated');
+			metaChanges.descriptionUpdated = true;
+		}
+		if (userBody.info !== undefined && (existingDoc?.info || null) !== (updatedUser.info || null)) {
+			changes.push('info updated');
+			metaChanges.infoUpdated = true;
+		}
+		if (typeof userBody.verified === 'boolean' && Boolean(existingDoc?.verified) !== Boolean(updatedUser.verified)) {
+			changes.push(`verified: ${updatedUser.verified ? 'true' : 'false'}`);
+			metaChanges.verified = Boolean(updatedUser.verified);
+		}
+		if (typeof userBody.widgets === 'boolean' && Boolean((existingDoc as any)?.widgets) !== Boolean((updatedUser as any).widgets)) {
+			changes.push(`widgets: ${(updatedUser as any).widgets ? 'enabled' : 'disabled'}`);
+			metaChanges.widgets = Boolean((updatedUser as any).widgets);
+		}
+		if (userBody.email !== undefined && (existingDoc?.email || '') !== (updatedUser.email || '')) {
+			changes.push(`email: "${existingDoc?.email || ''}" → "${updatedUser.email || ''}"`);
+			metaChanges.email = updatedUser.email || '';
+		}
+		if (userBody.icon !== undefined && (existingDoc?.icon || '') !== (updatedUser.icon || '')) {
+			changes.push('avatar URL updated');
+			metaChanges.icon = updatedUser.icon || '';
+		}
+		if (Array.isArray(userBody.showcases) && (existingDoc?.showcases?.length || 0) !== (updatedUser.showcases?.length || 0)) {
+			changes.push(`showcases: ${existingDoc?.showcases?.length || 0} → ${updatedUser.showcases?.length || 0}`);
+			metaChanges.showcasesCount = updatedUser.showcases?.length || 0;
+		}
+		if (Array.isArray(userBody.connections) && (existingDoc?.connections?.length || 0) !== (updatedUser.connections?.length || 0)) {
+			changes.push(`connections: ${existingDoc?.connections?.length || 0} → ${updatedUser.connections?.length || 0}`);
+			metaChanges.connectionsCount = updatedUser.connections?.length || 0;
+		}
+		if (Array.isArray(userBody.devices) && (existingDoc?.devices?.length || 0) !== (updatedUser.devices?.length || 0)) {
+			changes.push(`devices: ${existingDoc?.devices?.length || 0} → ${updatedUser.devices?.length || 0}`);
+			metaChanges.devicesCount = updatedUser.devices?.length || 0;
+		}
+		if (userBody.stripeCustomerId !== undefined && ((existingDoc as any)?.stripeCustomerId || null) !== ((updatedUser as any).stripeCustomerId || null)) {
+			changes.push(`stripeCustomerId: ${(existingDoc as any)?.stripeCustomerId || 'none'} → ${(updatedUser as any).stripeCustomerId || 'none'}`);
+			metaChanges.stripeCustomerId = (updatedUser as any).stripeCustomerId || null;
+		}
+		if (typeof userBody.staffSubscription === 'boolean' && Boolean((existingDoc as any)?.staffSubscription) !== userBody.staffSubscription) {
+			changes.push(`staffSubscription: ${userBody.staffSubscription ? 'enabled' : 'disabled'}`);
+			metaChanges.staffSubscription = userBody.staffSubscription;
+		}
+		if ((userBody.vanitySlug !== undefined || unsetFields.vanitySlug) && (existingDoc?.vanitySlug || '') !== (updatedUser.vanitySlug || '')) {
+			changes.push(`vanitySlug: "${existingDoc?.vanitySlug || ''}" → "${updatedUser.vanitySlug || ''}"`);
+			metaChanges.vanitySlug = updatedUser.vanitySlug || '';
+		}
+		if (addedRoles.length > 0) {
+			changes.push(`roles +[${addedRoles.join(', ')}]`);
+			metaChanges.rolesAdded = addedRoles.join(', ');
+		}
+		if (removedRoles.length > 0) {
+			changes.push(`roles -[${removedRoles.join(', ')}]`);
+			metaChanges.rolesRemoved = removedRoles.join(', ');
+		}
+		if (credits) {
+			const oldBalance = Number((existingCredits as any)?.balance) || 0;
+			const newBalance = Number(updatedCredits?.balance) || 0;
+			const oldStreak = Number((existingCredits as any)?.streak) || 0;
+			const newStreak = Number(updatedCredits?.streak) || 0;
+			if (credits.balance !== undefined && oldBalance !== newBalance) {
+				changes.push(`credits: ${oldBalance} → ${newBalance}`);
+				metaChanges.creditsBalance = `${oldBalance} → ${newBalance}`;
+			}
+			if (credits.streak !== undefined && oldStreak !== newStreak) {
+				changes.push(`streak: ${oldStreak} → ${newStreak}`);
+				metaChanges.creditsStreak = `${oldStreak} → ${newStreak}`;
+			}
+			const slotKeys = ['streakShields', 'extraBotSlots', 'extraCdnSlots', 'extraShowcaseSlots', 'extraVanitySlots', 'totalSpent'] as const;
+			for (const sk of slotKeys) {
+				if ((credits as any)[sk] !== undefined) {
+					const oldVal = Number((existingCredits as any)?.[sk]) || 0;
+					const newVal = Number((updatedCredits as any)?.[sk]) || 0;
+					if (oldVal !== newVal) {
+						changes.push(`${sk}: ${oldVal} → ${newVal}`);
+						metaChanges[sk] = `${oldVal} → ${newVal}`;
+					}
+				}
+			}
+			if (Array.isArray(credits.unlockedBadges)) {
+				const oldB = ((existingCredits as any)?.unlockedBadges || []).join(',');
+				const newB = (updatedCredits?.unlockedBadges || []).join(',');
+				if (oldB !== newB) {
+					changes.push(`unlockedBadges: [${newB}]`);
+					metaChanges.unlockedBadges = updatedCredits?.unlockedBadges || [];
+				}
+			}
+		}
+		if (level) {
+			const oldLvl = Number((existingLevel as any)?.level) || 1;
+			const newLvl = Number(updatedLevel?.level) || 1;
+			const oldXp = Number((existingLevel as any)?.xp) || 0;
+			const newXp = Number(updatedLevel?.xp) || 0;
+			if (level.level !== undefined && oldLvl !== newLvl) {
+				changes.push(`level: ${oldLvl} → ${newLvl}`);
+				metaChanges.globalLevel = `${oldLvl} → ${newLvl}`;
+			}
+			if (level.xp !== undefined && oldXp !== newXp) {
+				changes.push(`xp: ${oldXp} → ${newXp}`);
+				metaChanges.globalXp = `${oldXp} → ${newXp}`;
+			}
+		}
+
+		if (changes.length > 0) {
+			await recordAuditLog(req, {
+				action: 'user.update',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Updated user "${updatedUser.name || resolvedId}" (${changes.join(', ')})`,
+				metadata: metaChanges,
+			});
 		}
 
 		return NextResponse.json({
@@ -328,10 +664,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 	}
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
 		const { models } = await database('xernerx');
+
+		const targetUser = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] })
+			.select('id')
+			.lean();
+		const resolvedTargetId = targetUser?.id || id;
+
+		const caller = await resolveCallerAuth(req, ['users']);
+		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
+		if (!isStaffOrSystem && caller.userId !== resolvedTargetId && caller.userId !== id) {
+			return NextResponse.json({ error: 'Forbidden: You can only delete your own account.' }, { status: 403 });
+		}
 
 		const deletedUser = await models.users.User.findOneAndDelete({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 
@@ -345,6 +692,14 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
 		await models.users.Credit.findOneAndDelete({ ownerId: resolvedId });
 		await models.users.Level.deleteMany({ ownerId: resolvedId });
 		await models.users.Subscription.deleteMany({ ownerId: resolvedId });
+
+		await recordAuditLog(req, {
+			action: 'user.delete',
+			targetType: 'user',
+			targetId: resolvedId,
+			summary: `Deleted user "${deletedUser.name || resolvedId}"`,
+			metadata: { email: deletedUser.email || null },
+		});
 
 		return NextResponse.json({ success: true, deletedId: resolvedId });
 	} catch (error: unknown) {

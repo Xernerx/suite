@@ -17,5 +17,7 @@ export interface AdminServerSummary {
 	info?: string;
 	voteCount?: number;
 	memberCount?: number;
+	promotedUntil?: string | null;
+	boostedUntil?: string | null;
 	links?: Record<string, string>;
 }

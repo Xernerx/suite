@@ -89,16 +89,15 @@ export default function SidebarUserCard({
 	const isApplication = type === 'application';
 
 	useEffect(() => {
+		if (!activeUser?.id) return;
 		fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include', cache: 'no-store' })
 			.then((res) => (res.ok ? res.json() : []))
 			.then((data) => setRoles(data))
 			.catch(() => {});
-		if (activeUser?.id) {
-			fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${encodeURIComponent(activeUser.id)}`), { credentials: 'include' })
-				.then((res) => (res.ok ? res.json() : []))
-				.then((data) => Array.isArray(data) && setUserBots(data))
-				.catch(() => {});
-		}
+		fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${encodeURIComponent(activeUser.id)}`), { credentials: 'include' })
+			.then((res) => (res.ok ? res.json() : []))
+			.then((data) => Array.isArray(data) && setUserBots(data))
+			.catch(() => {});
 	}, [getEnvUrl, activeUser?.id]);
 
 	const hasLoadedCredits = !userLoading && Boolean(activeUser?.credits);

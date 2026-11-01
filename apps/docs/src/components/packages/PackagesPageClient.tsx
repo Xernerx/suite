@@ -1,20 +1,30 @@
 /** @format */
 'use client';
 
-import { ArrowRight, Box, FileText, GitBranch, Layers } from 'lucide-react';
+import { ArrowRight, Box, Check, Copy, ExternalLink, FileText, GitBranch, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PackageInstallBar } from '@/components/packages/PackageInstallBar';
 import { PackagesSearch, SearchIndexItem } from '@/components/packages/PackagesSearch';
 import { PackagesSidebar } from '@/components/packages/PackagesSidebar';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 
 export function PackagesPageClient({ packages, index }: { packages: any[]; index: SearchIndexItem[] }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const { toast } = useToast();
 	const [query, setQuery] = useState('');
 	const [scopeFilter, setScopeFilter] = useState<'all' | 'collection' | 'modular'>('all');
+	const [copiedPkg, setCopiedPkg] = useState<string | null>(null);
+
+	const handleCopyImport = (pkgName: string) => {
+		const snippet = `import * as xernerx from '${pkgName}';`;
+		navigator.clipboard.writeText(snippet);
+		setCopiedPkg(pkgName);
+		toast({ type: 'success', title: t('docs.packages.page.importCopied') });
+		setTimeout(() => setCopiedPkg((prev) => (prev === pkgName ? null : prev)), 2000);
+	};
 
 	const q = query.trim().toLowerCase();
 	const filteredPackages = packages.filter((pkg) => {
@@ -164,10 +174,29 @@ export function PackagesPageClient({ packages, index }: { packages: any[]; index
 									</div>
 								</div>
 
-								<div className="flex items-center justify-between pt-2 border-t border-(--border)/10">
-									<div className="flex items-center gap-1.5 text-xs text-(--text-muted)">
-										<GitBranch size={13} className="text-(--accent)" />
-										<span>{t('docs.packages.page.overview.versionsAvailable', { count: pkg.versions.length })}</span>
+								<div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-(--border)/10">
+									<div className="flex items-center gap-2 text-xs text-(--text-muted)">
+										<span className="inline-flex items-center gap-1.5">
+											<GitBranch size={13} className="text-(--accent)" />
+											<span>{t('docs.packages.page.overview.versionsAvailable', { count: pkg.versions.length })}</span>
+										</span>
+										<button
+											type="button"
+											onClick={() => handleCopyImport(pkg.name)}
+											className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+										>
+											{copiedPkg === pkg.name ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
+											<span>{t('docs.packages.page.copyImport')}</span>
+										</button>
+										<a
+											href={`https://www.npmjs.com/package/${pkg.name}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors"
+										>
+											<span>{t('docs.packages.page.viewOnNpm')}</span>
+											<ExternalLink size={10} />
+										</a>
 									</div>
 									<Link
 										href={`/packages/${pkg.name}/${pkg.versions[0]}`}

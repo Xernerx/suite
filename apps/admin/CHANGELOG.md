@@ -2,6 +2,27 @@
 
 # admin
 
+## 0.24.0
+
+### Minor Changes
+
+-   - **Organizations Management Portal (`Organizations`)**: Added a dedicated Organizations administration view (`OrganizationCard` & `OrganizationModal`) with live search, privacy/verified filtering, sorting (`members`, `treasury`, `name`), CSV/JSON export, treasury balance adjustments, member/role management, and audit log cross-navigation.
+    - **3-Tab User Management Modal Overhaul (`UserModal`)**: Rebuilt the Admin User modal into dedicated `Identity`, `Economy & Perks`, and `Assets & Moderation` tabs (`UserIdentityTab`, `UserEconomyPerksTab`, `UserAssetsModerationTab`) with a live `UserProfilePreview` card, direct credit/streak/shield adjustments, global level & XP overrides, extra slot grants (`bots`, `cdn`, `showcases`, `vanity`), dot-matrix & badge controls, and moderation actions for user showcases, OAuth connections, and active devices.
+    - **Bot & Server Administration Modals (`BotModal` & `ServerModal`)**: Expanded bot and server management modals with spotlight boost controls, vanity slug unlocking, organization assignment, verification toggles, and direct entity cross-navigation.
+    - **Overview, Invites & Audit Logs Polish**: Upgraded `HomeOverview`, `Invites`, and `AuditLogs` with full localization and refined filtering.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 0.23.0
 
 ### Minor Changes

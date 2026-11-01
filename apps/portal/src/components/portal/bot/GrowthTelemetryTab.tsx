@@ -2,11 +2,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, ArrowDownRight, ArrowUpRight, BarChart3, Calendar, Server, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { Activity, ArrowDownRight, ArrowUpRight, BarChart3, Calendar, Download, Server, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Tabs } from '@xernerx/ui';
+import { Button, Tabs } from '@xernerx/ui';
 
 interface GrowthTelemetryTabProps {
 	botConfig: any;
@@ -20,11 +20,13 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetryTabProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl, isReady } = useEnvironment();
+	const { toast } = useToast();
 
 	const [stats, setStats] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [activeMetric, setActiveMetric] = useState<MetricKey>('guildCount');
 	const [chartMode, setChartMode] = useState<'area' | 'bar'>('area');
+	const [rangeDays, setRangeDays] = useState<7 | 14 | 30>(30);
 	const [hoverPoint, setHoverPoint] = useState<{ timestamp: number; val: number } | null>(null);
 
 	useEffect(() => {
@@ -116,6 +118,8 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 		return buckets;
 	}, [stats, fallbackPoint]);
 
+	const visibleBuckets = useMemo(() => dailyBuckets.slice(-rangeDays), [dailyBuckets, rangeDays]);
+
 	if (loading) {
 		return (
 			<div className="py-16 flex justify-center">
@@ -124,8 +128,31 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 		);
 	}
 
-	const firstSnap = stats.length > 0 ? stats[0] : dailyBuckets[0];
-	const latestSnap = stats.length > 0 ? stats[stats.length - 1] : dailyBuckets[dailyBuckets.length - 1];
+	const firstSnap = visibleBuckets[0] || dailyBuckets[0];
+	const latestSnap = visibleBuckets[visibleBuckets.length - 1] || dailyBuckets[dailyBuckets.length - 1];
+
+	const handleExportCsv = () => {
+		const header = ['Date', 'Timestamp', 'Servers', 'Members', 'Shards', 'Votes'];
+		const rows = visibleBuckets.map((b) => [
+			new Date(b.timestamp).toISOString().split('T')[0],
+			String(b.timestamp),
+			String(b.guildCount),
+			String(b.userCount),
+			String(b.shardCount),
+			String(b.voteCount),
+		]);
+		const csvContent = [header.join(','), ...rows.map((r) => r.join(','))].join('\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `bot-${botId}-growth-${rangeDays}d.csv`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+		toast({ type: 'success', title: t('app.portal.bot.growth.exportedToast') });
+	};
 
 	const metricCards: {
 		id: MetricKey;
@@ -205,14 +232,14 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 									{isPositive ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
 									{isPositive ? `+${card.delta.toLocaleString()}` : card.delta.toLocaleString()} ({isPositive ? `+${card.percent}%` : `${card.percent}%`})
 								</span>
-								<span className="text-[11px] text-(--text-muted)">{t('app.portal.bot.growth.last30Days')}</span>
+								<span className="text-[11px] text-(--text-muted)">{t('app.portal.bot.growth.lastNDays', { days: rangeDays })}</span>
 							</div>
 						</button>
 					);
 				})}
 			</div>
 
-			{/* Interactive 30-Day Growth Chart Card */}
+			{/* Interactive Growth Chart Card */}
 			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-(--border)/10">
 					<div className="flex items-center gap-3">
@@ -221,13 +248,35 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 						</div>
 						<div>
 							<h3 className="text-lg font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('app.portal.bot.growth.chartTitle', { metric: activeMeta.label })}
+								{t('app.portal.bot.growth.chartTitleNDays', { days: rangeDays, metric: activeMeta.label })}
 							</h3>
 							<p className="text-xs text-(--text-muted)">{t('app.portal.bot.growth.chartSubtitle')}</p>
 						</div>
 					</div>
 
-					<Tabs size="sm" fullWidth={false} tabs={modeTabs} activeTab={chartMode} onChange={(id) => setChartMode(id as 'area' | 'bar')} />
+					<div className="flex flex-wrap items-center gap-2">
+						<div className="inline-flex items-center rounded-full border border-(--border)/15 bg-(--background)/50 p-1 gap-1">
+							{([7, 14, 30] as const).map((days) => (
+								<button
+									key={days}
+									type="button"
+									onClick={() => {
+										setRangeDays(days);
+										setHoverPoint(null);
+									}}
+									className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold transition-colors cursor-pointer ${
+										rangeDays === days ? 'bg-(--accent) text-(--text)' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{t('app.portal.bot.growth.rangeDays', { days })}
+								</button>
+							))}
+						</div>
+						<Tabs size="sm" fullWidth={false} tabs={modeTabs} activeTab={chartMode} onChange={(id) => setChartMode(id as 'area' | 'bar')} />
+						<Button size="sm" variant="secondary" onClick={handleExportCsv}>
+							<Download size={13} /> {t('app.portal.bot.growth.exportCsv')}
+						</Button>
+					</div>
 				</div>
 
 				{/* Inspected Data Point Readout */}
@@ -247,8 +296,8 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 					<ResponsiveContainer width="100%" height="100%">
 						{chartMode === 'area' ? (
 							<AreaChart
-								key={`area-${activeMetric}`}
-								data={dailyBuckets}
+								key={`area-${activeMetric}-${rangeDays}`}
+								data={visibleBuckets}
 								margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
 								onMouseMove={(state: any) => {
 									const payload = state?.activePayload?.[0]?.payload;
@@ -299,8 +348,8 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 							</AreaChart>
 						) : (
 							<BarChart
-								key={`bar-${activeMetric}`}
-								data={dailyBuckets}
+								key={`bar-${activeMetric}-${rangeDays}`}
+								data={visibleBuckets}
 								margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
 								onMouseMove={(state: any) => {
 									const payload = state?.activePayload?.[0]?.payload;

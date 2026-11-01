@@ -144,7 +144,7 @@ export function ServerHeader({ server, setServer, organizationData, canManageSer
 					{organizationData?.name &&
 						((organizationData.privacy || organizationData.config?.privacy) !== 'private' ? (
 							<Link
-								href={`/organization/${organizationData._id}`}
+								href={`/organization/${organizationData.vanitySlug || organizationData._id}`}
 								className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-(--background)/80 border border-(--border)/10 hover:border-(--accent)/50 shadow-sm backdrop-blur-md transition-colors"
 							>
 								<Building2 className="w-4 h-4 text-(--accent)" />

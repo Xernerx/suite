@@ -15,6 +15,7 @@ const schema = new Schema(
 		streakShields: { type: Number, default: 0, min: 0, max: 3 },
 		referredBy: { type: String, default: null },
 		referralBonusClaimed: { type: Boolean, default: false },
+		signInBonusClaimed: { type: Boolean, default: false },
 		claimedAchievements: { type: [String], default: [] },
 		unlockedBadges: { type: [String], default: [] },
 		activeBadges: { type: [String], default: [] },

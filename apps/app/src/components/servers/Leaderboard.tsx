@@ -94,12 +94,20 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 					voice: voiceList,
 				});
 
+				const preseededMap: Record<string, any> = {};
 				const idsToFetch = new Set<string>();
 				for (const item of [...levelsList, ...textList, ...voiceList]) {
 					const uid = String(item?.userId || item?.ownerId || item?.id || '');
-					if (uid && !item?.isPrivate && !item?.user?.username && !item?.username && !item?.global_name) {
+					if (!uid || item?.isPrivate) continue;
+					if (item?.user?.username || item?.user?.global_name) {
+						preseededMap[uid] = item.user;
+					} else if (!item?.username && !item?.global_name) {
 						idsToFetch.add(uid);
 					}
+				}
+
+				if (Object.keys(preseededMap).length > 0 && !cancelled) {
+					setDiscordMap((prev) => ({ ...prev, ...preseededMap }));
 				}
 
 				if (idsToFetch.size > 0) {
@@ -117,7 +125,7 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 						})
 					);
 					if (!cancelled) {
-						const nextMap: Record<string, any> = {};
+						const nextMap: Record<string, any> = { ...preseededMap };
 						for (const pair of results) {
 							if (pair) nextMap[pair[0]] = pair[1];
 						}

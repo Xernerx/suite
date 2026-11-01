@@ -1,11 +1,11 @@
 /** @format */
-import { Bot, Boxes, Bug, Code, HardDrive, HelpCircle, Lightbulb, Map, Server } from 'lucide-react';
+import { Bot, Boxes, Building2, Bug, Code, HardDrive, HelpCircle, Lightbulb, Map, Server } from 'lucide-react';
 import type React from 'react';
 import { ACCOUNT_DEEP_FEATURES, ACCOUNT_TABS, ADMIN_TABS, STORE_DEEP_LINKS, SUITE_DEEP_PORTALS, SUPPORT_PORTALS } from './commandPaletteCatalog';
 
 export { ACCOUNT_DEEP_FEATURES, ACCOUNT_TABS, ADMIN_TABS, STORE_DEEP_LINKS, SUITE_DEEP_PORTALS, SUPPORT_PORTALS };
 
-export type PaletteSectionKey = 'views' | 'actions' | 'bots' | 'servers' | 'docs' | 'faq' | 'community' | 'store' | 'apps' | 'settings' | 'support' | 'admin';
+export type PaletteSectionKey = 'views' | 'actions' | 'bots' | 'servers' | 'organizations' | 'docs' | 'faq' | 'community' | 'store' | 'apps' | 'settings' | 'support' | 'admin';
 
 export type PaletteActionItem = {
 	id: string;
@@ -30,6 +30,7 @@ export function buildDynamicPaletteItems({
 	trimmedQuery,
 	liveBots,
 	liveServers,
+	liveOrganizations = [],
 	communityData,
 	faqCatalog = [],
 	docsCatalog = [],
@@ -39,6 +40,7 @@ export function buildDynamicPaletteItems({
 	trimmedQuery: string;
 	liveBots: any[];
 	liveServers: any[];
+	liveOrganizations?: any[];
 	communityData: { issues: any[]; suggestions: any[]; roadmap: any[] };
 	faqCatalog?: any[];
 	docsCatalog?: any[];
@@ -48,11 +50,11 @@ export function buildDynamicPaletteItems({
 	const dynamicItems: PaletteActionItem[] = [];
 
 	liveBots.forEach((bot) => {
-		const avatarUrl = bot.avatarUrl || (bot.avatar ? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64` : null);
+		const avatarUrl = bot.discord?.avatarUrl || bot.avatarUrl || (bot.avatar ? `https://cdn.discordapp.com/avatars/${bot.id}/${bot.avatar}.png?size=64` : null);
 		dynamicItems.push({
 			id: `live-bot-${bot.id}`,
 			section: 'bots',
-			label: bot.name || bot.username || bot.id,
+			label: bot.discord?.global_name || bot.discord?.username || bot.name || bot.username || bot.id,
 			subtitle: bot.description || `#${bot.id}`,
 			avatarUrl,
 			icon: Bot,
@@ -74,6 +76,23 @@ export function buildDynamicPaletteItems({
 			icon: Server,
 			onSelect: () => {
 				window.location.href = `${getEnvUrl('https://app.xernerx.com')}/servers/${srv.id}`;
+				onClose();
+			},
+		});
+	});
+
+	liveOrganizations.forEach((org) => {
+		const orgId = org._id || org.id;
+		const slugOrId = org.vanitySlug || orgId;
+		dynamicItems.push({
+			id: `live-org-${orgId}`,
+			section: 'organizations',
+			label: org.name || orgId,
+			subtitle: org.description || (org.vanitySlug ? `@${org.vanitySlug}` : `#${orgId}`),
+			avatarUrl: org.logoUrl || null,
+			icon: Building2,
+			onSelect: () => {
+				window.location.href = `${getEnvUrl('https://app.xernerx.com')}/organization/${slugOrId}`;
 				onClose();
 			},
 		});

@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Settings2, User as UserIcon, Copy, Check, Coins } from 'lucide-react';
+import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './types';
 import { UserModal } from './UserModal';
@@ -17,13 +17,14 @@ interface UserCardProps {
 	onUserUpdated: (updated: FullUser) => void;
 	onDiscordFetched: (id: string, discord: DiscordProfile) => void;
 	onViewAuditLogs?: (userId: string) => void;
-	onManageCredits?: (user: UserSummary) => void;
+	onNavigateEntity?: (tab: string, query: string) => void;
 }
 
-export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated, onDiscordFetched, onViewAuditLogs, onManageCredits }: UserCardProps) {
+export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated, onDiscordFetched, onViewAuditLogs, onNavigateEntity }: UserCardProps) {
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [modalInitialTab, setModalInitialTab] = useState<'profile' | 'economy' | 'assets'>('profile');
 	const [copiedId, setCopiedId] = useState(false);
 	const [discord, setDiscord] = useState<DiscordProfile | null>(user.discord || null);
 
@@ -47,6 +48,8 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 
 	const activeRolesList = getNormalizedRoles(user);
 	const activeRoles = roles.filter((r) => activeRolesList.includes(r.id));
+	const userLevel = user.level?.level ?? 1;
+	const userCredits = user.credits?.balance ?? 0;
 
 	return (
 		<>
@@ -64,7 +67,10 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 					opacity: 0,
 					scale: 0.95,
 				}}
-				onClick={() => setIsModalOpen(true)}
+				onClick={() => {
+					setModalInitialTab('profile');
+					setIsModalOpen(true);
+				}}
 				className="flex items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:border-(--accent)/30 group relative"
 				style={{
 					padding: 'calc(var(--ui-gap) * 0.75)',
@@ -74,7 +80,7 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 				<div className="absolute inset-0 bg-gradient-to-br from-transparent to-(--border)/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
 				<div
-					className="flex items-center relative z-10"
+					className="flex items-center relative z-10 min-w-0"
 					style={{
 						gap: 'calc(var(--ui-gap) * 0.75)',
 					}}
@@ -94,9 +100,22 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 							<UserIcon size={24} className="text-(--text-muted)" />
 						</div>
 					)}
-					<div className="flex flex-col overflow-hidden">
-						<h2 className="font-bold text-base text-(--text) truncate group-hover:text-(--accent) transition-colors">{displayName}</h2>
+					<div className="flex flex-col overflow-hidden min-w-0">
+						<div className="flex items-center gap-1.5 min-w-0">
+							<h2 className="font-bold text-base text-(--text) truncate group-hover:text-(--accent) transition-colors">{displayName}</h2>
+							{user.verified && <CheckCircle2 size={14} className="text-(--accent-green) shrink-0" />}
+						</div>
 						<div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+							<span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) font-mono font-bold">
+								<Sparkles size={10} />
+								{t('admin.users.card.levelShort', { level: userLevel })}
+							</span>
+							{userCredits > 0 && (
+								<span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10 text-(--text) font-mono font-semibold">
+									<Coins size={10} className="text-(--accent)" />
+									{userCredits.toLocaleString()}
+								</span>
+							)}
 							{activeRoles.length > 0 ? (
 								activeRoles.map((r) => (
 									<span key={r.id} className="text-xs px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) font-medium truncate">
@@ -130,19 +149,18 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 				</div>
 
 				<div className="flex items-center gap-1.5 relative z-10 shrink-0 mr-2">
-					{onManageCredits && (
-						<button
-							type="button"
-							title={t('admin.users.creditsModal.manageButton')}
-							onClick={(e) => {
-								e.stopPropagation();
-								onManageCredits({ ...user, discord: discord || user.discord });
-							}}
-							className="flex items-center justify-center w-8 h-8 rounded-full bg-(--accent)/15 hover:bg-(--accent)/25 text-(--accent) opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-						>
-							<Coins size={15} />
-						</button>
-					)}
+					<button
+						type="button"
+						title={t('admin.users.creditsModal.manageButton')}
+						onClick={(e) => {
+							e.stopPropagation();
+							setModalInitialTab('economy');
+							setIsModalOpen(true);
+						}}
+						className="flex items-center justify-center w-8 h-8 rounded-full bg-(--accent)/15 hover:bg-(--accent)/25 text-(--accent) opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+					>
+						<Coins size={15} />
+					</button>
 					<div className="flex items-center justify-center w-8 h-8 rounded-full bg-(--border)/10 opacity-0 group-hover:opacity-100 transition-all text-(--text)">
 						<Settings2 size={16} />
 					</div>
@@ -159,6 +177,8 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 				onUserDeleted={onUserDeleted}
 				onUserUpdated={onUserUpdated}
 				onViewAuditLogs={onViewAuditLogs}
+				onNavigateEntity={onNavigateEntity}
+				initialTab={modalInitialTab}
 			/>
 		</>
 	);

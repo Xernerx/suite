@@ -1,5 +1,5 @@
 /** @format */
-import { Bot, Bug, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
+import { Bot, Bug, Building2, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
 import type { AdminPermissionsMap } from '../HomeOverview';
 import type { ModuleCard, UrgentItem } from './HomeOverviewSections';
 
@@ -15,6 +15,7 @@ interface BuildCardsInput {
 	users: any[];
 	bots: any[];
 	servers: any[];
+	organizations?: any[];
 	roles: any[];
 	tokens: any[];
 	storeItems: any[];
@@ -36,6 +37,7 @@ export function buildHomeOverviewCards({
 	users,
 	bots,
 	servers,
+	organizations = [],
 	roles,
 	tokens,
 	storeItems,
@@ -216,6 +218,18 @@ export function buildHomeOverviewCards({
 			meta: t('admin.dashboard.home.cards.serversMeta', { total: servers.length, verified: verifiedServers }),
 			icon: Server,
 			badge: { text: `${servers.length}`, tone: 'normal' },
+		});
+	}
+
+	if ((permissions.canOrganizations ?? permissions.canUsers) && permissions.isServerSet) {
+		const verifiedOrgs = organizations.filter((o) => o.verified).length;
+		moduleCards.push({
+			id: 'mod-organizations',
+			view: 'organizations',
+			title: t('admin.organizations.title'),
+			meta: t('admin.dashboard.home.cards.serversMeta', { total: organizations.length, verified: verifiedOrgs }),
+			icon: Building2,
+			badge: { text: `${organizations.length}`, tone: 'normal' },
 		});
 	}
 

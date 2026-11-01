@@ -1,6 +1,108 @@
 /** @format */
 
+import crypto from 'crypto';
 import { database } from '@xernerx/lib/core';
+
+const SIGN_IN_BONUS_AMOUNT = 1000;
+const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
+
+async function resolveDefaultJoinRoles(db: any): Promise<string[]> {
+	const roles = new Set<string>([DEFAULT_JOIN_ROLE_ID]);
+	try {
+		const setting = await (db.models.core as any)?.Setting?.findOne({ id: 'join_roles' }).lean();
+		if (setting?.value) {
+			const parsed = JSON.parse(setting.value);
+			if (Array.isArray(parsed)) {
+				for (const r of parsed) {
+					if (r && typeof r === 'string') roles.add(r);
+				}
+			}
+		}
+	} catch {}
+	return Array.from(roles);
+}
+
+async function ensureUserBonusAndDefaults(userId: string) {
+	if (!userId) return;
+	try {
+		const db = await database('xernerx');
+		const CreditModel = (db.models.users as any)?.Credit;
+		const LevelModel = (db.models.users as any)?.Level;
+		const UserModel = (db.models.users as any)?.User;
+
+		if (CreditModel) {
+			const existingCredit = (await CreditModel.findOne({ ownerId: userId }).lean()) as any;
+			const bonusTx = {
+				id: crypto.randomUUID(),
+				type: 'earn',
+				amount: SIGN_IN_BONUS_AMOUNT,
+				multiplierPercent: 100,
+				itemId: 'signin_bonus',
+				itemName: 'Welcome Sign-In Bonus',
+				createdAt: new Date(),
+			};
+
+			if (!existingCredit) {
+				await CreditModel.create({
+					ownerId: userId,
+					balance: SIGN_IN_BONUS_AMOUNT,
+					signInBonusClaimed: true,
+					transactions: [bonusTx],
+				}).catch(async () => {
+					await CreditModel.updateOne(
+						{ ownerId: userId, signInBonusClaimed: { $ne: true } },
+						{
+							$inc: { balance: SIGN_IN_BONUS_AMOUNT },
+							$set: { signInBonusClaimed: true },
+							$push: { transactions: { $each: [bonusTx], $position: 0 } },
+						}
+					).catch(() => {});
+				});
+			} else {
+				const hasTx = Array.isArray(existingCredit.transactions) && existingCredit.transactions.some((t: any) => t?.itemId === 'signin_bonus');
+				const alreadyClaimed = Boolean(existingCredit.signInBonusClaimed || hasTx);
+				if (!alreadyClaimed) {
+					await CreditModel.updateOne(
+						{ ownerId: userId, signInBonusClaimed: { $ne: true } },
+						{
+							$inc: { balance: SIGN_IN_BONUS_AMOUNT },
+							$set: { signInBonusClaimed: true },
+							$push: { transactions: { $each: [bonusTx], $position: 0 } },
+						}
+					).catch(() => {});
+				}
+			}
+		}
+
+		if (LevelModel) {
+			const existingLevel = await LevelModel.findOne({ ownerId: userId }).lean();
+			if (!existingLevel) {
+				await LevelModel.create({
+					id: crypto.randomUUID(),
+					ownerId: userId,
+					level: 1,
+					xp: 0,
+				}).catch(() => {});
+			}
+		}
+
+		if (UserModel) {
+			const userDoc = (await UserModel.findOne({ id: userId }).lean()) as any;
+			if (userDoc) {
+				const updates: Record<string, any> = {};
+				if (userDoc.agreedTerms && userDoc.agreedPrivacy && !userDoc.verified) {
+					updates.verified = true;
+				}
+				if (!Array.isArray(userDoc.roles) || userDoc.roles.length === 0) {
+					updates.roles = await resolveDefaultJoinRoles(db);
+				}
+				if (Object.keys(updates).length > 0) {
+					await UserModel.updateOne({ id: userId }, { $set: updates }).catch(() => {});
+				}
+			}
+		}
+	} catch {}
+}
 
 async function getModel(action: string) {
 	const db = await database('xernerx');
@@ -99,18 +201,67 @@ export default async function Server(msg: any) {
 			}
 			return model.findOne(getFilter(msg.action, msg.body)).lean();
 
-		case 'create':
+		case 'create': {
+			const isUserAction = msg.action === 'users' || msg.action === 'user' || msg.action === 'profile' || msg.action === 'profiles';
+			const isCreditAction = msg.action === 'credits' || msg.action === 'credit';
+			if (isUserAction) {
+				const keys = Object.keys(msg.body || {}).filter((k) => k !== 'id' && msg.body[k] !== undefined && msg.body[k] !== null && msg.body[k] !== '');
+				if (keys.length === 0) {
+					return model.findOne(getFilter(msg.action, msg.body)).lean();
+				}
+				if (msg.body?.agreedTerms && msg.body?.agreedPrivacy) {
+					msg.body.verified = true;
+				}
+			}
+			if (isCreditAction && msg.body && !msg.body.signInBonusClaimed) {
+				const baseBalance = Number(msg.body.balance) || 0;
+				msg.body.balance = baseBalance < SIGN_IN_BONUS_AMOUNT ? baseBalance + SIGN_IN_BONUS_AMOUNT : baseBalance;
+				msg.body.signInBonusClaimed = true;
+				const existingTxs = Array.isArray(msg.body.transactions) ? msg.body.transactions : [];
+				if (!existingTxs.some((t: any) => t?.itemId === 'signin_bonus')) {
+					msg.body.transactions = [
+						{
+							id: crypto.randomUUID(),
+							type: 'earn',
+							amount: SIGN_IN_BONUS_AMOUNT,
+							multiplierPercent: 100,
+							itemId: 'signin_bonus',
+							itemName: 'Welcome Sign-In Bonus',
+							createdAt: new Date(),
+						},
+						...existingTxs,
+					];
+				}
+			}
 			try {
 				const res = await model.create(msg.body);
+				if (isUserAction && msg.body?.id) {
+					await ensureUserBonusAndDefaults(String(msg.body.id));
+					return model.findOne(getFilter(msg.action, msg.body)).lean();
+				}
 				return res?.toObject ? res.toObject() : res;
 			} catch (error: any) {
 				if (error?.code === 11000) {
+					if (isUserAction && msg.body?.id) {
+						await ensureUserBonusAndDefaults(String(msg.body.id));
+					}
 					return model.findOne(getFilter(msg.action, msg.body)).lean();
 				}
 				throw error;
 			}
+		}
 
 		case 'update': {
+			const isUserAction = msg.action === 'users' || msg.action === 'user' || msg.action === 'profile' || msg.action === 'profiles';
+			if (isUserAction) {
+				const keys = Object.keys(msg.body || {}).filter((k) => k !== 'id' && msg.body[k] !== undefined && msg.body[k] !== null && msg.body[k] !== '');
+				if (keys.length === 0) {
+					return model.findOne(getFilter(msg.action, msg.body)).lean();
+				}
+				if (msg.body?.agreedTerms && msg.body?.agreedPrivacy) {
+					msg.body.verified = true;
+				}
+			}
 			if ((msg.action === 'credits' || msg.action === 'credit') && typeof msg.body?.balance === 'number' && !msg.body?.skipMultiplier) {
 				try {
 					const db = await database('xernerx');
@@ -162,7 +313,7 @@ export default async function Server(msg: any) {
 				} catch {}
 			}
 
-			return model
+			const updatedDoc = await model
 				.findOneAndUpdate(
 					getFilter(msg.action, msg.body),
 					{
@@ -175,6 +326,13 @@ export default async function Server(msg: any) {
 					}
 				)
 				.lean();
+
+			if (isUserAction && msg.body?.id) {
+				await ensureUserBonusAndDefaults(String(msg.body.id));
+				return model.findOne(getFilter(msg.action, msg.body)).lean();
+			}
+
+			return updatedDoc;
 		}
 
 		case 'delete':

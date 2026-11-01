@@ -20,7 +20,7 @@ export default function Profile() {
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
 	const activeUser = user || session?.user;
 	const userId = activeUser?.id;
-	const isVanityUnlocked = Boolean((user as any)?.vanityUnlocked || (user as any)?.vanitySlug || (user as any)?.verified);
+	const isVanityUnlocked = Boolean((user as any)?.vanityUnlocked || (user as any)?.vanitySlug);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
 
 	const handleUnlockVanity = async () => {

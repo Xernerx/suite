@@ -134,7 +134,13 @@ function DashboardContent() {
 					...staticItems,
 					...managedGuilds.map((g) => ({
 						label: g.name,
-						onClick: () => setSelectedGuild(g),
+						onClick: () => {
+							setSelectedGuild(g);
+							setView(`server-${g.id}`);
+							const params = new URLSearchParams(window.location.search);
+							params.set('guild', g.id);
+							router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+						},
 						category: t('app.dashboard.categories.servers'),
 						icon: g.iconUrl
 							? () => <Image src={g.iconUrl!} alt={g.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
@@ -153,6 +159,10 @@ function DashboardContent() {
 					const initialGuild = (requestedGuildId ? managedGuilds.find((g) => g.id === requestedGuildId) : null) || managedGuilds[0];
 					setSelectedGuild(initialGuild);
 					setView(`server-${initialGuild.id}`);
+					if (params.get('guild') !== initialGuild.id) {
+						params.set('guild', initialGuild.id);
+						router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+					}
 				}
 			} catch (error) {
 				console.error('Failed to fetch guilds:', error);
@@ -174,9 +184,16 @@ function DashboardContent() {
 		const guildId = view.replace('server-', '');
 		if (selectedGuild?.id !== guildId) {
 			const matched = guilds.find((g) => g.id === guildId);
-			if (matched) setSelectedGuild(matched);
+			if (matched) {
+				setSelectedGuild(matched);
+				const params = new URLSearchParams(window.location.search);
+				if (params.get('guild') !== matched.id) {
+					params.set('guild', matched.id);
+					router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+				}
+			}
 		}
-	}, [view, guilds, selectedGuild?.id]);
+	}, [view, guilds, selectedGuild?.id, router]);
 
 	const [organizations, setOrganizations] = useState<any[]>([]);
 
@@ -239,6 +256,7 @@ function DashboardContent() {
 					locale: guildConfig.locale,
 					links: guildConfig.links,
 					vanitySlug: guildConfig.vanitySlug,
+					tags: Array.isArray(guildConfig.tags) ? guildConfig.tags : [],
 				}),
 			});
 			if (res.ok) {

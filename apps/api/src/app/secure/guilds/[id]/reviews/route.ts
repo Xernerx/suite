@@ -28,16 +28,55 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 		const reviews = await ReviewModel.find({ guildId }).sort({ createdAt: -1 }).lean();
 
 		const userIds = [...new Set(reviews.map((r: any) => r.userId))] as string[];
+		const UserModel = (db.models.users as any)?.User;
+		const dbUsers =
+			UserModel && userIds.length > 0
+				? await UserModel.find({ id: { $in: userIds } })
+						.select('id name icon vanitySlug discordCache')
+						.lean()
+				: [];
+		const dbUserMap = new Map<string, any>(dbUsers.map((u: any) => [u.id, u]));
+
 		const userProfiles = await Promise.all(
 			userIds.map(async (uid: string) => {
+				const dbUser = dbUserMap.get(uid);
+				const cached = dbUser?.discordCache;
+				if (cached?.username || cached?.globalName) {
+					return {
+						id: uid,
+						username: cached.username || dbUser?.name,
+						global_name: cached.globalName || cached.username || dbUser?.name,
+						avatar: cached.avatar || null,
+						avatarUrl: cached.avatarUrl || dbUser?.icon || null,
+						vanitySlug: dbUser?.vanitySlug,
+					};
+				}
 				try {
-					const res = await fetch(`https://discord.com/api/v10/users/${uid}`, {
-						headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
-						next: { revalidate: 3600 },
-					});
-					if (res.ok) return await res.json();
+					const token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
+					if (token) {
+						const res = await fetch(`https://discord.com/api/v10/users/${uid}`, {
+							headers: { Authorization: `Bot ${token}` },
+							next: { revalidate: 3600 },
+						});
+						if (res.ok) {
+							const data = await res.json();
+							return {
+								...data,
+								vanitySlug: dbUser?.vanitySlug,
+							};
+						}
+					}
 				} catch (e) {
 					console.error(`Failed to fetch discord user ${uid}`, e);
+				}
+				if (dbUser) {
+					return {
+						id: uid,
+						username: dbUser.name,
+						global_name: dbUser.name,
+						avatarUrl: dbUser.icon || null,
+						vanitySlug: dbUser.vanitySlug,
+					};
 				}
 				return { id: uid };
 			})

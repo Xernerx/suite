@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Activity, Bell, Bot, Compass, ExternalLink, Eye, Ghost, LayoutDashboard, RefreshCw, Server, TerminalSquare, Trophy } from 'lucide-react';
+import { Activity, Bell, Bot, CheckCheck, Compass, ExternalLink, Eye, Ghost, LayoutDashboard, RefreshCw, Server, TerminalSquare, Trophy } from 'lucide-react';
 import { Badge, Button, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useNotifications, useSidebar, useUser } from '@xernerx/providers';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,10 +11,11 @@ export function OverlayMonitor() {
 	const { t } = useDictionary();
 	const { hide } = useSidebar();
 	const { getEnvUrl, isReady } = useEnvironment();
-	const { notifications, unreadCount, markAsRead, refresh } = useNotifications();
+	const { notifications, unreadCount, markAsRead, markAllAsRead, refresh } = useNotifications();
 	const { user } = useUser();
 
 	const [activeTab, setActiveTab] = useState<'feed' | 'servers' | 'inspector' | 'quick'>('feed');
+	const [feedFilter, setFeedFilter] = useState<'all' | 'unread'>('all');
 	const [pingMs, setPingMs] = useState<number | null>(null);
 	const [online, setOnline] = useState<boolean>(true);
 	const [topBots, setTopBots] = useState<any[]>([]);
@@ -218,13 +219,47 @@ export function OverlayMonitor() {
 
 			{activeTab === 'feed' && (
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
-					{notifications.length === 0 ? (
+					{notifications.length > 0 && (
+						<div className="flex items-center justify-between gap-2 px-1">
+							<div className="inline-flex items-center rounded-full border border-(--border)/10 bg-(--foreground)/30 p-0.5 gap-0.5">
+								<button
+									type="button"
+									onClick={() => setFeedFilter('all')}
+									className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+										feedFilter === 'all' ? 'bg-(--accent) text-(--text)' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{t('app.overlay.filterAll')}
+								</button>
+								<button
+									type="button"
+									onClick={() => setFeedFilter('unread')}
+									className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
+										feedFilter === 'unread' ? 'bg-(--accent) text-(--text)' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{t('app.overlay.filterUnread', { count: unreadCount })}
+								</button>
+							</div>
+							{unreadCount > 0 && (
+								<button
+									type="button"
+									onClick={() => markAllAsRead()}
+									className="inline-flex items-center gap-1 rounded-full border border-(--accent)/30 bg-(--accent)/15 hover:bg-(--accent)/25 px-2.5 py-1 text-[11px] font-bold text-(--accent) transition-colors cursor-pointer"
+								>
+									<CheckCheck size={12} />
+									<span>{t('app.overlay.markAllRead')}</span>
+								</button>
+							)}
+						</div>
+					)}
+					{(feedFilter === 'unread' ? notifications.filter((n) => !n.read) : notifications).length === 0 ? (
 						<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 p-8 text-center">
 							<Bell size={22} className="text-(--text-muted) mb-2 opacity-60" />
-							<p className="text-xs text-(--text-muted)">{t('app.overlay.emptyFeed')}</p>
+							<p className="text-xs text-(--text-muted)">{feedFilter === 'unread' ? t('app.overlay.noUnreadFeed') : t('app.overlay.emptyFeed')}</p>
 						</div>
 					) : (
-						notifications.slice(0, 8).map((n) => (
+						(feedFilter === 'unread' ? notifications.filter((n) => !n.read) : notifications).slice(0, 8).map((n) => (
 							<div
 								key={n.id}
 								onClick={() => {

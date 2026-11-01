@@ -82,3 +82,50 @@ export function formatBytes(bytes: number): string {
 	if (kb < 1024) return `${kb.toFixed(1)} KB`;
 	return `${(kb / 1024).toFixed(2)} MB`;
 }
+
+export function detectHasteLanguageFromFilename(filename: string): string {
+	const clean = (filename || '').trim();
+	if (!clean) return 'plaintext';
+	if (clean.toLowerCase() === 'dockerfile' || clean.toLowerCase().endsWith('.dockerfile')) return 'dockerfile';
+	const ext = clean.includes('.') ? clean.split('.').pop()?.toLowerCase() || '' : '';
+	const extMap: Record<string, string> = {
+		ts: 'typescript',
+		tsx: 'typescript',
+		mts: 'typescript',
+		cts: 'typescript',
+		js: 'javascript',
+		jsx: 'javascript',
+		mjs: 'javascript',
+		cjs: 'javascript',
+		json: 'json',
+		jsonc: 'json',
+		py: 'python',
+		sh: 'bash',
+		bash: 'bash',
+		zsh: 'bash',
+		md: 'markdown',
+		mdx: 'markdown',
+		html: 'html',
+		htm: 'html',
+		css: 'css',
+		scss: 'css',
+		sql: 'sql',
+		yml: 'yaml',
+		yaml: 'yaml',
+		rs: 'rust',
+		go: 'go',
+		java: 'java',
+		cs: 'csharp',
+		cpp: 'cpp',
+		cc: 'cpp',
+		cxx: 'cpp',
+		c: 'cpp',
+		h: 'cpp',
+		hpp: 'cpp',
+		php: 'php',
+		rb: 'ruby',
+		txt: 'plaintext',
+		log: 'plaintext',
+	};
+	return extMap[ext] || 'plaintext';
+}

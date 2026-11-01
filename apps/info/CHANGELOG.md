@@ -2,6 +2,26 @@
 
 # info
 
+## 1.11.0
+
+### Minor Changes
+
+-   - **Live Status Telemetry Summary Strip**: Added a 4-card real-time operational summary (`Services Online`, `Average Latency`, `24h Uptime`, `Active Bots`) to the Status Hub.
+    - **Roadmap Live Status Counts & Current Quarter Filter**: Added live item count badges to each status filter pill (`All`, `Idea`, `Planned`, `In Progress`, `Released`) and a 1-click `Current Quarter` filter pill.
+    - **Suggestions, Issues & Changelog Upgrades**: Added a 4-card KPI strip and status filter pills (`All`, `Open`, `Approved`, `Implemented`) on Suggestions, a `My Reports` filter on Issue Tracker, and a 3-card release telemetry strip with a `Latest Release` quick-jump pill on Changelog.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 1.10.10
 
 ### Patch Changes

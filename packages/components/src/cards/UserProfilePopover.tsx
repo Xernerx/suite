@@ -50,6 +50,7 @@ const VANITY_BADGE_ICONS: Record<string, any> = {
 
 export interface UserProfilePopoverInitialUser {
 	id?: string;
+	vanitySlug?: string;
 	username?: string;
 	global_name?: string;
 	globalName?: string;
@@ -244,7 +245,7 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 		toast({ type: 'success', title: t('components.cards.sidebaruser.userIdCopied'), description: cleanId });
 	};
 
-	const profileUrl = getEnvUrl(`https://app.xernerx.com/users/${cleanId}`);
+	const profileUrl = getEnvUrl(`https://app.xernerx.com/users/${dbUser?.vanitySlug || initialUser?.vanitySlug || cleanId}`);
 
 	return (
 		<>
@@ -344,9 +345,12 @@ export function UserProfilePopover({ userId, initialUser, children, className = 
 									</div>
 
 									<div className="flex flex-col gap-0.5 min-w-0">
-										<h3 className="text-lg font-black text-(--text) truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>
-											{displayName}
-										</h3>
+										<div className="flex items-center gap-1.5 min-w-0">
+											<h3 className="text-lg font-black text-(--text) truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>
+												{displayName}
+											</h3>
+											{dbUser?.verified && <ShieldCheck size={16} className="text-(--accent-green) shrink-0" />}
+										</div>
 										<div className="flex items-center gap-2 min-w-0">
 											{username && <span className="text-xs text-(--text-muted) font-medium truncate">@{username}</span>}
 											<button

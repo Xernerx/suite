@@ -14,24 +14,59 @@ export async function GET(req: NextRequest) {
 		const suggestions = await models.core.Suggestion.find({ status: 'pending' }).sort({ createdAt: -1 }).lean();
 
 		const authorIds = [...new Set(suggestions.map((s) => s.authorId))];
-		const users = await models.users.User.find({ id: { $in: authorIds } }).lean();
+		const users = await models.users.User.find({ id: { $in: authorIds } })
+			.select('id name icon vanitySlug discordCache')
+			.lean();
 		const userMap: Record<string, any> = {};
 
 		await Promise.all(
 			authorIds.map(async (id) => {
+				const dbUser = users.find((u: any) => u.id === id);
+				const cached = dbUser?.discordCache;
+				if (cached?.username || cached?.globalName) {
+					userMap[id] = {
+						id,
+						name: cached.globalName || cached.username || dbUser?.name,
+						icon: cached.avatarUrl || dbUser?.icon || null,
+						vanitySlug: dbUser?.vanitySlug,
+					};
+					return;
+				}
 				try {
-					if (process.env.DISCORD_CLIENT_TOKEN) {
+					const token = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
+					if (token) {
 						const discordRes = await fetch(`https://discord.com/api/v10/users/${id}`, {
-							headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
+							headers: { Authorization: `Bot ${token}` },
 							next: { revalidate: 3600 },
 						});
 
 						if (discordRes.ok) {
 							const data = await discordRes.json();
+							const avatarUrl = data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null;
 							userMap[id] = {
+								id,
 								name: data.global_name || data.username,
-								icon: data.avatar ? `https://cdn.discordapp.com/avatars/${id}/${data.avatar}.${data.avatar.startsWith('a_') ? 'gif' : 'png'}?size=1024` : null,
+								icon: avatarUrl,
+								vanitySlug: dbUser?.vanitySlug,
 							};
+							if (dbUser) {
+								models.users.User.updateOne(
+									{ id },
+									{
+										$set: {
+											name: data.global_name || data.username || dbUser.name,
+											...(avatarUrl ? { icon: avatarUrl } : {}),
+											discordCache: {
+												username: data.username,
+												globalName: data.global_name || null,
+												avatar: data.avatar || null,
+												avatarUrl,
+												cachedAt: new Date(),
+											},
+										},
+									}
+								).catch(() => {});
+							}
 							return; // successfully fetched from discord
 						}
 					}
@@ -40,11 +75,10 @@ export async function GET(req: NextRequest) {
 				}
 
 				// Fallback to database
-				const dbUser = users.find((u) => u.id === id);
 				if (dbUser) {
-					userMap[id] = { name: dbUser.name, icon: dbUser.icon };
+					userMap[id] = { id, name: dbUser.name, icon: dbUser.icon, vanitySlug: dbUser.vanitySlug };
 				} else {
-					userMap[id] = { name: 'Unknown User', icon: null };
+					userMap[id] = { id, name: 'Unknown User', icon: null };
 				}
 			})
 		);
@@ -103,7 +137,7 @@ export async function POST(req: NextRequest) {
 				],
 				ctaLinks: [
 					{ label: 'Vote & Discuss', url: `https://info.xernerx.com/suggestions?id=${suggestion.id}` },
-					{ label: 'Submit Suggestion (+250 Credits)', url: 'https://info.xernerx.com/suggestions' },
+					{ label: 'Submit Suggestion', url: 'https://info.xernerx.com/suggestions' },
 				],
 			}
 		).catch(() => {});

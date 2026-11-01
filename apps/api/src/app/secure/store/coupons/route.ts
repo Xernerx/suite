@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import Stripe from 'stripe';
 import { database } from '@xernerx/lib/server';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const isStripeConfigured = Boolean(stripeKey && stripeKey !== 'sk_test_placeholder');
@@ -45,6 +46,11 @@ export async function GET(req: Request) {
 					durationInMonths: found.durationInMonths || null,
 				},
 			});
+		}
+
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
 		}
 
 		if (stripe) {
@@ -99,6 +105,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageStore']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Store management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json();
 		const { models } = await database('xernerx');
 		const Coupon = (models.store as any).Coupon;
@@ -199,6 +210,13 @@ export async function POST(req: Request) {
 			stripeCouponId,
 			stripePromotionCodeId,
 			enabled,
+		});
+
+		await recordAuditLog(req, {
+			action: 'store.coupon.created',
+			targetType: 'setting',
+			targetId: coupon.id,
+			summary: `Created store coupon "${coupon.code}" (${discountType === 'percent' ? `${percentOff}% off` : `${amountOff} ${currency.toUpperCase()} off`})`,
 		});
 
 		return NextResponse.json(coupon, { status: 201 });

@@ -2,6 +2,26 @@
 
 # cdn
 
+## 1.3.0
+
+### Minor Changes
+
+-   - **Media Viewer Metadata HUD & Markdown Copy (`/view/[id]`)**: Upgraded `MediaActions` to display filename, MIME type badge, formatted file size, 3-tier privacy badge (`Public`, `Limited`, `Private`), and a 1-click `Copy Markdown` (`![filename](rawUrl)`) button.
+    - **Direct Upload Privacy Selector**: Added a `Public` / `Limited` / `Private` privacy selector directly on the `cdn.xernerx.com` upload studio prior to uploading.
+    - **CORS, Authentication & 3-Tier Privacy Hardening**: Added origin-validated CORS headers (`cors.ts`), authenticated upload verification on `/upload` and `/upload/[id]`, and strict 3-tier privacy access checks on `/raw/[id]` and `/media`.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 1.2.17
 
 ### Patch Changes

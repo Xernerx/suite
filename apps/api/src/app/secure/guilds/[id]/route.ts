@@ -226,6 +226,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 		if (body.privacy !== undefined) updateData['privacy'] = body.privacy;
 		if (body.widgets !== undefined) updateData['widgets'] = Boolean(body.widgets);
 		if (body.links !== undefined) updateData['links'] = body.links;
+		if (body.voteCount !== undefined) updateData['voteCount'] = Math.max(0, Number(body.voteCount) || 0);
+		if (body.memberCount !== undefined) updateData['memberCount'] = Math.max(0, Number(body.memberCount) || 0);
+		if (body.promotedUntil !== undefined) updateData['promotedUntil'] = body.promotedUntil || null;
+		if (body.boostedUntil !== undefined) updateData['boostedUntil'] = body.boostedUntil || null;
 
 		const { _id: _omitId, __v: _omitV, createdAt: _omitCreated, updatedAt: _omitUpdated, action: _omitAction, ...cleanBody } = body || {};
 		const finalSet = Object.keys(updateData).length > 0 ? updateData : cleanBody;
@@ -276,7 +280,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
-		const db = (await database('xernerx')).models.guilds.Guild as any;
+		const { models } = await database('xernerx');
+		const guildModels = models.guilds as any;
+		const db = guildModels.Guild as any;
 
 		const deletedGuild = await db.findOneAndDelete({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 
@@ -284,11 +290,20 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 			return NextResponse.json({ error: 'Guild not found' }, { status: 404 });
 		}
 
+		const targetGuildId = deletedGuild.id || id;
+		await Promise.all([
+			guildModels?.Vote?.deleteMany({ $or: [{ guildId: targetGuildId }, { id: targetGuildId }] }).catch(() => {}),
+			guildModels?.Review?.deleteMany({ $or: [{ guildId: targetGuildId }, { id: targetGuildId }] }).catch(() => {}),
+			guildModels?.Stat?.deleteMany({ $or: [{ guildId: targetGuildId }, { id: targetGuildId }] }).catch(() => {}),
+			guildModels?.Member?.deleteMany({ $or: [{ guildId: targetGuildId }, { id: targetGuildId }] }).catch(() => {}),
+			guildModels?.Role?.deleteMany({ $or: [{ guildId: targetGuildId }, { id: targetGuildId }] }).catch(() => {}),
+		]);
+
 		await recordAuditLog(req, {
 			action: 'server.delete',
 			targetType: 'server',
-			targetId: deletedGuild.id || id,
-			summary: `Deleted server "${deletedGuild.name || deletedGuild.id || id}"`,
+			targetId: targetGuildId,
+			summary: `Deleted server "${deletedGuild.name || targetGuildId}"`,
 		});
 
 		return NextResponse.json({ success: true }, { status: 200 });

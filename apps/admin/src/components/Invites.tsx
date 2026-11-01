@@ -5,10 +5,22 @@ import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useEnvironment, useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Modal, Button, Confirm, Input, Toggle } from '@xernerx/ui';
+import { Modal, Button, Confirm, Input, Toggle, Selector, MultiSelector } from '@xernerx/ui';
 import { Link, Plus, Trash2, Edit2, Copy, Check, ExternalLink, Download, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PermissionFlagsBits } from 'discord-api-types/v10';
+
+const DISCORD_SCOPE_OPTIONS = [
+	{ label: 'bot', value: 'bot' },
+	{ label: 'applications.commands', value: 'applications.commands' },
+	{ label: 'identify', value: 'identify' },
+	{ label: 'guilds', value: 'guilds' },
+	{ label: 'guilds.join', value: 'guilds.join' },
+	{ label: 'guilds.members.read', value: 'guilds.members.read' },
+	{ label: 'email', value: 'email' },
+	{ label: 'connections', value: 'connections' },
+	{ label: 'webhook.incoming', value: 'webhook.incoming' },
+];
 
 interface AppInvite {
 	id: string; // URL Slug
@@ -28,6 +40,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 	const { toast } = useToast();
 
 	const [invites, setInvites] = useState<AppInvite[]>([]);
+	const [availableBots, setAvailableBots] = useState<any[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [search, setSearch] = useState(initialSearch);
@@ -45,17 +58,24 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 	const [newId, setNewId] = useState('');
 	const [newClientId, setNewClientId] = useState('');
 	const [newName, setNewName] = useState('');
-	const [newScopes, setNewScopes] = useState('bot, applications.commands');
+	const [newScopes, setNewScopes] = useState<string[]>(['bot', 'applications.commands']);
 	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
 
 	const fetchInvites = async (isManual = false) => {
 		if (isManual) setRefreshing(true);
 		else setLoading(true);
 		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), { credentials: 'include' });
+			const [res, botsRes] = await Promise.all([
+				fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/secure/bots?all=true&limit=200'), { credentials: 'include' }).catch(() => null),
+			]);
 			if (res.ok) {
 				const data = await res.json();
 				setInvites(Array.isArray(data) ? data : []);
+			}
+			if (botsRes?.ok) {
+				const botsData = await botsRes.json();
+				setAvailableBots(Array.isArray(botsData) ? botsData : []);
 			}
 		} catch (error) {
 			console.error(error);
@@ -75,7 +95,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		setNewId('');
 		setNewClientId('');
 		setNewName('');
-		setNewScopes('bot, applications.commands');
+		setNewScopes(['bot', 'applications.commands']);
 		setSelectedPermissions(BigInt(0));
 		setIsCreateOpen(true);
 	};
@@ -85,7 +105,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		setNewId(invite.id);
 		setNewClientId(invite.clientId);
 		setNewName(invite.name);
-		setNewScopes(invite.scopes.join(', '));
+		setNewScopes(Array.isArray(invite.scopes) && invite.scopes.length > 0 ? invite.scopes : ['bot', 'applications.commands']);
 		setSelectedPermissions(BigInt(invite.permissions));
 		setIsCreateOpen(true);
 	};
@@ -99,10 +119,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 			clientId: newClientId,
 			name: newName,
 			permissions: selectedPermissions.toString(),
-			scopes: newScopes
-				.split(',')
-				.map((s) => s.trim())
-				.filter(Boolean),
+			scopes: newScopes.map((s) => s.trim()).filter(Boolean),
 		};
 
 		try {
@@ -328,14 +345,62 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 						</div>
 					</div>
 
-					<div className="flex flex-col gap-2">
+					<div className="relative z-40 flex flex-col gap-2">
 						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.clientId')}</label>
-						<Input type="text" value={newClientId} onChange={(e) => setNewClientId(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderClientId')} />
+						<Selector
+							value={newClientId}
+							onChange={(val) => {
+								setNewClientId(val);
+								const matchedBot = availableBots.find((b) => String(b.id) === val);
+								if (matchedBot && !editId) {
+									const botDisplayName = matchedBot.discord?.globalName || matchedBot.discord?.username || matchedBot.name || '';
+									if (!newName && botDisplayName) setNewName(botDisplayName);
+									if (!newId) {
+										const slugCandidate =
+											matchedBot.vanitySlug ||
+											botDisplayName
+												.toLowerCase()
+												.replace(/[^a-z0-9-]+/g, '-')
+												.replace(/^-+|-+$/g, '');
+										if (slugCandidate) setNewId(slugCandidate);
+									}
+								}
+							}}
+							options={(() => {
+								const opts = availableBots.map((b) => {
+									const labelName = b.discord?.globalName || b.discord?.username || b.name || b.id;
+									return {
+										label: `${labelName} (${b.id})`,
+										value: String(b.id),
+									};
+								});
+								if (newClientId && !opts.some((o) => o.value === newClientId)) {
+									opts.unshift({ label: newClientId, value: newClientId });
+								}
+								return opts;
+							})()}
+							placeholder={t('admin.dashboard.invites.placeholderClientId')}
+							toggleClassName="!h-11"
+						/>
 					</div>
 
-					<div className="flex flex-col gap-2">
+					<div className="relative z-30 flex flex-col gap-2">
 						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.scopes')}</label>
-						<Input type="text" value={newScopes} onChange={(e) => setNewScopes(e.target.value)} required />
+						<MultiSelector
+							value={newScopes}
+							onChange={setNewScopes}
+							options={(() => {
+								const opts = [...DISCORD_SCOPE_OPTIONS];
+								for (const s of newScopes) {
+									if (s && !opts.some((o) => o.value === s)) {
+										opts.push({ label: s, value: s });
+									}
+								}
+								return opts;
+							})()}
+							placeholder="Select OAuth2 scopes..."
+							toggleClassName="!h-11"
+						/>
 					</div>
 
 					<div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-2 rounded-xl bg-(--foreground)/10 border border-(--border)/10 p-4">

@@ -20,11 +20,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 		const StatModel = (db.models.guilds as any).Stat;
 		const VoteModel = (db.models.guilds as any).Vote;
 
-		const [guild, latestStat, voteCount] = await Promise.all([
-			GuildModel.findOne({ id }).lean() as Promise<any>,
-			StatModel.findOne({ id }).sort({ timestamp: -1 }).lean() as Promise<any>,
-			VoteModel.countDocuments({ guildId: id }) as Promise<number>,
-		]);
+		const guild = (await GuildModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean()) as any;
+		const resolvedGuildId = String(guild?.id || id);
+
+		const [latestStat, voteCount] = guild
+			? await Promise.all([StatModel.findOne({ id: resolvedGuildId }).sort({ timestamp: -1 }).lean() as Promise<any>, VoteModel.countDocuments({ guildId: resolvedGuildId }) as Promise<number>])
+			: [null, 0];
 
 		if (!guild || guild.privacy === 'private') {
 			label = 'Xernerx';

@@ -2,7 +2,7 @@
 
 import { Command } from 'commander';
 import { spawnSync, execSync } from 'child_process';
-import { select, isCancel } from '@clack/prompts';
+import { select, multiselect, text, isCancel } from '@clack/prompts';
 import fs from 'fs';
 import path from 'path';
 import { terminal } from '../utils/terminal';
@@ -233,7 +233,10 @@ export default function registerCommit(program: Command) {
 			}
 
 			const changesetDir = path.resolve(process.cwd(), '.changeset');
-			const existingChangesets = fs.existsSync(changesetDir) ? fs.readdirSync(changesetDir).filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md') : [];
+			if (!fs.existsSync(changesetDir)) {
+				fs.mkdirSync(changesetDir, { recursive: true });
+			}
+			const existingChangesets = fs.readdirSync(changesetDir).filter((f) => f.endsWith('.md') && f.toLowerCase() !== 'readme.md');
 			for (const file of existingChangesets) {
 				const fp = path.join(changesetDir, file);
 				const raw = fs.readFileSync(fp, 'utf8');
@@ -241,10 +244,106 @@ export default function registerCommit(program: Command) {
 					fs.writeFileSync(fp, raw.replace(/^<!--\s*@format\s*-->\s*/, ''));
 				}
 			}
-			if (!process.stdin.isTTY && existingChangesets.length > 0) {
+
+			if (!process.stdin.isTTY) {
 				runSync('npx @changesets/cli status');
-			} else {
-				runSync('npx @changesets/cli');
+				return;
 			}
+
+			if (existingChangesets.length > 0) {
+				const action = await select({
+					message: `Found ${existingChangesets.length} existing per-app changeset file(s) in .changeset/. What would you like to do?`,
+					options: [
+						{ label: `Use existing per-app changesets (${existingChangesets.length} ready)`, value: 'keep' },
+						{ label: 'Add additional per-app changeset(s)', value: 'add' },
+					],
+				});
+				if (isCancel(action) || action === 'keep') {
+					runSync('npx @changesets/cli status');
+					return;
+				}
+			}
+
+			// Discover all workspace packages and detect which ones have modified files in git status
+			const workspaceRoots = ['apps', 'packages', 'services', 'clients', '.xernerx'];
+			const workspaces: Array<{ name: string; relDir: string; version: string }> = [];
+			for (const root of workspaceRoots) {
+				const absRoot = path.resolve(process.cwd(), root);
+				if (!fs.existsSync(absRoot)) continue;
+				for (const entry of fs.readdirSync(absRoot, { withFileTypes: true })) {
+					if (!entry.isDirectory()) continue;
+					const pkgJsonPath = path.join(absRoot, entry.name, 'package.json');
+					if (!fs.existsSync(pkgJsonPath)) continue;
+					try {
+						const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
+						if (pkg.name && pkg.version) {
+							workspaces.push({
+								name: pkg.name,
+								relDir: `${root}/${entry.name}`,
+								version: pkg.version,
+							});
+						}
+					} catch {}
+				}
+			}
+
+			const changedDirs = new Set<string>();
+			try {
+				const rawStatus = execSync('git status --porcelain').toString();
+				for (const line of rawStatus.split(/\r?\n/).filter(Boolean)) {
+					const filePath = line.slice(3).trim().replace(/\\/g, '/').replace(/^"|"$/g, '');
+					for (const ws of workspaces) {
+						if (filePath.startsWith(`${ws.relDir}/`)) {
+							changedDirs.add(ws.name);
+						}
+					}
+				}
+			} catch {}
+
+			const selectedPackages = await multiselect({
+				message: 'Select the apps/packages to create separate changesets for (Space to toggle, Enter to confirm):',
+				options: workspaces.map((ws) => ({
+					value: ws.name,
+					label: `${ws.name} (${ws.relDir} @ v${ws.version})`,
+					hint: changedDirs.has(ws.name) ? 'modified' : undefined,
+				})),
+				initialValues: workspaces.filter((ws) => changedDirs.has(ws.name)).map((ws) => ws.name),
+				required: true,
+			});
+
+			if (isCancel(selectedPackages) || !Array.isArray(selectedPackages) || selectedPackages.length === 0) {
+				return;
+			}
+
+			for (const pkgName of selectedPackages) {
+				const bumpType = await select({
+					message: `[${pkgName}] Select version bump type:`,
+					options: [
+						{ label: 'patch (bug fixes, UI polish, internal updates)', value: 'patch' },
+						{ label: 'minor (new features, endpoints, or components)', value: 'minor' },
+						{ label: 'major (breaking changes)', value: 'major' },
+					],
+				});
+				if (isCancel(bumpType)) return;
+
+				const summary = await text({
+					message: `[${pkgName}] Enter changelog message for ${pkgName} only:`,
+					placeholder: `Describe what changed in ${pkgName}...`,
+					validate: (val) => (!val || !val.trim() ? `Please enter a changelog message for ${pkgName}` : undefined),
+				});
+				if (isCancel(summary)) return;
+
+				const safeSlug = pkgName
+					.replace(/^@/, '')
+					.replace(/[^a-z0-9-]+/gi, '-')
+					.toLowerCase();
+				const fileName = `${safeSlug}-${Date.now().toString(36)}.md`;
+				const filePath = path.join(changesetDir, fileName);
+				const fileContent = `---\n'${pkgName}': ${bumpType}\n---\n\n${String(summary).trim()}\n`;
+				fs.writeFileSync(filePath, fileContent, 'utf8');
+				commitLog.log(`✔ Created dedicated changeset .changeset/${fileName} for ${pkgName} (${bumpType})`);
+			}
+
+			runSync('npx @changesets/cli status');
 		});
 }

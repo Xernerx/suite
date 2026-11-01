@@ -1,7 +1,8 @@
 /** @format */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { authenticateV1BotRequest } from '@/lib/v1BotAuth';
 
 const COOLDOWN_HOURS = 12;
 
@@ -15,12 +16,12 @@ export async function OPTIONS() {
 	return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string; userId: string }> }) {
 	const resolvedParams = await params;
 	const rawId = String(resolvedParams?.id || '').trim();
-	const userId = String(resolvedParams?.userId || '').trim();
+	const rawUserId = String(resolvedParams?.userId || '').trim();
 
-	if (!rawId || !userId) {
+	if (!rawId || !rawUserId) {
 		return NextResponse.json({ error: 'Both bot id and userId are required.' }, { status: 400, headers: corsHeaders });
 	}
 
@@ -29,15 +30,39 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 		const BotModel = (db.models.bots as any).Bot;
 		const VoteModel = (db.models.bots as any).Vote;
 		const ReviewModel = (db.models.bots as any).Review;
+		const UserModel = (db.models.users as any).User;
 		const CreditModel = (db.models.users as any).Credit;
 
-		const botDoc = await BotModel.findOne({
-			$or: [{ id: rawId }, { vanitySlug: rawId.toLowerCase() }],
-		})
-			.select('id vanitySlug')
-			.lean();
+		let hasFullAccess = false;
+		if (request.headers.get('Authorization')) {
+			const authResult = await authenticateV1BotRequest(request, rawId, { isMutation: false });
+			hasFullAccess = Boolean(authResult.hasFullAccess);
+		}
+
+		const [botDoc, userDoc] = await Promise.all([
+			BotModel.findOne({
+				$or: [{ id: rawId }, { vanitySlug: rawId.toLowerCase() }],
+			})
+				.select('id vanitySlug privacy')
+				.lean(),
+			UserModel
+				? UserModel.findOne({
+						$or: [{ id: rawUserId }, { vanitySlug: rawUserId.toLowerCase() }],
+					})
+						.select('id privacy')
+						.lean()
+				: null,
+		]);
+
+		if (!hasFullAccess && botDoc?.privacy === 'private') {
+			return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403, headers: corsHeaders });
+		}
+		if (!hasFullAccess && userDoc?.privacy === 'private') {
+			return NextResponse.json({ error: 'This user profile is private.' }, { status: 403, headers: corsHeaders });
+		}
 
 		const botId = String(botDoc?.id || rawId);
+		const userId = String(userDoc?.id || rawUserId);
 		const vanitySlug = botDoc?.vanitySlug ? String(botDoc.vanitySlug).toLowerCase() : null;
 
 		const [lastVote, review, creditDoc] = await Promise.all([
@@ -89,7 +114,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 		return NextResponse.json(
 			{
 				botId: rawId,
-				userId,
+				userId: rawUserId,
 				voted: false,
 				lastVotedAt: null,
 				nextVoteAt: null,

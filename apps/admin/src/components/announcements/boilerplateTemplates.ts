@@ -60,7 +60,7 @@ export function buildBoilerplateTemplate(
 					components: [
 						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.welcomeBtnApp'), url: 'https://app.xernerx.com' },
 						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.welcomeBtnDesktop'), url: 'https://xernerx.com/download' },
-						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.welcomeBtnCredits'), url: 'https://store.xernerx.com?category=credits' },
+						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.ecosystemBtnPortal'), url: 'https://portal.xernerx.com' },
 						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.welcomeBtnInfo'), url: 'https://info.xernerx.com' },
 						{ type: 2, style: 5, label: t('admin.dashboard.announcements.templates.welcomeBtnAccount'), url: 'https://account.xernerx.com' },
 					],

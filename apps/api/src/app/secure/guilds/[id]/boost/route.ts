@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 		const Guild = (models.guilds as any).Guild;
 		const Credit = (models.users as any).Credit;
 
-		const guild = await Guild.findOne({ id });
+		const guild = await Guild.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
 		if (!guild) {
 			return NextResponse.json({ error: 'Server not found.' }, { status: 404 });
 		}

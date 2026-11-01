@@ -2,11 +2,16 @@
 
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { recordAuditLog, sendUserNotification } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth, sendUserNotification } from '@/lib/auditAndNotify';
 import { dispatchAppCommunityWebhook } from '@/lib/mainDiscordServer';
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageRoadmap']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Roadmap management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const body = await req.json();
 		const { models } = await database('xernerx');
@@ -67,6 +72,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageRoadmap']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Roadmap management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const { id } = await params;
 		const { models } = await database('xernerx');
 		const deleted = (await models.core.RoadmapItem.findOneAndDelete({ id }).lean()) as any;

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, User, Trash2, Copy, Check } from 'lucide-react';
 import { UserProfilePopover } from '@xernerx/components';
 import { Button, Confirm, Input, Selector } from '@xernerx/ui';
@@ -28,12 +28,24 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 	const { toast } = useToast();
 
 	const [inviteUserId, setInviteUserId] = useState('');
+	const [availableUsers, setAvailableUsers] = useState<any[]>([]);
 	const [fetchingUser, setFetchingUser] = useState(false);
 	const [inviteUserObj, setInviteUserObj] = useState<any>(null);
 	const [inviteModalOpen, setInviteModalOpen] = useState(false);
 	const [invitingMember, setInvitingMember] = useState(false);
 	const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
 	const [copiedId, setCopiedId] = useState<string | null>(null);
+	const [memberSearch, setMemberSearch] = useState('');
+	const [roleFilter, setRoleFilter] = useState<string>('all');
+
+	useEffect(() => {
+		fetch(getEnvUrl('https://api.xernerx.com/secure/users'), { credentials: 'include' })
+			.then((r) => (r.ok ? r.json() : []))
+			.then((data) => {
+				if (Array.isArray(data)) setAvailableUsers(data);
+			})
+			.catch(() => {});
+	}, [getEnvUrl]);
 
 	const handleCopyMemberId = (id: string) => {
 		navigator.clipboard.writeText(id);
@@ -63,7 +75,7 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 							const roleId = typeof roleItem === 'string' ? roleItem : roleItem.id;
 							if (!roleId) return null;
 							try {
-								const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/roles/${roleId}`), { credentials: 'include' });
+								const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
 								if (res.ok) return await res.json();
 							} catch (e) {}
 							return null;
@@ -201,18 +213,67 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 		);
 	};
 
+	const totalMemberCount = 1 + (Array.isArray(orgConfig?.members) ? orgConfig.members.length : 0);
+	const roleFilterOptions = [
+		{ value: 'all', label: t('app.portal.members.allRoles') },
+		{ value: 'none', label: t('app.portal.members.noRole') },
+		...(orgConfig?.roles || []).map((r: any) => ({ value: r.id, label: r.name })),
+	];
+
+	const matchesMemberFilter = (userId: string) => {
+		const memberObj = orgMembers.find((m) => m.userId === userId);
+		const assignedRole = memberObj?.roles?.[0] || '';
+		if (roleFilter === 'none' && assignedRole !== '') return false;
+		if (roleFilter !== 'all' && roleFilter !== 'none' && assignedRole !== roleFilter) return false;
+		const q = memberSearch.trim().toLowerCase();
+		if (!q) return true;
+		const p = memberProfiles[userId];
+		return (
+			String(userId).toLowerCase().includes(q) ||
+			String(p?.global_name || '')
+				.toLowerCase()
+				.includes(q) ||
+			String(p?.username || '')
+				.toLowerCase()
+				.includes(q)
+		);
+	};
+
+	const filteredMembers = (orgConfig?.members || []).filter((memberId: string) => matchesMemberFilter(memberId));
+
 	return (
 		<>
 			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
-				<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-					<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-						<Users className="w-4 h-4" />
+				<div className="flex items-center justify-between gap-3 mb-6">
+					<div className="flex items-center gap-3 text-(--text) font-extrabold text-sm tracking-widest uppercase">
+						<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
+							<Users className="w-4 h-4" />
+						</div>
+						<span>{t('app.portal.members.header')}</span>
+						<span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30">{totalMemberCount}</span>
 					</div>
-					{t('app.portal.members.header')}
 				</div>
 				<div className="flex flex-col gap-6">
 					<div className="flex flex-col gap-2">
-						<label className="text-sm font-bold text-(--text)">{t('app.portal.members.currentMembers')}</label>
+						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+							<label className="text-sm font-bold text-(--text)">{t('app.portal.members.currentMembers')}</label>
+							<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+								<div className="w-full sm:w-64">
+									<Input
+										variant="search"
+										shortcut={true}
+										value={memberSearch}
+										onChange={(e) => setMemberSearch(e.target.value)}
+										placeholder={t('app.portal.members.searchPlaceholder')}
+									/>
+								</div>
+								{(orgConfig?.roles || []).length > 0 && (
+									<div className="w-full sm:w-44">
+										<Selector value={roleFilter} options={roleFilterOptions} onChange={setRoleFilter} />
+									</div>
+								)}
+							</div>
+						</div>
 						<div className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 							<div className="flex items-center justify-between text-sm">
 								<div className="flex items-center gap-2 flex-wrap">
@@ -252,42 +313,46 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 								{renderMemberActions(selectedOrg.owner)}
 							</div>
 							{orgConfig?.members?.length > 0 ? (
-								orgConfig.members.map((memberId: string) => (
-									<div key={memberId} className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-(--border)/5">
-										<div className="flex items-center gap-2 flex-wrap">
-											<UserProfilePopover userId={memberId} initialUser={memberProfiles[memberId]}>
-												<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
-													{memberProfiles[memberId]?.avatar ? (
-														<Image
-															src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
-															alt="Avatar"
-															width={24}
-															height={24}
-															unoptimized
-															className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
-														/>
-													) : (
-														<div className="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm">
-															<User className="w-3 h-3 text-(--text-muted)" />
-														</div>
-													)}
-													<span className="font-medium">
-														{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
-													</span>
-												</div>
-											</UserProfilePopover>
-											<button
-												type="button"
-												onClick={() => handleCopyMemberId(memberId)}
-												className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded-xl border border-(--border)/10 transition-colors cursor-pointer"
-											>
-												<span>{memberId}</span>
-												{copiedId === memberId ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
-											</button>
+								filteredMembers.length > 0 ? (
+									filteredMembers.map((memberId: string) => (
+										<div key={memberId} className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-(--border)/5">
+											<div className="flex items-center gap-2 flex-wrap">
+												<UserProfilePopover userId={memberId} initialUser={memberProfiles[memberId]}>
+													<div className="flex items-center gap-2 hover:text-(--accent) transition-colors">
+														{memberProfiles[memberId]?.avatar ? (
+															<Image
+																src={`https://cdn.discordapp.com/avatars/${memberId}/${memberProfiles[memberId].avatar}.png`}
+																alt="Avatar"
+																width={24}
+																height={24}
+																unoptimized
+																className="w-6 h-6 rounded-full object-cover shadow-sm border border-(--border)/10"
+															/>
+														) : (
+															<div className="w-6 h-6 rounded-full bg-(--foreground)/50 flex items-center justify-center border border-(--border)/10 shadow-sm">
+																<User className="w-3 h-3 text-(--text-muted)" />
+															</div>
+														)}
+														<span className="font-medium">
+															{memberProfiles[memberId]?.global_name || memberProfiles[memberId]?.username || t('app.portal.members.unknownUser')}
+														</span>
+													</div>
+												</UserProfilePopover>
+												<button
+													type="button"
+													onClick={() => handleCopyMemberId(memberId)}
+													className="inline-flex items-center gap-1 text-(--text-muted) hover:text-(--text) text-[10px] font-mono bg-(--background)/50 hover:bg-(--background) px-1.5 py-0.5 rounded-xl border border-(--border)/10 transition-colors cursor-pointer"
+												>
+													<span>{memberId}</span>
+													{copiedId === memberId ? <Check size={10} className="text-(--accent-green)" /> : <Copy size={10} />}
+												</button>
+											</div>
+											{renderMemberActions(memberId)}
 										</div>
-										{renderMemberActions(memberId)}
-									</div>
-								))
+									))
+								) : (
+									<span className="text-xs text-(--text-muted) mt-2 pt-2 border-t border-(--border)/5">{t('app.portal.members.noMatchingMembers')}</span>
+								)
 							) : (
 								<span className="text-xs text-(--text-muted) mt-2 pt-2 border-t border-(--border)/5">{t('app.portal.members.noMembers')}</span>
 							)}
@@ -341,6 +406,36 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 					)}
 					<div className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
 						<label className="text-sm font-bold text-(--text)">{t('app.portal.members.inviteMember')}</label>
+						{availableUsers.length > 0 && (
+							<div className="relative z-20">
+								<Selector
+									value={availableUsers.some((u) => String(u.id) === inviteUserId.trim()) ? inviteUserId.trim() : ''}
+									onChange={(val) => {
+										if (val) setInviteUserId(val);
+									}}
+									options={[
+										{ label: t('app.portal.members.invitePlaceholder'), value: '' },
+										...availableUsers
+											.filter((u) => {
+												const uid = String(u.id);
+												if (uid === String(selectedOrg.owner)) return false;
+												if (Array.isArray(orgConfig?.members) && orgConfig.members.includes(uid)) return false;
+												if (pendingInvites.some((p) => String(p.userId) === uid)) return false;
+												return true;
+											})
+											.map((u) => {
+												const display = u.discord?.globalName || u.name || u.discord?.username || u.id;
+												const handle = u.discord?.username ? `@${u.discord.username}` : u.id;
+												return {
+													label: `${display} (${handle})`,
+													value: String(u.id),
+												};
+											}),
+									]}
+									placeholder={t('app.portal.members.invitePlaceholder')}
+								/>
+							</div>
+						)}
 						<div className="flex items-center gap-2">
 							<Input
 								value={inviteUserId}

@@ -2,8 +2,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Activity, Clock, Settings2 } from 'lucide-react';
-import { useDictionary } from '@xernerx/providers';
+import { Activity, Bot, Clock, ExternalLink, Settings2 } from 'lucide-react';
+import Image from 'next/image';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Badge, CopyButton } from '@xernerx/ui';
 import { TokenListInfo } from './types';
 
@@ -22,6 +23,7 @@ const statusVariants: Record<TokenListInfo['status'], 'success' | 'muted' | 'dan
 
 export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const tokenId = token.id || token._id;
 
 	return (
@@ -47,6 +49,20 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 			</div>
 
 			<div className="flex flex-wrap items-center gap-1.5">
+				{token.botInfo ? (
+					<span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 max-w-full truncate">
+						{token.botInfo.avatarUrl ? (
+							<Image src={token.botInfo.avatarUrl} alt={token.botInfo.name} width={14} height={14} unoptimized className="w-3.5 h-3.5 rounded-full object-cover shrink-0" />
+						) : (
+							<Bot size={12} className="shrink-0" />
+						)}
+						<span className="truncate">{token.botInfo.name}</span>
+					</span>
+				) : (
+					<Badge variant="muted" size="sm" icon={<Bot size={11} />}>
+						{t('account.tokens.unboundBadge')}
+					</Badge>
+				)}
 				<Badge variant="muted" size="sm" icon={<Activity size={11} />}>
 					{t('account.tokens.requestsBadge', { count: (token.requestCount ?? 0).toLocaleString() })}
 				</Badge>
@@ -55,8 +71,20 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 				</Badge>
 			</div>
 
-			<div className="flex items-center text-xs font-medium text-(--accent) opacity-0 transition-opacity group-hover:opacity-100 mt-1">
-				<Settings2 size={14} className="mr-1.5" /> {t('account.tokens.manageSettings')}
+			<div className="flex items-center justify-between gap-2 mt-1">
+				<div className="flex items-center text-xs font-medium text-(--accent) opacity-0 transition-opacity group-hover:opacity-100">
+					<Settings2 size={14} className="mr-1.5" /> {t('account.tokens.manageSettings')}
+				</div>
+				{token.botId && (
+					<a
+						href={getEnvUrl(`https://portal.xernerx.com/?bot=${token.botId}`)}
+						onClick={(e) => e.stopPropagation()}
+						className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-(--background)/60 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors"
+					>
+						<ExternalLink size={11} />
+						<span>{t('account.tokens.openInPortal')}</span>
+					</a>
+				)}
 			</div>
 		</motion.div>
 	);

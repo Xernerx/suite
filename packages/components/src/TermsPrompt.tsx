@@ -52,6 +52,7 @@ export function TermsPrompt() {
 				body: JSON.stringify({
 					agreedTerms: now,
 					agreedPrivacy: now,
+					verified: true,
 				}),
 			});
 

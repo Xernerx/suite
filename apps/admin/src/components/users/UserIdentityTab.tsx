@@ -1,0 +1,240 @@
+/** @format */
+'use client';
+
+import React from 'react';
+import { Loader2 } from 'lucide-react';
+import { timezones } from '@xernerx/lib';
+import { Input, MultiSelector, Selector, Toggle } from '@xernerx/ui';
+import { useDictionary } from '@xernerx/providers';
+import type { Role } from './types';
+
+interface UserIdentityTabProps {
+	name: string;
+	setName: (val: string) => void;
+	icon: string;
+	setIcon: (val: string) => void;
+	email: string;
+	setEmail: (val: string) => void;
+	stripeCustomerId: string;
+	setStripeCustomerId: (val: string) => void;
+	selectedRoleIds: string[];
+	setSelectedRoleIds: (val: string[]) => void;
+	roles: Role[];
+	privacy: string;
+	setPrivacy: (val: string) => void;
+	verified: boolean;
+	setVerified: (val: boolean) => void;
+	vanityUnlocked: boolean;
+	setVanityUnlocked: (val: boolean) => void;
+	vanitySlug: string;
+	setVanitySlug: (val: string) => void;
+	widgets: boolean;
+	setWidgets: (val: boolean) => void;
+	staffSubscription: boolean;
+	subLoading: boolean;
+	onStaffSubscriptionToggle: (checked: boolean) => void;
+	pronouns: string;
+	setPronouns: (val: string) => void;
+	gender: string;
+	setGender: (val: string) => void;
+	birthday: string;
+	setBirthday: (val: string) => void;
+	timezone: string;
+	setTimezone: (val: string) => void;
+	description: string;
+	setDescription: (val: string) => void;
+	info: string;
+	setInfo: (val: string) => void;
+}
+
+export function UserIdentityTab({
+	name,
+	setName,
+	icon,
+	setIcon,
+	email,
+	setEmail,
+	stripeCustomerId,
+	setStripeCustomerId,
+	selectedRoleIds,
+	setSelectedRoleIds,
+	roles,
+	privacy,
+	setPrivacy,
+	verified,
+	setVerified,
+	vanityUnlocked,
+	setVanityUnlocked,
+	vanitySlug,
+	setVanitySlug,
+	widgets,
+	setWidgets,
+	staffSubscription,
+	subLoading,
+	onStaffSubscriptionToggle,
+	pronouns,
+	setPronouns,
+	gender,
+	setGender,
+	birthday,
+	setBirthday,
+	timezone,
+	setTimezone,
+	description,
+	setDescription,
+	info,
+	setInfo,
+}: UserIdentityTabProps) {
+	const { t } = useDictionary();
+
+	const timezoneOptions = [
+		{ label: t('admin.users.fields.genderUnspecified'), value: '' },
+		...timezones.map((tz) => ({
+			value: tz.value,
+			label: (
+				<div className="flex items-center justify-between w-full gap-2">
+					<span>{tz.label}</span>
+					<span className="text-xs text-(--text-muted) font-mono">{tz.offset}</span>
+				</div>
+			),
+		})),
+	];
+
+	return (
+		<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.25)' }}>
+			<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.displayNameLabel')}</label>
+					<Input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+				</div>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.emailLabel')}</label>
+					<Input type="text" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t('admin.users.fields.emailPlaceholder')} />
+				</div>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.iconLabel')}</label>
+					<Input type="text" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder={t('admin.users.fields.iconPlaceholder')} />
+				</div>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.stripeCustomerIdLabel')}</label>
+					<Input type="text" value={stripeCustomerId} onChange={(e) => setStripeCustomerId(e.target.value)} placeholder={t('admin.users.stripeCustomerPlaceholder')} />
+				</div>
+			</div>
+
+			<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+				<label className="block text-xs font-medium text-(--text)">{t('admin.users.rolesLabel')}</label>
+				<MultiSelector
+					value={selectedRoleIds}
+					onChange={setSelectedRoleIds}
+					options={roles.map((r) => ({
+						value: r.id,
+						label: r.name || t('admin.roles.unnamedRole'),
+						color: r.permissions?.color || undefined,
+					}))}
+					placeholder={t('admin.users.addRolePlaceholder')}
+				/>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.privacyLevelLabel')}</label>
+					<Selector
+						value={privacy}
+						onChange={(val: string) => setPrivacy(val)}
+						options={[
+							{ label: t('account.profile.privacy.public'), value: 'public' },
+							{ label: t('account.profile.privacy.limited'), value: 'limited' },
+							{ label: t('account.profile.privacy.private'), value: 'private' },
+						]}
+					/>
+				</div>
+
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.vanitySlugLabel')}</label>
+					<Input
+						type="text"
+						value={vanitySlug}
+						onChange={(e) => setVanitySlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+						placeholder={t('admin.users.fields.vanitySlugPlaceholder')}
+					/>
+				</div>
+			</div>
+
+			<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex items-center justify-between rounded-2xl border border-(--border)/10 bg-(--background)/50 px-4 py-2.5">
+					<div className="flex flex-col">
+						<span className="text-xs font-bold text-(--text)">{t('admin.users.fields.verifiedToggle')}</span>
+						<span className="text-[10px] text-(--text-muted)">{t('admin.users.fields.verifiedDesc')}</span>
+					</div>
+					<Toggle
+						checked={verified}
+						onChange={(e) => {
+							setVerified(e.target.checked);
+						}}
+					/>
+				</div>
+
+				<div className="flex items-center justify-between rounded-2xl border border-(--border)/10 bg-(--background)/50 px-4 py-2.5">
+					<span className="text-xs font-bold text-(--text)">{t('admin.users.fields.vanityUnlockedToggle')}</span>
+					<Toggle checked={vanityUnlocked} onChange={(e) => setVanityUnlocked(e.target.checked)} />
+				</div>
+
+				<div className="flex items-center justify-between rounded-2xl border border-(--border)/10 bg-(--background)/50 px-4 py-2.5">
+					<span className="text-xs font-bold text-(--text)">{t('admin.users.fields.widgetsToggle')}</span>
+					<Toggle checked={widgets} onChange={(e) => setWidgets(e.target.checked)} />
+				</div>
+
+				<div className={`flex flex-col justify-center rounded-2xl border border-(--accent)/20 bg-(--accent)/5 px-4 py-2.5 ${subLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+					<div className="flex items-center justify-between">
+						<div className="flex flex-col">
+							<span className="text-xs font-bold text-(--accent)">{t('admin.users.staffSubTitle')}</span>
+							<span className="text-[10px] text-(--text-muted)">{t('admin.users.staffSubDesc')}</span>
+						</div>
+						<div className="flex items-center gap-2">
+							{subLoading && <Loader2 size={14} className="animate-spin text-(--accent)" />}
+							<Toggle checked={staffSubscription} onChange={(e) => onStaffSubscriptionToggle(e.target.checked)} />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div className="grid grid-cols-2 md:grid-cols-4 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.pronounsLabel')}</label>
+					<Input type="text" value={pronouns} onChange={(e) => setPronouns(e.target.value)} placeholder={t('admin.users.fields.pronounsPlaceholder')} />
+				</div>
+				<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.genderLabel')}</label>
+					<Selector
+						value={gender}
+						onChange={(val: string) => setGender(val)}
+						options={[
+							{ label: t('admin.users.fields.genderUnspecified'), value: '' },
+							{ label: t('admin.users.fields.genderMale'), value: 'male' },
+							{ label: t('admin.users.fields.genderFemale'), value: 'female' },
+							{ label: t('admin.users.fields.genderOther'), value: 'other' },
+						]}
+					/>
+				</div>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.birthdayLabel')}</label>
+					<Input variant="date" value={birthday} onChange={(e) => setBirthday(e.target.value)} />
+				</div>
+				<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.timezoneLabel')}</label>
+					<Selector value={timezone} onChange={(val: string) => setTimezone(val)} options={timezoneOptions} placeholder={t('admin.users.fields.timezonePlaceholder')} />
+				</div>
+			</div>
+
+			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+				<label className="block text-xs font-medium text-(--text)">{t('admin.users.descriptionLabel')}</label>
+				<Input variant="textarea" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="resize-none" />
+			</div>
+
+			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+				<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.infoLabel')}</label>
+				<Input variant="textarea" value={info} onChange={(e) => setInfo(e.target.value)} rows={4} className="resize-none" />
+			</div>
+		</div>
+	);
+}

@@ -6,15 +6,34 @@ import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+async function findOrgByIdOrSlug(OrganizationModel: any, id: string) {
+	const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+	const query = isObjectId ? { $or: [{ _id: id }, { vanitySlug: id.toLowerCase() }] } : { vanitySlug: id.toLowerCase() };
+	return OrganizationModel.findOne(query).lean();
+}
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
 		const db = await database('xernerx');
 		const OrganizationModel = (db.models.organizations as any).Organization;
+		const MemberModel = (db.models.organizations as any).Member;
 
-		const org = await OrganizationModel.findOne({ _id: id }).select('treasuryBalance treasuryLedger owner members name').lean();
+		const org = await findOrgByIdOrSlug(OrganizationModel, id);
 		if (!org) {
 			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+		}
+		const orgId = String(org._id);
+
+		const isSystemToken = Boolean(req.headers.get('x-token-id'));
+		const session = (await getServerSession(auth)) as any;
+		const userId = session?.user?.id ? String(session.user.id) : null;
+		const isOwner = Boolean(userId && org.owner === userId);
+		const isArrayMember = Boolean(userId && Array.isArray(org.members) && org.members.includes(userId));
+		const memberDoc = !isSystemToken && !isOwner && !isArrayMember && userId && MemberModel ? await MemberModel.findOne({ ownerId: orgId, userId }).lean() : null;
+
+		if (!isSystemToken && !isOwner && !isArrayMember && !memberDoc) {
+			return NextResponse.json({ error: 'Forbidden: Only organization members can view the treasury.' }, { status: 403 });
 		}
 
 		const ledger = Array.isArray(org.treasuryLedger) ? [...org.treasuryLedger].sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
@@ -49,14 +68,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const MemberModel = (db.models.organizations as any).Member;
 		const CreditModel = (db.models.users as any).Credit;
 
-		const org = await OrganizationModel.findOne({ _id: id }).lean();
+		const org = await findOrgByIdOrSlug(OrganizationModel, id);
 		if (!org) {
 			return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
 		}
+		const orgId = String(org._id);
 
 		const isOwner = org.owner === userId;
 		const isArrayMember = Array.isArray(org.members) && org.members.includes(userId);
-		const memberDoc = !isOwner && !isArrayMember && MemberModel ? await MemberModel.findOne({ organizationId: id, userId }).lean() : null;
+		const memberDoc = !isOwner && !isArrayMember && MemberModel ? await MemberModel.findOne({ ownerId: orgId, userId }).lean() : null;
 
 		if (!isOwner && !isArrayMember && !memberDoc) {
 			return NextResponse.json({ error: 'Forbidden: Only organization members can access the treasury.' }, { status: 403 });
@@ -86,7 +106,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 							id: randomUUID(),
 							type: 'org_treasury',
 							amount: -amount,
-							itemId: String(id),
+							itemId: orgId,
 							itemName: `Treasury Deposit: ${org.name}`,
 							createdAt: now,
 						},
@@ -100,13 +120,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 				username,
 				type: 'deposit',
 				amount,
-				targetId: String(id),
+				targetId: orgId,
 				targetName: org.name,
 				createdAt: now,
 			};
 
 			const updatedOrg = await OrganizationModel.findOneAndUpdate(
-				{ _id: id },
+				{ _id: orgId },
 				{
 					$inc: { treasuryBalance: amount },
 					$push: {
@@ -147,24 +167,30 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 			if (targetType === 'bot') {
 				const BotModel = (db.models.bots as any).Bot;
-				const bot = await BotModel.findOne({ id: targetId }).lean();
+				const bot = await BotModel.findOne({ $or: [{ id: targetId }, { vanitySlug: targetId.toLowerCase() }] }).lean();
 				if (!bot) {
 					return NextResponse.json({ error: 'Target bot not found' }, { status: 404 });
 				}
-				targetName = bot.name || targetId;
+				if (String(bot.organization || '') !== orgId && !(Array.isArray(bot.owners) && bot.owners.includes(org.owner))) {
+					return NextResponse.json({ error: 'Forbidden: Target bot does not belong to this organization.' }, { status: 403 });
+				}
+				targetName = bot.name || bot.id;
 				const baseTime = bot.boostedUntil && new Date(bot.boostedUntil) > now ? new Date(bot.boostedUntil).getTime() : now.getTime();
 				const boostedUntil = new Date(baseTime + durationMs);
-				await BotModel.updateOne({ id: targetId }, { $set: { boostedUntil, promotedUntil: boostedUntil } });
+				await BotModel.updateOne({ id: bot.id }, { $set: { boostedUntil, promotedUntil: boostedUntil } });
 			} else {
 				const GuildModel = (db.models.guilds as any).Guild;
-				const guild = await GuildModel.findOne({ id: targetId }).lean();
+				const guild = await GuildModel.findOne({ $or: [{ id: targetId }, { vanitySlug: targetId.toLowerCase() }] }).lean();
 				if (!guild) {
 					return NextResponse.json({ error: 'Target server not found' }, { status: 404 });
 				}
-				targetName = guild.name || targetId;
+				if (String(guild.organization || '') !== orgId && guild.owner !== org.owner) {
+					return NextResponse.json({ error: 'Forbidden: Target server does not belong to this organization.' }, { status: 403 });
+				}
+				targetName = guild.name || guild.id;
 				const baseTime = guild.boostedUntil && new Date(guild.boostedUntil) > now ? new Date(guild.boostedUntil).getTime() : now.getTime();
 				const boostedUntil = new Date(baseTime + durationMs);
-				await GuildModel.updateOne({ id: targetId }, { $set: { boostedUntil, promotedUntil: boostedUntil } });
+				await GuildModel.updateOne({ id: guild.id }, { $set: { boostedUntil, promotedUntil: boostedUntil } });
 			}
 
 			const ledgerEntry = {
@@ -179,7 +205,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			};
 
 			const updatedOrg = await OrganizationModel.findOneAndUpdate(
-				{ _id: id },
+				{ _id: orgId },
 				{
 					$inc: { treasuryBalance: -cost },
 					$push: {
@@ -201,7 +227,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		if (action === 'unlock_vanity') {
 			const targetType = body.targetType === 'server' ? 'server' : body.targetType === 'bot' ? 'bot' : 'organization';
-			const targetId = String(body.targetId || id).trim();
+			const targetId = String(body.targetId || orgId).trim();
 			const cost = 2000;
 
 			const currentTreasury = Number(org.treasuryBalance) || 0;
@@ -214,31 +240,37 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 			if (targetType === 'bot') {
 				const BotModel = (db.models.bots as any).Bot;
-				const bot = await BotModel.findOne({ id: targetId }).lean();
+				const bot = await BotModel.findOne({ $or: [{ id: targetId }, { vanitySlug: targetId.toLowerCase() }] }).lean();
 				if (!bot) {
 					return NextResponse.json({ error: 'Target bot not found' }, { status: 404 });
+				}
+				if (String(bot.organization || '') !== orgId && !(Array.isArray(bot.owners) && bot.owners.includes(org.owner))) {
+					return NextResponse.json({ error: 'Forbidden: Target bot does not belong to this organization.' }, { status: 403 });
 				}
 				if (bot.vanityUnlocked || bot.vanitySlug || bot.verified) {
 					return NextResponse.json({ error: 'Vanity URL is already unlocked for this bot.' }, { status: 400 });
 				}
-				targetName = bot.name || targetId;
-				await BotModel.updateOne({ id: targetId }, { $set: { vanityUnlocked: true } });
+				targetName = bot.name || bot.id;
+				await BotModel.updateOne({ id: bot.id }, { $set: { vanityUnlocked: true } });
 			} else if (targetType === 'server') {
 				const GuildModel = (db.models.guilds as any).Guild;
-				const guild = await GuildModel.findOne({ id: targetId }).lean();
+				const guild = await GuildModel.findOne({ $or: [{ id: targetId }, { vanitySlug: targetId.toLowerCase() }] }).lean();
 				if (!guild) {
 					return NextResponse.json({ error: 'Target server not found' }, { status: 404 });
+				}
+				if (String(guild.organization || '') !== orgId && guild.owner !== org.owner) {
+					return NextResponse.json({ error: 'Forbidden: Target server does not belong to this organization.' }, { status: 403 });
 				}
 				if (guild.vanityUnlocked || guild.vanitySlug || guild.verified) {
 					return NextResponse.json({ error: 'Vanity URL is already unlocked for this server.' }, { status: 400 });
 				}
-				targetName = guild.name || targetId;
-				await GuildModel.updateOne({ id: targetId }, { $set: { vanityUnlocked: true } });
+				targetName = guild.name || guild.id;
+				await GuildModel.updateOne({ id: guild.id }, { $set: { vanityUnlocked: true } });
 			} else {
 				if (org.vanityUnlocked || org.vanitySlug || org.verified) {
 					return NextResponse.json({ error: 'Vanity URL is already unlocked for this organization.' }, { status: 400 });
 				}
-				await OrganizationModel.updateOne({ _id: id }, { $set: { vanityUnlocked: true } });
+				await OrganizationModel.updateOne({ _id: orgId }, { $set: { vanityUnlocked: true } });
 			}
 
 			const ledgerEntry = {
@@ -253,7 +285,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			};
 
 			const updatedOrg = await OrganizationModel.findOneAndUpdate(
-				{ _id: id },
+				{ _id: orgId },
 				{
 					$inc: { treasuryBalance: -cost },
 					$push: {

@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 const DEFAULT_SUPPORT_CHECKLIST = ['Retried the command?', 'Bot is online?', 'Have someone else try?', 'Checked if you have permissions?'];
 
@@ -162,6 +162,11 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
 	try {
+		const caller = await resolveCallerAuth(req, ['manageSupport']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Support management permission required' }, { status: caller.userId ? 403 : 401 });
+		}
+
 		const body = await req.json();
 		const { entity } = body;
 

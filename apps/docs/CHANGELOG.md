@@ -2,6 +2,25 @@
 
 # docs
 
+## 1.9.0
+
+### Minor Changes
+
+-   - **SDK Packages 1-Click Import Copy & NPM Links**: Added a 1-click `Copy Import` (`import ... from '@xernerx/...'`) action and direct NPM registry link on every package card in the `/packages` catalog.
+    - **Interactive WebSocket RPC Playground Upgrades**: Added a `Format JSON` body button, a 1-click `Copy wscat CLI` command button, and a `Recent Dispatches` strip to reload previous RPC frames and compare latencies.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 1.8.10
 
 ### Patch Changes

@@ -108,6 +108,9 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	}, [setNavItems, show, hide, t, canManageServer, id, server?.id]);
 
 	useEffect(() => {
+		setServer(null);
+		setOrganizationData(null);
+		setLoading(true);
 		const fetchServer = async () => {
 			try {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}`));

@@ -2,6 +2,27 @@
 
 # app
 
+## 2.18.0
+
+### Minor Changes
+
+-   - **Rich Server Profile Bento Overhaul & Vitals Sidebar (`/servers/[id]`)**: Rebuilt server profiles into a 12-column Bento layout with a 4-card `ServerVitalsSidebar` (`Online Now`, `Members`, `Bots`, `Boosts`), Community Tags card, linked Organization showcase card, and rich Markdown overview.
+    - **Server Dashboard Upgrades (`/dashboard`)**: Added a Community Tags manager (up to 8 custom tags), 1-click Bot Invite shortcuts for official ecosystem bots, Vanity URL 1-click Copy & Open actions, Server Profile JSON backup export/import, and Window Peak & Average chart readouts on Server Statistics (`MetricsChart`).
+    - **Public User & Organization Profile Bento Upgrades (`/users/[id]` & `/organization/[id]`)**: Added a universal 4-card KPI strip (`Global Level`, `Daily Streak`, `Servers`, `Bots`) on public user profiles and a 3-card ecosystem reach strip (`Members`, `Bots`, `Servers`) with interactive linked server cards on public organization profiles.
+    - **Explore Directory, Global Leaderboards & Live Overlay**: Upgraded `ExploreSearchBar` and `ExploreCards`, added a pinned `Your Current Standing` banner on Streaks and Levels leaderboards, and added an `All` / `Unread` filter with 1-click `Mark All Read` in the Live Overlay (`OverlayMonitor`).
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.13.0
+    - @xernerx/lib@1.18.0
+    - @xernerx/providers@0.19.0
+    - @xernerx/ui@0.7.16
+    - @xernerx/feedback@0.4.11
+
 ## 2.17.1
 
 ### Patch Changes

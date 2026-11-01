@@ -31,7 +31,15 @@ export async function GET(req: Request) {
 			const ids = idsParam.split(',').map((id) => id.trim());
 			query = { id: { $in: ids } }; // If querying by explicit IDs, bypass privacy check
 		} else if (organization) {
-			query = { organization }; // If querying by organization, bypass privacy check
+			let resolvedOrgId = organization;
+			if (!/^[0-9a-fA-F]{24}$/.test(organization)) {
+				const orgDoc = await (db.models.organizations as any)?.Organization?.findOne({ vanitySlug: organization.toLowerCase() })
+					.select('_id')
+					.lean()
+					.catch(() => null);
+				if (orgDoc?._id) resolvedOrgId = String(orgDoc._id);
+			}
+			query = { organization: resolvedOrgId }; // If querying by organization, bypass privacy check
 		} else if (owner || organizationsParam) {
 			const orgList = organizationsParam
 				? organizationsParam

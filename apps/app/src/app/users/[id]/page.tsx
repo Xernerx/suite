@@ -43,19 +43,20 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 			items.push(
 				...bots.map((b) => ({
 					label: b.discord?.global_name || b.discord?.username || b.name || t('common.unknownBot'),
-					href: `/bots/${b.id}`,
-					icon: b.discord?.avatar
-						? () => (
-								<Image
-									src={`https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`}
-									alt={b.name}
-									width={20}
-									height={20}
-									unoptimized
-									className="w-5 h-5 rounded-full object-cover"
-								/>
-							)
-						: Bot,
+					href: `/bots/${b.vanitySlug || b.id}`,
+					icon:
+						b.discord?.avatarUrl || b.discord?.avatar
+							? () => (
+									<Image
+										src={b.discord.avatarUrl || `https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`}
+										alt={b.name}
+										width={20}
+										height={20}
+										unoptimized
+										className="w-5 h-5 rounded-full object-cover"
+									/>
+								)
+							: Bot,
 					category: t('app.users.nav.publishedBots'),
 				}))
 			);
@@ -65,7 +66,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 			items.push(
 				...organizations.map((o) => ({
 					label: o.name,
-					href: `/organization/${o._id}`,
+					href: `/organization/${o.vanitySlug || o._id}`,
 					icon: o.iconUrl ? () => <Image src={getEnvUrl(o.iconUrl)} alt={o.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" /> : Building2,
 					category: t('app.users.nav.organizations'),
 				}))
@@ -76,7 +77,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 			items.push(
 				...servers.map((s) => ({
 					label: s.name,
-					href: `/servers/${s.id}`,
+					href: `/servers/${s.vanitySlug || s.id}`,
 					icon: s.iconUrl
 						? () => <Image src={s.iconUrl} alt={s.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
 						: s.icon
@@ -97,7 +98,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 		}
 
 		const uid = (session as any)?.user?.id;
-		if (uid && uid === id) {
+		if (uid && (uid === id || (user?.id && uid === user.id))) {
 			items.push({
 				label: t('app.users.editProfile'),
 				href: `${getEnvUrl('https://account.xernerx.com/')}?view=profile`,
@@ -108,7 +109,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
 		setNavItems(items);
 		return () => hide();
-	}, [setNavItems, show, hide, id, session, bots, organizations, servers, getEnvUrl, router, t]);
+	}, [setNavItems, show, hide, id, user?.id, session, bots, organizations, servers, getEnvUrl, router, t]);
 
 	useEffect(() => {
 		setUser(null);
@@ -144,10 +145,11 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					return;
 				}
 
-				setUser(userData || { id });
+				const resolvedUserId = userData?.id || discordData?.id || id;
+				setUser(userData || { id: resolvedUserId });
 				setDiscordUser(discordData);
 
-				const isSelf = Boolean(uid && (uid === id || uid === userData?.id));
+				const isSelf = Boolean(uid && (uid === id || uid === resolvedUserId));
 
 				if (botsRes.ok) {
 					const fetchedBots = await botsRes.json();
@@ -155,6 +157,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
 					const botsWithDiscord = await Promise.all(
 						publicBots.map(async (b: any) => {
+							if (b.discord?.username || b.discord?.global_name) return b;
 							try {
 								const res = await fetch(getEnvUrl(`https://api.xernerx.com/core/users/${b.id}/discord`));
 								if (res.ok) {
@@ -181,8 +184,8 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					.filter(Boolean)
 					.join(',');
 				const guildsQueryUrl = orgIdsParam
-					? `https://api.xernerx.com/secure/guilds?owner=${id}&organizations=${encodeURIComponent(orgIdsParam)}`
-					: `https://api.xernerx.com/secure/guilds?owner=${id}`;
+					? `https://api.xernerx.com/secure/guilds?owner=${encodeURIComponent(resolvedUserId)}&organizations=${encodeURIComponent(orgIdsParam)}`
+					: `https://api.xernerx.com/secure/guilds?owner=${encodeURIComponent(resolvedUserId)}`;
 				const guildsRes = await fetch(getEnvUrl(guildsQueryUrl));
 				if (guildsRes.ok) {
 					const fetchedGuilds = await guildsRes.json();

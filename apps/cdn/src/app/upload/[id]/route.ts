@@ -5,19 +5,10 @@ import { put } from '@vercel/blob';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
+import { getCdnCorsHeaders } from '@/lib/cors';
 
 function getCorsHeaders(origin: string | null) {
-	const isLocal = origin?.includes('localhost') || origin?.includes('127.0.0.1') || (origin ? /^https?:\/\/(?:[0-9]{1,3}\.){3}[0-9]{1,3}(?::\d+)?$/.test(origin) : false);
-	const isXernerx = origin?.endsWith('.xernerx.com') || (origin ? origin.includes('.dev.') : false);
-
-	const allowedOrigin = isLocal || isXernerx ? origin : 'https://xernerx.com';
-
-	return {
-		'Access-Control-Allow-Origin': allowedOrigin || '*',
-		'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-		'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-upload-name',
-		'Access-Control-Allow-Credentials': 'true',
-	};
+	return getCdnCorsHeaders(origin, 'GET, POST, PUT, DELETE, OPTIONS', 'Content-Type, Authorization, x-upload-name');
 }
 
 export async function OPTIONS(req: Request) {
@@ -35,8 +26,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 		const session = await getServerSession(auth);
 		const userId = (session?.user as any)?.id;
 		if (!userId) {
-			console.log('Upload rejected: Unauthorized. Session object:', session);
-			return NextResponse.json({ error: 'Unauthorized', session: session }, { status: 401, headers: corsHeaders });
+			return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
 		}
 
 		const { models } = await database('xernerx');
@@ -47,14 +37,8 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 		const RoleModel = models.core.Role;
 		const roles = await RoleModel.find({ id: { $in: roleIds } });
 
-		console.log('DEBUG UPLOAD - session user:', session?.user);
-		console.log('DEBUG UPLOAD - roleIds:', roleIds);
-		console.log('DEBUG UPLOAD - fetched roles:', roles);
-
 		const canUpload = roles.some((r) => r.permissions?.uploadMedia);
 		const canManage = roles.some((r) => r.permissions?.manageMedia);
-
-		console.log('DEBUG UPLOAD - canUpload:', canUpload, 'canManage:', canManage);
 
 		const params = await props.params;
 		const targetUserId = params.id;
@@ -67,7 +51,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 		}
 
 		if (!canUpload && !canManage) {
-			return NextResponse.json({ error: `Forbidden. You do not have permission to upload media. roles: ${JSON.stringify(roles)}` }, { status: 403, headers: corsHeaders });
+			return NextResponse.json({ error: 'Forbidden. You do not have permission to upload media.' }, { status: 403, headers: corsHeaders });
 		}
 
 		// 1.5. Storage Limits Check

@@ -352,9 +352,10 @@ export function ServerReviews({ server, id, canManageServer = false }: ServerRev
 									<div className="flex items-center gap-3 group">
 										<Image
 											src={
-												review.user?.avatar
+												review.user?.avatarUrl ||
+												(review.user?.avatar
 													? `https://cdn.discordapp.com/avatars/${review.userId}/${review.user.avatar}.png?size=64`
-													: `https://cdn.discordapp.com/embed/avatars/${review.user?.discriminator ? Number(review.user.discriminator) % 5 : 0}.png`
+													: `https://cdn.discordapp.com/embed/avatars/${review.user?.discriminator ? Number(review.user.discriminator) % 5 : 0}.png`)
 											}
 											alt="Avatar"
 											width={32}

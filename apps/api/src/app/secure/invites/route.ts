@@ -2,7 +2,7 @@
 
 import { database } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { recordAuditLog } from '@/lib/auditAndNotify';
+import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET() {
 	try {
@@ -43,6 +43,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
 	try {
+		const caller = await resolveCallerAuth(req, ['invites']);
+		if (!caller.authorized) {
+			return NextResponse.json({ error: 'Forbidden: Missing invites permission.' }, { status: 403 });
+		}
+
 		const body = await req.json();
 		const invite = await (await database('xernerx')).models.core.AppInvite.create(body);
 		await recordAuditLog(req, {

@@ -267,7 +267,7 @@ export default class UserCommand extends SlashCommandBuilder {
 			}
 
 			const overviewLines = [`• **User:** <@${targetId}>`];
-			if (userProfile?.verified) {
+			if (userProfile?.verified || (userProfile?.agreedTerms && userProfile?.agreedPrivacy)) {
 				overviewLines.push('• **Verified:** Yes');
 			}
 			if (userProfile?.privacy === 'private') {

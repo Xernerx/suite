@@ -7,12 +7,32 @@ import { authenticateV1BotRequest } from '@/lib/v1BotAuth';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
+		const authHeader = req.headers.get('Authorization');
+
+		if (authHeader) {
+			const authResult = await authenticateV1BotRequest(req, id, { isMutation: false });
+			if (authResult.error) return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+			const { bot, botId, hasFullAccess, CommandModel } = authResult as Required<typeof authResult>;
+			if (!hasFullAccess && bot.privacy === 'private') {
+				return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
+			}
+			const commands = await CommandModel.find({ botId });
+			return NextResponse.json(commands);
+		}
+
 		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any).Bot;
 		const CommandModel = (db.models.bots as any).Command;
 
-		if (!CommandModel) return NextResponse.json({ error: 'Database model not found' }, { status: 500 });
+		if (!CommandModel || !BotModel) return NextResponse.json({ error: 'Database model not found' }, { status: 500 });
 
-		const commands = await CommandModel.find({ botId: id });
+		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		if (!bot) return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
+		if (bot.privacy === 'private') {
+			return NextResponse.json({ error: 'This bot profile is private.' }, { status: 403 });
+		}
+
+		const commands = await CommandModel.find({ botId: bot.id });
 		return NextResponse.json(commands);
 	} catch (error: any) {
 		console.error('Failed to GET bot commands:', error);
