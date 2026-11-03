@@ -984,7 +984,7 @@ export async function ensureStoreSeed() {
 				badge: 'Ultimate Ecosystem',
 				discountPercent: 0,
 				features: [
-					'Access to all consumer bots (Zodiac, Virtue, To-Do, Metamorphosis)',
+					'Access to all consumer bots (Zodiac, Virtue, To-Do List Bot, Metamorphosis)',
 					'200% Credit Multiplier on all earned credits',
 					'All server-level utility subscriptions',
 					'Priority support channel access',
@@ -996,7 +996,7 @@ export async function ensureStoreSeed() {
 			...[
 				{ id: 'bot-zodiac', name: 'Zodiac Pass', skuId: 'prod_V0pSuzpbmBFsRv', feat: 'Direct developer support', order: 1 },
 				{ id: 'bot-virtue', name: 'Virtue Pass', skuId: 'prod_V0pRf7S9w9Pjb9', feat: 'Advanced moderation suite', order: 2 },
-				{ id: 'bot-todo', name: 'To-Do Pass', skuId: 'prod_V0pREm72CzuoVc', feat: 'Unlimited task boards', order: 3 },
+				{ id: 'bot-todo', name: 'To-Do List Bot Pass', skuId: 'prod_V0pREm72CzuoVc', feat: 'Unlimited task boards', order: 3 },
 				{ id: 'bot-metamorphosis', name: 'Metamorphosis Pass', skuId: 'prod_V0pQ0EDH0iEDIm', feat: 'Dynamic logging channels', order: 4 },
 			].map((b) => ({
 				id: b.id,

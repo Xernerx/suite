@@ -39,6 +39,7 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 
 		const canUpload = roles.some((r) => r.permissions?.uploadMedia);
 		const canManage = roles.some((r) => r.permissions?.manageMedia);
+		const hasAdminAccess = roles.some((r) => r.permissions?.access);
 
 		const params = await props.params;
 		const targetUserId = params.id;
@@ -96,6 +97,14 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
 
 		// 2. Parse form data
 		const formData = await req.formData();
+		const source = ((formData.get('source') as string) || '').trim();
+		if (source === 'admin-markdown') {
+			const isAdminOrigin =
+				Boolean(origin) && (/^https?:\/\/admin\.(?:(?:dev|canary)\.)?[a-z0-9.-]+(?::\d+)?$/i.test(origin || '') || /^https?:\/\/(?:localhost|127\.0\.0\.1):4006$/i.test(origin || ''));
+			if (!hasAdminAccess || !isAdminOrigin) {
+				return NextResponse.json({ error: 'Forbidden. Markdown media paste is restricted to the Admin Portal.' }, { status: 403, headers: corsHeaders });
+			}
+		}
 		const file = formData.get('file') as File;
 		const privacy = (formData.get('privacy') as string) || 'private';
 		const rawShared = formData.get('shared') as string;

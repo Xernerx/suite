@@ -2,6 +2,38 @@
 
 # admin
 
+## 0.25.0
+
+### Minor Changes
+
+- ## Blog & Newsroom Studio, Clipboard Media Paste-to-CDN & Account Blacklist Controls
+
+    Introduced the full-page-width Blog & Newsroom Studio, enabled automatic clipboard image and video paste-to-CDN across all Admin Markdown editors, and added staff account blacklisting, Virtue data controls, and token security rules.
+
+    ### Added
+    - **Blog & Newsroom Studio (`BlogStudio` & `BlogEditorModal`)**: Added a full-page-width (`max-w-(--page-width)`) editorial studio with category, audience, and 3-tier privacy (`Public`, `Limited`, `Private`) controls, quick article templates (`Security`, `Product`, `Engineering`, `Community`), and 1-click cross-posting to **Discord Webhooks** and the **Suite Announcement Banner**.
+    - **Admin Clipboard Media Paste-to-CDN**: Enabled automatic clipboard image and video pasting (`allowAdminMediaPaste`) across all Admin Markdown editors (`BlogEditorModal`, `BotModal`, `ServerModal`, `OrganizationModal`, and `UserIdentityTab`) with a live glassmorphic upload progress bar card and automatic CDN Markdown link insertion.
+    - **Account Blacklist & Virtue Progression Controls**: Added staff **Account Blacklist** controls (`blacklisted` toggle and reason) with suspended badges on user cards, plus **Virtue XP & Level Inspection / Reset** controls inside the Admin User modal.
+    - **Staff Token TTL & IP Allowlists**: Added token expiration date (`expiresAt`) and IP allowlist (`allowedIps`) configuration and status pills across Admin token management.
+
+    ### Changed
+    - **Announcement Article Linking**: Updated the Announcement modal (`AnnouncementModal`) to support linking suite banners directly to Newsroom blog posts (`blogSlug`) or custom URLs (`link`).
+    - **Unified Split Markdown Editors**: Upgraded all Markdown fields across the Admin portal to the unified `@xernerx/ui` `<Markdown />` component with Write, Split, and Preview modes.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 0.24.1
 
 ### Patch Changes

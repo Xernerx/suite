@@ -18,12 +18,34 @@ export interface TokenVerificationResult {
 	tokenDoc?: any;
 }
 
+function isIpAllowed(clientIp: string | undefined, allowedIps: unknown): boolean {
+	if (!Array.isArray(allowedIps) || allowedIps.length === 0) return true;
+	const cleanList = allowedIps.map((ip) => String(ip || '').trim()).filter(Boolean);
+	if (cleanList.length === 0) return true;
+	if (!clientIp) return true;
+	const normalizedClient = String(clientIp)
+		.trim()
+		.replace(/^::ffff:/i, '');
+	const isDev = process.env.ENVIRONMENT?.toUpperCase() === 'DEVELOPMENT' || process.env.NODE_ENV?.toUpperCase() === 'DEVELOPMENT';
+	if (isDev && (normalizedClient === '127.0.0.1' || normalizedClient === '::1')) {
+		return true;
+	}
+	return cleanList.some((allowed) => {
+		const normAllowed = allowed.replace(/^::ffff:/i, '');
+		if (normAllowed === normalizedClient || normAllowed === '*') return true;
+		if (normAllowed.endsWith('.*')) {
+			return normalizedClient.startsWith(normAllowed.slice(0, -1));
+		}
+		return false;
+	});
+}
+
 /**
  * Validates whether a token is permitted to use the WebSocket gateway.
  * A token is ONLY valid if it exists in `users.tokens`, is not inactive/suspended,
  * and has `permissions.websocket === true`.
  */
-export async function verifyWebsocketToken(token: unknown): Promise<TokenVerificationResult> {
+export async function verifyWebsocketToken(token: unknown, clientIp?: string): Promise<TokenVerificationResult> {
 	if (!token || typeof token !== 'string') {
 		return { valid: false, message: 'Missing or invalid token' };
 	}
@@ -69,11 +91,36 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
 			return { valid: false, message: `Forbidden: Token is ${tokenDoc.status}` };
 		}
 
+		if (tokenDoc.expiresAt) {
+			const expMs = new Date(tokenDoc.expiresAt).getTime();
+			if (!Number.isNaN(expMs) && expMs <= Date.now()) {
+				return { valid: false, message: 'Unauthorized: Token has expired' };
+			}
+		}
+
+		if (!isIpAllowed(clientIp, tokenDoc.allowedIps)) {
+			return { valid: false, message: 'Forbidden: Client IP is not in this token allowlist' };
+		}
+
 		if (tokenDoc.permissions?.websocket !== true) {
 			return {
 				valid: false,
 				message: 'Forbidden: Token does not have websocket permission',
 			};
+		}
+
+		const ownerIds = Array.isArray(tokenDoc.owners) ? tokenDoc.owners.map(String).filter(Boolean) : [];
+		if (ownerIds.length > 0 && (db.models.users as any)?.User) {
+			const blacklistedOwner = await (db.models.users as any).User.findOne({ id: { $in: ownerIds }, blacklisted: true })
+				.select('id')
+				.lean()
+				.catch(() => null);
+			if (blacklistedOwner) {
+				return {
+					valid: false,
+					message: 'Forbidden: Token owner account is blacklisted',
+				};
+			}
 		}
 
 		// Record token usage telemetry and activate pending tokens
@@ -104,7 +151,7 @@ export async function verifyWebsocketToken(token: unknown): Promise<TokenVerific
  * Verifies that an already-authenticated token still has active websocket permissions
  * and increments usage telemetry.
  */
-export async function checkTokenWebsocketAccess(tokenId: string): Promise<boolean> {
+export async function checkTokenWebsocketAccess(tokenId: string, clientIp?: string): Promise<boolean> {
 	if (!tokenId || typeof tokenId !== 'string') return false;
 
 	try {
@@ -125,7 +172,20 @@ export async function checkTokenWebsocketAccess(tokenId: string): Promise<boolea
 			{ returnDocument: 'after' }
 		).lean();
 
-		return Boolean(tokenDoc && (tokenDoc as any).permissions?.websocket === true);
+		if (!tokenDoc || (tokenDoc as any).permissions?.websocket !== true) return false;
+
+		if ((tokenDoc as any).expiresAt) {
+			const expMs = new Date((tokenDoc as any).expiresAt).getTime();
+			if (!Number.isNaN(expMs) && expMs <= Date.now()) {
+				return false;
+			}
+		}
+
+		if (!isIpAllowed(clientIp, (tokenDoc as any).allowedIps)) {
+			return false;
+		}
+
+		return true;
 	} catch (e) {
 		terminal.error(`Failed to check token websocket access: ${e instanceof Error ? e.message : String(e)}`);
 		return false;

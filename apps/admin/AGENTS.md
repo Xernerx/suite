@@ -10,8 +10,9 @@
 
 - **Permission-Driven View Switcher (`/`):**
     - Like `apps/account`, the main console (`src/app/page.tsx`) is a single-page view switcher controlled by `useSidebar().view`.
-    - Views include: `media`, `translations`, `users`, `applications_review`, `applications_manage`, `roles`, `tokens`, `settings`, `invites`, `announcements`, `roadmap`, `suggestions`, `issues`.
+    - Views include: `media`, `translations`, `users`, `bots`, `servers`, `organizations`, `applications_review`, `applications_manage`, `roles`, `tokens`, `settings`, `invites`, `announcements`, `blog`, `roadmap`, `suggestions`, `issues`, `audit`, `virtue`.
     - Every view and action must enforce role-based access control (RBAC) via `usePermission()` / `@xernerx/lib` permission flags.
+    - All Markdown editors in `apps/admin` (`BlogEditorModal`, `BotModal`, `ServerModal`, `OrganizationModal`, `UserIdentityTab`) use `<Markdown editable allowAdminMediaPaste />` from `@xernerx/ui` for Write / Split / Preview editing and Admin-only clipboard image/video paste-to-CDN.
 - **Bootstrap Route (`/setup/[...key]`):**
     - Visiting `/setup/<NEXTAUTH_SECRET>` while authenticated bootstraps the master `owner` role in MongoDB with full permissions and assigns it to the current user. Do not weaken the `NEXTAUTH_SECRET` check on this route.
 

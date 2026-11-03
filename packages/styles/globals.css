@@ -18,6 +18,9 @@
 
 	--color-bg-dark: #09090b;
 	--color-fg-dark: #18181b;
+
+	--container-8xl: 96rem;
+	--container-9xl: 112rem;
 }
 
 @utility h-screen {

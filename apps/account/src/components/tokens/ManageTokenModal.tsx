@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import { Activity, Check, Clock, Copy, Eye, EyeOff, Loader2, RefreshCw, Save, Trash2 } from 'lucide-react';
-import { Badge, Button, Confirm, Input, Modal, Toggle } from '@xernerx/ui';
+import { Activity, Check, Clock, Copy, Eye, EyeOff, Loader2, RefreshCw, Save, Shield, Trash2 } from 'lucide-react';
+import { Badge, Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
@@ -28,6 +28,8 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 	const [name, setName] = useState('');
 	const [owners, setOwners] = useState<string[]>([]);
 	const [status, setStatus] = useState<TokenStatus>('active');
+	const [ttlOption, setTtlOption] = useState<string>('keep');
+	const [allowedIpsInput, setAllowedIpsInput] = useState('');
 	const [isTokenVisible, setIsTokenVisible] = useState(false);
 	const [copied, setCopied] = useState(false);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -51,6 +53,8 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 				setName(data.name);
 				setOwners(data.owners || []);
 				setStatus(data.status);
+				setTtlOption(data.expiresAt ? 'keep' : 'never');
+				setAllowedIpsInput(Array.isArray(data.allowedIps) ? data.allowedIps.join(', ') : '');
 			} catch (error) {
 				toast({
 					title: t('account.tokens.manage.loadError', {
@@ -66,7 +70,20 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 		fetchFullToken();
 	}, [tokenId, onClose, toast, getEnvUrl, t]);
 
-	const isDirty = token ? name !== token.name || [...owners].sort().join(',') !== [...token.owners].sort().join(',') || status !== token.status : false;
+	const normalizedAllowedIps = allowedIpsInput
+		.split(',')
+		.map((s) => s.trim())
+		.filter(Boolean);
+	const originalAllowedIps = Array.isArray(token?.allowedIps) ? token.allowedIps.map((s) => String(s).trim()).filter(Boolean) : [];
+	const initialTtlOption = token?.expiresAt ? 'keep' : 'never';
+
+	const isDirty = token
+		? name !== token.name ||
+			[...owners].sort().join(',') !== [...(token.owners || [])].sort().join(',') ||
+			status !== token.status ||
+			ttlOption !== initialTtlOption ||
+			normalizedAllowedIps.join(',') !== originalAllowedIps.join(',')
+		: false;
 
 	const verifyDesktopBiometric = async (): Promise<boolean> => {
 		const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
@@ -126,6 +143,8 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 					name,
 					owners,
 					status,
+					ttlDays: ttlOption,
+					allowedIps: normalizedAllowedIps,
 				}),
 			});
 			if (!res.ok) throw new Error('Update failed');
@@ -311,6 +330,58 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 							>
 								<label className="text-sm font-medium text-(--text)">{t('account.tokens.manage.ownersLabel')}</label>
 								<AsyncUserMultiSelector values={owners} onChange={setOwners} getEnvUrl={getEnvUrl} />
+							</div>
+
+							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<div className="flex items-center justify-between gap-2">
+										<label className="text-sm font-medium text-(--text)">{t('account.tokens.ttl.label')}</label>
+										{token.expiresAt ? (
+											new Date(token.expiresAt).getTime() <= Date.now() ? (
+												<Badge variant="danger" size="sm">
+													{t('account.tokens.ttl.expiredBadge')}
+												</Badge>
+											) : (
+												<Badge variant="warning" size="sm">
+													{t('account.tokens.ttl.expiresOnBadge', { date: new Date(token.expiresAt).toLocaleDateString() })}
+												</Badge>
+											)
+										) : (
+											<Badge variant="success" size="sm">
+												{t('account.tokens.ttl.longLivedBadge')}
+											</Badge>
+										)}
+									</div>
+									<Selector
+										value={ttlOption}
+										onChange={setTtlOption}
+										options={[
+											...(token.expiresAt
+												? [
+														{
+															value: 'keep',
+															label: t('account.tokens.ttl.keepCurrent', {
+																date: new Date(token.expiresAt).toLocaleDateString(),
+															}),
+														},
+													]
+												: []),
+											{ value: 'never', label: t('account.tokens.ttl.never') },
+											{ value: '7', label: t('account.tokens.ttl.days7') },
+											{ value: '30', label: t('account.tokens.ttl.days30') },
+											{ value: '90', label: t('account.tokens.ttl.days90') },
+											{ value: '365', label: t('account.tokens.ttl.days365') },
+										]}
+									/>
+								</div>
+
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="text-sm font-medium text-(--text) flex items-center gap-1.5">
+										<Shield size={13} className="text-(--accent)" />
+										{t('account.tokens.allowedIps.label')}
+									</label>
+									<Input type="text" value={allowedIpsInput} onChange={(e) => setAllowedIpsInput(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
+								</div>
 							</div>
 
 							{token.status !== 'pending' && token.status !== 'suspended' && (

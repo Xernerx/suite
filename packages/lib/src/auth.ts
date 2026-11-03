@@ -12,6 +12,7 @@ declare module 'next-auth' {
 		} & DefaultSession['user'];
 		accessToken?: string;
 		qrHandoffToken?: string;
+		signedInAt?: number;
 		error?: string;
 	}
 }
@@ -238,6 +239,7 @@ export const auth: NextAuthOptions = {
 					accessToken: (user as any).accessToken,
 					refreshToken: (user as any).refreshToken,
 					accessTokenExpires: (user as any).accessTokenExpires || Date.now() + 7 * 24 * 60 * 60 * 1000,
+					signedInAt: Date.now(),
 				};
 			}
 
@@ -248,7 +250,12 @@ export const auth: NextAuthOptions = {
 					accessToken: account.access_token,
 					refreshToken: account.refresh_token,
 					accessTokenExpires: account.expires_at ? account.expires_at * 1000 : Date.now() + 7 * 24 * 60 * 60 * 1000,
+					signedInAt: Date.now(),
 				};
+			}
+
+			if (!token.signedInAt) {
+				token.signedInAt = Date.now();
 			}
 
 			// Return previous token if the access token has not expired yet
@@ -283,6 +290,7 @@ export const auth: NextAuthOptions = {
 				},
 				accessToken: token.accessToken as string | undefined,
 				qrHandoffToken,
+				signedInAt: typeof token.signedInAt === 'number' ? token.signedInAt : undefined,
 				error: token.error as string | undefined,
 			};
 		},

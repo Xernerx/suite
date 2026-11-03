@@ -17,7 +17,6 @@ export default function Profile() {
 	const { getEnvUrl } = useEnvironment();
 	const { toast, remind } = useToast();
 	const [copiedId, setCopiedId] = useState(false);
-	const [markdownPreview, setMarkdownPreview] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
 	const activeUser = user || session?.user;
 	const userId = activeUser?.id;
@@ -366,8 +365,6 @@ export default function Profile() {
 					{/* Info (Long Description) */}
 					<Markdown
 						editable
-						preview={markdownPreview}
-						onPreviewChange={setMarkdownPreview}
 						label={t('account.profile.infoField.label')}
 						value={formData.info}
 						onChange={(val) => handleChange('info', val)}

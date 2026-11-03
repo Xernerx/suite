@@ -92,7 +92,17 @@ export async function resolveCallerAuth(req: Request, requiredPermissions?: stri
 	const mergedPermissions: Record<string, boolean> = {};
 	try {
 		const { models } = await database('xernerx');
-		const userDoc = (await models.users.User.findOne({ id: userId }).select('roles').lean()) as any;
+		const userDoc = (await models.users.User.findOne({ id: userId }).select('roles blacklisted').lean()) as any;
+		if (userDoc?.blacklisted) {
+			return {
+				authenticated: true,
+				authorized: false,
+				isSystemToken: false,
+				isStaff: false,
+				userId,
+				permissions: {},
+			};
+		}
 		const roleIds = Array.isArray(userDoc?.roles) ? userDoc.roles.map((r: any) => (typeof r === 'string' ? r : r?.id)).filter(Boolean) : [];
 		if (roleIds.length > 0 && models.core?.Role) {
 			const roleDocs = await models.core.Role.find({ id: { $in: roleIds } })

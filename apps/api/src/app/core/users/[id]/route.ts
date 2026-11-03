@@ -40,7 +40,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const resolvedId = user?.id || id;
 
 		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
-		if (user?.privacy === 'private' || (isExternalWidget && !user?.widgets)) {
+		if (user?.privacy === 'private' || user?.blacklisted || (isExternalWidget && !user?.widgets)) {
 			return NextResponse.json({ error: 'User profile is private or widgets are disabled' }, { status: 404 });
 		}
 

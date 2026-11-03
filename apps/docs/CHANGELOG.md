@@ -2,6 +2,33 @@
 
 # docs
 
+## 1.9.2
+
+### Patch Changes
+
+- ## Newsroom & Blog API, Virtue Data Deletion & Token Security Documentation
+
+    Documented the new Core and Secure Blog API endpoints, self-service Virtue data deletion endpoint, and API token TTL expiration and IP allowlist fields.
+
+    ### Added
+    - **Core Blog API Reference (`CoreEndpoints`)**: Added interactive endpoint documentation, query parameters, and response schemas for `GET /core/blog`, `GET /core/blog/[slug]`, and `POST /core/blog/[slug]`.
+    - **Secure Blog Studio & Virtue Deletion Reference (`SecureEndpoints`)**: Added interactive documentation for `GET /secure/blog`, `POST /secure/blog`, `PATCH /secure/blog/[id]`, `DELETE /secure/blog/[id]`, and `DELETE /secure/users/[id]/virtue`.
+
+    ### Changed
+    - **Token Security Schema Documentation (`SecureEndpoints`)**: Updated `/secure/tokens` and `/secure/tokens/[id]` endpoint specifications to document the optional `expiresAt` TTL and `allowedIps` parameters.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 1.9.1
 
 ### Patch Changes

@@ -106,7 +106,6 @@
 			"fallbackName": "User",
 			"session": {
 				"title": "Active Session",
-				"description": "Sign out of your active account session on this device. You will need to re-authenticate to access your workspace.",
 				"button": "Log out"
 			},
 			"danger": {
@@ -466,12 +465,6 @@
 				},
 				"rights": {
 					"title": "9. Your Rights (GDPR & CCPA)",
-					"items": [
-						"Right to access and export your personal data (available any time via the self-service \"Export Data (JSON)\" tool in Account -> Activity).",
-						"Right to rectification, profile reset, or permanent account deletion (available directly in Account -> Settings).",
-						"Right to restrict or object to certain data processing activities and to unlink connected third-party accounts at any time.",
-						"Right to withdraw consent for non-essential cookies and marketing communications."
-					],
 					"content": "Under data protection frameworks including the GDPR, UK GDPR, and CCPA, you have comprehensive rights over your personal data. You can exercise most of these rights instantly through your Account Dashboard or by contacting our legal team."
 				},
 				"cookies": {

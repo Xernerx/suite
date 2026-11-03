@@ -24,28 +24,40 @@ async function reconcileVirtueAndOrphanUsers(xernerxDb: any) {
 		const PText = (virtueDb?.models?.profiles as any)?.Text;
 		const PVoice = (virtueDb?.models?.profiles as any)?.Voice;
 
-		const [existingUserIds, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds] = await Promise.all([
-			UserModel.distinct('id').catch(() => []),
-			CreditModel ? CreditModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
-			LevelModel ? LevelModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
-			VUser ? VUser.distinct('id').catch(() => []) : Promise.resolve([]),
-			LLevel ? LLevel.distinct('id').catch(() => []) : Promise.resolve([]),
-			LText ? LText.distinct('id').catch(() => []) : Promise.resolve([]),
-			LVoice ? LVoice.distinct('id').catch(() => []) : Promise.resolve([]),
-			PLevel ? PLevel.distinct('id').catch(() => []) : Promise.resolve([]),
-			PText ? PText.distinct('id').catch(() => []) : Promise.resolve([]),
-			PVoice ? PVoice.distinct('id').catch(() => []) : Promise.resolve([]),
-		]);
+		const [existingUserIds, optOutUserDocs, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, optOutVUserDocs, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds] =
+			await Promise.all([
+				UserModel.distinct('id').catch(() => []),
+				UserModel.find({ $or: [{ services: false }, { blacklisted: true }] })
+					.select('id')
+					.lean()
+					.catch(() => []),
+				CreditModel ? CreditModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
+				LevelModel ? LevelModel.distinct('ownerId').catch(() => []) : Promise.resolve([]),
+				VUser ? VUser.distinct('id').catch(() => []) : Promise.resolve([]),
+				VUser
+					? VUser.find({ $or: [{ services: false }, { blacklisted: true }] })
+							.select('id')
+							.lean()
+							.catch(() => [])
+					: Promise.resolve([]),
+				LLevel ? LLevel.distinct('id').catch(() => []) : Promise.resolve([]),
+				LText ? LText.distinct('id').catch(() => []) : Promise.resolve([]),
+				LVoice ? LVoice.distinct('id').catch(() => []) : Promise.resolve([]),
+				PLevel ? PLevel.distinct('id').catch(() => []) : Promise.resolve([]),
+				PText ? PText.distinct('id').catch(() => []) : Promise.resolve([]),
+				PVoice ? PVoice.distinct('id').catch(() => []) : Promise.resolve([]),
+			]);
 
 		const existingUserSet = new Set((existingUserIds || []).map((id: any) => String(id)));
 		const existingCreditSet = new Set((existingCreditOwnerIds || []).map((id: any) => String(id)));
 		const existingLevelSet = new Set((existingLevelOwnerIds || []).map((id: any) => String(id)));
+		const optOutSet = new Set([...(optOutUserDocs || []).map((d: any) => String(d?.id || '')), ...(optOutVUserDocs || []).map((d: any) => String(d?.id || ''))]);
 
 		const candidateIds = new Set<string>();
 		for (const list of [existingUserIds, existingCreditOwnerIds, existingLevelOwnerIds, vUserIds, lLevelIds, lTextIds, lVoiceIds, pLevelIds, pTextIds, pVoiceIds]) {
 			for (const rawId of list || []) {
 				const uid = String(rawId || '').trim();
-				if (/^\d{15,22}$/.test(uid)) {
+				if (/^\d{15,22}$/.test(uid) && !optOutSet.has(uid)) {
 					candidateIds.add(uid);
 				}
 			}
@@ -136,12 +148,15 @@ export async function GET(req: Request) {
 		const query: Record<string, any> = {};
 		if (isPublicOnly) {
 			query.privacy = 'public';
+			query.blacklisted = { $ne: true };
 		}
 
 		await db.User.updateMany({ agreedTerms: { $ne: null }, agreedPrivacy: { $ne: null }, verified: { $ne: true } }, { $set: { verified: true } }).catch(() => {});
 
 		const [users, levels, credits] = await Promise.all([
-			db.User.find(query).lean().select(['id', 'name', 'icon', 'roles', 'privacy', 'verified', 'vanitySlug', 'stripeCustomerId', 'agreedTerms', 'agreedPrivacy', 'discordCache']),
+			db.User.find(query)
+				.lean()
+				.select(['id', 'name', 'icon', 'roles', 'privacy', 'verified', 'blacklisted', 'services', 'vanitySlug', 'stripeCustomerId', 'agreedTerms', 'agreedPrivacy', 'discordCache']),
 			db.Level.find({})
 				.select(['ownerId', 'level', 'xp'])
 				.lean()
@@ -175,6 +190,8 @@ export async function GET(req: Request) {
 		const normalized = users.map((u: any) => ({
 			...u,
 			verified: Boolean(u.verified || (u.agreedTerms && u.agreedPrivacy)),
+			blacklisted: Boolean(u.blacklisted),
+			services: u.services !== false,
 			discord: u.discordCache?.username ? u.discordCache : undefined,
 			level: levelMap.get(String(u.id)) || { level: 1, xp: 0 },
 			credits: creditMap.get(String(u.id)) || { balance: 0, streak: 0 },

@@ -159,13 +159,7 @@
 					"title": "8. Seguridad de los datos"
 				},
 				"rights": {
-					"title": "9. Tus derechos",
-					"items": [
-						"Derecho a acceder y exportar tus datos.",
-						"Derecho de rectificación o supresión.",
-						"Derecho a restringir u oponerte al procesamiento.",
-						"Derecho a la portabilidad de los datos."
-					]
+					"title": "9. Tus derechos"
 				},
 				"cookies": {
 					"title": "10. Cookies y seguimiento",
@@ -202,7 +196,6 @@
 			"fallbackName": "Usuario",
 			"session": {
 				"title": "Sesión activa",
-				"description": "Cierra sesión en tu cuenta activa en este dispositivo. Deberás volver a autenticarte para acceder a tu espacio de trabajo.",
 				"button": "Cerrar sesión"
 			},
 			"danger": {

@@ -31,7 +31,7 @@ The **Store** service (`store.xernerx.com`, dev port `4008`) is the dedicated st
 
 ## ✨ Core Features
 
-- **Consumer & Bot Passes:** Individual bot subscriptions (Zodiac, Virtue, To-Do, Metamorphosis) and server utility licenses.
+- **Consumer & Bot Passes:** Individual bot subscriptions (Zodiac, Virtue, To-Do List Bot, Metamorphosis) and server utility licenses.
 - **Ultra Master Bundle:** Side-by-side comparison of the Free tier and all-inclusive Ultra plan.
 - **Developer API Plans:** Tiered access for developers building bots, apps, and integrations with the Xernerx Gateway.
 - **Subscription Management:** Seamless one-click cancellation and Stripe Checkout sessions via `api.xernerx.com`.

@@ -76,12 +76,12 @@ export async function buildStoreMessage(client: Client, tab: StoreCategoryTab, r
 			embed.addFields([
 				{
 					name: 'Ultra Ecosystem',
-					value: 'All consumer bots (Virtue, Zodiac, To-Do, Metamorphosis), 200% Credit Multiplier, and 1,000 CDN Media Slots.',
+					value: 'All consumer bots (Virtue, Zodiac, To-Do List Bot, Metamorphosis), 200% Credit Multiplier, and 1,000 CDN Media Slots.',
 					inline: false,
 				},
 				{
 					name: 'Individual Bot Passes',
-					value: 'Dedicated passes for **Virtue**, **Zodiac**, **To-Do**, **Metamorphosis**, and **Developer Pro** with a 125% Credit Multiplier.',
+					value: 'Dedicated passes for **Virtue**, **Zodiac**, **To-Do List Bot**, **Metamorphosis**, and **Developer Pro** with a 125% Credit Multiplier.',
 					inline: false,
 				},
 			]);

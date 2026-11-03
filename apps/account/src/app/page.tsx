@@ -3,7 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Activity, Bell, Computer, DollarSign, Globe, KeyRound, Link, Paintbrush, ShieldCheck, SlidersHorizontal, User, Image } from 'lucide-react';
-import { useDictionary, useSession, useSidebar } from '@xernerx/providers';
+import { useDictionary, useSession, useSidebar, useUser } from '@xernerx/providers';
 
 import Account from '@/components/Account';
 import ActivityView from '@/components/ActivityView';
@@ -38,9 +38,11 @@ const COMPONENT_MAP: Record<string, React.ReactNode> = {
 
 export default function Home() {
 	const { data: session, status } = useSession();
+	const { user } = useUser();
 	const { hide, show, setNavItems, view, setView } = useSidebar();
 	const { t } = useDictionary();
 	const hasInitializedView = useRef(false);
+	const isBlacklisted = Boolean((user as any)?.blacklisted);
 
 	useEffect(() => {
 		hide();
@@ -51,6 +53,22 @@ export default function Home() {
 
 		if (!session) {
 			hide();
+			return;
+		}
+
+		if (isBlacklisted) {
+			show();
+			setNavItems([
+				{
+					category: t('common.nav.categories.account'),
+					icon: User,
+					label: t('common.nav.items.account'),
+					view: 'account',
+				},
+			]);
+			if (view !== 'account') {
+				setView('account');
+			}
 			return;
 		}
 
@@ -155,7 +173,7 @@ export default function Home() {
 			const targetView = candidateView in COMPONENT_MAP ? candidateView : 'profile';
 			setView(targetView);
 		}
-	}, [session, status, hide, show, setNavItems, setView, t]);
+	}, [session, status, isBlacklisted, view, hide, show, setNavItems, setView, t]);
 
 	useEffect(() => {
 		if (!hasInitializedView.current || !view || typeof window === 'undefined') return;
@@ -173,7 +191,7 @@ export default function Home() {
 
 	if (status === 'loading') return <Loading />;
 
-	const currentView = view || 'profile';
+	const currentView = isBlacklisted ? 'account' : view || 'profile';
 	const ActiveComponent = COMPONENT_MAP[currentView] || null;
 
 	return (

@@ -24,7 +24,7 @@ const milestones: Milestone[] = [
 	},
 	{
 		icon: <UserPlus />,
-		link: 'https://app.xernerx.com/bots/782105629572464652',
+		link: 'https://app.xernerx.com/bots/todo',
 	},
 	{
 		icon: <Globe />,
@@ -34,7 +34,7 @@ const milestones: Milestone[] = [
 	},
 	{
 		icon: <Star />,
-		link: 'https://app.xernerx.com/bots/881678826906730547',
+		link: 'https://app.xernerx.com/bots/metamorphosis',
 	},
 	{
 		icon: <Calendar />,
@@ -44,7 +44,7 @@ const milestones: Milestone[] = [
 	},
 	{
 		icon: <ShieldCheck />,
-		link: 'https://app.xernerx.com/bots/950251264095162418',
+		link: 'https://app.xernerx.com/bots/zodiac',
 	},
 	{
 		icon: <ArrowUpRight />,
@@ -76,7 +76,7 @@ const milestones: Milestone[] = [
 	},
 	{
 		icon: <Star />,
-		link: 'https://app.xernerx.com/bots/1484880634844287138',
+		link: 'https://app.xernerx.com/bots/virtue',
 	},
 	{
 		icon: <RefreshCw />,

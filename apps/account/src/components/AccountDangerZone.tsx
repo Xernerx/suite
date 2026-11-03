@@ -10,6 +10,10 @@ interface AccountDangerZoneProps {
 	setIsConfirmDataOpen: (open: boolean) => void;
 	isDeletingData: boolean;
 	handleDeleteData: () => Promise<void>;
+	isConfirmVirtueOpen: boolean;
+	setIsConfirmVirtueOpen: (open: boolean) => void;
+	isDeletingVirtue: boolean;
+	handleDeleteVirtueData: () => Promise<void>;
 	isConfirmAccountOpen: boolean;
 	setIsConfirmAccountOpen: (open: boolean) => void;
 	isDeletingAccount: boolean;
@@ -21,6 +25,10 @@ export function AccountDangerZone({
 	setIsConfirmDataOpen,
 	isDeletingData,
 	handleDeleteData,
+	isConfirmVirtueOpen,
+	setIsConfirmVirtueOpen,
+	isDeletingVirtue,
+	handleDeleteVirtueData,
 	isConfirmAccountOpen,
 	setIsConfirmAccountOpen,
 	isDeletingAccount,
@@ -66,6 +74,45 @@ export function AccountDangerZone({
 				>
 					<Trash2 size={16} />
 					<span>{t('account.common.description4')}</span>
+				</button>
+			</div>
+
+			{/* Delete Virtue Data Card */}
+			<div
+				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
+				style={{
+					padding: 'var(--ui-gap)',
+					gap: 'var(--ui-gap)',
+				}}
+			>
+				<div
+					className="flex flex-col max-w-xl"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.25)',
+					}}
+				>
+					<div
+						className="flex items-center text-(--accent-orange) font-semibold text-base"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.5)',
+						}}
+					>
+						<AlertTriangle size={18} />
+						<h3>{t('account.account.virtueData.title')}</h3>
+					</div>
+					<p className="text-xs text-(--accent-orange)/80">{t('account.account.virtueData.description')}</p>
+				</div>
+				<button
+					type="button"
+					onClick={() => setIsConfirmVirtueOpen(true)}
+					className="flex items-center justify-center rounded-2xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm cursor-pointer"
+					style={{
+						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<Trash2 size={16} />
+					<span>{t('account.account.virtueData.button')}</span>
 				</button>
 			</div>
 
@@ -117,6 +164,17 @@ export function AccountDangerZone({
 				variant="warning"
 				loading={isDeletingData}
 				onConfirm={handleDeleteData}
+			/>
+
+			<Confirm
+				open={isConfirmVirtueOpen}
+				onOpenChange={setIsConfirmVirtueOpen}
+				title={t('account.account.virtueData.title')}
+				description={t('account.account.virtueData.confirmDescription')}
+				confirmText={t('account.account.virtueData.button')}
+				variant="warning"
+				loading={isDeletingVirtue}
+				onConfirm={handleDeleteVirtueData}
 			/>
 
 			<Confirm

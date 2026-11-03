@@ -127,7 +127,6 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	if (loading) {
 		return (
 			<div className="flex-1 flex items-center justify-center min-h-screen">
-				<h1 className="sr-only">{t('app.bots.nav.botProfile')}</h1>
 				<Loading />
 			</div>
 		);

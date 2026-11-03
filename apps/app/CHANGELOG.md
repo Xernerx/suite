@@ -2,6 +2,31 @@
 
 # app
 
+## 2.19.1
+
+### Patch Changes
+
+- ## Unified Split Markdown Editors & Public Directory Suspension Filtering
+
+    Upgraded bot and server Markdown editors to the unified Write / Split / Preview component and enforced 3-tier privacy and suspended account filtering across public profiles, search, and leaderboards.
+
+    ### Changed
+    - **Unified Markdown Editor & Renderer**: Upgraded bot profile overviews (`Profile`), bot release notes (`Releases`), and server dashboard descriptions (`General`) to use the unified `@xernerx/ui` `<Markdown />` component with Write, side-by-side Split, and Preview modes.
+    - **Public Profile Privacy, Suspension Filtering & `To-Do List Bot` Metadata (`/users/[id]` & `/bots/[id]`)**: Updated public user and bot profile pages and OpenGraph metadata generators (`profileMetadata.ts`, `layout.tsx`, `bots/layout.tsx`) to enforce 3-tier privacy (`Public`, `Limited`, `Private`), restrict visibility of blacklisted accounts, and standardize public bot references to **`To-Do List Bot`**.
+    - **Explore Directory, Leaderboards & Sitemap Filtering**: Updated directory search results (`ExploreSearchBar`), global XP/streak leaderboards (`LeaderboardClient`), and XML sitemap generation (`sitemap.ts`) to exclude suspended accounts and unlisted entities.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 2.19.0
 
 ### Minor Changes

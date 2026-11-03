@@ -68,6 +68,8 @@ const AnnouncementSchema = new Schema(
 		startsAt: { type: Date, default: null },
 		expiresAt: { type: Date, default: null },
 		targetApps: { type: [String], default: ['all'] },
+		link: { type: String, default: null },
+		blogSlug: { type: String, default: null },
 	},
 	{ timestamps: true }
 );

@@ -40,6 +40,7 @@ const APPS = [
 	{ id: 'info', name: 'Info', devPort: 4007 },
 	{ id: 'store', name: 'Store', devPort: 4008 },
 	{ id: 'haste', name: 'Haste', devPort: 4011 },
+	{ id: 'blog', name: 'Blog', devPort: 4012 },
 	{ id: 'www', name: 'Website', devPort: 4000 },
 ] as const;
 
@@ -48,16 +49,45 @@ const FETCH_HEADERS: Record<string, string> = {
 	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 XernerxSuite/1.0',
 };
 
+function unwrapTitledChangesetBlocks(text: string): string {
+	const lines = text.split(/\r?\n/);
+	const out: string[] = [];
+	let unindentActive = false;
+
+	for (const line of lines) {
+		if (/^[-*]\s+(#{2,3}\s+.+)$/.test(line)) {
+			unindentActive = true;
+			out.push(line.replace(/^[-*]\s+/, ''));
+			continue;
+		}
+		if (unindentActive) {
+			if (line.trim() === '') {
+				out.push('');
+				continue;
+			}
+			if (/^(?:\t| {2,4})/.test(line)) {
+				out.push(line.replace(/^(?:\t| {2,4})/, ''));
+				continue;
+			}
+			unindentActive = false;
+		}
+		out.push(line);
+	}
+	return out.join('\n');
+}
+
 function cleanChangelogMarkdown(raw: string): string {
-	const cleaned = raw
-		.replace(/^([ \t]*[-*][ \t]*)<!--\s*@format\s*-->[ \t]*\r?\n+[ \t]+/gim, '$1')
-		.replace(/^[ \t]*[-*][ \t]*<!--\s*@format\s*-->[ \t]*\r?\n*/gim, '')
-		.replace(/<!--\s*@format\s*-->[ \t]*\r?\n*/gi, '')
-		.replace(/^#\s+[^\r\n]+\r?\n*/gm, '')
-		.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
-		.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
-		.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
-		.trim();
+	const cleaned = unwrapTitledChangesetBlocks(
+		raw
+			.replace(/^([ \t]*[-*][ \t]*)<!--\s*@format\s*-->[ \t]*\r?\n+[ \t]+/gim, '$1')
+			.replace(/^[ \t]*[-*][ \t]*<!--\s*@format\s*-->[ \t]*\r?\n*/gim, '')
+			.replace(/<!--\s*@format\s*-->[ \t]*\r?\n*/gi, '')
+			.replace(/^#\s+[^\r\n]+\r?\n*/gm, '')
+			.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
+			.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
+			.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
+			.trim()
+	);
 
 	const lines = cleaned.split(/\r?\n/);
 	const sections: Array<{ heading: string; versionId: string; bodyLines: string[] }> = [];
@@ -65,7 +95,7 @@ function cleanChangelogMarkdown(raw: string): string {
 	const preamble: string[] = [];
 
 	for (const line of lines) {
-		if (line.startsWith('## ')) {
+		if (/^##\s+\[?v?\d+\.\d+/i.test(line)) {
 			const versionId = line
 				.replace(/^##\s+/, '')
 				.replace(/[^a-zA-Z0-9.-]/g, '')

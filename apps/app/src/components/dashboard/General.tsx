@@ -16,7 +16,6 @@ interface GeneralProps {
 export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
-	const [markdownPreview, setMarkdownPreview] = useState(false);
 	const [tagInput, setTagInput] = useState('');
 
 	const currentTags: string[] = Array.isArray(guildConfig.tags) ? guildConfig.tags : [];
@@ -115,8 +114,6 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 					</div>
 					<Markdown
 						editable
-						preview={markdownPreview}
-						onPreviewChange={setMarkdownPreview}
 						label={t('app.dashboard.text9')}
 						value={guildConfig.info || ''}
 						onChange={(val) => setGuildConfig({ ...guildConfig, info: val })}

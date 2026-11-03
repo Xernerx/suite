@@ -2,7 +2,7 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
-import { Button, Input, Modal } from '@xernerx/ui';
+import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 import AsyncUserMultiSelector from './AsyncUserMultiSelector';
@@ -20,6 +20,8 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 	const { t } = useDictionary();
 	const [name, setName] = useState('');
 	const [owners, setOwners] = useState<string[]>([]);
+	const [ttlDays, setTtlDays] = useState('never');
+	const [allowedIpsInput, setAllowedIpsInput] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	useEffect(() => {
@@ -28,6 +30,8 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 		} else if (!isOpen) {
 			setName('');
 			setOwners(userId ? [userId] : []);
+			setTtlDays('never');
+			setAllowedIpsInput('');
 		}
 	}, [isOpen, userId]);
 
@@ -39,6 +43,10 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 		setIsSubmitting(true);
 		const newTokenId = generateTokenString();
 		try {
+			const allowedIps = allowedIpsInput
+				.split(',')
+				.map((s) => s.trim())
+				.filter(Boolean);
 			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}secure/tokens/${newTokenId}`, {
 				method: 'POST',
 				headers: {
@@ -50,6 +58,8 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 					status: 'pending',
 					owners,
 					userId: userId || owners[0],
+					ttlDays,
+					allowedIps,
 				}),
 			});
 			if (!res.ok) {
@@ -108,6 +118,38 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 				>
 					<label className="text-sm font-medium text-(--text)">{t('account.tokens.manage.ownersLabel')}</label>
 					<AsyncUserMultiSelector values={owners} onChange={setOwners} getEnvUrl={getEnvUrl} />
+				</div>
+
+				<div
+					className="flex flex-col"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<label className="text-sm font-medium text-(--text)">{t('account.tokens.ttl.label')}</label>
+					<Selector
+						value={ttlDays}
+						onChange={setTtlDays}
+						options={[
+							{ value: 'never', label: t('account.tokens.ttl.never') },
+							{ value: '7', label: t('account.tokens.ttl.days7') },
+							{ value: '30', label: t('account.tokens.ttl.days30') },
+							{ value: '90', label: t('account.tokens.ttl.days90') },
+							{ value: '365', label: t('account.tokens.ttl.days365') },
+						]}
+					/>
+					<span className="text-[11px] text-(--text-muted)">{t('account.tokens.ttl.hint')}</span>
+				</div>
+
+				<div
+					className="flex flex-col"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<label className="text-sm font-medium text-(--text)">{t('account.tokens.allowedIps.label')}</label>
+					<Input type="text" value={allowedIpsInput} onChange={(e) => setAllowedIpsInput(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
+					<span className="text-[11px] text-(--text-muted)">{t('account.tokens.allowedIps.hint')}</span>
 				</div>
 
 				<div className="flex justify-end gap-3 mt-2">

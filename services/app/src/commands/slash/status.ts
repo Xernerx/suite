@@ -16,6 +16,7 @@ const SUITE_SERVICES = [
 	{ id: 'admin', name: 'Admin', domain: 'admin.xernerx.com' },
 	{ id: 'hosting', name: 'Hosting', domain: 'hosting.xernerx.com' },
 	{ id: 'haste', name: 'Haste', domain: 'haste.xernerx.com' },
+	{ id: 'blog', name: 'Blog', domain: 'blog.xernerx.com' },
 	{ id: 'api', name: 'API', domain: 'api.xernerx.com' },
 	{ id: 'cdn', name: 'CDN', domain: 'cdn.xernerx.com' },
 ] as const;

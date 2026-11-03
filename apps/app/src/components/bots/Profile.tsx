@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import ReactMarkdown from 'react-markdown';
 import { Activity, Calendar, Check, ChevronRight, ChevronUp, Copy, Rocket, Server, ShieldCheck, Sparkles, Star, Tag, Terminal, User, Users } from 'lucide-react';
 import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
@@ -285,8 +284,8 @@ export default function Profile({ bot }: { bot: any }) {
 							</div>
 
 							{latestRelease.body && (
-								<div className="rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4 text-sm text-(--text-muted) prose max-w-none prose-headings:font-fredoka prose-headings:text-(--text) prose-strong:text-(--text) prose-code:text-(--accent) line-clamp-6 overflow-hidden">
-									<ReactMarkdown>{latestRelease.body}</ReactMarkdown>
+								<div className="rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4 text-sm text-(--text-muted) line-clamp-6 overflow-hidden">
+									<Markdown>{latestRelease.body}</Markdown>
 								</div>
 							)}
 						</div>

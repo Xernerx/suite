@@ -93,6 +93,46 @@ export async function authenticateV1BotRequest(req: NextRequest, rawBotId: strin
 		return { error: 'Token is inactive or suspended', status: 403 };
 	}
 
+	if (tokenDoc && (tokenDoc as any).expiresAt) {
+		const expMs = new Date((tokenDoc as any).expiresAt).getTime();
+		if (!Number.isNaN(expMs) && expMs <= Date.now()) {
+			return { error: 'Token has expired. Extend or remove its expiration in your token settings.', status: 401 };
+		}
+	}
+
+	if (tokenDoc && Array.isArray((tokenDoc as any).allowedIps) && (tokenDoc as any).allowedIps.length > 0) {
+		const cleanList = (tokenDoc as any).allowedIps.map((ip: any) => String(ip || '').trim()).filter(Boolean);
+		if (cleanList.length > 0) {
+			const forwardedFor = req.headers.get('x-forwarded-for');
+			const clientIp = (forwardedFor ? forwardedFor.split(',')[0].trim() : req.headers.get('x-real-ip') || '').replace(/^::ffff:/i, '');
+			const isLocalDev = process.env.ENVIRONMENT?.toLowerCase() === 'development' && (clientIp === '127.0.0.1' || clientIp === '::1' || !clientIp);
+			if (clientIp && !isLocalDev) {
+				const allowed = cleanList.some((entry: string) => {
+					const norm = entry.replace(/^::ffff:/i, '');
+					if (norm === clientIp || norm === '*') return true;
+					if (norm.endsWith('.*')) return clientIp.startsWith(norm.slice(0, -1));
+					return false;
+				});
+				if (!allowed) {
+					return { error: 'Forbidden: Client IP is not in this token allowlist', status: 403 };
+				}
+			}
+		}
+	}
+
+	if (tokenDoc) {
+		const ownerIds = Array.isArray(tokenDoc.owners) ? tokenDoc.owners.map(String).filter(Boolean) : [];
+		if (ownerIds.length > 0 && (db.models.users as any)?.User) {
+			const blacklistedOwner = await (db.models.users as any).User.findOne({ id: { $in: ownerIds }, blacklisted: true })
+				.select('id')
+				.lean()
+				.catch(() => null);
+			if (blacklistedOwner) {
+				return { error: 'Forbidden: Token owner account is restricted', status: 403 };
+			}
+		}
+	}
+
 	let bot = await BotModel.findOne({ $or: [{ id: rawBotId }, { vanitySlug: rawBotId.toLowerCase() }] });
 	const resolvedBotId = bot?.id || rawBotId;
 

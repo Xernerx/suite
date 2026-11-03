@@ -2,6 +2,20 @@
 
 # bot
 
+## 2.1.13
+
+### Patch Changes
+
+- ## Store Command Embed Standardization (`To-Do List Bot`)
+
+    Updated `/store` slash command embeds in the Xernerx Bot daemon to use the official **To-Do List Bot** name.
+
+    ### Changed
+    - **Store Command Embeds (`commands/slash/store.ts`)**: Standardized Ultra Ecosystem and Individual Bot Passes embed descriptions from `To-Do` to **`To-Do List Bot`**.
+
+- Updated dependencies
+    - @xernerx/lib@1.20.0
+
 ## 2.1.12
 
 ### Patch Changes

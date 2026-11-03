@@ -2,6 +2,20 @@
 
 # @xernerx/desktop
 
+## 2.5.1
+
+### Patch Changes
+
+- ## Newsroom & Blog Rich Presence & Account Security Sync
+
+    Added Discord Rich Presence and window title recognition for the Xernerx Newsroom & Blog and synced main-process session security checks.
+
+    ### Added
+    - **Newsroom & Blog Rich Presence (`metadata.ts`)**: Added `blog.xernerx.com` route recognition for dynamic desktop window titles and Discord Rich Presence status updates while reading Xernerx Newsroom & Engineering Blog articles.
+
+    ### Changed
+    - **Main Process Navigation & Security Sync (`main.ts`)**: Updated Electron main-process subdomain routing and session checks to support `blog.xernerx.com` and respect platform-wide account status gates.
+
 ## 2.5.0
 
 ### Minor Changes

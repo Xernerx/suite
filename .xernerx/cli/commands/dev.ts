@@ -49,7 +49,7 @@ export default function registerDev(program: Command) {
 		.description('Start the development servers and conditionally run the tunnel')
 		.option('--only <type>', 'Run only a specific workspace type (apps, services, clients, tunnel)')
 		.option('--prepare-only', 'Run only the environment preparation step and exit')
-		.option('--eager', 'Start all 12 web apps immediately instead of waiting for URL requests')
+		.option('--eager', 'Start all 13 web apps immediately instead of waiting for URL requests')
 		.option('--idle-timeout <seconds>', 'Seconds of inactivity before spinning down an awake app (0 to disable)', '60')
 		.action(async (options) => {
 			const rootEnvPath = path.join(process.cwd(), '.env');
@@ -207,13 +207,14 @@ export default function registerDev(program: Command) {
 				return;
 			}
 
-			if (!process.env.NODE_OPTIONS || !process.env.NODE_OPTIONS.includes('--max-old-space-size')) {
-				process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : ''}--max-old-space-size=512 --max-semi-space-size=16`;
-			}
-
 			const parsedIdleTimeout = Number.parseFloat(options.idleTimeout ?? '60');
 			const idleTimeoutSeconds = Number.isFinite(parsedIdleTimeout) && parsedIdleTimeout >= 0 ? parsedIdleTimeout : 60;
 			const isLazy = !options.eager;
+
+			if (!process.env.NODE_OPTIONS || !process.env.NODE_OPTIONS.includes('--max-old-space-size')) {
+				const maxOldSpaceMb = isLazy ? 1024 : 512;
+				process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS ? process.env.NODE_OPTIONS + ' ' : ''}--max-old-space-size=${maxOldSpaceMb} --max-semi-space-size=16`;
+			}
 
 			if (options.only) {
 				const type = options.only;
@@ -221,7 +222,7 @@ export default function registerDev(program: Command) {
 				if (type === 'apps') {
 					process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
 					if (isLazy) {
-						terminal.log(`Starting On-Demand URL Listener for all 12 apps (idle spin-down: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'})...`);
+						terminal.log(`Starting On-Demand URL Listener for all 13 apps (idle spin-down: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'})...`);
 						await startLazyAppsSupervisor({
 							domain: currentDomain,
 							isCustomDomain: hasCustomDomain,
@@ -245,7 +246,7 @@ export default function registerDev(program: Command) {
 				process.env.NEXT_PUBLIC_DOMAIN = currentDomain;
 
 				if (isLazy) {
-					terminal.log(`Starting On-Demand URL Listener for apps (4000-4011) [idle spin-down: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'}]...`);
+					terminal.log(`Starting On-Demand URL Listener for apps (4000-4012) [idle spin-down: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'}]...`);
 					await startLazyAppsSupervisor({
 						domain: currentDomain,
 						isCustomDomain: hasCustomDomain,

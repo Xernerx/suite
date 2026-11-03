@@ -57,8 +57,6 @@ export function Header() {
 	const notificationsRef = useRef<HTMLDivElement>(null);
 	const [optionsOpen, setOptionsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(true);
-	const [activeAnnouncement, setActiveAnnouncement] = useState<any | null>(null);
-	const [nowMs, setNowMs] = useState(() => Date.now());
 	const [desktopUpdateState, setDesktopUpdateState] = useState<{ checking?: boolean; outdated?: boolean; latestVersion?: string } | null>(null);
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
@@ -85,10 +83,8 @@ export function Header() {
 		};
 		window.addEventListener('xernerx:desktop-update-state', handleDesktopUpdateState);
 		const timer = setTimeout(() => setIsExpanded(false), 2000);
-		const clock = setInterval(() => setNowMs(Date.now()), 30000);
 		return () => {
 			clearTimeout(timer);
-			clearInterval(clock);
 			window.removeEventListener('xernerx:desktop-update-state', handleDesktopUpdateState);
 		};
 	}, []);
@@ -137,6 +133,7 @@ export function Header() {
 				[port === '4009' || host.startsWith('portal.') || Boolean(pathname?.startsWith('/portal')), 'Developer Portal'],
 				[port === '4010' || host.startsWith('hosting.'), 'Server Hosting'],
 				[port === '4011' || host.startsWith('haste.'), 'Xernerx Haste'],
+				[port === '4012' || host.startsWith('blog.'), 'Xernerx Blog'],
 				[Boolean(pathname?.startsWith('/dashboard')), 'Server Dashboard'],
 				[Boolean(pathname?.startsWith('/overlay')), 'Live Overlay Monitor'],
 			];
@@ -211,9 +208,10 @@ export function Header() {
 			'4009': 'portal',
 			'4010': 'hosting',
 			'4011': 'haste',
+			'4012': 'blog',
 		};
 		if (isLocalHost && portMap[port]) pre = portMap[port];
-		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting', 'haste'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
+		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting', 'haste', 'blog'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
 
 		const params = new URLSearchParams(window.location.search);
 		if (state !== 'hidden' && view && !params.has('view')) params.set('view', view);
@@ -222,30 +220,6 @@ export function Header() {
 	};
 
 	const urlState = getInitialUrlState();
-
-	useEffect(() => {
-		if (!isMounted || typeof window === 'undefined') return;
-		fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements?activeOnly=true&app=${encodeURIComponent(urlState.pre)}`), { credentials: 'include' })
-			.then((res) => (res.ok ? res.json() : []))
-			.then((list: any[]) => {
-				if (!Array.isArray(list) || list.length === 0) return setActiveAnnouncement(null);
-				const dismissed: string[] = JSON.parse(localStorage.getItem('xernerx-dismissed-announcements') || '[]');
-				const match = list.find((a) => a?.id && !dismissed.includes(a.id) && a?.expiresAt && new Date(a.expiresAt).getTime() > Date.now());
-				setActiveAnnouncement(match || null);
-			})
-			.catch(() => {});
-	}, [isMounted, getEnvUrl, urlState.pre]);
-
-	const dismissBanner = (id: string) => {
-		try {
-			const dismissed: string[] = JSON.parse(localStorage.getItem('xernerx-dismissed-announcements') || '[]');
-			if (!dismissed.includes(id)) localStorage.setItem('xernerx-dismissed-announcements', JSON.stringify([...dismissed, id]));
-		} catch {}
-		setActiveAnnouncement(null);
-	};
-
-	const bannerExpiresMs = activeAnnouncement?.expiresAt ? new Date(activeAnnouncement.expiresAt).getTime() : 0;
-	const bannerMinsLeft = bannerExpiresMs > nowMs ? Math.max(1, Math.floor((bannerExpiresMs - nowMs) / 60000)) : 0;
 
 	const headerIconBtnClass =
 		effectiveControls === 'xernerx'
@@ -262,32 +236,6 @@ export function Header() {
 
 	return (
 		<div className="relative flex flex-col w-full z-[9999] shrink-0 bg-(--background)" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-			{activeAnnouncement && bannerMinsLeft > 0 && (
-				<div
-					className="flex items-center justify-between gap-3 py-1.5 bg-(--accent)/15 border-b border-(--accent)/30 backdrop-blur-md text-xs text-(--text)"
-					style={{
-						paddingLeft: 'calc(1rem + env(safe-area-inset-left, 0px))',
-						paddingRight: 'calc(1rem + env(safe-area-inset-right, 0px))',
-					}}
-				>
-					<div className="flex items-center gap-2 min-w-0">
-						<Megaphone size={13} className="text-(--accent) shrink-0" />
-						<span className="font-bold truncate">{activeAnnouncement.title}</span>
-						{activeAnnouncement.message?.content && <span className="text-(--text-muted) truncate hidden sm:inline">— {activeAnnouncement.message.content}</span>}
-						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--accent)/20 text-(--accent) border border-(--accent)/30 shrink-0">
-							<Clock size={10} />
-							{t('admin.dashboard.announcements.expiresIn', {
-								hours: Math.floor(bannerMinsLeft / 60),
-								minutes: bannerMinsLeft % 60,
-								time: `${Math.floor(bannerMinsLeft / 60)}h ${bannerMinsLeft % 60}m`,
-							})}
-						</span>
-					</div>
-					<button type="button" onClick={() => dismissBanner(activeAnnouncement.id)} className="text-(--text-muted) hover:text-(--text) cursor-pointer shrink-0">
-						<X size={13} />
-					</button>
-				</div>
-			)}
 			<header
 				className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} h-[50px] shrink-0 items-center justify-between w-full bg-(--background) touch-none`}
 				style={{

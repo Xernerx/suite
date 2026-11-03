@@ -2,6 +2,37 @@
 
 # auth
 
+## 2.13.0
+
+### Minor Changes
+
+- ## Self-Service Virtue Data Deletion, API Token Security Controls & Split Markdown Bio Editor
+
+    Expanded Account Settings with self-service Virtue progression deletion, advanced API token expiration and IP allowlist controls, and a side-by-side Split Markdown editor for your public biography.
+
+    ### Added
+    - **Self-Service Virtue Data Deletion**: Added a dedicated **Delete Virtue Data** action in the Account Danger Zone allowing you to permanently erase your Virtue XP, level progression, and streak history across all servers without deleting your Xernerx account.
+    - **API Token Expiration Dates (`expiresAt` TTL)**: Added optional expiration date controls when creating or managing API tokens, with live expiration status badges on token cards.
+    - **API Token IP Allowlists (`allowedIps`)**: Added optional IPv4/IPv6 allowlist configuration on API tokens to restrict token usage strictly to trusted server IP addresses.
+
+    ### Changed
+    - **Unified Markdown Biography Editor**: Upgraded the Profile Biography field to use the shared `<Markdown />` editor with live **Write**, side-by-side **Split**, and rendered **Preview** modes.
+    - **Active Device & Session Management**: Refined active device session cards, global sign-out session invalidation (`sessionVersion`), tombstone persistence when resetting or deleting data with `services: false` or `blacklisted: true`, and standardized `To-Do List Bot` metadata descriptions.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 2.12.0
 
 ### Minor Changes

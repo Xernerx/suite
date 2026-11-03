@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Server, Shield, Globe, Key, Map, Lightbulb, Bug, HelpCircle, Code, Activity, BookOpen } from 'lucide-react';
+import { Server, Shield, Globe, Key, Map, Lightbulb, Bug, HelpCircle, Code, Activity, BookOpen, Newspaper } from 'lucide-react';
 import Image from 'next/image';
 import { CodeBlock } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
@@ -165,6 +165,18 @@ export function CoreEndpoints({ activeGroup = 'all', searchQuery = '', methodFil
 				{ method: 'GET', path: '/core/changelog/reactions', auth: 'public' as const },
 				{ method: 'POST', path: '/core/changelog/reactions', auth: 'token' as const },
 				{ method: 'GET', path: '/core/downloads/app?channel=stable|canary', auth: 'public' as const },
+			],
+		},
+		{
+			id: 'core-blog',
+			group: 'core-info',
+			title: t('docs.api.core.coreBlog.title'),
+			icon: Newspaper,
+			description: t('docs.api.core.coreBlog.description'),
+			routes: [
+				{ method: 'GET', path: '/core/blog?category=&audience=&q=&tag=&featured=', auth: 'public' as const },
+				{ method: 'GET', path: '/core/blog/[slug]', auth: 'public' as const },
+				{ method: 'POST', path: '/core/blog/[slug]', auth: 'token' as const },
 			],
 		},
 		{

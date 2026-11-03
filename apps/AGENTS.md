@@ -2,16 +2,17 @@
 
 # `apps/*` — Frontend Application Guidelines (`AGENTS.md`)
 
-All Next.js applications inside `apps/*` (`www`, `account`, `app`, `store`, `docs`, `admin`, `info`, `cdn`) must strictly follow these structural and architectural rules.
+All Next.js applications inside `apps/*` (`www`, `account`, `app`, `store`, `docs`, `admin`, `info`, `cdn`, `portal`, `hosting`, `haste`, `blog`) must strictly follow these structural and architectural rules.
 
 ---
 
 ## 🧱 1. Component Reuse First (`@xernerx/ui` & `@xernerx/components`)
 
 - **Always check shared packages before writing custom UI markup:**
-    - Check [`@xernerx/ui`](../packages/ui/index.ts) for primitives: `Button`, `Input`, `Toggle`, `Slider`, `Selector`, `MultiSelector`, `Confirm`, `Modal`, `CollapsibleCard`, `Tabs`, `Divider`, `Tooltip`, `CodeBlock`, `PreventLossConfirmation`.
-    - Check [`@xernerx/components`](../packages/components/index.ts) for shared shells and domain widgets: `AppLayout`, `Page`, `Header`, `Sidebar`, `Footer`, `BotCard`, `BotRow`, `AdBanner`, `CookiePrompt`, `VersionTracker`.
-- **Toggles Instead of Checkboxes (`Toggle.tsx`):** Never render raw native `<input type="checkbox">` elements. Always use `Toggle` from `@xernerx/ui` for boolean settings, switches, and binary state controls.
+    - Check [`@xernerx/ui`](../packages/ui/index.ts) for primitives: `Button`, `Input`, `Toggle`, `Check`, `Slider`, `Selector`, `MultiSelector`, `Confirm`, `Modal`, `Markdown`, `CollapsibleCard`, `Tabs`, `Divider`, `Tooltip`, `CodeBlock`, `PreventLossConfirmation`.
+    - Check [`@xernerx/components`](../packages/components/index.ts) for shared shells and domain widgets: `AppLayout`, `Page`, `Header`, `Sidebar`, `Footer`, `BotCard`, `BotRow`, `AdBanner`, `CookiePrompt`, `VersionTracker`, `BlacklistGate`.
+- **Unified `<Markdown />` Component:** Always use `<Markdown />` from `@xernerx/ui` for rendering and editing Markdown content (with `editable` for the 3-way **Write / Split / Preview** switcher, and `allowAdminMediaPaste` strictly inside `apps/admin`). Never create custom duplicate Markdown editors or renderers.
+- **Toggles vs Checks (`Toggle.tsx` & `Check.tsx`):** Never render raw native `<input type="checkbox">` elements. Use `Toggle` strictly for boolean on/off switches and `Check` for item selection.
 - Only create an app-local component when it is specific to a single app's domain.
 
 ---

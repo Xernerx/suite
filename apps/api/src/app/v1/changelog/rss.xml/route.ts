@@ -13,6 +13,7 @@ const APPS = [
 	{ id: 'admin', name: 'Admin', devPort: 4006 },
 	{ id: 'hosting', name: 'Hosting', devPort: 4010 },
 	{ id: 'haste', name: 'Haste', devPort: 4011 },
+	{ id: 'blog', name: 'Blog', devPort: 4012 },
 	{ id: 'api', name: 'API', devPort: 4001 },
 	{ id: 'cdn', name: 'CDN', devPort: 4002 },
 	{ id: 'docs', name: 'Docs', devPort: 4005 },
@@ -114,7 +115,7 @@ async function fetchPackageChangelogItems(): Promise<Array<{ title: string; link
 						.replace(/^#\s+[^\r\n]+\r?\n*/gm, '')
 						.trim();
 
-					const sections = content.split(/^##\s+/m).slice(1, 4);
+					const sections = content.split(/^##\s+(?=\[?v?\d+\.\d+)/m).slice(1, 4);
 					for (const sec of sections) {
 						const lines = sec.trim().split(/\r?\n/);
 						const version = lines[0]?.trim().replace(/[^a-zA-Z0-9.-]/g, '') || latestVersion;
@@ -156,7 +157,7 @@ export async function GET() {
 					}
 					if (!content) return;
 
-					const sections = content.split(/^##\s+/m).slice(1, 5);
+					const sections = content.split(/^##\s+(?=\[?v?\d+\.\d+)/m).slice(1, 5);
 					for (const sec of sections) {
 						const lines = sec.trim().split(/\r?\n/);
 						const version = lines[0]?.trim().replace(/[^a-zA-Z0-9.-]/g, '') || 'latest';

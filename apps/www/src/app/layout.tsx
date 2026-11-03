@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 		template: 'Xernerx Studios | %s',
 	},
-	description: 'Xernerx Studios builds Discord bots (To-Do List, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+	description: 'Xernerx Studios builds Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 	keywords: [
 		'Xernerx',
 		'Xernerx Studios',
@@ -30,7 +30,6 @@ export const metadata: Metadata = {
 		'Xernerx Account',
 		'1 Account 1 Place 1 Setup',
 		'To-Do List Bot',
-		'TDL Discord Bot',
 		'Virtue Discord Bot',
 		'Metamorphosis Discord Bot',
 		'Zodiac Discord Bot',
@@ -48,7 +47,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description: 'Xernerx Studios builds Discord bots (To-Do List, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+		description: 'Xernerx Studios builds Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 		url: 'https://www.xernerx.com',
 		siteName: 'Xernerx Studios',
 		images: [
@@ -68,7 +67,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description: 'Xernerx Studios builds Discord bots (To-Do List, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+		description: 'Xernerx Studios builds Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 		images: ['/banner.png'],
 	},
 
@@ -94,7 +93,7 @@ const structuredData = {
 			logo: 'https://www.xernerx.com/logo.png',
 			slogan: '1 Account, 1 Place, 1 Setup',
 			description:
-				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (To-Do List, Virtue, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
+				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (To-Do List Bot, Virtue, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
 			sameAs: ['https://github.com/xernerx', 'https://www.npmjs.com/org/xernerx'],
 			knowsAbout: [
 				'Discord Bots',
@@ -115,7 +114,7 @@ const structuredData = {
 			name: 'Xernerx Studios',
 			publisher: { '@id': 'https://www.xernerx.com/#organization' },
 			description:
-				'Official hub for Xernerx Studios (Version 5): 1 Xernerx Account for the Xernerx Suite, To-Do List, Virtue, Metamorphosis, and Zodiac, plus bot statistics tracking, public bot listings, and developer frameworks.',
+				'Official hub for Xernerx Studios (Version 5): 1 Xernerx Account for the Xernerx Suite, To-Do List Bot, Virtue, Metamorphosis, and Zodiac, plus bot statistics tracking, public bot listings, and developer frameworks.',
 		},
 		{
 			'@type': 'SoftwareApplication',
@@ -127,7 +126,52 @@ const structuredData = {
 			url: 'https://app.xernerx.com',
 			author: { '@id': 'https://www.xernerx.com/#organization' },
 			description:
-				'Version 5 of the Xernerx platform: a unified dashboard for configuring To-Do List, Virtue, Metamorphosis, and Zodiac, discovering Discord bots and servers, tracking automated bot telemetry, and managing developer organizations with 1 Xernerx Account.',
+				'Version 5 of the Xernerx platform: a unified dashboard for configuring To-Do List Bot, Virtue, Metamorphosis, and Zodiac, discovering Discord bots and servers, tracking automated bot telemetry, and managing developer organizations with 1 Xernerx Account.',
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': 'https://app.xernerx.com/bots/virtue#bot',
+			name: 'Virtue Discord Bot',
+			alternateName: ['Virtue', 'Virtue Leveling Bot'],
+			applicationCategory: 'UtilitiesApplication',
+			operatingSystem: 'Discord, Web',
+			url: 'https://app.xernerx.com/bots/virtue',
+			author: { '@id': 'https://www.xernerx.com/#organization' },
+			description:
+				'Text and voice XP leveling Discord bot developed by Xernerx Studios with global and server leaderboards, configurable XP curves, role rewards, and server booster multipliers.',
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': 'https://app.xernerx.com/bots/todo#bot',
+			name: 'To-Do List Bot',
+			alternateName: ['Xernerx To-Do List Bot'],
+			applicationCategory: 'UtilitiesApplication',
+			operatingSystem: 'Discord, Web',
+			url: 'https://app.xernerx.com/bots/todo',
+			author: { '@id': 'https://www.xernerx.com/#organization' },
+			description: 'Collaborative Discord task boards, personal checklists, and productivity bot developed by Xernerx Studios.',
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': 'https://app.xernerx.com/bots/metamorphosis#bot',
+			name: 'Metamorphosis Discord Bot',
+			alternateName: ['Metamorphosis'],
+			applicationCategory: 'UtilitiesApplication',
+			operatingSystem: 'Discord, Web',
+			url: 'https://app.xernerx.com/bots/metamorphosis',
+			author: { '@id': 'https://www.xernerx.com/#organization' },
+			description: 'Dynamic temporary voice channels and automated community management Discord bot developed by Xernerx Studios.',
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': 'https://app.xernerx.com/bots/zodiac#bot',
+			name: 'Zodiac Discord Bot',
+			alternateName: ['Zodiac'],
+			applicationCategory: 'UtilitiesApplication',
+			operatingSystem: 'Discord, Web',
+			url: 'https://app.xernerx.com/bots/zodiac',
+			author: { '@id': 'https://www.xernerx.com/#organization' },
+			description: 'Daily horoscopes, zodiac sign profiles, compatibility readings, and astrology Discord bot developed by Xernerx Studios.',
 		},
 	],
 };

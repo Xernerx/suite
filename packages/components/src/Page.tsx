@@ -4,10 +4,12 @@
 import { useDictionary, useEnvironment, useLoading, usePlatform, useShortcuts, useSidebar, useTheme, useToast, useUser } from '@xernerx/providers';
 import { AmbientStageCanvas, CursorFxCanvas, XernerxDotLogo } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { Eye, Lock, ShieldCheck, UploadCloud } from 'lucide-react';
+import { Eye, Lock, Megaphone, ShieldCheck, UploadCloud, X } from 'lucide-react';
+import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
+import { BlacklistGate } from './BlacklistGate';
 import { Footer } from './Footer';
 import { Header } from './Header';
 import { useWindowControlsStyle } from './HeaderWindowControls';
@@ -34,6 +36,69 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const [entryLoading, setEntryLoading] = useState(true);
 	const [isDragUploading, setIsDragUploading] = useState(false);
 	const [stagePreview, setStagePreview] = useState(false);
+	const [isFixedWatermarkApp, setIsFixedWatermarkApp] = useState(false);
+	const [activeAnnouncement, setActiveAnnouncement] = useState<any | null>(null);
+	const [nowMs, setNowMs] = useState(() => Date.now());
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const clock = setInterval(() => setNowMs(Date.now()), 30000);
+		const host = window.location.hostname;
+		const port = window.location.port;
+		const isLocalHost = host === 'localhost' || host === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
+		const portMap: Record<string, string> = {
+			'4000': 'www',
+			'4001': 'api',
+			'4002': 'cdn',
+			'4003': 'account',
+			'4004': 'app',
+			'4005': 'docs',
+			'4006': 'admin',
+			'4007': 'info',
+			'4008': 'store',
+			'4009': 'portal',
+			'4010': 'hosting',
+			'4011': 'haste',
+			'4012': 'blog',
+		};
+		let appPre = 'app';
+		if (isLocalHost && portMap[port]) appPre = portMap[port];
+		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting', 'haste', 'blog'].forEach((p) => host.startsWith(`${p}.`) && (appPre = p));
+
+		fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements?activeOnly=true&app=${encodeURIComponent(appPre)}`), { credentials: 'include' })
+			.then((res) => (res.ok ? res.json() : []))
+			.then((list: any[]) => {
+				if (!Array.isArray(list) || list.length === 0) return setActiveAnnouncement(null);
+				const dismissed: string[] = JSON.parse(localStorage.getItem('xernerx-dismissed-announcements') || '[]');
+				const match = list.find((a) => a?.id && !dismissed.includes(a.id) && a?.expiresAt && new Date(a.expiresAt).getTime() > Date.now());
+				setActiveAnnouncement(match || null);
+			})
+			.catch(() => {});
+
+		return () => clearInterval(clock);
+	}, [getEnvUrl]);
+
+	const dismissBanner = (id: string) => {
+		try {
+			const dismissed: string[] = JSON.parse(localStorage.getItem('xernerx-dismissed-announcements') || '[]');
+			if (!dismissed.includes(id)) localStorage.setItem('xernerx-dismissed-announcements', JSON.stringify([...dismissed, id]));
+		} catch {}
+		setActiveAnnouncement(null);
+	};
+
+	const bannerExpiresMs = activeAnnouncement?.expiresAt ? new Date(activeAnnouncement.expiresAt).getTime() : 0;
+	const bannerMinsLeft = bannerExpiresMs > nowMs ? Math.max(1, Math.floor((bannerExpiresMs - nowMs) / 60000)) : 0;
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const fixed =
+			['4000', '4001', '4005'].includes(window.location.port) ||
+			['xernerx.com', 'dev.xernerx.com', 'canary.xernerx.com'].includes(window.location.hostname) ||
+			window.location.hostname.startsWith('www.') ||
+			window.location.hostname.startsWith('api.') ||
+			window.location.hostname.startsWith('docs.');
+		setIsFixedWatermarkApp(fixed);
+	}, []);
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
@@ -294,14 +359,6 @@ export function Page({ children }: { children: React.ReactNode }) {
 		};
 	}, [t, toast]);
 
-	const isFixedWatermarkApp =
-		typeof window !== 'undefined' &&
-		(['4000', '4001', '4005'].includes(window.location.port) ||
-			['xernerx.com', 'dev.xernerx.com', 'canary.xernerx.com'].includes(window.location.hostname) ||
-			window.location.hostname.startsWith('www.') ||
-			window.location.hostname.startsWith('api.') ||
-			window.location.hostname.startsWith('docs.'));
-
 	const stage = isFixedWatermarkApp ? 'default' : uiPreferences?.dotMatrixStage || 'default';
 	const matrixType = isFixedWatermarkApp
 		? 'default'
@@ -442,11 +499,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 					{/* Centralized AppLayout Dot-Matrix Loading & Sticky Stage */}
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
 						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 3.5rem - env(safe-area-inset-top, 0px))' }}>
-							{!isFixedWatermarkApp && !isBatterySaverActive && !isSystemIdle && !privacyShieldLocked && (
-								<div className="absolute inset-0 pointer-events-none">
-									<AmbientStageCanvas scene={uiPreferences?.ambientScene || 'default'} />
-								</div>
-							)}
+							<div className="absolute inset-0 pointer-events-none">
+								<AmbientStageCanvas scene={isFixedWatermarkApp || isBatterySaverActive || isSystemIdle || privacyShieldLocked ? 'default' : uiPreferences?.ambientScene || 'default'} />
+							</div>
 							<XernerxDotLogo
 								variant={effectiveVariant}
 								renderStyle={effectiveRenderStyle}
@@ -473,7 +528,30 @@ export function Page({ children }: { children: React.ReactNode }) {
 								paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
 							}}
 						>
-							{children}
+							{activeAnnouncement && bannerMinsLeft > 0 && (
+								<div
+									className="max-w-(--page-width) mx-auto w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-(--accent)/15 border border-(--accent)/30 backdrop-blur-md text-xs text-(--text) shadow-sm"
+									style={{ marginBottom: 'var(--ui-gap)' }}
+								>
+									<div className="flex items-center gap-2 min-w-0">
+										<Megaphone size={14} className="text-(--accent) shrink-0" />
+										<span className="font-bold truncate">{activeAnnouncement.title}</span>
+										{activeAnnouncement.message?.content && <span className="text-(--text-muted) truncate hidden sm:inline">— {activeAnnouncement.message.content}</span>}
+										{(activeAnnouncement.link || activeAnnouncement.blogSlug) && (
+											<Link
+												href={getEnvUrl(activeAnnouncement.link || `https://blog.xernerx.com/${activeAnnouncement.blogSlug}`)}
+												className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-(--accent) text-(--background) hover:opacity-90 transition-opacity shrink-0"
+											>
+												{t('blog.card.readMore')}
+											</Link>
+										)}
+									</div>
+									<button type="button" onClick={() => dismissBanner(activeAnnouncement.id)} className="text-(--text-muted) hover:text-(--text) cursor-pointer shrink-0">
+										<X size={14} />
+									</button>
+								</div>
+							)}
+							<BlacklistGate>{children}</BlacklistGate>
 						</main>
 
 						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}

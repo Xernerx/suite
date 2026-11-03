@@ -32,19 +32,21 @@ export function DictionaryProvider({
 				value = getNestedValue(fallbackDictionary, path);
 			}
 
-			// 3. Last resort fallback to path string
-			if (value === undefined) {
+			// 3. Last resort fallback to path string (or if resolved to a nested object instead of a leaf string)
+			if (value === undefined || value === null || typeof value === 'object') {
 				return path;
 			}
+
+			const strValue = String(value);
 
 			// 4. Handle variable interpolation
 			if (variables) {
 				return Object.entries(variables).reduce((str, [key, val]) => {
 					return str.replace(new RegExp(`\\{${key}\\}`, 'g'), String(val));
-				}, value);
+				}, strValue);
 			}
 
-			return value;
+			return strValue;
 		};
 	}, [activeDictionary, fallbackDictionary]);
 

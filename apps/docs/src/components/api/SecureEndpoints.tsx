@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Server, Key, Shield, Link as LinkIcon, Megaphone, Languages, FileText, Settings2, Bot, Globe, Building2, ShoppingBag, Bell, Bug } from 'lucide-react';
+import { Server, Key, Shield, Link as LinkIcon, Megaphone, Languages, FileText, Settings2, Bot, Globe, Building2, ShoppingBag, Bell, Bug, Newspaper } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 import { EndpointSection } from './EndpointSection';
 
@@ -34,6 +34,7 @@ export function SecureEndpoints({ activeGroup = 'all', searchQuery = '', methodF
 				{ method: 'PATCH', path: '/secure/users/[id]/appearance', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/users/[id]/virtue', auth: 'secure' as const },
 				{ method: 'PATCH', path: '/secure/users/[id]/virtue', auth: 'secure' as const },
+				{ method: 'DELETE', path: '/secure/users/[id]/virtue', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/users/[id]/achievements', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/users/[id]/achievements', auth: 'secure' as const },
 				{ method: 'GET', path: '/secure/users/[id]/referrals', auth: 'secure' as const },
@@ -223,6 +224,19 @@ export function SecureEndpoints({ activeGroup = 'all', searchQuery = '', methodF
 				{ method: 'DELETE', path: '/secure/announcements/[id]', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/announcements/create-webhook', auth: 'secure' as const },
 				{ method: 'GET', path: '/api/cron/announcements', auth: 'secure' as const },
+			],
+		},
+		{
+			id: 'manage-blog',
+			group: 'secure-moderation',
+			title: t('docs.api.secure.manageBlog.title'),
+			icon: Newspaper,
+			description: t('docs.api.secure.manageBlog.description'),
+			routes: [
+				{ method: 'GET', path: '/secure/blog', auth: 'secure' as const },
+				{ method: 'POST', path: '/secure/blog', auth: 'secure' as const },
+				{ method: 'PATCH', path: '/secure/blog/[id]', auth: 'secure' as const },
+				{ method: 'DELETE', path: '/secure/blog/[id]', auth: 'secure' as const },
 			],
 		},
 		{

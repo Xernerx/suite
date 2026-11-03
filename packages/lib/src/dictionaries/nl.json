@@ -56,11 +56,22 @@
 				"careers": "Vacatures",
 				"status": "Systeemstatus",
 				"statusOperational": "Alle systemen operationeel",
-				"statusDegraded": "Systeemstatus: Vertraagd"
+				"statusDegraded": "Systeemstatus: Vertraagd",
+				"changelog": "Wijzigingslogboek",
+				"download": "Desktop Client",
+				"invites": "Bot Uitnodigingen"
 			},
 			"title": "Xernerx Studios",
 			"description": "© 2024 -",
-			"description2": "Xernerx Studios"
+			"description2": "Xernerx Studios",
+			"share": {
+				"label": "Delen",
+				"twitter": "Delen op X",
+				"facebook": "Delen op Facebook",
+				"linkedin": "Delen op LinkedIn",
+				"reddit": "Delen op Reddit",
+				"whatsapp": "Delen op WhatsApp"
+			}
 		},
 		"sidebar": {
 			"login": "Inloggen",
@@ -108,7 +119,9 @@
 		"buttons": {
 			"cancel": "Annuleren",
 			"confirm": "Bevestigen",
-			"proceed": "Doorgaan"
+			"proceed": "Doorgaan",
+			"delete": "Verwijderen",
+			"close": "Sluiten"
 		},
 		"shortcuts": {
 			"modal": {
@@ -194,6 +207,10 @@
 		"selector": {
 			"placeholder": "Zoek...",
 			"description": "Geen opties gevonden"
+		},
+		"confirm": {
+			"typeToConfirmBefore": "Typ",
+			"typeToConfirmAfter": "Om te bevestigen"
 		}
 	},
 	"api": {
@@ -225,7 +242,6 @@
 			"fallbackName": "Gebruiker",
 			"session": {
 				"title": "Actieve sessie",
-				"description": "Meld je af bij je actieve accountsessie op dit apparaat. Je moet opnieuw authenticeren om toegang te krijgen tot je werkruimte.",
 				"button": "Uitloggen"
 			},
 			"danger": {
@@ -645,12 +661,6 @@
 				},
 				"rights": {
 					"title": "9. Jouw rechten (AVG / GDPR & CCPA)",
-					"items": [
-						"Recht op inzage en gegevensoverdraagbaarheid (op elk moment beschikbaar via de zelfbedieningsfunctie \"Mijn gegevens exporteren (JSON)\" in Account -> Activiteit).",
-						"Recht op rectificatie, profielreset of permanente accountverwijdering (direct beschikbaar via Account -> Instellingen).",
-						"Recht om bepaalde gegevensverwerkingen te beperken of er bezwaar tegen te maken, en om gekoppelde accounts van derden op elk moment te ontkoppelen.",
-						"Recht om je toestemming voor niet-essentiële cookies en marketingcommunicatie op elk moment in te trekken."
-					],
 					"content": "Onder gegevensbeschermingswetgeving zoals de AVG (GDPR) en CCPA heb je uitgebreide rechten met betrekking tot je persoonsgegevens. Je kunt de meeste van deze rechten direct uitoefenen via je Accountdashboard of door contact op te nemen met ons juridische team."
 				},
 				"cookies": {

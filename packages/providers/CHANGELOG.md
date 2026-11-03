@@ -2,6 +2,24 @@
 
 # @xernerx/providers
 
+## 0.21.0
+
+### Minor Changes
+
+- ## Blog Subdomain Resolution, Command Palette Deep Search & User Security Context
+
+    Registered `blog.xernerx.com` across environment and theme providers, expanded the `Ctrl + K` Command Palette catalog with all new portals and studios, and exposed account blacklist state on `useUser()`.
+
+    ### Changed
+    - **Subdomain Environment & Theme Sync (`EnvironmentProvider.tsx` & `ThemeProvider.tsx`)**: Registered `blog.xernerx.com` (dev port `4012`) in `getEnvUrl()` subdomain resolution and cross-subdomain theme synchronization.
+    - **Global Command Palette Deep Search & `To-Do List Bot` Naming (`commandPaletteCatalog.ts`)**: Expanded `Ctrl + K` / `Ctrl + Shift + K` with deep-search entries for the **Xernerx Newsroom & Blog (`blog.xernerx.com`)**, **Admin Blog Studio**, **Platform & Bot Security Architecture (`/security`)**, **Cookie Policy (`/cookies`)**, **Profile Identity Cosmetics Studio**, **Stage Render Forms**, **Ambient Canvas Scenes**, **Cursor FX**, **Header & Icon Packs**, **Desktop App Icon Crests**, and **Delete Virtue Data**, and standardized consumer store descriptions to **`To-Do List Bot`**.
+    - **User & Cookie Context Updates (`UserProvider.tsx` & `CookieProvider.tsx`)**: Exposed account `blacklisted`, `blacklistedReason`, and `services` flags on `useUser()`, handled automatic sign-out when `sessionInvalidated` is returned by `/secure/users/[id]`, and synced cookie policy version tracking.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.20.0
+
 ## 0.20.0
 
 ### Minor Changes

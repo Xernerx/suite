@@ -28,7 +28,7 @@ export default function InvitesPage() {
 			{
 				id: 'virtue',
 				name: 'Virtue',
-				clientId: '950251264095162418',
+				clientId: '1484880634844287138',
 				botName: t('www.applications.virtue.title'),
 				botAvatar: null,
 				description: t('www.applications.virtue.desc'),

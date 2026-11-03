@@ -33,6 +33,7 @@ const SUITE_SERVICES: Array<{ id: string; labelKey: string; host: string; port: 
 	{ id: 'admin', labelKey: 'info.status.services.admin', host: 'admin.xernerx.com', port: 4006 },
 	{ id: 'hosting', labelKey: 'info.status.services.hosting', host: 'hosting.xernerx.com', port: 4010 },
 	{ id: 'haste', labelKey: 'info.status.services.haste', host: 'haste.xernerx.com', port: 4011 },
+	{ id: 'blog', labelKey: 'info.status.services.blog', host: 'blog.xernerx.com', port: 4012 },
 ];
 
 export default function StatusClient() {

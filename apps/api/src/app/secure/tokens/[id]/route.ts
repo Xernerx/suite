@@ -120,9 +120,39 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		const resolvedOwners = Array.from(new Set([...(Array.isArray(body.owners) ? body.owners : []), userId].filter(Boolean)));
 
+		let resolvedExpiresAt: Date | null = null;
+		if (body.ttlDays !== undefined && body.ttlDays !== null && body.ttlDays !== 'never' && body.ttlDays !== '') {
+			const days = Number(body.ttlDays);
+			if (Number.isFinite(days) && days > 0) {
+				resolvedExpiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+			}
+		} else if (body.expiresAt) {
+			const parsed = new Date(body.expiresAt);
+			if (!Number.isNaN(parsed.getTime())) {
+				resolvedExpiresAt = parsed;
+			}
+		}
+
+		const resolvedAllowedIps: string[] = Array.isArray(body.allowedIps)
+			? Array.from(new Set<string>(body.allowedIps.map((ip: any) => String(ip || '').trim()).filter(Boolean))).slice(0, 50)
+			: typeof body.allowedIps === 'string'
+				? Array.from(
+						new Set<string>(
+							body.allowedIps
+								.split(',')
+								.map((ip: string) => ip.trim())
+								.filter(Boolean)
+						)
+					).slice(0, 50)
+				: [];
+
+		delete body.ttlDays;
+
 		const newToken = await TokenModel.create({
 			...body,
 			owners: resolvedOwners,
+			expiresAt: resolvedExpiresAt,
+			allowedIps: resolvedAllowedIps,
 			id,
 		});
 
@@ -178,6 +208,41 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				cleanBody.status = 'pending';
 			}
 		}
+
+		if (cleanBody.ttlDays !== undefined) {
+			if (cleanBody.ttlDays === 'never' || cleanBody.ttlDays === null || cleanBody.ttlDays === '' || Number(cleanBody.ttlDays) === 0) {
+				cleanBody.expiresAt = null;
+			} else if (cleanBody.ttlDays !== 'keep') {
+				const days = Number(cleanBody.ttlDays);
+				if (Number.isFinite(days) && days > 0) {
+					cleanBody.expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+				}
+			}
+			delete cleanBody.ttlDays;
+		} else if (cleanBody.expiresAt !== undefined) {
+			if (!cleanBody.expiresAt) {
+				cleanBody.expiresAt = null;
+			} else {
+				const parsed = new Date(cleanBody.expiresAt);
+				cleanBody.expiresAt = Number.isNaN(parsed.getTime()) ? null : parsed;
+			}
+		}
+
+		if (cleanBody.allowedIps !== undefined) {
+			cleanBody.allowedIps = Array.isArray(cleanBody.allowedIps)
+				? Array.from(new Set<string>(cleanBody.allowedIps.map((ip: any) => String(ip || '').trim()).filter(Boolean))).slice(0, 50)
+				: typeof cleanBody.allowedIps === 'string'
+					? Array.from(
+							new Set<string>(
+								cleanBody.allowedIps
+									.split(',')
+									.map((ip: string) => ip.trim())
+									.filter(Boolean)
+							)
+						).slice(0, 50)
+					: [];
+		}
+
 		const token = await TokenModel.findOneAndUpdate({ id }, cleanBody, { returnDocument: 'after' });
 		if (!token) {
 			return NextResponse.json({ error: 'Token not found' }, { status: 404 });

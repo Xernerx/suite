@@ -27,10 +27,11 @@ function getNestedJsonString(fileContent: string, keyPath: string[]): string | n
 	}
 }
 
-function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean; cookiesChanged: boolean } {
+function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean; cookiesChanged: boolean; securityChanged: boolean } {
 	let termsChanged = false;
 	let privacyChanged = false;
 	let cookiesChanged = false;
+	let securityChanged = false;
 
 	try {
 		const rawStatus = execSync('git status --porcelain').toString();
@@ -47,6 +48,9 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 			}
 			if (filePath.includes('apps/www/src/app/cookies')) {
 				cookiesChanged = true;
+			}
+			if (filePath.includes('apps/www/src/app/security')) {
+				securityChanged = true;
 			}
 
 			if (filePath.startsWith('packages/lib/src/dictionaries/') && filePath.endsWith('.json')) {
@@ -65,6 +69,7 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 					if (getNestedJsonString(currentRaw, ['www', 'terms'])) termsChanged = true;
 					if (getNestedJsonString(currentRaw, ['www', 'privacy'])) privacyChanged = true;
 					if (getNestedJsonString(currentRaw, ['www', 'cookies'])) cookiesChanged = true;
+					if (getNestedJsonString(currentRaw, ['www', 'security'])) securityChanged = true;
 				} else {
 					if (getNestedJsonString(currentRaw, ['www', 'terms']) !== getNestedJsonString(headRaw, ['www', 'terms'])) {
 						termsChanged = true;
@@ -78,6 +83,9 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 					) {
 						cookiesChanged = true;
 					}
+					if (getNestedJsonString(currentRaw, ['www', 'security']) !== getNestedJsonString(headRaw, ['www', 'security'])) {
+						securityChanged = true;
+					}
 				}
 			}
 		}
@@ -85,7 +93,7 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 		// Safely ignore git errors if not in a git repo
 	}
 
-	return { termsChanged, privacyChanged, cookiesChanged };
+	return { termsChanged, privacyChanged, cookiesChanged, securityChanged };
 }
 
 function flattenDictionary(obj: Record<string, any>, prefix = '', out: Record<string, string> = {}): Record<string, string> {
@@ -175,7 +183,7 @@ export default function registerCommit(program: Command) {
 
 			if (process.stdin.isTTY) {
 				try {
-					const { termsChanged, privacyChanged, cookiesChanged } = detectPolicyChanges();
+					const { termsChanged, privacyChanged, cookiesChanged, securityChanged } = detectPolicyChanges();
 					const now = new Date();
 					const newDate = now.toISOString().split('T')[0] + 'T00:00:00Z';
 					const readableDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -245,6 +253,26 @@ export default function registerCommit(program: Command) {
 							commitLog.log(`✔ Bumped COOKIES_VERSION date to ${newDate} in CookieProvider.tsx`);
 
 							execSync(`git add "${cookieProviderPath}"`);
+						}
+					}
+
+					if (securityChanged) {
+						const bumpSecurity = await select({
+							message: 'You have modified the Platform & Bot Security page (/security). Do you want to update its Last Reviewed date?',
+							options: [
+								{ label: 'No, this was just a minor typo or layout fix', value: false },
+								{ label: 'Yes, update the Last Reviewed date to today', value: true },
+							],
+						});
+
+						if (!isCancel(bumpSecurity) && bumpSecurity) {
+							const securityPagePath = path.resolve(process.cwd(), 'apps/www/src/app/security/page.tsx');
+							if (fs.existsSync(securityPagePath)) {
+								const pageContent = fs.readFileSync(securityPagePath, 'utf8').replace(/(\{t\('www\.security\.header\.effectiveDate'\)\})\s+[^<]+/g, `$1 ${readableDate}`);
+								fs.writeFileSync(securityPagePath, pageContent);
+								commitLog.log(`✔ Updated Last Reviewed date to ${readableDate} in apps/www/src/app/security/page.tsx`);
+								execSync(`git add "${securityPagePath}"`);
+							}
 						}
 					}
 				} catch (e) {
@@ -346,12 +374,53 @@ export default function registerCommit(program: Command) {
 				});
 				if (isCancel(bumpType)) return;
 
-				const summary = await text({
-					message: `[${pkgName}] Enter changelog message for ${pkgName} only:`,
-					placeholder: `Describe what changed in ${pkgName}...`,
-					validate: (val) => (!val || !val.trim() ? `Please enter a changelog message for ${pkgName}` : undefined),
+				const title = await text({
+					message: `[${pkgName}] Enter release title (## Title):`,
+					placeholder: `Short headline for ${pkgName} update...`,
+					validate: (val) => (!val || !val.trim() ? `Please enter a release title for ${pkgName}` : undefined),
 				});
-				if (isCancel(summary)) return;
+				if (isCancel(title)) return;
+
+				const shortDesc = await text({
+					message: `[${pkgName}] Enter short description:`,
+					placeholder: `Concise overview of what changed in ${pkgName}...`,
+					validate: (val) => (!val || !val.trim() ? `Please enter a short description for ${pkgName}` : undefined),
+				});
+				if (isCancel(shortDesc)) return;
+
+				const addedRaw = await text({
+					message: `[${pkgName}] ### Added items (optional, separate bullets with ";" or leave blank):`,
+					placeholder: `Feature A: Description; Feature B: Description`,
+				});
+				if (isCancel(addedRaw)) return;
+
+				const changedRaw = await text({
+					message: `[${pkgName}] ### Changed items (optional, separate bullets with ";" or leave blank):`,
+					placeholder: `Updated Feature: Description`,
+				});
+				if (isCancel(changedRaw)) return;
+
+				const deletedRaw = await text({
+					message: `[${pkgName}] ### Deleted items (optional, separate bullets with ";" or leave blank):`,
+					placeholder: `Removed Feature: Description`,
+				});
+				if (isCancel(deletedRaw)) return;
+
+				const formatBullets = (rawVal: string | symbol | undefined) =>
+					String(rawVal || '')
+						.split(';')
+						.map((s) => s.trim().replace(/^[-*]\s+/, ''))
+						.filter(Boolean)
+						.map((s) => `- ${s}`)
+						.join('\n');
+
+				const sections: string[] = [`## ${String(title).trim()}`, String(shortDesc).trim()];
+				const addedBullets = formatBullets(addedRaw);
+				const changedBullets = formatBullets(changedRaw);
+				const deletedBullets = formatBullets(deletedRaw);
+				if (addedBullets) sections.push(`### Added\n\n${addedBullets}`);
+				if (changedBullets) sections.push(`### Changed\n\n${changedBullets}`);
+				if (deletedBullets) sections.push(`### Deleted\n\n${deletedBullets}`);
 
 				const safeSlug = pkgName
 					.replace(/^@/, '')
@@ -359,7 +428,7 @@ export default function registerCommit(program: Command) {
 					.toLowerCase();
 				const fileName = `${safeSlug}-${Date.now().toString(36)}.md`;
 				const filePath = path.join(changesetDir, fileName);
-				const fileContent = `---\n'${pkgName}': ${bumpType}\n---\n\n${String(summary).trim()}\n`;
+				const fileContent = `---\n'${pkgName}': ${bumpType}\n---\n\n${sections.join('\n\n')}\n`;
 				fs.writeFileSync(filePath, fileContent, 'utf8');
 				commitLog.log(`✔ Created dedicated changeset .changeset/${fileName} for ${pkgName} (${bumpType})`);
 			}

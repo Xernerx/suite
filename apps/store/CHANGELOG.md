@@ -4,6 +4,29 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.9.1
+
+### Patch Changes
+
+- ## Store Documentation & Bot Pass Naming Synchronization
+
+    Standardized consumer bot pass documentation in the Store service to reference **To-Do List Bot**.
+
+    ### Changed
+    - **Consumer Bot Pass Documentation (`README.md`)**: Updated consumer bot pass references from `To-Do` to **`To-Do List Bot`** for consistency across the Xernerx Store.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 0.9.0
 
 ### Minor Changes

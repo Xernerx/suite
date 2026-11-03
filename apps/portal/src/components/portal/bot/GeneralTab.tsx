@@ -19,7 +19,6 @@ export default function GeneralTab({ botConfig, setBotConfig, onVanityUnlocked, 
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const { user, mutate: mutateUser } = useUser();
-	const [markdownPreview, setMarkdownPreview] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
 	const [copiedVanity, setCopiedVanity] = useState(false);
 
@@ -168,8 +167,6 @@ export default function GeneralTab({ botConfig, setBotConfig, onVanityUnlocked, 
 					</div>
 					<Markdown
 						editable
-						preview={markdownPreview}
-						onPreviewChange={setMarkdownPreview}
 						label={t('app.portal.bot.general.longDesc')}
 						value={botConfig.info || ''}
 						onChange={(val) => setBotConfig({ ...botConfig, info: val })}

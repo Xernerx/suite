@@ -2,6 +2,31 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.4.1
+
+### Patch Changes
+
+- ## Unified Write / Split / Preview Markdown Editors Across Developer Portal
+
+    Upgraded all bot and organization Markdown editors in the Developer Portal to use the shared `<Markdown />` component with side-by-side Split preview.
+
+    ### Changed
+    - **Bot Overview Split Markdown Editor (`GeneralTab`)**: Upgraded the Bot Long Description editor to the unified `@xernerx/ui` `<Markdown />` component with **Write**, side-by-side **Split**, and **Preview** modes.
+    - **Bot Releases Markdown Editor & Renderer (`ReleasesTab`)**: Upgraded Bot Release Notes creation and version history rendering to use the unified `<Markdown />` component.
+    - **Organization Description Split Markdown Editor (`OrgInfoTab`)**: Upgraded the Organization Description editor to use the unified `<Markdown />` component with side-by-side Split preview.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 1.4.0
 
 ### Minor Changes

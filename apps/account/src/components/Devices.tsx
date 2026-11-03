@@ -2,10 +2,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
+import { signOut, useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { Button, Confirm } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
-import { Computer, Smartphone, ShieldCheck, Trash2, Clock, CheckCircle2 } from 'lucide-react';
+import { Computer, Smartphone, ShieldCheck, Trash2, Clock, CheckCircle2, LogOut } from 'lucide-react';
 import { DevicePairingCard } from './DevicePairingCard';
 
 interface DeviceSession {
@@ -59,6 +59,7 @@ export default function Devices() {
 	const [loading, setLoading] = useState(true);
 	const [revoking, setRevoking] = useState(false);
 	const [confirmRevokeOthers, setConfirmRevokeOthers] = useState(false);
+	const [confirmRevokeAll, setConfirmRevokeAll] = useState(false);
 	const [revokeTarget, setRevokeTarget] = useState<DeviceSession | null>(null);
 
 	useEffect(() => {
@@ -112,6 +113,28 @@ export default function Devices() {
 		}
 	};
 
+	const handleRevokeAllSessions = async () => {
+		if (!userId) return;
+		setRevoking(true);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ action: 'revoke_sessions' }),
+			});
+			if (res.ok) {
+				toast({ type: 'success', title: t('account.account.session.revokeAllSuccess') });
+				setConfirmRevokeAll(false);
+				await signOut({ callbackUrl: getEnvUrl('https://account.xernerx.com/login') });
+			}
+		} catch (err: any) {
+			toast({ type: 'error', title: err.message });
+		} finally {
+			setRevoking(false);
+		}
+	};
+
 	const handleRevokeSingle = async () => {
 		if (!userId || !revokeTarget) return;
 		setRevoking(true);
@@ -148,12 +171,18 @@ export default function Devices() {
 					<p className="text-sm text-(--text-muted) mt-1">{t('account.devices.description')}</p>
 				</div>
 
-				{devices.length > 1 && (
-					<Button variant="danger" onClick={() => setConfirmRevokeOthers(true)} disabled={revoking} className="flex items-center gap-2">
-						<Trash2 size={15} />
-						{t('account.devices.revokeOthers')}
+				<div className="flex flex-wrap items-center gap-2">
+					{devices.length > 1 && (
+						<Button variant="secondary" onClick={() => setConfirmRevokeOthers(true)} disabled={revoking} className="flex items-center gap-2">
+							<Trash2 size={15} />
+							{t('account.devices.revokeOthers')}
+						</Button>
+					)}
+					<Button variant="danger" onClick={() => setConfirmRevokeAll(true)} disabled={revoking} className="flex items-center gap-2">
+						<LogOut size={15} />
+						{t('account.account.session.revokeAllButton')}
 					</Button>
-				)}
+				</div>
 			</div>
 
 			<DevicePairingCard />
@@ -216,6 +245,18 @@ export default function Devices() {
 				variant="danger"
 				loading={revoking}
 				onConfirm={handleRevokeOthers}
+			/>
+
+			<Confirm
+				open={confirmRevokeAll}
+				onOpenChange={setConfirmRevokeAll}
+				title={t('account.account.session.revokeAllConfirmTitle')}
+				description={t('account.account.session.revokeAllConfirmDesc')}
+				confirmText={t('account.account.session.revokeAllButton')}
+				cancelText={t('common.buttons.cancel')}
+				variant="danger"
+				loading={revoking}
+				onConfirm={handleRevokeAllSessions}
 			/>
 
 			<Confirm

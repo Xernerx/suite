@@ -34,6 +34,8 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 	const [newSelectedOwners, setNewSelectedOwners] = useState<string[]>([]);
 	const [newSecure, setNewSecure] = useState(false);
 	const [newWebsocket, setNewWebsocket] = useState(false);
+	const [newTtlDays, setNewTtlDays] = useState('never');
+	const [newAllowedIps, setNewAllowedIps] = useState('');
 	const [creating, setCreating] = useState(false);
 
 	const fetchTokens = useCallback(
@@ -86,6 +88,11 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 					status: newStatus,
 					botId: newBotId || undefined,
 					owners: newSelectedOwners,
+					ttlDays: newTtlDays,
+					allowedIps: newAllowedIps
+						.split(',')
+						.map((s) => s.trim())
+						.filter(Boolean),
 					permissions: {
 						secure: newSecure,
 						websocket: newWebsocket,
@@ -102,6 +109,8 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 				setNewSelectedOwners([]);
 				setNewSecure(false);
 				setNewWebsocket(false);
+				setNewTtlDays('never');
+				setNewAllowedIps('');
 				toast({
 					type: 'success',
 					title: t('admin.tokens.toast.createSuccess'),
@@ -311,6 +320,10 @@ export default function Tokens({ initialSearch = '', onViewAuditLogs }: { initia
 				setNewSecure={setNewSecure}
 				newWebsocket={newWebsocket}
 				setNewWebsocket={setNewWebsocket}
+				newTtlDays={newTtlDays}
+				setNewTtlDays={setNewTtlDays}
+				newAllowedIps={newAllowedIps}
+				setNewAllowedIps={setNewAllowedIps}
 				getEnvUrl={getEnvUrl}
 				onSubmit={handleCreate}
 				creating={creating}

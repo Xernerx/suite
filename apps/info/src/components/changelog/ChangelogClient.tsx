@@ -17,15 +17,36 @@ function toVersionId(headingText: string): string {
 	return headingText.replace(/[^a-zA-Z0-9.-]/g, '').replace(/^v/i, '');
 }
 
+function unwrapTitledChangesetBlocks(text: string): string {
+	let unindent = false;
+	return text
+		.split(/\r?\n/)
+		.map((line) => {
+			if (/^[-*]\s+(#{2,3}\s+.+)$/.test(line)) {
+				unindent = true;
+				return line.replace(/^[-*]\s+/, '');
+			}
+			if (unindent) {
+				if (line.trim() === '') return '';
+				if (/^(?:\t| {2,4})/.test(line)) return line.replace(/^(?:\t| {2,4})/, '');
+				unindent = false;
+			}
+			return line;
+		})
+		.join('\n');
+}
+
 function normalizeChangelogBody(raw: string): string {
-	return raw
-		.replace(/^([ \t]*[-*][ \t]*)<!--\s*@format\s*-->[ \t]*\r?\n+[ \t]+/gim, '$1')
-		.replace(/^[ \t]*[-*][ \t]*<!--\s*@format\s*-->[ \t]*\r?\n*/gim, '')
-		.replace(/<!--\s*@format\s*-->[ \t]*\r?\n*/gi, '')
-		.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
-		.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
-		.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
-		.trim();
+	return unwrapTitledChangesetBlocks(
+		raw
+			.replace(/^([ \t]*[-*][ \t]*)<!--\s*@format\s*-->[ \t]*\r?\n+[ \t]+/gim, '$1')
+			.replace(/^[ \t]*[-*][ \t]*<!--\s*@format\s*-->[ \t]*\r?\n*/gim, '')
+			.replace(/<!--\s*@format\s*-->[ \t]*\r?\n*/gi, '')
+			.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
+			.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
+			.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
+			.trim()
+	);
 }
 
 const REACTION_EMOJIS = ['🔥', '🚀', '❤️', '🎉'] as const;
@@ -42,6 +63,7 @@ const CLIENT_APPS = [
 	{ id: 'info', name: 'Info' },
 	{ id: 'store', name: 'Store' },
 	{ id: 'haste', name: 'Haste' },
+	{ id: 'blog', name: 'Blog' },
 	{ id: 'www', name: 'Website' },
 ] as const;
 
@@ -113,21 +135,15 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 	const handleToggleReaction = async (versionKey: string, emoji: string) => {
 		const storageKey = `${versionKey}:${emoji}`;
 		if (reactedMap[storageKey]) return;
-
 		const nextReacted = { ...reactedMap, [storageKey]: true };
 		setReactedMap(nextReacted);
 		try {
 			localStorage.setItem('xernerx_changelog_reacted', JSON.stringify(nextReacted));
 		} catch {}
-
 		setReactions((prev) => ({
 			...prev,
-			[versionKey]: {
-				...(prev[versionKey] || {}),
-				[emoji]: ((prev[versionKey] || {})[emoji] || 0) + 1,
-			},
+			[versionKey]: { ...(prev[versionKey] || {}), [emoji]: ((prev[versionKey] || {})[emoji] || 0) + 1 },
 		}));
-
 		try {
 			const res = await fetch(`${getEnvUrl('https://api.xernerx.com/')}core/changelog/reactions`, {
 				method: 'POST',
@@ -135,9 +151,7 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 				body: JSON.stringify({ versionKey, emoji }),
 			});
 			const data = await res.json();
-			if (res.ok && data?.reactions) {
-				setReactions(data.reactions);
-			}
+			if (res.ok && data?.reactions) setReactions(data.reactions);
 		} catch {}
 	};
 
@@ -162,30 +176,20 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 				},
 			};
 		});
-
 		setNavItems(items);
-
 		if (items.length > 0) {
 			if (!hasAppliedUrlParam.current) {
 				hasAppliedUrlParam.current = true;
 				const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
 				const rawHash = typeof window !== 'undefined' && window.location.hash ? decodeURIComponent(window.location.hash.substring(1)).toLowerCase() : null;
 				const targetItem = (itemParam ? decodeURIComponent(itemParam).toLowerCase() : null) || rawHash;
-				if (targetItem) {
-					const match = items.find((i) => i.view === `changelog-${targetItem}` || i.view === `changelog-@xernerx/${targetItem}`);
-					if (match && view !== match.view) {
-						setView(match.view);
-					} else if (!view) {
-						setView(items[0].view);
-					}
-				} else if (!view || !items.some((i) => i.view === view)) {
-					setView(items[0].view);
-				}
+				const match = targetItem ? items.find((i) => i.view === `changelog-${targetItem}` || i.view === `changelog-@xernerx/${targetItem}`) : null;
+				if (match && view !== match.view) setView(match.view);
+				else if (!view) setView(items[0].view);
 			} else if (!view) {
 				setView(items[0].view);
 			}
 		}
-
 		return () => clearNavItems();
 	}, [changelogs, setNavItems, clearNavItems, show, setView, view, t]);
 
@@ -220,7 +224,7 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 		};
 
 		for (const line of lines) {
-			if (line.startsWith('## ')) {
+			if (/^##\s+\[?v?\d+\.\d+/i.test(line)) {
 				pushSection();
 				currentHeading = line;
 				currentLines = [];
@@ -240,31 +244,26 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 	}, [parsedSections, search]);
 
 	useEffect(() => {
-		if (typeof window !== 'undefined' && window.location.hash) {
-			const hash = window.location.hash.substring(1);
-			setActiveVersionId(hash);
-			const element = document.getElementById(hash);
-			if (element) {
-				setTimeout(() => {
-					element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-				}, 100);
-			}
-		}
+		if (typeof window === 'undefined' || !window.location.hash) return;
+		const hash = window.location.hash.substring(1);
+		setActiveVersionId(hash);
+		const element = document.getElementById(hash);
+		if (element) setTimeout(() => element.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 	}, [activeLog]);
 
-	const jumpToVersion = (id: string) => {
+	const jumpToVersion = (id: string, copyLink = false) => {
 		if (!activeLog) return;
 		setActiveVersionId(id);
 		window.history.replaceState(null, '', `?item=${encodeURIComponent(activeLog.appName.toLowerCase())}#${id}`);
-		const element = document.getElementById(id);
-		if (element) {
-			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		if (copyLink && typeof window !== 'undefined') {
+			navigator.clipboard.writeText(window.location.href);
+			toast({ title: t('www.changelog.linkCopiedTitle'), description: t('www.changelog.linkCopiedDesc', { version: id }) });
 		}
+		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	};
 
 	const selectLogItem = (log: ChangelogEntry) => {
-		const viewKey = `changelog-${log.appName.toLowerCase()}`;
-		setView(viewKey);
+		setView(`changelog-${log.appName.toLowerCase()}`);
 		setSearch('');
 		setActiveVersionId(null);
 		window.history.replaceState(null, '', `#${log.appName.toLowerCase()}`);
@@ -322,39 +321,23 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 
 			{/* 3-Card Release Telemetry Summary Strip */}
 			<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-					<div>
-						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('www.changelog.kpi.appsTracked')}</span>
-						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{changelogs.filter((c) => (c.group || 'applications') === 'applications').length}
-						</p>
+				{[
+					{ label: t('www.changelog.kpi.appsTracked'), value: changelogs.filter((c) => (c.group || 'applications') === 'applications').length, icon: LayoutDashboard },
+					{ label: t('www.changelog.kpi.packagesTracked'), value: changelogs.filter((c) => c.group === 'packages').length, icon: Package },
+					{ label: t('www.changelog.kpi.releasesInFeed'), value: parsedSections.length, icon: Tag },
+				].map(({ label: kpiLabel, value: kpiVal, icon: KpiIcon }) => (
+					<div key={kpiLabel} className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+						<div>
+							<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{kpiLabel}</span>
+							<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{kpiVal}
+							</p>
+						</div>
+						<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+							<KpiIcon size={18} />
+						</div>
 					</div>
-					<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-						<LayoutDashboard size={18} />
-					</div>
-				</div>
-				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-					<div>
-						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('www.changelog.kpi.packagesTracked')}</span>
-						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{changelogs.filter((c) => c.group === 'packages').length}
-						</p>
-					</div>
-					<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-						<Package size={18} />
-					</div>
-				</div>
-				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-					<div>
-						<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{t('www.changelog.kpi.releasesInFeed')}</span>
-						<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{parsedSections.length}
-						</p>
-					</div>
-					<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-						<Tag size={18} />
-					</div>
-				</div>
+				))}
 			</div>
 
 			{/* Category Filter & Item Quick Switcher Bar */}
@@ -476,21 +459,7 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 								</div>
 
 								<div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-(--border)/10">
-									<div
-										className="flex items-center gap-2.5 cursor-pointer text-(--text) hover:text-(--accent) transition-colors"
-										onClick={() => {
-											setActiveVersionId(sec.id);
-											window.history.replaceState(null, '', `?item=${encodeURIComponent(activeLog.appName.toLowerCase())}#${sec.id}`);
-											if (typeof window !== 'undefined') {
-												navigator.clipboard.writeText(window.location.href);
-												toast({ title: t('www.changelog.linkCopiedTitle'), description: t('www.changelog.linkCopiedDesc', { version: sec.id }) });
-											}
-											const element = document.getElementById(sec.id);
-											if (element) {
-												element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-											}
-										}}
-									>
+									<div className="flex items-center gap-2.5 cursor-pointer text-(--text) hover:text-(--accent) transition-colors" onClick={() => jumpToVersion(sec.id, true)}>
 										<span className="px-2.5 py-0.5 rounded-xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 text-xs font-mono font-bold">v{sec.id}</span>
 										<h2 className="text-xl sm:text-2xl font-extrabold font-mono m-0 leading-none group-hover/item:text-(--accent) transition-colors">{sec.label}</h2>
 										<Link2 className="w-4 h-4 opacity-0 -translate-x-2 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all text-(--accent)" />

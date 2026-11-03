@@ -57,6 +57,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 	const [vanityUnlocked, setVanityUnlocked] = useState(Boolean(user.vanitySlug));
 	const [vanitySlug, setVanitySlug] = useState(user.vanitySlug || '');
 	const [widgets, setWidgets] = useState(false);
+	const [blacklisted, setBlacklisted] = useState(Boolean(user.blacklisted));
+	const [services, setServices] = useState(user.services !== false);
 	const [staffSubscription, setStaffSubscription] = useState(false);
 	const [pronouns, setPronouns] = useState('');
 	const [gender, setGender] = useState('');
@@ -110,6 +112,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 						setVanityUnlocked(Boolean(data.vanityUnlocked || data.vanitySlug));
 						setVanitySlug(data.vanitySlug || '');
 						setWidgets(Boolean(data.widgets));
+						setBlacklisted(Boolean(data.blacklisted));
+						setServices(data.services !== false);
 						setStaffSubscription(Boolean(data.staffSubscription));
 						setPronouns(data.pronouns || '');
 						setGender(data.gender || '');
@@ -162,6 +166,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 			vanityUnlocked !== Boolean(fullUser.vanityUnlocked || fullUser.vanitySlug) ||
 			vanitySlug !== (fullUser.vanitySlug || '') ||
 			widgets !== Boolean(fullUser.widgets) ||
+			blacklisted !== Boolean(fullUser.blacklisted) ||
+			services !== (fullUser.services !== false) ||
 			staffSubscription !== Boolean(fullUser.staffSubscription) ||
 			pronouns !== (fullUser.pronouns || '') ||
 			gender !== (fullUser.gender || '') ||
@@ -201,6 +207,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 		vanityUnlocked,
 		vanitySlug,
 		widgets,
+		blacklisted,
+		services,
 		staffSubscription,
 		pronouns,
 		gender,
@@ -287,6 +295,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 					vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
 					vanitySlug: vanitySlug.trim(),
 					widgets,
+					blacklisted,
+					services,
 					staffSubscription,
 					pronouns: pronouns.trim() || '',
 					gender: gender || undefined,
@@ -340,6 +350,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 				vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
 				vanitySlug: vanitySlug.trim(),
 				widgets,
+				blacklisted,
+				services,
 				staffSubscription,
 				pronouns,
 				gender,
@@ -412,6 +424,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									globalXp={globalXp}
 									verified={verified}
 									vanitySlug={vanitySlug}
+									blacklisted={blacklisted}
+									services={services}
 									onViewAuditLogs={
 										onViewAuditLogs
 											? () => {
@@ -464,6 +478,10 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 										setVanitySlug={setVanitySlug}
 										widgets={widgets}
 										setWidgets={setWidgets}
+										blacklisted={blacklisted}
+										setBlacklisted={setBlacklisted}
+										services={services}
+										setServices={setServices}
 										staffSubscription={staffSubscription}
 										subLoading={subLoading}
 										onStaffSubscriptionToggle={handleStaffSubscriptionToggle}

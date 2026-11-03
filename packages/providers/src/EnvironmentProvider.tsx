@@ -98,6 +98,9 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 						case 'haste.xernerx.com':
 							url.port = '4011';
 							break;
+						case 'blog.xernerx.com':
+							url.port = '4012';
+							break;
 						case 'xernerx.com':
 						case 'www.xernerx.com':
 							url.port = '4000';

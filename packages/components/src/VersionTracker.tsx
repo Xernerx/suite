@@ -136,7 +136,7 @@ export function VersionTracker() {
 					}
 				}
 			} catch (error) {
-				console.error('Failed to check version:', error);
+				console.warn('Failed to check version:', error);
 			}
 		};
 

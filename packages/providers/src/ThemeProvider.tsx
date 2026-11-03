@@ -19,7 +19,7 @@ export type AmbientSceneType = 'default' | 'mesh_lava' | 'cyber_grid' | 'topogra
 export type SurfaceStyleType = 'default' | 'crystal' | 'holographic' | 'neon' | 'obsidian';
 export type CursorFxType = 'default' | 'starlight_trail' | 'plasma_sparks' | 'cyber_reticle' | 'sonic_rings' | 'aurora_ribbon';
 export type OverlaySkinType = 'default' | 'hud_tactical' | 'frosted_prism' | 'neon_arcade' | 'minimal_pill';
-export type HeaderSubdomainId = 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'api' | 'www' | 'admin' | 'hosting';
+export type HeaderSubdomainId = 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'blog' | 'api' | 'www' | 'admin' | 'hosting';
 
 const VALID_MATRIX_TYPES: readonly DotMatrixType[] = [
 	'default',
@@ -46,7 +46,7 @@ const VALID_AMBIENT_SCENES: readonly AmbientSceneType[] = ['default', 'mesh_lava
 const VALID_SURFACE_STYLES: readonly SurfaceStyleType[] = ['default', 'crystal', 'holographic', 'neon', 'obsidian'];
 const VALID_CURSOR_FX: readonly CursorFxType[] = ['default', 'starlight_trail', 'plasma_sparks', 'cyber_reticle', 'sonic_rings', 'aurora_ribbon'];
 const VALID_OVERLAY_SKINS: readonly OverlaySkinType[] = ['default', 'hud_tactical', 'frosted_prism', 'neon_arcade', 'minimal_pill'];
-export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'api', 'www', 'admin', 'hosting'];
+export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'blog', 'api', 'www', 'admin', 'hosting'];
 export const DEFAULT_HEADER_SUBDOMAINS: HeaderSubdomainId[] = ['portal', 'store'];
 
 const COSMETIC_CHILD_TO_BUNDLE: Record<string, string> = {

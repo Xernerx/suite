@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { CheckCircle2, Download, RefreshCw } from 'lucide-react';
+import { Ban, CheckCircle2, Download, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
@@ -33,6 +33,7 @@ export default function Users({
 	const [sortBy, setSortBy] = useState<UserSortOption>('name_asc');
 	const [filterRoleIds, setFilterRoleIds] = useState<string[]>([]);
 	const [verifiedOnly, setVerifiedOnly] = useState(false);
+	const [blacklistedOnly, setBlacklistedOnly] = useState(false);
 	const [limit, setLimit] = useState(30);
 
 	useEffect(() => {
@@ -42,7 +43,7 @@ export default function Users({
 	// Reset limit when filters change
 	useEffect(() => {
 		setLimit(30);
-	}, [search, sortBy, filterRoleIds, verifiedOnly]);
+	}, [search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly]);
 
 	const fetchData = useCallback(
 		async (isManual = false) => {
@@ -88,6 +89,8 @@ export default function Users({
 							stripeCustomerId: updatedUser.stripeCustomerId,
 							icon: updatedUser.icon,
 							verified: updatedUser.verified,
+							blacklisted: updatedUser.blacklisted,
+							services: updatedUser.services,
 							vanitySlug: updatedUser.vanitySlug,
 							level: updatedUser.level || u.level,
 							credits: updatedUser.credits
@@ -129,7 +132,8 @@ export default function Users({
 				const userRoleIds = getNormalizedRoles(user);
 				const matchesRoles = filterRoleIds.length === 0 || filterRoleIds.some((roleId) => userRoleIds.includes(roleId));
 				const matchesVerified = !verifiedOnly || Boolean(user.verified);
-				return matchesSearch && matchesRoles && matchesVerified;
+				const matchesBlacklisted = !blacklistedOnly || Boolean(user.blacklisted);
+				return matchesSearch && matchesRoles && matchesVerified && matchesBlacklisted;
 			})
 			.sort((a, b) => {
 				if (sortBy === 'level_desc') {
@@ -156,7 +160,7 @@ export default function Users({
 					return nameB.localeCompare(nameA);
 				}
 			});
-	}, [users, search, sortBy, filterRoleIds, verifiedOnly]);
+	}, [users, search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly]);
 
 	const renderedUsers = filteredUsers.slice(0, limit);
 	const loadMoreRef = useInfiniteScroll(filteredUsers.length > limit, loading, () => setLimit((prev) => prev + 30));
@@ -171,6 +175,8 @@ export default function Users({
 				name: u.name || u.discord?.globalName || u.discord?.username || '',
 				discordUsername: u.discord?.username || '',
 				verified: Boolean(u.verified),
+				blacklisted: Boolean(u.blacklisted),
+				services: u.services !== false,
 				level: u.level?.level ?? 1,
 				xp: u.level?.xp ?? 0,
 				credits: u.credits?.balance ?? 0,
@@ -188,7 +194,7 @@ export default function Users({
 			return;
 		}
 
-		const headers = ['id', 'name', 'discordUsername', 'verified', 'level', 'xp', 'credits', 'streak', 'roles', 'stripeCustomerId'];
+		const headers = ['id', 'name', 'discordUsername', 'verified', 'blacklisted', 'services', 'level', 'xp', 'credits', 'streak', 'roles', 'stripeCustomerId'];
 		const rows = filteredUsers.map((u) => {
 			const roleNames = getNormalizedRoles(u)
 				.map((rid) => roleMap.get(rid) || rid)
@@ -198,6 +204,8 @@ export default function Users({
 				u.name || u.discord?.globalName || u.discord?.username || '',
 				u.discord?.username || '',
 				u.verified ? 'true' : 'false',
+				u.blacklisted ? 'true' : 'false',
+				u.services !== false ? 'true' : 'false',
 				u.level?.level ?? 1,
 				u.level?.xp ?? 0,
 				u.credits?.balance ?? 0,
@@ -305,6 +313,16 @@ export default function Users({
 				>
 					<CheckCircle2 size={16} />
 					<span>{t('admin.users.fields.verifiedFilter')}</span>
+				</button>
+				<button
+					type="button"
+					onClick={() => setBlacklistedOnly((prev) => !prev)}
+					className={`flex items-center justify-center gap-2 rounded-full border backdrop-blur-md text-sm font-medium transition-colors shrink-0 w-full sm:w-auto h-[56px] px-5 shadow-sm cursor-pointer ${
+						blacklistedOnly ? 'border-(--accent-red)/40 bg-(--accent-red)/15 text-(--accent-red)' : 'border-(--border)/10 bg-(--foreground)/30 text-(--text) hover:bg-(--foreground)/50'
+					}`}
+				>
+					<Ban size={16} />
+					<span>{t('admin.users.fields.blacklistedFilter')}</span>
 				</button>
 				<div className="relative w-full sm:w-56 z-50">
 					<Selector

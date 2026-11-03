@@ -2,6 +2,34 @@
 
 # cdn
 
+## 1.4.0
+
+### Minor Changes
+
+- ## Admin Clipboard Media Upload Verification & Cross-Subdomain Streaming
+
+    Added strict server-side origin and RBAC verification for Admin Markdown clipboard media uploads and expanded CORS support for cross-subdomain streaming.
+
+    ### Added
+    - **Admin Markdown Media Upload Gate (`POST /upload/[id]`)**: Added server-side origin (`admin.xernerx.com` / port `4006`) and staff RBAC (`hasAdminAccess` + `uploadMedia` / `manageMedia`) verification for `source: 'admin-markdown'` clipboard image and video paste uploads.
+
+    ### Changed
+    - **Cross-Subdomain Upload Progress & Streaming CORS (`cors.ts`)**: Expanded CORS headers to support authenticated `XMLHttpRequest` upload progress tracking from the Admin portal and seamless `/raw/[id]` media streaming across `blog.xernerx.com` and suite applications.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 1.3.1
 
 ### Patch Changes

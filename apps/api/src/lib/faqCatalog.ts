@@ -109,7 +109,7 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 
 			let table: FaqTableData | undefined;
 			if (card.tableType === 'subdomains') {
-				const subs = ['www', 'app', 'account', 'store', 'cdn', 'docs', 'info', 'api', 'admin'] as const;
+				const subs = ['www', 'app', 'account', 'store', 'cdn', 'docs', 'info', 'blog', 'api', 'admin'] as const;
 				table = {
 					headers: [t('faq.overview.table.subdomain'), t('faq.overview.table.purpose')],
 					rows: subs.map((s) => [s === 'www' ? 'xernerx.com' : `${s}.xernerx.com`, t(`faq.overview.subdomains.${s}`)]),

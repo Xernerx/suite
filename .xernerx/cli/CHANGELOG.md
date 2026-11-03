@@ -2,6 +2,20 @@
 
 # @xernerx/cli
 
+## 2.5.2
+
+### Patch Changes
+
+- ## Blog Workspace Orchestration & Security Policy Review Detection
+
+    Registered `apps/blog` (`blog.xernerx.com`, port `4012`) in the local development orchestrator and extended `pnpm suite commit` to detect `/security` policy updates.
+
+    ### Added
+    - **Security Policy Review Detection (`commit.ts`)**: Extended `pnpm suite commit` policy change detection to monitor `/security` (`apps/www/src/app/security` and `www.security.*` in `en-GB.json`) alongside `/terms`, `/privacy`, and `/cookies`, prompting to update the Security page's Last Reviewed date.
+
+    ### Changed
+    - **Local Dev Orchestrator & Lazy Proxy (`dev.ts` & `lazyProxy.ts`)**: Registered `apps/blog` (`blog.xernerx.com`, dev port `4012`) in the workspace dev server runner and on-demand lazy reverse proxy.
+
 ## 2.5.1
 
 ### Patch Changes

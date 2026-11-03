@@ -36,21 +36,37 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 	const [selectedOwners, setSelectedOwners] = useState<string[]>(token.owners || []);
 	const [secure, setSecure] = useState(false);
 	const [websocket, setWebsocket] = useState(false);
+	const [ttlOption, setTtlOption] = useState<string>('never');
+	const [allowedIpsInput, setAllowedIpsInput] = useState('');
 
 	const isDirty = useMemo(() => {
 		if (!fullToken) return false;
 		const sortedSelectedOwners = [...selectedOwners].sort();
 		const sortedOriginalOwners = [...(fullToken.owners || [])].sort();
 		const ownersChanged = JSON.stringify(sortedSelectedOwners) !== JSON.stringify(sortedOriginalOwners);
+		const initialTtl = fullToken.expiresAt ? 'keep' : 'never';
+		const normalizedIps = allowedIpsInput
+			.split(',')
+			.map((s) => s.trim())
+			.filter(Boolean)
+			.join(',');
+		const originalIps = Array.isArray(fullToken.allowedIps)
+			? fullToken.allowedIps
+					.map((s) => String(s).trim())
+					.filter(Boolean)
+					.join(',')
+			: '';
 		return (
 			name !== (fullToken.name || '') ||
 			status !== (fullToken.status || 'active') ||
 			botId !== (fullToken.botId || '') ||
 			ownersChanged ||
 			secure !== !!fullToken.permissions?.secure ||
-			websocket !== !!fullToken.permissions?.websocket
+			websocket !== !!fullToken.permissions?.websocket ||
+			ttlOption !== initialTtl ||
+			normalizedIps !== originalIps
 		);
-	}, [fullToken, name, status, botId, selectedOwners, secure, websocket]);
+	}, [fullToken, name, status, botId, selectedOwners, secure, websocket, ttlOption, allowedIpsInput]);
 
 	const handleToggleExpand = async () => {
 		setIsModalOpen(true);
@@ -69,6 +85,8 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 					setSelectedOwners(data.owners || []);
 					setSecure(!!data.permissions?.secure);
 					setWebsocket(!!data.permissions?.websocket);
+					setTtlOption(data.expiresAt ? 'keep' : 'never');
+					setAllowedIpsInput(Array.isArray(data.allowedIps) ? data.allowedIps.join(', ') : '');
 				}
 			} catch (err) {
 				console.error('Failed to fetch token details:', err);
@@ -84,11 +102,17 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 		if (submitter && submitter.getAttribute('type') !== 'submit') return;
 		setSaving(true);
 		try {
+			const parsedAllowedIps = allowedIpsInput
+				.split(',')
+				.map((s) => s.trim())
+				.filter(Boolean);
 			const payload = {
 				name,
 				status,
 				botId: botId || undefined,
 				owners: selectedOwners,
+				ttlDays: ttlOption,
+				allowedIps: parsedAllowedIps,
 				permissions: {
 					secure,
 					websocket,
@@ -111,12 +135,14 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 					status,
 					botId: botId || undefined,
 					owners: selectedOwners,
+					allowedIps: parsedAllowedIps,
 					permissions: {
 						secure,
 						websocket,
 					},
 				};
 				setFullToken(manuallyUpdatedToken);
+				setTtlOption(manuallyUpdatedToken.expiresAt ? 'keep' : 'never');
 				onTokenUpdated(manuallyUpdatedToken);
 				toast({
 					title: t('admin.tokens.tokenUpdated'),
@@ -347,6 +373,38 @@ export function TokenCard({ token, getEnvUrl, onTokenDeleted, onTokenUpdated, on
 								>
 									<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
 									<AsyncUserMultiSelector values={selectedOwners} onChange={setSelectedOwners} getEnvUrl={getEnvUrl} />
+								</div>
+							</div>
+
+							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="block text-xs font-medium text-(--text)">{t('account.tokens.ttl.label')}</label>
+									<Selector
+										value={ttlOption}
+										onChange={setTtlOption}
+										options={[
+											...(fullToken?.expiresAt
+												? [
+														{
+															value: 'keep',
+															label: t('account.tokens.ttl.keepCurrent', {
+																date: new Date(fullToken.expiresAt).toLocaleDateString(),
+															}),
+														},
+													]
+												: []),
+											{ value: 'never', label: t('account.tokens.ttl.never') },
+											{ value: '7', label: t('account.tokens.ttl.days7') },
+											{ value: '30', label: t('account.tokens.ttl.days30') },
+											{ value: '90', label: t('account.tokens.ttl.days90') },
+											{ value: '365', label: t('account.tokens.ttl.days365') },
+										]}
+									/>
+								</div>
+
+								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+									<label className="block text-xs font-medium text-(--text)">{t('account.tokens.allowedIps.label')}</label>
+									<Input type="text" value={allowedIpsInput} onChange={(e) => setAllowedIpsInput(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
 								</div>
 							</div>
 

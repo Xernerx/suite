@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles } from 'lucide-react';
+import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles, Ban } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './types';
 import { UserModal } from './UserModal';
@@ -104,6 +104,12 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 						<div className="flex items-center gap-1.5 min-w-0">
 							<h2 className="font-bold text-base text-(--text) truncate group-hover:text-(--accent) transition-colors">{displayName}</h2>
 							{user.verified && <CheckCircle2 size={14} className="text-(--accent-green) shrink-0" />}
+							{user.blacklisted && (
+								<span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-(--accent-red)/15 text-(--accent-red) border border-(--accent-red)/30 font-bold shrink-0">
+									<Ban size={10} />
+									{t('admin.users.fields.blacklistedBadge')}
+								</span>
+							)}
 						</div>
 						<div className="flex flex-wrap items-center gap-1.5 mt-0.5">
 							<span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) font-mono font-bold">
