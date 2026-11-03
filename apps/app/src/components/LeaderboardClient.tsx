@@ -306,7 +306,10 @@ export default function LeaderboardClient() {
 		});
 	}, [data, activeTab, searchQuery, sortBy, discordMap, guildIdParam]);
 
-	const getHref = (entry: any) => (activeTab === 'bots' ? `/bots/${entry.id}` : activeTab === 'servers' ? `/servers/${entry.id}` : `/users/${entry.id}`);
+	const getHref = (entry: any) => {
+		const slugOrId = entry.vanitySlug || entry.id;
+		return activeTab === 'bots' ? `/bots/${slugOrId}` : activeTab === 'servers' ? `/servers/${slugOrId}` : `/users/${slugOrId}`;
+	};
 	const pillBase = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-bold text-(--text)';
 	const pillAccent = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-bold text-(--accent)';
 	const badge = (icon: React.ReactNode, text: React.ReactNode, accent = false) => (

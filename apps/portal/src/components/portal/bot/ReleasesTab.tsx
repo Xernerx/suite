@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { Calendar, Plus, Rocket, Tag, Trash2 } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Button, Confirm, Input } from '@xernerx/ui';
+import { Button, Confirm, Input, Markdown } from '@xernerx/ui';
 
 export default function ReleasesTab({
 	botId,
@@ -137,10 +137,7 @@ export default function ReleasesTab({
 							<Input value={relTitle} onChange={(e) => setRelTitle(e.target.value)} placeholder={t('app.portal.bot.releases.releaseTitlePlaceholder')} />
 						</div>
 					</div>
-					<div>
-						<label className="block text-xs font-bold text-(--text-muted) uppercase tracking-wider mb-1.5">{t('app.portal.bot.releases.bodyLabel')}</label>
-						<Input variant="textarea" value={relBody} onChange={(e) => setRelBody(e.target.value)} placeholder={t('app.portal.bot.releases.bodyPlaceholder')} className="min-h-[100px]" />
-					</div>
+					<Markdown editable label={t('app.portal.bot.releases.bodyLabel')} value={relBody} onChange={setRelBody} placeholder={t('app.portal.bot.releases.bodyPlaceholder')} rows={4} />
 					<div className="flex justify-end">
 						<Button variant="primary" onClick={handlePublishRelease} loading={publishingRelease} className="gap-1.5">
 							<Plus size={15} />

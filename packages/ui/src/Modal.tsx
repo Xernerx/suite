@@ -7,6 +7,25 @@ import { Button } from './Button';
 import { X } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | '8xl' | '9xl' | 'page' | 'full';
+
+const MODAL_SIZE_CLASSES: Record<ModalSize, string> = {
+	sm: 'max-w-sm',
+	md: 'max-w-md',
+	lg: 'max-w-lg',
+	xl: 'max-w-xl',
+	'2xl': 'max-w-2xl',
+	'3xl': 'max-w-3xl',
+	'4xl': 'max-w-4xl',
+	'5xl': 'max-w-5xl',
+	'6xl': 'max-w-6xl',
+	'7xl': 'max-w-7xl',
+	'8xl': 'max-w-8xl',
+	'9xl': 'max-w-9xl',
+	page: 'max-w-(--page-width)',
+	full: 'max-w-[96vw]',
+};
+
 export interface ModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -14,9 +33,11 @@ export interface ModalProps {
 	description?: string;
 	children: React.ReactNode;
 	maxWidth?: string;
+	size?: ModalSize;
 }
 
-export function Modal({ open, onOpenChange, title, description, children, maxWidth = 'max-w-md' }: ModalProps) {
+export function Modal({ open, onOpenChange, title, description, children, maxWidth, size = 'md' }: ModalProps) {
+	const resolvedMaxWidth = maxWidth || MODAL_SIZE_CLASSES[size] || 'max-w-md';
 	const { t } = useDictionary();
 	const ref = useRef<HTMLDivElement>(null);
 	const [mounted, setMounted] = React.useState(false);
@@ -53,7 +74,7 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 					ref={ref}
 					role="dialog"
 					aria-modal="true"
-					className={`xrx-overlay-surface flex flex-col w-full max-h-full overflow-hidden ${maxWidth} rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
+					className={`xrx-overlay-surface flex flex-col w-full max-h-full overflow-hidden ${resolvedMaxWidth} rounded-3xl border border-(--border)/10 bg-(--background)/95 backdrop-blur-xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_10%,transparent)] animate-in zoom-in-95 duration-200 relative text-left`}
 					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 				>
 					{(title || description) && (

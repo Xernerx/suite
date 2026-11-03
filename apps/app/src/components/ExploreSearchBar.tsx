@@ -61,9 +61,10 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 					const [res, orgsData] = await Promise.all([fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?search=${encodeURIComponent(trimmed)}&limit=5`)), orgsPromise]);
 					const botItems: SearchResultItem[] = [];
 					if (res.ok) {
-						const bots: Array<{ id: string; description?: string; voteCount?: number; discord?: any }> = await res.json();
+						const bots: Array<{ id: string; vanitySlug?: string; description?: string; voteCount?: number; discord?: any }> = await res.json();
 						const enriched = await Promise.all(
 							bots.slice(0, 5).map(async (bot) => {
+								const slugOrId = bot.vanitySlug || bot.id;
 								if (bot.discord?.username || bot.discord?.global_name) {
 									return {
 										id: bot.id,
@@ -72,7 +73,7 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 										avatarUrl: bot.discord.avatarUrl || null,
 										voteCount: bot.voteCount || 0,
 										kind: 'bot' as const,
-										href: `/bots/${bot.id}`,
+										href: `/bots/${slugOrId}`,
 									};
 								}
 								try {
@@ -85,7 +86,7 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 										avatarUrl: d?.avatarUrl || null,
 										voteCount: bot.voteCount || 0,
 										kind: 'bot' as const,
-										href: `/bots/${bot.id}`,
+										href: `/bots/${slugOrId}`,
 									};
 								} catch {
 									return {
@@ -95,7 +96,7 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 										avatarUrl: null,
 										voteCount: bot.voteCount || 0,
 										kind: 'bot' as const,
-										href: `/bots/${bot.id}`,
+										href: `/bots/${slugOrId}`,
 									};
 								}
 							})
@@ -121,7 +122,7 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 					const [res, orgsData] = await Promise.all([fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${encodeURIComponent(trimmed)}&limit=5&privacy=public`)), orgsPromise]);
 					const serverItems: SearchResultItem[] = [];
 					if (res.ok) {
-						const guilds: Array<{ id: string; name: string; icon?: string; description?: string; voteCount?: number; memberCount?: number }> = await res.json();
+						const guilds: Array<{ id: string; vanitySlug?: string; name: string; icon?: string; description?: string; voteCount?: number; memberCount?: number }> = await res.json();
 						serverItems.push(
 							...guilds.slice(0, 5).map((g) => ({
 								id: g.id,
@@ -131,7 +132,7 @@ export function ExploreSearchBar({ context }: { context: 'bots' | 'servers' }) {
 								voteCount: g.voteCount || 0,
 								memberCount: g.memberCount,
 								kind: 'server' as const,
-								href: `/servers/${g.id}`,
+								href: `/servers/${g.vanitySlug || g.id}`,
 							}))
 						);
 					}

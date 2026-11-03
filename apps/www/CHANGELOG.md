@@ -2,6 +2,35 @@
 
 # www
 
+## 0.22.0
+
+### Minor Changes
+
+- ## Platform & Bot Security Architecture (`/security`) & Legal Policy Synchronization
+
+    Launched the dedicated Platform & Bot Security Architecture center at `/security`, synchronized all legal policies (`/terms`, `/privacy`, `/cookies`) with current suite storage and features, and added `blog.xernerx.com` to Deep Search and showcase cards.
+
+    ### Added
+    - **Platform & Bot Security Architecture (`/security`)**: Added a comprehensive Security & Trust Center page featuring a sticky Table of Contents, top reading progress bar, quick links, and 9 architectural sections detailing OAuth2/NextAuth session isolation, RBAC & 2FA, Bearer token SHA-256 hashing & IP allowlists, Discord bot permission boundaries (`Virtue`, `To-Do List Bot`, `Metamorphosis`, `Zodiac`), WebSocket gateway security, CDN & Haste 3-tier privacy, Stripe PCI-DSS billing isolation, and vulnerability disclosure.
+
+    ### Changed
+    - **Legal & Privacy Policy Synchronization (`/terms`, `/privacy`, `/cookies`)**: Updated Terms of Service, Privacy Policy, and Cookie Policy to document all active session cookies, `localStorage` preference keys, Credit Store cosmetic unlocks, and self-service Virtue data deletion, and aligned their top reading progress bars directly below the suite header.
+    - **Landing Showcase, Timeline, Deep Search & `To-Do List Bot` Standardization (`LandingServiceCards`, `Timeline`, `WwwDeepSearch`, `layout.tsx`, `sitemap`)**: Added the Xernerx Newsroom & Blog (`blog.xernerx.com`), Security Center (`/security`), and Cookie Policy (`/cookies`) across landing service cards, company milestones, `Ctrl + K` Deep Search, and XML sitemap generation, and standardized all public SEO metadata, OpenGraph images, and Schema.org structured data to **`To-Do List Bot`**.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 0.21.0
 
 ### Minor Changes

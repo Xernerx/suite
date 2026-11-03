@@ -64,6 +64,8 @@ export async function GET(request: NextRequest) {
 				permissions: t.permissions,
 				requestCount: t.requestCount || 0,
 				lastUsedAt: t.lastUsedAt || null,
+				expiresAt: t.expiresAt || null,
+				allowedIps: Array.isArray(t.allowedIps) ? t.allowedIps : [],
 			};
 		});
 

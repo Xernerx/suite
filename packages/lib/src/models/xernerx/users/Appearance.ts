@@ -15,7 +15,7 @@ const schema = new Schema(
 		uiPreferences: {
 			headerSubdomains: {
 				type: [String],
-				enum: ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'api', 'www', 'admin', 'hosting'],
+				enum: ['app', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'blog', 'api', 'www', 'admin', 'hosting'],
 				default: ['portal', 'store'],
 			},
 			showHeaderStore: { type: Boolean, default: true },

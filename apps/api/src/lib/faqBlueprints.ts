@@ -86,6 +86,7 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('activityLog', 'https://account.xernerx.com/?tab=activity', 'account.xernerx.com/activity'),
 					ql('accountSettings', 'https://account.xernerx.com/?tab=account', 'account.xernerx.com'),
 					ql('privacyPolicy', 'https://www.xernerx.com/privacy', 'xernerx.com/privacy'),
+					ql('securityPolicy', 'https://www.xernerx.com/security', 'xernerx.com/security'),
 				]
 			),
 			c(
@@ -97,6 +98,7 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('profileSettings', 'https://account.xernerx.com/?tab=profile', 'account.xernerx.com/profile'),
 					ql('accountSettings', 'https://account.xernerx.com/?tab=account', 'account.xernerx.com'),
 					ql('termsPolicy', 'https://www.xernerx.com/terms', 'xernerx.com/terms'),
+					ql('securityPolicy', 'https://www.xernerx.com/security', 'xernerx.com/security'),
 				]
 			),
 			c(
@@ -108,6 +110,7 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('accountSettings', 'https://account.xernerx.com/?tab=account', 'account.xernerx.com'),
 					ql('activityLog', 'https://account.xernerx.com/?tab=activity', 'account.xernerx.com/activity'),
 					ql('privacyPolicy', 'https://www.xernerx.com/privacy', 'xernerx.com/privacy'),
+					ql('securityPolicy', 'https://www.xernerx.com/security', 'xernerx.com/security'),
 				]
 			),
 		],

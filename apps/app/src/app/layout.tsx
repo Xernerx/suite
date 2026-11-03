@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 		template: 'Xernerx App | %s',
 	},
-	description: 'Discover public Discord bots and servers, configure To-Do List, Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
+	description: 'Discover public Discord bots and servers, configure To-Do List Bot, Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
 	keywords: [
 		'Xernerx',
 		'Xernerx Studios',
@@ -30,8 +30,7 @@ export const metadata: Metadata = {
 		'Discord servers',
 		'bot list',
 		'server directory',
-		'To-Do List',
-		'TDL',
+		'To-Do List Bot',
 		'Virtue',
 		'Metamorphosis',
 		'Zodiac',
@@ -49,7 +48,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 			template: 'Xernerx App | %s',
 		},
-		description: 'Discover public Discord bots and servers, configure To-Do List, Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
+		description: 'Discover public Discord bots and servers, configure To-Do List Bot, Virtue, Metamorphosis, and Zodiac in one dashboard, and track live bot statistics on Xernerx App.',
 		url: 'https://app.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -69,7 +68,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx App | Discord Bot List, Server Explorer & Dashboard',
 			template: 'Xernerx App | %s',
 		},
-		description: 'Discover Discord bots & servers, configure To-Do List, Virtue, Metamorphosis & Zodiac in one place, and track or promote your bots.',
+		description: 'Discover Discord bots & servers, configure To-Do List Bot, Virtue, Metamorphosis & Zodiac in one place, and track or promote your bots.',
 		images: ['/banner.png'],
 	},
 

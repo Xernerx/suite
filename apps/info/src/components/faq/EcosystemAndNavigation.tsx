@@ -19,6 +19,7 @@ export default function EcosystemAndNavigation({ searchQuery = '' }: { searchQue
 		{ key: 'cdn', href: 'https://cdn.xernerx.com', domain: 'cdn.xernerx.com' },
 		{ key: 'docs', href: 'https://docs.xernerx.com', domain: 'docs.xernerx.com' },
 		{ key: 'info', href: 'https://info.xernerx.com', domain: 'info.xernerx.com' },
+		{ key: 'blog', href: 'https://blog.xernerx.com', domain: 'blog.xernerx.com' },
 		{ key: 'api', href: 'https://api.xernerx.com', domain: 'api.xernerx.com' },
 		{ key: 'admin', href: 'https://admin.xernerx.com', domain: 'admin.xernerx.com' },
 	] as const;

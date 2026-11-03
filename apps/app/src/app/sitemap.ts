@@ -12,15 +12,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const entries: MetadataRoute.Sitemap = [
 		{ url: baseUrl, lastModified: now, changeFrequency: 'daily', priority: 1.0 },
 		{ url: `${baseUrl}/bots`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+		{ url: `${baseUrl}/bots/virtue`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: `${baseUrl}/bots/todo`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: `${baseUrl}/bots/metamorphosis`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: `${baseUrl}/bots/zodiac`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: `${baseUrl}/servers`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: `${baseUrl}/users`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: `${baseUrl}/leaderboard`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
 		{ url: `${baseUrl}/dashboard`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
 		{ url: `${baseUrl}/overlay`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-		{ url: `${baseUrl}/todo`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-		{ url: `${baseUrl}/metamorphosis`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-		{ url: `${baseUrl}/zodiac`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
 	];
+
+	const officialIdToSlug: Record<string, string> = {
+		'1484880634844287138': 'virtue',
+		'782105629572464652': 'todo',
+		'881678826906730547': 'metamorphosis',
+		'950251264095162418': 'zodiac',
+	};
+	const seenBotSlugs = new Set<string>(['virtue', 'todo', 'metamorphosis', 'zodiac']);
 
 	try {
 		const db = await database('xernerx');
@@ -61,8 +70,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		]);
 
 		for (const bot of publicBots) {
-			const slugOrId = bot.vanitySlug || bot.id;
-			if (!slugOrId) continue;
+			const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;
+			if (!slugOrId || seenBotSlugs.has(String(slugOrId).toLowerCase())) continue;
+			seenBotSlugs.add(String(slugOrId).toLowerCase());
 			entries.push({
 				url: `${baseUrl}/bots/${encodeURIComponent(String(slugOrId))}`,
 				lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,

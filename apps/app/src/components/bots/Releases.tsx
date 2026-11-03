@@ -2,10 +2,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { Calendar, Rocket, Sparkles, Tag } from 'lucide-react';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
+import { Markdown } from '@xernerx/ui';
 
 export interface BotReleaseItem {
 	id?: string;
@@ -153,8 +153,8 @@ export function Releases({ bot, id }: ReleasesProps) {
 									</div>
 
 									{rel.body && (
-										<div className="rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4 text-sm text-(--text-muted) prose max-w-none prose-headings:font-fredoka prose-headings:text-(--text) prose-strong:text-(--text) prose-code:text-(--accent)">
-											<ReactMarkdown>{rel.body}</ReactMarkdown>
+										<div className="rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4 text-sm text-(--text-muted)">
+											<Markdown>{rel.body}</Markdown>
 										</div>
 									)}
 								</div>

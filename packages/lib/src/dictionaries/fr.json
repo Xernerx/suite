@@ -153,8 +153,7 @@
 					"title": "8. Sécurité des données"
 				},
 				"rights": {
-					"title": "9. Vos droits",
-					"items": ["Droit d'accès à vos données.", "Droit de rectification ou de suppression.", "Droit de restreindre ou de s'opposer au traitement.", "Droit à la portabilité des données."]
+					"title": "9. Vos droits"
 				},
 				"cookies": {
 					"title": "10. Cookies et suivi",
@@ -191,7 +190,6 @@
 			"fallbackName": "Utilisateur",
 			"session": {
 				"title": "Session Active",
-				"description": "Déconnectez-vous de la session active sur cet appareil. Vous devrez vous réauthentifier pour accéder à votre espace de travail.",
 				"button": "Se déconnecter"
 			},
 			"danger": {

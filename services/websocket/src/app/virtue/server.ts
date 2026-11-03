@@ -1,7 +1,7 @@
 /** @format */
 
 import { database } from '@xernerx/lib/core';
-import { ensureUserBonusAndDefaults } from '../xernerx/server';
+import { canUseUserServices, ensureUserBonusAndDefaults } from '../xernerx/server';
 
 async function getModels(action: string) {
 	const db = await database('virtue');
@@ -137,8 +137,9 @@ export default async function Server(msg: any) {
 					.slice(0, limit);
 			}
 
+			const serviceCheck = targetUserId ? await canUseUserServices(targetUserId) : { allowed: true, blacklisted: false, services: true, userDoc: null };
 			const doc = await model.findOne(filter).lean();
-			if (doc && targetUserId) {
+			if (doc && targetUserId && serviceCheck.allowed) {
 				await ensureUserBonusAndDefaults(targetUserId);
 			}
 			if (doc && ((Number((doc as any).level) || 0) > 0 || (Number((doc as any).xp) || 0) > 0 || !['levels', 'level', 'members', 'member'].includes(msg.action))) {
@@ -147,14 +148,30 @@ export default async function Server(msg: any) {
 			if (fallback && fallback !== model) {
 				const fbDoc = await fallback.findOne(filter).lean();
 				if (fbDoc) {
-					if (targetUserId) await ensureUserBonusAndDefaults(targetUserId);
+					if (targetUserId && serviceCheck.allowed) await ensureUserBonusAndDefaults(targetUserId);
 					return fbDoc;
 				}
 			}
 			return doc || null;
 		}
 
-		case 'create':
+		case 'create': {
+			if (targetUserId) {
+				const serviceCheck = await canUseUserServices(targetUserId);
+				if (!serviceCheck.allowed) {
+					return {
+						...(msg.body || {}),
+						id: targetUserId,
+						xp: 0,
+						level: 0,
+						messages: 0,
+						timeSpent: 0,
+						blacklisted: serviceCheck.blacklisted,
+						services: serviceCheck.services,
+						servicesDisabled: true,
+					};
+				}
+			}
 			try {
 				const res = await model.create(msg.body);
 				if (targetUserId) {
@@ -171,6 +188,7 @@ export default async function Server(msg: any) {
 
 				throw error;
 			}
+		}
 
 		case 'update': {
 			if (msg.body?.guild && msg.body?.resetGuild === true && !msg.body?.id && ['levels', 'level', 'members', 'member', 'text', 'textLevels', 'voice', 'voiceLevels'].includes(msg.action)) {
@@ -179,6 +197,23 @@ export default async function Server(msg: any) {
 					await fallback.updateMany({ guild: msg.body.guild }, { $set: { level: 0, xp: 0, messages: 0, timeSpent: 0 } }).catch(() => null);
 				}
 				return { success: true, guild: msg.body.guild };
+			}
+
+			if (targetUserId) {
+				const serviceCheck = await canUseUserServices(targetUserId);
+				if (!serviceCheck.allowed) {
+					return {
+						...(msg.body || {}),
+						id: targetUserId,
+						xp: 0,
+						level: 0,
+						messages: 0,
+						timeSpent: 0,
+						blacklisted: serviceCheck.blacklisted,
+						services: serviceCheck.services,
+						servicesDisabled: true,
+					};
+				}
 			}
 
 			const updated = await model

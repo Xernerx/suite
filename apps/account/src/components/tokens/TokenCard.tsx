@@ -69,6 +69,21 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 				<Badge variant="muted" size="sm" icon={<Clock size={11} />}>
 					{token.lastUsedAt ? t('account.tokens.lastUsedBadge', { date: new Date(token.lastUsedAt).toLocaleDateString() }) : t('account.tokens.neverUsedBadge')}
 				</Badge>
+				{token.expiresAt ? (
+					new Date(token.expiresAt).getTime() <= Date.now() ? (
+						<Badge variant="danger" size="sm">
+							{t('account.tokens.ttl.expiredBadge')}
+						</Badge>
+					) : (
+						<Badge variant="warning" size="sm">
+							{t('account.tokens.ttl.expiresOnBadge', { date: new Date(token.expiresAt).toLocaleDateString() })}
+						</Badge>
+					)
+				) : (
+					<Badge variant="muted" size="sm">
+						{t('account.tokens.ttl.longLivedBadge')}
+					</Badge>
+				)}
 			</div>
 
 			<div className="flex items-center justify-between gap-2 mt-1">

@@ -1,6 +1,6 @@
 /** @format */
 
-import { BookOpen, Cloud, FileCode2, Globe, LayoutDashboard, Server, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
+import { BookOpen, Cloud, FileCode2, Globe, LayoutDashboard, Newspaper, Server, ShieldAlert, Terminal, UserCircle, Compass, Building2, LifeBuoy, Store } from 'lucide-react';
 
 export type NavigationItem = {
 	label: string;
@@ -27,6 +27,7 @@ export const navigation: NavigationItem[] = [
 
 	// External
 	{ label: 'lib.navigation.items.website', href: 'https://www.xernerx.com', icon: Globe, category: 'lib.navigation.categories.public' },
+	{ label: 'lib.navigation.items.blog', href: 'https://blog.xernerx.com', icon: Newspaper, category: 'lib.navigation.categories.public' },
 	{ label: 'lib.navigation.items.help', href: 'https://info.xernerx.com', icon: LifeBuoy, category: 'lib.navigation.categories.public' },
 
 	// Management
@@ -35,7 +36,7 @@ export const navigation: NavigationItem[] = [
 ];
 
 export type HeaderSubdomainItem = {
-	id: 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'api' | 'www' | 'admin' | 'hosting';
+	id: 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'blog' | 'api' | 'www' | 'admin' | 'hosting';
 	label: string;
 	host: string;
 	href: string;
@@ -50,6 +51,7 @@ export const headerSubdomainsCatalog: HeaderSubdomainItem[] = [
 	{ id: 'store', label: 'lib.navigation.items.store', host: 'store.xernerx.com', href: 'https://store.xernerx.com', icon: Store },
 	{ id: 'account', label: 'lib.navigation.items.account', host: 'account.xernerx.com', href: 'https://account.xernerx.com', icon: UserCircle },
 	{ id: 'info', label: 'lib.navigation.items.help', host: 'info.xernerx.com', href: 'https://info.xernerx.com', icon: LifeBuoy },
+	{ id: 'blog', label: 'lib.navigation.items.blog', host: 'blog.xernerx.com', href: 'https://blog.xernerx.com', icon: Newspaper },
 	{ id: 'docs', label: 'lib.navigation.items.docs', host: 'docs.xernerx.com', href: 'https://docs.xernerx.com', icon: BookOpen },
 	{ id: 'cdn', label: 'lib.navigation.items.cdn', host: 'cdn.xernerx.com', href: 'https://cdn.xernerx.com', icon: Cloud },
 	{ id: 'haste', label: 'lib.navigation.items.haste', host: 'haste.xernerx.com', href: 'https://haste.xernerx.com', icon: FileCode2 },

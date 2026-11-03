@@ -16,8 +16,10 @@ export async function GET(req: NextRequest) {
 		const authHeaderParam = req.headers.get('authorization');
 		const { models } = await database('xernerx');
 
-		// 1. Strictly fetch ONLY users who have explicitly set privacy === 'public'
-		const publicUsers = (await models.users.User.find({ privacy: 'public' }).select('id name icon verified description discordCache').lean()) as any[];
+		// 1. Strictly fetch ONLY users who have explicitly set privacy === 'public' and are not blacklisted
+		const publicUsers = (await models.users.User.find({ privacy: 'public', blacklisted: { $ne: true } })
+			.select('id name icon verified description discordCache')
+			.lean()) as any[];
 		const publicUserMap = new Map<string, any>();
 		for (const u of publicUsers) {
 			if (u?.id) publicUserMap.set(String(u.id), u);
@@ -351,14 +353,22 @@ export async function GET(req: NextRequest) {
 
 				if (levelUserIds.length > 0) {
 					const foundUsers = await models.users.User.find({ id: { $in: levelUserIds } })
-						.select('id name icon verified description privacy discordCache')
+						.select('id name icon verified blacklisted services description privacy discordCache')
 						.lean()
 						.catch(() => []);
 					for (const u of foundUsers || []) {
 						if (u?.id) extraUsersMap.set(String(u.id), u);
 					}
 
-					const missingLevelUserIds = levelUserIds.filter((uid) => /^\d{15,22}$/.test(uid) && !extraUsersMap.has(uid));
+					const vOptOutUsers = (virtueDb.models.profiles as any)?.User
+						? await (virtueDb.models.profiles as any).User.find({ id: { $in: levelUserIds }, $or: [{ services: false }, { blacklisted: true }] })
+								.select('id')
+								.lean()
+								.catch(() => [])
+						: [];
+					const vOptOutSet = new Set((vOptOutUsers || []).map((d: any) => String(d?.id || '')));
+
+					const missingLevelUserIds = levelUserIds.filter((uid) => /^\d{15,22}$/.test(uid) && !extraUsersMap.has(uid) && !vOptOutSet.has(uid));
 					if (missingLevelUserIds.length > 0) {
 						let defaultRoles = [DEFAULT_JOIN_ROLE_ID];
 						const SettingModel = (models.core as any)?.Setting;

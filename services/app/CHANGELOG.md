@@ -2,6 +2,21 @@
 
 # `@xernerx/app`
 
+## 2.4.2
+
+### Patch Changes
+
+- ## Newsroom Status Health Check & Guild Member Security Sync
+
+    Updated the support bot `/status` command to monitor `blog.xernerx.com` and synced guild member join handling with platform account blacklist checks.
+
+    ### Changed
+    - **Live Status Command (`commands/slash/status.ts`)**: Added `blog.xernerx.com` to the `/status` Discord slash command health matrix so the support bot reports live Newsroom & Blog availability and latency.
+    - **Guild Member Join Security Check (`events/guildMemberAdd.ts`)**: Updated `guildMemberAdd` event handling to check and respect platform-wide user blacklist flags.
+
+- Updated dependencies
+    - @xernerx/lib@1.20.0
+
 ## 2.4.1
 
 ### Patch Changes

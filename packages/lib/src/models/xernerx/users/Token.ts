@@ -15,6 +15,8 @@ const schema = new Schema(
 		botId: { type: String },
 		lastUsedAt: { type: Date, default: null },
 		requestCount: { type: Number, default: 0 },
+		expiresAt: { type: Date, default: null }, // Optional TTL expiration date (null = long-lived / never expires)
+		allowedIps: { type: [String], default: [] }, // Optional IP allowlist (empty = allow from any IP)
 	},
 	{ timestamps: true }
 );

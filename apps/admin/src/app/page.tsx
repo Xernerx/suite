@@ -15,6 +15,7 @@ import {
 	Users as UsersIcon,
 	Link,
 	Megaphone,
+	Newspaper,
 	Image,
 	Map,
 	Inbox,
@@ -43,6 +44,7 @@ import Users from '@/components/Users';
 import Settings from '@/components/Settings';
 import Invites from '@/components/Invites';
 import Announcements from '@/components/Announcements';
+import BlogStudio from '@/components/BlogStudio';
 import Suggestions from '@/components/Suggestions';
 import Roadmap from '@/components/Roadmap';
 import Issues from '@/components/Issues';
@@ -283,7 +285,10 @@ export default function Home() {
 			items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.applications_manage'), view: 'applications_manage', icon: Ticket });
 		if (canTokens && isServerSet) items.push({ category: t('common.nav.categories.administrator'), label: t('common.nav.items.tokens'), view: 'tokens', icon: Key });
 		if (canInvites) items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.invites'), view: 'invites', icon: Link });
-		if (canAnnouncements) items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
+		if (canAnnouncements) {
+			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
+			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.blog'), view: 'blog', icon: Newspaper });
+		}
 		if (canManageRoadmap) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.roadmap'), view: 'roadmap', icon: Map });
 		if (canManageSuggestions) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.suggestions'), view: 'suggestions', icon: Inbox });
 		if (canManageIssues) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.issues'), view: 'issues', icon: Bug });
@@ -382,7 +387,10 @@ export default function Home() {
 	if (canSettings) allowedViews.push('settings');
 	if (canSettings || canBots) allowedViews.push('virtue');
 	if (canInvites) allowedViews.push('invites');
-	if (canAnnouncements) allowedViews.push('announcements');
+	if (canAnnouncements) {
+		allowedViews.push('announcements');
+		allowedViews.push('blog');
+	}
 	if (canManageRoadmap) allowedViews.push('roadmap');
 	if (canManageSuggestions) allowedViews.push('suggestions');
 	if (canManageIssues) allowedViews.push('issues');
@@ -446,6 +454,7 @@ export default function Home() {
 			{activeView === 'virtue' && <VirtueAdmin avatarUrl={virtueAvatarUrl} adminServerId={adminServerId} />}
 			{activeView === 'invites' && <Invites initialSearch={triageQuery} />}
 			{activeView === 'announcements' && <Announcements />}
+			{activeView === 'blog' && <BlogStudio />}
 			{activeView === 'roadmap' && <Roadmap />}
 			{activeView === 'suggestions' && <Suggestions initialSearch={triageQuery} />}
 			{activeView === 'issues' && <Issues initialSearch={triageQuery} />}

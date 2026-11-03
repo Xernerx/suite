@@ -1,7 +1,6 @@
 /** @format */
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { Building2, Upload } from 'lucide-react';
 import { Input, Markdown, Selector } from '@xernerx/ui';
@@ -31,7 +30,6 @@ interface OrgInfoTabProps {
 export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, handleUpload, uploadingMedia }: OrgInfoTabProps) {
 	const { t, locales } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
-	const [markdownPreview, setMarkdownPreview] = useState(false);
 
 	return (
 		<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-[2rem] p-8 shadow-xl">
@@ -97,8 +95,6 @@ export default function OrgInfoTab({ orgConfig, setOrgConfig, pendingUploads, ha
 				</div>
 				<Markdown
 					editable
-					preview={markdownPreview}
-					onPreviewChange={setMarkdownPreview}
 					label={t('app.portal.labels.extendedInfo')}
 					value={orgConfig.info || ''}
 					onChange={(val) => setOrgConfig({ ...orgConfig, info: val })}

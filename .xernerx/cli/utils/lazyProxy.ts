@@ -29,6 +29,7 @@ export const SUITE_APPS: AppDefinition[] = [
 	{ id: 'portal', label: 'Portal', port: 4009, internalPort: 14009, dir: 'apps/portal', color: '\x1b[94m' },
 	{ id: 'hosting', label: 'Hosting', port: 4010, internalPort: 14010, dir: 'apps/hosting', color: '\x1b[93m' },
 	{ id: 'haste', label: 'Haste', port: 4011, internalPort: 14011, dir: 'apps/haste', color: '\x1b[90m' },
+	{ id: 'blog', label: 'Blog', port: 4012, internalPort: 14012, dir: 'apps/blog', color: '\x1b[91m' },
 ];
 
 type AppState = 'sleeping' | 'booting' | 'running';
@@ -779,6 +780,8 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 		const elapsedEl = document.getElementById('elapsed');
 		const descEl = document.getElementById('status-desc');
 		const pillEl = document.getElementById('status-pill');
+		const titleEl = document.querySelector('h1');
+		let reloading = false;
 
 		setInterval(() => {
 			const s = ((Date.now() - start) / 1000).toFixed(1);
@@ -792,9 +795,15 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 					const data = await res.json();
 					if (data.status === 'running') {
 						if (pillEl) pillEl.textContent = 'READY — LOADING APP';
-						if (descEl) descEl.textContent = 'Server is online! Redirecting...';
-						window.location.replace(window.location.href);
-						return;
+						if (titleEl) titleEl.textContent = 'Opening ${app.label}...';
+						if (descEl) descEl.textContent = 'Server is online! Compiling route and loading page...';
+						if (!reloading) {
+							reloading = true;
+							window.location.reload();
+							setTimeout(() => {
+								reloading = false;
+							}, 4000);
+						}
 					}
 				}
 			} catch {}
@@ -1006,10 +1015,12 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 
 						// 1. Readiness status endpoint for the splash screen
 						if (pathname === '/__suite_status') {
-							if (url.includes('wake=1') && app.state === 'sleeping') {
-								wakeApp(app, url);
-							}
-							if (app.state === 'booting') {
+							if (url.includes('wake=1')) {
+								app.lastActiveAt = Date.now();
+								if (app.state === 'sleeping') {
+									wakeApp(app, url);
+								}
+							} else if (app.state === 'booting') {
 								app.lastActiveAt = Date.now();
 							}
 							res.writeHead(200, {

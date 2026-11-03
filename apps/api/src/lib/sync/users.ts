@@ -14,7 +14,7 @@ export async function syncUserRoles(userId: string, db: any, targetGuildId?: str
 	const SettingModel = db.models.core.Setting;
 
 	const user = await UserModel.findOne({ id: userId }).lean();
-	if (!user) return;
+	if (!user || (user as any).blacklisted) return;
 
 	const allRoles = await RoleModel.find({ sync: true }).lean();
 	const userRoleIds = user.roles || [];

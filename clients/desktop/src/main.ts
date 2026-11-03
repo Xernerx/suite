@@ -375,6 +375,9 @@ async function waitForServer(targetUrl?: string) {
 			checkOrigin = new URL(targetUrl).origin;
 		} catch {}
 	}
+	if (!app.isPackaged) {
+		fetch(`${checkOrigin}/__suite_status?wake=1`, { cache: 'no-store' }).catch(() => {});
+	}
 	const maxAttempts = 4;
 	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 		let retryLabel = 'Retrying';
@@ -797,7 +800,14 @@ function createMainWindow(bounds: Electron.Rectangle) {
 		} catch {}
 	};
 	win.webContents.on('did-navigate', (_event, url, httpResponseCode) => recordLastVisited(url, httpResponseCode));
-	win.webContents.on('did-navigate-in-page', (_event, url) => recordLastVisited(url));
+	win.webContents.on('did-navigate-in-page', (_event, url) => {
+		recordLastVisited(url);
+		try {
+			if (!win.isDestroyed() && win.webContents.getTitle().includes('— Xernerx Dev')) {
+				win.webContents.reload();
+			}
+		} catch {}
+	});
 
 	win.webContents.on('before-input-event', (event, input) => {
 		if ((input.control || input.meta) && input.shift && input.key.toLowerCase() === 'n') {

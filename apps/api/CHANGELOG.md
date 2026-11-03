@@ -2,6 +2,38 @@
 
 # api
 
+## 0.29.0
+
+### Minor Changes
+
+- ## Newsroom & Blog API, Virtue Data Deletion & Token TTL / IP Allowlist Enforcement
+
+    Added public and staff API endpoints for the Xernerx Newsroom & Blog, introduced self-service and staff Virtue data deletion, and enforced account blacklists, token TTL expirations, and IP allowlists across `/core/*`, `/secure/*`, and `/v1/*`.
+
+    ### Added
+    - **Public Newsroom & Blog Endpoints (`GET /core/blog`, `GET/POST /core/blog/[slug]`)**: Added public endpoints for listing and reading articles with category, audience, and search filtering, 3-tier privacy enforcement (`public`, `limited`, `private`), view count increments, authenticated Discord community emoji reactions, and 3 auto-seeded launch articles.
+    - **Staff Blog Studio Endpoints (`GET/POST /secure/blog`, `PATCH/DELETE /secure/blog/[id]`)**: Added RBAC-protected CRUD endpoints for managing blog posts with automatic slug generation, estimated reading time calculation, staff audit logging, and 1-click cross-posting to Discord Webhooks and the Suite Announcement Banner.
+    - **Virtue Data Deletion Endpoint (`DELETE /secure/users/[id]/virtue`)**: Added a dedicated endpoint allowing users (for their own account) and authorized staff to permanently purge Virtue XP, level progression, and streak records.
+
+    ### Changed
+    - **Token TTL Expiration & IP Allowlist Validation (`/secure/tokens` & `/v1/*`)**: Updated token CRUD and Bearer authentication middlewares (`/secure/validate/token`, `proxy.ts`, and `v1BotAuth`) to validate optional `expiresAt` timestamps and client `allowedIps` rules on every request while keeping tokens long-lived by default.
+    - **Platform-Wide Account Blacklist, Tombstone Persistence & Global Session Revocation**: Updated `/core/users/[id]`, `/core/bots/[id]`, `/v1/leaderboard`, `/secure/users/[id]`, and `/secure/users/[id]/virtue` to enforce `blacklisted` account restrictions, increment `sessionVersion` on global sign-out, and persist minimal `{ id, services: false, blacklisted: true }` tombstones on data/account deletion when opted out or blacklisted.
+    - **Suite Version Registry, RSS, Blueprints & `To-Do List Bot` Standardization**: Registered `blog` (`blog.xernerx.com`) in `suiteVersions` and `/v1/changelog/rss.xml`, standardized public references to `To-Do List Bot` across blog seeds, store seeds (`To-Do List Bot Pass`), SEO analyzer, and official bot slug resolution (`to-do-list-bot`), and synced API documentation and FAQ catalog blueprints.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 0.28.0
 
 ### Minor Changes

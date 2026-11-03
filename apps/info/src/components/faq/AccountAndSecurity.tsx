@@ -135,6 +135,7 @@ export default function AccountAndSecurity({ searchQuery = '' }: { searchQuery?:
 							{ label: t('faq.quickLinks.activityLog'), href: 'https://account.xernerx.com/?tab=activity', vanity: 'account.xernerx.com/activity' },
 							{ label: t('faq.quickLinks.accountSettings'), href: 'https://account.xernerx.com/?tab=account', vanity: 'account.xernerx.com' },
 							{ label: t('faq.quickLinks.privacyPolicy'), href: 'https://www.xernerx.com/privacy', vanity: 'xernerx.com/privacy' },
+							{ label: t('faq.quickLinks.securityPolicy'), href: 'https://www.xernerx.com/security', vanity: 'xernerx.com/security' },
 						]}
 					/>
 				</div>
@@ -152,6 +153,7 @@ export default function AccountAndSecurity({ searchQuery = '' }: { searchQuery?:
 							{ label: t('faq.quickLinks.profileSettings'), href: 'https://account.xernerx.com/?tab=profile', vanity: 'account.xernerx.com/profile' },
 							{ label: t('faq.quickLinks.accountSettings'), href: 'https://account.xernerx.com/?tab=account', vanity: 'account.xernerx.com' },
 							{ label: t('faq.quickLinks.termsPolicy'), href: 'https://www.xernerx.com/terms', vanity: 'xernerx.com/terms' },
+							{ label: t('faq.quickLinks.securityPolicy'), href: 'https://www.xernerx.com/security', vanity: 'xernerx.com/security' },
 						]}
 					/>
 				</div>
@@ -169,6 +171,7 @@ export default function AccountAndSecurity({ searchQuery = '' }: { searchQuery?:
 							{ label: t('faq.quickLinks.accountSettings'), href: 'https://account.xernerx.com/?tab=account', vanity: 'account.xernerx.com' },
 							{ label: t('faq.quickLinks.activityLog'), href: 'https://account.xernerx.com/?tab=activity', vanity: 'account.xernerx.com/activity' },
 							{ label: t('faq.quickLinks.privacyPolicy'), href: 'https://www.xernerx.com/privacy', vanity: 'xernerx.com/privacy' },
+							{ label: t('faq.quickLinks.securityPolicy'), href: 'https://www.xernerx.com/security', vanity: 'xernerx.com/security' },
 						]}
 					/>
 				</div>

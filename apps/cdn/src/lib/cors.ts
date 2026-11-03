@@ -1,6 +1,6 @@
 /** @format */
 
-const TRUSTED_SUITE_APPS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste']);
+const TRUSTED_SUITE_APPS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste', 'blog']);
 
 export function isTrustedXernerxOrigin(origin: string | null): boolean {
 	if (!origin) return false;

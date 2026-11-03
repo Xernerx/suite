@@ -539,7 +539,7 @@ function buildContentAgent(home: any, targetUrl: string): McpContentAgent {
 		metaDescription:
 			currentDesc.length >= 110 && currentDesc.length <= 160
 				? currentDesc
-				: 'Configure Discord bots (To-Do List, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and developer telemetry from 1 unified Xernerx Suite account.',
+				: 'Configure Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and developer telemetry from 1 unified Xernerx Suite account.',
 		h1Suggestion: h1 || 'Empowering Developers. Connecting Communities.',
 		faqSuggestion:
 			'1. What is Xernerx Studios and how does 1 Account, 1 Place, 1 Setup work?\n2. Which Discord bots and open-source SDKs are included in the Xernerx Suite?\n3. How can developers publish bots and track live telemetry via the v1 API?',

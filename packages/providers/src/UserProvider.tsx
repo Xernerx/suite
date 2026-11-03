@@ -125,8 +125,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 					} else if (res.ok) {
 						xernerx = await res.json();
 
-						const needsSignInBonus = !xernerx?.credits?.signInBonusClaimed;
-						const needsJoinRoles = !Array.isArray(xernerx?.roles) || xernerx.roles.length === 0;
+						// Enforce global session revocation ("Sign Out All Devices")
+						const sessionSignedInAt = Number((sessionWithError as any)?.signedInAt) || 0;
+						const revokedAtMs = xernerx?.sessionRevokedAt ? new Date(xernerx.sessionRevokedAt).getTime() : 0;
+						if (revokedAtMs > 0 && sessionSignedInAt > 0 && revokedAtMs > sessionSignedInAt + 2000) {
+							const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
+							signOut({ callbackUrl: authLoginUrl });
+							return;
+						}
+
+						const isOptOutOrTombstone = Boolean(xernerx?.blacklisted || xernerx?.services === false || xernerx?.tombstone);
+						const needsSignInBonus = !isOptOutOrTombstone && !xernerx?.credits?.signInBonusClaimed;
+						const needsJoinRoles = !isOptOutOrTombstone && (!Array.isArray(xernerx?.roles) || xernerx.roles.length === 0);
 
 						if (needsSignInBonus || needsJoinRoles) {
 							const postRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {

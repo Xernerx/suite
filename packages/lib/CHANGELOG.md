@@ -2,6 +2,22 @@
 
 # @xernerx/lib
 
+## 1.20.0
+
+### Minor Changes
+
+- ## BlogPost Mongoose Schema, Token TTL / IP Allowlists, Account Blacklist Fields & Localization
+
+    Added the `BlogPost` database model, extended `Announcement`, `UserProfile`, and `Token` schemas, registered `blog.xernerx.com` in suite navigation, and added localization dictionaries.
+
+    ### Added
+    - **BlogPost Mongoose Model (`BlogPost.ts`)**: Added the `BlogPost` schema (`blog_posts` collection) supporting slugs, categories, audience targeting, 3-tier `privacy` (`public`, `limited`, `private`), tags, author metadata, reading time, views, and emoji reactions.
+    - **Localization Dictionaries & `To-Do List Bot` Standardization (`en-GB.json` & `i18n.config.ts`)**: Added complete localization dictionaries for the Newsroom & Blog (`blog.*`), Admin Blog Studio (`admin.dashboard.blog.*`), Security & Trust Center (`www.security.*`), self-service Virtue data deletion (`account.dangerZone.*`), account blacklisting, and token security controls, and standardized all public bot references across dictionaries to **`To-Do List Bot`**.
+
+    ### Changed
+    - **Announcement, UserProfile & Token Schemas (`Announcement.ts`, `Profile.ts`, `Token.ts`)**: Extended `Announcement` with optional `link` and `blogSlug` fields, added `blacklisted`, `blacklistedReason`, `services`, `sessionVersion`, and `sessionRevokedAt` to `UserProfile`, and added optional `expiresAt` TTL and `allowedIps` arrays to `Token`.
+    - **App Registry, Navigation & Session Validation (`registry.ts`, `navigation.ts`, `auth.ts`)**: Registered `blog` (`blog.xernerx.com`, port `4012`) in the central app registry and global navigation drawer, and enforced `sessionVersion` verification in NextAuth JWT/session callbacks.
+
 ## 1.19.0
 
 ### Minor Changes

@@ -33,6 +33,10 @@ const schema = new Schema(
 		lastSeenVersions: { type: Map, of: String, default: {} }, // User's last seen app versions
 
 		verified: { type: Boolean, default: false }, // Whether the user has been verified
+		blacklisted: { type: Boolean, default: false }, // Whether the user is banned from using Xernerx services
+		services: { type: Boolean, default: true }, // Whether automatic profile creation in Discord/Virtue is enabled
+		sessionVersion: { type: Number, default: 1 }, // Monotonic session counter incremented on global sign-out
+		sessionRevokedAt: { type: Date, default: null }, // Timestamp of most recent global session revocation
 		staffSubscription: { type: Boolean, default: false }, // Infinite staff subscription override
 		stripeCustomerId: { type: String, default: null }, // Linked Stripe customer ID
 		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service

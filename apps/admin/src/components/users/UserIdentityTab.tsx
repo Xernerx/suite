@@ -4,7 +4,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { timezones } from '@xernerx/lib';
-import { Input, MultiSelector, Selector, Toggle } from '@xernerx/ui';
+import { Input, Markdown, MultiSelector, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import type { Role } from './types';
 
@@ -30,6 +30,10 @@ interface UserIdentityTabProps {
 	setVanitySlug: (val: string) => void;
 	widgets: boolean;
 	setWidgets: (val: boolean) => void;
+	blacklisted: boolean;
+	setBlacklisted: (val: boolean) => void;
+	services: boolean;
+	setServices: (val: boolean) => void;
 	staffSubscription: boolean;
 	subLoading: boolean;
 	onStaffSubscriptionToggle: (checked: boolean) => void;
@@ -69,6 +73,10 @@ export function UserIdentityTab({
 	setVanitySlug,
 	widgets,
 	setWidgets,
+	blacklisted,
+	setBlacklisted,
+	services,
+	setServices,
 	staffSubscription,
 	subLoading,
 	onStaffSubscriptionToggle,
@@ -196,6 +204,26 @@ export function UserIdentityTab({
 						</div>
 					</div>
 				</div>
+
+				<div className="flex items-center justify-between rounded-2xl border border-(--border)/10 bg-(--background)/50 px-4 py-2.5">
+					<div className="flex flex-col pr-2">
+						<span className="text-xs font-bold text-(--text)">{t('admin.users.fields.servicesToggle')}</span>
+						<span className="text-[10px] text-(--text-muted)">{t('admin.users.fields.servicesDesc')}</span>
+					</div>
+					<Toggle checked={services} onChange={(e) => setServices(e.target.checked)} />
+				</div>
+
+				<div
+					className={`flex items-center justify-between rounded-2xl border px-4 py-2.5 transition-colors ${
+						blacklisted ? 'border-(--accent-red)/30 bg-(--accent-red)/10' : 'border-(--border)/10 bg-(--background)/50'
+					}`}
+				>
+					<div className="flex flex-col pr-2">
+						<span className={`text-xs font-bold ${blacklisted ? 'text-(--accent-red)' : 'text-(--text)'}`}>{t('admin.users.fields.blacklistedToggle')}</span>
+						<span className="text-[10px] text-(--text-muted)">{t('admin.users.fields.blacklistedDesc')}</span>
+					</div>
+					<Toggle checked={blacklisted} onChange={(e) => setBlacklisted(e.target.checked)} />
+				</div>
 			</div>
 
 			<div className="grid grid-cols-2 md:grid-cols-4 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
@@ -231,10 +259,7 @@ export function UserIdentityTab({
 				<Input variant="textarea" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="resize-none" />
 			</div>
 
-			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-				<label className="block text-xs font-medium text-(--text)">{t('admin.users.fields.infoLabel')}</label>
-				<Input variant="textarea" value={info} onChange={(e) => setInfo(e.target.value)} rows={4} className="resize-none" />
-			</div>
+			<Markdown editable allowAdminMediaPaste label={t('admin.users.fields.infoLabel')} value={info} onChange={setInfo} rows={4} />
 		</div>
 	);
 }

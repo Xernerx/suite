@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, ScrollText, Sparkles, User as UserIcon } from 'lucide-react';
+import { Ban, Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, ScrollText, Sparkles, User as UserIcon } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import type { DiscordProfile, FullUser, UserSummary } from './types';
@@ -18,11 +18,27 @@ interface UserProfilePreviewProps {
 	globalLevel?: number;
 	globalXp?: number;
 	verified?: boolean;
+	blacklisted?: boolean;
+	services?: boolean;
 	vanitySlug?: string;
 	onViewAuditLogs?: () => void;
 }
 
-export function UserProfilePreview({ user, discord, fullUser, displayName, avatarUrl, discordBanner, globalLevel, globalXp, verified, vanitySlug, onViewAuditLogs }: UserProfilePreviewProps) {
+export function UserProfilePreview({
+	user,
+	discord,
+	fullUser,
+	displayName,
+	avatarUrl,
+	discordBanner,
+	globalLevel,
+	globalXp,
+	verified,
+	blacklisted,
+	services,
+	vanitySlug,
+	onViewAuditLogs,
+}: UserProfilePreviewProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
@@ -37,6 +53,8 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 	const resolvedLevel = globalLevel ?? fullUser?.level?.level ?? 1;
 	const resolvedXp = globalXp ?? fullUser?.level?.xp ?? 0;
 	const isVerified = verified ?? Boolean(fullUser?.verified || user.verified);
+	const isBlacklisted = blacklisted ?? Boolean(fullUser?.blacklisted || user.blacklisted);
+	const isServicesEnabled = services ?? (fullUser?.services !== undefined ? fullUser.services !== false : user.services !== false);
 	const resolvedSlug = vanitySlug ?? fullUser?.vanitySlug ?? user.vanitySlug ?? '';
 
 	const handleSyncRoles = async () => {
@@ -124,6 +142,17 @@ export function UserProfilePreview({ user, discord, fullUser, displayName, avata
 							<Sparkles size={12} />
 							{t('admin.users.card.levelBadge', { level: resolvedLevel, xp: resolvedXp.toLocaleString() })}
 						</span>
+						{isBlacklisted && (
+							<span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent-red)/15 text-(--accent-red) border border-(--accent-red)/30">
+								<Ban size={12} />
+								{t('admin.users.fields.blacklistedBadge')}
+							</span>
+						)}
+						{!isServicesEnabled && (
+							<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent-orange)/15 text-(--accent-orange) border border-(--accent-orange)/30">
+								{t('admin.users.fields.servicesDisabledBadge')}
+							</span>
+						)}
 						{resolvedSlug && (
 							<span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-(--background)/60 text-(--text-muted) border border-(--border)/10">
 								/{resolvedSlug}

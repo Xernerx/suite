@@ -12,7 +12,7 @@ const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS = 100;
 const SESSION_MAX_REQUESTS = 300;
 
-const TRUSTED_SUITE_SUBDOMAINS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste']);
+const TRUSTED_SUITE_SUBDOMAINS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste', 'blog']);
 
 function isAllowedSuiteHostname(hostname: string): boolean {
 	if (!hostname) return false;
@@ -166,12 +166,22 @@ export async function proxy(req: NextRequest) {
 				const tokenRes = await fetch(validationUrl, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ token }),
+					body: JSON.stringify({ token, clientIp: ip }),
 				});
 
-				if (!tokenRes.ok) return errorResponse('Unauthorized: Invalid Token', 401);
+				if (!tokenRes.ok) {
+					const errPayload = await tokenRes.json().catch(() => ({}));
+					if (errPayload?.expired) {
+						return errorResponse('Unauthorized: Token has expired', 401);
+					}
+					return errorResponse('Unauthorized: Invalid Token', 401);
+				}
 
 				const tokenData = await tokenRes.json();
+
+				if (tokenData.ipBlocked) {
+					return errorResponse('Forbidden: Client IP is not in this token allowlist', 403);
+				}
 
 				// Only refuse hard flags (inactive and suspended).
 				// 'pending' and 'active' are allowed through to the backend API.

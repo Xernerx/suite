@@ -7,19 +7,43 @@ import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
 import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
+const OFFICIAL_BOT_SLUG_TO_ID: Record<string, string> = {
+	virtue: '1484880634844287138',
+	todo: '782105629572464652',
+	'to-do-list': '782105629572464652',
+	'to-do-list-bot': '782105629572464652',
+	tdl: '782105629572464652',
+	metamorphosis: '881678826906730547',
+	zodiac: '950251264095162418',
+};
+
+const OFFICIAL_BOT_ID_TO_SLUG: Record<string, string> = {
+	'1484880634844287138': 'virtue',
+	'782105629572464652': 'todo',
+	'881678826906730547': 'metamorphosis',
+	'950251264095162418': 'zodiac',
+};
+
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const id = (await params).id;
+		const lowerId = id.toLowerCase();
+		const mappedOfficialId = OFFICIAL_BOT_SLUG_TO_ID[lowerId];
 		const db = await database('xernerx');
 		const BotModel = (db.models.bots as any).Bot;
 
-		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		const bot = await BotModel.findOne({
+			$or: [{ id }, { vanitySlug: lowerId }, ...(mappedOfficialId ? [{ id: mappedOfficialId }] : [])],
+		}).lean();
 
 		if (!bot) {
 			return NextResponse.json({ error: 'Bot not found' }, { status: 404 });
 		}
 
 		const botId = bot.id;
+		if (!bot.vanitySlug && OFFICIAL_BOT_ID_TO_SLUG[botId]) {
+			bot.vanitySlug = OFFICIAL_BOT_ID_TO_SLUG[botId];
+		}
 
 		// Dynamically compute the overall vote count from the distinct votes collection
 		const VoteModel = (db.models.bots as any).Vote;

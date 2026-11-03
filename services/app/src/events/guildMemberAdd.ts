@@ -57,6 +57,7 @@ export default class GuildMemberAddEvent extends EventBuilder {
 			// If it's a human, ALSO sync their profile roles
 			if (!member.user.bot) {
 				const userProfile = await db.models.users.User.findOne({ id: member.id }).lean();
+				if ((userProfile as any)?.blacklisted) return;
 				if (userProfile && userProfile.roles && userProfile.roles.length > 0) {
 					const coreRoles = await db.models.core.Role.find({ id: { $in: userProfile.roles }, sync: true }).lean();
 					for (const r of coreRoles) {

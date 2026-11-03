@@ -106,10 +106,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 		const hasBonusTx = Array.isArray((credits as any)?.transactions) && (credits as any).transactions.some((t: any) => t?.itemId === 'signin_bonus');
 		const signInBonusClaimed = Boolean((credits as any)?.signInBonusClaimed || hasBonusTx);
+		const isTombstone = (Boolean((user as any).blacklisted) || (user as any).services === false) && !user.name && !user.email && (!Array.isArray(user.roles) || user.roles.length === 0);
 
 		return NextResponse.json({
 			...user,
 			verified: isVerified,
+			blacklisted: Boolean((user as any).blacklisted),
+			services: (user as any).services !== false,
+			tombstone: isTombstone,
+			sessionVersion: Number((user as any).sessionVersion) || 1,
+			sessionRevokedAt: (user as any).sessionRevokedAt || null,
 			staffSubscription: isStaffSubActive,
 			connections: sanitizedConnections,
 			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug),
@@ -153,10 +159,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const level = isStaffOrSystem ? rawLevel : undefined;
 		if (!isStaffOrSystem) {
 			delete userBody.roles;
+			delete userBody.blacklisted;
 			delete userBody.staffSubscription;
 			delete userBody.verified;
 			delete userBody.vanityUnlocked;
 			delete userBody.stripeCustomerId;
+		}
+
+		if ((existingUser?.blacklisted || existingUser?.services === false) && !isStaffOrSystem) {
+			return NextResponse.json(
+				{
+					...existingUser,
+					blacklisted: Boolean(existingUser.blacklisted),
+					services: existingUser.services !== false,
+					appearance: {},
+					credits: { balance: 0, streak: 0, signInBonusClaimed: true },
+					level: { level: 1, xp: 0 },
+					levels: [],
+					bonusGranted: false,
+					isNewProfile: false,
+				},
+				{ status: 200 }
+			);
 		}
 
 		// Fetch default join roles
@@ -315,11 +339,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				return NextResponse.json({ error: 'Forbidden: Only staff can dispatch manual notifications.' }, { status: 403 });
 			}
 			delete userBody.roles;
+			delete userBody.blacklisted;
 			delete userBody.staffSubscription;
 			delete userBody.vanityUnlocked;
 			delete userBody.stripeCustomerId;
 			if (!(userBody.agreedTerms && userBody.agreedPrivacy)) {
 				delete userBody.verified;
+			}
+			if ((existingDoc as any)?.blacklisted) {
+				if (userBody.action === 'unlock_vanity' || (userBody.vanitySlug !== undefined && userBody.vanitySlug !== '')) {
+					return NextResponse.json({ error: 'Forbidden: Your account is restricted from using Xernerx services.' }, { status: 403 });
+				}
 			}
 		}
 
@@ -336,6 +366,113 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				summary: `Synced Discord roles for user "${existingDoc?.name || resolvedId}"`,
 			});
 			return NextResponse.json({ success: true });
+		}
+
+		if (userBody.action === 'revoke_sessions') {
+			const now = new Date();
+			const updated = await models.users.User.findOneAndUpdate(
+				{ id: resolvedId },
+				{
+					$inc: { sessionVersion: 1 },
+					$set: { sessionRevokedAt: now, devices: [] },
+				},
+				{ returnDocument: 'after', upsert: true }
+			).lean();
+			await recordAuditLog(req, {
+				action: 'user.sessions.revoke',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Revoked all active device sessions for user "${existingDoc?.name || resolvedId}"`,
+				metadata: { sessionVersion: (updated as any)?.sessionVersion || 2 },
+			});
+			return NextResponse.json({
+				success: true,
+				sessionVersion: Number((updated as any)?.sessionVersion) || 2,
+				sessionRevokedAt: now.toISOString(),
+			});
+		}
+
+		if (userBody.action === 'reset_data') {
+			let wasBlacklisted = Boolean((existingDoc as any)?.blacklisted);
+			let wasServicesOptOut = (existingDoc as any)?.services === false;
+
+			try {
+				const virtueDb = await database('virtue');
+				const VUserModel = (virtueDb.models.profiles as any)?.User;
+				if (VUserModel) {
+					const vDoc = (await VUserModel.findOne({ id: resolvedId })
+						.lean()
+						.catch(() => null)) as any;
+					if (vDoc?.blacklisted) wasBlacklisted = true;
+					if (vDoc?.services === false) wasServicesOptOut = true;
+				}
+			} catch {}
+
+			await Promise.all([
+				models.users.Appearance.deleteMany({ ownerId: resolvedId }).catch(() => null),
+				models.users.Credit.deleteMany({ ownerId: resolvedId }).catch(() => null),
+				models.users.Level.deleteMany({ ownerId: resolvedId }).catch(() => null),
+			]);
+
+			if (wasBlacklisted || wasServicesOptOut) {
+				const tombstoneDoc: Record<string, any> = {
+					id: resolvedId,
+					...(wasBlacklisted ? { blacklisted: true } : {}),
+					...(wasServicesOptOut ? { services: false } : {}),
+				};
+				await models.users.User.collection.replaceOne({ id: resolvedId }, tombstoneDoc, { upsert: true });
+
+				try {
+					const virtueDb = await database('virtue');
+					const VUserModel = (virtueDb.models.profiles as any)?.User;
+					if (VUserModel) {
+						await VUserModel.collection.replaceOne({ id: resolvedId }, tombstoneDoc, { upsert: true }).catch(() => null);
+					}
+				} catch {}
+
+				await recordAuditLog(req, {
+					action: 'user.data.reset',
+					targetType: 'user',
+					targetId: resolvedId,
+					summary: `Reset profile data for user "${existingDoc?.name || resolvedId}" (tombstone persisted)`,
+					metadata: { blacklisted: wasBlacklisted, services: !wasServicesOptOut },
+				});
+
+				return NextResponse.json({
+					id: resolvedId,
+					blacklisted: wasBlacklisted,
+					services: !wasServicesOptOut,
+					tombstone: true,
+					appearance: {},
+					credits: { balance: 0, streak: 0 },
+					level: { level: 1, xp: 0 },
+				});
+			}
+
+			const resetDoc: Record<string, any> = {
+				id: resolvedId,
+				name: userBody.name || existingDoc?.name || 'User',
+				privacy: 'private',
+				services: true,
+				blacklisted: false,
+				roles: Array.isArray(existingDoc?.roles) ? existingDoc.roles : [],
+				preferences: { locale: 'en-GB' },
+			};
+			await models.users.User.collection.replaceOne({ id: resolvedId }, resetDoc, { upsert: true });
+
+			await recordAuditLog(req, {
+				action: 'user.data.reset',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Reset profile data for user "${existingDoc?.name || resolvedId}"`,
+			});
+
+			return NextResponse.json({
+				...resetDoc,
+				appearance: {},
+				credits: { balance: 0, streak: 0 },
+				level: { level: 1, xp: 0 },
+			});
 		}
 
 		if (userBody.action === 'send_notification') {
@@ -699,6 +836,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			changes.push(`verified: ${updatedUser.verified ? 'true' : 'false'}`);
 			metaChanges.verified = Boolean(updatedUser.verified);
 		}
+		if (typeof userBody.blacklisted === 'boolean' && Boolean((existingDoc as any)?.blacklisted) !== Boolean((updatedUser as any).blacklisted)) {
+			changes.push(`blacklisted: ${(updatedUser as any).blacklisted ? 'true' : 'false'}`);
+			metaChanges.blacklisted = Boolean((updatedUser as any).blacklisted);
+		}
+		if (typeof userBody.services === 'boolean' && ((existingDoc as any)?.services !== false) !== ((updatedUser as any).services !== false)) {
+			changes.push(`services: ${(updatedUser as any).services !== false ? 'enabled' : 'disabled'}`);
+			metaChanges.services = (updatedUser as any).services !== false;
+		}
+		if (typeof userBody.services === 'boolean' || typeof userBody.blacklisted === 'boolean') {
+			try {
+				const virtueDb = await database('virtue');
+				const VUserModel = (virtueDb.models.profiles as any)?.User;
+				if (VUserModel) {
+					const virtueSync: Record<string, any> = {};
+					if (typeof userBody.services === 'boolean') virtueSync.services = userBody.services;
+					if (typeof userBody.blacklisted === 'boolean') virtueSync.blacklisted = userBody.blacklisted;
+					await VUserModel.updateOne({ id: resolvedId }, { $set: virtueSync }).catch(() => null);
+				}
+			} catch {}
+		}
 		if (typeof userBody.widgets === 'boolean' && Boolean((existingDoc as any)?.widgets) !== Boolean((updatedUser as any).widgets)) {
 			changes.push(`widgets: ${(updatedUser as any).widgets ? 'enabled' : 'disabled'}`);
 			metaChanges.widgets = Boolean((updatedUser as any).widgets);
@@ -836,21 +993,76 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 		}
 
 		const resolvedId = deletedUser.id;
+		let wasBlacklisted = Boolean((deletedUser as any).blacklisted);
+		let wasServicesOptOut = (deletedUser as any).services === false;
 
 		await models.users.Appearance.findOneAndDelete({ ownerId: resolvedId });
 		await models.users.Credit.findOneAndDelete({ ownerId: resolvedId });
 		await models.users.Level.deleteMany({ ownerId: resolvedId });
 		await models.users.Subscription.deleteMany({ ownerId: resolvedId });
 
+		try {
+			const virtueDb = await database('virtue');
+			const VUserModel = (virtueDb.models.profiles as any)?.User;
+			if (VUserModel) {
+				const existingVirtueUser = (await VUserModel.findOne({ id: resolvedId })
+					.lean()
+					.catch(() => null)) as any;
+				if (existingVirtueUser?.blacklisted) wasBlacklisted = true;
+				if (existingVirtueUser?.services === false) wasServicesOptOut = true;
+			}
+			const virtueModelsToDelete = Array.from(
+				new Set(
+					[
+						VUserModel,
+						(virtueDb.models.levels as any)?.Level,
+						(virtueDb.models.levels as any)?.Text,
+						(virtueDb.models.levels as any)?.Voice,
+						(virtueDb.models.profiles as any)?.Level,
+						(virtueDb.models.profiles as any)?.Text,
+						(virtueDb.models.profiles as any)?.Voice,
+					].filter(Boolean)
+				)
+			);
+			await Promise.all(virtueModelsToDelete.map((m: any) => m.deleteMany({ id: resolvedId }).catch(() => null)));
+
+			if ((wasBlacklisted || wasServicesOptOut) && VUserModel) {
+				const virtueTombstone: Record<string, any> = {
+					id: resolvedId,
+					...(wasBlacklisted ? { blacklisted: true } : {}),
+					...(wasServicesOptOut ? { services: false } : {}),
+				};
+				await VUserModel.collection.replaceOne({ id: resolvedId }, virtueTombstone, { upsert: true }).catch(() => null);
+			}
+		} catch {}
+
+		if (wasBlacklisted || wasServicesOptOut) {
+			const tombstoneDoc: Record<string, any> = {
+				id: resolvedId,
+				...(wasBlacklisted ? { blacklisted: true } : {}),
+				...(wasServicesOptOut ? { services: false } : {}),
+			};
+			await models.users.User.collection.replaceOne({ id: resolvedId }, tombstoneDoc, { upsert: true });
+		}
+
 		await recordAuditLog(req, {
 			action: 'user.delete',
 			targetType: 'user',
 			targetId: resolvedId,
-			summary: `Deleted user "${deletedUser.name || resolvedId}"`,
-			metadata: { email: deletedUser.email || null },
+			summary: `Deleted user "${deletedUser.name || resolvedId}"${wasBlacklisted || wasServicesOptOut ? ' (tombstone persisted)' : ''}`,
+			metadata: {
+				email: deletedUser.email || null,
+				tombstonePersisted: wasBlacklisted || wasServicesOptOut,
+				...(wasBlacklisted ? { blacklisted: true } : {}),
+				...(wasServicesOptOut ? { services: false } : {}),
+			},
 		});
 
-		return NextResponse.json({ success: true, deletedId: resolvedId });
+		return NextResponse.json({
+			success: true,
+			deletedId: resolvedId,
+			tombstonePersisted: wasBlacklisted || wasServicesOptOut,
+		});
 	} catch (error: unknown) {
 		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
 	}

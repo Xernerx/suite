@@ -2,6 +2,24 @@
 
 # @xernerx/ui
 
+## 0.8.0
+
+### Minor Changes
+
+- ## Unified Write / Split / Preview Markdown Component, Admin Media Paste & Wide Modal Presets
+
+    Upgraded `<Markdown />` with a 3-way Write / Split / Preview switcher and Admin-only clipboard media paste-to-CDN with live upload progress, and added extra-wide size presets to `<Modal />`.
+
+    ### Added
+    - **Write / Split / Preview Mode Switcher (`Markdown.tsx`)**: Added a 3-way mode switcher (`Write`, side-by-side `Split`, and `Preview`) to `<Markdown editable />` alongside syntax-highlighted `<CodeBlock />` rendering and inline `<img>` / `<video controls>` support.
+    - **Admin Clipboard Media Paste with Progress Bar (`Markdown.tsx`)**: Added `allowAdminMediaPaste` to `<Markdown />` (restricted strictly to `admin.xernerx.com` / port `4006` and authorized staff permissions) with real-time `XMLHttpRequest` upload progress bar cards when pasting images or videos.
+    - **Expanded Modal Size Presets (`Modal.tsx`)**: Added a `size?: ModalSize` prop (`'sm'`, `'md'`, `'lg'`, `'xl'`, `'2xl'`, `'3xl'`, `'4xl'`, `'5xl'`, `'6xl'`, `'7xl'`, `'8xl'`, `'9xl'`, `'page'`, `'full'`) alongside `maxWidth`.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/providers@0.21.0
+
 ## 0.7.17
 
 ### Patch Changes

@@ -2,6 +2,17 @@
 
 # @xernerx/styles
 
+## 0.4.0
+
+### Minor Changes
+
+- ## Expanded Tailwind CSS v4 Container Width Tokens (`8xl` & `9xl`)
+
+    Added extra-wide container size tokens to the central Tailwind CSS v4 theme configuration for studio modals and split-view editors.
+
+    ### Added
+    - **Extra-Wide Container Tokens (`globals.css`)**: Added `--container-8xl` (`96rem`) and `--container-9xl` (`112rem`) to the central Tailwind CSS v4 `@theme` configuration so studio modals and side-by-side split editors can use `max-w-8xl` and `max-w-9xl`.
+
 ## 0.3.0
 
 ### Minor Changes

@@ -349,4 +349,22 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		],
 		keywords: ['haste', 'hastebin', 'pastebin', 'documents', 'raw', 'snippet', 'code', 'eval', 'ttl', 'expiresin', '@xernerx/commands'],
 	},
+	{
+		id: 'api-core-blog',
+		slug: 'core-blog',
+		category: 'api',
+		categoryTitleKey: 'docs.home.categories.api.title',
+		sectionTitleKey: 'docs.api.common.nav.allEndpoints',
+		titleKey: 'docs.api.core.coreBlog.title',
+		descKey: 'docs.api.core.coreBlog.description',
+		method: 'GET',
+		path: '/core/blog',
+		docPath: '/api/core#core-blog',
+		quickLinks: [
+			{ label: 'Xernerx Newsroom & Blog', href: 'https://blog.xernerx.com', vanity: 'blog.xernerx.com' },
+			{ label: 'Blog RSS Feed', href: 'https://blog.xernerx.com/rss.xml', vanity: 'blog.xernerx.com/rss.xml' },
+			{ label: 'Blog API Endpoint', href: 'https://api.xernerx.com/core/blog' },
+		],
+		keywords: ['core', 'blog', 'newsroom', 'articles', 'announcements', 'security', 'engineering', 'reactions', 'rss'],
+	},
 ];

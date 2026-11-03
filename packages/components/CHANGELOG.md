@@ -2,6 +2,37 @@
 
 # @xernerx/components
 
+## 0.15.0
+
+### Minor Changes
+
+- ## In-Flow Suite Announcement Banner, Suspended Account Gate & Newsroom Navigation
+
+    Relocated the Suite Announcement Banner into `<Page />` `<main>` below `<Header />` with direct blog article linking, added `<BlacklistGate />` for suspended accounts, and integrated `blog.xernerx.com` across suite navigation.
+
+    ### Added
+    - **Suspended Account Gate (`BlacklistGate.tsx`)**: Added `<BlacklistGate />` to restrict blacklisted accounts across suite applications while preserving access to **Account Settings (`account.xernerx.com`)** for self-service data deletion and **Legal & Security pages (`/terms`, `/privacy`, `/cookies`, `/security`)**.
+    - **Shared Token Security Types (`tokens/types.ts`)**: Added `expiresAt` and `allowedIps` fields to shared API token TypeScript interfaces.
+
+    ### Changed
+    - **In-Flow Suite Announcement Banner & SSR Hydration Consistency (`Page.tsx` & `Header.tsx`)**: Moved the cross-suite announcement banner out of `<Header />` into `<Page />` `<main>` directly below the header and beside `<Sidebar />` so it never overlaps navigation, made it clickable with a **Read Article** CTA when linked to a blog post (`link` / `blogSlug`), and resolved SSR/client hydration mismatches around `<XernerxDotLogo />` and `<BlacklistGate />`.
+    - **Global Navigation, Footer & URL Omnibar (`Footer.tsx`, `HeaderOmnibar.tsx`, `VersionTracker.tsx`)**: Added the **Xernerx Newsroom & Blog (`blog.xernerx.com`)** to global footer links, the `Ctrl + .` URL Omnibar (`SUBDOMAIN_ROUTES`), and suite version tracking.
+
+    ### Deleted
+    - **Announcement Banner Countdown Timer (`Page.tsx`)**: Removed the live expiration countdown timer pill from the cross-page announcement banner for a cleaner editorial bar.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 0.14.0
 
 ### Minor Changes

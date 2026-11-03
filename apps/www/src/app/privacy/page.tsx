@@ -195,7 +195,7 @@ export default function Page() {
 			<motion.div
 				style={{
 					scaleX,
-					top: 'env(safe-area-inset-top, 0px)',
+					top: 'calc(50px + env(safe-area-inset-top, 0px))',
 				}}
 				className="fixed left-0 right-0 h-0.75 origin-left bg-(--accent) z-50"
 			/>
@@ -230,7 +230,7 @@ export default function Page() {
 							>
 								{t('www.privacy.header.title')}
 							</h1>
-							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.privacy.header.effectiveDate')} 1 November 2026</div>
+							<div className="text-sm font-medium tracking-wide uppercase text-(--text-muted)">{t('www.privacy.header.effectiveDate')} 3 November 2026</div>
 						</header>
 
 						<div className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl p-10 shadow-sm space-y-16">

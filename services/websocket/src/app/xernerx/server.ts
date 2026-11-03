@@ -22,16 +22,59 @@ async function resolveDefaultJoinRoles(db: any): Promise<string[]> {
 	return Array.from(roles);
 }
 
+export async function canUseUserServices(userId: string): Promise<{ allowed: boolean; blacklisted: boolean; services: boolean; userDoc: any }> {
+	if (!userId || !/^\d{15,22}$/.test(String(userId))) {
+		return { allowed: true, blacklisted: false, services: true, userDoc: null };
+	}
+	try {
+		const db = await database('xernerx');
+		const UserModel = (db.models.users as any)?.User;
+		const userDoc = UserModel ? ((await UserModel.findOne({ id: String(userId) }).lean()) as any) : null;
+		if (userDoc) {
+			const blacklisted = Boolean(userDoc.blacklisted);
+			const services = userDoc.services !== false;
+			return {
+				allowed: !blacklisted && services,
+				blacklisted,
+				services,
+				userDoc,
+			};
+		}
+
+		const virtueDb = await database('virtue').catch(() => null);
+		const VUserModel = (virtueDb?.models?.profiles as any)?.User;
+		const vUserDoc = VUserModel
+			? ((await VUserModel.findOne({ id: String(userId) })
+					.select('blacklisted services')
+					.lean()) as any)
+			: null;
+		if (vUserDoc) {
+			const blacklisted = Boolean(vUserDoc.blacklisted);
+			const services = vUserDoc.services !== false;
+			return {
+				allowed: !blacklisted && services,
+				blacklisted,
+				services,
+				userDoc: null,
+			};
+		}
+	} catch {}
+	return { allowed: true, blacklisted: false, services: true, userDoc: null };
+}
+
 export async function ensureUserBonusAndDefaults(userId: string) {
 	if (!userId || !/^\d{15,22}$/.test(String(userId))) return;
 	try {
+		const serviceCheck = await canUseUserServices(userId);
+		if (!serviceCheck.allowed) return;
+
 		const db = await database('xernerx');
 		const CreditModel = (db.models.users as any)?.Credit;
 		const LevelModel = (db.models.users as any)?.Level;
 		const UserModel = (db.models.users as any)?.User;
 
 		if (UserModel) {
-			const userDoc = (await UserModel.findOne({ id: userId }).lean()) as any;
+			const userDoc = serviceCheck.userDoc || ((await UserModel.findOne({ id: userId }).lean()) as any);
 			if (!userDoc) {
 				const defaultRoles = await resolveDefaultJoinRoles(db);
 				await UserModel.create({
@@ -39,6 +82,7 @@ export async function ensureUserBonusAndDefaults(userId: string) {
 					roles: defaultRoles,
 				}).catch(() => {});
 			} else {
+				if (userDoc.blacklisted || userDoc.services === false) return;
 				const updates: Record<string, any> = {};
 				if (userDoc.agreedTerms && userDoc.agreedPrivacy && !userDoc.verified) {
 					updates.verified = true;
@@ -212,6 +256,23 @@ export default async function Server(msg: any) {
 			const isCreditAction = msg.action === 'credits' || msg.action === 'credit';
 			const isLevelAction = msg.action === 'levels' || msg.action === 'level';
 			const targetUserId = String(msg.body?.ownerId || msg.body?.id || '');
+			if ((isUserAction || isCreditAction || isLevelAction) && targetUserId) {
+				const serviceCheck = await canUseUserServices(targetUserId);
+				if (!serviceCheck.allowed) {
+					return (
+						serviceCheck.userDoc || {
+							id: targetUserId,
+							ownerId: targetUserId,
+							blacklisted: serviceCheck.blacklisted,
+							services: serviceCheck.services,
+							balance: 0,
+							level: 0,
+							xp: 0,
+							servicesDisabled: true,
+						}
+					);
+				}
+			}
 			if (isUserAction) {
 				if (msg.body?.agreedTerms && msg.body?.agreedPrivacy) {
 					msg.body.verified = true;
@@ -262,6 +323,24 @@ export default async function Server(msg: any) {
 			const isCreditAction = msg.action === 'credits' || msg.action === 'credit';
 			const isLevelAction = msg.action === 'levels' || msg.action === 'level';
 			const targetUserId = String(msg.body?.ownerId || msg.body?.id || '');
+			const isExplicitServiceOrBlacklistMutation = isUserAction && (typeof msg.body?.services === 'boolean' || typeof msg.body?.blacklisted === 'boolean');
+			if ((isUserAction || isCreditAction || isLevelAction) && targetUserId && !isExplicitServiceOrBlacklistMutation) {
+				const serviceCheck = await canUseUserServices(targetUserId);
+				if (!serviceCheck.allowed) {
+					return (
+						serviceCheck.userDoc || {
+							id: targetUserId,
+							ownerId: targetUserId,
+							blacklisted: serviceCheck.blacklisted,
+							services: serviceCheck.services,
+							balance: 0,
+							level: 0,
+							xp: 0,
+							servicesDisabled: true,
+						}
+					);
+				}
+			}
 			if (isUserAction) {
 				const keys = Object.keys(msg.body || {}).filter((k) => k !== 'id' && msg.body[k] !== undefined && msg.body[k] !== null && msg.body[k] !== '');
 				if (keys.length === 0) {

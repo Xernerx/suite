@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		{ url: 'https://www.xernerx.com/invites', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
 		{ url: 'https://www.xernerx.com/applications', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
 		{ url: 'https://www.xernerx.com/contact', lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
+		{ url: 'https://www.xernerx.com/security', lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
 		{ url: 'https://www.xernerx.com/terms', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
 		{ url: 'https://www.xernerx.com/privacy', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
 		{ url: 'https://www.xernerx.com/cookies', lastModified: now, changeFrequency: 'monthly', priority: 0.5 },
@@ -22,6 +23,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		// APP (app.xernerx.com)
 		{ url: 'https://app.xernerx.com/', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: 'https://app.xernerx.com/bots', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
+		{ url: 'https://app.xernerx.com/bots/virtue', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: 'https://app.xernerx.com/bots/todo', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: 'https://app.xernerx.com/bots/metamorphosis', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: 'https://app.xernerx.com/bots/zodiac', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: 'https://app.xernerx.com/servers', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: 'https://app.xernerx.com/users', lastModified: now, changeFrequency: 'daily', priority: 0.85 },
 		{ url: 'https://app.xernerx.com/leaderboard', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
@@ -79,9 +84,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 				: [],
 		]);
 
+		const officialIdToSlug: Record<string, string> = {
+			'1484880634844287138': 'virtue',
+			'782105629572464652': 'todo',
+			'881678826906730547': 'metamorphosis',
+			'950251264095162418': 'zodiac',
+		};
+		const seenBotSlugs = new Set<string>(['virtue', 'todo', 'metamorphosis', 'zodiac']);
+
 		for (const bot of publicBots) {
-			const slugOrId = bot.vanitySlug || bot.id;
-			if (!slugOrId) continue;
+			const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;
+			if (!slugOrId || seenBotSlugs.has(String(slugOrId).toLowerCase())) continue;
+			seenBotSlugs.add(String(slugOrId).toLowerCase());
 			entries.push({
 				url: `https://app.xernerx.com/bots/${encodeURIComponent(String(slugOrId))}`,
 				lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,

@@ -21,7 +21,20 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const StatModel = (db.models.bots as any).Stat;
 		const VoteModel = (db.models.bots as any).Vote;
 
-		const bot = await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		const officialSlugMap: Record<string, string> = {
+			virtue: '1484880634844287138',
+			todo: '782105629572464652',
+			'to-do-list': '782105629572464652',
+			'to-do-list-bot': '782105629572464652',
+			tdl: '782105629572464652',
+			metamorphosis: '881678826906730547',
+			zodiac: '950251264095162418',
+		};
+		const mappedOfficialId = officialSlugMap[id.toLowerCase()];
+
+		const bot = await BotModel.findOne({
+			$or: [{ id }, { vanitySlug: id.toLowerCase() }, ...(mappedOfficialId ? [{ id: mappedOfficialId }] : [])],
+		}).lean();
 		const isExternalWidget = format === 'svg' || format === 'iframe' || format === 'html' || fetchDest === 'iframe';
 		if (!bot || bot.privacy === 'private' || (isExternalWidget && !bot.widgets)) {
 			return NextResponse.json({ error: 'Bot profile not found or private' }, { status: 404 });

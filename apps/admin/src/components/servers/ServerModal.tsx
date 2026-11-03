@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { CheckCircle2, ExternalLink, ScrollText, Server as ServerIcon, ThumbsUp, Trash2, Users } from 'lucide-react';
-import { Button, Confirm, Input, Modal, Selector, Toggle } from '@xernerx/ui';
+import { Button, Confirm, Input, Markdown, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { AdminServerSummary } from './types';
@@ -346,10 +346,7 @@ export function ServerModal({ open, onOpenChange, server, getEnvUrl, onServerDel
 										<Input variant="textarea" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
 									</div>
 
-									<div className="flex flex-col gap-1.5">
-										<label className="text-xs font-semibold text-(--text)">{t('admin.users.fields.infoLabel')}</label>
-										<Input variant="textarea" rows={4} value={info} onChange={(e) => setInfo(e.target.value)} />
-									</div>
+									<Markdown editable allowAdminMediaPaste label={t('admin.users.fields.infoLabel')} value={info} onChange={setInfo} rows={4} />
 								</>
 							)}
 

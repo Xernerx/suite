@@ -227,7 +227,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
 	const currentView = view || 'profile';
 	const uid = (session as any)?.user?.id;
-	const isPrivateProfile = user?.privacy === 'private' && uid !== id && uid !== user?.id;
+	const isPrivateProfile = (user?.privacy === 'private' || user?.blacklisted) && uid !== id && uid !== user?.id;
 
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">

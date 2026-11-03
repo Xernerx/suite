@@ -23,6 +23,10 @@ interface CreateTokenModalProps {
 	setNewSecure: (secure: boolean) => void;
 	newWebsocket: boolean;
 	setNewWebsocket: (ws: boolean) => void;
+	newTtlDays?: string;
+	setNewTtlDays?: (ttl: string) => void;
+	newAllowedIps?: string;
+	setNewAllowedIps?: (ips: string) => void;
 	getEnvUrl: (url: string) => string;
 	onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 	creating: boolean;
@@ -43,6 +47,10 @@ export function CreateTokenModal({
 	setNewSecure,
 	newWebsocket,
 	setNewWebsocket,
+	newTtlDays = 'never',
+	setNewTtlDays,
+	newAllowedIps = '',
+	setNewAllowedIps,
 	getEnvUrl,
 	onSubmit,
 	creating,
@@ -124,6 +132,30 @@ export function CreateTokenModal({
 					<label className="block text-xs font-medium text-(--text)">{t('admin.tokens.manage.ownersLabel')}</label>
 					<AsyncUserMultiSelector values={newSelectedOwners} onChange={setNewSelectedOwners} getEnvUrl={getEnvUrl} />
 				</div>
+				{setNewTtlDays && (
+					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+						<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+							<label className="block text-xs font-medium text-(--text)">{t('account.tokens.ttl.label')}</label>
+							<Selector
+								value={newTtlDays}
+								onChange={setNewTtlDays}
+								options={[
+									{ value: 'never', label: t('account.tokens.ttl.never') },
+									{ value: '7', label: t('account.tokens.ttl.days7') },
+									{ value: '30', label: t('account.tokens.ttl.days30') },
+									{ value: '90', label: t('account.tokens.ttl.days90') },
+									{ value: '365', label: t('account.tokens.ttl.days365') },
+								]}
+							/>
+						</div>
+						{setNewAllowedIps && (
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+								<label className="block text-xs font-medium text-(--text)">{t('account.tokens.allowedIps.label')}</label>
+								<Input type="text" value={newAllowedIps} onChange={(e) => setNewAllowedIps(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
+							</div>
+						)}
+					</div>
+				)}
 				<div className="flex items-center justify-between pt-1">
 					<div className="flex flex-col">
 						<span className="text-xs font-medium text-(--text)">{t('admin.tokens.edit.secure')}</span>

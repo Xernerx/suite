@@ -18,8 +18,10 @@ import {
 	Map,
 	MessageCircle,
 	MessageSquare,
+	Newspaper,
 	Package,
 	Shield,
+	ShieldCheck,
 	SlidersHorizontal,
 } from 'lucide-react';
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
@@ -136,7 +138,9 @@ export function Footer() {
 				{/* ---------------------------------------------------------------- */}
 				<FooterSection title={t('common.footer.sections.resources')}>
 					<FooterLink href={resolveUrl('https://www.xernerx.com/download')} icon={Download} label={t('common.footer.links.download')} external={false} />
+					<FooterLink href={resolveUrl('https://blog.xernerx.com')} icon={Newspaper} label={t('common.footer.links.blog')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/invites')} icon={LinkIcon} label={t('common.footer.links.invites')} external={false} />
+					<FooterLink href={resolveUrl('https://www.xernerx.com/security')} icon={ShieldCheck} label={t('common.footer.links.security')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/privacy')} icon={Shield} label={t('common.footer.links.privacy')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/terms')} icon={FileText} label={t('common.footer.links.terms')} external={false} />
 					<FooterLink href={resolveUrl('https://www.xernerx.com/cookies')} icon={Cookie} label={t('common.footer.links.cookies')} external={false} />

@@ -2,6 +2,34 @@
 
 # info
 
+## 1.11.2
+
+### Patch Changes
+
+- ## Newsroom Status Monitoring, Structured Changelog Parser & Security FAQ Updates
+
+    Added `blog.xernerx.com` across the Status Hub, Unified Changelog, and Ecosystem FAQ, upgraded the changelog parser to unwrap titled release sections, and expanded Account & Security FAQ guides.
+
+    ### Added
+    - **Newsroom & Blog Status Monitoring (`StatusClient`)**: Added `blog.xernerx.com` to the Live Status Matrix (`/status`) for real-time availability, response latency, and 24-hour uptime tracking.
+    - **Newsroom & Blog Changelog Feed (`ChangelogClient` & `changelog/page.tsx`)**: Added **Blog (`blog.xernerx.com`)** to the Unified Release Changelog (`/changelog`) application switcher and live fallback loader.
+
+    ### Changed
+    - **Structured Changelog Title & Section Parser (`ChangelogClient` & `changelog/page.tsx`)**: Updated the changelog Markdown parser to distinguish version headings (`## x.y.z`) from release title headings (`## Title`) and cleanly unwrap `### Added`, `### Changed`, and `### Deleted` sections.
+    - **Ecosystem & Security FAQ Synchronization (`EcosystemAndNavigation` & `AccountAndSecurity`)**: Added `blog.xernerx.com` (`4012`) to the Ecosystem Subdomains table and expanded Account & Security FAQs to cover `/security`, secondary OAuth connections, self-service Virtue data deletion, API token TTL/IP allowlists, and Credit Store cosmetic categories.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.0
+    - @xernerx/lib@1.20.0
+    - @xernerx/providers@0.21.0
+    - @xernerx/styles@0.4.0
+    - @xernerx/ui@0.8.0
+    - @xernerx/feedback@0.5.1
+
 ## 1.11.1
 
 ### Patch Changes

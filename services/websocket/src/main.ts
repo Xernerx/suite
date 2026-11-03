@@ -215,7 +215,7 @@ async function start() {
 				const initialToken = queryToken || bearerToken;
 
 				if (initialToken) {
-					const res = await verifyWebsocketToken(initialToken);
+					const res = await verifyWebsocketToken(initialToken, String(ip || ''));
 					if (res.valid && res.tokenId) {
 						ws.authed = true;
 						ws.authError = undefined;
@@ -260,7 +260,7 @@ async function start() {
 								return send(ws, { id: msg.id, success: false, message: 'Missing token' });
 							}
 
-							const res = await verifyWebsocketToken(token);
+							const res = await verifyWebsocketToken(token, String(ip || ''));
 
 							if (!res.valid || !res.tokenId) {
 								ws.authed = false;
@@ -289,7 +289,7 @@ async function start() {
 						}
 
 						// Enforce live token state & websocket permission on every message
-						const hasAccess = await checkTokenWebsocketAccess(ws.tokenId);
+						const hasAccess = await checkTokenWebsocketAccess(ws.tokenId, String(ip || ''));
 						if (!hasAccess) {
 							ws.authed = false;
 							ws.tokenId = undefined;

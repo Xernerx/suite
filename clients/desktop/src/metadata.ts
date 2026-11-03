@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 export type WindowControlsStyle = 'system' | 'windows' | 'macos' | 'xernerx';
 export type DesktopAppIcon = 'default' | 'blue' | 'cyan' | 'green' | 'gold' | 'orange' | 'red' | 'pink' | 'white' | 'black';
-export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'website' | 'help' | 'admin' | 'hosting';
+export type StartupLocation = 'last' | 'explore' | 'dashboard' | 'account' | 'store' | 'portal' | 'api' | 'docs' | 'cdn' | 'haste' | 'blog' | 'website' | 'help' | 'admin' | 'hosting';
 
 export const VALID_APP_ICONS: DesktopAppIcon[] = ['default', 'blue', 'cyan', 'green', 'gold', 'orange', 'red', 'pink', 'white', 'black'];
 
@@ -40,6 +40,8 @@ export const STARTUP_LOCATION_URLS: Record<Exclude<StartupLocation, 'last'>, str
 	api: 'https://api.xernerx.com',
 	docs: 'https://docs.xernerx.com',
 	cdn: 'https://cdn.xernerx.com',
+	haste: 'https://haste.xernerx.com',
+	blog: 'https://blog.xernerx.com',
 	website: 'https://www.xernerx.com',
 	help: 'https://info.xernerx.com',
 	admin: 'https://admin.xernerx.com',
@@ -73,6 +75,8 @@ const SUBDOMAIN_TO_PORT: Record<string, string> = {
 	store: '4008',
 	portal: '4009',
 	hosting: '4010',
+	haste: '4011',
+	blog: '4012',
 };
 
 const PORT_TO_SUBDOMAIN: Record<string, string> = {
@@ -87,6 +91,8 @@ const PORT_TO_SUBDOMAIN: Record<string, string> = {
 	'4008': 'store',
 	'4009': 'portal',
 	'4010': 'hosting',
+	'4011': 'haste',
+	'4012': 'blog',
 };
 
 export function loadEnvDomain(): string {

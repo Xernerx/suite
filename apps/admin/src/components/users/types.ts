@@ -62,6 +62,8 @@ export interface UserAssetEntity {
 	icon?: string;
 	privacy?: string;
 	verified?: boolean;
+	blacklisted?: boolean;
+	services?: boolean;
 	vanitySlug?: string;
 	isOwner?: boolean;
 }
@@ -80,6 +82,8 @@ export interface FullUser {
 	timezone?: string;
 	privacy?: string;
 	verified?: boolean;
+	blacklisted?: boolean;
+	services?: boolean;
 	vanitySlug?: string;
 	vanityUnlocked?: boolean;
 	widgets?: boolean;
@@ -123,6 +127,8 @@ export interface UserSummary {
 	name: string;
 	icon: string;
 	verified?: boolean;
+	blacklisted?: boolean;
+	services?: boolean;
 	vanitySlug?: string;
 	discord?: DiscordProfile | null;
 	stripeCustomerId?: string;

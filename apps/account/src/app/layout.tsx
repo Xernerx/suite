@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 		template: 'Xernerx Account | %s',
 	},
 	description:
-		'Your single Xernerx Account across the Xernerx Suite, To-Do List, Virtue, Metamorphosis, and Zodiac. Manage your unified profile, themes, linked connections, developer API tokens, and billing in one place.',
+		'Your single Xernerx Account across the Xernerx Suite, To-Do List Bot, Virtue, Metamorphosis, and Zodiac. Manage your unified profile, themes, linked connections, developer API tokens, and billing in one place.',
 
 	metadataBase: new URL('https://account.xernerx.com'),
 
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 			template: 'Xernerx Account | %s',
 		},
 		description:
-			'Your single Xernerx Account across the Xernerx Suite, To-Do List, Virtue, Metamorphosis, and Zodiac. Manage your unified profile, themes, linked connections, developer API tokens, and billing in one place.',
+			'Your single Xernerx Account across the Xernerx Suite, To-Do List Bot, Virtue, Metamorphosis, and Zodiac. Manage your unified profile, themes, linked connections, developer API tokens, and billing in one place.',
 		url: 'https://account.xernerx.com',
 		siteName: 'Xernerx',
 		images: [
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Account | 1 Account, 1 Place, 1 Setup Across Xernerx',
 			template: 'Xernerx Account | %s',
 		},
-		description: '1 Account, 1 Place, 1 Setup across the Xernerx Suite, To-Do List, Virtue, Metamorphosis, and Zodiac.',
+		description: '1 Account, 1 Place, 1 Setup across the Xernerx Suite, To-Do List Bot, Virtue, Metamorphosis, and Zodiac.',
 		images: ['/banner.png'],
 	},
 

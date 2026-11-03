@@ -49,7 +49,7 @@ export default function Image() {
 			<div
 				style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '28px', color: '#71717a', fontSize: '20px' }}
 			>
-				<span>Xernerx Suite v5 • To-Do List • Virtue • Metamorphosis • Zodiac</span>
+				<span>Xernerx Suite v5 • To-Do List Bot • Virtue • Metamorphosis • Zodiac</span>
 				<span>1 Account, 1 Place, 1 Setup</span>
 			</div>
 		</div>,

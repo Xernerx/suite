@@ -50,12 +50,20 @@ const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
 		{ path: '/', label: 'New Code Paste' },
 		{ path: '/?view=mine', label: 'My Saved Pastes' },
 	],
+	blog: [
+		{ path: '/', label: 'Blog Home & Latest Articles' },
+		{ path: '/platform-and-bot-security-architecture', label: 'Platform & Bot Security Architecture' },
+		{ path: '/the-customization-update-stage-render-forms-and-cosmetics-studio', label: 'The Customization Update' },
+		{ path: '/rss.xml', label: 'RSS 2.0 Syndication Feed' },
+	],
 	www: [
 		{ path: '/', label: 'Xernerx Showcase' },
 		{ path: '/download', label: 'Download Desktop App' },
 		{ path: '/applications', label: 'Team Applications' },
+		{ path: '/security', label: 'Platform & Bot Security' },
 		{ path: '/terms', label: 'Terms of Service' },
 		{ path: '/privacy', label: 'Privacy Policy' },
+		{ path: '/cookies', label: 'Cookie Policy' },
 	],
 };
 
@@ -230,7 +238,21 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 		return routes.filter((r) => r.path.toLowerCase().includes(q) || r.label.toLowerCase().includes(q)).slice(0, 5);
 	}, [selectedPre, cleanQuery]);
 
-	const subdomainOptions = ['app', 'portal', 'www', 'api', 'cdn', 'haste', 'docs', ...(hasAdminAccess ? ['admin'] : []), ...(hasHostingAccess ? ['hosting'] : []), 'account', 'store', 'info'];
+	const subdomainOptions = [
+		'app',
+		'portal',
+		'www',
+		'blog',
+		'api',
+		'cdn',
+		'haste',
+		'docs',
+		...(hasAdminAccess ? ['admin'] : []),
+		...(hasHostingAccess ? ['hosting'] : []),
+		'account',
+		'store',
+		'info',
+	];
 	if (!subdomainOptions.includes(urlState.pre)) subdomainOptions.push(urlState.pre);
 
 	return (

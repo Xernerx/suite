@@ -2,6 +2,21 @@
 
 # @xernerx/websocket
 
+## 1.5.2
+
+### Patch Changes
+
+- ## WebSocket Handshake Token TTL, IP Allowlist & Blacklist Enforcement
+
+    Hardened the WebSocket gateway handshake and real-time RPC handlers with API token TTL expiration, client IP allowlists, and account blacklist verification.
+
+    ### Changed
+    - **Handshake Token TTL, IP Allowlist & Blacklist Checks (`auth.ts` & `main.ts`)**: Enforced token `expiresAt` timestamps, client `allowedIps` rules, and user `blacklisted` flags during WebSocket connection handshakes.
+    - **Virtue & Directory RPC Guards (`virtue/server.ts` & `xernerx/server.ts`)**: Added account blacklist and 3-tier privacy checks across real-time Virtue progression events and Xernerx directory synchronization handlers.
+
+- Updated dependencies
+    - @xernerx/lib@1.20.0
+
 ## 1.5.1
 
 ### Patch Changes
