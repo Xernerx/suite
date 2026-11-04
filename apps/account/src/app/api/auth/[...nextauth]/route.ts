@@ -1,7 +1,7 @@
 /** @format */
 
-import NextAuth from 'next-auth/next';
 import { AuthOptions } from 'next-auth';
+import NextAuth from 'next-auth/next';
 import { auth } from '@xernerx/lib';
 
 const rawHandler = NextAuth(auth as AuthOptions);
@@ -41,9 +41,7 @@ async function handler(req: Request, ctx: any): Promise<Response> {
 				if (targetUrl.pathname.endsWith('/api/auth/error') || (targetUrl.pathname.endsWith('/api/auth/signin') && targetUrl.searchParams.has('error'))) {
 					return buildLoginRedirect(targetUrl.searchParams.get('error'));
 				}
-			} catch {
-				// keep original redirect if URL parsing fails
-			}
+			} catch {}
 		}
 
 		if (req.method === 'GET' && response.status >= 500 && (action === 'signin' || action === 'callback')) {

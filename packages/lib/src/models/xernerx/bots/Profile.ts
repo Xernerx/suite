@@ -45,6 +45,8 @@ const schema = new Schema(
 		voteCount: { type: Number, default: 0 }, // Fast cache for total votes
 		status: { type: String, enum: ['online', 'idle', 'dnd', 'offline'], default: 'offline' }, // Live presence status tracked by the Xernerx bot
 		statusUpdatedAt: { type: Date }, // Timestamp when status was last synced by the Xernerx bot
+		statusChangedAt: { type: Date }, // Timestamp when status last transitioned between online and offline
+		lastWebhookStatus: { type: String, enum: ['online', 'offline'] }, // Last online/offline state dispatched to status webhooks
 		activity: { type: String }, // Current Discord activity label
 		releases: {
 			type: [

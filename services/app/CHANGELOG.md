@@ -2,6 +2,26 @@
 
 # `@xernerx/app`
 
+## 2.5.0
+
+### Minor Changes
+
+- ## Blog & Haste Slash Commands and Presence Webhook Detection
+
+    Added `/blog` and `/haste` slash commands, scheduled blog Discord announcements, and live bot presence transition detection in the Xernerx App Discord bot.
+
+    ### Added
+    - **`/blog` & `/haste` Slash Commands**: Added `/blog` for browsing official Xernerx Blog articles and `/haste` for creating and inspecting `haste.xernerx.com` pastes directly from Discord.
+    - **Scheduled Blog Announcements & Presence Listener**: Added `scheduledAnnouncements.ts` and `presenceUpdate.ts` to publish scheduled blog articles and observe live bot online/offline presence transitions.
+
+    ### Changed
+    - **Ready Lifecycle Poller**: Updated `clientReady.ts` to initialize the scheduled blog announcement poller on startup.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.21.0
+
 ## 2.4.2
 
 ### Patch Changes

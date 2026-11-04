@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Settings, Server, Bot, ExternalLink, Tag, Plus, X } from 'lucide-react';
+import { Settings, Bot, ExternalLink, Tag, Plus, X, ShieldCheck, Globe } from 'lucide-react';
 import { Input, Markdown } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 
@@ -41,62 +41,62 @@ export default function General({ guildConfig, setGuildConfig }: GeneralProps) {
 
 	return (
 		<>
-			{/* Server Sync Data Card */}
-			{guildConfig.bot ? (
-				<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-3xl shadow-xl h-min" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-					<div className="flex items-center gap-3 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-						<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-							<Server className="w-4 h-4" />
-						</div>
-						{t('app.dashboard.text2')}
+			{/* Compact Server Sync & Bot Connection Bar */}
+			<div
+				className={`flex flex-col lg:flex-row lg:items-center justify-between rounded-3xl backdrop-blur-md border shadow-sm ${
+					guildConfig.bot ? 'bg-(--foreground)/30 border-(--border)/20' : 'bg-(--accent)/5 border-(--accent)/25'
+				}`}
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+			>
+				<div className="flex items-center gap-3.5 min-w-0">
+					<div
+						className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border ${
+							guildConfig.bot ? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30' : 'bg-(--accent)/15 text-(--accent) border-(--accent)/30'
+						}`}
+					>
+						<Bot className="w-5 h-5" />
 					</div>
-					<p className="text-xs text-(--text-muted) p-4 bg-(--accent)/5 rounded-2xl border border-(--accent)/10 text-(--accent)">{t('app.dashboard.text3')}</p>
-
-					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-						<div className="flex flex-col gap-2">
-							<label className="text-sm font-bold text-(--text) ml-1">{t('app.dashboard.text4')}</label>
-							<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
-								<Settings className="w-5 h-5 opacity-50" />
-								{guildConfig.bot ? t('common.yes') : t('common.no')}
-							</div>
+					<div className="flex flex-col min-w-0">
+						<div className="flex items-center gap-2 flex-wrap">
+							<h3 className="text-sm font-extrabold text-(--text) tracking-wide uppercase">{guildConfig.bot ? t('app.dashboard.text2') : t('app.dashboard.botNotConnected')}</h3>
+							<span
+								className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${
+									guildConfig.bot ? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30' : 'bg-(--background)/60 text-(--text-muted) border-(--border)/15'
+								}`}
+							>
+								<span className={`w-1.5 h-1.5 rounded-full ${guildConfig.bot ? 'bg-(--accent-green)' : 'bg-(--text-muted)'}`} />
+								{t('app.dashboard.text4')}: {guildConfig.bot ? t('common.yes') : t('common.no')}
+							</span>
 						</div>
-						<div className="flex flex-col gap-2">
-							<label className="text-sm font-bold text-(--text) ml-1">{t('app.dashboard.text5')}</label>
-							<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
-								<Settings className="w-5 h-5 opacity-50" />
-								{guildConfig.verified ? t('common.yes') : t('common.no')}
-							</div>
-						</div>
-						<div className="flex flex-col gap-2">
-							<label className="text-sm font-bold text-(--text) ml-1">{t('app.dashboard.text6')}</label>
-							<div className="bg-(--background)/50 border border-(--border)/10 rounded-2xl px-5 py-3.5 flex items-center gap-3 text-(--text-muted) cursor-not-allowed opacity-70">
-								<Settings className="w-5 h-5 opacity-50" />
-								{guildConfig.locale || 'en-US'}
-							</div>
-						</div>
+						<p className="text-xs text-(--text-muted) mt-0.5 line-clamp-1">{guildConfig.bot ? t('app.dashboard.text3') : t('app.dashboard.botNotConnectedDesc')}</p>
 					</div>
 				</div>
-			) : (
-				<div className="flex flex-col items-center text-center justify-center bg-(--accent)/5 border border-(--accent)/20 rounded-[2rem] p-10 shadow-xl h-min animate-in fade-in zoom-in-95 duration-300">
-					<div className="w-16 h-16 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent) mb-4 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
-						<Server className="w-8 h-8" />
+
+				<div className="flex flex-wrap items-center gap-2 shrink-0">
+					<div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-(--background)/60 border border-(--border)/10 text-xs">
+						<ShieldCheck className={`w-3.5 h-3.5 ${guildConfig.verified ? 'text-(--accent)' : 'text-(--text-muted)'}`} />
+						<span className="text-(--text-muted) font-medium">{t('app.dashboard.text5')}:</span>
+						<span className="font-bold text-(--text)">{guildConfig.verified ? t('common.yes') : t('common.no')}</span>
 					</div>
-					<h3 className="text-xl font-extrabold text-(--text) mb-2">{t('app.dashboard.botNotConnected')}</h3>
-					<p className="text-sm text-(--text-muted) mb-6 max-w-sm">{t('app.dashboard.botNotConnectedDesc')}</p>
-					<div className="flex flex-wrap items-center justify-center gap-3">
+					<div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-(--background)/60 border border-(--border)/10 text-xs">
+						<Globe className="w-3.5 h-3.5 text-(--accent)" />
+						<span className="text-(--text-muted) font-medium">{t('app.dashboard.text6')}:</span>
+						<span className="font-bold font-mono text-(--text)">{guildConfig.locale || 'en-US'}</span>
+					</div>
+					{!guildConfig.bot && (
 						<a
 							href={getEnvUrl('https://xernerx.com/invite/xernerx')}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-extrabold bg-(--accent) text-(--text-active) hover:bg-(--hover-accent) transition-all shadow-sm"
+							className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-extrabold bg-(--accent) text-(--text-active) hover:bg-(--hover-accent) transition-all shadow-sm"
 						>
 							<Bot className="w-4 h-4" />
 							{t('app.dashboard.inviteXernerxBot')}
 							<ExternalLink className="w-3.5 h-3.5 opacity-80" />
 						</a>
-					</div>
+					)}
 				</div>
-			)}
+			</div>
 
 			{/* Server Info Card */}
 			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-3xl shadow-xl" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>

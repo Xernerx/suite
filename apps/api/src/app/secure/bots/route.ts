@@ -138,6 +138,7 @@ export async function GET(request: Request) {
 					vanitySlug: 1,
 					vanityUnlocked: 1,
 					verified: 1,
+					status: 1,
 					privacy: 1,
 					widgets: 1,
 					owners: 1,

@@ -235,6 +235,8 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 					if (!open) onClose();
 				}}
 				title={t('account.tokens.manage.modalTitle')}
+				size="2xl"
+				maxWidth="max-w-2xl"
 			>
 				{isLoading || !token ? (
 					<div className="flex h-64 items-center justify-center">
@@ -332,56 +334,56 @@ export default function ManageTokenModal({ tokenId, onClose, onSuccess, onTokenR
 								<AsyncUserMultiSelector values={owners} onChange={setOwners} getEnvUrl={getEnvUrl} />
 							</div>
 
-							<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-									<div className="flex items-center justify-between gap-2">
-										<label className="text-sm font-medium text-(--text)">{t('account.tokens.ttl.label')}</label>
-										{token.expiresAt ? (
-											new Date(token.expiresAt).getTime() <= Date.now() ? (
-												<Badge variant="danger" size="sm">
-													{t('account.tokens.ttl.expiredBadge')}
-												</Badge>
-											) : (
-												<Badge variant="warning" size="sm">
-													{t('account.tokens.ttl.expiresOnBadge', { date: new Date(token.expiresAt).toLocaleDateString() })}
-												</Badge>
-											)
-										) : (
-											<Badge variant="success" size="sm">
-												{t('account.tokens.ttl.longLivedBadge')}
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+								<div className="flex items-center justify-between gap-2">
+									<label className="text-sm font-medium text-(--text)">{t('account.tokens.ttl.label')}</label>
+									{token.expiresAt ? (
+										new Date(token.expiresAt).getTime() <= Date.now() ? (
+											<Badge variant="danger" size="sm">
+												{t('account.tokens.ttl.expiredBadge')}
 											</Badge>
-										)}
-									</div>
-									<Selector
-										value={ttlOption}
-										onChange={setTtlOption}
-										options={[
-											...(token.expiresAt
-												? [
-														{
-															value: 'keep',
-															label: t('account.tokens.ttl.keepCurrent', {
-																date: new Date(token.expiresAt).toLocaleDateString(),
-															}),
-														},
-													]
-												: []),
-											{ value: 'never', label: t('account.tokens.ttl.never') },
-											{ value: '7', label: t('account.tokens.ttl.days7') },
-											{ value: '30', label: t('account.tokens.ttl.days30') },
-											{ value: '90', label: t('account.tokens.ttl.days90') },
-											{ value: '365', label: t('account.tokens.ttl.days365') },
-										]}
-									/>
+										) : (
+											<Badge variant="warning" size="sm">
+												{t('account.tokens.ttl.expiresOnBadge', { date: new Date(token.expiresAt).toLocaleDateString() })}
+											</Badge>
+										)
+									) : (
+										<Badge variant="success" size="sm">
+											{t('account.tokens.ttl.longLivedBadge')}
+										</Badge>
+									)}
 								</div>
+								<Selector
+									value={ttlOption}
+									onChange={setTtlOption}
+									options={[
+										...(token.expiresAt
+											? [
+													{
+														value: 'keep',
+														label: t('account.tokens.ttl.keepCurrent', {
+															date: new Date(token.expiresAt).toLocaleDateString(),
+														}),
+													},
+												]
+											: []),
+										{ value: 'never', label: t('account.tokens.ttl.never') },
+										{ value: '7', label: t('account.tokens.ttl.days7') },
+										{ value: '30', label: t('account.tokens.ttl.days30') },
+										{ value: '90', label: t('account.tokens.ttl.days90') },
+										{ value: '365', label: t('account.tokens.ttl.days365') },
+									]}
+								/>
+								<span className="text-[11px] text-(--text-muted)">{t('account.tokens.ttl.hint')}</span>
+							</div>
 
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
-									<label className="text-sm font-medium text-(--text) flex items-center gap-1.5">
-										<Shield size={13} className="text-(--accent)" />
-										{t('account.tokens.allowedIps.label')}
-									</label>
-									<Input type="text" value={allowedIpsInput} onChange={(e) => setAllowedIpsInput(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
-								</div>
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+								<label className="text-sm font-medium text-(--text) inline-flex items-center gap-1.5">
+									<Shield size={14} className="text-(--accent) shrink-0" />
+									<span>{t('account.tokens.allowedIps.label')}</span>
+								</label>
+								<Input type="text" value={allowedIpsInput} onChange={(e) => setAllowedIpsInput(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
+								<span className="text-[11px] text-(--text-muted)">{t('account.tokens.allowedIps.hint')}</span>
 							</div>
 
 							{token.status !== 'pending' && token.status !== 'suspended' && (

@@ -58,7 +58,7 @@ export function CreateTokenModal({
 	const { t } = useDictionary();
 
 	return (
-		<Modal open={open} onOpenChange={onOpenChange} title={t('admin.tokens.create.modalTitle')} description={t('admin.tokens.description')}>
+		<Modal open={open} onOpenChange={onOpenChange} title={t('admin.tokens.create.modalTitle')} description={t('admin.tokens.description')} size="2xl" maxWidth="max-w-2xl">
 			<form
 				onSubmit={onSubmit}
 				className="flex flex-col overflow-visible"

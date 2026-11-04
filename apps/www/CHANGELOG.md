@@ -2,6 +2,36 @@
 
 # www
 
+## 0.23.0
+
+### Minor Changes
+
+- ## Deep Search Compare Studio Indexing & AI Discovery Manifests
+
+    Added `/llms.txt` and `/llms-full.txt` discovery manifests and indexed the new Compare Bots & Servers Studio in Deep Search on `xernerx.com`.
+
+    ### Added
+    - **Compare Studio Deep Search Indexing**: Registered the `app.xernerx.com/compare` studio inside the `xernerx.com` hero Deep Search bar for instant keyboard and keyword discovery.
+    - **LLM Discovery Routes (`/llms.txt` & `/llms-full.txt`)**: Added structured platform overview manifests and updated `robots.ts` for AI and search engine indexing.
+
+    ### Changed
+    - **Invites, Legal Pages & Service Showcase Cards**: Refined official bot invite cards, Terms & Privacy policy references, and landing service showcase cards.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 0.22.0
 
 ### Minor Changes

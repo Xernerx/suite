@@ -1,9 +1,10 @@
 /** @format */
 
-import { createLogger, database } from '@xernerx/lib/core';
+import { createLogger, database, dispatchBotStatusWebhooks } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { syncBotCommands, updateBotPresence } from '../lib/botUtils.js';
 import { syncMainServerBotIconEmojis } from '../lib/botIconEmojis.js';
+import { processDueScheduledAnnouncements } from '../lib/scheduledAnnouncements.js';
 
 const appBotLog = createLogger('APP-BOT');
 
@@ -62,25 +63,16 @@ export default class AppClientReadyEvent extends EventBuilder {
 			const db = await database('xernerx');
 			const SettingModel = (db.models.core as any).Setting;
 			const BotModel = (db.models.bots as any).Bot;
+			const HookModel = (db.models.bots as any).Hook;
 
-			const [mainOrgSetting, adminServerSetting] = await Promise.all([SettingModel.findOne({ id: 'main_org_id' }).lean(), SettingModel.findOne({ id: 'admin_server_id' }).lean()]);
+			const [mainOrgSetting, adminServerSetting, statusHookBotIds] = await Promise.all([
+				SettingModel.findOne({ id: 'main_org_id' }).lean(),
+				SettingModel.findOne({ id: 'admin_server_id' }).lean(),
+				HookModel ? HookModel.distinct('botId', { events: { $in: ['POST online', 'POST offline'] } }).catch(() => []) : Promise.resolve([]),
+			]);
 
 			const mainOrgId = mainOrgSetting?.value ? String(mainOrgSetting.value) : null;
 			const adminServerId = adminServerSetting?.value ? String(adminServerSetting.value) : null;
-
-			const orgBots = mainOrgId && BotModel ? await BotModel.find({ organization: mainOrgId }).lean() : [];
-			const botIds = orgBots.map((b: any) => String(b.id)).filter(Boolean);
-
-			const orderedGuilds = [
-				...(adminServerId && this.client.guilds.cache.has(adminServerId) ? [this.client.guilds.cache.get(adminServerId)!] : []),
-				...Array.from(this.client.guilds.cache.values()).filter((g) => g.id !== adminServerId),
-			];
-
-			if (botIds.length > 0) {
-				for (const guild of orderedGuilds.slice(0, 5)) {
-					await guild.members.fetch({ user: botIds, withPresences: true }).catch(() => null);
-				}
-			}
 
 			const bucketMs = 30 * 60 * 1000;
 			const currentBucket = String(Math.floor(Date.now() / bucketMs) * bucketMs);
@@ -147,17 +139,42 @@ export default class AppClientReadyEvent extends EventBuilder {
 				})
 			);
 
+			const botQueryOr: any[] = [];
+			if (mainOrgId) botQueryOr.push({ organization: mainOrgId });
+			if (Array.isArray(statusHookBotIds) && statusHookBotIds.length > 0) {
+				botQueryOr.push({ id: { $in: statusHookBotIds.map(String) } });
+			}
+
+			const orgBots = botQueryOr.length > 0 && BotModel ? await BotModel.find({ $or: botQueryOr }).lean() : [];
+			const botIds = orgBots.map((b: any) => String(b.id)).filter(Boolean);
+
+			const orderedGuilds = [
+				...(adminServerId && this.client.guilds.cache.has(adminServerId) ? [this.client.guilds.cache.get(adminServerId)!] : []),
+				...Array.from(this.client.guilds.cache.values()).filter((g) => g.id !== adminServerId),
+			];
+
+			if (botIds.length > 0) {
+				for (const guild of orderedGuilds.slice(0, 5)) {
+					await guild.members.fetch({ user: botIds, withPresences: true }).catch(() => null);
+				}
+			}
+
 			for (const botDoc of orgBots) {
 				const botId = String(botDoc.id);
 				let status: 'online' | 'idle' | 'dnd' | 'offline' = 'offline';
 				let activity = '';
+				let isMemberInAnyGuild = false;
 
 				if (botId === this.client.user?.id) {
+					isMemberInAnyGuild = true;
 					const rawSelfStatus = this.client.user?.presence?.status;
 					status = rawSelfStatus === 'idle' || rawSelfStatus === 'dnd' ? rawSelfStatus : 'online';
 					activity = this.client.user?.presence?.activities?.[0]?.state || this.client.user?.presence?.activities?.[0]?.name || '';
 				} else {
 					for (const guild of orderedGuilds) {
+						if (guild.members.cache.has(botId) || guild.presences?.cache?.has(botId)) {
+							isMemberInAnyGuild = true;
+						}
 						const presence = guild.presences?.cache?.get(botId) || guild.members.cache.get(botId)?.presence;
 						if (presence && presence.status && presence.status !== 'offline' && presence.status !== 'invisible') {
 							status = presence.status === 'idle' || presence.status === 'dnd' ? presence.status : 'online';
@@ -165,29 +182,37 @@ export default class AppClientReadyEvent extends EventBuilder {
 							break;
 						}
 					}
-					const recentlySelfReported = botDoc.statusUpdatedAt && Date.now() - new Date(botDoc.statusUpdatedAt).getTime() < 2 * 60 * 1000 && botDoc.status && botDoc.status !== 'offline';
-					if (status === 'offline' && recentlySelfReported) {
+					if (!isMemberInAnyGuild && botDoc.status) {
 						status = botDoc.status;
 						activity = botDoc.activity || '';
 					}
 				}
 
-				storedHistory.bots[botId] = storedHistory.bots[botId] || {};
-				storedHistory.bots[botId][currentBucket] = { status, ping: null };
-				for (const tsKey of Object.keys(storedHistory.bots[botId])) {
-					if (Number(tsKey) < cutoffTs) delete storedHistory.bots[botId][tsKey];
+				if (mainOrgId && String(botDoc.organization) === mainOrgId) {
+					storedHistory.bots[botId] = storedHistory.bots[botId] || {};
+					storedHistory.bots[botId][currentBucket] = { status, ping: null };
+					for (const tsKey of Object.keys(storedHistory.bots[botId])) {
+						if (Number(tsKey) < cutoffTs) delete storedHistory.bots[botId][tsKey];
+					}
 				}
 
-				await BotModel.findOneAndUpdate(
-					{ id: botId },
-					{
-						$set: {
-							status,
-							statusUpdatedAt: new Date(),
-							activity,
+				if (isMemberInAnyGuild) {
+					const prevBot = await BotModel.findOneAndUpdate(
+						{ id: botId },
+						{
+							$set: {
+								status,
+								statusUpdatedAt: new Date(),
+								activity,
+							},
 						},
+						{ returnDocument: 'before' }
+					).lean();
+
+					if (prevBot) {
+						await dispatchBotStatusWebhooks(prevBot, status, prevBot.status, activity);
 					}
-				);
+				}
 			}
 
 			await SettingModel.findOneAndUpdate(
@@ -202,6 +227,7 @@ export default class AppClientReadyEvent extends EventBuilder {
 				},
 				{ upsert: true }
 			);
+			await processDueScheduledAnnouncements(this.client);
 		} catch (error) {
 			appBotLog.error(`Failed to sync main org bot statuses: ${(error as any)?.message || error}`);
 		}

@@ -110,13 +110,16 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				},
 			];
 
+			const isScheduledFuture = new Date(doc.publishedAt || Date.now()).getTime() > Date.now() + 5000;
+			const defaultChannelId = body.channelId || (body.crossPostDiscord ? '941426815854055484' : '');
+
 			const announcementDoc = await Announcement.create({
 				id: crypto.randomUUID(),
 				title: doc.title,
-				channelId: body.channelId || '',
+				channelId: defaultChannelId,
 				webhookUrl: webhookUrl || 'https://blog.xernerx.com',
 				message: {
-					content: doc.subtitle || 'Read the full update on blog.xernerx.com',
+					content: body.discordPingContent || doc.subtitle || 'Read the full update on blog.xernerx.com',
 					embeds: [embedPayload],
 					components: componentsPayload,
 				},
@@ -126,11 +129,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 				targetApps,
 				link: articleUrl,
 				blogSlug: doc.slug,
+				sentAt: body.crossPostDiscord ? null : isScheduledFuture ? null : new Date(),
 			});
 
 			doc.linkedAnnouncementId = announcementDoc.id;
 
-			if (body.crossPostDiscord && webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
+			if (!isScheduledFuture && body.crossPostDiscord && webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
 				try {
 					const webhookRes = await fetch(`${webhookUrl}?wait=true`, {
 						method: 'POST',

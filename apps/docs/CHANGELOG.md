@@ -2,6 +2,36 @@
 
 # docs
 
+## 1.10.0
+
+### Minor Changes
+
+- ## Bot Status Webhook Documentation & AI Discovery Route
+
+    Documented the new `POST online` and `POST offline` API-tier bot status webhooks and added an `/llms.txt` index on `docs.xernerx.com`.
+
+    ### Added
+    - **Bot Status Webhooks Reference**: Documented `POST online` and `POST offline` outbound webhook triggers, payload schemas, Developer API tier requirements, and the 1-shared-server Discord Gateway presence requirement in `docs.xernerx.com/api/v1`.
+    - **LLM Documentation Manifest (`/llms.txt`)**: Added a structured `/llms.txt` index route and updated the sitemap for developer documentation discovery.
+
+    ### Changed
+    - **OpenGraph & Build Pipeline**: Updated dynamic OpenGraph preview generation and build preparation scripts.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.9.2
 
 ### Patch Changes

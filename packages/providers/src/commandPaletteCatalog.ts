@@ -263,6 +263,16 @@ export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey;
 		icon: Layers,
 	},
 	{
+		id: 'app-compare',
+		section: 'apps',
+		baseUrl: 'https://app.xernerx.com',
+		path: '/compare',
+		label: 'Compare Bots & Servers Studio',
+		subtitle: 'app.xernerx.com/compare • Side-by-side comparison of server counts, votes, ratings, commands & members',
+		keywords: 'compare bots servers versus vs head to head metrics stats votes ratings commands members',
+		icon: BarChart3,
+	},
+	{
 		id: 'app-overlay',
 		section: 'apps',
 		baseUrl: 'https://app.xernerx.com',

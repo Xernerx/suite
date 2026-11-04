@@ -1,12 +1,13 @@
 {
 	"name": "bot",
-	"version": "2.1.13",
+	"version": "2.2.0",
 	"description": "Xernerx Bot Discord daemon for directory, stats, and guild synchronization",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
+		"initialize": "node ../../.xernerx/cli/prepare-package.mjs --sync-only",
 		"dev": "node --watch --import tsx src/main.ts",
-		"build": "tsc",
+		"build": "node ../../.xernerx/cli/prepare-package.mjs && tsc",
 		"start": "node --import tsx src/main.ts"
 	},
 	"engines": {
@@ -24,15 +25,15 @@
 		"typescript": "^6.0.3"
 	},
 	"dependencies": {
-		"@xernerx/commands": "^0.2.7",
-		"@xernerx/framework": "^1.1.1",
+		"@xernerx/commands": "^0.2.8",
+		"@xernerx/framework": "^1.1.2",
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/stats": "^1.0.14",
-		"@xernerx/terminal": "^1.1.15",
+		"@xernerx/terminal": "^1.2.0",
 		"discord.js": "^14.27.0",
 		"mongoose": "^9.11.4",
-		"next": "^16.4.3",
+		"next": "^16.4.5",
 		"server-only": "^0.0.1",
-		"tslib": "^2.8.1"
+		"tslib": "^2.9.1"
 	}
 }

@@ -111,14 +111,16 @@ export async function POST(req: Request) {
 				},
 			];
 
-			if (body.createHeaderBanner || webhookUrl) {
+			if (body.createHeaderBanner || body.crossPostDiscord || webhookUrl) {
+				const isScheduledFuture = publishedAt.getTime() > Date.now() + 5000;
+				const defaultChannelId = body.channelId || (body.crossPostDiscord ? '941426815854055484' : '');
 				const announcementDoc = await Announcement.create({
 					id: crypto.randomUUID(),
 					title: newPost.title,
-					channelId: body.channelId || '',
+					channelId: defaultChannelId,
 					webhookUrl: webhookUrl || 'https://blog.xernerx.com',
 					message: {
-						content: newPost.subtitle || `New article published on blog.xernerx.com`,
+						content: body.discordPingContent || newPost.subtitle || `New article published on blog.xernerx.com`,
 						embeds: [embedPayload],
 						components: componentsPayload,
 					},
@@ -128,49 +130,52 @@ export async function POST(req: Request) {
 					targetApps,
 					link: articleUrl,
 					blogSlug: newPost.slug,
+					sentAt: body.crossPostDiscord ? null : isScheduledFuture ? null : new Date(),
 				});
 
 				newPost.linkedAnnouncementId = announcementDoc.id;
 				await newPost.save();
 
-				if (body.crossPostDiscord && webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
-					try {
-						const webhookRes = await fetch(`${webhookUrl}?wait=true`, {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({
-								content: body.discordPingContent || '',
-								embeds: [embedPayload],
-								components: componentsPayload,
-							}),
-						});
-						if (webhookRes.ok) {
-							const webhookData = await webhookRes.json();
-							announcementDoc.discordMessageId = webhookData.id;
-							announcementDoc.sentAt = new Date();
-							await announcementDoc.save();
+				if (!isScheduledFuture) {
+					if (body.crossPostDiscord && webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
+						try {
+							const webhookRes = await fetch(`${webhookUrl}?wait=true`, {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({
+									content: body.discordPingContent || '',
+									embeds: [embedPayload],
+									components: componentsPayload,
+								}),
+							});
+							if (webhookRes.ok) {
+								const webhookData = await webhookRes.json();
+								announcementDoc.discordMessageId = webhookData.id;
+								announcementDoc.sentAt = new Date();
+								await announcementDoc.save();
+							}
+						} catch (webhookErr) {
+							console.warn('Blog Discord cross-post webhook error:', webhookErr);
 						}
-					} catch (webhookErr) {
-						console.warn('Blog Discord cross-post webhook error:', webhookErr);
 					}
-				}
 
-				await Dispatch.create({
-					id: crypto.randomUUID(),
-					senderId: 'system',
-					targetId: 'global',
-					category: 'announcement',
-					type: 'info',
-					data: {
-						title: newPost.title,
-						message: newPost.subtitle || 'Read the latest article on blog.xernerx.com',
-						link: articleUrl,
-						startsAt: publishedAt.toISOString(),
-						expiresAt: expiresAt.toISOString(),
-						targetApps,
-					},
-					status: 'pending',
-				});
+					await Dispatch.create({
+						id: crypto.randomUUID(),
+						senderId: 'system',
+						targetId: 'global',
+						category: 'announcement',
+						type: 'info',
+						data: {
+							title: newPost.title,
+							message: newPost.subtitle || 'Read the latest article on blog.xernerx.com',
+							link: articleUrl,
+							startsAt: publishedAt.toISOString(),
+							expiresAt: expiresAt.toISOString(),
+							targetApps,
+						},
+						status: 'pending',
+					});
+				}
 			}
 		}
 

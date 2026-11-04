@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Award, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Heart, LayoutGrid, Lock, Pencil, Plus, Rocket, Trash2, Trophy, Zap } from 'lucide-react';
 import { Badge, Button, Input, Modal, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
@@ -411,13 +412,13 @@ export function ProfileShowcases({ user, userId, mutate, avatarFrame, nameplate,
 								{isUnlocked ? (
 									<Toggle checked={isActive} onChange={(e) => handleToggleBadge(b.id, e.target.checked)} />
 								) : b.source === 'achievement' ? (
-									<a href={getEnvUrl('https://account.xernerx.com/?tab=billing')} className="text-xs font-bold text-(--accent) hover:underline shrink-0">
+									<Link href={getEnvUrl('https://account.xernerx.com/?tab=billing')} className="text-xs font-bold text-(--accent) hover:underline shrink-0">
 										{t('account.profile.showcases.achievementsLink')}
-									</a>
+									</Link>
 								) : (
-									<a href={getEnvUrl('https://store.xernerx.com/?category=credits')} className="text-xs font-bold text-(--accent) hover:underline shrink-0">
+									<Link href={getEnvUrl('https://store.xernerx.com/?category=credits')} className="text-xs font-bold text-(--accent) hover:underline shrink-0">
 										{t('account.profile.showcases.unlockLink')}
-									</a>
+									</Link>
 								)}
 							</div>
 						);

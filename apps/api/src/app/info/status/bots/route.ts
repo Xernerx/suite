@@ -1,6 +1,6 @@
 /** @format */
 
-import { database } from '@xernerx/lib/server';
+import { database, dispatchBotStatusWebhooks } from '@xernerx/lib/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -215,7 +215,7 @@ export async function GET(req: NextRequest) {
 				const resolvedUpdatedAt = liveInfo ? new Date() : bot.statusUpdatedAt ? new Date(bot.statusUpdatedAt) : null;
 
 				if (liveInfo) {
-					await BotModel.updateOne(
+					const prevBot = await BotModel.findOneAndUpdate(
 						{ id: botId },
 						{
 							$set: {
@@ -225,8 +225,15 @@ export async function GET(req: NextRequest) {
 								activity: resolvedActivity,
 								statusUpdatedAt: resolvedUpdatedAt,
 							},
-						}
-					).catch(() => null);
+						},
+						{ returnDocument: 'before' }
+					)
+						.lean()
+						.catch(() => null);
+
+					if (prevBot?.status) {
+						await dispatchBotStatusWebhooks(prevBot, resolvedStatus, prevBot.status, resolvedActivity).catch(() => null);
+					}
 				}
 
 				return {

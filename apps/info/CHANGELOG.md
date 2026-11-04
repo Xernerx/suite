@@ -2,6 +2,34 @@
 
 # info
 
+## 1.11.3
+
+### Patch Changes
+
+- ## Suggestions Hub Refinements & Route Metadata Layouts
+
+    Polished the Feature Suggestions hub and added dedicated SEO metadata layouts for the Status and Changelog routes on `info.xernerx.com`.
+
+    ### Added
+    - **Status & Changelog Route Layouts**: Added dedicated route metadata layouts for `/status` and `/changelog` on `info.xernerx.com` for richer link previews.
+
+    ### Changed
+    - **Suggestions Hub KPI & Filter Bar**: Streamlined the KPI summary cards and status/sort filter controls on `info.xernerx.com/suggestions`.
+    - **FAQ & OpenGraph Updates**: Updated FAQ layout metadata and dynamic OpenGraph image generation.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.11.2
 
 ### Patch Changes

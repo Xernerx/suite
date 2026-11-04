@@ -43,6 +43,8 @@ export default function OrgWorkspaceHeader({ organization }: OrgWorkspaceHeaderP
 						alt={organization.name}
 						width={80}
 						height={80}
+						loading="eager"
+						priority
 						unoptimized
 						className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
 					/>

@@ -2,6 +2,20 @@
 
 # @xernerx/cli
 
+## 2.6.0
+
+### Minor Changes
+
+- ## Workspace Package Preparation Script & Structured Changelog Enforcement
+
+    Added `prepare-package.mjs` for standalone workspace pre-build synchronization and updated `suite commit` to enforce structured changelogs.
+
+    ### Added
+    - **Pre-Build Package Synchronizer (`prepare-package.mjs`)**: Added a standalone preparation script that syncs static branding assets and environment configuration before individual app builds.
+
+    ### Changed
+    - **Build & Lazy Proxy Orchestration**: Updated `commands/build.ts`, `utils/lazyProxy.ts`, and `.xernerx/cli/AGENTS.md` to support standalone workspace builds and structured changeset generation.
+
 ## 2.5.2
 
 ### Patch Changes

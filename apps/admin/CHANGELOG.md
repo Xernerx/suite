@@ -2,6 +2,31 @@
 
 # admin
 
+## 0.25.1
+
+### Patch Changes
+
+- ## Staff Token Modal Layout & OpenGraph Updates
+
+    Widened the staff API token creation modal in `admin.xernerx.com` to match the updated token management layout across the suite.
+
+    ### Changed
+    - **Staff Token Creation Modal**: Expanded the token creation dialog to the `2xl` modal width with full-width expiration and IP restriction controls so labels never wrap or collide.
+    - **OpenGraph Image Generation**: Updated dynamic OpenGraph preview metadata and dependency versions for `admin.xernerx.com`.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 0.25.0
 
 ### Minor Changes

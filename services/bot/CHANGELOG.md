@@ -2,6 +2,25 @@
 
 # bot
 
+## 2.2.0
+
+### Minor Changes
+
+- ## Live Bot Presence Webhook Detection & Command Updates
+
+    Added Discord Gateway `presenceUpdate` tracking for `POST online` and `POST offline` bot status webhooks and refined profile and organization commands in the Xernerx Bot daemon.
+
+    ### Added
+    - **Gateway Presence Webhook Triggering (`presenceUpdate.ts`)**: Added real-time Discord Gateway presence monitoring so bots sharing a server with the Xernerx Bot trigger `POST online` and `POST offline` webhooks immediately upon connecting or disconnecting.
+
+    ### Changed
+    - **Profile Context & Organization Slash Commands**: Refined user profile context menu embeds and `/organization` slash command responses.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.21.0
+
 ## 2.1.13
 
 ### Patch Changes

@@ -1014,14 +1014,14 @@ export async function ensureStoreSeed() {
 			{
 				id: 'dev-pro',
 				name: 'Developer Pro',
-				description: 'Advanced API rate limits and custom domains.',
+				description: 'Advanced API rate limits, unlimited bots, and real-time online/offline status webhooks.',
 				categoryId: 'developers',
 				skuId: 'prod_V0oBbO5pVQMxcC',
 				itemType: 'subscription',
 				isFeatured: false,
 				badge: 'Developer Pro',
 				discountPercent: 0,
-				features: ['Advanced API access', 'Extended rate limits', 'Unlimited Projects'],
+				features: ['Advanced API access', 'Extended rate limits', 'Unlimited Projects', 'Bot Online & Offline POST Webhooks'],
 				order: 0,
 				enabled: true,
 			},
@@ -1065,4 +1065,13 @@ export async function ensureStoreSeed() {
 			await Item.updateOne({ id: refreshId }, { $set: { name: seedItem.name, description: seedItem.description, badge: seedItem.badge, features: seedItem.features, order: seedItem.order } });
 		}
 	}
+
+	await Item.updateOne(
+		{ id: 'dev-pro' },
+		{
+			$addToSet: {
+				features: 'Bot Online & Offline POST Webhooks',
+			},
+		}
+	).catch(() => null);
 }

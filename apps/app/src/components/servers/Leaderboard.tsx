@@ -72,7 +72,7 @@ export function ServerLeaderboard({ id }: ServerLeaderboardProps) {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/leaderboard`), {
 					credentials: 'include',
 				}).catch(() => null);
-				let data = res && res.ok ? await res.json().catch(() => null) : null;
+				const data = res && res.ok ? await res.json().catch(() => null) : null;
 				let levelsList = Array.isArray(data?.levels) ? data.levels : [];
 				let textList = Array.isArray(data?.text) ? data.text : Array.isArray(data) ? data : [];
 				let voiceList = Array.isArray(data?.voice) ? data.voice : [];

@@ -57,16 +57,14 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 
 	useEffect(() => {
 		if (!isReady) return;
+		const safeJson = (url: string, fallback: any) =>
+			fetch(getEnvUrl(url))
+				.then((r) => (r.ok ? r.json() : fallback))
+				.catch(() => fallback);
 		Promise.all([
-			fetch(getEnvUrl('https://api.xernerx.com/core/faq?flat=true'))
-				.then((r) => (r.ok ? r.json() : { items: [] }))
-				.catch(() => ({ items: [] })),
-			fetch(getEnvUrl('https://api.xernerx.com/core/docs?flat=true'))
-				.then((r) => (r.ok ? r.json() : { items: [] }))
-				.catch(() => ({ items: [] })),
-			fetch(getEnvUrl('https://api.xernerx.com/secure/dispatch/applications'))
-				.then((r) => (r.ok ? r.json() : []))
-				.catch(() => []),
+			safeJson('https://api.xernerx.com/core/faq?flat=true', { items: [] }),
+			safeJson('https://api.xernerx.com/core/docs?flat=true', { items: [] }),
+			safeJson('https://api.xernerx.com/secure/dispatch/applications', []),
 		]).then(([faqRes, docsRes, appsRes]) => {
 			setFaqItems(Array.isArray(faqRes?.items) ? faqRes.items : []);
 			setDocsItems(Array.isArray(docsRes?.items) ? docsRes.items : []);
@@ -82,11 +80,12 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 			return;
 		}
 		const timer = setTimeout(() => {
+			const q = encodeURIComponent(trimmed);
 			Promise.all([
-				fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?search=${encodeURIComponent(trimmed)}&limit=5`))
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?search=${q}&limit=5`))
 					.then((r) => (r.ok ? r.json() : []))
 					.catch(() => []),
-				fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${encodeURIComponent(trimmed)}&limit=5`))
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds?search=${q}&limit=5`))
 					.then((r) => (r.ok ? r.json() : []))
 					.catch(() => []),
 			]).then(([botsRes, guildsRes]) => {
@@ -195,6 +194,16 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 				external: true,
 			},
 			{
+				id: 'page-compare',
+				category: 'pages',
+				title: 'Compare Bots & Servers Studio',
+				description: 'Compare up to 4 Discord bots or community servers side-by-side across stats, features, and verification.',
+				subLabel: 'app.xernerx.com/compare',
+				keywords: 'compare vs comparison side by side bots servers stats metrics',
+				href: getEnvUrl('https://app.xernerx.com/compare'),
+				external: true,
+			},
+			{
 				id: 'page-portal',
 				category: 'pages',
 				title: 'Developer Portal & Organizations',
@@ -238,48 +247,23 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 			},
 		];
 
-		const officialBots: WwwSearchResult[] = [
-			{
-				id: 'bot-virtue',
-				category: 'bots',
-				title: t('www.applications.virtue.title'),
-				description: t('www.applications.virtue.desc'),
-				subLabel: t('www.tags.discordBot'),
-				keywords: 'virtue leveling xp voice progression roles leaderboard discord bot',
-				href: getEnvUrl('https://app.xernerx.com/bots/virtue'),
-				external: true,
-			},
-			{
-				id: 'bot-todo',
-				category: 'bots',
-				title: t('www.applications.todo.title'),
-				description: t('www.applications.todo.desc'),
-				subLabel: t('www.tags.discordBot'),
-				keywords: 'todo list bot tasks boards productivity discord',
-				href: getEnvUrl('https://app.xernerx.com/bots/todo'),
-				external: true,
-			},
-			{
-				id: 'bot-zodiac',
-				category: 'bots',
-				title: t('www.applications.zodiac.title'),
-				description: t('www.applications.zodiac.desc'),
-				subLabel: t('www.tags.discordBot'),
-				keywords: 'zodiac astrology horoscopes discord bot',
-				href: getEnvUrl('https://app.xernerx.com/bots/zodiac'),
-				external: true,
-			},
-			{
-				id: 'bot-metamorphosis',
-				category: 'bots',
-				title: t('www.applications.metamorphosis.title'),
-				description: t('www.applications.metamorphosis.desc'),
-				subLabel: t('www.tags.discordBot'),
-				keywords: 'metamorphosis logging moderation discord bot',
-				href: getEnvUrl('https://app.xernerx.com/bots/metamorphosis'),
-				external: true,
-			},
-		];
+		const officialBots: WwwSearchResult[] = (
+			[
+				['virtue', 'virtue leveling xp voice progression roles leaderboard discord bot'],
+				['todo', 'todo list bot tasks boards productivity discord'],
+				['zodiac', 'zodiac astrology horoscopes discord bot'],
+				['metamorphosis', 'metamorphosis logging moderation discord bot'],
+			] as const
+		).map(([slug, keywords]) => ({
+			id: `bot-${slug}`,
+			category: 'bots',
+			title: t(`www.applications.${slug}.title`),
+			description: t(`www.applications.${slug}.desc`),
+			subLabel: t('www.tags.discordBot'),
+			keywords,
+			href: getEnvUrl(`https://app.xernerx.com/bots/${slug}`),
+			external: true,
+		}));
 
 		const dynamicBotResults: WwwSearchResult[] = liveBots.map((b: any) => ({
 			id: `live-bot-${b.id}`,
@@ -388,36 +372,29 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 	};
 
 	const categoryBadge = (category: WwwSearchCategory) => {
-		switch (category) {
-			case 'pages':
-				return { label: t('www.hero.search.categories.pages'), icon: <Compass className="w-3.5 h-3.5 text-(--accent)" />, cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20' };
-			case 'bots':
-				return { label: t('www.hero.search.categories.bots'), icon: <Bot className="w-3.5 h-3.5 text-(--accent)" />, cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20' };
-			case 'docs':
-				return { label: t('www.hero.search.categories.docs'), icon: <Boxes className="w-3.5 h-3.5 text-(--accent)" />, cls: 'bg-(--accent)/10 text-(--accent) border-(--accent)/20' };
-			case 'faq':
-				return {
-					label: t('www.hero.search.categories.faq'),
-					icon: <LifeBuoy className="w-3.5 h-3.5 text-(--accent-green)" />,
-					cls: 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20',
-				};
-			case 'careers':
-				return {
-					label: t('www.hero.search.categories.careers'),
-					icon: <Briefcase className="w-3.5 h-3.5 text-(--accent-orange)" />,
-					cls: 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20',
-				};
-		}
+		const accentCls = 'bg-(--accent)/10 text-(--accent) border-(--accent)/20';
+		const map = {
+			pages: { label: t('www.hero.search.categories.pages'), icon: <Compass className="w-3.5 h-3.5 text-(--accent)" />, cls: accentCls },
+			bots: { label: t('www.hero.search.categories.bots'), icon: <Bot className="w-3.5 h-3.5 text-(--accent)" />, cls: accentCls },
+			docs: { label: t('www.hero.search.categories.docs'), icon: <Boxes className="w-3.5 h-3.5 text-(--accent)" />, cls: accentCls },
+			faq: {
+				label: t('www.hero.search.categories.faq'),
+				icon: <LifeBuoy className="w-3.5 h-3.5 text-(--accent-green)" />,
+				cls: 'bg-(--accent-green)/10 text-(--accent-green) border-(--accent-green)/20',
+			},
+			careers: {
+				label: t('www.hero.search.categories.careers'),
+				icon: <Briefcase className="w-3.5 h-3.5 text-(--accent-orange)" />,
+				cls: 'bg-(--accent-orange)/10 text-(--accent-orange) border-(--accent-orange)/20',
+			},
+		};
+		return map[category];
 	};
 
-	const pills: Array<{ key: 'all' | WwwSearchCategory; label: string }> = [
-		{ key: 'all', label: t('www.hero.search.categories.all') },
-		{ key: 'pages', label: t('www.hero.search.categories.pages') },
-		{ key: 'bots', label: t('www.hero.search.categories.bots') },
-		{ key: 'docs', label: t('www.hero.search.categories.docs') },
-		{ key: 'faq', label: t('www.hero.search.categories.faq') },
-		{ key: 'careers', label: t('www.hero.search.categories.careers') },
-	];
+	const pills: Array<{ key: 'all' | WwwSearchCategory; label: string }> = (['all', 'pages', 'bots', 'docs', 'faq', 'careers'] as const).map((key) => ({
+		key,
+		label: t(`www.hero.search.categories.${key}`),
+	}));
 
 	return (
 		<div ref={containerRef} className="relative w-full max-w-2xl mx-auto mt-6 text-left z-30">

@@ -8,7 +8,6 @@ import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, useEnvironment, useNotificati
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-
 import BannerCanary from '../../public/banner-canary.svg';
 import BannerDev from '../../public/banner-dev.svg';
 import BannerPublic from '../../public/banner.svg';
@@ -18,9 +17,7 @@ import SidebarNotifications, { getReadyCooldownReminders } from './cards/Sidebar
 import SidebarUserCard from './cards/SidebarUser';
 import { HeaderOmnibar, SubSelector } from './HeaderOmnibar';
 import { HeaderWindowControls, useWindowControlsStyle } from './HeaderWindowControls';
-
 export { SubSelector };
-
 const deviceIcons = { desktop: Monitor, mobile: Smartphone, tablet: Tablet } as const;
 
 export function Header() {
@@ -137,8 +134,11 @@ export function Header() {
 				[Boolean(pathname?.startsWith('/dashboard')), 'Server Dashboard'],
 				[Boolean(pathname?.startsWith('/overlay')), 'Live Overlay Monitor'],
 			];
+			const isHosting = port === '4010' || host.startsWith('hosting.');
+			const isAdmin = port === '4006' || host.startsWith('admin.');
 			const appLabel = activityMap.find(([cond]) => cond)?.[1] || 'Xernerx App';
-			electronBridge.setActivity({ details: appLabel, state: view ? `Viewing ${view}` : 'Exploring Xernerx Suite' });
+			const stateLabel = isHosting ? 'Managing Infrastructure' : isAdmin ? 'Staff Workspace' : view ? `Viewing ${view.replace(/[-_]+/g, ' ')}` : 'Exploring Xernerx Suite';
+			electronBridge.setActivity({ details: appLabel, state: stateLabel });
 		}
 	}, [pathname, view]);
 
@@ -195,23 +195,10 @@ export function Header() {
 		const isLocalHost = host === 'localhost' || host === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
 		const env = host.includes('.dev.') || isLocalHost ? 'dev' : host.includes('.canary.') ? 'canary' : 'public';
 		let pre = 'app';
-		const portMap: Record<string, string> = {
-			'4000': 'www',
-			'4001': 'api',
-			'4002': 'cdn',
-			'4003': 'account',
-			'4004': 'app',
-			'4005': 'docs',
-			'4006': 'admin',
-			'4007': 'info',
-			'4008': 'store',
-			'4009': 'portal',
-			'4010': 'hosting',
-			'4011': 'haste',
-			'4012': 'blog',
-		};
-		if (isLocalHost && portMap[port]) pre = portMap[port];
-		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting', 'haste', 'blog'].forEach((p) => host.startsWith(`${p}.`) && (pre = p));
+		const pairs = '4000:www,4001:api,4002:cdn,4003:account,4004:app,4005:docs,4006:admin,4007:info,4008:store,4009:portal,4010:hosting,4011:haste,4012:blog'.split(',').map((s) => s.split(':'));
+		const matchedPort = pairs.find(([p]) => p === port)?.[1];
+		if (isLocalHost && matchedPort) pre = matchedPort;
+		else pairs.forEach(([, p]) => host.startsWith(`${p}.`) && (pre = p));
 
 		const params = new URLSearchParams(window.location.search);
 		if (state !== 'hidden' && view && !params.has('view')) params.set('view', view);
@@ -221,18 +208,17 @@ export function Header() {
 
 	const urlState = getInitialUrlState();
 
-	const headerIconBtnClass =
-		effectiveControls === 'xernerx'
-			? 'h-8 w-8 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer'
-			: effectiveControls === 'squircle'
-				? 'h-8 w-8 rounded-xl bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer'
-				: effectiveControls === 'capsule'
-					? 'h-7 w-7 rounded-full flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:text-(--accent) transition-all cursor-pointer'
-					: effectiveControls === 'minimal'
-						? 'h-8 w-8 rounded-full bg-(--accent)/8 hover:bg-(--accent)/20 border border-(--accent)/20 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer'
-						: effectiveControls === 'macos'
-							? 'h-8 w-8 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer'
-							: 'flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors';
+	const btnClassMap: Record<string, string> = {
+		xernerx:
+			'h-8 w-8 rounded-full bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer',
+		squircle:
+			'h-8 w-8 rounded-xl bg-(--foreground)/50 border border-(--border)/15 flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--accent) transition-all cursor-pointer',
+		capsule: 'h-7 w-7 rounded-full flex items-center justify-center text-(--text-muted) hover:bg-(--accent)/20 hover:text-(--accent) transition-all cursor-pointer',
+		minimal:
+			'h-8 w-8 rounded-full bg-(--accent)/8 hover:bg-(--accent)/20 border border-(--accent)/20 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer',
+		macos: 'h-8 w-8 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 flex items-center justify-center text-(--text-muted) hover:text-(--accent) transition-all cursor-pointer',
+	};
+	const headerIconBtnClass = btnClassMap[effectiveControls] || 'flex items-center text-(--text) cursor-pointer hover:text-(--accent) transition-colors';
 
 	return (
 		<div className="relative flex flex-col w-full z-[9999] shrink-0 bg-(--background)" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
@@ -484,15 +470,7 @@ export function Header() {
 						type="button"
 						aria-label={t('components.header.title1')}
 						title={t('components.header.title1')}
-						onClick={() =>
-							setOptionsOpen((prev) => {
-								if (prev) {
-									setNotificationsOpen(false);
-									setUserMenuOpen(false);
-								}
-								return !prev;
-							})
-						}
+						onClick={() => setOptionsOpen((prev) => (prev && (setNotificationsOpen(false), setUserMenuOpen(false)), !prev))}
 						className={`relative md:hidden ${headerIconBtnClass}`}
 					>
 						<ChevronLeft

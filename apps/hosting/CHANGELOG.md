@@ -2,6 +2,31 @@
 
 # Changelog
 
+## 1.3.4
+
+### Patch Changes
+
+- ## Infrastructure Console OpenGraph & Build Updates
+
+    Updated OpenGraph social preview generation and package build scripts for `hosting.xernerx.com`.
+
+    ### Changed
+    - **OpenGraph Preview & Dependencies**: Updated dynamic OpenGraph card rendering and core Next.js/Tailwind v4 dependencies on `hosting.xernerx.com`.
+    - **Pre-Build Preparation**: Synced package initialization scripts with the workspace preparation pipeline.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.3.3
 
 ### Patch Changes

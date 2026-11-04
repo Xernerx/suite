@@ -5242,7 +5242,7 @@
 			"title": "Store, Billing, Credits & CDN",
 			"card1": {
 				"title": "What plans, passes, and promo codes are available on the Xernerx Store?",
-				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories—or apply promotional coupon codes (including via ?promo=CODE or ?code=CODE links): (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do List Bot, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and individual Zodiac, Virtue, To-Do List Bot, and Metamorphosis passes; (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects); and (3) Servers (?category=servers) for dedicated guild infrastructure."
+				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories—or apply promotional coupon codes (including via ?promo=CODE or ?code=CODE links): (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do List Bot, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and individual Zodiac, Virtue, To-Do List Bot, and Metamorphosis passes; (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects, and real-time POST online / POST offline bot status webhooks); and (3) Servers (?category=servers) for dedicated guild infrastructure."
 			},
 			"card2": {
 				"title": "How do I manage or cancel subscriptions, and how does the Supporters showcase work?",
@@ -5286,7 +5286,7 @@
 			},
 			"card4": {
 				"title": "How do Outbound Bot Webhooks work, and is the WebSocket Gateway public?",
-				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (portal.xernerx.com/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 9 event triggers (votes, stats, reviews, and releases), complete with per-webhook HMAC-SHA256 Signing Secrets (whsec_...), a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
+				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (portal.xernerx.com/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 12 event triggers (votes, tips, stats, reviews, releases, plus API-tier POST online and POST offline status transition webhooks—which require an active Developer API subscription and sharing at least 1 Discord server with the Xernerx Bot), complete with per-webhook HMAC-SHA256 Signing Secrets (whsec_...), a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
 			},
 			"card5": {
 				"title": "What features are exclusive to the Xernerx Desktop App?",
@@ -6348,7 +6348,15 @@
 					"copySecret": "Copy Secret",
 					"secretGenerated": "Generated new webhook signing secret (save changes to apply)",
 					"secretCopied": "Signing secret copied to clipboard",
-					"secretHint": "Used to sign outgoing webhook payloads in the X-Xernerx-Signature (sha256) header."
+					"secretHint": "Used to sign outgoing webhook payloads in the X-Xernerx-Signature (sha256) header.",
+					"apiTierBadge": "API Tier",
+					"apiTierRequiredToast": "POST online and POST offline webhooks require an active Developer API (Developer Pro or Ultra) subscription.",
+					"apiTierCalloutTitle": "Real-Time Bot Online & Offline Webhooks (API Tier)",
+					"apiTierCalloutDesc": "Subscribe to the Developer API tier (Developer Pro or Ultra) and ensure your bot shares at least 1 Discord server with the Xernerx Bot to receive instant HMAC-signed POST online and POST offline webhook notifications whenever your bot connects or disconnects.",
+					"apiTierUpgradeBtn": "Upgrade to API Tier",
+					"sharedServerTitle": "Shared Server Requirement (POST online & POST offline)",
+					"sharedServerDesc": "To receive real-time POST online and POST offline status webhooks, your bot must share at least 1 Discord server with the Xernerx Bot so live Discord Gateway presence transitions can be observed.",
+					"inviteXernerxBotBtn": "Invite Xernerx Bot"
 				},
 				"growth": {
 					"metrics": {
@@ -6809,6 +6817,37 @@
 			"viewMyProfile": "My Profile",
 			"claimDailyGift": "Daily Gift"
 		},
+		"compare": {
+			"title": "Compare Bots & Servers",
+			"subtitle": "Compare scale, community votes, ratings, commands, and features side-by-side.",
+			"backToExplore": "Back to Explore",
+			"compareBots": "Compare Bots",
+			"compareServers": "Compare Servers",
+			"selectFirst": "Select first {type}...",
+			"selectSecond": "Select second {type}...",
+			"swapButton": "Swap Sides",
+			"shareComparison": "Copy Comparison Link",
+			"linkCopied": "Comparison Link Copied",
+			"viewProfile": "View Full Page",
+			"verified": "Verified",
+			"unverified": "Unverified",
+			"winnerBadge": "Higher",
+			"metricsHeader": "Head-to-Head Metrics",
+			"serversCount": "Active Servers",
+			"usersCount": "Total Users",
+			"shardsCount": "Gateway Shards",
+			"votesCount": "Community Votes",
+			"ratingLabel": "Average Rating",
+			"commandsCount": "Slash Commands",
+			"membersCount": "Server Members",
+			"botsInServer": "Bots in Server",
+			"boostsCount": "Server Boosts",
+			"messagesCount": "Tracked Messages",
+			"statusLabel": "Live Status",
+			"tagsLabel": "Directory Tags",
+			"noTags": "No tags listed",
+			"emptyPrompt": "Select two entries above to compare their live metrics side-by-side."
+		},
 		"overlay": {
 			"title": "Xernerx Live Monitor",
 			"subtitle": "Always-on-Top Companion",
@@ -7258,9 +7297,11 @@
 					},
 					"botWebhooksRelay": {
 						"title": "Bot Webhooks & Desktop Localhost Relay",
-						"description": "Receive real-time HTTP POST webhook dispatches when users vote, review, update stats, or publish a new release on your bot — with built-in localhost relay support in the Xernerx Desktop App.",
+						"description": "Receive real-time HTTP POST webhook dispatches when users vote, tip, review, update stats, publish a new release, or when your bot transitions online or offline (API Tier; requires sharing at least 1 Discord server with the Xernerx Bot) — with built-in localhost relay support in the Xernerx Desktop App.",
 						"localRelayTitle": "Testing on localhost / 127.0.0.1 (Zero Ngrok Required)",
 						"localRelayDesc": "When configuring webhooks in portal.xernerx.com/bots/[id] inside the Xernerx Desktop App, setting your Webhook URL to http://localhost:3000/... or http://127.0.0.1:... displays a Local Relay Ready badge. Clicking Test Ping dispatches the exact signed JSON payload and X-Xernerx-* headers directly from your local machine via Electron's main process.",
+						"statusWebhooksTitle": "Real-Time POST online & POST offline Status Webhooks (API Tier + 1 Shared Server)",
+						"statusWebhooksDesc": "Developer API subscribers (Developer Pro or Ultra) can subscribe to POST online and POST offline triggers. Your bot must share at least 1 Discord server with the Xernerx Bot so live Discord Gateway presence transitions between online/idle/dnd and offline can be detected and dispatched.",
 						"headersAndEvents": "Webhook Headers & Event Triggers"
 					},
 					"postBotReleases": {

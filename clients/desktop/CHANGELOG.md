@@ -2,6 +2,20 @@
 
 # @xernerx/desktop
 
+## 2.6.0
+
+### Minor Changes
+
+- ## Localhost Webhook Relay & Companion Overlay Enhancements
+
+    Added localhost webhook relay support and refined Discord Rich Presence and live overlay window controls in the Xernerx Desktop App.
+
+    ### Added
+    - **Localhost Webhook Relay (`relayLocalWebhook`)**: Added an Electron main-process HTTP relay allowing bot developers to test signed `X-Xernerx-*` webhook payloads directly against `http://localhost` and `http://127.0.0.1` endpoints without external tunnels.
+
+    ### Changed
+    - **Live Overlay & Rich Presence Updates**: Refined companion overlay window management, loading splash screen styling, and Discord Rich Presence activity reporting.
+
 ## 2.5.1
 
 ### Patch Changes

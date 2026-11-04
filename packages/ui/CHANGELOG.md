@@ -2,6 +2,20 @@
 
 # @xernerx/ui
 
+## 0.8.1
+
+### Patch Changes
+
+- ## Shared UI Primitive Dependency Updates
+
+    Updated `next`, `lucide-react`, and `tailwindcss` dependencies in `@xernerx/ui`.
+
+    ### Changed
+    - **Primitive UI Dependencies**: Upgraded `lucide-react`, `next`, and `tailwindcss` package versions in `@xernerx/ui`.
+
+- Updated dependencies
+    - @xernerx/providers@0.22.0
+
 ## 0.8.0
 
 ### Minor Changes

@@ -13,6 +13,7 @@ const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
 		{ path: '/bots', label: 'Bot Directory' },
 		{ path: '/servers', label: 'Server Directory' },
 		{ path: '/leaderboard', label: 'Global Leaderboards' },
+		{ path: '/compare', label: 'Compare Bots & Servers' },
 		{ path: '/dashboard', label: 'Server & Bot Dashboard' },
 		{ path: '/overlay', label: 'Live Companion Overlay' },
 	],
@@ -72,19 +73,14 @@ export function SubSelector({ name, options, defaultValue, onSelectOption }: { n
 	const [value, setValue] = useState(defaultValue);
 	const ref = useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		setValue(defaultValue);
-	}, [defaultValue]);
+	useEffect(() => setValue(defaultValue), [defaultValue]);
 
 	useEffect(() => {
+		if (!isOpen) return;
 		const handleClickOutside = (e: MouseEvent) => {
-			if (ref.current && !ref.current.contains(e.target as Node)) {
-				setIsOpen(false);
-			}
+			if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
 		};
-		if (isOpen) {
-			window.addEventListener('click', handleClickOutside);
-		}
+		window.addEventListener('click', handleClickOutside);
 		return () => window.removeEventListener('click', handleClickOutside);
 	}, [isOpen]);
 
@@ -156,14 +152,11 @@ export function HeaderOmnibar({ isOpen, onClose, urlState, resolveOmnibarUrl, ha
 	}, [urlState.pre, urlState.env, urlState.path, isOpen]);
 
 	useEffect(() => {
+		if (!dropdownOpen) return;
 		const handleClickOutside = (e: MouseEvent) => {
-			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-				setDropdownOpen(false);
-			}
+			if (containerRef.current && !containerRef.current.contains(e.target as Node)) setDropdownOpen(false);
 		};
-		if (dropdownOpen) {
-			window.addEventListener('mousedown', handleClickOutside);
-		}
+		window.addEventListener('mousedown', handleClickOutside);
 		return () => window.removeEventListener('mousedown', handleClickOutside);
 	}, [dropdownOpen]);
 

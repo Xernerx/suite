@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { Loader2, Shield } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
@@ -92,6 +92,8 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 				if (!open) onClose();
 			}}
 			title={t('account.tokens.create.modalTitle')}
+			size="2xl"
+			maxWidth="max-w-2xl"
 		>
 			<form
 				onSubmit={handleSubmit}
@@ -147,7 +149,10 @@ export default function CreateTokenModal({ isOpen, onClose, onSuccess, userId }:
 						gap: 'calc(var(--ui-gap) * 0.5)',
 					}}
 				>
-					<label className="text-sm font-medium text-(--text)">{t('account.tokens.allowedIps.label')}</label>
+					<label className="text-sm font-medium text-(--text) inline-flex items-center gap-1.5">
+						<Shield size={14} className="text-(--accent) shrink-0" />
+						<span>{t('account.tokens.allowedIps.label')}</span>
+					</label>
 					<Input type="text" value={allowedIpsInput} onChange={(e) => setAllowedIpsInput(e.target.value)} placeholder={t('account.tokens.allowedIps.placeholder')} />
 					<span className="text-[11px] text-(--text-muted)">{t('account.tokens.allowedIps.hint')}</span>
 				</div>

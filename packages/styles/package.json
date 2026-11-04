@@ -1,17 +1,17 @@
 {
 	"name": "@xernerx/styles",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"private": true,
 	"exports": {
 		".": "./index.ts",
 		"./globals.css": "./globals.css"
 	},
 	"devDependencies": {
-		"@tailwindcss/postcss": "^4.3.3",
-		"tailwindcss": "^4.3.3"
+		"@tailwindcss/postcss": "^4.3.4",
+		"tailwindcss": "^4.3.4"
 	},
 	"dependencies": {
 		"@tailwindcss/typography": "^0.5.20",
-		"next": "^16.4.3"
+		"next": "^16.4.5"
 	}
 }

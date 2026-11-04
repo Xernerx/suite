@@ -37,6 +37,7 @@ export default function PortalBotPage() {
 	const [botConfig, setBotConfig] = useState<any>(null);
 	const [originalBotConfig, setOriginalBotConfig] = useState<any>(null);
 	const [webhookDeliveries, setWebhookDeliveries] = useState<any[]>([]);
+	const [hasApiTier, setHasApiTier] = useState(false);
 	const [organizations, setOrganizations] = useState<any[]>([]);
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [configLoading, setConfigLoading] = useState(true);
@@ -95,10 +96,14 @@ export default function PortalBotPage() {
 						...(h.id ? { id: h.id } : {}),
 						botId: h.botId || botId,
 						url: h.url,
+						...(h.secret ? { secret: h.secret } : {}),
 						events: h.events || [],
 					}));
 					const deliveriesData = Array.isArray(hooksRaw?.deliveries) ? hooksRaw.deliveries : (Array.isArray(hooksRaw) ? hooksRaw : []).flatMap((h: any) => h.deliveries || []);
 					setWebhookDeliveries(deliveriesData);
+					if (typeof hooksRaw?.hasApiTier === 'boolean') {
+						setHasApiTier(hooksRaw.hasApiTier);
+					}
 
 					if (tagsRes.ok) {
 						setAvailableTags(await tagsRes.json());
@@ -186,6 +191,7 @@ export default function PortalBotPage() {
 											alt={b.name}
 											width={20}
 											height={20}
+											loading="eager"
 											unoptimized
 											className="w-5 h-5 rounded-xl object-cover"
 										/>
@@ -339,6 +345,8 @@ export default function PortalBotPage() {
 								alt={botConfig.name}
 								width={80}
 								height={80}
+								loading="eager"
+								priority
 								unoptimized
 								className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
 							/>
@@ -410,7 +418,9 @@ export default function PortalBotPage() {
 
 					{activeTab === 'links' && <LinksTab botConfig={botConfig} setBotConfig={setBotConfig} />}
 
-					{activeTab === 'webhooks' && <WebhooksTab botConfig={botConfig} setBotConfig={setBotConfig} deliveries={webhookDeliveries} onDeliveriesChange={setWebhookDeliveries} />}
+					{activeTab === 'webhooks' && (
+						<WebhooksTab botConfig={botConfig} setBotConfig={setBotConfig} deliveries={webhookDeliveries} onDeliveriesChange={setWebhookDeliveries} hasApiTier={hasApiTier} />
+					)}
 
 					{activeTab === 'settings' && <SettingsTab botConfig={botConfig} setBotConfig={setBotConfig} organizations={organizations} onDeleteClick={() => setIsConfirmDeleteOpen(true)} />}
 				</div>

@@ -393,7 +393,7 @@ export async function buildUserMetadata(id: string): Promise<Metadata> {
 		const OrganizationModel = (db.models.organizations as any).Organization;
 
 		const user = await UserModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
-		if (user?.privacy === 'private') {
+		if (user?.privacy === 'private' || user?.blacklisted) {
 			return buildFallbackMetadata(
 				'User Profile & Community Activity',
 				'This user profile is private or does not exist on the Xernerx Studios platform. Explore public Discord bots, servers, and creators.',
@@ -639,5 +639,123 @@ export async function buildServerMetadata(id: string): Promise<Metadata> {
 			canonicalPath,
 			appBase
 		);
+	}
+}
+
+export interface EntitySeoSummary {
+	name: string;
+	description: string;
+	info: string;
+	tags: string[];
+	canonicalUrl: string;
+	jsonLd: Record<string, any>;
+}
+
+export async function getServerSeoData(id: string): Promise<EntitySeoSummary | null> {
+	const { appBase } = await resolveEnvUrls();
+	try {
+		const db = await database('xernerx');
+		const GuildModel = (db.models.guilds as any).Guild;
+		const guild = await GuildModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		if (!guild || guild.privacy === 'private') return null;
+
+		const name = String(guild.name || 'Discord Server');
+		const description = String(guild.description || `Join the ${name} Discord community on Xernerx Studios.`);
+		const info = String(guild.info || description);
+		const tags: string[] = Array.isArray(guild.tags) ? guild.tags.map(String) : [];
+		const canonicalUrl = `${appBase}/servers/${encodeURIComponent(String(guild.vanitySlug || guild.id))}`;
+
+		return {
+			name,
+			description,
+			info,
+			tags,
+			canonicalUrl,
+			jsonLd: {
+				'@context': 'https://schema.org',
+				'@type': 'Organization',
+				'@id': `${canonicalUrl}#server`,
+				name,
+				description,
+				url: canonicalUrl,
+			},
+		};
+	} catch {
+		return null;
+	}
+}
+
+export async function getUserSeoData(id: string): Promise<EntitySeoSummary | null> {
+	const { appBase } = await resolveEnvUrls();
+	try {
+		const db = await database('xernerx');
+		const UserModel = (db.models.users as any).User;
+		const user = await UserModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
+		if (!user || user.privacy === 'private' || user.blacklisted) return null;
+
+		const resolvedId = String(user.id || id);
+		const discordUser = await fetchDiscordUser(resolvedId);
+		const name = String(user.name || discordUser?.global_name || discordUser?.username || 'Xernerx User');
+		const description = String(user.description || `Explore ${name}'s profile, published Discord bots, and communities on Xernerx Studios.`);
+		const info = String(user.info || description);
+		const canonicalUrl = `${appBase}/users/${encodeURIComponent(String(user.vanitySlug || resolvedId))}`;
+
+		return {
+			name,
+			description,
+			info,
+			tags: [],
+			canonicalUrl,
+			jsonLd: {
+				'@context': 'https://schema.org',
+				'@type': 'ProfilePage',
+				'@id': `${canonicalUrl}#profile`,
+				url: canonicalUrl,
+				mainEntity: {
+					'@type': 'Person',
+					name,
+					description,
+					url: canonicalUrl,
+				},
+			},
+		};
+	} catch {
+		return null;
+	}
+}
+
+export async function getOrganizationSeoData(id: string): Promise<EntitySeoSummary | null> {
+	const { appBase } = await resolveEnvUrls();
+	try {
+		const db = await database('xernerx');
+		const OrganizationModel = (db.models.organizations as any).Organization;
+		const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+		const query = isObjectId ? { $or: [{ _id: id }, { vanitySlug: id.toLowerCase() }] } : { vanitySlug: id.toLowerCase() };
+		const org = await OrganizationModel.findOne(query).lean();
+		const privacy = org?.config?.privacy || org?.privacy;
+		if (!org || privacy === 'private') return null;
+
+		const name = String(org.name || 'Organization');
+		const description = String(org.description || `Explore ${name}'s published Discord bots and communities on Xernerx Studios.`);
+		const info = String(org.info || description);
+		const canonicalUrl = `${appBase}/organization/${encodeURIComponent(String(org.vanitySlug || org._id))}`;
+
+		return {
+			name,
+			description,
+			info,
+			tags: [],
+			canonicalUrl,
+			jsonLd: {
+				'@context': 'https://schema.org',
+				'@type': 'Organization',
+				'@id': `${canonicalUrl}#organization`,
+				name,
+				description,
+				url: canonicalUrl,
+			},
+		};
+	} catch {
+		return null;
 	}
 }

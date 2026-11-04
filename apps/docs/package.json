@@ -1,11 +1,11 @@
 {
 	"name": "docs",
-	"version": "1.9.2",
+	"version": "1.10.0",
 	"private": true,
 	"scripts": {
-		"initialize": "suite initialize",
+		"initialize": "node ../../.xernerx/cli/prepare-package.mjs --sync-only",
 		"dev": "next dev -p 4005",
-		"build": "next build",
+		"build": "node ../../.xernerx/cli/prepare-package.mjs && next build",
 		"start": "next start",
 		"lint": "eslint"
 	},
@@ -16,26 +16,26 @@
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/styles": "workspace:*",
-		"@xernerx/terminal": "^1.1.15",
+		"@xernerx/terminal": "^1.2.0",
 		"@xernerx/ui": "workspace:*",
 		"framer-motion": "^14.9.0",
-		"lucide-react": "^1.65.0",
-		"next": "^16.4.3",
+		"lucide-react": "^1.67.0",
+		"next": "^16.4.5",
 		"next-auth": "^4.24.15",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
 		"react-syntax-highlighter": "^16.1.2"
 	},
 	"devDependencies": {
-		"@tailwindcss/postcss": "^4.3.3",
+		"@tailwindcss/postcss": "^4.3.4",
 		"@types/node": "^26.6.6",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"@types/react-syntax-highlighter": "^15.5.13",
 		"babel-plugin-react-compiler": "1.0.0",
-		"eslint": "^10.13.0",
-		"eslint-config-next": "^16.4.3",
-		"tailwindcss": "^4.3.3",
+		"eslint": "^10.14.0",
+		"eslint-config-next": "^16.4.5",
+		"tailwindcss": "^4.3.4",
 		"typescript": "^6.0.3"
 	}
 }

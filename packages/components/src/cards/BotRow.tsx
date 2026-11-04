@@ -89,7 +89,7 @@ export function BotRow({ bot, hrefPrefix = '/bots' }: { bot: BotProfile; hrefPre
 					{loading ? (
 						<Loading variant="small" />
 					) : avatar ? (
-						<Image src={avatar} alt={name} width={48} height={48} className="w-full h-full object-cover" unoptimized />
+						<Image src={avatar} alt={name} width={48} height={48} loading="eager" className="w-full h-full object-cover" unoptimized />
 					) : (
 						<Bot className="w-5 h-5 text-(--text-muted)" />
 					)}

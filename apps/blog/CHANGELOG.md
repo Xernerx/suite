@@ -2,6 +2,33 @@
 
 # blog
 
+## 1.1.1
+
+### Patch Changes
+
+- ## Article Reader Navigation & OpenGraph Enhancements
+
+    Refined the article reader layout and OpenGraph social card rendering on `blog.xernerx.com`.
+
+    ### Added
+    - **ESLint Workspace Configuration**: Added a dedicated `eslint.config.mjs` configuration for the `blog` workspace.
+
+    ### Changed
+    - **Article Page & OpenGraph Rendering**: Updated article reader layout spacing, table-of-contents quick links, and dynamic OpenGraph image generation on `blog.xernerx.com/[slug]`.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.1.0
 
 ### Minor Changes

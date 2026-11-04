@@ -2,6 +2,7 @@
 'use client';
 
 import { motion, useScroll, useSpring } from 'framer-motion';
+import Link from 'next/link';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import { PageFaqSection } from '@/components/PageFaqSection';
@@ -89,13 +90,13 @@ export default function Page() {
 			content: (
 				<p>
 					{t('www.terms.sections.data.contentPrefix')}
-					<a href="/privacy" target="_blank" rel="noreferrer" className="text-(--accent) hover:underline font-medium">
+					<Link href="/privacy" className="text-(--accent) hover:underline font-medium">
 						{t('www.terms.sections.data.contentLink')}
-					</a>
+					</Link>
 					{t('www.terms.sections.data.contentMiddle')}
-					<a href="/cookies" target="_blank" rel="noreferrer" className="text-(--accent) hover:underline font-medium">
+					<Link href="/cookies" className="text-(--accent) hover:underline font-medium">
 						{t('www.terms.sections.data.cookiesLink')}
-					</a>
+					</Link>
 					{t('www.terms.sections.data.contentSuffix')}
 				</p>
 			),

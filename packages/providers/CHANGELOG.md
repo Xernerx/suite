@@ -2,6 +2,25 @@
 
 # @xernerx/providers
 
+## 0.22.0
+
+### Minor Changes
+
+- ## Command Palette Compare Studio Registration
+
+    Registered the `app.xernerx.com/compare` studio in the global `Ctrl + K` Command Palette catalog.
+
+    ### Added
+    - **Compare Bots & Servers Command Palette Entry**: Added `app-compare` (`https://app.xernerx.com/compare`) to `SUITE_DEEP_PORTALS` in `commandPaletteCatalog.ts` so `Ctrl + K` surfaces side-by-side bot and server comparisons across every subdomain.
+
+    ### Changed
+    - **Provider Package Dependencies**: Updated `next`, `lucide-react`, and `tailwindcss` dependencies in `@xernerx/providers`.
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.21.0
+
 ## 0.21.0
 
 ### Minor Changes

@@ -2,6 +2,36 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.5.0
+
+### Minor Changes
+
+- ## Real-Time Bot Online & Offline Webhooks in Developer Portal
+
+    Added `POST online` and `POST offline` webhook triggers, API-tier upgrade callouts, and shared-server guidance to the Bot Webhooks studio on `portal.xernerx.com`.
+
+    ### Added
+    - **`POST online` & `POST offline` Webhook Triggers**: Added real-time bot online and offline status transition triggers to the Outbound Webhooks configuration studio on `portal.xernerx.com/bots/[id]` for Developer API (`Developer Pro` and `Ultra`) subscribers.
+    - **Shared Server & API Tier Guidance Callouts**: Added clear callouts explaining the Developer API tier requirement and the 1-shared-server requirement with the Xernerx Bot for live Discord Gateway presence detection.
+
+    ### Changed
+    - **Workspace Headers & Bot Studio Navigation**: Polished personal and organization workspace headers and bot studio tab layouts.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.4.1
 
 ### Patch Changes

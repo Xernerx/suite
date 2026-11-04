@@ -2,6 +2,31 @@
 
 # @xernerx/components
 
+## 0.15.1
+
+### Patch Changes
+
+- ## Header Omnibar Compare Route & Media Manager Refinements
+
+    Added the `/compare` route to the Header Omnibar and streamlined the shared `Header` and `MediaManager` components.
+
+    ### Added
+    - **Omnibar Compare Route**: Registered `/compare` (`Compare Bots & Servers`) under the `app.xernerx.com` route suggestions in `HeaderOmnibar`.
+
+    ### Changed
+    - **Header, Footer & Media Manager**: Streamlined header control bar rendering, bulk media privacy actions in `MediaManager`, `BotRow` status indicators, and `TermsPrompt` version checks.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 0.15.0
 
 ### Minor Changes

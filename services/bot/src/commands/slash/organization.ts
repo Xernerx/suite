@@ -2,7 +2,7 @@
 
 import { database } from '@xernerx/lib/core';
 import { SlashCommandBuilder, type SlashCommandAutocomplete, type SlashCommandOptions } from '@xernerx/framework';
-import { EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { getUserAccentColor } from '../../lib/botUtils.js';
 
 interface CachedOrgChoice {
@@ -38,6 +38,14 @@ async function getOrgChoices(): Promise<CachedOrgChoice[]> {
 	}
 }
 
+const ORG_OPTION = {
+	name: 'organization',
+	description: 'Search and select a public organization (defaults to Xernerx Studios).',
+	type: 'string' as const,
+	required: false,
+	autocomplete: true,
+};
+
 export default class OrganizationCommand extends SlashCommandBuilder {
 	constructor() {
 		super('organization', {
@@ -49,15 +57,22 @@ export default class OrganizationCommand extends SlashCommandBuilder {
 				{
 					name: 'profile',
 					description: 'View an organization profile on the Xernerx directory.',
-					options: [
-						{
-							name: 'organization',
-							description: 'Search and select a public organization (defaults to Xernerx Studios).',
-							type: 'string',
-							required: false,
-							autocomplete: true,
-						},
-					],
+					options: [ORG_OPTION],
+				},
+				{
+					name: 'bots',
+					description: 'View the bots published by an organization on Xernerx.',
+					options: [ORG_OPTION],
+				},
+				{
+					name: 'members',
+					description: 'View the team members and roles of an organization on Xernerx.',
+					options: [ORG_OPTION],
+				},
+				{
+					name: 'servers',
+					description: 'View the community servers affiliated with an organization on Xernerx.',
+					options: [ORG_OPTION],
 				},
 			],
 		});
@@ -90,7 +105,7 @@ export default class OrganizationCommand extends SlashCommandBuilder {
 		}
 	}
 
-	override async exec({ interaction, options }: SlashCommandOptions) {
+	override async exec({ interaction, options, subcommand }: SlashCommandOptions) {
 		const replyMethod = interaction.deferred ? 'editReply' : 'reply';
 		const clientBotUser = interaction.client.user;
 		const clientBotAvatar = clientBotUser?.displayAvatarURL();
@@ -163,6 +178,96 @@ export default class OrganizationCommand extends SlashCommandBuilder {
 				return await (interaction as any)[replyMethod]({ embeds: [privateEmbed] });
 			}
 
+			const orgUrl = `https://app.xernerx.com/organizations/${orgId}`;
+			const iconUrl = orgDoc.iconUrl && String(orgDoc.iconUrl).startsWith('http') ? orgDoc.iconUrl : orgDoc.icon && String(orgDoc.icon).startsWith('http') ? orgDoc.icon : undefined;
+			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+				new ButtonBuilder().setLabel('View Organization on Xernerx').setStyle(ButtonStyle.Link).setURL(orgUrl),
+				new ButtonBuilder().setLabel('Explore Xernerx Directory').setStyle(ButtonStyle.Link).setURL('https://app.xernerx.com')
+			);
+
+			if (subcommand === 'bots') {
+				const publicBots = await BotModel.find({ organization: orgId, privacy: 'public' })
+					.select('id name description status verified voteCount')
+					.lean()
+					.catch(() => []);
+
+				const lines =
+					publicBots.length > 0
+						? publicBots.slice(0, 12).map((b: any) => {
+								const statusDot = b.status === 'online' || b.status === 'idle' || b.status === 'dnd' ? '🟢' : '⚫';
+								const verifiedBadge = b.verified ? ' ✓' : '';
+								const desc = b.description ? ` — ${String(b.description).slice(0, 60)}${String(b.description).length > 60 ? '...' : ''}` : '';
+								return `${statusDot} **[${b.name || b.id}${verifiedBadge}](https://app.xernerx.com/bots/${b.id})**${desc}`;
+							})
+						: ['No public bots are currently listed under this organization.'];
+
+				const embed = new EmbedBuilder()
+					.setColor(accentColor)
+					.setTitle(`${orgDoc.name} • Published Bots (${publicBots.length})`)
+					.setURL(orgUrl)
+					.setDescription(lines.join('\n'))
+					.setFooter({
+						text: `${clientBotName} • Organization Bots`,
+						iconURL: clientBotAvatar,
+					})
+					.setTimestamp();
+
+				if (iconUrl) embed.setThumbnail(iconUrl);
+				return await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
+			}
+
+			if (subcommand === 'members') {
+				const uniqueMemberIds = Array.from(new Set<string>([String(orgDoc.owner), ...(Array.isArray(orgDoc.members) ? orgDoc.members.map(String) : [])].filter(Boolean)));
+				const memberLines = uniqueMemberIds.slice(0, 20).map((uid) => {
+					const isOwner = uid === String(orgDoc.owner);
+					return `• <@${uid}> ${isOwner ? '**(Owner)**' : ''} — [View Profile](https://app.xernerx.com/users/${uid})`;
+				});
+
+				const embed = new EmbedBuilder()
+					.setColor(accentColor)
+					.setTitle(`${orgDoc.name} • Team Members (${uniqueMemberIds.length})`)
+					.setURL(orgUrl)
+					.setDescription(memberLines.join('\n') || 'No members found.')
+					.setFooter({
+						text: `${clientBotName} • Organization Members`,
+						iconURL: clientBotAvatar,
+					})
+					.setTimestamp();
+
+				if (iconUrl) embed.setThumbnail(iconUrl);
+				return await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
+			}
+
+			if (subcommand === 'servers') {
+				const publicServers = await GuildModel.find({ organization: orgId, privacy: 'public' })
+					.select('id name description verified memberCount voteCount')
+					.lean()
+					.catch(() => []);
+
+				const lines =
+					publicServers.length > 0
+						? publicServers.slice(0, 12).map((s: any) => {
+								const verifiedBadge = s.verified ? ' ✓' : '';
+								const members = s.memberCount ? ` (\`${Number(s.memberCount).toLocaleString()} members\`)` : '';
+								return `• **[${s.name || s.id}${verifiedBadge}](https://app.xernerx.com/servers/${s.id})**${members}`;
+							})
+						: ['No public servers are currently listed under this organization.'];
+
+				const embed = new EmbedBuilder()
+					.setColor(accentColor)
+					.setTitle(`${orgDoc.name} • Affiliated Servers (${publicServers.length})`)
+					.setURL(orgUrl)
+					.setDescription(lines.join('\n'))
+					.setFooter({
+						text: `${clientBotName} • Organization Servers`,
+						iconURL: clientBotAvatar,
+					})
+					.setTimestamp();
+
+				if (iconUrl) embed.setThumbnail(iconUrl);
+				return await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
+			}
+
 			const [publicBots, publicServers] = await Promise.all([
 				BotModel.find({ organization: orgId, privacy: 'public' })
 					.select('id name verified')
@@ -174,11 +279,7 @@ export default class OrganizationCommand extends SlashCommandBuilder {
 					.catch(() => []),
 			]);
 
-			const orgUrl = `https://app.xernerx.com/organizations/${orgId}`;
-			const iconUrl = orgDoc.iconUrl && String(orgDoc.iconUrl).startsWith('http') ? orgDoc.iconUrl : orgDoc.icon && String(orgDoc.icon).startsWith('http') ? orgDoc.icon : undefined;
-
 			const uniqueMembers = new Set<string>([String(orgDoc.owner), ...(Array.isArray(orgDoc.members) ? orgDoc.members.map(String) : [])].filter(Boolean));
-
 			const overviewLines = [`• **Owner:** <@${orgDoc.owner}>`, `• **Members:** \`${uniqueMembers.size.toLocaleString()}\``, ...(orgDoc.verified ? ['• **Verified:** Yes'] : [])];
 
 			const embed = new EmbedBuilder()
@@ -250,15 +351,15 @@ export default class OrganizationCommand extends SlashCommandBuilder {
 				})
 				.setTimestamp();
 
-			await (interaction as any)[replyMethod]({ embeds: [embed] });
+			await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
 		} catch (error) {
-			console.error('Error executing /organization profile:', error);
+			console.error('Error executing /organization command:', error);
 			const errEmbed = new EmbedBuilder()
 				.setColor(0xe06c75)
 				.setTitle('Failed to Load Organization')
 				.setDescription('An error occurred while fetching organization information. Please try again shortly.')
 				.setFooter({
-					text: `${clientBotName} • Organization Profile`,
+					text: `${clientBotName} • Organization Directory`,
 					iconURL: clientBotAvatar,
 				})
 				.setTimestamp();
