@@ -4,6 +4,31 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.9.2
+
+### Patch Changes
+
+- ## Store OpenGraph & Build Pipeline Refinements
+
+    Updated dynamic OpenGraph social preview generation and build scripts on `store.xernerx.com`.
+
+    ### Changed
+    - **OpenGraph Social Previews**: Updated dynamic OpenGraph card rendering and framework dependencies on `store.xernerx.com`.
+    - **Build Preparation Pipeline**: Updated package build and initialization scripts to run automated workspace asset synchronization.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 0.9.1
 
 ### Patch Changes

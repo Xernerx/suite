@@ -1,30 +1,26 @@
 /** @format */
 
-import { database, formatMilestoneCount, getHighestMilestoneBadge } from '@xernerx/lib/core';
-import { ContextCommandBuilder, type ContextCommandOptions } from '@xernerx/framework';
-import { ApplicationCommandType, EmbedBuilder } from 'discord.js';
+import { database, getHighestMilestoneBadge } from '@xernerx/lib/core';
+import { ContextCommandBuilder } from '@xernerx/framework';
+import { ActionRowBuilder, ApplicationCommandType, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { DEFAULT_XERNERX_COLOR, getUserAccentColor, parseHexColor } from '../../lib/botUtils.js';
 import { ensureMilestoneEmojisLoaded, getMilestoneEmoji } from '../../lib/milestoneEmojis.js';
 
-const VANITY_BADGE_LABELS: Record<string, string> = {
-	dot_matrix_banner: 'Dot-Matrix Architect',
-	credit_patron: 'Credit Patron',
-	high_roller: 'High Roller',
-	vault_sovereign: 'Vault Sovereign',
-};
-
-export default class ViewProfileContextCommand extends ContextCommandBuilder {
+export default class ViewXernerxProfileContextCommand extends ContextCommandBuilder {
 	constructor() {
-		super('View Xernerx Profile', {
+		super('viewXernerxProfile', {
 			name: 'View Xernerx Profile',
-			description: 'View a Discord user or bot profile on the Xernerx ecosystem via right-click context menu.',
+			description: 'View this user or bot on the Xernerx ecosystem directory.',
 			type: ApplicationCommandType.User,
 			defer: true,
 			deploy: { global: true },
 		});
 	}
 
-	override async exec({ interaction }: ContextCommandOptions<'user'>) {
+	override async exec(args: Parameters<ContextCommandBuilder['exec']>[0]) {
+		const { interaction } = args;
+		if (!interaction.isUserContextMenuCommand()) return;
+
 		const replyMethod = interaction.deferred ? 'editReply' : 'reply';
 		const clientBotUser = interaction.client.user;
 		const clientBotAvatar = clientBotUser?.displayAvatarURL();
@@ -35,40 +31,49 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 		const isSelf = targetId === interaction.user.id;
 
 		try {
-			const db = await database('xernerx');
+			const [db, requesterAccent] = await Promise.all([database('xernerx'), getUserAccentColor(interaction.user.id), ensureMilestoneEmojisLoaded(interaction.client)]);
 
 			if (targetDiscordUser.bot) {
 				const BotModel = (db.models.bots as any).Bot;
 				const StatModel = (db.models.bots as any).Stat;
 				const VoteModel = (db.models.bots as any).Vote;
-				const CommandModel = (db.models.bots as any).Command;
-				const accentColor = await getUserAccentColor(interaction.user.id);
+				const ReviewModel = (db.models.bots as any).Review;
 
-				const bot = await BotModel.findOne({ id: targetId }).lean();
+				const bot = await BotModel.findOne({ id: targetId })
+					.lean()
+					.catch(() => null);
+				const botUrl = `https://app.xernerx.com/bots/${targetId}`;
+				const compareUrl = `https://app.xernerx.com/compare?type=bots&a=${targetId}`;
+
 				if (!bot) {
-					const notFoundEmbed = new EmbedBuilder()
-						.setColor(0xe06c75)
-						.setTitle('Bot Not Registered')
-						.setDescription(`**${targetDiscordUser.username}** is not registered on the [Xernerx Bot Directory](https://app.xernerx.com).`)
+					const unlistedEmbed = new EmbedBuilder()
+						.setColor(requesterAccent)
+						.setTitle(targetDiscordUser.username)
+						.setURL('https://app.xernerx.com')
+						.setDescription(`**${targetDiscordUser.username}** is not listed on the Xernerx Bot Directory yet.\n\nExplore verified Discord bots or submit your own bot on **Xernerx**!`)
 						.setThumbnail(targetDiscordUser.displayAvatarURL({ size: 256 }))
 						.setFooter({
-							text: `${clientBotName} • Bot Profile`,
+							text: `${clientBotName} • Bot Directory`,
 							iconURL: clientBotAvatar,
 						})
 						.setTimestamp();
 
-					return await (interaction as any)[replyMethod]({ embeds: [notFoundEmbed] });
+					const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+						new ButtonBuilder().setLabel('Explore Bots on Xernerx').setStyle(ButtonStyle.Link).setURL('https://app.xernerx.com'),
+						new ButtonBuilder().setLabel('Developer Portal').setStyle(ButtonStyle.Link).setURL('https://portal.xernerx.com')
+					);
+
+					return await (interaction as any)[replyMethod]({ embeds: [unlistedEmbed], components: [row] });
 				}
 
 				const isOwner = Array.isArray(bot.owners) && bot.owners.map(String).includes(interaction.user.id);
 				if (bot.privacy === 'private' && !isOwner) {
 					const privateEmbed = new EmbedBuilder()
-						.setColor(accentColor)
-						.setTitle('Private Bot')
-						.setDescription(`**${bot.name || targetDiscordUser.username}** is set to **private**.`)
-						.setThumbnail(targetDiscordUser.displayAvatarURL({ size: 256 }))
+						.setColor(requesterAccent)
+						.setTitle('Private Bot Listing')
+						.setDescription(`**${bot.name || targetDiscordUser.username}** is set to **private** by its owners.`)
 						.setFooter({
-							text: `${clientBotName} • Bot Profile`,
+							text: `${clientBotName} • Bot Directory`,
 							iconURL: clientBotAvatar,
 						})
 						.setTimestamp();
@@ -76,8 +81,7 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 					return await (interaction as any)[replyMethod]({ embeds: [privateEmbed] });
 				}
 
-				const [, latestStat, voteCount, commandCount] = await Promise.all([
-					ensureMilestoneEmojisLoaded(interaction.client),
+				const [latestStat, voteCount, reviews] = await Promise.all([
 					StatModel
 						? StatModel.findOne({ id: targetId })
 								.sort({ timestamp: -1 })
@@ -85,45 +89,50 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 								.catch(() => null)
 						: Promise.resolve(null),
 					VoteModel ? VoteModel.countDocuments({ botId: targetId }).catch(() => bot.voteCount || 0) : Promise.resolve(bot.voteCount || 0),
-					CommandModel ? CommandModel.countDocuments({ botId: targetId }).catch(() => (bot.commands || []).length) : Promise.resolve((bot.commands || []).length),
+					ReviewModel
+						? ReviewModel.find({ botId: targetId })
+								.select('rating')
+								.lean()
+								.catch(() => [])
+						: Promise.resolve([]),
 				]);
 
-				const guildCount = (latestStat as any)?.guildCount ?? 0;
-				const userCount = (latestStat as any)?.userCount ?? 0;
-				const botUrl = `https://app.xernerx.com/bots/${targetId}`;
+				const servers = (latestStat as any)?.guildCount ?? 0;
+				const users = (latestStat as any)?.userCount ?? 0;
+				const avgRating = reviews.length > 0 ? (reviews.reduce((acc: number, r: any) => acc + (Number(r.rating) || 0), 0) / reviews.length).toFixed(1) : null;
 
-				const serverMilestone = getHighestMilestoneBadge(guildCount, 'servers');
-				const memberMilestone = getHighestMilestoneBadge(userCount, 'members');
-				const serverEmoji = getMilestoneEmoji(interaction.client, 'servers', serverMilestone.tier);
-				const memberEmoji = getMilestoneEmoji(interaction.client, 'members', memberMilestone.tier);
+				const serverMilestone = getHighestMilestoneBadge(servers, 'servers');
+				const memberMilestone = getHighestMilestoneBadge(users, 'members');
+				const serverMilestoneEmoji = getMilestoneEmoji(interaction.client, 'servers', serverMilestone.tier);
+				const memberMilestoneEmoji = getMilestoneEmoji(interaction.client, 'members', memberMilestone.tier);
 
-				const botEmbed = new EmbedBuilder()
-					.setColor(accentColor)
-					.setTitle(targetDiscordUser.globalName || targetDiscordUser.username || bot.name)
+				const embed = new EmbedBuilder()
+					.setColor(requesterAccent)
+					.setTitle(bot.name || targetDiscordUser.username)
 					.setURL(botUrl)
-					.setThumbnail(targetDiscordUser.displayAvatarURL({ size: 512 }))
-					.setDescription(bot.description || bot.info || `Explore **${bot.name || targetDiscordUser.username}** on the Xernerx Bot Directory.`)
+					.setDescription(bot.description || bot.shortDescription || `Explore **${bot.name || targetDiscordUser.username}** on the Xernerx Bot Directory.`)
+					.setThumbnail(targetDiscordUser.displayAvatarURL({ size: 256 }))
 					.addFields([
 						{
 							name: 'Metrics',
 							value: [
-								`• **Servers:** \`${guildCount.toLocaleString()}\``,
-								`• **Users:** \`${userCount.toLocaleString()}\``,
-								`• **Votes:** \`${Number(voteCount).toLocaleString()}\``,
-								`• **Commands:** \`${Number(commandCount).toLocaleString()}\``,
+								`• **Servers:** \`${servers.toLocaleString()}\``,
+								`• **Users:** \`${users.toLocaleString()}\``,
+								`• **Votes:** \`${Number(voteCount || 0).toLocaleString()}\``,
+								`• **Rating:** ${avgRating ? `\`${avgRating} / 5.0\` (\`${reviews.length}\`)` : '`No reviews`'}`,
 							].join('\n'),
 							inline: true,
 						},
 						{
-							name: 'Developers',
-							value: Array.isArray(bot.owners) && bot.owners.length > 0 ? bot.owners.map((id: string) => `<@${id}>`).join(', ') : 'Xernerx Studios',
+							name: 'Overview',
+							value: [`• **Status:** \`${String(bot.status || 'offline').toUpperCase()}\``, `• **Verified:** \`${bot.verified ? 'Yes' : 'No'}\``].join('\n'),
 							inline: true,
 						},
 						{
 							name: 'Milestones',
 							value: [
-								`${serverEmoji} **${serverMilestone.label}** ${serverMilestone.unlocked ? `(\`Tier #${serverMilestone.tier}\`)` : '(`Starter Tier`)'}`,
-								`${memberEmoji} **${memberMilestone.label}** ${memberMilestone.unlocked ? `(\`Tier #${memberMilestone.tier}\`)` : '(`Starter Tier`)'}`,
+								`${serverMilestoneEmoji} **${serverMilestone.label}** ${serverMilestone.unlocked ? `(\`Tier #${serverMilestone.tier}\`)` : '(`Starter Tier`)'}`,
+								`${memberMilestoneEmoji} **${memberMilestone.label}** ${memberMilestone.unlocked ? `(\`Tier #${memberMilestone.tier}\`)` : '(`Starter Tier`)'}`,
 							].join('\n'),
 							inline: false,
 						},
@@ -134,18 +143,22 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 					})
 					.setTimestamp();
 
-				return await (interaction as any)[replyMethod]({ embeds: [botEmbed] });
+				const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+					new ButtonBuilder().setLabel('View Full Bot Page on Xernerx').setStyle(ButtonStyle.Link).setURL(botUrl),
+					new ButtonBuilder().setLabel('Compare with Another Bot').setStyle(ButtonStyle.Link).setURL(compareUrl)
+				);
+
+				return await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
 			}
 
-			// Regular User Profile
+			// Human User Profile
 			const UserModel = (db.models.users as any).User;
 			const AppearanceModel = (db.models.users as any).Appearance;
 			const CreditModel = (db.models.users as any).Credit;
 			const BotModel = (db.models.bots as any).Bot;
-			const StatModel = (db.models.bots as any).Stat;
+			const OrganizationModel = (db.models.organizations as any).Organization;
 
-			const [, userProfile, appearanceDoc, creditDoc, publicBots] = await Promise.all([
-				ensureMilestoneEmojisLoaded(interaction.client),
+			const [userProfile, appearanceDoc, creditDoc, ownedBotsCount, orgCount] = await Promise.all([
 				UserModel.findOne({ id: targetId })
 					.lean()
 					.catch(() => null),
@@ -158,22 +171,19 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 				CreditModel.findOne({ ownerId: targetId })
 					.lean()
 					.catch(() => null),
-				BotModel
-					? BotModel.find({ owners: targetId, privacy: 'public' })
-							.select('id name')
-							.lean()
-							.catch(() => [])
-					: Promise.resolve([]),
+				BotModel.countDocuments({ owners: targetId, privacy: 'public' }).catch(() => 0),
+				OrganizationModel.countDocuments({ $or: [{ owner: targetId }, { members: targetId }], privacy: 'public' }).catch(() => 0),
 			]);
 
-			const accentColor = parseHexColor(appearanceDoc?.accent) ?? (await getUserAccentColor(interaction.user.id)) ?? DEFAULT_XERNERX_COLOR;
+			const accentColor = parseHexColor(appearanceDoc?.accent) ?? requesterAccent ?? DEFAULT_XERNERX_COLOR;
+			const profileUrl = `https://app.xernerx.com/users/${targetId}`;
+			const displayName = userProfile?.globalName || targetDiscordUser.globalName || userProfile?.username || targetDiscordUser.username;
 
-			if (userProfile?.privacy === 'private' && !isSelf) {
+			if ((userProfile?.privacy === 'private' || creditDoc?.privacy === 'private') && !isSelf) {
 				const privateEmbed = new EmbedBuilder()
-					.setColor(DEFAULT_XERNERX_COLOR)
+					.setColor(accentColor)
 					.setTitle('Private Profile')
-					.setDescription(`**${targetDiscordUser.globalName || targetDiscordUser.username}**'s profile is set to **private**.`)
-					.setThumbnail(targetDiscordUser.displayAvatarURL({ size: 256 }))
+					.setDescription(`**${displayName}** has set their Xernerx profile to **private**.`)
 					.setFooter({
 						text: `${clientBotName} • User Profile`,
 						iconURL: clientBotAvatar,
@@ -183,36 +193,28 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 				return await (interaction as any)[replyMethod]({ embeds: [privateEmbed] });
 			}
 
-			const displayName = userProfile?.name || targetDiscordUser.globalName || targetDiscordUser.username || 'Xernerx User';
-			const avatarUrl = userProfile?.icon && String(userProfile.icon).startsWith('http') ? userProfile.icon : targetDiscordUser.displayAvatarURL({ size: 512 });
-			const profileUrl = `https://app.xernerx.com/users/${targetId}`;
-			const streak = (creditDoc as any)?.streak || 0;
-			const balance = (creditDoc as any)?.balance || 0;
-			const rawBadges: string[] = Array.isArray((creditDoc as any)?.activeBadges) ? (creditDoc as any).activeBadges : [];
-			const vanityBadges = rawBadges.map((b) => VANITY_BADGE_LABELS[b] || b).filter(Boolean);
+			const currentStreak = creditDoc?.dailyStreak?.count || 0;
+			const bestStreak = creditDoc?.dailyStreak?.bestStreak || currentStreak;
+			const shields = creditDoc?.dailyStreak?.shields || 0;
 
-			const userEmbed = new EmbedBuilder()
+			const embed = new EmbedBuilder()
 				.setColor(accentColor)
 				.setTitle(displayName)
 				.setURL(profileUrl)
-				.setThumbnail(avatarUrl)
-				.setDescription(userProfile?.description || userProfile?.info || `View **${displayName}** on [app.xernerx.com](${profileUrl}).`)
+				.setDescription(userProfile?.bio || `View **${displayName}**'s full profile, showcases, and ecosystem activity on **Xernerx**.`)
+				.setThumbnail(targetDiscordUser.displayAvatarURL({ size: 256 }))
 				.addFields([
 					{
 						name: 'Overview',
-						value: [
-							`• **User:** <@${targetId}>`,
-							...(userProfile?.verified || (userProfile?.agreedTerms && userProfile?.agreedPrivacy) ? ['• **Verified:** Yes'] : []),
-							...(userProfile?.pronouns ? [`• **Pronouns:** ${userProfile.pronouns}`] : []),
-						].join('\n'),
+						value: [`• **User:** <@${targetId}>`, `• **Public Bots:** \`${ownedBotsCount.toLocaleString()}\``, `• **Organizations:** \`${orgCount.toLocaleString()}\``].join('\n'),
 						inline: true,
 					},
 					{
-						name: 'Rewards',
+						name: 'Daily Streak',
 						value: [
-							`• **Streak:** \`${streak}d\``,
-							...(isSelf ? [`• **Credits:** \`${balance.toLocaleString()}\``] : []),
-							...(vanityBadges.length > 0 ? [`• **Badges:** ${vanityBadges.map((b) => `\`${b}\``).join(', ')}`] : []),
+							`• **Current:** \`${currentStreak} day${currentStreak === 1 ? '' : 's'}\``,
+							`• **Best:** \`${bestStreak} day${bestStreak === 1 ? '' : 's'}\``,
+							`• **Shields:** \`${shields}\``,
 						].join('\n'),
 						inline: true,
 					},
@@ -223,52 +225,20 @@ export default class ViewProfileContextCommand extends ContextCommandBuilder {
 				})
 				.setTimestamp();
 
-			if (publicBots.length > 0) {
-				const botStatsList = await Promise.all(
-					publicBots.map(async (b: any) => {
-						const latest = StatModel
-							? await StatModel.findOne({ id: String(b.id) })
-									.sort({ timestamp: -1 })
-									.lean()
-									.catch(() => null)
-							: null;
-						return {
-							bot: b,
-							guildCount: Number((latest as any)?.guildCount ?? 0) || 0,
-							userCount: Number((latest as any)?.userCount ?? 0) || 0,
-						};
-					})
-				);
+			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+				new ButtonBuilder().setLabel('View Full Profile on Xernerx').setStyle(ButtonStyle.Link).setURL(profileUrl),
+				new ButtonBuilder().setLabel('Explore Xernerx Directory').setStyle(ButtonStyle.Link).setURL('https://app.xernerx.com')
+			);
 
-				const maxGuildEntry = botStatsList.reduce((best, cur) => (cur.guildCount > best.guildCount ? cur : best), botStatsList[0]);
-				const maxUserEntry = botStatsList.reduce((best, cur) => (cur.userCount > best.userCount ? cur : best), botStatsList[0]);
-
-				const serverBadge = getHighestMilestoneBadge(maxGuildEntry.guildCount, 'servers');
-				const memberBadge = getHighestMilestoneBadge(maxUserEntry.userCount, 'members');
-				const serverEmoji = getMilestoneEmoji(interaction.client, 'servers', serverBadge.tier);
-				const memberEmoji = getMilestoneEmoji(interaction.client, 'members', memberBadge.tier);
-
-				userEmbed.addFields([
-					{
-						name: 'Bot Milestones',
-						value: [
-							`${serverEmoji} **${serverBadge.label}** — [${maxGuildEntry.bot.name || maxGuildEntry.bot.id}](https://app.xernerx.com/bots/${maxGuildEntry.bot.id}) (\`${formatMilestoneCount(maxGuildEntry.guildCount)}\`)`,
-							`${memberEmoji} **${memberBadge.label}** — [${maxUserEntry.bot.name || maxUserEntry.bot.id}](https://app.xernerx.com/bots/${maxUserEntry.bot.id}) (\`${formatMilestoneCount(maxUserEntry.userCount)}\`)`,
-						].join('\n'),
-						inline: false,
-					},
-				]);
-			}
-
-			await (interaction as any)[replyMethod]({ embeds: [userEmbed] });
+			await (interaction as any)[replyMethod]({ embeds: [embed], components: [row] });
 		} catch (error) {
 			console.error('Error executing View Xernerx Profile context command:', error);
 			const errEmbed = new EmbedBuilder()
 				.setColor(0xe06c75)
 				.setTitle('Failed to Load Profile')
-				.setDescription('An error occurred while fetching the profile. Please try again shortly.')
+				.setDescription('An error occurred while loading this Xernerx profile. Please try again shortly.')
 				.setFooter({
-					text: `${clientBotName} • Profile`,
+					text: `${clientBotName} • Profile Directory`,
 					iconURL: clientBotAvatar,
 				})
 				.setTimestamp();

@@ -5,7 +5,7 @@ import { database } from '@xernerx/lib/server';
 import { getServerSession } from 'next-auth';
 import { auth } from '@xernerx/lib';
 import { randomUUID } from 'crypto';
-import { collectBotDeliveries } from '@/lib/webhookDispatcher';
+import { collectBotDeliveries, hasBotApiTierSubscription } from '@/lib/webhookDispatcher';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -14,12 +14,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
 		const { id } = await params;
 		const db = await database('xernerx');
+		const BotProfileModel = (db.models.bots as any).Bot;
 		const HookModel = (db.models.bots as any).Hook;
 
-		const hooks = await HookModel.find({ botId: id }).lean();
+		const [bot, hooks] = await Promise.all([
+			BotProfileModel ? BotProfileModel.findOne({ id }).select('id owners organization').lean() : Promise.resolve(null),
+			HookModel.find({ botId: id }).lean(),
+		]);
 		const deliveries = collectBotDeliveries(hooks);
+		const hasApiTier = await hasBotApiTierSubscription(bot || id, [session.user.id]);
 
-		return NextResponse.json({ hooks, deliveries }, { status: 200 });
+		return NextResponse.json({ hooks, deliveries, hasApiTier }, { status: 200 });
 	} catch (error) {
 		console.error('Failed to fetch hooks:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
@@ -61,6 +66,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 			return NextResponse.json({ error: 'Webhook URL cannot be empty.' }, { status: 400 });
 		}
 
+		const hasApiTier = await hasBotApiTierSubscription(bot, [session.user.id]);
+		const requestsStatusWebhook = hooks.some((h: any) => Array.isArray(h?.events) && (h.events.includes('POST online') || h.events.includes('POST offline')));
+		if (requestsStatusWebhook && !hasApiTier) {
+			return NextResponse.json(
+				{
+					error: 'POST online and POST offline webhooks require an active Developer API (Developer Pro or Ultra) subscription.',
+					code: 'API_TIER_REQUIRED',
+				},
+				{ status: 403 }
+			);
+		}
+
 		const existingHooks = await HookModel.find({ botId: id }).lean();
 		const deliveriesByUrl = new Map<string, any[]>();
 		const secretByUrl = new Map<string, string>();
@@ -91,7 +108,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 		const updatedHooks = await HookModel.find({ botId: id }).lean();
 		const deliveries = collectBotDeliveries(updatedHooks);
 
-		return NextResponse.json({ success: true, message: 'Hooks synced successfully', hooks: updatedHooks, deliveries }, { status: 200 });
+		return NextResponse.json({ success: true, message: 'Hooks synced successfully', hooks: updatedHooks, deliveries, hasApiTier }, { status: 200 });
 	} catch (error) {
 		console.error('Failed to sync hooks:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

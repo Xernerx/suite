@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Flame, LayoutDashboard, Sparkles, Trophy, Users, ChevronUp } from 'lucide-react';
+import { Flame, LayoutDashboard, Scale, Sparkles, Trophy, Users, ChevronUp } from 'lucide-react';
 import { Loading } from '@xernerx/feedback';
 import { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, usePlatform, useSidebar } from '@xernerx/providers';
@@ -267,6 +267,13 @@ export default function Home() {
 						>
 							<Trophy className="w-4 h-4 group-hover:scale-110 transition-transform" />
 							<span className="text-sm font-bold">{t('app.leaderboard.title')}</span>
+						</Link>
+						<Link
+							href={`/compare?type=${context}`}
+							className="flex items-center justify-center gap-2 px-5 h-12 rounded-xl bg-(--background) border border-(--border)/10 text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/50 hover:bg-(--accent)/10 transition-all flex-1 md:flex-none group shadow-sm"
+						>
+							<Scale className="w-4 h-4 group-hover:scale-110 transition-transform" />
+							<span className="text-sm font-bold">{t('app.compare.title')}</span>
 						</Link>
 					</div>
 

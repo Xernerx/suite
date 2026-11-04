@@ -2,6 +2,20 @@
 
 # @xernerx/websocket
 
+## 1.5.3
+
+### Patch Changes
+
+- ## WebSocket Gateway Dependency Updates
+
+    Updated `@xernerx/terminal` and TypeScript dependencies in `services/websocket`.
+
+    ### Changed
+    - **Service Dependencies**: Upgraded `@xernerx/terminal` to `^1.2.0` in `services/websocket`.
+
+- Updated dependencies
+    - @xernerx/lib@1.21.0
+
 ## 1.5.2
 
 ### Patch Changes

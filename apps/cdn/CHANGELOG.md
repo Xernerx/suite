@@ -2,6 +2,31 @@
 
 # cdn
 
+## 1.4.1
+
+### Patch Changes
+
+- ## Media Access View & OpenGraph Refinements
+
+    Updated the unauthorized media fallback view and OpenGraph social preview generation on `cdn.xernerx.com`.
+
+    ### Changed
+    - **Unauthorized Media View**: Refined layout styling and localization on the protected media fallback screen (`UnauthorizedView`) when viewing restricted CDN assets.
+    - **Package Build & OpenGraph Pipeline**: Updated the package pre-build synchronization script and dynamic OpenGraph image route.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.4.0
 
 ### Minor Changes

@@ -45,15 +45,19 @@ const CLIENT_ID_CANDIDATES = resolveClientIds();
 export interface RpcActivityPayload {
 	details?: string;
 	state?: string;
+	appIcon?: string;
 }
 
 let socket: net.Socket | null = null;
 let pendingClient: net.Socket | null = null;
 let reconnectTimer: NodeJS.Timeout | null = null;
+let sendDebounceTimer: NodeJS.Timeout | null = null;
 let activeClientIdIndex = 0;
 let isReady = false;
 let isEnabled = true;
 let isIdleOverride = false;
+let currentAppIcon = 'default';
+let lastSentSignature = '';
 let rpcLog: (msg: string) => void = () => {};
 const startTimestamp = Math.floor(Date.now() / 1000);
 let lastActivity: RpcActivityPayload = {
@@ -92,6 +96,7 @@ function encodePacket(op: number, data: Record<string, any>): Buffer {
 }
 
 function buildActivityPacket(activity: RpcActivityPayload | null): Buffer {
+	const iconFilename = currentAppIcon && currentAppIcon !== 'default' ? `icon-${currentAppIcon}.png` : 'icon.png';
 	const frame = {
 		cmd: 'SET_ACTIVITY',
 		args: {
@@ -104,7 +109,7 @@ function buildActivityPacket(activity: RpcActivityPayload | null): Buffer {
 						state: activity.state || 'Managing Workspace',
 						timestamps: { start: startTimestamp },
 						assets: {
-							large_image: 'https://xernerx.com/icon.png',
+							large_image: `https://xernerx.com/${iconFilename}`,
 							large_text: 'Xernerx Suite',
 						},
 						buttons: [{ label: 'Xernerx Suite', url: 'https://xernerx.com' }],
@@ -116,14 +121,30 @@ function buildActivityPacket(activity: RpcActivityPayload | null): Buffer {
 	return encodePacket(1, frame);
 }
 
-function sendActivityFrame(activity: RpcActivityPayload | null) {
+function sendActivityFrame(activity: RpcActivityPayload | null, immediate = false) {
 	if (!socket || socket.destroyed || !isReady) return;
-	try {
-		const packet = buildActivityPacket(activity);
-		socket.write(packet);
-		rpcLog(`RPC SENT SET_ACTIVITY: pid=${process.pid} details="${activity?.details || ''}" state="${activity?.state || ''}"`);
-	} catch (err) {
-		rpcLog(`RPC WRITE ERROR: ${(err as Error)?.message || err}`);
+	const dispatch = () => {
+		if (!socket || socket.destroyed || !isReady) return;
+		const sig = activity ? `${activity.details || ''}||${activity.state || ''}||${currentAppIcon}` : 'null';
+		if (sig === lastSentSignature) return;
+		try {
+			const packet = buildActivityPacket(activity);
+			socket.write(packet);
+			lastSentSignature = sig;
+			rpcLog(`RPC SENT SET_ACTIVITY: pid=${process.pid} details="${activity?.details || ''}" state="${activity?.state || ''}" icon="${currentAppIcon}"`);
+		} catch (err) {
+			rpcLog(`RPC WRITE ERROR: ${(err as Error)?.message || err}`);
+		}
+	};
+
+	if (sendDebounceTimer) {
+		clearTimeout(sendDebounceTimer);
+		sendDebounceTimer = null;
+	}
+	if (immediate) {
+		dispatch();
+	} else {
+		sendDebounceTimer = setTimeout(dispatch, 250);
 	}
 }
 
@@ -211,8 +232,9 @@ function tryConnectPipe(index = 0, clientIdIdx = activeClientIdIndex) {
 
 		if (op === 1 && !isReady) {
 			isReady = true;
+			lastSentSignature = '';
 			activeClientIdIndex = clientIdIdx;
-			sendActivityFrame(getEffectiveActivity());
+			sendActivityFrame(getEffectiveActivity(), true);
 		}
 	});
 
@@ -233,20 +255,34 @@ function tryConnectPipe(index = 0, clientIdIdx = activeClientIdIndex) {
 			rpcLog(`RPC SOCKET CLOSED (clientId=${clientId})`);
 			socket = null;
 			isReady = false;
+			lastSentSignature = '';
 		}
 		if (rejectedClientId) return;
 	});
 }
 
-export function syncDiscordRpc(enabled: boolean, activity?: RpcActivityPayload) {
+export function syncDiscordRpc(enabled: boolean, activity?: RpcActivityPayload, appIcon?: string) {
 	isEnabled = enabled;
+	if (appIcon) {
+		currentAppIcon = appIcon.trim().toLowerCase() || 'default';
+	} else if (activity?.appIcon) {
+		currentAppIcon = activity.appIcon.trim().toLowerCase() || 'default';
+	}
 	if (activity) {
-		lastActivity = { ...lastActivity, ...activity };
+		lastActivity = {
+			details: activity.details ?? lastActivity.details,
+			state: activity.state ?? lastActivity.state,
+		};
 	}
 
 	ensureReconnectLoop();
 
 	if (!isEnabled) {
+		if (sendDebounceTimer) {
+			clearTimeout(sendDebounceTimer);
+			sendDebounceTimer = null;
+		}
+		lastSentSignature = '';
 		if (pendingClient && !pendingClient.destroyed) {
 			pendingClient.destroy();
 		}

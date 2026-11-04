@@ -218,16 +218,8 @@ function FooterLink({ href, onClick, icon: Icon, label, external = true }: { hre
 		);
 	}
 
-	if (external && href) {
-		return (
-			<a suppressHydrationWarning href={href} target="_blank" rel="noopener noreferrer" className={className} style={linkStyle}>
-				{content}
-			</a>
-		);
-	}
-
 	return (
-		<Link suppressHydrationWarning href={href || '#'} className={className} style={linkStyle}>
+		<Link suppressHydrationWarning href={href || '#'} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className={className} style={linkStyle}>
 			{content}
 		</Link>
 	);

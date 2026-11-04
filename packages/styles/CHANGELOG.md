@@ -2,6 +2,17 @@
 
 # @xernerx/styles
 
+## 0.4.1
+
+### Patch Changes
+
+- ## Tailwind CSS v4 Stylesheet Dependency Updates
+
+    Updated `@tailwindcss/postcss` and `tailwindcss` dependencies in `@xernerx/styles`.
+
+    ### Changed
+    - **Tailwind CSS v4 Tooling**: Upgraded `tailwindcss` and `@tailwindcss/postcss` to `^4.3.4` in `@xernerx/styles`.
+
 ## 0.4.0
 
 ### Minor Changes

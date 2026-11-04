@@ -2,6 +2,22 @@
 
 # @xernerx/feedback
 
+## 0.5.2
+
+### Patch Changes
+
+- ## Feedback Package Dependency Updates
+
+    Updated core React, Next.js, Lucide icon, and Tailwind CSS v4 dependencies in `@xernerx/feedback`.
+
+    ### Changed
+    - **Framework & Icon Dependencies**: Upgraded `next`, `lucide-react`, and `tailwindcss` peer/dev dependency versions in `@xernerx/feedback`.
+
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/providers@0.22.0
+    - @xernerx/ui@0.8.1
+
 ## 0.5.1
 
 ### Patch Changes

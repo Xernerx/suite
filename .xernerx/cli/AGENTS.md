@@ -11,7 +11,7 @@
 - `init` (`commands/init.ts`): Interactive `.env` generator and workspace synchronizer.
 - `dev` (`commands/dev.ts`): Runs pre-flights (`generate-locales`, `.env` sync), boots `mongodb-memory-server` persisted in `.xernerx/database` on port `27017` (when `MONGO_XERNERX` is unset), resolves `DOMAIN`/`NEXT_PUBLIC_DOMAIN`, and launches apps/services via `concurrently`.
 - `start` (`commands/start.ts`): Production starter.
-- `build` (`commands/build.ts`): Workspace-wide build runner (`pnpm -r build`).
+- `build [target]` (`commands/build.ts` & `prepare-package.mjs`): Workspace-wide (`pnpm -r build` with `SUITE_MONOREPO_BUILD=1`) or single-target (`pnpm suite build <target>`) build runner. Each individual project's `build` script executes `node ../../.xernerx/cli/prepare-package.mjs` to install only that project's `package.json` plus `packages/*` (`pnpm install --filter "<pkg>..." --filter "@xernerx/*..."`), regenerate `packages/lib/src/i18n.config.ts`, and sync `packages/public` into `<project>/public` before building.
 - `lint` (`commands/lint.ts`): Workspace linter.
 - `clean` (`commands/clean.ts`): Purges `.next`, `dist`, `build`, and `node_modules` caches and reinstalls dependencies.
 - `generate-locales` (`commands/generateLocales.ts`): Scans `packages/lib/src/dictionaries/*.json` and writes `packages/lib/src/i18n.config.ts`.

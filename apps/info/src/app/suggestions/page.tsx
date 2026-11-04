@@ -150,19 +150,8 @@ export default function SuggestionsPage() {
 
 	const submitSuggestion = async (e: any) => {
 		e.preventDefault();
-		if (!user)
-			return toast({
-				type: 'error',
-				title: t('info.suggestions.toasts.notAuthenticated'),
-				description: t('info.suggestions.toasts.mustBeLoggedIn'),
-			});
-		if (!product) {
-			return toast({
-				type: 'error',
-				title: t('info.suggestions.toasts.error'),
-				description: t('info.suggestions.toasts.productRequired'),
-			});
-		}
+		if (!user) return toast({ type: 'error', title: t('info.suggestions.toasts.notAuthenticated'), description: t('info.suggestions.toasts.mustBeLoggedIn') });
+		if (!product) return toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: t('info.suggestions.toasts.productRequired') });
 		if (!title || !description) return;
 
 		const resolved = resolveBot(product);
@@ -172,19 +161,9 @@ export default function SuggestionsPage() {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({
-					title,
-					description,
-					productId: resolved?.name || product,
-					botId: resolved?.id || null,
-				}),
+				body: JSON.stringify({ title, description, productId: resolved?.name || product, botId: resolved?.id || null }),
 			});
-			if (res.status === 409)
-				return toast({
-					type: 'error',
-					title: t('info.suggestions.toasts.duplicate'),
-					description: t('info.suggestions.toasts.duplicateTitle'),
-				});
+			if (res.status === 409) return toast({ type: 'error', title: t('info.suggestions.toasts.duplicate'), description: t('info.suggestions.toasts.duplicateTitle') });
 			if (!res.ok) throw new Error('Failed');
 			toast({ type: 'success', title: t('info.suggestions.toasts.success'), description: t('info.suggestions.toasts.submitted') });
 			setTitle('');
@@ -193,18 +172,13 @@ export default function SuggestionsPage() {
 			setSearch('');
 			setShowForm(false);
 			fetchSuggestions();
-		} catch (err) {
+		} catch {
 			toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: t('info.suggestions.toasts.failedToPost') });
 		}
 	};
 
 	const vote = async (id: string, action: 'upvote' | 'downvote') => {
-		if (!user)
-			return toast({
-				type: 'error',
-				title: t('info.suggestions.toasts.notAuthenticated'),
-				description: t('info.suggestions.toasts.mustBeLoggedInVote'),
-			});
+		if (!user) return toast({ type: 'error', title: t('info.suggestions.toasts.notAuthenticated'), description: t('info.suggestions.toasts.mustBeLoggedInVote') });
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/info/suggestions/${id}/vote`), {
 				method: 'PUT',
@@ -214,7 +188,7 @@ export default function SuggestionsPage() {
 			});
 			if (!res.ok) throw new Error('Failed to vote');
 			fetchSuggestions();
-		} catch (err) {
+		} catch {
 			toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: t('info.suggestions.toasts.failedToVote') });
 		}
 	};
@@ -272,7 +246,7 @@ export default function SuggestionsPage() {
 			if (user?.id && (s.upvotes?.includes(user.id) || s.authorId === user.id || s.author?.id === user.id)) myUpvotes++;
 		}
 		return { total: suggestions.length, planned, implemented, myUpvotes };
-	}, [suggestions, user?.id]);
+	}, [suggestions, user]);
 
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 pb-24 gap-12">
@@ -350,93 +324,56 @@ export default function SuggestionsPage() {
 								className="flex flex-col gap-4 w-full"
 							>
 								<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-2">
-									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-										<div>
-											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.total')}</span>
-											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{suggestionStats.total}
-											</p>
+									{[
+										{ label: t('info.suggestions.kpi.total'), value: suggestionStats.total, icon: <Lightbulb size={18} />, green: false },
+										{ label: t('info.suggestions.kpi.planned'), value: suggestionStats.planned, icon: <Sparkles size={18} />, green: false },
+										{ label: t('info.suggestions.kpi.implemented'), value: suggestionStats.implemented, icon: <CheckCircle2 size={18} />, green: true },
+										{ label: t('info.suggestions.kpi.myUpvotes'), value: suggestionStats.myUpvotes, icon: <ThumbsUp size={18} />, green: false },
+									].map((kpi) => (
+										<div key={kpi.label} className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
+											<div>
+												<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{kpi.label}</span>
+												<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
+													{kpi.value}
+												</p>
+											</div>
+											<div
+												className={`p-2.5 rounded-2xl border ${kpi.green ? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/25' : 'bg-(--accent)/15 text-(--accent) border-(--accent)/25'}`}
+											>
+												{kpi.icon}
+											</div>
 										</div>
-										<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-											<Lightbulb size={18} />
-										</div>
-									</div>
-									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-										<div>
-											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.planned')}</span>
-											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{suggestionStats.planned}
-											</p>
-										</div>
-										<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-											<Sparkles size={18} />
-										</div>
-									</div>
-									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-										<div>
-											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.implemented')}</span>
-											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{suggestionStats.implemented}
-											</p>
-										</div>
-										<div className="p-2.5 rounded-2xl bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
-											<CheckCircle2 size={18} />
-										</div>
-									</div>
-									<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-										<div>
-											<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{t('info.suggestions.kpi.myUpvotes')}</span>
-											<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{suggestionStats.myUpvotes}
-											</p>
-										</div>
-										<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-											<ThumbsUp size={18} />
-										</div>
-									</div>
+									))}
 								</div>
 
 								<div className="flex flex-col gap-2.5">
 									<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
 										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
-											{(
-												[
-													{ id: 'all', label: t('info.suggestions.filters.all') },
-													{ id: 'open', label: t('info.suggestions.filters.open') },
-													{ id: 'planned', label: t('info.suggestions.filters.planned') },
-													{ id: 'implemented', label: t('info.suggestions.filters.implemented') },
-												] as Array<{ id: 'all' | 'open' | 'planned' | 'implemented'; label: string }>
-											).map((opt) => (
+											{(['all', 'open', 'planned', 'implemented'] as const).map((id) => (
 												<button
-													key={opt.id}
+													key={id}
 													type="button"
-													onClick={() => setStatusFilter(opt.id)}
+													onClick={() => setStatusFilter(id)}
 													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-														statusFilter === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+														statusFilter === id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 													}`}
 												>
-													{opt.label}
+													{t(`info.suggestions.filters.${id}`)}
 												</button>
 											))}
 										</div>
 										<div className="flex items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
-											{(
-												[
-													{ id: 'top', label: t('info.suggestions.sort.top') },
-													{ id: 'newest', label: t('info.suggestions.sort.newest') },
-													...(user ? [{ id: 'mine', label: t('info.suggestions.sort.mine') }] : []),
-												] as Array<{ id: 'top' | 'newest' | 'mine'; label: string }>
-											).map((opt) => (
+											{(['top', 'newest', ...(user ? (['mine'] as const) : [])] as const).map((id) => (
 												<button
-													key={opt.id}
+													key={id}
 													type="button"
-													onClick={() => setSortBy(opt.id)}
+													onClick={() => setSortBy(id)}
 													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-														sortBy === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+														sortBy === id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
 													}`}
 												>
-													{opt.label}
+													{t(`info.suggestions.sort.${id}`)}
 												</button>
 											))}
 										</div>

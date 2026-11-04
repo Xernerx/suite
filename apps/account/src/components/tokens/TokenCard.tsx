@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { motion } from 'framer-motion';
 import { Activity, Bot, Clock, ExternalLink, Settings2 } from 'lucide-react';
-import Image from 'next/image';
-import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Badge, CopyButton } from '@xernerx/ui';
+import { useDictionary, useEnvironment } from '@xernerx/providers';
+
+import Image from 'next/image';
 import { TokenListInfo } from './types';
+import { motion } from 'framer-motion';
 
 interface TokenCardProps {
 	token: TokenListInfo;
@@ -40,7 +41,7 @@ export default function TokenCard({ token, index, onSelect }: TokenCardProps) {
 		>
 			<div className="flex items-start justify-between">
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h2 className="text-base font-semibold text-(--text) truncate max-w-[180px]">{token.name}</h2>
+					<h2 className="text-base font-semibold text-(--text) truncate max-w-45">{token.name}</h2>
 					{tokenId && <CopyButton value={tokenId} label={`...${tokenId.slice(-6)}`} toastTitle={t('account.tokens.idCopied')} />}
 				</div>
 				<Badge variant={statusVariants[token.status]} dot>

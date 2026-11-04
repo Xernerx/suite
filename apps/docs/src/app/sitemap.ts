@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next';
 
 export const revalidate = 3600;
 
-const PUBLISHED_PACKAGES = ['framework', 'stats', 'builder', 'logger', 'api'];
+const PUBLISHED_PACKAGES = ['xernerx', '@xernerx/framework', '@xernerx/commands', '@xernerx/hooks', '@xernerx/stats', '@xernerx/websocket', '@xernerx/terminal', '@xernerx/extension-builder'];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const baseUrl = 'https://docs.xernerx.com';

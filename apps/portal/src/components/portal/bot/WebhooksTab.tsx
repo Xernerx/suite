@@ -2,19 +2,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Code2, Copy, Eye, EyeOff, KeyRound, Link2, Loader2, RefreshCw, Send, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { Check, Copy, ExternalLink, Eye, EyeOff, KeyRound, Link2, Loader2, Lock, RefreshCw, Send, Sparkles, Trash2 } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Toggle } from '@xernerx/ui';
-import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import WebhookDeliveriesCard, { WebhookDeliveryItem } from '@/components/portal/WebhookDeliveriesCard';
 
-const ALL_WEBHOOK_EVENTS = ['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'];
-
-const SIGNATURE_SNIPPET = `import crypto from 'crypto';
-
-export function verifyXernerxWebhook(rawBody: string, signatureHeader: string, secret: string): boolean {
-	const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-	return crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(expected));
-}`;
+const STANDARD_WEBHOOK_EVENTS = ['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'];
+const API_TIER_WEBHOOK_EVENTS = ['POST online', 'POST offline'];
+const ALL_WEBHOOK_EVENTS = [...STANDARD_WEBHOOK_EVENTS, ...API_TIER_WEBHOOK_EVENTS];
 
 function generateWebhookSecret(): string {
 	const bytes = new Uint8Array(16);
@@ -54,17 +50,44 @@ interface WebhooksTabProps {
 	setBotConfig: (config: any) => void;
 	deliveries?: WebhookDeliveryItem[];
 	onDeliveriesChange?: (deliveries: WebhookDeliveryItem[]) => void;
+	hasApiTier?: boolean;
 }
 
-export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], onDeliveriesChange }: WebhooksTabProps) {
+export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], onDeliveriesChange, hasApiTier = false }: WebhooksTabProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
+	const { user } = useUser();
+
+	const activeSubscriptions = ((user as any)?.billing?.subscriptions || []).filter((s: any) => s.status === 'active' || s.status === 'trialing');
+	const clientHasApiTier = Boolean(
+		(user as any)?.staffSubscription ||
+		activeSubscriptions.some(
+			(s: any) =>
+				s.stripeSubscriptionId === 'staff_infinite_sub' ||
+				String(s.stripeSubscriptionId || '')
+					.toLowerCase()
+					.includes('ultra') ||
+				String(s.stripeSubscriptionId || '')
+					.toLowerCase()
+					.includes('dev-pro') ||
+				s.priceId === 'dev-pro' ||
+				s.priceId === 'ultra' ||
+				s.priceId === 'prod_V0oBbO5pVQMxcC' ||
+				s.priceId === 'prod_V0pD5uXoTQkrYS' ||
+				String(s.priceId || '')
+					.toLowerCase()
+					.includes('dev-pro') ||
+				String(s.priceId || '')
+					.toLowerCase()
+					.includes('ultra')
+		)
+	);
+	const effectiveHasApiTier = Boolean(hasApiTier || clientHasApiTier);
 	const [testingIndex, setTestingIndex] = useState<number | null>(null);
 	const [confirmDeleteIdx, setConfirmDeleteIdx] = useState<number | null>(null);
 	const [revealedSecrets, setRevealedSecrets] = useState<Record<number, boolean>>({});
 	const [copiedSecretIdx, setCopiedSecretIdx] = useState<number | null>(null);
-	const [copiedSnippet, setCopiedSnippet] = useState(false);
 	const [localDeliveries, setLocalDeliveries] = useState<WebhookDeliveryItem[]>(deliveries);
 
 	const activeDeliveries = onDeliveriesChange ? deliveries : localDeliveries;
@@ -259,7 +282,10 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 											type="button"
 											onClick={() => {
 												const newHooks = [...(botConfig.hooks || [])];
-												newHooks[index] = { ...(newHooks[index] || {}), events: [...ALL_WEBHOOK_EVENTS] };
+												newHooks[index] = {
+													...(newHooks[index] || {}),
+													events: effectiveHasApiTier ? [...ALL_WEBHOOK_EVENTS] : [...STANDARD_WEBHOOK_EVENTS],
+												};
 												setBotConfig({ ...botConfig, hooks: newHooks });
 											}}
 											className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent) hover:text-white transition-colors cursor-pointer"
@@ -280,23 +306,82 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 									</div>
 								</div>
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-									{ALL_WEBHOOK_EVENTS.map((event) => (
-										<label key={event} className="flex items-center gap-2 cursor-pointer">
-											<Toggle
-												checked={hook.events?.includes(event) || false}
-												onChange={() => {
-													const newHooks = [...(botConfig.hooks || [])];
-													const currentHook = newHooks[index] || { url: '', events: [] };
-													const events = currentHook.events || [];
-													const nextEvents = events.includes(event) ? events.filter((e: string) => e !== event) : [...events, event];
-													newHooks[index] = { ...currentHook, events: nextEvents };
-													setBotConfig({ ...botConfig, hooks: newHooks });
-												}}
-											/>
-											<span className="text-sm text-(--text)">{event}</span>
-										</label>
-									))}
+									{ALL_WEBHOOK_EVENTS.map((event) => {
+										const isApiTierEvent = API_TIER_WEBHOOK_EVENTS.includes(event);
+										const isChecked = hook.events?.includes(event) || false;
+										const isLocked = isApiTierEvent && !effectiveHasApiTier;
+
+										return (
+											<label key={event} className={`flex items-center gap-2 ${isLocked && !isChecked ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}>
+												<Toggle
+													checked={isChecked}
+													onChange={() => {
+														if (isLocked && !isChecked) {
+															toast({ type: 'error', title: t('app.portal.bot.webhooks.apiTierRequiredToast') });
+															return;
+														}
+														const newHooks = [...(botConfig.hooks || [])];
+														const currentHook = newHooks[index] || { url: '', events: [] };
+														const events = currentHook.events || [];
+														const nextEvents = events.includes(event) ? events.filter((e: string) => e !== event) : [...events, event];
+														newHooks[index] = { ...currentHook, events: nextEvents };
+														setBotConfig({ ...botConfig, hooks: newHooks });
+													}}
+												/>
+												<span className="text-sm text-(--text) flex items-center gap-1.5 flex-wrap">
+													<span>{event}</span>
+													{isApiTierEvent && (
+														<Badge variant="accent" size="sm" className="inline-flex items-center gap-1 text-[10px] py-0 px-1.5">
+															{isLocked ? <Lock size={10} /> : <Sparkles size={10} />}
+															<span>{t('app.portal.bot.webhooks.apiTierBadge')}</span>
+														</Badge>
+													)}
+												</span>
+											</label>
+										);
+									})}
 								</div>
+								{!effectiveHasApiTier ? (
+									<div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-(--accent)/10 border border-(--accent)/25">
+										<div className="flex flex-col gap-0.5">
+											<span className="text-xs font-extrabold text-(--text) flex items-center gap-1.5">
+												<Sparkles size={13} className="text-(--accent)" />
+												<span>{t('app.portal.bot.webhooks.apiTierCalloutTitle')}</span>
+											</span>
+											<p className="text-xs text-(--text-muted)">{t('app.portal.bot.webhooks.apiTierCalloutDesc')}</p>
+										</div>
+										<div className="flex flex-wrap items-center gap-2 shrink-0">
+											<Link href={getEnvUrl('https://www.xernerx.com/invites')} target="_blank">
+												<Button type="button" variant="secondary" size="sm" className="flex items-center gap-1.5 text-xs">
+													<span>{t('app.portal.bot.webhooks.inviteXernerxBotBtn')}</span>
+													<ExternalLink size={12} />
+												</Button>
+											</Link>
+											<Link href={getEnvUrl('https://store.xernerx.com?category=developers')} target="_blank">
+												<Button type="button" variant="primary" size="sm" className="flex items-center gap-1.5 text-xs">
+													<span>{t('app.portal.bot.webhooks.apiTierUpgradeBtn')}</span>
+													<ExternalLink size={12} />
+												</Button>
+											</Link>
+										</div>
+									</div>
+								) : (
+									<div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-(--accent)/10 border border-(--accent)/25">
+										<div className="flex flex-col gap-0.5">
+											<span className="text-xs font-extrabold text-(--text) flex items-center gap-1.5">
+												<Sparkles size={13} className="text-(--accent)" />
+												<span>{t('app.portal.bot.webhooks.sharedServerTitle')}</span>
+											</span>
+											<p className="text-xs text-(--text-muted)">{t('app.portal.bot.webhooks.sharedServerDesc')}</p>
+										</div>
+										<Link href={getEnvUrl('https://www.xernerx.com/invites')} target="_blank" className="shrink-0">
+											<Button type="button" variant="secondary" size="sm" className="flex items-center gap-1.5 text-xs">
+												<span>{t('app.portal.bot.webhooks.inviteXernerxBotBtn')}</span>
+												<ExternalLink size={12} />
+											</Button>
+										</Link>
+									</div>
+								)}
 							</div>
 						</div>
 					))}
@@ -309,37 +394,6 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 					>
 						{t('app.portal.bot.webhooks.addWebhook')}
 					</Button>
-				</div>
-
-				{/* HMAC Signature Verification Snippet Card */}
-				<div className="mt-6 pt-6 border-t border-(--border)/10 flex flex-col gap-3">
-					<div className="flex flex-wrap items-center justify-between gap-2">
-						<div>
-							<h3 className="text-sm font-extrabold text-(--text) flex items-center gap-2">
-								<Code2 className="w-4 h-4 text-(--accent)" />
-								{t('app.portal.bot.webhooks.verifySignatureTitle')}
-							</h3>
-							<p className="text-xs text-(--text-muted) mt-0.5">{t('app.portal.bot.webhooks.verifySignatureDesc')}</p>
-						</div>
-						<Button
-							type="button"
-							variant="secondary"
-							size="sm"
-							onClick={() => {
-								navigator.clipboard.writeText(SIGNATURE_SNIPPET);
-								setCopiedSnippet(true);
-								toast({ type: 'success', title: t('app.portal.bot.webhooks.snippetCopied') });
-								setTimeout(() => setCopiedSnippet(false), 2000);
-							}}
-							className="flex items-center gap-1.5 text-xs"
-						>
-							{copiedSnippet ? <Check size={13} className="text-(--accent-green)" /> : <Copy size={13} />}
-							<span>{t('app.portal.bot.webhooks.copySnippet')}</span>
-						</Button>
-					</div>
-					<pre className="p-4 rounded-2xl bg-(--background)/60 border border-(--border)/10 text-xs font-mono text-(--text) overflow-x-auto leading-relaxed">
-						<code>{SIGNATURE_SNIPPET}</code>
-					</pre>
 				</div>
 			</div>
 

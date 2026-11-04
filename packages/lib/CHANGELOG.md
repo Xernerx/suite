@@ -2,6 +2,21 @@
 
 # @xernerx/lib
 
+## 1.21.0
+
+### Minor Changes
+
+- ## Bot Status Webhook Dispatcher & Localization Updates
+
+    Added the shared `botStatusWebhooks` dispatcher utility, extended bot profile webhook trigger schemas, and added localization strings for the Compare Studio and API-tier webhooks.
+
+    ### Added
+    - **Bot Status Webhook Dispatcher (`botStatusWebhooks.ts`)**: Added `notifyBotStatusTransition` and `sweepStaleBotsOffline` helpers for dispatching HMAC-SHA256 signed `POST online` and `POST offline` webhooks to eligible Developer API subscribers.
+    - **Compare Studio & Webhook Localization Keys**: Added `app.compare.*`, `portal.botView.webhooks.apiTier*`, and `docs.api.v1.botWebhooksRelay.statusWebhooks*` translation strings in `en-GB.json`.
+
+    ### Changed
+    - **Bot Profile Webhook Trigger Enum**: Extended `BotsProfileModel` webhook event triggers to include `'POST online'` and `'POST offline'`.
+
 ## 1.20.0
 
 ### Minor Changes

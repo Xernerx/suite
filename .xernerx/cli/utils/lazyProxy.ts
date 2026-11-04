@@ -39,6 +39,8 @@ interface ManagedApp extends AppDefinition {
 	child: ChildProcess | null;
 	lastActiveAt: number;
 	bootStartedAt: number;
+	bootProgress: number;
+	bootStage: string;
 	activeRequestsCount: number;
 	pendingQueue: Array<() => void>;
 	activeSockets: Set<net.Socket>;
@@ -210,6 +212,31 @@ function isBrowserDocumentNavigation(req: http.IncomingMessage, app: AppDefiniti
 	return accept.includes('text/html');
 }
 
+const ICON_LOGO_BOUNDS = {
+	minX: -15,
+	maxX: 1265,
+	minY: 195,
+	maxY: 1075,
+};
+
+const ICON_LOGO_PATHS = [
+	{
+		tx: 625,
+		ty: 580,
+		d: 'M0 2.7006 C12.0531 2.7006 13.8605 7.0627 34.4375 2.25 C38.3928 1.3518 42.3506 0.4645 46.3086 -0.4219 C47.278 -0.6397 48.2473 -0.8576 49.2461 -1.082 C79.1935 -7.7598 79.1935 -7.7598 94.0625 -7.5 C95.7722 -7.484 95.7722 -7.484 97.5164 -7.4678 C107.9447 -7.2315 117.7053 -5.9123 126 1 C126.5711 1.4692 127.1421 1.9384 127.7305 2.4219 C134.017 8.0516 138.5025 16.5348 139.2734 25.0039 C139.5597 35.0345 137.9078 42.0118 131.0625 49.5 C123.9999 55.9916 115.7073 61.1905 107.7617 66.5195 C65.2759 95.0603 47.3979 123.8364 33.7732 173.0378 C31.1033 182.6369 28.3726 192.023 23.9648 200.9883 C23.6591 201.6173 23.3533 202.2463 23.0382 202.8943 C20.6545 207.4589 17.6612 210.4749 14 214 C12.6581 217.5451 12.959 221.2323 13 225 C13.0042 225.7269 13.0084 226.4537 13.0127 227.2026 C13.6776 288.186 35.2878 349.842 78 394 C78.7031 394.7418 78.7031 394.7418 79.4204 395.4985 C96.5954 413.6034 117.791 427.5349 138.9805 440.5117 C144.5749 443.9466 150.0481 447.5692 155.5415 451.1624 C161.657 455.1526 167.8244 459.0491 174.0645 462.8418 C177.0161 464.6565 179.7137 466.3703 182 469 C149.4955 465.252 114.619 454.4014 88 435 C87.4476 434.5988 86.8953 434.1976 86.3262 433.7842 C43.7875 402.5456 17.4861 359.4583 0 310 C-17.4861 359.4583 -43.7875 402.5456 -86.3262 433.7842 C-86.8953 434.1976 -87.4476 434.5988 -88 435 C-114.619 454.4014 -149.4955 465.252 -182 469 C-179.7137 466.3703 -177.0161 464.6565 -174.0645 462.8418 C-167.8244 459.0491 -161.657 455.1526 -155.5415 451.1624 C-150.0481 447.5692 -144.5749 443.9466 -138.9805 440.5117 C-117.791 427.5349 -96.5954 413.6034 -79.4204 395.4985 C-78.7031 394.7418 -78.7031 394.7418 -78 394 C-35.2878 349.842 -13.6776 288.186 -13.0127 227.2026 C-13.0084 226.4537 -13.0042 225.7269 -13 225 C-12.959 221.2323 -12.6581 217.5451 -14 214 C-17.6612 210.4749 -20.6545 207.4589 -23.0382 202.8943 C-23.3533 202.2463 -23.6591 201.6173 -23.9648 200.9883 C-28.3726 192.023 -31.1033 182.6369 -33.7732 173.0378 C-47.3979 123.8364 -65.2759 95.0603 -107.7617 66.5195 C-115.7073 61.1905 -123.9999 55.9916 -131.0625 49.5 C-137.9078 42.0118 -139.5597 35.0345 -139.2734 25.0039 C-138.5025 16.5348 -134.017 8.0516 -127.7305 2.4219 C-127.1421 1.9384 -126.5711 1.4692 -126 1 C-117.7053 -5.9123 -107.9447 -7.2315 -97.5164 -7.4678 C-95.7722 -7.484 -95.7722 -7.484 -94.0625 -7.5 C-79.1935 -7.7598 -79.1935 -7.7598 -49.2461 -1.082 C-48.2473 -0.8576 -47.278 -0.6397 -46.3086 -0.4219 C-42.3506 0.4645 -38.3928 1.3518 -34.4375 2.25 C-13.8605 7.0627 -12.0531 2.7006 0 2.7006 Z',
+	},
+	{
+		tx: 1176,
+		ty: 229,
+		d: 'M1 0 C2.0545 0.1716 3.1089 0.3432 4.1953 0.52 C24.332 3.8182 50.9764 8.2444 67 22 C65.7798 28.8082 64.1411 35.3201 61.9375 41.875 C61.484 43.2259 61.484 43.2259 61.0212 44.604 C40.4366 104.2835 -1.957 150.1635 -58 178 C-58.665 178.3316 -59.33 178.6632 -60.0151 179.0049 C-90.8909 194.1075 -128.3766 199.2219 -162.375 199.25 C-163.1181 199.2507 -163.8612 199.2513 -164.6269 199.252 C-208.7234 199.1889 -256.7184 187.0727 -293.3125 161.75 C-296.3504 159.7629 -298.3898 158.5186 -302.0625 158.75 C-324.5525 164.3495 -338.4924 186.4294 -349.6875 205 C-350.4641 206.33 -351.2376 207.6618 -352 209 C-358.1 188.8407 -338.9526 154.3683 -330 137 C-323.3316 124.5807 -316.0549 112.8148 -307 102 C-306.1272 100.9248 -305.2549 99.8492 -304.3828 98.7734 C-292.3825 84.1864 -278.9409 70.306 -263.6299 59.1899 C-262.0133 58.0097 -260.4244 56.792 -258.8359 55.5742 C-236.7816 38.8953 -210.9281 27.2151 -185 18 C-183.8812 17.5964 -183.8812 17.5964 -182.7397 17.1846 C-156.9101 7.9942 -129.1067 3.5791 -102 0 C-100.7544 -0.1652 -99.5089 -0.3303 -98.2256 -0.5005 C-65.7678 -4.6055 -31.302 -5.6694 1 0 Z M-102 32 C-102.0146 32.7779 -102.0292 33.5557 -102.0442 34.3572 C-102.6825 65.0895 -105.6655 94.89 -115.2327 124.3115 C-116.1372 127.0148 -116.1372 127.0148 -116 130 C-120.5378 126.4669 -124.0068 122.8383 -127.375 118.1875 C-128.085 117.209 -128.085 117.209 -128.8093 116.2107 C-144.3507 94.1922 -150.7912 68.4766 -153 42 C-159.9204 42.6309 -166.2517 44.8546 -172.8125 47.0625 C-174.015 47.4666 -175.2176 47.8707 -176.4565 48.2871 C-186.2631 51.6413 -195.7019 55.4298 -205 60 C-206.0217 60.4935 -206.0217 60.4935 -207.064 60.9971 C-219.7556 67.1859 -231.4857 74.8516 -243 83 C-243.8474 83.5826 -244.6948 84.1652 -245.5679 84.7654 C-250.3571 88.1809 -250.3571 88.1809 -253.3516 93.1133 C-255.1351 113.9803 -252.4517 133.0967 -243 152 C-240.1578 153.3647 -237.1157 154.2619 -234.125 155.25 C-233.2011 155.5557 -232.2773 155.8615 -231.3254 156.1765 C-223.6988 158.6149 -215.9983 160.5611 -208.1875 162.3125 C-207.1171 162.5545 -206.0467 162.7965 -204.9438 163.0459 C-190.5383 166.1498 -176.3915 167.4143 -161.6875 167.375 C-160.5227 167.3742 -160.5227 167.3742 -159.3344 167.3734 C-136.5599 167.3007 -114.7969 163.5593 -93 157 C-91.8771 156.6643 -91.8771 156.6643 -90.7314 156.3218 C-64.0974 148.146 -40.3722 133.8806 -20 115 C-19.0371 114.108 -18.0741 113.2159 -17.082 112.2969 C-7.0407 102.6096 7.489 88.5609 8.1875 74.125 C7.9781 61.4579 5.2615 49.836 1 38 C0.6932 37.0223 0.6932 37.0223 0.3801 36.0249 C-0.3231 33.8533 -0.3231 33.8533 -2 31 C-4.7302 29.7573 -4.7302 29.7573 -7.9375 29.625 C-8.9778 29.5141 -10.018 29.4033 -11.0898 29.2891 C-13.0254 29.146 -13.0254 29.146 -15 29 C-15.8193 28.916 -16.6386 28.8321 -17.4827 28.7456 C-26.6782 27.846 -35.8336 27.8442 -45.0625 27.875 C-45.8836 27.8766 -46.7047 27.8781 -47.5507 27.8797 C-75.4325 26.381 -75.4325 26.381 -102 32 Z',
+	},
+	{
+		tx: 74,
+		ty: 229,
+		d: 'M-1 0 C31.302 -5.6694 65.7678 -4.6055 98.2256 -0.5005 C99.5089 -0.3303 100.7544 -0.1652 102 0 C129.1067 3.5791 156.9101 7.9942 182.7397 17.1846 C183.8812 17.5964 183.8812 17.5964 185 18 C210.9281 27.2151 236.7816 38.8953 258.8359 55.5742 C260.4244 56.792 262.0133 58.0097 263.6299 59.1899 C278.9409 70.306 292.3825 84.1864 304.3828 98.7734 C305.2549 99.8492 306.1272 100.9248 307 102 C316.0549 112.8148 323.3316 124.5807 330 137 C338.9526 154.3683 358.1 188.8407 352 209 C351.2376 207.6618 350.4641 206.33 349.6875 205 C338.4924 186.4294 324.5525 164.3495 302.0625 158.75 C298.3898 158.5186 296.3504 159.7629 293.3125 161.75 C256.7184 187.0727 208.7234 199.1889 164.6269 199.252 C163.8612 199.2513 163.1181 199.2507 162.375 199.25 C128.3766 199.2219 90.8909 194.1075 60.0151 179.0049 C59.33 178.6632 58.665 178.3316 58 178 C1.957 150.1635 -40.4366 104.2835 -61.0212 44.604 C-61.484 43.2259 -61.484 43.2259 -61.9375 41.875 C-64.1411 35.3201 -65.7798 28.8082 -67 22 C-50.9764 8.2444 -24.332 3.8182 -4.1953 0.52 C-3.1089 0.3432 -2.0545 0.1716 -1 0 Z M102 32 C75.4325 26.381 75.4325 26.381 47.5507 27.8797 C46.7047 27.8781 45.8836 27.8766 45.0625 27.875 C35.8336 27.8442 26.6782 27.846 17.4827 28.7456 C16.6386 28.8321 15.8193 28.916 15 29 C13.0254 29.146 13.0254 29.146 11.0898 29.2891 C10.018 29.4033 8.9778 29.5141 7.9375 29.625 C4.7302 29.7573 4.7302 29.7573 2 31 C0.3231 33.8533 0.3231 33.8533 -0.3801 36.0249 C-0.6932 37.0223 -0.6932 37.0223 -1 38 C-5.2615 49.836 -7.9781 61.4579 -8.1875 74.125 C-7.489 88.5609 7.0407 102.6096 17.082 112.2969 C18.0741 113.2159 19.0371 114.108 20 115 C40.3722 133.8806 64.0974 148.146 90.7314 156.3218 C91.8771 156.6643 91.8771 156.6643 93 157 C114.7969 163.5593 136.5599 167.3007 159.3344 167.3734 C160.5227 167.3742 160.5227 167.3742 161.6875 167.375 C176.3915 167.4143 190.5383 166.1498 204.9438 163.0459 C206.0467 162.7965 207.1171 162.5545 208.1875 162.3125 C215.9983 160.5611 223.6988 158.6149 231.3254 156.1765 C232.2773 155.8615 233.2011 155.5557 234.125 155.25 C237.1157 154.2619 240.1578 153.3647 243 152 C252.4517 133.0967 255.1351 113.9803 253.3516 93.1133 C250.3571 88.1809 250.3571 88.1809 245.5679 84.7654 C244.6948 84.1652 243.8474 83.5826 243 83 C231.4857 74.8516 219.7556 67.1859 207.064 60.9971 C206.0217 60.4935 206.0217 60.4935 205 60 C195.7019 55.4298 186.2631 51.6413 176.4565 48.2871 C175.2176 47.8707 174.015 47.4666 172.8125 47.0625 C166.2517 44.8546 159.9204 42.6309 153 42 C150.7912 68.4766 144.3507 94.1922 128.8093 116.2107 C128.085 117.209 128.085 117.209 127.375 118.1875 C124.0068 122.8383 120.5378 126.4669 116 130 C116.1372 127.0148 116.1372 127.0148 115.2327 124.3115 C105.6655 94.89 102.6825 65.0895 102.0442 34.3572 C102.0292 33.5557 102.0146 32.7779 102 32 Z',
+	},
+];
+
 const FULL_LOGO_BOUNDS = {
 	minX: 195,
 	maxX: 1800,
@@ -315,16 +342,17 @@ export function parseSplashPreferences(cookieHeader?: string): { accent: string;
 export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTimeoutSeconds: number, req?: http.IncomingMessage): string {
 	const { accent, theme } = parseSplashPreferences(req?.headers.cookie);
 	const initialThemeAttr = theme === 'light' || theme === 'dark' ? ` data-theme="${theme}"` : '';
+	const reqPath = req?.url && !req.url.startsWith('/__suite_status') ? req.url : '/';
 
 	return `<!DOCTYPE html>
 <html lang="en"${initialThemeAttr} style="--accent: ${accent};">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Starting ${app.label} — Xernerx Dev</title>
+	<title>Waking ${app.label} — Xernerx Suite</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;600;700&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 	<script>
 		(function() {
 			function getCookie(name) {
@@ -352,6 +380,9 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 					? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
 					: (storedTheme === 'light' ? 'light' : 'dark');
 				document.documentElement.setAttribute('data-theme', resolvedTheme);
+				if (window.electron) {
+					document.documentElement.classList.add('is-electron');
+				}
 			} catch (e) {}
 		})();
 	</script>
@@ -363,6 +394,10 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 			--text-muted: #a1a1aa;
 			--border: #27272a;
 			--accent: ${accent};
+			--hover-accent: color-mix(in srgb, var(--accent) 85%, white);
+			--accent-green: #38e54d;
+			--accent-orange: #ff8c00;
+			--accent-red: #f23f43;
 		}
 		@media (prefers-color-scheme: light) {
 			:root:not([data-theme="dark"]) {
@@ -392,128 +427,565 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 			margin: 0;
 			padding: 0;
 		}
-		body {
-			min-height: 100vh;
+		html, body {
+			height: 100vh;
 			width: 100vw;
+			background: var(--background);
+			color: var(--text);
+			font-family: 'Fredoka', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			overflow: hidden;
+			user-select: none;
+			-webkit-font-smoothing: antialiased;
+		}
+		.suite-header {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 50px;
+			z-index: 50;
+			background: var(--background);
+			color: var(--text);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 16px;
+			gap: 12px;
+			-webkit-app-region: drag;
+			app-region: drag;
+		}
+		.env-bar {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 2px;
+			background: var(--accent-orange);
+			box-shadow: 0 0 10px var(--accent-orange);
+			pointer-events: none;
+		}
+		.header-left {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-width: 0;
+			flex: 1;
+		}
+		.brand-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 5px 10px;
+			border-radius: 9999px;
+			color: var(--text);
+			text-decoration: none;
+			font-weight: 700;
+			font-size: 14px;
+			letter-spacing: 0.01em;
+			flex-shrink: 0;
+		}
+		.brand-dot {
+			width: 10px;
+			height: 10px;
+			border-radius: 9999px;
+			background: var(--accent);
+			box-shadow: 0 0 12px var(--accent);
+		}
+		.env-tag {
+			padding: 2px 7px;
+			border-radius: 9999px;
+			font-size: 10px;
+			font-weight: 700;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			background: color-mix(in srgb, var(--accent-orange) 16%, transparent);
+			color: var(--accent-orange);
+			border: 1px solid color-mix(in srgb, var(--accent-orange) 32%, transparent);
+		}
+		.omnibar {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			height: 32px;
+			padding: 0 12px;
+			border-radius: 9999px;
+			background: color-mix(in srgb, var(--foreground) 50%, transparent);
+			border: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+			font-size: 12px;
+			color: var(--text-muted);
+			min-width: 0;
+			max-width: 460px;
+			overflow: hidden;
+		}
+		.omnibar-app {
+			font-weight: 700;
+			color: var(--text);
+			flex-shrink: 0;
+		}
+		.omnibar-sep {
+			opacity: 0.35;
+			flex-shrink: 0;
+		}
+		.omnibar-url {
+			font-family: 'Cascadia Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 11px;
+			color: var(--text-muted);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.header-right {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			-webkit-app-region: no-drag;
+			app-region: no-drag;
+			flex-shrink: 0;
+		}
+		.header-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			height: 32px;
+			padding: 0 12px;
+			border-radius: 9999px;
+			background: color-mix(in srgb, var(--foreground) 50%, transparent);
+			border: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+			color: var(--text-muted);
+			font-family: inherit;
+			font-size: 12px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+		.header-btn:hover {
+			background: color-mix(in srgb, var(--accent) 15%, transparent);
+			border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+			color: var(--text);
+		}
+		.win-controls {
+			display: none;
+			align-items: center;
+			gap: 6px;
+			padding-left: 6px;
+			margin-left: 2px;
+			border-left: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+		}
+		html.is-electron .win-controls {
+			display: inline-flex;
+		}
+		.win-btn {
+			width: 32px;
+			height: 32px;
+			border-radius: 9999px;
+			background: color-mix(in srgb, var(--foreground) 50%, transparent);
+			border: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+			color: var(--text-muted);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: all 0.15s ease;
+		}
+		.win-btn:hover {
+			background: color-mix(in srgb, var(--accent) 15%, transparent);
+			border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+			color: var(--accent);
+		}
+		.win-btn.close:hover {
+			background: var(--accent-red);
+			border-color: var(--accent-red);
+			color: #ffffff;
+		}
+		.suite-stage {
+			position: fixed;
+			inset: 50px 0 0 0;
+			border-top-left-radius: 12px;
+			border-top-right-radius: 12px;
+			overflow: hidden;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: flex-end;
+			justify-content: center;
+			padding: 24px;
+			text-align: center;
 			background:
 				radial-gradient(circle at 50% 15%, color-mix(in srgb, var(--accent) 30%, var(--foreground)) 0%, var(--foreground) 75%),
 				linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 0%, var(--foreground) 50%, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 100%);
-			color: var(--text);
-			font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-			padding: 32px 24px 44px;
-			overflow: hidden;
-			position: relative;
-			user-select: none;
 		}
 		#dot-matrix-canvas {
-			position: fixed;
+			position: absolute;
 			inset: 0;
-			width: 100vw;
-			height: 100vh;
+			width: 100%;
+			height: 100%;
 			z-index: 1;
 			display: block;
 		}
-		.hud {
+		.feedback-card {
 			position: relative;
 			z-index: 10;
 			width: 100%;
-			max-width: 480px;
+			max-width: 560px;
 			border-radius: 24px;
-			background: color-mix(in srgb, var(--foreground) 68%, transparent);
-			backdrop-filter: blur(20px);
-			-webkit-backdrop-filter: blur(20px);
-			border: 1px solid color-mix(in srgb, var(--border) 45%, transparent);
-			box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
-			padding: 22px 26px;
+			background: color-mix(in srgb, var(--foreground) 30%, transparent);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+			border: 1px solid color-mix(in srgb, var(--border) 10%, transparent);
+			box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+			padding: 28px;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			text-align: center;
-			gap: 14px;
+			gap: 18px;
 		}
-		.badge {
+		.icon-badge {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 112px;
+			padding: 12px;
+			border-radius: 16px;
+			background: color-mix(in srgb, var(--accent) 10%, transparent);
+			border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+		}
+		#compact-icon-canvas {
+			width: 88px;
+			height: 68px;
+			display: block;
+		}
+		.status-pill-wrap {
 			display: inline-flex;
 			align-items: center;
 			gap: 8px;
-			padding: 5px 14px;
+			padding: 6px 16px;
 			border-radius: 9999px;
+			border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+			background: color-mix(in srgb, var(--background) 50%, transparent);
+			box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
 			font-size: 11px;
 			font-weight: 700;
-			letter-spacing: 0.04em;
-			background: color-mix(in srgb, var(--accent) 14%, transparent);
-			color: var(--accent);
-			border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--text-muted);
 		}
-		.dot {
-			width: 7px;
-			height: 7px;
+		.pulse-wrap {
+			position: relative;
+			display: inline-flex;
+			width: 8px;
+			height: 8px;
+			flex-shrink: 0;
+		}
+		.pulse-ring {
+			position: absolute;
+			inset: 0;
 			border-radius: 9999px;
 			background: var(--accent);
-			box-shadow: 0 0 10px var(--accent);
-			animation: blink 1.2s ease-in-out infinite;
+			opacity: 0.75;
+			animation: ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
 		}
-		@keyframes blink {
-			0%, 100% { opacity: 0.35; transform: scale(0.9); }
-			50% { opacity: 1; transform: scale(1.15); }
+		.pulse-dot {
+			position: relative;
+			width: 8px;
+			height: 8px;
+			border-radius: 9999px;
+			background: var(--accent);
+		}
+		@keyframes ping {
+			75%, 100% {
+				transform: scale(2.2);
+				opacity: 0;
+			}
+		}
+		.heading-group {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			width: 100%;
+			gap: 6px;
 		}
 		h1 {
 			font-family: 'Fredoka', sans-serif;
-			font-size: 24px;
-			font-weight: 700;
-			letter-spacing: -0.01em;
+			font-size: 26px;
+			font-weight: 800;
+			letter-spacing: -0.015em;
 			color: var(--text);
 		}
 		p {
-			font-size: 13px;
+			max-width: 420px;
+			font-size: 14px;
 			line-height: 1.5;
 			color: var(--text-muted);
 		}
-		.well {
+		.details-box {
 			width: 100%;
 			border-radius: 16px;
-			background: color-mix(in srgb, var(--background) 58%, transparent);
-			border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
-			padding: 11px 15px;
+			background: color-mix(in srgb, var(--background) 70%, transparent);
+			border: 1px solid color-mix(in srgb, var(--border) 10%, transparent);
+			text-align: left;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+		}
+		.details-header {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			font-size: 12px;
-			color: var(--text-muted);
+			padding: 10px 16px;
+			border-bottom: 1px solid color-mix(in srgb, var(--border) 10%, transparent);
+			background: color-mix(in srgb, var(--background) 50%, transparent);
 		}
-		.well code {
+		.details-title {
+			font-family: 'Cascadia Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 12px;
+			font-weight: 700;
 			color: var(--accent);
-			font-weight: 600;
-			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 		}
 		.elapsed-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			border-radius: 12px;
+			border: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+			background: color-mix(in srgb, var(--foreground) 60%, transparent);
+			padding: 3px 10px;
+			font-family: 'Cascadia Code', ui-monospace, monospace;
 			font-variant-numeric: tabular-nums;
-			font-weight: 700;
+			font-size: 11px;
+			font-weight: 600;
 			color: var(--text);
+		}
+		.details-body {
+			padding: 14px 16px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+		.details-line {
+			font-family: 'Cascadia Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 12px;
+			color: var(--text);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.details-line.muted {
+			color: var(--text-muted);
+		}
+		.progress-block {
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			padding-top: 4px;
+		}
+		.progress-meta {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 8px;
+			font-family: 'Cascadia Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+			font-size: 11px;
+		}
+		.progress-stage {
+			color: var(--text-muted);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.progress-pct {
+			color: var(--accent);
+			font-weight: 700;
+			font-variant-numeric: tabular-nums;
+			flex-shrink: 0;
+		}
+		.progress-track {
+			width: 100%;
+			height: 6px;
+			border-radius: 9999px;
+			background: color-mix(in srgb, var(--foreground) 85%, transparent);
+			border: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+			overflow: hidden;
+			position: relative;
+		}
+		.progress-bar {
+			height: 100%;
+			width: 8%;
+			border-radius: 9999px;
+			background: var(--accent);
+			box-shadow: 0 0 12px var(--accent);
+			transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+			position: relative;
+			overflow: hidden;
+		}
+		.progress-bar::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+			animation: progressShimmer 1.4s ease-in-out infinite;
+		}
+		@keyframes progressShimmer {
+			0% { transform: translateX(-100%); }
+			100% { transform: translateX(100%); }
+		}
+		.actions-row {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: center;
+			gap: 12px;
+			padding-top: 2px;
+		}
+		.btn-primary {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			border-radius: 16px;
+			background: var(--accent);
+			border: 1px solid transparent;
+			padding: 10px 18px;
+			font-family: inherit;
+			font-size: 14px;
+			font-weight: 600;
+			color: #ffffff;
+			cursor: pointer;
+			box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+			transition: background-color 0.15s ease;
+		}
+		.btn-primary:hover {
+			background: var(--hover-accent);
+		}
+		.btn-secondary {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			border-radius: 16px;
+			background: color-mix(in srgb, var(--background) 60%, transparent);
+			border: 1px solid color-mix(in srgb, var(--border) 15%, transparent);
+			padding: 10px 18px;
+			font-family: inherit;
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--text);
+			cursor: pointer;
+			box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+			transition: background-color 0.15s ease;
+		}
+		.btn-secondary:hover {
+			background: var(--background);
 		}
 	</style>
 </head>
 <body>
-	<canvas id="dot-matrix-canvas" aria-hidden="true"></canvas>
-	<div class="hud">
-		<div class="badge">
-			<span class="dot"></span>
-			<span id="status-pill">ON-DEMAND DEV LISTENER</span>
+	<header class="suite-header" a-label="Xernerx Studios">
+		<div class="env-bar"></div>
+		<div class="header-left">
+			<a href="${displayUrl}" aria-label="Xernerx Studios" class="brand-pill">
+				<span class="brand-dot"></span>
+				<span>Xernerx</span>
+				<span class="env-tag">DEV</span>
+			</a>
 		</div>
-		<div>
-			<h1>Waking up ${app.label}</h1>
-			<p id="status-desc" style="margin-top: 4px;">Spawning Next.js dev server on demand. This page will open automatically as soon as it is ready.</p>
+		<div class="header-right">
+			<button type="button" class="header-btn" id="header-reload-btn" title="Reload now">
+				<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+				<span>Reload</span>
+			</button>
+			<div class="win-controls">
+				<button type="button" class="win-btn" id="win-dock" title="Dock App Sidebar">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg>
+				</button>
+				<button type="button" class="win-btn" id="win-min" title="Minimize">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+				</button>
+				<button type="button" class="win-btn" id="win-max" title="Maximize">
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+				</button>
+				<button type="button" class="win-btn close" id="win-close" title="Close">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+				</button>
+			</div>
 		</div>
-		<div class="well">
-			<span>Endpoint: <code>${displayUrl}</code></span>
-			<span id="elapsed" class="elapsed-pill">0.0s</span>
+	</header>
+	<main class="suite-stage">
+		<canvas id="dot-matrix-canvas" aria-hidden="true"></canvas>
+		<div class="feedback-card" id="wake-feedback-card">
+			<div class="icon-badge">
+				<canvas id="compact-icon-canvas" aria-hidden="true"></canvas>
+			</div>
+			<div class="status-pill-wrap">
+				<span class="pulse-wrap">
+					<span class="pulse-ring"></span>
+					<span class="pulse-dot"></span>
+				</span>
+				<span id="status-pill">ON-DEMAND DEV SERVER</span>
+			</div>
+			<div class="heading-group">
+				<h1>Waking up ${app.label}</h1>
+				<p id="status-desc">Starting the ${app.label} development server on demand. This page will open automatically as soon as it is ready.</p>
+			</div>
+			<div class="details-box">
+				<div class="details-header">
+					<span class="details-title">Dev Server Status</span>
+					<span id="elapsed" class="elapsed-pill">0.0s</span>
+				</div>
+				<div class="details-body">
+					<div class="details-line">Endpoint: ${displayUrl}${reqPath}</div>
+					<div class="details-line muted">Workspace: ${app.dir} (port :${app.port} · idle spin-down: ${idleTimeoutSeconds > 0 ? idleTimeoutSeconds + 's' : 'off'})</div>
+					<div class="progress-block">
+						<div class="progress-meta">
+							<span class="progress-stage" id="boot-stage">Spawning Next.js process...</span>
+							<span class="progress-pct" id="boot-pct">8%</span>
+						</div>
+						<div class="progress-track">
+							<div class="progress-bar" id="boot-bar" style="width: 8%;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="actions-row">
+				<button type="button" class="btn-primary" id="card-reload-btn">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+					<span>Reload Now</span>
+				</button>
+				<button type="button" class="btn-secondary" id="card-copy-btn">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+					<span id="card-copy-label">Copy Endpoint</span>
+				</button>
+			</div>
 		</div>
-		<p style="font-size: 11px; opacity: 0.72;">Idle spin-down active (${idleTimeoutSeconds > 0 ? idleTimeoutSeconds + 's timeout' : 'disabled'})</p>
-	</div>
+	</main>
 	<script>
+		(function bindHeaderControls() {
+			var reloadBtn = document.getElementById('header-reload-btn');
+			if (reloadBtn) reloadBtn.addEventListener('click', function() { window.location.reload(); });
+			var cardReloadBtn = document.getElementById('card-reload-btn');
+			if (cardReloadBtn) cardReloadBtn.addEventListener('click', function() { window.location.reload(); });
+			var cardCopyBtn = document.getElementById('card-copy-btn');
+			var cardCopyLabel = document.getElementById('card-copy-label');
+			if (cardCopyBtn) {
+				cardCopyBtn.addEventListener('click', function() {
+					try {
+						navigator.clipboard.writeText('${displayUrl}${reqPath}');
+						if (cardCopyLabel) cardCopyLabel.textContent = 'Copied!';
+						setTimeout(function() { if (cardCopyLabel) cardCopyLabel.textContent = 'Copy Endpoint'; }, 2000);
+					} catch (e) {}
+				});
+			}
+			var dockBtn = document.getElementById('win-dock');
+			if (dockBtn) dockBtn.addEventListener('click', function() { if (window.electron && window.electron.toggleDockSidebar) window.electron.toggleDockSidebar(); });
+			var minBtn = document.getElementById('win-min');
+			if (minBtn) minBtn.addEventListener('click', function() { if (window.electron && window.electron.minimize) window.electron.minimize(); });
+			var maxBtn = document.getElementById('win-max');
+			if (maxBtn) maxBtn.addEventListener('click', function() { if (window.electron && window.electron.maximize) window.electron.maximize(); });
+			var closeBtn = document.getElementById('win-close');
+			if (closeBtn) closeBtn.addEventListener('click', function() { if (window.electron && window.electron.close) window.electron.close(); });
+		})();
+		const ICON_LOGO_BOUNDS = ${JSON.stringify(ICON_LOGO_BOUNDS)};
+		const ICON_LOGO_PATHS = ${JSON.stringify(ICON_LOGO_PATHS)};
 		const FULL_LOGO_BOUNDS = ${JSON.stringify(FULL_LOGO_BOUNDS)};
 		const FULL_LOGO_PATHS = ${JSON.stringify(FULL_LOGO_PATHS)};
 		const SAMPLE_OFFSETS = [
@@ -545,9 +1017,16 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 		(function initDotMatrixLoader() {
 			const canvas = document.getElementById('dot-matrix-canvas');
 			const ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
+			const iconCanvas = document.getElementById('compact-icon-canvas');
+			const iconCtx = iconCanvas && iconCanvas.getContext ? iconCanvas.getContext('2d') : null;
 			if (!canvas || !ctx) return;
 
 			const compiledFull = FULL_LOGO_PATHS.map((item) => ({
+				tx: item.tx,
+				ty: item.ty,
+				path: new Path2D(item.d),
+			}));
+			const compiledIcon = ICON_LOGO_PATHS.map((item) => ({
 				tx: item.tx,
 				ty: item.ty,
 				path: new Path2D(item.d),
@@ -562,6 +1041,12 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 			const pointer = { x: -9999, y: -9999, active: false };
 			const shockwaves = [];
 
+			let iconW = 88;
+			let iconH = 68;
+			let iconDpr = 2;
+			let iconCellRadius = 1.4;
+			let iconDots = [];
+
 			let accentRgb = [139, 124, 246];
 			let textRgb = [250, 250, 250];
 			let mutedRgb = [161, 161, 170];
@@ -574,9 +1059,72 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 				mutedRgb = parseCssColor(styles.getPropertyValue('--text-muted'), isLight ? [82, 82, 91] : [161, 161, 170]);
 			}
 
+			function buildIconGrid() {
+				if (!iconCanvas || !iconCtx) return;
+				iconW = 88;
+				iconH = 68;
+				iconDpr = Math.max(2, Math.min(window.devicePixelRatio || 1, 2.5));
+				iconCanvas.width = Math.round(iconW * iconDpr);
+				iconCanvas.height = Math.round(iconH * iconDpr);
+
+				const cols = 28;
+				const rows = 20;
+				const padX = iconW * 0.04;
+				const padY = iconH * 0.04;
+				const drawW = iconW - padX * 2;
+				const drawH = iconH - padY * 2;
+				const stepX = drawW / cols;
+				const stepY = drawH / rows;
+				iconCellRadius = Math.min(stepX, stepY) * 0.37;
+
+				const spanX = ICON_LOGO_BOUNDS.maxX - ICON_LOGO_BOUNDS.minX;
+				const spanY = ICON_LOGO_BOUNDS.maxY - ICON_LOGO_BOUNDS.minY;
+				iconDots = [];
+
+				for (let r = 0; r < rows; r++) {
+					for (let c = 0; c < cols; c++) {
+						const u = (c + 0.5) / cols;
+						const v = (r + 0.5) / rows;
+						const homeX = padX + u * drawW;
+						const homeY = padY + v * drawH;
+						const nx = (u - 0.5) * 2;
+						const ny = (v - 0.5) * 2;
+						const distCenter = Math.hypot(nx, ny);
+						let hits = 0;
+						for (let s = 0; s < SAMPLE_OFFSETS.length; s++) {
+							const px = homeX + SAMPLE_OFFSETS[s][0] * stepX;
+							const py = homeY + SAMPLE_OFFSETS[s][1] * stepY;
+							const lu = (px - padX) / drawW;
+							const lv = (py - padY) / drawH;
+							if (lu < 0 || lu > 1 || lv < 0 || lv > 1) continue;
+							const svgX = ICON_LOGO_BOUNDS.minX + lu * spanX;
+							const svgY = ICON_LOGO_BOUNDS.minY + lv * spanY;
+							for (let i = 0; i < compiledIcon.length; i++) {
+								if (iconCtx.isPointInPath(compiledIcon[i].path, svgX - compiledIcon[i].tx, svgY - compiledIcon[i].ty, 'evenodd')) {
+									hits++;
+									break;
+								}
+							}
+						}
+						const rawCov = hits / SAMPLE_OFFSETS.length;
+						const cov = rawCov > 0.08 ? Math.max(0.46, rawCov) : 0.22;
+						if (cov <= 0.26) continue;
+						iconDots.push({
+							homeX,
+							homeY,
+							nx,
+							ny,
+							distCenter,
+							coverage: cov,
+							phase: (c * 0.19 + r * 0.23) % (Math.PI * 2),
+						});
+					}
+				}
+			}
+
 			function buildGrid() {
-				activeW = Math.max(320, window.innerWidth || 1200);
-				activeH = Math.max(240, window.innerHeight || 800);
+				activeW = Math.max(320, canvas.clientWidth || window.innerWidth || 1200);
+				activeH = Math.max(240, canvas.clientHeight || (window.innerHeight - 50) || 750);
 				dpr = Math.min(window.devicePixelRatio || 1, 1.35);
 				canvas.width = Math.round(activeW * dpr);
 				canvas.height = Math.round(activeH * dpr);
@@ -592,16 +1140,16 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 				const svgSpanX = FULL_LOGO_BOUNDS.maxX - FULL_LOGO_BOUNDS.minX;
 				const svgSpanY = FULL_LOGO_BOUNDS.maxY - FULL_LOGO_BOUNDS.minY;
 				const aspect = svgSpanX / svgSpanY;
-				const maxFracW = isCompactBanner ? 0.9 : 0.86;
-				let boxW = Math.min(activeW * maxFracW, 1280);
+				const maxFracW = isCompactBanner ? 0.9 : 0.84;
+				let boxW = Math.min(activeW * maxFracW, 1240);
 				let boxH = boxW / aspect;
-				const maxFracH = isCompactBanner ? 0.86 : 0.62;
+				const maxFracH = isCompactBanner ? 0.86 : 0.56;
 				if (boxH > activeH * maxFracH) {
 					boxH = activeH * maxFracH;
 					boxW = boxH * aspect;
 				}
 				const offX = (activeW - boxW) * 0.5;
-				const offY = isCompactBanner ? (activeH - boxH) * 0.5 : Math.max(activeH * 0.06, (activeH - boxH) * 0.34);
+				const offY = isCompactBanner ? (activeH - boxH) * 0.5 : Math.max(activeH * 0.08, (activeH - boxH) * 0.44);
 
 				cellRadiusBase = Math.min(cellStepX, cellStepY) * 0.33;
 				repelRadius = Math.max(95, Math.min(activeW, activeH) * 0.16);
@@ -657,19 +1205,23 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 			}
 
 			syncThemeColors();
+			buildIconGrid();
 			buildGrid();
 
 			window.addEventListener('resize', buildGrid);
 			window.addEventListener('pointermove', (e) => {
-				pointer.x = e.clientX;
-				pointer.y = e.clientY;
-				pointer.active = true;
+				const rect = canvas.getBoundingClientRect();
+				pointer.x = e.clientX - rect.left;
+				pointer.y = e.clientY - rect.top;
+				pointer.active = pointer.y >= 0;
 			});
 			window.addEventListener('pointerleave', () => {
 				pointer.active = false;
 			});
 			window.addEventListener('click', (e) => {
-				shockwaves.push({ x: e.clientX, y: e.clientY, birth: performance.now() });
+				const rect = canvas.getBoundingClientRect();
+				if (e.clientY < rect.top) return;
+				shockwaves.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, birth: performance.now() });
 				if (shockwaves.length > 4) shockwaves.shift();
 			});
 
@@ -679,10 +1231,38 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 					syncThemeColors();
 					lastColorSync = now;
 				}
+				const t = now * 0.001;
+
+				if (iconCtx && iconDots.length > 0) {
+					iconCtx.setTransform(iconDpr, 0, 0, iconDpr, 0, 0);
+					iconCtx.clearRect(0, 0, iconW, iconH);
+					for (let i = 0; i < iconDots.length; i++) {
+						const d = iconDots[i];
+						const logoBlend = Math.max(0, Math.min(1, (d.coverage - 0.22) / 0.52));
+						const waveDiag = Math.sin(d.nx * 5.2 - d.ny * 3.8 - t * 3.4);
+						const waveRadial = Math.cos(d.distCenter * 6.4 - t * 2.8);
+						const waveNorm = Math.pow((waveDiag * 0.65 + waveRadial * 0.35 + 1) * 0.5, 1.5);
+						const fx = d.homeX + Math.cos(d.nx * 4.5 - d.ny * 2.5 - t * 3.1 + d.phase * 0.25) * 0.7;
+						const fy = d.homeY + Math.sin(d.nx * 4.8 - d.ny * 3.0 - t * 3.4 + d.phase * 0.25) * 0.9;
+						const radius = Math.max(0.65, iconCellRadius * d.coverage * (0.62 + waveNorm * 0.68));
+						const accentMix = Math.min(1, waveNorm * 0.92);
+						const baseR = mutedRgb[0] + (textRgb[0] - mutedRgb[0]) * logoBlend;
+						const baseG = mutedRgb[1] + (textRgb[1] - mutedRgb[1]) * logoBlend;
+						const baseB = mutedRgb[2] + (textRgb[2] - mutedRgb[2]) * logoBlend;
+						const rCol = Math.round(baseR + (accentRgb[0] - baseR) * accentMix);
+						const gCol = Math.round(baseG + (accentRgb[1] - baseG) * accentMix);
+						const bCol = Math.round(baseB + (accentRgb[2] - baseB) * accentMix);
+						const alpha = Math.min(1, 0.58 + waveNorm * 0.42);
+						iconCtx.beginPath();
+						iconCtx.arc(fx, fy, radius, 0, Math.PI * 2);
+						iconCtx.fillStyle = 'rgba(' + rCol + ',' + gCol + ',' + bCol + ',' + alpha.toFixed(3) + ')';
+						iconCtx.fill();
+					}
+				}
+
 				ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 				ctx.clearRect(0, 0, activeW, activeH);
 
-				const t = now * 0.001;
 				for (let i = shockwaves.length - 1; i >= 0; i--) {
 					if (now - shockwaves[i].birth > 1500) shockwaves.splice(i, 1);
 				}
@@ -758,8 +1338,9 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 					const gCol = Math.round(baseG + (accentRgb[1] - baseG) * accentMix);
 					const bCol = Math.round(baseB + (accentRgb[2] - baseB) * accentMix);
 
-					const logoRawAlpha = Math.min(1, 0.52 + waveNorm * 0.48 + cursorBoost * 0.52 + shockBoost * 0.48);
-					const ambientRawAlpha = 0.08 + activeEnergy * 0.34;
+					// Subdued stage mode (matching Page.tsx subdued={true} when Feedback views are mounted)
+					const logoRawAlpha = Math.min(1, 0.34 + waveNorm * 0.36 + cursorBoost * 0.52 + shockBoost * 0.48);
+					const ambientRawAlpha = 0.07 + activeEnergy * 0.30;
 					const alpha = ambientRawAlpha + (logoRawAlpha - ambientRawAlpha) * logoBlend;
 
 					if (alpha > 0.005 && radius > 0.15) {
@@ -781,11 +1362,39 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 		const descEl = document.getElementById('status-desc');
 		const pillEl = document.getElementById('status-pill');
 		const titleEl = document.querySelector('h1');
+		const bootStageEl = document.getElementById('boot-stage');
+		const bootPctEl = document.getElementById('boot-pct');
+		const bootBarEl = document.getElementById('boot-bar');
 		let reloading = false;
+		let serverProgress = 8;
+		let serverStage = '';
+		let displayedProgress = 8;
+		let isServerRunning = false;
+
+		function resolveFallbackStage(elapsedSec) {
+			if (isServerRunning) return 'Server ready — compiling route & opening page...';
+			if (serverStage) return serverStage;
+			if (elapsedSec < 0.9) return 'Spawning Next.js process...';
+			if (elapsedSec < 2.0) return 'Initializing Next.js runtime...';
+			if (elapsedSec < 3.4) return 'Loading workspace environment...';
+			return 'Starting compiler & bundler...';
+		}
 
 		setInterval(() => {
-			const s = ((Date.now() - start) / 1000).toFixed(1);
-			if (elapsedEl) elapsedEl.textContent = s + 's';
+			const elapsedMs = Date.now() - start;
+			const elapsedSec = elapsedMs / 1000;
+			if (elapsedEl) elapsedEl.textContent = elapsedSec.toFixed(1) + 's';
+
+			const timeCurvePct = isServerRunning
+				? 96
+				: Math.min(88, Math.round(8 + 80 * (1 - Math.exp(-elapsedSec / 3.8))));
+			const targetPct = Math.max(serverProgress, timeCurvePct);
+			if (displayedProgress < targetPct) {
+				displayedProgress = Math.min(targetPct, displayedProgress + Math.max(1, Math.ceil((targetPct - displayedProgress) * 0.28)));
+			}
+			if (bootBarEl) bootBarEl.style.width = displayedProgress + '%';
+			if (bootPctEl) bootPctEl.textContent = displayedProgress + '%';
+			if (bootStageEl) bootStageEl.textContent = resolveFallbackStage(elapsedSec);
 		}, 100);
 
 		async function checkStatus() {
@@ -793,13 +1402,26 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 				const res = await fetch('/__suite_status?wake=1', { cache: 'no-store' });
 				if (res.ok) {
 					const data = await res.json();
+					if (typeof data.bootProgress === 'number' && data.bootProgress > serverProgress) {
+						serverProgress = data.bootProgress;
+					}
+					if (typeof data.bootStage === 'string' && data.bootStage) {
+						serverStage = data.bootStage;
+					}
 					if (data.status === 'running') {
+						isServerRunning = true;
+						serverProgress = Math.max(serverProgress, 95);
 						if (pillEl) pillEl.textContent = 'READY — LOADING APP';
 						if (titleEl) titleEl.textContent = 'Opening ${app.label}...';
 						if (descEl) descEl.textContent = 'Server is online! Compiling route and loading page...';
 						if (!reloading) {
 							reloading = true;
-							window.location.reload();
+							setTimeout(() => {
+								displayedProgress = 100;
+								if (bootBarEl) bootBarEl.style.width = '100%';
+								if (bootPctEl) bootPctEl.textContent = '100%';
+								window.location.reload();
+							}, 120);
 							setTimeout(() => {
 								reloading = false;
 							}, 4000);
@@ -807,9 +1429,9 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 					}
 				}
 			} catch {}
-			setTimeout(checkStatus, 500);
+			setTimeout(checkStatus, 400);
 		}
-		setTimeout(checkStatus, 400);
+		setTimeout(checkStatus, 300);
 	</script>
 </body>
 </html>`;
@@ -825,6 +1447,8 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 		child: null,
 		lastActiveAt: 0,
 		bootStartedAt: 0,
+		bootProgress: 0,
+		bootStage: 'Sleeping',
 		activeRequestsCount: 0,
 		pendingQueue: [],
 		activeSockets: new Set(),
@@ -840,6 +1464,8 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 			app.readinessTimer = null;
 		}
 		app.state = 'running';
+		app.bootProgress = Math.max(app.bootProgress, 94);
+		app.bootStage = 'Server ready — compiling route & opening page...';
 		app.lastActiveAt = Date.now();
 		const bootSec = ((Date.now() - app.bootStartedAt) / 1000).toFixed(1);
 		app.logger.log(`\x1b[32m✔ Online and ready in ${bootSec}s\x1b[0m (idle timeout: ${idleTimeoutSeconds > 0 ? `${idleTimeoutSeconds}s` : 'off'})`);
@@ -860,6 +1486,8 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 		const child = app.child;
 		app.child = null;
 		app.state = 'sleeping';
+		app.bootProgress = 0;
+		app.bootStage = 'Sleeping';
 		app.activeRequestsCount = 0;
 
 		for (const sock of app.activeSockets) {
@@ -881,6 +1509,8 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 
 		app.state = 'booting';
 		app.bootStartedAt = Date.now();
+		app.bootProgress = 12;
+		app.bootStage = 'Spawning Next.js process...';
 		const displayUrl = getAppDisplayUrl(app, domain, isCustomDomain);
 		app.logger.log(`⚡ Request received for \x1b[1m${displayUrl}${triggerUrl && triggerUrl !== '/' ? triggerUrl : ''}\x1b[0m — waking Next.js dev server...`);
 
@@ -906,7 +1536,29 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 		app.child = child;
 
 		const handleLine = (_raw: string, plain: string) => {
+			const trimmed = plain.trim();
+			if (trimmed.includes('Next.js')) {
+				app.bootProgress = Math.max(app.bootProgress, 32);
+				app.bootStage = 'Initializing Next.js runtime...';
+			} else if (trimmed.includes('Local:') || trimmed.includes('Network:')) {
+				app.bootProgress = Math.max(app.bootProgress, 48);
+				app.bootStage = 'Binding local listener...';
+			} else if (trimmed.includes('Environments:') || trimmed.includes('Experiments')) {
+				app.bootProgress = Math.max(app.bootProgress, 64);
+				app.bootStage = 'Loading workspace environment...';
+			} else if (trimmed.includes('Starting...')) {
+				app.bootProgress = Math.max(app.bootProgress, 78);
+				app.bootStage = 'Starting compiler & bundler...';
+			} else if (trimmed.includes('Compiling')) {
+				app.bootProgress = Math.max(app.bootProgress, 96);
+				app.bootStage = trimmed.replace(/^[○✓]\s*/, '');
+			} else if (trimmed.includes('Compiled')) {
+				app.bootProgress = 100;
+				app.bootStage = 'Compiled — opening page...';
+			}
 			if (plain.includes('Ready in') || plain.includes('✓ Ready')) {
+				app.bootProgress = Math.max(app.bootProgress, 90);
+				app.bootStage = 'Server ready — compiling route...';
 				probePortReady(app.internalPort).then((ok) => {
 					if (ok && app.child === child) markAppReady(app);
 				});
@@ -1034,6 +1686,8 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 									label: app.label,
 									port: app.port,
 									elapsedMs: app.bootStartedAt ? Date.now() - app.bootStartedAt : 0,
+									bootProgress: app.bootProgress,
+									bootStage: app.bootStage,
 								})
 							);
 							return;

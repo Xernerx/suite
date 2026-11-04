@@ -263,7 +263,7 @@ function applyRuntimeMetadata(targetMeta: Metadata) {
 	syncFeatureShortcuts(targetMeta, { getWin: () => win, onQuickCapture: triggerQuickCapture });
 	syncStreamerProtection(targetMeta);
 	broadcastPowerState(targetMeta, 'preference-changed');
-	syncDiscordRpc(targetMeta.discordRpc !== false);
+	syncDiscordRpc(targetMeta.discordRpc !== false, undefined, targetMeta.appIcon);
 	syncCdnWatchFolder(targetMeta.cdnWatchFolder, { getWin: () => win, log });
 	syncExplorerContextMenu(Boolean(targetMeta.explorerContextMenu), getActiveIconPath(targetMeta), log);
 	broadcastMetadataUpdate(targetMeta);
@@ -648,7 +648,7 @@ function registerIpcHandlers() {
 
 	ipcMain.on('rpc:setActivity', (_, activity: RpcActivityPayload) => {
 		const latest = getMetadata();
-		syncDiscordRpc(latest.discordRpc !== false, activity);
+		syncDiscordRpc(latest.discordRpc !== false, activity, latest.appIcon);
 	});
 
 	ipcMain.handle('overlay:toggle', () => {
@@ -1052,7 +1052,9 @@ if (!gotTheLock) {
 	});
 
 	app.whenReady().then(() => {
-		setRpcLogger(log);
+		setRpcLogger((msg) => {
+			if (getMetadata().debug) log(msg);
+		});
 		registerIpcHandlers();
 		const readyMeta = getMetadata();
 		const readyIconPath = getActiveIconPath(readyMeta);
@@ -1128,7 +1130,7 @@ if (!gotTheLock) {
 		);
 		syncGlobalHotkey(readyMeta.globalHotkey !== false, () => win);
 		syncFeatureShortcuts(readyMeta, { getWin: () => win, onQuickCapture: triggerQuickCapture });
-		syncDiscordRpc(readyMeta.discordRpc !== false);
+		syncDiscordRpc(readyMeta.discordRpc !== false, undefined, readyMeta.appIcon);
 		if (!app.isPackaged) {
 			let relaunchTimer: NodeJS.Timeout | null = null;
 			try {

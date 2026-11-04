@@ -2,6 +2,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useDictionary, useEnvironment, usePermissions, useToast, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, EmptyState, Input, Selector, Tabs } from '@xernerx/ui';
@@ -217,17 +218,10 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 	const filteredMedia = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
 		const list = media.filter((item) => {
-			if (privacyFilter === 'shared') {
-				if (!Array.isArray(item.shared) || item.shared.length === 0) return false;
-			} else if (privacyFilter !== 'all' && item.privacy !== privacyFilter) {
-				return false;
-			}
-			if (folderFilter !== 'all' && (item.folder || 'Uncategorized') !== folderFilter) {
-				return false;
-			}
-			if (tagFilter && (!Array.isArray(item.tags) || !item.tags.includes(tagFilter))) {
-				return false;
-			}
+			if (privacyFilter === 'shared' && (!Array.isArray(item.shared) || item.shared.length === 0)) return false;
+			if (privacyFilter !== 'all' && privacyFilter !== 'shared' && item.privacy !== privacyFilter) return false;
+			if (folderFilter !== 'all' && (item.folder || 'Uncategorized') !== folderFilter) return false;
+			if (tagFilter && (!Array.isArray(item.tags) || !item.tags.includes(tagFilter))) return false;
 			if (!q) return true;
 			const tagMatch = Array.isArray(item.tags) && item.tags.some((tg: string) => tg.toLowerCase().includes(q));
 			return item.filename?.toLowerCase().includes(q) || item.mimeType?.toLowerCase().includes(q) || item._id?.toLowerCase().includes(q) || tagMatch;
@@ -240,9 +234,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 		});
 	}, [media, searchQuery, privacyFilter, folderFilter, tagFilter, sortBy]);
 
-	const toggleSelect = (id: string) => {
-		setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-	};
+	const toggleSelect = (id: string) => setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
 	const handleBulkPrivacy = async (privacy: 'public' | 'limited' | 'private') => {
 		if (selectedIds.length === 0 || bulkBusy) return;
@@ -269,14 +261,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 		if (selectedIds.length === 0 || bulkBusy) return;
 		setBulkBusy(true);
 		try {
-			await Promise.all(
-				selectedIds.map((id) =>
-					fetch(getEnvUrl(`https://cdn.xernerx.com/media/${id}`), {
-						method: 'DELETE',
-						credentials: 'include',
-					})
-				)
-			);
+			await Promise.all(selectedIds.map((id) => fetch(getEnvUrl(`https://cdn.xernerx.com/media/${id}`), { method: 'DELETE', credentials: 'include' })));
 			setMedia((prev) => prev.filter((m) => !selectedIds.includes(m._id)));
 			setSelectedIds([]);
 			toast({ type: 'success', title: t('admin.dashboard.media.toasts.deleteSuccess') });
@@ -358,18 +343,13 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 		<div
 			className={`flex flex-col max-w-(--page-width) mx-auto w-full rounded-3xl transition-all ${isDragging ? 'ring-2 ring-(--accent) bg-(--accent)/5 p-4' : ''}`}
 			style={{ gap: 'var(--ui-gap)', ...(scope === 'self' ? { padding: 'var(--ui-gap)' } : {}) }}
-			onDragOver={(e) => {
-				if (!canUpload && !canManage) return;
-				e.preventDefault();
-				setIsDragging(true);
-			}}
+			onDragOver={(e) => (canUpload || canManage) && (e.preventDefault(), setIsDragging(true))}
 			onDragLeave={() => setIsDragging(false)}
 			onDrop={(e) => {
 				if (!canUpload && !canManage) return;
 				e.preventDefault();
 				setIsDragging(false);
-				const file = e.dataTransfer?.files?.[0];
-				if (file) stageFileForUpload(file);
+				if (e.dataTransfer?.files?.[0]) stageFileForUpload(e.dataTransfer.files[0]);
 			}}
 		>
 			{/* Header */}
@@ -382,7 +362,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 				</div>
 				<div className="flex flex-wrap items-center gap-3">
 					{scope === 'self' && quota && (
-						<a
+						<Link
 							href={getEnvUrl('https://store.xernerx.com/?category=credits')}
 							className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-(--foreground)/35 hover:bg-(--accent)/15 border border-(--border)/15 hover:border-(--accent)/35 text-xs font-bold text-(--text) transition-all"
 						>
@@ -391,14 +371,14 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 							</span>
 							<span className="text-(--text-muted)">{t('account.media.slotsUsed')}</span>
 							<span className="text-(--text-muted)">• {t('account.media.totalSize', { size: totalBytesFormatted })}</span>
-						</a>
+						</Link>
 					)}
 					{scope === 'self' && canManage && (
-						<a href={getEnvUrl('https://admin.xernerx.com/?view=media')}>
+						<Link href={getEnvUrl('https://admin.xernerx.com/?view=media')}>
 							<Button variant="secondary">
 								<ShieldAlert size={16} className="text-(--accent-orange)" /> {t('account.media.switchToAdmin')}
 							</Button>
-						</a>
+						</Link>
 					)}
 					{(canUpload || canManage) && (
 						<div>
@@ -444,15 +424,11 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 						<Button size="sm" variant="secondary" onClick={() => setSelectedIds(filteredMedia.map((m) => m._id))}>
 							{t('account.media.bulk.selectAll')}
 						</Button>
-						<Button size="sm" variant="secondary" onClick={() => handleBulkPrivacy('public')} disabled={bulkBusy}>
-							{t('account.media.privacy.public')}
-						</Button>
-						<Button size="sm" variant="secondary" onClick={() => handleBulkPrivacy('limited')} disabled={bulkBusy}>
-							{t('account.media.privacy.limited')}
-						</Button>
-						<Button size="sm" variant="secondary" onClick={() => handleBulkPrivacy('private')} disabled={bulkBusy}>
-							{t('account.media.privacy.private')}
-						</Button>
+						{(['public', 'limited', 'private'] as const).map((p) => (
+							<Button key={p} size="sm" variant="secondary" onClick={() => handleBulkPrivacy(p)} disabled={bulkBusy}>
+								{t(`account.media.privacy.${p}`)}
+							</Button>
+						))}
 						<Button size="sm" variant="danger" onClick={handleBulkDelete} loading={bulkBusy}>
 							<Trash size={13} /> {t('common.buttons.delete')}
 						</Button>

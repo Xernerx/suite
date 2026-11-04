@@ -1,7 +1,7 @@
 /** @format */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { database, sendWebhook } from '@xernerx/lib/server';
+import { database, dispatchBotStatusWebhooks, sendWebhook } from '@xernerx/lib/server';
 import { authenticateV1BotRequest, fetchDiscordBotIdentity } from '@/lib/v1BotAuth';
 
 async function getBotMeta(BotModel: any, id: string) {
@@ -84,13 +84,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			timestamp: new Date(),
 		});
 
-		const updateFields: any = {};
+		const updateFields: any = {
+			status: 'online',
+			statusUpdatedAt: new Date(),
+		};
 		if (typeof body.voteCount === 'number') {
 			updateFields.voteCount = body.voteCount;
 		}
 
-		if (Object.keys(updateFields).length > 0) {
-			await BotModel.findOneAndUpdate({ id }, { $set: updateFields });
+		const prevBot = await BotModel.findOneAndUpdate({ id }, { $set: updateFields }, { returnDocument: 'before' }).lean();
+		if (prevBot?.status === 'offline') {
+			await dispatchBotStatusWebhooks(prevBot, 'online', 'offline', prevBot.activity || '').catch((err) => {
+				console.error('Failed to trigger bot online webhook on stats post:', err);
+			});
 		}
 
 		const botMeta = await getBotMeta(BotModel, id);

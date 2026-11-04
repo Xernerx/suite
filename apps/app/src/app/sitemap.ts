@@ -18,9 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		{ url: `${baseUrl}/bots/zodiac`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: `${baseUrl}/servers`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: `${baseUrl}/users`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
-		{ url: `${baseUrl}/leaderboard`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
-		{ url: `${baseUrl}/dashboard`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-		{ url: `${baseUrl}/overlay`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+		{ url: `${baseUrl}/leaderboard`, lastModified: now, changeFrequency: 'daily', priority: 0.85 },
 	];
 
 	const officialIdToSlug: Record<string, string> = {
@@ -54,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 						.catch(() => [])
 				: [],
 			UserModel
-				? UserModel.find({ privacy: 'public' })
+				? UserModel.find({ privacy: 'public', blacklisted: { $ne: true } })
 						.select('id vanitySlug updatedAt')
 						.limit(2000)
 						.lean()

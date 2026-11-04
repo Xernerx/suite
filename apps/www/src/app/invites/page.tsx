@@ -3,6 +3,7 @@
 
 import { ArrowUpRight, Link as LinkIcon, Copy, Check, ShieldCheck, Sliders, KeyRound } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
@@ -154,7 +155,7 @@ export default function InvitesPage() {
 				) : (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 						{filteredInvites.map((invite) => (
-							<a
+							<Link
 								key={invite.id}
 								href={`/invites/${invite.id}`}
 								className="group flex flex-col p-8 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/40 shadow-sm hover:shadow-[0_10px_40px_-10px_color-mix(in_srgb,var(--accent)_30%,transparent)] transition-all overflow-hidden relative"
@@ -193,7 +194,7 @@ export default function InvitesPage() {
 										{copiedId === invite.id ? <Check size={14} className="text-(--accent-green)" /> : <Copy size={14} />}
 									</button>
 								</div>
-							</a>
+							</Link>
 						))}
 					</div>
 				)}

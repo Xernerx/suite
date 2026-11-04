@@ -254,9 +254,15 @@ export function V1PlatformEndpoints({
 			],
 			extra: (
 				<div className="p-6 border-t border-(--border)/10 space-y-5">
-					<div className="rounded-2xl bg-(--accent)/10 border border-(--accent)/30 p-4">
-						<h4 className="text-sm font-bold text-(--accent) mb-1">{t('docs.api.v1.endpoints.botWebhooksRelay.localRelayTitle')}</h4>
-						<p className="text-xs text-(--text-muted) leading-relaxed">{t('docs.api.v1.endpoints.botWebhooksRelay.localRelayDesc')}</p>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div className="rounded-2xl bg-(--accent)/10 border border-(--accent)/30 p-4">
+							<h4 className="text-sm font-bold text-(--accent) mb-1">{t('docs.api.v1.endpoints.botWebhooksRelay.localRelayTitle')}</h4>
+							<p className="text-xs text-(--text-muted) leading-relaxed">{t('docs.api.v1.endpoints.botWebhooksRelay.localRelayDesc')}</p>
+						</div>
+						<div className="rounded-2xl bg-(--accent)/10 border border-(--accent)/30 p-4">
+							<h4 className="text-sm font-bold text-(--accent) mb-1">{t('docs.api.v1.endpoints.botWebhooksRelay.statusWebhooksTitle')}</h4>
+							<p className="text-xs text-(--text-muted) leading-relaxed">{t('docs.api.v1.endpoints.botWebhooksRelay.statusWebhooksDesc')}</p>
+						</div>
 					</div>
 
 					<div>
@@ -273,7 +279,12 @@ export function V1PlatformEndpoints({
 								{
 									label: 'Express / Node.js Receiver',
 									language: 'typescript',
-									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat", "POST release"\n  const deliveryId = req.headers['x-xernerx-delivery'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
+									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat", "POST release", "POST online", "POST offline"\n  const deliveryId = req.headers['x-xernerx-delivery-id'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
+								},
+								{
+									label: 'Verify Signature (HMAC-SHA256)',
+									language: 'typescript',
+									code: `import crypto from 'crypto';\n\nexport function verifyXernerxWebhook(rawBody: string, signatureHeader: string, secret: string): boolean {\n  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');\n  return crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(expected));\n}`,
 								},
 								{
 									label: 'Webhook JSON Payload',
@@ -284,6 +295,11 @@ export function V1PlatformEndpoints({
 									label: 'POST release Payload',
 									language: 'json',
 									code: `{\n  "event": "POST release",\n  "botId": "${effectiveBotId}",\n  "timestamp": "2026-10-25T14:00:00.000Z",\n  "bot": {\n    "id": "${effectiveBotId}",\n    "name": "My Bot",\n    "vanitySlug": "my-bot",\n    "url": "https://app.xernerx.com/bots/my-bot?tab=releases"\n  },\n  "release": {\n    "id": "b1f23c45-6789-4012-89ab-cdef01234567",\n    "version": "v1.2.0",\n    "title": "Major Update",\n    "body": "Added new slash commands and webhook triggers.",\n    "authorId": "123456789012345678",\n    "createdAt": "2026-10-25T14:00:00.000Z"\n  }\n}`,
+								},
+								{
+									label: 'POST online / POST offline (API Tier)',
+									language: 'json',
+									code: `{\n  "event": "POST online",\n  "botId": "${effectiveBotId}",\n  "timestamp": "2026-11-04T19:30:00.000Z",\n  "status": "online",\n  "previousStatus": "offline",\n  "online": true,\n  "activity": "Watching 1,200 servers",\n  "bot": {\n    "id": "${effectiveBotId}",\n    "name": "My Bot",\n    "vanitySlug": "my-bot",\n    "url": "https://app.xernerx.com/bots/my-bot"\n  },\n  "data": {\n    "status": "online",\n    "previousStatus": "offline",\n    "online": true,\n    "activity": "Watching 1,200 servers",\n    "timestamp": "2026-11-04T19:30:00.000Z"\n  }\n}`,
 								},
 							]}
 						/>

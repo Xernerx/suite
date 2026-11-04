@@ -1,12 +1,13 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.5.1",
+	"version": "2.6.0",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
-		"build": "tsc",
+		"initialize": "node ../../.xernerx/cli/prepare-package.mjs --sync-only",
+		"build": "node ../../.xernerx/cli/prepare-package.mjs && tsc",
 		"dist": "pnpm build && electron-builder --publish never",
 		"dev": "tsc && electron ."
 	},
@@ -14,12 +15,12 @@
 	"license": "MIT",
 	"packageManager": "pnpm@11.24.0",
 	"dependencies": {
-		"@xernerx/terminal": "^1.1.15",
+		"@xernerx/terminal": "^1.2.0",
 		"electron-store": "^12.0.0",
 		"electron-updater": "^6.8.11"
 	},
 	"devDependencies": {
-		"electron": "45.1.0",
+		"electron": "45.2.1",
 		"electron-builder": "^26.18.0",
 		"typescript": "^6.0.3"
 	},

@@ -2,6 +2,37 @@
 
 # api
 
+## 0.30.0
+
+### Minor Changes
+
+- ## Real-Time Bot Online & Offline Status Webhooks
+
+    Added real-time `POST online` and `POST offline` outbound webhook triggers for Developer API subscribers along with automated stale-bot offline sweep detection.
+
+    ### Added
+    - **Real-Time `POST online` & `POST offline` Webhook Triggers**: Added outbound HMAC-SHA256 signed webhook dispatches whenever a bot transitions between online and offline states via stats heartbeats or live Discord Gateway presence events.
+    - **Automated Offline Status Sweeps**: Added periodic status sweep checks on `/info/status/bots` to transition stale bots to `offline` and dispatch `POST offline` webhooks automatically.
+
+    ### Changed
+    - **Webhook Subscription Validation**: Enforced Developer API tier (`Developer Pro` or `Ultra`) eligibility checks when saving or testing `POST online` and `POST offline` webhook triggers on `/secure/bots/[id]/hooks`.
+    - **Directory Search & Blog Publishing Routes**: Refined bot and guild search filtering and scheduled blog announcement metadata handling.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 0.29.0
 
 ### Minor Changes

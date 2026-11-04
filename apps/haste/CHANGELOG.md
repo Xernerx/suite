@@ -2,6 +2,31 @@
 
 # Changelog
 
+## 1.3.3
+
+### Patch Changes
+
+- ## OpenGraph Preview & Build Pipeline Updates
+
+    Updated OpenGraph social card rendering and build preparation scripts for `haste.xernerx.com`.
+
+    ### Changed
+    - **OpenGraph Social Preview**: Refined dynamic OpenGraph image generation and updated framework dependencies for `haste.xernerx.com`.
+    - **Pre-Build Asset Synchronization**: Updated package initialization and build scripts to sync static assets automatically before Next.js builds.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 1.3.2
 
 ### Patch Changes

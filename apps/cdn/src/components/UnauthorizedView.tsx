@@ -1,6 +1,7 @@
 /** @format */
 'use client';
 
+import Link from 'next/link';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
@@ -17,13 +18,13 @@ export function UnauthorizedView({ signedIn, accountUrl, currentUrl }: { signedI
 				<h1 className="text-2xl font-bold text-(--text)">{signedIn ? t('cdn.view.unauthorized.forbidden') : t('cdn.view.unauthorized.unauthorized')}</h1>
 				<p className="text-sm text-(--text-muted)">{t('cdn.view.unauthorized.description')}</p>
 				{signedIn ? (
-					<a href={accountUrl} className="mt-4">
+					<Link href={accountUrl} className="mt-4">
 						<Button variant="primary">{t('cdn.view.unauthorized.returnToLibrary')}</Button>
-					</a>
+					</Link>
 				) : (
-					<a href={`${accountUrl}/login?redirect=${encodeURIComponent(currentUrl)}`} className="mt-4">
+					<Link href={`${accountUrl}/login?redirect=${encodeURIComponent(currentUrl)}`} className="mt-4">
 						<Button variant="primary">{t('cdn.view.unauthorized.signIn')}</Button>
-					</a>
+					</Link>
 				)}
 			</div>
 		</div>

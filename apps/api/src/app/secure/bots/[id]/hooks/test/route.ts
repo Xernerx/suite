@@ -39,10 +39,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 					test: true,
 					botId: id,
 					timestamp: new Date().toISOString(),
+					...(events.includes('POST online') || events.includes('POST offline')
+						? {
+								status: events.includes('POST offline') && !events.includes('POST online') ? 'offline' : 'online',
+								previousStatus: events.includes('POST offline') && !events.includes('POST online') ? 'online' : 'offline',
+								online: !(events.includes('POST offline') && !events.includes('POST online')),
+							}
+						: {}),
 					data: {
 						userId: '000000000000000000',
 						subscribedEvents: events,
 						message: 'Test webhook ping from Xernerx Developer Portal',
+						...(events.includes('POST online') || events.includes('POST offline')
+							? {
+									status: events.includes('POST offline') && !events.includes('POST online') ? 'offline' : 'online',
+									previousStatus: events.includes('POST offline') && !events.includes('POST online') ? 'online' : 'offline',
+									online: !(events.includes('POST offline') && !events.includes('POST online')),
+									activity: 'Sample Bot Status Activity',
+								}
+							: {}),
 						...(events.includes('POST release')
 							? {
 									release: {

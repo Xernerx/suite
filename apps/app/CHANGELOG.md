@@ -2,6 +2,36 @@
 
 # app
 
+## 2.20.0
+
+### Minor Changes
+
+- ## Side-by-Side Bot & Server Comparison Studio
+
+    Introduced the interactive `/compare` studio on `app.xernerx.com` for comparing Discord bots and community servers head-to-head across live metrics.
+
+    ### Added
+    - **Compare Bots & Servers Studio (`/compare`)**: Added a side-by-side comparison studio allowing users to compare any two Discord bots or community servers across active servers, total users, shards, community votes, average rating, slash commands, boosts, and directory tags with shareable comparison links.
+    - **AI Discovery Manifest (`/llms.txt`)**: Added a structured `/llms.txt` discovery route and enriched route-level SEO metadata layouts for leaderboards, organizations, servers, and user profiles.
+
+    ### Changed
+    - **Explore Hub & Leaderboard Navigation**: Added quick-access Compare Studio navigation and refined server leaderboard and dashboard general settings views.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 2.19.1
 
 ### Patch Changes

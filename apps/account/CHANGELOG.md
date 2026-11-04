@@ -2,6 +2,32 @@
 
 # auth
 
+## 2.13.1
+
+### Patch Changes
+
+- ## API Token Management Modal Refinements & Showcase Polish
+
+    Expanded the API Token creation and management modals on `account.xernerx.com` for improved readability and cleaner field alignment.
+
+    ### Changed
+    - **Wider Manage & Create Token Modals**: Expanded the API Token creation and management dialogs to a wider `2xl` layout so access keys, usage badges, and security controls have generous breathing room.
+    - **Full-Width Expiration & IP Allowlist Fields**: Stacked the Token Expiration (TTL) selector and Allowed IP Addresses input into full-width rows so field labels and status badges stay cleanly aligned without wrapping.
+    - **Token Card & Profile Showcase Refinements**: Polished token status indicators, showcase card rendering, and dynamic OpenGraph social preview generation across `account.xernerx.com`.
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.1
+    - @xernerx/feedback@0.5.2
+    - @xernerx/lib@1.21.0
+    - @xernerx/providers@0.22.0
+    - @xernerx/styles@0.4.1
+    - @xernerx/ui@0.8.1
+
 ## 2.13.0
 
 ### Minor Changes

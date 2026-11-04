@@ -2,6 +2,7 @@
 'use client';
 
 import { Button, Modal } from '@xernerx/ui';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useUser } from '@xernerx/providers';
 
@@ -90,14 +91,14 @@ export function TermsPrompt() {
 				<p className="text-(--text-muted)">{t('components.termsPrompt.description')}</p>
 				<ul className="list-disc pl-5 text-(--text-muted) space-y-1">
 					<li>
-						<a href={getEnvUrl('https://www.xernerx.com/terms')} target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline">
+						<Link href={getEnvUrl('https://www.xernerx.com/terms')} target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline">
 							{t('components.termsPrompt.termsLink')}
-						</a>
+						</Link>
 					</li>
 					<li>
-						<a href={getEnvUrl('https://www.xernerx.com/privacy')} target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline">
+						<Link href={getEnvUrl('https://www.xernerx.com/privacy')} target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline">
 							{t('components.termsPrompt.privacyLink')}
-						</a>
+						</Link>
 					</li>
 				</ul>
 				<p className="text-(--text-muted) text-sm">{t('components.termsPrompt.warning')}</p>

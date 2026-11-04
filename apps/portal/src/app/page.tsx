@@ -223,7 +223,7 @@ export default function PortalPage() {
 				},
 				category: t('app.portal.categories.organizations'),
 				icon: org.iconUrl
-					? () => <Image src={getEnvUrl(org.iconUrl as string)} alt={org.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-xl object-cover" />
+					? () => <Image src={getEnvUrl(org.iconUrl as string)} alt={org.name} width={20} height={20} loading="eager" unoptimized className="w-5 h-5 rounded-xl object-cover" />
 					: () => <div className="w-5 h-5 rounded-xl bg-(--foreground) flex items-center justify-center text-[10px]">{org.name.charAt(0)}</div>,
 				view: `org-${org._id}`,
 			})),
@@ -244,7 +244,9 @@ export default function PortalPage() {
 					label: bot.discord?.global_name || bot.discord?.username || bot.name || bot.id,
 					href: `/bots/${bot.id}`,
 					category: t('common.nav.categories.bots'),
-					icon: avatarUrl ? () => <Image src={avatarUrl} alt={bot.name || bot.id} width={20} height={20} unoptimized className="w-5 h-5 rounded-xl object-cover" /> : (Bot as any),
+					icon: avatarUrl
+						? () => <Image src={avatarUrl} alt={bot.name || bot.id} width={20} height={20} loading="eager" unoptimized className="w-5 h-5 rounded-xl object-cover" />
+						: (Bot as any),
 				});
 			});
 		}
