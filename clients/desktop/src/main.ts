@@ -87,7 +87,7 @@ import {
 	toggleOverlayWindow,
 } from './overlay.js';
 import { type RpcActivityPayload, setRpcLogger, syncDiscordRpc } from './rpc.js';
-import { checkDesktopRelease, downloadAndInstallUpdate, runStartupUpdater } from './updater.js';
+import { applyStagedUpdate, checkDesktopRelease, downloadAndInstallUpdate, hasStagedUpdate, runStartupUpdater, stageUpdateBinary } from './updater.js';
 
 const store = new Store();
 const __filename = fileURLToPath(import.meta.url);
@@ -287,6 +287,13 @@ export function relaunchApp(finalMeta?: Partial<Metadata>) {
 		}
 	} catch {}
 
+	const staged = hasStagedUpdate();
+	if (app.isPackaged && staged.ready && staged.path) {
+		log(`RELAUNCHING WITH STAGED UPDATE: v${staged.version || 'latest'} (${staged.path})`);
+		void applyStagedUpdate(updaterContext, staged.path, staged.version);
+		return;
+	}
+
 	isQuitting = true;
 	try {
 		globalShortcut.unregisterAll();
@@ -433,8 +440,8 @@ const updaterContext = {
 	},
 };
 
-async function runUpdater() {
-	await runStartupUpdater(updaterContext, DEBUG);
+async function runUpdater(): Promise<boolean> {
+	return await runStartupUpdater(updaterContext, DEBUG);
 }
 
 /* --------------------------------------------- */
@@ -688,7 +695,13 @@ function registerIpcHandlers() {
 		return true;
 	});
 
-	ipcMain.handle('app:checkForUpdate', () => checkDesktopRelease(log));
+	ipcMain.handle('app:checkForUpdate', async () => {
+		const res = await checkDesktopRelease(log);
+		if (res.outdated && res.downloadUrl && !res.downloaded && !res.downloading) {
+			void stageUpdateBinary(updaterContext, res, { foreground: false, showSplashStatus: false });
+		}
+		return res;
+	});
 	ipcMain.handle('app:installUpdate', (_, targetInfo?: Parameters<typeof downloadAndInstallUpdate>[1]) => downloadAndInstallUpdate(updaterContext, targetInfo));
 
 	ipcMain.on('app:restart', (_, finalMeta?: Partial<Metadata>) => {
@@ -845,7 +858,8 @@ async function createWindow() {
 	});
 
 	try {
-		await runUpdater();
+		const installingStartupUpdate = await runUpdater();
+		if (installingStartupUpdate) return;
 
 		const launchMeta = getMetadata();
 		const initialDeepLink = pendingDeepLink || process.argv.find((arg) => arg.startsWith('xernerx://'));

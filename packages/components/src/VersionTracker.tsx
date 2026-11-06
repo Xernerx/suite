@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { ArrowRight, CheckCircle2, Download, ExternalLink, RefreshCw, Sparkles } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Download, ExternalLink, FileText, RefreshCw, Sparkles } from 'lucide-react';
 import { Button, Modal } from '@xernerx/ui';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/providers';
@@ -9,6 +9,9 @@ import { useDictionary, useEnvironment, useSession, useToast } from '@xernerx/pr
 export interface DesktopUpdateState {
 	checking: boolean;
 	outdated: boolean;
+	downloaded: boolean;
+	downloading: boolean;
+	progress: number;
 	currentVersion: string;
 	latestVersion: string;
 	channel: 'stable' | 'canary';
@@ -70,11 +73,18 @@ export function VersionTracker() {
 	const hasChecked = useRef(false);
 
 	const [desktopUpdate, setDesktopUpdate] = useState<DesktopUpdateState | null>(null);
+	const desktopUpdateRef = useRef<DesktopUpdateState | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [installing, setInstalling] = useState(false);
 	const [installStatus, setInstallStatus] = useState<'idle' | 'downloading' | 'installing' | 'error'>('idle');
 	const [progress, setProgress] = useState(0);
 	const lastUpdateErrorRef = useRef<string | null>(null);
+
+	const updateDesktopState = useCallback((next: DesktopUpdateState) => {
+		desktopUpdateRef.current = next;
+		setDesktopUpdate(next);
+		emitDesktopUpdateState(next);
+	}, []);
 
 	// 1. Web App Changelog Version Tracker
 	useEffect(() => {
@@ -143,24 +153,27 @@ export function VersionTracker() {
 		checkVersion();
 	}, [isReady, session, getEnvUrl, toast, t]);
 
-	// 2. Desktop App Outdated Checker & Header Updater Trigger
+	// 2. Desktop App Silent Background Checker & Header Updater Trigger
 	const checkDesktopAppVersion = useCallback(
 		async (manualTrigger = false) => {
 			const electron = getElectron();
 			const currentVersion = cleanVer(electron?.version);
 			if (!currentVersion) return;
 
+			const prev = desktopUpdateRef.current;
 			const channel: 'stable' | 'canary' = currentVersion.includes('canary') ? 'canary' : 'stable';
 			const checkingState: DesktopUpdateState = {
 				checking: true,
-				outdated: desktopUpdate?.outdated ?? false,
+				outdated: prev?.outdated ?? false,
+				downloaded: prev?.downloaded ?? false,
+				downloading: prev?.downloading ?? false,
+				progress: prev?.progress ?? 0,
 				currentVersion,
-				latestVersion: desktopUpdate?.latestVersion || currentVersion,
+				latestVersion: prev?.latestVersion || currentVersion,
 				channel,
-				downloadUrl: desktopUpdate?.downloadUrl ?? null,
+				downloadUrl: prev?.downloadUrl ?? null,
 			};
-			setDesktopUpdate(checkingState);
-			emitDesktopUpdateState(checkingState);
+			updateDesktopState(checkingState);
 
 			try {
 				let resolved: DesktopUpdateState | null = null;
@@ -180,9 +193,14 @@ export function VersionTracker() {
 								}
 							} catch {}
 						}
+						const isDownloaded = Boolean(ipcRes.downloaded);
+						const isDownloading = Boolean(ipcRes.downloading);
 						resolved = {
 							checking: false,
 							outdated: Boolean(ipcRes.outdated),
+							downloaded: isDownloaded,
+							downloading: isDownloading,
+							progress: isDownloaded ? 100 : typeof ipcRes.progress === 'number' ? ipcRes.progress : prev?.progress || 0,
 							currentVersion: cleanVer(ipcRes.currentVersion || currentVersion),
 							latestVersion: cleanVer(ipcRes.latestVersion),
 							channel: ipcRes.channel || channel,
@@ -203,14 +221,18 @@ export function VersionTracker() {
 							const match = String(asset.name).match(/Xernerx[\s_-]*App-(.+?)-setup\.(?:exe|dmg|AppImage)$/i);
 							if (match?.[1]) latestVersion = cleanVer(match[1]);
 						}
+						const assetUrl = asset?.url || asset?.browser_download_url || null;
 						if (latestVersion) {
 							resolved = {
 								checking: false,
 								outdated: isRemoteNewer(currentVersion, latestVersion),
+								downloaded: false,
+								downloading: false,
+								progress: 0,
 								currentVersion,
 								latestVersion,
 								channel,
-								downloadUrl: asset?.url || asset?.browser_download_url || null,
+								downloadUrl: assetUrl,
 							};
 						}
 					}
@@ -219,51 +241,83 @@ export function VersionTracker() {
 				const finalState: DesktopUpdateState = resolved || {
 					checking: false,
 					outdated: false,
+					downloaded: false,
+					downloading: false,
+					progress: 0,
 					currentVersion,
 					latestVersion: currentVersion,
 					channel,
 					downloadUrl: null,
 				};
 
-				setDesktopUpdate(finalState);
-				emitDesktopUpdateState(finalState);
+				updateDesktopState(finalState);
 
-				if (finalState.outdated) {
-					const dismissedKey = `xernerx_dismissed_desktop_update_${currentVersion}`;
-					const dismissedTarget = sessionStorage.getItem(dismissedKey);
-					if (manualTrigger || dismissedTarget !== finalState.latestVersion) {
-						setModalOpen(true);
-					}
-				} else if (manualTrigger) {
+				// Discord-style: only open the modal when the user explicitly clicks the Header badge or triggers a manual check
+				if (manualTrigger) {
 					setModalOpen(true);
 				}
 			} catch (err) {
 				console.error('Failed to check desktop client version:', err);
 				const fallbackState: DesktopUpdateState = {
 					checking: false,
-					outdated: desktopUpdate?.outdated ?? false,
+					outdated: prev?.outdated ?? false,
+					downloaded: prev?.downloaded ?? false,
+					downloading: prev?.downloading ?? false,
+					progress: prev?.progress ?? 0,
 					currentVersion,
-					latestVersion: desktopUpdate?.latestVersion || currentVersion,
+					latestVersion: prev?.latestVersion || currentVersion,
 					channel,
-					downloadUrl: desktopUpdate?.downloadUrl ?? null,
+					downloadUrl: prev?.downloadUrl ?? null,
 				};
-				setDesktopUpdate(fallbackState);
-				emitDesktopUpdateState(fallbackState);
+				updateDesktopState(fallbackState);
 			}
 		},
-		[getEnvUrl, desktopUpdate?.outdated, desktopUpdate?.latestVersion, desktopUpdate?.downloadUrl]
+		[getEnvUrl, updateDesktopState]
 	);
 
 	useEffect(() => {
 		const electron = getElectron();
 		if (!isReady || !electron?.version) return;
 
+		const currentVersion = cleanVer(electron.version);
+		const channel: 'stable' | 'canary' = currentVersion.includes('canary') ? 'canary' : 'stable';
+
 		const unsubscribeProgress = electron.onUpdateProgress?.((payload: any) => {
+			const prev = desktopUpdateRef.current;
+			const nextVer = cleanVer(payload.version) || prev?.latestVersion || currentVersion;
+
 			if (payload.status === 'downloading' || payload.status === 'checking') {
 				lastUpdateErrorRef.current = null;
-				setInstalling(true);
+				const pct = payload.progress || 1;
+				setProgress(pct);
 				setInstallStatus('downloading');
-				setProgress(payload.progress || 1);
+				updateDesktopState({
+					checking: false,
+					outdated: true,
+					downloaded: false,
+					downloading: true,
+					progress: pct,
+					currentVersion,
+					latestVersion: nextVer,
+					channel: prev?.channel || channel,
+					downloadUrl: prev?.downloadUrl || null,
+				});
+			} else if (payload.status === 'ready') {
+				lastUpdateErrorRef.current = null;
+				setInstalling(false);
+				setInstallStatus('idle');
+				setProgress(100);
+				updateDesktopState({
+					checking: false,
+					outdated: true,
+					downloaded: true,
+					downloading: false,
+					progress: 100,
+					currentVersion,
+					latestVersion: nextVer,
+					channel: prev?.channel || channel,
+					downloadUrl: prev?.downloadUrl || null,
+				});
 			} else if (payload.status === 'installing') {
 				setInstalling(true);
 				setInstallStatus('installing');
@@ -274,6 +328,13 @@ export function VersionTracker() {
 				}
 				setInstalling(false);
 				setInstallStatus('error');
+				if (prev) {
+					updateDesktopState({
+						...prev,
+						checking: false,
+						downloading: false,
+					});
+				}
 			}
 		});
 
@@ -289,7 +350,7 @@ export function VersionTracker() {
 			() => {
 				void checkDesktopAppVersion(false);
 			},
-			30 * 60 * 1000
+			15 * 60 * 1000
 		);
 
 		return () => {
@@ -297,7 +358,7 @@ export function VersionTracker() {
 			window.removeEventListener('xernerx:open-desktop-updater', handleOpenUpdater);
 			unsubscribeProgress?.();
 		};
-	}, [isReady]);
+	}, [isReady, checkDesktopAppVersion, updateDesktopState]);
 
 	const handleInstallUpdate = async () => {
 		if (!desktopUpdate) return;
@@ -306,8 +367,8 @@ export function VersionTracker() {
 		if (typeof electron?.installUpdate === 'function') {
 			lastUpdateErrorRef.current = null;
 			setInstalling(true);
-			setInstallStatus('downloading');
-			setProgress(1);
+			setInstallStatus(desktopUpdate.downloaded ? 'installing' : 'downloading');
+			setProgress(desktopUpdate.downloaded ? 100 : desktopUpdate.progress || 1);
 			const ok = await electron.installUpdate({
 				outdated: desktopUpdate.outdated,
 				currentVersion: desktopUpdate.currentVersion,
@@ -345,6 +406,12 @@ export function VersionTracker() {
 		setModalOpen(false);
 	};
 
+	const handleViewChangelog = () => {
+		const changelogUrl = getEnvUrl('https://info.xernerx.com/changelog');
+		setModalOpen(false);
+		window.location.href = changelogUrl;
+	};
+
 	const handleDownloadManual = async () => {
 		const electron = getElectron();
 		const targetUrl = getEnvUrl('https://www.xernerx.com/download');
@@ -356,9 +423,6 @@ export function VersionTracker() {
 	};
 
 	const handleRemindLater = () => {
-		if (desktopUpdate?.outdated) {
-			sessionStorage.setItem(`xernerx_dismissed_desktop_update_${desktopUpdate.currentVersion}`, desktopUpdate.latestVersion);
-		}
 		setModalOpen(false);
 	};
 
@@ -366,12 +430,21 @@ export function VersionTracker() {
 
 	const isOutdated = desktopUpdate.outdated;
 	const isChecking = desktopUpdate.checking;
+	const isReadyToInstall = isOutdated && desktopUpdate.downloaded;
+	const isActivelyDownloading = installing || desktopUpdate.downloading;
+	const activeProgress = installing ? progress : desktopUpdate.progress || progress;
 
 	return (
 		<Modal
 			open={modalOpen}
 			onOpenChange={(open) => !installing && setModalOpen(open)}
-			title={isOutdated ? t('components.versionTracker.desktopOutdated.title') : t('components.versionTracker.desktopOutdated.modalTitleUpToDate')}
+			title={
+				isReadyToInstall
+					? t('components.versionTracker.desktopOutdated.readyTitle')
+					: isOutdated
+						? t('components.versionTracker.desktopOutdated.title')
+						: t('components.versionTracker.desktopOutdated.modalTitleUpToDate')
+			}
 			maxWidth="max-w-lg"
 		>
 			<div className="space-y-5">
@@ -379,30 +452,47 @@ export function VersionTracker() {
 					className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${
 						isChecking
 							? 'bg-(--accent)/10 border-(--accent)/30 text-(--accent)'
-							: isOutdated
-								? 'bg-(--accent-orange)/10 border-(--accent-orange)/30 text-(--accent-orange)'
-								: 'bg-(--accent-green)/10 border-(--accent-green)/30 text-(--accent-green)'
+							: isReadyToInstall
+								? 'bg-(--accent-green)/10 border-(--accent-green)/30 text-(--accent-green)'
+								: isOutdated
+									? 'bg-(--accent-orange)/10 border-(--accent-orange)/30 text-(--accent-orange)'
+									: 'bg-(--accent-green)/10 border-(--accent-green)/30 text-(--accent-green)'
 					}`}
 				>
-					{isChecking ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : isOutdated ? <Sparkles className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+					{isChecking ? (
+						<RefreshCw className="w-3.5 h-3.5 animate-spin" />
+					) : isReadyToInstall ? (
+						<CheckCircle2 className="w-3.5 h-3.5" />
+					) : isOutdated ? (
+						<Sparkles className="w-3.5 h-3.5" />
+					) : (
+						<CheckCircle2 className="w-3.5 h-3.5" />
+					)}
 					<span>
 						{isChecking
 							? t('components.versionTracker.desktopOutdated.checkingBadge')
-							: isOutdated
-								? t('components.versionTracker.desktopOutdated.badge')
-								: t('components.versionTracker.desktopOutdated.upToDateBadge')}
+							: isReadyToInstall
+								? t('components.versionTracker.desktopOutdated.readyBadge')
+								: isOutdated
+									? t('components.versionTracker.desktopOutdated.badge')
+									: t('components.versionTracker.desktopOutdated.upToDateBadge')}
 					</span>
 				</div>
 
 				<p className="text-sm text-(--text-muted) leading-relaxed">
-					{isOutdated
-						? t('components.versionTracker.desktopOutdated.description', {
+					{isReadyToInstall
+						? t('components.versionTracker.desktopOutdated.readyDescription', {
 								current: desktopUpdate.currentVersion,
 								latest: desktopUpdate.latestVersion,
 							})
-						: t('components.versionTracker.desktopOutdated.upToDateDescription', {
-								current: desktopUpdate.currentVersion,
-							})}
+						: isOutdated
+							? t('components.versionTracker.desktopOutdated.description', {
+									current: desktopUpdate.currentVersion,
+									latest: desktopUpdate.latestVersion,
+								})
+							: t('components.versionTracker.desktopOutdated.upToDateDescription', {
+									current: desktopUpdate.currentVersion,
+								})}
 				</p>
 
 				<div className="grid grid-cols-3 gap-3 p-3.5 rounded-2xl bg-(--background)/60 border border-(--border)/10">
@@ -425,31 +515,42 @@ export function VersionTracker() {
 					</div>
 				</div>
 
-				{installing && (
+				{isActivelyDownloading && (
 					<div className="space-y-2 p-3.5 rounded-2xl bg-(--background)/50 border border-(--accent)/30">
 						<div className="flex items-center justify-between text-xs font-bold text-(--text)">
 							<span className="flex items-center gap-2">
 								<RefreshCw className="w-3.5 h-3.5 text-(--accent) animate-spin" />
-								{installStatus === 'installing' ? t('components.versionTracker.desktopOutdated.installing') : t('components.versionTracker.desktopOutdated.downloading', { progress })}
+								{installStatus === 'installing'
+									? t('components.versionTracker.desktopOutdated.installing')
+									: t('components.versionTracker.desktopOutdated.downloading', { progress: activeProgress })}
 							</span>
-							<span className="text-(--accent) font-mono">{progress}%</span>
+							<span className="text-(--accent) font-mono">{activeProgress}%</span>
 						</div>
 						<div className="w-full h-2 rounded-full bg-(--foreground)/40 overflow-hidden">
-							<div className="h-full bg-(--accent) rounded-full transition-all duration-200" style={{ width: `${Math.max(4, progress)}%` }} />
+							<div className="h-full bg-(--accent) rounded-full transition-all duration-200" style={{ width: `${Math.max(4, activeProgress)}%` }} />
 						</div>
 					</div>
 				)}
 
 				<div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-					<Button variant="secondary" onClick={handleRemindLater} disabled={installing}>
-						{isOutdated ? t('components.versionTracker.desktopOutdated.remindLater') : t('components.versionTracker.desktopOutdated.close')}
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button variant="secondary" onClick={handleRemindLater} disabled={installing}>
+							{isOutdated ? t('components.versionTracker.desktopOutdated.remindLater') : t('components.versionTracker.desktopOutdated.close')}
+						</Button>
+
+						<Button variant="secondary" onClick={handleViewChangelog} disabled={installing} className="gap-1.5">
+							<FileText className="w-4 h-4 text-(--accent)" />
+							{t('components.versionTracker.desktopOutdated.viewChangelog')}
+						</Button>
+					</div>
 
 					<div className="flex items-center gap-2">
-						<Button variant="secondary" onClick={handleDownloadManual} disabled={installing} className="gap-1.5">
-							<ExternalLink className="w-4 h-4" />
-							{t('components.versionTracker.desktopOutdated.downloadManual')}
-						</Button>
+						{!isReadyToInstall && (
+							<Button variant="secondary" onClick={handleDownloadManual} disabled={installing} className="gap-1.5">
+								<ExternalLink className="w-4 h-4" />
+								{t('components.versionTracker.desktopOutdated.downloadManual')}
+							</Button>
+						)}
 
 						{isOutdated ? (
 							<Button variant="primary" onClick={handleInstallUpdate} disabled={installing} className="gap-1.5">
@@ -457,8 +558,10 @@ export function VersionTracker() {
 								{installing
 									? installStatus === 'installing'
 										? t('components.versionTracker.desktopOutdated.installing')
-										: t('components.versionTracker.desktopOutdated.downloading', { progress })
-									: t('components.versionTracker.desktopOutdated.updateNow')}
+										: t('components.versionTracker.desktopOutdated.downloading', { progress: activeProgress })
+									: isReadyToInstall
+										? t('components.versionTracker.desktopOutdated.installReadyNow')
+										: t('components.versionTracker.desktopOutdated.updateNow')}
 							</Button>
 						) : (
 							<Button variant="primary" onClick={() => void checkDesktopAppVersion(true)} disabled={isChecking} className="gap-1.5">

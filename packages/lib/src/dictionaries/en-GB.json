@@ -7839,6 +7839,7 @@
 			"openInDesktop": "Open in App",
 			"checkUpdates": "Check for Desktop Updates",
 			"updateAvailable": "Desktop Update Available (v{version})",
+			"updateReady": "Update v{version} Ready — Click to Install",
 			"store": "Store",
 			"title1": "Open App Drawer (Ctrl + Space)",
 			"notifications": "Notifications (Ctrl + I)",
@@ -7908,7 +7909,12 @@
 				"close": "Close",
 				"upToDateToastTitle": "Desktop App Up to Date",
 				"upToDateToastDesc": "Xernerx App v{version} is already on the latest release.",
-				"errorFallback": "Automatic installer failed ({error}). Opening the download page instead."
+				"errorFallback": "Automatic installer failed ({error}). Opening the download page instead.",
+				"readyBadge": "Update Ready to Install",
+				"readyTitle": "Desktop Update Ready",
+				"readyDescription": "Xernerx App v{latest} has been downloaded in the background (currently running v{current}). Click below to install silently and restart now, or it will automatically install on your next launch.",
+				"installReadyNow": "Install & Restart Now",
+				"viewChangelog": "Changelog"
 			}
 		},
 		"sidebarUser": {

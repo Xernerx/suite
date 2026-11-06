@@ -2,6 +2,18 @@
 
 # app
 
+## 2.20.1
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.2
+    - @xernerx/lib@1.21.1
+    - @xernerx/providers@0.22.1
+    - @xernerx/feedback@0.5.3
+    - @xernerx/ui@0.8.2
+
 ## 2.20.0
 
 ### Minor Changes

@@ -2,6 +2,17 @@
 
 # @xernerx/lib
 
+## 1.21.1
+
+### Patch Changes
+
+- ## Desktop Update Ready & Changelog Localization Keys
+
+    Added English localization strings for the silent background desktop updater, header ready badge, and changelog modal button.
+
+    ### Added
+    - **Desktop Updater Dictionary Keys**: Added `components.header.updateReady` and `components.versionTracker.desktopOutdated` keys (`readyBadge`, `readyTitle`, `readyDescription`, `installReadyNow`, `viewChangelog`) to `en-GB.json`.
+
 ## 1.21.0
 
 ### Minor Changes
