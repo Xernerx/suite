@@ -2,6 +2,26 @@
 
 # @xernerx/components
 
+## 0.15.3
+
+### Patch Changes
+
+- ## AppLayout & Page Shell Refinements
+
+    Refined the shared application shell, stage preview controls, and ad placement gating.
+
+    ### Changed
+    - **Page Shell & Stage Preview Pill**: Updated the stage preview pill to use theme-aware surface and active text tokens and streamlined subdomain port resolution.
+    - **AppLayout Ad Gating**: Scoped shared ad unit loading strictly to public showcase surfaces (`www` and `blog`).
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/lib@1.22.0
+    - @xernerx/providers@0.22.2
+    - @xernerx/ui@0.8.3
+    - @xernerx/feedback@0.5.4
+
 ## 0.15.2
 
 ### Patch Changes

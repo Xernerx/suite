@@ -4,6 +4,32 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.10.0
+
+### Minor Changes
+
+- ## Discord Storefront SKU Pass Integration
+
+    Added direct Discord Application Storefront pass status and purchase links to Store catalog cards.
+
+    ### Added
+    - **Discord Storefront Pass Actions**: Store cards backed by a native Discord Application Storefront SKU now display active entitlement status and link directly to the official Discord Storefront page or subscription settings.
+
+    ### Changed
+    - **Catalog Pricing Display**: Preserved native Discord Storefront pricing on Discord-managed passes when web promo codes are applied.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.3
+    - @xernerx/lib@1.22.0
+    - @xernerx/providers@0.22.2
+    - @xernerx/ui@0.8.3
+    - @xernerx/feedback@0.5.4
+
 ## 0.9.3
 
 ### Patch Changes

@@ -16,6 +16,8 @@ import { useWindowControlsStyle } from './HeaderWindowControls';
 import NextTopLoader from 'nextjs-toploader';
 import { Sidebar } from './Sidebar';
 
+const PORT_APP_APPS = ['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste', 'blog'];
+
 export function Page({ children }: { children: React.ReactNode }) {
 	const { device } = usePlatform();
 	const { state } = useSidebar();
@@ -33,7 +35,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const [isBatterySaverActive, setIsBatterySaverActive] = useState(false);
 	const [isSystemIdle, setIsSystemIdle] = useState(false);
 	const [privacyShieldLocked, setPrivacyShieldLocked] = useState(false);
-	const [entryLoading, setEntryLoading] = useState(true);
+	const [entryLoading] = useState(false);
 	const [isDragUploading, setIsDragUploading] = useState(false);
 	const [stagePreview, setStagePreview] = useState(false);
 	const [isFixedWatermarkApp, setIsFixedWatermarkApp] = useState(false);
@@ -44,26 +46,11 @@ export function Page({ children }: { children: React.ReactNode }) {
 		if (typeof window === 'undefined') return;
 		const clock = setInterval(() => setNowMs(Date.now()), 30000);
 		const host = window.location.hostname;
-		const port = window.location.port;
+		const portIdx = Number(window.location.port) - 4000;
 		const isLocalHost = host === 'localhost' || host === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(host);
-		const portMap: Record<string, string> = {
-			'4000': 'www',
-			'4001': 'api',
-			'4002': 'cdn',
-			'4003': 'account',
-			'4004': 'app',
-			'4005': 'docs',
-			'4006': 'admin',
-			'4007': 'info',
-			'4008': 'store',
-			'4009': 'portal',
-			'4010': 'hosting',
-			'4011': 'haste',
-			'4012': 'blog',
-		};
 		let appPre = 'app';
-		if (isLocalHost && portMap[port]) appPre = portMap[port];
-		else ['www', 'api', 'cdn', 'docs', 'admin', 'account', 'store', 'info', 'portal', 'hosting', 'haste', 'blog'].forEach((p) => host.startsWith(`${p}.`) && (appPre = p));
+		if (isLocalHost && PORT_APP_APPS[portIdx]) appPre = PORT_APP_APPS[portIdx];
+		else PORT_APP_APPS.forEach((p) => host.startsWith(`${p}.`) && (appPre = p));
 
 		fetch(getEnvUrl(`https://api.xernerx.com/secure/announcements?activeOnly=true&app=${encodeURIComponent(appPre)}`), { credentials: 'include' })
 			.then((res) => (res.ok ? res.json() : []))
@@ -102,14 +89,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
-		const onStagePreview = (e: Event) => {
-			const detail = (e as CustomEvent<{ active?: boolean }>).detail;
-			setStagePreview(Boolean(detail?.active));
-		};
+		const onStagePreview = (e: Event) => setStagePreview(Boolean((e as CustomEvent<{ active?: boolean }>).detail?.active));
 		const preventWindowScroll = () => {
-			if (window.scrollY !== 0 || window.scrollX !== 0) {
-				window.scrollTo(0, 0);
-			}
+			if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
 		};
 		window.addEventListener('xernerx:stage-preview', onStagePreview);
 		window.addEventListener('scroll', preventWindowScroll, { passive: true });
@@ -133,11 +115,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 				formData.append('folder', 'Desktop Captures');
 				formData.append('tags', JSON.stringify(sourceType === 'watch-folder' ? ['desktop', 'watch-folder'] : ['desktop', 'capture']));
 
-				const uploadRes = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${userId}`), {
-					method: 'POST',
-					body: formData,
-					credentials: 'include',
-				});
+				const uploadRes = await fetch(getEnvUrl(`https://cdn.xernerx.com/upload/${userId}`), { method: 'POST', body: formData, credentials: 'include' });
 
 				if (uploadRes.ok) {
 					bridge?.setProgressBar?.(1, 'normal');
@@ -152,17 +130,8 @@ export function Page({ children }: { children: React.ReactNode }) {
 						const isWatch = sourceType === 'watch-folder';
 						const title = isWatch ? t('account.preferences.desktop.watchFolderUploadedTitle') : t('account.preferences.desktop.captureUploadedTitle');
 						const desc = isWatch ? t('account.preferences.desktop.watchFolderUploadedDesc', { filename: file.name }) : cdnUrl;
-						toast({
-							type: 'success',
-							title,
-							description: desc,
-						});
-						bridge?.notify?.({
-							title,
-							body: isWatch ? desc : t('account.preferences.desktop.captureUploadedDesc'),
-							link: cdnUrl,
-							force: true,
-						});
+						toast({ type: 'success', title, description: desc });
+						bridge?.notify?.({ title, body: isWatch ? desc : t('account.preferences.desktop.captureUploadedDesc'), link: cdnUrl, force: true });
 						return true;
 					}
 				}
@@ -179,30 +148,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 		if (!bridge?.syncDailyGiftSchedule) return;
 		const credits = (discordUser as any)?.credits;
 		if (credits) {
-			bridge
-				.syncDailyGiftSchedule({
-					nextClaimAt: credits.giftIn || null,
-					streak: typeof credits.streak === 'number' ? credits.streak : 0,
-				})
-				.catch(() => {});
+			bridge.syncDailyGiftSchedule({ nextClaimAt: credits.giftIn || null, streak: typeof credits.streak === 'number' ? credits.streak : 0 }).catch(() => {});
 		}
 	}, [userLoading, (discordUser as any)?.credits?.giftIn, (discordUser as any)?.credits?.streak]);
-
-	useEffect(() => {
-		if (
-			typeof navigator !== 'undefined' &&
-			((navigator as any).webdriver ||
-				/bot|crawl|spider|mediapartners|adsbot|google|bing|slurp|duckduck|baidu|yandex|seobility|lighthouse|pagespeed|headless|prerender|facebookexternalhit|twitterbot|discordbot|whatsapp|linkedinbot/i.test(
-					navigator.userAgent || ''
-				))
-		) {
-			setEntryLoading(false);
-			return;
-		}
-		setEntryLoading(true);
-		const timer = setTimeout(() => setEntryLoading(false), 520);
-		return () => clearTimeout(timer);
-	}, []);
 
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
@@ -213,9 +161,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 			if (!powerState || typeof powerState !== 'object') return;
 			const active = Boolean(powerState.effectiveBatterySaver);
 			setIsBatterySaverActive(active);
-			if (typeof document !== 'undefined') {
-				document.documentElement.classList.toggle('reduce-motion', active || Boolean(uiPreferences?.reducedMotion));
-			}
+			if (typeof document !== 'undefined') document.documentElement.classList.toggle('reduce-motion', active || Boolean(uiPreferences?.reducedMotion));
 		};
 
 		bridge
@@ -246,9 +192,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 		try {
 			if (bridge?.verifyBiometrics) {
 				const bio = await bridge.verifyBiometrics(t('account.preferences.desktop.biometricPromptPrivacy'));
-				if (bio && bio.verified === false) {
-					return;
-				}
+				if (bio && bio.verified === false) return;
 			}
 			setPrivacyShieldLocked(false);
 			await bridge?.unlockPrivacyShield?.();
@@ -265,44 +209,24 @@ export function Page({ children }: { children: React.ReactNode }) {
 		const unsubCapture = bridge.onQuickCapture(async (payload: { dataUrl: string; filename: string; sourceType: 'screen' | 'clipboard' | 'watch-folder'; timestamp: number }) => {
 			if (!payload?.dataUrl) return;
 			const userId = (activeUser as any)?.id;
+			const notifyFallback = () => {
+				toast({ type: 'success', title: t('account.preferences.desktop.captureClipboardTitle'), description: t('account.preferences.desktop.captureClipboardDesc') });
+				bridge.notify?.({ title: t('account.preferences.desktop.captureClipboardTitle'), body: t('account.preferences.desktop.captureClipboardDesc'), force: true });
+			};
 
-			if (!userId) {
-				toast({
-					type: 'success',
-					title: t('account.preferences.desktop.captureClipboardTitle'),
-					description: t('account.preferences.desktop.captureClipboardDesc'),
-				});
-				bridge.notify?.({
-					title: t('account.preferences.desktop.captureClipboardTitle'),
-					body: t('account.preferences.desktop.captureClipboardDesc'),
-					force: true,
-				});
-				return;
-			}
+			if (!userId) return notifyFallback();
 
 			try {
 				const blobRes = await fetch(payload.dataUrl);
 				const blob = await blobRes.blob();
 				const file = new File([blob], payload.filename || `xernerx-capture-${Date.now()}.png`, { type: blob.type || 'image/png' });
-				const uploaded = await uploadFileToDesktopCdn(file, payload.sourceType || 'screen');
-				if (uploaded) return;
+				if (await uploadFileToDesktopCdn(file, payload.sourceType || 'screen')) return;
 			} catch {}
 
-			toast({
-				type: 'success',
-				title: t('account.preferences.desktop.captureClipboardTitle'),
-				description: t('account.preferences.desktop.captureClipboardDesc'),
-			});
-			bridge.notify?.({
-				title: t('account.preferences.desktop.captureClipboardTitle'),
-				body: t('account.preferences.desktop.captureClipboardDesc'),
-				force: true,
-			});
+			notifyFallback();
 		});
 
-		return () => {
-			unsubCapture?.();
-		};
+		return () => unsubCapture?.();
 	}, [activeUser, t, toast, uploadFileToDesktopCdn]);
 
 	useEffect(() => {
@@ -319,25 +243,12 @@ export function Page({ children }: { children: React.ReactNode }) {
 					title: t('account.preferences.desktop.clipboardGuardTitle'),
 					description: t('account.preferences.desktop.clipboardGuardDesc', { seconds }),
 					duration: 12000,
-					action: {
-						label: t('account.preferences.desktop.clipboardGuardKeep'),
-						onClick: () => {
-							bridge.cancelClipboardGuard?.();
-						},
-					},
+					action: { label: t('account.preferences.desktop.clipboardGuardKeep'), onClick: () => bridge.cancelClipboardGuard?.() },
 				});
 			} else if (payload.event === 'cancelled') {
-				toast({
-					type: 'info',
-					title: t('account.preferences.desktop.clipboardGuardCancelledTitle'),
-					description: t('account.preferences.desktop.clipboardGuardCancelledDesc'),
-				});
+				toast({ type: 'info', title: t('account.preferences.desktop.clipboardGuardCancelledTitle'), description: t('account.preferences.desktop.clipboardGuardCancelledDesc') });
 			} else if (payload.event === 'cleared') {
-				toast({
-					type: 'info',
-					title: t('account.preferences.desktop.clipboardGuardClearedTitle'),
-					description: t('account.preferences.desktop.clipboardGuardClearedDesc'),
-				});
+				toast({ type: 'info', title: t('account.preferences.desktop.clipboardGuardClearedTitle'), description: t('account.preferences.desktop.clipboardGuardClearedDesc') });
 			}
 		});
 
@@ -345,9 +256,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 			setTimeout(async () => {
 				try {
 					const sel = window.getSelection()?.toString()?.trim() || '';
-					if (sel && /^(?:xrx_|xrn_)[A-Za-z0-9._-]{12,}$/.test(sel)) {
-						await bridge.guardClipboardSecret?.(sel, 60000);
-					}
+					if (sel && /^(?:xrx_|xrn_)[A-Za-z0-9._-]{12,}$/.test(sel)) await bridge.guardClipboardSecret?.(sel, 60000);
 				} catch {}
 			}, 60);
 		};
@@ -409,7 +318,6 @@ export function Page({ children }: { children: React.ReactNode }) {
 							? false
 							: backgroundMode === 'blank';
 
-	// Footer only renders when the sidebar is hidden
 	const showFooter = state === 'hidden';
 
 	return (
@@ -424,18 +332,14 @@ export function Page({ children }: { children: React.ReactNode }) {
 				}
 			}}
 			onDragLeave={(e) => {
-				if (e.currentTarget === e.target) {
-					setIsDragUploading(false);
-				}
+				if (e.currentTarget === e.target) setIsDragUploading(false);
 			}}
 			onDrop={async (e) => {
 				if (!isDragUploading) return;
 				e.preventDefault();
 				setIsDragUploading(false);
 				const droppedFile = e.dataTransfer?.files?.[0];
-				if (droppedFile) {
-					await uploadFileToDesktopCdn(droppedFile);
-				}
+				if (droppedFile) await uploadFileToDesktopCdn(droppedFile);
 			}}
 		>
 			{isDragUploading && (
@@ -472,31 +376,26 @@ export function Page({ children }: { children: React.ReactNode }) {
 					</div>
 				</div>
 			)}
-			{/* Header stays completely fixed at the top */}
 			<Header />
 			{!isFixedWatermarkApp && !isBatterySaverActive && !isSystemIdle && !privacyShieldLocked && uiPreferences?.cursorFx && uiPreferences.cursorFx !== 'default' && (
 				<CursorFxCanvas fx={uiPreferences.cursorFx} />
 			)}
 
-			{/* Middle layout container filling the screen */}
 			<div className={`flex flex-1 min-h-0 overflow-hidden ${isRightAligned ? 'flex-row-reverse' : ''}`}>
 				<NextTopLoader color="var(--accent)" showSpinner={false} shadow="none" height={3} />
-
 				<Sidebar />
 
-				{/* Scrollable Content Area with a prominent, symmetrical radial and linear accent gradient */}
 				<div
 					id="main-scroll-container"
-					className={`relative h-full min-h-0 flex-1 ${activeLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'} shadow-inner
-                        ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'} 
-                    `}
+					className={`relative h-full min-h-0 flex-1 ${activeLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'} shadow-inner ${
+						device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'
+					}`}
 					style={{
 						WebkitOverflowScrolling: 'touch',
 						background:
 							'radial-gradient(circle at 50% 15%, color-mix(in srgb, var(--accent) 30%, var(--foreground)) 0%, var(--foreground) 75%), linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 0%, var(--foreground) 50%, color-mix(in srgb, var(--accent) 20%, var(--foreground)) 100%)',
 					}}
 				>
-					{/* Centralized AppLayout Dot-Matrix Loading & Sticky Stage */}
 					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-0">
 						<div className="relative flex flex-col items-center justify-center w-full" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 3.5rem - env(safe-area-inset-top, 0px))' }}>
 							<div className="absolute inset-0 pointer-events-none">
@@ -546,7 +445,12 @@ export function Page({ children }: { children: React.ReactNode }) {
 											</Link>
 										)}
 									</div>
-									<button type="button" onClick={() => dismissBanner(activeAnnouncement.id)} className="text-(--text-muted) hover:text-(--text) cursor-pointer shrink-0">
+									<button
+										type="button"
+										onClick={() => dismissBanner(activeAnnouncement.id)}
+										aria-label={t('common.close')}
+										className="text-(--text-muted) hover:text-(--text) cursor-pointer shrink-0"
+									>
 										<X size={14} />
 									</button>
 								</div>
@@ -554,7 +458,6 @@ export function Page({ children }: { children: React.ReactNode }) {
 							<BlacklistGate>{children}</BlacklistGate>
 						</main>
 
-						{/* Rendered only when sidebar is hidden, acting as an extra scrollable element */}
 						{showFooter && <Footer />}
 					</div>
 
@@ -569,11 +472,11 @@ export function Page({ children }: { children: React.ReactNode }) {
 									setStagePreview(false);
 									setContentHidden(false);
 								}}
-								className="inline-flex items-center gap-2 rounded-full bg-(--accent) hover:bg-(--hover-accent) text-white px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+								className="inline-flex items-center gap-2 rounded-full bg-(--accent) hover:bg-(--hover-accent) text-(--text-active) px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-sm"
 							>
 								<Eye size={14} />
 								<span>{t('account.appearance.showUi')}</span>
-								<kbd className="ml-1 rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-mono">Alt + H / Esc</kbd>
+								<kbd className="ml-1 rounded-full bg-(--background)/30 px-2 py-0.5 text-[10px] font-mono">Alt + H / Esc</kbd>
 							</button>
 						</div>
 					)}

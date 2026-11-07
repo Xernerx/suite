@@ -63,6 +63,14 @@ export interface CatalogItem {
 	order: number;
 	stripeName?: string;
 	stripeDescription?: string | null;
+	discordSku?: {
+		skuId: string;
+		applicationId: string;
+		slug?: string | null;
+		storeUrl: string;
+		hasEntitlement?: boolean;
+		entitlementEndsAt?: string | null;
+	} | null;
 	prices: CatalogPrice[];
 }
 

@@ -17,6 +17,7 @@ export interface SelectorProps {
 	placeholder?: string;
 	items?: boolean;
 	required?: boolean;
+	disabled?: boolean;
 	toggleClassName?: string;
 }
 
@@ -38,7 +39,7 @@ function getLabelString(label: React.ReactNode): string {
 	}
 	return '';
 }
-export function Selector({ value, options, onChange, placeholder, items, required, toggleClassName = '' }: SelectorProps) {
+export function Selector({ value, options, onChange, placeholder, items, required, disabled = false, toggleClassName = '' }: SelectorProps) {
 	const { t } = useDictionary();
 	const resolvedPlaceholder = placeholder ?? t('common.selector.defaultPlaceholder');
 	const [isOpen, setIsOpen] = useState(false);
@@ -120,8 +121,13 @@ export function Selector({ value, options, onChange, placeholder, items, require
 			)}
 			<button
 				type="button"
-				onClick={() => setIsOpen(!isOpen)}
-				className={`flex w-full min-w-max items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none ${toggleClassName}`}
+				disabled={disabled}
+				onClick={() => {
+					if (!disabled) setIsOpen(!isOpen);
+				}}
+				className={`flex w-full min-w-max items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all ${
+					disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none cursor-pointer'
+				} ${toggleClassName}`}
 				style={{
 					gap: 'var(--ui-gap)',
 				}}

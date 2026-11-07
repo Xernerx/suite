@@ -2,6 +2,34 @@
 
 # api
 
+## 0.31.0
+
+### Minor Changes
+
+- ## Virtue Dynamic Hoist Roles & Discord Storefront Entitlements
+
+    Added Virtue Dynamic Hoist Roles configuration persistence, Server Booster XP multipliers, and live Discord Application Storefront SKU entitlement verification across the API gateway.
+
+    ### Added
+    - **Discord Application Storefront Entitlement Resolver**: Added live Discord `/applications/{id}/entitlements` verification and SKU pricing enrichment in `/secure/store/catalog`, `/secure/guilds/[id]/virtue`, `/secure/core/settings/[id]`, and `creditMultiplier`.
+    - **Virtue Dynamic Hoist Roles & Booster Multipliers**: Added `dynamicRoles` (anchor role, progression track, name template, max role cap, and two-stop hex color gradient) and `boosterMultiplier` validation and persistence on `GET`/`PATCH /secure/guilds/[id]/virtue`.
+
+    ### Changed
+    - **Store Checkout Guard**: Updated `POST /secure/store/checkout` to return a direct `discordStoreUrl` redirect when an item is sold natively through a Discord Application Storefront SKU.
+    - **Store Catalog Seeding**: Updated `storeSeed` to include Discord SKU metadata (`discordApplicationId`, `discordSkuId`, `discordStoreSlug`) and refreshed Virtue Pass feature highlights.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.3
+    - @xernerx/lib@1.22.0
+    - @xernerx/providers@0.22.2
+    - @xernerx/ui@0.8.3
+    - @xernerx/feedback@0.5.4
+
 ## 0.30.1
 
 ### Patch Changes

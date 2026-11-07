@@ -3360,6 +3360,8 @@
 			"daysLeft": "{days}d left",
 			"canceled": "Canceled",
 			"cancelSubscription": "Cancel subscription",
+			"discordSub": "Discord App Subscription",
+			"manageOnDiscord": "Manage in Discord",
 			"confirmPrompt": "Are you sure?",
 			"keepSubscription": "No, keep it",
 			"cancelButton": "Yes, cancel",
@@ -4453,8 +4455,8 @@
 							"desc": "Files uploaded to cdn.xernerx.com are stored in private @vercel/blob storage and streamed through permission-checked /raw/[id] routes. Code pastes on haste.xernerx.com enforce configurable TTL expirations that automatically purge expired documents."
 						},
 						"stripe": {
-							"title": "PCI-Compliant Stripe Checkout & Entitlement Verification:",
-							"desc": "All Store subscriptions and Credit Top-Up purchases are processed directly by Stripe. Xernerx never touches or stores raw credit card numbers, all subscription unlocks verify cryptographic Stripe webhook signatures, and all Credit Store cosmetic equips (stage render forms, ambient scenes, cursor FX, icon packs, avatar frames, nameplates, card themes, and overlay skins) enforce server-side ownership checks against your unlockedBadges ledger."
+							"title": "PCI-Compliant Stripe & Discord Storefront Entitlement Verification:",
+							"desc": "All Store subscriptions and Credit Top-Up purchases are processed directly by Stripe or official Discord Application Storefront SKUs. Xernerx never touches or stores raw credit card numbers, all subscription unlocks verify cryptographic Stripe webhook signatures or live Discord SKU entitlements, and all Credit Store cosmetic equips (stage render forms, ambient scenes, cursor FX, icon packs, avatar frames, nameplates, card themes, and overlay skins) enforce server-side ownership checks against your unlockedBadges ledger."
 						},
 						"audit": {
 							"title": "RBAC, Blacklist Enforcement & Immutable Staff Audit Logs:",
@@ -5162,7 +5164,7 @@
 			},
 			"card3": {
 				"title": "How does the Virtue Progression System (app.xernerx.com/dashboard?tab=virtue) work?",
-				"description": "Virtue is Xernerx's progression and engagement engine. Per-server text XP/levels/messages and voice XP/levels/time are tracked in the dedicated virtue database, while contributing to each user's unified global platform level in xernerx. In the Server Dashboard under the Virtue tab (?tab=virtue), server admins can configure: (1) Virtue Curve Mode—Easy (Very fast), Casual (Fast), Balanced (Standard), Hard (Slow curve), or Extreme (Prestige); (2) Automatic Reset Cycles—Daily, Weekly, or Monthly leaderboard wipes; (3) Tracked Level Roles (roles unlocked as members ascend) and Ignored Roles (exempt from earning score); and (4) Level-Up Announcements—toggleable channel embeds with a custom message template supporting [@mention] and [@level], a custom Announcement Channel ID, and an Auto-Delete timer in seconds."
+				"description": "Virtue is Xernerx's progression and engagement engine. Per-server text XP/levels/messages and voice XP/levels/time are tracked in the dedicated virtue database, while contributing to each user's unified global platform level in xernerx. In the Server Dashboard under the Virtue tab (?tab=virtue), server admins can configure: (1) Virtue Curve Mode—Easy (Very fast), Casual (Fast), Balanced (Standard), Hard (Slow curve), or Extreme (Prestige), plus Server Booster XP Multipliers (1x–2x); (2) Automatic Reset Cycles—Daily, Weekly, or Monthly leaderboard wipes; (3) Manual Milestone Level Roles (with Stack Level Roles toggle) or automated Dynamic Hoist Roles (which dynamically create, hoist, color-interpolate from Color A to Color B, and prune/consolidate up to 250 active level roles above your Level 1 Anchor Role), plus Tracked Roles and Ignored Roles/Channels; and (4) Level-Up Announcements—toggleable channel embeds with a custom message template supporting [@mention] and [@level], a custom Announcement Channel, and an Auto-Delete timer in seconds."
 			},
 			"card4": {
 				"title": "How do Developer Organizations (portal.xernerx.com) and Organization Roles work?",
@@ -5181,8 +5183,8 @@
 				"description": "When Virtue's leveling module is enabled on your Discord server, members automatically earn XP from text messages and active time in voice channels. Server owners can customize XP rates, level-up role rewards, and announcements in the Virtue Dashboard, while members can browse real-time ranked XP and Voice Leaderboards on your public server page."
 			},
 			"card8": {
-				"title": "Can I assign Virtue level roles for Text XP and Voice XP independently or based on Unified Server XP?",
-				"description": "Yes! In the Server Dashboard under the Virtue tab (app.xernerx.com/dashboard?tab=virtue), each Level Role can be assigned to one of three XP tracks: (1) Unified Server XP (Combined)—unlocks when a member reaches the target combined Server Level from both text and voice activity; (2) Text XP (Messages Only)—unlocks independently when a member reaches the target level on the text chat XP track; or (3) Voice XP (Voice Time Only)—unlocks independently when a member reaches the target level on the voice channel XP track. Members can also run /roles in Discord to view all configured level roles, their track badges (SERVER, TEXT, VOICE), and their live unlock progress."
+				"title": "Can I assign Virtue level roles for Text XP and Voice XP independently or use Dynamic Hoist Roles?",
+				"description": "Yes! In the Server Dashboard under the Virtue tab (app.xernerx.com/dashboard?tab=virtue), each Level Role (or your Dynamic Hoist Roles configuration) can be assigned to one of three XP tracks: (1) Unified Server XP (Combined)—unlocks when a member reaches the target combined Server Level from both text and voice activity; (2) Text XP (Messages Only)—unlocks independently when a member reaches the target level on the text chat XP track; or (3) Voice XP (Voice Time Only)—unlocks independently when a member reaches the target level on the voice channel XP track. With Dynamic Hoist Roles enabled (Server Owner Pass), Virtue automatically creates, hoists, and color-interpolates up to 250 level roles above your Level 1 Base Anchor Role. Members can also run /roles in Discord to view all configured level roles, their track badges (SERVER, TEXT, VOICE), and their live unlock progress."
 			}
 		},
 		"account": {
@@ -5805,7 +5807,38 @@
 				"ignoredChannelsDesc": "Messages and voice activity in these channels will not grant server XP.",
 				"stackRoles": "Stack Level Roles",
 				"stackRolesEnabledDesc": "Members keep all unlocked milestone roles as they level up.",
-				"stackRolesDisabledDesc": "Unlocking a higher role replaces previous lower-level roles on that track."
+				"stackRolesDisabledDesc": "Unlocking a higher role replaces previous lower-level roles on that track.",
+				"serverPremiumBadge": "Owner Pass Required",
+				"serverPremiumActive": "Server Owner Subscribed",
+				"serverPremiumRequired": "Custom difficulty modes, booster multipliers, reset cycles, and Dynamic Hoist Roles are unlocked when the server owner holds an active Virtue Pass or Ultra subscription.",
+				"serverPremiumCta": "Get Virtue Pass",
+				"editLevelRoleAria": "Edit level role",
+				"doneEditingRoleAria": "Done editing level role",
+				"removeLevelRoleAria": "Remove level role",
+				"dynamicRoles": {
+					"manualModeTab": "Manual Milestones",
+					"dynamicModeTab": "Dynamic Hoist Roles",
+					"anchorLabel": "Level 1 Base Role (Hoist Anchor)",
+					"anchorDesc": "Always stays present in Discord (even at 0 users) and anchors the hoist & hierarchy position for all dynamic level roles created above it.",
+					"trackLabel": "Progression Track",
+					"trackDesc": "Level track that drives role tiers.",
+					"templateLabel": "Role Name Template",
+					"templateUsePrefix": "Use",
+					"templateUseSuffix": "for the tier number.",
+					"maxRolesLabel": "Max Dynamic Roles",
+					"maxRolesAuto": "250 (Auto)",
+					"maxRolesCount": "{count} milestones",
+					"gradientTitle": "Dynamic Role Color Gradient (Color A → Color B)",
+					"gradientEnabledDesc": "Smoothly interpolates role colors from Level 1 (Color A) up to the highest active tier (Color B).",
+					"gradientDisabledDesc": "Inherits the color of your Level 1 Base Role across all dynamic level roles.",
+					"colorStartLabel": "Start Color (Level 1)",
+					"colorEndLabel": "End Color (Highest Active Level)",
+					"previewLabel": "Live Hoist Stack Preview",
+					"activeRolesTitle": "Active Dynamic Roles in Discord",
+					"activeRolesDesc": "Roles with 0 members are automatically promoted or pruned; when active levels exceed {max}, Virtue consolidates to the {max} most defining milestones.",
+					"selectAnchorPrompt": "Select a Level 1 Base Role above to activate dynamic level role creation and hoist management.",
+					"anchorBadge": "L1 Anchor"
+				}
 			}
 		},
 		"layout": {},

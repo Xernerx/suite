@@ -27,19 +27,23 @@ export function DynamicItemCard({ item, billingInterval, actionLoading, appliedC
 
 	const activePrice = item.prices.find((p) => p.interval === billingInterval) || item.prices[0];
 	const currentSub = getActiveSubscription(activePrice?.id || null);
+	const hasDiscordEntitlement = Boolean(item.discordSku?.hasEntitlement);
+	const isDiscordSku = Boolean(item.discordSku?.storeUrl);
 
 	const originalAmount = activePrice ? activePrice.unitAmount / 100 : null;
 	const baseDiscounted = activePrice?.discountedAmount ? activePrice.discountedAmount / 100 : originalAmount;
-	const effectiveDiscountPercent = appliedCoupon?.discountType === 'percent' ? Math.max(item.discountPercent || 0, appliedCoupon.percentOff || 0) : item.discountPercent || 0;
+	const effectiveDiscountPercent = isDiscordSku ? 0 : appliedCoupon?.discountType === 'percent' ? Math.max(item.discountPercent || 0, appliedCoupon.percentOff || 0) : item.discountPercent || 0;
 	const discountedAmount =
 		originalAmount === null
 			? null
-			: appliedCoupon?.discountType === 'amount'
-				? Math.max(0, (baseDiscounted ?? originalAmount) - (appliedCoupon.amountOff || 0))
-				: effectiveDiscountPercent > 0
-					? originalAmount * (1 - effectiveDiscountPercent / 100)
-					: baseDiscounted;
-	const hasDiscount = originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
+			: isDiscordSku
+				? originalAmount
+				: appliedCoupon?.discountType === 'amount'
+					? Math.max(0, (baseDiscounted ?? originalAmount) - (appliedCoupon.amountOff || 0))
+					: effectiveDiscountPercent > 0
+						? originalAmount * (1 - effectiveDiscountPercent / 100)
+						: baseDiscounted;
+	const hasDiscount = !isDiscordSku && originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
 
 	return (
 		<div className="p-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md flex flex-col justify-between shadow-sm hover:border-(--accent)/50 hover:bg-(--foreground)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)] transition-all">
@@ -95,13 +99,32 @@ export function DynamicItemCard({ item, billingInterval, actionLoading, appliedC
 
 			{/* Action Button */}
 			<div>
-				{currentSub ? (
+				{hasDiscordEntitlement ? (
+					<a
+						href={item.discordSku?.storeUrl || 'https://discord.com/settings/subscriptions'}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-(--accent-green)/10 text-(--accent-green) border border-(--accent-green)/20 hover:bg-(--accent-green)/20 transition-colors flex items-center justify-center gap-1.5"
+					>
+						<Check size={14} />
+						{t('account.store.buttons.currentPlan')}
+					</a>
+				) : currentSub ? (
 					<button
 						onClick={() => handleCancelClick(currentSub.stripeSubscriptionId)}
 						className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-(--accent-red)/10 text-(--accent-red) border border-(--accent-red)/20 hover:bg-(--accent-red)/20 transition-colors cursor-pointer"
 					>
 						{t('account.store.buttons.cancelPass')}
 					</button>
+				) : isDiscordSku && item.discordSku?.storeUrl ? (
+					<a
+						href={item.discordSku.storeUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="w-full py-2.5 px-3 rounded-xl text-xs font-medium bg-(--background) hover:bg-(--accent) text-(--text) hover:text-white border border-(--border)/10 transition-all duration-200 cursor-pointer flex items-center justify-center shadow-xs"
+					>
+						{t('account.store.buttons.getPass')}
+					</a>
 				) : (
 					<button
 						onClick={() => handleSubscribe(activePrice?.id || null, item.discountPercent)}

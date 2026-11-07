@@ -2,6 +2,20 @@
 
 # cdn
 
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.3
+    - @xernerx/lib@1.22.0
+    - @xernerx/providers@0.22.2
+    - @xernerx/ui@0.8.3
+    - @xernerx/feedback@0.5.4
+
 ## 1.4.2
 
 ### Patch Changes

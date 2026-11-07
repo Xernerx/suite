@@ -238,7 +238,7 @@ export const STORE_DEEP_LINKS = [
 		path: '/?category=consumers',
 		label: 'Ultra Ecosystem & Bot Passes',
 		subtitle: 'store.xernerx.com/?category=consumers • All-in-one Ultra bundle, Virtue, Zodiac & To-Do List Bot',
-		keywords: 'ultra ecosystem pass zodiac virtue todo metamorphosis consumer subscriptions',
+		keywords: 'ultra ecosystem pass zodiac virtue todo metamorphosis consumer subscriptions server premium dynamic hoist roles booster xp multiplier',
 		icon: Sparkles,
 	},
 	{
@@ -259,7 +259,7 @@ export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey;
 		path: '',
 		label: 'Developer Portal (My Bots, Servers & Orgs)',
 		subtitle: 'portal.xernerx.com • Manage bot settings, analytics, releases, webhooks & organizations',
-		keywords: 'developer portal manage bots servers guilds organizations webhooks releases analytics virtue',
+		keywords: 'developer portal manage bots servers guilds organizations webhooks releases analytics virtue dynamic hoist roles role gradient booster xp multiplier',
 		icon: Layers,
 	},
 	{

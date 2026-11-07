@@ -85,7 +85,7 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>
 			<body style={themeProps.style} suppressHydrationWarning>
 				<SessionProvider session={session}>
-					<AppLayout dictionary={dict}>
+					<AppLayout dictionary={dict} enableAds>
 						<PermissionProvider>{children}</PermissionProvider>
 					</AppLayout>
 				</SessionProvider>

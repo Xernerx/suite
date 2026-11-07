@@ -2,6 +2,32 @@
 
 # auth
 
+## 2.14.0
+
+### Minor Changes
+
+- ## Discord App Subscriptions & Billing View
+
+    Unified Discord Application Storefront subscription entitlements into the Account Billing portal alongside Stripe subscriptions.
+
+    ### Added
+    - **Discord App Subscription Cards**: Active Discord Application Storefront passes (such as Virtue Pass) now appear automatically in your subscription list with live renewal dates, pricing badges, and a direct "Manage in Discord" action button.
+
+    ### Changed
+    - **Unified Subscription Resolution**: Enhanced subscription catalog enrichment to resolve both Stripe recurring plans and verified Discord SKU entitlements in a single pass.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.3
+    - @xernerx/lib@1.22.0
+    - @xernerx/providers@0.22.2
+    - @xernerx/ui@0.8.3
+    - @xernerx/feedback@0.5.4
+
 ## 2.13.2
 
 ### Patch Changes

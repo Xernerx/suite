@@ -2,6 +2,21 @@
 
 # @xernerx/lib
 
+## 1.22.0
+
+### Minor Changes
+
+- ## Virtue Dynamic Hoist Roles Schema, Discord SKU Config & Localization
+
+    Expanded the Virtue Guild Mongoose model, StoreItem schema, product catalog constants, and `en-GB` localization dictionary.
+
+    ### Added
+    - **Virtue Guild Schema (`dynamicRoles`)**: Added `dynamicRoles` (`enabled`, `anchorRoleId`, `nameTemplate`, `maxRoles`, `track`, `gradientEnabled`, `colorStart`, `colorEnd`, `managed`) and `boosterMultiplier` fields to the Virtue `Guild` profile schema.
+    - **Localization Keys**: Added `app.dashboard.virtue.dynamicRoles.*`, `app.dashboard.virtue.*Aria`, and `account.billing.discordSub` / `manageOnDiscord` translation keys in `en-GB.json`.
+
+    ### Changed
+    - **FAQ & Security Dictionaries**: Updated `info.faq.servers` and `www.security.sections.infrastructure.items.stripe` localization strings to document Dynamic Hoist Roles, Server Booster XP multipliers, and Discord Application Storefront SKU entitlements.
+
 ## 1.21.1
 
 ### Patch Changes

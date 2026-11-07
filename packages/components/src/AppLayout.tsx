@@ -21,6 +21,7 @@ import {
 	signOut,
 	useEnvironment,
 } from '@xernerx/providers';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 import { CookiePrompt } from './CookiePrompt';
@@ -80,6 +81,9 @@ export function AppLayout({
 	initialEnvironment?: 'dev' | 'canary' | 'public';
 	enableAds?: boolean;
 }) {
+	const pathname = usePathname() || '/';
+	const isAdExcludedRoute = /^\/(?:terms|privacy|cookies|security|disclaimer|contact|applications|invites|login|logout|overlay)(?:\/|$)/i.test(pathname);
+
 	if (typeof window !== 'undefined') {
 		const w = window as any;
 		w.googlefc = w.googlefc || {};
@@ -144,7 +148,7 @@ export function AppLayout({
 			}}
 		>
 			<ThemeScript />
-			{enableAds && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+			{enableAds && !isAdExcludedRoute && process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
 				<script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`} crossOrigin="anonymous" />
 			)}
 
