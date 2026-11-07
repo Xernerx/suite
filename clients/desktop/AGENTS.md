@@ -9,6 +9,7 @@
 ## 🏗️ Architecture & Files
 
 - **`src/main.ts`:** Electron main process (ES Module) managing window lifecycle, tray, auto-updater, and environment-aware target URL resolution (`https://app.xernerx.com` in production, or local dev port `4004` / `app.dev.*` in development).
+- **`src/updater.ts`:** Discord-style background update pipeline querying `https://api.xernerx.com/core/download`, polling while GitHub Actions assets build (`waiting-for-assets`), streaming updates atomically to `.part` files in the OS temp folder, applying silent unattended installations (`/S` on Windows NSIS, atomic `APPIMAGE` swap on Linux, silent `hdiutil` `.dmg` copy on macOS), and auto-installing updates on startup (`loading.html`) or restart.
 - **`src/metadata.ts`:** Runtime configuration persistence (`config.json` in `userData` + `metadata.json` sync), external file watcher, system tray menu builder, and Discord Rich Presence (`@xhayper/discord-rpc`).
 - **`src/notifications.ts`:** Native Windows Action Center & Apple Notification Center (`UNNotification`) dispatcher, click-to-navigate handler, taskbar flash, and macOS Dock / system tray unread badge synchronization.
 - **`src/features.ts`:** Native desktop-exclusive OS integrations:

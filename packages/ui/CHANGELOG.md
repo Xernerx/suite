@@ -2,6 +2,26 @@
 
 # @xernerx/ui
 
+## 0.8.3
+
+### Patch Changes
+
+- ## Selector Disabled State Prop
+
+    Added `disabled` prop support to the shared `Selector` primitive component.
+
+    ### Added
+    - **Disabled State (`Selector`)**: Added `disabled?: boolean` to `SelectorProps` with disabled button attributes, muted opacity styling, and interaction locking.
+
+- Updated dependencies
+    - @xernerx/providers@0.22.2
+
+## 0.8.2
+
+### Patch Changes
+
+- @xernerx/providers@0.22.1
+
 ## 0.8.1
 
 ### Patch Changes

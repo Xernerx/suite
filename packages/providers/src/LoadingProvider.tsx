@@ -23,7 +23,7 @@ export interface LoadingContextType {
 const LoadingContext = createContext<LoadingContextType | null>(null);
 
 function isAutomatedClient(): boolean {
-	if (typeof window === 'undefined') return false;
+	if (typeof window === 'undefined') return true;
 	const nav = typeof navigator !== 'undefined' ? navigator : undefined;
 	if (nav && (nav as any).webdriver) return true;
 	const ua = nav?.userAgent || '';
@@ -34,11 +34,11 @@ function isAutomatedClient(): boolean {
 
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
-	const { status: sessionStatus } = useSession();
+	useSession();
 
 	const [manualLoading, setManualLoading] = useState(false);
 	const [manualMessage, setManualMessage] = useState<string | undefined>(undefined);
-	const [routeLoading, setRouteLoading] = useState<boolean>(() => !isAutomatedClient());
+	const [routeLoading, setRouteLoading] = useState<boolean>(false);
 	const [customMode, setCustomMode] = useState<AppBackgroundDotMode | null>(null);
 	const [customVariant, setCustomVariant] = useState<AppDotLogoVariant | null>(null);
 	const [autoMode, setAutoMode] = useState<AppBackgroundDotMode>('blank');
@@ -47,7 +47,6 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 	const [loaderCount, setLoaderCount] = useState(0);
 	const [loaderMessage, setLoaderMessage] = useState<string | undefined>(undefined);
 
-	// Load every page with Loading active from initial render, then turn routeLoading false after entrance completes
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const { hostname, port } = window.location;
@@ -65,16 +64,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 			}
 		}
 
-		if (isAutomatedClient()) {
-			setRouteLoading(false);
-			return;
-		}
-
-		setRouteLoading(true);
-		const timer = setTimeout(() => {
-			setRouteLoading(false);
-		}, 1100);
-		return () => clearTimeout(timer);
+		setRouteLoading(false);
 	}, [pathname]);
 
 	const syncLoadersState = useCallback(() => {
@@ -118,7 +108,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
 
 	const backgroundMode: AppBackgroundDotMode = customMode ?? (pathname === '/download' ? 'sticky-ripple' : autoMode);
 	const dotVariant: AppDotLogoVariant = customVariant ?? 'full';
-	const isLoading = routeLoading || sessionStatus === 'loading' || manualLoading || loaderCount > 0;
+	const isLoading = routeLoading || manualLoading || loaderCount > 0;
 	const message = manualMessage || loaderMessage;
 
 	const value = useMemo<LoadingContextType>(

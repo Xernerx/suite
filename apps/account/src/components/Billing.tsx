@@ -22,21 +22,14 @@ interface EnrichedSubscription extends UserSubscription {
 	productDescription: string | null;
 	priceFormatted?: string | null;
 	interval?: 'month' | 'year' | null;
+	discordStoreUrl?: string | null;
 }
 
 const allProductIds = [...products.users, ...products.developers, ...(products.servers || [])];
 
 export default function Billing() {
 	const { t } = useDictionary();
-	const {
-		user,
-		mutate,
-		loading: userLoading,
-	} = useUser() as {
-		user: any;
-		mutate?: () => Promise<void>;
-		loading?: boolean;
-	};
+	const { user, mutate, loading: userLoading } = useUser() as { user: any; mutate?: () => Promise<void>; loading?: boolean };
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const [enriched, setEnriched] = useState<EnrichedSubscription[]>([]);
@@ -60,13 +53,10 @@ export default function Billing() {
 		}
 		const updateCountdown = () => {
 			const diff = nextGiftMs - Date.now();
-			if (diff <= 0) {
-				setTimeLeft('00:00:00');
-				return;
-			}
-			const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-			const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-			const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+			if (diff <= 0) return setTimeLeft('00:00:00');
+			const hours = Math.floor((diff % 86400000) / 3600000);
+			const minutes = Math.floor((diff % 3600000) / 60000);
+			const seconds = Math.floor((diff % 60000) / 1000);
 			setTimeLeft([hours, minutes, seconds].map((v) => String(v).padStart(2, '0')).join(':'));
 		};
 		updateCountdown();
@@ -78,78 +68,63 @@ export default function Billing() {
 		if (!user?.id || claimingGift) return;
 		setClaimingGift(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/store/${user.id}/gift`), {
-				method: 'POST',
-				credentials: 'include',
-			});
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/store/${user.id}/gift`), { method: 'POST', credentials: 'include' });
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.error || t('account.billing.credits.claimError'));
 			if (mutate) await mutate();
 			toast({
 				type: 'success',
-				title: t('account.billing.credits.claimSuccess', {
-					amount: data.rewardEarned || data.reward || 50,
-					streak: data.streak || data.credits?.streak || 1,
-				}),
+				title: t('account.billing.credits.claimSuccess', { amount: data.rewardEarned || data.reward || 50, streak: data.streak || data.credits?.streak || 1 }),
 			});
 		} catch (err: any) {
-			toast({
-				type: 'error',
-				title: err.message || t('account.billing.credits.claimError'),
-			});
+			toast({ type: 'error', title: err.message || t('account.billing.credits.claimError') });
 		} finally {
 			setClaimingGift(false);
 		}
 	};
 
-	const allRawSubs: UserSubscription[] = useMemo(() => {
-		return user?.billing?.subscriptions || user?.subscriptions || [];
-	}, [user]);
+	const allRawSubs: UserSubscription[] = useMemo(() => user?.billing?.subscriptions || user?.subscriptions || [], [user]);
 
 	useEffect(() => {
 		if (userLoading) return;
 		async function resolve() {
 			setLoading(true);
+			const priceMap: Record<string, { productName: string; productDescription: string | null; priceFormatted?: string | null; interval?: 'month' | 'year' | null }> = {};
+			const discordEntitlementSubs: EnrichedSubscription[] = [];
+			const fmtPrice = (amt?: number, cur?: string) =>
+				typeof amt === 'number' ? new Intl.NumberFormat(undefined, { style: 'currency', currency: (cur || 'eur').toUpperCase() }).format(amt / 100) : null;
 
-			const priceMap: Record<
-				string,
-				{
-					productName: string;
-					productDescription: string | null;
-					priceFormatted?: string | null;
-					interval?: 'month' | 'year' | null;
-				}
-			> = {};
-
-			// 1. Primary lookup via live Store Catalog (/secure/store/catalog)
 			try {
-				const catalogRes = await fetch(getEnvUrl('https://api.xernerx.com/secure/store/catalog'), {
-					credentials: 'include',
-				});
+				const catalogRes = await fetch(getEnvUrl('https://api.xernerx.com/secure/store/catalog'), { credentials: 'include' });
 				if (catalogRes.ok) {
 					const catalogData = await catalogRes.json();
 					for (const item of catalogData.items || []) {
 						for (const price of item.prices || []) {
-							const unitAmount = price.discountedAmount ?? price.unitAmount;
-							const formatted =
-								typeof unitAmount === 'number'
-									? new Intl.NumberFormat(undefined, {
-											style: 'currency',
-											currency: (price.currency || 'eur').toUpperCase(),
-										}).format(unitAmount / 100)
-									: null;
 							priceMap[price.id] = {
 								productName: item.name || item.stripeName || item.skuId,
 								productDescription: item.description || item.stripeDescription || null,
-								priceFormatted: formatted,
+								priceFormatted: fmtPrice(price.discountedAmount ?? price.unitAmount, price.currency),
 								interval: price.interval === 'year' ? 'year' : price.interval === 'month' ? 'month' : null,
 							};
+						}
+						if (item.discordSku?.hasEntitlement) {
+							const primaryPrice = item.prices?.[0];
+							discordEntitlementSubs.push({
+								stripeSubscriptionId: `discord_sku_${item.discordSku.skuId}`,
+								priceId: primaryPrice?.id || item.discordSku.skuId,
+								status: 'active',
+								currentPeriodEnd: item.discordSku.entitlementEndsAt || '',
+								productName: item.name || item.stripeName || item.skuId,
+								productDescription: item.description || item.stripeDescription || null,
+								priceFormatted: fmtPrice(primaryPrice?.discountedAmount ?? primaryPrice?.unitAmount, primaryPrice?.currency),
+								interval: 'month',
+								discordStoreUrl: item.discordSku.storeUrl || null,
+							});
 						}
 					}
 				}
 			} catch {}
 
-			// 2. Fallback lookup for any legacy priceId not in catalog
 			const missingSubs = allRawSubs.filter((s) => s.priceId && !priceMap[s.priceId]);
 			if (missingSubs.length > 0) {
 				for (const productId of allProductIds) {
@@ -158,25 +133,22 @@ export default function Billing() {
 						if (!res.ok) continue;
 						const data = await res.json();
 						for (const price of data.prices || []) {
-							if (!priceMap[price.id]) {
-								priceMap[price.id] = {
-									productName: data.name ?? productId,
-									productDescription: data.description ?? null,
-								};
-							}
+							if (!priceMap[price.id]) priceMap[price.id] = { productName: data.name ?? productId, productDescription: data.description ?? null };
 						}
 					} catch {}
 				}
 			}
 
-			const result: EnrichedSubscription[] = allRawSubs.map((sub) => ({
-				...sub,
-				productName: priceMap[sub.priceId]?.productName ?? sub.priceId,
-				productDescription: priceMap[sub.priceId]?.productDescription ?? null,
-				priceFormatted: priceMap[sub.priceId]?.priceFormatted ?? null,
-				interval: priceMap[sub.priceId]?.interval ?? null,
-			}));
-			setEnriched(result);
+			setEnriched([
+				...discordEntitlementSubs,
+				...allRawSubs.map((sub) => ({
+					...sub,
+					productName: priceMap[sub.priceId]?.productName ?? sub.priceId,
+					productDescription: priceMap[sub.priceId]?.productDescription ?? null,
+					priceFormatted: priceMap[sub.priceId]?.priceFormatted ?? null,
+					interval: priceMap[sub.priceId]?.interval ?? null,
+				})),
+			]);
 			setLoading(false);
 		}
 		resolve();
@@ -188,32 +160,21 @@ export default function Billing() {
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/store/${user.id}/cancel`), {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
-				body: JSON.stringify({
-					stripeSubscriptionId,
-				}),
+				body: JSON.stringify({ stripeSubscriptionId }),
 			});
 			if (res.ok) {
 				setEnriched((prev) => prev.map((s) => (s.stripeSubscriptionId === stripeSubscriptionId ? { ...s, status: 'canceled' } : s)));
 				if (mutate) await mutate();
-				toast({
-					type: 'success',
-					title: t('account.billing.toasts.cancelSuccess'),
-				});
+				toast({ type: 'success', title: t('account.billing.toasts.cancelSuccess') });
 			} else {
 				const errData = await res.json().catch(() => ({}));
 				throw new Error(errData.error || t('account.billing.toasts.cancelError'));
 			}
 		} catch (err: any) {
 			console.error('Failed to cancel subscription', err);
-			toast({
-				type: 'error',
-				title: t('account.billing.toasts.cancelError'),
-				description: err.message,
-			});
+			toast({ type: 'error', title: t('account.billing.toasts.cancelError'), description: err.message });
 		} finally {
 			setCancellingId(null);
 			setCancelConfirm(null);
@@ -221,27 +182,15 @@ export default function Billing() {
 	};
 
 	const getStatusVariant = (status: string): 'success' | 'warning' | 'danger' | 'accent' | 'muted' => {
-		switch (status) {
-			case 'active':
-				return 'success';
-			case 'trialing':
-				return 'accent';
-			case 'past_due':
-				return 'warning';
-			case 'canceled':
-				return 'danger';
-			default:
-				return 'muted';
-		}
+		if (status === 'active') return 'success';
+		if (status === 'trialing') return 'accent';
+		if (status === 'past_due') return 'warning';
+		if (status === 'canceled') return 'danger';
+		return 'muted';
 	};
 
-	const formatDate = (dateStr: string) =>
-		new Date(dateStr).toLocaleDateString(undefined, {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-		});
-	const daysUntil = (dateStr: string) => Math.max(0, Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+	const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+	const daysUntil = (dateStr: string) => Math.max(0, Math.ceil((new Date(dateStr).getTime() - Date.now()) / 86400000));
 
 	const activeSubs = useMemo(() => enriched.filter((s) => s.status === 'active' || s.status === 'trialing'), [enriched]);
 	const historySubs = useMemo(() => enriched.filter((s) => s.status !== 'active' && s.status !== 'trialing'), [enriched]);
@@ -433,6 +382,8 @@ export default function Billing() {
 												{t('account.billing.renewsOn', { date: formatDate(renewalDate) })}
 												{isExpiringSoon && ` · ${t('account.billing.daysLeft', { days: days ?? 0 })}`}
 											</span>
+										) : isActive && item.discordStoreUrl ? (
+											<span className="text-(--text-muted)">{t('account.billing.discordSub')}</span>
 										) : (
 											<span className="text-(--text-muted)">{t('account.billing.canceled')}</span>
 										)}
@@ -440,9 +391,21 @@ export default function Billing() {
 
 									{isActive && (
 										<div className="flex items-center gap-2">
-											<Button variant="danger" size="sm" onClick={() => setCancelConfirm(item)} disabled={isCancelling}>
-												{t('account.billing.cancelSubscription')}
-											</Button>
+											{item.discordStoreUrl ? (
+												<Button
+													variant="secondary"
+													size="sm"
+													onClick={() => window.open(item.discordStoreUrl!, '_blank', 'noopener,noreferrer')}
+													className="flex items-center gap-1.5"
+												>
+													<ExternalLink size={13} />
+													{t('account.billing.manageOnDiscord')}
+												</Button>
+											) : (
+												<Button variant="danger" size="sm" onClick={() => setCancelConfirm(item)} disabled={isCancelling}>
+													{t('account.billing.cancelSubscription')}
+												</Button>
+											)}
 										</div>
 									)}
 								</div>

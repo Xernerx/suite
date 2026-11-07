@@ -54,7 +54,14 @@ export function Header() {
 	const notificationsRef = useRef<HTMLDivElement>(null);
 	const [optionsOpen, setOptionsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(true);
-	const [desktopUpdateState, setDesktopUpdateState] = useState<{ checking?: boolean; outdated?: boolean; latestVersion?: string } | null>(null);
+	const [desktopUpdateState, setDesktopUpdateState] = useState<{
+		checking?: boolean;
+		outdated?: boolean;
+		downloaded?: boolean;
+		downloading?: boolean;
+		latestVersion?: string;
+		downloadUrl?: string | null;
+	} | null>(null);
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
 	const pathname = usePathname();
@@ -310,20 +317,32 @@ export function Header() {
 							</div>
 						)}
 
-						{isMounted && isApp && desktopUpdateState?.outdated && (
+						{isMounted && isApp && desktopUpdateState?.outdated && (desktopUpdateState.downloaded || (!desktopUpdateState.downloading && Boolean(desktopUpdateState.downloadUrl))) && (
 							<button
 								type="button"
 								onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-desktop-updater'))}
-								aria-label={t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })}
-								title={t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })}
-								className={`relative ${headerIconBtnClass} text-(--accent-orange)`}
+								aria-label={
+									desktopUpdateState.downloaded
+										? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
+										: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
+								}
+								title={
+									desktopUpdateState.downloaded
+										? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
+										: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
+								}
+								className={`relative ${headerIconBtnClass} ${desktopUpdateState.downloaded ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}
 							>
 								{desktopUpdateState.checking ? (
 									<RefreshCw size={effectiveControls === 'windows' ? 20 : 16} className="animate-spin text-(--accent)" />
 								) : (
 									<Download size={effectiveControls === 'windows' ? 20 : 16} />
 								)}
-								<span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent-orange) border-2 border-(--background) animate-pulse" />
+								<span
+									className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${
+										desktopUpdateState.downloaded ? 'bg-(--accent-green)' : 'bg-(--accent-orange)'
+									} border-2 border-(--background) animate-pulse`}
+								/>
 							</button>
 						)}
 

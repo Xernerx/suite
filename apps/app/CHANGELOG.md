@@ -2,6 +2,46 @@
 
 # app
 
+## 2.21.0
+
+### Minor Changes
+
+- ## Virtue Dynamic Hoist Roles Studio & Booster XP Multipliers
+
+    Introduced the Dynamic Hoist Roles Studio, live color gradient interpolation preview, and Server Booster XP multipliers to the Virtue Server Dashboard.
+
+    ### Added
+    - **Dynamic Hoist Roles Mode**: Added a dedicated Dynamic Hoist Roles configuration studio allowing Server Premium guilds to select a Level 1 Base Role hoist anchor, progression track, custom `[@level]` role name template, and a max dynamic role budget (up to 250 auto-consolidated milestones).
+    - **Dynamic Role Color Gradient & Live Preview**: Added two-stop hex color gradient controls (`Color A → Color B`) with a live hoist stack pill preview and active Discord role status summary.
+    - **Server Booster XP Multiplier**: Added a configurable Server Booster XP Bonus selector (`1x`, `1.25x`, `1.5x`, `2x`) for Server Premium communities.
+
+    ### Changed
+    - **Config Portability Support**: Expanded Virtue JSON configuration export, import, and cross-server copy to include `boosterMultiplier`, `stackRoles`, and `dynamicRoles` settings.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.3
+    - @xernerx/lib@1.22.0
+    - @xernerx/providers@0.22.2
+    - @xernerx/ui@0.8.3
+    - @xernerx/feedback@0.5.4
+
+## 2.20.1
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+    - @xernerx/components@0.15.2
+    - @xernerx/lib@1.21.1
+    - @xernerx/providers@0.22.1
+    - @xernerx/feedback@0.5.3
+    - @xernerx/ui@0.8.2
+
 ## 2.20.0
 
 ### Minor Changes

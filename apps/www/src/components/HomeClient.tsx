@@ -128,21 +128,9 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					navigator.userAgent || ''
 				));
 
-		let fallbackTimer = 0;
-		const handleConstructComplete = () => {
-			setMatrixConstructed(true);
-			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
-		};
-
-		if (isAutomated) {
-			setMatrixConstructed(true);
-		} else {
-			setMatrixConstructed(false);
-			(window as any).__xernerxConstructPending = true;
-			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: true } }));
+		setMatrixConstructed(true);
+		if (!isAutomated) {
 			window.dispatchEvent(new CustomEvent('xernerx:construct-logo'));
-			window.addEventListener('xernerx:construct-complete', handleConstructComplete);
-			fallbackTimer = window.setTimeout(handleConstructComplete, 3550);
 		}
 
 		const scrollEl = document.getElementById('main-scroll-container');
@@ -177,8 +165,6 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 		scrollEl?.addEventListener('scroll', handleScroll, { passive: true });
 		return () => {
-			window.clearTimeout(fallbackTimer);
-			window.removeEventListener('xernerx:construct-complete', handleConstructComplete);
 			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
 			scrollEl?.removeEventListener('scroll', handleScroll);
 			setBackgroundMode(null);
@@ -385,7 +371,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					</div>
 
 					<motion.div
-						initial={{ opacity: 0, y: 24 }}
+						initial={false}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
 						transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -397,7 +383,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					</motion.div>
 
 					<motion.div
-						initial={{ opacity: 0, x: 24 }}
+						initial={false}
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
 						transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -442,7 +428,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					).map((pillar, idx) => (
 						<motion.div
 							key={pillar.title}
-							initial={{ opacity: 0, y: 20 }}
+							initial={false}
 							whileInView={{ opacity: 1, y: 0 }}
 							whileHover={{ y: -6, scale: 1.015 }}
 							viewport={{ once: true, margin: '-50px' }}

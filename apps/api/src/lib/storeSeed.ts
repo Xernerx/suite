@@ -993,23 +993,40 @@ export async function ensureStoreSeed() {
 				order: 0,
 				enabled: true,
 			},
+			{
+				id: 'bot-virtue',
+				name: 'Virtue Pass',
+				description: 'Official Discord App Subscription for Virtue — unlocks custom Difficulty Modes, Booster XP Multipliers, and automated Reset Cycles on any server you own.',
+				categoryId: 'consumers',
+				skuId: 'discord_virtue',
+				itemType: 'subscription',
+				isFeatured: false,
+				discountPercent: 0,
+				features: [
+					'Unlocks Difficulty Modes (Easy, Medium, Hard) on servers you own',
+					'Server Booster XP Multipliers (up to 3x bonus)',
+					'Automated Weekly, Monthly & Yearly XP Reset Cycles',
+					'125% Credit Multiplier on earned Xernerx credits',
+				],
+				order: 1,
+				enabled: true,
+			},
 			...[
-				{ id: 'bot-zodiac', name: 'Zodiac Pass', skuId: 'prod_V0pSuzpbmBFsRv', feat: 'Direct developer support', order: 1 },
-				{ id: 'bot-virtue', name: 'Virtue Pass', skuId: 'prod_V0pRf7S9w9Pjb9', feat: 'Advanced moderation suite', order: 2 },
-				{ id: 'bot-todo', name: 'To-Do List Bot Pass', skuId: 'prod_V0pREm72CzuoVc', feat: 'Unlimited task boards', order: 3 },
-				{ id: 'bot-metamorphosis', name: 'Metamorphosis Pass', skuId: 'prod_V0pQ0EDH0iEDIm', feat: 'Dynamic logging channels', order: 4 },
+				{ id: 'bot-zodiac', name: 'Zodiac Pass', feat: 'Direct developer support', order: 2 },
+				{ id: 'bot-todo', name: 'To-Do List Bot Pass', feat: 'Unlimited task boards', order: 3 },
+				{ id: 'bot-metamorphosis', name: 'Metamorphosis Pass', feat: 'Dynamic logging channels', order: 4 },
 			].map((b) => ({
 				id: b.id,
 				name: b.name,
-				description: 'Individual bot license pass with premium feature access.',
+				description: 'Individual bot license pass via Discord App Subscriptions.',
 				categoryId: 'consumers',
-				skuId: b.skuId,
+				skuId: '',
 				itemType: 'subscription',
 				isFeatured: false,
 				discountPercent: 0,
 				features: [`Premium ${b.name.replace(' Pass', '')} access`, '125% Credit Multiplier on earned credits', b.feat],
 				order: b.order,
-				enabled: true,
+				enabled: false,
 			})),
 			{
 				id: 'dev-pro',
@@ -1071,6 +1088,37 @@ export async function ensureStoreSeed() {
 		{
 			$addToSet: {
 				features: 'Bot Online & Offline POST Webhooks',
+			},
+		}
+	).catch(() => null);
+
+	// Migrate legacy Stripe bot SKUs to Discord SKUs (Virtue active; Zodiac/To-Do/Metamorphosis disabled until Discord SKUs are created)
+	await Item.updateOne(
+		{ id: 'bot-virtue', skuId: 'prod_V0pRf7S9w9Pjb9' },
+		{
+			$set: {
+				skuId: 'discord_virtue',
+				description: 'Official Discord App Subscription for Virtue — unlocks custom Difficulty Modes, Booster XP Multipliers, and automated Reset Cycles on any server you own.',
+				features: [
+					'Unlocks Difficulty Modes (Easy, Medium, Hard) on servers you own',
+					'Server Booster XP Multipliers (up to 3x bonus)',
+					'Automated Weekly, Monthly & Yearly XP Reset Cycles',
+					'125% Credit Multiplier on earned Xernerx credits',
+				],
+				enabled: true,
+			},
+		}
+	).catch(() => null);
+
+	await Item.updateMany(
+		{
+			id: { $in: ['bot-zodiac', 'bot-todo', 'bot-metamorphosis'] },
+			skuId: { $in: ['prod_V0pSuzpbmBFsRv', 'prod_V0pREm72CzuoVc', 'prod_V0pQ0EDH0iEDIm'] },
+		},
+		{
+			$set: {
+				skuId: '',
+				enabled: false,
 			},
 		}
 	).catch(() => null);

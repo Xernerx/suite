@@ -48,10 +48,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		{ url: 'https://info.xernerx.com/changelog', lastModified: now, changeFrequency: 'daily', priority: 0.8 },
 		{ url: 'https://info.xernerx.com/faq', lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
 
-		// STORE & PORTAL & HASTE
+		// STORE & PORTAL & HASTE & BLOG
 		{ url: 'https://store.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
 		{ url: 'https://portal.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
 		{ url: 'https://haste.xernerx.com/', lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
+		{ url: 'https://blog.xernerx.com/', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 	];
 
 	try {

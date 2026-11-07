@@ -2,6 +2,28 @@
 
 # @xernerx/providers
 
+## 0.22.2
+
+### Patch Changes
+
+- ## Instant Route Transitions & Command Palette Search Keywords
+
+    Eliminated artificial route-change loading delays in `LoadingProvider` and expanded `Ctrl + K` Command Palette search keywords.
+
+    ### Changed
+    - **LoadingProvider**: Removed the 1100ms route-change artificial loading timer and `sessionStatus === 'loading'` gate so page transitions render immediately.
+    - **Command Palette Catalog**: Added search keywords for Virtue Dynamic Hoist Roles, Role Color Gradients, and Server Booster XP Multipliers.
+
+- Updated dependencies
+    - @xernerx/lib@1.22.0
+
+## 0.22.1
+
+### Patch Changes
+
+- Updated dependencies
+    - @xernerx/lib@1.21.1
+
 ## 0.22.0
 
 ### Minor Changes

@@ -329,7 +329,7 @@ export default function SecurityPage() {
 								{t('www.security.header.title')}
 							</h1>
 							<p className="max-w-3xl text-base text-(--text-muted) leading-relaxed">{t('www.security.header.subtitle')}</p>
-							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 3 November 2026</div>
+							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 8 November 2026</div>
 						</header>
 
 						{/* Core Security Pillars Bento */}

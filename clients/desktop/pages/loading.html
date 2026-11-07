@@ -116,6 +116,9 @@
 		if (window.electron) {
 			window.electron.onStatus((message) => {
 				status.textContent = message;
+				if (typeof message === 'string' && /^(?:Downloading|Installing|Update)/i.test(message)) {
+					status.classList.remove('hidden');
+				}
 			});
 
 			window.electron.onError((message) => {

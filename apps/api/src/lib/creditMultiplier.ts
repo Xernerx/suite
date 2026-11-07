@@ -9,6 +9,51 @@ const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_
 
 // Cache priceId -> productId lookups to avoid repeated Stripe calls
 const priceProductCache = new Map<string, string>();
+const discordEntitlementCache = new Map<string, { active: boolean; expiresAt: number }>();
+
+function decodeBotIdFromToken(token?: string): string | null {
+	if (!token || !token.includes('.')) return null;
+	try {
+		const id = Buffer.from(token.split('.')[0], 'base64').toString('utf8').trim();
+		return /^\d{17,20}$/.test(id) ? id : null;
+	} catch {
+		return null;
+	}
+}
+
+async function hasActiveDiscordBotEntitlement(userId: string): Promise<boolean> {
+	if (!userId) return false;
+	const now = Date.now();
+	const cached = discordEntitlementCache.get(userId);
+	if (cached && cached.expiresAt > now) {
+		return cached.active;
+	}
+
+	const virtueToken = process.env.VIRTUE_BOT_TOKEN?.trim();
+	const virtueAppId = decodeBotIdFromToken(virtueToken);
+	if (!virtueToken || !virtueAppId) return false;
+
+	try {
+		const res = await fetch(`https://discord.com/api/v10/applications/${virtueAppId}/entitlements?user_id=${encodeURIComponent(userId)}&exclude_ended=true`, {
+			headers: { Authorization: `Bot ${virtueToken}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return false;
+		const entitlements = await res.json().catch(() => []);
+		const active =
+			Array.isArray(entitlements) &&
+			entitlements.some((ent: any) => {
+				if (!ent || ent.deleted) return false;
+				if (!ent.ends_at) return true;
+				const endMs = new Date(ent.ends_at).getTime();
+				return Number.isNaN(endMs) || endMs > now;
+			});
+		discordEntitlementCache.set(userId, { active, expiresAt: now + 5 * 60 * 1000 });
+		return active;
+	} catch {
+		return false;
+	}
+}
 
 async function isUltraPriceId(priceId: string, ultraSkuId: string): Promise<boolean> {
 	if (!priceId) return false;
@@ -106,6 +151,15 @@ export async function applySubscriptionCreditMultiplier(userId: string, baseCred
 		});
 
 		if (validSubs.length === 0) {
+			if (await hasActiveDiscordBotEntitlement(userId)) {
+				return {
+					baseCredits: cleanBase,
+					finalCredits: Math.round(cleanBase * 1.25),
+					multiplier: 1.25,
+					multiplierPercent: 125,
+					tier: 'subscriber',
+				};
+			}
 			return {
 				baseCredits: cleanBase,
 				finalCredits: cleanBase,

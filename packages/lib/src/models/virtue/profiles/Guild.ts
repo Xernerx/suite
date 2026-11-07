@@ -96,6 +96,29 @@ const schema = new Schema(
 			],
 			default: [],
 		},
+		dynamicRoles: {
+			enabled: { type: Boolean, default: false },
+			anchorRoleId: { type: String, default: null },
+			nameTemplate: { type: String, default: 'Level [@level]' },
+			maxRoles: { type: Number, default: 250 },
+			track: {
+				type: String,
+				enum: ['server', 'unified', 'text', 'voice'],
+				default: 'server',
+			},
+			gradientEnabled: { type: Boolean, default: false },
+			colorStart: { type: String, default: '#7c5cff' },
+			colorEnd: { type: String, default: '#00e5ff' },
+			managed: {
+				type: [
+					{
+						level: { type: Number, required: true },
+						roleId: { type: String, required: true },
+					},
+				],
+				default: [],
+			},
+		},
 		serverRoles: {
 			type: [
 				{

@@ -118,10 +118,38 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 							scheduled_end_time: new Date(scheduledEndMs).toISOString(),
 						};
 
-						let syncedEventId: string | null = null;
+						let syncedEventId: string | null = prevDiscordEventId || null;
+						const listRes = await fetch(`https://discord.com/api/v10/guilds/${adminServerId}/scheduled-events`, {
+							headers: { Authorization: `Bot ${botToken}` },
+						}).catch(() => null);
+						const existingEvents: any[] = listRes?.ok ? await listRes.json().catch(() => []) : [];
+						if (Array.isArray(existingEvents) && existingEvents.length > 0) {
+							const matchingEvents = existingEvents.filter(
+								(ev: any) =>
+									ev &&
+									(ev.id === syncedEventId ||
+										ev.entity_metadata?.location === 'https://app.xernerx.com/leaderboard' ||
+										ev.name === eventPayload.name ||
+										(typeof ev.name === 'string' && ev.name.startsWith('⚡ ') && ev.name.includes('XP)')))
+							);
+							if (matchingEvents.length > 0) {
+								const primary = matchingEvents.find((ev: any) => ev.id === syncedEventId) || matchingEvents[0];
+								syncedEventId = primary.id;
+								for (const dup of matchingEvents) {
+									if (dup.id !== syncedEventId) {
+										await fetch(`https://discord.com/api/v10/guilds/${adminServerId}/scheduled-events/${dup.id}`, {
+											method: 'DELETE',
+											headers: { Authorization: `Bot ${botToken}` },
+										}).catch(() => null);
+									}
+								}
+							} else if (syncedEventId && listRes?.ok) {
+								syncedEventId = null;
+							}
+						}
 
-						if (prevDiscordEventId) {
-							const patchRes = await fetch(`https://discord.com/api/v10/guilds/${adminServerId}/scheduled-events/${prevDiscordEventId}`, {
+						if (syncedEventId) {
+							const patchRes = await fetch(`https://discord.com/api/v10/guilds/${adminServerId}/scheduled-events/${syncedEventId}`, {
 								method: 'PATCH',
 								headers: {
 									Authorization: `Bot ${botToken}`,
@@ -132,11 +160,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 							if (patchRes?.ok) {
 								const updatedEv = await patchRes.json().catch(() => null);
-								syncedEventId = updatedEv?.id || prevDiscordEventId;
+								syncedEventId = updatedEv?.id || syncedEventId;
+							} else if (patchRes?.status === 404) {
+								syncedEventId = null;
 							} else if (patchRes && patchRes.status !== 404) {
 								// If event is already ACTIVE, Discord rejects scheduled_start_time changes; retry without scheduled_start_time
 								const { scheduled_start_time: _omitStart, ...activePayload } = eventPayload;
-								const retryRes = await fetch(`https://discord.com/api/v10/guilds/${adminServerId}/scheduled-events/${prevDiscordEventId}`, {
+								await fetch(`https://discord.com/api/v10/guilds/${adminServerId}/scheduled-events/${syncedEventId}`, {
 									method: 'PATCH',
 									headers: {
 										Authorization: `Bot ${botToken}`,
@@ -144,9 +174,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 									},
 									body: JSON.stringify(activePayload),
 								}).catch(() => null);
-								if (retryRes?.ok) {
-									syncedEventId = prevDiscordEventId;
-								}
 							}
 						}
 
@@ -178,8 +205,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 							}
 						}
 
-						parsed.discordEventId = syncedEventId;
-						parsed.discordEventGuildId = syncedEventId ? adminServerId : null;
+						parsed.discordEventId = syncedEventId || prevDiscordEventId || null;
+						parsed.discordEventGuildId = parsed.discordEventId ? adminServerId : null;
+						parsed.targetGuildId = adminServerId;
 					}
 				}
 			} catch (err) {

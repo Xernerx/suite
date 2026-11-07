@@ -28,6 +28,17 @@ export async function POST(req: Request) {
 			return NextResponse.json({ error: 'Price ID is required' }, { status: 400 });
 		}
 
+		// Handle Discord Storefront SKU redirects (`discord_sku:<appId>:<skuId>`)
+		if (typeof priceId === 'string' && priceId.startsWith('discord_sku:')) {
+			const [, discordAppId, discordSkuId] = priceId.split(':');
+			if (discordAppId && discordSkuId) {
+				return NextResponse.json({
+					url: `https://discord.com/application-directory/${encodeURIComponent(discordAppId)}/store/${encodeURIComponent(discordSkuId)}`,
+					provider: 'discord',
+				});
+			}
+		}
+
 		const origin = req.headers.get('origin') || 'https://store.xernerx.com';
 		const isCreditPack = itemType === 'credit_pack';
 

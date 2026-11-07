@@ -14,6 +14,18 @@ export interface VirtueLevelRole {
 	track?: VirtueLevelRoleTrack;
 }
 
+export interface VirtueDynamicRolesConfig {
+	enabled: boolean;
+	anchorRoleId: string | null;
+	nameTemplate: string;
+	maxRoles: number;
+	track: VirtueLevelRoleTrack;
+	gradientEnabled: boolean;
+	colorStart: string;
+	colorEnd: string;
+	managed?: { level: number; roleId: string }[];
+}
+
 export interface VirtueConfigShape {
 	mode: 'easy' | 'casual' | 'balanced' | 'hard' | 'extreme';
 	cycles: {
@@ -34,6 +46,7 @@ export interface VirtueConfigShape {
 	};
 	stackRoles?: boolean;
 	boosterMultiplier?: number;
+	dynamicRoles?: VirtueDynamicRolesConfig;
 	levelRoles?: VirtueLevelRole[];
 	textLevelRoles?: { level: number; roleId: string }[];
 	voiceLevelRoles?: { level: number; roleId: string }[];
@@ -129,8 +142,12 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 			}
 			onApplyConfig({
 				mode: cfg.mode,
+				boosterMultiplier: cfg.boosterMultiplier,
 				cycles: cfg.cycles,
 				roles: cfg.roles,
+				channels: cfg.channels,
+				stackRoles: cfg.stackRoles,
+				dynamicRoles: cfg.dynamicRoles,
 				levelRoles: cfg.levelRoles || cfg.roles?.levels,
 				textLevelRoles: cfg.textLevelRoles || cfg.roles?.textLevels,
 				voiceLevelRoles: cfg.voiceLevelRoles || cfg.roles?.voiceLevels,
@@ -183,8 +200,12 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 			const data = await res.json();
 			onApplyConfig({
 				mode: data.mode,
+				boosterMultiplier: data.boosterMultiplier,
 				cycles: data.cycles,
 				roles: data.roles,
+				channels: data.channels,
+				stackRoles: data.stackRoles,
+				dynamicRoles: data.dynamicRoles,
 				levelRoles: data.levelRoles || data.roles?.levels,
 				textLevelRoles: data.textLevelRoles || data.roles?.textLevels,
 				voiceLevelRoles: data.voiceLevelRoles || data.roles?.voiceLevels,
@@ -210,57 +231,50 @@ export default function ConfigPortabilityCard({ guildId, currentConfig, onApplyC
 
 	return (
 		<>
-			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-				<div className="flex flex-wrap items-center justify-between gap-3">
-					<div className="flex items-center gap-3">
-						<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
-							<FileJson size={18} />
-						</div>
-						<div>
-							<h3 className="text-base font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('app.dashboard.virtue.portability.title')}
-							</h3>
-							<p className="text-xs text-(--text-muted)">{t('app.dashboard.virtue.portability.subtitle')}</p>
-						</div>
+			<div
+				className="flex flex-col xl:flex-row xl:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+			>
+				<div className="flex items-center gap-3.5 min-w-0">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+						<FileJson size={18} />
 					</div>
-
-					<div className="flex flex-wrap items-center gap-2">
-						<Button variant="secondary" size="sm" onClick={handleExportJson}>
-							<Download size={14} className="text-(--accent)" />
-							<span>{t('app.dashboard.virtue.portability.exportBtn')}</span>
-						</Button>
-
-						<Button variant="secondary" size="sm" onClick={() => setImportModalOpen(true)}>
-							<Upload size={14} className="text-(--accent)" />
-							<span>{t('app.dashboard.virtue.portability.importBtn')}</span>
-						</Button>
+					<div className="flex flex-col min-w-0">
+						<h3 className="text-sm font-extrabold text-(--text) tracking-wide uppercase">{t('app.dashboard.virtue.portability.title')}</h3>
+						<p className="text-xs text-(--text-muted) mt-0.5 line-clamp-1">{t('app.dashboard.virtue.portability.subtitle')}</p>
 					</div>
 				</div>
 
-				{/* Cross-Server Config Cloning Row */}
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-3.5">
-					<div className="flex flex-col">
-						<span className="text-xs font-extrabold text-(--text)">{t('app.dashboard.virtue.portability.cloneTitle')}</span>
-						<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.virtue.portability.cloneDesc')}</span>
-					</div>
-
-					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto sm:min-w-80">
-						<div className="flex-1">
-							<Selector
-								value={sourceGuildId}
-								onChange={setSourceGuildId}
-								placeholder={t('app.dashboard.virtue.portability.selectServerPlaceholder')}
-								options={guilds.map((g) => ({
-									value: g.id,
-									label: g.name,
-								}))}
-							/>
+				<div className="flex flex-wrap items-center gap-2 shrink-0">
+					{guilds.length > 0 && (
+						<div className="flex items-center gap-2 w-full sm:w-auto">
+							<div className="w-full sm:w-52">
+								<Selector
+									value={sourceGuildId}
+									onChange={setSourceGuildId}
+									placeholder={t('app.dashboard.virtue.portability.selectServerPlaceholder')}
+									options={guilds.map((g) => ({
+										value: g.id,
+										label: g.name,
+									}))}
+								/>
+							</div>
+							<Button variant="primary" size="sm" onClick={handleCloneFromServer} loading={cloning} disabled={!sourceGuildId} className="shrink-0">
+								{!cloning && <Copy size={13} />}
+								<span>{t('app.dashboard.virtue.portability.cloneBtn')}</span>
+							</Button>
 						</div>
-						<Button variant="primary" size="sm" onClick={handleCloneFromServer} loading={cloning} disabled={!sourceGuildId} className="shrink-0">
-							{!cloning && <Copy size={13} />}
-							<span>{t('app.dashboard.virtue.portability.cloneBtn')}</span>
-						</Button>
-					</div>
+					)}
+
+					<Button variant="secondary" size="sm" onClick={handleExportJson}>
+						<Download size={14} className="text-(--accent)" />
+						<span>{t('app.dashboard.virtue.portability.exportBtn')}</span>
+					</Button>
+
+					<Button variant="secondary" size="sm" onClick={() => setImportModalOpen(true)}>
+						<Upload size={14} className="text-(--accent)" />
+						<span>{t('app.dashboard.virtue.portability.importBtn')}</span>
+					</Button>
 				</div>
 			</div>
 

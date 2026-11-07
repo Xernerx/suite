@@ -2,6 +2,21 @@
 
 # @xernerx/desktop
 
+## 2.6.1
+
+### Patch Changes
+
+- ## Silent Background Updates & Instant Restart
+
+    Added a seamless background update pipeline so new Desktop App releases download silently in the background and install automatically on restart without opening an external setup wizard.
+
+    ### Added
+    - **Silent Background Staging**: New releases now download quietly in the background as soon as installer packages finish building, lighting up the header update button in green once the update is ready to apply.
+    - **Startup Auto-Updates**: Launching or restarting the Desktop App automatically applies any downloaded update on the startup splash screen so you are always on the latest version.
+
+    ### Changed
+    - **Unattended One-Click Installation**: Clicking **Install & Restart Now** now applies the staged update silently and immediately relaunches the Desktop App without prompting through a separate installer wizard.
+
 ## 2.6.0
 
 ### Minor Changes
