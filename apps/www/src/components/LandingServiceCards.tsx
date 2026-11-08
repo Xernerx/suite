@@ -256,7 +256,7 @@ export function DeveloperSoftwareCard({ item, href }: { item: DeveloperSoftwareC
 						{item.title}
 					</Link>
 				</h3>
-				<p className="text-sm text-(--text-muted) leading-relaxed">{item.desc}</p>
+				<p className="text-sm text-(--text-muted) leading-relaxed line-clamp-4">{item.desc}</p>
 			</div>
 		</motion.div>
 	);

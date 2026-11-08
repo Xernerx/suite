@@ -10,11 +10,10 @@ import { useDictionary } from '@xernerx/providers';
 interface IssueCardProps {
 	issue: any;
 	botInfo: { id: string; name: string; avatarUrl: string | null } | null;
-	selectedProduct: string | null;
-	onSelectProduct: (prod: string | null) => void;
+	onToggleProduct: (prod: string) => void;
 }
 
-export default function IssueCard({ issue, botInfo, selectedProduct, onSelectProduct }: IssueCardProps) {
+export default function IssueCard({ issue, botInfo, onToggleProduct }: IssueCardProps) {
 	const { t } = useDictionary();
 
 	return (
@@ -82,7 +81,7 @@ export default function IssueCard({ issue, botInfo, selectedProduct, onSelectPro
 
 					<button
 						type="button"
-						onClick={() => onSelectProduct(selectedProduct === issue.productId ? null : issue.productId)}
+						onClick={() => onToggleProduct(issue.productId)}
 						className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 backdrop-blur-md text-(--accent) px-2.5 py-1 rounded-full border border-(--accent)/25 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
 					>
 						{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}

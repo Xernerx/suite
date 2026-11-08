@@ -93,6 +93,7 @@ function cleanChangelogMarkdown(raw: string): string {
 			.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
 			.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
 			.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
+			.replace(/(?:^[ \t]*[-*][ \t]+Updated dependencies[^\r\n]*\r?\n)+([ \t]*[-*][ \t]+Updated dependencies)/gim, '$1')
 			.trim()
 	);
 
@@ -252,11 +253,7 @@ async function getPackageChangelogs(): Promise<ChangelogEntry[]> {
 
 function readLocalBotChangelog(botId: string): string | null {
 	const cwd = process.cwd();
-	const candidates = [
-		path.resolve(cwd, '..', 'apps', botId, 'CHANGELOG.md'),
-		path.resolve(cwd, '../../apps', botId, 'CHANGELOG.md'),
-		path.resolve(cwd, '../../../apps', botId, 'CHANGELOG.md'),
-	];
+	const candidates = [path.resolve(cwd, '..', 'apps', botId, 'CHANGELOG.md'), path.resolve(cwd, '../../apps', botId, 'CHANGELOG.md'), path.resolve(cwd, '../../../apps', botId, 'CHANGELOG.md')];
 	for (const filePath of candidates) {
 		try {
 			if (fs.existsSync(filePath)) {

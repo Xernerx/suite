@@ -2,6 +2,24 @@
 
 # @xernerx/components
 
+## 0.15.5
+
+### Patch Changes
+
+- ## Desktop App Handoff Button in Header
+  
+  Added an "Open in App" button to the web header whenever the Xernerx Desktop Client is detected running locally.
+  
+  ### Added
+  
+  - **Open in Desktop Button**: Automatically detects a running local Xernerx Desktop Client instance and surfaces a one-click header button to hand off the active page into the native desktop window.
+- Updated dependencies
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
 ## 0.15.4
 
 ### Patch Changes
@@ -13,7 +31,6 @@
   ### Changed
   
   - **Global Footer & Omnibar (`Footer.tsx` & `HeaderOmnibar.tsx`)**: Linked `/license` in the legal footer navigation and registered `/license` in `SUBDOMAIN_ROUTES`.
-- Updated dependencies
 - Updated dependencies
   - @xernerx/lib@1.22.1
   - @xernerx/providers@0.22.3
@@ -32,8 +49,6 @@
     - **Page Shell & Stage Preview Pill**: Updated the stage preview pill to use theme-aware surface and active text tokens and streamlined subdomain port resolution.
     - **AppLayout Ad Gating**: Scoped shared ad unit loading strictly to public showcase surfaces (`www` and `blog`).
 
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -76,10 +91,6 @@
     - **Header, Footer & Media Manager**: Streamlined header control bar rendering, bulk media privacy actions in `MediaManager`, `BotRow` status indicators, and `TermsPrompt` version checks.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/feedback@0.5.2
     - @xernerx/lib@1.21.0
     - @xernerx/providers@0.22.0
@@ -108,9 +119,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
     - @xernerx/styles@0.4.0
@@ -125,10 +133,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/feedback@0.5.0
     - @xernerx/lib@1.19.0
@@ -146,8 +150,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/lib@1.18.0
     - @xernerx/providers@0.19.0
@@ -1194,7 +1196,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/feedback@0.0.22
     - @xernerx/lib@0.5.3
@@ -1317,7 +1318,6 @@
 - Xerple and Crean
 - Xerple and Crean
 - Updated dependencies
-- Updated dependencies
     - @xernerx/providers@0.3.6
     - @xernerx/feedback@0.0.14
     - @xernerx/lib@0.3.5
@@ -1380,7 +1380,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.3.0
     - @xernerx/lib@0.3.1

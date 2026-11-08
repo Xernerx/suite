@@ -12,8 +12,8 @@ interface MobileRoadmapTimelineProps {
 	itemsWithQ: any[];
 	matchesRoadmapFilters: (item: any) => boolean;
 	allProducts: string[];
-	selectedProduct: string | null;
-	setSelectedProduct: (prod: string | null) => void;
+	selectedProducts: string[];
+	onToggleProduct: (prod: string) => void;
 	getProductColor: (prod: string) => string;
 	resolveBot: (itemOrProd: any) => { name: string; avatarUrl: string | null } | null;
 	statusColors: Record<string, string>;
@@ -26,8 +26,8 @@ export default function MobileRoadmapTimeline({
 	itemsWithQ,
 	matchesRoadmapFilters,
 	allProducts,
-	selectedProduct,
-	setSelectedProduct,
+	selectedProducts,
+	onToggleProduct,
 	getProductColor,
 	resolveBot,
 	statusColors,
@@ -65,7 +65,7 @@ export default function MobileRoadmapTimeline({
 						<div className="flex flex-col gap-8 pl-[18px]">
 							{allProducts.map((prod) => {
 								const pItems = qItems.filter((i: any) => i.productId === prod);
-								if (pItems.length === 0 || (selectedProduct && prod !== selectedProduct)) return null;
+								if (pItems.length === 0 || (selectedProducts.length > 0 && !selectedProducts.includes(prod))) return null;
 								const color = getProductColor(prod);
 								const prodBotInfo = resolveBot(pItems[0] || prod);
 
@@ -73,7 +73,7 @@ export default function MobileRoadmapTimeline({
 									<div key={prod} className="flex flex-col gap-4 relative border-l-2 pl-6" style={{ borderColor: `color-mix(in srgb, ${color} 40%, transparent)` }}>
 										<div className="absolute top-0 -left-[3px] w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
 										<span
-											onClick={() => setSelectedProduct(selectedProduct === prod ? null : prod)}
+											onClick={() => onToggleProduct(prod)}
 											className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-full w-fit cursor-pointer hover:brightness-125 transition-all"
 											style={{
 												color: color,

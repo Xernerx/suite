@@ -910,7 +910,6 @@
 			}
 		},
 		"roadmap": {
-			"title": "Platform Roadmap",
 			"description": "Onze chronologische reis van functies, optimalisaties en releases. Zie precies wat er aankomt en wanneer.",
 			"metrics": {
 				"avgResolutionTime": "Gemiddelde oplostijd van problemen",
@@ -947,7 +946,6 @@
 			}
 		},
 		"suggestions": {
-			"title": "Functie Sandbox",
 			"description": "Stem op ideeën of dien je eigen idee in. Populaire suggesties worden beoordeeld door ons team en toegevoegd aan de roadmap.",
 			"newSuggestion": "Nieuwe Suggestie",
 			"titlePlaceholder": "Titel",

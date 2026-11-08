@@ -2,6 +2,27 @@
 
 # info
 
+## 1.11.7
+
+### Patch Changes
+
+- ## Streamlined Roadmap, Suggestions, Issues & Changelog Headers
+  
+  Unified the header bars, multi-select product/status filters, and inline creation prompts across Roadmap, Suggestions, Issues, and Changelog.
+  
+  ### Changed
+  
+  - **Unified Header & Filter Bars**: Simplified the Roadmap, Suggestions, Issues, and Changelog headers into compact horizontal bars with `Ctrl + K` search inputs and multi-select product and status dropdowns.
+  - **Inline Submission Guidance**: Added helper captions under the Suggestions and Issues search bars indicating that typing a new title reveals the inline submission form.
+  - **Faster Product Metadata Loading**: Reused resolved product metadata from the roadmap catalog to eliminate redundant Discord profile lookups on page load.
+- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
 ## 1.11.6
 
 ### Patch Changes
@@ -14,8 +35,6 @@
   
   - **Release Changelog (`ChangelogClient.tsx` & `changelog/page.tsx`)**: Added `Haste`, `Blog`, `@xernerx/extension-builder`, and `@xernerx/hooks` to the changelog tracker and streamlined component state management.
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
   - @xernerx/components@0.15.4
   - @xernerx/lib@1.22.1
   - @xernerx/providers@0.22.3
@@ -27,9 +46,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -40,7 +56,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -63,11 +78,6 @@
     - **Suggestions Hub KPI & Filter Bar**: Streamlined the KPI summary cards and status/sort filter controls on `info.xernerx.com/suggestions`.
     - **FAQ & OpenGraph Updates**: Updated FAQ layout metadata and dynamic OpenGraph image generation.
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
@@ -93,10 +103,6 @@
     - **Ecosystem & Security FAQ Synchronization (`EcosystemAndNavigation` & `AccountAndSecurity`)**: Added `blog.xernerx.com` (`4012`) to the Ecosystem Subdomains table and expanded Account & Security FAQs to cover `/security`, secondary OAuth connections, self-service Virtue data deletion, API token TTL/IP allowlists, and Credit Store cosmetic categories.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
@@ -109,11 +115,6 @@
 ### Patch Changes
 
 - Updated the Desktop App FAQ with documentation on customizable Desktop App Icon crests and automatic accent-color icon matching, and refreshed synced branding assets.
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
@@ -132,9 +133,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0

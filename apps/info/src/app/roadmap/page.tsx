@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useEnvironment, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Input } from '@xernerx/ui';
+import { Input, MultiSelector } from '@xernerx/ui';
 import { motion } from 'framer-motion';
 import KnownIssuesSection from '@/components/roadmap/KnownIssuesSection';
 import MobileRoadmapTimeline from '@/components/roadmap/MobileRoadmapTimeline';
@@ -16,25 +16,28 @@ export default function RoadmapPage() {
 	const { t } = useDictionary();
 	const [roadmap, setRoadmap] = useState<any[]>([]);
 	const [issues, setIssues] = useState<any[]>([]);
-	const [metrics, setMetrics] = useState<any>(null);
 	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
 	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
-	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-	const [statusFilter, setStatusFilter] = useState<'all' | 'idea' | 'planned' | 'active' | 'released'>('all');
-	const [onlyCurrentQuarter, setOnlyCurrentQuarter] = useState(false);
+	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
+
+	const toggleProduct = (prod: string) => {
+		setSelectedProducts((prev) => (prev.includes(prod) ? prev.filter((p) => p !== prod) : [...prev, prod]));
+	};
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const q = params.get('q');
 			const prod = params.get('product');
-			const status = params.get('status') as any;
+			const status = params.get('status');
 			if (q) setSearchQuery(q);
-			if (prod) setSelectedProduct(prod);
-			if (status && ['all', 'idea', 'planned', 'active', 'released'].includes(status)) {
-				setStatusFilter(status);
+			if (prod) setSelectedProducts(prod.split(',').filter(Boolean));
+			if (status) {
+				const valid = status.split(',').filter((s) => ['idea', 'planned', 'active', 'released', 'current_quarter'].includes(s));
+				if (valid.length > 0) setSelectedStatuses(valid);
 			}
 		}
 	}, []);
@@ -42,15 +45,15 @@ export default function RoadmapPage() {
 	useEffect(() => {
 		if (typeof window === 'undefined' || loading) return;
 		const params = new URLSearchParams(window.location.search);
-		if (selectedProduct) params.set('product', selectedProduct);
+		if (selectedProducts.length > 0) params.set('product', selectedProducts.join(','));
 		else params.delete('product');
-		if (statusFilter !== 'all') params.set('status', statusFilter);
+		if (selectedStatuses.length > 0) params.set('status', selectedStatuses.join(','));
 		else params.delete('status');
 		if (searchQuery.trim()) params.set('q', searchQuery.trim());
 		else params.delete('q');
 		const qs = params.toString();
 		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
-	}, [selectedProduct, statusFilter, searchQuery, loading]);
+	}, [selectedProducts, selectedStatuses, searchQuery, loading]);
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -58,9 +61,6 @@ export default function RoadmapPage() {
 			fetch(getEnvUrl('https://api.xernerx.com/info/roadmap'))
 				.then((res) => (res.ok ? res.json() : { data: [] }))
 				.catch(() => ({ data: [] })),
-			fetch(getEnvUrl('https://api.xernerx.com/info/issues/metrics'))
-				.then((res) => (res.ok ? res.json() : { data: null }))
-				.catch(() => ({ data: null })),
 			fetch(getEnvUrl('https://api.xernerx.com/info/issues'))
 				.then((res) => (res.ok ? res.json() : { data: [] }))
 				.catch(() => ({ data: [] })),
@@ -68,28 +68,33 @@ export default function RoadmapPage() {
 				.then((res) => (res.ok ? res.json() : { data: [], bots: [] }))
 				.catch(() => ({ data: [], bots: [] })),
 		])
-			.then(([roadmapData, metricsData, issuesData, productsData]) => {
+			.then(([roadmapData, issuesData, productsData]) => {
 				const rItems = roadmapData?.data || [];
 				const iItems = issuesData?.data || [];
 				const botsList = Array.isArray(productsData?.bots) ? productsData.bots : [];
 
 				setRoadmap(rItems);
-				setMetrics(metricsData?.data || null);
 				setIssues(iItems);
 				setOrgBots(botsList);
 				setLoading(false);
 
+				const alreadyResolvedIds = new Set(botsList.filter((b: any) => b?.id && b?.name && b?.avatarUrl).map((b: any) => String(b.id).trim()));
 				const botIds = new Set<string>();
 				botsList.forEach((b: any) => {
-					if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) botIds.add(String(b.id).trim());
+					if (b?.id && /^\d{17,20}$/.test(String(b.id).trim()) && !alreadyResolvedIds.has(String(b.id).trim())) botIds.add(String(b.id).trim());
 				});
 				[...rItems, ...iItems].forEach((item: any) => {
-					if (item?.botId && /^\d{17,20}$/.test(String(item.botId).trim())) botIds.add(String(item.botId).trim());
-					else if (item?.productId && /^\d{17,20}$/.test(String(item.productId).trim())) botIds.add(String(item.productId).trim());
+					const candidate =
+						item?.botId && /^\d{17,20}$/.test(String(item.botId).trim())
+							? String(item.botId).trim()
+							: item?.productId && /^\d{17,20}$/.test(String(item.productId).trim())
+								? String(item.productId).trim()
+								: null;
+					if (candidate && !alreadyResolvedIds.has(candidate)) botIds.add(candidate);
 				});
 
 				botIds.forEach((id) => {
-					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`))
+					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`), { credentials: 'include' })
 						.then((res) => (res.ok ? res.json() : null))
 						.then((d) => {
 							if (!d) return;
@@ -118,12 +123,6 @@ export default function RoadmapPage() {
 
 		if (!targetId) return null;
 		return botProfiles[targetId] || (matchedOrgBot ? { name: matchedOrgBot.name, avatarUrl: matchedOrgBot.avatarUrl } : null);
-	};
-
-	const formatTime = (ms: number) => {
-		if (!ms) return t('info.roadmap.metrics.na');
-		const hours = (ms / (1000 * 60 * 60)).toFixed(1);
-		return t('info.roadmap.metrics.hours', { count: hours });
 	};
 
 	// Process Roadmap into Timeline
@@ -161,6 +160,9 @@ export default function RoadmapPage() {
 	};
 
 	const normalizedQuery = searchQuery.trim().toLowerCase();
+	const onlyCurrentQuarter = selectedStatuses.includes('current_quarter');
+	const activeStatusFilters = selectedStatuses.filter((s) => s !== 'current_quarter');
+
 	const statusCounts: Record<'all' | 'idea' | 'planned' | 'active' | 'released', number> = {
 		all: 0,
 		idea: 0,
@@ -169,7 +171,7 @@ export default function RoadmapPage() {
 		released: 0,
 	};
 	itemsWithQ.forEach((item: any) => {
-		if (selectedProduct && item.productId !== selectedProduct) return;
+		if (selectedProducts.length > 0 && !selectedProducts.includes(item.productId)) return;
 		if (onlyCurrentQuarter && item.targetQuarter !== currentQuarterStr) return;
 		const st = (item.status || 'idea') as 'idea' | 'planned' | 'active' | 'released';
 		statusCounts.all += 1;
@@ -177,9 +179,9 @@ export default function RoadmapPage() {
 	});
 
 	const matchesRoadmapFilters = (item: any) => {
-		if (selectedProduct && item.productId !== selectedProduct) return false;
+		if (selectedProducts.length > 0 && !selectedProducts.includes(item.productId)) return false;
 		if (onlyCurrentQuarter && item.targetQuarter !== currentQuarterStr) return false;
-		if (statusFilter !== 'all' && (item.status || 'idea') !== statusFilter) return false;
+		if (activeStatusFilters.length > 0 && !activeStatusFilters.includes(item.status || 'idea')) return false;
 		if (normalizedQuery) {
 			const botInfo = resolveBot(item);
 			const prodLabel = (botInfo?.name || item.productId || '').toLowerCase();
@@ -197,7 +199,7 @@ export default function RoadmapPage() {
 	};
 
 	const filteredIssues = issues.filter((issue: any) => {
-		if (selectedProduct && issue.productId !== selectedProduct) return false;
+		if (selectedProducts.length > 0 && !selectedProducts.includes(issue.productId)) return false;
 		if (normalizedQuery) {
 			const botInfo = resolveBot(issue);
 			const prodLabel = (botInfo?.name || issue.productId || '').toLowerCase();
@@ -215,122 +217,57 @@ export default function RoadmapPage() {
 	});
 
 	return (
-		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen overflow-hidden">
-			{/* Header & Metrics */}
-			<motion.div
-				initial={{ opacity: 1, y: 0 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5, ease: 'easeOut' }}
-				className="flex flex-col items-center justify-center p-12 bg-transparent border-b border-(--border)/10 backdrop-blur-sm relative z-10"
-			>
-				<h1 className="text-5xl font-bold mb-4 text-(--text)">{t('info.roadmap.title')}</h1>
-				<p className="text-(--text-muted) mb-8 max-w-2xl text-center">{t('info.roadmap.description')}</p>
-
-				<div className="flex gap-8 mt-4">
-					<motion.div
-						initial={{ opacity: 0, scale: 0.9 }}
-						animate={{ opacity: 1, scale: 1 }}
-						transition={{ duration: 0.4, delay: 0.15 }}
-						whileHover={{ scale: 1.03 }}
-						className="flex flex-col items-center p-6 bg-(--foreground)/40 backdrop-blur-md rounded-2xl border border-(--accent)/25 shadow-sm"
-					>
-						<span className="text-3xl font-bold text-(--accent)">{formatTime(metrics?.avgTimeMs)}</span>
-						<span className="text-sm text-(--text-muted) uppercase tracking-widest mt-1">{t('info.roadmap.metrics.avgResolutionTime')}</span>
-					</motion.div>
-					<motion.div
-						initial={{ opacity: 0, scale: 0.9 }}
-						animate={{ opacity: 1, scale: 1 }}
-						transition={{ duration: 0.4, delay: 0.25 }}
-						whileHover={{ scale: 1.03 }}
-						className="flex flex-col items-center p-6 bg-(--foreground)/40 backdrop-blur-md rounded-2xl border border-(--accent)/25 shadow-sm"
-					>
-						<span className="text-3xl font-bold text-(--accent)">{metrics?.recentResolutions?.length || 0}</span>
-						<span className="text-sm text-(--text-muted) uppercase tracking-widest mt-1">{t('info.roadmap.metrics.recentResolutions')}</span>
-					</motion.div>
+		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pt-24 px-4 sm:px-8">
+			{/* Header & Filters */}
+			<div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 mb-4 border-b border-(--border)/10 relative z-30">
+				<div className="flex flex-col gap-1.5">
+					<h1 className="text-3xl sm:text-4xl font-black tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('info.roadmap.title')}
+					</h1>
+					<p className="text-sm sm:text-base text-(--text-muted) max-w-2xl">{t('info.roadmap.description')}</p>
 				</div>
 
-				{/* Search Bar & Interactive Product / Status Filters */}
-				<div className="flex flex-col items-center gap-4 w-full max-w-4xl mt-10">
-					<div className="w-full max-w-xl">
+				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
+					<div className="w-full sm:w-72 xl:w-80">
 						<Input variant="search" shortcut={true} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('info.roadmap.searchPlaceholder')} />
 					</div>
 
-					{allProducts.length > 0 && (
-						<div className="flex flex-wrap items-center justify-center gap-2">
-							<button
-								type="button"
-								onClick={() => setSelectedProduct(null)}
-								className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
-									selectedProduct === null
-										? 'bg-(--accent) text-white border-(--accent) shadow-md'
-										: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:text-(--text) hover:border-(--border)/30'
-								}`}
-							>
-								{t('info.roadmap.allProducts')}
-							</button>
-							{allProducts.map((prod: string) => {
-								const color = getProductColor(prod);
-								const isSelected = selectedProduct === prod;
-								const botInfo = resolveBot(prod);
-								return (
-									<button
-										key={prod}
-										type="button"
-										onClick={() => setSelectedProduct(isSelected ? null : prod)}
-										className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border backdrop-blur-md ${
-											isSelected ? 'shadow-md scale-105' : 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 shadow-xs hover:text-(--text)'
-										}`}
-										style={isSelected ? { backgroundColor: `color-mix(in srgb, ${color} 18%, var(--background))`, borderColor: color, color: color } : undefined}
-									>
-										<span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color }} />
-										{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}
-										<span>{botInfo ? botInfo.name : prod}</span>
-									</button>
-								);
-							})}
-						</div>
-					)}
-
-					<div className="flex flex-wrap items-center justify-center gap-2">
-						{(['all', 'idea', 'planned', 'active', 'released'] as const).map((statusKey) => {
-							const active = statusFilter === statusKey;
-							return (
-								<button
-									key={statusKey}
-									type="button"
-									onClick={() => setStatusFilter(statusKey)}
-									className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer border backdrop-blur-md ${
-										active
-											? 'bg-(--accent)/15 text-(--text) border-(--accent)/50 shadow-sm'
-											: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 shadow-xs hover:text-(--text)'
-									}`}
-								>
-									{statusKey !== 'all' && <span className={`w-2 h-2 rounded-full ${statusColors[statusKey]}`} />}
-									<span>{statusKey === 'all' ? t('info.roadmap.allStatuses') : t(`info.roadmap.timeline.status.${statusKey}`)}</span>
-									<span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-(--background)/60 text-(--text-muted)">{statusCounts[statusKey]}</span>
-								</button>
-							);
+					<MultiSelector
+						className="w-full sm:w-auto shrink-0"
+						placeholder={t('info.roadmap.allProducts')}
+						value={selectedProducts}
+						onChange={setSelectedProducts}
+						options={allProducts.map((prod: string) => {
+							const botInfo = resolveBot(prod);
+							return {
+								value: prod,
+								label: botInfo ? botInfo.name : prod,
+								color: getProductColor(prod),
+							};
 						})}
-						<button
-							type="button"
-							onClick={() => setOnlyCurrentQuarter((prev) => !prev)}
-							className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border backdrop-blur-md ${
-								onlyCurrentQuarter
-									? 'bg-(--accent) text-white border-(--accent) shadow-sm'
-									: 'bg-(--foreground)/30 text-(--accent) border-(--accent)/30 shadow-xs hover:bg-(--accent)/15'
-							}`}
-						>
-							<span className="w-2 h-2 rounded-full bg-current animate-pulse" />
-							<span>{t('info.roadmap.currentQuarterFilter', { quarter: currentQuarterStr })}</span>
-						</button>
-					</div>
+					/>
+
+					<MultiSelector
+						className="w-full sm:w-auto shrink-0"
+						searchable={false}
+						placeholder={`${t('info.roadmap.allStatuses')} (${statusCounts.all})`}
+						value={selectedStatuses}
+						onChange={setSelectedStatuses}
+						options={[
+							{ value: 'idea', label: `${t('info.roadmap.timeline.status.idea')} (${statusCounts.idea})`, color: 'var(--text-muted)' },
+							{ value: 'planned', label: `${t('info.roadmap.timeline.status.planned')} (${statusCounts.planned})`, color: 'var(--accent)' },
+							{ value: 'active', label: `${t('info.roadmap.timeline.status.active')} (${statusCounts.active})`, color: 'var(--accent-orange)' },
+							{ value: 'released', label: `${t('info.roadmap.timeline.status.released')} (${statusCounts.released})`, color: 'var(--accent-green)' },
+							{ value: 'current_quarter', label: t('info.roadmap.currentQuarterFilter', { quarter: currentQuarterStr }), color: 'var(--accent)' },
+						]}
+					/>
 				</div>
-			</motion.div>
+			</div>
 
 			{/* Beautiful Horizontal Timeline (Hanging Wire Harness) */}
 			{loading ? (
 				<div className="flex items-center justify-center py-24 flex-1">
-					<Loading />
+					<Loading variant="small" />
 				</div>
 			) : (
 				<>
@@ -354,12 +291,12 @@ export default function RoadmapPage() {
 										{allProducts.map((prod: string, i: number) => {
 											const trackY = trackStartY + i * trackSpacing;
 											const color = getProductColor(prod);
-											const isSelected = selectedProduct === prod;
-											const isFaded = selectedProduct && !isSelected;
+											const isSelected = selectedProducts.includes(prod);
+											const isFaded = selectedProducts.length > 0 && !isSelected;
 											return (
 												<div
 													key={prod}
-													onClick={() => setSelectedProduct(isSelected ? null : prod)}
+													onClick={() => toggleProduct(prod)}
 													className={`absolute left-0 right-0 cursor-pointer transition-all duration-300 hover:h-[4px] hover:opacity-100 z-10 ${isFaded ? 'opacity-10 h-[2px]' : isSelected ? 'opacity-100 h-[3px] shadow-[0_0_10px_currentColor]' : 'opacity-30 h-[2px]'}`}
 													style={{ top: `${trackY}px`, backgroundColor: color, color: color }}
 												>
@@ -443,7 +380,7 @@ export default function RoadmapPage() {
 
 																<div className="flex justify-between items-start mb-4 z-10">
 																	<span
-																		onClick={() => setSelectedProduct(selectedProduct === item.productId ? null : item.productId)}
+																		onClick={() => toggleProduct(item.productId)}
 																		className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase px-2.5 py-1 rounded-full tracking-wider border cursor-pointer hover:brightness-125 transition-all"
 																		style={{
 																			color: color,
@@ -503,8 +440,8 @@ export default function RoadmapPage() {
 							itemsWithQ={itemsWithQ}
 							matchesRoadmapFilters={matchesRoadmapFilters}
 							allProducts={allProducts}
-							selectedProduct={selectedProduct}
-							setSelectedProduct={setSelectedProduct}
+							selectedProducts={selectedProducts}
+							onToggleProduct={toggleProduct}
 							getProductColor={getProductColor}
 							resolveBot={resolveBot}
 							statusColors={statusColors}

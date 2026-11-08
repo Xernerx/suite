@@ -406,6 +406,7 @@ function applyTheme(theme: Theme) {
 	root.classList.toggle('dark', resolved === 'dark');
 	root.style.colorScheme = resolved;
 	root.dataset.theme = resolved;
+	setPref('resolvedTheme', resolved);
 }
 
 function syncAccentCssVars(colorStr: string) {

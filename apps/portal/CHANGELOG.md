@@ -2,12 +2,22 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
-## 1.5.3
+## 1.5.4
 
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 1.5.3
+
+### Patch Changes
+
 - Updated dependencies
   - @xernerx/components@0.15.4
   - @xernerx/lib@1.22.1
@@ -20,9 +30,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -33,7 +40,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -59,11 +65,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
     - @xernerx/lib@1.21.0
@@ -85,10 +86,6 @@
     - **Organization Description Split Markdown Editor (`OrgInfoTab`)**: Upgraded the Organization Description editor to use the unified `<Markdown />` component with side-by-side Split preview.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
@@ -104,11 +101,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
@@ -128,9 +120,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0

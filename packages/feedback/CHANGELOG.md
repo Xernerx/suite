@@ -2,6 +2,14 @@
 
 # @xernerx/feedback
 
+## 0.5.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.22.4
+  - @xernerx/ui@0.8.5
+
 ## 0.5.5
 
 ### Patch Changes
@@ -14,7 +22,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.22.2
     - @xernerx/ui@0.8.3
@@ -38,7 +45,6 @@
     - **Framework & Icon Dependencies**: Upgraded `next`, `lucide-react`, and `tailwindcss` peer/dev dependency versions in `@xernerx/feedback`.
 
 - Updated dependencies
-- Updated dependencies
     - @xernerx/providers@0.22.0
     - @xernerx/ui@0.8.1
 
@@ -46,7 +52,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.21.0
     - @xernerx/ui@0.8.0
@@ -60,7 +65,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
     - @xernerx/providers@0.20.0
     - @xernerx/ui@0.7.17
 
@@ -68,7 +72,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.19.0
     - @xernerx/ui@0.7.16
@@ -645,7 +648,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/providers@0.3.14
     - @xernerx/ui@0.3.5
@@ -721,7 +723,6 @@
 - Xerple and Crean
 - Xerple and Crean
 - Updated dependencies
-- Updated dependencies
     - @xernerx/providers@0.3.6
     - @xernerx/ui@0.2.9
 
@@ -764,7 +765,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/ui@0.2.3
 

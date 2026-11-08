@@ -100,7 +100,11 @@ async function fetchShowcasePackagesFromRemote(): Promise<ShowcasePackage[]> {
 							);
 
 							if (firstRealLine) {
-								parsedDesc = firstRealLine.replace(/\*|\_|\`/g, '');
+								parsedDesc = firstRealLine
+									.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+									.replace(/\s*\(https?:\/\/[^)]+\)/g, '')
+									.replace(/\*|\_|\`/g, '')
+									.trim();
 							}
 						}
 

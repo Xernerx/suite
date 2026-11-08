@@ -237,139 +237,142 @@ export default function StorePage() {
 	// Compute discount for current category
 	const categoryMaxDiscount = currentItems.reduce((max, item) => Math.max(max, item.discountPercent || 0), 0);
 
-	if (loading) return <Loading />;
-
 	return (
-		<div
-			className="flex flex-col items-center justify-center max-w-(--page-width) mx-auto w-full min-h-screen transition-colors duration-200"
-			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-		>
-			<div className="max-w-4xl w-full flex flex-col items-center mb-4" style={{ gap: 'var(--ui-gap)' }}>
-				<h1 className="text-5xl md:text-6xl font-extrabold tracking-tight drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-					{t('account.store.title')}
-				</h1>
-				<p className="text-(--text-muted) text-lg text-center max-w-2xl">{t('account.store.description')}</p>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full min-h-screen pt-24 px-4 sm:px-8 pb-24">
+			<div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4 pb-6 mb-8 border-b border-(--border)/10 relative z-30">
+				<div className="flex flex-col gap-1.5">
+					<h1 className="text-3xl sm:text-4xl font-black tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('account.store.title')}
+					</h1>
+					<p className="text-sm sm:text-base text-(--text-muted) max-w-2xl">{t('account.store.description')}</p>
+				</div>
 
-				{/* Dynamic Ecosystem Categories Switcher */}
-				{categories.length > 0 && (
-					<div className="flex flex-wrap items-center justify-center gap-2 p-1.5 rounded-full border border-(--border)/10 bg-(--foreground) mt-2">
-						{categories.map((cat) => {
-							const IconComponent = ICONS_MAP[cat.icon] || ShoppingBag;
-							const isActive = cat.id === currentCategory?.id;
+				<div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+					{/* Dynamic Ecosystem Categories Switcher */}
+					{categories.length > 0 && (
+						<div className="flex flex-wrap items-center gap-1 p-1 h-10 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
+							{categories.map((cat) => {
+								const IconComponent = ICONS_MAP[cat.icon] || ShoppingBag;
+								const isActive = cat.id === currentCategory?.id;
 
-							return (
-								<button
-									key={cat.id}
-									onClick={() => {
-										setActiveCategory(cat.id);
-										updateStoreUrlParams(cat.id, billingInterval);
-									}}
-									className={`px-5 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer ${
-										isActive ? 'bg-(--accent) text-white shadow-sm' : 'text-(--text-muted) hover:text-(--text)'
-									}`}
-								>
-									<IconComponent size={16} /> {cat.name}
-								</button>
-							);
-						})}
-					</div>
-				)}
+								return (
+									<button
+										key={cat.id}
+										onClick={() => {
+											setActiveCategory(cat.id);
+											updateStoreUrlParams(cat.id, billingInterval);
+										}}
+										className={`h-full px-3.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+											isActive ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+										}`}
+									>
+										<IconComponent size={14} /> {cat.name}
+									</button>
+								);
+							})}
+						</div>
+					)}
 
-				{/* Global Billing Interval Toggle (Only for recurring subscription categories) */}
-				{currentCategory?.id !== 'credits' && (
-					<div className="flex items-center gap-2 p-1 rounded-full border border-(--border)/10 bg-(--foreground) mt-2">
-						<button
-							onClick={() => {
-								setBillingInterval('month');
-								updateStoreUrlParams(currentCategory?.id, 'month');
-							}}
-							className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
-								billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-							}`}
-						>
-							{t('account.store.billing.monthly')}
-						</button>
-						<button
-							onClick={() => {
-								setBillingInterval('year');
-								updateStoreUrlParams(currentCategory?.id, 'year');
-							}}
-							className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors flex items-center gap-1.5 cursor-pointer ${
-								billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-							}`}
-						>
-							{t('account.store.billing.annually')}
-							{categoryMaxDiscount > 0 && <span className="bg-(--accent-green)/10 text-(--accent-green) px-1.5 py-0.5 rounded-xl text-[10px] font-bold">-{categoryMaxDiscount}%</span>}
-						</button>
-					</div>
-				)}
-
-				{/* Promo Code Bar */}
-				<div className="flex flex-wrap items-center justify-center gap-2 mt-1 w-full max-w-md">
-					{appliedCoupon ? (
-						<div className="flex items-center justify-between gap-3 w-full px-4 py-2.5 rounded-2xl bg-(--accent-green)/15 border border-(--accent-green)/30 text-xs font-bold text-(--accent-green)">
-							<div className="flex items-center gap-2 min-w-0">
-								<Check size={14} className="shrink-0" />
-								<span className="font-mono tracking-wider">{appliedCoupon.code}</span>
-								<span className="text-(--text) font-semibold truncate">
-									({appliedCoupon.discountType === 'amount' ? `-€${appliedCoupon.amountOff}` : `-${appliedCoupon.percentOff}%`})
-								</span>
-							</div>
+					{/* Global Billing Interval Toggle (Only for recurring subscription categories) */}
+					{currentCategory && currentCategory.id !== 'credits' && (
+						<div className="flex items-center gap-1 p-1 h-10 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
 							<button
-								type="button"
 								onClick={() => {
-									setAppliedCoupon(null);
-									setPromoInput('');
-									if (typeof window !== 'undefined') {
-										try {
-											sessionStorage.removeItem('xernerx_store_promo');
-											const params = new URLSearchParams(window.location.search);
-											params.delete('promo');
-											params.delete('code');
-											const qs = params.toString();
-											window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
-										} catch {}
-									}
+									setBillingInterval('month');
+									updateStoreUrlParams(currentCategory?.id, 'month');
 								}}
-								className="p-1 rounded-lg hover:bg-(--background)/50 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer"
-								aria-label={t('account.store.promo.remove')}
+								className={`h-full px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+									billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+								}`}
 							>
-								<X size={14} />
+								{t('account.store.billing.monthly')}
+							</button>
+							<button
+								onClick={() => {
+									setBillingInterval('year');
+									updateStoreUrlParams(currentCategory?.id, 'year');
+								}}
+								className={`h-full px-3 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+									billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+								}`}
+							>
+								{t('account.store.billing.annually')}
+								{categoryMaxDiscount > 0 && (
+									<span className="bg-(--accent-green)/15 text-(--accent-green) px-1.5 py-0.5 rounded-lg text-[10px] font-bold">-{categoryMaxDiscount}%</span>
+								)}
 							</button>
 						</div>
-					) : (
-						<div className="flex items-center gap-2 w-full">
-							<div className="flex-1">
-								<Input
-									value={promoInput}
-									onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter') {
-											e.preventDefault();
-											handleApplyPromoCode();
-										}
-									}}
-									placeholder={t('account.store.promo.placeholder')}
-								/>
-							</div>
-							<Button
-								variant="secondary"
-								size="sm"
-								loading={validatingPromo}
-								disabled={!promoInput.trim()}
-								onClick={() => handleApplyPromoCode()}
-								className="flex items-center gap-1.5 shrink-0"
-							>
-								<TicketPercent size={14} className="text-(--accent)" />
-								<span>{t('account.store.promo.applyButton')}</span>
-							</Button>
+					)}
+
+					{/* Promo Code Bar (Only for paid checkout categories) */}
+					{currentCategory && currentCategory.id !== 'credits' && (
+						<div className="flex items-center gap-2">
+							{appliedCoupon ? (
+								<div className="flex items-center gap-2 h-10 px-3.5 rounded-2xl bg-(--accent-green)/15 border border-(--accent-green)/30 text-xs font-bold text-(--accent-green)">
+									<Check size={14} className="shrink-0" />
+									<span className="font-mono tracking-wider">{appliedCoupon.code}</span>
+									<span className="text-(--text) font-semibold">({appliedCoupon.discountType === 'amount' ? `-€${appliedCoupon.amountOff}` : `-${appliedCoupon.percentOff}%`})</span>
+									<button
+										type="button"
+										onClick={() => {
+											setAppliedCoupon(null);
+											setPromoInput('');
+											if (typeof window !== 'undefined') {
+												try {
+													sessionStorage.removeItem('xernerx_store_promo');
+													const params = new URLSearchParams(window.location.search);
+													params.delete('promo');
+													params.delete('code');
+													const qs = params.toString();
+													window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+												} catch {}
+											}
+										}}
+										className="p-1 rounded-lg hover:bg-(--background)/50 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer"
+										aria-label={t('account.store.promo.remove')}
+									>
+										<X size={14} />
+									</button>
+								</div>
+							) : (
+								<div className="flex items-center gap-1.5">
+									<div className="w-48 sm:w-56">
+										<Input
+											value={promoInput}
+											onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+											onKeyDown={(e) => {
+												if (e.key === 'Enter') {
+													e.preventDefault();
+													handleApplyPromoCode();
+												}
+											}}
+											placeholder={t('account.store.promo.placeholder')}
+										/>
+									</div>
+									<Button
+										variant="secondary"
+										loading={validatingPromo}
+										disabled={!promoInput.trim()}
+										onClick={() => handleApplyPromoCode()}
+										className="flex items-center gap-1.5 shrink-0"
+									>
+										<TicketPercent size={14} className="text-(--accent)" />
+										<span>{t('account.store.promo.applyButton')}</span>
+									</Button>
+								</div>
+							)}
 						</div>
 					)}
 				</div>
 			</div>
 
 			{/* Category View */}
-			{currentCategory &&
+			{loading ? (
+				<div className="flex items-center justify-center py-24">
+					<Loading variant="small" />
+				</div>
+			) : (
+				currentCategory &&
 				(currentCategory.id === 'credits' ? (
 					<CreditStoreView items={currentItems} user={user} userLoading={userLoading || loading} mutateUser={mutate} actionLoading={actionLoading} onBuyCreditPack={handleBuyCreditPack} />
 				) : (
@@ -384,7 +387,8 @@ export default function StorePage() {
 						handleSubscribe={handleSubscribe}
 						handleCancelClick={handleCancelClick}
 					/>
-				))}
+				))
+			)}
 
 			<p className="mt-12 text-center text-xs text-(--text-muted) opacity-70">{t('account.store.taxNotice')}</p>
 		</div>

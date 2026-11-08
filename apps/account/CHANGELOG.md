@@ -2,12 +2,22 @@
 
 # auth
 
-## 2.14.1
+## 2.14.2
 
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 2.14.1
+
+### Patch Changes
+
 - Updated dependencies
   - @xernerx/components@0.15.4
   - @xernerx/lib@1.22.1
@@ -32,9 +42,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -45,7 +52,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -66,11 +72,6 @@
     - **Full-Width Expiration & IP Allowlist Fields**: Stacked the Token Expiration (TTL) selector and Allowed IP Addresses input into full-width rows so field labels and status badges stay cleanly aligned without wrapping.
     - **Token Card & Profile Showcase Refinements**: Polished token status indicators, showcase card rendering, and dynamic OpenGraph social preview generation across `account.xernerx.com`.
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
@@ -99,10 +100,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
@@ -118,11 +115,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
@@ -142,9 +134,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0
@@ -1240,7 +1229,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/components@0.2.21
     - @xernerx/feedback@0.0.22
@@ -1394,7 +1382,6 @@
 - Xerple and Crean
 - Xerple and Crean
 - Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.2.13
     - @xernerx/providers@0.3.6
     - @xernerx/feedback@0.0.14
@@ -1503,7 +1490,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.3.0
     - @xernerx/components@0.2.7

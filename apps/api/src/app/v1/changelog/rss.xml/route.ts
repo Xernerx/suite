@@ -185,7 +185,10 @@ async function fetchBotChangelogItems(isDevEnv: boolean): Promise<Array<{ title:
 				}
 				if (!content) return;
 
-				const cleaned = content.replace(/<!--\s*@format\s*-->/g, '').replace(/^#\s+[^\r\n]+\r?\n*/gm, '').trim();
+				const cleaned = content
+					.replace(/<!--\s*@format\s*-->/g, '')
+					.replace(/^#\s+[^\r\n]+\r?\n*/gm, '')
+					.trim();
 				const sections = cleaned.split(/^##\s+(?=\[?v?\d+\.\d+)/m).slice(1, 5);
 				for (const sec of sections) {
 					const lines = sec.trim().split(/\r?\n/);

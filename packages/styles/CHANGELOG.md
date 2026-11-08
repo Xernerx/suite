@@ -2,6 +2,18 @@
 
 # @xernerx/styles
 
+## 0.4.2
+
+### Patch Changes
+
+- ## Responsive 90% Default Page Width Token
+  
+  Updated the root `--page-width` CSS custom property default to `90%`.
+  
+  ### Changed
+  
+  - **Root `--page-width` Variable**: Changed the default `--page-width` token in `globals.css` from `1400px` to `90%`.
+
 ## 0.4.1
 
 ### Patch Changes

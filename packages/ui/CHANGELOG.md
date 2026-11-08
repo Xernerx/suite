@@ -2,6 +2,21 @@
 
 # @xernerx/ui
 
+## 0.8.5
+
+### Patch Changes
+
+- ## Unified Pill Geometry & Auto-Width Dropdowns for Selector & MultiSelector
+  
+  Unified the trigger styling and auto-sizing dropdown menus across `Selector`, `MultiSelector`, and search `Input` components.
+  
+  ### Changed
+  
+  - **Unified Selector & MultiSelector Triggers**: Standardized `Selector` and `MultiSelector` triggers on pill geometry (`rounded-full`), `bg-(--foreground)/40` glass surfaces, and `w-max` auto-width dropdown popovers that never wrap short option labels.
+  - **Compact Search Input**: Refined `Input variant="search"` padding, shortcut badge spacing, and action button sizing to align cleanly alongside filter selectors.
+- Updated dependencies
+  - @xernerx/providers@0.22.4
+
 ## 0.8.4
 
 ### Patch Changes
@@ -604,7 +619,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/providers@0.3.14
 
@@ -687,7 +701,6 @@
 
 - Xerple and Crean
 - Xerple and Crean
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.3.6
 

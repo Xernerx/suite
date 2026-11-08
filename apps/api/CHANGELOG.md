@@ -2,6 +2,25 @@
 
 # api
 
+## 0.31.2
+
+### Patch Changes
+
+- ## Trusted Frontend Rate-Limit Tier & Development Exemption
+  
+  Refined API gateway rate limiting for trusted Xernerx web origins and local development environments.
+  
+  ### Changed
+  
+  - **Trusted Origin Rate-Limit Tier**: Granted trusted `*.xernerx.com` frontend origins the authenticated session rate-limit tier (`600 req/min`) and exempted `*.dev.xernerx.com` / development traffic from strict IP rate limiting.
+- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
 ## 0.31.1
 
 ### Patch Changes
@@ -13,8 +32,6 @@
   ### Changed
   
   - **Changelog RSS Feed (`/v1/changelog/rss.xml`)**: Added `haste`, `blog`, `@xernerx/extension-builder`, and `@xernerx/hooks` to the aggregated release feed.
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
   - @xernerx/components@0.15.4
   - @xernerx/lib@1.22.1
@@ -41,9 +58,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -54,7 +68,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -80,11 +93,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
@@ -114,10 +122,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
@@ -133,11 +137,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
@@ -157,9 +156,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0
@@ -1375,7 +1371,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/components@0.2.21
     - @xernerx/feedback@0.0.22
@@ -1575,7 +1570,6 @@
 
 - Xerple and Crean
 - Xerple and Crean
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.2.13
     - @xernerx/providers@0.3.6

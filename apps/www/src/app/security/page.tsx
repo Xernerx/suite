@@ -230,8 +230,7 @@ export default function SecurityPage() {
 					<p>{t('www.security.sections.licensing.intro')}</p>
 					<ul className="list-disc pl-6 space-y-4">
 						<li>
-							<strong className="text-(--text)">{t('www.security.sections.licensing.proprietaryTitle')}</strong>{' '}
-							{t('www.security.sections.licensing.proprietaryDesc')}{' '}
+							<strong className="text-(--text)">{t('www.security.sections.licensing.proprietaryTitle')}</strong> {t('www.security.sections.licensing.proprietaryDesc')}{' '}
 							<span className="inline-flex flex-wrap items-center gap-3 mt-1">
 								<Link href="/license" className="text-(--accent) hover:underline font-medium">
 									{t('www.security.sections.licensing.proprietaryLink')}
@@ -243,8 +242,7 @@ export default function SecurityPage() {
 							</span>
 						</li>
 						<li>
-							<strong className="text-(--text)">{t('www.security.sections.licensing.apacheTitle')}</strong>{' '}
-							{t('www.security.sections.licensing.apacheDesc')}{' '}
+							<strong className="text-(--text)">{t('www.security.sections.licensing.apacheTitle')}</strong> {t('www.security.sections.licensing.apacheDesc')}{' '}
 							<span className="inline-flex flex-wrap items-center gap-3 mt-1">
 								<a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline font-medium">
 									{t('www.security.sections.licensing.apacheLink')}

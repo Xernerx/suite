@@ -1038,7 +1038,7 @@
 					"translationsTitle": "Localization & Translations",
 					"translationsUrgent": "{count} locales below 100% coverage",
 					"translationsMeta": "{avg}% average coverage across {total} locales",
-					"roadmapTitle": "Platform Roadmap",
+					"roadmapTitle": "Roadmap",
 					"roadmapMeta": "{active} in progress • {planned} planned • {ideas} ideas",
 					"usersTitle": "Users",
 					"usersMeta": "{total} registered • {verified} verified",
@@ -1362,7 +1362,7 @@
 					"supportField1Name": "⚡ Server Slash Commands",
 					"supportField1Val": "• /faq & /docs — Search FAQs, REST API v1 & SDK docs\n• /status — Live service & bot uptime telemetry\n• /issues & /suggestions — Track bugs & vote on ideas\n• /roadmap & /changelog — Follow upcoming & shipped releases",
 					"supportField2Name": "🧭 Feedback & Support Hub",
-					"supportField2Val": "• Bug Tracker: info.xernerx.com/bugs\n• Feature Suggestions: info.xernerx.com/suggestions\n• Platform Roadmap: info.xernerx.com/roadmap",
+					"supportField2Val": "• Bug Tracker: info.xernerx.com/bugs\n• Feature Suggestions: info.xernerx.com/suggestions\n• Roadmap: info.xernerx.com/roadmap",
 					"supportBtnBug": "Report a Bug",
 					"supportBtnSuggest": "Suggest a Feature",
 					"supportBtnFaq": "Browse FAQ",
@@ -3159,6 +3159,8 @@
 				"confirmRedeemDesc": "You are about to spend {cost} credits on {item}. Your remaining balance will be {remaining} credits.",
 				"confirmRedeemButton": "Confirm & Redeem",
 				"equipInSettings": "Equip in Account Settings",
+				"searchPlaceholder": "Search credit perks and packs...",
+				"allCategories": "All Categories",
 				"filters": {
 					"all": "All Items",
 					"cdnSlots": "CDN Slots",
@@ -5044,7 +5046,7 @@
 				"store": "Ecosystem store portal for Monthly & Annual subscriptions, the €0 Free Tier, the Ultra Ecosystem master pass, individual bot passes (Zodiac, Virtue, To-Do List Bot, Metamorphosis), Developer Pro, and server infrastructure.",
 				"cdn": "Distributed media content delivery network and private Vercel Blob storage with drag-and-drop/Ctrl+V upload, Public/Limited/Private access controls, /view/[id] web viewer, and /raw/[id] binary streaming.",
 				"docs": "Developer documentation hub featuring interactive REST API specs (/api/v1, /api/core, /api/secure) with an in-browser API Playground, CDN docs (/cdn), live GitHub/npm Package docs reader (/packages), and WebSocket Gateway RPC specs (/websocket).",
-				"info": "Support & feedback knowledgebank housing the chronological Platform Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
+				"info": "Support & feedback knowledgebank housing the chronological Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
 				"api": "Core backend HTTP gateway, Bearer token validator, Discord & Stripe webhook processor, live SVG/PNG/iframe widget renderer (/core/*, /v1/*/badge.svg), and rate-limited REST router.",
 				"admin": "Internal staff RBAC portal for managing Discord-synced roles, users, bots, servers, Staff Subscriptions, elevated API tokens, Translation Studio (/translations), application reviews, platform announcements, roadmap/issue/suggestion moderation, support configurations & tickets, and store catalog items.",
 				"blog": "Official newsroom, security & trust reports, engineering deep-dives, product announcements, and RSS syndication (/rss.xml)."
@@ -5116,8 +5118,8 @@
 				"description": "You can use clean vanity routes on any Xernerx domain: /support and /discord open our official Discord community, /github opens our GitHub organization, and /npm opens our npm package suite. On xernerx.com you can use /invite (or /invite/[slug]), /desktop (for /download), and /careers or /jobs (for /applications). On info.xernerx.com you can use /bugs (for /issues) and /help (for /faq). On account.xernerx.com every settings tab has a direct vanity path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
 			},
 			"card6": {
-				"title": "How do the Suggestion Centre (/suggestions) and Platform Roadmap (/roadmap) work?",
-				"description": "In the Suggestion Centre (info.xernerx.com/suggestions), you can filter ideas by product, sort by Most Upvoted, Newest, or Upvoted by Me, and submit new feature ideas (with real-time duplicate detection as you type). Popular suggestions are promoted by staff to the Platform Roadmap (info.xernerx.com/roadmap), which tracks milestones across Idea, Planned, In Progress, and Released stages alongside live Avg Issue Resolution Time metrics and the Known Issues Tracker. Click Notify Me (Watching) on any roadmap milestone to receive an automatic notification the moment it is released."
+				"title": "How do the Suggestion Centre (/suggestions) and Roadmap (/roadmap) work?",
+				"description": "In the Suggestion Centre (info.xernerx.com/suggestions), you can filter ideas by product, sort by Most Upvoted, Newest, or Upvoted by Me, and submit new feature ideas (with real-time duplicate detection as you type). Popular suggestions are promoted by staff to the Roadmap (info.xernerx.com/roadmap), which tracks milestones across Idea, Planned, In Progress, and Released stages alongside live Avg Issue Resolution Time metrics and the Known Issues Tracker. Click Notify Me (Watching) on any roadmap milestone to receive an automatic notification the moment it is released."
 			}
 		},
 		"desktop": {
@@ -8142,7 +8144,7 @@
 			}
 		},
 		"roadmap": {
-			"title": "Platform Roadmap",
+			"title": "Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
 			"searchPlaceholder": "Search roadmap milestones and known issues...",
 			"allProducts": "All Products",

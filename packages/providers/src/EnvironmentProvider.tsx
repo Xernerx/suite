@@ -17,6 +17,17 @@ interface EnvironmentContextType {
 
 const EnvironmentContext = createContext<EnvironmentContextType | undefined>(undefined);
 
+function getServerEnvironment(): Environment {
+	const env = process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase();
+	if (env === 'development' || env === 'dev') {
+		return 'dev';
+	}
+	if (env === 'canary') {
+		return 'canary';
+	}
+	return 'public';
+}
+
 function getInitialEnvironment(): Environment {
 	if (typeof window !== 'undefined') {
 		const hostname = window.location.hostname;
@@ -29,22 +40,15 @@ function getInitialEnvironment(): Environment {
 			return 'canary';
 		}
 	}
-	const env = process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase();
-	if (env === 'development' || env === 'dev') {
-		return 'dev';
-	}
-	if (env === 'canary') {
-		return 'canary';
-	}
-	return 'public';
+	return getServerEnvironment();
 }
 
 export function EnvironmentProvider({ children, initialEnvironment }: { children: React.ReactNode; initialEnvironment?: Environment }) {
 	const [environment, setEnvironment] = useState<Environment>(() => {
 		if (initialEnvironment) return initialEnvironment;
-		return getInitialEnvironment();
+		return getServerEnvironment();
 	});
-	const [isReady, setIsReady] = useState(() => typeof window !== 'undefined');
+	const [isReady, setIsReady] = useState(false);
 
 	useEffect(() => {
 		setEnvironment(getInitialEnvironment());
@@ -54,7 +58,7 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 	const getEnvUrl = React.useCallback(
 		(baseUrl: string) => {
 			const domain = process.env.NEXT_PUBLIC_DOMAIN || '';
-			const windowHostname = typeof window !== 'undefined' ? window.location.hostname : '';
+			const windowHostname = isReady && typeof window !== 'undefined' ? window.location.hostname : '';
 			const isIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(domain) || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(windowHostname);
 			const isLocalhost = domain === 'localhost' || domain === '127.0.0.1' || windowHostname === 'localhost' || windowHostname === '127.0.0.1';
 			let transformedUrl = baseUrl;
@@ -163,7 +167,7 @@ export function EnvironmentProvider({ children, initialEnvironment }: { children
 
 			return transformedUrl;
 		},
-		[environment]
+		[environment, isReady]
 	);
 
 	const value = {

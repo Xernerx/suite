@@ -250,7 +250,7 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	const linesCount = useMemo(() => (doc?.content ? doc.content.split(/\r?\n/).length : 0), [doc]);
 	const authorDisplayName = doc?.author?.globalName || doc?.author?.username || doc?.author?.name || null;
 
-	if (!isReady || status === 'loading' || loading || redirectingToLogin) {
+	if (status === 'loading' || loading || redirectingToLogin) {
 		return <Loading />;
 	}
 

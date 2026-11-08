@@ -2,6 +2,24 @@
 
 # @xernerx/providers
 
+## 0.22.4
+
+### Patch Changes
+
+- ## Deterministic Environment Hydration & Command Palette Desktop Handoff
+  
+  Made `EnvironmentProvider` initial state deterministic across SSR and client hydration and added an "Open in Desktop App" action to the Command Palette.
+  
+  ### Added
+  
+  - **Command Palette Desktop Action**: Added an action to open the current URL in the Xernerx Desktop Client from `Ctrl + K`.
+  
+  ### Changed
+  
+  - **SSR-Safe Environment Initialization**: Initialized `EnvironmentProvider` state deterministically during SSR and initial client hydration before resolving browser hostname overrides in `useEffect`.
+- Updated dependencies
+  - @xernerx/lib@1.22.2
+
 ## 0.22.3
 
 ### Patch Changes
@@ -862,7 +880,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/lib@0.5.3
 
@@ -942,7 +959,6 @@
 
 - Xerple and Crean
 - Xerple and Crean
-- Updated dependencies
 - Updated dependencies
     - @xernerx/lib@0.3.5
 

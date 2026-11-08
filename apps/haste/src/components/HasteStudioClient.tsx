@@ -236,7 +236,7 @@ export function HasteStudioClient() {
 	const byteSize = useMemo(() => new TextEncoder().encode(content).length, [content]);
 	const lineCount = useMemo(() => (content ? content.split(/\r?\n/).length : 1), [content]);
 
-	if (status === 'loading' || status === 'unauthenticated' || !isReady) {
+	if (status === 'loading' || status === 'unauthenticated') {
 		return <Loading />;
 	}
 

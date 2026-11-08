@@ -2,9 +2,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Search } from 'lucide-react';
+import { Check, ChevronDown, Search } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from './Button';
 import { useDictionary } from '@xernerx/providers';
 export interface MultiSelectorOption {
 	label: string;
@@ -41,6 +40,7 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, []);
 	const [openUpwards, setOpenUpwards] = useState(false);
+	const [alignRight, setAlignRight] = useState(false);
 
 	useEffect(() => {
 		if (open) {
@@ -53,6 +53,8 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 				} else {
 					setOpenUpwards(false);
 				}
+				const spaceRight = window.innerWidth - rect.left;
+				setAlignRight(spaceRight < 280 && rect.right > 280);
 			}
 			if (searchable) {
 				setTimeout(() => inputRef.current?.focus(), 50);
@@ -109,13 +111,12 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 		<div ref={ref} className={`relative w-full ${open ? 'z-[100]' : ''} ${className ?? ''}`}>
 			{label && <label className="mb-2 block text-sm font-medium text-(--text)">{label}</label>}
 
-			<Button
+			<button
 				type="button"
-				variant="secondary"
 				onClick={() => setOpen((v) => !v)}
-				className={`w-full justify-between ${toggleClassName ?? ''} ${open ? 'border-(--accent)/50 bg-(--foreground)/50' : ''}`}
+				className={`flex h-10 px-4 w-full min-w-max items-center justify-between gap-2.5 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all hover:border-(--accent)/50 hover:bg-(--foreground)/50 focus:border-(--accent) focus:outline-none cursor-pointer ${toggleClassName ?? ''} ${open ? 'border-(--accent)/50 bg-(--foreground)/50' : ''}`}
 			>
-				<div className="flex items-center gap-3 overflow-hidden">
+				<div className="flex items-center gap-2.5 overflow-hidden">
 					{!!value.length && (
 						<div className="flex -space-x-1.5">
 							{value.slice(0, 3).map((selectedValue) => {
@@ -133,11 +134,11 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 						</div>
 					)}
 
-					<span className="truncate font-medium text-(--text)">{displayValue()}</span>
+					<span className="whitespace-nowrap truncate font-medium text-(--text)">{displayValue()}</span>
 				</div>
 
 				<ChevronDown size={16} className={`text-(--text-muted) transition-transform duration-200 shrink-0 ${open ? 'rotate-180' : ''}`} />
-			</Button>
+			</button>
 
 			<AnimatePresence>
 				{open && (
@@ -158,7 +159,7 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 							duration: 0.15,
 							ease: 'easeOut',
 						}}
-						className={`absolute left-0 ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] w-full overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl p-2`}
+						className={`absolute ${alignRight ? 'right-0' : 'left-0'} ${openUpwards ? 'bottom-[calc(100%+8px)]' : 'top-[calc(100%+8px)]'} z-[100] min-w-full w-max max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-(--border)/10 bg-(--foreground) backdrop-blur-md shadow-2xl p-2`}
 					>
 						<div className="flex flex-col gap-1">
 							{searchable && (
@@ -175,27 +176,29 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 								</div>
 							)}
 
-							<div className="max-h-72 overflow-y-auto pr-1 flex flex-col gap-1">
+							<div className="max-h-72 overflow-y-auto overflow-x-hidden pr-1 flex flex-col gap-1">
 								{filteredOptions.map((option) => {
 									const selected = value.includes(option.value);
 									return (
-										<Button
+										<button
 											key={option.value}
 											type="button"
-											variant={selected ? 'primary' : 'ghost'}
 											onClick={() => toggle(option.value)}
-											className={`w-full justify-start ${selected ? '' : 'hover:bg-(--accent)/10 hover:text-(--text)'}`}
+											className={`flex w-full items-center justify-between gap-3 whitespace-nowrap rounded-xl px-3 py-2 text-sm transition-colors cursor-pointer ${
+												selected ? 'bg-(--accent) text-(--accent-contrast) font-semibold' : 'text-(--text) font-medium hover:bg-(--accent)/10'
+											}`}
 										>
-											<div className="flex items-center gap-3">
+											<div className="flex items-center gap-2.5 whitespace-nowrap">
 												<div
 													className="size-2.5 rounded-full shadow-inner border border-(--border)/20 shrink-0"
 													style={{
 														background: option.color ?? 'var(--accent)',
 													}}
 												/>
-												<span className={`${selected ? 'font-semibold text-white' : 'font-medium text-(--text)'}`}>{option.label}</span>
+												<span className="whitespace-nowrap">{option.label}</span>
 											</div>
-										</Button>
+											{selected && <Check className="h-4 w-4 shrink-0" />}
+										</button>
 									);
 								})}
 

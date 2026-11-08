@@ -39,10 +39,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		// Sort ascending by timestamp so milestone threshold crossings and downsampling cover the full history from oldest to newest
-		const rawStats = await StatModel.find(query)
-			.select('_id timestamp guildCount servers userCount users shardCount shards voteCount votes onlineSince data')
-			.sort({ timestamp: 1 })
-			.lean();
+		const rawStats = await StatModel.find(query).select('_id timestamp guildCount servers userCount users shardCount shards voteCount votes onlineSince data').sort({ timestamp: 1 }).lean();
 
 		// Always preserve the exact first snapshot that crossed each server or member milestone threshold
 		const mustKeepIndices = new Set<number>();
@@ -111,8 +108,16 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		const OrgModel = (db.models.organizations as any)?.Profile;
 
 		const [botDoc, userDoc] = await Promise.all([
-			BotProfile ? BotProfile.findOne({ id }).lean().catch(() => null) : null,
-			UserModel ? UserModel.findOne({ id: userId }).lean().catch(() => null) : null,
+			BotProfile
+				? BotProfile.findOne({ id })
+						.lean()
+						.catch(() => null)
+				: null,
+			UserModel
+				? UserModel.findOne({ id: userId })
+						.lean()
+						.catch(() => null)
+				: null,
 		]);
 
 		const isStaff = (userDoc as any)?.role === 'admin' || (userDoc as any)?.role === 'staff';
@@ -124,7 +129,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 			if (ownerId === userId || owners.includes(userId)) {
 				isAuthorized = true;
 			} else if ((botDoc as any).organizationId && OrgModel) {
-				const orgDoc = await OrgModel.findOne({ id: (botDoc as any).organizationId }).lean().catch(() => null);
+				const orgDoc = await OrgModel.findOne({ id: (botDoc as any).organizationId })
+					.lean()
+					.catch(() => null);
 				const members: any[] = Array.isArray((orgDoc as any)?.members) ? (orgDoc as any).members : [];
 				if (String((orgDoc as any)?.ownerId) === userId || members.some((m: any) => String(m?.id || m?.userId || m) === userId)) {
 					isAuthorized = true;

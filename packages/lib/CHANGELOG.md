@@ -2,6 +2,19 @@
 
 # @xernerx/lib
 
+## 1.22.2
+
+### Patch Changes
+
+- ## Default Page Width & Store/Info Localization Updates
+  
+  Updated the default page width token to 90% and added localization strings for the streamlined Store and Info filter bars.
+  
+  ### Changed
+  
+  - **Default Page Width Token**: Updated `DEFAULT_LAYOUT_SCALING.pageWidth` to `90` (`90%` viewport width) with legacy `1400px` migration support.
+  - **Localization Dictionaries**: Added Store credit perk search/category strings and updated Roadmap titles across the English source dictionary.
+
 ## 1.22.1
 
 ### Patch Changes

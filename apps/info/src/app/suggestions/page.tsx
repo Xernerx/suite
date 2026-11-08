@@ -4,9 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Selector, Input } from '@xernerx/ui';
+import { Button, Selector, MultiSelector, Input } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogIn, Lightbulb, Sparkles, CheckCircle2, ThumbsUp } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import { SuggestionCard } from '@/components/suggestions/SuggestionCard';
 
 function fuzzySearch(query: string, text: string) {
@@ -35,17 +35,22 @@ export default function SuggestionsPage() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
-	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [sortBy, setSortBy] = useState<'top' | 'newest' | 'mine'>('top');
-	const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'planned' | 'implemented'>('all');
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
+
+	const toggleProduct = (prod: string) => {
+		setSelectedProducts((prev) => (prev.includes(prod) ? prev.filter((p) => p !== prod) : [...prev, prod]));
+	};
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const qParam = params.get('q');
 			const prodParam = params.get('product');
+			const statusParam = params.get('status');
 			const sortParam = params.get('sort') as any;
 			const savedDraft = sessionStorage.getItem('xernerx_suggestion_draft');
 			if (qParam) {
@@ -54,7 +59,11 @@ export default function SuggestionsPage() {
 				setSearch(savedDraft);
 				sessionStorage.removeItem('xernerx_suggestion_draft');
 			}
-			if (prodParam) setSelectedProduct(prodParam);
+			if (prodParam) setSelectedProducts(prodParam.split(',').filter(Boolean));
+			if (statusParam) {
+				const valid = statusParam.split(',').filter((s) => ['open', 'planned', 'implemented'].includes(s));
+				if (valid.length > 0) setSelectedStatuses(valid);
+			}
 			if (sortParam && ['top', 'newest', 'mine'].includes(sortParam)) {
 				setSortBy(sortParam);
 			}
@@ -64,21 +73,28 @@ export default function SuggestionsPage() {
 	useEffect(() => {
 		if (typeof window === 'undefined' || loading) return;
 		const params = new URLSearchParams(window.location.search);
-		if (selectedProduct) params.set('product', selectedProduct);
+		if (selectedProducts.length > 0) params.set('product', selectedProducts.join(','));
 		else params.delete('product');
+		if (selectedStatuses.length > 0) params.set('status', selectedStatuses.join(','));
+		else params.delete('status');
 		if (sortBy !== 'top') params.set('sort', sortBy);
 		else params.delete('sort');
 		const qs = params.toString();
 		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
-	}, [selectedProduct, sortBy, loading]);
+	}, [selectedProducts, selectedStatuses, sortBy, loading]);
 
 	const fetchSuggestions = async () => {
 		const botIds = new Set<string>();
+		let resolvedOrgBots: { id: string; name: string; avatarUrl: string | null }[] = [];
 
 		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/suggestions'));
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			const d = await res.json();
+			const [sugRes, prodRes] = await Promise.all([
+				fetch(getEnvUrl('https://api.xernerx.com/info/suggestions'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/info/roadmap/products'), { credentials: 'include' }),
+			]);
+
+			if (!sugRes.ok) throw new Error(`HTTP ${sugRes.status}`);
+			const d = await sugRes.json();
 			const list = d.data || [];
 			setSuggestions(list);
 			list.forEach((s: any) => {
@@ -88,28 +104,28 @@ export default function SuggestionsPage() {
 					botIds.add(String(s.productId).trim());
 				}
 			});
-		} catch (err: any) {
-			toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: err.message });
-		}
 
-		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/roadmap/products'));
-			if (res.ok) {
-				const d = await res.json();
-				setProducts(d.data || []);
-				if (Array.isArray(d.bots)) {
-					setOrgBots(d.bots);
-					d.bots.forEach((b: any) => {
-						if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) {
+			if (prodRes.ok) {
+				const pd = await prodRes.json();
+				setProducts(pd.data || []);
+				if (Array.isArray(pd.bots)) {
+					resolvedOrgBots = pd.bots;
+					setOrgBots(pd.bots);
+					pd.bots.forEach((b: any) => {
+						if (b?.id && /^\d{17,20}$/.test(String(b.id).trim()) && (!b.name || !b.avatarUrl)) {
 							botIds.add(String(b.id).trim());
 						}
 					});
 				}
 			}
-		} catch {}
+		} catch (err: any) {
+			toast({ type: 'error', title: t('info.suggestions.toasts.error'), description: err.message });
+		}
 
+		const alreadyResolvedIds = new Set(resolvedOrgBots.filter((b) => b.name && b.avatarUrl).map((b) => String(b.id).trim()));
 		botIds.forEach((id) => {
-			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`))
+			if (alreadyResolvedIds.has(id)) return;
+			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`), { credentials: 'include' })
 				.then((res) => (res.ok ? res.json() : null))
 				.then((d) => {
 					if (!d) return;
@@ -206,18 +222,25 @@ export default function SuggestionsPage() {
 			if (sortBy === 'mine' && !(user && (s.upvotes?.includes(user.id) || s.authorId === user.id || s.author?.id === user.id))) {
 				return false;
 			}
-			const rawStatus = String(s.status || 'open').toLowerCase();
-			if (statusFilter === 'open' && rawStatus !== 'open' && rawStatus !== 'pending' && rawStatus !== 'submitted') return false;
-			if (statusFilter === 'planned' && rawStatus !== 'planned' && rawStatus !== 'active' && rawStatus !== 'approved' && rawStatus !== 'in_progress') return false;
-			if (statusFilter === 'implemented' && rawStatus !== 'implemented' && rawStatus !== 'completed' && rawStatus !== 'released') return false;
+			if (selectedStatuses.length > 0) {
+				const rawStatus = String(s.status || 'open').toLowerCase();
+				const normalizedStatus =
+					rawStatus === 'planned' || rawStatus === 'active' || rawStatus === 'approved' || rawStatus === 'in_progress'
+						? 'planned'
+						: rawStatus === 'implemented' || rawStatus === 'completed' || rawStatus === 'released'
+							? 'implemented'
+							: 'open';
+				if (!selectedStatuses.includes(normalizedStatus)) return false;
+			}
 			const botInfo = resolveBot(s);
 			const prodName = botInfo?.name || s.productId || '';
-			if (selectedProduct) {
-				const selectedBot = resolveBot(selectedProduct);
-				const selectedName = selectedBot?.name || selectedProduct;
-				if (prodName.toLowerCase() !== selectedName.toLowerCase() && s.productId !== selectedProduct) {
-					return false;
-				}
+			if (selectedProducts.length > 0) {
+				const matchesAny = selectedProducts.some((sp) => {
+					const selectedBot = resolveBot(sp);
+					const selectedName = selectedBot?.name || sp;
+					return prodName.toLowerCase() === selectedName.toLowerCase() || s.productId === sp;
+				});
+				if (!matchesAny) return false;
 			}
 			if (!search) return true;
 			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
@@ -233,32 +256,67 @@ export default function SuggestionsPage() {
 			const votesB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
 			return votesB - votesA;
 		});
-	}, [search, selectedProduct, sortBy, statusFilter, user, suggestions, orgBots, botProfiles]);
-
-	const suggestionStats = useMemo(() => {
-		let planned = 0;
-		let implemented = 0;
-		let myUpvotes = 0;
-		for (const s of suggestions) {
-			const st = String(s.status || 'open').toLowerCase();
-			if (st === 'planned' || st === 'active' || st === 'approved' || st === 'in_progress') planned++;
-			if (st === 'implemented' || st === 'completed' || st === 'released') implemented++;
-			if (user?.id && (s.upvotes?.includes(user.id) || s.authorId === user.id || s.author?.id === user.id)) myUpvotes++;
-		}
-		return { total: suggestions.length, planned, implemented, myUpvotes };
-	}, [suggestions, user]);
+	}, [search, selectedProducts, sortBy, selectedStatuses, user, suggestions, orgBots, botProfiles]);
 
 	return (
-		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 pb-24 gap-12">
-			<motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
-				<h1 className="text-4xl font-bold mb-4 text-(--text)">{t('info.suggestions.title')}</h1>
-				<p className="text-(--text-muted)">{t('info.suggestions.description')}</p>
-			</motion.div>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full min-h-screen pt-24 px-4 sm:px-8 pb-24">
+			<div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 mb-8 border-b border-(--border)/10 relative z-30">
+				<div className="flex flex-col gap-1.5">
+					<h1 className="text-3xl sm:text-4xl font-black tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('info.suggestions.title')}
+					</h1>
+					<p className="text-sm sm:text-base text-(--text-muted) max-w-2xl">{t('info.suggestions.description')}</p>
+				</div>
+
+				<div className="flex flex-col gap-1.5 w-full lg:w-auto">
+					<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
+						<div className="w-full sm:w-80 xl:w-96">
+							<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+						</div>
+						<MultiSelector
+							className="w-full sm:w-auto shrink-0"
+							placeholder={t('info.suggestions.allProducts')}
+							value={selectedProducts}
+							onChange={setSelectedProducts}
+							options={availableProducts.map((prod) => {
+								const botInfo = resolveBot(prod);
+								return {
+									value: prod,
+									label: botInfo ? botInfo.name : prod,
+								};
+							})}
+						/>
+						<MultiSelector
+							className="w-full sm:w-auto shrink-0"
+							searchable={false}
+							placeholder={t('info.suggestions.filters.all')}
+							value={selectedStatuses}
+							onChange={setSelectedStatuses}
+							options={[
+								{ value: 'open', label: t('info.suggestions.filters.open'), color: 'var(--text-muted)' },
+								{ value: 'planned', label: t('info.suggestions.filters.planned'), color: 'var(--accent)' },
+								{ value: 'implemented', label: t('info.suggestions.filters.implemented'), color: 'var(--accent-green)' },
+							]}
+						/>
+						<div className="w-full sm:w-auto shrink-0">
+							<Selector
+								value={sortBy}
+								onChange={(val) => setSortBy(val as any)}
+								options={(['top', 'newest', ...(user ? (['mine'] as const) : [])] as const).map((id) => ({
+									value: id,
+									label: t(`info.suggestions.sort.${id}`),
+								}))}
+							/>
+						</div>
+					</div>
+					<p className="text-xs text-(--text-muted) px-2">{t('info.suggestions.startTyping')}</p>
+				</div>
+			</div>
 
 			<div className="w-full">
 				{loading ? (
 					<div className="flex items-center justify-center py-24">
-						<Loading />
+						<Loading variant="small" />
 					</div>
 				) : (
 					<AnimatePresence mode="wait">
@@ -269,7 +327,7 @@ export default function SuggestionsPage() {
 								animate={{ opacity: 1, scale: 1, y: 0 }}
 								exit={{ opacity: 0, scale: 0.96, y: -10 }}
 								transition={{ duration: 0.25, ease: 'easeOut' }}
-								className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-xl flex flex-col gap-4 w-full"
+								className="bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm p-6 rounded-3xl flex flex-col gap-4 w-full"
 							>
 								<h2 className="text-xl font-bold text-(--text)">{t('info.suggestions.newSuggestion')}</h2>
 								<form onSubmit={submitSuggestion} className="flex flex-col gap-4">
@@ -323,111 +381,9 @@ export default function SuggestionsPage() {
 								transition={{ duration: 0.2, ease: 'easeOut' }}
 								className="flex flex-col gap-4 w-full"
 							>
-								<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-2">
-									{[
-										{ label: t('info.suggestions.kpi.total'), value: suggestionStats.total, icon: <Lightbulb size={18} />, green: false },
-										{ label: t('info.suggestions.kpi.planned'), value: suggestionStats.planned, icon: <Sparkles size={18} />, green: false },
-										{ label: t('info.suggestions.kpi.implemented'), value: suggestionStats.implemented, icon: <CheckCircle2 size={18} />, green: true },
-										{ label: t('info.suggestions.kpi.myUpvotes'), value: suggestionStats.myUpvotes, icon: <ThumbsUp size={18} />, green: false },
-									].map((kpi) => (
-										<div key={kpi.label} className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-											<div>
-												<span className="text-[11px] font-extrabold uppercase tracking-wider text-(--text-muted)">{kpi.label}</span>
-												<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-													{kpi.value}
-												</p>
-											</div>
-											<div
-												className={`p-2.5 rounded-2xl border ${kpi.green ? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/25' : 'bg-(--accent)/15 text-(--accent) border-(--accent)/25'}`}
-											>
-												{kpi.icon}
-											</div>
-										</div>
-									))}
-								</div>
-
-								<div className="flex flex-col gap-2.5">
-									<Input variant="search" shortcut={true} placeholder={t('info.suggestions.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
-										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
-											{(['all', 'open', 'planned', 'implemented'] as const).map((id) => (
-												<button
-													key={id}
-													type="button"
-													onClick={() => setStatusFilter(id)}
-													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-														statusFilter === id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-													}`}
-												>
-													{t(`info.suggestions.filters.${id}`)}
-												</button>
-											))}
-										</div>
-										<div className="flex items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
-											{(['top', 'newest', ...(user ? (['mine'] as const) : [])] as const).map((id) => (
-												<button
-													key={id}
-													type="button"
-													onClick={() => setSortBy(id)}
-													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-														sortBy === id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-													}`}
-												>
-													{t(`info.suggestions.sort.${id}`)}
-												</button>
-											))}
-										</div>
-									</div>
-
-									{availableProducts.length > 0 && (
-										<div className="flex flex-wrap items-center gap-1.5 pt-1">
-											<button
-												type="button"
-												onClick={() => setSelectedProduct(null)}
-												className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-													selectedProduct === null
-														? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-														: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
-												}`}
-											>
-												{t('info.suggestions.allProducts')}
-											</button>
-											{availableProducts.map((prod) => {
-												const botInfo = resolveBot(prod);
-												const isSelected = selectedProduct === prod;
-												return (
-													<button
-														key={prod}
-														type="button"
-														onClick={() => setSelectedProduct(isSelected ? null : prod)}
-														className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-															isSelected
-																? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-																: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
-														}`}
-													>
-														{botInfo?.avatarUrl && (
-															<Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
-														)}
-														<span>{botInfo ? botInfo.name : prod}</span>
-													</button>
-												);
-											})}
-										</div>
-									)}
-								</div>
-
 								<AnimatePresence mode="popLayout">
 									{filteredSuggestions.map((s: any) => (
-										<SuggestionCard
-											key={s.id}
-											suggestion={s}
-											userId={user?.id}
-											botInfo={resolveBot(s)}
-											selectedProduct={selectedProduct}
-											onSelectProduct={setSelectedProduct}
-											onVote={vote}
-										/>
+										<SuggestionCard key={s.id} suggestion={s} userId={user?.id} botInfo={resolveBot(s)} onToggleProduct={toggleProduct} onVote={vote} />
 									))}
 								</AnimatePresence>
 

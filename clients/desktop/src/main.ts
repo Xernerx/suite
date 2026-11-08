@@ -5,6 +5,7 @@ import Store from 'electron-store';
 import { Terminal } from '@xernerx/terminal';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import http from 'http';
 import path from 'path';
 import {
 	broadcastPowerState,
@@ -1063,9 +1064,81 @@ if (!gotTheLock) {
 		globalShortcut.unregisterAll();
 		stopAllLocalBots();
 		syncDiscordRpc(false);
+		try {
+			desktopBridgeServer?.close();
+			desktopBridgeServer = null;
+		} catch {}
 	});
 
+	let desktopBridgeServer: http.Server | null = null;
+	const DESKTOP_BRIDGE_PORTS = [41990, 41991, 41992];
+
+	function startDesktopBridgeServer() {
+		if (desktopBridgeServer) return;
+		const server = http.createServer((req, res) => {
+			res.setHeader('Access-Control-Allow-Origin', '*');
+			res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+			res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+			res.setHeader('Access-Control-Allow-Private-Network', 'true');
+			res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
+			if (req.method === 'OPTIONS') {
+				res.writeHead(204);
+				res.end();
+				return;
+			}
+
+			const parsed = new URL(req.url || '/', 'http://127.0.0.1');
+			if (parsed.pathname === '/status' || parsed.pathname === '/ping') {
+				res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+				res.end(
+					JSON.stringify({
+						running: true,
+						app: 'xernerx-desktop',
+						version: app.getVersion(),
+					})
+				);
+				return;
+			}
+
+			if (parsed.pathname === '/open') {
+				const rawUrl = parsed.searchParams.get('url') || '';
+				if (win && !win.isDestroyed()) {
+					if (win.isMinimized()) win.restore();
+					win.show();
+					win.focus();
+					if (rawUrl) {
+						const targetUrl = resolveDeepLinkUrl(`xernerx://open?url=${encodeURIComponent(rawUrl)}`);
+						win.loadURL(targetUrl).catch(() => {});
+					}
+				} else if (rawUrl) {
+					pendingDeepLink = `xernerx://open?url=${encodeURIComponent(rawUrl)}`;
+				}
+				res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+				res.end(JSON.stringify({ ok: true }));
+				return;
+			}
+
+			res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+			res.end(JSON.stringify({ error: 'Not found' }));
+		});
+
+		let portIndex = 0;
+		const tryListen = () => {
+			if (portIndex >= DESKTOP_BRIDGE_PORTS.length) return;
+			const port = DESKTOP_BRIDGE_PORTS[portIndex++];
+			server.listen(port, '127.0.0.1', () => {
+				desktopBridgeServer = server;
+			});
+		};
+		server.on('error', () => {
+			tryListen();
+		});
+		tryListen();
+	}
+
 	app.whenReady().then(() => {
+		startDesktopBridgeServer();
 		setRpcLogger((msg) => {
 			if (getMetadata().debug) log(msg);
 		});

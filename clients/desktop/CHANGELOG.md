@@ -2,6 +2,18 @@
 
 # @xernerx/desktop
 
+## 2.6.2
+
+### Patch Changes
+
+- ## Local Loopback Bridge for Opening Web Links in Desktop App
+  
+  Added a local loopback HTTP bridge and `xernerx://open` deep-link handler so web pages can open directly inside the running Xernerx Desktop Client.
+  
+  ### Added
+  
+  - **Local Loopback Bridge (`127.0.0.1:41990-41992`)**: Added a localhost status and URL handoff listener allowing Xernerx web apps to detect when the Desktop Client is running and focus or open the current page inside the native app.
+
 ## 2.6.1
 
 ### Patch Changes

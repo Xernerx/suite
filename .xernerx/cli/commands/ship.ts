@@ -2,9 +2,31 @@
 
 import { Command } from 'commander';
 import { execSync, spawnSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 import { terminal } from '../utils/terminal';
 
 const shipLog = terminal.child({ scope: 'SHIP' });
+
+function deduplicateChangelogDependencies(rootDir: string) {
+	const workspaceFolders = ['apps', 'packages', 'services', 'clients', '.xernerx'];
+	for (const group of workspaceFolders) {
+		const groupPath = path.join(rootDir, group);
+		if (!fs.existsSync(groupPath)) continue;
+		for (const entry of fs.readdirSync(groupPath, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue;
+			const clPath = path.join(groupPath, entry.name, 'CHANGELOG.md');
+			if (!fs.existsSync(clPath)) continue;
+			try {
+				const raw = fs.readFileSync(clPath, 'utf8');
+				const cleaned = raw.replace(/(?:^[ \t]*[-*][ \t]+Updated dependencies[^\r\n]*\r?\n)+([ \t]*[-*][ \t]+Updated dependencies)/gim, '$1');
+				if (cleaned !== raw) {
+					fs.writeFileSync(clPath, cleaned, 'utf8');
+				}
+			} catch {}
+		}
+	}
+}
 
 function runSync(cmd: string) {
 	spawnSync(cmd, { stdio: 'inherit', shell: true });
@@ -20,6 +42,7 @@ export default function registerShip(program: Command) {
 				shipLog.warn('Versioning was skipped or failed. Aborting release.');
 				return;
 			}
+			deduplicateChangelogDependencies(process.cwd());
 			runSync('git add .');
 			runSync('git commit -m "chore: release"');
 			runSync('npx @changesets/cli git-tag');

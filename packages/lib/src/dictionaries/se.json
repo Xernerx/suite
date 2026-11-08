@@ -132,7 +132,6 @@
 			}
 		},
 		"roadmap": {
-			"title": "Platform Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
 			"metrics": {
 				"recentResolutions": "Issues Resolved Recently",
@@ -160,7 +159,7 @@
 			}
 		},
 		"suggestions": {
-			"title": "Feature Sandbox",
+			"title": "Suggestions",
 			"description": "Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.",
 			"newSuggestion": "New Suggestion",
 			"titlePlaceholder": "Title",

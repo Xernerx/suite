@@ -82,13 +82,7 @@ export function BotStatsLogCard({ botId, earliestTimestamp, onDeleted }: BotStat
 		if (!q) return dayStats;
 		return dayStats.filter((stat) => {
 			const timeStr = new Date(stat.timestamp).toLocaleTimeString().toLowerCase();
-			return (
-				timeStr.includes(q) ||
-				String(stat.guildCount).includes(q) ||
-				String(stat.userCount).includes(q) ||
-				String(stat.shardCount).includes(q) ||
-				String(stat.voteCount).includes(q)
-			);
+			return timeStr.includes(q) || String(stat.guildCount).includes(q) || String(stat.userCount).includes(q) || String(stat.shardCount).includes(q) || String(stat.voteCount).includes(q);
 		});
 	}, [dayStats, search]);
 
@@ -114,10 +108,7 @@ export function BotStatsLogCard({ botId, earliestTimestamp, onDeleted }: BotStat
 	};
 
 	return (
-		<div
-			className="flex flex-col rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md shadow-sm"
-			style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
-		>
+		<div className="flex flex-col rounded-3xl bg-(--foreground)/30 border border-(--border)/10 backdrop-blur-md shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-(--border)/10">
 				<div className="flex items-center gap-3">
 					<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
@@ -138,12 +129,7 @@ export function BotStatsLogCard({ botId, earliestTimestamp, onDeleted }: BotStat
 
 				<div className="flex flex-wrap items-center gap-2">
 					<div className="w-56">
-						<Input
-							variant="search"
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							placeholder={t('app.bots.overview.statsLogSearchPlaceholder')}
-						/>
+						<Input variant="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('app.bots.overview.statsLogSearchPlaceholder')} />
 					</div>
 					<div className="w-44">
 						<Input
@@ -181,12 +167,7 @@ export function BotStatsLogCard({ botId, earliestTimestamp, onDeleted }: BotStat
 									{new Date(stat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
 								</span>
 								{stat._id && (
-									<Button
-										variant="danger"
-										size="sm"
-										onClick={() => setPendingDelete(stat)}
-										className="!p-1.5 rounded-xl"
-									>
+									<Button variant="danger" size="sm" onClick={() => setPendingDelete(stat)} className="!p-1.5 rounded-xl">
 										<Trash2 size={13} />
 									</Button>
 								)}

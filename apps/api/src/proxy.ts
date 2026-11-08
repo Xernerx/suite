@@ -7,10 +7,10 @@ import { proxy as i18nProxyHandler } from '@xernerx/lib';
 // --- IN-MEMORY RATE LIMITER CACHE ---
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-// Configuration: 100 requests per 1 minute window per IP (300/min for authenticated first-party browser sessions)
+// Configuration: 100 requests per 1 minute window per IP (600/min for first-party browser sessions)
 const WINDOW_MS = 60 * 1000;
 const MAX_REQUESTS = 100;
-const SESSION_MAX_REQUESTS = 300;
+const SESSION_MAX_REQUESTS = 600;
 
 const TRUSTED_SUITE_SUBDOMAINS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste', 'blog']);
 
@@ -96,8 +96,8 @@ export async function proxy(req: NextRequest) {
 	const realIp = req.headers.get('x-real-ip');
 	const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || '127.0.0.1';
 
-	const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
-	const isAuthenticatedFrontendSession = isTrustedFrontend && hasSessionCookie;
+	const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1' || process.env.ENVIRONMENT?.toLowerCase() === 'development' || hostNameOnly.includes('.dev.');
+	const isAuthenticatedFrontendSession = isTrustedFrontend;
 	const effectiveMaxRequests = isAuthenticatedFrontendSession ? SESSION_MAX_REQUESTS : MAX_REQUESTS;
 	const rateBucketKey = isAuthenticatedFrontendSession ? `sess:${ip}` : `pub:${ip}`;
 

@@ -211,9 +211,24 @@ export function CommandPaletteModal({
 				section: 'actions',
 				label: t('components.header.openInDesktop'),
 				icon: Compass,
-				onSelect: () => {
-					if (typeof window !== 'undefined') window.location.href = `xernerx://open?url=${encodeURIComponent(window.location.href)}`;
+				onSelect: async () => {
 					onClose();
+					if (typeof window === 'undefined') return;
+					const currentUrl = window.location.href;
+					for (const port of [41990, 41991, 41992]) {
+						try {
+							const controller = new AbortController();
+							const timeout = setTimeout(() => controller.abort(), 1000);
+							const res = await fetch(`http://127.0.0.1:${port}/open?url=${encodeURIComponent(currentUrl)}`, {
+								method: 'GET',
+								cache: 'no-store',
+								signal: controller.signal,
+							});
+							clearTimeout(timeout);
+							if (res.ok) return;
+						} catch {}
+					}
+					window.location.href = `xernerx://open?url=${encodeURIComponent(currentUrl)}`;
 				},
 			});
 		}
