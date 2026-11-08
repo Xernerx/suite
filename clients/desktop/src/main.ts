@@ -129,6 +129,10 @@ const desktopTerminal = new Terminal({
 	spin: false,
 });
 
+function getDebugLogFilePath(): string {
+	return path.join(app.getPath('documents'), 'xernerx-debug.log');
+}
+
 function log(message: string) {
 	if (/error|failed|exception/i.test(message)) {
 		desktopTerminal.error(message);
@@ -138,7 +142,7 @@ function log(message: string) {
 		desktopTerminal.log(message);
 	}
 	try {
-		const file = path.join(app.getPath('desktop'), 'xernerx-debug.log');
+		const file = getDebugLogFilePath();
 		fs.appendFileSync(file, `[${new Date().toISOString()}] ${message}\n`);
 	} catch {}
 }
@@ -602,7 +606,7 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.handle('app:getLogs', () => {
-		const logFile = path.join(app.getPath('desktop'), 'xernerx-debug.log');
+		const logFile = getDebugLogFilePath();
 		try {
 			if (!fs.existsSync(logFile)) log('Initialized debug log file');
 			return {
@@ -618,7 +622,7 @@ function registerIpcHandlers() {
 	});
 
 	ipcMain.handle('app:openLogs', async () => {
-		const logFile = path.join(app.getPath('desktop'), 'xernerx-debug.log');
+		const logFile = getDebugLogFilePath();
 		try {
 			if (!fs.existsSync(logFile)) log('Opened debug log file');
 			await shell.openPath(logFile);
@@ -963,6 +967,7 @@ async function createWindow() {
 		}
 	} catch (error) {
 		sendError((error as Error).message);
+		await new Promise((r) => setTimeout(r, 3500));
 	} finally {
 		if (splash && !splash.isDestroyed()) {
 			splash.destroy();

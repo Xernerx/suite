@@ -118,8 +118,64 @@ function getCandidateApiBases(channel: 'stable' | 'canary'): string[] {
 
 function resolveStagedInstallerPath(info: { fileName?: string | null; latestVersion?: string | null }): string {
 	const ext = process.platform === 'win32' ? 'exe' : process.platform === 'darwin' ? 'dmg' : 'AppImage';
-	const safeFileName = (info.fileName || `Xernerx-App-${info.latestVersion || 'latest'}-setup.${ext}`).replace(/[^a-zA-Z0-9._ -]/g, '_');
-	return path.join(app.getPath('temp'), safeFileName);
+	const tempDir = app.getPath('temp');
+	const explicitName = info.fileName || cachedUpdateInfo?.fileName || null;
+	if (explicitName) {
+		const safeExplicit = explicitName.replace(/[^a-zA-Z0-9._ -]/g, '_');
+		return path.join(tempDir, safeExplicit);
+	}
+
+	const ver = cleanVersionString(info.latestVersion || cachedUpdateInfo?.latestVersion) || 'latest';
+	const dotCandidate = path.join(tempDir, `Xernerx.App-${ver}-setup.${ext}`.replace(/[^a-zA-Z0-9._ -]/g, '_'));
+	const dashCandidate = path.join(tempDir, `Xernerx-App-${ver}-setup.${ext}`.replace(/[^a-zA-Z0-9._ -]/g, '_'));
+	if (fs.existsSync(dotCandidate)) return dotCandidate;
+	if (fs.existsSync(dashCandidate)) return dashCandidate;
+	return dotCandidate;
+}
+
+function getUpdateAttemptMarkerPath(): string {
+	return path.join(app.getPath('temp'), 'xernerx-update-attempt.json');
+}
+
+function recordUpdateAttempt(fromVersion: string, toVersion?: string | null) {
+	try {
+		fs.writeFileSync(
+			getUpdateAttemptMarkerPath(),
+			JSON.stringify({
+				fromVersion: cleanVersionString(fromVersion),
+				toVersion: cleanVersionString(toVersion),
+				timestamp: Date.now(),
+			}),
+			'utf8'
+		);
+	} catch {}
+}
+
+function shouldSkipStartupAutoUpdate(currentVersion: string, targetVersion?: string | null): boolean {
+	try {
+		const markerPath = getUpdateAttemptMarkerPath();
+		if (!fs.existsSync(markerPath)) return false;
+		const raw = JSON.parse(fs.readFileSync(markerPath, 'utf8')) as {
+			fromVersion?: string;
+			toVersion?: string;
+			timestamp?: number;
+		};
+		const cleanCurrent = cleanVersionString(currentVersion);
+		if (!raw.fromVersion || raw.fromVersion !== cleanCurrent) {
+			fs.unlinkSync(markerPath);
+			return false;
+		}
+		const ageMs = Date.now() - (raw.timestamp || 0);
+		if (ageMs >= 0 && ageMs < 2 * 60 * 1000) {
+			if (!targetVersion || !raw.toVersion || cleanVersionString(targetVersion) === raw.toVersion) {
+				return true;
+			}
+		}
+		fs.unlinkSync(markerPath);
+		return false;
+	} catch {
+		return false;
+	}
 }
 
 function isStagedBinaryValid(filePath: string, expectedSize?: number | null): boolean {
@@ -141,10 +197,10 @@ function cleanupOldStagedInstallers(currentVersion: string, keepFilePath?: strin
 		const tempDir = app.getPath('temp');
 		const entries = fs.readdirSync(tempDir);
 		for (const entry of entries) {
-			if (!/^Xernerx[\s_-]*App-.*-setup\.(?:exe|dmg|AppImage)(?:\.part)?$/i.test(entry)) continue;
+			if (!/^Xernerx[\s._-]*App-.*-setup\.(?:exe|dmg|AppImage)(?:\.part)?$/i.test(entry)) continue;
 			const fullPath = path.join(tempDir, entry);
 			if (keepFilePath && path.resolve(fullPath) === path.resolve(keepFilePath)) continue;
-			const match = entry.match(/^Xernerx[\s_-]*App-(.+?)-setup\./i);
+			const match = entry.match(/^Xernerx[\s._-]*App-(.+?)-setup\./i);
 			const fileVer = match?.[1] ? cleanVersionString(match[1]) : '';
 			if (entry.endsWith('.part') || !fileVer || fileVer === currentVersion || !isRemoteVersionNewer(currentVersion, fileVer)) {
 				try {
@@ -217,7 +273,7 @@ export async function checkDesktopRelease(log?: (msg: string) => void): Promise<
 
 			let latestVersion = cleanVersionString(data.version);
 			if (!latestVersion && asset?.name) {
-				const match = asset.name.match(/Xernerx[\s_-]*App-(.+?)-setup\.(?:exe|dmg|AppImage)$/i);
+				const match = asset.name.match(/Xernerx[\s._-]*App-(.+?)-setup\.(?:exe|dmg|AppImage)$/i);
 				if (match?.[1]) latestVersion = cleanVersionString(match[1]);
 			}
 			if (!latestVersion && data.tagName && data.tagName !== 'canary') {
@@ -460,14 +516,17 @@ export async function stageUpdateBinary(ctx: UpdaterContext, targetInfo?: Deskto
 export async function applyStagedUpdate(ctx: UpdaterContext, stagedPath: string, version?: string | null): Promise<boolean> {
 	if (!fs.existsSync(stagedPath)) return false;
 
+	const targetVersion = version || cachedUpdateInfo?.latestVersion || null;
+	recordUpdateAttempt(app.getVersion(), targetVersion);
+
 	broadcastUpdateProgress(
 		ctx,
 		{
 			status: 'installing',
 			progress: 100,
 			downloaded: true,
-			version: version || cachedUpdateInfo?.latestVersion || null,
-			message: `Installing update ${version ? `v${version} ` : ''}& restarting…`,
+			version: targetVersion,
+			message: `Installing update ${targetVersion ? `v${targetVersion} ` : ''}& restarting…`,
 		},
 		true
 	);
@@ -478,10 +537,67 @@ export async function applyStagedUpdate(ctx: UpdaterContext, stagedPath: string,
 	await new Promise((r) => setTimeout(r, 400));
 
 	if (process.platform === 'win32') {
-		// Run NSIS installer silently (/S) after a 1s grace period so all Electron handles close,
-		// wait for NSIS extraction to complete, and then relaunch the updated executable automatically.
-		const cmdLine = 'timeout /t 1 /nobreak >nul & start "" /wait "%XRX_INSTALLER%" /S --updated & start "" "%XRX_APP_EXE%" --relaunch --updated';
-		const child = spawn('cmd.exe', ['/d', '/s', '/c', cmdLine], {
+		const scriptPath = path.join(app.getPath('temp'), 'xernerx-apply-update.ps1');
+		const installDir = path.dirname(process.execPath);
+		const logFile = path.join(app.getPath('documents'), 'xernerx-debug.log');
+
+		const psScript = [
+			'$ErrorActionPreference = "SilentlyContinue"',
+			'$installer = $env:XRX_INSTALLER',
+			'$appExe = $env:XRX_APP_EXE',
+			'$installDir = $env:XRX_INSTALL_DIR',
+			'$parentPid = [int]$env:XRX_PARENT_PID',
+			'$logFile = $env:XRX_LOG_FILE',
+			'function Write-Log($msg) {',
+			'    try {',
+			'        $ts = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")',
+			'        Add-Content -Path $logFile -Value "[$ts] $msg" -Encoding UTF8',
+			'    } catch {}',
+			'}',
+			'Write-Log "UPDATER HELPER: Waiting for PID $parentPid to exit..."',
+			'if ($parentPid -gt 0) {',
+			'    Wait-Process -Id $parentPid -Timeout 10 -ErrorAction SilentlyContinue',
+			'}',
+			'Start-Sleep -Milliseconds 600',
+			'try {',
+			'    $remaining = Get-CimInstance Win32_Process | Where-Object { $_.Path -and $_.Path.StartsWith($installDir, [System.StringComparison]::OrdinalIgnoreCase) }',
+			'    foreach ($p in $remaining) {',
+			'        Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue',
+			'    }',
+			'} catch {}',
+			'Start-Sleep -Milliseconds 400',
+			'$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)',
+			'$isPerMachine = (Test-Path "HKLM:\\Software\\4b8ce840-4d39-578b-83f7-135560058601") -or (Test-Path "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\4b8ce840-4d39-578b-83f7-135560058601")',
+			'if (-not $isPerMachine -and $env:ProgramFiles -and $installDir.StartsWith($env:ProgramFiles, [System.StringComparison]::OrdinalIgnoreCase)) {',
+			'    $isPerMachine = $true',
+			'}',
+			'$modeFlag = if ($isPerMachine) { "/allusers" } else { "/currentuser" }',
+			'$nsisArgs = @("/S", $modeFlag, "--updated", "/D=$installDir")',
+			'Write-Log ("UPDATER HELPER: Running installer " + $installer + " (" + ($nsisArgs -join " ") + ") perMachine=" + $isPerMachine + " isAdmin=" + $isAdmin)',
+			'try {',
+			'    if ($isPerMachine -and -not $isAdmin) {',
+			'        $proc = Start-Process -FilePath $installer -ArgumentList $nsisArgs -Verb RunAs -Wait -PassThru -ErrorAction Stop',
+			'    } else {',
+			'        $proc = Start-Process -FilePath $installer -ArgumentList $nsisArgs -Wait -PassThru -ErrorAction Stop',
+			'    }',
+			'    Write-Log ("UPDATER HELPER: Installer finished with exitCode=" + $proc.ExitCode)',
+			'} catch {',
+			'    Write-Log ("UPDATER HELPER ERROR: " + $_.Exception.Message)',
+			'}',
+			'if (Test-Path $appExe) {',
+			'    Write-Log ("UPDATER HELPER: Relaunching " + $appExe)',
+			'    Start-Process -FilePath $appExe -ArgumentList @("--relaunch", "--updated")',
+			'}',
+		].join('\r\n');
+
+		try {
+			fs.writeFileSync(scriptPath, psScript, 'utf8');
+		} catch (err) {
+			ctx.log(`FAILED TO WRITE UPDATER SCRIPT: ${(err as Error).message}`);
+		}
+
+		const psExe = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+		const child = spawn(psExe, ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', scriptPath], {
 			detached: true,
 			stdio: 'ignore',
 			windowsHide: true,
@@ -489,6 +605,9 @@ export async function applyStagedUpdate(ctx: UpdaterContext, stagedPath: string,
 				...process.env,
 				XRX_INSTALLER: stagedPath,
 				XRX_APP_EXE: process.execPath,
+				XRX_INSTALL_DIR: installDir,
+				XRX_PARENT_PID: String(process.pid),
+				XRX_LOG_FILE: logFile,
 			},
 		});
 		child.unref();
@@ -682,6 +801,11 @@ export async function runStartupUpdater(ctx: UpdaterContext, isDebug: boolean): 
 	try {
 		const info = await checkDesktopRelease(ctx.log);
 		if (info.outdated && info.downloadUrl) {
+			if (shouldSkipStartupAutoUpdate(currentVersion, info.latestVersion)) {
+				ctx.log(`STARTUP UPDATE SKIPPED: Recent update attempt from v${currentVersion} -> v${info.latestVersion} did not complete; skipping auto-apply on startup to avoid restart loop.`);
+				startBackgroundUpdatePoller(ctx);
+				return false;
+			}
 			ctx.log(`STARTUP UPDATE AVAILABLE: v${currentVersion} -> v${info.latestVersion}`);
 			const stagedPath = await stageUpdateBinary(ctx, info, { foreground: false, showSplashStatus: true });
 			if (stagedPath) {

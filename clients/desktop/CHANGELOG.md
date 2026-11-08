@@ -2,6 +2,20 @@
 
 # @xernerx/desktop
 
+## 2.6.3
+
+### Patch Changes
+
+- ## Silent Auto-Updater Reliability & Documents Debug Log
+  
+  Resolved Windows silent auto-update handoff and elevation issues and moved runtime debug log output to the Documents folder.
+  
+  ### Changed
+  
+  - **Windows Silent Auto-Updater**: Replaced the legacy `cmd.exe` update launcher with a dedicated PowerShell updater helper that waits for all app processes to close, handles per-machine UAC elevation cleanly, prevents duplicate installer downloads, and guards against startup update loops.
+  - **Startup Error Visibility**: Kept the splash window visible briefly when a startup error occurs so diagnostic messages can be read before the window closes.
+  - **Runtime Debug Log Location**: Moved `xernerx-debug.log` generation and log viewer lookups from the Desktop directory to the user's Documents folder.
+
 ## 2.6.2
 
 ### Patch Changes
