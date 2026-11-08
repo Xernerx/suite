@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/app",
-	"version": "2.5.2",
+	"version": "2.5.4",
 	"description": "Xernerx App Discord bot daemon for support, docs, status, and community hub",
 	"main": "dist/main.js",
 	"type": "module",
@@ -15,7 +15,7 @@
 	},
 	"keywords": [],
 	"author": "Xernerx Studios",
-	"license": "MIT",
+	"license": "SEE LICENSE IN LICENSE",
 	"packageManager": "pnpm@11.20.0",
 	"devDependencies": {
 		"@types/react": "^19.3.0",

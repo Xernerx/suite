@@ -125,14 +125,11 @@ export function Selector({ value, options, onChange, placeholder, items, require
 				onClick={() => {
 					if (!disabled) setIsOpen(!isOpen);
 				}}
-				className={`flex w-full min-w-max items-center justify-between rounded-2xl p-3 border border-(--border)/10 bg-(--foreground)/80 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all ${
-					disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-(--accent)/50 hover:bg-(--foreground) focus:border-(--accent) focus:outline-none cursor-pointer'
-				} ${toggleClassName}`}
-				style={{
-					gap: 'var(--ui-gap)',
-				}}
+				className={`flex h-10 px-4 w-full min-w-max items-center justify-between gap-2 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-sm text-(--text) shadow-sm transition-all ${
+					disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-(--accent)/50 hover:bg-(--foreground)/50 focus:border-(--accent) focus:outline-none cursor-pointer'
+				} ${isOpen ? 'border-(--accent)/50 bg-(--foreground)/50' : ''} ${toggleClassName}`}
 			>
-				<span className="font-medium whitespace-nowrap">{selectedOption ? selectedOption.label : resolvedPlaceholder}</span>
+				<span className="font-medium whitespace-nowrap truncate">{selectedOption ? selectedOption.label : resolvedPlaceholder}</span>
 				<ChevronDown className={`h-4 w-4 shrink-0 text-(--text-muted) transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
 			</button>
 

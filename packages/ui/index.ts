@@ -19,3 +19,4 @@ export * from './src/Badge';
 export * from './src/EmptyState';
 export * from './src/CopyButton';
 export * from './src/Markdown';
+export * from './src/Ad';

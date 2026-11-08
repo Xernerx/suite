@@ -166,6 +166,15 @@ export function WwwDeepSearch({ packages = [] }: { packages?: ShowcasePackage[] 
 				href: '/security',
 			},
 			{
+				id: 'page-license',
+				category: 'pages',
+				title: t('www.license.header.title'),
+				description: t('www.license.header.subtitle'),
+				subLabel: 'xernerx.com/license',
+				keywords: 'license proprietary saas apache-2.0 open source sdk copyright trademarks legal',
+				href: '/license',
+			},
+			{
 				id: 'page-privacy',
 				category: 'pages',
 				title: t('www.privacy.header.title'),

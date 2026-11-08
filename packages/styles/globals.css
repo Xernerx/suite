@@ -43,7 +43,7 @@
 	--hover-accent: color-mix(in srgb, var(--accent) 85%, white 15%);
 	--active-accent: color-mix(in srgb, var(--accent-readable) 85%, black 15%);
 
-	--accent-green: #39ff14;
+	--accent-green: #16a34a;
 	--accent-orange: #ff6600;
 	--accent-red: #ff3333;
 	--accent-violet: #a855f7;
@@ -86,6 +86,8 @@ html.dark {
 
 	--text: #fafafa;
 	--text-muted: #a1a1aa;
+
+	--accent-green: #39ff14;
 }
 
 html {

@@ -47,10 +47,10 @@ export function DynamicCategoryView({
 	const showFreeCard = category.id === 'consumers';
 
 	return (
-		<div className="w-full max-w-(--page-width) flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
+		<div className="w-full flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
 			{/* Featured section */}
 			{(featuredItems.length > 0 || showFreeCard) && (
-				<div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-4xl mx-auto" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="grid grid-cols-1 md:grid-cols-2 w-full" style={{ gap: 'var(--ui-gap)' }}>
 					{/* Free Tier Card */}
 					{showFreeCard && (
 						<motion.div

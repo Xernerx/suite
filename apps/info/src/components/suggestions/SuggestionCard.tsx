@@ -9,12 +9,11 @@ interface SuggestionCardProps {
 	suggestion: any;
 	userId?: string;
 	botInfo: { id: string; name: string; avatarUrl: string | null } | null;
-	selectedProduct: string | null;
-	onSelectProduct: (prod: string | null) => void;
+	onToggleProduct: (prod: string) => void;
 	onVote: (id: string, action: 'upvote' | 'downvote') => void;
 }
 
-export function SuggestionCard({ suggestion: s, userId, botInfo, selectedProduct, onSelectProduct, onVote }: SuggestionCardProps) {
+export function SuggestionCard({ suggestion: s, userId, botInfo, onToggleProduct, onVote }: SuggestionCardProps) {
 	const hasUpvoted = Boolean(userId && s.upvotes?.includes(userId));
 	const hasDownvoted = Boolean(userId && s.downvotes?.includes(userId));
 	const netVotes = (s.upvotes?.length || 0) - (s.downvotes?.length || 0);
@@ -67,7 +66,7 @@ export function SuggestionCard({ suggestion: s, userId, botInfo, selectedProduct
 				<div className="text-(--text-muted) text-sm mb-2 mt-1">{s.description}</div>
 				<button
 					type="button"
-					onClick={() => onSelectProduct(selectedProduct === s.productId ? null : s.productId)}
+					onClick={() => onToggleProduct(s.productId)}
 					className="inline-flex items-center gap-1.5 text-xs font-mono bg-(--accent)/10 backdrop-blur-md text-(--accent) px-2.5 py-1 rounded-full border border-(--accent)/25 w-fit cursor-pointer hover:bg-(--accent)/20 transition-colors"
 				>
 					{botInfo?.avatarUrl && <Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />}

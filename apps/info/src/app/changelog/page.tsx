@@ -44,6 +44,13 @@ const APPS = [
 	{ id: 'www', name: 'Website', devPort: 4000 },
 ] as const;
 
+const BOTS = [
+	{ id: 'virtue', name: 'Virtue', repo: 'Xernerx/Virtue', botId: '1484880634844287138' },
+	{ id: 'zodiac', name: 'Zodiac', repo: 'Xernerx/Zodiac', botId: '' },
+	{ id: 'tdl', name: 'To-Do List Bot', repo: 'Xernerx/TDL', botId: '' },
+	{ id: 'metamorphosis', name: 'Metamorphosis', repo: 'Xernerx/Metamorphosis', botId: '' },
+] as const;
+
 const FETCH_HEADERS: Record<string, string> = {
 	Accept: 'application/json',
 	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 XernerxSuite/1.0',
@@ -86,6 +93,7 @@ function cleanChangelogMarkdown(raw: string): string {
 			.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
 			.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
 			.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
+			.replace(/(?:^[ \t]*[-*][ \t]+Updated dependencies[^\r\n]*\r?\n)+([ \t]*[-*][ \t]+Updated dependencies)/gim, '$1')
 			.trim()
 	);
 
@@ -211,6 +219,9 @@ async function getPackageChangelogs(): Promise<ChangelogEntry[]> {
 			sortedPackages.map(async (pkg): Promise<ChangelogEntry | null> => {
 				try {
 					const docRes = await fetch(`https://raw.githubusercontent.com/Xernerx/docs/main/packages/${pkg.name}/${pkg.latestVersion}/docs.json`, {
+						headers: {
+							...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+						},
 						next: { revalidate: 300 },
 					});
 					if (!docRes.ok) return null;
@@ -240,11 +251,82 @@ async function getPackageChangelogs(): Promise<ChangelogEntry[]> {
 	}
 }
 
+function readLocalBotChangelog(botId: string): string | null {
+	const cwd = process.cwd();
+	const candidates = [path.resolve(cwd, '..', 'apps', botId, 'CHANGELOG.md'), path.resolve(cwd, '../../apps', botId, 'CHANGELOG.md'), path.resolve(cwd, '../../../apps', botId, 'CHANGELOG.md')];
+	for (const filePath of candidates) {
+		try {
+			if (fs.existsSync(filePath)) {
+				const raw = fs.readFileSync(filePath, 'utf8');
+				const cleaned = cleanChangelogMarkdown(raw);
+				if (cleaned) return cleaned;
+			}
+		} catch {}
+	}
+	return null;
+}
+
+async function getBotChangelogs(isDevEnv: boolean): Promise<ChangelogEntry[]> {
+	const ghToken = process.env.GITHUB_TOKEN || process.env.GITHUB_PAT;
+
+	const results = await Promise.all(
+		BOTS.map(async (bot): Promise<ChangelogEntry | null> => {
+			if (isDevEnv) {
+				const localMd = readLocalBotChangelog(bot.id);
+				if (localMd) {
+					return {
+						appName: bot.name,
+						content: localMd,
+						group: 'bots',
+						botHref: bot.botId ? `/bots/${bot.botId}` : undefined,
+					};
+				}
+			}
+
+			for (const branch of ['main', 'canary']) {
+				try {
+					const res = await fetch(`https://raw.githubusercontent.com/${bot.repo}/${branch}/CHANGELOG.md`, {
+						headers: {
+							...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+						},
+						next: { revalidate: 300 },
+					});
+					if (!res.ok) continue;
+					const raw = await res.text();
+					const cleaned = cleanChangelogMarkdown(raw);
+					if (cleaned) {
+						return {
+							appName: bot.name,
+							content: cleaned,
+							group: 'bots',
+							botHref: bot.botId ? `/bots/${bot.botId}` : undefined,
+						};
+					}
+				} catch {}
+			}
+
+			const fallbackLocal = readLocalBotChangelog(bot.id);
+			if (fallbackLocal) {
+				return {
+					appName: bot.name,
+					content: fallbackLocal,
+					group: 'bots',
+					botHref: bot.botId ? `/bots/${bot.botId}` : undefined,
+				};
+			}
+
+			return null;
+		})
+	);
+
+	return results.filter((entry): entry is ChangelogEntry => entry !== null);
+}
+
 async function getChangelogs(): Promise<ChangelogEntry[]> {
 	const baseDomain = process.env.NEXT_PUBLIC_DOMAIN && !/^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(process.env.NEXT_PUBLIC_DOMAIN) ? process.env.NEXT_PUBLIC_DOMAIN : 'xernerx.com';
 	const isDevEnv = process.env.ENVIRONMENT?.toLowerCase() === 'development' || process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase() === 'development';
 
-	const [appResults, pkgResults] = await Promise.all([
+	const [appResults, botResults, pkgResults] = await Promise.all([
 		Promise.all(
 			APPS.map(async (app): Promise<ChangelogEntry | null> => {
 				const fsContent = readLocalAppChangelog(app.id);
@@ -266,10 +348,11 @@ async function getChangelogs(): Promise<ChangelogEntry[]> {
 				return null;
 			})
 		),
+		getBotChangelogs(isDevEnv),
 		getPackageChangelogs(),
 	]);
 
-	return [...appResults.filter((entry): entry is ChangelogEntry => entry !== null), ...pkgResults];
+	return [...appResults.filter((entry): entry is ChangelogEntry => entry !== null), ...botResults, ...pkgResults];
 }
 
 export default async function ChangelogPage() {

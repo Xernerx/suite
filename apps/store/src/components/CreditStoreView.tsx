@@ -4,12 +4,12 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Award, Bot, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
-import { Badge, Button, Confirm, Tabs } from '@xernerx/ui';
+import { Badge, Button, Confirm, Input, MultiSelector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { CreditLedgerCard } from './CreditLedgerCard';
 import { DailyStreakLadder } from './DailyStreakLadder';
 import { DotMatrixPerkPreview } from './DotMatrixPerkPreview';
-import { CatalogItem } from './types';
+import { CatalogItem, CHILD_TO_BUNDLE, FALLBACK_EUR_PRICES } from './types';
 
 interface CreditStoreViewProps {
 	items: CatalogItem[];
@@ -19,8 +19,6 @@ interface CreditStoreViewProps {
 	actionLoading: string | null;
 	onBuyCreditPack: (priceId: string, item: CatalogItem) => void;
 }
-
-type PerkFilter = 'all' | 'stage_style' | 'icon_pack' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'credit_packs';
 
 const PERK_ICONS: Record<string, any> = {
 	cdn_slots: HardDrive,
@@ -43,42 +41,14 @@ const PERK_ICONS: Record<string, any> = {
 	vault_sovereign: Crown,
 	vanity_badge: Award,
 };
-const CHILD_TO_BUNDLE: Record<string, string> = {
-	ambient_mesh_lava: 'ambient_scenes_pack',
-	ambient_cyber_grid: 'ambient_scenes_pack',
-	ambient_topography: 'ambient_scenes_pack',
-	ambient_nebula_cosmos: 'ambient_scenes_pack',
-	ambient_prism_caustics: 'ambient_scenes_pack',
-	surface_crystal: 'surface_styles_pack',
-	surface_holographic: 'surface_styles_pack',
-	surface_neon: 'surface_styles_pack',
-	surface_obsidian: 'surface_styles_pack',
-	frame_plasma_ring: 'profile_frames_pack',
-	frame_holo_crown: 'profile_frames_pack',
-	frame_cyber_hex: 'profile_frames_pack',
-	frame_solar_flare: 'profile_frames_pack',
-	nameplate_aurora_wave: 'profile_nameplates_pack',
-	nameplate_synth_horizon: 'profile_nameplates_pack',
-	nameplate_nebula_shimmer: 'profile_nameplates_pack',
-	nameplate_cyber_circuit: 'profile_nameplates_pack',
-	cursor_starlight_trail: 'cursor_fx_bundle',
-	cursor_plasma_sparks: 'cursor_fx_bundle',
-	cursor_cyber_reticle: 'cursor_fx_bundle',
-	cursor_sonic_rings: 'cursor_fx_bundle',
-	cursor_aurora_ribbon: 'cursor_fx_bundle',
-	skin_hud_tactical: 'overlay_skins_bundle',
-	skin_frosted_prism: 'overlay_skins_bundle',
-	skin_neon_arcade: 'overlay_skins_bundle',
-	skin_minimal_pill: 'overlay_skins_bundle',
-};
-const FALLBACK_EUR_PRICES: Record<string, string> = { 'credits-500': '€5.00', 'credits-1200': '€10.00', 'credits-3250': '€25.00', 'credits-7000': '€50.00' };
 
 export function CreditStoreView({ items, user, userLoading, mutateUser, actionLoading, onBuyCreditPack }: CreditStoreViewProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
-	const [filter, setFilter] = useState<PerkFilter>('all');
+	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+	const [search, setSearch] = useState('');
 	const [claimingDaily, setClaimingDaily] = useState(false);
 	const [timeLeft, setTimeLeft] = useState('');
 	const [confirmItem, setConfirmItem] = useState<CatalogItem | null>(null);
@@ -87,11 +57,6 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	const hasLoadedCredits = !userLoading && Boolean(user?.credits);
 	const creditBalance = user?.credits?.balance ?? 0;
 	const creditStreak = user?.credits?.streak ?? 0;
-	const totalSpent = user?.credits?.totalSpent ?? 0;
-	const extraCdnSlots = user?.credits?.extraCdnSlots ?? 0;
-	const extraShowcaseSlots = user?.credits?.extraShowcaseSlots ?? 0;
-	const extraBotSlots = user?.credits?.extraBotSlots ?? 0;
-	const extraVanitySlots = user?.credits?.extraVanitySlots ?? 0;
 	const unlockedBadges: string[] = Array.isArray(user?.credits?.unlockedBadges) ? user.credits.unlockedBadges : [];
 	const nextGiftMs = hasLoadedCredits && user?.credits?.giftIn ? new Date(user.credits.giftIn).getTime() : null;
 	const canClaimGift = hasLoadedCredits && Boolean(user?.id) && (nextGiftMs !== null ? Number.isFinite(nextGiftMs) && nextGiftMs <= Date.now() : creditStreak === 0);
@@ -181,21 +146,23 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 
 	const creditPacks = useMemo(() => items.filter((i) => i.itemType === 'credit_pack').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
 	const creditPerks = useMemo(() => items.filter((i) => i.itemType === 'credit_perk').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
-	const filteredPerks = useMemo(
-		() =>
-			filter === 'credit_packs'
-				? []
-				: filter === 'all'
-					? creditPerks
-					: filter === 'stage_style'
-						? creditPerks.filter((i) => i.perkType === 'stage_style' || i.perkType === 'ambient_scene' || i.perkType === 'surface_style')
-						: filter === 'icon_pack'
-							? creditPerks.filter((i) => i.perkType === 'icon_pack' || i.perkType === 'window_style' || i.perkType === 'cursor_fx' || i.perkType === 'overlay_skin')
-							: filter === 'vanity_badge'
-								? creditPerks.filter((i) => i.perkType === 'vanity_badge' || i.perkType === 'profile_cosmetic')
-								: creditPerks.filter((i) => i.perkType === filter),
-		[creditPerks, filter]
-	);
+	const matchesPerkCategory = (item: CatalogItem, cat: string) => {
+		if (cat === 'stage_style') return item.perkType === 'stage_style' || item.perkType === 'ambient_scene' || item.perkType === 'surface_style';
+		if (cat === 'icon_pack') return item.perkType === 'icon_pack' || item.perkType === 'window_style' || item.perkType === 'cursor_fx' || item.perkType === 'overlay_skin';
+		if (cat === 'vanity_badge') return item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic';
+		return item.perkType === cat;
+	};
+	const filteredPerks = useMemo(() => {
+		const activePerkCategories = selectedCategories.filter((c) => c !== 'credit_packs');
+		if (selectedCategories.length > 0 && activePerkCategories.length === 0) return [];
+		const q = search.trim().toLowerCase();
+		return creditPerks.filter((item) => {
+			if (activePerkCategories.length > 0 && !activePerkCategories.some((c) => matchesPerkCategory(item, c))) return false;
+			if (!q) return true;
+			return item.name?.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q) || item.badge?.toLowerCase().includes(q);
+		});
+	}, [creditPerks, selectedCategories, search]);
+	const showCreditPacks = selectedCategories.length === 0 || selectedCategories.includes('credit_packs');
 	const getPerkIcon = (perkType?: string, perkValue?: string | number | null) => PERK_ICONS[String(perkValue || '')] || PERK_ICONS[String(perkType || '')] || Sparkles;
 	const getEffectiveCreditCost = (item: CatalogItem) => {
 		const base = Math.max(0, Number(item.creditCost) || 0);
@@ -203,52 +170,28 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	};
 
 	return (
-		<div className="w-full max-w-(--page-width) flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 1.5)' }}>
-			{/* Wallet & Perks Status Bar */}
-			<div
-				className="flex flex-col lg:flex-row lg:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-				style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-			>
-				<div className="flex flex-wrap items-center gap-4">
-					<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]">
-						<Coins size={28} />
+		<div className="w-full flex flex-col gap-8">
+			{/* Unified Wallet & Daily Streak Bar */}
+			<div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-4 sm:p-5 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
+				<div className="flex flex-wrap items-center gap-3.5">
+					<div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
+						<Coins size={22} />
 					</div>
-					<div className="flex flex-col gap-1">
-						<div className="flex flex-wrap items-center gap-2.5">
-							<span className="text-2xl md:text-3xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{creditBalance.toLocaleString()} {t('account.billing.credits.unit')}
-							</span>
-							{creditStreak > 0 && (
-								<Badge variant="accent" icon={<Flame size={12} />}>
-									{t('account.billing.credits.streakDays', { count: creditStreak })}
-								</Badge>
-							)}
-							{totalSpent > 0 && (
-								<Badge variant="muted" size="sm">
-									{t('account.store.credits.lifetimeSpent', { amount: totalSpent.toLocaleString() })}
-								</Badge>
-							)}
-						</div>
-						<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
-							{[
-								{ icon: HardDrive, text: t('account.store.credits.ownedCdnSlots', { count: 10 + extraCdnSlots, extra: extraCdnSlots }), show: true },
-								{ icon: LayoutGrid, text: t('account.store.credits.ownedShowcaseSlots', { count: 1 + extraShowcaseSlots, extra: extraShowcaseSlots }), show: true },
-								{ icon: Bot, text: t('account.store.credits.ownedBotSlots', { count: 1 + extraBotSlots, extra: extraBotSlots }), show: true },
-								{ icon: Globe, text: t('account.store.credits.ownedVanitySlots', { count: extraVanitySlots }), show: extraVanitySlots > 0 },
-								{ icon: Award, text: t('account.store.credits.ownedBadges', { count: unlockedBadges.length }), show: true },
-							]
-								.filter((p) => p.show)
-								.map((pill, i) => (
-									<span key={i} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-(--background)/60 border border-(--border)/10">
-										<pill.icon size={11} className="text-(--accent)" />
-										{pill.text}
-									</span>
-								))}
-						</div>
+					<div className="flex flex-wrap items-center gap-2.5">
+						<span className="text-xl sm:text-2xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{creditBalance.toLocaleString()} {t('account.billing.credits.unit')}
+						</span>
+						{creditStreak > 0 && (
+							<Badge variant="accent" icon={<Flame size={12} />}>
+								{t('account.billing.credits.streakDays', { count: creditStreak })}
+							</Badge>
+						)}
 					</div>
 				</div>
 
-				<div className="flex flex-wrap items-center gap-2.5 shrink-0">
+				<DailyStreakLadder streak={creditStreak} canClaim={canClaimGift} user={user} onClaim={handleClaimDaily} claiming={claimingDaily} />
+
+				<div className="flex flex-wrap items-center gap-2 shrink-0">
 					{user?.id ? (
 						<Button variant={canClaimGift ? 'primary' : 'secondary'} onClick={handleClaimDaily} disabled={!canClaimGift || claimingDaily} className="flex items-center gap-2 font-mono">
 							{claimingDaily ? <Loader2 size={15} className="animate-spin" /> : canClaimGift ? <Gift size={15} /> : <Clock size={15} />}
@@ -264,181 +207,171 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 							{t('account.store.credits.signInToRedeem')}
 						</Button>
 					)}
-					<Button variant="secondary" onClick={() => setFilter(filter === 'credit_packs' ? 'all' : 'credit_packs')} className="flex items-center gap-2">
+					<Button
+						variant="secondary"
+						onClick={() => setSelectedCategories((prev) => (prev.length === 1 && prev[0] === 'credit_packs' ? [] : ['credit_packs']))}
+						className="flex items-center gap-2"
+					>
 						<Coins size={15} className="text-(--accent)" />
 						{t('account.store.credits.topUpButton')}
 					</Button>
 				</div>
 			</div>
 
-			{/* 7-Day Daily Streak Ladder & Subscriber Multiplier */}
-			<DailyStreakLadder streak={creditStreak} canClaim={canClaimGift} user={user} onClaim={handleClaimDaily} claiming={claimingDaily} />
+			{/* Header & Filter Bar */}
+			<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-30">
+				<div className="flex flex-col gap-0.5">
+					<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						<Sparkles size={20} className="text-(--accent)" />
+						{t('account.store.credits.perksHeading')}
+					</h2>
+					<span className="text-xs text-(--text-muted)">{t('account.store.credits.perksSubheading')}</span>
+				</div>
 
-			{/* Filter Tabs */}
-			<div className="flex flex-wrap items-center justify-between gap-3">
-				<Tabs
-					size="sm"
-					activeTab={filter}
-					onChange={(id) => setFilter(id as PerkFilter)}
-					tabs={[
-						{ id: 'all', label: t('account.store.credits.filters.all') },
-						{ id: 'stage_style', label: t('account.store.credits.filters.stageStyles') },
-						{ id: 'icon_pack', label: t('account.store.credits.filters.iconPacks') },
-						{ id: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
-						{ id: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
-						{ id: 'bot_slots', label: t('account.store.credits.filters.botSlots') },
-						{ id: 'vanity_url', label: t('account.store.credits.filters.vanityUrls') },
-						{ id: 'trial_pass', label: t('account.store.credits.filters.trialPasses') },
-						{ id: 'vanity_badge', label: t('account.store.credits.filters.vanityBadges') },
-						{ id: 'streak_shield', label: t('account.store.credits.filters.streakShields') },
-						{ id: 'credit_packs', label: t('account.store.credits.filters.creditPacks') },
-					]}
-				/>
+				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
+					<div className="w-full sm:w-72">
+						<Input variant="search" shortcut={true} placeholder={t('account.store.credits.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+					</div>
+					<MultiSelector
+						className="w-full sm:w-auto shrink-0"
+						placeholder={t('account.store.credits.allCategories')}
+						value={selectedCategories}
+						onChange={setSelectedCategories}
+						options={[
+							{ value: 'stage_style', label: t('account.store.credits.filters.stageStyles') },
+							{ value: 'icon_pack', label: t('account.store.credits.filters.iconPacks') },
+							{ value: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
+							{ value: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
+							{ value: 'bot_slots', label: t('account.store.credits.filters.botSlots') },
+							{ value: 'vanity_url', label: t('account.store.credits.filters.vanityUrls') },
+							{ value: 'trial_pass', label: t('account.store.credits.filters.trialPasses') },
+							{ value: 'vanity_badge', label: t('account.store.credits.filters.vanityBadges') },
+							{ value: 'streak_shield', label: t('account.store.credits.filters.streakShields') },
+							{ value: 'credit_packs', label: t('account.store.credits.filters.creditPacks') },
+						]}
+					/>
+				</div>
 			</div>
 
 			{/* Credit Perks Grid */}
 			{filteredPerks.length > 0 && (
-				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex items-center justify-between">
-						<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							<Sparkles size={20} className="text-(--accent)" />
-							{t('account.store.credits.perksHeading')}
-						</h2>
-						<span className="text-xs text-(--text-muted) hidden sm:block">{t('account.store.credits.perksSubheading')}</span>
-					</div>
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
+					{filteredPerks.map((item) => {
+						const PerkIcon = getPerkIcon(item.perkType, item.perkValue);
+						const effectiveCost = getEffectiveCreditCost(item);
+						const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix' || item.perkType === 'profile_cosmetic';
+						const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
+						const badgeKey = String(item.perkValue || item.id);
+						const isOwnedBadge =
+							((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isStageOrIcon) &&
+								(unlockedBadges.includes(badgeKey) || Boolean(CHILD_TO_BUNDLE[badgeKey] && unlockedBadges.includes(CHILD_TO_BUNDLE[badgeKey])))) ||
+							(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3);
+						const canAfford = creditBalance >= effectiveCost;
 
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
-						{filteredPerks.map((item) => {
-							const PerkIcon = getPerkIcon(item.perkType, item.perkValue);
-							const effectiveCost = getEffectiveCreditCost(item);
-							const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix' || item.perkType === 'profile_cosmetic';
-							const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
-							const badgeKey = String(item.perkValue || item.id);
-							const isOwnedBadge =
-								((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isStageOrIcon) &&
-									(unlockedBadges.includes(badgeKey) || Boolean(CHILD_TO_BUNDLE[badgeKey] && unlockedBadges.includes(CHILD_TO_BUNDLE[badgeKey])))) ||
-								(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3);
-							const canAfford = creditBalance >= effectiveCost;
-
-							return (
-								<div
-									key={item.id}
-									className={`relative flex flex-col justify-between rounded-3xl border backdrop-blur-md transition-all ${
-										item.isFeatured
-											? 'bg-(--foreground)/40 border-(--accent)/35 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
-											: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30 shadow-sm'
-									}`}
-									style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-								>
-									<div className="flex flex-col gap-3">
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex items-center gap-2 text-(--accent)">
-												<div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-(--accent)/15 border border-(--accent)/25">
-													<PerkIcon size={18} />
-												</div>
-												{item.badge && (
-													<span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">{item.badge}</span>
-												)}
+						return (
+							<div
+								key={item.id}
+								className={`relative flex flex-col justify-between rounded-3xl border backdrop-blur-md transition-all p-5 gap-4 ${
+									item.isFeatured
+										? 'bg-(--foreground)/40 border-(--accent)/35 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
+										: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30 shadow-sm'
+								}`}
+							>
+								<div className="flex flex-col gap-3">
+									<div className="flex items-center justify-between gap-2">
+										<div className="flex items-center gap-2 text-(--accent)">
+											<div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-(--accent)/15 border border-(--accent)/25">
+												<PerkIcon size={18} />
 											</div>
+											{item.badge && (
+												<span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">{item.badge}</span>
+											)}
 											{item.discountPercent > 0 && (
 												<span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
 													-{item.discountPercent}%
 												</span>
 											)}
 										</div>
-
-										<DotMatrixPerkPreview initialVariant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} perkValue={String(item.perkValue || '')} />
-
-										<div>
-											<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{item.name}
-											</h3>
-											<p className="text-xs text-(--text-muted) mt-1">{item.description}</p>
-										</div>
-
-										<div className="flex items-baseline gap-2 pt-1">
-											<span className="inline-flex items-center gap-1.5 text-2xl font-extrabold text-(--accent)">
-												<Coins size={20} />
+										<div className="flex items-baseline gap-1.5 shrink-0">
+											<span className="inline-flex items-center gap-1 text-lg font-extrabold text-(--accent)">
+												<Coins size={16} />
 												{effectiveCost.toLocaleString()}
 											</span>
-											<span className="text-xs font-semibold text-(--text-muted)">{t('account.billing.credits.unit')}</span>
 											{item.discountPercent > 0 && item.creditCost && (
 												<span className="text-xs text-(--text-muted) line-through opacity-60">{item.creditCost.toLocaleString()}</span>
 											)}
 										</div>
-
-										{item.features && item.features.length > 0 && (
-											<ul className="flex flex-col gap-2 pt-2 border-t border-(--border)/10">
-												{item.features.map((feat, i) => (
-													<li key={i} className="flex items-start gap-2 text-xs text-(--text-muted)">
-														<Check size={14} className="text-(--accent) shrink-0 mt-0.5" />
-														<span>{feat}</span>
-													</li>
-												))}
-											</ul>
-										)}
 									</div>
 
-									<div className="pt-2 flex flex-col gap-2">
-										{isOwnedBadge ? (
-											<>
-												<Button variant="secondary" disabled className="w-full flex items-center justify-center gap-2">
-													<Check size={15} className="text-(--accent-green)" />
-													{t('account.store.credits.alreadyUnlocked')}
-												</Button>
-												{(isDotMatrix || isStageOrIcon) && (
-													<Button
-														variant="primary"
-														size="sm"
-														onClick={() =>
-															(window.location.href = getEnvUrl(
-																`https://account.xernerx.com/?tab=${
-																	isDotMatrix ? 'profile' : item.perkValue === 'ui_icon_packs' || item.perkType === 'window_style' ? 'preferences' : 'appearance'
-																}`
-															))
-														}
-														className="w-full flex items-center justify-center gap-1.5"
-													>
-														<ExternalLink size={14} />
-														{t(isDotMatrix ? 'account.store.credits.dotMatrixPreview.customizeInProfile' : 'account.store.credits.equipInSettings')}
-													</Button>
-												)}
-											</>
-										) : (
-											<Button
-												variant={canAfford ? 'primary' : 'secondary'}
-												disabled={userLoading || redeemingId === item.id}
-												onClick={() => {
-													if (!user?.id) {
-														window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
-														return;
-													}
-													if (!canAfford) {
-														setFilter('credit_packs');
-														return;
-													}
-													setConfirmItem(item);
-												}}
-												className="w-full flex items-center justify-center gap-2"
-											>
-												<Coins size={15} />
-												{canAfford
-													? t('account.store.credits.redeemButton', { cost: effectiveCost.toLocaleString() })
-													: t('account.store.credits.needMoreCredits', {
-															missing: Math.max(0, effectiveCost - creditBalance).toLocaleString(),
-														})}
-											</Button>
-										)}
+									<DotMatrixPerkPreview initialVariant={(user?.credits?.dotMatrixVariant as any) || 'orbit'} perkValue={String(item.perkValue || '')} />
+
+									<div>
+										<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+											{item.name}
+										</h3>
+										<p className="text-xs text-(--text-muted) mt-1 leading-relaxed">{item.description}</p>
 									</div>
 								</div>
-							);
-						})}
-					</div>
+
+								<div className="flex flex-col gap-2">
+									{isOwnedBadge ? (
+										<>
+											<Button variant="secondary" disabled className="w-full flex items-center justify-center gap-2">
+												<Check size={15} className="text-(--accent-green)" />
+												{t('account.store.credits.alreadyUnlocked')}
+											</Button>
+											{(isDotMatrix || isStageOrIcon) && (
+												<Button
+													variant="primary"
+													size="sm"
+													onClick={() =>
+														(window.location.href = getEnvUrl(
+															`https://account.xernerx.com/?tab=${
+																isDotMatrix ? 'profile' : item.perkValue === 'ui_icon_packs' || item.perkType === 'window_style' ? 'preferences' : 'appearance'
+															}`
+														))
+													}
+													className="w-full flex items-center justify-center gap-1.5"
+												>
+													<ExternalLink size={14} />
+													{t(isDotMatrix ? 'account.store.credits.dotMatrixPreview.customizeInProfile' : 'account.store.credits.equipInSettings')}
+												</Button>
+											)}
+										</>
+									) : (
+										<Button
+											variant={canAfford ? 'primary' : 'secondary'}
+											disabled={userLoading || redeemingId === item.id}
+											onClick={() => {
+												if (!user?.id) {
+													window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
+													return;
+												}
+												if (!canAfford) {
+													setSelectedCategories(['credit_packs']);
+													return;
+												}
+												setConfirmItem(item);
+											}}
+											className="w-full flex items-center justify-center gap-2"
+										>
+											<Coins size={15} />
+											{canAfford
+												? t('account.store.credits.redeemButton', { cost: effectiveCost.toLocaleString() })
+												: t('account.store.credits.needMoreCredits', {
+														missing: Math.max(0, effectiveCost - creditBalance).toLocaleString(),
+													})}
+										</Button>
+									)}
+								</div>
+							</div>
+						);
+					})}
 				</div>
 			)}
 
 			{/* Credit Top-Up Packs (Stripe SKU-linked) */}
-			{(filter === 'all' || filter === 'credit_packs') && creditPacks.length > 0 && (
+			{showCreditPacks && creditPacks.length > 0 && (
 				<div className="flex flex-col pt-2" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
 						<div>

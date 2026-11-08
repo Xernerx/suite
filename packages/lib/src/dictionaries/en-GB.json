@@ -51,6 +51,7 @@
 			},
 			"links": {
 				"security": "Security",
+				"license": "License",
 				"privacy": "Privacy",
 				"terms": "Terms",
 				"cookies": "Cookies",
@@ -1037,7 +1038,7 @@
 					"translationsTitle": "Localization & Translations",
 					"translationsUrgent": "{count} locales below 100% coverage",
 					"translationsMeta": "{avg}% average coverage across {total} locales",
-					"roadmapTitle": "Platform Roadmap",
+					"roadmapTitle": "Roadmap",
 					"roadmapMeta": "{active} in progress • {planned} planned • {ideas} ideas",
 					"usersTitle": "Users",
 					"usersMeta": "{total} registered • {verified} verified",
@@ -1361,7 +1362,7 @@
 					"supportField1Name": "⚡ Server Slash Commands",
 					"supportField1Val": "• /faq & /docs — Search FAQs, REST API v1 & SDK docs\n• /status — Live service & bot uptime telemetry\n• /issues & /suggestions — Track bugs & vote on ideas\n• /roadmap & /changelog — Follow upcoming & shipped releases",
 					"supportField2Name": "🧭 Feedback & Support Hub",
-					"supportField2Val": "• Bug Tracker: info.xernerx.com/bugs\n• Feature Suggestions: info.xernerx.com/suggestions\n• Platform Roadmap: info.xernerx.com/roadmap",
+					"supportField2Val": "• Bug Tracker: info.xernerx.com/bugs\n• Feature Suggestions: info.xernerx.com/suggestions\n• Roadmap: info.xernerx.com/roadmap",
 					"supportBtnBug": "Report a Bug",
 					"supportBtnSuggest": "Suggest a Feature",
 					"supportBtnFaq": "Browse FAQ",
@@ -3158,6 +3159,8 @@
 				"confirmRedeemDesc": "You are about to spend {cost} credits on {item}. Your remaining balance will be {remaining} credits.",
 				"confirmRedeemButton": "Confirm & Redeem",
 				"equipInSettings": "Equip in Account Settings",
+				"searchPlaceholder": "Search credit perks and packs...",
+				"allCategories": "All Categories",
 				"filters": {
 					"all": "All Items",
 					"cdnSlots": "CDN Slots",
@@ -3901,6 +3904,52 @@
 				"a3": "Send security disclosures directly to security@xernerx.com and GDPR or CCPA privacy requests to legal@xernerx.com. You can also export or delete your personal data any time from your Account Settings."
 			}
 		},
+		"license": {
+			"toc": "Contents",
+			"header": {
+				"badge": "Software & Ecosystem Licensing",
+				"title": "Xernerx Studios License",
+				"subtitle": "How the Xernerx Suite, official Discord bots, and open-source TypeScript SDKs are licensed across our ecosystem.",
+				"effectiveDate": "Version 1.0 • Effective Date: 8 November 2026"
+			},
+			"actions": {
+				"copy": "Copy Plain-Text LICENSE",
+				"copied": "Copied LICENSE to Clipboard!",
+				"download": "Download LICENSE File"
+			},
+			"sections": {
+				"overview": {
+					"title": "1. Two-Tier Ecosystem Licensing",
+					"content": "Xernerx Studios operates a two-tier licensing structure across the entire Xernerx Studios workspace, separating our hosted platform, client applications, and official Discord bots from our open-source developer frameworks, starter examples, and package documentation:",
+					"proprietaryTitle": "Tier 1 — Xernerx Proprietary & SaaS License v1.0:",
+					"proprietaryDesc": "Covers the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and api, plus shared internal packages @xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), standalone and suite Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), the real-time WebSocket gateway (services/websocket), and the Xernerx Desktop and Mobile Clients. Access is granted through official hosted interfaces; source code redistribution or competing commercial deployment is prohibited.",
+					"openSourceTitle": "Tier 2 — Apache License, Version 2.0 (Open-Source SDKs, Examples & Package Docs):",
+					"openSourceDesc": "Covers all 8 standalone public npm developer packages (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx), the canonical open-source package documentation repository (docs), and the official TypeScript and JavaScript starter examples repository (examples). Developers may freely install, modify, and distribute these SDKs and starter templates in commercial or personal projects under the standard Apache-2.0 terms."
+				},
+				"plainText": {
+					"title": "2. Full Plain-Text License (LICENSE)",
+					"subtitle": "Below is the exact plain-text XERNERX STUDIOS PROPRIETARY & SAAS LICENSE included in the root LICENSE file of our proprietary and SaaS repositories:"
+				},
+				"openSource": {
+					"title": "3. Open-Source SDKs (Apache-2.0)",
+					"content": "All standalone developer packages published by Xernerx Studios to the public npm registry are licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0). This grants you a perpetual, worldwide, royalty-free copyright and patent license to build and ship your own Discord bots and applications while protecting Xernerx Studios trademarks."
+				},
+				"contact": {
+					"title": "4. Commercial Licensing & Legal Inquiries",
+					"prefix": "For commercial licensing inquiries, trademark permissions, or legal correspondence, contact"
+				}
+			},
+			"description": "legal@xernerx.com",
+			"faq": {
+				"subtitle": "Common questions about using Xernerx software, open-source NPM packages, and brand assets.",
+				"q1": "Can I use @xernerx/framework and @xernerx/stats in my own commercial Discord bot?",
+				"a1": "Yes! All public @xernerx/* npm SDKs are licensed under Apache-2.0, meaning you can freely use them in both hobby and commercial Discord bots without royalties.",
+				"q2": "Can I self-host or redistribute a clone of the Xernerx Suite or Virtue?",
+				"a2": "No. The Xernerx Suite web applications, backend services, and official bots (such as Virtue, Metamorphosis, Zodiac, and To-Do List Bot) are governed by the Xernerx Studios Proprietary & SaaS License and may only be accessed via our official hosted platform.",
+				"q3": "Are Xernerx logos and bot names covered by the open-source license?",
+				"a3": "No. Both the Xernerx Proprietary License and Section 6 of the Apache-2.0 License reserve all rights to the Xernerx Studios name, logos, icons, and product trademarks."
+			}
+		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
 			"description": "Xernerx Studios is a development studio dedicated to empowering developers and connecting communities through consumer and developer simplicity. We build Discord bots that power thousands of communities—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—alongside reliable open-source frameworks and SDKs (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
@@ -4001,7 +4050,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data when you use our websites, dashboards, Developer Portal (portal.xernerx.com), Haste pastebin (haste.xernerx.com), Discord bots, APIs, CDN, and desktop applications."
+					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data across the entire Xernerx Studios ecosystem—including all 13 *.xernerx.com web applications (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com), our standalone and suite Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot), our open-source TypeScript SDKs (@xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, @xernerx/websocket, and xernerx), our real-time WebSocket gateway, and the Xernerx Desktop and Mobile client applications."
 				},
 				"dataCollected": {
 					"title": "2. Information We Collect",
@@ -4014,12 +4063,12 @@
 						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity. For authorized staff members who link infrastructure providers (such as Vercel or Easypanel) for internal hosting management, connection credentials are kept strictly private and are never exposed on public profiles."
 					},
 					"developers": {
-						"title": "For API, Portal & Bot Developers:",
-						"desc": "Scoped Bearer API tokens (with optional expiresAt TTL expiration dates and allowedIps IP allowlists), webhook URLs and secrets (for vote, review, and tip events), bot release changelogs, slash command registries, organization membership and treasury records, real-time WebSocket gateway telemetry, and configuration settings managed via portal.xernerx.com and our API."
+						"title": "For API, Portal, SDK & Bot Developers:",
+						"desc": "Scoped Bearer API tokens (with optional expiresAt TTL expiration dates and allowedIps IP allowlists), webhook URLs and secrets (for vote, review, and tip events verified via @xernerx/hooks), bot release changelogs, slash/context/message command registries synced via @xernerx/commands and @xernerx/framework, automated guild/user telemetry reported via @xernerx/stats, organization membership and treasury records, real-time WebSocket gateway telemetry (@xernerx/websocket), and configuration settings managed via portal.xernerx.com and our API."
 					},
 					"botUsers": {
 						"title": "For Bot, Virtue Leveling & Community End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (such as Virtue, Zodiac, Metamorphosis, or To-Do List Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our global and server leveling bot), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened (we never record, listen to, or process voice audio). We also cache non-sensitive server role and channel metadata (IDs, names, colors, and positions) so server administrators can configure level-up role rewards and channel filters in the dashboard, and we read your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" button in Account Settings."
+						"desc": "When you interact with a bot powered by Xernerx (Virtue, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" button in Account Settings."
 					},
 					"cdnAndContent": {
 						"title": "CDN Media, Haste Pastes, Showcases & 3-Tier Privacy:",
@@ -4039,8 +4088,8 @@
 					}
 				},
 				"apiData": {
-					"title": "3. API Data Collection & Developer Obligations",
-					"content": "When developers use our REST API (/v1/* and /secure/*), Haste API (/v1/haste), embeddable public widgets, outgoing webhooks, or real-time WebSocket gateway to synchronize bot statistics or fetch metadata, we collect and store this data to render public pages and provide analytics. Developers are strictly prohibited from transmitting unrequested personally identifiable information (PII) of their end users to our API or Haste service. We do not sell or share API data with third-party advertisers."
+					"title": "3. API, Open-Source SDKs & Developer Obligations",
+					"content": "When developers use our REST API (/v1/* and /secure/*), Haste API (/v1/haste), embeddable public widgets, outgoing webhooks, real-time WebSocket gateway (services/websocket), or our open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) to synchronize bot statistics, verify voter/reviewer/tipper engagement in memory, or fetch metadata, we collect and store only the necessary telemetry and engagement records to render public directory pages and provide analytics. Developers are strictly prohibited from transmitting unrequested personally identifiable information (PII) of their end users to our API or Haste service. We do not sell or share API data with third-party advertisers."
 				},
 				"legalBasis": {
 					"title": "4. Legal Basis for Processing",
@@ -4125,7 +4174,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "These Terms of Service (\"Terms\") govern your access to all websites, dashboards, Developer Portal (portal.xernerx.com), Haste pastebin (haste.xernerx.com), Discord bots, software packages, APIs, CDN services, and desktop clients provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
+					"content": "These Terms of Service (\"Terms\") govern your access to the entire Xernerx Studios ecosystem—including all 13 *.xernerx.com websites and dashboards (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com), standalone and suite Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot), open-source TypeScript SDK packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), starter examples (examples), and package documentation (docs), REST and WebSocket APIs, CDN services, and the Xernerx Desktop and Mobile client applications provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
 				},
 				"eligibility": {
 					"title": "2. Eligibility",
@@ -4141,8 +4190,8 @@
 					]
 				},
 				"apiUsage": {
-					"title": "4. Developer Portal, API, Widgets & WebSocket Terms",
-					"content": "Developers using portal.xernerx.com, our REST API (/v1/* and /secure/*), Haste API (/v1/haste), outgoing webhooks, embeddable public widgets, or real-time WebSocket RPC gateway must follow these rules:",
+					"title": "4. Developer Portal, Open-Source SDKs, API, Widgets & WebSocket Terms",
+					"content": "Developers using portal.xernerx.com, our open-source npm SDKs (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), our REST API (/v1/* and /secure/*), Haste API (/v1/haste), outgoing webhooks, embeddable public widgets, or real-time WebSocket RPC gateway (services/websocket) must follow these rules:",
 					"items": [
 						"Respect all rate limits and plan quotas. Never spam, scrape, or abuse API endpoints, Haste document creation, webhook deliveries, or WebSocket connections.",
 						"Keep your Bearer API tokens and webhook secrets confidential, and use optional token TTL expirations (expiresAt) and IP allowlists (allowedIps) where appropriate. You are responsible for all actions performed with your keys and organization credentials.",
@@ -4152,7 +4201,7 @@
 				},
 				"botUsage": {
 					"title": "5. Bot & Virtue Leveling Terms",
-					"content": "Users interacting with Xernerx Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, and Xernerx App/Bot) must not exploit commands, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, and XP curve modes configured by each server. Server administrators may enable automated Daily, Weekly, or Monthly leaderboard cycle resets (or trigger manual server resets) and import/clone Virtue configurations across servers they manage; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent. You may opt out of automatic Discord profile creation via \"Automatic Service Profiles\" or permanently wipe your Virtue progression across all servers at any time via \"Delete Virtue Data\" in Account Settings."
+					"content": "Users interacting with Xernerx Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot) must not exploit commands, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, XP curve modes, and stackable /boost multipliers (published bot review, active 12-hour vote, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers). Server administrators may configure static level-up role rewards (/roles), Dynamic Hoist Roles (automatically managing milestone hoist roles with custom naming templates and hex color gradients within Discord's 250-role server limit), automated Daily, Weekly, or Monthly leaderboard cycle resets (or manual server resets), and cross-server configuration imports; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent. You may opt out of automatic Discord profile creation via \"Automatic Service Profiles\" or permanently wipe your Virtue progression across all servers at any time via \"Delete Virtue Data\" in Account Settings."
 				},
 				"accounts": {
 					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
@@ -4189,7 +4238,7 @@
 				},
 				"intellectualProperty": {
 					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, branding, and visual assets remain the exclusive property of Xernerx Studios. Open-source packages are governed by their respective repository licenses. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
+					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), package documentation repository (docs), and starter examples repository (examples) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
 				},
 				"warranty": {
 					"title": "13. Disclaimer of Warranties",
@@ -4236,7 +4285,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions. It applies whenever you visit or interact with our websites, dashboards, Developer Portal, Haste pastebin, APIs, and desktop applications."
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions across all 13 *.xernerx.com web applications (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com) and the Xernerx Desktop and Mobile client applications. Our standalone and suite Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot) and open-source npm SDK packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) operate server-side via cryptographic tokens and webhooks and never set browser cookies."
 				},
 				"whatAreCookies": {
 					"title": "2. What Are Cookies?",
@@ -4318,7 +4367,7 @@
 			"header": {
 				"badge": "Security & Trust Architecture",
 				"title": "Platform & Bot Security",
-				"subtitle": "How Xernerx Studios protects your identity, community servers, developer credentials, and progression data across the entire Xernerx Suite monorepo and our official Discord bots.",
+				"subtitle": "How Xernerx Studios protects your identity, community servers, developer credentials, and progression data across the entire Xernerx Studios ecosystem—including the Xernerx Suite monorepo, our standalone and suite Discord bots, our open-source TypeScript SDKs, and native client applications.",
 				"effectiveDate": "Last Reviewed:"
 			},
 			"pillars": {
@@ -4341,8 +4390,8 @@
 			},
 			"sections": {
 				"overview": {
-					"title": "1. Monorepo Defense-in-Depth Architecture",
-					"content": "The Xernerx Suite is engineered as a unified, strictly typed TypeScript monorepo housing all web applications (www, app, account, portal, store, docs, info, admin, hosting, cdn, haste), our core API gateway (api.xernerx.com), the real-time WebSocket microservice router, the Electron Desktop Client, and our official Discord bot daemons. By sharing a single canonical security layer (@xernerx/lib), authentication checks, schema validations, and privacy rules are enforced identically across every subdomain and service."
+					"title": "1. Ecosystem & Monorepo Defense-in-Depth Architecture",
+					"content": "The Xernerx Studios workspace is engineered as a unified, strictly typed TypeScript ecosystem spanning the Xernerx Suite monorepo—housing all 13 web applications (www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and our core API gateway at api.xernerx.com), shared internal libraries (@xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), the real-time WebSocket microservice router (services/websocket), the Xernerx App and Xernerx Bot daemons (services/app and services/bot), and the Xernerx Desktop and Mobile Clients—alongside our standalone Virtue Discord bot repository (apps/virtue), our 8 standalone open-source npm SDKs (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), our canonical package documentation & security governance repository (docs), and our official TypeScript and JavaScript starter examples repository (examples). By sharing a single canonical security layer (@xernerx/lib), authentication checks, schema validations, and privacy rules are enforced identically across every subdomain, bot, SDK, and service."
 				},
 				"authentication": {
 					"title": "2. Identity, Sessions & Desktop Partitioning",
@@ -4387,15 +4436,15 @@
 				},
 				"bots": {
 					"title": "4. Official Discord Bots Security & Data Minimization",
-					"intro": "Our four in-house Discord applications—Virtue, To-Do List Bot, Metamorphosis, and Zodiac—are built on @xernerx/framework with strict data minimization and least-privilege Discord permissions:",
+					"intro": "Our in-house Discord applications—Virtue (apps/virtue), To-Do List Bot, Metamorphosis, Zodiac, and our suite daemons Xernerx App (services/app) and Xernerx Bot (services/bot)—are built on @xernerx/framework, @xernerx/commands, @xernerx/stats, and @xernerx/websocket with strict data minimization and least-privilege Discord permissions:",
 					"virtue": {
 						"title": "Virtue (Text & Voice XP Leveling Bot)",
 						"badge": "Zero Message Content Stored",
 						"points": [
-							"No Raw Message Logging: Virtue calculates XP and increments numeric message counters in real time without ever storing, logging, or indexing the text content or attachments of your Discord messages.",
-							"Voice Presence Only (No Audio Capture): Voice XP tracks only the duration (timeSpent) a user is connected to an eligible voice channel. Virtue never joins voice channels, listens to microphones, or processes audio packets.",
-							"Granular Server Exclusions & Opt-Out: Server administrators can exclude specific text channels, voice channels, or roles from XP tracking in the dashboard, and individual users can toggle off \"Automatic Service Profiles\" in Account Settings to opt out of automatic profile creation.",
-							"Dedicated Self-Service Wipe: Users can permanently delete all of their Virtue XP, levels, message counts, voice time, and preferences across every server using the \"Delete Virtue Data\" button in Account Settings."
+							"Least-Privilege Intents & Zero Message Logging: Virtue connects solely with Guilds, GuildMessages, and GuildVoiceStates gateway intents (without the privileged MessageContent intent), calculating XP and incrementing numeric message counters in real time without ever receiving, logging, or indexing the text content or attachments of your Discord messages.",
+							"Voice Presence & Peer Verification (No Audio Capture): Voice XP tracks only active undeafened duration (timeSpent) when at least two eligible non-bot members are present in a non-AFK voice channel. Virtue never joins voice channels, listens to microphones, or processes audio packets.",
+							"Hierarchy-Safe Role Sync & Dynamic Hoist Roles: Static level-up role rewards (/roles), Server Booster / /boost XP multipliers, and Dynamic Hoist Roles (milestone hoist roles with custom naming templates and hex color gradients) operate strictly below Virtue's highest role and respect Discord's 250-role guild cap to prevent privilege escalation.",
+							"Granular Server Exclusions & Self-Service Wipe: Server administrators can exclude specific text channels, voice channels, categories, or roles from XP tracking, and individual users can toggle off \"Automatic Service Profiles\" or permanently delete all of their Virtue XP, levels, message counts, voice time, and preferences across every server using \"Delete Virtue Data\" in Account Settings."
 						]
 					},
 					"todo": {
@@ -4427,19 +4476,19 @@
 					}
 				},
 				"apiAndWebhooks": {
-					"title": "5. API Gateway, Cryptographic Tokens & Webhooks",
+					"title": "5. API Gateway, Open-Source SDKs, Cryptographic Tokens & Webhooks",
 					"items": {
 						"tokens": {
 							"title": "Scoped Bearer Tokens (xrn_):",
 							"desc": "Developer API keys and bot tokens are generated using cryptographically secure random bytes, scoped to granular permissions (bots, guilds, users, stats, /secure, WebSocket), and support optional TTL expiration dates (expiresAt), IP allowlists (allowedIps), multi-owner access, and 1-click key rotation."
 						},
 						"webhooks": {
-							"title": "HMAC-SHA256 Signed Webhooks (@xernerx/hooks):",
-							"desc": "Outbound vote, review, and tip webhooks include an X-Xernerx-Signature HMAC-SHA256 digest and timestamp header so bot developers can cryptographically verify payload authenticity and reject replay attacks."
+							"title": "HMAC-SHA256 Signed Webhooks & Engagement Cache (@xernerx/hooks):",
+							"desc": "Outbound vote, review, tip, release, and stat webhooks include an X-Xernerx-Signature HMAC-SHA256 digest and timestamp header verified in constant time (crypto.timingSafeEqual) by @xernerx/hooks (HooksClient and XernerxHooks built on @xernerx/extension-builder), which caches voted, reviewed, and tipped states in memory with authenticated REST fallback (GET /v1/bots/:botId/users/:userId) to reject replay attacks without requiring a third-party database."
 						},
 						"websocket": {
-							"title": "Authenticated WebSocket Microservice Router:",
-							"desc": "Internal real-time communication between our Discord daemons and backend databases passes through an authenticated WebSocket gateway (services/websocket) requiring valid token handshakes before any RPC action is executed."
+							"title": "Authenticated WebSocket Router & SDKs (@xernerx/websocket & @xernerx/stats):",
+							"desc": "Real-time communication between our Discord daemons (Virtue, Xernerx App, Xernerx Bot), developer bots powered by xernerx / @xernerx/framework / @xernerx/commands / @xernerx/terminal, and backend databases passes through an authenticated WebSocket gateway (services/websocket) and the @xernerx/websocket and @xernerx/stats client SDKs, requiring valid token handshakes before any RPC action or telemetry sync is executed."
 						}
 					}
 				},
@@ -4475,9 +4524,27 @@
 						"Delete Account: Permanently purge your Xernerx account, appearance settings, credits, levels, subscriptions, and Virtue records across our databases."
 					]
 				},
+				"licensing": {
+					"title": "8. Software & Ecosystem Licensing",
+					"intro": "To protect platform integrity, intellectual property, and open-source developer freedom, Xernerx Studios enforces a strict two-tier licensing model across all repositories and packages in the Xernerx Studios workspace:",
+					"proprietaryTitle": "Xernerx Studios Proprietary & SaaS License v1.0:",
+					"proprietaryDesc": "Governs the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including Xernerx Blog, Xernerx Haste, and Xernerx CDN), standalone and suite Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), and the Xernerx Desktop and Mobile Clients. Prohibits unauthorized source code redistribution, reverse-engineering, or competing commercial deployments.",
+					"proprietaryLink": "Read the Xernerx Proprietary & SaaS License (/license)",
+					"plainTextLink": "View Plain-Text LICENSE",
+					"apacheTitle": "Apache License, Version 2.0 (Open-Source SDKs, Examples & Package Docs):",
+					"apacheDesc": "Governs all 8 standalone developer packages published to npm (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx), the canonical package documentation repository (docs), and the official starter examples repository (examples), granting perpetual copyright and patent licenses while protecting Xernerx Studios trademarks.",
+					"apacheLink": "Official Apache-2.0 License Text",
+					"packagesLink": "Browse @xernerx/* SDK Docs",
+					"githubLink": "GitHub Repositories",
+					"policiesPrefix": "All licenses operate alongside our ",
+					"termsLink": "Terms of Service",
+					"privacyLink": "Privacy Policy",
+					"andText": " and ",
+					"cookiesLink": "Cookie Policy"
+				},
 				"disclosure": {
-					"title": "8. Vulnerability Disclosure & Security Contact",
-					"content": "If you discover a potential security vulnerability across any Xernerx web application, API endpoint, NPM package, desktop client, or Discord bot, please report it responsibly so we can investigate and remediate it promptly.",
+					"title": "9. Vulnerability Disclosure & Security Contact",
+					"content": "If you discover a potential security vulnerability across any Xernerx web application, API endpoint, NPM package, desktop client, or Discord bot, please report it responsibly (as outlined in our repository SECURITY.md policies) so we can investigate and remediate it promptly.",
 					"emailPrefix": "Report security issues directly to",
 					"email": "security@xernerx.com",
 					"issuesLinkText": "or open a confidential report via the Issue Tracker on info.xernerx.com."
@@ -4833,11 +4900,14 @@
 		},
 		"changelog": {
 			"category": "Applications",
+			"botsCategory": "Discord Bots",
 			"packagesCategory": "NPM Packages",
 			"filterAll": "All Changelogs",
 			"filterApps": "Web Applications",
+			"filterBots": "Discord Bots",
 			"filterPackages": "NPM Packages",
 			"viewPackageDocs": "Package Docs",
+			"viewBotProfile": "Bot Profile",
 			"noLogs": "No changelogs found.",
 			"title": "{name} Changelog",
 			"subtitle": "See the latest updates and release notes.",
@@ -4850,6 +4920,7 @@
 			"latestVersionBadge": "Latest: v{version}",
 			"kpi": {
 				"appsTracked": "Web Applications",
+				"botsTracked": "Discord Bots",
 				"packagesTracked": "SDK Packages",
 				"releasesInFeed": "Releases in Feed"
 			}
@@ -4975,7 +5046,7 @@
 				"store": "Ecosystem store portal for Monthly & Annual subscriptions, the €0 Free Tier, the Ultra Ecosystem master pass, individual bot passes (Zodiac, Virtue, To-Do List Bot, Metamorphosis), Developer Pro, and server infrastructure.",
 				"cdn": "Distributed media content delivery network and private Vercel Blob storage with drag-and-drop/Ctrl+V upload, Public/Limited/Private access controls, /view/[id] web viewer, and /raw/[id] binary streaming.",
 				"docs": "Developer documentation hub featuring interactive REST API specs (/api/v1, /api/core, /api/secure) with an in-browser API Playground, CDN docs (/cdn), live GitHub/npm Package docs reader (/packages), and WebSocket Gateway RPC specs (/websocket).",
-				"info": "Support & feedback knowledgebank housing the chronological Platform Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
+				"info": "Support & feedback knowledgebank housing the chronological Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
 				"api": "Core backend HTTP gateway, Bearer token validator, Discord & Stripe webhook processor, live SVG/PNG/iframe widget renderer (/core/*, /v1/*/badge.svg), and rate-limited REST router.",
 				"admin": "Internal staff RBAC portal for managing Discord-synced roles, users, bots, servers, Staff Subscriptions, elevated API tokens, Translation Studio (/translations), application reviews, platform announcements, roadmap/issue/suggestion moderation, support configurations & tickets, and store catalog items.",
 				"blog": "Official newsroom, security & trust reports, engineering deep-dives, product announcements, and RSS syndication (/rss.xml)."
@@ -5047,8 +5118,8 @@
 				"description": "You can use clean vanity routes on any Xernerx domain: /support and /discord open our official Discord community, /github opens our GitHub organization, and /npm opens our npm package suite. On xernerx.com you can use /invite (or /invite/[slug]), /desktop (for /download), and /careers or /jobs (for /applications). On info.xernerx.com you can use /bugs (for /issues) and /help (for /faq). On account.xernerx.com every settings tab has a direct vanity path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
 			},
 			"card6": {
-				"title": "How do the Suggestion Centre (/suggestions) and Platform Roadmap (/roadmap) work?",
-				"description": "In the Suggestion Centre (info.xernerx.com/suggestions), you can filter ideas by product, sort by Most Upvoted, Newest, or Upvoted by Me, and submit new feature ideas (with real-time duplicate detection as you type). Popular suggestions are promoted by staff to the Platform Roadmap (info.xernerx.com/roadmap), which tracks milestones across Idea, Planned, In Progress, and Released stages alongside live Avg Issue Resolution Time metrics and the Known Issues Tracker. Click Notify Me (Watching) on any roadmap milestone to receive an automatic notification the moment it is released."
+				"title": "How do the Suggestion Centre (/suggestions) and Roadmap (/roadmap) work?",
+				"description": "In the Suggestion Centre (info.xernerx.com/suggestions), you can filter ideas by product, sort by Most Upvoted, Newest, or Upvoted by Me, and submit new feature ideas (with real-time duplicate detection as you type). Popular suggestions are promoted by staff to the Roadmap (info.xernerx.com/roadmap), which tracks milestones across Idea, Planned, In Progress, and Released stages alongside live Avg Issue Resolution Time metrics and the Known Issues Tracker. Click Notify Me (Watching) on any roadmap milestone to receive an automatic notification the moment it is released."
 			}
 		},
 		"desktop": {
@@ -5594,7 +5665,19 @@
 				"shardGuilds": "{count} servers",
 				"shardPing": "{ping}ms",
 				"shardHealthy": "Healthy",
+				"longestStreakLabel": "Longest Streak: {duration}",
+				"allShardsUptime": "All Shards",
+				"shardUptimeFilter": "Shard #{id} Uptime",
 				"customTelemetryTitle": "Custom Bot Telemetry",
+				"statsLogTitle": "Daily Telemetry Snapshot Log",
+				"statsLogSubtitle": "Inspect individual timestamped stat snapshots by date and remove corrupted entries.",
+				"statsLogSearchPlaceholder": "Filter snapshots by count or time...",
+				"statsLogEntriesCount": "{count} snapshots",
+				"statsLogEmpty": "No stat snapshots recorded on {date}.",
+				"statsLogDeleteTitle": "Delete Stat Snapshot",
+				"statsLogDeleteConfirm": "Are you sure you want to permanently delete the stat snapshot from {time}?",
+				"statsLogDeletedToast": "Stat snapshot deleted",
+				"statsLogDeleteErrorToast": "Failed to delete stat snapshot",
 				"remainingToNextTier": "{remaining} away from {target}"
 			},
 			"verifiedBadge": "Verified",
@@ -8061,7 +8144,7 @@
 			}
 		},
 		"roadmap": {
-			"title": "Platform Roadmap",
+			"title": "Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
 			"searchPlaceholder": "Search roadmap milestones and known issues...",
 			"allProducts": "All Products",

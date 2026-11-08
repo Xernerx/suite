@@ -2,18 +2,25 @@
 
 import { cookies, headers } from 'next/headers';
 
+const LEGACY_PAGE_WIDTH_PERCENT: Record<string, number> = {
+	compact: 75,
+	default: 90,
+	wide: 95,
+	full: 100,
+};
+
 function resolvePageWidthValue(pageWidth?: string): string {
-	switch (pageWidth) {
-		case 'compact':
-			return '80rem';
-		case 'wide':
-			return '112rem';
-		case 'full':
-			return '100%';
-		case 'default':
-		default:
-			return '96rem';
+	if (pageWidth) {
+		const trimmed = pageWidth.trim().toLowerCase();
+		if (trimmed in LEGACY_PAGE_WIDTH_PERCENT) {
+			return `${LEGACY_PAGE_WIDTH_PERCENT[trimmed]}%`;
+		}
+		const num = parseInt(trimmed.replace('%', ''), 10);
+		if (!isNaN(num)) {
+			return `${Math.min(100, Math.max(60, Math.round(num / 5) * 5))}%`;
+		}
 	}
+	return '90%';
 }
 
 export async function getThemeLayoutProps() {
@@ -25,12 +32,13 @@ export async function getThemeLayoutProps() {
 
 	const accent = cookieStore.get('accent')?.value || '#8b7cf6';
 	const theme = cookieStore.get('theme')?.value || 'system';
+	const resolvedTheme = cookieStore.get('resolvedTheme')?.value;
 	const uiZoom = cookieStore.get('uiZoom')?.value;
 	const uiGap = cookieStore.get('uiGap')?.value;
 	const pageWidth = cookieStore.get('pageWidth')?.value;
 	const textScale = cookieStore.get('textScale')?.value;
 
-	const isLight = theme === 'light';
+	const isLight = theme === 'light' || (theme === 'system' && resolvedTheme === 'light');
 
 	const initialStyles: Record<string, string> = {
 		'--accent': accent,

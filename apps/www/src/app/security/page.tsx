@@ -223,6 +223,60 @@ export default function SecurityPage() {
 			),
 		},
 		{
+			id: 'licensing',
+			title: t('www.security.sections.licensing.title'),
+			content: (
+				<div className="space-y-4">
+					<p>{t('www.security.sections.licensing.intro')}</p>
+					<ul className="list-disc pl-6 space-y-4">
+						<li>
+							<strong className="text-(--text)">{t('www.security.sections.licensing.proprietaryTitle')}</strong> {t('www.security.sections.licensing.proprietaryDesc')}{' '}
+							<span className="inline-flex flex-wrap items-center gap-3 mt-1">
+								<Link href="/license" className="text-(--accent) hover:underline font-medium">
+									{t('www.security.sections.licensing.proprietaryLink')}
+								</Link>
+								<span>•</span>
+								<Link href="/license#plain-text-license" className="text-(--accent) hover:underline font-medium">
+									{t('www.security.sections.licensing.plainTextLink')}
+								</Link>
+							</span>
+						</li>
+						<li>
+							<strong className="text-(--text)">{t('www.security.sections.licensing.apacheTitle')}</strong> {t('www.security.sections.licensing.apacheDesc')}{' '}
+							<span className="inline-flex flex-wrap items-center gap-3 mt-1">
+								<a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline font-medium">
+									{t('www.security.sections.licensing.apacheLink')}
+								</a>
+								<span>•</span>
+								<a href={getEnvUrl('https://docs.xernerx.com/packages')} className="text-(--accent) hover:underline font-medium">
+									{t('www.security.sections.licensing.packagesLink')}
+								</a>
+								<span>•</span>
+								<a href="https://github.com/xernerx" target="_blank" rel="noopener noreferrer" className="text-(--accent) hover:underline font-medium">
+									{t('www.security.sections.licensing.githubLink')}
+								</a>
+							</span>
+						</li>
+					</ul>
+					<p className="text-sm">
+						{t('www.security.sections.licensing.policiesPrefix')}
+						<Link href="/terms" className="text-(--accent) hover:underline font-medium">
+							{t('www.security.sections.licensing.termsLink')}
+						</Link>
+						{', '}
+						<Link href="/privacy" className="text-(--accent) hover:underline font-medium">
+							{t('www.security.sections.licensing.privacyLink')}
+						</Link>
+						{t('www.security.sections.licensing.andText')}
+						<Link href="/cookies" className="text-(--accent) hover:underline font-medium">
+							{t('www.security.sections.licensing.cookiesLink')}
+						</Link>
+						.
+					</p>
+				</div>
+			),
+		},
+		{
 			id: 'disclosure',
 			title: t('www.security.sections.disclosure.title'),
 			content: (

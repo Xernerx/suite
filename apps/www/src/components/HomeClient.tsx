@@ -27,6 +27,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 	const servicesRef = useRef<HTMLDivElement>(null);
 	const softwareRef = useRef<HTMLDivElement>(null);
+	const servicesTrackRef = useRef<HTMLDivElement>(null);
+	const softwareTrackRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLElement | null>(null);
 	const [ready, setReady] = useState(false);
 	const [matrixConstructed, setMatrixConstructed] = useState(true);
@@ -63,7 +65,10 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					staticSoftwareItems[0],
 					...publicPackages.map((pkg) => {
 						const fallbackDesc = t('www.software.packageDesc', { name: pkg.name });
-						const cleanDesc = pkg.desc?.trim();
+						const cleanDesc = pkg.desc
+							?.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+							.replace(/\s*\(https?:\/\/[^)]+\)/g, '')
+							.trim();
 						const finalDesc = !cleanDesc ? fallbackDesc : cleanDesc.length < 45 ? `${cleanDesc.endsWith('.') ? cleanDesc : `${cleanDesc}.`} ${fallbackDesc}` : cleanDesc;
 						return {
 							icon: <Boxes size={24} />,
@@ -82,10 +87,20 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 	}, []);
 
 	const { scrollYProgress: servicesProgress } = useScroll(ready ? { target: servicesRef, container: containerRef } : {});
-	const servicesX = useTransform(servicesProgress, [0, 1], ['0%', '-60%']);
+	const servicesX = useTransform(servicesProgress, (v) => {
+		const el = servicesTrackRef.current;
+		if (!el || !el.parentElement) return '0px';
+		const maxShift = Math.max(0, el.scrollWidth - el.parentElement.clientWidth);
+		return `${-v * maxShift}px`;
+	});
 
 	const { scrollYProgress: softwareProgress } = useScroll(ready ? { target: softwareRef, container: containerRef } : {});
-	const softwareX = useTransform(softwareProgress, [0, 1], ['0%', '70%']);
+	const softwareX = useTransform(softwareProgress, (v) => {
+		const el = softwareTrackRef.current;
+		if (!el || !el.parentElement) return '0px';
+		const maxShift = Math.max(0, el.scrollWidth - el.parentElement.clientWidth);
+		return `${v * maxShift}px`;
+	});
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -329,8 +344,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 						<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">{t('www.sections.consumer.description')}</p>
 					</div>
 
-					<div className="relative z-10 w-full overflow-hidden flex items-center h-[430px]">
-						<motion.div style={{ x: servicesX }} className="flex gap-8 px-6 md:px-12 xl:px-[15vw] absolute left-0 w-max">
+					<div className="relative z-10 w-full overflow-x-clip flex items-center min-h-[460px] py-6">
+						<motion.div ref={servicesTrackRef} style={{ x: servicesX }} className="flex items-stretch gap-8 px-6 md:px-12 xl:px-[15vw] absolute left-0 w-max">
 							{consumerServiceItems.map((item) => (
 								<ServiceProfileCard key={item.id} item={item} profile={botProfiles[item.botId]} />
 							))}
@@ -340,7 +355,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			</section>
 
 			{/* DEVELOPER SOFTWARE (Mirrored Horizontal Scroll) */}
-			<section id="software" ref={softwareRef} className="relative h-[200dvh]">
+			<section id="software" ref={softwareRef} className="relative h-[300dvh]">
 				<div className="sticky top-0 h-dvh flex flex-col justify-center overflow-hidden">
 					<div className="w-full text-right mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
 						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -349,8 +364,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 						<p className="max-w-2xl ml-auto text-base text-(--text-muted) leading-relaxed">{t('www.sections.developer.description')}</p>
 					</div>
 
-					<div className="relative z-10 w-full overflow-hidden flex items-center h-[370px]">
-						<motion.div style={{ x: softwareX }} className="flex gap-8 px-6 md:px-12 xl:px-[15vw] absolute right-0 w-max">
+					<div className="relative z-10 w-full overflow-x-clip flex items-center min-h-[420px] py-6">
+						<motion.div ref={softwareTrackRef} style={{ x: softwareX }} className="flex items-stretch gap-8 px-6 md:px-12 xl:px-[15vw] absolute right-0 w-max">
 							{softwareItems.map((item) => (
 								<DeveloperSoftwareCard key={item.title} item={item} href={getEnvUrl(item.link)} />
 							))}

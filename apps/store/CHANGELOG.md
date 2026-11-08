@@ -4,6 +4,41 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.10.2
+
+### Patch Changes
+
+- ## Streamlined Store Header, Unified Credit Bar & Category Search
+  
+  Simplified the Xernerx Store header, merged the Credit Wallet and 7-Day Streak Ladder into a single bar, and added search and multi-category filtering for credit perks.
+  
+  ### Added
+  
+  - **Credit Perk Search & Multi-Category Filter**: Added a `Ctrl + K` search input and multi-select category dropdown to filter redeemable credit perks and top-up packs.
+  
+  ### Changed
+  
+  - **Unified Store Header & Page Width Alignment**: Consolidated the store hero and ecosystem switcher into a single horizontal header bar aligned with the full page width.
+  - **Compact Wallet & 7-Day Streak Bar**: Merged the credit balance display, 7-day daily streak pills, claim timer, and top-up button into a single glass bar.
+- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 0.10.0
 
 ### Minor Changes
@@ -21,9 +56,6 @@ All notable changes to the `store` application will be documented in this file.
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -34,7 +66,6 @@ All notable changes to the `store` application will be documented in this file.
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -55,11 +86,6 @@ All notable changes to the `store` application will be documented in this file.
     - **Build Preparation Pipeline**: Updated package build and initialization scripts to run automated workspace asset synchronization.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
     - @xernerx/lib@1.21.0
@@ -79,10 +105,6 @@ All notable changes to the `store` application will be documented in this file.
     - **Consumer Bot Pass Documentation (`README.md`)**: Updated consumer bot pass references from `To-Do` to **`To-Do List Bot`** for consistency across the Xernerx Store.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
@@ -99,11 +121,6 @@ All notable changes to the `store` application will be documented in this file.
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
     - @xernerx/lib@1.19.0
@@ -115,9 +132,6 @@ All notable changes to the `store` application will be documented in this file.
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0

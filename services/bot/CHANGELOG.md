@@ -2,6 +2,20 @@
 
 # bot
 
+## 2.2.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.22.2
+
+## 2.2.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.22.1
+
 ## 2.2.2
 
 ### Patch Changes
@@ -588,7 +602,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/lib@0.5.3
 
@@ -663,7 +676,6 @@
 
 - Xerple and Crean
 - Xerple and Crean
-- Updated dependencies
 - Updated dependencies
     - @xernerx/lib@0.3.5
 

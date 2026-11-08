@@ -2,13 +2,33 @@
 
 # Changelog
 
-## 1.3.6
+## 1.3.8
 
 ### Patch Changes
 
 - Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 1.3.7
+
+### Patch Changes
+
 - Updated dependencies
-- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
+## 1.3.6
+
+### Patch Changes
+
 - Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
@@ -20,7 +40,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -41,11 +60,6 @@
     - **Pre-Build Preparation**: Synced package initialization scripts with the workspace preparation pipeline.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
     - @xernerx/lib@1.21.0
@@ -57,10 +71,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
@@ -75,11 +85,6 @@
 
 - Synced the updated color-variant branding icons, logos, banners, and transparent dot-matrix animations across the Hosting console.
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
     - @xernerx/lib@1.19.0
@@ -92,9 +97,6 @@
 ### Patch Changes
 
 -   - **Hosting Console Localization & Telemetry**: Synced hosting node console views and status labels with the central localization dictionary.
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0

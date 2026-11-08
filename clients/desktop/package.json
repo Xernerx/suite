@@ -1,7 +1,7 @@
 {
 	"name": "desktop",
 	"productName": "Xernerx App",
-	"version": "2.6.1",
+	"version": "2.6.2",
 	"description": "Xernerx App",
 	"main": "dist/main.js",
 	"type": "module",
@@ -12,7 +12,7 @@
 		"dev": "tsc && electron ."
 	},
 	"author": "Xernerx Studios",
-	"license": "MIT",
+	"license": "SEE LICENSE IN LICENSE",
 	"packageManager": "pnpm@11.24.0",
 	"dependencies": {
 		"@xernerx/terminal": "^1.2.0",

@@ -3,14 +3,15 @@
 
 import { useDictionary, useEnvironment, useSidebar, useToast } from '@xernerx/providers';
 import { Button, Input, Markdown } from '@xernerx/ui';
-import { ExternalLink, LayoutDashboard, Link2, Package, Rss, Tag } from 'lucide-react';
+import { Bot, ExternalLink, LayoutDashboard, Link2, Package, Rss } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export interface ChangelogEntry {
 	appName: string;
 	content: string;
-	group?: 'applications' | 'packages';
+	group?: 'applications' | 'bots' | 'packages';
 	docsHref?: string;
+	botHref?: string;
 }
 
 function toVersionId(headingText: string): string {
@@ -45,27 +46,30 @@ function normalizeChangelogBody(raw: string): string {
 			.replace(/^([ \t]*[-*][ \t]*)\r?\n+[ \t]+/gm, '$1')
 			.replace(/^[ \t]*[-*][ \t]*$\r?\n?/gm, '')
 			.replace(/^###[ \t]+(?:Major|Minor|Patch)[ \t]+Changes[ \t]*(?:\r?\n)*(?=#+|\s*$)/gim, '')
+			.replace(/(?:^[ \t]*[-*][ \t]+Updated dependencies[^\r\n]*\r?\n)+([ \t]*[-*][ \t]+Updated dependencies)/gim, '$1')
 			.trim()
 	);
 }
 
 const REACTION_EMOJIS = ['🔥', '🚀', '❤️', '🎉'] as const;
 
-const CLIENT_APPS = [
-	{ id: 'app', name: 'App' },
-	{ id: 'portal', name: 'Portal' },
-	{ id: 'account', name: 'Account' },
-	{ id: 'admin', name: 'Admin' },
-	{ id: 'hosting', name: 'Hosting' },
-	{ id: 'api', name: 'API' },
-	{ id: 'cdn', name: 'CDN' },
-	{ id: 'docs', name: 'Docs' },
-	{ id: 'info', name: 'Info' },
-	{ id: 'store', name: 'Store' },
-	{ id: 'haste', name: 'Haste' },
-	{ id: 'blog', name: 'Blog' },
-	{ id: 'www', name: 'Website' },
-] as const;
+const CLIENT_APPS = (
+	[
+		['app', 'App'],
+		['portal', 'Portal'],
+		['account', 'Account'],
+		['admin', 'Admin'],
+		['hosting', 'Hosting'],
+		['api', 'API'],
+		['cdn', 'CDN'],
+		['docs', 'Docs'],
+		['info', 'Info'],
+		['store', 'Store'],
+		['haste', 'Haste'],
+		['blog', 'Blog'],
+		['www', 'Website'],
+	] as const
+).map(([id, name]) => ({ id, name }));
 
 export default function ChangelogClient({ changelogs: initialChangelogs }: { changelogs: ChangelogEntry[] }) {
 	const { setNavItems, clearNavItems, show, setView, view } = useSidebar();
@@ -75,7 +79,6 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 
 	const [fallbackApps, setFallbackApps] = useState<ChangelogEntry[]>([]);
 	const [search, setSearch] = useState('');
-	const [groupFilter, setGroupFilter] = useState<'all' | 'applications' | 'packages'>('all');
 	const [activeVersionId, setActiveVersionId] = useState<string | null>(null);
 	const [reactions, setReactions] = useState<Record<string, Record<string, number>>>({});
 	const [reactedMap, setReactedMap] = useState<Record<string, boolean>>({});
@@ -86,8 +89,9 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 		const missing = fallbackApps.filter((a) => !existingNames.has(a.appName.toLowerCase()));
 		if (missing.length === 0) return initialChangelogs;
 		const apps = [...initialChangelogs.filter((c) => (c.group || 'applications') === 'applications'), ...missing];
+		const bots = initialChangelogs.filter((c) => c.group === 'bots');
 		const pkgs = initialChangelogs.filter((c) => c.group === 'packages');
-		return [...apps, ...pkgs];
+		return [...apps, ...bots, ...pkgs];
 	}, [initialChangelogs, fallbackApps]);
 
 	useEffect(() => {
@@ -155,51 +159,37 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 		} catch {}
 	};
 
-	useEffect(() => {
-		show();
-	}, [show]);
+	const selectLogItem = (log: ChangelogEntry) => {
+		setView(`changelog-${log.appName.toLowerCase()}`);
+		setSearch('');
+		setActiveVersionId(null);
+		window.history.replaceState(null, '', `#${log.appName.toLowerCase()}`);
+	};
 
 	useEffect(() => {
-		const items = changelogs.map((log) => {
-			const isPkg = log.group === 'packages';
-			const viewKey = `changelog-${log.appName.toLowerCase()}`;
-			return {
-				label: log.appName,
-				category: isPkg ? t('www.changelog.packagesCategory') : t('www.changelog.category'),
-				icon: (isPkg ? Package : LayoutDashboard) as any,
-				view: viewKey,
-				onClick: () => {
-					setView(viewKey);
-					setSearch('');
-					setActiveVersionId(null);
-					window.history.replaceState(null, '', `#${log.appName.toLowerCase()}`);
-				},
-			};
-		});
+		show();
+		const items = changelogs.map((log) => ({
+			label: log.appName,
+			category: log.group === 'packages' ? t('www.changelog.packagesCategory') : log.group === 'bots' ? t('www.changelog.botsCategory') : t('www.changelog.category'),
+			icon: (log.group === 'packages' ? Package : log.group === 'bots' ? Bot : LayoutDashboard) as any,
+			view: `changelog-${log.appName.toLowerCase()}`,
+			onClick: () => selectLogItem(log),
+		}));
 		setNavItems(items);
-		if (items.length > 0) {
-			if (!hasAppliedUrlParam.current) {
-				hasAppliedUrlParam.current = true;
-				const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
-				const rawHash = typeof window !== 'undefined' && window.location.hash ? decodeURIComponent(window.location.hash.substring(1)).toLowerCase() : null;
-				const targetItem = (itemParam ? decodeURIComponent(itemParam).toLowerCase() : null) || rawHash;
-				const match = targetItem ? items.find((i) => i.view === `changelog-${targetItem}` || i.view === `changelog-@xernerx/${targetItem}`) : null;
-				if (match && view !== match.view) setView(match.view);
-				else if (!view) setView(items[0].view);
-			} else if (!view) {
-				setView(items[0].view);
-			}
+		if (items.length > 0 && !hasAppliedUrlParam.current) {
+			hasAppliedUrlParam.current = true;
+			const itemParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('item') : null;
+			const rawHash = typeof window !== 'undefined' && window.location.hash ? decodeURIComponent(window.location.hash.substring(1)).toLowerCase() : null;
+			const targetItem = (itemParam ? decodeURIComponent(itemParam).toLowerCase() : null) || rawHash;
+			const match = targetItem ? items.find((i) => i.view === `changelog-${targetItem}` || i.view === `changelog-@xernerx/${targetItem}`) : null;
+			setView(match ? match.view : view || items[0].view);
+		} else if (items.length > 0 && !view) {
+			setView(items[0].view);
 		}
 		return () => clearNavItems();
 	}, [changelogs, setNavItems, clearNavItems, show, setView, view, t]);
 
-	const visibleLogs = useMemo(() => {
-		if (groupFilter === 'all') return changelogs;
-		return changelogs.filter((l) => (l.group || 'applications') === groupFilter);
-	}, [changelogs, groupFilter]);
-
-	const activeLog =
-		visibleLogs.find((log) => `changelog-${log.appName.toLowerCase()}` === view) || changelogs.find((log) => `changelog-${log.appName.toLowerCase()}` === view) || visibleLogs[0] || changelogs[0];
+	const activeLog = changelogs.find((log) => `changelog-${log.appName.toLowerCase()}` === view) || changelogs[0];
 
 	const parsedSections = useMemo(() => {
 		if (!activeLog?.content) return [];
@@ -262,13 +252,6 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 		document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 	};
 
-	const selectLogItem = (log: ChangelogEntry) => {
-		setView(`changelog-${log.appName.toLowerCase()}`);
-		setSearch('');
-		setActiveVersionId(null);
-		window.history.replaceState(null, '', `#${log.appName.toLowerCase()}`);
-	};
-
 	if (!activeLog) {
 		return (
 			<div className="flex flex-col w-full min-h-screen pt-24 px-4 sm:px-8 max-w-(--page-width) mx-auto">
@@ -282,152 +265,37 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 
 	return (
 		<div className="flex flex-col w-full min-h-screen pt-24 px-4 sm:px-8 max-w-(--page-width) mx-auto">
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-				<div className="flex flex-col gap-2">
-					<div className="flex flex-wrap items-center gap-2.5">
-						<h1 className="text-4xl md:text-5xl font-black text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{t('www.changelog.title', { name: activeLog.appName })}
-						</h1>
-						<span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
-							{activeLog.group === 'packages' ? t('www.changelog.packagesCategory') : t('www.changelog.category')}
-						</span>
-						{parsedSections[0]?.id && (
-							<button
-								type="button"
-								onClick={() => jumpToVersion(parsedSections[0].id)}
-								className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-(--accent) text-white shadow-xs hover:bg-(--hover-accent) transition-colors cursor-pointer"
-							>
-								{t('www.changelog.latestVersionBadge', { version: parsedSections[0].id })}
-							</button>
-						)}
-					</div>
-					<p className="text-lg text-(--text-muted)">{t('www.changelog.subtitle')}</p>
+			<div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 mb-8 border-b border-(--border)/10">
+				<div className="flex flex-col gap-1.5">
+					<h1 className="text-3xl sm:text-4xl font-black tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('www.changelog.title', { name: activeLog.appName })}
+					</h1>
+					<p className="text-sm sm:text-base text-(--text-muted)">{t('www.changelog.subtitle')}</p>
 				</div>
 
-				<div className="flex flex-wrap items-center gap-2 shrink-0">
-					{activeLog.docsHref && (
-						<Button variant="secondary" onClick={() => window.open(getEnvUrl(`https://docs.xernerx.com${activeLog.docsHref}`), '_blank')} className="flex items-center gap-2">
-							<Package size={15} className="text-(--accent)" />
-							<span>{t('www.changelog.viewPackageDocs')}</span>
+				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full md:w-auto">
+					<div className="w-full sm:w-96 lg:w-[420px]">
+						<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('www.changelog.searchPlaceholder')} />
+					</div>
+					{activeLog.botHref && (
+						<Button variant="secondary" onClick={() => window.open(getEnvUrl(`https://app.xernerx.com${activeLog.botHref}`), '_blank')} className="flex items-center gap-2 shrink-0">
+							<Bot size={15} className="text-(--accent)" />
+							<span className="hidden sm:inline">{t('www.changelog.viewBotProfile')}</span>
 							<ExternalLink size={13} />
 						</Button>
 					)}
-					<Button variant="secondary" onClick={() => window.open(getEnvUrl('https://api.xernerx.com/v1/changelog/rss.xml'), '_blank')} className="flex items-center gap-2">
+					{activeLog.docsHref && (
+						<Button variant="secondary" onClick={() => window.open(getEnvUrl(`https://docs.xernerx.com${activeLog.docsHref}`), '_blank')} className="flex items-center gap-2 shrink-0">
+							<Package size={15} className="text-(--accent)" />
+							<span className="hidden sm:inline">{t('www.changelog.viewPackageDocs')}</span>
+							<ExternalLink size={13} />
+						</Button>
+					)}
+					<Button variant="secondary" onClick={() => window.open(getEnvUrl('https://api.xernerx.com/v1/changelog/rss.xml'), '_blank')} className="flex items-center gap-2 shrink-0">
 						<Rss size={15} className="text-(--accent-orange)" />
-						{t('www.changelog.rssFeed')}
+						<span className="hidden sm:inline">{t('www.changelog.rssFeed')}</span>
 					</Button>
 				</div>
-			</div>
-
-			{/* 3-Card Release Telemetry Summary Strip */}
-			<div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-				{[
-					{ label: t('www.changelog.kpi.appsTracked'), value: changelogs.filter((c) => (c.group || 'applications') === 'applications').length, icon: LayoutDashboard },
-					{ label: t('www.changelog.kpi.packagesTracked'), value: changelogs.filter((c) => c.group === 'packages').length, icon: Package },
-					{ label: t('www.changelog.kpi.releasesInFeed'), value: parsedSections.length, icon: Tag },
-				].map(({ label: kpiLabel, value: kpiVal, icon: KpiIcon }) => (
-					<div key={kpiLabel} className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-4 shadow-sm flex items-center justify-between">
-						<div>
-							<span className="text-xs font-extrabold uppercase tracking-wider text-(--text-muted)">{kpiLabel}</span>
-							<p className="text-2xl font-bold text-(--text) mt-0.5" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{kpiVal}
-							</p>
-						</div>
-						<div className="p-2.5 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-							<KpiIcon size={18} />
-						</div>
-					</div>
-				))}
-			</div>
-
-			{/* Category Filter & Item Quick Switcher Bar */}
-			<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm p-3.5 mb-6 flex flex-col gap-3">
-				<div className="flex flex-wrap items-center gap-1.5 pb-2.5 border-b border-(--border)/10">
-					{(
-						[
-							{ id: 'all', label: t('www.changelog.filterAll'), icon: Tag },
-							{ id: 'applications', label: t('www.changelog.filterApps'), icon: LayoutDashboard },
-							{ id: 'packages', label: t('www.changelog.filterPackages'), icon: Package },
-						] as const
-					).map((tab) => {
-						const Icon = tab.icon;
-						const isSelected = groupFilter === tab.id;
-						return (
-							<button
-								key={tab.id}
-								type="button"
-								onClick={() => {
-									setGroupFilter(tab.id);
-									const firstInGroup = tab.id === 'all' ? changelogs[0] : changelogs.find((c) => (c.group || 'applications') === tab.id);
-									if (firstInGroup) selectLogItem(firstInGroup);
-								}}
-								className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all cursor-pointer ${
-									isSelected
-										? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-										: 'bg-(--background)/60 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/30'
-								}`}
-							>
-								<Icon size={13} />
-								<span>{tab.label}</span>
-							</button>
-						);
-					})}
-				</div>
-
-				<div className="flex flex-wrap items-center gap-1.5">
-					{visibleLogs.map((log) => {
-						const isCurrent = activeLog.appName === log.appName;
-						const isPkg = log.group === 'packages';
-						return (
-							<button
-								key={log.appName}
-								type="button"
-								onClick={() => selectLogItem(log)}
-								className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${isPkg ? 'font-mono' : ''} ${
-									isCurrent
-										? 'bg-(--accent)/15 text-(--accent) border-(--accent)/40 font-bold'
-										: 'bg-(--background)/50 text-(--text-muted) border-(--border)/10 hover:text-(--text) hover:border-(--accent)/25'
-								}`}
-							>
-								{isPkg ? <Package size={12} /> : <LayoutDashboard size={12} />}
-								<span>{log.appName}</span>
-							</button>
-						);
-					})}
-				</div>
-			</div>
-
-			{/* Search Bar & Version Quick-Jump Pills */}
-			<div className="flex flex-col gap-4 mb-10">
-				<div className="max-w-xl w-full">
-					<Input variant="search" shortcut={true} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('www.changelog.searchPlaceholder')} />
-				</div>
-
-				{parsedSections.length > 0 && (
-					<div className="flex flex-wrap items-center gap-1.5">
-						<span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-(--text-muted) mr-1">
-							<Tag size={12} className="text-(--accent)" />
-							{t('www.changelog.jumpToVersion')}
-						</span>
-						{parsedSections.slice(0, 12).map((sec) => {
-							const isSelected = activeVersionId === sec.id;
-							return (
-								<button
-									key={`${activeLog.appName}-pill-${sec.id}`}
-									type="button"
-									onClick={() => jumpToVersion(sec.id)}
-									className={`text-xs font-mono font-semibold px-2.5 py-1 rounded-full border transition-all cursor-pointer backdrop-blur-md ${
-										isSelected
-											? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-											: 'bg-(--foreground)/30 text-(--text-muted) border-(--border)/10 shadow-xs hover:border-(--accent)/40 hover:text-(--text)'
-									}`}
-								>
-									v{sec.id}
-								</button>
-							);
-						})}
-					</div>
-				)}
 			</div>
 
 			{filteredSections.length === 0 && search.trim() ? (

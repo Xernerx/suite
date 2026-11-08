@@ -31,6 +31,8 @@ export function Header() {
 	const hasHostingAccess = hasPermission('hosting');
 	const { effectiveControls, isRightAligned } = useWindowControlsStyle();
 	const [isElectron, setIsElectron] = useState(false);
+	const [isDesktopRunning, setIsDesktopRunning] = useState(false);
+	const [desktopBridgePort, setDesktopBridgePort] = useState<number>(41990);
 
 	const { data: session } = useSession();
 	const { user: discordUser, loading: userLoading } = useUser();
@@ -94,6 +96,72 @@ export function Header() {
 	}, []);
 
 	const isApp = type === 'application' || isElectron;
+
+	useEffect(() => {
+		if (!isMounted || isApp || typeof window === 'undefined') return;
+		let cancelled = false;
+		const ports = [41990, 41991, 41992];
+
+		const checkDesktopRunning = async () => {
+			for (const port of ports) {
+				try {
+					const controller = new AbortController();
+					const timeout = setTimeout(() => controller.abort(), 1200);
+					const res = await fetch(`http://127.0.0.1:${port}/status`, {
+						method: 'GET',
+						cache: 'no-store',
+						signal: controller.signal,
+					});
+					clearTimeout(timeout);
+					if (res.ok) {
+						const data = await res.json();
+						if (data?.running && data?.app === 'xernerx-desktop') {
+							if (!cancelled) {
+								setIsDesktopRunning(true);
+								setDesktopBridgePort(port);
+							}
+							return;
+						}
+					}
+				} catch {}
+			}
+			if (!cancelled) setIsDesktopRunning(false);
+		};
+
+		void checkDesktopRunning();
+		const handleFocusOrVis = () => {
+			if (document.visibilityState === 'visible') void checkDesktopRunning();
+		};
+		window.addEventListener('focus', handleFocusOrVis);
+		document.addEventListener('visibilitychange', handleFocusOrVis);
+		const interval = setInterval(() => {
+			if (document.visibilityState === 'visible') void checkDesktopRunning();
+		}, 12000);
+
+		return () => {
+			cancelled = true;
+			window.removeEventListener('focus', handleFocusOrVis);
+			document.removeEventListener('visibilitychange', handleFocusOrVis);
+			clearInterval(interval);
+		};
+	}, [isMounted, isApp]);
+
+	const handleOpenInDesktop = async () => {
+		if (typeof window === 'undefined') return;
+		const currentUrl = window.location.href;
+		try {
+			const controller = new AbortController();
+			const timeout = setTimeout(() => controller.abort(), 1200);
+			const res = await fetch(`http://127.0.0.1:${desktopBridgePort}/open?url=${encodeURIComponent(currentUrl)}`, {
+				method: 'GET',
+				cache: 'no-store',
+				signal: controller.signal,
+			});
+			clearTimeout(timeout);
+			if (res.ok) return;
+		} catch {}
+		window.location.href = `xernerx://open?url=${encodeURIComponent(currentUrl)}`;
+	};
 
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -288,15 +356,17 @@ export function Header() {
 					>
 						{!isApp && preferences.showHeaderDownload && (
 							<div className="hidden sm:flex [.is-electron_&]:!hidden items-center gap-2">
-								<button
-									type="button"
-									onClick={() => typeof window !== 'undefined' && (window.location.href = `xernerx://open?url=${encodeURIComponent(window.location.href)}`)}
-									title={t('components.header.openInDesktop')}
-									className="flex items-center gap-1.5 rounded-full bg-(--accent)/10 hover:bg-(--accent)/20 border border-(--accent)/30 px-2.5 py-1 text-xs font-bold text-(--accent) transition-colors cursor-pointer whitespace-nowrap"
-								>
-									<Monitor size={13} className="shrink-0" />
-									<span className="hidden lg:inline">{t('components.header.openInDesktop')}</span>
-								</button>
+								{isDesktopRunning && (
+									<button
+										type="button"
+										onClick={handleOpenInDesktop}
+										title={t('components.header.openInDesktop')}
+										className="flex items-center gap-1.5 rounded-full bg-(--accent)/10 hover:bg-(--accent)/20 border border-(--accent)/30 px-2.5 py-1 text-xs font-bold text-(--accent) transition-colors cursor-pointer whitespace-nowrap"
+									>
+										<Monitor size={13} className="shrink-0" />
+										<span className="hidden lg:inline">{t('components.header.openInDesktop')}</span>
+									</button>
+								)}
 								<motion.div
 									animate={{ width: isExpanded ? 'auto' : '20px' }}
 									onHoverStart={() => setIsExpanded(true)}

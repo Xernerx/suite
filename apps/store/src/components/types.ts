@@ -81,3 +81,39 @@ export interface ProductData {
 	description: string | null;
 	prices: CatalogPrice[];
 }
+
+export const CHILD_TO_BUNDLE: Record<string, string> = {
+	ambient_mesh_lava: 'ambient_scenes_pack',
+	ambient_cyber_grid: 'ambient_scenes_pack',
+	ambient_topography: 'ambient_scenes_pack',
+	ambient_nebula_cosmos: 'ambient_scenes_pack',
+	ambient_prism_caustics: 'ambient_scenes_pack',
+	surface_crystal: 'surface_styles_pack',
+	surface_holographic: 'surface_styles_pack',
+	surface_neon: 'surface_styles_pack',
+	surface_obsidian: 'surface_styles_pack',
+	frame_plasma_ring: 'profile_frames_pack',
+	frame_holo_crown: 'profile_frames_pack',
+	frame_cyber_hex: 'profile_frames_pack',
+	frame_solar_flare: 'profile_frames_pack',
+	nameplate_aurora_wave: 'profile_nameplates_pack',
+	nameplate_synth_horizon: 'profile_nameplates_pack',
+	nameplate_nebula_shimmer: 'profile_nameplates_pack',
+	nameplate_cyber_circuit: 'profile_nameplates_pack',
+	cursor_starlight_trail: 'cursor_fx_bundle',
+	cursor_plasma_sparks: 'cursor_fx_bundle',
+	cursor_cyber_reticle: 'cursor_fx_bundle',
+	cursor_sonic_rings: 'cursor_fx_bundle',
+	cursor_aurora_ribbon: 'cursor_fx_bundle',
+	skin_hud_tactical: 'overlay_skins_bundle',
+	skin_frosted_prism: 'overlay_skins_bundle',
+	skin_neon_arcade: 'overlay_skins_bundle',
+	skin_minimal_pill: 'overlay_skins_bundle',
+};
+
+export const FALLBACK_EUR_PRICES: Record<string, string> = {
+	'credits-500': '€5.00',
+	'credits-1200': '€10.00',
+	'credits-3250': '€25.00',
+	'credits-7000': '€50.00',
+};

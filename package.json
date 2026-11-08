@@ -4,6 +4,7 @@
 	"type": "module",
 	"description": "Xernerx Suite",
 	"author": "Xernerx Studios",
+	"license": "SEE LICENSE IN LICENSE",
 	"packageManager": "pnpm@11.24.0",
 	"engines": {
 		"node": ">=20"

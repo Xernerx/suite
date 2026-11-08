@@ -24,7 +24,7 @@ export async function GET() {
 - [Xernerx Documentation](https://docs.xernerx.com/): Interactive v1 REST API reference (/api/v1), open-source NPM package docs (/packages), CDN docs (/cdn), and WebSocket RPC specs (/websocket).
 - [Xernerx Account Hub](https://account.xernerx.com/): Unified Discord identity, theme & UI scaling, QR device pairing, scoped Bearer API tokens (xrx_), GDPR JSON data export, and self-service Virtue data deletion.
 - [Xernerx Store](https://store.xernerx.com/): Ultra Ecosystem bundle, Virtue Pass, To-Do List Bot Pass, Metamorphosis Pass, Zodiac Pass, Developer Pro API plan, and the Credit Store Cosmetics Vault.
-- [Xernerx Info & Support Hub](https://info.xernerx.com/): Live 9-service status matrix (/status), public platform roadmap (/roadmap), community suggestions (/suggestions), bug tracker (/issues), unified changelog (/changelog), and FAQ (/faq).
+- [Xernerx Info & Support Hub](https://info.xernerx.com/): Live 9-service status matrix (/status), public roadmap (/roadmap), community suggestions (/suggestions), bug tracker (/issues), unified changelog (/changelog), and FAQ (/faq).
 - [Xernerx Newsroom & Blog](https://blog.xernerx.com/): Official engineering deep-dives, security architecture reports, product announcements, and RSS feed (/rss.xml).
 - [Xernerx Desktop Client Download](https://www.xernerx.com/download): Native Electron companion app for Windows, macOS, and Linux with multi-account session isolation and an always-on-top in-game overlay (/overlay).
 
@@ -38,6 +38,7 @@ export async function GET() {
 - [@xernerx/websocket](https://docs.xernerx.com/packages/@xernerx/websocket): Bidirectional RPC client for the Xernerx WebSocket gateway.
 - [@xernerx/terminal](https://docs.xernerx.com/packages/@xernerx/terminal): Structured ANSI logger and CLI spinner toolkit.
 - [@xernerx/extension-builder](https://docs.xernerx.com/packages/@xernerx/extension-builder): Base extension lifecycle builder for @xernerx/framework.
+- [Xernerx Examples (Xernerx/examples)](https://github.com/Xernerx/examples): Official TypeScript (@xernerx/*) and JavaScript (xernerx) Discord bot starter templates and sharding examples.
 
 ## Security, Privacy & Legal Compliance
 

@@ -27,11 +27,12 @@ function getNestedJsonString(fileContent: string, keyPath: string[]): string | n
 	}
 }
 
-function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean; cookiesChanged: boolean; securityChanged: boolean } {
+function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean; cookiesChanged: boolean; securityChanged: boolean; licenseChanged: boolean } {
 	let termsChanged = false;
 	let privacyChanged = false;
 	let cookiesChanged = false;
 	let securityChanged = false;
+	let licenseChanged = false;
 
 	try {
 		const rawStatus = execSync('git status --porcelain').toString();
@@ -49,8 +50,11 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 			if (filePath.includes('apps/www/src/app/cookies')) {
 				cookiesChanged = true;
 			}
-			if (filePath.includes('apps/www/src/app/security')) {
+			if (filePath.includes('apps/www/src/app/security') || filePath === 'SECURITY.md') {
 				securityChanged = true;
+			}
+			if (filePath.includes('apps/www/src/app/license') || filePath === 'LICENSE') {
+				licenseChanged = true;
 			}
 
 			if (filePath.startsWith('packages/lib/src/dictionaries/') && filePath.endsWith('.json')) {
@@ -70,6 +74,7 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 					if (getNestedJsonString(currentRaw, ['www', 'privacy'])) privacyChanged = true;
 					if (getNestedJsonString(currentRaw, ['www', 'cookies'])) cookiesChanged = true;
 					if (getNestedJsonString(currentRaw, ['www', 'security'])) securityChanged = true;
+					if (getNestedJsonString(currentRaw, ['www', 'license'])) licenseChanged = true;
 				} else {
 					if (getNestedJsonString(currentRaw, ['www', 'terms']) !== getNestedJsonString(headRaw, ['www', 'terms'])) {
 						termsChanged = true;
@@ -86,6 +91,9 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 					if (getNestedJsonString(currentRaw, ['www', 'security']) !== getNestedJsonString(headRaw, ['www', 'security'])) {
 						securityChanged = true;
 					}
+					if (getNestedJsonString(currentRaw, ['www', 'license']) !== getNestedJsonString(headRaw, ['www', 'license'])) {
+						licenseChanged = true;
+					}
 				}
 			}
 		}
@@ -93,7 +101,7 @@ function detectPolicyChanges(): { termsChanged: boolean; privacyChanged: boolean
 		// Safely ignore git errors if not in a git repo
 	}
 
-	return { termsChanged, privacyChanged, cookiesChanged, securityChanged };
+	return { termsChanged, privacyChanged, cookiesChanged, securityChanged, licenseChanged };
 }
 
 function flattenDictionary(obj: Record<string, any>, prefix = '', out: Record<string, string> = {}): Record<string, string> {

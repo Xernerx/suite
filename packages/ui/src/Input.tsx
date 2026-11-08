@@ -3,8 +3,6 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Search, Command } from 'lucide-react';
-import { Button } from './Button';
-
 import { usePlatform } from '@xernerx/providers';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {
@@ -65,34 +63,31 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', re
 		const shortcutText = platform === 'macos' ? activeShortcut : `Ctrl + ${activeShortcut}`;
 
 		return (
-			<div className={`relative group w-full ${className}`}>
+			<div
+				className={`${baseClasses} relative group flex items-center gap-1.5 w-full h-10 pl-4 pr-1.5 rounded-2xl shadow-sm focus-within:ring-2 focus-within:ring-(--accent) focus-within:border-transparent ${className}`}
+			>
 				<input
 					ref={setRefs}
 					type="text"
 					data-search-shortcut={activeShortcut ? activeShortcut.toLowerCase() : undefined}
-					className={`${baseClasses} block w-full h-[56px] py-0 pl-6 pr-32 text-base rounded-full shadow-lg`}
+					className="flex-1 min-w-0 h-full bg-transparent border-none outline-none text-sm text-(--text) placeholder:text-(--text-muted) truncate"
 					onKeyDown={handleKeyDown}
 					{...(props as React.InputHTMLAttributes<HTMLInputElement>)}
 				/>
-				<div className="absolute inset-y-0 right-2 flex items-center gap-2">
-					{showShortcut && (
-						<div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-xl bg-(--background) border border-(--border)/10 text-xs text-(--text-muted) font-mono">
-							{platform === 'macos' ? <Command className="w-3 h-3" /> : null}
-							<span>{shortcutText}</span>
-						</div>
-					)}
-					<Button
-						type="button"
-						aria-label={props.placeholder ? String(props.placeholder) : 'Search'}
-						size="icon"
-						variant="primary"
-						className="rounded-full shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_40%,transparent)] w-10 h-10 p-0 flex items-center justify-center shrink-0 aspect-square"
-						style={{ borderRadius: '9999px' }}
-						onClick={handleSearchClick}
-					>
-						<Search className="w-4 h-4" />
-					</Button>
-				</div>
+				{showShortcut && (
+					<div className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-(--background) border border-(--border)/10 text-[11px] text-(--text-muted) font-mono shrink-0 pointer-events-none">
+						{platform === 'macos' ? <Command className="w-3 h-3" /> : null}
+						<span>{shortcutText}</span>
+					</div>
+				)}
+				<button
+					type="button"
+					aria-label={props.placeholder ? String(props.placeholder) : 'Search'}
+					className="rounded-xl bg-(--accent) text-(--accent-contrast) hover:bg-(--hover-accent) shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_35%,transparent)] w-7 h-7 p-0 flex items-center justify-center shrink-0 aspect-square transition-colors cursor-pointer active:scale-95"
+					onClick={handleSearchClick}
+				>
+					<Search className="w-3.5 h-3.5" />
+				</button>
 			</div>
 		);
 	}

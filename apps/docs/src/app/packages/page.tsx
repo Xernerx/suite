@@ -119,6 +119,9 @@ async function getPackages() {
 
 				try {
 					const docRes = await fetch(`https://raw.githubusercontent.com/Xernerx/docs/main/packages/${pkg.name}/${latestVersion}/docs.json`, {
+						headers: {
+							...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+						},
 						next: { revalidate: 300 },
 					});
 					if (!docRes.ok) return { ...pkg, description, hasChangelog };

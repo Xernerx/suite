@@ -2,13 +2,40 @@
 
 # Changelog
 
-## 1.3.5
+## 1.3.7
+
+### Patch Changes
+
+- ## Hydration Stability for Haste Studio & Viewer
+  
+  Fixed a server/client hydration mismatch when loading the Haste Studio editor and document viewer.
+  
+  ### Changed
+  
+  - **SSR Hydration Alignment**: Updated the Haste Studio editor and document viewer to render deterministically across server-side rendering and initial client hydration.
+- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 1.3.6
 
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
+## 1.3.5
+
+### Patch Changes
+
 - Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
@@ -20,7 +47,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -41,11 +67,6 @@
     - **Pre-Build Asset Synchronization**: Updated package initialization and build scripts to sync static assets automatically before Next.js builds.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
     - @xernerx/lib@1.21.0
@@ -57,10 +78,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
@@ -74,11 +91,6 @@
 ### Patch Changes
 
 - Updated the dynamic sitemap configuration and synced color-variant branding assets.
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
@@ -96,9 +108,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0

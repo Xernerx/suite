@@ -2,6 +2,51 @@
 
 # www
 
+## 0.24.1
+
+### Patch Changes
+
+- ## Developer Software Carousel & Package Card Refinements
+  
+  Fixed card clipping, horizontal scroll range calculation, and Markdown link formatting in the Developer Software showcase on the landing page.
+  
+  ### Changed
+  
+  - **Developer Software Horizontal Scroll**: Calculated exact horizontal scroll travel from container widths and prevented vertical card clipping across the Developer Software section.
+  - **Package Description Formatting**: Cleaned raw Markdown links from live npm README excerpts on landing page package cards.
+- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 0.24.0
+
+### Minor Changes
+
+- ## Ecosystem Licensing Page & Full Organization Policy Coverage
+  
+  Added the dedicated `/license` page and expanded `/terms`, `/privacy`, `/cookies`, and `/security` to cover the entire Xernerx Studios ecosystem.
+  
+  ### Added
+  
+  - **Software & Ecosystem Licensing Page (`/license`)**: Added an interactive licensing overview with 1-click plain-text `LICENSE` copy/download and two-tier coverage for the Xernerx Proprietary & SaaS License v1.0 and Apache-2.0 open-source SDKs.
+  
+  ### Changed
+  
+  - **Full Organization Policy Coverage (`/terms`, `/privacy`, `/cookies`, `/security`)**: Updated all legal and security pages to cover all 13 `*.xernerx.com` web applications, standalone and suite Discord bots (`Virtue`, `To-Do List Bot`, `Metamorphosis`, `Zodiac`, `Xernerx App`, `Xernerx Bot`), all 8 `@xernerx/*` & `xernerx` npm SDKs, `Xernerx/examples`, `Xernerx/docs`, and native Desktop/Mobile clients.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 0.23.2
 
 ### Patch Changes
@@ -16,9 +61,6 @@
     - **Public Sitemap**: Added `/cookies` to `sitemap.xml` and removed retired static routes.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -29,7 +71,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -54,11 +95,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
@@ -85,10 +121,6 @@
 ### Patch Changes
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0
     - @xernerx/providers@0.21.0
@@ -104,11 +136,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.14.0
     - @xernerx/feedback@0.5.0
@@ -126,9 +153,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.13.0
     - @xernerx/lib@1.18.0
@@ -1128,7 +1152,6 @@
 
 ### Patch Changes
 
-- Updated dependencies and fixed a loading state issue on app
 - Updated dependencies
     - @xernerx/components@0.2.21
     - @xernerx/feedback@0.0.22
@@ -1281,7 +1304,6 @@
 - Xerple and Crean
 - Xerple and Crean
 - Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.2.13
     - @xernerx/providers@0.3.6
     - @xernerx/feedback@0.0.14
@@ -1369,7 +1391,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/providers@0.3.0
     - @xernerx/components@0.2.7

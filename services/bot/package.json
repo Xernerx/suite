@@ -1,6 +1,6 @@
 {
 	"name": "bot",
-	"version": "2.2.2",
+	"version": "2.2.4",
 	"description": "Xernerx Bot Discord daemon for directory, stats, and guild synchronization",
 	"main": "dist/main.js",
 	"type": "module",
@@ -15,7 +15,7 @@
 	},
 	"keywords": [],
 	"author": "Xernerx Studios",
-	"license": "MIT",
+	"license": "SEE LICENSE IN LICENSE",
 	"packageManager": "pnpm@11.20.0",
 	"devDependencies": {
 		"@types/react": "^19.3.0",

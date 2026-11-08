@@ -343,6 +343,16 @@ export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey;
 		icon: ShieldCheck,
 	},
 	{
+		id: 'www-license',
+		section: 'support',
+		baseUrl: 'https://www.xernerx.com',
+		path: '/license',
+		label: 'Software & Ecosystem License',
+		subtitle: 'xernerx.com/license • Xernerx Proprietary & SaaS License v1.0 and Apache-2.0 Open-Source SDKs',
+		keywords: 'license proprietary saas apache-2.0 open source copyright trademarks legal',
+		icon: FileText,
+	},
+	{
 		id: 'www-terms',
 		section: 'support',
 		baseUrl: 'https://www.xernerx.com',

@@ -1,22 +1,84 @@
-<!-- @format -->
+XERNERX STUDIOS PROPRIETARY & SAAS LICENSE
+Version 1.0 — November 2026
 
-XERNERX STUDIOS PROPRIETARY LICENSE
+Copyright (c) 2022-2026 Xernerx Studios. All rights reserved.
 
-Copyright (c) 2024-2026 Xernerx Studios. All rights reserved.
+This software, source code, documentation, visual design system, and associated
+services (collectively, the "Software"), including the Xernerx Suite, Virtue,
+Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog,
+Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile Clients, are the
+proprietary property of Xernerx Studios ("Licensor").
 
-1. GRANT OF USE
-   Xernerx Studios grants you a limited, non-exclusive, non-transferable, revocable license to access and use the Xernerx Suite software, APIs, and services strictly for their intended purposes via official interfaces provided by Xernerx Studios.
+1. GRANT OF LIMITED SAAS & CLIENT ACCESS
+   Subject to your continuous compliance with this License and the Xernerx
+   Studios Terms of Service (https://xernerx.com/terms), Licensor grants you a
+   limited, non-exclusive, non-transferable, non-sublicensable, revocable
+   license to access and use the Software solely through the official hosted
+   web applications (*.xernerx.com), official Discord bot instances, public
+   REST/WebSocket APIs, and official Desktop Client binaries distributed by
+   Xernerx Studios.
 
-2. RESTRICTIONS
-   You agree NOT to:
+   Authorized Xernerx Studios staff members, moderators, and translators are
+   granted limited permission to clone, inspect, and execute this repository
+   solely for internal development, testing, and localization on behalf of
+   Xernerx Studios.
 
-- Copy, modify, distribute, sell, or transfer any part of this software or source code.
-- Reverse-engineer, decompile, or attempt to extract the source code of this software, except where permitted by applicable law.
-- Remove, alter, or obscure any proprietary notices, watermarks, or copyright labels.
-- Use the software or APIs to build a competing product, service, or unauthorized integration without explicit written consent from Xernerx Studios.
+2. STRICT PROHIBITIONS & RESTRICTIONS
+   Except as expressly permitted in writing by Xernerx Studios, you may NOT:
+   (a) Copy, reproduce, publish, distribute, sublicense, sell, lease, or
+       transfer any part of the source code, compiled binaries, database
+       schemas, or UI components of the Software to any third party.
+   (b) Host, deploy, or operate a public, private, or commercial instance,
+       clone, fork, or derivative service based on the Software (including
+       competing Discord bots, dashboards, pastebins, or API gateways).
+   (c) Reverse-engineer, decompile, disassemble, scrape, or attempt to extract
+       the source code, underlying algorithms, or private API endpoints of the
+       Software, except to the minimum extent expressly required by applicable
+       law.
+   (d) Remove, alter, bypass, or obscure any copyright notices, watermarks,
+       telemetry hooks, authentication checks, rate limits, or license controls.
 
-3. DISCLAIMER OF WARRANTIES
-   THE SOFTWARE AND SERVICES ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY.
+3. TRADEMARKS, BRANDING & VISUAL ASSETS
+   This License grants no rights whatsoever to use the trade names, trademarks,
+   service marks, logos, mascot artwork, domain names, or branding assets of
+   Xernerx Studios—including "Xernerx", "Xernerx Studios", "Xernerx Suite",
+   "Virtue", "Metamorphosis", "Zodiac", "To-Do List Bot", and all static media
+   in `packages/public`. All goodwill generated from the use of Xernerx Studios
+   marks inures exclusively to Xernerx Studios.
 
-4. TERMINATION
-   This license is effective until terminated. Xernerx Studios reserves the right to terminate your access to the ecosystem immediately if you violate any terms outlined herein.
+4. CONTRIBUTOR LICENSE GRANT (CLA)
+   By submitting any pull request, code, localization dictionary translation,
+   documentation, or other contribution to this repository, you hereby grant
+   Xernerx Studios a perpetual, worldwide, non-exclusive, royalty-free,
+   irrevocable, transferable license (with the right to sublicense under any
+   proprietary or open-source terms) to use, reproduce, modify, distribute,
+   and commercialize your contribution as part of the Software.
+
+5. OPEN-SOURCE SDK CARVE-OUT
+   Standalone developer SDKs, starter examples, and package documentation
+   separately published by Xernerx Studios—specifically `@xernerx/framework`,
+   `@xernerx/stats`, `@xernerx/commands`, `@xernerx/websocket`,
+   `@xernerx/hooks`, `@xernerx/terminal`, `@xernerx/extension-builder`,
+   `xernerx`, `Xernerx/examples`, and `Xernerx/docs`—are licensed separately
+   under the Apache License, Version 2.0, and are not governed by the
+   proprietary restrictions of this License.
+
+6. TERMINATION
+   This License is effective until terminated. Your rights under this License
+   will terminate automatically and immediately without notice if you breach
+   any term hereof. Upon termination, you must immediately cease all use of
+   the Software and destroy all local copies of the source code or binaries in
+   your possession.
+
+7. DISCLAIMER OF WARRANTIES
+   THE SOFTWARE AND SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT
+   WARRANTY OF ANY KIND, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING BUT NOT
+   LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+   PURPOSE, TITLE, AND NON-INFRINGEMENT.
+
+8. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL XERNERX STUDIOS, ITS FOUNDERS, CONTRIBUTORS, OR AFFILIATES
+   BE LIABLE FOR ANY CLAIM, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING LOSS OF DATA, REVENUE, PROFITS, OR BUSINESS
+   INTERRUPTION) ARISING OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THIS
+   LICENSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.

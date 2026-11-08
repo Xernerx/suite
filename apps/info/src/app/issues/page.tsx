@@ -1,10 +1,9 @@
 /** @format */
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Input } from '@xernerx/ui';
+import { Button, Input, MultiSelector } from '@xernerx/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn } from 'lucide-react';
 import IssueCard from '@/components/issues/IssueCard';
@@ -36,14 +35,18 @@ export default function IssuesPage() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [product, setProduct] = useState('');
-	const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-	const [statusFilter, setStatusFilter] = useState<'all' | 'verified' | 'submitted' | 'release' | 'mine'>('all');
+	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [search, setSearch] = useState('');
 	const [showForm, setShowForm] = useState(false);
 	const [attachment, setAttachment] = useState<File | null>(null);
 	const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
 	const [preUploadedScreenshot, setPreUploadedScreenshot] = useState<string | null>(null);
 	const [uploading, setUploading] = useState(false);
+
+	const toggleProduct = (prod: string) => {
+		setSelectedProducts((prev) => (prev.includes(prod) ? prev.filter((p) => p !== prod) : [...prev, prod]));
+	};
 
 	useEffect(() => {
 		if (!attachment || !attachment.type.startsWith('image/')) {
@@ -60,7 +63,7 @@ export default function IssuesPage() {
 			const params = new URLSearchParams(window.location.search);
 			const qParam = params.get('q');
 			const prodParam = params.get('product');
-			const statusParam = params.get('status') as any;
+			const statusParam = params.get('status');
 			const reportParam = params.get('report');
 			const pageParam = params.get('page');
 			const screenshotParam = params.get('screenshot');
@@ -100,10 +103,11 @@ export default function IssuesPage() {
 						.catch(() => {});
 				}
 			} else if (prodParam) {
-				setSelectedProduct(prodParam);
+				setSelectedProducts(prodParam.split(',').filter(Boolean));
 			}
-			if (statusParam && ['all', 'verified', 'submitted', 'release'].includes(statusParam)) {
-				setStatusFilter(statusParam);
+			if (statusParam) {
+				const valid = statusParam.split(',').filter((s) => ['verified', 'submitted', 'release', 'mine'].includes(s));
+				if (valid.length > 0) setSelectedStatuses(valid);
 			}
 		}
 	}, []);
@@ -111,21 +115,25 @@ export default function IssuesPage() {
 	useEffect(() => {
 		if (typeof window === 'undefined' || loading) return;
 		const params = new URLSearchParams(window.location.search);
-		if (selectedProduct) params.set('product', selectedProduct);
+		if (selectedProducts.length > 0) params.set('product', selectedProducts.join(','));
 		else params.delete('product');
-		if (statusFilter !== 'all') params.set('status', statusFilter);
+		if (selectedStatuses.length > 0) params.set('status', selectedStatuses.join(','));
 		else params.delete('status');
 		const qs = params.toString();
 		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
-	}, [selectedProduct, statusFilter, loading]);
+	}, [selectedProducts, selectedStatuses, loading]);
 
 	const fetchIssues = async () => {
 		const botIds = new Set<string>();
+		let resolvedOrgBots: { id: string; name: string; avatarUrl: string | null }[] = [];
 
 		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/issues?status=open'));
-			if (!res.ok) throw new Error(`HTTP ${res.status}`);
-			const d = await res.json();
+			const [issRes, prodRes] = await Promise.all([
+				fetch(getEnvUrl('https://api.xernerx.com/info/issues?status=open'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/info/roadmap/products'), { credentials: 'include' }),
+			]);
+			if (!issRes.ok) throw new Error(`HTTP ${issRes.status}`);
+			const d = await issRes.json();
 			const list = d.data || [];
 			setIssues(list);
 			list.forEach((s: any) => {
@@ -135,28 +143,28 @@ export default function IssuesPage() {
 					botIds.add(String(s.productId).trim());
 				}
 			});
-		} catch (err: any) {
-			toast({ type: 'error', title: t('info.bugs.toasts.error'), description: err.message });
-		}
 
-		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/info/roadmap/products'));
-			if (res.ok) {
-				const d = await res.json();
-				setProducts(d.data || []);
-				if (Array.isArray(d.bots)) {
-					setOrgBots(d.bots);
-					d.bots.forEach((b: any) => {
-						if (b?.id && /^\d{17,20}$/.test(String(b.id).trim())) {
+			if (prodRes.ok) {
+				const pd = await prodRes.json();
+				setProducts(pd.data || []);
+				if (Array.isArray(pd.bots)) {
+					resolvedOrgBots = pd.bots;
+					setOrgBots(pd.bots);
+					pd.bots.forEach((b: any) => {
+						if (b?.id && /^\d{17,20}$/.test(String(b.id).trim()) && (!b.name || !b.avatarUrl)) {
 							botIds.add(String(b.id).trim());
 						}
 					});
 				}
 			}
-		} catch {}
+		} catch (err: any) {
+			toast({ type: 'error', title: t('info.bugs.toasts.error'), description: err.message });
+		}
 
+		const alreadyResolvedIds = new Set(resolvedOrgBots.filter((b) => b.name && b.avatarUrl).map((b) => String(b.id).trim()));
 		botIds.forEach((id) => {
-			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`))
+			if (alreadyResolvedIds.has(id)) return;
+			fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`), { credentials: 'include' })
 				.then((res) => (res.ok ? res.json() : null))
 				.then((d) => {
 					if (!d) return;
@@ -259,24 +267,31 @@ export default function IssuesPage() {
 	const filteredIssues = useMemo(() => {
 		const openIssues = issues.filter((s: any) => s.status !== 'resolved');
 		return openIssues.filter((s: any) => {
-			if (statusFilter === 'verified' && !s.acknowledged) return false;
-			if (statusFilter === 'submitted' && s.acknowledged) return false;
-			if (statusFilter === 'release' && !(s.resolvedApp && s.resolvedVersion)) return false;
-			if (statusFilter === 'mine' && !(user?.id && (s.authorId === user.id || s.author?.id === user.id))) return false;
+			if (selectedStatuses.length > 0) {
+				const matchesStatus = selectedStatuses.some((st) => {
+					if (st === 'verified') return Boolean(s.acknowledged);
+					if (st === 'submitted') return !s.acknowledged;
+					if (st === 'release') return Boolean(s.resolvedApp && s.resolvedVersion);
+					if (st === 'mine') return Boolean(user?.id && (s.authorId === user.id || s.author?.id === user.id));
+					return false;
+				});
+				if (!matchesStatus) return false;
+			}
 
 			const botInfo = resolveBot(s);
 			const prodName = botInfo?.name || s.productId || '';
-			if (selectedProduct) {
-				const selectedBot = resolveBot(selectedProduct);
-				const selectedName = selectedBot?.name || selectedProduct;
-				if (prodName.toLowerCase() !== selectedName.toLowerCase() && s.productId !== selectedProduct) {
-					return false;
-				}
+			if (selectedProducts.length > 0) {
+				const matchesAny = selectedProducts.some((sp) => {
+					const selectedBot = resolveBot(sp);
+					const selectedName = selectedBot?.name || sp;
+					return prodName.toLowerCase() === selectedName.toLowerCase() || s.productId === sp;
+				});
+				if (!matchesAny) return false;
 			}
 			if (!search) return true;
 			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
 		});
-	}, [search, selectedProduct, statusFilter, issues, orgBots, botProfiles, user?.id]);
+	}, [search, selectedProducts, selectedStatuses, issues, orgBots, botProfiles, user?.id]);
 
 	const handlePaste = (e: React.ClipboardEvent) => {
 		const items = e.clipboardData?.items;
@@ -294,16 +309,55 @@ export default function IssuesPage() {
 	};
 
 	return (
-		<div className="flex flex-col max-w-(--page-width) mx-auto w-full p-8 md:p-12 pb-24 gap-12">
-			<motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} className="text-center">
-				<h1 className="text-4xl font-bold mb-4 text-(--text)">{t('info.bugs.title')}</h1>
-				<p className="text-(--text-muted)">{t('info.bugs.description')}</p>
-			</motion.div>
+		<div className="flex flex-col max-w-(--page-width) mx-auto w-full min-h-screen pt-24 px-4 sm:px-8 pb-24">
+			<div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 mb-8 border-b border-(--border)/10 relative z-30">
+				<div className="flex flex-col gap-1.5">
+					<h1 className="text-3xl sm:text-4xl font-black tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('info.bugs.title')}
+					</h1>
+					<p className="text-sm sm:text-base text-(--text-muted) max-w-2xl">{t('info.bugs.description')}</p>
+				</div>
+
+				<div className="flex flex-col gap-1.5 w-full lg:w-auto">
+					<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
+						<div className="w-full sm:w-80 xl:w-96">
+							<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+						</div>
+						<MultiSelector
+							className="w-full sm:w-auto shrink-0"
+							placeholder={t('info.bugs.allProducts')}
+							value={selectedProducts}
+							onChange={setSelectedProducts}
+							options={availableProducts.map((prod) => {
+								const botInfo = resolveBot(prod);
+								return {
+									value: prod,
+									label: botInfo ? botInfo.name : prod,
+								};
+							})}
+						/>
+						<MultiSelector
+							className="w-full sm:w-auto shrink-0"
+							searchable={false}
+							placeholder={t('info.bugs.filters.all')}
+							value={selectedStatuses}
+							onChange={setSelectedStatuses}
+							options={[
+								{ value: 'verified', label: t('info.bugs.filters.verified'), color: 'var(--accent)' },
+								{ value: 'submitted', label: t('info.bugs.filters.submitted'), color: 'var(--accent-orange)' },
+								{ value: 'release', label: t('info.bugs.filters.release'), color: 'var(--accent-green)' },
+								...(user ? [{ value: 'mine', label: t('info.bugs.filters.mine'), color: 'var(--text-muted)' }] : []),
+							]}
+						/>
+					</div>
+					<p className="text-xs text-(--text-muted) px-2">{t('info.bugs.startTyping')}</p>
+				</div>
+			</div>
 
 			<div className="w-full">
 				{loading ? (
 					<div className="flex items-center justify-center py-24">
-						<Loading />
+						<Loading variant="small" />
 					</div>
 				) : (
 					<AnimatePresence mode="wait">
@@ -362,75 +416,9 @@ export default function IssuesPage() {
 								transition={{ duration: 0.2, ease: 'easeOut' }}
 								className="flex flex-col gap-4 w-full"
 							>
-								<div className="flex flex-col gap-2.5">
-									<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-									<div className="flex flex-wrap items-center justify-between gap-2 px-1">
-										<p className="text-xs text-(--text-muted)">{t('info.bugs.startTyping')}</p>
-										<div className="flex flex-wrap items-center gap-1 p-0.5 rounded-full bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-xs">
-											{(
-												[
-													{ id: 'all', label: t('info.bugs.filters.all') },
-													{ id: 'verified', label: t('info.bugs.filters.verified') },
-													{ id: 'submitted', label: t('info.bugs.filters.submitted') },
-													{ id: 'release', label: t('info.bugs.filters.release') },
-													...(user ? [{ id: 'mine', label: t('info.bugs.filters.mine') }] : []),
-												] as Array<{ id: 'all' | 'verified' | 'submitted' | 'release' | 'mine'; label: string }>
-											).map((opt) => (
-												<button
-													key={opt.id}
-													type="button"
-													onClick={() => setStatusFilter(opt.id)}
-													className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-														statusFilter === opt.id ? 'bg-(--accent) text-white shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-													}`}
-												>
-													{opt.label}
-												</button>
-											))}
-										</div>
-									</div>
-
-									{availableProducts.length > 0 && (
-										<div className="flex flex-wrap items-center gap-1.5 pt-1">
-											<button
-												type="button"
-												onClick={() => setSelectedProduct(null)}
-												className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-													selectedProduct === null
-														? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-														: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
-												}`}
-											>
-												{t('info.bugs.allProducts')}
-											</button>
-											{availableProducts.map((prod) => {
-												const botInfo = resolveBot(prod);
-												const isSelected = selectedProduct === prod;
-												return (
-													<button
-														key={prod}
-														type="button"
-														onClick={() => setSelectedProduct(isSelected ? null : prod)}
-														className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer ${
-															isSelected
-																? 'bg-(--accent) text-white border-(--accent) shadow-xs'
-																: 'bg-(--foreground)/30 backdrop-blur-md text-(--text-muted) border-(--border)/10 shadow-xs hover:bg-(--foreground)/50 hover:border-(--accent)/40 hover:text-(--text)'
-														}`}
-													>
-														{botInfo?.avatarUrl && (
-															<Image src={botInfo.avatarUrl} alt={botInfo.name} width={16} height={16} unoptimized className="w-4 h-4 rounded-full object-cover" />
-														)}
-														<span>{botInfo ? botInfo.name : prod}</span>
-													</button>
-												);
-											})}
-										</div>
-									)}
-								</div>
-
 								<AnimatePresence mode="popLayout">
 									{filteredIssues.map((s: any) => (
-										<IssueCard key={s.id} issue={s} botInfo={resolveBot(s)} selectedProduct={selectedProduct} onSelectProduct={setSelectedProduct} />
+										<IssueCard key={s.id} issue={s} botInfo={resolveBot(s)} onToggleProduct={toggleProduct} />
 									))}
 								</AnimatePresence>
 

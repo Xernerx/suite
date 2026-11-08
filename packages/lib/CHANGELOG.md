@@ -2,6 +2,31 @@
 
 # @xernerx/lib
 
+## 1.22.2
+
+### Patch Changes
+
+- ## Default Page Width & Store/Info Localization Updates
+  
+  Updated the default page width token to 90% and added localization strings for the streamlined Store and Info filter bars.
+  
+  ### Changed
+  
+  - **Default Page Width Token**: Updated `DEFAULT_LAYOUT_SCALING.pageWidth` to `90` (`90%` viewport width) with legacy `1400px` migration support.
+  - **Localization Dictionaries**: Added Store credit perk search/category strings and updated Roadmap titles across the English source dictionary.
+
+## 1.22.1
+
+### Patch Changes
+
+- ## Organization-Wide Legal, Security & Licensing Dictionary Strings
+  
+  Updated localization dictionaries for `/license`, `/terms`, `/privacy`, `/cookies`, and `/security`.
+  
+  ### Changed
+  
+  - **English & Locale Dictionaries (`en-GB.json`)**: Added `www.license.*` keys and expanded `www.terms.*`, `www.privacy.*`, `www.cookies.*`, and `www.security.*` to cover all repositories across the Xernerx Studios organization.
+
 ## 1.22.0
 
 ### Minor Changes

@@ -641,9 +641,6 @@
 						"desc": "Foutlogboeken, beveiligingsaudittrails en systeeminteracties om de platformstabiliteit te waarborgen, rate-limits te handhaven en misbruik te voorkomen."
 					}
 				},
-				"apiData": {
-					"title": "3. API-gegevensverzameling & verplichtingen voor ontwikkelaars"
-				},
 				"legalBasis": {
 					"title": "4. Juridische grondslag voor verwerking"
 				},
@@ -913,7 +910,6 @@
 			}
 		},
 		"roadmap": {
-			"title": "Platform Roadmap",
 			"description": "Onze chronologische reis van functies, optimalisaties en releases. Zie precies wat er aankomt en wanneer.",
 			"metrics": {
 				"avgResolutionTime": "Gemiddelde oplostijd van problemen",
@@ -950,7 +946,6 @@
 			}
 		},
 		"suggestions": {
-			"title": "Functie Sandbox",
 			"description": "Stem op ideeën of dien je eigen idee in. Populaire suggesties worden beoordeeld door ons team en toegevoegd aan de roadmap.",
 			"newSuggestion": "Nieuwe Suggestie",
 			"titlePlaceholder": "Titel",

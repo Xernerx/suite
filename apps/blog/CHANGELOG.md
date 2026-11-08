@@ -2,6 +2,29 @@
 
 # blog
 
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.15.5
+  - @xernerx/lib@1.22.2
+  - @xernerx/providers@0.22.4
+  - @xernerx/styles@0.4.2
+  - @xernerx/ui@0.8.5
+  - @xernerx/feedback@0.5.6
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 1.1.3
 
 ### Patch Changes
@@ -14,9 +37,6 @@
     - **Root Layout Shell**: Enabled `enableAds` on the shared `AppLayout` wrapper for consistent suite-wide newsroom banner rendering.
 
 - Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
     - @xernerx/components@0.15.3
     - @xernerx/lib@1.22.0
     - @xernerx/providers@0.22.2
@@ -27,7 +47,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.2
     - @xernerx/lib@1.21.1
@@ -49,11 +68,6 @@
     ### Changed
     - **Article Page & OpenGraph Rendering**: Updated article reader layout spacing, table-of-contents quick links, and dynamic OpenGraph image generation on `blog.xernerx.com/[slug]`.
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.1
     - @xernerx/feedback@0.5.2
@@ -78,10 +92,6 @@
 
 ### Patch Changes
 
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
-- Updated dependencies
 - Updated dependencies
     - @xernerx/components@0.15.0
     - @xernerx/lib@1.20.0

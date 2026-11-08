@@ -445,9 +445,6 @@
 						"desc": "Error logs, security audit trails, and system interactions collected to maintain platform stability, enforce rate limits, and prevent abuse."
 					}
 				},
-				"apiData": {
-					"title": "3. API Data Collection & Developer Obligations"
-				},
 				"legalBasis": {
 					"title": "4. Legal Basis for Processing"
 				},
@@ -522,10 +519,6 @@
 					"title": "Suggestions",
 					"description": "Have a great idea? Submit it to our community sandbox where others can vote it up to our roadmap!"
 				},
-				"bugs": {
-					"title": "Bug Tracker",
-					"description": "Found a glitch? Report it here so our engineers can squash it and move it to the known issues list."
-				},
 				"faq": {
 					"title": "FAQ",
 					"description": "Frequently asked questions, billing inquiries, and general help with your Xernerx account."
@@ -533,10 +526,8 @@
 			}
 		},
 		"roadmap": {
-			"title": "Platform Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
 			"metrics": {
-				"avgResolutionTime": "Avg Bug Resolution Time",
 				"recentResolutions": "Issues Resolved Recently",
 				"hours": "{count} hours",
 				"na": "N/A"
@@ -554,7 +545,6 @@
 			},
 			"knownIssues": {
 				"title": "Known Issues Tracker",
-				"description": "A transparent log of active bugs and recently resolved problems across our ecosystem.",
 				"openIssues": "Open Issues",
 				"noOpenIssues": "No active issues known! Everything is running smoothly.",
 				"recentlyResolved": "Recently Resolved",
@@ -563,7 +553,6 @@
 			}
 		},
 		"suggestions": {
-			"title": "Feature Sandbox",
 			"description": "Vote on ideas or submit your own. Popular suggestions are reviewed by our team and moved to the roadmap.",
 			"newSuggestion": "New Suggestion",
 			"titlePlaceholder": "Title",
@@ -589,9 +578,6 @@
 			}
 		},
 		"bugs": {
-			"title": "Bug Tracker",
-			"description": "Report bugs or issues you encounter. Bugs are reviewed by our team and moved to the known issues list once verified.",
-			"newBug": "New Bug",
 			"titlePlaceholder": "Title",
 			"descriptionPlaceholder": "Description",
 			"selectProduct": "Select Product",
@@ -599,9 +585,6 @@
 			"uploading": "Uploading...",
 			"submit": "Submit",
 			"cancel": "Cancel",
-			"searchPlaceholder": "Search bugs (e.g. 'login error')...",
-			"noMatch": "No bugs match \"{query}\".",
-			"reportAsNew": "Report as a New Bug",
 			"status": {
 				"resolved": "Resolved",
 				"verified": "Verified",
@@ -612,8 +595,6 @@
 				"notAuthenticated": "Not Authenticated",
 				"mustBeLoggedIn": "You must be logged in to post.",
 				"duplicate": "Duplicate",
-				"duplicateTitle": "A bug with this exact title already exists!",
-				"submitted": "Bug submitted!",
 				"success": "Success",
 				"uploadFailed": "Upload Failed",
 				"failedToUpload": "Failed to upload attachment",
