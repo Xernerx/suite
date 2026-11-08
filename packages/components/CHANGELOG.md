@@ -2,6 +2,24 @@
 
 # @xernerx/components
 
+## 0.15.4
+
+### Patch Changes
+
+- ## Footer License Link & Omnibar Route Registration
+  
+  Added the `/license` route to the global footer and URL omnibar.
+  
+  ### Changed
+  
+  - **Global Footer & Omnibar (`Footer.tsx` & `HeaderOmnibar.tsx`)**: Linked `/license` in the legal footer navigation and registered `/license` in `SUBDOMAIN_ROUTES`.
+- Updated dependencies
+- Updated dependencies
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 0.15.3
 
 ### Patch Changes

@@ -38,6 +38,7 @@
 | **[Portal](./apps/portal/README.md)**   | `4009`   | [`portal.xernerx.com`](https://portal.xernerx.com)   | [`portal.canary`](https://portal.canary.xernerx.com)   | [`portal.dev`](https://portal.dev.xernerx.com)   | Developer portal, organizations, bot publishing, slash commands, & webhooks   |
 | **[Hosting](./apps/hosting/README.md)** | `4010`   | [`hosting.xernerx.com`](https://hosting.xernerx.com) | [`hosting.canary`](https://hosting.canary.xernerx.com) | [`hosting.dev`](https://hosting.dev.xernerx.com) | Staff-only multi-node server hosting & Easypanel infrastructure console       |
 | **[Haste](./apps/haste/README.md)**     | `4011`   | [`haste.xernerx.com`](https://haste.xernerx.com)     | [`haste.canary`](https://haste.canary.xernerx.com)     | [`haste.dev`](https://haste.dev.xernerx.com)     | First-party Hastebin-compatible code pastebin, TTL expirations, & `/raw/[id]` |
+| **[Blog](./apps/blog/README.md)**       | `4012`   | [`blog.xernerx.com`](https://blog.xernerx.com)       | [`blog.canary`](https://blog.canary.xernerx.com)       | [`blog.dev`](https://blog.dev.xernerx.com)       | Official newsroom, security & engineering deep-dives, & `/rss.xml` feed       |
 
 ### 📦 Shared Workspace Packages (`packages/*`)
 
@@ -61,6 +62,24 @@
 | **[Desktop](./clients/desktop/README.md)**      | `clients/desktop`    | Electron desktop companion client wrapping `app.xernerx.com`                           |
 | **[Mobile](./clients/mobile/README.md)**        | `clients/mobile`     | Cross-platform mobile client workspace                                                 |
 | **[@xernerx/cli](./.xernerx/cli/README.md)**    | `.xernerx/cli`       | Internal `suite` CLI orchestrating dev servers, i18n generation, env sync, & lint      |
+
+### 🤖 Official Discord Bots & Open-Source TypeScript SDKs (`Xernerx Studios/`)
+
+| Project / Package                                                                                | License                         | Description                                                                                                           |
+| :----------------------------------------------------------------------------------------------- | :------------------------------ | :-------------------------------------------------------------------------------------------------------------------- |
+| **[Virtue](https://xernerx.com/applications/virtue)** (`../apps/virtue`)                         | Xernerx Proprietary & SaaS v1.0 | Text & voice XP leveling bot, Dynamic Hoist Roles, `/boost` multipliers, cycle resets, and personalized `/level` SVG  |
+| **[To-Do List Bot, Metamorphosis & Zodiac](https://xernerx.com/applications)**                   | Xernerx Proprietary & SaaS v1.0 | Productivity task boards, ephemeral voice room automation, and daily astrology/compatibility Discord bots             |
+| **[`xernerx`](https://docs.xernerx.com/packages/xernerx)** (`../packages/xernerx`)               | Apache-2.0                      | All-in-one Xernerx Suite SDK & Discord bot framework meta-package                                                     |
+| **[`@xernerx/framework`](https://docs.xernerx.com/packages/@xernerx/framework)**                 | Apache-2.0                      | Modular Discord.js bot client, sharding, event & extension loader, and `XernerxUser` enrichment                       |
+| **[`@xernerx/commands`](https://docs.xernerx.com/packages/@xernerx/commands)**                   | Apache-2.0                      | Slash, Context Menu, and Message command builder, validator, and handler                                              |
+| **[`@xernerx/extension-builder`](https://docs.xernerx.com/packages/@xernerx/extension-builder)** | Apache-2.0                      | Official base `ExtensionBuilder` contract for `@xernerx/framework` extensions                                         |
+| **[`@xernerx/hooks`](https://docs.xernerx.com/packages/@xernerx/hooks)**                         | Apache-2.0                      | HMAC-SHA256 webhook receiver (`HooksClient` / `XernerxHooks`) & zero-database engagement cache with REST fallback     |
+| **[`@xernerx/stats`](https://docs.xernerx.com/packages/@xernerx/stats)**                         | Apache-2.0                      | Automated bot telemetry, guild count, and statistics reporter                                                         |
+| **[`@xernerx/terminal`](https://docs.xernerx.com/packages/@xernerx/terminal)**                   | Apache-2.0                      | Scoped CLI logger and structured terminal output utility                                                              |
+| **[`@xernerx/websocket`](https://docs.xernerx.com/packages/@xernerx/websocket)**                 | Apache-2.0                      | Real-time bidirectional WebSocket RPC client for Xernerx services                                                     |
+| **[`docs`](https://docs.xernerx.com/packages)** (`../docs`)                                      | Apache-2.0                      | Canonical open-source package documentation (`docs/packages/*`) & security governance policies                        |
+| **[`examples`](https://github.com/Xernerx/examples)** (`../examples`)                            | Apache-2.0                      | Official TypeScript (`@xernerx/*`) and JavaScript (`xernerx`) Discord bot starter templates and sharding examples     |
+| **[`.github`](https://github.com/Xernerx/.github)** (`../.github`)                               | Apache-2.0                      | GitHub Organization profile (`profile/README.md`) & inherited community standards (`CODE_OF_CONDUCT`, `CONTRIBUTING`) |
 
 ---
 

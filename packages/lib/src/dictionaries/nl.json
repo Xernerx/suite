@@ -641,9 +641,6 @@
 						"desc": "Foutlogboeken, beveiligingsaudittrails en systeeminteracties om de platformstabiliteit te waarborgen, rate-limits te handhaven en misbruik te voorkomen."
 					}
 				},
-				"apiData": {
-					"title": "3. API-gegevensverzameling & verplichtingen voor ontwikkelaars"
-				},
 				"legalBasis": {
 					"title": "4. Juridische grondslag voor verwerking"
 				},

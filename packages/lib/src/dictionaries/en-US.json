@@ -445,9 +445,6 @@
 						"desc": "Error logs, security audit trails, and system interactions collected to maintain platform stability, enforce rate limits, and prevent abuse."
 					}
 				},
-				"apiData": {
-					"title": "3. API Data Collection & Developer Obligations"
-				},
 				"legalBasis": {
 					"title": "4. Legal Basis for Processing"
 				},

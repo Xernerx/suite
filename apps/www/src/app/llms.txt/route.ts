@@ -38,6 +38,7 @@ export async function GET() {
 - [@xernerx/websocket](https://docs.xernerx.com/packages/@xernerx/websocket): Bidirectional RPC client for the Xernerx WebSocket gateway.
 - [@xernerx/terminal](https://docs.xernerx.com/packages/@xernerx/terminal): Structured ANSI logger and CLI spinner toolkit.
 - [@xernerx/extension-builder](https://docs.xernerx.com/packages/@xernerx/extension-builder): Base extension lifecycle builder for @xernerx/framework.
+- [Xernerx Examples (Xernerx/examples)](https://github.com/Xernerx/examples): Official TypeScript (@xernerx/*) and JavaScript (xernerx) Discord bot starter templates and sharding examples.
 
 ## Security, Privacy & Legal Compliance
 

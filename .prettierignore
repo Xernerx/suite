@@ -1,0 +1,7 @@
+.changeset/*.md
+CHANGELOG.md
+LICENSE
+**/dist
+**/.next
+**/node_modules
+pnpm-lock.yaml

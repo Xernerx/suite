@@ -49,7 +49,11 @@ async function getAvailableVersions(pkgName: string): Promise<string[]> {
 
 async function getPackageData(pkgName: string, version: string) {
 	try {
+		const ghToken = process.env.GITHUB_TOKEN || process.env.GITHUB_PAT;
 		const res = await fetch(`https://raw.githubusercontent.com/Xernerx/docs/main/packages/${pkgName}/${version}/docs.json`, {
+			headers: {
+				...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+			},
 			next: { revalidate: 300 },
 		});
 		if (!res.ok) return null;

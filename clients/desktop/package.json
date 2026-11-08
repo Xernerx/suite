@@ -12,7 +12,7 @@
 		"dev": "tsc && electron ."
 	},
 	"author": "Xernerx Studios",
-	"license": "MIT",
+	"license": "SEE LICENSE IN LICENSE",
 	"packageManager": "pnpm@11.24.0",
 	"dependencies": {
 		"@xernerx/terminal": "^1.2.0",

@@ -2,6 +2,26 @@
 
 # docs
 
+## 1.10.3
+
+### Patch Changes
+
+- ## Full 8-Package SDK Catalog in Developer Documentation
+  
+  Updated the `/packages` catalog and package reader to include `@xernerx/extension-builder` and `@xernerx/hooks`.
+  
+  ### Changed
+  
+  - **Package Reference Catalog (`/packages`)**: Added `@xernerx/extension-builder` and `@xernerx/hooks` alongside `xernerx`, `@xernerx/framework`, `@xernerx/commands`, `@xernerx/stats`, `@xernerx/terminal`, and `@xernerx/websocket`.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 1.10.2
 
 ### Patch Changes

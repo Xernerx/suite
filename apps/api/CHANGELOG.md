@@ -2,6 +2,26 @@
 
 # api
 
+## 0.31.1
+
+### Patch Changes
+
+- ## Complete Open-Source SDK & App Coverage in Changelog RSS Feed
+  
+  Expanded the `/v1/changelog/rss.xml` feed to include all web applications and open-source SDK packages.
+  
+  ### Changed
+  
+  - **Changelog RSS Feed (`/v1/changelog/rss.xml`)**: Added `haste`, `blog`, `@xernerx/extension-builder`, and `@xernerx/hooks` to the aggregated release feed.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 0.31.0
 
 ### Minor Changes

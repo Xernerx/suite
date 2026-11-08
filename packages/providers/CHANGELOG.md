@@ -2,6 +2,20 @@
 
 # @xernerx/providers
 
+## 0.22.3
+
+### Patch Changes
+
+- ## Command Palette Registration for License & Open-Source SDKs
+  
+  Registered `/license`, `@xernerx/extension-builder`, and `@xernerx/hooks` in the global Command Palette.
+  
+  ### Changed
+  
+  - **Command Palette Catalog (`commandPaletteCatalog.ts`)**: Added `/license` under `SUITE_DEEP_PORTALS` and added `@xernerx/extension-builder` and `@xernerx/hooks` to the package documentation search entries.
+- Updated dependencies
+  - @xernerx/lib@1.22.1
+
 ## 0.22.2
 
 ### Patch Changes

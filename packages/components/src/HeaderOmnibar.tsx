@@ -62,6 +62,7 @@ const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
 		{ path: '/download', label: 'Download Desktop App' },
 		{ path: '/applications', label: 'Team Applications' },
 		{ path: '/security', label: 'Platform & Bot Security' },
+		{ path: '/license', label: 'Software & Ecosystem License' },
 		{ path: '/terms', label: 'Terms of Service' },
 		{ path: '/privacy', label: 'Privacy Policy' },
 		{ path: '/cookies', label: 'Cookie Policy' },

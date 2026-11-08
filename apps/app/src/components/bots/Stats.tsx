@@ -5,8 +5,39 @@ import { useEffect, useRef, useState } from 'react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { EmptyState } from '@xernerx/ui';
-import { Activity, Cpu, Server, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { Activity, Cpu, Flame, Server, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MetricsChart, TimeframeKey } from '../MetricsChart';
+
+function computeLongestStreakDuration(stats: any[], currentStats: any): string | null {
+	let maxMs = 0;
+	let currentOnlineSince: number | null = null;
+	let currentStart = 0;
+
+	for (const s of stats) {
+		const os = Number(s.onlineSince) || 0;
+		const ts = Number(s.timestamp) || 0;
+		if (os <= 0 || ts <= 0) continue;
+
+		if (currentOnlineSince === null || Math.abs(os - currentOnlineSince) > 60_000) {
+			currentOnlineSince = os;
+			currentStart = os;
+		}
+		const span = Math.max(0, ts - currentStart);
+		if (span > maxMs) maxMs = span;
+	}
+
+	if (maxMs <= 0 && currentStats?.onlineSince) {
+		maxMs = Math.max(0, Date.now() - Number(currentStats.onlineSince));
+	}
+	if (maxMs <= 0) return null;
+
+	const days = Math.floor(maxMs / (1000 * 60 * 60 * 24));
+	const hours = Math.floor((maxMs / (1000 * 60 * 60)) % 24);
+	const minutes = Math.floor((maxMs / 1000 / 60) % 60);
+	if (days > 0) return `${days}d ${hours}h`;
+	if (hours > 0) return `${hours}h ${minutes}m`;
+	return `${minutes}m`;
+}
 
 export default function Stats({ bot, id }: { bot: any; id: string }) {
 	const { t } = useDictionary();
@@ -16,6 +47,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 	const [statsLoading, setStatsLoading] = useState(true);
 	const [timeframe, setTimeframe] = useState<TimeframeKey>('24h');
 	const [activeMetric, setActiveMetric] = useState<'guildCount' | 'userCount' | 'shardCount' | 'voteCount' | 'uptime' | 'valuation'>('guildCount');
+	const [selectedShardId, setSelectedShardId] = useState<number | null>(null);
 	const statsCache = useRef<Record<string, any[]>>({});
 
 	useEffect(() => {
@@ -85,6 +117,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 	}
 
 	const currentStats = stats[stats.length - 1];
+	const longestStreakDuration = computeLongestStreakDuration(stats, currentStats);
 
 	const mappedStats = stats.map((s) => {
 		const baseline = s.guildCount * 0.1 + s.userCount * 0.001;
@@ -102,9 +135,17 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 		const multiplier = Math.max(0.5, Math.min(3.0, 1 + growthRate));
 		const valuation = baseline * multiplier;
 
+		let uptimeHours = s.onlineSince ? Math.max(0, (s.timestamp - s.onlineSince) / (1000 * 60 * 60)) : 0;
+		if (selectedShardId !== null && Array.isArray(s.shards)) {
+			const matchedShard = s.shards.find((sh: any, idx: number) => Number(sh?.id ?? sh?.shardId ?? idx) === selectedShardId);
+			if (matchedShard?.onlineSince) {
+				uptimeHours = Math.max(0, (s.timestamp - Number(matchedShard.onlineSince)) / (1000 * 60 * 60));
+			}
+		}
+
 		return {
 			...s,
-			uptime: s.onlineSince ? Math.max(0, (s.timestamp - s.onlineSince) / (1000 * 60 * 60)) : 0,
+			uptime: uptimeHours,
 			valuation,
 		};
 	});
@@ -220,31 +261,63 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 							<p className="text-xs text-(--text-muted)">{t('app.bots.overview.shardMatrixSubtitle')}</p>
 						</div>
 					</div>
-					<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-extrabold text-(--accent)">
-						<Activity size={12} />
-						{t('app.bots.overview.shardsCount', { count: totalShardCount })}
-					</span>
+					<div className="flex flex-wrap items-center gap-2">
+						{selectedShardId !== null && (
+							<button
+								type="button"
+								onClick={() => setSelectedShardId(null)}
+								className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent) text-white text-xs font-extrabold cursor-pointer transition-all"
+							>
+								{t('app.bots.overview.shardUptimeFilter', { id: selectedShardId })} · {t('app.bots.overview.allShardsUptime')}
+							</button>
+						)}
+						{longestStreakDuration && (
+							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-extrabold text-(--accent)">
+								<Flame size={12} />
+								{t('app.bots.overview.longestStreakLabel', { duration: longestStreakDuration })}
+							</span>
+						)}
+						<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-extrabold text-(--accent)">
+							<Activity size={12} />
+							{t('app.bots.overview.shardsCount', { count: totalShardCount })}
+						</span>
+					</div>
 				</div>
 
 				<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 					{shardItems.map((sh: any) => {
 						const isOnline = sh.status === 'online' || sh.status === 'ready' || sh.status === '0';
+						const shardNum = Number(sh.id);
+						const isShardSelected = selectedShardId === shardNum;
 						return (
-							<div
+							<button
 								key={sh.id}
-								className="flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl bg-(--background)/55 border border-(--border)/10 hover:border-(--accent)/30 transition-all"
+								type="button"
+								onClick={() => {
+									if (isShardSelected) {
+										setSelectedShardId(null);
+									} else {
+										setSelectedShardId(shardNum);
+										setActiveMetric('uptime');
+									}
+								}}
+								className={`flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+									isShardSelected
+										? 'bg-(--accent)/15 border-(--accent) shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_18%,transparent)]'
+										: 'bg-(--background)/55 border-(--border)/10 hover:border-(--accent)/30'
+								}`}
 							>
-								<div className="flex items-center justify-between gap-2">
+								<div className="flex items-center justify-between gap-2 w-full">
 									<span className="text-xs font-mono font-extrabold text-(--text)">{t('app.bots.overview.shardLabel', { id: sh.id })}</span>
 									<span className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-(--accent-green) shadow-[0_0_8px_var(--accent-green)]' : 'bg-(--accent-orange)'}`} />
 								</div>
-								<div className="flex items-center justify-between text-[11px] font-mono text-(--text-muted)">
+								<div className="flex items-center justify-between text-[11px] font-mono text-(--text-muted) w-full">
 									<span>{t('app.bots.overview.shardGuilds', { count: sh.guilds.toLocaleString() })}</span>
 									<span className="text-(--accent) font-bold">
 										{sh.ping !== null && sh.ping !== undefined ? t('app.bots.overview.shardPing', { ping: sh.ping }) : t('app.bots.overview.shardHealthy')}
 									</span>
 								</div>
-							</div>
+							</button>
 						);
 					})}
 				</div>

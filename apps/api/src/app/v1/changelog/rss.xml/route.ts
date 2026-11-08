@@ -22,6 +22,13 @@ const APPS = [
 	{ id: 'www', name: 'Website', devPort: 4000 },
 ] as const;
 
+const BOTS = [
+	{ id: 'virtue', name: 'Virtue', repo: 'Xernerx/Virtue' },
+	{ id: 'zodiac', name: 'Zodiac', repo: 'Xernerx/Zodiac' },
+	{ id: 'tdl', name: 'To-Do List Bot', repo: 'Xernerx/TDL' },
+	{ id: 'metamorphosis', name: 'Metamorphosis', repo: 'Xernerx/Metamorphosis' },
+] as const;
+
 const FETCH_HEADERS: Record<string, string> = {
 	Accept: 'application/json',
 	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 XernerxSuite/1.0',
@@ -101,6 +108,9 @@ async function fetchPackageChangelogItems(): Promise<Array<{ title: string; link
 				try {
 					const latestVersion = versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }))[0];
 					const docRes = await fetch(`https://raw.githubusercontent.com/Xernerx/docs/main/packages/${pkgName}/${latestVersion}/docs.json`, {
+						headers: {
+							...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+						},
 						next: { revalidate: 300 },
 					});
 					if (!docRes.ok) return;
@@ -134,13 +144,73 @@ async function fetchPackageChangelogItems(): Promise<Array<{ title: string; link
 	return pkgItems;
 }
 
+async function fetchBotChangelogItems(isDevEnv: boolean): Promise<Array<{ title: string; link: string; guid: string; description: string }>> {
+	const botItems: Array<{ title: string; link: string; guid: string; description: string }> = [];
+	const ghToken = process.env.GITHUB_TOKEN || process.env.GITHUB_PAT;
+	const cwd = process.cwd();
+
+	await Promise.all(
+		BOTS.map(async (bot) => {
+			try {
+				let content: string | null = null;
+				if (isDevEnv) {
+					for (const candidate of [
+						path.resolve(cwd, '..', 'apps', bot.id, 'CHANGELOG.md'),
+						path.resolve(cwd, '../../apps', bot.id, 'CHANGELOG.md'),
+						path.resolve(cwd, '../../../apps', bot.id, 'CHANGELOG.md'),
+					]) {
+						try {
+							if (fs.existsSync(candidate)) {
+								content = fs.readFileSync(candidate, 'utf8').trim();
+								if (content) break;
+							}
+						} catch {}
+					}
+				}
+				if (!content) {
+					for (const branch of ['main', 'canary']) {
+						try {
+							const res = await fetch(`https://raw.githubusercontent.com/${bot.repo}/${branch}/CHANGELOG.md`, {
+								headers: {
+									...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
+								},
+								next: { revalidate: 300 },
+							});
+							if (res.ok) {
+								content = (await res.text()).trim();
+								if (content) break;
+							}
+						} catch {}
+					}
+				}
+				if (!content) return;
+
+				const cleaned = content.replace(/<!--\s*@format\s*-->/g, '').replace(/^#\s+[^\r\n]+\r?\n*/gm, '').trim();
+				const sections = cleaned.split(/^##\s+(?=\[?v?\d+\.\d+)/m).slice(1, 5);
+				for (const sec of sections) {
+					const lines = sec.trim().split(/\r?\n/);
+					const version = lines[0]?.trim().replace(/[^a-zA-Z0-9.-]/g, '') || 'latest';
+					const body = lines.slice(1).join('\n').trim();
+					botItems.push({
+						title: `${bot.name} v${version}`,
+						link: `https://info.xernerx.com/changelog?item=${encodeURIComponent(bot.name.toLowerCase())}#${version}`,
+						guid: `xernerx-bot-${bot.id}-${version}`,
+						description: body || `Release notes for ${bot.name} v${version}`,
+					});
+				}
+			} catch {}
+		})
+	);
+	return botItems;
+}
+
 export async function GET() {
 	const baseDomain = process.env.NEXT_PUBLIC_DOMAIN && !/^(localhost|127\.0\.0\.1|\d+\.\d+\.\d+\.\d+)$/.test(process.env.NEXT_PUBLIC_DOMAIN) ? process.env.NEXT_PUBLIC_DOMAIN : 'xernerx.com';
 	const isDevEnv = process.env.ENVIRONMENT?.toLowerCase() === 'development' || process.env.NEXT_PUBLIC_ENVIRONMENT?.toLowerCase() === 'development';
 
 	const items: Array<{ title: string; link: string; guid: string; description: string }> = [];
 
-	const [, pkgItems] = await Promise.all([
+	const [, botItems, pkgItems] = await Promise.all([
 		Promise.all(
 			APPS.map(async (app) => {
 				try {
@@ -172,10 +242,11 @@ export async function GET() {
 				} catch {}
 			})
 		),
+		fetchBotChangelogItems(isDevEnv),
 		fetchPackageChangelogItems(),
 	]);
 
-	items.push(...pkgItems);
+	items.push(...botItems, ...pkgItems);
 	const seenGuids = new Set<string>();
 	const uniqueItems = items.filter((item) => {
 		if (seenGuids.has(item.guid)) return false;

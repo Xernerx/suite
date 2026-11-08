@@ -2,6 +2,26 @@
 
 # info
 
+## 1.11.6
+
+### Patch Changes
+
+- ## Expanded Ecosystem Release Changelog Tracker
+  
+  Updated the `/changelog` feed to track all 13 web applications and all 8 open-source NPM packages.
+  
+  ### Changed
+  
+  - **Release Changelog (`ChangelogClient.tsx` & `changelog/page.tsx`)**: Added `Haste`, `Blog`, `@xernerx/extension-builder`, and `@xernerx/hooks` to the changelog tracker and streamlined component state management.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 1.11.5
 
 ### Patch Changes

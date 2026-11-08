@@ -52,10 +52,11 @@ let inflightRefresh: Promise<ShowcasePackage[]> | null = null;
 
 async function fetchShowcasePackagesFromRemote(): Promise<ShowcasePackage[]> {
 	try {
+		const ghToken = process.env.GITHUB_TOKEN || process.env.GITHUB_PAT;
 		const res = await fetch('https://api.github.com/repos/Xernerx/docs/git/trees/main?recursive=1', {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
-				...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}),
+				...(ghToken ? { Authorization: `Bearer ${ghToken}` } : {}),
 			},
 			signal: AbortSignal.timeout(1500),
 			next: { revalidate: 3600 },

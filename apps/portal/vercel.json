@@ -1,0 +1,10 @@
+{
+	"ignoreCommand": "node ../../.xernerx/cli/vercel-ignore.mjs portal",
+	"git": {
+		"deploymentEnabled": {
+			"main": true,
+			"canary": true,
+			"dictionary": false
+		}
+	}
+}

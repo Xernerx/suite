@@ -2,6 +2,33 @@
 
 # www
 
+## 0.24.0
+
+### Minor Changes
+
+- ## Ecosystem Licensing Page & Full Organization Policy Coverage
+  
+  Added the dedicated `/license` page and expanded `/terms`, `/privacy`, `/cookies`, and `/security` to cover the entire Xernerx Studios ecosystem.
+  
+  ### Added
+  
+  - **Software & Ecosystem Licensing Page (`/license`)**: Added an interactive licensing overview with 1-click plain-text `LICENSE` copy/download and two-tier coverage for the Xernerx Proprietary & SaaS License v1.0 and Apache-2.0 open-source SDKs.
+  
+  ### Changed
+  
+  - **Full Organization Policy Coverage (`/terms`, `/privacy`, `/cookies`, `/security`)**: Updated all legal and security pages to cover all 13 `*.xernerx.com` web applications, standalone and suite Discord bots (`Virtue`, `To-Do List Bot`, `Metamorphosis`, `Zodiac`, `Xernerx App`, `Xernerx Bot`), all 8 `@xernerx/*` & `xernerx` npm SDKs, `Xernerx/examples`, `Xernerx/docs`, and native Desktop/Mobile clients.
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 0.23.2
 
 ### Patch Changes

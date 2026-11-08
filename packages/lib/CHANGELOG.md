@@ -2,6 +2,18 @@
 
 # @xernerx/lib
 
+## 1.22.1
+
+### Patch Changes
+
+- ## Organization-Wide Legal, Security & Licensing Dictionary Strings
+  
+  Updated localization dictionaries for `/license`, `/terms`, `/privacy`, `/cookies`, and `/security`.
+  
+  ### Changed
+  
+  - **English & Locale Dictionaries (`en-GB.json`)**: Added `www.license.*` keys and expanded `www.terms.*`, `www.privacy.*`, `www.cookies.*`, and `www.security.*` to cover all repositories across the Xernerx Studios organization.
+
 ## 1.22.0
 
 ### Minor Changes

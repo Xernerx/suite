@@ -2,6 +2,19 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.5.3
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @xernerx/components@0.15.4
+  - @xernerx/lib@1.22.1
+  - @xernerx/providers@0.22.3
+  - @xernerx/feedback@0.5.5
+  - @xernerx/ui@0.8.4
+
 ## 1.5.2
 
 ### Patch Changes

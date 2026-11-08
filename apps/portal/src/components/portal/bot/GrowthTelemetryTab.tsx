@@ -7,6 +7,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Too
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Tabs } from '@xernerx/ui';
+import { BotStatsLogCard } from './BotStatsLogCard';
 
 interface GrowthTelemetryTabProps {
 	botConfig: any;
@@ -389,6 +390,15 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 					</ResponsiveContainer>
 				</div>
 			</div>
+
+			{/* Daily Telemetry Snapshot Log & Single-Row Deletion */}
+			<BotStatsLogCard
+				botId={botId}
+				earliestTimestamp={stats[0]?.timestamp}
+				onDeleted={(deletedId) => {
+					setStats((prev) => prev.filter((s: any) => String(s._id) !== deletedId));
+				}}
+			/>
 		</div>
 	);
 }
