@@ -87,6 +87,12 @@ export const permissions: PermissionDefinition[] = [
 		defaultValue: false,
 	},
 	{
+		key: 'giveaways',
+		label: 'Manage Giveaways',
+		description: 'Permission to create, manage, draw winners, and fulfill platform and Discord giveaways.',
+		defaultValue: false,
+	},
+	{
 		key: 'manageMedia',
 		label: 'Manage Media',
 		description: 'Permission to view, edit, and delete all media files on the CDN.',

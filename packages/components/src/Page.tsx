@@ -11,6 +11,7 @@ import { useSession } from 'next-auth/react';
 
 import { BlacklistGate } from './BlacklistGate';
 import { Footer } from './Footer';
+import { GiveawayBanner } from './GiveawayBanner';
 import { Header } from './Header';
 import { useWindowControlsStyle } from './HeaderWindowControls';
 import NextTopLoader from 'nextjs-toploader';
@@ -455,6 +456,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 									</button>
 								</div>
 							)}
+							<GiveawayBanner />
 							<BlacklistGate>{children}</BlacklistGate>
 						</main>
 

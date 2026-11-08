@@ -2,6 +2,32 @@
 
 # api
 
+## 0.32.0
+
+### Minor Changes
+
+- ## Giveaways API, Discord Guild Resource Cache & Public Product Filtering
+  
+  Added `/secure/giveaways` endpoints, resilient Discord guild channel/role caching with rate-limit handling, and public-only product filtering for Info hub selectors.
+  
+  ### Added
+  
+  - `/secure/giveaways`, `/secure/giveaways/[id]`, and `/secure/giveaways/[id]/enter` endpoints for managing, entering, drawing, and rerolling giveaways
+  - `discordGuildResources.ts` helper with TTL caching, in-flight request deduplication, `429` retry handling, and multi-bot token fallback for guild channels and roles
+  
+  ### Changed
+  
+  - Filtered `/info/roadmap/products` so only public main-organization products appear in product selectors
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 0.31.2
 
 ### Patch Changes

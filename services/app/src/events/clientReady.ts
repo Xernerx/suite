@@ -1,6 +1,6 @@
 /** @format */
 
-import { createLogger, database, dispatchBotStatusWebhooks } from '@xernerx/lib/core';
+import { createLogger, database, dispatchBotStatusWebhooks, processDueGiveaways } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { syncBotCommands, updateBotPresence } from '../lib/botUtils.js';
 import { syncMainServerBotIconEmojis } from '../lib/botIconEmojis.js';
@@ -228,6 +228,7 @@ export default class AppClientReadyEvent extends EventBuilder {
 				{ upsert: true }
 			);
 			await processDueScheduledAnnouncements(this.client);
+			await processDueGiveaways();
 		} catch (error) {
 			appBotLog.error(`Failed to sync main org bot statuses: ${(error as any)?.message || error}`);
 		}

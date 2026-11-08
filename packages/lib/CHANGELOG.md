@@ -2,6 +2,20 @@
 
 # @xernerx/lib
 
+## 1.23.0
+
+### Minor Changes
+
+- ## Platform Giveaways Engine & Model
+  
+  Added the core Giveaways Mongoose model, draw-time eligibility and bonus entry evaluator, Discord embed & interaction handler, and `manageGiveaways` RBAC permission.
+  
+  ### Added
+  
+  - `Giveaway` Mongoose model (`packages/lib/src/models/xernerx/core/Giveaway.ts`) supporting web & Discord channels, auto-fulfilled prizes, draw-time requirements, and bonus entry multipliers
+  - Giveaways engine (`packages/lib/src/giveaways.ts`) with draw-time requirement verification, weighted random drawing, automatic prize fulfillment, and clean Discord embeds
+  - `manageGiveaways` staff permission in `packages/lib/src/permissions.ts`
+
 ## 1.22.2
 
 ### Patch Changes

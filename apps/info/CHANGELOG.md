@@ -2,6 +2,24 @@
 
 # info
 
+## 1.11.8
+
+### Patch Changes
+
+- ## Public-Only Product Filtering in Info Selectors
+  
+  Filtered product selectors across Roadmap, Issues, and Suggestions so private/development bots are excluded from public selection lists.
+  
+  ### Changed
+  
+  - Filtered organization bots in Roadmap, Issues, and Suggestions pages to only include products with `privacy === 'public'`
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 1.11.7
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 /** @format */
-import { Bot, Bug, Building2, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
+import { Bot, Bug, Building2, Gift, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
 import type { AdminPermissionsMap } from '../HomeOverview';
 import type { ModuleCard, UrgentItem } from './HomeOverviewSections';
 
@@ -23,6 +23,7 @@ interface BuildCardsInput {
 	mediaList: any[];
 	invites: any[];
 	announcements: any[];
+	giveaways?: any[];
 }
 
 export function buildHomeOverviewCards({
@@ -45,6 +46,7 @@ export function buildHomeOverviewCards({
 	mediaList,
 	invites,
 	announcements,
+	giveaways = [],
 }: BuildCardsInput): { urgentItems: UrgentItem[]; moduleCards: ModuleCard[] } {
 	const urgentItems: UrgentItem[] = [];
 	const moduleCards: ModuleCard[] = [];
@@ -301,6 +303,18 @@ export function buildHomeOverviewCards({
 			meta: t('admin.dashboard.home.cards.announcementsMeta', { total: announcements.length, scheduled: scheduledCount }),
 			icon: Megaphone,
 			badge: { text: `${announcements.length}`, tone: 'normal' },
+		});
+	}
+
+	if (permissions.canGiveaways ?? permissions.canAnnouncements) {
+		const activeGiveawaysCount = giveaways.filter((g) => g.status === 'active').length;
+		moduleCards.push({
+			id: 'mod-giveaways',
+			view: 'giveaways',
+			title: t('admin.dashboard.home.cards.giveawaysTitle'),
+			meta: t('admin.dashboard.home.cards.giveawaysMeta', { active: activeGiveawaysCount, total: giveaways.length }),
+			icon: Gift,
+			badge: { text: `${activeGiveawaysCount}`, tone: activeGiveawaysCount > 0 ? 'ok' : 'normal' },
 		});
 	}
 

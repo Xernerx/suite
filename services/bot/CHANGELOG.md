@@ -2,6 +2,23 @@
 
 # bot
 
+## 2.3.0
+
+### Minor Changes
+
+- ## Discord Giveaway Button Interaction Handler
+  
+  Wired Discord giveaway button interactions (`giveaway:enter`, `giveaway:leave`, `giveaway:info`) into the Xernerx Bot daemon.
+  
+  ### Added
+  
+  - Registered `handleGiveawayDiscordInteraction` in `services/bot/src/events/interactionCreate.ts`
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.23.0
+
 ## 2.2.4
 
 ### Patch Changes

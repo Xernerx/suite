@@ -998,6 +998,7 @@
 				"mediaLibrary": "Media Library",
 				"invites": "Invites",
 				"announcements": "Announcements",
+				"giveaways": "Giveaways",
 				"store": "Store",
 				"auditLogs": "Audit Logs",
 				"bots": "Bots",
@@ -1052,6 +1053,8 @@
 					"invitesMeta": "{total} configured OAuth2 invite slugs",
 					"announcementsTitle": "Announcements",
 					"announcementsMeta": "{total} announcements ({scheduled} scheduled)",
+					"giveawaysTitle": "Giveaways",
+					"giveawaysMeta": "{active} active • {total} total giveaways",
 					"mediaTitle": "CDN Media Library",
 					"mediaMeta": "{total} uploaded assets in storage",
 					"settingsTitle": "System Configuration",
@@ -1428,6 +1431,165 @@
 					"www": "Main Website (www)",
 					"admin": "Admin Portal (admin)",
 					"blog": "Blog & Newsroom (blog)"
+				}
+			},
+			"giveaways": {
+				"title": "Giveaways",
+				"subtitle": "Launch, schedule, and auto-fulfill Discord & Web giveaways across the Xernerx ecosystem.",
+				"createButton": "Create Giveaway",
+				"searchPlaceholder": "Search giveaways by title, description, or prize...",
+				"emptyTitle": "No Giveaways Found",
+				"emptySubtitle": "Create your first giveaway to reward the community with Xernerx Credits, Store Passes, Discord Roles, or custom prizes.",
+				"kpis": {
+					"active": "Active Giveaways",
+					"totalEntrants": "Total Entrants",
+					"scheduled": "Scheduled",
+					"completed": "Completed"
+				},
+				"filters": {
+					"all": "All Statuses"
+				},
+				"status": {
+					"active": "Active",
+					"scheduled": "Scheduled",
+					"ended": "Ended",
+					"cancelled": "Cancelled"
+				},
+				"prizeTypes": {
+					"credits": "Xernerx Credits",
+					"store_item": "Store Item / Pass",
+					"discord_role": "Discord Role",
+					"custom": "Custom Prize"
+				},
+				"requirements": {
+					"openToAll": "Open to Everyone",
+					"accountBadge": "Xernerx Account",
+					"verifiedBadge": "Verified Profile",
+					"activePassBadge": "Active Pass",
+					"levelBadge": "Lvl {level}+",
+					"streakBadge": "{streak}d Streak+",
+					"spentBadge": "{amount}+ Spent",
+					"rolesCountBadge": "{count} Role Req(s)",
+					"itemsCountBadge": "{count} Item Req(s)",
+					"requireAccount": "Require Registered Xernerx Account",
+					"requireVerified": "Require Verified Xernerx Profile",
+					"requireActivePass": "Require Active Pass / Subscription",
+					"minGlobalLevel": "Minimum Global User Level",
+					"minGlobalLevelDesc": "Require entrants to reach at least this Global User Level across Xernerx & Virtue (0 = Any Level).",
+					"anyLevelPreset": "Any Level (0)",
+					"levelPreset": "Level {level}+",
+					"minStreak": "Minimum Daily Gift Streak (Days)",
+					"minTotalSpent": "Minimum Lifetime Credits Spent",
+					"requiredDiscordRoles": "Required Discord Roles",
+					"roleMatchMode": "Role Requirement Mode",
+					"matchAnyRole": "Any Selected Role (OR)",
+					"matchAllRoles": "All Selected Roles (AND)",
+					"excludedDiscordRoles": "Excluded / Blacklisted Roles",
+					"requiredItemsOrBadges": "Required Store Items or Badges Owned"
+				},
+				"card": {
+					"allWebApps": "All Web Apps",
+					"winnerCount": "{count} Winner(s)",
+					"ticketsCount": "{count} total tickets",
+					"startsLabel": "Starts",
+					"endsLabel": "Ends",
+					"endedLabel": "Ended",
+					"drawnWinnersTitle": "Drawn Winners ({count})",
+					"fulfilled": "Fulfilled",
+					"pendingFulfillment": "Pending"
+				},
+				"actions": {
+					"viewEntrants": "Entrants & Odds",
+					"drawNow": "End & Draw Now",
+					"rerollAll": "Reroll All",
+					"rerollWinner": "Reroll Winner",
+					"fulfillNow": "Fulfill Prize",
+					"cancelGiveaway": "Cancel Giveaway"
+				},
+				"modal": {
+					"createTitle": "Create Giveaway",
+					"editTitle": "Edit Giveaway",
+					"subtitle": "Follow the quick steps below to configure your giveaway.",
+					"steps": {
+						"details": "Details",
+						"channels": "Channels",
+						"prize": "Prize",
+						"requirements": "Requirements",
+						"bonus": "Bonus Odds",
+						"stepCounter": "Step {current} of {total}",
+						"back": "Back",
+						"next": "Next Step"
+					},
+					"tabs": {
+						"general": "1. General & Schedule",
+						"prize": "2. Prize & Auto-Fulfillment",
+						"requirements": "3. Requirements & Bonus Odds"
+					},
+					"titleLabel": "Giveaway Title",
+					"titlePlaceholder": "e.g. Weekend 2,500 Credits & Virtue Pass Drop",
+					"winnerCountLabel": "Number of Winners",
+					"descriptionLabel": "Description",
+					"descriptionPlaceholder": "Describe the giveaway rules or celebration...",
+					"bannerUrlLabel": "Banner Image URL (Optional)",
+					"startsAtLabel": "Starts At",
+					"endsAtLabel": "Ends At (Auto-Draws Winners)",
+					"discordChannelLabel": "Discord Channel (Main Server)",
+					"webOnlyNoChannel": "Web Banner Only (No Discord Post)",
+					"pingRoleLabel": "Mention / Ping Role on Launch",
+					"noPing": "No Mention",
+					"showOnWebLabel": "Display In-App Web Giveaway Banner",
+					"showOnWebDesc": "Allows users to enter directly from the Xernerx web applications.",
+					"targetAppsLabel": "Target Web Applications",
+					"prizeLabelField": "Prize Display Name",
+					"prizeLabelPlaceholder": "e.g. 2,500 Xernerx Credits",
+					"creditAmountLabel": "Credits Amount (Auto-Credited per Winner)",
+					"storeItemLabel": "Store Product / Perk / Pass (Auto-Granted)",
+					"selectStoreItem": "Select a store item...",
+					"durationDaysLabel": "Pass Duration in Days (For Subscriptions/Trials)",
+					"discordRoleRewardLabel": "Discord Role Reward (Auto-Assigned on Main Server)",
+					"selectDiscordRole": "Select a Discord role...",
+					"customPrizeValueLabel": "Custom Prize Code / Delivery Instructions (Sent to Winner)",
+					"customPrizeValuePlaceholder": "Optional code, claim link, or instructions delivered in the winner's notification...",
+					"bonusEntriesTitle": "Bonus Entry Multipliers",
+					"noBonusRules": "No bonus entry rules configured. Every eligible entrant receives 1 ticket.",
+					"bonusRuleLabel": "Display Label",
+					"extraEntriesLabel": "Extra Tickets (+)",
+					"minGlobalLevelBonusLabel": "Minimum Global User Level for Bonus",
+					"bonusTypes": {
+						"activePass": "Active Pass Subscriber",
+						"verified": "Verified Profile",
+						"globalLevel": "Global User Level Tier",
+						"discordRole": "Discord Role",
+						"storeItem": "Store Item / Badge"
+					},
+					"saveChanges": "Save Changes",
+					"launchGiveaway": "Launch Giveaway"
+				},
+				"entrantsModal": {
+					"subtitle": "{entrants} Entrants • {tickets} Total Weighted Tickets",
+					"searchPlaceholder": "Search entrants by username or Discord ID...",
+					"empty": "No entrants found for this giveaway yet."
+				},
+				"confirm": {
+					"endNowTitle": "End Giveaway & Draw Winners Now?",
+					"endNowDesc": "This will immediately close \"{title}\", draw winners using weighted odds, and auto-fulfill prizes.",
+					"cancelTitle": "Cancel Giveaway?",
+					"cancelDesc": "This will mark \"{title}\" as cancelled without drawing winners.",
+					"deleteTitle": "Delete Giveaway?",
+					"deleteDesc": "Are you sure you want to permanently delete \"{title}\"?"
+				},
+				"toasts": {
+					"created": "Giveaway created!",
+					"updated": "Giveaway updated!",
+					"saveFailed": "Failed to save giveaway",
+					"drawn": "Winners drawn and prizes fulfilled!",
+					"rerolled": "Giveaway winner(s) rerolled!",
+					"rerollFailed": "Failed to reroll winners",
+					"fulfilled": "Winner prize fulfilled!",
+					"fulfillFailed": "Failed to fulfill winner prize",
+					"cancelled": "Giveaway cancelled",
+					"deleted": "Giveaway deleted",
+					"actionFailed": "Action failed"
 				}
 			},
 			"applicationReviews": {
@@ -1840,6 +2002,10 @@
 			"announcements": {
 				"label": "Manage Announcements",
 				"description": "Permission to create, edit, and publish platform announcements."
+			},
+			"giveaways": {
+				"label": "Manage Giveaways",
+				"description": "Permission to create, manage, draw winners, and fulfill platform and Discord giveaways."
 			},
 			"manageMedia": {
 				"label": "Manage Media",
@@ -7537,6 +7703,10 @@
 					"title": "Manage Announcements",
 					"description": "Create, edit, and publish platform announcements."
 				},
+				"manageGiveaways": {
+					"title": "Manage Giveaways",
+					"description": "Create, schedule, draw winners, and fulfill Discord & Web giveaways."
+				},
 				"manageTranslations": {
 					"title": "Manage Translations",
 					"description": "Add and modify system-wide translations."
@@ -8676,6 +8846,33 @@
 			"public": "Public",
 			"limited": "Unlisted (Limited)",
 			"private": "Private (Staff Only)"
+		}
+	},
+	"giveawayBanner": {
+		"liveBadge": "Live Giveaway",
+		"entriesCount": "{count} entries",
+		"endsIn": "Ends in {time}",
+		"enteredBadge": "Entered ({weight}x)",
+		"enterButton": "Enter Giveaway",
+		"entering": "Entering...",
+		"detailsButton": "Details & Odds",
+		"modalSubtitle": "Prize: {prize} • {winners} Winner(s)",
+		"prizeLabel": "Prize",
+		"winnersLabel": "Winners",
+		"entrantsLabel": "Entrants",
+		"eligibleStatus": "You meet all requirements for the final draw",
+		"ineligibleStatus": "Complete before giveaway ends to qualify at draw time",
+		"yourWeight": "{weight}x Entry Weight",
+		"endsAtLabel": "Draws on",
+		"leaveButton": "Leave Giveaway",
+		"refreshEntryButton": "Refresh Multipliers",
+		"toasts": {
+			"enteredTitle": "Giveaway Entry Confirmed!",
+			"alreadyEntered": "Entry Multipliers Updated!",
+			"enteredDesc": "Your ticket weight is {weight}x ({odds}% current win chance).",
+			"enterFailed": "Could not enter giveaway",
+			"notEligible": "You do not meet the eligibility requirements for this giveaway.",
+			"leftTitle": "Left giveaway"
 		}
 	}
 }

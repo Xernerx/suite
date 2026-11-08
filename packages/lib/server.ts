@@ -9,3 +9,4 @@ export * from './src/dispatch';
 export * from './src/emails/BasicTemplate';
 export * from './src/terminal';
 export * from './src/botStatusWebhooks';
+export * from './src/giveaways';

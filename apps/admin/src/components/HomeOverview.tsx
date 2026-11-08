@@ -23,6 +23,7 @@ export interface AdminPermissionsMap {
 	canSettings: boolean;
 	canInvites: boolean;
 	canAnnouncements: boolean;
+	canGiveaways?: boolean;
 	canMedia: boolean;
 	canManageRoadmap: boolean;
 	canManageSuggestions: boolean;
@@ -60,6 +61,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 	const [storeCategories, setStoreCategories] = useState<any[]>([]);
 	const [invites, setInvites] = useState<any[]>([]);
 	const [announcements, setAnnouncements] = useState<any[]>([]);
+	const [giveaways, setGiveaways] = useState<any[]>([]);
 	const [mediaList, setMediaList] = useState<any[]>([]);
 
 	const pingService = useCallback(async (appId: string, host: string) => {
@@ -257,6 +259,15 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
+				if (permissions.canGiveaways ?? permissions.canAnnouncements) {
+					tasks.push(
+						fetch(getEnvUrl('https://api.xernerx.com/secure/giveaways'), { credentials: 'include' })
+							.then((r) => (r.ok ? r.json() : null))
+							.then((d) => setGiveaways(Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : []))
+							.catch(() => {})
+					);
+				}
+
 				if (permissions.canMedia) {
 					tasks.push(
 						fetch(getEnvUrl('https://cdn.xernerx.com/api/media?admin=true'), { credentials: 'include' })
@@ -310,6 +321,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 		mediaList,
 		invites,
 		announcements,
+		giveaways,
 	});
 
 	return (

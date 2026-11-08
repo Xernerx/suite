@@ -2,6 +2,23 @@
 
 # `@xernerx/app`
 
+## 2.6.0
+
+### Minor Changes
+
+- ## Discord Giveaway Interactions & Auto-Draw Scheduler
+  
+  Wired Discord giveaway button interactions (`giveaway:enter`, `giveaway:leave`, `giveaway:info`) and background due-giveaway processing into the Xernerx App bot daemon.
+  
+  ### Added
+  
+  - Registered `handleGiveawayDiscordInteraction` in `interactionCreate.ts` and `processDueGiveaways` interval in `clientReady.ts`
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.23.0
+
 ## 2.5.4
 
 ### Patch Changes

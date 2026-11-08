@@ -217,7 +217,17 @@ export async function handleSupportMessageCreate(message: Message): Promise<bool
 			}
 		}
 
-		const bots = SupportBotModel ? await SupportBotModel.find({ guild: message.guild.id }).lean() : [];
+		const rawBots = SupportBotModel ? await SupportBotModel.find({ guild: message.guild.id }).lean() : [];
+		const BotModel = (db.models.bots as any)?.Bot;
+		const nonPublicBotDocs =
+			BotModel && rawBots.length > 0
+				? await BotModel.find({ id: { $in: rawBots.map((b: any) => String(b.id)) }, privacy: { $ne: 'public' } })
+						.select('id')
+						.lean()
+						.catch(() => [])
+				: [];
+		const nonPublicBotIdSet = new Set(nonPublicBotDocs.map((b: any) => String(b.id)));
+		const bots = rawBots.filter((b: any) => !nonPublicBotIdSet.has(String(b.id)));
 		const checklist = await getSupportChecklist(db);
 
 		const thread = await message.startThread({

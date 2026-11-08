@@ -2,6 +2,27 @@
 
 # admin
 
+## 0.26.0
+
+### Minor Changes
+
+- ## Admin Giveaways Management & 5-Step Wizard
+  
+  Added a dedicated Giveaways management hub to the Admin portal with a 5-step creation wizard, minimum global user level requirements, bonus odds rules, and an entrants/winners drawer.
+  
+  ### Added
+  
+  - Admin Giveaways view (`apps/admin/src/components/Giveaways.tsx`), 5-step wizard modal (`GiveawayModal.tsx`), and entrants/winners drawer (`GiveawayEntrantsModal.tsx`)
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 0.25.5
 
 ### Patch Changes

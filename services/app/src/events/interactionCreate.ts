@@ -1,6 +1,7 @@
 /** @format */
 
 import { EventBuilder } from '@xernerx/framework';
+import { handleGiveawayDiscordInteraction } from '@xernerx/lib/core';
 import { Interaction } from 'discord.js';
 import { buildStatusMessage } from '../commands/slash/status.js';
 import { buildRoadmapOverviewMessage, type RoadmapFilterTab } from '../commands/slash/roadmap.js';
@@ -33,6 +34,11 @@ export default class AppInteractionCreateEvent extends EventBuilder {
 		if (!interaction.isButton()) return;
 
 		try {
+			if (interaction.customId.startsWith('giveaway:')) {
+				await handleGiveawayDiscordInteraction(interaction);
+				return;
+			}
+
 			if (interaction.customId === 'status:refresh') {
 				await interaction.deferUpdate();
 				const payload = await buildStatusMessage(interaction.client, interaction.user.id);

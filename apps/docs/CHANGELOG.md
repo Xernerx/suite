@@ -2,6 +2,24 @@
 
 # docs
 
+## 1.10.5
+
+### Patch Changes
+
+- ## Giveaways API Documentation
+  
+  Documented the new `/secure/giveaways` endpoints in the interactive API documentation.
+  
+  ### Added
+  
+  - Added `/secure/giveaways`, `/secure/giveaways/[id]`, and `/secure/giveaways/[id]/enter` blueprints to `SecureEndpoints.tsx`
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 1.10.4
 
 ### Patch Changes

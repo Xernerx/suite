@@ -15,6 +15,7 @@ import {
 	Users as UsersIcon,
 	Link,
 	Megaphone,
+	Gift,
 	Newspaper,
 	Image,
 	Map,
@@ -44,6 +45,7 @@ import Users from '@/components/Users';
 import Settings from '@/components/Settings';
 import Invites from '@/components/Invites';
 import Announcements from '@/components/Announcements';
+import Giveaways from '@/components/Giveaways';
 import BlogStudio from '@/components/BlogStudio';
 import Suggestions from '@/components/Suggestions';
 import Roadmap from '@/components/Roadmap';
@@ -211,6 +213,7 @@ export default function Home() {
 	const canSettings = hasDbFallback || (userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false);
 	const canInvites = hasDbFallback || (userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false);
 	const canAnnouncements = hasDbFallback || (userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false);
+	const canGiveaways = hasDbFallback || (userRolePermissions.giveaways ?? userRolePermissions.announcements ?? permissions.find((p) => p.key === 'giveaways')?.defaultValue ?? false);
 	const canManageMedia = hasDbFallback || (userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false);
 	const canUploadMedia = hasDbFallback || (userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true);
 	const canManageRoadmap = hasDbFallback || (userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false);
@@ -288,6 +291,9 @@ export default function Home() {
 		if (canAnnouncements) {
 			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
 			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.blog'), view: 'blog', icon: Newspaper });
+		}
+		if (canGiveaways) {
+			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.giveaways'), view: 'giveaways', icon: Gift });
 		}
 		if (canManageRoadmap) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.roadmap'), view: 'roadmap', icon: Map });
 		if (canManageSuggestions) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.suggestions'), view: 'suggestions', icon: Inbox });
@@ -391,6 +397,7 @@ export default function Home() {
 		allowedViews.push('announcements');
 		allowedViews.push('blog');
 	}
+	if (canGiveaways) allowedViews.push('giveaways');
 	if (canManageRoadmap) allowedViews.push('roadmap');
 	if (canManageSuggestions) allowedViews.push('suggestions');
 	if (canManageIssues) allowedViews.push('issues');
@@ -422,6 +429,7 @@ export default function Home() {
 						canSettings,
 						canInvites,
 						canAnnouncements,
+						canGiveaways,
 						canMedia,
 						canManageRoadmap,
 						canManageSuggestions,
@@ -454,6 +462,7 @@ export default function Home() {
 			{activeView === 'virtue' && <VirtueAdmin avatarUrl={virtueAvatarUrl} adminServerId={adminServerId} />}
 			{activeView === 'invites' && <Invites initialSearch={triageQuery} />}
 			{activeView === 'announcements' && <Announcements />}
+			{activeView === 'giveaways' && <Giveaways />}
 			{activeView === 'blog' && <BlogStudio />}
 			{activeView === 'roadmap' && <Roadmap />}
 			{activeView === 'suggestions' && <Suggestions initialSearch={triageQuery} />}

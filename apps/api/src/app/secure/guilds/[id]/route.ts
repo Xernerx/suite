@@ -6,6 +6,7 @@ import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
 import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
+import { fetchGuildChannelsCached, fetchGuildInfoCached } from '@/lib/discordGuildResources';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -22,89 +23,49 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			guild.voteCount = await VoteModel.countDocuments({ guildId });
 		}
 
-		const botToken = process.env.DISCORD_BOT_TOKEN || process.env.DISCORD_CLIENT_TOKEN;
-		let activeToken = botToken;
-		let botInServer = false;
-		if (botToken) {
-			try {
-				// Do a quick check against Discord to see if the public bot is in this server
-				let discordRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=false`, {
-					headers: { Authorization: `Bot ${botToken}` },
-				});
-				if (!discordRes.ok && process.env.DISCORD_CLIENT_TOKEN && process.env.DISCORD_CLIENT_TOKEN !== botToken) {
-					const fallbackRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}?with_counts=false`, {
-						headers: { Authorization: `Bot ${process.env.DISCORD_CLIENT_TOKEN}` },
-					});
-					if (fallbackRes.ok) {
-						discordRes = fallbackRes;
-						activeToken = process.env.DISCORD_CLIENT_TOKEN;
-					}
-				}
-				botInServer = discordRes.ok;
+		const [discordGuild, channelsData] = await Promise.all([fetchGuildInfoCached(guildId), fetchGuildChannelsCached(guildId)]);
 
-				if (discordRes.ok && guild) {
-					const discordGuild = await discordRes.json();
+		const botInServer = Boolean(discordGuild || (Array.isArray(channelsData) && channelsData.length > 0));
 
-					const updates: any = {};
-					let needsUpdate = false;
+		if (discordGuild && guild) {
+			const updates: any = {};
+			let needsUpdate = false;
 
-					if (guild.name !== discordGuild.name) {
-						updates.name = discordGuild.name;
-						guild.name = discordGuild.name;
-						needsUpdate = true;
-					}
+			if (guild.name !== discordGuild.name) {
+				updates.name = discordGuild.name;
+				guild.name = discordGuild.name;
+				needsUpdate = true;
+			}
 
-					if (guild.icon !== discordGuild.icon) {
-						updates.icon = discordGuild.icon;
-						guild.icon = discordGuild.icon;
-						needsUpdate = true;
-					}
+			if (guild.icon !== discordGuild.icon) {
+				updates.icon = discordGuild.icon;
+				guild.icon = discordGuild.icon;
+				needsUpdate = true;
+			}
 
-					if (guild.banner !== discordGuild.banner) {
-						updates.banner = discordGuild.banner;
-						guild.banner = discordGuild.banner;
-						needsUpdate = true;
-					}
+			if (guild.banner !== discordGuild.banner) {
+				updates.banner = discordGuild.banner;
+				guild.banner = discordGuild.banner;
+				needsUpdate = true;
+			}
 
-					if (guild.bot !== botInServer) {
-						updates.bot = botInServer;
-						guild.bot = botInServer;
-						needsUpdate = true;
-					}
+			if (guild.bot !== botInServer) {
+				updates.bot = botInServer;
+				guild.bot = botInServer;
+				needsUpdate = true;
+			}
 
-					if (needsUpdate) {
-						await db.updateOne({ id: guildId }, { $set: updates });
-					}
-				} else if (guild && guild.bot !== botInServer) {
-					// Bot is no longer in the server, update the database
-					await db.updateOne({ id: guildId }, { $set: { bot: botInServer } });
-					guild.bot = botInServer;
-				}
-			} catch (e) {
-				console.error('[Guild GET] Error checking bot presence:', e);
+			if (needsUpdate) {
+				await db.updateOne({ id: guildId }, { $set: updates }).catch(() => null);
 			}
 		}
 
-		let activeChannels: { id: string; name: string }[] = [];
-		if (botInServer && activeToken) {
-			try {
-				const channelsRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/channels`, {
-					headers: { Authorization: `Bot ${activeToken}` },
-					next: { revalidate: 60 },
-				});
-				if (channelsRes.ok) {
-					const channelsData = await channelsRes.json();
-					if (Array.isArray(channelsData)) {
-						activeChannels = channelsData
-							.filter((c: any) => c.type === 0 || c.type === 5 || c.type === 15 || c.type === 16)
-							.sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
-							.map((c: any) => ({ id: c.id, name: c.name, type: c.type }));
-					}
-				}
-			} catch (e) {
-				console.error('[Guild GET] Error fetching channels:', e);
-			}
-		}
+		const activeChannels = Array.isArray(channelsData)
+			? channelsData
+					.filter((c: any) => c.type === undefined || c.type === 0 || c.type === 5 || c.type === 15 || c.type === 16)
+					.sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+					.map((c: any) => ({ id: String(c.id), name: String(c.name), type: c.type ?? 0 }))
+			: [];
 
 		if (!guild) {
 			// Return an empty/default object instead of 404 so the client can initialize it

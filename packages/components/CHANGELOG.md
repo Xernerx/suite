@@ -2,6 +2,26 @@
 
 # @xernerx/components
 
+## 0.16.0
+
+### Minor Changes
+
+- ## Live Giveaway Web Banner & Interactive Entry Modal
+  
+  Added `GiveawayBanner` to the shared application `Page` shell so active web giveaways surface across targeted subdomains with live entry, odds preview, and requirement checklists.
+  
+  ### Added
+  
+  - `GiveawayBanner` component (`packages/components/src/GiveawayBanner.tsx`) with subdomain targeting, interactive entry modal, and draw-time requirement indicators
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 0.15.5
 
 ### Patch Changes
