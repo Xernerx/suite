@@ -6,3 +6,4 @@ export * from './src/registry';
 export * from './src/milestones';
 export * from './src/terminal';
 export * from './src/botStatusWebhooks';
+export * from './src/giveaways';

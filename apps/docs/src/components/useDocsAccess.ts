@@ -35,15 +35,15 @@ export function useDocsAccess() {
 
 				const hasDirectWebsocket = hasDirectAdmin || user?.permissions?.websocket === true || (Array.isArray(user?.permissions) && user.permissions.includes('websocket'));
 
-				const rolePromises = Array.isArray(user?.roles)
-					? user.roles.map(async (roleItem: any) => {
-							const roleId = typeof roleItem === 'string' ? roleItem : roleItem.id;
-							if (!roleId) return null;
-							const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
-							if (!res.ok) return null;
-							return res.json();
-						})
-					: [];
+				const roleIds = Array.isArray(user?.roles) ? user.roles.map((roleItem: any) => (typeof roleItem === 'string' ? roleItem : roleItem?.id)).filter(Boolean) : [];
+
+				const rolesPromise =
+					roleIds.length > 0
+						? fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' })
+								.then((res) => (res.ok ? res.json() : []))
+								.then((allRoles) => (Array.isArray(allRoles) ? allRoles.filter((r: any) => r?.id && roleIds.includes(r.id)) : []))
+								.catch(() => [])
+						: Promise.resolve([]);
 
 				const tokensPromise = fetch(getEnvUrl('https://api.xernerx.com/secure/tokens'), { credentials: 'include' })
 					.then(async (res) => {
@@ -61,7 +61,7 @@ export function useDocsAccess() {
 					})
 					.catch(() => []);
 
-				const [fetchedRoles, fetchedTokens] = await Promise.all([Promise.all(rolePromises), tokensPromise]);
+				const [fetchedRoles, fetchedTokens] = await Promise.all([rolesPromise, tokensPromise]);
 
 				const hasRoleAdmin = fetchedRoles.some(
 					(role: any) =>

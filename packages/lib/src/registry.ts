@@ -13,6 +13,7 @@ import CoreInviteSchema from './models/xernerx/core/Invite';
 import CoreAppInviteSchema from './models/xernerx/core/AppInvite';
 import CoreRoleSchema from './models/xernerx/core/Role';
 import CoreAnnouncementSchema from './models/xernerx/core/Announcement';
+import CoreGiveawaySchema from './models/xernerx/core/Giveaway';
 import CoreBlogPostSchema from './models/xernerx/core/BlogPost';
 import CoreMediaSchema from './models/xernerx/core/Media';
 import CoreSuggestionSchema from './models/xernerx/core/Suggestion';
@@ -64,6 +65,7 @@ export const xernerxModels = {
 		AppInvite: { schema: CoreAppInviteSchema, modelName: 'AppInvite' },
 		Role: { schema: CoreRoleSchema, modelName: 'Role' },
 		Announcement: { schema: CoreAnnouncementSchema, modelName: 'Announcement' },
+		Giveaway: { schema: CoreGiveawaySchema, modelName: 'Giveaway', collection: 'giveaways' },
 		BlogPost: { schema: CoreBlogPostSchema, modelName: 'BlogPost', collection: 'blog_posts' },
 		Media: { schema: CoreMediaSchema, modelName: 'Media' },
 		Suggestion: { schema: CoreSuggestionSchema, modelName: 'Suggestion' },

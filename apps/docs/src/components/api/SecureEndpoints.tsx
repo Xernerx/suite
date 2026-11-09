@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Server, Key, Shield, Link as LinkIcon, Megaphone, Languages, FileText, Settings2, Bot, Globe, Building2, ShoppingBag, Bell, Bug, Newspaper } from 'lucide-react';
+import { Server, Key, Shield, Link as LinkIcon, Megaphone, Gift, Languages, FileText, Settings2, Bot, Globe, Building2, ShoppingBag, Bell, Bug, Newspaper } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 import { EndpointSection } from './EndpointSection';
 
@@ -224,6 +224,22 @@ export function SecureEndpoints({ activeGroup = 'all', searchQuery = '', methodF
 				{ method: 'DELETE', path: '/secure/announcements/[id]', auth: 'secure' as const },
 				{ method: 'POST', path: '/secure/announcements/create-webhook', auth: 'secure' as const },
 				{ method: 'GET', path: '/api/cron/announcements', auth: 'secure' as const },
+			],
+		},
+		{
+			id: 'manage-giveaways',
+			group: 'secure-moderation',
+			title: t('docs.api.secure.manageGiveaways.title'),
+			icon: Gift,
+			description: t('docs.api.secure.manageGiveaways.description'),
+			routes: [
+				{ method: 'GET', path: '/secure/giveaways', auth: 'secure' as const },
+				{ method: 'POST', path: '/secure/giveaways', auth: 'secure' as const },
+				{ method: 'GET', path: '/secure/giveaways/[id]', auth: 'secure' as const },
+				{ method: 'PATCH', path: '/secure/giveaways/[id]', auth: 'secure' as const },
+				{ method: 'DELETE', path: '/secure/giveaways/[id]', auth: 'secure' as const },
+				{ method: 'POST', path: '/secure/giveaways/[id]/enter', auth: 'secure' as const },
+				{ method: 'DELETE', path: '/secure/giveaways/[id]/enter', auth: 'secure' as const },
 			],
 		},
 		{

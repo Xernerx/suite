@@ -4,7 +4,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button, Confirm, Modal } from '@xernerx/ui';
-import { useDictionary, useToast } from '@xernerx/providers';
+import { useDictionary, useToast, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserConnectionItem, UserDeviceItem, UserShowcaseItem, UserSummary } from './types';
 import { UserProfilePreview } from './UserProfilePreview';
@@ -29,6 +29,7 @@ interface UserModalProps {
 export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl, onUserDeleted, onUserUpdated, onViewAuditLogs, onNavigateEntity, initialTab = 'profile' }: UserModalProps) {
 	const { toast } = useToast();
 	const { t } = useDictionary();
+	const { user: currentUser, mutate: mutateCurrentUser } = useUser() as { user: any; mutate: () => Promise<void> };
 
 	const [activeTab, setActiveTab] = useState<'profile' | 'economy' | 'assets'>(initialTab);
 	const [fullUser, setFullUser] = useState<FullUser | null>(null);
@@ -49,6 +50,16 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 	const [email, setEmail] = useState('');
 	const initialRoles = getNormalizedRoles(user);
 	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(initialRoles);
+	const existingRoleIdSet = useMemo(() => new Set(roles.map((r) => r.id)), [roles]);
+	const missingRoleCount = useMemo(() => selectedRoleIds.filter((rid) => Boolean(rid) && !existingRoleIdSet.has(rid)).length, [selectedRoleIds, existingRoleIdSet]);
+
+	useEffect(() => {
+		if (!open) {
+			const latestRoles = getNormalizedRoles(user);
+			setSelectedRoleIds(latestRoles);
+			setFullUser((prev) => (prev ? { ...prev, roles: latestRoles } : prev));
+		}
+	}, [open, user.roles]);
 	const [stripeCustomerId, setStripeCustomerId] = useState(user.stripeCustomerId || '');
 	const [description, setDescription] = useState('');
 	const [info, setInfo] = useState('');
@@ -365,6 +376,9 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 			};
 			setFullUser(manuallyUpdatedUser);
 			onUserUpdated(manuallyUpdatedUser);
+			if (currentUser?.id === user.id) {
+				mutateCurrentUser().catch(() => {});
+			}
 			toast({ title: t('admin.users.toast.updateSuccess'), type: 'success' });
 		} catch (err: any) {
 			console.error(err);
@@ -426,6 +440,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									vanitySlug={vanitySlug}
 									blacklisted={blacklisted}
 									services={services}
+									missingRoleCount={missingRoleCount}
 									onViewAuditLogs={
 										onViewAuditLogs
 											? () => {

@@ -70,18 +70,19 @@ export default function OrgMembersTab({ session, selectedOrg, orgConfig, setOrgC
 				if (dbRes && dbRes.ok) {
 					dbUser = await dbRes.json();
 
-					if (dbUser.roles && Array.isArray(dbUser.roles)) {
-						const rolePromises = dbUser.roles.map(async (roleItem: any) => {
-							const roleId = typeof roleItem === 'string' ? roleItem : roleItem.id;
-							if (!roleId) return null;
+					if (dbUser.roles && Array.isArray(dbUser.roles) && dbUser.roles.length > 0) {
+						const roleIds = dbUser.roles.map((roleItem: any) => (typeof roleItem === 'string' ? roleItem : roleItem?.id)).filter(Boolean);
+						if (roleIds.length > 0) {
 							try {
-								const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
-								if (res.ok) return await res.json();
+								const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' });
+								if (res.ok) {
+									const allRoles = await res.json();
+									if (Array.isArray(allRoles)) {
+										fullRoles = allRoles.filter((r: any) => r?.id && roleIds.includes(r.id));
+									}
+								}
 							} catch (e) {}
-							return null;
-						});
-						const fetched = await Promise.all(rolePromises);
-						fullRoles = fetched.filter(Boolean);
+						}
 					}
 				}
 				setInviteUserObj({ ...discordUser, dbData: dbUser, fullRoles });

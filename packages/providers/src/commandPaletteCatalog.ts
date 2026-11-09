@@ -169,7 +169,7 @@ export const ACCOUNT_DEEP_FEATURES = [
 		id: 'vanity-slug',
 		view: 'profile',
 		label: 'Custom Vanity Profile URL & Privacy Tier',
-		subtitle: 'Account Profile • Set xernerx.com/users/{slug} & Public/Limited/Private visibility',
+		subtitle: 'Account Profile • Set app.xernerx.com/users/{slug} & Public/Limited/Private visibility',
 		keywords: 'vanity url slug custom handle privacy public limited private embed widget',
 		icon: Lock,
 	},

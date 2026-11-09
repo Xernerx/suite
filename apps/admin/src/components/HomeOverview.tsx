@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity, ArrowRight, Gauge, RefreshCw } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
@@ -23,6 +23,7 @@ export interface AdminPermissionsMap {
 	canSettings: boolean;
 	canInvites: boolean;
 	canAnnouncements: boolean;
+	canGiveaways?: boolean;
 	canMedia: boolean;
 	canManageRoadmap: boolean;
 	canManageSuggestions: boolean;
@@ -38,6 +39,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
+	const hasLoadedOnceRef = useRef(false);
 
 	const [apps, setApps] = useState<SuiteAppVersionInfo[]>(FALLBACK_APPS);
 	const [pings, setPings] = useState<Record<string, number | null>>({});
@@ -60,6 +62,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 	const [storeCategories, setStoreCategories] = useState<any[]>([]);
 	const [invites, setInvites] = useState<any[]>([]);
 	const [announcements, setAnnouncements] = useState<any[]>([]);
+	const [giveaways, setGiveaways] = useState<any[]>([]);
 	const [mediaList, setMediaList] = useState<any[]>([]);
 
 	const pingService = useCallback(async (appId: string, host: string) => {
@@ -90,9 +93,28 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 		}
 	}, []);
 
+	const {
+		canUsers,
+		canBots,
+		canServers,
+		canOrganizations,
+		canRoles,
+		canApplicationsReview,
+		canTokens,
+		canInvites,
+		canAnnouncements,
+		canGiveaways,
+		canMedia,
+		canManageRoadmap,
+		canManageSuggestions,
+		canManageIssues,
+		canManageStore,
+		isServerSet,
+	} = permissions;
+
 	const fetchAllData = useCallback(
 		async (isManual = false) => {
-			if (isManual) setRefreshing(true);
+			if (isManual || hasLoadedOnceRef.current) setRefreshing(true);
 			else setLoading(true);
 
 			try {
@@ -124,7 +146,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 				);
 
 				// 2. Permission-gated fetches
-				if (permissions.canManageIssues) {
+				if (canManageIssues) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/core/issues'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : null))
@@ -133,7 +155,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canApplicationsReview && permissions.isServerSet) {
+				if (canApplicationsReview && isServerSet) {
 					tasks.push(
 						Promise.all([
 							fetch(getEnvUrl('https://api.xernerx.com/secure/dispatch/applications/reviews'), { credentials: 'include', cache: 'no-store' }).then((r) => (r.ok ? r.json() : [])),
@@ -153,7 +175,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canManageSuggestions) {
+				if (canManageSuggestions) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/core/suggestions'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : null))
@@ -162,7 +184,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canManageRoadmap) {
+				if (canManageRoadmap) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/core/roadmap'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : null))
@@ -171,7 +193,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canUsers && permissions.isServerSet) {
+				if (canUsers && isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/users'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -180,7 +202,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canBots && permissions.isServerSet) {
+				if (canBots && isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/bots?all=true'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -189,7 +211,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canServers && permissions.isServerSet) {
+				if (canServers && isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/guilds?all=true'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -198,7 +220,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if ((permissions.canOrganizations ?? permissions.canUsers) && permissions.isServerSet) {
+				if ((canOrganizations ?? canUsers) && isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/organizations?admin=true'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -207,7 +229,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canRoles && permissions.isServerSet) {
+				if ((canRoles || canUsers) && isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -216,7 +238,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canTokens && permissions.isServerSet) {
+				if (canTokens && isServerSet) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/tokens?admin=true'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -225,7 +247,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canManageStore) {
+				if (canManageStore) {
 					tasks.push(
 						Promise.all([
 							fetch(getEnvUrl('https://api.xernerx.com/secure/store/items'), { credentials: 'include' }).then((r) => (r.ok ? r.json() : [])),
@@ -239,7 +261,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canInvites) {
+				if (canInvites) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/invites'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : null))
@@ -248,7 +270,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canAnnouncements) {
+				if (canAnnouncements) {
 					tasks.push(
 						fetch(getEnvUrl('https://api.xernerx.com/secure/announcements'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : null))
@@ -257,7 +279,16 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					);
 				}
 
-				if (permissions.canMedia) {
+				if (canGiveaways ?? canAnnouncements) {
+					tasks.push(
+						fetch(getEnvUrl('https://api.xernerx.com/secure/giveaways'), { credentials: 'include' })
+							.then((r) => (r.ok ? r.json() : null))
+							.then((d) => setGiveaways(Array.isArray(d?.data) ? d.data : Array.isArray(d) ? d : []))
+							.catch(() => {})
+					);
+				}
+
+				if (canMedia) {
 					tasks.push(
 						fetch(getEnvUrl('https://cdn.xernerx.com/api/media?admin=true'), { credentials: 'include' })
 							.then((r) => (r.ok ? r.json() : []))
@@ -268,11 +299,31 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 
 				await Promise.all(tasks);
 			} finally {
+				hasLoadedOnceRef.current = true;
 				setLoading(false);
 				setRefreshing(false);
 			}
 		},
-		[getEnvUrl, permissions, pingService]
+		[
+			getEnvUrl,
+			pingService,
+			canUsers,
+			canBots,
+			canServers,
+			canOrganizations,
+			canRoles,
+			canApplicationsReview,
+			canTokens,
+			canInvites,
+			canAnnouncements,
+			canGiveaways,
+			canMedia,
+			canManageRoadmap,
+			canManageSuggestions,
+			canManageIssues,
+			canManageStore,
+			isServerSet,
+		]
 	);
 
 	useEffect(() => {
@@ -310,6 +361,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 		mediaList,
 		invites,
 		announcements,
+		giveaways,
 	});
 
 	return (

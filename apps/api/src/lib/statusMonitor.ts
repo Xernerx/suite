@@ -137,7 +137,7 @@ export async function recordAndGetStatusHistory(options?: { forceRefresh?: boole
 
 	// Record & backfill Main Org Bots
 	const mainOrgId = mainOrgSetting?.value ? String(mainOrgSetting.value) : null;
-	const orgBots = mainOrgId && BotModel ? await BotModel.find({ organization: mainOrgId }).lean() : [];
+	const orgBots = mainOrgId && BotModel ? await BotModel.find({ organization: mainOrgId, privacy: 'public' }).lean() : [];
 	const botIds = orgBots.map((b: any) => String(b.id)).filter(Boolean);
 
 	if (botIds.length > 0 && StatModel) {

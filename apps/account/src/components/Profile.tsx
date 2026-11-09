@@ -313,11 +313,11 @@ export default function Profile() {
 									</Badge>
 								)}
 							</div>
-							<span className="text-xs font-mono text-(--accent)">xernerx.com/users/{formData.vanitySlug || userId || 'slug'}</span>
+							<span className="text-xs font-mono text-(--accent)">app.xernerx.com/users/{formData.vanitySlug || userId || 'slug'}</span>
 						</div>
 						{isVanityUnlocked ? (
 							<div className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-2">
-								<span className="text-xs font-mono font-bold text-(--text-muted) px-2 shrink-0">xernerx.com/users/</span>
+								<span className="text-xs font-mono font-bold text-(--text-muted) px-2 shrink-0">app.xernerx.com/users/</span>
 								<div className="flex-1">
 									<Input
 										type="text"

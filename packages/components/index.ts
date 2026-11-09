@@ -19,3 +19,4 @@ export * from './src/tokens/AsyncUserMultiSelector';
 export * from './src/cards/UserProfilePopover';
 export * from './src/SpotlightBoostModal';
 export * from './src/OverlayBotRunnerCard';
+export * from './src/GiveawayBanner';

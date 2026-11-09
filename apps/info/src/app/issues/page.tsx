@@ -256,8 +256,9 @@ export default function IssuesPage() {
 	};
 
 	const availableProducts = useMemo(() => {
+		if (products.length > 0) return products;
 		const openIssues = issues.filter((s: any) => s.status !== 'resolved');
-		const set = new Set<string>(products);
+		const set = new Set<string>();
 		openIssues.forEach((s: any) => {
 			if (s.productId) set.add(s.productId);
 		});

@@ -16,6 +16,7 @@ export default function RoadmapPage() {
 	const { t } = useDictionary();
 	const [roadmap, setRoadmap] = useState<any[]>([]);
 	const [issues, setIssues] = useState<any[]>([]);
+	const [products, setProducts] = useState<string[]>([]);
 	const [orgBots, setOrgBots] = useState<{ id: string; name: string; avatarUrl: string | null }[]>([]);
 	const [botProfiles, setBotProfiles] = useState<Record<string, { name: string; avatarUrl: string | null }>>({});
 	const [loading, setLoading] = useState(true);
@@ -71,10 +72,12 @@ export default function RoadmapPage() {
 			.then(([roadmapData, issuesData, productsData]) => {
 				const rItems = roadmapData?.data || [];
 				const iItems = issuesData?.data || [];
+				const prodList = Array.isArray(productsData?.data) ? productsData.data : [];
 				const botsList = Array.isArray(productsData?.bots) ? productsData.bots : [];
 
 				setRoadmap(rItems);
 				setIssues(iItems);
+				setProducts(prodList);
 				setOrgBots(botsList);
 				setLoading(false);
 
@@ -145,10 +148,24 @@ export default function RoadmapPage() {
 		return qA.localeCompare(qB);
 	});
 
-	const allProducts = Array.from(new Set(roadmap.map((i: any) => i.productId)));
+	const publicProductSet = new Set(products.map((p) => String(p).toLowerCase()));
+	const allProducts = Array.from(
+		new Set(
+			roadmap
+				.map((i: any) => i.productId)
+				.filter((prod: any) => {
+					if (!prod) return false;
+					if (publicProductSet.size === 0) return true;
+					const botInfo = resolveBot(prod);
+					const resolvedName = (botInfo?.name || String(prod)).toLowerCase();
+					return publicProductSet.has(String(prod).toLowerCase()) || publicProductSet.has(resolvedName);
+				})
+		)
+	);
+	const selectableProducts = Array.from(new Set([...products, ...allProducts])).filter(Boolean);
 	const productColors = ['#3b82f6', '#ec4899', '#10b981', '#f97316', '#8b5cf6', '#06b6d4', '#ef4444', '#eab308'];
 	const getProductColor = (prod: string) => {
-		const idx = allProducts.indexOf(prod);
+		const idx = selectableProducts.indexOf(prod);
 		return productColors[Math.max(0, idx) % productColors.length];
 	};
 
@@ -237,7 +254,7 @@ export default function RoadmapPage() {
 						placeholder={t('info.roadmap.allProducts')}
 						value={selectedProducts}
 						onChange={setSelectedProducts}
-						options={allProducts.map((prod: string) => {
+						options={selectableProducts.map((prod: string) => {
 							const botInfo = resolveBot(prod);
 							return {
 								value: prod,

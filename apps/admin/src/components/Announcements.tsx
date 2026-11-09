@@ -43,18 +43,35 @@ export default function Announcements() {
 
 	const fetchChannels = async () => {
 		try {
-			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), { credentials: 'include' });
-			if (res.ok) {
-				const data = await res.json();
-				if (data.value) {
-					const guildRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${data.value}`), { credentials: 'include' });
-					if (guildRes.ok) {
-						const guildData = await guildRes.json();
-						if (guildData.channels) {
-							setChannels(guildData.channels.map((c: any) => ({ label: '#' + c.name, value: c.id })));
-						}
-					}
-				}
+			let guildId = '687429190165069838';
+			const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/admin_server_id'), { credentials: 'include' }).catch(() => null);
+			if (res?.ok) {
+				const data = await res.json().catch(() => null);
+				if (data?.value) guildId = String(data.value);
+			}
+
+			const [chRes, guildRes] = await Promise.all([
+				fetch(getEnvUrl(`https://api.xernerx.com/core/guilds/${guildId}/discord/channels`)).catch(() => null),
+				fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${guildId}`), { credentials: 'include' }).catch(() => null),
+			]);
+
+			let rawChannels: any[] = [];
+			if (chRes?.ok) {
+				const chData = await chRes.json().catch(() => null);
+				if (Array.isArray(chData)) rawChannels = chData;
+			}
+			if (rawChannels.length === 0 && guildRes?.ok) {
+				const guildData = await guildRes.json().catch(() => null);
+				if (Array.isArray(guildData?.channels)) rawChannels = guildData.channels;
+			}
+
+			if (rawChannels.length > 0) {
+				setChannels(
+					rawChannels
+						.filter((c: any) => c?.id && c?.name && (c.type === undefined || [0, 5, 15, 16].includes(Number(c.type))))
+						.sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+						.map((c: any) => ({ label: '#' + String(c.name).replace(/^#/, ''), value: String(c.id) }))
+				);
 			}
 		} catch (e) {
 			console.error('Failed to fetch channels', e);

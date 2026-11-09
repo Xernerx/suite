@@ -3,34 +3,9 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
+import { fetchDiscordWithFallback as fetchDiscordResource, fetchGuildChannelsCached, fetchGuildInfoCached, fetchGuildRolesCached } from '@/lib/discordGuildResources';
 
 const DEFAULT_SUPPORT_CHECKLIST = ['Retried the command?', 'Bot is online?', 'Have someone else try?', 'Checked if you have permissions?'];
-
-async function fetchDiscordResource(path: string) {
-	const primaryToken = process.env.DISCORD_CLIENT_TOKEN || process.env.DISCORD_BOT_TOKEN;
-	const fallbackToken = process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_BOT_TOKEN !== primaryToken ? process.env.DISCORD_BOT_TOKEN : null;
-
-	if (!primaryToken) return null;
-
-	try {
-		let res = await fetch(`https://discord.com/api/v10${path}`, {
-			headers: { Authorization: `Bot ${primaryToken}` },
-			cache: 'no-store',
-		});
-
-		if (!res.ok && fallbackToken) {
-			res = await fetch(`https://discord.com/api/v10${path}`, {
-				headers: { Authorization: `Bot ${fallbackToken}` },
-				cache: 'no-store',
-			});
-		}
-
-		if (res.ok) {
-			return await res.json();
-		}
-	} catch {}
-	return null;
-}
 
 export async function GET(req: Request) {
 	try {
@@ -84,7 +59,7 @@ export async function GET(req: Request) {
 		const targetGuildId = requestedGuildId || adminServerId;
 
 		const [discordGuild, discordChannelsRaw, discordRolesRaw] = targetGuildId
-			? await Promise.all([fetchDiscordResource(`/guilds/${targetGuildId}`), fetchDiscordResource(`/guilds/${targetGuildId}/channels`), fetchDiscordResource(`/guilds/${targetGuildId}/roles`)])
+			? await Promise.all([fetchGuildInfoCached(targetGuildId), fetchGuildChannelsCached(targetGuildId), fetchGuildRolesCached(targetGuildId)])
 			: [null, null, null];
 
 		const discordChannels = Array.isArray(discordChannelsRaw)

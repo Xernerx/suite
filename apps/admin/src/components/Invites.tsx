@@ -5,22 +5,10 @@ import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { useEnvironment, useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Modal, Button, Confirm, Input, Toggle, Selector, MultiSelector } from '@xernerx/ui';
+import { Button, Confirm, Input } from '@xernerx/ui';
 import { Link, Plus, Trash2, Edit2, Copy, Check, ExternalLink, Download, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PermissionFlagsBits } from 'discord-api-types/v10';
-
-const DISCORD_SCOPE_OPTIONS = [
-	{ label: 'bot', value: 'bot' },
-	{ label: 'applications.commands', value: 'applications.commands' },
-	{ label: 'identify', value: 'identify' },
-	{ label: 'guilds', value: 'guilds' },
-	{ label: 'guilds.join', value: 'guilds.join' },
-	{ label: 'guilds.members.read', value: 'guilds.members.read' },
-	{ label: 'email', value: 'email' },
-	{ label: 'connections', value: 'connections' },
-	{ label: 'webhook.incoming', value: 'webhook.incoming' },
-];
+import InviteModal, { parsePermissionBigInt } from './invites/InviteModal';
 
 interface AppInvite {
 	id: string; // URL Slug
@@ -28,6 +16,7 @@ interface AppInvite {
 	name: string;
 	permissions: string;
 	scopes: string[];
+	redirect?: boolean;
 	botName?: string;
 	botAvatar?: string | null;
 	createdAt?: string;
@@ -59,6 +48,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 	const [newClientId, setNewClientId] = useState('');
 	const [newName, setNewName] = useState('');
 	const [newScopes, setNewScopes] = useState<string[]>(['bot', 'applications.commands']);
+	const [newRedirect, setNewRedirect] = useState<boolean>(false);
 	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
 
 	const fetchInvites = async (isManual = false) => {
@@ -96,6 +86,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		setNewClientId('');
 		setNewName('');
 		setNewScopes(['bot', 'applications.commands']);
+		setNewRedirect(false);
 		setSelectedPermissions(BigInt(0));
 		setIsCreateOpen(true);
 	};
@@ -106,7 +97,8 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		setNewClientId(invite.clientId);
 		setNewName(invite.name);
 		setNewScopes(Array.isArray(invite.scopes) && invite.scopes.length > 0 ? invite.scopes : ['bot', 'applications.commands']);
-		setSelectedPermissions(BigInt(invite.permissions));
+		setNewRedirect(Boolean(invite.redirect));
+		setSelectedPermissions(parsePermissionBigInt(invite.permissions) ?? BigInt(0));
 		setIsCreateOpen(true);
 	};
 
@@ -120,6 +112,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 			name: newName,
 			permissions: selectedPermissions.toString(),
 			scopes: newScopes.map((s) => s.trim()).filter(Boolean),
+			redirect: newRedirect,
 		};
 
 		try {
@@ -174,10 +167,6 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		}
 	};
 
-	const togglePermission = (bit: bigint) => {
-		setSelectedPermissions((prev) => ((prev & bit) === bit ? prev & ~bit : prev | bit));
-	};
-
 	const filteredInvites = useMemo(() => {
 		return invites.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()) || i.id.toLowerCase().includes(search.toLowerCase()));
 	}, [invites, search]);
@@ -194,9 +183,9 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 			URL.revokeObjectURL(url);
 			return;
 		}
-		const headers = ['id', 'name', 'clientId', 'permissions', 'scopes'];
+		const headers = ['id', 'name', 'clientId', 'permissions', 'scopes', 'redirect'];
 		const rows = filteredInvites.map((inv) =>
-			[inv.id, (inv.name || '').replace(/"/g, '""'), inv.clientId || '', inv.permissions || '', (inv.scopes || []).join(';')].map((cell) => `"${cell}"`).join(',')
+			[inv.id, (inv.name || '').replace(/"/g, '""'), inv.clientId || '', inv.permissions || '', (inv.scopes || []).join(';'), String(Boolean(inv.redirect))].map((cell) => `"${cell}"`).join(',')
 		);
 		const csvContent = [headers.join(','), ...rows].join('\n');
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -242,7 +231,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 			<Input variant="search" shortcut={true} placeholder={t('admin.dashboard.invites.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 
 			{filteredInvites.length === 0 ? (
-				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground) py-16 text-center">
+				<div className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md py-16 text-center">
 					<p className="text-sm text-(--text-muted)">{t('admin.dashboard.invites.noInvites')}</p>
 				</div>
 			) : (
@@ -259,20 +248,27 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 								style={{ gap: 'var(--ui-gap)' }}
 							>
 								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-4">
+									<div className="flex items-center gap-4 min-w-0">
 										{invite.botAvatar ? (
-											<Image src={invite.botAvatar} alt={invite.botName || invite.name} width={48} height={48} unoptimized className="w-12 h-12 rounded-2xl shadow-sm" />
+											<Image src={invite.botAvatar} alt={invite.botName || invite.name} width={48} height={48} unoptimized className="w-12 h-12 rounded-2xl shadow-sm shrink-0" />
 										) : (
-											<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/10 text-(--accent)">
+											<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/10 text-(--accent) shrink-0">
 												<Link size={20} />
 											</div>
 										)}
-										<div className="flex flex-col">
-											<span className="font-bold text-(--text)">{invite.botName || invite.name}</span>
-											<span className="text-xs text-(--text-muted)">/invites/{invite.id}</span>
+										<div className="flex flex-col min-w-0">
+											<div className="flex items-center gap-2 flex-wrap">
+												<span className="font-bold text-(--text) truncate">{invite.botName || invite.name}</span>
+												{invite.redirect && (
+													<span className="rounded-full bg-(--accent)/10 border border-(--accent)/30 px-2 py-0.5 text-[10px] font-semibold text-(--accent)">
+														{t('admin.dashboard.invites.redirectBadge')}
+													</span>
+												)}
+											</div>
+											<span className="text-xs text-(--text-muted) truncate">/invites/{invite.id}</span>
 										</div>
 									</div>
-									<div className="flex items-center gap-1">
+									<div className="flex items-center gap-1 shrink-0">
 										<button
 											type="button"
 											onClick={() => {
@@ -284,7 +280,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 											}}
 											title={t('admin.dashboard.invites.copyInviteUrl')}
 											aria-label={t('admin.dashboard.invites.copyInviteUrl')}
-											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
+											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
 										>
 											{copiedSlug === invite.id ? <Check size={16} className="text-(--accent-green)" /> : <Copy size={16} />}
 										</button>
@@ -294,7 +290,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 											rel="noopener noreferrer"
 											aria-label={t('admin.dashboard.invites.openInvite')}
 											title={t('admin.dashboard.invites.openInvite')}
-											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
+											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
 										>
 											<ExternalLink size={16} />
 										</a>
@@ -302,7 +298,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 											type="button"
 											onClick={() => openEditModal(invite)}
 											aria-label={t('common.edit')}
-											className="p-2 rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
+											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
 										>
 											<Edit2 size={16} />
 										</button>
@@ -310,14 +306,14 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 											type="button"
 											onClick={() => handleDelete(invite.id)}
 											aria-label={t('common.delete')}
-											className="p-2 rounded-xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors"
+											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors cursor-pointer"
 										>
 											<Trash2 size={16} />
 										</button>
 									</div>
 								</div>
 
-								<div className="bg-(--background) rounded-xl p-3 border border-(--border)/5 text-xs font-mono text-(--text-muted) truncate">
+								<div className="bg-(--background)/50 rounded-2xl p-3 border border-(--border)/10 text-xs font-mono text-(--text-muted) truncate">
 									{t('admin.dashboard.invites.perms')} {invite.permissions}
 								</div>
 							</motion.div>
@@ -326,111 +322,26 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 				</motion.div>
 			)}
 
-			<Modal
+			<InviteModal
 				open={isCreateOpen}
 				onOpenChange={setIsCreateOpen}
-				title={editId ? t('admin.dashboard.invites.editModalTitle') : t('admin.dashboard.invites.createModalTitle')}
-				description={t('admin.dashboard.invites.modalDesc')}
-				maxWidth="max-w-4xl"
-			>
-				<form onSubmit={handleSave} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="grid grid-cols-2 gap-4">
-						<div className="flex flex-col gap-2">
-							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.urlSlug')}</label>
-							<Input type="text" value={newId} onChange={(e) => setNewId(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderTodo')} />
-						</div>
-						<div className="flex flex-col gap-2">
-							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.appName')}</label>
-							<Input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} required placeholder={t('admin.dashboard.invites.placeholderAppName')} />
-						</div>
-					</div>
-
-					<div className="relative z-40 flex flex-col gap-2">
-						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.clientId')}</label>
-						<Selector
-							value={newClientId}
-							onChange={(val) => {
-								setNewClientId(val);
-								const matchedBot = availableBots.find((b) => String(b.id) === val);
-								if (matchedBot && !editId) {
-									const botDisplayName = matchedBot.discord?.globalName || matchedBot.discord?.username || matchedBot.name || '';
-									if (!newName && botDisplayName) setNewName(botDisplayName);
-									if (!newId) {
-										const slugCandidate =
-											matchedBot.vanitySlug ||
-											botDisplayName
-												.toLowerCase()
-												.replace(/[^a-z0-9-]+/g, '-')
-												.replace(/^-+|-+$/g, '');
-										if (slugCandidate) setNewId(slugCandidate);
-									}
-								}
-							}}
-							options={(() => {
-								const opts = availableBots.map((b) => {
-									const labelName = b.discord?.globalName || b.discord?.username || b.name || b.id;
-									return {
-										label: `${labelName} (${b.id})`,
-										value: String(b.id),
-									};
-								});
-								if (newClientId && !opts.some((o) => o.value === newClientId)) {
-									opts.unshift({ label: newClientId, value: newClientId });
-								}
-								return opts;
-							})()}
-							placeholder={t('admin.dashboard.invites.placeholderClientId')}
-							toggleClassName="!h-11"
-						/>
-					</div>
-
-					<div className="relative z-30 flex flex-col gap-2">
-						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.scopes')}</label>
-						<MultiSelector
-							value={newScopes}
-							onChange={setNewScopes}
-							options={(() => {
-								const opts = [...DISCORD_SCOPE_OPTIONS];
-								for (const s of newScopes) {
-									if (s && !opts.some((o) => o.value === s)) {
-										opts.push({ label: s, value: s });
-									}
-								}
-								return opts;
-							})()}
-							placeholder="Select OAuth2 scopes..."
-							toggleClassName="!h-11"
-						/>
-					</div>
-
-					<div className="flex flex-col gap-2 max-h-96 overflow-y-auto pr-2 rounded-xl bg-(--foreground)/10 border border-(--border)/10 p-4">
-						<label className="text-xs font-medium text-(--text) sticky top-0 py-1 z-10 mb-2 border-b border-(--border)/10 pb-2">{t('admin.dashboard.invites.permMatrix')}</label>
-						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-							{Object.entries(PermissionFlagsBits).map(([key, bit]) => {
-								const b = BigInt(bit as bigint);
-								return (
-									<label
-										key={key}
-										className="flex items-center justify-between gap-2 text-[11px] text-(--text-muted) cursor-pointer p-2 hover:bg-(--foreground)/50 rounded-xl transition-colors border border-transparent hover:border-(--border)/10"
-									>
-										<span className="truncate flex-1">{key}</span>
-										<Toggle checked={(selectedPermissions & b) === b} onChange={() => togglePermission(b)} size="sm" />
-									</label>
-								);
-							})}
-						</div>
-					</div>
-
-					<div className="flex justify-end gap-3 pt-4 border-t border-(--border)/10 mt-2">
-						<Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
-							{t('admin.dashboard.invites.cancel')}
-						</Button>
-						<Button type="submit" variant="primary" disabled={creating}>
-							{creating ? t('admin.dashboard.invites.saving') : t('admin.dashboard.invites.saveButton')}
-						</Button>
-					</div>
-				</form>
-			</Modal>
+				editId={editId}
+				newId={newId}
+				setNewId={setNewId}
+				newClientId={newClientId}
+				setNewClientId={setNewClientId}
+				newName={newName}
+				setNewName={setNewName}
+				newScopes={newScopes}
+				setNewScopes={setNewScopes}
+				newRedirect={newRedirect}
+				setNewRedirect={setNewRedirect}
+				selectedPermissions={selectedPermissions}
+				setSelectedPermissions={setSelectedPermissions}
+				availableBots={availableBots}
+				creating={creating}
+				onSave={handleSave}
+			/>
 
 			<Confirm
 				open={Boolean(deleteConfirmId)}

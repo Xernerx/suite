@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Ban, CheckCircle2, Download, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Ban, CheckCircle2, Download, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
@@ -34,16 +34,22 @@ export default function Users({
 	const [filterRoleIds, setFilterRoleIds] = useState<string[]>([]);
 	const [verifiedOnly, setVerifiedOnly] = useState(false);
 	const [blacklistedOnly, setBlacklistedOnly] = useState(false);
+	const [missingRolesOnly, setMissingRolesOnly] = useState(false);
 	const [limit, setLimit] = useState(30);
 
 	useEffect(() => {
-		if (initialSearch !== undefined) setSearch(initialSearch);
+		if (initialSearch === 'missing:roles') {
+			setMissingRolesOnly(true);
+			setSearch('');
+		} else if (initialSearch !== undefined) {
+			setSearch(initialSearch);
+		}
 	}, [initialSearch]);
 
 	// Reset limit when filters change
 	useEffect(() => {
 		setLimit(30);
-	}, [search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly]);
+	}, [search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly, missingRolesOnly]);
 
 	const fetchData = useCallback(
 		async (isManual = false) => {
@@ -121,6 +127,36 @@ export default function Users({
 		});
 	}, []);
 
+	const existingRoleIdSet = useMemo(() => new Set(roles.map((r) => r.id)), [roles]);
+
+	const allMissingRoleIds = useMemo(() => {
+		const missing = new Set<string>();
+		for (const u of users) {
+			for (const rid of getNormalizedRoles(u)) {
+				if (rid && !existingRoleIdSet.has(rid)) missing.add(rid);
+			}
+		}
+		return Array.from(missing);
+	}, [users, existingRoleIdSet]);
+
+	const usersWithMissingRolesCount = useMemo(() => {
+		return users.filter((u) => getNormalizedRoles(u).some((rid) => Boolean(rid) && !existingRoleIdSet.has(rid))).length;
+	}, [users, existingRoleIdSet]);
+
+	const roleFilterOptions = useMemo(() => {
+		const validOpts = roles.map((r) => ({
+			value: r.id,
+			label: r.name || t('admin.roles.unnamedRole'),
+			color: r.permissions?.color || undefined,
+		}));
+		const missingOpts = allMissingRoleIds.map((id) => ({
+			value: id,
+			label: t('admin.users.missingRoles.optionLabel', { id: id.length > 12 ? `${id.slice(0, 8)}…` : id }),
+			color: 'var(--accent-red)',
+		}));
+		return [...missingOpts, ...validOpts];
+	}, [roles, allMissingRoleIds, t]);
+
 	const filteredUsers = useMemo(() => {
 		return users
 			.filter((user) => {
@@ -130,10 +166,12 @@ export default function Users({
 				const discordMatch = user.discord?.username?.toLowerCase().includes(query) ?? false;
 				const matchesSearch = nameMatch || idMatch || discordMatch;
 				const userRoleIds = getNormalizedRoles(user);
+				const hasMissing = userRoleIds.some((rid) => Boolean(rid) && !existingRoleIdSet.has(rid));
 				const matchesRoles = filterRoleIds.length === 0 || filterRoleIds.some((roleId) => userRoleIds.includes(roleId));
 				const matchesVerified = !verifiedOnly || Boolean(user.verified);
 				const matchesBlacklisted = !blacklistedOnly || Boolean(user.blacklisted);
-				return matchesSearch && matchesRoles && matchesVerified && matchesBlacklisted;
+				const matchesMissingRoles = !missingRolesOnly || hasMissing;
+				return matchesSearch && matchesRoles && matchesVerified && matchesBlacklisted && matchesMissingRoles;
 			})
 			.sort((a, b) => {
 				if (sortBy === 'level_desc') {
@@ -160,7 +198,7 @@ export default function Users({
 					return nameB.localeCompare(nameA);
 				}
 			});
-	}, [users, search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly]);
+	}, [users, search, sortBy, filterRoleIds, verifiedOnly, blacklistedOnly, missingRolesOnly, existingRoleIdSet]);
 
 	const renderedUsers = filteredUsers.slice(0, limit);
 	const loadMoreRef = useInfiniteScroll(filteredUsers.length > limit, loading, () => setLimit((prev) => prev + 30));
@@ -294,11 +332,7 @@ export default function Users({
 					<MultiSelector
 						value={filterRoleIds}
 						onChange={setFilterRoleIds}
-						options={roles.map((r) => ({
-							value: r.id,
-							label: r.name || t('admin.roles.unnamedRole'),
-							color: r.permissions?.color || undefined,
-						}))}
+						options={roleFilterOptions}
 						placeholder={t('admin.users.rolesLabel')}
 						searchPlaceholder={t('admin.users.searchRolesPlaceholder')}
 						toggleClassName="h-[56px] !rounded-full !text-base shadow-sm"
@@ -323,6 +357,23 @@ export default function Users({
 				>
 					<Ban size={16} />
 					<span>{t('admin.users.fields.blacklistedFilter')}</span>
+				</button>
+				<button
+					type="button"
+					onClick={() => setMissingRolesOnly((prev) => !prev)}
+					className={`flex items-center justify-center gap-2 rounded-full border backdrop-blur-md text-sm font-medium transition-colors shrink-0 w-full sm:w-auto h-[56px] px-5 shadow-sm cursor-pointer ${
+						missingRolesOnly
+							? 'border-(--accent-red)/40 bg-(--accent-red)/15 text-(--accent-red)'
+							: usersWithMissingRolesCount > 0
+								? 'border-(--accent-red)/30 bg-(--accent-red)/5 text-(--accent-red) hover:bg-(--accent-red)/15'
+								: 'border-(--border)/10 bg-(--foreground)/30 text-(--text) hover:bg-(--foreground)/50'
+					}`}
+				>
+					<AlertTriangle size={16} />
+					<span>{t('admin.users.fields.missingRolesFilter')}</span>
+					{usersWithMissingRolesCount > 0 && (
+						<span className="inline-flex items-center justify-center rounded-full bg-(--accent-red)/20 px-2 py-0.5 text-xs font-bold font-mono">{usersWithMissingRolesCount}</span>
+					)}
 				</button>
 				<div className="relative w-full sm:w-56 z-50">
 					<Selector

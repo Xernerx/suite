@@ -2,6 +2,42 @@
 
 # docs
 
+## 1.10.6
+
+### Patch Changes
+
+- ## Batch RBAC Role Resolution for Staff Docs Access
+  
+  Eliminated per-role `/secure/core/{id}` 404 requests when checking staff documentation permissions.
+  
+  ### Changed
+  
+  - **Catalog-Based Role Resolution**: Updated `useDocsAccess` to fetch `GET /secure/core` once and safely ignore deleted or non-existent role IDs on user profiles.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
+## 1.10.5
+
+### Patch Changes
+
+- ## Giveaways API Documentation
+  
+  Documented the new `/secure/giveaways` endpoints in the interactive API documentation.
+  
+  ### Added
+  
+  - Added `/secure/giveaways`, `/secure/giveaways/[id]`, and `/secure/giveaways/[id]/enter` blueprints to `SecureEndpoints.tsx`
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 1.10.4
 
 ### Patch Changes

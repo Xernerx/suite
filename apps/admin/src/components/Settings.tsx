@@ -32,10 +32,12 @@ export default function Settings() {
 	const [availableRoles, setAvailableRoles] = useState<{ id: string; name: string }[]>([]);
 	const [userGuilds, setUserGuilds] = useState<any[]>([]);
 
+	const accessToken = (session as any)?.accessToken as string | undefined;
+
 	useEffect(() => {
-		if (session && (session as any).accessToken) {
+		if (accessToken) {
 			fetch('https://discord.com/api/v10/users/@me/guilds', {
-				headers: { Authorization: `Bearer ${(session as any).accessToken}` },
+				headers: { Authorization: `Bearer ${accessToken}` },
 			})
 				.then((res) => res.json())
 				.then((guilds) => {
@@ -53,7 +55,7 @@ export default function Settings() {
 				})
 				.catch(console.error);
 		}
-	}, [session]);
+	}, [accessToken]);
 
 	const fetchSettings = async () => {
 		setIsLoading(true);

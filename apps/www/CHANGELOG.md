@@ -2,6 +2,35 @@
 
 # www
 
+## 0.24.3
+
+### Patch Changes
+
+- ## OAuth2 Post-Authorization Bot Page Redirect on `/invites/[id]`
+  
+  Appended Discord OAuth2 callback parameters when `redirect` is enabled on an `AppInvite`.
+  
+  ### Changed
+  
+  - **Conditional OAuth2 Redirect Parameters**: Updated `/invites/[id]` to append `&response_type=code&redirect_uri=https%3A%2F%2Fapp.xernerx.com%2Fbots%2F<slug>` when `invite.redirect` is enabled.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
+## 0.24.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 0.24.1
 
 ### Patch Changes

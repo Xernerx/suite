@@ -2,6 +2,26 @@
 
 # @xernerx/ui
 
+## 0.8.7
+
+### Patch Changes
+
+- ## Danger Option Styling in `MultiSelector`
+  
+  Added danger state support for invalid or orphaned options in `MultiSelector`.
+  
+  ### Added
+  
+  - **`MultiSelectOption.danger` Variant**: Added red danger styling and warning indicators for invalid options in `MultiSelector` triggers and dropdown lists.
+- Updated dependencies
+  - @xernerx/providers@0.22.6
+
+## 0.8.6
+
+### Patch Changes
+
+- @xernerx/providers@0.22.5
+
 ## 0.8.5
 
 ### Patch Changes

@@ -2,6 +2,54 @@
 
 # api
 
+## 0.32.1
+
+### Patch Changes
+
+- ## Removed Hardcoded Default Join Role & Updated Bot Webhook Listing Links
+  
+  Stopped auto-injecting a legacy default role UUID on user records and aligned bot webhook embed links with `app.xernerx.com`.
+  
+  ### Changed
+  
+  - **Bot Webhook Listing URLs**: Updated vote, review, and credit tip webhook embed URLs to point directly to `https://app.xernerx.com/bots/...`.
+  
+  ### Deleted
+  
+  - **Legacy Default Join Role Injection**: Removed hardcoded `1b333119-d818-4fb1-a5dc-12621fd14198` role assignments and fallbacks from `/secure/users`, `/secure/users/[id]`, and `/v1/leaderboard`.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
+## 0.32.0
+
+### Minor Changes
+
+- ## Giveaways API, Discord Guild Resource Cache & Public Product Filtering
+  
+  Added `/secure/giveaways` endpoints, resilient Discord guild channel/role caching with rate-limit handling, and public-only product filtering for Info hub selectors.
+  
+  ### Added
+  
+  - `/secure/giveaways`, `/secure/giveaways/[id]`, and `/secure/giveaways/[id]/enter` endpoints for managing, entering, drawing, and rerolling giveaways
+  - `discordGuildResources.ts` helper with TTL caching, in-flight request deduplication, `429` retry handling, and multi-bot token fallback for guild channels and roles
+  
+  ### Changed
+  
+  - Filtered `/info/roadmap/products` so only public main-organization products appear in product selectors
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.0
+  - @xernerx/lib@1.23.0
+  - @xernerx/providers@0.22.5
+  - @xernerx/feedback@0.5.7
+  - @xernerx/ui@0.8.6
+
 ## 0.31.2
 
 ### Patch Changes

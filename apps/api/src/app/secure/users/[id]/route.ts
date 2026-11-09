@@ -139,7 +139,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 const SIGN_IN_BONUS_AMOUNT = 1000;
-const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -183,13 +182,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			);
 		}
 
-		// Fetch default join roles
+		// Fetch configured join roles from Admin Settings and ensure only existing RBAC roles are auto-granted
 		const joinRolesSetting = await models.core.Setting.findOne({ id: 'join_roles' }).lean();
 		let joinRoles: string[] = [];
 		try {
 			joinRoles = JSON.parse(joinRolesSetting?.value || '[]');
 		} catch {}
-		const mergedRoles = Array.from(new Set([...(existingUser?.roles || []), ...(isStaffOrSystem ? userBody.roles || [] : []), DEFAULT_JOIN_ROLE_ID, ...joinRoles].filter(Boolean)));
+		const candidateJoinRoleIds = Array.from(new Set((Array.isArray(joinRoles) ? joinRoles : []).filter((r): r is string => typeof r === 'string' && r.trim().length > 0)));
+		const existingJoinRoleDocs =
+			candidateJoinRoleIds.length > 0 && models.core?.Role
+				? await models.core.Role.find({ id: { $in: candidateJoinRoleIds } })
+						.select('id')
+						.lean()
+						.catch(() => [])
+				: [];
+		const validJoinRoles = (existingJoinRoleDocs || []).map((r: any) => String(r.id)).filter(Boolean);
+		const explicitStaffRoles = isStaffOrSystem && Array.isArray(userBody.roles) ? userBody.roles.filter(Boolean) : [];
+		const mergedRoles = !existingUser
+			? Array.from(new Set([...explicitStaffRoles, ...validJoinRoles]))
+			: explicitStaffRoles.length > 0
+				? Array.from(new Set([...(existingUser.roles || []), ...explicitStaffRoles]))
+				: Array.isArray(existingUser.roles)
+					? existingUser.roles
+					: [];
 
 		let userDoc: any = existingUser;
 		let rolesJustGranted = false;
@@ -200,14 +215,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			rolesJustGranted = mergedRoles.length > 0;
 		} else {
 			const hadRoles = Array.isArray(existingUser.roles) && existingUser.roles.length > 0;
-			const backfillUpdates: Record<string, any> = { roles: mergedRoles };
+			const backfillUpdates: Record<string, any> = {};
+			if (explicitStaffRoles.length > 0) backfillUpdates.roles = mergedRoles;
 			if (!existingUser.name && userBody.name) backfillUpdates.name = userBody.name;
 			if (!existingUser.email && userBody.email) backfillUpdates.email = userBody.email;
 			if (existingUser.agreedTerms && existingUser.agreedPrivacy && !existingUser.verified) {
 				backfillUpdates.verified = true;
 			}
-			userDoc = await models.users.User.findOneAndUpdate({ id }, { $set: backfillUpdates }, { returnDocument: 'after', runValidators: true }).lean();
-			rolesJustGranted = !hadRoles && mergedRoles.length > 0;
+			userDoc =
+				Object.keys(backfillUpdates).length > 0
+					? await models.users.User.findOneAndUpdate({ id }, { $set: backfillUpdates }, { returnDocument: 'after', runValidators: true }).lean()
+					: existingUser;
+			rolesJustGranted = !hadRoles && Boolean(backfillUpdates.roles?.length);
 		}
 
 		if (rolesJustGranted) {

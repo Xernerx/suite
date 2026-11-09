@@ -50,7 +50,7 @@ export default function registerDev(program: Command) {
 		.option('--only <type>', 'Run only a specific workspace type (apps, services, clients, tunnel)')
 		.option('--prepare-only', 'Run only the environment preparation step and exit')
 		.option('--eager', 'Start all 13 web apps immediately instead of waiting for URL requests')
-		.option('--idle-timeout <seconds>', 'Seconds of inactivity before spinning down an awake app (0 to disable)', '60')
+		.option('--idle-timeout <seconds>', 'Seconds of inactivity before spinning down an awake app (0 to disable)', '300')
 		.action(async (options) => {
 			const rootEnvPath = path.join(process.cwd(), '.env');
 
@@ -207,8 +207,8 @@ export default function registerDev(program: Command) {
 				return;
 			}
 
-			const parsedIdleTimeout = Number.parseFloat(options.idleTimeout ?? '60');
-			const idleTimeoutSeconds = Number.isFinite(parsedIdleTimeout) && parsedIdleTimeout >= 0 ? parsedIdleTimeout : 60;
+			const parsedIdleTimeout = Number.parseFloat(options.idleTimeout ?? '300');
+			const idleTimeoutSeconds = Number.isFinite(parsedIdleTimeout) && parsedIdleTimeout >= 0 ? parsedIdleTimeout : 300;
 			const isLazy = !options.eager;
 
 			if (!process.env.NODE_OPTIONS || !process.env.NODE_OPTIONS.includes('--max-old-space-size')) {

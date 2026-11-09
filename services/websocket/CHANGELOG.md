@@ -2,6 +2,27 @@
 
 # @xernerx/websocket
 
+## 1.5.9
+
+### Patch Changes
+
+- ## Removed Hardcoded Default Join Role on WebSocket User Sync
+  
+  Stopped assigning a hardcoded default role UUID when creating or syncing users over WebSocket.
+  
+  ### Deleted
+  
+  - **Legacy Default Role Assignment**: Removed hardcoded `1b333119-d818-4fb1-a5dc-12621fd14198` role initialization from `services/websocket/src/app/xernerx/server.ts`.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+
+## 1.5.8
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.23.0
+
 ## 1.5.7
 
 ### Patch Changes

@@ -34,11 +34,12 @@ export default function HostingPage() {
 	useEffect(() => {
 		if (!isReady) return;
 		async function fetchNodesAndPermissions() {
-			const roleIds = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+			const rawRoles = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+			const roleIds = rawRoles.map((r: any) => (typeof r === 'string' ? r : r?.id)).filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0);
 			try {
-				const [settingsRes, ...roleResponses] = await Promise.all([
+				const [settingsRes, rolesRes] = await Promise.all([
 					fetch(getEnvUrl('https://api.xernerx.com/secure/core/settings/hosting_nodes_config'), { credentials: 'include' }).catch(() => null),
-					...roleIds.map((roleId: string) => fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' }).catch(() => null)),
+					roleIds.length > 0 ? fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include' }).catch(() => null) : Promise.resolve(null),
 				]);
 
 				if (settingsRes && settingsRes.ok) {
@@ -68,13 +69,16 @@ export default function HostingPage() {
 				}
 
 				const mergedPermissions: Record<string, boolean> = {};
-				for (const res of roleResponses) {
-					if (res && res.ok) {
-						const roleDoc = await res.json().catch(() => ({}));
-						const perms = roleDoc?.permissions || {};
-						for (const [k, v] of Object.entries(perms)) {
-							if (v) mergedPermissions[k] = true;
-							else if (mergedPermissions[k] === undefined) mergedPermissions[k] = false;
+				if (rolesRes && rolesRes.ok) {
+					const allRoles = await rolesRes.json().catch(() => []);
+					if (Array.isArray(allRoles)) {
+						for (const roleDoc of allRoles) {
+							if (!roleDoc?.id || !roleIds.includes(roleDoc.id)) continue;
+							const perms = roleDoc?.permissions || {};
+							for (const [k, v] of Object.entries(perms)) {
+								if (v) mergedPermissions[k] = true;
+								else if (mergedPermissions[k] === undefined) mergedPermissions[k] = false;
+							}
 						}
 					}
 				}

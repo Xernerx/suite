@@ -1,6 +1,6 @@
 /** @format */
 
-import { database } from '@xernerx/lib/core';
+import { database, handleGiveawayDiscordInteraction } from '@xernerx/lib/core';
 import { EventBuilder } from '@xernerx/framework';
 import { Interaction } from 'discord.js';
 import { buildBotStatsMessage, type StatsTimeframe } from '../commands/slash/bot.js';
@@ -24,6 +24,15 @@ export default class BotInteractionCreateEvent extends EventBuilder {
 		}
 
 		if (!interaction.isButton()) return;
+
+		if (interaction.customId.startsWith('giveaway:')) {
+			try {
+				await handleGiveawayDiscordInteraction(interaction);
+			} catch (error) {
+				console.error('[XernerxBot] Error handling giveaway button:', error);
+			}
+			return;
+		}
 
 		if (interaction.customId.startsWith('bot_stats:')) {
 			try {

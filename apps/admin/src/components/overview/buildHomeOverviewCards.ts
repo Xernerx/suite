@@ -1,5 +1,5 @@
 /** @format */
-import { Bot, Bug, Building2, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
+import { Bot, Bug, Building2, Gift, Image as ImageIcon, Inbox, Key, Languages, Link as LinkIcon, Map, Megaphone, Server, Shield, ShoppingBag, Ticket, Users as UsersIcon } from 'lucide-react';
 import type { AdminPermissionsMap } from '../HomeOverview';
 import type { ModuleCard, UrgentItem } from './HomeOverviewSections';
 
@@ -23,6 +23,7 @@ interface BuildCardsInput {
 	mediaList: any[];
 	invites: any[];
 	announcements: any[];
+	giveaways?: any[];
 }
 
 export function buildHomeOverviewCards({
@@ -45,6 +46,7 @@ export function buildHomeOverviewCards({
 	mediaList,
 	invites,
 	announcements,
+	giveaways = [],
 }: BuildCardsInput): { urgentItems: UrgentItem[]; moduleCards: ModuleCard[] } {
 	const urgentItems: UrgentItem[] = [];
 	const moduleCards: ModuleCard[] = [];
@@ -187,13 +189,39 @@ export function buildHomeOverviewCards({
 
 	if (permissions.canUsers && permissions.isServerSet) {
 		const verifiedUsers = users.filter((u) => u.verified).length;
+		const existingRoleIds = new Set((roles || []).map((r: any) => r?.id).filter(Boolean));
+		const usersWithMissingRoles =
+			roles.length > 0 ? users.filter((u) => Array.isArray(u?.roles) && u.roles.some((rid: any) => typeof rid === 'string' && rid.trim().length > 0 && !existingRoleIds.has(rid))) : [];
+
+		if (usersWithMissingRoles.length > 0) {
+			urgentItems.push({
+				id: 'urgent-users-missing-roles',
+				view: 'users',
+				title: t('admin.dashboard.home.cards.usersTitle'),
+				subtitle: t('admin.dashboard.home.cards.usersMissingRolesUrgent', { count: usersWithMissingRoles.length }),
+				count: usersWithMissingRoles.length,
+				severity: 'warning',
+				icon: UsersIcon,
+				highlights: [
+					{
+						label: t('admin.users.fields.missingRolesFilter'),
+						query: 'missing:roles',
+					},
+					...usersWithMissingRoles.slice(0, 2).map((u) => ({
+						label: u.name || u.discord?.username || u.id,
+						query: u.id,
+					})),
+				],
+			});
+		}
+
 		moduleCards.push({
 			id: 'mod-users',
 			view: 'users',
 			title: t('admin.dashboard.home.cards.usersTitle'),
 			meta: t('admin.dashboard.home.cards.usersMeta', { total: users.length, verified: verifiedUsers }),
 			icon: UsersIcon,
-			badge: { text: `${users.length}`, tone: 'normal' },
+			badge: usersWithMissingRoles.length > 0 ? { text: `${usersWithMissingRoles.length} !`, tone: 'urgent' } : { text: `${users.length}`, tone: 'normal' },
 		});
 	}
 
@@ -301,6 +329,18 @@ export function buildHomeOverviewCards({
 			meta: t('admin.dashboard.home.cards.announcementsMeta', { total: announcements.length, scheduled: scheduledCount }),
 			icon: Megaphone,
 			badge: { text: `${announcements.length}`, tone: 'normal' },
+		});
+	}
+
+	if (permissions.canGiveaways ?? permissions.canAnnouncements) {
+		const activeGiveawaysCount = giveaways.filter((g) => g.status === 'active').length;
+		moduleCards.push({
+			id: 'mod-giveaways',
+			view: 'giveaways',
+			title: t('admin.dashboard.home.cards.giveawaysTitle'),
+			meta: t('admin.dashboard.home.cards.giveawaysMeta', { active: activeGiveawaysCount, total: giveaways.length }),
+			icon: Gift,
+			badge: { text: `${activeGiveawaysCount}`, tone: activeGiveawaysCount > 0 ? 'ok' : 'normal' },
 		});
 	}
 

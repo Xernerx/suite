@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import React from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { timezones } from '@xernerx/lib';
 import { Input, Markdown, MultiSelector, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
@@ -95,6 +95,22 @@ export function UserIdentityTab({
 }: UserIdentityTabProps) {
 	const { t } = useDictionary();
 
+	const existingRoleIdSet = useMemo(() => new Set(roles.map((r) => r.id)), [roles]);
+	const missingRoleIds = useMemo(() => selectedRoleIds.filter((rid) => Boolean(rid) && !existingRoleIdSet.has(rid)), [selectedRoleIds, existingRoleIdSet]);
+	const roleOptions = useMemo(() => {
+		const validOpts = roles.map((r) => ({
+			value: r.id,
+			label: r.name || t('admin.roles.unnamedRole'),
+			color: r.permissions?.color || undefined,
+		}));
+		const missingOpts = missingRoleIds.map((rid) => ({
+			value: rid,
+			label: t('admin.users.missingRoles.optionLabel', { id: rid }),
+			color: 'var(--accent-red)',
+		}));
+		return [...missingOpts, ...validOpts];
+	}, [roles, missingRoleIds, t]);
+
 	const timezoneOptions = [
 		{ label: t('admin.users.fields.genderUnspecified'), value: '' },
 		...timezones.map((tz) => ({
@@ -131,16 +147,44 @@ export function UserIdentityTab({
 
 			<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 				<label className="block text-xs font-medium text-(--text)">{t('admin.users.rolesLabel')}</label>
-				<MultiSelector
-					value={selectedRoleIds}
-					onChange={setSelectedRoleIds}
-					options={roles.map((r) => ({
-						value: r.id,
-						label: r.name || t('admin.roles.unnamedRole'),
-						color: r.permissions?.color || undefined,
-					}))}
-					placeholder={t('admin.users.addRolePlaceholder')}
-				/>
+				<MultiSelector value={selectedRoleIds} onChange={setSelectedRoleIds} options={roleOptions} placeholder={t('admin.users.addRolePlaceholder')} />
+				{missingRoleIds.length > 0 && (
+					<div className="mt-1.5 flex flex-col gap-2 rounded-2xl border border-(--accent-red)/30 bg-(--accent-red)/10 px-4 py-3">
+						<div className="flex flex-wrap items-center justify-between gap-2">
+							<div className="flex items-center gap-2 text-xs font-bold text-(--accent-red)">
+								<AlertTriangle size={14} className="shrink-0" />
+								<span>{t('admin.users.missingRoles.calloutTitle', { count: missingRoleIds.length })}</span>
+							</div>
+							<button
+								type="button"
+								onClick={() => setSelectedRoleIds(selectedRoleIds.filter((id) => existingRoleIdSet.has(id)))}
+								className="inline-flex items-center gap-1 rounded-full bg-(--accent-red)/15 hover:bg-(--accent-red)/25 border border-(--accent-red)/30 px-2.5 py-1 text-[11px] font-bold text-(--accent-red) transition-colors cursor-pointer"
+							>
+								<X size={11} />
+								<span>{t('admin.users.missingRoles.removeAll')}</span>
+							</button>
+						</div>
+						<p className="text-[11px] text-(--text-muted)">{t('admin.users.missingRoles.calloutDesc')}</p>
+						<div className="flex flex-wrap items-center gap-1.5">
+							{missingRoleIds.map((rid) => (
+								<span
+									key={rid}
+									className="inline-flex items-center gap-1.5 rounded-full bg-(--background)/70 border border-(--accent-red)/30 pl-2.5 pr-1 py-1 text-xs font-mono text-(--accent-red)"
+								>
+									<span>{rid}</span>
+									<button
+										type="button"
+										aria-label={t('admin.users.missingRoles.removeOne', { id: rid })}
+										onClick={() => setSelectedRoleIds(selectedRoleIds.filter((id) => id !== rid))}
+										className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-(--accent-red)/20 transition-colors cursor-pointer"
+									>
+										<X size={11} />
+									</button>
+								</span>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>

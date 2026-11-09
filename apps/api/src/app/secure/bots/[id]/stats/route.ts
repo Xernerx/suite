@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { auth, MEMBER_MILESTONE_THRESHOLDS, SERVER_MILESTONE_THRESHOLDS } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -84,9 +85,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
+		const caller = await resolveCallerAuth(req, ['bots']);
 		const session = await getServerSession(auth).catch(() => null);
-		const userId = (session?.user as any)?.id ? String((session?.user as any).id) : null;
-		if (!userId) {
+		const userId = caller.userId || ((session?.user as any)?.id ? String((session?.user as any).id) : null);
+		if (!userId && !caller.isSystemToken) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
@@ -102,38 +104,43 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		}
 
 		const db = await database('xernerx');
-		const BotProfile = (db.models.bots as any).Profile;
+		const BotModel = (db.models.bots as any).Bot;
 		const StatModel = (db.models.bots as any).Stat;
-		const UserModel = (db.models.users as any).User;
-		const OrgModel = (db.models.organizations as any)?.Profile;
+		const OrgModel = (db.models.organizations as any)?.Organization;
+		const MemberModel = (db.models.organizations as any)?.Member;
 
-		const [botDoc, userDoc] = await Promise.all([
-			BotProfile
-				? BotProfile.findOne({ id })
-						.lean()
-						.catch(() => null)
-				: null,
-			UserModel
-				? UserModel.findOne({ id: userId })
-						.lean()
-						.catch(() => null)
-				: null,
-		]);
+		const botDoc = BotModel
+			? await BotModel.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] })
+					.lean()
+					.catch(() => null)
+			: null;
 
-		const isStaff = (userDoc as any)?.role === 'admin' || (userDoc as any)?.role === 'staff';
-		let isAuthorized = isStaff;
+		let isAuthorized = Boolean(caller.isSystemToken || caller.isStaff || caller.authorized);
 
-		if (!isAuthorized && botDoc) {
+		if (!isAuthorized && botDoc && userId) {
 			const ownerId = String((botDoc as any).ownerId || '');
 			const owners: string[] = Array.isArray((botDoc as any).owners) ? (botDoc as any).owners.map(String) : [];
+			const orgRef = (botDoc as any).organization || (botDoc as any).organizationId;
+
 			if (ownerId === userId || owners.includes(userId)) {
 				isAuthorized = true;
-			} else if ((botDoc as any).organizationId && OrgModel) {
-				const orgDoc = await OrgModel.findOne({ id: (botDoc as any).organizationId })
-					.lean()
-					.catch(() => null);
+			} else if (orgRef && OrgModel) {
+				const [orgDoc, memberDoc] = await Promise.all([
+					OrgModel.findById(orgRef)
+						.select('owner ownerId members')
+						.lean()
+						.catch(() => null),
+					MemberModel
+						? MemberModel.findOne({
+								$or: [{ ownerId: String(orgRef) }, { organizationId: String(orgRef) }],
+								userId,
+							})
+								.lean()
+								.catch(() => null)
+						: null,
+				]);
 				const members: any[] = Array.isArray((orgDoc as any)?.members) ? (orgDoc as any).members : [];
-				if (String((orgDoc as any)?.ownerId) === userId || members.some((m: any) => String(m?.id || m?.userId || m) === userId)) {
+				if (memberDoc || String((orgDoc as any)?.owner || (orgDoc as any)?.ownerId || '') === userId || members.some((m: any) => String(m?.id || m?.userId || m) === userId)) {
 					isAuthorized = true;
 				}
 			}
@@ -143,7 +150,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 		}
 
-		const result = await StatModel.deleteOne({ _id: statId, id });
+		const targetBotId = String((botDoc as any)?.id || id);
+		const result = await StatModel.deleteOne({ _id: statId, id: { $in: [id, targetBotId] } });
 		return NextResponse.json({ deleted: (result?.deletedCount || 0) > 0, statId });
 	} catch (error) {
 		console.error('Failed to delete bot stat entry:', error);

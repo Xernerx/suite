@@ -116,7 +116,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 									icon_url: authorIcon,
 								},
 								title: isDevReply ? 'Developer responded to a review!' : 'Review Voted!',
-								url: `https://xernerx.com/bots/${botId}`,
+								url: `https://app.xernerx.com/bots/${botId}`,
 								description: isDevReply
 									? `A developer just responded to a review on your bot.\n\n${review.devResponse || '*No text provided.*'}`
 									: `A user just ${actualAction} a review on your bot!`,

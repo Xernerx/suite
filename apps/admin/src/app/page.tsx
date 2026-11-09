@@ -15,6 +15,7 @@ import {
 	Users as UsersIcon,
 	Link,
 	Megaphone,
+	Gift,
 	Newspaper,
 	Image,
 	Map,
@@ -25,7 +26,7 @@ import {
 	ScrollText,
 } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
@@ -44,6 +45,7 @@ import Users from '@/components/Users';
 import Settings from '@/components/Settings';
 import Invites from '@/components/Invites';
 import Announcements from '@/components/Announcements';
+import Giveaways from '@/components/Giveaways';
 import BlogStudio from '@/components/BlogStudio';
 import Suggestions from '@/components/Suggestions';
 import Roadmap from '@/components/Roadmap';
@@ -70,10 +72,13 @@ export default function Home() {
 	const [virtueAvatarUrl, setVirtueAvatarUrl] = useState<string | null>(null);
 	const hasInitializedView = useRef(false);
 
-	const handleNavigateFromOverview = (targetView: string, query?: string) => {
-		setTriageQuery(query || '');
-		setView(targetView);
-	};
+	const handleNavigateFromOverview = useCallback(
+		(targetView: string, query?: string) => {
+			setTriageQuery(query || '');
+			setView(targetView);
+		},
+		[setView]
+	);
 
 	useEffect(() => {
 		if (typeof document !== 'undefined') {
@@ -92,7 +97,7 @@ export default function Home() {
 				if (res.ok) {
 					const data = await res.json();
 					setAdminServerId(data.value || null);
-				} else {
+				} else if (res.status >= 500) {
 					const errData = await res.json().catch(() => ({}));
 					if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
 				}
@@ -150,41 +155,43 @@ export default function Home() {
 		fetchVirtueAvatar();
 	}, [getEnvUrl, isReady]);
 
+	const userRoleIdsKey = useMemo(() => {
+		const raw = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+		return raw
+			.map((r: any) => (typeof r === 'string' ? r : r?.id))
+			.filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0)
+			.sort()
+			.join(',');
+	}, [user?.roles, user?.role]);
+
 	useEffect(() => {
-		if (!isReady) return;
+		if (!isReady || userLoading) return;
 		async function fetchPermissions() {
-			const roleIds = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+			const roleIds = userRoleIdsKey ? userRoleIdsKey.split(',').filter(Boolean) : [];
 			if (roleIds.length === 0) {
 				setRoleLoading(false);
 				return;
 			}
 			try {
-				const roleDocs = await Promise.all(
-					roleIds.map(async (roleId: string) => {
-						const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
-						if (res.ok) {
-							const roleDoc = await res.json();
-							return roleDoc.permissions || {};
-						} else {
-							const errData = await res.json().catch(() => ({}));
-							if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
-						}
-						return {};
-					})
-				);
-
-				const mergedPermissions = roleDocs.reduce(
-					(acc, curr) => {
-						for (const [k, v] of Object.entries(curr)) {
-							if (v) acc[k] = true;
-							else if (acc[k] === undefined) acc[k] = false;
-						}
-						return acc;
-					},
-					{} as Record<string, boolean>
-				);
-
-				setUserRolePermissions(mergedPermissions);
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include', cache: 'no-store' });
+				if (res.ok) {
+					const allRoles = await res.json();
+					const roleDocs = Array.isArray(allRoles) ? allRoles.filter((r: any) => r?.id && roleIds.includes(r.id)).map((r: any) => r?.permissions || {}) : [];
+					const mergedPermissions = roleDocs.reduce(
+						(acc, curr) => {
+							for (const [k, v] of Object.entries(curr)) {
+								if (v) acc[k] = true;
+								else if (acc[k] === undefined) acc[k] = false;
+							}
+							return acc;
+						},
+						{} as Record<string, boolean>
+					);
+					setUserRolePermissions(mergedPermissions);
+				} else if (res.status >= 500) {
+					const errData = await res.json().catch(() => ({}));
+					if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
+				}
 			} catch (err: any) {
 				console.warn('Failed to fetch role permissions:', err);
 				toast({ type: 'error', title: t('admin.dashboard.toasts.fetchPermissionsError'), description: err.message });
@@ -193,10 +200,8 @@ export default function Home() {
 			}
 		}
 
-		if (!userLoading) {
-			fetchPermissions();
-		}
-	}, [user, userLoading, getEnvUrl, isReady]);
+		fetchPermissions();
+	}, [userRoleIdsKey, userLoading, getEnvUrl, isReady, toast, t]);
 
 	const hasDbFallback = Boolean(dbError);
 	const canTranslations = hasDbFallback || (userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false);
@@ -211,6 +216,7 @@ export default function Home() {
 	const canSettings = hasDbFallback || (userRolePermissions.settings ?? permissions.find((p) => p.key === 'settings')?.defaultValue ?? false);
 	const canInvites = hasDbFallback || (userRolePermissions.invites ?? permissions.find((p) => p.key === 'invites')?.defaultValue ?? false);
 	const canAnnouncements = hasDbFallback || (userRolePermissions.announcements ?? permissions.find((p) => p.key === 'announcements')?.defaultValue ?? false);
+	const canGiveaways = hasDbFallback || (userRolePermissions.giveaways ?? userRolePermissions.announcements ?? permissions.find((p) => p.key === 'giveaways')?.defaultValue ?? false);
 	const canManageMedia = hasDbFallback || (userRolePermissions.manageMedia ?? permissions.find((p) => p.key === 'manageMedia')?.defaultValue ?? false);
 	const canUploadMedia = hasDbFallback || (userRolePermissions.uploadMedia ?? permissions.find((p) => p.key === 'uploadMedia')?.defaultValue ?? true);
 	const canManageRoadmap = hasDbFallback || (userRolePermissions.manageRoadmap ?? permissions.find((p) => p.key === 'manageRoadmap')?.defaultValue ?? false);
@@ -289,6 +295,9 @@ export default function Home() {
 			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.announcements'), view: 'announcements', icon: Megaphone });
 			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.blog'), view: 'blog', icon: Newspaper });
 		}
+		if (canGiveaways) {
+			items.push({ category: t('common.nav.categories.administrator'), label: t('admin.dashboard.nav.giveaways'), view: 'giveaways', icon: Gift });
+		}
 		if (canManageRoadmap) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.roadmap'), view: 'roadmap', icon: Map });
 		if (canManageSuggestions) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.suggestions'), view: 'suggestions', icon: Inbox });
 		if (canManageIssues) items.push({ category: t('common.nav.categories.product'), label: t('common.nav.items.issues'), view: 'issues', icon: Bug });
@@ -336,6 +345,53 @@ export default function Home() {
 			window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
 		}
 	}, [view]);
+
+	const overviewPermissions = useMemo(
+		() => ({
+			canUsers,
+			canBots,
+			canServers,
+			canOrganizations,
+			canRoles,
+			canApplicationsReview,
+			canApplicationsManage,
+			canTokens,
+			canTranslations,
+			canSettings,
+			canInvites,
+			canAnnouncements,
+			canGiveaways,
+			canMedia,
+			canManageRoadmap,
+			canManageSuggestions,
+			canManageIssues,
+			canManageStore,
+			isServerSet,
+			adminServerId,
+		}),
+		[
+			canUsers,
+			canBots,
+			canServers,
+			canOrganizations,
+			canRoles,
+			canApplicationsReview,
+			canApplicationsManage,
+			canTokens,
+			canTranslations,
+			canSettings,
+			canInvites,
+			canAnnouncements,
+			canGiveaways,
+			canMedia,
+			canManageRoadmap,
+			canManageSuggestions,
+			canManageIssues,
+			canManageStore,
+			isServerSet,
+			adminServerId,
+		]
+	);
 
 	if ((userLoading || roleLoading || serverLoading) && !dbError) return <Loading />;
 
@@ -391,6 +447,7 @@ export default function Home() {
 		allowedViews.push('announcements');
 		allowedViews.push('blog');
 	}
+	if (canGiveaways) allowedViews.push('giveaways');
 	if (canManageRoadmap) allowedViews.push('roadmap');
 	if (canManageSuggestions) allowedViews.push('suggestions');
 	if (canManageIssues) allowedViews.push('issues');
@@ -407,32 +464,7 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			{activeView === 'overview' && (
-				<HomeOverview
-					permissions={{
-						canUsers,
-						canBots,
-						canServers,
-						canOrganizations,
-						canRoles,
-						canApplicationsReview,
-						canApplicationsManage,
-						canTokens,
-						canTranslations,
-						canSettings,
-						canInvites,
-						canAnnouncements,
-						canMedia,
-						canManageRoadmap,
-						canManageSuggestions,
-						canManageIssues,
-						canManageStore,
-						isServerSet,
-						adminServerId,
-					}}
-					onNavigate={handleNavigateFromOverview}
-				/>
-			)}
+			{activeView === 'overview' && <HomeOverview permissions={overviewPermissions} onNavigate={handleNavigateFromOverview} />}
 			{activeView === 'seo' && <Overview />}
 			{activeView === 'audit' && <AuditLogs initialSearch={triageQuery} />}
 			{activeView === 'support' && <Support />}
@@ -454,6 +486,7 @@ export default function Home() {
 			{activeView === 'virtue' && <VirtueAdmin avatarUrl={virtueAvatarUrl} adminServerId={adminServerId} />}
 			{activeView === 'invites' && <Invites initialSearch={triageQuery} />}
 			{activeView === 'announcements' && <Announcements />}
+			{activeView === 'giveaways' && <Giveaways />}
 			{activeView === 'blog' && <BlogStudio />}
 			{activeView === 'roadmap' && <Roadmap />}
 			{activeView === 'suggestions' && <Suggestions initialSearch={triageQuery} />}

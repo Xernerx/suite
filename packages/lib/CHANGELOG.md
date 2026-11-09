@@ -2,6 +2,38 @@
 
 # @xernerx/lib
 
+## 1.23.1
+
+### Patch Changes
+
+- ## AppInvite Redirect Field, Missing Role Triage & Localization Updates
+  
+  Added `redirect` support to the `AppInvite` Mongoose schema alongside localization strings for Admin Invite permission/URL importing, post-auth redirects, and non-existent role triage.
+  
+  ### Added
+  
+  - **`AppInvite.redirect` Schema Field**: Added `redirect` (`Boolean`, default `false`) to `models.core.AppInvite` for enabling post-authorization OAuth2 callbacks.
+  - **Admin Invite Permission & Redirect Strings**: Added dictionary keys for the Permission Bitfield (`BigInt`) input, Discord OAuth2 URL importer, Post-Auth Bot Page Redirect toggle, and feedback toasts under `admin.dashboard.invites`.
+  - **Admin Missing Role Strings**: Added dictionary keys for invalid role badges, filter pills, tooltips, and removal actions under `admin.users` and `admin.home`.
+  
+  ### Changed
+  
+  - **Account Vanity URL Hint**: Updated `account.profile.vanitySlug.hint` to reference `app.xernerx.com/users/{slug}`.
+
+## 1.23.0
+
+### Minor Changes
+
+- ## Platform Giveaways Engine & Model
+  
+  Added the core Giveaways Mongoose model, draw-time eligibility and bonus entry evaluator, Discord embed & interaction handler, and `manageGiveaways` RBAC permission.
+  
+  ### Added
+  
+  - `Giveaway` Mongoose model (`packages/lib/src/models/xernerx/core/Giveaway.ts`) supporting web & Discord channels, auto-fulfilled prizes, draw-time requirements, and bonus entry multipliers
+  - Giveaways engine (`packages/lib/src/giveaways.ts`) with draw-time requirement verification, weighted random drawing, automatic prize fulfillment, and clean Discord embeds
+  - `manageGiveaways` staff permission in `packages/lib/src/permissions.ts`
+
 ## 1.22.2
 
 ### Patch Changes

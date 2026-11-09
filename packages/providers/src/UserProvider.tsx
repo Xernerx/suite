@@ -105,7 +105,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 								...(session?.user || {}),
 								credits: { balance: 1000 },
 								level: { level: 1, xp: 0 },
-								roles: ['1b333119-d818-4fb1-a5dc-12621fd14198'],
 							}),
 						});
 
@@ -136,9 +135,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 						const isOptOutOrTombstone = Boolean(xernerx?.blacklisted || xernerx?.services === false || xernerx?.tombstone);
 						const needsSignInBonus = !isOptOutOrTombstone && !xernerx?.credits?.signInBonusClaimed;
-						const needsJoinRoles = !isOptOutOrTombstone && (!Array.isArray(xernerx?.roles) || xernerx.roles.length === 0);
 
-						if (needsSignInBonus || needsJoinRoles) {
+						if (needsSignInBonus) {
 							const postRes = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
 								method: 'POST',
 								credentials: 'include',
@@ -147,7 +145,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 									...(session?.user || {}),
 									credits: { balance: 1000 },
 									level: { level: 1, xp: 0 },
-									roles: ['1b333119-d818-4fb1-a5dc-12621fd14198'],
 								}),
 							}).catch(() => null);
 

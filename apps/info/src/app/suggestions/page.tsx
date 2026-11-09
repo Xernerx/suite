@@ -210,7 +210,8 @@ export default function SuggestionsPage() {
 	};
 
 	const availableProducts = useMemo(() => {
-		const set = new Set<string>(products);
+		if (products.length > 0) return products;
+		const set = new Set<string>();
 		suggestions.forEach((s: any) => {
 			if (s.productId) set.add(s.productId);
 		});

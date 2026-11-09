@@ -38,12 +38,15 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 			setLoading(true);
 			try {
 				const thirtyDaysAgo = Date.now() - 30 * DAY_MS;
-				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${botId}/stats?after=${thirtyDaysAgo}`));
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/bots/${botId}/stats?after=${thirtyDaysAgo}`), {
+					credentials: 'include',
+				});
 				if (res.ok && active) {
 					const raw = await res.json();
 					if (Array.isArray(raw)) {
 						const normalized = raw
 							.map((s: any) => ({
+								_id: s._id ? String(s._id) : undefined,
 								timestamp: s.timestamp ? (typeof s.timestamp === 'string' && /^\d+$/.test(s.timestamp) ? Number(s.timestamp) : new Date(s.timestamp).getTime()) : Date.now(),
 								guildCount: Number(s.guildCount ?? s.servers ?? 0) || 0,
 								userCount: Number(s.userCount ?? s.users ?? 0) || 0,
