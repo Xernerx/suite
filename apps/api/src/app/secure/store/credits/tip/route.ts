@@ -197,7 +197,7 @@ export async function POST(req: Request) {
 											icon_url: authorIcon,
 										},
 										title: 'New Credit Tip!',
-										url: `https://xernerx.com/bots/${effectiveBotId}`,
+										url: `https://app.xernerx.com/bots/${effectiveBotId}`,
 										description: cleanNote
 											? `This user just tipped **${rawAmount.toLocaleString()}** credits to your bot!\n\n> ${cleanNote}`
 											: `This user just tipped **${rawAmount.toLocaleString()}** credits to your bot!`,

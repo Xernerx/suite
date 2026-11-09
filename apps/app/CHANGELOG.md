@@ -2,6 +2,24 @@
 
 # app
 
+## 2.21.4
+
+### Patch Changes
+
+- ## Explicit `app.xernerx.com` Server Vanity URL Display
+  
+  Updated the Server Dashboard Custom Vanity URL Slug preview to display `app.xernerx.com/servers/...`.
+  
+  ### Changed
+  
+  - **Server Vanity URL Prefix**: Displayed `app.xernerx.com/servers/...` in the server dashboard settings so the preview matches the copied public link.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 2.21.3
 
 ### Patch Changes

@@ -2,6 +2,14 @@
 
 # @xernerx/feedback
 
+## 0.5.8
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+
 ## 0.5.7
 
 ### Patch Changes

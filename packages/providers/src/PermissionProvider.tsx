@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useDictionary } from './DictionaryProvider';
 import { useEnvironment } from './EnvironmentProvider';
 import { useUser } from './UserProvider';
@@ -25,37 +25,36 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 	const [rolePermissions, setRolePermissions] = useState<Record<string, boolean>>({});
 	const [loading, setLoading] = useState(true);
 
+	const roleIdsKey = useMemo(() => {
+		const rawRoles = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+		return rawRoles
+			.map((r: any) => (typeof r === 'string' ? r : r?.id))
+			.filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0)
+			.sort()
+			.join(',');
+	}, [user?.roles, user?.role]);
+
 	useEffect(() => {
 		if (!isReady || userLoading) return;
 		let cancelled = false;
 
 		async function fetchPermissions() {
-			const rawRoles = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
-			const roleIds = rawRoles.map((r: any) => (typeof r === 'string' ? r : r?.id)).filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0);
+			const roleIds = roleIdsKey ? roleIdsKey.split(',').filter(Boolean) : [];
 
 			if (roleIds.length === 0) {
+				setRolePermissions({});
 				if (!cancelled) setLoading(false);
 				return;
 			}
 			try {
-				const roleDocs = await Promise.all(
-					roleIds.map(async (roleId: string) => {
-						try {
-							const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${encodeURIComponent(roleId)}`), {
-								credentials: 'include',
-							});
-							if (res.ok) {
-								const roleDoc = await res.json();
-								return roleDoc?.permissions || {};
-							}
-						} catch {
-							// Ignore transient or aborted fetch errors during navigation/HMR
-						}
-						return {};
-					})
-				);
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core'), {
+					credentials: 'include',
+				}).catch(() => null);
 
 				if (cancelled) return;
+
+				const allRoles = res?.ok ? await res.json().catch(() => []) : [];
+				const roleDocs = Array.isArray(allRoles) ? allRoles.filter((r: any) => r?.id && roleIds.includes(r.id)).map((r: any) => r?.permissions || {}) : [];
 
 				const mergedPermissions = roleDocs.reduce(
 					(acc, curr) => {
@@ -82,13 +81,18 @@ export function PermissionProvider({ children }: { children: React.ReactNode }) 
 		return () => {
 			cancelled = true;
 		};
-	}, [getEnvUrl, isReady, user, userLoading, toast]);
+	}, [getEnvUrl, isReady, roleIdsKey, userLoading, toast, t]);
 
-	const hasPermission = (key: string) => {
-		return rolePermissions[key] ?? defaultPermissions.find((p) => p.key === key)?.defaultValue ?? false;
-	};
+	const hasPermission = useCallback(
+		(key: string) => {
+			return rolePermissions[key] ?? defaultPermissions.find((p) => p.key === key)?.defaultValue ?? false;
+		},
+		[rolePermissions]
+	);
 
-	return <PermissionContext.Provider value={{ permissions: rolePermissions, hasPermission, loading: loading || userLoading }}>{children}</PermissionContext.Provider>;
+	const contextValue = useMemo(() => ({ permissions: rolePermissions, hasPermission, loading: loading || userLoading }), [rolePermissions, hasPermission, loading, userLoading]);
+
+	return <PermissionContext.Provider value={contextValue}>{children}</PermissionContext.Provider>;
 }
 
 export function usePermissions() {

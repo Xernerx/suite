@@ -189,13 +189,39 @@ export function buildHomeOverviewCards({
 
 	if (permissions.canUsers && permissions.isServerSet) {
 		const verifiedUsers = users.filter((u) => u.verified).length;
+		const existingRoleIds = new Set((roles || []).map((r: any) => r?.id).filter(Boolean));
+		const usersWithMissingRoles =
+			roles.length > 0 ? users.filter((u) => Array.isArray(u?.roles) && u.roles.some((rid: any) => typeof rid === 'string' && rid.trim().length > 0 && !existingRoleIds.has(rid))) : [];
+
+		if (usersWithMissingRoles.length > 0) {
+			urgentItems.push({
+				id: 'urgent-users-missing-roles',
+				view: 'users',
+				title: t('admin.dashboard.home.cards.usersTitle'),
+				subtitle: t('admin.dashboard.home.cards.usersMissingRolesUrgent', { count: usersWithMissingRoles.length }),
+				count: usersWithMissingRoles.length,
+				severity: 'warning',
+				icon: UsersIcon,
+				highlights: [
+					{
+						label: t('admin.users.fields.missingRolesFilter'),
+						query: 'missing:roles',
+					},
+					...usersWithMissingRoles.slice(0, 2).map((u) => ({
+						label: u.name || u.discord?.username || u.id,
+						query: u.id,
+					})),
+				],
+			});
+		}
+
 		moduleCards.push({
 			id: 'mod-users',
 			view: 'users',
 			title: t('admin.dashboard.home.cards.usersTitle'),
 			meta: t('admin.dashboard.home.cards.usersMeta', { total: users.length, verified: verifiedUsers }),
 			icon: UsersIcon,
-			badge: { text: `${users.length}`, tone: 'normal' },
+			badge: usersWithMissingRoles.length > 0 ? { text: `${usersWithMissingRoles.length} !`, tone: 'urgent' } : { text: `${users.length}`, tone: 'normal' },
 		});
 	}
 

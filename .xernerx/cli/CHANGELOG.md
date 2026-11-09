@@ -2,6 +2,19 @@
 
 # @xernerx/cli
 
+## 2.7.2
+
+### Patch Changes
+
+- ## HMR-Aware Lazy Dev Proxy & Extended Idle Timeout
+  
+  Kept active development apps awake while browser tabs remain connected via HMR WebSockets and increased the default idle spin-down timeout.
+  
+  ### Changed
+  
+  - **HMR WebSocket Activity Tracking**: Tracked open Next.js HMR WebSocket connections per app in `lazyProxy` so apps (along with `api` and `cdn`) never spin down while a browser tab is open.
+  - **Default Idle Timeout**: Increased the default `suite dev --idle-timeout` threshold from `60s` to `300s`.
+
 ## 2.7.1
 
 ### Patch Changes

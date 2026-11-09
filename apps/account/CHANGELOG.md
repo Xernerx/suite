@@ -2,6 +2,24 @@
 
 # auth
 
+## 2.14.4
+
+### Patch Changes
+
+- ## Explicit `app.xernerx.com` Vanity Profile URL Display
+  
+  Updated the Vanity Profile URL preview and copy link button to display the full `app.xernerx.com` subdomain.
+  
+  ### Changed
+  
+  - **Vanity Profile URL Prefix**: Updated the profile vanity slug input prefix and copied link from `xernerx.com/users/...` to `app.xernerx.com/users/...`.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 2.14.3
 
 ### Patch Changes

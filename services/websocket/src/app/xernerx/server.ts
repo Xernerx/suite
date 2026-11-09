@@ -4,22 +4,31 @@ import crypto from 'crypto';
 import { database } from '@xernerx/lib/core';
 
 const SIGN_IN_BONUS_AMOUNT = 1000;
-const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
 
 async function resolveDefaultJoinRoles(db: any): Promise<string[]> {
-	const roles = new Set<string>([DEFAULT_JOIN_ROLE_ID]);
+	const candidateIds = new Set<string>();
 	try {
 		const setting = await (db.models.core as any)?.Setting?.findOne({ id: 'join_roles' }).lean();
 		if (setting?.value) {
 			const parsed = JSON.parse(setting.value);
 			if (Array.isArray(parsed)) {
 				for (const r of parsed) {
-					if (r && typeof r === 'string') roles.add(r);
+					if (r && typeof r === 'string' && r.trim().length > 0) candidateIds.add(r.trim());
 				}
 			}
 		}
-	} catch {}
-	return Array.from(roles);
+		const ids = Array.from(candidateIds);
+		if (ids.length === 0) return [];
+		const RoleModel = (db.models.core as any)?.Role;
+		if (!RoleModel) return [];
+		const existingRoles = await RoleModel.find({ id: { $in: ids } })
+			.select('id')
+			.lean()
+			.catch(() => []);
+		return (existingRoles || []).map((r: any) => String(r.id)).filter(Boolean);
+	} catch {
+		return [];
+	}
 }
 
 export async function canUseUserServices(userId: string): Promise<{ allowed: boolean; blacklisted: boolean; services: boolean; userDoc: any }> {
@@ -86,9 +95,6 @@ export async function ensureUserBonusAndDefaults(userId: string) {
 				const updates: Record<string, any> = {};
 				if (userDoc.agreedTerms && userDoc.agreedPrivacy && !userDoc.verified) {
 					updates.verified = true;
-				}
-				if (!Array.isArray(userDoc.roles) || userDoc.roles.length === 0) {
-					updates.roles = await resolveDefaultJoinRoles(db);
 				}
 				if (Object.keys(updates).length > 0) {
 					await UserModel.updateOne({ id: userId }, { $set: updates }).catch(() => {});

@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import tinycolor from 'tinycolor2';
 import { useEnvironment } from '@xernerx/providers';
 import { useSession } from 'next-auth/react';
@@ -462,6 +462,8 @@ function applyAccent(color?: string | number | null) {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { data: session } = useSession();
+	const sessionUserId = (session?.user as any)?.id as string | undefined;
+	const syncedUserIdRef = useRef<string | null>(null);
 
 	const [theme, setThemeState] = useState<Theme>(() => {
 		if (typeof window === 'undefined') return 'system';
@@ -518,11 +520,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 		setResolvedTheme(theme === 'system' ? getSystemTheme() : theme);
 
-		if (!session?.user || !(session.user as any).id) return;
+		if (!sessionUserId) {
+			syncedUserIdRef.current = null;
+			return;
+		}
+		if (syncedUserIdRef.current === sessionUserId) return;
+		syncedUserIdRef.current = sessionUserId;
 
 		const fetchRemoteSync = async () => {
 			try {
-				const userId = (session.user as any).id;
+				const userId = sessionUserId;
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
 					credentials: 'include',
 				});
@@ -743,7 +750,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		};
 
 		fetchRemoteSync();
-	}, [getEnvUrl, session, isReady]);
+	}, [getEnvUrl, sessionUserId, isReady]);
 
 	useEffect(() => {
 		const resolved = theme === 'system' ? getSystemTheme() : theme;
@@ -752,18 +759,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		syncAccentCssVars(getPref('accent') || DEFAULT_ACCENT);
 	}, [theme]);
 
-	function updateTheme(next: Theme) {
-		if (theme !== next) {
+	const updateTheme = useCallback((next: Theme) => {
+		setThemeState((prev) => {
+			if (prev === next) return prev;
 			setPref('theme', next);
-			setThemeState(next);
-		}
-	}
+			return next;
+		});
+	}, []);
 
 	const syncPreferencesToRemote = useCallback(
 		async (nextPrefs: UIPreferences) => {
-			if (!session?.user || !(session.user as any).id) return;
+			if (!sessionUserId) return;
 			try {
-				const userId = (session.user as any).id;
+				const userId = sessionUserId;
 				await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
 					method: 'PATCH',
 					headers: { 'Content-Type': 'application/json' },
@@ -776,7 +784,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 				});
 			} catch {}
 		},
-		[getEnvUrl, session]
+		[getEnvUrl, sessionUserId]
 	);
 
 	const setPreference = useCallback(
@@ -870,22 +878,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		return () => media.removeEventListener('change', handler);
 	}, [theme]);
 
-	return (
-		<ThemeContext.Provider
-			value={{
-				theme,
-				resolvedTheme,
-				setTheme: updateTheme,
-				setAccent: applyAccent,
-				preferences,
-				uiPreferences: preferences,
-				setPreference,
-				resetPreferences,
-			}}
-		>
-			{children}
-		</ThemeContext.Provider>
+	const contextValue = useMemo<ThemeContextType>(
+		() => ({
+			theme,
+			resolvedTheme,
+			setTheme: updateTheme,
+			setAccent: applyAccent,
+			preferences,
+			uiPreferences: preferences,
+			setPreference,
+			resetPreferences,
+		}),
+		[theme, resolvedTheme, updateTheme, preferences, setPreference, resetPreferences]
 	);
+
+	return <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>;
 }
 
 const FALLBACK_THEME_CONTEXT: ThemeContextType = {

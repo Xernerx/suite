@@ -93,20 +93,32 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 		}
 		onChange([...value, option]);
 	}
+	const effectiveOptions = React.useMemo(() => {
+		const knownValues = new Set(options.map((o) => o.value));
+		const missingSelected: MultiSelectorOption[] = value
+			.filter((v) => Boolean(v) && !knownValues.has(v))
+			.map((v) => ({
+				value: v,
+				label: v,
+				color: 'var(--accent-red)',
+			}));
+		return missingSelected.length > 0 ? [...missingSelected, ...options] : options;
+	}, [options, value]);
+
 	function displayValue() {
 		if (!value.length) return resolvedPlaceholder;
 		if (value.length === 1) {
-			return options.find((x) => x.value === value[0])?.label ?? resolvedPlaceholder;
+			return effectiveOptions.find((x) => x.value === value[0])?.label ?? value[0] ?? resolvedPlaceholder;
 		}
 		if (value.length === 2) {
 			return value
-				.map((v) => options.find((x) => x.value === v)?.label)
+				.map((v) => effectiveOptions.find((x) => x.value === v)?.label ?? v)
 				.filter(Boolean)
 				.join(', ');
 		}
 		return t('common.multiselector.selectedCount', { count: value.length });
 	}
-	const filteredOptions = options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()));
+	const filteredOptions = effectiveOptions.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()) || opt.value.toLowerCase().includes(query.toLowerCase()));
 	return (
 		<div ref={ref} className={`relative w-full ${open ? 'z-[100]' : ''} ${className ?? ''}`}>
 			{label && <label className="mb-2 block text-sm font-medium text-(--text)">{label}</label>}
@@ -120,7 +132,7 @@ export function MultiSelector({ value, options, onChange, placeholder, className
 					{!!value.length && (
 						<div className="flex -space-x-1.5">
 							{value.slice(0, 3).map((selectedValue) => {
-								const option = options.find((x) => x.value === selectedValue);
+								const option = effectiveOptions.find((x) => x.value === selectedValue);
 								return (
 									<div
 										key={selectedValue}

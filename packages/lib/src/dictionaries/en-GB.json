@@ -615,7 +615,21 @@
 				"ownedServersTitle": "Owned Servers ({count})",
 				"noOwnedServers": "No owned servers.",
 				"organizationsTitle": "Organizations ({count})",
-				"noOrganizations": "No organizations."
+				"noOrganizations": "No organizations.",
+				"missingRolesFilter": "Missing Roles"
+			},
+			"missingRoles": {
+				"badge": "Invalid Roles ({count})",
+				"warningTooltip": "User has {count} non-existent role(s) assigned",
+				"pillLabel": "Missing: {id}",
+				"pillTooltip": "Non-existent role ID: {id} — click × to remove",
+				"optionLabel": "Non-existent role ({id})",
+				"calloutTitle": "{count} Non-Existent Role(s) Assigned",
+				"calloutDesc": "These role IDs no longer exist in the RBAC directory. Remove them and save changes.",
+				"removeAll": "Remove All",
+				"removeOne": "Remove role {id}",
+				"removedToast": "Removed non-existent role",
+				"removeErrorToast": "Failed to remove non-existent role"
 			}
 		},
 		"tokens": {
@@ -1062,7 +1076,8 @@
 					"botsTitle": "Bots",
 					"botsMeta": "{total} registered • {verified} verified",
 					"serversTitle": "Servers",
-					"serversMeta": "{total} registered • {verified} verified"
+					"serversMeta": "{total} registered • {verified} verified",
+					"usersMissingRolesUrgent": "{count} user(s) have non-existent roles assigned"
 				}
 			},
 			"overview": {
@@ -1260,6 +1275,21 @@
 				"clientId": "Client ID",
 				"placeholderClientId": "Discord Client ID",
 				"scopes": "Scopes (comma separated)",
+				"placeholderScopes": "Select OAuth2 scopes...",
+				"permissionBigIntLabel": "Permission Bitfield (BigInt)",
+				"permissionBigIntPlaceholder": "e.g. 2147485696",
+				"permissionBigIntHint": "Enter or paste a permission integer to directly enable matching permissions.",
+				"oauthUrlLabel": "Discord Auth Invite URL",
+				"oauthUrlPlaceholder": "https://discord.com/oauth2/authorize?client_id=...&permissions=...",
+				"oauthUrlHint": "Paste a Discord OAuth2 authorize URL to directly enable its permissions and scopes.",
+				"applyUrlButton": "Apply",
+				"clearPermsButton": "Clear",
+				"enabledPermsCount": "{count} enabled",
+				"redirectLabel": "Post-Auth Bot Page Redirect",
+				"redirectDesc": "Append OAuth2 code callback parameters to redirect users to the bot page after authorization.",
+				"redirectBadge": "OAuth2 Redirect",
+				"copyRedirectUri": "Copy Redirect URI",
+				"redirectUriCopied": "Redirect URI copied for Discord Developer Portal",
 				"permMatrix": "Permission Matrix",
 				"cancel": "Cancel",
 				"saveButton": "Save Invite",
@@ -1276,7 +1306,10 @@
 					"deleteFailed": "Failed to delete invite",
 					"updateSuccess": "Invite updated",
 					"createSuccess": "Invite created",
-					"saveFailed": "Failed to save invite"
+					"saveFailed": "Failed to save invite",
+					"appliedInviteUrl": "Applied permissions from Discord invite URL",
+					"appliedBigInt": "Applied permission bitfield",
+					"invalidInviteInput": "Invalid Discord OAuth2 URL or permission integer"
 				}
 			},
 			"announcements": {
@@ -2612,7 +2645,7 @@
 			"vanitySlug": {
 				"label": "Vanity Profile URL",
 				"placeholder": "your-custom-handle",
-				"hint": "3–32 lowercase letters, numbers, or hyphens. Accessible at xernerx.com/users/{slug}."
+				"hint": "3–32 lowercase letters, numbers, or hyphens. Accessible at app.xernerx.com/users/{slug}."
 			}
 		},
 		"appearance": {

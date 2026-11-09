@@ -2,6 +2,28 @@
 
 # api
 
+## 0.32.1
+
+### Patch Changes
+
+- ## Removed Hardcoded Default Join Role & Updated Bot Webhook Listing Links
+  
+  Stopped auto-injecting a legacy default role UUID on user records and aligned bot webhook embed links with `app.xernerx.com`.
+  
+  ### Changed
+  
+  - **Bot Webhook Listing URLs**: Updated vote, review, and credit tip webhook embed URLs to point directly to `https://app.xernerx.com/bots/...`.
+  
+  ### Deleted
+  
+  - **Legacy Default Join Role Injection**: Removed hardcoded `1b333119-d818-4fb1-a5dc-12621fd14198` role assignments and fallbacks from `/secure/users`, `/secure/users/[id]`, and `/v1/leaderboard`.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 0.32.0
 
 ### Minor Changes

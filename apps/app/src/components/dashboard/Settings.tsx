@@ -159,7 +159,7 @@ export default function Settings({ guildConfig, setGuildConfig, onVanityUnlocked
 					</div>
 					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
 						<span>{t('app.dashboard.settings.vanitySlugDesc')}</span>
-						<span className="font-mono text-(--accent)">xernerx.com/servers/{guildConfig.vanitySlug || guildConfig.id}</span>
+						<span className="font-mono text-(--accent)">app.xernerx.com/servers/{guildConfig.vanitySlug || guildConfig.id}</span>
 						<button
 							type="button"
 							onClick={handleCopyVanityUrl}

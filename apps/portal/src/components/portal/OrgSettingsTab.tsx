@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock } from 'lucide-react';
+import { Shield, AlertTriangle, Trash2, Globe, Coins, Sparkles, Lock, Copy, Check, ExternalLink } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Selector } from '@xernerx/ui';
 import { WidgetSettingsCard } from '@xernerx/components';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
@@ -24,9 +24,18 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, onVanityUnlock
 	const { user, mutate: mutateUser } = useUser();
 	const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 	const [unlockingVanity, setUnlockingVanity] = useState(false);
+	const [copiedVanity, setCopiedVanity] = useState(false);
 
 	const isVanityUnlocked = Boolean(orgConfig.vanityUnlocked || orgConfig.verified);
 	const extraVanitySlots = Number(user?.credits?.extraVanitySlots) || 0;
+	const publicOrgUrl = getEnvUrl(`https://app.xernerx.com/organization/${orgConfig.vanitySlug || orgConfig._id}`);
+
+	const handleCopyVanityUrl = () => {
+		navigator.clipboard.writeText(publicOrgUrl);
+		setCopiedVanity(true);
+		toast({ type: 'success', title: t('app.dashboard.settings.vanityUrlCopied') });
+		setTimeout(() => setCopiedVanity(false), 2000);
+	};
 
 	const handleUnlockVanity = async () => {
 		setUnlockingVanity(true);
@@ -122,8 +131,26 @@ export default function OrgSettingsTab({ orgConfig, setOrgConfig, onVanityUnlock
 							</Badge>
 						)}
 					</div>
-					<div className="flex flex-wrap items-center gap-1 text-xs text-(--text-muted)">
-						{t('app.portal.settings.vanitySlugDesc')} <span className="font-mono text-(--accent)">xernerx.com/organization/{orgConfig.vanitySlug || orgConfig._id}</span>
+					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
+						<span>{t('app.portal.settings.vanitySlugDesc')}</span>
+						<span className="font-mono text-(--accent)">app.xernerx.com/organization/{orgConfig.vanitySlug || orgConfig._id}</span>
+						<button
+							type="button"
+							onClick={handleCopyVanityUrl}
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
+						>
+							{copiedVanity ? <Check size={11} className="text-(--accent-green)" /> : <Copy size={11} />}
+							<span>{t('app.dashboard.settings.copyVanityUrl')}</span>
+						</button>
+						<a
+							href={publicOrgUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-(--background)/60 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 transition-colors"
+						>
+							<span>{t('app.dashboard.settings.openPublicProfile')}</span>
+							<ExternalLink size={11} />
+						</a>
 					</div>
 					{!isVanityUnlocked && (
 						<p className="text-xs text-(--text-muted) flex items-center gap-1.5 mt-0.5">

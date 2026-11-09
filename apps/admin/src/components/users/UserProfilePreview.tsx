@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Ban, Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, ScrollText, Sparkles, User as UserIcon } from 'lucide-react';
+import { AlertTriangle, Ban, Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, ScrollText, Sparkles, User as UserIcon } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import type { DiscordProfile, FullUser, UserSummary } from './types';
@@ -21,6 +21,7 @@ interface UserProfilePreviewProps {
 	blacklisted?: boolean;
 	services?: boolean;
 	vanitySlug?: string;
+	missingRoleCount?: number;
 	onViewAuditLogs?: () => void;
 }
 
@@ -37,6 +38,7 @@ export function UserProfilePreview({
 	blacklisted,
 	services,
 	vanitySlug,
+	missingRoleCount = 0,
 	onViewAuditLogs,
 }: UserProfilePreviewProps) {
 	const { t } = useDictionary();
@@ -146,6 +148,12 @@ export function UserProfilePreview({
 							<span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent-red)/15 text-(--accent-red) border border-(--accent-red)/30">
 								<Ban size={12} />
 								{t('admin.users.fields.blacklistedBadge')}
+							</span>
+						)}
+						{missingRoleCount > 0 && (
+							<span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent-red)/15 text-(--accent-red) border border-(--accent-red)/30">
+								<AlertTriangle size={12} />
+								{t('admin.users.missingRoles.badge', { count: missingRoleCount })}
 							</span>
 						)}
 						{!isServicesEnabled && (

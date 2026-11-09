@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 
 const SIGN_IN_BONUS_AMOUNT = 1000;
-const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
 
 export const dynamic = 'force-dynamic';
 
@@ -370,8 +369,9 @@ export async function GET(req: NextRequest) {
 
 					const missingLevelUserIds = levelUserIds.filter((uid) => /^\d{15,22}$/.test(uid) && !extraUsersMap.has(uid) && !vOptOutSet.has(uid));
 					if (missingLevelUserIds.length > 0) {
-						let defaultRoles = [DEFAULT_JOIN_ROLE_ID];
+						let candidateRoles: string[] = [];
 						const SettingModel = (models.core as any)?.Setting;
+						const RoleModel = (models.core as any)?.Role;
 						if (SettingModel) {
 							const joinRolesSetting = await SettingModel.findOne({ id: 'join_roles' })
 								.lean()
@@ -380,10 +380,18 @@ export async function GET(req: NextRequest) {
 								try {
 									const parsed = JSON.parse(joinRolesSetting.value);
 									if (Array.isArray(parsed)) {
-										defaultRoles = Array.from(new Set([DEFAULT_JOIN_ROLE_ID, ...parsed.filter((r) => typeof r === 'string' && r)]));
+										candidateRoles = Array.from(new Set(parsed.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)));
 									}
 								} catch {}
 							}
+						}
+						let defaultRoles: string[] = [];
+						if (RoleModel && candidateRoles.length > 0) {
+							const existingRoleDocs = await RoleModel.find({ id: { $in: candidateRoles } })
+								.select('id')
+								.lean()
+								.catch(() => []);
+							defaultRoles = (existingRoleDocs || []).map((r: any) => String(r.id)).filter(Boolean);
 						}
 						await Promise.all(
 							missingLevelUserIds.flatMap((uid) => [

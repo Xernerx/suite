@@ -2,6 +2,26 @@
 
 # @xernerx/providers
 
+## 0.22.6
+
+### Patch Changes
+
+- ## Clean User Role Defaults, Batch Permission Lookup & Session Refetch Tuning
+  
+  Removed legacy default role injection, switched `PermissionProvider` to batch role resolution, and reduced redundant session and theme refetches.
+  
+  ### Changed
+  
+  - **Batch RBAC Permission Resolution**: Updated `PermissionProvider` to resolve user roles against a single `GET /secure/core` request so deleted role IDs never cause 404 errors.
+  - **Session & Theme Sync Stability**: Disabled `refetchOnWindowFocus` by default in `SessionProvider` and deduplicated remote preference syncs in `ThemeProvider`.
+  - **Command Palette Vanity Subtitles**: Updated vanity URL navigation subtitles in `commandPaletteCatalog` to show `app.xernerx.com/...`.
+  
+  ### Deleted
+  
+  - **Legacy Fallback Join Role**: Removed hardcoded `1b333119-d818-4fb1-a5dc-12621fd14198` role fallback from `UserProvider`.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+
 ## 0.22.5
 
 ### Patch Changes

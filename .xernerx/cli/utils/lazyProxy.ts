@@ -44,6 +44,7 @@ interface ManagedApp extends AppDefinition {
 	activeRequestsCount: number;
 	pendingQueue: Array<() => void>;
 	activeSockets: Set<net.Socket>;
+	activeHmrClients: Set<net.Socket>;
 	server: http.Server | null;
 	readinessTimer: NodeJS.Timeout | null;
 	logger: Terminal;
@@ -1438,7 +1439,7 @@ export function renderSplashHtml(app: AppDefinition, displayUrl: string, idleTim
 }
 
 export async function startLazyAppsSupervisor(options: LazySupervisorOptions): Promise<void> {
-	const { domain, isCustomDomain, idleTimeoutSeconds = 60 } = options;
+	const { domain, isCustomDomain, idleTimeoutSeconds = 300 } = options;
 	const idleTimeoutMs = idleTimeoutSeconds > 0 ? idleTimeoutSeconds * 1000 : 0;
 
 	const managedApps: ManagedApp[] = SUITE_APPS.map((def) => ({
@@ -1452,6 +1453,7 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 		activeRequestsCount: 0,
 		pendingQueue: [],
 		activeSockets: new Set(),
+		activeHmrClients: new Set(),
 		server: null,
 		readinessTimer: null,
 		logger: terminal.child({ scope: `${def.label}:${def.port}` }),
@@ -1496,6 +1498,13 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 			} catch {}
 		}
 		app.activeSockets.clear();
+
+		for (const sock of app.activeHmrClients) {
+			try {
+				sock.destroy();
+			} catch {}
+		}
+		app.activeHmrClients.clear();
 
 		if (child?.pid) {
 			app.logger.warn(`💤 ${reason} — spinning down Next.js (PID ${child.pid}) to free RAM.`);
@@ -1778,6 +1787,15 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 							return;
 						}
 
+						app.lastActiveAt = Date.now();
+						app.activeHmrClients.add(clientSocket);
+						const removeHmrClient = () => {
+							if (app.activeHmrClients.delete(clientSocket)) {
+								app.lastActiveAt = Date.now();
+							}
+						};
+						clientSocket.once('close', removeHmrClient);
+
 						const upstreamSocket = net.connect(app.internalPort, '127.0.0.1', () => {
 							const reqLines = [`${req.method || 'GET'} ${req.url || '/'} HTTP/${req.httpVersion}`];
 							for (let i = 0; i < req.rawHeaders.length; i += 2) {
@@ -1792,9 +1810,18 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 						});
 
 						app.activeSockets.add(upstreamSocket);
-						upstreamSocket.once('close', () => app.activeSockets.delete(upstreamSocket));
-						upstreamSocket.on('error', () => clientSocket.destroy());
-						clientSocket.on('error', () => upstreamSocket.destroy());
+						upstreamSocket.once('close', () => {
+							app.activeSockets.delete(upstreamSocket);
+							removeHmrClient();
+						});
+						upstreamSocket.on('error', () => {
+							removeHmrClient();
+							clientSocket.destroy();
+						});
+						clientSocket.on('error', () => {
+							removeHmrClient();
+							upstreamSocket.destroy();
+						});
 					});
 
 					server.on('error', (err: NodeJS.ErrnoException) => {
@@ -1818,9 +1845,25 @@ export async function startLazyAppsSupervisor(options: LazySupervisorOptions): P
 	if (idleTimeoutMs > 0) {
 		setInterval(() => {
 			const now = Date.now();
+			const anyFrontendHasOpenTab = managedApps.some((a) => a.id !== 'api' && a.id !== 'cdn' && a.state === 'running' && a.activeHmrClients.size > 0);
+
 			for (const app of managedApps) {
-				if (app.state === 'running' && app.activeRequestsCount === 0 && now - app.lastActiveAt >= idleTimeoutMs) {
-					stopApp(app, `Idle for ${idleTimeoutSeconds}s with no requests`);
+				if (app.state !== 'running' || app.activeRequestsCount > 0) continue;
+
+				// Never spin down an app while at least one browser tab still has an open HMR WebSocket
+				if (app.activeHmrClients.size > 0) {
+					app.lastActiveAt = now;
+					continue;
+				}
+
+				// Keep API and CDN awake while any frontend tab is open so returning to an open tab never stalls on cold-boot
+				if ((app.id === 'api' || app.id === 'cdn') && anyFrontendHasOpenTab) {
+					app.lastActiveAt = now;
+					continue;
+				}
+
+				if (now - app.lastActiveAt >= idleTimeoutMs) {
+					stopApp(app, `Idle for ${idleTimeoutSeconds}s with no open tabs or requests`);
 				}
 			}
 		}, 5000);

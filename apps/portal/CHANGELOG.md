@@ -2,6 +2,25 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.5.6
+
+### Patch Changes
+
+- ## `app.xernerx.com` Vanity URL Previews & Batch Organization Role Lookup
+  
+  Updated Bot and Organization vanity URL previews to show `app.xernerx.com` and switched Organization member role checks to a single catalog fetch.
+  
+  ### Changed
+  
+  - **Bot & Organization Vanity URL Prefixes**: Updated Custom Vanity URL Slug displays in Bot General settings and Organization settings to show `app.xernerx.com/bots/...` and `app.xernerx.com/orgs/...`.
+  - **Organization Member Role Lookup**: Replaced per-role `/secure/core/{id}` fetches in `OrgMembersTab` with a single `GET /secure/core` lookup.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 1.5.5
 
 ### Patch Changes

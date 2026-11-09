@@ -2,6 +2,35 @@
 
 # admin
 
+## 0.27.0
+
+### Minor Changes
+
+- ## Direct Invite Permission Import, OAuth2 Redirect Toggle & Role Triage
+  
+  Added direct Permission BigInt and Discord OAuth2 Invite URL importing plus a Post-Auth Bot Page Redirect toggle in the Invites manager, prevented deleted RBAC role IDs from crashing the Admin Portal, and added Danger badges and one-click cleanup for orphaned user roles.
+  
+  ### Added
+  
+  - **Post-Auth Bot Page Redirect Toggle**: Added a toggle on Application Invites to append `&response_type=code&redirect_uri=https%3A%2F%2Fapp.xernerx.com%2Fbots%2F<slug>` with a live query preview and one-click Redirect URI copy button.
+  - **Direct Invite Permission BigInt & OAuth2 URL Import**: Added a two-way synced **Permission Bitfield (BigInt)** input and a **Discord Auth Invite URL** importer in the Invites modal to directly enable permissions, sync OAuth2 scopes and redirect flags, and auto-select Client IDs.
+  - **Missing Role Danger Badges & Filter**: Highlighted users assigned non-existent role IDs with Danger indicators across user cards, previews, the Home Overview triage card, and a dedicated **Missing Roles** filter pill.
+  - **One-Click & Modal Orphaned Role Removal**: Added inline `×` removal on user cards and a dedicated cleanup callout inside the User Identity editor to strip deleted role IDs.
+  
+  ### Changed
+  
+  - **Resilient Admin Role Bootstrap**: Resolved RBAC permissions from a single `GET /secure/core` catalog fetch and restricted fatal database error states to `5xx` responses.
+  - **Settings Guild Fetch Stability**: Keyed the Discord guild lookup effect in `Settings` on `accessToken` instead of the session object reference.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 0.26.0
 
 ### Minor Changes

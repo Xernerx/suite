@@ -2,6 +2,24 @@
 
 # docs
 
+## 1.10.6
+
+### Patch Changes
+
+- ## Batch RBAC Role Resolution for Staff Docs Access
+  
+  Eliminated per-role `/secure/core/{id}` 404 requests when checking staff documentation permissions.
+  
+  ### Changed
+  
+  - **Catalog-Based Role Resolution**: Updated `useDocsAccess` to fetch `GET /secure/core` once and safely ignore deleted or non-existent role IDs on user profiles.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 1.10.5
 
 ### Patch Changes

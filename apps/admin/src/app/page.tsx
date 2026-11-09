@@ -26,7 +26,7 @@ import {
 	ScrollText,
 } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useUser, useToast } from '@xernerx/providers';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import ApplicationConfigs from '@/components/ApplicationConfigs';
 import ApplicationReviews from '@/components/ApplicationReviews';
@@ -72,10 +72,13 @@ export default function Home() {
 	const [virtueAvatarUrl, setVirtueAvatarUrl] = useState<string | null>(null);
 	const hasInitializedView = useRef(false);
 
-	const handleNavigateFromOverview = (targetView: string, query?: string) => {
-		setTriageQuery(query || '');
-		setView(targetView);
-	};
+	const handleNavigateFromOverview = useCallback(
+		(targetView: string, query?: string) => {
+			setTriageQuery(query || '');
+			setView(targetView);
+		},
+		[setView]
+	);
 
 	useEffect(() => {
 		if (typeof document !== 'undefined') {
@@ -94,7 +97,7 @@ export default function Home() {
 				if (res.ok) {
 					const data = await res.json();
 					setAdminServerId(data.value || null);
-				} else {
+				} else if (res.status >= 500) {
 					const errData = await res.json().catch(() => ({}));
 					if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
 				}
@@ -152,41 +155,43 @@ export default function Home() {
 		fetchVirtueAvatar();
 	}, [getEnvUrl, isReady]);
 
+	const userRoleIdsKey = useMemo(() => {
+		const raw = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+		return raw
+			.map((r: any) => (typeof r === 'string' ? r : r?.id))
+			.filter((id: any): id is string => typeof id === 'string' && id.trim().length > 0)
+			.sort()
+			.join(',');
+	}, [user?.roles, user?.role]);
+
 	useEffect(() => {
-		if (!isReady) return;
+		if (!isReady || userLoading) return;
 		async function fetchPermissions() {
-			const roleIds = Array.isArray(user?.roles) ? user.roles : user?.role ? [user.role] : [];
+			const roleIds = userRoleIdsKey ? userRoleIdsKey.split(',').filter(Boolean) : [];
 			if (roleIds.length === 0) {
 				setRoleLoading(false);
 				return;
 			}
 			try {
-				const roleDocs = await Promise.all(
-					roleIds.map(async (roleId: string) => {
-						const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/core/${roleId}`), { credentials: 'include' });
-						if (res.ok) {
-							const roleDoc = await res.json();
-							return roleDoc.permissions || {};
-						} else {
-							const errData = await res.json().catch(() => ({}));
-							if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
-						}
-						return {};
-					})
-				);
-
-				const mergedPermissions = roleDocs.reduce(
-					(acc, curr) => {
-						for (const [k, v] of Object.entries(curr)) {
-							if (v) acc[k] = true;
-							else if (acc[k] === undefined) acc[k] = false;
-						}
-						return acc;
-					},
-					{} as Record<string, boolean>
-				);
-
-				setUserRolePermissions(mergedPermissions);
+				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/core'), { credentials: 'include', cache: 'no-store' });
+				if (res.ok) {
+					const allRoles = await res.json();
+					const roleDocs = Array.isArray(allRoles) ? allRoles.filter((r: any) => r?.id && roleIds.includes(r.id)).map((r: any) => r?.permissions || {}) : [];
+					const mergedPermissions = roleDocs.reduce(
+						(acc, curr) => {
+							for (const [k, v] of Object.entries(curr)) {
+								if (v) acc[k] = true;
+								else if (acc[k] === undefined) acc[k] = false;
+							}
+							return acc;
+						},
+						{} as Record<string, boolean>
+					);
+					setUserRolePermissions(mergedPermissions);
+				} else if (res.status >= 500) {
+					const errData = await res.json().catch(() => ({}));
+					if (errData?.error) setDbError((prev) => prev || `DatabaseError: ${errData.error}`);
+				}
 			} catch (err: any) {
 				console.warn('Failed to fetch role permissions:', err);
 				toast({ type: 'error', title: t('admin.dashboard.toasts.fetchPermissionsError'), description: err.message });
@@ -195,10 +200,8 @@ export default function Home() {
 			}
 		}
 
-		if (!userLoading) {
-			fetchPermissions();
-		}
-	}, [user, userLoading, getEnvUrl, isReady]);
+		fetchPermissions();
+	}, [userRoleIdsKey, userLoading, getEnvUrl, isReady, toast, t]);
 
 	const hasDbFallback = Boolean(dbError);
 	const canTranslations = hasDbFallback || (userRolePermissions.translations ?? permissions.find((p) => p.key === 'translations')?.defaultValue ?? false);
@@ -343,6 +346,53 @@ export default function Home() {
 		}
 	}, [view]);
 
+	const overviewPermissions = useMemo(
+		() => ({
+			canUsers,
+			canBots,
+			canServers,
+			canOrganizations,
+			canRoles,
+			canApplicationsReview,
+			canApplicationsManage,
+			canTokens,
+			canTranslations,
+			canSettings,
+			canInvites,
+			canAnnouncements,
+			canGiveaways,
+			canMedia,
+			canManageRoadmap,
+			canManageSuggestions,
+			canManageIssues,
+			canManageStore,
+			isServerSet,
+			adminServerId,
+		}),
+		[
+			canUsers,
+			canBots,
+			canServers,
+			canOrganizations,
+			canRoles,
+			canApplicationsReview,
+			canApplicationsManage,
+			canTokens,
+			canTranslations,
+			canSettings,
+			canInvites,
+			canAnnouncements,
+			canGiveaways,
+			canMedia,
+			canManageRoadmap,
+			canManageSuggestions,
+			canManageIssues,
+			canManageStore,
+			isServerSet,
+			adminServerId,
+		]
+	);
+
 	if ((userLoading || roleLoading || serverLoading) && !dbError) return <Loading />;
 
 	if (dbError) {
@@ -414,33 +464,7 @@ export default function Home() {
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			{activeView === 'overview' && (
-				<HomeOverview
-					permissions={{
-						canUsers,
-						canBots,
-						canServers,
-						canOrganizations,
-						canRoles,
-						canApplicationsReview,
-						canApplicationsManage,
-						canTokens,
-						canTranslations,
-						canSettings,
-						canInvites,
-						canAnnouncements,
-						canGiveaways,
-						canMedia,
-						canManageRoadmap,
-						canManageSuggestions,
-						canManageIssues,
-						canManageStore,
-						isServerSet,
-						adminServerId,
-					}}
-					onNavigate={handleNavigateFromOverview}
-				/>
-			)}
+			{activeView === 'overview' && <HomeOverview permissions={overviewPermissions} onNavigate={handleNavigateFromOverview} />}
 			{activeView === 'seo' && <Overview />}
 			{activeView === 'audit' && <AuditLogs initialSearch={triageQuery} />}
 			{activeView === 'support' && <Support />}

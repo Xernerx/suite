@@ -142,7 +142,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 										icon_url: authorIcon,
 									},
 									title: 'New Vote!',
-									url: `https://xernerx.com/bots/${id}`,
+									url: `https://app.xernerx.com/bots/${id}`,
 									description: `This user just voted for your bot! Your bot now has **${totalVotes}** votes.`,
 									color: 0xff00a0,
 									footer: {

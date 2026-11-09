@@ -2,6 +2,24 @@
 
 # Changelog
 
+## 1.3.10
+
+### Patch Changes
+
+- ## Resilient Staff Role Verification on Hosting Console
+  
+  Resolved staff hosting permissions via `GET /secure/core` so orphaned role IDs no longer trigger 404 lookups.
+  
+  ### Changed
+  
+  - **Batch Role Lookup**: Replaced per-role `/secure/core/{id}` requests on the Hosting Console entry page with a single `GET /secure/core` role map check.
+- Updated dependencies
+  - @xernerx/lib@1.23.1
+  - @xernerx/providers@0.22.6
+  - @xernerx/ui@0.8.7
+  - @xernerx/components@0.16.1
+  - @xernerx/feedback@0.5.8
+
 ## 1.3.9
 
 ### Patch Changes

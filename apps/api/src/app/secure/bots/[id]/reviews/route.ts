@@ -177,7 +177,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 										icon_url: authorIcon,
 									},
 									title: eventType === 'POST review' ? 'New Review!' : 'Review Updated!',
-									url: `https://xernerx.com/bots/${id}`,
+									url: `https://app.xernerx.com/bots/${id}`,
 									description: content || '*No text provided.*',
 									fields: [
 										{
@@ -284,7 +284,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
 										icon_url: authorIcon,
 									},
 									title: 'Review Deleted',
-									url: `https://xernerx.com/bots/${id}`,
+									url: `https://app.xernerx.com/bots/${id}`,
 									description: `This user deleted their review.`,
 									color: 0xff0000,
 									footer: {

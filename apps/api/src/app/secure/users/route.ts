@@ -5,7 +5,6 @@ import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 
 const SIGN_IN_BONUS_AMOUNT = 1000;
-const DEFAULT_JOIN_ROLE_ID = '1b333119-d818-4fb1-a5dc-12621fd14198';
 
 async function reconcileVirtueAndOrphanUsers(xernerxDb: any) {
 	try {
@@ -77,7 +76,7 @@ async function reconcileVirtueAndOrphanUsers(xernerxDb: any) {
 			return;
 		}
 
-		let defaultRoles = [DEFAULT_JOIN_ROLE_ID];
+		let candidateRoles: string[] = [];
 		if (SettingModel) {
 			const joinRolesSetting = await SettingModel.findOne({ id: 'join_roles' })
 				.lean()
@@ -86,10 +85,20 @@ async function reconcileVirtueAndOrphanUsers(xernerxDb: any) {
 				try {
 					const parsed = JSON.parse(joinRolesSetting.value);
 					if (Array.isArray(parsed)) {
-						defaultRoles = Array.from(new Set([DEFAULT_JOIN_ROLE_ID, ...parsed.filter((r) => typeof r === 'string' && r)]));
+						candidateRoles = Array.from(new Set(parsed.filter((r): r is string => typeof r === 'string' && r.trim().length > 0)));
 					}
 				} catch {}
 			}
+		}
+
+		const RoleModel = xernerxDb.models.core?.Role;
+		let defaultRoles: string[] = [];
+		if (RoleModel && candidateRoles.length > 0) {
+			const existingRoleDocs = await RoleModel.find({ id: { $in: candidateRoles } })
+				.select('id')
+				.lean()
+				.catch(() => []);
+			defaultRoles = (existingRoleDocs || []).map((r: any) => String(r.id)).filter(Boolean);
 		}
 
 		await Promise.all([
