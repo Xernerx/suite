@@ -58,11 +58,29 @@ function serializeBlogPost(doc: any): BlogPostItem {
 }
 
 async function fetchPublicOrLimitedBlogPost(slug: string): Promise<BlogPostItem | null> {
+	if (process.env.MONGO_XERNERX) {
+		try {
+			const { models } = await database('xernerx');
+			const BlogPost = (models.core as any)?.BlogPost;
+			if (BlogPost) {
+				const post = await BlogPost.findOne({ $or: [{ slug }, { id: slug }] }).lean();
+				if (post) {
+					return post.privacy === 'private' ? null : serializeBlogPost(post);
+				}
+			}
+		} catch {
+			// Fall through to public API lookup
+		}
+	}
+
 	try {
-		const { models } = await database('xernerx');
-		const BlogPost = (models.core as any)?.BlogPost;
-		if (!BlogPost) return null;
-		const post = await BlogPost.findOne({ $or: [{ slug }, { id: slug }] }).lean();
+		const domain = process.env.DOMAIN || 'xernerx.com';
+		const envVar = (process.env.ENVIRONMENT || '').toLowerCase();
+		const apiBase = envVar === 'canary' ? `https://api.canary.${domain}` : envVar === 'development' ? 'http://localhost:4001' : `https://api.${domain}`;
+		const res = await fetch(`${apiBase}/core/blog/${encodeURIComponent(slug)}`, { next: { revalidate: 300 } });
+		if (!res.ok) return null;
+		const data = await res.json();
+		const post = data?.post || data;
 		if (!post || post.privacy === 'private') return null;
 		return serializeBlogPost(post);
 	} catch {

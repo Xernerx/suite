@@ -2,6 +2,23 @@
 
 # @xernerx/components
 
+## 0.16.2
+
+### Patch Changes
+
+- ## Official Social Follow Links in Global Footer
+  
+  Added official Xernerx Studios social profile buttons to the shared application Footer.
+  
+  ### Added
+  
+  - **Footer Follow Row**: Added official follow links for X, Bluesky, Instagram, Discord, and GitHub alongside updated share intents.
+- Updated dependencies
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 0.16.1
 
 ### Patch Changes

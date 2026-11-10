@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Copy, ExternalLink, Eye, EyeOff, KeyRound, Link2, Loader2, Lock, RefreshCw, Send, Sparkles, Trash2 } from 'lucide-react';
+import { AlertTriangle, Check, Copy, ExternalLink, Eye, EyeOff, KeyRound, Link2, Loader2, Lock, RefreshCw, Send, Sparkles, Trash2 } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast, useUser } from '@xernerx/providers';
 import WebhookDeliveriesCard, { WebhookDeliveryItem } from '@/components/portal/WebhookDeliveriesCard';
 
-const STANDARD_WEBHOOK_EVENTS = ['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'];
+const STANDARD_WEBHOOK_EVENTS = ['POST vote', 'POST tip', 'POST stat', 'PATCH stat', 'DELETE stat', 'WARN shard', 'POST review', 'PATCH review', 'DELETE review', 'VOTE review', 'POST release'];
 const API_TIER_WEBHOOK_EVENTS = ['POST online', 'POST offline'];
 const ALL_WEBHOOK_EVENTS = [...STANDARD_WEBHOOK_EVENTS, ...API_TIER_WEBHOOK_EVENTS];
 
@@ -288,7 +288,7 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 												};
 												setBotConfig({ ...botConfig, hooks: newHooks });
 											}}
-											className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent) hover:text-white transition-colors cursor-pointer"
+											className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent) hover:text-(--accent-contrast) transition-colors cursor-pointer"
 										>
 											{t('app.portal.bot.webhooks.selectAllEvents')}
 										</button>
@@ -308,6 +308,7 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 								<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
 									{ALL_WEBHOOK_EVENTS.map((event) => {
 										const isApiTierEvent = API_TIER_WEBHOOK_EVENTS.includes(event);
+										const isShardWarnEvent = event === 'WARN shard';
 										const isChecked = hook.events?.includes(event) || false;
 										const isLocked = isApiTierEvent && !effectiveHasApiTier;
 
@@ -328,12 +329,16 @@ export default function WebhooksTab({ botConfig, setBotConfig, deliveries = [], 
 														setBotConfig({ ...botConfig, hooks: newHooks });
 													}}
 												/>
-												<span className="text-sm text-(--text) flex items-center gap-1.5 flex-wrap">
+												<span className="text-sm text-(--text) flex flex-row items-center gap-1.5 flex-wrap">
 													<span>{event}</span>
+													{isShardWarnEvent && (
+														<Badge variant="warning" size="sm" icon={<AlertTriangle size={10} />} className="text-[10px] py-0.5 px-2">
+															{t('app.portal.bot.webhooks.shardWarnBadge')}
+														</Badge>
+													)}
 													{isApiTierEvent && (
-														<Badge variant="accent" size="sm" className="inline-flex items-center gap-1 text-[10px] py-0 px-1.5">
-															{isLocked ? <Lock size={10} /> : <Sparkles size={10} />}
-															<span>{t('app.portal.bot.webhooks.apiTierBadge')}</span>
+														<Badge variant="accent" size="sm" icon={isLocked ? <Lock size={10} /> : <Sparkles size={10} />} className="text-[10px] py-0.5 px-2">
+															{t('app.portal.bot.webhooks.apiTierBadge')}
 														</Badge>
 													)}
 												</span>

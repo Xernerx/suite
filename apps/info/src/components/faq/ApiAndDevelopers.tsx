@@ -126,6 +126,22 @@ export default function ApiAndDevelopers({ searchQuery = '' }: { searchQuery?: s
 				</div>
 			),
 		},
+		{
+			id: 'card10',
+			title: t('faq.developers.card10.title'),
+			searchableText: `${t('faq.developers.card10.title')} ${t('faq.developers.card10.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.developers.card10.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.v1ApiDocs'), href: 'https://docs.xernerx.com/api/v1#post-bot-stats', vanity: 'docs.xernerx.com/api/v1#post-bot-stats' },
+							{ label: t('faq.quickLinks.devPortal'), href: 'https://portal.xernerx.com', vanity: 'portal.xernerx.com' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.developers.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;

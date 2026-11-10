@@ -27,6 +27,11 @@ export default function OrganizationPage({ params }: { params: Promise<{ id: str
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
+		if (!organization?.name) return;
+		document.title = `Xernerx App | ${organization.name}${organization.verified ? ' ✓' : ''}`;
+	}, [organization]);
+
+	useEffect(() => {
 		show();
 
 		const items: any[] = [

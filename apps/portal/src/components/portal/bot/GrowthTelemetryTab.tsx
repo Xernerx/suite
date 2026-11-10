@@ -7,6 +7,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Too
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Tabs } from '@xernerx/ui';
+import { BotShardCapacityCard } from './BotShardCapacityCard';
 import { BotStatsLogCard } from './BotStatsLogCard';
 
 interface GrowthTelemetryTabProps {
@@ -51,6 +52,7 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 								guildCount: Number(s.guildCount ?? s.servers ?? 0) || 0,
 								userCount: Number(s.userCount ?? s.users ?? 0) || 0,
 								shardCount: Array.isArray(s.shardCount) ? s.shardCount.length : Number(s.shardCount ?? s.shards ?? 0) || 0,
+								shards: Array.isArray(s.shards) ? s.shards : [],
 								voteCount: Number(s.voteCount ?? s.votes ?? 0) || 0,
 							}))
 							.sort((a, b) => a.timestamp - b.timestamp);
@@ -393,6 +395,9 @@ export default function GrowthTelemetryTab({ botConfig, botId }: GrowthTelemetry
 					</ResponsiveContainer>
 				</div>
 			</div>
+
+			{/* Per-Shard 2.5k Capacity Diagnostics */}
+			<BotShardCapacityCard latestStat={stats[stats.length - 1] || fallbackPoint} />
 
 			{/* Daily Telemetry Snapshot Log & Single-Row Deletion */}
 			<BotStatsLogCard

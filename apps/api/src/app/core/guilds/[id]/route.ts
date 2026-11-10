@@ -44,9 +44,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const payload = {
 			id: guild.id,
+			vanitySlug: guild.vanitySlug || null,
 			name: guild.name || 'Unknown Server',
 			description: guild.description || '',
 			info: guild.info || '',
+			tags: Array.isArray(guild.tags) ? guild.tags : [],
 			iconUrl,
 			bannerUrl,
 			verified: Boolean(guild.verified),

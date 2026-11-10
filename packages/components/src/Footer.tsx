@@ -27,7 +27,7 @@ import {
 import { useCookie, useDictionary, useEnvironment } from '@xernerx/providers';
 import { useEffect, useState } from 'react';
 
-import { BsFacebook, BsGithub, BsLinkedin, BsReddit, BsTwitterX, BsWhatsapp } from 'react-icons/bs';
+import { BsBluesky, BsDiscord, BsFacebook, BsGithub, BsInstagram, BsLinkedin, BsReddit, BsTwitterX, BsWhatsapp } from 'react-icons/bs';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -46,9 +46,37 @@ export function Footer() {
 			.catch(() => setSystemOnline(false));
 	}, [isReady]);
 
+	const socialLinks = [
+		{
+			href: 'https://x.com/XernerxStudios',
+			label: t('common.footer.follow.x'),
+			icon: BsTwitterX,
+		},
+		{
+			href: 'https://bsky.app/profile/xernerx.com',
+			label: t('common.footer.follow.bluesky'),
+			icon: BsBluesky,
+		},
+		{
+			href: 'https://www.instagram.com/xernerxstudios/',
+			label: t('common.footer.follow.instagram'),
+			icon: BsInstagram,
+		},
+		{
+			href: 'https://discord.gg/yrm8gqTuXa',
+			label: t('common.footer.follow.discord'),
+			icon: BsDiscord,
+		},
+		{
+			href: 'https://github.com/xernerx',
+			label: t('common.footer.follow.github'),
+			icon: BsGithub,
+		},
+	];
+
 	const shareLinks = [
 		{
-			href: 'https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.xernerx.com&text=Xernerx%20Studios%20%E2%80%94%20Modern%20Software%2C%20Bots%20%26%20Developer%20Tools',
+			href: 'https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.xernerx.com&text=Xernerx%20Studios%20%E2%80%94%20Modern%20Software%2C%20Bots%20%26%20Developer%20Tools&via=XernerxStudios',
 			label: t('common.footer.share.twitter'),
 			icon: BsTwitterX,
 		},
@@ -108,7 +136,28 @@ export function Footer() {
 							<span>{systemOnline === false ? t('common.footer.links.statusDegraded') : t('common.footer.links.statusOperational')}</span>
 						</div>
 
-						<div className="mt-2 flex flex-wrap items-center justify-center md:justify-start gap-2" aria-label={t('common.footer.share.label')}>
+						<div className="mt-2 flex flex-wrap items-center justify-center md:justify-start gap-2" aria-label={t('common.footer.follow.label')}>
+							<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted) mr-1">{t('common.footer.follow.label')}:</span>
+							{socialLinks.map((item) => {
+								const SocialIcon = item.icon;
+								return (
+									<Link
+										key={item.href}
+										href={item.href}
+										target="_blank"
+										rel="me noopener noreferrer"
+										aria-label={item.label}
+										title={item.label}
+										className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-(--border)/10 bg-(--foreground)/30 text-(--text-muted) backdrop-blur-md transition-all hover:border-(--accent)/30 hover:bg-(--accent)/10 hover:text-(--accent)"
+									>
+										<SocialIcon size={13} />
+										<span className="sr-only">{item.label}</span>
+									</Link>
+								);
+							})}
+						</div>
+
+						<div className="mt-1 flex flex-wrap items-center justify-center md:justify-start gap-2" aria-label={t('common.footer.share.label')}>
 							<span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted) mr-1">{t('common.footer.share.label')}:</span>
 							{shareLinks.map((item) => {
 								const ShareIcon = item.icon;

@@ -171,6 +171,22 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 				</div>
 			),
 		},
+		{
+			id: 'card12',
+			title: t('faq.bots.card12.title'),
+			searchableText: `${t('faq.bots.card12.title')} ${t('faq.bots.card12.description')}`,
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+					<p className="text-(--text) leading-relaxed">{t('faq.bots.card12.description')}</p>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.botInvites'), href: 'https://www.xernerx.com/invites', vanity: 'xernerx.com/invites' },
+							{ label: t('faq.quickLinks.exploreBots'), href: 'https://app.xernerx.com/bots', vanity: 'app.xernerx.com/bots' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.bots.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;

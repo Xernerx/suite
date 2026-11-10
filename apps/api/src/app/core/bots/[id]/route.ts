@@ -26,6 +26,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 			todo: '782105629572464652',
 			'to-do-list': '782105629572464652',
 			'to-do-list-bot': '782105629572464652',
+			todolistbot: '782105629572464652',
 			tdl: '782105629572464652',
 			metamorphosis: '881678826906730547',
 			zodiac: '950251264095162418',
@@ -79,9 +80,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const payload = {
 			id: bot.id,
+			vanitySlug: bot.vanitySlug || null,
 			name: discordName || bot.name || 'Unknown Bot',
 			description: bot.description || '',
 			info: bot.info || '',
+			tags: Array.isArray(bot.tags) ? bot.tags : [],
 			avatarUrl,
 			bannerUrl,
 			verified: Boolean(bot.verified),

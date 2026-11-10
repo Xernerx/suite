@@ -18,6 +18,10 @@ export async function GET() {
 - **Core Tagline**: 1 Account, 1 Place, 1 Setup
 - **GitHub**: https://github.com/xernerx
 - **NPM Organization**: https://www.npmjs.com/org/xernerx
+- **X (Twitter)**: https://x.com/XernerxStudios
+- **Bluesky**: https://bsky.app/profile/xernerx.com
+- **Instagram**: https://www.instagram.com/xernerxstudios/
+- **Discord Community**: https://discord.gg/yrm8gqTuXa
 
 ---
 

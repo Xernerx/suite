@@ -72,6 +72,15 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 	}, [id]);
 
 	useEffect(() => {
+		if (!bot) return;
+		const displayName = bot.discord?.global_name || bot.discord?.username || bot.name;
+		if (displayName) {
+			const hasBotWord = /\bbot\b/i.test(displayName);
+			document.title = `Xernerx App | ${displayName}${bot.verified ? ' ✓' : ''} — ${hasBotWord ? 'Discord App & Commands' : 'Discord Bot'}`;
+		}
+	}, [bot]);
+
+	useEffect(() => {
 		if (!isReady) return;
 		const fetchBot = async () => {
 			try {

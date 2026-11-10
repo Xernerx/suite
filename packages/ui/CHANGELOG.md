@@ -2,6 +2,19 @@
 
 # @xernerx/ui
 
+## 0.8.8
+
+### Patch Changes
+
+- ## Inline Single-Row Layout Alignment in `Badge`
+  
+  Prevented icons and children inside `Badge` from wrapping onto multiple lines in compact flex layouts.
+  
+  ### Changed
+  
+  - **`Badge` Inline Flex Alignment**: Added `flex-row` and `whitespace-nowrap` alignment to `Badge` and its inner icon/label spans so badges with icons always render on a single horizontal line.
+- @xernerx/providers@0.22.7
+
 ## 0.8.7
 
 ### Patch Changes

@@ -2,6 +2,24 @@
 
 # blog
 
+## 1.1.8
+
+### Patch Changes
+
+- ## Resilient Article Metadata & Sitemap Discovery
+  
+  Improved public article metadata resolution and social preview cards across the newsroom.
+  
+  ### Changed
+  
+  - **Article & Sitemap Fallbacks**: Added resilient public API fallback resolution for article pages and sitemaps along with official `@XernerxStudios` social card tags.
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 1.1.7
 
 ### Patch Changes

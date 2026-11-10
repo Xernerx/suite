@@ -2,6 +2,31 @@
 
 # app
 
+## 2.22.0
+
+### Minor Changes
+
+- ## Per-Shard 2.5k Capacity Matrix & Enhanced Public Profile Metadata
+  
+  Added 2,500-server per-shard capacity bars and high-load indicators to Bot Statistics alongside improved public profile SEO metadata.
+  
+  ### Added
+  
+  - **Shard 2.5k Capacity Bars & Badges**: Added `{servers} / 2,500` capacity ratios, utilization bars, and High Load / At 2.5k Limit badges to every shard in the Bot Statistics Shard Health Matrix.
+  
+  ### Changed
+  
+  - **Public Profile & Sitemap Metadata**: Improved Bot, Server, User, and Organization social preview cards and canonical sitemap coverage.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 2.21.4
 
 ### Patch Changes

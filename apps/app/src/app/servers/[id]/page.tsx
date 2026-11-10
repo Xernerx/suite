@@ -40,6 +40,11 @@ export default function ServerPage({ params }: { params: Promise<{ id: string }>
 	const [loading, setLoading] = useState(true);
 	const [canManageServer, setCanManageServer] = useState(false);
 
+	useEffect(() => {
+		if (!server?.name) return;
+		document.title = `Xernerx App | ${server.name}${server.verified ? ' ✓' : ''}`;
+	}, [server]);
+
 	// Vote State
 	const [canVote, setCanVote] = useState(false);
 	const [nextVoteAt, setNextVoteAt] = useState<string | null>(null);

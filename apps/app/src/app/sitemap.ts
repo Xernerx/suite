@@ -112,7 +112,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 			});
 		}
 	} catch {
-		// Gracefully fall back to static entries if database is unreachable during build
+		try {
+			const [botsRes, guildsRes] = await Promise.all([
+				fetch('https://api.xernerx.com/secure/bots?limit=500', { headers: { Origin: baseUrl }, next: { revalidate: 3600 } }).catch(() => null),
+				fetch('https://api.xernerx.com/secure/guilds?limit=500', { headers: { Origin: baseUrl }, next: { revalidate: 3600 } }).catch(() => null),
+			]);
+			const publicBots = botsRes?.ok ? await botsRes.json().catch(() => []) : [];
+			const publicServers = guildsRes?.ok ? await guildsRes.json().catch(() => []) : [];
+
+			if (Array.isArray(publicBots)) {
+				for (const bot of publicBots) {
+					const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;
+					if (!slugOrId || seenBotSlugs.has(String(slugOrId).toLowerCase())) continue;
+					seenBotSlugs.add(String(slugOrId).toLowerCase());
+					entries.push({
+						url: `${baseUrl}/bots/${encodeURIComponent(String(slugOrId))}`,
+						lastModified: bot.updatedAt ? new Date(bot.updatedAt) : now,
+						changeFrequency: 'weekly',
+						priority: 0.8,
+					});
+				}
+			}
+
+			if (Array.isArray(publicServers)) {
+				for (const guild of publicServers) {
+					const slugOrId = guild.vanitySlug || guild.id;
+					if (!slugOrId) continue;
+					entries.push({
+						url: `${baseUrl}/servers/${encodeURIComponent(String(slugOrId))}`,
+						lastModified: guild.updatedAt ? new Date(guild.updatedAt) : now,
+						changeFrequency: 'weekly',
+						priority: 0.8,
+					});
+				}
+			}
+		} catch {
+			// Gracefully fall back to static entries if API is unreachable during build
+		}
 	}
 
 	return entries;

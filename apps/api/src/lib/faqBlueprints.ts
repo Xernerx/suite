@@ -266,6 +266,13 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 				['faq.developers.card9.description'],
 				[ql('hasteStudio', 'https://haste.xernerx.com', 'haste.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1#haste-documents', 'docs.xernerx.com/api/v1#haste-documents')]
 			),
+			c(
+				'card10',
+				'shard-capacity-limit',
+				'faq.developers.card10.title',
+				['faq.developers.card10.description'],
+				[ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1#post-bot-stats', 'docs.xernerx.com/api/v1#post-bot-stats'), ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com')]
+			),
 		],
 	},
 	{

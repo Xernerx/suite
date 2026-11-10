@@ -3,7 +3,7 @@
 
 import { CodeBlock } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
-import { BarChart2, Code, Rocket } from 'lucide-react';
+import { BarChart2, Code, Rocket, ShieldAlert } from 'lucide-react';
 import { EndpointSection } from './EndpointSection';
 
 interface V1SubProps {
@@ -92,13 +92,25 @@ export function V1StatsEndpoints({ activeGroup = 'all', searchQuery = '', method
 									<td className="py-3 font-mono">Number</td>
 									<td className="py-3">{t('docs.api.v1.common.shardCountDesc')}</td>
 								</tr>
-								<tr>
+								<tr className="border-b border-(--border)/5">
 									<td className="py-3 font-mono text-(--accent)">userCount</td>
 									<td className="py-3 font-mono">Number</td>
 									<td className="py-3">{t('docs.api.v1.common.userCountDesc')}</td>
 								</tr>
+								<tr>
+									<td className="py-3 font-mono text-(--accent)">shards</td>
+									<td className="py-3 font-mono">ShardStats[]</td>
+									<td className="py-3">{t('docs.api.v1.common.shardsDesc')}</td>
+								</tr>
 							</tbody>
 						</table>
+					</div>
+
+					<div className="bg-(--accent-orange)/10 border border-(--accent-orange)/25 p-4 rounded-2xl mb-4">
+						<h3 className="text-(--accent-orange) font-bold mb-1 flex items-center gap-2">
+							<ShieldAlert size={16} /> {t('docs.api.v1.common.shardLimitRuleTitle')}
+						</h3>
+						<p className="text-sm text-(--text-muted)">{t('docs.api.v1.common.shardLimitRuleDesc')}</p>
 					</div>
 
 					<div className="bg-(--accent)/10 border border-(--accent)/20 p-4 rounded-2xl mb-6">

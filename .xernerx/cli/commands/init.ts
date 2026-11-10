@@ -80,7 +80,6 @@ STRIPE_COUPON_ID=""
 
 # New monolithic database
 MONGO_XERNERX="${mongoXernerx}"
-MONGO_LEGACY=""
 
 # Legacy shards (do not delete yet)
 MONGO_ZODIAC=""

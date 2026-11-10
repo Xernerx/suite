@@ -3,12 +3,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
+import { getEnabledInviteOptions, normalizeInviteOptions, safeParsePermBigInt, type InviteOptionsConfig } from '@xernerx/lib';
 import { useEnvironment, useDictionary, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input } from '@xernerx/ui';
 import { Link, Plus, Trash2, Edit2, Copy, Check, ExternalLink, Download, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import InviteModal, { parsePermissionBigInt } from './invites/InviteModal';
+import InviteModal from './invites/InviteModal';
 
 interface AppInvite {
 	id: string; // URL Slug
@@ -17,6 +18,7 @@ interface AppInvite {
 	permissions: string;
 	scopes: string[];
 	redirect?: boolean;
+	options?: InviteOptionsConfig;
 	botName?: string;
 	botAvatar?: string | null;
 	createdAt?: string;
@@ -49,7 +51,12 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 	const [newName, setNewName] = useState('');
 	const [newScopes, setNewScopes] = useState<string[]>(['bot', 'applications.commands']);
 	const [newRedirect, setNewRedirect] = useState<boolean>(false);
-	const [selectedPermissions, setSelectedPermissions] = useState<bigint>(BigInt(0));
+
+	const [essentialEnabled, setEssentialEnabled] = useState<boolean>(true);
+	const [essentialPermissions, setEssentialPermissions] = useState<bigint>(BigInt(0));
+	const [optionalEnabled, setOptionalEnabled] = useState<boolean>(false);
+	const [optionalPermissions, setOptionalPermissions] = useState<bigint>(BigInt(0));
+	const [advancedEnabled, setAdvancedEnabled] = useState<boolean>(false);
 
 	const fetchInvites = async (isManual = false) => {
 		if (isManual) setRefreshing(true);
@@ -87,18 +94,27 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		setNewName('');
 		setNewScopes(['bot', 'applications.commands']);
 		setNewRedirect(false);
-		setSelectedPermissions(BigInt(0));
+		setEssentialEnabled(true);
+		setEssentialPermissions(BigInt(0));
+		setOptionalEnabled(false);
+		setOptionalPermissions(BigInt(0));
+		setAdvancedEnabled(false);
 		setIsCreateOpen(true);
 	};
 
 	const openEditModal = (invite: AppInvite) => {
+		const norm = normalizeInviteOptions(invite);
 		setEditId(invite.id);
 		setNewId(invite.id);
 		setNewClientId(invite.clientId);
 		setNewName(invite.name);
 		setNewScopes(Array.isArray(invite.scopes) && invite.scopes.length > 0 ? invite.scopes : ['bot', 'applications.commands']);
 		setNewRedirect(Boolean(invite.redirect));
-		setSelectedPermissions(parsePermissionBigInt(invite.permissions) ?? BigInt(0));
+		setEssentialEnabled(norm.essential.enabled);
+		setEssentialPermissions(safeParsePermBigInt(norm.essential.permissions));
+		setOptionalEnabled(norm.optional.enabled);
+		setOptionalPermissions(safeParsePermBigInt(norm.optional.permissions));
+		setAdvancedEnabled(norm.advanced.enabled);
 		setIsCreateOpen(true);
 	};
 
@@ -106,13 +122,31 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		e.preventDefault();
 		setCreating(true);
 
+		const effectiveOptional = essentialEnabled ? essentialPermissions | optionalPermissions : optionalPermissions;
+		const options: InviteOptionsConfig = {
+			essential: {
+				enabled: essentialEnabled,
+				permissions: essentialPermissions.toString(),
+			},
+			optional: {
+				enabled: optionalEnabled,
+				permissions: effectiveOptional.toString(),
+			},
+			advanced: {
+				enabled: advancedEnabled,
+				permissions: '0',
+			},
+		};
+		const primaryPerms = essentialEnabled ? essentialPermissions.toString() : optionalEnabled ? effectiveOptional.toString() : '0';
+
 		const payload = {
 			id: newId,
 			clientId: newClientId,
 			name: newName,
-			permissions: selectedPermissions.toString(),
+			permissions: primaryPerms,
 			scopes: newScopes.map((s) => s.trim()).filter(Boolean),
 			redirect: newRedirect,
+			options,
 		};
 
 		try {
@@ -183,10 +217,15 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 			URL.revokeObjectURL(url);
 			return;
 		}
-		const headers = ['id', 'name', 'clientId', 'permissions', 'scopes', 'redirect'];
-		const rows = filteredInvites.map((inv) =>
-			[inv.id, (inv.name || '').replace(/"/g, '""'), inv.clientId || '', inv.permissions || '', (inv.scopes || []).join(';'), String(Boolean(inv.redirect))].map((cell) => `"${cell}"`).join(',')
-		);
+		const headers = ['id', 'name', 'clientId', 'permissions', 'scopes', 'redirect', 'enabledOptions'];
+		const rows = filteredInvites.map((inv) => {
+			const enabledKeys = getEnabledInviteOptions(inv)
+				.map((o) => o.key)
+				.join(';');
+			return [inv.id, (inv.name || '').replace(/"/g, '""'), inv.clientId || '', inv.permissions || '', (inv.scopes || []).join(';'), String(Boolean(inv.redirect)), enabledKeys]
+				.map((cell) => `"${cell}"`)
+				.join(',');
+		});
 		const csvContent = [headers.join(','), ...rows].join('\n');
 		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
@@ -237,87 +276,115 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 			) : (
 				<motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					<AnimatePresence>
-						{filteredInvites.map((invite) => (
-							<motion.div
-								key={invite.id}
-								layout
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.9 }}
-								className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-6 relative group"
-								style={{ gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-4 min-w-0">
-										{invite.botAvatar ? (
-											<Image src={invite.botAvatar} alt={invite.botName || invite.name} width={48} height={48} unoptimized className="w-12 h-12 rounded-2xl shadow-sm shrink-0" />
-										) : (
-											<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/10 text-(--accent) shrink-0">
-												<Link size={20} />
+						{filteredInvites.map((invite) => {
+							const enabledOpts = getEnabledInviteOptions(invite);
+							return (
+								<motion.div
+									key={invite.id}
+									layout
+									initial={{ opacity: 0, scale: 0.9 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.9 }}
+									className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-6 relative group"
+									style={{ gap: 'var(--ui-gap)' }}
+								>
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-4 min-w-0">
+											{invite.botAvatar ? (
+												<Image
+													src={invite.botAvatar}
+													alt={invite.botName || invite.name}
+													width={48}
+													height={48}
+													unoptimized
+													className="w-12 h-12 rounded-2xl shadow-sm shrink-0"
+												/>
+											) : (
+												<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/10 text-(--accent) shrink-0">
+													<Link size={20} />
+												</div>
+											)}
+											<div className="flex flex-col min-w-0">
+												<div className="flex items-center gap-2 flex-wrap">
+													<span className="font-bold text-(--text) truncate">{invite.botName || invite.name}</span>
+													{invite.redirect && (
+														<span className="rounded-full bg-(--accent)/10 border border-(--accent)/30 px-2 py-0.5 text-[10px] font-semibold text-(--accent)">
+															{t('admin.dashboard.invites.redirectBadge')}
+														</span>
+													)}
+												</div>
+												<span className="text-xs text-(--text-muted) truncate">/invites/{invite.id}</span>
 											</div>
-										)}
-										<div className="flex flex-col min-w-0">
-											<div className="flex items-center gap-2 flex-wrap">
-												<span className="font-bold text-(--text) truncate">{invite.botName || invite.name}</span>
-												{invite.redirect && (
-													<span className="rounded-full bg-(--accent)/10 border border-(--accent)/30 px-2 py-0.5 text-[10px] font-semibold text-(--accent)">
-														{t('admin.dashboard.invites.redirectBadge')}
-													</span>
-												)}
-											</div>
-											<span className="text-xs text-(--text-muted) truncate">/invites/{invite.id}</span>
+										</div>
+										<div className="flex items-center gap-1 shrink-0">
+											<button
+												type="button"
+												onClick={() => {
+													const url = `${getEnvUrl('https://www.xernerx.com')}/invites/${invite.id}`;
+													navigator.clipboard.writeText(url);
+													setCopiedSlug(invite.id);
+													toast({ type: 'success', title: t('admin.dashboard.invites.inviteUrlCopied') });
+													setTimeout(() => setCopiedSlug((prev) => (prev === invite.id ? null : prev)), 2000);
+												}}
+												title={t('admin.dashboard.invites.copyInviteUrl')}
+												aria-label={t('admin.dashboard.invites.copyInviteUrl')}
+												className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
+											>
+												{copiedSlug === invite.id ? <Check size={16} className="text-(--accent-green)" /> : <Copy size={16} />}
+											</button>
+											<a
+												href={`${getEnvUrl('https://www.xernerx.com')}/invites/${invite.id}`}
+												target="_blank"
+												rel="noopener noreferrer"
+												aria-label={t('admin.dashboard.invites.openInvite')}
+												title={t('admin.dashboard.invites.openInvite')}
+												className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
+											>
+												<ExternalLink size={16} />
+											</a>
+											<button
+												type="button"
+												onClick={() => openEditModal(invite)}
+												aria-label={t('common.edit')}
+												className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
+											>
+												<Edit2 size={16} />
+											</button>
+											<button
+												type="button"
+												onClick={() => handleDelete(invite.id)}
+												aria-label={t('common.delete')}
+												className="p-2 rounded-2xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors cursor-pointer"
+											>
+												<Trash2 size={16} />
+											</button>
 										</div>
 									</div>
-									<div className="flex items-center gap-1 shrink-0">
-										<button
-											type="button"
-											onClick={() => {
-												const url = `${getEnvUrl('https://www.xernerx.com')}/invites/${invite.id}`;
-												navigator.clipboard.writeText(url);
-												setCopiedSlug(invite.id);
-												toast({ type: 'success', title: t('admin.dashboard.invites.inviteUrlCopied') });
-												setTimeout(() => setCopiedSlug((prev) => (prev === invite.id ? null : prev)), 2000);
-											}}
-											title={t('admin.dashboard.invites.copyInviteUrl')}
-											aria-label={t('admin.dashboard.invites.copyInviteUrl')}
-											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
-										>
-											{copiedSlug === invite.id ? <Check size={16} className="text-(--accent-green)" /> : <Copy size={16} />}
-										</button>
-										<a
-											href={`${getEnvUrl('https://www.xernerx.com')}/invites/${invite.id}`}
-											target="_blank"
-											rel="noopener noreferrer"
-											aria-label={t('admin.dashboard.invites.openInvite')}
-											title={t('admin.dashboard.invites.openInvite')}
-											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors"
-										>
-											<ExternalLink size={16} />
-										</a>
-										<button
-											type="button"
-											onClick={() => openEditModal(invite)}
-											aria-label={t('common.edit')}
-											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--text) hover:bg-(--foreground) transition-colors cursor-pointer"
-										>
-											<Edit2 size={16} />
-										</button>
-										<button
-											type="button"
-											onClick={() => handleDelete(invite.id)}
-											aria-label={t('common.delete')}
-											className="p-2 rounded-2xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors cursor-pointer"
-										>
-											<Trash2 size={16} />
-										</button>
-									</div>
-								</div>
 
-								<div className="bg-(--background)/50 rounded-2xl p-3 border border-(--border)/10 text-xs font-mono text-(--text-muted) truncate">
-									{t('admin.dashboard.invites.perms')} {invite.permissions}
-								</div>
-							</motion.div>
-						))}
+									<div className="flex flex-wrap items-center justify-between gap-2">
+										<div className="flex flex-wrap items-center gap-1.5">
+											{enabledOpts.map((opt) => (
+												<span
+													key={opt.key}
+													className="rounded-full bg-(--accent)/10 border border-(--accent)/30 px-2.5 py-0.5 text-[10px] font-semibold text-(--accent) capitalize"
+												>
+													{opt.key} ({opt.permissionCount})
+												</span>
+											))}
+										</div>
+										<span className="text-[10px] font-mono text-(--text-muted)">
+											{enabledOpts.length === 1
+												? t('admin.dashboard.invites.singleUrlBehaviorPill')
+												: t('admin.dashboard.invites.multiUrlBehaviorPill', { count: enabledOpts.length })}
+										</span>
+									</div>
+
+									<div className="bg-(--background)/50 rounded-2xl p-3 border border-(--border)/10 text-xs font-mono text-(--text-muted) truncate">
+										{t('admin.dashboard.invites.perms')} {invite.permissions}
+									</div>
+								</motion.div>
+							);
+						})}
 					</AnimatePresence>
 				</motion.div>
 			)}
@@ -336,8 +403,16 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 				setNewScopes={setNewScopes}
 				newRedirect={newRedirect}
 				setNewRedirect={setNewRedirect}
-				selectedPermissions={selectedPermissions}
-				setSelectedPermissions={setSelectedPermissions}
+				essentialEnabled={essentialEnabled}
+				setEssentialEnabled={setEssentialEnabled}
+				essentialPermissions={essentialPermissions}
+				setEssentialPermissions={setEssentialPermissions}
+				optionalEnabled={optionalEnabled}
+				setOptionalEnabled={setOptionalEnabled}
+				optionalPermissions={optionalPermissions}
+				setOptionalPermissions={setOptionalPermissions}
+				advancedEnabled={advancedEnabled}
+				setAdvancedEnabled={setAdvancedEnabled}
 				availableBots={availableBots}
 				creating={creating}
 				onSave={handleSave}

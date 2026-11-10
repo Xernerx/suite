@@ -2,6 +2,24 @@
 
 # auth
 
+## 2.14.5
+
+### Patch Changes
+
+- ## Official Social Preview Card Metadata
+  
+  Updated social preview metadata for shared Xernerx Account links.
+  
+  ### Changed
+  
+  - **Social Card Attribution**: Added official `@XernerxStudios` social card metadata to Account page previews.
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 2.14.4
 
 ### Patch Changes

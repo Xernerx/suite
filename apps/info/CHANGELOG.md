@@ -2,6 +2,24 @@
 
 # info
 
+## 1.11.10
+
+### Patch Changes
+
+- ## Bot Invite Preset & 2.5k Shard Capacity FAQ Guides
+  
+  Added new FAQ entries covering multi-option Discord bot invites and 2,500-server shard limits.
+  
+  ### Added
+  
+  - **Invite Options & Shard Limit FAQs**: Added FAQ guides explaining **Essential**, **Optional**, and **Advanced (0-Permission)** bot invite presets as well as Discord's 2,500-server per-shard telemetry limit and warnings.
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 1.11.9
 
 ### Patch Changes

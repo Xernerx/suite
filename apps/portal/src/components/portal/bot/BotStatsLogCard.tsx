@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, Database, Server, ShieldCheck, Trash2, Users } from 'lucide-react';
+import { Activity, AlertTriangle, Database, Server, ShieldCheck, Trash2, Users } from 'lucide-react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button, Confirm, Input } from '@xernerx/ui';
@@ -157,42 +157,63 @@ export function BotStatsLogCard({ botId, earliestTimestamp, onDeleted }: BotStat
 				</div>
 			) : (
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 max-h-96 overflow-y-auto pr-1">
-					{filteredDayStats.map((stat, idx) => (
-						<div
-							key={stat._id || `${stat.timestamp}-${idx}`}
-							className="flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl bg-(--background)/55 border border-(--border)/10 hover:border-(--accent)/30 transition-all"
-						>
-							<div className="flex items-center justify-between gap-2 pb-2 border-b border-(--border)/10">
-								<span className="text-xs font-mono font-bold text-(--text)">
-									{new Date(stat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-								</span>
-								{stat._id && (
-									<Button variant="danger" size="sm" onClick={() => setPendingDelete(stat)} className="!p-1.5 rounded-xl">
-										<Trash2 size={13} />
-									</Button>
-								)}
-							</div>
+					{filteredDayStats.map((stat, idx) => {
+						const effectiveShards = Math.max(1, Number(stat.shardCount) || 1);
+						const instanceWarn =
+							Array.isArray(stat.shards) &&
+							stat.shards.some((sh: any) => {
+								const span = Array.isArray(sh?.shardIds) && sh.shardIds.length > 0 ? sh.shardIds.length : Math.max(1, Math.ceil(effectiveShards / Math.max(1, stat.shards.length)));
+								return Number(sh?.guildCount ?? sh?.guilds ?? sh?.servers ?? 0) / span >= 2000;
+							});
+						const isHighShardLoad = instanceWarn || stat.guildCount / effectiveShards >= 2000;
 
-							<div className="grid grid-cols-2 gap-2 text-xs font-mono">
-								<div className="flex items-center gap-1.5 text-(--text-muted)">
-									<Server size={12} className="text-(--accent) shrink-0" />
-									<span className="font-bold text-(--text)">{stat.guildCount.toLocaleString()}</span>
+						return (
+							<div
+								key={stat._id || `${stat.timestamp}-${idx}`}
+								className={`flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl border transition-all ${
+									isHighShardLoad ? 'bg-(--accent-orange)/10 border-(--accent-orange)/35' : 'bg-(--background)/55 border-(--border)/10 hover:border-(--accent)/30'
+								}`}
+							>
+								<div className="flex items-center justify-between gap-2 pb-2 border-b border-(--border)/10">
+									<div className="flex items-center gap-1.5 min-w-0">
+										<span className="text-xs font-mono font-bold text-(--text)">
+											{new Date(stat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+										</span>
+										{isHighShardLoad && (
+											<span className="inline-flex items-center gap-1 rounded-full bg-(--accent-orange)/15 border border-(--accent-orange)/30 px-2 py-0.5 text-[10px] font-bold text-(--accent-orange)">
+												<AlertTriangle size={10} />
+												{t('app.bots.overview.statsLogShardWarnBadge')}
+											</span>
+										)}
+									</div>
+									{stat._id && (
+										<Button variant="danger" size="sm" onClick={() => setPendingDelete(stat)} className="!p-1.5 rounded-xl">
+											<Trash2 size={13} />
+										</Button>
+									)}
 								</div>
-								<div className="flex items-center gap-1.5 text-(--text-muted)">
-									<Users size={12} className="text-(--accent) shrink-0" />
-									<span className="font-bold text-(--text)">{stat.userCount.toLocaleString()}</span>
-								</div>
-								<div className="flex items-center gap-1.5 text-(--text-muted)">
-									<Activity size={12} className="text-(--accent) shrink-0" />
-									<span>{stat.shardCount.toLocaleString()}</span>
-								</div>
-								<div className="flex items-center gap-1.5 text-(--text-muted)">
-									<ShieldCheck size={12} className="text-(--accent) shrink-0" />
-									<span>{stat.voteCount.toLocaleString()}</span>
+
+								<div className="grid grid-cols-2 gap-2 text-xs font-mono">
+									<div className="flex items-center gap-1.5 text-(--text-muted)">
+										<Server size={12} className="text-(--accent) shrink-0" />
+										<span className="font-bold text-(--text)">{stat.guildCount.toLocaleString()}</span>
+									</div>
+									<div className="flex items-center gap-1.5 text-(--text-muted)">
+										<Users size={12} className="text-(--accent) shrink-0" />
+										<span className="font-bold text-(--text)">{stat.userCount.toLocaleString()}</span>
+									</div>
+									<div className="flex items-center gap-1.5 text-(--text-muted)">
+										<Activity size={12} className="text-(--accent) shrink-0" />
+										<span>{stat.shardCount.toLocaleString()}</span>
+									</div>
+									<div className="flex items-center gap-1.5 text-(--text-muted)">
+										<ShieldCheck size={12} className="text-(--accent) shrink-0" />
+										<span>{stat.voteCount.toLocaleString()}</span>
+									</div>
 								</div>
 							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			)}
 

@@ -2,6 +2,28 @@
 
 # www
 
+## 0.25.0
+
+### Minor Changes
+
+- ## Multi-Option Discord Bot Invites & Expanded Deep Search
+  
+  Added Essential, Optional, and Advanced (`0`-Permission) invite presets on `/invites` with automatic single-link redirection or an aligned preset chooser when multiple options are available.
+  
+  ### Added
+  
+  - **Multi-Option Bot Invite Chooser**: Added **Essential**, **Optional (All + Additional)**, and **Advanced (0 Permissions)** invite presets on `/invites/[slug]` and `/invites/[slug]/[option]`, automatically redirecting immediately when 1 option is active or displaying the aligned preset selector when 2–3 options are configured.
+  - **Social Channels & Deep Search**: Added official X, Bluesky, and Instagram discovery links across site metadata, `llms.txt`, and `Ctrl + K` search.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 0.24.3
 
 ### Patch Changes

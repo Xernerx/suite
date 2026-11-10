@@ -8,6 +8,7 @@ export * from './src/products';
 export * from './src/permissions';
 export * from './src/timezones';
 export * from './src/milestones';
+export * from './src/inviteOptions';
 export type { Locale } from './src/i18n.config';
 import defaultEnGbDictionary from './src/dictionaries/en-GB.json';
 export { defaultEnGbDictionary };

@@ -40,6 +40,15 @@ export async function GET() {
 - [@xernerx/extension-builder](https://docs.xernerx.com/packages/@xernerx/extension-builder): Base extension lifecycle builder for @xernerx/framework.
 - [Xernerx Examples (Xernerx/examples)](https://github.com/Xernerx/examples): Official TypeScript (@xernerx/*) and JavaScript (xernerx) Discord bot starter templates and sharding examples.
 
+## Official Social & Community Channels
+
+- [X (Twitter) — @XernerxStudios](https://x.com/XernerxStudios)
+- [Bluesky — @xernerx.com](https://bsky.app/profile/xernerx.com)
+- [Instagram — @xernerxstudios](https://www.instagram.com/xernerxstudios/)
+- [GitHub — @xernerx](https://github.com/xernerx)
+- [NPM — @xernerx](https://www.npmjs.com/org/xernerx)
+- [Discord Support Community](https://discord.gg/yrm8gqTuXa)
+
 ## Security, Privacy & Legal Compliance
 
 - [Platform & Bot Security Architecture](https://www.xernerx.com/security): Zero message content logging in Virtue, Universal 3-Tier Privacy Truth (Public, Limited, Private), SHA-256 hashed API tokens with optional TTL & IP allowlists, and self-service data deletion.

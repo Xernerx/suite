@@ -30,6 +30,14 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 	const [notFound, setNotFound] = useState(false);
 
 	useEffect(() => {
+		const displayName = user?.name || discordUser?.global_name || discordUser?.username;
+		if (!displayName) return;
+		const username = discordUser?.username;
+		const handle = username && username !== displayName ? ` (@${username})` : '';
+		document.title = `Xernerx App | ${displayName}${user?.verified ? ' ✓' : ''}${handle}`;
+	}, [user, discordUser]);
+
+	useEffect(() => {
 		show();
 
 		const items: any[] = [

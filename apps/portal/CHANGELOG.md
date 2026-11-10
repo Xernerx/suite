@@ -2,6 +2,29 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.6.0
+
+### Minor Changes
+
+- ## `WARN shard` Webhook Trigger & Discord 2.5k Shard Capacity Diagnostics
+  
+  Added a dedicated `WARN shard` (`2k+ / Shard`) webhook event toggle in Bot Webhooks alongside per-shard 2,500-guild capacity diagnostics in Growth & Telemetry.
+  
+  ### Added
+  
+  - **`WARN shard` Webhook Event Toggle**: Added a dedicated `WARN shard` (`2k+ / Shard`) trigger in the Bot Webhooks tab so developers can subscribe to HMAC-signed shard capacity alerts without enabling noisy `POST stat` webhooks.
+  - **Discord 2.5k Shard Capacity Card**: Added per-instance `2,500`-guild utilization bars, Close Code `4011` scaling callouts, and recommended shard count pills to Bot Growth & Telemetry.
+  - **Snapshot Log Load Badges**: Highlighted historical telemetry snapshots approaching `2,000+` guilds per shard in the Daily Telemetry Snapshot Log.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 1.5.6
 
 ### Patch Changes
