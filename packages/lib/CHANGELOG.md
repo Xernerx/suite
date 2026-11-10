@@ -2,6 +2,24 @@
 
 # @xernerx/lib
 
+## 1.24.0
+
+### Minor Changes
+
+- ## Multi-Option Bot Invite Utilities, Social Redirects & Dev Schema Reloading
+  
+  Added shared multi-option Discord invite helpers, `AppInvite.options` schema support, global social vanity redirects, and automatic Mongoose schema HMR invalidation.
+  
+  ### Added
+  
+  - **Multi-Option Invite Helpers**: Exported `normalizeInviteOptions`, `getEnabledInviteOptions`, `decodeDiscordPermissionLabels`, and `buildDiscordBotAuthorizeUrl` from `@xernerx/lib` alongside `AppInvite.options` (`essential`, `optional`, `advanced`).
+  - **Global Social Vanity Redirects**: Added `/x`, `/twitter`, `/bluesky`, `/bsky`, `/instagram`, and `/ig` redirects in `withXernerxConfig`.
+  - **Localization Dictionaries**: Added source strings for multi-option bot invites, 2.5k shard capacity diagnostics, and new FAQ entries.
+  
+  ### Changed
+  
+  - **Automatic Dev Schema HMR Refresh**: Updated `database.ts` to detect updated Mongoose `Schema` instances automatically during development hot reloads.
+
 ## 1.23.1
 
 ### Patch Changes

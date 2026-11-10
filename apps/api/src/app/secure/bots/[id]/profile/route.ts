@@ -12,6 +12,7 @@ const OFFICIAL_BOT_SLUG_TO_ID: Record<string, string> = {
 	todo: '782105629572464652',
 	'to-do-list': '782105629572464652',
 	'to-do-list-bot': '782105629572464652',
+	todolistbot: '782105629572464652',
 	tdl: '782105629572464652',
 	metamorphosis: '881678826906730547',
 	zodiac: '950251264095162418',

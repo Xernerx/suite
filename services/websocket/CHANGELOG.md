@@ -2,6 +2,13 @@
 
 # @xernerx/websocket
 
+## 1.5.10
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.24.0
+
 ## 1.5.9
 
 ### Patch Changes

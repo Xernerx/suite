@@ -48,6 +48,8 @@ export const metadata: Metadata = {
 	},
 
 	twitter: {
+		site: '@XernerxStudios',
+		creator: '@XernerxStudios',
 		title: {
 			default: 'Xernerx Support | Roadmap, Changelog, Issues & FAQ Hub',
 			template: 'Xernerx Support | %s',

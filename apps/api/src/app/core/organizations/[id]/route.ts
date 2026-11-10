@@ -41,6 +41,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
 		const payload = {
 			id: String(organization._id),
+			vanitySlug: organization.vanitySlug || null,
 			name: organization.name || 'Unknown Organization',
 			description: organization.description || '',
 			info: organization.info || '',

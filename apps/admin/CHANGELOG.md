@@ -2,6 +2,27 @@
 
 # admin
 
+## 0.28.0
+
+### Minor Changes
+
+- ## Multi-Option Bot Invite Tiers (`Essential`, `Optional`, `Advanced`)
+  
+  Added multi-tier invite configuration with per-tier permission matrices, live redirect-vs-selector indicators, BigInt entry, and Discord OAuth2 URL importing in the Admin Invites manager.
+  
+  ### Added
+  
+  - **Multi-Option Invite Tier Controls**: Added individual toggles and permission tabs for **Essential**, **Optional (All + Additional)**, and **Advanced (0 Perms)** invites with live `1 URL • Immediate Redirect` vs `Option Selector` status pills.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 0.27.0
 
 ### Minor Changes

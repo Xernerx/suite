@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/providers",
-	"version": "0.22.6",
+	"version": "0.22.7",
 	"private": true,
 	"main": "./index.ts",
 	"exports": {

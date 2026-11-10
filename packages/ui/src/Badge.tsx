@@ -34,10 +34,12 @@ export function Badge({ children, variant = 'accent', size = 'sm', icon, dot = f
 	const sizeClasses = size === 'sm' ? 'px-2.5 py-0.5 text-[10px]' : 'px-3 py-1 text-xs';
 
 	return (
-		<span className={`inline-flex items-center gap-1.5 rounded-full border font-bold uppercase tracking-wider shrink-0 ${variantClasses[variant]} ${sizeClasses} ${className}`}>
+		<span
+			className={`inline-flex flex-row items-center gap-1.5 rounded-full border font-bold uppercase tracking-wider whitespace-nowrap shrink-0 ${variantClasses[variant]} ${sizeClasses} ${className}`}
+		>
 			{dot && <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotClasses[variant]}`} />}
-			{icon && <span className="shrink-0 flex items-center">{icon}</span>}
-			<span>{children}</span>
+			{icon && <span className="shrink-0 inline-flex items-center">{icon}</span>}
+			<span className="inline-flex flex-row items-center gap-1 whitespace-nowrap">{children}</span>
 		</span>
 	);
 }

@@ -69,6 +69,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 									},
 								}
 							: {}),
+						...(events.includes('WARN shard')
+							? {
+									shardWarning: {
+										severity: 'warning',
+										warningThreshold: 2000,
+										maxGuildsPerShard: 2500,
+										recommendedShards: 2,
+										warnings: [
+											{
+												shardId: '0',
+												guildCount: 2150,
+												maxGuilds: 2500,
+												utilizationPercent: 86,
+												severity: 'warning',
+												message: 'Shard #0: 2,150 / 2,500 guilds (86%)',
+											},
+										],
+									},
+								}
+							: {}),
 					},
 				};
 

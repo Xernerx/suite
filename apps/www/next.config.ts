@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
 				permanent: false,
 			},
 			{
+				source: '/invite/:slug/:option',
+				destination: '/invites/:slug/:option',
+				permanent: false,
+			},
+			{
 				source: '/careers',
 				destination: '/applications',
 				permanent: false,

@@ -2,10 +2,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { PermissionFlagsBits } from 'discord-api-types/v10';
-import { Check, Copy, RotateCcw, Sparkles } from 'lucide-react';
+import { Check, Copy, Layers, Shield, ShieldCheck, Sliders } from 'lucide-react';
 import { useDictionary, useToast } from '@xernerx/providers';
-import { Button, Input, Modal, MultiSelector, Selector, Toggle } from '@xernerx/ui';
+import { Button, Input, Modal, MultiSelector, Selector, Tabs, Toggle } from '@xernerx/ui';
+import { countPermissionFlags, InvitePermissionsEditor } from './InvitePermissionsEditor';
 
 const DISCORD_SCOPE_OPTIONS = [
 	{ label: 'bot', value: 'bot' },
@@ -18,114 +18,6 @@ const DISCORD_SCOPE_OPTIONS = [
 	{ label: 'connections', value: 'connections' },
 	{ label: 'webhook.incoming', value: 'webhook.incoming' },
 ];
-
-const PERMISSION_ENTRIES: Array<[string, bigint]> = (() => {
-	const byBit = new Map<bigint, string>();
-	for (const [key, rawBit] of Object.entries(PermissionFlagsBits)) {
-		if (key === 'ManageEmojisAndStickers') continue;
-		const bit = BigInt(rawBit as bigint);
-		if (!byBit.has(bit)) {
-			byBit.set(bit, key);
-		}
-	}
-	return Array.from(byBit.entries()).map(([bit, key]) => [key, bit]);
-})();
-
-export interface ParsedInviteInput {
-	permissions: bigint | null;
-	scopes: string[] | null;
-	clientId: string | null;
-	redirect: boolean | null;
-	redirectSlug: string | null;
-	source: 'bigint' | 'url';
-}
-
-export function parsePermissionBigInt(raw: string | number | bigint | null | undefined): bigint | null {
-	if (typeof raw === 'bigint') return raw >= BigInt(0) ? raw : null;
-	if (typeof raw === 'number') return Number.isInteger(raw) && raw >= 0 ? BigInt(raw) : null;
-	if (typeof raw !== 'string') return null;
-	const cleaned = raw.trim().replace(/n$/i, '');
-	if (!cleaned) return null;
-	if (!/^(?:\d+|0x[0-9a-fA-F]+)$/.test(cleaned)) return null;
-	try {
-		const val = BigInt(cleaned);
-		return val >= BigInt(0) ? val : null;
-	} catch {
-		return null;
-	}
-}
-
-export function parseDiscordInviteInput(raw: string): ParsedInviteInput | null {
-	const trimmed = raw.trim();
-	if (!trimmed) return null;
-
-	const directBigInt = parsePermissionBigInt(trimmed);
-	if (directBigInt !== null) {
-		return {
-			permissions: directBigInt,
-			scopes: null,
-			clientId: null,
-			redirect: null,
-			redirectSlug: null,
-			source: 'bigint',
-		};
-	}
-
-	let candidateUrl = trimmed;
-	if (/^(?:(?:www\.|canary\.|ptb\.)?discord(?:app)?\.com)\//i.test(candidateUrl)) {
-		candidateUrl = `https://${candidateUrl}`;
-	} else if (candidateUrl.startsWith('?')) {
-		candidateUrl = `https://discord.com/oauth2/authorize${candidateUrl}`;
-	} else if (!/^https?:\/\//i.test(candidateUrl) && /(?:^|[?&])(?:permissions|client_id|scope|response_type|redirect_uri)=/i.test(candidateUrl)) {
-		candidateUrl = `https://discord.com/oauth2/authorize?${candidateUrl.replace(/^\?/, '')}`;
-	}
-
-	try {
-		const url = new URL(candidateUrl);
-		const permsRaw = url.searchParams.get('permissions');
-		const clientIdRaw = url.searchParams.get('client_id')?.trim() || null;
-		const scopeRaw = url.searchParams.get('scope');
-		const responseTypeRaw = url.searchParams.get('response_type')?.trim().toLowerCase() || null;
-		const redirectUriRaw = url.searchParams.get('redirect_uri')?.trim() || null;
-
-		let permissions: bigint | null = null;
-		if (permsRaw !== null && permsRaw.trim() !== '') {
-			permissions = parsePermissionBigInt(permsRaw);
-			if (permissions === null) return null;
-		}
-
-		const scopes = scopeRaw
-			? scopeRaw
-					.split(/[\s,+]+/)
-					.map((s) => s.trim())
-					.filter(Boolean)
-			: null;
-
-		const hasRedirectParams = responseTypeRaw === 'code' || Boolean(redirectUriRaw);
-		let redirectSlug: string | null = null;
-		if (redirectUriRaw) {
-			const match = redirectUriRaw.match(/\/bots\/([^/?#]+)/i);
-			if (match?.[1]) {
-				redirectSlug = decodeURIComponent(match[1]);
-			}
-		}
-
-		if (permissions === null && !clientIdRaw && (!scopes || scopes.length === 0) && !hasRedirectParams) {
-			return null;
-		}
-
-		return {
-			permissions,
-			scopes: scopes && scopes.length > 0 ? Array.from(new Set(scopes)) : null,
-			clientId: clientIdRaw,
-			redirect: hasRedirectParams,
-			redirectSlug,
-			source: 'url',
-		};
-	} catch {
-		return null;
-	}
-}
 
 interface InviteModalProps {
 	open: boolean;
@@ -141,8 +33,16 @@ interface InviteModalProps {
 	setNewScopes: (scopes: string[]) => void;
 	newRedirect: boolean;
 	setNewRedirect: (val: boolean) => void;
-	selectedPermissions: bigint;
-	setSelectedPermissions: React.Dispatch<React.SetStateAction<bigint>>;
+	essentialEnabled: boolean;
+	setEssentialEnabled: (val: boolean) => void;
+	essentialPermissions: bigint;
+	setEssentialPermissions: (val: bigint) => void;
+	optionalEnabled: boolean;
+	setOptionalEnabled: (val: boolean) => void;
+	optionalPermissions: bigint;
+	setOptionalPermissions: (val: bigint) => void;
+	advancedEnabled: boolean;
+	setAdvancedEnabled: (val: boolean) => void;
 	availableBots: any[];
 	creating: boolean;
 	onSave: (e: React.FormEvent) => void;
@@ -162,8 +62,16 @@ export default function InviteModal({
 	setNewScopes,
 	newRedirect,
 	setNewRedirect,
-	selectedPermissions,
-	setSelectedPermissions,
+	essentialEnabled,
+	setEssentialEnabled,
+	essentialPermissions,
+	setEssentialPermissions,
+	optionalEnabled,
+	setOptionalEnabled,
+	optionalPermissions,
+	setOptionalPermissions,
+	advancedEnabled,
+	setAdvancedEnabled,
 	availableBots,
 	creating,
 	onSave,
@@ -171,25 +79,36 @@ export default function InviteModal({
 	const { t } = useDictionary();
 	const { toast } = useToast();
 
-	const [bigintInput, setBigintInput] = useState<string>(selectedPermissions.toString());
-	const [oauthUrlInput, setOauthUrlInput] = useState<string>('');
+	const [activePermTab, setActivePermTab] = useState<'essential' | 'optional'>('essential');
 	const [copiedRedirectUri, setCopiedRedirectUri] = useState(false);
-
-	useEffect(() => {
-		setBigintInput(selectedPermissions.toString());
-	}, [selectedPermissions, open]);
+	const [isEditorInvalid, setIsEditorInvalid] = useState(false);
 
 	useEffect(() => {
 		if (open) {
-			setOauthUrlInput('');
 			setCopiedRedirectUri(false);
+			setIsEditorInvalid(false);
+			if (essentialEnabled) setActivePermTab('essential');
+			else if (optionalEnabled) setActivePermTab('optional');
 		}
 	}, [open, editId]);
+
+	useEffect(() => {
+		if (activePermTab === 'essential' && !essentialEnabled && optionalEnabled) {
+			setActivePermTab('optional');
+		} else if (activePermTab === 'optional' && !optionalEnabled && essentialEnabled) {
+			setActivePermTab('essential');
+		}
+	}, [activePermTab, essentialEnabled, optionalEnabled]);
 
 	const matchedBot = useMemo(() => availableBots.find((b) => String(b.id) === newClientId), [availableBots, newClientId]);
 	const resolvedRedirectSlug = matchedBot?.vanitySlug || newId.trim() || newClientId.trim() || 'slug';
 	const resolvedRedirectUri = `https://app.xernerx.com/bots/${resolvedRedirectSlug}`;
 	const encodedRedirectParams = `&response_type=code&redirect_uri=${encodeURIComponent(resolvedRedirectUri)}`;
+
+	const effectiveOptionalPermissions = essentialEnabled ? essentialPermissions | optionalPermissions : optionalPermissions;
+	const essentialCount = useMemo(() => countPermissionFlags(essentialPermissions), [essentialPermissions]);
+	const optionalCount = useMemo(() => countPermissionFlags(effectiveOptionalPermissions), [effectiveOptionalPermissions]);
+	const enabledUrlCount = Number(essentialEnabled) + Number(optionalEnabled) + Number(advancedEnabled);
 
 	const selectClientWithAutofill = (clientIdVal: string, fallbackSlug?: string | null) => {
 		setNewClientId(clientIdVal);
@@ -212,83 +131,15 @@ export default function InviteModal({
 		}
 	};
 
-	const applyInviteInput = (raw: string, silentInvalid = false): boolean => {
-		const parsed = parseDiscordInviteInput(raw);
-		if (!parsed) {
-			if (!silentInvalid) {
-				toast({ type: 'error', title: t('admin.dashboard.invites.toasts.invalidInviteInput') });
-			}
-			return false;
-		}
-
-		if (parsed.permissions !== null) {
-			setSelectedPermissions(parsed.permissions);
-			setBigintInput(parsed.permissions.toString());
-		}
-
-		if (parsed.scopes && parsed.scopes.length > 0) {
-			setNewScopes(parsed.scopes);
-		}
-
-		if (parsed.redirect !== null) {
-			setNewRedirect(parsed.redirect);
-		}
-
-		if (parsed.clientId && (!editId || !newClientId)) {
-			selectClientWithAutofill(parsed.clientId, parsed.redirectSlug);
-		} else if (!editId && !newId && parsed.redirectSlug) {
-			setNewId(parsed.redirectSlug);
-		}
-
-		toast({
-			type: 'success',
-			title: parsed.source === 'url' ? t('admin.dashboard.invites.toasts.appliedInviteUrl') : t('admin.dashboard.invites.toasts.appliedBigInt'),
-		});
-		return true;
-	};
-
-	const handleBigIntChange = (val: string) => {
-		if (/(?:https?:\/\/|discord(?:app)?\.com|permissions=|client_id=|redirect_uri=)/i.test(val)) {
-			setOauthUrlInput(val);
-			applyInviteInput(val, true);
+	const handleToggleTier = (tier: 'essential' | 'optional' | 'advanced', nextVal: boolean) => {
+		if (!nextVal && enabledUrlCount <= 1) {
+			toast({ type: 'error', title: t('admin.dashboard.invites.minOneOptionToast') });
 			return;
 		}
-
-		setBigintInput(val);
-		if (val.trim() === '') {
-			setSelectedPermissions(BigInt(0));
-			return;
-		}
-
-		const parsed = parsePermissionBigInt(val);
-		if (parsed !== null) {
-			setSelectedPermissions(parsed);
-		}
+		if (tier === 'essential') setEssentialEnabled(nextVal);
+		else if (tier === 'optional') setOptionalEnabled(nextVal);
+		else setAdvancedEnabled(nextVal);
 	};
-
-	const handleBigIntBlur = () => {
-		if (bigintInput.trim() === '') {
-			setBigintInput('0');
-			setSelectedPermissions(BigInt(0));
-			return;
-		}
-		const parsed = parsePermissionBigInt(bigintInput);
-		setBigintInput((parsed ?? selectedPermissions).toString());
-	};
-
-	const togglePermission = (bit: bigint) => {
-		setSelectedPermissions((prev) => ((prev & bit) === bit ? prev & ~bit : prev | bit));
-	};
-
-	const enabledPermCount = useMemo(() => {
-		let count = 0;
-		for (const [, bit] of PERMISSION_ENTRIES) {
-			if ((selectedPermissions & bit) === bit) count++;
-		}
-		return count;
-	}, [selectedPermissions]);
-
-	const isBigIntInvalid = bigintInput.trim() !== '' && parsePermissionBigInt(bigintInput) === null;
 
 	return (
 		<Modal
@@ -387,111 +238,116 @@ export default function InviteModal({
 					)}
 				</div>
 
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4">
-					<div className="flex flex-col gap-1.5">
-						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.permissionBigIntLabel')}</label>
-						<Input
-							type="text"
-							inputMode="numeric"
-							value={bigintInput}
-							onChange={(e) => handleBigIntChange(e.target.value)}
-							onBlur={handleBigIntBlur}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									e.preventDefault();
-									handleBigIntBlur();
+				{/* Multi-Option Tier Configuration */}
+				<div className="flex flex-col gap-3 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4">
+					<div className="flex flex-wrap items-center justify-between gap-2">
+						<div className="flex flex-col gap-0.5">
+							<span className="text-xs font-semibold text-(--text)">{t('admin.dashboard.invites.optionsSectionTitle')}</span>
+							<span className="text-[11px] text-(--text-muted)">{t('admin.dashboard.invites.optionsSectionDesc')}</span>
+						</div>
+						<span className="rounded-full bg-(--accent)/15 border border-(--accent)/30 px-3 py-1 text-[11px] font-bold text-(--accent)">
+							{enabledUrlCount === 1 ? t('admin.dashboard.invites.singleUrlBehaviorPill') : t('admin.dashboard.invites.multiUrlBehaviorPill', { count: enabledUrlCount })}
+						</span>
+					</div>
+
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+						<div
+							className={`flex items-center justify-between gap-3 rounded-2xl border p-3 transition-colors ${
+								essentialEnabled ? 'bg-(--accent)/10 border-(--accent)/30' : 'bg-(--foreground)/20 border-(--border)/10'
+							}`}
+						>
+							<div className="flex items-center gap-2.5 min-w-0">
+								<ShieldCheck size={16} className={essentialEnabled ? 'text-(--accent) shrink-0' : 'text-(--text-muted) shrink-0'} />
+								<div className="flex flex-col min-w-0">
+									<span className="text-xs font-bold text-(--text) truncate">{t('admin.dashboard.invites.optionEssentialTitle')}</span>
+									<span className="text-[10px] text-(--text-muted) truncate">{t('admin.dashboard.invites.optionEssentialDesc', { count: essentialCount })}</span>
+								</div>
+							</div>
+							<Toggle checked={essentialEnabled} onChange={() => handleToggleTier('essential', !essentialEnabled)} size="sm" />
+						</div>
+
+						<div
+							className={`flex items-center justify-between gap-3 rounded-2xl border p-3 transition-colors ${
+								optionalEnabled ? 'bg-(--accent)/10 border-(--accent)/30' : 'bg-(--foreground)/20 border-(--border)/10'
+							}`}
+						>
+							<div className="flex items-center gap-2.5 min-w-0">
+								<Layers size={16} className={optionalEnabled ? 'text-(--accent) shrink-0' : 'text-(--text-muted) shrink-0'} />
+								<div className="flex flex-col min-w-0">
+									<span className="text-xs font-bold text-(--text) truncate">{t('admin.dashboard.invites.optionOptionalTitle')}</span>
+									<span className="text-[10px] text-(--text-muted) truncate">{t('admin.dashboard.invites.optionOptionalDesc', { count: optionalCount })}</span>
+								</div>
+							</div>
+							<Toggle checked={optionalEnabled} onChange={() => handleToggleTier('optional', !optionalEnabled)} size="sm" />
+						</div>
+
+						<div
+							className={`flex items-center justify-between gap-3 rounded-2xl border p-3 transition-colors ${
+								advancedEnabled ? 'bg-(--accent)/10 border-(--accent)/30' : 'bg-(--foreground)/20 border-(--border)/10'
+							}`}
+						>
+							<div className="flex items-center gap-2.5 min-w-0">
+								<Sliders size={16} className={advancedEnabled ? 'text-(--accent) shrink-0' : 'text-(--text-muted) shrink-0'} />
+								<div className="flex flex-col min-w-0">
+									<span className="text-xs font-bold text-(--text) truncate">{t('admin.dashboard.invites.optionAdvancedTitle')}</span>
+									<span className="text-[10px] text-(--text-muted) truncate">{t('admin.dashboard.invites.optionAdvancedDesc')}</span>
+								</div>
+							</div>
+							<Toggle checked={advancedEnabled} onChange={() => handleToggleTier('advanced', !advancedEnabled)} size="sm" />
+						</div>
+					</div>
+				</div>
+
+				{/* Active Permission Editor */}
+				{essentialEnabled || optionalEnabled ? (
+					<div className="flex flex-col gap-3">
+						{essentialEnabled && optionalEnabled && (
+							<Tabs
+								size="sm"
+								tabs={[
+									{ id: 'essential', label: `${t('admin.dashboard.invites.tabEssentialPerms')} (${essentialCount})`, icon: <ShieldCheck size={14} /> },
+									{ id: 'optional', label: `${t('admin.dashboard.invites.tabOptionalPerms')} (${optionalCount})`, icon: <Layers size={14} /> },
+								]}
+								activeTab={activePermTab}
+								onChange={(id) => setActivePermTab(id as 'essential' | 'optional')}
+							/>
+						)}
+
+						<InvitePermissionsEditor
+							tierKey={activePermTab}
+							value={activePermTab === 'essential' ? essentialPermissions : effectiveOptionalPermissions}
+							lockedBits={activePermTab === 'optional' && essentialEnabled ? essentialPermissions : BigInt(0)}
+							onChangeBits={(next) => {
+								if (activePermTab === 'essential') {
+									setEssentialPermissions(next);
+								} else {
+									setOptionalPermissions(next);
 								}
 							}}
-							placeholder={t('admin.dashboard.invites.permissionBigIntPlaceholder')}
-							className={`font-mono text-sm ${isBigIntInvalid ? 'border-(--accent-red) focus:ring-(--accent-red)' : ''}`}
-						/>
-						<span className="text-[11px] text-(--text-muted)">{t('admin.dashboard.invites.permissionBigIntHint')}</span>
-					</div>
-
-					<div className="flex flex-col gap-1.5">
-						<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.oauthUrlLabel')}</label>
-						<div className="flex items-center gap-2">
-							<Input
-								type="text"
-								value={oauthUrlInput}
-								onChange={(e) => setOauthUrlInput(e.target.value)}
-								onPaste={(e) => {
-									const pasted = e.clipboardData.getData('text').trim();
-									if (pasted && oauthUrlInput.trim() === '' && parseDiscordInviteInput(pasted)) {
-										e.preventDefault();
-										setOauthUrlInput(pasted);
-										applyInviteInput(pasted);
-									}
-								}}
-								onKeyDown={(e) => {
-									if (e.key === 'Enter') {
-										e.preventDefault();
-										if (oauthUrlInput.trim()) applyInviteInput(oauthUrlInput);
-									}
-								}}
-								placeholder={t('admin.dashboard.invites.oauthUrlPlaceholder')}
-								className="flex-1 text-sm"
-							/>
-							<Button type="button" variant="secondary" onClick={() => applyInviteInput(oauthUrlInput)} disabled={!oauthUrlInput.trim()} className="shrink-0 flex items-center gap-1.5">
-								<Sparkles size={14} />
-								<span>{t('admin.dashboard.invites.applyUrlButton')}</span>
-							</Button>
-						</div>
-						<span className="text-[11px] text-(--text-muted)">{t('admin.dashboard.invites.oauthUrlHint')}</span>
-					</div>
-				</div>
-
-				<div className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-2 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4">
-					<div className="flex items-center justify-between gap-2 sticky top-0 py-1.5 z-10 mb-1 border-b border-(--border)/10 bg-(--background)/90 backdrop-blur-md">
-						<div className="flex items-center gap-2">
-							<label className="text-xs font-medium text-(--text)">{t('admin.dashboard.invites.permMatrix')}</label>
-							<span className="rounded-full bg-(--accent)/10 border border-(--accent)/30 px-2.5 py-0.5 text-[11px] font-semibold text-(--accent)">
-								{t('admin.dashboard.invites.enabledPermsCount', { count: enabledPermCount })}
-							</span>
-						</div>
-						<Button
-							type="button"
-							variant="ghost"
-							size="sm"
-							disabled={selectedPermissions === BigInt(0)}
-							onClick={() => {
-								setSelectedPermissions(BigInt(0));
-								setBigintInput('0');
+							onValidityChange={setIsEditorInvalid}
+							onImportMetadata={(meta) => {
+								if (meta.scopes && meta.scopes.length > 0) setNewScopes(meta.scopes);
+								if (meta.redirect !== null) setNewRedirect(meta.redirect);
+								if (meta.clientId && (!editId || !newClientId)) {
+									selectClientWithAutofill(meta.clientId, meta.redirectSlug);
+								} else if (!editId && !newId && meta.redirectSlug) {
+									setNewId(meta.redirectSlug);
+								}
 							}}
-							className="flex items-center gap-1 text-xs"
-						>
-							<RotateCcw size={12} />
-							<span>{t('admin.dashboard.invites.clearPermsButton')}</span>
-						</Button>
+						/>
 					</div>
-
-					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-						{PERMISSION_ENTRIES.map(([key, bit]) => {
-							const isChecked = (selectedPermissions & bit) === bit;
-							return (
-								<label
-									key={key}
-									className={`flex items-center justify-between gap-2 text-[11px] cursor-pointer p-2.5 rounded-2xl transition-colors border ${
-										isChecked
-											? 'bg-(--accent)/10 border-(--accent)/30 text-(--text) font-medium'
-											: 'border-transparent text-(--text-muted) hover:bg-(--foreground)/40 hover:border-(--border)/10'
-									}`}
-								>
-									<span className="truncate flex-1" title={key}>
-										{key}
-									</span>
-									<Toggle checked={isChecked} onChange={() => togglePermission(bit)} size="sm" />
-								</label>
-							);
-						})}
+				) : (
+					<div className="flex items-center gap-3 rounded-2xl bg-(--background)/50 border border-(--border)/10 p-4 text-xs text-(--text-muted)">
+						<Shield size={16} className="text-(--accent) shrink-0" />
+						<span>{t('admin.dashboard.invites.advancedOnlyNotice')}</span>
 					</div>
-				</div>
+				)}
 
 				<div className="flex justify-end gap-3 pt-4 border-t border-(--border)/10 mt-1">
 					<Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
 						{t('admin.dashboard.invites.cancel')}
 					</Button>
-					<Button type="submit" variant="primary" disabled={creating || isBigIntInvalid}>
+					<Button type="submit" variant="primary" disabled={creating || isEditorInvalid || enabledUrlCount === 0}>
 						{creating ? t('admin.dashboard.invites.saving') : t('admin.dashboard.invites.saveButton')}
 					</Button>
 				</div>

@@ -2,6 +2,33 @@
 
 # api
 
+## 0.33.0
+
+### Minor Changes
+
+- ## `WARN shard` Capacity Webhooks, 2.5k Per-Shard Validation & Multi-Option Invites
+  
+  Added dedicated HMAC-signed `WARN shard` webhook dispatching at 2,000+ guilds/shard, enforced Discord's 2,500-guild per-shard limit on bot telemetry endpoints, and added multi-tier `AppInvite` option support.
+  
+  ### Added
+  
+  - **`WARN shard` Outbound Webhooks**: Dispatched HMAC-signed, delivery-logged `WARN shard` webhooks (plus Portal test ping payloads) whenever `POST` or `PATCH /v1/bots/[id]/stats` reports any shard at or above `2,000` guilds.
+  - **Discord 2,500-Guild Per-Shard Validation (`POST` & `PATCH /v1/bots/[id]/stats`)**: Validated overall `guildCount` and each entry in `shards[]` against Discord's 2,500-guild shard maximum (`400 SHARD_LIMIT_EXCEEDED`) and returned `shardHealth` metrics.
+  - **Multi-Option Invite Normalization**: Added normalized `options` (`essential`, `optional`, `advanced`) handling and bot metadata enrichment across `/secure/invites`.
+  
+  ### Changed
+  
+  - **Core Entity Metadata & Catalogs**: Enriched `/core/*` entity responses with `vanitySlug` and `tags`, and synced public docs and FAQ blueprints.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 0.32.1
 
 ### Patch Changes

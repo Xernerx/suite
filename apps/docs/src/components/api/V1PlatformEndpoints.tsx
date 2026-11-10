@@ -279,7 +279,7 @@ export function V1PlatformEndpoints({
 								{
 									label: 'Express / Node.js Receiver',
 									language: 'typescript',
-									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat", "POST release", "POST online", "POST offline"\n  const deliveryId = req.headers['x-xernerx-delivery-id'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
+									code: `import express from 'express';\n\nconst app = express();\napp.use(express.json());\n\napp.post('/webhooks/xernerx', (req, res) => {\n  const event = req.headers['x-xernerx-event']; // e.g. "POST vote", "POST review", "POST stat", "WARN shard", "POST release", "POST online", "POST offline"\n  const deliveryId = req.headers['x-xernerx-delivery-id'];\n  const payload = req.body;\n\n  console.log(\`[Xernerx Webhook] \${event} (\${deliveryId})\`, payload);\n  res.status(200).json({ received: true });\n});\n\n// Test directly in /portal inside the Xernerx Desktop App using http://localhost:3000/webhooks/xernerx\napp.listen(3000, () => console.log('Listening on http://localhost:3000/webhooks/xernerx'));`,
 								},
 								{
 									label: 'Verify Signature (HMAC-SHA256)',
@@ -295,6 +295,11 @@ export function V1PlatformEndpoints({
 									label: 'POST release Payload',
 									language: 'json',
 									code: `{\n  "event": "POST release",\n  "botId": "${effectiveBotId}",\n  "timestamp": "2026-10-25T14:00:00.000Z",\n  "bot": {\n    "id": "${effectiveBotId}",\n    "name": "My Bot",\n    "vanitySlug": "my-bot",\n    "url": "https://app.xernerx.com/bots/my-bot?tab=releases"\n  },\n  "release": {\n    "id": "b1f23c45-6789-4012-89ab-cdef01234567",\n    "version": "v1.2.0",\n    "title": "Major Update",\n    "body": "Added new slash commands and webhook triggers.",\n    "authorId": "123456789012345678",\n    "createdAt": "2026-10-25T14:00:00.000Z"\n  }\n}`,
+								},
+								{
+									label: 'WARN shard Payload (2k+ / Shard)',
+									language: 'json',
+									code: `{\n  "event": "WARN shard",\n  "botId": "${effectiveBotId}",\n  "timestamp": "2026-11-10T01:00:00.000Z",\n  "severity": "warning",\n  "guildCount": 2150,\n  "effectiveShards": 1,\n  "recommendedShards": 2,\n  "warningThreshold": 2000,\n  "maxGuildsPerShard": 2500,\n  "utilizationPercent": 86,\n  "warnings": [\n    {\n      "shardId": "0",\n      "guildCount": 2150,\n      "maxGuilds": 2500,\n      "utilizationPercent": 86,\n      "severity": "warning",\n      "message": "Shard #0: 2,150 / 2,500 guilds (86%)"\n    }\n  ]\n}`,
 								},
 								{
 									label: 'POST online / POST offline (API Tier)',

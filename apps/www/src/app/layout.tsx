@@ -63,6 +63,8 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
+		site: '@XernerxStudios',
+		creator: '@XernerxStudios',
 		title: {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
@@ -94,7 +96,14 @@ const structuredData = {
 			slogan: '1 Account, 1 Place, 1 Setup',
 			description:
 				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (To-Do List Bot, Virtue, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
-			sameAs: ['https://github.com/xernerx', 'https://www.npmjs.com/org/xernerx'],
+			sameAs: [
+				'https://github.com/xernerx',
+				'https://www.npmjs.com/org/xernerx',
+				'https://x.com/XernerxStudios',
+				'https://bsky.app/profile/xernerx.com',
+				'https://www.instagram.com/xernerxstudios/',
+				'https://discord.gg/yrm8gqTuXa',
+			],
 			knowsAbout: [
 				'Discord Bots',
 				'Discord Bot Statistics Tracking',

@@ -130,7 +130,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#post-bot-stats' },
 			{ label: '@xernerx/stats Package', href: 'https://npmjs.com/package/@xernerx/stats', external: true },
 		],
-		keywords: ['post', 'bots', 'stats', 'telemetry', 'push', 'metrics', 'guilds', 'shards'],
+		keywords: ['post', 'bots', 'stats', 'telemetry', 'push', 'metrics', 'guilds', 'shards', '2500', 'shard-limit'],
 	},
 	{
 		id: 'api-update-bot-stats',

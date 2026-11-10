@@ -2,6 +2,18 @@
 
 # @xernerx/cli
 
+## 2.7.3
+
+### Patch Changes
+
+- ## Removed Deprecated `MONGO_LEGACY` Key from Environment Templates
+  
+  Cleaned up the legacy `MONGO_LEGACY` environment variable from `suite init` generated `.env.example` files.
+  
+  ### Deleted
+  
+  - **`MONGO_LEGACY` Template Key**: Removed obsolete `MONGO_LEGACY` entries from generated workspace environment templates.
+
 ## 2.7.2
 
 ### Patch Changes

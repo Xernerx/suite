@@ -75,6 +75,14 @@
 				"invites": "Bot Invites",
 				"blog": "Blog & Newsroom"
 			},
+			"follow": {
+				"label": "Follow",
+				"x": "Follow on X (@XernerxStudios)",
+				"bluesky": "Follow on Bluesky (@xernerx.com)",
+				"instagram": "Follow on Instagram (@xernerxstudios)",
+				"discord": "Join Discord Community",
+				"github": "Follow on GitHub"
+			},
 			"share": {
 				"label": "Share",
 				"twitter": "Share on X",
@@ -1290,6 +1298,21 @@
 				"redirectBadge": "OAuth2 Redirect",
 				"copyRedirectUri": "Copy Redirect URI",
 				"redirectUriCopied": "Redirect URI copied for Discord Developer Portal",
+				"optionsSectionTitle": "Invite Permission Options",
+				"optionsSectionDesc": "Enable 1 option to redirect immediately, or enable 2–3 options to show the invite tier selector.",
+				"singleUrlBehaviorPill": "1 URL • Immediate Redirect",
+				"multiUrlBehaviorPill": "{count} URLs • Option Selector",
+				"optionEssentialTitle": "Essential",
+				"optionEssentialDesc": "Core required permissions ({count} perms)",
+				"optionOptionalTitle": "Optional",
+				"optionOptionalDesc": "All essential + additional ({count} perms)",
+				"optionAdvancedTitle": "Advanced",
+				"optionAdvancedDesc": "Zero guild permissions (0 perms)",
+				"tabEssentialPerms": "Essential Permissions",
+				"tabOptionalPerms": "Optional (All + Additional)",
+				"inheritedFromEssentialBadge": "Essential",
+				"advancedOnlyNotice": "Advanced mode only — requests 0 Discord guild permissions so server admins can configure permissions manually.",
+				"minOneOptionToast": "At least one invite option must remain enabled",
 				"permMatrix": "Permission Matrix",
 				"cancel": "Cancel",
 				"saveButton": "Save Invite",
@@ -5071,6 +5094,39 @@
 			"copyInviteUrl": "Copy Invite Link",
 			"inviteUrlCopied": "Invite link copied to clipboard",
 			"noMatchingInvites": "No invites match \"{query}\".",
+			"directRedirectBadge": "Direct Invite",
+			"multiOptionsBadge": "{count} Invite Options",
+			"backToInvites": "All Application Invites",
+			"chooserSubtitle": "Select the permission preset that best fits how you manage your Discord server.",
+			"options": {
+				"essential": {
+					"label": "Essential",
+					"badge": "Recommended",
+					"description": "Grants only the core permissions required for standard features to work out of the box.",
+					"cta": "Invite with Essential"
+				},
+				"optional": {
+					"label": "Optional",
+					"badge": "All + Additional",
+					"description": "Includes every Essential permission plus additional permissions for optional modules and automation.",
+					"cta": "Invite with Optional"
+				},
+				"advanced": {
+					"label": "Advanced",
+					"badge": "0 Permissions",
+					"description": "Invites the bot with 0 guild permissions so experienced server admins can configure roles and channel overrides manually.",
+					"cta": "Invite with 0 Perms"
+				},
+				"permissionsCount": "{count} permissions",
+				"additionalPermissionsCount": "+{count} additional",
+				"zeroPermissions": "0 permissions requested",
+				"includedPermissionsTitle": "Included Permissions",
+				"additionalPermissionsTitle": "Additional Over Essential",
+				"permissionModeTitle": "Permission Mode",
+				"advancedModeTag": "Manual Role & Channel Overrides",
+				"morePermissions": "+{count} more",
+				"copyTierUrl": "Copy {tier} invite link"
+			},
 			"guide": {
 				"title": "How Official Xernerx Bot Invites Work",
 				"subtitle": "Every invite link on this page connects directly to Discord's official OAuth2 authorization flow with least-privilege permissions tailored to each service.",
@@ -5264,7 +5320,7 @@
 			},
 			"card4": {
 				"title": "What official vanity URLs and quick redirects can I use?",
-				"description": "Across every Xernerx subdomain, /support and /discord redirect to our official Discord Support Server, /github opens github.com/xernerx, and /npm opens our npm package suite. On xernerx.com, use /invite or /invite/[slug] for bot invites, /desktop for the Desktop App download page, and /careers or /jobs for open team applications. On info.xernerx.com, use /bugs for the Issue Tracker (/issues) and /help for the FAQ (/faq). On app.xernerx.com, use /orgs or /organizations for the Developer Portal (/portal) and /leaderboards for /leaderboard. On account.xernerx.com, every settings tab has a clean vanity path: /profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media."
+				"description": "Across every Xernerx subdomain, /support and /discord redirect to our official Discord Support Server, /github opens github.com/xernerx, /npm opens our npm package suite, /x (or /twitter) opens x.com/XernerxStudios, /bluesky (or /bsky) opens bsky.app/profile/xernerx.com, and /instagram (or /ig) opens instagram.com/xernerxstudios. On xernerx.com, use /invite or /invite/[slug] for bot invites, /desktop for the Desktop App download page, and /careers or /jobs for open team applications. On info.xernerx.com, use /bugs for the Issue Tracker (/issues) and /help for the FAQ (/faq). On app.xernerx.com, use /orgs or /organizations for the Developer Portal (/portal) and /leaderboards for /leaderboard. On account.xernerx.com, every settings tab has a clean vanity path: /profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media."
 			},
 			"card5": {
 				"title": "How does the floating Support Button work, and how can I contact specific departments?",
@@ -5314,7 +5370,7 @@
 			},
 			"card5": {
 				"title": "What official vanity links and quick redirects are available across the suite?",
-				"description": "You can use clean vanity routes on any Xernerx domain: /support and /discord open our official Discord community, /github opens our GitHub organization, and /npm opens our npm package suite. On xernerx.com you can use /invite (or /invite/[slug]), /desktop (for /download), and /careers or /jobs (for /applications). On info.xernerx.com you can use /bugs (for /issues) and /help (for /faq). On account.xernerx.com every settings tab has a direct vanity path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
+				"description": "You can use clean vanity routes on any Xernerx domain: /support and /discord open our official Discord community, /github opens our GitHub organization, /npm opens our npm package suite, /x (or /twitter) opens x.com/XernerxStudios, /bluesky (or /bsky) opens bsky.app/profile/xernerx.com, and /instagram (or /ig) opens instagram.com/xernerxstudios. On xernerx.com you can use /invite (or /invite/[slug]), /desktop (for /download), and /careers or /jobs (for /applications). On info.xernerx.com you can use /bugs (for /issues) and /help (for /faq). On account.xernerx.com every settings tab has a direct vanity path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
 			},
 			"card6": {
 				"title": "How do the Suggestion Centre (/suggestions) and Roadmap (/roadmap) work?",
@@ -5419,6 +5475,10 @@
 			"card11": {
 				"title": "How do Bot Vitals, online presence tracking, and telemetry work — and what is available to any bot owner vs. Xernerx Studios?",
 				"description": "Every bot profile on app.xernerx.com/bots/[id] features a Bot Vitals & Info card alongside live telemetry: (1) Available to All Bot Owners—the Bot Vitals card automatically decodes the bot's Discord creation date from its Snowflake ID, displays its Xernerx listing date, counts synced Slash and Context commands (PUT /v1/bots/[id]/commands or @xernerx/commands), lists Vanity URLs and official links, and tracks 32-tier Server & Member Milestone badges. Any bot owner can also push onlineSince uptime, serverCount, userCount, shardCount, per-shard health matrices (shards: [{ id, guilds, ping, status }]), and custom telemetry to POST /v1/bots/[id]/stats via @xernerx/stats; (2) Official Xernerx Studios Bots Only—live Discord Gateway presence (online/idle/dnd/offline status and active custom activity text) and 24-hour status history on info.xernerx.com/status are tracked automatically via the Xernerx Bot and Xernerx App daemons and are exclusively scoped to official Xernerx Studios bots."
+			},
+			"card12": {
+				"title": "How do Essential, Optional, and Advanced (0-Permission) Bot Invite Options work?",
+				"description": "Official bot invites on xernerx.com/invites/[slug] support up to three permission presets: Essential (recommended core Discord permissions required out of the box), Optional (all Essential permissions plus additional permissions for optional modules and automation), and Advanced (0 guild permissions so experienced server administrators can configure channel and role overrides manually). When only 1 invite option is configured for a bot, visiting xernerx.com/invites/[slug] redirects straight to Discord's OAuth2 authorization screen; when 2 or 3 options are configured, xernerx.com/invites/[slug] displays the interactive permission preset chooser (while direct links such as /invites/[slug]/essential redirect immediately)."
 			}
 		},
 		"servers": {
@@ -5579,6 +5639,10 @@
 			"card9": {
 				"title": "How does Xernerx Haste (haste.xernerx.com) work for bots and developers?",
 				"description": "Xernerx Haste (haste.xernerx.com) is our first-party code pastebin and Hastebin-compatible server backed by a dedicated MongoDB cluster with automatic TTL expirations (1h, 24h, 7d, 30d, or never) and 3-tier privacy (public, limited, and private). Any registered Xernerx user can publish pastes from the web studio or programmatically via POST https://haste.xernerx.com/documents/[userId] or POST https://api.xernerx.com/v1/haste by passing their Xernerx User ID (such as from client.owners in @xernerx/commands), while any unauthenticated user can view public and limited pastes."
+			},
+			"card10": {
+				"title": "How does Discord's 2,500-Guild Per-Shard Limit validation and capacity warning work when posting bot stats?",
+				"description": "Because Discord enforces a hard Gateway limit of 2,500 guilds per WebSocket shard (Close Code 4011), POST and PATCH requests to /v1/bots/[id]/stats validate both overall serverCount against shards × 2,500 and each individual shard or cluster entry in shards[] against its 2,500-guild per-shard capacity (returning 400 SHARD_LIMIT_EXCEEDED for impossible payloads). When any shard reaches 2,000+ guilds (80%+ capacity), Xernerx surfaces real-time High Load / Critical badges across the Bot Shard Health Matrix on app.xernerx.com and portal.xernerx.com and dispatches dedicated HMAC-signed WARN shard webhooks (configurable under Portal -> Bot -> Webhooks) with recommended shard counts."
 			}
 		}
 	},
@@ -5862,8 +5926,22 @@
 				"shardMatrixSubtitle": "Live cluster distribution and shard runtime diagnostics.",
 				"shardLabel": "Shard #{id}",
 				"shardGuilds": "{count} servers",
+				"shardCapacityRatio": "{count} / {max}",
+				"shardCapacityPercent": "{percent}%",
 				"shardPing": "{ping}ms",
 				"shardHealthy": "Healthy",
+				"shardWarningBadge": "High Load",
+				"shardCriticalBadge": "At 2.5k Limit",
+				"shardMaxCapPill": "2.5k Max / Shard",
+				"shardAlertsPill": "{count} Near 2.5k Cap",
+				"shardCapacityTitle": "Discord 2.5k Shard Capacity",
+				"shardCapacitySubtitle": "Monitors each instance against Discord's 2,500-guild Gateway shard maximum.",
+				"shardCapacityHealthyPill": "Healthy (< 2.0k / shard)",
+				"shardCapacityWarningPill": "Approaching 2.5k Cap",
+				"shardCapacityCriticalPill": "Critical — Shard Immediately",
+				"shardRecommendedPill": "Recommended: {count}+ Shards",
+				"shardWarningCallout": "{count} instance(s) exceed 2,000 servers per shard. Discord disconnects shards at 2,500 guilds (Close Code 4011) — scale to at least {recommended} shards.",
+				"statsLogShardWarnBadge": "Near 2.5k/shard",
 				"longestStreakLabel": "Longest Streak: {duration}",
 				"allShardsUptime": "All Shards",
 				"shardUptimeFilter": "Shard #{id} Uptime",
@@ -6665,6 +6743,7 @@
 					"secretCopied": "Signing secret copied to clipboard",
 					"secretHint": "Used to sign outgoing webhook payloads in the X-Xernerx-Signature (sha256) header.",
 					"apiTierBadge": "API Tier",
+					"shardWarnBadge": "2k+ / Shard",
 					"apiTierRequiredToast": "POST online and POST offline webhooks require an active Developer API (Developer Pro or Ultra) subscription.",
 					"apiTierCalloutTitle": "Real-Time Bot Online & Offline Webhooks (API Tier)",
 					"apiTierCalloutDesc": "Subscribe to the Developer API tier (Developer Pro or Ultra) and ensure your bot shares at least 1 Discord server with the Xernerx Bot to receive instant HMAC-signed POST online and POST offline webhook notifications whenever your bot connects or disconnects.",
@@ -7644,7 +7723,10 @@
 					"description": "Description",
 					"serverCountDesc": "The number of servers the bot is in (alias for guildCount).",
 					"shardCountDesc": "The number of active shards.",
-					"userCountDesc": "The estimated total number of users across all guilds."
+					"userCountDesc": "The estimated total number of users across all guilds.",
+					"shardsDesc": "Optional array of per-shard telemetry objects ({ shardId, guildCount, userCount, onlineSince }).",
+					"shardLimitRuleTitle": "Discord 2,500-Guild Shard Limit Validation",
+					"shardLimitRuleDesc": "Each Gateway shard is validated against Discord's 2,500-guild maximum. Payloads where serverCount exceeds shards × 2,500 or any shard instance exceeds its 2,500-guild cap return 400 Bad Request (SHARD_LIMIT_EXCEEDED). Enable the WARN shard webhook trigger in the Developer Portal to receive HMAC-signed alerts whenever any shard reaches 2,000+ guilds."
 				},
 				"snippetGenerator": {
 					"botIdLabel": "Interactive Snippet Bot ID",

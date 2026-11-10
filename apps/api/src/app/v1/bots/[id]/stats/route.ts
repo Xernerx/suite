@@ -3,9 +3,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { database, dispatchBotStatusWebhooks, sendWebhook } from '@xernerx/lib/server';
 import { authenticateV1BotRequest, fetchDiscordBotIdentity } from '@/lib/v1BotAuth';
+import { DISCORD_SHARD_MAX_GUILDS, DISCORD_SHARD_WARNING_GUILDS, type BotShardValidationSuccess, validateAndAnalyzeBotShardStats } from '@/lib/botShardValidation';
+import { dispatchBotWebhook } from '@/lib/webhookDispatcher';
 
 async function getBotMeta(BotModel: any, id: string) {
-	const botDoc = await BotModel.findOne({ id }).select('name avatar').lean();
+	const botDoc = await BotModel.findOne({ id }).select('name avatar vanitySlug').lean();
 	let name = botDoc?.name;
 	let avatar = botDoc?.avatar;
 
@@ -45,8 +47,96 @@ async function getBotMeta(BotModel: any, id: string) {
 	return {
 		name: name || 'your bot',
 		displayName: name || 'Unknown Bot',
+		vanitySlug: botDoc?.vanitySlug || null,
 		avatarUrl,
 	};
+}
+
+async function dispatchShardCapacityWarningHooks(params: {
+	botId: string;
+	botMeta: { name: string; displayName: string; vanitySlug: string | null; avatarUrl?: string };
+	hooks: any[];
+	guildCount: number;
+	validation: BotShardValidationSuccess;
+}) {
+	const { botId, botMeta, hooks, guildCount, validation } = params;
+	if (!hooks?.length || validation.warnings.length === 0) return;
+
+	const warnHooks = hooks.filter((h: any) => h?.url && Array.isArray(h.events) && h.events.includes('WARN shard'));
+	if (warnHooks.length === 0) return;
+
+	const nowIso = new Date().toISOString();
+	const growthUrl = `https://portal.xernerx.com/bots/${botId}?tab=growth`;
+	const warnEmbed = {
+		title: validation.hasCritical ? '🚨 Critical: Discord 2.5k Shard Limit Reached' : '⚠️ Shard Capacity Warning (2,000+ Guilds)',
+		url: growthUrl,
+		description: `**${botMeta.displayName}** has **${validation.warnings.length}** shard instance(s) at or above **${DISCORD_SHARD_WARNING_GUILDS.toLocaleString()}** servers (approaching Discord's **${DISCORD_SHARD_MAX_GUILDS.toLocaleString()}**-guild Gateway shard ceiling — Close Code \`4011\`).`,
+		color: validation.hasCritical ? 0xff4444 : 0xffaa00,
+		fields: [
+			{
+				name: 'Affected Shards',
+				value: validation.warnings
+					.slice(0, 8)
+					.map((w) => `• ${w.message}`)
+					.join('\n'),
+			},
+			{ name: 'Total Servers', value: guildCount.toLocaleString(), inline: true },
+			{ name: 'Active Shards', value: validation.effectiveShardCount.toLocaleString(), inline: true },
+			{ name: 'Recommended Shards', value: `**${validation.recommendedShards}+**`, inline: true },
+		],
+		footer: {
+			text: `${botMeta.displayName} • Xernerx Shard Capacity Monitor`,
+			...(botMeta.avatarUrl ? { icon_url: botMeta.avatarUrl } : {}),
+		},
+		timestamp: nowIso,
+	};
+
+	const shardData = {
+		severity: validation.hasCritical ? 'critical' : 'warning',
+		guildCount,
+		effectiveShards: validation.effectiveShardCount,
+		recommendedShards: validation.recommendedShards,
+		warningThreshold: DISCORD_SHARD_WARNING_GUILDS,
+		maxGuildsPerShard: DISCORD_SHARD_MAX_GUILDS,
+		utilizationPercent: validation.highestUtilizationPercent,
+		warnings: validation.warnings,
+	};
+
+	for (const hook of warnHooks) {
+		try {
+			const isDiscordWebhook = /^https:\/\/(ptb\.|canary\.)?discord(app)?\.com\/api\/webhooks\//i.test(hook.url);
+			const payload = isDiscordWebhook
+				? {
+						username: 'Xernerx App',
+						avatar_url: 'https://xernerx.com/logo.png',
+						embeds: [warnEmbed],
+					}
+				: {
+						event: 'WARN shard',
+						botId,
+						timestamp: nowIso,
+						...shardData,
+						bot: {
+							id: botId,
+							name: botMeta.displayName,
+							vanitySlug: botMeta.vanitySlug,
+							url: growthUrl,
+						},
+						data: shardData,
+						embeds: [warnEmbed],
+					};
+
+			await dispatchBotWebhook({
+				botId,
+				url: hook.url,
+				event: 'WARN shard',
+				payload,
+				secret: hook.secret,
+			});
+		} catch (err) {
+			console.error('Failed to trigger WARN shard bot webhook:', err);
+		}
+	}
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -70,6 +160,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		const userCount = typeof body.userCount === 'number' ? body.userCount : 0;
 		const onlineSince = typeof body.onlineSince === 'number' ? body.onlineSince : 0;
 		const shards = Array.isArray(body.shards) ? body.shards : [];
+
+		const validation = validateAndAnalyzeBotShardStats({
+			guildCount: serverCount,
+			userCount,
+			shardCount,
+			shards,
+		});
+
+		if (!validation.valid) {
+			return NextResponse.json(
+				{
+					error: validation.error,
+					code: 'SHARD_LIMIT_EXCEEDED',
+					maxGuildsPerShard: DISCORD_SHARD_MAX_GUILDS,
+				},
+				{ status: 400 }
+			);
+		}
 
 		const currentVoteCount = VoteModel ? await VoteModel.countDocuments({ botId: id }) : 0;
 
@@ -111,7 +219,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 						embeds: [
 							{
 								title: 'Bot Stats Posted',
-								description: `The stats for **${botMeta.name}** were just posted!\n\n**Servers:** ${serverCount}\n**Shards:** ${shardCount}`,
+								description: `The stats for **${botMeta.name}** were just posted!\n\n**Servers:** ${serverCount.toLocaleString()}\n**Shards:** ${validation.effectiveShardCount.toLocaleString()}`,
 								color: 0x00ff00,
 								footer: {
 									text: botMeta.displayName,
@@ -125,9 +233,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 					console.error('Failed to trigger bot webhook for stat post', e);
 				}
 			}
+
+			await dispatchShardCapacityWarningHooks({
+				botId: id,
+				botMeta,
+				hooks,
+				guildCount: serverCount,
+				validation,
+			});
 		}
 
-		return NextResponse.json({ message: 'Stats updated successfully' }, { status: 201 });
+		return NextResponse.json(
+			{
+				message: 'Stats updated successfully',
+				shardHealth: {
+					maxPerShard: DISCORD_SHARD_MAX_GUILDS,
+					effectiveShards: validation.effectiveShardCount,
+					recommendedShards: validation.recommendedShards,
+					utilizationPercent: validation.highestUtilizationPercent,
+					warnings: validation.warnings,
+				},
+			},
+			{ status: 201 }
+		);
 	} catch (error: any) {
 		console.error('Failed to process bot stats POST:', error);
 		return NextResponse.json({ error: 'Internal Server Error', message: error.message, stack: error.stack }, { status: 500 });
@@ -194,25 +322,47 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			body.guildCount = body.serverCount;
 		}
 
+		const existingDoc = statId ? await StatModel.findOne({ _id: statId, id }).lean() : await StatModel.findOne({ id }).sort({ _id: -1 }).lean();
+
+		const nextGuildCount = typeof body.guildCount === 'number' ? body.guildCount : Number((existingDoc as any)?.guildCount ?? 0);
+		const nextUserCount = typeof body.userCount === 'number' ? body.userCount : Number((existingDoc as any)?.userCount ?? 0);
+		const nextShardCount = typeof body.shardCount === 'number' ? body.shardCount : Number((existingDoc as any)?.shardCount ?? 0);
+		const nextShards = Array.isArray(body.shards) ? body.shards : Array.isArray((existingDoc as any)?.shards) ? (existingDoc as any).shards : [];
+
+		const validation = validateAndAnalyzeBotShardStats({
+			guildCount: nextGuildCount,
+			userCount: nextUserCount,
+			shardCount: nextShardCount,
+			shards: nextShards,
+		});
+
+		if (!validation.valid) {
+			return NextResponse.json(
+				{
+					error: validation.error,
+					code: 'SHARD_LIMIT_EXCEEDED',
+					maxGuildsPerShard: DISCORD_SHARD_MAX_GUILDS,
+				},
+				{ status: 400 }
+			);
+		}
+
 		if (statId) {
 			await StatModel.updateOne({ _id: statId, id }, { $set: body });
+		} else if (existingDoc) {
+			await StatModel.updateOne({ _id: (existingDoc as any)._id }, { $set: body });
 		} else {
-			const latest = await StatModel.findOne({ id }).sort({ _id: -1 });
-			if (latest) {
-				await StatModel.updateOne({ _id: latest._id }, { $set: body });
-			} else {
-				const currentVoteCount = VoteModel ? await VoteModel.countDocuments({ botId: id }) : 0;
-				await StatModel.create({
-					id,
-					guildCount: typeof body.guildCount === 'number' ? body.guildCount : 0,
-					shardCount: typeof body.shardCount === 'number' ? body.shardCount : 0,
-					userCount: typeof body.userCount === 'number' ? body.userCount : 0,
-					voteCount: currentVoteCount,
-					onlineSince: typeof body.onlineSince === 'number' ? body.onlineSince : 0,
-					shards: Array.isArray(body.shards) ? body.shards : [],
-					timestamp: new Date(),
-				});
-			}
+			const currentVoteCount = VoteModel ? await VoteModel.countDocuments({ botId: id }) : 0;
+			await StatModel.create({
+				id,
+				guildCount: nextGuildCount,
+				shardCount: nextShardCount,
+				userCount: nextUserCount,
+				voteCount: currentVoteCount,
+				onlineSince: typeof body.onlineSince === 'number' ? body.onlineSince : 0,
+				shards: nextShards,
+				timestamp: new Date(),
+			});
 		}
 
 		const botMeta = await getBotMeta(BotModel, id);
@@ -241,9 +391,26 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 					console.error('Failed to trigger bot webhook for stat update', e);
 				}
 			}
+
+			await dispatchShardCapacityWarningHooks({
+				botId: id,
+				botMeta,
+				hooks,
+				guildCount: nextGuildCount,
+				validation,
+			});
 		}
 
-		return NextResponse.json({ message: 'Stats updated successfully' });
+		return NextResponse.json({
+			message: 'Stats updated successfully',
+			shardHealth: {
+				maxPerShard: DISCORD_SHARD_MAX_GUILDS,
+				effectiveShards: validation.effectiveShardCount,
+				recommendedShards: validation.recommendedShards,
+				utilizationPercent: validation.highestUtilizationPercent,
+				warnings: validation.warnings,
+			},
+		});
 	} catch (error: any) {
 		console.error('Failed to PATCH bot stats:', error);
 		return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

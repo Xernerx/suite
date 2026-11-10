@@ -2,6 +2,24 @@
 
 # docs
 
+## 1.10.7
+
+### Patch Changes
+
+- ## Documented `WARN shard` Webhook Payload & 2,500-Guild Shard Validation
+  
+  Documented the `WARN shard` (`2k+ / Shard`) webhook payload and Discord 2,500-guild per-shard telemetry validation rules across the V1 API reference.
+  
+  ### Added
+  
+  - **`WARN shard` & Stats Shard Limit Reference**: Added the `WARN shard` JSON payload example to Bot Webhooks and documented `shards` (`ShardStats[]`) and `400 SHARD_LIMIT_EXCEEDED` validation on `POST /v1/bots/[id]/stats`.
+- Updated dependencies
+  - @xernerx/components@0.16.2
+  - @xernerx/lib@1.24.0
+  - @xernerx/ui@0.8.8
+  - @xernerx/providers@0.22.7
+  - @xernerx/feedback@0.5.9
+
 ## 1.10.6
 
 ### Patch Changes

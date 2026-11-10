@@ -321,6 +321,13 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 				['faq.bots.card3.description'],
 				[ql('botInvites', 'https://www.xernerx.com/invites', 'xernerx.com/invite'), ql('coreApiDocs', 'https://docs.xernerx.com/api/core', 'docs.xernerx.com/api/core')]
 			),
+			c(
+				'card12',
+				'invite-permission-options',
+				'faq.bots.card12.title',
+				['faq.bots.card12.description'],
+				[ql('botInvites', 'https://www.xernerx.com/invites', 'xernerx.com/invites'), ql('exploreBots', 'https://app.xernerx.com/bots', 'app.xernerx.com/bots')]
+			),
 		],
 	},
 	{

@@ -66,6 +66,36 @@ export function withXernerxConfig(appConfig: NextConfig = {}): NextConfig {
 					destination: 'https://www.npmjs.com/package/xernerx',
 					permanent: false,
 				},
+				{
+					source: '/x',
+					destination: 'https://x.com/XernerxStudios',
+					permanent: false,
+				},
+				{
+					source: '/twitter',
+					destination: 'https://x.com/XernerxStudios',
+					permanent: false,
+				},
+				{
+					source: '/bluesky',
+					destination: 'https://bsky.app/profile/xernerx.com',
+					permanent: false,
+				},
+				{
+					source: '/bsky',
+					destination: 'https://bsky.app/profile/xernerx.com',
+					permanent: false,
+				},
+				{
+					source: '/instagram',
+					destination: 'https://www.instagram.com/xernerxstudios/',
+					permanent: false,
+				},
+				{
+					source: '/ig',
+					destination: 'https://www.instagram.com/xernerxstudios/',
+					permanent: false,
+				},
 			];
 		},
 		reactCompiler: appConfig.reactCompiler ?? true,

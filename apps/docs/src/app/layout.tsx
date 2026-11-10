@@ -49,6 +49,8 @@ export const metadata: Metadata = {
 
 	twitter: {
 		card: 'summary_large_image',
+		site: '@XernerxStudios',
+		creator: '@XernerxStudios',
 		title: {
 			default: 'Xernerx Docs | Bot Frameworks, NPM Packages & v1 Stats API',
 			template: 'Xernerx Docs | %s',

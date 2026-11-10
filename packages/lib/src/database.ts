@@ -44,6 +44,7 @@ const globalWithMongoose = global as typeof global & {
 	__models_v33?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v34?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v35?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__models_v36?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
 // Close any legacy per-database connections left over from older HMR reloads
@@ -149,10 +150,13 @@ if (globalWithMongoose.__models_v33) {
 if (globalWithMongoose.__models_v34) {
 	delete globalWithMongoose.__models_v34;
 }
+if (globalWithMongoose.__models_v35) {
+	delete globalWithMongoose.__models_v35;
+}
 
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v35 || {};
+const cachedModels = globalWithMongoose.__models_v36 || {};
 
 // Also close any orphaned top-level mongoose.connections not tracked in rootConnections
 const trackedRoots = new Set(Object.values(rootConnections));
@@ -165,7 +169,7 @@ for (const conn of mongoose.connections) {
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
-	globalWithMongoose.__models_v35 = cachedModels;
+	globalWithMongoose.__models_v36 = cachedModels;
 }
 
 const getUris = (): Record<string, string> => {
@@ -205,7 +209,15 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste') {
 	if (rootConn && Object.keys(cachedModels[projectId]).length > 0) {
 		const registry = registries[projectId];
 		const isFullyCached =
-			registry && Object.entries(registry).every(([cat, models]: [string, any]) => cachedModels[projectId][cat] && Object.keys(models).every((m) => cachedModels[projectId][cat][m]));
+			registry &&
+			Object.entries(registry).every(
+				([cat, models]: [string, any]) =>
+					cachedModels[projectId][cat] &&
+					Object.entries(models).every(([m, def]: [string, any]) => {
+						const cached = cachedModels[projectId][cat][m];
+						return cached && (process.env.NODE_ENV === 'production' || cached.schema === def.schema);
+					})
+			);
 
 		if (isFullyCached) {
 			return {

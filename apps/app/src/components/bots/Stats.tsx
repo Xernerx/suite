@@ -5,8 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { EmptyState } from '@xernerx/ui';
-import { Activity, Cpu, Flame, Server, ShieldCheck, TrendingUp, Users } from 'lucide-react';
+import { Activity, AlertTriangle, Cpu, Flame, Server, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import { MetricsChart, TimeframeKey } from '../MetricsChart';
+
+const DISCORD_SHARD_MAX = 2500;
+const DISCORD_SHARD_WARN = 2000;
+const DISCORD_SHARD_CRITICAL = 2400;
 
 function computeLongestStreakDuration(stats: any[], currentStats: any): string | null {
 	let maxMs = 0;
@@ -201,20 +205,54 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 
 	const rawShards = Array.isArray(currentStats.shards) ? currentStats.shards : [];
 	const totalShardCount = Math.max(1, Number(currentStats.shardCount) || rawShards.length || 1);
-	const shardItems =
+	const defaultClusterSpan = rawShards.length > 0 && totalShardCount > rawShards.length ? Math.ceil(totalShardCount / rawShards.length) : 1;
+
+	const shardItems: Array<{
+		id: string | number;
+		guilds: number;
+		maxGuilds: number;
+		loadPercent: number;
+		severity: 'healthy' | 'warning' | 'critical';
+		ping: number | null;
+		status: string;
+	}> =
 		rawShards.length > 0
-			? rawShards.map((sh: any, idx: number) => ({
-					id: sh?.id ?? sh?.shardId ?? idx,
-					guilds: Number(sh?.guilds ?? sh?.guildCount ?? sh?.servers ?? Math.round((currentStats.guildCount || 0) / totalShardCount)),
-					ping: sh?.ping ?? sh?.latency ?? sh?.wsPing ?? null,
-					status: String(sh?.status ?? 'online').toLowerCase(),
-				}))
-			: Array.from({ length: Math.min(16, totalShardCount) }, (_, idx) => ({
-					id: idx,
-					guilds: Math.round((currentStats.guildCount || 0) / totalShardCount),
-					ping: null,
-					status: 'online',
-				}));
+			? rawShards.map((sh: any, idx: number) => {
+					const shardSpan = Array.isArray(sh?.shardIds) && sh.shardIds.length > 0 ? sh.shardIds.length : Number(sh?.shardCount) > 0 ? Math.floor(Number(sh.shardCount)) : defaultClusterSpan;
+					const guilds = Number(sh?.guilds ?? sh?.guildCount ?? sh?.servers ?? Math.round((currentStats.guildCount || 0) / rawShards.length));
+					const maxGuilds = shardSpan * DISCORD_SHARD_MAX;
+					const perShardGuilds = guilds / shardSpan;
+					const loadPercent = Math.min(100, Math.round((guilds / maxGuilds) * 100));
+					const severity: 'healthy' | 'warning' | 'critical' = perShardGuilds >= DISCORD_SHARD_CRITICAL ? 'critical' : perShardGuilds >= DISCORD_SHARD_WARN ? 'warning' : 'healthy';
+
+					return {
+						id: sh?.id ?? sh?.shardId ?? idx,
+						guilds,
+						maxGuilds,
+						loadPercent,
+						severity,
+						ping: sh?.ping ?? sh?.latency ?? sh?.wsPing ?? null,
+						status: String(sh?.status ?? 'online').toLowerCase(),
+					};
+				})
+			: Array.from({ length: Math.min(16, totalShardCount) }, (_, idx) => {
+					const guilds = Math.round((currentStats.guildCount || 0) / totalShardCount);
+					const loadPercent = Math.min(100, Math.round((guilds / DISCORD_SHARD_MAX) * 100));
+					const severity: 'healthy' | 'warning' | 'critical' = guilds >= DISCORD_SHARD_CRITICAL ? 'critical' : guilds >= DISCORD_SHARD_WARN ? 'warning' : 'healthy';
+
+					return {
+						id: idx,
+						guilds,
+						maxGuilds: DISCORD_SHARD_MAX,
+						loadPercent,
+						severity,
+						ping: null,
+						status: 'online',
+					};
+				});
+
+	const alertShardsCount = shardItems.filter((sh) => sh.severity !== 'healthy').length;
+	const hasCriticalShard = shardItems.some((sh) => sh.severity === 'critical');
 
 	const customTelemetryEntries =
 		currentStats.data && typeof currentStats.data === 'object' && !Array.isArray(currentStats.data)
@@ -266,10 +304,26 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 							<button
 								type="button"
 								onClick={() => setSelectedShardId(null)}
-								className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent) text-white text-xs font-extrabold cursor-pointer transition-all"
+								className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent) text-(--accent-contrast) text-xs font-extrabold cursor-pointer transition-all"
 							>
 								{t('app.bots.overview.shardUptimeFilter', { id: selectedShardId })} · {t('app.bots.overview.allShardsUptime')}
 							</button>
+						)}
+						{alertShardsCount > 0 ? (
+							<span
+								className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-extrabold ${
+									hasCriticalShard
+										? 'bg-(--accent-red)/15 border-(--accent-red)/30 text-(--accent-red)'
+										: 'bg-(--accent-orange)/15 border-(--accent-orange)/30 text-(--accent-orange)'
+								}`}
+							>
+								<AlertTriangle size={12} />
+								{t('app.bots.overview.shardAlertsPill', { count: alertShardsCount })}
+							</span>
+						) : (
+							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-xs font-mono font-bold text-(--text-muted)">
+								{t('app.bots.overview.shardMaxCapPill')}
+							</span>
 						)}
 						{longestStreakDuration && (
 							<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-extrabold text-(--accent)">
@@ -289,6 +343,16 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 						const isOnline = sh.status === 'online' || sh.status === 'ready' || sh.status === '0';
 						const shardNum = Number(sh.id);
 						const isShardSelected = selectedShardId === shardNum;
+						const borderClass = isShardSelected
+							? 'bg-(--accent)/15 border-(--accent) shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_18%,transparent)]'
+							: sh.severity === 'critical'
+								? 'bg-(--accent-red)/10 border-(--accent-red)/35 hover:border-(--accent-red)'
+								: sh.severity === 'warning'
+									? 'bg-(--accent-orange)/10 border-(--accent-orange)/35 hover:border-(--accent-orange)'
+									: 'bg-(--background)/55 border-(--border)/10 hover:border-(--accent)/30';
+
+						const barColorClass = sh.severity === 'critical' ? 'bg-(--accent-red)' : sh.severity === 'warning' ? 'bg-(--accent-orange)' : 'bg-(--accent)';
+
 						return (
 							<button
 								key={sh.id}
@@ -301,21 +365,39 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 										setActiveMetric('uptime');
 									}
 								}}
-								className={`flex flex-col justify-between gap-2.5 p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
-									isShardSelected
-										? 'bg-(--accent)/15 border-(--accent) shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_18%,transparent)]'
-										: 'bg-(--background)/55 border-(--border)/10 hover:border-(--accent)/30'
-								}`}
+								className={`flex flex-col justify-between gap-2 p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${borderClass}`}
 							>
 								<div className="flex items-center justify-between gap-2 w-full">
 									<span className="text-xs font-mono font-extrabold text-(--text)">{t('app.bots.overview.shardLabel', { id: sh.id })}</span>
 									<span className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-(--accent-green) shadow-[0_0_8px_var(--accent-green)]' : 'bg-(--accent-orange)'}`} />
 								</div>
-								<div className="flex items-center justify-between text-[11px] font-mono text-(--text-muted) w-full">
-									<span>{t('app.bots.overview.shardGuilds', { count: sh.guilds.toLocaleString() })}</span>
-									<span className="text-(--accent) font-bold">
-										{sh.ping !== null && sh.ping !== undefined ? t('app.bots.overview.shardPing', { ping: sh.ping }) : t('app.bots.overview.shardHealthy')}
-									</span>
+
+								<div className="flex flex-col gap-1 w-full">
+									<div className="flex items-center justify-between text-[11px] font-mono text-(--text-muted) w-full">
+										<span>
+											{t('app.bots.overview.shardCapacityRatio', {
+												count: sh.guilds.toLocaleString(),
+												max: sh.maxGuilds.toLocaleString(),
+											})}
+										</span>
+										<span className={`font-bold ${sh.severity === 'critical' ? 'text-(--accent-red)' : sh.severity === 'warning' ? 'text-(--accent-orange)' : 'text-(--accent)'}`}>
+											{t('app.bots.overview.shardCapacityPercent', { percent: sh.loadPercent })}
+										</span>
+									</div>
+									<div className="h-1.5 w-full rounded-full bg-(--foreground)/40 overflow-hidden">
+										<div className={`h-full rounded-full transition-all ${barColorClass}`} style={{ width: `${Math.max(2, sh.loadPercent)}%` }} />
+									</div>
+								</div>
+
+								<div className="flex items-center justify-between text-[10px] font-mono text-(--text-muted) w-full">
+									{sh.severity === 'critical' ? (
+										<span className="text-(--accent-red) font-bold">{t('app.bots.overview.shardCriticalBadge')}</span>
+									) : sh.severity === 'warning' ? (
+										<span className="text-(--accent-orange) font-bold">{t('app.bots.overview.shardWarningBadge')}</span>
+									) : (
+										<span>{t('app.bots.overview.shardHealthy')}</span>
+									)}
+									{sh.ping !== null && sh.ping !== undefined && <span className="text-(--accent) font-bold">{t('app.bots.overview.shardPing', { ping: sh.ping })}</span>}
 								</div>
 							</button>
 						);
