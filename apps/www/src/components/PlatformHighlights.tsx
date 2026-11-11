@@ -45,7 +45,7 @@ export function PlatformHighlights() {
 				{cards.map((card, i) => (
 					<motion.div
 						key={card.title}
-						initial={false}
+						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						whileHover={{ y: -8, scale: 1.015 }}
 						viewport={{ once: true, margin: '-50px' }}
@@ -98,7 +98,7 @@ export function LandingCta() {
 	return (
 		<section id="cta" className="max-w-(--page-width) mx-auto w-full px-6 pb-32 relative">
 			<motion.div
-				initial={false}
+				initial={{ opacity: 0, y: 24 }}
 				whileInView={{ opacity: 1, y: 0 }}
 				viewport={{ once: true, margin: '-80px' }}
 				transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}

@@ -41,6 +41,16 @@ const schema = new Schema(
 		stripeCustomerId: { type: String, default: null }, // Linked Stripe customer ID
 		agreedTerms: { type: Date, default: null }, // Timestamp of when the user agreed to the Terms of Service
 		agreedPrivacy: { type: Date, default: null }, // Timestamp of when the user agreed to the Privacy Policy
+		onboarding: {
+			persona: { type: String, enum: ['user', 'developer', 'both'], default: 'user' },
+			suiteIntroCompleted: { type: Boolean, default: false },
+			dashboardTourCompleted: { type: Boolean, default: false },
+			supportPromptCompleted: { type: Boolean, default: false },
+			tourPostponed: { type: Boolean, default: false },
+			tourPostponedPhase: { type: String, default: null },
+			completedAt: { type: Date, default: null },
+			onboardedBots: { type: [String], default: [] },
+		},
 		privacy: { type: String, enum: ['public', 'private', 'limited'], default: 'private' }, // Privacy level of the user
 		widgets: { type: Boolean, default: false }, // Whether public embed widgets are enabled
 		preferences: { locale: { type: String } }, // User locale (e.g., en-US, es-ES, fr-FR)

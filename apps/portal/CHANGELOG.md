@@ -2,6 +2,27 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.7.0
+
+### Minor Changes
+
+- ## Developer Portal Guided Tour & Quick-Action Onboarding
+  
+  Added contextual onboarding tour support and quick-action navigation hooks to the Developer Portal personal workspace.
+  
+  ### Added
+  
+  - **Personal Workspace Tour Targets**: Added spotlight tour anchors for bot creation, organization management, and API credential configuration in `PersonalWorkspace`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 1.6.0
 
 ### Minor Changes

@@ -2,6 +2,32 @@
 
 # admin
 
+## 0.29.0
+
+### Minor Changes
+
+- ## Multi-Option App Invite Management, Tour Replay Controls & Responsive Modals
+  
+  Added multi-option destination configuration for custom `/invites` links, staff controls for user onboarding states, and `--page-width` responsive sizing on admin modals.
+  
+  ### Added
+  
+  - **Multi-Option App Invite Builder**: Updated `InviteModal` and `Invites` to configure multiple selectable bot or server invite destinations under a single vanity invite code.
+  - **User Onboarding State Controls**: Added staff inspection and reset controls for user onboarding and tour completion flags in `UserModal` and `UserProfilePreview`.
+  
+  ### Changed
+  
+  - **Dynamic Page-Width Modal Containers**: Updated `InviteModal` and `UserModal` to scale with `max-w-(--page-width)` instead of fixed pixel widths.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 0.28.0
 
 ### Minor Changes

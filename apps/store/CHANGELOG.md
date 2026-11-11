@@ -4,6 +4,31 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.11.0
+
+### Minor Changes
+
+- ## Official Discord Virtue Pass Showcase & Active Ultra Pass Recognition
+  
+  Updated the Virtue Pass store showcase with official `$1.99 /mo` Discord App Subscription artwork, banner imagery, and live perks, and improved active plan detection for server-assigned Ultra passes.
+  
+  ### Added
+  
+  - **Official Discord Virtue Pass Card**: Added Virtue's `$1.99 /mo` Discord App Subscription pass artwork, banner backdrop, app badge, and official Discord benefit pills (`Increased XP`, `Level Modes`, `Boost Multipliers`, and `Seasonal Wipes`) to the Store.
+  
+  ### Changed
+  
+  - **Active Ultra Pass Plan Detection**: Updated the Free vs. Ultra Ecosystem comparison cards, Daily Streak multiplier ladder, and individual Bot Pass cards so accounts with an active server-assigned Ultra pass or trial accurately display their active plan and unlocked status.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 0.10.5
 
 ### Patch Changes

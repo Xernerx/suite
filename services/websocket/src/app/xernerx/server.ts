@@ -434,8 +434,29 @@ export default async function Server(msg: any) {
 			return updatedDoc;
 		}
 
-		case 'delete':
-			return model.findOneAndDelete(getFilter(msg.action, msg.body)).lean();
+		case 'delete': {
+			const deleted = (await model.findOneAndDelete(getFilter(msg.action, msg.body)).lean()) as any;
+			const isUserDelete = msg.action === 'users' || msg.action === 'user' || msg.action === 'profile' || msg.action === 'profiles';
+			const targetUserId = String(deleted?.id || msg.body?.id || '');
+			if (isUserDelete && targetUserId) {
+				try {
+					const db = await database('xernerx');
+					const DispatchInvite = (db.models.dispatch as any)?.Invite;
+					await Promise.all([
+						(db.models.users as any)?.Appearance?.deleteMany({ ownerId: targetUserId }).catch(() => null),
+						(db.models.users as any)?.Credit?.deleteMany({ ownerId: targetUserId }).catch(() => null),
+						(db.models.users as any)?.Level?.deleteMany({ ownerId: targetUserId }).catch(() => null),
+						(db.models.users as any)?.Subscription?.deleteMany({ ownerId: targetUserId }).catch(() => null),
+						DispatchInvite?.deleteMany({ targetId: targetUserId }).catch(() => null),
+						DispatchInvite?.updateMany(
+							{ targetId: 'global', $or: [{ readBy: targetUserId }, { deletedBy: targetUserId }] },
+							{ $pull: { readBy: targetUserId, deletedBy: targetUserId } }
+						).catch(() => null),
+					]);
+				} catch {}
+			}
+			return deleted;
+		}
 
 		default:
 			throw new Error(`Unknown method: ${msg.method}`);

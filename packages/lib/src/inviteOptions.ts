@@ -183,13 +183,14 @@ export function getEnabledInviteOptions(invite: { permissions?: string | null; o
 	return result;
 }
 
-export function buildDiscordBotAuthorizeUrl(params: { clientId: string; permissions: string; scopes?: string[]; redirect?: boolean; targetSlug?: string }): string {
+export function buildDiscordBotAuthorizeUrl(params: { clientId: string; permissions: string; scopes?: string[]; redirect?: boolean; targetSlug?: string; appBaseUrl?: string }): string {
 	const scopesList = Array.isArray(params.scopes) && params.scopes.length > 0 ? params.scopes.filter(Boolean) : ['bot', 'applications.commands'];
 	let url = `https://discord.com/oauth2/authorize?client_id=${encodeURIComponent(params.clientId)}&permissions=${encodeURIComponent(params.permissions || '0')}&scope=${scopesList.join('+')}`;
 
 	if (params.redirect) {
 		const slug = params.targetSlug || params.clientId;
-		const redirectUri = `https://app.xernerx.com/bots/${slug}`;
+		const base = (params.appBaseUrl || 'https://app.xernerx.com').replace(/\/+$/, '');
+		const redirectUri = `${base}/bots/${slug}`;
 		url += `&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}`;
 	}
 

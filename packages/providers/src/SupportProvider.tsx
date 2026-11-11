@@ -37,7 +37,21 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 	const [isJoinModalOpen, setJoinModalOpen] = useState(false);
 	const [isJoining, setIsJoining] = useState(false);
 	const [isSnappingBug, setIsSnappingBug] = useState(false);
+	const [hideForOnboarding, setHideForOnboarding] = useState(false);
+	const [isOnboardingActive, setIsOnboardingActive] = useState(false);
 	const popoverRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const onOnboardingStage = (e: Event) => {
+			const detail = (e as CustomEvent<{ active?: boolean; phase?: string }>).detail;
+			if (!detail) return;
+			setIsOnboardingActive(Boolean(detail.active));
+			setHideForOnboarding(Boolean(detail.active && detail.phase !== 'ready'));
+		};
+		window.addEventListener('xernerx:onboarding-stage', onOnboardingStage);
+		return () => window.removeEventListener('xernerx:onboarding-stage', onOnboardingStage);
+	}, []);
 
 	const handleReportBugOnPage = async () => {
 		if (typeof window === 'undefined') return;
@@ -274,10 +288,10 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 		>
 			{children}
 
-			{!isMobileOpen && !isSnappingBug && (
+			{!isMobileOpen && !isSnappingBug && !hideForOnboarding && (
 				<div
 					ref={popoverRef}
-					className="fixed z-[9999]"
+					className={`fixed z-[9999] transition-all duration-300 ${isOnboardingActive ? 'pointer-events-none select-none max-lg:!bottom-20' : ''}`}
 					style={{
 						bottom: 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))',
 						...(isRightAligned ? { left: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))' } : { right: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))' }),
@@ -397,7 +411,7 @@ export function SupportProvider({ children }: { children: React.ReactNode }) {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							onClick={() => !isJoining && setJoinModalOpen(false)}
-							className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+							className="absolute inset-0 bg-(--background)/60 backdrop-blur-sm"
 						/>
 
 						<motion.div

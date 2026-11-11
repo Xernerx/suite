@@ -142,7 +142,7 @@ function TimelineCard({ milestone, index }: { milestone: Milestone; index: numbe
 
 			{/* CARD */}
 			<motion.div
-				initial={false}
+				initial={{ opacity: 0, x: 24, scale: 0.98 }}
 				whileInView={{ opacity: 1, x: 0, scale: 1 }}
 				whileHover={{ y: -6, scale: 1.01 }}
 				viewport={{ once: true, margin: '-80px' }}

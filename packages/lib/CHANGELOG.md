@@ -2,6 +2,23 @@
 
 # @xernerx/lib
 
+## 1.25.0
+
+### Minor Changes
+
+- ## Onboarding Tour State, Multi-Option App Invites & Localization Dictionary Updates
+  
+  Added user onboarding/tour persistence fields, multi-option app invite helpers, and updated `en-GB.json` localization keys for bot onboarding, Store Discord passes, FAQ, and legal disclosures.
+  
+  ### Added
+  
+  - **Onboarding & Page Tour Schema Fields**: Extended `Profile` and `Appearance` Mongoose schemas with onboarding completion, persona selection, and per-page tour state tracking.
+  - **Multi-Option App Invite Helpers**: Added `inviteOptions.ts` and extended `AppInvite` to support multi-destination invite links.
+  
+  ### Changed
+  
+  - **Localization Dictionary & Legal/FAQ Sync**: Added `app.botOnboarding.*` and `common.onboarding.*` keys to `en-GB.json`, updated FAQ and Terms/Cookies descriptions for Virtue's `$1.99 /mo` Discord App Subscription and onboarding storage keys, and pruned modified keys from secondary locale dictionaries.
+
 ## 1.24.0
 
 ### Minor Changes

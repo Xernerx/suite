@@ -31,7 +31,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 	const softwareTrackRef = useRef<HTMLDivElement>(null);
 	const containerRef = useRef<HTMLElement | null>(null);
 	const [ready, setReady] = useState(false);
-	const [matrixConstructed, setMatrixConstructed] = useState(true);
+	const [matrixConstructed, setMatrixConstructed] = useState(false);
 	const [botProfiles, setBotProfiles] = useState<Record<string, BotProfileData>>({});
 
 	const consumerServiceItems = buildConsumerServiceItems(t, getEnvUrl);
@@ -143,9 +143,21 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					navigator.userAgent || ''
 				));
 
-		setMatrixConstructed(true);
-		if (!isAutomated) {
+		let fallbackTimer = 0;
+		const handleConstructComplete = () => {
+			setMatrixConstructed(true);
+			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
+		};
+
+		if (isAutomated) {
+			setMatrixConstructed(true);
+		} else {
+			setMatrixConstructed(false);
+			(window as any).__xernerxConstructPending = true;
+			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: true } }));
 			window.dispatchEvent(new CustomEvent('xernerx:construct-logo'));
+			window.addEventListener('xernerx:construct-complete', handleConstructComplete);
+			fallbackTimer = window.setTimeout(handleConstructComplete, 3550);
 		}
 
 		const scrollEl = document.getElementById('main-scroll-container');
@@ -180,6 +192,8 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 		scrollEl?.addEventListener('scroll', handleScroll, { passive: true });
 		return () => {
+			window.clearTimeout(fallbackTimer);
+			window.removeEventListener('xernerx:construct-complete', handleConstructComplete);
 			window.dispatchEvent(new CustomEvent('xernerx:stage-preview', { detail: { active: false } }));
 			scrollEl?.removeEventListener('scroll', handleScroll);
 			setBackgroundMode(null);
@@ -191,7 +205,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 
 	return (
 		<motion.div
-			initial={false}
+			initial={{ opacity: 0, y: '56vh' }}
 			animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: '56vh' }}
 			transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
 			className={`flex flex-col selection:bg-(--accent) selection:text-white ${pageReady ? '' : 'pointer-events-none select-none'}`}
@@ -200,7 +214,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			<section className="min-h-dvh flex flex-col items-center justify-start px-6 pt-[52dvh] sm:pt-[54dvh] pb-12 relative z-30">
 				<div className="w-full max-w-(--page-width) mx-auto flex flex-col items-center text-center relative z-10">
 					<motion.div
-						initial={false}
+						initial={{ opacity: 0, y: 36 }}
 						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
 						transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
 						className="w-full flex flex-col items-center text-center bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 rounded-[2.75rem] px-8 py-8 sm:px-12 sm:py-10 lg:px-16 lg:py-11 shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_18%,transparent)] relative"
@@ -308,7 +322,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					].map((point, i) => (
 						<motion.div
 							key={point.title}
-							initial={false}
+							initial={{ opacity: 0, y: 40 }}
 							animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
 							whileHover={{ y: -8, scale: 1.015 }}
 							transition={{ duration: 1.6, delay: 0.25 + i * 0.16, ease: [0.22, 1, 0.36, 1] }}
@@ -386,7 +400,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					</div>
 
 					<motion.div
-						initial={false}
+						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
 						transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
@@ -398,7 +412,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					</motion.div>
 
 					<motion.div
-						initial={false}
+						initial={{ opacity: 0, x: 24 }}
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-100px' }}
 						transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -443,7 +457,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 					).map((pillar, idx) => (
 						<motion.div
 							key={pillar.title}
-							initial={false}
+							initial={{ opacity: 0, y: 20 }}
 							whileInView={{ opacity: 1, y: 0 }}
 							whileHover={{ y: -6, scale: 1.015 }}
 							viewport={{ once: true, margin: '-50px' }}

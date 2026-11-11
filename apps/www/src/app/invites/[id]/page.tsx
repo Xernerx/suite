@@ -1,5 +1,6 @@
 /** @format */
 
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { buildDiscordBotAuthorizeUrl, getEnabledInviteOptions } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
@@ -7,9 +8,16 @@ import { InviteOptionChooser } from '@/components/InviteOptionChooser';
 
 export const dynamic = 'force-dynamic';
 
+function resolveAppBaseUrl(host: string | null): string {
+	const h = (host || '').toLowerCase();
+	if (h.includes('.dev.xernerx.com') || h.startsWith('localhost:')) return 'https://app.dev.xernerx.com';
+	if (h.includes('.canary.xernerx.com')) return 'https://app.canary.xernerx.com';
+	return 'https://app.xernerx.com';
+}
+
 export default async function InviteSlugPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ option?: string; tier?: string }> }) {
-	const resolvedParams = await params;
-	const resolvedSearch = await searchParams;
+	const [resolvedParams, resolvedSearch, reqHeaders] = await Promise.all([params, searchParams, headers()]);
+	const appBaseUrl = resolveAppBaseUrl(reqHeaders.get('x-forwarded-host') || reqHeaders.get('host'));
 
 	const db = await database('xernerx');
 	const invite: any = await db.models.core.AppInvite.findOne({ id: resolvedParams.id }).lean();
@@ -35,6 +43,7 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 					scopes: invite.scopes,
 					redirect: Boolean(invite.redirect),
 					targetSlug,
+					appBaseUrl,
 				})
 			);
 		}
@@ -49,6 +58,7 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 				scopes: invite.scopes,
 				redirect: Boolean(invite.redirect),
 				targetSlug,
+				appBaseUrl,
 			})
 		);
 	}
@@ -85,6 +95,7 @@ export default async function InviteSlugPage({ params, searchParams }: { params:
 			scopes: invite.scopes,
 			redirect: Boolean(invite.redirect),
 			targetSlug,
+			appBaseUrl,
 		}),
 	}));
 

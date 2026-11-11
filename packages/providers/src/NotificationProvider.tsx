@@ -70,6 +70,7 @@ interface NotificationContextType {
 	markAsUnread: (id: string) => Promise<void>;
 	markAllAsRead: () => Promise<void>;
 	deleteNotification: (id: string) => Promise<void>;
+	clearAllNotifications: () => Promise<void>;
 	refresh: () => Promise<void>;
 	notifyNative: (payload: NativeNotificationPayload) => Promise<boolean>;
 }
@@ -401,6 +402,28 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 		});
 	};
 
+	const clearAllNotifications = async () => {
+		const clearable = notifications.filter((n) => !n.isInvite);
+		const now = Date.now();
+		for (const n of clearable) {
+			pendingMutationsRef.current.set(n.id, { state: 'deleted', timestamp: now });
+		}
+		setNotifications((prev) => prev.filter((n) => n.isInvite));
+		const globalIds = clearable.filter((n) => n.userId === 'global').map((n) => n.id);
+		if (globalIds.length > 0 && typeof window !== 'undefined') {
+			const deletedGlobals = JSON.parse(localStorage.getItem('xernerx-deleted-globals') || '[]');
+			localStorage.setItem('xernerx-deleted-globals', JSON.stringify(Array.from(new Set([...deletedGlobals, ...globalIds]))));
+		}
+		if (!user?.id) return;
+		const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+			body: JSON.stringify({ action: 'clear_notifications' }),
+		});
+		if (!res.ok) throw new Error('Failed to clear notifications');
+	};
+
 	const markAllAsRead = async () => {
 		const unreadNotifications = notifications.filter((n) => !n.read);
 		if (unreadNotifications.length === 0) return;
@@ -446,7 +469,18 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
 	return (
 		<NotificationContext.Provider
-			value={{ notifications, unreadCount, isLoading, markAsRead, markAsUnread, markAllAsRead, deleteNotification, refresh: () => fetchNotifications(false), notifyNative }}
+			value={{
+				notifications,
+				unreadCount,
+				isLoading,
+				markAsRead,
+				markAsUnread,
+				markAllAsRead,
+				deleteNotification,
+				clearAllNotifications,
+				refresh: () => fetchNotifications(false),
+				notifyNative,
+			}}
 		>
 			{children}
 		</NotificationContext.Provider>

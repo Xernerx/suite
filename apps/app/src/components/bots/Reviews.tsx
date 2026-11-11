@@ -177,7 +177,7 @@ export default function Reviews({ bot, id }: { bot: any; id: string }) {
 	const isOwner = user && bot && (bot.owners?.includes(user.id) || (bot.ownersData && bot.ownersData[0]?.id === user.id));
 
 	return (
-		<div className="flex flex-col gap-6">
+		<div data-bot-tour="reviews" className="flex flex-col gap-6 rounded-3xl transition-all duration-300">
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-(--foreground)/50 border border-(--border)/10 rounded-3xl backdrop-blur-md">
 				<div className="flex items-center gap-6 flex-1">
 					<div className="flex flex-col items-center justify-center">

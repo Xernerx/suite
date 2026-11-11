@@ -67,7 +67,17 @@ export interface CatalogItem {
 		skuId: string;
 		applicationId: string;
 		slug?: string | null;
+		summary?: string | null;
 		storeUrl: string;
+		thumbnailUrl?: string | null;
+		bannerUrl?: string | null;
+		appIconUrl?: string | null;
+		benefits?: {
+			id: string;
+			name: string;
+			description: string;
+			emoji?: string | null;
+		}[];
 		hasEntitlement?: boolean;
 		entitlementEndsAt?: string | null;
 	} | null;

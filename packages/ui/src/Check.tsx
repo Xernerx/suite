@@ -47,7 +47,7 @@ export const Check = forwardRef<HTMLInputElement, CheckProps>(
 		return (
 			<label
 				className={`
-					inline-flex shrink-0 cursor-pointer items-center gap-2.5 select-none group/check
+					inline-flex max-w-full cursor-pointer items-center gap-2.5 select-none group/check
 					${disabled ? 'cursor-not-allowed opacity-60' : ''}
 					${className}
 				`}
@@ -55,7 +55,7 @@ export const Check = forwardRef<HTMLInputElement, CheckProps>(
 				<input type="checkbox" ref={ref} className="sr-only" checked={checked} disabled={disabled} onChange={handleChange} {...props} />
 				<span
 					className={`
-						relative inline-flex items-center justify-center transition-all duration-200 ease-out backdrop-blur-md
+						relative inline-flex shrink-0 items-center justify-center transition-all duration-200 ease-out backdrop-blur-md
 						focus-within:ring-2 focus-within:ring-(--accent) focus-within:ring-offset-2 focus-within:ring-offset-(--background)
 						${activeSize.box}
 						${activeSize.radius}
@@ -72,7 +72,7 @@ export const Check = forwardRef<HTMLInputElement, CheckProps>(
 						<CheckIcon size={activeSize.icon} strokeWidth={3} className={`transition-transform duration-150 ${checked ? 'scale-100' : 'scale-0'}`} />
 					)}
 				</span>
-				{label !== undefined && <span className={`${activeSize.text} font-medium text-(--text)`}>{label}</span>}
+				{label !== undefined && <span className={`${activeSize.text} min-w-0 font-medium leading-snug text-(--text)`}>{label}</span>}
 			</label>
 		);
 	}

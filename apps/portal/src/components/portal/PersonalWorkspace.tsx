@@ -72,7 +72,10 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-			<div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8">
+			<div
+				data-tour="portal-header"
+				className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden p-8 transition-all duration-300"
+			>
 				<div className="relative z-10 flex items-center gap-4">
 					{session?.user?.image ? (
 						<Image
@@ -140,7 +143,7 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 			</div>
 
 			{/* Aggregate Developer KPI Strip */}
-			<div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
+			<div data-tour="portal-kpis" className="grid grid-cols-2 lg:grid-cols-4 rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
 				{kpiCards.map((card) => {
 					const Icon = card.icon;
 					return (
@@ -167,7 +170,7 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 			</div>
 
 			{/* Personal Bots Card */}
-			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-3xl p-8 shadow-sm">
+			<div data-tour="portal-bots" className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-3xl p-8 shadow-sm transition-all duration-300">
 				<div className="flex items-center gap-3 mb-6 text-(--text) font-extrabold text-sm tracking-widest uppercase">
 					<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
 						<Bot className="w-4 h-4" />
@@ -193,7 +196,7 @@ export default function PersonalWorkspace({ session, bots, organizations, guilds
 			</div>
 
 			{/* Managed Discord Servers Card */}
-			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-3xl p-8 shadow-sm">
+			<div data-tour="portal-orgs" className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/20 rounded-3xl p-8 shadow-sm transition-all duration-300">
 				<div className="flex flex-wrap items-center justify-between gap-3 mb-6">
 					<div className="flex items-center gap-3">
 						<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">

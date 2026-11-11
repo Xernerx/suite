@@ -22,15 +22,16 @@ export function DailyStreakLadder({ streak, canClaim, user, onClaim, claiming }:
 		const subs: any[] = Array.isArray(user?.subscriptions) ? user.subscriptions : [];
 		const now = Date.now();
 		let hasActiveSub = false;
-		let hasUltra = false;
+		let hasUltra = Boolean(user?.staffSubscription);
 
 		for (const sub of subs) {
 			const status = String(sub?.status || '').toLowerCase();
 			if (status !== 'active' && status !== 'trialing') continue;
-			if (sub?.expiresAt && new Date(sub.expiresAt).getTime() <= now) continue;
+			const expiry = sub?.expiresAt || sub?.currentPeriodEnd;
+			if (expiry && new Date(expiry).getTime() <= now) continue;
 			hasActiveSub = true;
-			const planStr = `${sub?.planId || ''} ${sub?.planName || ''} ${sub?.tier || ''}`.toLowerCase();
-			if (planStr.includes('ultra')) {
+			const planStr = `${sub?.priceId || ''} ${sub?.stripeSubscriptionId || ''} ${sub?.planId || ''} ${sub?.planName || ''} ${sub?.tier || ''}`.toLowerCase();
+			if (planStr.includes('ultra') || planStr.includes('staff_infinite_sub') || planStr.includes('prod_v0pd5uxotqkrys')) {
 				hasUltra = true;
 			}
 		}
@@ -42,7 +43,7 @@ export function DailyStreakLadder({ streak, canClaim, user, onClaim, claiming }:
 			return { multiplier: 1.25, percent: 125, tier: 'subscriber' as const };
 		}
 		return { multiplier: 1, percent: 100, tier: 'free' as const };
-	}, [user?.subscriptions]);
+	}, [user?.subscriptions, user?.staffSubscription]);
 
 	const completedInCycle = useMemo(() => {
 		if (streak <= 0) return 0;

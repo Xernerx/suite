@@ -2,6 +2,32 @@
 
 # app
 
+## 2.23.0
+
+### Minor Changes
+
+- ## Bot Invite Onboarding Flow & Guided Dashboard Tours
+  
+  Added a dedicated post-invite orbital onboarding flow for newly connected Discord servers alongside interactive spotlight tours across Bot Profiles and the Server Dashboard.
+  
+  ### Added
+  
+  - **Bot Invite Onboarding Experience**: Added a unified circular orbital connection sequence at `/bots/[id]/onboarding` that transitions into destination cards for the Bot Profile and Server Dashboard, a Quick-Join Official Support Server bar, and automatic `+100 Credits` first-time server connection rewards.
+  - **Interactive Bot & Server Dashboard Tours**: Added step-by-step spotlight tours highlighting Bot Profile tabs, live statistics, and Server Dashboard configuration modules, with instant replay triggers.
+  
+  ### Changed
+  
+  - **Bot Invite Redirect Routing**: Updated bot invite buttons across Bot Profiles, the Bot Directory, and the Floating Action Bar to route newly authorized servers through the post-invite onboarding flow.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 2.22.0
 
 ### Minor Changes

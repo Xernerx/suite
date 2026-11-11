@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 import { BlacklistGate } from './BlacklistGate';
+import { FirstSignInOnboarding, type OnboardingStageState } from './FirstSignInOnboarding';
 import { Footer } from './Footer';
 import { GiveawayBanner } from './GiveawayBanner';
 import { Header } from './Header';
@@ -39,6 +40,10 @@ export function Page({ children }: { children: React.ReactNode }) {
 	const [entryLoading] = useState(false);
 	const [isDragUploading, setIsDragUploading] = useState(false);
 	const [stagePreview, setStagePreview] = useState(false);
+	const [onboardingStage, setOnboardingStage] = useState<OnboardingStageState>(() =>
+		typeof window !== 'undefined' && (window as any).__xernerxOnboardingStage ? (window as any).__xernerxOnboardingStage : { active: false, phase: 'welcome' }
+	);
+	const [introStage, setIntroStage] = useState<{ active: boolean; variant?: any; renderStyle?: any }>({ active: false });
 	const [isFixedWatermarkApp, setIsFixedWatermarkApp] = useState(false);
 	const [activeAnnouncement, setActiveAnnouncement] = useState<any | null>(null);
 	const [nowMs, setNowMs] = useState(() => Date.now());
@@ -91,13 +96,29 @@ export function Page({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (typeof window === 'undefined') return;
 		const onStagePreview = (e: Event) => setStagePreview(Boolean((e as CustomEvent<{ active?: boolean }>).detail?.active));
+		const onOnboardingStage = (e: Event) => {
+			const detail = (e as CustomEvent<OnboardingStageState>).detail;
+			if (detail && typeof detail.active === 'boolean') {
+				setOnboardingStage(detail);
+			}
+		};
+		const onIntroStage = (e: Event) => {
+			const detail = (e as CustomEvent<{ active: boolean; variant?: any; renderStyle?: any }>).detail;
+			if (detail && typeof detail.active === 'boolean') {
+				setIntroStage(detail);
+			}
+		};
 		const preventWindowScroll = () => {
 			if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
 		};
 		window.addEventListener('xernerx:stage-preview', onStagePreview);
+		window.addEventListener('xernerx:onboarding-stage', onOnboardingStage);
+		window.addEventListener('xernerx:intro-stage', onIntroStage);
 		window.addEventListener('scroll', preventWindowScroll, { passive: true });
 		return () => {
 			window.removeEventListener('xernerx:stage-preview', onStagePreview);
+			window.removeEventListener('xernerx:onboarding-stage', onOnboardingStage);
+			window.removeEventListener('xernerx:intro-stage', onIntroStage);
 			window.removeEventListener('scroll', preventWindowScroll);
 		};
 	}, []);
@@ -283,8 +304,13 @@ export function Page({ children }: { children: React.ReactNode }) {
 
 	const activeLoading = isLoading || entryLoading;
 	const effectiveStagePreview = stagePreview || isContentHidden;
+	const isLivePageTour = onboardingStage.active && (onboardingStage.phase === 'dashboard' || onboardingStage.phase === 'portal' || onboardingStage.phase === 'explore');
+	const isReadyPhase = onboardingStage.active && onboardingStage.phase === 'ready';
+	const isHeaderMovedOffScreen =
+		onboardingStage.active && (onboardingStage.phase === 'welcome' || onboardingStage.phase === 'who-we-are' || onboardingStage.phase === 'setup' || onboardingStage.phase === 'tour-choice');
 	const isFeedbackVariant = dotVariant === '404' || dotVariant === 'error' || dotVariant === 'lock';
-	const effectiveRenderStyle = isFixedWatermarkApp || isFeedbackVariant ? 'dots' : uiPreferences?.dotMatrixRenderStyle || 'dots';
+	const effectiveRenderStyle =
+		introStage.active && introStage.renderStyle ? introStage.renderStyle : isFixedWatermarkApp || isFeedbackVariant ? 'dots' : uiPreferences?.dotMatrixRenderStyle || 'dots';
 	const targetVariant = isFeedbackVariant
 		? dotVariant
 		: matrixType !== 'default' && matrixType !== 'blank'
@@ -293,33 +319,35 @@ export function Page({ children }: { children: React.ReactNode }) {
 				? 'orbit'
 				: dotVariant;
 
-	const effectiveVariant = activeLoading ? 'full' : targetVariant;
-	const effectiveRipple = activeLoading
-		? true
-		: isBatterySaverActive || isSystemIdle || privacyShieldLocked
+	const effectiveVariant = introStage.active && introStage.variant ? introStage.variant : activeLoading ? 'full' : targetVariant;
+	const effectiveRipple =
+		introStage.active || activeLoading
+			? true
+			: isBatterySaverActive || isSystemIdle || privacyShieldLocked
+				? false
+				: effectiveStagePreview
+					? matrixAnim !== 'static'
+					: matrixAnim === 'always' || effectiveRenderStyle !== 'dots'
+						? true
+						: matrixAnim === 'static'
+							? false
+							: backgroundMode === 'sticky-ripple';
+	const effectiveBlank =
+		introStage.active || activeLoading
 			? false
 			: effectiveStagePreview
-				? matrixAnim !== 'static'
-				: matrixAnim === 'always' || effectiveRenderStyle !== 'dots'
+				? false
+				: isBatterySaverActive || isSystemIdle || privacyShieldLocked
 					? true
-					: matrixAnim === 'static'
-						? false
-						: backgroundMode === 'sticky-ripple';
-	const effectiveBlank = activeLoading
-		? false
-		: effectiveStagePreview
-			? false
-			: isBatterySaverActive || isSystemIdle || privacyShieldLocked
-				? true
-				: matrixType === 'blank'
-					? true
-					: matrixType !== 'default' || effectiveRenderStyle !== 'dots'
-						? false
-						: matrixAnim === 'always'
+					: matrixType === 'blank'
+						? true
+						: matrixType !== 'default' || effectiveRenderStyle !== 'dots'
 							? false
-							: backgroundMode === 'blank';
+							: matrixAnim === 'always'
+								? false
+								: backgroundMode === 'blank';
 
-	const showFooter = state === 'hidden';
+	const showFooter = state === 'hidden' && !introStage.active;
 
 	return (
 		<div
@@ -377,7 +405,13 @@ export function Page({ children }: { children: React.ReactNode }) {
 					</div>
 				</div>
 			)}
-			<Header />
+			<div
+				className={`transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] shrink-0 z-[60] ${
+					isHeaderMovedOffScreen ? '-translate-y-full opacity-0 pointer-events-none max-h-0 overflow-hidden' : 'translate-y-0 opacity-100 max-h-24'
+				}`}
+			>
+				<Header />
+			</div>
 			{!isFixedWatermarkApp && !isBatterySaverActive && !isSystemIdle && !privacyShieldLocked && uiPreferences?.cursorFx && uiPreferences.cursorFx !== 'default' && (
 				<CursorFxCanvas fx={uiPreferences.cursorFx} />
 			)}
@@ -388,9 +422,9 @@ export function Page({ children }: { children: React.ReactNode }) {
 
 				<div
 					id="main-scroll-container"
-					className={`relative h-full min-h-0 flex-1 ${activeLoading || effectiveStagePreview ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'} shadow-inner ${
-						device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'
-					}`}
+					className={`relative h-full min-h-0 flex-1 ${
+						activeLoading || effectiveStagePreview || introStage.active || (onboardingStage.active && !isLivePageTour) ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'
+					} shadow-inner ${device === 'mobile' || state === 'hidden' ? 'rounded-t-xl' : isRightAligned ? 'rounded-tr-xl' : 'rounded-tl-xl'}`}
 					style={{
 						WebkitOverflowScrolling: 'touch',
 						background:
@@ -406,17 +440,28 @@ export function Page({ children }: { children: React.ReactNode }) {
 								variant={effectiveVariant}
 								renderStyle={effectiveRenderStyle}
 								backgroundMode
-								ripple={effectiveRipple}
+								ripple={effectiveRipple || onboardingStage.active || introStage.active}
 								blank={effectiveBlank}
-								subdued={!activeLoading && !effectiveStagePreview}
+								subdued={(!activeLoading && !effectiveStagePreview && !onboardingStage.active && !introStage.active) || isLivePageTour || isReadyPhase}
+								vivid={introStage.active}
 							/>
 							{activeLoading && message && <div className="absolute bottom-14 font-medium text-(--accent) text-sm">{message}</div>}
 						</div>
 					</div>
 
+					<div className="sticky top-0 left-0 w-full h-0 overflow-visible pointer-events-none z-30">
+						<div className="relative w-full pointer-events-none" style={{ height: 'calc(100dvh / var(--ui-zoom, 1) - 50px - env(safe-area-inset-top, 0px))' }}>
+							<FirstSignInOnboarding />
+						</div>
+					</div>
+
 					<div
-						className={`relative z-10 flex flex-col ${showFooter ? 'min-h-full justify-between' : ''} ${
-							activeLoading || effectiveStagePreview ? 'opacity-0 pointer-events-none select-none' : 'opacity-100 transition-opacity duration-500'
+						className={`relative z-10 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${showFooter ? 'min-h-full justify-between' : ''} ${
+							isLivePageTour || isReadyPhase
+								? 'translate-y-0 scale-100 opacity-100 pb-72'
+								: activeLoading || effectiveStagePreview || onboardingStage.active
+									? 'translate-y-24 scale-95 opacity-0 pointer-events-none select-none'
+									: 'translate-y-0 scale-100 opacity-100'
 						}`}
 					>
 						<main
@@ -473,6 +518,7 @@ export function Page({ children }: { children: React.ReactNode }) {
 								onClick={() => {
 									setStagePreview(false);
 									setContentHidden(false);
+									window.dispatchEvent(new CustomEvent('xernerx:construct-complete'));
 								}}
 								className="inline-flex items-center gap-2 rounded-full bg-(--accent) hover:bg-(--hover-accent) text-(--text-active) px-4 py-1.5 text-xs font-semibold transition-all cursor-pointer shadow-sm"
 							>

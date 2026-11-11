@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { AlertTriangle, Ban, Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, ScrollText, Sparkles, User as UserIcon } from 'lucide-react';
+import { AlertTriangle, Ban, Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, RotateCcw, ScrollText, Sparkles, Trash2, User as UserIcon } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import type { DiscordProfile, FullUser, UserSummary } from './types';
@@ -23,6 +23,7 @@ interface UserProfilePreviewProps {
 	vanitySlug?: string;
 	missingRoleCount?: number;
 	onViewAuditLogs?: () => void;
+	onUnverified?: () => void;
 }
 
 export function UserProfilePreview({
@@ -40,17 +41,20 @@ export function UserProfilePreview({
 	vanitySlug,
 	missingRoleCount = 0,
 	onViewAuditLogs,
+	onUnverified,
 }: UserProfilePreviewProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const [syncingRoles, setSyncingRoles] = useState(false);
+	const [unverifying, setUnverifying] = useState(false);
 	const [notifyOpen, setNotifyOpen] = useState(false);
 	const [notifType, setNotifType] = useState<'info' | 'success' | 'warning' | 'error'>('info');
 	const [notifTitle, setNotifTitle] = useState('');
 	const [notifMessage, setNotifMessage] = useState('');
 	const [notifLink, setNotifLink] = useState('');
 	const [sendingNotif, setSendingNotif] = useState(false);
+	const [clearingNotifs, setClearingNotifs] = useState(false);
 
 	const resolvedLevel = globalLevel ?? fullUser?.level?.level ?? 1;
 	const resolvedXp = globalXp ?? fullUser?.level?.xp ?? 0;
@@ -75,6 +79,26 @@ export function UserProfilePreview({
 			toast({ title: t('admin.users.actions.syncRolesError'), type: 'error' });
 		} finally {
 			setSyncingRoles(false);
+		}
+	};
+
+	const unverify = async () => {
+		if (unverifying) return;
+		setUnverifying(true);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ action: 'unverify' }),
+			});
+			if (!res.ok) throw new Error('Failed to unverify user');
+			onUnverified?.();
+			toast({ title: t('admin.users.actions.unverifySuccess'), type: 'success' });
+		} catch {
+			toast({ title: t('admin.users.actions.unverifyError'), type: 'error' });
+		} finally {
+			setUnverifying(false);
 		}
 	};
 
@@ -106,6 +130,25 @@ export function UserProfilePreview({
 			toast({ title: t('admin.users.actions.notifyError'), type: 'error' });
 		} finally {
 			setSendingNotif(false);
+		}
+	};
+
+	const handleClearNotifications = async () => {
+		if (clearingNotifs) return;
+		setClearingNotifs(true);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({ action: 'clear_notifications' }),
+			});
+			if (!res.ok) throw new Error('Failed to clear notifications');
+			toast({ title: t('admin.users.actions.clearNotificationsSuccess'), type: 'success' });
+		} catch {
+			toast({ title: t('admin.users.actions.clearNotificationsError'), type: 'error' });
+		} finally {
+			setClearingNotifs(false);
 		}
 	};
 
@@ -178,6 +221,17 @@ export function UserProfilePreview({
 								<span>{t('admin.users.fields.agreedPrivacy')}</span>
 								<span className="font-mono text-(--text)">{fullUser.agreedPrivacy ? new Date(fullUser.agreedPrivacy).toLocaleDateString() : t('admin.users.fields.notAccepted')}</span>
 							</div>
+							{(isVerified || Boolean(fullUser.agreedTerms || fullUser.agreedPrivacy)) && (
+								<button
+									type="button"
+									onClick={unverify}
+									disabled={unverifying}
+									className="mt-1 flex items-center justify-center gap-1.5 w-full rounded-lg bg-(--accent-orange)/15 hover:bg-(--accent-orange)/25 border border-(--accent-orange)/30 px-2.5 py-1.5 text-[11px] font-bold text-(--accent-orange) transition-colors cursor-pointer disabled:opacity-50"
+								>
+									<RotateCcw size={12} className={unverifying ? 'animate-spin' : ''} />
+									<span>{t('admin.users.actions.unverify')}</span>
+								</button>
+							)}
 						</div>
 					)}
 
@@ -245,11 +299,29 @@ export function UserProfilePreview({
 						</button>
 						<button
 							type="button"
+							onClick={unverify}
+							disabled={unverifying || (!isVerified && !fullUser?.agreedTerms && !fullUser?.agreedPrivacy)}
+							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 font-semibold text-(--text-muted) hover:text-(--accent-orange) hover:border-(--accent-orange)/30 transition-all text-left group cursor-pointer disabled:opacity-50"
+						>
+							<span className="truncate">{t('admin.users.actions.unverify')}</span>
+							<RotateCcw size={14} className={`shrink-0 ml-2 ${unverifying ? 'animate-spin text-(--accent-orange)' : ''}`} />
+						</button>
+						<button
+							type="button"
 							onClick={() => setNotifyOpen(true)}
 							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 font-semibold text-(--text-muted) hover:text-(--accent) hover:border-(--accent)/30 transition-all text-left group cursor-pointer"
 						>
 							<span className="truncate">{t('admin.users.actions.sendNotification')}</span>
 							<Bell size={14} className="shrink-0 ml-2" />
+						</button>
+						<button
+							type="button"
+							onClick={handleClearNotifications}
+							disabled={clearingNotifs}
+							className="flex items-center justify-between text-xs bg-(--background)/50 p-2.5 rounded-xl border border-(--border)/10 font-semibold text-(--text-muted) hover:text-(--accent-orange) hover:border-(--accent-orange)/30 transition-all text-left group cursor-pointer disabled:opacity-50"
+						>
+							<span className="truncate">{t('admin.users.actions.clearNotifications')}</span>
+							<Trash2 size={14} className={`shrink-0 ml-2 ${clearingNotifs ? 'animate-pulse text-(--accent-orange)' : ''}`} />
 						</button>
 						{user.id && onViewAuditLogs && (
 							<button

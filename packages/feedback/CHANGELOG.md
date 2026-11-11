@@ -2,6 +2,24 @@
 
 # @xernerx/feedback
 
+## 0.6.0
+
+### Minor Changes
+
+- ## Interactive Particle Morphing & Orbital Mode for XernerxDotLogo
+  
+  Extended `XernerxDotLogo` and `dotLogoMorph` with orbital ring rendering, icon target morphing, and customizable particle physics for onboarding animations.
+  
+  ### Added
+  
+  - **Orbital & Target-Shape Particle Morphing**: Added support in `XernerxDotLogo` and `dotLogoMorph` for morphing dot particles between the Xernerx crest, orbital rings, and custom SVG/canvas targets.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 0.5.9
 
 ### Patch Changes

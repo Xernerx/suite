@@ -2,6 +2,28 @@
 
 # @xernerx/providers
 
+## 0.23.0
+
+### Minor Changes
+
+- ## Command Palette Onboarding Shortcuts, Live Guild Sync & Theme-Aware Modal Backdrops
+  
+  Registered Bot Onboarding commands in `commandPaletteCatalog`, added real-time guild connection events in `NotificationProvider`, and updated modal backdrops to use theme-aware CSS variables.
+  
+  ### Added
+  
+  - **Command Palette Onboarding Entry**: Added the `Virtue — Bot Onboarding & Setup Flow` route item to `commandPaletteCatalog.ts` for `Ctrl + K` global search discovery.
+  - **Real-Time Guild Connection Event Dispatch**: Updated `NotificationProvider` to broadcast live guild-bot connection events to active onboarding flows.
+  
+  ### Changed
+  
+  - **Theme-Aware Overlay Backdrops**: Updated `CommandPaletteModal`, `ShortcutHelpModal`, `ShortcutsProvider`, and `SupportProvider` to use `bg-(--background)/60` and `bg-(--background)/70` instead of hardcoded `bg-black/*` utilities.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.25.0
+
 ## 0.22.7
 
 ### Patch Changes

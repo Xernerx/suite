@@ -33,6 +33,7 @@ export default function StorePage() {
 	const [categories, setCategories] = useState<CatalogCategory[]>([]);
 	const [items, setItems] = useState<CatalogItem[]>([]);
 	const [activeCategory, setActiveCategory] = useState<string>('');
+	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
 	const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
 	const [actionLoading, setActionLoading] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -131,10 +132,21 @@ export default function StorePage() {
 			if (!res.ok) throw new Error('Failed to load store catalog');
 			const data = await res.json();
 			const cats: CatalogCategory[] = data.categories || [];
+			const loadedItems: CatalogItem[] = data.items || [];
 			setCategories(cats);
-			setItems(data.items || []);
-			const urlCat = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('category') : null;
-			if (urlCat && cats.some((c) => c.id === urlCat)) {
+			setItems(loadedItems);
+			const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+			const urlItem = searchParams?.get('item');
+			const urlCat = searchParams?.get('category');
+			const matchedItem = urlItem ? loadedItems.find((i) => i.id === urlItem || i.skuId === urlItem) : null;
+			if (matchedItem) {
+				setHighlightedItemId(matchedItem.id);
+				setActiveCategory(matchedItem.categoryId);
+				setTimeout(() => {
+					const el = document.getElementById(`store-item-${matchedItem.id}`);
+					el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}, 180);
+			} else if (urlCat && cats.some((c) => c.id === urlCat)) {
 				setActiveCategory(urlCat);
 			} else if (cats.length > 0) {
 				setActiveCategory((prev) => (prev && cats.some((c) => c.id === prev) ? prev : cats[0].id));
@@ -226,10 +238,73 @@ export default function StorePage() {
 		router.push(`/${subscriptionId}/cancel`);
 	};
 
-	const getActiveSubscription = (priceId: string | null) => {
-		if (!priceId) return null;
-		return subscriptions.find((sub) => sub.priceId === priceId && (sub.status === 'active' || sub.status === 'trialing'));
-	};
+	const getActiveSubscription = useCallback(
+		(priceId: string | null, item?: CatalogItem): UserSubscription | null => {
+			const now = Date.now();
+			const validSubs = subscriptions.filter((sub) => {
+				if (!sub || (sub.status !== 'active' && sub.status !== 'trialing')) return false;
+				if (!sub.currentPeriodEnd) return true;
+				const endMs = new Date(sub.currentPeriodEnd).getTime();
+				return Number.isNaN(endMs) || endMs > now;
+			});
+
+			const isUserUltra =
+				Boolean(user?.staffSubscription) ||
+				validSubs.some((sub) => {
+					const pid = String(sub.priceId || '').toLowerCase();
+					const sid = String(sub.stripeSubscriptionId || '').toLowerCase();
+					return pid === 'ultra' || pid === 'prod_v0pd5uxotqkrys' || sid === 'staff_infinite_sub' || sid.includes('ultra');
+				});
+
+			if (item?.id === 'ultra' && isUserUltra) {
+				const matchedUltraSub = validSubs.find((sub) => {
+					const pid = String(sub.priceId || '').toLowerCase();
+					const sid = String(sub.stripeSubscriptionId || '').toLowerCase();
+					return pid === 'ultra' || pid === String(item.skuId || '').toLowerCase() || sid === 'staff_infinite_sub' || sid.includes('ultra') || item.prices?.some((p) => p.id === sub.priceId);
+				});
+				return (
+					matchedUltraSub || {
+						stripeSubscriptionId: 'staff_infinite_sub',
+						priceId: 'ultra',
+						status: 'active',
+						currentPeriodEnd: '',
+					}
+				);
+			}
+
+			if (item) {
+				const itemPrices = new Set((item.prices || []).map((p) => p.id));
+				const itemIdLower = String(item.id || '').toLowerCase();
+				const itemSkuLower = String(item.skuId || '').toLowerCase();
+				const matchedItemSub = validSubs.find((sub) => {
+					const pid = String(sub.priceId || '');
+					const pidLower = pid.toLowerCase();
+					const sidLower = String(sub.stripeSubscriptionId || '').toLowerCase();
+					return (
+						(priceId && pid === priceId) ||
+						itemPrices.has(pid) ||
+						(itemIdLower && pidLower === itemIdLower) ||
+						(itemSkuLower && pidLower === itemSkuLower) ||
+						(itemIdLower && sidLower.includes(itemIdLower))
+					);
+				});
+				if (matchedItemSub) return matchedItemSub;
+
+				if (item.categoryId === 'consumers' && item.id.startsWith('bot-') && isUserUltra) {
+					return {
+						stripeSubscriptionId: 'included_in_ultra',
+						priceId: 'ultra',
+						status: 'active',
+						currentPeriodEnd: '',
+					};
+				}
+			}
+
+			if (!priceId) return null;
+			return validSubs.find((sub) => sub.priceId === priceId) || null;
+		},
+		[subscriptions, user?.staffSubscription]
+	);
 
 	const currentCategory = categories.find((c) => c.id === activeCategory) || categories[0];
 	const currentItems = items.filter((i) => i.categoryId === currentCategory?.id);
@@ -382,6 +457,7 @@ export default function StorePage() {
 						billingInterval={billingInterval}
 						userLoading={userLoading || loading}
 						actionLoading={actionLoading}
+						highlightedItemId={highlightedItemId}
 						appliedCoupon={appliedCoupon}
 						getActiveSubscription={getActiveSubscription}
 						handleSubscribe={handleSubscribe}

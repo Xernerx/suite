@@ -2,6 +2,32 @@
 
 # api
 
+## 0.34.0
+
+### Minor Changes
+
+- ## Live Discord Storefront SKU Sync, Onboarding Rewards & Server-Set Ultra Resolution
+  
+  Updated `/secure/store/catalog` to sync Virtue's published Discord Application Subscription SKU (`$1.99 /mo`) with full CDN asset URLs, added first-time bot invite credit rewards, and unified server-assigned Ultra pass detection across user and guild endpoints.
+  
+  ### Added
+  
+  - **Live Discord Storefront Metadata & Asset Sync**: Enriched `/secure/store/catalog` and `storeSeed.ts` to query Discord's public storefront listing and application metadata for Virtue (`SKU 1568740534753693860`), returning `$1.99 /mo` USD pricing, `1024x1024` SKU thumbnail artwork, application banner/icon URLs, and structured Discord subscription benefits.
+  - **Bot Invite Onboarding Reward Endpoint**: Added server-connection verification and `+100 Credits` first-time guild onboarding reward issuance in `/secure/bots/[id]/profile` and `/secure/users/[id]`.
+  
+  ### Changed
+  
+  - **Unified Server-Set Ultra Pass Detection**: Updated `/secure/users/[id]` and `/secure/guilds/[id]/virtue` so server-set Ultra passes (`staffSubscription`, `staff_infinite_sub`, `ultra`, and active Credit Store trials) consistently resolve `tier: 'ultra'` and unlock Virtue premium guild settings.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 0.33.0
 
 ### Minor Changes

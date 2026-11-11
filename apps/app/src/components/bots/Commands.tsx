@@ -137,7 +137,11 @@ export default function Commands({ bot }: { bot: any }) {
 	};
 
 	if (commands.length === 0) {
-		return <div className="text-center text-(--text-muted) py-12 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">{t('app.bots.id.text15')}</div>;
+		return (
+			<div data-bot-tour="commands" className="text-center text-(--text-muted) py-12 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30 transition-all duration-300">
+				{t('app.bots.id.text15')}
+			</div>
+		);
 	}
 
 	const showSlashSection = (filterTab === 'all' || filterTab === 'slash') && slashCommands.length > 0;
@@ -145,7 +149,7 @@ export default function Commands({ bot }: { bot: any }) {
 	const hasAnyVisible = showSlashSection || showContextSection;
 
 	return (
-		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+		<div data-bot-tour="commands" className="flex flex-col rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
 			<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-(--foreground)/40 border border-(--border)/10 p-4 rounded-3xl backdrop-blur-md">
 				<div className="flex-1 max-w-xl">
 					<Input

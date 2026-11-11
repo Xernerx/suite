@@ -50,7 +50,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 	const [newClientId, setNewClientId] = useState('');
 	const [newName, setNewName] = useState('');
 	const [newScopes, setNewScopes] = useState<string[]>(['bot', 'applications.commands']);
-	const [newRedirect, setNewRedirect] = useState<boolean>(false);
+	const [newRedirect, setNewRedirect] = useState<boolean>(true);
 
 	const [essentialEnabled, setEssentialEnabled] = useState<boolean>(true);
 	const [essentialPermissions, setEssentialPermissions] = useState<bigint>(BigInt(0));
@@ -93,7 +93,7 @@ export default function Invites({ initialSearch = '' }: { initialSearch?: string
 		setNewClientId('');
 		setNewName('');
 		setNewScopes(['bot', 'applications.commands']);
-		setNewRedirect(false);
+		setNewRedirect(true);
 		setEssentialEnabled(true);
 		setEssentialPermissions(BigInt(0));
 		setOptionalEnabled(false);

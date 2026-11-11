@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { LogOut, Settings, Info, User as UserIcon, ExternalLink, Download, Ban, Bot, ShieldAlert } from 'lucide-react';
+import { LogOut, Settings, Info, User as UserIcon, ExternalLink, Download, Ban, Bot, ShieldAlert, Compass, Sparkles, RotateCcw } from 'lucide-react';
 import { signOut, useDictionary, useEnvironment, useSession, useUser, useToast } from '@xernerx/providers';
 import { Button, Confirm, CopyButton, Selector, Toggle } from '@xernerx/ui';
 import { WidgetSettingsCard } from '@xernerx/components';
@@ -29,7 +29,31 @@ export default function Account() {
 	const [privacy, setPrivacy] = useState(activeUser?.privacy || 'private');
 	const [widgets, setWidgets] = useState(Boolean((activeUser as any)?.widgets));
 	const [servicesEnabled, setServicesEnabled] = useState((activeUser as any)?.services !== false);
+	const [localTourPostponed, setLocalTourPostponed] = useState(false);
 	const avatarUrl = activeUser?.image || (userId && activeUser?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${activeUser.avatar}.png` : null);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			setLocalTourPostponed(Boolean(localStorage.getItem('xernerx_tour_postponed')));
+		} catch {}
+		const onTourPostponedChange = (e: Event) => {
+			const detail = (e as CustomEvent<{ postponed?: boolean }>)?.detail;
+			if (detail && typeof detail.postponed === 'boolean') {
+				setLocalTourPostponed(detail.postponed);
+			} else {
+				try {
+					setLocalTourPostponed(Boolean(localStorage.getItem('xernerx_tour_postponed')));
+				} catch {}
+			}
+		};
+		window.addEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
+		return () => window.removeEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
+	}, []);
+
+	const isTourPostponed = Boolean(
+		localTourPostponed || (activeUser as any)?.onboarding?.tourPostponed || (activeUser?.agreedTerms && activeUser?.agreedPrivacy && !(activeUser as any)?.onboarding?.completedAt)
+	);
 
 	useEffect(() => {
 		if (!activeUser) return;
@@ -81,6 +105,15 @@ export default function Account() {
 			setIsRevokingAllSessions(false);
 		}
 	};
+	const clearLocalNotificationState = (targetUserId: string) => {
+		if (typeof window === 'undefined') return;
+		try {
+			localStorage.removeItem('xernerx-read-globals');
+			localStorage.removeItem('xernerx-deleted-globals');
+			localStorage.removeItem('xernerx-read-invites');
+			localStorage.removeItem(`xernerx-notified-dispatch-ids:${targetUserId}`);
+		} catch {}
+	};
 	const handleDeleteAccount = async () => {
 		if (!userId) return;
 		try {
@@ -93,6 +126,7 @@ export default function Account() {
 			if (!res.ok) {
 				throw new Error(t('account.account.danger.toasts.deleteUserError'));
 			}
+			clearLocalNotificationState(userId);
 			const authLoginUrl = getEnvUrl('https://account.xernerx.com/login');
 			await signOut({
 				callbackUrl: authLoginUrl,
@@ -127,6 +161,7 @@ export default function Account() {
 			if (!res.ok) {
 				throw new Error(t('account.account.danger.toasts.deleteDataFailed'));
 			}
+			clearLocalNotificationState(userId);
 			toast({
 				type: 'success',
 				title: t('account.account.danger.toasts.dataDeletedTitle'),
@@ -465,6 +500,65 @@ export default function Account() {
 					loading={isRevokingAllSessions}
 					onConfirm={handleRevokeAllSessions}
 				/>
+
+				{/* Interactive Suite Tour Card */}
+				<div
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
+					style={{
+						padding: 'var(--ui-gap)',
+						gap: 'var(--ui-gap)',
+					}}
+				>
+					<div
+						className="flex flex-col max-w-xl"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.25)',
+						}}
+					>
+						<div
+							className="flex items-center text-(--text) font-semibold text-base"
+							style={{
+								gap: 'calc(var(--ui-gap) * 0.5)',
+							}}
+						>
+							<Compass size={18} className="text-(--accent)" />
+							<h3>{t('account.account.tour.title')}</h3>
+							{isTourPostponed && (
+								<span className="inline-flex items-center gap-1 rounded-full bg-(--accent)/15 border border-(--accent)/35 px-2.5 py-0.5 text-[11px] font-bold text-(--accent)">
+									<Sparkles size={11} />
+									{t('account.account.tour.postponedBadge')}
+								</span>
+							)}
+						</div>
+						<p className="text-xs text-(--text-muted)">{isTourPostponed ? t('account.account.tour.postponedDescription') : t('account.account.tour.description')}</p>
+					</div>
+					<div className="flex flex-wrap items-center gap-2 shrink-0">
+						{isTourPostponed && (
+							<Button
+								variant="secondary"
+								onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-suite-tutorial', { detail: { startPhase: 'header' } }))}
+								className="gap-2 shrink-0"
+							>
+								<RotateCcw size={15} />
+								<span>{t('account.account.tour.restartButton')}</span>
+							</Button>
+						)}
+						<Button
+							variant={isTourPostponed ? 'primary' : 'secondary'}
+							onClick={() =>
+								window.dispatchEvent(
+									new CustomEvent('xernerx:open-suite-tutorial', {
+										detail: isTourPostponed ? { resume: true } : { startPhase: 'header' },
+									})
+								)
+							}
+							className="gap-2 shrink-0"
+						>
+							<Sparkles size={15} />
+							<span>{isTourPostponed ? t('components.header.continueTour') : t('account.account.tour.replayButton')}</span>
+						</Button>
+					</div>
+				</div>
 
 				{/* Privacy Setting Card */}
 				<div

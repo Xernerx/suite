@@ -98,13 +98,14 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 	const { getEnvUrl } = useEnvironment();
 	const { t } = useDictionary();
 	const { toast } = useToast();
-	const { notifications, unreadCount, markAsRead, markAsUnread, markAllAsRead, deleteNotification, refresh } = useNotifications();
+	const { notifications, unreadCount, markAsRead, markAsUnread, markAllAsRead, deleteNotification, clearAllNotifications, refresh } = useNotifications();
 	const { isRightAligned } = useWindowControlsStyle();
 	const { user: discordUser, loading: userLoading, mutate: mutateUser } = useUser();
 	const { data: session } = useSession();
 	const activeUser = discordUser || session?.user;
 	const readyReminders = !userLoading && discordUser ? getReadyCooldownReminders(discordUser, getEnvUrl, t) : [];
 	const totalUnread = unreadCount + readyReminders.length;
+	const clearableCount = notifications.filter((n) => !n.isInvite).length + readyReminders.length;
 
 	const dismissReminder = async (reminder: CooldownReminderItem) => {
 		if (!activeUser?.id) return;
@@ -136,6 +137,7 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 	const [mounted, setMounted] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isClearing, setIsClearing] = useState(false);
 	const [filterMode, setFilterMode] = useState<'all' | 'unread'>('all');
 
 	const visibleNotifications = filterMode === 'unread' ? notifications.filter((n) => !n.read) : notifications;
@@ -158,6 +160,22 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 			await refresh();
 		} finally {
 			setIsRefreshing(false);
+		}
+	};
+
+	const handleClearAll = async () => {
+		if (isClearing || clearableCount === 0) return;
+		setIsClearing(true);
+		try {
+			await clearAllNotifications();
+			if (readyReminders.length > 0) {
+				await mutateUser();
+			}
+			toast({ title: t('components.cards.sidebarnotifications.clearedAllSuccess'), type: 'success' });
+		} catch (err: any) {
+			toast({ title: err.message || t('components.cards.sidebarnotifications.failedClearAll'), type: 'error' });
+		} finally {
+			setIsClearing(false);
 		}
 	};
 
@@ -275,9 +293,21 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 									onClick={markAllAsRead}
 									title={t('components.cards.sidebarnotifications.text3')}
 									aria-label={t('components.cards.sidebarnotifications.text3')}
-									className="h-6 w-6 flex items-center justify-center rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors"
+									className="h-6 w-6 flex items-center justify-center rounded-xl text-(--text-muted) hover:text-(--text) hover:bg-(--border)/10 transition-colors cursor-pointer"
 								>
 									<Check size={12} />
+								</button>
+							)}
+							{clearableCount > 0 && (
+								<button
+									type="button"
+									onClick={handleClearAll}
+									disabled={isClearing}
+									title={t('components.cards.sidebarnotifications.clearAll')}
+									aria-label={t('components.cards.sidebarnotifications.clearAll')}
+									className="h-6 w-6 flex items-center justify-center rounded-xl text-(--text-muted) hover:text-(--accent-red) hover:bg-(--accent-red)/10 transition-colors cursor-pointer disabled:opacity-50"
+								>
+									{isClearing ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
 								</button>
 							)}
 						</div>
@@ -368,7 +398,7 @@ export default function SidebarNotifications({ isCollapsed, placement = 'bottom'
 			{mounted &&
 				selectedNotification &&
 				createPortal(
-					<div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200" style={{ zIndex: 2147483640 }}>
+					<div className="fixed inset-0 flex items-center justify-center bg-(--background)/60 backdrop-blur-md p-4 sm:p-8 animate-in fade-in duration-200" style={{ zIndex: 2147483640 }}>
 						<div
 							className="flex flex-col w-full max-w-2xl max-h-[90dvh] rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-2xl animate-in zoom-in-95 duration-200"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}

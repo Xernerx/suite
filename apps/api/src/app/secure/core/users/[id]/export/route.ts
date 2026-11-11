@@ -17,7 +17,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 
 		const { models } = await database('xernerx');
 
-		const [profile, appearance, credits, botsOwned, guildsOwned] = await Promise.all([
+		const [profile, appearance, credits, botsOwned, guildsOwned, notifications] = await Promise.all([
 			models.users.User.findOne({ id }).lean(),
 			models.users.Appearance.findOne({ ownerId: id }).lean(),
 			models.users.Credit.findOne({ ownerId: id }).lean(),
@@ -25,6 +25,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 				.lean()
 				.catch(() => []),
 			(models.guilds as any).Guild.find({ owner: id })
+				.lean()
+				.catch(() => []),
+			(models.dispatch as any)?.Invite?.find({ targetId: id })
+				.sort({ createdAt: -1 })
 				.lean()
 				.catch(() => []),
 		]);
@@ -35,6 +39,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 			credits: credits || { balance: 0, streak: 0, transactions: [] },
 			showcases: profile?.showcases || [],
 			connections: profile?.connections || [],
+			notifications: notifications || [],
 			botsOwned: botsOwned || [],
 			guildsOwned: guildsOwned || [],
 			exportedAt: new Date().toISOString(),

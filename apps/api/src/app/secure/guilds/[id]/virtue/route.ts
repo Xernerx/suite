@@ -17,6 +17,7 @@ const VIRTUE_OR_ULTRA_IDS = new Set([
 	'ultra',
 	'bot-virtue',
 	'discord_virtue',
+	'1568740534753693860',
 	'virtue',
 	'credit_trial_ultra',
 	'credit_trial_bot-virtue',
@@ -78,7 +79,7 @@ async function resolveGuildDiscordPremium(guildId: string): Promise<{
 	if (ownerId && xDb) {
 		try {
 			const XUser = (xDb.models.users as any)?.Profile || (xDb.models.users as any)?.User;
-			const XSub = (xDb.models.billing as any)?.Subscription || (xDb.models.store as any)?.Subscription;
+			const XSub = (xDb.models.users as any)?.Subscription || (xDb.models.billing as any)?.Subscription || (xDb.models.store as any)?.Subscription;
 			const [userDoc, subDocs] = await Promise.all([
 				XUser
 					? XUser.findOne({ id: ownerId })

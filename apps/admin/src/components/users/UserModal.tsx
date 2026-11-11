@@ -358,6 +358,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 				info,
 				privacy,
 				verified,
+				...(verified === false ? { agreedTerms: null, agreedPrivacy: null } : {}),
 				vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
 				vanitySlug: vanitySlug.trim(),
 				widgets,
@@ -418,7 +419,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 
 	return (
 		<>
-			<Modal open={open} onOpenChange={onOpenChange} title={t('admin.users.manageUser')} description={t('admin.users.manageProfileDesc', { name: displayName })} maxWidth="max-w-7xl">
+			<Modal open={open} onOpenChange={onOpenChange} title={t('admin.users.manageUser')} description={t('admin.users.manageProfileDesc', { name: displayName })} maxWidth="max-w-(--page-width)">
 				<div className="flex flex-col overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 					{loadingDetails ? (
 						<div className="flex justify-center py-6">
@@ -449,6 +450,20 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 												}
 											: undefined
 									}
+									onUnverified={() => {
+										setVerified(false);
+										const nextFull: FullUser = {
+											...(fullUser as FullUser),
+											verified: false,
+											agreedTerms: null,
+											agreedPrivacy: null,
+										};
+										setFullUser(nextFull);
+										onUserUpdated(nextFull);
+										if (currentUser?.id === user.id) {
+											mutateCurrentUser().catch(() => {});
+										}
+									}}
 								/>
 							</div>
 
