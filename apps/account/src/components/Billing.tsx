@@ -99,6 +99,15 @@ export default function Billing() {
 				if (catalogRes.ok) {
 					const catalogData = await catalogRes.json();
 					for (const item of catalogData.items || []) {
+						const primaryPrice = item.prices?.[0];
+						const baseMeta = {
+							productName: item.name || item.stripeName || item.skuId,
+							productDescription: item.description || item.stripeDescription || null,
+							priceFormatted: primaryPrice ? fmtPrice(primaryPrice.discountedAmount ?? primaryPrice.unitAmount, primaryPrice.currency) : null,
+							interval: (primaryPrice?.interval === 'year' ? 'year' : primaryPrice?.interval === 'month' ? 'month' : null) as 'month' | 'year' | null,
+						};
+						if (item.id && !priceMap[item.id]) priceMap[item.id] = baseMeta;
+						if (item.skuId && !priceMap[item.skuId]) priceMap[item.skuId] = baseMeta;
 						for (const price of item.prices || []) {
 							priceMap[price.id] = {
 								productName: item.name || item.stripeName || item.skuId,
@@ -108,7 +117,6 @@ export default function Billing() {
 							};
 						}
 						if (item.discordSku?.hasEntitlement) {
-							const primaryPrice = item.prices?.[0];
 							discordEntitlementSubs.push({
 								stripeSubscriptionId: `discord_sku_${item.discordSku.skuId}`,
 								priceId: primaryPrice?.id || item.discordSku.skuId,

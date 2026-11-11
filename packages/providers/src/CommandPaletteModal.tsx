@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useDictionary } from './DictionaryProvider';
 import { useEnvironment } from './EnvironmentProvider';
+import { usePlatform } from './PlatformProvider';
 import { useSidebar } from './SidebarProvider';
 import { useTheme } from './ThemeProvider';
 import { useToast } from './ToastProvider';
@@ -35,6 +36,7 @@ export function CommandPaletteModal({
 }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+	const { device } = usePlatform();
 	const { toast } = useToast();
 	const router = useRouter();
 	const sidebar = useSidebar();
@@ -205,7 +207,7 @@ export function CommandPaletteModal({
 					},
 				}
 			);
-		} else {
+		} else if (device === 'desktop') {
 			list.push({
 				id: 'action-open-in-desktop',
 				section: 'actions',
@@ -287,6 +289,35 @@ export function CommandPaletteModal({
 					onClose();
 				},
 			},
+			...(activeUser
+				? [
+						{
+							id: 'action-suite-tour',
+							section: 'actions' as PaletteSectionKey,
+							label: Boolean(
+								(typeof window !== 'undefined' && localStorage.getItem('xernerx_tour_postponed')) ||
+								(discordUser as any)?.onboarding?.tourPostponed ||
+								(discordUser?.agreedTerms && discordUser?.agreedPrivacy && !(discordUser as any)?.onboarding?.completedAt)
+							)
+								? t('common.shortcuts.modal.palette.actions.continueSuiteTour')
+								: t('common.shortcuts.modal.palette.actions.suiteTour'),
+							icon: Compass,
+							onSelect: () => {
+								const resume = Boolean(
+									(typeof window !== 'undefined' && localStorage.getItem('xernerx_tour_postponed')) ||
+									(discordUser as any)?.onboarding?.tourPostponed ||
+									(discordUser?.agreedTerms && discordUser?.agreedPrivacy && !(discordUser as any)?.onboarding?.completedAt)
+								);
+								onClose();
+								window.dispatchEvent(
+									new CustomEvent('xernerx:open-suite-tutorial', {
+										detail: resume ? { resume: true } : { startPhase: 'header' },
+									})
+								);
+							},
+						},
+					]
+				: []),
 			{
 				id: 'action-new-paste',
 				section: 'actions',
@@ -412,7 +443,7 @@ export function CommandPaletteModal({
 		<AnimatePresence>
 			{isOpen && (
 				<div className="fixed inset-0 z-50 flex items-start justify-center pt-[calc(12dvh+env(safe-area-inset-top,0px))] p-4">
-					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-(--background)/60 backdrop-blur-sm" />
 
 					<motion.div
 						initial={{ opacity: 0, scale: 0.96, y: -10 }}

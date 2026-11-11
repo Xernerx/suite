@@ -15,12 +15,36 @@ import Statistics from '@/components/dashboard/Statistics';
 import Links from '@/components/dashboard/Links';
 import VirtueGeneral from '@/components/dashboard/virtue/General';
 import Settings from '@/components/dashboard/Settings';
+import DashboardBotTour from '@/components/dashboard/DashboardBotTour';
 import SpotlightBoostModal from '@/components/SpotlightBoostModal';
 import { AppSeoSection } from '@/components/AppSeoSection';
 
 const VALID_DASHBOARD_TABS = ['info', 'stats', 'links', 'virtue', 'settings'];
 
 type Guild = { id: string; name: string; icon: string | null; iconUrl: string | null; banner: string | null; bannerUrl: string | null; permissions: string; features: string[] };
+
+const TOUR_DEMO_GUILD: Guild = {
+	id: '100000000000000000',
+	name: 'Xernerx Community Hub',
+	icon: null,
+	iconUrl: null,
+	banner: null,
+	bannerUrl: null,
+	permissions: '8',
+	features: [],
+};
+
+const TOUR_DEMO_GUILD_CONFIG = {
+	id: '100000000000000000',
+	name: 'Xernerx Community Hub',
+	description: 'Your Discord server directory profile, live analytics, and Virtue XP & voice leveling modules.',
+	info: 'Welcome to your Server Dashboard! Configure your server profile, links, privacy tier, and Virtue modules right from here.',
+	privacy: 'public',
+	widgets: true,
+	locale: 'en-GB',
+	tags: ['Community', 'Gaming', 'Leveling'],
+	links: {},
+};
 
 function DashboardContent() {
 	const { data: session, status } = useSession();
@@ -44,8 +68,19 @@ function DashboardContent() {
 	const [rateLimited, setRateLimited] = useState(false);
 	const [copiedId, setCopiedId] = useState(false);
 	const initialTab = searchParams.get('tab');
+	const botTourName = searchParams.get('xrx_bot_tour');
+	const isTourDashboard = searchParams.get('xrx_tour') === 'dashboard' || Boolean(botTourName);
 	const [activeTab, setActiveTab] = useState(initialTab && VALID_DASHBOARD_TABS.includes(initialTab) ? initialTab : 'info');
 	const { remind, toast } = useToast();
+	const effectiveGuild = selectedGuild || (isTourDashboard ? TOUR_DEMO_GUILD : null);
+	const effectiveGuildConfig = guildConfig || (isTourDashboard ? TOUR_DEMO_GUILD_CONFIG : null);
+
+	const handleFinishBotTour = () => {
+		const params = new URLSearchParams(searchParams.toString());
+		params.delete('xrx_bot_tour');
+		const qs = params.toString();
+		router.replace(`/dashboard${qs ? `?${qs}` : ''}`, { scroll: false });
+	};
 
 	useEffect(() => {
 		const tabParam = searchParams.get('tab');
@@ -322,43 +357,44 @@ function DashboardContent() {
 
 	return (
 		<div
-			className="flex flex-col max-w-(--page-width) mx-auto w-full"
+			className={`flex flex-col max-w-(--page-width) mx-auto w-full ${botTourName ? 'pb-48' : ''}`}
 			style={{
 				padding: 'var(--ui-gap)',
 				gap: 'var(--ui-gap)',
 				fontSize: 'var(--text-scale, 14px)',
 			}}
 		>
-			{loading ? (
+			{loading && !isTourDashboard ? (
 				<div className="flex flex-col items-center justify-center text-center py-12 gap-3">
 					<h1 className="sr-only">{t('app.seo.dashboard.h1')}</h1>
 					<p className="sr-only">{t('app.seo.dashboard.guideIntro')}</p>
 					<Loading message={t('app.dashboard.loadingServers')} />
 				</div>
-			) : selectedGuild ? (
+			) : effectiveGuild ? (
 				<>
 					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 						{/* Guild Summary Card (Page Header) */}
 						<div
-							className="relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden"
+							data-tour="dash-header"
+							className="relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all duration-300"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 						>
 							{/* Optional Banner Background */}
-							{(selectedGuild as any).bannerUrl && (
+							{(effectiveGuild as any).bannerUrl && (
 								<div
 									className="absolute inset-0 z-0 opacity-20"
 									style={{
-										backgroundImage: `url(${(selectedGuild as any).bannerUrl})`,
+										backgroundImage: `url(${(effectiveGuild as any).bannerUrl})`,
 										backgroundSize: 'cover',
 										backgroundPosition: 'center',
 									}}
 								/>
 							)}
 							<div className="relative z-10 flex items-center" style={{ gap: 'var(--ui-gap)' }}>
-								{selectedGuild.iconUrl ? (
+								{effectiveGuild.iconUrl ? (
 									<Image
-										src={selectedGuild.iconUrl}
-										alt={selectedGuild.name}
+										src={effectiveGuild.iconUrl}
+										alt={effectiveGuild.name}
 										width={80}
 										height={80}
 										unoptimized
@@ -371,7 +407,7 @@ function DashboardContent() {
 								)}
 								<div className="flex flex-col gap-1.5">
 									<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-										{selectedGuild.name}
+										{effectiveGuild.name}
 									</span>
 									<button
 										type="button"
@@ -380,7 +416,7 @@ function DashboardContent() {
 									>
 										<span>
 											{t('app.dashboard.text1')}
-											{selectedGuild.id}
+											{effectiveGuild.id}
 										</span>
 										{copiedId ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
 									</button>
@@ -391,7 +427,7 @@ function DashboardContent() {
 									<Rocket className="w-4 h-4" />
 									{t('app.boost.boostServerBtn')}
 								</Button>
-								<Link href={`/servers/${guildConfig?.vanitySlug || selectedGuild.id}`}>
+								<Link href={`/servers/${effectiveGuildConfig?.vanitySlug || effectiveGuild.id}`}>
 									<Button variant="secondary" className="gap-2">
 										<ExternalLink className="w-4 h-4" />
 										{t('app.portal.workspace.viewPublicProfile')}
@@ -400,53 +436,57 @@ function DashboardContent() {
 							</div>
 						</div>
 
-						{configLoading ? (
+						{configLoading && !isTourDashboard ? (
 							<div className="flex flex-col w-full h-full text-center items-center justify-center py-20 text-(--text-muted)">
 								<Loading variant="default" />
 							</div>
-						) : guildConfig ? (
+						) : effectiveGuildConfig ? (
 							<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
-								<Tabs
-									activeTab={activeTab}
-									onChange={handleTabChange}
-									tabs={[
-										{ id: 'info', label: t('app.dashboard.tabs.info') },
-										{ id: 'stats', label: t('app.dashboard.tabs.stats') },
-										{ id: 'links', label: t('app.dashboard.tabs.links') },
-										{ id: 'virtue', label: t('app.dashboard.tabs.virtue') },
-										{ id: 'settings', label: t('app.dashboard.tabs.settings') },
-									]}
-								/>
-
-								{activeTab === 'info' && <General guildConfig={guildConfig} setGuildConfig={setGuildConfig} />}
-
-								{activeTab === 'stats' && (
-									<Statistics
-										guildConfig={guildConfig}
-										timeframe={timeframe}
-										setTimeframe={setTimeframe}
-										activeMetric={activeMetric}
-										handleMetricSwitch={handleMetricSwitch}
-										isUndrawing={isUndrawing}
+								<div data-tour="dash-tabs" className="rounded-2xl transition-all duration-300">
+									<Tabs
+										activeTab={activeTab}
+										onChange={handleTabChange}
+										tabs={[
+											{ id: 'info', label: t('app.dashboard.tabs.info') },
+											{ id: 'stats', label: t('app.dashboard.tabs.stats') },
+											{ id: 'links', label: t('app.dashboard.tabs.links') },
+											{ id: 'virtue', label: t('app.dashboard.tabs.virtue') },
+											{ id: 'settings', label: t('app.dashboard.tabs.settings') },
+										]}
 									/>
-								)}
+								</div>
 
-								{activeTab === 'links' && <Links guildConfig={guildConfig} setGuildConfig={setGuildConfig} />}
+								<div data-tour="dash-config" className="flex flex-col rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
+									{activeTab === 'info' && <General guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
 
-								{activeTab === 'virtue' && selectedGuild && <VirtueGeneral id={selectedGuild.id} managedGuilds={guilds} />}
+									{activeTab === 'stats' && (
+										<Statistics
+											guildConfig={effectiveGuildConfig}
+											timeframe={timeframe}
+											setTimeframe={setTimeframe}
+											activeMetric={activeMetric}
+											handleMetricSwitch={handleMetricSwitch}
+											isUndrawing={isUndrawing}
+										/>
+									)}
 
-								{activeTab === 'settings' && (
-									<Settings
-										guildConfig={guildConfig}
-										setGuildConfig={setGuildConfig}
-										onVanityUnlocked={() => {
-											setGuildConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
-											setOriginalGuildConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
-										}}
-										organizations={organizations}
-										handleDeleteGuild={handleDeleteGuild}
-									/>
-								)}
+									{activeTab === 'links' && <Links guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
+
+									{activeTab === 'virtue' && effectiveGuild && <VirtueGeneral id={effectiveGuild.id} managedGuilds={guilds} />}
+
+									{activeTab === 'settings' && (
+										<Settings
+											guildConfig={effectiveGuildConfig}
+											setGuildConfig={setGuildConfig}
+											onVanityUnlocked={() => {
+												setGuildConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+												setOriginalGuildConfig((prev: any) => (prev ? { ...prev, vanityUnlocked: true } : prev));
+											}}
+											organizations={organizations}
+											handleDeleteGuild={handleDeleteGuild}
+										/>
+									)}
+								</div>
 							</div>
 						) : null}
 					</div>
@@ -506,6 +546,8 @@ function DashboardContent() {
 				confirmKeyword={selectedGuild?.name || 'DELETE'}
 				onConfirm={confirmDeleteGuild}
 			/>
+
+			{botTourName && <DashboardBotTour botName={botTourName} onFinish={handleFinishBotTour} />}
 		</div>
 	);
 }

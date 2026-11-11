@@ -2,6 +2,31 @@
 
 # @xernerx/components
 
+## 0.17.0
+
+### Minor Changes
+
+- ## First-Sign-In Onboarding Experience, Omnibar Onboarding Routes & Theme-Aware Glass Surfaces
+  
+  Added the suite-wide First-Sign-In Onboarding flow and contextual page tours, registered Bot Onboarding routes in `HeaderOmnibar`, and standardized glassmorphic surfaces on theme-aware CSS variables.
+  
+  ### Added
+  
+  - **First-Sign-In Onboarding & Contextual Page Tours**: Added `FirstSignInOnboarding`, `FirstSignInIntroScene`, `FirstSignInWelcomeAndPersonaScenes`, `FirstSignInSidebarScene`, `FirstSignInSetupAndHeader`, and `FirstSignInPageTours` to guide new users through terms agreement, persona selection, appearance customization, and interactive app tours.
+  - **Omnibar Bot Onboarding Quick-Jump**: Registered `/bots/virtue/onboarding` in `HeaderOmnibar` for instant URL navigation.
+  
+  ### Changed
+  
+  - **Theme-Aware Glass Surfaces & Page-Width Scaling**: Replaced hardcoded dark backdrop utilities and off-palette indicator colors in `Header`, `Sidebar`, `SidebarNotifications`, and `FirstSignInOnboarding` with theme-aware CSS variables (`var(--background)`, `var(--accent)`, `var(--accent-orange)`) and `max-w-(--page-width)`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 0.16.2
 
 ### Patch Changes

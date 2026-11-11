@@ -30,6 +30,7 @@ const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
 	],
 	store: [
 		{ path: '/', label: 'Store & Subscriptions' },
+		{ path: '/?item=bot-virtue', label: 'Virtue — Premium User Pass' },
 		{ path: '/?tab=credits', label: 'Virtual Credits & Daily Gift' },
 	],
 	info: [
@@ -59,6 +60,7 @@ const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
 	],
 	www: [
 		{ path: '/', label: 'Xernerx Showcase' },
+		{ path: '/invites', label: 'Official Bot Invites Hub' },
 		{ path: '/download', label: 'Download Desktop App' },
 		{ path: '/applications', label: 'Team Applications' },
 		{ path: '/security', label: 'Platform & Bot Security' },
@@ -86,12 +88,10 @@ export function SubSelector({ name, options, defaultValue, onSelectOption }: { n
 	}, [isOpen]);
 
 	return (
-		<div ref={ref} className="relative flex items-center">
-			<input type="hidden" name={name} value={value} />
+		<div ref={ref} className="relative flex items-center" data-name={name}>
 			<div className="text-sm font-medium text-(--text) cursor-pointer hover:text-(--accent) transition-colors flex items-center select-none" onClick={() => setIsOpen(!isOpen)}>
 				{value}
 			</div>
-
 			<AnimatePresence>
 				{isOpen && (
 					<motion.div

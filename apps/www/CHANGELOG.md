@@ -2,6 +2,31 @@
 
 # www
 
+## 0.26.0
+
+### Minor Changes
+
+- ## Multi-Option Invite Chooser & Synchronized Desktop Interactive Preview
+  
+  Added a destination chooser for multi-bot invite links and updated the Desktop App interactive preview to match the latest application shell.
+  
+  ### Added
+  
+  - **Multi-Option Invite Chooser**: Added an interactive destination selector on `/invites/[id]` when an invite link offers multiple bot or server invite options.
+  
+  ### Changed
+  
+  - **Desktop Interactive Preview**: Synchronized the `/download` interactive desktop preview with the latest application shell header, sidebar, and onboarding tour indicators.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 0.25.0
 
 ### Minor Changes

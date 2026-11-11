@@ -2,6 +2,23 @@
 
 # @xernerx/websocket
 
+## 1.6.0
+
+### Minor Changes
+
+- ## Real-Time Guild Bot Sync Broadcasts for Onboarding Flows
+  
+  Updated the `xernerx` WebSocket service handler to broadcast real-time guild bot installation events so open `/bots/[id]/onboarding` views detect newly connected servers immediately.
+  
+  ### Added
+  
+  - **Live Guild Installation Broadcasts**: Added real-time WebSocket event forwarding in `services/websocket/src/app/xernerx/server.ts` when a bot joins or syncs a Discord guild.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.25.0
+
 ## 1.5.10
 
 ### Patch Changes

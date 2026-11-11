@@ -2,7 +2,25 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, ChevronLeft, Clock, Download, Gift, LayoutGrid, Megaphone, Monitor, RefreshCw, Search, SidebarClose, SidebarOpen, Smartphone, Tablet, User as UserIcon, X } from 'lucide-react';
+import {
+	Bell,
+	ChevronLeft,
+	Clock,
+	Download,
+	Gift,
+	LayoutGrid,
+	Megaphone,
+	Monitor,
+	RefreshCw,
+	Search,
+	SidebarClose,
+	SidebarOpen,
+	Smartphone,
+	Sparkles,
+	Tablet,
+	User as UserIcon,
+	X,
+} from 'lucide-react';
 import { headerSubdomainsCatalog } from '@xernerx/lib';
 import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, useEnvironment, useNotifications, usePermissions, usePlatform, useShortcuts, useSidebar, useTheme, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
@@ -39,6 +57,7 @@ export function Header() {
 	const activeUser = discordUser || session?.user;
 
 	const [isMounted, setIsMounted] = useState(false);
+	const [localTourPostponed, setLocalTourPostponed] = useState(false);
 	const { notifications } = useNotifications();
 	const readyReminders = isMounted && !userLoading && discordUser ? getReadyCooldownReminders(discordUser, getEnvUrl, t) : [];
 	const totalUnreadCount = notifications.filter((n) => !n.read).length + readyReminders.length;
@@ -56,6 +75,19 @@ export function Header() {
 	const notificationsRef = useRef<HTMLDivElement>(null);
 	const [optionsOpen, setOptionsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(true);
+	const [onboardingStage, setOnboardingStage] = useState<{
+		active: boolean;
+		phase?: string;
+		headerStepId?: string;
+		revealedHeaderItems?: string[];
+		sidebarStepId?: string;
+		revealedSidebarItems?: string[];
+	}>({
+		active: false,
+		phase: 'welcome',
+		headerStepId: 'logo',
+		revealedHeaderItems: [],
+	});
 	const [desktopUpdateState, setDesktopUpdateState] = useState<{
 		checking?: boolean;
 		outdated?: boolean;
@@ -64,6 +96,41 @@ export function Header() {
 		latestVersion?: string;
 		downloadUrl?: string | null;
 	} | null>(null);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		if ((window as any).__xernerxOnboardingStage) {
+			setOnboardingStage((window as any).__xernerxOnboardingStage);
+		}
+		const onOnboardingStage = (e: Event) => {
+			const detail = (
+				e as CustomEvent<{
+					active: boolean;
+					phase?: string;
+					headerStepId?: string;
+					revealedHeaderItems?: string[];
+					sidebarStepId?: string;
+					revealedSidebarItems?: string[];
+				}>
+			).detail;
+			if (detail && typeof detail.active === 'boolean') {
+				setOnboardingStage(detail);
+			}
+		};
+		window.addEventListener('xernerx:onboarding-stage', onOnboardingStage);
+		return () => window.removeEventListener('xernerx:onboarding-stage', onOnboardingStage);
+	}, []);
+
+	const isHeaderBuildMode = onboardingStage.active && onboardingStage.phase === 'header';
+	const isSidebarBuildMode = onboardingStage.active && onboardingStage.phase === 'sidebar';
+	const isSidebarBeforeDockMove = isSidebarBuildMode && Array.isArray(onboardingStage.revealedSidebarItems) && !onboardingStage.revealedSidebarItems.includes('moved-dock');
+	const showControlsInHeader = state === 'hidden' || isHeaderBuildMode || isSidebarBeforeDockMove;
+	const hasRevealedList = Array.isArray(onboardingStage.revealedHeaderItems) && onboardingStage.revealedHeaderItems.length > 0;
+	const isItemRevealed = (id: string) => !isHeaderBuildMode || !hasRevealedList || onboardingStage.revealedHeaderItems!.includes(id);
+	const isItemHighlighted = (id: string) => isHeaderBuildMode && onboardingStage.headerStepId === id;
+	const isShortcutHighlighted = (subId: string) => isHeaderBuildMode && (onboardingStage.headerStepId === subId || (onboardingStage.headerStepId === 'store' && isItemRevealed(subId)));
+	const effectiveOptionsOpen = isHeaderBuildMode ? isItemRevealed('search') : optionsOpen;
+	const activeRingClass = 'ring-2 ring-(--accent) shadow-[0_0_18px_color-mix(in_srgb,var(--accent)_70%,transparent)] scale-110 transition-all duration-300';
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
 	const pathname = usePathname();
@@ -79,6 +146,20 @@ export function Header() {
 
 	useEffect(() => {
 		setIsMounted(true);
+		try {
+			setLocalTourPostponed(Boolean(localStorage.getItem('xernerx_tour_postponed')));
+		} catch {}
+		const onTourPostponedChange = (e: Event) => {
+			const detail = (e as CustomEvent<{ postponed?: boolean }>)?.detail;
+			if (detail && typeof detail.postponed === 'boolean') {
+				setLocalTourPostponed(detail.postponed);
+			} else {
+				try {
+					setLocalTourPostponed(Boolean(localStorage.getItem('xernerx_tour_postponed')));
+				} catch {}
+			}
+		};
+		window.addEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
 		const detectedElectron = Boolean((window as any).electron) || navigator.userAgent.toLowerCase().includes('electron');
 		setIsElectron(detectedElectron);
 		if (detectedElectron) document.documentElement.classList.add('is-electron');
@@ -91,6 +172,7 @@ export function Header() {
 		const timer = setTimeout(() => setIsExpanded(false), 2000);
 		return () => {
 			clearTimeout(timer);
+			window.removeEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
 			window.removeEventListener('xernerx:desktop-update-state', handleDesktopUpdateState);
 		};
 	}, []);
@@ -98,7 +180,20 @@ export function Header() {
 	const isApp = type === 'application' || isElectron;
 
 	useEffect(() => {
-		if (!isMounted || isApp || typeof window === 'undefined') return;
+		if (!isMounted || isApp || device !== 'desktop' || typeof window === 'undefined' || typeof navigator === 'undefined') {
+			setIsDesktopRunning(false);
+			return;
+		}
+		const ua = navigator.userAgent || '';
+		const isMobileOrTabletUa =
+			/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(ua) ||
+			Boolean((navigator as any).userAgentData?.mobile) ||
+			(ua.toLowerCase().includes('mac') && navigator.maxTouchPoints > 2);
+		if (isMobileOrTabletUa) {
+			setIsDesktopRunning(false);
+			return;
+		}
+
 		let cancelled = false;
 		const ports = [41990, 41991, 41992];
 
@@ -144,7 +239,7 @@ export function Header() {
 			document.removeEventListener('visibilitychange', handleFocusOrVis);
 			clearInterval(interval);
 		};
-	}, [isMounted, isApp]);
+	}, [isMounted, isApp, device]);
 
 	const handleOpenInDesktop = async () => {
 		if (typeof window === 'undefined') return;
@@ -173,7 +268,7 @@ export function Header() {
 	}, []);
 
 	useEffect(() => {
-		if (state !== 'hidden' || !activeUser) return;
+		if (state !== 'hidden' || !activeUser || onboardingStage.active) return;
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
 				e.preventDefault();
@@ -187,7 +282,7 @@ export function Header() {
 		};
 		window.addEventListener('keydown', handleKeyDown);
 		return () => window.removeEventListener('keydown', handleKeyDown);
-	}, [state, activeUser]);
+	}, [state, activeUser, onboardingStage.active]);
 
 	useEffect(() => {
 		setUserMenuOpen(false);
@@ -234,6 +329,11 @@ export function Header() {
 	}, [activeUser, avatarUrl]);
 
 	const hasLoadedCredits = !userLoading && Boolean(discordUser?.credits);
+	const isTourPostponed =
+		isMounted &&
+		Boolean(activeUser) &&
+		!userLoading &&
+		Boolean(localTourPostponed || (discordUser as any)?.onboarding?.tourPostponed || (discordUser?.agreedTerms && discordUser?.agreedPrivacy && !(discordUser as any)?.onboarding?.completedAt));
 	const giftInTime = hasLoadedCredits && discordUser?.credits?.giftIn ? new Date(discordUser.credits.giftIn).getTime() : null;
 	const isGiftReady =
 		preferences.showGiftBadge && isMounted && hasLoadedCredits && (giftInTime !== null ? Number.isFinite(giftInTime) && Date.now() >= giftInTime : (discordUser?.credits?.streak ?? 0) === 0);
@@ -259,7 +359,7 @@ export function Header() {
 
 	const renderBanner = () => {
 		if (effectiveIsDev) return <BannerDev className="h-10 text-(--accent) hover:text-(--accent-orange) transition-colors" />;
-		if (effectiveIsCanary) return <BannerCanary className="h-10 text-(--accent) hover:text-(--accent) transition-colors" />;
+		if (effectiveIsCanary) return <BannerCanary className="h-10 text-(--accent) hover:text-(--hover-accent) transition-colors" />;
 		return <BannerPublic className="h-10 text-(--accent) hover:text-(--hover-accent) transition-colors" />;
 	};
 
@@ -298,15 +398,17 @@ export function Header() {
 	return (
 		<div className="relative flex flex-col w-full z-[9999] shrink-0 bg-(--background)" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
 			<header
-				className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} h-[50px] shrink-0 items-center justify-between w-full bg-(--background) touch-none`}
+				className={`relative flex ${isRightAligned ? 'flex-row-reverse' : ''} h-[50px] shrink-0 items-center justify-between w-full bg-(--background) touch-none transition-all duration-300 ${
+					isItemHighlighted('logo') ? 'border-b border-(--accent)/60 shadow-[0_4px_24px_color-mix(in_srgb,var(--accent)_30%,transparent)]' : ''
+				}`}
 				style={{
 					paddingLeft: 'calc(var(--ui-gap) + env(safe-area-inset-left, 0px))',
 					paddingRight: 'calc(var(--ui-gap) + env(safe-area-inset-right, 0px))',
 					fontSize: 'var(--text-scale, 14px)',
 				}}
 			>
-				{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent-orange) shadow-[0_0_12px_rgba(249,115,22,0.8)]" />}
-				{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent) shadow-[0_0_12px_rgba(59,130,246,0.8)]" />}
+				{effectiveIsDev && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent-orange) shadow-[0_0_12px_color-mix(in_srgb,var(--accent-orange)_80%,transparent)]" />}
+				{effectiveIsCanary && <div className="absolute inset-x-0 top-0 h-[2px] bg-(--accent) shadow-[0_0_12px_color-mix(in_srgb,var(--accent)_80%,transparent)]" />}
 
 				<div className={`flex ${isRightAligned ? 'flex-row-reverse' : ''} items-center shrink-0`} style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
 					{!isRightAligned && effectiveControls === 'macos' && (
@@ -315,13 +417,19 @@ export function Header() {
 						</div>
 					)}
 
-					{state !== 'hidden' && (
+					{state !== 'hidden' && !isHeaderBuildMode && (
 						<button
 							type="button"
+							disabled={onboardingStage.active}
 							aria-label={t('components.sidebar.title')}
 							title={t('components.sidebar.title')}
 							onClick={() => (window.innerWidth < 768 ? setMobileOpen(!isMobileOpen) : toggle())}
-							className={`relative z-10 ${effectiveControls === 'windows' ? 'p-2' : ''} ${headerIconBtnClass}`}
+							className={`relative z-10 ${effectiveControls === 'windows' ? 'p-2' : ''} ${headerIconBtnClass} ${
+								(isSidebarBuildMode && (onboardingStage.sidebarStepId === 'toggle' || onboardingStage.sidebarStepId === 'collapse')) ||
+								(onboardingStage.active && ((onboardingStage as any).pageTourTarget === 'dash-sidebar' || (onboardingStage as any).pageTourTarget === 'portal-orgs'))
+									? activeRingClass
+									: ''
+							} ${onboardingStage.active ? 'pointer-events-none select-none' : ''}`}
 							style={isRightAligned ? { marginLeft: 'var(--ui-gap)' } : { marginRight: 'var(--ui-gap)' }}
 						>
 							{state == 'open' ? (
@@ -335,7 +443,14 @@ export function Header() {
 					<Link
 						href={'/'}
 						aria-label="Xernerx Studios"
-						className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:left-auto [.is-electron_&]:static [.is-electron_&]:translate-x-0 [.is-electron_&]:left-auto flex items-center"
+						onClick={(e) => {
+							if (onboardingStage.active) e.preventDefault();
+						}}
+						className={`${
+							effectiveOptionsOpen ? 'static translate-x-0 left-auto' : 'absolute left-1/2 -translate-x-1/2'
+						} md:static md:translate-x-0 md:left-auto [.is-electron_&]:static [.is-electron_&]:translate-x-0 [.is-electron_&]:left-auto flex items-center transition-all duration-300 ${
+							isItemHighlighted('logo') ? 'drop-shadow-[0_0_12px_var(--accent)] scale-105' : ''
+						} ${onboardingStage.active ? 'pointer-events-none select-none' : ''}`}
 						draggable={false}
 					>
 						{renderBanner()}
@@ -349,12 +464,24 @@ export function Header() {
 					className={`flex ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${effectiveControls === 'windows' ? 'gap-4' : 'gap-2'} shrink-0 relative z-10`}
 					style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
 				>
+					{!onboardingStage.active && isTourPostponed && (
+						<button
+							type="button"
+							onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-suite-tutorial', { detail: { resume: true } }))}
+							title={t('components.header.continueTourTooltip')}
+							className="flex items-center gap-1.5 h-8 px-3 rounded-full bg-(--accent)/15 hover:bg-(--accent) border border-(--accent)/35 text-xs font-extrabold text-(--accent) hover:text-white transition-all cursor-pointer whitespace-nowrap shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_20%,transparent)] shrink-0"
+						>
+							<Sparkles size={13} className="shrink-0" />
+							<span>{t('components.header.continueTour')}</span>
+						</button>
+					)}
+
 					<div
-						className={`${optionsOpen ? 'flex animate-in fade-in slide-in-from-right-2 duration-150' : 'hidden md:flex'} ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${
+						className={`${effectiveOptionsOpen ? 'flex animate-in fade-in slide-in-from-right-2 duration-150' : 'hidden md:flex'} ${isRightAligned ? 'flex-row-reverse' : ''} items-center ${
 							effectiveControls === 'windows' ? 'gap-4' : effectiveControls === 'capsule' ? 'gap-1.5 rounded-full bg-(--foreground)/50 border border-(--border)/15 px-2 py-0.5' : 'gap-2'
-						} shrink-0`}
+						} shrink-0 ${onboardingStage.active ? 'pointer-events-none select-none' : ''}`}
 					>
-						{!isApp && preferences.showHeaderDownload && (
+						{!onboardingStage.active && !isApp && preferences.showHeaderDownload && (
 							<div className="hidden sm:flex [.is-electron_&]:!hidden items-center gap-2">
 								{isDesktopRunning && (
 									<button
@@ -387,42 +514,46 @@ export function Header() {
 							</div>
 						)}
 
-						{isMounted && isApp && desktopUpdateState?.outdated && (desktopUpdateState.downloaded || (!desktopUpdateState.downloading && Boolean(desktopUpdateState.downloadUrl))) && (
-							<button
-								type="button"
-								onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-desktop-updater'))}
-								aria-label={
-									desktopUpdateState.downloaded
-										? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
-										: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
-								}
-								title={
-									desktopUpdateState.downloaded
-										? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
-										: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
-								}
-								className={`relative ${headerIconBtnClass} ${desktopUpdateState.downloaded ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}
-							>
-								{desktopUpdateState.checking ? (
-									<RefreshCw size={effectiveControls === 'windows' ? 20 : 16} className="animate-spin text-(--accent)" />
-								) : (
-									<Download size={effectiveControls === 'windows' ? 20 : 16} />
-								)}
-								<span
-									className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${
-										desktopUpdateState.downloaded ? 'bg-(--accent-green)' : 'bg-(--accent-orange)'
-									} border-2 border-(--background) animate-pulse`}
-								/>
-							</button>
-						)}
+						{!onboardingStage.active &&
+							isMounted &&
+							isApp &&
+							desktopUpdateState?.outdated &&
+							(desktopUpdateState.downloaded || (!desktopUpdateState.downloading && Boolean(desktopUpdateState.downloadUrl))) && (
+								<button
+									type="button"
+									onClick={() => window.dispatchEvent(new CustomEvent('xernerx:open-desktop-updater'))}
+									aria-label={
+										desktopUpdateState.downloaded
+											? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
+											: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
+									}
+									title={
+										desktopUpdateState.downloaded
+											? t('components.header.updateReady', { version: desktopUpdateState.latestVersion || '' })
+											: t('components.header.updateAvailable', { version: desktopUpdateState.latestVersion || '' })
+									}
+									className={`relative ${headerIconBtnClass} ${desktopUpdateState.downloaded ? 'text-(--accent-green)' : 'text-(--accent-orange)'}`}
+								>
+									{desktopUpdateState.checking ? (
+										<RefreshCw size={effectiveControls === 'windows' ? 20 : 16} className="animate-spin text-(--accent)" />
+									) : (
+										<Download size={effectiveControls === 'windows' ? 20 : 16} />
+									)}
+									<span
+										className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${
+											desktopUpdateState.downloaded ? 'bg-(--accent-green)' : 'bg-(--accent-orange)'
+										} border-2 border-(--background) animate-pulse`}
+									/>
+								</button>
+							)}
 
-						{preferences.showHeaderCommandPalette && (
+						{(preferences.showHeaderCommandPalette || isHeaderBuildMode) && isItemRevealed('search') && (
 							<button
 								type="button"
 								onClick={() => setSearchOpen(true)}
 								aria-label={t('components.header.commandPalette')}
 								title={t('components.header.commandPalette')}
-								className={
+								className={`${
 									effectiveControls === 'xernerx'
 										? 'flex items-center gap-2 h-8 px-3 rounded-full bg-(--foreground)/50 border border-(--border)/15 text-(--text-muted) hover:bg-(--accent)/20 hover:border-(--accent)/40 hover:text-(--text) transition-all cursor-pointer'
 										: effectiveControls === 'squircle'
@@ -434,7 +565,7 @@ export function Header() {
 													: effectiveControls === 'macos'
 														? 'flex items-center gap-2 h-8 px-3 rounded-xl bg-(--foreground)/25 hover:bg-(--foreground)/60 border border-(--border)/10 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
 														: 'flex items-center gap-2 px-2.5 py-1 rounded-full bg-(--foreground)/40 hover:bg-(--foreground) border border-(--border)/10 hover:border-(--accent)/40 text-(--text-muted) hover:text-(--text) transition-all cursor-pointer'
-								}
+								} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('search') ? activeRingClass : ''}`}
 							>
 								<Search size={15} className="text-(--accent)" />
 								{preferences.showShortcutHints && <kbd className="hidden md:inline-flex items-center text-[10px] font-mono font-bold text-(--text-muted)">Ctrl K</kbd>}
@@ -445,13 +576,21 @@ export function Header() {
 							.filter(
 								(sub) =>
 									(!sub.adminOnly || hasPermission(sub.requiredPermission || 'access')) &&
-									(Array.isArray(preferences.headerSubdomains) ? preferences.headerSubdomains : DEFAULT_HEADER_SUBDOMAINS).includes(sub.id)
+									(isHeaderBuildMode
+										? isItemRevealed(sub.id)
+										: (Array.isArray(preferences.headerSubdomains) ? preferences.headerSubdomains : DEFAULT_HEADER_SUBDOMAINS).includes(sub.id))
 							)
 							.map((sub) => {
 								const SubIcon = sub.icon;
 								const label = t(sub.label);
 								const resolvedHref = getEnvUrl(sub.href);
-								const isCurrent = isMounted && urlState.pre === sub.id;
+								const isCurrent =
+									isMounted &&
+									(sub.id === 'dashboard'
+										? urlState.pre === 'app' && Boolean(pathname?.startsWith('/dashboard'))
+										: sub.id === 'app'
+											? urlState.pre === 'app' && !pathname?.startsWith('/dashboard')
+											: urlState.pre === sub.id);
 								const openCompanionIfModified = (e: React.MouseEvent, isMiddle = false) => {
 									const bridge = typeof window !== 'undefined' ? (window as any).electron : undefined;
 									if (bridge?.openCompanionWindow && (isMiddle ? e.button === 1 : e.ctrlKey || e.metaKey || e.shiftKey)) {
@@ -468,7 +607,9 @@ export function Header() {
 										title={label}
 										onClick={(e) => openCompanionIfModified(e, false)}
 										onAuxClick={(e) => openCompanionIfModified(e, true)}
-										className={`${headerIconBtnClass} ${isCurrent ? 'text-(--accent)' : ''}`}
+										className={`${headerIconBtnClass} ${isCurrent ? 'text-(--accent)' : ''} animate-in fade-in zoom-in-75 duration-300 ${
+											isShortcutHighlighted(sub.id) ? activeRingClass : ''
+										}`}
 									>
 										<SubIcon size={effectiveControls === 'windows' ? 20 : 16} />
 										<span className="sr-only">{label}</span>
@@ -476,20 +617,26 @@ export function Header() {
 								);
 							})}
 
-						{state === 'hidden' && preferences.showHeaderAppDrawer && (
-							<button type="button" className={headerIconBtnClass} onClick={() => setNavOpen(true)} aria-label={t('components.header.title1')} title={t('components.header.title1')}>
+						{showControlsInHeader && (preferences.showHeaderAppDrawer || isHeaderBuildMode || isSidebarBeforeDockMove) && isItemRevealed('drawer') && (
+							<button
+								type="button"
+								className={`${headerIconBtnClass} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('drawer') ? activeRingClass : ''}`}
+								onClick={() => setNavOpen(true)}
+								aria-label={t('components.header.title1')}
+								title={t('components.header.title1')}
+							>
 								<LayoutGrid size={effectiveControls === 'windows' ? 20 : 16} />
 							</button>
 						)}
 
-						{isMounted && state === 'hidden' && activeUser && preferences.showHeaderNotifications && (
-							<div ref={notificationsRef} className="relative flex items-center">
+						{isMounted && showControlsInHeader && activeUser && (preferences.showHeaderNotifications || isHeaderBuildMode || isSidebarBeforeDockMove) && isItemRevealed('alerts') && (
+							<div ref={notificationsRef} className="relative flex items-center animate-in fade-in zoom-in-75 duration-300">
 								<button
 									type="button"
 									onClick={() => setNotificationsOpen((prev) => (!prev && setUserMenuOpen(false), !prev))}
 									aria-label={t('components.header.notifications')}
 									title={t('components.header.notifications')}
-									className={`relative ${headerIconBtnClass} ${notificationsOpen ? 'text-(--accent)' : ''}`}
+									className={`relative ${headerIconBtnClass} ${notificationsOpen ? 'text-(--accent)' : ''} ${isItemHighlighted('alerts') ? activeRingClass : ''}`}
 								>
 									<Bell size={effectiveControls === 'windows' ? 20 : 16} />
 									{hasUnread && (
@@ -502,12 +649,14 @@ export function Header() {
 							</div>
 						)}
 
-						{isMounted && state === 'hidden' && activeUser && (
-							<div ref={userMenuRef} className="relative flex items-center">
+						{isMounted && showControlsInHeader && activeUser && isItemRevealed('profile') && (
+							<div ref={userMenuRef} className="relative flex items-center animate-in fade-in zoom-in-75 duration-300">
 								<button
 									type="button"
 									onClick={() => setUserMenuOpen((prev) => (!prev && setNotificationsOpen(false), !prev))}
-									className="relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden"
+									className={`relative flex items-center justify-center rounded-full transition-transform hover:scale-105 cursor-pointer focus:outline-hidden ${
+										isItemHighlighted('profile') ? activeRingClass : ''
+									}`}
 									aria-label={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
 									title={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
 								>
@@ -555,22 +704,29 @@ export function Header() {
 						)}
 					</div>
 
-					<button
-						type="button"
-						aria-label={t('components.header.title1')}
-						title={t('components.header.title1')}
-						onClick={() => setOptionsOpen((prev) => (prev && (setNotificationsOpen(false), setUserMenuOpen(false)), !prev))}
-						className={`relative md:hidden ${headerIconBtnClass}`}
-					>
-						<ChevronLeft
-							size={effectiveControls === 'windows' ? 20 : 16}
-							strokeWidth={2.5}
-							className={`transition-transform duration-200 ${isRightAligned ? (optionsOpen ? 'text-(--accent)' : 'rotate-180') : optionsOpen ? 'rotate-180 text-(--accent)' : ''}`}
-						/>
-						{isMounted && !optionsOpen && state === 'hidden' && (hasUnread || isGiftReady) && (
-							<span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent) border-2 border-(--background)" />
-						)}
-					</button>
+					{(!isHeaderBuildMode || isItemRevealed('mobile-tray')) && (
+						<button
+							type="button"
+							disabled={onboardingStage.active}
+							aria-label={t('components.header.title1')}
+							title={t('components.header.title1')}
+							onClick={() => setOptionsOpen((prev) => (prev && (setNotificationsOpen(false), setUserMenuOpen(false)), !prev))}
+							className={`relative md:hidden ${headerIconBtnClass} ${isItemHighlighted('mobile-tray') ? activeRingClass : ''} ${
+								onboardingStage.active ? 'pointer-events-none select-none' : ''
+							}`}
+						>
+							<ChevronLeft
+								size={effectiveControls === 'windows' ? 20 : 16}
+								strokeWidth={2.5}
+								className={`transition-transform duration-200 ${
+									isRightAligned ? (effectiveOptionsOpen ? 'text-(--accent)' : 'rotate-180') : effectiveOptionsOpen ? 'rotate-180 text-(--accent)' : ''
+								}`}
+							/>
+							{isMounted && !effectiveOptionsOpen && state === 'hidden' && (hasUnread || isGiftReady) && (
+								<span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-(--accent) border-2 border-(--background)" />
+							)}
+						</button>
+					)}
 
 					{(isRightAligned || effectiveControls !== 'macos') && <HeaderWindowControls isApp={isApp} effectiveControls={effectiveControls} />}
 				</div>

@@ -20,7 +20,7 @@ interface DynamicFeaturedCardProps {
 		percentOff: number;
 		amountOff: number;
 	} | null;
-	getActiveSubscription: (priceId: string | null) => UserSubscription | null | undefined;
+	getActiveSubscription: (priceId: string | null, item?: CatalogItem) => UserSubscription | null | undefined;
 	handleSubscribe: (priceId: string | null, discountPercent: number) => void;
 	handleCancelClick: (subscriptionId: string) => void;
 }
@@ -29,7 +29,11 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 	const { t } = useDictionary();
 
 	const activePrice = item.prices.find((p) => p.interval === billingInterval) || item.prices[0];
-	const currentSub = getActiveSubscription(activePrice?.id || null);
+	const currentSub = getActiveSubscription(activePrice?.id || null, item);
+	const isStripeManagedSub = Boolean(currentSub?.stripeSubscriptionId && String(currentSub.stripeSubscriptionId).startsWith('sub_'));
+	const hasFinitePeriodEnd = Boolean(
+		currentSub?.currentPeriodEnd && !Number.isNaN(new Date(currentSub.currentPeriodEnd).getTime()) && new Date(currentSub.currentPeriodEnd).getTime() - Date.now() < 5 * 365 * 24 * 60 * 60 * 1000
+	);
 
 	const originalAmount = activePrice ? activePrice.unitAmount / 100 : null;
 	const baseDiscounted = activePrice?.discountedAmount ? activePrice.discountedAmount / 100 : originalAmount;
@@ -105,18 +109,27 @@ export function DynamicFeaturedCard({ item, billingInterval, userLoading, action
 				</div>
 			) : currentSub ? (
 				<div className="space-y-2">
-					<button
-						onClick={() => handleCancelClick(currentSub.stripeSubscriptionId)}
-						className="w-full py-3 px-4 rounded-xl font-medium bg-(--accent-red)/10 hover:bg-(--accent-red)/20 text-(--accent-red) border border-(--accent-red)/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-					>
-						<AlertCircle size={16} />
-						{t('account.store.buttons.cancelUltra')}
-					</button>
-					<p className="text-xs text-center text-(--text-muted)">
-						{t('account.store.buttons.activeUntil', {
-							date: new Date(currentSub.currentPeriodEnd).toLocaleDateString(),
-						})}
-					</p>
+					{isStripeManagedSub ? (
+						<button
+							onClick={() => handleCancelClick(currentSub.stripeSubscriptionId)}
+							className="w-full py-3 px-4 rounded-xl font-medium bg-(--accent-red)/10 hover:bg-(--accent-red)/20 text-(--accent-red) border border-(--accent-red)/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+						>
+							<AlertCircle size={16} />
+							{t('account.store.buttons.cancelUltra')}
+						</button>
+					) : (
+						<div className="w-full py-3 px-4 rounded-xl font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/30 flex items-center justify-center gap-2 cursor-default">
+							<Check size={16} />
+							<span>{t('account.store.buttons.currentPlan')}</span>
+						</div>
+					)}
+					{hasFinitePeriodEnd && (
+						<p className="text-xs text-center text-(--text-muted)">
+							{t('account.store.buttons.activeUntil', {
+								date: new Date(currentSub.currentPeriodEnd).toLocaleDateString(),
+							})}
+						</p>
+					)}
 				</div>
 			) : (
 				<button

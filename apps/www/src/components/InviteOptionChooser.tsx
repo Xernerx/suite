@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, Check, Copy, Layers, Link as LinkIcon, ShieldCheck, Sliders } from 'lucide-react';
 import type { InviteOptionKey, ResolvedInviteOption } from '@xernerx/lib';
 import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
@@ -50,24 +51,36 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 	return (
 		<div className="min-h-screen py-28 relative">
 			<div className="max-w-(--page-width) mx-auto w-full px-6 relative z-10 flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-				<div>
+				<motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}>
 					<Link
 						href="/invites"
-						className="inline-flex items-center gap-2 rounded-full bg-(--foreground)/30 hover:bg-(--foreground)/50 backdrop-blur-md border border-(--border)/10 px-4 py-2 text-xs font-bold text-(--text-muted) hover:text-(--text) transition-colors"
+						className="group inline-flex items-center gap-2 rounded-full bg-(--foreground)/30 hover:bg-(--foreground)/50 backdrop-blur-md border border-(--border)/10 px-4 py-2 text-xs font-bold text-(--text-muted) hover:text-(--text) transition-colors"
 					>
-						<ArrowLeft size={14} />
+						<ArrowLeft size={14} className="transition-transform group-hover:-translate-x-1" />
 						<span>{t('www.invites.backToInvites')}</span>
 					</Link>
-				</div>
+				</motion.div>
 
-				<div className="flex flex-col sm:flex-row sm:items-center gap-6 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-8 shadow-sm w-full">
-					{botAvatar ? (
-						<Image src={botAvatar} alt={botName} width={72} height={72} unoptimized className="w-18 h-18 rounded-3xl shadow-md shrink-0" />
-					) : (
-						<div className="w-18 h-18 rounded-3xl bg-(--accent)/15 border border-(--accent)/30 flex items-center justify-center text-(--accent) shrink-0">
-							<LinkIcon size={28} />
-						</div>
-					)}
+				<motion.div
+					initial={{ opacity: 0, y: 18, scale: 0.98 }}
+					animate={{ opacity: 1, y: 0, scale: 1 }}
+					transition={{ duration: 0.45, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
+					className="flex flex-col sm:flex-row sm:items-center gap-6 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 p-8 shadow-sm w-full"
+				>
+					<motion.div
+						initial={{ scale: 0.85, rotate: -4, opacity: 0 }}
+						animate={{ scale: 1, rotate: 0, opacity: 1 }}
+						transition={{ duration: 0.45, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+						className="shrink-0"
+					>
+						{botAvatar ? (
+							<Image src={botAvatar} alt={botName} width={72} height={72} unoptimized className="w-18 h-18 rounded-3xl shadow-md shrink-0" />
+						) : (
+							<div className="w-18 h-18 rounded-3xl bg-(--accent)/15 border border-(--accent)/30 flex items-center justify-center text-(--accent) shrink-0">
+								<LinkIcon size={28} />
+							</div>
+						)}
+					</motion.div>
 
 					<div className="flex flex-col gap-2 min-w-0 flex-1">
 						<div className="flex flex-wrap items-center gap-3">
@@ -78,10 +91,10 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 						</div>
 						<p className="text-sm sm:text-base text-(--text-muted) max-w-3xl leading-relaxed">{description || t('www.invites.chooserSubtitle')}</p>
 					</div>
-				</div>
+				</motion.div>
 
 				<div className={`grid ${gridColsClass} items-stretch w-full`} style={{ gap: 'var(--ui-gap)' }}>
-					{options.map((opt) => {
+					{options.map((opt, idx) => {
 						const Icon = OPTION_ICONS[opt.key];
 						const isPrimary = opt.key === 'essential' || options.length === 1;
 						const label = t(`www.invites.options.${opt.key}.label`);
@@ -94,9 +107,13 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 						const remainingCount = Math.max(0, previewLabels.length - visibleLabels.length);
 
 						return (
-							<div
+							<motion.div
 								key={opt.key}
-								className={`flex flex-col h-full rounded-3xl backdrop-blur-md p-7 border transition-all ${
+								initial={{ opacity: 0, y: 24, scale: 0.97 }}
+								animate={{ opacity: 1, y: 0, scale: 1 }}
+								whileHover={{ y: -6, scale: 1.012 }}
+								transition={{ duration: 0.45, delay: 0.12 + idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+								className={`group flex flex-col h-full rounded-3xl backdrop-blur-md p-7 border transition-colors ${
 									isPrimary
 										? 'bg-(--foreground)/40 border-(--accent)/40 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_18%,transparent)]'
 										: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30 shadow-sm'
@@ -104,7 +121,7 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 								style={{ gap: 'var(--ui-gap)' }}
 							>
 								<div className="flex items-start justify-between gap-3">
-									<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
+									<div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
 										<Icon size={22} />
 									</div>
 									<div className="flex items-center gap-1.5">
@@ -115,15 +132,41 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 										>
 											{badge}
 										</span>
-										<button
+										<motion.button
 											type="button"
+											whileHover={{ scale: 1.08 }}
+											whileTap={{ scale: 0.92 }}
 											onClick={() => copyOptionLink(opt.key)}
 											title={t('www.invites.options.copyTierUrl', { tier: label })}
 											aria-label={t('www.invites.options.copyTierUrl', { tier: label })}
 											className="p-2 rounded-full bg-(--background)/60 hover:bg-(--foreground) border border-(--border)/10 text-(--text-muted) hover:text-(--text) transition-colors cursor-pointer"
 										>
-											{copiedKey === opt.key ? <Check size={14} className="text-(--accent-green)" /> : <Copy size={14} />}
-										</button>
+											<AnimatePresence mode="wait" initial={false}>
+												{copiedKey === opt.key ? (
+													<motion.span
+														key="copied"
+														initial={{ scale: 0.5, opacity: 0, rotate: -20 }}
+														animate={{ scale: 1, opacity: 1, rotate: 0 }}
+														exit={{ scale: 0.5, opacity: 0, rotate: 20 }}
+														transition={{ duration: 0.16 }}
+														className="flex items-center justify-center"
+													>
+														<Check size={14} className="text-(--accent-green)" />
+													</motion.span>
+												) : (
+													<motion.span
+														key="copy"
+														initial={{ scale: 0.5, opacity: 0, rotate: 20 }}
+														animate={{ scale: 1, opacity: 1, rotate: 0 }}
+														exit={{ scale: 0.5, opacity: 0, rotate: -20 }}
+														transition={{ duration: 0.16 }}
+														className="flex items-center justify-center"
+													>
+														<Copy size={14} />
+													</motion.span>
+												)}
+											</AnimatePresence>
+										</motion.button>
 									</div>
 								</div>
 
@@ -161,15 +204,26 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 												</span>
 											) : (
 												<>
-													{visibleLabels.map((perm) => (
-														<span key={perm} className="rounded-full bg-(--foreground)/40 border border-(--border)/10 px-2.5 py-0.5 text-[11px] text-(--text-muted)">
+													{visibleLabels.map((perm, permIdx) => (
+														<motion.span
+															key={perm}
+															initial={{ opacity: 0, scale: 0.9 }}
+															animate={{ opacity: 1, scale: 1 }}
+															transition={{ duration: 0.25, delay: 0.2 + idx * 0.08 + permIdx * 0.02 }}
+															className="rounded-full bg-(--foreground)/40 border border-(--border)/10 px-2.5 py-0.5 text-[11px] text-(--text-muted)"
+														>
 															{perm}
-														</span>
+														</motion.span>
 													))}
 													{remainingCount > 0 && (
-														<span className="rounded-full bg-(--accent)/10 border border-(--accent)/25 px-2.5 py-0.5 text-[11px] font-semibold text-(--accent)">
+														<motion.span
+															initial={{ opacity: 0, scale: 0.9 }}
+															animate={{ opacity: 1, scale: 1 }}
+															transition={{ duration: 0.25, delay: 0.2 + idx * 0.08 + visibleLabels.length * 0.02 }}
+															className="rounded-full bg-(--accent)/10 border border-(--accent)/25 px-2.5 py-0.5 text-[11px] font-semibold text-(--accent)"
+														>
 															{t('www.invites.options.morePermissions', { count: remainingCount })}
-														</span>
+														</motion.span>
 													)}
 												</>
 											)}
@@ -177,13 +231,13 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 									</div>
 								</div>
 
-								<a href={opt.discordUrl} className="w-full mt-auto">
+								<a href={opt.discordUrl} target="_blank" rel="noopener noreferrer" className="w-full mt-auto">
 									<Button variant={isPrimary ? 'primary' : 'secondary'} className="w-full flex items-center justify-center gap-2">
 										<span>{cta}</span>
 										<ArrowUpRight size={16} />
 									</Button>
 								</a>
-							</div>
+							</motion.div>
 						);
 					})}
 				</div>

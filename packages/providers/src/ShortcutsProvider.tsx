@@ -105,6 +105,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 	const [isUrlPlacerOpen, setUrlPlacerOpen] = useState(false);
 	const [isSidebarVisible, setSidebarVisible] = useState(true);
 	const [isContentHidden, setContentHidden] = useState(false);
+	const [isOnboardingActive, setIsOnboardingActive] = useState(false);
 	const [shortcuts, setShortcuts] = useState<ShortcutItem[]>(defaultShortcuts);
 	const toggleSidebar = () => setSidebarVisible((prev) => !prev);
 	const toggleContentHidden = () => setContentHidden((prev) => !prev);
@@ -115,6 +116,18 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 		});
 	};
 	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const onOnboardingStage = (e: Event) => {
+			const detail = (e as CustomEvent<{ active?: boolean }>).detail;
+			if (detail && typeof detail.active === 'boolean') {
+				setIsOnboardingActive(detail.active);
+			}
+		};
+		window.addEventListener('xernerx:onboarding-stage', onOnboardingStage);
+		return () => window.removeEventListener('xernerx:onboarding-stage', onOnboardingStage);
+	}, []);
+	useEffect(() => {
+		if (isOnboardingActive) return;
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const target = e.target as HTMLElement;
 			const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
@@ -180,7 +193,7 @@ export function ShortcutsProvider({ children }: { children: React.ReactNode }) {
 			window.removeEventListener('keydown', handleKeyDown);
 			unsubQuickLaunch?.();
 		};
-	}, [getEnvUrl, toast, t, isSearchOpen, sidebar.state, sidebar.view]);
+	}, [getEnvUrl, toast, t, isSearchOpen, sidebar.state, sidebar.view, isOnboardingActive]);
 	const value = {
 		isHelpOpen,
 		setHelpOpen,
@@ -311,7 +324,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [] }: { isOpen: 
 							opacity: 0,
 						}}
 						onClick={onClose}
-						className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+						className="absolute inset-0 bg-(--background)/60 backdrop-blur-sm"
 					/>
 
 					<motion.div

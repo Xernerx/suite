@@ -36,7 +36,7 @@ export const navigation: NavigationItem[] = [
 ];
 
 export type HeaderSubdomainItem = {
-	id: 'app' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'blog' | 'api' | 'www' | 'admin' | 'hosting';
+	id: 'app' | 'dashboard' | 'portal' | 'store' | 'account' | 'info' | 'docs' | 'cdn' | 'haste' | 'blog' | 'api' | 'www' | 'admin' | 'hosting';
 	label: string;
 	host: string;
 	href: string;
@@ -47,6 +47,7 @@ export type HeaderSubdomainItem = {
 
 export const headerSubdomainsCatalog: HeaderSubdomainItem[] = [
 	{ id: 'app', label: 'lib.navigation.items.explore', host: 'app.xernerx.com', href: 'https://app.xernerx.com', icon: Compass },
+	{ id: 'dashboard', label: 'lib.navigation.items.dashboard', host: 'app.xernerx.com/dashboard', href: 'https://app.xernerx.com/dashboard', icon: LayoutDashboard },
 	{ id: 'portal', label: 'lib.navigation.items.portal', host: 'portal.xernerx.com', href: 'https://portal.xernerx.com', icon: Building2 },
 	{ id: 'store', label: 'lib.navigation.items.store', host: 'store.xernerx.com', href: 'https://store.xernerx.com', icon: Store },
 	{ id: 'account', label: 'lib.navigation.items.account', host: 'account.xernerx.com', href: 'https://account.xernerx.com', icon: UserCircle },

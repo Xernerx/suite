@@ -157,8 +157,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 			}).catch(() => null);
 
 			try {
-				const Dispatch = (await database('xernerx')).models.dispatch as any;
-				await Dispatch.create({
+				const Dispatch = ((await database('xernerx')).models.dispatch as any)?.Invite;
+				await Dispatch?.create({
 					id: crypto.randomUUID(),
 					targetId: body.targetId,
 					senderId: String(orgId),
@@ -268,7 +268,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
 		await Promise.all([
 			db.Role?.deleteMany({ ownerId: deletedOrgId }).catch(() => null),
 			db.Member?.deleteMany({ $or: [{ ownerId: deletedOrgId }, { organizationId: deletedOrgId }] }).catch(() => null),
-			(fullDb.models.dispatch as any)?.deleteMany({ senderId: deletedOrgId, type: 'organization_invite', status: 'pending' }).catch(() => null),
+			(fullDb.models.dispatch as any)?.Invite?.deleteMany({ senderId: deletedOrgId, type: 'organization_invite', status: 'pending' }).catch(() => null),
 			(fullDb.models.bots as any)?.Bot?.updateMany({ organization: deletedOrgId }, { $unset: { organization: 1 } }).catch(() => null),
 			(fullDb.models.guilds as any)?.Guild?.updateMany({ organization: deletedOrgId }, { $unset: { organization: 1 } }).catch(() => null),
 		]);

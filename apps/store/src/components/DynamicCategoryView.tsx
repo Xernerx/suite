@@ -15,6 +15,7 @@ interface DynamicCategoryViewProps {
 	billingInterval: 'month' | 'year';
 	userLoading: boolean;
 	actionLoading: string | null;
+	highlightedItemId?: string | null;
 	appliedCoupon?: {
 		code: string;
 		name: string;
@@ -22,7 +23,7 @@ interface DynamicCategoryViewProps {
 		percentOff: number;
 		amountOff: number;
 	} | null;
-	getActiveSubscription: (priceId: string | null) => UserSubscription | null | undefined;
+	getActiveSubscription: (priceId: string | null, item?: CatalogItem) => UserSubscription | null | undefined;
 	handleSubscribe: (priceId: string | null, discountPercent: number) => void;
 	handleCancelClick: (subscriptionId: string) => void;
 }
@@ -33,6 +34,7 @@ export function DynamicCategoryView({
 	billingInterval,
 	userLoading,
 	actionLoading,
+	highlightedItemId,
 	appliedCoupon,
 	getActiveSubscription,
 	handleSubscribe,
@@ -45,6 +47,10 @@ export function DynamicCategoryView({
 
 	// Determine if we should show the free tier card (e.g. for consumers)
 	const showFreeCard = category.id === 'consumers';
+	const hasActiveCategoryPlan = items.some((i) => {
+		const activePrice = i.prices.find((p) => p.interval === billingInterval) || i.prices[0];
+		return Boolean(i.discordSku?.hasEntitlement || getActiveSubscription(activePrice?.id || null, i));
+	});
 
 	return (
 		<div className="w-full flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 2)' }}>
@@ -92,7 +98,8 @@ export function DynamicCategoryView({
 								disabled
 								className="w-full py-3 px-4 rounded-xl font-medium bg-(--background) text-(--text) border border-(--border)/10 flex items-center justify-center gap-2 cursor-default shadow-xs"
 							>
-								<Check size={16} className="text-(--accent-green)" /> {t('account.store.buttons.currentPlan')}
+								<Check size={16} className={hasActiveCategoryPlan ? 'text-(--text-muted)' : 'text-(--accent-green)'} />{' '}
+								{hasActiveCategoryPlan ? t('account.store.buttons.includedInPlan') : t('account.store.buttons.currentPlan')}
 							</button>
 						</motion.div>
 					)}
@@ -124,13 +131,24 @@ export function DynamicCategoryView({
 						{category.description && <p className="text-xs text-(--text-muted) hidden md:block">{category.description}</p>}
 					</div>
 
-					<div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
+					<div
+						className={
+							standardItems.length === 1
+								? 'grid grid-cols-1 w-full'
+								: standardItems.length === 2
+									? 'grid grid-cols-1 md:grid-cols-2 w-full'
+									: 'grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 w-full'
+						}
+						style={{ gap: 'var(--ui-gap)' }}
+					>
 						{standardItems.map((item) => (
 							<DynamicItemCard
 								key={item.id}
 								item={item}
 								billingInterval={billingInterval}
 								actionLoading={actionLoading}
+								isHighlighted={highlightedItemId === item.id}
+								isWideShowcase={standardItems.length === 1}
 								appliedCoupon={appliedCoupon}
 								getActiveSubscription={getActiveSubscription}
 								handleSubscribe={handleSubscribe}

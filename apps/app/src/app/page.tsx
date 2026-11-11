@@ -22,6 +22,7 @@ export default function Home() {
 	// Redirect on initial cold app start if running within the desktop application wrapper and startupLocation is not 'explore'
 	useEffect(() => {
 		if (type !== 'application' || !isReady) return;
+		if (typeof window !== 'undefined' && window.location.search.includes('xrx_tour')) return;
 		if (sessionStorage.getItem('hasRedirectedToDashboard')) return;
 		sessionStorage.setItem('hasRedirectedToDashboard', 'true');
 
@@ -232,7 +233,10 @@ export default function Home() {
 	return (
 		<div className="flex flex-col w-full h-full relative">
 			{/* Hero Section */}
-			<section className="flex flex-col items-center justify-center text-center mt-16 mb-8 relative z-10 w-full px-4 transition-all duration-500">
+			<section
+				data-tour="explore-hero"
+				className="flex flex-col items-center justify-center text-center mt-16 mb-8 py-4 rounded-3xl relative z-10 w-full max-w-(--page-width) mx-auto px-4 transition-all duration-500"
+			>
 				<h1 className="text-6xl md:text-8xl font-extrabold tracking-tight mb-6 drop-shadow-sm transition-all duration-500" style={{ fontFamily: 'var(--font-fredoka)' }}>
 					{t('app.home.text3')}
 					<br />
@@ -248,6 +252,7 @@ export default function Home() {
 				className={`sticky top-4 z-50 flex flex-col md:flex-row items-center justify-center mb-12 w-full px-4 max-w-(--page-width) mx-auto transition-all duration-500 ${isScrolled ? 'top-8' : ''}`}
 			>
 				<div
+					data-tour="explore-bar"
 					className={`w-full p-2 rounded-2xl border transition-all duration-500 flex flex-col md:flex-row items-center gap-2 ${
 						isScrolled ? 'bg-(--background)/80 border-(--border)/20 backdrop-blur-xl shadow-2xl scale-[1.02]' : 'bg-(--foreground)/40 border-(--border)/10 backdrop-blur-md shadow-lg'
 					}`}
@@ -281,7 +286,10 @@ export default function Home() {
 					<ExploreSearchBar context={context} />
 
 					{/* Context Switcher */}
-					<div className="flex items-center p-1 bg-(--background) rounded-xl border border-(--border)/10 h-12 w-full md:w-auto shrink-0 shadow-inner">
+					<div
+						data-tour="explore-switcher"
+						className="flex items-center p-1 bg-(--background) rounded-xl border border-(--border)/10 h-12 w-full md:w-auto shrink-0 shadow-inner transition-all duration-300"
+					>
 						<button
 							onClick={() => setContext('bots')}
 							className={`flex-1 md:flex-none px-6 h-full rounded-lg text-sm font-bold transition-all ${
@@ -303,7 +311,7 @@ export default function Home() {
 			</section>
 
 			{/* Grid Section */}
-			<section className="flex flex-col w-full max-w-(--page-width) mx-auto mb-24 relative z-10">
+			<section data-tour="explore-grid" className="flex flex-col w-full max-w-(--page-width) mx-auto mb-24 rounded-3xl p-2 relative z-10 transition-all duration-300">
 				{loading ? (
 					<div className="flex items-center justify-center py-20">
 						<Loading />

@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { Check, Copy, Layers, Shield, ShieldCheck, Sliders } from 'lucide-react';
-import { useDictionary, useToast } from '@xernerx/providers';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button, Input, Modal, MultiSelector, Selector, Tabs, Toggle } from '@xernerx/ui';
 import { countPermissionFlags, InvitePermissionsEditor } from './InvitePermissionsEditor';
 
@@ -77,6 +77,7 @@ export default function InviteModal({
 	onSave,
 }: InviteModalProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
 	const [activePermTab, setActivePermTab] = useState<'essential' | 'optional'>('essential');
@@ -102,7 +103,7 @@ export default function InviteModal({
 
 	const matchedBot = useMemo(() => availableBots.find((b) => String(b.id) === newClientId), [availableBots, newClientId]);
 	const resolvedRedirectSlug = matchedBot?.vanitySlug || newId.trim() || newClientId.trim() || 'slug';
-	const resolvedRedirectUri = `https://app.xernerx.com/bots/${resolvedRedirectSlug}`;
+	const resolvedRedirectUri = getEnvUrl(`https://app.xernerx.com/bots/${resolvedRedirectSlug}`);
 	const encodedRedirectParams = `&response_type=code&redirect_uri=${encodeURIComponent(resolvedRedirectUri)}`;
 
 	const effectiveOptionalPermissions = essentialEnabled ? essentialPermissions | optionalPermissions : optionalPermissions;
@@ -147,7 +148,7 @@ export default function InviteModal({
 			onOpenChange={onOpenChange}
 			title={editId ? t('admin.dashboard.invites.editModalTitle') : t('admin.dashboard.invites.createModalTitle')}
 			description={t('admin.dashboard.invites.modalDesc')}
-			maxWidth="max-w-4xl"
+			maxWidth="max-w-(--page-width)"
 		>
 			<form onSubmit={onSave} className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

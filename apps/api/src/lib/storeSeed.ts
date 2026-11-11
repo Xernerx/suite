@@ -995,17 +995,19 @@ export async function ensureStoreSeed() {
 			},
 			{
 				id: 'bot-virtue',
-				name: 'Virtue Pass',
-				description: 'Official Discord App Subscription for Virtue — unlocks custom Difficulty Modes, Booster XP Multipliers, and automated Reset Cycles on any server you own.',
+				name: 'Virtue — Premium User Pass',
+				description: 'Official Discord App Subscription for Virtue — unlock +50% XP across all sources plus custom Level Modes, Boost Multipliers, and Seasonal Wipes on any server you own.',
 				categoryId: 'consumers',
-				skuId: 'discord_virtue',
+				skuId: '1568740534753693860',
 				itemType: 'subscription',
 				isFeatured: false,
+				badge: 'Official Discord Pass',
 				discountPercent: 0,
 				features: [
-					'Unlocks Difficulty Modes (Easy, Medium, Hard) on servers you own',
-					'Server Booster XP Multipliers (up to 3x bonus)',
-					'Automated Weekly, Monthly & Yearly XP Reset Cycles',
+					'Increased XP — Get 50% more XP from all sources',
+					'Level Modes — Set up custom server XP curves on servers you own',
+					'Boost Multipliers — Configure faster level progression for Server Boosters',
+					'Seasonal Wipes — Run automated seasonal level & XP resets on servers you own',
 					'125% Credit Multiplier on earned Xernerx credits',
 				],
 				order: 1,
@@ -1094,20 +1096,29 @@ export async function ensureStoreSeed() {
 
 	// Migrate legacy Stripe bot SKUs to Discord SKUs (Virtue active; Zodiac/To-Do/Metamorphosis disabled until Discord SKUs are created)
 	await Item.updateOne(
-		{ id: 'bot-virtue', skuId: 'prod_V0pRf7S9w9Pjb9' },
+		{ id: 'bot-virtue' },
 		{
 			$set: {
-				skuId: 'discord_virtue',
-				description: 'Official Discord App Subscription for Virtue — unlocks custom Difficulty Modes, Booster XP Multipliers, and automated Reset Cycles on any server you own.',
+				id: 'bot-virtue',
+				name: 'Virtue — Premium User Pass',
+				categoryId: 'consumers',
+				skuId: '1568740534753693860',
+				badge: 'Official Discord Pass',
+				description: 'Official Discord App Subscription for Virtue — unlock +50% XP across all sources plus custom Level Modes, Boost Multipliers, and Seasonal Wipes on any server you own.',
 				features: [
-					'Unlocks Difficulty Modes (Easy, Medium, Hard) on servers you own',
-					'Server Booster XP Multipliers (up to 3x bonus)',
-					'Automated Weekly, Monthly & Yearly XP Reset Cycles',
+					'Increased XP — Get 50% more XP from all sources',
+					'Level Modes — Set up custom server XP curves on servers you own',
+					'Boost Multipliers — Configure faster level progression for Server Boosters',
+					'Seasonal Wipes — Run automated seasonal level & XP resets on servers you own',
 					'125% Credit Multiplier on earned Xernerx credits',
 				],
+				discountPercent: 0,
+				isFeatured: false,
+				order: 2,
 				enabled: true,
 			},
-		}
+		},
+		{ upsert: true }
 	).catch(() => null);
 
 	await Item.updateMany(

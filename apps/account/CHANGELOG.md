@@ -2,6 +2,31 @@
 
 # auth
 
+## 2.15.0
+
+### Minor Changes
+
+- ## Active Ultra Pass Billing Status & Guided Tour Replay Controls
+  
+  Updated Account Billing to recognize server-assigned Ultra passes and added quick-launch controls in Preferences to replay platform onboarding and page tours.
+  
+  ### Added
+  
+  - **Onboarding & Page Tour Replay Controls**: Added options in Account Preferences to replay the First-Sign-In Welcome Tour or reset contextual page spotlight tours across the suite.
+  
+  ### Changed
+  
+  - **Active Ultra Pass Billing Display**: Updated the Billing overview so accounts with a server-assigned Ultra pass accurately reflect their active Ultra Ecosystem membership and unlocked perks.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.17.0
+  - @xernerx/feedback@0.6.0
+  - @xernerx/lib@1.25.0
+  - @xernerx/providers@0.23.0
+  - @xernerx/ui@0.8.9
+
 ## 2.14.5
 
 ### Patch Changes

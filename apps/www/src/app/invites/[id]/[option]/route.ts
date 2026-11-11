@@ -26,12 +26,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			return NextResponse.redirect(new URL(`/invites/${encodeURIComponent(id)}`, req.url));
 		}
 
+		const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').toLowerCase();
+		const appBaseUrl =
+			host.includes('.dev.xernerx.com') || host.startsWith('localhost:')
+				? 'https://app.dev.xernerx.com'
+				: host.includes('.canary.xernerx.com')
+					? 'https://app.canary.xernerx.com'
+					: 'https://app.xernerx.com';
+
 		const discordUrl = buildDiscordBotAuthorizeUrl({
 			clientId: invite.clientId,
 			permissions: matched.permissions,
 			scopes: invite.scopes,
 			redirect: Boolean(invite.redirect),
 			targetSlug,
+			appBaseUrl,
 		});
 
 		return NextResponse.redirect(discordUrl);

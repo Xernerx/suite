@@ -89,7 +89,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 		const resolvedSubscriptions = Array.isArray(subscriptions) ? [...subscriptions] : [];
 		const hasStaffSubRecord = resolvedSubscriptions.some((s: any) => s.stripeSubscriptionId === 'staff_infinite_sub');
 		const isStaffSubActive = Boolean((user as any).staffSubscription || hasStaffSubRecord);
-		if (isStaffSubActive && !resolvedSubscriptions.some((s: any) => s.status === 'active' || s.status === 'trialing')) {
+		if (isStaffSubActive && !hasStaffSubRecord) {
 			resolvedSubscriptions.push({
 				ownerId: resolvedId,
 				stripeSubscriptionId: 'staff_infinite_sub',
@@ -139,6 +139,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 const SIGN_IN_BONUS_AMOUNT = 1000;
+const BOT_INVITE_BONUS_AMOUNT = 100;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -288,7 +289,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 						$set: { signInBonusClaimed: true },
 						$push: { transactions: { $each: [bonusTx], $position: 0 } },
 					},
-					{ returnDocument: 'after', runValidators: true }
+					{ returnDocument: 'after', runValidators: true, strict: false }
 				).lean();
 				bonusGranted = true;
 			}
@@ -387,6 +388,45 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			return NextResponse.json({ success: true });
 		}
 
+		if (userBody.action === 'unverify') {
+			const prevOnboarding = (existingDoc as any)?.onboarding || {};
+			const resetOnboarding = {
+				persona: prevOnboarding.persona || 'user',
+				suiteIntroCompleted: false,
+				dashboardTourCompleted: false,
+				supportPromptCompleted: false,
+				tourPostponed: false,
+				tourPostponedPhase: null,
+				completedAt: null,
+				onboardedBots: Array.isArray(prevOnboarding.onboardedBots) ? prevOnboarding.onboardedBots : [],
+			};
+			const updated = await models.users.User.findOneAndUpdate(
+				{ id: resolvedId },
+				{
+					$set: {
+						verified: false,
+						agreedTerms: null,
+						agreedPrivacy: null,
+						onboarding: resetOnboarding,
+					},
+				},
+				{ returnDocument: 'after', runValidators: true, strict: false }
+			).lean();
+			await recordAuditLog(req, {
+				action: 'user.unverify',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Unverified user "${existingDoc?.name || resolvedId}" and reset ToS & Privacy Policy dates`,
+			});
+			return NextResponse.json({
+				...updated,
+				verified: false,
+				agreedTerms: null,
+				agreedPrivacy: null,
+				onboarding: resetOnboarding,
+			});
+		}
+
 		if (userBody.action === 'revoke_sessions') {
 			const now = new Date();
 			const updated = await models.users.User.findOneAndUpdate(
@@ -427,10 +467,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				}
 			} catch {}
 
+			const DispatchInvite = (models.dispatch as any)?.Invite;
 			await Promise.all([
 				models.users.Appearance.deleteMany({ ownerId: resolvedId }).catch(() => null),
 				models.users.Credit.deleteMany({ ownerId: resolvedId }).catch(() => null),
 				models.users.Level.deleteMany({ ownerId: resolvedId }).catch(() => null),
+				DispatchInvite?.deleteMany({ targetId: resolvedId }).catch(() => null),
+				DispatchInvite?.updateMany({ targetId: 'global', $or: [{ readBy: resolvedId }, { deletedBy: resolvedId }] }, { $pull: { readBy: resolvedId, deletedBy: resolvedId } }).catch(
+					() => null
+				),
 			]);
 
 			if (wasBlacklisted || wasServicesOptOut) {
@@ -519,6 +564,103 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			return NextResponse.json({ success: true });
 		}
 
+		if (userBody.action === 'clear_notifications') {
+			const DispatchInvite = (models.dispatch as any)?.Invite;
+			const [deleteRes, globalRes] = await Promise.all([
+				DispatchInvite
+					? DispatchInvite.deleteMany({
+							targetId: resolvedId,
+							category: { $ne: 'application' },
+							$nor: [{ category: 'invite', status: 'pending' }],
+						}).catch(() => null)
+					: Promise.resolve(null),
+				DispatchInvite ? DispatchInvite.updateMany({ targetId: 'global', deletedBy: { $ne: resolvedId } }, { $addToSet: { deletedBy: resolvedId } }).catch(() => null) : Promise.resolve(null),
+				models.users.User.updateOne(
+					{ id: resolvedId },
+					{
+						$set: {
+							'notifications.dailyGiftReminderAt': null,
+							'notifications.voteReminders': [],
+						},
+					}
+				).catch(() => null),
+			]);
+			await recordAuditLog(req, {
+				action: 'user.notifications.clear',
+				targetType: 'user',
+				targetId: resolvedId,
+				summary: `Cleared all notifications for user "${existingDoc?.name || resolvedId}"`,
+				metadata: {
+					deletedCount: deleteRes?.deletedCount ?? 0,
+					dismissedGlobalsCount: globalRes?.modifiedCount ?? 0,
+				},
+			});
+			return NextResponse.json({
+				success: true,
+				deletedCount: deleteRes?.deletedCount ?? 0,
+				dismissedGlobalsCount: globalRes?.modifiedCount ?? 0,
+			});
+		}
+
+		if (userBody.action === 'claim_bot_invite_bonus') {
+			const rawBotId = String(userBody.botId || '')
+				.trim()
+				.toLowerCase();
+			const rawGuildId =
+				String(userBody.guildId || 'initial')
+					.trim()
+					.toLowerCase() || 'initial';
+			const botName = String(userBody.botName || rawBotId || 'Bot').trim();
+			if (!rawBotId) {
+				return NextResponse.json({ error: 'botId is required.' }, { status: 400 });
+			}
+
+			const itemId = `bot_invite:${rawBotId}:${rawGuildId}`;
+			const existingCredit = (await models.users.Credit.findOne({ ownerId: resolvedId }).lean()) as any;
+			const alreadyRewarded = Array.isArray(existingCredit?.transactions) && existingCredit.transactions.some((tx: any) => tx?.itemId === itemId);
+
+			let bonusGranted = false;
+			let updatedCredit = existingCredit;
+
+			if (!alreadyRewarded) {
+				const inviteTx = {
+					id: crypto.randomUUID(),
+					type: 'earn',
+					amount: BOT_INVITE_BONUS_AMOUNT,
+					multiplierPercent: 100,
+					itemId,
+					itemName: `Bot Invite Bonus (${botName})`,
+					createdAt: new Date(),
+				};
+
+				if (!existingCredit) {
+					const created = await models.users.Credit.create({
+						ownerId: resolvedId,
+						balance: BOT_INVITE_BONUS_AMOUNT,
+						transactions: [inviteTx],
+					});
+					updatedCredit = created?.toObject ? created.toObject() : created;
+				} else {
+					updatedCredit = await models.users.Credit.findOneAndUpdate(
+						{ ownerId: resolvedId },
+						{
+							$inc: { balance: BOT_INVITE_BONUS_AMOUNT },
+							$push: { transactions: { $each: [inviteTx], $position: 0 } },
+						},
+						{ returnDocument: 'after', runValidators: true, strict: false }
+					).lean();
+				}
+				bonusGranted = true;
+			}
+
+			return NextResponse.json({
+				success: true,
+				bonusGranted,
+				bonusAmount: BOT_INVITE_BONUS_AMOUNT,
+				balance: Number(updatedCredit?.balance) || 0,
+			});
+		}
+
 		if (userBody.agreedTerms && userBody.agreedPrivacy) {
 			userBody.verified = true;
 		} else if (userBody.verified === true) {
@@ -528,6 +670,32 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		} else if (userBody.verified === false) {
 			userBody.agreedTerms = null;
 			userBody.agreedPrivacy = null;
+		}
+
+		if (userBody.onboarding && typeof userBody.onboarding === 'object') {
+			const prevOnboarding = (existingDoc as any)?.onboarding || {};
+			const prevBots = Array.isArray(prevOnboarding.onboardedBots) ? prevOnboarding.onboardedBots.map(String) : [];
+			const incomingBots = Array.isArray(userBody.onboarding.onboardedBots) ? userBody.onboarding.onboardedBots.map(String) : [];
+			const mergedBots = Array.from(new Set([...prevBots, ...incomingBots].filter(Boolean)));
+			const validPersonas = ['user', 'developer', 'both'];
+			const validTourPhases = ['header', 'sidebar', 'dashboard', 'portal', 'explore', 'ready'];
+			const nextTourPostponed = typeof userBody.onboarding.tourPostponed === 'boolean' ? userBody.onboarding.tourPostponed : Boolean(prevOnboarding.tourPostponed);
+			const rawPostponedPhase = userBody.onboarding.tourPostponedPhase !== undefined ? userBody.onboarding.tourPostponedPhase : prevOnboarding.tourPostponedPhase;
+			userBody.onboarding = {
+				persona: validPersonas.includes(userBody.onboarding.persona) ? userBody.onboarding.persona : validPersonas.includes(prevOnboarding.persona) ? prevOnboarding.persona : 'user',
+				suiteIntroCompleted: Boolean(userBody.onboarding.suiteIntroCompleted ?? prevOnboarding.suiteIntroCompleted),
+				dashboardTourCompleted: Boolean(userBody.onboarding.dashboardTourCompleted ?? prevOnboarding.dashboardTourCompleted),
+				supportPromptCompleted: Boolean(userBody.onboarding.supportPromptCompleted ?? prevOnboarding.supportPromptCompleted),
+				tourPostponed: nextTourPostponed,
+				tourPostponedPhase: nextTourPostponed && validTourPhases.includes(rawPostponedPhase) ? rawPostponedPhase : null,
+				completedAt:
+					nextTourPostponed || userBody.onboarding.completedAt === null
+						? null
+						: userBody.onboarding.completedAt
+							? new Date(userBody.onboarding.completedAt)
+							: prevOnboarding.completedAt || null,
+				onboardedBots: mergedBots,
+			};
 		}
 
 		if (userBody.action === 'unlock_vanity') {
@@ -594,7 +762,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 		// findOneAndUpdate with { returnDocument: 'after' } returns the updated document rather than the old one
 		const updatedUser =
-			Object.keys(mongoUpdate).length > 0 ? await models.users.User.findOneAndUpdate({ id: resolvedId }, mongoUpdate, { returnDocument: 'after', runValidators: true }).lean() : existingDoc;
+			Object.keys(mongoUpdate).length > 0
+				? await models.users.User.findOneAndUpdate({ id: resolvedId }, mongoUpdate, { returnDocument: 'after', runValidators: true, strict: false }).lean()
+				: existingDoc;
 
 		if (typeof userBody.staffSubscription === 'boolean' && models.users.Subscription) {
 			if (userBody.staffSubscription) {
@@ -1015,10 +1185,15 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 		let wasBlacklisted = Boolean((deletedUser as any).blacklisted);
 		let wasServicesOptOut = (deletedUser as any).services === false;
 
-		await models.users.Appearance.findOneAndDelete({ ownerId: resolvedId });
-		await models.users.Credit.findOneAndDelete({ ownerId: resolvedId });
-		await models.users.Level.deleteMany({ ownerId: resolvedId });
-		await models.users.Subscription.deleteMany({ ownerId: resolvedId });
+		const DispatchInvite = (models.dispatch as any)?.Invite;
+		await Promise.all([
+			models.users.Appearance.findOneAndDelete({ ownerId: resolvedId }),
+			models.users.Credit.findOneAndDelete({ ownerId: resolvedId }),
+			models.users.Level.deleteMany({ ownerId: resolvedId }),
+			models.users.Subscription.deleteMany({ ownerId: resolvedId }),
+			DispatchInvite?.deleteMany({ targetId: resolvedId }).catch(() => null),
+			DispatchInvite?.updateMany({ targetId: 'global', $or: [{ readBy: resolvedId }, { deletedBy: resolvedId }] }, { $pull: { readBy: resolvedId, deletedBy: resolvedId } }).catch(() => null),
+		]);
 
 		try {
 			const virtueDb = await database('virtue');

@@ -117,7 +117,11 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 	}
 
 	if (stats.length === 0) {
-		return <EmptyState title={t('app.bots.id.text8')} />;
+		return (
+			<div data-bot-tour="stats" className="rounded-3xl transition-all duration-300">
+				<EmptyState title={t('app.bots.id.text8')} />
+			</div>
+		);
 	}
 
 	const currentStats = stats[stats.length - 1];
@@ -260,7 +264,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 			: [];
 
 	return (
-		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+		<div data-bot-tour="stats" className="flex flex-col rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
 			<MetricsChart
 				metrics={metrics}
 				activeMetric={activeMetric}

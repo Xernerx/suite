@@ -91,9 +91,9 @@ export function beginDotRearrangeMorph(params: {
 		buf.fromY[idx] = src.y;
 		buf.toX[idx] = d.homeX;
 		buf.toY[idx] = d.homeY;
-		buf.fromCov[idx] = Math.max(src.cov, d.targetCoverage * 0.9);
-		buf.arc[idx] = (k % 2 === 0 ? 1 : -1) * (16 + (k % 7) * 4.5);
-		buf.delay[idx] = (k / nextLit.length) * 0.28;
+		buf.fromCov[idx] = Math.max(src.cov, d.targetCoverage * 0.92);
+		buf.arc[idx] = (k % 2 === 0 ? 1 : -1) * (24 + (k % 9) * 6.5);
+		buf.delay[idx] = (k / nextLit.length) * 0.26;
 		d.coverage = buf.fromCov[idx];
 		d.x = src.x;
 		d.y = src.y;
@@ -102,7 +102,7 @@ export function beginDotRearrangeMorph(params: {
 	}
 
 	let mergeCount = 0;
-	const maxMerging = Math.min(prevLit.length, Math.max(nextLit.length, 220));
+	const maxMerging = Math.min(prevLit.length, Math.max(nextLit.length, 320));
 	const stride = Math.max(1, Math.floor(prevLit.length / maxMerging));
 	for (let m = 0; m < prevLit.length; m += stride) {
 		const p = prevLit[m];
@@ -115,8 +115,8 @@ export function beginDotRearrangeMorph(params: {
 		buf.toX[p.idx] = dest.homeX;
 		buf.toY[p.idx] = dest.homeY;
 		buf.fromCov[p.idx] = p.cov;
-		buf.arc[p.idx] = (mergeCount % 2 === 0 ? -1 : 1) * (14 + (mergeCount % 6) * 4);
-		buf.delay[p.idx] = (mergeCount % 12) * 0.022;
+		buf.arc[p.idx] = (mergeCount % 2 === 0 ? -1 : 1) * (20 + (mergeCount % 8) * 5.5);
+		buf.delay[p.idx] = (mergeCount % 14) * 0.02;
 		mergeCount++;
 	}
 

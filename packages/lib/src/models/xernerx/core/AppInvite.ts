@@ -17,7 +17,7 @@ const schema = new Schema(
 		name: { type: String, required: true },
 		permissions: { type: String, required: true },
 		scopes: { type: Array, default: ['bot', 'applications.commands'] },
-		redirect: { type: Boolean, default: false },
+		redirect: { type: Boolean, default: true },
 		options: {
 			essential: {
 				enabled: { type: Boolean, default: true },

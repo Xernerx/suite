@@ -4,7 +4,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Bell, Building2, Check, Columns2, EyeOff, Gift, Layers, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
+import { Activity, Bell, Building2, Check, Columns2, EyeOff, Gift, Layers, LayoutDashboard, Minus, MousePointerClick, Radio, RefreshCw, Search, Sparkles, Square, Store, X } from 'lucide-react';
 import { useDictionary } from '@xernerx/providers';
 
 const PREVIEW_CRESTS = [
@@ -94,6 +94,9 @@ export function DesktopInteractivePreview() {
 							<Search size={10} className="text-(--accent)" />
 							Ctrl K / .
 						</button>
+						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
+							<LayoutDashboard size={11} />
+						</span>
 						<span className="hidden sm:inline-flex h-6 w-6 items-center justify-center rounded-xl bg-(--foreground)/35 border border-(--border)/10 text-(--text-muted)">
 							<Building2 size={11} />
 						</span>

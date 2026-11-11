@@ -85,6 +85,26 @@ export default function SidebarUserCard({
 	const [claiming, setClaiming] = useState(false);
 	const [togglingReminder, setTogglingReminder] = useState(false);
 	const [timeLeft, setTimeLeft] = useState<string>('');
+	const [localTourPostponed, setLocalTourPostponed] = useState(false);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		try {
+			setLocalTourPostponed(Boolean(localStorage.getItem('xernerx_tour_postponed')));
+		} catch {}
+		const onTourPostponedChange = (e: Event) => {
+			const detail = (e as CustomEvent<{ postponed?: boolean }>)?.detail;
+			if (detail && typeof detail.postponed === 'boolean') {
+				setLocalTourPostponed(detail.postponed);
+			} else {
+				try {
+					setLocalTourPostponed(Boolean(localStorage.getItem('xernerx_tour_postponed')));
+				} catch {}
+			}
+		};
+		window.addEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
+		return () => window.removeEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
+	}, []);
 
 	const isApplication = type === 'application';
 
@@ -498,6 +518,20 @@ export default function SidebarUserCard({
 						</div>
 					)}
 				</div>
+
+				{Boolean(localTourPostponed || activeUser?.onboarding?.tourPostponed || (activeUser?.agreedTerms && activeUser?.agreedPrivacy && !activeUser?.onboarding?.completedAt)) && (
+					<button
+						type="button"
+						onClick={() => {
+							onClose?.();
+							window.dispatchEvent(new CustomEvent('xernerx:open-suite-tutorial', { detail: { resume: true } }));
+						}}
+						className="w-full flex items-center justify-center gap-2 bg-(--accent)/15 hover:bg-(--accent) text-(--accent) hover:text-white border border-(--accent)/35 text-xs font-extrabold py-2.5 px-3 rounded-xl transition-all cursor-pointer"
+					>
+						<Sparkles size={14} className="shrink-0" />
+						<span>{t('components.header.continueTour')}</span>
+					</button>
+				)}
 
 				{isApplication && <SidebarUserDesktopSection onClose={onClose} />}
 			</div>

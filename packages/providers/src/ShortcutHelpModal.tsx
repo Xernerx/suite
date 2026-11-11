@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, Command, FileText, X } from 'lucide-react';
+import { ChevronDown, Command, FileText, Sparkles, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useDictionary } from './DictionaryProvider';
 import { useEnvironment } from './EnvironmentProvider';
@@ -85,7 +85,7 @@ function ChangelogModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
 		<AnimatePresence>
 			{isOpen && (
 				<div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-(--background)/60 backdrop-blur-sm" />
 
 					<motion.div
 						initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -213,7 +213,7 @@ export function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onC
 			<AnimatePresence>
 				{isOpen && (
 					<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-(--background)/60 backdrop-blur-sm" />
 
 						<motion.div
 							initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -243,14 +243,29 @@ export function HelpModal({ isOpen, onClose, shortcuts }: { isOpen: boolean; onC
 									</div>
 								</div>
 
-								<button
-									type="button"
-									onClick={onClose}
-									aria-label={t('common.close')}
-									className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition"
-								>
-									<X size={18} />
-								</button>
+								<div className="flex items-center gap-2">
+									<button
+										type="button"
+										onClick={() => {
+											onClose();
+											if (typeof window !== 'undefined') {
+												window.dispatchEvent(new CustomEvent('xernerx:open-suite-tutorial'));
+											}
+										}}
+										className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/30 hover:bg-(--accent)/25 transition cursor-pointer"
+									>
+										<Sparkles size={13} />
+										<span>{t('components.firstSignIn.buttons.replayTour')}</span>
+									</button>
+									<button
+										type="button"
+										onClick={onClose}
+										aria-label={t('common.close')}
+										className="rounded-lg p-2 text-(--text-muted) hover:bg-(--background) hover:text-(--text) transition"
+									>
+										<X size={18} />
+									</button>
+								</div>
 							</div>
 
 							<div

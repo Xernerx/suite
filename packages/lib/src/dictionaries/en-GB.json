@@ -195,7 +195,9 @@
 						"toggleOmnibar": "Toggle URL Omnibar",
 						"copyUrl": "Copy Current Suite URL",
 						"openShortcuts": "View Keyboard Shortcuts",
-						"openAccount": "Open Account Settings"
+						"openAccount": "Open Account Settings",
+						"suiteTour": "Take Interactive Suite Tour",
+						"continueSuiteTour": "Continue Interactive Suite Tour"
 					},
 					"footer": {
 						"navigate": "to navigate",
@@ -510,6 +512,9 @@
 				"syncRoles": "Sync Discord Roles",
 				"syncRolesSuccess": "Synced Discord roles across all servers",
 				"syncRolesError": "Failed to sync Discord roles",
+				"unverify": "Unverify (Reset ToS & PP)",
+				"unverifySuccess": "User unverified and ToS & Privacy Policy dates reset",
+				"unverifyError": "Failed to unverify user",
 				"sendNotification": "Send Notification",
 				"notifyModalTitle": "Send Direct Notification",
 				"notifyModalDesc": "Dispatch an in-app notification directly to {name}.",
@@ -524,7 +529,10 @@
 				"notifyMessagePlaceholder": "Write your notification message...",
 				"notifyLinkLabel": "Optional Action URL",
 				"notifySuccess": "Notification sent to user",
-				"notifyError": "Failed to send notification"
+				"notifyError": "Failed to send notification",
+				"clearNotifications": "Clear Notifications",
+				"clearNotificationsSuccess": "Cleared all notifications for user",
+				"clearNotificationsError": "Failed to clear notifications"
 			},
 			"idCopied": "ID copied to clipboard",
 			"emailCopied": "Email copied to clipboard",
@@ -2472,6 +2480,14 @@
 				"revokeAllSuccess": "Signed out of all devices",
 				"revokeAllError": "Failed to revoke active sessions"
 			},
+			"tour": {
+				"title": "Interactive Suite Tour",
+				"postponedBadge": "Paused",
+				"description": "Take a guided interactive walkthrough of the Global Top Bar, Sidebar, Server Dashboard, Developer Portal, and Explore directory.",
+				"postponedDescription": "Your interactive Suite Tour is paused. Pick up right where you left off or restart from the beginning.",
+				"replayButton": "Take Suite Tour",
+				"restartButton": "Restart Tour"
+			},
 			"danger": {
 				"title": "Delete User Data & Account",
 				"description": "Permanently delete your profile data, stored preferences, and close your account across the ecosystem. This action cannot be undone.",
@@ -3290,7 +3306,10 @@
 			},
 			"cards": {
 				"botFallback": "Individual bot license pass",
-				"serverFallback": "Server infrastructure pass"
+				"serverFallback": "Server infrastructure pass",
+				"discordPassBadge": "Official Discord Pass",
+				"creditBoostBadge": "125% Credit Boost",
+				"includedBenefitsTitle": "Included Pass Perks & Server Benefits"
 			},
 			"developer": {
 				"free": {
@@ -3328,6 +3347,7 @@
 				"cancelPass": "Cancel Pass",
 				"getPass": "Get Pass",
 				"currentPlan": "Current Plan",
+				"includedInPlan": "Included in Your Plan",
 				"cancelApi": "Cancel API Plan",
 				"upgradeApi": "Upgrade API",
 				"redirecting": "Redirecting..."
@@ -4431,10 +4451,10 @@
 				},
 				"storeAndBilling": {
 					"title": "7. Store, Subscriptions, Virtual Credits & Perks",
-					"content": "Paid subscriptions, add-ons, and one-time Credit Top-Up Packs are billed in advance via Stripe, which may display localized currencies through Adaptive Pricing:",
+					"content": "Paid subscriptions, add-ons, and one-time Credit Top-Up Packs are billed in advance via Stripe (which may display localized currencies through Adaptive Pricing) or, for official Discord App Subscriptions such as the Virtue — Premium User Pass ($1.99/mo), directly through Discord's native billing system:",
 					"items": [
 						"You can cancel a recurring subscription any time in the Billing Portal. Your plan benefits remain active until the end of the current billing period.",
-						"Virtual Credits—whether purchased via Credit Top-Up Packs or earned through Daily Mystery Gifts, login streaks, referrals, or achievements—are non-monetary digital platform tokens with no real-world cash value. Peer-to-peer credit tips, Organization Treasury deposits, and credit redemptions (including Spotlight Boosts, Vanity URL unlocks, extra CDN/Showcase/Bot slots, 7-Day Trial Passes, Streak Shields, Vanity Badges, Dot-Matrix Banner formations, Stage Render Forms, Ambient Canvas Scenes, Glass Surface Styles, Cursor Trail & Click Shockwave FX, Header & Icon Packs, Desktop App Icon Crests, Avatar Frame Shaders, Animated Nameplates, Profile Card Themes, Overlay HUD Skins, and Master Cosmetic Bundles) are final, non-withdrawable, and non-refundable outside statutory consumer rights.",
+						"Virtual Credits—whether purchased via Credit Top-Up Packs or earned through Daily Mystery Gifts, login streaks, bot server invites (+100 Credits per newly connected server), referrals, or achievements—are non-monetary digital platform tokens with no real-world cash value. Peer-to-peer credit tips, Organization Treasury deposits, and credit redemptions (including Spotlight Boosts, Vanity URL unlocks, extra CDN/Showcase/Bot slots, 7-Day Trial Passes, Streak Shields, Vanity Badges, Dot-Matrix Banner formations, Stage Render Forms, Ambient Canvas Scenes, Glass Surface Styles, Cursor Trail & Click Shockwave FX, Header & Icon Packs, Desktop App Icon Crests, Avatar Frame Shaders, Animated Nameplates, Profile Card Themes, Overlay HUD Skins, and Master Cosmetic Bundles) are final, non-withdrawable, and non-refundable outside statutory consumer rights.",
 						"If a subscription or trial expires, features and CDN storage quotas revert to standard tier limits (plus any permanent slot upgrades you have unlocked). Existing files are kept, but new uploads may pause if you exceed your quota."
 					]
 				},
@@ -4554,7 +4574,7 @@
 				},
 				"localStorage": {
 					"title": "5. Local Storage & Desktop Client Storage",
-					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, page width, dot-matrix stage, ambient scene, glass surface, cursor FX, header/icon style, and overlay skin preferences (theme, accent, uiZoom, uiGap, textScale, pageWidth, clientSync, syncFromDiscord, pref_dotMatrixStage, pref_dotMatrixType, pref_dotMatrixRenderStyle, pref_dotMatrixAnimation, pref_windowControls, pref_uiIconStyle, pref_ambientScene, pref_surfaceStyle, pref_cursorFx, pref_overlaySkin, pref_headerSubdomains, and related pref_* workspace flags) and sidebar state for instant startup. All Credit Store cosmetics cached in localStorage are automatically verified against your account's unlockedBadges ledger on sync. In the Xernerx Desktop App, local settings, taskbar/Dock app icon crests, and Local Bot Runner configurations live in metadata.json, and each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>) so you can switch accounts safely."
+					"content": "We also use browser localStorage to cache non-sensitive theme, zoom, page width, dot-matrix stage, ambient scene, glass surface, cursor FX, header/icon style, and overlay skin preferences (theme, accent, uiZoom, uiGap, textScale, pageWidth, clientSync, syncFromDiscord, pref_dotMatrixStage, pref_dotMatrixType, pref_dotMatrixRenderStyle, pref_dotMatrixAnimation, pref_windowControls, pref_uiIconStyle, pref_ambientScene, pref_surfaceStyle, pref_cursorFx, pref_overlaySkin, pref_headerSubdomains, and related pref_* workspace flags), interactive tour and post-invite onboarding progress (xernerx_tour_postponed, xernerx_post_first_signin_return_url, xernerx_bot_onboarded_guilds_v1, xernerx_dashboard_bot_tour_v1), and sidebar state for instant startup. All Credit Store cosmetics cached in localStorage are automatically verified against your account's unlockedBadges ledger on sync. In the Xernerx Desktop App, local settings, taskbar/Dock app icon crests, and Local Bot Runner configurations live in metadata.json, and each account slot uses an isolated Chromium session partition (persist:xernerx-<slot>) so you can switch accounts safely."
 				},
 				"thirdParty": {
 					"title": "6. Third-Party Cookies",
@@ -5478,7 +5498,7 @@
 			},
 			"card12": {
 				"title": "How do Essential, Optional, and Advanced (0-Permission) Bot Invite Options work?",
-				"description": "Official bot invites on xernerx.com/invites/[slug] support up to three permission presets: Essential (recommended core Discord permissions required out of the box), Optional (all Essential permissions plus additional permissions for optional modules and automation), and Advanced (0 guild permissions so experienced server administrators can configure channel and role overrides manually). When only 1 invite option is configured for a bot, visiting xernerx.com/invites/[slug] redirects straight to Discord's OAuth2 authorization screen; when 2 or 3 options are configured, xernerx.com/invites/[slug] displays the interactive permission preset chooser (while direct links such as /invites/[slug]/essential redirect immediately)."
+				"description": "Official bot invites on xernerx.com/invites/[slug] support up to three permission presets: Essential (recommended core Discord permissions required out of the box), Optional (all Essential permissions plus additional permissions for optional modules and automation), and Advanced (0 guild permissions so experienced server administrators can configure channel and role overrides manually). When only 1 invite option is configured for a bot, visiting xernerx.com/invites/[slug] redirects straight to Discord's OAuth2 authorization screen; when 2 or 3 options are configured, xernerx.com/invites/[slug] displays the interactive permission preset chooser (while direct links such as /invites/[slug]/essential redirect immediately). After authorizing in Discord, the post-invite onboarding screen (app.xernerx.com/bots/[id]/onboarding) awards +100 Credits for each newly connected server and lets you jump straight into the Bot Profile or Server Dashboard."
 			}
 		},
 		"servers": {
@@ -5574,7 +5594,7 @@
 			"title": "Store, Billing, Credits & CDN",
 			"card1": {
 				"title": "What plans, passes, and promo codes are available on the Xernerx Store?",
-				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories—or apply promotional coupon codes (including via ?promo=CODE or ?code=CODE links): (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do List Bot, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and individual Zodiac, Virtue, To-Do List Bot, and Metamorphosis passes; (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects, and real-time POST online / POST offline bot status webhooks); and (3) Servers (?category=servers) for dedicated guild infrastructure."
+				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories—or apply promotional coupon codes (including via ?promo=CODE or ?code=CODE links): (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do List Bot, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and the official Virtue — Premium User Pass ($1.99/mo via Discord App Subscription, unlocking +50% XP, custom Level Modes, Boost Multipliers, Seasonal Wipes, and a 125% Credit Multiplier — automatically included with Ultra Ecosystem); (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects, and real-time POST online / POST offline bot status webhooks); and (3) Credits & Perks (?category=credits) for Credit Top-Up Packs and permanent ecosystem unlocks."
 			},
 			"card2": {
 				"title": "How do I manage or cancel subscriptions, and how does the Supporters showcase work?",
@@ -5582,7 +5602,7 @@
 			},
 			"card3": {
 				"title": "How do the Daily Credit Gift, 48-hour streak grace window, and voting rewards work?",
-				"description": "Claim your Daily Gift every 24h for 50 base Credits + streak bonuses (up to +100) + a +100 Milestone Bonus every 7th day, protected by up to 3 Streak Shields. You can also earn automatic Community Bounties (+500 Credits for verified/resolved bug reports on info.xernerx.com/bugs, +250 Credits for accepted/implemented suggestions on info.xernerx.com/suggestions), claim Contributor Milestone Achievements (Streak Master, Community Voter, Ecosystem Builder), and earn +250 Credits for both you and a friend via the Referral Program!"
+				"description": "Claim your Daily Gift every 24h for 50 base Credits + streak bonuses (up to +100) + a +100 Milestone Bonus every 7th day, protected by up to 3 Streak Shields. You also earn +100 Credits for every new Discord server you invite an official bot to, automatic Community Bounties (+500 Credits for verified/resolved bug reports on info.xernerx.com/bugs, +250 Credits for accepted/implemented suggestions on info.xernerx.com/suggestions), Contributor Milestone Achievements (Streak Master, Community Voter, Ecosystem Builder), and +250 Credits for both you and a friend via the Referral Program!"
 			},
 			"card4": {
 				"title": "How does the Media CDN (cdn.xernerx.com) work and what are the storage quotas?",
@@ -5972,6 +5992,168 @@
 				"sortNewest": "Sort: Newest",
 				"surpriseMe": "Surprise Me",
 				"showingCount": "Showing {count} bots"
+			},
+			"onboarding": {
+				"pageTitle": "{name} — Setup & Onboarding",
+				"checklistHeading": "Setup Checklist",
+				"hero": {
+					"badge": "Bot Invite Onboarding",
+					"title": "Thank you for inviting {name}!",
+					"whyHereDesc": "You were redirected here after adding {name} to your Discord server. Follow this quick checklist to sign in, learn how {name} works, and open your dashboard.",
+					"skipToDashboard": "Skip to Dashboard",
+					"skipToProfile": "Skip to Bot Profile"
+				},
+				"steps": {
+					"signinTitle": "1. Sign in to Xernerx",
+					"signinSubtitle": "Unlock dashboards, credits & full access",
+					"usageTitle": "2. How to Use {name}",
+					"usageSubtitle": "Slash commands & granted permissions",
+					"dashboardTitle": "3. Around the Dashboard",
+					"dashboardSubtitle": "Tour server settings & leveling controls",
+					"dashboardSubtitleGeneric": "Tour server directory, stats & settings",
+					"dashboardSubtitleCompact": "Select your server to configure",
+					"supportTitle": "Join Support & Finish",
+					"supportSubtitle": "Optional 1-click support & launch"
+				},
+				"signin": {
+					"heading": "Start by Signing in to Xernerx",
+					"whyAccountFirstDesc": "Signing in with Discord unlocks your Server Dashboard, Virtue leveling configuration, community voting & reviews, daily credit gifts, and 1-click support server join without interruptions.",
+					"perkDashboardTitle": "Full Dashboard & Server Control",
+					"perkDashboardDesc": "Manage your server directory profile, view 30-day growth stats, and configure Virtue leveling in your browser.",
+					"perkCreditsTitle": "+1,000 Free Welcome Credits",
+					"perkCreditsDesc": "New accounts receive a 1,000-credit welcome bonus for server/bot boosts, vanity URLs, and profile cosmetics.",
+					"ctaCardTitle": "Connect Your Discord Account",
+					"ctaCardDesc": "You will return right back to this setup checklist after signing in.",
+					"continueAsGuest": "Preview First",
+					"signInButton": "Sign in with Discord",
+					"signedInAs": "Signed in and verified as {name}"
+				},
+				"usage": {
+					"heading": "Get to Know How to Use {name}",
+					"subtitle": "{name} uses native Discord Slash Commands. Click any command below to copy it and try it in your server:",
+					"slashTip": "Type / in your Discord server's message bar and select {name} to browse all available commands.",
+					"grantedPermsTitle": "Permissions Granted ({count})"
+				},
+				"dashboard": {
+					"heading": "Explore the {name} Dashboard",
+					"subtitle": "Manage {name} and your Discord server from the Xernerx Dashboard:",
+					"alreadyTouredDesc": "You have already toured the Xernerx Dashboard! Pick the server you just invited the bot to below so we can take you straight to its configuration.",
+					"card1Title": "XP Modes & Multipliers",
+					"card1Desc": "Choose between Easy, Casual, Balanced, Hard, or Extreme leveling curves and server booster multipliers.",
+					"card2Title": "Level Roles & Cycle Resets",
+					"card2Desc": "Automate level-up role rewards, dynamic hoist roles, and daily/weekly/monthly leaderboard cycles.",
+					"genericCard1Title": "Public Directory & Links",
+					"genericCard1Desc": "Customize your server description, tags, invite link, and social links in the public Server Directory.",
+					"genericCard2Title": "Privacy, Vanity URL & Backups",
+					"genericCard2Desc": "Control 3-tier server visibility, claim a custom vanity URL, and export or restore JSON configurations.",
+					"card3Title": "Server Profile & Telemetry",
+					"card3Desc": "Customize your public server page, review member & message statistics, and export/import configs.",
+					"selectServerLabel": "Target Discord Server"
+				},
+				"support": {
+					"heading": "Need a Hand? Join Official Support",
+					"subtitle": "Before you jump into {name}, you can optionally join our official support server with 1 click:",
+					"signInToJoin": "Sign in for 1-Click Join",
+					"viewBotInfoBtn": "View Bot Info Page",
+					"launchDashboardBtn": "Open {name} Dashboard",
+					"launchBotProfileBtn": "Explore {name} Commands"
+				},
+				"banner": {
+					"title": "Configure {name} in the Server Dashboard",
+					"subtitle": "Manage server settings, leveling roles, and live telemetry for {name} directly from your dashboard.",
+					"genericSubtitle": "Manage your server directory profile, 30-day statistics, and settings for {name} directly from your dashboard.",
+					"setupGuideBtn": "Setup Guide",
+					"openDashboardBtn": "Open Server Dashboard"
+				},
+				"tour": {
+					"welcomeLabel": "Welcome",
+					"welcomeTitle": "Welcome to {name}!",
+					"welcomeDesc": "Thanks for inviting {name}! Let's take a quick interactive tour of its commands, live stats, and setup options.",
+					"overviewLabel": "Overview & Voting",
+					"overviewTitle": "Bot Overview & 12h Voting",
+					"overviewDesc": "Vote for {name} every 12 hours to support it and earn free Xernerx Credits — and toggle the bell icon for automatic vote reminders.",
+					"sidebarLabel": "Sidebar Views",
+					"sidebarTitle": "Navigate {name}'s Views",
+					"sidebarDesc": "Use the Sidebar to switch between {name}'s Profile, Live Statistics, Milestones, Slash Commands, Releases, and Reviews.",
+					"commandsLabel": "Commands",
+					"commandsTitle": "Interactive Command Explorer",
+					"commandsDesc": "Search {name}'s slash and context menu commands, fill in parameters interactively, and copy the ready-to-paste command for Discord.",
+					"statsLabel": "Live Stats",
+					"statsTitle": "Live Telemetry & Milestones",
+					"statsDesc": "Track {name}'s live shard health, uptime streak, server & user growth charts, and unlocked milestones.",
+					"reviewsLabel": "Reviews",
+					"reviewsTitle": "Community Reviews & Ratings",
+					"reviewsDesc": "Read feedback from other server owners or leave your own rating and review for {name}.",
+					"finishLabel": "Where Next?",
+					"finishTitle": "Where would you like to go?",
+					"finishDesc": "You're all set with {name}! Choose where you'd like to jump in next:",
+					"skipTourBtn": "Skip Tour",
+					"tourBtnLabel": "Bot Tour"
+				},
+				"thankYou": {
+					"badge": "Invite Complete",
+					"creditsBadge": "+100 Credits",
+					"title": "Thank you for inviting {name}!",
+					"subtitleWithDashboard": "{name} has been added to your Discord server. Review your setup below, then continue to the Server Dashboard for a quick interactive tour.",
+					"subtitleNoDashboard": "{name} has been added to your Discord server. Review how to use its commands below, then head over to its Bot Profile.",
+					"commandsPreviewTitle": "Quick Start — Slash Commands",
+					"commandsPreviewDesc": "Type / in any channel of your Discord server to use {name}'s commands:",
+					"continueToDashboardBtn": "Continue to Dashboard & Start Tour",
+					"continueToProfileBtn": "Continue to Bot Profile",
+					"viewProfileSecondaryBtn": "View Bot Profile"
+				},
+				"intro": {
+					"statusSignal": "Establishing {name} Uplink...",
+					"statusSyncing": "Syncing Bot × Server...",
+					"statusCredits": "Granting +100 Invite Reward...",
+					"statusReady": "{name} • Online & Ready",
+					"actSignal": "Uplink",
+					"actFusion": "Server Sync",
+					"actVault": "+100 Credits",
+					"actReady": "Ready",
+					"signalHeading": "Connecting {name}...",
+					"signalSubtitle": "Verifying Discord OAuth2 authorization and slash command permissions for your server.",
+					"fusionHeading": "{name} Linked",
+					"fusionHeadingWithGuild": "{name} × {guild} Linked",
+					"fusionSubtitle": "Slash commands, server permissions, and live Xernerx Suite integration are active.",
+					"vaultBadge": "Bot Invite Reward",
+					"creditsGranted": "+100 Credits added to your Xernerx Vault for inviting {name}",
+					"pillarCommands": "Slash Commands",
+					"pillarDashboard": "Server Dashboard",
+					"pillarSync": "Live Server Sync",
+					"pillarReward": "+100 Invite Bonus",
+					"headlinePrefix": "Thank You for Inviting",
+					"subtitle": "Your bot is ready — let's review your quick-start commands and server dashboard.",
+					"replayIntroBtn": "Replay Intro"
+				},
+				"dashboardTour": {
+					"sidebarLabel": "Servers",
+					"sidebarTitle": "Switch Between Your Servers",
+					"sidebarDesc": "All Discord servers you manage appear in this left Sidebar (or press Alt + 1..9 to switch instantly).",
+					"headerLabel": "Server Header",
+					"headerTitle": "Server Overview & Spotlight Boost",
+					"headerDesc": "Copy your Server ID, boost your server to the top of Explore, or open your public Server Profile.",
+					"tabsLabel": "Modules",
+					"tabsTitle": "Dashboard & {name} Modules",
+					"tabsDesc": "Switch between General Info, 30-Day Analytics, Social Links, Virtue Leveling, and Server Settings.",
+					"configLabel": "Configuration",
+					"configTitle": "Configure {name} & Server Settings",
+					"configDesc": "Customize {name}'s settings, XP curves, level-up announcements, and role rewards right here — press Ctrl + S anytime to save.",
+					"finishBtn": "Finish Tour",
+					"skipBtn": "Skip Tour"
+				},
+				"repeat": {
+					"badge": "Thank You for Inviting {name}!",
+					"title": "Where would you like to go?",
+					"subtitle": "{name} is ready in your server. Choose whether to view its Bot Profile or open your Server Dashboard:",
+					"profileCardTitle": "{name} Bot Profile",
+					"profileCardDesc": "Browse interactive slash commands, live statistics, milestones, releases, and community reviews.",
+					"profileCardBtn": "Open Bot Profile",
+					"dashboardCardTitle": "Server Dashboard",
+					"dashboardCardDesc": "Configure {name} modules, server directory settings, and permissions for your Discord server.",
+					"dashboardCardBtn": "Open Dashboard",
+					"replayTourBtn": "View Welcome & Dashboard Tour"
+				}
 			}
 		},
 		"dashboard": {
@@ -8194,7 +8376,10 @@
 				"dailyGiftReadyTitle": "Daily Gift Ready to Claim!",
 				"dailyGiftReadyDesc": "Your 24-hour Daily Gift cooldown has finished. Claim your free credits now!",
 				"voteReadyTitle": "Vote Cooldown Ready: {name}",
-				"voteReadyDesc": "Your 12-hour vote cooldown for {name} has expired. Cast your next vote now!"
+				"voteReadyDesc": "Your 12-hour vote cooldown for {name} has expired. Cast your next vote now!",
+				"clearAll": "Clear all notifications",
+				"clearedAllSuccess": "All notifications cleared",
+				"failedClearAll": "Failed to clear notifications"
 			},
 			"sidebarsuite": {
 				"text1": "Suite"
@@ -8249,6 +8434,8 @@
 			"urlCopied": "URL copied to clipboard",
 			"announcementEndsIn": "Ends in {time}",
 			"dismissAnnouncement": "Dismiss announcement",
+			"continueTour": "Continue Tour",
+			"continueTourTooltip": "Resume your interactive Xernerx Suite tour where you left off",
 			"omnibar": {
 				"placeholder": "/path or search bots, servers, orgs...",
 				"routesHeading": "Subdomain Routes ({app})",
@@ -8329,6 +8516,207 @@
 			"dailyGiftReadyDesc": "Your 24-hour Daily Gift cooldown has finished. Claim your free credits now!",
 			"voteReadyTitle": "Vote Cooldown Ready: {name}",
 			"voteReadyDesc": "Your 12-hour vote cooldown for {name} has expired. Cast your next vote now!"
+		},
+		"firstSignIn": {
+			"modalTitle": "Welcome to the Xernerx Suite",
+			"steps": {
+				"welcome": "Welcome",
+				"whoWeAre": "Your Path",
+				"setup": "Privacy & Locale",
+				"tourChoice": "Suite Tour",
+				"navigation": "Top Bar",
+				"dashboard": "Sidebar",
+				"dashboardTour": "Dashboard",
+				"portalTour": "Portal",
+				"exploreTour": "Explore",
+				"support": "Ready"
+			},
+			"demoNav": {
+				"explore": "Explore",
+				"myServers": "My Servers",
+				"portalOverview": "Developer Portal",
+				"organizations": "Organizations",
+				"myBots": "My Bots"
+			},
+			"intro": {
+				"actSignal": "Signal",
+				"actFusion": "Identity",
+				"actVault": "Rewards",
+				"actReady": "Welcome",
+				"statusSignal": "Incoming Discord Handshake...",
+				"statusSyncing": "Fusing Unified Suite Identity...",
+				"statusCredits": "Minting Welcome Wallet...",
+				"statusReady": "Ecosystem Initialized",
+				"verifiedBadge": "Discord Identity Connected",
+				"signalHeading": "Signal Locked",
+				"signalSubtitle": "Establishing your encrypted single sign-on bridge across the Xernerx ecosystem...",
+				"fusionHeading": "Identity Fused, {name}",
+				"fusionSubtitle": "Your Discord profile is now linked to 12+ Xernerx applications, server dashboards, and developer tools.",
+				"vaultBadge": "Welcome Gift Unlocked",
+				"pillarBots": "Flagship Discord Bots",
+				"pillarDashboard": "Live Server Dashboards",
+				"pillarPortal": "Developer & SDK Portal",
+				"pillarExplore": "Bot & Server Directory",
+				"pillarCloud": "Private CDN & Haste",
+				"pillarEconomy": "Global XP & Credits",
+				"headlinePrefix": "Welcome to",
+				"headlineBrand": "XERNERX",
+				"subtitle": "One unified account across every bot, server dashboard, and developer tool.",
+				"creditsGranted": "+1,000 Welcome Credits Added to Your Wallet",
+				"skipIntro": "Skip Intro"
+			},
+			"welcome": {
+				"heading": "Hey there, {name}!",
+				"subtitle": "Your Discord account is your single login across every Xernerx app — and we just added 1,000 free welcome credits to your wallet.",
+				"legalHeader": "Terms of Service & Privacy Policy",
+				"legalDescription": "Please review and accept our Terms of Service and Privacy Policy to activate your account.",
+				"agreeCheckbox": "I have read and agree to the Xernerx Terms of Service and Privacy Policy"
+			},
+			"whoWeAre": {
+				"heading": "How will you use Xernerx?",
+				"personaPrompt": "Pick one or both — we will tailor your shortcuts and tour automatically:",
+				"roleUserTitle": "Bot & Community User",
+				"roleUserDesc": "Set up bots like Virtue in your Discord servers, climb XP leaderboards, and discover new communities.",
+				"roleDevTitle": "Developer & Creator",
+				"roleDevDesc": "Build Discord bots with our TypeScript & JavaScript SDKs, manage team Organizations, and publish to the directory.",
+				"botsTitle": "Flagship Discord Bots",
+				"botsDesc": "Power your servers with Virtue (XP & voice leveling, hoist roles, boosts, and rank cards) and more.",
+				"suiteTitle": "Live Server Dashboards",
+				"suiteDesc": "Manage your Discord server profiles, view 30-day statistics, configure Virtue leveling, and claim daily credit gifts.",
+				"openSourceTitle": "Modular @xernerx/* SDK",
+				"openSourceDesc": "Build Discord.js bots faster with @xernerx/framework, @xernerx/commands, @xernerx/hooks, and @xernerx/stats.",
+				"devPortalTitle": "Developer Portal & Teams",
+				"devPortalDesc": "Create team Organizations, customize your bot directory listings, sync slash commands, and configure HMAC-SHA256 webhooks.",
+				"bothDevAndPortalTitle": "Dashboards & Developer Portal",
+				"bothDevAndPortalDesc": "Manage your Discord servers on the Dashboard while building and publishing your own bots on the Portal.",
+				"unifiedTitle": "One Unified Account",
+				"unifiedDesc": "Your permissions, wallet credits, themes, and privacy settings sync automatically across every app."
+			},
+			"setup": {
+				"heading": "Your Privacy & Preferences",
+				"subtitle": "Choose who can see your profile and check that your language and theme look right.",
+				"privacySelectorTitle": "Profile Visibility",
+				"whereYouShowUpLabel": "Where you appear:",
+				"publicTitle": "Public",
+				"publicBadge": "Listed Everywhere",
+				"publicDesc": "Your profile is open and discoverable across the community.",
+				"publicWhere": "Directories, explorers, leaderboards, and search results.",
+				"limitedTitle": "Limited",
+				"limitedBadge": "Direct Link Only",
+				"limitedDesc": "Unlisted from public browsing, but anyone with your link can view it.",
+				"limitedWhere": "Hidden from search and leaderboards — accessible only via direct link.",
+				"privateTitle": "Private",
+				"privateBadge": "Only You",
+				"privateDesc": "Strictly private and locked down to your account alone.",
+				"privateWhere": "Nowhere publicly — only you can view your profile.",
+				"languageTitle": "Display Language",
+				"languageDesc": "We detected this language from your Discord settings. Feel free to change it anytime.",
+				"themeTitle": "Theme & Appearance",
+				"themeDesc": "Follow your device theme automatically, or pick Dark or Light mode.",
+				"themeSystem": "System",
+				"themeDark": "Dark",
+				"themeLight": "Light"
+			},
+			"tourChoice": {
+				"heading": "Account Setup Complete!",
+				"subtitle": "Would you like a quick interactive tour of the Xernerx Suite, or postpone it for later?",
+				"takeTitle": "Take the Interactive Tour",
+				"recommendedBadge": "1 Min",
+				"takeDesc": "Walk through your Top Bar, Sidebar, Server Dashboard, and Explore directory so you know where everything lives.",
+				"skipTitle": "Skip Tour for Now",
+				"skipDesc": "Jump straight in — a \"Continue Tour\" button will remain in your Top Bar and Sidebar so you can take the tour anytime."
+			},
+			"navigation": {
+				"sub0Title": "Your Global Top Bar",
+				"sub0Desc": "This Top Bar stays with you across every Xernerx app. Click the logo anytime to go home, or press Ctrl + . to open the URL Omnibar.",
+				"mobileTrayTitle": "Mobile Slide-Out Tray",
+				"mobileTrayDesc": "On mobile, your toolbar icons tuck neatly into this slide-out tray on the right so your top bar never feels cramped.",
+				"paletteTitle": "Global Search & Command Palette",
+				"paletteDesc": "Click the search button in the top-right (or press Ctrl + K) to search bots, servers, docs, or run quick actions from anywhere.",
+				"shortcutDashboardTitle": "Server Dashboard Shortcut",
+				"shortcutDashboardDesc": "Since you chose Bot & Community User, we pinned the Server Dashboard to your Top Bar for instant access to your servers and Virtue settings.",
+				"shortcutPortalTitle": "Developer Portal Shortcut",
+				"shortcutPortalDesc": "Since you chose Developer & Creator, we pinned the Developer Portal to your Top Bar so you can manage your bots, teams, and webhooks in one click.",
+				"shortcutStoreTitle": "Your Quick-Launch Shortcuts",
+				"shortcutStoreDesc": "We also added the Store alongside your shortcuts. You can freely pin, unpin, or reorder any Xernerx app in Account Settings.",
+				"appDrawerTitle": "App Navigation Drawer",
+				"appDrawerDesc": "Click the 4-square grid icon in the top-right (or press Ctrl + Space) to switch between App, Account, Store, Docs, Info, and Portal.",
+				"alertsTitle": "Notifications & Cooldowns",
+				"alertsDesc": "Your notification bell tracks platform updates, security alerts, and reminders when your vote or daily gift cooldowns are ready.",
+				"profileTitle": "Profile, Theme & Daily Gift",
+				"profileDesc": "Click your avatar in the top-right to claim your daily credit gift, switch themes, or open Account Settings."
+			},
+			"dashboard": {
+				"subToggleTitle": "The Workspace Sidebar",
+				"subToggleDesc": "Apps with multiple views open this Sidebar on the left, along with a toggle button (Ctrl + B) in the top-left of your Header.",
+				"serverHubTitle": "Your Sidebar Views",
+				"serverHubDesc": "Switch between Explore, the Developer Portal, and your managed Discord servers right from the left Sidebar (or press Alt + 1..9).",
+				"devWorkspaceTitle": "Your Sidebar Views",
+				"devWorkspaceDesc": "Switch between Explore, your Personal Workspace, team Organizations, and your bots right from the left Sidebar (or press Alt + 1..9).",
+				"bothWorkspaceTitle": "Your Sidebar Views",
+				"bothWorkspaceDesc": "Switch between Explore, your managed Discord servers, Personal Workspace, team Organizations, and bots right from the left Sidebar (or press Alt + 1..9).",
+				"dockedNavTitle": "Docked Bottom Controls",
+				"dockedNavDesc": "Whenever the Sidebar is open, your App Drawer, Notifications, and Profile move out of the Header and dock neatly at the bottom of the Sidebar.",
+				"subCollapseTitle": "Compact Icon Rail",
+				"subCollapseDesc": "Need more room? Click the top-left toggle (or press Ctrl + B) to collapse the Sidebar into a compact icon rail."
+			},
+			"pageTours": {
+				"dashboard": {
+					"sidebarTitle": "Server Switcher",
+					"sidebarDesc": "Every Discord server where you have Manage Server permissions appears in the left Sidebar so you can switch servers in one click.",
+					"headerTitle": "Server Header & Boosts",
+					"headerDesc": "Copy your server ID, preview your public directory listing, or launch a Spotlight Boost right from your server header.",
+					"tabsTitle": "Server & Virtue Modules",
+					"tabsDesc": "Use these tabs to switch between General Info, 30-day Statistics, Invite & Social Links, Virtue leveling, and Settings (privacy tier, custom vanity URL, embed widget, and JSON backups).",
+					"configTitle": "Live Configuration",
+					"configDesc": "Edit your server profile or Virtue settings below — press Ctrl + S anytime to save and publish your changes live."
+				},
+				"portal": {
+					"headerTitle": "Your Developer Workspace",
+					"headerDesc": "Create team Organizations, manage API Bearer tokens, open the SDK docs, or view your public developer profile from this header.",
+					"kpisTitle": "Live Reach & Telemetry",
+					"kpisDesc": "Track your total bots, servers reached, users reached, and community upvotes — updated automatically via @xernerx/stats.",
+					"botsTitle": "Your Bots & Webhooks",
+					"botsDesc": "Select any bot to edit its public directory profile, sync slash commands, post releases, view 30-day growth, or connect HMAC-SHA256 webhooks (@xernerx/hooks).",
+					"orgsTitle": "Teams & Managed Servers",
+					"orgsDesc": "Use the left Sidebar to switch between your Personal Workspace and team Organizations, or jump directly to the Dashboard or public listing for any Discord server you manage below."
+				},
+				"explore": {
+					"heroTitle": "Welcome to Explore",
+					"heroDesc": "This is your home on app.xernerx.com — where the community discovers verified Discord bots and public servers.",
+					"barTitle": "Search, Leaderboards & Compare",
+					"barDesc": "Jump to your Server Dashboard, check global XP & vote Leaderboards, compare listings side-by-side, or press Ctrl + K to search bots, servers, and organizations.",
+					"switcherTitle": "Bots & Servers Switcher",
+					"switcherDesc": "Flip between the Discord Bot Directory and the Discord Server Directory anytime in one click.",
+					"gridTitle": "Live Community Directory",
+					"gridDesc": "Browse Promoted spotlights, Top Voted favorites, Biggest communities, and Newcomers! Click Continue to wrap up right here on Explore."
+				}
+			},
+			"support": {
+				"heading": "You are all set!",
+				"subtitle": "Notice the Support button that just popped into the bottom corner? Use it anytime you need help — or join our Discord server below.",
+				"joinCardTitle": "Official Xernerx Discord Server",
+				"optionalBadge": "Optional",
+				"joinCardDesc": "Join in one click with your linked Discord account for live support, updates, and community giveaways.",
+				"oneClickJoinBtn": "Join Support Server",
+				"alreadyJoined": "Joined Official Server"
+			},
+			"buttons": {
+				"back": "Back",
+				"next": "Continue",
+				"agreeAndContinue": "Agree & Let's Begin",
+				"takeTour": "Take Tour",
+				"skipTour": "Skip Tour",
+				"postponeTour": "Skip for Now",
+				"replayTour": "Replay Tour",
+				"finish": "Enter Xernerx"
+			},
+			"skipConfirm": {
+				"title": "Skip the Suite Tour for Now?",
+				"description": "You can continue the interactive tour at any later date from the Continue Tour button in your Header or Sidebar, from Account Settings, or via the Ctrl + K Command Palette.",
+				"confirm": "Skip for Now",
+				"cancel": "Stay in Tour"
+			}
 		}
 	},
 	"lib": {

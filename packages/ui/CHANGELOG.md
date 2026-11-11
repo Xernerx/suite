@@ -2,6 +2,20 @@
 
 # @xernerx/ui
 
+## 0.8.9
+
+### Patch Changes
+
+- ## Custom Child Layout Support for Check Primitive
+  
+  Updated the `Check` component in `@xernerx/ui` to support rich multi-line children and custom card layouts alongside standard label text.
+  
+  ### Changed
+  
+  - **Flexible `Check` Content Layout**: Enhanced `Check.tsx` alignment and container styling when rendering custom child elements inside selectable onboarding and filter cards.
+- Updated dependencies
+  - @xernerx/providers@0.23.0
+
 ## 0.8.8
 
 ### Patch Changes

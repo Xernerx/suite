@@ -265,6 +265,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 			}
 		}
 
+		// Determine if this bot belongs to the main Xernerx organization and whether it has a dashboard
+		const [mainOrgSetting, appInviteExists] = await Promise.all([
+			(db.models.core as any)?.Setting?.findOne({ id: 'main_org_id' })
+				.lean()
+				.catch(() => null),
+			(db.models.core as any)?.AppInvite?.exists({ clientId: botId }).catch(() => null),
+		]);
+		const mainOrgId = String(mainOrgSetting?.value || '').trim();
+		const orgNameLower = String(bot.organizationData?.name || '').toLowerCase();
+		bot.isMainOrgBot = Boolean((mainOrgId && String(bot.organization || '') === mainOrgId) || OFFICIAL_BOT_ID_TO_SLUG[botId] || appInviteExists || orgNameLower.includes('xernerx'));
+		bot.hasSuiteDashboard = Boolean(botId === '1484880634844287138' || String(bot.vanitySlug || '').toLowerCase() === 'virtue' || bot.links?.dashboard);
+
 		// Fetch Discord Profile (with discordCache fallback & persistence)
 		try {
 			const tokens = Array.from(new Set([process.env.DISCORD_BOT_TOKEN, process.env.DISCORD_CLIENT_TOKEN].filter(Boolean))) as string[];

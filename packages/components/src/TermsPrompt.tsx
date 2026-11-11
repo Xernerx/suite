@@ -34,8 +34,13 @@ export function TermsPrompt() {
 				setIsOpen(false);
 				return;
 			}
-			const userTermsTime = user.agreedTerms ? new Date(user.agreedTerms).getTime() : 0;
-			const userPrivacyTime = user.agreedPrivacy ? new Date(user.agreedPrivacy).getTime() : 0;
+			// First-ever sign-in (agreedTerms or agreedPrivacy is null) is handled by FirstSignInOnboarding / BotOnboardingFlow
+			if (!user.agreedTerms || !user.agreedPrivacy) {
+				setIsOpen(false);
+				return;
+			}
+			const userTermsTime = new Date(user.agreedTerms).getTime();
+			const userPrivacyTime = new Date(user.agreedPrivacy).getTime();
 
 			if (userTermsTime < TERMS_VERSION || userPrivacyTime < PRIVACY_VERSION) {
 				setIsOpen(true);

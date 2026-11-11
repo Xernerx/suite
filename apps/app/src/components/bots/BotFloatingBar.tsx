@@ -17,9 +17,10 @@ interface BotFloatingBarProps {
 	timeLeft: string;
 	nextVoteAt: string | null;
 	onVote: () => void;
+	onInvite?: () => void;
 }
 
-export default function BotFloatingBar({ bot, avatarUrl, botDisplayName, isSignedIn = false, canVote, voting, timeLeft, nextVoteAt, onVote }: BotFloatingBarProps) {
+export default function BotFloatingBar({ bot, avatarUrl, botDisplayName, isSignedIn = false, canVote, voting, timeLeft, nextVoteAt, onVote, onInvite }: BotFloatingBarProps) {
 	const { t } = useDictionary();
 	const { view, setView } = useSidebar();
 	const [visible, setVisible] = useState(false);
@@ -126,7 +127,10 @@ export default function BotFloatingBar({ bot, avatarUrl, botDisplayName, isSigne
 						</Button>
 					)}
 					{bot.links?.invite && (
-						<Button onClick={() => window.open(bot.links.invite, '_blank')} className="px-4 py-1.5 text-xs rounded-2xl shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_35%,transparent)]">
+						<Button
+							onClick={() => (onInvite ? onInvite() : window.open(bot.links.invite, '_blank', 'noopener,noreferrer'))}
+							className="px-4 py-1.5 text-xs rounded-2xl shadow-[0_0_14px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+						>
 							{t('app.bots.explore.quickInvite')}
 							<ExternalLink className="w-3 h-3 ml-1.5" />
 						</Button>

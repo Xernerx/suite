@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Bell, Code2, Columns2, Command, Download, Gift, Globe, Keyboard, LayoutGrid, LayoutTemplate, Lock, PanelLeftClose, RotateCcw, SlidersHorizontal, Sparkles, Zap } from 'lucide-react';
+import { Bell, Code2, Columns2, Command, Compass, Download, Gift, Globe, Keyboard, LayoutGrid, LayoutTemplate, Lock, PanelLeftClose, RotateCcw, SlidersHorizontal, Sparkles, Zap } from 'lucide-react';
 import { Button, Check, Selector, Toggle } from '@xernerx/ui';
 import { headerSubdomainsCatalog } from '@xernerx/lib';
 import { DesktopPreferencesSection } from './DesktopPreferencesSection';
@@ -343,6 +343,33 @@ export default function Preferences() {
 							<Toggle checked={Boolean(preferences[key])} onChange={(val) => handleTogglePreference(key, val)} suppressHydrationWarning />
 						</div>
 					))}
+
+					{/* Interactive Suite Tour Row */}
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+						<div className="flex items-start gap-3.5 max-w-2xl">
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
+								<Compass size={18} />
+							</div>
+							<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+								<h3 className="text-base font-semibold text-(--text)">{t('account.account.tour.title')}</h3>
+								<p className="text-xs text-(--text-muted)">{t('account.account.tour.description')}</p>
+							</div>
+						</div>
+						<Button
+							variant="secondary"
+							onClick={() =>
+								window.dispatchEvent(
+									new CustomEvent('xernerx:open-suite-tutorial', {
+										detail: Boolean((user as any)?.onboarding?.tourPostponed) ? { resume: true } : { startPhase: 'header' },
+									})
+								)
+							}
+							className="gap-2 shrink-0"
+						>
+							<Sparkles size={15} />
+							<span>{Boolean((user as any)?.onboarding?.tourPostponed) ? t('components.header.continueTour') : t('account.account.tour.replayButton')}</span>
+						</Button>
+					</div>
 				</div>
 			</div>
 

@@ -237,8 +237,16 @@ export const STORE_DEEP_LINKS = [
 		id: 'store-consumers',
 		path: '/?category=consumers',
 		label: 'Ultra Ecosystem & Bot Passes',
-		subtitle: 'store.xernerx.com/?category=consumers • All-in-one Ultra bundle, Virtue, Zodiac & To-Do List Bot',
-		keywords: 'ultra ecosystem pass zodiac virtue todo metamorphosis consumer subscriptions server premium dynamic hoist roles booster xp multiplier',
+		subtitle: 'store.xernerx.com/?category=consumers • All-in-one Ultra bundle & Virtue — Premium User Pass',
+		keywords: 'ultra ecosystem pass virtue consumer subscriptions server premium dynamic hoist roles booster xp multiplier',
+		icon: Sparkles,
+	},
+	{
+		id: 'store-virtue-pass',
+		path: '/?item=bot-virtue',
+		label: 'Virtue — Premium User Pass ($1.99/mo)',
+		subtitle: 'store.xernerx.com/?item=bot-virtue • Official Discord App Subscription (+50% XP, Level Modes, Boost Multipliers & Seasonal Wipes)',
+		keywords: 'virtue pass premium user discord app subscription xp multiplier level modes seasonal wipes',
 		icon: Sparkles,
 	},
 	{

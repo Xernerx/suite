@@ -39,6 +39,11 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 	const { data: session } = useSession();
 	const { user } = useUser();
 
+	const handleInviteBot = () => {
+		const inviteUrl = bot.links?.invite || `https://discord.com/oauth2/authorize?client_id=${bot.id || id}&permissions=8&scope=bot%20applications.commands`;
+		window.open(inviteUrl, '_blank', 'noopener,noreferrer');
+	};
+
 	// Vote State
 	const [canVote, setCanVote] = useState(false);
 	const [nextVoteAt, setNextVoteAt] = useState<string | null>(null);
@@ -198,7 +203,10 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 
 	return (
 		<>
-			<div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8 p-8 rounded-3xl bg-(--foreground)/50 border border-(--border)/10 backdrop-blur-md shadow-sm mt-8 relative overflow-hidden">
+			<div
+				data-bot-tour="header"
+				className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8 p-8 rounded-3xl bg-(--foreground)/50 border border-(--border)/10 backdrop-blur-md shadow-sm mt-8 relative overflow-hidden transition-all duration-300"
+			>
 				{bot.discord?.banner && (
 					<div
 						className="absolute inset-0 opacity-20 pointer-events-none"
@@ -253,9 +261,9 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 
 				<div className="flex-shrink-0 w-full md:w-auto mt-4 md:mt-0 relative z-10 flex flex-col items-start md:items-end gap-6">
 					<div className="flex flex-col items-start md:items-end gap-3 w-full">
-						<div className="flex flex-wrap sm:flex-row w-full md:w-auto gap-3">
+						<div data-bot-tour="vote" className="flex flex-wrap sm:flex-row w-full md:w-auto gap-3 rounded-2xl transition-all duration-300">
 							{bot.links?.invite && (
-								<Button onClick={() => window.open(bot.links!.invite, '_blank')} className="w-full sm:w-auto px-8 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
+								<Button onClick={handleInviteBot} className="w-full sm:w-auto px-8 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_40%,transparent)]">
 									{t('app.bots.id.text5')}
 								</Button>
 							)}
@@ -458,6 +466,7 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 				timeLeft={timeLeft}
 				nextVoteAt={nextVoteAt}
 				onVote={handleVote}
+				onInvite={handleInviteBot}
 			/>
 		</>
 	);

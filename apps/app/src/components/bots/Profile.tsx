@@ -102,7 +102,7 @@ export default function Profile({ bot }: { bot: any }) {
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 			{/* Top At-a-Glance KPI Strip */}
-			<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" style={{ gap: 'var(--ui-gap)' }}>
+			<div data-bot-tour="kpis" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
 				{kpiCards.map((card) => {
 					const Icon = card.icon;
 					return (

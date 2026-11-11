@@ -1,12 +1,13 @@
 /** @format */
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { Suspense, useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
 import { Button } from '@xernerx/ui';
-import { User, Activity, Terminal, ArrowLeft, Star, Settings, Trophy, Tag } from 'lucide-react';
+import { User, Activity, Terminal, ArrowLeft, Star, Settings, Trophy, Tag, LayoutDashboard, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import Header from '@/components/bots/Header';
 import Profile from '@/components/bots/Profile';
@@ -32,14 +33,18 @@ interface BotProfile {
 	releases?: any[];
 	discord?: any;
 	ownersData?: any[];
+	isMainOrgBot?: boolean;
+	hasSuiteDashboard?: boolean;
+	vanitySlug?: string;
 }
 
-export default function BotPage({ params }: { params: Promise<{ id: string }> }) {
-	const { id } = use(params);
+function BotPageContent({ id }: { id: string }) {
 	const { getEnvUrl, isReady } = useEnvironment();
 	const { view, setNavItems, show, hide } = useSidebar();
 	const { t } = useDictionary();
 	const { data: session } = useSession();
+	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const [bot, setBot] = useState<BotProfile | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -92,6 +97,22 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 
 					if (botData.privacy === 'private' && !isOwner) {
 						setBot(null);
+						return;
+					}
+
+					// Redirect post-invite Discord OAuth2 callbacks to the dedicated onboarding page
+					const skipOnboarding = searchParams.get('skipOnboarding') === '1';
+					const hasInviteParams = Boolean(searchParams.get('guild_id') || searchParams.get('code') || searchParams.get('onboarding') === '1');
+					if (!skipOnboarding && hasInviteParams) {
+						const onboardingQuery = new URLSearchParams();
+						const guildId = searchParams.get('guild_id');
+						const perms = searchParams.get('permissions');
+						const tour = searchParams.get('tour');
+						if (guildId) onboardingQuery.set('guild_id', guildId);
+						if (perms) onboardingQuery.set('permissions', perms);
+						if (tour) onboardingQuery.set('tour', tour);
+						const qs = onboardingQuery.toString();
+						router.replace(`/bots/${botData.vanitySlug || id}/onboarding${qs ? `?${qs}` : ''}`);
 						return;
 					}
 
@@ -157,10 +178,49 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 
 	const currentView = view || 'profile';
 	const resolvedBotId = bot.id || id;
+	const isVirtueBot = resolvedBotId === '1484880634844287138' || String(bot.vanitySlug || id).toLowerCase() === 'virtue';
+	const hasBotDashboard = Boolean(bot.isMainOrgBot && (isVirtueBot || bot.hasSuiteDashboard || bot.links?.dashboard));
+	const botDisplayName = bot.discord?.global_name || bot.discord?.username || bot.name || id;
+	const dashboardHref = isVirtueBot ? '/dashboard?tab=virtue' : bot.links?.dashboard || '/dashboard';
 
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
 			<Header bot={bot} id={resolvedBotId} setBot={setBot} />
+
+			{hasBotDashboard && (
+				<div
+					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl bg-(--foreground)/40 border border-(--accent)/35 backdrop-blur-md shadow-sm mb-4"
+					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+				>
+					<div className="flex items-start sm:items-center gap-3.5">
+						<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+							<LayoutDashboard className="w-5 h-5" />
+						</div>
+						<div>
+							<h2 className="text-base font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+								{t('app.bots.onboarding.banner.title', { name: botDisplayName })}
+							</h2>
+							<p className="text-xs text-(--text-muted) mt-0.5">
+								{t(isVirtueBot ? 'app.bots.onboarding.banner.subtitle' : 'app.bots.onboarding.banner.genericSubtitle', { name: botDisplayName })}
+							</p>
+						</div>
+					</div>
+					<div className="flex flex-wrap items-center gap-2 shrink-0">
+						<Link href={`/bots/${bot.vanitySlug || id}/onboarding`}>
+							<Button variant="secondary" className="gap-1.5 text-xs">
+								<Sparkles className="w-3.5 h-3.5 text-(--accent)" />
+								<span>{t('app.bots.onboarding.banner.setupGuideBtn')}</span>
+							</Button>
+						</Link>
+						<Link href={dashboardHref}>
+							<Button variant="primary" className="gap-1.5 text-xs">
+								<LayoutDashboard className="w-3.5 h-3.5" />
+								<span>{t('app.bots.onboarding.banner.openDashboardBtn')}</span>
+							</Button>
+						</Link>
+					</div>
+				</div>
+			)}
 
 			<div className="mt-4">
 				{currentView === 'profile' && <Profile bot={bot} />}
@@ -171,5 +231,20 @@ export default function BotPage({ params }: { params: Promise<{ id: string }> })
 				{currentView === 'reviews' && <Reviews bot={bot} id={resolvedBotId} />}
 			</div>
 		</div>
+	);
+}
+
+export default function BotPage({ params }: { params: Promise<{ id: string }> }) {
+	const { id } = use(params);
+	return (
+		<Suspense
+			fallback={
+				<div className="flex-1 flex items-center justify-center min-h-screen">
+					<Loading />
+				</div>
+			}
+		>
+			<BotPageContent id={id} />
+		</Suspense>
 	);
 }
