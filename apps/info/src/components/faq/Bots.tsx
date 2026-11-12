@@ -200,7 +200,7 @@ export default function Bots({ searchQuery = '' }: { searchQuery?: string }) {
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				{cards.map((card) => (
-					<CollapsibleCard key={card.id} message={card.title} description={card.description} />
+					<CollapsibleCard key={card.id} id={`bots.${card.id}`} message={card.title} description={card.description} />
 				))}
 			</div>
 		</div>

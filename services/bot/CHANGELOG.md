@@ -2,6 +2,23 @@
 
 # bot
 
+## 2.4.0
+
+### Minor Changes
+
+- ## Global Leaderboard Shadowban Filtering & Catalog Fallbacks
+  
+  Excluded shadowbanned accounts from `/leaderboard` rankings in the Discord bot daemon and synced catalog fallback definitions.
+  
+  ### Changed
+  
+  - **Global Leaderboard Shadowban Filter**: Updated `/leaderboard` (`users` and `virtue` scopes) in `services/bot` to exclude users with `shadowban: true`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+
 ## 2.3.3
 
 ### Patch Changes

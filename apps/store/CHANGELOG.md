@@ -4,6 +4,27 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.12.0
+
+### Minor Changes
+
+- ## Store Deep-Link Item Highlighting & Virtue Pass Display
+  
+  Added deep-link item highlighting (`?item=`) and refined Virtue Pass and credit pack presentation in the Xernerx Store.
+  
+  ### Added
+  
+  - **Store Item Deep-Link Highlighting**: Added automatic smooth scrolling and accent highlight rings when opening `/store?item=<id>` across `DynamicCategoryView` and `CreditStoreView`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+  - @xernerx/ui@0.9.0
+  - @xernerx/components@0.17.1
+  - @xernerx/providers@0.23.1
+  - @xernerx/feedback@0.6.1
+
 ## 0.11.0
 
 ### Minor Changes

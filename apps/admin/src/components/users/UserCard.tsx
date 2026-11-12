@@ -4,10 +4,10 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles, Ban, AlertTriangle, X } from 'lucide-react';
+import { Settings2, User as UserIcon, Copy, Check, Coins, CheckCircle2, Sparkles, Ban, AlertTriangle, X, Code2, Compass, Layers, Clock, EyeOff } from 'lucide-react';
 import { Tooltip } from '@xernerx/ui';
 import { useDictionary, useToast, useUser } from '@xernerx/providers';
-import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './types';
+import { DiscordProfile, FullUser, getNormalizedRoles, getUserPersona, getUserTourStatus, Role, UserSummary } from './types';
 import { UserModal } from './UserModal';
 
 interface UserCardProps {
@@ -56,6 +56,13 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 	const hasMissingRoles = missingRoleIds.length > 0;
 	const userLevel = user.level?.level ?? 1;
 	const userCredits = user.credits?.balance ?? 0;
+	const persona = getUserPersona(user);
+	const tourStatus = getUserTourStatus(user);
+	const personaLabel =
+		persona === 'both' ? t('admin.users.onboarding.personaBothShort') : persona === 'developer' ? t('admin.users.onboarding.personaDeveloper') : t('admin.users.onboarding.personaUser');
+	const personaFullLabel =
+		persona === 'both' ? t('admin.users.onboarding.personaBoth') : persona === 'developer' ? t('admin.users.onboarding.personaDeveloper') : t('admin.users.onboarding.personaUser');
+	const tourCompletedDate = user.onboarding?.completedAt ? new Date(user.onboarding.completedAt).toLocaleDateString() : '';
 
 	const handleRemoveMissingRole = async (e: React.MouseEvent, roleId: string) => {
 		e.stopPropagation();
@@ -161,6 +168,12 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 									{t('admin.users.fields.blacklistedBadge')}
 								</span>
 							)}
+							{user.shadowban && (
+								<span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-(--accent-orange)/15 text-(--accent-orange) border border-(--accent-orange)/30 font-bold shrink-0">
+									<EyeOff size={10} />
+									{t('admin.users.fields.shadowbanBadge')}
+								</span>
+							)}
 						</div>
 						<div className="flex flex-wrap items-center gap-1.5 mt-0.5">
 							<span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-(--accent)/15 text-(--accent) font-mono font-bold">
@@ -173,6 +186,48 @@ export function UserCard({ user, roles, getEnvUrl, onUserDeleted, onUserUpdated,
 									{userCredits.toLocaleString()}
 								</span>
 							)}
+							<Tooltip content={t('admin.users.onboarding.personaTooltip', { persona: personaFullLabel })}>
+								<span
+									className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border font-semibold shrink-0 ${
+										persona === 'developer' || persona === 'both'
+											? 'bg-(--accent)/10 text-(--accent) border-(--accent)/25'
+											: 'bg-(--background)/60 text-(--text) border-(--border)/10'
+									}`}
+								>
+									{persona === 'both' ? <Layers size={10} /> : persona === 'developer' ? <Code2 size={10} /> : <UserIcon size={10} />}
+									<span>{personaLabel}</span>
+								</span>
+							</Tooltip>
+							<Tooltip
+								content={
+									tourStatus === 'completed'
+										? t('admin.users.onboarding.tourCompletedTooltip', { date: tourCompletedDate ? ` (${tourCompletedDate})` : '' })
+										: tourStatus === 'postponed'
+											? t('admin.users.onboarding.tourPostponedTooltip', {
+													phase: user.onboarding?.tourPostponedPhase ? ` (${user.onboarding.tourPostponedPhase})` : '',
+												})
+											: t('admin.users.onboarding.tourPendingTooltip')
+								}
+							>
+								<span
+									className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border font-semibold shrink-0 ${
+										tourStatus === 'completed'
+											? 'bg-(--accent-green)/15 text-(--accent-green) border-(--accent-green)/30'
+											: tourStatus === 'postponed'
+												? 'bg-(--accent-orange)/15 text-(--accent-orange) border-(--accent-orange)/30'
+												: 'bg-(--border)/10 text-(--text-muted) border-(--border)/10'
+									}`}
+								>
+									{tourStatus === 'postponed' ? <Clock size={10} /> : <Compass size={10} />}
+									<span>
+										{tourStatus === 'completed'
+											? t('admin.users.onboarding.tourCompletedBadge')
+											: tourStatus === 'postponed'
+												? t('admin.users.onboarding.tourPostponedBadge')
+												: t('admin.users.onboarding.tourPendingBadge')}
+									</span>
+								</span>
+							</Tooltip>
 							{activeRoles.map((r) => (
 								<span key={r.id} className="text-xs px-2 py-0.5 rounded-full bg-(--accent)/10 text-(--accent) font-medium truncate">
 									{r.name}

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 				? UserModel.findOne({
 						$or: [{ id: rawUserId }, { vanitySlug: rawUserId.toLowerCase() }],
 					})
-						.select('id privacy')
+						.select('id privacy shadowban')
 						.lean()
 				: null,
 		]);
@@ -106,6 +106,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 				reviewed,
 				rating,
 				tipped,
+				shadowban: Boolean((userDoc as any)?.shadowban),
 			},
 			{ status: 200, headers: corsHeaders }
 		);
@@ -121,6 +122,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 				reviewed: false,
 				rating: null,
 				tipped: 0,
+				shadowban: false,
 			},
 			{ status: 200, headers: corsHeaders }
 		);

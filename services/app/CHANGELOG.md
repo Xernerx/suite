@@ -2,6 +2,23 @@
 
 # `@xernerx/app`
 
+## 2.7.0
+
+### Minor Changes
+
+- ## Discord Slash Command Deep-Link Anchors & FAQ Catalog Fallbacks
+  
+  Updated `@xernerx/app` slash commands (`/faq`, `/changelog`, `/issues`, `/roadmap`, `/suggestions`) to link directly to highlighted web anchor targets and synced offline catalog fallbacks.
+  
+  ### Changed
+  
+  - **Direct Deep-Link URLs in Slash Commands**: Updated `/faq`, `/changelog`, `/issues`, `/roadmap`, and `/suggestions` embeds and buttons to include `#slug` and `?id=` deep-link targets.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+
 ## 2.6.3
 
 ### Patch Changes

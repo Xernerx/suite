@@ -13,21 +13,22 @@ const ISSUES_TABS: { id: IssuesFilterTab; label: string }[] = [
 	{ id: 'resolved', label: 'Resolved Fixes' },
 ];
 
-function formatIssueStatus(status?: string): string {
-	return status === 'resolved' ? '🟢 Resolved' : '🟠 Open';
+function formatIssueStatus(status?: string, acknowledged?: boolean): string {
+	if (status === 'resolved') return '🟢 Resolved';
+	return acknowledged ? '🔵 Verified' : '🟠 Submitted';
 }
 
 export async function buildIssuesOverviewMessage(client: Client, tab: IssuesFilterTab = 'all', requesterUserId?: string) {
 	const botUser = client.user;
 	const botAvatar = botUser?.displayAvatarURL({ size: 256 });
 	const botName = botUser?.username || 'Xernerx App';
-	const issuesUrl = 'https://info.xernerx.com/bugs';
+	const issuesUrl = 'https://info.xernerx.com/issues';
 
 	const [db, accentColor] = await Promise.all([database('xernerx'), getUserAccentColor(requesterUserId)]);
 	const IssueModel = (db.models.core as any).Issue;
 
 	const items = IssueModel
-		? await IssueModel.find({ acknowledged: true })
+		? await IssueModel.find({})
 				.sort({ createdAt: -1 })
 				.lean()
 				.catch(() => [])
@@ -51,7 +52,7 @@ export async function buildIssuesOverviewMessage(client: Client, tab: IssuesFilt
 		.setColor(accentColor)
 		.setTitle('Xernerx Suite • Issue & Bug Tracker')
 		.setURL(issuesUrl)
-		.setDescription(`Report reproducible bugs on [info.xernerx.com/bugs](${issuesUrl}). Every verified bug report automatically awards a **+500 Credit Bounty** to the reporter!`);
+		.setDescription(`Report reproducible bugs on [info.xernerx.com/issues](${issuesUrl}). Every verified bug report automatically awards a **+500 Credit Bounty** to the reporter!`);
 
 	if (botAvatar) {
 		overviewEmbed.setThumbnail(botAvatar);
@@ -139,7 +140,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 			const db = await database('xernerx');
 			const IssueModel = (db.models.core as any).Issue;
 			const items = IssueModel
-				? await IssueModel.find({ acknowledged: true })
+				? await IssueModel.find({})
 						.sort({ createdAt: -1 })
 						.limit(50)
 						.lean()
@@ -163,7 +164,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 
 			await interaction.respond(
 				filtered.slice(0, 25).map((item: any) => {
-					const statusLabel = item.status === 'resolved' ? 'Resolved' : 'Open';
+					const statusLabel = item.status === 'resolved' ? 'Resolved' : item.acknowledged ? 'Verified' : 'Open';
 					const rawLabel = `[${statusLabel}] ${item.title}`;
 					return {
 						name: rawLabel.length > 100 ? `${rawLabel.slice(0, 97)}...` : rawLabel,
@@ -185,7 +186,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 		const botAvatar = botUser?.displayAvatarURL();
 		const botName = botUser?.username || 'Xernerx App';
 		const rawInput = (options as any)?.issue?.value || interaction.options.getString('issue') || '';
-		const issuesUrl = 'https://info.xernerx.com/bugs';
+		const issuesUrl = 'https://info.xernerx.com/issues';
 
 		try {
 			if (!rawInput || !String(rawInput).trim()) {
@@ -197,7 +198,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 			const IssueModel = (db.models.core as any).Issue;
 
 			const items = IssueModel
-				? await IssueModel.find({ acknowledged: true })
+				? await IssueModel.find({})
 						.sort({ createdAt: -1 })
 						.lean()
 						.catch(() => [])
@@ -218,7 +219,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 				const notFoundEmbed = new EmbedBuilder()
 					.setColor(0xe06c75)
 					.setTitle('Issue Not Found')
-					.setDescription(`We couldn't find a tracked issue matching **"${rawInput}"**.\n\nReport bugs or view known issues at [info.xernerx.com/bugs](${issuesUrl}).`)
+					.setDescription(`We couldn't find a tracked issue matching **"${rawInput}"**.\n\nReport bugs or view known issues at [info.xernerx.com/issues](${issuesUrl}).`)
 					.setFooter({
 						text: `${botName} • Issues`,
 						iconURL: botAvatar,
@@ -230,6 +231,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 
 			const createdTs = found.createdAt ? Math.floor(new Date(found.createdAt).getTime() / 1000) : null;
 			const resolvedTs = found.resolvedAt ? Math.floor(new Date(found.resolvedAt).getTime() / 1000) : null;
+			const itemUrl = `${issuesUrl}?id=${encodeURIComponent(String(found.id || found._id))}`;
 
 			const resolutionLines: string[] = [];
 			if (found.resolvedApp || found.resolvedVersion) {
@@ -245,13 +247,13 @@ export default class IssuesCommand extends SlashCommandBuilder {
 			const itemEmbed = new EmbedBuilder()
 				.setColor(accentColor)
 				.setTitle(found.title)
-				.setURL(issuesUrl)
+				.setURL(itemUrl)
 				.setDescription(found.description || 'No description provided.')
 				.addFields([
 					{
 						name: 'Issue Details',
 						value: [
-							`• **Status:** ${formatIssueStatus(found.status)}`,
+							`• **Status:** ${formatIssueStatus(found.status, found.acknowledged)}`,
 							`• **Product:** \`${found.productId || 'Suite'}\``,
 							...(found.authorId ? [`• **Reporter:** <@${found.authorId}>`] : []),
 							...(createdTs ? [`• **Reported:** <t:${createdTs}:R>`] : []),
@@ -271,7 +273,7 @@ export default class IssuesCommand extends SlashCommandBuilder {
 				.setTimestamp();
 
 			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-				new ButtonBuilder().setLabel('View Bug Tracker').setStyle(ButtonStyle.Link).setURL(issuesUrl),
+				new ButtonBuilder().setLabel('View on Issue Tracker').setStyle(ButtonStyle.Link).setURL(itemUrl),
 				new ButtonBuilder().setLabel('System Status').setStyle(ButtonStyle.Link).setURL('https://info.xernerx.com/status')
 			);
 

@@ -197,7 +197,7 @@ export default function EcosystemAndNavigation({ searchQuery = '' }: { searchQue
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				{cards.map((card) => (
-					<CollapsibleCard key={card.id} message={card.title} description={card.description} />
+					<CollapsibleCard key={card.id} id={`overview.${card.id}`} message={card.title} description={card.description} />
 				))}
 			</div>
 		</div>

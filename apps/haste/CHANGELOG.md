@@ -2,6 +2,17 @@
 
 # Changelog
 
+## 1.3.12
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+  - @xernerx/ui@0.9.0
+  - @xernerx/components@0.17.1
+  - @xernerx/providers@0.23.1
+  - @xernerx/feedback@0.6.1
+
 ## 1.3.11
 
 ### Patch Changes

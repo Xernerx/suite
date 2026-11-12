@@ -63,9 +63,25 @@ export interface UserAssetEntity {
 	privacy?: string;
 	verified?: boolean;
 	blacklisted?: boolean;
+	shadowban?: boolean;
 	services?: boolean;
 	vanitySlug?: string;
 	isOwner?: boolean;
+}
+
+export type UserPersona = 'user' | 'developer' | 'both';
+
+export type UserTourStatus = 'completed' | 'postponed' | 'pending';
+
+export interface UserOnboardingState {
+	persona?: UserPersona;
+	suiteIntroCompleted?: boolean;
+	dashboardTourCompleted?: boolean;
+	supportPromptCompleted?: boolean;
+	tourPostponed?: boolean;
+	tourPostponedPhase?: string | null;
+	completedAt?: string | null;
+	onboardedBots?: string[];
 }
 
 export interface FullUser {
@@ -83,6 +99,7 @@ export interface FullUser {
 	privacy?: string;
 	verified?: boolean;
 	blacklisted?: boolean;
+	shadowban?: boolean;
 	services?: boolean;
 	vanitySlug?: string;
 	vanityUnlocked?: boolean;
@@ -92,6 +109,7 @@ export interface FullUser {
 	locale?: string;
 	staffSubscription?: boolean;
 	stripeCustomerId?: string;
+	onboarding?: UserOnboardingState;
 	showcases?: UserShowcaseItem[];
 	connections?: UserConnectionItem[];
 	devices?: UserDeviceItem[];
@@ -128,10 +146,12 @@ export interface UserSummary {
 	icon: string;
 	verified?: boolean;
 	blacklisted?: boolean;
+	shadowban?: boolean;
 	services?: boolean;
 	vanitySlug?: string;
 	discord?: DiscordProfile | null;
 	stripeCustomerId?: string;
+	onboarding?: UserOnboardingState;
 	level?: {
 		level?: number;
 		xp?: number;
@@ -140,6 +160,20 @@ export interface UserSummary {
 		balance?: number;
 		streak?: number;
 	};
+}
+
+export function getUserPersona(obj?: { onboarding?: UserOnboardingState | null } | null): UserPersona {
+	const raw = obj?.onboarding?.persona;
+	if (raw === 'developer' || raw === 'both' || raw === 'user') return raw;
+	return 'user';
+}
+
+export function getUserTourStatus(obj?: { onboarding?: UserOnboardingState | null } | null): UserTourStatus {
+	const ob = obj?.onboarding;
+	if (!ob) return 'pending';
+	if (ob.tourPostponed) return 'postponed';
+	if (ob.completedAt || ob.dashboardTourCompleted) return 'completed';
+	return 'pending';
 }
 
 export function getNormalizedRoles(

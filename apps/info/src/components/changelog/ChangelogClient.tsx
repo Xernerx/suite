@@ -163,7 +163,7 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 		setView(`changelog-${log.appName.toLowerCase()}`);
 		setSearch('');
 		setActiveVersionId(null);
-		window.history.replaceState(null, '', `#${log.appName.toLowerCase()}`);
+		window.history.replaceState(null, '', `?item=${encodeURIComponent(log.appName.toLowerCase())}`);
 	};
 
 	useEffect(() => {
@@ -234,12 +234,16 @@ export default function ChangelogClient({ changelogs: initialChangelogs }: { cha
 	}, [parsedSections, search]);
 
 	useEffect(() => {
-		if (typeof window === 'undefined' || !window.location.hash) return;
-		const hash = window.location.hash.substring(1);
-		setActiveVersionId(hash);
-		const element = document.getElementById(hash);
-		if (element) setTimeout(() => element.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-	}, [activeLog]);
+		if (typeof window === 'undefined') return;
+		const params = new URLSearchParams(window.location.search);
+		const rawVer = (params.get('version') || window.location.hash.substring(1) || '').replace(/^v/i, '').trim();
+		if (!rawVer) return;
+		setActiveVersionId(rawVer);
+		const timer = setTimeout(() => {
+			document.getElementById(rawVer)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}, 120);
+		return () => clearTimeout(timer);
+	}, [activeLog, parsedSections.length]);
 
 	const jumpToVersion = (id: string, copyLink = false) => {
 		if (!activeLog) return;

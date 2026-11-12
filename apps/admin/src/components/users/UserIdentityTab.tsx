@@ -6,7 +6,7 @@ import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { timezones } from '@xernerx/lib';
 import { Input, Markdown, MultiSelector, Selector, Toggle } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
-import type { Role } from './types';
+import type { Role, UserPersona } from './types';
 
 interface UserIdentityTabProps {
 	name: string;
@@ -22,6 +22,10 @@ interface UserIdentityTabProps {
 	roles: Role[];
 	privacy: string;
 	setPrivacy: (val: string) => void;
+	persona: UserPersona;
+	setPersona: (val: UserPersona) => void;
+	tourCompleted: boolean;
+	setTourCompleted: (val: boolean) => void;
 	verified: boolean;
 	setVerified: (val: boolean) => void;
 	vanityUnlocked: boolean;
@@ -32,6 +36,8 @@ interface UserIdentityTabProps {
 	setWidgets: (val: boolean) => void;
 	blacklisted: boolean;
 	setBlacklisted: (val: boolean) => void;
+	shadowban: boolean;
+	setShadowban: (val: boolean) => void;
 	services: boolean;
 	setServices: (val: boolean) => void;
 	staffSubscription: boolean;
@@ -65,6 +71,10 @@ export function UserIdentityTab({
 	roles,
 	privacy,
 	setPrivacy,
+	persona,
+	setPersona,
+	tourCompleted,
+	setTourCompleted,
 	verified,
 	setVerified,
 	vanityUnlocked,
@@ -75,6 +85,8 @@ export function UserIdentityTab({
 	setWidgets,
 	blacklisted,
 	setBlacklisted,
+	shadowban,
+	setShadowban,
 	services,
 	setServices,
 	staffSubscription,
@@ -187,7 +199,7 @@ export function UserIdentityTab({
 				)}
 			</div>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
+			<div className="grid grid-cols-1 md:grid-cols-3 overflow-visible" style={{ gap: 'var(--ui-gap)' }}>
 				<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 					<label className="block text-xs font-medium text-(--text)">{t('admin.users.privacyLevelLabel')}</label>
 					<Selector
@@ -197,6 +209,19 @@ export function UserIdentityTab({
 							{ label: t('account.profile.privacy.public'), value: 'public' },
 							{ label: t('account.profile.privacy.limited'), value: 'limited' },
 							{ label: t('account.profile.privacy.private'), value: 'private' },
+						]}
+					/>
+				</div>
+
+				<div className="flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
+					<label className="block text-xs font-medium text-(--text)">{t('admin.users.onboarding.personaFieldLabel')}</label>
+					<Selector
+						value={persona}
+						onChange={(val: string) => setPersona(val as UserPersona)}
+						options={[
+							{ label: t('admin.users.onboarding.personaUser'), value: 'user' },
+							{ label: t('admin.users.onboarding.personaDeveloper'), value: 'developer' },
+							{ label: t('admin.users.onboarding.personaBoth'), value: 'both' },
 						]}
 					/>
 				</div>
@@ -224,6 +249,14 @@ export function UserIdentityTab({
 							setVerified(e.target.checked);
 						}}
 					/>
+				</div>
+
+				<div className="flex items-center justify-between rounded-2xl border border-(--border)/10 bg-(--background)/50 px-4 py-2.5">
+					<div className="flex flex-col">
+						<span className="text-xs font-bold text-(--text)">{t('admin.users.onboarding.tourToggle')}</span>
+						<span className="text-[10px] text-(--text-muted)">{t('admin.users.onboarding.tourToggleDesc')}</span>
+					</div>
+					<Toggle checked={tourCompleted} onChange={(e) => setTourCompleted(e.target.checked)} />
 				</div>
 
 				<div className="flex items-center justify-between rounded-2xl border border-(--border)/10 bg-(--background)/50 px-4 py-2.5">
@@ -255,6 +288,18 @@ export function UserIdentityTab({
 						<span className="text-[10px] text-(--text-muted)">{t('admin.users.fields.servicesDesc')}</span>
 					</div>
 					<Toggle checked={services} onChange={(e) => setServices(e.target.checked)} />
+				</div>
+
+				<div
+					className={`flex items-center justify-between rounded-2xl border px-4 py-2.5 transition-colors ${
+						shadowban ? 'border-(--accent-orange)/30 bg-(--accent-orange)/10' : 'border-(--border)/10 bg-(--background)/50'
+					}`}
+				>
+					<div className="flex flex-col pr-2">
+						<span className={`text-xs font-bold ${shadowban ? 'text-(--accent-orange)' : 'text-(--text)'}`}>{t('admin.users.fields.shadowbanToggle')}</span>
+						<span className="text-[10px] text-(--text-muted)">{t('admin.users.fields.shadowbanDesc')}</span>
+					</div>
+					<Toggle checked={shadowban} onChange={(e) => setShadowban(e.target.checked)} />
 				</div>
 
 				<div

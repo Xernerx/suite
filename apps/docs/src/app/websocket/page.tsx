@@ -51,15 +51,13 @@ export default function WebsocketDocsPage() {
 				}, 80);
 				return;
 			}
-			if (!view) {
-				setView('overview');
-			}
+			setView('overview');
 		};
 
 		applyHash();
 		window.addEventListener('hashchange', applyHash);
 		return () => window.removeEventListener('hashchange', applyHash);
-	}, [setView, view, hasWebsocket]);
+	}, [setView, hasWebsocket]);
 
 	useEffect(() => {
 		if (loading) return;

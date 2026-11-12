@@ -206,12 +206,12 @@ export function V1ProfileEndpoints({ activeGroup = 'all', searchQuery = '', meth
 							{
 								label: '@xernerx/hooks SDK',
 								language: 'typescript',
-								code: `import { HooksClient } from '@xernerx/hooks';\n\nconst hooks = new HooksClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst engagement = await hooks.getUser('482513687417061376');\nconsole.log(engagement.voted, engagement.reviewed, engagement.tipped);`,
+								code: `import { HooksClient } from '@xernerx/hooks';\n\nconst hooks = new HooksClient({\n    botId: '${effectiveBotId}',\n    token: process.env.XERNERX_API_TOKEN!\n});\n\nconst engagement = await hooks.getUser('482513687417061376');\nconsole.log(engagement.voted, engagement.reviewed, engagement.tipped, engagement.shadowban);`,
 							},
 							{
 								label: 'TypeScript (fetch)',
 								language: 'typescript',
-								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/users/482513687417061376');\nconst { voted, lastVotedAt, nextVoteAt, reviewed, rating, tipped } = await response.json();\nconsole.log({ voted, reviewed, tipped });`,
+								code: `const response = await fetch('https://api.xernerx.com/v1/bots/${effectiveBotId}/users/482513687417061376');\nconst { voted, lastVotedAt, nextVoteAt, reviewed, rating, tipped, shadowban } = await response.json();\nconsole.log({ voted, reviewed, tipped, shadowban });`,
 							},
 							{
 								label: 'cURL',

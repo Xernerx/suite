@@ -159,7 +159,7 @@ export async function searchFaq(query: string): Promise<FaqItem[]> {
 			const matchQuestion = item.question.toLowerCase().includes(q);
 			const matchCategory = item.categoryTitle.toLowerCase().includes(q);
 			const matchSection = item.sectionTitle.toLowerCase().includes(q);
-			const matchId = item.id.toLowerCase().includes(q) || item.slug.toLowerCase().includes(q);
+			const matchId = item.id.toLowerCase().includes(q) || (item.fullId && item.fullId.toLowerCase().includes(q)) || item.slug.toLowerCase().includes(q);
 			const matchAnswer = item.answer.toLowerCase().includes(q);
 			return matchQuestion || matchCategory || matchSection || matchId || matchAnswer;
 		})
@@ -187,7 +187,17 @@ export async function searchDocs(query: string): Promise<DocsItem[]> {
 export async function findFaqItem(idOrSlug: string): Promise<FaqItem | null> {
 	const items = await fetchFaqItems();
 	const target = idOrSlug.trim().toLowerCase();
-	return items.find((i) => i.id.toLowerCase() === target || i.slug.toLowerCase() === target || i.fullId?.toLowerCase() === target || i.question.toLowerCase() === target) || null;
+	return (
+		items.find(
+			(i) =>
+				i.fullId?.toLowerCase() === target ||
+				`${i.categoryId}.${i.id}`.toLowerCase() === target ||
+				`${i.categoryId}.${i.slug}`.toLowerCase() === target ||
+				i.question.toLowerCase() === target
+		) ||
+		items.find((i) => i.id.toLowerCase() === target || i.slug.toLowerCase() === target) ||
+		null
+	);
 }
 
 export async function findDocsItem(idOrSlug: string): Promise<DocsItem | null> {

@@ -96,7 +96,7 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 			{ label: 'Endpoint Reference', href: 'https://docs.xernerx.com/api/v1#fetch-bot-user-engagement' },
 			{ label: '@xernerx/hooks SDK', href: 'https://docs.xernerx.com/packages/@xernerx/hooks' },
 		],
-		keywords: ['get', 'bots', 'users', 'engagement', 'voted', 'reviewed', 'tipped', 'cooldown', '@xernerx/hooks', '@xernerx/framework'],
+		keywords: ['get', 'bots', 'users', 'engagement', 'voted', 'reviewed', 'tipped', 'shadowban', 'cooldown', '@xernerx/hooks', '@xernerx/framework'],
 	},
 	{
 		id: 'api-fetch-bot-stats',

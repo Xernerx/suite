@@ -7,7 +7,7 @@ import { Button, Input, MultiSelector, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loading } from '@xernerx/feedback';
-import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserSummary } from './users/types';
+import { DiscordProfile, FullUser, getNormalizedRoles, getUserPersona, getUserTourStatus, Role, UserSummary } from './users/types';
 import { UserCard } from './users/UserCard';
 import { useInfiniteScroll } from './useInfiniteScroll';
 
@@ -96,8 +96,10 @@ export default function Users({
 							icon: updatedUser.icon,
 							verified: updatedUser.verified,
 							blacklisted: updatedUser.blacklisted,
+							shadowban: updatedUser.shadowban,
 							services: updatedUser.services,
 							vanitySlug: updatedUser.vanitySlug,
+							onboarding: updatedUser.onboarding || u.onboarding,
 							level: updatedUser.level || u.level,
 							credits: updatedUser.credits
 								? {
@@ -164,7 +166,8 @@ export default function Users({
 				const nameMatch = user.name?.toLowerCase().includes(query) ?? false;
 				const idMatch = user.id?.toLowerCase().includes(query) ?? false;
 				const discordMatch = user.discord?.username?.toLowerCase().includes(query) ?? false;
-				const matchesSearch = nameMatch || idMatch || discordMatch;
+				const personaMatch = getUserPersona(user).toLowerCase().includes(query);
+				const matchesSearch = nameMatch || idMatch || discordMatch || personaMatch;
 				const userRoleIds = getNormalizedRoles(user);
 				const hasMissing = userRoleIds.some((rid) => Boolean(rid) && !existingRoleIdSet.has(rid));
 				const matchesRoles = filterRoleIds.length === 0 || filterRoleIds.some((roleId) => userRoleIds.includes(roleId));
@@ -212,8 +215,12 @@ export default function Users({
 				id: u.id,
 				name: u.name || u.discord?.globalName || u.discord?.username || '',
 				discordUsername: u.discord?.username || '',
+				persona: getUserPersona(u),
+				tourStatus: getUserTourStatus(u),
+				tourCompletedAt: u.onboarding?.completedAt || null,
 				verified: Boolean(u.verified),
 				blacklisted: Boolean(u.blacklisted),
+				shadowban: Boolean(u.shadowban),
 				services: u.services !== false,
 				level: u.level?.level ?? 1,
 				xp: u.level?.xp ?? 0,
@@ -232,7 +239,7 @@ export default function Users({
 			return;
 		}
 
-		const headers = ['id', 'name', 'discordUsername', 'verified', 'blacklisted', 'services', 'level', 'xp', 'credits', 'streak', 'roles', 'stripeCustomerId'];
+		const headers = ['id', 'name', 'discordUsername', 'persona', 'tourStatus', 'verified', 'blacklisted', 'shadowban', 'services', 'level', 'xp', 'credits', 'streak', 'roles', 'stripeCustomerId'];
 		const rows = filteredUsers.map((u) => {
 			const roleNames = getNormalizedRoles(u)
 				.map((rid) => roleMap.get(rid) || rid)
@@ -241,8 +248,11 @@ export default function Users({
 				u.id,
 				u.name || u.discord?.globalName || u.discord?.username || '',
 				u.discord?.username || '',
+				getUserPersona(u),
+				getUserTourStatus(u),
 				u.verified ? 'true' : 'false',
 				u.blacklisted ? 'true' : 'false',
+				u.shadowban ? 'true' : 'false',
 				u.services !== false ? 'true' : 'false',
 				u.level?.level ?? 1,
 				u.level?.xp ?? 0,

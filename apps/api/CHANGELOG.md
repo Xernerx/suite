@@ -2,6 +2,33 @@
 
 # api
 
+## 0.35.0
+
+### Minor Changes
+
+- ## User Shadowban Filtering, Admin Onboarding Controls & FAQ Deep-Link Blueprints
+  
+  Added global leaderboard shadowban filtering, `XernerxUser` engagement shadowban enrichment, Admin Users onboarding & shadowban mutation support, and FAQ/Docs deep-link catalog blueprints.
+  
+  ### Added
+  
+  - **Bot User Engagement Shadowban Field**: Included `shadowban: Boolean` on `GET /v1/bots/[id]/users/[userId]` payloads for `@xernerx/framework` and `@xernerx/hooks`.
+  - **Admin Users Onboarding & Shadowban Support**: Exposed `onboarding` in `GET /secure/users` and allowed updating `shadowban` and `onboarding` in `PATCH /secure/users/[id]`.
+  - **Virtue & Credit Algorithm FAQ Blueprints**: Added `faq-virtue-xp-level-algorithm` and `faq-credit-handout-algorithm` to the public FAQ blueprint registry alongside `#slug` deep-link anchors across FAQ and Docs catalogs.
+  
+  ### Changed
+  
+  - **Global Leaderboard Shadowban Exclusion**: Filtered out accounts with `shadowban: true` from `GET /v1/leaderboard` (`users` and `virtue` tabs).
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+  - @xernerx/ui@0.9.0
+  - @xernerx/components@0.17.1
+  - @xernerx/providers@0.23.1
+  - @xernerx/feedback@0.6.1
+
 ## 0.34.0
 
 ### Minor Changes

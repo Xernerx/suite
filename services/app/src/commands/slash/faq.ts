@@ -35,27 +35,27 @@ export async function buildFaqOverviewMessage(client: Client, tab: FaqCategoryTa
 		embed.addFields([
 			{
 				name: '🛡️ Platform & Identity',
-				value: '• [Account & Security](https://info.xernerx.com/faq?category=account)\n• [Store, Virtue & Billing](https://info.xernerx.com/faq?category=store)',
+				value: '• [Ecosystem & Navigation](https://info.xernerx.com/faq?category=overview)\n• [Account & Security](https://info.xernerx.com/faq?category=account)\n• [Billing & Store](https://info.xernerx.com/faq?category=billing)\n• [Desktop & Overlay](https://info.xernerx.com/faq?category=desktop)',
 				inline: true,
 			},
 			{
 				name: '⚙️ Developer Ecosystem',
-				value: '• [Bot Directory](https://info.xernerx.com/faq?category=bots)\n• [Developer Portal](https://info.xernerx.com/faq?category=portal)\n• [SDKs & Libraries](https://info.xernerx.com/faq?category=developers)',
+				value: '• [Bots & Directory](https://info.xernerx.com/faq?category=bots)\n• [API & Developers](https://info.xernerx.com/faq?category=developers)\n• [Environments & Status](https://info.xernerx.com/faq?category=environments)',
 				inline: true,
 			},
 			{
-				name: '💬 Community & Governance',
-				value: '• [Support & Feedback](https://info.xernerx.com/faq?category=support)\n• [Moderation & Safety](https://info.xernerx.com/faq?category=moderation)\n• [General Ecosystem](https://info.xernerx.com/faq?category=general)',
+				name: '💬 Community & Localization',
+				value: '• [Servers & Organizations](https://info.xernerx.com/faq?category=servers)\n• [Translations](https://info.xernerx.com/faq?category=translations)',
 				inline: false,
 			},
 		]);
 	} else {
 		const categoryMap: Record<Exclude<FaqCategoryTab, 'overview'>, string[]> = {
-			platform: ['account', 'store', 'billing'],
-			developers: ['bots', 'portal', 'developers', 'api'],
-			community: ['support', 'moderation', 'general'],
+			platform: ['account', 'billing', 'desktop'],
+			developers: ['bots', 'developers', 'environments'],
+			community: ['overview', 'servers', 'translations'],
 		};
-		const matching = allItems.filter((item) => categoryMap[tab].some((k) => item.categoryId.toLowerCase().includes(k) || item.categoryTitle.toLowerCase().includes(k)));
+		const matching = allItems.filter((item) => categoryMap[tab].some((k) => item.categoryId.toLowerCase() === k || item.categoryTitle.toLowerCase().includes(k)));
 		const displayItems = (matching.length > 0 ? matching : allItems).slice(0, 8);
 
 		embed.addFields([
@@ -118,10 +118,13 @@ export default class FaqCommand extends SlashCommandBuilder {
 			const results = await searchFaq(query);
 
 			await interaction.respond(
-				results.slice(0, 25).map((item) => ({
-					name: item.question.length > 100 ? `${item.question.slice(0, 97)}...` : item.question,
-					value: item.id.length > 100 ? item.id.slice(0, 100) : item.id,
-				}))
+				results.slice(0, 25).map((item) => {
+					const uniqueId = item.fullId || (item.id.includes('.') ? item.id : `${item.categoryId}.${item.id}`);
+					return {
+						name: item.question.length > 100 ? `${item.question.slice(0, 97)}...` : item.question,
+						value: uniqueId.length > 100 ? uniqueId.slice(0, 100) : uniqueId,
+					};
+				})
 			);
 		} catch (error) {
 			console.error('Error in /faq autocomplete:', error);

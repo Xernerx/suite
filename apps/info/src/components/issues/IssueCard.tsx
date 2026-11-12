@@ -11,20 +11,24 @@ interface IssueCardProps {
 	issue: any;
 	botInfo: { id: string; name: string; avatarUrl: string | null } | null;
 	onToggleProduct: (prod: string) => void;
+	highlighted?: boolean;
 }
 
-export default function IssueCard({ issue, botInfo, onToggleProduct }: IssueCardProps) {
+export default function IssueCard({ issue, botInfo, onToggleProduct, highlighted = false }: IssueCardProps) {
 	const { t } = useDictionary();
 
 	return (
 		<motion.div
+			id={`issue-${issue.id || issue._id}`}
 			layout
 			initial={{ opacity: 0, y: 15 }}
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, scale: 0.95 }}
 			transition={{ duration: 0.25, ease: 'easeOut' }}
 			whileHover={{ y: -2 }}
-			className="flex gap-4 p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
+			className={`flex gap-4 p-4 rounded-3xl border ${
+				highlighted ? 'border-(--accent)/60 ring-2 ring-(--accent)/25 bg-(--foreground)/50' : 'border-(--border)/10 bg-(--foreground)/30'
+			} backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30 scroll-mt-28`}
 		>
 			<div className="flex flex-col justify-center w-full min-w-0">
 				<div className="flex justify-between items-start gap-4">

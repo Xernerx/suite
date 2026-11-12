@@ -253,7 +253,17 @@ export default async function Server(msg: any) {
 		case 'get':
 			if (!msg.body?.ownerId && !msg.body?.id && (msg.action === 'levels' || msg.action === 'level')) {
 				const limit = Math.min(200, Math.max(1, Number(msg.body?.limit) || 100));
-				return model.find({}).sort({ level: -1, xp: -1 }).limit(limit).lean();
+				const db = await database('xernerx');
+				const UserModel = (db.models.users as any)?.User;
+				const excludedUsers = UserModel
+					? await UserModel.find({ $or: [{ blacklisted: true }, { shadowban: true }] })
+							.select('id')
+							.lean()
+							.catch(() => [])
+					: [];
+				const excludedIds = (excludedUsers || []).map((u: any) => String(u?.id || '')).filter(Boolean);
+				const query = excludedIds.length > 0 ? { ownerId: { $nin: excludedIds }, id: { $nin: excludedIds } } : {};
+				return model.find(query).sort({ level: -1, xp: -1 }).limit(limit).lean();
 			}
 			return model.findOne(getFilter(msg.action, msg.body)).lean();
 

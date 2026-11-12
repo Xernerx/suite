@@ -5,7 +5,7 @@
 import { Bot, Code, Coins, Server, Sparkles, Tag, ShoppingBag, TicketPercent, X, Check } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Input } from '@xernerx/ui';
+import { Button, Input, Toggle } from '@xernerx/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CatalogCategory, CatalogItem, UserSubscription } from '../components/types';
@@ -35,6 +35,7 @@ export default function StorePage() {
 	const [activeCategory, setActiveCategory] = useState<string>('');
 	const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
 	const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
+	const [hideOwned, setHideOwned] = useState<boolean>(false);
 	const [actionLoading, setActionLoading] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [promoInput, setPromoInput] = useState('');
@@ -350,33 +351,39 @@ export default function StorePage() {
 
 					{/* Global Billing Interval Toggle (Only for recurring subscription categories) */}
 					{currentCategory && currentCategory.id !== 'credits' && (
-						<div className="flex items-center gap-1 p-1 h-10 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
-							<button
-								onClick={() => {
-									setBillingInterval('month');
-									updateStoreUrlParams(currentCategory?.id, 'month');
-								}}
-								className={`h-full px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-									billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-								}`}
-							>
-								{t('account.store.billing.monthly')}
-							</button>
-							<button
-								onClick={() => {
-									setBillingInterval('year');
-									updateStoreUrlParams(currentCategory?.id, 'year');
-								}}
-								className={`h-full px-3 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-									billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
-								}`}
-							>
-								{t('account.store.billing.annually')}
-								{categoryMaxDiscount > 0 && (
-									<span className="bg-(--accent-green)/15 text-(--accent-green) px-1.5 py-0.5 rounded-lg text-[10px] font-bold">-{categoryMaxDiscount}%</span>
-								)}
-							</button>
-						</div>
+						<>
+							<div className="flex items-center gap-2.5 h-10 px-3.5 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs shrink-0">
+								<Toggle size="sm" checked={hideOwned} onChange={(e) => setHideOwned(e.target.checked)} />
+								<span className="text-xs font-semibold text-(--text) select-none">{t('account.store.credits.filters.hideOwned')}</span>
+							</div>
+							<div className="flex items-center gap-1 p-1 h-10 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xs">
+								<button
+									onClick={() => {
+										setBillingInterval('month');
+										updateStoreUrlParams(currentCategory?.id, 'month');
+									}}
+									className={`h-full px-3 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+										billingInterval === 'month' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{t('account.store.billing.monthly')}
+								</button>
+								<button
+									onClick={() => {
+										setBillingInterval('year');
+										updateStoreUrlParams(currentCategory?.id, 'year');
+									}}
+									className={`h-full px-3 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+										billingInterval === 'year' ? 'bg-(--background) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text)'
+									}`}
+								>
+									{t('account.store.billing.annually')}
+									{categoryMaxDiscount > 0 && (
+										<span className="bg-(--accent-green)/15 text-(--accent-green) px-1.5 py-0.5 rounded-lg text-[10px] font-bold">-{categoryMaxDiscount}%</span>
+									)}
+								</button>
+							</div>
+						</>
 					)}
 
 					{/* Promo Code Bar (Only for paid checkout categories) */}
@@ -449,7 +456,16 @@ export default function StorePage() {
 			) : (
 				currentCategory &&
 				(currentCategory.id === 'credits' ? (
-					<CreditStoreView items={currentItems} user={user} userLoading={userLoading || loading} mutateUser={mutate} actionLoading={actionLoading} onBuyCreditPack={handleBuyCreditPack} />
+					<CreditStoreView
+						items={currentItems}
+						user={user}
+						userLoading={userLoading || loading}
+						mutateUser={mutate}
+						actionLoading={actionLoading}
+						onBuyCreditPack={handleBuyCreditPack}
+						hideOwned={hideOwned}
+						onHideOwnedChange={setHideOwned}
+					/>
 				) : (
 					<DynamicCategoryView
 						category={currentCategory}
@@ -458,6 +474,7 @@ export default function StorePage() {
 						userLoading={userLoading || loading}
 						actionLoading={actionLoading}
 						highlightedItemId={highlightedItemId}
+						hideOwned={hideOwned}
 						appliedCoupon={appliedCoupon}
 						getActiveSubscription={getActiveSubscription}
 						handleSubscribe={handleSubscribe}

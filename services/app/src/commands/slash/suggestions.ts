@@ -244,11 +244,12 @@ export default class SuggestionsCommand extends SlashCommandBuilder {
 			const downvotes = Array.isArray(found.downvotes) ? found.downvotes.length : 0;
 			const netVotes = upvotes - downvotes;
 			const createdTs = found.createdAt ? Math.floor(new Date(found.createdAt).getTime() / 1000) : null;
+			const itemUrl = `${suggestionsUrl}?id=${encodeURIComponent(String(found.id || found._id))}`;
 
 			const itemEmbed = new EmbedBuilder()
 				.setColor(accentColor)
 				.setTitle(found.title)
-				.setURL(suggestionsUrl)
+				.setURL(itemUrl)
 				.setDescription(found.description || 'No description provided.')
 				.addFields([
 					{
@@ -274,7 +275,7 @@ export default class SuggestionsCommand extends SlashCommandBuilder {
 				.setTimestamp();
 
 			const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-				new ButtonBuilder().setLabel('Vote on Suggestions Hub').setStyle(ButtonStyle.Link).setURL(suggestionsUrl),
+				new ButtonBuilder().setLabel('Vote on Suggestions Hub').setStyle(ButtonStyle.Link).setURL(itemUrl),
 				new ButtonBuilder().setLabel('View Roadmap').setStyle(ButtonStyle.Link).setURL('https://info.xernerx.com/roadmap')
 			);
 

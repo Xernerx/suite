@@ -119,7 +119,7 @@ export async function buildLeaderboardMessage(client: Client, category: Leaderbo
 		const UserModel = (db.models.users as any).User;
 		const CreditModel = (db.models.users as any).Credit;
 
-		const publicUsers = await UserModel.find({ privacy: 'public' })
+		const publicUsers = await UserModel.find({ privacy: 'public', blacklisted: { $ne: true }, shadowban: { $ne: true } })
 			.select('id name')
 			.lean()
 			.catch(() => []);

@@ -39,6 +39,7 @@ export default function SuggestionsPage() {
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [sortBy, setSortBy] = useState<'top' | 'newest' | 'mine'>('top');
 	const [search, setSearch] = useState('');
+	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 	const [showForm, setShowForm] = useState(false);
 
 	const toggleProduct = (prod: string) => {
@@ -49,10 +50,14 @@ export default function SuggestionsPage() {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const qParam = params.get('q');
+			const idParam = params.get('id') || window.location.hash.replace(/^#(?:suggestion-)?/, '');
 			const prodParam = params.get('product');
 			const statusParam = params.get('status');
 			const sortParam = params.get('sort') as any;
 			const savedDraft = sessionStorage.getItem('xernerx_suggestion_draft');
+			if (idParam) {
+				setHighlightedId(idParam.trim());
+			}
 			if (qParam) {
 				setSearch(qParam);
 			} else if (savedDraft) {
@@ -226,7 +231,7 @@ export default function SuggestionsPage() {
 			if (selectedStatuses.length > 0) {
 				const rawStatus = String(s.status || 'open').toLowerCase();
 				const normalizedStatus =
-					rawStatus === 'planned' || rawStatus === 'active' || rawStatus === 'approved' || rawStatus === 'in_progress'
+					rawStatus === 'planned' || rawStatus === 'active' || rawStatus === 'approved' || rawStatus === 'accepted' || rawStatus === 'in_progress'
 						? 'planned'
 						: rawStatus === 'implemented' || rawStatus === 'completed' || rawStatus === 'released'
 							? 'implemented'
@@ -258,6 +263,15 @@ export default function SuggestionsPage() {
 			return votesB - votesA;
 		});
 	}, [search, selectedProducts, sortBy, selectedStatuses, user, suggestions, orgBots, botProfiles]);
+
+	useEffect(() => {
+		if (!highlightedId || loading || typeof document === 'undefined') return;
+		const timer = setTimeout(() => {
+			const el = document.getElementById(`suggestion-${highlightedId}`);
+			if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}, 150);
+		return () => clearTimeout(timer);
+	}, [highlightedId, loading, filteredSuggestions.length]);
 
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full min-h-screen pt-24 px-4 sm:px-8 pb-24">
@@ -384,7 +398,15 @@ export default function SuggestionsPage() {
 							>
 								<AnimatePresence mode="popLayout">
 									{filteredSuggestions.map((s: any) => (
-										<SuggestionCard key={s.id} suggestion={s} userId={user?.id} botInfo={resolveBot(s)} onToggleProduct={toggleProduct} onVote={vote} />
+										<SuggestionCard
+											key={s.id}
+											suggestion={s}
+											userId={user?.id}
+											botInfo={resolveBot(s)}
+											onToggleProduct={toggleProduct}
+											onVote={vote}
+											highlighted={Boolean(highlightedId && (String(s.id) === highlightedId || String(s._id) === highlightedId))}
+										/>
 									))}
 								</AnimatePresence>
 

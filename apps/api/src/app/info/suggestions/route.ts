@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
 	try {
 		const { models } = await database('xernerx');
-		const suggestions = await models.core.Suggestion.find({ status: 'pending' }).sort({ createdAt: -1 }).lean();
+		const suggestions = await models.core.Suggestion.find({ status: { $ne: 'declined' } }).sort({ createdAt: -1 }).lean();
 
 		const authorIds = [...new Set(suggestions.map((s) => s.authorId))];
 		const users = await models.users.User.find({ id: { $in: authorIds } })

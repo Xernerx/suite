@@ -2,6 +2,23 @@
 
 # @xernerx/websocket
 
+## 1.7.0
+
+### Minor Changes
+
+- ## WebSocket Global Leaderboard Shadowban Filtering
+  
+  Excluded shadowbanned accounts from real-time WebSocket global XP leaderboard queries.
+  
+  ### Changed
+  
+  - **WebSocket `fetchLeaderboard` Shadowban Exclusion**: Added `shadowban: { $ne: true }` to global `fetchLeaderboard` queries in `services/websocket/src/app/xernerx/server.ts`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+
 ## 1.6.0
 
 ### Minor Changes

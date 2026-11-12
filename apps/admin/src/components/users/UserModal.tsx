@@ -6,7 +6,7 @@ import { Trash2 } from 'lucide-react';
 import { Button, Confirm, Modal } from '@xernerx/ui';
 import { useDictionary, useToast, useUser } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { DiscordProfile, FullUser, getNormalizedRoles, Role, UserConnectionItem, UserDeviceItem, UserShowcaseItem, UserSummary } from './types';
+import { DiscordProfile, FullUser, getNormalizedRoles, getUserPersona, getUserTourStatus, Role, UserConnectionItem, UserDeviceItem, UserPersona, UserShowcaseItem, UserSummary } from './types';
 import { UserProfilePreview } from './UserProfilePreview';
 import { UserIdentityTab } from './UserIdentityTab';
 import { UserEconomyPerksTab } from './UserEconomyPerksTab';
@@ -64,11 +64,14 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 	const [description, setDescription] = useState('');
 	const [info, setInfo] = useState('');
 	const [privacy, setPrivacy] = useState('private');
+	const [persona, setPersona] = useState<UserPersona>(getUserPersona(user));
+	const [tourCompleted, setTourCompleted] = useState(getUserTourStatus(user) === 'completed');
 	const [verified, setVerified] = useState(Boolean(user.verified));
 	const [vanityUnlocked, setVanityUnlocked] = useState(Boolean(user.vanitySlug));
 	const [vanitySlug, setVanitySlug] = useState(user.vanitySlug || '');
 	const [widgets, setWidgets] = useState(false);
 	const [blacklisted, setBlacklisted] = useState(Boolean(user.blacklisted));
+	const [shadowban, setShadowban] = useState(Boolean(user.shadowban));
 	const [services, setServices] = useState(user.services !== false);
 	const [staffSubscription, setStaffSubscription] = useState(false);
 	const [pronouns, setPronouns] = useState('');
@@ -119,11 +122,14 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 						setDescription(data.description || '');
 						setInfo(data.info || '');
 						setPrivacy(data.privacy || 'private');
+						setPersona(getUserPersona(data));
+						setTourCompleted(getUserTourStatus(data) === 'completed');
 						setVerified(Boolean(data.verified || (data.agreedTerms && data.agreedPrivacy)));
 						setVanityUnlocked(Boolean(data.vanityUnlocked || data.vanitySlug));
 						setVanitySlug(data.vanitySlug || '');
 						setWidgets(Boolean(data.widgets));
 						setBlacklisted(Boolean(data.blacklisted));
+						setShadowban(Boolean(data.shadowban));
 						setServices(data.services !== false);
 						setStaffSubscription(Boolean(data.staffSubscription));
 						setPronouns(data.pronouns || '');
@@ -173,11 +179,14 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 			description !== (fullUser.description || '') ||
 			info !== (fullUser.info || '') ||
 			privacy !== (fullUser.privacy || 'private') ||
+			persona !== getUserPersona(fullUser) ||
+			tourCompleted !== (getUserTourStatus(fullUser) === 'completed') ||
 			verified !== Boolean(fullUser.verified || (fullUser.agreedTerms && fullUser.agreedPrivacy)) ||
 			vanityUnlocked !== Boolean(fullUser.vanityUnlocked || fullUser.vanitySlug) ||
 			vanitySlug !== (fullUser.vanitySlug || '') ||
 			widgets !== Boolean(fullUser.widgets) ||
 			blacklisted !== Boolean(fullUser.blacklisted) ||
+			shadowban !== Boolean(fullUser.shadowban) ||
 			services !== (fullUser.services !== false) ||
 			staffSubscription !== Boolean(fullUser.staffSubscription) ||
 			pronouns !== (fullUser.pronouns || '') ||
@@ -214,11 +223,14 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 		description,
 		info,
 		privacy,
+		persona,
+		tourCompleted,
 		verified,
 		vanityUnlocked,
 		vanitySlug,
 		widgets,
 		blacklisted,
+		shadowban,
 		services,
 		staffSubscription,
 		pronouns,
@@ -289,6 +301,24 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 				claimedAchievements,
 			};
 
+			const onboardingPayload = {
+				...(fullUser?.onboarding || {}),
+				persona,
+				...(tourCompleted
+					? {
+							suiteIntroCompleted: true,
+							dashboardTourCompleted: true,
+							supportPromptCompleted: true,
+							tourPostponed: false,
+							tourPostponedPhase: null,
+							completedAt: fullUser?.onboarding?.completedAt || new Date().toISOString(),
+						}
+					: {
+							dashboardTourCompleted: false,
+							completedAt: null,
+						}),
+			};
+
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
@@ -302,11 +332,13 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 					description,
 					info,
 					privacy,
+					onboarding: onboardingPayload,
 					verified,
 					vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
 					vanitySlug: vanitySlug.trim(),
 					widgets,
 					blacklisted,
+					shadowban,
 					services,
 					staffSubscription,
 					pronouns: pronouns.trim() || '',
@@ -357,12 +389,14 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 				description,
 				info,
 				privacy,
+				onboarding: updated?.onboarding || onboardingPayload,
 				verified,
 				...(verified === false ? { agreedTerms: null, agreedPrivacy: null } : {}),
 				vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
 				vanitySlug: vanitySlug.trim(),
 				widgets,
 				blacklisted,
+				shadowban,
 				services,
 				staffSubscription,
 				pronouns,
@@ -440,7 +474,10 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									verified={verified}
 									vanitySlug={vanitySlug}
 									blacklisted={blacklisted}
+									shadowban={shadowban}
 									services={services}
+									persona={persona}
+									tourCompleted={tourCompleted}
 									missingRoleCount={missingRoleCount}
 									onViewAuditLogs={
 										onViewAuditLogs
@@ -452,11 +489,23 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									}
 									onUnverified={() => {
 										setVerified(false);
+										setTourCompleted(false);
+										const resetOnboarding = {
+											persona,
+											suiteIntroCompleted: false,
+											dashboardTourCompleted: false,
+											supportPromptCompleted: false,
+											tourPostponed: false,
+											tourPostponedPhase: null,
+											completedAt: null,
+											onboardedBots: fullUser?.onboarding?.onboardedBots || [],
+										};
 										const nextFull: FullUser = {
 											...(fullUser as FullUser),
 											verified: false,
 											agreedTerms: null,
 											agreedPrivacy: null,
+											onboarding: resetOnboarding,
 										};
 										setFullUser(nextFull);
 										onUserUpdated(nextFull);
@@ -500,6 +549,10 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 										roles={roles}
 										privacy={privacy}
 										setPrivacy={setPrivacy}
+										persona={persona}
+										setPersona={setPersona}
+										tourCompleted={tourCompleted}
+										setTourCompleted={setTourCompleted}
 										verified={verified}
 										setVerified={setVerified}
 										vanityUnlocked={vanityUnlocked}
@@ -510,6 +563,8 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 										setWidgets={setWidgets}
 										blacklisted={blacklisted}
 										setBlacklisted={setBlacklisted}
+										shadowban={shadowban}
+										setShadowban={setShadowban}
 										services={services}
 										setServices={setServices}
 										staffSubscription={staffSubscription}
