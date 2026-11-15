@@ -14,7 +14,7 @@ import AccountAndSecurity from '@/components/faq/AccountAndSecurity';
 import BillingAndStore from '@/components/faq/BillingAndStore';
 import ApiAndDevelopers from '@/components/faq/ApiAndDevelopers';
 import Translations from '@/components/faq/Translations';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -22,6 +22,7 @@ export default function Page() {
 	const { show, setNavItems, setView, view } = useSidebar();
 	const { t } = useDictionary();
 	const [searchQuery, setSearchQuery] = useState('');
+	const hasInitializedUrl = useRef(false);
 
 	useEffect(() => {
 		const items: Array<SidebarNavItem> = [
@@ -83,14 +84,17 @@ export default function Page() {
 
 		setNavItems(items);
 
-		if (typeof window !== 'undefined') {
+		if (!hasInitializedUrl.current && typeof window !== 'undefined') {
+			hasInitializedUrl.current = true;
 			const params = new URLSearchParams(window.location.search);
-			const requestedCat = (params.get('category') || params.get('view'))?.toLowerCase();
+			const cardParam = params.get('card') || window.location.hash.replace(/^#/, '');
+			const cardCatPrefix = cardParam?.includes('.') ? cardParam.split('.')[0]?.toLowerCase() : undefined;
+			const requestedCat = (params.get('category') || params.get('view') || cardCatPrefix)?.toLowerCase();
 			const requestedQuery = params.get('q') || params.get('search');
 			if (requestedQuery) {
 				setSearchQuery((prev) => prev || requestedQuery);
 			}
-			if (requestedCat && items.some((i) => i.view === requestedCat) && !view) {
+			if (requestedCat && items.some((i) => i.view === requestedCat)) {
 				setView(requestedCat);
 				show();
 				return;

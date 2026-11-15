@@ -621,9 +621,12 @@
 				"verifiedFilter": "Verified Only",
 				"blacklistedFilter": "Blacklisted Only",
 				"blacklistedBadge": "Blacklisted",
+				"shadowbanBadge": "Shadowbanned",
 				"servicesDisabledBadge": "Services Off",
 				"blacklistedToggle": "Blacklist User",
 				"blacklistedDesc": "Disable access to all Xernerx services without deleting data (user can still sign in to Account Hub to delete data).",
+				"shadowbanToggle": "Shadowban User",
+				"shadowbanDesc": "Hide the user from all global leaderboards across the suite without restricting their account access.",
 				"servicesToggle": "Automatic Service Profiles",
 				"servicesDesc": "Allow Discord activity (messages/voice) to automatically create or update Xernerx & Virtue profiles.",
 				"ownedBotsTitle": "Owned Bots ({count})",
@@ -646,6 +649,29 @@
 				"removeOne": "Remove role {id}",
 				"removedToast": "Removed non-existent role",
 				"removeErrorToast": "Failed to remove non-existent role"
+			},
+			"onboarding": {
+				"personaLabel": "Persona",
+				"personaFieldLabel": "Account Persona",
+				"personaUser": "User",
+				"personaDeveloper": "Developer",
+				"personaBoth": "Both (User & Dev)",
+				"personaBothShort": "Both",
+				"tourLabel": "Suite Tour",
+				"tourCompletedBadge": "Tour Done",
+				"tourPostponedBadge": "Tour Postponed",
+				"tourPendingBadge": "Tour Not Done",
+				"tourCompleted": "Completed",
+				"tourCompletedOn": "Completed ({date})",
+				"tourPostponed": "Postponed",
+				"tourPostponedPhase": "Postponed ({phase})",
+				"tourPending": "Not Completed",
+				"tourToggle": "Suite Tour Completed",
+				"tourToggleDesc": "Marks the interactive Suite onboarding tour as completed for this user.",
+				"personaTooltip": "Selected onboarding persona: {persona}",
+				"tourCompletedTooltip": "Interactive Suite Tour completed{date}",
+				"tourPostponedTooltip": "Interactive Suite Tour postponed{phase}",
+				"tourPendingTooltip": "User has not completed the interactive Suite Tour yet"
 			}
 		},
 		"tokens": {
@@ -3414,7 +3440,8 @@
 					"iconPacks": "Icon & Header Packs",
 					"creditPacks": "Buy Credits (€)",
 					"streakShields": "Streak Shields",
-					"vanityUrls": "Vanity URLs"
+					"vanityUrls": "Vanity URLs",
+					"hideOwned": "Hide Owned"
 				},
 				"ladder": {
 					"title": "7-Day Daily Streak Ladder",
@@ -5535,6 +5562,15 @@
 			"card8": {
 				"title": "Can I assign Virtue level roles for Text XP and Voice XP independently or use Dynamic Hoist Roles?",
 				"description": "Yes! In the Server Dashboard under the Virtue tab (app.xernerx.com/dashboard?tab=virtue), each Level Role (or your Dynamic Hoist Roles configuration) can be assigned to one of three XP tracks: (1) Unified Server XP (Combined)—unlocks when a member reaches the target combined Server Level from both text and voice activity; (2) Text XP (Messages Only)—unlocks independently when a member reaches the target level on the text chat XP track; or (3) Voice XP (Voice Time Only)—unlocks independently when a member reaches the target level on the voice channel XP track. With Dynamic Hoist Roles enabled (Server Owner Pass), Virtue automatically creates, hoists, and color-interpolates up to 250 level roles above your Level 1 Base Anchor Role. Members can also run /roles in Discord to view all configured level roles, their track badges (SERVER, TEXT, VOICE), and their live unlock progress."
+			},
+			"card9": {
+				"title": "How are Virtue & Global XP, Level Curves, Cooldowns, and Multipliers calculated?",
+				"description1": "Virtue tracks four progression tracks simultaneously—<strong>Global Level</strong> (across all Xernerx servers) plus per-server <strong>Unified Server</strong>, <strong>Text</strong>, and <strong>Voice</strong> levels. Advancing from current <code>level</code> to <code>level + 1</code> requires <code>XP = a × (level + 1)² + b × (level + 1)</code>, with any overflow XP carrying over into the next level.",
+				"description2": "Here are the exact difficulty curve parameters, cooldowns, voice eligibility rules, and stacked XP multipliers:",
+				"bullet1": "<strong>5 Curve Difficulty Modes (<code>a</code>, <code>b</code>, Base XP Roll &amp; Cooldown):</strong> <strong>Easy</strong> (<code>a = 1, b = 20</code>, <code>15–25 XP</code> per roll, <code>30s</code> cooldown) • <strong>Casual</strong> (<code>a = 3, b = 40</code>, <code>10–18 XP</code>, <code>45s</code> cooldown) • <strong>Balanced (Default &amp; Global Track)</strong> (<code>a = 5, b = 50</code>, <code>7–13 XP</code>, <code>60s</code> server / <code>120s</code> global cooldown) • <strong>Hard</strong> (<code>a = 8, b = 60</code>, <code>5–10 XP</code>, <code>120s</code> cooldown) • <strong>Extreme</strong> (<code>a = 12, b = 100</code>, <code>3–7 XP</code>, <code>300s</code> cooldown).",
+				"bullet2": "<strong>Voice Channel Eligibility &amp; Go Live Boost:</strong> Voice XP ticks every <code>60s</code> (minimum <code>30s</code> active) when a non-bot member is in a non-AFK voice channel, is not deafened or self-deafened, and at least <strong>2 eligible members</strong> are present in the channel. Active screen-sharing / Go Live grants a <strong><code>1.25x</code> (<code>+25%</code>) Voice Streaming XP Multiplier</strong>.",
+				"bullet3": "<strong>Personal XP Multiplier (<code>1 + bonus</code>, up to <code>1.65x</code>):</strong> Additive personal bonuses stack from holding an active <strong>Virtue Pass or Ultra Ecosystem pass</strong> (<code>+50%</code> / <code>+0.50</code>), having an active <strong>12-hour Bot Vote</strong> (<code>+10%</code> / <code>+0.10</code>), and having submitted a <strong>Bot Review</strong> (<code>+5%</code> / <code>+0.05</code>).",
+				"bullet4": "<strong>Server, Booster &amp; Global Event Multipliers:</strong> Final XP per message or voice tick is <code>round(baseRoll × personalMultiplier × serverMultiplier × boosterMultiplier × globalEventMultiplier)</code>, combining the server's base XP rate (<code>1x–5x</code>), Discord Server Booster bonus (<code>1x–3x</code> on premium servers), and any active platform-wide Global XP Event (<code>1x–10x</code>)."
 			}
 		},
 		"account": {
@@ -5602,7 +5638,7 @@
 			},
 			"card3": {
 				"title": "How do the Daily Credit Gift, 48-hour streak grace window, and voting rewards work?",
-				"description": "Claim your Daily Gift every 24h for 50 base Credits + streak bonuses (up to +100) + a +100 Milestone Bonus every 7th day, protected by up to 3 Streak Shields. You also earn +100 Credits for every new Discord server you invite an official bot to, automatic Community Bounties (+500 Credits for verified/resolved bug reports on info.xernerx.com/bugs, +250 Credits for accepted/implemented suggestions on info.xernerx.com/suggestions), Contributor Milestone Achievements (Streak Master, Community Voter, Ecosystem Builder), and +250 Credits for both you and a friend via the Referral Program!"
+				"description": "Claim your Daily Gift every 24h for 50–150 random base Credits + (streak × 10) streak bonus + a +250 Milestone Chest every 7th day, protected by a 48-hour grace window and up to 3 Streak Shields. You also earn 100 base Credits every 12h when voting for a bot or server, +100 Credits for every new Discord server you invite an official bot to, automatic Community Bounties (+500 Credits for verified/resolved bug reports on info.xernerx.com/bugs, +250 Credits for accepted/implemented suggestions on info.xernerx.com/suggestions), Contributor Milestone Achievements (Streak Master, Community Voter, Ecosystem Builder), and +250 Credits for both you and a friend via the Referral Program!"
 			},
 			"card4": {
 				"title": "How does the Media CDN (cdn.xernerx.com) work and what are the storage quotas?",
@@ -5619,6 +5655,16 @@
 			"card7": {
 				"title": "Can I tip Credits to other users or bot developers?",
 				"description": "Yes! Peer-to-Peer Credit Tipping allows you to send spendable Xernerx Credits directly to friends, community contributors, or your favorite bot developers from their public profile or bot listing page. Both the sender and recipient receive an instant ledger receipt in their Account Billing history."
+			},
+			"card8": {
+				"title": "How are Credit Hand-Outs calculated across Level-Ups, Daily Gifts, Votes, and Multipliers?",
+				"description1": "Xernerx Credits are minted automatically across level-up milestones, daily streaks, voting, server onboarding, referrals, and community contributions. Both Virtue level-up tracks use a square-root progression curve (<code>root = √(level − 1)</code>) with milestone bonuses every 10th level and anti-inflation caps:",
+				"description2": "Here is the exact mathematical breakdown for every credit hand-out in the ecosystem:",
+				"bullet1": "<strong>Server Level-Up Credits (<code>3–22</code> Credits):</strong> Rolls a random integer between <code>min = 3 + min(10, floor(√(level − 1) × 0.6))</code> and <code>max = 5 + min(15, floor(√(level − 1) × 1.0))</code>, adds <strong><code>+2</code> Credits</strong> on every 10th milestone level (<code>level % 10 === 0</code>), and caps at <strong><code>22</code> Credits</strong> per level-up (scaling from <code>3–5</code> Credits at Level 1 up to <code>13–22</code> Credits at high levels).",
+				"bullet2": "<strong>Global Level-Up Credits (<code>5–80</code> Credits):</strong> Rolls a random integer between <code>min = 5 + min(25, floor(√(level − 1) × 1.5))</code> and <code>max = 25 + min(50, floor(√(level − 1) × 3.2))</code>, adds <strong><code>+5</code> Credits</strong> on every 10th milestone level, and caps at <strong><code>80</code> Credits</strong> per level-up (scaling from <code>5–25</code> Credits at Level 1 up to <code>30–80</code> Credits at high levels).",
+				"bullet3": "<strong>Daily Gift &amp; 7-Day Milestone Formula:</strong> Every 24 hours (with a 48-hour streak grace window or automatic Streak Shield protection), base reward is <code>Base = Random(50, 150) + (streak × 10) + (streak % 7 === 0 ? 250 : 0)</code>.",
+				"bullet4": "<strong>Subscription Credit Multipliers (<code>100%</code> / <code>125%</code> / <code>200%</code>):</strong> Applied to Daily Gifts and 12-hour Bot/Server Votes (<code>100</code> base Credits): <strong>Free Tier</strong> receives <code>100%</code> (<code>1.0x</code>), an active <strong>Virtue Pass or individual subscription</strong> receives <code>125%</code> (<code>1.25x</code>), and <strong>Ultra Ecosystem or Staff Subscription</strong> receives <code>200%</code> (<code>2.0x</code>).",
+				"bullet5": "<strong>Fixed Onboarding, Bounty, Referral &amp; Achievement Payouts:</strong> <strong><code>+1,000</code> Credits</strong> Welcome Wallet on first sign-in • <strong><code>+100</code> Credits</strong> per newly connected Discord server via Bot Onboarding • <strong><code>+250</code> Credits</strong> to both you and your friend on their first Daily Gift claim via Referrals • <strong><code>+500</code> Credits</strong> for verified/resolved Bug Reports and <strong><code>+250</code> Credits</strong> for accepted/implemented Suggestions • <strong><code>+150</code> / <code>+500</code> / <code>+2,000</code> Credits</strong> for <code>7</code> / <code>30</code> / <code>100</code>-day streaks, <strong><code>+150</code> / <code>+500</code> Credits</strong> for <code>10</code> / <code>50</code> votes, and <strong><code>+500</code> Credits</strong> for Ecosystem Builder."
 			}
 		},
 		"developers": {
@@ -7861,7 +7907,7 @@
 					},
 					"fetchLeaderboard": {
 						"title": "Fetch Platform Leaderboard",
-						"description": "Retrieve top public Discord bots, servers, and user daily credit streaks ranked across the Xernerx ecosystem."
+						"description": "Retrieve top public Discord bots, servers, and user daily credit streaks (excluding shadowbanned accounts) ranked across the Xernerx ecosystem."
 					},
 					"fetchChangelogRss": {
 						"title": "Fetch Changelog RSS Feed",
@@ -7894,7 +7940,7 @@
 					},
 					"fetchBotUserEngagement": {
 						"title": "Fetch User Bot Engagement (Voted, Reviewed, Tipped)",
-						"description": "Check whether a Discord user has an active 12-hour vote cooldown, has left a review, and their cumulative credit tips for a bot. Used by @xernerx/framework and @xernerx/hooks engagement validators."
+						"description": "Check whether a Discord user has an active 12-hour vote cooldown, has left a review, their cumulative credit tips for a bot, and whether their account is shadowbanned. Used by @xernerx/framework and @xernerx/hooks engagement validators."
 					}
 				},
 				"common": {

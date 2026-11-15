@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
 		const authHeaderParam = req.headers.get('authorization');
 		const { models } = await database('xernerx');
 
-		// 1. Strictly fetch ONLY users who have explicitly set privacy === 'public' and are not blacklisted
-		const publicUsers = (await models.users.User.find({ privacy: 'public', blacklisted: { $ne: true } })
+		// 1. Strictly fetch ONLY users who have explicitly set privacy === 'public' and are not blacklisted or shadowbanned
+		const publicUsers = (await models.users.User.find({ privacy: 'public', blacklisted: { $ne: true }, shadowban: { $ne: true } })
 			.select('id name icon verified description discordCache')
 			.lean()) as any[];
 		const publicUserMap = new Map<string, any>();

@@ -2,6 +2,29 @@
 
 # info
 
+## 1.12.0
+
+### Minor Changes
+
+- ## Virtue Leveling & Credit Hand-Out Algorithm FAQs and Deep-Link Highlighting
+  
+  Added detailed mathematical breakdowns for Virtue & Global XP level curves and ecosystem credit hand-outs to the FAQ hub, plus deep-link highlight rings across FAQ, Suggestions, Issues, Roadmap, and Changelog views.
+  
+  ### Added
+  
+  - **Virtue & Global XP Level Algorithm Card**: Added `faq.servers.card9` detailing the `XP = a × (level + 1)² + b × (level + 1)` threshold curve, all 5 difficulty modes (`Easy`, `Casual`, `Balanced`, `Hard`, `Extreme`), voice channel eligibility & `1.25x` Go Live streaming boost, and stacked personal, server, and booster multipliers.
+  - **Credit Hand-Out Algorithm Card**: Added `faq.billing.card8` detailing the square-root Server (`3–22` Credits) and Global (`5–80` Credits) level-up credit formulas, the Daily Gift & 7-Day Milestone formula, `100%` / `125%` / `200%` subscription credit multipliers, and fixed onboarding, referral, bounty, and achievement payouts.
+  - **Deep-Link Hash & Query Highlighting**: Added automatic auto-expand, smooth scrolling, and accent highlight rings when linking to specific cards across `/faq`, `/suggestions`, `/issues`, `/bugs`, `/roadmap`, and `/changelog`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+  - @xernerx/ui@0.9.0
+  - @xernerx/components@0.17.1
+  - @xernerx/providers@0.23.1
+  - @xernerx/feedback@0.6.1
+
 ## 1.11.11
 
 ### Patch Changes

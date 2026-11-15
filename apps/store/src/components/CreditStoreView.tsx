@@ -2,9 +2,9 @@
 
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { Award, Bot, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
-import { Badge, Button, Confirm, Input, MultiSelector } from '@xernerx/ui';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Award, Bot, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, PackageSearch, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
+import { Badge, Button, Confirm, Input, Tabs, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { CreditLedgerCard } from './CreditLedgerCard';
 import { DailyStreakLadder } from './DailyStreakLadder';
@@ -18,6 +18,8 @@ interface CreditStoreViewProps {
 	mutateUser?: () => Promise<any>;
 	actionLoading: string | null;
 	onBuyCreditPack: (priceId: string, item: CatalogItem) => void;
+	hideOwned?: boolean;
+	onHideOwnedChange?: (hideOwned: boolean) => void;
 }
 
 const PERK_ICONS: Record<string, any> = {
@@ -42,12 +44,18 @@ const PERK_ICONS: Record<string, any> = {
 	vanity_badge: Award,
 };
 
-export function CreditStoreView({ items, user, userLoading, mutateUser, actionLoading, onBuyCreditPack }: CreditStoreViewProps) {
+export function CreditStoreView({ items, user, userLoading, mutateUser, actionLoading, onBuyCreditPack, hideOwned: controlledHideOwned, onHideOwnedChange }: CreditStoreViewProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 
-	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+	const [selectedCategory, setSelectedCategory] = useState<string>('all');
+	const [internalHideOwned, setInternalHideOwned] = useState(false);
+	const hideOwned = controlledHideOwned ?? internalHideOwned;
+	const setHideOwned = (val: boolean) => {
+		setInternalHideOwned(val);
+		onHideOwnedChange?.(val);
+	};
 	const [search, setSearch] = useState('');
 	const [claimingDaily, setClaimingDaily] = useState(false);
 	const [timeLeft, setTimeLeft] = useState('');
@@ -146,6 +154,18 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 
 	const creditPacks = useMemo(() => items.filter((i) => i.itemType === 'credit_pack').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
 	const creditPerks = useMemo(() => items.filter((i) => i.itemType === 'credit_perk').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
+	const isPerkOwned = useCallback(
+		(item: CatalogItem) => {
+			const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
+			const badgeKey = String(item.perkValue || item.id);
+			return (
+				((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isStageOrIcon) &&
+					(unlockedBadges.includes(badgeKey) || unlockedBadges.includes(String(item.id)) || Boolean(CHILD_TO_BUNDLE[badgeKey] && unlockedBadges.includes(CHILD_TO_BUNDLE[badgeKey])))) ||
+				(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3)
+			);
+		},
+		[unlockedBadges, user?.credits?.streakShields]
+	);
 	const matchesPerkCategory = (item: CatalogItem, cat: string) => {
 		if (cat === 'stage_style') return item.perkType === 'stage_style' || item.perkType === 'ambient_scene' || item.perkType === 'surface_style';
 		if (cat === 'icon_pack') return item.perkType === 'icon_pack' || item.perkType === 'window_style' || item.perkType === 'cursor_fx' || item.perkType === 'overlay_skin';
@@ -153,16 +173,16 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 		return item.perkType === cat;
 	};
 	const filteredPerks = useMemo(() => {
-		const activePerkCategories = selectedCategories.filter((c) => c !== 'credit_packs');
-		if (selectedCategories.length > 0 && activePerkCategories.length === 0) return [];
+		if (selectedCategory === 'credit_packs') return [];
 		const q = search.trim().toLowerCase();
 		return creditPerks.filter((item) => {
-			if (activePerkCategories.length > 0 && !activePerkCategories.some((c) => matchesPerkCategory(item, c))) return false;
+			if (hideOwned && isPerkOwned(item)) return false;
+			if (selectedCategory !== 'all' && !matchesPerkCategory(item, selectedCategory)) return false;
 			if (!q) return true;
 			return item.name?.toLowerCase().includes(q) || item.description?.toLowerCase().includes(q) || item.badge?.toLowerCase().includes(q);
 		});
-	}, [creditPerks, selectedCategories, search]);
-	const showCreditPacks = selectedCategories.length === 0 || selectedCategories.includes('credit_packs');
+	}, [creditPerks, selectedCategory, search, hideOwned, isPerkOwned]);
+	const showCreditPacks = selectedCategory === 'all' || selectedCategory === 'credit_packs';
 	const getPerkIcon = (perkType?: string, perkValue?: string | number | null) => PERK_ICONS[String(perkValue || '')] || PERK_ICONS[String(perkType || '')] || Sparkles;
 	const getEffectiveCreditCost = (item: CatalogItem) => {
 		const base = Math.max(0, Number(item.creditCost) || 0);
@@ -209,7 +229,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 					)}
 					<Button
 						variant="secondary"
-						onClick={() => setSelectedCategories((prev) => (prev.length === 1 && prev[0] === 'credit_packs' ? [] : ['credit_packs']))}
+						onClick={() => setSelectedCategory((prev) => (prev === 'credit_packs' ? 'all' : 'credit_packs'))}
 						className="flex items-center gap-2"
 					>
 						<Coins size={15} className="text-(--accent)" />
@@ -219,41 +239,54 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 			</div>
 
 			{/* Header & Filter Bar */}
-			<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-30">
-				<div className="flex flex-col gap-0.5">
-					<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						<Sparkles size={20} className="text-(--accent)" />
-						{t('account.store.credits.perksHeading')}
-					</h2>
-					<span className="text-xs text-(--text-muted)">{t('account.store.credits.perksSubheading')}</span>
+			<div className="flex flex-col gap-3">
+				<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-30">
+					<div className="flex flex-col gap-0.5">
+						<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							<Sparkles size={20} className="text-(--accent)" />
+							{t('account.store.credits.perksHeading')}
+						</h2>
+						<span className="text-xs text-(--text-muted)">{t('account.store.credits.perksSubheading')}</span>
+					</div>
+
+					<div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full lg:w-auto">
+						<div className="flex items-center gap-2.5 h-10 px-3.5 rounded-2xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shrink-0">
+							<Toggle size="sm" checked={hideOwned} onChange={(e) => setHideOwned(e.target.checked)} />
+							<span className="text-xs font-semibold text-(--text) select-none">{t('account.store.credits.filters.hideOwned')}</span>
+						</div>
+						<div className="w-full sm:w-72">
+							<Input variant="search" shortcut={true} placeholder={t('account.store.credits.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
+						</div>
+					</div>
 				</div>
 
-				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
-					<div className="w-full sm:w-72">
-						<Input variant="search" shortcut={true} placeholder={t('account.store.credits.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-					</div>
-					<MultiSelector
-						className="w-full sm:w-auto shrink-0"
-						placeholder={t('account.store.credits.allCategories')}
-						value={selectedCategories}
-						onChange={setSelectedCategories}
-						options={[
-							{ value: 'stage_style', label: t('account.store.credits.filters.stageStyles') },
-							{ value: 'icon_pack', label: t('account.store.credits.filters.iconPacks') },
-							{ value: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
-							{ value: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
-							{ value: 'bot_slots', label: t('account.store.credits.filters.botSlots') },
-							{ value: 'vanity_url', label: t('account.store.credits.filters.vanityUrls') },
-							{ value: 'trial_pass', label: t('account.store.credits.filters.trialPasses') },
-							{ value: 'vanity_badge', label: t('account.store.credits.filters.vanityBadges') },
-							{ value: 'streak_shield', label: t('account.store.credits.filters.streakShields') },
-							{ value: 'credit_packs', label: t('account.store.credits.filters.creditPacks') },
-						]}
-					/>
-				</div>
+				<Tabs
+					size="sm"
+					activeTab={selectedCategory}
+					onChange={setSelectedCategory}
+					tabs={[
+						{ id: 'all', label: t('account.store.credits.allCategories') },
+						{ id: 'stage_style', label: t('account.store.credits.filters.stageStyles') },
+						{ id: 'icon_pack', label: t('account.store.credits.filters.iconPacks') },
+						{ id: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
+						{ id: 'showcase_slots', label: t('account.store.credits.filters.showcaseSlots') },
+						{ id: 'bot_slots', label: t('account.store.credits.filters.botSlots') },
+						{ id: 'vanity_url', label: t('account.store.credits.filters.vanityUrls') },
+						{ id: 'trial_pass', label: t('account.store.credits.filters.trialPasses') },
+						{ id: 'vanity_badge', label: t('account.store.credits.filters.vanityBadges') },
+						{ id: 'streak_shield', label: t('account.store.credits.filters.streakShields') },
+						{ id: 'credit_packs', label: t('account.store.credits.filters.creditPacks') },
+					]}
+				/>
 			</div>
 
 			{/* Credit Perks Grid */}
+			{filteredPerks.length === 0 && !showCreditPacks && (
+				<div className="flex flex-col items-center justify-center p-12 text-center border border-(--border)/10 rounded-3xl bg-(--foreground)/20">
+					<PackageSearch className="w-12 h-12 text-(--text-muted) mb-3 opacity-50" />
+					<p className="text-(--text-muted) text-sm">{t('account.store.noItems')}</p>
+				</div>
+			)}
 			{filteredPerks.length > 0 && (
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
 					{filteredPerks.map((item) => {
@@ -261,11 +294,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 						const effectiveCost = getEffectiveCreditCost(item);
 						const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix' || item.perkType === 'profile_cosmetic';
 						const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
-						const badgeKey = String(item.perkValue || item.id);
-						const isOwnedBadge =
-							((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isStageOrIcon) &&
-								(unlockedBadges.includes(badgeKey) || Boolean(CHILD_TO_BUNDLE[badgeKey] && unlockedBadges.includes(CHILD_TO_BUNDLE[badgeKey])))) ||
-							(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3);
+						const isOwnedBadge = isPerkOwned(item);
 						const canAfford = creditBalance >= effectiveCost;
 
 						return (
@@ -348,7 +377,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 													return;
 												}
 												if (!canAfford) {
-													setSelectedCategories(['credit_packs']);
+													setSelectedCategory('credit_packs');
 													return;
 												}
 												setConfirmItem(item);

@@ -160,6 +160,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 		if (!isStaffOrSystem) {
 			delete userBody.roles;
 			delete userBody.blacklisted;
+			delete userBody.shadowban;
 			delete userBody.staffSubscription;
 			delete userBody.verified;
 			delete userBody.vanityUnlocked;
@@ -360,6 +361,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			}
 			delete userBody.roles;
 			delete userBody.blacklisted;
+			delete userBody.shadowban;
 			delete userBody.staffSubscription;
 			delete userBody.vanityUnlocked;
 			delete userBody.stripeCustomerId;
@@ -519,6 +521,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 				privacy: 'private',
 				services: true,
 				blacklisted: false,
+				shadowban: Boolean((existingDoc as any)?.shadowban),
 				roles: Array.isArray(existingDoc?.roles) ? existingDoc.roles : [],
 				preferences: { locale: 'en-GB' },
 			};

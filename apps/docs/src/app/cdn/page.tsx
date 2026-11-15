@@ -44,15 +44,13 @@ export default function CdnDocsPage() {
 				}, 80);
 				return;
 			}
-			if (!view) {
-				setView('overview');
-			}
+			setView('overview');
 		};
 
 		applyHash();
 		window.addEventListener('hashchange', applyHash);
 		return () => window.removeEventListener('hashchange', applyHash);
-	}, [setView, view, isAdmin]);
+	}, [setView, isAdmin]);
 
 	useEffect(() => {
 		if (!loading && !isAdmin) {

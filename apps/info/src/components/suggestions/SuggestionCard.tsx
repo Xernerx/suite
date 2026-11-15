@@ -11,22 +11,26 @@ interface SuggestionCardProps {
 	botInfo: { id: string; name: string; avatarUrl: string | null } | null;
 	onToggleProduct: (prod: string) => void;
 	onVote: (id: string, action: 'upvote' | 'downvote') => void;
+	highlighted?: boolean;
 }
 
-export function SuggestionCard({ suggestion: s, userId, botInfo, onToggleProduct, onVote }: SuggestionCardProps) {
+export function SuggestionCard({ suggestion: s, userId, botInfo, onToggleProduct, onVote, highlighted = false }: SuggestionCardProps) {
 	const hasUpvoted = Boolean(userId && s.upvotes?.includes(userId));
 	const hasDownvoted = Boolean(userId && s.downvotes?.includes(userId));
 	const netVotes = (s.upvotes?.length || 0) - (s.downvotes?.length || 0);
 
 	return (
 		<motion.div
+			id={`suggestion-${s.id || s._id}`}
 			layout
 			initial={{ opacity: 0, y: 15 }}
 			animate={{ opacity: 1, y: 0 }}
 			exit={{ opacity: 0, scale: 0.95 }}
 			transition={{ duration: 0.25, ease: 'easeOut' }}
 			whileHover={{ y: -2 }}
-			className="flex gap-4 p-4 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30"
+			className={`flex gap-4 p-4 rounded-3xl border ${
+				highlighted ? 'border-(--accent)/60 ring-2 ring-(--accent)/25 bg-(--foreground)/50' : 'border-(--border)/10 bg-(--foreground)/30'
+			} backdrop-blur-md shadow-sm transition-colors hover:border-(--accent)/30 scroll-mt-28`}
 		>
 			<div className="flex flex-col items-center gap-1 justify-center shrink-0">
 				<motion.button

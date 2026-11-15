@@ -415,6 +415,20 @@ export const FAQ_PLATFORM_AND_COMMUNITY_BLUEPRINTS: RawCategoryBlueprint[] = [
 					ql('botInvites', 'https://www.xernerx.com/invites', 'xernerx.com/invite'),
 				]
 			),
+			c(
+				'card9',
+				'virtue-level-algorithm',
+				'faq.servers.card9.title',
+				['faq.servers.card9.description1', 'faq.servers.card9.description2'],
+				[
+					ql('virtueSettings', 'https://app.xernerx.com/dashboard?tab=virtue', 'app.xernerx.com/dashboard?tab=virtue'),
+					ql('leaderboards', 'https://app.xernerx.com/leaderboard', 'app.xernerx.com/leaderboard'),
+					ql('storeConsumers', 'https://store.xernerx.com/?category=consumers', 'store.xernerx.com/?category=consumers'),
+				],
+				{
+					bulletKeys: ['faq.servers.card9.bullet1', 'faq.servers.card9.bullet2', 'faq.servers.card9.bullet3', 'faq.servers.card9.bullet4'],
+				}
+			),
 		],
 	},
 ];

@@ -155,7 +155,7 @@ export default function ApiAndDevelopers({ searchQuery = '' }: { searchQuery?: s
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				{cards.map((card) => (
-					<CollapsibleCard key={card.id} message={card.title} description={card.description} />
+					<CollapsibleCard key={card.id} id={`developers.${card.id}`} message={card.title} description={card.description} />
 				))}
 			</div>
 		</div>

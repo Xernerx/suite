@@ -2,6 +2,19 @@
 
 # @xernerx/lib
 
+## 1.26.0
+
+### Minor Changes
+
+- ## User Profile `shadowban` Schema & Localization Dictionary Updates
+  
+  Added the `shadowban` boolean property to the Mongoose `User` profile model and updated `en-GB.json` with Admin Users persona/tour/shadowban keys and Virtue/Credit FAQ algorithm breakdowns.
+  
+  ### Added
+  
+  - **Mongoose User `shadowban` Field**: Added `shadowban: { type: Boolean, default: false }` to `packages/lib/src/models/xernerx/users/Profile.ts`.
+  - **Admin & FAQ Localization Keys**: Added `admin.users.card.*`, `admin.users.preview.*`, `admin.users.identity.*`, `faq.servers.card9.*`, and `faq.billing.card8.*` localization strings in `en-GB.json`.
+
 ## 1.25.0
 
 ### Minor Changes

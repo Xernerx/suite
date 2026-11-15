@@ -3,7 +3,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, ArrowLeft, Award, BarChart2, Bot, Code, Compass, Globe, HelpCircle, Key, Layers, Lock, Map, Settings2, Shield, ShoppingBag, Terminal } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SidebarNavItem, useSidebar, useDictionary } from '@xernerx/providers';
 import { Loading, NotPermitted } from '@xernerx/feedback';
 import { Input, Selector } from '@xernerx/ui';
@@ -37,12 +37,14 @@ const HASH_TO_VIEW: Record<string, string> = {
 	'fetch-changelog-rss': 'v1-platform',
 	'fetch-version-changelog': 'v1-platform',
 	'haste-documents': 'v1-platform',
+	'bot-webhooks-local-relay': 'v1-platform',
 	'fetch-bot-embed': 'core-embeds',
 	'fetch-organization-embed': 'core-embeds',
 	'fetch-guild-embed': 'core-embeds',
 	'fetch-user-embed': 'core-embeds',
 	'core-faq': 'core-faq',
 	'core-docs': 'core-faq',
+	'core-blog': 'core-info',
 	'info-status': 'core-info',
 	'info-roadmap': 'core-info',
 	'info-suggestions': 'core-info',
@@ -65,6 +67,7 @@ export default function APIDocs() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [methodFilter, setMethodFilter] = useState<string>('ALL');
 	const [playgroundTarget, setPlaygroundTarget] = useState<{ method: string; path: string } | null>(null);
+	const appliedHashVersionRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (version === 'secure' && !loading && !isAdmin) {
@@ -109,11 +112,15 @@ export default function APIDocs() {
 		setNavItems(navItems);
 
 		const validViews = new Set(navItems.map((i) => i.view).filter(Boolean));
-		if (typeof window !== 'undefined' && window.location.hash) {
+		if (appliedHashVersionRef.current !== version && typeof window !== 'undefined' && window.location.hash) {
+			appliedHashVersionRef.current = version;
 			const rawHash = window.location.hash.replace('#', '');
 			const mappedView = HASH_TO_VIEW[rawHash];
 			if (mappedView && validViews.has(mappedView)) {
 				setView(mappedView);
+				setTimeout(() => {
+					document.getElementById(rawHash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}, 150);
 				return () => clearNavItems();
 			}
 		}

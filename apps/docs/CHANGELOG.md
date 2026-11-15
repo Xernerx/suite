@@ -2,6 +2,28 @@
 
 # docs
 
+## 1.11.0
+
+### Minor Changes
+
+- ## API Engagement Shadowban Reference & Deep-Link Anchor Highlighting
+  
+  Updated the V1 API documentation for `GET /v1/bots/:id/users/:userId` with the `shadowban` field and added `#slug` hash scrolling and highlight rings across API, CDN, and WebSocket documentation pages.
+  
+  ### Added
+  
+  - **Bot User Engagement `shadowban` Documentation**: Documented the `shadowban` boolean response property in `V1ProfileEndpoints`.
+  - **Hash Deep-Link Scrolling & Highlighting**: Added automatic smooth scrolling and accent highlight rings when navigating to `#slug` hashes on `/api/[version]`, `/cdn`, and `/websocket`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+  - @xernerx/ui@0.9.0
+  - @xernerx/components@0.17.1
+  - @xernerx/providers@0.23.1
+  - @xernerx/feedback@0.6.1
+
 ## 1.10.8
 
 ### Patch Changes

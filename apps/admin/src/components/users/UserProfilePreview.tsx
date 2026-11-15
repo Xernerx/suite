@@ -3,10 +3,10 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { AlertTriangle, Ban, Bell, CheckCircle2, Copy, ExternalLink, RefreshCw, RotateCcw, ScrollText, Sparkles, Trash2, User as UserIcon } from 'lucide-react';
+import { AlertTriangle, Ban, Bell, CheckCircle2, Copy, EyeOff, ExternalLink, RefreshCw, RotateCcw, ScrollText, Sparkles, Trash2, User as UserIcon } from 'lucide-react';
 import { Button, Input, Modal, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import type { DiscordProfile, FullUser, UserSummary } from './types';
+import { getUserPersona, getUserTourStatus, type DiscordProfile, type FullUser, type UserPersona, type UserSummary } from './types';
 
 interface UserProfilePreviewProps {
 	user: UserSummary;
@@ -19,8 +19,11 @@ interface UserProfilePreviewProps {
 	globalXp?: number;
 	verified?: boolean;
 	blacklisted?: boolean;
+	shadowban?: boolean;
 	services?: boolean;
 	vanitySlug?: string;
+	persona?: UserPersona;
+	tourCompleted?: boolean;
 	missingRoleCount?: number;
 	onViewAuditLogs?: () => void;
 	onUnverified?: () => void;
@@ -37,8 +40,11 @@ export function UserProfilePreview({
 	globalXp,
 	verified,
 	blacklisted,
+	shadowban,
 	services,
 	vanitySlug,
+	persona,
+	tourCompleted,
 	missingRoleCount = 0,
 	onViewAuditLogs,
 	onUnverified,
@@ -60,8 +66,18 @@ export function UserProfilePreview({
 	const resolvedXp = globalXp ?? fullUser?.level?.xp ?? 0;
 	const isVerified = verified ?? Boolean(fullUser?.verified || user.verified);
 	const isBlacklisted = blacklisted ?? Boolean(fullUser?.blacklisted || user.blacklisted);
+	const isShadowbanned = shadowban ?? Boolean(fullUser?.shadowban || user.shadowban);
 	const isServicesEnabled = services ?? (fullUser?.services !== undefined ? fullUser.services !== false : user.services !== false);
 	const resolvedSlug = vanitySlug ?? fullUser?.vanitySlug ?? user.vanitySlug ?? '';
+	const resolvedPersona = persona ?? getUserPersona(fullUser || user);
+	const rawTourStatus = getUserTourStatus(fullUser || user);
+	const resolvedTourStatus = tourCompleted !== undefined ? (tourCompleted ? 'completed' : rawTourStatus === 'postponed' ? 'postponed' : 'pending') : rawTourStatus;
+	const completedDateStr = fullUser?.onboarding?.completedAt
+		? new Date(fullUser.onboarding.completedAt).toLocaleDateString()
+		: user.onboarding?.completedAt
+			? new Date(user.onboarding.completedAt).toLocaleDateString()
+			: '';
+	const postponedPhaseStr = fullUser?.onboarding?.tourPostponedPhase || user.onboarding?.tourPostponedPhase || '';
 
 	const handleSyncRoles = async () => {
 		if (syncingRoles) return;
@@ -193,6 +209,12 @@ export function UserProfilePreview({
 								{t('admin.users.fields.blacklistedBadge')}
 							</span>
 						)}
+						{isShadowbanned && (
+							<span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent-orange)/15 text-(--accent-orange) border border-(--accent-orange)/30">
+								<EyeOff size={12} />
+								{t('admin.users.fields.shadowbanBadge')}
+							</span>
+						)}
 						{missingRoleCount > 0 && (
 							<span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-(--accent-red)/15 text-(--accent-red) border border-(--accent-red)/30">
 								<AlertTriangle size={12} />
@@ -213,6 +235,34 @@ export function UserProfilePreview({
 
 					{fullUser && (
 						<div className="mt-3 grid grid-cols-1 gap-1.5 text-[11px] bg-(--background)/40 p-2.5 rounded-xl border border-(--border)/10 text-(--text-muted)">
+							<div className="flex items-center justify-between">
+								<span>{t('admin.users.onboarding.personaLabel')}</span>
+								<span className="font-semibold text-(--text)">
+									{resolvedPersona === 'both'
+										? t('admin.users.onboarding.personaBoth')
+										: resolvedPersona === 'developer'
+											? t('admin.users.onboarding.personaDeveloper')
+											: t('admin.users.onboarding.personaUser')}
+								</span>
+							</div>
+							<div className="flex items-center justify-between">
+								<span>{t('admin.users.onboarding.tourLabel')}</span>
+								<span
+									className={`font-mono font-semibold ${
+										resolvedTourStatus === 'completed' ? 'text-(--accent-green)' : resolvedTourStatus === 'postponed' ? 'text-(--accent-orange)' : 'text-(--text-muted)'
+									}`}
+								>
+									{resolvedTourStatus === 'completed'
+										? completedDateStr
+											? t('admin.users.onboarding.tourCompletedOn', { date: completedDateStr })
+											: t('admin.users.onboarding.tourCompleted')
+										: resolvedTourStatus === 'postponed'
+											? postponedPhaseStr
+												? t('admin.users.onboarding.tourPostponedPhase', { phase: postponedPhaseStr })
+												: t('admin.users.onboarding.tourPostponed')
+											: t('admin.users.onboarding.tourPending')}
+								</span>
+							</div>
 							<div className="flex items-center justify-between">
 								<span>{t('admin.users.fields.agreedTerms')}</span>
 								<span className="font-mono text-(--text)">{fullUser.agreedTerms ? new Date(fullUser.agreedTerms).toLocaleDateString() : t('admin.users.fields.notAccepted')}</span>

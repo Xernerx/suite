@@ -46,6 +46,41 @@ export default function BillingAndStore({ searchQuery = '' }: { searchQuery?: st
 			),
 		},
 		{
+			id: 'card8',
+			title: t('faq.billing.card8.title'),
+			searchableText: [
+				t('faq.billing.card8.title'),
+				t('faq.billing.card8.description1'),
+				t('faq.billing.card8.description2'),
+				t('faq.billing.card8.bullet1'),
+				t('faq.billing.card8.bullet2'),
+				t('faq.billing.card8.bullet3'),
+				t('faq.billing.card8.bullet4'),
+				t('faq.billing.card8.bullet5'),
+			].join(' '),
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+					<p className="text-(--text) leading-relaxed" dangerouslySetInnerHTML={{ __html: t('faq.billing.card8.description1') }}></p>
+					<p className="text-(--text) leading-relaxed">{t('faq.billing.card8.description2')}</p>
+					<ul className="list-disc pl-5 text-(--text-muted) flex flex-col gap-2">
+						<li dangerouslySetInnerHTML={{ __html: t('faq.billing.card8.bullet1') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.billing.card8.bullet2') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.billing.card8.bullet3') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.billing.card8.bullet4') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.billing.card8.bullet5') }}></li>
+					</ul>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.billingTab'), href: 'https://account.xernerx.com/?tab=billing', vanity: 'account.xernerx.com/billing' },
+							{ label: t('faq.quickLinks.creditStore'), href: 'https://store.xernerx.com/?category=credits', vanity: 'store.xernerx.com/?category=credits' },
+							{ label: t('faq.quickLinks.virtueSettings'), href: 'https://app.xernerx.com/dashboard?tab=virtue', vanity: 'app.xernerx.com/dashboard?tab=virtue' },
+							{ label: t('faq.quickLinks.leaderboards'), href: 'https://app.xernerx.com/leaderboard', vanity: 'app.xernerx.com/leaderboard' },
+						]}
+					/>
+				</div>
+			),
+		},
+		{
 			id: 'card6',
 			title: t('faq.billing.card6.title'),
 			searchableText: `${t('faq.billing.card6.title')} ${t('faq.billing.card6.description')}`,
@@ -142,7 +177,7 @@ export default function BillingAndStore({ searchQuery = '' }: { searchQuery?: st
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				{cards.map((card) => (
-					<CollapsibleCard key={card.id} message={card.title} description={card.description} />
+					<CollapsibleCard key={card.id} id={`billing.${card.id}`} message={card.title} description={card.description} />
 				))}
 			</div>
 		</div>

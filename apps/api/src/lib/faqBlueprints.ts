@@ -146,6 +146,21 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 				]
 			),
 			c(
+				'card8',
+				'credit-handout-algorithm',
+				'faq.billing.card8.title',
+				['faq.billing.card8.description1', 'faq.billing.card8.description2'],
+				[
+					ql('billingTab', 'https://account.xernerx.com/?tab=billing', 'account.xernerx.com/billing'),
+					ql('creditStore', 'https://store.xernerx.com/?category=credits', 'store.xernerx.com/?category=credits'),
+					ql('virtueSettings', 'https://app.xernerx.com/dashboard?tab=virtue', 'app.xernerx.com/dashboard?tab=virtue'),
+					ql('leaderboards', 'https://app.xernerx.com/leaderboard', 'app.xernerx.com/leaderboard'),
+				],
+				{
+					bulletKeys: ['faq.billing.card8.bullet1', 'faq.billing.card8.bullet2', 'faq.billing.card8.bullet3', 'faq.billing.card8.bullet4', 'faq.billing.card8.bullet5'],
+				}
+			),
+			c(
 				'card6',
 				'credit-store-perks',
 				'faq.billing.card6.title',
@@ -243,10 +258,10 @@ const FAQ_ACCOUNT_AND_DEVS_BLUEPRINTS: RawCategoryBlueprint[] = [
 			),
 			c(
 				'card4',
-				'webhooks',
+				'websocket',
 				'faq.developers.card4.title',
 				['faq.developers.card4.description'],
-				[ql('devPortal', 'https://portal.xernerx.com', 'portal.xernerx.com'), ql('v1ApiDocs', 'https://docs.xernerx.com/api/v1', 'docs.xernerx.com/api/v1')]
+				[ql('websocketDocs', 'https://docs.xernerx.com/websocket', 'docs.xernerx.com/websocket'), ql('npmPackagesDocs', 'https://docs.xernerx.com/packages', 'docs.xernerx.com/packages')]
 			),
 			c(
 				'card2',

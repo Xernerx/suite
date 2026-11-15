@@ -23,6 +23,7 @@ export default function RoadmapPage() {
 	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
+	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
 	const toggleProduct = (prod: string) => {
 		setSelectedProducts((prev) => (prev.includes(prod) ? prev.filter((p) => p !== prod) : [...prev, prod]));
@@ -32,8 +33,10 @@ export default function RoadmapPage() {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const q = params.get('q');
+			const idParam = params.get('id') || window.location.hash.replace(/^#(?:roadmap-)?/, '');
 			const prod = params.get('product');
 			const status = params.get('status');
+			if (idParam) setHighlightedId(idParam.trim());
 			if (q) setSearchQuery(q);
 			if (prod) setSelectedProducts(prod.split(',').filter(Boolean));
 			if (status) {
@@ -233,6 +236,15 @@ export default function RoadmapPage() {
 		return true;
 	});
 
+	useEffect(() => {
+		if (!highlightedId || loading || typeof document === 'undefined') return;
+		const timer = setTimeout(() => {
+			const el = document.getElementById(`roadmap-${highlightedId}`);
+			if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+		}, 180);
+		return () => clearTimeout(timer);
+	}, [highlightedId, loading, roadmap.length]);
+
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pt-24 px-4 sm:px-8">
 			{/* Header & Filters */}
@@ -367,15 +379,19 @@ export default function RoadmapPage() {
 														const color = getProductColor(item.productId);
 														const distToTrack = cardsY - trackY;
 														const botInfo = resolveBot(item);
+														const isHighlighted = Boolean(highlightedId && (String(item.id) === highlightedId || String(item._id) === highlightedId));
 
 														return (
 															<motion.div
+																id={`roadmap-${item.id || item._id}`}
 																layout
 																initial={{ opacity: 0, y: 15 }}
 																animate={{ opacity: 1, y: 0 }}
 																transition={{ duration: 0.3, ease: 'easeOut' }}
 																key={item.id}
-																className="relative flex flex-col w-[340px] shrink-0 p-6 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border border-(--border)/10 shadow-lg hover:-translate-y-1 hover:shadow-2xl hover:bg-(--foreground)/50 transition-all duration-300 group/card"
+																className={`relative flex flex-col w-[340px] shrink-0 p-6 bg-(--foreground)/30 backdrop-blur-xl rounded-2xl border ${
+																	isHighlighted ? 'border-(--accent)/60 ring-2 ring-(--accent)/25 bg-(--foreground)/50' : 'border-(--border)/10'
+																} shadow-lg hover:-translate-y-1 hover:shadow-2xl hover:bg-(--foreground)/50 transition-all duration-300 group/card`}
 															>
 																{/* Vertical Wire connecting card up to its horizontal track */}
 																<div

@@ -2,6 +2,29 @@
 
 # admin
 
+## 0.30.0
+
+### Minor Changes
+
+- ## Admin Users Persona, Tour Status & Shadowban Management
+  
+  Added account persona, onboarding tour completion status, and global leaderboard shadowban controls across the Admin Users portal.
+  
+  ### Added
+  
+  - **User Card Persona, Tour & Shadowban Badges**: Added persona (`User`, `Developer`, `User & Developer`), Suite Tour completion (`Tour Done` / `Tour Pending`), and `Shadowbanned` badges to `UserCard`.
+  - **Profile Preview & Identity Controls**: Added Persona and Suite Tour status rows to `UserProfilePreview` alongside an Account Persona `<Selector />`, Suite Tour Completed `<Toggle />`, and Shadowban User `<Toggle />` inside `UserIdentityTab`.
+  - **Admin Users Export Enrichment**: Included `persona`, `tourStatus`, and `shadowban` fields in Admin Users CSV and JSON exports.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.26.0
+  - @xernerx/ui@0.9.0
+  - @xernerx/components@0.17.1
+  - @xernerx/providers@0.23.1
+  - @xernerx/feedback@0.6.1
+
 ## 0.29.0
 
 ### Minor Changes

@@ -257,11 +257,12 @@ export default class RoadmapCommand extends SlashCommandBuilder {
 
 			const upvoteCount = Array.isArray(found.upvotes) ? found.upvotes.length : 0;
 			const watcherCount = Array.isArray(found.watchers) ? found.watchers.length : 0;
+			const itemUrl = `https://info.xernerx.com/roadmap?id=${encodeURIComponent(String(found.id || found._id))}`;
 
 			const itemEmbed = new EmbedBuilder()
 				.setColor(accentColor)
 				.setTitle(found.title)
-				.setURL('https://info.xernerx.com/roadmap')
+				.setURL(itemUrl)
 				.setDescription(found.description || 'No description provided.')
 				.addFields([
 					{
@@ -285,7 +286,7 @@ export default class RoadmapCommand extends SlashCommandBuilder {
 				})
 				.setTimestamp();
 
-			const buttons: ButtonBuilder[] = [new ButtonBuilder().setLabel('Vote & Watch on Roadmap').setStyle(ButtonStyle.Link).setURL('https://info.xernerx.com/roadmap')];
+			const buttons: ButtonBuilder[] = [new ButtonBuilder().setLabel('Vote & Watch on Roadmap').setStyle(ButtonStyle.Link).setURL(itemUrl)];
 			if (found.changelogUrl) {
 				buttons.push(new ButtonBuilder().setLabel('Read Release Notes').setStyle(ButtonStyle.Link).setURL(String(found.changelogUrl)));
 			}

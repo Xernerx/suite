@@ -16,6 +16,7 @@ interface DynamicCategoryViewProps {
 	userLoading: boolean;
 	actionLoading: string | null;
 	highlightedItemId?: string | null;
+	hideOwned?: boolean;
 	appliedCoupon?: {
 		code: string;
 		name: string;
@@ -35,6 +36,7 @@ export function DynamicCategoryView({
 	userLoading,
 	actionLoading,
 	highlightedItemId,
+	hideOwned = false,
 	appliedCoupon,
 	getActiveSubscription,
 	handleSubscribe,
@@ -42,11 +44,18 @@ export function DynamicCategoryView({
 }: DynamicCategoryViewProps) {
 	const { t } = useDictionary();
 
-	const featuredItems = items.filter((i) => i.isFeatured);
-	const standardItems = items.filter((i) => !i.isFeatured);
+	const visibleItems = hideOwned
+		? items.filter((i) => {
+				const activePrice = i.prices.find((p) => p.interval === billingInterval) || i.prices[0];
+				return !Boolean(i.discordSku?.hasEntitlement || getActiveSubscription(activePrice?.id || null, i));
+			})
+		: items;
+
+	const featuredItems = visibleItems.filter((i) => i.isFeatured);
+	const standardItems = visibleItems.filter((i) => !i.isFeatured);
 
 	// Determine if we should show the free tier card (e.g. for consumers)
-	const showFreeCard = category.id === 'consumers';
+	const showFreeCard = category.id === 'consumers' && !hideOwned;
 	const hasActiveCategoryPlan = items.some((i) => {
 		const activePrice = i.prices.find((p) => p.interval === billingInterval) || i.prices[0];
 		return Boolean(i.discordSku?.hasEntitlement || getActiveSubscription(activePrice?.id || null, i));

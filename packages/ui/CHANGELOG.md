@@ -2,6 +2,22 @@
 
 # @xernerx/ui
 
+## 0.9.0
+
+### Minor Changes
+
+- ## CollapsibleCard Deep-Link Anchor & Highlight Support
+  
+  Added `id` anchor targeting and `highlighted` visual accent ring support to `CollapsibleCard`.
+  
+  ### Added
+  
+  - **CollapsibleCard `id` & `highlighted` Props**: Added optional `id` and `highlighted` props to `CollapsibleCard` so deep-linked FAQ and documentation cards automatically expand and display an accent glow ring.
+
+### Patch Changes
+
+- @xernerx/providers@0.23.1
+
 ## 0.8.9
 
 ### Patch Changes

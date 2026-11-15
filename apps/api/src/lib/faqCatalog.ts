@@ -17,6 +17,7 @@ export interface FaqTableData {
 
 export interface FaqCardItem {
 	id: string;
+	cardId?: string;
 	slug: string;
 	fullId: string;
 	categoryId: string;
@@ -136,10 +137,13 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 			const markdown = [...mdParagraphs, ...mdBullets].join('\n\n');
 			const cardUrl = `${categoryUrl}&card=${card.id}`;
 
+			const fullId = `${cat.id}.${card.id}`;
+
 			return {
-				id: card.id,
+				id: fullId,
+				cardId: card.id,
 				slug: card.slug,
-				fullId: `${cat.id}.${card.id}`,
+				fullId,
 				categoryId: cat.id,
 				categoryTitle,
 				sectionId: cat.sectionId,

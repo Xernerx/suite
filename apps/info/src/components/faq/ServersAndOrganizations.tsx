@@ -142,6 +142,38 @@ export default function ServersAndOrganizations({ searchQuery = '' }: { searchQu
 				</div>
 			),
 		},
+		{
+			id: 'card9',
+			title: t('faq.servers.card9.title'),
+			searchableText: [
+				t('faq.servers.card9.title'),
+				t('faq.servers.card9.description1'),
+				t('faq.servers.card9.description2'),
+				t('faq.servers.card9.bullet1'),
+				t('faq.servers.card9.bullet2'),
+				t('faq.servers.card9.bullet3'),
+				t('faq.servers.card9.bullet4'),
+			].join(' '),
+			description: (
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
+					<p className="text-(--text) leading-relaxed" dangerouslySetInnerHTML={{ __html: t('faq.servers.card9.description1') }}></p>
+					<p className="text-(--text) leading-relaxed">{t('faq.servers.card9.description2')}</p>
+					<ul className="list-disc pl-5 text-(--text-muted) flex flex-col gap-2">
+						<li dangerouslySetInnerHTML={{ __html: t('faq.servers.card9.bullet1') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.servers.card9.bullet2') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.servers.card9.bullet3') }}></li>
+						<li dangerouslySetInnerHTML={{ __html: t('faq.servers.card9.bullet4') }}></li>
+					</ul>
+					<FaqQuickLinks
+						links={[
+							{ label: t('faq.quickLinks.virtueSettings'), href: 'https://app.xernerx.com/dashboard?tab=virtue', vanity: 'app.xernerx.com/dashboard?tab=virtue' },
+							{ label: t('faq.quickLinks.leaderboards'), href: 'https://app.xernerx.com/leaderboard', vanity: 'app.xernerx.com/leaderboard' },
+							{ label: t('faq.quickLinks.storeConsumers'), href: 'https://store.xernerx.com/?category=consumers', vanity: 'store.xernerx.com/?category=consumers' },
+						]}
+					/>
+				</div>
+			),
+		},
 	].filter((c) => !q || c.searchableText.toLowerCase().includes(q) || t('faq.servers.title').toLowerCase().includes(q));
 
 	if (cards.length === 0) return null;
@@ -155,7 +187,7 @@ export default function ServersAndOrganizations({ searchQuery = '' }: { searchQu
 
 			<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 				{cards.map((card) => (
-					<CollapsibleCard key={card.id} message={card.title} description={card.description} />
+					<CollapsibleCard key={card.id} id={`servers.${card.id}`} message={card.title} description={card.description} />
 				))}
 			</div>
 		</div>

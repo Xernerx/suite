@@ -1,6 +1,6 @@
 {
 	"name": "bot",
-	"version": "2.3.3",
+	"version": "2.4.0",
 	"description": "Xernerx Bot Discord daemon for directory, stats, and guild synchronization",
 	"main": "dist/main.js",
 	"type": "module",

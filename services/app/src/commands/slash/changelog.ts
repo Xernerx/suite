@@ -155,7 +155,8 @@ export default class ChangelogCommand extends SlashCommandBuilder {
 			}
 
 			const formattedBody = cleanChangelogMarkdown(payload.content);
-			const changelogUrl = 'https://info.xernerx.com/changelog';
+			const cleanVer = payload.selectedVersion && payload.selectedVersion !== 'latest' ? payload.selectedVersion.replace(/^v/i, '') : '';
+			const changelogUrl = cleanVer ? `https://info.xernerx.com/changelog#${cleanVer}` : 'https://info.xernerx.com/changelog';
 
 			const embed = new EmbedBuilder()
 				.setColor(accentColor)

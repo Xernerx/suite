@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
 			{
 				feedType: 'issues',
 				title: `🐛 New Bug Report: ${String(body.title).slice(0, 120)}`,
-				url: `https://info.xernerx.com/bugs?id=${issue.id}`,
+				url: `https://info.xernerx.com/issues?id=${issue.id}`,
 				description: String(body.description || '').slice(0, 350),
 				color: 0xf59e0b,
 				fields: [
@@ -159,8 +159,8 @@ export async function POST(req: NextRequest) {
 					{ name: 'Reported By', value: `<@${session.user.id}>`, inline: true },
 				],
 				ctaLinks: [
-					{ label: 'Inspect Issue', url: `https://info.xernerx.com/bugs?id=${issue.id}` },
-					{ label: 'Report a Bug', url: 'https://info.xernerx.com/bugs' },
+					{ label: 'Inspect Issue', url: `https://info.xernerx.com/issues?id=${issue.id}` },
+					{ label: 'Report a Bug', url: 'https://info.xernerx.com/issues' },
 				],
 			}
 		).catch(() => {});

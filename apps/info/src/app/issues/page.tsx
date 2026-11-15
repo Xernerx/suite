@@ -38,6 +38,7 @@ export default function IssuesPage() {
 	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [search, setSearch] = useState('');
+	const [highlightedId, setHighlightedId] = useState<string | null>(null);
 	const [showForm, setShowForm] = useState(false);
 	const [attachment, setAttachment] = useState<File | null>(null);
 	const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
@@ -62,12 +63,16 @@ export default function IssuesPage() {
 		if (typeof window !== 'undefined') {
 			const params = new URLSearchParams(window.location.search);
 			const qParam = params.get('q');
+			const idParam = params.get('id') || window.location.hash.replace(/^#(?:issue-)?/, '');
 			const prodParam = params.get('product');
 			const statusParam = params.get('status');
 			const reportParam = params.get('report');
 			const pageParam = params.get('page');
 			const screenshotParam = params.get('screenshot');
 			const savedDraft = sessionStorage.getItem('xernerx_issue_draft') || sessionStorage.getItem('xernerx_bug_draft');
+			if (idParam) {
+				setHighlightedId(idParam.trim());
+			}
 			if (qParam) {
 				setSearch(qParam);
 			} else if (savedDraft) {
@@ -129,7 +134,7 @@ export default function IssuesPage() {
 
 		try {
 			const [issRes, prodRes] = await Promise.all([
-				fetch(getEnvUrl('https://api.xernerx.com/info/issues?status=open'), { credentials: 'include' }),
+				fetch(getEnvUrl('https://api.xernerx.com/info/issues'), { credentials: 'include' }),
 				fetch(getEnvUrl('https://api.xernerx.com/info/roadmap/products'), { credentials: 'include' }),
 			]);
 			if (!issRes.ok) throw new Error(`HTTP ${issRes.status}`);
@@ -266,8 +271,16 @@ export default function IssuesPage() {
 	}, [products, issues]);
 
 	const filteredIssues = useMemo(() => {
-		const openIssues = issues.filter((s: any) => s.status !== 'resolved');
+		const openIssues = issues.filter(
+			(s: any) =>
+				s.status !== 'resolved' ||
+				(s.resolvedApp && s.resolvedVersion && s.releaseStatus !== 'production') ||
+				(highlightedId && (String(s.id) === highlightedId || String(s._id) === highlightedId))
+		);
 		return openIssues.filter((s: any) => {
+			if (highlightedId && (String(s.id) === highlightedId || String(s._id) === highlightedId) && !search && selectedProducts.length === 0 && selectedStatuses.length === 0) {
+				return true;
+			}
 			if (selectedStatuses.length > 0) {
 				const matchesStatus = selectedStatuses.some((st) => {
 					if (st === 'verified') return Boolean(s.acknowledged);
@@ -292,7 +305,16 @@ export default function IssuesPage() {
 			if (!search) return true;
 			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
 		});
-	}, [search, selectedProducts, selectedStatuses, issues, orgBots, botProfiles, user?.id]);
+	}, [search, selectedProducts, selectedStatuses, issues, orgBots, botProfiles, user?.id, highlightedId]);
+
+	useEffect(() => {
+		if (!highlightedId || loading || typeof document === 'undefined') return;
+		const timer = setTimeout(() => {
+			const el = document.getElementById(`issue-${highlightedId}`);
+			if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}, 150);
+		return () => clearTimeout(timer);
+	}, [highlightedId, loading, filteredIssues.length]);
 
 	const handlePaste = (e: React.ClipboardEvent) => {
 		const items = e.clipboardData?.items;
@@ -419,7 +441,13 @@ export default function IssuesPage() {
 							>
 								<AnimatePresence mode="popLayout">
 									{filteredIssues.map((s: any) => (
-										<IssueCard key={s.id} issue={s} botInfo={resolveBot(s)} onToggleProduct={toggleProduct} />
+										<IssueCard
+											key={s.id}
+											issue={s}
+											botInfo={resolveBot(s)}
+											onToggleProduct={toggleProduct}
+											highlighted={Boolean(highlightedId && (String(s.id) === highlightedId || String(s._id) === highlightedId))}
+										/>
 									))}
 								</AnimatePresence>
 

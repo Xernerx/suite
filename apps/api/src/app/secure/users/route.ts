@@ -165,7 +165,23 @@ export async function GET(req: Request) {
 		const [users, levels, credits] = await Promise.all([
 			db.User.find(query)
 				.lean()
-				.select(['id', 'name', 'icon', 'roles', 'privacy', 'verified', 'blacklisted', 'services', 'vanitySlug', 'stripeCustomerId', 'agreedTerms', 'agreedPrivacy', 'discordCache']),
+				.select([
+					'id',
+					'name',
+					'icon',
+					'roles',
+					'privacy',
+					'verified',
+					'blacklisted',
+					'shadowban',
+					'services',
+					'vanitySlug',
+					'stripeCustomerId',
+					'agreedTerms',
+					'agreedPrivacy',
+					'discordCache',
+					'onboarding',
+				]),
 			db.Level.find({})
 				.select(['ownerId', 'level', 'xp'])
 				.lean()
@@ -200,8 +216,19 @@ export async function GET(req: Request) {
 			...u,
 			verified: Boolean(u.verified || (u.agreedTerms && u.agreedPrivacy)),
 			blacklisted: Boolean(u.blacklisted),
+			shadowban: Boolean(u.shadowban),
 			services: u.services !== false,
 			discord: u.discordCache?.username ? u.discordCache : undefined,
+			onboarding: u.onboarding || {
+				persona: 'user',
+				suiteIntroCompleted: false,
+				dashboardTourCompleted: false,
+				supportPromptCompleted: false,
+				tourPostponed: false,
+				tourPostponedPhase: null,
+				completedAt: null,
+				onboardedBots: [],
+			},
 			level: levelMap.get(String(u.id)) || { level: 1, xp: 0 },
 			credits: creditMap.get(String(u.id)) || { balance: 0, streak: 0 },
 		}));

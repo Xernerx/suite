@@ -34,6 +34,7 @@ const schema = new Schema(
 
 		verified: { type: Boolean, default: false }, // Whether the user has been verified
 		blacklisted: { type: Boolean, default: false }, // Whether the user is banned from using Xernerx services
+		shadowban: { type: Boolean, default: false }, // Whether the user is shadowbanned (excluded from global leaderboards)
 		services: { type: Boolean, default: true }, // Whether automatic profile creation in Discord/Virtue is enabled
 		sessionVersion: { type: Number, default: 1 }, // Monotonic session counter incremented on global sign-out
 		sessionRevokedAt: { type: Date, default: null }, // Timestamp of most recent global session revocation
