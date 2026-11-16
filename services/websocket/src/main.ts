@@ -9,12 +9,16 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env configuration
-for (const envPath of [path.resolve(__dirname, '../.env'), path.resolve(__dirname, '../../.env'), path.resolve(process.cwd(), '.env')]) {
-	try {
-		process.loadEnvFile(envPath);
-	} catch {}
+function loadEnvFiles() {
+	for (const envPath of [path.resolve(__dirname, '../.env'), path.resolve(__dirname, '../../.env'), path.resolve(process.cwd(), '.env')]) {
+		try {
+			process.loadEnvFile(envPath);
+		} catch {}
+	}
 }
+
+// Load .env configuration
+loadEnvFiles();
 
 import { Terminal } from '@xernerx/terminal';
 import { verifyWebsocketToken, checkTokenWebsocketAccess } from './lib/auth';
@@ -65,25 +69,44 @@ const methods = {
 
 /* ================= LOAD SERVICES ================= */
 
+async function loadServiceFolder(folder: string): Promise<ServiceFn | undefined> {
+	if (!/^[a-z0-9_-]+$/i.test(folder)) return undefined;
+
+	let servicePath = path.join(appDir, folder, 'server.ts');
+	try {
+		await fs.access(servicePath);
+	} catch {
+		servicePath = path.join(appDir, folder, 'server.js');
+	}
+
+	try {
+		const mod = await import(pathToFileURL(servicePath).href);
+		if (typeof mod.default === 'function') {
+			services[folder] = mod.default;
+			terminal.log(`Loaded service: ${folder}`);
+			return mod.default;
+		}
+	} catch (e) {
+		terminal.warn(`Skipped ${folder}: ${(e as Error).message}`);
+	}
+
+	return undefined;
+}
+
 async function loadServices() {
 	const folders = await fs.readdir(appDir);
 
 	for (const folder of folders) {
-		let servicePath = path.join(appDir, folder, 'server.ts');
-		try {
-			await fs.access(servicePath);
-		} catch {
-			servicePath = path.join(appDir, folder, 'server.js');
-		}
-
-		try {
-			const mod = await import(pathToFileURL(servicePath).href);
-			services[folder] = mod.default;
-			terminal.log(`Loaded service: ${folder}`);
-		} catch (e) {
-			terminal.warn(`Skipped ${folder}: ${(e as Error).message}`);
-		}
+		await loadServiceFolder(folder);
 	}
+}
+
+async function resolveService(name: unknown): Promise<ServiceFn | undefined> {
+	if (typeof name !== 'string' || !name) return undefined;
+	if (services[name]) return services[name];
+
+	loadEnvFiles();
+	return loadServiceFolder(name);
 }
 
 /* ================= ROUTER ================= */
@@ -105,7 +128,7 @@ async function handleMessage(ws: AuthedWebSocket, msg: any) {
 		return send(ws, { message: 'Missing request id' });
 	}
 
-	const service = services[msg.service];
+	const service = await resolveService(msg.service);
 	const method = methods[msg.method as keyof typeof methods];
 
 	if (!service) {

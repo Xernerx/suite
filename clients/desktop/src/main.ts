@@ -265,7 +265,7 @@ function applyRuntimeMetadata(targetMeta: Metadata) {
 	}
 	syncRuntimeAppIcon(targetMeta);
 	syncGlobalHotkey(targetMeta.globalHotkey !== false, () => win);
-	syncFeatureShortcuts(targetMeta, { getWin: () => win, onQuickCapture: triggerQuickCapture });
+	syncFeatureShortcuts(targetMeta, { getWin: () => win, getMeta: () => getMetadata(), onQuickCapture: triggerQuickCapture });
 	syncStreamerProtection(targetMeta);
 	broadcastPowerState(targetMeta, 'preference-changed');
 	syncDiscordRpc(targetMeta.discordRpc !== false, undefined, targetMeta.appIcon);
@@ -1221,7 +1221,7 @@ if (!gotTheLock) {
 			}
 		);
 		syncGlobalHotkey(readyMeta.globalHotkey !== false, () => win);
-		syncFeatureShortcuts(readyMeta, { getWin: () => win, onQuickCapture: triggerQuickCapture });
+		syncFeatureShortcuts(readyMeta, { getWin: () => win, getMeta: () => getMetadata(), onQuickCapture: triggerQuickCapture });
 		syncDiscordRpc(readyMeta.discordRpc !== false, undefined, readyMeta.appIcon);
 		if (!app.isPackaged) {
 			let relaunchTimer: NodeJS.Timeout | null = null;

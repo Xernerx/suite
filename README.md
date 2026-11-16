@@ -68,6 +68,7 @@
 | Project / Package                                                                                | License                         | Description                                                                                                           |
 | :----------------------------------------------------------------------------------------------- | :------------------------------ | :-------------------------------------------------------------------------------------------------------------------- |
 | **[Virtue](https://xernerx.com/applications/virtue)** (`../apps/virtue`)                         | Xernerx Proprietary & SaaS v1.0 | Text & voice XP leveling bot, Dynamic Hoist Roles, `/boost` multipliers, cycle resets, and personalized `/level` SVG  |
+| **[YourApps](https://xernerx.com/applications)** (`../apps/yourapps`)                            | Xernerx Proprietary & SaaS v1.0 | Discord-native forms, staff recruitment, and community applications bot with modals, resumable drafts, & Apply panels |
 | **[To-Do List Bot, Metamorphosis & Zodiac](https://xernerx.com/applications)**                   | Xernerx Proprietary & SaaS v1.0 | Productivity task boards, ephemeral voice room automation, and daily astrology/compatibility Discord bots             |
 | **[`xernerx`](https://docs.xernerx.com/packages/xernerx)** (`../packages/xernerx`)               | Apache-2.0                      | All-in-one Xernerx Suite SDK & Discord bot framework meta-package                                                     |
 | **[`@xernerx/framework`](https://docs.xernerx.com/packages/@xernerx/framework)**                 | Apache-2.0                      | Modular Discord.js bot client, sharding, event & extension loader, and `XernerxUser` enrichment                       |
@@ -77,9 +78,9 @@
 | **[`@xernerx/stats`](https://docs.xernerx.com/packages/@xernerx/stats)**                         | Apache-2.0                      | Automated bot telemetry, guild count, and statistics reporter                                                         |
 | **[`@xernerx/terminal`](https://docs.xernerx.com/packages/@xernerx/terminal)**                   | Apache-2.0                      | Scoped CLI logger and structured terminal output utility                                                              |
 | **[`@xernerx/websocket`](https://docs.xernerx.com/packages/@xernerx/websocket)**                 | Apache-2.0                      | Real-time bidirectional WebSocket RPC client for Xernerx services                                                     |
-| **[`docs`](https://docs.xernerx.com/packages)** (`../docs`)                                      | Apache-2.0                      | Canonical open-source package documentation (`docs/packages/*`) & security governance policies                        |
-| **[`examples`](https://github.com/Xernerx/examples)** (`../examples`)                            | Apache-2.0                      | Official TypeScript (`@xernerx/*`) and JavaScript (`xernerx`) Discord bot starter templates and sharding examples     |
-| **[`.github`](https://github.com/Xernerx/.github)** (`../.github`)                               | Apache-2.0                      | GitHub Organization profile (`profile/README.md`) & inherited community standards (`CODE_OF_CONDUCT`, `CONTRIBUTING`) |
+| **[`docs`](https://docs.xernerx.com/packages)** (`../docs`)                                      | Xernerx Proprietary & SaaS v1.0 | Canonical open-source package documentation (`docs/packages/*`) & security governance policies                        |
+| **[`examples`](https://github.com/Xernerx/examples)** (`../examples`)                            | Xernerx Proprietary & SaaS v1.0 | Official TypeScript (`@xernerx/*`) and JavaScript (`xernerx`) Discord bot starter templates and sharding examples     |
+| **[`.github`](https://github.com/Xernerx/.github)** (`../.github`)                               | Xernerx Proprietary & SaaS v1.0 | GitHub Organization profile (`profile/README.md`) & inherited community standards (`CODE_OF_CONDUCT`, `CONTRIBUTING`) |
 
 ---
 

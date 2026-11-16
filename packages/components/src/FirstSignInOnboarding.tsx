@@ -2,7 +2,7 @@
 'use client';
 
 import { Confirm } from '@xernerx/ui';
-import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, useEnvironment, useSidebar, useTheme, useUser, type HeaderSubdomainId } from '@xernerx/providers';
+import { DEFAULT_HEADER_SUBDOMAINS, useDictionary, useEnvironment, useShortcuts, useSidebar, useTheme, useUser, type HeaderSubdomainId } from '@xernerx/providers';
 import confetti from 'canvas-confetti';
 import { AnimatePresence } from 'framer-motion';
 import { Bot, Building2, Compass, LayoutDashboard, Terminal } from 'lucide-react';
@@ -12,7 +12,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FirstSignInIntroScene } from './FirstSignInIntroScene';
 import { FirstSignInHeaderScene, FirstSignInSetupScene, type HeaderBuildStepId, type PrivacyTier } from './FirstSignInSetupAndHeader';
 import { FirstSignInSidebarScene, type SidebarBuildStepId } from './FirstSignInSidebarScene';
-import { DASHBOARD_TOUR_STEPS, EXPLORE_TOUR_STEPS, FirstSignInPageTourScene, PORTAL_TOUR_STEPS, type PageTourStepId } from './FirstSignInPageTours';
+import { DASHBOARD_TOUR_STEPS, EXPLORE_TOUR_STEPS, FirstSignInNavPromptScene, FirstSignInPageTourScene, PORTAL_TOUR_STEPS, type PageTourStepId, type TourNavTargetPhase } from './FirstSignInPageTours';
 import { FirstSignInReadyScene, FirstSignInStageDock, FirstSignInTourChoiceScene, FirstSignInWelcomeScene, FirstSignInWhoWeAreScene } from './FirstSignInWelcomeAndPersonaScenes';
 
 export type OnboardingStagePhase = 'welcome' | 'who-we-are' | 'setup' | 'tour-choice' | 'header' | 'sidebar' | 'dashboard' | 'portal' | 'explore' | 'ready';
@@ -26,6 +26,8 @@ export interface OnboardingStageState {
 	sidebarStepId?: SidebarBuildStepId;
 	revealedSidebarItems?: string[];
 	pageTourTarget?: PageTourStepId;
+	navPromptTarget?: TourNavTargetPhase | null;
+	navMenuExplained?: boolean;
 }
 
 const VALID_TOUR_PHASES: OnboardingStagePhase[] = ['welcome', 'who-we-are', 'setup', 'tour-choice', 'header', 'sidebar', 'dashboard', 'portal', 'explore', 'ready'];
@@ -36,6 +38,7 @@ export function FirstSignInOnboarding() {
 	const { getEnvUrl } = useEnvironment();
 	const { preferences, setPreference } = useTheme();
 	const { state: sidebarState, toggle, hide, show, setMobileOpen, navItems, setNavItems, clearNavItems } = useSidebar();
+	const { setNavOpen } = useShortcuts();
 	const router = useRouter();
 	const pathname = usePathname();
 
@@ -46,6 +49,8 @@ export function FirstSignInOnboarding() {
 	const [headerStepIndex, setHeaderStepIndex] = useState(0);
 	const [sidebarStepIndex, setSidebarStepIndex] = useState(0);
 	const [pageTourStepIndex, setPageTourStepIndex] = useState(0);
+	const [navPromptTarget, setNavPromptTarget] = useState<TourNavTargetPhase | null>(null);
+	const [navMenuExplained, setNavMenuExplained] = useState(false);
 	const [isBotUser, setIsBotUser] = useState(true);
 	const [isDeveloper, setIsDeveloper] = useState(false);
 	const [privacy, setPrivacy] = useState<PrivacyTier>('public');
@@ -151,10 +156,12 @@ export function FirstSignInOnboarding() {
 			sidebarStepId: activeSidebarStepId,
 			revealedSidebarItems,
 			pageTourTarget: activePageTourTarget,
+			navPromptTarget,
+			navMenuExplained,
 		};
 		(window as any).__xernerxOnboardingStage = detail;
 		window.dispatchEvent(new CustomEvent<OnboardingStageState>('xernerx:onboarding-stage', { detail }));
-	}, [isOpen, user, currentPhase, activeHeaderStepId, revealedHeaderItems.join(','), activeSidebarStepId, revealedSidebarItems.join(','), activePageTourTarget]);
+	}, [isOpen, user, currentPhase, activeHeaderStepId, revealedHeaderItems.join(','), activeSidebarStepId, revealedSidebarItems.join(','), activePageTourTarget, navPromptTarget, navMenuExplained]);
 
 	useEffect(() => {
 		return () => {
@@ -311,6 +318,13 @@ export function FirstSignInOnboarding() {
 			setHeaderStepIndex(0);
 			setSidebarStepIndex(0);
 			setPageTourStepIndex(0);
+			setNavPromptTarget(null);
+			if (targetPhase === 'welcome' || targetPhase === 'who-we-are' || targetPhase === 'setup' || targetPhase === 'tour-choice' || targetPhase === 'header' || targetPhase === 'sidebar') {
+				setNavMenuExplained(false);
+				try {
+					localStorage.removeItem('xernerx_tour_nav_explained');
+				} catch {}
+			}
 			setTermsChecked(Boolean(user?.agreedTerms && user?.agreedPrivacy));
 			setIsIntroPlaying(targetPhase === 'welcome');
 			setIsManualReplay(true);
@@ -331,6 +345,7 @@ export function FirstSignInOnboarding() {
 		const personaParam = search.get('xrx_persona') as OnboardingPersona | null;
 		const replayParam = search.get('xrx_replay') === '1';
 		const subParam = search.get('xrx_sub');
+		const navExplainedParam = search.get('xrx_nav_explained') === '1';
 
 		if (tourParam && VALID_TOUR_PHASES.includes(tourParam)) {
 			if (personaParam === 'both') {
@@ -343,6 +358,12 @@ export function FirstSignInOnboarding() {
 				setIsBotUser(true);
 				setIsDeveloper(false);
 			}
+			let localNavExplained = false;
+			try {
+				localNavExplained = localStorage.getItem('xernerx_tour_nav_explained') === '1';
+			} catch {}
+			setNavMenuExplained(Boolean(navExplainedParam || localNavExplained));
+			setNavPromptTarget(null);
 			setTermsChecked(true);
 			setIsIntroPlaying(false);
 			setIsManualReplay(replayParam);
@@ -495,7 +516,9 @@ export function FirstSignInOnboarding() {
 		return currPath === destPath;
 	};
 
-	const navigateToPhase = async (nextPhase: OnboardingStagePhase, subMode: 'first' | 'last' = 'first') => {
+	const navigateToPhase = async (nextPhase: OnboardingStagePhase, subMode: 'first' | 'last' = 'first', forceNavExplained?: boolean) => {
+		setNavPromptTarget(null);
+		const effectiveNavExplained = forceNavExplained ?? navMenuExplained;
 		if (nextPhase === 'header') setHeaderStepIndex(subMode === 'last' ? Math.max(0, headerSteps.length - 1) : 0);
 		if (nextPhase === 'sidebar') setSidebarStepIndex(subMode === 'last' ? Math.max(0, sidebarSteps.length - 1) : 0);
 		if (nextPhase === 'dashboard' || nextPhase === 'portal' || nextPhase === 'explore') {
@@ -509,6 +532,7 @@ export function FirstSignInOnboarding() {
 			targetUrl.searchParams.set('xrx_persona', persona);
 			if (isManualReplay) targetUrl.searchParams.set('xrx_replay', '1');
 			if (subMode === 'last') targetUrl.searchParams.set('xrx_sub', 'last');
+			if (effectiveNavExplained) targetUrl.searchParams.set('xrx_nav_explained', '1');
 
 			if (window.location.origin === targetUrl.origin) {
 				setCurrentPhase(nextPhase);
@@ -526,10 +550,28 @@ export function FirstSignInOnboarding() {
 			cleanUrl.searchParams.set('xrx_persona', persona);
 			if (isManualReplay) cleanUrl.searchParams.set('xrx_replay', '1');
 			else cleanUrl.searchParams.delete('xrx_replay');
+			if (effectiveNavExplained) cleanUrl.searchParams.set('xrx_nav_explained', '1');
+			else cleanUrl.searchParams.delete('xrx_nav_explained');
 			cleanUrl.searchParams.delete('xrx_sub');
 			window.history.replaceState(null, '', `${cleanUrl.pathname}${cleanUrl.search}`);
 		}
 	};
+
+	useEffect(() => {
+		const handleTourNavSelect = (e: Event) => {
+			const targetPhase = (e as CustomEvent<{ targetPhase?: TourNavTargetPhase }>)?.detail?.targetPhase || navPromptTarget;
+			if (!targetPhase) return;
+			setNavMenuExplained(true);
+			setNavPromptTarget(null);
+			setNavOpen(false);
+			try {
+				localStorage.setItem('xernerx_tour_nav_explained', '1');
+			} catch {}
+			void navigateToPhase(targetPhase, 'first', true);
+		};
+		window.addEventListener('xernerx:tour-navigate-select', handleTourNavSelect);
+		return () => window.removeEventListener('xernerx:tour-navigate-select', handleTourNavSelect);
+	}, [navPromptTarget, persona, isManualReplay, user, privacy, selectedLocale]);
 
 	const handleNextStep = async () => {
 		if (currentPhase === 'welcome') {
@@ -559,6 +601,10 @@ export function FirstSignInOnboarding() {
 
 		const nextPhase = phaseSequence[stepIndexInSequence + 1];
 		if (nextPhase) {
+			if (nextPhase === 'dashboard' || nextPhase === 'portal' || nextPhase === 'explore') {
+				setNavPromptTarget(nextPhase);
+				return;
+			}
 			await navigateToPhase(nextPhase, 'first');
 			return;
 		}
@@ -566,6 +612,11 @@ export function FirstSignInOnboarding() {
 	};
 
 	const handleBackStep = async () => {
+		if (navPromptTarget) {
+			setNavPromptTarget(null);
+			setNavOpen(false);
+			return;
+		}
 		if (currentPhase === 'header' && clampedHeaderIndex > 0) {
 			setHeaderStepIndex((prev) => prev - 1);
 			return;
@@ -589,11 +640,14 @@ export function FirstSignInOnboarding() {
 		syncPersonaHeaderShortcuts(isBotUser, isDeveloper);
 		await persistOnboardingState('postponed');
 		restoreOriginalSidebar(true);
+		setNavPromptTarget(null);
+		setNavOpen(false);
 		setIsManualReplay(false);
 		setIsOpen(false);
 
 		if (typeof window !== 'undefined') {
 			try {
+				localStorage.removeItem('xernerx_tour_nav_explained');
 				const returnUrl = localStorage.getItem('xernerx_post_first_signin_return_url');
 				if (returnUrl) {
 					localStorage.removeItem('xernerx_post_first_signin_return_url');
@@ -607,6 +661,7 @@ export function FirstSignInOnboarding() {
 			cleanUrl.searchParams.delete('xrx_persona');
 			cleanUrl.searchParams.delete('xrx_replay');
 			cleanUrl.searchParams.delete('xrx_sub');
+			cleanUrl.searchParams.delete('xrx_nav_explained');
 			window.history.replaceState(null, '', `${cleanUrl.pathname}${cleanUrl.search}`);
 		}
 	};
@@ -614,11 +669,14 @@ export function FirstSignInOnboarding() {
 	const handleFinish = async () => {
 		await persistOnboardingState('completed');
 		restoreOriginalSidebar(true);
+		setNavPromptTarget(null);
+		setNavOpen(false);
 		setIsManualReplay(false);
 		setIsOpen(false);
 
 		if (typeof window !== 'undefined') {
 			try {
+				localStorage.removeItem('xernerx_tour_nav_explained');
 				const returnUrl = localStorage.getItem('xernerx_post_first_signin_return_url');
 				if (returnUrl) {
 					localStorage.removeItem('xernerx_post_first_signin_return_url');
@@ -637,6 +695,7 @@ export function FirstSignInOnboarding() {
 			cleanUrl.searchParams.delete('xrx_persona');
 			cleanUrl.searchParams.delete('xrx_replay');
 			cleanUrl.searchParams.delete('xrx_sub');
+			cleanUrl.searchParams.delete('xrx_nav_explained');
 			window.history.replaceState(null, '', `${cleanUrl.pathname}${cleanUrl.search}`);
 		}
 	};
@@ -666,12 +725,14 @@ export function FirstSignInOnboarding() {
 	};
 
 	const isLivePageTour = currentPhase === 'dashboard' || currentPhase === 'portal' || currentPhase === 'explore';
-	const isBottomAnchored = isLivePageTour || currentPhase === 'ready' || (currentPhase === 'sidebar' && isMobileViewport);
+	const isBottomAnchored = Boolean(navPromptTarget) || isLivePageTour || currentPhase === 'ready' || (currentPhase === 'sidebar' && isMobileViewport);
 
 	return (
 		<div
 			className={`w-full h-full flex flex-col items-center justify-between overflow-hidden px-3 py-3 sm:px-8 sm:py-5 transition-all duration-500 ${
-				isLivePageTour || currentPhase === 'ready' ? 'pointer-events-none bg-gradient-to-t from-(--background) via-(--background)/65 via-30% to-transparent' : 'pointer-events-auto'
+				Boolean(navPromptTarget) || isLivePageTour || currentPhase === 'ready'
+					? 'pointer-events-none bg-gradient-to-t from-(--background) via-(--background)/65 via-30% to-transparent'
+					: 'pointer-events-auto'
 			}`}
 		>
 			{/* Center Stage Choreography (or Bottom-Anchored Tour Card on Live Page Tours / Ready / Mobile Sidebar) */}
@@ -682,70 +743,76 @@ export function FirstSignInOnboarding() {
 					}`}
 				>
 					<AnimatePresence mode="wait">
-						{currentPhase === 'welcome' && isIntroPlaying && (
-							<FirstSignInIntroScene key="scene-intro" displayName={displayName} username={user.username} avatarUrl={avatarUrl} onComplete={() => setIsIntroPlaying(false)} />
-						)}
+						{navPromptTarget ? (
+							<FirstSignInNavPromptScene key={`scene-nav-prompt-${navPromptTarget}`} targetPhase={navPromptTarget} onOpenNavMenu={() => setNavOpen(true)} />
+						) : (
+							<>
+								{currentPhase === 'welcome' && isIntroPlaying && (
+									<FirstSignInIntroScene key="scene-intro" displayName={displayName} username={user.username} avatarUrl={avatarUrl} onComplete={() => setIsIntroPlaying(false)} />
+								)}
 
-						{currentPhase === 'welcome' && !isIntroPlaying && (
-							<FirstSignInWelcomeScene
-								displayName={displayName}
-								avatarUrl={avatarUrl}
-								termsChecked={termsChecked}
-								isInitialTermsNull={isInitialTermsNull}
-								onTermsCheckedChange={setTermsChecked}
-							/>
-						)}
+								{currentPhase === 'welcome' && !isIntroPlaying && (
+									<FirstSignInWelcomeScene
+										displayName={displayName}
+										avatarUrl={avatarUrl}
+										termsChecked={termsChecked}
+										isInitialTermsNull={isInitialTermsNull}
+										onTermsCheckedChange={setTermsChecked}
+									/>
+								)}
 
-						{currentPhase === 'who-we-are' && (
-							<FirstSignInWhoWeAreScene
-								isBotUser={isBotUser}
-								isDeveloper={isDeveloper}
-								persona={persona}
-								onToggleBotUser={handleToggleBotUser}
-								onToggleDeveloper={handleToggleDeveloper}
-							/>
-						)}
+								{currentPhase === 'who-we-are' && (
+									<FirstSignInWhoWeAreScene
+										isBotUser={isBotUser}
+										isDeveloper={isDeveloper}
+										persona={persona}
+										onToggleBotUser={handleToggleBotUser}
+										onToggleDeveloper={handleToggleDeveloper}
+									/>
+								)}
 
-						{currentPhase === 'setup' && (
-							<FirstSignInSetupScene
-								privacy={privacy}
-								onPrivacyChange={setPrivacy}
-								selectedLocale={selectedLocale}
-								onLocaleChange={setSelectedLocale}
-								discordLocale={(user as any)?.locale}
-							/>
-						)}
+								{currentPhase === 'setup' && (
+									<FirstSignInSetupScene
+										privacy={privacy}
+										onPrivacyChange={setPrivacy}
+										selectedLocale={selectedLocale}
+										onLocaleChange={setSelectedLocale}
+										discordLocale={(user as any)?.locale}
+									/>
+								)}
 
-						{currentPhase === 'tour-choice' && (
-							<FirstSignInTourChoiceScene submitting={submitting} postponing={postponing} onTakeTour={handleNextStep} onOpenSkipConfirm={() => setConfirmSkipOpen(true)} />
-						)}
+								{currentPhase === 'tour-choice' && (
+									<FirstSignInTourChoiceScene submitting={submitting} postponing={postponing} onTakeTour={handleNextStep} onOpenSkipConfirm={() => setConfirmSkipOpen(true)} />
+								)}
 
-						{currentPhase === 'header' && (
-							<FirstSignInHeaderScene
-								headerSteps={headerSteps}
-								headerStepIndex={clampedHeaderIndex}
-								setHeaderStepIndex={setHeaderStepIndex}
-								avatarUrl={avatarUrl}
-								displayName={displayName}
-							/>
-						)}
+								{currentPhase === 'header' && (
+									<FirstSignInHeaderScene
+										headerSteps={headerSteps}
+										headerStepIndex={clampedHeaderIndex}
+										setHeaderStepIndex={setHeaderStepIndex}
+										avatarUrl={avatarUrl}
+										displayName={displayName}
+									/>
+								)}
 
-						{currentPhase === 'sidebar' && (
-							<FirstSignInSidebarScene
-								sidebarSteps={sidebarSteps}
-								sidebarStepIndex={clampedSidebarIndex}
-								setSidebarStepIndex={setSidebarStepIndex}
-								persona={persona}
-								avatarUrl={avatarUrl}
-								displayName={displayName}
-							/>
-						)}
+								{currentPhase === 'sidebar' && (
+									<FirstSignInSidebarScene
+										sidebarSteps={sidebarSteps}
+										sidebarStepIndex={clampedSidebarIndex}
+										setSidebarStepIndex={setSidebarStepIndex}
+										persona={persona}
+										avatarUrl={avatarUrl}
+										displayName={displayName}
+									/>
+								)}
 
-						{(currentPhase === 'dashboard' || currentPhase === 'portal' || currentPhase === 'explore') && (
-							<FirstSignInPageTourScene phase={currentPhase} steps={activePageTourSteps} stepIndex={clampedPageTourIndex} setStepIndex={setPageTourStepIndex} />
-						)}
+								{(currentPhase === 'dashboard' || currentPhase === 'portal' || currentPhase === 'explore') && (
+									<FirstSignInPageTourScene phase={currentPhase} steps={activePageTourSteps} stepIndex={clampedPageTourIndex} setStepIndex={setPageTourStepIndex} />
+								)}
 
-						{currentPhase === 'ready' && <FirstSignInReadyScene />}
+								{currentPhase === 'ready' && <FirstSignInReadyScene />}
+							</>
+						)}
 					</AnimatePresence>
 				</div>
 			</div>
@@ -766,6 +833,8 @@ export function FirstSignInOnboarding() {
 					onNavigateToPhase={(phaseId) => navigateToPhase(phaseId, 'first')}
 					onOpenSkipConfirm={() => setConfirmSkipOpen(true)}
 					onNextStep={handleNextStep}
+					navPromptTarget={navPromptTarget}
+					onOpenNavMenu={() => setNavOpen(true)}
 				/>
 			)}
 

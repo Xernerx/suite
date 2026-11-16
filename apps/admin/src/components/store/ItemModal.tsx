@@ -25,9 +25,7 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 	const [skuId, setSkuId] = useState('');
 	const [creditCost, setCreditCost] = useState<number>(0);
 	const [creditAmount, setCreditAmount] = useState<number>(0);
-	const [perkType, setPerkType] = useState<'none' | 'cdn_slots' | 'showcase_slots' | 'bot_slots' | 'vanity_url' | 'trial_pass' | 'vanity_badge' | 'streak_shield' | 'boost_bot' | 'boost_server'>(
-		'none'
-	);
+	const [perkType, setPerkType] = useState<NonNullable<StoreItem['perkType']>>('none');
 	const [perkValue, setPerkValue] = useState<string>('');
 	const [durationDays, setDurationDays] = useState<number>(0);
 	const [badge, setBadge] = useState('');
@@ -177,6 +175,15 @@ export function ItemModal({ isOpen, onClose, item, categories, onSave }: ItemMod
 								value={perkType}
 								onChange={(val) => setPerkType(val as any)}
 								options={[
+									{ value: 'dot_matrix', label: t('admin.store.itemModal.perks.dotMatrix') },
+									{ value: 'stage_style', label: t('admin.store.itemModal.perks.stageStyle') },
+									{ value: 'ambient_scene', label: t('admin.store.itemModal.perks.ambientScene') },
+									{ value: 'surface_style', label: t('admin.store.itemModal.perks.surfaceStyle') },
+									{ value: 'profile_cosmetic', label: t('admin.store.itemModal.perks.profileCosmetic') },
+									{ value: 'cursor_fx', label: t('admin.store.itemModal.perks.cursorFx') },
+									{ value: 'overlay_skin', label: t('admin.store.itemModal.perks.overlaySkin') },
+									{ value: 'icon_pack', label: t('admin.store.itemModal.perks.iconPack') },
+									{ value: 'window_style', label: t('admin.store.itemModal.perks.windowStyle') },
 									{ value: 'cdn_slots', label: t('admin.store.itemModal.perks.cdnSlots') },
 									{ value: 'showcase_slots', label: t('admin.store.itemModal.perks.showcaseSlots') },
 									{ value: 'bot_slots', label: t('admin.store.itemModal.perks.botSlots') },

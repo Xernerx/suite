@@ -24,7 +24,7 @@ const deviceIcons = {
 
 export function Sidebar() {
 	const { data: session } = useSession();
-	const { state, isMobileOpen, setMobileOpen, navItems, view, setView } = useSidebar();
+	const { state, isMobileOpen, setMobileOpen, navItems, view, setView, topSlot, bottomSlot, accountSlot, accountCards } = useSidebar();
 	const { user: discordUser, loading: userLoading } = useUser();
 	const { device } = usePlatform();
 	const { t } = useDictionary();
@@ -118,6 +118,7 @@ export function Sidebar() {
 	}, []);
 
 	const isSidebarBuildMode = onboardingStage.active && onboardingStage.phase === 'sidebar';
+	const isNavPromptActive = onboardingStage.active && Boolean((onboardingStage as any).navPromptTarget);
 	const hasSidebarRevealedList = Array.isArray(onboardingStage.revealedSidebarItems) && onboardingStage.revealedSidebarItems.length > 0;
 	const isSidebarItemRevealed = (id: string) => !isSidebarBuildMode || !hasSidebarRevealedList || onboardingStage.revealedSidebarItems!.includes(id);
 	const isSidebarItemHighlighted = (id: string) =>
@@ -265,10 +266,13 @@ export function Sidebar() {
 					</div>
 				)}
 
+				{/* Optional App-Specific Top Slot */}
+				{topSlot && !onboardingStage.active && <div className="relative z-30 pt-4 shrink-0">{typeof topSlot === 'function' ? topSlot({ isCollapsed }) : topSlot}</div>}
+
 				{/* Navigation Items */}
 				<nav
 					aria-label={t('components.sidebar.title')}
-					className={`flex flex-1 flex-col overflow-y-auto overflow-x-hidden pt-4 rounded-2xl transition-all duration-300 ${
+					className={`flex flex-1 flex-col overflow-y-auto overflow-x-hidden ${topSlot && !onboardingStage.active ? 'pt-1' : 'pt-4'} rounded-2xl transition-all duration-300 ${
 						isSidebarItemHighlighted('views') ? 'ring-2 ring-(--accent) bg-(--accent)/10 p-1.5 shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_50%,transparent)]' : ''
 					}`}
 					style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}
@@ -371,8 +375,10 @@ export function Sidebar() {
 						})}
 				</nav>
 
+				{bottomSlot && !onboardingStage.active && <div className="relative z-20 pb-2 shrink-0">{typeof bottomSlot === 'function' ? bottomSlot({ isCollapsed }) : bottomSlot}</div>}
+
 				{isSidebarItemRevealed('moved-dock') && <Divider />}
-				{/* Bottom Ecosystem & User Section */}
+				{/* Bottom Ecosystem & Layered Account Stack */}
 
 				{isSidebarItemRevealed('moved-dock') && (
 					<div
@@ -380,11 +386,26 @@ export function Sidebar() {
 						className={`relative flex flex-col animate-in fade-in slide-in-from-bottom-3 duration-300 ${isCollapsed ? 'items-center' : ''}`}
 						style={{ paddingBottom: 'calc(var(--ui-gap) + env(safe-area-inset-bottom, 0px))', gap: 'calc(var(--ui-gap) * 0.5)' }}
 					>
+						{!onboardingStage.active &&
+							(() => {
+								const slotList = [...(Array.isArray(accountSlot) ? accountSlot : accountSlot ? [accountSlot] : []), ...Object.values(accountCards)];
+								if (slotList.length === 0) return null;
+								return (
+									<div className={`relative z-10 flex w-full flex-col ${isCollapsed ? 'items-center' : ''}`} style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+										{slotList.map((entry, idx) => (
+											<div key={idx} className="w-full">
+												{typeof entry === 'function' ? entry({ isCollapsed }) : entry}
+											</div>
+										))}
+									</div>
+								);
+							})()}
+
 						{!activeUser ? (
 							<Link
 								href={loginHref}
 								title={t('common.sidebar.login')}
-								className={`flex items-center justify-center rounded-xl bg-(--accent) text-(--accent-contrast) border border-(--border)/15 transition-colors hover:bg-(--hover-accent) mt-1
+								className={`flex items-center justify-center rounded-xl bg-(--accent) text-(--accent-contrast) border border-(--border)/15 transition-colors hover:bg-(--hover-accent)
                                 ${isCollapsed ? 'h-10 w-10 p-0' : 'w-full font-medium text-sm'}
                             `}
 								style={!isCollapsed ? { padding: 'calc(var(--ui-gap) * 0.75) var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.5)' } : {}}
@@ -393,7 +414,7 @@ export function Sidebar() {
 								{!isCollapsed && <span>{t('common.sidebar.login')}</span>}
 							</Link>
 						) : (
-							<div className="relative w-full mt-1 flex flex-col gap-2">
+							<div className="relative z-30 w-full flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
 								{!onboardingStage.active && isTourPostponed && (
 									<button
 										type="button"
@@ -418,9 +439,9 @@ export function Sidebar() {
 
 								{/* Combined Trigger Card Wrapper */}
 								<div
-									className={`group relative overflow-hidden flex w-full items-center rounded-2xl transition-all 
-                                ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate} border border-(--accent)/35 shadow-sm` : !nameplateUrl ? 'hover:bg-(--foreground)/30 backdrop-blur-md' : 'shadow-inner'}
-                                ${customNameplate === 'none' && !nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/30 backdrop-blur-md' : ''}
+									className={`group relative overflow-hidden flex w-full items-center rounded-2xl border transition-all 
+                                ${customNameplate !== 'none' ? `xrx-nameplate-${customNameplate} border-(--accent)/35 shadow-sm` : !nameplateUrl ? 'border-(--border)/10 bg-(--foreground)/30 hover:bg-(--foreground)/45 backdrop-blur-md' : 'border-(--border)/10 shadow-inner'}
+                                ${customNameplate === 'none' && !nameplateUrl && activeMenu !== 'none' ? 'bg-(--foreground)/45 backdrop-blur-md' : ''}
                                 ${isCollapsed ? 'flex-col justify-center' : 'justify-between'}
                                 ${isSidebarItemHighlighted('moved-dock') ? 'ring-2 ring-(--accent) shadow-[0_0_22px_color-mix(in_srgb,var(--accent)_60%,transparent)] bg-(--accent)/15' : ''}
                             `}
@@ -537,8 +558,9 @@ export function Sidebar() {
 												setActiveMenu('none');
 												setNavOpen(true);
 											}}
-											className={`shrink-0 flex items-center justify-center rounded-xl transition-colors 
+											className={`shrink-0 flex items-center justify-center rounded-xl transition-all 
                                             ${nameplateUrl ? 'hover:bg-(--background)/30 text-white drop-shadow-md' : 'hover:bg-(--background) text-(--text-muted) hover:text-(--text)'}
+                                            ${isNavPromptActive ? 'ring-2 ring-(--accent) bg-(--accent)/20 text-(--accent) shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_75%,transparent)] scale-110 animate-pulse pointer-events-auto cursor-pointer' : ''}
                                         `}
 											style={{ padding: 'calc(var(--ui-gap) * 0.5)' }}
 										>

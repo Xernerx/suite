@@ -463,6 +463,7 @@ export default function StorePage() {
 						mutateUser={mutate}
 						actionLoading={actionLoading}
 						onBuyCreditPack={handleBuyCreditPack}
+						highlightedItemId={highlightedItemId}
 						hideOwned={hideOwned}
 						onHideOwnedChange={setHideOwned}
 					/>

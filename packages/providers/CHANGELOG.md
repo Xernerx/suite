@@ -2,6 +2,27 @@
 
 # @xernerx/providers
 
+## 0.24.0
+
+### Minor Changes
+
+- ## App Drawer Navigation Modal, Automatic Device Session Sync & Command Palette Updates
+  
+  Extracted NavigationModal, added automatic client device session registration in UserProvider, and registered YourApps portals in commandPaletteCatalog.
+  
+  ### Added
+  
+  - **Command Palette Portals & Client Device Detection**: Added Server Applications entries to commandPaletteCatalog and automatic client device session telemetry in UserProvider.
+  
+  ### Changed
+  
+  - **Shortcuts & Theme Providers**: Extracted NavigationModal from ShortcutsProvider and expanded cosmetic unlock validation in ThemeProvider.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.27.0
+
 ## 0.23.1
 
 ### Patch Changes

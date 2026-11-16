@@ -4,6 +4,31 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.0
+
+### Minor Changes
+
+- ## Dedicated Credit Top-Up Packs & Individual Dot-Matrix Perk Previews
+  
+  Added a streamlined Credit Top-Up Packs section and individual live previews for Dot-Matrix Banner formations in the Credit Store.
+  
+  ### Added
+  
+  - **Credit Top-Up Packs Section**: Added a dedicated top-up pack selector in the Credit Store for instant virtual credit purchases.
+  
+  ### Changed
+  
+  - **Dot-Matrix Perk Previews**: Updated Credit Store cards to preview each individual Dot-Matrix formation and cosmetic unlock accurately.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 0.12.0
 
 ### Minor Changes

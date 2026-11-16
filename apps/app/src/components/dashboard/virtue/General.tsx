@@ -41,7 +41,7 @@ function snapshotFromApiData(data: any, hasServerPrem: boolean, fb?: VirtueConfi
 	});
 }
 
-export default function VirtueGeneral({ id, managedGuilds }: { id?: string; managedGuilds?: { id: string; name: string }[] }) {
+export default function VirtueGeneral({ id, managedGuilds, isActive = true }: { id?: string; managedGuilds?: { id: string; name: string }[]; isActive?: boolean }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast, remind } = useToast();
@@ -193,12 +193,19 @@ export default function VirtueGeneral({ id, managedGuilds }: { id?: string; mana
 	}, [originalConfig, profile?.serverPremium, applySnapshotToState]);
 
 	useEffect(() => {
+		if (!isActive) return;
 		if (isDirty) remind(true, handleSave, handleReset, saving);
 		else remind(false);
 		return () => remind(false);
-	}, [isDirty, saving, handleSave, handleReset, remind]);
+	}, [isActive, isDirty, saving, handleSave, handleReset, remind]);
 
-	if (loading) return <Loading />;
+	if (loading) {
+		return (
+			<div className="flex items-center justify-center py-16 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
+				<Loading variant="small" />
+			</div>
+		);
+	}
 
 	if (!profile) {
 		return (

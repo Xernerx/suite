@@ -2,6 +2,32 @@
 
 # www
 
+## 0.27.0
+
+### Minor Changes
+
+- ## YourApps Showcase, Invite Presets, Policy Updates & Desktop Preview Sync
+  
+  Added YourApps across official bot invites, deep search, security architecture, licensing, and the interactive Desktop App preview.
+  
+  ### Added
+  
+  - **YourApps Directory & Invite Presets**: Added YourApps to official bot invite presets, deep search results, and machine-readable site indexes.
+  - **Security & Licensing Coverage**: Added a dedicated YourApps security card on /security and updated /terms, /privacy, /cookies, and /license to cover server application forms and data handling.
+  
+  ### Changed
+  
+  - **Interactive Desktop Preview**: Updated the /download live overlay ticker to include YourApps alongside Virtue and Xernerx.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 0.26.1
 
 ### Patch Changes

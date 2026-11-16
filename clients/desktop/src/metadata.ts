@@ -294,49 +294,46 @@ export function loadMetadata(store: Store, log: (msg: string) => void, forceRelo
 
 	const primaryFile = getMetadataFilePath();
 	const userFile = getUserMetadataFilePath();
-	const lastSavedPrimaryRaw = store.get('lastSavedMetadataRaw') as string | undefined;
 	const overrides = (store.get('metadataOverrides') as Partial<Metadata> | undefined) || {};
 
-	let primaryRaw: string | null = null;
 	let primaryData: Partial<Metadata> = {};
 	try {
-		log(`LOADING: ${primaryFile}`);
 		if (fs.existsSync(primaryFile)) {
-			primaryRaw = fs.readFileSync(primaryFile, 'utf-8');
-			primaryData = JSON.parse(primaryRaw);
+			primaryData = JSON.parse(fs.readFileSync(primaryFile, 'utf-8'));
 		}
 	} catch {
 		log(`WARNING: Failed to load ${primaryFile}`);
 	}
 
 	let userData: Partial<Metadata> = {};
+	let hasUserFile = false;
 	try {
-		if (app.isPackaged && fs.existsSync(userFile)) {
+		if (fs.existsSync(userFile)) {
+			log(`LOADING: ${userFile}`);
 			userData = JSON.parse(fs.readFileSync(userFile, 'utf-8'));
+			hasUserFile = true;
+		} else {
+			log(`LOADING: ${primaryFile}`);
 		}
-	} catch {}
+	} catch {
+		log(`WARNING: Failed to load ${userFile}`);
+	}
 
-	const fileChangedExternally = !app.isPackaged && primaryRaw !== null && primaryRaw !== lastSavedPrimaryRaw;
-	const resolved = fileChangedExternally
-		? sanitizeMetadata({
-				...DEFAULT_METADATA,
-				...overrides,
-				...userData,
-				...primaryData,
-			})
-		: sanitizeMetadata({
-				...DEFAULT_METADATA,
-				...primaryData,
-				...userData,
-				...overrides,
-			});
+	// Never let shipped resources/metadata.json (primaryData) overwrite user settings stored in
+	// electron-store (overrides) or %APPDATA%/Xernerx App/metadata.json (userData) across app updates.
+	const resolved = sanitizeMetadata({
+		...DEFAULT_METADATA,
+		...primaryData,
+		...overrides,
+		...userData,
+	});
 
 	cachedMetadata = resolved;
 
 	try {
 		store.set('metadataOverrides', resolved);
-		if (primaryRaw !== null) {
-			store.set('lastSavedMetadataRaw', primaryRaw);
+		if (!hasUserFile && Object.keys(overrides).length > 0) {
+			writeAndFlushFile(userFile, JSON.stringify(resolved, null, '\t') + '\n');
 		}
 	} catch {}
 
@@ -351,35 +348,17 @@ export function persistMetadata(store: Store, patch: Partial<Metadata>, log: (ms
 	cachedMetadata = updated;
 	lastInternalWriteAt = Date.now();
 
-	const primaryFile = getMetadataFilePath();
 	const userFile = getUserMetadataFilePath();
 
 	try {
 		store.set('metadataOverrides', updated);
 	} catch {}
 
-	let wrotePrimary = false;
 	try {
-		writeAndFlushFile(primaryFile, serialized);
-		store.set('lastSavedMetadataRaw', serialized);
-		wrotePrimary = true;
-		log(`SAVED: ${primaryFile}`);
+		writeAndFlushFile(userFile, serialized);
+		log(`SAVED: ${userFile}`);
 	} catch {
-		try {
-			if (fs.existsSync(primaryFile)) {
-				store.set('lastSavedMetadataRaw', fs.readFileSync(primaryFile, 'utf-8'));
-			}
-		} catch {}
-		log(`WARNING: Could not write directly to ${primaryFile}, persisting to userData metadata.json`);
-	}
-
-	if (app.isPackaged || !wrotePrimary) {
-		try {
-			writeAndFlushFile(userFile, serialized);
-			if (!wrotePrimary) {
-				log(`SAVED: ${userFile}`);
-			}
-		} catch {}
+		log(`WARNING: Could not write to ${userFile}`);
 	}
 
 	return { ...updated };
@@ -394,16 +373,16 @@ export function broadcastMetadataUpdate(updated: Metadata) {
 }
 
 export function watchMetadataFile(onUpdate: () => void) {
-	try {
-		const metaFile = getMetadataFilePath();
-		if (fs.existsSync(metaFile)) {
+	const watchedFiles = Array.from(new Set([getUserMetadataFilePath(), getMetadataFilePath()]));
+	for (const metaFile of watchedFiles) {
+		try {
 			fs.watchFile(metaFile, { interval: 1000 }, (curr, prev) => {
 				if (curr.mtimeMs === prev.mtimeMs) return;
 				if (Date.now() - lastInternalWriteAt < 1500) return;
 				onUpdate();
 			});
-		}
-	} catch {}
+		} catch {}
+	}
 }
 
 export function syncGlobalHotkey(enabled: boolean | undefined, getWin: () => BrowserWindow | undefined) {

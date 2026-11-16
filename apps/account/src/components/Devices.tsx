@@ -19,7 +19,8 @@ interface DeviceSession {
 function detectCurrentDevice(): DeviceSession {
 	const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
 	let browser = 'Browser';
-	if (ua.includes('Edg/')) browser = 'Microsoft Edge';
+	if (ua.includes('XernerxDesktop') || ua.includes('Electron/')) browser = 'Xernerx Desktop';
+	else if (ua.includes('Edg/')) browser = 'Microsoft Edge';
 	else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
 	else if (ua.includes('Chrome/')) browser = 'Google Chrome';
 	else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
@@ -27,9 +28,9 @@ function detectCurrentDevice(): DeviceSession {
 
 	let os = 'Unknown OS';
 	if (ua.includes('Windows')) os = 'Windows';
-	else if (ua.includes('Mac OS')) os = 'macOS';
+	else if (ua.includes('Mac OS') || ua.includes('Macintosh')) os = 'macOS';
 	else if (ua.includes('Android')) os = 'Android';
-	else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+	else if (ua.includes('iPhone') || ua.includes('iPad') || ua.includes('iOS')) os = 'iOS';
 	else if (ua.includes('Linux')) os = 'Linux';
 
 	const isMobile = /Android|iPhone|iPad|Mobile/i.test(ua);
@@ -74,7 +75,7 @@ export default function Devices() {
 			.then((res) => (res.ok ? res.json() : null))
 			.then(async (data) => {
 				const existing: DeviceSession[] = Array.isArray(data?.devices) ? data.devices : [];
-				const merged = [current, ...existing.filter((d) => d.id !== current.id)].slice(0, 10);
+				const merged = [current, ...existing.filter((d) => d.id !== current.id && d.id !== 'web-oauth-session')].slice(0, 10);
 				setDevices(merged);
 
 				await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {

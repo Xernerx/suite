@@ -2,6 +2,30 @@
 
 # @xernerx/components
 
+## 0.18.0
+
+### Minor Changes
+
+- ## Refined First Sign-In Onboarding, Sidebar Account Card & Blacklist Policy Access
+  
+  Updated the interactive First Sign-In tour scenes, extracted SidebarAccountCard, synced HeaderOmnibar routes, and allowed /license under BlacklistGate.
+  
+  ### Added
+  
+  - **Omnibar & Policy Route Support**: Added /dashboard?tab=applications to HeaderOmnibar quick routes and permitted /license access in BlacklistGate.
+  
+  ### Changed
+  
+  - **First Sign-In Tour & Sidebar Shell**: Refined First Sign-In onboarding transitions, localized BlacklistGate copy via common.blacklistGate.*, and modularized SidebarAccountCard.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 0.17.1
 
 ### Patch Changes

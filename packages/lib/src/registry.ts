@@ -137,3 +137,17 @@ export const hasteModels = {
 		Document: { schema: HasteDocumentSchema, modelName: 'Document', collection: 'documents' },
 	},
 };
+
+import YourAppsProfileSchema from './models/yourapps/guilds/Profile';
+import YourAppsFormSchema from './models/yourapps/guilds/Form';
+import YourAppsSubmissionSchema from './models/yourapps/guilds/Submission';
+import YourAppsDraftSchema from './models/yourapps/guilds/Draft';
+
+export const yourappsModels = {
+	guilds: {
+		Profile: { schema: YourAppsProfileSchema, modelName: 'YourAppsProfile', collection: 'profiles' },
+		Form: { schema: YourAppsFormSchema, modelName: 'YourAppsForm', collection: 'forms' },
+		Submission: { schema: YourAppsSubmissionSchema, modelName: 'YourAppsSubmission', collection: 'submissions' },
+		Draft: { schema: YourAppsDraftSchema, modelName: 'YourAppsDraft', collection: 'drafts' },
+	},
+};

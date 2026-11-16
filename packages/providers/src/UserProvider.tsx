@@ -25,6 +25,46 @@ function getPref(key: string): string | null {
 	return null;
 }
 
+interface ClientDeviceSession {
+	id: string;
+	browser: string;
+	os: string;
+	deviceType: 'desktop' | 'mobile';
+	lastActive: string;
+}
+
+function detectClientDevice(): ClientDeviceSession | null {
+	if (typeof navigator === 'undefined') return null;
+	const ua = navigator.userAgent || '';
+	if (!ua) return null;
+
+	let browser = 'Browser';
+	if (ua.includes('XernerxDesktop') || ua.includes('Electron/')) browser = 'Xernerx Desktop';
+	else if (ua.includes('Edg/')) browser = 'Microsoft Edge';
+	else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
+	else if (ua.includes('Chrome/')) browser = 'Google Chrome';
+	else if (ua.includes('Firefox/')) browser = 'Mozilla Firefox';
+	else if (ua.includes('Safari/')) browser = 'Apple Safari';
+
+	let os = 'Unknown OS';
+	if (ua.includes('Windows')) os = 'Windows';
+	else if (ua.includes('Mac OS') || ua.includes('Macintosh')) os = 'macOS';
+	else if (ua.includes('Android')) os = 'Android';
+	else if (ua.includes('iPhone') || ua.includes('iPad') || ua.includes('iOS')) os = 'iOS';
+	else if (ua.includes('Linux')) os = 'Linux';
+
+	const isMobile = /Android|iPhone|iPad|Mobile/i.test(ua);
+	const id = `${os}-${browser}`.toLowerCase().replace(/[^a-z0-9-]/g, '');
+
+	return {
+		id,
+		browser,
+		os,
+		deviceType: isMobile ? 'mobile' : 'desktop',
+		lastActive: new Date().toISOString(),
+	};
+}
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
 	const { data: session, status } = useSession();
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -94,6 +134,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 				if (xernerxResult.status === 'fulfilled') {
 					const res = xernerxResult.value;
+					const currentDevice = detectClientDevice();
 
 					if (res.status === 404) {
 						// User strictly does NOT exist, create them via POST with 1000 initial credits
@@ -103,6 +144,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
 								...(session?.user || {}),
+								...(currentDevice ? { devices: [currentDevice] } : {}),
 								credits: { balance: 1000 },
 								level: { level: 1, xp: 0 },
 							}),
@@ -143,6 +185,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 								headers: { 'Content-Type': 'application/json' },
 								body: JSON.stringify({
 									...(session?.user || {}),
+									...(currentDevice ? { devices: [currentDevice] } : {}),
 									credits: { balance: 1000 },
 									level: { level: 1, xp: 0 },
 								}),
@@ -157,6 +200,25 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 										type: 'info',
 									});
 								}
+							}
+						}
+
+						if (!isOptOutOrTombstone && currentDevice) {
+							const existingDevices: ClientDeviceSession[] = Array.isArray(xernerx?.devices) ? xernerx.devices : [];
+							const prevMatch = existingDevices.find((d) => d?.id === currentDevice.id);
+							const hadPlaceholder = existingDevices.some((d) => d?.id === 'web-oauth-session');
+							const prevActiveMs = prevMatch?.lastActive ? new Date(prevMatch.lastActive).getTime() : 0;
+							const shouldSyncDevice = !prevMatch || hadPlaceholder || !Number.isFinite(prevActiveMs) || Date.now() - prevActiveMs > 5 * 60 * 1000;
+							const mergedDevices = [currentDevice, ...existingDevices.filter((d) => d && d.id !== currentDevice.id && d.id !== 'web-oauth-session')].slice(0, 10);
+							xernerx = { ...xernerx, devices: mergedDevices };
+
+							if (shouldSyncDevice) {
+								fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${userId}`), {
+									method: 'PATCH',
+									credentials: 'include',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({ devices: mergedDevices }),
+								}).catch(() => {});
 							}
 						}
 					} else {

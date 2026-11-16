@@ -2,6 +2,31 @@
 
 # info
 
+## 1.13.0
+
+### Minor Changes
+
+- ## Expanded Multi-Category FAQ Hub & Server Applications Guide
+  
+  Reorganized the interactive FAQ into granular topic categories with deep-linkable cards and added Server Applications documentation.
+  
+  ### Added
+  
+  - **Server Applications FAQ**: Added a dedicated FAQ guide covering YourApps setup, 13-type Discord form fields, resumable drafts, and reviewer role workflows.
+  
+  ### Changed
+  
+  - **Granular FAQ Categories & Deep Links**: Streamlined FAQ category navigation, search matching, and direct card deep-linking across platform, community, account, billing, and developer topics.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 1.12.0
 
 ### Minor Changes

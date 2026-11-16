@@ -155,10 +155,10 @@ export const DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		categoryTitleKey: 'docs.websocket.hero.title',
 		sectionTitleKey: 'docs.websocket.nav.servicesAndActions',
 		titleKey: 'docs.websocket.nav.servicesAndActions',
-		rawDescription: 'Registered WebSocket microservice routers and actions across Virtue, Xernerx Suite, and real-time overlays.',
+		rawDescription: 'Registered WebSocket microservice routers and actions across Virtue, YourApps, Xernerx Suite, and real-time overlays.',
 		docPath: '/websocket#services',
 		quickLinks: [{ label: 'Services & Actions Reference', href: 'https://docs.xernerx.com/websocket#services' }],
-		keywords: ['websocket', 'services', 'actions', 'virtue', 'xernerx', 'overlay', 'levels'],
+		keywords: ['websocket', 'services', 'actions', 'virtue', 'yourapps', 'xernerx', 'overlay', 'levels', 'forms', 'submissions'],
 	},
 
 	// Developer Packages (All-in-One `xernerx` & Modular `@xernerx/*`)

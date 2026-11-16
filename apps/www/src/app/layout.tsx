@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 		default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 		template: 'Xernerx Studios | %s',
 	},
-	description: 'Xernerx Studios builds Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+	description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 	keywords: [
 		'Xernerx',
 		'Xernerx Studios',
@@ -31,6 +31,7 @@ export const metadata: Metadata = {
 		'1 Account 1 Place 1 Setup',
 		'To-Do List Bot',
 		'Virtue Discord Bot',
+		'YourApps Discord Bot',
 		'Metamorphosis Discord Bot',
 		'Zodiac Discord Bot',
 		'Discord Bot Stats',
@@ -148,6 +149,18 @@ const structuredData = {
 			author: { '@id': 'https://www.xernerx.com/#organization' },
 			description:
 				'Text and voice XP leveling Discord bot developed by Xernerx Studios with global and server leaderboards, configurable XP curves, role rewards, and server booster multipliers.',
+		},
+		{
+			'@type': 'SoftwareApplication',
+			'@id': 'https://app.xernerx.com/bots/yourapps#bot',
+			name: 'YourApps Discord Bot',
+			alternateName: ['YourApps', 'YourApps Applications Bot'],
+			applicationCategory: 'UtilitiesApplication',
+			operatingSystem: 'Discord, Web',
+			url: 'https://app.xernerx.com/bots/yourapps',
+			author: { '@id': 'https://www.xernerx.com/#organization' },
+			description:
+				'Discord-native forms, staff recruitment, and community applications bot developed by Xernerx Studios featuring Modals V2, web application portals, Apply panels, and automated review workflows.',
 		},
 		{
 			'@type': 'SoftwareApplication',

@@ -33,7 +33,27 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		if (body.creditAmount !== undefined) item.creditAmount = Math.max(0, Number(body.creditAmount) || 0);
 		if (
 			body.perkType !== undefined &&
-			['none', 'cdn_slots', 'showcase_slots', 'bot_slots', 'vanity_url', 'trial_pass', 'vanity_badge', 'streak_shield', 'boost_bot', 'boost_server'].includes(body.perkType)
+			[
+				'none',
+				'cdn_slots',
+				'showcase_slots',
+				'bot_slots',
+				'vanity_url',
+				'trial_pass',
+				'vanity_badge',
+				'streak_shield',
+				'boost_bot',
+				'boost_server',
+				'dot_matrix',
+				'stage_style',
+				'ambient_scene',
+				'surface_style',
+				'profile_cosmetic',
+				'cursor_fx',
+				'overlay_skin',
+				'icon_pack',
+				'window_style',
+			].includes(body.perkType)
 		) {
 			item.perkType = body.perkType;
 		}

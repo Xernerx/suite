@@ -123,13 +123,14 @@ export function Header() {
 
 	const isHeaderBuildMode = onboardingStage.active && onboardingStage.phase === 'header';
 	const isSidebarBuildMode = onboardingStage.active && onboardingStage.phase === 'sidebar';
+	const isNavPromptActive = onboardingStage.active && Boolean((onboardingStage as any).navPromptTarget);
 	const isSidebarBeforeDockMove = isSidebarBuildMode && Array.isArray(onboardingStage.revealedSidebarItems) && !onboardingStage.revealedSidebarItems.includes('moved-dock');
 	const showControlsInHeader = state === 'hidden' || isHeaderBuildMode || isSidebarBeforeDockMove;
 	const hasRevealedList = Array.isArray(onboardingStage.revealedHeaderItems) && onboardingStage.revealedHeaderItems.length > 0;
 	const isItemRevealed = (id: string) => !isHeaderBuildMode || !hasRevealedList || onboardingStage.revealedHeaderItems!.includes(id);
 	const isItemHighlighted = (id: string) => isHeaderBuildMode && onboardingStage.headerStepId === id;
 	const isShortcutHighlighted = (subId: string) => isHeaderBuildMode && (onboardingStage.headerStepId === subId || (onboardingStage.headerStepId === 'store' && isItemRevealed(subId)));
-	const effectiveOptionsOpen = isHeaderBuildMode ? isItemRevealed('search') : optionsOpen;
+	const effectiveOptionsOpen = isHeaderBuildMode ? isItemRevealed('search') : isNavPromptActive ? true : optionsOpen;
 	const activeRingClass = 'ring-2 ring-(--accent) shadow-[0_0_18px_color-mix(in_srgb,var(--accent)_70%,transparent)] scale-110 transition-all duration-300';
 
 	const { setNavOpen, setSearchOpen, isUrlPlacerOpen, setUrlPlacerOpen } = useShortcuts();
@@ -617,17 +618,21 @@ export function Header() {
 								);
 							})}
 
-						{showControlsInHeader && (preferences.showHeaderAppDrawer || isHeaderBuildMode || isSidebarBeforeDockMove) && isItemRevealed('drawer') && (
-							<button
-								type="button"
-								className={`${headerIconBtnClass} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('drawer') ? activeRingClass : ''}`}
-								onClick={() => setNavOpen(true)}
-								aria-label={t('components.header.title1')}
-								title={t('components.header.title1')}
-							>
-								<LayoutGrid size={effectiveControls === 'windows' ? 20 : 16} />
-							</button>
-						)}
+						{(showControlsInHeader || isNavPromptActive) &&
+							(preferences.showHeaderAppDrawer || isHeaderBuildMode || isSidebarBeforeDockMove || isNavPromptActive) &&
+							isItemRevealed('drawer') && (
+								<button
+									type="button"
+									className={`${headerIconBtnClass} animate-in fade-in zoom-in-75 duration-300 ${isItemHighlighted('drawer') || isNavPromptActive ? activeRingClass : ''} ${
+										isNavPromptActive ? 'pointer-events-auto animate-pulse' : ''
+									}`}
+									onClick={() => setNavOpen(true)}
+									aria-label={t('components.header.title1')}
+									title={t('components.header.title1')}
+								>
+									<LayoutGrid size={effectiveControls === 'windows' ? 20 : 16} />
+								</button>
+							)}
 
 						{isMounted && showControlsInHeader && activeUser && (preferences.showHeaderNotifications || isHeaderBuildMode || isSidebarBeforeDockMove) && isItemRevealed('alerts') && (
 							<div ref={notificationsRef} className="relative flex items-center animate-in fade-in zoom-in-75 duration-300">

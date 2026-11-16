@@ -367,4 +367,21 @@ export const API_DOCS_BLUEPRINTS: RawDocBlueprint[] = [
 		],
 		keywords: ['core', 'blog', 'newsroom', 'articles', 'announcements', 'security', 'engineering', 'reactions', 'rss'],
 	},
+	{
+		id: 'api-secure-guild-applications',
+		slug: 'manage-guilds',
+		category: 'api',
+		categoryTitleKey: 'docs.home.categories.api.title',
+		sectionTitleKey: 'docs.api.common.nav.allEndpoints',
+		rawTitle: 'Server Applications & YourApps Forms (/secure/guilds/:id/applications)',
+		rawDescription: 'Configure YourApps server channels, reviewer roles, Discord Modal V2 application positions, Apply panels, and applicant submission reviews.',
+		method: 'GET',
+		path: '/secure/guilds/:id/applications',
+		docPath: '/api/secure#manage-guilds',
+		quickLinks: [
+			{ label: 'Server Applications Dashboard', href: 'https://app.xernerx.com/dashboard?tab=applications', vanity: 'app.xernerx.com/dashboard?tab=applications' },
+			{ label: 'WebSocket Services Reference', href: 'https://docs.xernerx.com/websocket#services' },
+		],
+		keywords: ['secure', 'guilds', 'yourapps', 'applications', 'positions', 'submissions', 'panels', 'modals', 'forms', 'apply'],
+	},
 ];

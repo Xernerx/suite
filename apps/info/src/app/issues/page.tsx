@@ -3,24 +3,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button, Input, MultiSelector } from '@xernerx/ui';
-import { motion, AnimatePresence } from 'framer-motion';
-import { LogIn } from 'lucide-react';
-import IssueCard from '@/components/issues/IssueCard';
+import { AnimatePresence } from 'framer-motion';
 import { IssueSubmitForm } from '@/components/issues/IssueSubmitForm';
-
-function fuzzySearch(query: string, text: string) {
-	if (!query) return true;
-	const q = query.toLowerCase().replace(/\s+/g, '');
-	const t = text.toLowerCase();
-	let i = 0,
-		j = 0;
-	while (i < q.length && j < t.length) {
-		if (q[i] === t[j]) i++;
-		j++;
-	}
-	return i === q.length;
-}
+import { IssuesHeaderFilters } from '@/components/issues/IssuesHeaderFilters';
+import { fuzzySearch, IssueLoginPrompt, IssuesResultsList } from '@/components/issues/IssuesListSection';
 
 export default function IssuesPage() {
 	const { getEnvUrl, isReady } = useEnvironment();
@@ -198,7 +184,6 @@ export default function IssuesPage() {
 		const rawProd = isObj ? itemOrProd.productId : itemOrProd;
 
 		const matchedOrgBot = orgBots.find((b) => b.id === rawBotId || b.id === rawProd || (rawProd && b.name.toLowerCase() === String(rawProd).toLowerCase()));
-
 		const targetId = rawBotId || matchedOrgBot?.id || (rawProd && /^\d{17,20}$/.test(String(rawProd).trim()) ? String(rawProd).trim() : null);
 
 		if (!targetId) return null;
@@ -333,49 +318,17 @@ export default function IssuesPage() {
 
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full min-h-screen pt-24 px-4 sm:px-8 pb-24">
-			<div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-6 mb-8 border-b border-(--border)/10 relative z-30">
-				<div className="flex flex-col gap-1.5">
-					<h1 className="text-3xl sm:text-4xl font-black tracking-tight text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{t('info.bugs.title')}
-					</h1>
-					<p className="text-sm sm:text-base text-(--text-muted) max-w-2xl">{t('info.bugs.description')}</p>
-				</div>
-
-				<div className="flex flex-col gap-1.5 w-full lg:w-auto">
-					<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
-						<div className="w-full sm:w-80 xl:w-96">
-							<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
-						</div>
-						<MultiSelector
-							className="w-full sm:w-auto shrink-0"
-							placeholder={t('info.bugs.allProducts')}
-							value={selectedProducts}
-							onChange={setSelectedProducts}
-							options={availableProducts.map((prod) => {
-								const botInfo = resolveBot(prod);
-								return {
-									value: prod,
-									label: botInfo ? botInfo.name : prod,
-								};
-							})}
-						/>
-						<MultiSelector
-							className="w-full sm:w-auto shrink-0"
-							searchable={false}
-							placeholder={t('info.bugs.filters.all')}
-							value={selectedStatuses}
-							onChange={setSelectedStatuses}
-							options={[
-								{ value: 'verified', label: t('info.bugs.filters.verified'), color: 'var(--accent)' },
-								{ value: 'submitted', label: t('info.bugs.filters.submitted'), color: 'var(--accent-orange)' },
-								{ value: 'release', label: t('info.bugs.filters.release'), color: 'var(--accent-green)' },
-								...(user ? [{ value: 'mine', label: t('info.bugs.filters.mine'), color: 'var(--text-muted)' }] : []),
-							]}
-						/>
-					</div>
-					<p className="text-xs text-(--text-muted) px-2">{t('info.bugs.startTyping')}</p>
-				</div>
-			</div>
+			<IssuesHeaderFilters
+				search={search}
+				setSearch={setSearch}
+				selectedProducts={selectedProducts}
+				setSelectedProducts={setSelectedProducts}
+				availableProducts={availableProducts}
+				resolveBot={resolveBot}
+				selectedStatuses={selectedStatuses}
+				setSelectedStatuses={setSelectedStatuses}
+				hasUser={Boolean(user)}
+			/>
 
 			<div className="w-full">
 				{loading ? (
@@ -386,6 +339,7 @@ export default function IssuesPage() {
 					<AnimatePresence mode="wait">
 						{user && showForm ? (
 							<IssueSubmitForm
+								key="create-form"
 								title={title}
 								setTitle={setTitle}
 								description={description}
@@ -405,100 +359,22 @@ export default function IssuesPage() {
 								onCancel={() => setShowForm(false)}
 							/>
 						) : !user && showForm ? (
-							<motion.div
-								key="login-prompt"
-								initial={{ opacity: 0, scale: 0.96, y: 10 }}
-								animate={{ opacity: 1, scale: 1, y: 0 }}
-								exit={{ opacity: 0, scale: 0.96, y: -10 }}
-								className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-3xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
-							>
-								<div className="text-base font-bold text-(--text)">{t('info.bugs.newBug')}</div>
-								<div className="text-sm">{t('info.suggestions.loginToSubmit')}</div>
-								<div className="flex items-center gap-2">
-									<Button
-										onClick={() => {
-											if (typeof window !== 'undefined') {
-												window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
-											}
-										}}
-									>
-										<LogIn size={16} />
-										{t('common.sidebar.login')}
-									</Button>
-									<Button variant="secondary" onClick={() => setShowForm(false)}>
-										{t('info.bugs.cancel')}
-									</Button>
-								</div>
-							</motion.div>
+							<IssueLoginPrompt key="login-prompt" onCancel={() => setShowForm(false)} />
 						) : (
-							<motion.div
+							<IssuesResultsList
 								key="search-list"
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: -10 }}
-								transition={{ duration: 0.2, ease: 'easeOut' }}
-								className="flex flex-col gap-4 w-full"
-							>
-								<AnimatePresence mode="popLayout">
-									{filteredIssues.map((s: any) => (
-										<IssueCard
-											key={s.id}
-											issue={s}
-											botInfo={resolveBot(s)}
-											onToggleProduct={toggleProduct}
-											highlighted={Boolean(highlightedId && (String(s.id) === highlightedId || String(s._id) === highlightedId))}
-										/>
-									))}
-								</AnimatePresence>
-
-								{filteredIssues.length === 0 && !search.trim() && (
-									<motion.div
-										initial={{ opacity: 0, scale: 0.95 }}
-										animate={{ opacity: 1, scale: 1 }}
-										transition={{ duration: 0.25 }}
-										className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-2 text-(--text-muted)"
-									>
-										<div>{t('info.roadmap.knownIssues.noOpenIssues')}</div>
-									</motion.div>
-								)}
-
-								{filteredIssues.length === 0 && search.trim() && (
-									<motion.div
-										initial={{ opacity: 0, scale: 0.95 }}
-										animate={{ opacity: 1, scale: 1 }}
-										transition={{ duration: 0.25 }}
-										className="p-8 text-center border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm rounded-xl flex flex-col items-center justify-center gap-4 text-(--text-muted)"
-									>
-										<div>{t('info.bugs.noMatch', { query: search })}</div>
-										{user ? (
-											<Button
-												onClick={() => {
-													setTitle(search);
-													setSearch('');
-													setShowForm(true);
-												}}
-											>
-												{t('info.bugs.reportAsNew')}
-											</Button>
-										) : (
-											<div className="flex flex-col items-center gap-3">
-												<div>{t('info.suggestions.loginToSubmit')}</div>
-												<Button
-													onClick={() => {
-														if (typeof window !== 'undefined') {
-															sessionStorage.setItem('xernerx_issue_draft', search);
-															window.location.href = `${getEnvUrl('https://account.xernerx.com/login')}?redirect=${encodeURIComponent(window.location.href)}`;
-														}
-													}}
-												>
-													<LogIn size={16} />
-													{t('common.sidebar.login')}
-												</Button>
-											</div>
-										)}
-									</motion.div>
-								)}
-							</motion.div>
+								filteredIssues={filteredIssues}
+								search={search}
+								highlightedId={highlightedId}
+								hasUser={Boolean(user)}
+								resolveBot={resolveBot}
+								onToggleProduct={toggleProduct}
+								onReportAsNew={() => {
+									setTitle(search);
+									setSearch('');
+									setShowForm(true);
+								}}
+							/>
 						)}
 					</AnimatePresence>
 				)}

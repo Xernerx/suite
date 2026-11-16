@@ -1,6 +1,6 @@
 {
 	"name": "account",
-	"version": "2.15.1",
+	"version": "2.16.0",
 	"private": true,
 	"scripts": {
 		"initialize": "node ../../.xernerx/cli/prepare-package.mjs --sync-only",

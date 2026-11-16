@@ -39,6 +39,14 @@ export default function InvitesPage() {
 				description: t('www.applications.virtue.desc'),
 			},
 			{
+				id: 'yourapps',
+				name: 'YourApps',
+				clientId: '619328560141697036',
+				botName: t('www.applications.yourapps.title'),
+				botAvatar: null,
+				description: t('www.applications.yourapps.desc'),
+			},
+			{
 				id: 'metamorphosis',
 				name: 'Metamorphosis',
 				clientId: '881678826906730547',

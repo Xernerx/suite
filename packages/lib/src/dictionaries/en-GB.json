@@ -331,7 +331,10 @@
 			"reset": "Reset",
 			"saveChanges": "Save Changes",
 			"saved": "Saved!",
-			"saving": "Saving..."
+			"saving": "Saving...",
+			"copy": "Copy",
+			"copied": "Copied!",
+			"close": "Close"
 		},
 		"justNow": "Just now",
 		"loading": "Loading...",
@@ -384,7 +387,10 @@
 			"reload": "Reload",
 			"home": "Home"
 		},
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"saving": "Saving...",
+		"refresh": "Refresh",
+		"add": "Add"
 	},
 	"api": {
 		"title": "Xernerx API",
@@ -2216,6 +2222,15 @@
 					"creditPerk": "Credit Store Perk (Redeemable)"
 				},
 				"perks": {
+					"dotMatrix": "Dot-Matrix Formation",
+					"stageStyle": "Stage Render Form",
+					"ambientScene": "Ambient Canvas Scene",
+					"surfaceStyle": "Glass Surface Style",
+					"profileCosmetic": "Profile Cosmetic",
+					"cursorFx": "Cursor FX",
+					"overlaySkin": "Overlay Skin",
+					"iconPack": "Desktop / UI Icon Pack",
+					"windowStyle": "Window Control Style",
 					"cdnSlots": "CDN Upload Slots",
 					"showcaseSlots": "Profile Showcase Slots",
 					"botSlots": "Bot & API Token Slots",
@@ -3411,7 +3426,7 @@
 				"signInToRedeem": "Sign In to Redeem",
 				"topUpButton": "Buy Credits (€)",
 				"perksHeading": "Redeemable Credit Perks",
-				"perksSubheading": "Spend your earned or purchased credits on permanent slots, trial passes, and vanity badges.",
+				"perksSubheading": "Spend your earned or purchased credits on Dot-Matrix formations, stage shaders, permanent slots, trial passes, and vanity badges.",
 				"alreadyUnlocked": "Unlocked & Owned",
 				"redeemButton": "Redeem for {cost} Credits",
 				"needMoreCredits": "Need {missing} More Credits — Top Up",
@@ -3431,6 +3446,7 @@
 				"allCategories": "All Categories",
 				"filters": {
 					"all": "All Items",
+					"dotMatrix": "Dot-Matrix Effects",
 					"cdnSlots": "CDN Slots",
 					"showcaseSlots": "Showcase Slots",
 					"botSlots": "Bot Slots",
@@ -3550,6 +3566,8 @@
 			"title": "Connections",
 			"description": "Link third-party accounts via OAuth to verify your external profiles across the Xernerx ecosystem.",
 			"connected": "Connected",
+			"connectedSectionTitle": "Connected Accounts",
+			"connectedSectionDesc": "Accounts currently linked to your Xernerx identity.",
 			"primaryIdentity": "Required Login",
 			"availableTitle": "OAuth Connections",
 			"availableDesc": "Optional verified external accounts. These cannot be used to sign in — Discord remains your required login identity.",
@@ -4026,9 +4044,9 @@
 			"faq": {
 				"subtitle": "Direct answers about the Xernerx Studios ecosystem, Discord bots, open-source SDKs, and unified dashboard.",
 				"q1": "What is Xernerx Studios and how does the Xernerx Suite work?",
-				"a1": "Xernerx Studios is a software studio that builds Discord bots, open-source TypeScript frameworks, and the Xernerx Suite. With 1 Account, 1 Place, 1 Setup, you sign in once to configure To-Do List Bot, Virtue, Metamorphosis, and Zodiac or manage your own developer bots.",
+				"a1": "Xernerx Studios is a software studio that builds Discord bots, open-source TypeScript frameworks, and the Xernerx Suite. With 1 Account, 1 Place, 1 Setup, you sign in once to configure Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac or manage your own developer bots.",
 				"q2": "Which Discord bots are built and maintained by Xernerx Studios?",
-				"a2": "We build and operate four official Discord bots: To-Do List Bot for server productivity and checklists, Virtue for text and voice XP leveling, Metamorphosis for real-time multilingual translation, and Zodiac for astrology and horoscopes.",
+				"a2": "We build and operate five official Discord bots: Virtue for text and voice XP leveling, YourApps for Discord-native forms and staff applications, To-Do List Bot for server productivity and checklists, Metamorphosis for real-time multilingual translation, and Zodiac for astrology and horoscopes.",
 				"q3": "Can developers publish and track their own Discord bots on Xernerx?",
 				"a3": "Yes. Developers can use @xernerx/framework, @xernerx/stats, and our public v1 REST API to push live server and shard telemetry, sync slash commands, and list their bots in our public explorer.",
 				"q4": "Is the Xernerx Suite free to use for Discord communities?",
@@ -4101,7 +4119,7 @@
 				"departments": {
 					"engineering": {
 						"title": "Platform & Bot Engineering",
-						"description": "Design and maintain our Next.js web applications, REST APIs, real-time WebSocket gateways, Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot), and open-source NPM packages (@xernerx/framework, @xernerx/stats)."
+						"description": "Design and maintain our Next.js web applications, REST APIs, real-time WebSocket gateways, Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot), and open-source NPM packages (@xernerx/framework, @xernerx/stats)."
 					},
 					"moderation": {
 						"title": "Community Moderation & Trust",
@@ -4131,6 +4149,10 @@
 						"description": "Accepted contributors receive scoped role-based permissions, access to our internal tools and Canary testing environments, and a warm welcome from the team."
 					}
 				}
+			},
+			"yourapps": {
+				"title": "YourApps",
+				"desc": "Discord-native forms, staff recruitment, and community applications—featuring 13-type Modals V2, web application portals, Apply panels, and automated review workflows configured directly in your Dashboard."
 			}
 		},
 		"contact": {
@@ -4191,7 +4213,7 @@
 					"title": "1. Two-Tier Ecosystem Licensing",
 					"content": "Xernerx Studios operates a two-tier licensing structure across the entire Xernerx Studios workspace, separating our hosted platform, client applications, and official Discord bots from our open-source developer frameworks, starter examples, and package documentation:",
 					"proprietaryTitle": "Tier 1 — Xernerx Proprietary & SaaS License v1.0:",
-					"proprietaryDesc": "Covers the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and api, plus shared internal packages @xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), standalone and suite Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), the real-time WebSocket gateway (services/websocket), and the Xernerx Desktop and Mobile Clients. Access is granted through official hosted interfaces; source code redistribution or competing commercial deployment is prohibited.",
+					"proprietaryDesc": "Covers the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and api, plus shared internal packages @xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), standalone and suite Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), the real-time WebSocket gateway (services/websocket), and the Xernerx Desktop and Mobile Clients. Access is granted through official hosted interfaces; source code redistribution or competing commercial deployment is prohibited.",
 					"openSourceTitle": "Tier 2 — Apache License, Version 2.0 (Open-Source SDKs, Examples & Package Docs):",
 					"openSourceDesc": "Covers all 8 standalone public npm developer packages (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx), the canonical open-source package documentation repository (docs), and the official TypeScript and JavaScript starter examples repository (examples). Developers may freely install, modify, and distribute these SDKs and starter templates in commercial or personal projects under the standard Apache-2.0 terms."
 				},
@@ -4214,7 +4236,7 @@
 				"q1": "Can I use @xernerx/framework and @xernerx/stats in my own commercial Discord bot?",
 				"a1": "Yes! All public @xernerx/* npm SDKs are licensed under Apache-2.0, meaning you can freely use them in both hobby and commercial Discord bots without royalties.",
 				"q2": "Can I self-host or redistribute a clone of the Xernerx Suite or Virtue?",
-				"a2": "No. The Xernerx Suite web applications, backend services, and official bots (such as Virtue, Metamorphosis, Zodiac, and To-Do List Bot) are governed by the Xernerx Studios Proprietary & SaaS License and may only be accessed via our official hosted platform.",
+				"a2": "No. The Xernerx Suite web applications, backend services, and official bots (such as Virtue, YourApps, Metamorphosis, Zodiac, and To-Do List Bot) are governed by the Xernerx Studios Proprietary & SaaS License and may only be accessed via our official hosted platform.",
 				"q3": "Are Xernerx logos and bot names covered by the open-source license?",
 				"a3": "No. Both the Xernerx Proprietary License and Section 6 of the Apache-2.0 License reserve all rights to the Xernerx Studios name, logos, icons, and product trademarks."
 			}
@@ -4319,7 +4341,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data across the entire Xernerx Studios ecosystem—including all 13 *.xernerx.com web applications (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com), our standalone and suite Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot), our open-source TypeScript SDKs (@xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, @xernerx/websocket, and xernerx), our real-time WebSocket gateway, and the Xernerx Desktop and Mobile client applications."
+					"content": "This Privacy Policy explains how Xernerx Studios (\"we\", \"our\", \"us\") collects, uses, and protects your personal data across the entire Xernerx Studios ecosystem—including all 13 *.xernerx.com web applications (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com), our standalone and suite Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot), our open-source TypeScript SDKs (@xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, @xernerx/websocket, and xernerx), our real-time WebSocket gateway, and the Xernerx Desktop and Mobile client applications."
 				},
 				"dataCollected": {
 					"title": "2. Information We Collect",
@@ -4336,8 +4358,8 @@
 						"desc": "Scoped Bearer API tokens (with optional expiresAt TTL expiration dates and allowedIps IP allowlists), webhook URLs and secrets (for vote, review, and tip events verified via @xernerx/hooks), bot release changelogs, slash/context/message command registries synced via @xernerx/commands and @xernerx/framework, automated guild/user telemetry reported via @xernerx/stats, organization membership and treasury records, real-time WebSocket gateway telemetry (@xernerx/websocket), and configuration settings managed via portal.xernerx.com and our API."
 					},
 					"botUsers": {
-						"title": "For Bot, Virtue Leveling & Community End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (Virtue, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" button in Account Settings."
+						"title": "For Bot, Virtue Leveling, YourApps & Community End Users:",
+						"desc": "When you interact with a bot powered by Xernerx (Virtue, YourApps, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. For YourApps (our standalone forms and applications bot operating solely with Guilds and GuildMessages intents and zero MessageContent intent), we store server-configured position forms, your resumable application drafts, and the explicit form responses and reviewer decisions you submit via Discord Modals V2 or the web portal (/servers/[id]/applications/[appId]) so designated server reviewers can evaluate your application. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent passive Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" button in Account Settings."
 					},
 					"cdnAndContent": {
 						"title": "CDN Media, Haste Pastes, Showcases & 3-Tier Privacy:",
@@ -4443,7 +4465,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "These Terms of Service (\"Terms\") govern your access to the entire Xernerx Studios ecosystem—including all 13 *.xernerx.com websites and dashboards (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com), standalone and suite Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot), open-source TypeScript SDK packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), starter examples (examples), and package documentation (docs), REST and WebSocket APIs, CDN services, and the Xernerx Desktop and Mobile client applications provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
+					"content": "These Terms of Service (\"Terms\") govern your access to the entire Xernerx Studios ecosystem—including all 13 *.xernerx.com websites and dashboards (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com), standalone and suite Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot), open-source TypeScript SDK packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), starter examples (examples), and package documentation (docs), REST and WebSocket APIs, CDN services, and the Xernerx Desktop and Mobile client applications provided by Xernerx Studios. By accessing or using our services, you agree to be legally bound by these Terms."
 				},
 				"eligibility": {
 					"title": "2. Eligibility",
@@ -4469,8 +4491,8 @@
 					]
 				},
 				"botUsage": {
-					"title": "5. Bot & Virtue Leveling Terms",
-					"content": "Users interacting with Xernerx Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot) must not exploit commands, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, XP curve modes, and stackable /boost multipliers (published bot review, active 12-hour vote, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers). Server administrators may configure static level-up role rewards (/roles), Dynamic Hoist Roles (automatically managing milestone hoist roles with custom naming templates and hex color gradients within Discord's 250-role server limit), automated Daily, Weekly, or Monthly leaderboard cycle resets (or manual server resets), and cross-server configuration imports; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent. You may opt out of automatic Discord profile creation via \"Automatic Service Profiles\" or permanently wipe your Virtue progression across all servers at any time via \"Delete Virtue Data\" in Account Settings."
+					"title": "5. Bot, Virtue Leveling & YourApps Terms",
+					"content": "Users interacting with Xernerx Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot) must not exploit commands, spam or submit abusive content through YourApps server application forms, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, XP curve modes, and stackable /boost multipliers (published bot review, active 12-hour vote, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers). Server administrators may configure static level-up role rewards (/roles), Dynamic Hoist Roles (automatically managing milestone hoist roles with custom naming templates and hex color gradients within Discord's 250-role server limit), YourApps application forms and automated approval/denial role workflows, automated Daily, Weekly, or Monthly leaderboard cycle resets (or manual server resets), and cross-server configuration imports; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent. You may opt out of automatic Discord profile creation via \"Automatic Service Profiles\" or permanently wipe your Virtue progression across all servers at any time via \"Delete Virtue Data\" in Account Settings."
 				},
 				"accounts": {
 					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
@@ -4507,7 +4529,7 @@
 				},
 				"intellectualProperty": {
 					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), package documentation repository (docs), and starter examples repository (examples) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
+					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), package documentation repository (docs), and starter examples repository (examples) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
 				},
 				"warranty": {
 					"title": "13. Disclaimer of Warranties",
@@ -4554,7 +4576,7 @@
 			"sections": {
 				"introduction": {
 					"title": "1. Introduction",
-					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions across all 13 *.xernerx.com web applications (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com) and the Xernerx Desktop and Mobile client applications. Our standalone and suite Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot) and open-source npm SDK packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) operate server-side via cryptographic tokens and webhooks and never set browser cookies."
+					"content": "This Cookie Policy explains how Xernerx Studios (\"we\", \"our\", or \"us\") uses cookies, local storage, and session partitions across all 13 *.xernerx.com web applications (xernerx.com, app.xernerx.com, account.xernerx.com, portal.xernerx.com, store.xernerx.com, docs.xernerx.com, info.xernerx.com, blog.xernerx.com, haste.xernerx.com, cdn.xernerx.com, admin.xernerx.com, hosting.xernerx.com, and api.xernerx.com) and the Xernerx Desktop and Mobile client applications. Our standalone and suite Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac, Xernerx App, and Xernerx Bot) and open-source npm SDK packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) operate server-side via cryptographic tokens and webhooks and never set browser cookies."
 				},
 				"whatAreCookies": {
 					"title": "2. What Are Cookies?",
@@ -4660,7 +4682,7 @@
 			"sections": {
 				"overview": {
 					"title": "1. Ecosystem & Monorepo Defense-in-Depth Architecture",
-					"content": "The Xernerx Studios workspace is engineered as a unified, strictly typed TypeScript ecosystem spanning the Xernerx Suite monorepo—housing all 13 web applications (www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and our core API gateway at api.xernerx.com), shared internal libraries (@xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), the real-time WebSocket microservice router (services/websocket), the Xernerx App and Xernerx Bot daemons (services/app and services/bot), and the Xernerx Desktop and Mobile Clients—alongside our standalone Virtue Discord bot repository (apps/virtue), our 8 standalone open-source npm SDKs (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), our canonical package documentation & security governance repository (docs), and our official TypeScript and JavaScript starter examples repository (examples). By sharing a single canonical security layer (@xernerx/lib), authentication checks, schema validations, and privacy rules are enforced identically across every subdomain, bot, SDK, and service."
+					"content": "The Xernerx Studios workspace is engineered as a unified, strictly typed TypeScript ecosystem spanning the Xernerx Suite monorepo—housing all 13 web applications (www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and our core API gateway at api.xernerx.com), shared internal libraries (@xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), the real-time WebSocket microservice router (services/websocket), the Xernerx App and Xernerx Bot daemons (services/app and services/bot), and the Xernerx Desktop and Mobile Clients—alongside our standalone Virtue (apps/virtue) and YourApps (apps/yourapps) Discord bot repositories, our 8 standalone open-source npm SDKs (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), our canonical package documentation & security governance repository (docs), and our official TypeScript and JavaScript starter examples repository (examples). By sharing a single canonical security layer (@xernerx/lib), authentication checks, schema validations, and privacy rules are enforced identically across every subdomain, bot, SDK, and service."
 				},
 				"authentication": {
 					"title": "2. Identity, Sessions & Desktop Partitioning",
@@ -4705,7 +4727,7 @@
 				},
 				"bots": {
 					"title": "4. Official Discord Bots Security & Data Minimization",
-					"intro": "Our in-house Discord applications—Virtue (apps/virtue), To-Do List Bot, Metamorphosis, Zodiac, and our suite daemons Xernerx App (services/app) and Xernerx Bot (services/bot)—are built on @xernerx/framework, @xernerx/commands, @xernerx/stats, and @xernerx/websocket with strict data minimization and least-privilege Discord permissions:",
+					"intro": "Our in-house Discord applications—Virtue (apps/virtue), YourApps (apps/yourapps), To-Do List Bot, Metamorphosis, Zodiac, and our suite daemons Xernerx App (services/app) and Xernerx Bot (services/bot)—are built on @xernerx/framework, @xernerx/commands, @xernerx/stats, and @xernerx/websocket with strict data minimization and least-privilege Discord permissions:",
 					"virtue": {
 						"title": "Virtue (Text & Voice XP Leveling Bot)",
 						"badge": "Zero Message Content Stored",
@@ -4742,6 +4764,15 @@
 							"Scoped Channel Delivery: Automated daily horoscope feeds post only to channels explicitly configured by server administrators and immediately stop if the channel or bot permission is revoked.",
 							"Instant Reset Support: Clearing your profile data in Account Settings immediately wipes any stored birthday or astrological preferences."
 						]
+					},
+					"yourapps": {
+						"title": "YourApps (Discord Forms, Recruitment & Applications Bot)",
+						"badge": "Zero Bot DB & Scoped Reviews",
+						"points": [
+							"Zero MessageContent & Zero Direct Database Drivers: YourApps connects solely with Guilds and GuildMessages intents (without the privileged MessageContent intent) and holds zero direct database credentials—persisting forms, resumable drafts, and submissions strictly over our authenticated WebSocket RPC gateway (service: \"yourapps\").",
+							"Scoped Reviewer Access & Applicant Privacy: Submitted responses and reviewer notes are strictly isolated per Discord server and accessible only to server administrators, configured reviewRoles/adminRoles, and the submitting applicant.",
+							"Hierarchy-Safe Automated Role Rewards: Approval rewardRoles and removeRoles execute with explicit role-hierarchy bounds checks and applicant eligibility verification (requiredRoles, restrictedRoles, blacklistRoles, minimumJoinTime, and re-apply cooldowns)."
+						]
 					}
 				},
 				"apiAndWebhooks": {
@@ -4757,7 +4788,7 @@
 						},
 						"websocket": {
 							"title": "Authenticated WebSocket Router & SDKs (@xernerx/websocket & @xernerx/stats):",
-							"desc": "Real-time communication between our Discord daemons (Virtue, Xernerx App, Xernerx Bot), developer bots powered by xernerx / @xernerx/framework / @xernerx/commands / @xernerx/terminal, and backend databases passes through an authenticated WebSocket gateway (services/websocket) and the @xernerx/websocket and @xernerx/stats client SDKs, requiring valid token handshakes before any RPC action or telemetry sync is executed."
+							"desc": "Real-time communication between our Discord daemons (Virtue, YourApps, Xernerx App, Xernerx Bot), developer bots powered by xernerx / @xernerx/framework / @xernerx/commands / @xernerx/terminal, and backend databases passes through an authenticated WebSocket gateway (services/websocket) and the @xernerx/websocket and @xernerx/stats client SDKs, requiring valid token handshakes before any RPC action or telemetry sync is executed."
 						}
 					}
 				},
@@ -4766,7 +4797,7 @@
 					"items": {
 						"databases": {
 							"title": "Multi-Cluster Database Segmentation:",
-							"desc": "Core platform records (xernerx), Virtue progression tracks (virtue), and Hastebin code pastes (haste) are separated into distinct logical databases with strict Mongoose schema validation and connection pool caps."
+							"desc": "Core platform records (xernerx), Virtue progression tracks (virtue), YourApps server application forms & submissions (guilds), and Hastebin code pastes (haste) are separated into distinct logical databases with strict Mongoose schema validation and connection pool caps."
 						},
 						"cdn": {
 							"title": "Private Blob CDN & Ephemeral Haste TTLs:",
@@ -4797,7 +4828,7 @@
 					"title": "8. Software & Ecosystem Licensing",
 					"intro": "To protect platform integrity, intellectual property, and open-source developer freedom, Xernerx Studios enforces a strict two-tier licensing model across all repositories and packages in the Xernerx Studios workspace:",
 					"proprietaryTitle": "Xernerx Studios Proprietary & SaaS License v1.0:",
-					"proprietaryDesc": "Governs the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including Xernerx Blog, Xernerx Haste, and Xernerx CDN), standalone and suite Discord bots (Virtue, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), and the Xernerx Desktop and Mobile Clients. Prohibits unauthorized source code redistribution, reverse-engineering, or competing commercial deployments.",
+					"proprietaryDesc": "Governs the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including Xernerx Blog, Xernerx Haste, and Xernerx CDN), standalone and suite Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), and the Xernerx Desktop and Mobile Clients. Prohibits unauthorized source code redistribution, reverse-engineering, or competing commercial deployments.",
 					"proprietaryLink": "Read the Xernerx Proprietary & SaaS License (/license)",
 					"plainTextLink": "View Plain-Text LICENSE",
 					"apacheTitle": "Apache License, Version 2.0 (Open-Source SDKs, Examples & Package Docs):",
@@ -5194,10 +5225,10 @@
 				"subtitle": "Common questions about inviting and configuring official Xernerx Discord bots in your server.",
 				"q1": "What Discord permissions do I need to invite a Xernerx bot to my server?",
 				"a1": "You need the Manage Server (or Administrator) permission in the target Discord server to authorize an official bot invite through Discord's OAuth2 flow.",
-				"q2": "How do I configure To-Do List Bot, Virtue, Metamorphosis, or Zodiac after inviting them?",
+				"q2": "How do I configure Virtue, YourApps, To-Do List Bot, Metamorphosis, or Zodiac after inviting them?",
 				"a2": "As soon as the bot joins your server, open app.xernerx.com and select your server from the dashboard to configure XP curves, level roles, translation channels, and module toggles in real time.",
 				"q3": "Are all official Xernerx Studios Discord bots verified by Discord?",
-				"a3": "Yes. To-Do List Bot, Virtue, Metamorphosis, and Zodiac are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes."
+				"a3": "Yes. Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac are verified Discord applications hosted on our 24/7 monitored infrastructure with least-privilege OAuth2 scopes."
 			}
 		},
 		"changelog": {
@@ -5265,9 +5296,12 @@
 		"noResults": "No questions found matching \"{query}\".",
 		"category": {
 			"suite": "Xernerx Suite",
-			"platform": "Platform & Clients",
-			"community": "Bots, Servers & Virtue",
-			"accountAndDevs": "Account, Billing & Devs"
+			"platform": "Platform",
+			"community": "Community",
+			"account": "Account",
+			"billing": "Billing",
+			"developers": "Developers",
+			"accountAndDevs": "Account & Developers"
 		},
 		"quickLinks": {
 			"label": "Quick Links & Vanity Routes",
@@ -5332,58 +5366,70 @@
 			"tryOmnibar": "Open URL Omnibar (Ctrl + .)",
 			"tryShortcutsModal": "View Shortcuts & Changelog (Ctrl + /)",
 			"creditStore": "Credit Store & Perks",
-			"hasteStudio": "Xernerx Haste"
+			"hasteStudio": "Xernerx Haste",
+			"portalSubdomain": "Developer Portal",
+			"hostingConsole": "Hosting Console",
+			"blogNewsroom": "Official Blog",
+			"applicationsSettings": "Server Applications Studio"
 		},
 		"overview": {
-			"navTitle": "Ecosystem & Navigation",
-			"title": "Ecosystem, Navigation & Shortcuts",
+			"navTitle": "Ecosystem",
+			"title": "Ecosystem",
 			"table": {
 				"subdomain": "Subdomain",
 				"purpose": "Purpose & Core Features"
 			},
 			"subdomains": {
 				"www": "Marketing showcase, company timeline, official bot invites (/invites), open team applications (/applications), legal & security policies (/terms, /privacy, /cookies, /security), and Desktop Client downloads (/download).",
-				"app": "Bot & Server Discovery (/bots, /servers), Ecosystem Leaderboards (/leaderboard), Supporters showcase (/supporters), Server Dashboard & Virtue config (/dashboard), Developer Portal & Organizations (/portal), Public User & Org profiles (/users/[id], /organization/[id]), and Live Overlay Monitor (/overlay).",
-				"account": "Unified Discord identity hub, QR/6-character device pairing & active sessions (/devices), secondary OAuth connections (/connections), theme & UI scaling (/appearance), workspace & desktop preferences (/preferences), localization (/language), notification matrix (/notifications), billing & daily gifts (/billing), API tokens (/tokens), personal activity & JSON data export (/activity), and media library (/media).",
-				"store": "Ecosystem store portal for Monthly & Annual subscriptions, the €0 Free Tier, the Ultra Ecosystem master pass, individual bot passes (Zodiac, Virtue, To-Do List Bot, Metamorphosis), Developer Pro, and server infrastructure.",
-				"cdn": "Distributed media content delivery network and private Vercel Blob storage with drag-and-drop/Ctrl+V upload, Public/Limited/Private access controls, /view/[id] web viewer, and /raw/[id] binary streaming.",
-				"docs": "Developer documentation hub featuring interactive REST API specs (/api/v1, /api/core, /api/secure) with an in-browser API Playground, CDN docs (/cdn), live GitHub/npm Package docs reader (/packages), and WebSocket Gateway RPC specs (/websocket).",
-				"info": "Support & feedback knowledgebank housing the chronological Roadmap (/roadmap), Community Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live 9-Service Status Matrix (/status), Unified Changelog (/changelog), and FAQ (/faq).",
-				"api": "Core backend HTTP gateway, Bearer token validator, Discord & Stripe webhook processor, live SVG/PNG/iframe widget renderer (/core/*, /v1/*/badge.svg), and rate-limited REST router.",
-				"admin": "Internal staff RBAC portal for managing Discord-synced roles, users, bots, servers, Staff Subscriptions, elevated API tokens, Translation Studio (/translations), application reviews, platform announcements, roadmap/issue/suggestion moderation, support configurations & tickets, and store catalog items.",
-				"blog": "Official newsroom, security & trust reports, engineering deep-dives, product announcements, and RSS syndication (/rss.xml)."
+				"app": "Bot & Server Discovery (/bots, /servers), Ecosystem Leaderboards (/leaderboard), Supporters showcase (/supporters), Server Dashboard with Virtue & YourApps config (/dashboard), Public User & Organization profiles (/users/[id], /organization/[id]), and Live Overlay Monitor (/overlay).",
+				"account": "Unified Discord identity hub, profile & cosmetics (/profile), QR/6-character device pairing & active sessions (/devices), secondary OAuth connections (/connections), theme & UI scaling (/appearance), workspace & desktop preferences (/preferences), localization (/language), notification matrix (/notifications), billing & daily gifts (/billing), API tokens (/tokens), activity & JSON data export (/activity), and media library (/media).",
+				"store": "Ecosystem store portal for Monthly & Annual subscriptions, the €0 Free Tier, the Ultra Ecosystem master pass, Virtue — Premium User Pass, Developer Pro, and the Credit Store & Top-Up Packs.",
+				"portal": "Dedicated Developer Portal for creating Organizations, managing published Discord bots, syncing slash commands, configuring webhooks, and managing team roles.",
+				"cdn": "Distributed media content delivery network and private storage with drag-and-drop/Ctrl+V upload, aspect-ratio cropping, Public/Limited/Private access controls, /view/[id] web viewer, and /raw/[id] binary streaming.",
+				"docs": "Developer documentation hub featuring interactive REST API specs (/api/v1, /api/core, /api/secure) with an in-browser API Playground, CDN docs (/cdn), live NPM Package docs reader (/packages), and WebSocket Gateway architecture specs (/websocket).",
+				"info": "Support & feedback hub housing the Public Roadmap (/roadmap), Suggestion Centre (/suggestions), Issue & Bug Tracker (/issues), Live System Status (/status), Unified Changelog (/changelog), and FAQ (/faq).",
+				"haste": "First-party Hastebin-compatible code pastebin with syntax highlighting, configurable TTL expirations, 3-tier privacy, and /raw/[id] streaming.",
+				"blog": "Official newsroom, security & engineering deep-dives, product announcements, and /rss.xml syndication.",
+				"api": "Core backend HTTP gateway, Bearer token validator, Discord & Stripe webhook processor, live SVG/PNG/iframe widget renderer, and rate-limited REST router.",
+				"admin": "Internal staff RBAC portal for moderation, role management, Translation Studio (/translations), application reviews, announcements, store catalog, and support operations.",
+				"hosting": "Staff-only multi-node server infrastructure and container management console."
+			},
+			"card0": {
+				"title": "What is the Xernerx Suite?",
+				"description": "The Xernerx Suite is an interconnected ecosystem of Discord bots, community discovery directories, server analytics, developer tools, and web applications built by Xernerx Studios. A single passwordless Discord sign-in carries your identity, custom theme & scaling preferences, notifications, and Xernerx Credits seamlessly across every subdomain and our native Desktop App."
 			},
 			"card1": {
-				"title": "How is the Xernerx Suite organized across its 9 subdomains?",
-				"description": "The Xernerx Suite is a unified multi-application ecosystem where a single Discord sign-in, your theme & scaling preferences, and your notifications carry seamlessly across 9 specialized subdomains:"
+				"title": "How is the Xernerx Suite organized across its 13 subdomains?",
+				"description": "Each part of the Xernerx ecosystem lives on its own dedicated subdomain while sharing one unified session, theme, and navigation shell:"
 			},
 			"card2": {
-				"title": "How do the Command Palette (Ctrl + K), App Drawer (Ctrl + Space), and URL Omnibar (Ctrl + .) work?",
-				"description": "You can navigate across the entire suite without touching your mouse: (1) Press Ctrl + K to focus the current page's search bar, or press Ctrl + Shift + K (or Ctrl + K when no page search bar is mounted) to open the global Command Palette—which searches current page views, quick actions (theme toggle, sidebar toggle, copy URL), suite apps, account settings, live public bots and servers, and community issues/suggestions/roadmap items; (2) Press Ctrl + Space (or Alt + A) to open the App Drawer grid and launch any Xernerx subdomain; (3) Press Ctrl + . to open the URL Omnibar in the header, allowing you to switch subdomains, switch between Public/Canary/Dev environments, and type a custom path in one bar. Click any button below to test them live:"
+				"title": "How does the Command Palette (Ctrl + K) work?",
+				"description": "Press Ctrl + K to focus the current page search bar, or press Ctrl + Shift + K (or Ctrl + K when no page search bar is mounted) to open the global Command Palette. From one search bar you can jump to sidebar views, trigger quick actions (toggle theme, collapse sidebar, copy URL), switch suite apps, search live public bots and servers, or look up FAQ articles, documentation endpoints, issues, suggestions, and roadmap items."
+			},
+			"card7": {
+				"title": "How does the App Drawer (Ctrl + Space) work?",
+				"description": "Press Ctrl + Space (or Alt + A) anywhere in the suite—or click the grid icon in the top header—to open the App Drawer. It presents a visual launcher grid of Xernerx applications so you can jump between App, Account, Store, Portal, CDN, Docs, Info, Haste, and Blog while staying in your active Release, Canary, or Dev environment."
+			},
+			"card8": {
+				"title": "How does the URL Omnibar (Ctrl + .) work?",
+				"description": "Press Ctrl + . to expand the interactive URL Omnibar in the header. It lets you switch subdomains, toggle between Release, Canary, and Dev environments, and type a custom route path or query parameter in a single bar without manually editing browser URLs."
 			},
 			"card3": {
 				"title": "What global keyboard shortcuts are available across all Xernerx web apps?",
-				"description": "Every application in the suite supports these global shortcuts: Ctrl + / opens the Keyboard Shortcuts & Changelog modal; Ctrl + K focuses page search or opens the Command Palette (Ctrl + Shift + K forces the Command Palette); Ctrl + Space or Alt + A opens the App Drawer; Ctrl + B collapses or expands the Sidebar; Ctrl + . toggles the URL Omnibar; Ctrl + I opens the Notifications drawer; Ctrl + , jumps straight to Account Settings (account.xernerx.com); Ctrl + S or Ctrl + Enter saves unsaved form changes (and Alt + R resets unsaved changes); Alt + 1..9 switches between sidebar views or tabs; Ctrl + Shift + C copies the current suite URL (automatically preserving your active ?view= parameter); Ctrl + R reloads application state; and Esc closes any open modal, popover, or drawer."
+				"description": "Every application supports these global shortcuts: Ctrl + / opens the Keyboard Shortcuts & Changelog modal; Ctrl + K focuses page search or opens the Command Palette (Ctrl + Shift + K always opens the Command Palette); Ctrl + Space or Alt + A opens the App Drawer; Ctrl + B collapses or expands the Sidebar; Ctrl + . toggles the URL Omnibar; Ctrl + I opens Notifications; Ctrl + , jumps to Account Settings; Ctrl + S or Ctrl + Enter saves unsaved changes (Alt + R resets them); Alt + 1..9 switches sidebar tabs; Ctrl + Shift + C copies the current URL (including ?view=); and Esc closes any open modal or drawer."
 			},
 			"card4": {
 				"title": "What official vanity URLs and quick redirects can I use?",
-				"description": "Across every Xernerx subdomain, /support and /discord redirect to our official Discord Support Server, /github opens github.com/xernerx, /npm opens our npm package suite, /x (or /twitter) opens x.com/XernerxStudios, /bluesky (or /bsky) opens bsky.app/profile/xernerx.com, and /instagram (or /ig) opens instagram.com/xernerxstudios. On xernerx.com, use /invite or /invite/[slug] for bot invites, /desktop for the Desktop App download page, and /careers or /jobs for open team applications. On info.xernerx.com, use /bugs for the Issue Tracker (/issues) and /help for the FAQ (/faq). On app.xernerx.com, use /orgs or /organizations for the Developer Portal (/portal) and /leaderboards for /leaderboard. On account.xernerx.com, every settings tab has a clean vanity path: /profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media."
-			},
-			"card5": {
-				"title": "How does the floating Support Button work, and how can I contact specific departments?",
-				"description": "Clicking the floating Support button in the bottom-right corner of any page opens a quick-help popover with links to the Support Hub, Report an Issue, Suggest a Feature, and FAQ, plus a Join Support Server button. If you are signed in and not yet a member of our Discord server, clicking Join Support Server uses your authorized Discord guilds.join scope to add your account to the official Xernerx Support server automatically and open the support channel. For direct email inquiries, visit xernerx.com/contact to reach General Inquiries (info@xernerx.com), Technical Support (support@xernerx.com), Billing & Invoices (invoice@xernerx.com), Security Disclosures (security@xernerx.com), or Legal & Privacy (legal@xernerx.com)."
+				"description": "On any Xernerx subdomain, /support and /discord redirect to our official Discord Support Server, /github opens github.com/xernerx, /npm opens our npm packages, /x (or /twitter) opens x.com/XernerxStudios, /bluesky (or /bsky) opens Bluesky, and /instagram (or /ig) opens Instagram. On xernerx.com, use /invite or /invite/[slug] for bot invites, /desktop for Desktop downloads, and /careers or /jobs for open roles. On info.xernerx.com, use /bugs for /issues and /help for /faq. On account.xernerx.com, every settings tab has a clean path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
 			},
 			"card6": {
-				"title": "How do Custom Vanity Slugs work for Bots, Servers, and Users?",
-				"description": "Custom Vanity Slugs let you replace long Discord snowflake IDs with clean, memorable URLs across the suite—such as app.xernerx.com/bots/virtue, app.xernerx.com/servers/xernerx, and app.xernerx.com/users/alex. Vanity slugs can be unlocked via the Credit Store or supporter perks and configured directly in your Profile Settings, Server Dashboard, or Developer Portal."
+				"title": "What are Custom Vanity Slugs for Bots, Servers, Organizations, and Users?",
+				"description": "Custom Vanity Slugs replace long numeric Discord Snowflake IDs with clean, memorable URLs—such as app.xernerx.com/bots/virtue, app.xernerx.com/servers/xernerx, and app.xernerx.com/users/alex. Vanity URL slots can be unlocked in the Credit Store (or included via supporter perks) and configured in your Profile Settings, Server Dashboard, or Developer Portal."
 			}
 		},
 		"environments": {
-			"title": "Environments, Status, Roadmap & Feedback",
-			"card": {
-				"title": "What are the Release, Canary, and Dev environments?",
-				"description": "Within Xernerx Studios we operate 3 isolated environments across all 9 suite subdomains (www, app, account, api, cdn, docs, info, store, and admin). Here is what each environment is used for:"
-			},
+			"navTitle": "Environments",
+			"title": "Environments",
 			"table": {
 				"header": {
 					"environment": "Environment",
@@ -5392,176 +5438,172 @@
 				},
 				"release": {
 					"label": "Release",
-					"description": "The stable production environment (*.xernerx.com) used for general availability."
+					"description": "The stable production environment (*.xernerx.com) used for everyday general availability."
 				},
 				"canary": {
 					"label": "Canary",
-					"description": "The public staging and beta environment (*.canary.xernerx.com) where new features and merged translations arrive first."
+					"description": "The public staging and preview environment (*.canary.xernerx.com) where upcoming features and newly submitted translations arrive first."
 				},
 				"dev": {
 					"label": "Dev",
-					"description": "The internal development environment (*.dev.xernerx.com) used for active building and local service orchestration."
+					"description": "The internal local development environment (*.dev.xernerx.com) used by Xernerx engineers."
 				}
 			},
+			"card": {
+				"title": "What are the Release, Canary, and Dev environments?",
+				"description": "Xernerx operates three isolated deployment environments across the suite so new features and translations can be tested safely before reaching production:"
+			},
+			"card7": {
+				"title": "Should I use Release or Canary?",
+				"description": "For everyday use, bot management, and billing, we recommend the stable Release environment (*.xernerx.com). Use Canary (*.canary.xernerx.com) when you want to preview upcoming UI updates, test newly merged community translations, or verify fixes marked with a Canary Only badge on the Issue Tracker."
+			},
 			"card2": {
-				"title": "How can I monitor live uptime, service latency, and active incidents?",
-				"description": "Visit info.xernerx.com/status to inspect real-time operational health and response latency across all 9 Xernerx Suite services, view verified active incidents from the issue tracker, or click Status Badge to embed our live SVG status shield (api.xernerx.com/v1/status/badge.svg) in your README or website."
+				"title": "How can I check live system uptime, latency, and active incidents?",
+				"description": "Visit info.xernerx.com/status to view real-time operational health and response latency (in ms) across Xernerx Suite web apps, APIs, and official bots, inspect verified active incidents linked from the Issue Tracker, or copy our live Status SVG Badge (api.xernerx.com/v1/status/badge.svg)."
 			},
 			"card3": {
-				"title": "Where can I read release notes, changelogs, or subscribe via RSS?",
-				"description": "Every Xernerx Suite web app exposes CORS-enabled GET /api/version and GET /api/changelog endpoints and automatically notifies you with an App Updated toast when a new version is deployed. You can press Ctrl + / anywhere to open the Changelog & Shortcuts modal, browse full version histories with direct version deep-links on info.xernerx.com/changelog, or subscribe to our RSS 2.0 feed at api.xernerx.com/v1/changelog/rss."
+				"title": "Where can I read release notes and changelogs or subscribe via RSS?",
+				"description": "Browse full version histories and package release notes at info.xernerx.com/changelog, press Ctrl + / inside any app to view recent updates, or subscribe to our automated RSS 2.0 feed at api.xernerx.com/v1/changelog/rss. Whenever a new build goes live while you have an app open, an automatic App Updated toast lets you refresh in one click."
+			}
+		},
+		"feedback": {
+			"navTitle": "Feedback",
+			"title": "Feedback",
+			"card0": {
+				"title": "What is the Xernerx Support & Feedback Hub (info.xernerx.com)?",
+				"description": "info.xernerx.com is the central support, transparency, and community feedback portal for the Xernerx Suite. From one hub you can search this FAQ, report and track bugs (/issues), propose and upvote new ideas (/suggestions), follow upcoming milestones (/roadmap), check live service health (/status), and read version release notes (/changelog)."
 			},
-			"card4": {
-				"title": "How does the Issue & Bug Tracker (info.xernerx.com/issues) work, and what do the release badges mean?",
-				"description": "On info.xernerx.com/issues (or vanity URL info.xernerx.com/bugs), you can filter reports by All Open, Verified (acknowledged by engineers), Unverified (community submitted), or Pending Release, and attach up to 10MB screenshots or logs (PNG, JPG, GIF, WEBP, TXT, LOG, JSON) via drag-and-drop or Ctrl + V paste. When our engineers link a fix to a target app version, the issue card displays a live deployment badge: Queued • app vX.Y.Z (awaiting build), Canary Only • app vX.Y.Z (live on *.canary.xernerx.com), or Live (Prod & Canary) • app vX.Y.Z once rolled out to Production."
+			"card1": {
+				"title": "How does the floating Support Button work?",
+				"description": "Clicking the floating Support button in the bottom-right corner of any page opens a quick-help menu with direct links to the Support Hub, Report an Issue, Suggest a Feature, and FAQ, plus a 1-click Join Support Server action. If you are signed in, Join Support Server uses your authorized Discord guilds.join scope to add you directly to the official Xernerx Discord server."
 			},
 			"card5": {
-				"title": "What official vanity links and quick redirects are available across the suite?",
-				"description": "You can use clean vanity routes on any Xernerx domain: /support and /discord open our official Discord community, /github opens our GitHub organization, /npm opens our npm package suite, /x (or /twitter) opens x.com/XernerxStudios, /bluesky (or /bsky) opens bsky.app/profile/xernerx.com, and /instagram (or /ig) opens instagram.com/xernerxstudios. On xernerx.com you can use /invite (or /invite/[slug]), /desktop (for /download), and /careers or /jobs (for /applications). On info.xernerx.com you can use /bugs (for /issues) and /help (for /faq). On account.xernerx.com every settings tab has a direct vanity path (/profile, /activity, /connections, /devices, /appearance, /preferences, /language, /notifications, /billing, /tokens, and /media)."
+				"title": "How can I contact specific Xernerx departments directly?",
+				"description": "Visit xernerx.com/contact for department routing and direct email inquiries: General Inquiries (info@xernerx.com), Technical Support (support@xernerx.com), Billing & Invoices (invoice@xernerx.com), Responsible Security Disclosures (security@xernerx.com), and Legal & Privacy requests (legal@xernerx.com)."
+			},
+			"card2": {
+				"title": "How do I report a bug on the Issue Tracker?",
+				"description": "Open info.xernerx.com/issues (or vanity path info.xernerx.com/bugs) to search existing reports by product or status (All Open, Verified, Unverified, Pending Release) and submit a new bug report. You can attach up to 10MB diagnostic files or screenshots (PNG, JPG, GIF, WEBP, TXT, LOG, JSON) via drag-and-drop or Ctrl + V clipboard paste."
 			},
 			"card6": {
-				"title": "How do the Suggestion Centre (/suggestions) and Roadmap (/roadmap) work?",
-				"description": "In the Suggestion Centre (info.xernerx.com/suggestions), you can filter ideas by product, sort by Most Upvoted, Newest, or Upvoted by Me, and submit new feature ideas (with real-time duplicate detection as you type). Popular suggestions are promoted by staff to the Roadmap (info.xernerx.com/roadmap), which tracks milestones across Idea, Planned, In Progress, and Released stages alongside live Avg Issue Resolution Time metrics and the Known Issues Tracker. Click Notify Me (Watching) on any roadmap milestone to receive an automatic notification the moment it is released."
+				"title": "What do the Queued, Canary Only, and Live badges mean on bug reports?",
+				"description": "When an engineer links a bug report to a target release version, the issue card displays a live deployment badge: Queued • app vX.Y.Z (fix committed, awaiting build), Canary Only • app vX.Y.Z (live for testing on *.canary.xernerx.com), and Live (Prod & Canary) • app vX.Y.Z once deployed to production. Verified bug reports that get resolved also award an automatic +500 Credits community bounty!"
+			},
+			"card3": {
+				"title": "How does the Suggestion Centre work?",
+				"description": "On info.xernerx.com/suggestions, anyone signed in can submit feature requests for any Xernerx app or bot (with real-time duplicate detection as you type), filter by product, and upvote ideas from the community. Accepted and implemented suggestions automatically reward the author with a +250 Credits bounty."
+			},
+			"card7": {
+				"title": "How does the Public Roadmap work?",
+				"description": "Popular community suggestions and internal initiatives are promoted to info.xernerx.com/roadmap, where milestones move across Idea, Planned, In Progress, and Released columns alongside live Average Issue Resolution Time metrics. Click Notify Me (Watching) on any milestone to receive an automatic alert the moment it ships."
+			},
+			"card4": {
+				"title": "How do I apply for open staff, moderator, or translator positions?",
+				"description": "Visit xernerx.com/applications (or xernerx.com/careers and xernerx.com/jobs) to view open engineering, moderation, community, and localization positions, review role requirements, and submit an application. You can track your application status anytime on account.xernerx.com/activity."
 			}
 		},
 		"desktop": {
-			"navTitle": "Desktop App & Overlay",
-			"title": "Desktop Client & Live Overlay Monitor",
+			"navTitle": "Desktop",
+			"title": "Desktop",
 			"card1": {
-				"title": "What is the Xernerx Desktop App and how do I switch between Stable and Canary channels?",
-				"description": "The Xernerx Desktop App (xernerx.com/download or xernerx.com/desktop) is our native Electron companion client for Windows, macOS, and Linux. It wraps the Xernerx workspace in a clean borderless window with automatic background updates and native OS integration. When visiting the download page on Canary or Dev environments, you can toggle between the Stable release channel and the Canary build channel."
+				"title": "What is the Xernerx Desktop App?",
+				"description": "The Xernerx Desktop App (xernerx.com/download or xernerx.com/desktop) is our native Electron companion client for Windows, macOS, and Linux. It runs the Xernerx Suite inside a sleek borderless window with native OS notifications, multi-account session isolation, global hotkeys, Discord Rich Presence, and an Always-on-Top game overlay."
+			},
+			"card6": {
+				"title": "How do I switch between Stable and Canary builds on Desktop?",
+				"description": "Updates download automatically in the background on the Desktop App. If you want to test early builds, visit canary.xernerx.com/download (or toggle the release channel on the download page) to install or switch between the Stable production channel and the Canary preview channel."
 			},
 			"card2": {
-				"title": "How does the 1-Click Multi-Account Switcher work in the Desktop App?",
-				"description": "Unlike a standard browser where signing into an alt Discord account logs out your main account, the Xernerx Desktop App isolates each account slot in its own dedicated Chromium session partition (persist:xernerx and persist:xernerx-<slot>) stored in your local metadata.json configuration. Open your user card in the sidebar to add an account slot or swap between multiple signed-in Discord accounts in one click."
+				"title": "How does the 1-Click Multi-Account Switcher work?",
+				"description": "Unlike a standard browser where signing into a second Discord account signs out your main account, the Desktop App isolates each account slot in its own Chromium session partition (persist:xernerx and persist:xernerx-<slot>). Click your user card in the sidebar to add an account slot and switch between multiple Discord accounts in a single click."
 			},
 			"card3": {
-				"title": "What is the Always-on-Top Live Overlay Monitor (app.xernerx.com/overlay)?",
-				"description": "The Live Overlay Monitor (launched from your sidebar user card or at app.xernerx.com/overlay) is a compact, game-friendly companion view designed to be pinned on top of fullscreen applications and games. It displays real-time API latency (in ms) and operational health, a Live Feed tab of recent events and notifications, a Servers & Bots quick-status tab, and Quick Actions to open routes in your main window."
+				"title": "What is the Always-on-Top Live Overlay Monitor?",
+				"description": "The Live Overlay Monitor (launched from your sidebar user card or at app.xernerx.com/overlay) is a compact HUD designed to stay pinned over fullscreen games and apps. It shows real-time API ping & service health, a live notification/event feed, quick Server & Bot status cards, and 1-click navigation shortcuts."
 			},
 			"card4": {
-				"title": "How do Custom Desktop App Icons, Native Notifications, Streamer Protection, Quick Capture to CDN, and Desktop Hotkeys work?",
-				"description": "When running the Desktop App, a dedicated Desktop Client section appears in account.xernerx.com/preferences. From there you can choose your preferred Desktop App Icon crest (10 color variants for your taskbar, system tray, and notifications—or get prompted automatically when selecting a matching Accent Color in account.xernerx.com/appearance), set your default Startup Location (Dashboard, Developer Portal, Account, Explore, Store, Docs, CDN, etc.), and toggle Native OS Notifications (Windows Action Center toasts, Apple Notification Center banners, taskbar flashes, and macOS Dock unread badges), Streamer Protection (using native OS win.setContentProtection to hide your window from OBS and screen recorders), Smart Battery Saver & Wake Sync (throttling background canvas animations on battery power and resyncing on wake), Discord Rich Presence (RPC), the global Ctrl + Shift + X summon hotkey, and optional global hotkeys for the Spotlight Quick Launcher (Ctrl + Shift + Space, off by default to avoid app conflicts) and Quick Screen Capture to CDN (Ctrl + Shift + S)."
+				"title": "How do Custom Desktop App Icons, Startup Locations, and Native Notifications work?",
+				"description": "When using the Desktop App, open account.xernerx.com/preferences to unlock the Desktop Client panel. There you can pick from 10 Desktop App Icon color crests for your taskbar/dock, choose your default Startup Location (Dashboard, Portal, Account, Explore, Store, Docs, CDN), enable Native OS Notifications with unread dock/taskbar badges, and toggle Discord Rich Presence (RPC)."
+			},
+			"card7": {
+				"title": "How do Streamer Protection, Quick Screen Capture, and Desktop Global Hotkeys work?",
+				"description": "In account.xernerx.com/preferences under Desktop Client, you can enable Streamer Protection (using native OS content protection to hide your window from OBS and screen recorders), Smart Battery Saver (throttling background canvas effects on battery), the global Ctrl + Shift + X summon shortcut, Spotlight Quick Launcher (Ctrl + Shift + Space), and Quick Screen Capture straight to your Xernerx Media CDN (Ctrl + Shift + S)."
 			},
 			"card5": {
-				"title": "How can I use Taskbar JumpLists, inspect Desktop App logs, edit raw metadata.json, or clear the app cache?",
-				"description": "Right-clicking the Xernerx icon on your Windows Taskbar or macOS Dock gives you direct JumpList and Dock shortcuts to open your Dashboard, Developer Portal, Live Overlay, or trigger an instant Screen Capture to your Xernerx CDN media library. Inside account.xernerx.com/preferences, you can also switch the Desktop Client panel into raw JSON Editor mode to edit your local metadata.json flags directly, open the Desktop Logs Modal to inspect or copy diagnostic runtime logs, or click Clear Cache to purge cached Chromium assets."
-			}
-		},
-		"translations": {
-			"title": "Translations & Localization",
-			"card1": {
-				"title": "How do I become a translator?",
-				"p1": "Sign in on account.xernerx.com, open Language preferences (/language or /?tab=language), and select any language with less than 100% translation coverage to reveal the Contribute card (or select + Contribute a translation from the dropdown).",
-				"p2": "Make sure you are logged in with your Discord account before submitting your translator request."
-			},
-			"card2": {
-				"title": "How does the Translation Studio work once my application is approved?",
-				"description": "Translator applications are reviewed by staff on admin.xernerx.com. Once approved, you immediately unlock the Translation Studio on admin.xernerx.com/?tab=translations, where you can translate missing keys one by one in the distraction-free New Entries card flow, search and refine existing translations in Review Existing mode against the English (UK) (en-GB) source of truth, or export dictionary JSON."
-			},
-			"card3": {
-				"title": "I translated but it didn't update on the live site immediately?",
-				"description": "When you click Push to review in the Translation Studio, your changes are committed to the dictionary branch and automatically merged into the canary branch without requiring manual admin approval. The Translation Studio loads language JSON files directly from the Canary branch, stores the Canary version your translation was submitted against, and locks the submit button until the Canary version updates and the Canary build finishes and passes."
-			},
-			"card4": {
-				"title": "My language is not included in the list—how can I request it?",
-				"description": "Join our official Discord server via /support (or submit a request in the Suggestion Centre on info.xernerx.com/suggestions) and let our team know which language locale you would like to translate. Once we initialize the base locale file, you can start translating right away in the Translation Studio."
-			},
-			"card5": {
-				"title": "How does language detection and cross-subdomain syncing work?",
-				"description": "Your selected interface language is saved in the first-party NEXT_LOCALE cookie across all *.xernerx.com subdomains and synced to your account profile so every web app and the Desktop Client render in your language automatically. Your Language settings page also displays a read-only indicator of the locale currently reported by your Discord account."
+				"title": "How do Taskbar JumpLists, Desktop logs, metadata.json, and cache clearing work?",
+				"description": "Right-clicking the Xernerx icon on your Windows Taskbar or macOS Dock opens JumpList shortcuts to launch your Dashboard, Developer Portal, Live Overlay, or a CDN Screen Capture. For troubleshooting, open account.xernerx.com/preferences to inspect or copy diagnostic Desktop Logs, edit raw local metadata.json flags, or click Clear Cache to reset cached Chromium assets."
 			}
 		},
 		"bots": {
-			"navTitle": "Bots, Reviews & Rankings",
-			"title": "Bots, Discovery, Reviews & Leaderboards",
-			"card": {
-				"title": "How is the Estimated Value calculated on Bot and Organization profiles?",
-				"description1": "The <strong>Estimated Value</strong> metric displayed on bot and organization profiles is a purely statistical estimation of \"Audience & Reach Value\". It is designed to gamify community reach and measure the scale of a bot's attention economy.",
-				"disclaimer": "⚠️ Disclaimer: This valuation does NOT track, represent, or account for any actual financial income, subscription revenue, or server hosting expenses on the developer's end.",
-				"description2": "The formula combines a static baseline and a dynamic 30-day growth velocity multiplier:",
-				"baseline": "<strong>Baseline:</strong> Calculated by assigning a flat baseline weight to current active servers and total user reach.",
-				"multiplier": "<strong>Momentum Multiplier:</strong> Compares current baseline metrics against the bot's baseline 30 days prior. Rapidly growing bots receive a growth multiplier (up to 3.0x), while bots losing active reach receive a proportional discount."
+			"navTitle": "Bots",
+			"title": "Bots",
+			"card0": {
+				"title": "What is the Xernerx Bot Directory?",
+				"description": "The Xernerx Bot Directory (app.xernerx.com/bots) is a curated showcase of both official first-party Xernerx Studios bots (such as Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac) and community-built Discord bots—complete with interactive slash command search, verified server telemetry, user reviews, 12-hour voting, and custom vanity URLs."
 			},
 			"card2": {
-				"title": "How do I register a Discord bot and bind an API token?",
-				"description": "Go to account.xernerx.com/tokens (/?tab=tokens) and create a new API token (prefixed with xrx_), which starts in a pending state. Use that token with your bot via @xernerx/stats, @xernerx/framework, or any POST, PUT, PATCH, or DELETE request to https://api.xernerx.com/v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases). On its first mutation request, the token automatically binds to your bot and user account—transitioning to active and scoping the token to that bot—while simultaneously creating your bot's profile from Discord so you can customize descriptions, links, webhooks, and slash commands in the Developer Portal on portal.xernerx.com."
-			},
-			"card3": {
-				"title": "Where can I find official pre-configured Discord bot invite links?",
-				"description": "Visit xernerx.com/invites (or use vanity links such as xernerx.com/invite/[slug]) to browse and copy official OAuth2 invite links for verified Xernerx applications—including To-Do List Bot, Virtue, Metamorphosis, and Zodiac—pre-configured with the exact Discord permissions each bot requires."
-			},
-			"card4": {
-				"title": "How do Bot Webhooks, Signing Secrets, and live Test Pings work?",
-				"description": "In the Developer Portal (portal.xernerx.com/bots/[id]) under the Webhooks tab, you can register any HTTPS webhook endpoint or Discord Webhook URL (https://discord.com/api/webhooks/...), configure or roll a cryptographic Signing Secret (whsec_...) used to sign payloads in the X-Xernerx-Signature (sha256) header, and toggle any of the 9 supported event triggers: POST vote, POST stat, PATCH stat, DELETE stat, POST review, PATCH review, DELETE review, VOTE review, and POST release. Click Test Ping at any time to send a live test payload (POST /secure/bots/[id]/hooks/test) and inspect the HTTP status code and round-trip latency in milliseconds."
-			},
-			"card5": {
-				"title": "How do Bot and Server voting, 12-hour cooldowns, and the Ecosystem Leaderboards work?",
-				"description": "Any signed-in user can vote for a public Discord bot (app.xernerx.com/bots/[id]) or server (app.xernerx.com/servers/[id]) once every 12 hours. Every vote immediately records a new point on the historical statistics graph and fires subscribed POST vote webhooks. Visit app.xernerx.com/leaderboard (or /leaderboards) to explore top rankings across three tabs: Top Bots (sorted by Votes, Users, or Servers), Top Servers (sorted by Votes or Members), and Daily Streaks."
-			},
-			"card6": {
-				"title": "How do I manage my Discord server and configure the Virtue progression system?",
-				"description": "Open the Server Dashboard at app.xernerx.com/dashboard, which automatically lists every Discord server where you hold Administrator (0x8) or Manage Server (0x20) permissions. From there you can customize your public server listing, inspect historical member/message/boost/bot charts across 24h to All-Time timeframes, and open the Virtue tab (?tab=virtue) to configure XP curve difficulty (Easy, Casual, Balanced, Hard, Extreme), periodic reset cycles (Daily, Weekly, Monthly), tracked level roles, ignored roles, custom level-up messages ([@mention], [@level]), and auto-delete timers."
-			},
-			"card7": {
-				"title": "How do Developer Organizations work?",
-				"description": "On portal.xernerx.com, click New Organization in the sidebar to group multiple bots, linked Discord servers, and team members under a shared public profile (app.xernerx.com/organization/[id]). Organization owners can invite members by Discord User ID (delivering an interactive in-app invitation), assign custom organization roles, and transfer bots or servers between Personal and Organization workspaces."
-			},
-			"card8": {
-				"title": "How does Bot and Server Discovery work on app.xernerx.com?",
-				"description": "On app.xernerx.com, you can toggle between Bots and Servers in the hero explorer, search by keyword or tag, and browse algorithmic discovery categories including Top Voted, Newly Added, Staff Picks, Promoted, Biggest on Platform, Biggest Communities, and Newcomers. Each bot or server card displays live server/member counts, vote totals, verification badges, and short descriptions."
+				"title": "How do I register my Discord bot and bind an API token?",
+				"description": "Visit account.xernerx.com/tokens and create a new API token (prefixed with xrx_), which starts in a Pending state. Send your first authenticated mutation request (such as posting stats via @xernerx/stats or syncing commands to /v1/bots/[id]/*): Xernerx automatically fetches your bot metadata from Discord, binds and activates the token for that bot, and unlocks your bot workspace in portal.xernerx.com."
 			},
 			"card9": {
-				"title": "How do Slash Command syncing and interactive command search work on Bot profiles?",
-				"description": "Bot developers can publish their Discord slash commands either manually in portal.xernerx.com/bots/[id] under the Commands tab or automatically on bot startup via PUT https://api.xernerx.com/v1/bots/[id]/commands (which performs a clean bulk sync of your command array and required/optional parameters). Visitors viewing your public bot profile on app.xernerx.com/bots/[id] can open the Commands tab to search commands and parameters in real time and click any command pill to copy /command-name to their clipboard."
+				"title": "How do Slash Command syncing and interactive command search work?",
+				"description": "Bot owners can manage slash commands manually in portal.xernerx.com or sync them automatically on startup via PUT /v1/bots/[id]/commands (or @xernerx/commands). Visitors on your public bot profile (app.xernerx.com/bots/[id]) can search commands and options in real time under the Commands tab and click any command pill to copy /command-name."
+			},
+			"card11": {
+				"title": "What are Bot Vitals and Server/Member Milestone Badges?",
+				"description": "Every bot profile displays a Bot Vitals card showing the bot’s decoded Discord creation date, Xernerx listing date, synced Slash & Context command counts, official links, and 32-tier Server & Member Milestone badges (Servers-1..16 and Members-1..16) that also showcase your highest-tier bot achievement on your developer user profile."
+			},
+			"card13": {
+				"title": "How do Bot Telemetry Stats and live online presence tracking work?",
+				"description": "Any bot developer can push serverCount, userCount, shardCount, per-shard health arrays (shards: [{ id, guilds, ping, status }]), and onlineSince uptime to POST /v1/bots/[id]/stats using @xernerx/stats. Live Discord Gateway presence (online/idle/dnd/offline status and 24h status history on info.xernerx.com/status) is automatically tracked for official Xernerx Studios bots (and available via status webhooks on Developer Pro)."
 			},
 			"card10": {
 				"title": "How do Bot Reviews, Star Ratings, and Developer Responses work?",
-				"description": "On any public bot profile (app.xernerx.com/bots/[id]) under the Reviews tab, signed-in users can submit a 1-to-5 star rating with an optional written review, edit or delete their review, and mark other community reviews as helpful. Visitors can filter reviews by star rating (1★ to 5★) or sort by Most Helpful, Newest, Highest Rated, and Lowest Rated. Verified owners of the bot can post an official Developer Response directly underneath any review, and receive real-time webhook alerts via the POST review, PATCH review, DELETE review, and VOTE review webhook triggers."
+				"description": "Signed-in users can leave a 1-to-5 star rating and written review on any public bot profile, mark reviews as helpful, and filter by star rating or sort order (Most Helpful, Newest, Highest/Lowest Rated). Verified bot owners can post an official Developer Response directly beneath any review."
 			},
-			"card11": {
-				"title": "How do Bot Vitals, online presence tracking, and telemetry work — and what is available to any bot owner vs. Xernerx Studios?",
-				"description": "Every bot profile on app.xernerx.com/bots/[id] features a Bot Vitals & Info card alongside live telemetry: (1) Available to All Bot Owners—the Bot Vitals card automatically decodes the bot's Discord creation date from its Snowflake ID, displays its Xernerx listing date, counts synced Slash and Context commands (PUT /v1/bots/[id]/commands or @xernerx/commands), lists Vanity URLs and official links, and tracks 32-tier Server & Member Milestone badges. Any bot owner can also push onlineSince uptime, serverCount, userCount, shardCount, per-shard health matrices (shards: [{ id, guilds, ping, status }]), and custom telemetry to POST /v1/bots/[id]/stats via @xernerx/stats; (2) Official Xernerx Studios Bots Only—live Discord Gateway presence (online/idle/dnd/offline status and active custom activity text) and 24-hour status history on info.xernerx.com/status are tracked automatically via the Xernerx Bot and Xernerx App daemons and are exclusively scoped to official Xernerx Studios bots."
+			"card3": {
+				"title": "Where can I find official invite links for Xernerx Studios bots?",
+				"description": "Visit xernerx.com/invites (or use short links like xernerx.com/invite/virtue and xernerx.com/invite/yourapps) to grab official OAuth2 invite links for Xernerx Studios bots—including Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—pre-configured with recommended Discord permissions."
 			},
 			"card12": {
-				"title": "How do Essential, Optional, and Advanced (0-Permission) Bot Invite Options work?",
-				"description": "Official bot invites on xernerx.com/invites/[slug] support up to three permission presets: Essential (recommended core Discord permissions required out of the box), Optional (all Essential permissions plus additional permissions for optional modules and automation), and Advanced (0 guild permissions so experienced server administrators can configure channel and role overrides manually). When only 1 invite option is configured for a bot, visiting xernerx.com/invites/[slug] redirects straight to Discord's OAuth2 authorization screen; when 2 or 3 options are configured, xernerx.com/invites/[slug] displays the interactive permission preset chooser (while direct links such as /invites/[slug]/essential redirect immediately). After authorizing in Discord, the post-invite onboarding screen (app.xernerx.com/bots/[id]/onboarding) awards +100 Credits for each newly connected server and lets you jump straight into the Bot Profile or Server Dashboard."
+				"title": "What is the difference between Essential, Optional, and Advanced Bot Invite Options?",
+				"description": "Official bot invite pages support three permission presets: Essential (core permissions needed out of the box), Optional (Essential plus permissions for extra automation modules), and Advanced (0 guild permissions for admins who prefer manual role/channel overrides). Connecting an official bot to a new server also awards +100 Credits on the post-invite onboarding screen!"
 			}
 		},
 		"servers": {
-			"navTitle": "Servers, Virtue & Orgs",
-			"title": "Server Dashboard, Virtue & Organizations",
+			"navTitle": "Servers",
+			"title": "Servers",
+			"card0": {
+				"title": "What is the Xernerx Server Directory & Dashboard?",
+				"description": "Xernerx lets Discord server owners showcase their communities publicly on app.xernerx.com/servers while managing growth analytics, public listing details, custom vanity slugs, Virtue XP leveling, and YourApps application forms from a unified web control panel at app.xernerx.com/dashboard."
+			},
 			"card1": {
-				"title": "Who can access the Server Dashboard (app.xernerx.com/dashboard) and how does Server Sync work?",
-				"description": "When you open app.xernerx.com/dashboard, Xernerx queries your Discord guilds and automatically lists every server where you hold Administrator (0x8) or Manage Server (0x20) permissions in the sidebar (switchable with Alt + 1..9 or ?guild=[id]). The Server Sync Data banner indicates whether the Xernerx Bot is currently connected to the server (Bot Connected vs Bot Not Connected), whether the community is Verified, and the guild's active Discord locale."
+				"title": "Who can access a Discord server in the Server Dashboard?",
+				"description": "When you open app.xernerx.com/dashboard, Xernerx checks your Discord guilds and automatically lists every server where you hold Administrator (0x8) or Manage Server (0x20) permissions in the sidebar (quickly switchable with Alt + 1..9 or ?guild=[id])."
+			},
+			"card10": {
+				"title": "What does the Server Sync status banner mean?",
+				"description": "At the top of the Server Dashboard, the Server Sync banner shows whether the Xernerx Bot is currently present in your guild (Bot Connected vs Bot Not Connected), whether your server holds a Verified community badge, and the active Discord locale reported by your server."
 			},
 			"card2": {
-				"title": "What server analytics and timeframes are tracked in the Server Dashboard?",
-				"description": "Once the Xernerx Bot is in your server, open the Stats tab (app.xernerx.com/dashboard?tab=stats) to inspect historical growth charts across four metrics: Members, Messages (30-minute intervals), Bots, and Server Boosts. You can filter the chart across 24 Hours (24h), 7 Days (7d), 30 Days (30d), 3 Months (3m), 6 Months (6m), 1 Year (1y), or All-Time (all)."
+				"title": "What server analytics and timeframes are tracked?",
+				"description": "Once connected, open the Stats tab (app.xernerx.com/dashboard?tab=stats) to inspect historical charts for Members, Messages (recorded in 30-minute intervals), Bots, and Server Boosts across 24 Hours (24h), 7 Days (7d), 30 Days (30d), 3 Months (3m), 6 Months (6m), 1 Year (1y), or All-Time (all)."
 			},
+			"card11": {
+				"title": "How do Server Applications and YourApps work?",
+				"description": "Invite YourApps and open the Applications tab (app.xernerx.com/dashboard?tab=applications) to create custom staff, appeal, event, or feedback forms using 13 question types, publish interactive Apply panels to Discord channels, and configure automatic approval/denial role rewards. Members can apply either natively inside Discord Modals V2 (/apply, /positions) or on the web at app.xernerx.com/servers/[id]/applications/[appId], while staff review submissions in Discord (/review, /submissions) or directly in the Dashboard."
+			}
+		},
+		"virtue": {
+			"navTitle": "Virtue",
+			"title": "Virtue",
 			"card3": {
-				"title": "How does the Virtue Progression System (app.xernerx.com/dashboard?tab=virtue) work?",
-				"description": "Virtue is Xernerx's progression and engagement engine. Per-server text XP/levels/messages and voice XP/levels/time are tracked in the dedicated virtue database, while contributing to each user's unified global platform level in xernerx. In the Server Dashboard under the Virtue tab (?tab=virtue), server admins can configure: (1) Virtue Curve Mode—Easy (Very fast), Casual (Fast), Balanced (Standard), Hard (Slow curve), or Extreme (Prestige), plus Server Booster XP Multipliers (1x–2x); (2) Automatic Reset Cycles—Daily, Weekly, or Monthly leaderboard wipes; (3) Manual Milestone Level Roles (with Stack Level Roles toggle) or automated Dynamic Hoist Roles (which dynamically create, hoist, color-interpolate from Color A to Color B, and prune/consolidate up to 250 active level roles above your Level 1 Anchor Role), plus Tracked Roles and Ignored Roles/Channels; and (4) Level-Up Announcements—toggleable channel embeds with a custom message template supporting [@mention] and [@level], a custom Announcement Channel, and an Auto-Delete timer in seconds."
+				"title": "What is Virtue?",
+				"description": "Virtue is Xernerx Studios’ flagship Discord progression and leveling bot. Members earn XP automatically from chatting in text channels and hanging out in voice channels—leveling up both on your individual Discord server (unlocking custom server roles and rank cards) and on their global Xernerx profile."
 			},
-			"card4": {
-				"title": "How do Developer Organizations (portal.xernerx.com) and Organization Roles work?",
-				"description": "In the Developer Portal (portal.xernerx.com), click New Organization in the sidebar to create a shared team workspace with its own public profile (app.xernerx.com/organization/[id]). Inside an organization workspace you can upload a custom avatar and banner to the CDN, write a Markdown profile, create custom Organization Roles (Roles tab), invite team members by Discord User ID (who receive an interactive Accept/Decline notification in their Notifications drawer), feature an official Discord server, and view combined Est. Network Value, Total Servers, and Total Users across all published organization bots."
-			},
-			"card5": {
-				"title": "How do I transfer a Bot or Server to an Organization, or reset/delete its data?",
-				"description": "Open the Settings tab of your bot (portal.xernerx.com/bots/[id]) or server (app.xernerx.com/dashboard?tab=settings). Under Transfer Organization, select any organization you own or belong to (or select Personal to move it back to your personal workspace) and save your changes. In the same Settings tab, you can also click Reset Data to clear all descriptions, external links, and widget toggles back to default without removing the listing, or click Delete to permanently purge the bot or server profile from Xernerx."
-			},
-			"card6": {
-				"title": "How do Public User Profiles (app.xernerx.com/users/[id]), Discord Collectibles, and Badges work?",
-				"description": "Every user has a customizable profile at app.xernerx.com/users/[id] (editable on account.xernerx.com/profile). Public profiles showcase your Discord avatar, animated Discord Avatar Decorations and Collectibles Nameplates (toggleable via showDiscordCollectibles in account.xernerx.com/preferences), Clan badge, short bio, full Markdown Info, pronouns, timezone with UTC offset, Global Level, Daily Streak, Published Bots, Official Servers, Organizations, and automatic ecosystem badges including Bot Developer, Bug Hunter, and Contributor."
-			},
-			"card7": {
-				"title": "How do Virtue Server XP & Voice Leaderboards work?",
-				"description": "When Virtue's leveling module is enabled on your Discord server, members automatically earn XP from text messages and active time in voice channels. Server owners can customize XP rates, level-up role rewards, and announcements in the Virtue Dashboard, while members can browse real-time ranked XP and Voice Leaderboards on your public server page."
-			},
-			"card8": {
-				"title": "Can I assign Virtue level roles for Text XP and Voice XP independently or use Dynamic Hoist Roles?",
-				"description": "Yes! In the Server Dashboard under the Virtue tab (app.xernerx.com/dashboard?tab=virtue), each Level Role (or your Dynamic Hoist Roles configuration) can be assigned to one of three XP tracks: (1) Unified Server XP (Combined)—unlocks when a member reaches the target combined Server Level from both text and voice activity; (2) Text XP (Messages Only)—unlocks independently when a member reaches the target level on the text chat XP track; or (3) Voice XP (Voice Time Only)—unlocks independently when a member reaches the target level on the voice channel XP track. With Dynamic Hoist Roles enabled (Server Owner Pass), Virtue automatically creates, hoists, and color-interpolates up to 250 level roles above your Level 1 Base Anchor Role. Members can also run /roles in Discord to view all configured level roles, their track badges (SERVER, TEXT, VOICE), and their live unlock progress."
+			"card10": {
+				"title": "What can server admins customize in the Virtue Dashboard?",
+				"description": "In app.xernerx.com/dashboard?tab=virtue, server admins can choose from 5 XP Curve Difficulty Modes, configure Server Booster XP Multipliers, exclude specific ignored channels or roles, and customize Level-Up Announcements with [@mention] and [@level] variables, a dedicated announcement channel, and an optional auto-delete timer."
 			},
 			"card9": {
 				"title": "How are Virtue & Global XP, Level Curves, Cooldowns, and Multipliers calculated?",
@@ -5570,91 +5612,203 @@
 				"bullet1": "<strong>5 Curve Difficulty Modes (<code>a</code>, <code>b</code>, Base XP Roll &amp; Cooldown):</strong> <strong>Easy</strong> (<code>a = 1, b = 20</code>, <code>15–25 XP</code> per roll, <code>30s</code> cooldown) • <strong>Casual</strong> (<code>a = 3, b = 40</code>, <code>10–18 XP</code>, <code>45s</code> cooldown) • <strong>Balanced (Default &amp; Global Track)</strong> (<code>a = 5, b = 50</code>, <code>7–13 XP</code>, <code>60s</code> server / <code>120s</code> global cooldown) • <strong>Hard</strong> (<code>a = 8, b = 60</code>, <code>5–10 XP</code>, <code>120s</code> cooldown) • <strong>Extreme</strong> (<code>a = 12, b = 100</code>, <code>3–7 XP</code>, <code>300s</code> cooldown).",
 				"bullet2": "<strong>Voice Channel Eligibility &amp; Go Live Boost:</strong> Voice XP ticks every <code>60s</code> (minimum <code>30s</code> active) when a non-bot member is in a non-AFK voice channel, is not deafened or self-deafened, and at least <strong>2 eligible members</strong> are present in the channel. Active screen-sharing / Go Live grants a <strong><code>1.25x</code> (<code>+25%</code>) Voice Streaming XP Multiplier</strong>.",
 				"bullet3": "<strong>Personal XP Multiplier (<code>1 + bonus</code>, up to <code>1.65x</code>):</strong> Additive personal bonuses stack from holding an active <strong>Virtue Pass or Ultra Ecosystem pass</strong> (<code>+50%</code> / <code>+0.50</code>), having an active <strong>12-hour Bot Vote</strong> (<code>+10%</code> / <code>+0.10</code>), and having submitted a <strong>Bot Review</strong> (<code>+5%</code> / <code>+0.05</code>).",
-				"bullet4": "<strong>Server, Booster &amp; Global Event Multipliers:</strong> Final XP per message or voice tick is <code>round(baseRoll × personalMultiplier × serverMultiplier × boosterMultiplier × globalEventMultiplier)</code>, combining the server's base XP rate (<code>1x–5x</code>), Discord Server Booster bonus (<code>1x–3x</code> on premium servers), and any active platform-wide Global XP Event (<code>1x–10x</code>)."
+				"bullet4": "<strong>Server, Booster &amp; Global Event Multipliers:</strong> Final XP per message or voice tick is <code>round(baseRoll × personalMultiplier × serverMultiplier × boosterMultiplier × globalEventMultiplier)</code>, combining the server’s base XP rate (<code>1x–5x</code>), Discord Server Booster bonus (<code>1x–3x</code> on premium servers), and any active platform-wide Global XP Event (<code>1x–10x</code>)."
+			},
+			"card7": {
+				"title": "How do Virtue Server Leaderboards and Seasonal Reset Cycles work?",
+				"description": "Every server with Virtue enabled gets live ranked Server XP, Text XP, and Voice Time leaderboards viewable both on your public server page (app.xernerx.com/servers/[id]) and in Discord via /leaderboard. Server owners with an active pass can also enable automated Daily, Weekly, Monthly, or Yearly Seasonal Reset Cycles to keep competition fresh."
+			},
+			"card8": {
+				"title": "Can I assign Level Roles separately for Text XP and Voice XP?",
+				"description": "Yes! Each milestone Level Role can be bound to one of three independent tracks: Unified Server XP (combined text + voice level), Text XP Only (messages), or Voice XP Only (voice activity), with a toggle to either stack previous roles or keep only the highest earned role. Members can run /roles in Discord anytime to check role rewards and their unlock progress."
+			},
+			"card11": {
+				"title": "What are Dynamic Hoist Roles in Virtue?",
+				"description": "Instead of manually creating dozens of level roles, Dynamic Hoist Roles automatically create, hoist in the member list, smoothly interpolate role colors between Color A and Color B, and consolidate/prune up to 250 active level roles above your chosen Level 1 Base Anchor Role as members level up."
+			}
+		},
+		"leaderboards": {
+			"navTitle": "Leaderboards",
+			"title": "Leaderboards",
+			"card0": {
+				"title": "What are the Xernerx Ecosystem Leaderboards?",
+				"description": "The Ecosystem Leaderboards (app.xernerx.com/leaderboard) rank the most active public Bots, Discord Servers, Global Virtue XP earners, and Daily Credit Streak holders across the platform. Accounts or listings set to Limited/Private—or restricted via moderation shadowban—are automatically excluded to keep rankings fair."
+			},
+			"card8": {
+				"title": "How does Bot and Server Discovery work on app.xernerx.com?",
+				"description": "On app.xernerx.com, switch between Bots and Servers in the explorer, search by keyword or category tag, and browse curated discovery shelves including Top Voted, Promoted, Staff Picks, Biggest on Platform, Biggest Communities, and Newly Added."
+			},
+			"card5": {
+				"title": "How do Bot and Server voting and 12-hour cooldowns work?",
+				"description": "Any signed-in user can vote for a public Bot or Server once every 12 hours. Each vote increments the listing’s ranking score, plots a data point on its analytics chart, dispatches subscribed POST vote webhooks, and rewards the voter with 100 base Credits (multiplied up to 200% by active passes)."
+			},
+			"card9": {
+				"title": "How do Community Spotlight Boosts work?",
+				"description": "Anyone can spend Credits directly on a public Bot or Server page to activate a 24-Hour (1,000 Credits) or 7-Day (5,000 Credits) Community Spotlight Boost, featuring that community or bot in the Promoted discovery shelf on app.xernerx.com."
+			},
+			"card1": {
+				"title": "How is Estimated Value calculated on Bot and Organization profiles?",
+				"description1": "The <strong>Estimated Value</strong> metric displayed on bot and organization profiles is a purely statistical estimation of \"Audience & Reach Value\" designed to gamify community reach.",
+				"disclaimer": "⚠️ Disclaimer: This valuation does NOT track, represent, or account for actual financial income, subscription revenue, or hosting costs.",
+				"description2": "The calculation combines a static reach baseline with a 30-day growth multiplier:",
+				"baseline": "<strong>Baseline:</strong> Assigns a flat statistical weight to current active servers and total user reach.",
+				"multiplier": "<strong>Momentum Multiplier:</strong> Compares current reach against 30 days ago—rewarding rapidly growing bots (up to 3.0x) and discounting declining reach."
+			}
+		},
+		"organizations": {
+			"navTitle": "Organizations",
+			"title": "Organizations",
+			"card4": {
+				"title": "What is a Xernerx Organization?",
+				"description": "A Xernerx Organization is a shared team workspace created in the Developer Portal (portal.xernerx.com) with its own public brand page at app.xernerx.com/organization/[id]. It lets teams manage multiple Discord bots, linked community servers, custom branding, and aggregate reach statistics together in one place."
+			},
+			"card6": {
+				"title": "How do Organization Member Invites and Custom Roles work?",
+				"description": "Organization owners can invite collaborators by Discord User ID—sending an interactive Accept/Decline invite directly to their Xernerx Notifications drawer—and create custom Organization Roles in the Roles tab to control who can edit bots, manage webhooks, invite members, or configure settings."
+			},
+			"card5": {
+				"title": "How do I transfer a Bot or Server to or from an Organization?",
+				"description": "Open the Settings tab of your bot (portal.xernerx.com) or server (app.xernerx.com/dashboard?tab=settings), select the target Organization (or Personal to return it to your individual account) under Transfer Organization, and save your changes."
+			},
+			"card7": {
+				"title": "How do I reset or permanently delete a Bot or Server listing?",
+				"description": "In the Settings tab of your Bot or Server, Reset Data clears custom descriptions, external links, and widget settings back to a clean slate while keeping your listing registered, whereas Delete permanently removes the Bot or Server profile from Xernerx."
 			}
 		},
 		"account": {
-			"navTitle": "Account, Privacy & Prefs",
-			"title": "Account, Devices, Customization & Privacy",
+			"navTitle": "Security",
+			"title": "Account Security",
+			"card0": {
+				"title": "What is a Xernerx Account?",
+				"description": "Your Xernerx Account (account.xernerx.com) is your unified identity across all Xernerx web apps, Discord bots, and the Desktop Client. There are no separate passwords to manage—authentication is handled securely through Discord OAuth2 and encrypted session tokens."
+			},
 			"card1": {
-				"title": "How do Discord OAuth2 sign-in and QR Code / 6-Character Device Pairing work?",
-				"description": "Xernerx Suite uses Discord OAuth2 as your primary identity across all *.xernerx.com subdomains (requesting profile, email, connections, guilds, and guilds.join scopes—clickable under About permissions on /login). When signing into the Xernerx Desktop App or a new browser, you can skip typing passwords or 2FA codes by scanning the login QR code with an already-authenticated phone or opening account.xernerx.com/devices (/?tab=devices) and entering the 6-character pairing code to approve the session instantly."
+				"title": "How does Discord OAuth2 sign-in work and what permissions are requested?",
+				"description": "Signing in via Discord requests basic identity, email, linked connections, your server list (to populate the Server Dashboard for guilds you manage), and guilds.join (only used when you explicitly click Join Support Server). You can inspect every scope under About permissions on account.xernerx.com/login."
 			},
-			"card2": {
-				"title": "How do Personal and Bot API Bearer Tokens work?",
-				"description": "On account.xernerx.com/tokens (/?tab=tokens), you can generate Bearer tokens (prefixed with xrx_). Newly created tokens start in a pending state; when first used with a bot on any POST, PUT, PATCH, or DELETE request to /v1/bots/[id]/* (such as /stats, /commands, /profile, or /releases), the token automatically creates the bot profile if needed, binds to that bot ID and your user account, transitions to active, and is scoped to GET requests and that bot's endpoints. Pass your token in the Authorization: Bearer <token> HTTP header when calling api.xernerx.com."
-			},
-			"card3": {
-				"title": "How do Public, Limited, and Private privacy levels and Terms/Cookie consent prompts work?",
-				"description": "Every User, Bot, Server, Organization, and CDN Media item enforces our Universal 3-Tier Privacy Truth: Public (listed in public directories, explorers, leaderboards, and search; accessible by anyone), Limited (unlisted—never shown in public directories, search, or leaderboards, but accessible to anyone with the direct link or ID), and Private (strictly owner-only—never listed and blocked from viewing even with a direct link or ID unless you are the authenticated owner or authorized co-owner/member)."
-			},
-			"card4": {
-				"title": "How do Daily Credits and activity streaks work?",
-				"description": "You can claim daily credits once every 24 hours from account.xernerx.com/billing or your sidebar user card. Consecutive daily claims within the 48-hour grace window build your streak multiplier, which can be displayed on your public profile badge (/v1/users/[id]/badge.svg?type=streak) and the community leaderboard."
+			"card13": {
+				"title": "How does QR Code and 6-Character Device Pairing work?",
+				"description": "When signing into the Desktop App or a new browser, you can skip typing credentials or 2FA codes: either scan the login QR code with an already signed-in mobile device, or open account.xernerx.com/devices and enter the 6-character pairing code shown on screen to approve the login instantly."
 			},
 			"card5": {
 				"title": "How do I view and revoke active device sessions?",
-				"description": "Visit account.xernerx.com/devices (/?tab=devices) to view up to 10 active browser and Desktop App sessions with automatic OS (Windows, macOS, Linux, Android, iOS) and browser detection, truncated session identifiers, and last-active timestamps. You can revoke any individual device in one click or use Log Out All Other Devices to terminate every session except your current one."
+				"description": "Open account.xernerx.com/devices to inspect up to 10 active browser and Desktop App sessions with OS, browser, and last-active timestamps. Click Revoke next to any unfamiliar device, or click Log Out All Other Devices to terminate every session except your current one."
 			},
 			"card6": {
-				"title": "Which secondary OAuth Connections are supported?",
-				"description": "On account.xernerx.com/connections (/?tab=connections), your Discord account is permanently linked as your Primary Identity. You can also link verified secondary OAuth accounts for GitHub, Twitch, YouTube, X (Twitter), Spotify, Steam, and Reddit—each with a Display on public profile toggle—while OAuth access tokens are immediately discarded after verification. Authorized staff with the hosting RBAC permission can also link private Easypanel and Vercel credentials for hosting.xernerx.com."
-			},
-			"card7": {
-				"title": "How do Appearance themes, Discord accent sync, Stage Render Forms, Ambient Canvas Scenes, and custom UI scaling work?",
-				"description": "Open account.xernerx.com/appearance (/?tab=appearance) to switch between Dark, Light, and System themes, choose from 24 named preset accent colors (or Sync Accent from Discord), configure the Dot-Matrix & Stage Formation (Default page-adaptive, Xernerx Wordmark, Xernerx Crest, Orbital Rings, Spiral Galaxy, Double Helix, Cyber Prism, Infinity Loop, Harmonic Wave Lattice, Chronos Astrolabe, Supernova Pulsar, 4D Hypercube Tesseract, Retro Synthwave Sun, Sacred Lotus Mandala, or Blank after loading), Stage Render Form (Classic Dot Matrix, Starlight Constellation Mesh, Isometric Hex-Grid, Liquid Aurora Ribbons, or Cyber Matrix Glyphs), Ambient Canvas Scene, Glass Surface Style, Cursor Trail & Click Shockwave FX, Overlay HUD Skin, and customize UI Zoom (--ui-scale), Layout Spacing (--ui-gap), Page Width (--page-width), and Text Scale (--text-scale)."
-			},
-			"card8": {
-				"title": "How does the Granular Notification Matrix work across In-App, Discord, and Email?",
-				"description": "On account.xernerx.com/notifications (/?tab=notifications), you can search alerts or use Enable Category / Mute Category across 6 categories—API (rate limit warnings, token created/revoked, downtime), Billing (invoice paid, subscription expiring, payment failed), Apps (bot approved/rejected), Community (roadmap released, issue/suggestion status updates, application reviewed), General (birthday), and Virtue (level-up)—across In-App, Discord DM, and Email channels. Community email notifications are free for all users, while transactional API, Billing, and Apps email alerts unlock with an active subscription."
-			},
-			"card9": {
-				"title": "What Header and Workspace customization toggles are in Preferences (account.xernerx.com/preferences)?",
-				"description": "On account.xernerx.com/preferences (/?tab=preferences), you can declutter and tailor your workspace: (1) Header & Navigation Bar—choose your Header & Window Control button geometry (including Glass Capsule, Squircles, and Stealth Dots), select your Suite UI Icon Pack Style (Standard Vector, Duotone Accent Glow, Bold Pop, or Thin Precision), and individually pin or hide header subdomains and action buttons; and (2) Workspace, Profile & Motion—switch Global Sidebar Alignment between System, Left, or Right, and toggle Keyboard Shortcut Hints, Discord Collectibles (animated avatar decorations & nameplates), Daily Gift Badge indicator, Reduced Motion, Default Sidebar Collapsed, and Developer Mode."
+				"title": "Which secondary OAuth Connections can I link to my account?",
+				"description": "In account.xernerx.com/connections, alongside your primary Discord identity, you can link verified GitHub, Twitch, YouTube, X (Twitter), Spotify, Steam, and Reddit accounts. Each connection has its own Display on public profile toggle, and OAuth access tokens are discarded immediately after verification."
 			},
 			"card10": {
-				"title": "How do I view my Account Activity Log, export my GDPR JSON data, wipe Virtue data, or reset/delete my account?",
-				"description": "Open account.xernerx.com/activity (/?tab=activity) to search and filter your submitted Applications, Issues, Suggestions, and Reviews alongside their live status badges and staff review notes, or click Export Data to download a complete JSON archive (xernerx-account-data-[id]-[date].json). On account.xernerx.com (/?tab=account), you can also toggle Automatic Service Profiles on or off, reset your profile data, click Delete Virtue Data to permanently wipe all of your Virtue XP, levels, message counts, and voice duration across all servers, or permanently delete your account across the ecosystem."
+				"title": "Where can I view my Account Activity Log?",
+				"description": "Visit account.xernerx.com/activity to search and filter your submitted Applications, Bug Reports, Suggestions, and Bot Reviews along with their live moderation status badges and staff responses."
+			},
+			"card14": {
+				"title": "How do I wipe my Virtue XP data, reset my profile, or delete my account?",
+				"description": "Open account.xernerx.com/?tab=account for granular data controls: Reset Profile clears your bio and profile customizations, Delete Virtue Data permanently wipes your Virtue XP, levels, message counts, and voice time across all servers, and Delete Account permanently purges your Xernerx account."
+			}
+		},
+		"profiles": {
+			"navTitle": "Profiles",
+			"title": "Profiles",
+			"card6": {
+				"title": "What is a Xernerx User Profile?",
+				"description": "Every user gets a customizable profile page at app.xernerx.com/users/[id] (or /users/[slug]), editable from account.xernerx.com/profile. It showcases your bio, full Markdown Info section, pronouns, timezone, Global Level, Daily Streak, published Bots, Servers, and Organizations."
+			},
+			"card12": {
+				"title": "How do Discord Collectibles and automatic Ecosystem Badges work?",
+				"description": "User profiles automatically render your animated Discord Avatar Decoration, Collectibles Nameplate, and Clan tag (toggleable in Preferences), alongside earned platform badges such as Bot Developer, Bug Hunter, Contributor, Community Supporter, and Bot Milestone badges."
 			},
 			"card11": {
-				"title": "How do Profile Showcases, Profile Cosmetics, and Vanity Badges work?",
-				"description": "Every user receives 1 free Profile Showcase slot in Account Settings -> Profile (account.xernerx.com/?tab=profile) to pin a custom card with a title, description, tag, cover image, and external link to their public profile (app.xernerx.com/users/[id]), with 1-click Quick-Fill from your Bots, Servers, Organizations, and linked OAuth Connections. In the Profile Identity Cosmetics Studio, you can also equip Avatar Frame Shaders (Plasma Halo, Prismatic Crown, Cyber Glitch Ring, Solar Flare), Animated Nameplates (Aurora Shimmer, Gold Foil, Cyber Neon, Sakura Drift), Profile Card Themes (Obsidian Gold, Cyber Matrix, Celestial Nebula, Sakura Frost), and up to 3 Vanity Badges unlocked in the Credit Store or via Ultra Ecosystem."
+				"title": "How do Profile Showcases work?",
+				"description": "Every account includes 1 free Profile Showcase slot in account.xernerx.com/profile (with additional slots unlockable in the Credit Store) to pin a featured card with a custom title, description, tag, cover image, and link—or 1-click Quick-Fill from any of your Bots, Servers, Organizations, or linked Connections."
+			},
+			"card13": {
+				"title": "What are Profile Cosmetics and Vanity Badges?",
+				"description": "Inside the Profile Identity Cosmetics Studio (account.xernerx.com/profile), you can equip Avatar Frame Shaders (such as Plasma Halo or Prismatic Crown), Animated Nameplates, Profile Card Themes, the Interactive Dot-Matrix Profile Header, and up to 3 Vanity Badges unlocked in the Credit Store or through milestone achievements."
+			}
+		},
+		"preferences": {
+			"navTitle": "Preferences",
+			"title": "Preferences",
+			"card7": {
+				"title": "How do Light/Dark Themes and Accent Colors work?",
+				"description": "Open account.xernerx.com/appearance to switch between Dark, Light, and System themes and select from 24 curated Accent Colors—or click Sync Accent from Discord—to personalize buttons, highlights, glows, and active states across every Xernerx app."
+			},
+			"card10": {
+				"title": "What are Stage Render Forms, Ambient Canvas Scenes, and Cursor FX?",
+				"description": "In account.xernerx.com/appearance, you can customize the interactive background canvas with Dot-Matrix Formations (Crest, Orbital Rings, Spiral Galaxy, Tesseract, etc.), Stage Render Forms (Constellation Mesh, Hex-Grid, Aurora Ribbons, Cyber Glyphs), Ambient Canvas Scenes, Glass Surface Styles, and Cursor Shockwave FX."
+			},
+			"card11": {
+				"title": "How do Custom UI Zoom, Layout Spacing, Page Width, and Text Scaling work?",
+				"description": "Accessibility and layout sliders in account.xernerx.com/appearance let you independently tune UI Zoom (--ui-scale), Layout Spacing (--ui-gap), container Page Width (--page-width), and Text Scale (--text-scale), adapting every page across the suite in real time."
+			},
+			"card9": {
+				"title": "What Header and Workspace toggles are available in Preferences?",
+				"description": "On account.xernerx.com/preferences, you can choose Window Control geometry (Glass Capsule, Squircles, Stealth Dots), switch UI Icon Pack styles, pin or hide header links, set Sidebar Alignment (System, Left, Right), and toggle Reduced Motion, Shortcut Hints, Daily Gift indicators, and Developer Mode."
+			},
+			"card8": {
+				"title": "How does the Granular Notification Matrix work?",
+				"description": "On account.xernerx.com/notifications, you can toggle alerts individually across In-App, Discord DM, and Email channels for 6 categories: API, Billing, Apps, Community, General, and Virtue. Community email alerts are free for everyone, while transactional API/Billing/Apps emails unlock with an active pass."
+			}
+		},
+		"privacy": {
+			"navTitle": "Privacy",
+			"title": "Privacy",
+			"card3": {
+				"title": "What is the difference between Public, Limited, and Private visibility?",
+				"description": "Every User Profile, Bot, Server, Organization, Haste paste, and CDN Media file follows our Universal 3-Tier Privacy Truth: Public (listed in directories, search, and leaderboards; viewable by anyone), Limited (unlisted—hidden from all public directories, search, and leaderboards, but accessible via direct link), and Private (strictly locked to the owner and authorized co-owners/members)."
+			},
+			"card4": {
+				"title": "How do Terms of Service, Privacy Policy, and Cookie consent work?",
+				"description": "Xernerx uses strictly necessary first-party cookies for authentication and your NEXT_LOCALE preference, and prompts signed-in users whenever our versioned Terms of Service (/terms), Privacy Policy (/privacy), or Cookie Policy (/cookies) are materially updated. Full security practices are documented at xernerx.com/security."
 			},
 			"card12": {
 				"title": "How can I download a copy of my personal data (.json)?",
-				"description": "You can export a complete, machine-readable .json archive of your Xernerx account at any time with 1-Click Personal Data Export in Account Settings. The archive includes your profile metadata, linked connections, preferences, credit ledger history, owned entities, and recent security activity logs."
+				"description": "Click Export Data in account.xernerx.com or account.xernerx.com/activity at any time to download a complete, machine-readable GDPR .json archive containing your profile metadata, linked connections, preferences, credit ledger history, owned entities, and activity logs."
 			}
 		},
 		"billing": {
-			"navTitle": "Store, Billing & CDN",
-			"title": "Store, Billing, Credits & CDN",
+			"navTitle": "Subscriptions",
+			"title": "Subscriptions",
+			"card0": {
+				"title": "What is the Xernerx Store?",
+				"description": "The Xernerx Store (store.xernerx.com) is where users, server owners, and bot developers can compare the €0 Free Tier against optional premium passes, Developer Pro API plans, and Credit Store perks—with transparent pricing and Monthly or Annual billing."
+			},
 			"card1": {
-				"title": "What plans, passes, and promo codes are available on the Xernerx Store?",
-				"description": "On store.xernerx.com, you can switch between Monthly (?interval=month) and Annual (?interval=year) billing across three catalog categories—or apply promotional coupon codes (including via ?promo=CODE or ?code=CODE links): (1) Bots, Servers & Ultra (?category=consumers), featuring the €0 Free Tier (consumer bots + 10 CDN uploads), the all-in-one Ultra Ecosystem master pass (unlocking Zodiac, Virtue, To-Do List Bot, and Metamorphosis user & server subscriptions, priority support, and 1,000 CDN uploads), and the official Virtue — Premium User Pass ($1.99/mo via Discord App Subscription, unlocking +50% XP, custom Level Modes, Boost Multipliers, Seasonal Wipes, and a 125% Credit Multiplier — automatically included with Ultra Ecosystem); (2) Developer API (?category=developers) featuring Developer Pro (advanced API access, extended rate limits, unlimited projects, and real-time POST online / POST offline bot status webhooks); and (3) Credits & Perks (?category=credits) for Credit Top-Up Packs and permanent ecosystem unlocks."
+				"title": "What subscription plans and passes are available?",
+				"description": "Alongside the €0 Free Tier (access to consumer bots + 10 CDN slots), we offer: (1) Virtue — Premium User Pass ($1.99/mo via Discord App Subscription, unlocking +50% Virtue XP, custom server Curve Modes, Booster Multipliers, Reset Cycles, and a 125% Credit Multiplier); (2) Ultra Ecosystem (our all-in-one master pass unlocking every consumer bot pass including Virtue, 1,000 CDN slots, priority support, and a 200% Credit Multiplier); and (3) Developer Pro (extended API rate limits, unlimited projects, and live bot online/offline status webhooks)."
+			},
+			"card9": {
+				"title": "How do Store promo codes and Annual billing discounts work?",
+				"description": "On store.xernerx.com, toggle between Monthly (?interval=month) and Annual (?interval=year) billing to save on yearly plans, or apply promotional coupon codes at Stripe checkout (including automatic code pre-fill via ?promo=CODE or ?code=CODE links)."
 			},
 			"card2": {
-				"title": "How do I manage or cancel subscriptions, and how does the Supporters showcase work?",
-				"description": "Visit account.xernerx.com/billing (/?tab=billing) or store.xernerx.com. On the Billing tab you can filter subscriptions by All, Active, or History, check renewal dates (including a 7-day expiring-soon badge), and cancel any active Stripe subscription in one click (POST /secure/store/[userId]/cancel). Team members with Staff Subscriptions enabled automatically receive an active infinite pass across all services. All users with an active subscription or Staff Subscription are celebrated on the Community Supporters page at app.xernerx.com/supporters."
+				"title": "How do I manage or cancel an active subscription?",
+				"description": "Open account.xernerx.com/billing to view active passes, renewal dates, and billing history, and cancel any Stripe web subscription in one click. Subscriptions purchased natively inside Discord (such as the Discord SKU Virtue Pass) are managed directly in Discord User Settings -> Subscriptions."
+			},
+			"card10": {
+				"title": "What is the Community Supporters showcase?",
+				"description": "Every member holding an active paid pass (or Staff Subscription) is automatically featured on the Community Supporters wall at app.xernerx.com/supporters and receives supporter recognition on their public Xernerx profile."
+			}
+		},
+		"credits": {
+			"navTitle": "Credits",
+			"title": "Credits",
+			"card0": {
+				"title": "What are Xernerx Credits?",
+				"description": "Xernerx Credits are the Suite-wide virtual reward currency! Every user receives a free +1,000 Credits Welcome Wallet the first time they sign in, and you can earn Credits every day simply by using the platform and chatting in Discord. Credits can be spent in the Credit Store on permanent account upgrades (like custom vanity URLs, extra CDN storage slots, and showcase slots), UI & profile cosmetics, Streak Shields, Spotlight Boosts, or tipped directly to friends and bot developers."
+			},
+			"card1": {
+				"title": "What are all the ways I can earn Credits for free?",
+				"description": "You can earn Credits without spending a cent by claiming your 24-hour Daily Gift, voting for Bots and Servers every 12 hours, leveling up your Server or Global Virtue rank, inviting official bots to new Discord servers (+100 Credits), inviting friends via your Referral link (+250 Credits each), reporting verified bugs (+500 Credits), submitting accepted suggestions (+250 Credits), and unlocking milestone achievements."
 			},
 			"card3": {
-				"title": "How do the Daily Credit Gift, 48-hour streak grace window, and voting rewards work?",
-				"description": "Claim your Daily Gift every 24h for 50–150 random base Credits + (streak × 10) streak bonus + a +250 Milestone Chest every 7th day, protected by a 48-hour grace window and up to 3 Streak Shields. You also earn 100 base Credits every 12h when voting for a bot or server, +100 Credits for every new Discord server you invite an official bot to, automatic Community Bounties (+500 Credits for verified/resolved bug reports on info.xernerx.com/bugs, +250 Credits for accepted/implemented suggestions on info.xernerx.com/suggestions), Contributor Milestone Achievements (Streak Master, Community Voter, Ecosystem Builder), and +250 Credits for both you and a friend via the Referral Program!"
+				"title": "How does the Daily Credit Gift work?",
+				"description": "Once every 24 hours, claim your Daily Gift from account.xernerx.com/billing or your sidebar user card to receive 50–150 random base Credits + (streak × 10) consecutive-day bonus Credits—plus an extra +250 Credits Milestone Chest on every 7th streak day!"
 			},
-			"card4": {
-				"title": "How does the Media CDN (cdn.xernerx.com) work and what are the storage quotas?",
-				"description": "Every Xernerx account includes 10 Media CDN slots on cdn.xernerx.com (1,000 with an active subscription or Staff Subscription, plus permanent +1/+3/+10 slot upgrades in the Credit Store). The Media Studio supports custom Folders, searchable #tags, multi-select bulk privacy/deletion controls, and a pre-upload Aspect-Ratio Image Cropper (1:1 Avatar, 16:9 Banner, or Freeform)."
-			},
-			"card5": {
-				"title": "How do I apply for open staff or developer positions at Xernerx Studios?",
-				"description": "Visit xernerx.com/applications (or vanity URLs xernerx.com/careers and xernerx.com/jobs) to browse open engineering, moderation, translator, and community roles, review requirements and benefits, and submit your application. You can track your application's review status and staff notes anytime on account.xernerx.com/activity and enable Application Reviewed alerts on account.xernerx.com/notifications."
-			},
-			"card6": {
-				"title": "What can I spend Credits on in the Credit Store, and how do Credit Top-Up Packs work?",
-				"description": "Visit store.xernerx.com/?category=credits to redeem Credits for permanent CDN Media Slots, Profile Showcase Slots, Custom Vanity URL Slots (2,000 Credits per slot or 5,000 Credits for a 3-slot bundle for Users, Bots, Servers & Organizations), Streak Shields (500 Credits, max 3 active), 3-Day/7-Day Trial Passes, Vanity Badges, Stage Render Forms (Constellation, Hex-Grid, Aurora, Cyber Glyphs), Ambient Canvas Scenes, Glass Surface Styles, Cursor Trail & Click Shockwave FX, Header & Icon Packs, Desktop App Icon Crests, Avatar Frame Shaders, Animated Nameplates, Profile Card Themes, Overlay HUD Skins, and Master Cosmetic Bundles (all included automatically with Ultra Ecosystem). You can also spend Credits on Bot & Server pages to activate 24-Hour (1,000 Credits) or 7-Day (5,000 Credits) Community Spotlight Boosts and send Creator Tips (50–2,500 Credits)."
-			},
-			"card7": {
-				"title": "Can I tip Credits to other users or bot developers?",
-				"description": "Yes! Peer-to-Peer Credit Tipping allows you to send spendable Xernerx Credits directly to friends, community contributors, or your favorite bot developers from their public profile or bot listing page. Both the sender and recipient receive an instant ledger receipt in their Account Billing history."
+			"card9": {
+				"title": "How do the 48-hour streak grace window and Streak Shields work?",
+				"description": "After claiming a Daily Gift, the next claim unlocks in 24 hours and your streak stays safe for a full 48-hour grace window. If you ever miss the 48-hour window and own a Streak Shield (500 Credits in the Credit Store, up to 3 held at once), one shield is consumed automatically to protect your streak from resetting."
 			},
 			"card8": {
 				"title": "How are Credit Hand-Outs calculated across Level-Ups, Daily Gifts, Votes, and Multipliers?",
@@ -5665,50 +5819,143 @@
 				"bullet3": "<strong>Daily Gift &amp; 7-Day Milestone Formula:</strong> Every 24 hours (with a 48-hour streak grace window or automatic Streak Shield protection), base reward is <code>Base = Random(50, 150) + (streak × 10) + (streak % 7 === 0 ? 250 : 0)</code>.",
 				"bullet4": "<strong>Subscription Credit Multipliers (<code>100%</code> / <code>125%</code> / <code>200%</code>):</strong> Applied to Daily Gifts and 12-hour Bot/Server Votes (<code>100</code> base Credits): <strong>Free Tier</strong> receives <code>100%</code> (<code>1.0x</code>), an active <strong>Virtue Pass or individual subscription</strong> receives <code>125%</code> (<code>1.25x</code>), and <strong>Ultra Ecosystem or Staff Subscription</strong> receives <code>200%</code> (<code>2.0x</code>).",
 				"bullet5": "<strong>Fixed Onboarding, Bounty, Referral &amp; Achievement Payouts:</strong> <strong><code>+1,000</code> Credits</strong> Welcome Wallet on first sign-in • <strong><code>+100</code> Credits</strong> per newly connected Discord server via Bot Onboarding • <strong><code>+250</code> Credits</strong> to both you and your friend on their first Daily Gift claim via Referrals • <strong><code>+500</code> Credits</strong> for verified/resolved Bug Reports and <strong><code>+250</code> Credits</strong> for accepted/implemented Suggestions • <strong><code>+150</code> / <code>+500</code> / <code>+2,000</code> Credits</strong> for <code>7</code> / <code>30</code> / <code>100</code>-day streaks, <strong><code>+150</code> / <code>+500</code> Credits</strong> for <code>10</code> / <code>50</code> votes, and <strong><code>+500</code> Credits</strong> for Ecosystem Builder."
+			},
+			"card6": {
+				"title": "What can I spend Credits on in the Credit Store?",
+				"description": "Visit store.xernerx.com/?category=credits to redeem Credits for Dot-Matrix Formations (individually for 500 Credits or all 11 + Interactive Profile Banner for 3,500 Credits), Stage Render Forms (Constellation Mesh, Cyber Hex-Grid, Aurora Bokeh & Waves, and Cyber Glyphs), Ambient Canvas Scenes, Glass Surface Styles, Cursor FX, Overlay Skins, Avatar Frame Shaders, Animated Nameplates, Desktop Icon Crests, permanent CDN Media Slots, extra Profile Showcase Slots, Custom Vanity URL Slots, Streak Shields, Trial Passes, Spotlight Boosts, and Vanity Badges."
+			},
+			"card10": {
+				"title": "Can I buy Credit Top-Up Packs, and do Credits ever expire?",
+				"description": "Yes—optional one-time Credit Top-Up Packs are available on store.xernerx.com/?category=credits if you want an instant balance boost. Xernerx Credits never expire, are tracked transparently in your Credit Activity Ledger, and are virtual platform items with no real-world cash withdrawal value."
+			},
+			"card7": {
+				"title": "Can I tip Credits to other users or bot developers?",
+				"description": "Yes! Peer-to-Peer Credit Tipping lets you send 50–2,500 spendable Credits directly to friends, contributors, or bot developers from their public User or Bot profile. Both sender and recipient receive an instant ledger receipt, and bots can listen for tips in real time via POST tip webhooks."
+			}
+		},
+		"cdn": {
+			"navTitle": "Media CDN",
+			"title": "Media CDN",
+			"card0": {
+				"title": "What is the Xernerx Media CDN (cdn.xernerx.com)?",
+				"description": "The Xernerx Media CDN is our first-party media hosting studio for uploading, organizing, cropping, and streaming avatars, banners, screenshots, and attachments across the Xernerx ecosystem."
+			},
+			"card4": {
+				"title": "What are the Media CDN storage quotas and how can I unlock more slots?",
+				"description": "Every free Xernerx account includes 10 Media CDN slots, while active subscribers (and Staff Subscriptions) receive 1,000 slots. You can also unlock permanent +1, +3, or +10 Media Slot upgrades anytime using Credits in the Credit Store."
+			},
+			"card5": {
+				"title": "How do Folders, Image Cropping, Privacy Levels, and /raw/[id] links work?",
+				"description": "Upload files via drag-and-drop, file picker, Ctrl + V paste, or Desktop Quick Capture, and crop images before upload using 1:1 Avatar, 16:9 Banner, or Freeform presets. Organize uploads with custom Folders and #tags, set each file to Public, Limited (unlisted direct link), or Private (owner-only), share the rich web viewer (/view/[id]), or embed direct binary streams (/raw/[id])."
 			}
 		},
 		"developers": {
-			"navTitle": "API, Widgets & Packages",
-			"title": "API, Widgets, Webhooks & NPM Packages",
+			"navTitle": "REST API",
+			"title": "REST API",
+			"card0": {
+				"title": "What is the Xernerx REST API (api.xernerx.com)?",
+				"description": "api.xernerx.com is the core HTTP gateway for integrating Discord bots, external websites, and developer scripts with Xernerx—powering automated bot stats, slash command syncing, voter/reviewer/tipper checks, live embed widgets, SVG shields, and Haste paste creation."
+			},
 			"card1": {
-				"title": "Which API namespace should I use (/v1, /core, or /secure)?",
-				"description": "Use /v1/* (docs.xernerx.com/api/v1) for public bot developer integrations—including bot profiles, statistical snapshots (@xernerx/stats), bulk slash command syncing (PUT /v1/bots/[id]/commands), release notes (POST /v1/bots/[id]/releases), live SVG badges (/v1/[entity]/[id]/badge.svg), leaderboards (/v1/leaderboard), and changelog RSS (/v1/changelog/rss). Use /core/* and /info/* (docs.xernerx.com/api/core) for public embed widgets, Discord metadata lookups, and public roadmap/suggestions/issues queries. Roughly 70% of our HTTP API (/secure/*) and 100% of our WebSocket Gateway are private internal infrastructure built to run Xernerx Suite applications and in-house bots, and are off-limits to the public."
+				"title": "What is the difference between /v1, /core, and /secure endpoints?",
+				"description": "Use /v1/* (docs.xernerx.com/api/v1) for public developer integrations (bot profiles, stats, commands, releases, user engagement checks, badges, leaderboards, and Haste). Use /core/* and /info/* (docs.xernerx.com/api/core) for public embed widgets and community roadmap/issues/FAQ feeds. Routes under /secure/* are private first-party endpoints reserved for Xernerx web applications."
 			},
-			"card2": {
-				"title": "What are the API rate limits, CORS policies, and Interactive Playground features?",
-				"description": "Public requests to api.xernerx.com are rate-limited to 100 requests per minute per IP address (returning 429 Too Many Requests with Retry-After and X-RateLimit-* headers; first-party *.xernerx.com traffic is exempt, and extended limits are available via Developer Pro on store.xernerx.com/?category=developers). Public routes (/v1/*, /core/*, /api/version, /api/changelog) include permissive CORS headers. You can test live API requests with your Bearer token directly in your browser using the Interactive API Explorer on docs.xernerx.com/api/v1."
-			},
-			"card3": {
-				"title": "How do I embed live Bot, Server, Organization, or User widgets and SVG badges?",
-				"description": "Enable Public Embed Widget in your User, Bot, Server, or Organization Settings to unlock live cards at /core/[bots|guilds|organizations|users]/[id]—supporting JSON, HTML iframes (?type=iframe), SVGs (?type=svg), and PNG cards (?type=png), complete with active Vanity Badges and Daily Streaks on user cards. You can also embed compact SVG shields via /v1/[entity]/[id]/badge.svg (including status, ping, guilds, votes, and streak metrics) with 1-click Markdown/HTML copy from any Bot Statistics tab."
-			},
-			"card4": {
-				"title": "How do Outbound Bot Webhooks work, and is the WebSocket Gateway public?",
-				"description": "The internal WebSocket Gateway is 100% private infrastructure reserved for first-party Xernerx services. For external bot developers, the Developer Portal (portal.xernerx.com/bots/[id]) provides real-time Outbound HTTP & Discord Webhooks across 12 event triggers (votes, tips, stats, reviews, releases, plus API-tier POST online and POST offline status transition webhooks—which require an active Developer API subscription and sharing at least 1 Discord server with the Xernerx Bot), complete with per-webhook HMAC-SHA256 Signing Secrets (whsec_...), a live Webhook Delivery Log recording the latest 25 deliveries with status codes, latency, payload inspection, and 1-click Replay."
-			},
-			"card5": {
-				"title": "What features are exclusive to the Xernerx Desktop App?",
-				"description": "Download the native Electron client at xernerx.com/download (or xernerx.com/desktop) for Windows, macOS, and Linux. Desktop-exclusive features configurable in account.xernerx.com/preferences include: (1) Multi-Account Switcher with isolated Chromium session partitions; (2) Always-on-Top Live Overlay Monitor (app.xernerx.com/overlay); (3) Live Discord Rich Presence (RPC); and (4) Global summon shortcut (Ctrl + Shift + X), system tray mode, and customizable borderless window controls."
-			},
-			"card6": {
-				"title": "What global keyboard shortcuts are available across all Xernerx applications?",
-				"description": "Every Xernerx Suite application supports global keyboard shortcuts: Ctrl + K focuses the page search bar or opens the Command Palette (Ctrl + Shift + K always opens the Command Palette), Ctrl + Space (or Alt + A) opens the App Drawer, Ctrl + . toggles the cross-subdomain URL Omnibar, Ctrl + B toggles the Sidebar, Ctrl + I opens Notifications, Ctrl + , jumps to Account Settings, Ctrl + / opens the Keyboard Shortcuts & Changelog modal, Ctrl + S / Ctrl + Enter saves unsaved changes, Alt + 1..9 switches sidebar views, and Ctrl + Shift + C copies the current suite URL."
+			"card11": {
+				"title": "How do Personal and Bot API Bearer Tokens (xrx_) work?",
+				"description": "Generate Bearer tokens (prefixed with xrx_) at account.xernerx.com/tokens and pass them in the Authorization: Bearer <token> HTTP header. When a new token is first used on a /v1/bots/[id]/* mutation, it automatically binds to that bot ID and scopes mutations to your bot."
 			},
 			"card7": {
-				"title": "How do Token Lifecycle States (Pending, Active, Inactive, Suspended), TTL Expirations, IP Allowlists, and Milestones work?",
-				"description": "Tokens created on account.xernerx.com/tokens track live requestCount and lastUsedAt telemetry whenever validated via /secure/validate/token, support optional TTL expiration dates (7d, 30d, 90d, 365d, or Long-Lived) and comma-separated IP allowlists (allowedIps, including CIDR/wildcard patterns), and support 1-click Roll Token to rotate your secret key in-place without losing permissions, co-owners, or bound bot settings. Bots also unlock 16-tier Server Milestones (Servers-1..16) and Member Milestones (Members-1..16) displayed on bot profiles and showcased as Biggest Bot Milestone Badges on developer user profiles."
+				"title": "What do Token Lifecycle States, TTL Expirations, IP Allowlists, and Roll Token do?",
+				"description": "Tokens transition across Pending (unused), Active (bound and valid), Inactive, and Suspended states while tracking live requestCount and lastUsedAt telemetry. You can configure optional TTL expirations (7d, 30d, 90d, 365d, or Long-Lived), restrict usage to comma-separated IP/CIDR allowlists, and click Roll Token to rotate a compromised secret key in-place without losing settings."
 			},
-			"card8": {
-				"title": "How does the Open-Source NPM Package Documentation Reader (docs.xernerx.com/packages) work?",
-				"description": "Visit docs.xernerx.com/packages to browse official open-source Xernerx developer libraries and frameworks published on npm and GitHub (such as xernerx, @xernerx/framework, and @xernerx/stats). The documentation reader dynamically indexes every published semantic version and lets you switch versions via the Version Selector, inspect Classes, Interfaces, Functions, Constructors, Properties, and Methods, or use the global package search bar to jump to any symbol across all latest packages."
+			"card2": {
+				"title": "What are the API rate limits and CORS policies?",
+				"description": "Public requests to api.xernerx.com allow 100 requests per minute per IP address (returning 429 Too Many Requests with Retry-After and X-RateLimit-* headers; higher quotas unlock with Developer Pro). All public /v1/* and /core/* endpoints include permissive CORS headers for browser and widget usage."
 			},
-			"card9": {
-				"title": "How does Xernerx Haste (haste.xernerx.com) work for bots and developers?",
-				"description": "Xernerx Haste (haste.xernerx.com) is our first-party code pastebin and Hastebin-compatible server backed by a dedicated MongoDB cluster with automatic TTL expirations (1h, 24h, 7d, 30d, or never) and 3-tier privacy (public, limited, and private). Any registered Xernerx user can publish pastes from the web studio or programmatically via POST https://haste.xernerx.com/documents/[userId] or POST https://api.xernerx.com/v1/haste by passing their Xernerx User ID (such as from client.owners in @xernerx/commands), while any unauthenticated user can view public and limited pastes."
+			"card12": {
+				"title": "How do I test endpoints in the Interactive API Playground?",
+				"description": "Every public endpoint on docs.xernerx.com/api/v1 and docs.xernerx.com/api/core includes an in-browser Interactive Playground where you can fill path/query parameters, attach your xrx_ Bearer token, send live requests, and inspect JSON responses and status codes."
 			},
 			"card10": {
-				"title": "How does Discord's 2,500-Guild Per-Shard Limit validation and capacity warning work when posting bot stats?",
-				"description": "Because Discord enforces a hard Gateway limit of 2,500 guilds per WebSocket shard (Close Code 4011), POST and PATCH requests to /v1/bots/[id]/stats validate both overall serverCount against shards × 2,500 and each individual shard or cluster entry in shards[] against its 2,500-guild per-shard capacity (returning 400 SHARD_LIMIT_EXCEEDED for impossible payloads). When any shard reaches 2,000+ guilds (80%+ capacity), Xernerx surfaces real-time High Load / Critical badges across the Bot Shard Health Matrix on app.xernerx.com and portal.xernerx.com and dispatches dedicated HMAC-signed WARN shard webhooks (configurable under Portal -> Bot -> Webhooks) with recommended shard counts."
+				"title": "How does Discord’s 2,500-Guild Per-Shard Limit validation work?",
+				"description": "Because Discord enforces a hard limit of 2,500 guilds per Gateway shard (Close Code 4011), POST/PATCH /v1/bots/[id]/stats validates serverCount against shards × 2,500 and checks each entry in shards[] (returning 400 SHARD_LIMIT_EXCEEDED for invalid totals). When any shard reaches 2,000+ guilds (80%+ capacity), Xernerx displays High Load / Critical badges and fires WARN shard webhooks."
+			}
+		},
+		"webhooks": {
+			"navTitle": "Webhooks",
+			"title": "Webhooks",
+			"card1": {
+				"title": "What are Xernerx Bot Webhooks and which events are supported?",
+				"description": "Outbound Bot Webhooks (configured in portal.xernerx.com under your bot’s Webhooks tab) push real-time JSON events to your HTTPS server or a Discord channel webhook whenever users vote (POST vote), tip credits (POST tip), leave/edit/delete/vote on reviews, update stats, trigger shard warnings (WARN shard), publish releases, or transition online/offline (Developer Pro)."
+			},
+			"card2": {
+				"title": "How do Webhook Signing Secrets (whsec_) and HMAC-SHA256 verification work?",
+				"description": "Each bot webhook has a cryptographic Signing Secret (whsec_...) used to sign the raw request body in the X-Xernerx-Signature: sha256=<hmac> header. Always verify signatures in constant time using crypto.timingSafeEqual—or install @xernerx/hooks, which handles signature verification, Express routing, and engagement caching automatically."
+			},
+			"card3": {
+				"title": "How do Live Test Pings, Delivery Logs, and 1-Click Replay work?",
+				"description": "In your bot’s Webhooks tab on portal.xernerx.com, click Test Ping to dispatch an instant TEST ping event and inspect HTTP status and round-trip latency in milliseconds. Below your configuration, the Webhook Delivery Log records your latest 25 deliveries with full payload inspection and 1-click Replay for failed attempts."
+			},
+			"card4": {
+				"title": "Is the Xernerx WebSocket Gateway public?",
+				"description": "No—the internal WebSocket Gateway documented on docs.xernerx.com/websocket is 100% private infrastructure reserved for first-party Xernerx services and daemons. Third-party bot developers should use Outbound Webhooks (@xernerx/hooks) and the /v1 REST API."
+			}
+		},
+		"packages": {
+			"navTitle": "Packages",
+			"title": "Packages",
+			"card0": {
+				"title": "What official open-source NPM packages does Xernerx publish?",
+				"description": "Xernerx Studios maintains open-source Apache-2.0 TypeScript packages on npm and GitHub: xernerx (all-in-one SDK), @xernerx/framework (modular Discord.js client, sharding, and XernerxUser enrichment), @xernerx/commands (slash/context/message command builders), @xernerx/hooks (webhook receiver & engagement cache), @xernerx/stats (automated telemetry reporter), @xernerx/extension-builder, and @xernerx/terminal."
+			},
+			"card8": {
+				"title": "How does the NPM Package Documentation Reader work?",
+				"description": "Visit docs.xernerx.com/packages to browse generated TypeDoc API references for every published version of our npm packages—complete with a semantic Version Selector, Class/Interface/Method breakdowns, and cross-package symbol search."
+			},
+			"card3": {
+				"title": "How do I embed live Bot, Server, Organization, or User widgets on my site?",
+				"description": "Enable Public Embed Widget in your User, Bot, Server, or Organization Settings to unlock live embeddable cards at api.xernerx.com/core/[bots|guilds|organizations|users]/[id]—available as responsive HTML iframes (?type=iframe), SVGs (?type=svg), PNG images (?type=png), or raw JSON."
+			},
+			"card4": {
+				"title": "How do I embed live SVG Status and Stats Badges in GitHub READMEs?",
+				"description": "Use api.xernerx.com/v1/[bots|guilds|users]/[id]/badge.svg (with metric types such as status, ping, guilds, votes, or streak) or api.xernerx.com/v1/status/badge.svg for platform health. One-click Markdown and HTML snippets are available on any Bot Statistics tab."
+			},
+			"card9": {
+				"title": "What is Xernerx Haste (haste.xernerx.com)?",
+				"description": "Xernerx Haste is our fast, Hastebin-compatible code pastebin for sharing logs, configs, and code snippets with syntax highlighting, configurable TTL expirations (1h, 24h, 7d, 30d, or never), 3-tier privacy (Public, Limited, Private), and /raw/[id] plain-text streaming."
+			},
+			"card10": {
+				"title": "How can my bot or script publish pastes programmatically to Xernerx Haste?",
+				"description": "Any registered Xernerx user or bot can create pastes via POST https://haste.xernerx.com/documents/[userId] or POST https://api.xernerx.com/v1/haste (passing your Xernerx User ID or Bearer token) and receive back the shareable paste key and URL."
+			}
+		},
+		"translations": {
+			"navTitle": "Translations",
+			"title": "Translations",
+			"card0": {
+				"title": "How does localization work across the Xernerx Suite?",
+				"description": "Xernerx is translated by our global community into multiple languages, with English (UK) (en-GB) serving as the primary source of truth. Whenever a new feature launches or an English string is updated, any untranslated key automatically falls back to English (UK) so you never see broken placeholder keys."
+			},
+			"card1": {
+				"title": "How do I become a community translator?",
+				"p1": "Sign in on account.xernerx.com, open Language settings (/language), and select any language below 100% completion to reveal the Contribute card—or apply directly via xernerx.com/applications.",
+				"p2": "Make sure you are signed in with your Discord account before submitting your translator application."
+			},
+			"card2": {
+				"title": "How does the Translation Studio work once approved?",
+				"description": "Once staff approve your translator role, open admin.xernerx.com/?tab=translations to translate missing strings one by one in the distraction-free New Entries queue, refine existing translations in Review Existing mode side-by-side against English (UK), or export locale JSON."
+			},
+			"card3": {
+				"title": "Why didn’t my submitted translation appear on the main site immediately?",
+				"description": "Clicking Push to review commits your translations and merges them automatically into the Canary branch (*.canary.xernerx.com) first. Once the Canary build passes verification, translations roll out to the stable Release environment on the next production deployment."
+			},
+			"card4": {
+				"title": "How can I request a new language that isn’t listed yet?",
+				"description": "Join our official Discord server via /support or open a request on info.xernerx.com/suggestions letting us know which language locale you want to contribute to so our team can initialize the dictionary file."
+			},
+			"card5": {
+				"title": "How does language detection and cross-subdomain syncing work?",
+				"description": "Your chosen language is stored in a first-party NEXT_LOCALE cookie shared across *.xernerx.com and saved to your Xernerx profile, keeping every web app and the Desktop Client in sync automatically."
 			}
 		}
 	},
@@ -6063,9 +6310,9 @@
 				},
 				"signin": {
 					"heading": "Start by Signing in to Xernerx",
-					"whyAccountFirstDesc": "Signing in with Discord unlocks your Server Dashboard, Virtue leveling configuration, community voting & reviews, daily credit gifts, and 1-click support server join without interruptions.",
+					"whyAccountFirstDesc": "Signing in with Discord unlocks your Server Dashboard, Virtue leveling and YourApps server application configuration, community voting & reviews, daily credit gifts, and 1-click support server join without interruptions.",
 					"perkDashboardTitle": "Full Dashboard & Server Control",
-					"perkDashboardDesc": "Manage your server directory profile, view 30-day growth stats, and configure Virtue leveling in your browser.",
+					"perkDashboardDesc": "Manage your server directory profile, view 30-day growth stats, and configure Virtue leveling or YourApps forms in your browser.",
 					"perkCreditsTitle": "+1,000 Free Welcome Credits",
 					"perkCreditsDesc": "New accounts receive a 1,000-credit welcome bonus for server/bot boosts, vanity URLs, and profile cosmetics.",
 					"ctaCardTitle": "Connect Your Discord Account",
@@ -6109,7 +6356,8 @@
 					"subtitle": "Manage server settings, leveling roles, and live telemetry for {name} directly from your dashboard.",
 					"genericSubtitle": "Manage your server directory profile, 30-day statistics, and settings for {name} directly from your dashboard.",
 					"setupGuideBtn": "Setup Guide",
-					"openDashboardBtn": "Open Server Dashboard"
+					"openDashboardBtn": "Open Server Dashboard",
+					"yourappsSubtitle": "Build application forms, publish Apply panels, and review submissions for {name} directly from your dashboard."
 				},
 				"tour": {
 					"welcomeLabel": "Welcome",
@@ -6181,10 +6429,10 @@
 					"headerDesc": "Copy your Server ID, boost your server to the top of Explore, or open your public Server Profile.",
 					"tabsLabel": "Modules",
 					"tabsTitle": "Dashboard & {name} Modules",
-					"tabsDesc": "Switch between General Info, 30-Day Analytics, Social Links, Virtue Leveling, and Server Settings.",
+					"tabsDesc": "Switch between General Info, 30-Day Analytics, Social Links, Virtue Leveling, YourApps Applications, and Server Settings.",
 					"configLabel": "Configuration",
 					"configTitle": "Configure {name} & Server Settings",
-					"configDesc": "Customize {name}'s settings, XP curves, level-up announcements, and role rewards right here — press Ctrl + S anytime to save.",
+					"configDesc": "Customize {name}'s settings, application forms, XP curves, and role rewards right here — press Ctrl + S anytime to save.",
 					"finishBtn": "Finish Tour",
 					"skipBtn": "Skip Tour"
 				},
@@ -6244,7 +6492,8 @@
 				"stats": "Stats",
 				"settings": "Settings",
 				"links": "Links",
-				"virtue": "Levels"
+				"virtue": "Levels",
+				"applications": "Applications"
 			},
 			"botNotConnected": "Bot Not Connected",
 			"botNotConnectedDesc": "Invite Xernerx Bot to unlock automated server telemetry and member growth charts.",
@@ -6426,6 +6675,196 @@
 					"activeRolesDesc": "Roles with 0 members are automatically promoted or pruned; when active levels exceed {max}, Virtue consolidates to the {max} most defining milestones.",
 					"selectAnchorPrompt": "Select a Level 1 Base Role above to activate dynamic level role creation and hoist management.",
 					"anchorBadge": "L1 Anchor"
+				}
+			},
+			"applications": {
+				"title": "YourApps • Server Applications",
+				"notAdded": "YourApps is not in this server yet",
+				"notAddedDesc": "Invite YourApps to build interactive Discord forms, publish one-click Apply panels, and review staff or community submissions without ever leaving Discord.",
+				"inviteBtn": "Invite YourApps to Server",
+				"refreshBtn": "Refresh",
+				"sections": {
+					"overview": "Settings & Channels",
+					"positions": "Positions & Forms",
+					"submissions": "Submissions Queue"
+				},
+				"stats": {
+					"openPositions": "Open Positions",
+					"pending": "Pending Review",
+					"approved": "Approved",
+					"denied": "Denied"
+				},
+				"channels": {
+					"title": "Channels & Routing",
+					"placeholder": "None (Disabled)",
+					"logChannel": "Submission Log Channel",
+					"logChannelDesc": "New submissions are posted here with instant Approve / Deny buttons.",
+					"archiveChannel": "Archive Channel",
+					"archiveChannelDesc": "Reviewed applications are archived here with the final decision.",
+					"panelChannel": "Default Panel Channel",
+					"panelChannelDesc": "Default channel pre-selected when publishing Apply panels."
+				},
+				"roles": {
+					"title": "Role Permissions & Pings",
+					"placeholder": "Select roles...",
+					"submissionPings": "Submission Ping Roles",
+					"submissionPingsDesc": "Mentioned whenever a new application is submitted.",
+					"adminRoles": "YourApps Admin Roles",
+					"adminRolesDesc": "Can create/edit positions and change YourApps settings in Discord.",
+					"reviewRoles": "Reviewer Roles",
+					"reviewRolesDesc": "Allowed to view, approve, and deny submissions.",
+					"blacklistRoles": "Blacklisted Roles",
+					"blacklistRolesDesc": "Blocked from submitting any form or application in this server."
+				},
+				"behavior": {
+					"title": "Workflow Preferences",
+					"dmNotifications": "DM Applicant Updates",
+					"dmNotificationsDesc": "Notify applicants via Direct Message when their submission is approved or denied.",
+					"threadPerSubmission": "Discussion Thread per Submission",
+					"threadPerSubmissionDesc": "Automatically open a discussion thread under new submission cards in the log channel."
+				},
+				"positions": {
+					"title": "Application Positions & Forms",
+					"subtitle": "Create recruitment positions or community forms with up to 25 Discord-native questions.",
+					"createBtn": "New Position",
+					"publishPanelBtn": "Publish Discord Panel",
+					"emptyTitle": "No positions configured yet",
+					"emptyDesc": "Create your first position here to start accepting applications in Discord.",
+					"editBtn": "Edit",
+					"deleteBtn": "Delete",
+					"openBadge": "Open",
+					"closedBadge": "Closed",
+					"questionsCount": "{count} Questions",
+					"rewardRolesCount": "{count} Reward Roles",
+					"deleteTitle": "Delete Position",
+					"deleteDesc": "Are you sure you want to delete \"{name}\"? Existing archived submissions will remain, but active drafts will be cleared.",
+					"categories": {
+						"staff": "Staff Application",
+						"appeal": "Appeal",
+						"feedback": "Feedback",
+						"event": "Event Signup",
+						"custom": "Custom Form"
+					},
+					"modal": {
+						"createTitle": "Create Position",
+						"editTitle": "Edit Position",
+						"nameLabel": "Position Name",
+						"namePlaceholder": "e.g. Moderator, Event Host, Ban Appeal",
+						"categoryLabel": "Form Category",
+						"stateLabel": "Status",
+						"descriptionLabel": "Description",
+						"descriptionPlaceholder": "Displayed on Apply panels and before applicants start the form...",
+						"questionsTitle": "Form Questions",
+						"addQuestionBtn": "Add Question",
+						"questionPlaceholder": "Enter question prompt...",
+						"inputPlaceholder": "Optional input placeholder...",
+						"optionsLabel": "Dropdown Options (comma-separated)",
+						"optionsPlaceholder": "Option 1, Option 2, Option 3",
+						"choiceInputPlaceholder": "Type a choice (spaces & symbols allowed) and press Enter...",
+						"addChoiceBtn": "Add Choice",
+						"choicesCountMaxLabel": "Choices ({count}/{max})",
+						"minChoicesHint": "Add at least {min} choice(s)",
+						"booleanHint": "Renders 2 radio options in Discord — leave empty for Yes / No, or customize both labels:",
+						"booleanYesPlaceholder": "Yes (default)",
+						"booleanNoPlaceholder": "No (default)",
+						"requiredToggle": "Required",
+						"types": {
+							"short": "Short Text",
+							"paragraph": "Paragraph",
+							"number": "Number",
+							"select": "Dropdown Menu",
+							"radio": "Radio Group",
+							"multiselect": "Checkbox Group",
+							"boolean": "Yes / No",
+							"checkbox": "Single Checkbox",
+							"user": "User Picker",
+							"role": "Role Picker",
+							"channel": "Channel Picker",
+							"mentionable": "Mentionable Picker",
+							"file": "File Upload"
+						},
+						"rulesTitle": "Role Rewards & Eligibility",
+						"rewardRoles": "Reward Roles (on Approval)",
+						"removeRoles": "Remove Roles (on Approval)",
+						"requiredRoles": "Required Roles (to Apply)",
+						"restrictedRoles": "Restricted Roles (Cannot Apply)",
+						"cooldownLabel": "Re-apply Cooldown (seconds)",
+						"minJoinLabel": "Minimum Server Time (seconds)",
+						"acceptMsgLabel": "Custom Approval Note (Optional)",
+						"denyMsgLabel": "Custom Denial Note (Optional)",
+						"saveBtn": "Save Position",
+						"cancelBtn": "Cancel"
+					},
+					"panelModal": {
+						"title": "Publish Apply Panel to Discord",
+						"desc": "Send an interactive embed with an Apply button or position selector directly to a Discord channel.",
+						"channelLabel": "Target Channel",
+						"panelTitleLabel": "Embed Title",
+						"panelDescLabel": "Embed Description",
+						"buttonLabel": "Button / Selector Label",
+						"positionsLabel": "Included Positions (leave empty for all Open positions)",
+						"publishBtn": "Send Panel to Discord",
+						"defaultTitle": "Server Applications",
+						"defaultDesc": "Select a position below to fill out and submit your application directly inside Discord.",
+						"defaultButton": "Apply Now"
+					},
+					"wizard": {
+						"stepInfo": "Form Info",
+						"stepQuestions": "Form Questions",
+						"stepEligibility": "Eligibility",
+						"stepReview": "Review",
+						"backBtn": "Back",
+						"nextBtn": "Continue",
+						"editStepBtn": "Edit",
+						"nameRequired": "Please enter a position name before continuing.",
+						"questionRequired": "Please add at least one question prompt before continuing.",
+						"optionsRequired": "Please add at least one option for Dropdown and Checkbox Group questions.",
+						"radioOptionsRequired": "Radio Group questions require at least 2 options.",
+						"selectMinChoicesRequired": "Question #{num} (Choice Menu) needs at least 2 choices before continuing.",
+						"reviewSubtitle": "Verify your form details, questions, and eligibility rules before saving.",
+						"noDescription": "No description provided",
+						"noneConfigured": "None",
+						"secondsUnit": "{count}s"
+					}
+				},
+				"submissions": {
+					"title": "Submissions Queue",
+					"searchPlaceholder": "Search by applicant or submission ID...",
+					"allStatuses": "All Statuses",
+					"allPositions": "All Positions",
+					"statusPending": "Pending",
+					"statusApproved": "Approved",
+					"statusDenied": "Denied",
+					"statusWithdrawn": "Withdrawn",
+					"emptyTitle": "No matching submissions",
+					"emptyDesc": "Submissions filled out in Discord will appear here in real time.",
+					"inspectBtn": "Review",
+					"submittedAt": "Submitted {date}",
+					"reviewedBy": "Reviewed by {reviewer}",
+					"modal": {
+						"title": "Submission • {position}",
+						"applicant": "Applicant",
+						"status": "Status",
+						"answersTitle": "Submitted Responses",
+						"noAnswer": "No answer provided",
+						"reasonLabel": "Reviewer Note / Reason (Optional)",
+						"reasonPlaceholder": "Shared with the applicant (if DMs are enabled) and recorded in the archive...",
+						"approveBtn": "Approve Application",
+						"denyBtn": "Deny Application",
+						"deleteBtn": "Delete Submission",
+						"deleteTitle": "Delete Submission",
+						"deleteDesc": "Permanently remove submission {id} from this server's records?"
+					}
+				},
+				"toast": {
+					"savedSuccess": "Application settings saved",
+					"saveError": "Failed to save application settings",
+					"positionSaved": "Position saved",
+					"positionDeleted": "Position deleted",
+					"panelPublished": "Apply panel published to Discord",
+					"submissionApproved": "Application approved",
+					"submissionDenied": "Application denied",
+					"submissionDeleted": "Submission deleted"
 				}
 			}
 		},
@@ -7361,6 +7800,41 @@
 				"discoverSimilarTitle": "Discover More Communities",
 				"discoverSimilarSubtitle": "Other active public Discord servers on Xernerx.",
 				"exploreAllServers": "Explore All Servers"
+			},
+			"applications": {
+				"title": "Server Applications",
+				"subtitle": "Browse open positions and submit your application directly on the web.",
+				"backToPositions": "All Server Positions",
+				"backToServer": "Server Profile",
+				"signInTitle": "Sign in with Discord to Apply",
+				"signInDesc": "Connect your Discord account so we can verify your server membership and roles.",
+				"signInBtn": "Sign in with Discord",
+				"notConfiguredTitle": "Applications Unavailable",
+				"notConfiguredDesc": "YourApps is not currently active on this Discord server.",
+				"notFoundTitle": "Position Not Found",
+				"notFoundDesc": "This application position no longer exists or has been removed.",
+				"emptyPositionsTitle": "No Open Positions",
+				"emptyPositionsDesc": "There are no application positions configured on this server right now.",
+				"applyBtn": "Apply Now",
+				"closedBtn": "Closed",
+				"ineligibleBadge": "Ineligible",
+				"eligibleBadge": "Eligible",
+				"mySubmissionsTitle": "Your Recent Submissions",
+				"mySubmissionsEmpty": "You have not submitted any applications in this server yet.",
+				"requiredTag": "Required",
+				"optionalTag": "Optional",
+				"submitBtn": "Submit Application",
+				"submittedTitle": "Application Submitted!",
+				"submittedDesc": "Your application for \"{position}\" has been received (ID: #{id}).",
+				"viewMySubmissionsBtn": "View All Server Positions",
+				"checkboxAgreeLabel": "Check to confirm",
+				"userInputPlaceholder": "Enter Discord username or user ID...",
+				"fileInputPlaceholder": "Paste file or portfolio URL (https://...)...",
+				"selectOptionPlaceholder": "Select an option...",
+				"selectMultiplePlaceholder": "Select one or more options...",
+				"selectRolePlaceholder": "Select a server role...",
+				"selectChannelPlaceholder": "Select a server channel...",
+				"submittedToast": "Application submitted!"
 			}
 		},
 		"supporters": {
@@ -8347,6 +8821,15 @@
 				},
 				"zodiac": {
 					"desc": "Zodiac bot configurations and star sign telemetry."
+				},
+				"yourapps": {
+					"description": "Manages Discord-native server forms, guild profiles, persistent applicant drafts, and submission review workflows for <strong>YourApps</strong> (stored under the <code>guilds</code> database).",
+					"profilesDesc": "Guild setup profiles (guilds.profiles), bot presence, log/archive channels, role permissions, and active Apply panels.",
+					"formsDesc": "Application forms & positions (guilds.forms) with up to 25 typed questions, role rewards, and eligibility rules.",
+					"submissionsDesc": "Applicant submissions (guilds.submissions), question answers, review decisions, and Discord message references.",
+					"draftsDesc": "Auto-saved in-progress multi-step form drafts (guilds.drafts) scoped by guild, user, and form.",
+					"statsDesc": "Aggregated counts of open/total forms and pending/approved/denied submissions.",
+					"exampleTitle": "Example: Fetch Open Server Forms"
 				}
 			},
 			"client": {
@@ -8712,10 +9195,10 @@
 					"sidebarDesc": "Every Discord server where you have Manage Server permissions appears in the left Sidebar so you can switch servers in one click.",
 					"headerTitle": "Server Header & Boosts",
 					"headerDesc": "Copy your server ID, preview your public directory listing, or launch a Spotlight Boost right from your server header.",
-					"tabsTitle": "Server & Virtue Modules",
-					"tabsDesc": "Use these tabs to switch between General Info, 30-day Statistics, Invite & Social Links, Virtue leveling, and Settings (privacy tier, custom vanity URL, embed widget, and JSON backups).",
+					"tabsTitle": "Server, Virtue & Applications Modules",
+					"tabsDesc": "Use these tabs to switch between General Info, 30-day Statistics, Invite & Social Links, Virtue leveling, Applications (YourApps), and Settings (privacy tier, custom vanity URL, embed widget, and JSON backups).",
 					"configTitle": "Live Configuration",
-					"configDesc": "Edit your server profile or Virtue settings below — press Ctrl + S anytime to save and publish your changes live."
+					"configDesc": "Edit your server profile, Virtue leveling, or YourApps application settings below — press Ctrl + S anytime to save and publish your changes live."
 				},
 				"portal": {
 					"headerTitle": "Your Developer Workspace",
@@ -8762,6 +9245,22 @@
 				"description": "You can continue the interactive tour at any later date from the Continue Tour button in your Header or Sidebar, from Account Settings, or via the Ctrl + K Command Palette.",
 				"confirm": "Skip for Now",
 				"cancel": "Stay in Tour"
+			},
+			"navHandoff": {
+				"promptBadge": "Hands-On Navigation",
+				"promptTitle": "Use Suite Navigation to open {destination}",
+				"promptDesc": "Click the highlighted Navigation icon in the bar or press Ctrl + . on your keyboard to open the Suite Navigation Menu, then select {destination}.",
+				"openMenuBtn": "Open Navigation Menu",
+				"waitingHint": "Click Navigation Icon or press Ctrl + .",
+				"menuExplainBadge": "Suite Navigation — First Look",
+				"menuExplainTitle": "Your Unified Ecosystem Launcher",
+				"menuExplainDesc": "Every Xernerx application across User, Developer, and Public portals lives right here. You can filter apps by typing, move with arrow keys, or click any icon to jump across subdomains. Select the highlighted {destination} card below to continue!",
+				"nextStopBadge": "Next Tour Stop →",
+				"destinations": {
+					"dashboard": "Server Dashboard",
+					"portal": "Developer Portal",
+					"explore": "Explore Hub"
+				}
 			}
 		}
 	},

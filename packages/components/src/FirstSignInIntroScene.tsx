@@ -102,10 +102,10 @@ export function FirstSignInIntroScene({ displayName, username, avatarUrl, onComp
 		};
 	}, []);
 
-	// Trigger initial dot-matrix construction once on mount
+	// Trigger initial dot-matrix spiral construction once on mount (isolated from landing page construct)
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			window.dispatchEvent(new CustomEvent('xernerx:construct-logo'));
+			window.dispatchEvent(new CustomEvent('xernerx:construct-logo', { detail: { mode: 'spiral' } }));
 		}
 	}, []);
 

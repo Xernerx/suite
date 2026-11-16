@@ -14,6 +14,11 @@ const FORMATIONS: { id: DotLogoVariant; labelKey: string }[] = [
 	{ id: 'prism', labelKey: 'account.appearance.dotMatrix.types.prism' },
 	{ id: 'infinity', labelKey: 'account.appearance.dotMatrix.types.infinity' },
 	{ id: 'wavegrid', labelKey: 'account.appearance.dotMatrix.types.wavegrid' },
+	{ id: 'chronos', labelKey: 'account.appearance.dotMatrix.types.chronos' },
+	{ id: 'supernova', labelKey: 'account.appearance.dotMatrix.types.supernova' },
+	{ id: 'tesseract', labelKey: 'account.appearance.dotMatrix.types.tesseract' },
+	{ id: 'synthwave', labelKey: 'account.appearance.dotMatrix.types.synthwave' },
+	{ id: 'lotus', labelKey: 'account.appearance.dotMatrix.types.lotus' },
 	{ id: 'full', labelKey: 'account.appearance.dotMatrix.types.full' },
 	{ id: 'icon', labelKey: 'account.appearance.dotMatrix.types.icon' },
 ];
@@ -41,7 +46,7 @@ export function DotMatrixBannerStudio({ isUnlocked, isActive, selectedVariant = 
 				action: {
 					label: t('account.appearance.dotMatrix.openCreditStore'),
 					onClick: () => {
-						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits&perk=dot_matrix&item=perk-badge-dotmatrix');
 					},
 				},
 			});
@@ -77,7 +82,7 @@ export function DotMatrixBannerStudio({ isUnlocked, isActive, selectedVariant = 
 					<Button
 						variant="primary"
 						size="sm"
-						onClick={() => (window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits'))}
+						onClick={() => (window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits&perk=dot_matrix&item=perk-badge-dotmatrix'))}
 						className="flex items-center gap-1.5 shrink-0"
 					>
 						<ExternalLink size={13} />

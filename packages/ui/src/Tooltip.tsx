@@ -1,8 +1,11 @@
 /** @format */
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export interface TooltipProps {
 	content: React.ReactNode;
@@ -14,8 +17,50 @@ export interface TooltipProps {
 }
 
 export function Tooltip({ content, children, position = 'top', className = '', contentClassName = '', delay = 100 }: TooltipProps) {
+	const [mounted, setMounted] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+	const [coords, setCoords] = useState<{ centerX: number; anchorY: number; effectivePos: 'top' | 'bottom' } | null>(null);
+	const triggerRef = useRef<HTMLDivElement>(null);
 	const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+	useEffect(() => {
+		setMounted(true);
+	}, []);
+
+	const updatePosition = useCallback(() => {
+		const el = triggerRef.current;
+		if (!el || typeof window === 'undefined') return;
+		const rect = el.getBoundingClientRect();
+		const scale = el.offsetWidth > 0 ? rect.width / el.offsetWidth : 1;
+		const vw = window.innerWidth / scale;
+		const vh = window.innerHeight / scale;
+		const rTop = rect.top / scale;
+		const rBottom = rect.bottom / scale;
+		const rLeft = rect.left / scale;
+		const rWidth = rect.width / scale;
+
+		let effectivePos = position;
+		if (position === 'top' && rTop < 64 && vh - rBottom > rTop) {
+			effectivePos = 'bottom';
+		} else if (position === 'bottom' && vh - rBottom < 64 && rTop > vh - rBottom) {
+			effectivePos = 'top';
+		}
+
+		const centerX = Math.max(24, Math.min(vw - 24, rLeft + rWidth / 2));
+		const anchorY = effectivePos === 'top' ? vh - rTop + 10 : rBottom + 10;
+		setCoords({ centerX, anchorY, effectivePos });
+	}, [position]);
+
+	useIsomorphicLayoutEffect(() => {
+		if (!isOpen) return;
+		updatePosition();
+		window.addEventListener('scroll', updatePosition, true);
+		window.addEventListener('resize', updatePosition);
+		return () => {
+			window.removeEventListener('scroll', updatePosition, true);
+			window.removeEventListener('resize', updatePosition);
+		};
+	}, [isOpen, updatePosition]);
 
 	const show = () => {
 		if (timerRef.current) clearTimeout(timerRef.current);
@@ -35,31 +80,43 @@ export function Tooltip({ content, children, position = 'top', className = '', c
 
 	if (!content) return <>{children}</>;
 
+	const effectivePos = coords?.effectivePos ?? position;
+
 	return (
-		<div className={`relative inline-flex items-center ${className}`} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}>
+		<div ref={triggerRef} className={`relative inline-flex items-center ${className}`} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}>
 			{children}
-			<AnimatePresence>
-				{isOpen && (
-					<motion.div
-						initial={{ opacity: 0, scale: 0.95, y: position === 'top' ? 4 : -4 }}
-						animate={{ opacity: 1, scale: 1, y: 0 }}
-						exit={{ opacity: 0, scale: 0.95, y: position === 'top' ? 4 : -4 }}
-						transition={{ duration: 0.15, ease: 'easeOut' }}
-						className={`absolute left-1/2 -translate-x-1/2 z-50 pointer-events-none ${position === 'top' ? 'bottom-full mb-2.5' : 'top-full mt-2.5'}`}
-					>
-						<div
-							className={`relative px-4 py-2 bg-(--background)/95 text-(--text) backdrop-blur-xl border border-(--border)/20 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] text-xs w-max max-w-[380px] sm:max-w-[460px] text-center text-balance leading-relaxed ${contentClassName}`}
-						>
-							{content}
-							{position === 'top' ? (
-								<div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 bg-(--background)/95 border-r border-b border-(--border)/20" />
-							) : (
-								<div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-1 w-2 h-2 rotate-45 bg-(--background)/95 border-l border-t border-(--border)/20" />
-							)}
-						</div>
-					</motion.div>
+			{mounted &&
+				typeof document !== 'undefined' &&
+				createPortal(
+					<AnimatePresence>
+						{isOpen && coords && (
+							<motion.div
+								initial={{ opacity: 0, scale: 0.95, y: effectivePos === 'top' ? 4 : -4 }}
+								animate={{ opacity: 1, scale: 1, y: 0 }}
+								exit={{ opacity: 0, scale: 0.95, y: effectivePos === 'top' ? 4 : -4 }}
+								transition={{ duration: 0.15, ease: 'easeOut' }}
+								className="fixed z-[100060] -translate-x-1/2 pointer-events-none font-sans antialiased"
+								style={{
+									left: `${coords.centerX}px`,
+									top: effectivePos === 'bottom' ? `${coords.anchorY}px` : undefined,
+									bottom: effectivePos === 'top' ? `${coords.anchorY}px` : undefined,
+								}}
+							>
+								<div
+									className={`relative px-4 py-2 bg-(--background)/95 text-(--text) backdrop-blur-xl border border-(--border)/20 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)] text-xs w-max max-w-[380px] sm:max-w-[460px] text-center text-balance leading-relaxed ${contentClassName}`}
+								>
+									{content}
+									{effectivePos === 'top' ? (
+										<div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 rotate-45 bg-(--background)/95 border-r border-b border-(--border)/20" />
+									) : (
+										<div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-1 w-2 h-2 rotate-45 bg-(--background)/95 border-l border-t border-(--border)/20" />
+									)}
+								</div>
+							</motion.div>
+						)}
+					</AnimatePresence>,
+					document.body
 				)}
-			</AnimatePresence>
 		</div>
 	);
 }

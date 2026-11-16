@@ -371,11 +371,16 @@ export function DesktopInteractivePreview() {
 						</div>
 
 						{/* Overlay Owned Bots Status Ticker */}
-						<div className="flex items-center gap-1.5 pt-0.5">
+						<div className="flex flex-wrap items-center gap-1.5 pt-0.5">
 							<span className="inline-flex items-center gap-1 rounded-full bg-(--foreground)/40 border border-(--border)/10 px-2 py-0.5 text-[10px] font-bold text-(--text)">
 								<span className="h-1.5 w-1.5 rounded-full bg-(--accent-green) animate-pulse" />
 								<span>Virtue</span>
 								<span className="font-mono text-[9px] text-(--accent)">1.2k</span>
+							</span>
+							<span className="inline-flex items-center gap-1 rounded-full bg-(--foreground)/40 border border-(--border)/10 px-2 py-0.5 text-[10px] font-bold text-(--text)">
+								<span className="h-1.5 w-1.5 rounded-full bg-(--accent-green) animate-pulse" />
+								<span>YourApps</span>
+								<span className="font-mono text-[9px] text-(--accent)">380</span>
 							</span>
 							<span className="inline-flex items-center gap-1 rounded-full bg-(--foreground)/40 border border-(--border)/10 px-2 py-0.5 text-[10px] font-bold text-(--text)">
 								<span className="h-1.5 w-1.5 rounded-full bg-(--accent-green) animate-pulse" />

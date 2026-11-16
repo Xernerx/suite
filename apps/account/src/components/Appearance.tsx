@@ -1,8 +1,6 @@
 /** @format */
 'use client';
 
-import { EyeOff, Laptop, Moon, RotateCcw, Sun } from 'lucide-react';
-import { Button, Selector, Toggle } from '@xernerx/ui';
 import {
 	useDictionary,
 	useEnvironment,
@@ -24,42 +22,9 @@ import { DotMatrixSettingsCard } from './DotMatrixSettingsCard';
 import { AmbientAndSurfaceCard } from './AmbientAndSurfaceCard';
 import { AppearanceScalingCards } from './AppearanceScalingCards';
 import { AppearanceAccentPicker, PRESET_COLORS } from './AppearanceAccentPicker';
-
-function setThemeVar(name: string, value: string) {
-	if (typeof document === 'undefined') return;
-	document.documentElement.style.setProperty(name, value);
-	if (document.body) {
-		document.body.style.setProperty(name, value);
-	}
-}
-
-function getPref(key: string): string | null {
-	if (typeof window === 'undefined') return null;
-	try {
-		const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
-		if (match) return match[2];
-	} catch {}
-	try {
-		return localStorage.getItem(key);
-	} catch {}
-	return null;
-}
-
-function setPref(key: string, value: string) {
-	if (typeof window === 'undefined') return;
-	try {
-		const domain = process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com';
-		if (window.location.hostname.endsWith(domain)) {
-			document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-			document.cookie = `${key}=${value}; domain=.${domain}; path=/; max-age=31536000; SameSite=Lax`;
-		} else {
-			document.cookie = `${key}=${value}; path=/; max-age=31536000; SameSite=Lax`;
-		}
-	} catch {}
-	try {
-		localStorage.setItem(key, value);
-	} catch {}
-}
+import { getPref, parseStoredPageWidth, setPref, setThemeVar } from './appearance/appearanceStorage';
+import { AppearanceHeader, AppearanceThemeCard } from './appearance/AppearanceThemeCard';
+import { AppearanceSyncCards } from './appearance/AppearanceSyncCards';
 
 export default function Appearance() {
 	const { data: session } = useSession();
@@ -79,12 +44,8 @@ export default function Appearance() {
 	const cursorFx: CursorFxType = uiPreferences?.cursorFx || 'default';
 	const overlaySkin: OverlaySkinType = uiPreferences?.overlaySkin || 'default';
 
-	const [clientSync, setClientSync] = useState<boolean>(() => {
-		return getPref('clientSync') === 'true';
-	});
-	const [syncFromDiscord, setSyncFromDiscord] = useState<boolean>(() => {
-		return getPref('syncFromDiscord') !== 'false';
-	});
+	const [clientSync, setClientSync] = useState<boolean>(() => getPref('clientSync') === 'true');
+	const [syncFromDiscord, setSyncFromDiscord] = useState<boolean>(() => getPref('syncFromDiscord') !== 'false');
 
 	const [selectedColor, setSelectedColor] = useState<string>('#8b7cf6');
 	const [selectedTheme, setSelectedTheme] = useState<string>('system');
@@ -93,23 +54,6 @@ export default function Appearance() {
 	const [uiGap, setUiGap] = useState<string>('16');
 	const [pageWidth, setPageWidth] = useState<number>(90);
 	const [textScale, setTextScale] = useState<number>(14);
-
-	const parseStoredPageWidth = (raw: string | null): number => {
-		if (!raw) return 90;
-		const legacyMap: Record<string, number> = {
-			compact: 75,
-			default: 90,
-			wide: 95,
-			full: 100,
-		};
-		const trimmed = raw.trim().toLowerCase();
-		if (trimmed in legacyMap) return legacyMap[trimmed];
-		const parsed = parseInt(trimmed.replace('%', ''), 10);
-		if (!isNaN(parsed)) {
-			return Math.min(100, Math.max(60, Math.round(parsed / 5) * 5));
-		}
-		return 90;
-	};
 
 	useEffect(() => {
 		(() => {
@@ -279,10 +223,7 @@ export default function Appearance() {
 		setPref('uiGap', val);
 		setThemeVar('--ui-gap', `${val}px`);
 		saveToDb({ uiGap: val });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.density.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.density.title') });
 	};
 
 	const handlePageWidthChange = (val: number) => {
@@ -302,64 +243,43 @@ export default function Appearance() {
 	const handleDotMatrixTypeChange = (nextType: DotMatrixType) => {
 		setPreference('dotMatrixType', nextType);
 		saveToDb({ dotMatrixType: nextType });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.dotMatrixStage.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.dotMatrixStage.title') });
 	};
 
 	const handleDotMatrixRenderStyleChange = (nextStyle: DotMatrixRenderStyle) => {
 		setPreference('dotMatrixRenderStyle', nextStyle);
 		saveToDb({ dotMatrixRenderStyle: nextStyle });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.dotMatrixStage.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.dotMatrixStage.title') });
 	};
 
 	const handleDotMatrixAnimationChange = (nextAnim: DotMatrixAnimation) => {
 		setPreference('dotMatrixAnimation', nextAnim);
 		saveToDb({ dotMatrixAnimation: nextAnim });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.dotMatrixStage.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.dotMatrixStage.title') });
 	};
 
 	const handleAmbientSceneChange = (nextScene: AmbientSceneType) => {
 		setPreference('ambientScene', nextScene);
 		saveToDb({ ambientScene: nextScene });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.ambientScene.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.ambientScene.title') });
 	};
 
 	const handleSurfaceStyleChange = (nextStyle: SurfaceStyleType) => {
 		setPreference('surfaceStyle', nextStyle);
 		saveToDb({ surfaceStyle: nextStyle });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.surfaceStyle.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.surfaceStyle.title') });
 	};
 
 	const handleCursorFxChange = (nextFx: CursorFxType) => {
 		setPreference('cursorFx', nextFx);
 		saveToDb({ cursorFx: nextFx });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.cursorFx.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.cursorFx.title') });
 	};
 
 	const handleOverlaySkinChange = (nextSkin: OverlaySkinType) => {
 		setPreference('overlaySkin', nextSkin);
 		saveToDb({ overlaySkin: nextSkin });
-		toast({
-			type: 'success',
-			title: t('account.appearance.toast.overlaySkin.title'),
-		});
+		toast({ type: 'success', title: t('account.appearance.toast.overlaySkin.title') });
 	};
 
 	const handleResetDefaults = () => {
@@ -416,60 +336,16 @@ export default function Appearance() {
 		toast({ type: 'success', title: t('account.appearance.toast.resetSuccess') });
 	};
 
-	const renderOption = (Icon: any, text: string) => (
-		<div className="flex items-center gap-2.5">
-			<Icon size={16} />
-			<span className="font-medium">{text}</span>
-		</div>
-	);
-
-	const themeOptions = [
-		{ value: 'dark', label: renderOption(Moon, t('account.appearance.theme.options.dark')) },
-		{ value: 'light', label: renderOption(Sun, t('account.appearance.theme.options.light')) },
-		{ value: 'system', label: renderOption(Laptop, t('account.appearance.theme.options.system')) },
-	];
-
 	return (
 		<div
 			className={`flex flex-col max-w-(--page-width) mx-auto w-full transition-opacity duration-300 ${isUiHidden ? 'opacity-0 pointer-events-none select-none' : 'opacity-100'}`}
 			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 		>
-			<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
-				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-					<h1 className="text-4xl font-extrabold tracking-tight text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{t('account.appearance.title')}
-					</h1>
-					<p className="text-sm text-(--text-muted)">{t('account.appearance.description')}</p>
-				</div>
-
-				<div className="flex flex-wrap items-center gap-2 shrink-0">
-					<Button variant="secondary" onClick={() => setIsUiHidden(true)} className="flex items-center gap-2">
-						<EyeOff size={15} />
-						{t('account.appearance.hideUi')}
-					</Button>
-					<Button variant="secondary" onClick={handleResetDefaults} className="flex items-center gap-2">
-						<RotateCcw size={15} />
-						{t('account.appearance.resetDefaults')}
-					</Button>
-				</div>
-			</div>
+			<AppearanceHeader onHideUi={() => setIsUiHidden(true)} onResetDefaults={handleResetDefaults} />
 
 			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-				{/* Theme Selector Card */}
-				<div
-					className="relative z-50 flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.theme.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.theme.description')}</p>
-					</div>
-					<div className="w-full sm:w-auto">
-						<Selector value={selectedTheme} options={themeOptions} onChange={handleThemeChange} />
-					</div>
-				</div>
+				<AppearanceThemeCard selectedTheme={selectedTheme} onThemeChange={handleThemeChange} />
 
-				{/* Dot-Matrix Background Stage & Animation Card */}
 				<DotMatrixSettingsCard
 					dotMatrixType={dotMatrixType}
 					dotMatrixRenderStyle={dotMatrixRenderStyle}
@@ -481,7 +357,6 @@ export default function Appearance() {
 					onToggleHideUi={toggleContentHidden}
 				/>
 
-				{/* Standalone Full-Screen Ambient Shaders, Card Surfaces, Cursor FX & Overlay Skins */}
 				<AmbientAndSurfaceCard
 					ambientScene={ambientScene}
 					surfaceStyle={surfaceStyle}
@@ -494,31 +369,8 @@ export default function Appearance() {
 					onToggleHideUi={toggleContentHidden}
 				/>
 
-				{/* Sync Accent with Clients */}
-				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.clientSync.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.clientSync.description')}</p>
-					</div>
-					<Toggle checked={clientSync} onChange={handleToggleClientSync} suppressHydrationWarning />
-				</div>
+				<AppearanceSyncCards clientSync={clientSync} onToggleClientSync={handleToggleClientSync} syncFromDiscord={syncFromDiscord} onToggleDiscordSync={handleToggleSync} />
 
-				{/* Sync Accent with Discord */}
-				<div
-					className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm"
-					style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-				>
-					<div className="flex flex-col max-w-xl" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
-						<h2 className="text-base font-semibold text-(--text)">{t('account.appearance.discordSync.title')}</h2>
-						<p className="text-xs text-(--text-muted)">{t('account.appearance.discordSync.description')}</p>
-					</div>
-					<Toggle checked={syncFromDiscord} onChange={handleToggleSync} suppressHydrationWarning />
-				</div>
-
-				{/* Accent Color Picker */}
 				<AppearanceAccentPicker selectedColor={selectedColor} syncFromDiscord={syncFromDiscord} onSelectColor={handleSelectColor} />
 
 				<AppearanceScalingCards

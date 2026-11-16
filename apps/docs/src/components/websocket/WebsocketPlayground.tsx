@@ -3,102 +3,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Activity, CheckCircle2, Clock, Code2, Copy, Key, Play, Radio, RotateCcw, Sparkles, Terminal, Zap } from 'lucide-react';
-import { Button, CodeBlock, Input, Selector } from '@xernerx/ui';
+import { CheckCircle2, Clock, Code2, Copy, Key, Play, RotateCcw, Sparkles, Terminal, Zap } from 'lucide-react';
+import { Button, Input, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-
-interface PresetAction {
-	id: string;
-	label: string;
-	service: 'xernerx' | 'virtue';
-	method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
-	action: string;
-	body: Record<string, any>;
-}
-
-const PRESET_ACTIONS: PresetAction[] = [
-	{ id: 'ping', label: 'ping', service: 'xernerx', method: 'GET', action: 'ping', body: { echo: 'heartbeat' } },
-	{ id: 'stats', label: 'stats', service: 'xernerx', method: 'POST', action: 'bots', body: { id: '102938475612345678', guildCount: 420, shardCount: 2, userCount: 84500 } },
-	{ id: 'guilds', label: 'guilds', service: 'virtue', method: 'GET', action: 'guilds', body: { id: '102938475612345678' } },
-	{ id: 'levels', label: 'levels', service: 'xernerx', method: 'GET', action: 'levels', body: { ownerId: '482513687417061376' } },
-	{ id: 'users', label: 'users', service: 'xernerx', method: 'GET', action: 'users', body: { id: '482513687417061376' } },
-	{ id: 'credits', label: 'credits', service: 'xernerx', method: 'PATCH', action: 'credits', body: { ownerId: '482513687417061376', streak: 7 } },
-];
-
-function buildSimulatedResponse(reqId: string, service: string, method: string, action: string, parsedBody: Record<string, any>) {
-	const nowIso = new Date().toISOString();
-
-	if (action === 'ping') {
-		return {
-			id: reqId,
-			ok: true,
-			status: 200,
-			service,
-			action: 'ping',
-			pong: true,
-			echo: parsedBody.echo || 'heartbeat',
-			timestamp: nowIso,
-		};
-	}
-
-	if (service === 'virtue' && action === 'guilds') {
-		return {
-			id: reqId,
-			_id: '64e0a7bc9e1234567890abcd',
-			id_guild: parsedBody.id || '102938475612345678',
-			mode: parsedBody.mode || 'default',
-			levelUp: parsedBody.levelUp ?? true,
-			levelMessage: parsedBody.levelMessage || 'GG [@mention], you advanced to level [@level]!',
-			cycles: { daily: true, weekly: true, monthly: false },
-			updatedAt: nowIso,
-		};
-	}
-
-	if (action === 'levels' || action === 'globalLevel') {
-		return {
-			id: reqId,
-			ownerId: parsedBody.ownerId || parsedBody.id || '482513687417061376',
-			level: 24,
-			xp: 18450,
-			nextLevelXp: 20000,
-			updatedAt: nowIso,
-		};
-	}
-
-	if (action === 'credits') {
-		return {
-			id: reqId,
-			ownerId: parsedBody.ownerId || parsedBody.id || '482513687417061376',
-			balance: 4250,
-			streak: parsedBody.streak ?? 7,
-			updatedAt: nowIso,
-		};
-	}
-
-	if (action === 'bots' || action === 'stats') {
-		return {
-			id: reqId,
-			botId: parsedBody.id || '102938475612345678',
-			guildCount: parsedBody.guildCount ?? 420,
-			shardCount: parsedBody.shardCount ?? 2,
-			userCount: parsedBody.userCount ?? 84500,
-			syncedAt: nowIso,
-		};
-	}
-
-	return {
-		id: reqId,
-		ok: true,
-		service,
-		method,
-		action: action || 'default',
-		data: {
-			...parsedBody,
-			_simulated: true,
-			processedAt: nowIso,
-		},
-	};
-}
+import { buildSimulatedResponse, PRESET_ACTIONS, type PresetAction, type WebsocketDispatchHistoryItem } from './websocketPlaygroundPresets';
+import { WebsocketPlaygroundResponsePanel } from './WebsocketPlaygroundResponsePanel';
 
 export function WebsocketPlayground() {
 	const { t } = useDictionary();
@@ -116,9 +25,7 @@ export function WebsocketPlayground() {
 	const [latencyMs, setLatencyMs] = useState<number | null>(null);
 	const [responseJson, setResponseJson] = useState<string>('');
 	const [lastRequestJson, setLastRequestJson] = useState<string>('');
-	const [history, setHistory] = useState<{ id: string; service: string; method: string; action: string; bodyText: string; responseJson: string; latencyMs: number; mode: 'live' | 'simulated' }[]>(
-		[]
-	);
+	const [history, setHistory] = useState<WebsocketDispatchHistoryItem[]>([]);
 
 	const handleFormatJson = () => {
 		try {
@@ -433,82 +340,25 @@ export function WebsocketPlayground() {
 				</div>
 
 				{/* Right Column: Live Frame & Formatted JSON Response */}
-				<div className="lg:col-span-6 flex flex-col gap-4">
-					<div className="flex flex-col gap-1.5">
-						<div className="flex items-center justify-between">
-							<span className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">
-								{responseJson ? t('docs.websocket.playground.responseHeading') : t('docs.websocket.playground.framePreviewHeading')}
-							</span>
-							<span className="inline-flex items-center gap-1 text-[11px] font-mono text-(--accent)">
-								<Radio size={12} />
-								wss://ws.xernerx.com
-							</span>
-						</div>
-
-						<div className="rounded-2xl overflow-hidden border border-(--border)/10 bg-(--background)/50 text-sm">
-							<CodeBlock
-								key={responseJson ? `res-${latencyMs}` : `req-${service}-${method}-${action}`}
-								tabs={
-									responseJson
-										? [
-												{
-													label: t('docs.websocket.playground.responseTab'),
-													language: 'json',
-													code: responseJson,
-												},
-												{
-													label: t('docs.websocket.playground.requestTab'),
-													language: 'json',
-													code: lastRequestJson || previewRequestFrame,
-												},
-											]
-										: [
-												{
-													label: t('docs.websocket.playground.requestTab'),
-													language: 'json',
-													code: previewRequestFrame,
-												},
-											]
-								}
-							/>
-						</div>
-					</div>
-
-					{history.length > 0 && (
-						<div className="flex flex-col gap-1.5">
-							<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted)">{t('docs.websocket.playground.recentDispatches')}</span>
-							<div className="flex flex-wrap items-center gap-1.5">
-								{history.map((h) => (
-									<button
-										key={h.id}
-										type="button"
-										onClick={() => {
-											setService(h.service);
-											setMethod(h.method);
-											setAction(h.action);
-											setBodyText(h.bodyText);
-											setResponseJson(h.responseJson);
-											setLatencyMs(h.latencyMs);
-											setLastMode(h.mode);
-										}}
-										className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-(--background)/60 hover:bg-(--accent)/15 text-(--text) border border-(--border)/10 hover:border-(--accent)/30 transition-colors cursor-pointer"
-									>
-										<span className="font-bold text-(--accent)">{h.method}</span>
-										<span>
-											{h.service}/{h.action || 'default'}
-										</span>
-										<span className="text-(--text-muted)">({h.latencyMs}ms)</span>
-									</button>
-								))}
-							</div>
-						</div>
-					)}
-
-					<div className="p-3.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 flex items-start gap-2.5">
-						<Activity size={16} className="text-(--accent) shrink-0 mt-0.5" />
-						<p className="text-xs text-(--text-muted) leading-relaxed">{t('docs.websocket.playground.helperNote')}</p>
-					</div>
-				</div>
+				<WebsocketPlaygroundResponsePanel
+					service={service}
+					method={method}
+					action={action}
+					latencyMs={latencyMs}
+					responseJson={responseJson}
+					lastRequestJson={lastRequestJson}
+					previewRequestFrame={previewRequestFrame}
+					history={history}
+					onSelectHistoryItem={(h) => {
+						setService(h.service);
+						setMethod(h.method);
+						setAction(h.action);
+						setBodyText(h.bodyText);
+						setResponseJson(h.responseJson);
+						setLatencyMs(h.latencyMs);
+						setLastMode(h.mode);
+					}}
+				/>
 			</div>
 		</motion.section>
 	);

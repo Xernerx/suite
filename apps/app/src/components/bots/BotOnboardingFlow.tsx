@@ -53,7 +53,8 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 	const resolvedBotId = String(bot?.id || id);
 	const botSlugLower = String(bot?.vanitySlug || id).toLowerCase();
 	const isVirtue = useMemo(() => resolvedBotId === '1484880634844287138' || botSlugLower === 'virtue', [resolvedBotId, botSlugLower]);
-	const hasDashboard = useMemo(() => Boolean(isVirtue || bot?.hasSuiteDashboard || bot?.links?.dashboard), [isVirtue, bot?.hasSuiteDashboard, bot?.links?.dashboard]);
+	const isYourApps = useMemo(() => resolvedBotId === '619328560141697036' || resolvedBotId === '877221257161109574' || botSlugLower === 'yourapps', [resolvedBotId, botSlugLower]);
+	const hasDashboard = useMemo(() => Boolean(isVirtue || isYourApps || bot?.hasSuiteDashboard || bot?.links?.dashboard), [isVirtue, isYourApps, bot?.hasSuiteDashboard, bot?.links?.dashboard]);
 
 	const [localOnboarded, setLocalOnboarded] = useState<string[]>(() => readLocalOnboardedBots());
 	const [isIntroPlaying, setIsIntroPlaying] = useState<boolean>(true);
@@ -202,10 +203,11 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 		await persistOnboardingCompletion();
 		if (target === 'dashboard') {
 			const targetGuild = selectedGuildId || initialGuildId || '';
-			if (isVirtue || bot?.hasSuiteDashboard || !bot?.links?.dashboard) {
+			if (isVirtue || isYourApps || bot?.hasSuiteDashboard || !bot?.links?.dashboard) {
 				const query = new URLSearchParams();
 				if (targetGuild) query.set('guild', targetGuild);
 				if (isVirtue) query.set('tab', 'virtue');
+				else if (isYourApps) query.set('tab', 'applications');
 				if (withDashboardTour) query.set('xrx_bot_tour', botDisplayName);
 				router.push(`/dashboard?${query.toString()}`);
 				return;

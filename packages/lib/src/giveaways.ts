@@ -31,6 +31,34 @@ export interface GiveawayEligibilityResult {
 }
 
 const BUNDLE_CHILD_UNLOCKS: Record<string, string[]> = {
+	dot_matrix_banner: [
+		'dot_matrix_orbit',
+		'dot_matrix_vortex',
+		'dot_matrix_helix',
+		'dot_matrix_prism',
+		'dot_matrix_infinity',
+		'dot_matrix_wavegrid',
+		'dot_matrix_chronos',
+		'dot_matrix_supernova',
+		'dot_matrix_tesseract',
+		'dot_matrix_synthwave',
+		'dot_matrix_lotus',
+	],
+	stage_styles_pack: [
+		'stage_constellation',
+		'stage_hexgrid',
+		'stage_aurora',
+		'stage_glyphs',
+		'dot_matrix_chronos',
+		'dot_matrix_supernova',
+		'dot_matrix_tesseract',
+		'dot_matrix_synthwave',
+		'dot_matrix_lotus',
+	],
+	stage_constellation: ['dot_matrix_chronos', 'dot_matrix_supernova'],
+	stage_hexgrid: ['dot_matrix_tesseract'],
+	stage_aurora: ['dot_matrix_synthwave'],
+	stage_glyphs: ['dot_matrix_lotus'],
 	ambient_scenes_pack: ['ambient_mesh_lava', 'ambient_cyber_grid', 'ambient_topography', 'ambient_nebula_cosmos', 'ambient_prism_caustics'],
 	surface_styles_pack: ['surface_crystal', 'surface_holographic', 'surface_neon', 'surface_obsidian'],
 	profile_frames_pack: ['frame_plasma_ring', 'frame_holo_crown', 'frame_cyber_hex', 'frame_solar_flare'],
@@ -679,7 +707,7 @@ export async function fulfillGiveawayWinner(giveaway: any, winnerUserId: string)
 						if (BUNDLE_CHILD_UNLOCKS[badgeId]) {
 							for (const childId of BUNDLE_CHILD_UNLOCKS[badgeId]) badgesToUnlock.add(childId);
 						}
-						if (item.perkType === 'vanity_badge') badgesToActivate.add(badgeId);
+						if (item.perkType === 'vanity_badge' || badgeId === 'dot_matrix_banner') badgesToActivate.add(badgeId);
 					}
 
 					await CreditModel.updateOne(

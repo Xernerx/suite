@@ -233,6 +233,7 @@ export function syncFeatureShortcuts(
 	meta: Metadata,
 	opts: {
 		getWin: () => BrowserWindow | undefined;
+		getMeta?: () => Metadata;
 		onQuickCapture: (sourceType: 'screen' | 'clipboard') => void;
 	}
 ) {
@@ -240,6 +241,12 @@ export function syncFeatureShortcuts(
 		globalShortcut.unregister('CommandOrControl+Shift+Space');
 		if (meta.globalQuickLauncher === true) {
 			globalShortcut.register('CommandOrControl+Shift+Space', () => {
+				if (opts.getMeta && opts.getMeta().globalQuickLauncher !== true) {
+					try {
+						globalShortcut.unregister('CommandOrControl+Shift+Space');
+					} catch {}
+					return;
+				}
 				const win = opts.getWin();
 				if (!win || win.isDestroyed()) return;
 				if (win.isMinimized()) win.restore();
@@ -254,6 +261,12 @@ export function syncFeatureShortcuts(
 		globalShortcut.unregister('CommandOrControl+Shift+S');
 		if (meta.quickCaptureHotkey === true) {
 			globalShortcut.register('CommandOrControl+Shift+S', () => {
+				if (opts.getMeta && opts.getMeta().quickCaptureHotkey !== true) {
+					try {
+						globalShortcut.unregister('CommandOrControl+Shift+S');
+					} catch {}
+					return;
+				}
 				opts.onQuickCapture('screen');
 			});
 		}

@@ -16,7 +16,7 @@ import { WebsocketClientSection } from '@/components/websocket/WebsocketClientSe
 import { WebsocketPlayground } from '@/components/websocket/WebsocketPlayground';
 import { useDocsAccess } from '@/components/useDocsAccess';
 
-const WS_SERVICES = ['ALL', 'virtue', 'xernerx', 'planned'] as const;
+const WS_SERVICES = ['ALL', 'virtue', 'yourapps', 'xernerx', 'planned'] as const;
 
 const HASH_TO_VIEW: Record<string, string> = {
 	overview: 'overview',
