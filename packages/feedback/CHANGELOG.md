@@ -2,6 +2,21 @@
 
 # @xernerx/feedback
 
+## 0.6.2
+
+### Patch Changes
+
+- ## Spiral Construct Mode in XernerxDotLogo
+  
+  Added spiral particle construction choreography support to XernerxDotLogo for onboarding transitions.
+  
+  ### Added
+  
+  - **Spiral Construct Animation**: Supported custom spiral construct event payloads in XernerxDotLogo background mode.
+- Updated dependencies
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 0.6.1
 
 ### Patch Changes

@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Database, Globe, Layers } from 'lucide-react';
+import { ClipboardCheck, Database, Globe, Layers } from 'lucide-react';
 import { CodeBlock } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 
@@ -23,6 +23,14 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 		{ action: 'voice', db: 'virtue', dbClass: 'text-(--accent-orange)', filter: '{ id, guild }', desc: t('docs.websocket.services.virtue.voiceDesc'), html: false },
 	];
 
+	const yourappsActions = [
+		{ action: 'profiles', db: 'guilds', filter: '{ id }', desc: t('docs.websocket.services.yourapps.profilesDesc') },
+		{ action: 'forms', db: 'guilds', filter: '{ id, guild } or { guild, state }', desc: t('docs.websocket.services.yourapps.formsDesc') },
+		{ action: 'submissions', db: 'guilds', filter: '{ id, guild } or { guild, status, userId }', desc: t('docs.websocket.services.yourapps.submissionsDesc') },
+		{ action: 'drafts', db: 'guilds', filter: '{ guild, userId, positionId }', desc: t('docs.websocket.services.yourapps.draftsDesc') },
+		{ action: 'stats', db: 'guilds', filter: '{ guild }', desc: t('docs.websocket.services.yourapps.statsDesc') },
+	];
+
 	const xernerxActions = [
 		{ action: 'users', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.usersDesc') },
 		{ action: 'levels', db: 'xernerx', filter: '{ id } or { ownerId }', desc: t('docs.websocket.services.xernerx.levelsDesc') },
@@ -36,9 +44,11 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 	];
 
 	const filteredVirtue = virtueActions.filter((a) => !q || 'virtue'.includes(q) || a.action.toLowerCase().includes(q) || a.db.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));
+	const filteredYourapps = yourappsActions.filter((a) => !q || 'yourapps'.includes(q) || a.action.toLowerCase().includes(q) || a.db.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));
 	const filteredXernerx = xernerxActions.filter((a) => !q || 'xernerx'.includes(q) || a.action.toLowerCase().includes(q) || a.db.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));
 
 	const showVirtue = (serviceFilter === 'ALL' || serviceFilter === 'virtue') && filteredVirtue.length > 0;
+	const showYourapps = (serviceFilter === 'ALL' || serviceFilter === 'yourapps') && filteredYourapps.length > 0;
 	const showXernerx = (serviceFilter === 'ALL' || serviceFilter === 'xernerx') && filteredXernerx.length > 0;
 	const showPlanned =
 		(serviceFilter === 'ALL' || serviceFilter === 'planned') &&
@@ -114,6 +124,75 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 											label: 'Response',
 											language: 'json',
 											code: `{\n  "id": "req-guild-update",\n  "_id": "64e0a7bc9e1234567890abcd",\n  "id": "102938475612345678",\n  "mode": "extreme",\n  "cycles": {\n    "daily": false,\n    "weekly": false,\n    "monthly": false\n  },\n  "roles": {\n    "ignored": [],\n    "tracked": []\n  },\n  "levelUp": true,\n  "levelMessage": "Congratulations [@mention]! You reached level [@level]!",\n  "levelChannel": null,\n  "autoDelete": 0,\n  "createdAt": "2026-08-15T12:00:00.000Z",\n  "updatedAt": "2026-09-13T09:30:00.000Z"\n}`,
+										},
+									]}
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* YOURAPPS SERVICE */}
+			{showYourapps && (
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden">
+					<div className="flex items-center justify-between gap-3 bg-(--background)/40 border-b border-(--border)/10" style={{ padding: 'var(--ui-gap)' }}>
+						<div className="flex items-center gap-3">
+							<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30">
+								<ClipboardCheck size={20} />
+							</div>
+							<div>
+								<div className="flex items-center gap-2">
+									<h3 className="font-bold text-lg text-(--text) font-mono">service: &quot;yourapps&quot;</h3>
+									<span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/30 rounded-full">
+										{t('docs.websocket.services.activeBadge')}
+									</span>
+								</div>
+								<p className="text-xs text-(--text-muted) mt-0.5">{t('docs.websocket.services.actionsCount', { count: filteredYourapps.length })}</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="space-y-6" style={{ padding: 'var(--ui-gap)' }}>
+						<p className="text-xs sm:text-sm text-(--text-muted) leading-relaxed" dangerouslySetInnerHTML={{ __html: t('docs.websocket.services.yourapps.description') }} />
+
+						<div className="overflow-x-auto rounded-2xl border border-(--border)/10 bg-(--background)/50 p-4">
+							<table className="w-full text-left text-sm border-collapse">
+								<thead>
+									<tr className="border-b border-(--border)/10 text-(--text-muted)">
+										<th className="pb-2 font-medium">{t('docs.websocket.services.table.action')}</th>
+										<th className="pb-2 font-medium">{t('docs.websocket.services.table.database')}</th>
+										<th className="pb-2 font-medium">{t('docs.websocket.services.table.filterKeys')}</th>
+										<th className="pb-2 font-medium">{t('docs.websocket.services.table.description')}</th>
+									</tr>
+								</thead>
+								<tbody className="text-(--text)">
+									{filteredYourapps.map((row, idx) => (
+										<tr key={row.action} className={idx < filteredYourapps.length - 1 ? 'border-b border-(--border)/5' : ''}>
+											<td className="py-3 font-mono font-bold text-(--accent)">{row.action}</td>
+											<td className="py-3 font-mono text-xs font-bold text-(--accent)">{row.db}</td>
+											<td className="py-3 font-mono text-xs text-(--text-muted)">{row.filter}</td>
+											<td className="py-3 text-(--text-muted)">{row.desc}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+
+						<div>
+							<h4 className="text-sm font-bold text-(--text) mb-3">{t('docs.websocket.services.yourapps.exampleTitle')}</h4>
+							<div className="rounded-2xl overflow-hidden border border-(--border)/10 text-sm">
+								<CodeBlock
+									tabs={[
+										{
+											label: 'Request',
+											language: 'json',
+											code: `{\n  "id": 1,\n  "service": "yourapps",\n  "method": "GET",\n  "action": "forms",\n  "body": {\n    "guild": "784094726432489522",\n    "state": "open"\n  }\n}`,
+										},
+										{
+											label: 'Response',
+											language: 'json',
+											code: `{\n  "id": 1,\n  "items": [\n    {\n      "id": "pos_9f8a7b6c",\n      "guild": "784094726432489522",\n      "name": "Moderator",\n      "state": "open",\n      "questions": [\n        { "id": "q_1", "question": "Why would you like to join?", "type": "paragraph", "required": true }\n      ]\n    }\n  ],\n  "total": 1\n}`,
 										},
 									]}
 								/>

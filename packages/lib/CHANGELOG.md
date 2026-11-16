@@ -2,6 +2,23 @@
 
 # @xernerx/lib
 
+## 1.27.0
+
+### Minor Changes
+
+- ## YourApps Mongoose Models, Shared FAQ Blueprints & Localization Dictionary Sync
+  
+  Added the yourapps database connection and Mongoose schemas, centralized FAQ blueprints in @xernerx/lib, and updated en-GB.json localization keys.
+  
+  ### Added
+  
+  - **YourApps Database & Schemas**: Registered the yourapps database cluster and Mongoose models (YourAppsProfile, YourAppsForm, YourAppsSubmission, YourAppsDraft).
+  - **Shared FAQ Blueprints**: Exported FAQ_BLUEPRINTS and FAQ_SUBDOMAINS_CATALOG directly from @xernerx/lib for shared API, web, and bot consumption.
+  
+  ### Changed
+  
+  - **Localization Dictionaries**: Added Server Applications, policy, onboarding, and common action keys in en-GB.json and pruned modified keys across secondary locales.
+
 ## 1.26.0
 
 ### Minor Changes

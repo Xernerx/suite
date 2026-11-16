@@ -5,9 +5,9 @@ Copyright (c) 2022-2026 Xernerx Studios. All rights reserved.
 
 This software, source code, documentation, visual design system, and associated
 services (collectively, the "Software"), including the Xernerx Suite, Virtue,
-Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog,
-Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile Clients, are the
-proprietary property of Xernerx Studios ("Licensor").
+YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot,
+Xernerx Blog, Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile
+Clients, are the proprietary property of Xernerx Studios ("Licensor").
 
 1. GRANT OF LIMITED SAAS & CLIENT ACCESS
    Subject to your continuous compliance with this License and the Xernerx
@@ -42,9 +42,9 @@ proprietary property of Xernerx Studios ("Licensor").
    This License grants no rights whatsoever to use the trade names, trademarks,
    service marks, logos, mascot artwork, domain names, or branding assets of
    Xernerx Studios—including "Xernerx", "Xernerx Studios", "Xernerx Suite",
-   "Virtue", "Metamorphosis", "Zodiac", "To-Do List Bot", and all static media
-   in `packages/public`. All goodwill generated from the use of Xernerx Studios
-   marks inures exclusively to Xernerx Studios.
+   "Virtue", "YourApps", "Metamorphosis", "Zodiac", "To-Do List Bot", and all
+   static media in `packages/public`. All goodwill generated from the use of
+   Xernerx Studios marks inures exclusively to Xernerx Studios.
 
 4. CONTRIBUTOR LICENSE GRANT (CLA)
    By submitting any pull request, code, localization dictionary translation,

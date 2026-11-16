@@ -34,26 +34,26 @@ export async function buildFaqOverviewMessage(client: Client, tab: FaqCategoryTa
 	if (tab === 'overview') {
 		embed.addFields([
 			{
-				name: '🛡️ Platform & Identity',
-				value: '• [Ecosystem & Navigation](https://info.xernerx.com/faq?category=overview)\n• [Account & Security](https://info.xernerx.com/faq?category=account)\n• [Billing & Store](https://info.xernerx.com/faq?category=billing)\n• [Desktop & Overlay](https://info.xernerx.com/faq?category=desktop)',
+				name: '🛡️ Platform & Account',
+				value: '• [Ecosystem](https://info.xernerx.com/faq?category=overview) • [Environments](https://info.xernerx.com/faq?category=environments)\n• [Feedback](https://info.xernerx.com/faq?category=feedback) • [Desktop](https://info.xernerx.com/faq?category=desktop)\n• [Security](https://info.xernerx.com/faq?category=account) • [Profiles](https://info.xernerx.com/faq?category=profiles)\n• [Preferences](https://info.xernerx.com/faq?category=preferences) • [Privacy](https://info.xernerx.com/faq?category=privacy)',
 				inline: true,
 			},
 			{
-				name: '⚙️ Developer Ecosystem',
-				value: '• [Bots & Directory](https://info.xernerx.com/faq?category=bots)\n• [API & Developers](https://info.xernerx.com/faq?category=developers)\n• [Environments & Status](https://info.xernerx.com/faq?category=environments)',
+				name: '💬 Community & Billing',
+				value: '• [Bots](https://info.xernerx.com/faq?category=bots) • [Servers](https://info.xernerx.com/faq?category=servers)\n• [Virtue](https://info.xernerx.com/faq?category=virtue) • [Leaderboards](https://info.xernerx.com/faq?category=leaderboards)\n• [Organizations](https://info.xernerx.com/faq?category=organizations)\n• [Subscriptions](https://info.xernerx.com/faq?category=billing) • [Credits](https://info.xernerx.com/faq?category=credits) • [Media CDN](https://info.xernerx.com/faq?category=cdn)',
 				inline: true,
 			},
 			{
-				name: '💬 Community & Localization',
-				value: '• [Servers & Organizations](https://info.xernerx.com/faq?category=servers)\n• [Translations](https://info.xernerx.com/faq?category=translations)',
+				name: '⚙️ Developers',
+				value: '• [REST API](https://info.xernerx.com/faq?category=developers) • [Webhooks](https://info.xernerx.com/faq?category=webhooks) • [Packages](https://info.xernerx.com/faq?category=packages) • [Translations](https://info.xernerx.com/faq?category=translations)',
 				inline: false,
 			},
 		]);
 	} else {
 		const categoryMap: Record<Exclude<FaqCategoryTab, 'overview'>, string[]> = {
-			platform: ['account', 'billing', 'desktop'],
-			developers: ['bots', 'developers', 'environments'],
-			community: ['overview', 'servers', 'translations'],
+			platform: ['account', 'profiles', 'preferences', 'privacy', 'billing', 'credits', 'cdn', 'desktop'],
+			developers: ['bots', 'developers', 'webhooks', 'packages', 'environments'],
+			community: ['overview', 'feedback', 'servers', 'virtue', 'leaderboards', 'organizations', 'translations'],
 		};
 		const matching = allItems.filter((item) => categoryMap[tab].some((k) => item.categoryId.toLowerCase() === k || item.categoryTitle.toLowerCase().includes(k)));
 		const displayItems = (matching.length > 0 ? matching : allItems).slice(0, 8);

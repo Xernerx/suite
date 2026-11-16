@@ -2,6 +2,18 @@
 
 # @xernerx/desktop
 
+## 2.6.4
+
+### Patch Changes
+
+- ## Synchronized Desktop Shortcut Metadata & Preferences
+  
+  Refined local metadata persistence and global shortcut synchronization in the Xernerx Desktop companion app.
+  
+  ### Changed
+  
+  - **Metadata & Shortcut Sync**: Improved local preferences normalization and live feature shortcut registration across desktop windows.
+
 ## 2.6.3
 
 ### Patch Changes

@@ -2,6 +2,25 @@
 
 # admin
 
+## 0.30.1
+
+### Patch Changes
+
+- ## Store Perk Unlock Controls & Modularized Admin Portal Views
+  
+  Updated Admin Store item perk mapping and User Economy unlocks, and modularized Giveaways, Overview, Users, Virtue, and SEO Analyzer components.
+  
+  ### Changed
+  
+  - **Store & User Economy Perk Controls**: Synced individual Dot-Matrix formation unlock IDs in ItemModal and UserEconomyPerksTab.
+  - **Modularized Admin Views**: Extracted sub-components and form hooks across GiveawayModal, Giveaways, Overview, SeoAnalyzerReportModal, UserModal, and VirtueAdmin.
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 0.30.0
 
 ### Minor Changes

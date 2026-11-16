@@ -21,7 +21,7 @@ const VANITY_BADGE_IDS = [
 
 const ACHIEVEMENT_IDS = ['streak_7', 'streak_30', 'streak_100', 'voter_10', 'voter_50', 'ecosystem_builder'] as const;
 
-const DOT_MATRIX_VARIANTS = ['orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'full', 'icon'] as const;
+const DOT_MATRIX_VARIANTS = ['orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'chronos', 'supernova', 'tesseract', 'synthwave', 'lotus', 'full', 'icon'] as const;
 
 interface UserEconomyPerksTabProps {
 	credits: number;

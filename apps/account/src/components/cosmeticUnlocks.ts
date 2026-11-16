@@ -41,17 +41,17 @@ export const RENDER_STYLE_UNLOCK_MAP: Partial<Record<DotMatrixRenderStyle, strin
 };
 
 export const FORMATION_UNLOCK_MAP: Partial<Record<DotMatrixType, string>> = {
-	orbit: 'dot_matrix_banner',
-	vortex: 'dot_matrix_banner',
-	helix: 'dot_matrix_banner',
-	prism: 'dot_matrix_banner',
-	infinity: 'dot_matrix_banner',
-	wavegrid: 'dot_matrix_banner',
-	chronos: 'stage_constellation',
-	supernova: 'stage_constellation',
-	tesseract: 'stage_hexgrid',
-	synthwave: 'stage_aurora',
-	lotus: 'stage_glyphs',
+	orbit: 'dot_matrix_orbit',
+	vortex: 'dot_matrix_vortex',
+	helix: 'dot_matrix_helix',
+	prism: 'dot_matrix_prism',
+	infinity: 'dot_matrix_infinity',
+	wavegrid: 'dot_matrix_wavegrid',
+	chronos: 'dot_matrix_chronos',
+	supernova: 'dot_matrix_supernova',
+	tesseract: 'dot_matrix_tesseract',
+	synthwave: 'dot_matrix_synthwave',
+	lotus: 'dot_matrix_lotus',
 };
 
 export const AVATAR_FRAME_UNLOCK_MAP: Record<string, string> = {
@@ -96,33 +96,48 @@ export const UI_ICON_STYLE_UNLOCK_MAP: Partial<Record<UIIconStyle, string>> = {
 	precision: 'ui_icon_packs',
 };
 
-const CHILD_TO_PARENT_BUNDLE: Record<string, string> = {
-	ambient_mesh_lava: 'ambient_scenes_pack',
-	ambient_cyber_grid: 'ambient_scenes_pack',
-	ambient_topography: 'ambient_scenes_pack',
-	ambient_nebula_cosmos: 'ambient_scenes_pack',
-	ambient_prism_caustics: 'ambient_scenes_pack',
-	surface_crystal: 'surface_styles_pack',
-	surface_holographic: 'surface_styles_pack',
-	surface_neon: 'surface_styles_pack',
-	surface_obsidian: 'surface_styles_pack',
-	frame_plasma_ring: 'profile_frames_pack',
-	frame_holo_crown: 'profile_frames_pack',
-	frame_cyber_hex: 'profile_frames_pack',
-	frame_solar_flare: 'profile_frames_pack',
-	nameplate_aurora_wave: 'profile_nameplates_pack',
-	nameplate_synth_horizon: 'profile_nameplates_pack',
-	nameplate_nebula_shimmer: 'profile_nameplates_pack',
-	nameplate_cyber_circuit: 'profile_nameplates_pack',
-	cursor_starlight_trail: 'cursor_fx_bundle',
-	cursor_plasma_sparks: 'cursor_fx_bundle',
-	cursor_cyber_reticle: 'cursor_fx_bundle',
-	cursor_sonic_rings: 'cursor_fx_bundle',
-	cursor_aurora_ribbon: 'cursor_fx_bundle',
-	skin_hud_tactical: 'overlay_skins_bundle',
-	skin_frosted_prism: 'overlay_skins_bundle',
-	skin_neon_arcade: 'overlay_skins_bundle',
-	skin_minimal_pill: 'overlay_skins_bundle',
+const CHILD_TO_PARENT_BUNDLES: Record<string, string[]> = {
+	dot_matrix_orbit: ['dot_matrix_banner'],
+	dot_matrix_vortex: ['dot_matrix_banner'],
+	dot_matrix_helix: ['dot_matrix_banner'],
+	dot_matrix_prism: ['dot_matrix_banner'],
+	dot_matrix_infinity: ['dot_matrix_banner'],
+	dot_matrix_wavegrid: ['dot_matrix_banner'],
+	dot_matrix_chronos: ['dot_matrix_banner', 'stage_constellation', 'stage_styles_pack'],
+	dot_matrix_supernova: ['dot_matrix_banner', 'stage_constellation', 'stage_styles_pack'],
+	dot_matrix_tesseract: ['dot_matrix_banner', 'stage_hexgrid', 'stage_styles_pack'],
+	dot_matrix_synthwave: ['dot_matrix_banner', 'stage_aurora', 'stage_styles_pack'],
+	dot_matrix_lotus: ['dot_matrix_banner', 'stage_glyphs', 'stage_styles_pack'],
+	stage_constellation: ['stage_styles_pack'],
+	stage_hexgrid: ['stage_styles_pack'],
+	stage_aurora: ['stage_styles_pack'],
+	stage_glyphs: ['stage_styles_pack'],
+	ambient_mesh_lava: ['ambient_scenes_pack'],
+	ambient_cyber_grid: ['ambient_scenes_pack'],
+	ambient_topography: ['ambient_scenes_pack'],
+	ambient_nebula_cosmos: ['ambient_scenes_pack'],
+	ambient_prism_caustics: ['ambient_scenes_pack'],
+	surface_crystal: ['surface_styles_pack'],
+	surface_holographic: ['surface_styles_pack'],
+	surface_neon: ['surface_styles_pack'],
+	surface_obsidian: ['surface_styles_pack'],
+	frame_plasma_ring: ['profile_frames_pack'],
+	frame_holo_crown: ['profile_frames_pack'],
+	frame_cyber_hex: ['profile_frames_pack'],
+	frame_solar_flare: ['profile_frames_pack'],
+	nameplate_aurora_wave: ['profile_nameplates_pack'],
+	nameplate_synth_horizon: ['profile_nameplates_pack'],
+	nameplate_nebula_shimmer: ['profile_nameplates_pack'],
+	nameplate_cyber_circuit: ['profile_nameplates_pack'],
+	cursor_starlight_trail: ['cursor_fx_bundle'],
+	cursor_plasma_sparks: ['cursor_fx_bundle'],
+	cursor_cyber_reticle: ['cursor_fx_bundle'],
+	cursor_sonic_rings: ['cursor_fx_bundle'],
+	cursor_aurora_ribbon: ['cursor_fx_bundle'],
+	skin_hud_tactical: ['overlay_skins_bundle'],
+	skin_frosted_prism: ['overlay_skins_bundle'],
+	skin_neon_arcade: ['overlay_skins_bundle'],
+	skin_minimal_pill: ['overlay_skins_bundle'],
 };
 
 export function hasUltraOrStaffAccess(user: any, hasAdminAccess = false): boolean {
@@ -144,7 +159,7 @@ export function isCosmeticUnlocked(user: any, _hasAdminAccess: boolean, required
 	if (!requiredBadgeId) return true;
 	const unlocked: string[] = Array.isArray(user?.credits?.unlockedBadges) ? user.credits.unlockedBadges : [];
 	if (unlocked.includes(requiredBadgeId)) return true;
-	const parentBundle = CHILD_TO_PARENT_BUNDLE[requiredBadgeId];
-	if (parentBundle && unlocked.includes(parentBundle)) return true;
+	const parentBundles = CHILD_TO_PARENT_BUNDLES[requiredBadgeId];
+	if (parentBundles && parentBundles.some((b) => unlocked.includes(b))) return true;
 	return false;
 }

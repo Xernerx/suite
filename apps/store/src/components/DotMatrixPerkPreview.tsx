@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Bell, Compass, Copy, Cpu, Crosshair, Crown, Flame, Gem, Hexagon, LayoutGrid, Minus, MousePointerClick, Play, Search, Shield, Sparkles, Square, User, X, Zap } from 'lucide-react';
 import { AmbientStageCanvas, CursorFxCanvas, XernerxDotLogo, type AmbientSceneType, type CursorFxType, type DotLogoVariant, type DotMatrixRenderStyle } from '@xernerx/feedback';
 import { useDictionary } from '@xernerx/providers';
@@ -22,12 +22,33 @@ const FORMATIONS: { id: DotLogoVariant; labelKey: string }[] = [
 	{ id: 'icon', labelKey: 'account.appearance.dotMatrix.types.icon' },
 ];
 
+const SINGLE_FORMATION_MAP: Record<string, DotLogoVariant> = {
+	dot_matrix_orbit: 'orbit',
+	dot_matrix_vortex: 'vortex',
+	dot_matrix_helix: 'helix',
+	dot_matrix_prism: 'prism',
+	dot_matrix_infinity: 'infinity',
+	dot_matrix_wavegrid: 'wavegrid',
+	dot_matrix_chronos: 'chronos',
+	dot_matrix_supernova: 'supernova',
+	dot_matrix_tesseract: 'tesseract',
+	dot_matrix_synthwave: 'synthwave',
+	dot_matrix_lotus: 'lotus',
+};
+
 const STAGE_PRESETS: Record<string, { variant: DotLogoVariant; renderStyle: DotMatrixRenderStyle }> = {
 	stage_constellation: { variant: 'supernova', renderStyle: 'constellation' },
 	stage_hexgrid: { variant: 'tesseract', renderStyle: 'hexgrid' },
 	stage_aurora: { variant: 'synthwave', renderStyle: 'aurora' },
 	stage_glyphs: { variant: 'lotus', renderStyle: 'glyphs' },
 };
+
+const STAGE_BUNDLE_OPTIONS: Array<{ key: string; renderStyle: DotMatrixRenderStyle; variant: DotLogoVariant; labelKey: string }> = [
+	{ key: 'stage_constellation', renderStyle: 'constellation', variant: 'supernova', labelKey: 'account.appearance.dotMatrix.renderStyles.constellation' },
+	{ key: 'stage_hexgrid', renderStyle: 'hexgrid', variant: 'tesseract', labelKey: 'account.appearance.dotMatrix.renderStyles.hexgrid' },
+	{ key: 'stage_aurora', renderStyle: 'aurora', variant: 'synthwave', labelKey: 'account.appearance.dotMatrix.renderStyles.aurora' },
+	{ key: 'stage_glyphs', renderStyle: 'glyphs', variant: 'lotus', labelKey: 'account.appearance.dotMatrix.renderStyles.glyphs' },
+];
 
 const AMBIENT_SCENES: Array<{ id: Exclude<AmbientSceneType, 'default'>; labelKey: string }> = [
 	{ id: 'mesh_lava', labelKey: 'account.appearance.ambientScene.options.mesh_lava.label' },
@@ -63,18 +84,52 @@ const DESKTOP_CREST_PACKS: Record<string, Array<{ id: string; label: string; src
 export function DotMatrixPerkPreview({ initialVariant = 'orbit', perkValue = 'dot_matrix_banner' }: { initialVariant?: DotLogoVariant; perkValue?: string }) {
 	const { t } = useDictionary();
 	const stagePreset = STAGE_PRESETS[perkValue];
-	const [variant, setVariant] = useState<DotLogoVariant>(stagePreset ? stagePreset.variant : initialVariant);
-	const [renderStyle, setRenderStyle] = useState<DotMatrixRenderStyle>(stagePreset ? stagePreset.renderStyle : 'dots');
+	const singleFormation = SINGLE_FORMATION_MAP[perkValue];
+	const isStageBundle = perkValue === 'stage_styles_pack';
+	const previewHostRef = useRef<HTMLDivElement | null>(null);
+	const [isNearViewport, setIsNearViewport] = useState(true);
+	const [variant, setVariant] = useState<DotLogoVariant>(() => {
+		if (singleFormation) return singleFormation;
+		if (stagePreset) return stagePreset.variant;
+		if (isStageBundle) return 'supernova';
+		return initialVariant;
+	});
+	const [renderStyle, setRenderStyle] = useState<DotMatrixRenderStyle>(() => {
+		if (stagePreset) return stagePreset.renderStyle;
+		if (isStageBundle) return 'constellation';
+		return 'dots';
+	});
 	const [ambientScene, setAmbientScene] = useState<Exclude<AmbientSceneType, 'default'>>('mesh_lava');
 	const [cursorFxPreview, setCursorFxPreview] = useState<Exclude<CursorFxType, 'default'>>('starlight_trail');
 	const [morphingFromLoad, setMorphingFromLoad] = useState(false);
 
 	useEffect(() => {
-		if (stagePreset) {
+		if (singleFormation) {
+			setVariant(singleFormation);
+			setRenderStyle('dots');
+		} else if (stagePreset) {
 			setVariant(stagePreset.variant);
 			setRenderStyle(stagePreset.renderStyle);
+		} else if (isStageBundle) {
+			setVariant('supernova');
+			setRenderStyle('constellation');
 		}
-	}, [perkValue]);
+	}, [perkValue, singleFormation, stagePreset, isStageBundle]);
+
+	useEffect(() => {
+		const el = previewHostRef.current;
+		if (!el || typeof IntersectionObserver === 'undefined') return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					setIsNearViewport(entry.isIntersecting);
+				}
+			},
+			{ rootMargin: '250px' }
+		);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, []);
 
 	const triggerLoadingMorphDemo = () => {
 		setMorphingFromLoad(true);
@@ -339,18 +394,20 @@ export function DotMatrixPerkPreview({ initialVariant = 'orbit', perkValue = 'do
 		);
 	}
 
-	if (perkValue !== 'dot_matrix_banner' && !stagePreset) return null;
+	if (perkValue !== 'dot_matrix_banner' && !singleFormation && !stagePreset && !isStageBundle) return null;
 
 	return (
-		<div className="flex flex-col gap-2">
+		<div ref={previewHostRef} className="flex flex-col gap-2">
 			<div className="relative h-32 w-full rounded-2xl overflow-hidden border border-(--accent)/35 bg-(--background)/75 shadow-[inset_0_0_24px_color-mix(in_srgb,var(--accent)_14%,transparent)]">
-				<div className="absolute inset-0">
-					<XernerxDotLogo variant={morphingFromLoad ? 'full' : variant} renderStyle={renderStyle} backgroundMode ripple={true} vivid={true} />
-				</div>
+				{isNearViewport && (
+					<div className="absolute inset-0">
+						<XernerxDotLogo variant={morphingFromLoad ? 'full' : variant} renderStyle={renderStyle} backgroundMode ripple={true} vivid={true} />
+					</div>
+				)}
 				<div className="relative z-10 flex items-center justify-between px-2.5 py-2 pointer-events-none">
 					<span className="inline-flex items-center gap-1 rounded-full bg-(--background)/80 backdrop-blur-md border border-(--accent)/30 px-2 py-0.5 text-[10px] font-bold text-(--accent)">
 						<Cpu size={11} />
-						{t('account.store.credits.dotMatrixPreview.liveBadge')}
+						{singleFormation ? t(`account.appearance.dotMatrix.types.${singleFormation}`) : t('account.store.credits.dotMatrixPreview.liveBadge')}
 					</span>
 					<button
 						type="button"
@@ -383,11 +440,34 @@ export function DotMatrixPerkPreview({ initialVariant = 'orbit', perkValue = 'do
 						);
 					})}
 				</div>
+			) : isStageBundle ? (
+				<div className="flex flex-wrap items-center gap-1">
+					{STAGE_BUNDLE_OPTIONS.map((opt) => {
+						const active = renderStyle === opt.renderStyle;
+						return (
+							<button
+								key={opt.key}
+								type="button"
+								onClick={() => {
+									setRenderStyle(opt.renderStyle);
+									setVariant(opt.variant);
+								}}
+								className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all cursor-pointer ${
+									active
+										? 'bg-(--accent) text-(--accent-contrast) border-(--accent) shadow-xs'
+										: 'bg-(--background)/55 text-(--text-muted) border-(--border)/10 hover:border-(--accent)/35 hover:text-(--text)'
+								}`}
+							>
+								{t(opt.labelKey)}
+							</button>
+						);
+					})}
+				</div>
 			) : (
 				<div className="flex items-center justify-between gap-1 text-[10px] text-(--text-muted) px-1">
 					<span className="inline-flex items-center gap-1 font-semibold text-(--accent)">
 						<Sparkles size={10} />
-						{t(`account.appearance.dotMatrix.renderStyles.${renderStyle}`)}
+						{singleFormation ? t(`account.appearance.dotMatrix.types.${singleFormation}`) : t(`account.appearance.dotMatrix.renderStyles.${renderStyle}`)}
 					</span>
 					<span>{t('account.store.credits.dotMatrixPreview.clickHint')}</span>
 				</div>

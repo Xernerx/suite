@@ -51,9 +51,34 @@ export async function POST(req: Request) {
 			creditDoc = await Credit.create({ ownerId: userId, balance: 0, streak: 0 });
 		}
 
-		const ONE_TIME_UNLOCK_PERK_TYPES = new Set(['vanity_badge', 'stage_style', 'icon_pack', 'window_style', 'ambient_scene', 'surface_style', 'profile_cosmetic', 'cursor_fx', 'overlay_skin']);
+		const ONE_TIME_UNLOCK_PERK_TYPES = new Set([
+			'vanity_badge',
+			'dot_matrix',
+			'stage_style',
+			'icon_pack',
+			'window_style',
+			'ambient_scene',
+			'surface_style',
+			'profile_cosmetic',
+			'cursor_fx',
+			'overlay_skin',
+		]);
 
 		const BUNDLE_CHILD_UNLOCKS: Record<string, string[]> = {
+			dot_matrix_banner: [
+				'dot_matrix_orbit',
+				'dot_matrix_vortex',
+				'dot_matrix_helix',
+				'dot_matrix_prism',
+				'dot_matrix_infinity',
+				'dot_matrix_wavegrid',
+				'dot_matrix_chronos',
+				'dot_matrix_supernova',
+				'dot_matrix_tesseract',
+				'dot_matrix_synthwave',
+				'dot_matrix_lotus',
+			],
+			stage_styles_pack: ['stage_constellation', 'stage_hexgrid', 'stage_aurora', 'stage_glyphs'],
 			ambient_scenes_pack: ['ambient_mesh_lava', 'ambient_cyber_grid', 'ambient_topography', 'ambient_nebula_cosmos', 'ambient_prism_caustics'],
 			surface_styles_pack: ['surface_crystal', 'surface_holographic', 'surface_neon', 'surface_obsidian'],
 			profile_frames_pack: ['frame_plasma_ring', 'frame_holo_crown', 'frame_cyber_hex', 'frame_solar_flare'],
@@ -61,18 +86,29 @@ export async function POST(req: Request) {
 			cursor_fx_bundle: ['cursor_starlight_trail', 'cursor_plasma_sparks', 'cursor_cyber_reticle', 'cursor_sonic_rings', 'cursor_aurora_ribbon'],
 			overlay_skins_bundle: ['skin_hud_tactical', 'skin_frosted_prism', 'skin_neon_arcade', 'skin_minimal_pill'],
 		};
-		const CHILD_TO_BUNDLE: Record<string, string> = {};
-		for (const [bundleId, children] of Object.entries(BUNDLE_CHILD_UNLOCKS)) {
-			for (const childId of children) {
-				CHILD_TO_BUNDLE[childId] = bundleId;
+		const BONUS_CHILD_UNLOCKS: Record<string, string[]> = {
+			stage_styles_pack: ['dot_matrix_chronos', 'dot_matrix_supernova', 'dot_matrix_tesseract', 'dot_matrix_synthwave', 'dot_matrix_lotus'],
+			stage_constellation: ['dot_matrix_chronos', 'dot_matrix_supernova'],
+			stage_hexgrid: ['dot_matrix_tesseract'],
+			stage_aurora: ['dot_matrix_synthwave'],
+			stage_glyphs: ['dot_matrix_lotus'],
+		};
+		const PARENT_UNLOCKS: Record<string, string[]> = {};
+		for (const sourceMap of [BUNDLE_CHILD_UNLOCKS, BONUS_CHILD_UNLOCKS]) {
+			for (const [parentId, children] of Object.entries(sourceMap)) {
+				for (const childId of children) {
+					if (!PARENT_UNLOCKS[childId]) PARENT_UNLOCKS[childId] = [];
+					if (!PARENT_UNLOCKS[childId].includes(parentId)) PARENT_UNLOCKS[childId].push(parentId);
+				}
 			}
 		}
 
 		if (ONE_TIME_UNLOCK_PERK_TYPES.has(item.perkType)) {
 			const badgeId = String(item.perkValue || item.id);
-			const parentBundle = CHILD_TO_BUNDLE[badgeId];
+			const parents = PARENT_UNLOCKS[badgeId] || [];
 			const ownedList = Array.isArray(creditDoc.unlockedBadges) ? creditDoc.unlockedBadges : [];
-			if (ownedList.includes(badgeId) || (parentBundle && ownedList.includes(parentBundle))) {
+			const allBundleChildrenOwned = Boolean(BUNDLE_CHILD_UNLOCKS[badgeId]?.length && BUNDLE_CHILD_UNLOCKS[badgeId].every((c) => ownedList.includes(c)));
+			if (ownedList.includes(badgeId) || parents.some((p) => ownedList.includes(p)) || allBundleChildrenOwned) {
 				return NextResponse.json({ error: 'You already own this cosmetic unlock.' }, { status: 409 });
 			}
 		} else if (item.perkType === 'streak_shield') {
@@ -121,16 +157,21 @@ export async function POST(req: Request) {
 		} else if (ONE_TIME_UNLOCK_PERK_TYPES.has(item.perkType)) {
 			const badgeId = String(item.perkValue || item.id);
 			badgesToUnlock.add(badgeId);
-			if (BUNDLE_CHILD_UNLOCKS[badgeId]) {
-				for (const childId of BUNDLE_CHILD_UNLOCKS[badgeId]) {
-					badgesToUnlock.add(childId);
+			for (const childId of BUNDLE_CHILD_UNLOCKS[badgeId] || []) {
+				badgesToUnlock.add(childId);
+			}
+			for (const bonusId of BONUS_CHILD_UNLOCKS[badgeId] || []) {
+				badgesToUnlock.add(bonusId);
+			}
+			for (const [bundleId, children] of Object.entries(BUNDLE_CHILD_UNLOCKS)) {
+				if (children.every((c) => badgesToUnlock.has(c))) {
+					badgesToUnlock.add(bundleId);
+					if (bundleId === 'dot_matrix_banner') {
+						badgesToActivate.add('dot_matrix_banner');
+					}
 				}
 			}
-			const parentBundle = CHILD_TO_BUNDLE[badgeId];
-			if (parentBundle && BUNDLE_CHILD_UNLOCKS[parentBundle]?.every((c) => badgesToUnlock.has(c))) {
-				badgesToUnlock.add(parentBundle);
-			}
-			if (item.perkType === 'vanity_badge') {
+			if (item.perkType === 'vanity_badge' || badgeId === 'dot_matrix_banner') {
 				badgesToActivate.add(badgeId);
 			}
 		} else if (item.perkType === 'streak_shield') {

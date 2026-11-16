@@ -1,13 +1,13 @@
 {
 	"debug": false,
 	"hardwareAcceleration": true,
-	"startMinimized": true,
+	"startMinimized": false,
 	"startMaximized": false,
-	"startOnBoot": true,
+	"startOnBoot": false,
 	"alwaysOnTop": false,
-	"minimizeOnClose": true,
+	"minimizeOnClose": false,
 	"globalHotkey": true,
-	"globalQuickLauncher": true,
+	"globalQuickLauncher": false,
 	"quickCaptureHotkey": false,
 	"streamerMode": false,
 	"batterySaver": true,
@@ -15,11 +15,11 @@
 	"discordRpc": true,
 	"desktopNotifications": true,
 	"dailyStreakReminder": true,
-	"idlePrivacyShield": true,
+	"idlePrivacyShield": false,
 	"idleAfkRpc": true,
-	"explorerContextMenu": true,
+	"explorerContextMenu": false,
 	"cdnWatchFolder": "",
-	"windowControls": "xernerx",
+	"windowControls": "system",
 	"appIcon": "default",
-	"startupLocation": "last"
+	"startupLocation": "dashboard"
 }

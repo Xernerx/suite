@@ -3,13 +3,14 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Award, Bot, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, PackageSearch, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react';
+import { Award, Bot, Check, Clock, Coins, Cpu, Crown, ExternalLink, Flame, Gem, Gift, Globe, HardDrive, LayoutGrid, Loader2, PackageSearch, Shield, Sparkles, Zap } from 'lucide-react';
 import { Badge, Button, Confirm, Input, Tabs, Toggle } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { CreditLedgerCard } from './CreditLedgerCard';
+import { CreditTopUpPacksSection } from './CreditTopUpPacksSection';
 import { DailyStreakLadder } from './DailyStreakLadder';
 import { DotMatrixPerkPreview } from './DotMatrixPerkPreview';
-import { CatalogItem, CHILD_TO_BUNDLE, FALLBACK_EUR_PRICES } from './types';
+import { BUNDLE_CHILDREN_MAP, CatalogItem, COSMETIC_PARENT_UNLOCKS } from './types';
 
 interface CreditStoreViewProps {
 	items: CatalogItem[];
@@ -18,9 +19,25 @@ interface CreditStoreViewProps {
 	mutateUser?: () => Promise<any>;
 	actionLoading: string | null;
 	onBuyCreditPack: (priceId: string, item: CatalogItem) => void;
+	highlightedItemId?: string | null;
 	hideOwned?: boolean;
 	onHideOwnedChange?: (hideOwned: boolean) => void;
 }
+
+const VALID_CREDIT_FILTER_TABS = new Set([
+	'all',
+	'dot_matrix',
+	'stage_style',
+	'icon_pack',
+	'cdn_slots',
+	'showcase_slots',
+	'bot_slots',
+	'vanity_url',
+	'trial_pass',
+	'vanity_badge',
+	'streak_shield',
+	'credit_packs',
+]);
 
 const PERK_ICONS: Record<string, any> = {
 	cdn_slots: HardDrive,
@@ -29,7 +46,9 @@ const PERK_ICONS: Record<string, any> = {
 	vanity_url: Globe,
 	trial_pass: Zap,
 	streak_shield: Shield,
+	dot_matrix: Cpu,
 	stage_style: Cpu,
+	stage_styles_pack: Cpu,
 	ambient_scene: Sparkles,
 	surface_style: Gem,
 	profile_cosmetic: Crown,
@@ -44,7 +63,7 @@ const PERK_ICONS: Record<string, any> = {
 	vanity_badge: Award,
 };
 
-export function CreditStoreView({ items, user, userLoading, mutateUser, actionLoading, onBuyCreditPack, hideOwned: controlledHideOwned, onHideOwnedChange }: CreditStoreViewProps) {
+export function CreditStoreView({ items, user, userLoading, mutateUser, actionLoading, onBuyCreditPack, highlightedItemId, hideOwned: controlledHideOwned, onHideOwnedChange }: CreditStoreViewProps) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
@@ -61,6 +80,29 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	const [timeLeft, setTimeLeft] = useState('');
 	const [confirmItem, setConfirmItem] = useState<CatalogItem | null>(null);
 	const [redeemingId, setRedeemingId] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
+		const params = new URLSearchParams(window.location.search);
+		const urlPerk = params.get('perk') || params.get('filter');
+		if (urlPerk && VALID_CREDIT_FILTER_TABS.has(urlPerk)) {
+			setSelectedCategory(urlPerk);
+		}
+	}, []);
+
+	const handleSelectTab = useCallback((nextTab: string) => {
+		setSelectedCategory(nextTab);
+		if (typeof window === 'undefined') return;
+		const params = new URLSearchParams(window.location.search);
+		if (nextTab && nextTab !== 'all') {
+			params.set('perk', nextTab);
+		} else {
+			params.delete('perk');
+			params.delete('filter');
+		}
+		const qs = params.toString();
+		window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
+	}, []);
 
 	const hasLoadedCredits = !userLoading && Boolean(user?.credits);
 	const creditBalance = user?.credits?.balance ?? 0;
@@ -156,20 +198,24 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 	const creditPerks = useMemo(() => items.filter((i) => i.itemType === 'credit_perk').sort((a, b) => (a.order ?? 0) - (b.order ?? 0)), [items]);
 	const isPerkOwned = useCallback(
 		(item: CatalogItem) => {
-			const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
+			const isCosmeticUnlock = ['dot_matrix', 'stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
 			const badgeKey = String(item.perkValue || item.id);
+			const parentUnlocks = COSMETIC_PARENT_UNLOCKS[badgeKey] || [];
+			const bundleChildren = BUNDLE_CHILDREN_MAP[badgeKey];
+			const allChildrenOwned = Boolean(bundleChildren?.length && bundleChildren.every((child) => unlockedBadges.includes(child)));
 			return (
-				((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isStageOrIcon) &&
-					(unlockedBadges.includes(badgeKey) || unlockedBadges.includes(String(item.id)) || Boolean(CHILD_TO_BUNDLE[badgeKey] && unlockedBadges.includes(CHILD_TO_BUNDLE[badgeKey])))) ||
+				((item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || isCosmeticUnlock) &&
+					(unlockedBadges.includes(badgeKey) || unlockedBadges.includes(String(item.id)) || parentUnlocks.some((p) => unlockedBadges.includes(p)) || allChildrenOwned)) ||
 				(item.perkType === 'streak_shield' && (user?.credits?.streakShields ?? 0) >= 3)
 			);
 		},
 		[unlockedBadges, user?.credits?.streakShields]
 	);
 	const matchesPerkCategory = (item: CatalogItem, cat: string) => {
-		if (cat === 'stage_style') return item.perkType === 'stage_style' || item.perkType === 'ambient_scene' || item.perkType === 'surface_style';
+		if (cat === 'dot_matrix') return item.perkType === 'dot_matrix' || item.perkValue === 'dot_matrix_banner' || item.perkType === 'stage_style';
+		if (cat === 'stage_style') return item.perkType === 'dot_matrix' || item.perkType === 'stage_style' || item.perkType === 'ambient_scene' || item.perkType === 'surface_style';
 		if (cat === 'icon_pack') return item.perkType === 'icon_pack' || item.perkType === 'window_style' || item.perkType === 'cursor_fx' || item.perkType === 'overlay_skin';
-		if (cat === 'vanity_badge') return item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic';
+		if (cat === 'vanity_badge') return item.perkType === 'vanity_badge' || item.perkType === 'profile_cosmetic' || item.perkValue === 'dot_matrix_banner';
 		return item.perkType === cat;
 	};
 	const filteredPerks = useMemo(() => {
@@ -227,11 +273,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 							{t('account.store.credits.signInToRedeem')}
 						</Button>
 					)}
-					<Button
-						variant="secondary"
-						onClick={() => setSelectedCategory((prev) => (prev === 'credit_packs' ? 'all' : 'credit_packs'))}
-						className="flex items-center gap-2"
-					>
+					<Button variant="secondary" onClick={() => handleSelectTab(selectedCategory === 'credit_packs' ? 'all' : 'credit_packs')} className="flex items-center gap-2">
 						<Coins size={15} className="text-(--accent)" />
 						{t('account.store.credits.topUpButton')}
 					</Button>
@@ -263,9 +305,10 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 				<Tabs
 					size="sm"
 					activeTab={selectedCategory}
-					onChange={setSelectedCategory}
+					onChange={handleSelectTab}
 					tabs={[
 						{ id: 'all', label: t('account.store.credits.allCategories') },
+						{ id: 'dot_matrix', label: t('account.store.credits.filters.dotMatrix') },
 						{ id: 'stage_style', label: t('account.store.credits.filters.stageStyles') },
 						{ id: 'icon_pack', label: t('account.store.credits.filters.iconPacks') },
 						{ id: 'cdn_slots', label: t('account.store.credits.filters.cdnSlots') },
@@ -292,18 +335,24 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 					{filteredPerks.map((item) => {
 						const PerkIcon = getPerkIcon(item.perkType, item.perkValue);
 						const effectiveCost = getEffectiveCreditCost(item);
-						const isDotMatrix = item.perkValue === 'dot_matrix_banner' || item.id === 'perk-badge-dotmatrix' || item.perkType === 'profile_cosmetic';
-						const isStageOrIcon = ['stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(String(item.perkType));
+						const isProfileCosmetic = item.perkType === 'profile_cosmetic';
+						const isEquipableSetting = ['dot_matrix', 'stage_style', 'ambient_scene', 'surface_style', 'cursor_fx', 'overlay_skin', 'icon_pack', 'window_style'].includes(
+							String(item.perkType)
+						);
 						const isOwnedBadge = isPerkOwned(item);
 						const canAfford = creditBalance >= effectiveCost;
+						const isHighlighted = highlightedItemId === item.id;
 
 						return (
 							<div
 								key={item.id}
+								id={`store-item-${item.id}`}
 								className={`relative flex flex-col justify-between rounded-3xl border backdrop-blur-md transition-all p-5 gap-4 ${
-									item.isFeatured
-										? 'bg-(--foreground)/40 border-(--accent)/35 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
-										: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30 shadow-sm'
+									isHighlighted
+										? 'bg-(--foreground)/45 border-(--accent) ring-2 ring-(--accent)/45 shadow-[0_0_26px_color-mix(in_srgb,var(--accent)_28%,transparent)]'
+										: item.isFeatured
+											? 'bg-(--foreground)/40 border-(--accent)/35 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)]'
+											: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30 shadow-sm'
 								}`}
 							>
 								<div className="flex flex-col gap-3">
@@ -349,21 +398,21 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 												<Check size={15} className="text-(--accent-green)" />
 												{t('account.store.credits.alreadyUnlocked')}
 											</Button>
-											{(isDotMatrix || isStageOrIcon) && (
+											{(isProfileCosmetic || isEquipableSetting) && (
 												<Button
 													variant="primary"
 													size="sm"
 													onClick={() =>
 														(window.location.href = getEnvUrl(
 															`https://account.xernerx.com/?tab=${
-																isDotMatrix ? 'profile' : item.perkValue === 'ui_icon_packs' || item.perkType === 'window_style' ? 'preferences' : 'appearance'
+																isProfileCosmetic ? 'profile' : item.perkValue === 'ui_icon_packs' || item.perkType === 'window_style' ? 'preferences' : 'appearance'
 															}`
 														))
 													}
 													className="w-full flex items-center justify-center gap-1.5"
 												>
 													<ExternalLink size={14} />
-													{t(isDotMatrix ? 'account.store.credits.dotMatrixPreview.customizeInProfile' : 'account.store.credits.equipInSettings')}
+													{t(isProfileCosmetic ? 'account.store.credits.dotMatrixPreview.customizeInProfile' : 'account.store.credits.equipInSettings')}
 												</Button>
 											)}
 										</>
@@ -377,7 +426,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 													return;
 												}
 												if (!canAfford) {
-													setSelectedCategory('credit_packs');
+													handleSelectTab('credit_packs');
 													return;
 												}
 												setConfirmItem(item);
@@ -400,93 +449,7 @@ export function CreditStoreView({ items, user, userLoading, mutateUser, actionLo
 			)}
 
 			{/* Credit Top-Up Packs (Stripe SKU-linked) */}
-			{showCreditPacks && creditPacks.length > 0 && (
-				<div className="flex flex-col pt-2" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-						<div>
-							<h2 className="text-2xl font-bold text-(--text) flex items-center gap-2" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								<Coins size={20} className="text-(--accent)" />
-								{t('account.store.credits.packsHeading')}
-							</h2>
-							<p className="text-xs text-(--text-muted) mt-0.5">{t('account.store.credits.packsSubheading')}</p>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" style={{ gap: 'var(--ui-gap)' }}>
-						{creditPacks.map((pack) => {
-							const activePrice = pack.prices?.[0] || null;
-							const rawAmount = activePrice ? (activePrice.discountedAmount ?? activePrice.unitAmount) : null;
-							const formattedPrice =
-								typeof rawAmount === 'number'
-									? new Intl.NumberFormat(undefined, {
-											style: 'currency',
-											currency: (activePrice.currency || 'eur').toUpperCase(),
-										}).format(rawAmount / 100)
-									: FALLBACK_EUR_PRICES[pack.id] || '€—';
-
-							const isBusy = Boolean(activePrice && actionLoading === activePrice.id);
-
-							return (
-								<div
-									key={pack.id}
-									className={`flex flex-col justify-between rounded-3xl border backdrop-blur-md transition-all ${
-										pack.isFeatured
-											? 'bg-(--foreground)/40 border-(--accent)/40 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_18%,transparent)]'
-											: 'bg-(--foreground)/30 border-(--border)/10 hover:border-(--accent)/30 shadow-sm'
-									}`}
-									style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-								>
-									<div className="flex flex-col gap-3">
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-												<Coins size={20} />
-											</div>
-											{pack.badge && (
-												<span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">{pack.badge}</span>
-											)}
-										</div>
-
-										<div>
-											<h3 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-												{pack.name}
-											</h3>
-											<p className="text-xs text-(--text-muted) mt-1">{pack.description}</p>
-										</div>
-
-										<div className="flex items-baseline gap-1.5 pt-1">
-											<span className="text-3xl font-extrabold text-(--text)">{formattedPrice}</span>
-											<span className="text-xs text-(--text-muted)">{t('account.store.credits.oneTimePurchase')}</span>
-										</div>
-
-										{pack.features && pack.features.length > 0 && (
-											<ul className="flex flex-col gap-1.5 pt-2 border-t border-(--border)/10">
-												{pack.features.map((feat, idx) => (
-													<li key={idx} className="flex items-start gap-2 text-xs text-(--text-muted)">
-														<Check size={13} className="text-(--accent) shrink-0 mt-0.5" />
-														<span>{feat}</span>
-													</li>
-												))}
-											</ul>
-										)}
-									</div>
-
-									<Button
-										variant={pack.isFeatured ? 'primary' : 'secondary'}
-										disabled={!activePrice || isBusy}
-										onClick={() => {
-											if (activePrice) onBuyCreditPack(activePrice.id, pack);
-										}}
-										className="w-full flex items-center justify-center gap-2"
-									>
-										{isBusy ? <Loader2 size={15} className="animate-spin" /> : <ShoppingBag size={15} />}
-										{activePrice ? t('account.store.credits.buyPackButton') : t('account.store.credits.skuPending')}
-									</Button>
-								</div>
-							);
-						})}
-					</div>
-				</div>
-			)}
+			{showCreditPacks && <CreditTopUpPacksSection creditPacks={creditPacks} actionLoading={actionLoading} onBuyCreditPack={onBuyCreditPack} />}
 
 			{/* Credit Balance Activity Ledger */}
 			{user?.id && <CreditLedgerCard transactions={user?.credits?.transactions} streakShields={user?.credits?.streakShields ?? 0} />}

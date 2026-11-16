@@ -2,6 +2,31 @@
 
 # docs
 
+## 1.12.0
+
+### Minor Changes
+
+- ## YourApps WebSocket Service Reference & Guild Applications API Endpoints
+  
+  Documented the yourapps WebSocket microservice router and all /secure/guilds/[id]/applications/* REST endpoints.
+  
+  ### Added
+  
+  - **YourApps WebSocket & Secure API Reference**: Added interactive documentation for the yourapps WebSocket service actions and all 8 /secure/guilds/[id]/applications/* endpoints.
+  
+  ### Changed
+  
+  - **WebSocket Playground**: Modularized preset selection and live JSON-RPC response inspection in the interactive WebSocket Playground.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 1.11.0
 
 ### Minor Changes

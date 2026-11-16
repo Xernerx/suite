@@ -2,6 +2,21 @@
 
 # @xernerx/ui
 
+## 0.9.1
+
+### Patch Changes
+
+- ## Portaled Modal Dropdowns, Tooltips & Deep-Linkable Collapsible Cards
+  
+  Portaled Selector, MultiSelector, and Tooltip overlays to document.body to eliminate modal clipping and scrollbars, and added slug support to CollapsibleCard.
+  
+  ### Changed
+  
+  - **Body-Portaled Menus & Tooltips**: Rendered Selector, MultiSelector, and Tooltip popovers via fixed-position body portals with --ui-zoom coordinate scaling, preventScroll focus, and Escape capture handling.
+  - **Modal & CollapsibleCard Enhancements**: Prevented horizontal scrollbar artifacts in Modal containers and added slug query matching to CollapsibleCard.
+- Updated dependencies
+  - @xernerx/providers@0.24.0
+
 ## 0.9.0
 
 ### Minor Changes

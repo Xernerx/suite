@@ -190,10 +190,7 @@ export async function findFaqItem(idOrSlug: string): Promise<FaqItem | null> {
 	return (
 		items.find(
 			(i) =>
-				i.fullId?.toLowerCase() === target ||
-				`${i.categoryId}.${i.id}`.toLowerCase() === target ||
-				`${i.categoryId}.${i.slug}`.toLowerCase() === target ||
-				i.question.toLowerCase() === target
+				i.fullId?.toLowerCase() === target || `${i.categoryId}.${i.id}`.toLowerCase() === target || `${i.categoryId}.${i.slug}`.toLowerCase() === target || i.question.toLowerCase() === target
 		) ||
 		items.find((i) => i.id.toLowerCase() === target || i.slug.toLowerCase() === target) ||
 		null

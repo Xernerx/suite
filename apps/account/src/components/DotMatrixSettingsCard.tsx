@@ -123,6 +123,7 @@ export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixRenderStyle, dot
 		const reqUnlock = FORMATION_UNLOCK_MAP[nextType];
 		if (!isCosmeticUnlocked(user, hasAdminAccess, reqUnlock)) {
 			setPreviewOverrideType(nextType);
+			setPreviewOverrideStyle(null);
 			triggerLoadMorphPreview();
 			toast({
 				type: 'info',
@@ -131,7 +132,7 @@ export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixRenderStyle, dot
 				action: {
 					label: t('account.appearance.dotMatrix.openCreditStore'),
 					onClick: () => {
-						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+						window.location.href = getEnvUrl(`https://store.xernerx.com/?category=credits&perk=dot_matrix&item=perk-dot-matrix-${nextType}`);
 					},
 				},
 			});
@@ -145,6 +146,7 @@ export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixRenderStyle, dot
 		const reqUnlock = RENDER_STYLE_UNLOCK_MAP[nextStyle];
 		if (!isCosmeticUnlocked(user, hasAdminAccess, reqUnlock)) {
 			setPreviewOverrideStyle(nextStyle);
+			setPreviewOverrideType(null);
 			triggerLoadMorphPreview();
 			toast({
 				type: 'info',
@@ -153,7 +155,7 @@ export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixRenderStyle, dot
 				action: {
 					label: t('account.appearance.dotMatrix.openCreditStore'),
 					onClick: () => {
-						window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits');
+						window.location.href = getEnvUrl(`https://store.xernerx.com/?category=credits&perk=dot_matrix&item=perk-stage-${nextStyle}`);
 					},
 				},
 			});
@@ -225,7 +227,15 @@ export function DotMatrixSettingsCard({ dotMatrixType, dotMatrixRenderStyle, dot
 							<Button
 								size="sm"
 								variant="primary"
-								onClick={() => (window.location.href = getEnvUrl('https://store.xernerx.com/?category=credits'))}
+								onClick={() =>
+									(window.location.href = getEnvUrl(
+										previewOverrideType
+											? `https://store.xernerx.com/?category=credits&perk=dot_matrix&item=perk-dot-matrix-${previewOverrideType}`
+											: previewOverrideStyle
+												? `https://store.xernerx.com/?category=credits&perk=dot_matrix&item=perk-stage-${previewOverrideStyle}`
+												: 'https://store.xernerx.com/?category=credits&perk=dot_matrix'
+									))
+								}
 								className="inline-flex items-center gap-1.5"
 							>
 								<ExternalLink size={13} />

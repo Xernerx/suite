@@ -30,7 +30,9 @@ function getStore(): GuildResourceStore {
 }
 
 export function getCandidateDiscordTokens(): string[] {
-	return Array.from(new Set([process.env.DISCORD_CLIENT_TOKEN, process.env.DISCORD_BOT_TOKEN, process.env.VIRTUE_BOT_TOKEN].map((t) => String(t || '').trim()).filter(Boolean)));
+	return Array.from(
+		new Set([process.env.DISCORD_CLIENT_TOKEN, process.env.DISCORD_BOT_TOKEN, process.env.VIRTUE_BOT_TOKEN, process.env.YOURAPPS_BOT_TOKEN].map((t) => String(t || '').trim()).filter(Boolean))
+	);
 }
 
 export async function fetchDiscordWithFallback(path: string): Promise<any | null> {
@@ -124,17 +126,22 @@ export async function fetchGuildChannelsCached(guildId: string): Promise<any[]> 
 				return cached.data;
 			}
 
-			// Fallback to Virtue DB synced channels
-			const virtueDb = await database('virtue').catch(() => null);
-			const VirtueGuildModel = (virtueDb?.models?.profiles as any)?.Guild;
-			if (VirtueGuildModel) {
-				const virtueProfile: any = await VirtueGuildModel.findOne({ id: guildId })
-					.select('serverChannels')
-					.lean()
-					.catch(() => null);
-				if (Array.isArray(virtueProfile?.serverChannels) && virtueProfile.serverChannels.length > 0) {
-					store.channels.set(guildId, { data: virtueProfile.serverChannels, updatedAt: Date.now() });
-					return virtueProfile.serverChannels;
+			// Fallback to Virtue or YourApps DB synced channels
+			for (const [proj, cat, modelKey] of [
+				['virtue', 'profiles', 'Guild'],
+				['yourapps', 'guilds', 'Profile'],
+			] as const) {
+				const subDb = await database(proj).catch(() => null);
+				const GuildModel = (subDb?.models?.[cat] as any)?.[modelKey];
+				if (GuildModel) {
+					const profile: any = await GuildModel.findOne({ id: guildId })
+						.select('serverChannels')
+						.lean()
+						.catch(() => null);
+					if (Array.isArray(profile?.serverChannels) && profile.serverChannels.length > 0) {
+						store.channels.set(guildId, { data: profile.serverChannels, updatedAt: Date.now() });
+						return profile.serverChannels;
+					}
 				}
 			}
 
@@ -174,17 +181,22 @@ export async function fetchGuildRolesCached(guildId: string): Promise<any[]> {
 				return cached.data;
 			}
 
-			// Fallback to Virtue DB synced roles
-			const virtueDb = await database('virtue').catch(() => null);
-			const VirtueGuildModel = (virtueDb?.models?.profiles as any)?.Guild;
-			if (VirtueGuildModel) {
-				const virtueProfile: any = await VirtueGuildModel.findOne({ id: guildId })
-					.select('serverRoles')
-					.lean()
-					.catch(() => null);
-				if (Array.isArray(virtueProfile?.serverRoles) && virtueProfile.serverRoles.length > 0) {
-					store.roles.set(guildId, { data: virtueProfile.serverRoles, updatedAt: Date.now() });
-					return virtueProfile.serverRoles;
+			// Fallback to Virtue or YourApps DB synced roles
+			for (const [proj, cat, modelKey] of [
+				['virtue', 'profiles', 'Guild'],
+				['yourapps', 'guilds', 'Profile'],
+			] as const) {
+				const subDb = await database(proj).catch(() => null);
+				const GuildModel = (subDb?.models?.[cat] as any)?.[modelKey];
+				if (GuildModel) {
+					const profile: any = await GuildModel.findOne({ id: guildId })
+						.select('serverRoles')
+						.lean()
+						.catch(() => null);
+					if (Array.isArray(profile?.serverRoles) && profile.serverRoles.length > 0) {
+						store.roles.set(guildId, { data: profile.serverRoles, updatedAt: Date.now() });
+						return profile.serverRoles;
+					}
 				}
 			}
 

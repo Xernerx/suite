@@ -1,16 +1,18 @@
 /** @format */
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button, Confirm, Modal } from '@xernerx/ui';
-import { useDictionary, useToast, useUser } from '@xernerx/providers';
+import { useDictionary } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { DiscordProfile, FullUser, getNormalizedRoles, getUserPersona, getUserTourStatus, Role, UserConnectionItem, UserDeviceItem, UserPersona, UserShowcaseItem, UserSummary } from './types';
+import type { DiscordProfile, FullUser, Role, UserSummary } from './types';
 import { UserProfilePreview } from './UserProfilePreview';
 import { UserIdentityTab } from './UserIdentityTab';
 import { UserEconomyPerksTab } from './UserEconomyPerksTab';
 import { UserAssetsModerationTab } from './UserAssetsModerationTab';
+import { resolveUserDisplayMedia } from './userModalHelpers';
+import { useUserModalForm } from './useUserModalForm';
 
 interface UserModalProps {
 	open: boolean;
@@ -27,16 +29,8 @@ interface UserModalProps {
 }
 
 export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl, onUserDeleted, onUserUpdated, onViewAuditLogs, onNavigateEntity, initialTab = 'profile' }: UserModalProps) {
-	const { toast } = useToast();
 	const { t } = useDictionary();
-	const { user: currentUser, mutate: mutateCurrentUser } = useUser() as { user: any; mutate: () => Promise<void> };
-
 	const [activeTab, setActiveTab] = useState<'profile' | 'economy' | 'assets'>(initialTab);
-	const [fullUser, setFullUser] = useState<FullUser | null>(null);
-	const [loadingDetails, setLoadingDetails] = useState(false);
-	const [saving, setSaving] = useState(false);
-	const [deleting, setDeleting] = useState(false);
-	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
 	useEffect(() => {
 		if (open) {
@@ -44,412 +38,37 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 		}
 	}, [open, initialTab]);
 
-	// Profile & Identity states
-	const [name, setName] = useState(user.name || '');
-	const [icon, setIcon] = useState(user.icon || '');
-	const [email, setEmail] = useState('');
-	const initialRoles = getNormalizedRoles(user);
-	const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>(initialRoles);
-	const existingRoleIdSet = useMemo(() => new Set(roles.map((r) => r.id)), [roles]);
-	const missingRoleCount = useMemo(() => selectedRoleIds.filter((rid) => Boolean(rid) && !existingRoleIdSet.has(rid)).length, [selectedRoleIds, existingRoleIdSet]);
-
-	useEffect(() => {
-		if (!open) {
-			const latestRoles = getNormalizedRoles(user);
-			setSelectedRoleIds(latestRoles);
-			setFullUser((prev) => (prev ? { ...prev, roles: latestRoles } : prev));
-		}
-	}, [open, user.roles]);
-	const [stripeCustomerId, setStripeCustomerId] = useState(user.stripeCustomerId || '');
-	const [description, setDescription] = useState('');
-	const [info, setInfo] = useState('');
-	const [privacy, setPrivacy] = useState('private');
-	const [persona, setPersona] = useState<UserPersona>(getUserPersona(user));
-	const [tourCompleted, setTourCompleted] = useState(getUserTourStatus(user) === 'completed');
-	const [verified, setVerified] = useState(Boolean(user.verified));
-	const [vanityUnlocked, setVanityUnlocked] = useState(Boolean(user.vanitySlug));
-	const [vanitySlug, setVanitySlug] = useState(user.vanitySlug || '');
-	const [widgets, setWidgets] = useState(false);
-	const [blacklisted, setBlacklisted] = useState(Boolean(user.blacklisted));
-	const [shadowban, setShadowban] = useState(Boolean(user.shadowban));
-	const [services, setServices] = useState(user.services !== false);
-	const [staffSubscription, setStaffSubscription] = useState(false);
-	const [pronouns, setPronouns] = useState('');
-	const [gender, setGender] = useState('');
-	const [birthday, setBirthday] = useState('');
-	const [timezone, setTimezone] = useState('');
-	const [subLoading, setSubLoading] = useState(false);
-
-	// Economy, Level & Perks states
-	const [credits, setCredits] = useState<number>(0);
-	const [streak, setStreak] = useState<number>(0);
-	const [streakShields, setStreakShields] = useState<number>(0);
-	const [totalSpent, setTotalSpent] = useState<number>(0);
-	const [globalLevel, setGlobalLevel] = useState<number>(1);
-	const [globalXp, setGlobalXp] = useState<number>(0);
-	const [extraBotSlots, setExtraBotSlots] = useState<number>(0);
-	const [extraCdnSlots, setExtraCdnSlots] = useState<number>(0);
-	const [extraShowcaseSlots, setExtraShowcaseSlots] = useState<number>(0);
-	const [extraVanitySlots, setExtraVanitySlots] = useState<number>(0);
-	const [referredBy, setReferredBy] = useState<string>('');
-	const [referralBonusClaimed, setReferralBonusClaimed] = useState<boolean>(false);
-	const [dotMatrixVariant, setDotMatrixVariant] = useState<string>('orbit');
-	const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
-	const [activeBadges, setActiveBadges] = useState<string[]>([]);
-	const [claimedAchievements, setClaimedAchievements] = useState<string[]>([]);
-
-	// Moderation Assets states
-	const [showcases, setShowcases] = useState<UserShowcaseItem[]>([]);
-	const [connections, setConnections] = useState<UserConnectionItem[]>([]);
-	const [devices, setDevices] = useState<UserDeviceItem[]>([]);
-
-	useEffect(() => {
-		if (open && !fullUser && !loadingDetails) {
-			setLoadingDetails(true);
-			fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
-				credentials: 'include',
-				cache: 'no-store',
-			})
-				.then((res) => (res.ok ? res.json() : null))
-				.then((data: FullUser | null) => {
-					if (data) {
-						setFullUser(data);
-						setName(data.name || '');
-						setIcon(data.icon || '');
-						setEmail(data.email || '');
-						setSelectedRoleIds(getNormalizedRoles(data));
-						setStripeCustomerId(data.stripeCustomerId || '');
-						setDescription(data.description || '');
-						setInfo(data.info || '');
-						setPrivacy(data.privacy || 'private');
-						setPersona(getUserPersona(data));
-						setTourCompleted(getUserTourStatus(data) === 'completed');
-						setVerified(Boolean(data.verified || (data.agreedTerms && data.agreedPrivacy)));
-						setVanityUnlocked(Boolean(data.vanityUnlocked || data.vanitySlug));
-						setVanitySlug(data.vanitySlug || '');
-						setWidgets(Boolean(data.widgets));
-						setBlacklisted(Boolean(data.blacklisted));
-						setShadowban(Boolean(data.shadowban));
-						setServices(data.services !== false);
-						setStaffSubscription(Boolean(data.staffSubscription));
-						setPronouns(data.pronouns || '');
-						setGender(data.gender || '');
-						setBirthday(data.birthday ? String(data.birthday).slice(0, 10) : '');
-						setTimezone(data.timezone || '');
-						setCredits(data.credits?.balance || 0);
-						setStreak(data.credits?.streak || 0);
-						setStreakShields(data.credits?.streakShields || 0);
-						setTotalSpent(data.credits?.totalSpent || 0);
-						setGlobalLevel(data.level?.level ?? 1);
-						setGlobalXp(data.level?.xp ?? 0);
-						setExtraBotSlots(data.credits?.extraBotSlots || 0);
-						setExtraCdnSlots(data.credits?.extraCdnSlots || 0);
-						setExtraShowcaseSlots(data.credits?.extraShowcaseSlots || 0);
-						setExtraVanitySlots(data.credits?.extraVanitySlots || 0);
-						setReferredBy(data.credits?.referredBy || '');
-						setReferralBonusClaimed(Boolean(data.credits?.referralBonusClaimed));
-						setDotMatrixVariant(data.credits?.dotMatrixVariant || 'orbit');
-						setUnlockedBadges(Array.isArray(data.credits?.unlockedBadges) ? data.credits!.unlockedBadges! : []);
-						setActiveBadges(Array.isArray(data.credits?.activeBadges) ? data.credits!.activeBadges! : []);
-						setClaimedAchievements(Array.isArray(data.credits?.claimedAchievements) ? data.credits!.claimedAchievements! : []);
-						setShowcases(Array.isArray(data.showcases) ? data.showcases : []);
-						setConnections(Array.isArray(data.connections) ? data.connections : []);
-						setDevices(Array.isArray(data.devices) ? data.devices : []);
-					}
-				})
-				.catch((err) => {
-					console.error('Failed to fetch user details:', err);
-				})
-				.finally(() => {
-					setLoadingDetails(false);
-				});
-		}
-	}, [open, fullUser, loadingDetails, user.id, getEnvUrl]);
-
-	const isDirty = useMemo(() => {
-		if (!fullUser) return false;
-		const rolesChanged = JSON.stringify([...selectedRoleIds].sort()) !== JSON.stringify([...getNormalizedRoles(fullUser)].sort());
-		const origBirthday = fullUser.birthday ? String(fullUser.birthday).slice(0, 10) : '';
-		return (
-			name !== (fullUser.name || '') ||
-			icon !== (fullUser.icon || '') ||
-			email !== (fullUser.email || '') ||
-			rolesChanged ||
-			stripeCustomerId !== (fullUser.stripeCustomerId || '') ||
-			description !== (fullUser.description || '') ||
-			info !== (fullUser.info || '') ||
-			privacy !== (fullUser.privacy || 'private') ||
-			persona !== getUserPersona(fullUser) ||
-			tourCompleted !== (getUserTourStatus(fullUser) === 'completed') ||
-			verified !== Boolean(fullUser.verified || (fullUser.agreedTerms && fullUser.agreedPrivacy)) ||
-			vanityUnlocked !== Boolean(fullUser.vanityUnlocked || fullUser.vanitySlug) ||
-			vanitySlug !== (fullUser.vanitySlug || '') ||
-			widgets !== Boolean(fullUser.widgets) ||
-			blacklisted !== Boolean(fullUser.blacklisted) ||
-			shadowban !== Boolean(fullUser.shadowban) ||
-			services !== (fullUser.services !== false) ||
-			staffSubscription !== Boolean(fullUser.staffSubscription) ||
-			pronouns !== (fullUser.pronouns || '') ||
-			gender !== (fullUser.gender || '') ||
-			birthday !== origBirthday ||
-			timezone !== (fullUser.timezone || '') ||
-			credits !== (fullUser.credits?.balance || 0) ||
-			streak !== (fullUser.credits?.streak || 0) ||
-			streakShields !== (fullUser.credits?.streakShields || 0) ||
-			totalSpent !== (fullUser.credits?.totalSpent || 0) ||
-			globalLevel !== (fullUser.level?.level ?? 1) ||
-			globalXp !== (fullUser.level?.xp ?? 0) ||
-			extraBotSlots !== (fullUser.credits?.extraBotSlots || 0) ||
-			extraCdnSlots !== (fullUser.credits?.extraCdnSlots || 0) ||
-			extraShowcaseSlots !== (fullUser.credits?.extraShowcaseSlots || 0) ||
-			extraVanitySlots !== (fullUser.credits?.extraVanitySlots || 0) ||
-			referredBy !== (fullUser.credits?.referredBy || '') ||
-			referralBonusClaimed !== Boolean(fullUser.credits?.referralBonusClaimed) ||
-			dotMatrixVariant !== (fullUser.credits?.dotMatrixVariant || 'orbit') ||
-			JSON.stringify(unlockedBadges) !== JSON.stringify(fullUser.credits?.unlockedBadges || []) ||
-			JSON.stringify(activeBadges) !== JSON.stringify(fullUser.credits?.activeBadges || []) ||
-			JSON.stringify(claimedAchievements) !== JSON.stringify(fullUser.credits?.claimedAchievements || []) ||
-			JSON.stringify(showcases) !== JSON.stringify(fullUser.showcases || []) ||
-			JSON.stringify(connections) !== JSON.stringify(fullUser.connections || []) ||
-			JSON.stringify(devices) !== JSON.stringify(fullUser.devices || [])
-		);
-	}, [
+	const {
 		fullUser,
-		name,
-		icon,
-		email,
-		selectedRoleIds,
-		stripeCustomerId,
-		description,
-		info,
-		privacy,
-		persona,
-		tourCompleted,
-		verified,
-		vanityUnlocked,
-		vanitySlug,
-		widgets,
-		blacklisted,
-		shadowban,
-		services,
-		staffSubscription,
-		pronouns,
-		gender,
-		birthday,
-		timezone,
-		credits,
-		streak,
-		streakShields,
-		totalSpent,
-		globalLevel,
-		globalXp,
-		extraBotSlots,
-		extraCdnSlots,
-		extraShowcaseSlots,
-		extraVanitySlots,
-		referredBy,
-		referralBonusClaimed,
-		dotMatrixVariant,
-		unlockedBadges,
-		activeBadges,
-		claimedAchievements,
-		showcases,
-		connections,
-		devices,
-	]);
+		loadingDetails,
+		saving,
+		deleting,
+		confirmDeleteOpen,
+		setConfirmDeleteOpen,
+		subLoading,
+		missingRoleCount,
+		isDirty,
+		draft,
+		setters,
+		handleStaffSubscriptionToggle,
+		handleUpdate,
+		handleDelete,
+		handleUnverified,
+	} = useUserModalForm({
+		open,
+		user,
+		roles,
+		getEnvUrl,
+		onUserDeleted,
+		onUserUpdated,
+	});
 
-	const handleStaffSubscriptionToggle = async (checked: boolean) => {
-		setSubLoading(true);
-		try {
-			const endpoint = checked ? `secure/store/${user.id}/product` : `secure/store/${user.id}/cancel`;
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/${endpoint}`), {
-				method: 'POST',
-				credentials: 'include',
-			});
-			if (res.ok) {
-				setStaffSubscription(checked);
-				toast({ title: checked ? t('admin.users.toast.staffApplied') : t('admin.users.toast.staffCanceled'), type: 'success' });
-			} else {
-				throw new Error('Failed to update subscription status');
-			}
-		} catch (err) {
-			console.error(err);
-			toast({ title: t('admin.users.toast.staffError'), type: 'error' });
-		} finally {
-			setSubLoading(false);
-		}
-	};
-
-	const handleUpdate = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setSaving(true);
-		try {
-			const creditsPayload = {
-				balance: credits,
-				streak,
-				streakShields,
-				totalSpent,
-				extraBotSlots,
-				extraCdnSlots,
-				extraShowcaseSlots,
-				extraVanitySlots,
-				referredBy: referredBy.trim() || null,
-				referralBonusClaimed,
-				dotMatrixVariant,
-				unlockedBadges,
-				activeBadges,
-				claimedAchievements,
-			};
-
-			const onboardingPayload = {
-				...(fullUser?.onboarding || {}),
-				persona,
-				...(tourCompleted
-					? {
-							suiteIntroCompleted: true,
-							dashboardTourCompleted: true,
-							supportPromptCompleted: true,
-							tourPostponed: false,
-							tourPostponedPhase: null,
-							completedAt: fullUser?.onboarding?.completedAt || new Date().toISOString(),
-						}
-					: {
-							dashboardTourCompleted: false,
-							completedAt: null,
-						}),
-			};
-
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify({
-					name,
-					icon: icon.trim() || '',
-					email: email.trim() || '',
-					roles: selectedRoleIds,
-					stripeCustomerId: stripeCustomerId.trim() || null,
-					description,
-					info,
-					privacy,
-					onboarding: onboardingPayload,
-					verified,
-					vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
-					vanitySlug: vanitySlug.trim(),
-					widgets,
-					blacklisted,
-					shadowban,
-					services,
-					staffSubscription,
-					pronouns: pronouns.trim() || '',
-					gender: gender || undefined,
-					birthday: birthday.trim() || null,
-					timezone: timezone.trim() || '',
-					showcases,
-					connections,
-					devices,
-					credits: creditsPayload,
-					level: {
-						level: Math.max(0, globalLevel),
-						xp: Math.max(0, globalXp),
-					},
-				}),
-			});
-			if (!res.ok) {
-				const errJson = await res.json().catch(() => ({}));
-				throw new Error(errJson.error || t('admin.users.updateFailed'));
-			}
-			const updated = await res.json();
-
-			const previousRoles = fullUser ? getNormalizedRoles(fullUser) : initialRoles;
-			for (const r of roles) {
-				const discordRoleId = r.role;
-				if (!discordRoleId || !r.sync) continue;
-				const wasAssigned = previousRoles.includes(r.id);
-				const isAssigned = selectedRoleIds.includes(r.id);
-				if (wasAssigned === isAssigned) continue;
-				await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}/discord/roles`), {
-					method: isAssigned ? 'POST' : 'DELETE',
-					headers: { 'Content-Type': 'application/json' },
-					credentials: 'include',
-					body: JSON.stringify({ roleId: discordRoleId }),
-				}).catch((err) => {
-					toast({ type: 'error', title: isAssigned ? t('admin.users.assignRoleFailed') : t('admin.users.removeRoleFailed'), description: err.message });
-				});
-			}
-
-			const manuallyUpdatedUser: FullUser = {
-				...(fullUser as FullUser),
-				...updated,
-				name,
-				icon,
-				email,
-				roles: selectedRoleIds,
-				stripeCustomerId: stripeCustomerId.trim() || undefined,
-				description,
-				info,
-				privacy,
-				onboarding: updated?.onboarding || onboardingPayload,
-				verified,
-				...(verified === false ? { agreedTerms: null, agreedPrivacy: null } : {}),
-				vanityUnlocked: vanityUnlocked || Boolean(vanitySlug.trim()),
-				vanitySlug: vanitySlug.trim(),
-				widgets,
-				blacklisted,
-				shadowban,
-				services,
-				staffSubscription,
-				pronouns,
-				gender,
-				birthday: birthday.trim() || undefined,
-				timezone,
-				showcases,
-				connections,
-				devices,
-				credits: { ...fullUser?.credits, ...creditsPayload },
-				level: { level: Math.max(0, globalLevel), xp: Math.max(0, globalXp) },
-			};
-			setFullUser(manuallyUpdatedUser);
-			onUserUpdated(manuallyUpdatedUser);
-			if (currentUser?.id === user.id) {
-				mutateCurrentUser().catch(() => {});
-			}
-			toast({ title: t('admin.users.toast.updateSuccess'), type: 'success' });
-		} catch (err: any) {
-			console.error(err);
-			toast({ title: err.message || t('admin.users.toast.updateError'), type: 'error' });
-		} finally {
-			setSaving(false);
-		}
-	};
-
-	const handleDelete = async () => {
-		setDeleting(true);
-		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${user.id}`), {
-				method: 'DELETE',
-				credentials: 'include',
-			});
-			if (res.ok) {
-				onUserDeleted(user.id);
-				toast({ title: t('admin.users.toast.deleteSuccess'), type: 'success' });
-			}
-		} catch (err) {
-			console.error(err);
-			toast({ title: t('admin.users.toast.deleteError'), type: 'error' });
-		} finally {
-			setDeleting(false);
-			setConfirmDeleteOpen(false);
-		}
-	};
-
-	const avatarUrl =
-		discord?.avatarUrl ||
-		(discord?.avatar && user.id ? `https://cdn.discordapp.com/avatars/${user.id}/${discord.avatar}.${discord.avatar.startsWith('a_') ? 'gif' : 'png'}` : null) ||
-		icon ||
-		user.icon;
-	const discordBanner = discord?.banner ? `https://cdn.discordapp.com/banners/${user.id}/${discord.banner}.${discord.banner.startsWith('a_') ? 'gif' : 'png'}?size=512` : null;
-	const displayName = discord?.globalName || discord?.username || user.name || t('account.account.fallbackName');
+	const { avatarUrl, discordBanner, displayName } = resolveUserDisplayMedia({
+		user,
+		discord,
+		icon: draft.icon,
+		fallbackName: t('account.account.fallbackName'),
+	});
 
 	return (
 		<>
@@ -469,15 +88,15 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									displayName={displayName}
 									avatarUrl={avatarUrl}
 									discordBanner={discordBanner}
-									globalLevel={globalLevel}
-									globalXp={globalXp}
-									verified={verified}
-									vanitySlug={vanitySlug}
-									blacklisted={blacklisted}
-									shadowban={shadowban}
-									services={services}
-									persona={persona}
-									tourCompleted={tourCompleted}
+									globalLevel={draft.globalLevel}
+									globalXp={draft.globalXp}
+									verified={draft.verified}
+									vanitySlug={draft.vanitySlug}
+									blacklisted={draft.blacklisted}
+									shadowban={draft.shadowban}
+									services={draft.services}
+									persona={draft.persona}
+									tourCompleted={draft.tourCompleted}
 									missingRoleCount={missingRoleCount}
 									onViewAuditLogs={
 										onViewAuditLogs
@@ -487,32 +106,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 												}
 											: undefined
 									}
-									onUnverified={() => {
-										setVerified(false);
-										setTourCompleted(false);
-										const resetOnboarding = {
-											persona,
-											suiteIntroCompleted: false,
-											dashboardTourCompleted: false,
-											supportPromptCompleted: false,
-											tourPostponed: false,
-											tourPostponedPhase: null,
-											completedAt: null,
-											onboardedBots: fullUser?.onboarding?.onboardedBots || [],
-										};
-										const nextFull: FullUser = {
-											...(fullUser as FullUser),
-											verified: false,
-											agreedTerms: null,
-											agreedPrivacy: null,
-											onboarding: resetOnboarding,
-										};
-										setFullUser(nextFull);
-										onUserUpdated(nextFull);
-										if (currentUser?.id === user.id) {
-											mutateCurrentUser().catch(() => {});
-										}
-									}}
+									onUnverified={handleUnverified}
 								/>
 							</div>
 
@@ -536,101 +130,101 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 
 								{activeTab === 'profile' && (
 									<UserIdentityTab
-										name={name}
-										setName={setName}
-										icon={icon}
-										setIcon={setIcon}
-										email={email}
-										setEmail={setEmail}
-										stripeCustomerId={stripeCustomerId}
-										setStripeCustomerId={setStripeCustomerId}
-										selectedRoleIds={selectedRoleIds}
-										setSelectedRoleIds={setSelectedRoleIds}
+										name={draft.name}
+										setName={setters.setName}
+										icon={draft.icon}
+										setIcon={setters.setIcon}
+										email={draft.email}
+										setEmail={setters.setEmail}
+										stripeCustomerId={draft.stripeCustomerId}
+										setStripeCustomerId={setters.setStripeCustomerId}
+										selectedRoleIds={draft.selectedRoleIds}
+										setSelectedRoleIds={setters.setSelectedRoleIds}
 										roles={roles}
-										privacy={privacy}
-										setPrivacy={setPrivacy}
-										persona={persona}
-										setPersona={setPersona}
-										tourCompleted={tourCompleted}
-										setTourCompleted={setTourCompleted}
-										verified={verified}
-										setVerified={setVerified}
-										vanityUnlocked={vanityUnlocked}
-										setVanityUnlocked={setVanityUnlocked}
-										vanitySlug={vanitySlug}
-										setVanitySlug={setVanitySlug}
-										widgets={widgets}
-										setWidgets={setWidgets}
-										blacklisted={blacklisted}
-										setBlacklisted={setBlacklisted}
-										shadowban={shadowban}
-										setShadowban={setShadowban}
-										services={services}
-										setServices={setServices}
-										staffSubscription={staffSubscription}
+										privacy={draft.privacy}
+										setPrivacy={setters.setPrivacy}
+										persona={draft.persona}
+										setPersona={setters.setPersona}
+										tourCompleted={draft.tourCompleted}
+										setTourCompleted={setters.setTourCompleted}
+										verified={draft.verified}
+										setVerified={setters.setVerified}
+										vanityUnlocked={draft.vanityUnlocked}
+										setVanityUnlocked={setters.setVanityUnlocked}
+										vanitySlug={draft.vanitySlug}
+										setVanitySlug={setters.setVanitySlug}
+										widgets={draft.widgets}
+										setWidgets={setters.setWidgets}
+										blacklisted={draft.blacklisted}
+										setBlacklisted={setters.setBlacklisted}
+										shadowban={draft.shadowban}
+										setShadowban={setters.setShadowban}
+										services={draft.services}
+										setServices={setters.setServices}
+										staffSubscription={draft.staffSubscription}
 										subLoading={subLoading}
 										onStaffSubscriptionToggle={handleStaffSubscriptionToggle}
-										pronouns={pronouns}
-										setPronouns={setPronouns}
-										gender={gender}
-										setGender={setGender}
-										birthday={birthday}
-										setBirthday={setBirthday}
-										timezone={timezone}
-										setTimezone={setTimezone}
-										description={description}
-										setDescription={setDescription}
-										info={info}
-										setInfo={setInfo}
+										pronouns={draft.pronouns}
+										setPronouns={setters.setPronouns}
+										gender={draft.gender}
+										setGender={setters.setGender}
+										birthday={draft.birthday}
+										setBirthday={setters.setBirthday}
+										timezone={draft.timezone}
+										setTimezone={setters.setTimezone}
+										description={draft.description}
+										setDescription={setters.setDescription}
+										info={draft.info}
+										setInfo={setters.setInfo}
 									/>
 								)}
 
 								{activeTab === 'economy' && (
 									<UserEconomyPerksTab
-										credits={credits}
-										setCredits={setCredits}
-										streak={streak}
-										setStreak={setStreak}
-										streakShields={streakShields}
-										setStreakShields={setStreakShields}
-										totalSpent={totalSpent}
-										setTotalSpent={setTotalSpent}
-										globalLevel={globalLevel}
-										setGlobalLevel={setGlobalLevel}
-										globalXp={globalXp}
-										setGlobalXp={setGlobalXp}
-										extraBotSlots={extraBotSlots}
-										setExtraBotSlots={setExtraBotSlots}
-										extraCdnSlots={extraCdnSlots}
-										setExtraCdnSlots={setExtraCdnSlots}
-										extraShowcaseSlots={extraShowcaseSlots}
-										setExtraShowcaseSlots={setExtraShowcaseSlots}
-										extraVanitySlots={extraVanitySlots}
-										setExtraVanitySlots={setExtraVanitySlots}
-										referredBy={referredBy}
-										setReferredBy={setReferredBy}
-										referralBonusClaimed={referralBonusClaimed}
-										setReferralBonusClaimed={setReferralBonusClaimed}
-										dotMatrixVariant={dotMatrixVariant}
-										setDotMatrixVariant={setDotMatrixVariant}
-										unlockedBadges={unlockedBadges}
-										setUnlockedBadges={setUnlockedBadges}
-										activeBadges={activeBadges}
-										setActiveBadges={setActiveBadges}
-										claimedAchievements={claimedAchievements}
-										setClaimedAchievements={setClaimedAchievements}
+										credits={draft.credits}
+										setCredits={setters.setCredits}
+										streak={draft.streak}
+										setStreak={setters.setStreak}
+										streakShields={draft.streakShields}
+										setStreakShields={setters.setStreakShields}
+										totalSpent={draft.totalSpent}
+										setTotalSpent={setters.setTotalSpent}
+										globalLevel={draft.globalLevel}
+										setGlobalLevel={setters.setGlobalLevel}
+										globalXp={draft.globalXp}
+										setGlobalXp={setters.setGlobalXp}
+										extraBotSlots={draft.extraBotSlots}
+										setExtraBotSlots={setters.setExtraBotSlots}
+										extraCdnSlots={draft.extraCdnSlots}
+										setExtraCdnSlots={setters.setExtraCdnSlots}
+										extraShowcaseSlots={draft.extraShowcaseSlots}
+										setExtraShowcaseSlots={setters.setExtraShowcaseSlots}
+										extraVanitySlots={draft.extraVanitySlots}
+										setExtraVanitySlots={setters.setExtraVanitySlots}
+										referredBy={draft.referredBy}
+										setReferredBy={setters.setReferredBy}
+										referralBonusClaimed={draft.referralBonusClaimed}
+										setReferralBonusClaimed={setters.setReferralBonusClaimed}
+										dotMatrixVariant={draft.dotMatrixVariant}
+										setDotMatrixVariant={setters.setDotMatrixVariant}
+										unlockedBadges={draft.unlockedBadges}
+										setUnlockedBadges={setters.setUnlockedBadges}
+										activeBadges={draft.activeBadges}
+										setActiveBadges={setters.setActiveBadges}
+										claimedAchievements={draft.claimedAchievements}
+										setClaimedAchievements={setters.setClaimedAchievements}
 										transactions={fullUser?.credits?.transactions || []}
 									/>
 								)}
 
 								{activeTab === 'assets' && (
 									<UserAssetsModerationTab
-										showcases={showcases}
-										setShowcases={setShowcases}
-										connections={connections}
-										setConnections={setConnections}
-										devices={devices}
-										setDevices={setDevices}
+										showcases={draft.showcases}
+										setShowcases={setters.setShowcases}
+										connections={draft.connections}
+										setConnections={setters.setConnections}
+										devices={draft.devices}
+										setDevices={setters.setDevices}
 										ownedBots={fullUser?.ownedBots || []}
 										ownedServers={fullUser?.ownedServers || []}
 										userOrganizations={fullUser?.userOrganizations || []}

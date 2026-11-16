@@ -2,6 +2,20 @@
 
 # `@xernerx/app`
 
+## 2.7.1
+
+### Patch Changes
+
+- ## Updated /faq Category Links & Fallback Catalogs
+  
+  Synchronized the Discord /faq command embed links and offline fallback catalog with the expanded 20-category FAQ structure.
+  
+  ### Changed
+  
+  - **FAQ Slash Command & Fallbacks**: Updated category links in /faq and refreshed catalogFallbacks entries.
+- Updated dependencies
+  - @xernerx/lib@1.27.0
+
 ## 2.7.0
 
 ### Minor Changes

@@ -60,6 +60,13 @@ export default function SecurityPage() {
 			],
 		},
 		{
+			id: 'yourapps',
+			href: getEnvUrl('https://app.xernerx.com/bots/yourapps'),
+			title: t('www.security.sections.bots.yourapps.title'),
+			badge: t('www.security.sections.bots.yourapps.badge'),
+			points: [t('www.security.sections.bots.yourapps.points.0'), t('www.security.sections.bots.yourapps.points.1'), t('www.security.sections.bots.yourapps.points.2')],
+		},
+		{
 			id: 'todo',
 			href: getEnvUrl('https://app.xernerx.com/bots/todo'),
 			title: t('www.security.sections.bots.todo.title'),
@@ -383,7 +390,7 @@ export default function SecurityPage() {
 								{t('www.security.header.title')}
 							</h1>
 							<p className="max-w-3xl text-base text-(--text-muted) leading-relaxed">{t('www.security.header.subtitle')}</p>
-							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 8 November 2026</div>
+							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 16 November 2026</div>
 						</header>
 
 						{/* Core Security Pillars Bento */}

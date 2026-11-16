@@ -4,142 +4,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 import { database, sendWebhook } from '@xernerx/lib/server';
-import { recordAuditLog, resolveCallerAuth, sendUserNotification } from '@/lib/auditAndNotify';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 import { syncUserRoles } from '@/lib/sync/users';
-import { normalizeVanitySlug, unlockVanityWithUserCredits, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
+import { normalizeVanitySlug, VANITY_SLUG_REGEX } from '@/lib/vanityUnlock';
+import { handleUserPatchAction, mergeUserDevices, parseUserAgentDevice, SIGN_IN_BONUS_AMOUNT } from '@/lib/userRouteActions';
+import { syncVirtueAndRecordUserUpdateAudit, updateUserAppearanceCreditsAndLevel } from '@/lib/userRouteCosmeticsAndAudit';
+import { handleDeleteUserById, handleGetUserById, normalizeUserOnboardingAndVerification } from '@/lib/userRouteLifecycle';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	try {
-		const { id } = await params;
-		const requestedSecrets = req.nextUrl.searchParams.get('includeSecrets') === 'true';
-		const { models } = await database('xernerx');
-
-		const user = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] }).lean();
-
-		if (!user) {
-			return NextResponse.json({ error: 'User not found' }, { status: 404 });
-		}
-
-		const resolvedId = user.id;
-		let includeSecrets = false;
-		if (requestedSecrets) {
-			const caller = await resolveCallerAuth(req, ['users']);
-			includeSecrets = Boolean(caller.isSystemToken || caller.authorized || caller.userId === resolvedId || caller.userId === id);
-		}
-
-		// Fetch separated domain models in parallel
-		const [appearance, credits, levels, subscriptions, organizations, ownedBots, ownedServers, directOrgs, verifiedIssuesCount, approvedSuggestionsCount] = await Promise.all([
-			models.users.Appearance.findOne({ ownerId: resolvedId }).lean(),
-			models.users.Credit.findOne({ ownerId: resolvedId }).lean(),
-			models.users.Level.find({ ownerId: resolvedId }).lean(),
-			models.users.Subscription.find({ ownerId: resolvedId }).lean(),
-			models.organizations.Member.find({ userId: resolvedId }).lean(),
-			(models.bots.Bot as any)
-				.find({ owners: resolvedId })
-				.select(['id', 'name', 'avatar', 'privacy', 'verified', 'vanitySlug'])
-				.lean()
-				.catch(() => []),
-			(models.guilds.Guild as any)
-				.find({ owner: resolvedId })
-				.select(['id', 'name', 'icon', 'privacy', 'verified', 'vanitySlug'])
-				.lean()
-				.catch(() => []),
-			(models.organizations.Organization as any)
-				.find({ $or: [{ owner: resolvedId }, { members: resolvedId }] })
-				.select(['_id', 'name', 'icon', 'iconUrl', 'owner', 'verified', 'privacy', 'vanitySlug'])
-				.lean()
-				.catch(() => []),
-			(models.core.Issue as any).countDocuments({ authorId: resolvedId, acknowledged: true }).catch(() => 0),
-			(models.core.Suggestion as any)
-				.countDocuments({
-					$or: [{ authorId: resolvedId }, { 'author.id': resolvedId }],
-					status: { $in: ['approved', 'implemented', 'completed'] },
-				})
-				.catch(() => 0),
-		]);
-
-		const userOrganizations = (directOrgs || []).map((org: any) => ({
-			id: String(org._id || org.id),
-			name: org.name || 'Unnamed Organization',
-			icon: org.iconUrl || org.icon || '',
-			privacy: org.privacy || 'private',
-			verified: Boolean(org.verified),
-			vanitySlug: org.vanitySlug || '',
-			isOwner: org.owner === resolvedId,
-		}));
-
-		const sanitizedConnections = Array.isArray((user as any).connections)
-			? (user as any).connections.map((conn: any) => {
-					if (includeSecrets) {
-						return {
-							...conn,
-							hasSecret: Boolean(conn.secret),
-							hasToken: Boolean(conn.token),
-						};
-					}
-					const { secret, token, ...rest } = conn;
-					return {
-						...rest,
-						hasSecret: Boolean(secret),
-						hasToken: Boolean(token),
-					};
-				})
-			: [];
-
-		const resolvedSubscriptions = Array.isArray(subscriptions) ? [...subscriptions] : [];
-		const hasStaffSubRecord = resolvedSubscriptions.some((s: any) => s.stripeSubscriptionId === 'staff_infinite_sub');
-		const isStaffSubActive = Boolean((user as any).staffSubscription || hasStaffSubRecord);
-		if (isStaffSubActive && !hasStaffSubRecord) {
-			resolvedSubscriptions.push({
-				ownerId: resolvedId,
-				stripeSubscriptionId: 'staff_infinite_sub',
-				priceId: 'ultra',
-				status: 'active',
-				currentPeriodEnd: new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000),
-			} as any);
-		}
-
-		const isVerified = Boolean(user.verified || (user.agreedTerms && user.agreedPrivacy));
-		if (isVerified && !user.verified) {
-			await models.users.User.updateOne({ id: resolvedId }, { $set: { verified: true } }).catch(() => {});
-		}
-
-		const hasBonusTx = Array.isArray((credits as any)?.transactions) && (credits as any).transactions.some((t: any) => t?.itemId === 'signin_bonus');
-		const signInBonusClaimed = Boolean((credits as any)?.signInBonusClaimed || hasBonusTx);
-		const isTombstone = (Boolean((user as any).blacklisted) || (user as any).services === false) && !user.name && !user.email && (!Array.isArray(user.roles) || user.roles.length === 0);
-
-		return NextResponse.json({
-			...user,
-			verified: isVerified,
-			blacklisted: Boolean((user as any).blacklisted),
-			services: (user as any).services !== false,
-			tombstone: isTombstone,
-			sessionVersion: Number((user as any).sessionVersion) || 1,
-			sessionRevokedAt: (user as any).sessionRevokedAt || null,
-			staffSubscription: isStaffSubActive,
-			connections: sanitizedConnections,
-			vanityUnlocked: Boolean(user.vanityUnlocked || user.vanitySlug),
-			appearance: appearance || {},
-			credits: credits ? { ...credits, signInBonusClaimed } : { balance: 0, streak: 0, signInBonusClaimed: false },
-			level: (levels && levels[0]) || { level: 1, xp: 0 },
-			levels: levels || [],
-			subscriptions: resolvedSubscriptions,
-			organizations: organizations || [],
-			ownedBots: ownedBots || [],
-			ownedServers: ownedServers || [],
-			userOrganizations,
-			communityStats: {
-				verifiedIssuesCount: verifiedIssuesCount || 0,
-				approvedSuggestionsCount: approvedSuggestionsCount || 0,
-			},
-		});
-	} catch (error: unknown) {
-		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-	}
+	const { id } = await params;
+	return handleGetUserById(req, id);
 }
-
-const SIGN_IN_BONUS_AMOUNT = 1000;
-const BOT_INVITE_BONUS_AMOUNT = 100;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	try {
@@ -184,7 +59,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			);
 		}
 
-		// Fetch configured join roles from Admin Settings and ensure only existing RBAC roles are auto-granted
 		const joinRolesSetting = await models.core.Setting.findOne({ id: 'join_roles' }).lean();
 		let joinRoles: string[] = [];
 		try {
@@ -210,9 +84,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
 		let userDoc: any = existingUser;
 		let rolesJustGranted = false;
+		const selfLiveDevice = !caller.isSystemToken && caller.userId === id ? parseUserAgentDevice(req.headers.get('user-agent')) : null;
 
 		if (!existingUser) {
-			const created = await models.users.User.create({ ...userBody, roles: mergedRoles, id });
+			const initialDevices = Array.isArray(userBody.devices) && userBody.devices.length > 0 ? userBody.devices : selfLiveDevice ? [selfLiveDevice] : [];
+			const created = await models.users.User.create({ ...userBody, devices: initialDevices, roles: mergedRoles, id });
 			userDoc = created?.toObject ? created.toObject() : created;
 			rolesJustGranted = mergedRoles.length > 0;
 		} else {
@@ -223,6 +99,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			if (!existingUser.email && userBody.email) backfillUpdates.email = userBody.email;
 			if (existingUser.agreedTerms && existingUser.agreedPrivacy && !existingUser.verified) {
 				backfillUpdates.verified = true;
+			}
+			if (selfLiveDevice) {
+				const merged = mergeUserDevices(existingUser.devices, selfLiveDevice);
+				if (merged.shouldPersist) {
+					backfillUpdates.devices = merged.devices;
+				}
 			}
 			userDoc =
 				Object.keys(backfillUpdates).length > 0
@@ -280,7 +162,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 			creditDoc = createdCredit?.toObject ? createdCredit.toObject() : createdCredit;
 			bonusGranted = true;
 		} else {
-			const hasBonusTx = Array.isArray(existingCredit.transactions) && existingCredit.transactions.some((t: any) => t?.itemId === 'signin_bonus');
+			const hasBonusTx = Array.isArray(existingCredit.transactions) && existingCredit.transactions.some((tx: any) => tx?.itemId === 'signin_bonus');
 			const alreadyClaimed = Boolean(existingCredit.signInBonusClaimed || hasBonusTx);
 			if (!alreadyClaimed) {
 				creditDoc = await models.users.Credit.findOneAndUpdate(
@@ -378,350 +260,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		const unsetFields: Record<string, 1> = {};
 		const isVanityAlreadyUnlocked = Boolean(existingDoc?.vanityUnlocked || existingDoc?.vanitySlug || (isStaffOrSystem && userBody.vanityUnlocked));
 
-		if (userBody.action === 'sync_roles') {
-			const db = await database('xernerx');
-			await syncUserRoles(resolvedId, db);
-			await recordAuditLog(req, {
-				action: 'user.roles.sync',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Synced Discord roles for user "${existingDoc?.name || resolvedId}"`,
-			});
-			return NextResponse.json({ success: true });
-		}
+		const actionResponse = await handleUserPatchAction({
+			req,
+			models,
+			resolvedId,
+			existingDoc,
+			userBody,
+			isVanityAlreadyUnlocked,
+		});
+		if (actionResponse) return actionResponse;
 
-		if (userBody.action === 'unverify') {
-			const prevOnboarding = (existingDoc as any)?.onboarding || {};
-			const resetOnboarding = {
-				persona: prevOnboarding.persona || 'user',
-				suiteIntroCompleted: false,
-				dashboardTourCompleted: false,
-				supportPromptCompleted: false,
-				tourPostponed: false,
-				tourPostponedPhase: null,
-				completedAt: null,
-				onboardedBots: Array.isArray(prevOnboarding.onboardedBots) ? prevOnboarding.onboardedBots : [],
-			};
-			const updated = await models.users.User.findOneAndUpdate(
-				{ id: resolvedId },
-				{
-					$set: {
-						verified: false,
-						agreedTerms: null,
-						agreedPrivacy: null,
-						onboarding: resetOnboarding,
-					},
-				},
-				{ returnDocument: 'after', runValidators: true, strict: false }
-			).lean();
-			await recordAuditLog(req, {
-				action: 'user.unverify',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Unverified user "${existingDoc?.name || resolvedId}" and reset ToS & Privacy Policy dates`,
-			});
-			return NextResponse.json({
-				...updated,
-				verified: false,
-				agreedTerms: null,
-				agreedPrivacy: null,
-				onboarding: resetOnboarding,
-			});
-		}
-
-		if (userBody.action === 'revoke_sessions') {
-			const now = new Date();
-			const updated = await models.users.User.findOneAndUpdate(
-				{ id: resolvedId },
-				{
-					$inc: { sessionVersion: 1 },
-					$set: { sessionRevokedAt: now, devices: [] },
-				},
-				{ returnDocument: 'after', upsert: true }
-			).lean();
-			await recordAuditLog(req, {
-				action: 'user.sessions.revoke',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Revoked all active device sessions for user "${existingDoc?.name || resolvedId}"`,
-				metadata: { sessionVersion: (updated as any)?.sessionVersion || 2 },
-			});
-			return NextResponse.json({
-				success: true,
-				sessionVersion: Number((updated as any)?.sessionVersion) || 2,
-				sessionRevokedAt: now.toISOString(),
-			});
-		}
-
-		if (userBody.action === 'reset_data') {
-			let wasBlacklisted = Boolean((existingDoc as any)?.blacklisted);
-			let wasServicesOptOut = (existingDoc as any)?.services === false;
-
-			try {
-				const virtueDb = await database('virtue');
-				const VUserModel = (virtueDb.models.profiles as any)?.User;
-				if (VUserModel) {
-					const vDoc = (await VUserModel.findOne({ id: resolvedId })
-						.lean()
-						.catch(() => null)) as any;
-					if (vDoc?.blacklisted) wasBlacklisted = true;
-					if (vDoc?.services === false) wasServicesOptOut = true;
-				}
-			} catch {}
-
-			const DispatchInvite = (models.dispatch as any)?.Invite;
-			await Promise.all([
-				models.users.Appearance.deleteMany({ ownerId: resolvedId }).catch(() => null),
-				models.users.Credit.deleteMany({ ownerId: resolvedId }).catch(() => null),
-				models.users.Level.deleteMany({ ownerId: resolvedId }).catch(() => null),
-				DispatchInvite?.deleteMany({ targetId: resolvedId }).catch(() => null),
-				DispatchInvite?.updateMany({ targetId: 'global', $or: [{ readBy: resolvedId }, { deletedBy: resolvedId }] }, { $pull: { readBy: resolvedId, deletedBy: resolvedId } }).catch(
-					() => null
-				),
-			]);
-
-			if (wasBlacklisted || wasServicesOptOut) {
-				const tombstoneDoc: Record<string, any> = {
-					id: resolvedId,
-					...(wasBlacklisted ? { blacklisted: true } : {}),
-					...(wasServicesOptOut ? { services: false } : {}),
-				};
-				await models.users.User.collection.replaceOne({ id: resolvedId }, tombstoneDoc, { upsert: true });
-
-				try {
-					const virtueDb = await database('virtue');
-					const VUserModel = (virtueDb.models.profiles as any)?.User;
-					if (VUserModel) {
-						await VUserModel.collection.replaceOne({ id: resolvedId }, tombstoneDoc, { upsert: true }).catch(() => null);
-					}
-				} catch {}
-
-				await recordAuditLog(req, {
-					action: 'user.data.reset',
-					targetType: 'user',
-					targetId: resolvedId,
-					summary: `Reset profile data for user "${existingDoc?.name || resolvedId}" (tombstone persisted)`,
-					metadata: { blacklisted: wasBlacklisted, services: !wasServicesOptOut },
-				});
-
-				return NextResponse.json({
-					id: resolvedId,
-					blacklisted: wasBlacklisted,
-					services: !wasServicesOptOut,
-					tombstone: true,
-					appearance: {},
-					credits: { balance: 0, streak: 0 },
-					level: { level: 1, xp: 0 },
-				});
-			}
-
-			const resetDoc: Record<string, any> = {
-				id: resolvedId,
-				name: userBody.name || existingDoc?.name || 'User',
-				privacy: 'private',
-				services: true,
-				blacklisted: false,
-				shadowban: Boolean((existingDoc as any)?.shadowban),
-				roles: Array.isArray(existingDoc?.roles) ? existingDoc.roles : [],
-				preferences: { locale: 'en-GB' },
-			};
-			await models.users.User.collection.replaceOne({ id: resolvedId }, resetDoc, { upsert: true });
-
-			await recordAuditLog(req, {
-				action: 'user.data.reset',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Reset profile data for user "${existingDoc?.name || resolvedId}"`,
-			});
-
-			return NextResponse.json({
-				...resetDoc,
-				appearance: {},
-				credits: { balance: 0, streak: 0 },
-				level: { level: 1, xp: 0 },
-			});
-		}
-
-		if (userBody.action === 'send_notification') {
-			const notifTitle = String(userBody.title || '').trim();
-			const notifMessage = String(userBody.message || '').trim();
-			const notifType = (['info', 'success', 'warning', 'error'].includes(userBody.type) ? userBody.type : 'info') as 'info' | 'success' | 'warning' | 'error';
-			const notifLink = userBody.link ? String(userBody.link).trim() : null;
-			if (!notifTitle || !notifMessage) {
-				return NextResponse.json({ error: 'Title and message are required.' }, { status: 400 });
-			}
-			await sendUserNotification({
-				targetId: resolvedId,
-				type: notifType,
-				title: notifTitle,
-				message: notifMessage,
-				link: notifLink,
-			});
-			await recordAuditLog(req, {
-				action: 'user.notify',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Sent notification "${notifTitle}" to user "${existingDoc?.name || resolvedId}"`,
-				metadata: { type: notifType, title: notifTitle, link: notifLink },
-			});
-			return NextResponse.json({ success: true });
-		}
-
-		if (userBody.action === 'clear_notifications') {
-			const DispatchInvite = (models.dispatch as any)?.Invite;
-			const [deleteRes, globalRes] = await Promise.all([
-				DispatchInvite
-					? DispatchInvite.deleteMany({
-							targetId: resolvedId,
-							category: { $ne: 'application' },
-							$nor: [{ category: 'invite', status: 'pending' }],
-						}).catch(() => null)
-					: Promise.resolve(null),
-				DispatchInvite ? DispatchInvite.updateMany({ targetId: 'global', deletedBy: { $ne: resolvedId } }, { $addToSet: { deletedBy: resolvedId } }).catch(() => null) : Promise.resolve(null),
-				models.users.User.updateOne(
-					{ id: resolvedId },
-					{
-						$set: {
-							'notifications.dailyGiftReminderAt': null,
-							'notifications.voteReminders': [],
-						},
-					}
-				).catch(() => null),
-			]);
-			await recordAuditLog(req, {
-				action: 'user.notifications.clear',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Cleared all notifications for user "${existingDoc?.name || resolvedId}"`,
-				metadata: {
-					deletedCount: deleteRes?.deletedCount ?? 0,
-					dismissedGlobalsCount: globalRes?.modifiedCount ?? 0,
-				},
-			});
-			return NextResponse.json({
-				success: true,
-				deletedCount: deleteRes?.deletedCount ?? 0,
-				dismissedGlobalsCount: globalRes?.modifiedCount ?? 0,
-			});
-		}
-
-		if (userBody.action === 'claim_bot_invite_bonus') {
-			const rawBotId = String(userBody.botId || '')
-				.trim()
-				.toLowerCase();
-			const rawGuildId =
-				String(userBody.guildId || 'initial')
-					.trim()
-					.toLowerCase() || 'initial';
-			const botName = String(userBody.botName || rawBotId || 'Bot').trim();
-			if (!rawBotId) {
-				return NextResponse.json({ error: 'botId is required.' }, { status: 400 });
-			}
-
-			const itemId = `bot_invite:${rawBotId}:${rawGuildId}`;
-			const existingCredit = (await models.users.Credit.findOne({ ownerId: resolvedId }).lean()) as any;
-			const alreadyRewarded = Array.isArray(existingCredit?.transactions) && existingCredit.transactions.some((tx: any) => tx?.itemId === itemId);
-
-			let bonusGranted = false;
-			let updatedCredit = existingCredit;
-
-			if (!alreadyRewarded) {
-				const inviteTx = {
-					id: crypto.randomUUID(),
-					type: 'earn',
-					amount: BOT_INVITE_BONUS_AMOUNT,
-					multiplierPercent: 100,
-					itemId,
-					itemName: `Bot Invite Bonus (${botName})`,
-					createdAt: new Date(),
-				};
-
-				if (!existingCredit) {
-					const created = await models.users.Credit.create({
-						ownerId: resolvedId,
-						balance: BOT_INVITE_BONUS_AMOUNT,
-						transactions: [inviteTx],
-					});
-					updatedCredit = created?.toObject ? created.toObject() : created;
-				} else {
-					updatedCredit = await models.users.Credit.findOneAndUpdate(
-						{ ownerId: resolvedId },
-						{
-							$inc: { balance: BOT_INVITE_BONUS_AMOUNT },
-							$push: { transactions: { $each: [inviteTx], $position: 0 } },
-						},
-						{ returnDocument: 'after', runValidators: true, strict: false }
-					).lean();
-				}
-				bonusGranted = true;
-			}
-
-			return NextResponse.json({
-				success: true,
-				bonusGranted,
-				bonusAmount: BOT_INVITE_BONUS_AMOUNT,
-				balance: Number(updatedCredit?.balance) || 0,
-			});
-		}
-
-		if (userBody.agreedTerms && userBody.agreedPrivacy) {
-			userBody.verified = true;
-		} else if (userBody.verified === true) {
-			const now = new Date();
-			if (!existingDoc?.agreedTerms && !userBody.agreedTerms) userBody.agreedTerms = now;
-			if (!existingDoc?.agreedPrivacy && !userBody.agreedPrivacy) userBody.agreedPrivacy = now;
-		} else if (userBody.verified === false) {
-			userBody.agreedTerms = null;
-			userBody.agreedPrivacy = null;
-		}
-
-		if (userBody.onboarding && typeof userBody.onboarding === 'object') {
-			const prevOnboarding = (existingDoc as any)?.onboarding || {};
-			const prevBots = Array.isArray(prevOnboarding.onboardedBots) ? prevOnboarding.onboardedBots.map(String) : [];
-			const incomingBots = Array.isArray(userBody.onboarding.onboardedBots) ? userBody.onboarding.onboardedBots.map(String) : [];
-			const mergedBots = Array.from(new Set([...prevBots, ...incomingBots].filter(Boolean)));
-			const validPersonas = ['user', 'developer', 'both'];
-			const validTourPhases = ['header', 'sidebar', 'dashboard', 'portal', 'explore', 'ready'];
-			const nextTourPostponed = typeof userBody.onboarding.tourPostponed === 'boolean' ? userBody.onboarding.tourPostponed : Boolean(prevOnboarding.tourPostponed);
-			const rawPostponedPhase = userBody.onboarding.tourPostponedPhase !== undefined ? userBody.onboarding.tourPostponedPhase : prevOnboarding.tourPostponedPhase;
-			userBody.onboarding = {
-				persona: validPersonas.includes(userBody.onboarding.persona) ? userBody.onboarding.persona : validPersonas.includes(prevOnboarding.persona) ? prevOnboarding.persona : 'user',
-				suiteIntroCompleted: Boolean(userBody.onboarding.suiteIntroCompleted ?? prevOnboarding.suiteIntroCompleted),
-				dashboardTourCompleted: Boolean(userBody.onboarding.dashboardTourCompleted ?? prevOnboarding.dashboardTourCompleted),
-				supportPromptCompleted: Boolean(userBody.onboarding.supportPromptCompleted ?? prevOnboarding.supportPromptCompleted),
-				tourPostponed: nextTourPostponed,
-				tourPostponedPhase: nextTourPostponed && validTourPhases.includes(rawPostponedPhase) ? rawPostponedPhase : null,
-				completedAt:
-					nextTourPostponed || userBody.onboarding.completedAt === null
-						? null
-						: userBody.onboarding.completedAt
-							? new Date(userBody.onboarding.completedAt)
-							: prevOnboarding.completedAt || null,
-				onboardedBots: mergedBots,
-			};
-		}
-
-		if (userBody.action === 'unlock_vanity') {
-			delete userBody.action;
-			if (!isVanityAlreadyUnlocked) {
-				const unlockRes = await unlockVanityWithUserCredits(models, resolvedId, existingDoc?.name || `User ${resolvedId}`);
-				if (!unlockRes.ok) {
-					return NextResponse.json({ error: unlockRes.error }, { status: 403 });
-				}
-				const unlockedUser = await models.users.User.findOneAndUpdate({ id: resolvedId }, { $set: { vanityUnlocked: true } }, { returnDocument: 'after', runValidators: true }).lean();
-				return NextResponse.json({
-					...unlockedUser,
-					vanityUnlocked: true,
-					vanitySlug: unlockedUser?.vanitySlug || '',
-					credits: unlockRes.credits || {},
-					usedSlot: unlockRes.usedSlot,
-					cost: unlockRes.cost,
-				});
-			}
-			return NextResponse.json({ ...existingDoc, vanityUnlocked: true, vanitySlug: existingDoc?.vanitySlug || '' });
-		}
-
+		normalizeUserOnboardingAndVerification(userBody, existingDoc);
 		delete userBody.action;
+
+		if (!caller.isSystemToken && caller.userId === resolvedId && userBody.devices === undefined) {
+			const liveDevice = parseUserAgentDevice(req.headers.get('user-agent'));
+			if (liveDevice) {
+				const merged = mergeUserDevices((existingDoc as any)?.devices, liveDevice);
+				if (merged.shouldPersist) {
+					userBody.devices = merged.devices;
+				}
+			}
+		}
 
 		if (userBody.birthday === '' || userBody.birthday === null) {
 			delete userBody.birthday;
@@ -763,7 +323,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 		if (Object.keys(userBody).length > 0) mongoUpdate.$set = userBody;
 		if (Object.keys(unsetFields).length > 0) mongoUpdate.$unset = unsetFields;
 
-		// findOneAndUpdate with { returnDocument: 'after' } returns the updated document rather than the old one
 		const updatedUser =
 			Object.keys(mongoUpdate).length > 0
 				? await models.users.User.findOneAndUpdate({ id: resolvedId }, mongoUpdate, { returnDocument: 'after', runValidators: true, strict: false }).lean()
@@ -814,7 +373,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 					}).catch(console.error);
 				}
 
-				// Trigger background sync across Discord servers
 				setTimeout(async () => {
 					try {
 						const db = await database('xernerx');
@@ -830,325 +388,30 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 			return NextResponse.json({ error: 'User not found' }, { status: 404 });
 		}
 
-		const existingCredits = (await models.users.Credit.findOne({ ownerId: resolvedId }).lean()) as any;
-		const effectiveUnlockedBadges: string[] = Array.isArray(credits?.unlockedBadges)
-			? credits.unlockedBadges.map(String)
-			: Array.isArray(existingCredits?.unlockedBadges)
-				? existingCredits.unlockedBadges.map(String)
-				: [];
+		const { existingCredits, existingLevel, updatedAppearance, updatedCredits, updatedLevel } = await updateUserAppearanceCreditsAndLevel({
+			models,
+			resolvedId,
+			appearance,
+			credits,
+			level,
+		});
 
-		const CHILD_TO_BUNDLE_MAP: Record<string, string> = {
-			ambient_mesh_lava: 'ambient_scenes_pack',
-			ambient_cyber_grid: 'ambient_scenes_pack',
-			ambient_topography: 'ambient_scenes_pack',
-			ambient_nebula_cosmos: 'ambient_scenes_pack',
-			ambient_prism_caustics: 'ambient_scenes_pack',
-			surface_crystal: 'surface_styles_pack',
-			surface_holographic: 'surface_styles_pack',
-			surface_neon: 'surface_styles_pack',
-			surface_obsidian: 'surface_styles_pack',
-			frame_plasma_ring: 'profile_frames_pack',
-			frame_holo_crown: 'profile_frames_pack',
-			frame_cyber_hex: 'profile_frames_pack',
-			frame_solar_flare: 'profile_frames_pack',
-			nameplate_aurora_wave: 'profile_nameplates_pack',
-			nameplate_synth_horizon: 'profile_nameplates_pack',
-			nameplate_nebula_shimmer: 'profile_nameplates_pack',
-			nameplate_cyber_circuit: 'profile_nameplates_pack',
-			cursor_starlight_trail: 'cursor_fx_bundle',
-			cursor_plasma_sparks: 'cursor_fx_bundle',
-			cursor_cyber_reticle: 'cursor_fx_bundle',
-			cursor_sonic_rings: 'cursor_fx_bundle',
-			cursor_aurora_ribbon: 'cursor_fx_bundle',
-			skin_hud_tactical: 'overlay_skins_bundle',
-			skin_frosted_prism: 'overlay_skins_bundle',
-			skin_neon_arcade: 'overlay_skins_bundle',
-			skin_minimal_pill: 'overlay_skins_bundle',
-		};
-		const hasCosmeticBadge = (reqBadge?: string) => {
-			if (!reqBadge) return true;
-			if (effectiveUnlockedBadges.includes(reqBadge)) return true;
-			const parentBundle = CHILD_TO_BUNDLE_MAP[reqBadge];
-			return Boolean(parentBundle && effectiveUnlockedBadges.includes(parentBundle));
-		};
-
-		let updatedAppearance: any = null;
-		if (appearance) {
-			const { uiPreferences, _id: _aId, __v: _aV, createdAt: _aCreated, updatedAt: _aUpdated, ownerId: _aOwner, ...restAppearance } = appearance;
-			const appearanceUpdate: Record<string, any> = { ...restAppearance };
-			if (uiPreferences && typeof uiPreferences === 'object') {
-				const typeUnlock: Record<string, string> = {
-					orbit: 'dot_matrix_banner',
-					vortex: 'dot_matrix_banner',
-					helix: 'dot_matrix_banner',
-					prism: 'dot_matrix_banner',
-					infinity: 'dot_matrix_banner',
-					wavegrid: 'dot_matrix_banner',
-					chronos: 'stage_constellation',
-					supernova: 'stage_constellation',
-					tesseract: 'stage_hexgrid',
-					synthwave: 'stage_aurora',
-					lotus: 'stage_glyphs',
-				};
-				const renderUnlock: Record<string, string> = {
-					constellation: 'stage_constellation',
-					hexgrid: 'stage_hexgrid',
-					aurora: 'stage_aurora',
-					glyphs: 'stage_glyphs',
-				};
-				const wcUnlock: Record<string, string> = {
-					capsule: 'window_styles_pack',
-					squircle: 'window_styles_pack',
-					minimal: 'window_styles_pack',
-				};
-				const iconUnlock: Record<string, string> = {
-					duotone: 'ui_icon_packs',
-					bold: 'ui_icon_packs',
-					precision: 'ui_icon_packs',
-				};
-				const sceneUnlock: Record<string, string> = {
-					mesh_lava: 'ambient_mesh_lava',
-					cyber_grid: 'ambient_cyber_grid',
-					topography: 'ambient_topography',
-					nebula_cosmos: 'ambient_nebula_cosmos',
-					prism_caustics: 'ambient_prism_caustics',
-				};
-				const surfUnlock: Record<string, string> = {
-					crystal: 'surface_crystal',
-					holographic: 'surface_holographic',
-					neon: 'surface_neon',
-					obsidian: 'surface_obsidian',
-				};
-				const fxUnlock: Record<string, string> = {
-					starlight_trail: 'cursor_starlight_trail',
-					plasma_sparks: 'cursor_plasma_sparks',
-					cyber_reticle: 'cursor_cyber_reticle',
-					sonic_rings: 'cursor_sonic_rings',
-					aurora_ribbon: 'cursor_aurora_ribbon',
-				};
-				const skinUnlock: Record<string, string> = {
-					hud_tactical: 'skin_hud_tactical',
-					frosted_prism: 'skin_frosted_prism',
-					neon_arcade: 'skin_neon_arcade',
-					minimal_pill: 'skin_minimal_pill',
-				};
-
-				for (const [k, rawVal] of Object.entries(uiPreferences)) {
-					let v = rawVal;
-					if (k === 'dotMatrixType' && typeof v === 'string' && !hasCosmeticBadge(typeUnlock[v])) v = 'default';
-					if (k === 'dotMatrixRenderStyle' && typeof v === 'string' && !hasCosmeticBadge(renderUnlock[v])) v = 'dots';
-					if (k === 'windowControls' && typeof v === 'string' && !hasCosmeticBadge(wcUnlock[v])) v = 'system';
-					if (k === 'uiIconStyle' && typeof v === 'string' && !hasCosmeticBadge(iconUnlock[v])) v = 'standard';
-					if (k === 'ambientScene' && typeof v === 'string' && !hasCosmeticBadge(sceneUnlock[v])) v = 'default';
-					if (k === 'surfaceStyle' && typeof v === 'string' && !hasCosmeticBadge(surfUnlock[v])) v = 'default';
-					if (k === 'cursorFx' && typeof v === 'string' && !hasCosmeticBadge(fxUnlock[v])) v = 'default';
-					if (k === 'overlaySkin' && typeof v === 'string' && !hasCosmeticBadge(skinUnlock[v])) v = 'default';
-					appearanceUpdate[`uiPreferences.${k}`] = v;
-				}
-			}
-			updatedAppearance = await models.users.Appearance.findOneAndUpdate(
-				{ ownerId: resolvedId },
-				{ $set: appearanceUpdate },
-				{ upsert: true, returnDocument: 'after', runValidators: true }
-			).lean();
-		} else {
-			updatedAppearance = await models.users.Appearance.findOne({ ownerId: resolvedId }).lean();
-		}
-
-		let updatedCredits: any = null;
-		if (credits) {
-			const { _id: _cId, __v: _cV, createdAt: _cCreated, updatedAt: _cUpdated, ownerId: _cOwner, ...cleanCredits } = credits;
-			if (cleanCredits.profileCosmetics && typeof cleanCredits.profileCosmetics === 'object') {
-				const frameUnlock: Record<string, string> = {
-					plasma_ring: 'frame_plasma_ring',
-					holo_crown: 'frame_holo_crown',
-					cyber_hex: 'frame_cyber_hex',
-					solar_flare: 'frame_solar_flare',
-				};
-				const npUnlock: Record<string, string> = {
-					aurora_wave: 'nameplate_aurora_wave',
-					synth_horizon: 'nameplate_synth_horizon',
-					nebula_shimmer: 'nameplate_nebula_shimmer',
-					cyber_circuit: 'nameplate_cyber_circuit',
-				};
-				const cardUnlock: Record<string, string> = {
-					holographic: 'nameplate_aurora_wave',
-					celestial: 'nameplate_synth_horizon',
-					cyber_neon: 'nameplate_nebula_shimmer',
-					obsidian_gold: 'nameplate_cyber_circuit',
-				};
-				const reqFrame = String(cleanCredits.profileCosmetics.avatarFrame || 'none');
-				const reqNp = String(cleanCredits.profileCosmetics.nameplate || 'none');
-				const reqCard = String(cleanCredits.profileCosmetics.cardTheme || 'default');
-				cleanCredits.profileCosmetics = {
-					avatarFrame: hasCosmeticBadge(frameUnlock[reqFrame]) ? reqFrame : 'none',
-					nameplate: hasCosmeticBadge(npUnlock[reqNp]) ? reqNp : 'none',
-					cardTheme: hasCosmeticBadge(cardUnlock[reqCard]) ? reqCard : 'default',
-				};
-			}
-			if (cleanCredits.dotMatrixVariant !== undefined) {
-				if (!hasCosmeticBadge('dot_matrix_banner')) {
-					cleanCredits.dotMatrixVariant = existingCredits?.dotMatrixVariant || 'orbit';
-				}
-			}
-			updatedCredits = await models.users.Credit.findOneAndUpdate({ ownerId: resolvedId }, { $set: cleanCredits }, { upsert: true, returnDocument: 'after', runValidators: true }).lean();
-		} else {
-			updatedCredits = existingCredits;
-		}
-
-		const existingLevel = level ? await models.users.Level.findOne({ ownerId: resolvedId }).lean() : null;
-		let updatedLevel: any = null;
-		if (level) {
-			const { _id: _lId, __v: _lV, createdAt: _lCreated, updatedAt: _lUpdated, ownerId: _lOwner, ...cleanLevel } = level;
-			updatedLevel = await models.users.Level.findOneAndUpdate({ ownerId: resolvedId }, { $set: cleanLevel }, { upsert: true, returnDocument: 'after', runValidators: true }).lean();
-		} else {
-			updatedLevel = await models.users.Level.findOne({ ownerId: resolvedId }).lean();
-		}
-
-		const changes: string[] = [];
-		const metaChanges: Record<string, any> = {};
-
-		if (userBody.name !== undefined && (existingDoc?.name || null) !== (updatedUser.name || null)) {
-			changes.push(`name: "${existingDoc?.name || ''}" → "${updatedUser.name || ''}"`);
-			metaChanges.name = updatedUser.name || null;
-		}
-		if (userBody.privacy !== undefined && (existingDoc?.privacy || 'public') !== (updatedUser.privacy || 'public')) {
-			changes.push(`privacy: ${existingDoc?.privacy || 'public'} → ${updatedUser.privacy}`);
-			metaChanges.privacy = updatedUser.privacy;
-		}
-		if (userBody.description !== undefined && (existingDoc?.description || null) !== (updatedUser.description || null)) {
-			changes.push('description updated');
-			metaChanges.descriptionUpdated = true;
-		}
-		if (userBody.info !== undefined && (existingDoc?.info || null) !== (updatedUser.info || null)) {
-			changes.push('info updated');
-			metaChanges.infoUpdated = true;
-		}
-		if (typeof userBody.verified === 'boolean' && Boolean(existingDoc?.verified) !== Boolean(updatedUser.verified)) {
-			changes.push(`verified: ${updatedUser.verified ? 'true' : 'false'}`);
-			metaChanges.verified = Boolean(updatedUser.verified);
-		}
-		if (typeof userBody.blacklisted === 'boolean' && Boolean((existingDoc as any)?.blacklisted) !== Boolean((updatedUser as any).blacklisted)) {
-			changes.push(`blacklisted: ${(updatedUser as any).blacklisted ? 'true' : 'false'}`);
-			metaChanges.blacklisted = Boolean((updatedUser as any).blacklisted);
-		}
-		if (typeof userBody.services === 'boolean' && ((existingDoc as any)?.services !== false) !== ((updatedUser as any).services !== false)) {
-			changes.push(`services: ${(updatedUser as any).services !== false ? 'enabled' : 'disabled'}`);
-			metaChanges.services = (updatedUser as any).services !== false;
-		}
-		if (typeof userBody.services === 'boolean' || typeof userBody.blacklisted === 'boolean') {
-			try {
-				const virtueDb = await database('virtue');
-				const VUserModel = (virtueDb.models.profiles as any)?.User;
-				if (VUserModel) {
-					const virtueSync: Record<string, any> = {};
-					if (typeof userBody.services === 'boolean') virtueSync.services = userBody.services;
-					if (typeof userBody.blacklisted === 'boolean') virtueSync.blacklisted = userBody.blacklisted;
-					await VUserModel.updateOne({ id: resolvedId }, { $set: virtueSync }).catch(() => null);
-				}
-			} catch {}
-		}
-		if (typeof userBody.widgets === 'boolean' && Boolean((existingDoc as any)?.widgets) !== Boolean((updatedUser as any).widgets)) {
-			changes.push(`widgets: ${(updatedUser as any).widgets ? 'enabled' : 'disabled'}`);
-			metaChanges.widgets = Boolean((updatedUser as any).widgets);
-		}
-		if (userBody.email !== undefined && (existingDoc?.email || '') !== (updatedUser.email || '')) {
-			changes.push(`email: "${existingDoc?.email || ''}" → "${updatedUser.email || ''}"`);
-			metaChanges.email = updatedUser.email || '';
-		}
-		if (userBody.icon !== undefined && (existingDoc?.icon || '') !== (updatedUser.icon || '')) {
-			changes.push('avatar URL updated');
-			metaChanges.icon = updatedUser.icon || '';
-		}
-		if (Array.isArray(userBody.showcases) && (existingDoc?.showcases?.length || 0) !== (updatedUser.showcases?.length || 0)) {
-			changes.push(`showcases: ${existingDoc?.showcases?.length || 0} → ${updatedUser.showcases?.length || 0}`);
-			metaChanges.showcasesCount = updatedUser.showcases?.length || 0;
-		}
-		if (Array.isArray(userBody.connections) && (existingDoc?.connections?.length || 0) !== (updatedUser.connections?.length || 0)) {
-			changes.push(`connections: ${existingDoc?.connections?.length || 0} → ${updatedUser.connections?.length || 0}`);
-			metaChanges.connectionsCount = updatedUser.connections?.length || 0;
-		}
-		if (Array.isArray(userBody.devices) && (existingDoc?.devices?.length || 0) !== (updatedUser.devices?.length || 0)) {
-			changes.push(`devices: ${existingDoc?.devices?.length || 0} → ${updatedUser.devices?.length || 0}`);
-			metaChanges.devicesCount = updatedUser.devices?.length || 0;
-		}
-		if (userBody.stripeCustomerId !== undefined && ((existingDoc as any)?.stripeCustomerId || null) !== ((updatedUser as any).stripeCustomerId || null)) {
-			changes.push(`stripeCustomerId: ${(existingDoc as any)?.stripeCustomerId || 'none'} → ${(updatedUser as any).stripeCustomerId || 'none'}`);
-			metaChanges.stripeCustomerId = (updatedUser as any).stripeCustomerId || null;
-		}
-		if (typeof userBody.staffSubscription === 'boolean' && Boolean((existingDoc as any)?.staffSubscription) !== userBody.staffSubscription) {
-			changes.push(`staffSubscription: ${userBody.staffSubscription ? 'enabled' : 'disabled'}`);
-			metaChanges.staffSubscription = userBody.staffSubscription;
-		}
-		if ((userBody.vanitySlug !== undefined || unsetFields.vanitySlug) && (existingDoc?.vanitySlug || '') !== (updatedUser.vanitySlug || '')) {
-			changes.push(`vanitySlug: "${existingDoc?.vanitySlug || ''}" → "${updatedUser.vanitySlug || ''}"`);
-			metaChanges.vanitySlug = updatedUser.vanitySlug || '';
-		}
-		if (addedRoles.length > 0) {
-			changes.push(`roles +[${addedRoles.join(', ')}]`);
-			metaChanges.rolesAdded = addedRoles.join(', ');
-		}
-		if (removedRoles.length > 0) {
-			changes.push(`roles -[${removedRoles.join(', ')}]`);
-			metaChanges.rolesRemoved = removedRoles.join(', ');
-		}
-		if (credits) {
-			const oldBalance = Number((existingCredits as any)?.balance) || 0;
-			const newBalance = Number(updatedCredits?.balance) || 0;
-			const oldStreak = Number((existingCredits as any)?.streak) || 0;
-			const newStreak = Number(updatedCredits?.streak) || 0;
-			if (credits.balance !== undefined && oldBalance !== newBalance) {
-				changes.push(`credits: ${oldBalance} → ${newBalance}`);
-				metaChanges.creditsBalance = `${oldBalance} → ${newBalance}`;
-			}
-			if (credits.streak !== undefined && oldStreak !== newStreak) {
-				changes.push(`streak: ${oldStreak} → ${newStreak}`);
-				metaChanges.creditsStreak = `${oldStreak} → ${newStreak}`;
-			}
-			const slotKeys = ['streakShields', 'extraBotSlots', 'extraCdnSlots', 'extraShowcaseSlots', 'extraVanitySlots', 'totalSpent'] as const;
-			for (const sk of slotKeys) {
-				if ((credits as any)[sk] !== undefined) {
-					const oldVal = Number((existingCredits as any)?.[sk]) || 0;
-					const newVal = Number((updatedCredits as any)?.[sk]) || 0;
-					if (oldVal !== newVal) {
-						changes.push(`${sk}: ${oldVal} → ${newVal}`);
-						metaChanges[sk] = `${oldVal} → ${newVal}`;
-					}
-				}
-			}
-			if (Array.isArray(credits.unlockedBadges)) {
-				const oldB = ((existingCredits as any)?.unlockedBadges || []).join(',');
-				const newB = (updatedCredits?.unlockedBadges || []).join(',');
-				if (oldB !== newB) {
-					changes.push(`unlockedBadges: [${newB}]`);
-					metaChanges.unlockedBadges = updatedCredits?.unlockedBadges || [];
-				}
-			}
-		}
-		if (level) {
-			const oldLvl = Number((existingLevel as any)?.level) || 1;
-			const newLvl = Number(updatedLevel?.level) || 1;
-			const oldXp = Number((existingLevel as any)?.xp) || 0;
-			const newXp = Number(updatedLevel?.xp) || 0;
-			if (level.level !== undefined && oldLvl !== newLvl) {
-				changes.push(`level: ${oldLvl} → ${newLvl}`);
-				metaChanges.globalLevel = `${oldLvl} → ${newLvl}`;
-			}
-			if (level.xp !== undefined && oldXp !== newXp) {
-				changes.push(`xp: ${oldXp} → ${newXp}`);
-				metaChanges.globalXp = `${oldXp} → ${newXp}`;
-			}
-		}
-
-		if (changes.length > 0) {
-			await recordAuditLog(req, {
-				action: 'user.update',
-				targetType: 'user',
-				targetId: resolvedId,
-				summary: `Updated user "${updatedUser.name || resolvedId}" (${changes.join(', ')})`,
-				metadata: metaChanges,
-			});
-		}
+		await syncVirtueAndRecordUserUpdateAudit({
+			req,
+			resolvedId,
+			existingDoc,
+			updatedUser,
+			userBody,
+			unsetFields,
+			addedRoles,
+			removedRoles,
+			credits,
+			existingCredits,
+			updatedCredits,
+			level,
+			existingLevel,
+			updatedLevel,
+		});
 
 		return NextResponse.json({
 			...updatedUser,
@@ -1163,104 +426,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	try {
-		const { id } = await params;
-		const { models } = await database('xernerx');
-
-		const targetUser = await models.users.User.findOne({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] })
-			.select('id')
-			.lean();
-		const resolvedTargetId = targetUser?.id || id;
-
-		const caller = await resolveCallerAuth(req, ['users']);
-		const isStaffOrSystem = Boolean(caller.isSystemToken || caller.authorized);
-		if (!isStaffOrSystem && caller.userId !== resolvedTargetId && caller.userId !== id) {
-			return NextResponse.json({ error: 'Forbidden: You can only delete your own account.' }, { status: 403 });
-		}
-
-		const deletedUser = await models.users.User.findOneAndDelete({ $or: [{ id }, { vanitySlug: id.toLowerCase() }] });
-
-		if (!deletedUser) {
-			return NextResponse.json({ error: 'User not found' }, { status: 404 });
-		}
-
-		const resolvedId = deletedUser.id;
-		let wasBlacklisted = Boolean((deletedUser as any).blacklisted);
-		let wasServicesOptOut = (deletedUser as any).services === false;
-
-		const DispatchInvite = (models.dispatch as any)?.Invite;
-		await Promise.all([
-			models.users.Appearance.findOneAndDelete({ ownerId: resolvedId }),
-			models.users.Credit.findOneAndDelete({ ownerId: resolvedId }),
-			models.users.Level.deleteMany({ ownerId: resolvedId }),
-			models.users.Subscription.deleteMany({ ownerId: resolvedId }),
-			DispatchInvite?.deleteMany({ targetId: resolvedId }).catch(() => null),
-			DispatchInvite?.updateMany({ targetId: 'global', $or: [{ readBy: resolvedId }, { deletedBy: resolvedId }] }, { $pull: { readBy: resolvedId, deletedBy: resolvedId } }).catch(() => null),
-		]);
-
-		try {
-			const virtueDb = await database('virtue');
-			const VUserModel = (virtueDb.models.profiles as any)?.User;
-			if (VUserModel) {
-				const existingVirtueUser = (await VUserModel.findOne({ id: resolvedId })
-					.lean()
-					.catch(() => null)) as any;
-				if (existingVirtueUser?.blacklisted) wasBlacklisted = true;
-				if (existingVirtueUser?.services === false) wasServicesOptOut = true;
-			}
-			const virtueModelsToDelete = Array.from(
-				new Set(
-					[
-						VUserModel,
-						(virtueDb.models.levels as any)?.Level,
-						(virtueDb.models.levels as any)?.Text,
-						(virtueDb.models.levels as any)?.Voice,
-						(virtueDb.models.profiles as any)?.Level,
-						(virtueDb.models.profiles as any)?.Text,
-						(virtueDb.models.profiles as any)?.Voice,
-					].filter(Boolean)
-				)
-			);
-			await Promise.all(virtueModelsToDelete.map((m: any) => m.deleteMany({ id: resolvedId }).catch(() => null)));
-
-			if ((wasBlacklisted || wasServicesOptOut) && VUserModel) {
-				const virtueTombstone: Record<string, any> = {
-					id: resolvedId,
-					...(wasBlacklisted ? { blacklisted: true } : {}),
-					...(wasServicesOptOut ? { services: false } : {}),
-				};
-				await VUserModel.collection.replaceOne({ id: resolvedId }, virtueTombstone, { upsert: true }).catch(() => null);
-			}
-		} catch {}
-
-		if (wasBlacklisted || wasServicesOptOut) {
-			const tombstoneDoc: Record<string, any> = {
-				id: resolvedId,
-				...(wasBlacklisted ? { blacklisted: true } : {}),
-				...(wasServicesOptOut ? { services: false } : {}),
-			};
-			await models.users.User.collection.replaceOne({ id: resolvedId }, tombstoneDoc, { upsert: true });
-		}
-
-		await recordAuditLog(req, {
-			action: 'user.delete',
-			targetType: 'user',
-			targetId: resolvedId,
-			summary: `Deleted user "${deletedUser.name || resolvedId}"${wasBlacklisted || wasServicesOptOut ? ' (tombstone persisted)' : ''}`,
-			metadata: {
-				email: deletedUser.email || null,
-				tombstonePersisted: wasBlacklisted || wasServicesOptOut,
-				...(wasBlacklisted ? { blacklisted: true } : {}),
-				...(wasServicesOptOut ? { services: false } : {}),
-			},
-		});
-
-		return NextResponse.json({
-			success: true,
-			deletedId: resolvedId,
-			tombstonePersisted: wasBlacklisted || wasServicesOptOut,
-		});
-	} catch (error: unknown) {
-		return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-	}
+	const { id } = await params;
+	return handleDeleteUserById(req, id);
 }

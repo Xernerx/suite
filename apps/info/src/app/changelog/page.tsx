@@ -46,6 +46,7 @@ const APPS = [
 
 const BOTS = [
 	{ id: 'virtue', name: 'Virtue', repo: 'Xernerx/Virtue', botId: '1484880634844287138' },
+	{ id: 'yourapps', name: 'YourApps', repo: 'Xernerx/yourapps', botId: '619328560141697036' },
 	{ id: 'zodiac', name: 'Zodiac', repo: 'Xernerx/Zodiac', botId: '' },
 	{ id: 'tdl', name: 'To-Do List Bot', repo: 'Xernerx/TDL', botId: '' },
 	{ id: 'metamorphosis', name: 'Metamorphosis', repo: 'Xernerx/Metamorphosis', botId: '' },

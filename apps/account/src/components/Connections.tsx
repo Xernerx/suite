@@ -165,6 +165,8 @@ export default function Connections() {
 
 	const easypanelConnection = connections.find((c) => c.provider === 'easypanel');
 	const vercelConnection = connections.find((c) => c.provider === 'vercel');
+	const connectedOAuthProviders = OAUTH_PROVIDERS.filter((p) => connections.some((c) => c.provider === p.id));
+	const unconnectedOAuthProviders = OAUTH_PROVIDERS.filter((p) => !connections.some((c) => c.provider === p.id));
 
 	const handleConnect = (providerId: string) => {
 		setBusyProvider(providerId);
@@ -225,66 +227,77 @@ export default function Connections() {
 				<p className="text-sm text-(--text-muted)">{t('account.connections.description')}</p>
 			</div>
 
-			{/* Primary Required Login: Discord OAuth2 */}
-			<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-				<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
-					<div className="flex items-center gap-4">
-						<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
-							<Shield size={28} />
-						</div>
-						<div>
-							<div className="flex flex-wrap items-center gap-2">
-								<h2 className="text-lg font-bold text-(--text)">Discord</h2>
-								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
-									<CheckCircle2 size={12} />
-									{t('account.connections.connected')}
-								</span>
-								<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
-									<Lock size={11} />
-									{t('account.connections.primaryIdentity')}
-								</span>
+			{/* Connected Accounts Section (Top Half) */}
+			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+					<h2 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('account.connections.connectedSectionTitle')}
+					</h2>
+					<p className="text-xs text-(--text-muted)">{t('account.connections.connectedSectionDesc')}</p>
+				</div>
+
+				{/* Primary Required Login: Discord OAuth2 */}
+				<div className="rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+					<div className="flex flex-col sm:flex-row sm:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
+						<div className="flex items-center gap-4">
+							<div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/30 shrink-0">
+								<Shield size={28} />
 							</div>
-							<p className="text-xs text-(--text-muted) mt-1">
-								{(activeUser as any)?.global_name || (activeUser as any)?.name} (@{(activeUser as any)?.username || 'discord'}) • ID: <code className="font-mono">{userId}</code>
-							</p>
+							<div>
+								<div className="flex flex-wrap items-center gap-2">
+									<h2 className="text-lg font-bold text-(--text)">Discord</h2>
+									<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
+										<CheckCircle2 size={12} />
+										{t('account.connections.connected')}
+									</span>
+									<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-(--accent)/15 text-(--accent) border border-(--accent)/25">
+										<Lock size={11} />
+										{t('account.connections.primaryIdentity')}
+									</span>
+								</div>
+								<p className="text-xs text-(--text-muted) mt-1">
+									{(activeUser as any)?.global_name || (activeUser as any)?.name} (@{(activeUser as any)?.username || 'discord'}) • ID: <code className="font-mono">{userId}</code>
+								</p>
+							</div>
 						</div>
+
+						{userId && (
+							<div className="flex flex-wrap items-center gap-2 shrink-0">
+								{supportCtx && (
+									<Button variant={supportCtx.isMember ? 'secondary' : 'primary'} onClick={() => supportCtx.triggerDiscordAction()} className="flex items-center gap-2 shrink-0">
+										{supportCtx.isMember ? <MessageCircle size={15} /> : <UserPlus size={15} />}
+										{supportCtx.isMember ? t('common.supportprovider.description') : t('common.supportprovider.joinButton')}
+									</Button>
+								)}
+								<Button
+									variant="secondary"
+									onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com')}/users/${userId}`, '_blank')}
+									className="flex items-center gap-2 shrink-0"
+								>
+									<ExternalLink size={15} />
+									{t('account.profile.viewPublicProfile')}
+								</Button>
+							</div>
+						)}
 					</div>
 
-					{userId && (
-						<div className="flex flex-wrap items-center gap-2 shrink-0">
-							{supportCtx && (
-								<Button variant={supportCtx.isMember ? 'secondary' : 'primary'} onClick={() => supportCtx.triggerDiscordAction()} className="flex items-center gap-2 shrink-0">
-									{supportCtx.isMember ? <MessageCircle size={15} /> : <UserPlus size={15} />}
-									{supportCtx.isMember ? t('common.supportprovider.description') : t('common.supportprovider.joinButton')}
-								</Button>
-							)}
-							<Button variant="secondary" onClick={() => window.open(`${getEnvUrl('https://app.xernerx.com')}/users/${userId}`, '_blank')} className="flex items-center gap-2 shrink-0">
-								<ExternalLink size={15} />
-								{t('account.profile.viewPublicProfile')}
-							</Button>
+					{isApplication && (
+						<div className="flex items-center justify-between pt-3 border-t border-(--border)/10 gap-4">
+							<div className="flex items-center gap-3 min-w-0">
+								<div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
+									<Gamepad2 size={16} />
+								</div>
+								<div className="flex flex-col min-w-0">
+									<span className="text-sm font-semibold text-(--text)">{t('account.preferences.desktopItems.discordRpc.title')}</span>
+									<span className="text-xs text-(--text-muted)">{t('account.preferences.desktopItems.discordRpc.description')}</span>
+								</div>
+							</div>
+							<Toggle checked={discordRpcEnabled} onChange={handleToggleDiscordRpc} suppressHydrationWarning />
 						</div>
 					)}
 				</div>
 
-				{isApplication && (
-					<div className="flex items-center justify-between pt-3 border-t border-(--border)/10 gap-4">
-						<div className="flex items-center gap-3 min-w-0">
-							<div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 shrink-0">
-								<Gamepad2 size={16} />
-							</div>
-							<div className="flex flex-col min-w-0">
-								<span className="text-sm font-semibold text-(--text)">{t('account.preferences.desktopItems.discordRpc.title')}</span>
-								<span className="text-xs text-(--text-muted)">{t('account.preferences.desktopItems.discordRpc.description')}</span>
-							</div>
-						</div>
-						<Toggle checked={discordRpcEnabled} onChange={handleToggleDiscordRpc} suppressHydrationWarning />
-					</div>
-				)}
-			</div>
-
-			{/* Staff-Only Server Hosting Connections: Easypanel & Vercel (Only rendered when user has 'hosting' permission) */}
-			{hasHostingAccess && (
-				<>
+				{hasHostingAccess && easypanelConnection && (
 					<EasypanelConnectionCard
 						connection={easypanelConnection}
 						defaultEmail={(activeUser as any)?.email || ''}
@@ -295,60 +308,47 @@ export default function Connections() {
 							if (mutate) mutate();
 						}}
 					/>
-					<VercelConnectionCard connection={vercelConnection} isBusy={busyProvider === 'vercel'} onDisconnect={() => handleDisconnect('vercel')} />
-				</>
-			)}
+				)}
 
-			{/* Optional OAuth Connections Grid */}
-			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-					<h2 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{t('account.connections.availableTitle')}
-					</h2>
-					<p className="text-xs text-(--text-muted)">{t('account.connections.availableDesc')}</p>
-				</div>
+				{hasHostingAccess && vercelConnection && <VercelConnectionCard connection={vercelConnection} isBusy={busyProvider === 'vercel'} onDisconnect={() => handleDisconnect('vercel')} />}
 
-				<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
-					{OAUTH_PROVIDERS.map((provider) => {
-						const IconComponent = provider.icon;
-						const connected = connections.find((c) => c.provider === provider.id);
-						const isBusy = busyProvider === provider.id;
+				{connectedOAuthProviders.length > 0 && (
+					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+						{connectedOAuthProviders.map((provider) => {
+							const IconComponent = provider.icon;
+							const connected = connections.find((c) => c.provider === provider.id)!;
+							const isBusy = busyProvider === provider.id;
 
-						return (
-							<div
-								key={provider.id}
-								className={`flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all ${
-									!OAUTH_WORKFLOWS_ENABLED ? 'opacity-50 grayscale pointer-events-none select-none' : ''
-								}`}
-								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex items-start justify-between gap-3">
-									<div className="flex items-center gap-3.5 min-w-0">
-										{connected?.avatar ? (
-											<Image
-												src={connected.avatar}
-												alt={connected.username}
-												width={48}
-												height={48}
-												unoptimized
-												className="h-12 w-12 rounded-2xl border border-(--border)/15 object-cover shrink-0"
-											/>
-										) : (
-											<div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-(--accent)/25 bg-(--accent)/15 text-(--accent) shrink-0">
-												<IconComponent size={22} />
-											</div>
-										)}
-										<div className="min-w-0">
-											<div className="flex items-center gap-2">
-												<h3 className="text-base font-bold text-(--text) truncate">{provider.name}</h3>
-												{connected && (
+							return (
+								<div
+									key={provider.id}
+									className="flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all"
+									style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+								>
+									<div className="flex items-start justify-between gap-3">
+										<div className="flex items-center gap-3.5 min-w-0">
+											{connected.avatar ? (
+												<Image
+													src={connected.avatar}
+													alt={connected.username}
+													width={48}
+													height={48}
+													unoptimized
+													className="h-12 w-12 rounded-2xl border border-(--border)/15 object-cover shrink-0"
+												/>
+											) : (
+												<div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-(--accent)/25 bg-(--accent)/15 text-(--accent) shrink-0">
+													<IconComponent size={22} />
+												</div>
+											)}
+											<div className="min-w-0">
+												<div className="flex items-center gap-2">
+													<h3 className="text-base font-bold text-(--text) truncate">{provider.name}</h3>
 													<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-(--accent-green)/15 text-(--accent-green) border border-(--accent-green)/25">
 														<CheckCircle2 size={10} />
 														{t('account.connections.verifiedBadge')}
 													</span>
-												)}
-											</div>
-											{connected ? (
+												</div>
 												<div className="flex items-center gap-2 mt-0.5">
 													<span className="text-xs font-medium text-(--text) truncate">{connected.displayName || connected.username}</span>
 													{connected.url && (
@@ -363,23 +363,80 @@ export default function Connections() {
 														</a>
 													)}
 												</div>
-											) : (
-												<p className="text-xs text-(--text-muted) mt-0.5">{t('account.connections.notConnected')}</p>
-											)}
+											</div>
 										</div>
-									</div>
 
-									{connected ? (
 										<Button
 											variant="secondary"
 											onClick={() => handleDisconnect(provider.id)}
-											disabled={!OAUTH_WORKFLOWS_ENABLED || isBusy}
+											disabled={isBusy}
 											className="flex items-center gap-1.5 text-(--accent-red) shrink-0 text-xs px-3 py-1.5"
 										>
 											<Unplug size={13} />
 											{t('account.connections.disconnect')}
 										</Button>
-									) : (
+									</div>
+
+									<div className="flex items-center justify-between pt-3 border-t border-(--border)/10">
+										<span className="text-xs text-(--text-muted)">{t('account.connections.showOnProfile')}</span>
+										<Toggle checked={connected.showOnProfile !== false} onChange={(e) => handleToggleVisibility(provider.id, e.target.checked)} />
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
+			</div>
+
+			{/* Available / Unconnected Connections Section (Lower Half) */}
+			<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
+					<h2 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+						{t('account.connections.availableTitle')}
+					</h2>
+					<p className="text-xs text-(--text-muted)">{t('account.connections.availableDesc')}</p>
+				</div>
+
+				{hasHostingAccess && !easypanelConnection && (
+					<EasypanelConnectionCard
+						connection={undefined}
+						defaultEmail={(activeUser as any)?.email || ''}
+						isBusy={busyProvider === 'easypanel'}
+						onDisconnect={() => handleDisconnect('easypanel')}
+						onSaved={(savedConn) => {
+							setConnections((prev) => [...prev.filter((c) => c.provider !== 'easypanel'), savedConn]);
+							if (mutate) mutate();
+						}}
+					/>
+				)}
+
+				{hasHostingAccess && !vercelConnection && <VercelConnectionCard connection={undefined} isBusy={busyProvider === 'vercel'} onDisconnect={() => handleDisconnect('vercel')} />}
+
+				{unconnectedOAuthProviders.length > 0 && (
+					<div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 'var(--ui-gap)' }}>
+						{unconnectedOAuthProviders.map((provider) => {
+							const IconComponent = provider.icon;
+							const isBusy = busyProvider === provider.id;
+
+							return (
+								<div
+									key={provider.id}
+									className={`flex flex-col justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm transition-all ${
+										!OAUTH_WORKFLOWS_ENABLED ? 'opacity-50 grayscale pointer-events-none select-none' : ''
+									}`}
+									style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+								>
+									<div className="flex items-start justify-between gap-3">
+										<div className="flex items-center gap-3.5 min-w-0">
+											<div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-(--accent)/25 bg-(--accent)/15 text-(--accent) shrink-0">
+												<IconComponent size={22} />
+											</div>
+											<div className="min-w-0">
+												<h3 className="text-base font-bold text-(--text) truncate">{provider.name}</h3>
+												<p className="text-xs text-(--text-muted) mt-0.5">{t('account.connections.notConnected')}</p>
+											</div>
+										</div>
+
 										<Button
 											onClick={() => handleConnect(provider.id)}
 											disabled={!OAUTH_WORKFLOWS_ENABLED || isBusy}
@@ -388,19 +445,12 @@ export default function Connections() {
 											<Plus size={14} />
 											{t('account.connections.connectButton')}
 										</Button>
-									)}
-								</div>
-
-								{connected && (
-									<div className="flex items-center justify-between pt-3 border-t border-(--border)/10">
-										<span className="text-xs text-(--text-muted)">{t('account.connections.showOnProfile')}</span>
-										<Toggle checked={connected.showOnProfile !== false} onChange={(e) => handleToggleVisibility(provider.id, e.target.checked)} />
 									</div>
-								)}
-							</div>
-						);
-					})}
-				</div>
+								</div>
+							);
+						})}
+					</div>
+				)}
 			</div>
 		</div>
 	);

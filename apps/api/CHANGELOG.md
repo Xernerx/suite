@@ -2,6 +2,32 @@
 
 # api
 
+## 0.36.0
+
+### Minor Changes
+
+- ## Guild Applications REST Endpoints, Individual Cosmetic Unlocks & Docs Blueprints
+  
+  Added /secure/guilds/[id]/applications/* endpoints for YourApps forms, panels, and submission reviews, updated Credit Store seed unlocks, and expanded FAQ/Docs catalog blueprints.
+  
+  ### Added
+  
+  - **Guild Applications API (/secure/guilds/[id]/applications/*)**: Added endpoints for guild application settings, 13-type Modal V2 position CRUD, Discord Apply panel deployment, web apply metadata, and submission review workflows.
+  - **Docs & FAQ Blueprints**: Registered YourApps REST and WebSocket entries in /core/docs and /core/faq catalog blueprints.
+  
+  ### Changed
+  
+  - **Store Seed & Route Modularization**: Updated Credit Store seed items for per-formation Dot-Matrix unlocks and modularized user, bot profile, and SEO analyzer route handlers.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 0.35.0
 
 ### Minor Changes

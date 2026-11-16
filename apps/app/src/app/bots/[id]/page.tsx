@@ -178,10 +178,12 @@ function BotPageContent({ id }: { id: string }) {
 
 	const currentView = view || 'profile';
 	const resolvedBotId = bot.id || id;
-	const isVirtueBot = resolvedBotId === '1484880634844287138' || String(bot.vanitySlug || id).toLowerCase() === 'virtue';
-	const hasBotDashboard = Boolean(bot.isMainOrgBot && (isVirtueBot || bot.hasSuiteDashboard || bot.links?.dashboard));
+	const botSlugLower = String(bot.vanitySlug || id).toLowerCase();
+	const isVirtueBot = resolvedBotId === '1484880634844287138' || botSlugLower === 'virtue';
+	const isYourAppsBot = resolvedBotId === '619328560141697036' || resolvedBotId === '877221257161109574' || botSlugLower === 'yourapps';
+	const hasBotDashboard = Boolean(bot.isMainOrgBot && (isVirtueBot || isYourAppsBot || bot.hasSuiteDashboard || bot.links?.dashboard));
 	const botDisplayName = bot.discord?.global_name || bot.discord?.username || bot.name || id;
-	const dashboardHref = isVirtueBot ? '/dashboard?tab=virtue' : bot.links?.dashboard || '/dashboard';
+	const dashboardHref = isVirtueBot ? '/dashboard?tab=virtue' : isYourAppsBot ? '/dashboard?tab=applications' : bot.links?.dashboard || '/dashboard';
 
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen pb-24">
@@ -201,7 +203,9 @@ function BotPageContent({ id }: { id: string }) {
 								{t('app.bots.onboarding.banner.title', { name: botDisplayName })}
 							</h2>
 							<p className="text-xs text-(--text-muted) mt-0.5">
-								{t(isVirtueBot ? 'app.bots.onboarding.banner.subtitle' : 'app.bots.onboarding.banner.genericSubtitle', { name: botDisplayName })}
+								{t(isVirtueBot ? 'app.bots.onboarding.banner.subtitle' : isYourAppsBot ? 'app.bots.onboarding.banner.yourappsSubtitle' : 'app.bots.onboarding.banner.genericSubtitle', {
+									name: botDisplayName,
+								})}
 							</p>
 						</div>
 					</div>

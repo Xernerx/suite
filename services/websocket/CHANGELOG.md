@@ -2,6 +2,23 @@
 
 # @xernerx/websocket
 
+## 1.8.0
+
+### Minor Changes
+
+- ## YourApps Real-Time WebSocket Microservice Router
+  
+  Registered the yourapps WebSocket service for guild profiles, form positions, resumable drafts, and application submissions.
+  
+  ### Added
+  
+  - **YourApps Service Router (yourapps)**: Added authenticated WebSocket CRUD actions backing guild application profiles, forms, resumable multi-modal drafts, and reviewer submission updates.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.27.0
+
 ## 1.7.0
 
 ### Minor Changes

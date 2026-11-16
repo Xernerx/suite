@@ -2,16 +2,13 @@
 
 'use client';
 
-import { BellRing, Camera, Code2, Columns2, Compass, FileText, FolderSync, Layers, LayoutTemplate, Lock, RefreshCw, Save, Trash2, X } from 'lucide-react';
-import { Badge, Button, Confirm, Input, Selector, Toggle } from '@xernerx/ui';
+import { Confirm } from '@xernerx/ui';
 import { DesktopAccountSwitcher } from './DesktopAccountSwitcher';
-import { DesktopAppIconPicker } from './DesktopAppIconPicker';
 import { DesktopLogsModal } from './DesktopLogsModal';
 import { isCosmeticUnlocked, WINDOW_CONTROL_UNLOCK_MAP } from './cosmeticUnlocks';
 import {
 	type BooleanDesktopKey,
 	DEFAULT_DESKTOP_METADATA,
-	DESKTOP_ITEMS,
 	type DesktopAppIcon,
 	type DesktopMetadata,
 	normalizeDesktopMetadata,
@@ -20,6 +17,8 @@ import {
 	VALID_STARTUP_LOCATIONS,
 	type WindowControlsStyle,
 } from './desktopPreferencesConfig';
+import { DesktopPreferencesToolbar } from './desktop/DesktopPreferencesToolbar';
+import { DesktopPreferencesBody } from './desktop/DesktopPreferencesBody';
 import { navigation } from '@xernerx/lib';
 import { useDictionary, useEnvironment, useNotifications, usePermissions, useTheme, useToast, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
@@ -319,193 +318,45 @@ export function DesktopPreferencesSection() {
 	return (
 		<>
 			<div className="flex flex-col rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden">
-				<div className="bg-(--background)/50 border-b border-(--border)/10 flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}>
-					<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-						<div className="flex flex-wrap items-center gap-2">
-							<h2 className="text-lg font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('account.preferences.sections.desktop')}
-							</h2>
-							{desktopMeta.streamerMode && (
-								<Badge variant="accent" size="sm">
-									{broadcasterName ? `${t('account.preferences.desktop.streamerActive')} (${broadcasterName})` : t('account.preferences.desktop.streamerProtected')}
-								</Badge>
-							)}
-							{onBatteryPower && desktopMeta.batterySaver && (
-								<Badge variant="muted" size="sm">
-									{t('account.preferences.desktop.batterySaverActive')}
-								</Badge>
-							)}
-						</div>
-						<p className="text-xs text-(--text-muted)">{t('account.preferences.sections.desktopDesc')}</p>
-					</div>
+				<DesktopPreferencesToolbar
+					desktopMeta={desktopMeta}
+					broadcasterName={broadcasterName}
+					onBatteryPower={onBatteryPower}
+					developerMode={Boolean(preferences.developerMode)}
+					capturing={capturing}
+					clearingCache={clearingCache}
+					isJsonMode={isJsonMode}
+					needsRestart={needsRestart}
+					onQuickCapture={handleQuickCapture}
+					onTestNotification={handleTestNotification}
+					onLaunchOverlay={handleLaunchOverlay}
+					onOpenLogs={() => setLogsModalOpen(true)}
+					onClearCache={handleClearDesktopCache}
+					onToggleEditorMode={handleToggleEditorMode}
+					onRestartDesktopApp={handleRestartDesktopApp}
+				/>
 
-					<div className="flex flex-wrap items-center gap-2">
-						<Button variant="secondary" size="sm" onClick={() => (window as any).electron?.setDockedMode?.()} className="flex items-center gap-1.5">
-							<Columns2 size={14} /> {t('account.preferences.desktop.dockToggle')}
-						</Button>
-						<Button variant="secondary" size="sm" onClick={() => (window as any).electron?.lockPrivacyShield?.()} className="flex items-center gap-1.5">
-							<Lock size={14} /> {t('account.preferences.desktop.lockNow')}
-						</Button>
-						<Button variant="secondary" size="sm" onClick={handleQuickCapture} disabled={capturing} className="flex items-center gap-1.5">
-							<Camera size={14} /> {t('account.preferences.desktop.quickCapture')}
-						</Button>
-						<Button variant="secondary" size="sm" onClick={handleTestNotification} className="flex items-center gap-1.5">
-							<BellRing size={14} /> {t('account.preferences.desktop.testNotification')}
-						</Button>
-						{preferences.developerMode && (
-							<Button variant="secondary" size="sm" onClick={handleLaunchOverlay} className="flex items-center gap-1.5">
-								<Layers size={14} /> {t('account.preferences.desktop.launchOverlay')}
-							</Button>
-						)}
-						<Button variant="secondary" size="sm" onClick={() => setLogsModalOpen(true)} className="flex items-center gap-1.5">
-							<FileText size={14} /> {t('account.preferences.desktop.openLogs')}
-						</Button>
-						<Button variant="secondary" size="sm" onClick={handleClearDesktopCache} disabled={clearingCache} className="flex items-center gap-1.5">
-							{clearingCache ? <RefreshCw size={14} className="animate-spin" /> : <Trash2 size={14} />} {t('account.preferences.desktop.clearCache')}
-						</Button>
-						<Button variant={isJsonMode ? 'primary' : 'secondary'} size="sm" onClick={handleToggleEditorMode} className="flex items-center gap-1.5">
-							<Code2 size={14} /> {isJsonMode ? t('account.preferences.desktop.visualEditor') : t('account.preferences.desktop.editJson')}
-						</Button>
-					</div>
-				</div>
-
-				{needsRestart && (
-					<div
-						className="flex flex-col sm:flex-row sm:items-center justify-between bg-(--accent)/10 border-b border-(--accent)/25"
-						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-					>
-						<div className="flex items-center gap-3">
-							<RefreshCw size={18} className="text-(--accent) shrink-0 animate-spin" />
-							<div className="flex flex-col">
-								<span className="text-sm font-bold text-(--text)">{t('account.preferences.desktop.restartBannerTitle')}</span>
-								<span className="text-xs text-(--text-muted)">{t('account.preferences.desktop.restartBannerDesc')}</span>
-							</div>
-						</div>
-						<Button variant="primary" size="sm" onClick={handleRestartDesktopApp} className="flex items-center gap-2 shrink-0">
-							<RefreshCw size={14} /> {t('account.preferences.desktop.restartNow')}
-						</Button>
-					</div>
-				)}
-
-				{isJsonMode ? (
-					<div className="flex flex-col" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-						<Input
-							variant="textarea"
-							rows={14}
-							value={jsonText}
-							onChange={(e) => {
-								jsonDirtyRef.current = true;
-								setJsonText(e.target.value);
-								if (jsonError) setJsonError(null);
-							}}
-							onKeyDown={(e) => {
-								if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
-									e.preventDefault();
-									handleSaveJson();
-								}
-							}}
-							className="font-mono text-xs leading-relaxed"
-						/>
-						{jsonError && <p className="text-xs font-medium text-(--accent-red)">{jsonError}</p>}
-						<div className="flex items-center justify-end gap-2">
-							<Button variant="secondary" size="sm" onClick={handleFormatJson} className="flex items-center gap-1.5">
-								<Code2 size={14} />
-								{t('account.preferences.desktop.formatJson')}
-							</Button>
-							<Button variant="primary" size="sm" onClick={() => void handleSaveJson()} className="flex items-center gap-1.5">
-								<Save size={14} />
-								{t('account.preferences.desktop.saveJson')}
-							</Button>
-						</div>
-					</div>
-				) : (
-					<div className="flex flex-col">
-						<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-							<div className="flex items-start gap-3.5 max-w-2xl">
-								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
-									<Compass size={18} />
-								</div>
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-									<h3 className="text-base font-semibold text-(--text)">{t('account.preferences.desktopItems.startupLocation.title')}</h3>
-									<p className="text-xs text-(--text-muted)">{t('account.preferences.desktopItems.startupLocation.description')}</p>
-								</div>
-							</div>
-							<div className="w-full sm:w-64 shrink-0">
-								<Selector value={desktopMeta.startupLocation || 'dashboard'} options={startupLocationOptions} onChange={handleStartupLocationChange} items={false} />
-							</div>
-						</div>
-
-						<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-							<div className="flex items-start gap-3.5 max-w-2xl">
-								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
-									<LayoutTemplate size={18} />
-								</div>
-								<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-									<h3 className="text-base font-semibold text-(--text)">{t('account.preferences.desktopItems.windowControls.title')}</h3>
-									<p className="text-xs text-(--text-muted)">{t('account.preferences.desktopItems.windowControls.description')}</p>
-								</div>
-							</div>
-							<div className="w-full sm:w-64 shrink-0">
-								<Selector value={desktopMeta.windowControls || 'system'} options={windowControlsOptions} onChange={handleWindowControlsChange} items={false} />
-							</div>
-						</div>
-
-						<DesktopAppIconPicker value={desktopMeta.appIcon || 'default'} onChange={handleAppIconChange} />
-
-						<div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-							<div className="flex items-start gap-3.5 max-w-2xl">
-								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
-									<FolderSync size={18} />
-								</div>
-								<div className="flex flex-col min-w-0" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-									<h3 className="text-base font-semibold text-(--text)">{t('account.preferences.desktop.watchFolderTitle')}</h3>
-									<p className="text-xs text-(--text-muted)">{t('account.preferences.desktop.watchFolderDesc')}</p>
-									<span className="mt-1 inline-flex items-center rounded-xl bg-(--background)/60 border border-(--border)/10 px-2.5 py-1 font-mono text-[11px] text-(--text-muted) truncate max-w-md">
-										{desktopMeta.cdnWatchFolder || t('account.preferences.desktop.watchFolderEmpty')}
-									</span>
-								</div>
-							</div>
-							<div className="flex items-center gap-2 shrink-0">
-								<Button variant="secondary" size="sm" onClick={handleSelectWatchFolder} className="flex items-center gap-1.5">
-									<FolderSync size={14} />
-									{t('account.preferences.desktop.watchFolderSelect')}
-								</Button>
-								{desktopMeta.cdnWatchFolder && (
-									<Button variant="ghost" size="sm" onClick={handleClearWatchFolder} className="flex items-center gap-1 text-(--text-muted) hover:text-(--accent-red)">
-										<X size={14} />
-										{t('account.preferences.desktop.watchFolderClear')}
-									</Button>
-								)}
-							</div>
-						</div>
-
-						{DESKTOP_ITEMS.map(({ key, icon: Icon, requiresRestart }) => (
-							<div
-								key={key}
-								className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-(--border)/5 last:border-none"
-								style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-							>
-								<div className="flex items-start gap-3.5 max-w-2xl">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/25 mt-0.5">
-										<Icon size={18} />
-									</div>
-									<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.2)' }}>
-										<div className="flex flex-wrap items-center gap-2">
-											<h3 className="text-base font-semibold text-(--text)">{t(`account.preferences.desktopItems.${key}.title`)}</h3>
-											{requiresRestart && (
-												<Badge variant="muted" size="sm">
-													{t('account.preferences.desktop.restartBannerTitle')}
-												</Badge>
-											)}
-										</div>
-										<p className="text-xs text-(--text-muted)">{t(`account.preferences.desktopItems.${key}.description`)}</p>
-									</div>
-								</div>
-								<Toggle checked={desktopMeta[key]} onChange={(val) => handleToggleDesktopFlag(key, requiresRestart, val)} suppressHydrationWarning />
-							</div>
-						))}
-					</div>
-				)}
+				<DesktopPreferencesBody
+					isJsonMode={isJsonMode}
+					jsonText={jsonText}
+					jsonError={jsonError}
+					onJsonChange={(nextText) => {
+						jsonDirtyRef.current = true;
+						setJsonText(nextText);
+						if (jsonError) setJsonError(null);
+					}}
+					onFormatJson={handleFormatJson}
+					onSaveJson={() => void handleSaveJson()}
+					desktopMeta={desktopMeta}
+					startupLocationOptions={startupLocationOptions}
+					windowControlsOptions={windowControlsOptions}
+					onStartupLocationChange={handleStartupLocationChange}
+					onWindowControlsChange={handleWindowControlsChange}
+					onAppIconChange={handleAppIconChange}
+					onSelectWatchFolder={handleSelectWatchFolder}
+					onClearWatchFolder={handleClearWatchFolder}
+					onToggleDesktopFlag={handleToggleDesktopFlag}
+				/>
 
 				<DesktopAccountSwitcher />
 			</div>

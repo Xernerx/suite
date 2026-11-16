@@ -1,22 +1,91 @@
 /** @format */
 'use client';
 
-import { Building2, Code, Compass, CreditCard, Languages, Monitor, Server, Shield, TrendingUp } from 'lucide-react';
+import {
+	Bot,
+	Building2,
+	Code,
+	Coins,
+	Compass,
+	CreditCard,
+	Eye,
+	HardDrive,
+	Languages,
+	Layers,
+	MessageSquare,
+	Monitor,
+	Package,
+	SearchX,
+	Server,
+	Shield,
+	SlidersHorizontal,
+	Sparkles,
+	Trophy,
+	User,
+	Webhook,
+} from 'lucide-react';
+import { FAQ_BLUEPRINTS } from '@xernerx/lib';
 import { SidebarNavItem, useDictionary, useSidebar } from '@xernerx/providers';
 import { Input } from '@xernerx/ui';
-
-import EcosystemAndNavigation from '@/components/faq/EcosystemAndNavigation';
-import Environments from '@/components/faq/Environments';
-import DesktopAndOverlay from '@/components/faq/DesktopAndOverlay';
-import Bots from '@/components/faq/Bots';
-import ServersAndOrganizations from '@/components/faq/ServersAndOrganizations';
-import AccountAndSecurity from '@/components/faq/AccountAndSecurity';
-import BillingAndStore from '@/components/faq/BillingAndStore';
-import ApiAndDevelopers from '@/components/faq/ApiAndDevelopers';
-import Translations from '@/components/faq/Translations';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
+import FaqCategorySection, { countMatchingFaqCards } from '@/components/faq/FaqCategorySection';
 
-import { motion, AnimatePresence } from 'framer-motion';
+const LEGACY_CARD_VIEW_MAP: Record<string, string> = {
+	'overview.card5': 'feedback',
+	'environments.card4': 'feedback',
+	'environments.card6': 'feedback',
+	'billing.card5': 'feedback',
+	'bots.card8': 'leaderboards',
+	'bots.card5': 'leaderboards',
+	'bots.card1': 'leaderboards',
+	'bots.card4': 'webhooks',
+	'servers.card3': 'virtue',
+	'servers.card7': 'virtue',
+	'servers.card8': 'virtue',
+	'servers.card9': 'virtue',
+	'servers.card4': 'organizations',
+	'servers.card5': 'organizations',
+	'servers.card6': 'profiles',
+	'account.card11': 'profiles',
+	'account.card7': 'preferences',
+	'account.card8': 'preferences',
+	'account.card9': 'preferences',
+	'account.card3': 'privacy',
+	'account.card12': 'privacy',
+	'billing.card3': 'credits',
+	'billing.card6': 'credits',
+	'billing.card7': 'credits',
+	'billing.card8': 'credits',
+	'billing.card4': 'cdn',
+	'developers.card4': 'webhooks',
+	'developers.card3': 'packages',
+	'developers.card8': 'packages',
+	'developers.card9': 'packages',
+};
+
+const CATEGORY_ICONS = {
+	overview: Compass,
+	environments: Layers,
+	feedback: MessageSquare,
+	desktop: Monitor,
+	bots: Bot,
+	servers: Server,
+	virtue: Sparkles,
+	leaderboards: Trophy,
+	organizations: Building2,
+	account: Shield,
+	profiles: User,
+	preferences: SlidersHorizontal,
+	privacy: Eye,
+	billing: CreditCard,
+	credits: Coins,
+	cdn: HardDrive,
+	developers: Code,
+	webhooks: Webhook,
+	packages: Package,
+	translations: Languages,
+} as const;
 
 export default function Page() {
 	const { show, setNavItems, setView, view } = useSidebar();
@@ -25,71 +94,25 @@ export default function Page() {
 	const hasInitializedUrl = useRef(false);
 
 	useEffect(() => {
-		const items: Array<SidebarNavItem> = [
-			{
-				icon: Compass,
-				label: t('faq.overview.navTitle'),
-				view: 'overview',
-				category: t('faq.category.platform'),
-			},
-			{
-				icon: Server,
-				label: t('common.nav.items.environments'),
-				view: 'environments',
-				category: t('faq.category.platform'),
-			},
-			{
-				icon: Monitor,
-				label: t('faq.desktop.navTitle'),
-				view: 'desktop',
-				category: t('faq.category.platform'),
-			},
-			{
-				icon: TrendingUp,
-				label: t('faq.bots.navTitle'),
-				view: 'bots',
-				category: t('faq.category.community'),
-			},
-			{
-				icon: Building2,
-				label: t('faq.servers.navTitle'),
-				view: 'servers',
-				category: t('faq.category.community'),
-			},
-			{
-				icon: Shield,
-				label: t('faq.account.navTitle'),
-				view: 'account',
-				category: t('faq.category.accountAndDevs'),
-			},
-			{
-				icon: CreditCard,
-				label: t('faq.billing.navTitle'),
-				view: 'billing',
-				category: t('faq.category.accountAndDevs'),
-			},
-			{
-				icon: Code,
-				label: t('faq.developers.navTitle'),
-				view: 'developers',
-				category: t('faq.category.accountAndDevs'),
-			},
-			{
-				icon: Languages,
-				label: t('common.nav.items.translations'),
-				view: 'translations',
-				category: t('faq.category.accountAndDevs'),
-			},
-		];
+		const items: Array<SidebarNavItem> = FAQ_BLUEPRINTS.map((cat) => ({
+			icon: CATEGORY_ICONS[cat.id as keyof typeof CATEGORY_ICONS] || Compass,
+			label: t(cat.navTitleKey),
+			view: cat.id,
+			category: t(cat.sectionTitleKey),
+		}));
 
 		setNavItems(items);
 
 		if (!hasInitializedUrl.current && typeof window !== 'undefined') {
 			hasInitializedUrl.current = true;
 			const params = new URLSearchParams(window.location.search);
-			const cardParam = params.get('card') || window.location.hash.replace(/^#/, '');
-			const cardCatPrefix = cardParam?.includes('.') ? cardParam.split('.')[0]?.toLowerCase() : undefined;
-			const requestedCat = (params.get('category') || params.get('view') || cardCatPrefix)?.toLowerCase();
+			const cardParam = (params.get('card') || window.location.hash.replace(/^#/, '') || '').toLowerCase();
+			const rawCat = (params.get('category') || params.get('view') || '').toLowerCase();
+			const scopedCardKey = cardParam.includes('.') ? cardParam : rawCat && cardParam ? `${rawCat}.${cardParam}` : '';
+			const mappedLegacyView = scopedCardKey ? LEGACY_CARD_VIEW_MAP[scopedCardKey] : undefined;
+			const cardCatPrefix = cardParam.includes('.') ? cardParam.split('.')[0]?.toLowerCase() : undefined;
+			const slugCatMatch = !rawCat && cardParam && !cardParam.includes('.') ? FAQ_BLUEPRINTS.find((cat) => cat.cards.some((c) => c.slug.toLowerCase() === cardParam))?.id : undefined;
+			const requestedCat = mappedLegacyView || rawCat || cardCatPrefix || slugCatMatch;
 			const requestedQuery = params.get('q') || params.get('search');
 			if (requestedQuery) {
 				setSearchQuery((prev) => prev || requestedQuery);
@@ -101,7 +124,6 @@ export default function Page() {
 			}
 		}
 
-		// Only set the default view if one isn't already active
 		if (!view) {
 			setView(items.at(0)?.view || null);
 		}
@@ -111,6 +133,7 @@ export default function Page() {
 
 	const activeView = view || 'overview';
 	const isSearching = searchQuery.trim().length > 0;
+	const matchCount = isSearching ? countMatchingFaqCards(searchQuery, t) : 1;
 
 	return (
 		<div className="flex flex-col w-full">
@@ -121,28 +144,26 @@ export default function Page() {
 			{isSearching ? (
 				<div className="flex flex-col w-full">
 					<h1 className="sr-only">{t('faq.overview.title')}</h1>
-					<EcosystemAndNavigation searchQuery={searchQuery} />
-					<Environments searchQuery={searchQuery} />
-					<DesktopAndOverlay searchQuery={searchQuery} />
-					<Bots searchQuery={searchQuery} />
-					<ServersAndOrganizations searchQuery={searchQuery} />
-					<AccountAndSecurity searchQuery={searchQuery} />
-					<BillingAndStore searchQuery={searchQuery} />
-					<ApiAndDevelopers searchQuery={searchQuery} />
-					<Translations searchQuery={searchQuery} />
+					{matchCount === 0 ? (
+						<div className="max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)' }}>
+							<div
+								className="flex flex-col items-center justify-center rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-center shadow-sm"
+								style={{ padding: 'calc(var(--ui-gap) * 2)', gap: 'calc(var(--ui-gap) * 0.5)' }}
+							>
+								<div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-(--accent)/10 border border-(--accent)/30 text-(--accent)">
+									<SearchX size={22} />
+								</div>
+								<p className="text-sm font-medium text-(--text-muted)">{t('faq.noResults', { query: searchQuery.trim() })}</p>
+							</div>
+						</div>
+					) : (
+						FAQ_BLUEPRINTS.map((cat) => <FaqCategorySection key={cat.id} categoryId={cat.id} searchQuery={searchQuery} />)
+					)}
 				</div>
 			) : (
 				<AnimatePresence mode="wait">
 					<motion.div key={activeView} initial={{ opacity: 1, y: 0 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
-						{activeView === 'overview' && <EcosystemAndNavigation />}
-						{activeView === 'environments' && <Environments />}
-						{activeView === 'desktop' && <DesktopAndOverlay />}
-						{activeView === 'bots' && <Bots />}
-						{activeView === 'servers' && <ServersAndOrganizations />}
-						{activeView === 'account' && <AccountAndSecurity />}
-						{activeView === 'billing' && <BillingAndStore />}
-						{activeView === 'developers' && <ApiAndDevelopers />}
-						{activeView === 'translations' && <Translations />}
+						<FaqCategorySection categoryId={activeView} />
 					</motion.div>
 				</AnimatePresence>
 			)}

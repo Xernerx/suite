@@ -2,6 +2,33 @@
 
 # app
 
+## 2.24.0
+
+### Minor Changes
+
+- ## Server Applications Studio, Discord Modal V2 Question Builder & Instant Dashboard Tabs
+  
+  Added full YourApps server applications management to the Server Dashboard alongside public server application pages, 13 Discord Modal V2 form field types, and instant tab switching.
+  
+  ### Added
+  
+  - **Server Applications Studio**: Added a dedicated Applications tab to the Server Dashboard for configuring review, archive, and panel channels, reviewer roles, Apply panels, open positions, and applicant submissions.
+  - **13-Type Form Question & Choice Builder**: Added interactive position creation supporting Short Text, Paragraph, Number, Dropdown Menu, Radio Group, Checkbox Group, custom Yes/No options, Single Checkbox, User, Role, Channel, and Mentionable pickers, and File Uploads with multi-word chip entry.
+  - **YourApps Invite Onboarding**: Connected post-invite onboarding and guided dashboard tours directly to the Server Applications tab when inviting YourApps.
+  
+  ### Changed
+  
+  - **Instant Server Dashboard Tab Switching**: Kept the Server Dashboard header and navigation mounted with an inline loading state while loading Virtue leveling and YourApps application tabs, caching loaded tabs for instant switching.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 2.23.1
 
 ### Patch Changes

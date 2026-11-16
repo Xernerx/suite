@@ -8,13 +8,14 @@ import { useEffect, useRef, useState } from 'react';
 
 interface CollapsibleCardProps {
 	id?: string;
+	slug?: string;
 	message: string;
 	description: React.ReactNode | string;
 	defaultOpen?: boolean;
 	className?: string;
 }
 
-export function CollapsibleCard({ id, message, description, defaultOpen = false, className = '' }: CollapsibleCardProps) {
+export function CollapsibleCard({ id, slug, message, description, defaultOpen = false, className = '' }: CollapsibleCardProps) {
 	const [isOpen, setIsOpen] = useState(defaultOpen);
 	const [isHighlighted, setIsHighlighted] = useState(false);
 	const cardRef = useRef<HTMLDivElement>(null);
@@ -31,15 +32,19 @@ export function CollapsibleCard({ id, message, description, defaultOpen = false,
 		const rawCard = (params.get('card') || window.location.hash.replace(/^#/, '') || '').trim().toLowerCase();
 		if (!rawCard) return;
 
-		const rawCategory = (params.get('category') || '').trim().toLowerCase();
+		const rawCategory = (params.get('category') || params.get('view') || '').trim().toLowerCase();
 		const targetId = id.trim().toLowerCase();
-		const scopedQueryId = !rawCard.includes('.') && rawCategory ? `${rawCategory}.${rawCard}` : rawCard;
+		const targetCat = targetId.includes('.') ? targetId.split('.')[0] || '' : '';
+		const targetCardSuffix = targetId.includes('.') ? targetId.split('.').pop() || targetId : targetId;
+		const normalizedSlug = slug?.trim().toLowerCase() || '';
 
-		const isMatch =
-			targetId === scopedQueryId ||
-			targetId === rawCard ||
-			rawCard.endsWith(`.${targetId}`) ||
-			(!rawCategory && targetId.endsWith(`.${rawCard}`));
+		const hasExplicitCategory = rawCard.includes('.') || Boolean(rawCategory);
+		const scopedQueryId = !rawCard.includes('.') && rawCategory ? `${rawCategory}.${rawCard}` : rawCard;
+		const scopedSlugId = normalizedSlug && targetCat ? `${targetCat}.${normalizedSlug}` : normalizedSlug;
+
+		const isMatch = hasExplicitCategory
+			? targetId === scopedQueryId || (Boolean(scopedSlugId) && scopedSlugId === scopedQueryId)
+			: targetId === rawCard || targetCardSuffix === rawCard || (Boolean(normalizedSlug) && normalizedSlug === rawCard);
 
 		if (isMatch) {
 			setIsOpen(true);

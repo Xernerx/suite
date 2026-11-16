@@ -304,7 +304,16 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pr
 
 		await models.users.User.findOneAndUpdate({ id: userId }, { $set: { connections: updatedConnections } });
 
-		return NextResponse.json({ connections: updatedConnections });
+		const sanitized = updatedConnections.map((conn: any) => {
+			const { token, secret, ...rest } = conn;
+			return {
+				...rest,
+				hasSecret: Boolean(secret),
+				hasToken: Boolean(token),
+			};
+		});
+
+		return NextResponse.json({ connections: sanitized });
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message }, { status: 500 });
 	}
@@ -330,7 +339,16 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ pro
 
 		await models.users.User.findOneAndUpdate({ id: userId }, { $set: { connections: updatedConnections } });
 
-		return NextResponse.json({ connections: updatedConnections });
+		const sanitized = updatedConnections.map((conn: any) => {
+			const { token, secret, ...rest } = conn;
+			return {
+				...rest,
+				hasSecret: Boolean(secret),
+				hasToken: Boolean(token),
+			};
+		});
+
+		return NextResponse.json({ connections: sanitized });
 	} catch (err: any) {
 		return NextResponse.json({ error: err.message }, { status: 500 });
 	}

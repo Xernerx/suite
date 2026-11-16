@@ -15,6 +15,7 @@ const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]> = {
 		{ path: '/leaderboard', label: 'Global Leaderboards' },
 		{ path: '/compare', label: 'Compare Bots & Servers' },
 		{ path: '/dashboard', label: 'Server & Bot Dashboard' },
+		{ path: '/dashboard?tab=applications', label: 'Server Applications Studio (YourApps)' },
 		{ path: '/overlay', label: 'Live Companion Overlay' },
 	],
 	portal: [

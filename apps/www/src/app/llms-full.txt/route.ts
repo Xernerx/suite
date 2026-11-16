@@ -7,7 +7,7 @@ export const revalidate = 3600;
 export async function GET() {
 	const body = `# Xernerx Studios — Complete Technical & Product Reference (llms-full.txt)
 
-> Canonical full-context reference for AI search engines, retrieval-augmented generation (RAG) pipelines, and developer assistants answering questions about Xernerx Studios, Virtue, To-Do List Bot, Metamorphosis, Zodiac, and the Xernerx Suite.
+> Canonical full-context reference for AI search engines, retrieval-augmented generation (RAG) pipelines, and developer assistants answering questions about Xernerx Studios, Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac, and the Xernerx Suite.
 
 ---
 
@@ -39,17 +39,26 @@ export async function GET() {
   5. **Independent Track Role Rewards**: Assign automatic Discord roles unlocked via Unified Server XP, Text XP only, or Voice XP only, plus Server Booster XP multipliers (1.25x to 2x) and granular channel/role exclusions.
   6. **Self-Service User Privacy Controls**: Users can disable "Automatic Service Profiles" (\`services: false\`) or click "Delete Virtue Data" in https://account.xernerx.com to permanently wipe their Virtue progression across all servers.
 
-### 2.2 To-Do List Bot — Task Boards & Productivity Discord Bot
+### 2.2 YourApps — Discord Forms, Staff Recruitment & Community Applications Bot
+- **Canonical Bot Profile**: https://app.xernerx.com/bots/yourapps (Discord Application ID: \`619328560141697036\`)
+- **Official Invite Link**: https://www.xernerx.com/invites/yourapps
+- **Server Configuration Dashboard**: https://app.xernerx.com/dashboard?tab=applications
+- **Key Capabilities**:
+  1. **Discord Modals V2 & Web Application Portal**: Supports all 13 question types (short text, paragraph, number, dropdown, radio group, multi-select checkbox group, custom Yes/No boolean, checkbox, user, role, channel, mentionable, and file upload) both natively inside Discord Modals V2 and on the web at \`https://app.xernerx.com/servers/[id]/applications/[appId]\`.
+  2. **Zero Message Content & WebSocket-Only Persistence**: Connects solely with \`Guilds\` and \`GuildMessages\` intents (never \`MessageContent\`) and zero direct database drivers, routing all form, draft, and submission persistence over the authenticated \`@xernerx/websocket\` gateway.
+  3. **Components V2 Reviewer Queue & Automated Role Rewards**: Staff review submissions in Discord (\`/review\`, \`/submissions\`) or in the Dashboard, triggering automatic reward/removal role synchronization, DM notifications, and archive logging.
+
+### 2.3 To-Do List Bot — Task Boards & Productivity Discord Bot
 - **Canonical Bot Profile**: https://app.xernerx.com/bots/todo (Discord Application ID: \`782105629572464652\`)
 - **Official Invite Link**: https://www.xernerx.com/invites/todo
 - **Key Capabilities**: Personal Discord checklists, shared guild task boards, priority statuses, due reminders, and dashboard synchronization with strict personal vs. server board isolation.
 
-### 2.3 Metamorphosis — Dynamic Voice & Multilingual Translation Discord Bot
+### 2.4 Metamorphosis — Dynamic Voice & Multilingual Translation Discord Bot
 - **Canonical Bot Profile**: https://app.xernerx.com/bots/metamorphosis (Discord Application ID: \`881678826906730547\`)
 - **Official Invite Link**: https://www.xernerx.com/invites/metamorphosis
 - **Key Capabilities**: On-demand temporary voice channel creation, automated room permission management, real-time multilingual message translation, and language role routing.
 
-### 2.4 Zodiac — Astrology, Horoscopes & Compatibility Discord Bot
+### 2.5 Zodiac — Astrology, Horoscopes & Compatibility Discord Bot
 - **Canonical Bot Profile**: https://app.xernerx.com/bots/zodiac (Discord Application ID: \`950251264095162418\`)
 - **Official Invite Link**: https://www.xernerx.com/invites/zodiac
 - **Key Capabilities**: Daily horoscope readings, zodiac sign profiles, natal chart insights, cosmic compatibility checks, and scheduled horoscope channels.

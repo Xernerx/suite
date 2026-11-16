@@ -2,7 +2,7 @@
 
 import mongoose, { Connection, Model, Schema } from 'mongoose';
 
-import { xernerxModels, virtueModels, hasteModels } from './registry';
+import { xernerxModels, virtueModels, hasteModels, yourappsModels } from './registry';
 import { createLogger } from './terminal';
 
 const dbLog = createLogger('DB');
@@ -48,6 +48,7 @@ const globalWithMongoose = global as typeof global & {
 	__models_v37?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v38?: Record<string, Record<string, Record<string, Model<any>>>>;
 	__models_v39?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__models_v40?: Record<string, Record<string, Record<string, Model<any>>>>;
 };
 
 // Close any legacy per-database connections left over from older HMR reloads
@@ -165,10 +166,13 @@ if (globalWithMongoose.__models_v37) {
 if (globalWithMongoose.__models_v38) {
 	delete globalWithMongoose.__models_v38;
 }
+if (globalWithMongoose.__models_v39) {
+	delete globalWithMongoose.__models_v39;
+}
 
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v39 || {};
+const cachedModels = globalWithMongoose.__models_v40 || {};
 
 // Also close any orphaned top-level mongoose.connections not tracked in rootConnections
 const trackedRoots = new Set(Object.values(rootConnections));
@@ -181,7 +185,7 @@ for (const conn of mongoose.connections) {
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
-	globalWithMongoose.__models_v39 = cachedModels;
+	globalWithMongoose.__models_v40 = cachedModels;
 }
 
 const getUris = (): Record<string, string> => {
@@ -191,6 +195,7 @@ const getUris = (): Record<string, string> => {
 		xernerx: xernerxUri,
 		virtue: process.env.MONGO_VIRTUE || (isLocalMemoryServer ? xernerxUri : ''),
 		haste: process.env.MONGO_HASTE || (isLocalMemoryServer ? xernerxUri : ''),
+		yourapps: process.env.MONGO_YOURAPPS || (isLocalMemoryServer ? xernerxUri : ''),
 	};
 };
 
@@ -204,9 +209,10 @@ const registries: Record<string, any> = {
 	xernerx: xernerxModels,
 	virtue: virtueModels,
 	haste: hasteModels,
+	yourapps: yourappsModels,
 };
 
-export async function database(projectId: 'xernerx' | 'virtue' | 'haste') {
+export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'yourapps') {
 	if (!activeConnections[projectId]) activeConnections[projectId] = {};
 	if (!cachedModels[projectId]) cachedModels[projectId] = {};
 

@@ -2,6 +2,29 @@
 
 # auth
 
+## 2.16.0
+
+### Minor Changes
+
+- ## Redesigned Account Connections, Individual Formation Unlocks & Device Tracking
+  
+  Refined connected third-party account management, individual Dot-Matrix formation unlock mapping, and active device session display.
+  
+  ### Changed
+  
+  - **Connected Accounts Layout**: Separated active linked accounts from available third-party providers for clearer one-click linking and visibility toggles.
+  - **Individual Dot-Matrix Banner Unlocks**: Updated Dot-Matrix Studio formation unlocks so each geometric formation unlocks independently.
+  - **Active Device Sessions**: Improved current-device recognition and browser and operating system session labels in Trusted Devices.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.18.0
+  - @xernerx/feedback@0.6.2
+  - @xernerx/lib@1.27.0
+  - @xernerx/providers@0.24.0
+  - @xernerx/ui@0.9.1
+
 ## 2.15.1
 
 ### Patch Changes

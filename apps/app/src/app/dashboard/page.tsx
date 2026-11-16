@@ -1,50 +1,30 @@
 /** @format */
 'use client';
 
-import { Compass, Server, ExternalLink, Copy, Check, Trophy, Rocket } from 'lucide-react';
-import { Confirm, Tabs, Button } from '@xernerx/ui';
+import { Confirm, Tabs } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Suspense, useEffect, useState, useMemo } from 'react';
 import { Loading } from '@xernerx/feedback';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 
 import General from '@/components/dashboard/General';
 import Statistics from '@/components/dashboard/Statistics';
 import Links from '@/components/dashboard/Links';
 import VirtueGeneral from '@/components/dashboard/virtue/General';
+import ApplicationsGeneral from '@/components/dashboard/applications/General';
 import Settings from '@/components/dashboard/Settings';
 import DashboardBotTour from '@/components/dashboard/DashboardBotTour';
+import {
+	VALID_DASHBOARD_TABS,
+	TOUR_DEMO_GUILD,
+	TOUR_DEMO_GUILD_CONFIG,
+	buildDashboardNavItems,
+	DashboardGuildHeader,
+	DashboardEmptyState,
+	type Guild,
+} from '@/components/dashboard/DashboardGuildHeader';
 import SpotlightBoostModal from '@/components/SpotlightBoostModal';
 import { AppSeoSection } from '@/components/AppSeoSection';
-
-const VALID_DASHBOARD_TABS = ['info', 'stats', 'links', 'virtue', 'settings'];
-
-type Guild = { id: string; name: string; icon: string | null; iconUrl: string | null; banner: string | null; bannerUrl: string | null; permissions: string; features: string[] };
-
-const TOUR_DEMO_GUILD: Guild = {
-	id: '100000000000000000',
-	name: 'Xernerx Community Hub',
-	icon: null,
-	iconUrl: null,
-	banner: null,
-	bannerUrl: null,
-	permissions: '8',
-	features: [],
-};
-
-const TOUR_DEMO_GUILD_CONFIG = {
-	id: '100000000000000000',
-	name: 'Xernerx Community Hub',
-	description: 'Your Discord server directory profile, live analytics, and Virtue XP & voice leveling modules.',
-	info: 'Welcome to your Server Dashboard! Configure your server profile, links, privacy tier, and Virtue modules right from here.',
-	privacy: 'public',
-	widgets: true,
-	locale: 'en-GB',
-	tags: ['Community', 'Gaming', 'Leveling'],
-	links: {},
-};
 
 function DashboardContent() {
 	const { data: session, status } = useSession();
@@ -61,19 +41,34 @@ function DashboardContent() {
 	const [originalGuildConfig, setOriginalGuildConfig] = useState<any>(null);
 	const [configLoading, setConfigLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
-	const [deleting, setDeleting] = useState(false);
+	const [, setDeleting] = useState(false);
 	const [deleteGuildConfirmOpen, setDeleteGuildConfirmOpen] = useState(false);
 	const [boostModalOpen, setBoostModalOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [rateLimited, setRateLimited] = useState(false);
-	const [copiedId, setCopiedId] = useState(false);
 	const initialTab = searchParams.get('tab');
 	const botTourName = searchParams.get('xrx_bot_tour');
 	const isTourDashboard = searchParams.get('xrx_tour') === 'dashboard' || Boolean(botTourName);
 	const [activeTab, setActiveTab] = useState(initialTab && VALID_DASHBOARD_TABS.includes(initialTab) ? initialTab : 'info');
+	const [mountedBotTabs, setMountedBotTabs] = useState<{ guildId: string; virtue: boolean; applications: boolean }>({
+		guildId: '',
+		virtue: false,
+		applications: false,
+	});
 	const { remind, toast } = useToast();
 	const effectiveGuild = selectedGuild || (isTourDashboard ? TOUR_DEMO_GUILD : null);
 	const effectiveGuildConfig = guildConfig || (isTourDashboard ? TOUR_DEMO_GUILD_CONFIG : null);
+
+	useEffect(() => {
+		const gid = effectiveGuild?.id || '';
+		setMountedBotTabs((prev) => {
+			const sameGuild = prev.guildId === gid;
+			const nextVirtue = (sameGuild && prev.virtue) || activeTab === 'virtue';
+			const nextApps = (sameGuild && prev.applications) || activeTab === 'applications';
+			if (sameGuild && prev.virtue === nextVirtue && prev.applications === nextApps) return prev;
+			return { guildId: gid, virtue: nextVirtue, applications: nextApps };
+		});
+	}, [effectiveGuild?.id, activeTab]);
 
 	const handleFinishBotTour = () => {
 		const params = new URLSearchParams(searchParams.toString());
@@ -96,14 +91,6 @@ function DashboardContent() {
 		router.replace(`/dashboard?${params.toString()}`, { scroll: false });
 	};
 
-	const handleCopyGuildId = () => {
-		if (!selectedGuild?.id) return;
-		navigator.clipboard.writeText(selectedGuild.id);
-		setCopiedId(true);
-		toast({ title: t('app.servers.idCopied'), type: 'success' });
-		setTimeout(() => setCopiedId(false), 2000);
-	};
-
 	const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '3m' | '6m' | '1y' | 'all'>('24h');
 	const [activeMetric, setActiveMetric] = useState<'members' | 'messages' | 'bots' | 'boosts'>('members');
 	const [isUndrawing, setIsUndrawing] = useState(false);
@@ -114,7 +101,7 @@ function DashboardContent() {
 		setTimeout(() => {
 			setActiveMetric(metricId);
 			setIsUndrawing(false);
-		}, 400); // 400ms duration for undraw animation
+		}, 400);
 	};
 
 	useEffect(() => {
@@ -126,14 +113,7 @@ function DashboardContent() {
 		}
 
 		show();
-
-		const staticItems = [
-			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass as any, category: t('app.dashboard.categories.navigation') },
-			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy as any, category: t('app.dashboard.categories.navigation') },
-		];
-
-		// Populate static items immediately so they aren't blocked by the fetch or StrictMode
-		setNavItems(staticItems);
+		setNavItems(buildDashboardNavItems(t, []));
 
 		const fetchGuilds = async () => {
 			const sessionData = session as any;
@@ -165,24 +145,15 @@ function DashboardContent() {
 				});
 
 				setGuilds(managedGuilds);
-				setNavItems([
-					...staticItems,
-					...managedGuilds.map((g) => ({
-						label: g.name,
-						onClick: () => {
-							setSelectedGuild(g);
-							setView(`server-${g.id}`);
-							const params = new URLSearchParams(window.location.search);
-							params.set('guild', g.id);
-							router.replace(`/dashboard?${params.toString()}`, { scroll: false });
-						},
-						category: t('app.dashboard.categories.servers'),
-						icon: g.iconUrl
-							? () => <Image src={g.iconUrl!} alt={g.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
-							: () => <div className="w-5 h-5 rounded-full bg-(--foreground) flex items-center justify-center text-[10px]">{g.name.charAt(0)}</div>,
-						view: `server-${g.id}`,
-					})),
-				]);
+				setNavItems(
+					buildDashboardNavItems(t, managedGuilds, (g) => {
+						setSelectedGuild(g);
+						setView(`server-${g.id}`);
+						const params = new URLSearchParams(window.location.search);
+						params.set('guild', g.id);
+						router.replace(`/dashboard?${params.toString()}`, { scroll: false });
+					})
+				);
 
 				if (managedGuilds.length > 0) {
 					const params = new URLSearchParams(window.location.search);
@@ -320,7 +291,7 @@ function DashboardContent() {
 	}, [guildConfig, originalGuildConfig]);
 
 	useEffect(() => {
-		if (activeTab === 'virtue') return;
+		if (activeTab === 'virtue' || activeTab === 'applications') return;
 		remind(isDirty, handleSaveConfig, () => setGuildConfig(JSON.parse(JSON.stringify(originalGuildConfig))), saving);
 		return () => remind(false);
 	}, [activeTab, isDirty, saving, originalGuildConfig, remind, guildConfig, selectedGuild]);
@@ -371,92 +342,37 @@ function DashboardContent() {
 					<Loading message={t('app.dashboard.loadingServers')} />
 				</div>
 			) : effectiveGuild ? (
-				<>
-					<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-						{/* Guild Summary Card (Page Header) */}
-						<div
-							data-tour="dash-header"
-							className="relative flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm overflow-hidden transition-all duration-300"
-							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
-						>
-							{/* Optional Banner Background */}
-							{(effectiveGuild as any).bannerUrl && (
-								<div
-									className="absolute inset-0 z-0 opacity-20"
-									style={{
-										backgroundImage: `url(${(effectiveGuild as any).bannerUrl})`,
-										backgroundSize: 'cover',
-										backgroundPosition: 'center',
-									}}
-								/>
-							)}
-							<div className="relative z-10 flex items-center" style={{ gap: 'var(--ui-gap)' }}>
-								{effectiveGuild.iconUrl ? (
-									<Image
-										src={effectiveGuild.iconUrl}
-										alt={effectiveGuild.name}
-										width={80}
-										height={80}
-										unoptimized
-										className="h-20 w-20 rounded-full border border-(--border)/10 object-cover shrink-0 shadow-lg"
-									/>
-								) : (
-									<div className="flex h-20 w-20 items-center justify-center rounded-full bg-(--background)/50 shrink-0 shadow-lg border border-(--border)/10">
-										<Server className="w-8 h-8 text-(--text-muted)" />
-									</div>
-								)}
-								<div className="flex flex-col gap-1.5">
-									<span className="text-3xl font-extrabold text-(--text) drop-shadow-md tracking-tight" style={{ fontFamily: 'var(--font-fredoka)' }}>
-										{effectiveGuild.name}
-									</span>
-									<button
-										type="button"
-										onClick={handleCopyGuildId}
-										className="inline-flex items-center gap-1.5 w-fit text-xs font-mono text-(--text-muted) hover:text-(--text) bg-(--background)/60 hover:bg-(--background) px-2.5 py-1 rounded-lg border border-(--border)/10 transition-colors cursor-pointer"
-									>
-										<span>
-											{t('app.dashboard.text1')}
-											{effectiveGuild.id}
-										</span>
-										{copiedId ? <Check className="w-3.5 h-3.5 text-(--accent-green)" /> : <Copy className="w-3.5 h-3.5" />}
-									</button>
-								</div>
-							</div>
-							<div className="relative z-10 flex flex-wrap items-center gap-2 shrink-0">
-								<Button variant="primary" onClick={() => setBoostModalOpen(true)} className="gap-2">
-									<Rocket className="w-4 h-4" />
-									{t('app.boost.boostServerBtn')}
-								</Button>
-								<Link href={`/servers/${effectiveGuildConfig?.vanitySlug || effectiveGuild.id}`}>
-									<Button variant="secondary" className="gap-2">
-										<ExternalLink className="w-4 h-4" />
-										{t('app.portal.workspace.viewPublicProfile')}
-									</Button>
-								</Link>
-							</div>
+				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+					<DashboardGuildHeader
+						effectiveGuild={effectiveGuild}
+						copyableGuildId={selectedGuild?.id}
+						vanitySlug={effectiveGuildConfig?.vanitySlug}
+						onOpenBoost={() => setBoostModalOpen(true)}
+					/>
+
+					<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
+						<div data-tour="dash-tabs" className="rounded-2xl transition-all duration-300">
+							<Tabs
+								activeTab={activeTab}
+								onChange={handleTabChange}
+								tabs={[
+									{ id: 'info', label: t('app.dashboard.tabs.info') },
+									{ id: 'stats', label: t('app.dashboard.tabs.stats') },
+									{ id: 'links', label: t('app.dashboard.tabs.links') },
+									{ id: 'virtue', label: t('app.dashboard.tabs.virtue') },
+									{ id: 'applications', label: t('app.dashboard.tabs.applications') },
+									{ id: 'settings', label: t('app.dashboard.tabs.settings') },
+								]}
+							/>
 						</div>
 
-						{configLoading && !isTourDashboard ? (
-							<div className="flex flex-col w-full h-full text-center items-center justify-center py-20 text-(--text-muted)">
-								<Loading variant="default" />
-							</div>
-						) : effectiveGuildConfig ? (
-							<div className="flex flex-col w-full" style={{ gap: 'var(--ui-gap)' }}>
-								<div data-tour="dash-tabs" className="rounded-2xl transition-all duration-300">
-									<Tabs
-										activeTab={activeTab}
-										onChange={handleTabChange}
-										tabs={[
-											{ id: 'info', label: t('app.dashboard.tabs.info') },
-											{ id: 'stats', label: t('app.dashboard.tabs.stats') },
-											{ id: 'links', label: t('app.dashboard.tabs.links') },
-											{ id: 'virtue', label: t('app.dashboard.tabs.virtue') },
-											{ id: 'settings', label: t('app.dashboard.tabs.settings') },
-										]}
-									/>
+						<div data-tour="dash-config" className="flex flex-col rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
+							{activeTab !== 'virtue' && activeTab !== 'applications' && ((configLoading && !isTourDashboard) || !effectiveGuildConfig) ? (
+								<div className="flex items-center justify-center py-16 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
+									<Loading variant="small" />
 								</div>
-
-								<div data-tour="dash-config" className="flex flex-col rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
+							) : effectiveGuildConfig ? (
+								<>
 									{activeTab === 'info' && <General guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
 
 									{activeTab === 'stats' && (
@@ -472,8 +388,6 @@ function DashboardContent() {
 
 									{activeTab === 'links' && <Links guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
 
-									{activeTab === 'virtue' && effectiveGuild && <VirtueGeneral id={effectiveGuild.id} managedGuilds={guilds} />}
-
 									{activeTab === 'settings' && (
 										<Settings
 											guildConfig={effectiveGuildConfig}
@@ -486,39 +400,25 @@ function DashboardContent() {
 											handleDeleteGuild={handleDeleteGuild}
 										/>
 									)}
+								</>
+							) : null}
+
+							{effectiveGuild && ((mountedBotTabs.guildId === effectiveGuild.id && mountedBotTabs.virtue) || activeTab === 'virtue') && (
+								<div className={activeTab === 'virtue' ? 'flex flex-col' : 'hidden'} style={{ gap: 'var(--ui-gap)' }}>
+									<VirtueGeneral key={`virtue-${effectiveGuild.id}`} id={effectiveGuild.id} managedGuilds={guilds} isActive={activeTab === 'virtue'} />
 								</div>
-							</div>
-						) : null}
+							)}
+
+							{effectiveGuild && ((mountedBotTabs.guildId === effectiveGuild.id && mountedBotTabs.applications) || activeTab === 'applications') && (
+								<div className={activeTab === 'applications' ? 'flex flex-col' : 'hidden'} style={{ gap: 'var(--ui-gap)' }}>
+									<ApplicationsGeneral key={`apps-${effectiveGuild.id}`} id={effectiveGuild.id} isActive={activeTab === 'applications'} />
+								</div>
+							)}
+						</div>
 					</div>
-				</>
-			) : rateLimited ? (
-				<div className="flex flex-col items-center justify-center text-center">
-					<div className="w-20 h-20 bg-(--accent)/10 rounded-full flex items-center justify-center mb-6">
-						<Server className="w-10 h-10 text-(--accent)" />
-					</div>
-					<h1 className="text-3xl font-extrabold tracking-tight text-(--text) drop-shadow-sm mb-4" style={{ fontFamily: `var(--font-fredoka)` }}>
-						{t('app.dashboard.text21')}
-					</h1>
-					<p className="text-sm text-(--text-muted) max-w-md">{t('app.dashboard.text22')}</p>
 				</div>
 			) : (
-				<div className="flex flex-col items-center justify-center text-center">
-					<div className="w-20 h-20 bg-(--accent)/10 rounded-full flex items-center justify-center mb-6">
-						<Server className="w-10 h-10 text-(--accent)" />
-					</div>
-					<h1 className="text-3xl font-extrabold tracking-tight text-(--text) drop-shadow-sm mb-4" style={{ fontFamily: `var(--font-fredoka)` }}>
-						{t('app.dashboard.text23')}
-					</h1>
-					<p className="text-sm text-(--text-muted) max-w-md">{t('app.dashboard.text24')}</p>
-					<a
-						href="https://discord.com/new"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="mt-6 px-6 py-3 rounded-xl bg-(--accent) hover:bg-(--hover-accent) text-white font-medium transition-colors shadow-sm"
-					>
-						{t('app.dashboard.text25')}
-					</a>
-				</div>
+				<DashboardEmptyState rateLimited={rateLimited} />
 			)}
 
 			{selectedGuild && (

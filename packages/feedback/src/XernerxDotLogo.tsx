@@ -64,6 +64,7 @@ export function XernerxDotLogo({
 	const hasEnteredRef = useRef(false);
 	const constructStartRef = useRef(0);
 	const constructPulseRef = useRef(false);
+	const constructModeRef = useRef<'default' | 'spiral'>('default');
 	const wakeLoopRef = useRef<(() => void) | null>(null);
 	const colorSyncRef = useRef<(() => void) | null>(null);
 	const morphShapeRef = useRef<((nextVariant: DotLogoVariant) => void) | null>(null);
@@ -85,7 +86,9 @@ export function XernerxDotLogo({
 
 	useEffect(() => {
 		if (!backgroundMode || typeof window === 'undefined') return;
-		const onEarlyConstruct = () => {
+		const onEarlyConstruct = (e: Event) => {
+			const mode = (e as CustomEvent<{ mode?: 'default' | 'spiral' }>)?.detail?.mode || 'default';
+			constructModeRef.current = mode;
 			hasEnteredRef.current = true;
 			constructStartRef.current = performance.now();
 			constructPulseRef.current = false;
@@ -271,7 +274,6 @@ export function XernerxDotLogo({
 		let isRunning = false;
 		let morphStartAt = 0;
 		const morphDuration = 2.15;
-		const constructDuration = 2.85;
 		let lastColorSync = performance.now();
 		let lastFrameTime = performance.now();
 		let procTime = 0;
@@ -326,26 +328,32 @@ export function XernerxDotLogo({
 			visibilityBlend = 1;
 			morphStartAt = 0;
 			morphBuf.active.fill(0);
-			const cx = activeW * 0.5;
-			const cy = activeH * 0.46;
-			const halfW = activeW * 0.5;
-			const halfH = activeH * 0.5;
-			const curVar = variantRef.current;
-			for (let i = 0; i < dots.length; i++) {
-				const d = dots[i];
-				const nextCov = computeCoverageForVariant(curVar, d.homeX, d.homeY, procTime);
-				const nx = (d.homeX - cx) / halfW;
-				const ny = (d.homeY - cy) / halfH;
-				const hAng = Math.atan2(ny, nx);
-				const startAng = hAng - 4.6;
-				Object.assign(d, {
-					coverage: 0.22,
-					targetCoverage: nextCov,
-					x: cx + Math.cos(startAng) * 1.08 * halfW,
-					y: cy + Math.sin(startAng) * 1.08 * halfH,
-					vx: 0,
-					vy: 0,
-				});
+			if (constructModeRef.current === 'spiral') {
+				const cx = activeW * 0.5;
+				const cy = activeH * 0.46;
+				const halfW = activeW * 0.5;
+				const halfH = activeH * 0.5;
+				const curVar = variantRef.current;
+				for (let i = 0; i < dots.length; i++) {
+					const d = dots[i];
+					const nextCov = computeCoverageForVariant(curVar, d.homeX, d.homeY, procTime);
+					const nx = (d.homeX - cx) / halfW;
+					const ny = (d.homeY - cy) / halfH;
+					const hAng = Math.atan2(ny, nx);
+					const startAng = hAng - 4.6;
+					Object.assign(d, {
+						coverage: 0.22,
+						targetCoverage: nextCov,
+						x: cx + Math.cos(startAng) * 1.08 * halfW,
+						y: cy + Math.sin(startAng) * 1.08 * halfH,
+						vx: 0,
+						vy: 0,
+					});
+				}
+			} else {
+				for (let i = 0; i < dots.length; i++) {
+					Object.assign(dots[i], { coverage: 0.22, x: dots[i].homeX, y: dots[i].homeY, vx: 0, vy: 0 });
+				}
 			}
 		};
 		if (constructStartRef.current > 0) initConstructDots();
@@ -353,8 +361,10 @@ export function XernerxDotLogo({
 		const renderFrame = (now: number) => {
 			isRunning = false;
 			if (typeof document !== 'undefined' && document.hidden) return;
+			const isSpiralConstruct = constructModeRef.current === 'spiral';
+			const activeConstructDuration = isSpiralConstruct ? 2.85 : 3.4;
 			const constructAge = constructStartRef.current > 0 ? (now - constructStartRef.current) * 0.001 : 99;
-			const isConstructing = constructStartRef.current > 0 && constructAge < constructDuration;
+			const isConstructing = constructStartRef.current > 0 && constructAge < activeConstructDuration;
 			const morphAge = morphStartAt > 0 ? (now - morphStartAt) * 0.001 : 99;
 			const isMorphing = morphStartAt > 0 && morphAge < morphDuration;
 			if (morphStartAt > 0 && !isMorphing) {
@@ -369,6 +379,10 @@ export function XernerxDotLogo({
 						morphBuf.active[i] = 0;
 					}
 				}
+			}
+			if (!isSpiralConstruct && constructStartRef.current > 0 && constructAge >= 2.85 && !constructPulseRef.current) {
+				constructPulseRef.current = true;
+				shockwaves.push({ x: activeW * 0.5, y: activeH * 0.28, birth: now });
 			}
 			if (constructStartRef.current > 0 && !isConstructing) {
 				constructStartRef.current = 0;
@@ -432,7 +446,7 @@ export function XernerxDotLogo({
 			});
 			const liveProcedural = isAnimatedProceduralVariant(activeVar) && rippleBlend > 0.005 && !reducedMotion;
 			const covLerp = liveProcedural ? 0.24 : 0.075;
-			const constructFloatBlend = isConstructing ? Math.max(0, Math.min(1, (constructAge - 1.85) / 0.6)) : 1;
+			const constructFloatBlend = isConstructing ? (isSpiralConstruct ? Math.max(0, Math.min(1, (constructAge - 1.85) / 0.6)) : Math.max(0, Math.min(1, (constructAge - 2.6) / 0.8))) : 1;
 			const constructCenterX = activeW * 0.5;
 			const constructCenterY = activeH * 0.46;
 			const halfW = activeW * 0.5;
@@ -448,44 +462,66 @@ export function XernerxDotLogo({
 				let constructX = d.homeX;
 				let constructY = d.homeY;
 				if (isConstructing) {
-					const nx = (d.homeX - constructCenterX) / halfW;
-					const ny = (d.homeY - constructCenterY) / halfH;
-					const hNormR = Math.hypot(nx, ny);
-					const hAng = Math.atan2(ny, nx);
-					const armNorm = (((hAng + Math.PI) / (Math.PI * 2)) * 3) % 1;
-					const spiralDelay = d.distCenter * 0.24 + armNorm * 0.24;
-					const spiralProg = Math.max(0, Math.min(1, (constructAge - spiralDelay) / 1.15));
-					if (spiralProg <= 0.001) continue;
-					const spiralIn = Math.pow(1 - spiralProg, 1.85);
-					const vortexPinch = Math.sin(spiralProg * Math.PI);
-					const baseNormR = hNormR + (1.08 - hNormR) * spiralIn;
-					const curNormR = (0.12 + hNormR * 0.22) * vortexPinch + baseNormR * (1 - vortexPinch * 0.72);
-					const curAng = hAng - spiralIn * (4.6 + (i % 5) * 0.12);
-					constructX = constructCenterX + Math.cos(curAng) * curNormR * halfW;
-					constructY = constructCenterY + Math.sin(curAng) * curNormR * halfH;
-					gridScale = 0.55 + (1 - Math.pow(1 - spiralProg, 3)) * 0.45 + vortexPinch * 0.42;
-					if (spiralProg < 1) {
-						constructGlint = vortexPinch * 0.88;
-					}
-					if (d.targetCoverage > 0.28) {
-						const iconNorm = (hAng + Math.PI) / (Math.PI * 2);
-						const logoDelay = 1.2 + d.distCenter * 0.34 + iconNorm * 0.24;
-						const logoProg = Math.max(0, Math.min(1, (constructAge - logoDelay) / 0.52));
-						const logoEase = 1 - Math.pow(1 - logoProg, 3);
-						d.coverage = 0.22 + (d.targetCoverage - 0.22) * logoEase;
-						if (logoProg > 0.01 && logoProg < 0.99) {
-							const flare = Math.sin(logoProg * Math.PI);
-							constructGlint = Math.max(constructGlint, flare * 0.96);
-							gridScale *= 1 + flare * 0.38;
-							const pinchAng = hAng - (1 - logoEase) * 0.85;
-							const pinchR = hNormR * (1 + flare * 0.12);
-							constructX = constructCenterX + Math.cos(pinchAng) * pinchR * halfW;
-							constructY = constructCenterY + Math.sin(pinchAng) * pinchR * halfH;
+					if (isSpiralConstruct) {
+						const nx = (d.homeX - constructCenterX) / halfW;
+						const ny = (d.homeY - constructCenterY) / halfH;
+						const hNormR = Math.hypot(nx, ny);
+						const hAng = Math.atan2(ny, nx);
+						const armNorm = (((hAng + Math.PI) / (Math.PI * 2)) * 3) % 1;
+						const spiralDelay = d.distCenter * 0.24 + armNorm * 0.24;
+						const spiralProg = Math.max(0, Math.min(1, (constructAge - spiralDelay) / 1.15));
+						if (spiralProg <= 0.001) continue;
+						const spiralIn = Math.pow(1 - spiralProg, 1.85);
+						const vortexPinch = Math.sin(spiralProg * Math.PI);
+						const baseNormR = hNormR + (1.08 - hNormR) * spiralIn;
+						const curNormR = (0.12 + hNormR * 0.22) * vortexPinch + baseNormR * (1 - vortexPinch * 0.72);
+						const curAng = hAng - spiralIn * (4.6 + (i % 5) * 0.12);
+						constructX = constructCenterX + Math.cos(curAng) * curNormR * halfW;
+						constructY = constructCenterY + Math.sin(curAng) * curNormR * halfH;
+						gridScale = 0.55 + (1 - Math.pow(1 - spiralProg, 3)) * 0.45 + vortexPinch * 0.42;
+						if (spiralProg < 1) {
+							constructGlint = vortexPinch * 0.88;
 						}
+						if (d.targetCoverage > 0.28) {
+							const iconNorm = (hAng + Math.PI) / (Math.PI * 2);
+							const logoDelay = 1.2 + d.distCenter * 0.34 + iconNorm * 0.24;
+							const logoProg = Math.max(0, Math.min(1, (constructAge - logoDelay) / 0.52));
+							const logoEase = 1 - Math.pow(1 - logoProg, 3);
+							d.coverage = 0.22 + (d.targetCoverage - 0.22) * logoEase;
+							if (logoProg > 0.01 && logoProg < 0.99) {
+								const flare = Math.sin(logoProg * Math.PI);
+								constructGlint = Math.max(constructGlint, flare * 0.96);
+								gridScale *= 1 + flare * 0.38;
+								const pinchAng = hAng - (1 - logoEase) * 0.85;
+								const pinchR = hNormR * (1 + flare * 0.12);
+								constructX = constructCenterX + Math.cos(pinchAng) * pinchR * halfW;
+								constructY = constructCenterY + Math.sin(pinchAng) * pinchR * halfH;
+							}
+						} else {
+							d.coverage = d.targetCoverage;
+						}
+						maxMotionEnergy = 1;
 					} else {
-						d.coverage = d.targetCoverage;
+						const gridDelay = d.distCenter * 0.42 + (d.ny + 1) * 0.5 * 0.16;
+						const gridProg = Math.max(0, Math.min(1, (constructAge - gridDelay) / 0.36));
+						if (gridProg <= 0.001) continue;
+						gridScale = 1 - Math.pow(1 - gridProg, 3);
+						if (gridProg < 1) constructGlint = Math.sin(gridProg * Math.PI) * 0.55;
+						if (d.targetCoverage > 0.28) {
+							const logoDelay = 0.75 + ((d.nx + 0.86) / 1.72) * 1.65 + Math.abs(d.ny + 0.35) * 0.14;
+							const logoProg = Math.max(0, Math.min(1, (constructAge - logoDelay) / 0.44));
+							const logoEase = 1 - Math.pow(1 - logoProg, 3);
+							d.coverage = 0.22 + (d.targetCoverage - 0.22) * logoEase;
+							if (logoProg > 0.01 && logoProg < 0.99) {
+								const flare = Math.sin(logoProg * Math.PI);
+								constructGlint = Math.max(constructGlint, flare * 0.96);
+								gridScale *= 1 + flare * 0.32;
+							}
+						} else {
+							d.coverage = d.targetCoverage;
+						}
+						maxMotionEnergy = 1;
 					}
-					maxMotionEnergy = 1;
 				} else if (isMorphing && morphBuf.active[i] !== 0) {
 					const mMode = morphBuf.active[i];
 					const p = Math.max(0, Math.min(1, (morphAge - morphBuf.delay[i]) / (morphDuration - 0.3)));
@@ -561,7 +597,7 @@ export function XernerxDotLogo({
 				if (reducedMotion) {
 					d.x = d.homeX;
 					d.y = d.homeY;
-				} else if (isConstructing) {
+				} else if (isConstructing && isSpiralConstruct) {
 					d.x = constructX + floatX;
 					d.y = constructY + floatY;
 					d.vx = 0;
@@ -675,12 +711,16 @@ export function XernerxDotLogo({
 			startOrWakeLoop();
 		};
 		if (backgroundMode && typeof window !== 'undefined' && (window as any).__xernerxConstructPending && !hasEnteredRef.current) {
+			constructModeRef.current = 'default';
 			hasEnteredRef.current = true;
 			(window as any).__xernerxConstructPending = false;
 			beginMatrixConstruct();
 		}
-		const onConstructEvent = () => {
+		const onConstructEvent = (e: Event) => {
 			if (!backgroundMode) return;
+			const mode = (e as CustomEvent<{ mode?: 'default' | 'spiral' }>)?.detail?.mode || 'default';
+			if (mode === 'default' && hasEnteredRef.current) return;
+			constructModeRef.current = mode;
 			hasEnteredRef.current = true;
 			beginMatrixConstruct();
 		};

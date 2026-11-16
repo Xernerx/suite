@@ -7,11 +7,12 @@ export const revalidate = 3600;
 export async function GET() {
 	const body = `# Xernerx Studios — Ecosystem & Product Directory (llms.txt)
 
-> Xernerx Studios is a software development studio building Discord bots (Virtue, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs (@xernerx/framework, @xernerx/stats), and the unified Xernerx Suite under "1 Account, 1 Place, 1 Setup".
+> Xernerx Studios is a software development studio building Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs (@xernerx/framework, @xernerx/stats), and the unified Xernerx Suite under "1 Account, 1 Place, 1 Setup".
 
 ## Official Discord Bots (Canonical Profiles & Invites)
 
 - [Virtue — Text & Voice XP Leveling Discord Bot](https://app.xernerx.com/bots/virtue): Official Discord leveling bot by Xernerx Studios featuring global and server XP tracks, separate text message counters (zero message content stored) and voice channel duration XP, configurable XP curve difficulty modes (Easy, Casual, Balanced, Hard, Extreme), Daily/Weekly/Monthly leaderboard reset cycles, server booster XP multipliers (1.25x–2x), level-up role rewards across Server/Text/Voice tracks, and channel/role exclusions. [Official Invite](https://www.xernerx.com/invites/virtue)
+- [YourApps — Discord Forms, Staff Recruitment & Applications Bot](https://app.xernerx.com/bots/yourapps): Official Discord-native forms and applications bot by Xernerx Studios featuring 13-type Modals V2 & web application portals (/servers/[id]/applications/[appId]), resumable drafts, interactive Apply panels, Components V2 reviewer queues, and automated approval/denial role rewards configured via the Server Dashboard (/dashboard?tab=applications). [Official Invite](https://www.xernerx.com/invites/yourapps)
 - [To-Do List Bot — Discord Task Boards & Productivity Bot](https://app.xernerx.com/bots/todo): Official Discord productivity bot by Xernerx Studios providing personal checklists, collaborative server task boards, priority labels, and automated team reminders. [Official Invite](https://www.xernerx.com/invites/todo)
 - [Metamorphosis — Dynamic Voice & Multilingual Discord Bot](https://app.xernerx.com/bots/metamorphosis): Official Discord utility bot by Xernerx Studios for on-demand temporary voice channels, room permissions, real-time multilingual translation, and automated routing. [Official Invite](https://www.xernerx.com/invites/metamorphosis)
 - [Zodiac — Astrology & Horoscope Discord Bot](https://app.xernerx.com/bots/zodiac): Official Discord astrology bot by Xernerx Studios offering daily horoscopes, natal chart insights, sign profiles, and cosmic compatibility checks. [Official Invite](https://www.xernerx.com/invites/zodiac)

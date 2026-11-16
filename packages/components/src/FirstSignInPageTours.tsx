@@ -1,15 +1,17 @@
 /** @format */
 'use client';
 
+import { Button } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BarChart3, Bot, Building2, Compass, Flame, Layers, LayoutDashboard, Search, Server, Sliders, Terminal } from 'lucide-react';
+import { BarChart3, Bot, Building2, Compass, Flame, Layers, LayoutDashboard, LayoutGrid, Search, Server, Sliders, Sparkles, Terminal } from 'lucide-react';
 import React, { useEffect } from 'react';
 
 export type DashboardTourStepId = 'dash-sidebar' | 'dash-header' | 'dash-tabs' | 'dash-config';
 export type PortalTourStepId = 'portal-header' | 'portal-kpis' | 'portal-bots' | 'portal-orgs';
 export type ExploreTourStepId = 'explore-hero' | 'explore-bar' | 'explore-switcher' | 'explore-grid';
 export type PageTourStepId = DashboardTourStepId | PortalTourStepId | ExploreTourStepId;
+export type TourNavTargetPhase = 'dashboard' | 'portal' | 'explore';
 
 export const DASHBOARD_TOUR_STEPS: DashboardTourStepId[] = ['dash-sidebar', 'dash-header', 'dash-tabs', 'dash-config'];
 export const PORTAL_TOUR_STEPS: PortalTourStepId[] = ['portal-header', 'portal-kpis', 'portal-bots', 'portal-orgs'];
@@ -214,6 +216,57 @@ export function FirstSignInPageTourScene({
 					</div>
 				</motion.div>
 			</AnimatePresence>
+		</motion.div>
+	);
+}
+
+export function FirstSignInNavPromptScene({ targetPhase, onOpenNavMenu }: { targetPhase: TourNavTargetPhase; onOpenNavMenu: () => void }) {
+	const { t } = useDictionary();
+	const destinationName = t(`components.firstSignIn.navHandoff.destinations.${targetPhase}`);
+	const DestIcon = targetPhase === 'dashboard' ? LayoutDashboard : targetPhase === 'portal' ? Terminal : Compass;
+
+	return (
+		<motion.div
+			key={`scene-nav-prompt-${targetPhase}`}
+			initial={{ opacity: 0, y: 24, scale: 0.97 }}
+			animate={{ opacity: 1, y: 0, scale: 1 }}
+			exit={{ opacity: 0, y: 18, scale: 0.97 }}
+			transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+			className="flex flex-col items-center text-center max-w-2xl mx-auto w-full pointer-events-auto"
+		>
+			<div className="w-full rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/50 p-4 sm:p-6 text-left shadow-[0_0_44px_color-mix(in_srgb,var(--accent)_28%,transparent)]">
+				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+					<div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/40 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]">
+						<LayoutGrid size={26} />
+						<span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-(--accent) text-white border-2 border-(--background)">
+							<DestIcon size={12} />
+						</span>
+					</div>
+
+					<div className="flex-1 min-w-0 w-full">
+						<div className="flex flex-wrap items-center gap-2 mb-1">
+							<span className="inline-flex items-center gap-1 rounded-full bg-(--accent)/15 border border-(--accent)/35 px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-(--accent)">
+								<Sparkles size={11} />
+								{t('components.firstSignIn.navHandoff.promptBadge')}
+							</span>
+							<kbd className="rounded-xl bg-(--foreground) border border-(--accent)/40 px-2.5 py-0.5 font-mono text-xs font-extrabold text-(--accent) whitespace-nowrap">Ctrl + .</kbd>
+						</div>
+						<h3 className="text-lg sm:text-xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('components.firstSignIn.navHandoff.promptTitle', { destination: destinationName })}
+						</h3>
+						<p className="text-xs sm:text-sm text-(--text-muted) leading-relaxed mt-1">{t('components.firstSignIn.navHandoff.promptDesc', { destination: destinationName })}</p>
+					</div>
+
+					<Button
+						variant="primary"
+						onClick={onOpenNavMenu}
+						className="w-full sm:w-auto justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap shrink-0 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+					>
+						<LayoutGrid size={16} className="shrink-0" />
+						<span>{t('components.firstSignIn.navHandoff.openMenuBtn')}</span>
+					</Button>
+				</div>
+			</div>
 		</motion.div>
 	);
 }

@@ -2,6 +2,20 @@
 
 # bot
 
+## 2.4.1
+
+### Patch Changes
+
+- ## Refreshed Offline FAQ & Docs Fallback Catalogs
+  
+  Synchronized offline fallback FAQ and documentation entries in the Xernerx Bot daemon.
+  
+  ### Changed
+  
+  - **Fallback Catalog Sync**: Updated catalogFallbacks to match the latest FAQ and documentation blueprints.
+- Updated dependencies
+  - @xernerx/lib@1.27.0
+
 ## 2.4.0
 
 ### Minor Changes

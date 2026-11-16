@@ -2,16 +2,15 @@
 'use client';
 
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Boxes, Layers, Package, ShieldCheck, Sparkles } from 'lucide-react';
+import { Boxes, Package } from 'lucide-react';
 import { useDictionary, useEnvironment, useLoading, useSidebar } from '@xernerx/providers';
-
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import Timeline from '@/components/Timeline';
 import { LandingCta, PlatformHighlights } from '@/components/PlatformHighlights';
 import { PageFaqSection } from '@/components/PageFaqSection';
-import { WwwDeepSearch } from '@/components/WwwDeepSearch';
 import { BotProfileData, buildConsumerServiceItems, DeveloperSoftwareCard, ServiceProfileCard } from '@/components/LandingServiceCards';
+import { HomeHeroAndFeatures } from '@/components/home/HomeHeroAndFeatures';
+import { HomeAboutSection } from '@/components/home/HomeAboutSection';
 
 export type ShowcasePackage = {
 	name: string;
@@ -210,143 +209,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 			transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
 			className={`flex flex-col selection:bg-(--accent) selection:text-white ${pageReady ? '' : 'pointer-events-none select-none'}`}
 		>
-			{/* HERO SECTION — Sits cleanly beneath the constructed XERNERX dot-matrix stage */}
-			<section className="min-h-dvh flex flex-col items-center justify-start px-6 pt-[52dvh] sm:pt-[54dvh] pb-12 relative z-30">
-				<div className="w-full max-w-(--page-width) mx-auto flex flex-col items-center text-center relative z-10">
-					<motion.div
-						initial={{ opacity: 0, y: 36 }}
-						animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
-						transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-						className="w-full flex flex-col items-center text-center bg-(--foreground)/30 backdrop-blur-xl border border-(--border)/10 rounded-[2.75rem] px-8 py-8 sm:px-12 sm:py-10 lg:px-16 lg:py-11 shadow-[0_20px_60px_-15px_color-mix(in_srgb,var(--accent)_18%,transparent)] relative"
-					>
-						<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[2.75rem]">
-							<div
-								className="absolute inset-0 opacity-[0.06]"
-								style={{
-									backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
-									backgroundSize: '20px 20px',
-								}}
-							/>
-							<div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[32rem] h-36 rounded-full bg-(--accent)/15 blur-3xl" />
-						</div>
-
-						<h1
-							className="relative z-10 text-4xl sm:text-5xl lg:text-6xl xl:text-[4.25rem] font-extrabold tracking-tight mb-4 leading-[1.06] text-transparent bg-clip-text bg-gradient-to-br from-(--text) via-(--text) to-(--text-muted)"
-							style={{ fontFamily: 'var(--font-fredoka)' }}
-						>
-							{t('www.hero.title')}
-						</h1>
-
-						<p className="relative z-10 max-w-3xl mx-auto text-base sm:text-lg text-(--text-muted) leading-relaxed mb-7">{t('www.hero.description')}</p>
-
-						<div className="relative z-10 flex flex-wrap items-center justify-center gap-4">
-							<a
-								href="#services"
-								className="px-8 py-4 rounded-2xl bg-(--accent) text-white font-bold text-sm hover:opacity-90 transition-all shadow-[0_0_40px_-10px_var(--accent)] hover:shadow-[0_0_60px_-15px_var(--accent)] hover:-translate-y-1"
-							>
-								{t('www.hero.buttons.explore')}
-							</a>
-							<a
-								href="#software"
-								className="px-8 py-4 rounded-2xl bg-(--background)/60 text-(--text) font-bold text-sm hover:bg-(--accent)/15 hover:text-(--accent) hover:border-(--accent)/30 transition-all border border-(--border)/10 backdrop-blur-md"
-							>
-								{t('www.hero.buttons.software')}
-							</a>
-						</div>
-
-						<div className="relative z-30 w-full flex justify-center">
-							<WwwDeepSearch packages={publicPackages} />
-						</div>
-
-						<nav aria-label="Quick navigation" className="relative z-10 mt-6 flex flex-wrap items-center justify-center gap-2">
-							<a
-								href="#about"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
-							>
-								{t('www.hero.links.about')}
-							</a>
-							<a
-								href="#highlights"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
-							>
-								{t('www.hero.links.highlights')}
-							</a>
-							<a
-								href="#timeline"
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
-							>
-								{t('www.hero.links.timeline')}
-							</a>
-							<Link
-								href={getEnvUrl('https://www.xernerx.com/invites')}
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
-							>
-								{t('www.hero.links.invites')}
-							</Link>
-							<Link
-								href={getEnvUrl('https://www.xernerx.com/applications')}
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
-							>
-								{t('www.hero.links.careers')}
-							</Link>
-							<Link
-								href={getEnvUrl('https://www.xernerx.com/contact')}
-								className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-(--background)/55 hover:bg-(--accent)/15 text-(--text-muted) hover:text-(--accent) border border-(--border)/10 hover:border-(--accent)/30 backdrop-blur-md transition-colors"
-							>
-								{t('www.hero.links.contact')}
-							</Link>
-						</nav>
-					</motion.div>
-				</div>
-			</section>
-
-			{/* SELLING POINTS (Fluid Dot-Matrix Glass Bento Cards) */}
-			<section className="px-6 relative z-20 pb-8">
-				<div className="max-w-(--page-width) mx-auto w-full grid md:grid-cols-3 gap-6">
-					{[
-						{
-							title: t('www.features.scale.title'),
-							desc: t('www.features.scale.description'),
-							icon: <Layers className="w-6 h-6" />,
-						},
-						{
-							title: t('www.features.opensource.title'),
-							desc: t('www.features.opensource.description'),
-							icon: <ShieldCheck className="w-6 h-6" />,
-						},
-						{
-							title: t('www.features.design.title'),
-							desc: t('www.features.design.description'),
-							icon: <Sparkles className="w-6 h-6" />,
-						},
-					].map((point, i) => (
-						<motion.div
-							key={point.title}
-							initial={{ opacity: 0, y: 40 }}
-							animate={pageReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-							whileHover={{ y: -8, scale: 1.015 }}
-							transition={{ duration: 1.6, delay: 0.25 + i * 0.16, ease: [0.22, 1, 0.36, 1] }}
-							className="bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/45 rounded-3xl p-8 lg:p-10 shadow-xl hover:shadow-[0_16px_44px_-12px_color-mix(in_srgb,var(--accent)_32%,transparent)] relative overflow-hidden group transition-colors"
-						>
-							<div
-								className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-500 pointer-events-none"
-								style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)', backgroundSize: '20px 20px' }}
-							/>
-							<div className="absolute -top-12 -right-12 w-36 h-36 bg-(--accent)/15 rounded-full blur-3xl group-hover:bg-(--accent)/30 transition-colors pointer-events-none" />
-
-							<div className="relative z-10 flex flex-col items-start gap-4">
-								<div className="w-14 h-14 rounded-2xl bg-(--accent)/15 text-(--accent) flex items-center justify-center backdrop-blur-md border border-(--accent)/30 shadow-[0_0_24px_-6px_var(--accent)] group-hover:scale-110 transition-transform">
-									{point.icon}
-								</div>
-								<div className="text-xl font-bold mt-1 text-(--text) group-hover:text-(--accent) transition-colors" style={{ fontFamily: 'var(--font-fredoka)' }}>
-									{point.title}
-								</div>
-								<p className="text-(--text-muted) text-sm leading-relaxed">{point.desc}</p>
-							</div>
-						</motion.div>
-					))}
-				</div>
-			</section>
+			<HomeHeroAndFeatures pageReady={pageReady} publicPackages={publicPackages} />
 
 			{/* CONSUMER SERVICES (Horizontal Scroll) */}
 			<section id="services" ref={servicesRef} className="relative h-[300dvh]">
@@ -388,97 +251,7 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 				</div>
 			</section>
 
-			{/* ABOUT SECTION (Asymmetrical Bento-style) */}
-			<section id="about" className="max-w-(--page-width) mx-auto w-full px-6 relative" style={{ padding: 'calc(var(--ui-gap) * 6) 0' }}>
-				<div className="relative grid md:grid-cols-12 gap-8 items-center">
-					{/* Massive Watermark */}
-					<div
-						className="hidden lg:block absolute -left-20 top-1/2 -translate-y-1/2 text-[12rem] font-black text-(--foreground)/20 whitespace-nowrap pointer-events-none select-none -z-10"
-						style={{ fontFamily: 'var(--font-fredoka)' }}
-					>
-						{t('www.about.watermark')}
-					</div>
-
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-100px' }}
-						transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-						className="md:col-span-5 lg:col-span-4"
-					>
-						<h2 className="text-5xl font-extrabold mb-6 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{t('www.about.title')}
-						</h2>
-					</motion.div>
-
-					<motion.div
-						initial={{ opacity: 0, x: 24 }}
-						whileInView={{ opacity: 1, x: 0 }}
-						viewport={{ once: true, margin: '-100px' }}
-						transition={{ duration: 0.75, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-						className="md:col-span-7 lg:col-span-8 relative"
-					>
-						<div className="bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 p-10 lg:p-14 rounded-[3rem] shadow-xl relative overflow-hidden group hover:border-(--accent)/40 transition-all flex flex-col gap-6">
-							<div
-								className="absolute inset-0 opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none"
-								style={{
-									backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
-									backgroundSize: '22px 22px',
-								}}
-							/>
-							<div className="absolute top-0 right-0 w-40 h-40 bg-(--accent)/15 rounded-full blur-3xl group-hover:bg-(--accent)/25 transition-colors" />
-							<p className="text-lg lg:text-xl text-(--text-muted) leading-relaxed relative z-10 font-medium">{t('www.about.description')}</p>
-							<p className="text-base lg:text-lg text-(--text-muted) leading-relaxed relative z-10">{t('www.about.description2')}</p>
-						</div>
-					</motion.div>
-				</div>
-
-				{/* ECOSYSTEM PILLARS */}
-				<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-					{(
-						[
-							{
-								title: t('www.about.pillars.communities.title'),
-								desc: t('www.about.pillars.communities.description'),
-							},
-							{
-								title: t('www.about.pillars.frameworks.title'),
-								desc: t('www.about.pillars.frameworks.description'),
-							},
-							{
-								title: t('www.about.pillars.infrastructure.title'),
-								desc: t('www.about.pillars.infrastructure.description'),
-							},
-							{
-								title: t('www.about.pillars.identity.title'),
-								desc: t('www.about.pillars.identity.description'),
-							},
-						] as const
-					).map((pillar, idx) => (
-						<motion.div
-							key={pillar.title}
-							initial={{ opacity: 0, y: 20 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							whileHover={{ y: -6, scale: 1.015 }}
-							viewport={{ once: true, margin: '-50px' }}
-							transition={{ duration: 0.55, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-							className="relative overflow-hidden group bg-(--foreground)/35 backdrop-blur-xl border border-(--border)/10 hover:border-(--accent)/40 rounded-3xl p-8 shadow-xl hover:shadow-[0_14px_40px_-12px_color-mix(in_srgb,var(--accent)_30%,transparent)] transition-colors flex flex-col gap-3"
-						>
-							<div
-								className="absolute inset-0 opacity-[0.05] group-hover:opacity-[0.12] transition-opacity duration-500 pointer-events-none"
-								style={{
-									backgroundImage: 'radial-gradient(circle at 50% 50%, var(--accent) 1.5px, transparent 1.5px)',
-									backgroundSize: '18px 18px',
-								}}
-							/>
-							<div className="relative z-10 text-lg font-bold text-(--text) group-hover:text-(--accent) transition-colors" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{pillar.title}
-							</div>
-							<p className="relative z-10 text-sm text-(--text-muted) leading-relaxed">{pillar.desc}</p>
-						</motion.div>
-					))}
-				</div>
-			</section>
+			<HomeAboutSection />
 
 			{/* PLATFORM EXPERIENCE HIGHLIGHTS */}
 			<PlatformHighlights />

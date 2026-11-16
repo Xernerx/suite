@@ -1,7 +1,7 @@
 /** @format */
 
 import { dictionary, type Locale, locales } from '@xernerx/lib/server';
-import { FAQ_BLUEPRINTS } from './faqBlueprints';
+import { FAQ_BLUEPRINTS, FAQ_SUBDOMAINS_CATALOG } from './faqBlueprints';
 
 export interface FaqQuickLinkItem {
 	label: string;
@@ -69,11 +69,12 @@ function htmlToMarkdown(text: string): string {
 		.replace(/<b>(.*?)<\/b>/gi, '**$1**')
 		.replace(/<code>(.*?)<\/code>/gi, '`$1`')
 		.replace(/<em>(.*?)<\/em>/gi, '*$1*')
+		.replace(/&amp;/gi, '&')
 		.replace(/<[^>]+>/g, '');
 }
 
 function stripHtml(text: string): string {
-	return text.replace(/<[^>]+>/g, '');
+	return text.replace(/&amp;/gi, '&').replace(/<[^>]+>/g, '');
 }
 
 function resolveEnvHref(href: string, reqUrl?: string): string {
@@ -102,18 +103,24 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 
 		const items: FaqCardItem[] = cat.cards.map((card) => {
 			const question = t(card.titleKey);
-			const rawParagraphs = card.paragraphKeys.map((k) => t(k));
+			const orderedParagraphKeys =
+				card.disclaimerKey && card.paragraphKeys.length > 0
+					? [card.paragraphKeys[0]!, card.disclaimerKey, ...card.paragraphKeys.slice(1)]
+					: card.disclaimerKey
+						? [card.disclaimerKey]
+						: card.paragraphKeys;
+
+			const rawParagraphs = orderedParagraphKeys.map((k) => t(k));
 			const paragraphs = rawParagraphs.map(stripHtml);
-			const mdParagraphs = rawParagraphs.map(htmlToMarkdown);
+			const mdParagraphs = orderedParagraphKeys.map((k) => (k === card.disclaimerKey ? `**${htmlToMarkdown(t(k))}**` : htmlToMarkdown(t(k))));
 			const bullets = card.bulletKeys ? card.bulletKeys.map((k) => stripHtml(t(k))) : undefined;
 			const mdBullets = card.bulletKeys ? card.bulletKeys.map((k) => `- ${htmlToMarkdown(t(k))}`) : [];
 
 			let table: FaqTableData | undefined;
 			if (card.tableType === 'subdomains') {
-				const subs = ['www', 'app', 'account', 'store', 'cdn', 'docs', 'info', 'blog', 'api', 'admin'] as const;
 				table = {
 					headers: [t('faq.overview.table.subdomain'), t('faq.overview.table.purpose')],
-					rows: subs.map((s) => [s === 'www' ? 'xernerx.com' : `${s}.xernerx.com`, t(`faq.overview.subdomains.${s}`)]),
+					rows: FAQ_SUBDOMAINS_CATALOG.map((s) => [s.domain, t(`faq.overview.subdomains.${s.key}`)]),
 				};
 			} else if (card.tableType === 'environments') {
 				table = {
@@ -126,6 +133,9 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 				};
 			}
 
+			const tablePlainLines = table ? table.rows.map((r) => `${r[0]}: ${r.slice(1).join(' — ')}`) : [];
+			const tableMdLines = table ? table.rows.map((r) => `- **\`${r[0]}\`** — ${r.slice(1).join(' • ')}`) : [];
+
 			const quickLinks: FaqQuickLinkItem[] = card.links.map((l) => ({
 				label: t(l.labelKey),
 				href: resolveEnvHref(l.href, reqUrl),
@@ -133,8 +143,8 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 				external: l.external,
 			}));
 
-			const answer = [...paragraphs, ...(bullets || [])].join('\n\n');
-			const markdown = [...mdParagraphs, ...mdBullets].join('\n\n');
+			const answer = [...paragraphs, ...(bullets || []), ...tablePlainLines].join('\n\n');
+			const markdown = [...mdParagraphs, ...mdBullets, ...(tableMdLines.length > 0 ? [tableMdLines.join('\n')] : [])].join('\n\n');
 			const cardUrl = `${categoryUrl}&card=${card.id}`;
 
 			const fullId = `${cat.id}.${card.id}`;
@@ -159,7 +169,7 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 				discordEmbed: {
 					title: question,
 					url: cardUrl,
-					description: markdown,
+					description: markdown.length > 4000 ? `${markdown.slice(0, 3997)}...` : markdown,
 					fields:
 						quickLinks.length > 0
 							? [
@@ -186,7 +196,7 @@ export async function buildFaqCatalog(requestedLocale?: string | null, reqUrl?: 
 		};
 	});
 
-	const sectionIds = ['platform', 'community', 'accountAndDevs'] as const;
+	const sectionIds = ['platform', 'community', 'account', 'billing', 'developers'] as const;
 	const sections: FaqSectionItem[] = sectionIds.map((secId) => {
 		const secCats = categories.filter((c) => c.sectionId === secId);
 		return {

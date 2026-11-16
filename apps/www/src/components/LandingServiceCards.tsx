@@ -72,6 +72,16 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			defaultBannerUrl: 'https://cdn.discordapp.com/banners/1484880634844287138/34673c3bb1900169de38a5e40a56f34d.png?size=1024',
 		},
 		{
+			id: 'yourapps',
+			botId: '619328560141697036',
+			title: t('www.applications.yourapps.title'),
+			desc: t('www.applications.yourapps.desc'),
+			link: getEnvUrl('https://app.xernerx.com/bots/yourapps'),
+			tag: t('www.tags.discordBot'),
+			defaultAvatarUrl: '',
+			defaultBannerUrl: '',
+		},
+		{
 			id: 'metamorphosis',
 			botId: '881678826906730547',
 			title: t('www.applications.metamorphosis.title'),

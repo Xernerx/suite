@@ -92,13 +92,13 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', re
 		);
 	}
 
-	// Default for 'text' and 'date'
+	// Default for 'text', 'number', and 'date'
 	return (
 		<input
 			ref={setRefs}
 			type={variant}
 			data-search-shortcut={activeShortcut ? activeShortcut.toLowerCase() : undefined}
-			className={`${baseClasses} rounded-2xl p-3 w-full ${className}`}
+			className={`${baseClasses} rounded-2xl h-10 px-4 text-sm w-full ${className}`}
 			{...(props as React.InputHTMLAttributes<HTMLInputElement>)}
 		/>
 	);

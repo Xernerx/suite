@@ -442,7 +442,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ prov
 			try {
 				const parsedReturn = new URL(oauthState.returnTo);
 				const baseDomain = process.env.NEXT_PUBLIC_DOMAIN || 'xernerx.com';
-				if (parsedReturn.hostname.endsWith(baseDomain) || parsedReturn.hostname === 'localhost' || parsedReturn.hostname === '127.0.0.1') {
+				if (parsedReturn.hostname.endsWith(baseDomain) || parsedReturn.hostname === 'localhost' || parsedReturn.hostname.endsWith('.localhost') || parsedReturn.hostname === '127.0.0.1') {
 					parsedReturn.searchParams.set('connected', provider);
 					finalRedirect = parsedReturn.toString();
 				}

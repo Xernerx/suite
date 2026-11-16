@@ -13,6 +13,8 @@ export type SidebarNavItem = {
 	view?: string;
 };
 
+export type SidebarSlotRenderer = React.ReactNode | ((opts: { isCollapsed: boolean }) => React.ReactNode);
+
 type SidebarContextType = {
 	state: 'open' | 'closed' | 'hidden';
 	isMobileOpen: boolean;
@@ -24,6 +26,17 @@ type SidebarContextType = {
 	navItems: SidebarNavItem[];
 	setNavItems: (items: SidebarNavItem[]) => void;
 	clearNavItems: () => void;
+
+	topSlot: SidebarSlotRenderer | null;
+	setTopSlot: (slot: SidebarSlotRenderer | null) => void;
+
+	bottomSlot: SidebarSlotRenderer | null;
+	setBottomSlot: (slot: SidebarSlotRenderer | null) => void;
+
+	accountSlot: SidebarSlotRenderer | SidebarSlotRenderer[] | null;
+	setAccountSlot: (slot: SidebarSlotRenderer | SidebarSlotRenderer[] | null) => void;
+	accountCards: Record<string, SidebarSlotRenderer>;
+	registerAccountCard: (id: string, slot: SidebarSlotRenderer) => () => void;
 
 	view: string | null;
 	setView: (view: string | null) => void;
@@ -47,6 +60,34 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 	const [isMobileOpen, setMobileOpen] = useState(false);
 
 	const [navItems, setNavItems] = useState<SidebarNavItem[]>([]);
+	const [topSlot, setTopSlotState] = useState<SidebarSlotRenderer | null>(null);
+	const [bottomSlot, setBottomSlotState] = useState<SidebarSlotRenderer | null>(null);
+	const [accountSlot, setAccountSlotState] = useState<SidebarSlotRenderer | SidebarSlotRenderer[] | null>(null);
+	const [accountCards, setAccountCards] = useState<Record<string, SidebarSlotRenderer>>({});
+
+	const setTopSlot = useCallback((slot: SidebarSlotRenderer | null) => {
+		setTopSlotState(() => slot);
+	}, []);
+
+	const setBottomSlot = useCallback((slot: SidebarSlotRenderer | null) => {
+		setBottomSlotState(() => slot);
+	}, []);
+
+	const setAccountSlot = useCallback((slot: SidebarSlotRenderer | SidebarSlotRenderer[] | null) => {
+		setAccountSlotState(() => slot);
+	}, []);
+
+	const registerAccountCard = useCallback((id: string, slot: SidebarSlotRenderer) => {
+		setAccountCards((prev) => ({ ...prev, [id]: slot }));
+		return () => {
+			setAccountCards((prev) => {
+				if (!(id in prev)) return prev;
+				const next = { ...prev };
+				delete next[id];
+				return next;
+			});
+		};
+	}, []);
 
 	const [view, setViewState] = useState<string | null>(null);
 	const [isMounted, setIsMounted] = useState(false);
@@ -196,6 +237,17 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
 				navItems,
 				setNavItems,
 				clearNavItems,
+
+				topSlot,
+				setTopSlot,
+
+				bottomSlot,
+				setBottomSlot,
+
+				accountSlot,
+				setAccountSlot,
+				accountCards,
+				registerAccountCard,
 
 				view: isMounted ? view : navItems.find((i) => i.view)?.view || null,
 				setView,

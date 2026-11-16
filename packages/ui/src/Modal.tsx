@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 import { Button } from './Button';
 import { X } from 'lucide-react';
@@ -93,7 +94,7 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 						</div>
 					)}
 
-					<div className="flex flex-col flex-1 min-h-0 overflow-y-auto overscroll-contain pr-1" style={{ gap: 'var(--ui-gap)' }}>
+					<div className="flex flex-col flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain pr-1" style={{ gap: 'var(--ui-gap)' }}>
 						{children}
 					</div>
 				</div>
@@ -101,11 +102,8 @@ export function Modal({ open, onOpenChange, title, description, children, maxWid
 		</div>
 	);
 
-	return React.useMemo(() => {
-		if (typeof document !== 'undefined') {
-			const { createPortal } = require('react-dom');
-			return createPortal(modalContent, document.body);
-		}
-		return null;
-	}, [modalContent]);
+	if (typeof document !== 'undefined') {
+		return createPortal(modalContent, document.body);
+	}
+	return null;
 }

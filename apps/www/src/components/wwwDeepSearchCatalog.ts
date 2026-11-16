@@ -43,9 +43,9 @@ export function buildWwwStaticSearchEntries(params: {
 			id: 'page-invites',
 			category: 'pages',
 			title: t('www.hero.links.invites'),
-			description: 'Official Discord invite links (Essential, Optional, and Advanced 0-Permission presets) for Virtue, Zodiac, Metamorphosis, and To-Do List Bot.',
+			description: 'Official Discord invite links (Essential, Optional, and Advanced 0-Permission presets) for Virtue, YourApps, Zodiac, Metamorphosis, and To-Do List Bot.',
 			subLabel: 'xernerx.com/invites',
-			keywords: 'invites discord bots servers join add virtue zodiac metamorphosis todo essential optional advanced 0 permissions oauth2',
+			keywords: 'invites discord bots servers join add virtue yourapps zodiac metamorphosis todo essential optional advanced 0 permissions oauth2',
 			href: '/invites',
 		},
 		{
@@ -121,7 +121,7 @@ export function buildWwwStaticSearchEntries(params: {
 			title: t('www.security.header.title'),
 			description: t('www.security.header.subtitle'),
 			subLabel: 'xernerx.com/security',
-			keywords: 'security architecture encryption tokens webhooks virtue todo metamorphosis zodiac data minimization 3-tier privacy',
+			keywords: 'security architecture encryption tokens webhooks virtue yourapps todo metamorphosis zodiac data minimization 3-tier privacy',
 			href: '/security',
 		},
 		{
@@ -157,7 +157,7 @@ export function buildWwwStaticSearchEntries(params: {
 			title: t('www.services.dashboard.title'),
 			description: t('www.services.dashboard.desc'),
 			subLabel: 'app.xernerx.com',
-			keywords: 'dashboard explore bots servers leaderboard virtue overlay',
+			keywords: 'dashboard explore bots servers leaderboard virtue yourapps applications forms overlay',
 			href: getEnvUrl('https://app.xernerx.com'),
 			external: true,
 		},
@@ -218,6 +218,7 @@ export function buildWwwStaticSearchEntries(params: {
 	const officialBots: WwwSearchResult[] = (
 		[
 			['virtue', 'virtue leveling xp voice progression roles leaderboard discord bot'],
+			['yourapps', 'yourapps forms applications recruitment appeals modals discord bot'],
 			['todo', 'todo list bot tasks boards productivity discord'],
 			['zodiac', 'zodiac astrology horoscopes discord bot'],
 			['metamorphosis', 'metamorphosis logging moderation discord bot'],

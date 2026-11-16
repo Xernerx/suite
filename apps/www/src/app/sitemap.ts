@@ -24,6 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		{ url: 'https://app.xernerx.com/', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: 'https://app.xernerx.com/bots', lastModified: now, changeFrequency: 'daily', priority: 0.9 },
 		{ url: 'https://app.xernerx.com/bots/virtue', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
+		{ url: 'https://app.xernerx.com/bots/yourapps', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: 'https://app.xernerx.com/bots/todo', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: 'https://app.xernerx.com/bots/metamorphosis', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
 		{ url: 'https://app.xernerx.com/bots/zodiac', lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
@@ -87,11 +88,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 		const officialIdToSlug: Record<string, string> = {
 			'1484880634844287138': 'virtue',
+			'619328560141697036': 'yourapps',
 			'782105629572464652': 'todo',
 			'881678826906730547': 'metamorphosis',
 			'950251264095162418': 'zodiac',
 		};
-		const seenBotSlugs = new Set<string>(['virtue', 'todo', 'metamorphosis', 'zodiac']);
+		const seenBotSlugs = new Set<string>(['virtue', 'yourapps', 'todo', 'metamorphosis', 'zodiac']);
 
 		for (const bot of publicBots) {
 			const slugOrId = bot.vanitySlug || officialIdToSlug[String(bot.id)] || bot.id;

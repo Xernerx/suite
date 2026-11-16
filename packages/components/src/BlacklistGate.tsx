@@ -22,7 +22,8 @@ export function BlacklistGate({ children }: { children: React.ReactNode }) {
 			window.location.pathname === '/terms' ||
 			window.location.pathname === '/privacy' ||
 			window.location.pathname === '/cookies' ||
-			window.location.pathname === '/security';
+			window.location.pathname === '/security' ||
+			window.location.pathname === '/license';
 		setIsAllowedLocation(allowed);
 	}, []);
 
@@ -56,14 +57,14 @@ export function BlacklistGate({ children }: { children: React.ReactNode }) {
 
 				<span className="inline-flex items-center gap-1.5 rounded-full bg-(--accent-red)/15 border border-(--accent-red)/30 px-3 py-1 text-xs font-bold text-(--accent-red)">
 					<ShieldAlert size={13} />
-					{t('components.blacklistGate.badge')}
+					{t('common.blacklistGate.badge')}
 				</span>
 
 				<div className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.35)' }}>
 					<h1 className="text-2xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{t('components.blacklistGate.title')}
+						{t('common.blacklistGate.title')}
 					</h1>
-					<p className="text-sm text-(--text-muted) leading-relaxed">{t('components.blacklistGate.description')}</p>
+					<p className="text-sm text-(--text-muted) leading-relaxed">{t('common.blacklistGate.description')}</p>
 				</div>
 
 				<div className="flex flex-col sm:flex-row items-center justify-center w-full pt-2" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
@@ -75,7 +76,7 @@ export function BlacklistGate({ children }: { children: React.ReactNode }) {
 						className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl"
 					>
 						<Trash2 size={16} />
-						<span>{t('components.blacklistGate.manageAccountBtn')}</span>
+						<span>{t('common.blacklistGate.manageAccountBtn')}</span>
 					</Button>
 					<Button
 						variant="secondary"
@@ -85,7 +86,7 @@ export function BlacklistGate({ children }: { children: React.ReactNode }) {
 						className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl"
 					>
 						<LogOut size={16} />
-						<span>{t('components.blacklistGate.signOutBtn')}</span>
+						<span>{t('common.blacklistGate.signOutBtn')}</span>
 					</Button>
 				</div>
 			</div>

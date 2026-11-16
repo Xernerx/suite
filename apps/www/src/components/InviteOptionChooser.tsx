@@ -231,7 +231,7 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 									</div>
 								</div>
 
-								<a href={opt.discordUrl} target="_blank" rel="noopener noreferrer" className="w-full mt-auto">
+								<a href={opt.discordUrl} className="w-full mt-auto">
 									<Button variant={isPrimary ? 'primary' : 'secondary'} className="w-full flex items-center justify-center gap-2">
 										<span>{cta}</span>
 										<ArrowUpRight size={16} />

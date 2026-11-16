@@ -261,6 +261,16 @@ export const STORE_DEEP_LINKS = [
 
 export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey; baseUrl: string; path: string; label: string; subtitle: string; keywords: string; icon: React.ElementType }> = [
 	{
+		id: 'app-server-applications',
+		section: 'apps',
+		baseUrl: 'https://app.xernerx.com',
+		path: '/dashboard?tab=applications',
+		label: 'Server Applications Studio (YourApps)',
+		subtitle: 'app.xernerx.com/dashboard?tab=applications • Build Discord forms, Apply panels & review submissions',
+		keywords: 'yourapps applications forms positions questions apply panel approve deny review discord server dashboard',
+		icon: FileCheck,
+	},
+	{
 		id: 'app-portal',
 		section: 'apps',
 		baseUrl: 'https://portal.xernerx.com',
@@ -327,7 +337,7 @@ export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey;
 		path: '/invites',
 		label: 'Official Bot & Community Invites',
 		subtitle: 'xernerx.com/invites • Verified Discord invite links for official bots & servers',
-		keywords: 'invites discord join server add bot virtue zodiac metamorphosis todo',
+		keywords: 'invites discord join server add bot virtue yourapps zodiac metamorphosis todo',
 		icon: Ticket,
 	},
 	{
@@ -347,7 +357,7 @@ export const SUITE_DEEP_PORTALS: Array<{ id: string; section: PaletteSectionKey;
 		path: '/security',
 		label: 'Platform & Bot Security Architecture',
 		subtitle: 'xernerx.com/security • Zero message logging, 3-tier privacy, bot data minimization, API tokens & webhooks',
-		keywords: 'security architecture trust encryption zero message logging virtue todo metamorphosis zodiac 3-tier privacy oauth tokens webhooks disclosure',
+		keywords: 'security architecture trust encryption zero message logging virtue yourapps todo metamorphosis zodiac 3-tier privacy oauth tokens webhooks disclosure',
 		icon: ShieldCheck,
 	},
 	{

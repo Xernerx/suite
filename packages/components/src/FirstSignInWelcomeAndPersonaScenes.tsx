@@ -4,11 +4,12 @@
 import { Button, Check } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSupport } from '@xernerx/providers';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Bot, CheckCircle2, Clock, Code2, Coins, Compass, LayoutDashboard, LifeBuoy, ShieldCheck, Sparkles, Terminal, UserPlus, Webhook } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Bot, CheckCircle2, Clock, Code2, Coins, Compass, LayoutDashboard, LayoutGrid, LifeBuoy, ShieldCheck, Sparkles, Terminal, UserPlus, Webhook } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import type { OnboardingPersona, OnboardingStagePhase } from './FirstSignInOnboarding';
+import type { TourNavTargetPhase } from './FirstSignInPageTours';
 
 export function FirstSignInWelcomeScene({
 	displayName,
@@ -364,22 +365,7 @@ export function FirstSignInReadyScene() {
 	);
 }
 
-export function FirstSignInStageDock({
-	currentPhase,
-	step,
-	phaseSequence,
-	phaseLabels,
-	isInitialTermsNull,
-	termsChecked,
-	hasAnyPersonaSelected,
-	submitting,
-	postponing,
-	onDecline,
-	onBackStep,
-	onNavigateToPhase,
-	onOpenSkipConfirm,
-	onNextStep,
-}: {
+export function FirstSignInStageDock(props: {
 	currentPhase: OnboardingStagePhase;
 	step: number;
 	phaseSequence: OnboardingStagePhase[];
@@ -394,7 +380,27 @@ export function FirstSignInStageDock({
 	onNavigateToPhase: (phase: OnboardingStagePhase) => void;
 	onOpenSkipConfirm: () => void;
 	onNextStep: () => void;
+	navPromptTarget?: TourNavTargetPhase | null;
+	onOpenNavMenu?: () => void;
 }) {
+	const {
+		currentPhase,
+		step,
+		phaseSequence,
+		phaseLabels,
+		isInitialTermsNull,
+		termsChecked,
+		hasAnyPersonaSelected,
+		submitting,
+		postponing,
+		onDecline,
+		onBackStep,
+		onNavigateToPhase,
+		onOpenSkipConfirm,
+		onNextStep,
+		navPromptTarget,
+		onOpenNavMenu,
+	} = props;
 	const { t } = useDictionary();
 
 	return (
@@ -473,24 +479,35 @@ export function FirstSignInStageDock({
 						<span>{currentPhase === 'tour-choice' ? t('components.firstSignIn.buttons.skipTour') : t('components.firstSignIn.buttons.postponeTour')}</span>
 					</Button>
 				)}
-				<Button
-					variant="primary"
-					onClick={onNextStep}
-					isLoading={submitting}
-					disabled={postponing || (currentPhase === 'welcome' && isInitialTermsNull && !termsChecked) || (currentPhase === 'who-we-are' && !hasAnyPersonaSelected)}
-					className="gap-1.5 sm:gap-2 px-4 sm:px-5 text-xs sm:text-sm whitespace-nowrap shrink-0 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
-				>
-					<span>
-						{currentPhase === 'welcome' && isInitialTermsNull
-							? t('components.firstSignIn.buttons.agreeAndContinue')
-							: currentPhase === 'tour-choice'
-								? t('components.firstSignIn.buttons.takeTour')
-								: currentPhase === 'ready'
-									? t('components.firstSignIn.buttons.finish')
-									: t('components.firstSignIn.buttons.next')}
-					</span>
-					{currentPhase !== 'ready' ? <ArrowRight size={15} className="shrink-0" /> : <Sparkles size={15} className="shrink-0" />}
-				</Button>
+				{navPromptTarget ? (
+					<Button
+						variant="primary"
+						onClick={onOpenNavMenu}
+						className="gap-1.5 sm:gap-2 px-3.5 sm:px-4 text-xs sm:text-sm whitespace-nowrap shrink-0 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_45%,transparent)] animate-pulse"
+					>
+						<LayoutGrid size={15} className="shrink-0" />
+						<span>{t('components.firstSignIn.navHandoff.waitingHint')}</span>
+					</Button>
+				) : (
+					<Button
+						variant="primary"
+						onClick={onNextStep}
+						isLoading={submitting}
+						disabled={postponing || (currentPhase === 'welcome' && isInitialTermsNull && !termsChecked) || (currentPhase === 'who-we-are' && !hasAnyPersonaSelected)}
+						className="gap-1.5 sm:gap-2 px-4 sm:px-5 text-xs sm:text-sm whitespace-nowrap shrink-0 shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+					>
+						<span>
+							{currentPhase === 'welcome' && isInitialTermsNull
+								? t('components.firstSignIn.buttons.agreeAndContinue')
+								: currentPhase === 'tour-choice'
+									? t('components.firstSignIn.buttons.takeTour')
+									: currentPhase === 'ready'
+										? t('components.firstSignIn.buttons.finish')
+										: t('components.firstSignIn.buttons.next')}
+						</span>
+						{currentPhase !== 'ready' ? <ArrowRight size={15} className="shrink-0" /> : <Sparkles size={15} className="shrink-0" />}
+					</Button>
+				)}
 			</div>
 		</motion.div>
 	);

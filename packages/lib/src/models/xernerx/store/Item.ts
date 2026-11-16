@@ -29,6 +29,7 @@ const schema = new Schema(
 				'boost_bot',
 				'boost_server',
 				'vanity_url',
+				'dot_matrix',
 				'stage_style',
 				'icon_pack',
 				'window_style',

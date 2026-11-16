@@ -49,48 +49,63 @@ const VALID_OVERLAY_SKINS: readonly OverlaySkinType[] = ['default', 'hud_tactica
 export const VALID_HEADER_SUBDOMAINS: readonly HeaderSubdomainId[] = ['app', 'dashboard', 'portal', 'store', 'account', 'info', 'docs', 'cdn', 'haste', 'blog', 'api', 'www', 'admin', 'hosting'];
 export const DEFAULT_HEADER_SUBDOMAINS: HeaderSubdomainId[] = ['dashboard', 'portal', 'store'];
 
-const COSMETIC_CHILD_TO_BUNDLE: Record<string, string> = {
-	ambient_mesh_lava: 'ambient_scenes_pack',
-	ambient_cyber_grid: 'ambient_scenes_pack',
-	ambient_topography: 'ambient_scenes_pack',
-	ambient_nebula_cosmos: 'ambient_scenes_pack',
-	ambient_prism_caustics: 'ambient_scenes_pack',
-	surface_crystal: 'surface_styles_pack',
-	surface_holographic: 'surface_styles_pack',
-	surface_neon: 'surface_styles_pack',
-	surface_obsidian: 'surface_styles_pack',
-	cursor_starlight_trail: 'cursor_fx_bundle',
-	cursor_plasma_sparks: 'cursor_fx_bundle',
-	cursor_cyber_reticle: 'cursor_fx_bundle',
-	cursor_sonic_rings: 'cursor_fx_bundle',
-	cursor_aurora_ribbon: 'cursor_fx_bundle',
-	skin_hud_tactical: 'overlay_skins_bundle',
-	skin_frosted_prism: 'overlay_skins_bundle',
-	skin_neon_arcade: 'overlay_skins_bundle',
-	skin_minimal_pill: 'overlay_skins_bundle',
+const COSMETIC_PARENTS: Record<string, string[]> = {
+	dot_matrix_orbit: ['dot_matrix_banner'],
+	dot_matrix_vortex: ['dot_matrix_banner'],
+	dot_matrix_helix: ['dot_matrix_banner'],
+	dot_matrix_prism: ['dot_matrix_banner'],
+	dot_matrix_infinity: ['dot_matrix_banner'],
+	dot_matrix_wavegrid: ['dot_matrix_banner'],
+	dot_matrix_chronos: ['dot_matrix_banner', 'stage_constellation', 'stage_styles_pack'],
+	dot_matrix_supernova: ['dot_matrix_banner', 'stage_constellation', 'stage_styles_pack'],
+	dot_matrix_tesseract: ['dot_matrix_banner', 'stage_hexgrid', 'stage_styles_pack'],
+	dot_matrix_synthwave: ['dot_matrix_banner', 'stage_aurora', 'stage_styles_pack'],
+	dot_matrix_lotus: ['dot_matrix_banner', 'stage_glyphs', 'stage_styles_pack'],
+	stage_constellation: ['stage_styles_pack'],
+	stage_hexgrid: ['stage_styles_pack'],
+	stage_aurora: ['stage_styles_pack'],
+	stage_glyphs: ['stage_styles_pack'],
+	ambient_mesh_lava: ['ambient_scenes_pack'],
+	ambient_cyber_grid: ['ambient_scenes_pack'],
+	ambient_topography: ['ambient_scenes_pack'],
+	ambient_nebula_cosmos: ['ambient_scenes_pack'],
+	ambient_prism_caustics: ['ambient_scenes_pack'],
+	surface_crystal: ['surface_styles_pack'],
+	surface_holographic: ['surface_styles_pack'],
+	surface_neon: ['surface_styles_pack'],
+	surface_obsidian: ['surface_styles_pack'],
+	cursor_starlight_trail: ['cursor_fx_bundle'],
+	cursor_plasma_sparks: ['cursor_fx_bundle'],
+	cursor_cyber_reticle: ['cursor_fx_bundle'],
+	cursor_sonic_rings: ['cursor_fx_bundle'],
+	cursor_aurora_ribbon: ['cursor_fx_bundle'],
+	skin_hud_tactical: ['overlay_skins_bundle'],
+	skin_frosted_prism: ['overlay_skins_bundle'],
+	skin_neon_arcade: ['overlay_skins_bundle'],
+	skin_minimal_pill: ['overlay_skins_bundle'],
 };
 
 function hasBadgeUnlock(unlocked: string[], req?: string): boolean {
 	if (!req) return true;
 	if (unlocked.includes(req)) return true;
-	const bundle = COSMETIC_CHILD_TO_BUNDLE[req];
-	return Boolean(bundle && unlocked.includes(bundle));
+	const parents = COSMETIC_PARENTS[req];
+	return Boolean(parents && parents.some((p) => unlocked.includes(p)));
 }
 
 function enforceUnlockedCosmetics(prefs: UIPreferences, unlocked: string[]): UIPreferences {
 	const next = { ...prefs };
 	const typeMap: Partial<Record<DotMatrixType, string>> = {
-		orbit: 'dot_matrix_banner',
-		vortex: 'dot_matrix_banner',
-		helix: 'dot_matrix_banner',
-		prism: 'dot_matrix_banner',
-		infinity: 'dot_matrix_banner',
-		wavegrid: 'dot_matrix_banner',
-		chronos: 'stage_constellation',
-		supernova: 'stage_constellation',
-		tesseract: 'stage_hexgrid',
-		synthwave: 'stage_aurora',
-		lotus: 'stage_glyphs',
+		orbit: 'dot_matrix_orbit',
+		vortex: 'dot_matrix_vortex',
+		helix: 'dot_matrix_helix',
+		prism: 'dot_matrix_prism',
+		infinity: 'dot_matrix_infinity',
+		wavegrid: 'dot_matrix_wavegrid',
+		chronos: 'dot_matrix_chronos',
+		supernova: 'dot_matrix_supernova',
+		tesseract: 'dot_matrix_tesseract',
+		synthwave: 'dot_matrix_synthwave',
+		lotus: 'dot_matrix_lotus',
 	};
 	const renderMap: Partial<Record<DotMatrixRenderStyle, string>> = {
 		constellation: 'stage_constellation',
