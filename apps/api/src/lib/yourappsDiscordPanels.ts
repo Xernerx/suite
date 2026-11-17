@@ -1,7 +1,9 @@
 /** @format */
 
 export function getYourAppsBotToken(): string | null {
-	const raw = process.env.YOURAPPS_BOT_TOKEN?.trim();
+	const raw = process.env.YOURAPPS_BOT_TOKEN?.trim()
+		.replace(/^["']+|["']+$/g, '')
+		.trim();
 	return raw || null;
 }
 

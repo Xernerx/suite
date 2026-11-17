@@ -2,6 +2,7 @@
 
 export const OFFICIAL_BOT_SLUG_TO_ID: Record<string, string> = {
 	virtue: '1484880634844287138',
+	yourapps: '619328560141697036',
 	todo: '782105629572464652',
 	'to-do-list': '782105629572464652',
 	'to-do-list-bot': '782105629572464652',
@@ -13,6 +14,7 @@ export const OFFICIAL_BOT_SLUG_TO_ID: Record<string, string> = {
 
 export const OFFICIAL_BOT_ID_TO_SLUG: Record<string, string> = {
 	'1484880634844287138': 'virtue',
+	'619328560141697036': 'yourapps',
 	'782105629572464652': 'todo',
 	'881678826906730547': 'metamorphosis',
 	'950251264095162418': 'zodiac',
@@ -380,7 +382,8 @@ export async function enrichBotProfileDocument(bot: any, botId: string, db: any)
 	const mainOrgId = String(mainOrgSetting?.value || '').trim();
 	const orgNameLower = String(bot.organizationData?.name || '').toLowerCase();
 	bot.isMainOrgBot = Boolean((mainOrgId && String(bot.organization || '') === mainOrgId) || OFFICIAL_BOT_ID_TO_SLUG[botId] || appInviteExists || orgNameLower.includes('xernerx'));
-	bot.hasSuiteDashboard = Boolean(botId === '1484880634844287138' || String(bot.vanitySlug || '').toLowerCase() === 'virtue' || bot.links?.dashboard);
+	const slugLower = String(bot.vanitySlug || '').toLowerCase();
+	bot.hasSuiteDashboard = Boolean(botId === '1484880634844287138' || botId === '619328560141697036' || slugLower === 'virtue' || slugLower === 'yourapps' || bot.links?.dashboard);
 
 	await attachBotDiscordAndOwners(bot, botId, BotModel, UserModel);
 	bot.vanityUnlocked = Boolean(bot.vanityUnlocked || bot.vanitySlug || bot.verified);

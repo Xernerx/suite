@@ -37,6 +37,14 @@ const OFFICIAL_BOTS: OfficialBotDefault[] = [
 		tags: ['Leveling', 'XP', 'Voice', 'Leaderboard', 'Role Rewards', 'Community'],
 	},
 	{
+		id: '619328560141697036',
+		slug: 'yourapps',
+		name: 'YourApps',
+		description: 'Discord-native server forms, staff recruitment, appeals, and Modal V2 applications bot by Xernerx Studios with resumable drafts and automated role workflows.',
+		info: 'YourApps is an official Discord-native forms and server applications bot by Xernerx Studios. Build up to 25-question positions across 13 Discord Modal V2 field types in the Server Dashboard, deploy interactive Apply panels, support resumable multi-modal drafts, and automate reviewer approvals and role rewards.',
+		tags: ['Applications', 'Forms', 'Moderation', 'Recruitment', 'Utility', 'Community'],
+	},
+	{
 		id: '782105629572464652',
 		slug: 'todo',
 		name: 'To-Do List Bot',
