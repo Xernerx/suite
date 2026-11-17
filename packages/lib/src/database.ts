@@ -188,14 +188,21 @@ if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__models_v40 = cachedModels;
 }
 
+const cleanEnvUri = (val?: string): string =>
+	(val || '')
+		.trim()
+		.replace(/^[A-Z0-9_]+\s*=\s*/i, '')
+		.replace(/^["']+|["']+$/g, '')
+		.trim();
+
 const getUris = (): Record<string, string> => {
-	const xernerxUri = process.env.MONGO_XERNERX || '';
+	const xernerxUri = cleanEnvUri(process.env.MONGO_XERNERX);
 	const isLocalMemoryServer = xernerxUri.includes('127.0.0.1') || xernerxUri.includes('localhost');
 	return {
 		xernerx: xernerxUri,
-		virtue: process.env.MONGO_VIRTUE || (isLocalMemoryServer ? xernerxUri : ''),
-		haste: process.env.MONGO_HASTE || (isLocalMemoryServer ? xernerxUri : ''),
-		yourapps: process.env.MONGO_YOURAPPS || (isLocalMemoryServer ? xernerxUri : ''),
+		virtue: cleanEnvUri(process.env.MONGO_VIRTUE) || (isLocalMemoryServer ? xernerxUri : ''),
+		haste: cleanEnvUri(process.env.MONGO_HASTE) || (isLocalMemoryServer ? xernerxUri : ''),
+		yourapps: cleanEnvUri(process.env.MONGO_YOURAPPS) || (isLocalMemoryServer ? xernerxUri : ''),
 	};
 };
 
@@ -268,6 +275,12 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'your
 			socketTimeoutMS: 30000,
 		});
 		rootConn.on('error', (err) => dbLog.warn(`Mongoose connection error for ${projectId}: ${err?.message || err}`));
+		try {
+			await rootConn.asPromise();
+		} catch (connErr: any) {
+			rootConn.close().catch(() => {});
+			throw new Error(`MongoDB connection failed for ${projectId}: ${connErr?.message || connErr}`);
+		}
 		rootConnections[projectId] = rootConn;
 	}
 

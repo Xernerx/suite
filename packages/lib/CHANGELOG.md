@@ -2,6 +2,14 @@
 
 # @xernerx/lib
 
+## 1.27.1
+
+### Patch Changes
+
+- ## Fixed issues with backend
+  
+  Fixed an issue where database wasn't connecting properly for yourapps
+
 ## 1.27.0
 
 ### Minor Changes

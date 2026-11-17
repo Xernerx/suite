@@ -5,10 +5,11 @@ import { getServerSession } from 'next-auth';
 import { auth, MEMBER_MILESTONE_THRESHOLDS, SERVER_MILESTONE_THRESHOLDS } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 import { resolveCallerAuth } from '@/lib/auditAndNotify';
+import { OFFICIAL_BOT_SLUG_TO_ID } from '@/lib/botProfileHelpers';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
-		const { id } = await params;
+		const { id: rawId } = await params;
 		const url = new URL(req.url);
 		const limitParam = url.searchParams.get('limit');
 		const afterParam = url.searchParams.get('after');
@@ -17,7 +18,17 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const limit = limitParam !== null ? Math.max(1, parseInt(limitParam, 10) || 5000) : 5000;
 
 		const db = await database('xernerx');
+		const BotModel = (db.models.bots as any).Bot;
 		const StatModel = (db.models.bots as any).Stat;
+
+		let id = OFFICIAL_BOT_SLUG_TO_ID[rawId.toLowerCase()] || rawId;
+		if (!/^\d{15,22}$/.test(id) && BotModel) {
+			const matchedBot = await BotModel.findOne({ vanitySlug: rawId.toLowerCase() })
+				.select('id')
+				.lean()
+				.catch(() => null);
+			if (matchedBot?.id) id = String(matchedBot.id);
+		}
 
 		const query: any = { id };
 		const andConditions: any[] = [];

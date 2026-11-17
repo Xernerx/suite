@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import { CheckCircle2, ClipboardCheck, Clock, ExternalLink, FileSpreadsheet, Hash, Megaphone, Shield, XCircle } from 'lucide-react';
-import { MultiSelector, Selector, Tabs, Toggle } from '@xernerx/ui';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Clock, ExternalLink, FileSpreadsheet, Hash, Megaphone, RefreshCw, Shield, XCircle } from 'lucide-react';
+import { Button, MultiSelector, Selector, Tabs, Toggle } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useSearchParams } from 'next/navigation';
@@ -38,6 +38,7 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 	const [profile, setProfile] = useState<YourAppsProfile | null>(null);
 	const [applicationId, setApplicationId] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [loadError, setLoadError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
 	const [subView, setSubView] = useState<'overview' | 'positions' | 'submissions'>(
 		deepLinkSubmissionId || initialSubParam === 'submissions' ? 'submissions' : initialSubParam === 'overview' ? 'overview' : 'positions'
@@ -78,6 +79,7 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 	const fetchProfile = useCallback(async () => {
 		if (!id) return;
 		setLoading(true);
+		setLoadError(null);
 		try {
 			const [res, rolesRes, channelsRes] = await Promise.all([
 				fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/applications`), { credentials: 'include' }),
@@ -103,16 +105,20 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 			} else {
 				setProfile(null);
 				setOriginalConfig(null);
+				if (res.status !== 404 && data?.found !== false) {
+					setLoadError(String(data?.error || `HTTP ${res.status}`));
+				}
 				if (fetchedRoles.length > 0) setDiscordRoles(fetchedRoles);
 				if (fetchedChannels.length > 0) setDiscordChannels(fetchedChannels);
 			}
-		} catch {
+		} catch (err: any) {
 			setProfile(null);
 			setOriginalConfig(null);
+			setLoadError(err?.message || t('app.dashboard.applications.toast.saveError'));
 		} finally {
 			setLoading(false);
 		}
-	}, [id, getEnvUrl, applySnapshot]);
+	}, [id, getEnvUrl, applySnapshot, t]);
 
 	useEffect(() => {
 		fetchProfile();
@@ -179,6 +185,24 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 		return (
 			<div className="flex items-center justify-center py-16 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 				<Loading variant="small" />
+			</div>
+		);
+	}
+
+	if (loadError) {
+		return (
+			<div className="flex flex-col items-center text-center justify-center bg-(--foreground)/30 backdrop-blur-md border border-(--accent-red)/30 rounded-3xl p-10 shadow-sm gap-3">
+				<div className="w-14 h-14 rounded-full bg-(--accent-red)/15 flex items-center justify-center text-(--accent-red)">
+					<AlertTriangle className="w-7 h-7" />
+				</div>
+				<h3 className="text-xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('app.dashboard.applications.toast.saveError')}
+				</h3>
+				<p className="text-xs font-mono text-(--text-muted) max-w-md">{loadError}</p>
+				<Button variant="secondary" size="sm" onClick={fetchProfile} className="mt-2">
+					<RefreshCw className="w-3.5 h-3.5" />
+					<span>{t('app.dashboard.applications.refreshBtn')}</span>
+				</Button>
 			</div>
 		);
 	}
