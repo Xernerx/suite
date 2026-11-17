@@ -4,7 +4,7 @@
 import { Coins, CreditCard, ExternalLink, Flame, Gift, Loader2, RefreshCw, ShieldCheck, Sparkles, Clock } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Confirm, EmptyState, Tabs } from '@xernerx/ui';
-import { Loading } from '@xernerx/feedback';
+import { AccountViewSkeleton } from './AccountViewSkeleton';
 import { useEnvironment, useUser, useToast, useDictionary } from '@xernerx/providers';
 import { products } from '@xernerx/lib';
 import { CreditLedgerCard } from './CreditLedgerCard';
@@ -91,8 +91,16 @@ export default function Billing() {
 			setLoading(true);
 			const priceMap: Record<string, { productName: string; productDescription: string | null; priceFormatted?: string | null; interval?: 'month' | 'year' | null }> = {};
 			const discordEntitlementSubs: EnrichedSubscription[] = [];
-			const fmtPrice = (amt?: number, cur?: string) =>
-				typeof amt === 'number' ? new Intl.NumberFormat(undefined, { style: 'currency', currency: (cur || 'eur').toUpperCase() }).format(amt / 100) : null;
+			const fmtPrice = (amt?: number, cur?: string) => {
+				if (typeof amt !== 'number') return null;
+				const major = Math.round(amt) / 100;
+				return new Intl.NumberFormat('en-US', {
+					style: 'currency',
+					currency: (cur || 'eur').toUpperCase(),
+					minimumFractionDigits: major % 1 === 0 ? 0 : 2,
+					maximumFractionDigits: 2,
+				}).format(major);
+			};
 
 			try {
 				const catalogRes = await fetch(getEnvUrl('https://api.xernerx.com/secure/store/catalog'), { credentials: 'include' });
@@ -210,7 +218,7 @@ export default function Billing() {
 	}, [subFilter, enriched, activeSubs, historySubs]);
 
 	const isLoading = userLoading || loading;
-	if (isLoading) return <Loading />;
+	if (isLoading) return <AccountViewSkeleton variant="billing" />;
 
 	return (
 		<div

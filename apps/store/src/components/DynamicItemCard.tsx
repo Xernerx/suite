@@ -2,10 +2,11 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Check, Coins, ExternalLink, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { useDictionary } from '@xernerx/providers';
-import { CatalogItem, UserSubscription } from './types';
+import { CatalogItem, formatStorePrice, UserSubscription } from './types';
 
 interface DynamicItemCardProps {
 	item: CatalogItem;
@@ -23,14 +24,6 @@ interface DynamicItemCardProps {
 	getActiveSubscription: (priceId: string | null, item?: CatalogItem) => UserSubscription | null | undefined;
 	handleSubscribe: (priceId: string | null, discountPercent: number) => void;
 	handleCancelClick: (subscriptionId: string) => void;
-}
-
-function formatPriceAmount(amount: number | null | undefined, currency?: string): string {
-	if (amount === null || amount === undefined) return '—';
-	const cur = String(currency || 'eur').toLowerCase();
-	const symbol = cur === 'usd' ? '$' : cur === 'gbp' ? '£' : '€';
-	const hasCents = Math.round(amount * 100) % 100 !== 0;
-	return `${symbol}${hasCents ? amount.toFixed(2) : amount.toFixed(0)}`;
 }
 
 export function DynamicItemCard({
@@ -67,10 +60,11 @@ export function DynamicItemCard({
 						: baseDiscounted;
 	const hasDiscount = !isDiscordSku && originalAmount !== null && discountedAmount !== null && discountedAmount < originalAmount;
 
+	const [appIconFailed, setAppIconFailed] = useState(false);
 	const discordBenefits = item.discordSku?.benefits || [];
 	const thumbnailUrl = item.discordSku?.thumbnailUrl || null;
 	const bannerUrl = item.discordSku?.bannerUrl || null;
-	const appIconUrl = item.discordSku?.appIconUrl || null;
+	const appIconUrl = appIconFailed ? '/icon.png' : item.discordSku?.appIconUrl || null;
 
 	// Rich Discord App Subscription Showcase Layout (e.g. Virtue Pass $1.99/mo with artwork & benefits)
 	if (isDiscordSku && (thumbnailUrl || discordBenefits.length > 0)) {
@@ -94,7 +88,17 @@ export function DynamicItemCard({
 								<Sparkles size={12} />
 								{item.badge || item.discordSku?.summary || t('account.store.cards.discordPassBadge')}
 							</span>
-							{appIconUrl && <Image src={appIconUrl} alt={item.name} width={32} height={32} unoptimized className="w-8 h-8 rounded-xl border border-(--border)/20 shadow-md" />}
+							{appIconUrl && (
+								<Image
+									src={appIconUrl}
+									alt={item.name}
+									width={32}
+									height={32}
+									unoptimized
+									onError={() => setAppIconFailed(true)}
+									className="w-8 h-8 rounded-xl border border-(--border)/20 shadow-md"
+								/>
+							)}
 						</div>
 
 						{/* Official 1024x1024 Pass Artwork Thumbnail */}
@@ -105,7 +109,7 @@ export function DynamicItemCard({
 						)}
 					</div>
 
-					{/* Title, Description, $1.99 Price & CTA */}
+					{/* Title, Description, Price & CTA */}
 					<div className="p-6 flex flex-col justify-between flex-1" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 						<div>
 							<h3 className="text-2xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
@@ -117,7 +121,7 @@ export function DynamicItemCard({
 						<div className="flex items-end justify-between gap-4 pt-2">
 							<div className="flex items-baseline gap-1.5">
 								<span className="text-4xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-									{formatPriceAmount(discountedAmount, activePrice?.currency)}
+									{formatStorePrice(discountedAmount, activePrice?.currency)}
 								</span>
 								<span className="text-xs text-(--text-muted) font-medium">/{t('account.store.pricing.monthShort')}</span>
 							</div>
@@ -206,8 +210,8 @@ export function DynamicItemCard({
 				<div className="flex items-baseline gap-2 mb-6">
 					{activePrice ? (
 						<>
-							{hasDiscount && <span className="text-lg line-through text-(--text-muted) opacity-60">{formatPriceAmount(originalAmount, activePrice.currency)}</span>}
-							<span className={`text-3xl font-bold ${hasDiscount ? 'text-(--accent-green)' : 'text-(--text)'}`}>{formatPriceAmount(discountedAmount, activePrice.currency)}</span>
+							{hasDiscount && <span className="text-lg line-through text-(--text-muted) opacity-60">{formatStorePrice(originalAmount, activePrice.currency)}</span>}
+							<span className={`text-3xl font-bold ${hasDiscount ? 'text-(--accent-green)' : 'text-(--text)'}`}>{formatStorePrice(discountedAmount, activePrice.currency)}</span>
 							<span className="text-xs text-(--text-muted) font-normal">
 								/{billingInterval === 'month' ? t('account.store.pricing.monthShort') : t('account.store.pricing.yearShort')}
 							</span>

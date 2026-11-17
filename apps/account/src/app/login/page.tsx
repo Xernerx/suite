@@ -124,7 +124,7 @@ function SignInContent() {
 					</div>
 
 					{authError && (
-						<div className="flex items-start gap-3 w-full max-w-md rounded-2xl border border-(--accent-orange)/30 bg-(--accent-orange)/10 backdrop-blur-md px-4 py-3 text-left">
+						<div className="flex items-start gap-3 w-full max-w-lg rounded-2xl border border-(--accent-orange)/30 bg-(--accent-orange)/10 backdrop-blur-md px-4 py-3 text-left">
 							<AlertCircle size={18} className="text-(--accent-orange) shrink-0 mt-0.5" />
 							<div className="flex flex-col gap-0.5">
 								<span className="text-xs font-bold text-(--text)">{t('account.signin.authErrorTitle')}</span>
@@ -145,7 +145,7 @@ function SignInContent() {
 					</Button>
 
 					{/* QR + PAIRING LOGIN */}
-					<div className="flex items-center gap-3 w-full max-w-md my-1">
+					<div className="flex items-center gap-3 w-full max-w-lg my-1">
 						<div className="h-[1px] flex-1 bg-(--border)/10" />
 						<span className="text-[10px] font-bold uppercase tracking-widest text-(--text-muted)">{t('account.signin.orDivider')}</span>
 						<div className="h-[1px] flex-1 bg-(--border)/10" />
@@ -186,7 +186,7 @@ function SignInContent() {
 									duration: 0.25,
 									ease: 'easeInOut',
 								}}
-								className="w-full max-w-md overflow-hidden"
+								className="w-full max-w-lg overflow-hidden"
 							>
 								<div className="mt-2 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md p-6 text-left shadow-xl">
 									<div className="flex flex-col gap-4">

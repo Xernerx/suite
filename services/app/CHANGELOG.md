@@ -2,6 +2,20 @@
 
 # `@xernerx/app`
 
+## 2.7.3
+
+### Patch Changes
+
+- ## Framework & Discord.js Runtime Alignment
+  
+  Updated `@xernerx/framework`, `discord.js`, `mongoose`, and Node `>=24` / `pnpm@12.21.0` workspace metadata for the Xernerx App bot service.
+  
+  ### Changed
+  
+  - **Runtime Dependencies**: Upgraded `@xernerx/framework`, `discord.js`, and `mongoose` alongside `pnpm@12.21.0` / Node `>=24` engine fields.
+- Updated dependencies
+  - @xernerx/lib@1.28.0
+
 ## 2.7.2
 
 ### Patch Changes

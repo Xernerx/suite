@@ -2,6 +2,33 @@
 
 # api
 
+## 0.37.0
+
+### Minor Changes
+
+- ## Bot Profile Admin Endpoints, Self-Service Wipes & Discord Avatar Sync
+  
+  Added user/guild bot profile endpoints, self-service YourApps and server setup `DELETE` handlers, live Discord bot avatar refresh, and public-only bot filtering.
+  
+  ### Added
+  
+  - **User & Guild Bot Profile Endpoints**: Added `GET/PATCH /secure/users/:id/bots` and `GET/PATCH /secure/guilds/:id/bots` with automatic entity reconciliation across Virtue and YourApps.
+  - **Self-Service Data & Setup Wipe Endpoints**: Added `DELETE /secure/users/:id/yourapps` and `DELETE` handlers on `/secure/guilds/:id/virtue` and `/secure/guilds/:id/applications` with Discord `MANAGE_GUILD` / owner authorization.
+  
+  ### Changed
+  
+  - **Live Discord Bot Cache & Public Privacy Guard**: Refreshed stale Discord bot avatar/banner hashes automatically, enforced `publicOnly` / session ownership checks on `GET /secure/bots`, added NextAuth session fallback on `/core/users/:id/discord/guilds`, and resolved `api.facts` array entries on the gateway status page.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.36.1
 
 ### Patch Changes

@@ -36,7 +36,9 @@
 			"confirm": "Confirm",
 			"proceed": "Proceed",
 			"delete": "Delete",
-			"close": "Close"
+			"close": "Close",
+			"previous": "Previous",
+			"next": "Next"
 		},
 		"confirm": {
 			"typeToConfirmBefore": "Please type",
@@ -570,7 +572,8 @@
 			"tabs": {
 				"profile": "Profile & Identity",
 				"economy": "Economy, Level & Perks",
-				"assets": "Showcases, Connections & Devices"
+				"assets": "Showcases, Connections & Devices",
+				"bots": "Bot & Server Profiles"
 			},
 			"fields": {
 				"verifiedToggle": "Verified User",
@@ -678,6 +681,55 @@
 				"tourCompletedTooltip": "Interactive Suite Tour completed{date}",
 				"tourPostponedTooltip": "Interactive Suite Tour postponed{phase}",
 				"tourPendingTooltip": "User has not completed the interactive Suite Tour yet"
+			},
+			"botProfiles": {
+				"filterLabel": "Bot Profiles",
+				"cardServersBadge": "{count} Servers",
+				"heading": "Bot & Server Profiles",
+				"subheading": "Inspect and manage per-server bot data across {count} servers.",
+				"virtueLocaleBadge": "Virtue Locale: {locale}",
+				"noVirtueGlobal": "No Global Virtue Profile",
+				"emptyServersTitle": "No Server Bot Profiles Found",
+				"emptyServersDesc": "This user has not earned Virtue leveling XP or submitted YourApps forms in any Discord server yet.",
+				"selectServerLabel": "Select Server",
+				"selectServerPlaceholder": "Choose a server to inspect user bot data...",
+				"inspectServer": "Inspect Server",
+				"virtueTitle": "Virtue Server Profile",
+				"virtueDesc": "Unified server, text chat, and voice activity progression for this server.",
+				"saveVirtue": "Save Stats",
+				"resetVirtue": "Reset Server Stats",
+				"unifiedTrack": "Unified Server Level",
+				"textTrack": "Text Level & Messages",
+				"voiceTrack": "Voice Level & Time",
+				"levelField": "Level",
+				"xpField": "XP",
+				"messagesField": "Messages",
+				"voiceSecondsField": "Seconds",
+				"yourappsTitle": "YourApps Server Profile",
+				"yourappsSummary": "{submissions} submissions • {drafts} active drafts",
+				"wipeYourApps": "Wipe Server Forms Data",
+				"noYourAppsData": "No YourApps submissions or active drafts on this server.",
+				"submissionsHeading": "Submissions ({count})",
+				"draftsHeading": "Active Drafts ({count})",
+				"draftStepInfo": "Step {step} • {answered} answered",
+				"statusPending": "Pending",
+				"statusApproved": "Approved",
+				"statusDenied": "Denied",
+				"statusWithdrawn": "Withdrawn",
+				"reviewReasonLabel": "Review Reason",
+				"noAnswers": "No recorded answers.",
+				"loadError": "Failed to load user bot profiles.",
+				"virtueSaveSuccess": "Updated Virtue server profile!",
+				"submissionUpdated": "Updated submission status!",
+				"updateError": "Failed to update bot profile data.",
+				"resetSuccess": "Bot server data deleted.",
+				"resetError": "Failed to delete bot server data.",
+				"resetVirtueConfirmTitle": "Reset Virtue Server Stats",
+				"resetVirtueConfirmDesc": "Are you sure you want to reset this user's Virtue leveling data on {server}?",
+				"confirmDeleteTitle": "Delete Bot Data",
+				"confirmDeleteDesc": "Are you sure you want to delete {target}? This action cannot be undone.",
+				"cardServerBadge": "{count} Server",
+				"subheadingSingular": "Inspect and manage per-server bot data across {count} server."
 			}
 		},
 		"tokens": {
@@ -1130,7 +1182,7 @@
 			},
 			"overview": {
 				"title": "SEO & Subdomain Telemetry",
-				"subtitle": "Monitor live versions, latency, issue health, and Seobility SEO scores across all 9 Xernerx Suite subdomains.",
+				"subtitle": "Monitor live versions, latency, issue health, and Seobility SEO scores across all {count} Xernerx Suite subdomains.",
 				"refresh": "Refresh Metrics",
 				"refreshing": "Refreshing...",
 				"envProduction": "Production URLs",
@@ -2392,7 +2444,55 @@
 				"deleteSuccess": "Server deleted successfully.",
 				"deleteError": "Failed to delete server."
 			},
-			"filterBotActive": "Bot Installed"
+			"filterBotActive": "Bot Installed",
+			"filterVirtueActive": "Virtue Active",
+			"filterYourAppsActive": "YourApps Active",
+			"tabs": {
+				"bots": "Bot Profiles"
+			},
+			"botProfiles": {
+				"selectBotLabel": "Select Bot Profile",
+				"virtueOptionLabel": "Virtue — Leveling, XP & Dynamic Roles",
+				"yourappsOptionLabel": "YourApps — Forms, Panels & Submissions",
+				"membersCountBadge": "{count} Ranked",
+				"formsCountBadge": "{count} Forms",
+				"inactiveBadge": "No Data",
+				"virtueConfigTitle": "Virtue Server Configuration",
+				"virtueConfigSummary": "{members} ranked members • {roles} level role rewards",
+				"difficultyModeLabel": "Leveling Curve Mode",
+				"xpMultiplierLabel": "Server XP Multiplier",
+				"boosterMultiplierLabel": "Booster Multiplier",
+				"stackRolesLabel": "Stack Level Roles",
+				"levelUpAnnouncementsLabel": "Level-Up Announcements",
+				"dynamicRolesLabel": "Dynamic Hoist Roles",
+				"memberInspectorTitle": "Inspect Member Server Profile",
+				"selectMemberLabel": "Select Ranked Member",
+				"noRankedMembers": "No ranked Virtue members recorded in this server yet.",
+				"inspectUser": "Inspect User",
+				"yourappsConfigTitle": "YourApps Server Configuration",
+				"yourappsConfigSummary": "{forms} forms • {panels} panels • {applicants} applicants",
+				"dmNotificationsLabel": "Applicant DM Notifications",
+				"threadPerSubmissionLabel": "Thread Per Submission",
+				"formsHeading": "Application Forms ({count})",
+				"formMeta": "{category} • {questions} questions",
+				"applicantInspectorTitle": "Inspect Server Applicants",
+				"selectApplicantLabel": "Select Applicant",
+				"applicantCountsBadge": "{subs} subs • {drafts} drafts",
+				"noApplicants": "No application submissions or active drafts in this server yet.",
+				"submissionMeta": "{answers} answers • {date}",
+				"wipeBotData": "Wipe Bot Data",
+				"loadError": "Failed to load server bot profiles.",
+				"saveSuccess": "Saved server bot configuration!",
+				"saveError": "Failed to save server bot configuration.",
+				"deleteSuccess": "Deleted server bot data.",
+				"deleteError": "Failed to delete server bot data.",
+				"autoDeleteLabel": "Auto-Delete Delay (s)",
+				"levelMessageLabel": "Level-Up Message Template",
+				"cycleDailyLabel": "Daily Cycle Reset",
+				"cycleWeeklyLabel": "Weekly Cycle Reset",
+				"cycleMonthlyLabel": "Monthly Cycle Reset",
+				"noFormsConfigured": "No YourApps forms configured in this server yet."
+			}
 		},
 		"organizations": {
 			"title": "Organizations",
@@ -2565,7 +2665,7 @@
 			"blacklistedBanner": {
 				"badge": "Restricted",
 				"title": "Service Access Suspended",
-				"description": "Your account has been restricted from using Xernerx services. You may still export your personal data archive or permanently delete your Virtue data, profile data, and account below."
+				"description": "Your account has been restricted from using Xernerx services. You may still export your personal data archive or permanently delete your Virtue data, YourApps data, profile data, and account below."
 			},
 			"services": {
 				"title": "Automatic Service Profiles",
@@ -2574,6 +2674,15 @@
 				"toastEnabledDesc": "Automatic profile creation and progression tracking enabled.",
 				"toastDisabledDesc": "Automatic profile creation and progression tracking disabled.",
 				"toastError": "Failed to update automatic service preference"
+			},
+			"yourappsData": {
+				"title": "Delete YourApps Data",
+				"description": "Permanently wipe all of your submitted YourApps form applications, answers, and saved resumable drafts across all servers.",
+				"button": "Delete YourApps Data",
+				"confirmDescription": "Are you sure you want to permanently delete all of your YourApps application submissions and saved drafts across all Discord servers? Your main Xernerx account will remain active, but these applications cannot be recovered.",
+				"toastSuccessTitle": "YourApps Data Deleted",
+				"toastSuccessDesc": "All of your YourApps submissions and resumable drafts have been permanently deleted.",
+				"toastError": "Failed to delete YourApps data"
 			}
 		},
 		"profile": {
@@ -2725,7 +2834,7 @@
 			"vanitySlug": {
 				"label": "Vanity Profile URL",
 				"placeholder": "your-custom-handle",
-				"hint": "3–32 lowercase letters, numbers, or hyphens. Accessible at app.xernerx.com/users/{slug}."
+				"hint": "3–32 lowercase letters, numbers, or hyphens. Accessible at {host}/users/{slug}."
 			}
 		},
 		"appearance": {
@@ -3057,7 +3166,8 @@
 				"adminButton": "Go to Translations",
 				"requestFailed": "Failed to submit translator application",
 				"requestSuccess": "Translator application submitted successfully!",
-				"notLoggedIn": "You must be logged in to apply"
+				"notLoggedIn": "You must be logged in to apply",
+				"applicationPending": "Application Pending"
 			},
 			"virtue": {
 				"title": "Virtue Language",
@@ -3136,7 +3246,7 @@
 			"approveWhereStep1": "1. Open Account → Devices on any signed-in device (or /login on a signed-out device).",
 			"approveWhereStep2": "2. Copy the 6-character Pairing Code (e.g. A7K-9P2) shown beneath the QR code.",
 			"approveWhereStep3": "3. Enter that code here — or click any detected Waiting Device above.",
-			"enterDeviceCodePlaceholder": "Enter 6-char code from Account → Devices",
+			"enterDeviceCodePlaceholder": "6-char code (Account → Devices)",
 			"signInWithCodeButton": "Sign In with Code",
 			"authErrorTitle": "Sign-in could not be completed",
 			"authErrorDesc": "Your sign-in session expired or was cancelled ({error}). Please click Continue with Discord below to try again."
@@ -4201,7 +4311,7 @@
 				"badge": "Software & Ecosystem Licensing",
 				"title": "Xernerx Studios License",
 				"subtitle": "How the Xernerx Suite, official Discord bots, and open-source TypeScript SDKs are licensed across our ecosystem.",
-				"effectiveDate": "Version 1.0 • Effective Date: 8 November 2026"
+				"effectiveDate": "Version 1.0 • Effective Date: 17 November 2026"
 			},
 			"actions": {
 				"copy": "Copy Plain-Text LICENSE",
@@ -4211,11 +4321,11 @@
 			"sections": {
 				"overview": {
 					"title": "1. Two-Tier Ecosystem Licensing",
-					"content": "Xernerx Studios operates a two-tier licensing structure across the entire Xernerx Studios workspace, separating our hosted platform, client applications, and official Discord bots from our open-source developer frameworks, starter examples, and package documentation:",
+					"content": "Xernerx Studios operates a two-tier licensing structure across the entire Xernerx Studios workspace, separating our hosted platform, client applications, official Discord bots, documentation, and starter examples from our open-source developer frameworks:",
 					"proprietaryTitle": "Tier 1 — Xernerx Proprietary & SaaS License v1.0:",
-					"proprietaryDesc": "Covers the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and api, plus shared internal packages @xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), standalone and suite Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), the real-time WebSocket gateway (services/websocket), and the Xernerx Desktop and Mobile Clients. Access is granted through official hosted interfaces; source code redistribution or competing commercial deployment is prohibited.",
-					"openSourceTitle": "Tier 2 — Apache License, Version 2.0 (Open-Source SDKs, Examples & Package Docs):",
-					"openSourceDesc": "Covers all 8 standalone public npm developer packages (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx), the canonical open-source package documentation repository (docs), and the official TypeScript and JavaScript starter examples repository (examples). Developers may freely install, modify, and distribute these SDKs and starter templates in commercial or personal projects under the standard Apache-2.0 terms."
+					"proprietaryDesc": "Covers the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including www, app, account, portal, store, docs, info, blog, admin, hosting, cdn, haste, and api, plus shared internal packages @xernerx/components, @xernerx/feedback, @xernerx/lib, @xernerx/providers, @xernerx/styles, @xernerx/ui, and @xernerx/cli), standalone and suite Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), the real-time WebSocket gateway (services/websocket), the package documentation repository (docs), the starter examples repository (examples), organization governance (.github), and the Xernerx Desktop and Mobile Clients. Access is granted through official hosted interfaces; source code redistribution or competing commercial deployment is prohibited.",
+					"openSourceTitle": "Tier 2 — Apache License, Version 2.0 (Open-Source NPM SDKs):",
+					"openSourceDesc": "Covers all 8 standalone public npm developer packages (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx). Developers may freely install, modify, and distribute these SDKs in commercial or personal projects under the standard Apache-2.0 terms."
 				},
 				"plainText": {
 					"title": "2. Full Plain-Text License (LICENSE)",
@@ -4243,7 +4353,7 @@
 		},
 		"hero": {
 			"title": "Empowering Developers. Connecting Communities.",
-			"description": "Xernerx Studios is a development studio dedicated to empowering developers and connecting communities through consumer and developer simplicity. We build Discord bots that power thousands of communities—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—alongside reliable open-source frameworks and SDKs (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
+			"description": "Xernerx Studios is a development studio dedicated to empowering developers and connecting communities through consumer and developer simplicity. We build Discord bots that power thousands of communities—Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—alongside reliable open-source frameworks and SDKs (@xernerx/framework, @xernerx/stats) and the Xernerx Suite: 1 Account, 1 Place, 1 Setup to configure our services, track bot statistics, and publicly list and promote bots.",
 			"buttons": {
 				"explore": "Explore Services",
 				"software": "View Software"
@@ -4271,13 +4381,13 @@
 		},
 		"about": {
 			"title": "About Xernerx",
-			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity—empowering developers and connecting communities worldwide. Across our in-house Discord bots—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—our open-source developer frameworks and SDKs, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
-			"description2": "At the core of our ecosystem is 1 Account, 1 Place, 1 Setup: one Xernerx Account used across everything Xernerx—whether you are configuring To-Do List Bot, Virtue, Metamorphosis, or Zodiac for your server, discovering new communities, or using our Developer Portal and frameworks to track bot stats, publicly list your bots, and promote them.",
+			"description": "Xernerx Studios is a development studio built around consumer and developer simplicity—empowering developers and connecting communities worldwide. Across our in-house Discord bots—Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—our open-source developer frameworks and SDKs, and the Xernerx Suite, our goal is to make everything as fast, intuitive, and effortless as possible for both everyday community members and bot developers.",
+			"description2": "At the core of our ecosystem is 1 Account, 1 Place, 1 Setup: one Xernerx Account used across everything Xernerx—whether you are configuring Virtue, YourApps, To-Do List Bot, Metamorphosis, or Zodiac for your server, discovering new communities, or using our Developer Portal and frameworks to track bot stats, publicly list your bots, and promote them.",
 			"watermark": "ABOUT US",
 			"pillars": {
 				"communities": {
 					"title": "Discord Bots & Community Services",
-					"description": "We build and maintain dedicated Discord bots for communities worldwide—including productivity with To-Do List Bot, text & voice XP leveling with Virtue, multilingual translation with Metamorphosis, and astrology with Zodiac."
+					"description": "We build and maintain dedicated Discord bots for communities worldwide—including text & voice XP leveling with Virtue, forms & applications with YourApps, productivity with To-Do List Bot, multilingual translation with Metamorphosis, and astrology with Zodiac."
 				},
 				"frameworks": {
 					"title": "Open-Source Frameworks & Tooling",
@@ -4289,7 +4399,7 @@
 				},
 				"identity": {
 					"title": "1 Account, 1 Place, 1 Setup",
-					"description": "Your single Xernerx Account connects you across the Xernerx Suite, To-Do List Bot, Virtue, Metamorphosis, and Zodiac. Your identity, custom themes, preferences, and server setups stay unified everywhere."
+					"description": "Your single Xernerx Account connects you across the Xernerx Suite, Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac. Your identity, custom themes, preferences, and server setups stay unified everywhere."
 				}
 			}
 		},
@@ -4305,7 +4415,7 @@
 			},
 			"consumer": {
 				"title": "Consumer Services",
-				"description": "1 Account, 1 Place, 1 Setup. Sign in once with your Xernerx Account to configure our Discord services—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—discover verified bots and servers, and manage everything from one simple dashboard."
+				"description": "1 Account, 1 Place, 1 Setup. Sign in once with your Xernerx Account to configure our Discord services—Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—discover verified bots and servers, and manage everything from one simple dashboard."
 			},
 			"developer": {
 				"title": "Developer Software",
@@ -4315,7 +4425,7 @@
 		"services": {
 			"dashboard": {
 				"title": "Xernerx Suite & Dashboard",
-				"desc": "1 place for bot setup, server management, and bot discovery. Configure To-Do List Bot, Virtue, Metamorphosis, and Zodiac, explore public bots and servers, or track stats, list, and promote your own bots in the Developer Portal."
+				"desc": "1 place for bot setup, server management, and bot discovery. Configure Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac, explore public bots and servers, or track stats, list, and promote your own bots in the Developer Portal."
 			}
 		},
 		"packages": {
@@ -4351,7 +4461,7 @@
 					},
 					"connections": {
 						"title": "Connected Third-Party Accounts:",
-						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity. For authorized staff members who link infrastructure providers (such as Vercel or Easypanel) for internal hosting management, connection credentials are kept strictly private and are never exposed on public profiles."
+						"desc": "If you optionally link external accounts (such as GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, or Reddit) in Account Settings, we store the public account identifier, username, display name, avatar URL, profile URL, and your visibility preference (\"Show on Public Profile\"). We immediately discard OAuth access tokens after verifying your identity. For authorized staff members who link infrastructure providers (such as Vercel or Easypanel) for internal hosting management, connection credentials are kept strictly private and are never exposed on public profiles."
 					},
 					"developers": {
 						"title": "For API, Portal, SDK & Bot Developers:",
@@ -4359,7 +4469,7 @@
 					},
 					"botUsers": {
 						"title": "For Bot, Virtue Leveling, YourApps & Community End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (Virtue, YourApps, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. For YourApps (our standalone forms and applications bot operating solely with Guilds and GuildMessages intents and zero MessageContent intent), we store server-configured position forms, your resumable application drafts, and the explicit form responses and reviewer decisions you submit via Discord Modals V2 or the web portal (/servers/[id]/applications/[appId]) so designated server reviewers can evaluate your application. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent passive Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" button in Account Settings."
+						"desc": "When you interact with a bot powered by Xernerx (Virtue, YourApps, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. For YourApps (our standalone forms and applications bot operating solely with Guilds and GuildMessages intents and zero MessageContent intent), we store server-configured position forms, your resumable application drafts, and the explicit form responses and reviewer decisions you submit via Discord Modals V2 or the web portal (/servers/[id]/applications/[appId]) so designated server reviewers can evaluate your application. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent passive Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" and \"Delete YourApps Data\" buttons in Account Settings (and server administrators can permanently wipe per-server Virtue or YourApps setup configurations via \"Delete Virtue Setup\" and \"Delete YourApps Setup\" in the Server Dashboard)."
 					},
 					"cdnAndContent": {
 						"title": "CDN Media, Haste Pastes, Showcases & 3-Tier Privacy:",
@@ -4416,7 +4526,7 @@
 					"title": "9. Your Rights (GDPR & CCPA)",
 					"items": [
 						"Right to access and export your personal data (available any time via the self-service \"Download My Data (.json)\" tool in Account -> Settings and Account -> Activity).",
-						"Right to rectification, profile reset, permanent Virtue progression wipe (\"Delete Virtue Data\"), or permanent account deletion (available directly in Account -> Settings, even if your account is restricted from platform services).",
+						"Right to rectification, profile reset, permanent Virtue progression wipe (\"Delete Virtue Data\"), permanent YourApps submission & draft wipe (\"Delete YourApps Data\"), or permanent account deletion (available directly in Account -> Settings, even if your account is restricted from platform services).",
 						"Right to opt out of automatic Discord profile creation (\"Automatic Service Profiles\" toggle in Account -> Settings), restrict or object to certain data processing activities, and unlink connected third-party accounts at any time.",
 						"Right to withdraw consent for non-essential cookies and marketing communications."
 					],
@@ -4451,7 +4561,7 @@
 				"q1": "Does Xernerx Studios ever sell my personal data to advertisers?",
 				"a1": "No. We never sell your personal information or API telemetry to third-party advertisers. Data is processed strictly to provide and secure your Xernerx Account, Discord bots, and developer integrations.",
 				"q2": "How can I export or permanently delete my Xernerx Account data?",
-				"a2": "You can download a complete JSON archive of your data in Account -> Settings or Account -> Activity at any time. In Account -> Settings, you can also toggle off Automatic Service Profiles, reset your profile, wipe all Virtue leveling data across all servers (\"Delete Virtue Data\"), or permanently delete your account.",
+				"a2": "You can download a complete JSON archive of your data in Account -> Settings or Account -> Activity at any time. In Account -> Settings, you can also toggle off Automatic Service Profiles, reset your profile, wipe all Virtue leveling data across all servers (\"Delete Virtue Data\"), wipe all submitted YourApps applications and drafts across all servers (\"Delete YourApps Data\"), or permanently delete your account.",
 				"q3": "What visibility options are available for my profile, CDN uploads, and Haste pastes?",
 				"a3": "Every profile, bot, server, organization, CDN upload, and Haste paste supports three privacy tiers: Public (listed in directories), Limited (unlisted direct-link access only), and Private (strictly owner-only)."
 			}
@@ -4492,11 +4602,11 @@
 				},
 				"botUsage": {
 					"title": "5. Bot, Virtue Leveling & YourApps Terms",
-					"content": "Users interacting with Xernerx Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot) must not exploit commands, spam or submit abusive content through YourApps server application forms, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, XP curve modes, and stackable /boost multipliers (published bot review, active 12-hour vote, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers). Server administrators may configure static level-up role rewards (/roles), Dynamic Hoist Roles (automatically managing milestone hoist roles with custom naming templates and hex color gradients within Discord's 250-role server limit), YourApps application forms and automated approval/denial role workflows, automated Daily, Weekly, or Monthly leaderboard cycle resets (or manual server resets), and cross-server configuration imports; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent. You may opt out of automatic Discord profile creation via \"Automatic Service Profiles\" or permanently wipe your Virtue progression across all servers at any time via \"Delete Virtue Data\" in Account Settings."
+					"content": "Users interacting with Xernerx Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot) must not exploit commands, spam or submit abusive content through YourApps server application forms, abuse support ticket intake channels, or use automated scripts, self-bots, or unattended voice-channel AFK farming to artificially inflate Virtue XP or farm level-up Virtual Credits. In Virtue, XP is awarded across Global and Server tracks (Unified Server, Text, and Voice) subject to anti-spam cooldowns, channel/role exclusions, XP curve modes, and stackable /boost multipliers (published bot review, active 12-hour vote, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers). Server administrators may configure static level-up role rewards (/roles), Dynamic Hoist Roles (automatically managing milestone hoist roles with custom naming templates and hex color gradients within Discord's 250-role server limit), YourApps application forms and automated approval/denial role workflows, automated Daily, Weekly, or Monthly leaderboard cycle resets (or manual server resets), and cross-server configuration imports; cycle resets clear server-scoped levels, XP, message counts, and voice duration in that server, while your Global Xernerx Level and earned Virtual Credits remain permanent. You may opt out of automatic Discord profile creation via \"Automatic Service Profiles\" or permanently wipe your Virtue progression across all servers at any time via \"Delete Virtue Data\" and \"Delete YourApps Data\" in Account Settings (or wipe per-server setup configurations as a server administrator via \"Delete Virtue Setup\" and \"Delete YourApps Setup\" in the Server Dashboard)."
 				},
 				"accounts": {
 					"title": "6. User Accounts, QR Sign-In & Connected Accounts",
-					"content": "You sign in via Discord OAuth2 or our encrypted QR Code and Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not start yourself. You may optionally link third-party accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, or Reddit) to display on your profile. You can revoke active device sessions or unlink connected accounts at any time in Account Settings. If your account is suspended or blacklisted for violating these Terms, access to platform services is restricted via BlacklistGate, while self-service access to Account Settings (account.xernerx.com) remains available so you can export your personal data archive or permanently delete your Virtue data, profile data, and account."
+					"content": "You sign in via Discord OAuth2 or our encrypted QR Code and Pairing Code Device Sign-In system. Never approve a QR code or enter a 6-character pairing code that you did not start yourself. You may optionally link third-party accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, or Reddit) to display on your profile. You can revoke active device sessions or unlink connected accounts at any time in Account Settings. If your account is suspended or blacklisted for violating these Terms, access to platform services is restricted via BlacklistGate, while self-service access to Account Settings (account.xernerx.com) remains available so you can export your personal data archive or permanently delete your Virtue data, YourApps data, profile data, and account."
 				},
 				"storeAndBilling": {
 					"title": "7. Store, Subscriptions, Virtual Credits & Perks",
@@ -4525,11 +4635,11 @@
 				},
 				"thirdParty": {
 					"title": "11. Third-Party Services",
-					"content": "Our ecosystem integrates with Discord, Stripe, Google, and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit). We are not responsible for the availability or independent policies of third-party services."
+					"content": "Our ecosystem integrates with Discord, Stripe, Google, and optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, and Reddit). We are not responsible for the availability or independent policies of third-party services."
 				},
 				"intellectualProperty": {
 					"title": "12. Intellectual Property & User Content",
-					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket), package documentation repository (docs), and starter examples repository (examples) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
+					"content": "All Xernerx software, branding, and visual assets—including the Xernerx Suite monorepo, Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, Xernerx Bot, Xernerx Blog, Xernerx Haste, Xernerx CDN, package documentation repository (docs), starter examples repository (examples), organization governance (.github), and the Xernerx Desktop and Mobile Clients—remain the exclusive property of Xernerx Studios under the Xernerx Studios Proprietary & SaaS License (xernerx.com/license). Our 8 standalone open-source npm packages (xernerx, @xernerx/framework, @xernerx/commands, @xernerx/extension-builder, @xernerx/hooks, @xernerx/stats, @xernerx/terminal, and @xernerx/websocket) are governed by the Apache License, Version 2.0. You keep ownership of content you upload to cdn.xernerx.com, code and text pastes you publish on haste.xernerx.com, and showcase content on your profile. You grant Xernerx Studios a license to host, cache, and deliver that content solely according to your chosen visibility setting (public, limited, or private) and configured expiration (TTL)."
 				},
 				"warranty": {
 					"title": "13. Disclaimer of Warranties",
@@ -4627,7 +4737,7 @@
 				},
 				"thirdParty": {
 					"title": "6. Third-Party Cookies",
-					"content": "Some features connect with third-party services such as Discord, Stripe, and Google AdSense. Optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit) are only contacted when you link an account. These third parties may set their own cookies under their respective privacy policies."
+					"content": "Some features connect with third-party services such as Discord, Stripe, and Google AdSense. Optional connected account providers (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, and Reddit) are only contacted when you link an account. These third parties may set their own cookies under their respective privacy policies."
 				},
 				"managing": {
 					"title": "7. Managing Your Preferences",
@@ -4705,7 +4815,7 @@
 						},
 						"connections": {
 							"title": "Sanitized Secondary Connections:",
-							"desc": "Linked third-party OAuth accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, and Reddit) immediately discard OAuth access tokens after identity verification, and staff-only infrastructure connections (Easypanel and Vercel, gated by the hosting RBAC permission) strip all secret fields at the API boundary so credentials are never exposed on public profiles."
+							"desc": "Linked third-party OAuth accounts (GitHub, Twitch, YouTube, X/Twitter, Spotify, Steam, Bungie, and Reddit) immediately discard OAuth access tokens after identity verification, and staff-only infrastructure connections (Easypanel and Vercel, gated by the hosting RBAC permission) strip all secret fields at the API boundary so credentials are never exposed on public profiles."
 						}
 					}
 				},
@@ -4771,7 +4881,8 @@
 						"points": [
 							"Zero MessageContent & Zero Direct Database Drivers: YourApps connects solely with Guilds and GuildMessages intents (without the privileged MessageContent intent) and holds zero direct database credentials—persisting forms, resumable drafts, and submissions strictly over our authenticated WebSocket RPC gateway (service: \"yourapps\").",
 							"Scoped Reviewer Access & Applicant Privacy: Submitted responses and reviewer notes are strictly isolated per Discord server and accessible only to server administrators, configured reviewRoles/adminRoles, and the submitting applicant.",
-							"Hierarchy-Safe Automated Role Rewards: Approval rewardRoles and removeRoles execute with explicit role-hierarchy bounds checks and applicant eligibility verification (requiredRoles, restrictedRoles, blacklistRoles, minimumJoinTime, and re-apply cooldowns)."
+							"Hierarchy-Safe Automated Role Rewards: Approval rewardRoles and removeRoles execute with explicit role-hierarchy bounds checks and applicant eligibility verification (requiredRoles, restrictedRoles, blacklistRoles, minimumJoinTime, and re-apply cooldowns).",
+							"Self-Service Applicant & Server Setup Wipe: Individual users can permanently delete all of their submitted YourApps form applications, answers, and saved resumable drafts across all servers via \"Delete YourApps Data\" in Account Settings, while server owners can wipe per-server forms, panels, and submissions via \"Delete YourApps Setup\" in the Server Dashboard."
 						]
 					}
 				},
@@ -4821,18 +4932,19 @@
 						"Automatic Service Profiles (Opt-Out Toggle): Control whether Discord activity in servers with Virtue can automatically create or update your Xernerx User and Virtue progression profiles.",
 						"Delete Profile Data: Reset your bio, birthday, pronouns, timezone, and showcases while keeping your account active and switching your profile visibility to Private.",
 						"Delete Virtue Data: Permanently wipe all of your Virtue text XP, voice XP, unified levels, message counts, voice time, and Virtue preferences across all Discord servers.",
-						"Delete Account: Permanently purge your Xernerx account, appearance settings, credits, levels, subscriptions, and Virtue records across our databases."
+						"Delete Account: Permanently purge your Xernerx account, appearance settings, credits, levels, subscriptions, and Virtue records across our databases.",
+						"Delete YourApps Data & Server Bot Setup: Permanently wipe all of your submitted YourApps form applications, answers, and saved resumable drafts across all Discord servers from Account Settings, or wipe per-server Virtue and YourApps setup configurations from the Server Dashboard."
 					]
 				},
 				"licensing": {
 					"title": "8. Software & Ecosystem Licensing",
 					"intro": "To protect platform integrity, intellectual property, and open-source developer freedom, Xernerx Studios enforces a strict two-tier licensing model across all repositories and packages in the Xernerx Studios workspace:",
 					"proprietaryTitle": "Xernerx Studios Proprietary & SaaS License v1.0:",
-					"proprietaryDesc": "Governs the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including Xernerx Blog, Xernerx Haste, and Xernerx CDN), standalone and suite Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), and the Xernerx Desktop and Mobile Clients. Prohibits unauthorized source code redistribution, reverse-engineering, or competing commercial deployments.",
+					"proprietaryDesc": "Governs the Xernerx Suite monorepo (all 13 *.xernerx.com web applications including Xernerx Blog, Xernerx Haste, and Xernerx CDN), standalone and suite Discord bots (Virtue, YourApps, Metamorphosis, Zodiac, To-Do List Bot, Xernerx App, and Xernerx Bot), the canonical package documentation repository (docs), the official starter examples repository (examples), organization governance (.github), and the Xernerx Desktop and Mobile Clients. Prohibits unauthorized source code redistribution, reverse-engineering, or competing commercial deployments.",
 					"proprietaryLink": "Read the Xernerx Proprietary & SaaS License (/license)",
 					"plainTextLink": "View Plain-Text LICENSE",
-					"apacheTitle": "Apache License, Version 2.0 (Open-Source SDKs, Examples & Package Docs):",
-					"apacheDesc": "Governs all 8 standalone developer packages published to npm (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx), the canonical package documentation repository (docs), and the official starter examples repository (examples), granting perpetual copyright and patent licenses while protecting Xernerx Studios trademarks.",
+					"apacheTitle": "Apache License, Version 2.0 (Open-Source NPM SDKs):",
+					"apacheDesc": "Governs all 8 standalone developer packages published to npm (@xernerx/framework, @xernerx/stats, @xernerx/commands, @xernerx/websocket, @xernerx/hooks, @xernerx/terminal, @xernerx/extension-builder, and xernerx), granting perpetual copyright and patent licenses while protecting Xernerx Studios trademarks.",
 					"apacheLink": "Official Apache-2.0 License Text",
 					"packagesLink": "Browse @xernerx/* SDK Docs",
 					"githubLink": "GitHub Repositories",
@@ -4855,7 +4967,7 @@
 				"q1": "Does Virtue read or store the text of my Discord messages or record voice calls?",
 				"a1": "No. Virtue never stores raw message text or attachments, and it never joins voice channels or records audio. It only increments numeric message counts and active voice channel duration to calculate your XP.",
 				"q2": "Can I delete my Virtue XP and leveling data without deleting my entire Xernerx Account?",
-				"a2": "Yes. Go to account.xernerx.com, scroll to the Danger Zone in Account Settings, and click \"Delete Virtue Data\" to permanently wipe all of your Virtue levels, XP, message counts, and voice time across all servers while keeping your Xernerx Account intact.",
+				"a2": "Yes. Go to account.xernerx.com, scroll to the Danger Zone in Account Settings, and click \"Delete Virtue Data\" or \"Delete YourApps Data\" to permanently wipe all of your Virtue progression or YourApps form submissions and drafts across all servers while keeping your Xernerx Account intact. Server owners can also wipe per-server bot configurations via \"Delete Virtue Setup\" and \"Delete YourApps Setup\" in the Server Dashboard.",
 				"q3": "What happens when I set my profile, bot, or server privacy to Private?",
 				"a3": "When set to Private, your profile, bot, or server is completely hidden from all public directories, leaderboards, sitemaps, and search results, and our API blocks anyone except you (and authorized co-owners) from viewing it even if they have the direct link or ID."
 			}
@@ -5034,7 +5146,7 @@
 		"features": {
 			"scale": {
 				"title": "1 Account, 1 Place, 1 Setup",
-				"description": "One Xernerx Account works across our entire studio ecosystem—whether you are using the Xernerx Suite, configuring To-Do List Bot, Virtue, Metamorphosis, or Zodiac, or discovering new bots and servers."
+				"description": "One Xernerx Account works across our entire studio ecosystem—whether you are using the Xernerx Suite, configuring Virtue, YourApps, To-Do List Bot, Metamorphosis, or Zodiac, or discovering new bots and servers."
 			},
 			"opensource": {
 				"title": "Open-Source Heart",
@@ -5160,7 +5272,7 @@
 				"20": {
 					"date": "DYNAMIC_DATE",
 					"title": "Today",
-					"description": "You're all caught up! Today Xernerx Studios unites our Discord bots—To-Do List Bot, Virtue, Metamorphosis, and Zodiac—our open-source frameworks, and the Xernerx Suite under 1 Account, 1 Place, 1 Setup."
+					"description": "You're all caught up! Today Xernerx Studios unites our Discord bots—Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—our open-source frameworks, and the Xernerx Suite under 1 Account, 1 Place, 1 Setup."
 				}
 			}
 		},
@@ -5282,7 +5394,7 @@
 		},
 		"cta": {
 			"title": "1 Account. 1 Place. 1 Setup.",
-			"description": "Sign in once with your Xernerx Account to configure To-Do List Bot, Virtue, Metamorphosis, and Zodiac in one dashboard, discover Discord bots and servers, or track stats, publicly list, and promote your own bots.",
+			"description": "Sign in once with your Xernerx Account to configure Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac in one dashboard, discover Discord bots and servers, or track stats, publicly list, and promote your own bots.",
 			"dashboard": "Open Dashboard",
 			"download": "Get Desktop App",
 			"docs": "Read Documentation",
@@ -5704,7 +5816,7 @@
 			},
 			"card14": {
 				"title": "How do I wipe my Virtue XP data, reset my profile, or delete my account?",
-				"description": "Open account.xernerx.com/?tab=account for granular data controls: Reset Profile clears your bio and profile customizations, Delete Virtue Data permanently wipes your Virtue XP, levels, message counts, and voice time across all servers, and Delete Account permanently purges your Xernerx account."
+				"description": "Open account.xernerx.com/?tab=account for granular data controls: Reset Profile clears your bio and profile customizations, Delete Virtue Data permanently wipes your Virtue XP, levels, message counts, and voice time across all servers, Delete YourApps Data permanently wipes all submitted YourApps form applications, answers, and resumable drafts across all servers, and Delete Account permanently purges your Xernerx account. Server owners can also wipe per-server Virtue or YourApps configurations via Delete Virtue Setup and Delete YourApps Setup in app.xernerx.com/dashboard."
 			}
 		},
 		"profiles": {
@@ -6183,7 +6295,10 @@
 				"messageContextBadge": "Message Context",
 				"userContextHint": "Right-click User → Apps → {name}",
 				"messageContextHint": "Right-click Message → Apps → {name}",
-				"contextDefaultDesc": "Discord context menu action triggered directly on a {target}."
+				"contextDefaultDesc": "Discord context menu action triggered directly on a {target}.",
+				"optionCountSingular": "{count} option",
+				"subcommandCountSingular": "{count} subcommand",
+				"choiceBadgeSingular": "{count} choice"
 			},
 			"overview": {
 				"aboutBot": "About {name}",
@@ -6268,7 +6383,8 @@
 				"statsLogDeleteConfirm": "Are you sure you want to permanently delete the stat snapshot from {time}?",
 				"statsLogDeletedToast": "Stat snapshot deleted",
 				"statsLogDeleteErrorToast": "Failed to delete stat snapshot",
-				"remainingToNextTier": "{remaining} away from {target}"
+				"remainingToNextTier": "{remaining} away from {target}",
+				"shardCountSingular": "{count} Shard"
 			},
 			"verifiedBadge": "Verified",
 			"explore": {
@@ -6542,7 +6658,25 @@
 				"importJson": "Import JSON",
 				"exportSuccess": "Exported server profile configuration JSON!",
 				"importSuccess": "Applied imported server profile settings! Click Save Changes to persist.",
-				"importError": "Invalid server profile JSON file."
+				"importError": "Invalid server profile JSON file.",
+				"virtueSetupData": {
+					"title": "Delete Virtue Setup Data",
+					"description": "Permanently wipe all Virtue server setup settings, level role rewards, Dynamic Hoist Roles configuration, and channel rules for this server.",
+					"button": "Delete Virtue Setup",
+					"confirmDescription": "Are you sure you want to permanently delete all Virtue setup configurations, level roles, dynamic hoist roles, and channel rules for this server? This cannot be undone.",
+					"toastSuccessTitle": "Virtue Setup Deleted",
+					"toastSuccessDesc": "All Virtue setup configurations for this server have been wiped.",
+					"toastError": "Failed to delete Virtue setup data"
+				},
+				"yourappsSetupData": {
+					"title": "Delete YourApps Setup Data",
+					"description": "Permanently wipe all YourApps server setup settings, published panels, application positions, and form submissions for this server.",
+					"button": "Delete YourApps Setup",
+					"confirmDescription": "Are you sure you want to permanently delete all YourApps setup settings, application positions, panels, and submissions for this server? This cannot be undone.",
+					"toastSuccessTitle": "YourApps Setup Deleted",
+					"toastSuccessDesc": "All YourApps setup configurations, forms, and submissions for this server have been wiped.",
+					"toastError": "Failed to delete YourApps setup data"
+				}
 			},
 			"stats": {
 				"boosts": "Boosts",
@@ -7711,7 +7845,8 @@
 					"badgeCount": "{count} Bots Tracked",
 					"tierUnlocked": "Tier #{tier} Unlocked",
 					"starterTier": "Starter Badge"
-				}
+				},
+				"daySingular": "{count} day"
 			}
 		},
 		"servers": {
@@ -9212,7 +9347,7 @@
 				},
 				"explore": {
 					"heroTitle": "Welcome to Explore",
-					"heroDesc": "This is your home on app.xernerx.com — where the community discovers verified Discord bots and public servers.",
+					"heroDesc": "This is your home on {host} — where the community discovers verified Discord bots and public servers.",
 					"barTitle": "Search, Leaderboards & Compare",
 					"barDesc": "Jump to your Server Dashboard, check global XP & vote Leaderboards, compare listings side-by-side, or press Ctrl + K to search bots, servers, and organizations.",
 					"switcherTitle": "Bots & Servers Switcher",
@@ -9248,18 +9383,18 @@
 			},
 			"navHandoff": {
 				"promptBadge": "Hands-On Navigation",
-				"promptTitle": "Use Suite Navigation to open {destination}",
-				"promptDesc": "Click the highlighted Navigation icon in the bar or press Ctrl + . on your keyboard to open the Suite Navigation Menu, then select {destination}.",
-				"openMenuBtn": "Open Navigation Menu",
-				"waitingHint": "Click Navigation Icon or press Ctrl + .",
-				"menuExplainBadge": "Suite Navigation — First Look",
+				"promptTitle": "Use the App Drawer to open {destination}",
+				"promptDesc": "Click the highlighted App Drawer icon in the bar or press Ctrl + Space on your keyboard to open the App Drawer, then select {destination}.",
+				"openMenuBtn": "Open App Drawer",
+				"waitingHint": "Click App Drawer or press Ctrl + Space",
+				"menuExplainBadge": "App Drawer — First Look",
 				"menuExplainTitle": "Your Unified Ecosystem Launcher",
 				"menuExplainDesc": "Every Xernerx application across User, Developer, and Public portals lives right here. You can filter apps by typing, move with arrow keys, or click any icon to jump across subdomains. Select the highlighted {destination} card below to continue!",
 				"nextStopBadge": "Next Tour Stop →",
 				"destinations": {
-					"dashboard": "Server Dashboard",
-					"portal": "Developer Portal",
-					"explore": "Explore Hub"
+					"dashboard": "Dashboard",
+					"portal": "Portal",
+					"explore": "Explore"
 				}
 			}
 		}
@@ -9318,7 +9453,7 @@
 		"home": {
 			"title": "Support",
 			"description": "Welcome to the knowledgebank. Explore our transparent roadmap, submit new feature ideas, report issues, and find answers to all your questions.",
-			"searchPlaceholder": "Search all 70+ FAQ answers, roadmap milestones, issues, suggestions, docs, and status...",
+			"searchPlaceholder": "Search FAQ, roadmap, issues, suggestions & status...",
 			"searchEmpty": "No results found matching \"{query}\".",
 			"searchCategories": {
 				"all": "All",
@@ -9364,7 +9499,7 @@
 		"roadmap": {
 			"title": "Roadmap",
 			"description": "Our chronological journey of features, optimizations, and releases. See exactly what is arriving and when.",
-			"searchPlaceholder": "Search roadmap milestones and known issues...",
+			"searchPlaceholder": "Search roadmap & issues...",
 			"allProducts": "All Products",
 			"allStatuses": "All Statuses",
 			"currentQuarterFilter": "Current Quarter ({quarter})",
@@ -9713,7 +9848,8 @@
 			"privacyLabel": "Visibility & Privacy",
 			"expirationLabel": "Expiration (TTL)",
 			"linesCount": "{count} lines",
-			"contentPlaceholder": "Paste or type your code, logs, or command output here..."
+			"contentPlaceholder": "Paste or type your code, logs, or command output here...",
+			"lineCount": "{count} line"
 		},
 		"privacy": {
 			"public": "Public",
@@ -9762,7 +9898,8 @@
 			"notFoundTitle": "Haste Document Not Found",
 			"notFoundDescription": "This paste may have expired via its TTL schedule, been deleted by its author, or never existed.",
 			"privateTitle": "Private Haste Document",
-			"privateDescription": "This paste is marked as strictly private and can only be viewed by its owner."
+			"privateDescription": "This paste is marked as strictly private and can only be viewed by its owner.",
+			"viewCount": "{count} view"
 		},
 		"integration": {
 			"title": "Drop-in @xernerx/commands & API Integration",

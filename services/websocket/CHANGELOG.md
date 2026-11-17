@@ -2,6 +2,20 @@
 
 # @xernerx/websocket
 
+## 1.8.2
+
+### Patch Changes
+
+- ## WebSocket Gateway Runtime Alignment
+  
+  Updated Mongoose, TypeScript toolchain packages, and Node `>=24` / `pnpm@12.21.0` workspace metadata for the real-time WebSocket gateway.
+  
+  ### Changed
+  
+  - **Runtime Dependencies**: Upgraded `mongoose` and TypeScript runtime tooling alongside `pnpm@12.21.0` / Node `>=24` engine fields.
+- Updated dependencies
+  - @xernerx/lib@1.28.0
+
 ## 1.8.1
 
 ### Patch Changes

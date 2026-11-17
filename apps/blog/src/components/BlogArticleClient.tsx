@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowLeft, Calendar, Check, Clock, Copy, Eye, Flame, Heart, Lock, Megaphone, PenSquare, Rocket, Rss, ShieldCheck, Sparkles, Terminal, Users } from 'lucide-react';
 import { useDictionary, useEnvironment, usePermissions, useSidebar, useToast, useUser } from '@xernerx/providers';
-import { Loading, NotFound } from '@xernerx/feedback';
+import { NotFound } from '@xernerx/feedback';
 import { BlogMarkdownRenderer } from './BlogMarkdownRenderer';
 import { BlogPostCard } from './BlogPostCard';
+import { BlogArticleSkeleton } from './BlogSkeletons';
+import { FALLBACK_BLOG_POSTS, findFallbackBlogPost } from '@/lib/fallbackPosts';
 import { extractTocHeadings, type BlogCategory, type BlogPostItem, type ReactionKey } from './types';
 
 const CATEGORY_ICONS: Record<BlogCategory, React.ElementType> = {
@@ -71,7 +73,13 @@ export default function BlogArticleClient({ slug, initialPost }: { slug: string;
 		fetch(getEnvUrl(`https://api.xernerx.com/core/blog/${encodeURIComponent(slug)}`), { credentials: 'include' })
 			.then(async (res) => {
 				if (!res.ok) {
-					if (!initialPost) setNotFound(true);
+					const fallback = initialPost || findFallbackBlogPost(slug);
+					if (fallback) {
+						setPost(fallback);
+						setRelated(FALLBACK_BLOG_POSTS.filter((r) => r.slug !== fallback.slug).slice(0, 2));
+					} else {
+						setNotFound(true);
+					}
 					return null;
 				}
 				return res.json();
@@ -83,7 +91,13 @@ export default function BlogArticleClient({ slug, initialPost }: { slug: string;
 				}
 			})
 			.catch(() => {
-				if (!initialPost) setNotFound(true);
+				const fallback = initialPost || findFallbackBlogPost(slug);
+				if (fallback) {
+					setPost(fallback);
+					setRelated(FALLBACK_BLOG_POSTS.filter((r) => r.slug !== fallback.slug).slice(0, 2));
+				} else {
+					setNotFound(true);
+				}
 			})
 			.finally(() => setLoading(false));
 	}, [slug, isReady, getEnvUrl, initialPost]);
@@ -165,7 +179,7 @@ export default function BlogArticleClient({ slug, initialPost }: { slug: string;
 		} catch {}
 	};
 
-	if (loading) return <Loading />;
+	if (loading) return <BlogArticleSkeleton />;
 	if (notFound || !post) return <NotFound />;
 
 	const CategoryIcon = CATEGORY_ICONS[post.category] || Megaphone;
@@ -289,6 +303,10 @@ export default function BlogArticleClient({ slug, initialPost }: { slug: string;
 									<img
 										src={avatarUrl}
 										alt={post.author?.globalName || 'Xernerx'}
+										onError={(e) => {
+											e.currentTarget.onerror = null;
+											e.currentTarget.src = '/logo.png';
+										}}
 										className="h-9 w-9 rounded-full object-cover border border-(--accent)/30 bg-(--background) shrink-0"
 									/>
 									<div className="flex flex-col">

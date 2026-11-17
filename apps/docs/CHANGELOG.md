@@ -2,6 +2,28 @@
 
 # docs
 
+## 1.13.0
+
+### Minor Changes
+
+- ## Bot Profile & Self-Service Setup Deletion API Documentation
+  
+  Documented the new `/secure` user/guild bot profile inspection and self-service data/setup deletion endpoints.
+  
+  ### Added
+  
+  - **Secure Bot Profile & Deletion Endpoints**: Documented `GET/PATCH /secure/users/:id/bots`, `GET/PATCH /secure/guilds/:id/bots`, `DELETE /secure/users/:id/yourapps`, and `DELETE /secure/guilds/:id/{virtue|applications}` in the Secure API reference.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.12.1
 
 ### Patch Changes

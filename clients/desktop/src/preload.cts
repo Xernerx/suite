@@ -84,6 +84,7 @@ ipcRenderer.on('metadata:updated', (_: any, updated: any) => {
 });
 
 contextBridge.exposeInMainWorld('electron', {
+	isXernerxDesktop: true,
 	minimize: () => ipcRenderer.send('window:minimize'),
 	maximize: () => ipcRenderer.send('window:maximize'),
 	close: () => ipcRenderer.send('window:close'),

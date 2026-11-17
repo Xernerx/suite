@@ -718,8 +718,9 @@ export function XernerxDotLogo({
 		}
 		const onConstructEvent = (e: Event) => {
 			if (!backgroundMode) return;
-			const mode = (e as CustomEvent<{ mode?: 'default' | 'spiral' }>)?.detail?.mode || 'default';
-			if (mode === 'default' && hasEnteredRef.current) return;
+			const detail = (e as CustomEvent<{ mode?: 'default' | 'spiral'; force?: boolean }>)?.detail;
+			const mode = detail?.mode || 'default';
+			if (mode === 'default' && hasEnteredRef.current && !detail?.force) return;
 			constructModeRef.current = mode;
 			hasEnteredRef.current = true;
 			beginMatrixConstruct();

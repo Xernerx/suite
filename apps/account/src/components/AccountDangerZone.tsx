@@ -14,6 +14,10 @@ interface AccountDangerZoneProps {
 	setIsConfirmVirtueOpen: (open: boolean) => void;
 	isDeletingVirtue: boolean;
 	handleDeleteVirtueData: () => Promise<void>;
+	isConfirmYourAppsOpen: boolean;
+	setIsConfirmYourAppsOpen: (open: boolean) => void;
+	isDeletingYourApps: boolean;
+	handleDeleteYourAppsData: () => Promise<void>;
 	isConfirmAccountOpen: boolean;
 	setIsConfirmAccountOpen: (open: boolean) => void;
 	isDeletingAccount: boolean;
@@ -29,6 +33,10 @@ export function AccountDangerZone({
 	setIsConfirmVirtueOpen,
 	isDeletingVirtue,
 	handleDeleteVirtueData,
+	isConfirmYourAppsOpen,
+	setIsConfirmYourAppsOpen,
+	isDeletingYourApps,
+	handleDeleteYourAppsData,
 	isConfirmAccountOpen,
 	setIsConfirmAccountOpen,
 	isDeletingAccount,
@@ -116,6 +124,45 @@ export function AccountDangerZone({
 				</button>
 			</div>
 
+			{/* Delete YourApps Data Card */}
+			<div
+				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-orange)/20 bg-(--accent-orange)/5 shadow-sm"
+				style={{
+					padding: 'var(--ui-gap)',
+					gap: 'var(--ui-gap)',
+				}}
+			>
+				<div
+					className="flex flex-col max-w-xl"
+					style={{
+						gap: 'calc(var(--ui-gap) * 0.25)',
+					}}
+				>
+					<div
+						className="flex items-center text-(--accent-orange) font-semibold text-base"
+						style={{
+							gap: 'calc(var(--ui-gap) * 0.5)',
+						}}
+					>
+						<AlertTriangle size={18} />
+						<h3>{t('account.account.yourappsData.title')}</h3>
+					</div>
+					<p className="text-xs text-(--accent-orange)/80">{t('account.account.yourappsData.description')}</p>
+				</div>
+				<button
+					type="button"
+					onClick={() => setIsConfirmYourAppsOpen(true)}
+					className="flex items-center justify-center rounded-2xl bg-(--accent-orange) text-sm font-medium text-white transition-colors hover:bg-(--accent-orange)/80 shrink-0 shadow-sm cursor-pointer"
+					style={{
+						padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)',
+						gap: 'calc(var(--ui-gap) * 0.5)',
+					}}
+				>
+					<Trash2 size={16} />
+					<span>{t('account.account.yourappsData.button')}</span>
+				</button>
+			</div>
+
 			{/* Delete Account Card */}
 			<div
 				className="flex flex-col sm:flex-row sm:items-center justify-between rounded-3xl border border-(--accent-red)/20 bg-(--accent-red)/5 shadow-sm"
@@ -175,6 +222,17 @@ export function AccountDangerZone({
 				variant="warning"
 				loading={isDeletingVirtue}
 				onConfirm={handleDeleteVirtueData}
+			/>
+
+			<Confirm
+				open={isConfirmYourAppsOpen}
+				onOpenChange={setIsConfirmYourAppsOpen}
+				title={t('account.account.yourappsData.title')}
+				description={t('account.account.yourappsData.confirmDescription')}
+				confirmText={t('account.account.yourappsData.button')}
+				variant="warning"
+				loading={isDeletingYourApps}
+				onConfirm={handleDeleteYourAppsData}
 			/>
 
 			<Confirm

@@ -5,8 +5,9 @@ import { useState } from 'react';
 import { Server, LayoutDashboard, Link2, Unlink } from 'lucide-react';
 import { Button, Selector } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import Image from 'next/image';
 import Link from 'next/link';
+import { PortalSafeAvatar } from '@/components/portal/PortalSafeAvatar';
+import { resolveGuildIconUrl } from '@/lib/portalHelpers';
 
 interface OrgServersTabProps {
 	orgConfig: any;
@@ -126,20 +127,14 @@ export default function OrgServersTab({ orgConfig, setOrgConfig, orgGuilds, setO
 									value: guild.id,
 									label: (
 										<div className="flex items-center gap-3">
-											{guild.icon ? (
-												<Image
-													src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`}
-													alt={guild.name}
-													width={20}
-													height={20}
-													unoptimized
-													className="w-5 h-5 rounded-full object-cover shadow-sm border border-(--border)/10"
-												/>
-											) : (
-												<div className="w-5 h-5 rounded-full bg-(--foreground)/50 flex items-center justify-center text-(--text-muted) font-bold text-[10px] shadow-sm border border-(--border)/10">
-													{guild.name.charAt(0)}
-												</div>
-											)}
+											<PortalSafeAvatar
+												src={resolveGuildIconUrl(guild, 64)}
+												alt={guild.name || 'Server'}
+												fallbackKind="initial"
+												initial={String(guild.name || 'S')}
+												className="w-5 h-5 rounded-full object-cover shadow-sm border border-(--border)/10 shrink-0"
+												fallbackClassName="w-5 h-5 rounded-full bg-(--foreground)/50 flex items-center justify-center text-(--text-muted) font-bold text-[10px] shadow-sm border border-(--border)/10 shrink-0"
+											/>
 											<span className="font-medium">{guild.name}</span>
 										</div>
 									),
@@ -163,18 +158,14 @@ export default function OrgServersTab({ orgConfig, setOrgConfig, orgGuilds, setO
 							{orgGuilds.map((g: any) => (
 								<div key={g.id} className="flex items-center justify-between gap-4 p-4 hover:bg-(--foreground)/50 transition-colors">
 									<Link href={getEnvUrl(`https://app.xernerx.com/dashboard?guild=${g.id}`)} className="flex items-center gap-4 flex-1 min-w-0">
-										{g.icon ? (
-											<Image
-												src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`}
-												alt={g.name}
-												width={40}
-												height={40}
-												unoptimized
-												className="w-10 h-10 rounded-full shadow-sm object-cover shrink-0"
-											/>
-										) : (
-											<div className="w-10 h-10 bg-(--background) rounded-full flex items-center justify-center font-bold shadow-sm shrink-0">{g.name?.charAt(0) || 'S'}</div>
-										)}
+										<PortalSafeAvatar
+											src={resolveGuildIconUrl(g, 128)}
+											alt={g.name || 'Server'}
+											fallbackKind="initial"
+											initial={String(g.name || 'S')}
+											className="w-10 h-10 rounded-full shadow-sm object-cover shrink-0"
+											fallbackClassName="w-10 h-10 bg-(--background) rounded-full flex items-center justify-center font-bold shadow-sm shrink-0"
+										/>
 										<div className="flex flex-col min-w-0">
 											<span className="font-bold text-(--text) truncate">{g.name}</span>
 											<span className="text-xs text-(--text-muted)">{g.id}</span>

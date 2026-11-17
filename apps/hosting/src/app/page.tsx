@@ -4,8 +4,8 @@
 import { Cloud, Columns2, Server, Settings2, ShieldAlert } from 'lucide-react';
 import { useDictionary, useEnvironment, useSession, useSidebar, useUser } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
-import { Loading } from '@xernerx/feedback';
 import HostingConsole, { DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig } from '@/components/HostingConsole';
+import { HostingSkeleton } from '@/components/HostingSkeleton';
 import ReturnPage from '@/components/ReturnPage';
 
 export default function HostingPage() {
@@ -161,7 +161,7 @@ export default function HostingPage() {
 	}
 
 	if (status === 'loading' || userLoading || roleLoading) {
-		return <Loading />;
+		return <HostingSkeleton />;
 	}
 
 	if (!session || !userRolePermissions.access) {

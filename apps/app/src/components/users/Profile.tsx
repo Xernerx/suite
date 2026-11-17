@@ -1,35 +1,44 @@
 /** @format */
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { User, ShieldCheck, Server, Users, Building2, Sparkles, Clock, Award, Flame, Globe, ExternalLink, Code2, AtSign, Video, Tv, Music, Gamepad2, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { User, ShieldCheck, Server, Users, Building2, Sparkles, Clock, Award, Flame, Globe, ExternalLink, CheckCircle2, Bot } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Markdown } from '@xernerx/ui';
+import SafeAvatar from '@/components/SafeAvatar';
+import { normalizeUserConnection, normalizeUserShowcase, resolveUserLevelAndXp, type NormalizedUserConnection, type NormalizedUserShowcase } from './userProfileHelpers';
 
-const PROVIDER_META: Record<string, { label: string; icon: any }> = {
-	github: { label: 'GitHub', icon: Code2 },
-	twitch: { label: 'Twitch', icon: Tv },
-	youtube: { label: 'YouTube', icon: Video },
-	twitter: { label: 'X (Twitter)', icon: AtSign },
-	spotify: { label: 'Spotify', icon: Music },
-	steam: { label: 'Steam', icon: Gamepad2 },
-	reddit: { label: 'Reddit', icon: MessageCircle },
-};
+function ShowcaseImage({ src, alt }: { src: string; alt: string }) {
+	const [failed, setFailed] = useState(false);
+	if (failed) return null;
+	return (
+		<div className="h-36 w-full rounded-2xl overflow-hidden border border-(--border)/15 bg-(--background)/50">
+			<img src={src} alt={alt} className="h-full w-full object-cover" onError={() => setFailed(true)} />
+		</div>
+	);
+}
 
 export default function Profile({ user, bots, organizations, servers = [] }: { user: any; bots: any[]; organizations: any[]; servers?: any[] }) {
 	const { t } = useDictionary();
 	const { getEnvUrl } = useEnvironment();
+
+	const { level: resolvedLevel, xp: resolvedXp } = resolveUserLevelAndXp(user);
+	const streakCount = Math.max(0, Number(user?.credits?.streak || 0) || 0);
+	const formattedStreak = streakCount === 1 ? t('app.users.profile.daySingular', { count: 1 }) : t('app.users.profile.days', { count: streakCount.toLocaleString() });
 
 	const totalServers = bots.reduce((acc, bot) => acc + (bot.guildCount ?? bot.stats?.guildCount ?? bot.latestStat?.guildCount ?? 0), 0);
 	const totalUsers = bots.reduce((acc, bot) => acc + (bot.userCount ?? bot.stats?.userCount ?? bot.latestStat?.userCount ?? 0), 0);
 	const totalGuildMembers = servers.reduce((acc, srv) => acc + (srv.memberCount || 0), 0);
 	const combinedReach = totalUsers + totalGuildMembers;
 
-	const publicConnections = (Array.isArray(user?.connections) ? user.connections : []).filter((c: any) => c && c.showOnProfile !== false && c.provider !== 'easypanel' && c.provider !== 'ssh');
-	const showcases = Array.isArray(user?.showcases) ? user.showcases : [];
+	const publicConnections: NormalizedUserConnection[] = (Array.isArray(user?.connections) ? user.connections : [])
+		.filter((c: any) => c && c.showOnProfile !== false && c.provider !== 'easypanel' && c.provider !== 'ssh' && c.provider !== 'vercel')
+		.map((c: any) => normalizeUserConnection(c));
 
-	const hasDetails = Boolean(user?.pronouns || user?.timezone || user?.level || user?.credits?.streak || publicConnections.length > 0);
+	const showcases: NormalizedUserShowcase[] = (Array.isArray(user?.showcases) ? user.showcases : []).filter(Boolean).map((sc: any, idx: number) => normalizeUserShowcase(sc, idx, getEnvUrl));
+
+	const hasDetails = Boolean(user?.pronouns || user?.timezone || resolvedLevel > 1 || resolvedXp > 0 || streakCount > 0 || publicConnections.length > 0);
 
 	return (
 		<div className="flex flex-col gap-8">
@@ -44,9 +53,9 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 					</div>
 					<div>
 						<div className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							Lv. {Number(user?.level || 1).toLocaleString()}
+							Lv. {resolvedLevel.toLocaleString()}
 						</div>
-						<div className="text-xs text-(--text-muted) mt-0.5">{t('app.users.profile.kpi.xpProgress', { xp: Number(user?.xp || 0).toLocaleString() })}</div>
+						<div className="text-xs text-(--text-muted) mt-0.5">{t('app.users.profile.kpi.xpProgress', { xp: resolvedXp.toLocaleString() })}</div>
 					</div>
 				</div>
 
@@ -59,7 +68,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 					</div>
 					<div>
 						<div className="text-2xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{t('app.users.profile.days', { count: Number(user?.credits?.streak || 0).toLocaleString() })}
+							{formattedStreak}
 						</div>
 						<div className="text-xs text-(--text-muted) mt-0.5">{t('app.users.profile.kpi.streakActive')}</div>
 					</div>
@@ -123,9 +132,9 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 								<span className="bg-(--accent)/15 text-(--accent) border border-(--accent)/25 text-xs font-bold px-2.5 py-0.5 rounded-full">{showcases.length}</span>
 							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								{showcases.map((sc: any) => {
-									const CardWrapper: any = sc.linkUrl ? 'a' : 'div';
-									const wrapperProps = sc.linkUrl ? { href: sc.linkUrl, target: '_blank', rel: 'noopener noreferrer' } : {};
+								{showcases.map((sc) => {
+									const CardWrapper: any = sc.href ? 'a' : 'div';
+									const wrapperProps = sc.href ? { href: sc.href, target: '_blank', rel: 'noopener noreferrer' } : {};
 									return (
 										<CardWrapper
 											key={sc.id}
@@ -133,11 +142,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 											className="flex flex-col justify-between p-5 rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] transition-all group"
 										>
 											<div className="flex flex-col gap-3">
-												{sc.imageUrl && (
-													<div className="h-36 w-full rounded-2xl overflow-hidden border border-(--border)/15 bg-(--background)/50">
-														<img src={sc.imageUrl} alt={sc.title} className="h-full w-full object-cover" />
-													</div>
-												)}
+												{sc.imageUrl && <ShowcaseImage src={sc.imageUrl} alt={sc.title} />}
 												<div className="flex items-start justify-between gap-2">
 													<h3
 														className="font-bold text-lg text-(--text) group-hover:text-(--accent) transition-colors truncate"
@@ -153,10 +158,16 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 												</div>
 												{sc.description && <p className="text-sm text-(--text-muted) line-clamp-3">{sc.description}</p>}
 											</div>
-											{sc.linkUrl && (
-												<div className="flex items-center gap-1.5 text-xs font-bold text-(--accent) mt-4 pt-3 border-t border-(--border)/10">
-													<ExternalLink size={12} />
-													<span className="truncate">{sc.linkUrl}</span>
+											{sc.href && (
+												<div className="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-(--border)/10">
+													<span className="inline-flex items-center gap-1.5 text-xs font-mono text-(--text-muted) truncate min-w-0">
+														<Globe size={12} className="text-(--accent) shrink-0" />
+														<span className="truncate">{sc.displayHost || sc.title}</span>
+													</span>
+													<span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-(--accent)/15 text-(--accent) border border-(--accent)/25 text-[11px] font-bold group-hover:bg-(--accent) group-hover:text-(--accent-contrast) transition-colors shrink-0">
+														<span>{t('common.sidebarnotifications.button5')}</span>
+														<ExternalLink size={11} />
+													</span>
 												</div>
 											)}
 										</CardWrapper>
@@ -193,19 +204,18 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 											className="flex flex-col p-5 rounded-3xl bg-(--foreground)/40 backdrop-blur-md border border-(--border)/10 hover:border-(--accent)/50 hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_15%,transparent)] transition-all group"
 										>
 											<div className="flex items-center gap-4 mb-4">
-												{avatarUrl ? (
-													<Image
-														src={avatarUrl}
-														alt={bot.name || t('app.bots.avatarAlt')}
-														width={48}
-														height={48}
-														className="rounded-2xl shadow-sm border border-(--border)/20"
-													/>
-												) : (
-													<div className="w-12 h-12 rounded-2xl bg-(--background) border border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-sm">
-														<User className="w-6 h-6" />
-													</div>
-												)}
+												<SafeAvatar
+													src={avatarUrl}
+													alt={bot.name || t('app.bots.avatarAlt')}
+													width={48}
+													height={48}
+													className="w-12 h-12 rounded-2xl shadow-sm border border-(--border)/20 object-cover shrink-0"
+													fallback={
+														<div className="w-12 h-12 rounded-2xl bg-(--background) border border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-sm shrink-0">
+															<Bot className="w-6 h-6" />
+														</div>
+													}
+												/>
 												<div className="flex-1 min-w-0">
 													<div className="flex items-center gap-1">
 														<h3
@@ -214,7 +224,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 														>
 															{bot.discord?.global_name || bot.discord?.username || bot.name || t('common.unknownBot')}
 														</h3>
-														{bot.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) flex-shrink-0" />}
+														{bot.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) shrink-0" />}
 													</div>
 													<div className="flex items-center gap-2 text-xs text-(--text-muted) mt-0.5">
 														<span className="flex items-center gap-1">
@@ -256,11 +266,14 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 										>
 											<div className="flex items-center gap-4 mb-4">
 												<div className="w-12 h-12 rounded-2xl border border-(--border)/20 bg-(--background) overflow-hidden shadow-sm flex items-center justify-center shrink-0">
-													{iconSrc ? (
-														<Image src={iconSrc} alt={org.name} width={48} height={48} className="w-full h-full object-cover" unoptimized />
-													) : (
-														<Building2 className="w-6 h-6 text-(--text-muted)" />
-													)}
+													<SafeAvatar
+														src={iconSrc}
+														alt={org.name}
+														width={48}
+														height={48}
+														className="w-full h-full object-cover"
+														fallback={<Building2 className="w-6 h-6 text-(--text-muted)" />}
+													/>
 												</div>
 												<div className="flex-1 min-w-0">
 													<div className="flex items-center gap-1">
@@ -270,7 +283,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 														>
 															{org.name}
 														</h3>
-														{org.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) flex-shrink-0" />}
+														{org.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) shrink-0" />}
 													</div>
 												</div>
 											</div>
@@ -302,11 +315,14 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 										>
 											<div className="flex items-center gap-4 mb-4">
 												<div className="w-12 h-12 rounded-2xl border border-(--border)/20 bg-(--background) overflow-hidden shadow-sm flex items-center justify-center shrink-0">
-													{iconSrc ? (
-														<Image src={iconSrc} alt={server.name} width={48} height={48} className="w-full h-full object-cover" unoptimized />
-													) : (
-														<Server className="w-6 h-6 text-(--text-muted)" />
-													)}
+													<SafeAvatar
+														src={iconSrc}
+														alt={server.name}
+														width={48}
+														height={48}
+														className="w-full h-full object-cover"
+														fallback={<Server className="w-6 h-6 text-(--text-muted)" />}
+													/>
 												</div>
 												<div className="flex-1 min-w-0">
 													<div className="flex items-center gap-1">
@@ -316,7 +332,7 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 														>
 															{server.name}
 														</h3>
-														{server.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) flex-shrink-0" />}
+														{server.verified && <ShieldCheck className="w-4 h-4 text-(--accent-green) shrink-0" />}
 													</div>
 													<div className="flex items-center gap-2 text-xs text-(--text-muted) mt-0.5">
 														<span className="flex items-center gap-1">
@@ -367,22 +383,22 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 										<span className="text-sm font-bold text-(--text) font-mono">{user.timezone}</span>
 									</div>
 								)}
-								{typeof user?.level === 'number' && user.level > 0 && (
+								{(resolvedLevel > 1 || resolvedXp > 0) && (
 									<div className="flex items-center justify-between p-3 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 										<span className="text-xs font-bold uppercase tracking-wider text-(--text-muted) flex items-center gap-2">
 											<Award className="w-4 h-4 text-(--accent)" />
 											{t('app.users.profile.level')}
 										</span>
-										<span className="text-sm font-bold text-(--text)">{user.level}</span>
+										<span className="text-sm font-bold text-(--text)">Lv. {resolvedLevel.toLocaleString()}</span>
 									</div>
 								)}
-								{typeof user?.credits?.streak === 'number' && user.credits.streak > 0 && (
+								{streakCount > 0 && (
 									<div className="flex items-center justify-between p-3 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 										<span className="text-xs font-bold uppercase tracking-wider text-(--text-muted) flex items-center gap-2">
 											<Flame className="w-4 h-4 text-(--accent)" />
 											{t('app.users.profile.streak')}
 										</span>
-										<span className="text-sm font-bold text-(--text)">{t('app.users.profile.days', { count: user.credits.streak })}</span>
+										<span className="text-sm font-bold text-(--text)">{formattedStreak}</span>
 									</div>
 								)}
 							</div>
@@ -391,26 +407,26 @@ export default function Profile({ user, bots, organizations, servers = [] }: { u
 								<div className="flex flex-col gap-2 pt-3 border-t border-(--border)/10">
 									<span className="text-xs font-bold uppercase tracking-wider text-(--text-muted)">{t('account.connections.title')}</span>
 									<div className="flex flex-col gap-2">
-										{publicConnections.map((conn: any) => {
-											const meta = PROVIDER_META[conn.provider] || { label: conn.provider, icon: Globe };
-											const IconComp = meta.icon;
-											const href = conn.url || '#';
+										{publicConnections.map((conn) => {
+											const IconComp = conn.icon;
+											const RowTag: any = conn.href ? 'a' : 'div';
+											const rowProps = conn.href ? { href: conn.href, target: '_blank', rel: 'noopener noreferrer' } : {};
 											return (
-												<a
-													key={conn.provider}
-													href={href}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="flex items-center justify-between p-2.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 hover:border-(--accent)/40 text-xs font-medium text-(--text) transition-all"
+												<RowTag
+													key={conn.key}
+													{...rowProps}
+													className={`flex items-center justify-between p-2.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 text-xs font-medium text-(--text) transition-all ${
+														conn.href ? 'hover:border-(--accent)/40' : ''
+													}`}
 												>
-													<span className="flex items-center gap-2 truncate">
+													<span className="flex items-center gap-2 truncate min-w-0">
 														<IconComp size={14} className="text-(--accent) shrink-0" />
-														<span className="font-semibold">{meta.label}:</span>
-														<span className="truncate text-(--text-muted)">{conn.displayName || conn.username}</span>
+														<span className="font-semibold shrink-0">{conn.label}:</span>
+														<span className="truncate text-(--text-muted)">{conn.handle}</span>
 														<CheckCircle2 size={12} className="text-(--accent-green) shrink-0" />
 													</span>
-													<ExternalLink size={12} className="text-(--text-muted) shrink-0" />
-												</a>
+													{conn.href && <ExternalLink size={12} className="text-(--text-muted) shrink-0" />}
+												</RowTag>
 											);
 										})}
 									</div>

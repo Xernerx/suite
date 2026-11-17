@@ -26,9 +26,10 @@ import {
 	Trophy,
 	Users,
 } from 'lucide-react';
-import { evaluateBotMilestones, formatMilestoneCount } from '@xernerx/lib';
-import { useDictionary, useToast } from '@xernerx/providers';
+import { formatMilestoneCount } from '@xernerx/lib';
+import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
+import { computeBotMilestoneSummary } from './botMilestoneProgress';
 
 interface BotVitalsSidebarProps {
 	bot: any;
@@ -49,6 +50,7 @@ function decodeDiscordSnowflakeDate(snowflake?: string): Date | null {
 
 export function BotVitalsSidebar({ bot, id, onSelectView }: BotVitalsSidebarProps) {
 	const { t } = useDictionary();
+	const { getEnvUrl } = useEnvironment();
 	const { toast } = useToast();
 	const [copiedVanity, setCopiedVanity] = useState(false);
 
@@ -64,14 +66,14 @@ export function BotVitalsSidebar({ bot, id, onSelectView }: BotVitalsSidebarProp
 
 	const configuredLinks = Object.entries(bot.links || {}).filter(([key, val]) => key !== 'invite' && Boolean(val && String(val).trim()));
 
-	const peakGuilds = Math.max(Number(bot.peakStats?.guildCount) || 0, Number(bot.guildCount) || 0, Number(bot.latestStat?.guildCount) || 0);
-	const peakUsers = Math.max(Number(bot.peakStats?.userCount) || 0, Number(bot.userCount) || 0, Number(bot.latestStat?.userCount) || 0);
-	const serverMilestoneEval = evaluateBotMilestones(peakGuilds, bot.latestStat ? [bot.latestStat] : [], 'servers');
-	const memberMilestoneEval = evaluateBotMilestones(peakUsers, bot.latestStat ? [bot.latestStat] : [], 'members');
+	const serverMilestoneEval = computeBotMilestoneSummary(bot, [], 'servers');
+	const memberMilestoneEval = computeBotMilestoneSummary(bot, [], 'members');
 	const totalUnlockedMilestones = serverMilestoneEval.milestones.filter((m) => m.unlocked).length + memberMilestoneEval.milestones.filter((m) => m.unlocked).length;
 
 	const vanityPath = `/bots/${bot.vanitySlug || bot.id || id}`;
-	const fullProfileUrl = typeof window !== 'undefined' ? `${window.location.origin}${vanityPath}` : `https://app.xernerx.com${vanityPath}`;
+	const appBaseUrl = getEnvUrl('https://app.xernerx.com').replace(/\/$/, '');
+	const appDisplayHost = appBaseUrl.replace(/^https?:\/\//, '');
+	const fullProfileUrl = `${appBaseUrl}${vanityPath}`;
 
 	const handleCopyVanity = () => {
 		navigator.clipboard.writeText(fullProfileUrl).then(() => {
@@ -152,7 +154,10 @@ export function BotVitalsSidebar({ bot, id, onSelectView }: BotVitalsSidebarProp
 					<div className="flex items-center justify-between gap-2 p-3 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 						<div className="flex flex-col min-w-0">
 							<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">{t('app.bots.overview.vanityUrlLabel')}</span>
-							<span className="text-xs font-mono font-bold text-(--accent) truncate mt-0.5">{vanityPath}</span>
+							<span className="text-xs font-mono font-bold text-(--accent) truncate mt-0.5">
+								{appDisplayHost}
+								{vanityPath}
+							</span>
 						</div>
 						<button
 							type="button"
@@ -236,20 +241,18 @@ export function BotVitalsSidebar({ bot, id, onSelectView }: BotVitalsSidebarProp
 							key: 'servers',
 							label: t('app.bots.overview.serverTierLabel'),
 							icon: Server,
-							current: peakGuilds,
 							evalData: serverMilestoneEval,
 						},
 						{
 							key: 'members',
 							label: t('app.bots.overview.memberTierLabel'),
 							icon: Users,
-							current: peakUsers,
 							evalData: memberMilestoneEval,
 						},
-					].map(({ key, label, current, evalData }) => {
+					].map(({ key, label, evalData }) => {
 						const unlocked = evalData.highestUnlocked;
 						const next = evalData.nextMilestone;
-						const remaining = next ? Math.max(0, next.threshold - current) : 0;
+						const remaining = evalData.remaining;
 						return (
 							<div key={key} className="flex flex-col items-center text-center p-3.5 rounded-2xl bg-(--background)/50 border border-(--border)/10 gap-2">
 								<span className="text-[10px] font-bold uppercase tracking-wider text-(--text-muted)">{label}</span>

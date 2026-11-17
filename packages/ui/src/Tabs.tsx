@@ -24,7 +24,15 @@ export function Tabs({ tabs, activeTab, onChange, size = 'md', fullWidth = true,
 	const layoutGroupId = useId();
 
 	return (
-		<div className={`flex items-center gap-1.5 p-1.5 bg-(--foreground)/30 backdrop-blur-md rounded-2xl border border-(--border)/10 overflow-x-auto ${fullWidth ? 'w-full' : 'w-fit'} ${className}`}>
+		<div
+			onWheel={(e) => {
+				if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.shiftKey) return;
+				if (e.shiftKey && e.deltaY !== 0) {
+					e.currentTarget.scrollLeft += e.deltaY;
+				}
+			}}
+			className={`flex items-center gap-1.5 p-1.5 bg-(--foreground)/30 backdrop-blur-md rounded-2xl border border-(--border)/10 overflow-x-auto overflow-y-hidden ${fullWidth ? 'w-full' : 'w-fit'} ${className}`}
+		>
 			{tabs.map((tab) => {
 				const isActive = activeTab === tab.id;
 				return (

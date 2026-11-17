@@ -1,6 +1,10 @@
 {
 	"name": "portal",
-	"version": "1.7.3",
+	"version": "1.7.4",
+	"packageManager": "pnpm@12.21.0",
+	"engines": {
+		"node": ">=24"
+	},
 	"private": true,
 	"author": "Xernerx Studios",
 	"scripts": {
@@ -19,9 +23,9 @@
 		"@xernerx/styles": "workspace:*",
 		"@xernerx/terminal": "^1.2.0",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^14.9.0",
-		"lucide-react": "^1.67.0",
-		"next": "^16.4.5",
+		"framer-motion": "^14.14.0",
+		"lucide-react": "^1.73.0",
+		"next": "^16.4.6",
 		"next-auth": "^4.24.15",
 		"react": "^19.3.1",
 		"react-circle-flags": "^0.0.30",
@@ -31,14 +35,14 @@
 		"recharts": "^3.10.1"
 	},
 	"devDependencies": {
-		"@tailwindcss/postcss": "^4.3.4",
+		"@tailwindcss/postcss": "^4.3.5",
 		"@types/node": "^26.6.6",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"babel-plugin-react-compiler": "^1.0.0",
-		"eslint": "^10.14.0",
-		"eslint-config-next": "^16.4.5",
-		"tailwindcss": "^4.3.4",
+		"eslint": "^10.15.0",
+		"eslint-config-next": "^16.4.6",
+		"tailwindcss": "^4.3.5",
 		"typescript": "^6.0.3"
 	}
 }

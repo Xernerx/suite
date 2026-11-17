@@ -127,8 +127,8 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-						className="relative w-full max-w-3xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[85dvh] flex flex-col"
-						style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
+						className="relative w-full max-w-3xl rounded-3xl bg-(--foreground) border border-(--border)/10 shadow-2xl z-10 max-h-[88dvh] flex flex-col overflow-hidden"
+						style={{ padding: 'var(--ui-gap)', gap: 'calc(var(--ui-gap) * 0.75)' }}
 					>
 						<div className="flex items-center justify-between pb-3 border-b border-(--border)/10 shrink-0 gap-4">
 							<div className="flex items-center gap-3">
@@ -193,13 +193,13 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 							</motion.div>
 						)}
 
-						<div className="overflow-y-auto pr-1 flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
+						<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-3 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 							{visibleNavigation.length > 0 ? (
 								hasCategories ? (
 									Object.entries(groupedNavigation).map(([category, items]) => (
-										<div key={category} className="flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.5)' }}>
+										<div key={category} className="flex flex-col shrink-0" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 											<h3 className="text-xs font-bold uppercase tracking-wider text-(--text-muted) px-1">{t(category)}</h3>
-											<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 sm:gap-6 pt-1">
+											<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4 pt-1 pb-1">
 												{items.map((item: any, idx: number) => {
 													const globalIdx = visibleNavigation.indexOf(item);
 													const isSelected = globalIdx === selectedIndex;
@@ -241,7 +241,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 															onMouseEnter={() => {
 																if (!isDimmedByTour) setSelectedIndex(globalIdx);
 															}}
-															className={`relative group flex flex-col items-center gap-3 cursor-pointer transition-opacity ${
+															className={`relative group flex flex-col items-center gap-2 cursor-pointer transition-opacity ${
 																isDimmedByTour ? 'opacity-35 pointer-events-none select-none' : ''
 															}`}
 														>
@@ -251,7 +251,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 																</span>
 															)}
 															<div
-																className={`flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-[22px] bg-(--background) border shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md ${
+																className={`flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-(--background) border shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md ${
 																	isTourTarget
 																		? 'scale-105 border-(--accent) bg-(--accent)/15 ring-2 ring-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_65%,transparent)] animate-pulse'
 																		: isSelected
@@ -260,14 +260,14 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 																}`}
 															>
 																<AppIcon
-																	size={18}
+																	size={20}
 																	className={`${
 																		isTourTarget || isSelected ? 'text-(--accent)' : 'text-(--text-muted) group-hover:text-(--accent)'
 																	} transition-colors`}
 																/>
 															</div>
 															<span
-																className={`text-xs sm:text-sm font-medium text-center line-clamp-1 w-full px-1 ${
+																className={`text-xs sm:text-sm leading-snug font-medium text-center truncate w-full px-1 ${
 																	isTourTarget ? 'font-extrabold text-(--accent)' : isSelected ? 'text-(--accent)' : 'text-(--text)'
 																}`}
 															>
@@ -280,7 +280,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 										</div>
 									))
 								) : (
-									<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 sm:gap-6 py-2">
+									<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4 py-2">
 										{visibleNavigation.map((item: any, idx: number) => {
 											const isSelected = idx === selectedIndex;
 											const isTourTarget = isTourTargetItem(item);
@@ -302,7 +302,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 													onMouseEnter={() => {
 														if (!isDimmedByTour) setSelectedIndex(idx);
 													}}
-													className={`relative group flex flex-col items-center gap-3 cursor-pointer transition-opacity ${
+													className={`relative group flex flex-col items-center gap-2 cursor-pointer transition-opacity ${
 														isDimmedByTour ? 'opacity-35 pointer-events-none select-none' : ''
 													}`}
 												>
@@ -312,7 +312,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 														</span>
 													)}
 													<div
-														className={`flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-[22px] bg-(--background) border shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md ${
+														className={`flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl bg-(--background) border shadow-sm transition-all duration-200 ease-out group-hover:scale-105 group-hover:shadow-md ${
 															isTourTarget
 																? 'scale-105 border-(--accent) bg-(--accent)/15 ring-2 ring-(--accent) shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_65%,transparent)] animate-pulse'
 																: isSelected
@@ -321,12 +321,12 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 														}`}
 													>
 														<AppIcon
-															size={28}
+															size={22}
 															className={`${isTourTarget || isSelected ? 'text-(--accent)' : 'text-(--text-muted) group-hover:text-(--accent)'} transition-colors`}
 														/>
 													</div>
 													<span
-														className={`text-xs sm:text-sm font-medium text-center line-clamp-1 w-full px-1 ${
+														className={`text-xs sm:text-sm leading-snug font-medium text-center truncate w-full px-1 ${
 															isTourTarget ? 'font-extrabold text-(--accent)' : isSelected ? 'text-(--accent)' : 'text-(--text)'
 														}`}
 													>

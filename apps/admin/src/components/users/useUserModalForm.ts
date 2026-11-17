@@ -193,7 +193,7 @@ export function useUserModalForm({ open, user, roles, getEnvUrl, onUserDeleted, 
 		devices,
 	};
 
-	const isDirty = useMemo(() => isUserModalDirty(fullUser, draft), [fullUser, JSON.stringify(draft)]);
+	const isDirty = useMemo(() => isUserModalDirty(fullUser, draft), [fullUser, draft]);
 
 	const handleStaffSubscriptionToggle = async (checked: boolean) => {
 		setSubLoading(true);

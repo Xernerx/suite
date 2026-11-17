@@ -66,7 +66,7 @@ export const ACCOUNT_TABS = [
 		labelKey: 'common.nav.items.connections',
 		catKey: 'common.nav.categories.account',
 		icon: Globe,
-		keywords: 'connections oauth link github twitch youtube twitter x spotify steam reddit',
+		keywords: 'connections oauth link github twitch youtube twitter x spotify steam bungie reddit',
 	},
 	{ view: 'devices', labelKey: 'common.nav.items.devices', catKey: 'common.nav.categories.account', icon: Shield, keywords: 'devices sessions security qr code login approve sign in revoke' },
 	{
@@ -184,9 +184,9 @@ export const ACCOUNT_DEEP_FEATURES = [
 	{
 		id: 'delete-virtue-data',
 		view: 'account',
-		label: 'Delete Virtue Data, Reset Profile or Delete Account',
-		subtitle: 'Account Settings • Self-service wipe for Virtue XP/levels, profile reset & permanent account deletion',
-		keywords: 'delete virtue data wipe xp levels reset profile delete account danger zone privacy',
+		label: 'Delete Virtue / YourApps Data, Reset Profile or Delete Account',
+		subtitle: 'Account Settings • Self-service wipe for Virtue XP/levels, YourApps form submissions & drafts, profile reset & permanent account deletion',
+		keywords: 'delete virtue data yourapps data wipe xp levels applications drafts submissions reset profile delete account danger zone privacy',
 		icon: Trash2,
 	},
 	{
@@ -445,7 +445,20 @@ export const ADMIN_TABS = [
 	{ view: 'overview', labelKey: 'admin.dashboard.nav.overview', catKey: 'common.nav.categories.system', icon: Activity, keywords: 'admin overview dashboard stats health' },
 	{ view: 'seo', labelKey: 'admin.dashboard.nav.seo', catKey: 'common.nav.categories.system', icon: BarChart3, keywords: 'admin seo traffic analytics search' },
 	{ view: 'audit', labelKey: 'admin.dashboard.nav.auditLogs', catKey: 'common.nav.categories.system', icon: ScrollText, keywords: 'admin audit logs security history actions' },
-	{ view: 'users', labelKey: 'common.nav.items.users', catKey: 'common.nav.categories.moderator', icon: Users, keywords: 'admin users moderation roles credits subscriptions' },
+	{
+		view: 'users',
+		labelKey: 'common.nav.items.users',
+		catKey: 'common.nav.categories.moderator',
+		icon: Users,
+		keywords: 'admin users moderation roles credits subscriptions bot profiles virtue yourapps',
+	},
+	{
+		view: 'servers',
+		labelKey: 'common.nav.items.servers',
+		catKey: 'common.nav.categories.moderator',
+		icon: HardDrive,
+		keywords: 'admin servers guilds moderation bot profiles virtue yourapps setup',
+	},
 	{ view: 'roles', labelKey: 'common.nav.items.roles', catKey: 'common.nav.categories.system', icon: Shield, keywords: 'admin roles rbac permissions staff' },
 	{ view: 'store', labelKey: 'admin.dashboard.nav.store', catKey: 'common.nav.categories.product', icon: Store, keywords: 'admin store catalog items prices credits perks' },
 	{ view: 'media', labelKey: 'admin.dashboard.nav.mediaLibrary', catKey: 'admin.dashboard.nav.media', icon: ImageIcon, keywords: 'admin media library cdn uploads moderation' },

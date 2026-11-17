@@ -2,6 +2,25 @@
 
 # cdn
 
+## 1.4.13
+
+### Patch Changes
+
+- ## Cross-Subdomain Media Streaming & Preflight Support
+  
+  Improved cross-subdomain media library access and image streaming reliability across Xernerx web apps.
+  
+  ### Changed
+  
+  - **Cross-Origin Media Access**: Enabled seamless credentialed media library requests and preflight handling across all Xernerx subdomains.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.4.12
 
 ### Patch Changes

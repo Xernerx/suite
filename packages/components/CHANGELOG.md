@@ -2,6 +2,32 @@
 
 # @xernerx/components
 
+## 0.19.0
+
+### Minor Changes
+
+- ## Full-Viewport Boot Intro, Inline Omnibar Fix & Shell Polish
+  
+  Added the 4-act full-viewport pre-Terms boot intro, resolved composite Omnibar CSS overrides, and polished onboarding tours, avatars, and collectible nameplates.
+  
+  ### Added
+  
+  - **Full-Viewport Boot Intro (`FirstSignInIntroScene`)**: Added a 4-act full-screen dot-matrix cold-boot sequence (`full`, `infinity`, `plus1000`, and simulated shell wireframe) prior to Terms & Privacy onboarding.
+  - **Omnibar Subdomain Route Catalog (`omnibarRoutes.ts`)**: Added `admin` and `hosting` route suggestions and unclipped `overflow-visible` dropdown rendering.
+  
+  ### Changed
+  
+  - **Header, Sidebar & Tour Polish**: Switched `HeaderOmnibar` path input to `variant="inline"`, gated `HeaderWindowControls` strictly on `window.electron.isXernerxDesktop`, differentiated Dashboard with `Gauge`, feathered Discord collectible nameplates seamlessly, added `onError` avatar/banner fallbacks, and aligned onboarding tour copy to `Ctrl + Space` / `App Drawer`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.18.1
 
 ### Patch Changes

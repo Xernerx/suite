@@ -727,19 +727,21 @@ export function FirstSignInOnboarding() {
 	const isLivePageTour = currentPhase === 'dashboard' || currentPhase === 'portal' || currentPhase === 'explore';
 	const isBottomAnchored = Boolean(navPromptTarget) || isLivePageTour || currentPhase === 'ready' || (currentPhase === 'sidebar' && isMobileViewport);
 
+	const isFullBleedIntro = currentPhase === 'welcome' && isIntroPlaying && !navPromptTarget;
+
 	return (
 		<div
-			className={`w-full h-full flex flex-col items-center justify-between overflow-hidden px-3 py-3 sm:px-8 sm:py-5 transition-all duration-500 ${
+			className={`w-full h-full flex flex-col items-center justify-between overflow-hidden ${isFullBleedIntro ? 'p-0' : 'px-3 py-3 sm:px-8 sm:py-5'} transition-all duration-500 ${
 				Boolean(navPromptTarget) || isLivePageTour || currentPhase === 'ready'
 					? 'pointer-events-none bg-gradient-to-t from-(--background) via-(--background)/65 via-30% to-transparent'
 					: 'pointer-events-auto'
 			}`}
 		>
 			{/* Center Stage Choreography (or Bottom-Anchored Tour Card on Live Page Tours / Ready / Mobile Sidebar) */}
-			<div className={`w-full flex-1 min-h-0 flex flex-col items-center ${isBottomAnchored ? 'justify-end overflow-visible pb-1' : 'overflow-y-auto'}`}>
+			<div className={`w-full flex-1 min-h-0 flex flex-col items-center ${isBottomAnchored ? 'justify-end overflow-visible pb-1' : isFullBleedIntro ? 'overflow-hidden' : 'overflow-y-auto'}`}>
 				<div
-					className={`w-full max-w-(--page-width) mx-auto ${currentPhase === 'welcome' && isIntroPlaying ? 'h-full flex flex-col' : ''} ${
-						isBottomAnchored ? 'mt-auto pt-2' : currentPhase === 'welcome' && isIntroPlaying ? 'flex-1 py-1 sm:py-2' : 'my-auto py-2 sm:py-4'
+					className={`w-full ${isFullBleedIntro ? 'h-full flex flex-col' : 'max-w-(--page-width) mx-auto'} ${
+						isBottomAnchored ? 'mt-auto pt-2' : isFullBleedIntro ? 'flex-1' : 'my-auto py-2 sm:py-4'
 					}`}
 				>
 					<AnimatePresence mode="wait">

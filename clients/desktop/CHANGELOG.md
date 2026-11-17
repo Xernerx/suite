@@ -2,6 +2,18 @@
 
 # @xernerx/desktop
 
+## 2.6.5
+
+### Patch Changes
+
+- ## Verified Desktop Bridge Identification & Runtime Alignment
+  
+  Hardened desktop bridge identification for native window controls and aligned runtime dependencies.
+  
+  ### Changed
+  
+  - **Desktop Window Controls Handshake**: Exposed explicit Xernerx Desktop identification on the preload bridge so native window controls render exclusively inside the official desktop app.
+
 ## 2.6.4
 
 ### Patch Changes

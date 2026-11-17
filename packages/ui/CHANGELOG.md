@@ -2,6 +2,27 @@
 
 # @xernerx/ui
 
+## 0.10.0
+
+### Minor Changes
+
+- ## Inline Input Variant, `Button asChild`, Tabs Wheel Guard & Theme Lightbox
+  
+  Added `Input` `variant="inline"`, `Button` `asChild` / `getButtonClasses`, horizontal `Tabs` wheel pass-through, and theme-aware `Markdown` lightbox controls.
+  
+  ### Added
+  
+  - **`Input` `variant="inline"` & `Button` `asChild`**: Added surface-style-exempt inline inputs for composite bars and `getButtonClasses` / `asChild` support on `Button`.
+  
+  ### Changed
+  
+  - **`Tabs` & `Markdown` Polish**: Added `overflow-y-hidden` + vertical wheel pass-through on `Tabs` and converted `Markdown` image preview lightbox controls to theme-aware CSS variables.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.24.2
+
 ## 0.9.2
 
 ### Patch Changes

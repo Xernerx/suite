@@ -1,7 +1,7 @@
 /** @format */
 
 export type DotLogoVariant =
-	'icon' | 'full' | '404' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos' | 'supernova' | 'tesseract' | 'synthwave' | 'lotus';
+	'icon' | 'full' | '404' | 'plus1000' | 'error' | 'lock' | 'orbit' | 'vortex' | 'helix' | 'prism' | 'infinity' | 'wavegrid' | 'chronos' | 'supernova' | 'tesseract' | 'synthwave' | 'lotus';
 
 export type DotMatrixRenderStyle = 'dots' | 'constellation' | 'hexgrid' | 'aurora' | 'glyphs';
 
@@ -33,6 +33,7 @@ function isDigitFour(u: number, v: number, offsetX: number): boolean {
 
 export function isAnimatedProceduralVariant(variant: DotLogoVariant): boolean {
 	return (
+		variant === 'plus1000' ||
 		variant === 'orbit' ||
 		variant === 'vortex' ||
 		variant === 'helix' ||
@@ -56,6 +57,28 @@ export function sampleProceduralVariant(variant: DotLogoVariant, u: number, v: n
 		const dy = (v - 0.5) / 0.27;
 		const r = Math.hypot(dx, dy);
 		if (r >= 0.62 && r <= 1.0) return 1;
+		return 0;
+	}
+
+	if (variant === 'plus1000') {
+		const wave = 0.84 + 0.16 * Math.sin(u * 9.5 - time * 3.8);
+		// '+' symbol centered at (0.11, 0.5)
+		if (u >= 0.045 && u <= 0.175 && v >= 0.458 && v <= 0.542) return wave;
+		if (u >= 0.092 && u <= 0.128 && v >= 0.33 && v <= 0.67) return wave;
+
+		// '1' digit around u = 0.285
+		if (u >= 0.268 && u <= 0.308 && v >= 0.22 && v <= 0.78) return wave;
+		if (distToSegment(u, v, 0.286, 0.24, 0.226, 0.365) <= 0.024) return wave;
+		if (u >= 0.228 && u <= 0.346 && v >= 0.712 && v <= 0.78) return wave;
+
+		// Three '0' stadium rings at 0.46, 0.65, 0.84
+		const zeroCenters = [0.46, 0.65, 0.84];
+		for (let i = 0; i < zeroCenters.length; i++) {
+			const dx = (u - zeroCenters[i]) / 0.072;
+			const dy = (v - 0.5) / 0.275;
+			const r = Math.hypot(dx, dy);
+			if (r >= 0.58 && r <= 1.0) return wave;
+		}
 		return 0;
 	}
 
@@ -488,8 +511,8 @@ export function computeDotCoverage(params: {
 	const bounds = targetVar === 'full' ? FULL_LOGO_BOUNDS : ICON_LOGO_BOUNDS;
 	const svgSpanX = bounds.maxX - bounds.minX;
 	const svgSpanY = bounds.maxY - bounds.minY;
-	const wideProcedural = targetVar === '404' || targetVar === 'helix' || targetVar === 'infinity' || targetVar === 'wavegrid' || targetVar === 'synthwave';
-	const aspect = isSvg ? svgSpanX / svgSpanY : targetVar === '404' ? 2.4 : wideProcedural ? 2.0 : 1.35;
+	const wideProcedural = targetVar === '404' || targetVar === 'plus1000' || targetVar === 'helix' || targetVar === 'infinity' || targetVar === 'wavegrid' || targetVar === 'synthwave';
+	const aspect = isSvg ? svgSpanX / svgSpanY : targetVar === 'plus1000' ? 2.6 : targetVar === '404' ? 2.4 : wideProcedural ? 2.0 : 1.35;
 
 	let boxW = drawW;
 	let boxH = drawH;

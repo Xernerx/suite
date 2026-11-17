@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { resolveCallerAuth } from '@/lib/auditAndNotify';
-import { ensureSeededBlogPosts, serializeBlogPost } from '@/lib/defaultBlogPosts';
+import { DEFAULT_BLOG_POSTS, ensureSeededBlogPosts, serializeBlogPost } from '@/lib/defaultBlogPosts';
 
 export const dynamic = 'force-dynamic';
 
@@ -66,6 +66,9 @@ export async function GET(req: Request) {
 			tags: Array.from(allTagsSet),
 		});
 	} catch (err: any) {
-		return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
+		console.warn('Falling back to default blog posts on /core/blog error:', err?.message);
+		const fallbackPosts = DEFAULT_BLOG_POSTS.map((d) => serializeBlogPost(d, null, false));
+		const fallbackTags = Array.from(new Set(DEFAULT_BLOG_POSTS.flatMap((d) => d.tags || [])));
+		return NextResponse.json({ posts: fallbackPosts, tags: fallbackTags });
 	}
 }

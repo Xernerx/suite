@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity, ArrowRight, Gauge, RefreshCw } from 'lucide-react';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import { Button } from '@xernerx/ui';
-import { Loading } from '@xernerx/feedback';
+import { AdminSkeleton } from './AdminSkeleton';
 import { FALLBACK_APPS, type SuiteAppVersionInfo } from './OverviewSummaryCards';
 import { HomeOverviewSections } from './overview/HomeOverviewSections';
 import { buildHomeOverviewCards } from './overview/buildHomeOverviewCards';
@@ -330,7 +330,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 		fetchAllData(false);
 	}, [fetchAllData]);
 
-	if (loading) return <Loading />;
+	if (loading) return <AdminSkeleton variant="home" />;
 
 	// Compute Status Overview metrics
 	const onlineAppsCount = apps.filter((a) => pings[a.id] !== null).length;
@@ -411,7 +411,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 					</button>
 				</div>
 
-				<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-9 gap-2.5">
+				<div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
 					{apps.map((app) => {
 						const ping = pings[app.id];
 						const isUp = ping !== null;

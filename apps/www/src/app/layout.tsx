@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description: 'Xernerx Studios builds Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+		description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 		url: 'https://www.xernerx.com',
 		siteName: 'Xernerx Studios',
 		images: [
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
 			default: 'Xernerx Studios — Discord Bots, Suite & Open-Source SDKs',
 			template: 'Xernerx Studios | %s',
 		},
-		description: 'Xernerx Studios builds Discord bots (To-Do List Bot, Virtue, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
+		description: 'Xernerx Studios builds Discord bots (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac), open-source TypeScript SDKs, and the unified Xernerx Suite dashboard.',
 		images: ['/banner.png'],
 	},
 
@@ -96,7 +96,7 @@ const structuredData = {
 			logo: 'https://www.xernerx.com/logo.png',
 			slogan: '1 Account, 1 Place, 1 Setup',
 			description:
-				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (To-Do List Bot, Virtue, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
+				'Xernerx Studios is a development studio focused on consumer and developer simplicity. With 1 Xernerx Account, users configure in-house Discord services (Virtue, YourApps, To-Do List Bot, Metamorphosis, Zodiac) and discover communities in 1 unified dashboard, while bot developers use open-source frameworks (@xernerx/framework, @xernerx/stats) and the public v1 Stats API to track bot statistics, publicly list their bots, and promote them.',
 			sameAs: [
 				'https://github.com/xernerx',
 				'https://www.npmjs.com/org/xernerx',
@@ -110,8 +110,9 @@ const structuredData = {
 				'Discord Bot Statistics Tracking',
 				'Public Discord Bot Directory & Promotion',
 				'Unified Discord Server Dashboard',
-				'To-Do List Bot',
 				'Virtue Discord Bot',
+				'YourApps Discord Bot',
+				'To-Do List Bot',
 				'Metamorphosis Discord Bot',
 				'Zodiac Discord Bot',
 				'Open-Source Discord Bot Frameworks',
@@ -124,7 +125,7 @@ const structuredData = {
 			name: 'Xernerx Studios',
 			publisher: { '@id': 'https://www.xernerx.com/#organization' },
 			description:
-				'Official hub for Xernerx Studios (Version 5): 1 Xernerx Account for the Xernerx Suite, To-Do List Bot, Virtue, Metamorphosis, and Zodiac, plus bot statistics tracking, public bot listings, and developer frameworks.',
+				'Official hub for Xernerx Studios (Version 5): 1 Xernerx Account for the Xernerx Suite, Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac, plus bot statistics tracking, public bot listings, and developer frameworks.',
 		},
 		{
 			'@type': 'SoftwareApplication',
@@ -136,7 +137,7 @@ const structuredData = {
 			url: 'https://app.xernerx.com',
 			author: { '@id': 'https://www.xernerx.com/#organization' },
 			description:
-				'Version 5 of the Xernerx platform: a unified dashboard for configuring To-Do List Bot, Virtue, Metamorphosis, and Zodiac, discovering Discord bots and servers, tracking automated bot telemetry, and managing developer organizations with 1 Xernerx Account.',
+				'Version 5 of the Xernerx platform: a unified dashboard for configuring Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac, discovering Discord bots and servers, tracking automated bot telemetry, and managing developer organizations with 1 Xernerx Account.',
 		},
 		{
 			'@type': 'SoftwareApplication',
@@ -203,7 +204,11 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const [headersList, cookieStore, themeProps] = await Promise.all([headers(), cookies(), getThemeLayoutProps()]);
+	const [headersList, cookieStore, themeProps] = await Promise.all([
+		headers(),
+		cookies(),
+		getThemeLayoutProps().catch(() => ({ className: 'dark', style: { '--accent': '#8b7cf6', '--page-width': '90%' } as React.CSSProperties })),
+	]);
 
 	const host = headersList.get('host') || '';
 	const initialEnv: 'dev' | 'canary' | 'public' =
@@ -216,7 +221,9 @@ export default async function RootLayout({
 	const locale = cookieStore.get('NEXT_LOCALE')?.value || headersList.get('x-locale') || 'en-GB';
 	const hasSessionCookie = Boolean(cookieStore.get('__Secure-next-auth.session-token') || cookieStore.get('next-auth.session-token'));
 
-	const [session, dict] = await Promise.all([hasSessionCookie ? getServerSession(auth) : Promise.resolve(null), dictionary(locale as Locale)]);
+	const sessionPromise = hasSessionCookie ? Promise.race([getServerSession(auth).catch(() => null), new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500))]) : Promise.resolve(null);
+
+	const [session, dict] = await Promise.all([sessionPromise, dictionary(locale as Locale).catch(() => dictionary('en-GB' as Locale))]);
 
 	return (
 		<html lang={locale} suppressHydrationWarning className={themeProps.className} style={themeProps.style}>

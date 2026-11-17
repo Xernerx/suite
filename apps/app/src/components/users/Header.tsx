@@ -9,6 +9,7 @@ import { Button, CopyButton, Tooltip } from '@xernerx/ui';
 import { User, Share2, Settings, Sparkles, Coins, Cpu, Crown, Gem, Flame, Zap, Bot, Bug, Lightbulb, Trophy, Heart, Award, Rocket, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import SafeAvatar from '@/components/SafeAvatar';
 import TipCreditsModal from '@/components/users/TipCreditsModal';
 
 const DOT_MATRIX_CYCLE: DotLogoVariant[] = ['orbit', 'vortex', 'helix', 'prism', 'infinity', 'wavegrid', 'full', 'icon'];
@@ -126,20 +127,18 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 					</Tooltip>
 				</div>
 			)}
-			{avatarUrl ? (
-				<Image
-					src={avatarUrl}
-					alt={displayName}
-					width={128}
-					height={128}
-					className={`rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10 object-cover pointer-events-auto ${customFrame !== 'none' ? `xrx-avatar-frame-${customFrame}` : ''}`}
-					unoptimized
-				/>
-			) : (
-				<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg relative z-10">
-					<User className="w-12 h-12" />
-				</div>
-			)}
+			<SafeAvatar
+				src={avatarUrl}
+				alt={displayName}
+				width={128}
+				height={128}
+				className={`w-32 h-32 rounded-2xl shadow-lg border-2 border-(--border)/20 relative z-10 object-cover pointer-events-auto ${customFrame !== 'none' ? `xrx-avatar-frame-${customFrame}` : ''}`}
+				fallback={
+					<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg relative z-10">
+						<User className="w-12 h-12" />
+					</div>
+				}
+			/>
 
 			<div className="flex-1 relative z-10 pointer-events-none">
 				<div className="flex flex-wrap items-center gap-2.5 mb-2 pointer-events-auto">
@@ -157,12 +156,16 @@ export default function Header({ user, discordUser, bots = [], id, isPrivate = f
 					<CopyButton value={id} label={id} toastTitle={t('app.users.idCopied')} />
 					{discordUser?.clan?.tag && (
 						<span className="bg-(--foreground)/50 text-(--text) text-xs font-extrabold px-2.5 py-1 rounded-lg flex items-center gap-1.5 border border-(--border)/10">
-							{clanBadgeUrl ? <Image src={clanBadgeUrl} alt="" width={13} height={13} unoptimized /> : <Zap size={12} className="text-(--accent-orange)" />}
+							<SafeAvatar src={clanBadgeUrl} alt="" width={13} height={13} fallback={<Zap size={12} className="text-(--accent-orange)" />} />
 							{discordUser.clan.tag}
 						</span>
 					)}
 					{currentStreak > 0 && (
-						<Tooltip content={`${t('app.users.profile.streak')}: ${t('app.users.profile.days', { count: currentStreak })}`}>
+						<Tooltip
+							content={`${t('app.users.profile.streak')}: ${
+								currentStreak === 1 ? t('app.users.profile.daySingular', { count: 1 }) : t('app.users.profile.days', { count: Number(currentStreak).toLocaleString() })
+							}`}
+						>
 							<span className="inline-flex items-center gap-1 text-(--accent-orange) text-xs font-extrabold bg-(--accent-orange)/10 px-2.5 py-1 rounded-lg border border-(--accent-orange)/25">
 								<Flame size={13} className="fill-(--accent-orange)" />
 								{currentStreak}

@@ -6,8 +6,12 @@ import { useEffect } from 'react';
 export function ThemeScript() {
 	useEffect(() => {
 		try {
-			if (typeof (window as any).electron !== 'undefined' || navigator.userAgent.toLowerCase().includes('electron')) {
+			const bridge = (window as any).electron;
+			const isXernerxElectron = Boolean(bridge && (bridge.isXernerxDesktop || typeof bridge.minimize === 'function' || typeof bridge.close === 'function'));
+			if (isXernerxElectron) {
 				document.documentElement.classList.add('is-electron');
+			} else {
+				document.documentElement.classList.remove('is-electron');
 			}
 
 			function getPref(key: string) {

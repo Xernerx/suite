@@ -2,7 +2,7 @@
 
 # Xernerx Suite — Global Agent Guidelines (`AGENTS.md`)
 
-This repository is the **Xernerx Suite** monorepo (`pnpm@11.24.0`, Node `>=20`), housing all core web applications, shared libraries, backend services, native clients, and internal orchestration tooling for **Xernerx Studios**.
+This repository is the **Xernerx Suite** monorepo (`pnpm@12.21.0`, Node `>=24`), housing all core web applications, shared libraries, backend services, native clients, and internal orchestration tooling for **Xernerx Studios**.
 
 ---
 

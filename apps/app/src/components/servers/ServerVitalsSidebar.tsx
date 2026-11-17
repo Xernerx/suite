@@ -2,10 +2,10 @@
 'use client';
 
 import { Building2, ChevronRight, ChevronUp, Code2, ExternalLink, FileText, Globe, LifeBuoy, Link as LinkIcon, MessageSquare, Rocket, Shield, ShieldCheck, Sparkles, Tag, Users } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useDictionary } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
+import SafeAvatar from '@/components/SafeAvatar';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 
 export function ServerVitalsSidebar({ server, organizationData }: { server: any; organizationData: any }) {
 	const { t } = useDictionary();
@@ -155,11 +155,9 @@ export function ServerDiscoveryRow({ similarServers }: { similarServers: any[] }
 					</h3>
 					<p className="text-xs text-(--text-muted)">{t('app.servers.overview.discoverSimilarSubtitle')}</p>
 				</div>
-				<Link href="/servers">
-					<Button variant="outline" className="text-xs">
-						{t('app.servers.overview.exploreAllServers')}
-						<ChevronRight className="w-3.5 h-3.5 ml-1" />
-					</Button>
+				<Link href="/servers" className={getButtonLinkClasses('outline', 'md', 'text-xs')}>
+					{t('app.servers.overview.exploreAllServers')}
+					<ChevronRight className="w-3.5 h-3.5 ml-1" />
 				</Link>
 			</div>
 
@@ -174,13 +172,18 @@ export function ServerDiscoveryRow({ similarServers }: { similarServers: any[] }
 							className="flex flex-col justify-between gap-3 p-4 rounded-2xl bg-(--background)/50 hover:bg-(--background)/80 border border-(--border)/10 hover:border-(--accent)/40 transition-all group"
 						>
 							<div className="flex items-center gap-3">
-								{simIcon ? (
-									<Image src={simIcon} alt={sim.name} width={44} height={44} unoptimized className="w-11 h-11 rounded-2xl object-cover shrink-0 border border-(--border)/15" />
-								) : (
-									<div className="w-11 h-11 rounded-2xl bg-(--foreground) border border-(--border)/15 flex items-center justify-center font-bold text-(--text-muted) shrink-0">
-										{String(sim.name || 'S').charAt(0)}
-									</div>
-								)}
+								<SafeAvatar
+									src={simIcon}
+									alt={sim.name}
+									width={44}
+									height={44}
+									className="w-11 h-11 rounded-2xl object-cover shrink-0 border border-(--border)/15"
+									fallback={
+										<div className="w-11 h-11 rounded-2xl bg-(--foreground) border border-(--border)/15 flex items-center justify-center font-bold text-(--text-muted) shrink-0">
+											{String(sim.name || 'S').charAt(0)}
+										</div>
+									}
+								/>
 								<div className="min-w-0 flex-1">
 									<div className="flex items-center gap-1.5">
 										<span className="font-bold text-sm text-(--text) group-hover:text-(--accent) transition-colors truncate" style={{ fontFamily: 'var(--font-fredoka)' }}>

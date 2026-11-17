@@ -271,17 +271,6 @@ export function UserProfilePreview({
 								<span>{t('admin.users.fields.agreedPrivacy')}</span>
 								<span className="font-mono text-(--text)">{fullUser.agreedPrivacy ? new Date(fullUser.agreedPrivacy).toLocaleDateString() : t('admin.users.fields.notAccepted')}</span>
 							</div>
-							{(isVerified || Boolean(fullUser.agreedTerms || fullUser.agreedPrivacy)) && (
-								<button
-									type="button"
-									onClick={unverify}
-									disabled={unverifying}
-									className="mt-1 flex items-center justify-center gap-1.5 w-full rounded-lg bg-(--accent-orange)/15 hover:bg-(--accent-orange)/25 border border-(--accent-orange)/30 px-2.5 py-1.5 text-[11px] font-bold text-(--accent-orange) transition-colors cursor-pointer disabled:opacity-50"
-								>
-									<RotateCcw size={12} className={unverifying ? 'animate-spin' : ''} />
-									<span>{t('admin.users.actions.unverify')}</span>
-								</button>
-							)}
 						</div>
 					)}
 
@@ -419,7 +408,7 @@ export function UserProfilePreview({
 					</div>
 					<div className="flex flex-col gap-1.5">
 						<label className="text-xs font-medium text-(--text)">{t('admin.users.actions.notifyLinkLabel')}</label>
-						<Input type="text" value={notifLink} onChange={(e) => setNotifLink(e.target.value)} placeholder="https://app.xernerx.com/..." />
+						<Input type="text" value={notifLink} onChange={(e) => setNotifLink(e.target.value)} placeholder={`${getEnvUrl('https://app.xernerx.com')}/...`} />
 					</div>
 					<div className="flex justify-end gap-2 pt-2">
 						<Button type="button" variant="secondary" onClick={() => setNotifyOpen(false)}>

@@ -256,7 +256,7 @@ export function QrApproveView() {
 								value={codeInput}
 								onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
 								placeholder={t('account.signin.approveCodePlaceholder')}
-								className="text-center font-mono tracking-widest uppercase"
+								className="text-center font-mono tracking-widest uppercase placeholder:normal-case placeholder:tracking-normal placeholder:font-sans"
 							/>
 							{errorMsg && (
 								<div className="flex items-center justify-center gap-1.5 text-xs font-medium text-(--accent-red)">

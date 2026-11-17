@@ -11,6 +11,7 @@ import { UserProfilePreview } from './UserProfilePreview';
 import { UserIdentityTab } from './UserIdentityTab';
 import { UserEconomyPerksTab } from './UserEconomyPerksTab';
 import { UserAssetsModerationTab } from './UserAssetsModerationTab';
+import { UserBotServerProfilesTab } from './UserBotServerProfilesTab';
 import { resolveUserDisplayMedia } from './userModalHelpers';
 import { useUserModalForm } from './useUserModalForm';
 
@@ -25,12 +26,12 @@ interface UserModalProps {
 	onUserUpdated: (updated: FullUser) => void;
 	onViewAuditLogs?: (userId: string) => void;
 	onNavigateEntity?: (tab: string, query: string) => void;
-	initialTab?: 'profile' | 'economy' | 'assets';
+	initialTab?: 'profile' | 'economy' | 'assets' | 'bots';
 }
 
 export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl, onUserDeleted, onUserUpdated, onViewAuditLogs, onNavigateEntity, initialTab = 'profile' }: UserModalProps) {
 	const { t } = useDictionary();
-	const [activeTab, setActiveTab] = useState<'profile' | 'economy' | 'assets'>(initialTab);
+	const [activeTab, setActiveTab] = useState<'profile' | 'economy' | 'assets' | 'bots'>(initialTab);
 
 	useEffect(() => {
 		if (open) {
@@ -112,7 +113,7 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 
 							<form onSubmit={handleUpdate} className="col-span-1 md:col-span-2 flex flex-col overflow-visible" style={{ gap: 'calc(var(--ui-gap) * 1.25)' }}>
 								<div className="sticky top-0 z-10 flex flex-wrap items-center gap-1.5 bg-(--background)/95 backdrop-blur-md p-1 rounded-2xl border border-(--border)/10">
-									{(['profile', 'economy', 'assets'] as const).map((tabKey) => (
+									{(['profile', 'economy', 'assets', 'bots'] as const).map((tabKey) => (
 										<button
 											key={tabKey}
 											type="button"
@@ -239,6 +240,21 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 									/>
 								)}
 
+								{activeTab === 'bots' && (
+									<UserBotServerProfilesTab
+										userId={user.id}
+										getEnvUrl={getEnvUrl}
+										onNavigateEntity={
+											onNavigateEntity
+												? (tab, query) => {
+														onOpenChange(false);
+														onNavigateEntity(tab, query);
+													}
+												: undefined
+										}
+									/>
+								)}
+
 								<div className="sticky bottom-0 z-10 flex items-center justify-between pt-3 pb-1 bg-(--background)/95 backdrop-blur-md border-t border-(--border)/10 mt-auto">
 									<button
 										type="button"
@@ -248,9 +264,11 @@ export function UserModal({ open, onOpenChange, user, discord, roles, getEnvUrl,
 										<Trash2 size={14} />
 										{t('admin.users.deleteButton')}
 									</button>
-									<Button type="submit" disabled={saving || !isDirty}>
-										{saving ? t('admin.roles.saving') : t('admin.roles.saveChanges')}
-									</Button>
+									{activeTab !== 'bots' && (
+										<Button type="submit" disabled={saving || !isDirty}>
+											{saving ? t('admin.roles.saving') : t('admin.roles.saveChanges')}
+										</Button>
+									)}
 								</div>
 							</form>
 						</div>

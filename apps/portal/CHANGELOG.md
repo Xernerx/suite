@@ -2,6 +2,26 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.7.4
+
+### Patch Changes
+
+- ## Managed Guild Counter, Active Organization Sync & Avatar Fallbacks
+  
+  Fixed managed Discord guild counting, reactive `?org=` sidebar highlighting, and resilient bot/org media rendering in the Developer Portal.
+  
+  ### Changed
+  
+  - **Managed Discord Guilds & Sidebar State**: Passed session credentials when fetching `/core/users/:id/discord/guilds`, supported `BigInt` permission bitfields + owner checks, and synced active sidebar state reactively with `?org=`.
+  - **Media Fallbacks & Environment Vanity Previews**: Added `PortalSafeAvatar` / `PortalSafeBanner` `onError` fallbacks, theme-aware upload overlays, un-nested action links, and environment-aware vanity URL previews.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.7.3
 
 ### Patch Changes

@@ -5,8 +5,8 @@ import { fireIntroConfetti } from '@xernerx/components';
 import { useDictionary, useTheme } from '@xernerx/providers';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Bot, CheckCircle2, Coins, ShieldCheck, Sparkles } from 'lucide-react';
-import Image from 'next/image';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import SafeAvatar from '@/components/SafeAvatar';
 
 interface BotOnboardingIntroSceneProps {
 	botDisplayName: string;
@@ -25,7 +25,9 @@ export default function BotOnboardingIntroScene({ botDisplayName, avatarUrl, ver
 	const [beat, setBeat] = useState<0 | 1 | 2>(0);
 	const [creditCount, setCreditCount] = useState(0);
 	const onCompleteRef = useRef(onComplete);
-	onCompleteRef.current = onComplete;
+	useEffect(() => {
+		onCompleteRef.current = onComplete;
+	}, [onComplete]);
 	const hasCompletedRef = useRef(false);
 
 	const finishIntro = useCallback(() => {
@@ -155,26 +157,24 @@ export default function BotOnboardingIntroScene({ botDisplayName, avatarUrl, ver
 					className="relative z-10 flex items-center justify-center"
 				>
 					<div className="absolute -inset-4 rounded-full bg-(--accent)/25 blur-2xl animate-pulse pointer-events-none" />
-					{avatarUrl ? (
-						<Image
-							src={avatarUrl}
-							alt={botDisplayName}
-							width={112}
-							height={112}
-							unoptimized
-							className={`${
-								compact ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl' : 'w-24 h-24 sm:w-28 sm:h-28 rounded-3xl'
-							} border-2 border-(--accent) object-cover shadow-[0_0_48px_color-mix(in_srgb,var(--accent)_55%,transparent)] transition-all duration-500`}
-						/>
-					) : (
-						<div
-							className={`${
-								compact ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl' : 'w-24 h-24 sm:w-28 sm:h-28 rounded-3xl'
-							} bg-(--accent)/20 border-2 border-(--accent) flex items-center justify-center text-(--accent) font-extrabold shadow-[0_0_48px_color-mix(in_srgb,var(--accent)_55%,transparent)] transition-all duration-500`}
-						>
-							<Bot size={compact ? 30 : 42} />
-						</div>
-					)}
+					<SafeAvatar
+						src={avatarUrl}
+						alt={botDisplayName}
+						width={112}
+						height={112}
+						className={`${
+							compact ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl' : 'w-24 h-24 sm:w-28 sm:h-28 rounded-3xl'
+						} border-2 border-(--accent) object-cover shadow-[0_0_48px_color-mix(in_srgb,var(--accent)_55%,transparent)] transition-all duration-500`}
+						fallback={
+							<div
+								className={`${
+									compact ? 'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl' : 'w-24 h-24 sm:w-28 sm:h-28 rounded-3xl'
+								} bg-(--accent)/20 border-2 border-(--accent) flex items-center justify-center text-(--accent) font-extrabold shadow-[0_0_48px_color-mix(in_srgb,var(--accent)_55%,transparent)] transition-all duration-500`}
+							>
+								<Bot size={compact ? 30 : 42} />
+							</div>
+						}
+					/>
 
 					{/* +100 Bot Invite Credits Vault Burst Badge */}
 					<AnimatePresence>
@@ -183,12 +183,14 @@ export default function BotOnboardingIntroScene({ botDisplayName, avatarUrl, ver
 								initial={{ scale: 0, opacity: 0, y: 12 }}
 								animate={{ scale: 1, opacity: 1, y: 0 }}
 								transition={{ type: 'spring', stiffness: 280, damping: 16 }}
-								className={`absolute ${
-									compact ? '-bottom-2 -right-3 px-2.5 py-0.5 text-[11px]' : '-bottom-3 -right-4 px-3 py-1 text-xs'
-								} flex items-center gap-1 rounded-full bg-(--accent) font-extrabold text-white shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_70%,transparent)] border border-(--border)/20`}
+								className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap ${
+									compact ? '-bottom-3 px-2.5 py-0.5 text-[10px]' : '-bottom-3.5 px-3 py-1 text-xs'
+								} flex items-center gap-1 rounded-full bg-(--accent) font-extrabold text-(--accent-contrast) shadow-[0_0_24px_color-mix(in_srgb,var(--accent)_70%,transparent)] border border-(--border)/20`}
 							>
 								<Coins size={compact ? 11 : 13} className="shrink-0" />
-								<span>+{creditCount.toLocaleString()}</span>
+								<span>
+									+{creditCount.toLocaleString()} {t('app.leaderboard.metrics.credits')}
+								</span>
 							</motion.div>
 						)}
 					</AnimatePresence>

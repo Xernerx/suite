@@ -40,7 +40,7 @@ export function IssuesHeaderFilters({
 
 			<div className="flex flex-col gap-1.5 w-full lg:w-auto">
 				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto">
-					<div className="w-full sm:w-80 xl:w-96">
+					<div className="w-full sm:w-96 xl:w-[26rem]">
 						<Input variant="search" shortcut={true} placeholder={t('info.bugs.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} />
 					</div>
 					<MultiSelector

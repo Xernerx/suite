@@ -2,6 +2,25 @@
 
 # Changelog
 
+## 1.3.16
+
+### Patch Changes
+
+- ## Hosting Console Shimmer Skeletons
+  
+  Added loading skeletons during initial cluster and Vercel deployment hydration in the staff Hosting console.
+  
+  ### Added
+  
+  - **Hosting Skeleton (`HostingSkeleton`)**: Replaced blank loading states with glassmorphic shimmer skeletons across the Hosting console and Vercel panel.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.3.15
 
 ### Patch Changes

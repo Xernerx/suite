@@ -2,6 +2,23 @@
 
 # @xernerx/lib
 
+## 1.28.0
+
+### Minor Changes
+
+- ## HMR Mongo Connection Health, `BungieTricornIcon` & Localization Sync
+  
+  Hardened Mongoose child `useDb()` connection pooling across HMR reloads, exported `BungieTricornIcon`, differentiated the `Gauge` Dashboard icon, and updated `en-GB` dictionaries.
+  
+  ### Added
+  
+  - **`BungieTricornIcon` Export**: Exported the reusable `BungieTricornIcon` SVG component from `@xernerx/lib`.
+  
+  ### Changed
+  
+  - **Mongoose HMR Connection Stability (`database.ts`)**: Preserved healthy `useDb()` child connections and deduplicated in-flight connection promises during Next.js HMR reloads.
+  - **Navigation & Localization**: Updated Dashboard navigation metadata to `Gauge` and synced `en-GB.json` + regenerated `i18n.config.ts`.
+
 ## 1.27.1
 
 ### Patch Changes

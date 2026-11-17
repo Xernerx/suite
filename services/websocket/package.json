@@ -1,6 +1,6 @@
 {
 	"name": "websocket",
-	"version": "1.8.1",
+	"version": "1.8.2",
 	"description": "Xernerx Websocket",
 	"main": "dist/main.js",
 	"type": "module",
@@ -12,17 +12,17 @@
 	},
 	"author": "Xernerx Studios",
 	"license": "SEE LICENSE IN LICENSE",
-	"packageManager": "pnpm@10.32.0",
+	"packageManager": "pnpm@12.21.0",
+	"engines": {
+		"node": ">=24"
+	},
 	"dependencies": {
 		"@xernerx/lib": "workspace:*",
 		"@xernerx/terminal": "^1.2.0",
-		"jose": "^6.2.15",
-		"mongoose": "^9.11.4",
-		"next": "^16.4.5",
-		"ws": "^8.22.1"
-	},
-	"engines": {
-		"node": ">=20"
+		"jose": "^6.2.17",
+		"mongoose": "^9.12.2",
+		"next": "^16.4.6",
+		"ws": "^8.23.0"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.6",

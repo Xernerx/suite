@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
+import { isDiscordManagedMediaValue } from '@/lib/botDiscordSync';
 
 const discordUserCache = new Map<string, { payload: any; expiresAt: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -61,9 +62,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 					headers: {
 						Authorization: `Bot ${token}`,
 					},
+					signal: AbortSignal.timeout(2500),
 					next: { revalidate: 3600 },
-				});
-				if (res.ok) break;
+				}).catch(() => null);
+				if (res?.ok) break;
 			}
 		}
 
@@ -145,7 +147,16 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 					updatedAt: new Date(),
 				};
 				if (data.bot) {
-					await (models.bots.Bot as any).updateOne({ id: resolvedId }, { $set: { discordCache: cacheDoc } }).catch(() => {});
+					const existingBot = await (models.bots.Bot as any)
+						.findOne({ id: resolvedId })
+						.select('avatar')
+						.lean()
+						.catch(() => null);
+					const updateFields: Record<string, any> = { discordCache: cacheDoc };
+					if (existingBot && isDiscordManagedMediaValue(existingBot.avatar)) {
+						updateFields.avatar = data.avatar || '';
+					}
+					await (models.bots.Bot as any).updateOne({ id: resolvedId }, { $set: updateFields }).catch(() => {});
 				} else {
 					await (models.users.User as any).updateOne({ id: resolvedId }, { $set: { discordCache: cacheDoc } }).catch(() => {});
 				}

@@ -66,18 +66,18 @@ const SINGLE_AMBIENT_MAP: Record<string, Exclude<AmbientSceneType, 'default'>> =
 	ambient_prism_caustics: 'prism_caustics',
 };
 
-const DESKTOP_CREST_PACKS: Record<string, Array<{ id: string; label: string; src: string }>> = {
+const DESKTOP_CREST_PACKS: Record<string, Array<{ id: string; src: string }>> = {
 	icon_pack_monochrome: [
-		{ id: 'white', label: 'Monochrome White', src: '/icons/app/white.png' },
-		{ id: 'black', label: 'Obsidian Black', src: '/icons/app/black.png' },
+		{ id: 'white', src: '/icon-white.png' },
+		{ id: 'black', src: '/icon-black.png' },
 	],
 	icon_pack_neon: [
-		{ id: 'cyan', label: 'Arctic Cyan', src: '/icons/app/cyan.png' },
-		{ id: 'pink', label: 'Vibrant Pink', src: '/icons/app/pink.png' },
+		{ id: 'cyan', src: '/icon-cyan.png' },
+		{ id: 'pink', src: '/icon-pink.png' },
 	],
 	icon_pack_royal: [
-		{ id: 'gold', label: 'Amber Gold', src: '/icons/app/gold.png' },
-		{ id: 'red', label: 'Crimson Red', src: '/icons/app/red.png' },
+		{ id: 'gold', src: '/icon-gold.png' },
+		{ id: 'red', src: '/icon-red.png' },
 	],
 };
 
@@ -314,12 +314,23 @@ export function DotMatrixPerkPreview({ initialVariant = 'orbit', perkValue = 'do
 		const crests = DESKTOP_CREST_PACKS[perkValue];
 		return (
 			<div className="grid grid-cols-2 gap-2.5 rounded-2xl border border-(--accent)/30 bg-(--background)/65 p-3">
-				{crests.map((crest) => (
-					<div key={crest.id} className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-(--foreground)/45 border border-(--border)/10 p-2.5">
-						<img src={crest.src} alt={crest.label} className="h-11 w-11 rounded-xl object-contain drop-shadow-md" />
-						<span className="text-[11px] font-bold text-(--text) text-center">{crest.label}</span>
-					</div>
-				))}
+				{crests.map((crest) => {
+					const label = t(`account.preferences.desktopItems.appIcon.options.${crest.id}`);
+					return (
+						<div key={crest.id} className="flex flex-col items-center justify-center gap-1.5 rounded-xl bg-(--foreground)/45 border border-(--border)/10 p-2.5">
+							<img
+								src={crest.src}
+								alt={label}
+								onError={(e) => {
+									e.currentTarget.onerror = null;
+									e.currentTarget.src = '/icon.png';
+								}}
+								className="h-11 w-11 rounded-xl object-contain drop-shadow-md"
+							/>
+							<span className="text-[11px] font-bold text-(--text) text-center">{label}</span>
+						</div>
+					);
+				})}
 			</div>
 		);
 	}

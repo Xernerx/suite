@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { useDictionary } from '@xernerx/providers';
-import { Badge, Button, Check } from '@xernerx/ui';
+import { Badge, Button, Check, getButtonClasses } from '@xernerx/ui';
 import { Check as CheckIcon, Copy, ExternalLink, Eye, FileText, Film, Folder, Settings, Trash, Users } from 'lucide-react';
 
 interface MediaGridCardProps {
@@ -78,10 +78,15 @@ export function MediaGridCard({ item, rawUrl, viewUrl, isSelected, copiedId, onT
 					<Button variant="secondary" size="icon" title={t('account.media.copyUrl')} onClick={() => onCopyUrl(item._id)}>
 						{copiedId === item._id ? <CheckIcon size={16} className="text-(--accent-green)" /> : <Copy size={16} />}
 					</Button>
-					<a href={viewUrl} target="_blank" rel="noopener noreferrer">
-						<Button variant="secondary" size="icon">
-							<ExternalLink size={16} />
-						</Button>
+					<a
+						href={viewUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label={item.filename || t('common.sidebarnotifications.button5')}
+						title={item.filename || t('common.sidebarnotifications.button5')}
+						className={getButtonClasses({ variant: 'secondary', size: 'icon' })}
+					>
+						<ExternalLink size={16} />
 					</a>
 					<Button variant="primary" size="icon" onClick={() => onEdit({ ...item, shared: Array.isArray(item.shared) ? item.shared : [] })}>
 						<Settings size={16} />

@@ -14,6 +14,11 @@ const setLocaleCookie = (code: string) => {
 	document.cookie = `NEXT_LOCALE=${code}; domain=.${domain}; path=/; max-age=31536000; SameSite=Lax; Secure`;
 };
 
+const getEffectiveCoverage = (localeCode?: string, rawCoverage?: number) => {
+	if (localeCode === 'en-GB' || localeCode === 'en-US') return 100;
+	return rawCoverage ?? 0;
+};
+
 const getFlagCode = (localeCode: string) => {
 	switch (localeCode) {
 		case 'en-GB':
@@ -109,8 +114,16 @@ export default function Language() {
 	}, [user?.id, getEnvUrl]);
 
 	// Default to the user's saved preference first, then fallback to the cookie/context locale
-	const activeLocale = user?.preferences?.locale || currentLocale;
+	const activeLocale = user?.preferences?.locale || currentLocale || 'en-GB';
+	const activeLanguage = locales.find((l: { code: string; label: string; coverage: number }) => l.code === activeLocale) || currentLanguage;
+	const activeCoverage = getEffectiveCoverage(activeLocale, activeLanguage?.coverage);
 	const activeVirtueLocale = virtueLocale || activeLocale;
+
+	useEffect(() => {
+		if (user?.preferences?.locale && user.preferences.locale !== currentLocale) {
+			setLocaleCookie(user.preferences.locale);
+		}
+	}, [user?.preferences?.locale, currentLocale]);
 
 	// Fetch full role objects to check permissions
 	useEffect(() => {
@@ -161,7 +174,7 @@ export default function Language() {
 				credentials: 'include',
 				body: JSON.stringify({
 					configId: translatorAppConfig,
-					answers: { locale: currentLocale },
+					answers: { locale: activeLocale },
 				}),
 			});
 
@@ -276,6 +289,7 @@ export default function Language() {
 	const languageOptions = [
 		...locales.map((lang: { code: string; label: string; coverage: number }) => {
 			const countryCode = getFlagCode(lang.code);
+			const coverage = getEffectiveCoverage(lang.code, lang.coverage);
 
 			return {
 				value: lang.code,
@@ -287,16 +301,18 @@ export default function Language() {
 				),
 				badge: (
 					<span
-						className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${lang.coverage === 100 ? 'bg-(--accent-green)/10 text-(--accent-green)' : 'bg-(--accent-orange)/10 text-(--accent-orange)'}`}
+						className={`text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${coverage === 100 ? 'bg-(--accent-green)/10 text-(--accent-green)' : 'bg-(--accent-orange)/10 text-(--accent-orange)'}`}
 					>
-						{lang.coverage}%
+						{coverage}%
 					</span>
 				),
 			};
 		}),
 	];
 
-	const coverageDescription = t('account.language.coverage.description', { coverage: currentLanguage?.coverage ?? 0 });
+	const coverageDescription = t('account.language.coverage.description', { coverage: activeCoverage });
+	const pendingRaw = t('account.language.coverage.applicationPending');
+	const pendingButtonLabel = pendingRaw === 'account.language.coverage.applicationPending' ? 'Application Pending' : pendingRaw;
 
 	// Discord read-only locale indicator (uncoupled from the app's internal locale)
 	const discordLocale = user?.locale || 'en-US';
@@ -317,7 +333,7 @@ export default function Language() {
 				variant="primary"
 				onOpenChange={setShowConfirm}
 				title={t('account.language.coverage.confirmTitle')}
-				description={t('account.language.coverage.confirmPrompt', { language: currentLanguage?.label || currentLocale })}
+				description={t('account.language.coverage.confirmPrompt', { language: activeLanguage?.label || activeLocale })}
 				confirmText={t('common.buttons.proceed')}
 				cancelText={t('common.buttons.cancel')}
 				onConfirm={handleConfirmRequest}
@@ -349,7 +365,7 @@ export default function Language() {
 					</div>
 
 					{/* Bottom Section: Translation Invite Banner */}
-					{currentLanguage?.coverage < 100 && (
+					{activeLocale !== 'en-GB' && activeCoverage < 100 && (
 						<div
 							className="flex flex-col sm:flex-row sm:items-center justify-between bg-(--accent-orange)/5 border-t border-(--accent-orange)/10 transition-all rounded-b-[calc(1.5rem-1px)]"
 							style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
@@ -376,7 +392,7 @@ export default function Language() {
 								style={{ padding: 'calc(var(--ui-gap) * 0.5) var(--ui-gap)' }}
 							>
 								{(isRequesting || isCheckingRoles || isCheckingApplication) && !hasTranslationPermission && <Loader2 size={14} className="animate-spin" />}
-								{hasTranslationPermission ? t('account.language.coverage.adminButton') : hasPendingApplication ? 'Application Pending' : t('account.language.coverage.button')}
+								{hasTranslationPermission ? t('account.language.coverage.adminButton') : hasPendingApplication ? pendingButtonLabel : t('account.language.coverage.button')}
 							</button>
 						</div>
 					)}

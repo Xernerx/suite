@@ -4,12 +4,12 @@
 import { useEffect, useState, use } from 'react';
 import { useDictionary, useEnvironment, useSidebar, useSession } from '@xernerx/providers';
 import { Loading } from '@xernerx/feedback';
-import { Button } from '@xernerx/ui';
-import { User, ArrowLeft, Settings, Bot, Server, LayoutDashboard, Building2, Compass } from 'lucide-react';
-import Image from 'next/image';
+import { User, ArrowLeft, Settings, Bot, Server, Gauge, Building2, Compass } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import SafeAvatar from '@/components/SafeAvatar';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import Header from '@/components/users/Header';
 import Profile from '@/components/users/Profile';
 
@@ -42,7 +42,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 
 		const items: any[] = [
 			{ label: t('app.dashboard.nav.explore'), href: '/', icon: Compass, category: t('app.portal.categories.navigation') },
-			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, category: t('app.portal.categories.navigation') },
+			{ label: t('app.portal.nav.dashboard'), href: '/dashboard', icon: Gauge, category: t('app.portal.categories.navigation') },
 			{ label: t('app.users.nav.goBack'), onClick: () => router.back(), icon: ArrowLeft, category: t('app.portal.categories.navigation') },
 			{ label: t('app.users.nav.profile'), view: 'profile', icon: User, category: t('app.users.nav.userDetails') },
 		];
@@ -55,13 +55,13 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					icon:
 						b.discord?.avatarUrl || b.discord?.avatar
 							? () => (
-									<Image
+									<SafeAvatar
 										src={b.discord.avatarUrl || `https://cdn.discordapp.com/avatars/${b.id}/${b.discord.avatar}.png?size=64`}
-										alt={b.name}
+										alt={b.name || b.id}
 										width={20}
 										height={20}
-										unoptimized
 										className="w-5 h-5 rounded-full object-cover"
+										fallback={<Bot size={14} />}
 									/>
 								)
 							: Bot,
@@ -75,7 +75,9 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				...organizations.map((o) => ({
 					label: o.name,
 					href: `/organization/${o.vanitySlug || o._id}`,
-					icon: o.iconUrl ? () => <Image src={getEnvUrl(o.iconUrl)} alt={o.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" /> : Building2,
+					icon: o.iconUrl
+						? () => <SafeAvatar src={getEnvUrl(o.iconUrl)} alt={o.name} width={20} height={20} className="w-5 h-5 rounded-full object-cover" fallback={<Building2 size={14} />} />
+						: Building2,
 					category: t('app.users.nav.organizations'),
 				}))
 			);
@@ -87,16 +89,16 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					label: s.name,
 					href: `/servers/${s.vanitySlug || s.id}`,
 					icon: s.iconUrl
-						? () => <Image src={s.iconUrl} alt={s.name} width={20} height={20} unoptimized className="w-5 h-5 rounded-full object-cover" />
+						? () => <SafeAvatar src={s.iconUrl} alt={s.name} width={20} height={20} className="w-5 h-5 rounded-full object-cover" fallback={<Server size={14} />} />
 						: s.icon
 							? () => (
-									<Image
+									<SafeAvatar
 										src={`https://cdn.discordapp.com/icons/${s.id}/${s.icon}.png?size=64`}
 										alt={s.name}
 										width={20}
 										height={20}
-										unoptimized
 										className="w-5 h-5 rounded-full object-cover"
+										fallback={<Server size={14} />}
 									/>
 								)
 							: Server,
@@ -133,11 +135,10 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				const [userRes, discordRes, botsRes, orgsRes] = await Promise.all([
 					fetch(getEnvUrl(`https://api.xernerx.com/secure/users/${id}`)),
 					fetch(getEnvUrl(`https://api.xernerx.com/core/users/${id}/discord`)),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${id}`)),
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?user=${id}`)),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/bots?owner=${encodeURIComponent(id)}&publicOnly=true`)),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?user=${encodeURIComponent(id)}`)),
 				]);
 
-				const uid = (session as any)?.user?.id;
 				let userData: any = null;
 				let discordData: any = null;
 
@@ -157,11 +158,9 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				setUser(userData || { id: resolvedUserId });
 				setDiscordUser(discordData);
 
-				const isSelf = Boolean(uid && (uid === id || uid === resolvedUserId));
-
 				if (botsRes.ok) {
 					const fetchedBots = await botsRes.json();
-					const publicBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy === 'public' || isSelf) : [];
+					const publicBots = Array.isArray(fetchedBots) ? fetchedBots.filter((b: any) => b.privacy === 'public') : [];
 
 					const botsWithDiscord = await Promise.all(
 						publicBots.map(async (b: any) => {
@@ -183,7 +182,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				let publicOrgs: any[] = [];
 				if (orgsRes.ok) {
 					const fetchedOrgs = await orgsRes.json();
-					publicOrgs = Array.isArray(fetchedOrgs) ? fetchedOrgs.filter((o: any) => (o.privacy || o.config?.privacy) === 'public' || isSelf) : [];
+					publicOrgs = Array.isArray(fetchedOrgs) ? fetchedOrgs.filter((o: any) => (o.privacy || o.config?.privacy) === 'public') : [];
 					setOrganizations(publicOrgs);
 				}
 
@@ -197,7 +196,7 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 				const guildsRes = await fetch(getEnvUrl(guildsQueryUrl));
 				if (guildsRes.ok) {
 					const fetchedGuilds = await guildsRes.json();
-					const publicGuilds = Array.isArray(fetchedGuilds) ? fetchedGuilds.filter((g: any) => g.privacy === 'public' || isSelf) : [];
+					const publicGuilds = Array.isArray(fetchedGuilds) ? fetchedGuilds.filter((g: any) => g.privacy === 'public') : [];
 					setServers(publicGuilds);
 				}
 			} catch (error) {
@@ -226,8 +225,8 @@ export default function UserProfilePage({ params }: { params: Promise<{ id: stri
 					{t('app.users.notFoundTitle')}
 				</h1>
 				<p className="text-(--text-muted) mb-8">{t('app.users.notFoundDesc')}</p>
-				<Link href="/">
-					<Button variant="primary">{t('app.users.returnHome')}</Button>
+				<Link href="/" className={getButtonLinkClasses('primary')}>
+					{t('app.users.returnHome')}
 				</Link>
 			</div>
 		);

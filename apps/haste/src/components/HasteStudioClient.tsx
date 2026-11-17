@@ -1,11 +1,10 @@
 /** @format */
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Clock, Code2, FileCode2, FolderGit2, Globe, Link2, Lock, Plus, Save, Trash2, Upload } from 'lucide-react';
-import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useShortcuts, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Button, Input, Selector } from '@xernerx/ui';
 import { detectHasteLanguageFromFilename, formatBytes, HASTE_LANGUAGES } from './hasteConstants';
@@ -23,6 +22,7 @@ export function HasteStudioClient() {
 	const { show, setNavItems, clearNavItems, view, setView } = useSidebar();
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const effectiveUserId = user?.userId || (session?.user as any)?.id || '';
 	const activeTab: HasteTab = view === 'mine' ? 'mine' : 'editor';
@@ -237,7 +237,17 @@ export function HasteStudioClient() {
 	const lineCount = useMemo(() => (content ? content.split(/\r?\n/).length : 1), [content]);
 
 	if (status === 'loading' || status === 'unauthenticated') {
-		return <Loading />;
+		return (
+			<div className="flex flex-col w-full max-w-(--page-width) mx-auto" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div className="h-[580px] rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 animate-pulse p-6 flex flex-col justify-between">
+					<div className="flex items-center justify-between">
+						<div className="h-10 w-64 rounded-2xl bg-(--background)/60" />
+						<div className="h-10 w-40 rounded-2xl bg-(--background)/50" />
+					</div>
+					<div className="h-96 w-full rounded-2xl bg-(--background)/50 border border-(--border)/10" />
+				</div>
+			</div>
+		);
 	}
 
 	return (
@@ -279,6 +289,7 @@ export function HasteStudioClient() {
 
 						<div className="flex items-center flex-wrap gap-2 self-end sm:self-auto shrink-0">
 							<input
+								ref={fileInputRef}
 								type="file"
 								id="haste-file-import"
 								className="hidden"
@@ -288,14 +299,13 @@ export function HasteStudioClient() {
 									e.target.value = '';
 								}}
 							/>
-							<label htmlFor="haste-file-import" className="cursor-pointer">
-								<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" style={{ pointerEvents: 'none' }}>
-									<Upload className="w-4 h-4 mr-1.5" />
-									{t('haste.actions.importFile')}
-								</Button>
-							</label>
+							<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={() => fileInputRef.current?.click()}>
+								<Upload className="w-4 h-4 mr-1.5" />
+								{t('haste.actions.importFile')}
+							</Button>
 							{content.length > 0 && (
 								<Button
+									type="button"
 									variant="secondary"
 									size="sm"
 									className="rounded-2xl px-3.5 py-2"
@@ -309,6 +319,7 @@ export function HasteStudioClient() {
 								</Button>
 							)}
 							<Button
+								type="button"
 								variant="primary"
 								size="sm"
 								className="rounded-2xl px-5 py-2.5 shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
@@ -376,7 +387,14 @@ export function HasteStudioClient() {
 
 						<div className="flex items-center justify-between flex-wrap gap-2 text-xs text-(--text-muted) font-mono pt-1">
 							<div className="flex items-center gap-2">
-								<span className="px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-(--text)">{t('haste.editor.linesCount', { count: lineCount })}</span>
+								<span className="px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10 text-(--text)">
+									{lineCount === 1
+										? (() => {
+												const singular = t('haste.editor.lineCount', { count: 1 });
+												return singular === 'haste.editor.lineCount' ? '1 line' : singular;
+											})()
+										: t('haste.editor.linesCount', { count: lineCount })}
+								</span>
 								<span className="px-2.5 py-1 rounded-full bg-(--background)/60 border border-(--border)/10">{formatBytes(byteSize)} / 512 KB</span>
 							</div>
 							<span className="text-[11px] text-(--text-muted)">Ctrl + S</span>

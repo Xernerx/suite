@@ -7,6 +7,7 @@ import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import type { DiscordChannelItem, DiscordRoleItem, YourAppsPosition, YourAppsQuestion } from '@/components/dashboard/applications/types';
 
 interface FormPortalResponse {
@@ -116,11 +117,9 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 					{t('app.servers.applications.notFoundTitle')}
 				</h1>
 				<p className="text-sm text-(--text-muted) max-w-md">{t('app.servers.applications.notFoundDesc')}</p>
-				<Link href={`/servers/${guildId}/applications`}>
-					<Button variant="secondary">
-						<ArrowLeft className="w-4 h-4" />
-						<span>{t('app.servers.applications.backToPositions')}</span>
-					</Button>
+				<Link href={`/servers/${guildId}/applications`} className={getButtonLinkClasses('secondary')}>
+					<ArrowLeft className="w-4 h-4" />
+					<span>{t('app.servers.applications.backToPositions')}</span>
 				</Link>
 			</div>
 		);
@@ -147,8 +146,8 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 						{t('app.servers.applications.submittedTitle')}
 					</h1>
 					<p className="text-sm text-(--text-muted) max-w-md">{t('app.servers.applications.submittedDesc', { position: pos.name, id: submittedId })}</p>
-					<Link href={`/servers/${guildId}/applications`}>
-						<Button variant="primary">{t('app.servers.applications.viewMySubmissionsBtn')}</Button>
+					<Link href={`/servers/${guildId}/applications`} className={getButtonLinkClasses('primary')}>
+						{t('app.servers.applications.viewMySubmissionsBtn')}
 					</Link>
 				</div>
 			</div>
@@ -276,11 +275,9 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 	return (
 		<div className="max-w-(--page-width) mx-auto w-full py-8 px-4 flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 			<div className="flex items-center justify-between gap-3">
-				<Link href={`/servers/${guildId}/applications`}>
-					<Button variant="ghost" size="sm">
-						<ArrowLeft className="w-4 h-4" />
-						<span>{t('app.servers.applications.backToPositions')}</span>
-					</Button>
+				<Link href={`/servers/${guildId}/applications`} className={getButtonLinkClasses('ghost', 'sm')}>
+					<ArrowLeft className="w-4 h-4" />
+					<span>{t('app.servers.applications.backToPositions')}</span>
 				</Link>
 			</div>
 
@@ -347,8 +344,8 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 				))}
 
 				<div className="flex items-center justify-end gap-3 pt-2 border-t border-(--border)/10">
-					<Link href={`/servers/${guildId}/applications`}>
-						<Button variant="secondary">{t('app.dashboard.applications.positions.modal.cancelBtn')}</Button>
+					<Link href={`/servers/${guildId}/applications`} className={getButtonLinkClasses('secondary')}>
+						{t('app.dashboard.applications.positions.modal.cancelBtn')}
 					</Link>
 					<Button variant="primary" loading={submitting} disabled={!data.authenticated || !data.eligible} onClick={handleSubmit}>
 						<Send className="w-4 h-4" />

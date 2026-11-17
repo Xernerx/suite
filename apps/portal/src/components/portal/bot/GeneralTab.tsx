@@ -99,7 +99,9 @@ export default function GeneralTab({ botConfig, setBotConfig, onVanityUnlocked, 
 					</div>
 					<div className="flex flex-wrap items-center gap-2 text-xs text-(--text-muted)">
 						<span>{t('app.portal.bot.vanity.description')}</span>
-						<span className="font-mono text-(--accent)">app.xernerx.com/bots/{botConfig.vanitySlug || botConfig.id}</span>
+						<span className="font-mono text-(--accent)">
+							{getEnvUrl('https://app.xernerx.com').replace(/^https?:\/\//, '')}/bots/{botConfig.vanitySlug || botConfig.id}
+						</span>
 						<button
 							type="button"
 							onClick={handleCopyVanityUrl}

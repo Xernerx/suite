@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import { Suspense, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
 import { Button, Input, Selector } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
@@ -22,26 +22,49 @@ function BotsListContent() {
 	const [loading, setLoading] = useState(true);
 	const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
 	const [sortBy, setSortBy] = useState<string>('');
-	const [prevView, setPrevView] = useState<string | null>(view);
 
-	// Sync ?category= query param into active sidebar view
-	useEffect(() => {
-		const categoryParam = searchParams.get('category');
-		if (categoryParam) {
-			setView(categoryParam);
-		}
-	}, [searchParams, setView]);
+	const urlCategoryParam = searchParams.get('category') || searchParams.get('view');
+	const effectiveView = urlCategoryParam || view || 'all';
+	const activeTag = effectiveView.startsWith('tag-') ? effectiveView.replace('tag-', '') : null;
+	const activeSearchLabel = searchInput.trim() || searchParams.get('search');
 
-	// Clear ?search= query when user clicks a sidebar category
+	const handleSelectCategory = useCallback(
+		(catId: string) => {
+			setView(catId);
+			setSearchInput('');
+			router.replace(`/bots?category=${encodeURIComponent(catId)}`, { scroll: false });
+		},
+		[router, setView]
+	);
+
+	const handleSelectTag = useCallback(
+		(tag: string) => {
+			const nextCat = activeTag === tag ? 'all' : `tag-${tag}`;
+			setView(nextCat);
+			setSearchInput('');
+			router.replace(`/bots?category=${encodeURIComponent(nextCat)}`, { scroll: false });
+		},
+		[activeTag, router, setView]
+	);
+
+	// Keep sidebar active view synced with ?category= query param
 	useEffect(() => {
-		if (view && view !== prevView) {
-			setPrevView(view);
-			if (searchParams.get('search')) {
-				setSearchInput('');
-				router.replace('/bots', { scroll: false });
-			}
+		if (urlCategoryParam && view !== urlCategoryParam) {
+			setView(urlCategoryParam);
 		}
-	}, [view, prevView, searchParams, router]);
+	}, [urlCategoryParam, view, setView]);
+
+	// Canonical algorithm categories shared in identical order between Left Sidebar & Horizontal Pills
+	const categoryPills = useMemo(
+		() => [
+			{ id: 'all', label: t('app.bots.nav.allBots'), icon: Server },
+			{ id: 'top_voted', label: t('app.categories.topVoted'), icon: ChevronUp },
+			{ id: 'biggest', label: t('app.categories.biggestBots'), icon: Trophy },
+			{ id: 'promoted', label: t('app.categories.promoted'), icon: Flame },
+			{ id: 'newcomers', label: t('app.categories.newcomers'), icon: Sparkles },
+		],
+		[t]
+	);
 
 	// Setup Sidebar Navigation & Tag Catalog
 	useEffect(() => {
@@ -50,40 +73,54 @@ function BotsListContent() {
 		const baseNavItems = [
 			{ label: t('app.bots.nav.backToExplore'), href: '/', icon: ArrowLeft, category: t('app.bots.nav.categoryNavigation') },
 			{ label: t('app.leaderboard.title'), href: '/leaderboard', icon: Trophy, category: t('app.bots.nav.categoryNavigation') },
-			{ label: t('app.bots.nav.allBots'), view: 'all', icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.topVoted'), view: 'top_voted', icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.biggestBots'), view: 'biggest', icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.promoted'), view: 'promoted', icon: Flame, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.newcomers'), view: 'newcomers', icon: Sparkles, category: t('app.bots.nav.categoryAlgorithms') },
+			...categoryPills.map((pill) => ({
+				label: pill.label,
+				view: pill.id,
+				onClick: () => handleSelectCategory(pill.id),
+				icon: pill.icon,
+				category: t('app.bots.nav.categoryAlgorithms'),
+			})),
 		];
 
-		setNavItems(baseNavItems);
+		const buildTagNavItems = (tags: string[]) =>
+			tags.map((tag) => ({
+				label: tag,
+				view: `tag-${tag}`,
+				onClick: () => {
+					setView(`tag-${tag}`);
+					setSearchInput('');
+					router.replace(`/bots?category=${encodeURIComponent(`tag-${tag}`)}`, { scroll: false });
+				},
+				icon: Hash,
+				category: t('app.bots.nav.categoryCategories'),
+			}));
 
-		const fetchTags = async () => {
-			if (!isReady) return;
-			try {
-				const res = await fetch(getEnvUrl('https://api.xernerx.com/secure/bots/tags'), { next: { revalidate: 300 } });
-				if (res.ok) {
-					const tags: string[] = await res.json();
-					setAvailableTags(Array.isArray(tags) ? tags : []);
-					const tagNavItems = (Array.isArray(tags) ? tags : []).map((tag) => ({
-						label: tag,
-						view: `tag-${tag}`,
-						icon: Hash,
-						category: t('app.bots.nav.categoryCategories'),
-					}));
-					setNavItems([...baseNavItems, ...tagNavItems]);
-				}
-			} catch (error) {
-				console.error('Failed to fetch tags for sidebar:', error);
-			}
-		};
-		fetchTags();
+		if (availableTags.length > 0) {
+			setNavItems([...baseNavItems, ...buildTagNavItems(availableTags)]);
+		} else {
+			setNavItems(baseNavItems);
+		}
 
 		return () => hide();
-	}, [setNavItems, show, hide, getEnvUrl, isReady, t]);
+	}, [setNavItems, show, hide, t, categoryPills, availableTags, handleSelectCategory, router, setView]);
 
-	// Fetch Bots based on Sidebar View, Tag, Sort, or Search Query
+	useEffect(() => {
+		if (!isReady) return;
+		let cancelled = false;
+		fetch(getEnvUrl('https://api.xernerx.com/secure/bots/tags'), { next: { revalidate: 300 } })
+			.then((res) => (res.ok ? res.json() : []))
+			.then((tags) => {
+				if (!cancelled && Array.isArray(tags)) {
+					setAvailableTags(tags);
+				}
+			})
+			.catch((error) => console.error('Failed to fetch tags for sidebar:', error));
+		return () => {
+			cancelled = true;
+		};
+	}, [getEnvUrl, isReady]);
+
+	// Fetch Bots based on Active Category, Tag, Sort, or Search Query
 	useEffect(() => {
 		if (!isReady) return;
 		const timer = setTimeout(async () => {
@@ -93,13 +130,10 @@ function BotsListContent() {
 
 			if (activeSearch) {
 				params.set('search', activeSearch);
-			} else {
-				const currentCategory = searchParams.get('category') || view || 'biggest';
-				if (currentCategory.startsWith('tag-')) {
-					params.set('tag', currentCategory.replace('tag-', ''));
-				} else if (currentCategory !== 'all') {
-					params.set('category', currentCategory);
-				}
+			} else if (effectiveView.startsWith('tag-')) {
+				params.set('tag', effectiveView.replace('tag-', ''));
+			} else if (effectiveView !== 'all') {
+				params.set('category', effectiveView);
 			}
 
 			if (sortBy) {
@@ -121,19 +155,7 @@ function BotsListContent() {
 		}, 180);
 
 		return () => clearTimeout(timer);
-	}, [view, sortBy, getEnvUrl, searchParams, searchInput, isReady]);
-
-	const activeSearchLabel = searchInput.trim() || searchParams.get('search');
-	const effectiveView = searchParams.get('category') || view || 'biggest';
-	const activeTag = effectiveView.startsWith('tag-') ? effectiveView.replace('tag-', '') : null;
-
-	const categoryPills = [
-		{ id: 'biggest', label: t('app.categories.biggestBots'), icon: Trophy },
-		{ id: 'top_voted', label: t('app.categories.topVoted'), icon: ChevronUp },
-		{ id: 'promoted', label: t('app.categories.promoted'), icon: Flame },
-		{ id: 'newcomers', label: t('app.categories.newcomers'), icon: Sparkles },
-		{ id: 'all', label: t('app.bots.nav.allBots'), icon: Server },
-	];
+	}, [effectiveView, sortBy, getEnvUrl, searchParams, searchInput, isReady]);
 
 	const sortOptions = [
 		{ value: '', label: t('app.bots.explore.sortDefault') },
@@ -150,25 +172,33 @@ function BotsListContent() {
 		return boosted || bots[0];
 	}, [bots, activeSearchLabel]);
 
-	const handleSelectCategory = (catId: string) => {
-		setView(catId);
-		if (searchParams.get('search') || searchParams.get('category')) {
-			setSearchInput('');
-			router.replace('/bots', { scroll: false });
-		}
-	};
+	const gridBots = useMemo(() => {
+		if (!spotlightBot) return bots;
+		return bots.filter((b) => b.id !== spotlightBot.id);
+	}, [bots, spotlightBot]);
 
-	const handleSelectTag = (tag: string) => {
-		if (activeTag === tag) {
-			handleSelectCategory('biggest');
-		} else {
-			setView(`tag-${tag}`);
-			if (searchParams.get('search') || searchParams.get('category')) {
-				setSearchInput('');
-				router.replace('/bots', { scroll: false });
-			}
+	const categoryHeading = useMemo(() => {
+		if (activeSearchLabel) return `${t('common.search')}: ${activeSearchLabel}`;
+		if (activeTag) return `#${activeTag}`;
+		switch (effectiveView) {
+			case 'all':
+				return t('app.bots.nav.allBots');
+			case 'top_voted':
+				return t('app.categories.topVoted');
+			case 'biggest':
+				return t('app.categories.biggestBots');
+			case 'promoted':
+				return t('app.categories.promoted');
+			case 'newcomers':
+				return t('app.categories.newcomers');
+			case 'newly_added':
+				return t('app.categories.newlyAdded');
+			case 'staff_picks':
+				return t('app.categories.staffPicks');
+			default:
+				return t('app.bots.nav.allBots');
 		}
-	};
+	}, [activeSearchLabel, activeTag, effectiveView, t]);
 
 	const handleSurpriseMe = () => {
 		if (bots.length === 0) return;
@@ -184,36 +214,24 @@ function BotsListContent() {
 			<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-8 relative z-10">
 				<div className="flex flex-col gap-1">
 					<h1 className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-						{activeSearchLabel
-							? `${t('common.search')}: ${activeSearchLabel}`
-							: activeTag
-								? `#${activeTag}`
-								: effectiveView === 'all'
-									? t('app.bots.nav.allBots')
-									: effectiveView === 'top_voted'
-										? t('app.categories.topVoted')
-										: effectiveView === 'newcomers'
-											? t('app.categories.newcomers')
-											: effectiveView === 'promoted'
-												? t('app.categories.promoted')
-												: t('app.categories.biggestBots')}
+						{categoryHeading}
 					</h1>
 					<p className="text-sm text-(--text-muted)">{t('app.bots.explore.subtitle')}</p>
 				</div>
 
 				<div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full lg:w-auto">
-					<div className="w-full sm:w-72">
+					<div className="w-full sm:w-80">
 						<Input
 							variant="search"
 							shortcut="K"
-							placeholder={t('app.bots.placeholder1')}
+							placeholder={t('app.home.searchBots')}
 							value={searchInput}
 							onChange={(e) => setSearchInput(e.target.value)}
 							onSearch={(val) => {
 								if (val.trim()) {
 									router.push(`/bots?search=${encodeURIComponent(val.trim())}`);
 								} else {
-									router.push(`/bots?view=${effectiveView || 'biggest'}`);
+									router.push(`/bots?category=${encodeURIComponent(effectiveView || 'all')}`);
 								}
 							}}
 						/>
@@ -246,11 +264,11 @@ function BotsListContent() {
 									onClick={() => handleSelectCategory(pill.id)}
 									className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-extrabold transition-all cursor-pointer border ${
 										isActive
-											? 'bg-(--accent) text-white border-(--accent) shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]'
+											? 'bg-(--accent) text-(--accent-contrast) border-(--accent) shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]'
 											: 'bg-(--background)/60 hover:bg-(--background) text-(--text-muted) hover:text-(--text) border-(--border)/10'
 									}`}
 								>
-									<Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-(--accent)'}`} />
+									<Icon className={`w-3.5 h-3.5 ${isActive ? 'text-(--accent-contrast)' : 'text-(--accent)'}`} />
 									{pill.label}
 								</button>
 							);
@@ -265,7 +283,7 @@ function BotsListContent() {
 				</div>
 
 				{availableTags.length > 0 && (
-					<div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-(--border)/10 no-scrollbar">
+					<div className="flex items-center gap-1.5 overflow-x-auto overflow-y-hidden pt-2 border-t border-(--border)/10 no-scrollbar">
 						<span className="text-[11px] font-bold uppercase tracking-wider text-(--text-muted) mr-1 shrink-0">{t('app.bots.nav.categoryCategories')}:</span>
 						{availableTags.map((tag) => {
 							const isSelected = activeTag === tag;
@@ -298,18 +316,18 @@ function BotsListContent() {
 				<div className="flex-1 flex items-center justify-center py-32">
 					<Loading />
 				</div>
-			) : bots.length > 0 ? (
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24">
-					{bots.map((bot) => (
-						<BotCard key={bot.id} bot={bot} onSelectTag={handleSelectTag} />
-					))}
-				</div>
-			) : (
+			) : bots.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-40 border border-dashed border-(--border)/10 rounded-3xl bg-(--foreground)/30">
 					<h2 className="text-2xl font-bold text-(--text-muted) mb-2">{t('app.bots.text1')}</h2>
 					<p className="text-(--text-muted)/70">{t('app.bots.text2')}</p>
 				</div>
-			)}
+			) : gridBots.length > 0 ? (
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24">
+					{gridBots.map((bot) => (
+						<BotCard key={bot.id} bot={bot} onSelectTag={handleSelectTag} />
+					))}
+				</div>
+			) : null}
 		</div>
 	);
 }
@@ -325,7 +343,7 @@ export default function BotsList() {
 						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
 							<div className="flex items-center gap-4">
 								<div className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-									{t('app.categories.biggestBots')}
+									{t('app.bots.nav.allBots')}
 								</div>
 							</div>
 						</div>

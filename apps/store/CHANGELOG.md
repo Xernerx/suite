@@ -4,6 +4,30 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.2
+
+### Patch Changes
+
+- ## Consistent Store Pricing, Crest Previews & Loading Skeletons
+  
+  Standardized currency formatting across all Store plans and perks and bundled all desktop app icon crests.
+  
+  ### Added
+  
+  - **Store Loading Skeletons**: Added glassmorphic loading skeletons while Store categories and featured passes hydrate.
+  - **Desktop App Crest Previews**: Bundled all 10 custom desktop app crest icons with resilient image fallbacks.
+  
+  ### Changed
+  
+  - **Standardized Currency Formatting**: Unified subscription, add-on, and credit pack price labels across the Store.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.13.1
 
 ### Patch Changes

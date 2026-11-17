@@ -2,6 +2,20 @@
 
 # @xernerx/providers
 
+## 0.24.2
+
+### Patch Changes
+
+- ## App Drawer Scroll Bounds, Electron Preload Gate & Command Palette Sync
+  
+  Improved `NavigationModal` scroll bounds, hardened `PlatformProvider` desktop detection, guarded `SidebarProvider` tab params, and updated `commandPaletteCatalog`.
+  
+  ### Changed
+  
+  - **Providers & Command Palette**: Prevented `SidebarProvider.setView` from overwriting `tab` with `server-*`, gated `PlatformProvider` `application` mode on `window.electron.isXernerxDesktop`, bounded `NavigationModal` height so Admin/Hosting tiles never clip, added `aria-label` on the Support FAB, and indexed Bungie, Delete YourApps Data, and Admin Bot Profiles in `commandPaletteCatalog`.
+- Updated dependencies
+  - @xernerx/lib@1.28.0
+
 ## 0.24.1
 
 ### Patch Changes

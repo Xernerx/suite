@@ -6,8 +6,9 @@ import { PenSquare, Rss, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useDictionary, useEnvironment, usePermissions, useSidebar, useToast } from '@xernerx/providers';
 import { Button, Input } from '@xernerx/ui';
-import { Loading } from '@xernerx/feedback';
 import { BlogPostCard } from './BlogPostCard';
+import { BlogGridSkeleton } from './BlogSkeletons';
+import { FALLBACK_BLOG_POSTS } from '@/lib/fallbackPosts';
 import type { BlogCategory, BlogPostItem } from './types';
 
 const CATEGORIES: Array<'all' | BlogCategory> = ['all', 'announcements', 'security', 'product', 'engineering', 'community'];
@@ -35,12 +36,18 @@ export default function BlogHomeClient() {
 		if (!isReady) return;
 		setLoading(true);
 		fetch(getEnvUrl('https://api.xernerx.com/core/blog'), { credentials: 'include' })
-			.then((res) => (res.ok ? res.json() : { posts: [] }))
+			.then((res) => (res.ok ? res.json() : null))
 			.then((data) => {
-				setPosts(Array.isArray(data?.posts) ? data.posts : []);
+				if (Array.isArray(data?.posts) && data.posts.length > 0) {
+					setPosts(data.posts);
+				} else if (data === null) {
+					setPosts(FALLBACK_BLOG_POSTS);
+				} else {
+					setPosts([]);
+				}
 			})
 			.catch(() => {
-				setPosts([]);
+				setPosts(FALLBACK_BLOG_POSTS);
 			})
 			.finally(() => setLoading(false));
 	}, [isReady, getEnvUrl]);
@@ -78,8 +85,6 @@ export default function BlogHomeClient() {
 			window.open('/rss.xml', '_blank', 'noopener,noreferrer');
 		}
 	};
-
-	if (loading) return <Loading />;
 
 	return (
 		<div className="flex flex-col max-w-(--page-width) mx-auto w-full" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
@@ -130,35 +135,41 @@ export default function BlogHomeClient() {
 				</div>
 			</div>
 
-			{/* Featured Article */}
-			{featuredPost && <BlogPostCard post={featuredPost} featuredVariant={true} />}
-
-			{/* Article Grid */}
-			{gridPosts.length > 0 ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
-					{gridPosts.map((post) => (
-						<BlogPostCard key={post.id} post={post} />
-					))}
-				</div>
+			{loading ? (
+				<BlogGridSkeleton />
 			) : (
-				!featuredPost && (
-					<div className="flex flex-col items-center justify-center text-center rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 py-16 px-6 gap-3">
-						<Sparkles size={28} className="text-(--accent)" />
-						<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
-							{t('blog.home.emptyTitle')}
-						</h3>
-						<p className="text-sm text-(--text-muted) max-w-md">{t('blog.home.emptyDesc')}</p>
-						<Button
-							variant="ghost"
-							onClick={() => {
-								setSearch('');
-								setActiveCategory('all');
-							}}
-						>
-							{t('blog.home.resetFilters')}
-						</Button>
-					</div>
-				)
+				<>
+					{/* Featured Article */}
+					{featuredPost && <BlogPostCard post={featuredPost} featuredVariant={true} />}
+
+					{/* Article Grid */}
+					{gridPosts.length > 0 ? (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3" style={{ gap: 'var(--ui-gap)' }}>
+							{gridPosts.map((post) => (
+								<BlogPostCard key={post.id} post={post} />
+							))}
+						</div>
+					) : (
+						!featuredPost && (
+							<div className="flex flex-col items-center justify-center text-center rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 py-16 px-6 gap-3">
+								<Sparkles size={28} className="text-(--accent)" />
+								<h3 className="text-xl font-bold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+									{t('blog.home.emptyTitle')}
+								</h3>
+								<p className="text-sm text-(--text-muted) max-w-md">{t('blog.home.emptyDesc')}</p>
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setSearch('');
+										setActiveCategory('all');
+									}}
+								>
+									{t('blog.home.resetFilters')}
+								</Button>
+							</div>
+						)
+					)}
+				</>
 			)}
 		</div>
 	);

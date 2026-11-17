@@ -75,6 +75,8 @@ export function Header() {
 	const notificationsRef = useRef<HTMLDivElement>(null);
 	const [optionsOpen, setOptionsOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(true);
+	const [avatarFailed, setAvatarFailed] = useState(false);
+	const [decorationFailed, setDecorationFailed] = useState(false);
 	const [onboardingStage, setOnboardingStage] = useState<{
 		active: boolean;
 		phase?: string;
@@ -161,9 +163,11 @@ export function Header() {
 			}
 		};
 		window.addEventListener('xernerx:tour-postponed-change', onTourPostponedChange);
-		const detectedElectron = Boolean((window as any).electron) || navigator.userAgent.toLowerCase().includes('electron');
+		const bridge = (window as any).electron;
+		const detectedElectron = Boolean(bridge && (bridge.isXernerxDesktop || typeof bridge.minimize === 'function' || typeof bridge.close === 'function'));
 		setIsElectron(detectedElectron);
 		if (detectedElectron) document.documentElement.classList.add('is-electron');
+		else document.documentElement.classList.remove('is-electron');
 		if ((window as any).__xernerxDesktopUpdateState) setDesktopUpdateState((window as any).__xernerxDesktopUpdateState);
 		const handleDesktopUpdateState = (e: Event) => {
 			const detail = (e as CustomEvent).detail;
@@ -318,6 +322,11 @@ export function Header() {
 		: activeUser?.image;
 	const decorationUrl =
 		preferences.showDiscordCollectibles && activeUser?.avatar_decoration_data?.asset ? `https://cdn.discordapp.com/avatar-decoration-presets/${activeUser.avatar_decoration_data.asset}.png` : null;
+
+	useEffect(() => {
+		setAvatarFailed(false);
+		setDecorationFailed(false);
+	}, [avatarUrl, decorationUrl]);
 
 	useEffect(() => {
 		if (!activeUser?.id) return;
@@ -666,7 +675,7 @@ export function Header() {
 									title={activeUser?.global_name || activeUser?.name || t('components.sidebar.alt')}
 								>
 									<div className="relative shrink-0">
-										{avatarUrl ? (
+										{avatarUrl && !avatarFailed ? (
 											<div className="relative h-8 w-8">
 												<Image
 													src={avatarUrl}
@@ -676,8 +685,9 @@ export function Header() {
 													unoptimized
 													draggable={false}
 													loading="eager"
+													onError={() => setAvatarFailed(true)}
 												/>
-												{decorationUrl && (
+												{decorationUrl && !decorationFailed && (
 													<Image
 														src={decorationUrl}
 														alt={t('components.sidebar.alt2')}
@@ -685,6 +695,7 @@ export function Header() {
 														className="absolute -inset-[15%] max-w-[130%] max-h-[130%] scale-[1.15] z-10 pointer-events-none"
 														unoptimized
 														draggable={false}
+														onError={() => setDecorationFailed(true)}
 													/>
 												)}
 											</div>

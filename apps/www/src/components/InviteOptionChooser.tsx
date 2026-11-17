@@ -2,13 +2,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowUpRight, Check, Copy, Layers, Link as LinkIcon, ShieldCheck, Sliders } from 'lucide-react';
 import type { InviteOptionKey, ResolvedInviteOption } from '@xernerx/lib';
 import { useDictionary, useSidebar, useToast } from '@xernerx/providers';
-import { Button } from '@xernerx/ui';
 
 export interface InviteChooserOptionItem extends ResolvedInviteOption {
 	discordUrl: string;
@@ -33,6 +31,11 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 	const { t } = useDictionary();
 	const { toast } = useToast();
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
+	const [avatarFailed, setAvatarFailed] = useState(false);
+
+	useEffect(() => {
+		setAvatarFailed(false);
+	}, [botAvatar]);
 
 	useEffect(() => {
 		hide();
@@ -73,8 +76,8 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 						transition={{ duration: 0.45, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
 						className="shrink-0"
 					>
-						{botAvatar ? (
-							<Image src={botAvatar} alt={botName} width={72} height={72} unoptimized className="w-18 h-18 rounded-3xl shadow-md shrink-0" />
+						{botAvatar && !avatarFailed ? (
+							<img src={botAvatar} alt={botName} onError={() => setAvatarFailed(true)} className="w-18 h-18 rounded-3xl object-cover shadow-md shrink-0" />
 						) : (
 							<div className="w-18 h-18 rounded-3xl bg-(--accent)/15 border border-(--accent)/30 flex items-center justify-center text-(--accent) shrink-0">
 								<LinkIcon size={28} />
@@ -231,11 +234,16 @@ export function InviteOptionChooser({ id, botName, botAvatar, description, optio
 									</div>
 								</div>
 
-								<a href={opt.discordUrl} className="w-full mt-auto">
-									<Button variant={isPrimary ? 'primary' : 'secondary'} className="w-full flex items-center justify-center gap-2">
-										<span>{cta}</span>
-										<ArrowUpRight size={16} />
-									</Button>
+								<a
+									href={opt.discordUrl}
+									className={`w-full mt-auto h-10 px-4 text-sm inline-flex items-center justify-center gap-2 rounded-2xl font-medium transition-colors active:scale-95 ${
+										isPrimary
+											? 'bg-(--accent) text-(--accent-contrast) border border-(--border)/15 shadow-sm hover:bg-(--hover-accent) hover:shadow-[0_0_15px_color-mix(in_srgb,var(--accent-readable,var(--accent))_40%,transparent)]'
+											: 'border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md text-(--text) shadow-sm hover:bg-(--foreground)/50 hover:border-(--accent)/50'
+									}`}
+								>
+									<span>{cta}</span>
+									<ArrowUpRight size={16} />
 								</a>
 							</motion.div>
 						);

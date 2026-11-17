@@ -2,10 +2,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { Activity, ChevronUp, ExternalLink, ShieldCheck, Star, Tag, Terminal, Trophy, User } from 'lucide-react';
+import { Activity, Bot, ChevronUp, ExternalLink, ShieldCheck, Star, Tag, Terminal, Trophy, User } from 'lucide-react';
 import { useDictionary, useSidebar } from '@xernerx/providers';
 import { Button, Tooltip } from '@xernerx/ui';
+import SafeAvatar from '@/components/SafeAvatar';
 
 interface BotFloatingBarProps {
 	bot: any;
@@ -66,13 +66,18 @@ export default function BotFloatingBar({ bot, avatarUrl, botDisplayName, isSigne
 			<div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-3xl bg-(--background)/85 border border-(--accent)/25 backdrop-blur-xl shadow-[0_8px_30px_color-mix(in_srgb,var(--accent)_18%,transparent)]">
 				{/* Left: Bot Identity */}
 				<div className="flex items-center gap-3 min-w-0">
-					{avatarUrl ? (
-						<Image src={avatarUrl} alt={botDisplayName} width={36} height={36} unoptimized className="w-9 h-9 rounded-2xl object-cover border border-(--border)/20 shrink-0" />
-					) : (
-						<div className="w-9 h-9 rounded-2xl bg-(--foreground) border border-(--border)/20 flex items-center justify-center text-(--text-muted) shrink-0">
-							<User className="w-4 h-4" />
-						</div>
-					)}
+					<SafeAvatar
+						src={avatarUrl}
+						alt={botDisplayName}
+						width={36}
+						height={36}
+						className="w-9 h-9 rounded-2xl object-cover border border-(--border)/20 shrink-0"
+						fallback={
+							<div className="w-9 h-9 rounded-2xl bg-(--foreground) border border-(--border)/20 flex items-center justify-center text-(--text-muted) shrink-0">
+								<Bot className="w-4 h-4" />
+							</div>
+						}
+					/>
 					<div className="flex items-center gap-1.5 min-w-0">
 						<span className="text-sm font-extrabold text-(--text) truncate max-w-[180px]" style={{ fontFamily: 'var(--font-fredoka)' }}>
 							{botDisplayName}

@@ -2,6 +2,18 @@
 
 # @xernerx/cli
 
+## 2.7.4
+
+### Patch Changes
+
+- ## Suite CLI Toolchain & Prompt Alignment
+  
+  Updated `@clack/prompts`, `commander`, and `pnpm@12.21.0` / Node `>=24` engine metadata for the internal `suite` CLI.
+  
+  ### Changed
+  
+  - **CLI Dependencies**: Upgraded `@clack/prompts` and `commander` and aligned `pnpm@12.21.0` / Node `>=24` package metadata.
+
 ## 2.7.3
 
 ### Patch Changes

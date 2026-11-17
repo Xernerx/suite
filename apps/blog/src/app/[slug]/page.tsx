@@ -1,9 +1,12 @@
 /** @format */
 
+import { cache } from 'react';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { database } from '@xernerx/lib/server';
 import BlogArticleClient from '@/components/BlogArticleClient';
 import type { BlogPostItem, ReactionKey } from '@/components/types';
+import { findFallbackBlogPost, getBlogSlugCandidates, normalizeBlogSlug } from '@/lib/fallbackPosts';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,36 +60,77 @@ function serializeBlogPost(doc: any): BlogPostItem {
 	};
 }
 
-async function fetchPublicOrLimitedBlogPost(slug: string): Promise<BlogPostItem | null> {
+const fetchPublicOrLimitedBlogPost = cache(async (slug: string): Promise<BlogPostItem | null> => {
+	const candidates = getBlogSlugCandidates(slug);
+	const normalized = normalizeBlogSlug(slug);
+
 	if (process.env.MONGO_XERNERX) {
 		try {
-			const { models } = await database('xernerx');
-			const BlogPost = (models.core as any)?.BlogPost;
-			if (BlogPost) {
-				const post = await BlogPost.findOne({ $or: [{ slug }, { id: slug }] }).lean();
-				if (post) {
-					return post.privacy === 'private' ? null : serializeBlogPost(post);
-				}
+			const dbResult = await Promise.race([
+				(async () => {
+					const { models } = await database('xernerx');
+					const BlogPost = (models.core as any)?.BlogPost;
+					if (!BlogPost) return undefined;
+					const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+					const orClauses: Record<string, any>[] = [{ slug: { $in: candidates } }, { id: { $in: candidates } }];
+					if (escaped.length >= 6) {
+						orClauses.push({ slug: { $regex: `^${escaped}(-|$)`, $options: 'i' } });
+					}
+					let post = await BlogPost.findOne({ $or: orClauses }).lean();
+					if (!post && normalized.length >= 6) {
+						const publicDocs = await BlogPost.find({ privacy: { $in: ['public', 'limited'] } })
+							.select('slug')
+							.lean()
+							.catch(() => []);
+						const reverseHit = publicDocs.find((p: any) => p?.slug && normalized.startsWith(`${String(p.slug).toLowerCase()}-`));
+						if (reverseHit?.slug) {
+							post = await BlogPost.findOne({ slug: reverseHit.slug }).lean();
+						}
+					}
+					return post || null;
+				})(),
+				new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 2500)),
+			]);
+
+			if (dbResult) {
+				return dbResult.privacy === 'private' ? null : serializeBlogPost(dbResult);
 			}
 		} catch {
-			// Fall through to public API lookup
+			// Fall through to public API or default fallback lookup
 		}
 	}
 
 	try {
+		const reqHeaders = await headers().catch(() => null);
+		const host = (reqHeaders?.get('x-forwarded-host') || reqHeaders?.get('host') || '').toLowerCase();
 		const domain = process.env.DOMAIN || 'xernerx.com';
 		const envVar = (process.env.ENVIRONMENT || '').toLowerCase();
-		const apiBase = envVar === 'canary' ? `https://api.canary.${domain}` : envVar === 'development' ? 'http://localhost:4001' : `https://api.${domain}`;
-		const res = await fetch(`${apiBase}/core/blog/${encodeURIComponent(slug)}`, { next: { revalidate: 300 } });
-		if (!res.ok) return null;
-		const data = await res.json();
-		const post = data?.post || data;
-		if (!post || post.privacy === 'private') return null;
-		return serializeBlogPost(post);
+		const apiBase =
+			host.includes('.canary.') || envVar === 'canary'
+				? `https://api.canary.${domain}`
+				: host.includes('localhost') || envVar === 'development'
+					? 'http://localhost:4001'
+					: host.includes('.dev.')
+						? `https://api.dev.${domain}`
+						: `https://api.${domain}`;
+
+		const res = await fetch(`${apiBase}/core/blog/${encodeURIComponent(slug)}`, {
+			signal: AbortSignal.timeout(2500),
+			next: { revalidate: 300 },
+		});
+		if (res.ok) {
+			const data = await res.json();
+			const post = data?.post || data;
+			if (post && post.privacy !== 'private') {
+				return serializeBlogPost(post);
+			}
+		}
 	} catch {
-		return null;
+		// Fall through to built-in default blog posts
 	}
-}
+
+	return findFallbackBlogPost(slug);
+});
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
 	const { slug } = await params;

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { BungieTricornIcon } from '@xernerx/lib';
 import { useDictionary, useEnvironment, usePermissions, usePlatform, useSession, useSupport, useToast, useUser } from '@xernerx/providers';
 import { Button, Toggle } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
@@ -58,6 +59,11 @@ const OAUTH_PROVIDERS = [
 		id: 'steam',
 		name: 'Steam',
 		icon: Gamepad2,
+	},
+	{
+		id: 'bungie',
+		name: 'Bungie',
+		icon: BungieTricornIcon,
 	},
 	{
 		id: 'reddit',

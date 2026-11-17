@@ -131,6 +131,8 @@ const SUITE_APP_DEFS = [
 	['docs', 'Docs', 'docs.xernerx.com'],
 	['admin', 'Admin', 'admin.xernerx.com'],
 	['hosting', 'Hosting', 'hosting.xernerx.com'],
+	['haste', 'Haste', 'haste.xernerx.com'],
+	['blog', 'Blog', 'blog.xernerx.com'],
 	['api', 'API', 'api.xernerx.com'],
 	['cdn', 'CDN', 'cdn.xernerx.com'],
 ] as const;

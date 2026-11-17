@@ -1,14 +1,18 @@
 {
 	"name": "@xernerx/feedback",
-	"version": "0.6.3",
+	"version": "0.7.0",
+	"packageManager": "pnpm@12.21.0",
+	"engines": {
+		"node": ">=24"
+	},
 	"private": true,
 	"main": "./index.ts",
 	"dependencies": {
 		"@xernerx/providers": "workspace:*",
 		"@xernerx/ui": "workspace:*",
-		"framer-motion": "^14.9.0",
-		"lucide-react": "^1.67.0",
-		"next": "^16.4.5",
+		"framer-motion": "^14.14.0",
+		"lucide-react": "^1.73.0",
+		"next": "^16.4.6",
 		"react": "^19.3.1"
 	},
 	"devDependencies": {

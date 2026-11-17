@@ -6,7 +6,6 @@ import { UserProfilePopover } from '@xernerx/components';
 import { useDictionary, useEnvironment, useSession, useToast, useUser } from '@xernerx/providers';
 import { Badge, Button, CopyButton, Tooltip } from '@xernerx/ui';
 import {
-	User,
 	ExternalLink,
 	ShieldCheck,
 	Globe,
@@ -25,9 +24,10 @@ import {
 	BellRing,
 	Star,
 	Sparkles,
+	Bot,
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
+import SafeAvatar from '@/components/SafeAvatar';
 import SpotlightBoostModal from '@/components/SpotlightBoostModal';
 import TipCreditsModal from '@/components/users/TipCreditsModal';
 import BotFloatingBar from '@/components/bots/BotFloatingBar';
@@ -214,13 +214,18 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 					/>
 				)}
 				<div className="relative z-10 shrink-0">
-					{avatarUrl ? (
-						<Image src={avatarUrl} alt={botDisplayName} width={128} height={128} className="rounded-2xl shadow-lg border-2 border-(--border)/20" />
-					) : (
-						<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg">
-							<User className="w-12 h-12" />
-						</div>
-					)}
+					<SafeAvatar
+						src={avatarUrl}
+						alt={botDisplayName}
+						width={128}
+						height={128}
+						className="w-32 h-32 rounded-2xl shadow-lg border-2 border-(--border)/20 object-cover"
+						fallback={
+							<div className="w-32 h-32 rounded-2xl bg-(--background) border-2 border-(--border)/20 flex items-center justify-center text-(--text-muted) shadow-lg">
+								<Bot className="w-12 h-12" />
+							</div>
+						}
+					/>
 				</div>
 				<div className="flex-1 relative z-10">
 					<div className="flex flex-wrap items-center gap-3 mb-2">
@@ -379,34 +384,30 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 											href={`/organization/${bot.organizationData.vanitySlug || bot.organizationData._id}`}
 											className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors"
 										>
-											{bot.organizationData.iconUrl ? (
-												<Image
-													src={bot.organizationData.iconUrl}
-													alt={bot.organizationData.name}
-													width={16}
-													height={16}
-													unoptimized
-													className="w-4 h-4 rounded-full object-cover"
-												/>
-											) : (
-												<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
-											)}
+											<SafeAvatar
+												src={bot.organizationData.iconUrl}
+												alt={bot.organizationData.name}
+												width={16}
+												height={16}
+												className="w-4 h-4 rounded-full object-cover"
+												fallback={
+													<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
+												}
+											/>
 											<span className="text-xs font-bold text-(--accent)">{bot.organizationData.name}</span>
 										</Link>
 									) : (
 										<span className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm">
-											{bot.organizationData.iconUrl ? (
-												<Image
-													src={bot.organizationData.iconUrl}
-													alt={bot.organizationData.name}
-													width={16}
-													height={16}
-													unoptimized
-													className="w-4 h-4 rounded-full object-cover"
-												/>
-											) : (
-												<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
-											)}
+											<SafeAvatar
+												src={bot.organizationData.iconUrl}
+												alt={bot.organizationData.name}
+												width={16}
+												height={16}
+												className="w-4 h-4 rounded-full object-cover"
+												fallback={
+													<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px]">{bot.organizationData.name.charAt(0)}</div>
+												}
+											/>
 											<span className="text-xs font-bold text-(--text-muted)">{bot.organizationData.name}</span>
 										</span>
 									)}
@@ -418,24 +419,31 @@ export default function Header({ bot, id, setBot }: { bot: any; id: string; setB
 							<div className="flex flex-col items-start md:items-end gap-2">
 								<span className="text-[10px] font-bold text-(--text-muted) uppercase tracking-wider">{t('app.bots.id.text6')}</span>
 								<div className="flex flex-wrap gap-2 justify-end">
-									{bot.ownersData.map((owner: any) => (
-										<UserProfilePopover key={owner.id} userId={owner.id} initialUser={owner}>
-											<div className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors">
-												<Image
-													src={
-														owner.avatar
-															? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64`
-															: `https://cdn.discordapp.com/embed/avatars/${Number(owner.discriminator) % 5}.png`
-													}
-													alt={owner.global_name || owner.username || ''}
-													width={16}
-													height={16}
-													className="rounded-full"
-												/>
-												<span className="text-xs font-bold text-(--text)">{owner.global_name || owner.username}</span>
-											</div>
-										</UserProfilePopover>
-									))}
+									{bot.ownersData.map((owner: any) => {
+										const ownerName = owner.global_name || owner.username || owner.id || '';
+										const ownerAvatar = owner.avatarUrl || (owner.avatar ? `https://cdn.discordapp.com/avatars/${owner.id}/${owner.avatar}.png?size=64` : null);
+										return (
+											<UserProfilePopover key={owner.id} userId={owner.id} initialUser={owner}>
+												<div className="flex items-center gap-2 bg-(--background) border border-(--border)/10 px-3 py-1 rounded-full shadow-sm hover:border-(--accent)/50 transition-colors">
+													<SafeAvatar
+														src={ownerAvatar}
+														alt={ownerName}
+														width={16}
+														height={16}
+														className="w-4 h-4 rounded-full object-cover"
+														fallback={
+															<div className="w-4 h-4 rounded-full bg-(--foreground) flex items-center justify-center text-[8px] font-bold text-(--text-muted)">
+																{String(ownerName || '?')
+																	.charAt(0)
+																	.toUpperCase()}
+															</div>
+														}
+													/>
+													<span className="text-xs font-bold text-(--text)">{ownerName}</span>
+												</div>
+											</UserProfilePopover>
+										);
+									})}
 								</div>
 							</div>
 						)}

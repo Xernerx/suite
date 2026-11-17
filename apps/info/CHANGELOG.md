@@ -2,6 +2,26 @@
 
 # info
 
+## 1.13.2
+
+### Patch Changes
+
+- ## Environment-Aware Status Labels, Expanded FAQ & Search Polish
+  
+  Updated live status host labels, widened search bars, and expanded Account FAQ guidance.
+  
+  ### Changed
+  
+  - **Live Status Labels & Search Inputs**: Displayed environment-aware service domains on `/status` and widened search bars across Home, Roadmap, Suggestions, and Issues so keyboard shortcut hints never clip.
+  - **Data Control FAQ**: Updated Account data management answers to cover Delete YourApps Data and per-server bot setup deletion.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.13.1
 
 ### Patch Changes

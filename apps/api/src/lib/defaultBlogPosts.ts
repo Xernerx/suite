@@ -75,13 +75,59 @@ export function serializeBlogPost(doc: any, viewerId?: string | null, includeCon
 	return out;
 }
 
+export const BLOG_SLUG_ALIASES: Record<string, string> = {
+	'the-customization-update': 'the-customization-update-stage-render-forms-and-cosmetics-studio',
+	'customization-update': 'the-customization-update-stage-render-forms-and-cosmetics-studio',
+	'platform-and-bot-security': 'platform-and-bot-security-architecture',
+	'security-architecture': 'platform-and-bot-security-architecture',
+	'inside-the-xernerx-suite': 'inside-the-xernerx-suite-architecture',
+};
+
+export function resolveBlogSlugCandidates(rawSlug: string): string[] {
+	const normalized = sanitizeSlug(rawSlug);
+	const rawClean = String(rawSlug || '')
+		.trim()
+		.toLowerCase();
+	const set = new Set<string>([rawClean, normalized].filter(Boolean));
+	if (BLOG_SLUG_ALIASES[normalized]) {
+		set.add(BLOG_SLUG_ALIASES[normalized]);
+	}
+	for (const [shortAlias, fullSlug] of Object.entries(BLOG_SLUG_ALIASES)) {
+		if (fullSlug === normalized) {
+			set.add(shortAlias);
+		}
+	}
+	return Array.from(set);
+}
+
+export function buildBlogSlugQuery(rawSlug: string): Record<string, any> {
+	const candidates = resolveBlogSlugCandidates(rawSlug);
+	const normalized = sanitizeSlug(rawSlug);
+	const escaped = normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	const orClauses: Record<string, any>[] = [{ slug: { $in: candidates } }, { id: { $in: candidates } }];
+	if (escaped.length >= 6) {
+		orClauses.push({ slug: { $regex: `^${escaped}(-|$)`, $options: 'i' } });
+	}
+	return { $or: orClauses };
+}
+
+export function findMatchingDefaultBlogPost(rawSlug: string): (typeof DEFAULT_BLOG_POSTS)[number] | null {
+	const candidates = resolveBlogSlugCandidates(rawSlug);
+	const normalized = sanitizeSlug(rawSlug);
+	return (
+		DEFAULT_BLOG_POSTS.find(
+			(p) => candidates.includes(p.slug) || candidates.includes(p.id) || (normalized.length >= 6 && (p.slug.startsWith(`${normalized}-`) || normalized.startsWith(`${p.slug}-`)))
+		) || null
+	);
+}
+
 export const DEFAULT_BLOG_POSTS = [
 	{
 		id: 'blog-security-architecture-2026',
 		slug: 'platform-and-bot-security-architecture',
 		title: 'Platform & Bot Security Architecture: Zero Message Logging, 3-Tier Privacy & Cryptographic Webhooks',
 		subtitle:
-			'A deep dive into how Xernerx Studios protects your Discord communities, enforces strict data minimization across Virtue, To-Do List Bot, Metamorphosis, and Zodiac, and empowers you with self-service privacy controls.',
+			'A deep dive into how Xernerx Studios protects your Discord communities, enforces strict data minimization across Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac, and empowers you with self-service privacy controls.',
 		coverGradient: 'emerald',
 		category: 'security',
 		audience: 'all',
@@ -267,9 +313,12 @@ Explore the full interactive REST API and WebSocket documentation at [docs.xerne
 
 export async function ensureSeededBlogPosts(BlogPostModel: any) {
 	try {
-		const count = await BlogPostModel.countDocuments();
-		if (count === 0) {
-			for (const post of DEFAULT_BLOG_POSTS) {
+		for (const post of DEFAULT_BLOG_POSTS) {
+			const candidates = resolveBlogSlugCandidates(post.slug);
+			const existing = await BlogPostModel.exists({
+				$or: [{ id: post.id }, { slug: { $in: candidates } }],
+			});
+			if (!existing) {
 				await BlogPostModel.findOneAndUpdate({ slug: post.slug }, { $setOnInsert: { ...post, id: post.id || crypto.randomUUID() } }, { upsert: true });
 			}
 		}

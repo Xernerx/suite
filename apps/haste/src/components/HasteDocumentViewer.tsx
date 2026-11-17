@@ -2,11 +2,10 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ArrowLeft, Check, Clock, Code2, Copy, Download, ExternalLink, Eye, FileCode2, FolderGit2, GitFork, Globe, Link2, Lock, Plus, Trash2, User } from 'lucide-react';
-import { Loading, NotFound } from '@xernerx/feedback';
+import { NotFound } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
 import { Button, CodeBlock, Confirm, Markdown, Selector } from '@xernerx/ui';
 import { formatBytes, HASTE_FILE_EXTENSION_MAP, type HasteDocumentItem } from './hasteConstants';
@@ -251,12 +250,38 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 	const authorDisplayName = doc?.author?.globalName || doc?.author?.username || doc?.author?.name || null;
 
 	if (status === 'loading' || loading || redirectingToLogin) {
-		return <Loading />;
+		return (
+			<div className="flex flex-col w-full max-w-(--page-width) mx-auto" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
+				<div className="h-[520px] rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 animate-pulse p-6 flex flex-col justify-between">
+					<div className="flex items-center justify-between">
+						<div className="h-10 w-64 rounded-2xl bg-(--background)/60" />
+						<div className="h-10 w-56 rounded-2xl bg-(--background)/50" />
+					</div>
+					<div className="h-80 w-full rounded-2xl bg-(--background)/50 border border-(--border)/10" />
+				</div>
+			</div>
+		);
 	}
 
 	if (!doc) {
 		return <NotFound />;
 	}
+
+	const formattedViews =
+		doc.views === 1
+			? (() => {
+					const s = t('haste.viewer.viewCount', { count: 1 });
+					return s === 'haste.viewer.viewCount' ? '1 view' : s;
+				})()
+			: t('haste.viewer.viewsCount', { count: doc.views });
+
+	const formattedLines =
+		linesCount === 1
+			? (() => {
+					const s = t('haste.editor.lineCount', { count: 1 });
+					return s === 'haste.editor.lineCount' ? '1 line' : s;
+				})()
+			: t('haste.editor.linesCount', { count: linesCount });
 
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
@@ -268,11 +293,9 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 				<div className="flex flex-col lg:flex-row items-start lg:items-center justify-between" style={{ gap: 'var(--ui-gap)' }}>
 					<div className="flex items-start min-w-0" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 						{status === 'authenticated' && (
-							<Link href="/">
-								<Button variant="secondary" size="icon" className="rounded-2xl h-11 w-11 shrink-0">
-									<ArrowLeft className="w-5 h-5" />
-								</Button>
-							</Link>
+							<Button type="button" variant="secondary" size="icon" className="rounded-2xl h-11 w-11 shrink-0" onClick={() => router.push('/')}>
+								<ArrowLeft className="w-5 h-5" />
+							</Button>
 						)}
 						<div className="flex flex-col min-w-0" style={{ gap: 'calc(var(--ui-gap) * 0.25)' }}>
 							<div className="flex items-center flex-wrap gap-2">
@@ -311,9 +334,9 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 								)}
 								<span className="inline-flex items-center gap-1">
 									<Eye className="w-3.5 h-3.5 text-(--accent)" />
-									{t('haste.viewer.viewsCount', { count: doc.views })}
+									{formattedViews}
 								</span>
-								<span>{t('haste.editor.linesCount', { count: linesCount })}</span>
+								<span>{formattedLines}</span>
 								<span>{formatBytes(doc.size)}</span>
 								<span className="inline-flex items-center gap-1">
 									<Clock className="w-3.5 h-3.5" />
@@ -326,39 +349,35 @@ export function HasteDocumentViewer({ id }: HasteDocumentViewerProps) {
 					{/* Primary Action Toolbar */}
 					<div className="flex items-center flex-wrap gap-2 shrink-0">
 						{doc.language === 'markdown' && (
-							<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={() => setRenderMarkdown((prev) => !prev)}>
+							<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={() => setRenderMarkdown((prev) => !prev)}>
 								<Eye className="w-4 h-4 mr-1.5 text-(--accent)" />
 								{renderMarkdown ? t('haste.actions.viewRawSource') : t('haste.actions.previewMarkdown')}
 							</Button>
 						)}
-						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyCode}>
+						<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyCode}>
 							{copiedCode ? <Check className="w-4 h-4 mr-1.5 text-(--accent-green)" /> : <Copy className="w-4 h-4 mr-1.5" />}
 							{t('haste.actions.copyCode')}
 						</Button>
-						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyLink}>
+						<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyLink}>
 							{copiedLink ? <Check className="w-4 h-4 mr-1.5 text-(--accent-green)" /> : <Link2 className="w-4 h-4 mr-1.5" />}
 							{t('haste.actions.copyLink')}
 						</Button>
-						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyRawUrl}>
+						<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleCopyRawUrl}>
 							{copiedRaw ? <Check className="w-4 h-4 mr-1.5 text-(--accent-green)" /> : <Copy className="w-4 h-4 mr-1.5" />}
 							{t('haste.actions.copyRawUrl')}
 						</Button>
-						<Link href={`/raw/${doc.id}`} target="_blank">
-							<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2">
-								<ExternalLink className="w-4 h-4 mr-1.5" />
-								{t('haste.actions.raw')}
-							</Button>
-						</Link>
-						<Button variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleDownload}>
+						<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={() => window.open(`/raw/${doc.id}`, '_blank', 'noopener,noreferrer')}>
+							<ExternalLink className="w-4 h-4 mr-1.5" />
+							{t('haste.actions.raw')}
+						</Button>
+						<Button type="button" variant="secondary" size="sm" className="rounded-2xl px-3.5 py-2" onClick={handleDownload}>
 							<Download className="w-4 h-4 mr-1.5" />
 							{t('haste.actions.download')}
 						</Button>
-						<Link href={`/?fork=${doc.id}`}>
-							<Button variant="primary" size="sm" className="rounded-2xl px-4 py-2">
-								<GitFork className="w-4 h-4 mr-1.5" />
-								{t('haste.actions.fork')}
-							</Button>
-						</Link>
+						<Button type="button" variant="primary" size="sm" className="rounded-2xl px-4 py-2" onClick={() => router.push(`/?fork=${doc.id}`)}>
+							<GitFork className="w-4 h-4 mr-1.5" />
+							{t('haste.actions.fork')}
+						</Button>
 					</div>
 				</div>
 

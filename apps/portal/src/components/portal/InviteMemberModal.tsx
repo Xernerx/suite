@@ -1,10 +1,10 @@
 /** @format */
 'use client';
 
-import { User } from 'lucide-react';
-import Image from 'next/image';
 import { Button, Modal } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
+import { PortalSafeAvatar } from '@/components/portal/PortalSafeAvatar';
+import { resolveUserAvatarUrl } from '@/lib/portalHelpers';
 
 interface InviteMemberModalProps {
 	open: boolean;
@@ -23,13 +23,14 @@ export default function InviteMemberModal({ open, onOpenChange, inviteUserObj, c
 				<div className="flex flex-col items-center justify-center gap-4 bg-(--background)/50 p-6 rounded-3xl border border-(--border)/10">
 					<div className="flex flex-col gap-2 p-4 bg-(--background)/50 rounded-2xl border border-(--border)/10">
 						<div className="flex items-center gap-4">
-							{inviteUserObj.avatarUrl ? (
-								<Image src={inviteUserObj.avatarUrl} alt="Avatar" width={48} height={48} unoptimized className="w-12 h-12 rounded-full shadow-sm" />
-							) : (
-								<div className="w-12 h-12 bg-(--border)/10 rounded-full flex items-center justify-center">
-									<User className="text-(--text-muted) w-6 h-6" />
-								</div>
-							)}
+							<PortalSafeAvatar
+								src={resolveUserAvatarUrl(inviteUserObj.id, inviteUserObj, 128)}
+								alt={inviteUserObj.global_name || inviteUserObj.username || 'Avatar'}
+								fallbackKind="user"
+								className="w-12 h-12 rounded-full object-cover shadow-sm shrink-0"
+								fallbackClassName="w-12 h-12 bg-(--border)/10 rounded-full flex items-center justify-center shrink-0"
+								iconClassName="text-(--text-muted) w-6 h-6"
+							/>
 							<div className="flex flex-col">
 								<span className="font-bold text-(--text) text-lg">{inviteUserObj.global_name || inviteUserObj.username}</span>
 								<span className="text-sm text-(--text-muted)">@{inviteUserObj.username}</span>

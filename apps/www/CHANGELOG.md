@@ -2,6 +2,35 @@
 
 # www
 
+## 0.28.0
+
+### Minor Changes
+
+- ## Landing Carousels, Desktop Preview Sync & Self-Service Security Controls
+  
+  Refined the landing page experience, interactive desktop preview, official invites, and security documentation.
+  
+  ### Added
+  
+  - **YourApps Ecosystem Coverage**: Added YourApps across studio overview blurbs, service cards, and security documentation.
+  - **Self-Service YourApps & Server Setup Controls**: Documented self-service YourApps data deletion and per-server bot setup deletion on the Security, Privacy, and Terms pages.
+  
+  ### Changed
+  
+  - **Consumer & Developer Carousels**: Updated horizontal service and software carousels with Previous/Next controls while allowing vertical mouse-wheel scrolling to pass through naturally.
+  - **Interactive Desktop Preview**: Updated the simulated titlebar Dashboard shortcut icon and inline URL Omnibar preview on the Download page.
+  - **Official Invites & License Reliability**: Hardened `/invites` and `/license` loading and avatar fallbacks for instant availability.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 0.27.1
 
 ### Patch Changes

@@ -337,7 +337,7 @@ export default function Stats({ bot, id }: { bot: any; id: string }) {
 						)}
 						<span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-(--accent)/15 border border-(--accent)/30 text-xs font-extrabold text-(--accent)">
 							<Activity size={12} />
-							{t('app.bots.overview.shardsCount', { count: totalShardCount })}
+							{totalShardCount === 1 ? t('app.bots.overview.shardCountSingular', { count: 1 }) : t('app.bots.overview.shardsCount', { count: totalShardCount })}
 						</span>
 					</div>
 				</div>

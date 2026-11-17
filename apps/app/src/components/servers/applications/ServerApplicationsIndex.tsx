@@ -7,6 +7,7 @@ import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment } from '@xernerx/providers';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 
 interface PortalPositionSummary {
 	id: string;
@@ -176,11 +177,9 @@ export default function ServerApplicationsIndex({ guildId }: { guildId: string }
 
 									<div className="flex items-center justify-end pt-2 border-t border-(--border)/10">
 										{isOpen ? (
-											<Link href={`/servers/${guildId}/applications/${pos.id}`}>
-												<Button variant="primary" size="sm">
-													<span>{t('app.servers.applications.applyBtn')}</span>
-													<ArrowRight className="w-3.5 h-3.5" />
-												</Button>
+											<Link href={`/servers/${guildId}/applications/${pos.id}`} className={getButtonLinkClasses('primary', 'sm')}>
+												<span>{t('app.servers.applications.applyBtn')}</span>
+												<ArrowRight className="w-3.5 h-3.5" />
 											</Link>
 										) : (
 											<Button variant="secondary" size="sm" disabled>

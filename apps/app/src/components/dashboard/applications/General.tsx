@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PositionsSection from './PositionsSection';
 import SubmissionsSection from './SubmissionsSection';
+import { ServerBotSetupDangerCards } from '../ServerBotSetupDangerCards';
 import { normalizeChannels, normalizeRoles, type DiscordChannelItem, type DiscordRoleItem, type YourAppsConfigSnapshot, type YourAppsProfile } from './types';
 
 function extractSnapshot(data: any): YourAppsConfigSnapshot {
@@ -378,6 +379,8 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 					</div>
 				</div>
 			)}
+
+			{subView === 'overview' && <ServerBotSetupDangerCards guildId={id} mode="yourapps" onDeleted={fetchProfile} />}
 		</div>
 	);
 }

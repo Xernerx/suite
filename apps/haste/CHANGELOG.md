@@ -2,6 +2,25 @@
 
 # Changelog
 
+## 1.3.15
+
+### Patch Changes
+
+- ## File Import Polish, Singular Counts & Viewer Skeletons
+  
+  Cleaned up the Haste editor toolbar and singular line/view counters.
+  
+  ### Changed
+  
+  - **Toolbar & Counter Polish**: Consolidated `Import File` into a single accessible button, added singular `1 line` and `1 view` labels, and improved document loading skeletons.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.3.14
 
 ### Patch Changes

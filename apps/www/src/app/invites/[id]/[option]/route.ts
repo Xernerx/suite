@@ -3,19 +3,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildDiscordBotAuthorizeUrl, getEnabledInviteOptions } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { findDefaultOfficialInvite } from '@/lib/defaultOfficialInvites';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string; option: string }> }) {
 	try {
 		const { id, option } = await params;
-		const db = await database('xernerx');
-		const invite: any = await db.models.core.AppInvite.findOne({ id }).lean();
+		let invite: any = null;
+		let botDoc: any = null;
+
+		if (process.env.MONGO_XERNERX) {
+			try {
+				const dbLookup = await Promise.race([
+					(async () => {
+						const db = await database('xernerx');
+						const foundInvite: any = await db.models.core.AppInvite.findOne({ id }).lean();
+						if (!foundInvite) return null;
+						const foundBot = await (db.models.bots as any)?.Bot?.findOne({ id: foundInvite.clientId })
+							.select('vanitySlug')
+							.lean()
+							.catch(() => null);
+						return { invite: foundInvite, botDoc: foundBot };
+					})(),
+					new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500)),
+				]);
+				if (dbLookup) {
+					invite = dbLookup.invite;
+					botDoc = dbLookup.botDoc;
+				}
+			} catch {
+				// Fall back to default official invites
+			}
+		}
+
+		if (!invite) {
+			invite = findDefaultOfficialInvite(id);
+		}
 		if (!invite) {
 			return new NextResponse('Not Found', { status: 404 });
 		}
-		const botDoc = await (db.models.bots as any)?.Bot?.findOne({ id: invite.clientId })
-			.select('vanitySlug')
-			.lean()
-			.catch(() => null);
 
 		const targetSlug = botDoc?.vanitySlug || invite.id || invite.clientId;
 		const enabledOptions = getEnabledInviteOptions(invite);

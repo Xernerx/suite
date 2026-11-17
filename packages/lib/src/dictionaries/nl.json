@@ -740,7 +740,6 @@
 		"dashboard": {
 			"overview": {
 				"title": "Suite Overzicht & SEO",
-				"subtitle": "Monitor live versies, latentie, probleemstatus en Seobility SEO-scores over alle 9 Xernerx Suite subdomeinen.",
 				"refresh": "Statistieken Vernieuwen",
 				"refreshing": "Vernieuwen...",
 				"envProduction": "Productie URL's",

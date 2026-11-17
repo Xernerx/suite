@@ -537,17 +537,20 @@ export async function applyStagedUpdate(ctx: UpdaterContext, stagedPath: string,
 	await new Promise((r) => setTimeout(r, 400));
 
 	if (process.platform === 'win32') {
-		const scriptPath = path.join(app.getPath('temp'), 'xernerx-apply-update.ps1');
+		const tempDir = app.getPath('temp');
+		const scriptPath = path.join(tempDir, 'xernerx-apply-update.ps1');
+		const vbsPath = path.join(tempDir, 'xernerx-apply-update.vbs');
 		const installDir = path.dirname(process.execPath);
 		const logFile = path.join(app.getPath('documents'), 'xernerx-debug.log');
+		const psQuote = (val: string) => `'${String(val).replace(/'/g, "''")}'`;
 
 		const psScript = [
 			'$ErrorActionPreference = "SilentlyContinue"',
-			'$installer = $env:XRX_INSTALLER',
-			'$appExe = $env:XRX_APP_EXE',
-			'$installDir = $env:XRX_INSTALL_DIR',
-			'$parentPid = [int]$env:XRX_PARENT_PID',
-			'$logFile = $env:XRX_LOG_FILE',
+			`$installer = ${psQuote(stagedPath)}`,
+			`$appExe = ${psQuote(process.execPath)}`,
+			`$installDir = ${psQuote(installDir)}`,
+			`$parentPid = ${process.pid}`,
+			`$logFile = ${psQuote(logFile)}`,
 			'function Write-Log($msg) {',
 			'    try {',
 			'        $ts = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ")',
@@ -572,13 +575,13 @@ export async function applyStagedUpdate(ctx: UpdaterContext, stagedPath: string,
 			'    $isPerMachine = $true',
 			'}',
 			'$modeFlag = if ($isPerMachine) { "/allusers" } else { "/currentuser" }',
-			'$nsisArgs = @("/S", $modeFlag, "--updated", "/D=$installDir")',
-			'Write-Log ("UPDATER HELPER: Running installer " + $installer + " (" + ($nsisArgs -join " ") + ") perMachine=" + $isPerMachine + " isAdmin=" + $isAdmin)',
+			'$nsisArgString = "/S $modeFlag --updated /D=$installDir"',
+			'Write-Log ("UPDATER HELPER: Running installer " + $installer + " (" + $nsisArgString + ") perMachine=" + $isPerMachine + " isAdmin=" + $isAdmin)',
 			'try {',
 			'    if ($isPerMachine -and -not $isAdmin) {',
-			'        $proc = Start-Process -FilePath $installer -ArgumentList $nsisArgs -Verb RunAs -Wait -PassThru -ErrorAction Stop',
+			'        $proc = Start-Process -FilePath $installer -ArgumentList $nsisArgString -Verb RunAs -Wait -PassThru -ErrorAction Stop',
 			'    } else {',
-			'        $proc = Start-Process -FilePath $installer -ArgumentList $nsisArgs -Wait -PassThru -ErrorAction Stop',
+			'        $proc = Start-Process -FilePath $installer -ArgumentList $nsisArgString -Wait -PassThru -ErrorAction Stop',
 			'    }',
 			'    Write-Log ("UPDATER HELPER: Installer finished with exitCode=" + $proc.ExitCode)',
 			'} catch {',
@@ -590,25 +593,24 @@ export async function applyStagedUpdate(ctx: UpdaterContext, stagedPath: string,
 			'}',
 		].join('\r\n');
 
+		const systemRoot = process.env.SystemRoot || 'C:\\Windows';
+		const psExe = path.join(systemRoot, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
+		const wscriptExe = path.join(systemRoot, 'System32', 'wscript.exe');
+		const vbsCmd = `""${psExe}"" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ""${scriptPath}""`;
+		const vbsScript = `CreateObject("WScript.Shell").Run "${vbsCmd}", 0, False\r\n`;
+
 		try {
 			fs.writeFileSync(scriptPath, psScript, 'utf8');
+			fs.writeFileSync(vbsPath, vbsScript, 'utf8');
 		} catch (err) {
 			ctx.log(`FAILED TO WRITE UPDATER SCRIPT: ${(err as Error).message}`);
 		}
 
-		const psExe = path.join(process.env.SystemRoot || 'C:\\Windows', 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe');
-		const child = spawn(psExe, ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', scriptPath], {
+		// Spawn wscript.exe (GUI subsystem) so DETACHED_PROCESS does not break powershell.exe ConsoleHost initialization.
+		const child = spawn(wscriptExe, ['//B', '//NoLogo', vbsPath], {
 			detached: true,
 			stdio: 'ignore',
 			windowsHide: true,
-			env: {
-				...process.env,
-				XRX_INSTALLER: stagedPath,
-				XRX_APP_EXE: process.execPath,
-				XRX_INSTALL_DIR: installDir,
-				XRX_PARENT_PID: String(process.pid),
-				XRX_LOG_FILE: logFile,
-			},
 		});
 		child.unref();
 		app.exit(0);

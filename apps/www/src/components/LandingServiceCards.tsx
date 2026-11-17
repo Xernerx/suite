@@ -1,7 +1,7 @@
 /** @format */
 'use client';
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Activity, ArrowUpRight, Bot, Boxes, LayoutDashboard, Server, Sparkles, Users } from 'lucide-react';
@@ -48,8 +48,8 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			link: getEnvUrl('https://app.xernerx.com'),
 			tag: t('www.tags.platform'),
 			isPlatform: true,
-			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/1319029435655000234/b06769267090492ce293b0a2572fcb19.png?size=512',
-			defaultBannerUrl: 'https://cdn.discordapp.com/banners/1319029435655000234/e7e51d29fbe0e3e1982eb916f43c45ca.png?size=1024',
+			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/1319029435655000234/650686f35610dfe1f54fb219d561a8fe.png?size=512',
+			defaultBannerUrl: 'https://cdn.discordapp.com/banners/1319029435655000234/9dcc3f9fce03d267b9962477d96aef10.png?size=1024',
 		},
 		{
 			id: 'todo',
@@ -78,8 +78,8 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 			desc: t('www.applications.yourapps.desc'),
 			link: getEnvUrl('https://app.xernerx.com/bots/yourapps'),
 			tag: t('www.tags.discordBot'),
-			defaultAvatarUrl: '',
-			defaultBannerUrl: '',
+			defaultAvatarUrl: 'https://cdn.discordapp.com/avatars/619328560141697036/bceef453d5f2e3cc94e0ce573111ba4f.png?size=512',
+			defaultBannerUrl: 'https://cdn.discordapp.com/banners/619328560141697036/70c6f76dfbd69054ac5cb91987ac8f90.png?size=1024',
 		},
 		{
 			id: 'metamorphosis',
@@ -107,8 +107,29 @@ export function buildConsumerServiceItems(t: (path: string, variables?: Record<s
 export function ServiceProfileCard({ item, profile }: { item: ConsumerServiceCardItem; profile?: BotProfileData }) {
 	const { t } = useDictionary();
 
-	const avatarUrl = profile?.avatarUrl || item.defaultAvatarUrl;
-	const bannerUrl = profile?.bannerUrl || item.defaultBannerUrl;
+	const avatarCandidates = useMemo(
+		() => Array.from(new Set([profile?.avatarUrl, item.defaultAvatarUrl, '/icon.png'].filter((v): v is string => Boolean(v && v.trim())))),
+		[profile?.avatarUrl, item.defaultAvatarUrl]
+	);
+	const bannerCandidates = useMemo(
+		() => Array.from(new Set([profile?.bannerUrl, item.defaultBannerUrl].filter((v): v is string => Boolean(v && v.trim())))),
+		[profile?.bannerUrl, item.defaultBannerUrl]
+	);
+
+	const [avatarIdx, setAvatarIdx] = useState(0);
+	const [bannerIdx, setBannerIdx] = useState(0);
+
+	useEffect(() => {
+		setAvatarIdx(0);
+	}, [profile?.avatarUrl, item.defaultAvatarUrl]);
+
+	useEffect(() => {
+		setBannerIdx(0);
+	}, [profile?.bannerUrl, item.defaultBannerUrl]);
+
+	const activeAvatarUrl = avatarIdx < avatarCandidates.length ? avatarCandidates[avatarIdx] : null;
+	const activeBannerUrl = bannerIdx < bannerCandidates.length ? bannerCandidates[bannerIdx] : null;
+
 	const status = profile?.status || 'online';
 	const guildCount = profile?.guildCount ?? 0;
 	const userCount = profile?.userCount ?? 0;
@@ -143,7 +164,14 @@ export function ServiceProfileCard({ item, profile }: { item: ConsumerServiceCar
 
 			{/* Discord Profile Banner Header */}
 			<div className="relative h-32 w-full overflow-hidden bg-(--background)/60 shrink-0">
-				{bannerUrl && <img src={bannerUrl} alt={item.title} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108" />}
+				{activeBannerUrl && (
+					<img
+						src={activeBannerUrl}
+						alt={item.title}
+						onError={() => setBannerIdx((prev) => prev + 1)}
+						className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+					/>
+				)}
 				<div
 					className="absolute inset-0 opacity-25 mix-blend-overlay pointer-events-none"
 					style={{
@@ -175,8 +203,8 @@ export function ServiceProfileCard({ item, profile }: { item: ConsumerServiceCar
 				{/* Avatar + External Link Icon */}
 				<div className="flex items-end justify-between gap-4 mb-3">
 					<div className="relative h-16 w-16 rounded-2xl overflow-hidden bg-(--background) border-2 border-(--border)/20 shadow-lg ring-4 ring-(--foreground)/60 transition-transform duration-500 group-hover:scale-105 group-hover:-rotate-2 shrink-0">
-						{avatarUrl ? (
-							<img src={avatarUrl} alt={item.title} className="h-full w-full object-cover" />
+						{activeAvatarUrl ? (
+							<img src={activeAvatarUrl} alt={item.title} onError={() => setAvatarIdx((prev) => prev + 1)} className="h-full w-full object-cover" />
 						) : (
 							<div className="h-full w-full flex items-center justify-center bg-(--accent)/15 text-(--accent)">
 								<Boxes size={28} />

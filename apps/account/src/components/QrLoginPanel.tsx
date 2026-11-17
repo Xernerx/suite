@@ -150,7 +150,7 @@ export function QrLoginPanel({ callbackUrl }: { callbackUrl: string }) {
 
 	return (
 		<div
-			className="flex flex-col items-center w-full max-w-md rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl"
+			className="flex flex-col items-center w-full max-w-lg rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-xl"
 			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}
 		>
 			<div className="flex items-center gap-2 text-(--accent)">
@@ -222,12 +222,12 @@ export function QrLoginPanel({ callbackUrl }: { callbackUrl: string }) {
 			)}
 
 			{/* Redeem a 6-Character Code generated in Account -> Devices */}
-			<div className="flex items-center gap-2 w-full border-t border-(--border)/10 pt-3">
+			<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full border-t border-(--border)/10 pt-3">
 				<Input
 					value={enterCode}
 					onChange={(e) => setEnterCode(e.target.value.toUpperCase())}
 					placeholder={t('account.signin.enterDeviceCodePlaceholder')}
-					className="text-center font-mono text-xs tracking-wider uppercase"
+					className="text-center font-mono text-xs tracking-wider uppercase placeholder:normal-case placeholder:tracking-normal placeholder:font-sans"
 				/>
 				<Button variant="secondary" size="sm" isLoading={redeemingCode} onClick={handleRedeemShareCode} className="shrink-0">
 					{t('account.signin.signInWithCodeButton')}

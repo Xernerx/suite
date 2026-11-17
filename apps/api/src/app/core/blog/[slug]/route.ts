@@ -3,13 +3,13 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { resolveCallerAuth } from '@/lib/auditAndNotify';
-import { ensureSeededBlogPosts, REACTION_KEYS, type ReactionKey, serializeBlogPost } from '@/lib/defaultBlogPosts';
+import { buildBlogSlugQuery, DEFAULT_BLOG_POSTS, ensureSeededBlogPosts, findMatchingDefaultBlogPost, REACTION_KEYS, type ReactionKey, serializeBlogPost } from '@/lib/defaultBlogPosts';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
+	const { slug } = await params;
 	try {
-		const { slug } = await params;
 		const { searchParams } = new URL(req.url);
 		const isPreview = searchParams.get('preview') === 'true';
 
@@ -24,11 +24,34 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
 			userId: null,
 		}));
 
-		const doc = await BlogPost.findOne({
-			$or: [{ slug }, { id: slug }],
-		});
+		let doc = await BlogPost.findOne(buildBlogSlugQuery(slug));
+		if (!doc) {
+			const allPublic = await BlogPost.find({ privacy: { $in: ['public', 'limited'] } })
+				.select('id slug')
+				.lean()
+				.catch(() => []);
+			const reverseMatch = allPublic.find(
+				(p: any) =>
+					p?.slug &&
+					String(slug)
+						.toLowerCase()
+						.startsWith(`${String(p.slug).toLowerCase()}-`)
+			);
+			if (reverseMatch?.slug) {
+				doc = await BlogPost.findOne({ slug: reverseMatch.slug });
+			}
+		}
 
 		if (!doc) {
+			const fallbackDefault = findMatchingDefaultBlogPost(slug);
+			if (fallbackDefault) {
+				return NextResponse.json({
+					post: serializeBlogPost(fallbackDefault, caller.userId, true),
+					related: DEFAULT_BLOG_POSTS.filter((r) => r.slug !== fallbackDefault.slug)
+						.slice(0, 3)
+						.map((r) => serializeBlogPost(r, caller.userId, false)),
+				});
+			}
 			return NextResponse.json({ error: 'Article not found.' }, { status: 404 });
 		}
 
@@ -62,6 +85,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
 			related: relatedDocs.map((r: any) => serializeBlogPost(r, caller.userId, false)),
 		});
 	} catch (err: any) {
+		const fallbackDefault = findMatchingDefaultBlogPost(slug);
+		if (fallbackDefault) {
+			return NextResponse.json({
+				post: serializeBlogPost(fallbackDefault, null, true),
+				related: DEFAULT_BLOG_POSTS.filter((r) => r.slug !== fallbackDefault.slug)
+					.slice(0, 3)
+					.map((r) => serializeBlogPost(r, null, false)),
+			});
+		}
 		return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 });
 	}
 }
@@ -83,9 +115,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
 		const { models } = await database('xernerx');
 		const BlogPost = (models.core as any).BlogPost;
 
-		const doc = await BlogPost.findOne({
-			$or: [{ slug }, { id: slug }],
-		});
+		const doc = await BlogPost.findOne(buildBlogSlugQuery(slug));
 
 		if (!doc) {
 			return NextResponse.json({ error: 'Article not found.' }, { status: 404 });

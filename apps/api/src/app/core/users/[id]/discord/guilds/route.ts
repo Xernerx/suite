@@ -1,6 +1,8 @@
 /** @format */
 
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -15,12 +17,17 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		const { models } = await database('xernerx');
 
 		if (!authHeader || authHeader === 'Bearer undefined' || authHeader === 'Bearer null') {
-			const user = (await models.users?.User?.findOne({ id })
-				.lean()
-				.catch(() => null)) as any;
-			const fallbackToken = user?.accounts?.discord?.access_token || user?.token;
-			if (fallbackToken) {
-				authHeader = `Bearer ${fallbackToken}`;
+			const session = (await getServerSession(auth).catch(() => null)) as any;
+			if (session?.user?.id && String(session.user.id) === String(id) && session?.accessToken) {
+				authHeader = `Bearer ${session.accessToken}`;
+			} else {
+				const user = (await models.users?.User?.findOne({ id })
+					.lean()
+					.catch(() => null)) as any;
+				const fallbackToken = user?.accounts?.discord?.access_token || user?.token;
+				if (fallbackToken) {
+					authHeader = `Bearer ${fallbackToken}`;
+				}
 			}
 		}
 

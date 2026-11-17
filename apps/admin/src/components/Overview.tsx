@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
-import { Loading } from '@xernerx/feedback';
+import { AdminSkeleton } from './AdminSkeleton';
 import OverviewSummaryCards, { FALLBACK_APPS, LIGHTHOUSE_STORAGE_KEY, MCP_SEO_STORAGE_KEY, type LighthouseScoreData, type McpSeoScoreData, type SuiteAppVersionInfo } from './OverviewSummaryCards';
 import OverviewSubdomainCard, { type EnvFilterMode } from './OverviewSubdomainCard';
 import SeoAnalyzerReportModal from './SeoAnalyzerReportModal';
@@ -288,7 +288,7 @@ export default function Overview() {
 		fetchOverviewData(false);
 	}, [getEnvUrl, isDev]);
 
-	if (loading) return <Loading />;
+	if (loading) return <AdminSkeleton variant="seo" />;
 
 	const openIssuesCount = issues.filter((i) => i.status === 'open').length;
 	const pendingReviewCount = issues.filter((i) => i.status === 'open' && !i.acknowledged).length;
@@ -313,6 +313,7 @@ export default function Overview() {
 	return (
 		<div className="flex flex-col gap-6">
 			<OverviewHeader
+				appsCount={apps.length}
 				batchAuditState={batchAuditState}
 				refreshing={refreshing}
 				onBatchAudit={runBatchAudit}

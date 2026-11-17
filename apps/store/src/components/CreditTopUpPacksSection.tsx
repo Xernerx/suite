@@ -6,7 +6,7 @@ import React from 'react';
 import { Check, Coins, Loader2, ShoppingBag } from 'lucide-react';
 import { Button } from '@xernerx/ui';
 import { useDictionary } from '@xernerx/providers';
-import { CatalogItem, FALLBACK_EUR_PRICES } from './types';
+import { CatalogItem, FALLBACK_EUR_PRICES, formatStorePrice } from './types';
 
 interface CreditTopUpPacksSectionProps {
 	creditPacks: CatalogItem[];
@@ -35,13 +35,7 @@ export function CreditTopUpPacksSection({ creditPacks, actionLoading, onBuyCredi
 				{creditPacks.map((pack) => {
 					const activePrice = pack.prices?.[0] || null;
 					const rawAmount = activePrice ? (activePrice.discountedAmount ?? activePrice.unitAmount) : null;
-					const formattedPrice =
-						typeof rawAmount === 'number'
-							? new Intl.NumberFormat(undefined, {
-									style: 'currency',
-									currency: (activePrice.currency || 'eur').toUpperCase(),
-								}).format(rawAmount / 100)
-							: FALLBACK_EUR_PRICES[pack.id] || '€—';
+					const formattedPrice = typeof rawAmount === 'number' ? formatStorePrice(rawAmount / 100, activePrice?.currency) : FALLBACK_EUR_PRICES[pack.id] || '—';
 
 					const isBusy = Boolean(activePrice && actionLoading === activePrice.id);
 

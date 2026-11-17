@@ -64,7 +64,12 @@ export default function SecurityPage() {
 			href: getEnvUrl('https://app.xernerx.com/bots/yourapps'),
 			title: t('www.security.sections.bots.yourapps.title'),
 			badge: t('www.security.sections.bots.yourapps.badge'),
-			points: [t('www.security.sections.bots.yourapps.points.0'), t('www.security.sections.bots.yourapps.points.1'), t('www.security.sections.bots.yourapps.points.2')],
+			points: [
+				t('www.security.sections.bots.yourapps.points.0'),
+				t('www.security.sections.bots.yourapps.points.1'),
+				t('www.security.sections.bots.yourapps.points.2'),
+				t('www.security.sections.bots.yourapps.points.3'),
+			],
 		},
 		{
 			id: 'todo',
@@ -224,6 +229,7 @@ export default function SecurityPage() {
 						<li>{t('www.security.sections.dataControl.items.1')}</li>
 						<li>{t('www.security.sections.dataControl.items.2')}</li>
 						<li>{t('www.security.sections.dataControl.items.3')}</li>
+						<li>{t('www.security.sections.dataControl.items.5')}</li>
 						<li>{t('www.security.sections.dataControl.items.4')}</li>
 					</ul>
 				</div>
@@ -390,7 +396,7 @@ export default function SecurityPage() {
 								{t('www.security.header.title')}
 							</h1>
 							<p className="max-w-3xl text-base text-(--text-muted) leading-relaxed">{t('www.security.header.subtitle')}</p>
-							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 16 November 2026</div>
+							<div className="text-xs font-medium tracking-wide uppercase text-(--text-muted)">{t('www.security.header.effectiveDate')} 17 November 2026</div>
 						</header>
 
 						{/* Core Security Pillars Bento */}

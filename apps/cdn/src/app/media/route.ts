@@ -4,22 +4,21 @@ import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
-import { getCdnCorsHeaders } from '@/lib/cors';
+import { getCdnCorsHeaders, resolveCdnBaseUrl } from '@/lib/cors';
 
-function getCorsHeaders(origin: string | null) {
-	return getCdnCorsHeaders(origin, 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+function getCorsHeaders(req: Request) {
+	return getCdnCorsHeaders(req.headers.get('origin'), 'GET, POST, PUT, PATCH, DELETE, OPTIONS', undefined, req.headers.get('access-control-request-headers'));
 }
 
 export async function OPTIONS(req: Request) {
 	return new Response(null, {
 		status: 204,
-		headers: getCorsHeaders(req.headers.get('origin')),
+		headers: getCorsHeaders(req),
 	});
 }
 
 export async function GET(req: Request) {
-	const origin = req.headers.get('origin');
-	const corsHeaders = getCorsHeaders(origin);
+	const corsHeaders = getCorsHeaders(req);
 
 	try {
 		const session = await getServerSession(auth);
@@ -84,9 +83,7 @@ export async function GET(req: Request) {
 		const maxUploads = (isStaffSubscribed || canManage || activeSubscriptions.length > 0 ? 1000 : 10) + extraCdnSlots;
 		const selfUploadCount = userMedia.filter((m: any) => m.uploaderId === userId).length;
 
-		const domain = process.env.DOMAIN || 'xernerx.com';
-		const isDev = process.env.ENVIRONMENT === 'DEVELOPMENT';
-		const baseUrl = isDev ? `https://cdn.dev.${domain}` : `https://cdn.${domain}`;
+		const baseUrl = resolveCdnBaseUrl(req);
 
 		const mappedMedia = userMedia.map((m: any) => ({
 			...m,
@@ -111,8 +108,7 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-	const origin = req.headers.get('origin');
-	const corsHeaders = getCorsHeaders(origin);
+	const corsHeaders = getCorsHeaders(req);
 
 	try {
 		const session = await getServerSession(auth);

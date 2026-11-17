@@ -4,13 +4,13 @@
 
 import { Bot, Code, Coins, Server, Sparkles, Tag, ShoppingBag, TicketPercent, X, Check } from 'lucide-react';
 import { useDictionary, useEnvironment, useSidebar, useToast, useUser } from '@xernerx/providers';
-import { Loading } from '@xernerx/feedback';
 import { Button, Input, Toggle } from '@xernerx/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { CatalogCategory, CatalogItem, UserSubscription } from '../components/types';
+import { CatalogCategory, CatalogItem, formatStorePrice, UserSubscription } from '../components/types';
 import { DynamicCategoryView } from '../components/DynamicCategoryView';
 import { CreditStoreView } from '../components/CreditStoreView';
+import { StoreCatalogSkeleton } from '../components/StoreSkeleton';
 
 const ICONS_MAP: Record<string, any> = {
 	Bot,
@@ -393,7 +393,9 @@ export default function StorePage() {
 								<div className="flex items-center gap-2 h-10 px-3.5 rounded-2xl bg-(--accent-green)/15 border border-(--accent-green)/30 text-xs font-bold text-(--accent-green)">
 									<Check size={14} className="shrink-0" />
 									<span className="font-mono tracking-wider">{appliedCoupon.code}</span>
-									<span className="text-(--text) font-semibold">({appliedCoupon.discountType === 'amount' ? `-€${appliedCoupon.amountOff}` : `-${appliedCoupon.percentOff}%`})</span>
+									<span className="text-(--text) font-semibold">
+										({appliedCoupon.discountType === 'amount' ? `-${formatStorePrice(appliedCoupon.amountOff)}` : `-${appliedCoupon.percentOff}%`})
+									</span>
 									<button
 										type="button"
 										onClick={() => {
@@ -450,9 +452,7 @@ export default function StorePage() {
 
 			{/* Category View */}
 			{loading ? (
-				<div className="flex items-center justify-center py-24">
-					<Loading variant="small" />
-				</div>
+				<StoreCatalogSkeleton />
 			) : (
 				currentCategory &&
 				(currentCategory.id === 'credits' ? (

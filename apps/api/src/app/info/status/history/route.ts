@@ -20,10 +20,31 @@ ensureStatusMonitorCronStarted();
 
 export type { StatusBucketPoint };
 
+function resolveRequestTargetEnv(req: NextRequest): 'dev' | 'canary' | 'public' {
+	const explicit = (req.nextUrl.searchParams.get('env') || '').toLowerCase();
+	if (explicit === 'dev' || explicit === 'development') return 'dev';
+	if (explicit === 'canary') return 'canary';
+	if (explicit === 'public' || explicit === 'production') return 'public';
+
+	const origin = (req.headers.get('origin') || '').toLowerCase();
+	const host = (req.headers.get('x-forwarded-host') || req.headers.get('host') || '').toLowerCase();
+	if (origin.includes('.dev.') || origin.includes('localhost') || host.includes('.dev.') || host.includes('localhost')) {
+		return 'dev';
+	}
+	if (origin.includes('.canary.') || host.includes('.canary.')) {
+		return 'canary';
+	}
+	const env = (process.env.ENVIRONMENT || '').toLowerCase();
+	if (env === 'development') return 'dev';
+	if (env === 'canary') return 'canary';
+	return 'public';
+}
+
 export async function GET(req: NextRequest) {
 	try {
 		const forceRefresh = req.nextUrl.searchParams.get('refresh') === 'true' || req.nextUrl.searchParams.get('cron') === 'true';
-		const result = await recordAndGetStatusHistory({ forceRefresh });
+		const targetEnv = resolveRequestTargetEnv(req);
+		const result = await recordAndGetStatusHistory({ forceRefresh, targetEnv });
 		return NextResponse.json(result);
 	} catch (err) {
 		console.error('Failed to GET 24h status history:', err);

@@ -2,6 +2,29 @@
 
 # blog
 
+## 1.1.13
+
+### Patch Changes
+
+- ## Article Slug Aliases & Shimmer Loading Skeletons
+  
+  Improved article link reliability and added loading skeletons across the Xernerx Blog.
+  
+  ### Added
+  
+  - **Blog Loading Skeletons**: Added shimmer skeletons for featured heroes, article grids, and individual post pages during loading.
+  
+  ### Changed
+  
+  - **Short Slug Resolution**: Supported short article URL slugs alongside full canonical slugs so shared links always resolve cleanly.
+- Updated dependencies
+  - @xernerx/components@0.19.0
+  - @xernerx/feedback@0.7.0
+  - @xernerx/lib@1.28.0
+  - @xernerx/providers@0.24.2
+  - @xernerx/styles@0.4.3
+  - @xernerx/ui@0.10.0
+
 ## 1.1.12
 
 ### Patch Changes

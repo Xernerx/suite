@@ -20,6 +20,7 @@ import {
 	TOUR_DEMO_GUILD_CONFIG,
 	buildDashboardNavItems,
 	DashboardGuildHeader,
+	DashboardLoadingSkeleton,
 	DashboardEmptyState,
 	type Guild,
 } from '@/components/dashboard/DashboardGuildHeader';
@@ -41,7 +42,6 @@ function DashboardContent() {
 	const [originalGuildConfig, setOriginalGuildConfig] = useState<any>(null);
 	const [configLoading, setConfigLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
-	const [, setDeleting] = useState(false);
 	const [deleteGuildConfirmOpen, setDeleteGuildConfirmOpen] = useState(false);
 	const [boostModalOpen, setBoostModalOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -56,8 +56,9 @@ function DashboardContent() {
 		applications: false,
 	});
 	const { remind, toast } = useToast();
-	const effectiveGuild = selectedGuild || (isTourDashboard ? TOUR_DEMO_GUILD : null);
-	const effectiveGuildConfig = guildConfig || (isTourDashboard ? TOUR_DEMO_GUILD_CONFIG : null);
+	const useTourDemo = isTourDashboard && !loading && guilds.length === 0 && !selectedGuild;
+	const effectiveGuild = selectedGuild || (useTourDemo ? TOUR_DEMO_GUILD : null);
+	const effectiveGuildConfig = guildConfig || (useTourDemo ? TOUR_DEMO_GUILD_CONFIG : null);
 
 	useEffect(() => {
 		const gid = effectiveGuild?.id || '';
@@ -147,6 +148,12 @@ function DashboardContent() {
 				setGuilds(managedGuilds);
 				setNavItems(
 					buildDashboardNavItems(t, managedGuilds, (g) => {
+						if (selectedGuild?.id !== g.id) {
+							setGuildConfig(null);
+							setOriginalGuildConfig(null);
+							setConfigLoading(true);
+							remind(false);
+						}
 						setSelectedGuild(g);
 						setView(`server-${g.id}`);
 						const params = new URLSearchParams(window.location.search);
@@ -163,6 +170,9 @@ function DashboardContent() {
 						(params.get('view')?.startsWith('server-') ? params.get('view')!.replace('server-', '') : null) ||
 						(tabParam?.startsWith('server-') ? tabParam.replace('server-', '') : null);
 					const initialGuild = (requestedGuildId ? managedGuilds.find((g) => g.id === requestedGuildId) : null) || managedGuilds[0];
+					setGuildConfig(null);
+					setOriginalGuildConfig(null);
+					setConfigLoading(true);
 					setSelectedGuild(initialGuild);
 					setView(`server-${initialGuild.id}`);
 					if (params.get('guild') !== initialGuild.id) {
@@ -191,6 +201,10 @@ function DashboardContent() {
 		if (selectedGuild?.id !== guildId) {
 			const matched = guilds.find((g) => g.id === guildId);
 			if (matched) {
+				setGuildConfig(null);
+				setOriginalGuildConfig(null);
+				setConfigLoading(true);
+				remind(false);
 				setSelectedGuild(matched);
 				const params = new URLSearchParams(window.location.search);
 				if (params.get('guild') !== matched.id) {
@@ -199,43 +213,55 @@ function DashboardContent() {
 				}
 			}
 		}
-	}, [view, guilds, selectedGuild?.id, router]);
+	}, [view, guilds, selectedGuild?.id, router, remind]);
 
 	const [organizations, setOrganizations] = useState<any[]>([]);
 
 	useEffect(() => {
-		if (!selectedGuild) {
+		if (!selectedGuild?.id) {
 			setGuildConfig(null);
 			setOriginalGuildConfig(null);
+			setConfigLoading(false);
 			return;
 		}
 
+		let cancelled = false;
+		setGuildConfig(null);
+		setOriginalGuildConfig(null);
+		setConfigLoading(true);
+
+		const targetGuildId = selectedGuild.id;
 		const fetchConfig = async () => {
-			setConfigLoading(true);
 			try {
 				const [guildRes, orgsRes] = await Promise.all([
-					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), { credentials: 'include' }),
+					fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${targetGuildId}`), { credentials: 'include' }),
 					fetch(getEnvUrl(`https://api.xernerx.com/secure/organizations?user=${(session as any).user.id}`), { credentials: 'include' }),
 				]);
+				if (cancelled) return;
 
 				if (guildRes.ok) {
 					const data = await guildRes.json();
+					if (cancelled) return;
 					setGuildConfig(data);
 					setOriginalGuildConfig(JSON.parse(JSON.stringify(data)));
 				}
 
 				if (orgsRes.ok) {
-					setOrganizations(await orgsRes.json());
+					const orgList = await orgsRes.json();
+					if (!cancelled) setOrganizations(orgList);
 				}
 			} catch (error) {
 				console.error('Failed to fetch guild config', error);
 			} finally {
-				setConfigLoading(false);
+				if (!cancelled) setConfigLoading(false);
 			}
 		};
 
 		fetchConfig();
-	}, [selectedGuild, session, getEnvUrl, isReady]);
+		return () => {
+			cancelled = true;
+		};
+	}, [selectedGuild?.id, (session as any)?.user?.id, getEnvUrl, isReady]);
 
 	const handleSaveConfig = async () => {
 		if (!selectedGuild || !guildConfig) return;
@@ -246,9 +272,7 @@ function DashboardContent() {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), {
 				method: 'PATCH',
 				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					name: selectedGuild.name,
 					icon: selectedGuild.icon,
@@ -285,10 +309,7 @@ function DashboardContent() {
 		}
 	};
 
-	const isDirty = useMemo(() => {
-		if (!guildConfig || !originalGuildConfig) return false;
-		return JSON.stringify(guildConfig) !== JSON.stringify(originalGuildConfig);
-	}, [guildConfig, originalGuildConfig]);
+	const isDirty = useMemo(() => Boolean(guildConfig && originalGuildConfig && JSON.stringify(guildConfig) !== JSON.stringify(originalGuildConfig)), [guildConfig, originalGuildConfig]);
 
 	useEffect(() => {
 		if (activeTab === 'virtue' || activeTab === 'applications') return;
@@ -297,20 +318,14 @@ function DashboardContent() {
 	}, [activeTab, isDirty, saving, originalGuildConfig, remind, guildConfig, selectedGuild]);
 
 	const handleDeleteGuild = () => {
-		if (!selectedGuild) return;
-		setDeleteGuildConfirmOpen(true);
+		if (selectedGuild) setDeleteGuildConfirmOpen(true);
 	};
 
 	const confirmDeleteGuild = async () => {
 		if (!selectedGuild) return;
 		setDeleteGuildConfirmOpen(false);
-		setDeleting(true);
 		try {
-			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), {
-				method: 'DELETE',
-				credentials: 'include',
-			});
-
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${selectedGuild.id}`), { method: 'DELETE', credentials: 'include' });
 			if (res.ok) {
 				setSelectedGuild(null);
 				setGuildConfig(null);
@@ -321,26 +336,16 @@ function DashboardContent() {
 		} catch (error) {
 			console.error('Failed to delete guild', error);
 			toast({ title: t('app.dashboard.deleteFailed'), type: 'error' });
-		} finally {
-			setDeleting(false);
 		}
 	};
 
 	return (
 		<div
 			className={`flex flex-col max-w-(--page-width) mx-auto w-full ${botTourName ? 'pb-48' : ''}`}
-			style={{
-				padding: 'var(--ui-gap)',
-				gap: 'var(--ui-gap)',
-				fontSize: 'var(--text-scale, 14px)',
-			}}
+			style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)', fontSize: 'var(--text-scale, 14px)' }}
 		>
-			{loading && !isTourDashboard ? (
-				<div className="flex flex-col items-center justify-center text-center py-12 gap-3">
-					<h1 className="sr-only">{t('app.seo.dashboard.h1')}</h1>
-					<p className="sr-only">{t('app.seo.dashboard.guideIntro')}</p>
-					<Loading message={t('app.dashboard.loadingServers')} />
-				</div>
+			{loading ? (
+				<DashboardLoadingSkeleton />
 			) : effectiveGuild ? (
 				<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 					<DashboardGuildHeader
@@ -367,16 +372,16 @@ function DashboardContent() {
 						</div>
 
 						<div data-tour="dash-config" className="flex flex-col rounded-3xl transition-all duration-300" style={{ gap: 'var(--ui-gap)' }}>
-							{activeTab !== 'virtue' && activeTab !== 'applications' && ((configLoading && !isTourDashboard) || !effectiveGuildConfig) ? (
+							{activeTab !== 'virtue' && activeTab !== 'applications' && ((configLoading && !useTourDemo) || !effectiveGuildConfig) ? (
 								<div className="flex items-center justify-center py-16 rounded-3xl border border-(--border)/10 bg-(--foreground)/30 backdrop-blur-md shadow-sm">
 									<Loading variant="small" />
 								</div>
 							) : effectiveGuildConfig ? (
 								<>
-									{activeTab === 'info' && <General guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
-
+									{activeTab === 'info' && <General key={effectiveGuild.id} guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
 									{activeTab === 'stats' && (
 										<Statistics
+											key={effectiveGuild.id}
 											guildConfig={effectiveGuildConfig}
 											timeframe={timeframe}
 											setTimeframe={setTimeframe}
@@ -385,11 +390,10 @@ function DashboardContent() {
 											isUndrawing={isUndrawing}
 										/>
 									)}
-
-									{activeTab === 'links' && <Links guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
-
+									{activeTab === 'links' && <Links key={effectiveGuild.id} guildConfig={effectiveGuildConfig} setGuildConfig={setGuildConfig} />}
 									{activeTab === 'settings' && (
 										<Settings
+											key={effectiveGuild.id}
 											guildConfig={effectiveGuildConfig}
 											setGuildConfig={setGuildConfig}
 											onVanityUnlocked={() => {

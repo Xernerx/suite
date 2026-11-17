@@ -160,6 +160,71 @@ export interface UserSummary {
 		balance?: number;
 		streak?: number;
 	};
+	botProfiles?: {
+		bots: ('virtue' | 'yourapps')[];
+		serverCount: number;
+	};
+}
+
+export interface UserBotQuestionAnswer {
+	questionId: string;
+	question: string;
+	type: string;
+	answer: string;
+}
+
+export interface UserYourAppsSubmissionItem {
+	id: string;
+	positionId: string;
+	positionName: string;
+	status: 'pending' | 'approved' | 'denied' | 'withdrawn';
+	answers: UserBotQuestionAnswer[];
+	reviewedBy: string | null;
+	reviewedByTag: string | null;
+	reviewReason: string | null;
+	reviewedAt: string | null;
+	createdAt: string | null;
+}
+
+export interface UserYourAppsDraftItem {
+	id: string;
+	positionId: string;
+	positionName: string;
+	currentStep: number;
+	answers: UserBotQuestionAnswer[];
+	updatedAt: string | null;
+}
+
+export interface UserBotServerEntry {
+	guildId: string;
+	name: string;
+	iconUrl: string | null;
+	privacy: string;
+	verified: boolean;
+	vanitySlug?: string;
+	bots: ('virtue' | 'yourapps')[];
+	virtue: {
+		hasData: boolean;
+		unified: { level: number; xp: number; updatedAt?: string | null } | null;
+		text: { level: number; xp: number; messages: number; updatedAt?: string | null } | null;
+		voice: { level: number; xp: number; timeSpent: number; updatedAt?: string | null } | null;
+	};
+	yourapps: {
+		hasData: boolean;
+		submissions: UserYourAppsSubmissionItem[];
+		drafts: UserYourAppsDraftItem[];
+	};
+}
+
+export interface UserBotProfilesResponse {
+	userId: string;
+	virtueGlobal: {
+		found: boolean;
+		language: string | null;
+		locale: string | null;
+		updatedAt: string | null;
+	} | null;
+	servers: UserBotServerEntry[];
 }
 
 export function getUserPersona(obj?: { onboarding?: UserOnboardingState | null } | null): UserPersona {

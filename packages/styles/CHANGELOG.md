@@ -2,6 +2,18 @@
 
 # @xernerx/styles
 
+## 0.4.3
+
+### Patch Changes
+
+- ## Tailwind CSS v4 & Toolchain Alignment
+  
+  Aligned `@tailwindcss/postcss`, `tailwindcss`, and `pnpm@12.21.0` / Node `>=24` workspace metadata.
+  
+  ### Changed
+  
+  - **Toolchain & Dependency Alignment**: Updated Tailwind CSS v4 PostCSS dependencies and Node `>=24` / `pnpm@12.21.0` package metadata.
+
 ## 0.4.2
 
 ### Patch Changes

@@ -2,6 +2,24 @@
 
 # @xernerx/feedback
 
+## 0.7.0
+
+### Minor Changes
+
+- ## `plus1000` Dot-Matrix Formation & Vivid Stage Prop
+  
+  Added the `plus1000` dot-matrix formation and vivid brightness mode to `XernerxDotLogo`.
+  
+  ### Added
+  
+  - **`plus1000` Dot-Matrix Path**: Added the `+1000` milestone formation path and `vivid` rendering prop on `XernerxDotLogo`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/providers@0.24.2
+  - @xernerx/ui@0.10.0
+
 ## 0.6.3
 
 ### Patch Changes

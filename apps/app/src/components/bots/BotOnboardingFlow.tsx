@@ -72,6 +72,7 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 	const [savingStep, setSavingStep] = useState(false);
 	const [managedGuilds, setManagedGuilds] = useState<{ id: string; name: string; iconUrl?: string | null }[]>([]);
 	const [selectedGuildId, setSelectedGuildId] = useState<string>(initialGuildId || '');
+	const [verifiedBotGuilds, setVerifiedBotGuilds] = useState<Record<string, boolean>>(() => (initialGuildId ? { [initialGuildId]: true } : {}));
 
 	const botDisplayName = bot?.discord?.global_name || bot?.discord?.username || bot?.name || id;
 	const avatarUrl = bot?.discord?.avatar
@@ -88,7 +89,7 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 			.filter((c: any) => c && c.name && (!c.type || Number(c.type) === 1))
 			.slice(0, 6)
 			.map((c: any) => ({ name: String(c.name), description: String(c.description || '') }));
-	}, [bot?.commands]);
+	}, [bot]);
 
 	useEffect(() => {
 		hide();
@@ -148,12 +149,41 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 				setManagedGuilds(managed);
 				if (initialGuildId && managed.some((g) => g.id === initialGuildId)) {
 					setSelectedGuildId(initialGuildId);
-				} else if (!selectedGuildId && managed.length > 0) {
-					setSelectedGuildId(managed[0].id);
+					setVerifiedBotGuilds((prev) => ({ ...prev, [initialGuildId]: true }));
 				}
 			})
 			.catch(() => {});
-	}, [(session as any)?.user?.id, (session as any)?.accessToken, user?.id, getEnvUrl, initialGuildId, selectedGuildId]);
+	}, [(session as any)?.user?.id, (session as any)?.accessToken, user?.id, getEnvUrl, initialGuildId]);
+
+	// Verify whether the bot is actually present in the selected server before marking it Linked
+	useEffect(() => {
+		if (!selectedGuildId || selectedGuildId === initialGuildId || verifiedBotGuilds[selectedGuildId] !== undefined) return;
+		if (!isVirtue && !isYourApps) return;
+		let cancelled = false;
+		const endpoint = isVirtue ? `https://api.xernerx.com/secure/guilds/${selectedGuildId}/virtue` : `https://api.xernerx.com/secure/guilds/${selectedGuildId}/applications`;
+
+		fetch(getEnvUrl(endpoint), { credentials: 'include' })
+			.then(async (res) => {
+				if (!res.ok) return false;
+				const data = await res.json().catch(() => ({}));
+				if (isYourApps) return data?.found !== false && data?.botPresent !== false;
+				return true;
+			})
+			.then((present) => {
+				if (!cancelled) {
+					setVerifiedBotGuilds((prev) => ({ ...prev, [selectedGuildId]: Boolean(present) }));
+				}
+			})
+			.catch(() => {
+				if (!cancelled) {
+					setVerifiedBotGuilds((prev) => ({ ...prev, [selectedGuildId]: false }));
+				}
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [selectedGuildId, initialGuildId, isVirtue, isYourApps, getEnvUrl, verifiedBotGuilds]);
 
 	const persistOnboardingCompletion = useCallback(async () => {
 		const identifiers = [resolvedBotId, botSlugLower, String(id)].filter(Boolean);
@@ -225,7 +255,9 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 		router.push(`/bots/${id}?skipOnboarding=1`);
 	};
 
-	const matchedInvitedGuild = managedGuilds.find((g) => g.id === (selectedGuildId || initialGuildId)) || null;
+	const activeTargetGuildId = selectedGuildId || initialGuildId || '';
+	const isTargetGuildLinked = Boolean(activeTargetGuildId && (activeTargetGuildId === initialGuildId || verifiedBotGuilds[activeTargetGuildId] === true));
+	const matchedInvitedGuild = isTargetGuildLinked ? managedGuilds.find((g) => g.id === activeTargetGuildId) || null : null;
 
 	return (
 		<div className="min-h-[calc(100dvh-60px)] flex flex-col items-center justify-center py-6 px-4 max-w-(--page-width) mx-auto w-full" style={{ gap: 'var(--ui-gap)' }}>
@@ -310,7 +342,23 @@ export default function BotOnboardingFlow({ bot, id, initialGuildId, initialForc
 												<Selector
 													value={selectedGuildId}
 													onChange={(val) => setSelectedGuildId(String(val))}
-													options={managedGuilds.map((g) => ({ label: g.name, value: g.id }))}
+													placeholder={t('app.bots.onboarding.dashboard.selectServerLabel')}
+													options={managedGuilds.map((g) => {
+														const isVerified = g.id === initialGuildId || verifiedBotGuilds[g.id] === true;
+														return {
+															label: g.name,
+															value: g.id,
+															...(isVerified
+																? {
+																		badge: (
+																			<Badge variant="success" size="sm">
+																				{t('app.bots.onboarding.intro.actReady')}
+																			</Badge>
+																		),
+																	}
+																: {}),
+														};
+													})}
 												/>
 											</div>
 										)}

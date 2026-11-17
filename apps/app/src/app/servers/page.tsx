@@ -1,14 +1,14 @@
 /** @format */
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useDictionary, useEnvironment, useSidebar } from '@xernerx/providers';
-import { Button, Input } from '@xernerx/ui';
+import { Input } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import Link from 'next/link';
-import { Server, Users, ArrowLeft, ChevronUp, Image as ImageIcon, Trophy, Sparkles } from 'lucide-react';
-import Image from 'next/image';
+import { Server, Users, ArrowLeft, ChevronUp, Image as ImageIcon, Trophy, Sparkles, Flame } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import SafeAvatar from '@/components/SafeAvatar';
 import { AppSeoSection } from '@/components/AppSeoSection';
 
 interface GuildProfile {
@@ -31,21 +31,24 @@ function ServerCard({ server }: { server: GuildProfile }) {
 	return (
 		<Link
 			href={`/servers/${server.id}`}
-			className="group relative flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-2xl overflow-hidden hover:border-(--accent) transition-colors shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
+			className="group relative flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl overflow-hidden hover:border-(--accent) transition-colors shadow-sm hover:shadow-[0_0_20px_color-mix(in_srgb,var(--accent)_20%,transparent)]"
 		>
 			<div className="h-24 w-full relative bg-gradient-to-br from-(--border) to-(--background) overflow-hidden shrink-0 flex items-center justify-center">
-				{banner ? <Image src={banner} alt={`${name} banner`} fill className="object-cover" unoptimized /> : <ImageIcon className="w-8 h-8 text-(--text-muted)/30" />}
+				<SafeAvatar src={banner} alt={`${name} banner`} fill className="object-cover" fallback={<ImageIcon className="w-8 h-8 text-(--text-muted)/30" />} />
 				<div className="absolute inset-0 bg-(--accent)/20 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
 			</div>
 
 			<div className="flex flex-col px-6 pb-6 -mt-10 relative z-10 flex-1">
 				<div className="flex justify-between items-end">
 					<div className="w-20 h-20 rounded-2xl border-4 border-(--foreground) bg-(--background) overflow-hidden shadow-md flex items-center justify-center shrink-0">
-						{avatar ? (
-							<Image src={avatar} alt={name} width={80} height={80} className="w-full h-full object-cover" unoptimized />
-						) : (
-							<div className="text-2xl font-bold text-(--text-muted)">{name.charAt(0)}</div>
-						)}
+						<SafeAvatar
+							src={avatar}
+							alt={name}
+							width={80}
+							height={80}
+							className="w-full h-full object-cover"
+							fallback={<div className="text-2xl font-bold text-(--text-muted)">{name.charAt(0)}</div>}
+						/>
 					</div>
 
 					<div className="flex items-center gap-2 mb-2">
@@ -84,26 +87,25 @@ function ServersListContent() {
 	const [servers, setServers] = useState<GuildProfile[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
-	const [prevView, setPrevView] = useState<string | null>(view);
+
+	const urlCategoryParam = searchParams.get('category') || searchParams.get('view');
+	const effectiveView = urlCategoryParam || view || 'all';
+
+	const handleSelectCategory = useCallback(
+		(catId: string) => {
+			setView(catId);
+			setSearchInput('');
+			router.replace(`/servers?category=${encodeURIComponent(catId)}`, { scroll: false });
+		},
+		[router, setView]
+	);
 
 	// Sync ?category= query param into active sidebar view
 	useEffect(() => {
-		const categoryParam = searchParams.get('category');
-		if (categoryParam) {
-			setView(categoryParam);
+		if (urlCategoryParam && view !== urlCategoryParam) {
+			setView(urlCategoryParam);
 		}
-	}, [searchParams, setView]);
-
-	// Clear ?search= query when user clicks a sidebar category
-	useEffect(() => {
-		if (view && view !== prevView) {
-			setPrevView(view);
-			if (searchParams.get('search')) {
-				setSearchInput('');
-				router.replace('/servers', { scroll: false });
-			}
-		}
-	}, [view, prevView, searchParams, router]);
+	}, [urlCategoryParam, view, setView]);
 
 	// Setup Sidebar Navigation
 	useEffect(() => {
@@ -112,18 +114,19 @@ function ServersListContent() {
 		const baseNavItems = [
 			{ label: t('app.servers.nav.backToExplore'), href: '/', icon: ArrowLeft, category: t('app.bots.nav.categoryNavigation') },
 			{ label: t('app.leaderboard.title'), href: '/leaderboard?tab=servers', icon: Trophy, category: t('app.bots.nav.categoryNavigation') },
-			{ label: t('app.servers.nav.allServers'), view: 'all', icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.topVoted'), view: 'top_voted', icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.biggestServers'), view: 'biggest', icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },
-			{ label: t('app.categories.newcomers'), view: 'newcomers', icon: Sparkles, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.servers.nav.allServers'), view: 'all', onClick: () => handleSelectCategory('all'), icon: Server, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.topVoted'), view: 'top_voted', onClick: () => handleSelectCategory('top_voted'), icon: ChevronUp, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.biggestServers'), view: 'biggest', onClick: () => handleSelectCategory('biggest'), icon: Trophy, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.promoted'), view: 'promoted', onClick: () => handleSelectCategory('promoted'), icon: Flame, category: t('app.bots.nav.categoryAlgorithms') },
+			{ label: t('app.categories.newcomers'), view: 'newcomers', onClick: () => handleSelectCategory('newcomers'), icon: Sparkles, category: t('app.bots.nav.categoryAlgorithms') },
 		];
 
 		setNavItems(baseNavItems);
 
 		return () => hide();
-	}, [setNavItems, show, hide, t]);
+	}, [setNavItems, show, hide, t, handleSelectCategory]);
 
-	// Fetch Servers based on Sidebar View or Search Query
+	// Fetch Servers based on Active Category or Search Query
 	useEffect(() => {
 		if (!isReady) return;
 
@@ -134,8 +137,7 @@ function ServersListContent() {
 			if (activeSearch) {
 				query = `?search=${encodeURIComponent(activeSearch)}&limit=50&privacy=public`;
 			} else {
-				const currentCategory = searchParams.get('category') || view || 'biggest';
-				query = currentCategory === 'all' ? '?limit=50&privacy=public' : `?category=${currentCategory}&limit=50&privacy=public`;
+				query = effectiveView === 'all' ? '?limit=50&privacy=public' : `?category=${encodeURIComponent(effectiveView)}&limit=50&privacy=public`;
 			}
 
 			setLoading(true);
@@ -143,7 +145,7 @@ function ServersListContent() {
 				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds${query}`), { next: { revalidate: 60 } });
 				if (res.ok) {
 					const data = await res.json();
-					setServers(data);
+					setServers(Array.isArray(data) ? data : []);
 				}
 			} catch (error) {
 				console.error('Failed to fetch servers list', error);
@@ -153,10 +155,9 @@ function ServersListContent() {
 		}, 180);
 
 		return () => clearTimeout(timer);
-	}, [view, getEnvUrl, searchParams, searchInput, isReady]);
+	}, [effectiveView, getEnvUrl, searchParams, searchInput, isReady]);
 
 	const activeSearchLabel = searchInput.trim() || searchParams.get('search');
-	const effectiveView = searchParams.get('category') || view;
 
 	return (
 		<div className="flex flex-col w-full max-w-(--page-width) mx-auto min-h-screen">
@@ -170,9 +171,11 @@ function ServersListContent() {
 								? t('app.servers.nav.allServers')
 								: effectiveView === 'top_voted'
 									? t('app.categories.topVoted')
-									: effectiveView === 'newcomers'
-										? t('app.categories.newcomers')
-										: t('app.categories.biggestServers')}
+									: effectiveView === 'promoted'
+										? t('app.categories.promoted')
+										: effectiveView === 'newcomers'
+											? t('app.categories.newcomers')
+											: t('app.categories.biggestServers')}
 					</h1>
 				</div>
 
@@ -187,7 +190,7 @@ function ServersListContent() {
 							if (val.trim()) {
 								router.push(`/servers?search=${encodeURIComponent(val.trim())}`);
 							} else {
-								router.push(`/servers?view=${effectiveView || 'biggest'}`);
+								router.push(`/servers?category=${encodeURIComponent(effectiveView || 'all')}`);
 							}
 						}}
 					/>
@@ -229,7 +232,7 @@ export default function ServersList() {
 						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10 pt-8">
 							<div className="flex items-center gap-4">
 								<div className="text-4xl font-extrabold tracking-tight capitalize" style={{ fontFamily: 'var(--font-fredoka)' }}>
-									{t('app.categories.biggestServers')}
+									{t('app.servers.nav.allServers')}
 								</div>
 							</div>
 						</div>

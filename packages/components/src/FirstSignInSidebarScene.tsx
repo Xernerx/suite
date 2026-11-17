@@ -3,9 +3,9 @@
 
 import { useDictionary } from '@xernerx/providers';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, LayoutDashboard, LayoutGrid, PanelLeft, PanelLeftClose, Terminal, User as UserIcon } from 'lucide-react';
+import { Bell, Gauge, LayoutGrid, PanelLeft, PanelLeftClose, Terminal, User as UserIcon } from 'lucide-react';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { OnboardingPersona } from './FirstSignInOnboarding';
 
 export type SidebarBuildStepId = 'toggle' | 'views' | 'moved-dock' | 'collapse';
@@ -27,6 +27,11 @@ export function FirstSignInSidebarScene({
 }) {
 	const { t } = useDictionary();
 	const currentStepId: SidebarBuildStepId = sidebarSteps[sidebarStepIndex] || 'toggle';
+	const [avatarFailed, setAvatarFailed] = useState(false);
+
+	useEffect(() => {
+		setAvatarFailed(false);
+	}, [avatarUrl]);
 
 	const viewsTitle =
 		persona === 'both'
@@ -58,7 +63,7 @@ export function FirstSignInSidebarScene({
 			kbd: 'Ctrl + B',
 		},
 		views: {
-			icon: persona === 'developer' ? Terminal : LayoutDashboard,
+			icon: persona === 'developer' ? Terminal : Gauge,
 			title: viewsTitle,
 			desc: viewsDesc,
 			kbd: 'Alt + 1..9',
@@ -95,13 +100,22 @@ export function FirstSignInSidebarScene({
 					animate={{ opacity: 1, y: 0, scale: 1 }}
 					exit={{ opacity: 0, y: -14, scale: 0.98 }}
 					transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-					className="w-full rounded-3xl bg-(--background)/85 backdrop-blur-2xl border border-(--accent)/35 p-5 sm:p-7 text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_18%,transparent)]"
+					style={{ backgroundColor: 'color-mix(in srgb, var(--background) 93%, var(--foreground))' }}
+					className="w-full rounded-3xl bg-(--background)/94 backdrop-blur-2xl border border-(--accent)/35 p-5 sm:p-7 text-left shadow-[0_0_32px_color-mix(in_srgb,var(--accent)_18%,transparent)]"
 				>
 					<div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5">
 						{currentStepId === 'moved-dock' ? (
 							<div className="flex items-center gap-2 shrink-0">
-								{avatarUrl ? (
-									<Image src={avatarUrl} alt={displayName} width={44} height={44} unoptimized className="w-11 h-11 rounded-2xl border-2 border-(--accent)" />
+								{avatarUrl && !avatarFailed ? (
+									<Image
+										src={avatarUrl}
+										alt={displayName}
+										width={44}
+										height={44}
+										unoptimized
+										onError={() => setAvatarFailed(true)}
+										className="w-11 h-11 rounded-2xl border-2 border-(--accent) object-cover"
+									/>
 								) : (
 									<div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-(--accent)/15 text-(--accent) border border-(--accent)/40">
 										<UserIcon size={20} />
