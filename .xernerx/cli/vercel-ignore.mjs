@@ -10,6 +10,7 @@ const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '../..');
 
 const VALID_APPS = new Set(['www', 'api', 'cdn', 'account', 'app', 'docs', 'admin', 'info', 'store', 'portal', 'hosting', 'haste', 'blog']);
+const IGNORED_BRANCHES = new Set(['dictionary', 'community']);
 
 // Map each app to the top-level dictionary namespaces in packages/lib/src/dictionaries/*.json that it consumes
 const APP_DICTIONARY_NAMESPACES = {
@@ -108,6 +109,11 @@ function getChangedDictionaryNamespaces(prevSha, currSha, changedDictFiles) {
 }
 
 function main() {
+	const commitRef = (process.env.VERCEL_GIT_COMMIT_REF || '').trim().toLowerCase();
+	if (IGNORED_BRANCHES.has(commitRef)) {
+		skipBuild(`Branch '${commitRef}' is excluded from Vercel deployments.`);
+	}
+
 	const appName = detectAppName();
 	if (!appName) {
 		proceedBuild('Could not determine target app name; building by default.');
