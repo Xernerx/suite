@@ -7,9 +7,7 @@ import { database } from '@xernerx/lib/server';
 import { products } from '@xernerx/lib';
 import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
-const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder', {
-	apiVersion: '2026-10-28.endive',
-});
+const stripe = new Stripe((process.env.STRIPE_SECRET_KEY as string) || 'sk_test_placeholder');
 
 const STAFF_COUPON_ID = process.env.STRIPE_COUPON_ID;
 

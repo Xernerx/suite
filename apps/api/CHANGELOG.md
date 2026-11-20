@@ -2,6 +2,18 @@
 
 # api
 
+## 0.38.2
+
+### Patch Changes
+
+- ## Automatic Stripe SDK API Version Alignment
+  
+  Removed hardcoded Stripe `apiVersion` strings so store and billing routes automatically align with the installed `stripe` SDK version.
+  
+  ### Changed
+  
+  - **Stripe Client Initialization**: Updated store catalog, checkout, product, cancellation, coupon, webhook, and credit multiplier helpers to rely on the `stripe` SDK's built-in default API version instead of pinning `'2026-10-28.endive'`, preventing TypeScript build failures across minor Stripe SDK releases.
+
 ## 0.38.1
 
 ### Patch Changes

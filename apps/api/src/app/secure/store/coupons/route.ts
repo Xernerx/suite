@@ -8,11 +8,7 @@ import { recordAuditLog, resolveCallerAuth } from '@/lib/auditAndNotify';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const isStripeConfigured = Boolean(stripeKey && stripeKey !== 'sk_test_placeholder');
-const stripe = isStripeConfigured
-	? new Stripe(stripeKey, {
-			apiVersion: '2026-10-28.endive',
-		})
-	: null;
+const stripe = isStripeConfigured ? new Stripe(stripeKey) : null;
 
 export async function GET(req: Request) {
 	try {
