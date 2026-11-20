@@ -67,10 +67,12 @@ function runScopedInstall() {
 	const localPkg = JSON.parse(fs.readFileSync(localPkgPath, 'utf-8'));
 	if (!localPkg.name) return;
 
-	const filterArgs = ['--filter', `${localPkg.name}...`, ...getSharedPackageFilters()];
+	const relCwd = path.relative(repoRoot, cwd).replace(/\\/g, '/');
+	const isService = relCwd.startsWith('services/');
+	const filterArgs = isService ? ['--filter', `${localPkg.name}...`] : ['--filter', `${localPkg.name}...`, ...getSharedPackageFilters()];
 	if (dryRun) filterArgs.push('--dry-run');
 
-	console.log(`[SUITE] Installing scoped dependencies for "${localPkg.name}" + packages/* ...`);
+	console.log(`[SUITE] Installing scoped dependencies for "${localPkg.name}"${isService ? '' : ' + packages/*'} ...`);
 
 	const cmd = ['pnpm', 'install', ...filterArgs.map((arg) => (arg.startsWith('--') ? arg : `"${arg}"`))].join(' ');
 	const res = spawnSync(cmd, {

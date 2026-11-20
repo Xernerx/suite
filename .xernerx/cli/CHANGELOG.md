@@ -2,6 +2,19 @@
 
 # @xernerx/cli
 
+## 2.8.1
+
+### Patch Changes
+
+- ## Exclude `community` Branch from Vercel Deployments
+  
+  Disabled automatic Vercel deployments for the `community` branch alongside `dictionary` across all workspace `vercel.json` configs and the build ignore script.
+  
+  ### Changed
+  
+  - **Vercel Ignore Guard (`vercel-ignore.mjs`)**: Added an `IGNORED_BRANCHES` (`dictionary`, `community`) check on `VERCEL_GIT_COMMIT_REF` to immediately skip Vercel builds for excluded branches.
+  - **Deployment Configs (`vercel.json`)**: Added `"community": false` under `git.deploymentEnabled` in the root and all 13 app `vercel.json` files.
+
 ## 2.8.0
 
 ### Minor Changes

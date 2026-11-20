@@ -21,14 +21,13 @@
 		"@xernerx/terminal": "^1.2.0",
 		"jose": "^6.2.17",
 		"mongoose": "^9.12.2",
-		"next": "^16.4.6",
+		"tsx": "^4.23.15",
 		"ws": "^8.23.0"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6.6",
 		"@types/ws": "^8.18.2",
 		"tsc-watch": "7.2.1",
-		"tsx": "^4.23.15",
 		"typescript": "^6.0.3"
 	}
 }

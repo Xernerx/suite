@@ -4,7 +4,8 @@
 		"deploymentEnabled": {
 			"main": true,
 			"canary": true,
-			"dictionary": false
+			"dictionary": false,
+			"community": false
 		}
 	},
 	"crons": [
