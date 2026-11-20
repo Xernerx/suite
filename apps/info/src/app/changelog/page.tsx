@@ -138,16 +138,22 @@ function cleanChangelogMarkdown(raw: string): string {
 
 function readLocalAppChangelog(appId: string): string | null {
 	const cwd = process.cwd();
-	const candidates = [
-		path.resolve(cwd, '..', appId, 'CHANGELOG.md'),
-		path.resolve(cwd, 'apps', appId, 'CHANGELOG.md'),
-		path.resolve(cwd, '../../apps', appId, 'CHANGELOG.md'),
-		...(appId === 'info' ? [path.resolve(cwd, 'CHANGELOG.md')] : []),
-	];
+	if (appId === 'info') {
+		try {
+			const selfPath = path.join(cwd, 'CHANGELOG.md');
+			if (fs.existsSync(selfPath)) {
+				const raw = fs.readFileSync(selfPath, 'utf8');
+				const cleaned = cleanChangelogMarkdown(raw);
+				if (cleaned) return cleaned;
+			}
+		} catch {}
+	}
+	if (process.env.NODE_ENV !== 'development') return null;
+	const candidates = [path.resolve(cwd, '..', appId, 'CHANGELOG.md'), path.resolve(cwd, 'apps', appId, 'CHANGELOG.md'), path.resolve(cwd, '../../apps', appId, 'CHANGELOG.md')];
 	for (const filePath of candidates) {
 		try {
-			if (fs.existsSync(filePath)) {
-				const raw = fs.readFileSync(filePath, 'utf8');
+			if (fs.existsSync(/*turbopackIgnore: true*/ filePath)) {
+				const raw = fs.readFileSync(/*turbopackIgnore: true*/ filePath, 'utf8');
 				const cleaned = cleanChangelogMarkdown(raw);
 				if (cleaned) return cleaned;
 			}
@@ -250,12 +256,13 @@ async function getPackageChangelogs(): Promise<ChangelogEntry[]> {
 }
 
 function readLocalBotChangelog(botId: string): string | null {
+	if (process.env.NODE_ENV !== 'development') return null;
 	const cwd = process.cwd();
 	const candidates = [path.resolve(cwd, '..', 'apps', botId, 'CHANGELOG.md'), path.resolve(cwd, '../../apps', botId, 'CHANGELOG.md'), path.resolve(cwd, '../../../apps', botId, 'CHANGELOG.md')];
 	for (const filePath of candidates) {
 		try {
-			if (fs.existsSync(filePath)) {
-				const raw = fs.readFileSync(filePath, 'utf8');
+			if (fs.existsSync(/*turbopackIgnore: true*/ filePath)) {
+				const raw = fs.readFileSync(/*turbopackIgnore: true*/ filePath, 'utf8');
 				const cleaned = cleanChangelogMarkdown(raw);
 				if (cleaned) return cleaned;
 			}

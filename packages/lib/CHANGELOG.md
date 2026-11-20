@@ -2,6 +2,18 @@
 
 # @xernerx/lib
 
+## 1.29.1
+
+### Patch Changes
+
+- ## Exclude Dev Dictionary Reads from Bundle Tracing
+  
+  Marked development-only dictionary hot-reloading filesystem calls with `turbopackIgnore` so Next.js Turbopack does not trace monorepo directories during compilation.
+  
+  ### Changed
+  
+  - **Dictionary Loader**: Added `turbopackIgnore` hints to development-only `fs.existsSync` and `fs.readFileSync` calls in the locale dictionary loader.
+
 ## 1.29.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
 	"name": "portal",
-	"version": "1.7.5",
+	"version": "1.7.6",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

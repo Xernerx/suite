@@ -1,6 +1,6 @@
 {
 	"name": "store",
-	"version": "0.13.3",
+	"version": "0.13.4",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

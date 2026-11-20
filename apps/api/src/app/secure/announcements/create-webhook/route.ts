@@ -7,10 +7,15 @@ import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 function getLogoDataUri(): string | undefined {
 	try {
-		const localCandidates = [path.join(process.cwd(), 'public', 'logo.png'), path.join(process.cwd(), '..', '..', 'packages', 'public', 'logo.png')];
-		for (const candidate of localCandidates) {
-			if (fs.existsSync(candidate)) {
-				const buf = fs.readFileSync(candidate);
+		const appLogo = path.join(process.cwd(), 'public', 'logo.png');
+		if (fs.existsSync(appLogo)) {
+			const buf = fs.readFileSync(appLogo);
+			return `data:image/png;base64,${buf.toString('base64')}`;
+		}
+		if (process.env.NODE_ENV === 'development') {
+			const sharedLogo = path.join(process.cwd(), '..', '..', 'packages', 'public', 'logo.png');
+			if (fs.existsSync(/*turbopackIgnore: true*/ sharedLogo)) {
+				const buf = fs.readFileSync(/*turbopackIgnore: true*/ sharedLogo);
 				return `data:image/png;base64,${buf.toString('base64')}`;
 			}
 		}

@@ -25,11 +25,12 @@ export interface LighthouseScoreRecord {
 function resolvePageSpeedApiKey(): string | null {
 	if (process.env.PAGESPEED_API_KEY) return process.env.PAGESPEED_API_KEY;
 	if (process.env.NEXT_PUBLIC_PAGESPEED_API_KEY) return process.env.NEXT_PUBLIC_PAGESPEED_API_KEY;
+	if (process.env.NODE_ENV !== 'development') return null;
 	try {
 		const candidates = [path.join(process.cwd(), '.env'), path.resolve(process.cwd(), '..', '..', '.env')];
 		for (const envPath of candidates) {
-			if (fs.existsSync(envPath)) {
-				const content = fs.readFileSync(envPath, 'utf8');
+			if (fs.existsSync(/*turbopackIgnore: true*/ envPath)) {
+				const content = fs.readFileSync(/*turbopackIgnore: true*/ envPath, 'utf8');
 				const match = content.match(/^PAGESPEED_API_KEY=["']?([^"'\r\n]+)["']?/m);
 				if (match?.[1]) return match[1].trim();
 			}

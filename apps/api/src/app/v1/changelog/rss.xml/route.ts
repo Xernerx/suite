@@ -40,16 +40,21 @@ function escapeXml(str: string): string {
 
 function readLocalAppChangelog(appId: string): string | null {
 	const cwd = process.cwd();
-	const candidates = [
-		path.resolve(cwd, '..', appId, 'CHANGELOG.md'),
-		path.resolve(cwd, 'apps', appId, 'CHANGELOG.md'),
-		path.resolve(cwd, '../../apps', appId, 'CHANGELOG.md'),
-		...(appId === 'api' ? [path.resolve(cwd, 'CHANGELOG.md')] : []),
-	];
+	if (appId === 'api') {
+		try {
+			const selfPath = path.join(cwd, 'CHANGELOG.md');
+			if (fs.existsSync(selfPath)) {
+				const raw = fs.readFileSync(selfPath, 'utf8').trim();
+				if (raw) return raw;
+			}
+		} catch {}
+	}
+	if (process.env.NODE_ENV !== 'development') return null;
+	const candidates = [path.resolve(cwd, '..', appId, 'CHANGELOG.md'), path.resolve(cwd, 'apps', appId, 'CHANGELOG.md'), path.resolve(cwd, '../../apps', appId, 'CHANGELOG.md')];
 	for (const filePath of candidates) {
 		try {
-			if (fs.existsSync(filePath)) {
-				const raw = fs.readFileSync(filePath, 'utf8').trim();
+			if (fs.existsSync(/*turbopackIgnore: true*/ filePath)) {
+				const raw = fs.readFileSync(/*turbopackIgnore: true*/ filePath, 'utf8').trim();
 				if (raw) return raw;
 			}
 		} catch {}
@@ -150,15 +155,15 @@ async function fetchBotChangelogItems(isDevEnv: boolean): Promise<Array<{ title:
 		BOTS.map(async (bot) => {
 			try {
 				let content: string | null = null;
-				if (isDevEnv) {
+				if (process.env.NODE_ENV === 'development' && isDevEnv) {
 					for (const candidate of [
 						path.resolve(cwd, '..', 'apps', bot.id, 'CHANGELOG.md'),
 						path.resolve(cwd, '../../apps', bot.id, 'CHANGELOG.md'),
 						path.resolve(cwd, '../../../apps', bot.id, 'CHANGELOG.md'),
 					]) {
 						try {
-							if (fs.existsSync(candidate)) {
-								content = fs.readFileSync(candidate, 'utf8').trim();
+							if (fs.existsSync(/*turbopackIgnore: true*/ candidate)) {
+								content = fs.readFileSync(/*turbopackIgnore: true*/ candidate, 'utf8').trim();
 								if (content) break;
 							}
 						} catch {}

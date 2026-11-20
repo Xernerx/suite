@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/providers",
-	"version": "0.24.3",
+	"version": "0.24.4",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

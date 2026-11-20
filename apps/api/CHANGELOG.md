@@ -2,6 +2,25 @@
 
 # api
 
+## 0.38.1
+
+### Patch Changes
+
+- ## Scoped Production Filesystem Tracing
+  
+  Prevented whole-project serverless bundle tracing in Next.js Turbopack production builds across API route handlers.
+  
+  ### Changed
+  
+  - **Changelog RSS Feed (`/v1/changelog/rss.xml`)**: Scoped production disk reads strictly to the API's own `CHANGELOG.md` and restricted cross-workspace changelog filesystem fallbacks to development builds with `turbopackIgnore` directives.
+  - **Webhook & Lighthouse Helpers**: Gated parent-directory logo and local `.env` fallbacks in `/secure/announcements/create-webhook` and `/secure/core/lighthouse` strictly to development mode so production deployments remain lean and never trace local environment files.
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
 ## 0.38.0
 
 ### Minor Changes

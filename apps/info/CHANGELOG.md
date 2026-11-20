@@ -2,6 +2,24 @@
 
 # info
 
+## 1.13.4
+
+### Patch Changes
+
+- ## Faster & Leaner Changelog Builds
+  
+  Streamlined how the Changelog page resolves release history in production for faster, smaller deployments.
+  
+  ### Changed
+  
+  - **Production Changelog Loading**: Focused production changelog loading on live release endpoints and the site's own bundled release notes while keeping cross-workspace local previews strictly for development.
+- Updated dependencies
+  - @xernerx/lib@1.29.1
+  - @xernerx/components@0.19.2
+  - @xernerx/providers@0.24.4
+  - @xernerx/feedback@0.7.2
+  - @xernerx/ui@0.10.2
+
 ## 1.13.3
 
 ### Patch Changes
