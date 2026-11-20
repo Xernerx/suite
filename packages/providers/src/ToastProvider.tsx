@@ -291,9 +291,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 							<button
 								onClick={() => reminder.onSave?.()}
 								disabled={reminder.isSaving}
-								className="text-sm font-bold bg-(--accent) hover:bg-(--hover-accent) text-white px-5 py-2.5 rounded-2xl transition-colors shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_40%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+								className="text-sm font-bold bg-(--accent) hover:bg-(--hover-accent) text-(--accent-contrast) px-5 py-2.5 rounded-2xl transition-colors shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_40%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
 							>
-								{reminder.isSaving && <span className="animate-spin inline-block border-2 border-white/30 border-t-white rounded-full w-4 h-4" />}
+								{reminder.isSaving && <span className="animate-spin inline-block border-2 border-current border-t-transparent rounded-full w-4 h-4" />}
 								{t('common.toastprovider.button2')}
 							</button>
 						</div>

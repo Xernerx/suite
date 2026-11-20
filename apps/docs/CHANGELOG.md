@@ -2,6 +2,29 @@
 
 # docs
 
+## 1.14.0
+
+### Minor Changes
+
+- ## Updated API, CDN & WebSocket Reference
+  
+  Synchronized developer documentation with the latest secure API endpoints, YourApps CDN uploads, and WebSocket services.
+  
+  ### Changed
+  
+  - **Secure API & CDN Reference**: Documented the new mobile authentication, approval, staff error log, YourApps panel, and YourApps CDN upload endpoints.
+  - **WebSocket Services Reference**: Updated the WebSocket documentation to cover the expanded `xernerx` and `yourapps` actions.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 1.13.0
 
 ### Minor Changes

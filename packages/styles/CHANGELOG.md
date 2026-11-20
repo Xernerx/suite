@@ -2,6 +2,18 @@
 
 # @xernerx/styles
 
+## 0.4.4
+
+### Patch Changes
+
+- ## Cross-Browser `.no-scrollbar` Utility
+  
+  Added an unlayered `.no-scrollbar` utility class to hide horizontal scrollbars cleanly across modern and legacy WebKit browsers.
+  
+  ### Added
+  
+  - **`.no-scrollbar` Utility**: Defined unlayered `scrollbar-width: none` with a gated `@supports not (scrollbar-width: none)` `::-webkit-scrollbar` fallback after the global `*` scrollbar rule in `globals.css`.
+
 ## 0.4.3
 
 ### Patch Changes

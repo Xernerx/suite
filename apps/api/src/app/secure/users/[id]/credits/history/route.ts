@@ -22,7 +22,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
 		}
 
 		const rawTx = Array.isArray(creditDoc.transactions) ? creditDoc.transactions : [];
-		const sortedTx = [...rawTx].sort((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()).slice(0, 50);
+		const sortedTx = rawTx.toSorted((a: any, b: any) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()).slice(0, 50);
 
 		return NextResponse.json({
 			ownerId: id,

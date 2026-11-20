@@ -2,6 +2,26 @@
 
 # Changelog — `portal` (`portal.xernerx.com`)
 
+## 1.7.5
+
+### Patch Changes
+
+- ## Portal IME Safety & Config Cloning Improvements
+  
+  Improved international keyboard input on bot tag fields and modernized configuration snapshots.
+  
+  ### Changed
+  
+  - **IME-Safe Tag Entry**: Guarded `Enter` keydown handling on the bot tag input against active IME composition.
+  - **Structured State Snapshots**: Replaced `JSON.parse(JSON.stringify(...))` deep copies across bot, organization, command, and release editors with native `structuredClone()`.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 1.7.4
 
 ### Patch Changes

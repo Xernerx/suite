@@ -1,9 +1,8 @@
 /** @format */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { auth } from '@xernerx/lib';
 import { database } from '@xernerx/lib/server';
+import { resolveCallerAuth } from '@/lib/auditAndNotify';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,28 +30,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 			.catch(() => null);
 		const resolvedUserId = String(profile?.id || id);
 
-		const isSystemToken = Boolean(req.headers.get('x-token-id'));
-		const session = (await getServerSession(auth)) as any;
-		const viewerId = session?.user?.id ? String(session.user.id) : null;
-		const isOwner = Boolean(viewerId && (viewerId === resolvedUserId || viewerId === id));
+		const caller = await resolveCallerAuth(req, ['users', 'applications_review', 'applications_manage']);
+		const isOwner = Boolean(caller.userId && (caller.userId === resolvedUserId || caller.userId === id));
 
-		let isAuthorizedStaff = false;
-		if (!isOwner && !isSystemToken && viewerId) {
-			const viewerUser = await User.findOne({ id: viewerId })
-				.select('roles')
-				.lean()
-				.catch(() => null);
-			if (Array.isArray(viewerUser?.roles) && viewerUser.roles.length > 0 && Role) {
-				const roleIds = viewerUser.roles.map((r: any) => (typeof r === 'string' ? r : r?.id)).filter(Boolean);
-				const roleDocs = await Role.find({ id: { $in: roleIds } })
-					.select('permissions')
-					.lean()
-					.catch(() => []);
-				isAuthorizedStaff = roleDocs.some((r: any) => Boolean(r?.permissions?.users || r?.permissions?.applications_review || r?.permissions?.applications_manage));
-			}
-		}
-
-		if (!isOwner && !isSystemToken && !isAuthorizedStaff) {
+		if (!isOwner && !caller.isSystemToken && !caller.authorized) {
 			return NextResponse.json({ error: 'Forbidden: You can only view your own account activity.' }, { status: 403 });
 		}
 

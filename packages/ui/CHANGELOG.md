@@ -2,6 +2,21 @@
 
 # @xernerx/ui
 
+## 0.10.1
+
+### Patch Changes
+
+- ## UI Primitive IME Safety & Theme Contrast Fixes
+  
+  Added IME composition guards to core inputs and fixed Light Mode border and monochrome accent contrast across shared UI primitives.
+  
+  ### Changed
+  
+  - **IME-Safe `<Input>` & `<Confirm>`**: Guarded `Enter` keydown handlers in `Input` (`variant="search"`) and `Confirm` keyword confirmation against active IME composition.
+  - **Theme & Monochrome Contrast**: Replaced hardcoded `border-white/10` in `Selector` with `border-(--border)/15` and hardcoded `text-white` over `bg-(--accent)` in `Tabs` with `text-(--accent-contrast)`.
+- Updated dependencies
+  - @xernerx/providers@0.24.3
+
 ## 0.10.0
 
 ### Minor Changes

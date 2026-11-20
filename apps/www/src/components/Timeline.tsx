@@ -2,7 +2,7 @@
 
 'use client';
 
-import { ArrowUpRight, Bot, Building2, Calendar, Globe, LogOut, RefreshCw, ShieldCheck, Star, UserPlus } from 'lucide-react';
+import { ArrowUpRight, Bot, Building2, Calendar, ClipboardList, Globe, LogOut, PauseCircle, RefreshCw, ShieldCheck, Star, UserPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { useEnvironment, useDictionary } from '@xernerx/providers';
@@ -57,6 +57,9 @@ const milestones: Milestone[] = [
 		icon: <Globe />,
 	},
 	{
+		icon: <PauseCircle />,
+	},
+	{
 		icon: <RefreshCw />,
 		link: 'https://docs.xernerx.com/packages/@xernerx/framework',
 	},
@@ -81,6 +84,10 @@ const milestones: Milestone[] = [
 	{
 		icon: <RefreshCw />,
 		link: 'https://account.xernerx.com',
+	},
+	{
+		icon: <ClipboardList />,
+		link: 'https://app.xernerx.com/bots/yourapps',
 	},
 	{
 		icon: <Calendar />,

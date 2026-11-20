@@ -1,27 +1,50 @@
 /** @format */
 'use client';
 
-import { ArrowLeft, CheckCircle2, ClipboardList, LogIn, Send, Server, ShieldAlert } from 'lucide-react';
-import { Badge, Button, Check, Input, MultiSelector, Selector } from '@xernerx/ui';
+import { ArrowLeft, CheckCircle2, ClipboardList, EyeOff, LogIn, Send, Server, ShieldAlert } from 'lucide-react';
+import { Badge, Button } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getButtonLinkClasses } from '@/components/buttonLinkClasses';
 import type { DiscordChannelItem, DiscordRoleItem, YourAppsPosition, YourAppsQuestion } from '@/components/dashboard/applications/types';
+import ServerApplicationQuestionInput, { parseAttachmentLines } from './ServerApplicationQuestionInput';
+
+interface GuildMemberPreview {
+	id: string;
+	username: string;
+	displayName: string;
+}
 
 interface FormPortalResponse {
 	found: boolean;
-	botPresent: boolean;
-	server: { id: string; name: string; icon?: string | null; banner?: string | null };
+	privateServer?: boolean;
+	botPresent?: boolean;
+	server?: { id: string; name: string; icon?: string | null; banner?: string | null };
 	authenticated: boolean;
-	isMember: boolean;
-	eligible: boolean;
-	ineligibleReason: string | null;
+	isMember?: boolean;
+	eligible?: boolean;
+	ineligibleReason?: string | null;
 	position?: YourAppsPosition;
 	draftAnswers?: Array<{ questionId: string; answer: string }>;
 	serverRoles?: DiscordRoleItem[];
 	serverChannels?: DiscordChannelItem[];
+	guildMembers?: GuildMemberPreview[];
+}
+
+function isQuestionActiveOnWeb(question: YourAppsQuestion, answers: Record<string, string>): boolean {
+	const cond = question.condition;
+	if (!cond || !cond.questionId) return true;
+	const refRaw = String(answers[cond.questionId] ?? '').trim();
+	const target = String(cond.value ?? '').trim();
+	if (!target) return true;
+
+	const refLower = refRaw.toLowerCase();
+	const targetLower = target.toLowerCase();
+	if (cond.operator === 'not_equals') return refLower !== targetLower;
+	if (cond.operator === 'contains') return refLower.includes(targetLower);
+	return refLower === targetLower;
 }
 
 export default function ServerApplicationForm({ guildId, appId }: { guildId: string; appId: string }) {
@@ -32,8 +55,13 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 	const [data, setData] = useState<FormPortalResponse | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [answers, setAnswers] = useState<Record<string, string>>({});
+	const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+	const [uploadingQId, setUploadingQId] = useState<string | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [submittedId, setSubmittedId] = useState<string | null>(null);
+
+	const hydratedRef = useRef(false);
+	const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const fetchPositionForm = useCallback(async () => {
 		if (!isReady) return;
@@ -53,11 +81,13 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 						}
 					}
 					setAnswers(prefill);
+					setDraftStatus('saved');
 				}
 			}
 		} catch {
 			setData(null);
 		} finally {
+			hydratedRef.current = true;
 			setLoading(false);
 		}
 	}, [guildId, appId, getEnvUrl, isReady]);
@@ -66,8 +96,86 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 		fetchPositionForm();
 	}, [fetchPositionForm]);
 
+	const saveDraftNow = useCallback(
+		async (nextAnswers: Record<string, string>) => {
+			if (!data?.authenticated || !data?.eligible || submittedId) return;
+			setDraftStatus('saving');
+			try {
+				const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${guildId}/applications/apply/${appId}`), {
+					method: 'PUT',
+					credentials: 'include',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ answers: nextAnswers }),
+				});
+				if (res.ok) {
+					setDraftStatus('saved');
+				} else {
+					setDraftStatus('idle');
+				}
+			} catch {
+				setDraftStatus('idle');
+			}
+		},
+		[data?.authenticated, data?.eligible, submittedId, getEnvUrl, guildId, appId]
+	);
+
 	const setAnswer = (questionId: string, val: string) => {
-		setAnswers((prev) => ({ ...prev, [questionId]: val }));
+		setAnswers((prev) => {
+			const next = { ...prev, [questionId]: val };
+			if (hydratedRef.current && data?.authenticated && data?.eligible) {
+				if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+				setDraftStatus('saving');
+				draftTimerRef.current = setTimeout(() => {
+					void saveDraftNow(next);
+				}, 900);
+			}
+			return next;
+		});
+	};
+
+	useEffect(() => {
+		return () => {
+			if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+		};
+	}, []);
+
+	const handleFileSelection = async (questionId: string, fileList: FileList | null) => {
+		if (!fileList || fileList.length === 0) return;
+		const existing = parseAttachmentLines(answers[questionId] || '');
+		const slotsRemaining = Math.max(0, 5 - existing.length);
+		if (slotsRemaining === 0) return;
+
+		const files = Array.from(fileList).slice(0, slotsRemaining);
+		setUploadingQId(questionId);
+		try {
+			const uploadedLines: string[] = [];
+			for (const file of files) {
+				const formData = new FormData();
+				formData.append('file', file);
+				const res = await fetch(getEnvUrl('https://cdn.xernerx.com/yourapps/upload'), {
+					method: 'POST',
+					credentials: 'include',
+					body: formData,
+				});
+				const json = await res.json().catch(() => ({}));
+				if (!res.ok) {
+					throw new Error(json.error || 'Upload failed');
+				}
+				if (json.markdown) {
+					uploadedLines.push(String(json.markdown));
+				} else if (json.url) {
+					uploadedLines.push(`[${file.name}](${json.url})`);
+				}
+			}
+			if (uploadedLines.length > 0) {
+				const combined = [...existing.map((e) => e.rawLine), ...uploadedLines].join('\n');
+				setAnswer(questionId, combined);
+			}
+		} catch (err: any) {
+			toast({ title: t('app.dashboard.applications.toast.saveError'), description: err.message, type: 'error' });
+		} finally {
+			setUploadingQId(null);
+		}
 	};
 
 	const handleSignIn = () => {
@@ -78,6 +186,7 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 
 	const handleSubmit = async () => {
 		if (!data?.position) return;
+		if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
 		setSubmitting(true);
 		try {
 			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${guildId}/applications/apply/${appId}`), {
@@ -99,6 +208,19 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 		}
 	};
 
+	const activeQuestions = useMemo(() => {
+		if (!data?.position?.questions) return [];
+		const visible: YourAppsQuestion[] = [];
+		const visibleIds = new Set<string>();
+		for (const q of data.position.questions) {
+			if (q.condition?.questionId && !visibleIds.has(q.condition.questionId)) continue;
+			if (!isQuestionActiveOnWeb(q, answers)) continue;
+			visible.push(q);
+			visibleIds.add(q.id);
+		}
+		return visible;
+	}, [data?.position?.questions, answers]);
+
 	if (loading) {
 		return (
 			<div className="flex-1 flex items-center justify-center min-h-[60vh]">
@@ -107,7 +229,31 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 		);
 	}
 
-	if (!data || !data.found || !data.position) {
+	if (data?.privateServer) {
+		return (
+			<div className="max-w-(--page-width) mx-auto w-full py-16 px-4 flex flex-col items-center justify-center text-center gap-4">
+				<div className="w-14 h-14 rounded-full bg-(--accent)/15 flex items-center justify-center text-(--accent)">
+					<ShieldAlert className="w-7 h-7" />
+				</div>
+				<h1 className="text-2xl font-extrabold text-(--text)" style={{ fontFamily: 'var(--font-fredoka)' }}>
+					{t('app.servers.notFoundTitle')}
+				</h1>
+				<p className="text-sm text-(--text-muted) max-w-md">{data.authenticated ? t('app.servers.notFoundDesc') : t('app.servers.applications.signInDesc')}</p>
+				{!data.authenticated ? (
+					<Button variant="primary" onClick={handleSignIn}>
+						<LogIn className="w-4 h-4" />
+						<span>{t('app.servers.applications.signInBtn')}</span>
+					</Button>
+				) : (
+					<Link href="/servers" className={getButtonLinkClasses('secondary')}>
+						{t('app.servers.backToExplore')}
+					</Link>
+				)}
+			</div>
+		);
+	}
+
+	if (!data || !data.found || !data.position || !data.server) {
 		return (
 			<div className="max-w-(--page-width) mx-auto w-full py-16 px-4 flex flex-col items-center justify-center text-center gap-4">
 				<div className="w-14 h-14 rounded-full bg-(--accent)/15 flex items-center justify-center text-(--accent)">
@@ -126,14 +272,24 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 	}
 
 	const pos = data.position;
+	const isPoll = pos.category === 'poll';
+	const disabled = !data.authenticated || !data.eligible;
+
 	const roleOptions = (data.serverRoles || []).map((r) => ({
 		label: `@${r.name}`,
 		value: `<@&${r.id}> (@${r.name})`,
 	}));
-	const channelOptions = (data.serverChannels || []).map((c) => ({
-		label: `#${c.name}`,
-		value: `<#${c.id}> (#${c.name})`,
+	const channelOptions = (data.serverChannels || [])
+		.filter((c) => c.type === 0 || c.type === 5 || c.type === 15)
+		.map((c) => ({
+			label: `#${c.name}`,
+			value: `<#${c.id}> (#${c.name})`,
+		}));
+	const memberOptions = (data.guildMembers || []).map((m) => ({
+		label: `${m.displayName} (@${m.username})`,
+		value: `<@${m.id}> (${m.username})`,
 	}));
+	const mentionableOptions = [...memberOptions, ...roleOptions];
 
 	if (submittedId) {
 		return (
@@ -154,124 +310,6 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 		);
 	}
 
-	const renderQuestionControl = (q: YourAppsQuestion) => {
-		const val = answers[q.id] || '';
-		const opts = Array.isArray(q.options) ? q.options.filter(Boolean) : [];
-		const disabled = !data.authenticated || !data.eligible;
-
-		switch (q.type) {
-			case 'short':
-				return <Input disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || ''} />;
-
-			case 'number':
-				return <Input type="number" disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || '0'} />;
-
-			case 'select': {
-				const selectOpts = opts.map((o) => ({ label: o, value: o }));
-				return (
-					<Selector
-						disabled={disabled}
-						value={val}
-						onChange={(v: string) => setAnswer(q.id, v)}
-						options={selectOpts}
-						placeholder={q.placeholder || t('app.servers.applications.selectOptionPlaceholder')}
-					/>
-				);
-			}
-
-			case 'radio': {
-				return (
-					<div className="flex flex-col gap-2">
-						{opts.map((opt) => {
-							const active = val === opt;
-							return <Check key={opt} variant="circle" checked={active} disabled={disabled} onCheckedChange={() => setAnswer(q.id, opt)} label={opt} />;
-						})}
-					</div>
-				);
-			}
-
-			case 'multiselect': {
-				const multiOpts = opts.map((o) => ({ label: o, value: o }));
-				const selectedValues = val
-					.split(',')
-					.map((s) => s.trim())
-					.filter(Boolean);
-				return (
-					<MultiSelector
-						value={selectedValues}
-						onChange={(vals: string[]) => setAnswer(q.id, vals.join(', '))}
-						options={multiOpts}
-						placeholder={t('app.servers.applications.selectMultiplePlaceholder')}
-					/>
-				);
-			}
-
-			case 'boolean': {
-				const defaultYes = t('app.dashboard.applications.positions.modal.booleanYesPlaceholder');
-				const defaultNo = t('app.dashboard.applications.positions.modal.booleanNoPlaceholder');
-				const yesLabel = opts[0]?.trim() || defaultYes;
-				const noLabel = opts[1]?.trim() && opts[1]?.trim() !== yesLabel ? opts[1].trim() : defaultNo;
-				return (
-					<div className="flex flex-wrap gap-2">
-						<Button type="button" size="sm" variant={val === yesLabel ? 'primary' : 'secondary'} disabled={disabled} onClick={() => setAnswer(q.id, yesLabel)}>
-							{yesLabel}
-						</Button>
-						<Button type="button" size="sm" variant={val === noLabel ? 'primary' : 'secondary'} disabled={disabled} onClick={() => setAnswer(q.id, noLabel)}>
-							{noLabel}
-						</Button>
-					</div>
-				);
-			}
-
-			case 'checkbox':
-				return (
-					<Check
-						checked={val === 'Yes'}
-						disabled={disabled}
-						onCheckedChange={(checked) => setAnswer(q.id, checked ? 'Yes' : '')}
-						label={q.placeholder || t('app.servers.applications.checkboxAgreeLabel')}
-					/>
-				);
-
-			case 'role':
-				return roleOptions.length > 0 ? (
-					<Selector
-						disabled={disabled}
-						value={val}
-						onChange={(v: string) => setAnswer(q.id, v)}
-						options={roleOptions}
-						placeholder={q.placeholder || t('app.servers.applications.selectRolePlaceholder')}
-					/>
-				) : (
-					<Input disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || t('app.servers.applications.selectRolePlaceholder')} />
-				);
-
-			case 'channel':
-				return channelOptions.length > 0 ? (
-					<Selector
-						disabled={disabled}
-						value={val}
-						onChange={(v: string) => setAnswer(q.id, v)}
-						options={channelOptions}
-						placeholder={q.placeholder || t('app.servers.applications.selectChannelPlaceholder')}
-					/>
-				) : (
-					<Input disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || t('app.servers.applications.selectChannelPlaceholder')} />
-				);
-
-			case 'user':
-			case 'mentionable':
-				return <Input disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || t('app.servers.applications.userInputPlaceholder')} />;
-
-			case 'file':
-				return <Input disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || t('app.servers.applications.fileInputPlaceholder')} />;
-
-			case 'paragraph':
-			default:
-				return <Input variant="textarea" rows={4} disabled={disabled} value={val} onChange={(e) => setAnswer(q.id, e.target.value)} placeholder={q.placeholder || ''} />;
-		}
-	};
-
 	return (
 		<div className="max-w-(--page-width) mx-auto w-full py-8 px-4 flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
 			<div className="flex items-center justify-between gap-3">
@@ -279,9 +317,13 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 					<ArrowLeft className="w-4 h-4" />
 					<span>{t('app.servers.applications.backToPositions')}</span>
 				</Link>
+				{data.authenticated && data.eligible && draftStatus !== 'idle' && (
+					<Badge variant={draftStatus === 'saved' ? 'success' : 'outline'}>
+						{draftStatus === 'saving' ? t('app.servers.applications.draftSaving') : t('app.servers.applications.draftSaved')}
+					</Badge>
+				)}
 			</div>
 
-			{/* Header */}
 			<div className="flex flex-col gap-3 p-6 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 shadow-sm">
 				<div className="flex items-center gap-3">
 					{data.server.icon ? (
@@ -300,14 +342,20 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 							<Badge variant={pos.state === 'open' ? 'success' : 'muted'} dot>
 								{pos.state === 'open' ? t('app.dashboard.applications.positions.openBadge') : t('app.dashboard.applications.positions.closedBadge')}
 							</Badge>
-							<Badge variant="accent">{t(`app.dashboard.applications.positions.categories.${pos.category}`)}</Badge>
+							<Badge variant="accent">{t(`app.dashboard.applications.positions.categories.${pos.category || 'staff'}`)}</Badge>
+							{pos.anonymousResponses && <Badge variant="outline">{t('app.dashboard.applications.positions.anonymousBadge')}</Badge>}
 						</div>
 					</div>
 				</div>
 				{pos.description && <p className="text-sm text-(--text-muted) whitespace-pre-wrap">{pos.description}</p>}
+				{pos.anonymousResponses && (
+					<div className="flex items-center gap-2 text-xs text-(--accent)">
+						<EyeOff className="w-3.5 h-3.5 shrink-0" />
+						<span>{t('app.servers.applications.anonymousNotice')}</span>
+					</div>
+				)}
 			</div>
 
-			{/* Auth / Eligibility Banner */}
 			{!data.authenticated ? (
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl bg-(--foreground)/30 backdrop-blur-md border border-(--accent)/30 shadow-sm">
 					<div className="flex flex-col gap-1">
@@ -326,9 +374,8 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 				</div>
 			) : null}
 
-			{/* Questions Form */}
 			<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-				{pos.questions.map((q, idx) => (
+				{activeQuestions.map((q, idx) => (
 					<div key={q.id} className="flex flex-col gap-2 p-4 rounded-2xl bg-(--background)/50 border border-(--border)/10">
 						<div className="flex items-start justify-between gap-2">
 							<label className="text-sm font-bold text-(--text)">
@@ -339,7 +386,18 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 								{q.required !== false ? t('app.servers.applications.requiredTag') : t('app.servers.applications.optionalTag')}
 							</Badge>
 						</div>
-						{renderQuestionControl(q)}
+						<ServerApplicationQuestionInput
+							question={q}
+							value={answers[q.id] || ''}
+							disabled={disabled}
+							isUploadingThis={uploadingQId === q.id}
+							roleOptions={roleOptions}
+							channelOptions={channelOptions}
+							memberOptions={memberOptions}
+							mentionableOptions={mentionableOptions}
+							onChange={(val) => setAnswer(q.id, val)}
+							onUploadFiles={(files) => void handleFileSelection(q.id, files)}
+						/>
 					</div>
 				))}
 
@@ -349,7 +407,7 @@ export default function ServerApplicationForm({ guildId, appId }: { guildId: str
 					</Link>
 					<Button variant="primary" loading={submitting} disabled={!data.authenticated || !data.eligible} onClick={handleSubmit}>
 						<Send className="w-4 h-4" />
-						<span>{t('app.servers.applications.submitBtn')}</span>
+						<span>{isPoll ? t('app.servers.applications.submitPollBtn') : t('app.servers.applications.submitBtn')}</span>
 					</Button>
 				</div>
 			</div>

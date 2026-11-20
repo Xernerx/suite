@@ -54,7 +54,11 @@ export function Input({ variant = 'text', shortcut, onSearch, className = '', re
 		};
 
 		const handleKeyDown = (e: React.KeyboardEvent) => {
-			if (e.key === 'Enter') handleSearchClick();
+			if (e.key === 'Enter') {
+				if (!e.nativeEvent.isComposing && e.keyCode !== 229) {
+					handleSearchClick();
+				}
+			}
 			if (props.onKeyDown) props.onKeyDown(e as any);
 		};
 

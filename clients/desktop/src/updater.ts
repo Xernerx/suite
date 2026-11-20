@@ -247,15 +247,12 @@ export async function checkDesktopRelease(log?: (msg: string) => void): Promise<
 
 	for (const base of bases) {
 		try {
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 8000);
 			const res = await fetch(`${base}/core/downloads/app?channel=${channel}`, {
-				signal: controller.signal,
+				signal: AbortSignal.timeout(8000),
 				headers: {
 					Accept: 'application/json',
 				},
 			});
-			clearTimeout(timeout);
 
 			if (!res.ok) continue;
 

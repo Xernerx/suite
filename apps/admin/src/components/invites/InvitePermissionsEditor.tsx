@@ -235,6 +235,7 @@ export function InvitePermissionsEditor({ tierKey, value, lockedBits, onChangeBi
 						onBlur={handleBigIntBlur}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
+								if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 								e.preventDefault();
 								handleBigIntBlur();
 							}
@@ -262,6 +263,7 @@ export function InvitePermissionsEditor({ tierKey, value, lockedBits, onChangeBi
 							}}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
+									if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 									e.preventDefault();
 									if (oauthUrlInput.trim()) applyInviteInput(oauthUrlInput);
 								}

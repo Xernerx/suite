@@ -205,14 +205,11 @@ export function Header() {
 		const checkDesktopRunning = async () => {
 			for (const port of ports) {
 				try {
-					const controller = new AbortController();
-					const timeout = setTimeout(() => controller.abort(), 1200);
 					const res = await fetch(`http://127.0.0.1:${port}/status`, {
 						method: 'GET',
 						cache: 'no-store',
-						signal: controller.signal,
+						signal: AbortSignal.timeout(1200),
 					});
-					clearTimeout(timeout);
 					if (res.ok) {
 						const data = await res.json();
 						if (data?.running && data?.app === 'xernerx-desktop') {
@@ -250,14 +247,11 @@ export function Header() {
 		if (typeof window === 'undefined') return;
 		const currentUrl = window.location.href;
 		try {
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 1200);
 			const res = await fetch(`http://127.0.0.1:${desktopBridgePort}/open?url=${encodeURIComponent(currentUrl)}`, {
 				method: 'GET',
 				cache: 'no-store',
-				signal: controller.signal,
+				signal: AbortSignal.timeout(1200),
 			});
-			clearTimeout(timeout);
 			if (res.ok) return;
 		} catch {}
 		window.location.href = `xernerx://open?url=${encodeURIComponent(currentUrl)}`;

@@ -2,6 +2,27 @@
 
 # @xernerx/websocket
 
+## 1.9.0
+
+### Minor Changes
+
+- ## Expanded Suite & YourApps WebSocket Routing
+  
+  Added new real-time handlers for Xernerx Suite services and expanded YourApps WebSocket actions.
+  
+  ### Added
+  
+  - **Expanded YourApps & Suite Handlers**: Added real-time WebSocket actions supporting YourApps panel/poll synchronization, review workflows, and core suite events.
+  
+  ### Changed
+  
+  - **Gateway Routing**: Updated WebSocket gateway routing to support the expanded service actions.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.0
+
 ## 1.8.2
 
 ### Patch Changes

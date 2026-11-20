@@ -2,6 +2,13 @@
 
 # bot
 
+## 2.4.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/lib@1.29.0
+
 ## 2.4.3
 
 ### Patch Changes

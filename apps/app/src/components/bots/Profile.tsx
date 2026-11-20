@@ -44,7 +44,7 @@ export default function Profile({ bot }: { bot: any }) {
 	const allCommands = Array.isArray(bot.commands) ? bot.commands : [];
 	const featuredCommands = allCommands.slice(0, 5);
 
-	const sortedReleases = Array.isArray(bot.releases) ? [...bot.releases].sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
+	const sortedReleases = Array.isArray(bot.releases) ? bot.releases.toSorted((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()) : [];
 	const latestRelease = sortedReleases[0] || null;
 
 	const handleCopyCommand = (cmdName: string) => {

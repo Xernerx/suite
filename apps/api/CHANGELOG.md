@@ -2,6 +2,35 @@
 
 # api
 
+## 0.38.0
+
+### Minor Changes
+
+- ## Mobile Auth, Error Logging & YourApps Backend Expansion
+  
+  Added native mobile authentication, sign-in approval workflows, centralized staff error logging, and expanded YourApps server application endpoints.
+  
+  ### Added
+  
+  - **Mobile Authentication & Approval API**: Added `/secure/auth/mobile/{oauth/start,oauth/callback,handoff,exchange,session,validate}` and `/secure/auth/approval` routes for bearer-authenticated native mobile sessions and 2-digit sign-in approvals.
+  - **Staff Error Log Ingestion & Querying**: Added `/secure/errors` for storing and inspecting suite runtime error records.
+  - **YourApps Panel Management & Input Sanitization**: Added `/secure/guilds/[id]/applications/panels/[panelId]` and input sanitization helpers supporting polls, anonymous responses, scheduled windows, and consensus reviews.
+  
+  ### Changed
+  
+  - **YourApps Endpoints & Docs Blueprints**: Expanded `/secure/guilds/[id]/applications/*` handlers, Discord panel sync, and `docsBlueprints` catalogs to cover the new application, mobile, and error routes.
+  - **Modern Web APIs**: Replaced manual `AbortController` timers with `AbortSignal.timeout()` and `[...arr].sort()` / `.slice().reverse()` copies with `.toSorted()` and `.toReversed()`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 0.37.0
 
 ### Minor Changes

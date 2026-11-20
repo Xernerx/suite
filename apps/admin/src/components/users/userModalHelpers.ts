@@ -60,7 +60,7 @@ export interface UserModalDraft {
 
 export function isUserModalDirty(fullUser: FullUser | null, d: UserModalDraft): boolean {
 	if (!fullUser) return false;
-	const rolesChanged = JSON.stringify([...d.selectedRoleIds].sort()) !== JSON.stringify([...getNormalizedRoles(fullUser)].sort());
+	const rolesChanged = JSON.stringify(d.selectedRoleIds.toSorted()) !== JSON.stringify(getNormalizedRoles(fullUser).toSorted());
 	const origBirthday = fullUser.birthday ? String(fullUser.birthday).slice(0, 10) : '';
 	return (
 		d.name !== (fullUser.name || '') ||

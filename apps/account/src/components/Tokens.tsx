@@ -81,7 +81,7 @@ export default function Tokens() {
 				token.name?.toLowerCase().includes(q) || (token.id || token._id)?.toLowerCase().includes(q) || token.botId?.toLowerCase().includes(q) || token.botInfo?.name?.toLowerCase().includes(q)
 			);
 		});
-		return [...list].sort((a, b) => {
+		return list.toSorted((a, b) => {
 			if (sortBy === 'recent') {
 				return new Date(b.lastUsedAt || 0).getTime() - new Date(a.lastUsedAt || 0).getTime();
 			}

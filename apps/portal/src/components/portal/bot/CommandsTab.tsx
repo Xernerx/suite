@@ -95,7 +95,7 @@ export default function CommandsTab({
 				const updated = { ...botConfig, commands: cleaned };
 				setCommands(cleaned);
 				setBotConfig(updated);
-				setOriginalBotConfig?.(JSON.parse(JSON.stringify(updated)));
+				setOriginalBotConfig?.(structuredClone(updated));
 				toast({ type: 'success', title: t('app.portal.bot.commandsEditor.savedToast') });
 			} else {
 				const err = await res.json().catch(() => ({}));

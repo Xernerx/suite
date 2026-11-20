@@ -1,6 +1,6 @@
 {
 	"name": "@xernerx/lib",
-	"version": "1.28.0",
+	"version": "1.29.0",
 	"packageManager": "pnpm@12.21.0",
 	"engines": {
 		"node": ">=24"

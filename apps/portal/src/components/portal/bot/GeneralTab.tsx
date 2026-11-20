@@ -196,6 +196,7 @@ export default function GeneralTab({ botConfig, setBotConfig, onVanityUnlocked, 
 							list="available-tags"
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
+									if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 									e.preventDefault();
 									const val = e.currentTarget.value.trim();
 									if (val && !(botConfig.tags || []).includes(val)) {

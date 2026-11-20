@@ -93,6 +93,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 			e.preventDefault();
 			setSelectedIndex((prev) => (prev - 1 + visibleNavigation.length) % visibleNavigation.length);
 		} else if (e.key === 'Enter') {
+			if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 			e.preventDefault();
 			if (tourTargetPhase) {
 				triggerTourDestinationSelect();
@@ -107,12 +108,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 	};
 
 	const hasCategories = visibleNavigation.some((item) => item.category);
-	const groupedNavigation = visibleNavigation.reduce((acc: Record<string, any[]>, item: any) => {
-		const category = item.category || 'common.shortcuts.modal.navigation.other';
-		if (!acc[category]) acc[category] = [];
-		acc[category].push(item);
-		return acc;
-	}, {});
+	const groupedNavigation = Object.groupBy(visibleNavigation, (item: any) => item.category || 'common.shortcuts.modal.navigation.other');
 
 	const destinationName = tourTargetPhase ? t(`components.firstSignIn.navHandoff.destinations.${tourTargetPhase}`) : '';
 
@@ -196,7 +192,7 @@ export function NavigationModal({ isOpen, onClose, navigation = [], onboardingSt
 						<div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1 pb-3 flex flex-col" style={{ gap: 'calc(var(--ui-gap) * 0.75)' }}>
 							{visibleNavigation.length > 0 ? (
 								hasCategories ? (
-									Object.entries(groupedNavigation).map(([category, items]) => (
+									Object.entries(groupedNavigation).map(([category, items = []]) => (
 										<div key={category} className="flex flex-col shrink-0" style={{ gap: 'calc(var(--ui-gap) * 0.4)' }}>
 											<h3 className="text-xs font-bold uppercase tracking-wider text-(--text-muted) px-1">{t(category)}</h3>
 											<div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4 pt-1 pb-1">

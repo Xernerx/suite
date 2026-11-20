@@ -100,6 +100,7 @@ export function Confirm({ open, onOpenChange, title, description, confirmText = 
 							autoFocus
 							onKeyDown={(e) => {
 								if (e.key === 'Enter' && isKeywordMatched && !loading) {
+									if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 									e.preventDefault();
 									onConfirm();
 								}

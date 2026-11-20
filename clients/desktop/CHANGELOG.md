@@ -2,6 +2,18 @@
 
 # @xernerx/desktop
 
+## 2.6.6
+
+### Patch Changes
+
+- ## Desktop Network Timeout Modernization
+  
+  Simplified network timeout handling across the desktop companion's startup, updater, and local bot relay.
+  
+  ### Changed
+  
+  - **Native Timeout Signals**: Replaced manual `AbortController` timer scaffolding with `AbortSignal.timeout()` across server readiness checks, auto-update polling, native CDN drag caching, and local webhook relays.
+
 ## 2.6.5
 
 ### Patch Changes

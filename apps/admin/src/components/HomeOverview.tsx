@@ -68,10 +68,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 	const pingService = useCallback(async (appId: string, host: string) => {
 		const start = Date.now();
 		try {
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 4500);
-			const res = await fetch(`https://${host}/api/version`, { mode: 'cors', cache: 'no-store', signal: controller.signal });
-			clearTimeout(timeout);
+			const res = await fetch(`https://${host}/api/version`, { mode: 'cors', cache: 'no-store', signal: AbortSignal.timeout(4500) });
 			const elapsed = Date.now() - start;
 			setPings((prev) => ({ ...prev, [appId]: elapsed }));
 			if (res.ok) {
@@ -82,10 +79,7 @@ export default function HomeOverview({ permissions, onNavigate }: { permissions:
 			}
 		} catch {
 			try {
-				const controller = new AbortController();
-				const timeout = setTimeout(() => controller.abort(), 4500);
-				await fetch(`https://${host}/api/version`, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-				clearTimeout(timeout);
+				await fetch(`https://${host}/api/version`, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(4500) });
 				setPings((prev) => ({ ...prev, [appId]: Date.now() - start }));
 			} catch {
 				setPings((prev) => ({ ...prev, [appId]: null }));

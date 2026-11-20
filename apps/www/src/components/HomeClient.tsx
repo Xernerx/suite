@@ -1,8 +1,8 @@
 /** @format */
 'use client';
 
-import { motion } from 'framer-motion';
-import { Boxes, ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Boxes, Package } from 'lucide-react';
 import { useDictionary, useEnvironment, useLoading, useSidebar } from '@xernerx/providers';
 import { useEffect, useRef, useState } from 'react';
 import Timeline from '@/components/Timeline';
@@ -24,8 +24,12 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 	const { t } = useDictionary();
 	const { isLoading, setBackgroundMode, setDotVariant } = useLoading();
 
+	const servicesRef = useRef<HTMLDivElement>(null);
+	const softwareRef = useRef<HTMLDivElement>(null);
 	const servicesTrackRef = useRef<HTMLDivElement>(null);
 	const softwareTrackRef = useRef<HTMLDivElement>(null);
+	const containerRef = useRef<HTMLElement | null>(null);
+	const [ready, setReady] = useState(false);
 	const [matrixConstructed, setMatrixConstructed] = useState(true);
 	const [reducedMotion, setReducedMotion] = useState(false);
 	const [botProfiles, setBotProfiles] = useState<Record<string, BotProfileData>>({});
@@ -77,21 +81,26 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 				]
 			: staticSoftwareItems;
 
-	const handleCarouselWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-		if (Math.abs(e.deltaY) > Math.abs(e.deltaX) && !e.shiftKey) {
-			return;
-		}
-		if (e.shiftKey && e.deltaY !== 0) {
-			e.currentTarget.scrollLeft += e.deltaY;
-		}
-	};
+	useEffect(() => {
+		containerRef.current = document.getElementById('main-scroll-container');
+		setReady(true);
+	}, []);
 
-	const scrollCarouselBy = (ref: React.RefObject<HTMLDivElement | null>, direction: -1 | 1) => {
-		const el = ref.current;
-		if (!el) return;
-		const step = Math.max(320, Math.round(el.clientWidth * 0.72));
-		el.scrollBy({ left: direction * step, behavior: 'smooth' });
-	};
+	const { scrollYProgress: servicesProgress } = useScroll(ready ? { target: servicesRef, container: containerRef } : {});
+	const servicesX = useTransform(servicesProgress, (v) => {
+		const el = servicesTrackRef.current;
+		if (!el || !el.parentElement) return '0px';
+		const maxShift = Math.max(0, el.scrollWidth - el.parentElement.clientWidth);
+		return `${-v * maxShift}px`;
+	});
+
+	const { scrollYProgress: softwareProgress } = useScroll(ready ? { target: softwareRef, container: containerRef } : {});
+	const softwareX = useTransform(softwareProgress, (v) => {
+		const el = softwareTrackRef.current;
+		if (!el || !el.parentElement) return '0px';
+		const maxShift = Math.max(0, el.scrollWidth - el.parentElement.clientWidth);
+		return `${v * maxShift}px`;
+	});
 
 	useEffect(() => {
 		if (!isReady) return;
@@ -222,82 +231,42 @@ export default function HomeClient({ initialPackages = [] }: { initialPackages?:
 		>
 			<HomeHeroAndFeatures pageReady={pageReady} reducedMotion={reducedMotion} publicPackages={publicPackages} />
 
-			{/* CONSUMER SERVICES (Horizontal Carousel — Vertical Wheel Passes Through) */}
-			<section id="services" className="relative py-20 md:py-28">
-				<div className="flex flex-col justify-center">
-					<div className="w-full flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 relative z-10 px-6 md:px-12 xl:px-[15vw]">
-						<div className="text-left">
-							<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('www.sections.consumer.title')}
-							</h2>
-							<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">{t('www.sections.consumer.description')}</p>
-						</div>
-						<div className="flex items-center gap-2 shrink-0">
-							<button
-								type="button"
-								aria-label={t('common.buttons.previous')}
-								onClick={() => scrollCarouselBy(servicesTrackRef, -1)}
-								className="h-10 w-10 rounded-full bg-(--foreground)/40 hover:bg-(--accent)/15 border border-(--border)/10 hover:border-(--accent)/40 text-(--text) hover:text-(--accent) backdrop-blur-md flex items-center justify-center transition-colors cursor-pointer"
-							>
-								<ChevronLeft size={18} />
-							</button>
-							<button
-								type="button"
-								aria-label={t('common.buttons.next')}
-								onClick={() => scrollCarouselBy(servicesTrackRef, 1)}
-								className="h-10 w-10 rounded-full bg-(--foreground)/40 hover:bg-(--accent)/15 border border-(--border)/10 hover:border-(--accent)/40 text-(--text) hover:text-(--accent) backdrop-blur-md flex items-center justify-center transition-colors cursor-pointer"
-							>
-								<ChevronRight size={18} />
-							</button>
-						</div>
+			{/* CONSUMER SERVICES (Horizontal Scroll) */}
+			<section id="services" ref={servicesRef} className="relative h-[300dvh]">
+				<div className="sticky top-0 h-dvh flex flex-col justify-center overflow-hidden">
+					<div className="w-full text-left mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
+						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('www.sections.consumer.title')}
+						</h2>
+						<p className="max-w-2xl text-base text-(--text-muted) leading-relaxed">{t('www.sections.consumer.description')}</p>
 					</div>
 
-					<div ref={servicesTrackRef} onWheel={handleCarouselWheel} className="relative z-10 w-full overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth py-4">
-						<div className="flex items-stretch gap-8 px-6 md:px-12 xl:px-[15vw] w-max">
+					<div className="relative z-10 w-full overflow-x-clip flex items-center min-h-[460px] py-6">
+						<motion.div ref={servicesTrackRef} style={{ x: servicesX }} className="flex items-stretch gap-8 px-6 md:px-12 xl:px-[15vw] absolute left-0 w-max">
 							{consumerServiceItems.map((item) => (
 								<ServiceProfileCard key={item.id} item={item} profile={botProfiles[item.botId]} />
 							))}
-						</div>
+						</motion.div>
 					</div>
 				</div>
 			</section>
 
-			{/* DEVELOPER SOFTWARE (Horizontal Carousel — Vertical Wheel Passes Through) */}
-			<section id="software" className="relative py-20 md:py-28">
-				<div className="flex flex-col justify-center">
-					<div className="w-full flex flex-col sm:flex-row-reverse sm:items-end justify-between gap-4 mb-10 relative z-10 px-6 md:px-12 xl:px-[15vw]">
-						<div className="text-left sm:text-right">
-							<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
-								{t('www.sections.developer.title')}
-							</h2>
-							<p className="max-w-2xl sm:ml-auto text-base text-(--text-muted) leading-relaxed">{t('www.sections.developer.description')}</p>
-						</div>
-						<div className="flex items-center gap-2 shrink-0">
-							<button
-								type="button"
-								aria-label={t('common.buttons.previous')}
-								onClick={() => scrollCarouselBy(softwareTrackRef, -1)}
-								className="h-10 w-10 rounded-full bg-(--foreground)/40 hover:bg-(--accent)/15 border border-(--border)/10 hover:border-(--accent)/40 text-(--text) hover:text-(--accent) backdrop-blur-md flex items-center justify-center transition-colors cursor-pointer"
-							>
-								<ChevronLeft size={18} />
-							</button>
-							<button
-								type="button"
-								aria-label={t('common.buttons.next')}
-								onClick={() => scrollCarouselBy(softwareTrackRef, 1)}
-								className="h-10 w-10 rounded-full bg-(--foreground)/40 hover:bg-(--accent)/15 border border-(--border)/10 hover:border-(--accent)/40 text-(--text) hover:text-(--accent) backdrop-blur-md flex items-center justify-center transition-colors cursor-pointer"
-							>
-								<ChevronRight size={18} />
-							</button>
-						</div>
+			{/* DEVELOPER SOFTWARE (Mirrored Horizontal Scroll) */}
+			<section id="software" ref={softwareRef} className="relative h-[300dvh]">
+				<div className="sticky top-0 h-dvh flex flex-col justify-center overflow-hidden">
+					<div className="w-full text-right mb-16 relative z-10 px-6 md:px-12 xl:px-[15vw]">
+						<h2 className="text-4xl md:text-5xl font-extrabold mb-4 text-(--text) drop-shadow-sm" style={{ fontFamily: 'var(--font-fredoka)' }}>
+							{t('www.sections.developer.title')}
+						</h2>
+						<p className="max-w-2xl ml-auto text-base text-(--text-muted) leading-relaxed">{t('www.sections.developer.description')}</p>
 					</div>
 
-					<div ref={softwareTrackRef} onWheel={handleCarouselWheel} className="relative z-10 w-full overflow-x-auto overflow-y-hidden no-scrollbar scroll-smooth py-4">
-						<div className="flex items-stretch gap-8 px-6 md:px-12 xl:px-[15vw] w-max">
+					<div className="relative z-10 w-full overflow-x-clip flex items-center min-h-[420px] py-6">
+						<motion.div ref={softwareTrackRef} style={{ x: softwareX }} className="flex items-stretch gap-8 px-6 md:px-12 xl:px-[15vw] absolute right-0 w-max">
 							{softwareItems.map((item) => (
 								<DeveloperSoftwareCard key={item.title} item={item} href={getEnvUrl(item.link)} />
 							))}
-						</div>
+						</motion.div>
 					</div>
 				</div>
 			</section>

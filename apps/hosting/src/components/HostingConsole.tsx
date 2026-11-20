@@ -1,13 +1,14 @@
 /** @format */
 'use client';
 
-import { Cloud, Columns2, Copy, ExternalLink, KeyRound, Maximize2, Minimize2, RefreshCw, Server, Settings2, ShieldCheck, Terminal } from 'lucide-react';
+import { AlertOctagon, Cloud, Columns2, Copy, ExternalLink, KeyRound, Maximize2, Minimize2, RefreshCw, Server, Settings2, ShieldCheck, Terminal } from 'lucide-react';
 import { Badge, Button } from '@xernerx/ui';
 import { useDictionary, useEnvironment, useSession, useTheme, useToast, useUser } from '@xernerx/providers';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import HostingSshModal, { buildThemedNodeUrl, DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig, resolveNodeSshTarget } from './HostingSshModal';
 import HostingNodeConfigModal from './HostingNodeConfigModal';
 import HostingVercelPanel from './HostingVercelPanel';
+import HostingErrorLogsPanel from './HostingErrorLogsPanel';
 
 export { DEFAULT_HOSTING_NODES, isVercelNode, type HostingNodeConfig };
 
@@ -45,6 +46,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 	const [sshModalOpen, setSshModalOpen] = useState(false);
 	const [sshModalNode, setSshModalNode] = useState<HostingNodeConfig | undefined>(undefined);
 	const [nodePings, setNodePings] = useState<Record<string, NodePingState>>({});
+	const [openErrorCount, setOpenErrorCount] = useState<number>(0);
 	const iframeRefs = useRef<Record<string, HTMLIFrameElement | null>>({});
 
 	const probeNodesReachability = useCallback(async () => {
@@ -55,17 +57,13 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				[node.id]: { status: prev[node.id]?.status || 'checking', latencyMs: prev[node.id]?.latencyMs ?? null },
 			}));
 			const start = performance.now();
-			const controller = new AbortController();
-			const timer = setTimeout(() => controller.abort(), 5000);
 			try {
 				const targetProbeUrl = isVercelNode(node) ? 'https://www.xernerx.com/api/version' : node.url;
-				await fetch(targetProbeUrl, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+				await fetch(targetProbeUrl, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(5000) });
 				const elapsed = Math.max(1, Math.round(performance.now() - start));
 				setNodePings((prev) => ({ ...prev, [node.id]: { status: 'online', latencyMs: elapsed } }));
 			} catch {
 				setNodePings((prev) => ({ ...prev, [node.id]: { status: 'unreachable', latencyMs: null } }));
-			} finally {
-				clearTimeout(timer);
 			}
 		}
 	}, [nodes]);
@@ -109,6 +107,18 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 		loadUserConnections();
 	}, [loadUserConnections]);
 
+	useEffect(() => {
+		if (!isReady) return;
+		fetch(getEnvUrl('https://api.xernerx.com/secure/errors?status=open&limit=1'), { credentials: 'include', cache: 'no-store' })
+			.then((res) => (res.ok ? res.json() : null))
+			.then((data) => {
+				if (typeof data?.stats?.open === 'number') {
+					setOpenErrorCount(data.stats.open);
+				}
+			})
+			.catch(() => {});
+	}, [isReady, getEnvUrl]);
+
 	const handleCopyCred = async (value: string, label: string) => {
 		try {
 			await navigator.clipboard.writeText(value);
@@ -117,6 +127,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 	};
 
 	const isSplitView = activeView === 'split';
+	const isErrorsView = activeView === 'errors';
 	const selectedNode = nodes.find((n) => n.id === activeView) || nodes[0] || DEFAULT_HOSTING_NODES[0];
 
 	const handleReloadNode = (nodeId: string) => {
@@ -127,6 +138,10 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 
 	const handleReloadCurrent = () => {
 		probeNodesReachability();
+		if (isErrorsView) {
+			setReloadCounters((prev) => ({ ...prev, errors: (prev.errors || 0) + 1 }));
+			return;
+		}
 		if (isSplitView) {
 			const nextCounters = { ...reloadCounters };
 			nodes.forEach((n) => {
@@ -187,7 +202,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				<div className="flex flex-wrap items-center gap-2 min-w-0">
 					<div className="flex items-center gap-1.5 rounded-xl bg-(--background)/60 border border-(--border)/10 p-1">
 						{nodes.map((node) => {
-							const isSelected = !isSplitView && selectedNode?.id === node.id;
+							const isSelected = !isSplitView && !isErrorsView && selectedNode?.id === node.id;
 							const ping = nodePings[node.id];
 							const isUnreachable = ping?.status === 'unreachable';
 							const dotClass = isUnreachable
@@ -226,13 +241,32 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 								<span>{t('hosting.console.splitView')}</span>
 							</button>
 						)}
+						<button
+							type="button"
+							onClick={() => onSelectView('errors')}
+							className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition-all cursor-pointer ${
+								isErrorsView ? 'bg-(--accent) text-(--text) shadow-xs' : 'text-(--text-muted) hover:text-(--text) hover:bg-(--foreground)/50'
+							}`}
+						>
+							<AlertOctagon size={13} className={!isErrorsView && openErrorCount > 0 ? 'text-(--accent-red)' : ''} />
+							<span>{t('hosting.errors.navTitle')}</span>
+							{openErrorCount > 0 && (
+								<span
+									className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono font-extrabold ${
+										isErrorsView ? 'bg-(--background)/40 text-(--text)' : 'bg-(--accent-red)/20 text-(--accent-red)'
+									}`}
+								>
+									{openErrorCount}
+								</span>
+							)}
+						</button>
 					</div>
 
 					<Badge variant="accent" size="sm" icon={<ShieldCheck size={11} />}>
 						{t('hosting.console.staffGuardedBadge')}
 					</Badge>
 
-					{!isSplitView && selectedNode && (
+					{!isSplitView && !isErrorsView && selectedNode && (
 						<span className="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-(--background)/60 border border-(--border)/10 px-3 py-1 font-mono text-[11px] text-(--text-muted) truncate max-w-md">
 							{selectedNode.url}
 						</span>
@@ -314,7 +348,7 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 						<span className="hidden sm:inline">{isSplitView ? t('hosting.console.reloadAll') : t('hosting.console.reloadNode')}</span>
 					</Button>
 
-					{!isSplitView && selectedNode && (
+					{!isSplitView && !isErrorsView && selectedNode && (
 						<a
 							href={selectedNode.url}
 							target="_blank"
@@ -351,8 +385,17 @@ export default function HostingConsole({ activeView, onSelectView, nodes, onNode
 				className={`flex-1 w-full min-h-0 ${isSplitView ? 'grid grid-cols-1 lg:grid-cols-2' : 'flex flex-col'}`}
 				style={{ gap: isSplitView && !fullBleed ? 'calc(var(--ui-gap) * 0.75)' : '0px' }}
 			>
+				{isErrorsView && (
+					<div
+						className={`flex flex-col flex-1 min-h-0 w-full h-full overflow-hidden ${
+							fullBleed ? 'rounded-none border-0' : 'rounded-3xl border border-(--border)/10'
+						} bg-(--foreground)/30 backdrop-blur-md shadow-sm`}
+					>
+						<HostingErrorLogsPanel reloadTrigger={reloadCounters.errors || 0} onOpenCountChange={setOpenErrorCount} />
+					</div>
+				)}
 				{nodes.map((node) => {
-					const isVisible = isSplitView || selectedNode?.id === node.id;
+					const isVisible = !isErrorsView && (isSplitView || selectedNode?.id === node.id);
 					const reloadKey = reloadCounters[node.id] || 0;
 					const ping = nodePings[node.id];
 					return (

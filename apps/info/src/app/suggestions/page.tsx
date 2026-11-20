@@ -252,7 +252,7 @@ export default function SuggestionsPage() {
 			return fuzzySearch(search, s.title) || fuzzySearch(search, s.description) || fuzzySearch(search, prodName);
 		});
 
-		return [...filtered].sort((a, b) => {
+		return filtered.toSorted((a, b) => {
 			if (sortBy === 'newest') {
 				const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
 				const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;

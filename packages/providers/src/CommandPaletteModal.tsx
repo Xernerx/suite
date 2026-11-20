@@ -219,14 +219,11 @@ export function CommandPaletteModal({
 					const currentUrl = window.location.href;
 					for (const port of [41990, 41991, 41992]) {
 						try {
-							const controller = new AbortController();
-							const timeout = setTimeout(() => controller.abort(), 1000);
 							const res = await fetch(`http://127.0.0.1:${port}/open?url=${encodeURIComponent(currentUrl)}`, {
 								method: 'GET',
 								cache: 'no-store',
-								signal: controller.signal,
+								signal: AbortSignal.timeout(1000),
 							});
-							clearTimeout(timeout);
 							if (res.ok) return;
 						} catch {}
 					}
@@ -417,6 +414,7 @@ export function CommandPaletteModal({
 			e.preventDefault();
 			setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length);
 		} else if (e.key === 'Enter') {
+			if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 			e.preventDefault();
 			const target = filteredItems[selectedIndex];
 			if (target) target.onSelect();

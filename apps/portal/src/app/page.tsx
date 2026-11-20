@@ -278,7 +278,7 @@ function PortalPageContent() {
 				if (res.ok) {
 					const data = await res.json();
 					setOrgConfig(data);
-					setOriginalOrgConfig(JSON.parse(JSON.stringify(data)));
+					setOriginalOrgConfig(structuredClone(data));
 
 					let pendingUsers: any[] = [];
 					let fetchedOrgGuilds: any[] = [];
@@ -356,7 +356,7 @@ function PortalPageContent() {
 						const updated = await res.json().catch(() => null);
 						const merged = updated ? { ...finalConfig, ...updated } : finalConfig;
 						setOrgConfig(merged);
-						setOriginalOrgConfig(JSON.parse(JSON.stringify(merged)));
+						setOriginalOrgConfig(structuredClone(merged));
 						setPendingUploads({});
 						toast({ title: t('common.toast.savedSuccess'), type: 'success' });
 						remind(false);
@@ -372,7 +372,7 @@ function PortalPageContent() {
 			};
 
 			const handleReset = () => {
-				setOrgConfig(JSON.parse(JSON.stringify(originalOrgConfig)));
+				setOrgConfig(structuredClone(originalOrgConfig));
 				setPendingUploads({});
 			};
 

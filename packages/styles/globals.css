@@ -176,6 +176,16 @@ kbd {
 	scrollbar-color: var(--accent) var(--background);
 }
 
+.no-scrollbar {
+	scrollbar-width: none;
+}
+
+@supports not (scrollbar-width: none) {
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+}
+
 ::selection {
 	background: var(--accent);
 	color: color-mix(in srgb, var(--accent) 15%, black);

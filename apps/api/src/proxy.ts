@@ -96,8 +96,9 @@ export async function proxy(req: NextRequest) {
 	const realIp = req.headers.get('x-real-ip');
 	const ip = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || '127.0.0.1';
 
+	const hasMobileBearer = Boolean(req.headers.get('authorization')?.startsWith('Bearer xrx_mob_'));
 	const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1' || process.env.ENVIRONMENT?.toLowerCase() === 'development' || hostNameOnly.includes('.dev.');
-	const isAuthenticatedFrontendSession = isTrustedFrontend;
+	const isAuthenticatedFrontendSession = isTrustedFrontend || hasMobileBearer;
 	const effectiveMaxRequests = isAuthenticatedFrontendSession ? SESSION_MAX_REQUESTS : MAX_REQUESTS;
 	const rateBucketKey = isAuthenticatedFrontendSession ? `sess:${ip}` : `pub:${ip}`;
 
@@ -145,15 +146,50 @@ export async function proxy(req: NextRequest) {
 
 	const isSecureRoute = req.nextUrl.pathname.startsWith('/secure');
 	const isStripeWebhook = req.nextUrl.pathname.startsWith('/secure/webhooks/stripe');
-	const isValidationRoute = req.nextUrl.pathname === '/secure/validate/token';
+	const isValidationRoute = req.nextUrl.pathname === '/secure/validate/token' || req.nextUrl.pathname === '/secure/auth/mobile/validate';
+	const isPublicMobileAuthRoute =
+		req.nextUrl.pathname === '/secure/auth/mobile/oauth/start' ||
+		req.nextUrl.pathname === '/secure/auth/mobile/oauth/callback' ||
+		req.nextUrl.pathname === '/secure/auth/mobile/handoff' ||
+		req.nextUrl.pathname === '/secure/auth/mobile/exchange' ||
+		req.nextUrl.pathname === '/secure/auth/approval' ||
+		req.nextUrl.pathname === '/secure/auth/qr';
 
 	// 2. Intercept and secure the /secure/ routes
 	if (isSecureRoute && !isStripeWebhook && !isValidationRoute) {
 		const authHeader = req.headers.get('authorization');
 		const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
 
-		if (token) {
-			// PATH A: Token provided (API Clients, cURL, Postman) -> Validate it
+		if (token && token.startsWith('xrx_mob_')) {
+			// PATH A1: First-party Xernerx Mobile Device Session Bearer Token -> Validate against MobileSession
+			try {
+				let validationUrl = `${req.nextUrl.origin}/secure/auth/mobile/validate`;
+				if (process.env.ENVIRONMENT?.toLowerCase() === 'development') {
+					const port = req.nextUrl.port || process.env.PORT || '3000';
+					validationUrl = `http://127.0.0.1:${port}/secure/auth/mobile/validate`;
+				}
+
+				const mobileRes = await fetch(validationUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ token }),
+				});
+
+				if (!mobileRes.ok) {
+					const errPayload = await mobileRes.json().catch(() => ({}));
+					return errorResponse(errPayload?.error || 'Unauthorized: Mobile session expired or revoked', 401);
+				}
+
+				const mobileData = await mobileRes.json();
+				if (!mobileData?.valid || !mobileData?.userId) {
+					return errorResponse('Unauthorized: Invalid mobile session', 401);
+				}
+			} catch (error) {
+				console.error('Mobile session validation error:', error);
+				return errorResponse('Internal Server Error', 500);
+			}
+		} else if (token) {
+			// PATH A2: System/API Token provided (API Clients, cURL, Postman) -> Validate it
 			try {
 				let validationUrl = `${req.nextUrl.origin}/secure/validate/token`;
 
@@ -199,12 +235,12 @@ export async function proxy(req: NextRequest) {
 				console.error('Token validation error:', error);
 				return errorResponse('Internal Server Error', 500);
 			}
-		} else {
+		} else if (!isPublicMobileAuthRoute) {
 			// PATH B: No Token -> Is this your frontend relying on session cookies?
 			if (!isTrustedFrontend) {
 				return errorResponse('Unauthorized: Missing Bearer Token', 401);
 			}
-			const isPublicSecurePost = req.nextUrl.pathname === '/secure/auth/qr' || req.nextUrl.pathname === '/secure/applications/submit';
+			const isPublicSecurePost = req.nextUrl.pathname === '/secure/applications/submit';
 			if (req.method !== 'GET' && req.method !== 'HEAD' && !isPublicSecurePost && !hasSessionCookie && !isLocalDevOrigin) {
 				return errorResponse('Unauthorized: Session or Bearer Token required', 401);
 			}

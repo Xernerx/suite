@@ -8,7 +8,6 @@ import { Loading } from '@xernerx/feedback';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import ConfigPortabilityCard, { VirtueConfigShape, VirtueDynamicRolesConfig, VirtueLevelRole } from '@/components/virtue/ConfigPortabilityCard';
-import { ServerBotSetupDangerCards } from '@/components/dashboard/ServerBotSetupDangerCards';
 import LevelRolesSection, {
 	buildConfigSnapshot,
 	DEFAULT_DYNAMIC_ROLES,
@@ -173,7 +172,7 @@ export default function VirtueGeneral({ id, managedGuilds, isActive = true }: { 
 				setProfile(updated);
 				setDynamicRoles(nextSnapshot.dynamicRoles || DEFAULT_DYNAMIC_ROLES);
 				setLevelRoles(nextSnapshot.levelRoles || []);
-				setOriginalConfig(JSON.parse(JSON.stringify(nextSnapshot)));
+				setOriginalConfig(structuredClone(nextSnapshot));
 				remind(false);
 				toast({ title: t('app.dashboard.virtue.toast.savedSuccess'), type: 'success' });
 			} else {
@@ -483,8 +482,6 @@ export default function VirtueGeneral({ id, managedGuilds, isActive = true }: { 
 				setDynamicRoles={setDynamicRoles}
 				isServerPremium={isServerPremium}
 			/>
-
-			<ServerBotSetupDangerCards guildId={id} mode="virtue" onDeleted={fetchProfile} />
 		</div>
 	);
 }

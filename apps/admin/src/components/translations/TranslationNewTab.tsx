@@ -99,6 +99,7 @@ export function TranslationNewTab({ missingKeys, newIndex, setNewIndex, sourceDi
 					onChange={(e) => onInputChange(currentKey, e.target.value)}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter' && newIndex < missingKeys.length - 1) {
+							if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 							setNewIndex((prev) => prev + 1);
 						}
 					}}

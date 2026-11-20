@@ -2,6 +2,25 @@
 
 # info
 
+## 1.13.3
+
+### Patch Changes
+
+- ## Status & Changelog Request Modernization
+  
+  Simplified request timeout handling and list sorting across the Info hub.
+  
+  ### Changed
+  
+  - **Request Timeouts & Sorting**: Replaced manual `AbortController` timeouts with `AbortSignal.timeout()` on changelog and status probes, and updated suggestion sorting to use `.toSorted()`.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 1.13.2
 
 ### Patch Changes

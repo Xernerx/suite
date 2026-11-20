@@ -509,8 +509,6 @@ export async function relayLocalWebhook(req: { url: string; botId?: string; even
 
 	const start = performance.now();
 	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 10000);
 		const bodyPayload = JSON.stringify({
 			event: eventName,
 			botId: req.botId || 'unknown',
@@ -532,9 +530,8 @@ export async function relayLocalWebhook(req: { url: string; botId?: string; even
 				'X-Xernerx-Delivery': deliveryId,
 			},
 			body: bodyPayload,
-			signal: controller.signal,
+			signal: AbortSignal.timeout(10000),
 		});
-		clearTimeout(timeout);
 
 		const latencyMs = Math.max(1, Math.round(performance.now() - start));
 		const text = await res.text().catch(() => '');

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 import { recordAuditLog, resolveCallerAuth } from './auditAndNotify';
 import { getCandidateDiscordTokens } from './discordGuildResources';
-import { fetchYourAppsGuildState } from './yourappsDiscord';
+import { deleteDiscordMessage, fetchYourAppsGuildState } from './yourappsDiscord';
 
 export async function authorizeGuildSetupManager(req: NextRequest, guildId: string): Promise<{ ok: true; userId: string | null } | { ok: false; response: NextResponse }> {
 	const caller = await resolveCallerAuth(req, ['servers']);
@@ -150,6 +150,10 @@ export async function handleDeleteYourAppsGuildSetup(req: NextRequest, guildId: 
 	const existing: any = await ProfileModel.findOne({ id: guildId })
 		.lean()
 		.catch(() => null);
+
+	if (Array.isArray(existing?.panels) && existing.panels.length > 0) {
+		await Promise.all(existing.panels.filter((p: any) => p?.channelId && p?.messageId).map((p: any) => deleteDiscordMessage(String(p.channelId), String(p.messageId)).catch(() => false)));
+	}
 	const discordState = await fetchYourAppsGuildState(guildId).catch(() => ({ botPresent: false, serverRoles: [], serverChannels: [] }));
 
 	const [formsRes, subsRes, draftsRes] = await Promise.all([

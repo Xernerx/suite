@@ -59,14 +59,11 @@ function readLocalAppChangelog(appId: string): string | null {
 
 async function fetchChangelogFromUrl(url: string, timeoutMs = 4000): Promise<string | null> {
 	try {
-		const controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), timeoutMs);
 		const res = await fetch(url, {
 			headers: FETCH_HEADERS,
-			signal: controller.signal,
+			signal: AbortSignal.timeout(timeoutMs),
 			cache: 'no-store',
 		});
-		clearTimeout(timeout);
 		if (!res.ok) return null;
 		const data = await res.json();
 		const content = data?.fullContent || data?.content;

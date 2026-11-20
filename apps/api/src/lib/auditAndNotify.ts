@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { auth } from '@xernerx/lib';
 import { getServerSession } from 'next-auth';
+import { resolveMobileSessionFromRequest } from './mobileAuth';
 
 export interface AuditLogInput {
 	actorId?: string | null;
@@ -63,11 +64,20 @@ export async function resolveCallerAuth(req: Request, requiredPermissions?: stri
 
 	let userId: string | null = null;
 	try {
-		const session = (await getServerSession(auth)) as any;
-		if (session?.user?.id) {
-			userId = String(session.user.id);
+		const mobileSession = await resolveMobileSessionFromRequest(req);
+		if (mobileSession?.userId) {
+			userId = mobileSession.userId;
 		}
 	} catch {}
+
+	if (!userId) {
+		try {
+			const session = (await getServerSession(auth)) as any;
+			if (session?.user?.id) {
+				userId = String(session.user.id);
+			}
+		} catch {}
+	}
 
 	if (!userId && process.env.ENVIRONMENT?.toLowerCase() === 'development') {
 		const origin = req.headers.get('origin') || '';
@@ -143,6 +153,15 @@ export async function recordAuditLog(reqOrInput: Request | AuditLogInput, maybeI
 			const req = reqOrInput as Request;
 			actorId = req.headers.get('x-actor-id') || null;
 			actorName = req.headers.get('x-actor-name') || null;
+			if (!actorId) {
+				try {
+					const mobileSession = await resolveMobileSessionFromRequest(req);
+					if (mobileSession?.userId) {
+						actorId = mobileSession.userId;
+						actorName = mobileSession.oauthPayload?.name || null;
+					}
+				} catch {}
+			}
 		}
 
 		if (!actorId) {

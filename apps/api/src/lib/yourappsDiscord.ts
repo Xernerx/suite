@@ -1,15 +1,49 @@
 /** @format */
 
 import {
+	applyMemberRoleChanges,
 	applySubmissionDecisionInDiscord,
+	buildApplyPanelMessagePayload,
+	buildSubmissionDiscordComponents,
+	buildSubmissionDiscordEmbed,
+	closeSubmissionInterviewInDiscord,
 	decodeYourAppsApplicationId,
+	deleteDiscordMessage,
+	editDiscordApplyPanelMessage,
 	getPublicAppUrl,
 	getYourAppsBotToken,
+	notifyClarificationRequestedInDiscord,
+	notifyClarificationRespondedInDiscord,
+	openSubmissionInterviewInDiscord,
 	postSubmissionToDiscordLogChannel,
 	publishDiscordApplyPanel,
+	publishDiscordNativePoll,
+	syncGuildApplyPanels,
+	syncSubmissionLogMessageInDiscord,
 } from './yourappsDiscordPanels';
+import { snowflakeCreatedAtMs } from './yourappsSanitize';
 
-export { applySubmissionDecisionInDiscord, decodeYourAppsApplicationId, getPublicAppUrl, getYourAppsBotToken, postSubmissionToDiscordLogChannel, publishDiscordApplyPanel };
+export {
+	applyMemberRoleChanges,
+	applySubmissionDecisionInDiscord,
+	buildApplyPanelMessagePayload,
+	buildSubmissionDiscordComponents,
+	buildSubmissionDiscordEmbed,
+	closeSubmissionInterviewInDiscord,
+	decodeYourAppsApplicationId,
+	deleteDiscordMessage,
+	editDiscordApplyPanelMessage,
+	getPublicAppUrl,
+	getYourAppsBotToken,
+	notifyClarificationRequestedInDiscord,
+	notifyClarificationRespondedInDiscord,
+	openSubmissionInterviewInDiscord,
+	postSubmissionToDiscordLogChannel,
+	publishDiscordApplyPanel,
+	publishDiscordNativePoll,
+	syncGuildApplyPanels,
+	syncSubmissionLogMessageInDiscord,
+};
 
 export async function fetchYourAppsGuildState(guildId: string): Promise<{
 	botPresent: boolean;
@@ -71,7 +105,7 @@ export async function fetchYourAppsGuildState(guildId: string): Promise<{
 			const channels = await channelsRes.json().catch(() => []);
 			if (Array.isArray(channels)) {
 				serverChannels = channels
-					.filter((c: any) => c && c.id && (Number(c.type) === 0 || Number(c.type) === 5 || Number(c.type) === 15))
+					.filter((c: any) => c && c.id && (Number(c.type) === 0 || Number(c.type) === 4 || Number(c.type) === 5 || Number(c.type) === 15))
 					.sort((a: any, b: any) => (Number(a.position) || 0) - (Number(b.position) || 0))
 					.map((c: any) => ({
 						id: String(c.id),
@@ -94,20 +128,46 @@ export async function fetchYourAppsGuildState(guildId: string): Promise<{
 	}
 }
 
+export async function fetchGuildMembersPreview(guildId: string): Promise<Array<{ id: string; username: string; displayName: string }>> {
+	const token = getYourAppsBotToken();
+	if (!token || !guildId) return [];
+	try {
+		const res = await fetch(`https://discord.com/api/v10/guilds/${encodeURIComponent(guildId)}/members?limit=200`, {
+			headers: { Authorization: `Bot ${token}` },
+			cache: 'no-store',
+		});
+		if (!res.ok) return [];
+		const list = await res.json().catch(() => []);
+		if (!Array.isArray(list)) return [];
+		return list
+			.filter((m: any) => m?.user?.id && !m.user.bot)
+			.map((m: any) => ({
+				id: String(m.user.id),
+				username: String(m.user.username || m.user.id),
+				displayName: String(m.nick || m.user.global_name || m.user.username || m.user.id),
+			}));
+	} catch {
+		return [];
+	}
+}
+
 export async function fetchDiscordGuildMember(
 	guildId: string,
 	userId: string
 ): Promise<{
+	userId?: string;
 	isMember: boolean;
 	roles: string[];
 	joinedAtMs: number | null;
+	accountCreatedAtMs: number | null;
 	isAdminOrManageGuild: boolean;
 	userTag?: string;
 	userAvatar?: string | null;
 }> {
 	const token = getYourAppsBotToken();
+	const accountCreatedAtMs = snowflakeCreatedAtMs(userId);
 	if (!token || !guildId || !userId) {
-		return { isMember: false, roles: [], joinedAtMs: null, isAdminOrManageGuild: false };
+		return { userId, isMember: false, roles: [], joinedAtMs: null, accountCreatedAtMs, isAdminOrManageGuild: false };
 	}
 
 	try {
@@ -127,12 +187,12 @@ export async function fetchDiscordGuildMember(
 		]);
 
 		if (!memberRes || !memberRes.ok) {
-			return { isMember: false, roles: [], joinedAtMs: null, isAdminOrManageGuild: false };
+			return { userId, isMember: false, roles: [], joinedAtMs: null, accountCreatedAtMs, isAdminOrManageGuild: false };
 		}
 
 		const member = await memberRes.json().catch(() => null);
 		if (!member) {
-			return { isMember: false, roles: [], joinedAtMs: null, isAdminOrManageGuild: false };
+			return { userId, isMember: false, roles: [], joinedAtMs: null, accountCreatedAtMs, isAdminOrManageGuild: false };
 		}
 
 		const guild = guildRes && guildRes.ok ? await guildRes.json().catch(() => null) : null;
@@ -158,15 +218,17 @@ export async function fetchDiscordGuildMember(
 		const userAvatar = u?.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${u.avatar}.png?size=128` : null;
 
 		return {
+			userId,
 			isMember: true,
 			roles: memberRoles,
 			joinedAtMs: joinedAtMs && !Number.isNaN(joinedAtMs) ? joinedAtMs : null,
+			accountCreatedAtMs,
 			isAdminOrManageGuild,
 			userTag,
 			userAvatar,
 		};
 	} catch {
-		return { isMember: false, roles: [], joinedAtMs: null, isAdminOrManageGuild: false };
+		return { userId, isMember: false, roles: [], joinedAtMs: null, accountCreatedAtMs, isAdminOrManageGuild: false };
 	}
 }
 
@@ -185,19 +247,47 @@ function formatDurationSeconds(sec: number): string {
 }
 
 export function checkWebApplicantEligibility(params: {
-	member: { isMember: boolean; roles: string[]; joinedAtMs: number | null; isAdminOrManageGuild: boolean };
+	member: { userId?: string; isMember: boolean; roles: string[]; joinedAtMs: number | null; accountCreatedAtMs?: number | null; isAdminOrManageGuild: boolean };
 	guildConfig: any;
 	position: any;
 	latestSubmission?: any | null;
+	activeSubmissionCount?: number;
+	approvedSubmissionCount?: number;
 }): { ok: true } | { ok: false; reason: string } {
-	const { member, guildConfig, position, latestSubmission } = params;
+	const { member, guildConfig, position, latestSubmission, activeSubmissionCount, approvedSubmissionCount } = params;
 
 	if (!position) {
 		return { ok: false, reason: 'This position no longer exists.' };
 	}
+
+	const nowMs = Date.now();
+	if (position.opensAt) {
+		const opensMs = new Date(position.opensAt).getTime();
+		if (!Number.isNaN(opensMs) && opensMs > nowMs && position.state === 'closed') {
+			return { ok: false, reason: `Applications for "${position.name}" open in ${formatDurationSeconds((opensMs - nowMs) / 1000)}.` };
+		}
+	}
+	if (position.closesAt) {
+		const closesMs = new Date(position.closesAt).getTime();
+		if (!Number.isNaN(closesMs) && closesMs <= nowMs) {
+			return { ok: false, reason: `The application deadline for "${position.name}" has passed.` };
+		}
+	}
+
 	if (position.state !== 'open') {
 		return { ok: false, reason: `Applications for "${position.name}" are currently closed.` };
 	}
+
+	const maxSubs = Number(position.maxSubmissions) || 0;
+	if (maxSubs > 0 && typeof activeSubmissionCount === 'number' && activeSubmissionCount >= maxSubs) {
+		return { ok: false, reason: `"${position.name}" has reached its maximum of ${maxSubs} submissions.` };
+	}
+
+	const maxApps = Number(position.maxApprovals) || 0;
+	if (maxApps > 0 && typeof approvedSubmissionCount === 'number' && approvedSubmissionCount >= maxApps) {
+		return { ok: false, reason: `All ${maxApps} available spots for "${position.name}" have been filled.` };
+	}
+
 	if (!member.isMember) {
 		return { ok: false, reason: 'You must be a member of this Discord server to submit an application.' };
 	}
@@ -219,9 +309,21 @@ export function checkWebApplicantEligibility(params: {
 		return { ok: false, reason: 'You do not hold a required server role to apply for this position.' };
 	}
 
+	const minAccountSec = Number(position.minimumAccountAge) || 0;
+	const createdMs = member.accountCreatedAtMs ?? (member.userId ? snowflakeCreatedAtMs(member.userId) : null);
+	if (!isGuildAdmin && minAccountSec > 0 && createdMs) {
+		const acctSec = (nowMs - createdMs) / 1000;
+		if (acctSec < minAccountSec) {
+			return {
+				ok: false,
+				reason: `Your Discord account must be at least ${formatDurationSeconds(minAccountSec)} old (${formatDurationSeconds(minAccountSec - acctSec)} remaining).`,
+			};
+		}
+	}
+
 	const minJoinSec = Number(position.minimumJoinTime) || 0;
 	if (!isGuildAdmin && minJoinSec > 0 && member.joinedAtMs) {
-		const inServerSec = (Date.now() - member.joinedAtMs) / 1000;
+		const inServerSec = (nowMs - member.joinedAtMs) / 1000;
 		if (inServerSec < minJoinSec) {
 			return {
 				ok: false,
@@ -230,13 +332,13 @@ export function checkWebApplicantEligibility(params: {
 		}
 	}
 
-	if (latestSubmission?.status === 'pending') {
-		return { ok: false, reason: `You already have a pending application (#${latestSubmission.id}) for "${position.name}".` };
+	if (latestSubmission && ['pending', 'interview', 'needs_info'].includes(String(latestSubmission.status))) {
+		return { ok: false, reason: `You already have an active application (#${latestSubmission.id}) for "${position.name}".` };
 	}
 
 	const cooldownSec = Number(position.cooldown) || 0;
-	if (!isGuildAdmin && cooldownSec > 0 && latestSubmission?.createdAt) {
-		const elapsedSec = (Date.now() - new Date(latestSubmission.createdAt).getTime()) / 1000;
+	if (!isGuildAdmin && cooldownSec > 0 && latestSubmission?.createdAt && latestSubmission?.status !== 'withdrawn') {
+		const elapsedSec = (nowMs - new Date(latestSubmission.createdAt).getTime()) / 1000;
 		if (elapsedSec < cooldownSec) {
 			return {
 				ok: false,

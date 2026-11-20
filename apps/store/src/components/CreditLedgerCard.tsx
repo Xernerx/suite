@@ -27,7 +27,7 @@ export function CreditLedgerCard({ transactions = [], streakShields = 0 }: Credi
 
 	const sorted = useMemo(() => {
 		if (!Array.isArray(transactions)) return [];
-		return [...transactions].sort((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()).slice(0, 12);
+		return transactions.toSorted((a, b) => new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()).slice(0, 12);
 	}, [transactions]);
 
 	return (

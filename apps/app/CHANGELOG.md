@@ -2,6 +2,36 @@
 
 # app
 
+## 2.26.0
+
+### Minor Changes
+
+- ## YourApps Server Applications Suite & Dashboard Polish
+  
+  Expanded the YourApps server dashboard and public web application portals with polls, starter templates, consensus reviews, and smoother form interactions.
+  
+  ### Added
+  
+  - **Starter Templates & Applications Settings**: Added ready-to-use position templates and a dedicated YourApps server settings panel for configuring channels, roles, and permissions.
+  - **Interactive Apply Panels & Polls**: Added modal builders for publishing and syncing Discord Apply panels and native polls directly from your dashboard.
+  - **Rules, Review Workflows & Submission Inspector**: Added scheduling windows, eligibility rules, consensus review settings, and a rich submission inspector modal with internal notes, follow-up requests, and interview creation.
+  - **Expanded Web Form Inputs**: Added full question-type input support on server web application portals including file uploads, pickers, and multi-select choices.
+  
+  ### Changed
+  
+  - **IME-Safe Tag & Choice Entry**: Prevented CJK IME composition confirmations from prematurely submitting custom server tags or application choices.
+  - **State Snapshots & Sorting**: Replaced JSON round-trip config clones with `structuredClone()` and modernized bot/server release and review sorting.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 2.25.0
 
 ### Minor Changes

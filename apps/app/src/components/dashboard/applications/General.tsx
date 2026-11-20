@@ -1,15 +1,15 @@
 /** @format */
 'use client';
 
-import { AlertTriangle, CheckCircle2, ClipboardCheck, Clock, ExternalLink, FileSpreadsheet, Hash, Megaphone, RefreshCw, Shield, XCircle } from 'lucide-react';
-import { Button, MultiSelector, Selector, Tabs, Toggle } from '@xernerx/ui';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Clock, ExternalLink, FileSpreadsheet, MessageSquare, RefreshCw, XCircle } from 'lucide-react';
+import { Button, Tabs } from '@xernerx/ui';
 import { Loading } from '@xernerx/feedback';
 import { useDictionary, useEnvironment, useToast } from '@xernerx/providers';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import ApplicationsSettingsPanel from './ApplicationsSettingsPanel';
 import PositionsSection from './PositionsSection';
 import SubmissionsSection from './SubmissionsSection';
-import { ServerBotSetupDangerCards } from '../ServerBotSetupDangerCards';
 import { normalizeChannels, normalizeRoles, type DiscordChannelItem, type DiscordRoleItem, type YourAppsConfigSnapshot, type YourAppsProfile } from './types';
 
 function extractSnapshot(data: any): YourAppsConfigSnapshot {
@@ -24,6 +24,11 @@ function extractSnapshot(data: any): YourAppsConfigSnapshot {
 		blacklistRoles: cleanIds(data?.blacklistRoles),
 		dmNotifications: data?.dmNotifications !== false,
 		threadPerSubmission: Boolean(data?.threadPerSubmission),
+		selfReviewAllowed: Boolean(data?.selfReviewAllowed),
+		pollOnSubmission: Boolean(data?.pollOnSubmission),
+		pollDurationHours: Math.max(1, Math.min(168, Number(data?.pollDurationHours) || 48)),
+		interviewMode: data?.interviewMode === 'channel' ? 'channel' : 'thread',
+		interviewCategoryId: data?.interviewCategoryId ? String(data.interviewCategoryId) : '',
 	};
 }
 
@@ -41,6 +46,7 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 	const [loading, setLoading] = useState(true);
 	const [loadError, setLoadError] = useState<string | null>(null);
 	const [saving, setSaving] = useState(false);
+	const [syncingPanelNow, setSyncingPanelNow] = useState(false);
 	const [subView, setSubView] = useState<'overview' | 'positions' | 'submissions'>(
 		deepLinkSubmissionId || initialSubParam === 'submissions' ? 'submissions' : initialSubParam === 'overview' ? 'overview' : 'positions'
 	);
@@ -52,29 +58,13 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 	}, [deepLinkSubmissionId, initialSubParam]);
 
 	const [originalConfig, setOriginalConfig] = useState<YourAppsConfigSnapshot | null>(null);
-	const [logChannel, setLogChannel] = useState('');
-	const [archiveChannel, setArchiveChannel] = useState('');
-	const [panelChannel, setPanelChannel] = useState('');
-	const [submissionPings, setSubmissionPings] = useState<string[]>([]);
-	const [adminRoles, setAdminRoles] = useState<string[]>([]);
-	const [reviewRoles, setReviewRoles] = useState<string[]>([]);
-	const [blacklistRoles, setBlacklistRoles] = useState<string[]>([]);
-	const [dmNotifications, setDmNotifications] = useState(true);
-	const [threadPerSubmission, setThreadPerSubmission] = useState(false);
+	const [config, setConfig] = useState<YourAppsConfigSnapshot>(() => extractSnapshot(null));
 
 	const [discordRoles, setDiscordRoles] = useState<DiscordRoleItem[]>([]);
 	const [discordChannels, setDiscordChannels] = useState<DiscordChannelItem[]>([]);
 
-	const applySnapshot = useCallback((snap: YourAppsConfigSnapshot) => {
-		setLogChannel(snap.logChannel);
-		setArchiveChannel(snap.archiveChannel);
-		setPanelChannel(snap.panelChannel);
-		setSubmissionPings([...snap.submissionPings]);
-		setAdminRoles([...snap.adminRoles]);
-		setReviewRoles([...snap.reviewRoles]);
-		setBlacklistRoles([...snap.blacklistRoles]);
-		setDmNotifications(snap.dmNotifications);
-		setThreadPerSubmission(snap.threadPerSubmission);
+	const patchConfig = useCallback((patch: Partial<YourAppsConfigSnapshot>) => {
+		setConfig((prev) => ({ ...prev, ...patch }));
 	}, []);
 
 	const fetchProfile = useCallback(async () => {
@@ -97,7 +87,7 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 			if (res.ok && data?.found !== false) {
 				const snap = extractSnapshot(data);
 				setProfile(data);
-				applySnapshot(snap);
+				setConfig(snap);
 				setOriginalConfig(snap);
 				const pRoles = normalizeRoles(data.serverRoles, id);
 				const pChannels = normalizeChannels(data.serverChannels);
@@ -119,31 +109,16 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 		} finally {
 			setLoading(false);
 		}
-	}, [id, getEnvUrl, applySnapshot, t]);
+	}, [id, getEnvUrl, t]);
 
 	useEffect(() => {
 		fetchProfile();
 	}, [fetchProfile]);
 
-	const currentSnapshot = useMemo<YourAppsConfigSnapshot>(
-		() => ({
-			logChannel,
-			archiveChannel,
-			panelChannel,
-			submissionPings,
-			adminRoles,
-			reviewRoles,
-			blacklistRoles,
-			dmNotifications,
-			threadPerSubmission,
-		}),
-		[logChannel, archiveChannel, panelChannel, submissionPings, adminRoles, reviewRoles, blacklistRoles, dmNotifications, threadPerSubmission]
-	);
-
 	const isDirty = useMemo(() => {
 		if (!profile || !originalConfig) return false;
-		return JSON.stringify(currentSnapshot) !== JSON.stringify(originalConfig);
-	}, [profile, originalConfig, currentSnapshot]);
+		return JSON.stringify(config) !== JSON.stringify(originalConfig);
+	}, [profile, originalConfig, config]);
 
 	const handleSave = useCallback(async () => {
 		if (!id) return;
@@ -153,27 +128,55 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 				method: 'PATCH',
 				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(currentSnapshot),
+				body: JSON.stringify(config),
 			});
 			const data = await res.json().catch(() => ({}));
 			if (!res.ok) throw new Error(data.error || t('app.dashboard.applications.toast.saveError'));
 
 			const snap = extractSnapshot(data);
-			applySnapshot(snap);
+			setConfig(snap);
 			setOriginalConfig(snap);
+			if (Array.isArray(data?.panels)) {
+				setProfile((prev) => (prev ? { ...prev, panels: data.panels } : prev));
+			}
 			remind(false);
-			toast({ title: t('app.dashboard.applications.toast.savedSuccess'), type: 'success' });
+			if (data?.panelError) {
+				toast({ title: t('app.dashboard.applications.toast.saveError'), description: String(data.panelError), type: 'error' });
+			} else {
+				toast({ title: t('app.dashboard.applications.toast.savedSuccess'), type: 'success' });
+			}
 		} catch (err: any) {
 			toast({ title: t('app.dashboard.applications.toast.saveError'), description: err.message, type: 'error' });
 		} finally {
 			setSaving(false);
 		}
-	}, [id, getEnvUrl, currentSnapshot, applySnapshot, remind, toast, t]);
+	}, [id, getEnvUrl, config, remind, toast, t]);
+
+	const handleSyncPanelNow = useCallback(async () => {
+		if (!id) return;
+		setSyncingPanelNow(true);
+		try {
+			const res = await fetch(getEnvUrl(`https://api.xernerx.com/secure/guilds/${id}/applications/panels`), {
+				method: 'PUT',
+				credentials: 'include',
+			});
+			const data = await res.json().catch(() => ({}));
+			if (!res.ok) throw new Error(data.error || t('app.dashboard.applications.toast.saveError'));
+			if (Array.isArray(data?.panels)) {
+				setProfile((prev) => (prev ? { ...prev, panels: data.panels } : prev));
+			}
+			toast({ title: t('app.dashboard.applications.toast.panelsSynced'), type: 'success' });
+		} catch (err: any) {
+			toast({ title: t('app.dashboard.applications.toast.saveError'), description: err.message, type: 'error' });
+		} finally {
+			setSyncingPanelNow(false);
+		}
+	}, [id, getEnvUrl, toast, t]);
 
 	const handleReset = useCallback(() => {
 		if (!originalConfig) return;
-		applySnapshot(originalConfig);
-	}, [originalConfig, applySnapshot]);
+		setConfig(originalConfig);
+	}, [originalConfig]);
 
 	useEffect(() => {
 		if (!isActive) return;
@@ -236,30 +239,11 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 		);
 	}
 
-	const channelSelectorOptions = [
-		{ value: '', label: t('app.dashboard.applications.channels.placeholder') },
-		...discordChannels
-			.filter((c) => c.type === 0 || c.type === 5)
-			.map((c) => ({
-				value: c.id,
-				label: (
-					<span className="inline-flex items-center gap-1.5">
-						{c.type === 5 ? <Megaphone size={13} className="text-(--text-muted) shrink-0" /> : <Hash size={13} className="text-(--text-muted) shrink-0" />}
-						<span>{c.name}</span>
-					</span>
-				),
-			})),
-	];
-
-	const multiRoleOptions = discordRoles.map((r) => ({
-		label: `@${r.name}`,
-		value: r.id,
-		color: r.color > 0 ? `#${r.color.toString(16).padStart(6, '0')}` : undefined,
-	}));
+	const activePendingCount = (profile.stats?.pending ?? 0) + (profile.stats?.needsInfo ?? 0);
 
 	return (
 		<div className="flex flex-col" style={{ gap: 'var(--ui-gap)' }}>
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+			<div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
 				{[
 					{
 						label: t('app.dashboard.applications.stats.openPositions'),
@@ -267,7 +251,8 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 						icon: FileSpreadsheet,
 						tone: 'text-(--accent)',
 					},
-					{ label: t('app.dashboard.applications.stats.pending'), value: profile.stats?.pending ?? 0, icon: Clock, tone: 'text-(--accent-orange)' },
+					{ label: t('app.dashboard.applications.stats.pending'), value: activePendingCount, icon: Clock, tone: 'text-(--accent-orange)' },
+					{ label: t('app.dashboard.applications.stats.interview'), value: profile.stats?.interview ?? 0, icon: MessageSquare, tone: 'text-(--accent)' },
 					{ label: t('app.dashboard.applications.stats.approved'), value: profile.stats?.approved ?? 0, icon: CheckCircle2, tone: 'text-(--accent-green)' },
 					{ label: t('app.dashboard.applications.stats.denied'), value: profile.stats?.denied ?? 0, icon: XCircle, tone: 'text-(--accent-red)' },
 				].map((item) => {
@@ -302,9 +287,10 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 				<PositionsSection
 					guildId={id}
 					positions={profile.positions || []}
+					panels={profile.panels || []}
 					discordRoles={discordRoles}
 					discordChannels={discordChannels}
-					defaultPanelChannel={panelChannel}
+					defaultPanelChannel={config.panelChannel}
 					onChanged={fetchProfile}
 				/>
 			)}
@@ -312,75 +298,16 @@ export default function ApplicationsGeneral({ id, isActive = true }: { id?: stri
 			{subView === 'submissions' && id && <SubmissionsSection guildId={id} positions={profile.positions || []} initialSubmissionId={deepLinkSubmissionId} onCountsChanged={fetchProfile} />}
 
 			{subView === 'overview' && (
-				<div className="flex flex-col bg-(--foreground)/30 backdrop-blur-md border border-(--border)/10 rounded-3xl shadow-sm" style={{ padding: 'var(--ui-gap)', gap: 'var(--ui-gap)' }}>
-					<div className="flex items-center gap-2.5 text-(--text) font-extrabold text-sm tracking-widest uppercase">
-						<div className="w-8 h-8 rounded-full bg-(--accent)/20 flex items-center justify-center text-(--accent)">
-							<Shield className="w-4 h-4" />
-						</div>
-						<span>{t('app.dashboard.applications.title')}</span>
-					</div>
-
-					<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.channels.logChannel')}</label>
-							<Selector value={logChannel} onChange={setLogChannel} options={channelSelectorOptions} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.channels.logChannelDesc')}</span>
-						</div>
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.channels.archiveChannel')}</label>
-							<Selector value={archiveChannel} onChange={setArchiveChannel} options={channelSelectorOptions} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.channels.archiveChannelDesc')}</span>
-						</div>
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.channels.panelChannel')}</label>
-							<Selector value={panelChannel} onChange={setPanelChannel} options={channelSelectorOptions} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.channels.panelChannelDesc')}</span>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-(--border)/10">
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.roles.submissionPings')}</label>
-							<MultiSelector value={submissionPings} onChange={setSubmissionPings} options={multiRoleOptions} placeholder={t('app.dashboard.applications.roles.placeholder')} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.roles.submissionPingsDesc')}</span>
-						</div>
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.roles.reviewRoles')}</label>
-							<MultiSelector value={reviewRoles} onChange={setReviewRoles} options={multiRoleOptions} placeholder={t('app.dashboard.applications.roles.placeholder')} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.roles.reviewRolesDesc')}</span>
-						</div>
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.roles.adminRoles')}</label>
-							<MultiSelector value={adminRoles} onChange={setAdminRoles} options={multiRoleOptions} placeholder={t('app.dashboard.applications.roles.placeholder')} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.roles.adminRolesDesc')}</span>
-						</div>
-						<div className="flex flex-col gap-1.5">
-							<label className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.roles.blacklistRoles')}</label>
-							<MultiSelector value={blacklistRoles} onChange={setBlacklistRoles} options={multiRoleOptions} placeholder={t('app.dashboard.applications.roles.placeholder')} />
-							<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.roles.blacklistRolesDesc')}</span>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-(--border)/10">
-						<div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-(--background)/50 border border-(--border)/10">
-							<div className="flex flex-col">
-								<span className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.behavior.dmNotifications')}</span>
-								<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.behavior.dmNotificationsDesc')}</span>
-							</div>
-							<Toggle checked={dmNotifications} onChange={(e) => setDmNotifications(e.target.checked)} size="sm" />
-						</div>
-						<div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-(--background)/50 border border-(--border)/10">
-							<div className="flex flex-col">
-								<span className="text-xs font-bold text-(--text)">{t('app.dashboard.applications.behavior.threadPerSubmission')}</span>
-								<span className="text-[11px] text-(--text-muted)">{t('app.dashboard.applications.behavior.threadPerSubmissionDesc')}</span>
-							</div>
-							<Toggle checked={threadPerSubmission} onChange={(e) => setThreadPerSubmission(e.target.checked)} size="sm" />
-						</div>
-					</div>
-				</div>
+				<ApplicationsSettingsPanel
+					config={config}
+					discordRoles={discordRoles}
+					discordChannels={discordChannels}
+					isDirty={isDirty}
+					syncingPanelNow={syncingPanelNow}
+					onSyncPanelNow={handleSyncPanelNow}
+					onPatch={patchConfig}
+				/>
 			)}
-
-			{subView === 'overview' && <ServerBotSetupDangerCards guildId={id} mode="yourapps" onDeleted={fetchProfile} />}
 		</div>
 	);
 }

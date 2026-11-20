@@ -1,0 +1,36 @@
+name: Sync Community Branch
+
+on:
+    push:
+        branches:
+            - canary
+
+jobs:
+    sync-community:
+        name: Merge Canary to Community
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+        steps:
+            - name: Checkout Canary Branch
+              uses: actions/checkout@v4
+              with:
+                  ref: canary
+                  fetch-depth: 0
+
+            - name: Setup Git Identity
+              run: |
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+            - name: Sync Canary into Community
+              run: |
+                  git fetch origin canary
+                  if git ls-remote --exit-code --heads origin community >/dev/null 2>&1; then
+                    git fetch origin community
+                    git checkout -B community origin/community
+                    git merge origin/canary -X theirs --allow-unrelated-histories -m "chore: auto-sync canary into community"
+                  else
+                    git checkout -B community origin/canary
+                  fi
+                  git push origin HEAD:refs/heads/community

@@ -226,7 +226,7 @@ export function MediaManager({ scope = 'self' }: MediaManagerProps) {
 			const tagMatch = Array.isArray(item.tags) && item.tags.some((tg: string) => tg.toLowerCase().includes(q));
 			return item.filename?.toLowerCase().includes(q) || item.mimeType?.toLowerCase().includes(q) || item._id?.toLowerCase().includes(q) || tagMatch;
 		});
-		return [...list].sort((a, b) => {
+		return list.toSorted((a, b) => {
 			if (sortBy === 'oldest') return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
 			if (sortBy === 'largest') return (Number(b.size) || 0) - (Number(a.size) || 0);
 			if (sortBy === 'name') return String(a.filename || '').localeCompare(String(b.filename || ''));

@@ -5,13 +5,16 @@ import crypto from 'crypto';
 import { database } from '@xernerx/lib/server';
 import { decryptQrHandoffTicket, encryptQrHandoffTicket } from '@xernerx/lib';
 import { getToken } from 'next-auth/jwt';
+import { extractRequestIp, extractRequestLocation, mintHandoffTicketFromMobileSession, parseRequestDeviceInfo, resolveMobileSessionFromRequest } from '@/lib/mobileAuth';
 
 interface QrChallengeRecord {
 	token: string;
 	pairCode: string;
 	deviceInfo: string;
+	ipAddress?: string | null;
+	location?: string | null;
 	mode?: 'request' | 'share';
-	status: 'pending' | 'approved';
+	status: 'pending' | 'approved' | 'denied';
 	handoffTicket?: string;
 	approvedBy?: string;
 	expiresAt: number;
@@ -35,6 +38,19 @@ async function resolveHandoffTicket(req: NextRequest, rawTicket?: string, fallba
 	if (rawTicket && typeof rawTicket === 'string' && decryptQrHandoffTicket(rawTicket)) {
 		resolvedTicket = rawTicket;
 	} else {
+		// 1. Try first-party Xernerx Mobile Bearer session
+		const mobileSession = await resolveMobileSessionFromRequest(req);
+		if (mobileSession) {
+			const minted = await mintHandoffTicketFromMobileSession(mobileSession);
+			if (minted?.ticket) {
+				return {
+					resolvedTicket: minted.ticket,
+					resolvedUsername: minted.username || resolvedUsername,
+				};
+			}
+		}
+
+		// 2. Fall back to NextAuth browser session cookie
 		const jwtToken =
 			(await getToken({ req: req as any, secret: process.env.NEXTAUTH_SECRET, secureCookie: true }).catch(() => null)) ||
 			(await getToken({ req: req as any, secret: process.env.NEXTAUTH_SECRET, secureCookie: false }).catch(() => null));
@@ -74,7 +90,7 @@ export async function GET(req: NextRequest) {
 
 		if (list) {
 			const candidates = await models.core.Setting.find({ id: /^qr_auth_/ }).lean();
-			const pending: Array<{ token: string; pairCode: string; deviceInfo: string; expiresAt: number }> = [];
+			const pending: Array<{ token: string; pairCode: string; deviceInfo: string; ipAddress?: string | null; location?: string | null; expiresAt: number }> = [];
 			for (const c of candidates) {
 				try {
 					const parsed: QrChallengeRecord = JSON.parse(c.value);
@@ -83,6 +99,8 @@ export async function GET(req: NextRequest) {
 							token: parsed.token,
 							pairCode: parsed.pairCode,
 							deviceInfo: parsed.deviceInfo,
+							ipAddress: parsed.ipAddress || null,
+							location: parsed.location || null,
 							expiresAt: parsed.expiresAt,
 						});
 					}
@@ -124,6 +142,18 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json({ status: 'expired' }, { status: 410 });
 		}
 
+		// Cleanly return & clear denied challenge on poll
+		if (record.status === 'denied') {
+			if (poll || consume) {
+				await models.core.Setting.deleteOne({ id: settingDoc.id });
+			}
+			return NextResponse.json({
+				status: 'denied',
+				mode: record.mode || 'request',
+				deviceInfo: record.deviceInfo,
+			});
+		}
+
 		// Consume a share code or an approved request code
 		if ((consume || (poll && record.mode !== 'share')) && record.status === 'approved' && record.handoffTicket) {
 			await models.core.Setting.deleteOne({ id: settingDoc.id });
@@ -140,6 +170,8 @@ export async function GET(req: NextRequest) {
 			token: record.token,
 			pairCode: record.pairCode,
 			deviceInfo: record.deviceInfo,
+			ipAddress: record.ipAddress || null,
+			location: record.location || null,
 			expiresAt: record.expiresAt,
 		});
 	} catch (error: unknown) {
@@ -173,10 +205,9 @@ export async function POST(req: NextRequest) {
 		if (action === 'create') {
 			const token = crypto.randomBytes(16).toString('hex');
 			const pairCode = generatePairCode();
-			const ua = req.headers.get('user-agent') || '';
-			const isElectron = ua.toLowerCase().includes('electron') || Boolean(body.isDesktop);
-			const osLabel = ua.includes('Windows') ? 'Windows' : ua.includes('Mac') ? 'macOS' : ua.includes('Linux') ? 'Linux' : 'Device';
-			const deviceInfo = body.deviceInfo || (isElectron ? `Xernerx Desktop (${osLabel})` : `Web Browser (${osLabel})`);
+			const deviceInfo = parseRequestDeviceInfo(req, body);
+			const ipAddress = extractRequestIp(req);
+			const location = extractRequestLocation(req);
 			const isShareMode = body.mode === 'share';
 
 			let handoffTicket: string | undefined;
@@ -195,6 +226,8 @@ export async function POST(req: NextRequest) {
 				token,
 				pairCode,
 				deviceInfo,
+				ipAddress,
+				location,
 				mode: isShareMode ? 'share' : 'request',
 				status: isShareMode ? 'approved' : 'pending',
 				handoffTicket,
@@ -208,9 +241,46 @@ export async function POST(req: NextRequest) {
 				token,
 				pairCode,
 				deviceInfo,
+				ipAddress,
+				location,
 				mode: record.mode,
 				expiresAt: record.expiresAt,
 			});
+		}
+
+		if (action === 'deny') {
+			const { token, code } = body;
+			let targetDoc: any = null;
+			if (token) {
+				targetDoc = await models.core.Setting.findOne({ id: `qr_auth_${token}` }).lean();
+			} else if (code) {
+				const cleanCode = String(code)
+					.trim()
+					.toUpperCase()
+					.replace(/[^A-Z0-9]/g, '');
+				for (const doc of allQrDocs) {
+					try {
+						const parsed: QrChallengeRecord = JSON.parse(doc.value);
+						if (parsed.pairCode === cleanCode && Date.now() < parsed.expiresAt) {
+							targetDoc = doc;
+							break;
+						}
+					} catch {}
+				}
+			}
+
+			if (!targetDoc) {
+				return NextResponse.json({ error: 'QR challenge expired or not found' }, { status: 404 });
+			}
+
+			const record: QrChallengeRecord = JSON.parse(targetDoc.value);
+			const updated: QrChallengeRecord = {
+				...record,
+				status: 'denied',
+				handoffTicket: undefined,
+			};
+			await models.core.Setting.updateOne({ id: targetDoc.id }, { $set: { value: JSON.stringify(updated) } });
+			return NextResponse.json({ success: true, status: 'denied', deviceInfo: record.deviceInfo });
 		}
 
 		if (action === 'approve') {

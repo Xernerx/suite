@@ -394,10 +394,7 @@ async function waitForServer(targetUrl?: string) {
 	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 		let retryLabel = 'Retrying';
 		try {
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 4000);
-			const res = await fetch(`${checkOrigin}/api/version`, { signal: controller.signal });
-			clearTimeout(timeout);
+			const res = await fetch(`${checkOrigin}/api/version`, { signal: AbortSignal.timeout(4000) });
 			if (res.ok || (res.status >= 400 && res.status < 500)) {
 				sendStatus('Ready');
 				return;

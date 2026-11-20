@@ -68,8 +68,8 @@ async function attachBotReviewSummary(bot: any, botId: string, ReviewModel: any,
 		breakdown[star] = (breakdown[star] || 0) + 1;
 	}
 
-	const topReviewsRaw = [...allReviews]
-		.sort((a: any, b: any) => {
+	const topReviewsRaw = allReviews
+		.toSorted((a: any, b: any) => {
 			const scoreA = (a.upvotes?.length || 0) - (a.downvotes?.length || 0);
 			const scoreB = (b.upvotes?.length || 0) - (b.downvotes?.length || 0);
 			if (scoreB !== scoreA) return scoreB - scoreA;

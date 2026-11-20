@@ -28,6 +28,7 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 		{ action: 'forms', db: 'guilds', filter: '{ id, guild } or { guild, state }', desc: t('docs.websocket.services.yourapps.formsDesc') },
 		{ action: 'submissions', db: 'guilds', filter: '{ id, guild } or { guild, status, userId }', desc: t('docs.websocket.services.yourapps.submissionsDesc') },
 		{ action: 'drafts', db: 'guilds', filter: '{ guild, userId, positionId }', desc: t('docs.websocket.services.yourapps.draftsDesc') },
+		{ action: 'schedules', db: 'guilds', filter: '{ guild }', desc: t('docs.websocket.services.yourapps.schedulesDesc') },
 		{ action: 'stats', db: 'guilds', filter: '{ guild }', desc: t('docs.websocket.services.yourapps.statsDesc') },
 	];
 
@@ -41,6 +42,7 @@ export function WebsocketServicesSection({ searchQuery = '', serviceFilter = 'AL
 		{ action: 'guilds', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.guildsDesc') },
 		{ action: 'bots', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.botsDesc') },
 		{ action: 'settings', db: 'xernerx', filter: '{ id }', desc: t('docs.websocket.services.xernerx.settingsDesc') },
+		{ action: 'errors', db: 'xernerx', filter: '{ id } or { service, level, resolved }', desc: t('docs.websocket.services.xernerx.errorsDesc') },
 	];
 
 	const filteredVirtue = virtueActions.filter((a) => !q || 'virtue'.includes(q) || a.action.toLowerCase().includes(q) || a.db.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q));

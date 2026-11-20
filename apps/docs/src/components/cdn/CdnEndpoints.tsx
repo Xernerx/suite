@@ -34,6 +34,7 @@ export function CdnEndpoints({ searchQuery = '', methodFilter = 'ALL', activeGro
 					routes={[
 						{ method: 'POST', path: '/upload', auth: 'token', summary: t('docs.cdn.upload.summaryNew') },
 						{ method: 'POST', path: '/upload/[id]', auth: 'token', summary: t('docs.cdn.upload.summaryScoped') },
+						{ method: 'POST', path: '/yourapps/upload', auth: 'token', summary: t('docs.cdn.upload.summaryYourApps') },
 					]}
 					extra={
 						<div className="p-6 border-t border-(--border)/10 space-y-6">

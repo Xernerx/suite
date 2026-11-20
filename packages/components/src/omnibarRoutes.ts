@@ -22,7 +22,10 @@ export const SUBDOMAIN_ROUTES: Record<string, { path: string; label: string }[]>
 		{ path: '/?view=audit-logs', label: 'Staff Audit Logs' },
 		{ path: '/?view=settings', label: 'System Configuration' },
 	],
-	hosting: [{ path: '/', label: 'Infrastructure & Node Console' }],
+	hosting: [
+		{ path: '/', label: 'Infrastructure & Node Console' },
+		{ path: '/errors', label: 'Service & Bot Error Logs' },
+	],
 	portal: [
 		{ path: '/', label: 'Developer Portal Studio' },
 		{ path: '/?org=personal', label: 'Personal Developer Workspace' },

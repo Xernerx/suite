@@ -2,6 +2,23 @@
 
 # @xernerx/lib
 
+## 1.29.0
+
+### Minor Changes
+
+- ## Mobile Auth, Error Log & YourApps Models + Dictionary Updates
+  
+  Added new Mongoose models for mobile authentication and error tracking, expanded YourApps models, and updated localization dictionaries.
+  
+  ### Added
+  
+  - **New Core & User Models**: Added `ErrorLog`, `AuthApprovalRequest`, and `MobileSession` models and registered them in the central model registry.
+  
+  ### Changed
+  
+  - **Expanded YourApps Models**: Extended YourApps `Form`, `Profile`, and `Submission` schemas to support polls, anonymous responses, scheduled windows, follow-up clarifications, and consensus reviews.
+  - **Database Error Chaining & Dictionaries**: Attached `{ cause: connErr }` when re-throwing MongoDB connection errors, updated `en-GB.json` with YourApps, mobile, hosting, and timeline strings, and pruned empty parent objects from `ru.json`.
+
 ## 1.28.0
 
 ### Minor Changes

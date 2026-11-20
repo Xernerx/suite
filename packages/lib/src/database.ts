@@ -14,7 +14,7 @@ const globalWithMongoose = global as typeof global & {
 	__root_connections_v5?: Record<string, Connection>;
 	__db_connections_v5?: Record<string, Record<string, Connection>>;
 	__inflight_connections_v5?: Record<string, Promise<Connection> | undefined>;
-	__models_v41?: Record<string, Record<string, Record<string, Model<any>>>>;
+	__models_v43?: Record<string, Record<string, Record<string, Model<any>>>>;
 	[key: string]: any;
 };
 
@@ -31,7 +31,7 @@ if (globalWithMongoose.__connections_v2) {
 	delete globalWithMongoose.__models_v4;
 }
 
-for (let v = 5; v <= 40; v++) {
+for (let v = 5; v <= 42; v++) {
 	const key = `__models_v${v}`;
 	if (globalWithMongoose[key]) {
 		delete globalWithMongoose[key];
@@ -41,13 +41,13 @@ for (let v = 5; v <= 40; v++) {
 const rootConnections = globalWithMongoose.__root_connections_v5 || {};
 const activeConnections = globalWithMongoose.__db_connections_v5 || {};
 const inFlightConnections = globalWithMongoose.__inflight_connections_v5 || {};
-const cachedModels = globalWithMongoose.__models_v41 || {};
+const cachedModels = globalWithMongoose.__models_v43 || {};
 
 if (process.env.NODE_ENV !== 'production') {
 	globalWithMongoose.__root_connections_v5 = rootConnections;
 	globalWithMongoose.__db_connections_v5 = activeConnections;
 	globalWithMongoose.__inflight_connections_v5 = inFlightConnections;
-	globalWithMongoose.__models_v41 = cachedModels;
+	globalWithMongoose.__models_v43 = cachedModels;
 }
 
 function isConnectionHealthy(conn?: Connection | null): boolean {
@@ -163,7 +163,7 @@ export async function database(projectId: 'xernerx' | 'virtue' | 'haste' | 'your
 					await created.asPromise();
 				} catch (connErr: any) {
 					created.close().catch(() => {});
-					throw new Error(`MongoDB connection failed for ${projectId}: ${connErr?.message || connErr}`);
+					throw new Error(`MongoDB connection failed for ${projectId}: ${connErr?.message || connErr}`, { cause: connErr });
 				}
 				rootConnections[projectId] = created;
 				return created;

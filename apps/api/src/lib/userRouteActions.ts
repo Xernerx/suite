@@ -21,10 +21,11 @@ export const BOT_INVITE_BONUS_AMOUNT = 100;
 export function parseUserAgentDevice(ua?: string | null): TrackedUserDevice | null {
 	if (!ua || typeof ua !== 'string') return null;
 	if (/^node|^undici|Next\.js|vercel|curl|postman/i.test(ua.trim())) return null;
-	if (!/Mozilla\/|Electron\/|Dalvik\//i.test(ua)) return null;
+	if (!/Mozilla\/|Electron\/|Dalvik\/|XernerxMobile/i.test(ua)) return null;
 
 	let browser = 'Browser';
-	if (ua.includes('XernerxDesktop') || ua.includes('Electron/')) browser = 'Xernerx Desktop';
+	if (ua.includes('XernerxMobile')) browser = 'Xernerx Mobile';
+	else if (ua.includes('XernerxDesktop') || ua.includes('Electron/')) browser = 'Xernerx Desktop';
 	else if (ua.includes('Edg/')) browser = 'Microsoft Edge';
 	else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
 	else if (ua.includes('Chrome/')) browser = 'Google Chrome';
@@ -38,7 +39,7 @@ export function parseUserAgentDevice(ua?: string | null): TrackedUserDevice | nu
 	else if (ua.includes('iPhone') || ua.includes('iPad') || ua.includes('iOS')) os = 'iOS';
 	else if (ua.includes('Linux')) os = 'Linux';
 
-	const isMobile = /Android|iPhone|iPad|Mobile/i.test(ua);
+	const isMobile = /Android|iPhone|iPad|iOS|Mobile|XernerxMobile/i.test(ua);
 	const id = `${os}-${browser}`.toLowerCase().replace(/[^a-z0-9-]/g, '');
 
 	return {
@@ -131,6 +132,9 @@ export async function handleUserPatchAction(params: {
 			},
 			{ returnDocument: 'after', upsert: true }
 		).lean();
+		if (models.users?.MobileSession) {
+			await models.users.MobileSession.updateMany({ userId: resolvedId, revokedAt: null }, { $set: { revokedAt: now } }).catch(() => {});
+		}
 		await recordAuditLog(req, {
 			action: 'user.sessions.revoke',
 			targetType: 'user',

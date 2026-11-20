@@ -307,7 +307,7 @@ export function Selector({ value, options, onChange, placeholder, items, require
 														option.backgroundImage
 															? isSelected
 																? 'border border-(--accent)/70 shadow-xs'
-																: 'border border-white/10 hover:border-(--accent)/45'
+																: 'border border-(--border)/15 hover:border-(--accent)/45'
 															: isSelected
 																? 'bg-(--active-accent)/20 text-(--accent)'
 																: 'text-(--text) hover:bg-(--border)/5'

@@ -1,20 +1,46 @@
-name: Validate PR Source
+name: Validate PR Source & Branch Access
 
 on:
     pull_request:
         branches:
             - main
+            - canary
 
 jobs:
     validate-main-target:
         name: validate-main-target
         runs-on: ubuntu-latest
         steps:
-            - name: Verify source is canary
+            - name: Verify PR target and author permissions
+              env:
+                  BASE_REF: ${{ github.base_ref }}
+                  HEAD_REF: ${{ github.head_ref }}
+                  HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+                  BASE_REPO: ${{ github.repository }}
+                  AUTHOR_ASSOC: ${{ github.event.pull_request.author_association }}
               run: |
-                  echo "Source branch: ${{ github.head_ref }}"
-                  if [ "${{ github.head_ref }}" != "canary" ]; then
-                    echo "❌ Error: Direct pull requests to main are only permitted from the 'canary' branch."
+                  echo "Target branch: ${BASE_REF}"
+                  echo "Source branch: ${HEAD_REF} (${HEAD_REPO})"
+                  echo "Author association: ${AUTHOR_ASSOC}"
+
+                  if [ "${BASE_REF}" = "main" ]; then
+                    if [ "${HEAD_REF}" != "canary" ] || [ "${HEAD_REPO}" != "${BASE_REPO}" ]; then
+                      echo "❌ Error: Pull requests to 'main' are strictly restricted to the internal 'canary' branch."
+                      exit 1
+                    fi
+                    echo "✅ Valid canary -> main promotion PR."
+                    exit 0
+                  fi
+
+                  if [ "${BASE_REF}" = "canary" ]; then
+                    if [ "${HEAD_REPO}" = "${BASE_REPO}" ] && ( [ "${HEAD_REF}" = "community" ] || [ "${HEAD_REF}" = "dictionary" ] ); then
+                      echo "✅ Valid internal ${HEAD_REF} -> canary sync PR."
+                      exit 0
+                    fi
+                    if [ "${AUTHOR_ASSOC}" = "OWNER" ] || [ "${AUTHOR_ASSOC}" = "MEMBER" ] || [ "${AUTHOR_ASSOC}" = "COLLABORATOR" ]; then
+                      echo "✅ Authorized Xernerx Studios member targeting canary."
+                      exit 0
+                    fi
+                    echo "❌ Error: The 'canary' branch is locked to Xernerx Studios members. External contributors: please target the 'community' branch instead!"
                     exit 1
                   fi
-                  echo "✅ Source branch is valid."

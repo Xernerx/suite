@@ -175,14 +175,11 @@ export default function Overview() {
 		setPingingKeys((prev) => ({ ...prev, [key]: true }));
 		const start = Date.now();
 		try {
-			const controller = new AbortController();
-			const timeout = setTimeout(() => controller.abort(), 5000);
 			const res = await fetch(versionEndpointUrl, {
 				mode: 'cors',
 				cache: 'no-store',
-				signal: controller.signal,
+				signal: AbortSignal.timeout(5000),
 			});
-			clearTimeout(timeout);
 			const elapsed = Date.now() - start;
 			setPings((prev) => ({ ...prev, [key]: elapsed }));
 			if (res.ok) {
@@ -194,14 +191,11 @@ export default function Overview() {
 		} catch {
 			const fallbackStart = Date.now();
 			try {
-				const fallbackController = new AbortController();
-				const fallbackTimeout = setTimeout(() => fallbackController.abort(), 5000);
 				await fetch(versionEndpointUrl, {
 					mode: 'no-cors',
 					cache: 'no-store',
-					signal: fallbackController.signal,
+					signal: AbortSignal.timeout(5000),
 				});
-				clearTimeout(fallbackTimeout);
 				const elapsed = Date.now() - fallbackStart;
 				setPings((prev) => ({ ...prev, [key]: elapsed }));
 			} catch {

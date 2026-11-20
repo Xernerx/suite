@@ -2,6 +2,33 @@
 
 # auth
 
+## 2.18.0
+
+### Minor Changes
+
+- ## Mobile Sign-In Handoff & Account Reliability
+  
+  Added the mobile companion OAuth handoff flow and enhanced QR sign-in approval alongside modern runtime improvements.
+  
+  ### Added
+  
+  - **Mobile OAuth Handoff**: Added a dedicated `/login/mobile` sign-in handoff flow for authenticating the Xernerx Mobile companion app cleanly with your Xernerx Account.
+  - **Enhanced QR & Approval Sign-In**: Upgraded the QR sign-in panel to support live number-matching sign-in approvals from your paired mobile device.
+  
+  ### Changed
+  
+  - **Non-Mutating Sorting**: Modernized credit ledger, token list, and token owner sorting to use native non-mutating array methods.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 2.17.0
 
 ### Minor Changes

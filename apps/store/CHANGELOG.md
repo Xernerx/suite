@@ -4,6 +4,26 @@
 
 All notable changes to the `store` application will be documented in this file.
 
+## 0.13.3
+
+### Patch Changes
+
+- ## Store Promo Input & Ledger Polish
+  
+  Improved promo code input reliability for international keyboards and modernized credit ledger sorting.
+  
+  ### Changed
+  
+  - **IME-Safe Promo Entry**: Guarded the promo code `Enter` shortcut against active IME composition.
+  - **Credit Ledger Sorting**: Updated recent transaction sorting to use non-mutating `.toSorted()`.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 0.13.2
 
 ### Patch Changes

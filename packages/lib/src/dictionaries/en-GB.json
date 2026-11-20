@@ -3249,7 +3249,29 @@
 			"enterDeviceCodePlaceholder": "6-char code (Account → Devices)",
 			"signInWithCodeButton": "Sign In with Code",
 			"authErrorTitle": "Sign-in could not be completed",
-			"authErrorDesc": "Your sign-in session expired or was cancelled ({error}). Please click Continue with Discord below to try again."
+			"authErrorDesc": "Your sign-in session expired or was cancelled ({error}). Please click Continue with Discord below to try again.",
+			"qrTabLabel": "Scan QR",
+			"qrDenied": "Sign-in request was denied.",
+			"mobileApprovalTabLabel": "Approve on Mobile",
+			"mobileApprovalTitle": "Approve on Xernerx Mobile",
+			"mobileApprovalDescription": "Enter your username, Discord ID, or email to send a number-matched sign-in approval request straight to your phone.",
+			"mobileApprovalIdentifierPlaceholder": "Username, Discord ID, or email",
+			"mobileApprovalSendButton": "Send Approval Request",
+			"mobileApprovalNumberLabel": "Match this number on your phone",
+			"mobileApprovalWaiting": "Open the notification on Xernerx Mobile and tap {number} to sign in.",
+			"mobileApprovalDenied": "Sign-in request was denied on your mobile device.",
+			"mobileApprovalExpired": "Approval request expired. Send a new request to try again.",
+			"mobileApprovalCancel": "Use another account",
+			"mobileApprovalRetry": "Send New Request",
+			"mobileHandoffTitle": "Connecting Xernerx Mobile",
+			"mobileHandoffSigningIn": "Redirecting to Discord to verify your account...",
+			"mobileHandoffCompleting": "Finalizing secure handoff to Xernerx Mobile...",
+			"mobileHandoffReadyTitle": "Ready to Return to Xernerx Mobile",
+			"mobileHandoffReadyDesc": "Signed in as @{username}. Tap below if the app did not open automatically.",
+			"mobileHandoffOpenAppButton": "Open Xernerx Mobile",
+			"mobileHandoffCloseHint": "Or tap the X button above to close this window — Xernerx Mobile will finish signing in automatically.",
+			"mobileHandoffErrorTitle": "Could not hand off sign-in",
+			"mobileHandoffInvalidRedirect": "Missing or invalid mobile app return link."
 		},
 		"signout": {
 			"title": "Sign Out",
@@ -4469,7 +4491,7 @@
 					},
 					"botUsers": {
 						"title": "For Bot, Virtue Leveling, YourApps & Community End Users:",
-						"desc": "When you interact with a bot powered by Xernerx (Virtue, YourApps, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. For YourApps (our standalone forms and applications bot operating solely with Guilds and GuildMessages intents and zero MessageContent intent), we store server-configured position forms, your resumable application drafts, and the explicit form responses and reviewer decisions you submit via Discord Modals V2 or the web portal (/servers/[id]/applications/[appId]) so designated server reviewers can evaluate your application. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent passive Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" and \"Delete YourApps Data\" buttons in Account Settings (and server administrators can permanently wipe per-server Virtue or YourApps setup configurations via \"Delete Virtue Setup\" and \"Delete YourApps Setup\" in the Server Dashboard)."
+						"desc": "When you interact with a bot powered by Xernerx (Virtue, YourApps, Zodiac, Metamorphosis, To-Do List Bot, Xernerx App, or Xernerx Bot) or open a support ticket in an official Discord support channel, we process your Discord ID, guild IDs, command inputs, and support thread metadata (reported server, channel, command, and troubleshooting checklist responses). For Virtue (our standalone global and server leveling bot operating with least-privilege Guilds, GuildMessages, and GuildVoiceStates gateway intents and zero MessageContent intent), we track four progression tiers: Global Ecosystem Level & XP, Unified Server Level & XP, Server Text Level, XP & total message count (we only increment a numeric message counter and never receive or store raw message content), and Server Voice Level, XP & cumulative active seconds in non-AFK voice channels while undeafened with at least two eligible members (including streaming XP multipliers, without ever joining voice channels or recording audio). Virtue also evaluates stackable XP boost multipliers (/boost: published bot review, 12-hour vote window, Virtue Pass / Xernerx Ultra subscription, and Server Booster / role multipliers), caches non-sensitive server role and channel metadata (IDs, names, colors, and positions) to power static level-up role rewards (/roles), channel filters, and Dynamic Hoist Roles (automatically managing milestone hoist roles and color gradients within Discord's role cap), and reads your Xernerx Account theme, accent color, and locale preferences to render personalized /level and /leaderboard cards. For YourApps (our standalone forms and applications bot operating solely with Guilds and GuildMessages intents and zero MessageContent intent), we store server-configured position forms, your resumable application drafts, limited-privacy form attachments uploaded via cdn.xernerx.com/yourapps/upload, and the explicit form responses, follow-up clarifications, and reviewer decisions (including optional anonymous poll/feedback responses where your identity is hidden from staff cards) submitted via Discord Modals V2 or the web portal (/servers/[id]/applications/[appId]) so designated server reviewers can evaluate your application. You can toggle off \"Automatic Service Profiles\" in Account Settings at any time to prevent passive Discord activity from automatically creating or updating your Xernerx User and Virtue guild progression profiles, and you can permanently wipe all of your Virtue XP and leveling data across every server via the self-service \"Delete Virtue Data\" and \"Delete YourApps Data\" buttons in Account Settings (and server administrators can permanently wipe per-server Virtue or YourApps setup configurations via \"Delete Virtue Setup\" and \"Delete YourApps Setup\" in the Server Dashboard)."
 					},
 					"cdnAndContent": {
 						"title": "CDN Media, Haste Pastes, Showcases & 3-Tier Privacy:",
@@ -4880,8 +4902,8 @@
 						"badge": "Zero Bot DB & Scoped Reviews",
 						"points": [
 							"Zero MessageContent & Zero Direct Database Drivers: YourApps connects solely with Guilds and GuildMessages intents (without the privileged MessageContent intent) and holds zero direct database credentials—persisting forms, resumable drafts, and submissions strictly over our authenticated WebSocket RPC gateway (service: \"yourapps\").",
-							"Scoped Reviewer Access & Applicant Privacy: Submitted responses and reviewer notes are strictly isolated per Discord server and accessible only to server administrators, configured reviewRoles/adminRoles, and the submitting applicant.",
-							"Hierarchy-Safe Automated Role Rewards: Approval rewardRoles and removeRoles execute with explicit role-hierarchy bounds checks and applicant eligibility verification (requiredRoles, restrictedRoles, blacklistRoles, minimumJoinTime, and re-apply cooldowns).",
+							"Scoped Reviewer Access, Anonymous Mode & Limited Attachments: Submitted responses, staff consensus votes, internal notes, clarifications, and private interview rooms are isolated per Discord server for configured reviewRoles/adminRoles, optional anonymous forms mask applicant identities from staff views, and web form file uploads are stored as unlisted limited-privacy blobs via cdn.xernerx.com/yourapps/upload.",
+							"Hierarchy-Safe Lifecycle Role Automation: Pending, approval (rewardRoles/removeRoles), and denial (denyAddRoles/denyRemoveRoles) role triggers execute with explicit role-hierarchy bounds checks alongside applicant eligibility verification (requiredRoles, restrictedRoles, blacklistRoles, minimumAccountAge, minimumJoinTime, submission/approval caps, and re-apply cooldowns).",
 							"Self-Service Applicant & Server Setup Wipe: Individual users can permanently delete all of their submitted YourApps form applications, answers, and saved resumable drafts across all servers via \"Delete YourApps Data\" in Account Settings, while server owners can wipe per-server forms, panels, and submissions via \"Delete YourApps Setup\" in the Server Dashboard."
 						]
 					}
@@ -5235,41 +5257,51 @@
 					"description": "We launched Version 1 as the /stats section on the original Portal Development website. It displayed live 24-hour and lifetime server, user, and shard graphs directly from our database."
 				},
 				"13": {
+					"date": "November 2023",
+					"title": "YourApps Placed on Hiatus",
+					"description": "Facing a shifting Discord ecosystem and a legacy codebase that lacked modern slash commands, we temporarily suspended YourApps hosting and support—promising to bring it back once we could rebuild it properly."
+				},
+				"14": {
 					"date": "October 2024",
 					"title": "Xernerx Framework TypeScript Rewrite",
 					"description": "The Xernerx Framework was rebuilt from scratch in TypeScript for Discord.js v14. The rewrite introduced strict typing, automated command registration, and built-in dashboard hooks."
 				},
-				"14": {
+				"15": {
 					"date": "March 2025",
 					"title": "Xernerx Studios Founded",
 					"description": "We founded Xernerx Studios (xernerx.com), starting out as a dedicated RESTful statistics API for Discord bots. This marked the beginning of unifying our developer tools and bot services under the Xernerx brand."
 				},
-				"15": {
+				"16": {
 					"date": "June 2025",
 					"title": "Version 2: New Web UI & Xernerx Stats",
 					"description": "We rewrote the project for Version 2 on app.xernerx.com with a dedicated web interface, Discord sign-in, and scoped API tokens. Alongside it, we published @xernerx/stats so developers could push bot telemetry automatically."
 				},
-				"16": {
+				"17": {
 					"date": "August 2025",
 					"title": "Version 3: Profiles & Organizations",
 					"description": "Another full rewrite brought Version 3 to life, introducing customizable User and Bot Profiles, 30-day telemetry charts, and milestone badges. It also added outbound webhooks, embeddable widgets, and Developer Organizations."
 				},
-				"17": {
+				"18": {
 					"date": "April 2026",
 					"title": "Version 4: Public Discord Bot List",
 					"description": "We rewrote the platform from the ground up for Version 4, launching our public Discord Bot List (/bots) alongside xernerx.com. Developers could now publicly list, showcase, and promote their bots to communities alongside live statistics."
 				},
-				"18": {
+				"19": {
 					"date": "May 2026",
 					"title": "Virtue Development Begins",
 					"description": "Development began on Virtue, our dedicated Discord leveling bot for text and voice XP progression. Virtue was designed from day one to be configured directly through our web dashboard."
 				},
-				"19": {
+				"20": {
 					"date": "August 2026",
 					"title": "Version 5: The Xernerx Suite",
 					"description": "We rebuilt the entire platform into Version 5 as the unified Xernerx Suite monorepo powered by shared @xernerx/* packages. Version 5 united 1 Account (account.xernerx.com), our service setup dashboard, bot stats, public bot list, and desktop app."
 				},
-				"20": {
+				"21": {
+					"date": "November 2026",
+					"title": "YourApps Reborn on Xernerx Suite",
+					"description": "True to our promise, YourApps returned as a ground-up TypeScript rebuild integrated directly into the Xernerx Suite. The relaunch brought Discord-native Modals V2 across 13 question types, resumable drafts, dual Discord and web application portals, consensus reviews, and automated role workflows."
+				},
+				"22": {
 					"date": "DYNAMIC_DATE",
 					"title": "Today",
 					"description": "You're all caught up! Today Xernerx Studios unites our Discord bots—Virtue, YourApps, To-Do List Bot, Metamorphosis, and Zodiac—our open-source frameworks, and the Xernerx Suite under 1 Account, 1 Place, 1 Setup."
@@ -5703,7 +5735,7 @@
 			},
 			"card11": {
 				"title": "How do Server Applications and YourApps work?",
-				"description": "Invite YourApps and open the Applications tab (app.xernerx.com/dashboard?tab=applications) to create custom staff, appeal, event, or feedback forms using 13 question types, publish interactive Apply panels to Discord channels, and configure automatic approval/denial role rewards. Members can apply either natively inside Discord Modals V2 (/apply, /positions) or on the web at app.xernerx.com/servers/[id]/applications/[appId], while staff review submissions in Discord (/review, /submissions) or directly in the Dashboard."
+				"description": "Invite YourApps and open the Applications tab (app.xernerx.com/dashboard?tab=applications) to create custom staff, appeal, event, poll, or feedback forms using 13 question types, conditional skip logic, scheduled open/close windows, and auto-synced Components V2 Apply panels. Members can apply natively inside Discord Modals V2 (/positions) or on the web at app.xernerx.com/servers/[id]/applications/[appId], while staff review submissions in Discord (/review, /submissions) or the Dashboard with consensus voting, internal notes, follow-up clarifications, private interview rooms, and lifecycle role triggers."
 			}
 		},
 		"virtue": {
@@ -6825,6 +6857,8 @@
 				"stats": {
 					"openPositions": "Open Positions",
 					"pending": "Pending Review",
+					"interview": "In Interview",
+					"needsInfo": "Needs Clarification",
 					"approved": "Approved",
 					"denied": "Denied"
 				},
@@ -6835,8 +6869,8 @@
 					"logChannelDesc": "New submissions are posted here with instant Approve / Deny buttons.",
 					"archiveChannel": "Archive Channel",
 					"archiveChannelDesc": "Reviewed applications are archived here with the final decision.",
-					"panelChannel": "Default Panel Channel",
-					"panelChannelDesc": "Default channel pre-selected when publishing Apply panels."
+					"panelChannel": "Apply Panel Channel",
+					"panelChannelDesc": "Automatically publishes and syncs an interactive Apply Panel in this channel."
 				},
 				"roles": {
 					"title": "Role Permissions & Pings",
@@ -6853,30 +6887,80 @@
 				"behavior": {
 					"title": "Workflow Preferences",
 					"dmNotifications": "DM Applicant Updates",
-					"dmNotificationsDesc": "Notify applicants via Direct Message when their submission is approved or denied.",
+					"dmNotificationsDesc": "Notify applicants via Direct Message when their submission is approved, denied, or needs clarification.",
 					"threadPerSubmission": "Discussion Thread per Submission",
-					"threadPerSubmissionDesc": "Automatically open a discussion thread under new submission cards in the log channel."
+					"threadPerSubmissionDesc": "Automatically open a discussion thread under new submission cards in the log channel.",
+					"selfReviewAllowed": "Allow Staff Self-Review",
+					"selfReviewAllowedDesc": "When off, reviewers cannot vote on, approve, or deny their own applications.",
+					"pollOnSubmission": "Attach Native Discord Poll to Submissions",
+					"pollOnSubmissionDesc": "Automatically post a native Discord Approve / Interview / Deny poll with each new submission.",
+					"pollDurationHours": "Default Submission Poll Duration (Hours)",
+					"interviewMode": "Interview Room Mode",
+					"interviewModeThread": "Private Thread (in Log Channel)",
+					"interviewModeChannel": "Private Text Channel",
+					"interviewCategory": "Interview Channel Category",
+					"interviewCategoryDesc": "Used when Interview Room Mode is set to Private Text Channel."
 				},
 				"positions": {
 					"title": "Application Positions & Forms",
-					"subtitle": "Create recruitment positions or community forms with up to 25 Discord-native questions.",
+					"subtitle": "Create recruitment positions, appeals, polls, or community forms with up to 25 Discord-native questions.",
 					"createBtn": "New Position",
+					"duplicateBtn": "Duplicate",
+					"copySuffix": "(Copy)",
 					"publishPanelBtn": "Publish Discord Panel",
+					"publishPollBtn": "Post Discord Poll",
+					"syncPanelsBtn": "Sync Panels",
 					"emptyTitle": "No positions configured yet",
-					"emptyDesc": "Create your first position here to start accepting applications in Discord.",
+					"emptyDesc": "Create your first position or pick a starter template to start accepting responses in Discord and on the web.",
 					"editBtn": "Edit",
 					"deleteBtn": "Delete",
 					"openBadge": "Open",
 					"closedBadge": "Closed",
+					"anonymousBadge": "Anonymous",
+					"capSubmissionsBadge": "{current}/{max} Submissions",
+					"capApprovalsBadge": "{current}/{max} Spots",
+					"opensBadge": "Opens {date}",
+					"closesBadge": "Closes {date}",
 					"questionsCount": "{count} Questions",
 					"rewardRolesCount": "{count} Reward Roles",
 					"deleteTitle": "Delete Position",
 					"deleteDesc": "Are you sure you want to delete \"{name}\"? Existing archived submissions will remain, but active drafts will be cleared.",
+					"panelsTitle": "Live Discord Apply Panels",
+					"panelsSubtitle": "Panels automatically update in Discord whenever you open, close, edit, or delete positions.",
+					"panelsEmpty": "No live panels deployed yet. Publish an Apply Panel above to pin an interactive embed in your server.",
+					"panelAutoSyncBadge": "Auto-Sync",
+					"panelAllOpenLabel": "All Open Positions",
+					"panelEditTitle": "Edit Live Discord Panel",
+					"panelSaveBtn": "Update Live Panel",
+					"panelDeleteTitle": "Delete Discord Panel",
+					"panelDeleteDesc": "Remove \"{title}\" from Discord and stop syncing this panel?",
+					"pollModal": {
+						"title": "Publish Native Discord Poll",
+						"desc": "Post a native Discord Poll directly into any text or announcement channel.",
+						"questionLabel": "Poll Question",
+						"questionPlaceholder": "What should we host for this weekend's community event?",
+						"optionsLabel": "Poll Choices (2–10)",
+						"optionPlaceholder": "Type a poll option and press Enter...",
+						"addOptionBtn": "Add Option",
+						"durationLabel": "Duration (Hours, 1–168)",
+						"multiselectLabel": "Allow members to select multiple answers",
+						"publishBtn": "Post Poll to Discord"
+					},
+					"templates": {
+						"title": "Quick-Start Templates",
+						"moderator": "Moderator Recruitment",
+						"helper": "Trial Staff / Helper",
+						"appeal": "Ban / Mute Appeal",
+						"event": "Event Host Signup",
+						"bug": "Bug / Issue Report",
+						"poll": "Community Poll"
+					},
 					"categories": {
 						"staff": "Staff Application",
 						"appeal": "Appeal",
 						"feedback": "Feedback",
 						"event": "Event Signup",
+						"poll": "Poll / Survey",
 						"custom": "Custom Form"
 					},
 					"modal": {
@@ -6888,6 +6972,8 @@
 						"stateLabel": "Status",
 						"descriptionLabel": "Description",
 						"descriptionPlaceholder": "Displayed on Apply panels and before applicants start the form...",
+						"anonymousToggle": "Anonymous Responses",
+						"anonymousHint": "Hide respondent usernames and avatars from reviewers (ideal for community polls and feedback).",
 						"questionsTitle": "Form Questions",
 						"addQuestionBtn": "Add Question",
 						"questionPlaceholder": "Enter question prompt...",
@@ -6902,6 +6988,27 @@
 						"booleanYesPlaceholder": "Yes (default)",
 						"booleanNoPlaceholder": "No (default)",
 						"requiredToggle": "Required",
+						"advancedRulesBtn": "Rules & Logic",
+						"conditionLabel": "Conditional Visibility (Skip Logic)",
+						"conditionNone": "Always show this question",
+						"conditionIfQuestion": "Question #{num}: {text}",
+						"conditionOpEquals": "Equals",
+						"conditionOpNotEquals": "Does not equal",
+						"conditionOpContains": "Contains",
+						"conditionValPlaceholder": "Expected answer (e.g. Yes)...",
+						"minLengthLabel": "Min Characters",
+						"maxLengthLabel": "Max Characters",
+						"minValueLabel": "Min Value",
+						"maxValueLabel": "Max Value",
+						"validationLabel": "Answer Format Check",
+						"regexPlaceholder": "Custom RegExp pattern...",
+						"validation": {
+							"none": "No special format",
+							"url": "Valid URL (https://...)",
+							"email": "Email Address",
+							"discord_id": "Discord Snowflake ID",
+							"regex": "Custom Regex"
+						},
 						"types": {
 							"short": "Short Text",
 							"paragraph": "Paragraph",
@@ -6918,12 +7025,34 @@
 							"file": "File Upload"
 						},
 						"rulesTitle": "Role Rewards & Eligibility",
+						"pendingRoles": "Pending Roles (on Submit)",
 						"rewardRoles": "Reward Roles (on Approval)",
 						"removeRoles": "Remove Roles (on Approval)",
+						"denyAddRoles": "Add Roles (on Denial)",
+						"denyRemoveRoles": "Remove Roles (on Denial)",
 						"requiredRoles": "Required Roles (to Apply)",
 						"restrictedRoles": "Restricted Roles (Cannot Apply)",
 						"cooldownLabel": "Re-apply Cooldown (seconds)",
 						"minJoinLabel": "Minimum Server Time (seconds)",
+						"minAccountAgeLabel": "Minimum Discord Account Age (seconds)",
+						"scheduleCapsTitle": "Scheduling, Caps & Staff Consensus",
+						"opensAtLabel": "Scheduled Open Time (Optional)",
+						"closesAtLabel": "Scheduled Close Time (Optional)",
+						"maxSubmissionsLabel": "Auto-Close After Submissions (0 = Unlimited)",
+						"maxApprovalsLabel": "Auto-Close After Approvals (0 = Unlimited)",
+						"minVotesLabel": "Minimum Upvotes Required to Approve",
+						"autoApproveVotesLabel": "Auto-Approve Net Votes (0 = Off)",
+						"autoDenyVotesLabel": "Auto-Deny Net Downvotes (0 = Off)",
+						"overridesTitle": "Per-Position Routing & Reviewer Overrides",
+						"useServerDefault": "Use Server Default",
+						"stateEnabled": "Enabled",
+						"stateDisabled": "Disabled",
+						"logChannelOverride": "Override Log Channel",
+						"archiveChannelOverride": "Override Archive Channel",
+						"reviewRolesOverride": "Override Reviewer Roles",
+						"submissionPingsOverride": "Override Ping Roles",
+						"threadOverride": "Discussion Thread Override",
+						"pollOverride": "Native Discord Poll Override",
 						"acceptMsgLabel": "Custom Approval Note (Optional)",
 						"denyMsgLabel": "Custom Denial Note (Optional)",
 						"saveBtn": "Save Position",
@@ -6937,6 +7066,7 @@
 						"panelDescLabel": "Embed Description",
 						"buttonLabel": "Button / Selector Label",
 						"positionsLabel": "Included Positions (leave empty for all Open positions)",
+						"autoSyncLabel": "Automatically update this panel when positions open, close, or change",
 						"publishBtn": "Send Panel to Discord",
 						"defaultTitle": "Server Applications",
 						"defaultDesc": "Select a position below to fill out and submit your application directly inside Discord.",
@@ -6945,7 +7075,7 @@
 					"wizard": {
 						"stepInfo": "Form Info",
 						"stepQuestions": "Form Questions",
-						"stepEligibility": "Eligibility",
+						"stepEligibility": "Rules & Schedule",
 						"stepReview": "Review",
 						"backBtn": "Back",
 						"nextBtn": "Continue",
@@ -6955,7 +7085,7 @@
 						"optionsRequired": "Please add at least one option for Dropdown and Checkbox Group questions.",
 						"radioOptionsRequired": "Radio Group questions require at least 2 options.",
 						"selectMinChoicesRequired": "Question #{num} (Choice Menu) needs at least 2 choices before continuing.",
-						"reviewSubtitle": "Verify your form details, questions, and eligibility rules before saving.",
+						"reviewSubtitle": "Verify your form details, questions, schedules, and role triggers before saving.",
 						"noDescription": "No description provided",
 						"noneConfigured": "None",
 						"secondsUnit": "{count}s"
@@ -6967,18 +7097,45 @@
 					"allStatuses": "All Statuses",
 					"allPositions": "All Positions",
 					"statusPending": "Pending",
+					"statusInterview": "In Interview",
+					"statusNeedsInfo": "Needs Clarification",
 					"statusApproved": "Approved",
 					"statusDenied": "Denied",
 					"statusWithdrawn": "Withdrawn",
+					"exportCsvBtn": "Export CSV",
+					"exportJsonBtn": "Export JSON",
+					"pollResultsTitle": "Aggregated Choice Breakdown",
+					"pollResultsResponses": "{count} responses",
 					"emptyTitle": "No matching submissions",
-					"emptyDesc": "Submissions filled out in Discord will appear here in real time.",
+					"emptyDesc": "Submissions filled out in Discord or on the web will appear here in real time.",
 					"inspectBtn": "Review",
 					"submittedAt": "Submitted {date}",
 					"reviewedBy": "Reviewed by {reviewer}",
+					"anonymousApplicant": "Anonymous Respondent",
 					"modal": {
 						"title": "Submission • {position}",
 						"applicant": "Applicant",
 						"status": "Status",
+						"dossierTitle": "Applicant Context",
+						"dossierAccount": "Account created {date}",
+						"dossierJoined": "Joined server {date}",
+						"dossierPrior": "{count} prior submission(s)",
+						"votingTitle": "Staff Consensus & Interview",
+						"upvoteBtn": "Upvote ({count})",
+						"downvoteBtn": "Downvote ({count})",
+						"minVotesHint": "Requires {count} upvote(s) to approve",
+						"openInterviewBtn": "Open Discord Interview",
+						"closeInterviewBtn": "Close Interview",
+						"interviewActiveBadge": "Interview Active",
+						"clarifyTitle": "Follow-Up Clarifications",
+						"clarifyPlaceholder": "Ask the applicant a follow-up question...",
+						"sendClarifyBtn": "Send Question",
+						"clarifyPending": "Awaiting applicant reply...",
+						"internalNotesTitle": "Internal Staff Notes",
+						"internalNotesBadge": "Staff Only",
+						"internalNotesEmpty": "No internal staff notes yet.",
+						"internalNotesPlaceholder": "Write a private note for fellow reviewers...",
+						"addNoteBtn": "Add Note",
 						"answersTitle": "Submitted Responses",
 						"noAnswer": "No answer provided",
 						"reasonLabel": "Reviewer Note / Reason (Optional)",
@@ -6994,8 +7151,19 @@
 					"savedSuccess": "Application settings saved",
 					"saveError": "Failed to save application settings",
 					"positionSaved": "Position saved",
+					"positionDuplicated": "Position duplicated",
 					"positionDeleted": "Position deleted",
 					"panelPublished": "Apply panel published to Discord",
+					"panelUpdated": "Discord panel updated",
+					"panelDeleted": "Discord panel removed",
+					"panelsSynced": "Synced live Discord panels",
+					"pollPublished": "Native Discord poll published",
+					"voteSaved": "Staff vote updated",
+					"noteAdded": "Internal staff note added",
+					"clarificationSent": "Follow-up question sent to applicant",
+					"interviewOpened": "Opened Discord interview room",
+					"interviewClosed": "Closed interview room",
+					"exportedToast": "Exported {count} submissions",
 					"submissionApproved": "Application approved",
 					"submissionDenied": "Application denied",
 					"submissionDeleted": "Submission deleted"
@@ -7951,24 +8119,47 @@
 				"emptyPositionsTitle": "No Open Positions",
 				"emptyPositionsDesc": "There are no application positions configured on this server right now.",
 				"applyBtn": "Apply Now",
+				"voteBtn": "Vote Now",
 				"closedBtn": "Closed",
 				"ineligibleBadge": "Ineligible",
 				"eligibleBadge": "Eligible",
+				"anonymousNotice": "Anonymous Form: Your Discord username and avatar are hidden from reviewers.",
+				"draftSaving": "Saving draft...",
+				"draftSaved": "Draft auto-saved",
+				"conditionalBadge": "Conditional",
 				"mySubmissionsTitle": "Your Recent Submissions",
 				"mySubmissionsEmpty": "You have not submitted any applications in this server yet.",
 				"requiredTag": "Required",
 				"optionalTag": "Optional",
 				"submitBtn": "Submit Application",
+				"submitPollBtn": "Submit Response",
 				"submittedTitle": "Application Submitted!",
-				"submittedDesc": "Your application for \"{position}\" has been received (ID: #{id}).",
+				"submittedDesc": "Your submission for \"{position}\" has been received (ID: #{id}).",
 				"viewMySubmissionsBtn": "View All Server Positions",
 				"checkboxAgreeLabel": "Check to confirm",
 				"userInputPlaceholder": "Enter Discord username or user ID...",
+				"selectMemberPlaceholder": "Select a server member...",
 				"fileInputPlaceholder": "Paste file or portfolio URL (https://...)...",
+				"uploadFileBtn": "Upload Attachment",
+				"uploadingFile": "Uploading...",
+				"uploadHint": "Images, PDF, TXT, DOC/DOCX, or ZIP up to 8 MB (max 5 files)",
+				"removeFileBtn": "Remove",
 				"selectOptionPlaceholder": "Select an option...",
 				"selectMultiplePlaceholder": "Select one or more options...",
 				"selectRolePlaceholder": "Select a server role...",
 				"selectChannelPlaceholder": "Select a server channel...",
+				"withdrawBtn": "Withdraw",
+				"withdrawTitle": "Withdraw Application",
+				"withdrawDesc": "Are you sure you want to withdraw your application (#{id}) for \"{position}\"?",
+				"withdrawnToast": "Application withdrawn",
+				"answerClarifyBtn": "Answer Follow-Up",
+				"clarifyModalTitle": "Answer Reviewer Question",
+				"clarifyPromptLabel": "Reviewer Question",
+				"clarifyResponseLabel": "Your Response",
+				"clarifyResponsePlaceholder": "Type your clarification response...",
+				"submitClarifyBtn": "Send Response",
+				"clarifySentToast": "Clarification response sent!",
+				"interviewActiveNote": "Interview active in Discord",
 				"submittedToast": "Application submitted!"
 			}
 		},
@@ -8769,6 +8960,7 @@
 				"description": "Upload a new file to the private Vercel Blob store and create a MongoDB metadata record.",
 				"summaryNew": "Upload new media blob (multipart/form-data)",
 				"summaryScoped": "Upload or replace scoped media blob by ID",
+				"summaryYourApps": "Upload YourApps form attachment (limited privacy, max 8 MB)",
 				"contentType": "Content-Type",
 				"formFields": "Form Fields",
 				"fields": {
@@ -8949,7 +9141,8 @@
 					"guildsDesc": "Platform-wide guild profiles and institutional registration.",
 					"botsDesc": "Registered bot metadata, reviews, votes, and verification state.",
 					"exampleTitle": "Example: Query Global User & Level",
-					"settingsDesc": "Core system configuration and global event settings (such as Virtue Global XP multipliers)."
+					"settingsDesc": "Core system configuration and global event settings (such as Virtue Global XP multipliers).",
+					"errorsDesc": "Centralized service and bot error telemetry (core.error_logs) with SHA-256 fingerprint deduplication and 30-day TTL expiry."
 				},
 				"metamorphosis": {
 					"desc": "Metamorphosis bot profiles and integration hooks."
@@ -8958,12 +9151,13 @@
 					"desc": "Zodiac bot configurations and star sign telemetry."
 				},
 				"yourapps": {
-					"description": "Manages Discord-native server forms, guild profiles, persistent applicant drafts, and submission review workflows for <strong>YourApps</strong> (stored under the <code>guilds</code> database).",
-					"profilesDesc": "Guild setup profiles (guilds.profiles), bot presence, log/archive channels, role permissions, and active Apply panels.",
-					"formsDesc": "Application forms & positions (guilds.forms) with up to 25 typed questions, role rewards, and eligibility rules.",
-					"submissionsDesc": "Applicant submissions (guilds.submissions), question answers, review decisions, and Discord message references.",
-					"draftsDesc": "Auto-saved in-progress multi-step form drafts (guilds.drafts) scoped by guild, user, and form.",
-					"statsDesc": "Aggregated counts of open/total forms and pending/approved/denied submissions.",
+					"description": "Manages Discord-native server forms, polls, guild profiles, persistent applicant drafts, scheduled open/close windows, and collaborative review/interview workflows for <strong>YourApps</strong> (stored under the <code>guilds</code> database).",
+					"profilesDesc": "Guild setup profiles (guilds.profiles), bot presence, log/archive channels, interview settings, role permissions, and auto-synced Apply panels.",
+					"formsDesc": "Application forms, polls & positions (guilds.forms) with up to 25 conditional/validated questions, lifecycle role triggers, caps, and schedules.",
+					"submissionsDesc": "Applicant submissions (guilds.submissions), answers, staff votes, internal notes, clarifications, interviews, and Discord message references.",
+					"draftsDesc": "Auto-saved in-progress multi-step form drafts (guilds.drafts) synced across Discord Modals V2 and the Web Portal.",
+					"schedulesDesc": "Evaluates scheduled form open/close timestamps (opensAt / closesAt) and returns guilds requiring live Discord panel synchronization.",
+					"statsDesc": "Aggregated counts of open/total forms and pending/interview/clarification/approved/denied/withdrawn submissions.",
 					"exampleTitle": "Example: Fetch Open Server Forms"
 				}
 			},
@@ -9820,6 +10014,60 @@
 			"tokenSavedToast": "Vercel API credentials saved!",
 			"redeployTriggered": "Triggered Vercel redeploy for {name}!",
 			"redeployFailed": "Failed to trigger Vercel redeploy."
+		},
+		"errors": {
+			"navTitle": "Error Logs",
+			"stats": {
+				"openErrors": "Open Errors",
+				"fatalCount": "Fatal / Uncaught",
+				"occurrences": "Total Occurrences"
+			},
+			"filters": {
+				"searchPlaceholder": "Search error messages, stack traces, file paths, commands, or guild IDs...",
+				"allServices": "All Services",
+				"allLevels": "All Severities",
+				"allEnvironments": "All Environments"
+			},
+			"levels": {
+				"fatal": "Fatal",
+				"error": "Error",
+				"warn": "Warning"
+			},
+			"status": {
+				"open": "Open",
+				"resolved": "Resolved",
+				"all": "All Logs"
+			},
+			"actions": {
+				"livePoll": "Live Poll",
+				"refresh": "Refresh",
+				"resolveAll": "Resolve All",
+				"clearLogs": "Clear Logs",
+				"copyStack": "Copy Stack",
+				"openHaste": "Open in Haste",
+				"resolve": "Resolve",
+				"reopen": "Reopen",
+				"delete": "Delete"
+			},
+			"empty": {
+				"title": "No Error Logs Found",
+				"cleanDesc": "All monitored bots and background services are running cleanly with zero open errors.",
+				"searchDesc": "No error logs matched \"{query}\" under your current filters."
+			},
+			"confirmClear": {
+				"title": "Purge Service Error Logs",
+				"description": "Are you sure you want to permanently delete the matching error logs from the database? This action cannot be undone."
+			},
+			"toasts": {
+				"loadFailed": "Failed to load service error logs.",
+				"resolved": "Marked error log as resolved.",
+				"reopened": "Reopened error log.",
+				"resolvedAll": "Marked all open error logs as resolved!",
+				"deleted": "Deleted error log.",
+				"clearedAll": "Purged matching error logs!",
+				"copiedStack": "Copied stack trace to clipboard!",
+				"actionFailed": "Failed to update error log."
+			}
 		}
 	},
 	"haste": {

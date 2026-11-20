@@ -2,6 +2,26 @@
 
 # @xernerx/components
 
+## 0.19.1
+
+### Patch Changes
+
+- ## Shell IME Safety, Pill Geometry & Omnibar Updates
+  
+  Improved keyboard input safety, desktop bridge timeouts, badge rounding, and omnibar route indexing across shared shell components.
+  
+  ### Changed
+  
+  - **IME-Safe Enter & Pill Geometry**: Guarded `Enter` keydown handlers in `MediaModals` and `OverlayBotRunnerCard` against active IME composition and updated HTTP method badges to use `rounded-full`.
+  - **Desktop Bridge Timeouts & Sorting**: Replaced manual `AbortController` timers in `Header` with `AbortSignal.timeout()` and updated `MediaManager` sorting to `.toSorted()`.
+  - **Omnibar Routes**: Updated shared subdomain route entries in `omnibarRoutes.ts`.
+- Updated dependencies
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 0.19.0
 
 ### Minor Changes

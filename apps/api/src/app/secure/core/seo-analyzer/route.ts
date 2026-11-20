@@ -73,8 +73,6 @@ export async function GET(req: NextRequest) {
 
 		if (!isLocalTarget) {
 			try {
-				const controller = new AbortController();
-				const timeout = setTimeout(() => controller.abort(), 35000);
 				const mcpRes = await fetch(MCP_ANALYZE_ENDPOINT, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -86,9 +84,8 @@ export async function GET(req: NextRequest) {
 						competitors: '',
 					}),
 					cache: 'no-store',
-					signal: controller.signal,
+					signal: AbortSignal.timeout(35000),
 				});
-				clearTimeout(timeout);
 				if (mcpRes.ok) {
 					const json = await mcpRes.json().catch(() => null);
 					if (json?.homepage) {

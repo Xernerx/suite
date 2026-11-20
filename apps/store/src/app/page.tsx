@@ -426,6 +426,7 @@ export default function StorePage() {
 											onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
 											onKeyDown={(e) => {
 												if (e.key === 'Enter') {
+													if (e.nativeEvent.isComposing || e.keyCode === 229) return;
 													e.preventDefault();
 													handleApplyPromoCode();
 												}

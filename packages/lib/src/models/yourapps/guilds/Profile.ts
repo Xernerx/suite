@@ -14,6 +14,15 @@ const schema = new Schema(
 		blacklistRoles: { type: [String], default: [] },
 		dmNotifications: { type: Boolean, default: true },
 		threadPerSubmission: { type: Boolean, default: false },
+		selfReviewAllowed: { type: Boolean, default: false },
+		pollOnSubmission: { type: Boolean, default: false },
+		pollDurationHours: { type: Number, default: 48 },
+		interviewMode: {
+			type: String,
+			enum: ['thread', 'channel'],
+			default: 'thread',
+		},
+		interviewCategoryId: { type: String, default: null },
 		panels: {
 			type: [
 				{
@@ -24,7 +33,9 @@ const schema = new Schema(
 					description: { type: String, default: '' },
 					buttonLabel: { type: String, default: 'Apply Now' },
 					positionIds: { type: [String], default: [] },
+					autoSync: { type: Boolean, default: true },
 					createdAt: { type: Date, default: Date.now },
+					updatedAt: { type: Date, default: Date.now },
 				},
 			],
 			default: [],

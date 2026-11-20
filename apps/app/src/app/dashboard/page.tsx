@@ -243,7 +243,7 @@ function DashboardContent() {
 					const data = await guildRes.json();
 					if (cancelled) return;
 					setGuildConfig(data);
-					setOriginalGuildConfig(JSON.parse(JSON.stringify(data)));
+					setOriginalGuildConfig(structuredClone(data));
 				}
 
 				if (orgsRes.ok) {
@@ -292,7 +292,7 @@ function DashboardContent() {
 			if (res.ok) {
 				const updated = await res.json();
 				const merged = { ...guildConfig, ...updated };
-				setOriginalGuildConfig(JSON.parse(JSON.stringify(merged)));
+				setOriginalGuildConfig(structuredClone(merged));
 				setGuildConfig(merged);
 				mutateUser().catch(() => null);
 				toast({ title: t('common.toast.savedSuccess'), type: 'success' });
@@ -313,7 +313,7 @@ function DashboardContent() {
 
 	useEffect(() => {
 		if (activeTab === 'virtue' || activeTab === 'applications') return;
-		remind(isDirty, handleSaveConfig, () => setGuildConfig(JSON.parse(JSON.stringify(originalGuildConfig))), saving);
+		remind(isDirty, handleSaveConfig, () => setGuildConfig(structuredClone(originalGuildConfig)), saving);
 		return () => remind(false);
 	}, [activeTab, isDirty, saving, originalGuildConfig, remind, guildConfig, selectedGuild]);
 

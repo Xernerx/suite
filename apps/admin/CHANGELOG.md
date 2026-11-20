@@ -2,6 +2,26 @@
 
 # admin
 
+## 0.31.1
+
+### Patch Changes
+
+- ## Admin IME Safety & Modern Runtime Polish
+  
+  Improved international keyboard support in admin editors and modernized network timeouts and array sorting.
+  
+  ### Changed
+  
+  - **IME-Safe Enter Handling**: Guarded `Enter` keydown handlers in the Translations editor and Invite Permissions editor against active IME composition so CJK input confirmations never prematurely advance or submit.
+  - **Native Timeout & Sorting APIs**: Replaced manual `AbortController` timeout boilerplate with `AbortSignal.timeout()` across service health probes and modernized array sorting/reversing across token and user management panels.
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 0.31.0
 
 ### Minor Changes

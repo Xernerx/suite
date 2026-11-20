@@ -5,6 +5,92 @@ import { database } from '@xernerx/lib/core';
 
 const SIGN_IN_BONUS_AMOUNT = 1000;
 
+export function extractFilepathFromStack(stack?: string | null): string | null {
+	if (!stack || typeof stack !== 'string') return null;
+	const lines = stack
+		.split('\n')
+		.map((l) => l.trim())
+		.filter((l) => l.startsWith('at '));
+	const appLine = lines.find((l) => !l.includes('node:internal') && !l.includes('node_modules')) || lines[0];
+	if (!appLine) return null;
+	const match = appLine.match(/at\s+(?:.*\()?(.+?):(\d+):(\d+)\)?$/);
+	if (!match) return null;
+	const cleanFile = match[1].replace(/^file:\/\/\/?/i, '').replace(/\\/g, '/');
+	const shortPath = cleanFile.includes('/src/')
+		? `src/${cleanFile.split('/src/').pop()}`
+		: cleanFile.includes('/dist/')
+			? `dist/${cleanFile.split('/dist/').pop()}`
+			: cleanFile.split('/').slice(-3).join('/');
+	return `${shortPath}:${match[2]}:${match[3]}`;
+}
+
+export async function recordServiceErrorLog(body: any) {
+	const db = await database('xernerx');
+	const ErrorLogModel = (db.models.core as any)?.ErrorLog;
+	if (!ErrorLogModel) return null;
+
+	const rawService = String(body?.service || body?.serviceId || body?.id || 'unknown')
+		.trim()
+		.toLowerCase();
+	const service = rawService || 'unknown';
+
+	const rawEnv = String(body?.environment || process.env.ENVIRONMENT || process.env.NODE_ENV || 'production')
+		.trim()
+		.toLowerCase();
+	const environment: 'production' | 'canary' | 'development' = rawEnv === 'development' || rawEnv === 'dev' ? 'development' : rawEnv === 'canary' ? 'canary' : 'production';
+
+	const rawLevel = String(body?.level || 'error')
+		.trim()
+		.toLowerCase();
+	const level: 'error' | 'warn' | 'fatal' = rawLevel === 'warn' || rawLevel === 'warning' ? 'warn' : rawLevel === 'fatal' || rawLevel === 'critical' ? 'fatal' : 'error';
+
+	// Strip ANSI escape codes from terminal messages
+	const rawMessage = String(body?.message || 'Unknown error')
+		.replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '')
+		.trim();
+	const message = rawMessage.slice(0, 4000) || 'Unknown error';
+
+	const stack = body?.stack
+		? String(body.stack)
+				.replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '')
+				.slice(0, 16000)
+		: null;
+	const filepath = body?.filepath ? String(body.filepath).slice(0, 500) : extractFilepathFromStack(stack);
+	const meta = body?.meta && typeof body.meta === 'object' && !Array.isArray(body.meta) ? body.meta : {};
+
+	const fingerprintSource = `${service}:${environment}:${level}:${message.slice(0, 300)}:${filepath || ''}`;
+	const fingerprint = crypto.createHash('sha256').update(fingerprintSource).digest('hex');
+	const now = new Date();
+
+	const doc = await ErrorLogModel.findOneAndUpdate(
+		{ fingerprint, resolved: false },
+		{
+			$inc: { occurrences: 1 },
+			$set: {
+				lastSeenAt: now,
+				...(stack ? { stack } : {}),
+				...(filepath ? { filepath } : {}),
+				...(Object.keys(meta).length > 0 ? { meta } : {}),
+			},
+			$setOnInsert: {
+				id: crypto.randomUUID(),
+				service,
+				environment,
+				level,
+				message,
+				firstSeenAt: now,
+				resolved: false,
+			},
+		},
+		{
+			upsert: true,
+			returnDocument: 'after',
+		}
+	).lean();
+
+	return doc;
+}
+
 async function resolveDefaultJoinRoles(db: any): Promise<string[]> {
 	const candidateIds = new Set<string>();
 	try {
@@ -202,6 +288,10 @@ async function getModel(action: string) {
 		case 'setting':
 			return (db.models.core as any)?.Setting;
 
+		case 'errors':
+		case 'error':
+			return (db.models.core as any)?.ErrorLog;
+
 		default:
 			return null;
 	}
@@ -233,6 +323,8 @@ function getFilter(action: string, body: any) {
 		case 'bot':
 		case 'settings':
 		case 'setting':
+		case 'errors':
+		case 'error':
 			return {
 				id: body.id,
 			};
@@ -243,6 +335,58 @@ function getFilter(action: string, body: any) {
 }
 
 export default async function Server(msg: any) {
+	if (msg.action === 'errors' || msg.action === 'error') {
+		const db = await database('xernerx');
+		const ErrorLogModel = (db.models.core as any)?.ErrorLog;
+		if (!ErrorLogModel) throw new Error('ErrorLog model unavailable');
+
+		if (msg.method === 'create') {
+			return await recordServiceErrorLog(msg.body);
+		}
+
+		if (msg.method === 'get') {
+			const filter: Record<string, any> = {};
+			if (msg.body?.id) filter.id = String(msg.body.id);
+			if (msg.body?.service) filter.service = String(msg.body.service).toLowerCase();
+			if (msg.body?.environment) filter.environment = String(msg.body.environment).toLowerCase();
+			if (msg.body?.level) filter.level = String(msg.body.level).toLowerCase();
+			if (typeof msg.body?.resolved === 'boolean') filter.resolved = msg.body.resolved;
+			const limit = Math.min(500, Math.max(1, Number(msg.body?.limit) || 100));
+			const items = await ErrorLogModel.find(filter).sort({ lastSeenAt: -1 }).limit(limit).lean();
+			return { data: items };
+		}
+
+		if (msg.method === 'update') {
+			const resolved = msg.body?.resolved !== false;
+			if (msg.body?.all) {
+				const filter: Record<string, any> = {};
+				if (msg.body?.service) filter.service = String(msg.body.service).toLowerCase();
+				await ErrorLogModel.updateMany(filter, {
+					$set: { resolved, resolvedAt: resolved ? new Date() : null },
+				});
+				return { success: true };
+			}
+			const updated = await ErrorLogModel.findOneAndUpdate(
+				{ id: String(msg.body?.id || '') },
+				{ $set: { resolved, resolvedAt: resolved ? new Date() : null } },
+				{ returnDocument: 'after' }
+			).lean();
+			return updated || { success: false };
+		}
+
+		if (msg.method === 'delete') {
+			if (msg.body?.all) {
+				const filter: Record<string, any> = {};
+				if (msg.body?.service) filter.service = String(msg.body.service).toLowerCase();
+				if (msg.body?.resolvedOnly) filter.resolved = true;
+				await ErrorLogModel.deleteMany(filter);
+				return { success: true };
+			}
+			const deleted = await ErrorLogModel.findOneAndDelete({ id: String(msg.body?.id || '') }).lean();
+			return deleted || { success: true };
+		}
+	}
+
 	const model = await getModel(msg.action);
 
 	if (!model) {

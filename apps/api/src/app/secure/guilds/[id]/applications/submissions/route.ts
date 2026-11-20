@@ -3,6 +3,8 @@
 import { NextResponse } from 'next/server';
 import { database } from '@xernerx/lib/server';
 
+const VALID_STATUSES = ['pending', 'interview', 'needs_info', 'approved', 'denied', 'withdrawn'];
+
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
 	try {
 		const { id } = await params;
@@ -18,25 +20,40 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 		}
 
 		const query: Record<string, any> = { guild: id };
-		if (status && ['pending', 'approved', 'denied', 'withdrawn'].includes(status)) {
+		if (status && VALID_STATUSES.includes(status)) {
 			query.status = status;
 		}
 		if (positionId) {
 			query.positionId = positionId;
 		}
 
-		const [items, pending, approved, denied, total] = await Promise.all([
+		const [rawItems, pending, interview, needsInfo, approved, denied, withdrawn, total] = await Promise.all([
 			SubmissionModel.find(query).sort({ createdAt: -1 }).limit(limit).lean(),
 			SubmissionModel.countDocuments({ guild: id, status: 'pending' }),
+			SubmissionModel.countDocuments({ guild: id, status: 'interview' }),
+			SubmissionModel.countDocuments({ guild: id, status: 'needs_info' }),
 			SubmissionModel.countDocuments({ guild: id, status: 'approved' }),
 			SubmissionModel.countDocuments({ guild: id, status: 'denied' }),
+			SubmissionModel.countDocuments({ guild: id, status: 'withdrawn' }),
 			SubmissionModel.countDocuments({ guild: id }),
 		]);
+
+		const items = (rawItems || []).map((item: any) => {
+			if (item.anonymous) {
+				return {
+					...item,
+					userId: 'anonymous',
+					userTag: 'Anonymous Respondent',
+					userAvatar: '',
+				};
+			}
+			return item;
+		});
 
 		return NextResponse.json(
 			{
 				items,
-				counts: { pending, approved, denied, total },
+				counts: { pending, interview, needsInfo, approved, denied, withdrawn, total },
 			},
 			{ status: 200 }
 		);

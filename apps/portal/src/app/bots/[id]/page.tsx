@@ -117,13 +117,11 @@ export default function PortalBotPage() {
 						hooks: hooksData,
 					});
 					setOriginalBotConfig(
-						JSON.parse(
-							JSON.stringify({
-								...data,
-								links: data.links || {},
-								hooks: hooksData,
-							})
-						)
+						structuredClone({
+							...data,
+							links: data.links || {},
+							hooks: hooksData,
+						})
 					);
 				} else {
 					router.push('/');
@@ -254,7 +252,7 @@ export default function PortalBotPage() {
 							window.location.reload();
 						} else {
 							setBotConfig(nextBotConfig);
-							setOriginalBotConfig(JSON.parse(JSON.stringify(nextBotConfig)));
+							setOriginalBotConfig(structuredClone(nextBotConfig));
 						}
 					} else {
 						let errorMessage = t('common.toast.saveFailed');
@@ -275,7 +273,7 @@ export default function PortalBotPage() {
 			};
 
 			const handleReset = () => {
-				setBotConfig(JSON.parse(JSON.stringify(originalBotConfig)));
+				setBotConfig(structuredClone(originalBotConfig));
 			};
 
 			remind(true, handleSave, handleReset, saving);

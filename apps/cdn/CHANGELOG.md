@@ -2,6 +2,28 @@
 
 # cdn
 
+## 1.5.0
+
+### Minor Changes
+
+- ## YourApps Form Attachment Uploads
+  
+  Added limited-privacy file upload support for YourApps application form attachments.
+  
+  ### Added
+  
+  - **YourApps Upload Endpoint**: Added attachment uploads for YourApps forms stored under limited privacy so only authorized reviewers and direct-link holders can access submitted files.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 1.4.13
 
 ### Patch Changes

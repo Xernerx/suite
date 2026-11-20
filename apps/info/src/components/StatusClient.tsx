@@ -105,10 +105,7 @@ export default function StatusClient() {
 							const targetUrl = getEnvUrl(`https://${probeHost}/api/version`);
 							const start = performance.now();
 							try {
-								const controller = new AbortController();
-								const timeout = setTimeout(() => controller.abort(), 5000);
-								const res = await fetch(targetUrl, { signal: controller.signal, cache: 'no-store' });
-								clearTimeout(timeout);
+								const res = await fetch(targetUrl, { signal: AbortSignal.timeout(5000), cache: 'no-store' });
 								if (res.ok) {
 									ping = Math.round(performance.now() - start);
 									const data = await res.json().catch(() => ({}));

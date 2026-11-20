@@ -44,9 +44,9 @@ export async function GET() {
 - **Official Invite Link**: https://www.xernerx.com/invites/yourapps
 - **Server Configuration Dashboard**: https://app.xernerx.com/dashboard?tab=applications
 - **Key Capabilities**:
-  1. **Discord Modals V2 & Web Application Portal**: Supports all 13 question types (short text, paragraph, number, dropdown, radio group, multi-select checkbox group, custom Yes/No boolean, checkbox, user, role, channel, mentionable, and file upload) both natively inside Discord Modals V2 and on the web at \`https://app.xernerx.com/servers/[id]/applications/[appId]\`.
+  1. **Discord Modals V2 & Conditional Web Application Portal**: Supports all 13 question types (short text, paragraph, number, dropdown, radio group, multi-select checkbox group, custom Yes/No boolean, checkbox, user, role, channel, mentionable, and file upload via \`cdn.xernerx.com/yourapps/upload\`) with conditional skip logic, regex/min/max validation, scheduled open/close windows, submission/spot caps, and anonymous poll/feedback mode both natively inside Discord Modals V2 and on the web at \`https://app.xernerx.com/servers/[id]/applications/[appId]\`.
   2. **Zero Message Content & WebSocket-Only Persistence**: Connects solely with \`Guilds\` and \`GuildMessages\` intents (never \`MessageContent\`) and zero direct database drivers, routing all form, draft, and submission persistence over the authenticated \`@xernerx/websocket\` gateway.
-  3. **Components V2 Reviewer Queue & Automated Role Rewards**: Staff review submissions in Discord (\`/review\`, \`/submissions\`) or in the Dashboard, triggering automatic reward/removal role synchronization, DM notifications, and archive logging.
+  3. **Components V2 Panels, Consensus Queue & Interview Rooms**: Auto-syncs live Components V2 Apply panels in Discord channels while staff evaluate submissions in Discord (\`/review\`, \`/submissions\`) or in the Dashboard with upvote/downvote consensus thresholds, internal notes, applicant follow-up clarifications, 1-click private interview threads/channels, native Discord polls, and hierarchy-safe role rewards.
 
 ### 2.3 To-Do List Bot — Task Boards & Productivity Discord Bot
 - **Canonical Bot Profile**: https://app.xernerx.com/bots/todo (Discord Application ID: \`782105629572464652\`)

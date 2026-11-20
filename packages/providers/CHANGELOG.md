@@ -2,6 +2,22 @@
 
 # @xernerx/providers
 
+## 0.24.3
+
+### Patch Changes
+
+- ## Modal IME Safety, Accent Contrast & Modern Grouping
+  
+  Improved keyboard composition safety, monochrome accent legibility, and modern JS usage in global providers.
+  
+  ### Changed
+  
+  - **IME-Safe Modal Navigation**: Guarded `Enter` keydown handlers in `CommandPaletteModal` and `NavigationModal` against active IME composition (`isComposing` / `keyCode === 229`).
+  - **Monochrome Accent Contrast**: Updated the unsaved-changes Save button and spinner in `ToastProvider` to use `text-(--accent-contrast)` and `border-current`.
+  - **Modern Web APIs**: Switched `NavigationModal` category grouping to `Object.groupBy()` and `CommandPaletteModal` desktop bridge calls to `AbortSignal.timeout()`.
+- Updated dependencies
+  - @xernerx/lib@1.29.0
+
 ## 0.24.2
 
 ### Patch Changes

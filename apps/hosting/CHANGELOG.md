@@ -2,6 +2,32 @@
 
 # Changelog
 
+## 1.4.0
+
+### Minor Changes
+
+- ## Staff Error Logs Console & Health Probe Cleanup
+  
+  Added a dedicated error log viewer to the staff hosting portal and simplified node reachability timeouts.
+  
+  ### Added
+  
+  - **Error Logs View**: Added `/errors` with the interactive `HostingErrorLogsPanel` for inspecting and filtering suite runtime error logs across services.
+  
+  ### Changed
+  
+  - **Node Reachability Probes**: Replaced manual `AbortController` timers in `HostingConsole` with `AbortSignal.timeout()`.
+
+### Patch Changes
+
+- Updated dependencies
+  - @xernerx/components@0.19.1
+  - @xernerx/lib@1.29.0
+  - @xernerx/providers@0.24.3
+  - @xernerx/styles@0.4.4
+  - @xernerx/ui@0.10.1
+  - @xernerx/feedback@0.7.1
+
 ## 1.3.16
 
 ### Patch Changes
